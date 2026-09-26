@@ -319,4 +319,4 @@ current_state:
   - the F-14 pocket retarget (statistically null - BUG-296)
   - any PASS-only frame as an epistemic frame (it is a ROLE frame)
   - the golden retrieval set as ground truth (ids chosen from live search output)
-open_bugs_n: 77
+open_bugs_n: 128

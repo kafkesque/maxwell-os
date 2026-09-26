@@ -2,13 +2,12 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**98 open** / 91 closed of 189 ids.
+**128 open** / 156 closed of 284 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
 |---|---|---|
 | BUG-253 | reasoning models scored 0 under a small max_tokens budget (harness artifact, NOT model failure) | 1 |
-| BUG-254 | oMLX model registry is startup-cached; the fix is POST /admin/api/reload, not a GUI restart | 1 |
 | BUG-255 | `POST /admin/api/reload` swaps the single resident model and silently wedges an in-flight benchmark | 1 |
 | BUG-257 | the niah top tier exceeded oMLX's context window, making it unmeasurable | 2 |
 | BUG-258 | model_eval_report.py counted transport errors as model failures (CORRUPTED THE DELIVERABLE TABLE) | 1 |
@@ -23,17 +22,12 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-273 | the domains axis violates its own cardinality contract (2026-09-17) | 1 |
 | BUG-274 | the `related_fbs` graph is 56.8% asymmetric (2026-09-17) | 1 |
 | BUG-275 | LINK is unenforceable at retrieval, and both facets are unindexed (2026-09-17) | 1 |
-| BUG-276 | the C13 safety net is DEAD, and nothing backs up the DB (2026-09-17) | 1 |
 | BUG-277 | the content_type axis mixes two vocabularies, and the docs say "7 values" (2026-09-17) | 1 |
 | BUG-278 | stage 5 treats "unverifiable" as "untrue", and never persists which one it was (2026-09-19) | 1 |
 | BUG-279 | the production classifier is instructed to FREE-GENERATE labels, contradicting its own docstring and D316 (2026-09-19) | 1 |
 | BUG-280 | `content_type` (ROLE) is functionally single-valued in production, and `depth` is undefined without it (2026-09-19) | 1 |
 | BUG-281 | `noise_drop` fuses two different questions; there is no relevance axis (2026-09-19) | 1 |
 | BUG-282 | the schema is 53% dead, and the dead columns are the instrumentation (2026-09-19) | 1 |
-| BUG-283 | the ruler scorer accepted only integer indices and would have crashed on the first real sheet (2026-09-19) | 1 |
-| BUG-284 | the tooling kept reporting a RULED question as an open defect, and the ruler validator failed a decided sheet (2026-09-19) | 1 |
-| BUG-285 | the discipline/domain/depth filters do not constrain the hybrid result set (2026-09-19) | 1 |
-| BUG-286 | the write guard destroys the label that D-271a ruled legal (2026-09-19) | 1 |
 | BUG-287 | graph expansion re-admits the 3,250 quarantined rows it was meant to hide (2026-09-19) | 1 |
 | BUG-288 | the retrieval corpus is 11.1% of the knowledge, and `source_text` is not source (2026-09-19) | 1 |
 | BUG-289 | `source_diversity` counts FILENAMES, not works: 29.1% of "convergence" is duplicate ingestion (2026-09-19) | 1 |
@@ -79,8 +73,6 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-376 | (HIGH — OPEN, OWNER GATE = C-3): a completed S5 run's declared input was rewritten after the run, and the image is gone | 2 |
 | BUG-377 | (LOW-MED — OPEN 2026-09-23, found by the session-18 audit): pidfiles that outlive their pid, one of them recycled | 1 |
 | BUG-378 | (LOW-MED — OPEN 2026-09-23, found by the session-20 audit): repository hygiene drift | 1 |
-| BUG-379 |  | 1 |
-| BUG-380 |  | 1 |
 | BUG-381 |  | 1 |
 | BUG-382 |  | 1 |
 | BUG-389 | MED - Two verdicts were derived from checks that could not resolve what they were checking (BUG-375 class), and both were WRONG: (a) 'rerank | 1 |
@@ -105,3 +97,41 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-431 | ANCHOR-4 FORM column was refreshed from ruler_raw, so the sheet's declared 1-4 menu is not what it holds (2026-09-24, MED, OPEN) | 1 |
 | BUG-432 | INSTANCE 2 (2026-09-24): the tracked sheet's whole CONTEXT block is also pre-consolidation, so the | 3 |
 | BUG-433 | a committed artifact was clobbered by an out-of-band writer 3 hours later, silently (2026-09-24, HIGH, OPEN) | 1 |
+| BUG-448 | OPEN - the depth and domain axes had no consistency contract (existence gap, not a regression) | 1 |
+| BUG-450 | OPEN - the FORM (extraction_type) axis carries 150 labels with VOID rater provenance | 2 |
+| BUG-451 | OPEN - MEASURED: FORM (1-4) has ZERO discriminative power for depth-class-1 admission | 1 |
+| BUG-452 | OPEN - the FORM panel is raw-agreement only, and it is 2 of 4 models | 1 |
+| BUG-454 | OPEN - the token `flags` names two different things; the flag-consumer rail cannot see the new consumer | 1 |
+| BUG-455 | OPEN - the archive index has NO content identity: same-size corruption and duplication are both invisible | 1 |
+| BUG-456 | OPEN - the S4 "rolling" backup held 6 byte-identical slots: one recovery point, six names | 1 |
+| BUG-462 | OPEN - the declared agreement floor (D-373) has no consumer | 2 |
+| BUG-464 | OPEN - a bookkeeping column that reads as 192 open items when 4 cells are open | 1 |
+| BUG-465 | OPEN - a blank cell carries four meanings and the contract can only see one | 2 |
+| BUG-466 | OPEN - 148 adjudicated rows against a declared 150-row cohort, with no exclusion rule | 1 |
+| BUG-468 | OPEN - a digest recorded in prose for a live file that has since been written | 1 |
+| BUG-475 | OPEN (pipeline-side, needs owner ack) - a path constant bound at import cannot be isolated | 1 |
+| BUG-477 | OPEN - the FORM coder columns are `label (margin)` strings, and `owner_form` is declared but empty | 1 |
+| BUG-478 | OPEN (severity HIGH) - the only declared panel ingester REWRITES the ANCHOR-4 workbook and blanks the owner's adjudicated cells | 1 |
+| BUG-480 | OPEN (severity MEDIUM) - the CLAIM-SHAPE gate is a perfect screen and a weak classifier: 10/11, not shippable | 1 |
+| BUG-481 | OPEN (severity MED) - the machine register over-reports: 8 bugs carrying an explicit status field in the body are still counted OPEN | 1 |
+| BUG-482 | OPEN (severity MED) - three checks built this week are invoked by nothing, so they cannot report | 1 |
+| BUG-484 | OPEN | 1 |
+| BUG-487 | OPEN (owner gate) | 3 |
+| BUG-500 | (CONFIRMED, systemic) — a Dropbox conflicted copy is silent drift, not a merge conflict | 1 |
+| BUG-503 | OPEN - a live recipe would add 8 abandoned D2205 columns (incl. a 4th epistemic column) to the governed store | 2 |
+| BUG-511 | (OPEN in two orphan readers) — a reader that GUESSES an encoding does not crash, it silently changes text | 1 |
+| BUG-514 | (OPEN) — three readers still decide an encoding by GUESS | 1 |
+| BUG-516 | (OPEN, root cause of BUG-514) — the decode rule had NO home: NINE copies, three vocabularies | 2 |
+| BUG-520 | (DETECTOR LANDED 2026-09-26) - a silent repair is not a protection from crashing; it is a protection from NOTICING | 1 |
+| BUG-521 | (MEASURED 2026-09-26) - an encoding the ENVIRONMENT decides is UNDECLARED: 393 sites in 166 modules, and no rail could see them | 1 |
+| BUG-523 | (OPEN - found 2026-09-26 only because a human asked "what exactly must I ratify in D-2650?") - the reserved-fixture rule covered the TOKEN a | 1 |
+| BUG-524 | (OPEN 2026-09-26) - the STORES and COLUMNS axes had NO machine: two rails land, and their own controls found 3 defects in the rails themselv | 1 |
+| BUG-525 | (OPEN 2026-09-26) - the AMBIGUOUS-DECLARATION class: a key declared twice in one mapping is SILENTLY last-wins, and no rail could see it | 1 |
+| BUG-526 | (OPEN 2026-09-26) - the pin invariant had a SCAN and no WRITE moment: a pinned artifact could be edited and committed with nothing consultin | 1 |
+| BUG-527 | (OPEN 2026-09-26) - the staged-reading rails audit whichever index the ENVIRONMENT names, not the one being committed | 1 |
+| BUG-528 | (OPEN 2026-09-26) - will_not_touch matches NAMES, so a Dropbox-renamed sibling of a protected artifact is out of scope; one such copy is ALR | 1 |
+| BUG-529 | (OPEN 2026-09-26) - .pre-commit-config.yaml declares a C11/C12 gate that NOTHING invokes, and the hook slot has exactly ONE occupant | 1 |
+| BUG-532 | (OPEN 2026-09-26) - one lock, two homes: the session plan RESTATED the owner-instrument lock that a rail already checks | 1 |
+| BUG-537 | (MED - PROPOSED D-2653, OPEN 2026-09-26): regenerating archive/index.yaml de-listed a hygiene entry, so the rail's own remedy may be a silen | 1 |
+| BUG-542 | (MEDIUM - MITIGATED, REMEDY OWED 2026-09-26): the silent-repair allowlist is keyed by LINE NUMBER, so a mechanical edit becomes a FALSE FAIL | 2 |
+| BUG-545 | (MEDIUM - OPEN, MEASURED 2026-09-26): 17 of the 60 rails the health ladder invokes are NOT tracked by git - the control plane has no history | 1 |

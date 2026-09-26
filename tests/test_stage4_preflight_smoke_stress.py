@@ -39,6 +39,40 @@ from typing import Any
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
+
+def _stage_run_dir(stage: str, run_id: str) -> Path:
+    """The stage/{run_id} dir of a smoke run, resolved from the ONE path home.
+
+    WHY (BUG-546): a hand-built ROOT/"knowledge pipeline"/... path cannot be
+    redirected by MAXWELL_PIPELINE_ROOT, so a smoke test that WIPES its own run dir
+    wipes inside the LIVE production tree - which is how the S4 smoke dirs (and the
+    Dropbox conflicted siblings next to them) were deleted on 2026-09-26.
+    """
+    from pipeline import pipeline_paths as pp
+
+    bases = {"stage2_extract": pp.S2_DIR, "stage4_merge": pp.S4_DIR}
+    if stage not in bases:
+        raise AssertionError(f"{stage} has no declared stage dir (BUG-546)")
+    return Path(bases[stage]) / run_id
+
+
+def _rmtree_declared_test_run(path: Path) -> None:
+    """Delete a test-owned run dir ONLY when its run id is DECLARED test scratch.
+
+    Fails closed (BUG-546): an undeclared run id is REFUSED, so this helper cannot
+    delete a production run dir even if a caller passes one by mistake.
+    """
+    import fnmatch
+    import shutil
+
+    import yaml
+
+    cfg_file = ROOT / "config" / "test_isolation.yaml"
+    globs = list(yaml.safe_load(cfg_file.read_text(encoding="utf-8"))["allowed_run_id_globs"])
+    if not any(fnmatch.fnmatch(path.name, g) for g in globs):
+        raise AssertionError(f"REFUSED: {path} is not a declared test run id {globs} (BUG-546)")
+    shutil.rmtree(path)
+
 import pytest
 
 from pipeline.pipeline_paths import (
@@ -75,8 +109,11 @@ SYN = get_synonym_index()
 def test_depth_frugal_is_off() -> None:
     """D2354 must stay OFF — gpt-oss is superior for depth (gemma only when ON)."""
     assert S4_DEPTH_FRUGAL_ENABLED is False
-    # When frugal is OFF, the depth model must NOT be selected by S4.
-    assert S4_DEPTH_MODEL == "gemma-4-E4B-it-MLX-4bit"  # config default (unused while OFF)
+    # BUG-403/405 Gate D + D2454: the config key is DELIBERATELY null and pipeline_paths.py carries NO code
+    # default (the literal this test used to assert names a model refuted by measurement). The honest
+    # assertion is the state we are in: UNSET while OFF. BUG-470 - this assertion was stale at HEAD and no
+    # rail ran the suite, so a red test looked green for a whole pass.
+    assert S4_DEPTH_MODEL == ""  # UNSET: depth_model: null in config/pipeline_config.yaml
 
 
 def test_model_routing_r5_compliant() -> None:
@@ -320,14 +357,15 @@ def _stage_smoke_s2(run_id: str, picks: list[dict[str, Any]], inject_application
     MAXWELL_RUN_ID controls BOTH the S2 read path and the S4 write path, so a
     clean smoke run needs its own stage2_extract/{run_id}/checkpoint.jsonl.
     """
-    s2_dir = ROOT / "knowledge pipeline" / "stage2_extract" / run_id
+    s2_dir = _stage_run_dir("stage2_extract", run_id)
     s2_dir.mkdir(parents=True, exist_ok=True)
     # Wipe any prior S4 checkpoint for this run_id (test isolation: a leftover
     # checkpoint would trigger resume and skip everything, silently passing).
-    s4_dir = ROOT / "knowledge pipeline" / "stage4_merge" / run_id
+    # BUG-546: the path is resolved through pipeline_paths and the delete is REFUSED
+    # unless the run id is declared test scratch in config/test_isolation.yaml.
+    s4_dir = _stage_run_dir("stage4_merge", run_id)
     if s4_dir.exists():
-        import shutil
-        shutil.rmtree(s4_dir)
+        _rmtree_declared_test_run(s4_dir)
     rows = []
     for p in picks:
         rec = dict(p)
@@ -344,7 +382,7 @@ def _stage_smoke_s2(run_id: str, picks: list[dict[str, Any]], inject_application
 
 def _pick_diverse_s2() -> dict[str, dict[str, Any]]:
     """Return one representative per content_type from the real S2 checkpoint."""
-    s2 = ROOT / "knowledge pipeline" / "stage2_extract" / "t11" / "checkpoint.jsonl"
+    s2 = _stage_run_dir("stage2_extract", "t11") / "checkpoint.jsonl"
     rows = [json.loads(l) for l in open(s2, encoding="utf-8") if l.strip()]
     picks: dict[str, dict[str, Any]] = {}
     for r in rows:
@@ -406,7 +444,7 @@ def test_smoke_diverse_batch_writes_checkpoint_and_routes(tmp_path: Path) -> Non
     # too. The FB still flows if application present + name/definition valid.
     out = r.stdout + r.stderr
     # S4 checkpoint dir must exist under the smoke run_id.
-    s4_dir = ROOT / "knowledge pipeline" / "stage4_merge" / run_id
+    s4_dir = _stage_run_dir("stage4_merge", run_id)
     ckpt = s4_dir / "checkpoint.jsonl"
     assert ckpt.exists(), f"S4 checkpoint missing. stdout:\n{out}"
     written = [json.loads(l) for l in open(ckpt, encoding="utf-8") if l.strip()]
@@ -480,7 +518,7 @@ def test_smoke_live_cribs_contract(tmp_path: Path) -> None:
     out = r.stdout + r.stderr
     assert r.returncode == 0, f"S4 live smoke failed:\n{out}"
 
-    ckpt = ROOT / "knowledge pipeline" / "stage4_merge" / run_id / "checkpoint.jsonl"
+    ckpt = _stage_run_dir("stage4_merge", run_id) / "checkpoint.jsonl"
     assert ckpt.exists(), f"no checkpoint written:\n{out}"
     written = [json.loads(l) for l in open(ckpt, encoding="utf-8") if l.strip()]
     assert written, "no FBs written in live smoke"

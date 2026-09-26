@@ -2,20 +2,15 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 189,
-  "open_n": 98,
-  "closed_n": 91,
+  "total_ids": 284,
+  "open_n": 128,
+  "closed_n": 156,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
     {
       "id": "BUG-253",
       "title": "reasoning models scored 0 under a small max_tokens budget (harness artifact, NOT model failure)",
-      "events": 1
-    },
-    {
-      "id": "BUG-254",
-      "title": "oMLX model registry is startup-cached; the fix is POST /admin/api/reload, not a GUI restart",
       "events": 1
     },
     {
@@ -89,11 +84,6 @@
       "events": 1
     },
     {
-      "id": "BUG-276",
-      "title": "the C13 safety net is DEAD, and nothing backs up the DB (2026-09-17)",
-      "events": 1
-    },
-    {
       "id": "BUG-277",
       "title": "the content_type axis mixes two vocabularies, and the docs say \"7 values\" (2026-09-17)",
       "events": 1
@@ -121,26 +111,6 @@
     {
       "id": "BUG-282",
       "title": "the schema is 53% dead, and the dead columns are the instrumentation (2026-09-19)",
-      "events": 1
-    },
-    {
-      "id": "BUG-283",
-      "title": "the ruler scorer accepted only integer indices and would have crashed on the first real sheet (2026-09-19)",
-      "events": 1
-    },
-    {
-      "id": "BUG-284",
-      "title": "the tooling kept reporting a RULED question as an open defect, and the ruler validator failed a decided sheet (2026-09-19)",
-      "events": 1
-    },
-    {
-      "id": "BUG-285",
-      "title": "the discipline/domain/depth filters do not constrain the hybrid result set (2026-09-19)",
-      "events": 1
-    },
-    {
-      "id": "BUG-286",
-      "title": "the write guard destroys the label that D-271a ruled legal (2026-09-19)",
       "events": 1
     },
     {
@@ -369,16 +339,6 @@
       "events": 1
     },
     {
-      "id": "BUG-379",
-      "title": "",
-      "events": 1
-    },
-    {
-      "id": "BUG-380",
-      "title": "",
-      "events": 1
-    },
-    {
       "id": "BUG-381",
       "title": "",
       "events": 1
@@ -497,14 +457,210 @@
       "id": "BUG-433",
       "title": "a committed artifact was clobbered by an out-of-band writer 3 hours later, silently (2026-09-24, HIGH, OPEN)",
       "events": 1
+    },
+    {
+      "id": "BUG-448",
+      "title": "OPEN - the depth and domain axes had no consistency contract (existence gap, not a regression)",
+      "events": 1
+    },
+    {
+      "id": "BUG-450",
+      "title": "OPEN - the FORM (extraction_type) axis carries 150 labels with VOID rater provenance",
+      "events": 2
+    },
+    {
+      "id": "BUG-451",
+      "title": "OPEN - MEASURED: FORM (1-4) has ZERO discriminative power for depth-class-1 admission",
+      "events": 1
+    },
+    {
+      "id": "BUG-452",
+      "title": "OPEN - the FORM panel is raw-agreement only, and it is 2 of 4 models",
+      "events": 1
+    },
+    {
+      "id": "BUG-454",
+      "title": "OPEN - the token `flags` names two different things; the flag-consumer rail cannot see the new consumer",
+      "events": 1
+    },
+    {
+      "id": "BUG-455",
+      "title": "OPEN - the archive index has NO content identity: same-size corruption and duplication are both invisible",
+      "events": 1
+    },
+    {
+      "id": "BUG-456",
+      "title": "OPEN - the S4 \"rolling\" backup held 6 byte-identical slots: one recovery point, six names",
+      "events": 1
+    },
+    {
+      "id": "BUG-462",
+      "title": "OPEN - the declared agreement floor (D-373) has no consumer",
+      "events": 2
+    },
+    {
+      "id": "BUG-464",
+      "title": "OPEN - a bookkeeping column that reads as 192 open items when 4 cells are open",
+      "events": 1
+    },
+    {
+      "id": "BUG-465",
+      "title": "OPEN - a blank cell carries four meanings and the contract can only see one",
+      "events": 2
+    },
+    {
+      "id": "BUG-466",
+      "title": "OPEN - 148 adjudicated rows against a declared 150-row cohort, with no exclusion rule",
+      "events": 1
+    },
+    {
+      "id": "BUG-468",
+      "title": "OPEN - a digest recorded in prose for a live file that has since been written",
+      "events": 1
+    },
+    {
+      "id": "BUG-475",
+      "title": "OPEN (pipeline-side, needs owner ack) - a path constant bound at import cannot be isolated",
+      "events": 1
+    },
+    {
+      "id": "BUG-477",
+      "title": "OPEN - the FORM coder columns are `label (margin)` strings, and `owner_form` is declared but empty",
+      "events": 1
+    },
+    {
+      "id": "BUG-478",
+      "title": "OPEN (severity HIGH) - the only declared panel ingester REWRITES the ANCHOR-4 workbook and blanks the owner's adjudicated cells",
+      "events": 1
+    },
+    {
+      "id": "BUG-480",
+      "title": "OPEN (severity MEDIUM) - the CLAIM-SHAPE gate is a perfect screen and a weak classifier: 10/11, not shippable",
+      "events": 1
+    },
+    {
+      "id": "BUG-481",
+      "title": "OPEN (severity MED) - the machine register over-reports: 8 bugs carrying an explicit status field in the body are still counted OPEN",
+      "events": 1
+    },
+    {
+      "id": "BUG-482",
+      "title": "OPEN (severity MED) - three checks built this week are invoked by nothing, so they cannot report",
+      "events": 1
+    },
+    {
+      "id": "BUG-484",
+      "title": "OPEN",
+      "events": 1
+    },
+    {
+      "id": "BUG-487",
+      "title": "OPEN (owner gate)",
+      "events": 3
+    },
+    {
+      "id": "BUG-500",
+      "title": "(CONFIRMED, systemic) \u2014 a Dropbox conflicted copy is silent drift, not a merge conflict",
+      "events": 1
+    },
+    {
+      "id": "BUG-503",
+      "title": "OPEN - a live recipe would add 8 abandoned D2205 columns (incl. a 4th epistemic column) to the governed store",
+      "events": 2
+    },
+    {
+      "id": "BUG-511",
+      "title": "(OPEN in two orphan readers) \u2014 a reader that GUESSES an encoding does not crash, it silently changes text",
+      "events": 1
+    },
+    {
+      "id": "BUG-514",
+      "title": "(OPEN) \u2014 three readers still decide an encoding by GUESS",
+      "events": 1
+    },
+    {
+      "id": "BUG-516",
+      "title": "(OPEN, root cause of BUG-514) \u2014 the decode rule had NO home: NINE copies, three vocabularies",
+      "events": 2
+    },
+    {
+      "id": "BUG-520",
+      "title": "(DETECTOR LANDED 2026-09-26) - a silent repair is not a protection from crashing; it is a protection from NOTICING",
+      "events": 1
+    },
+    {
+      "id": "BUG-521",
+      "title": "(MEASURED 2026-09-26) - an encoding the ENVIRONMENT decides is UNDECLARED: 393 sites in 166 modules, and no rail could see them",
+      "events": 1
+    },
+    {
+      "id": "BUG-523",
+      "title": "(OPEN - found 2026-09-26 only because a human asked \"what exactly must I ratify in D-2650?\") - the reserved-fixture rule covered the TOKEN a",
+      "events": 1
+    },
+    {
+      "id": "BUG-524",
+      "title": "(OPEN 2026-09-26) - the STORES and COLUMNS axes had NO machine: two rails land, and their own controls found 3 defects in the rails themselv",
+      "events": 1
+    },
+    {
+      "id": "BUG-525",
+      "title": "(OPEN 2026-09-26) - the AMBIGUOUS-DECLARATION class: a key declared twice in one mapping is SILENTLY last-wins, and no rail could see it",
+      "events": 1
+    },
+    {
+      "id": "BUG-526",
+      "title": "(OPEN 2026-09-26) - the pin invariant had a SCAN and no WRITE moment: a pinned artifact could be edited and committed with nothing consultin",
+      "events": 1
+    },
+    {
+      "id": "BUG-527",
+      "title": "(OPEN 2026-09-26) - the staged-reading rails audit whichever index the ENVIRONMENT names, not the one being committed",
+      "events": 1
+    },
+    {
+      "id": "BUG-528",
+      "title": "(OPEN 2026-09-26) - will_not_touch matches NAMES, so a Dropbox-renamed sibling of a protected artifact is out of scope; one such copy is ALR",
+      "events": 1
+    },
+    {
+      "id": "BUG-529",
+      "title": "(OPEN 2026-09-26) - .pre-commit-config.yaml declares a C11/C12 gate that NOTHING invokes, and the hook slot has exactly ONE occupant",
+      "events": 1
+    },
+    {
+      "id": "BUG-532",
+      "title": "(OPEN 2026-09-26) - one lock, two homes: the session plan RESTATED the owner-instrument lock that a rail already checks",
+      "events": 1
+    },
+    {
+      "id": "BUG-537",
+      "title": "(MED - PROPOSED D-2653, OPEN 2026-09-26): regenerating archive/index.yaml de-listed a hygiene entry, so the rail's own remedy may be a silen",
+      "events": 1
+    },
+    {
+      "id": "BUG-542",
+      "title": "(MEDIUM - MITIGATED, REMEDY OWED 2026-09-26): the silent-repair allowlist is keyed by LINE NUMBER, so a mechanical edit becomes a FALSE FAIL",
+      "events": 2
+    },
+    {
+      "id": "BUG-545",
+      "title": "(MEDIUM - OPEN, MEASURED 2026-09-26): 17 of the 60 rails the health ladder invokes are NOT tracked by git - the control plane has no history",
+      "events": 1
     }
   ],
   "closed": [
+    "BUG-254",
     "BUG-256",
     "BUG-268",
     "BUG-269",
     "BUG-271",
     "BUG-272",
+    "BUG-276",
+    "BUG-283",
+    "BUG-284",
+    "BUG-285",
+    "BUG-286",
     "BUG-291",
     "BUG-307",
     "BUG-308",
@@ -552,6 +708,8 @@
     "BUG-373",
     "BUG-374",
     "BUG-375",
+    "BUG-379",
+    "BUG-380",
     "BUG-383",
     "BUG-384",
     "BUG-385",
@@ -590,6 +748,63 @@
     "BUG-442",
     "BUG-443",
     "BUG-444",
-    "BUG-445"
+    "BUG-445",
+    "BUG-446",
+    "BUG-447",
+    "BUG-449",
+    "BUG-453",
+    "BUG-457",
+    "BUG-458",
+    "BUG-459",
+    "BUG-460",
+    "BUG-461",
+    "BUG-463",
+    "BUG-467",
+    "BUG-469",
+    "BUG-470",
+    "BUG-471",
+    "BUG-472",
+    "BUG-473",
+    "BUG-474",
+    "BUG-476",
+    "BUG-479",
+    "BUG-483",
+    "BUG-485",
+    "BUG-486",
+    "BUG-488",
+    "BUG-489",
+    "BUG-490",
+    "BUG-491",
+    "BUG-497",
+    "BUG-499",
+    "BUG-501",
+    "BUG-502",
+    "BUG-504",
+    "BUG-505",
+    "BUG-506",
+    "BUG-507",
+    "BUG-508",
+    "BUG-509",
+    "BUG-510",
+    "BUG-512",
+    "BUG-513",
+    "BUG-517",
+    "BUG-518",
+    "BUG-519",
+    "BUG-522",
+    "BUG-530",
+    "BUG-531",
+    "BUG-533",
+    "BUG-534",
+    "BUG-535",
+    "BUG-536",
+    "BUG-538",
+    "BUG-539",
+    "BUG-540",
+    "BUG-541",
+    "BUG-543",
+    "BUG-544",
+    "BUG-546",
+    "BUG-547"
   ]
 }

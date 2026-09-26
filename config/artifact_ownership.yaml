@@ -1,0 +1,232 @@
+# artifact_ownership.yaml - who may write which artifact, and how (D-401, the RC-1 gate).
+#
+# WHY: the register's most destructive class is "one artifact, many writers, no ownership partition".
+# A writer regenerates its own columns and rewrites the whole file; another owner's cells are collateral
+# (BUG-478 blanked 148 owner cells). This file makes the ownership DECLARED, and scripts/lib/write_guard.py
+# makes it ENFORCED: a writer that would change a cell it does not own is refused, and nothing is written.
+#
+# mutability classes:
+#   immutable          - never rewritten in place; a new revision = a new file (content-addressed, I2)
+#   append_only        - rows/cells may be added; an existing cell may never be edited or blanked
+#   derived_regenerable- may be regenerated wholesale, but ONLY through write_guard with OWNED_ANY
+#   human_authored     - typed by the owner; a machine writer may add columns, never edit a filled cell
+#
+# `guard_exemption` is a DECLARATION OF DEBT, not a permission: scripts/lib/write_guard.py --audit AST-scans
+# every writer_of_record below for a real guard CALL site, and a writer with neither a call site nor an
+# exemption is DRIFT (D-401/I1). The count is bounded by guard_coverage.max_unguarded (SHRINK-ONLY). This key
+# exists because MEASURED 2026-09-25: 0 of 6 declared script writers imported the guard at all, so the
+# invariant was DECLARED and UNENFORCED - the state in which BUG-478 destroyed 148 owner cells.
+#
+# Every entry here must have a reconciliation entry in config/reconciliation.yaml, or an
+# unreconciled_reason. That is the cover check: a declared artifact with no reconciliation is RED.
+schema_version: "1.0"
+decided: D-401
+
+guard_coverage:
+  # SHRINK-ONLY (same direction as config/register_divergence.yaml#declared_max): routing a writer through the
+  # guard LOWERS max_unguarded. RAISING it to admit a new exemption is a declared decision, not an edit.
+  max_unguarded: 3
+  direction: shrink_only
+  measured: "3 unguarded of 7 declared script writer(s) - pipelines/stage4_merge.py and pipeline/stage5_verify.py (both owner-gated under pipeline/**) and scripts/render_closed_menu.py (owner decision owed on the answer-space pin). Guarded: scripts/reconcile.py, scripts/recompute_decision_summary.py, scripts/ingest_panel_column.py, scripts/f11_anchor_review.py."
+  ceiling_changed: "6 -> 4 -> 3 by edit 2026-09-25. The first move was measured only AFTER the fact (the audit's import detector could not see `from lib import write_guard`, so two genuinely-guarded writers read as unguarded - BUG-492); this move is the receipt of a GREEN audit run: 4/7 guarded, 3 unguarded, printed by scripts/lib/write_guard.py --audit. LOWERING is the permitted direction: raising this number is a decision, not an edit."
+  enforced_by: scripts/lib/write_guard.py   # --audit (a rail in `just health`)
+  reason: >-
+    MEASURED 2026-09-25: 0 of 6 declared script writers imported scripts/lib/write_guard.py, so the ownership
+    invariant was declared and unenforced. Each unguarded writer now carries a guard_exemption REASON and is
+    printed on every run; the ceiling makes the debt bounded and forces a decision to grow it. A writer whose
+    exemption is retirable (not owner-gated) is named as the next I1 step inside its own reason.
+
+artifacts:
+  governance/bug_status.json:
+    mutability: derived_regenerable
+    writer_of_record: scripts/bug_status.py
+    unreconciled_reason: >-
+      BUG-534: reconcile's `cover` meta-check requires every DECLARED owned artifact to carry either a
+      reconciliation entry or a declared reason. This one is reconciled by RE-DERIVATION rather than by a config
+      pointer - scripts/check_bug_status.py regenerates BOTH register outputs into a TEMP dir and byte-compares
+      them with the tracked files, so declaration == reality is machine-checked, not remembered. A reconciliation
+      ENTRY cannot be used here: the engine parses `declares` as YAML, and this artifact is a JSON register.
+    note: >
+      BUG-530/D-401 (declared 2026-09-26): this register is DERIVED wholesale from governance/buglog.md by the
+      generator, so the only legal ownership declaration is OWNED_ANY and the write is now ROUTED through
+      write_guard.write_document (crash-safe per C6). BEFORE the routing the write was a bare write_text, which
+      TRUNCATES the tracked file before the new bytes exist: an interrupted run left a truncated register, and
+      check_bug_status.py then reported the rail's own subject as the evidence of its own failure. The entry is
+      not decoration: write_guard --audit's population is DECLARED writers only, so until this declaration the
+      generator was INVISIBLE to the one rail that exists to bound exactly this class.
+  governance/bug_status.md:
+    mutability: derived_regenerable
+    writer_of_record: scripts/bug_status.py
+    unreconciled_reason: >-
+      BUG-534, same ruling as the JSON sibling: this markdown register is the second output of
+      scripts/bug_status.py and is byte-compared against a fresh re-derivation by scripts/check_bug_status.py
+      (rail 22 of `just health`), so its reconciliation is a re-derivation rather than a config pointer. The
+      engine cannot carry it as an entry because it parses `declares` as YAML and this artifact is markdown.
+    note: >
+      One generator, two declared outputs, same ruling as governance/bug_status.json above (BUG-530): both go
+      through write_document(OWNED_ANY) and both leave a receipt in governance/MUTATION_JOURNAL.jsonl. The
+      markdown is not a lesser artifact - it is the copy the owner reads, and a half-written one reads as a
+      truthful register.
+  governance/anchor_adjudication_workbook_20260924.csv:
+    mutability: human_authored
+    id_column: item_id
+    owned_by: [owner_depth, owner_note, owner_date, domains_final, depth_final]
+    writer_of_record: scripts/ingest_panel_column.py
+    machine_writers_forbidden: [scripts/cross_examine_anchor_axes.py]
+    note: >
+      BUG-478: cross_examine_anchor_axes.py::write_outputs truncates this file to the dispute set and blanks
+      WORKBOOK_OWNER_COLS. It is listed as forbidden until its workbook-write branch is guarded or deleted.
+      UPDATE 2026-09-25: the branch is now CREATE-ONLY - a machine may create this file when absent and may
+      never rewrite one - declared in config/anchor_cross_exam.yaml#outputs.workbook_create_only and enforced by
+      _write_owner_workbook, so code and declaration finally agree and machine_writers_forbidden is honoured.
+      GUARDED 2026-09-25: this ingestor now calls write_guard.write_rows(mode="merge", owned_keys={the one
+      target column}), so the ownership invariant is ENFORCED over the whole artifact and receipted. The former
+      exemption claimed "the guard's merge mode REFUSES row additions by design - an ingestor's job IS to add
+      rows": MEASURED, this ingestor PRESERVES the row count (new_rows is a map over the pre-image), so the
+      exemption described a mechanism the code does not have (BUG-491c, instance 2). Routing it also closed a
+      latent whole-file edit - the local csv.DictWriter would have re-terminated all 149 LF lines with CRLF.
+
+  governance/RECONCILIATION.json:
+    mutability: derived_regenerable
+    writer_of_record: scripts/reconcile.py
+    note: >
+      I1/D-401: the engine's own output. It is written through write_guard.write_document(OWNED_ANY) - the only
+      legal ownership declaration for a document - so governance/MUTATION_JOURNAL.jsonl carries a real receipt
+      instead of reading as an empty store. Registered 2026-09-25 (BUG-487 remainder); it is the FIRST declared
+      writer_of_record in this repo that actually calls the guard.
+
+  governance/F11_ANCHOR_REVIEW_20260923.csv:
+    mutability: human_authored
+    # BUG-492 (2026-09-25): this read `id_column: row`, but the export's header is item_id,name,why,... and
+    # carries no `row` column at all - so every row read as UNaddressable and the append invariant's id-reuse
+    # clause could not refuse anything (a declaration that cannot be falsified). Fixed to the column the
+    # artifact actually has; write_guard now REFUSES a write whose fieldnames lack the declared id column.
+    id_column: item_id
+    writer_of_record: scripts/f11_anchor_review.py
+    note: >-
+      GUARDED 2026-09-25: creates the export through write_guard.append_rows, keeping its own refuse-if-exists
+      rule (an export is evidence, R-D410) as the FIRST gate and the guard's declared append invariant
+      (addressable, non-reusing item_ids) as the second. The former exemption said the guard "refuses
+      additions"; that is precisely what the APPEND mode exists for (BUG-491c, instance 2).
+  governance/frontier_pack_20260924/raw:
+    mutability: append_only
+    writer_of_record: manual-blinded-coder-run
+    unreconciled_reason: >
+      A raw coder reply is evidence (R-D410), not a generated artifact: a reconciliation entry would have to
+      assert a count that no declaration carries. Write-once by construction; nothing regenerates it.
+    guard_exemption: >-
+      a raw coder reply is a HUMAN act, not code: the guard's jurisdiction is scripts. The declaration is
+      required anyway so that "no guard" is a stated fact rather than an unexamined omission.
+    note: A raw coder reply is evidence (R-D410). It is written once, verbatim, and never edited.
+
+  knowledge pipeline/stage4_merge/t11/checkpoint_enriched.jsonl:
+    mutability: immutable
+    writer_of_record: pipeline/stage4_merge.py
+    guard_exemption: >-
+      owner-gated under pipeline/**: the guard cannot be wired in without an owner-authorized edit to pipeline
+      code (BUG-376 - this path was rewritten in place AFTER the S5 run that declared it).
+    unreconciled_reason: >
+      BUG-376: this path was rewritten in place AFTER the S5 run that declared it, and the verified image no
+      longer exists. The root fix is I2 (content-addressed handoff) and it is owner-gated under pipeline/**.
+
+  knowledge pipeline/stage5_verify/t11/checkpoint.jsonl:
+    mutability: append_only
+    writer_of_record: pipeline/stage5_verify.py
+    guard_exemption: >-
+      owner-gated under pipeline/**: an owner-authorized pipeline edit is required (BUG-475 - S5_LOCK_PATH is
+      bound at import time, so no test can isolate the path the guard would have to write).
+    unreconciled_reason: >
+      BUG-475: S5_LOCK_PATH is bound at import time, so no test can isolate it. Owner-gated under pipeline/**.
+
+  config/decisions.yaml:
+    mutability: append_only
+    id_column: id
+    owned_by: []
+    writer_scope: append_only_new_records
+    writer_of_record: scripts/recompute_decision_summary.py
+    guard_note: >-
+      ROUTED 2026-09-25 (BUG-503 session, audit F5); RE-ROUTED 2026-09-26 (D-2655 HALF B). The guard call
+      sites are now the CHECKED APPEND in --mint and the one-shot strip that removed owned_by's former
+      subjects, so write_guard --audit joins this writer as ok guarded and the artifact owes NO guard debt -
+      the field is therefore guard_note, not guard_exemption: a debt field on an artifact that owes nothing is
+      itself a false declaration, and it is exactly the declaration-vs-reality drift every rail here exists to
+      catch. The earlier text named _surgical_write, which HALF B deleted (C19): a declaration citing a
+      function that no longer exists is the same drift, one level down. What the routing buys: tempfile ->
+      fsync -> os.replace, a receipt, post-write byte verification (C6) and a byte-exact pre-image under
+      backups/. If the guard call site is ever removed, --audit reports DRIFT instead of reading a stale
+      permission - the intended failure, not a regression.
+    note: >
+      The registry is the source of truth for decision ids. Records are APPEND-ONLY and EXTEND TO
+      END-OF-FILE: a record is never deleted, retitled or rewritten in place, and NO existing key may be
+      rewritten by any writer - which is why owned_by is EMPTY rather than a list of columns. D-2655
+      (2026-09-26) removed the derived head (total_decisions, summary, last_sync, decisions_sha256_16,
+      written_by) from this file: an append_only artifact whose handoff receipt is a PREFIX rule cannot hold a
+      value that changes on every mint, so the only sanctioned write is a pure byte-APPEND (--mint) and the
+      census of those values now lives in config/decisions_summary.json. Records-only removed a second failure
+      mode at the same time: a record appended after a LATER top-level key (the BUG-505 shape) cannot happen
+      when the records list is last. BUG-483: 62 of 766 records carried their state under a legacy status: key
+      (or none) and the census silently defaulted them to ACTIVE.
+
+  config/menu_axis_hashes.yaml:
+    mutability: derived_regenerable
+    writer_of_record: scripts/menu_axis_hashes.py
+      # BUG-453/D-371 (declared 2026-09-25): this file IS the answer-space pin (answer_space_hash over the
+      # declared answer axes), so its generator is a writer_of_record even though it writes a hash file rather
+      # than the menu. Before this declaration the writer was INVISIBLE to write_guard --audit, whose coverage is
+      # computed over DECLARED writers only - an undeclared writer of a config artifact is precisely the blindspot
+      # the audit exists to close. The write is now ROUTED (write_document, OWNED_ANY, crash-safe per C6) and this
+      # artifact is the reason the sealed/answer-space rules exist, so it may not itself be an exemption.
+    unreconciled_reason: >
+      Not duplicated in config/menu_axis_groups.yaml: that file declares WHICH AXIS belongs to which group
+      (membership, one home) while this one carries the hashes (values) - splitting them would put one fact in two
+      homes. Enforced by its own --check (wired into just health, STALE = rc 1, and a check may not repair) and
+      read by scripts/validate_depth_domain_contract.py --gate-if-active.
+
+  config/decisions_summary.json:
+    mutability: derived_regenerable
+    writer_of_record: scripts/recompute_decision_summary.py
+    unreconciled_reason: >
+      The cover rule (scripts/reconcile.py) is satisfied by declaring WHY there is nothing to reconcile against.
+      This artifact is a PURE FUNCTION of config/decisions.yaml: source_sha256 names the exact registry bytes it
+      describes, and scripts/recompute_decision_summary.py re-derives and verifies BOTH homes on every run, so
+      any disagreement is a NAMED drift the moment it exists. A separate reconciliation entry would have to
+      compare the census against the census - self-certifying evidence, which is the BUG-467 defect this repo
+      keeps re-finding. The registry it derives from is itself declared above.
+    note: >
+      D-2655 HALF A (2026-09-26): the derived census of config/decisions.yaml LEAVES that append-only file,
+      because it declares an append_only mutability and its handoff receipt is a PREFIX rule, while
+      total_decisions/summary/decisions_sha256_16/last_sync change on every mint (BUG-539) - no position inside
+      an append-only file is compatible with that rule. Declared derived_regenerable because the document is a
+      PURE FUNCTION of the registry bytes: it carries NO generation timestamp, so re-running the writer on an
+      unchanged registry is a byte-identical no-op and cannot manufacture drift. source_sha256 names the
+      registry bytes it describes (D-382). While both homes exist the writer verifies they agree on every run,
+      and no reader of this document may use .get(key, <literal>) - an absent key is the error (C12/D-2644).
+      HALF B (same day) has REMOVED the copy from the registry: this document is now that value's ONLY home and
+      config/decisions.yaml carries no derived key at all. The writer refuses to write either home unless they
+      agree, so the pair cannot drift apart silently.
+
+  config/closed_menu_v5.json:
+    mutability: immutable
+    writer_of_record: scripts/render_closed_menu.py
+      # BUG-491c (2026-09-25): this entry named `scripts/build_closed_menu.py`, which exists NOWHERE in the repo -
+      # not on disk, not in archive/, not in git: it is named ONLY here. A writer nobody can inspect enforces
+      # nothing, and the --audit rail (write_guard) caught it as DRIFT the first time it ever ran (D-401/I1).
+    guard_exemption: >-
+      NOT YET ROUTED, and the reason is measured rather than assumed. The guard's DOCUMENT mode would give this
+      write atomicity, a backup and a receipt; it would NOT supply the missing PIN. MEASURED 2026-09-25: the
+      only check in scripts/render_closed_menu.py recomputes the sha256 of the bytes it JUST WROTE and compares
+      it to the hash it JUST COMPUTED - self-consistency, not a comparison against a pinned value. So a
+      taxonomy/content-type change re-freezes the answer space with a NEW menu_hash and NO gate and NO refusal,
+      while D-277 requires labels stamped with an old menu_hash to be re-derived. This entry also declares
+      mutability: immutable while the mechanism is in-place regeneration - the declaration and the mechanism
+      disagree (BUG-491c, instance 3). RATIFIED 2026-09-25 (D-371): the composite pin is HISTORICAL and the
+      ANSWER SPACE is the pin, so no re-freeze is owed - and the refusal now EXISTS IN THE MECHANISM:
+      scripts/render_closed_menu.py refuses to overwrite an existing revision whose menu_hash differs from the live
+      render and mints a NEW revision (--mint-version N, I2 versioning) with the repoint obligation printed. The
+      declaration and the mechanism therefore agree now, which is what was measured to be false before (BUG-491c
+      instance 4, closed). Superseded wording kept for the record: "FIX REQUIRES AN OWNER DECISION:
+      refuse-if-hash-changes, or mint"
+      a new revision file (the option D-371 did not require, because the answer space never moved).
+    unreconciled_reason: >
+      It is the closed menu the answer-space sha is computed OVER, so it is checked by verify_anchor_manifest.py
+      and verify_menu_policy.py; duplicating that here would create two rulers for one fact.

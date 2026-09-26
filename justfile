@@ -4,21 +4,74 @@
 # ── Health ───────────────────────────────────────────────────
 health:
     @echo "=== Maxwell OS v3.0 Health Check ==="
+    python3 scripts/check_repo_integrity.py || [ $? -eq 2 ]   # RAIL 0: 0 git metadata intact | 1 repository defect (P0-A/P0-B, BUG-400) | 2 owner-owed
+    @just --list >/dev/null || { echo "FAIL justfile does not parse - the health rail cannot verify itself"; exit 1; }
     python3 scripts/guard_stacks_single_source.py || exit 1
     python3 pipeline/status.py
     python3 pipeline/integrity_check.py --quick
     python3 scripts/audit_flag_consumers.py || exit 1
     python3 scripts/verify_anchor_manifest.py || exit 1
     python3 scripts/consolidate_anchor4_context.py --check || exit 1
-python3 scripts/check_depth_menu.py || exit 1
-        python3 scripts/check_human_instruments.py || exit 1
+    python3 scripts/check_depth_menu.py || exit 1
+    python3 scripts/menu_axis_hashes.py --check || exit 1   # the answer-space pin must not be STALE (D-371/BUG-453)
+    python3 scripts/validate_depth_domain_contract.py --gate-if-active || [ $? -eq 2 ]   # 2 = owner-owed: loud, NOT fatal (BUG-457)
+    python3 scripts/check_human_instruments.py || exit 1
     python3 scripts/check_instrument_cohorts.py governance/ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv || exit 1
     python3 scripts/check_existence_negatives.py || exit 1
     python3 scripts/check_buglog_coverage.py || exit 1
+    python3 scripts/check_bug_status.py || exit 1
+    python3 scripts/check_register_divergence.py || exit 1
+    python3 scripts/lib/write_guard.py --selftest || exit 1
+    python3 scripts/lib/yaml_guard.py --selftest || exit 1       # D-2648 controls: a guard whose controls nothing runs is a comment (BUG-492)
+    python3 scripts/lib/yaml_guard.py --check || [ $? -eq 2 ]    # BUG-525/D-2649: a key declared TWICE in one mapping is SILENTLY last-wins; 2 = owner-owed artifacts
+    python3 scripts/lib/artifact_encoding.py --selftest || exit 1
+    python3 scripts/lib/operator_env.py --selftest || exit 1    # BUG-519: the operator-key rule has ONE home; its controls never print the value
+    python3 scripts/check_encoding_homes.py --selftest || exit 1  # BUG-492 controls for the D-2646 decode-home rail  # D-2644/D-2649: declared-encoding controls - a guess at an owner artifact is measured, not assumed
+    python3 scripts/lib/write_guard.py --audit || [ $? -eq 2 ]   # 2 = declared unguarded writers: loud, NOT fatal (BUG-457); D-401/I1
+    python3 scripts/check_depth_load_bearing.py || exit 1
+    python3 scripts/check_serving_gate.py --selftest || exit 1   # the D274a invariant's known-answer controls (a guardrail never seen failing is not a guardrail)
+    python3 scripts/check_serving_gate.py || [ $? -eq 2 ]        # D274a CI invariant over every stored row: 1 defect | 2 owner-owed label/status ontology (BUG-499), loud NOT fatal
+    python3 scripts/check_label_provenance.py --selftest || exit 1   # the BUG-497 boundary classifier's known-answer controls
+    python3 scripts/check_label_provenance.py || exit 1   # BUG-497/D-2640: a row OUTSIDE the declared boundary without the R1 stamp is a DEFECT - a broken stamp must not hide behind the boundary
+    # ^ this comment was found DISPLACED onto the check_config_defaults line on 2026-09-26 (three comments on one
+    #   line after a merge): a comment that documents another rail is a declaration with the wrong home (D-2649).
+    python3 scripts/check_s5_score_axis.py --selftest || exit 1   # BUG-502: the score axis' known-answer controls
+    python3 scripts/check_s5_score_axis.py || exit 1   # BUG-502: the ONE score-axis home must reproduce the stored corpus
+    python3 scripts/check_revoked_references.py --selftest || exit 1   # D-2645: the anti-resurrection rail known-answer controls
+    python3 scripts/check_revoked_references.py || [ $? -eq 2 ]        # D-2645: a revoked SCOPE may be named by NO live file; 2 = owner-owed, loud NOT fatal
+    python3 scripts/check_derivation_homes.py --selftest || exit 1     # D-2646: ONE DERIVED VALUE, ONE HOME - the known-answer controls
+    python3 scripts/check_derivation_homes.py || [ $? -eq 2 ]          # D-2646: a rival definition of a registered home is the BUG-499/BUG-502 class
+    python3 scripts/check_config_defaults.py --selftest || exit 1      # D-2644: the undeclared-default census known-answer controls
+    python3 scripts/check_config_defaults.py || [ $? -eq 2 ]           # D-2644: a config value read with a code default is UNDECLARED; 2 = the declared ceiling was stale and is now recorded
+    python3 scripts/lib/handoff.py --selftest || exit 1
+    python3 scripts/verify_handoffs.py || [ $? -eq 2 ]      # 2 = owner-owed: loud, NOT fatal (BUG-457); D-403
+    python3 scripts/resolve_dropbox_conflicts.py --selftest || exit 1     # D-2647 tri-state controls (BUG-492)
+    python3 scripts/check_encoding_homes.py --check || [ $? -eq 2 ]   # D-2646: a second decode implementation is DETECTED, not remembered; 2 = declared debt
+    python3 scripts/check_silent_repair.py --selftest || exit 1     # BUG-492: the C16 silent-repair detector must be SEEN to fire
+    python3 scripts/check_silent_repair.py --check || [ $? -eq 2 ]   # C16/BUG-511: no reader may silently repair bytes; 2 = declared debt, SHRINK-ONLY
+    python3 scripts/check_undeclared_encoding.py --selftest || exit 1   # BUG-492: the undeclared-codec detector must be SEEN to fire
+    python3 scripts/check_undeclared_encoding.py --check || [ $? -eq 2 ]  # D-2644/BUG-521: an encoding the ENVIRONMENT decides is UNDECLARED; 2 = declared class, SHRINK-ONLY
+    python3 scripts/check_store_authority.py --selftest || exit 1  # BUG-492: the store-authority detector must be SEEN to fire
+    python3 scripts/check_store_authority.py --check || exit 1     # BUG-524/STORES: exactly ONE authoritative store; a shared table name fails closed
+    python3 scripts/check_store_columns.py --selftest || exit 1    # BUG-492: the column-lifecycle detector must be SEEN to fire
+    python3 scripts/check_store_columns.py --check || [ $? -eq 2 ]  # BUG-524/COLUMNS: a label that cannot vary, a blank a count(col) cannot see; 2 = declared debt
+    python3 scripts/resolve_dropbox_conflicts.py --check || [ $? -eq 2 ]  # D-2647: a Dropbox-reverted artifact must never pass silently; 2 = siblings only the owner can settle
+    python3 scripts/reconcile.py --check || [ $? -eq 2 ]    # 2 = owner-owed debt: loud, NOT fatal (BUG-457)
+    python3 scripts/lib/measure.py --gaps || exit 1
+    # ^ ORDER IS LOAD-BEARING (BUG-489/BUG-490): every resolver rail runs BEFORE these two checker rails.
+    #   reconcile joins each DECLARED resolution domain to the record its rail has just published; measure
+    #   --gaps then checks the journals - and it DERIVES this order from this recipe (measure.health_chain)
+    #   and DRIFTs if a declared resolver rail sits AFTER it, because then "has not run yet" would read as
+    #   "never published" (which is how reconcile once reported ITSELF as an unpublished metric).
     python3 scripts/verify_anchor_family_registry.py || exit 1
     python3 scripts/verify_menu_routing.py || exit 1
     python3 scripts/verify_menu_policy.py || exit 1
-    python3 scripts/verify_recalibration_pins.py || exit 1
+    python3 scripts/verify_recalibration_pins.py --selftest || exit 1   # BUG-526/BUG-492: the pin rule's WRITE-time controls, incl. the OVERREACH control (an unrelated commit must be TOLERATED)
+    bash scripts/install_git_hooks.sh --check || exit 1   # BUG-526: the pre-commit hook is a DERIVED artifact living outside version control; it must equal its own re-derivation, not be remembered
+    python3 scripts/verify_recalibration_pins.py || [ $? -eq 2 ]   # BUG-536: 2 = a MOVED pin the OWNER owes a re-mint; loud, NOT fatal,
+    #   so an owner-owed pin cannot ABORT the ladder and hide the rails below it (BUG-457 tri-state; the hook still refuses any non-zero).
+    python3 scripts/verify_generator_pins.py --selftest || exit 1   # BUG-538/D-2653: the GENERATOR-identity rail's known-answer controls (12: incl. that a TRUNCATED revision is FATAL, and that a declared-but-unmeasurable fact is OWNER-OWED, never a silent pass - BUG-492)
+    python3 scripts/verify_generator_pins.py || [ $? -eq 2 ]   # BUG-538/D-2653: WHO PRODUCED THE NUMBERS. 0 = every declared generator matches the bytes on disk; 1 = broken declaration, fails CLOSED (C16); 2 = a MOVED generator (or an alias that disagrees) the OWNER owes a re-mint - a pin is re-minted by a DECISION (D-382/BUG-535), never by a quiet re-hash
     python3 scripts/verify_declared_inputs.py || exit 1
     python3 scripts/verify_frozen_pair.py || exit 1
     python3 scripts/verify_evidence_manifests.py || exit 1
@@ -26,8 +79,12 @@ python3 scripts/check_depth_menu.py || exit 1
     python3 scripts/r3_preflight.py || exit 1
     python3 scripts/verify_vec_integrity.py || exit 1
     python3 scripts/verify_boundary_injection.py || exit 1
+    python3 scripts/depth_pass_agreement.py --report-only
+    python3 scripts/depth_pass_agreement.py --check-cohort || exit 1
     python3 scripts/build_archive_index.py --check || exit 1
     python3 scripts/recompute_decision_summary.py --check || exit 1
+    python3 scripts/check_tests.py --selftest || exit 1   # BUG-492: the suite rail's OWN decisions (floor breach, regression, paid red, strict) must be SEEN to fire
+    python3 scripts/check_tests.py --check || exit 1      # D-2656: the SUITE is a RAIL - a failing test no rail runs is a control that never fires (BUG-470 class). 3 failures are DECLARED red and SHRINK-ONLY (the depth/domain contract is 'proposed'/owner gate); a 4th is FATAL, 0 collected is FATAL, a paid red is OWNER-OWED (2)
 
 healthcheck: health
 
@@ -37,6 +94,7 @@ stacks:
 
 preflight:
     @echo "=== Maxwell OS Preflight ==="
+    @python3 scripts/check_repo_integrity.py || [ $? -eq 2 ]   # RAIL 0 also gates a RUN: a conflicted/git-renamed tree must not be the tree a batch writes from (BUG-400/BUG-500)
     @python3 scripts/monitor_stacks.py || exit 1
     @python3 -c "from pipeline.pipeline_paths import ensure_dirs; ensure_dirs(); print('✅ Directories OK')"
     @python3 -c "from pipeline.pipeline_paths import check_books_source; ok, msg = check_books_source(); print(msg); exit(0 if ok else 1)"
@@ -292,15 +350,13 @@ retrieve-agentic query:
 retrieve-eval query fb_ids:
     python3 pipeline/retrieval_evaluator.py --critique-only --fb-ids "{{fb_ids}}"
 
-# D2205 Migration — two-axis epistemic model
-migrate-epistemic:
-    python3 pipeline/migrate_D2205_epistemic.py
-
-migrate-epistemic-dry:
-    python3 pipeline/migrate_D2205_epistemic.py --dry-run
-
-migrate-epistemic-verify:
-    python3 pipeline/migrate_D2205_epistemic.py --verify
+# D2205 Migration — TOMBSTONED 2026-09-25 (BUG-503)
+# The three recipes that used to live here (migrate-epistemic / -dry / -verify) were a REACHABLE
+# write path into an ABANDONED ontology: they ALTER fbs with 8 D2205 columns, one of which is
+# epistemic_state TEXT DEFAULT 'corroborated' - it would stamp "corroborated" on rows nobody
+# corroborated. Removed deliberately: an abandoned ontology must not have a reachable write path.
+# The script remains for the archaeology and now REFUSES (exit 2 = owner-owed) unless the owner
+# passes --i-understand-D2205-is-abandoned. Reviving D2205 is an OWNER decision.
 
 # MCP Server — start Maxwell knowledge server for agents
 mcp-server:
@@ -329,7 +385,52 @@ vibecheck-full:
     @for f in pipeline/*.py; do python3 -c "compile(open('$$f').read(), '$$f', 'exec')" && echo "✅ $$f" || echo "❌ $$f"; done
     @echo "✅ Full vibecheck complete"
 
+# ── Deep rail (D-390) ─────────────────────────────────────────────
+# WHY THIS EXISTS: `just health` runs RAILS, not the SUITE. A stale assertion in tests/ is
+# invisible to every rail — BUG-470 (`test_depth_frugal_is_off` asserted a literal D2454 had
+# refuted) sat undetected at HEAD for exactly that reason, and D-390 states the split.
+# health-deep = the aggregate rail PLUS the full test suite in STRICT mode: the declared red
+# ceiling must be EMPTY, i.e. the suite must be fully green.
+# SAFE TO RUN since BUG-473/BUG-546: conftest.py fails the session if the suite moves a
+# production artifact, and the smoke tests now resolve their stage dirs through pipeline_paths
+# and REFUSE to delete an undeclared run id.
+health-deep: health
+    @echo "=== deep rail: full test suite, strict (D-390/D-2656) ==="
+    python3 scripts/check_tests.py --check --strict
+
 # ── Cleanup ───────────────────────────────────────────────────
 clean:
     @echo "Use pipeline/safe_delete.py for safe deletion"
     @echo "  python3 pipeline/safe_delete.py data/checkpoints/ --reason 'reset pipeline'"
+
+# -- Handoffs (D-403): a stage handoff is a RECEIPT, not a path -----------------
+# WHY: a stage that declares an input PATH cannot prove which BYTES it consumed, and a producer that rewrites
+# that path later invalidates every downstream claim while nothing fails (BUG-376; BUG-488 found the same
+# defect inside the receipt itself: a quoted digest whose bytes no live path held). scripts/lib/handoff.py
+# takes a receipt (digest, bytes, mutability, code_sha, stamp); scripts/verify_handoffs.py compares BYTES.
+# This recipe is the rail's CALLER, so a verify_* script is not a declaration with no caller (BUG-482/486).
+handoffs:
+    @echo "=== handoffs (D-403): every claim re-derived from bytes ==="
+    python3 scripts/lib/handoff.py --selftest
+    python3 scripts/verify_handoffs.py
+
+# -- Instrument controls (D-400): no instrument decides before a sealed control ---
+# WHY: an instrument measured only on rows its own builder chose is not evidence (BUG-480). config/
+# instrument_controls.yaml declares every instrument BEFORE it is measured, so the number cannot pick its own
+# falsification; scripts/instrument_control.py scores it against a control whose answer was withheld.
+# NOT in the health recipe: 2 of 3 declared instruments still hold NO sealed control - owner-owed, not fatal.
+instruments:
+    @echo "=== instrument controls (D-400): a confusion matrix before any decision ==="
+    python3 scripts/instrument_control.py --selftest
+    python3 scripts/instrument_control.py --report
+
+# -- Criteria board (BUG-482/BUG-484) ------------------------------------------
+# WHY: governance/p0_p1_criteria.yaml has declared 28 executable criteria since 2026-09-17 and
+# scripts/drift_monitor.py evaluates every one of them - but NOTHING invoked the monitor, so 28 declarations
+# (two of them check_*.py rails) were reachable only by hand. That is BUG-482 one level up: a declaration with
+# no caller. This recipe is the caller, and scripts/reconcile.py derives reach through it, not from a filename.
+# NOT in the health recipe: 3 of the 28 criteria are DRIFT (real, open findings - BUG-484). A rail known to be
+# red does not belong in the fail-fast invariant chain; it belongs where its redness is visible and declared.
+criteria:
+    @echo "=== criteria board: governance/p0_p1_criteria.yaml (drift_monitor) ==="
+    python3 scripts/drift_monitor.py

@@ -1,0 +1,156 @@
+# derivations.yaml - ONE DERIVED VALUE, ONE HOME (D-2646; the BUG-499/BUG-502 class).
+#
+# WHY. BUG-499 and BUG-502 were one defect three times: a rule that decides a stored value existed as a verbatim
+# copy in TWO scripts, so the copies could diverge with nothing reporting it, and the question "which code decides
+# this column?" could not be answered FROM THE REPO. This registry turns that question into a lookup.
+#
+# WHAT THIS FILE IS NOT. It is not a list of every file that touches a column. A producer may legitimately carry
+# a value the home computed (that is declared_writers); what may never exist is a SECOND implementation of the
+# RULE - the one-home invariant, checked by FUNCTION NAME across the tree.
+#
+# SCAN ROOTS ARE A DECLARATION. backups/ and archive/ are excluded ON PURPOSE: they hold PRE-IMAGES of the same
+# module, and a pre-image of a home function is not a rival implementation. MEASURED 2026-09-25: the only
+# duplicate def recompute / def decisions_digest in the tree live under backups/, so scanning them would make the
+# rail fire on this repo's own backup discipline (BUG-372).
+
+schema_version: '1'
+decided: D-2646
+scan_roots: [pipeline, scripts, tools]
+
+derivations:
+- name: fbs.status
+  table: fbs
+  column: status
+  kind: derived_regenerable
+  home: pipeline/serving_gate.py::derive_status
+  parity_rail: scripts/check_serving_gate.py
+  status: homed
+  note: D274a invariant; the stored corpus is the only acceptable proof (D-2642) - 7995 MATCH.
+- name: fbs.epistemic_status
+  table: fbs
+  column: epistemic_status
+  kind: derived_regenerable
+  home: pipeline/serving_gate.py::derive_epistemic_status
+  parity_rail: scripts/check_serving_gate.py
+  status: homed
+  note: BUG-499 - the D2284 label rule had two verbatim copies and no home.
+- name: fbs.confidence_score
+  table: fbs
+  column: confidence_score
+  kind: derived_regenerable
+  home: pipeline/serving_gate.py::derive_conf_and_review
+  parity_rail: scripts/check_s5_score_axis.py
+  status: homed
+  note: BUG-502 - the axis was a verbatim copy in stage5_verify.py AND reinject_bug198_singletons.py.
+- name: fbs.needs_human_review
+  table: fbs
+  column: needs_human_review
+  kind: derived_regenerable
+  home: pipeline/serving_gate.py::derive_conf_and_review
+  parity_rail: scripts/check_s5_score_axis.py
+  status: homed
+  note: co-derived with confidence_score by the ONE comparator (D-2641); 7995/7995 identical on re-derivation.
+- name: fbs.classification_status
+  table: fbs
+  column: classification_status
+  kind: derived_regenerable
+  home: scripts/reinject_bug198_singletons.py::_classify_s4
+  parity_rail: null
+  status: orphan_magic_threshold
+  note: >-
+    BUG-504 instance 2, MEASURED 2026-09-25: 7995/7995 stored rows carry one value (CLEAN) decided by an
+    UNDECLARED literal 10 in _classify_s4. A threshold that exists only as a literal has no home and no config
+    row. Declared now so the defect is DECLARED, not discovered twice; T2 moves it into config and re-proves the
+    7995 stored values against the new read.
+- name: fbs.borp_score
+  table: fbs
+  column: borp_score
+  kind: derived_regenerable
+  home: null
+  parity_rail: null
+  status: dead_but_read
+  note: >-
+    MEASURED 2026-09-25: 7995/7995 non-null with distinct values [0.0] - a constant except that NO writer exists
+    anywhere in the tree. It is still ORDER BY-ed as an arbitrary top-10 in pipeline/query.py and averaged in
+    pipeline/run_monitor.py where avg_borp_score can only ever be 0.0. D2537 already calls it the dead borp_score
+    ordering. home null is ON PURPOSE: a null home is the machine-readable statement that no code decides this.
+- name: fbs.feedback_score
+  table: fbs
+  column: feedback_score
+  kind: derived_regenerable
+  home: pipeline/feedback.py::_update_fb_aggregates
+  parity_rail: null
+  status: declared_but_empty
+  note: >-
+    MEASURED 2026-09-25: 0 of 7995 rows populated; the writer is never called by any run. A column declared but
+    never populated is a lie the schema tells. T2 wires a call site or declares the field unpopulated.
+- name: decisions.summary
+  table: config/decisions_summary.json
+  column: summary
+  kind: derived_regenerable
+  home: scripts/recompute_decision_summary.py::recompute
+  parity_rail: scripts/recompute_decision_summary.py
+  status: homed
+  note: >-
+    BUG-402/483 - total, per-state counts and by_category are recomputed from the records. D-2655 HALF B
+    (2026-09-26) re-pointed this row: the counts no longer have a copy inside the append_only registry,
+    so the census is their only home, and recompute is still the ONE implementation of the rule.
+- name: decisions.decisions_sha256_16
+  table: config/decisions_summary.json
+  column: decisions_sha256_16
+  kind: derived_regenerable
+  home: scripts/recompute_decision_summary.py::decisions_digest
+  parity_rail: scripts/recompute_decision_summary.py
+  status: homed
+  note: >-
+    BUG-402 - a CONTENT-derived stamp proves WHAT was written, not WHEN. D-2655 HALF B (2026-09-26)
+    re-pointed this row from table config/decisions.yaml, where the stamp could not survive the
+    append-only prefix receipt (BUG-539).
+- name: decisions.census_json
+  table: config/decisions_summary.json
+  column: source_sha256
+  kind: derived_regenerable
+  home: scripts/recompute_decision_summary.py::census_document
+  parity_rail: scripts/recompute_decision_summary.py
+  status: homed
+  note: >-
+    D-2655 HALF A (2026-09-26). The census LEAVES the append-only registry because the handoff receipt is a
+    PREFIX rule while total_decisions/summary/decisions_sha256_16/last_sync change on every mint (BUG-539): no
+    position inside an append-only file is compatible with it. source_sha256 names the registry BYTES this
+    document describes (D-382). HALF B (2026-09-26) has removed the copy from the registry, so this document is
+    that value's only home and the writer refuses to write either home unless they agree.
+
+# C12/C16 census (D-2644): a config value read with a code default is an UNDECLARED value.
+# BUG-504 was five S5 weights read as _CFG.get(key, <literal>): the config miss WAS the bug. The class is not
+# one file. MEASURED 2026-09-25 by a probe: 199 such reads, two distinct debts, both shrink-only:
+#   shadowed_declared - the key IS declared and the call site still supplies a default, so a typo or a rename
+#                       moves behaviour with no error (the D-2644 defect proper);
+#   undeclared        - the key is declared NOWHERE, so the default IS the declaration (the
+#                       stage5.nli_model_fallback = "" case: a SILENT EMPTY NLI FALLBACK in the verifier path).
+# Ceilings are a DECLARATION of the measured state and the direction is shrink_only (D-401 precedent). The RAIL,
+# not the probe, owns the number: the first rail run re-measures and its value replaces this one.
+config_reads:
+  receivers: [_CFG, cfg, config, conf, settings]
+  config_glob: 'config/*.yaml'
+  ceilings:
+    shadowed_declared: 210
+    undeclared: 2
+    measured_by: scripts/check_config_defaults.py
+
+  direction: shrink_only
+  ceiling_changed: >-
+    initial declaration 2026-09-25 from the PROBE measurement (179 shadowed / 20 undeclared); the rail
+    (scripts/check_config_defaults.py, next step) re-measures and its number replaces this one, recorded here.
+    REMEASURED 2026-09-26 by scripts/check_config_defaults.py: shadowed_declared 179 -> 209, undeclared 20 -> 2. The RAIL owns the number (D-2642): the probe's value was a CLAIM, and a claim is not a measurement. From here the ceiling may only be LOWERED.
+    REMEASURED 2026-09-26 by scripts/check_config_defaults.py: shadowed_declared 209 -> 210, undeclared 2 -> 2. The RAIL owns the number (D-2642): the probe's value was a CLAIM, and a claim is not a measurement. From here the ceiling may only be LOWERED.
+
+enforcement:
+  rail: scripts/check_derivation_homes.py
+  # SHRINK-ONLY: how many registered derivations are NOT homed. Measured 2026-09-25 = 3 (1 orphan
+  # magic threshold, 1 dead-but-read, 1 declared-but-empty). Raising it is a DECISION, not an edit
+  # (the D-401/guard_coverage precedent): a count that can grow by edit is not a ceiling.
+  # LOWERED 3 -> 1 on 2026-09-26 by the rail's own instruction ("a ceiling may only be LOWERED"): the
+  # registry now carries 9 rows, 8 homed. The rail reported the stale ceiling as owner-owed (RC=2) on every
+  # run; a ceiling above the measured count is a number nothing enforces. Raising it remains a DECISION.
+  max_non_homed: 1
+  direction: shrink_only

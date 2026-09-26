@@ -1,0 +1,39 @@
+# test_isolation.yaml — what a pytest session is allowed to touch (BUG-473 / BUG-471 / BUG-475).
+#
+# WHY: `python3 -m pytest tests -q` renamed
+#   knowledge pipeline/stage5_verify/t11/checkpoint.jsonl   (1.03 GB, LIVE 7995-FB S5 state)
+# to checkpoint.jsonl.stale_20260925_182629 at 18:26:29 on 2026-09-25. `just health` then reported
+# `AUTHORITATIVE artifact is MISSING (C16)` with no pipeline run active. Root cause: run_stage5()
+# resolves the PRODUCTION checkpoint path and the S5 single-writer lock path is derived from it at
+# IMPORT time, so a test that patches only the checkpoint still writes the lock into the live dir.
+#
+# THE RULE (enforced by tests/conftest.py against the live stage trees):
+#   a test may not write outside a tmp dir.
+# The ONLY tolerated exception is an artifact under a run id declared below: the S2/S4 smoke tests
+# drive a stage end-to-end against a smoke run id, and a smoke run id is test scratch, never a
+# production run. Every tolerated touch is REPORTED — never silent (BUG-462 class: a digest that no
+# check reads is invisible).
+schema_version: '1.0'
+rule: 'a test may not write outside a tmp dir; a declared test run id is tolerated and reported'
+allowed_run_id_globs:
+  - 'smoke_*'          # tests/test_stage4_preflight_smoke_stress.py + the S2 preflight smoke tests
+  - 'test_*'
+  - 'tmp_*'
+matched_against: 'the path component directly under each stage dir (the run id)'
+notes:
+  - 'BUG-473 FIXED 2026-09-25: tests/test_fail_closed_d2402_2405.py now redirects STAGE5_CHECKPOINT, S5_INPUT_FINGERPRINT_PATH, STAGE4_5_CHECKPOINT and S5_LOCK_PATH into tmp_path.'
+  - 'BUG-471 FIXED 2026-09-25: the order-dependence WAS the production-lock leak, not generic state pollution.'
+  - 'BUG-475 OPEN: S5_LOCK_PATH is bound at import from STAGE5_CHECKPOINT, so no test can isolate it by patching the checkpoint alone. The structural fix belongs to pipeline/stage5_verify.py (resolve the lock path at call time from the same constant) and is NOT applied here — pipeline/** is production code and needs an owner ack.'
+  - 'OPEN: the S2/S4 smoke tests still write under their smoke run ids inside the production stage trees. Tolerated (declared + reported), not yet isolated.'
+  - 'BUG-546 FIXED 2026-09-26: tests/test_stage4_preflight_smoke_stress.py hand-built the PRODUCTION stage root (ROOT/"knowledge pipeline"/stage4_merge/run_id) and shutil.rmtree-d it - a destructive test no env var could redirect, and conftest TOLERATED it because the run id matched smoke_*. The path now comes from pipeline_paths and _rmtree_declared_test_run() REFUSES any path whose run id is not a declared test run id.'
+sandbox_finding: 'MAXWELL_PIPELINE_ROOT is NOT a suite sandbox: config/ (pipeline/taxonomy_manager.py::_get_taxonomy_path) and the books/DB paths also resolve under PROJECT_ROOT, so redirecting the root to a tmp dir produced 14 SPURIOUS failures (measured 2026-09-26: 17 failed sandboxed vs 3 at the real root). A suite sandbox must COPY THE CODE, never redirect the ROOT - recorded so the next engineer does not re-derive it (D-2656).'
+suite_rail:
+  decided: D-2656
+  invocation: ['python3', '-m', 'pytest', 'tests', '-q', '-p', 'no:cacheprovider']
+  min_collected: 261
+  timeout_seconds: 900
+  known_red_reason: 'the depth/domain contract is status: proposed (owner gate) - its 3 tests are DECLARED red and SHRINK-ONLY (D-2656); a paid red is owner-owed, a new failure is FATAL, and a collection floor breach is FATAL'
+  known_red:
+    - 'tests/test_depth_domain_contract.py::test_group_variant_blast_radius_measured'
+    - 'tests/test_depth_domain_contract.py::test_real_data_regression'
+    - 'tests/test_depth_domain_contract.py::test_composite_and_answer_space_are_reported_as_different_facts'

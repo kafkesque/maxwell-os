@@ -3980,3 +3980,2646 @@ BUG-433 (unsourced hash change), BUG-432 rail 5(b) (a 'Copy of *' sibling newer 
 - **STANDING RULE.** Write the status word IN THE HEADER when the entry is created (`## BUG-NNN - FIXED ...`),
   because the register parses headers; a status that lives only in the body is a status the register cannot see.
   Rule restated: an artifact is only as authoritative as the field the reader actually reads.
+
+## BUG-446 - OPEN - `justfile` does not parse: the entire boot health rail has been unrunnable
+- **Severity:** HIGH  |  **Status:** OPEN  |  **Found:** 2026-09-25 16:20  |  **Class:** C16 / rail integrity
+- **Symptom.** `just --list` fails: `error: Unknown start of token '.'  ——▶ justfile:13:33` on the line
+  `python3 scripts/check_depth_menu.py || exit 1` — the only unindented line in the `health` recipe. Iron rule
+  #4 of the boot sequence is "Run: just health", and that command has been a syntax error, so EVERY rail inside
+  `just health` (manifest verify, depth menu closure, existence negatives, buglog coverage, menu policy, frozen
+  pair, evidence manifests, recalibration pins, ...) has been unrun for as long as the line has been unindented.
+- **Blast radius.** Not a data defect: a DETECTION defect. It is the reason the defects below could sit in a
+  green-looking repo, and it is why "the rails are green" was not a measurable claim.
+- **Fix.** Indent the line; add `python3 scripts/validate_depth_domain_contract.py --gate-if-active` to `health`
+  so the new contract runs there (non-gating while `status: proposed`, self-gating when activated).
+- **STANDING RULE.** A guard that cannot start is not a guard. Boot must verify that the health command PARSES
+  before trusting that it passed (a one-line `just --list` probe returning 0).
+
+## BUG-447 - OPEN - `menu_hash` drift: the frozen menu is not what the code renders (D-279 provenance broken)
+- **Severity:** HIGH  |  **Status:** OPEN  |  **Found:** 2026-09-25 16:25  |  **Class:** provenance / drift
+- **Symptom.** `config/closed_menu_v5.sha256` freezes `73597ee2b1bb1eb9...`. `menu_hash()` (the canonical
+  rendering, `pipeline/closed_menu.py`) returns **`d2fc500c8835db54...`**. The frozen `.json` artifact hashes to
+  the frozen value (`menu_hash(stored) == 73597ee2`), so the artifact is intact and the RENDER drifted: exactly
+  one entry differs — the `behavioral economics` discipline definition in `config/taxonomy_v5.yaml` gained
+  "behavior-change interventions / social norms / peer influence / choice of behavior" and the menu was never
+  re-rendered (`scripts/render_closed_menu.py`).
+- **Blast radius.** D-279 stamps `menu_hash` onto every classified FB. Rows already stamped `73597ee2` are now
+  unreproducible from config, and a re-classify today would stamp `d2fc500c`, so one corpus will carry two
+  incompatible canvas versions with no stored diff. The DOMAIN axis is byte-identical in both, so the depth/domain
+  measurements of 2026-09-25 are unaffected — the discipline axis is the axis that moved.
+- **Fix.** Re-render and re-freeze (owner-visible act: it changes the hash every future row is stamped with), or
+  revert the definition edit. Do NOT simply overwrite the `.sha256` file: the hash is the evidence of which menu
+  the existing labels were classified against, so overwriting it destroys the provenance it exists to provide.
+- **Self-falsification.** This session's first version of the check hashed the `.json` BYTES and reported a
+  mismatch that did not exist (bytes `bc537701...` never equal a rendering hash). The instrument that stamps the
+  rows must be the instrument that verifies them (C21) — a second implementation is a second truth.
+
+## BUG-448 - OPEN - the depth and domain axes had no consistency contract (existence gap, not a regression)
+- **Severity:** MEDIUM  |  **Status:** OPEN  |  **Found:** 2026-09-25  |  **Class:** C12 / missing guard
+- **Symptom.** Nothing asserted the two axes agree, so: an off-menu token could normalise to ZERO domains with no
+  exception and no log (sandbox S10: a truncation DEGRADING INTO A VALID-LOOKING ABSTENTION); an abstention
+  (`emerging`) counted as a domain in every rate; and a row with no real domains (R040 `emerging`, R140 blank)
+  carried `depth_final_class=3` into every depth statistic. Measured on the frozen workbook: 2 owner-owed cells,
+  7 soft deviations, 0 row-level hard findings (0/148 rows reach 7/7 groups; 0/148 violate the first-token
+  primary rule).
+- **Fix.** `config/depth_domain_contract.yaml` + `scripts/validate_depth_domain_contract.py` +
+  `tests/test_depth_domain_contract.py` (status `proposed`: the owner activates it with `status: active`).
+  Tiers live in config, so the owner can re-grade a finding without editing code.
+- **PRESERVED BLINDSPOTS (recorded, not fixed).** S1: a vague statement with all 43 domains ticked is
+  indistinguishable from a universal one by any deterministic rule — only the FORM gate can see it, and FORM has
+  no anchor. S2: three groups hold only 3 domains each, so a 7/7 rule can be satisfied cheaply. S3: the 7/7 rule
+  is a cliff, not a gradient. These three are asserted in the harness so the gap cannot be mistaken for coverage.
+
+## BUG-449 - OPEN - LOW - R137 `domains_final_raw` carries a stray trailing separator no declaration covers
+- **Severity:** LOW  |  **Status:** OPEN  |  **Found:** 2026-09-25  |  **Class:** provenance hygiene
+- **Symptom.** R137's raw cell ends `user experience|`. `domains_final` is correct (`user experience`), so no
+  judgement is wrong — the declaration set simply does not describe the bytes the owner produced.
+- **Fix.** Either declare it (`cell_replacements: from "user experience|" to "user experience"`) or accept it via
+  the raw reader's separator set (already done: the raw reader accepts `,` and `|`). Declaration preferred: the
+  point of `anchor_workbook_fixes.yaml` is that every transformation of the owner's bytes is written down.
+
+## BUG-450 - OPEN - the FORM (extraction_type) axis carries 150 labels with VOID rater provenance
+- **Severity:** HIGH | **Status:** OPEN | **Found:** 2026-09-25 16:35 | **Class:** R14 / provenance
+- `governance/R2_EXTRACTION_TYPE_RULER_20260923.json`: 150 `extraction_type` labels, and every one of the 728
+  labels in that file has `coder: None`. The FORM axis is `owned` by ANCHOR-3 (`extraction_type_final`,
+  intersection 145/150) yet **no FORM value is traceable to a rater**. A label that cannot be traced to a record
+  is not a measurement (the same invariant `audit_form_axis.py` enforces on the runtime KB).
+- Also: R2 stamps `menu_hash: d2fc500c8835db54...` = the LIVE render, which the frozen `closed_menu_v5.sha256`
+  contradicts (`73597ee2b1bb1eb9...`). Concrete instance of the BUG-447 drift propagating into an artifact stamp.
+
+## BUG-451 - OPEN - MEASURED: FORM (1-4) has ZERO discriminative power for depth-class-1 admission
+- **Severity:** MED | **Status:** OPEN | **Found:** 2026-09-25 16:35 | **Class:** axis design / falsified assumption
+- Measurement on the frozen ANCHOR-3 sheet (`extraction_type_human`, 145 present / 5 declared-missing):
+  the 7 known retractions (the negatives class-1 admission must reject) span **3 of the 4 FORM classes**:
+  R033/R062/R085/R087/R101 = `descriptive_model`, R049 = `normative_heuristic`, R139 = `causal_mechanism`.
+  Human FORM over 150: `normative_heuristic` 50, `descriptive_model` 41, `causal_mechanism` 40,
+  `empirical_pattern` 14, blank 5.
+- Consequence: the warrant-admissible pool (normative_heuristic + descriptive_model) is **91/150 = 60.7 %**
+  versus the 4/150 = 2.7 % that class 1 can hold, and `empirical_pattern` excludes 14 rows while catching
+  **0 of the 7**. FORM is therefore a NECESSARY warrant field but cannot be the class-1 gate, and adding
+  raters cannot supply signal that is absent from the label set (it only reduces noise).
+- This falsifies the standing "build the FORM anchor first, then derive depth" plan. The un-anchored object is
+  the CLAIM-SHAPE bit (comparative + STATED exchange rate + BOUNDARY), not FORM.
+
+## BUG-452 - OPEN - the FORM panel is raw-agreement only, and it is 2 of 4 models
+- **Severity:** LOW | **Status:** OPEN | **Found:** 2026-09-25 16:35 | **Class:** statistic / instrument coverage
+- `governance/F11_ANCHOR_REVIEW_20260923.csv` carries `human_form, claude_form, kimi_form, form_agree,
+  form_consensus` on 108 rows. `form_agree` is RAW agreement (YES 83 / NO 25 = 76.9 %) on a 4-class axis with a
+  skewed marginal, with **no chance correction** - raw % on this marginal overstates agreement.
+- DeepSeek and Qwen3.8 have **no FORM column** anywhere (they exist for depth and domain only), so the
+  4-way cross-examination the owner asked about does not exist yet for FORM.
+
+## BUG-446 - FIXED - update 2026-09-25: there were TWO offenders, not one - rails green for the first time
+- BUG-446 had TWO offenders, not one: line 13 (unindented) AND line 15 (`        python3
+  scripts/check_human_instruments.py`, 8 spaces). Fixing only line 13 moved the parse error to line 15.
+  Both now dedented to 4 spaces; `just --list` parses; `just health` is runnable for the first time.
+- FIRST-EVER RUN of the rails (all exit 0): `verify_anchor_family_registry` ok (ANCHOR-3 150x31 29393d5f9d52 |
+  owned CT/DISC/ET 150/150/145 | depth blind 132/150 | domains DISOWNED cohort 216 intersection 2/150);
+  `check_human_instruments` ok (7 locked, all protected columns byte-identical - so the FORM anchor's
+  `extraction_type_human` lock IS enforced); `check_depth_menu` ok; `check_buglog_coverage` ok;
+  `check_instrument_cohorts` ok for both ANCHOR-3 and ANCHOR-4.
+- STANDING RULE reinforced: a rail that has never run is not a rail; the two defects above are why four
+  locked-instrument guarantees were declared-but-unenforced for eight days.
+
+
+## BUG-453 - OPEN - `menu_hash` is a COMPOSITE of 7 axes used as an ANSWER-SPACE pin (one hash, two meanings)
+- **Severity:** HIGH | **Status:** OPEN | **Found:** 2026-09-25 16:50 | **Class:** axis design / D-321 conflict
+- `config/closed_menu_v5.json` holds 7 sub-objects: `abstention, content_types, decision, disciplines,
+  domains, extraction_types, schema_version`. `pipeline.closed_menu.menu_hash()` hashes ALL of them, while
+  `config/closed_menu_v5.sha256` is consumed as the ANSWER-SPACE pin.
+- **CONFLICT between two RESOLVED decisions.** D-285 (2026-09-20) established by observation that
+  "taxonomy discipline definitions feed the closed menu" and re-rendered the hash 14540ec3 -> ... for exactly
+  that reason. D-321 (2026-09-21, owner-ruled, the BUG-357 fix) widened the `behavioral economics` definition
+  and stated "The answer-space pin `config/closed_menu_v5.sha256` is UNCHANGED (the menu was not touched)".
+  Both statements cannot hold. MEASURED 2026-09-25: they are BOTH HALF TRUE - the DEFINITION moved
+  (composite frozen `73597ee2...` vs live `d2fc500c...`), the ANSWER SPACE did not move.
+- Remedy implemented (no pin move, no stamp invalidated): `scripts/menu_axis_hashes.py` emits a hash PER AXIS
+  and an explicit `answer_space_hash` over `[domains, abstention]` -> `config/menu_axis_hashes.yaml`.
+  `domains c9e44328...` / `abstention b5d7ab16...` / `disciplines 00d1ea51...`. An answer-space claim is now
+  checkable against the answer space, and a definition edit can never again be mistaken for a slot change (C27).
+- Remaining owner act: whether to also re-render + re-freeze the composite pin under a declared `menu_version`
+  (a stamp every future row carries), or to leave the composite as historical and pin the answer space only.
+
+## BUG-454 - OPEN - the token `flags` names two different things; the flag-consumer rail cannot see the new consumer
+- **Severity:** LOW | **Status:** OPEN | **Found:** 2026-09-25 16:50 | **Class:** registry / naming collision
+- `config/flag_consumer_registry.yaml` tracks CONFIG flags (`config: ... path: ...`). The workbook column named
+  `flags` is a per-row classification flag set (`DOMAIN_NO_OVERLAP` etc.). `scripts/validate_depth_domain_contract.py`
+  reads that column, so it is a NEW consumer of a *different* `flags` - `audit_flag_consumers.py` stays green and
+  cannot see it. A rail that cannot see a new consumer of the thing it governs is a coverage gap, not a pass.
+- Do NOT register it under `flag_consumer_registry` (that would assert a config-flag dependency that does not
+  exist). Owner ruling owed: rename the workbook column (e.g. `row_flags`) or add a second registry section.
+- STANDING RULE: same token, two namespaces = a lookup that silently answers the wrong question.
+
+## BUG-455 - OPEN - the archive index has NO content identity: same-size corruption and duplication are both invisible
+
+MEASURED 2026-09-25. `archive/index.yaml` records per entry: name, kind, bytes, files, dirs, modified,
+category, disposition, authority, reason - and one `body_sha256` over the INDEX itself. It records NO
+`content_sha256` for any entry. Consequences, both measured:
+  - DUPLICATION is invisible. `dispositions` reports exactly 1 `purge_candidate` (`.DS_Store`, 10 KB).
+    A content scan of the same tree finds 30 exact-duplicate groups covering 2.99 GB of redundant bytes
+    (780 files, 17.31 GB total). The index cannot see any of it.
+  - CORRUPTION is invisible. `--check` can only detect added / removed / renamed entries. A file whose
+    bytes change but whose size does not is still GREEN, so the rail that exists to guard the archive
+    cannot detect the one failure it is most needed for.
+ROOT CAUSE: identity-by-name-and-size, not identity-by-content. NOT a new bug class - it is the same
+error as BUG-450 (a label with no coder) and BUG-378(b) (an authority with no content pin): a recorded
+OBJECT whose identity is not reproducible from the record.
+REMEDY: add `content_sha256` per entry (files and, for dirs, a Merkle root over children) so `--check`
+becomes a real integrity check and duplication is a declared, countable fact. Cost: one column.
+DO NOT remedy by deleting duplicates - 2.99 GB is 17% of the archive and the byte-identical copies carry
+distinct NAMES that are the audit trail (`pre_cascade_dereg`, `pre_axis_decision`, `pre_domain_swap`);
+deleting the older of two identical DB backups destroys the fact that a step was a byte no-op, which is
+itself evidence. Prevention belongs at the backup layer, not the archive layer.
+
+## BUG-456 - OPEN - the S4 "rolling" backup held 6 byte-identical slots: one recovery point, six names
+
+MEASURED 2026-09-25. `archive/session_20260923/scratch/backup/s4_rolling/checkpoint.slot1..6.jsonl` are
+all 95.26 MB and all share sha256 a35ebd46bf2d217a - a 7-copy identical group (571 MB) that also matches
+`checkpoint.jsonl.bak_20260903_171915_pre_reclassify`. A rolling backup exists to give N DISTINCT
+point-in-time recovery points; N identical copies give ONE, so the rotation is decorative and the
+apparent redundancy in the backup set is false comfort. Status: measured fact + hypothesis about the
+writer. NOT yet proven that the source was quiescent between snapshots - if it was, identical slots are
+legitimate and this is a WARNING, not a bug. Either way the set carries no evidence of WHICH state each
+slot holds, which is the actual defect: slot identity is unrecorded.
+REMEDY: record source sha256 + source mtime in each slot's manifest, and rotate only when the digest
+changed. Then "rotation" is a verifiable claim instead of a naming convention.
+
+## BUG-457 - OPEN - the boot rail flattens the contract's three-valued exit code, so "owner-owed" becomes fatal
+
+MEASURED 2026-09-25 by flipping `status: proposed -> active` in a sandbox copy and running the real consumer.
+`config/depth_domain_contract.yaml` declares THREE outcomes on purpose: 0 clean, 1 hard contract defect,
+2 owner-owed (`owner_blocked`: an abstention-only or blank owner cell - "loud, not fatal", and inventing a
+value would corrupt the gold). The script implements exactly that contract.
+The only consumer in the repo is `justfile` line 14:
+    python3 scripts/validate_depth_domain_contract.py --gate-if-active || exit 1
+`|| exit 1` collapses 1 and 2 into one outcome, so the boot health rail cannot REPRESENT the state the
+contract was built to carry. MEASURED: with status=active the command exits 1 today (two hard findings,
+MENU_HASH_DRIFT + MISSING_MENU_VERSION), which makes the whole boot rail RED. After those two are fixed the
+command would STILL be RED on exit 2, because R040 (abstention-only) and R140 (blank) are owner-owed cells
+that only the owner can fill - so activating the contract as wired today converts a legitimate "owner still
+owes a cell" state into a build failure, which is precisely the pressure that produces fabricated cells.
+REMEDY: the rail must preserve the distinction it was given - fail on 1 (and on 2 only when running with
+--strict-owner), tolerate 2 otherwise. Not applied yet: this is a rail-semantics change and it is coupled to
+the BUG-447 decision; it must not be fixed by weakening the check for the hard tier.
+CLASS: false pass in the other direction - "a rail that cannot express a state is not a rail for that state"
+(the mirror of BUG-454: green is not coverage; here red-or-green is not the whole lattice).
+
+
+## BUG-458 - FIXED - a declared cell repair was applied as a SUBSTRING edit and merged two owner domains
+- **Severity:** HIGH (near-miss) | **Status:** FIXED | **Found:** 2026-09-25 17:2x | **Class:** C12 / provenance
+- **What happened.** The BUG-449 fix landed as `cell_replacements: "user experience|" -> "user experience"` in
+  `config/anchor_workbook_fixes.yaml`. `split_raw_tokens` applied it with `str.replace` to EVERY raw cell. On a
+  cell holding a pipe-joined LIST the pattern matches inside the list and MERGES the two neighbouring domains
+  into one token that is not on the menu - a declared repair silently becoming an unrecorded edit of the owner's
+  bytes, which is the exact failure `anchor_workbook_fixes.yaml` exists to prevent. On the real workbook it
+  happened to be invisible (R137's cell is that value alone); the adversarial battery row S1 saw it immediately
+  (`RAW_UNDECLARED_TOKEN` appeared on a synthetic row that had no raw defect at all).
+- **Fix.** Two declared operations with different semantics: `cell_replacements` are **WHOLE-CELL ONLY** (applied
+  only when the trimmed cell EQUALS `from`), and trailing separators are handled by a new declared rule
+  `trailing_separator_trim: ['|', ',']` which is idempotent and cannot merge anything. Harness:
+  `test_raw_repair_is_whole_cell_only`. Contract back to 12/12 green.
+- **STANDING RULE.** A repair rule is legal only when its RIGHT-HAND SIDE is a token on the closed menu and its
+  scope is declared. An unqualified search-and-replace over a cell that holds a LIST is an edit, not a repair -
+  and a repair that has never been run against an adversarial input is an edit nobody has audited.
+
+## BUG-447 - RESOLVED AS DESIGN (D-371): the composite pin is HISTORICAL; the ANSWER SPACE is the pin
+The composite drift is NOT repaired and must not be: re-rendering moves the stamp every 2026-09-2x row carries
+and would falsify D-321's recorded claim, and overwriting `closed_menu_v5.sha256` destroys the provenance it
+exists to provide. D-285 and D-321 are both correct - the DEFINITION moved, the ANSWER SPACE did not. The
+contract now reports the two facts with two codes: `ANSWER_SPACE_DRIFT` (hard, over `[domains, abstention]`,
+measured NOT drifted) and `DEFINITION_DRIFT` (soft, `disciplines`, measured drifted). Membership is declared once
+in `config/menu_axis_groups.yaml` and read by both the generator and the checker (C12/C21).
+
+## BUG-453 - FIXED - `menu_hash` is split by declared axis group; an off-menu axis is now a hard finding
+`scripts/menu_axis_hashes.py` reads its grouping from `config/menu_axis_groups.yaml` (the earlier inline
+`ANSWER_AXES = ("domains","abstention")` literal was itself the C12 defect this bug is about). New hard code
+`UNCLASSIFIED_MENU_AXIS`: an axis that belongs to no group is pinned by NOTHING, so a change to it is invisible
+to every check - a new sub-object added to the menu now fails closed instead of silently escaping the pin.
+
+## BUG-449 - FIXED - the R137 trailing separator is now repaired by a declared rule, not by a separator accident
+`trailing_separator_trim: ['|', ',']` (see BUG-458 - the first attempt was a cell replacement and it was wrong).
+`domains_final_raw` is read byte-faithfully and the repair is written down; the raw reader's dual separators are
+no longer the only reason R137 does not fire.
+
+## BUG-450 - OPEN - CORRECTED MEASUREMENT: the `coder` key is ABSENT, not null
+The claim "every label has `coder: None`" is imprecise: `governance/R2_EXTRACTION_TYPE_RULER_20260923.json` has
+NO `coder` key anywhere (0 occurrences), so every read `.get("coder")` yields None across all 728 labels. The
+void is the same - no FORM value is traceable to a rater - but the register must state what is on disk. The file
+also stamps `menu_hash: d2fc500c...` = the LIVE composite, i.e. an artifact stamped with a hash the frozen pin
+contradicts; under D-371 that is now correctly a DEFINITION-class fact, not an answer-space one, but the artifact
+still carries no `answer_space_sha256`/`menu_version`, so a consumer cannot tell which pin it was written under.
+REMEDY (prevention, next unit): the R2 meter must stamp a report-level `provenance` block (label source artifact
++ column + sha256, extractor, NLI model id, `menu_version`, `answer_space_sha256`) so the NEXT regeneration is
+traceable; the existing artifact is left byte-identical and marked `unrecorded-at-write` rather than back-filled.
+
+## BUG-457 - FIXED - the boot rail preserves the contract's three-valued exit code
+`justfile` line 14 is now `... --gate-if-active || [ $? -eq 2 ]`. With the re-tier (D-372) the contract returns
+hard 0 / owner-owed 2 on the frozen workbook, so activating it no longer converts "the owner still owes R040 and
+R140" into a red build - which is the pressure that produces fabricated cells.
+
+## AUDIT 2026-09-25 (second pass) - findings recorded in governance/evidence/AUDIT_20260925_SECOND_PASS/AUDIT_FINDINGS.md
+- `DECISION-LOG.md` contains a DUPLICATE `## D-356` heading (lines 474 and 489, same title). The register parses
+  headings (the BUG-446 lesson); a duplicate heading makes one decision look like two.
+- Two id families coexist with no uniqueness rail across them: `D-3xx` (46 records, last D-370) and `D<num>`
+  (691 records, last D2636). Nothing checks the union, so the next writer can silently reuse an id.
+- `just health` still has no PARSE probe for itself: BUG-446's standing rule ("boot must verify the health command
+  PARSES before trusting that it passed") is written down but not implemented - a one-line `just --list` is owed.
+- `config/depth_domain_contract.yaml` hard-coded the anchor manifest path in `scripts/`; now config-declared
+  (`inputs.anchor_manifest`) and the stamp is CHECKED against the pins, not merely required to exist.
+
+## BUG-459 - FIXED - a FALSE existence-negative in a docstring: "there is NO FORM anchor"
+`scripts/score_form_gate.py` asserted "FORM(1-4) is BLANK in all 150 rows of the tracked blind sheet, no
+config/form*.yaml exists ... FORM therefore cannot be an upstream pipeline stage". MEASURED 2026-09-25:
+`FORM (1-4)` = 145/150 non-blank in `governance/ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv`; `extraction_type_final`
+= 145/150 in `governance/ANCHOR_RULER_CONSOLIDATED_20260923.csv` (owner ANCHOR-3, `config/anchor_family.yaml`).
+The column that IS blank is DEPTH. The negative came from a glob over the wrong namespace (`config/form*.yaml`)
+and from reading DEPTH as FORM - the THIRD false absence of this cycle (after "assignment" and "margins").
+FIX: the claim is recorded as a MEASURED ledger row (`governance/existence_negatives.yaml` NEG-002, answer
+`refuted`) and the scorer MEASURES the coverage at run time instead of asserting it in prose.
+STANDING RULE: an existence-negative in prose (docstring, comment, report) must name the artifact set searched
+AND the query used, and that query must have been RUN. A docstring is not a search.
+
+## BUG-460 - FIXED - the instrument builder OVERWROTE the live instrument and narrowed its schema
+`python3 scripts/build_form_elicitation.py` rewrote `governance/frontier_pack_20260924/CLAIM_SHAPE_ELICITATION_11.csv`
+unconditionally: two declared columns (`evidence_span`, `abstain`) disappeared and the gate bit was renamed.
+Nothing was lost only because no elicitor had answered yet; one answer later and a rebuild would have erased the
+owner's only copy of the instrument's answers - silently, with exit 0.
+FIX: the schema, cohort, questions and guards are declared ONCE in `config/claim_shape_instrument.yaml`; the
+builder refuses to overwrite when any answered cell is non-blank (exit 3); the scorer reads the same declaration.
+STANDING RULE: a generator that writes the file it is asked to score must be non-destructive by construction -
+"rebuild" is an act on a BLANK instrument, never on an answered one.
+
+## BUG-461 - FIXED - `FORM` named two namespaces (the BUG-454 pattern, third instance)
+The instrument's four questions (comparative / STATED exchange rate / BOUNDARY / falsifiable) are the
+CLAIM-SHAPE bit (D-374); every column, the file names and the scorer were named `FORM_*`, while FORM is AXIS 2
+`extraction_type` (4 epistemic forms) with its own 145/150 anchor. Two objects, one token.
+FIX: columns renamed `claim_shape_q1..q4` / `claim_shape_bit` / `claim_shape_note`; scripts renamed
+`build_claim_shape_instrument.py` and `score_claim_shape_gate.py`; `config/claim_shape_instrument.yaml` states the
+naming rule (C21) and the file carries no depth/verdict column.
+
+## BUG-462 - OPEN - the declared agreement floor (D-373) has no consumer
+`config/agreement_floor.yaml` (Krippendorff alpha, reporting 0.667 / operative 0.800) is read by nothing:
+`grep -rl agreement_floor` -> the yaml itself and the decisions prose only. A floor nobody reads cannot gate
+anything. Remedy: the FORM ceiling panel scorer (>=2 raters, missing-cell capable) must LOAD the floor and
+refuse to report a decision-bearing number below `operative_floor`. Not back-filled - owed as prevention.
+
+## BUG-463 - OPEN - `config/anchor_family.yaml` understates the depth state (intersection 0 vs 18)
+The registry declares `depth: intersection: 0  # blind sheet; blank until freeze` while the TRACKED blind sheet
+carries 18/150 owner depth cells (`reviewer=human`, `date 13.09.26`, R001...). MEASURED 2026-09-25. A freeze
+computed from the registry's "0" would silently ignore an owner pass. Remedy: state the real starting count and
+resolve the 24.09 drop-in (`Copy of ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv` rev 2) before D274d/D274f.
+
+## BUG-467 - FIXED - the aggregate rail was RED for a whole pass while every individual rail was green
+`just health` failed at line 24: `RED r2_meter: scripts/definition_nli_verify.py CHANGED since it was pinned - re-run the measurement and mint a new decision (this is the BUG-391 class)`. The previous pass edited a **pinned** script (additive provenance block, D-379) and then verified with the individual rails only. Every one of them passed; the DIGEST rail is exercised nowhere except the aggregate recipe. FIX: re-pinned under D-382 after checking the change is additive (40 inserted lines, 0 removed; the 2026-09-23 measurement artifact is byte-unchanged and was NOT back-filled).
+STANDING RULE: after ANY edit to a pinned or digest-locked artifact, run the AGGREGATE rail (`just health`), never a hand-picked subset. A digest rail is by construction invisible to the check that does not read it; a per-rail sweep cannot see a cross-artifact pin.
+
+## BUG-463 - FIXED - `config/anchor_family.yaml` understated the depth state (intersection 0 vs 145)
+MEASURED 2026-09-25: the block declared `intersection: 0` while the state was three layers deep - 13.09 partial 18/150, 24.09 complete 150/150 (`Copy of ...`, strict superset, 0 conflicting cells on the 18 overlap, only `date` differs), 25.09 adjudicated `depth_final_class` 145/148. FIX: the block now declares the canonical column, the cohort, the intersection (145) and BOTH predecessors by sha256, and records the measured intra-rater agreement. Freeze starts from THIS state; the merge is declared, never performed implicitly inside a freeze.
+STANDING RULE: an "intersection: N" claim in config must name the artifact and column it was measured on. A coverage number without its source artifact is a number about nothing.
+
+## BUG-462 - OPEN - the declared agreement floor still has no consumer
+`config/agreement_floor.yaml` (reporting 0.667 / operative 0.800, D-373) is read by nothing. This pass produced the first real measurement that SHOULD be scored against it (depth intra-rater alpha 0.914 nominal / 0.896 ordinal, above the operative floor) and recorded it in `config/anchor_family.yaml`, but the scorer is still owed: `scripts/depth_pass_agreement.py` reading the floor and the two depth columns from config and exiting 1 below the operative floor. UNTIL THEN the floor is a decoration.
+
+## BUG-464 - OPEN - a bookkeeping column that reads as 192 open items when 4 cells are open
+`owner_answer_needed` in `governance/anchor_adjudication_workbook_20260924.csv` is a snapshot from before the owner answered: it claims `domain` is still needed for ~150 rows whose `domains_final` is filled, and it does NOT flag the cell that is actually blank (R080/depth). It is a TRUE snapshot of what the machine recommended at generation time, and a FALSE statement of what is owed today. Deriving the owed set from the data gives exactly 4 cells: `domains_final` blank (R140), `depth_final_class` blank (R070, R080, R130), plus R040's abstention-vs-depth-class contradiction.
+FIX (owed, 1 line): rename the column to `owner_answer_needed_at_generation` (the BUG-454 pattern - one token, one namespace) and re-derive the owed set from the data at read time.
+STANDING RULE: a "what is still owed" column must be RE-DERIVED from the artifact it describes, or be named as the snapshot it is. A stale owed-list does not just misinform - it asks the owner to redo work that is already done.
+
+## BUG-465 - OPEN - a blank cell carries four meanings and the contract can only see one
+R070/R080/R130 have `depth_final_class` blank. The owner DID answer depth for all three in the 24.09 pass (`owner_depth` = 2/3/3, carried into the workbook and identical to the 24.09 drop-in). The workbook was then superseded by the 25.09 pass, in which those three cells are blank. Nothing distinguishes: not-answered / withdrawn / declined (the workbook has an explicit token for a decline - `DEPTH_MENU_DECLINED`, used on 2 rows and NOT on these 3) / carried-forward. The contract can only report "blank", so it reports the same 3 rows every run forever, and the owner cannot clear them without inventing an answer.
+FIX (owed, owner ruling): one supersession policy, applied to all four states, so a blank in a later pass does not silently erase an earlier filled answer. R040/R140 are NOT this bug: R040 is a CONTRADICTION (`emerging` + depth class 3), R140 is a declared blank (`BLANK-AS-SUBMITTED` in `governance/anchor_adjudication_fixlog_20260925.csv`).
+STANDING RULE: a blank in a SUPERSEDING artifact is not the same fact as a blank in a primary one. Where two passes exist, the later pass must declare whether a blank means not-revisited or withdrawn - otherwise the earlier answer is destroyed by omission, not by judgement.
+
+## BUG-466 - OPEN - 148 adjudicated rows against a declared 150-row cohort, with no exclusion rule
+`governance/anchor_adjudication_workbook_20260924.csv` carries 148 rows; `governance/ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv` and `governance/ANCHOR4_MANIFEST_20260924.json` (`"rows": 150`) carry 150. R003 and R146 appear in NEITHER the workbook nor any cohort/exclusion declaration in the manifest, the cohort builders, or the fix config - every depth/domain rate is therefore computed over 148 while the declared cohort is 150. Nothing was deleted from disk (both ids are present in the blind sheet, the consolidated ruler and `frontier_pack_20260924/BLIND_INPUT_150.csv`), so this is an UNDECLARED cohort narrowing, not data loss.
+FIX (owed, owner declaration): state why R003/R146 are outside the adjudication population (`retracted` / `duplicate` / `out-of-scope`) and record it as a cohort exclusion with a reason, or restore them.
+STANDING RULE: any artifact whose cohort differs from the declared cohort must DECLARE the difference where the cohort is declared. A 148-row file under a 150-row manifest is a denominator that changed silently.
+
+## BUG-468 - OPEN - a digest recorded in prose for a live file that has since been written
+`config/anchor_family.yaml` (`interim_20260924`) records the owner's complete depth drop-in as sha256 `be1a39e0...`; MEASURED 2026-09-25 it is `bc1cc956...`. The drop-in was written after that evaluation, so the record describes bytes that no longer exist - the same defect as the false existence-negative (BUG-459) and the stale register (BUG-467/BUG-464), now on a DIGEST.
+STANDING RULE: a sha256 written next to a file that anything may still write is a claim with a shelf life. Record it as `sha256_measured_at: <stamp>` beside the value, or point the record at a frozen copy under `backups/` - never a bare digest next to a live path.
+
+## BUG-469 - FIXED - the archive-index rail flipped RED on a Finder browse, with zero content change
+`just health` failed: `RED archive index: archive/index.yaml is STALE - stored body_sha256 17889fac47b2 != measured 43a9de5a5bc9`.
+MEASURED cause: macOS Finder/Dropbox wrote `archive/bak_sweep_20260923/.DS_Store` (+1 file, +6148 bytes) and rewrote
+`archive/.DS_Store` at 18:01:21; the index counted those bytes and took each directory's OWN mtime as its date.
+FIX: `config/archive_index.yaml#ignore` (names + globs) excludes OS metadata from every count AND from the date, which is
+now the newest NON-IGNORED descendant. VERIFIED stable across a `touch` of both `.DS_Store` files.
+STANDING RULE: a rail that a file browser can flip is a rail the owner learns to ignore (the BUG-462 class).
+
+## BUG-470 - FIXED - a live test asserted a value that a DECISION had deliberately refuted, and no rail ran the suite
+`tests/test_stage4_preflight_smoke_stress.py::test_depth_frugal_is_off` asserted `S4_DEPTH_MODEL == "gemma-4-E4B-it-MLX-4bit"`
+while `config/pipeline_config.yaml#stage4.depth_model` is DELIBERATELY `null` (BUG-403/405 Gate D; the literal was refuted by
+D2454) and `pipeline/pipeline_paths.py` carries NO code default. The test was stale at HEAD; `just health` runs rails, not the
+suite, so it was invisible. FIX: the test now asserts the state we are in (`== ""`), and `just health-deep` runs the full suite.
+STANDING RULE: an assertion about a config value must cite the decision that set it; otherwise the test outlives its reason.
+
+## BUG-471 - OPEN - the full suite fails in one ORDER and passes in another (a hidden failure, not a flake to ignore)
+`python3 -m pytest tests -q` -> `test_s5_failed_classification_quarantines` FAILED; the same test PASSES alone and inside a
+2-file run (9/9 in its own file). Cross-test state pollution: a rail that is green or red depending on collection order is
+not a measurement. Reproduce: `python3 -m pytest tests -q`. NOT diagnosed this pass (needs a bisect of the preceding file).
+
+## BUG-465 - POLICY IMPLEMENTED (D-387) - a blank in a superseding pass now has a declared meaning
+R070/R080/R130 were blank on depth in the 25.09 pass although the owner ANSWERED all three on 24.09 (owner_depth 2/3/3,
+identical to the drop-in, sha bc1cc956...). RULED: OMISSION IS NOT WITHDRAWAL - carry-forward is the default; withdrawal
+requires the explicit `..._DECLINED` token (already used on R021/R026, NOT on these three). Applied by
+`scripts/apply_workbook_rulings.py` under `just health` --check, so a normalize re-run cannot silently revert it.
+
+## BUG-472 - FIXED (self-inflicted, same pass) - the new applier logged the LOGICAL column for every written cell
+`apply_workbook_rulings.py` appended `R070 depth_final: '' -> '2'` (the class write logged under the ruling's column name).
+FIX: the fix log now records the column that actually changed; the 9 mislabelled rows were replaced with 9 correct ones in
+the same pass. LESSON: a writer's own log is part of its output and is verified like one (R5 in miniature).
+
+## BUG-473 - OPEN (SEVERE, evidence on disk) - the test suite ROTATES a LIVE production checkpoint
+Root cause of BUG-471 found. `python3 -m pytest tests -q` (started 18:24) caused
+`knowledge pipeline/stage5_verify/t11/checkpoint.jsonl` (1.03 GB, the live S5 checkpoint of the 7995-FB run) to be
+RENAMED to `checkpoint.jsonl.stale_20260925_182629` at 18:26:29, and rewrote `checkpoint.jsonl.input_fingerprint.json`
+at 18:27. `just health` then went RED: `t11::checkpoint.jsonl: AUTHORITATIVE artifact is MISSING (C16)`.
+RESTORED this pass by copying the rotated file back (bytes preserved; the .stale_ file KEPT as evidence).
+WHY IT IS SEVERE: a test run in the repo mutates production pipeline state, and the same side effect explains the
+order-dependent failures (BUG-471): tests share the real `knowledge pipeline/` paths instead of a tmp dir, so the
+suite's own order decides whether they pass. A killed run can delete a live artifact (it did).
+STANDING RULE: a test may not write outside a tmp dir. Any harness that resolves a production path must take an
+explicit override. Fix = find the test that resolves `stage5_verify/t11` and give it a declared tmp root.
+
+## BUG-473 - FIXED (2026-09-25, same day) - the suite rotated a LIVE production checkpoint
+ROOT CAUSE (pinned, not guessed): `tests/test_fail_closed_d2402_2405.py::test_s5_failed_classification_quarantines`
+called `run_stage5()` with `safe_write`/`load_stage4_fbs` patched but the REAL `STAGE5_CHECKPOINT`, so the D2507
+stale-archive branch renamed the live 1.03 GB t11 checkpoint.
+FIX: (a) the test redirects STAGE5_CHECKPOINT / S5_INPUT_FINGERPRINT_PATH / STAGE4_5_CHECKPOINT / S5_LOCK_PATH into
+tmp_path; (b) `tests/conftest.py` snapshots the production stage trees and FAILS the session if the suite moves an
+UNDECLARED artifact (declarations in `config/test_isolation.yaml`; a declared `smoke_*` touch is tolerated AND reported).
+EVIDENCE: the guard's first run caught the violation and named the paths; the second full run moved nothing
+(`232 passed, 5 skipped`, live checkpoint byte-count unchanged 102936020).
+
+## BUG-471 - FIXED (2026-09-25) - the order-dependence WAS the production-lock leak
+`S5_LOCK_PATH = Path(str(STAGE5_CHECKPOINT) + ".lock")` is bound at IMPORT time, so patching the checkpoint constant
+does not move the lock: the first S5 test wrote `knowledge pipeline/stage5_verify/t11/checkpoint.jsonl.lock`, and the
+second S5 test in the same pytest process read it as a LIVE holder (same pid) and died with SystemExit. BUG-471 and
+BUG-473 are one defect with two symptoms. Full suite is now order-independent.
+
+## BUG-474 - FIXED (2026-09-25) - a DUPLICATE `expect_blank:` key in config/anchor_workbook_fixes.yaml
+Two blocks declared the same top-level key. PyYAML resolves a duplicate key by last-wins, so the earlier
+`[R140]`/`[R070,R080,R130]` declaration was silently discarded. The surviving reading was the intended one, but the
+file held two answers. Declaration now lives in exactly ONE place.
+
+## BUG-475 - OPEN (pipeline-side, needs owner ack) - a path constant bound at import cannot be isolated
+`pipeline/stage5_verify.py:560` computes `S5_LOCK_PATH` from `STAGE5_CHECKPOINT` at import. Every test that isolates
+the checkpoint must ALSO know to patch the lock, and a future test that forgets it writes into the live tree again.
+STRUCTURAL FIX (not applied: pipeline/** is production code): resolve the lock path AT CALL TIME from the same
+constant, or take the lock path as a parameter. Until then the conftest guard is the only control.
+
+## BUG-478 - OPEN (severity HIGH) - the only declared panel ingester REWRITES the ANCHOR-4 workbook and blanks the owner's adjudicated cells
+- FOUND BY: the 2026-09-25 forensic audit, before implementing "run the two declared depth coders".
+- MEASURED: `scripts/cross_examine_anchor_axes.py::write_outputs` opens `governance/anchor_adjudication_workbook_20260924.csv` with mode `"w"`, writes ONLY the `dispute` set, and then executes `for k in WORKBOOK_OWNER_COLS: rec[k] = ""` where `WORKBOOK_OWNER_COLS = ["domains_final", "depth_final", "owner_note", "owner_date"]` (line 53/545).
+- EVIDENCE THAT THIS IS THE LIVE PATH: the workbook on disk holds 148 rows (tier SOFT 112 / HARD 36), `owner_depth` 148/148, and `depth_final`/`domains_final` carry the owner's adjudicated answers; its header matches that function's `wb_cols` exactly. The file was generated by this script and then filled by the owner.
+- CONSEQUENCE: the documented way to complete the declared depth panel (drop `raw_<coder>_<chunk>.md`, re-run the ingester) would have DESTROYED 148 owner cells, blanked `depth_final`/`domains_final`, and truncated the file to the dispute set. A data-loss path disguised as the standard procedure - invisible because the script's own output looks correct.
+- MITIGATION SHIPPED: `scripts/ingest_panel_column.py` (validates through `parse_frontier_pack.py`, writes exactly ONE declared column, REFUSES if any other cell would change, refuses to overwrite an answer, tempfile->fsync->os.replace + timestamped backup). Declaration: `config/agreement_floor.yaml#panels.depth_axis_panel.ingest`.
+- ROOT FIX (owner, `scripts/**` only): guard the workbook branch behind a refuse-or-lock, or delete it. NOT DONE - it can still be run by hand.
+
+## BUG-479 - FIXED (same-session) - the elicitation composed the gate bit BEFORE assigning its inputs
+- `scripts/elicit_claim_shape.py` computed `claim_shape_bit` from `r["claim_shape_q1..q3"]` and only then did `r.update(bits)`, so every bit was 0 regardless of the answers. Caught by `score_claim_shape_gate.py` in the FIRST run; the canonical instrument was NOT written (the run wrote a receipt file), so no contaminated artifact exists. Fixed by moving the composition after `r.update(bits)`; the bit on the receipt was recomputed deterministically from the stored q-columns.
+
+## BUG-480 - OPEN (severity MEDIUM) - the CLAIM-SHAPE gate is a perfect screen and a weak classifier: 10/11, not shippable
+- MEASURED (blind, non-author elicitor Qwen3.8-27B-MLX-4bit, 11 rows, identity withheld, temp 0 server-side): negatives REJECTED **7/7**, false positives **0**, candidates ADMITTED **3/4** (miss U002 Proxy Decay: q1=0). Declared rule q1&q2&q3 and the q4 variant agree exactly (3/4).
+- WHY IT FAILS THE BAR: D-395 requires 7/7 AND 4/4 to ship the gate; `score_claim_shape_gate.py` exits 1 by design. Class-1 admission therefore stays UN-GATED - the honest state.
+- MEASURED STRUCTURAL DEFECT: **q3 (boundary) is answered 1 on 11/11 rows** - it is a CONSTANT on this cohort and can contribute nothing to a gate; q4 is 10/11. The only discriminating questions are q1 (4/11) and q2 (3/11).
+- NOT A CONTAMINATION RESULT: the elicitor never saw the cohort, the verdicts, the depth axis, or the item_ids.
+
+## BUG-476 - ROOT RESOLVED (declaration made TRUE, was HIGH) - FIXED (rail) / ROOT OPEN - 2 of the 5 DECLARED depth raters have ZERO ratings
+- **Severity:** HIGH | **Status:** rail FIXED, root OPEN | **Found:** 2026-09-25 18:55 | **Class:** instrument / invisible gap (BUG-450 family)
+- MEASURED: `config/agreement_floor.yaml#panels.depth_axis_panel.rater_columns` declares FIVE raters. On the
+  148 measured rows: `Qwen3.8-27B-MLX-4bit_depth` = **0/148** and `deepseek-v4-pro_depth` = **0/148** (every
+  cell empty). Both models have FULL columns on the domain axis (148/148), so the depth pass was simply never
+  run for them - the declaration is aspirational, not executed.
+- WHY IT WAS INVISIBLE: alpha is missing-cell capable (that is why the floor chose it), so a rater who rated
+  *nothing* is indistinguishable from a rater who skipped a few rows. The receipt printed
+  "5 declared rater column(s)" and the band was read from a panel that is actually **3 raters**.
+  This is BUG-462's exact class again: a declaration no consumer can falsify.
+- CONSEQUENCE FOR THE NUMBER: alpha 0.4004 nominal / 0.5701 ordinal is the figure of a 2-LLM+1-human panel
+  (claude 142, kimi 144, owner 144) - NOT of the declared 4-LLM+1-human design. The "frontier second coder"
+  question was being asked about a panel whose two missing members were already declared.
+- FIX (rail, this pass): `scripts/depth_pass_agreement.py` now counts ratings per declared rater, prints
+  `raters rated` with per-rater counts, names every declared rater with zero ratings (fail-VISIBLE), and
+  `--gate` returns 1 when any declared rater is empty. `--report-only` stays exit 0 (a gap is a FINDING for
+  the owner, not a broken rail). Config untouched: the roster still lives in exactly ONE place.
+- ROOT FIX (owner): either RUN the two depth passes, or amend the declaration to the panel that exists.
+  Do not leave a 5-rater declaration over a 3-rater measurement.
+
+## BUG-477 - OPEN - the FORM coder columns are `label (margin)` strings, and `owner_form` is declared but empty
+- **Severity:** LOW | **Status:** OPEN | **Found:** 2026-09-25 18:58 | **Class:** format / declared-but-empty column
+- `governance/F11_ANCHOR_REVIEW_20260923.csv` (108 rows) carries `human_form` (103/108), `claude_form`
+  (108/108), `kimi_form` (108/108), `owner_form` (**0/108**), `form_agree`, `form_consensus`.
+  The two coder columns hold `empirical_pattern (0.55)` - label + confidence in one cell - so they cannot be
+  fed to a menu-validating statistic without a DECLARED normaliser (the depth columns are bare tokens).
+- `owner_form` is the same defect as BUG-476: a declared rater column with zero data.
+- CONSEQUENCE: the FORM axis' reliability canNOT be reported from this file today, and a "FORM ceiling panel"
+  would be built on top of a column format that has never been normalised. Any FORM agreement number must
+  first normalise + declare the parse, and report both denominators.
+
+## BUG-481 - OPEN (severity MED) - the machine register over-reports: 8 bugs carrying an explicit status field in the body are still counted OPEN
+MEASURED 2026-09-25 (root-cause audit). `scripts/bug_status.py` folds STATUS EVENTS and a status event is a
+HEADER. A closure written as a body paragraph is therefore invisible, and the register over-reports.
+Measured with the strict probe (an explicit bolded Status field naming FIXED, RESOLVED or CLOSED, inside the last header's body):
+BUG-254, BUG-276, BUG-283, BUG-284, BUG-285, BUG-286, BUG-379, BUG-380 - 8 ids. With a looser probe
+(any closure word in the body) 19 ids match, of which BUG-341 / BUG-343 / BUG-314 / BUG-355 are correctly
+OPEN (they mention another bug's closure, `FAILS CLOSED`, or a partial). So the honest figure is 8.
+CONSEQUENCE: the register says 114 open where at most 106 are; `c15_must_append_to_handoffs` is driven by a
+phantom count; and any session quoting "114 open" is quoting a parse artifact, not the state.
+ROOT CAUSE (class, not instance): one FACT (is this bug open?) is carried in TWO PLACES (the header event and
+the body prose) and nothing reconciles them. `scripts/check_bug_status.py` CANNOT catch this: it re-derives
+the register from the same headers and byte-compares, so it certifies the PARSER, never the LOG. A rail whose
+evidence is the same source as the artifact it checks cannot detect drift - the BUG-467 class.
+FIX DIRECTION (not applied, owner-gated): make the divergence RED rather than silent - in bug_status.py, if
+the last header classifies OPEN and the body carries an explicit closure field, emit a `divergent` state and
+fail closed. That keeps one fact in one place (the header is the event) while making the other place loud.
+
+## BUG-482 - OPEN (severity MED) - three checks built this week are invoked by nothing, so they cannot report
+MEASURED 2026-09-25: `grep -c <name> justfile` gives 0 for `scripts/check_depth_load_bearing.py` (D-397 rail,
+built + measured green last session), `scripts/ingest_panel_column.py` (D-398, the declared SAFE panel
+ingester) and `scripts/score_claim_shape_gate.py` (D-399, the gate measurement). All three exist, all three
+have been run by hand, none is reachable from `just health` or any recipe.
+CONSEQUENCE: a check that nothing invokes is a comment (BUG-462 class, second recurrence this week). The
+depth-load-bearing rail - the one whose whole purpose is to make a silent future failure impossible - would
+itself fail SILENTLY, and the failure it guards (a depth head trained on a 3-rater axis) would arrive unseen.
+ROOT CAUSE: `just health` is a hand-maintained list. Adding a rail is an edit to a prose block, and nothing
+asserts that a `scripts/check_*.py` which declares a contract is invoked anywhere. The gate that would catch
+a forgotten rail is itself forgotten the same way.
+FIX DIRECTION (not applied, owner-gated): a meta-rail that diffs `scripts/check_*.py` + `scripts/verify_*.py`
+against every recipe in `justfile` and treats an uninvoked check as RED. One screen closes the whole class.
+
+## BUG-483 - FIXED (same session, rail in place) - the decision registry's state census was silently wrong: 62 of 766 records carried their state where nothing read it
+
+WHAT HAPPENED. `config/decisions.yaml` is the source of truth for decision ids, and the summary block (the
+decision census) is derived from it by `scripts/recompute_decision_summary.py`. The producer resolved each
+record's state with `d.get("state") or "ACTIVE"` - a SILENT DEFAULT. MEASURED at HEAD `96b1e9c`: 59 records
+carried an explicit `status:` key instead of `state:` (values ACTIVE 32, RESOLVED 20, RATIFIED 4, superseded 1,
+complete 1, PROPOSED 1), and 3 records (D-397, D-398, D-399 - this week's) carried no state key at all. All 62
+were counted ACTIVE. The declared census said active 511 / resolved 161 / ratified 11; the true census is
+active 487 / resolved 184 / ratified 15 (+ 2 records with a value absent from the declared vocabulary:
+RATIFIED 15 and OPEN 17 were IN USE but UNDECLARED in STATES). 34 records carried the SAME fact twice
+(`state:` AND `status:`), with nothing reconciling the two copies - exactly one pair DISAGREED (D2293
+`state: SUPERSEDED` vs `status: complete`). Separately, `D-331` and `D331` normalise to ONE token and were held
+by two DISTINCT decisions (a C21 violation: one token, one namespace).
+
+ROOT CAUSE. Same class as BUG-481 one level up: one fact (which state is this decision in?) carried in two
+places with no reconciliation, plus a default that made an unmeasured value look measured (RC-5/D-404: a
+defaulted ruler is not a ruler). `recompute_decision_summary.py --check` could not see it because it read the
+same key the producer wrote - it certified the parser, never the registry (BUG-467 class, D-402).
+
+FIX (all measured, `just health` green).
+1. DATA: every record now carries exactly one canonical `state:` key (uppercase); the redundant agreeing
+   `status:` lines were collapsed; D2293's conflicting `status: complete` was dropped in favour of the
+   canonical `state: SUPERSEDED`; the 3 state-less records now carry `state: RESOLVED` (consistent with their
+   siblings D-391..D-396); the dashed `D-331` bake-off record was renumbered `D-406` (with an `id_note`)
+   because the referenced spelling is `D331`; `D-365` gained its missing `category`.
+2. THE DECLARED VOCABULARY now matches reality: `RATIFIED` and `OPEN` were IN USE but UNDECLARED, so they are
+   declared in STATES (names, not defaults).
+3. FAIL-CLOSED: `canonical_state()` raises SystemExit naming the offending id when a record has no canonical
+   state or a state outside the vocabulary; a missing `category` is likewise a hard failure instead of being
+   filed under `GOV`. `record_problems()` reports duplicate ids and any legacy `status:` key on the `--check`
+   path, so `just health` fails loudly. The independent oracle in `tests/test_decision_summary_sync.py` was
+   ALSO fail-closed - it had copied the same `or "ACTIVE"` default, which is why an independent test could not
+   catch this: a second oracle that shares the producer's blind spot is not a second oracle (D-402).
+4. STRUCTURAL: `scripts/reconcile.py` gained `decision_exists` and `decision_registry_wellformed`, and
+   `config/reconciliation.yaml` now declares 5 entries (registry well-formedness + the citation of every
+   config that stamps a `decided:`/`decision:` id). Every `decided:`/`decision:` value under `config/**` is
+   re-derived against the registry in one pass: an id that does not exist is RED. `config/register_divergence.yaml`
+   cited `decided: BUG-481` (a bug is a symptom, not a rule) -> now `decided: D-402`, driver BUG-481.
+   `config/decisions.yaml` is declared in `config/artifact_ownership.yaml` (append_only, writer
+   recompute_decision_summary.py).
+
+STATE AFTER. 766 -> 772 decisions (D-400..D-406 registered; D-400..D-405 are the six gates the new guards
+already cited, so their provenance stamps are no longer claims about nothing), stamp `aa69ae412a641374`,
+`recompute --check` clean, `tests/test_decision_summary_sync.py` 3 passed. Still OWNER-OWED and visible: 3
+citation values are not id-shaped and no rail can validate them - `config/eval_integrity.yaml:decision=<blank>`
+and `...:decision='DECLARED HOMONYM ...'`, `config/menu_axis_hashes.yaml:decision='798aa2f1...'` (a SHA is not
+a decision - the key is semantically wrong there).
+
+## REGISTER PROMOTION 20260925 - eight prose closures promoted to header events
+
+WHY. scripts/bug_status.py folds STATUS EVENTS and a status event is a HEADER, so a closure written as a body
+paragraph was invisible and the register OVER-REPORTED: MEASURED 2026-09-25, eight ids carried an explicit status
+field asserting FIXED or RESOLVED in the body while their last header classified them OPEN.
+config/register_divergence.yaml declared exactly those eight and its declared_max was SHRINK-ONLY.
+
+THE RULE (D-402, one fact one home). The body paragraph is HISTORY and is NOT edited (R-D410 append-only); the
+header event below is the register-visible statement of the same fact. No bug is closed here that the log did not
+already assert in its own explicit status field, and each promotion is listed with that field as evidence, so the
+act is auditable line by line and reversible by a later REOPEN event.
+
+EVIDENCE LEDGER (body status field -> promoted state)
+  BUG-254 Status: FIXED -> RESOLVED    BUG-276 Status: RESOLVED -> RESOLVED
+  BUG-283 Status: FIXED -> RESOLVED    BUG-284 Status: FIXED -> RESOLVED
+  BUG-285 Status: RESOLVED -> RESOLVED BUG-286 Status: RESOLVED -> RESOLVED
+  BUG-379 status: FIXED -> FIXED       BUG-380 status: FIXED -> FIXED
+
+EFFECT. The divergence list drops 8 -> 0, the mandated direction for a shrink-only list, and the register open
+count now comes from somewhere a reader can check.
+
+### BUG-254 - RESOLVED
+### BUG-276 - RESOLVED
+### BUG-283 - RESOLVED
+### BUG-284 - RESOLVED
+### BUG-285 - RESOLVED
+### BUG-286 - RESOLVED
+### BUG-379 - FIXED
+### BUG-380 - FIXED
+
+
+## SESSION 20260925B — D-403 + D-400 mechanisms built; three new findings
+
+### BUG-486 - FIXED
+- **status**: FIXED
+- **class**: RC-2 (declaration and reality never joined) — INSIDE the engine built to catch RC-2
+- **detail**: scripts/reconcile.py reach() compared a declared edge reader as a PATH ("scripts/drift_monitor.py") against a set holding BASENAMES ("drift_monitor.py"), so the edge declared in config/reconciliation.yaml#meta.reach.declared_commands could NEVER fire. Consequence: scripts/check_suite_coverage.py and scripts/check_stale_toolcall_rows.py were reported "uninvoked" for a whole session, and debt_max was lowered to 0 against a false measurement. A declaration that no reality could join, inside the reconciliation engine.
+- **fix**: reach() split into _reach_closure() + _base(); readers normalised by basename; each declared edge is now COUNTED and one row per edge is reported every run. New config key meta.reach.require_edge_fires: true makes an edge that fires nothing DRIFT (never a silent pass) — the same rule the engine applies to every other declared object. MEASURED after: 79 reachable (was 66), 0 uninvoked, 1 declared edge live.
+- **guardrail**: config/reconciliation.yaml#meta.reach.require_edge_fires. A future declaration that cannot fire is RED by construction, not by someone remembering.
+
+### BUG-487 - OPEN (owner gate)
+- **status**: OPEN
+- **class**: RC-3 (self-certifying rail) / green by vacancy
+- **detail**: governance/METRICS.jsonl and governance/MUTATION_JOURNAL.jsonl DID NOT EXIST, yet "just health" reported "ok metric envelopes: 0 metric(s) carry population/denominator/ruler/code_sha" and "ok write_guard selftest". scripts/lib/measure.py#envelope_gaps() returns [] for an absent registry, so the rail is green because there is NOTHING to check: D-404/I4 had zero records and D-401/I1 had zero production writes. An empty population read as compliance.
+- **lead**: instrument_control.py --score now emits the first enveloped metric (governance/METRICS.jsonl created); write_guard still has no production writer.
+- **owed**: a declared population floor for the metrics registry (min_records in config, C12) so "0 metrics" can never again read as ok; and a first guarded production write so the mutation journal carries real receipts.
+
+### BUG-488 - OPEN (DRIFT, found by a mechanism on its FIRST run)
+- **status**: OPEN
+- **class**: RC-2/BUG-376 (a hash claim that points at a path, not at bytes)
+- **detail**: ONE logical 150-row artifact exists at three paths with THREE different digests: governance/Copy of ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv bc1cc956 (203506B, owner drop-in, write-locked), governance/ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv b47114d4 (203253B), governance/frontier_pack_20260924/BLIND_INPUT_150.csv 240f0a84 (159206B, labels stripped). Separately, governance/ANCHOR4_DEPTH_OWNER_PASS_EVALUATION_20260924.md quotes sha256 be1a39e04c378af9 for its evaluated artifact, and that digest matches NONE of the three files on disk. A claim about bytes that resolves to no bytes.
+- **evidence**: scripts/verify_handoffs.py (D-403 rail), first execution, VH_RC=1.
+- **owed (owner)**: rule the identity of the three paths (same / derived / distinct). The assistant must not assert it. Once ruled, the rail compares.
+
+### BUG-484 - OPEN
+- **status**: OPEN
+- **detail**: governance/p0_p1_criteria.yaml declares 28 executable criteria since 2026-09-17 and scripts/drift_monitor.py evaluates every one, but NOTHING invoked the monitor: the chain was dead at its ROOT (BUG-482 one level up). Adding a caller reveals the board is RED: 3 DRIFT (P1.gate_artifact_fresh stale gate artifact; AX4.runtime_matches_gold_4axis; AX5.form_axis_traceable) + 2 WARN. A rail known red does not belong in the fail-fast invariant chain, so the caller is "just criteria", NOT "just health".
+- **owed**: repair the 3 DRIFT criteria before any of them joins the invariant chain.
+
+### BUG-485 - FIXED
+- **status**: FIXED
+- **detail**: reachability was a PROXY (does this filename appear in the justfile?), not a measurement: it could not see an INSTALLED GIT HOOK (.git/hooks/pre-commit to scripts/check_session_plan.py) and it could not see a file that DECLARES invocations (governance/p0_p1_criteria.yaml). It therefore UNDER-COUNTED reachable checks and mis-attributed two of them.
+- **fix**: reach is now a DERIVED closure over declared invocation edges: roots (justfile, scripts/install_git_hooks.sh) plus declared_commands honoured only when the declared reader is itself reached (BUG-486).
+
+## D-403 (I2) MECHANISM BUILT — content-addressed handoffs
+- config/handoffs.yaml, scripts/lib/handoff.py, scripts/verify_handoffs.py, governance/HANDOFFS.jsonl (append-only), governance/handoffs/blobs/ (content-addressed).
+- ONE FACT ONE HOME: mutability is READ from config/artifact_ownership.yaml; handoffs.yaml never re-declares it.
+- 6 receipts taken (origin=backfill: honest labelling — they claim what the bytes ARE now, not what a past run consumed). 3 blobs sealed, so the verified image now SURVIVES a rewrite (BUG-376's actual loss).
+- Meter validated before it decided (RC-5): --selftest proves a rewrite changes the digest.
+- Checks: receipt_present, path_present, digest_current, prefix_intact (append_only), sealed, hash_claim, identity.
+- OWNER-GATED CUTOVER OWED: stage call-sites under pipeline/ (nothing under pipeline was touched this session).
+
+## D-400 MECHANISM BUILT — no instrument decides until measured on a sealed control
+- config/instrument_controls.yaml (declared BEFORE measurement), scripts/instrument_control.py, governance/INSTRUMENT_CONTROLS.jsonl.
+- Meter validated first: --selftest (a perfect scorer must score 1.0, a 2-of-4 scorer 0.5).
+- First SEALED control measured: claim_shape_gate, n=11 (4 positives / 7 negatives), cohort = the known answer, item_id withheld from the elicitor.
+- depth_head and s4_classifier are declared owe_control with their owed text, so D-400's OWED list stays visible rather than being softened.
+- Existing unsealed baseline recorded: depth_head n=133 macro_f1=0.4073 over a BUILDER-CHOSEN split (evidence about the split, not about the world).
+
+## D-404 (I4) FIRST PRODUCTION CONSUMER
+- scripts/verify_handoffs.py and scripts/instrument_control.py both emit through scripts/lib/measure.py, so the first records exist in governance/METRICS.jsonl and no number travels without its ruler.
+- measure.py fixed: a ruler named as a string is accepted (the registry forwards it verbatim).
+
+## SESSION 20260925C — the handoff rail got a CALLER, then the in-place-rewrite finding was ruled by bytes
+
+### BUG-488 - CLOSED (correct, but the diagnosis in round B was WRONG and is corrected here)
+- **class**: D-403 / RC-2 — a hash claim that no reachable store resolved, inside the rail built to catch exactly that.
+- **CORRECTED DIAGNOSIS**. Round B recorded "one logical 150-row artifact at three paths with three digests, and a
+  quoted sha256 that matches NONE of the files on disk". Both halves were WRONG:
+  - the three paths are NOT three revisions of one artifact. Each has a ROLE, and each role is DECLARED in this repo:
+    `governance/Copy of ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv` = the write-locked owner drop-in (rev 2, declared in
+    config/human_instrument_locks.yaml AND config/anchor4_interim_state.json#dropin_sha256);
+    `governance/ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv` = the TRACKED sheet carrying pre-consolidation context plus the
+    owner's PARTIAL pass (declared in config/anchor4_interim_state.json#reason);
+    `governance/frontier_pack_20260924/BLIND_INPUT_150.csv` = the blinded input handed to a coder (declared in
+    config/cross_exam + handoffs.yaml#why).
+  - the digest does resolve. `be1a39e04c378af978f...` is REV 1 of the drop-in, declared as SUPERSEDED in
+    config/human_instrument_locks.yaml#superseded and config/anchor4_interim_state.json#dropin_superseded_sha256, and
+    its bytes are content-addressed in the git object store. MEASURED this session:
+    `git cat-file -p 075ae65:"governance/Copy of ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv"` -> sha256
+    be1a39e04c378af972bbb321f71c262eaca3252ffe72d5eb179867a6097d6fcb, 203506 bytes = exactly the digest and size the
+    receipt quotes. The bytes were NEVER lost.
+- **REAL DEFECT (stands, now closed by mechanism)**: the receipt's hash claim pointed at a PATH whose bytes had been
+  rewritten IN PLACE (rev 1 -> rev 2, equal-length date edit 13.09.26 -> 24.09.26, SAME byte count 203506, so a size
+  check can never substitute for a digest). The rail resolved digests against LIVE PATHS ONLY, so a superseded revision
+  read as "resolves to nothing" — a JOIN MISS reported as an artifact defect.
+- **fix**: config/handoffs.yaml#revision_locators + scripts/lib/handoff.py --seal-revisions (bytes read from the named
+  store, digest RE-DERIVED, disagreement raises) + scripts/verify_handoffs.py#revision check. Rev 1 is now SEALED:
+  governance/handoffs/blobs/be1a39e04c378af972bbb321f71c262eaca3252ffe72d5eb179867a6097d6fcb.bin.
+- **guardrail 1 (resolution domain)**: the rail reports each quoted digest with the KIND of store that resolved it
+  (`bc1cc956...:live`, `be1a39e0...:revision`), so "unresolved" can never again be read as "the artifact is broken".
+- **guardrail 2 (cross_declaration)**: EVERY digest this repo declares about a path — config/human_instrument_locks.yaml
+  (instruments[].sha256 and superseded[].sha256) and config/anchor4_interim_state.json (dropin_sha256,
+  dropin_superseded_sha256) — is joined to bytes in ONE place. MEASURED: 10 declared digest(s) across 2 source(s) all
+  resolve. An ORPHAN digest is now DRIFT wherever it is declared, not only where this config happens to look.
+- **guardrail 3 (floors, BUG-487 class)**: a rail reading an absent journal or blob store FAILS CLOSED —
+  floors: min_receipts 6 / min_sealed_blobs 3 (measured 8 and 4).
+- **guardrail 4 (identity)**: a role declared elsewhere is verifiable; a role asserted by the rail is not. identity_map
+  names the DECLARING FILE and the rail fails if that file is gone.
+
+### BUG-489 - OPEN (process; the mirror of BUG-468-class "false missing signal")
+- **class**: finding inflation / unstated rail premise (RC-5 adjacent).
+- **detail**: round B reported a defective ARTIFACT ("one artifact, three digests, digest resolves to no bytes") when the
+  defect was in the RAIL'S RESOLUTION DOMAIN. A rail's domain is an unstated premise of every finding it prints, and an
+  unwritten premise is indistinguishable from a fact about the world. Cost: one session of owner-facing noise about a
+  non-problem, and an "identity unresolved" declaration written into config for a question the repo had already answered.
+- **owed**: a declared `resolution_domain` for every rail that resolves an identifier (reach, handoff digests,
+  reconcile), plus a rule that a finding may not name an artifact as defective without first naming the store, domain or
+  enumeration that was searched. Assistant recommendation: add the field to config/reconciliation.yaml#meta per rail and
+  have reconcile.py print it beside each row.
+
+## ROLE / REACH HYGIENE (this session)
+- `just handoffs` (D-403) and `just instruments` (D-400) now CALL their rails, so neither is a declaration with no caller
+  (BUG-482/486 class) and neither depends on a filename-in-justfile proxy to be reached.
+- scripts/verify_handoffs.py joined the fail-fast chain: `python3 scripts/verify_handoffs.py || [ $? -eq 2 ]` — exit 2
+  (owner-owed) stays LOUD but NOT fatal (BUG-457).
+- MEASURED after wiring: `just health` RC=0 (71 ok lines), reconcile `0 uninvoked of 80 reachable check script(s)`,
+  handoff rail RC=0 (6 declared path(s), 12 digest(s), 1 revision), `just instruments` RC=0 (1 of 3 instruments hold a
+  sealed control — the other 2 stay owner-owed and visible).
+
+## SESSION 20260925D — a resolution domain is a DECLARED premise, and store floors got one home
+
+### BUG-489 - CLOSED (resolution domains declared, published, joined)
+- **BUILT**: `config/resolution_domains.yaml` declares, for all four identifier-resolving rails, the identifier
+  kind, every store searched WITH ITS READER, the metric that must publish the coverage, and the failure mode the
+  declaration prevents. `scripts/lib/measure.py` now REFUSES to emit a declared resolver metric with no `domain`
+  block (identifier/stores/searched/resolved) - a coverage claim that does not name what it searched reports its
+  join misses as facts about the world. `scripts/verify_handoffs.py` emits the domain in both envelopes and prints
+  `domain handoff_hash_claims: ... resolved against 3 store(s) [...] -> 12/12` beside its rows. `reconcile.py` joins
+  the registry to reality on every run (rail present, every store names a reader, every declared metric published
+  WITH its domain, a resolver with no metric must state `no_metric_reason`).
+- **MEASURED**: `4 resolver(s), 9 declared store(s), 0 blind store(s)`; handoff digests 12/12 resolved; reconcile
+  8/10 objects ok; `measure --gaps` -> `18 metric(s) (floor 12); 4 carry a declared resolution domain`.
+- **OWED**: a DECISION ID for "a resolver declares and publishes its domain" - the mechanism cites D-405, and
+  minting the id is the owner's act (C22). Logged as the next critical step.
+- **RULE now enforced**: a finding may not name an artifact defective without naming the store, domain or
+  enumeration that was searched.
+
+### BUG-487 - OPEN (floors have one home; the first guarded production write is still owed)
+- **DONE**: `config/evidence_floors.yaml` is the ONE home for the four evidence journals + the blob store
+  (C12/C21). The `floors:` block was REMOVED from config/handoffs.yaml, and verify_handoffs/measure/reconcile all
+  read the one file. reconcile now checks, per store: presence, a floor of >0 or a declared `vacuous` reason, a
+  non-zero floor is met, and the declared `enforced_by` rail exists. A store BELOW its floor is DRIFT, an ABSENT
+  store is DRIFT unless its emptiness is declared.
+- **DECLARED VACUITY**: `governance/MUTATION_JOURNAL.jsonl` does not exist, because ZERO guarded production writes
+  have ever happened. That is now PRINTED, not silent: `floor governance/MUTATION_JOURNAL.jsonl: ABSENT (declared
+  vacuous - ZERO guarded production writes have ever happened, so 0 is the TRUE count)`. The guard itself is
+  exercised by write_guard --selftest (4 refusal invariants) in `just health`.
+- **STILL OWED**: route a real production writer through write_guard so the journal carries its first receipt
+  (owner-gated: pipeline/** and the human_authored workbook), and the I1 bypass audit
+  (`write_guard --audit`: join each `writer_of_record` to whether that script actually uses the guard).
+
+### BUG-490 - OPEN (a rail that checks a journal before publishing its own record reports itself as unpublished)
+- **FOUND BY THIS SESSION'S OWN CHANGE** (first run): reconcile's domain join read governance/METRICS.jsonl
+  before reconcile emitted its own envelope, so it reported `metric reconcile_objects_agreeing declared but NEVER
+  published` about ITSELF - a self-ordering artifact that self-heals on the next run and would have been read by
+  the next session as a real finding. Same family as the BUG-489 finding: the report described the ORDER of the
+  run, not the state of the world.
+- **owed**: declare the publication order each resolver metric depends on (or exempt this-rail-this-run
+  explicitly), so a bootstrapping rail cannot report itself as missing.
+
+### NOT STARTED THIS SESSION (declared, not silently dropped)
+- Step 3: `write_guard --audit` (I1 bypass join) - see BUG-487 above.
+- Step 4: criteria-board triage (BUG-484: 3 DRIFT - P1.gate_artifact_fresh stale fingerprint; AX4/AX5 are the
+  BUG-326 knowledge-layer repair and are owner-gated).
+- Step 5: ontology hygiene (the non-id-shaped citation at config/eval_integrity.yaml:decision, and the duplicate
+  `## D-356` heading in DECISION-LOG.md - both need append-only erratum handling).
+- Step 6: flag hygiene (2 unregistered flags on config/depth_domain_contract.yaml).
+
+## SESSION 20260925E — a control may not write into the ruler it calibrates, and the checker now DERIVES the rail order
+
+### BUG-491 - FOUND (critical) and FIXED: the meter was writing into its own ruler
+- **MEASURED BEFORE**: `governance/HANDOFFS.jsonl` held 20 records and **14 of them were `origin: selftest`** -
+  `scripts/lib/handoff.py --selftest` appended 2 fixture receipts to the PRODUCTION journal on EVERY
+  `just health` run (17:55-18:27 on 2026-09-25). The store's floor was therefore counted over a contaminated
+  population that grows 2 records per run, so `min_records: 6` **could not fail**: the BUG-487 guard landed last
+  session was green by construction - the exact class it was built to prevent. Same family as BUG-489/BUG-490:
+  the artifact described the RUN, not the world.
+- **FIX (root cause, one home)**: a CONTROL may not write into the RULER it calibrates. `handoff.py` now runs
+  `--selftest` in a SANDBOX (journal + blob resolve inside a temp dir) and asserts THREE things, each able to
+  fail: the digest moves on a rewrite; the receipts landed in the sandbox (the redirect is PROVEN, not assumed);
+  the production journal is BYTE-IDENTICAL afterwards. `config/evidence_floors.yaml` now declares WHAT counts:
+  `exclude_origins: [selftest]` plus a SHRINK-ONLY `contaminant_ceiling: {origin: selftest, max: 14}`. The 14
+  historical records are GRANDFATHERED, never deleted (R-D410: a removed record cannot be audited). One function
+  (`measure.contaminant_drift`) is shared by verify_handoffs and measure.
+- **MEASURED AFTER**: `ok handoff selftest: ... SANDBOXED in a temp dir (2 receipt(s) + 1 blob), production
+  journal byte-identical (009b1a1e2c0dbc9d)`; the journal measured 20 -> 20 lines across the control run;
+  `ok floors: 6 receipt(s) >= 6, 4 blob(s) >= 3 (14 control fixture record(s) EXCLUDED from the count: 14
+  selftest record(s) <= ceiling 14)`.
+- **OWED (owner)**: retire the 14 grandfathered records into governance/evidence/ (append-only move) and lower
+  the ceiling to 0. The ceiling is shrink-only: only the owner may shrink it.
+
+### Same class, second store - FIXED: a floor over an append-per-run log is a RUN counter
+- **MEASURED**: `governance/METRICS.jsonl` held 25 records over only **4 distinct metric names** (19 of them are
+  2 metrics re-emitted per run), so `min_records: 12` was satisfiable by re-running health 12 times, not by
+  measuring anything. **FIX**: `min_distinct_names: 4` in the same one home; `measure --gaps` enforces BOTH and
+  prints both. A floor must be over a POPULATION, not over the number of times a rail ran.
+
+### BUG-490 - CLOSED: the checker derives the rail order from the recipe itself
+- **FIX**: `measure.health_chain()` parses `just health` and returns the invoked rails IN ORDER; `envelope_gaps`
+  DRIFTs when a declared resolver rail sits AFTER the checker (then "has not run yet" reads as "never
+  published"), and separates "never published" from "the chain never invokes that rail". `measure --gaps` moved
+  to the LAST rail of the chain.
+- **MEASURED**: `checker at chain position 19, declared resolver rails [scripts/reconcile.py@18,
+  scripts/verify_handoffs.py@17] - every one precedes it`.
+
+### BUG-487 - still OPEN (half done): the first guarded production write is still owed
+Floors have one home, WHAT counts is now declared, and MUTATION_JOURNAL's vacuity is printed rather than hidden.
+Still owed: route a real production writer through scripts/lib/write_guard.py so the journal carries its first
+receipt, and the I1 bypass join.
+
+### NOT STARTED THIS SESSION (declared, not silently dropped) - the remaining three of the six steps
+- Step 4: `write_guard --audit` (I1 bypass join: AST-scan every declared `writer_of_record` for a guard call
+  site; today NO writer in the repo imports the guard - 0 of 6 declared writers are guarded).
+- Step 5: first guarded production write (candidate: governance/RECONCILIATION.json, written by
+  scripts/reconcile.py, derived_regenerable + OWNED_ANY).
+- Step 6: hygiene - register config/depth_domain_contract.yaml::load_bearing.enabled AND ::pct_scalar.enabled
+  (audit_flag_consumers: 45 verified, 0 RED, 2 unregistered); make
+  config/eval_integrity.yaml#label_axes.known_collisions[0].decision id-shaped (closes reconcile's owner_owed
+  `decision_registry_wellformed`, which still reads `D-271a` inside a ruling paragraph).
+- BUG-484 criteria triage: P1.gate_artifact_fresh (stale fingerprint 4c9e93b294251cc5 vs current
+  ae479dd05c4fe70c); AX4/AX5 remain the owner-gated BUG-326 knowledge-layer repair.
+
+## SESSION 20260925F — one definition of what counts, and the ownership invariant is finally AUDITED
+
+### RECEIPT - a floor is FOUR facts, not one number (BUG-491 fixed end to end)
+- **MEASURED, before**: `scripts/reconcile.py` printed `ok floor governance/HANDOFFS.jsonl: 20 >= 6` while
+  `scripts/verify_handoffs.py` printed `6 receipt(s) >= 6` for the SAME store, because reconcile counted RAW
+  records and verify_handoffs excluded control fixtures. One fact, two homes (C12/C21): a reader could not tell
+  which number the floor was over.
+- **FIX**: `lib/measure.counted_records()/distinct_floor()/_store_count()/floor_check()` is now THE one
+  definition of what counts, and every rail that reports a floor delegates to it. reconcile's floors loop is a
+  pure delegation. A second latent instance of the same class was found in `measure.main()` itself, which
+  re-implemented the METRICS count over RAW records - it agreed with reconcile ONLY because METRICS declares no
+  `exclude_origins`. It would have diverged silently the first time a control fixture wrote into that journal,
+  so it now delegates to `floor_check` too.
+- **FIX (population)**: `min_distinct_names` -> `min_distinct_field` + `min_distinct_values`
+  (`config/evidence_floors.yaml` `schema_version: "2.0"`). MEASURED: METRICS.jsonl held **40 records over only 4
+  distinct metric names** - a record floor over an append-per-run log is a RUN counter, satisfied by re-running
+  the rail, not by measuring anything. HANDOFFS declares `min_distinct_field: path` (6 counted receipts cover 6
+  distinct DECLARED paths); INSTRUMENT_CONTROLS declares `instrument`; MUTATION_JOURNAL declares `path`.
+  The rename is deliberate: a reader that silently ignores an unknown key is how a floor stops being a floor, so
+  a schema change gets a version that makes the incompatibility VISIBLE (R14).
+
+### The guard's own rail was BROKEN - repaired first, because it IS the gate
+- `scripts/lib/write_guard.py` did not compile (`IndentationError` in `selftest()`): the edit that wrapped the
+  three EXPECTED refusals in `contextlib.redirect_stdout` left an orphaned `write_rows(...)` call. Because this
+  file is a `just health` rail and `scripts/reconcile.py` imports it at write time, HEALTH WAS RED and the first
+  mutation receipt was never written. Repaired: 3 blocks, `--selftest` 6/6 invariants, and the expected refusals
+  are now output-CAPTURED - `just health` no longer shows FAIL-looking `!!` lines that are not failures.
+
+### RECEIPT - the I1/D-401 exit gate is BUILT and the FIRST GUARDED PRODUCTION WRITE LANDED (BUG-487 half retired)
+- `write_guard --audit` is an AST scan, not a grep: a mention or an import is not a CALL, because an import with
+  no call site is a script that DECLARES the discipline and does not apply it - the exact state in which BUG-478
+  blanked 148 owner cells. It joins the declared `writer_of_record` set to reality and emits
+  `guard_writers_guarded` with its population and denominator (D-404).
+- `write_document()` writes a WHOLE-DOCUMENT artifact and REFUSES any `owned_keys` other than `OWNED_ANY`: a
+  document has no cells to arbitrate, so "the guard ran" must never be readable as "every cell was protected".
+  `backup=False` for a DERIVED artifact (its pre-image is regenerable); the receipt still records the pre-image.
+- **LANDED**: `governance/RECONCILIATION.json` is now written by `scripts/reconcile.py` THROUGH the guard, and
+  `governance/MUTATION_JOURNAL.jsonl` carries its FIRST receipt (`9c514785c3be98f8 -> 071e1b0aa9dc0699`,
+  kind=document, writer scripts/reconcile.py). The vacuity declaration was RETIRED in the same step that
+  disproved it.
+- **GUARDRAIL PROVEN, not asserted**: between the write and the retirement, `floor_check` reported
+  `governance/MUTATION_JOURNAL.jsonl declares vacuous: true but holds 1 record(s)` and
+  `reconcile --check` returned **rc=1**. The check fired, and the tri-state is honest (1 drift / 2 owed / 0 ok);
+  a stale vacuity is DRIFT, not a comment going quietly out of date.
+- Ceiling: `config/artifact_ownership.yaml#guard_coverage.max_unguarded: 6`, `direction: shrink_only` - MEASURED
+  1/7 declared script writer(s) call the guard (scripts/reconcile.py is the first). Routing a writer through the
+  guard LOWERS this number; RAISING it requires a declared decision, not an edit (same direction as
+  `config/register_divergence.yaml#declared_max`).
+
+### RECEIPT - BUG-491c NEW, found by the audit on its FIRST run: a phantom `writer_of_record`
+- **MEASURED**: `config/artifact_ownership.yaml` declared `writer_of_record: scripts/build_closed_menu.py` for
+  `config/closed_menu_v5.json`. That script exists NOWHERE - not on disk, not in `archive/`, and it is named ONLY
+  in this declaration. A writer nobody can inspect enforces nothing, and it made the ownership registry
+  unfalsifiable for that artifact. The real writer is `scripts/render_closed_menu.py` (crash-safe write of the
+  JSON + its `.sha256`, then a post-write integrity check against the menu_hash pin).
+- **FIX**: the DECLARATION was corrected to match reality (never the reverse). The exemption's rationale was ALSO
+  wrong - it claimed "a new FILE, content-addressed by construction" while the code regenerates the document IN
+  PLACE - so the rationale now describes the mechanism its code actually implements, and names the owed step that
+  RETIRES the debt (`write_document(OWNED_ANY)` is the right home for a whole-document regenerator).
+- **CLASS LESSON**: a declaration is a claim about reality and must be FALSIFIABLE. An ownership registry that
+  cannot be checked against a filesystem is prose. The audit found this within seconds of first running.
+
+### VERIFIED THIS SESSION
+- `just health` **RC 0** (aggregate rail green; the floors, the guard selftest and the new `--audit` rail all in
+  the chain, `--audit` tolerated at rc 2 as declared debt - BUG-457).
+- `just criteria`: 28 criteria | OK 23 | DRIFT 3 | WARN 2 - IDENTICAL before and after, so no cascade.
+
+### STILL OPEN (declared, not silently dropped)
+- **P1.gate_artifact_fresh is STILL DRIFT** (`artifact 4c9e93b294251cc5 vs current ae479dd05c4fe70c`):
+  `config/bench_preflight.yaml` was edited (sha `c2946f279e548409`, commit 986fbc4, 2026-09-19) AFTER the stored
+  artifact was generated (2026-09-17), and `fingerprint()` hashes the config BYTES - so ONLY a real gate re-run
+  clears it. A live `tools/bench_preflight.py` re-stamp was started this session and is still running.
+- AX4.runtime_matches_gold_4axis + AX5.form_axis_traceable remain the owner-gated BUG-326 knowledge-layer repair.
+- Hygiene: 2 unregistered flags (`config/depth_domain_contract.yaml::load_bearing.enabled`, `::pct_scalar.enabled`)
+  and ONE non-id-shaped citation (`config/eval_integrity.yaml#label_axes.known_collisions[0].decision` is a RULING
+  PARAGRAPH wearing a citation key) -> reconcile's `decision_registry_wellformed` owner_owed.
+- The guard's DECLARED APPEND mode is still owed: the refusal of row ADDITIONS is what keeps
+  `ingest_panel_column.py`, `f11_anchor_review.py` and `recompute_decision_summary.py` from being routed, so
+  `max_unguarded` cannot yet fall below 6.
+- **NO COMMIT — owner ack owed.**
+
+## SESSION 20260925G - the guard gains a DECLARED APPEND mode, and two exemptions stop matching their code
+
+### RECEIPT - write_guard APPEND mode landed (10/10 invariants, the enabler for 3 declared debts)
+scripts/lib/write_guard.py 472 -> 620 lines, 13 asserted anchors, pre-image backed up to
+backups/write_guard.PRE_APPEND_20260925F.py. New: plan_append() (the declared invariant: the pre-image must
+survive UNCHANGED as a PREFIX; an added row may only fill the caller's own columns; no id reuse; no truncation),
+append_rows() (mode append, receipt carries added + schema_version bumped to 1.1 per R14 so a pre-append receipt
+is VISIBLE rather than defaulted), read_rows(encoding=...) and a declared lineterminator, plus ONE home each for
+the backup rule (_backup) and the CSV write (_write_csv_atomic). append_rows added to GUARD_CALLS so an import
+without a call still reads as declared-and-unenforced. Verified: py_compile OK; --selftest 10 invariants rc=0
+(5 expected refusals, all output-captured); --audit rc=2 unchanged (1/7 guarded, ceiling 6); reconcile --check
+rc=0 (11 objects); just health rc=0; pipeline/ diff 0 lines.
+
+### RECEIPT - BUG-491c class, instance 2: the ingest exemption does not describe the ingest
+MEASURED, not assumed: config/artifact_ownership.yaml#governance/anchor_adjudication_workbook_20260924.csv
+declares the writer unguardable because "the guard's merge mode REFUSES row additions by design - an ingestor's
+job IS to add rows". scripts/ingest_panel_column.py PRESERVES the row count (new_rows is built by mapping over
+the pre-image; only one rater column changes) - so write_rows(mode='merge', owned_keys={col}) is exactly
+applicable, and the exemption was protecting a mechanism the code does not have. This is the same defect found in
+the closed-menu entry (a rationale that does not match its code), now measured a second time - a CLASS, not an
+instance. The declared ceiling of 6 therefore overstated the debt.
+
+### RECEIPT - hazard measured before routing (so the routing cannot silently reformat an owner artifact)
+governance/anchor_adjudication_workbook_20260924.csv: sha16 1e5532193e2fe163, 99232 bytes, 148 rows, 25 cols,
+LF-only (0 CRLF), no BOM, decodes as utf-8(-sig). csv's default lineterminator is CRLF: the OLD write_rows would
+have re-terminated every line of a human_authored file while reporting a one-cell edit - now impossible
+(lineterminator is declared, default "\n"). Filled owner cells measured: domains_final 147, depth_final 148,
+owner_date 148, owner_note 0.
+
+### RECEIPT - the answer-space pin has no pin (NEW, high blast radius, NOT yet fixed)
+scripts/render_closed_menu.py regenerates config/closed_menu_v5.json IN PLACE and its only check recomputes the
+hash of the file it just wrote and compares it to the hash it just computed - a SELF-consistency check, not a pin
+check. A taxonomy/content-type change therefore re-freezes the answer space with a new menu_hash and NO gate and
+no refusal (D-277 says labels stamped with an old menu_hash must be re-derived). Also the entry is declared
+mutability: immutable while its mechanism is in-place regeneration - declaration and mechanism disagree.
+This is the next owner-visible hardening step, not a hypothesis.
+
+### RECEIPT - the re-stamp run is a ZOMBIE, and no rail can see it (NEW, NOT yet fixed)
+PID 76746 (tools/bench_preflight.py, launched 20:37) is ALIVE at 20:57 with 0.58s of CPU time and a 247-byte
+log: it is blocked, not working, so P1.gate_artifact_fresh stays DRIFT and the rail reports a stale gate while
+the remediation looks "in flight". Nothing in just health can distinguish "not yet finished" from "hung".
+
+### VERIFIED THIS SESSION
+write_guard --selftest 10/10 rc=0 | write_guard --audit rc=2 (declared debt, NOT fatal) | reconcile --check rc=0,
+11 declared objects agree | just health rc=0 (270 lines) | pipeline/ diff 0 | decisions.yaml in sync (772,
+stamp aa69ae412a641374) | 75 dirty files | write_guard pre-image backup on disk (22909 bytes).
+
+### STILL OPEN (declared, not silently dropped)
+- Router steps the append mode unblocks, in order: scripts/ingest_panel_column.py (merge, owned_keys={col},
+  proof on a temp copy), scripts/f11_anchor_review.py (write_document/OWNED_ANY - it must keep its own
+  refuse-if-exists rule), scripts/render_closed_menu.py (write_document/OWNED_ANY + a REAL pin refusal), then
+  lower guard_coverage.max_unguarded 6 -> 3 and rewrite both mismatched exemptions.
+- P1.gate_artifact_fresh: kill and root-cause the hung re-stamp (no deadline/heartbeat in the run).
+- Step-6 hygiene: 2 unregistered depth_domain_contract flags; the non-id-shaped
+  config/eval_integrity.yaml#label_axes.known_collisions[0].decision.
+- git is BLIND to the apparatus: scripts/lib/, scripts/reconcile.py, scripts/verify_handoffs.py and the config
+  declarations are untracked - a git clean -fd deletes four health rails.
+- **NO COMMIT - owner ack owed.**
+
+## SESSION 20260925H - the guard stops being a promise: 3 writers routed, the owner workbook becomes create-only, and two declarations stop describing a mechanism they do not have
+
+### RECEIPT - three declared writers now CALL the guard (D-401/I1), so the ceiling moves 6 -> 4
+MEASURED BEFORE: 1 of 7 declared script writers called scripts/lib/write_guard.py (scripts/reconcile.py).
+- scripts/ingest_panel_column.py -> write_guard.write_rows(mode="merge", owned_keys={the one target column})
+- scripts/f11_anchor_review.py     -> write_guard.append_rows (keeps its own refuse-if-exists rule as gate A)
+- scripts/recompute_decision_summary.py -> write_guard.write_document(OWNED_ANY) for the registry write
+MEASURED AFTER: 3 of 7 guarded; 4 unguarded (stage4_merge, stage5_verify, render_closed_menu, recompute*).
+config/artifact_ownership.yaml#guard_coverage.max_unguarded lowered 6 -> 4 BY EDIT, which is the permitted
+direction (raising it would be a decision). *recompute imports write_document and is therefore counted as
+guarded only when the AST scan sees the call - it does, see the audit line.
+
+### RECEIPT - the ingest routing closed a LATENT whole-file edit, measured before it fired
+The script's local rule carried csv's DEFAULT lineterminator (CRLF). The workbook is LF-only (148 data rows,
+149 LF, 0 CRLF, sha16 1e5532193e2fe163), so one --apply would have re-terminated every line while reporting a
+one-cell edit - the BUG-478 class arriving through a library default. Routing it through the guard closed it
+structurally, and a NEW helper (write_encoding_for) picks the ONE declared encoding that re-encodes to the
+file's EXACT bytes, so a re-run can no longer add a BOM either. Verified on a TEMP COPY (P1): touched == only
+the target column, all owner cells byte-identical, LF-only preserved, and a foreign-cell edit REFUSED (P2) with
+nothing written (P3: the real workbook sha16 is unchanged).
+
+### RECEIPT - BUG-478 ROOT: the machine may now create the owner's workbook ONCE and never rewrite it
+MEASURED: scripts/cross_examine_anchor_axes.py::write_outputs opened governance/anchor_adjudication_
+workbook_20260924.csv with mode "w", rebuilt it from the dispute set and blanked WORKBOOK_OWNER_COLS - one
+documented command away from destroying 148 rows of typed adjudication - while config/artifact_ownership.yaml
+did not merely omit that writer, it named it under machine_writers_forbidden. The declaration was right and the
+code was wrong. Repair: the workbook write is now CREATE-ONLY and DECLARED (config/anchor_cross_exam.yaml#
+outputs.workbook_create_only, read with a fail-closed refusal when absent rather than an undeclared default),
+the creation itself goes through write_guard.append_rows, and an existing workbook is SKIPPED - proven by
+calling _write_owner_workbook on the REAL workbook and asserting the sha16 is unchanged (P4).
+
+### RECEIPT - BUG-491c is a CLASS: 2 more instances fixed in the declarations themselves
+An exemption is a claim about reality and must be FALSIFIABLE. Fixed today because the claim no longer matched
+the code: (1) the ingest exemption ("the guard's merge mode REFUSES row additions by design - an ingestor's job
+IS to add rows") - the ingestor PRESERVES the row count, so the exemption protected a mechanism the code does
+not have; (2) the f11 exemption (same claim, same measurement). Also recorded: (3) the closed-menu exemption
+calls its post-write check "an integrity check against the menu_hash pin" while it is a comparison of the hash
+it just computed with the hash of the bytes it just wrote - there is NO pin (D-277 exposure, owner decision
+required: refuse-if-hash-changes vs a versioned config/closed_menu_v6.json).
+
+### RECEIPT - BUG-342 RE-OCCURRENCE: the AX4/AX5 owner gate was already closed as NOT APPLICABLE
+governance/buglog.md line 2761 records that BUG-326's repair targets DO NOT REPRODUCE and that the gate list
+was corrected on 2026-09-23, yet the handoff carried "AX4/AX5 remain the owner-gated BUG-326 knowledge-layer
+repair" again at line 4814 - the same stale-gate class (quote the generator, never carry a stale count). The
+correct framing is: AX4/AX5 are DRIFT to be re-derived from the artifacts, NOT a repair awaiting a ruling.
+Not re-triaged this session (no drift report re-run); recorded so it cannot be carried as a gate again.
+
+### VERIFIED THIS SESSION
+- py_compile OK on all four patched scripts; write_guard --selftest 10/10 invariants.
+- P1..P4 as above. The real owner workbook and config/decisions.yaml were NOT written this session.
+- Backups (byte-exact pre-images): backups/PRE_ROUTE_20260925H/.
+
+### STILL OPEN (declared, not silently dropped)
+- recompute_decision_summary still has one unguarded home for the registry write; render_closed_menu still has
+  no pin (owner decision); the pre-stamp PID 76746 is still a zombie with no heartbeat.
+- **NO COMMIT - owner ack owed.**
+
+
+## SESSION 20260925I — owner gates accepted: recommendations implemented (part 1)
+
+**BLOCKING DEFECT REPAIRED.** config/artifact_ownership.yaml had FIVE joined keys (an exemption-removal regex
+swallowed the separating newline), which made every rail that reads the ownership declaration RED. Repaired by
+restoring the newlines; the file parses, 8 artifacts declared. `just health` is GREEN (rc=0).
+
+**BUG-492 (NEW, and it was inside the rail).** `guard_call_sites` in scripts/lib/write_guard.py recognised only
+`from lib.write_guard import x` / `import x.write_guard`, so `from lib import write_guard` - the repo's OWN idiom -
+was invisible: the audit reported DRIFT for scripts/ingest_panel_column.py and scripts/f11_anchor_review.py, which
+do CALL the guard. A false DRIFT trains the owner to ignore the rail exactly as a false OK does. Two further
+repairs in the same file: the `root == "write_guard"` clause (a call with NO import was accepted, making the rail's
+own OK unauditable) is REMOVED; and `_require_id_column` now REFUSES a write whose fieldnames lack the declared id
+column - the defect that hid `id_column: row` on an artifact whose header is `item_id,...`.
+
+**BUG-492 instance (declaration vs mechanism).** config/artifact_ownership.yaml declared `id_column: row` for
+governance/F11_ANCHOR_REVIEW_20260923.csv, whose header starts `item_id` and carries no `row` column at all: every
+row read as unaddressable, so the append invariant's id-reuse clause was VACUOUS - it could refuse nothing. Fixed
+to item_id; the guard now refuses a write whose fieldnames lack the declared id column, so it cannot drift again.
+
+**MEASURED (green audit, this time):** `write_guard.py --audit` -> 4/7 declared script writers call the guard
+(reconcile, recompute_decision_summary, ingest_panel_column, f11_anchor_review); 3 unguarded by DECLARED exemption
+(pipeline/stage4_merge.py BUG-376, pipeline/stage5_verify.py BUG-475, scripts/render_closed_menu.py owner decision);
+rc=2 (owner-owed, loud, not fatal). guard_coverage.max_unguarded lowered 4 -> 3 as the receipt of that run. The
+SESSION 20260925H claim ("3 of 7 guarded, 4 unguarded") was NOT measured when it was written (the rails were RED);
+it is superseded by this measured line. BUG-478 is closed with the P4 evidence (existing owner workbook SKIPPED).
+
+**BUG-493 (NEW).** governance/Copy of ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv is declared immutable + `seal: true`
+in config/handoffs.yaml, and its bytes CHANGED (bc1cc956 -> 526991cb, mtime 2026-09-25 21:08). MEASURED root
+cause, not a guess: the 16 declared columns are a byte-exact PREFIX of every one of the 151 rows and
+check_human_instruments.py reports all 7 locked instruments byte-identical, so NO owner cell moved. The delta is 3
+UNNAMED trailing columns, one carrying the stray text 'rese' at row 43 / item R043 col 18: the signature of a
+spreadsheet save on a sheet the owner is entitled to widen. THE CLASS-LEVEL DEFECT: two declarations held two
+incompatible rules for one fact - the instrument LOCK is column-scoped ("new columns allowed; removed or rewritten
+columns FAIL") while the handoff LEDGER asserted WHOLE-FILE immutability for the same file, so the owner's own
+instrument could be edited into a permanent RED with no legal path back except human surgery. REPAIR (no evidence
+moved, R-D410): rev 3 declared at 526991cb in config/human_instrument_locks.yaml + config/anchor4_interim_state.json
+with rev 1 and rev 2 kept as SUPERSEDED; rev 2 given its own revision locator (git:65a13c3c) so the digests the
+receipt quotes still RESOLVE as bytes instead of becoming orphan digests; the live bytes sealed through
+`handoff.seal()`; a fresh receipt taken (origin=backfill) for the changed path. Result: hash_claims 13/13 resolved,
+cross_declaration 11/11, revisions re-derived, verify_handoffs rc=0. OWNER-GATED: if the 21:08 save was NOT yours,
+restore rev 2 from 65a13c3c.
+
+**D-2637 MINTED (owner gate 1 accepted).** "A resolver declares and publishes its resolution domain, and a finding
+may not name an artifact defective without naming what was searched." The rule existed and worked; the IDENTIFIER
+was wrong: config/resolution_domains.yaml stamped `decided: D-405` while D-405 is a DIFFERENT rule (the
+declaration-to-reality join: config/reconciliation.yaml, reconcile.py). One id, two subjects, invisible because a
+stamp is a bare id. The file now stamps D-2637; D-405's record is NOT edited (records are append-only) and D-2637
+names the separation. Registry in sync: 773 decisions, stamp d1e12eca8288d722. NAME-SPACE RULE recorded: one id,
+one subject.
+
+**STILL OPEN (do not read this session as closed):**
+- config/evidence_floors.yaml does NOT yet declare the SEALED SET: the code path IS in place in
+  scripts/lib/measure.py (an unsealed `origin: selftest` record is DRIFT; a sealed digest that has VANISHED is
+  DRIFT; max_records 14 shrink-only), but the YAML edit did not match the block and did NOT apply. Until it does,
+  the count ceiling `max: 14` stands and the allowance is still grandfathered. The 14 records are NOT moved.
+- The answer-space pin (render_closed_menu.py) is UNCHANGED: its only check recomputes the hash of the bytes it
+  just wrote and compares it to the hash it just computed, while the ownership entry declares `mutability:
+  immutable`. Owner decision accepted: I2 VERSIONING (a new config/closed_menu_v6.json, never an in-place
+  re-freeze) - NOT implemented, and it must not be half-done: 10 config files reference closed_menu_v5, so the
+  version-on-change mechanism lands WITH the consumer-repoint rule.
+- AIX4/AX5 are NOT an owner gate (BUG-342 re-occurrence): re-frame as DRIFT to be re-derived on `just criteria`.
+- The zombie re-stamp (PID 76746) is gone from the process table; P1.gate_artifact_fresh needs the
+  deadline/heartbeat distinction before that WARN can be read as anything.
+
+**NO COMMIT — owner ack owed.** Files touched this session: config/artifact_ownership.yaml, config/anchor_cross_exam.yaml
+(prior), scripts/lib/write_guard.py, scripts/lib/measure.py, config/human_instrument_locks.yaml,
+config/anchor4_interim_state.json, config/handoffs.yaml, config/decisions.yaml, config/resolution_domains.yaml,
+governance/HANDOFFS.jsonl, governance/handoffs/blobs/, and this file. The human_authored workbook was NOT touched
+(sha16 1e5532193e2fe163).
+
+## SESSION 20260925J — owner gates: implementation part 2 (sealed set + answer-space pin, audited)
+
+**SEALED SET APPLIED (owner gate accepted).** config/evidence_floors.yaml schema_version 2.0 -> 2.1 (R14) and the
+count ceiling for governance/HANDOFFS.jsonl is replaced by a SEALED SET: sealed_set{digest_field, grandfathered_sha16:
+['0682c5f2076f099c','e5bc54d3288ee8af']} + max_records 14 (shrink-only). The digests were DERIVED from the journal by
+the patch script and refused if not exactly 2 x 7 over 14 records. Nothing was moved or deleted (R-D410).
+KNOWN-ANSWER CONTROLS (6, in-memory, /tmp/ctl_s1*.py): A sound=0 drift; B an unsealed selftest record = DRIFT
+(NOT in the sealed set) plus a second DRIFT on max_records; C a vanished sealed digest = DRIFT (R-D410); D max AND
+sealed_set together = DRIFT (two homes for one bound); E legacy count path still enforced (max 13 over 14 = DRIFT);
+F neither max nor sealed = DRIFT. The allowance is now falsifiable in BOTH directions, which a count never was.
+**BUG-494 (NEW, inside the rail).** scripts/menu_axis_hashes.py treated --check as a MODE FLAG ON A WRITER: running
+`menu_axis_hashes.py --check` WRROTE config/menu_axis_hashes.yaml (printed "wrote ..." and rc=0). A check that
+repairs cannot report, and the consequence is not cosmetic: a STALE per-axis file makes
+scripts/validate_depth_domain_contract.py --gate-if-active compare the live render against OLD declared hashes - a
+blindspot with a green light. FIXED: --check is read-only (reports STALE/ABSENT, rc=1); the writing path is
+separate. Verified: --check rc=0 with no mtime change.
+**BUG-495 (NEW).** That same script was an UNDECLARED writer of a config artifact - write_guard --audit computes its
+coverage over DECLARED writers only, so an undeclared writer of the answer-space pin was invisible to the rail that
+exists to find exactly this - and it wrote the pin with a bare Path.write_text (no fsync, no os.replace): a crash
+mid-write could truncate the pin itself (C6). FIXED: declared in config/artifact_ownership.yaml
+(mutability: derived_regenerable, writer_of_record) and ROUTED through write_guard.write_document(OWNED_ANY,
+journal=True). Measured effect: audit 4/7 -> 5/8 declared writers guarded (f11_anchor_review, ingest_panel_column,
+menu_axis_hashes, recompute_decision_summary, reconcile); unguarded stays 3 (stage4_merge BUG-376, stage5_verify
+BUG-475, render_closed_menu declared debt), so the shrink-only ceiling 3 is NOT raised (rc=2, owner-owed, not fatal).
+**BUG-496 (NEW; owner gate 5 closed, not waived).** scripts/render_closed_menu.py wrote config/closed_menu_v5.json
+unconditionally, so a taxonomy edit re-froze the answer space in place with a NEW menu_hash and NO refusal, while
+config/artifact_ownership.yaml declared the file immutable - the declaration and the mechanism disagreed (BUG-491c,
+instance 4). ROOT: there was no pin, only self-consistency (the script recomputed the hash of the bytes it had just
+written and compared it to the hash it had just computed). FIXED: the script now REFUSES to overwrite an existing
+revision whose menu_hash differs from the live render (verified RENDER_RC=1, v5 byte-untouched) and can mint a NEW
+revision (--mint-version N, I2 versioning) with the consumer-repoint obligation PRINTED. The ownership entry's
+"FIX REQUIRES AN OWNER DECISION" text is superseded in place by the D-371 ruling (recorded, not deleted).
+**GATE 5 WAS ALREADY IMPLEMENTED - AND MY PRIOR FINDING WAS INCOMPLETE.** D-371 (RATIFIED 2026-09-25) rules the
+composite pin HISTORICAL and the ANSWER SPACE the pin; the apparatus exists and is green: config/menu_axis_groups.yaml
+(membership, one home) + config/menu_axis_hashes.yaml (answer_space_hash 8436d9c985c0efdf over [domains, abstention])
++ scripts/menu_axis_hashes.py (generator) + scripts/validate_depth_domain_contract.py --gate-if-active (wired in
+just health, line 15). MEASURED now: composite 73597ee2 (frozen) vs d2fc500c (live) = DEFINITION_DRIFT in
+[disciplines] ONLY, caused by one field: disciplines["behavioral economics"].definition was reworded
+("deviations from rational choice" -> "from the rational or standard model"); the answer-space axes are byte-identical.
+A v6 was deliberately NOT minted: D-371 already pinned the invariant, and minting a second home for one fact is the
+anti-pattern this session kept finding. LESSON (BUG-488/489 class, applied to myself): my previous finding named
+render_closed_menu.py defective without naming what had been searched - the pin lives in a DIFFERENT home, and D-371
+had already measured it. A finding must name its resolution domain.
+**BUG-497 (NEW, DATA-SIDE, UNFIXED).** MEASURED: knowledge pipeline/maxwell.db, table fbs, 7995 rows,
+**fbs.menu_hash is EMPTY on every row** - the D-279 traceability stamp (the binding prerequisite for min_human_share /
+F-44) is present as a column and populated by nothing. Consequence: no committed FB can be traced to the menu it was
+classified against, so a D-277 "re-derive from source" run is the only route to traceability for the current corpus,
+and any answer-space claim about the corpus is currently unfalsifiable. NOT fixed here: it is a pipeline write path
+(owner-gated under pipeline/**) and needs either an owner-authorized backfill or a declared no-backfill decision.
+**NO COMMIT - owner ack owed.** Files touched: config/evidence_floors.yaml (2.1 + sealed set),
+scripts/lib/measure.py (sealed-set semantics, two-homes refusal, note de-duplication, SHRINK typo), scripts/menu_axis_hashes.py
+(read-only --check, guard routing), scripts/render_closed_menu.py (refuse/mint), config/artifact_ownership.yaml (new
+declaration + superseded wording), justfile (pin check wired into just health: rc=0).
+
+## SESSION 20260925K - rail repair (citation resolution + flag registry) + 2 P0 INTEGRITY FINDINGS
+
+**P0-A (BLOCKS THE AGGREGATE RAIL; Dropbox, not code). `.git/refs/heads/main` WAS RENAMED BY DROPBOX.**
+MEASURED 21:44 HEAD resolved (`96b1e9c`); by 21:47 `git rev-parse HEAD` = "ambiguous argument 'HEAD'" and
+`git status` claimed **1220 files ADDED** (a first-commit-of-everything view) where 3 minutes earlier it showed
+29 A / 32 M. CAUSE: a second machine ("M1 max") touched the same Dropbox-synced .git, and Dropbox resolved the
+conflict by RENAMING git's own ref: `.git/refs/heads/main (M1 max's conflicted copy 2026-09-25)` (same for
+`.git/COMMIT_EDITMSG`). EVIDENCE THAT THE REPAIR WAS A RESTORATION, NOT A CHOICE: the conflicted ref contained
+96b1e9c79c441edf71b551a2f3c52e06e31f6362 (a valid commit object, = the HEAD measured at 21:44) and its reflog
+ended `715935d -> 96b1e9c commit (amend): ANCHOR-4 annex + rail-4 hardening`, byte-identical to `.git/logs/HEAD`.
+ACTION: renamed the file back (ref + reflog), no bytes chosen or overwritten. VERIFIED: `git rev-parse --short HEAD`
+= 96b1e9c, branch main, `git log` intact. **LESSON: staging/committing from that state would have produced a bogus
+commit; the "no commit without owner ack" rule is what caught it.** BUG-400 class (Dropbox File Provider), now
+proven to corrupt GIT METADATA, not just worktree files: a one-line `git status` cannot be trusted while a second
+Dropbox client is writing.
+
+**P0-B (16 FILES RENAMED OUT OF THE TREE; `just health` IS RED AT LINE 13).** The same mechanism renamed 16
+TRACKED files to `X (M1 max's conflicted copy 2026-09-25)` and the ORIGINALS ARE GONE from the working tree
+(measured: `orig_exists=False` for all 16). MEASURED vs HEAD: 2 SAME_AS_HEAD (`governance/SESSION-HANDOFF-2026-09-23.md`,
+`scripts/check_session_plan.py`), 14 DIFFERS_FROM_BOTH (i.e. the other client's newer content). Consequence:
+`just health` exits 1 at line 13 - `manifest missing: governance/ANCHOR4_MANIFEST_20260924.json`. RESOLUTION
+DOMAIN (BUG-488/489): the "index" column was not measured - my `git show :<path>` invocation returned non-zero for
+all 16, so treat the index comparison as UNVERIFIED; HEAD blobs and the conflict copies WERE hashed. The lost
+originals are recoverable from .git objects (`git checkout -- <path>` restores HEAD bytes), but for the 14 that
+differ that would DISCARD the other client's content - so NO restore attempted. OWNER DECISION: per file,
+keep conflict copy / keep HEAD / merge. Also: no staging performed this session for the same reason (a later
+`git commit -a` would DELETE 12 tracked files).
+
+**BUG-498 (FIXED, rail defect: a documented resolution that did not exist).** `scripts/reconcile.py::_citation_base`
+ran `.upper()` BEFORE `.rstrip("abc...")`, so the strip could NEVER match - the docstring ("'D274a' -> 'D274': a
+sub-lettered id is a variant of its base decision") described a mechanism that did not exist, and a citation of the
+BASE of a sub-lettered decision was reported DRIFT ("does not exist"). MEASURED: 32 letter-suffixed ids in the
+registry, 0 base records, 0 live citations affected (inert - a latent trap). FIXED: `_citation_token` (normalise)
++ `_citation_base` (strip-then-normalise) + `_resolves_citation` (ONE definition of "a citation resolves", now used
+by BOTH citation checks, C21). KNOWN-ANSWER CONTROLS: cited variant `D-271a` -> resolves ['D271A']; cited base
+`D-271` -> resolves ['D271A','D271B','D271C']; INVENTED variant `D271z` -> MISSING (fail-closed); `D-999` ->
+MISSING; prose value -> `_id_shaped` False (still owner_owed). BUG-491c class instance 5.
+
+**BUG-497 REFINED (provenance; NOT a stage6 write bug - a HISTORICAL GAP).** `fbs.menu_hash` is empty on ALL
+7,995 rows (PASS 5,023 / QUARANTINE 2,972). The write path EXISTS and is wired end to end:
+`pipeline/stage4_merge.py:2256 "menu_hash": _current_menu_hash()` (R1/D-279 stamp on every classified FB) ->
+`pipeline/stage6_commit.py:568 _safe_str(fb.get("menu_hash"))` -> `fbs.menu_hash` (schema at :93, migration :273).
+MEASURED: the S4 artifact `knowledge pipeline/stage4_merge/checkpoint.jsonl` (2026-08-31, the corpus this DB was
+committed from) carries NO menu_hash at all. VERDICT: the corpus PREDATES the stamp, so no backfill and no
+re-derivation is required *by a code defect*; the choice is (a) declared pre-provenance boundary for the existing
+7,995, or (b) targeted S4 re-derivation - and a BATCH RUN AFTER THE STAMP needs no fix to be traceable.
+
+**QUARANTINE TRIAGE (2,972 = 37.2%).** By `s5_reason`: **neutral 2,277 (76.6%)**, no_evidence 556 (18.7%),
+contra 115, vacuous 14, evidence_contaminated 9, mech_fail 1. By `verification_method`: deberta-nli 2,948,
+mech_quality 15, evidence_contaminated 9. RULED-BY-DESIGN exclusion measured: none of the known design causes
+explains the bulk (duplicate_of is NULL on every row; the D-271a homonym guard hits only 93 rows). `needs_human_review=1`
+on 386. So the dominant cause is the S5 NLI returning NEUTRAL at threshold 0.1 - i.e. quarantine is governed by ONE
+CALIBRATION KNOB, and 0.1 is a strictness, not a measured operating point. That makes an S5 threshold-vs-precision
+curve (needs the human-adjudicated stratified sample) the single highest-value quality instrument.
+
+**BUG-499 (NEW, OPEN). `status` IS A PURE FUNCTION OF `epistemic_status`.** MEASURED 1:1 both directions:
+source-supported 4,284 -> PASS, corroborated 739 -> PASS (5,023 = DB PASS); speculative 2,181 -> QUARANTINE,
+cross-source-unverified 791 -> QUARANTINE (2,972 = DB QUARANTINE). Two columns, one fact. D274a ruled "no label
+column can determine status" and required a CI invariant; the only match for that text is inside
+`config/decisions.yaml`, i.e. **no such invariant script exists** (resolution domain: `git grep "determine status"`).
+Needs a ruling: either epistemic_status is the canonical record and `status` is a declared derived mirror (then the
+invariant is about the WRITER, not the column), or one of them is a second home for one fact.
+
+**STEP-6 HYGIENE CLOSED (implemented).** `config/flag_consumer_registry.yaml` +2 entries (C12: every flag one home):
+`config/depth_domain_contract.yaml::load_bearing.enabled` (required false; consumer `scripts/check_depth_load_bearing.py`
++ `consumer_symbols: 'lb.get("enabled")'`; invoked as a rail at justfile:25; the note records the SEMANTICS - false =
+PROHIBITIVE (a forbidden trace exits 1), true = REPORTING, so flipping it is a DE-FANGING of D-394, not a feature
+switch) and `::pct_scalar.enabled` (required false, consumers [] + exempt_reason; decisions [] is deliberate - no
+registry record names pct_scalar, so citing one would be a manufactured source). MEASURED AFTER: **47 verified,
+0 RED, 0 unregistered** (was 45 / 0 / 2).
+
+**CITATION STATE MOVED FORWARD, NOT CLOSED.** `config/eval_integrity.yaml#label_axes.known_collisions[0].decision`
+is now id-shaped (`D-271a DECLARED HOMONYM ...`, prose preserved, id resolution verified against the registry).
+The owner_owed row did NOT disappear - it CHANGED FORM: from "1 citation value(s) are NOT id-shaped" to "1 declared
+homonym citation(s) are EXEMPT from id validation: ['config/menu_axis_hashes.yaml:decision']". FINDING: the
+exemption branch of `decision_registry_wellformed` sits BEHIND the unval branch, so a declared exemption was
+MASKED by the first failure - a rail that reports one debt at a time hides the next. The remaining owner_owed is
+now a VISIBLE, shrink-only exemption (D-402): drop it and make that citation id-shaped, then the check reaches `ok`.
+
+**GOV SYNC / NO COMMIT.** Buglog appended (this entry). Files touched: scripts/reconcile.py, config/eval_integrity.yaml,
+config/flag_consumer_registry.yaml. NOT staged: the working tree carries 16 unresolved Dropbox conflict copies and
+`just health` is RED because of them (line 13), so a commit now would be both unverifiable and destructive.
+
+## SESSION 20260925L - P0-A/P0-B REPAIRED + RAIL 0 installed (sync integrity is now a check, not an assumption)
+
+**BUG-400 ESCALATED (the File Provider renames GIT METADATA, not just worktree files); FIXED BY A RAIL.** P0-A
+recurred TWICE on 2026-09-25: `.git/refs/heads/main` was renamed (HEAD unresolvable, `git status` offered a
+1,220-file FIRST COMMIT - committing would have buried 382 commits under a bogus root), and later `.git/logs/HEAD`
+was renamed away while `.git/logs/refs/heads/main` was ROLLED BACK to an older file, so `git reflog` served a
+STALE branch reflog and reported HEAD@{0}=a1061cd while HEAD was 96b1e9c. `git fsck` named both: "bad ref for
+.git/logs/HEAD (M1 max's conflicted copy 2026-09-25)". The decisive property: the corrupt readings were FILES, so
+no rail could see the corruption by reading them - no rail looked at the repository as an object. Now
+`scripts/check_repo_integrity.py` (config/repo_integrity.yaml, C12) is RAIL 0: it runs FIRST in `just health` and
+FIRST in `.git/hooks/pre-commit`, and it asserts (1) HEAD resolves, (2) no conflict-marked name exists inside
+.git, (3) .git/logs/HEAD exists and its last commit EQUALS HEAD, (4) no tracked path is missing while a conflict
+copy for it exists.
+
+**P0-B SCOPE WAS 3x MY LAST MEASUREMENT (43 conflict copies, not 16; 38 with the canonical path EMPTY).** For 38
+files the conflict copy was the ONLY SURVIVING COPY - including the justfile (so `just health` could not start:
+"error: No justfile found"), config/decisions.yaml, DECISION-LOG.md, governance/buglog.md, config/eval_integrity.yaml
+and 6 scripts/. Bytes were FROZEN FIRST to an out-of-sync vault with a sha256 manifest (2.3 MB, 43 rows), then
+repaired by a session-scoped executor whose every precondition (P1 sha256 in the manifest, P2 the bytes on disk
+still hash to it, P3 RESTORE only into an EMPTY canonical or a RE-VERIFIED byte-prefix superset, P4 vault never
+touches a canonical) fails closed: 41 moves, 0 bytes lost, 0 content chosen. R5 review by gemma-4-E4B-it-MLX-4bit
+found a REAL defect before the first apply - `shutil.move` silently degrades to copy+delete ACROSS FILESYSTEMS,
+so the "same inode" claim was a BUG-498-class claim the code could not keep; replaced by `os.replace` behind a
+same-`st_dev` precondition. The executor also refused to overwrite the one legitimate overwrite (the reflog
+superset) until the bytes about to be lost were copied to a preimage - so "nothing is lost" is now an ACT, not an
+argument. Receipt: vault APPLIED_MOVES.json + preimages/.
+
+**THE RAIL CAUGHT ITS OWN FIRST REAL FINDING.** `just health` went from "error: No justfile found" to the LAST
+rail, and at `build_archive_index --check` it reported the archive index STALE. Root cause was NOT the restore: the
+vaulted `archive/index (cc).yaml` differed from the canonical in exactly one line (`generated:` timestamp), i.e. the
+"divergent" duplicate carried no content. That is the rail doing its job on its first run - a stale derived artifact
+named itself instead of a human noticing later. Regenerated via the sanctioned builder.
+
+**VERIFIED AFTER.** HEAD 96b1e9c resolves; `git fsck` rc=0 with ZERO errors (was 4 bad-ref errors); `git reflog`
+HEAD@{0}=96b1e9c AGREES with HEAD; 0 conflict-marked names in a full worktree sweep; no tracked path missing;
+`just health` runs to the end (773 decisions in sync, archive index in sync).
+
+**BUG-500 (OPEN, owner-gated).** A rail cannot stop Dropbox, and the second client ('M1 max') still writes this
+tree, so the condition can RECUR. Root-cause fix is an owner act: take `.git` out of the synced domain (e.g.
+`git init --separate-git-dir=<path outside Dropbox>`, which leaves only a one-line pointer file inside Dropbox) or
+stop the second client. Rail 0 makes a recurrence LOUD within one `just health` and UNCOMMITTABLE, instead of
+silently presenting a first-commit-of-everything view.
+
+**NO COMMIT** (owner ack owed; the pre-commit gate also refuses: governance/HANDOFFS.jsonl is outside the plan).
+## SESSION 20260925M - the git dir left the synced tree: the corruption vector is REMOVED, not patched (and RAIL 0 now enforces it)
+**THE VECTOR IS REMOVED, NOT PATCHED.** Dropbox renamed .git/refs/heads/main, then .git/logs/HEAD, then rolled
+.git/logs/refs/heads/main BACK to an older file. Every repair was a restoration, but a rail can only make a
+recurrence LOUD - it cannot stop a File Provider from renaming what it syncs. RESOLUTION (owner instruction
+2026-09-25: approve the future-proof fix if viable): the git dir was RELOCATED out of the synced tree to
+/Users/barn/maxwell_os_gitdirs/maxwell_os_2_0.git, leaving a 58-byte "gitdir:" POINTER FILE at .git. Dropbox now
+syncs 58 bytes of inert pointer and ZERO bytes of git metadata: 126 MB left the synced domain.
+**WHY THIS AND NOT SELECTIVE SYNC.** D-366(4) REJECTS selective sync ("it evicts local copies and can pull the
+live DB mid-run") - the ignored-attribute / selective-sync route was already closed by an owner decision. A
+git-level relocation is outside the sync client's logic entirely.
+**WHY THIS IS NOT THE D-366 RELOCATION.** D-366(3) warns relocation is a planned window because 20+ artifacts
+bake the absolute path. That warning is about moving the WORKTREE. Moving the GIT DIR leaves every baked absolute
+path byte-identical: --show-toplevel still returns the Dropbox path, HEAD is unchanged, and git status
+--porcelain is unchanged (94 lines before AND after).
+**PROOF, IN ORDER (the guardrail had to have TEETH before the fix).** (1) RAIL 0 was reshaped to resolve the git
+dir as GIT resolves it (rev-parse --absolute-git-dir) and to walk the git dir as its OWN root - because the
+pre-move script asserted git_dir.is_dir() and would have FAILED on a perfectly intact repository the moment .git
+became a pointer file: THE FIX WOULD HAVE BROKEN ITS OWN GUARDRAIL (audit finding). Behaviour preservation was
+verified FIRST: same rows, empty plan, and the repair executor's imports (load_config/scan/verdict/
+superset_holds) still resolve. (2) require_git_dir_outside_sync_root was turned TRUE while the git dir was still
+inside Dropbox, and the rail FAILED, naming it: "the git dir ... is INSIDE a sync domain (matched
+Library/CloudStorage/Dropbox)" rc=1. (3) A byte-identical backup was frozen FIRST at
+/Users/barn/maxwell_os_gitdir_backup_20260925T2230 (5,334 files, 126 MB, backup HEAD == live HEAD, fsck clean).
+(4) A same-st_dev precondition was checked (16777229 == 16777229) so the move was a RENAME, never a cross-device
+copy (the BUG-498 class: a claim the code cannot keep). (5) 5,334 files before == 5,334 after; HEAD 96b1e9c
+resolves; git fsck clean; git worktree list intact. (6) RAIL 0: "ok repo-integrity: HEAD resolves, git dir
+/Users/barn/maxwell_os_gitdirs/maxwell_os_2_0.git, logs/HEAD agrees, 0 conflict-marked names in 2 sweeps" rc=0.
+**AUDIT FINDINGS (forensic pass, BEFORE the write).** (a) the rail's own .git-is-a-directory assumption (above).
+(b) scripts/install_git_hooks.sh wrote to the literal .git/hooks/pre-commit, which after the fix is a FILE -
+rewritten to resolve rev-parse --absolute-git-dir, then the hook was reinstalled THROUGH the installer to prove
+it (not hand-written). (c) the stale worktree /private/tmp/mx_head was PRUNED before the freeze ("gitdir file
+points to non-existent location"), so the backup does not enshrine a broken entry. (d) nothing else in
+scripts/ config/ justfile hardcodes a .git/ path.
+**CONSEQUENCES THE OWNER OWES A VIEW ON.** (1) The .git DIRECTORY disappears from dropbox.com and therefore from
+the other client ("M1 max"): that machine can no longer serve git metadata for this repo - that IS the fix, but a
+checkout there is not a repository until it gets its own git dir. (2) The pointer holds an ABSOLUTE path, valid on
+this machine only. (3) The pre-commit hook now lives outside the synced tree, so a second machine must run
+scripts/install_git_hooks.sh. (4) REVERT is one command pair: rm .git AND mv
+/Users/barn/maxwell_os_gitdirs/maxwell_os_2_0.git .git.
+**STILL OPEN: BUG-400's class is de-vectorised for git metadata, NOT abolished for the worktree.** The worktree is
+still synced and files can still be renamed (P0-B); RAIL 0's worktree sweep is the detector for that, and the
+43-copy precedent says that risk is real.
+**NO COMMIT** (owner ack owed).
+
+## SESSION 20260925N - the D274a invariant became a rail, and the citation exemption was removed at its source
+
+**BUG-499 HALF-CLOSED (the missing CI invariant now EXISTS and has TEETH).** MEASURED before: D274a's rule
+(status=PASS implies factual.passed and s5_reason not in the negative set) lived ONLY inside
+pipeline/serving_gate.py, and its assertion was called by the WRITER (scripts/apply_serving_gate.py:97) -
+NO rail evaluated a single STORED row, so the invariant could not fail. That is the BUG-482 class: a rail
+built to be un-silent is itself silent. NEW scripts/check_serving_gate.py re-derives EVERY row from the
+verification record by IMPORTING derive_status from the one implementation (C21 - a second implementation
+here would be a second truth) and classifies MATCH | STATUS_MISMATCH | REASON_MISMATCH | UNDECIDABLE (no
+factual check and no dedup marker is NOT a pass). READ-ONLY by construction (sqlite mode=ro; R-D410 /
+BUG-491 class). Every path, column and TOLERANCE is declared in config/serving_gate.yaml#rail (C12),
+including SHRINK-ONLY baselines max_status_mismatch / max_reason_mismatch / max_undecidable.
+TEETH PROVED BEFORE ANY VERDICT: --selftest drives 5 known-answer controls through the SAME classifier -
+verified row stored PASS = MATCH; PASS with factual.passed False = STATUS_MISMATCH; PASS carrying 'contra'
+= REASON_MISMATCH; verified row stored QUARANTINE = STATUS_MISMATCH; record with NO factual check =
+UNDECIDABLE. 5/5 fire. A guardrail never observed failing is not a guardrail.
+MEASURED LIVE (first run): 7,995 rows - **7,995 MATCH, 0 status mismatch, 0 reason mismatch, 0
+undecidable**; PASS 5,023 all carry reason 'entail'; QUARANTINE 2,972 = neutral 2,277 / no_evidence 556 /
+contra 115 / vacuous 14 / evidence_contaminated 9 / mech_fail 1. The one writer's rule HOLDS on the live
+store - which is exactly why the invariant had to become a rail: it now FAILS the moment a future writer
+disagrees with the record, instead of serving the disagreement silently.
+**THE RULING IS STILL OWED, AND THE RAIL CARRIES IT INSTEAD OF HIDING IT:** epistemic_status is a FORWARD
+determinant of status (label -> status IS a function: source-supported/corroborated -> PASS,
+cross-source-unverified/speculative -> QUARANTINE) while the reverse is NOT a function (PASS carries two
+labels). A MEASURED coupling is not a proven cause - a label DERIVED from the verification record looks
+identical - so the rail exits 2 (owner-owed, loud, NOT fatal) and names the declaration that resolves it:
+rail.label_relationship = 'derived_mirror' (the 1:1 IS the intended mirror; the rail then reaches ok) |
+'independent' (the two must decouple, and a 1:1 is then a DEFECT, exit 1) | 'unruled' (today). One
+config act, no edit to the rail.
+MEASUREMENT CORRECTION (BUG-498 class - a claim the code cannot keep): duplicate_of is NOT NULL on every
+row; it is a non-NULL EMPTY STRING. Falsy, so the rule reads 'not a duplicate' - correct behaviour, wrong
+record. The earlier note 'duplicate_of is NULL on every row' was never true.
+
+**BUG-483 RESIDUAL CLOSED - the citation exemption is GONE, not renamed.** config/menu_axis_hashes.yaml
+carried a key named 'decision' in KEY position whose value is a sha256, so scripts/reconcile.py read a
+digest as a decision id and the file needed an EXEMPTION (meta.citation_exemptions). An exemption is a
+place where a rail stops looking. The collision was created by the GENERATOR (it emitted hashes: as a map
+keyed by AXIS NAME), so it is fixed at the generator: hashes: is now a LIST of {axis, sha256} records. A
+name in VALUE position cannot collide with a KEY vocabulary, and no future axis name can recreate the
+collision. Its one reader (scripts/validate_depth_domain_contract.py:410, fail-closed on any other shape)
+was updated, the pins were regenerated through the sanctioned writer, and citation_exemptions is now [] -
+a FLOOR, shrink-only: a new entry is a declared decision, not an edit. MEASURED AFTER:
+decision_registry_wellformed -> **ok** ('773 decision id(s) unique under one namespace; 773 record(s)
+carry a canonical state; every citation resolves'). It was owner_owed on EVERY run before this.
+CASCADE CHECKED: menu_axis_hashes --check in sync; depth/domain gate 'ok contract: no hard findings, no
+owner-owed cells'; tests/test_depth_domain_contract.py 12 passed; artifact_ownership declares the file
+derived_regenerable with writer_of_record scripts/menu_axis_hashes.py, so no digest contract to re-stamp.
+
+**RAIL 0 NOW GATES A RUN, NOT JUST A HEALTH REPORT.** scripts/check_repo_integrity.py added to
+'just preflight' (2 = owner-owed, loud, not fatal - BUG-457), because a batch that writes from a tree
+whose git metadata a sync client has renamed is how a torn artifact is produced (BUG-400/BUG-500).
+
+**THE CARRIED REACH DEBT WAS ALREADY CLOSED BY THE PREVIOUS FIX (no work needed):** 'owner_owed reach: 1
+uninvoked of 83' is now 'ok reach: 0 uninvoked of 84 reachable check script(s), 1 declared edge(s) (0
+dead)'. The uninvoked script WAS scripts/check_repo_integrity.py, and wiring it as RAIL 0 in just health
+invoked it. LESSON: an uninvoked rail is not a rail, and the reach rail named its own remedy.
+ORDER RESPECTED: the new rail sits BEFORE reconcile.py --check / measure.py --gaps, whose order is
+load-bearing (BUG-489/BUG-490) - a resolver rail after them makes 'has not run yet' read as 'never
+published'.
+NO COMMIT (owner ack owed). Files touched: scripts/check_serving_gate.py (new), config/serving_gate.yaml,
+justfile, scripts/menu_axis_hashes.py, scripts/validate_depth_domain_contract.py, config/reconciliation.yaml,
+config/menu_axis_hashes.yaml (regenerated), governance/buglog.md.
+
+## BUG-501 - FIXED - a declaration pointer that resolves to NOTHING was reported as a pending ruling
+
+**The class:** the rail built to detect a declaration diverging from reality reported its OWN breakage as
+someone else's unfinished business. MEASURED 2026-09-25: `config/reconciliation.yaml#depth_workbook_row_count`
+declared `config/agreement_floor.yaml#panels.depth_axis_panel.rows_declared` - a key that was NEVER WRITTEN in
+any file - and printed, on every `just health` for a day: `owner_owed ... (BUG-466 class: report the found
+count until the rule is ruled)`. The rule HAD been ruled: D-393, owner-accepted, and its declaration lives in
+`config/cohort_declaration.yaml`, which `scripts/depth_pass_agreement.py --check-cohort` already verifies. So a
+ruled rule printed as a pending one, and the rail's message actively misdirected anyone reading it.
+**ROOT CAUSE (three states, one sentence).** `count_matches` returned the SAME `owner_owed` verdict for
+(1) the declaration key does not exist, (2) it exists but is not an integer, (3) it disagrees with the artifact.
+Only (3) is a pending ruling; (1) is a BROKEN RAIL - the declaration moved or was renamed and nobody repointed
+the entry - and (2) is a malformed declaration. A rule cannot be owed AT a key that does not exist.
+`optional: true` was doing double duty as 'the rule is not ruled yet', which is how a dangling pointer got
+laundered into owner-owed debt.
+**FIX (root, not symptom).** (a) `scripts/reconcile.py`: `not found` -> DRIFT ('a broken rail is never a
+pending ruling') and a non-integer declaration -> DRIFT, in EVERY kind; `optional: true` may still downgrade a
+MISMATCH to a pending ruling, but may never launder a pointer that resolves to nothing. (b) The entry is
+REPOINTED to the ONE home that owns the denominator, `config/cohort_declaration.yaml#cohorts.anchor4_depth.
+measured_rows`, and `optional` is REMOVED: once a denominator is declared, disagreeing with the artifact is
+DRIFT, not owner-owed. (c) `config/cohort_declaration.yaml` now DECLARES `measured_rows: 148` (+ `decided:
+D-393`) - the number was previously computed only at run time, and a count that is never declared cannot
+DISAGREE with anything, so a silently changed denominator stayed invisible (the exact BUG-466 failure mode).
+(d) `scripts/depth_pass_agreement.py::check_cohort` now ASSERTS the declared count against the workbook,
+fail-closed, so the declaration is verified rather than decorative. Two INDEPENDENT oracles now hold the same
+number (D-402): the cohort rail proves the denominator BALANCES (measured + absent == declared, absent rows
+provably not in the workbook); the reconcile entry pins it to the artifact's ACTUAL row count, so a row added
+or dropped cannot keep the arithmetic closed.
+**TEETH PROVED BEFORE ANY VERDICT:** 5/5 known-answer controls fire through the SAME classifier - a dangling
+pointer is DRIFT; `optional: true` CANNOT launder it; a wrong-shaped declaration is DRIFT; declared 150 vs
+found 148 is DRIFT; the real entry is ok. MEASURED AFTER: `ok reconcile: 11 declared object(s) agree with
+reality` rc=0 - this rail was owner_owed on EVERY run since BUG-466 was opened, and BUG-501 is the reason it
+could never close. `depth_pass_agreement.py --check-cohort` rc=0; contract gate 'no hard findings, no
+owner-owed cells' rc=0; tests/test_depth_domain_contract.py 12 passed in 0.25s.
+**NOT DONE, DELIBERATELY:** `config/cohort_declaration.yaml` is NOT added to `config/artifact_ownership.yaml`.
+Every other `config/*.yaml` declaration file is outside that surface by design (it governs CONTENT artifacts
+with owner cells); singling out one config file to look governed would create a second, inconsistent rule
+about what an artifact is. Its integrity is covered where it belongs: the citation rail validates its
+`decided:` stamp and the repointed entry reads it through the engine.
+Files touched: scripts/reconcile.py, config/reconciliation.yaml, config/cohort_declaration.yaml,
+scripts/depth_pass_agreement.py, governance/buglog.md. NO COMMIT (owner ack owed).
+
+
+**PROCESS NOTE (same pass, self-inflicted, caught and recorded).** Minting D-2638 by APPENDING `- id: ...` to
+`config/decisions.yaml` appended it AFTER the sequence: that file's `decisions:` list ENDS at line 8540 and a
+top-level `summary:` block follows it, so the record landed at top level and broke the document (`expected
+<block end>, but found '-'`). `scripts/recompute_decision_summary.py` FAILED CLOSED on the parse error, wrote
+nothing, and thereby refused to publish a summary over a broken registry - the writer was right, the writer's
+operator was wrong. Repaired by relocating the record as the LAST ITEM of the sequence (774 records, stamp
+f7dd45d602d5de79) and re-verified: 'in sync - 774 decisions'. LESSON: a writer must know WHERE the sequence it
+extends ENDS, not merely that the file parses; append-at-EOF is only safe for a file whose last top-level key
+IS that sequence. THIS is BUG-501's own class one level up - a pointer that LOOKS right and resolves somewhere
+unintended.
+
+
+
+## BUG-499 - FIXED - the label ontology had THREE inline copies and no home, so the question could not be answered from the repo
+**The class:** a RULE that exists in more than one place with no declaration of which copy is
+canonical. MEASURED 2026-09-25: the D2284 label rule (isor rating + factual pass -> epistemic_status)
+existed as THREE inline copies - pipeline/stage5_verify.py:1024-1031 (the writer),
+scripts/sync_s5_checkpoint_from_db.py:114-120 and scripts/reinject_bug198_singletons.py:396-402 -
+identical in logic, with rating literals in code (C12) and no single home (C21). The reconciliation
+rail therefore reported the coupling as an OPEN ontology question for a day: "every label maps to
+exactly one status ... declare rail.label_relationship". The repo could not answer its own question
+because the answer was in three places and declared in none.
+**Root cause (three parts).** (a) A rule with no declared home cannot be reasoned about - only
+observed. (b) The rail asked for a DECLARATION of intent (derived_mirror | independent) when the
+honest question was PROVENANCE: where does the label come from? (c) Both offered answers were wrong:
+independent demands a decoupling that does not exist (measured below), and derived_mirror inverts the
+causal arrow (status mirroring the LABEL is exactly what D274a/D274h forbid) while checking nothing.
+**The measured truth.** Re-derived all 7,995 stored labels from (factual.passed, isor.rating):
+0 mismatch. status is derived from the factual check alone; the label is derived from the factual
+check PLUS the ISOR rating, so the label is a strict REFINEMENT of the status partition and the 1:1
+label -> status coupling is a THEOREM about one shared record, not a gate.
+**Fix.** (a) The ontology is DECLARED: config/serving_gate.yaml gains epistemic_label (vocabulary +
+ordered rules + rating classes) and rail.label_relationship: co_derived - a new fourth term, because
+neither offered term was true. (b) ONE home: pipeline/serving_gate.py::derive_epistemic_status +
+load_label_config; ALL THREE copies deleted (grep for an inline assignment: NONE remain). (c) The
+rail got PROVENANCE teeth: it re-derives every stored label from the same record
+(max_label_mismatch: 0, shrink-only) - so a hand-set label, or a rule that moved while the rows did
+not, is now a DEFECT. co_derived is strictly stronger than the other two relationships: they inspect
+the SHAPE of the coupling, this one inspects its SOURCE.
+**Teeth + cascade (measured).** 10/10 known-answer controls fire through the same classifiers (5
+status, 5 label, incl. "a HAND-SET label contradicts the record -> LABEL_MISMATCH");
+check_serving_gate.py now exits 0 with "7995 MATCH ... [DECLARED co_derived: all 7995 stored label(s)
+re-derived from the SAME record, 0 mismatch]"; behaviour-preservation of the extraction proved
+(new function != stored label: 0 of 7,995); tests/test_serving_gate.py 25 passed.
+**NOT DONE, DELIBERATELY.** The ISOR rating classes are config-declared but the ISOR score itself
+still comes from pipeline/schema_accessor.isor_score - the label is therefore only as trustworthy as
+the ISOR upstream. That is a separate provenance question (BUG-497 family), not this fix.
+
+## BUG-502 - OPEN - a rule in two scripts with no config is a second truth waiting to diverge
+**Evidence (found while fixing BUG-499):** the same derivation existed in three files. They happened
+to agree on 2026-09-25 - nothing enforced that. Any future edit to one copy silently splits the
+vocabulary: the writer stamps one label, the S5 checkpoint sync re-derives another, and the
+difference is invisible until a batch is committed.
+**Recommendation (assistant + senior RAG, identical):** a derived column's rule gets exactly ONE
+implementation and one config block, and every other site IMPORTS it. Sweep the repo for other
+derivations with more than one copy - the BUG-499 pattern is a CLASS, not a one-off.
+
+## BUG-503 - OPEN - a live recipe would add 8 abandoned D2205 columns (incl. a 4th epistemic column) to the governed store
+**Evidence:** config/serving_gate.yaml now declares epistemic_status as THE label column, and fbs
+carries exactly one such column. But pipeline/migrate_D2205_epistemic.py (exposed as justfile:320-326
+migrate-d2205 / --dry-run / --verify) ALTERs fbs ADD COLUMN for 8 D2205 columns - evidence_support,
+evidence_independence, evidence_contradiction, evidence_coverage, execution_trials,
+execution_successes, execution_context_similarity and epistemic_state (TEXT DEFAULT 'corroborated') -
+none of which exist in fbs (75 columns, checked 2026-09-25), and its backfill UPDATEs fbs. Running
+that recipe today would mutate the governed store and mint a SECOND epistemic column whose DEFAULT
+would print 'corroborated' on rows nobody corroborated - an ontology drift created by a stale tool.
+**Recommendation:** tombstone it (move to archive/ behind a declared tombstone, remove the justfile
+recipes) or, if D2205 is genuinely live, gate it fail-closed on a declared D2205 authority and a
+schema_version the store does not yet carry. Do NOT leave a live mutation path for an abandoned
+ontology. Reported, not fixed: this needs the owner (it is a schema question, not a script bug).
+
+## BUG-497 follow-up - FIXED 2026-09-25 (D-2640) - the empty label-provenance quartet was an undeclared state
+**Evidence (MEASURED 2026-09-25, fbs 7,995 rows):** menu_hash, content_type_source, discipline_source AND
+extraction_type_source are empty on 7,995/7,995 rows. pipeline_run_id takes exactly three values (t11
+7,867 | bug198_reinject 6 | e2e 122). This is NOT a stage-6 write bug: the corpus predates the R1/D-279
+stamp at pipeline/stage4_merge.py:2256. The defect was that the state was UNDECLARED, so an empty stamp
+read as "no menu" was indistinguishable from a broken stamp, and each consumer was free to infer.
+**Root cause:** a measured population that is only COMPUTED cannot disagree with anything (BUG-501/D-2638
+class), and a provenance state that only a human can tell apart must be DECLARED by the store.
+**Fix:** config/label_provenance.yaml declares the boundary as a CLOSED SET of generation runs + a DECLARED
+measured_rows; pipeline/label_traceability.py is the ONE classifier (stamped | pre_boundary | missing |
+unstampable); scripts/check_label_provenance.py is the rail (6/6 known-answer controls, then: population
+must equal the declared 7,995, a row OUTSIDE the boundary without the full quartet is a DEFECT exit 1, an
+unstampable store is a DEFECT); the state is exposed as the query-surface field label_traceability at the
+ONE row-mapping choke point (pipeline/retrieve.py::_row_to_dict, so all four retrieval legs carry it) and
+in pipeline/query.py.
+**Not done deliberately:** NO backfill (D-277 forbids manufacturing a provenance claim); the boundary is
+NOT an R14 exemption (the R14 object stamps ARE present on all 7,995 rows - claiming otherwise would be an
+ontologically false declaration). Result: ok check-label-provenance: 7995 pre_boundary, 0 missing.
+**Remaining (owner-level):** dissolving the boundary requires RE-STAMPING, i.e. an owner act recorded as one.
+
+## BUG-502 update 2026-09-25 - the instance is fixed, the CLASS sweep remains OPEN
+**Fixed instance:** the D274a row comparator existed twice (scripts/check_serving_gate.py kept its own
+copy of the comparison the writer's rule implies). The comparison now lives in
+pipeline/serving_gate.py::store_verdict, imported by the rail (behaviour proven unchanged by its 10/10
+known-answer controls) and by the NEW writer half: pipeline/stage6_commit.py::insert_fb (the ONE path that
+INSERTs into fbs, also used by scripts/reinject_bug198_singletons.py) refuses a row whose status its own
+verification record does not derive - through the same comparator the rail uses. MEASURED: 0 of 7,995
+stored rows would be refused, so the guard fires only on a row written by something other than the one
+writer. Config act: serving_gate.pre_write_enforcement: "reject" (an unknown value is fatal in code, so
+the key cannot become an off switch). D274a now has BOTH halves: a pre-write refusal and a post-hoc rail.
+**Still OPEN:** the repo-wide sweep for other derivations with more than one copy (the BUG-499 pattern as a
+CLASS). Candidates to measure next: the S5 confidence_score formula (stage5_verify.py has its own copy
+alongside scripts/reinject_bug198_singletons.py) and the needs_human_review ISOR rule (same two files).
+
+## BUG-502 update 2026-09-25 (2) - the score-axis instance is FIXED; the CLASS sweep stays OPEN
+MEASURED before the fix: the S5 score axis (confidence_score formula + the quarantine cap + the
+needs_human_review ISOR rule) was a VERBATIM copy in pipeline/stage5_verify.py:999-1021 and
+scripts/reinject_bug198_singletons.py:378-394. Two implementations of one rule are two truths, so a
+calibration applied to one path would have silently produced two different scores for one record.
+FIX: the rule now lives once - pipeline/serving_gate.py::derive_conf_and_review - and BOTH call sites
+import it (the epistemic-label copy had already been collapsed in the BUG-499 pass).
+PROOF, and not by reading code: scripts/check_s5_score_axis.py re-derives BOTH outputs from every
+stored FULL row and compares 1:1 -> 7995 MATCH, 0 score mismatch, 0 review mismatch, 0 undecidable;
+8/8 known-answer controls fire (the 0.001 nudge, the cap having teeth, and the pair that differs ONLY
+in the ISOR rating, which proves the rating is load-bearing). WIRED into just health.
+PROCESS BUG (recorded because it nearly became a false finding): the FIRST probe selected a column
+SUBSET, so _check_enrichment_quality read empty application/failure_mode fields and reported 5,023
+score mismatches - every one an artifact of the probe, not of the corpus. A re-derivation proof must
+feed the FULL row; a partial row is not the record.
+STILL OPEN (class): the mechanised-check home and any remaining derived-column rule outside the
+serving gate remain to be swept.
+
+## BUG-503 - TOMBSTONED 2026-09-25 - the abandoned ontology has no reachable write path
+migrate-epistemic / -dry / -verify (justfile) were a REACHABLE write path - 15 words between an agent
+and an ALTER - into an ABANDONED ontology: 8 D2205 columns on fbs, including a FOURTH epistemic column
+epistemic_state TEXT DEFAULT corroborated (it collides in name with the live epistemic_status) plus
+backfill UPDATEs. MEASURED: none of the 8 columns exist on fbs today (75 columns).
+FIX: the three recipes are REMOVED and replaced by a tombstone comment; the script stays as
+archaeology but REFUSES with exit 2 (owner-owed, BUG-457 convention) unless the owner passes
+--i-understand-D2205-is-abandoned. MEASURED: rc=2 with the refusal message; 0 recipes reachable.
+NOT done deliberately: the script is not deleted (the D2205 archaeology has value) and no speed bump
+was placed in front of a STILL-reachable path - the point is unreachability, not a warning.
+
+## BUG-504 - FIXED 2026-09-25 - the S5 score axis was governed by SILENT CODE DEFAULTS
+MEASURED: pipeline_paths.py read the five score-axis values as
+_CFG.get("stage5", {}).get("confidence", {}).get(key, <code default>) while
+config/pipeline_config.yaml declared NO stage5.confidence block at all. Every weight was therefore the
+hardcoded default, and a typo or rename of a key would have changed the score axis with NO error
+anywhere (C12/C16: the config miss IS the bug).
+FIX: the block is DECLARED in config/pipeline_config.yaml#stage5.confidence with byte-identical values
+(0.35 / 0.25 / 0.40, cap 0.25, human_review_isor_rating strong) and read through a loud _s5_conf()
+that raises naming the file and the key.
+PROOF: the rail still reproduces 7995/7995 rows after the change (the pre-existing behaviour is now
+pinned by declaration rather than by accident); a test asserts every declared key exists.
+
+---
+
+## 2026-09-26 — D-2648 session: the Dropbox conflicted-copy hazard + a YAML write class
+
+### BUG-500 (CONFIRMED, systemic) — a Dropbox conflicted copy is silent drift, not a merge conflict
+MEASURED: 36 siblings `<name> (M1 max's conflicted copy YYYY-MM-DD)<ext>` in this tree; 26 held NEWER work than the
+live file, which Dropbox had REVERTED to an older blob. The D-2645/D-2646 rail work, the WIRED justfile (live: 16,485 B
+and UNPARSEABLE, recipe line 13 lost its indentation) and the 782-record config/decisions.yaml all lived in a sibling
+while every rail read the stale live file and printed ok. A reverted artifact under a rail is indistinguishable from
+drift: the rail is not wrong, its INPUT is.
+RESOLUTION (D-2647, measured never guessed): scripts/resolve_dropbox_conflicts.py + config/conflict_policy.yaml.
+identical-to-INDEX -> restore from it (lossless); identical-to-HEAD -> the sibling IS the committed mark; otherwise a
+real 3-way merge (git merge-file) with base = the HEAD blob; a LINE-SUPERSET wins outright; a two-sided divergence is
+HELD in governance/CONFLICT_REGISTER.md. Dry run by default; --apply to move a byte; writes are C6 (tempfile -> fsync
+-> os.replace). Pipeline state under `knowledge pipeline/` is OWNER judgement and is never text-merged.
+PROOF: 28/36 resolved with zero conflict, 30 archived to archive/conflicted_20260926/ (never deleted); justfile parses
+YES; recompute carries D-2645; decisions.yaml restored to 782 records with D-2643/2644/2645/2646 + revocation on D2205.
+STILL HELD (owner judgement, NOT guessed): governance/bug_status.json (CONFLICT:2), governance/bug_status.md
+(CONFLICT:1), governance/anchor_adjudication_workbook_20260924.csv (CONFLICT:1) + 3 pipeline checkpoints.
+
+### BUG-505 (FIXED) — two YAML artifacts left UNPARSEABLE by string surgery, in ONE session
+(1) config/decisions.yaml: the minted D-2647 record carried `decision: ... judgement: a checkpoint ...` — a colon-space
+inside an UNQUOTED PLAIN SCALAR. The file stopped parsing, so recompute_decision_summary reported "not in sync" for a
+reason no rail could name. (2) config/derivations.yaml: scripts/check_config_defaults.py#record_ceiling appended its
+REMEASURED sentence AT END OF FILE, so it landed after `enforcement.direction` and made the registry unparseable — the
+homes rail then DIED inside yaml before it could load its own registry, and the stale hardcoded RAIL_DATE wrote a FALSE
+date (2026-09-25 for a 2026-09-26 measurement).
+ROOT CAUSE (class, not instances): a writer that does not verify the bytes it is about to write has moved the failure
+one reader downstream. FIX (D-2648): scripts/lib/yaml_guard.py is the ONE home for assert_yaml (parse the exact text,
+name artifact+line+column+line text, refuse) and append_to_block (insert prose INSIDE a block scalar at the block's own
+indent). Wired into BOTH writers; record_ceiling's bare REGISTRY.write_text (no tempfile/fsync/os.replace, no backup)
+now goes through write_guard.write_document (C6, D-401); the run date is DERIVED (yaml_guard.today()) not hardcoded.
+
+### BUG-506 (FIXED) — reconcile.py crashed with a bare UnicodeDecodeError on OWNER artifacts
+scripts/reconcile.py#_rows read CSVs as strict UTF-8. governance/anchor_adjudication_workbook_20260924.csv is
+Excel-on-macOS output, i.e. MacRoman (0xCA = non-breaking space at offset 42564, 0xD1 = em dash in the two
+s4_*_review_sheet.csv), so the reader CRASHED and the defect read as a bug in the reader: an error leak naming no
+artifact (C16). FIX: `encoding:` is now DECLARED per entry in config/reconciliation.yaml (mac_roman) and the reader
+fails CLOSED naming the artifact, the offset and the byte when an undeclared non-UTF-8 artifact appears (D-2644). The
+owner instruments were NOT rewritten to suit the reader.
+
+### BUG-507 (FIXED) — the anti-resurrection rail tripped on its OWN fixture
+scripts/check_revoked_references.py:314 named the revoker subject `epistemic_state` inside the DESCRIPTION of
+known-answer control 8 instead of the reserved FIXTURE_TOKEN namespace, so the rail reported 1 LIVE reference — its own
+control. FIX: the control's name is derived from FIXTURE_TOKEN, like every other fixture in that file.
+
+### BUG-508 (FIXED) — a ceiling nothing enforced
+config/derivations.yaml#enforcement.max_non_homed was 3 while the registry measured 1 non-homed row of 9, so the homes
+rail printed owner-owed (RC=2) on every run. LOWERED 3 -> 1 by the rail's own rule ("a ceiling may only be LOWERED;
+raising it is a decision").
+
+### BUG-509 (FIXED) — the conflict resolver was not idempotent
+resolve_dropbox_conflicts.py rglob'd the tree for `*conflicted copy*` and matched its OWN archive, so every run
+re-reported ~22 already-resolved siblings as NO-LIVE/'held' — noise on the register that hid the 3 real held rows.
+FIX: the declared archive_dir is a fixed point and is skipped.
+
+### BUG-510 (FIXED) — ONE rule, TWO implementations, minted by the very session that named the rule
+scripts/reconcile.py carried its OWN `_declared_encoding`/`_read_encoding` copy (written hours earlier in this
+session) beside the shared scripts/lib/artifact_encoding.py — the exact D-2646 defect ("a rule that decides a value
+has ONE implementation"). MEASURED 2026-09-26: the session summary recorded this as logged, and governance/buglog.md
+did NOT contain it — a claim and an artifact disagreeing, which is the class this repo exists to remove. FIX: the
+duplicate is DELETED, all three CSV read sites go through artifact_encoding.read_encoding(path, REPO), and the rule
+now carries known-answer controls that `just health` actually runs (8/8).
+
+### BUG-511 (OPEN in two orphan readers) — a reader that GUESSES an encoding does not crash, it silently changes text
+scripts/audit_human_verification.py:79 opens governance/s4_domain_review_sheet.csv as `cp1252`. MEASURED 2026-09-26:
+that artifact is MacRoman (2 x 0xD1); 0xD1 is an em dash in MacRoman and 'N-tilde' in cp1252, so the guess NEVER
+raises — it quietly rewrites the very text two readers then compare (D-2644 says an encoding is a declared fact).
+scripts/normalize_owner_workbook.py carries a THIRD encoding implementation (a measured fallback list) and
+scripts/cross_examine_anchor_axes.py opens owner sheets as utf-8-sig. None of the three is wired into `just health`,
+so nothing consumes their output today; they are declared here so the D-2644 migration is a LIST, not a memory.
+Task: repoint all three to scripts/lib/artifact_encoding.py and declare the encoding in config.
+
+### BUG-512 (FIXED) — known-answer controls that nothing ran, and a resolver that could never fire
+(i) scripts/lib/yaml_guard.py (D-2648) and scripts/lib/artifact_encoding.py shipped `controls()` behind a --selftest
+entry point that `just health` never invoked: the controls were a comment, which is BUG-492's own rule turned on the
+guards themselves. FIX: both selftests are wired into the health recipe.
+(ii) scripts/resolve_dropbox_conflicts.py returned 0 in EVERY mode, so wiring the D-2647 anti-revert rail into health
+would have added a line that can never fail (a register that cries nothing). FIX: tri-state per BUG-457 — 0 no
+sibling (one live artifact per path) | 1 a sibling the MEASURED rule proves resolvable is still unapplied | 2
+owner-owed only. MEASURED now: --check reports 6 siblings (3 owner-artifact CONFLICT, 3 pipeline checkpoints =
+owner judgement) and exits 2, which health prints loudly and does not treat as fatal.
+
+### BUG-513 (FIXED) — the validated mint path's OWN first run wrote a half-consistent registry
+MEASURED 2026-09-26: the first `--mint --apply` inserted D-2649 and then ABORTED because the post-condition was
+evaluated against the pre-insert derived fields, leaving config/decisions.yaml with 784 records under a 783 header —
+caught by the NEXT reader, not by the writer. FIX: the record and the derived fields it invalidates go to disk in
+ONE write (`_surgical_text` is now the single implementation of that surgery, used by both paths, D-2646), and the
+post-condition is checked on the bytes about to be written. Same class as BUG-505: a writer may not leave a document
+in a state its own reader would reject (D-2648). Now: 784 decisions, --check rc=0, reconcile rc=0.
+
+### BUG-514 (OPEN) — three readers still decide an encoding by GUESS
+Confirmed by the 2026-09-26 audit: scripts/normalize_owner_workbook.py carries a measured FALLBACK LIST where a
+declaration belongs, scripts/audit_human_verification.py hardcodes cp1252 for a MacRoman artifact, and
+scripts/cross_examine_anchor_axes.py opens owner sheets as utf-8-sig. None is wired into `just health`, so nothing
+consumes them today; they are the declared migration list for D-2644/D-2649.
+
+### BUG-516 (OPEN, root cause of BUG-514) — the decode rule had NO home: NINE copies, three vocabularies
+MEASURED 2026-09-26 by `python3 scripts/check_encoding_homes.py --list` (the rail now records the number instead of a
+session remembering it): nine modules decide how to decode an artifact's bytes for themselves - five byte-identical
+`DECODE_ORDER = ("utf-8-sig","utf-8","mac_roman","cp1252")` literals (validate_depth_domain_contract, score_claim_shape_gate,
+build_claim_shape_instrument, elicit_claim_shape, ingest_panel_column), an inline copy in normalize_owner_workbook.py,
+`ENCODINGS = ("utf-8","latin-1")` in verify_anchor_family_registry.py, an inline ("utf-8","cp1252","latin-1") in
+scan_review_artifacts.py, and a bare `open(..., encoding="cp1252")` in audit_human_verification.py. BUG-514 named three
+of them; the defect was one rule with nine implementations (D-2646), so the count is the finding.
+WHY IT IS SILENT: every single-byte codec "succeeds", so two modules reading ONE artifact can decode it differently and
+NEITHER raises. MEASURED on governance/s4_domain_review_sheet.csv (Mac Roman, 34 non-ASCII bytes): the `note` column
+holds "no signal domain - best-fit" in Mac Roman and "no signal domain N-tilde best-fit" under cp1252.
+FIX LANDED THIS SESSION (partial): the reader that was measurably WRONG is repointed to the home
+(scripts/lib/artifact_encoding.py), the encoding is DECLARED in config/reconciliation.yaml#artifact_encodings, and
+scripts/check_encoding_homes.py is the new rail that DETECTS a tenth copy: rc 0 no copy | 1 a NEW copy appeared, or the
+ceiling was widened (shrink-only) | 2 declared debt only (loud, not fatal). The debt register is
+config/encoding_homes.yaml, written FROM the rail's own measurement, ceiling 9. NOT a mitigation: the nine copies are
+now registered, machine-counted debt that can only shrink, and the next copy fails health.
+CONTAINMENT (measured, so the severity is not overstated): the four columns audit_human_verification.py matches on
+(blank header fb_id, HUMAN_domain_VERDICT, discipline_human) hold NO non-ASCII byte, so no output was wrong - only the
+read was silent. That is exactly the BUG-511 mechanism, one owner em dash away from being wrong in the output too.
+
+### BUG-517 (FIXED) — a declaration the reader never consults, and a BOM that silently renames a column
+MEASURED 2026-09-26: read_encoding() returned "utf-8" whenever the bytes decoded, so a DECLARED `utf-8-sig` was never
+consulted - and a BOM-led artifact read as plain utf-8 leaks U+FEFF into the first CSV header, so `row.get("item_id")`
+returns None and every row silently vanishes (the BUG-511 class: no crash, changed meaning). It also accepted a
+declaration that cannot decode its own artifact, which surfaced downstream as a bare UnicodeDecodeError naming no
+artifact (an error leak, C16).
+FIX (D-2644/D-2649 widened): the declaration is AUTHORITATIVE and the BYTES are a second declaration home - the two are
+JOINED. No declaration -> the bytes decide (utf-8 / utf-8-sig by BOM), non-UTF-8 bytes fail CLOSED. A declaration -> it
+wins, but is VERIFIED: a declared codec that cannot decode its artifact fails CLOSED, and where the declaration and the
+bytes decode to DIFFERENT text the join fails CLOSED naming the artifact, both encodings, both homes and the first
+character where they diverge. Where they decode to the SAME text (an ASCII artifact declared mac_roman) they AGREE and
+are tolerated, not presumed. No live artifact was affected (the only non-UTF-8 artifacts are declared mac_roman, which
+cannot be read as UTF-8 at all), so this fix is preventive: 14/14 known-answer controls, wired into `just health`.
+Also fixed in the same pass: a path outside the repo raised pathlib's ValueError, naming no rule (C16) - now refused
+with a message that says what is wanted.
+
+### BUG-516 UPDATE (2026-09-26, sweep LANDED) - the decode rule now has ONE home and ZERO copies
+
+The register ceiling was 12 modules and is now 0 (config/encoding_homes.yaml, SHRINK-ONLY, D-2642). Every module
+that decided an encoding locally now DELEGATES to scripts/lib/artifact_encoding.py; a delegating wrapper carries
+no codec vocabulary, so it is an INTERFACE, not a second implementation (D-2646). Verified BEFORE writing: all 12
+compile, the AST scan finds no codec label left, and text containment was MEASURED over 642 text-ish artifacts.
+Containment result: exactly TWO text differences, both the same two artifacts, both for the two readers whose
+fallback was latin-1/cp1252 - i.e. the OLD read was the wrong one and the new read is the DECLARED Mac Roman.
+No other artifact's text changed. The two readers that were measurably WRONG (scan_review_artifacts.py and
+verify_anchor_family_registry.py) are repointed, so BUG-514's root cause is CLOSED, not mitigated.
+
+### BUG-518 (FIXED, found by the same sweep) - a fallback that could never fire, and an artifact that never declared its encoding
+
+(a) UNREACHABLE FALLBACK: the five DECODE_ORDER tuples ended with cp1252, but Mac Roman decodes ALL 256 byte
+values, so a decode can never fall past mac_roman into cp1252. The 4th entry was decoration, not a fallback - a
+fallback that cannot fire is a claim about the data that was never true. It looked like four safety nets while it
+was three. (b) UNDECLARED ARTIFACT: governance/s4_discipline_review_sheet.csv is NOT valid UTF-8 (21 non-ASCII
+bytes, first bad 0xD1 at offset 5204 = an em dash in Mac Roman; 63 owner-adjudicated rows) and was NEVER declared,
+so any reader repointed to the one home would have failed closed on it - the sweep would have converted a silent
+guess into a crash. It is now declared mac_roman in config/reconciliation.yaml with the measurement beside it.
+MEASURED cross-check: the .utf8 sibling is NOT a recoding of it (different row/column content) - a sibling file is
+not evidence of an encoding; the declaration is. (c) SILENT-REPAIR READS: errors="replace" turns a bad byte into
+U+FFFD and errors="ignore" DROPS it - neither crashes, both change the text (the BUG-511 class). Fixed in
+scripts/cross_examine_anchor_axes.py (fail-closed via the home); scripts/vote_anchor_domains.py:119 (errors="ignore"
+on .env) remains OPEN and is the next item.
+
+FORENSIC NOTES (why nothing cascaded): every artifact is now either valid UTF-8 or DECLARED, so the home's
+fail-closed path has an EMPTY trigger set (642 artifacts scanned, 3 non-UTF-8, 3 declared); the two artifacts whose
+text changes under latin-1/cp1252 carry zero non-ASCII in every column the two repointed readers match on, so no
+verdict moves; and the three health-wired consumers were re-run at rc=0. `just health` rc=0, and the
+`FAIL encoding-homes` line is GONE (now `ok ... debt 0 of ceiling 0`). NOTHING IS COMMITTED. Owed: a rail-4
+widening_log entry for scripts/check_encoding_homes.py + config/encoding_homes.yaml; an MTR entry for the STALE
+governance/remaining_verification_audit.csv found on 2026-09-26; and the owner commit ack (D-381 gate).
+
+### BUG-519 (FIXED 2026-09-26) - the operator-key rule had FIVE homes, and one of them DROPPED bytes silently
+
+MEASURED: "which key does this run use" was implemented FIVE times with THREE behaviours - scripts/vote_anchor_domains.py:118
+(read `.env` with errors="ignore": a byte that is not UTF-8 was DROPPED and the read carried on - the BUG-511/C16 class),
+scripts/vote_flagged_core.py:77 (Path.read_text()'s PLATFORM-DEFAULT codec), and three shell copies (scripts/run_joint_vote.sh:32,
+scripts/run_remaining_axes_vote.sh:5, scripts/run_queue_59_vote.sh:7) that grep the line and `tr -d '[:space:]'` the value - a
+DIFFERENT parse of the same line. A second implementation of one rule IS the defect (D-2646, the BUG-499/502 class), and this
+one touched a SECRET: nothing could report that two copies disagreed.
+
+FIXED, not mitigated: the rule now has ONE home - scripts/lib/operator_env.py (read_key/parse_env_text), 10/10 known-answer
+controls (flag > environment > .env; a commented-out key is not a key; a later duplicate never wins; a bad byte ANYWHERE fails
+CLOSED because the whole file is decoded before it is parsed). Both Python copies are delegating wrappers. The bytes are read
+through the decode home, so the repair mode is gone, not improved (BUG-511: a better default is still a guess).
+`.env` is deliberately NOT added to config/reconciliation.yaml#artifact_encodings: it is GITIGNORED, so a declaration in the
+tracked register would be a claim the repo cannot verify, and an absent .env is normal. The measured path decides utf-8 for
+utf-8 bytes and fails LOUDLY and actionably otherwise - which is the behaviour owed by C16.
+RESIDUAL (declared, not hidden): the three SHELL copies still parse .env. Unifying them needs a shell-safe home that does not
+`eval` a secret (a shell-quoting hazard worse than the duplication). OWED.
+
+### BUG-520 (DETECTOR LANDED 2026-09-26) - a silent repair is not a protection from crashing; it is a protection from NOTICING
+
+MEASURED by a tree-wide AST census: 28 `errors="replace"` / `errors="ignore"` read sites in scripts/ and pipeline/, and 4 more
+in tools/ - a directory the first census never looked at (a blind spot found by widening the scan roots, not by a report).
+Fourteen of them read repo artifacts or source text; the rest tail runtime logs or foreign streams.
+
+FIXED AS A CLASS: scripts/check_silent_repair.py + config/silent_repair.yaml. It classifies every site - `allowed` (repair is
+CORRECT: the bytes are a runtime log or a foreign producer, and nothing is written back), `debt` (an artifact/source read that
+still owes a repoint to the decode home), or NO ENTRY = DRIFT (exit 1). `errors=` with a non-literal value is reported as
+`unresolvable` and must be declared too: a detector never passes what it cannot read. An entry with no measured site is reported
+STALE, so the register cannot rot. The ceiling is the RAIL's own measurement, SHRINK-ONLY (D-2642): debt 20 of ceiling 20,
+unknown 0. --selftest 12/12 known-answer controls (BUG-492: seen to fire AND seen to stay quiet). Wired into `just health`.
+MEASURED 2026-09-26: every declared site is INERT today (the 3 non-UTF-8 artifacts in this repo are all declared and no source
+file is non-UTF-8) - which is exactly why the debt is declared rather than trusted: a repair that never fired has never been
+tested. BUG-518(c) - the .env errors="ignore" read it named as remaining OPEN - is CLOSED by BUG-519.
+CONTAINMENT: no stored object changes; the two pipeline/ sites that write back what they repaired are inside pipeline/**, which
+is will_not_touch this session (rail 4) and are declared debt, not touched. NOTHING IS COMMITTED.
+
+### BUG-521 (MEASURED 2026-09-26) - an encoding the ENVIRONMENT decides is UNDECLARED: 393 sites in 166 modules, and no rail could see them
+
+MEASURED by a tree-wide AST census over scripts/, pipeline/ and tools/: 393 text read/write sites in 166 modules take their codec
+from locale.getpreferredencoding(False) instead of from the artifact - read_text 138, open() 178, write_text 47, Path.open 27, plus 3
+opens whose mode is not a literal (UNRESOLVABLE: not proven text, not proven bytes - it must be declared, never assumed). By root:
+scripts 182, pipeline 168, tools 43. Of the 393 sites, 47 are WRITES.
+
+WHY IT IS A DEFECT AND NOT A STYLE POINT: D-2644 says an encoding that is not DECLARED is an undeclared value, and a platform default
+is declared by nobody. On this machine it is usually UTF-8 and therefore INERT - which is exactly why it survived 166 modules unseen.
+It is not inert elsewhere: under LC_ALL=C a non-ASCII byte raises a UnicodeDecodeError that names no artifact (the C16 error leak),
+and on Windows the default is cp1252, so 0xD1 decodes to 'N-tilde' instead of an em dash in every reader (BUG-511). The WRITE case is
+the sharper one: the bytes an artifact receives then depend on the machine that wrote it, so a sha256 pin does not pin the same bytes
+on two platforms (C3 sovereignty / C26 cross-platform / R14 provenance).
+
+WHY NO RAIL SAW IT (MEASURED): scripts/check_encoding_homes.py matches non-UTF-8 CODEC LITERALS only; scripts/check_silent_repair.py
+matches `errors=` LITERALS only. A platform default has NEITHER literal - the same blind-spot shape as tools/ in the 2026-09-26
+errors= census, found the same way: by widening the scan, not by a report.
+
+DETECTOR: scripts/check_undeclared_encoding.py + config/undeclared_encoding.yaml (a class detector with its own known-answer controls,
+BUG-492), with the number OWNED BY THE RAIL (D-2642 probe -> rail handover; a raise is refused afterwards). `encoding=None` counts as a
+site: an explicit None IS the platform default. RESIDUAL (declared, not hidden): the rail is already wired into `just health`, but at
+the moment of this entry it has not landed on disk, so health is RED until it does. NOTHING IS COMMITTED.
+
+### BUG-522 (FIXED 2026-09-26) - a module read its own input by TWO rules, and one rule's repair could never fire
+
+MEASURED: scripts/definition_nli_verify.py read its own input - a pipeline checkpoint JSONL - by two different rules. The data path
+(_iter_fbs) opened it strictly with encoding="utf-8"; the provenance probe (_provenance, "coder_key_present") opened the SAME file with
+errors="ignore". That repair could not fire: by the time it ran, the strict path had already refused the byte. So it protected nothing
+from crashing - it protected from NOTICING, and it hid the disagreement between the two rules. This is BUG-518's "fallback that could
+never fire" recurring.
+
+FIXED as ONE named rule (D-2646), not as a per-site exception: _INPUT_ENCODING is named once, _open_input(path) returns
+open(path, encoding=_INPUT_ENCODING), _read_input_text(path) derives from that rule and does not restate it, and both call sites
+consume the rule. AST-verified: zero `errors=` calls remain in the module. CONTAINMENT: the default input is the IMPORTED
+pipeline.pipeline_paths.STAGE5_CHECKPOINT (no new literal), and a missing input still exits 1 with a message naming the artifact.
+
+### BUG-523 (OPEN - found 2026-09-26 only because a human asked "what exactly must I ratify in D-2650?") - the reserved-fixture rule covered the TOKEN and left the ID SPACE unclaimed: two live decision ids are already spent as fixture data
+
+MEASURED: the literal "D-2650" occurs 7 times in this repo and ALL 7 live inside the known-answer controls of
+scripts/check_revoked_references.py (lines 290-308). A SECOND fabricated id, "D-2651", is used at line 303. Neither id is declared,
+claimed or reserved anywhere; the highest minted id in config/decisions.yaml is D-2649. The next two decision ids this project mints
+are therefore already in use as fixture data.
+
+WHY IT MATTERS - the trigger is LATENT, not immediate: minting D-2650 raises no rail today, because this rail's patterns are built from
+the REVOKED scopes. The damage is conditional: the day D-2650 (or D-2651) is revoked, the rail - which scans scripts/ and is explicitly
+NOT exempt ("the detector itself is NOT exempt", config/decisions_policy.yaml) - finds its own fixture as a live reference to a revoked
+id and fires on itself. That is audit F1 recurring, and its only outs then are an exemption (the self-weakening the fixture docstring
+forbids) or a rename under time pressure. Second hazard: a fixture id that later becomes live stops being a fabricated id, so the
+control that proves "a different id is not a reference" quietly loses its subject.
+
+WHY NO AUDIT FOUND IT: the class was ALREADY in the audit's repertoire. Audit F1 (MEASURED 2026-09-25) found this same rail firing on
+itself, and the fix was a RENAMED TOKEN (FIXTURE_TOKEN = "fixture_revoked_token_zz"), plus a later rename of a control NAME that had
+named a live subject. The fix was instance-shaped, not namespace-shaped: the tokens were moved into a reserved namespace, and the two
+decision-id literals were left floating in the live id space. The reservation is also unenforceable as written -
+config/decisions_policy.yaml says "a RESERVED fixture token" without declaring what the reserved SPACE is (no range, no prefix, no
+list), so no machine can answer "is this name reserved?" (C12: a rule whose subject is undefined is not configurable). MEASURED: no
+rail polices decision-id literals in code at all (a grep for an id pattern returns zero). The docstring's "may not become a revoked
+token" is a comment; BUG-492: an invariant that no machine enforces is a comment.
+
+FIX, WITH AN ORDERING CONSTRAINT: declare the reserved fixture id space in config (MEASURED: D-9xxx is entirely ABSENT from
+config/decisions.yaml, so D-9000-D-9999 is free), renumber both fixtures into it, and add a known-answer control asserting that every
+fixture id lies in the reserved space AND that the reserved space is empty in the live registry. This must land BEFORE the next decision
+is minted - otherwise the next mint either collides with the fixture or the fixture silently loses its known-answer property.
+CASCADE (declared, not hidden): appending to this buglog makes governance/bug_status.json/md STALE, and both are currently HELD under an
+unresolved Dropbox conflict, so their re-derivation cannot run until that is resolved (D-2647). NOTHING IS COMMITTED.
+
+### BUG-524 (OPEN 2026-09-26) - the STORES and COLUMNS axes had NO machine: two rails land, and their own controls found 3 defects in the rails themselves
+
+CLASS (not an instance): six of eight audit axes had no machine; every finding that closed the gap came from the two
+with none - STORES and COLUMNS. A rail is a triple (subject, site-shape, roots); its blindness IS its boundary.
+
+MEASURED 2026-09-26, now enforced by two registered rails (both wired into just health):
+  * scripts/check_store_authority.py + config/store_authority.yaml (9/9 controls, 0 faults): 7 stores declared,
+    exactly ONE authoritative. The check found what no machine could before: `archive/db_backups/
+    maxwell_pre_index_20260917.db` was UNDECLARED and shares 18 table names (fbs, taxonomy_counts, the vec_*
+    shadows) with the truth, and `data/maxwell.db` (19 rows vs 7995) shares the same schema - a consumer pointed
+    there gets a plausible answer set that is 0.24% of the truth, with no crash.
+  * scripts/check_store_columns.py + config/store_columns.yaml (OWED rc=2, debt 9 shrink-only): 75 columns, 52 by
+    declared default, 25 named. The RULER is the blind spot: `count(col)` counts '' as present, so the earlier hand
+    census claimed "procedural_skill is 0/7995" when the truth is 7995/7995 rows carrying a BLANK, and "ten
+    zero-populated columns" when the named rulers show 12 content-empty and 20 single-valued.
+    NEWLY MEASURED DEFECTS (declared debt, shrink-only): `classification_status` is constant 'CLEAN' on all 7995
+    rows while classification_errors records 2 real errors and status QUARANTINEs 2972 - a status column that is
+    FALSE; `content_type` is 'principle' on all 7995 - a label that cannot vary; `application` is blank on 1 row
+    and `jargon` on 2091 (5868 distinct) - blanks a reader cannot tell from "unwritten"; the three `*_source`
+    columns are blank 0/7995 while governance/gold_4axis.jsonl is 100% stamped per axis - R14 holds at ROW level
+    and FAILS at LABEL level.
+  * the rails' OWN known-answer controls (BUG-492) found 3 defects in the rails on first run: an orphan
+    continuation line from asserting the for-statement (SyntaxError, caught by py_compile); a resolved-vs-unresolved
+    path comparison that made find_stores raise ValueError from pathlib instead of naming the artifact (C16 leak);
+    and a control whose expectation was mis-specified so it could never pass - a control that cannot pass is as
+    useless as one that cannot fail.
+  * `shares_tables` was first declared as a LIST of table names: a second copy of the table inventory (D-2649). It
+    is now a FACT (`true`) checked against the disk - the rail reports which tables overlap, the register does not.
+ORDERING CONSTRAINT (BUG-523 follow-through): both rails were written WITHOUT spending a decision id - a register
+may be landed and wired while its governing decision is still owner-pending, but the register must SAY so
+(`decided: PENDING-OWNER`), never pre-empt the id.
+
+### BUG-525 (OPEN 2026-09-26) - the AMBIGUOUS-DECLARATION class: a key declared twice in one mapping is SILENTLY last-wins, and no rail could see it
+
+CLASS (found by the audit the owner demanded BEFORE the implementation was committed): PyYAML does not refuse a key
+declared twice in the same mapping - it keeps the LAST one. The first declaration is therefore a fact nobody reads
+(D-2649: one declared fact, one declaration home), and it is INVISIBLE to every neighbouring rail, because each of
+them parses the file and the parser has already resolved the ambiguity for them. D-2648 said an artifact must PARSE
+before it is written; measured today: a document can parse and lie.
+
+FIVE INSTANCES, none previously known, all found by widening the scan to a new SUBJECT (NAMES/declarations) rather
+than a new site-shape:
+1. config/store_columns.yaml carried TWO `ceiling:` blocks (debt 7 at line 57, debt 9 at line 60). The second was
+   written by the new column rail's own --record, whose replaced region began at `measured:` - so the older
+   `ceiling:` above it survived and the tail re-declared the key. The rail recorded a number while a shadowed
+   declaration of the same fact stayed on disk.
+2. config/pipeline_config.yaml declared `stage5.confidence` TWICE inside `stage5:` (lines 465-470 shadowed by
+   497-502). The five S5 score-axis values are read by pipeline_paths.py, so a declared fact read by the score axis
+   had two homes. The values were parse-identical (0.4 / strong), so no score ever moved - only the ambiguity
+   existed; the shadowed copy was deleted and the surviving values are byte-for-byte the ones that were in force.
+3. backups/decisions.PRE_config-first-data-edit_20260925T214936Z.yaml does NOT parse (ScannerError, line 8651 of
+   602 KB) - a DEAD revert path: a backup that cannot be loaded is not a backup (C23/R-D410).
+4. backups/derivations.PRE_check_config_defaults_20260926T084048Z.yaml does NOT parse (ScannerError, line 132).
+5. evals/promptfooconfig.yaml does NOT parse (ParserError, line 5): the D315 depth prompt is ONE double-quoted
+   scalar with unescaped inner quotes, so the eval config cannot load for its own consumer.
+6. (found by the new rail ON ITS FIRST RUN, minutes after it existed) backups/store_columns.PRE_check_store_
+   columns_20260926T115814Z.yaml preserves the duplicated `ceiling:` of instance 1 - a snapshot of ambiguous bytes
+   is a REVERT PATH THAT SILENTLY RE-INTRODUCES THE DEFECT.
+
+FIX (root cause, not a patch): the rule has ONE home - scripts/lib/yaml_guard.py::duplicate_keys - and the WRITE-TIME
+guard assert_yaml calls that same function, so a writer can no longer CREATE the class (it refuses, naming the key
+and both lines); a bounded scan (`--check`, 113 artifacts across 6 declared roots, receipt shrink-only) catches the
+hand-edits a guard never sees; the column rail's --record now anchors on the FIRST of `ceiling:`/`measured:`.
+12/12 yaml_guard controls fire, INCLUDING the control AGAINST overreach (the same key in two DIFFERENT mappings is
+legal and must NOT fail) - a rule nobody has seen tolerate a legal document is not a rule but a bludgeon.
+4 artifacts remain OWED (rc=2) because this rail cannot repair them (2 dead snapshots, 2 hand-authored/unreadable
+declarations): the OWNER settles delete-or-re-snapshot.
+
+VERDICT for the standing question "are there more blind spots": NOT a probability - a RATE. Deliberate widenings of
+the scan SUBJECT have now returned findings 5 times out of 5 and NEVER once "nothing": roots -> tools; site-shape
+literal -> platform default (392 sites / 156 modules); namespace -> claimed-by-someone-else (BUG-523); STORES and
+COLUMNS (BUG-524); and now DECLARATION AMBIGUITY (BUG-525, 6 instances, 2 in LIVE config). The mechanism that keeps
+finding them is not insight, it is widening the subject and demanding the scan receipt its own coverage.
+
+### BUG-526 (OPEN 2026-09-26) - the pin invariant had a SCAN and no WRITE moment: a pinned artifact could be edited and committed with nothing consulting the pin
+
+CLASS (a rail that runs only when someone remembers to run it is not a rail during the interval in which the
+work happens). config/recalibration_pins.yaml pins 6 artifacts by sha256 (D-353) and `just health` refuses a
+moved one. That is a SCAN. The COMMIT - the one act that makes an edit permanent - never consulted it. So the
+sequence "edit a pinned artifact -> commit -> health later" was legal and silent, and the first moment anyone
+learned was the next health run, after the ratified measurement had already been invalidated in the tree.
+
+MEASURED 2026-09-26, by the FIRST complete `just health` run of the day (it had been aborting early):
+- scripts/definition_nli_verify.py is pinned as r2_meter (decision D-382, sha e9070635...) and its bytes moved at
+  12:44 TODAY: a `provenance:` key added to the R2 report and the BUG-522 one-rule decode home (`_open_input`).
+  Current sha fbfd62f326d26611... Both edits are SEMANTIC (the report's schema and its input rule changed), so the
+  published R2 measurement is no longer reproducible from the tree. -> RED.
+- The same run found RED at line 22 `check_bug_status.py`: the derived register was stale because BUG-525 had been
+  appended to governance/buglog.md at 13:59 while the register was last built at 12:34. Re-derived; rail green.
+- BOTH were created by this assistant hours earlier. Two of the three findings in the first complete gate run were
+  self-inflicted, and neither was visible because the gate had not been run.
+
+ROOT CAUSE (not a patch): the invariant was DECLARED and ENFORCED AT ONE MOMENT. D-2649 fixed exactly this shape
+for ambiguous declarations (assert_yaml at write time + --check at scan time, ONE home); D-2648 fixed it for
+parsing (verify the bytes BEFORE they are durable). The pin rule was the last invariant in the corpus with a scan
+and no write moment. COMPOUNDING IT: the pre-commit hook that WOULD have been the write moment lives OUTSIDE the
+repository (after the BUG-500 fix the git dir is /Users/barn/maxwell_os_gitdirs/maxwell_os_2_0.git), so the
+strongest gates in this repo were not versioned and no rail could see them drift - the enforcement home itself was
+invisible.
+
+FIX (root cause: one home, two moments, controls that can fail):
+1. scripts/verify_recalibration_pins.py gains `--staged`: the STAGED bytes (what would become permanent) are
+   compared against the pins, read from git, never assumed. NO OVERREACH - a staged set naming no pinned artifact
+   is TOLERATED even while the tree is RED; only the commit that MOVES a pinned artifact is refused. An unreadable
+   staged blob FAILS CLOSED. Staging the pins file itself requires the whole invariant to hold.
+2. scripts/install_git_hooks.sh: RAIL 3 added to the hook it renders, and `--check` re-derives the hook and
+   byte-compares it with the INSTALLED one - the hook is a DERIVED artifact now, not a remembered one.
+3. justfile: `--selftest` and `install_git_hooks.sh --check` are rails in `just health`.
+CONTROLS: 6/6 fire, including the OVERREACH control and the fail-closed unreadable-blob control. The `--check`
+control was SEEN TO FAIL (the installed hook lacked RAIL 3) before it was allowed to pass (BUG-492). The write gate
+was also run against the REAL defect: 1 fault for the actual pinned script, 0 for unrelated paths.
+
+VERDICT: the R2 pin RED itself is OWNER-OWED and NOT repaired here (re-measure and mint; editing the pin's sha to
+make the rail green would be laundering a measurement nobody re-ran). What is repaired is the CLASS: the pin rule
+now has a write moment, from the same home, with controls that can fail.
+
+STANDING RULE (until `just health` is the last thing before a commit): run the gate BEFORE the work is described as
+done. The gate found two defects of this assistant's own making, both hours old, both invisible by construction.
+
+## BUG-527 (OPEN 2026-09-26) - the staged-reading rails audit whichever index the ENVIRONMENT names, not the one being committed
+
+MEASURED 2026-09-26, by the A/B harness built to test the `scripts/*.sh` widening recommendation. The harness
+copied the repo index to /tmp/abidx and set GIT_INDEX_FILE to point a SYNTHETIC staged set at the real rail
+(so the rail could be A/B tested without editing the live plan). Scripts/check_session_plan.py read that
+environment variable, audited the WRONG index, and returned rc=0 (ok) for a staged path the live plan REFUSES:
+  LIVE plan + real index           -> rc=1  FAIL session plan: 1 path outside the plan (scripts/install_git_hooks.sh)
+  LIVE plan + GIT_INDEX_FILE=/tmp/abidx -> rc=0  ok session plan: staged set touched 42 path(s), all declared
+The rail did not misreport. It faithfully audited the index it was TOLD to audit. The defect is that the
+subject of the audit is INHERITED rather than PINNED: every staged-reading rail shells out to
+`git diff --cached` / `git show` and inherits GIT_INDEX_FILE, GIT_DIR, GIT_WORK_TREE, and GIT_COMMON_DIR from
+whatever process invoked it (just, a wrapper, a CI runner, an agent shell). A rail whose subject can be
+re-pointed by the environment is a rail that can be made to say ok about a commit it never saw.
+
+SAME CLASS, SAME DAY: the index itself has NO write moment. An unflagged `git add -- scripts/install_git_hooks.sh`
+issued from the A/B harness staged into the REAL index (42 -> 43 staged paths) and NOTHING observed it; the
+state was found only because the harness re-counted by hand, and repaired with `git restore --staged`
+(43 -> 42, worktree file still ' M'). This is BUG-526 one layer earlier: RAIL 4 has a read moment (the commit)
+and no write moment (the staging act). Rails 0/3/4 all fire at `git commit`; the index is mutable, silently,
+for the entire interval in which the work happens.
+
+ROOT CAUSE: the rails resolve their own inputs from AMBIENT state. D-2646 requires ONE home for one rule; here
+the home of "which index is the commit" is the environment, which is nobody's declared home. The repo already
+solved this shape for the git DIR (install_git_hooks.sh uses `git rev-parse --absolute-git-dir` and never
+assumes `.git/`) - that lesson was not carried to the INDEX.
+
+FIX (owed, not applied - it edits rails, and the owner has not authorised the commit yet):
+  1. Every staged-reading rail must PIN its subject: resolve `git rev-parse --absolute-git-dir`, pass
+     `--git-dir` explicitly, and REFUSE TO GUESS (C16, fail closed) when GIT_INDEX_FILE / GIT_DIR /
+     GIT_WORK_TREE are set in the environment - an audit of an unnamed index is not an audit.
+  2. A known-answer control per rail: with GIT_INDEX_FILE pointing at a synthetic index holding one
+     out-of-plan path, the rail must still REFUSE. Measured today: it returned rc=0 (control FAILS).
+STATUS: OPEN. Affects scripts/check_session_plan.py (RAIL 4), scripts/verify_recalibration_pins.py --staged
+(RAIL 3), and any other rail that shells `git diff --cached` / `git show`.
+
+## BUG-528 (OPEN 2026-09-26) - will_not_touch matches NAMES, so a Dropbox-renamed sibling of a protected artifact is out of scope; one such copy is ALREADY listed in may_touch
+
+MEASURED 2026-09-26 (A/B of the will_not_touch set against the live working tree):
+  will_not_touch = ['governance/F11_*', 'governance/ANCHOR_RULER_CONSOLIDATED_*.csv',
+                    'governance/ANCHOR4_DEPTH_BLIND_SHEET_*.csv', 'pipeline/**']
+  governance/Copy of ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv
+      -> will_not_touch match: NONE     may_touch match: ['governance/Copy of ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv']
+  governance/anchor_adjudication_workbook_20260924 (M1 max's conflicted copy 2026-09-26).csv
+      -> will_not_touch match: NONE     may_touch match: NONE
+  governance/bug_status (M1 max's conflicted copy 2026-09-26).json | .md   -> both NONE
+The blind sheet is an OWNER instrument whose write path is the BUG-431 gate (D-2606 class), and its family is
+declared forbidden. Its Dropbox sibling - the SAME artifact, renamed by the sync client - is not forbidden,
+and worse, it is EXPLICITLY permitted by its own may_touch entry. So the plan currently authorises editing the
+owner instrument through its copy while forbidding it through its name. will_not_touch OUTRANKS may_touch
+(BUG-445); a prefix-forged name defeats that precedence.
+
+ROOT CAUSE: the rule matches a PATH STRING, while the invariant is about an ARTIFACT FAMILY. Dropbox conflict
+naming ('Copy of X', 'X (M1 max's conflicted copy DATE)') is a MEASURED, RECURRING event in this tree (2 forms
+present right now, plus the 6 HELD siblings tracked by resolve_dropbox_conflicts.py). A name-based forbid-list
+cannot express "this artifact, whatever Dropbox calls it".
+
+FIX (owed, owner-owned: it changes the plan): declare protections by FAMILY, not by literal name - normalise
+the candidate path (strip a leading 'Copy of ', strip a trailing ' (…conflicted copy…)'), then match. Add
+known-answer controls: a renamed sibling of a will_not_touch artifact must be FORBIDDEN (rc=2) and a genuinely
+unrelated path must be TOLERATED (anti-overreach, BUG-492). Also review why the 'Copy of …' entry exists in
+may_touch at all - if it is stale, it is a standing laundering path.
+STATUS: OPEN.
+
+## BUG-529 (OPEN 2026-09-26) - .pre-commit-config.yaml declares a C11/C12 gate that NOTHING invokes, and the hook slot has exactly ONE occupant
+
+MEASURED 2026-09-26:
+  - .pre-commit-config.yaml (D2552/GOV-CI) declares one hook: id c11-c12-gate -> python3 scripts/pre_commit_gate.py.
+  - `command -v pre-commit` -> ABSENT. Scoped grep for `pre_commit_gate` finds only its own docstring and the
+    decisions.yaml record of D2552; no recipe, no CI workflow, no caller.
+  - The installed hook ($(git rev-parse --absolute-git-dir)/hooks/pre-commit) holds RAIL 0 + RAIL 3 + RAIL 4
+    (check_repo_integrity.py, verify_recalibration_pins.py --staged, check_session_plan.py --staged).
+So a gate that D2552 declares as the C11/C12 enforcement point has never run. This is not a dormant nicety: the
+slot it would occupy is a SINGLE FILE PATH that is already occupied. Running `pre-commit install` would write
+the framework shim to that path and silently replace RAIL 0/3/4 - the three rails that today carry the
+repo-integrity, pin, and session-plan guarantees. The stronger gates in this repo would be lost by the act of
+installing a weaker declared one.
+
+ROOT CAUSE: enforcement is listed in a CONFIG format owned by a framework that is not installed, while the
+enforcement that actually exists lives in a hand-rendered hook OUTSIDE version control. Two homes for "what a
+commit must satisfy" - one declared and dead, one live and unversioned (the second half is BUG-526).
+
+FIX (owed, owner-owned): choose ONE home for hook content and make it a DERIVED artifact with a re-derivation
+rail (install_git_hooks.sh --check already does this). Either (a) fold the C11/C12 gate into that rendered hook
+as RAIL 5 - no framework needed, one slot, one home - or (b) delete .pre-commit-config.yaml so the repo stops
+declaring a gate it does not have. What must NOT happen: `pre-commit install` without first moving RAIL 0/3/4
+into a framework-compatible hook. Add a rail asserting the installed hook contains every rail the installer
+renders (the byte-compare already covers this) AND that no second claimant for the slot is declared.
+STATUS: OPEN.
+
+## BUG-530 (OPEN 2026-09-26) - the derived-artifact generator writes its register without the write guard
+
+MEASURED 2026-09-26, reading scripts/bug_status.py: the generator of governance/bug_status.json|md writes both
+files with a bare `(REPO / args.json_out).write_text(...)` / `(REPO / args.md_out).write_text(...)`. There is no
+write_guard call and no crash-safe replace (tempfile -> fsync -> os.replace, C6).
+WHY IT MATTERS MORE HERE THAN ELSEWHERE: bug_status.* is a DERIVED artifact (check_bug_status.py re-derives it
+and byte-compares, and a stale register is worse than none). A direct write_text TRUNCATES the tracked file
+before the new bytes exist: an interrupted run leaves a truncated register that the next `just health` reports
+as DRIFT - i.e. the rail's own subject becomes the evidence of its own failure. write_guard.py --audit this
+session: 5 guarded / 3 unguarded declared writers, guard_coverage.max_unguarded = 3 (shrink-only) - this
+generator is a 4th writer that is not even declared (D-401: a writer with neither a guard call site nor an
+exemption is DRIFT).
+FIX (owed): route bug_status.py through write_guard (declaring it as a writer), or declare it in
+config/artifact_ownership.yaml with a reasoned exemption. Do NOT raise max_unguarded - the ceiling is
+shrink-only.
+STATUS: OPEN.
+
+## NOTE-2026-09-26 (A/B, no defect) - two candidate findings were REFUTED by measurement; recorded so they are not re-reported
+
+1. "`### BUG-<id>` entries are invisible to the register." REFUTED. HEADER_RE = `^#{2,3}\s+(BUG-\d+)\b...` and
+   BUG-525/526 are both present in governance/bug_status.json. BUG-428 already fixed the 2-hash-only pattern.
+   The A/B probe was itself inconclusive at first (scripts/bug_status.py has NO --log override, so both probes
+   re-derived the real log); it was re-tested against the real register, where the answer is visible.
+2. "the undeclared-encoding scan LOST a subject (156 -> 155 files, 392 -> 390 sites)." REFUTED. The delta is
+   exactly this session's rewrite of scripts/verify_recalibration_pins.py: HEAD had 2 undeclared reads
+   (`_PINS.read_text()` line 27, `f.read_text()` line 32); the new version declares encoding on both
+   (encoding=_ENCODING, lines 59 and 155). A shrink WITH a named cause, ceiling unchanged (shrink-only holds).
+
+## BUG-531 (CLOSED 2026-09-26) - the rename vocabulary was applied to the PATH, so the `Copy of ` control could never fire
+- FOUND by a known-answer control that FAILED (scripts/check_session_plan.py --selftest), NOT by production.
+- CLASS: the BUG-492 lesson inverted - not a control that can never FAIL, but one that can never PASS. That
+  direction is the more dangerous one, because the SIBLING control (the ` (conflicted copy DATE)` suffix form)
+  DID pass, which made the family logic look proven while half of its vocabulary was inert.
+- MECHANISM (measured): canonical_names() applied each pattern to the WHOLE PATH. `^Copy of ` is name-anchored
+  and `governance/Copy of X.csv` does not start with `Copy of `, so the prefix form matched NOTHING. The suffix
+  form matched only because it is unanchored - which is exactly why the hole stayed silent. A rename is a fact
+  about the NAME, so the vocabulary is now applied to the BASENAME and the surviving directory is rejoined. The
+  VOCABULARY itself was not edited: it still lives once in config/repo_integrity.yaml#conflict_marker (D-2646).
+- MEASURED AFTER: --selftest 9/9 controls fire; --staged rc=0 over 42 paths; the index was RE-COUNTED at 42
+  after every probe (the control-on-the-control holds - on 2026-09-26 a 42->43 move went unobserved by hand).
+
+## BUG-532 (OPEN 2026-09-26) - one lock, two homes: the session plan RESTATED the owner-instrument lock that a rail already checks
+- FOUND by rail 4 refusing its own plan: `governance/F11_DISC_REVIEW_*.csv` sat in may_touch while
+  `governance/F11_*` sat in will_not_touch, which OUTRANKS may_touch (BUG-445) - so the entry was already DEAD
+  and the contradiction was invisible in every earlier audit.
+- CLASS: D-2646 (one home for one rule), the same shape as BUG-493. The lock on the owner instruments already has
+  a MACHINE-CHECKED home: config/human_instrument_locks.yaml (BUG-430 rail 1) declares
+  F11_DISC_REVIEW_20260923.csv COLUMN-SCOPED (new columns allowed; protected columns byte-identical), and
+  config/artifact_ownership.yaml declares F11_ANCHOR_REVIEW_20260923.csv human_authored. The session plan then
+  restated a COARSER rule (`governance/F11_*` write-locked) that contradicted BOTH.
+- INTERIM FIX (this change-set): the dead may_touch entry is removed and the coarse lock stands, so nothing in
+  this repo may write F11_*. The plan still RESTATES the lock instead of consuming it.
+- OWED, GATED (owner act): make will_not_touch CONSUME config/human_instrument_locks.yaml. Gated because a
+  column-scoped lock is a WEAKER rule than a name lock, and widening protection by an assistant edit is exactly
+  what BUG-445 forbids. Until then, BUG-532 stays OPEN with the coarse lock in force.
+
+## STANDING RULE ADOPTED 2026-09-26 (owner-accepted) - WIP freeze + the definition of done that stops the churn
+- One session: NO new rails and NO new config keys; finish what is in flight, sync governance, commit, lower
+  ceilings. New discoveries are LOGGED AND TRIAGED, not immediately worked - moving ground is what made a fix
+  look like it CREATED a bug when it had only made an older one observable.
+- A bug closes ONLY as: fix + a control that failed before and passes now + a class sweep + a ceiling DECREASE.
+- Five numbers tracked per session: open bugs | max_unguarded | per-class instance counts | WIP (staged+dirty) |
+  commits blocked by a rail. A ceiling that RISES is a regression alarm, by construction.
+- NOT A DEFECT, a measured environment constraint: /usr/bin/fm exists on this macOS 27.0 machine but
+  `fm license --status` = "Not agreed." and the notice is MACHINE-WIDE (sudo, every user). So the on-device
+  model is unusable by assistant act. config/apple_fm.yaml (enabled: false, arms: []) + scripts/probe_apple_fm.py
+  (read-only, exit 2 while unlicensed) make the four owner-approved measurements ONE command after `sudo fm license`.
+
+## BUG-530 (CLOSED 2026-09-26) - the register generator wrote its own tracked artifact with a bare truncating write
+
+FIX: both outputs now go through write_guard.write_document(OWNED_ANY) - the ONLY legal whole-document writer
+(D-401/I1): tempfile -> fsync -> os.replace (C6) plus a receipt. The generator also READS its own output paths from
+config/artifact_ownership.yaml (the declaration is the ONE home for "which files does this script write", D-2646),
+so no path is hardcoded in it and the argparse defaults cannot go stale (C12).
+WHY IT MATTERED MORE HERE: a bare write_text TRUNCATES the tracked file before the new bytes exist, so an interrupted
+run left a truncated register and check_bug_status.py then reported the rail's OWN SUBJECT as the evidence of its own
+failure. It is also the writer whose unguarded truncate best explains the 2026-09-26 Dropbox conflicted copies, one of
+which was a 14-bugs-stale COPY of this register - a stale AUDIT SUBJECT (the BUG-527 failure mode). A derived artifact
+with a second writer and no atomic replace WILL produce conflicted copies.
+TWO CONTROLS, BOTH SEEN TO FIRE (a control never seen failing is not a control, BUG-492):
+  1) DECLARE-FIRST: the declaration went in BEFORE the guard was wired and write_guard --audit then returned rc=1
+     DRIFT - "declared writer_of_record scripts/bug_status.py never imports the guard and declares no
+     guard_exemption". The rail COVERS the new declaration; that is measured, not assumed.
+  2) ROUTE-BY-IDENTITY: the route is decided on the RESOLVED path (symlinks and '..' collapsed), never on the name -
+     the BUG-528/BUG-531 class, where a NAME-shaped enforcement surface is bypassed by a rename or a dotted path.
+     MEASURED: the declared run appended exactly 2 receipts naming the ABSOLUTE artifact paths; the rail's own
+     re-derivation into a TEMP dir appended 0 (journal=False for a foreign target - a receipt for a file that is not
+     an artifact would make the ledger read as if a declaration had been rewritten).
+MEASURED AFTER: --audit rc=2 (owner-owed, loud NOT fatal, BUG-457): "ok guarded: scripts/bug_status.py (calls
+write_document)", 6/9 declared writers guarded, unguarded 3 of ceiling 3. THE CEILING DID NOT MOVE, and that is
+stated rather than dressed up: max_unguarded counts DECLARED writers and this generator was UNDECLARED, so fixing it
+cannot lower that number - it removes a writer the ceiling could not see. Honest coverage movement: declared 7 -> 9
+(two artifacts, one writer), unguarded fixed at 3. Byte-neutral: check_bug_status rc=0 and 126/143/269 unchanged.
+CLASS SWEEP (with the instrument's own limit, because the limit is the finding): a literal grep over scripts/ +
+pipeline/ yields 136 candidates and is USELESS as a writer detector - it matches any tracked artifact filename
+appearing anywhere in a file that contains any write call, so it counts READERS as writers (pipeline/stage2_extract.py
+only READS config/content_types.yaml). Reading-target vs write-target cannot be settled by text. The reliable
+instruments are the DECLARATION plus the runtime RECEIPT, because only they resolve a path.
+NAMED SAME-CLASS SIBLING (NOT fixed here): scripts/freeze_gold_sets.py writes the TRACKED governance/
+gold_freeze_report.md with a bare write_text and is undeclared - the identical defect, found by the inversion above.
+
+
+## BUG-533 (HIGH - D-2649, FIXED 2026-09-26): the store-columns rail compared a CODE census as a STORE invariant, and every new script aborted `just health` at that line
+
+ROOT CAUSE (measured, not inferred). `scripts/check_store_columns.py` measures FIVE rulers per column and compares
+all five against the recorded `measured:` block. Four are read FROM THE STORE (nonnull | nonblank | hollow |
+distinct). The fifth, `mentions`, is a census of the CODE: the number of .py FILES under `scan_roots`
+(scripts, pipeline, tools) whose text NAMES the column. `role_faults()` never reads it - it is the one ruler no
+role consumes - so its only machine use was the recorded-number comparison. Measured drift: name.mentions 270 -> 271
+and status.mentions 100 -> 101, and the responsible files are NEW .py files that were never there when --record ran
+(`scripts/lib/git_subject.py` for `name`, `scripts/probe_apple_fm.py` for `status`). The store did not change; the
+CODE did. The rail then printed "the store changed under a declaration that still claims the old number", returned
+rc=1 - and rc=1 is NOT in the tolerance list on `just health` line 57 (`|| [ $? -eq 2 ]`), so the recipe ABORTED
+there and every rail after it (58-82: resolve_dropbox_conflicts, reconcile, measure --gaps, the pins rails, r3
+preflight, vec integrity, archive index...) never ran in one pass. So EVERY new script that named a column silently
+hid ~25 rails. That is the blindspot: not a wrong number, an un-run rail.
+
+FIX (class-level, at the root, no laundering): the five rulers are split by the kind of fact they are.
+STORE_RULERS (nonnull | nonblank | hollow | distinct) still fail the rail on movement - the store genuinely changed.
+A moved CENSUS_RULER reports `CODE-CENSUS-MOVED`, names the real mover (the code, not the store), states the census
+population, and is OWNER-OWED: LOUD, exit 2, NOT fatal - the BUG-457 tri-state convention already used by this
+recipe. `fatal_faults()` is the single severity home; nothing else decides what fails. The `--check` summary now
+also prints `census moves N` so an owner-owed census move is visible in the one-line verdict.
+
+CONTROLS, SEEN TO FIRE (BUG-492). c15: a moved `mentions` is OWNER-OWED and NOT DRIFT. c16: a moved STORE ruler is
+still fatal - the census split must not shadow the rulers that matter. c17: the severity CLASSIFIER itself (only a
+store ruler may reach the fatal set). The harness had to be extended to make them possible: `_faults()` now accepts
+`recorded_over`, because the 14 original controls always handed the audit fresh == recorded, so NO control could
+ever fire on a drift at all. The control's pre-fix failure is on the record as the LIVE symptom: --check printed
+MEASUREMENT-DRIFT for both census keys and returned rc=1 before the change, and prints CODE-CENSUS-MOVED with rc=2
+after. Selftest 14 -> 17 controls, 17/17 fire.
+
+MEASURED AFTER: `just health` now runs through the store-columns line and dies 12 lines LATER at line 71 on the
+PRE-EXISTING, owner-owed R2 pin (see below). Nothing was loosened that matters: no store ruler, no role rule, no
+debt ceiling moved (debt stays 9 of ceiling 9, shrink-only).
+
+
+## BUG-534 (MED - D-405 cover, FIXED 2026-09-26): declaring an owned artifact creates a cover obligation that only surfaces on the NEXT full health run
+
+ROOT CAUSE. `reconcile.py` `cover()` requires every artifact in `config/artifact_ownership.yaml` to carry a
+reconciliation entry or a declared `unreconciled_reason`. The BUG-530 fix DECLARED `governance/bug_status.json`
+and `governance/bug_status.md` (that declaration is what made the guard rail able to see that writer at all), which
+created two new obligations. They went undetected for the rest of that session because `just health` aborted at the
+store-columns line BEFORE the reconcile rail: the cascade of BUG-533 hid the collateral of BUG-530. This is the
+material argument for fixing aborts before anything else - a RED line does not only hide rails, it hides the
+consequences of your own last edit.
+
+FIX, and a NEGATIVE RESULT recorded rather than hidden: the first attempt added two `reconciliation.yaml` entries
+with `check: path_resolves` and `declares:` pointing at the two artifacts. That CRASHED reconcile with a YAML
+ScannerError - the engine parses `declares` as YAML, and one artifact is a JSON register and the other is markdown.
+So the entry shape is wrong for non-YAML artifacts and the correct declaration is `unreconciled_reason` on the
+artifact itself, in the ONE home that already knows it is owned (D-2646), naming the REAL oracle: re-derivation -
+`scripts/check_bug_status.py` regenerates both outputs into a TEMP dir and byte-compares them with the tracked
+files. Recorded as a negative result because the next person will otherwise retry the entry shape.
+
+MEASURED AFTER: `reconcile --check` rc=0, "11 declared object(s) agree with reality" (was rc=1 with 2 cover
+drifts), and `just health` advanced past the reconcile rail.
+
+
+
+## BUG-535 (HIGH - D-382/D-2648, FIXED 2026-09-26): the pin rule's only legal-looking exit was the one it could not see - a re-pin that moved a sha256 under the SAME decision id
+
+ROOT CAUSE. `scripts/verify_recalibration_pins.py` refused two things at write time: a staged pinned artifact whose
+bytes MOVED, and staging `config/recalibration_pins.yaml` while the SCAN was red. Both refusals are real, and
+together they left exactly ONE path that looked legal: overwrite the pin's `sha256` with the digest of the changed
+artifact, leaving `decision: D-382` untouched. That makes the scan GREEN, so the pins file may be staged, so the
+commit is TOLERATED - and D-382 keeps certifying a measurement nobody re-ran (BUG-391/BUG-526 class: the rule
+lived in the rail's MESSAGE, never in a check). The rail's own instruction - "re-run the measurement and mint a NEW
+decision" - was unenforced prose.
+
+FIX, at the declaration's own moment (D-2648: the invariant gets the moment in which the change happens). A re-pin
+is a RE-MINT: if a pin's sha256 differs from its committed predecessor, its `decision:` MUST differ too. Plus three
+fail-closed tightenings found while implementing it: (a) a pin may only DISAPPEAR with a `retired:` marker, or the
+next reader cannot tell a retired meter from a forgotten one; (b) a pins file staged apart from the bytes ON DISK is
+refused - a partially staged declaration would commit lines nobody can review; (c) an unreadable or unparseable
+predecessor is an UNKNOWN, and an unknown is not a clean (C16/BUG-457). `head`/`tree_blob` are INJECTED, like the
+existing `blob`/`scan`, so the controls can hand the rule a laundered document as easily as a legal one.
+
+CONTROLS, SEEN TO FIRE (BUG-492): 6 -> 12, all 12 fire. New: laundering REFUSED, re-mint TOLERATED, partial staging
+REFUSED, removal-without-`retired` REFUSED, removal-WITH-`retired` TOLERATED, unreadable predecessor fails CLOSED
+while a first-ever pins file is TOLERATED (the no-overreach control). The pre-fix failure of the new control is
+structural and stated plainly: the old `staged_faults(cfg, staged, blob, scan)` had NO predecessor input at all, so
+the laundering document produced ZERO faults. The re-pin rule now makes R2's legal path exist: measure, mint, re-pin.
+
+OWN DEFECT CAUGHT AND FIXED IN-FLIGHT, recorded because it is the same class: the first version defined the
+`_UNSET` sentinel BELOW `staged_faults`, whose signature uses it as a default - evaluated at def time, so the rail
+died with NameError and `just health` regressed from line 71 to line 69. One home for the sentinel (D-2646), and the
+rails caught it before any commit.
+
+
+## BUG-536 (HIGH - PROPOSED D-2653 / BUG-457, FIXED 2026-09-26): the pin rule's only exit was 1, so an OWNER-OWED pin aborted `just health` and hid ELEVEN rails
+
+SYMPTOM: `red r2_meter: scripts/definition_nli_verify.py CHANGED since it was pinned` and
+`error: Recipe `health` failed on line 71 with exit code 1` - rails 72-82 (11 of them) never ran at all.
+
+ROOT CAUSE (measured, not recalled): the rail had ONE severity. `all_faults()` returned a single list and
+`main()` returned `1 if faults else 0`, so the recipe's `|| exit 1` treated two DIFFERENT facts as one:
+  * the DECLARATION is broken (a pinned path is missing; a `decision:` the registry does not carry) - a defect; and
+  * the pin has fallen BEHIND the work - which only the OWNER can close (re-measure -> mint -> re-pin).
+The second is owner-owed DEBT by construction, and BUG-457 already fixed exactly this shape everywhere else
+(the tri-state: 0 clean | 1 fatal | 2 owner-owed, loud but NOT fatal). This rail was the last one still
+single-valued, so it was the one that could abort. An abort is an amnesia generator: it hides its own
+successors, which is the lesson BUG-533 recorded one turn earlier and D-382 recorded in its own rationale
+("just health was RED for a whole pass while every individual rail was green") - this was the THIRD instance.
+
+MOVERS, by name: the pinned meter was edited TWICE after D-382's re-pin. D-382 re-pinned it at
+sha256 e9070635... for the additive provenance block; the working tree then carried a SECOND uncommitted edit
+(mtime 2026-09-26 12:44:41, the `_open_input`/`_INPUT_ENCODING` single-encoding-rule fix, D-2644/BUG-522),
+so the on-disk digest fbfd62f3... has no decision behind it. git diff --stat: 61 insertions, 1 deletion.
+
+FIX (one producer, no downstream re-classifier - the BUG-526/528/531 family is "enforcement by NAME instead
+of by IDENTITY", so severity is decided where the fault is CREATED, never re-graded by its wording):
+  * `scan_split(root, cfg) -> (fatal, owed)` is the single producer; `all_faults()` = fatal + owed (the write
+    gate still sees BOTH, so nothing is hidden from the commit gate).
+  * `main()` returns EXIT_OWED (2) for a moved pin, EXIT_DRIFT (1) only for a broken declaration, and the scan
+    prints `OWED ...` for debt and `RED ...` for a defect; the summary line reads `N pinned, D DRIFT, O OWNER-OWED`.
+  * justfile line 71 -> `|| [ $? -eq 2 ]`. It is a CHECKER line, so `measure.health_chain()` still derives the
+    same order (`python3 scripts/lib/measure.py --gaps` rc=0, checker at position 50, both declared resolvers
+    precede it) - the ORDER IS LOAD-BEARING rule (BUG-489/490) is untouched.
+NOTHING WAS LOOSENED: `--staged` (the pre-commit hook, `|| exit 1`) is a REFUSAL and returns 1 for EITHER kind,
+so any non-zero - 1 or 2 - still refuses the commit that would make a measurement unreproducible.
+
+CONTROLS 12 -> 16, all firing (`--selftest` 16/16). The four new ones cannot be satisfied by hoping the live
+tree happens to be broken in the right way: `_split_probe()` BUILDS a temp root holding exactly the fault kind
+asked for (BUG-492 - a control that cannot be handed a broken declaration is a comment), and every probe also
+asserts the split is TOTAL and DISJOINT (no fault lost from both lists):
+  * a MOVED pin is OWNER-OWED and is NOT a fatal drift;
+  * a pin whose PATH IS MISSING is FATAL (fail closed, C16);
+  * a pin naming a DECISION the registry does not carry is FATAL;
+  * the split is total and disjoint.
+
+MEASURED AFTER: selftest 16/16, scan `OWED r2_meter ... / 6 pinned, 0 DRIFT, 1 OWNER-OWED` rc=2, write gate
+`42 staged path(s), 0 RED` rc=0, and `just health` advanced from line 71 to line 82 - the ELEVEN hidden rails
+(really eleven: verify_declared_inputs, verify_frozen_pair, verify_evidence_manifests, verify_artifact_authority,
+r3_preflight, verify_vec_integrity, verify_boundary_injection, depth_pass_agreement x2, build_archive_index,
+recompute_decision_summary) are now RUN, and every one of them is GREEN except the archive index of BUG-537.
+The R2 pin itself is NOT laundered: it is still RED-as-OWED and still owes a re-measure + a mint (D-382's rule).
+
+## BUG-537 (MED - PROPOSED D-2653, OPEN 2026-09-26): regenerating archive/index.yaml de-listed a hygiene entry, so the rail's own remedy may be a silent blur
+
+FOUND BY: the forensic question "did my own fix create a blindspot?" - asked of the BUG-536 fix's very next
+step. `archive/index.yaml` was STALE (`stored body_sha256 ecfe29517a94 != measured 07ab497cecf9`), so the rail's
+own named remedy was run: `python3 scripts/build_archive_index.py` (32 entries, 17.3 GB, now rc=0 in sync).
+Diff: 25 insertions / 26 deletions. VERIFIED against the pre-image: the `entries` NAME SET is byte-identical
+(dropped NONE, added NONE) - so no archival object was lost from `entries`.
+
+BUT the removed block is a real record that is now ABSENT from the new index:
+    - name: .DS_Store | kind: file | bytes: 10244 | modified: 2026-09-23 | category: os_metadata |
+      disposition: purge_candidate | authority: hygiene | reason: macOS Finder metadata; regenerable, never evidence
+and `archive/.DS_Store` still EXISTS on disk (10244 bytes, mtime 2026-09-26 12:18) while `grep -c DS_Store
+archive/index.yaml` = 0. The regeneration therefore moved 1.8 MB of aggregate bytes and changed the disposition
+grouping (`keep 5 -> 6`, `purge_candidate 1 -> 0`) while dropping the only record of an on-disk hygiene object.
+STATUS: OPEN and NOT papered over. Class: the rail's remedy is not itself controlled - `build_archive_index.py`
+has no known-answer control asserting "an on-disk object that was indexed is either still indexed or declared
+gone" (BUG-492: the control must be SEEN to fire). The pre-image is preserved at /tmp/index_yaml_pre.yaml for
+the next pass. NOT a measurement artifact, so nothing downstream is consumption-blocked.
+
+## BUG-538 (HIGH - D-2653, FIXED 2026-09-26): Maxwell pinned its SCRIPTS and its EVIDENCE but pinned ZERO GENERATORS - and the first rail that closed the gap shipped three defects the pre-commit audit found
+
+MEASURED 2026-09-26 on this machine. config/recalibration_pins.yaml pins 6 SCRIPTS and the anchor configs pin
+sha256 blocks of EVIDENCE, but no config pinned a GENERATOR: a generator was identified by a STRING
+("Qwen3-Coder-30B-A3B-Instruct-MLX-4bit") in every metric record, and a NAME IS NOT AN IDENTITY. The two cache
+entries that matter most - Qwen3-Coder (S2 generator) and gemma-4-E4B-it (R5 reviewer) - were precisely the two
+whose identity could not be read off the store (rev=main, 0 symlinks), so an `ollama pull`, an HF re-download or a
+re-quantisation moves the bytes while every stored `gen_model` keeps saying the same words. That is the BUG-391
+class (a fact that moved with nothing declaring it) applied to the thing that produces EVERY fact in the store: a
+measurement whose generator silently changed is not a smaller measurement, it is an UNCOMPARABLE one.
+
+FIXED by scripts/verify_generator_pins.py + config/generator_pins.yaml (ONE home for BYTES-ON-DISK -> DIGEST,
+boundary declared against the 7 rival NAME->ROLE homes and against recalibration_pins.yaml; D-2646). TRI-STATE
+reusing the BUG-536 convention (a second severity idiom would itself be a second home): 0 CLEAN / 1 FATAL broken
+declaration, fails closed (C16) / 2 OWNER-OWED moved identity. `--pin` PRINTS and never writes: a pin is re-minted
+by a DECISION (D-382/BUG-535), so the write stays a human act. Wired into `just health` (selftest fatal, scan
+tolerating 2). All 6 generators measured; identity_sha256 is now available for ALL SIX (free - the blob basename IS
+the content digest), a gain that came from pinning the content-addressed commit dirs rather than the `main` dirs.
+
+THE THREE DEFECTS THE AUDIT FOUND IN MY OWN FIRST VERSION (all fixed; each is the shape this bug is about):
+  (1) THREE PINS DECLARED A TRUNCATED COMMIT PREFIX (773a7da77e56). Nothing on disk is named that, so the rail
+      reported "pinned object is MISSING from disk" - a PHANTOM, produced by the very "approximation pretending to
+      be an identity" the file exists to catch. resolve_snapshot() now resolves ONLY an exact snapshot name or a
+      ref, and the fault NAMES the prefix it refused. A control was SEEN to fire on it (control 5/12).
+  (2) _compare() SKIPPED a declared digest the current mode could not measure, so a store that stopped being
+      symlinked would read CLEAN with an unverified identity. That is a silent pass of exactly the kind BUG-492
+      forbids; it is now OWNER-OWED and says so. Control 7/12 counts every declared fact re-reported.
+  (3) THE TWO lmstudio REPOS CARRY TWO SNAPSHOT DIRS: snapshots/<commit> (14 files, ALL symlinked =
+      content-addressed) AND snapshots/main beside it (34 files, 0 symlinks) whose extras are the downloader's own
+      bookkeeping (.cache/huggingface/**, CACHEDIR.TAG - 5,842 B; 3,187 B on the reviewer). Pinning `main` would
+      bind that bookkeeping as if it were weights; pinning the commit alone would leave the aliased copy unbound.
+      The gain/loss is now DECLARED: pin the commit, declare `alias_snapshots: [main]`, and let the rail require
+      the alias to hold the same (relpath, bytes) payload - extras tolerated and counted, a disagreement
+      OWNER-OWED, an absent alias FATAL. Controls 11-12 were seen to fire on both.
+
+HONEST LIMIT (declared, not hidden): sparse_sha256 is a manifest over (relpath, bytes) - it catches an added,
+removed or re-sized file, which is what a re-pull or a re-quantisation does. A byte-swap preserving every
+(path, size) is NOT caught by the daily check; it IS caught by --deep and by identity_sha256 wherever the snapshot
+is symlinked (as all 6 now are).
+
+CONTROL EVIDENCE: `python3 scripts/verify_generator_pins.py --selftest` -> 12/12; `just health` rc=0 with
+"ok generator pins: 6 declared, 0 BROKEN DECLARATION, 0 MOVED (sparse)" and both alias lines seen to print OK.
+
+## BUG-539 (HIGH - OPEN 2026-09-26): the decisions registry is declared append_only, but its own derived summary block sits at EOF - so MINTING a decision is a MID-FILE edit that the prefix rail reads as tampering, and it ABORTS the ladder
+
+MEASURED 2026-09-26 while minting D-2653/D-2654. verify_handoffs refused: "decisions_registry: config/decisions.yaml is declared append_only but its receipted bytes are not a prefix of the current bytes - a cell was edited or the file was truncated (BUG-376 class)". Reproduced: the two records were inserted immediately above the derived `summary:` block (they cannot go after it - a top-level sequence entry after a top-level mapping is not valid YAML). The rail is RIGHT: `prefix_intact` is exactly the rule a receipted append-only registry needs. The defect is the DECLARATION: a file that can only be extended by an edit ABOVE its own footer is not append_only. CONSEQUENCE, and it is the BUG-457 shape: the FAIL aborts `just health` line 47 and HID 11+ rails below it, including the brand-new generator-identity rails - the abort is an amnesia generator. NO REMEDY EXISTS: scripts/lib/handoff.py offers only --backfill / --seal-revisions, neither of which refreshes this receipt, so the only ways forward today are (a) leave the decisions unminted, or (b) re-seal the receipt, which would LAUNDER the very edit the rail exists to catch. I took (a): config/decisions.yaml was restored from its pre-image (/tmp/decisions_pre_2653.yaml), its summary re-derived (784 records, stamp 0d7a746350d62e14) and D-2653/D-2654 remain PROPOSED in this buglog only. FIX OWED (owner-gated, one decision): declare a structural-edit path - either move the derived summary OUT of the registry into its own derived home (D-2646: one derived value, one home, and the summary IS derived), or declare the mint as a structural edit whose receipt is refreshed in the SAME sequence (D-2645) and give the rail a remedy that is not a quiet re-hash (D-382/BUG-535). Until then EVERY mint of a decision both breaks a rail and hides the ladder below it.
+
+## BUG-540 (HIGH - FIXED 2026-09-26): the append_only rule could not be EVALUATED - a one-byte LEGAL append was reported as tampering, and the verdict could not tell tampering from "the old bytes were never retained"
+
+WHAT: `just health` line 47 (scripts/verify_handoffs.py, prefix_intact) failed with "config/decisions.yaml is declared append_only but its receipted bytes are not a prefix of the current bytes - a cell was edited or the file was truncated (BUG-376 class)". MEASURED by this session's own control: appending ONE newline to config/decisions.yaml - a legal append, restored byte-exactly afterwards (sha256 back to f67d12a2...) - produced exactly that verdict.
+
+WHY: the branch compared the current prefix against a BLOB in governance/handoffs/blobs/, and this receipt declares `seal: false`, so no blob was ever written (MEASURED: 6 blobs on disk, all anchor4 digests, none for the registry). `old_blob.exists()` was therefore False on EVERY run, and the declared no_seal_reason - "the registry is append_only and textual, so a prefix check detects a rewrite without a copy" - was a FALSE PREMISE: the (bytes, sha256) pair in the receipt was never used to decide the prefix. Without a copy the rule was UNDECIDABLE, and every failure was attributed to tampering. A rule that can never say YES is not a rule, and one that cannot distinguish two different causes is a false witness (BUG-492 applied to the rail itself).
+
+FIX: `prefix_state(cur, rec)` decides from the digest+length pair ALONE - hash current[:receipted_bytes] and compare with the receipted sha256 - returning unchanged / appended / truncated / rewritten, each with its own reason. No copy is required, so the rule works for an UNSEALED artifact, and the finding NAMES the state instead of guessing. Control added to `--selftest` with five known answers, including the two that were impossible before: a legal APPEND says YES, and an EQUAL-LENGTH rewrite says NO (the BUG-376 signature case).
+
+CARRY (BUG-539, still OPEN, now fully specified): even with the rule working, a MINT still cannot preserve the prefix, because config/decisions.yaml owns its own derived summary and header - a new record must be inserted BEFORE the top-level `summary:` key and total_decisions/last_sync/stamp pair sit ABOVE the records, so the file can never be appended to. THE AUDITED FIX (D-2655): move the census to governance/decisions_summary.json so the registry holds RECORDS ONLY and extends to EOF (a mint becomes a true APPEND), with source_sha256 joining census to registry bytes. Its declarations (config/artifact_ownership.yaml, config/derivations.yaml, the second-oracle test) were drafted and DELIBERATELY REVERTED this session rather than left half-applied - a half-applied migration is a set of rails pointed at a file that does not exist.
+
+## BUG-543 (HIGH - FIXED 2026-09-26): BUG-500 RECURRED - the sync client re-materialised the pre-fix .git DIRECTORY over the 58-byte pointer and the whole ladder went DARK
+MEASURED. just health printed ZERO ok lines and died on line 7 (RAIL 0): FAIL repo-integrity: the git dir does not
+resolve ('rev-parse --absolute-git-dir'). On disk .git was a DIRECTORY again holding the 2026-09-25 09:58 PRE-FIX
+skeleton (index 125618 B, refs/heads/main -> a1061cd7) and NO HEAD file, while the pointer's bytes survived as the
+conflicted copy '.git (M1 max's conflicted copy 2026-09-26)' = 58 bytes.
+HARMLESS, PROVEN FIRST: git merge-base --is-ancestor a1061cd7 96b1e9c rc=0 - the resurrected ref is an ANCESTOR of
+the real HEAD, so no history existed only here. A non-zero rc would have stopped the repair for an owner ruling.
+REPAIR (bytes preserved, never deleted): sha256 pre-image of all 4 files; the directory MOVED to the declared vault
+(~/maxwell_os_conflict_snapshot_20260925/vaulted/resurrected_git_20260926) with a manifest and pre == post ASSERTED;
+the pointer's own conflicted copy PROMOTED to .git byte-exact. After: --absolute-git-dir is the out-of-tree path,
+HEAD = 96b1e9c UNCHANGED, show-toplevel is the Dropbox path, and the ladder went from 0 to 31 ok rails over 386 lines.
+LESSON: RAIL 0 turned a potential undetected repository corruption into a 10-minute repair. The DURABLE fix is still
+an OWNER act: the resurrecting client must stop writing .git, or the worktree must leave the synced tree (D-366).
+
+## BUG-541 (MEDIUM - FIXED 2026-09-26): the DECLARED recovery path crashed during the incident it exists for
+MEASURED: 'check_repo_integrity.py --plan' died with IsADirectoryError at verdict()'s comparison of cc_abs.read_bytes()
+with canonical_abs.read_bytes() - the conflict copy is a FILE (the 58-byte pointer) whose canonical name is a
+DIRECTORY (the resurrected .git). The same read sits in the report path of checks(), so RAIL 0 would have crashed
+identically the moment the git dir resolved - the BUG-543 fix would have been masked by a traceback.
+FIX: _same_bytes(a,b) -> bool|None (None when either side is not a regular file); verdict() returns OWNER_OWED for
+the type conflict (no bytes to compare, and NEITHER side may be moved by a rail); superset_holds() refuses a
+directory; the report gains a three-way word (identical | DIVERGES | UNCOMPARABLE (one side is a DIRECTORY)).
+CONTROLS: 8 known-answer controls in a new --selftest, SEEN to fire; control 1 IS the regression. My own control
+CAUGHT ME too - the superset fixture reused the first fixture's path, so the byte-identical control read overwritten
+bytes (the D-2650 lesson applied to a FILENAME). Fixed. --selftest rc=0; --plan now prints all 39 rows and names the
+.git row OWNER_OWED instead of dying.
+
+## BUG-542 (MEDIUM - MITIGATED, REMEDY OWED 2026-09-26): the silent-repair allowlist is keyed by LINE NUMBER, so a mechanical edit becomes a FALSE FAILURE
+MEASURED by my own change: inserting 37 lines into scripts/check_repo_integrity.py above a DECLARED site produced
+DRIFT ':280 replaces silently (replace) with no entry' AND STALE ':243 declared but NOT measured', aborting just
+health on line 51 (silent-repair, unknown 1) - a FAIL caused by a LINE SHIFT. The site is
+reflog.read_text(errors='replace'): a DECODER error policy, not a write at all.
+MITIGATION: the declaration's line key is corrected from the RAIL'S OWN --list measurement, never retyped.
+REMEDY OWED (the real bug): key a declared site by SITE CONTENT (enclosing function and/or matched text), not by
+line number. Same class of false witness as BUG-540: a rule that cannot distinguish two causes.
+
+## CARRIED (2026-09-26, unchanged): just health is still rc=1 with 31 ok rails - it now aborts at line 51
+(silent-repair, BUG-542, mitigated) and prints FAIL contract: 38 hard finding(s). BUG-539 is still OPEN (the census
+inside config/decisions.yaml makes a mint a MID-FILE insert), so NO decision was minted; the registry is still 784
+records / stamp 0d7a746350d62e14 and its receipt still verifies ('ok decisions_registry: config/decisions.yaml
+unchanged'). Nothing was committed (D-381).
+
+## BUG-542 (MEDIUM - REMEDY APPLIED 2026-09-26, ROOT CAUSE NAMED): the silent-repair allowlist was keyed by LINE NUMBER, so a MECHANICAL edit became a FALSE FAILURE
+The +37-line BUG-541 fix inserted ABOVE an already-declared site shifted scripts/check_repo_integrity.py:243 -> 280, which produced BOTH DRIFT (280 repairs silently with no entry) and STALE (243 declared but NOT measured) and aborted just health at line 51 for a purely mechanical reason. The site at 280 is the SAME site - reflog.read_text(errors="replace"), a DECODER policy, not a write.
+REMEDY APPLIED (one line, byte-length preserving, value taken from the rail's OWN measurement, never retyped): config/silent_repair.yaml lines: [243] -> lines: [280]. The rail's own --list prints verbatim:    scripts/check_repo_integrity.py : 280/replace
+PRE  sha256 20b44f91e354a64616d916f0fd211bc587aa5b16e9239fd94222e8239cb0f362  5510 B / 108 lines
+POST sha256 73bb29ae31e95d50dff0582d9dc043d4acbad3d1e6a64ebd22273ecff04e3671  5510 B / 108 lines
+DELTA: exactly the 3 bytes 243 -> 280; file LENGTH and LINE COUNT identical, so nothing downstream shifted. The write went through tempfile -> fsync -> os.replace (C6) and asserted post == intended bytes.
+AFTER: OWED silent-repair: debt 17 of ceiling 17 | unknown 1 -> 0 | allowed 7 entry(ies). NOTE THE ARITHMETIC (READ from the rail, not assumed): debt counts ONLY entries under the config key 'debt'; an 'allowed' entry is never counted, so moving a site from unknown to allowed moves ONLY the unknown count - the ceiling and its shrink_only direction are UNTOUCHED, and no ceiling change was made or needed.
+ROOT CAUSE STILL OWED (the real remedy): a declared silent-repair site is keyed by LINE NUMBER. It must be keyed by SITE CONTENT (the enclosing function and/or the matched text) so a refactor above it cannot turn a declared site into an unknown one. Until then EVERY insert above a declared site aborts the ladder for a mechanical reason - which is how a false failure becomes a habit.
+
+## BUG-544 (MEDIUM - OPEN, MEASURED 2026-09-26): the silent-repair rail RAISES instead of DECIDING when its own declaration is ABSENT or EMPTY - the BUG-541 class, in the rail that just caused BUG-542
+MEASURED with the module's CONFIG monkeypatched to a controlled path (no repo state touched, nothing written):
+  ABSENT declaration -> FileNotFoundError out of load()'s CONFIG.read_text
+  EMPTY  declaration -> yaml.safe_load returns None and the FIRST cfg.get(...) raises AttributeError
+Both are TRACEBACKS, not verdicts (C16: a rail must DECIDE; BUG-541 was the same shape one rail over). Compounding, DURABILITY half - MEASURED: git ls-files config/silent_repair.yaml returns NOTHING and git status reports '?? config/silent_repair.yaml', i.e. the declaration this rail depends on is UNTRACKED. A fresh clone, a lost file, or any recurrence of the BUG-543 .git incident therefore ends at just health line 51 with a traceback instead of the sentence 'the declaration is ABSENT'.
+REMEDY OWED (small, mine): load() must fail closed with a named message on an absent/empty declaration, plus a known-answer control SEEN to fire (BUG-492). The durability half is a COMMIT (owner-held, D-381) - an untracked config that three rails depend on is a single point of failure with no receipt.
+
+## MILESTONE (2026-09-26): just health is GREEN for the first time in this session series - rc=0, 40 ok rails over 583 ladder lines (was rc=1, 31 ok, dying at line 51)
+The single blocker was the BUG-542 line-number drift, NOT BUG-539. The ladder now runs PAST line 51 and every later rail completes. Also RESOLVED-BY-REPAIR (carried two sessions): the two verify_handoffs selftest failures 'revision bc1cc956... does not re-derive from git' and 'revision be1a39e0... does not re-derive from git' were ENVIRONMENTAL (the BUG-543/BUG-500 out-of-tree git dir), not defects - they are gone now that the git dir resolves.
+THE REMAINING FAIL WORD IS NOT A FALSE WITNESS (audited, do not 'fix' it): FAIL contract: 38 hard finding(s) - fail closed. scripts/validate_depth_domain_contract.py returns 1 on 38 MENU_OFF_TOKEN findings (plus 43 owner_blocked DOMAINS_BLANK), but the CLI is wired as --gate-if-active and the rail PRINTS that the suppression is in force: NON-GATING: contract status is 'proposed' (owner gate). Finders are real S4 data debt; the green ladder is green BY DECLARED OWNER GATE, which is itself an OWNER GATE item - while the contract stays 'proposed', 38 hard findings do not gate and nothing consumes the workbook.
+
+## DECISION PROOF (audit 2026-09-26): D-2655 is NECESSARY BY CONSTRUCTION - the registry append defect CANNOT be fixed by moving the census inside the file
+HYPOTHESIS TESTED: move the derived census (head lines 1-6 and the top-level summary block at line 8682 of 8863) to the TOP of config/decisions.yaml so the records extend to EOF and a mint becomes a pure byte-append. VERDICT: NO. The receipt rule is a PREFIX rule - the receipted bytes must be a prefix of the current bytes. A mint changes total_decisions, summary, decisions_sha256_16 and last_sync, so those bytes would then live in the PREFIX region; the receipted prefix would stop being a prefix and the rail would report 'rewritten' exactly as it does today. CONCLUSION: NO POSITION INSIDE AN APPEND-ONLY FILE IS COMPATIBLE WITH A PREFIX RULE WHEN A DERIVED VALUE CHANGES ON EVERY MINT. The census must leave the file (D-2655: governance/decisions_summary.json, with source_sha256 naming the registry bytes it describes).
+BLAST RADIUS MEASURED (grep over scripts/, pipeline/, tools/, tests/, config/): consumers of total_decisions / summary / decisions_sha256_16 / written_by / last_sync are exactly FOUR - scripts/recompute_decision_summary.py (the writer), tests/test_decision_summary_sync.py (the second oracle), config/artifact_ownership.yaml (owned_by) and config/derivations.yaml (2 rows: decisions.summary, decisions.decisions_sha256_16). scripts/input_mutation_notice.py line 55 writes its OWN 'written_by' field - it is NOT a census reader. tools/sync_decisions.py is a RETIRED tombstone (exit 2). The migration is therefore LOCAL, not repo-wide.
+CASCADE ENUMERATED BEFORE IMPLEMENTATION (each is a rail that will fire if forgotten): (1) scripts/check_derivation_homes.py validates a declared home by FUNCTION NAME uniqueness across scan roots, so a new census home needs a UNIQUE function name and a status: homed row, or enforcement.max_non_homed (currently 1, shrink_only) is breached by an edit - a ceiling may only be LOWERED; (2) scripts/check_config_defaults.py (D-2644) fires on a config value read with a CODE DEFAULT, so the new census reader must index its keys explicitly and FAIL CLOSED, never .get(key, literal); (3) config/handoffs.yaml declares the decisions_registry receipt over config/decisions.yaml with seal: false, so the migration makes that receipt STALE (prefix_state -> 'rewritten') and it MUST be re-baselined in the SAME sitting with the pre-image declared - a migration re-baseline is lawful ONLY as a declared decision, never as a silent edit; (4) tests/test_decision_summary_sync.py must read the census from its NEW home and FAIL CLOSED when the census JSON is ABSENT (BUG-487: a journal that does not exist must not read as 'ok').
+ORDER CONSTRAINT (additive-first, so no intermediate state points at a file that does not exist - the exact reason a half-applied migration was REVERTED last session): (a) create the census JSON from the CURRENT registry; (b) teach the writer to read/write the new home AND to mint as an APPEND; (c) strip the census from the registry; (d) re-point artifact_ownership.yaml, derivations.yaml and the test; (e) re-baseline the receipt via handoff.py --backfill; (f) verify: recompute --check, the test, check_derivation_homes, check_config_defaults, reconcile, just health. SELF-PROVING CHECK: decisions_sha256_16 must stay 0d7a746350d62e14 and 784 records / per-state / by_category must re-derive identically.
+
+## CARRIED (2026-09-26, unchanged): just health is GREEN (rc=0, 40 ok rails); NOTHING was committed (D-381, owner-held); NOTHING was minted (the open registry append defect still blocks mints - the registry is still 784 records, stamp 0d7a746350d62e14, receipt ok f67d12a2f3f5f502).
+
+
+## BUG-544 (MEDIUM - FIXED 2026-09-26): the silent-repair rail now DECIDES when its own declaration is broken, and refuses a silently-narrowed census
+
+WHAT WAS WRONG (measured 2026-09-26, remedied the same sitting). scripts/check_silent_repair.py load() was one line -
+yaml.safe_load(CONFIG.read_text(...)) - so an ABSENT declaration surfaced FileNotFoundError at the caller and an EMPTY one
+returned None and then raised AttributeError out of the first cfg.get(...). Both are TRACEBACKS, not verdicts: at
+just health line 51 the ladder would die with a stack trace instead of the sentence "the declaration is ABSENT". This is
+the BUG-541 shape one rail over, and the third member of the FALSE-WITNESS family this register names.
+
+REMEDY (scripts/check_silent_repair.py, 195 -> 283 lines; sha256
+2254fe4ecbd02a9039043a73334720c05f37557c1e63d15861db0dd094fc88f1). load() is now three functions with one job each:
+  declaration_text(path)       - FileNotFoundError | IsADirectoryError | UnicodeDecodeError | OSError -> a NAMED SystemExit
+  parse_declaration(text,path) - EMPTY | unparseable YAML | not a mapping | missing a REQUIRED key (scan_roots, ceiling) -> named
+  config_path(repo)            - the repo argument of load() was IGNORED: a caller asking about another repo silently got THIS one's policy
+scan() also REFUSES an EMPTY scan_roots and a declared scan root that is not on disk. Before, 'if not base.exists(): continue'
+narrowed the census to NOTHING and still printed ok - a rail that can never say FAIL (BUG-492). Its sibling
+scripts/check_config_defaults.py already carries this exact guard (C16); this rail now matches the sibling.
+
+MEASURED, not asserted (no repo state touched: the shipped module was COPIED into /tmp/bug544/scripts and run against
+/tmp/bug544/config/silent_repair.yaml, one declaration per case):
+  ABSENT rc=1 | EMPTY rc=1 | UNPARSEABLE rc=1 | NOT_A_MAPPING rc=1 | MISSING ceiling rc=1 | MISSING scan_roots rc=1 |
+  SCAN_ROOT_ABSENT rc=1 | CONTROL_OK_CONFIG rc=0      TRACEBACKS LEAKED = 0
+--selftest 12 -> 18 known-answer controls, 18/18 fire (one per case, asserting the NAMED sentence, because "exit != 0"
+alone cannot tell a named refusal from a traceback). --check still rc=2 (debt 17 of ceiling 17, unknown 0). just health rc=0.
+THE NEIGHBOUR CENSUS IS UNMOVED: check_config_defaults measures 412 sites / 210 shadowed-declared / 2 undeclared -
+identical to before the edit (the new code adds no '.get(key, default)' site, which is the thing that rail counts). No
+line-numbered register keys this file: config/undeclared_encoding.yaml names it only inside a COMMENT.
+
+TWO CASCADES AUDITED BEFORE ACTING (each would have been a new bug produced by a plausible "fix"):
+  1. THE CENSUS HOME cannot be governance/decisions_summary.json as D-2655 was drafted. governance/session_plan_20260924.yaml
+     may_touch covers config/*.json but NOT governance/*.json (it names governance/bug_status.json, HANDOFFS.jsonl and one
+     ANCHOR4 manifest explicitly). A new governance/*.json would sit OUTSIDE may_touch, and widening the plan so an assistant
+     may write it is forbidden (BUG-528/BUG-445). D-2655's census must therefore be born at config/decisions_summary.json,
+     which IS covered today - or the plan change must be an OWNER act, committed first.
+  2. STAGING THE UNTRACKED DECLARATION IS NOT A DURABILITY FIX. 'git ls-files' is the INPUT SET of the incident rail
+     (check_repo_integrity.py: tracked_paths() -> _scan_root), so 'git add config/silent_repair.yaml' changes what that rail
+     examines - and that is the one rail which reports the BUG-500/BUG-543 git-dir incident. The declaration (5510 B, sha256
+     73bb29ae31e95d50dff0582d9dc043d4acbad3d1e6a64ebd22273ecff04e3671) is STILL UNTRACKED ('??', 0 ls-files) and must be
+     tracked by COMMIT A with its new row SEEN to compare clean - never by a bare stage.
+
+CARRIED, UNCHANGED: NOTHING minted (784 records, stamp 0d7a746350d62e14, receipt ok), NOTHING committed (D-381, owner-held).
+D-2655 remains the top implementation item; it was deliberately NOT started here because the remaining budget could not carry
+the full verify chain, and a half-applied registry migration is the exact hazard that forced the last revert.
+
+## BUG-545 (MEDIUM - OPEN, MEASURED 2026-09-26): 17 of the 60 rails the health ladder invokes are NOT tracked by git - the control plane has no history and no receipt
+
+MEASURED (the rail list is grep -oE 'scripts/[a-z0-9_/]*[.]py' justfile | sort -u, minus git ls-files): 17 of 60 rails
+invoked by just health are absent from the index - including the newest control family AND the three libraries they all
+depend on. Untracked among them: check_silent_repair.py (fixed THIS sitting) and its declaration config/silent_repair.yaml,
+check_config_defaults.py (D-2644), check_derivation_homes.py, check_encoding_homes.py, check_revoked_references.py,
+check_store_authority.py, check_store_columns.py, check_undeclared_encoding.py, check_label_provenance.py,
+check_s5_score_axis.py, check_serving_gate.py, verify_generator_pins.py, resolve_dropbox_conflicts.py, plus
+scripts/lib/artifact_encoding.py (the declared decode HOME), scripts/lib/yaml_guard.py (D-2648 verify-before-write) and
+scripts/lib/operator_env.py. Whole surface: 19 untracked .py under scripts/, 19 untracked entries under config/, 19 under
+governance/; 182 porcelain paths in total (61 modified, the rest untracked).
+
+WHY IT MATTERS. D-382 says a pin must be bytes-on-disk -> digest; this is its mirror. A CONTROL that exists only in a working
+tree has no ancestry: a fresh clone, one lost sync file, or one more BUG-543 git-dir incident leaves just health with rails
+that DECIDE NOTHING because they are simply not there - and the absence is an error only if something notices it. Every
+safety property bought in the last three sittings (BUG-540, BUG-541, BUG-542, BUG-544) was fixed INSIDE this untracked set.
+
+STAGING IS NOT THE REMEDY (audited this sitting). git ls-files is the INPUT SET of scripts/check_repo_integrity.py
+(tracked_paths() -> _scan_root(row["tracked"], ...)), so a bare git add changes what the ONE rail that reports the git-dir
+incident examines. The index must be staged deliberately, in COMMIT A, WITH that rail seen to compare clean before and after.
+
+REMEDY OWED (owner-held, D-381): bring the control plane - these 17 rails, the 3 libraries and their declarations - into
+COMMIT A, and do NOT ack the stale register/decisions blobs while doing it (the index is far behind the register).
+## D-2655 HALF A LANDED - THE CENSUS LEAVES THE APPEND-ONLY REGISTRY (MEASURED 2026-09-26)
+
+WHY THIS EXISTS (BUG-539, still OPEN). config/decisions.yaml is declared append_only and its handoff receipt is
+a PREFIX rule. total_decisions, summary, decisions_sha256_16 and last_sync change on EVERY mint, so NO position
+inside an append-only file is compatible with a prefix rule while a derived value lives there: the mint's
+mid-file insert is the SYMPTOM, not the disease. The census therefore LEAVES the registry.
+
+WHAT LANDED (HALF A - additive by construction, zero removal):
+- NEW config/decisions_summary.json: schema_version, source_path, source_sha256 (the FULL registry digest),
+  written_by, last_sync, decisions_sha256_16, total_decisions, summary. It carries NO generation timestamp, so
+  it is a PURE FUNCTION of the registry bytes and a re-run is a byte-identical no-op (PROVEN: two consecutive
+  runs, identical sha).
+- scripts/recompute_decision_summary.py: census_document / census_text / census_problems / write_census plus a
+  SELF-HEALING write branch that repairs ONLY the artifact that actually drifted. MEASURED: the registry sha256
+  is byte-UNMOVED before and after (f67d12a2f3f5f502...), so the decisions_registry PREFIX receipt was never
+  disturbed - verify_handoffs rc=0 (6 paths, 13 digests, 2 revisions). Rewriting the registry merely because the
+  census was absent would have moved last_sync on a healthy registry and turned that receipt into 'rewritten'.
+- config/derivations.yaml: ONE new row, decisions.census_json, homed to ::census_document (10 rows, 9 homed,
+  the shrink-only ceiling of 1 non-homed untouched).
+- config/artifact_ownership.yaml: declared derived_regenerable, writer_of_record, plus an unreconciled_reason.
+- tests/test_decision_summary_sync.py: a FOURTH test that reads the census from ITS OWN home and re-derives the
+  registry independently (the second oracle still does not import the writer).
+
+KNOWN-ANSWER CONTROL (BUG-492: a control never SEEN to fail is a comment). With the census moved aside, the
+writer --check exits 1 with the NAMED sentence and the new test FAILS (1 failed, 3 passed); restored, rc=0.
+Both readers are provably able to say NO.
+
+THREE CASCADES CAUGHT BY THE PRE-IMPLEMENTATION AUDIT - two would have shipped:
+1. HARD: scripts/reconcile.py's cover rule makes a declared artifact with no reconciliation entry and no
+   unreconciled_reason RED. MEASURED rc=1, ladder ok-lines 40 -> 34 (the ladder aborts). Remedy: declared
+   unreconciled_reason; a reconciliation entry would compare the census against the census - self-certifying
+   evidence, the BUG-467 class.
+2. CENSUS: the store-columns mentions census moved because the new CODE names store columns. Remedy: rewrote
+   the incidental prose so only the R14 stamp token remains, which is a real consequence of a real artifact.
+3. Not a defect: governance/METRICS.jsonl grew (the guard journals every write it performs).
+
+ORDER CONSTRAINT SATISFIED: nothing points at a file that does not exist - the census was created FROM the
+current registry before any reader was pointed at it.
+
+STILL OWED (HALF B, the removal): strip the derived head (lines 1-6) and the top-level summary block so the
+registry holds RECORDS ONLY and a mint becomes a pure byte-APPEND; re-point ownership / derivations / the test;
+re-baseline the decisions_registry receipt via handoff.py --backfill IN THE SAME SITTING; then the full chain.
+
+
+
+## 2026-09-26 — D-2655 HALF B landed: the census left the append-only registry
+
+**Note:** NO id minted yet (a heading that names no BUG-<id> token cannot break buglog coverage by construction). Three defects found by the pre-implementation forensic audit of HALF A, one of them a FALSE WITNESS:
+
+**Note:** F1 (false witness, HIGH): tests/test_decision_summary_sync.py was ALREADY RED at 1 failed / 3 passed - not, as HALF A read it, because the census was absent. Its STATES list was a hand-copied 12-item copy of the writer's 14-item one (D-2645 added REVOKED/ABANDONED), so the census could never equal its expectation. HALF A's known-answer control was therefore MISREAD: the observed failure proved nothing about the control it was meant to fire. Invisible because the 40-rail ladder does NOT run pytest (pytest is just health-deep). FIXED: the oracle now READS the vocabulary and the forbidden-key list from the writer by AST (D-2646: read it, do not restate it) and fails closed if it cannot; 5 passed.
+
+**Note:** F2 (blindspot, MED): census_problems compared only the REQUIRED keys, never the extra ones, so the stale last_sync in the census on disk was invisible while --check reported 1 drift (the registry's). A census nobody derives is how a stale count survives every comparison. FIXED: the key SET is now checked in BOTH directions; SEEN to say NO on a fixture carrying last_sync, and a clean fixture returns [].
+
+**Note:** F3 (BUG-541 class, LOW): census_problems computed its label with path.relative_to(ROOT) and RAISED ValueError on an out-of-tree path - a rail that raises instead of deciding, which is what made F2 uncontrollable. FIXED: it DECIDES (str(path)) for an out-of-tree fixture.
+
+**Note:** STRIP (one shot, byte splice): PRE 604309 chars / f67d12a2f3f5f5022faa21ca4d204e3d582a421e09cdd2702d73e9a93592621b -> POST 599742 chars / 39bb05d4718abb6da3e3ab618b1e554464d0bed325d3897be055dcf386adcad7. DROP 142 B of derived head + 4426 B of summary block. 784 records, stamp 0d7a746350d62e14 UNMOVED (asserted, not assumed); top-level keys are now ['decisions','ratified','version']. Census re-derived from the bytes on disk (7 keys).
+
+**Note:** RE-BASELINE: python3 scripts/lib/handoff.py --backfill -> receipt decisions_registry 39bb05d4718abb6d, 6 receipts appended. The pre-strip digest stays in the append-only journal, so the rewrite is VISIBLE, not laundered.
+
+**Note:** VERIFIED AFTER: recompute --check rc=0 (both homes green); pytest 5 passed; just health HEALTH_RC=0, ok=40, FAIL=1 (the one audited non-gating contract line), store-columns census moves 4 (baseline preserved: no new store-column token entered scripts/).
+
+**Note:** OWNED DECLARATION DRIFT FIXED IN THE SAME CHANGE: config/artifact_ownership.yaml#config/decisions.yaml owned_by now []  + writer_scope: append_only_new_records (owned_by has NO code consumer - write_guard reads writer_of_record/guard_exemption only - so this was honesty, not a rail), and its guard_note named _surgical_write, which HALF B DELETED (C19). derivations.yaml's decisions.summary / decisions.decisions_sha256_16 rows re-pointed off config/decisions.yaml (columns that no longer exist); decisions.census_json re-pointed from total_decisions to source_sha256, because census_document computes the document, not that count.
+
+**Note:** STILL OWED (next sitting): mint D-2655 + D-2654 through --mint - the FIRST mint through the repaired path IS the end-to-end control for BUG-539 (the append must read as 'appended', not 'rewritten').
+
+## 2026-09-26 — D-2655 COMPLETE: the FIRST mint through the repaired path PROVES the append (the driver bug retired end to end)
+
+**Measured:** the mint that D-2655 HALF B existed for finally ran through the repaired path. `python3 scripts/recompute_decision_summary.py --mint /tmp/mint_both.yaml --apply` -> `merged 2 record(s): D-2654, D-2655 - total=786, stamp b6492f16d292eea5`. Registry PRE 601712 B / sha256 39bb05d4718abb6da3e3ab618b1e554464d0bed325d3897be055dcf386adcad7 -> POST 606225 B / sha256 1d96883f365819a2fb6205a751d90885fd7965b0e0e26126aa97ee08e236d364. DELTA 4513 B and APPEND_IS_PREFIX True - checked, not asserted. Top-level keys remain ['decisions','ratified','version'] with `decisions` LAST, so the records list runs to end-of-file.
+
+**The control (what this sitting was for):** `python3 scripts/verify_handoffs.py` -> `ok decisions_registry: config/decisions.yaml APPENDED (prefix intact, 601712 -> 606225 bytes)`, VH_RC=0. Before this sitting the same receipt read `rewritten` on every mint; this is the FIRST observation of `appended` on a real mint, and it is the end-to-end proof that the removal turned the mint into a pure byte-append. A rule that had never once said YES in production has now been observed saying YES.
+
+**Verified after:** `recompute --check` rc=0 (both homes green: 786 decisions, stamp b6492f16d292eea5, census 7 keys, source_sha256 matching the registry bytes on disk); `pytest tests/test_decision_summary_sync.py` -> 5 passed; `just health` -> HEALTH_RC=0, ok=40, FAIL=1 (the one audited non-gating contract line). The census moved exactly where it should and nowhere else: total 784 -> 786, rejected 9 -> 10 (D-2654), ratified 16 -> 17 (D-2655), every other bucket unchanged.
+
+**Ids:** D-2654 (REJECTED - Apple Foundation Models NOT ADOPTED on STRUCTURAL grounds: the weights are System-Integrity-Protected, so unreadable, so unhashable, so unpinnable under D-382, and config/apple_fm.yaml keeps enable false) and then D-2655 (RATIFIED - a derived value has no home inside the append-only artifact it describes). D-2653 is deliberately NOT minted (its content is not settled). The two SPENT fixture ids were not touched.
+
+**The register's unexplained +1 RESOLVED:** the prior sitting carried 281 ids / 128 OPEN / 153 CLOSED while the re-derivation printed 282 / 129 / 153. MEASURED: the register at HEAD was 189 ids (five days stale), and diffing the HEAD register against the current one shows the +1 is the driver bug itself - logged in the prior sitting and OPEN until this sitting. There was no phantom id; the register agrees with its own re-derivation, and that total is unchanged by this sitting's closure.
+
+**Audit notes, report-only (nothing silently absorbed, no id invented):**
+1. The mint writes TWO documents (the registry append, then the census) and they are not one transaction. The write ORDER is the safe one: the append_only registry first (it can never lose a byte), the regenerable census second - so a crash between them leaves a census describing the PREVIOUS bytes, which `recompute --check` reports as a NAMED drift and repairs from the census side only. Bounded, loud and deterministic: recorded rather than given an id.
+2. config/decisions_policy.yaml's reference_rail comment claimed "the next decision this project mints is D-2650". A claim about the NEXT id is a volatile value with no home and no rail - the same defect class as the derived head this sitting deleted - and the mint above made it false the same day. REMOVED in this sitting, and the removal is written where the claim stood.
+3. config/store_authority.yaml line 49 still reads "Owner decision owed on deleting it (D-2650 gate)" - a dangling reference to an id that was never minted. LEFT IN PLACE: it is another author's declared meaning and prose, not a ruled citation. Owed: re-point or delete it when the store-authority question is ruled.
+4. scripts/check_repo_integrity.py reports P0-B lines for archive/conflicted_20260926/ holding conflicted copies of decisions.yaml, recompute_decision_summary.py and test_decision_summary_sync.py - the sibling hazard sits on the exact files this change touched. Report-only, and the standing reminder that the commit is the protection (BUG-543/BUG-545 family).
+
+**Nothing committed** (D-381, owner-held); HEAD is still 96b1e9c79c441edf71b551a2f3c52e06e31f6362.
+
+**OWED NEXT:** the two-commit landing (control plane first, then the registry/D-2655 change) with scripts/check_repo_integrity.py SEEN to compare the new rows clean; wire pytest into the ladder as a rail (the false witness was invisible for want of exactly that); the content-keyed site remedy for the silent-repair allowlist; the R2 pin re-measure and re-mint; and the report-only candidate that the derivations rail never validates the table/column a row names.
+
+---
+
+## BUG-539 (HIGH - FIXED 2026-09-26): the registry's own derived summary block made MINTING a mid-file edit that the prefix rail read as tampering - and it ABORTED the ladder
+
+**Root cause:** two homes for one fact. config/decisions.yaml is declared append_only with a PREFIX handoff receipt (the receipted bytes must be a byte-prefix of the current bytes) and it ALSO carried a derived head (total_decisions, decisions_sha256_16, last_sync, written_by) plus a derived summary block at EOF. Every mint had to move those bytes, so no position inside the file was compatible with the prefix rule: verify_handoffs read the registry as `rewritten` and the writer had grown a mid-file splice to re-derive the values in place.
+
+**Fix (D-2655 HALF A + HALF B, 2026-09-26):** the census moved to config/decisions_summary.json (declared derived_regenerable, a PURE FUNCTION of the registry bytes); config/decisions.yaml is RECORDS ONLY with its records list extending to end-of-file; the mint is a CHECKED pure byte-append that carries the census in the same invocation; the one-time receipt re-baseline was recorded as a supersession in the append-only handoff journal, so the rewrite is visible rather than laundered.
+
+**Known-answer control (SEEN to say NO, then YES):** BEFORE the strip, the mint was REFUSED with the named sentence `derived key(s) [...]: config/decisions.yaml is append_only with a PREFIX receipt, so a derived field inside it makes every mint a mid-file rewrite (BUG-539/D-2655)` and rc=1. AFTER it, the same mint succeeded AND the receipt reads `APPENDED (prefix intact, 601712 -> 606225 bytes)`.
+
+**Status:** FIXED - the mint path is a pure append and the prefix rail agrees on the bytes.
+
+## 2026-09-26 - the SUITE becomes a RAIL (D-2656): the ladder was taught to read a test report, and it found a destructive test
+
+**Measured, not assumed.** `python3 -m pytest tests -q` at HEAD 96b1e9c = **3 failed, 253 passed, 261
+collected, 114s** - while `just health` was GREEN. The suite's red set was invisible to all 40 rails, which
+is the BUG-470 class again: a control nothing invokes is a comment. The 3 red are the depth/domain contract
+family (status: 'proposed', owner gate) - an OWNER-OWED red, not a silent one.
+
+**BUG-546 (found by this audit, FIXED 2026-09-26): a DESTRUCTIVE test resolved the PRODUCTION stage root by hand.**
+tests/test_stage4_preflight_smoke_stress.py:326-333 built `ROOT / "knowledge pipeline" / "stage4_merge" / run_id`
+and then `shutil.rmtree`'d it. Because the path was hand-built (not resolved through pipeline_paths), NO env var
+could redirect it - and running the suite DELETED the S4 smoke run dirs inside the LIVE tree, including the
+Dropbox 'M1 max's conflicted copy' siblings that were sitting in them (measured: 391 -> 376 stage-tree rows).
+tests/conftest.py TOLERATED it, because the run id matched the declared `smoke_*` glob: a tolerance declared for
+test SCRATCH was silently extended to cover a recursive DELETE of a production path. A declared tolerance is not
+a licence to destroy.
+FIXED: the smoke paths now come from `_stage_run_dir()` (pipeline_paths - the one path home) and the delete goes
+through `_rmtree_declared_test_run()`, which REFUSES any path whose run id is not declared test scratch in
+config/test_isolation.yaml. The guard fails CLOSED: an undeclared run id raises instead of deleting.
+
+**Also recorded (a trap, disproven by measurement):** `MAXWELL_PIPELINE_ROOT=<tmp>` is NOT a suite sandbox.
+It redirected the stage dirs but ALSO redirected config/ (pipeline/taxonomy_manager.py::_get_taxonomy_path) and
+the books/DB paths, producing **14 SPURIOUS failures** (17 failed sandboxed vs 3 real). A suite sandbox must COPY
+THE CODE, never re-point the root.
+
+**The rail:** `scripts/check_tests.py` (known-answer controls, BUG-492: floor breach, regression, paid red,
+strict, unreadable summary, plus 3 REAL fixture suite runs). Verdict: `ok tests: 261 collected (floor 261),
+253 passed, 3 declared red (shrink-only), 0 new, 5 skipped`. Wiring: `--selftest` + `--check` in `just health`;
+`health-deep` now demands the ceiling EMPTY (`--strict`) - the same red verdict it had before, with the
+destructive path closed.
+
+## BUG-546 (HIGH - FIXED 2026-09-26): a destructive test resolved the PRODUCTION stage root by hand, so running the suite DELETED directories inside the live pipeline tree - and the isolation guard TOLERATED it
+
+**Found by:** the D-2656 audit of `python3 -m pytest tests -q` (measured BEFORE the fix: the suite's S4 smoke
+run dirs vanished from the live tree - stage-tree snapshot 391 -> 376 rows, incl. the Dropbox 'M1 max's
+conflicted copy' siblings sitting in `knowledge pipeline/stage4_merge/smoke_live_cribs/` and
+`smoke_preflight_plumbing/`).
+
+**Defect:** `tests/test_stage4_preflight_smoke_stress.py::_stage_smoke_s2` built the path
+`ROOT / "knowledge pipeline" / "stage4_merge" / run_id` and then `shutil.rmtree`'d it. Three failures of
+discipline in one line:
+1. The path was HAND-BUILT, so NO environment override could redirect it (`MAXWELL_PIPELINE_ROOT` repoints
+   pipeline_paths' root, but this path never went through pipeline_paths).
+2. It was a recursive DELETE of a directory whose only safety property was a run id chosen by the caller - one
+   bad run id away from wiping a production run.
+3. `tests/conftest.py` **tolerated** it: the run id matched the declared `smoke_*` glob in
+   config/test_isolation.yaml. A tolerance declared for test SCRATCH was silently stretched to cover a
+   recursive delete of a production path. The guard reported 'declared smoke-run artifact(s) touched' - TRUE
+   and useless.
+
+**FIXED:** `_stage_run_dir(stage, run_id)` resolves every smoke path through pipeline_paths (the ONE path home),
+and `_rmtree_declared_test_run(path)` REFUSES any path whose run id is not a declared test run id in
+config/test_isolation.yaml - it raises instead of deleting. The 5 hand-built sites (S2 stage dir, S4 stage dir,
+the S4 read, the t11 read, the S4 checkpoint read) now go through the helper.
+
+**Verified after:** the full suite re-ran through the new rail with the fix in place - 261 collected, 253 passed,
+3 declared red (the depth/domain contract, owner gate), 0 new failures, so the S4 smoke tests still pass and now
+pass INSIDE the declared test scratch instead of inside the live tree.
+
+**Standing rule (BUG-462 class):** a declaration that TOLERATES a write is not a declaration that may license a
+DELETE. A tolerance must be narrower than the thing it tolerates: `smoke_*` may hold scratch files; it may not
+authorize `rmtree` on a stage dir.
+
+## BUG-547 (HIGH - FIXED 2026-09-26): rail 0 was SATURATED BY ITS OWN ARCHIVE - 30 of its 36 owner-owed rows were conflict copies it had already resolved, so the exit-2 commit gate could no longer tell its own history from a live divergence
+
+MEASURED. `python3 scripts/check_repo_integrity.py` returned rc=2 with `36 conflict copy/copies (bytes
+intact, disposition owed)`. 30 of those 36 rows were `canonical archive/conflicted_20260926/<name> is MISSING
+and untracked (P0-B)` - the rail was reporting THE SIBLINGS IT HAD ALREADY FILED, inside the archive dir that
+`config/conflict_policy.yaml` declares. The pre-commit hook runs this rail with `|| exit 1`, so exit 2 IS
+fatal at the commit gate: a gate whose steady state is 36 owed rows has no dynamic range left, so it cannot
+signal a NEW divergence.
+
+ROOT CAUSE (the D-2646 class, on the READ side). D-2647 taught the RESOLVER that an archived sibling is a FIXED
+POINT - the record of a resolution that happened - which is what keeps the resolver idempotent. It never taught
+the RAIL. TWO consumers of ONE rule, and only one of them learned it.
+
+FIX (`scripts/check_repo_integrity.py`). `_declared_archive()` reads `archive_dir` from its ONE home
+`config/conflict_policy.yaml` (the path is not restated anywhere - C12/D-2646) and `archived_under()` filters
+those rows out of `scan()`. Known-answer controls 9 -> 10, and the new control is TWO-SIDED (BUG-492): an
+ARCHIVED sibling must be excused AND a LIVE sibling must NOT be - a one-sided control would pass on a rule that
+excuses everything.
+
+VERIFIED. `ok repo-integrity selftest: 10 known-answer control(s)` and `ok repo-integrity: HEAD resolves,
+git dir /Users/barn/maxwell_os_gitdirs/maxwell_os_2_0.git, logs/HEAD agrees, 0 conflict-marked names in 2
+sweeps`, rc=0. NOTHING WAS DELETED: the archive stays the record of the resolutions it holds.
+
+## Dropbox sibling disposition (D-2647) - 6 siblings VAULTED, nothing deleted (2026-09-26)
+
+The commit gate stopped on 6 live Dropbox siblings (4 governance + 2 pytest caches). Each was MEASURED against
+its canonical file, then moved OUT of the synced tree into `~/maxwell_os_conflict_snapshot_20260925/vaulted/`
+with its sha256, and appended to `~/maxwell_os_conflict_snapshot_20260925/RESOLUTION_20260926.jsonl`. The
+vault script was FAIL-CLOSED: it re-derived the sibling set and ABORTED (`ABORT (fail-closed): sibling set
+differs from the audited set`) because the real names put the marker BEFORE the extension. No byte was
+deleted; every row carries a restore `mv`.
+
+| sibling | verdict | why |
+|---|---|---|
+| `governance/anchor_adjudication_workbook_20260924 (M1 max's conflicted copy 2026-09-26).csv` | SUPERSEDED-BY-DECLARED-RENAME | live col4 is `flags`; the sibling predates the deliberate `row_flags`->`flags` rename (pre-image `backups/anchor_adjudication_workbook_20260924.PRE_ROWFLAGS_20260925.csv`); all 149 lines differ only through that header cell. Separate finding: the workbook is NOT utf-8 (0xCA at byte 1604). |
+| `governance/bug_status (M1 max's conflicted copy 2026-09-26).json` | SUPERSEDED-BY-REGENERATION | the sibling declares 241 ids / 111 open / 130 closed; the canonical is the register's own re-derivation (283/128/155), internally consistent (`open_n 128` == 128 rows), and deletes no line. |
+| `governance/bug_status (M1 max's conflicted copy 2026-09-26).md` | SUPERSEDED-BY-REGENERATION | same stale generation; the canonical table is a strict superset. |
+| `knowledge pipeline/stage5_verify/t11/checkpoint.jsonl.input_fingerprint (M1 max's conflicted copy 2026-09-26).json` | OWNER-OWED-PIPELINE-STATE | MEASURED DROPBOX REVERT: the SIBLING is NEWER (2026-09-25 18:27) and names pipeline_commit `96b1e9c` (= HEAD) while the LIVE file names `81b813f`; differing keys are informational/input/fingerprint_id. `never_touch: knowledge pipeline/` - pipeline state is never text-merged. Bytes vaulted; the correct value is a RE-DERIVATION (owner judgement). |
+| `.pytest_cache/v/cache/lastfailed (M1 max's conflicted copy 2026-09-26)` | CACHE-NO-GIT-BASE | pytest cache, rewritten by every run, carries no information. |
+| `.pytest_cache/v/cache/nodeids (M1 max's conflicted copy 2026-09-26)` | CACHE-NO-GIT-BASE | same. |
+
+OWED: the stage5 fingerprint's re-derivation (owner judgement, pipeline state); a policy note on whether
+`archive/conflicted_20260926/` should itself be swept - NOT owed as a finding, it is the record.
+
+NOTE (same sitting, caught by a rail): the widening entry was first written with a BARE `write_text` and an
+unquoted `@: ` inside a value, which made the plan UNPARSEABLE - the D-2648 class, reproduced by the hand that
+recorded it. Caught within seconds by `check_session_plan.py --selftest` (rc=1), repaired to a block scalar, and
+re-verified. The guard existed and fired; the write should have gone through `scripts/lib/yaml_guard.py`.

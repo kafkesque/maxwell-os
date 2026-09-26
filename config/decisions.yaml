@@ -1,9 +1,5 @@
 version: '1.0'
 ratified: '2026-07-26'
-last_sync: '2026-09-23 16:39:31'
-decisions_sha256_16: 64fddc833723eba3
-written_by: scripts/recompute_decision_summary.py
-total_decisions: 737
 decisions:
 - id: D298
   category: VERIFICATION
@@ -1387,7 +1383,7 @@ decisions:
     summary re-synced.'
   champion: goose
   target_files:
-  - governance/DECISION-LOG.md
+  - DECISION-LOG.md
   - config/decisions.yaml
   - governance/buglog.md
   - governance/aggregated_remaining_tasks.md
@@ -1409,7 +1405,7 @@ decisions:
     --limit does DELETE FROM vec then embeds only N — never run --limit on production (destroys index).'
   champion: goose
   target_files:
-  - governance/DECISION-LOG.md
+  - DECISION-LOG.md
   - config/decisions.yaml
   - governance/buglog.md
   - governance/SESSION-HANDOFF-2026-09-03.md
@@ -2696,7 +2692,7 @@ decisions:
   summary: C12a fix — hardcoded 'knowledge pipeline' paths replaced with DATA_DIR from pipeline_paths.py
 - id: D2177
   date: '2026-08-05'
-  status: ACTIVE
+
   category: pipeline-fix
   summary: 'P0 cleanup: fsync (C6), LIMIT 5000 removal, Stage 3 ghost config purge, dead dep removal, schema/docstring sync'
   files: io_guard.py, principle_index.py, pipeline_paths.py, requirements.txt, justfile, stage1_5_embed_cluster.py, schemas.py, stage2_extract.py
@@ -2705,7 +2701,7 @@ decisions:
   state: ACTIVE
 - id: D2177a
   date: '2026-08-05'
-  status: ACTIVE
+
   category: governance
   summary: 'Buglog sync: 6 stale OPEN bugs marked RESOLVED/CLOSED. BUG-005/006 fixed in code (P0.1/P0.3), BUG-007/008/009 moot (Stage 3 removed)'
   files: governance/buglog.md
@@ -2964,6 +2960,12 @@ decisions:
   champion: auto-sync
   target_files: []
   created: '2026-07-26'
+  revocation_scope: "the D2205 P3 two-axis epistemic model fbs migration: the eight columns named in revocation_tokens. NOT the retrieval P0/P1, graph P2 or MCP P3 work, which stay live."
+  revocation_reason: "BUG-503: the migration would ALTER fbs with 8 columns including a FOURTH epistemic column colliding in name with the live epistemic_status, DEFAULT corroborated. It was never run; the recipes are removed and the script refuses with exit 2 (D-2643). The roadmap is not revoked, only this migration."
+  revocation_evidence: "governance/buglog.md BUG-503 (TOMBSTONED 2026-09-25) + pipeline/migrate_D2205_epistemic.py (refuses with exit 2)"
+  revocation_date: '2026-09-25'
+  revocation_tokens_home: pipeline/migrate_D2205_epistemic.py::EPISTEMIC_COLUMNS
+  revocation_tokens: [evidence_support, evidence_independence, evidence_contradiction, evidence_coverage, execution_trials, execution_successes, execution_context_similarity, epistemic_state]
 - id: D2206
   category: QLT
   state: ACTIVE
@@ -3270,7 +3272,7 @@ decisions:
 - id: D2248
   date: '2026-08-10'
   category: CLS
-  status: active
+
   title: 4-Way S2 Comparison (20-example) — DSPy wins avg, Traditional wins positive fidelity
   summary: 'DSPy 0.672 vs Traditional 0.592 avg quality on 20 examples (Qwen3-Coder, temp 0.0). DSPy: 5/5 negative rejection, 1 parse-fail; Traditional: 0/5 negatives, 6 parse-fails, but 0.845 vs 0.60 on
     both-scored positives. Positive-fidelity gap -> T-007b (demos 2->4, mechanism-weighted metric, or hybrid).'
@@ -3282,7 +3284,7 @@ decisions:
 - id: D2249
   date: '2026-08-10'
   category: CLS
-  status: active
+
   title: Benchmark-validated S4 classifier model chain (Phi -> GPT-OSS)
   summary: GPT-OSS-20B-MXFP4-Q8 = S4 depth classifier (62.5% acc, 24.9x faster than Gemma, 12.1GB vs 31GB). Full swap deferred pending BUG-075; requires Reasoning:none + max_tokens>=1024 + short focused
     depth prompt.
@@ -3293,7 +3295,7 @@ decisions:
 - id: D2250
   date: '2026-08-10'
   category: CLS
-  status: active
+
   title: 'BUG-075 FIXED: Focused depth prompt 87.5% (cross-domain 3/3); GPT-OSS live in S4'
   summary: 'Split S4 depth into short focused prompt (classify_depth_focused): 87.5% acc vs 38-62.5% long prompt. Cross-domain 0/3 -> 3/3. VERIFY_MODEL flipped Phi-4-mini -> gpt-oss-20b-MXFP4-Q8. Reasoning:none
     prefix + max_tokens 1024 config-driven (C12). omlx_call hardened for cold-reload missing content.'
@@ -3309,7 +3311,7 @@ decisions:
 - id: D2251
   date: '2026-08-10'
   category: CLS
-  status: active
+
   title: 'T-007b: Hybrid S2 (DSPy gate + Traditional extraction) WINS at 0.736'
   summary: '3-arm A/B: Hybrid 0.736 vs DSPy 0.672 vs Traditional 0.591. Hybrid = DSPy route gate + Traditional field extraction: matches Traditional positive-fidelity (0.845) AND DSPy negative rejection
     (5/6). Root cause of DSPy positive gap: MIPROv2 2 demos design-only (Cooper/Krug/Norman) vs 38-domain golden pool. Fix: max_labeled_demos 2->4 (config), re-optimization running.'
@@ -3321,7 +3323,7 @@ decisions:
 - id: D2252
   date: '2026-08-10'
   category: CLS
-  status: active
+
   title: 'T-007b resolution: hybrid is production; demo re-opt scheduled not interactive'
   summary: 'MIPROv2 with 4 demos ~20h (188s/example) — infeasible interactive. Hybrid (D2251, 0.736) needs no demo increase: DSPy gate + Trad extract. Config demos 2->3 (cost-balanced) for overnight opt
     only.'
@@ -3333,7 +3335,7 @@ decisions:
 - id: D2253
   date: '2026-08-10'
   category: PERF
-  status: superseded
+
   title: Full-run cost model corrected — ~26h not 100h; T1.1 unblocked
   summary: 'Naive 100h estimate (12964x28s/1 worker) ignored tiered+parallel arch. Real: 79.7% single-source (12s simplified prompt), 20.3% convergent (28s few-shot), 3 workers, merged S4 (45% faster),
     S5 ~3s/FB. Result: S2~18.7h + S4~3.9h + S5~0.7h = ~21-26h wall-clock. [SUPERSEDED by D2362: S4 figure was impossible — measured 25s/FB serial = ~90h, not 3.9h.]'
@@ -3345,7 +3347,7 @@ decisions:
 - id: D2254
   date: '2026-08-10'
   category: GOV
-  status: active
+
   title: Session handoff + governance sync (D2250-D2253)
   summary: 'Handoff file governance/HANDOFF_D2254.md created. Master prompt v8, DSPY_VALIDATION_REPORT, SESSION_AUDIT_D2250, task register aggregated. Next: T1.1 full run (~26h) + T-007b-v2 overnight.'
   impact: Clean session boundary; next session starts at T1.1 launch.
@@ -3357,7 +3359,7 @@ decisions:
 - id: D2255
   date: '2026-08-11'
   category: BUGFIX
-  status: active
+
   title: 'S5 NLI: DeBERTa FEVER activated as primary (config fix for D2216 dead code)'
   summary: D2216 promoted DeBERTa FEVER in code default but config/pipeline_config.yaml L172 hardcoded ModernBERT. Config wins per C12 → D2216 was dead code. Swapped nli_model to DeBERTa FEVER primary,
     ModernBERT fallback. DeBERTa FEVER is 5.8× more discriminative on convergent FBs.
@@ -3368,7 +3370,7 @@ decisions:
 - id: D2256
   date: '2026-08-11'
   category: GOV
-  status: active
+
   title: stage5_verify.py docstring updated (remove stale Phi-4-mini, update NLI)
   summary: 'Docstring was triple-stale: claimed ModernBERT NLI (was DeBERTa code default, ModernBERT config runtime), claimed Phi-4-mini classifier (retired D2249/D2250), process described DeBERTa NLI (was
     actually ModernBERT). Now shows 4 active families: Qwen3/S2, GPT-OSS/S4, Gemma-4-E4B/S5, DeBERTa FEVER/S5-NLI.'
@@ -3379,7 +3381,7 @@ decisions:
 - id: D2257
   date: '2026-08-11'
   category: DATA
-  status: active
+
   title: Golden set YAML meta count corrected (36→55 convergent positives)
   summary: 'Meta claimed convergent_positives: 36 but actual is_convergent=True field count is 55 (verified via grep -c). Stale count likely from pre-expansion v3.x. Updated with annotation.'
   impact: Meta now matches data. Cross-examination confusion resolved.
@@ -3389,7 +3391,7 @@ decisions:
 - id: D2258
   date: '2026-08-11'
   category: CFG
-  status: active
+
   title: Stale classify_model removed from v2.3 checkpoint block
   summary: 'BUG-078: pipeline_config.yaml L1642 contained classify_model: Phi-4-mini-instruct-8bit in a v2.3 schema checkpoint block. Removed with annotation. Phi-4-mini retired from pipeline classification
     per D2249/D2250.'
@@ -3400,7 +3402,7 @@ decisions:
 - id: D2259
   date: '2026-08-11'
   category: DATA
-  status: active
+
   title: GOLDEN-REVIEW.md v2.0 archived (0/225 checks, different ID scheme)
   summary: Moved config/golden/GOLDEN-REVIEW.md → archive/. v2.0 file with 75 examples, different ID scheme (LEA/STR/DES/PER/MGT), 0/225 review checks completed. Its presence alongside active v4.4 YAML
     confused every cross-examination round.
@@ -3411,7 +3413,7 @@ decisions:
 - id: D2260
   date: '2026-08-11'
   category: GOV
-  status: active
+
   title: HANDOFF_D2254 model registry corrected
   summary: 'BUG-079: Registry listed Phi-4-mini for S5 verify/gates (no pipeline config role). Listed retired gemma-4-31B instead of active gemma-4-E4B. Omitted DeBERTa FEVER and bge-m3. Rewrote§4 with
     verified config models.'
@@ -3422,7 +3424,7 @@ decisions:
 - id: D2261
   date: '2026-08-11'
   category: VAL
-  status: active
+
   title: E2E diagnostic gate authorized (50-100 book run before T1.1 full run)
   summary: 'Before committing the ~26h T1.1 full run on 12,964 clusters, run a smaller E2E diagnostic on 50-100 books. Gate: yield >1% AND S5 pass >40% → approve T1.1. Yield <0.5% OR S5 <20% → halt. Between
     → judgment call.'
@@ -3433,7 +3435,7 @@ decisions:
 - id: D2262
   date: '2026-08-11'
   category: PERF
-  status: active
+
   title: Goose MacWebContentsOcclusion fix documented
   summary: 'Goose (Electron) disables rendering when window is occluded → UI renderer uses ~25% CPU → steals 2-3 M1 Max cores from OMLX during long runs. Fix: keep window visible, or defaults write com.block.goose
     NSWindowOcclusionDetectionEnabled -bool false. Added to HANDOFF_D2254.md§0 pre-flight.'
@@ -3445,119 +3447,118 @@ decisions:
   date: '2026-08-11'
   title: 'S5 Deep Check: Gemma-4-E4B to Phi-4-mini swap (D2264)'
   category: validation
-  status: active
+
   files: config/pipeline_config.yaml, pipeline/stage5_verify.py, config/model_assignments.yaml
   state: ACTIVE
 - id: D2265
   date: '2026-08-11'
   title: Batch Classification for S4 — GPT-OSS reasoning amortization (D2265)
   category: pipeline-fix
-  status: active
+
   files: pipeline/stage4_merged_call.py, config/pipeline_config.yaml
   state: ACTIVE
 - id: D2266
   date: '2026-08-11'
   title: 'Process Guard: PID File Locking prevents multi-diagnostic (D2266)'
   category: BUGFIX
-  status: active
+
   files: pipeline/run_diagnostic.py
   state: ACTIVE
 - id: D2267
   date: '2026-08-11'
   title: Laptop Sleep Prevention via caffeinate (D2267)
   category: BUGFIX
-  status: active
+
   files: pipeline/run_diagnostic.py
   state: ACTIVE
 - id: D2268
   date: '2026-08-11'
   title: 'BUG-053 Mitigation: S5 Source Text Guard (D2268)'
   category: BUGFIX
-  status: active
+
   files: pipeline/stage5_verify.py, governance/buglog.md
   state: ACTIVE
 - id: D2282
   date: '2026-08-12'
   title: Pipeline Manifest — Per-Run Config Frozen at Launch (D2282)
   category: GOV
-  status: active
+
   files: config/pipeline_config.yaml, all stage modules
   state: ACTIVE
 - id: D2283
   date: '2026-08-12'
   title: FB Schema Split — Core vs Enrichment Contract (D2283)
   category: ARCH
-  status: active
+
   files: pipeline/stage5_verify.py, pipeline schema docs
   state: ACTIVE
 - id: D2284
   date: '2026-08-12'
   title: Source Independence Scoring — ISOR Beyond BORP (D2284)
   category: QLT
-  status: active
+
   files: pipeline/stage5_verify.py
   state: ACTIVE
 - id: D2285
   date: '2026-08-12'
   title: Claim Decomposition for S5 Verification (D2285)
   category: QLT
-  status: active
+
   files: pipeline/stage5_verify.py
   state: ACTIVE
 - id: D2286
   date: '2026-08-12'
   title: Golden Tiered Classification — GOLD-A/B/CHALLENGE (D2286)
   category: GOV
-  status: active
+
   files: config/golden/stage2_fewshot_convergent.yaml, evals/golden_cases.json
   state: ACTIVE
 - id: D2287
   date: '2026-08-12'
   title: DSPy Metric with Hard Gates (D2287)
   category: QLT
-  status: active
+
   files: pipeline/dspy_trainer.py
   state: ACTIVE
 - id: D2288
   date: '2026-08-12'
   title: Roundtable Inter-Rater Reliability — Fleiss Kappa (D2288)
   category: GOV
-  status: active
+
   files: config/golden/MASTER-ROUNDTABLE-EVAL-PROMPT-v8.md
   state: ACTIVE
 - id: D2289
   date: '2026-08-12'
   title: Author-Disjoint DSPy Splits Extended (D2289)
   category: QLT
-  status: active
+
   files: pipeline/dspy_trainer.py
   state: ACTIVE
 - id: D2290
   date: '2026-08-12'
   title: Taxonomy Re-Anchoring for AI/Agents Domain (D2290)
   category: CLS
-  status: active
+
   files: config/domain_anchors.yaml, config/taxonomy_v5.yaml
   state: ACTIVE
 - id: D2291
   date: '2026-08-12'
   title: S5 FLAG Path Audit — Verify Reachable (D2291)
   category: BUGFIX
-  status: active
+
   files: pipeline/stage5_verify.py
   state: ACTIVE
 - id: D2292
   date: '2026-08-12'
   title: Golden Depth Expansion — 170+ Examples (D2292)
   category: GOV
-  status: active
+
   files: config/golden/stage2_fewshot_convergent.yaml
   state: ACTIVE
 - id: D2293
   date: '2026-08-12'
   title: S5 Precision/Recall from Adjudicated Sample (D2293)
   category: VAL
-  status: complete
   note: 'SUPERSEDED by D2322 — P=1.000/R=0.556/F1=0.714 was measured on the broken pre-BUG-092 single-sequence DeBERTa call and is NOT reproducible. Honest auto-cal (D2322): P=0.647/R=0.386/F1=0.484 at
     threshold 0.10.'
   files: governance/
@@ -7475,7 +7476,11 @@ decisions:
     config gate stage5.single_writer_lock) because two writers on one checkpoint is worse than a crash: on 2026-09-21
     two runs wrote it within 4 minutes and only the io_guard shrink guard prevented a 50-row rollback. Proven live by a
     deliberately started second run being refused.
-- id: D-331
+- id: D-406
+  id_note: >
+    Renumbered from the dashed `D-331` on 2026-09-25: `D-331` and `D331` normalise to ONE token and two
+    distinct decisions held it (C21 - one token, one namespace). `D331` (F-11 round 2) is the referenced
+    spelling, so the bake-off record moved. Both records are byte-identical to their original content.
   category: RESEARCH
   state: RESOLVED
   date: '2026-09-22'
@@ -7742,30 +7747,30 @@ decisions:
 - id: D-346
   title: "MENU COARSEN GO (owner ruling 2026-09-23): the D-343 routing table is adopted as an ENFORCED contract (config/menu_routing.yaml + scripts/verify_menu_routing.py wired into just health) because every model-centric lever is measured and closed (k-NN arm rejected D-345; challenger -8.77 pp; R3 arbitration +0.00 pp) and the only remaining accuracy lever with a measured positive prior is making the menu honest about what the representation can carry: domains classify (+22.64 pp), discipline classify (+22.54 pp), extraction_type coarsen/calibrated abstention (+14.89 pp), content_type constant+human queue (+10.28 pp but 0.7863 <= 0.8161 constant), depth constant+human queue (+19.71 pp but 0.6540 <= 0.8193 constant) - the constant test dominates the null test. Taxonomy merges, retirements and any label removal remain a versioned menu change (v5.6 -> v6) with the labeler re-run and the ruler re-scored, never a silent edit. Checker run: 5 axes, 23 queued labels, 0 RED, 1 warn (depth has no machine-readable menu list)."
   category: ARCHITECTURE
-  status: RESOLVED
+  state: RESOLVED
   date: 2026-09-23
 - id: D-347
   title: "The incumbent must be RE-SCORED on the ruler in force, never quoted: scripts/incumbent_ruler_score.py + config/incumbent_ruler_score.yaml re-score the live store against ANCHOR_RULER_CONSOLIDATED_20260923 and show the widely quoted ANCHOR-1 numbers were stale in BOTH directions - content_type 0.6467 quoted vs 0.5933 against the same human cells (live store regressed 5.34 pp / 8 rows) and 0.6533 against the owner-adjudicated truth (+0.66 pp); discipline 0.5259 quoted vs 0.5172 on the identical 116-row subset (1 row) and 0.4400 against the current truth (-8.59 pp, owner adjudication moves against the incumbent); extraction_type 0.7172 unchanged on all three references. D-345 survives the correction (the k-NN arm loses under every reference), so the rejection was not a stale-baseline artifact. Any floor or gate reading ruler_measurement.measured_error_rate quotes a superseded ruler and must be re-pointed (G4a) or marked superseded. Evidence: governance/INCUMBENT_RULER_SCORE_20260923.json/.md"
   category: MEASUREMENT
-  status: RESOLVED
+  state: RESOLVED
   date: 2026-09-23
 
 - id: D-352
   title: "Abstention operating points re-scored on the ruler in force (D-347): the mechanism survives (margin AUC 0.7035 [0.620,0.785]), the ratified discipline point is over-stated (-8.3pp -> -5.33pp at 25% abstain, CI [1.4,10.3]), the ratified content_type point is indistinguishable from noise (4.19pp, CI [-1.8,8.9], P(gain>0)=0.908), and the 0.4741/116 denominator is unreconstructible (BUG-391). Paired bootstrap, no new inference."
   category: MEASUREMENT
-  status: RESOLVED
+  state: RESOLVED
   date: 2026-09-23
   artifacts: [scripts/abstention_robustness.py, config/abstention_robustness.yaml, governance/ABSTENTION_ROBUSTNESS_20260923.json]
   supersedes_note: "the discipline and content_type operating points in governance/ABSTENTION_CALIBRATION_20260923.json are marked supersession_pending, not deleted (R-D410)"
 - id: D-353
   title: "Abstention re-ratified on the ruler in force by the LOWER-CI-bound rule: discipline adopted at 25% abstain (gain 5.33pp, CI [1.37,10.26]); content_type REJECTED at its ratified point (CI [-1.81,8.86]) and only available at 50% abstain as a coverage/product decision. Recalibration trigger added (digest pins + verify_recalibration_pins.py wired into just health). Coverage SLA and served-stream honesty recorded as open owner gates."
   category: ARCHITECTURE
-  status: RESOLVED
+  state: RESOLVED
   date: 2026-09-23
   artifacts: [config/verify_abstention.yaml, config/recalibration_pins.yaml, scripts/verify_recalibration_pins.py]
 - id: D-356
   category: MEASUREMENT
-  status: RESOLVED
+  state: RESOLVED
   date: 2026-09-23
   title: The R2 meter speaks extraction_type - capability, with the ratified curve still owed
   decision: >-
@@ -7781,7 +7786,7 @@ decisions:
   related: [D-281, D-284, D-353, BUG-390]
 - id: D-360
   category: MEASUREMENT
-  status: RESOLVED
+  state: RESOLVED
   date: 2026-09-23
   title: "The owed R2 artifact is produced over the frozen ruler under a provenance stamp that differs from the corpus artifact"
   decision: >-
@@ -7796,7 +7801,7 @@ decisions:
   related: [D-356, BUG-398, D-348, D-337]
 - id: D-359
   category: ARCHITECTURE
-  status: PROPOSED
+  state: PROPOSED
   date: 2026-09-23
   title: "The vector store is keyed by ROWID: a re-commit retires the previous rowid's vector and completeness is asserted at the rowid level"
   decision: >-
@@ -7813,35 +7818,35 @@ decisions:
   related: [BUG-387, D-354, D-357, D-2185, BUG-104, D-359]
 - id: D-361
   category: ARCHITECTURE
-  status: RATIFIED
+  state: RATIFIED
   title: "The D-354 vec store integrity gate is a chained control of just health"
   description: "Discharges the sequencing condition recorded in config/vec_integrity.yaml, which deliberately withheld the gate while the store was RED (a permanently RED gate is its own future tax). REPAIR RECEIPT 2026-09-23: 15990 dead vec rows deleted (7995 vec_fbs + 7995 vec_fbs_ctx) in one transaction after a backup_guardian copy and the script's own pre_d354 copy; post-repair vec_fbs live 7995 orphans 0 missing 0 (live_pct 100.0), vec_fbs_ctx dormant empty, 0 RED, gate exit 0. fbs was never touched: 7995 rows, rowids still 7997..15991, pragma integrity_check ok, 0 foreign-key violations, fbs_fts 7995. The gate then became a chained control of just health in the same session. It is fail-closed: an absent run DB is RED, so a machine without the run DB cannot pass health - intended, because the run DB is the served artifact. The control reads the SHADOW rowid tables, so it needs no sqlite-vec extension (the BUG-104 interpreter constraint applies to REPAIR only)."
   artifacts: [justfile, config/vec_integrity.yaml, scripts/verify_vec_integrity.py, scripts/repair_vec_integrity.py, knowledge pipeline/maxwell.db]
   related: [D-354, D-357, D-355, BUG-387, BUG-394, BUG-104]
 - id: D-362
   category: MEASUREMENT
-  status: RATIFIED
+  state: RATIFIED
   title: "coverage_sla 0.75 - at most 25 percent of rows may be withheld"
   description: "Owner gate discharged 2026-09-23. The value is the smallest withholding whose paired-bootstrap LOWER bound is above zero on the ruler in force (the D-352/D-353 adoption rule), measured on ANCHOR-3 n=150 relative-only: 10 percent abstain gives 2.74 pp CI [-0.30, 4.96] NOT established; 25 percent gives 5.33 pp CI [1.37, 10.26] established; 50 percent gives 16.66 pp CI [7.33, 23.33] and is legal only if the SLA were 0.50. Consequence: the ratified discipline point is legal and the lever stays alive; the single remaining gate item is the shadow run before enabled may become true. Narrowing the SLA to 0.80 or higher would make the adopted point illegal and kill the lever, because its only legal alternative (10 percent) is not established. This is a risk control, not an accuracy claim: at the adopted point the served stream is still about 50 percent wrong against an advisory reference."
   artifacts: [config/verify_abstention.yaml, governance/ABSTENTION_ROBUSTNESS_20260923.json, governance/ABSTENTION_CALIBRATION_20260923.json]
   related: [D-349, D-352, D-353, D-339, D-337, BUG-391]
 - id: D-363
   category: GOVERNANCE
-  status: RESOLVED
+  state: RESOLVED
   title: "v6 menu merge DROPPED and R3 held-out DEFERRED, both recorded so they are not re-litigated"
   description: "(1) The one measured menu merge (making -> operations research, cos 0.9752, runner-up 0.9535, gap 0.0216) is DROPPED: it is a ~0 pp accuracy lever that would drag a labeler re-run and a ruler re-score and would invalidate the D-279 menu pin. (2) R3 held-out is DEFERRED: the ANCHOR1 blind sheet and key do not exist on disk or in git, so repointing the harness is a new pre-registration rather than a repair; the live harness already binds source anchor2 with authority ANCHOR-3. The cost of deferring is explicit: no held-out number this cycle, so every claim in this cycle stays relative-only (D-337). config/menu_v6_merge_map.yaml remains ratified_partial and NOT IN FORCE."
   artifacts: [config/menu_v6_merge_map.yaml, config/recalibration_pins.yaml, scripts/r3_preflight.py, governance/aggregated_remaining_tasks.md]
   related: [D-279, D-337, BUG-372]
 - id: D-364
   category: ARCHITECTURE
-  status: RATIFIED
+  state: RATIFIED
   title: "No code-level default for the DSPy program path - an unset config plus an enabled flag refuses"
   description: "BUG-397(b) two-site fix. Site 1: config/pipeline_config.yaml services.s2.dspy_program_path is explicitly null, and the key is KEPT because .get(key, default) would resurrect a code default if it were deleted. Site 2: pipeline/pipeline_paths.py no longer falls back to the literal data/dspy_mipro_optimized.json, a path that has never existed (C12: a hardcoded code default is the second defect, so a one-site fix would not have fixed it). Consumers refuse instead of guessing: pipeline/dspy_trainer.py raises on load when S2_DSPY_ENABLED is true and the path is unset, and always raises on save (D2243: never discard the pilot); with the flag false it reports and returns the documented None. Probe receipt: DSPY_PROGRAM_PATH is None and S2_DSPY_ENABLED is False. Latent either way: config/flag_consumer_registry.yaml records that the flag has no consumer the audit can verify."
   artifacts: [config/pipeline_config.yaml, pipeline/pipeline_paths.py, pipeline/dspy_trainer.py, config/flag_consumer_registry.yaml]
   related: [BUG-397, D2304, D2482, D2243]
 - id: D-357
   category: ARCHITECTURE
-  status: RESOLVED
+  state: RESOLVED
   date: 2026-09-23
   title: "The vec integrity contract is per table: a dormant store must be EMPTY"
   decision: >-
@@ -7856,7 +7861,7 @@ decisions:
   related: [D-354, D-355, BUG-394, BUG-104]
 - id: D-355
   category: ARCHITECTURE
-  status: RESOLVED
+  state: RESOLVED
   date: 2026-09-23
   title: A control must assert the state it is in, not the state it was built for
   decision: >-
@@ -7870,7 +7875,7 @@ decisions:
   related: [D-318, D-327, BUG-395, BUG-396]
 - id: D-354
   category: ARCHITECTURE
-  status: RESOLVED
+  state: RESOLVED
   date: 2026-09-23
   title: Referential integrity of the sqlite-vec stores is a gate
   decision: >-
@@ -7884,26 +7889,26 @@ decisions:
   title: "R2 definition-anchored NLI as a precision gate: content_type AUC 0.6410, flagged error 0.4483 vs unflagged
     0.2826, selective 0.3048 at 70% coverage; discipline AUC 0.5348 = NO signal. Measured on the existing 7995-FB artifact."
   category: MEASUREMENT
-  status: RESOLVED
+  state: RESOLVED
   date: 2026-09-23
 - id: D-349
   title: "Abstention drains to the MACHINE quarantine state, not a human queue: discipline t_low=p25 (0.3910 vs 0.4741) and
     content_type t_low=p30 (0.3048 vs 0.3467) ratified with measured curves; extraction_type REFUSED (BUG-390); enabled
     stays false until one shadow run."
   category: ARCHITECTURE
-  status: RESOLVED
+  state: RESOLVED
   date: 2026-09-23
 - id: D-350
   title: "Discipline tail merge map measured on stored centroids: 1 merge (decision making -> operations research, gap 0.0216),
     9 REFUSED (gap 0.0017-0.0115 < 0.02) - hand-picking a parent would be an unmeasured assertion."
   category: ARCHITECTURE
-  status: RESOLVED
+  state: RESOLVED
   date: 2026-09-23
 - id: D-351
   title: "noise_drop and process_template KEPT as human-only queue labels; retirement DECLINED; replaced by an enforced
     queue-closure rule on every constant axis."
   category: ARCHITECTURE
-  status: RESOLVED
+  state: RESOLVED
   date: 2026-09-23
 - id: D-345
   category: CLASSIFICATION
@@ -7933,7 +7938,8 @@ decisions:
   decisions: [D-344]
 
 - id: D-365
-  status: RATIFIED
+  category: GOVERNANCE/ARCHIVE
+  state: RATIFIED
   date: '2026-09-23'
   title: 'The archive index is derived data with a writer and a checker, and an archive sweep may not move a declared input'
   decision: 'archive/index.yaml is DERIVED data: its writer is scripts/build_archive_index.py and its checker is the same script with --check (exit 1 on a body_sha256 mismatch), configured entirely by config/archive_index.yaml (C12) and written atomically (C6). Its authority is D-365; the previous authority was D2226, which is in state REJECTED (BUG-404). The script READS bytes and WRITES one index and never moves, edits or deletes an archive entry: a disposition in the index is a claim about what MAY be done, not an act. An archive sweep may NOT be driven by age alone - every path declared as an input by any script or config is listed in protected_paths and is exempt, because moving a declared input is a silent input removal (BUG-406 measured: 35 of 414 swept temp/ entries were declared inputs, including the pipeline relay SOURCE_MAP temp/golden_source_map.json; all restored). temp/ overflow is dispositioned archive-first, never deleted, because the entries include date-stamped LLM transcripts that are evidence under R-D410. RECEIPT: archive/index.yaml regenerated - 34 entries, 17.3 GB, --check exit 0.'
@@ -8035,162 +8041,725 @@ decisions:
     'governance/MODEL_STORE_RECLAIM_A2_20260923.md']
   created: 2026-09-23
 
-summary:
-  total: 737
-  proposed: 7
-  draft: 1
-  active: 502
-  stale: 0
-  superseded: 16
-  archived: 8
-  rejected: 9
-  deferred: 14
-  resolved: 147
-  planned: 8
-  ratified: 8
-  open: 17
-  by_category:
-    ARCH: 27
-    ARCH / GOV: 1
-    ARCHITECTURE: 11
-    ARCHITECTURE / GOVERNANCE: 1
-    ARCHITECTURE / PIPELINE: 1
-    AUDIT / ONTOLOGY / BUGFIX: 1
-    BUG: 1
-    BUGFIX: 45
-    BUGFIX / CFG: 1
-    BUGFIX / DATA-INTEGRITY: 3
-    BUGFIX / DRIFT: 1
-    BUGFIX / FAIL-CLOSED: 6
-    BUGFIX / GOV: 2
-    BUGFIX / GOVERNANCE: 1
-    BUGFIX / INTEGRITY: 2
-    BUGFIX / OBSERVABILITY: 2
-    BUGFIX / PROMPT: 1
-    BUGFIX / PROVENANCE: 3
-    BUGFIX / RELIABILITY: 2
-    BUGFIX / ROBUSTNESS: 1
-    BUGFIX / VAL: 1
-    C12: 1
-    C12 / GOVERNANCE / BUGFIX: 1
-    CFG: 5
-    CLASSIFICATION: 2
-    CLS: 16
-    CLS / CFG: 1
-    CONTENT-TYPE ONTOLOGY / DATA: 6
-    CORRECTNESS: 5
-    DAT: 4
-    DAT / OPS: 1
-    DATA: 3
-    DATA / GOVERNANCE: 1
-    DATA / PROVENANCE: 1
-    DATA / QUALITY: 1
-    DATA / RELIABILITY: 2
-    DATA / TAXONOMY: 2
-    DEF: 1
-    DELEGATION / GOVERNANCE: 1
-    DELEGATION / GOVERNANCE / MCP: 1
-    EMBEDDING / MEASUREMENT: 1
-    EVALS: 10
-    FORENSIC AUDIT / CLASSIFIER STRATEGY: 1
-    FORENSIC AUDIT / CODE HYGIENE: 1
-    GOV: 22
-    GOV / ARCH: 1
-    GOV / PERF: 1
-    GOVERNANCE: 12
-    GOVERNANCE / C11 / C12: 1
-    GOVERNANCE / DATA: 1
-    GOVERNANCE / DELEGATION: 1
-    GOVERNANCE / EVALUATION: 1
-    GOVERNANCE / FORENSIC AUDIT: 1
-    GOVERNANCE / FORENSIC AUDIT / BUGFIX: 1
-    GOVERNANCE / GOLDEN-SET / C12: 1
-    GOVERNANCE / QUALITY: 1
-    GOVERNANCE / SOVEREIGNTY: 1
-    GOVERNANCE / WORKFLOW: 1
-    HARDENING: 2
-    HYGIENE: 1
-    HYGIENE / TESTING: 1
-    INF: 177
-    INF / GOV: 1
-    INF / OPS: 1
-    INFRA: 1
-    INFRASTRUCTURE: 1
-    INFRASTRUCTURE / RELIABILITY: 2
-    INFRASTRUCTURE / SOVEREIGNTY: 1
-    LABEL QUALITY / CLASSIFIER STRATEGY: 2
-    LABEL QUALITY / DATA: 19
-    LABEL QUALITY / ENRICHMENT: 2
-    LABEL QUALITY / EXECUTION: 6
-    LABEL QUALITY / HUMAN REVIEW: 5
-    LABEL QUALITY / MEASUREMENT: 5
-    LABEL QUALITY / PROCEDURE: 1
-    LABEL QUALITY / TAXONOMY: 2
-    LABEL QUALITY / VERIFICATION: 1
-    MARKET RESEARCH: 1
-    MEASUREMENT: 8
-    MEASUREMENT / ANCHOR: 1
-    MEASUREMENT / LABEL QUALITY: 3
-    MEASUREMENT / PLANNING: 1
-    MEASUREMENT / PROVENANCE: 1
-    MEASUREMENT / QUALITY: 1
-    MODEL: 2
-    MODELS / RETIREMENT: 1
-    OBSERVABILITY / TOOLING: 1
-    ONTOLOGY: 12
-    ONTOLOGY / AUDIT: 3
-    ONTOLOGY / AUDIT / STRATEGY: 1
-    ONTOLOGY / GOVERNANCE: 1
-    ONTOLOGY / LABEL QUALITY: 1
-    ONTOLOGY / MEASUREMENT: 1
-    ONTOLOGY / PIPELINE / RESEARCH: 2
-    ONTOLOGY / SCHEMA: 2
-    ONTOLOGY / VERIFICATION: 1
-    OPERATIONAL / CANARY: 1
-    OPS: 7
-    OPS / AUDIT: 1
-    OPS / DATA: 1
-    OPS / PERF: 2
-    OPS / QUALITY: 2
-    OPS / RELIABILITY: 10
-    PERF: 15
-    PERF / BUGFIX: 1
-    PERFORMANCE / DATA INTEGRITY / GOVERNANCE: 1
-    PIPELINE / CONTAMINATION: 1
-    PIPELINE / GOVERNANCE: 1
-    PIPELINE / QUALITY: 1
-    PIPELINE / QUALITY / BUGFIX: 1
-    PIPELINE / QUALITY / GOVERNANCE: 1
-    PRD: 1
-    PROCESS: 1
-    QA: 4
-    QLT: 50
-    QLT / AUDIT: 20
-    QLT / DATA: 1
-    QLT / PROMPT: 6
-    QUALITY / DATA: 14
-    QUALITY / GOLDEN-SET: 12
-    QUALITY / GOLDEN-SET / PROMPT: 1
-    QUALITY / GOVERNANCE: 3
-    QUALITY / RELIABILITY: 2
-    QUALITY / TAXONOMY: 1
-    RES: 4
-    RESEARCH: 9
-    RESILIENCE / QUALITY: 1
-    RETRIEVAL / ONTOLOGY: 6
-    RETRIEVAL / ONTOLOGY / GOVERNANCE: 1
-    RETRIEVAL / VALIDATION: 2
-    RETRIEVAL / VERIFICATION: 2
-    ROBUSTNESS / QUALITY: 3
-    SOVEREIGNTY: 1
-    STR: 1
-    TAXONOMY: 6
-    TAXONOMY / GOVERNANCE: 3
-    TAXONOMY / ONTOLOGY: 1
-    TAXONOMY / RETRIEVAL: 1
-    VAL: 8
-    VERIFICATION: 18
-    VERIFICATION / ONTOLOGY: 1
-    governance: 1
-    pipeline-fix: 2
-    validation: 1
+- id: D-371
+  category: TAXONOMY / GOVERNANCE
+  state: RATIFIED
+  date: '2026-09-25'
+  title: 'The composite menu pin is HISTORICAL; the ANSWER SPACE is the pin (BUG-447/BUG-453, owner-ruled)'
+  verification: 'Measured: frozen composite 73597ee2b1bb1eb9 vs live render d2fc500c8835db54 -> DRIFT, entirely in
+    the `disciplines` axis; answer space [domains, abstention] byte-identical (8436d9c985c0efdf). D-285 ("taxonomy
+    discipline definitions feed the closed menu") and D-321 ("the menu was not touched") are both correct: the
+    DEFINITION moved, the ANSWER SPACE did not. Ruling: keep config/closed_menu_v5.sha256 frozen as historical
+    (never re-rendered, never overwritten - re-rendering moves the stamp every 2026-09-2x row carries and
+    falsifies D-321; overwriting destroys the provenance the file exists to provide); pin answer_space_hash from
+    config/menu_axis_hashes.yaml; report ANSWER_SPACE_DRIFT (hard) and DEFINITION_DRIFT (soft) as two facts.
+    Membership declared once in config/menu_axis_groups.yaml, read by generator and checker (C12/C21). New hard
+    code UNCLASSIFIED_MENU_AXIS: an axis in no group is pinned by nothing.'
+  target_files:
+  - config/menu_axis_groups.yaml
+  - config/menu_axis_hashes.yaml
+  - scripts/menu_axis_hashes.py
+  - config/depth_domain_contract.yaml
+- id: D-372
+  category: RETRIEVAL / VALIDATION
+  state: RESOLVED
+  date: '2026-09-25'
+  title: 'depth/domain contract re-tiered: one drift code became two; MENU_HASH_DRIFT retired'
+  verification: 'MENU_HASH_DRIFT carried two meanings and is retired. The contract now returns hard 0 /
+    owner_blocked 2 on the frozen workbook (was hard 2 / owner_blocked 2). DESIGNED READING: hard 0 + owner-owed
+    2 = the answer space is intact, the gold is intact, and the owner still owes two cells - the state the
+    three-valued exit code exists to express. Activation sequence (owner gate, C22): owner pins D-371 -> contract
+    status proposed -> active. The justfile rail already preserves exit 2 (BUG-457). Harness 12/12, incl.
+    test_answer_space_pin_is_declared_once_and_holds and test_composite_and_answer_space_are_reported_as_different_facts.'
+  target_files:
+  - config/depth_domain_contract.yaml
+  - scripts/validate_depth_domain_contract.py
+  - tests/test_depth_domain_contract.py
+  - justfile
+- id: D-373
+  category: VERIFICATION
+  state: RATIFIED
+  date: '2026-09-25'
+  title: 'Agreement floor: Krippendorff alpha, reporting 0.667 / operative 0.800, declared BEFORE the raters run'
+  verification: 'Owner-approved 2026-09-25. config/agreement_floor.yaml. Alpha is the only admissible statistic
+    here because it is MISSING-CELL CAPABLE: pairwise kappa silently drops skipped rows and lets a reporter quote
+    the best pair. reporting_floor 0.667 licenses tentative conclusions only; operative_floor 0.800 is the only
+    floor that may gate a decision, an anchor edit or an admission rule. must_not_be_cited_as lists the existing
+    raw-agreement field (F11 form_agree, 83/25) so a chance-uncorrected number cannot be re-quoted as alpha.'
+  target_files:
+  - config/agreement_floor.yaml
+- id: D-374
+  category: VERIFICATION / ONTOLOGY
+  state: RESOLVED
+  date: '2026-09-25'
+  title: 'FORM keeps its anchor; the FORM panel is a CEILING MEASUREMENT; the claim-shape instrument is not FORM'
+  verification: 'FORM/extraction_type IS anchored (ANCHOR-3, extraction_type_final, 145/150 human, write-locked),
+    so a 4-model panel adds no truth and changes zero rows: DeepSeek + Qwen3.8 are run ONE-SHOT at temp 0 as a
+    ceiling measurement only, delivering alpha over human+4 raters (missing-cell capable) plus a per-class
+    confusion matrix - never one number (R5: raters are not truth). Renamed FORM_ELICITATION_11.csv ->
+    CLAIM_SHAPE_ELICITATION_11.csv, FORM_q*/FORM_claim_bit -> claim_* (C21: a second implementation of an axis is
+    a second truth) and added evidence_span + abstain. the un-anchored object is the CLAIM-SHAPE bit (comparative
+    + stated exchange rate + boundary), which is where the class-1 gate must come from (BUG-451 measured FORM has
+    zero discriminative power for class-1 admission).'
+  target_files:
+  - governance/frontier_pack_20260924/CLAIM_SHAPE_ELICITATION_11.csv
+  - config/agreement_floor.yaml
+- id: D-375
+  category: PROVENANCE
+  state: RESOLVED
+  date: '2026-09-25'
+  title: 'A declared cell repair is WHOLE-CELL; a trailing separator is TRIMMED (BUG-458 standing rule)'
+  verification: 'MEASURED near-miss: the BUG-449 repair landed as a substring replacement and, on a pipe-joined
+    cell, merged two owner domains into one undeclared token - a declared repair becoming an unrecorded edit.
+    Caught by battery row S1. RULE: a repair rule is legal only when its right-hand side is a token on the closed
+    menu and its scope is declared; cell_replacements apply only when the trimmed cell EQUALS from;
+    trailing_separator_trim handles separators idempotently. Harness: test_raw_repair_is_whole_cell_only.'
+  target_files:
+  - config/anchor_workbook_fixes.yaml
+  - scripts/validate_depth_domain_contract.py
+  - tests/test_depth_domain_contract.py
+- id: D-376
+  category: GOVERNANCE
+  state: PROPOSED
+  date: '2026-09-25'
+  title: 'Session-plan widening is logged and awaits the owner ack; self-widening an allow-list is the abuse the lock exists to prevent'
+  verification: 'governance/session_plan_20260924.yaml gained a widening_log block recording the 4 patterns the
+    assistant added to may_touch (tests/**, archive/index.yaml, governance/evidence/**, governance/CONTEXT_INDEX.md)
+    with actor, why and owner_ack: PENDING; will_not_touch_untouched: true. PROPOSED, not RESOLVED: the ack belongs
+    in the owner commit message, and the recommended rail (refuse any may_touch pattern with no widening_log the ack belongs in the owner commit message, and the recommended rail (refuse any may_touch pattern with no widening_log entry) is not built. Rule: a verbal ack is a declaration; an append-only log is a control.
+    entry) is not built. Rule: a verbal ack is a declaration; an append-only log is a control.'
+  target_files:
+  - governance/session_plan_20260924.yaml
+
+- id: D-377
+  category: ONTOLOGY / GOVERNANCE
+  state: RESOLVED
+  date: '2026-09-25'
+  title: 'The D1/D2 instrument is the CLAIM-SHAPE bit; it is NOT FORM, and its cohort is declared once'
+  decision: >
+    FORM is AXIS 2 `extraction_type` (4 epistemic forms, owner ANCHOR-3, column extraction_type_final,
+    145/150 - config/anchor_family.yaml) and KEEPS its anchor (D-374). The D1/D2 instrument elicits a 1-BIT
+    claim shape (comparative + STATED exchange rate + BOUNDARY + falsifiable) and must not be named FORM: the
+    4-class axis and the 1-bit gate are different objects (C21). Cohort, columns, questions and guards are
+    declared ONCE in config/claim_shape_instrument.yaml and read by BOTH the builder and the scorer - two
+    inline copies of a cohort are a denominator that can change without anyone editing the gate (BUG-461).
+  files: [config/claim_shape_instrument.yaml, scripts/build_claim_shape_instrument.py, scripts/score_claim_shape_gate.py]
+  bugs: [BUG-459, BUG-461]
+- id: D-378
+  category: SAFETY / ROBUSTNESS
+  state: RESOLVED
+  date: '2026-09-25'
+  title: 'A generator that writes an instrument must refuse to overwrite it once it carries an answer'
+  decision: >
+    "Rebuild" is an act on a BLANK instrument. A builder that rewrites the file it is also asked to score will
+    erase the only copy of an elicitor's answers and narrow the schema silently (BUG-460: two declared columns
+    dropped, exit 0). The builder therefore fails closed (exit 3) when any declared answered cell is non-blank.
+  files: [scripts/build_claim_shape_instrument.py, config/claim_shape_instrument.yaml]
+  bugs: [BUG-460]
+- id: D-379
+  category: PROVENANCE / VERIFICATION
+  state: RESOLVED
+  date: '2026-09-25'
+  title: 'An existence-negative in prose must be a measured ledger row - a docstring is not a search'
+  decision: >
+    Every absence claim about owner work (and about an axis) must name the artifact set searched and the query
+    used, and that query must have been RUN; otherwise the only permitted statement is "not found yet" (rail 3,
+    BUG-426). BUG-459 is the third false absence of the cycle ("FORM is blank" - measured 145/150) and it came
+    from a glob over a namespace that never existed plus a DEPTH/FORM column confusion. Negatives now live in
+    governance/existence_negatives.yaml (NEG-002) and a scorer that needs an anchor coverage figure MEASURES it.
+  files: [governance/existence_negatives.yaml, scripts/score_claim_shape_gate.py]
+  bugs: [BUG-459]
+- id: D-380
+  category: GOVERNANCE / PROCESS
+  state: RESOLVED
+  date: '2026-09-25'
+  title: 'A generated register must equal its re-derivation in the boot rail, and the rail must parse itself'
+  decision: >
+    governance/bug_status.json|md sat 13 ids behind governance/buglog.md while `just health` was green - a stale
+    register is worse than no register (BUG-463-class drift). scripts/check_bug_status.py re-derives the register
+    into a temp dir and byte-compares, wired into `just health`; BUG-446's owed rule is implemented with
+    `@just --list` as the FIRST line of the health recipe, so a justfile that cannot parse fails the rail that
+    depends on it.
+  files: [scripts/check_bug_status.py, justfile]
+  bugs: [BUG-446]
+
+- id: D-381
+  category: GOVERNANCE / PROCESS
+  state: RATIFIED
+  date: '2026-09-25'
+  title: 'Every owner gate carries a stated recommendation - and a senior RAG-engineer recommendation'
+  decision: >
+    The owner is the decision-maker; the assistant must never present a gate without the option it would
+    choose. Every blocked task is therefore reported with (1) the assistant's recommendation, and (2) a
+    SENIOR RAG-ENGINEER recommendation - the option that is most beneficial and most reliable for the
+    situation (retrieval/generation quality, provenance, reversibility, cost, and failure modes), with its
+    cost stated. A gate with no recommendation transfers work instead of information, and pushes a decision
+    onto whoever reads last (the pressure that produces fabricated values).
+  files: [governance/evidence/AUDIT_20260925_SECOND_PASS/AUDIT_FINDINGS.md]
+
+- id: D-382
+  category: PROVENANCE / VERIFICATION
+  state: RESOLVED
+  title: 'A pin is re-minted by a decision, never by a quiet re-hash - and the pinned artifact set is checked in the aggregate rail'
+  rationale: 'The previous pass edited scripts/definition_nli_verify.py (additive provenance block only; the 2026-09-23 measurement artifact is byte-unchanged and was NOT back-filled) and left config/recalibration_pins.yaml describing a file that no longer existed. just health was RED for a whole pass while every individual rail was green, because the digest rail is exercised nowhere else. Re-pinned under this decision.'
+- id: D-383
+  category: GOVERNANCE / PROCESS
+  state: RESOLVED
+  title: 'The workbook `flags` column is renamed `row_flags`; a column name is config, and a rename is declared once'
+  rationale: 'BUG-454/F-03 pattern (one token, two namespaces) for the third time: `flags` named both the workbook column and every local variable in the toolchain. Measured before the rename: no consumer reads the workbook column (all 148 values are machine-written), so the blast radius is 1 header cell. Declared in config/anchor_workbook_fixes.yaml as column_renames; the pre-rename file is backed up and its digest recorded.'
+- id: D-384
+  category: ONTOLOGY / GOVERNANCE
+  state: RESOLVED
+  title: 'The depth state is three declared layers - 13.09 partial 18/150, 24.09 complete 150/150, 25.09 adjudicated 145/148 - and the canonical column is depth_final_class'
+  rationale: 'MEASURED 2026-09-25: the 24.09 drop-in is a strict superset of the tracked sheet (0 conflicting cells on the 18 both fill). Intra-rater agreement between the 24.09 pass and the 25.09 adjudication is raw 0.710 (103/145) but alpha 0.914 nominal / 0.896 ordinal, ABOVE the operative floor 0.800; 38 of the 42 disagreements are adjacent classes concentrated at D2/D3 (18) and D3/D4 (16). The axis is reliable; the BOUNDARY is where the rubric is thin. Raw agreement alone would have argued for re-labelling the whole axis - the chance-corrected statistic says the opposite, which is why the floor must be read, not the raw rate.'
+- id: D-385
+  category: GOVERNANCE / PROCESS
+  state: PROPOSED
+  title: 'A blank in a superseding pass has four states (not-answered / withdrawn / declined / carried-forward) and must declare which'
+  rationale: 'BUG-465. R070/R080/R130 carry a blank depth in the 25.09 pass while the 24.09 pass answered all three (2/3/3). The contract sees one character and must therefore report the same three rows forever. A decline has an explicit token (DEPTH_MENU_DECLINED, used on 2 rows and not on these); a carry-forward has none. PROPOSED because the policy is the owner-s, and it applies to every future pass.'
+- id: D-386
+  category: ONTOLOGY / VERIFICATION
+  state: RESOLVED
+  title: 'FORM/extraction_type is KEPT as an anchored axis and is NOT consumed by S5 - it enters S5 as a REPORTED field first'
+  rationale: 'Owner ruling 2026-09-25 (gate 5). MEASURED support: FORM (1-4) is blank on exactly 5 rows of the blind sheet and all 5 are declared `noise drop` rows (R012, R021, R026, R084, R140) - so FORM carries NO blank on any claim-bearing row (145/145). The rule is kept; consumption stays off because BUG-451 measured FORM to have zero discriminative power for class-1 admission. Report -> measure -> decide, in that order.'
+
+- id: D-387
+  category: GOVERNANCE / PROCESS
+  state: RESOLVED
+  title: 'Omission is not withdrawal - a superseding pass carries a previously answered cell forward, and only the explicit ..._DECLINED token withdraws it'
+- id: D-388
+  category: ONTOLOGY / GOVERNANCE
+  state: RESOLVED
+  title: 'A DECLARED abstention (and a declared axis-exempt row) is terminal: counted with parity, never owed - and R040 is ruled arts & culture'
+- id: D-389
+  category: HYGIENE / VERIFICATION
+  state: RESOLVED
+  title: 'The archive index excludes declared OS metadata from every count and dates a directory by its newest non-ignored descendant, so a file browser cannot flip the rail'
+- id: D-390
+  category: VERIFICATION / PROCESS
+  state: PROPOSED
+  title: 'The aggregate rail runs rails, not the suite; a full-suite recipe (just health-deep) is the control that catches a stale assertion'
+
+- id: D-391
+  category: VERIFICATION/GOVERNANCE
+  state: RESOLVED
+  title: "The agreement floor has its first consumer, and the depth panel does NOT clear it"
+  context: >
+    config/agreement_floor.yaml was ratified with no consumer (BUG-462): a floor nothing reads is a comment. The
+    depth axis was the next strategic step (D-384 freeze), so the consumer was built against it:
+    scripts/depth_pass_agreement.py (Krippendorff alpha, nominal + ordinal, missing-cell capable, exclusions read
+    from the artifact that OWNS each declaration). MEASURED on the 144 independent units (148 measured rows minus
+    3 CARRY-FORWARD (R070/R080/R130) minus 1 declared axis-exempt (R140); R003/R146 declared absent):
+    alpha nominal 0.4004 (band: below_reporting), alpha ordinal 0.5701. Reported floor 0.667 / operative 0.800.
+  decision: >
+    The depth axis may NOT be frozen on this instrument. 0.4004 is below the reporting floor, so by the floor's own
+    band vocabulary it is "not a measurement of agreement - report the disagreement, decide nothing". The freeze
+    (D-384) is therefore blocked by MEASUREMENT, not by process. Consequence: D274f (the single-coder 30-row
+    test-retest ceiling) is now MANDATORY evidence, not a formality, and a frontier second coder is required before
+    any depth head (D2577) may be trained or admitted. Verified: perfect agreement returns exactly 1.0 (nominal and
+    ordinal) and a 3-unit/2-rater case reproduces the hand-computed Do=De=1/3, alpha=0.
+  authority: "assistant measurement + senior-RAG recommendation; the freeze decision stays the owner's (C22)"
+- id: D-392
+  category: VERIFICATION/PROCESS
+  state: RESOLVED
+  title: "A test may not write outside a tmp dir - enforced, not asserted"
+  context: >
+    BUG-473: a pytest run renamed the live 1.03 GB t11 checkpoint. BUG-471 was the same defect (S5_LOCK_PATH is
+    bound at import, so the first S5 test left a live lock in the production tree and the second died on it).
+  decision: >
+    tests/conftest.py snapshots every production stage artifact before the session and FAILS the session if an
+    UNDECLARED path is created, deleted or modified. A test-owned run id is declared in config/test_isolation.yaml
+    (globs), is tolerated, and is still REPORTED - a tolerated write must never become invisible (BUG-462 class).
+    The rule is executable: the guard found the violation and the 16 tolerated smoke artifacts on its first run.
+  authority: "assistant + senior-RAG (both: a standing rule that is not executed is not a control)"
+- id: D-393
+  category: GOVERNANCE/VERIFICATION
+  state: RESOLVED
+  title: "Every rate reports its denominator (148 measured of 150 declared)"
+  context: >
+    BUG-466: the ANCHOR-4 sheet declares rows: 150 while the owner workbook carries 148. R003/R146 are absent with
+    no declared exclusion rule, so every rate had an undeclared denominator.
+  decision: >
+    config/cohort_declaration.yaml declares the cohort: declared_rows 150, measured 148, absent [R003, R146] with a
+    reason and a forbidden-action list (no row added to the 150, no cell imputed). The agreement consumer asserts the
+    arithmetic closes (measured + absent == declared) and PRINTS both denominators. D-387 ('omission is not
+    withdrawal') governs a CELL the owner already filled; these two ROWS were never filled at all.
+  authority: "owner-accepted 2026-09-25 (BUG-466); implemented as a declaration, not a repair"
+
+- id: D-394
+  category: VERIFICATION/INSTRUMENT
+  state: RESOLVED
+  title: "The depth axis is NOT load-bearing, and the measured panel is 3 raters, not the declared 5"
+  context: >
+    BUG-476: the depth panel declaration names FIVE raters; only THREE rated (claude 142, kimi 144, owner 144).
+    Qwen3.8 and DeepSeek hold 0/148 depth cells while holding 148/148 domain cells - the depth pass was never
+    run for them. Because alpha is missing-cell capable, an EMPTY COLUMN is indistinguishable from a rater who
+    skipped a few rows, so the receipt printed "5 declared rater column(s)" over a 3-rater measurement.
+  decision: >
+    (1) The depth axis may NOT be frozen and may NOT be load-bearing on this evidence: no gate, no anchor edit,
+    no depth head (D2577/D274d untouched). (2) The declared panel must be made TRUE before any new rater is
+    bought - run the two missing depth passes or amend the declaration; a 5-rater declaration over a 3-rater
+    measurement is the defect. (3) The disagreement is ADJACENT, not random: of 172 disagreeing rater-pairs 152
+    are off-by-one (2<->3 x75, 3<->4 x66), 60/144 units are unanimous and 3 span the whole menu - the ORDERING
+    is sound, the BOUNDARY is what fails. (4) Class 1 is not the failure source (2.1-4.9% base rate, 24 of 172
+    disagreements) and is also not measurable by alpha at that prevalence - MEASURED alpha on the class-1 bit is
+    +0.1730 on 91.5-95.8% raw agreement (the kappa paradox at a rare class, cf. BUG-452). (5) The next
+    measurement is D274f (30-row test-retest, window opens 2026-10-08): the only number that separates a RATER
+    problem from a RUBRIC-observability problem. (6) Completing the panel is the highest-information next act: a
+    2-coder LLM alpha of 0.5472 projects to ~0.83 at 4 coders under Spearman-Brown with INDEPENDENT errors, so
+    the completed panel FALSIFIES or CONFIRMS that assumption - near 0.83 the raters were the constraint, near
+    0.55 the RUBRIC is, and then only declared re-operationalisation (making the substitution test determinable
+    from the row) can move the number, as a NEW instrument version, never as tuning.
+  authority: "assistant + senior-RAG (both: do not freeze a 0.40 measurement; do not buy a rater before the declaration is true)"
+  files: [config/agreement_floor.yaml, scripts/depth_pass_agreement.py, config/depth_classes.yaml, config/cohort_declaration.yaml]
+  evidence: >
+    alpha nominal 0.4004 (Do 0.4023 / De 0.6710, n=430) / ordinal 0.5701 on 144 units; leave-one-out: drop kimi
+    -> 0.2701, drop owner -> 0.5472 (= the claude+kimi pair), drop claude -> 0.3875. 3-class collapse 0.4172;
+    binary class-1 0.1730. Bands from config/agreement_floor.yaml (reporting 0.667 / operative 0.800).
+- id: D-395
+  category: GOVERNANCE/INSTRUMENT
+  state: RESOLVED
+  title: "Class-1 admission gates on the CLAIM-SHAPE bit, never on FORM, and is judged as a decision rule"
+  context: >
+    BUG-451 falsified FORM as a class-1 gate BY MEASUREMENT: the 7 owner-retracted class-1 calls span 3 of the 4
+    FORM classes (descriptive_model x5, normative_heuristic x1, causal_mechanism x1); the warrant-admissible pool
+    (normative_heuristic + descriptive_model) is 91/150 = 60.7% against a 2.7% class-1 capacity, and the FORM
+    precondition excludes 59 rows while catching exactly ONE of the 7 negatives (R139).
+  decision: >
+    (1) FORM stays a NECESSARY warrant field and is demoted from candidate gate, with its measured catch rate
+    (1/7) recorded permanently so the "build the FORM anchor first, then derive depth" plan cannot be
+    re-litigated. (2) A FORM 4-coder panel is NOT the floor's second consumer: it buys a reliability number for an
+    axis that is already owner-anchored (extraction_type_final 145/150, write-locked) and that cannot gate -
+    pure future tax. (3) The class-1 gate is the D-374 CLAIM-SHAPE bit (config/claim_shape_instrument.yaml -
+    instrument, builder, scorer and negative set already exist), elicited by a NON-AUTHOR (guards.refuse_elicitor
+    already says so) and judged as a DECISION RULE against the declared cohort [U001..U004 candidates;
+    R033 R049 R062 R085 R087 R101 R139 negatives]: 7/7 negatives rejected AND 4/4 candidates admitted, reported
+    with both denominators. (4) alpha must NOT be the class-1 statistic: at a 2.7-4.9% base rate the kappa
+    family collapses (measured +0.1730 nominal, pairwise +0.2310 / +0.3806 / -0.0404 on 91.5-95.8% raw
+    agreement); a rare-class admission rule is judged by its confusion matrix against the known negatives, i.e.
+    as a SCREENING TEST, not by an agreement coefficient.
+  authority: "assistant + senior-RAG (both: BUG-451 already answers this; adding raters cannot supply signal absent from the label set)"
+  files: [config/claim_shape_instrument.yaml, scripts/build_claim_shape_instrument.py, scripts/score_claim_shape_gate.py,
+          config/anchor_family.yaml, governance/existence_negatives.yaml, config/agreement_floor.yaml]
+  evidence: >
+    FORM x the negatives, ANCHOR_RULER_CONSOLIDATED_20260923.csv#extraction_type_final (145/150: causal_mechanism
+    40, descriptive_model 41, normative_heuristic 50, empirical_pattern 14, blank 5). BUG-477: the FORM coder
+    columns are 'label (margin)' strings and owner_form is declared but 0/108 filled - any FORM agreement figure
+    needs a declared parse first.
+
+- id: D-396
+  category: VERIFICATION/MEASUREMENT
+  state: RESOLVED
+  title: "G-study on the depth panel: rater bias is ZERO - the remedy is more raters, not a new rubric"
+  context: >
+    The depth panel's low alpha posed a fork: more raters, or a re-operationalised rubric. Alpha cannot answer
+    it - it is one number. A two-way ANOVA without replication over the complete-case design (142 units x 3 real
+    raters, 426 values) decomposes the variance instead.
+  decision: >
+    MEASURED: MS_item 1.4053, MS_rater 0.0446, MS_resid 0.3046; F_rater = 0.146 (2,282 df) - NO rater effect.
+    Variance components: item 0.367 (54.6%), rater(systematic bias) 0.000 (0.0%), item x rater residual 0.305
+    (45.4%); rater means 2.972 / 2.937 / 0.958~2.958 (range 0.035 on a 1-4 scale). CONSEQUENCE: the disagreement
+    is NOT coder bias and NOT scale-usage drift - it is item-specific, and the CLASSICAL remedy for item-specific
+    error with zero rater effect is AVERAGING MORE RATERS, not rewriting the rubric. Spearman-Brown under the
+    measured single-rater reliability (rho1 = 0.546): 2 raters 0.707, 4 raters 0.828, 5 raters 0.858, 10 raters
+    0.923. The declared panel has 4 LLM coders; TWO were never run (BUG-476), so the executed design was 2 coders
+    = 0.707 is NOT reachable for claude+kimi alone (measured 0.5472) - i.e. the executed design was BELOW its own
+    min. DECISION: (1) run the two missing declared coders - at 4 coders the projection crosses the 0.800
+    operative floor, and the run simultaneously FALSIFIES or CONFIRMS the independent-errors assumption; (2) do
+    NOT change the rubric, and do NOT buy a frontier coder, until the 4-coder panel has been measured; (3) the
+    ORDINAL alpha is the honest statistic for this axis - nominal alpha 0.4004 understates it because 86% of
+    disagreements are off-by-one, and ordinal alpha 0.5701 agrees almost exactly with the interval ICC 0.546;
+    the band is currently read from NOMINAL and that is a declared-choice question for the owner, NOT a value to
+    re-pick now that a score exists (the floor file forbids it); either way BOTH readings are below the 0.667
+    reporting floor, so the conclusion (depth may not be frozen) is robust to the choice.
+  authority: "assistant + senior-RAG (both: measure the structure before buying raters or rewriting an instrument; the fork was decidable from data already on disk)"
+  files: [scripts/depth_pass_agreement.py, config/agreement_floor.yaml, config/depth_classes.yaml]
+  evidence: >
+    Complete-case two-way ANOVA (no replication) on the 142 units where claude, kimi and owner all rated;
+    reliability projections are Spearman-Brown on the measured rho1, i.e. an UPPER BOUND that assumes
+    independent errors - the 4-coder run is the test of that assumption.
+
+- id: D-397
+  category: VERIFICATION/INSTRUMENT
+  state: RESOLVED
+  title: "Depth is declared NOT load-bearing as a RAIL, not a paragraph"
+  decision: >
+    (1) config/depth_domain_contract.yaml#load_bearing (enabled false, decided D-394) is the declaration:
+    no_gate, no_anchor_edit, no_depth_head, no_freeze. (2) It is consumed by
+    scripts/check_depth_load_bearing.py, which resolves every forbidden TRACE from that block and exits 1
+    while enabled is false and a trace is present (trained:false in anchor_family, no `gate` key on the panel,
+    no *depth*head* artifact). (3) Unblocks_when: the declared panel is complete and RUN blind AND the
+    ORDINAL alpha / interval ICC reaches the operative floor - the choice of statistic needs its own owner
+    ruling, because re-picking it after a score exists is what the floor file forbids.
+  evidence: "BUG-462 class: a floor or rail with no consumer is a comment."
+
+- id: D-398
+  category: GOVERNANCE/DATA-INTEGRITY
+  state: RESOLVED
+  title: "Filling a panel may not edit the gold: the ingest path is append-only by assertion"
+  decision: >
+    (1) BUG-478 measured: the only declared ingester (scripts/cross_examine_anchor_axes.py::write_outputs)
+    rebuilds governance/anchor_adjudication_workbook_20260924.csv from the dispute set and BLANKS
+    WORKBOOK_OWNER_COLS - completing the depth panel through it would have destroyed 148 owner cells. (2) The
+    declared writer is now scripts/ingest_panel_column.py: parse_frontier_pack validation, exactly ONE column,
+    refuses if ANY other cell would change, refuses to overwrite an answer, tempfile->fsync->os.replace +
+    timestamped backup. (3) Declaration lives in agreement_floor.yaml#panels.depth_axis_panel.ingest.
+    (4) The rater roster is unchanged; the two unrunnable raters are declared `declared_not_run` (BUG-476
+    root: a declaration is not a measurement).
+
+- id: D-399
+  category: VERIFICATION/INSTRUMENT
+  state: RESOLVED
+  title: "The CLAIM-SHAPE gate is a perfect screen and a weak classifier: 10/11 -> class-1 admission stays UN-GATED"
+  decision: >
+    MEASURED blind with a NON-AUTHOR elicitor (Qwen3.8-27B-MLX-4bit, item_id withheld, declared rule
+    q1&q2&q3 declared BEFORE the score): negatives rejected 7/7, false positives 0, candidates admitted 3/4
+    (U002 missed, q1=0); the q4 variant gives the same 3/4. D-395's bar (7/7 AND 4/4) is NOT met, so
+    scripts/score_claim_shape_gate.py exits 1 and NO gate is shipped. STRUCTURAL DEFECT found: q3 (boundary)
+    is 1 on 11/11 - a CONSTANT on this cohort, contributing nothing to the conjunction; only q1 (4/11) and
+    q2 (3/11) discriminate. CONSEQUENCE: class-1 admission remains un-gated; the screen (0 false positives)
+    may still be used to REJECT, never to ADMIT, until a second elicitor reproduces it. The instrument is
+    NOT wired into `just health` while it is unanswered-or-failing by design.
+  evidence: "receipt governance/frontier_pack_20260924/CLAIM_SHAPE_ELICITED_Qwen3.8-27B-MLX-4bit.csv"
+
+- id: D-400
+  category: VERIFICATION/INSTRUMENT
+  state: PROPOSED
+  date: '2026-09-25'
+  title: 'No instrument may decide until it has a confusion matrix on a sealed known-answer control'
+  decision: >
+    Generalises D-374 from ONE check to EVERY instrument that decides: a gate, a classifier, a head or a
+    threshold may not rule on production data until its error has been measured against a SEALED control
+    whose answer is known and unavailable to the builder. Driver (RC-5): seven instruments were shipped this
+    month whose error had never been measured on a control, so an instrument's confidence in itself was the
+    only evidence of its quality (BUG-480: a perfect screen measured at 10/11; the depth head at n=2).
+    OWED: the depth head, the CLAIM-SHAPE gate, the S4 classifier and the depth instrument each need a sealed
+    control sheet with a stated confusion matrix before they may gate anything.
+  files:
+  - config/eval_integrity.yaml
+  - config/claim_shape_instrument.yaml
+- id: D-401
+  category: GOVERNANCE/DATA-INTEGRITY
+  state: ACTIVE
+  date: '2026-09-25'
+  title: 'Every artifact has a declared owner-of-record, and a writer may not change a cell it does not own'
+  decision: >
+    The RC-1 gate. config/artifact_ownership.yaml declares, per artifact, the mutability class
+    (immutable / append_only / derived_regenerable / human_authored), the id column, the owner cells, the
+    writer_of_record and any machine writer forbidden. scripts/lib/write_guard.py is the ONLY sanctioned way
+    to write an artifact holding cells you do not own: it backs the file up byte-exact, REFUSES if any
+    non-owned cell would change (nothing is written), writes via tempfile -> fsync -> os.replace (C6),
+    re-measures after the write and appends a mutation record to governance/MUTATION_JOURNAL.jsonl.
+    OWNED_ANY ('*') permits a whole-file regeneration but must be EXPLICIT, never a default. Its self-test
+    asserts four invariants and is wired into `just health`. Driver: BUG-478 (a panel ingester blanked 148
+    owner cells) and 156 of 274 scripts holding a 'w' write with no declared ownership.
+  files:
+  - config/artifact_ownership.yaml
+  - scripts/lib/write_guard.py
+  - governance/MUTATION_JOURNAL.jsonl
+- id: D-402
+  category: GOVERNANCE/VERIFICATION
+  state: ACTIVE
+  date: '2026-09-25'
+  title: 'A rail may not take its evidence from the same source as the artifact it checks'
+  decision: >
+    The RC-3 gate. A check whose evidence is re-derived by the same code (or the same file) that produced the
+    artifact can only ever certify the producer, never the artifact: scripts/check_bug_status.py re-derives
+    from the same headers as governance/bug_status.json, so it could not see BUG-481 (8 bugs closed in prose
+    and still counted OPEN); /compact re-derives nothing. Every rail must therefore name its evidence source
+    and, where the artifact and the evidence share a source, an INDEPENDENT second oracle must exist.
+    Mechanism in force: scripts/reconcile.py re-derives each fact from the DECLARATION and the ARTIFACT
+    independently and never reads another rail's output. OWED: an audit of the pre-existing verify_* rails
+    for shared-source evidence, recorded rail by rail.
+  files:
+  - scripts/reconcile.py
+  - scripts/check_register_divergence.py
+- id: D-403
+  category: PIPELINE/PROVENANCE
+  state: PROPOSED
+  date: '2026-09-25'
+  title: 'Stage handoffs are content-addressed; a hash claim never points at a mutable path'
+  decision: >
+    The RC-2/BUG-376 gate. A stage that declares an input path cannot prove WHICH bytes it consumed, so a
+    producer that rewrites that path after the run invalidates every downstream claim without any transaction
+    failing (BUG-376: the t11 checkpoint_enriched.jsonl was rewritten after the S5 run and the verified image
+    no longer exists; BUG-341/BUG-433 are the same class). Handoffs are therefore RECEIPTS: input digests,
+    output digest, code_sha and stamp recorded at run time, so `verify` compares bytes, not paths.
+    Mechanism: scripts/lib/handoff.py + config/handoffs.yaml + governance/HANDOFFS.jsonl.
+  files:
+  - scripts/lib/handoff.py
+  - config/handoffs.yaml
+  - governance/HANDOFFS.jsonl
+- id: D-404
+  category: VERIFICATION/INSTRUMENT
+  state: ACTIVE
+  date: '2026-09-25'
+  title: 'No number without its ruler: every emitted metric carries population, denominator, ruler_sha and code_sha'
+  decision: >
+    A number that travels without the population it was measured on, the denominator it was divided by, the
+    ruler that produced it and the code that ran is not a measurement (BUG-391 class). scripts/lib/measure.py
+    is the only sanctioned way to publish a number: emit_metric FAILS CLOSED when population or denominator is
+    absent, stamps code_sha (git rev + dirty flag) and appends the envelope to governance/METRICS.jsonl;
+    `--gaps` audits the stored set for envelopes that lost a field. Driver: the agreement floor (0.667/0.800)
+    quoted against panels of three different populations (148 / 144 / 116) with the ruler named only in prose.
+  files:
+  - scripts/lib/measure.py
+  - governance/METRICS.jsonl
+- id: D-405
+  category: GOVERNANCE/VERIFICATION
+  state: ACTIVE
+  date: '2026-09-25'
+  title: 'One reconciliation engine: one command answers where a declaration disagrees with reality'
+  decision: >
+    The RC-2 gate. ~30 verify_* scripts each checked one declaration against one artifact, ad hoc, and each
+    had to be REMEMBERED - which is why one class (declaration diverges from reality) arrived 30 times under
+    30 names (BUG-462/463/466/476/450/468/455/456/412). scripts/reconcile.py + config/reconciliation.yaml
+    evaluate every declared object in one pass, each entry naming its declaration, its artifact and its check
+    kind; an UNDECLARED check kind is a hard failure, never a silent pass. Two meta-checks are mandatory:
+    `reach` (every check_*/verify_* that declares a contract must be invoked by a recipe - BUG-482) and
+    `cover` (every artifact in artifact_ownership.yaml must have an entry or an unreconciled_reason). Tri-state
+    exit: 0 ok, 1 drift, 2 owner-owed (loud, not fatal - BUG-457).
+  files:
+  - scripts/reconcile.py
+  - config/reconciliation.yaml
+  - governance/RECONCILIATION.json
+- id: D-2637
+  state: RESOLVED
+  category: GOVERNANCE/VERIFICATION
+  title: "A resolver declares and publishes its resolution domain, and a finding may not name an artifact defective without naming what was searched"
+  decision: >-
+    Minted 2026-09-25 to separate TWO rules that one id was carrying. (1) THIS rule: config/resolution_domains.yaml
+    is the ONE declared home of what each resolver resolved an identifier AGAINST; scripts/lib/measure.py refuses a
+    declared resolver metric with no domain block; scripts/reconcile.py joins the declaration to the rail; and a
+    finding may not name an artifact defective without printing the domain it searched (BUG-488/BUG-489: resolving
+    a digest against live paths only made a SUPERSEDED revision read as "resolves to nothing"). Every rail that
+    publishes a domain stamps `decided: D-2637` and prints its domain beside its rows. (2) D-405 remains the
+    SEPARATE rule it was minted for - the declaration-to-reality JOIN (config/reconciliation.yaml, scripts/
+    reconcile.py): a declaration and reality are joined in one place, or the join is owed. The overload was
+    invisible because a stamp is a bare id: config/resolution_domains.yaml stamped D-405 while D-405's subject was
+    the join. D-405's record is NOT edited (records are append-only). NAME-SPACE RULE: one id, one subject; if two
+    rules need one id, the id is not yet minted.
+  date: "2026-09-25"
+- id: D-2638
+  category: GOVERNANCE/VERIFICATION
+  state: ACTIVE
+  date: '2026-09-25'
+  title: 'A declaration pointer that resolves to nothing is a broken rail, never a pending ruling'
+  context: >
+    BUG-501. config/reconciliation.yaml#depth_workbook_row_count declared a key that was never written anywhere
+    (config/agreement_floor.yaml#panels.depth_axis_panel.rows_declared) while the rule it was waiting for had
+    already been ruled (D-393) and the declaration had MOVED to config/cohort_declaration.yaml, where a
+    consumer already verified it. The engine reported its own dangling pointer as owner-owed debt, so a ruled
+    rule printed as a pending one for a day and the message ('until the rule is ruled') misdirected the reader.
+  decision: >
+    The reconciliation engine must separate THREE states it had been collapsing into one verdict: a declaration
+    whose pointer DOES NOT RESOLVE is DRIFT (a broken rail - the declaration moved and nobody repointed the
+    entry), a declaration of the wrong SHAPE is DRIFT, and only a declared value that MISMATCHES reality may be
+    owner-owed. `optional: true` may downgrade a mismatch to a pending ruling; it may never launder a pointer
+    that resolves to nothing. Companion rule from the same fix: a denominator that is only COMPUTED cannot
+    disagree with anything, so a cohort's measured count must be DECLARED and asserted against the artifact
+    (two independent oracles, D-402), never merely derived at run time.
+  authority: "assistant + senior-RAG (both: a rail may not be silent about its own brokenness)"
+  files: [scripts/reconcile.py, config/reconciliation.yaml, config/cohort_declaration.yaml, scripts/depth_pass_agreement.py]
+  evidence: >
+    Fixed and measured 2026-09-25: 5/5 known-answer controls fire through the same classifier (dangling ->
+    drift, optional cannot launder, wrong shape -> drift, 150 vs 148 -> drift, real entry -> ok); reconcile
+    '11 declared object(s) agree with reality' rc=0 (was owner_owed on every run since BUG-466);
+    --check-cohort rc=0; contract gate rc=0; 12 tests passed.
+- id: D-2639
+  category: GOVERNANCE/ONTOLOGY
+  state: ACTIVE
+  date: '2026-09-25'
+  title: 'A derived column with no declared home is an unanswerable question - and a 1:1 coupling must be PROVEN from its source, not declared by its shape'
+  context: >
+    BUG-499. The D2284 epistemic label existed as three identical inline copies with rating literals in
+    code and no declaration, so when the rail reported 'every label maps to exactly one status' the repo
+    could not say whether that was a hidden gate (D274a's defect) or a property of one shared record.
+    Both offered declarations were unusable: 'independent' demands a decoupling that measurement
+    contradicts (0/7,995 labels fail to re-derive from the record), and 'derived_mirror' inverts the
+    causal arrow while checking nothing about the label's provenance.
+  decision: >
+    (1) A DERIVED column gets ONE implementation and one config block; every other site imports it - a
+    second copy is a second truth (C21), and an undeclared rule cannot be reasoned about, only observed.
+    (2) When two columns are functions of the SAME record, declare their relationship as CO_DERIVED:
+    the rail must then re-derive the dependent column from the record and fail on mismatch
+    (max_label_mismatch, shrink-only), because inspecting the SHAPE of a coupling verifies nothing about
+    its SOURCE. A hand-set value, or a rule that moved while the rows did not, must be a DEFECT.
+    (3) An ontology is declared in config (C12) and is never inferred from the data it explains.
+  authority: 'assistant + senior-RAG (both: measure the provenance before naming the coupling)'
+  files: [pipeline/serving_gate.py, pipeline/stage5_verify.py, config/serving_gate.yaml,
+          scripts/check_serving_gate.py, scripts/sync_s5_checkpoint_from_db.py,
+          scripts/reinject_bug198_singletons.py, tests/test_serving_gate.py]
+  evidence: >
+    MEASURED 2026-09-25: 7,995/7,995 stored labels re-derive from (factual.passed, isor.rating), 0
+    mismatch; all three inline copies deleted (grep for an inline label assignment: NONE); 10/10
+    known-answer controls fire incl. 'a HAND-SET label contradicts the record -> LABEL_MISMATCH';
+    check_serving_gate.py rc=0 with the co_derived proof in the headline (was owner_owed on every run);
+    extraction behaviour-preserving (new function != stored label: 0/7,995); 25 tests pass.
+
+- id: D-2640
+  category: GOVERNANCE/PROVENANCE
+  state: ACTIVE
+  date: '2026-09-25'
+  title: 'A provenance state that only a human can tell apart must be DECLARED by the store, bounded by a closed set, and enforced by a rail'
+  decision: >
+    (1) An empty label-provenance stamp is NOT evidence of anything until the store declares which generation
+    runs are inside a PRE_PROVENANCE_BOUNDARY. The boundary is a CLOSED SET of runs plus a DECLARED measured
+    population (never a date predicate: a date lets a new run silently join the boundary and absorb its own gap).
+    (2) Rows inside the boundary are classified pre_boundary and NEVER backfilled (D-277). A row OUTSIDE the
+    boundary lacking the quartet is a DEFECT (a broken stamp must not hide behind the boundary).
+    (3) The state is a DECLARED FIELD OF THE QUERY SURFACE, attached at the one row-mapping choke point, so no
+    consumer infers traceability from an empty column. (4) This is the TRACEABILITY axis; it is NOT the C29
+    authorship vocabulary and NOT the eval provenance tiers - three axes, three names, one meaning each.
+  measured: '7995/7995 rows empty on menu_hash + 3 *_source; runs t11 7,867 | bug198_reinject 6 | e2e 122; 0 missing'
+- id: D-2641
+  category: GOVERNANCE/INVARIANT
+  state: ACTIVE
+  date: '2026-09-25'
+  title: 'An invariant needs both halves: a pre-write refusal in the one writer and a post-hoc rail - and one comparator, never two'
+  decision: >
+    (1) A declared invariant whose only enforcement is a rail over stored rows is half-enforced: the store can be
+    mutated before anyone looks. The single write path must evaluate the SAME rule BEFORE the write and refuse the
+    row (fail closed). (2) The comparator is ONE function (pipeline/serving_gate.py::store_verdict) imported by the
+    writer and the rail; two implementations of one comparison are two truths (BUG-499/BUG-502). (3) The pre-write
+    policy is declared in config and an unknown value is fatal, so the guard cannot be turned into an off switch.
+  measured: 'pre_write_verdict refuses 0 of 7,995 stored rows; rail 7995 MATCH; 10/10 + 6/6 known-answer controls'
+- id: D-2642
+  state: active
+  category: GOVERNANCE/INVARIANT
+  title: 'A rule about the verification record has exactly ONE implementation, and the corpus it produced is the only acceptable proof of a refactor'
+  measured: 'the S5 score axis was a verbatim copy in stage5_verify.py AND reinject_bug198_singletons.py; after collapsing it into serving_gate.derive_conf_and_review the stored corpus re-derives 7995/7995 on confidence_score AND needs_human_review with 8/8 known-answer controls; a probe fed a column SUBSET produced 5023 false mismatches (a partial row is not the record)'
+  decision: 'The score axis lives in pipeline/serving_gate.py::derive_conf_and_review and both call sites import it. Equivalence is proven against the STORED corpus WITH FULL ROWS, never by reading the code.'
+- id: D-2643
+  state: active
+  category: GOVERNANCE/SAFETY
+  title: 'An abandoned ontology must not have a REACHABLE write path - unreachability, not a speed bump'
+  measured: 'just migrate-epistemic/-dry/-verify reached 8 D2205 ALTERs on fbs incl. a fourth epistemic column with DEFAULT corroborated; none of the 8 columns exist on fbs (75 columns); after the tombstone rc=2 (owner-owed) and 0 recipes reachable'
+  decision: 'The D2205 migration recipes are removed and the script refuses with exit 2 unless the owner passes --i-understand-D2205-is-abandoned. Deleting the archaeology is NOT the fix; closing the reachable path is.'
+- id: D-2644
+  state: active
+  category: GOVERNANCE/CONFIG
+  title: 'A config value read with a code default is an UNDECLARED value - a config miss must be the error'
+  measured: 'all five S5 score-axis weights were governed by _CFG.get(..., <code default>) with no stage5.confidence block in config/pipeline_config.yaml; they are now declared with byte-identical values and read through a loud _s5_conf() that names the file and the key'
+  decision: 'C12/C16 extended to constants: if the caller supplies a default, the value is not declared. Declare it and read it loudly; .get(..., default) on config is a defect, not a convenience.'
+
+- id: D-2645
+  state: 'active'
+  category: 'GOVERNANCE'
+  title: 'Revocation ontology - a revoked scope is a DECLARED SUB-FACT with a rail'
+  measured: 'MEASURED 2026-09-25: the D2205 P3 migration is abandoned while the D2205 roadmap is ACTIVE (live retrieval P0/P1 and CRAG citations), so a whole-record state would be FALSE. Declared with prefixed scalar keys on the record (audit F2: no record carries a mapping-shaped value, so no new shape enters a governed registry). 24 pre-rule SUPERSEDED/ARCHIVED records are pinned BY IDENTITY, never by a count.'
+  decision: 'A tombstone stops EXECUTION; a registry stops RE-PROPOSAL (D-2643). Required fields scope/reason/evidence/date/tokens; whole-record states REVOKED/ABANDONED; rules in config/decisions_policy.yaml; rail scripts/check_revoked_references.py with known-answer controls and a RESERVED fixture namespace. First subject: D2205 P3. Declaring a revocation is a structural edit of an append_only registry: the handoff receipt is refreshed in the same sequence and a forgotten refresh is LOUD (verify_handoffs), never silent.'
+- id: D-2646
+  state: 'active'
+  category: 'GOVERNANCE'
+  title: 'One derived value, one home - a rule that decides a stored value has ONE implementation'
+  measured: 'MEASURED 2026-09-25 by a tree-wide AST scan: BUG-499 and BUG-502 were one defect three times - a rule deciding a stored value existed verbatim in TWO scripts with nothing reporting divergence. config/derivations.yaml holds 9 rows: 6 homed, 1 orphan_magic_threshold (an undeclared literal 10), 1 dead_but_read (borp_score: 7995/7995 constant 0.0, no writer, still ORDER BY-ed), 1 declared_but_empty (feedback_score 0/7995).'
+  decision: 'config/derivations.yaml declares each derived value with home plus parity rail plus status; home: null is the machine-readable statement that NO code decides it. The same rule governs config reads: a value read with a code default is UNDECLARED (D-2644), ceilings shrink-only (179 shadowed / 20 undeclared) and the RAIL owns the number, not the probe.'
+- id: D-2647
+  state: RATIFIED
+  category: GOVERNANCE / INTEGRITY
+  title: A Dropbox conflicted copy is silent drift, not a merge conflict
+  measured: MEASURED 2026-09-26 - 36 conflicted-copy siblings; 26 held NEWER work than the live file, which Dropbox had reverted to an older blob. The D-2645/D-2646 rail work, the wired justfile and the 782-record decisions.yaml all lived in a sibling while every rail read the stale live file and printed ok.
+  decision: 'Resolution is measured, never guessed - scripts/resolve_dropbox_conflicts.py + config/conflict_policy.yaml. identical-to-INDEX is restored from it (lossless); identical-to-HEAD means the sibling is the committed mark; otherwise a real 3-way merge with base = the HEAD blob, a line-superset wins outright, and a two-sided divergence is HELD in governance/CONFLICT_REGISTER.md. Pipeline state is owner judgement: a checkpoint is not a document to be text-merged.'
+- id: D-2649
+  state: OPEN
+  category: GOVERNANCE / INTEGRITY
+  title: A declared fact has ONE declaration home; two homes that disagree are a defect
+  measured: MEASURED 2026-09-26 - scripts/lib/artifact_encoding.py joins config/reconciliation.yaml and config/cohort_declaration.yaml
+    for an artifact's encoding. Before this rule the join was last-writer-wins, so a second home could declare cp1252
+    for an artifact the first declared mac_roman and every reader would silently pick one. 0xD1 is an em dash in
+    MacRoman and 'N-tilde' in cp1252, so that disagreement would not crash - it would quietly change the text two
+    readers then compare (BUG-511).
+  decision: 'An artifact''s declared facts (its encoding first) are joined across every declaration home and the
+    join FAILS CLOSED when two homes disagree, naming the artifact, both values and both homes. A reader never picks
+    a side: picking is the read-side twin of guessing, which D-2644 already forbids. This is D-2646 (one rule, one
+    home) applied to the DECLARATION rather than to the code that reads it. Where the same value is declared twice
+    and AGREES, the duplicate is checked and tolerated, not presumed harmless.'
+- id: D-2654
+  state: REJECTED
+  category: INFRASTRUCTURE / SERVING
+  date: 2026-09-26
+  title: An unverifiable arm is not a cheaper arm - Apple Foundation Models NOT ADOPTED
+  measured: MEASURED 2026-09-26 on this host (macOS 27). The system binary /usr/bin/fm returns rc=69 for every subcommand
+    until a machine-wide licence is granted, so no arm can be exercised non-interactively; the weights live under
+    /System/Library/AssetsV2/com_apple_MobileAsset_UAF_FM_GenerativeModels and are System-Integrity-Protected (Operation
+    not permitted), so they can be neither read nor hashed; FoundationModels.framework is resident only in the dyld
+    shared cache, so the model VERSION cannot be recorded at all. The four candidate risks (cost, quality, latency,
+    privacy) were therefore measured as MOOT against those structural facts rather than against a running arm, and
+    the egress question is a machine-wide fact rather than a per-project cost.
+  decision: 'The Apple Foundation Models arm stays NOT ADOPTED and config/apple_fm.yaml keeps enable false. An arm
+    whose weights cannot be read cannot be hashed, and an arm that cannot be hashed cannot be PINNED (D-382), so
+    every number it produced would be unreproducible and unverifiable - a dependency whose identity is unrecordable
+    is a future tax, not a saving. Its availability is also a machine-wide fact (an OS licence and OS state) rather
+    than something this project declares, and it cannot be pinned, re-measured or reverted version by version. The
+    refusal is STRUCTURAL, not a verdict on model quality: it would be re-opened only if the weights became readable
+    and hashable, which is exactly what would turn the four risks into measurements instead of moot points.'
+  files:
+  - config/apple_fm.yaml
+  - config/serving_gate.yaml
+- id: D-2655
+  state: RATIFIED
+  category: GOVERNANCE / INTEGRITY
+  date: 2026-09-26
+  title: A derived value has NO home inside the append-only artifact it describes
+  measured: 'MEASURED 2026-09-26. config/decisions.yaml declares mutability append_only and its handoff receipt
+    is a PREFIX rule (the receipted bytes must be a byte-prefix of the current bytes), while it ALSO carried a derived
+    head (total_decisions, decisions_sha256_16, last_sync, written_by) and a derived summary block that move on
+    every mint. No position inside an append-only file is compatible with a prefix rule while a derived value lives
+    there: every mint rewrote bytes inside the receipted region, so verify_handoffs reported the registry as rewritten
+    and the writer had grown a mid-file splice to re-derive the derived fields in place (BUG-539). The symptom read
+    as a careless writer; the defect was a derived value living in the wrong home. MEASURED BEFORE the fix: 604309
+    bytes and 8863 lines carrying 142 bytes of derived head plus a 4426-byte summary block that no record could
+    ever be appended after. MEASURED AFTER: 599742 bytes, 8677 lines, 784 records and an UNMOVED content stamp 0d7a746350d62e14,
+    with the census re-derived to seven keys in its own home.'
+  decision: 'A derived value lives in exactly ONE home, and NEVER inside the append-only artifact it describes.
+    The census (total_decisions, summary, decisions_sha256_16, written_by) moved to config/decisions_summary.json,
+    declared derived_regenerable and a PURE FUNCTION of the registry bytes; config/decisions.yaml is RECORDS ONLY
+    and its records list extends to end of file. A mint is therefore a pure byte APPEND, and it is CHECKED as one
+    (the minted text must have the bytes already on disk as a prefix) rather than asserted, with the census carried
+    in the SAME invocation by the same writer. The derived keys ABSENCE from the registry IS the contract, and a
+    rail fails closed when one comes back (REGISTRY_DERIVED_KEYS + registry_shape_problems). The one-time re-baseline
+    of the decisions_registry receipt was recorded as a supersession in the append-only handoff journal, so the
+    rewrite is VISIBLE rather than laundered. Repairs are routed by KIND: the steady-state repair touches the census
+    only, and the one-shot strip that removed the head stays disabled behind an explicit flag so it cannot be re-run
+    as routine maintenance.'
+  files:
+  - config/decisions.yaml
+  - config/decisions_summary.json
+  - config/artifact_ownership.yaml
+  - config/derivations.yaml
+  - scripts/recompute_decision_summary.py
+  - tests/test_decision_summary_sync.py
+  bugs:
+  - BUG-539
+- id: D-2656
+  state: RATIFIED
+  category: GOVERNANCE / INTEGRITY
+  title: A suite no rail runs is a control that never fires - the suite becomes a RAIL with a declared, shrink-only
+    red ceiling
+  date: 2026-09-26
+  measured: 'measured 2026-09-26 at HEAD 96b1e9c: ''python3 -m pytest tests -q'' = 3 failed, 253 passed, 261 collected,
+    114s, and ''just health'' was GREEN at the same moment - so the suite''s red set was invisible to all 40 rails
+    (the BUG-470 class). All 3 failures are the depth/domain contract family, whose status is ''proposed'' (owner
+    gate). Also measured: MAXWELL_PIPELINE_ROOT=/tmp/... is NOT a suite sandbox (17 failed sandboxed vs 3 at the
+    real root) because config/ (pipeline/taxonomy_manager.py) and the books/DB paths resolve under PROJECT_ROOT
+    too; and tests/test_stage4_preflight_smoke_stress.py hand-built the PRODUCTION stage root and shutil.rmtree-d
+    a run dir inside the live tree (BUG-546).
+
+    '
+  decision: '''just health'' now runs scripts/check_tests.py - the SUITE as a RAIL. The declared red set lives in
+    config/test_isolation.yaml (suite_rail.known_red: 3 ids; min_collected: 261) and is a CEILING that may only
+    SHRINK: a NEW failure is FATAL (1), an unreadable summary or a collection-floor breach is FATAL, and a declared
+    red that now PASSES is OWNER-OWED (2) because a paid debt must not stay declared. D-390 is REVISED, not repealed:
+    health MEASURES the suite, health-deep demands it fully green via --strict. A suite sandbox is NOT an environment
+    redirect: a sandbox must COPY the code, never re-point PROJECT_ROOT - recorded here so the next engineer does
+    not re-derive it.
+
+    '
+  files:
+  - scripts/check_tests.py
+  - config/test_isolation.yaml
+  - tests/test_stage4_preflight_smoke_stress.py
+  - justfile
+  bugs:
+  - BUG-546

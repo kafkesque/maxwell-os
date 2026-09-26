@@ -561,3 +561,19 @@ acceptance, not a certainty level - nothing is fabricated into a gold column.
 
 Rule restated: a class that the gold never reaches is either misdefined or absent, and those two are told
 apart by writing the class definition as a claim someone can falsify, not by lowering the bar until it fires.
+
+## D-2649 — A declared fact has ONE declaration home; two homes that disagree are a defect (OPEN, minted 2026-09-26)
+
+MEASURED: an artifact's encoding could be declared in BOTH config/reconciliation.yaml and
+config/cohort_declaration.yaml. The reader joined them last-writer-wins, so a disagreement was resolved by whoever
+iterated last — silently. 0xD1 is an em dash in MacRoman and 'N-tilde' in cp1252, so a wrong pick does not crash: it
+changes the text two readers then compare (BUG-511).
+
+RULE: the join FAILS CLOSED and names the artifact, both values and both homes. A reader never picks a side —
+picking is the read-side twin of guessing, which D-2644 forbids. Two homes that AGREE are checked and tolerated.
+This is D-2646 (one rule, one home) applied to the DECLARATION rather than to the code that reads it.
+
+HOME + PROOF: scripts/lib/artifact_encoding.py (declared(), 8/8 known-answer controls, wired into `just health`).
+MINTED BY: scripts/recompute_decision_summary.py --mint — a validated, emitter-rendered insertion path (the
+record is dumped by the YAML emitter, parsed back in full, and written with the derived fields in ONE write).
+STATE OPEN because the owner has not ratified it; nothing about the mint is a claim of approval.

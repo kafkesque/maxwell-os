@@ -1,0 +1,115 @@
+# decisions_policy.yaml - the REVOCATION ontology (D-2645, completes D-2643/BUG-503).
+#
+# WHY. D-2643 made the abandoned D2205 migration unreachable to EXECUTE (recipes removed, script refuses with
+# exit 2). That is a TOMBSTONE, and a tombstone does not stop RE-PROPOSAL: a future agent can read the kept
+# archaeology, find the eight column names, and write a NEW migration with the same defect. A revoked scope
+# must therefore be a DECLARED FACT with a rail, not a comment.
+#
+# DIRECTION OF AUTHORITY. config/decisions.yaml owns WHAT is revoked (the revocation_* keys on the record);
+# this file owns the RULES (which states require the declaration, which states carry pinned legacy debt, what
+# counts as LIVE code). Code owns neither; no value here may be re-typed in scripts/ (C12/C12c/C20).
+#
+# WHY PREFIXED KEYS AND NOT A NESTED BLOCK (audit F2, MEASURED 2026-09-25). A revocation is declared with
+# revocation_scope / revocation_reason / revocation_evidence / revocation_date / revocation_tokens rather than
+# a nested mapping, because none of the 780 records carries a MAPPING-shaped value: the registry's shapes are
+# scalar and list-of-scalar (target_files 530, files 125, artifacts 13, related 11, bugs 4, decisions 3,
+# superseded_by 1). Adding a new shape to a governed registry is a risk no consumer audit can fully retire,
+# and a prefixed scalar key is also greppable without parsing YAML. The audit found no consumer that flattens
+# record values, so either shape would LOAD; the flat one is the one that cannot surprise the next consumer.
+#
+# WHY A SUB-FACT AND NOT A STATE. A revocation is a SUB-FACT: D2205's RAG roadmap is ACTIVE (retrieval P0/P1
+# and the CRAG evaluator are live code citing it as authority) while ONE of its migrations is abandoned.
+# Relabelling D2205 ABANDONED would be false and would turn every live authority citation into a false
+# positive. Only a WHOLE-record withdrawal uses the two whole_record_states.
+
+schema_version: '1'
+decided: D-2645
+
+revocation:
+  field_prefix: revocation_
+  # A revocation without a reason is a rumour; without evidence it cannot be falsified; without a scope it
+  # cannot be told apart from a whole-record withdrawal; without tokens the rail has no subject.
+  required_fields: [scope, reason, evidence, date, tokens]
+  whole_record_states: [REVOKED, ABANDONED]
+  # These states SHOULD carry a declaration. The records below predate the rule and are pinned BY IDENTITY,
+  # never by a count: a ceiling would let a NEW omission hide inside it. The list may only shrink - a listed id
+  # that now carries a declaration, or no longer exists, is a STALE declaration and fails the rail.
+  legacy_debt_states: [SUPERSEDED, ARCHIVED]
+  legacy_debt_ids:
+  - D2000
+  - D2001
+  - D2002
+  - D2034
+  - D2052
+  - D2070
+  - D2080
+  - D2085
+  - D2087
+  - D2091
+  - D2100
+  - D2195
+  - D2196
+  - D2204
+  - D2223
+  - D2224
+  - D2253
+  - D2293
+  - D2294
+  - D2296
+  - D2317
+  - D2318
+  - D2430
+  - D2582
+  legacy_debt_measured: >-
+    MEASURED 2026-09-25: 16 SUPERSEDED + 8 ARCHIVED = 24 records, 0 carrying a reason or evidence (4 carry a
+    date, 4 carry superseded_by). They are NOT backfilled: a reason reconstructed by a tool is not evidence, and
+    inventing one to make a rail green is the corruption this register exists to prevent. The debt is DECLARED
+    here, and the reference rail still protects what matters: every revocation minted from 2026-09-25 on must
+    carry its scope, reason, evidence, date and tokens or it is not a revocation.
+  reference_rail: scripts/check_revoked_references.py
+
+# What counts as LIVE code. governance/** and archive/** are deliberately NOT scanned: those files are the
+# archaeology, and a rail that forbids writing down what was abandoned would delete the only evidence that it
+# was abandoned (D-2643: keep the archaeology, close the path).
+#
+# EXEMPTIONS ARE DECLARATIONS, NOT CONVENIENCES (audit F4): every exempt path must EXIST and must carry an
+# exempt_reasons entry, or the rail fails closed. An exemption for an absent file is a permission pre-registered
+# for a file a future author has not written yet. The detector itself is NOT exempt (audit F1): its known-answer
+# controls use a RESERVED fixture token instead of the live subject, so the rail names no revoked token and
+# needs no exemption for itself.
+reference_rail:
+  # BUG-523 (MEASURED 2026-09-26): the rule below said "a RESERVED fixture token" but never declared WHAT
+  # the reserved SPACE is, so no machine could answer "is this name reserved?". A reservation that is not a
+  # declaration is a comment. MEASURED: the reserved range below is entirely ABSENT from
+  # config/decisions.yaml, so it is free; the two fixture ids were drawn from the LIVE space and were
+  # collision-free only by luck.
+  # D-2655 (2026-09-26): the sentence that used to stand here - "the next decision this project mints is
+  # D-2650" - was REMOVED rather than corrected. A claim about the NEXT id is a volatile value with no home
+  # and no rail: it is the same defect class as the derived head this sitting deleted from the append-only
+  # registry, and the mint it named (D-2654/D-2655) made it false within the same day. Only
+  # config/decisions.yaml can answer which ids exist.
+  reserved_fixture_ids:
+    range: [D-9000, D-9999]
+    why: >-
+      A known-answer control must use a name no production object can ever claim. Both fixture ids in this
+      rail were drawn from the LIVE decision space (D-2650, D-2651) and were collision-free only by luck:
+      they were unclaimed on the day they were written. The range is the reservation; the controls assert
+      that every fixture id lies inside it and that no id inside it exists in config/decisions.yaml.
+  scan_roots: [pipeline, scripts, tools]
+  scan_files: [justfile]
+  scan_globs: ['config/*.yaml']
+  exempt_paths:
+  - config/decisions.yaml
+  - config/decisions_policy.yaml
+  - pipeline/migrate_D2205_epistemic.py
+  exempt_reasons:
+    config/decisions.yaml: >-
+      the DECLARATION must be able to name the tokens it revokes: this file is the evidence for the revocation
+      and the rail reads its subject from it. Exempting it is what lets the scan be strict everywhere else.
+    config/decisions_policy.yaml: >-
+      the RULES file must be able to name the states it governs (REVOKED/ABANDONED) and the legacy debt it
+      pins. It declares no token of a revoked scope and it is the rail's own policy input.
+    pipeline/migrate_D2205_epistemic.py: >-
+      the TOMBSTONE must be able to name its own subject: it is the evidence for the revocation and it is
+      unreachable without the explicit owner opt-in flag (D-2643). Exempting it is what lets the scan be
+      strict everywhere else.

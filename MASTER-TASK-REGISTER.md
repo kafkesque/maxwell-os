@@ -334,3 +334,18 @@
 > **STILL OWED (mine, no gate):** the R5 bounded re-review of D-364 and D-359 (the first attempt returned NO VERDICT,
 > recorded in the buglog as owed); the D-359 scratch re-commit rehearsal; the abstention shadow run (the last
 > activation item); the extraction_type curve (`--config` argument for `scripts/r2_gate_measure.py`).
+
+---
+
+## 2026-09-26R - regulatory: the rails' own gate was the thing blocking the landing
+
+- **BUG-547 (HIGH, FIXED)**: rail 0 was saturated by its own archive - 30 of 36 owner-owed rows were conflict
+  copies already filed into the DECLARED archive, so the exit-2 commit gate had no dynamic range left to signal a
+  NEW divergence. Root cause: D-2647 taught the RESOLVER the fixed-point rule and never the RAIL (one rule, two
+  consumers). Fixed; controls 9 -> 10, two-sided.
+- **6 Dropbox siblings VAULTED**, nothing deleted, sha256 + manifest; 1 of them is a measured Dropbox REVERT of
+  pipeline state that the owner must re-derive.
+- **WIDENED `may_touch` by 5 named paths** so the record-keeping surface every session must write is inside the
+  contract, instead of being recorded as OWED session after session. Commit the plan FIRST.
+- **OWED**: the three-commit landing; the `DECISION-LOG.md` narratives D-2650..D-2656; the owner's ruling on the
+  depth/domain contract (3 red tests are a PAID red on an owner gate, not a defect).

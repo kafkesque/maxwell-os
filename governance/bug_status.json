@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 307,
-  "open_n": 132,
-  "closed_n": 175,
+  "total_ids": 312,
+  "open_n": 136,
+  "closed_n": 176,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -667,6 +667,26 @@
       "id": "BUG-569",
       "title": "(OPEN, LOW): the adoption NOTE has no RAIL-LEVEL control at a real partial commit",
       "events": 1
+    },
+    {
+      "id": "BUG-570",
+      "title": "(OPEN, LOW): the duplicate BUG-493 CLOSED block is NOT byte-identical (the earlier claim was FALSE)",
+      "events": 2
+    },
+    {
+      "id": "BUG-571",
+      "title": "(OPEN, LOW): the register is fed by HEADINGS only, so an id written INLINE is real to every human and absent from every machine home (BUG-49",
+      "events": 1
+    },
+    {
+      "id": "BUG-572",
+      "title": "(OPEN, LOW): a status word in a heading's TITLE decides a bug's status when the parenthetical slot names none (measured, with the flip list)",
+      "events": 1
+    },
+    {
+      "id": "BUG-573",
+      "title": "(OPEN, MED): a RED earlier in the ladder SHORT-CIRCUITS it, so every LATER fault is invisible (measured: the stale dormancy of scripts/check",
+      "events": 1
     }
   ],
   "closed": [
@@ -795,6 +815,7 @@
     "BUG-489",
     "BUG-490",
     "BUG-491",
+    "BUG-493",
     "BUG-497",
     "BUG-499",
     "BUG-501",
@@ -844,6 +865,6 @@
     "BUG-565",
     "BUG-566",
     "BUG-567",
-    "BUG-570"
+    "BUG-574"
   ]
 }

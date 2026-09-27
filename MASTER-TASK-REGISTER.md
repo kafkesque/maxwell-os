@@ -508,3 +508,26 @@ declared tolerance in `config/repo_integrity.yaml#git_subject` + two controls; (
 `_staged_paths`, git_subject's differential control); (3) **BUG-431's CONTENT promotion** - OWNER GATE; (4) mints
 D-2671/D-2672; (5) BUG-560 -> BUG-563 -> BUG-564 remainder.
 RISK NOTE (now retired): before fe239df a worktree clean destroyed BOTH copies of a write-locked owner instrument.
+
+## 2026-09-27 - D-2667..D-2674 MINTED; the mint refused a TRUE citation (BUG-571); ONE word received (RATIFY)
+
+- [x] DONE: the registry lag is repaired - D-2667, D-2668, D-2669, D-2670, D-2671, D-2672, D-2673, D-2674 minted in
+      ascending order (797 -> 805 records, stamp ec8f32ea8a61c80d, census carried in the same invocation). `just health`
+      rc=0; it had been RED at reconcile's D-405 join ('citations that do not resolve: config/repo_integrity.yaml:decided=D-2673
+      / D-2674').
+- [x] DONE (owner gate): RATIFY received -> D-2674 puts the repo-integrity git-subject guard set IN FORCE (it carried
+      decided: PENDING-OWNER) and names rails 3/4/5 as consumers of ONE home, with RAIL 0 exempt so the recovery rail still
+      runs on a broken repository (BUG-568 filed, not papered over).
+- [x] DONE: BUG-493 is now VISIBLE to the register (an appended heading; it had existed only as inline prose, so the mint
+      gate REFUSED D-2671's true citation). Class filed as BUG-571.
+- [x] DONE: BUG-570's status is truthful again (REOPENED event) after measuring that the parser lets a status word in a
+      heading's TITLE decide the status: tightening the rule flips 10 of 397 events, 2 corrections and 8 regressions ->
+      REFUSED on measurement, filed as BUG-572.
+- [ ] NEXT (mine): BUG-560 - route scripts/apply_workbook_rulings.py through scripts/lib/write_guard.py (owned_keys = the
+      ruled columns) with a control REFUSING an out-of-scope column.
+- [ ] NEXT (mine): BUG-571 - the cited-by-decision join in scripts/bug_status.py (owner-owed, not silent).
+- [ ] NEXT (mine): BUG-568 - a git-subject pin for RAIL 0 DERIVED from the same home, tolerant of an already-broken repo.
+- [ ] OWNER GATE (unchanged): BUG-431 CONTENT promotion (merge the 150/150 pass into the tracked sheet, retire
+      config/anchor4_interim_state.json).
+- [ ] OWED (housekeeping): the two foreign-body backups are KEPT by owner word; hooks ACTIVE; `just health-deep` stays
+      honestly RED until the owner rules on the depth/domain contract.

@@ -1084,3 +1084,21 @@ permanent, and it did not consult the pin. `just health` was NOT run between 12:
   `provenance: anchor4_depth_sheet_owner_dropin -> head`; BUG-493 CLOSED. **BUG-431's CONTENT promotion (the
   owner's 150/150 pass INTO the tracked sheet + retiring config/anchor4_interim_state.json) is STILL an OWNER
   GATE - the PROMOTE wrote no sheet.**
+
+### D-2667 - D-2674 (2026-09-27) - the registry lag is minted; the mint REFUSED a true citation (BUG-571)
+
+- **HEAD**: 645aeae (D-2673, the write-boundary adoption). The registry now carries D-2667..D-2674 (805 records, stamp
+  ec8f32ea8a61c80d) and `just health` is rc=0; the RED it repaired was reconcile's D-405 join naming the two citations in
+  `config/repo_integrity.yaml` (decided: D-2673, D-2674) that resolved against nothing.
+- **D-2674 (OWNER WORD: RATIFY)**: the repo-integrity `git_subject` guard set is IN FORCE with a minted id (it had carried
+  `decided: PENDING-OWNER`) and its consumer list is a DECLARED CLAIM joined by D-405 - rails 3/4/5 read ONE home
+  (`scripts/lib/git_subject.py`); RAIL 0 is deliberately EXEMPT (BUG-568) because it must run when git metadata is broken.
+- **D-2673**: git's OWN temporary index is ADOPTED, READ and NAMED at the write boundary (3 conditions, else REFUSED, C16);
+  BUG-566/BUG-567 fixed; BUG-568/BUG-569 filed. **D-2672**: a git name-list read is NUL-separated in ONE home (BUG-565).
+- **THE FINDING**: D-2671's true citation of BUG-493 was REFUSED by the mint gate - the id existed in buglog.md ONLY as
+  inline prose, never as a heading, so the register could not see it. Repaired by an appended heading; class filed as BUG-571.
+- **ALSO MEASURED**: a status word in a heading's TITLE decides a bug's status when the paren slot names none (BUG-570 read
+  CLOSED while live). The blanket tightening flips 10 of 397 events - 2 corrections, 8 regressions - so it is REFUSED on
+  measurement and filed as BUG-572.
+- **NEXT**: BUG-560 (write_guard for apply_workbook_rulings.py), BUG-571 (the cited-by-decision join), BUG-568 (a derived
+  rail-0 pin), the BUG-431 CONTENT promotion (OWNER GATE).

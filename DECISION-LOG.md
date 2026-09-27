@@ -807,3 +807,75 @@ one object); revision locators still re-derive (rev 1, rev 2, f2778a48); hash_cl
 integrity unchanged; 'just health' rc=0.
 
 NOT a delegate claim (R5): OMLX is unreachable and no reachable local model is a verifier, so no signature is claimed.
+
+## D-2672 (2026-09-26) - a git NAME-LIST read is not a name SPLIT: the staged set is NUL-separated in ONE home (BUG-565 fixed, BUG-566 filed)
+
+CONTEXT. MEASURED: rail 4 read the staged names with `--name-only` and split on NEWLINES. A path containing a newline
+then leaves the audited set SILENTLY - a red gate turning green - and the same read was duplicated wherever a rail
+needed names, so one fact had as many homes as there were readers.
+DECISION. ONE home - scripts/lib/git_subject.py#run_git_paths - reads `--name-only -z` and splits on NUL, refusing on a
+non-zero rc rather than returning a partial set. Three known-answer controls over a REAL synthetic index are SEEN red on
+the pre-fix code (a rule never seen to refuse is not a rule, BUG-492), and rail 4's --selftest is wired into `just health`
+instead of being a hand-run. The same session FILED BUG-566 rather than papering over it: rail 4 REFUSED git's own
+`next-index-*.lock` at a PARTIAL commit while rail 5 TOLERATED and NAMED it - one fact, two homes - so no partial commit
+could pass rail 4 until a DECLARED tolerance existed (D-2673).
+MEASURED AFTER (8a84622): pre-fix controls red (3); rail 4 selftest 23/23; the refusal reproduced at a real partial commit.
+NOT a delegate claim (R5): no reachable local model is a verifier, so no signature is claimed.
+
+## D-2673 (2026-09-27) - ADOPT, never tolerate: git's own temporary index is READ as the subject at the write boundary (BUG-566 and BUG-567 FIXED)
+
+CONTEXT. TWO RAILS, ONE FACT. At a partial commit (`git commit -- <path>`) git mints its own temporary index and hands it
+to the pre-commit hook through GIT_INDEX_FILE. MEASURED on git 2.39.5 (Apple Git-154), separate-git-dir layout: the file
+EXISTS at hook time, git removes it on exit, and a normal commit hands `<gitdir>/index` instead. Rail 4 REFUSED the minted
+name (no partial commit could pass) and rail 5 TOLERATED and NAMED it - and rail 5's note was FALSE (BUG-567): its child
+environment DROPPED GIT_INDEX_FILE, so it audited `<gitdir>/index` while NAMING the temp index. That is the BUG-527 class at
+the write boundary, wrong in BOTH directions - over-refusal on a superset, and under-refusal when the declaration lives only
+in the commit set.
+DECISION. ADOPT, never merely tolerate. An ambient index is READ as the subject only when ALL THREE hold: (1) its realpath
+is a file DIRECTLY inside the PINNED git dir, (2) its basename matches a DECLARED owner_name_globs entry, (3) it EXISTS.
+Anything else ambient is REFUSED (C16). Tolerance was rejected because a rail that NAMES an index it did not read reports
+on the wrong bytes; (3) is not decoration because git reads a MISSING index as EMPTY, so an absent file would report 'all
+declared' over no bytes at all - the silent wrong-subject audit. ONE home (scripts/lib/git_subject.py#index_subject) serves
+rails 3, 4 and 5; an explicit --index-file still wins as a declared diagnostic home; the declaration is
+config/repo_integrity.yaml#git_subject.index_tolerance, and its globs are joined to the name git ACTUALLY mints (D-405).
+MEASURED AFTER (645aeae). module selftest 13/13 including the D-405 join to a live minted name; rails 16/16, 23/23, 11/11;
+refusals seen in both directions (foreign git dir, `..` escape, a name git never mints, a non-existent minted name; the
+repo's OWN index name is NOT adopted). The landing commit WAS a partial commit: the hook handed all three rails
+`next-index-48081.lock`, each printed the ADOPTED note, read the commit set and returned 0 (8 files, 351 insertions).
+NOT a delegate claim (R5): no reachable local model is a verifier, so no signature is claimed.
+
+## D-2674 (2026-09-27) - the owner's RATIFY puts the repo-integrity git-subject guard set IN FORCE, and names its consumers as a CLAIM (BUG-527, BUG-568)
+
+CONTEXT. `config/repo_integrity.yaml#git_subject` carried `decided: PENDING-OWNER` because the guard set landed as the
+BUG-527 fix and claimed no decision id - a guard set IN FORCE with no declared authority, which is the defect one level up
+from the one it fixes.
+DECISION. OWNER WORD: RATIFY (approving the audit recommendation, including KEEP for the two foreign-body backups and the
+hooks ACTIVE). The marker resolves to this MINTED id; the guard set itself is unchanged. The block also names its consumers
+as a CLAIM joined by D-405: rails 3, 4 and 5 read the ONE home (scripts/lib/git_subject.py). DELIBERATELY EXEMPT: RAIL 0
+(scripts/check_repo_integrity.py), which must still run when git metadata is BROKEN - pinning it would make the recovery rail
+fail closed on the very condition it reports. Its ambient subject is FILED as BUG-568, not papered over.
+MEASURED AFTER: config parses; the module selftest joins the declared globs to a name git mints live; the citation resolves
+against this record, which is the same D-405 join that made the registry lag VISIBLE instead of remembered.
+
+## REGISTRY SYNC (2026-09-27) - the lag D-2667..D-2674 is minted; the mint REFUSED a true citation until the register could see BUG-493 (BUG-571, BUG-572)
+
+WHAT WAS OWED. config/decisions.yaml lagged at D-2666 while six decisions were authored in this log, so two citations in
+config/repo_integrity.yaml (decided: D-2673, D-2674) resolved against NOTHING and `just health` was RED at the D-405 join
+(reconcile: 'citations that do not resolve'). The lag was MEASURED, not remembered: the registry is records-only (D-2655)
+and the mint gate requires the NEXT FREE id, so the lag is repaired only by minting in ascending order.
+WHAT THE MINT FOUND (the reason this is a decision and not a chore). D-2671 cited BUG-493 - the bug its own PROMOTE
+clears - and the gate REFUSED it: 'cites bug(s) that are NOT in the register: BUG-493'. MEASURED CAUSE: that id was written
+in governance/buglog.md ONLY as inline bold prose, never as a heading, so the register's parser could not see it and the id
+was absent from every machine home (C15 count, handoffs, the mint join). A TRUE citation was refused because a real, CLOSED
+bug was invisible. REPAIR: an appended `## BUG-493` status EVENT (an append, never a rewrite) plus BUG-571 for the class -
+the register is fed by HEADINGS only, and the honest control is the cited-by-decision join, not a scan of prose.
+ALSO MEASURED, AND FIXED AT THE ID ONLY: BUG-570 was filed OPEN and the register read it CLOSED, because the slot reader
+falls back to the WHOLE header when the parenthetical names no status word, and that title carried a status word belonging
+to ANOTHER bug ('the duplicate BUG-493 CLOSED block'). Tightening the rule to 'the status region is the header up to the
+first colon' flips 10 of 397 heading events - 2 corrections and 8 REGRESSIONS (BUG-347, BUG-388 and others whose status sits
+after the colon by design) - so the blanket rule was REFUSED ON MEASUREMENT and filed as BUG-572 with a REOPENED event
+landed for this id so the register states the truth while the rule is argued.
+MEASURED AFTER. Mints: D-2667..D-2674 in ascending order, each rc=0 (797 -> 805 records, stamp ec8f32ea8a61c80d, census
+written in the same invocation). Register: 310 ids, OPEN 135 / CLOSED 175, BUG-493 CLOSED. `just health` rc=0. No other home
+quotes the registry's count or stamp (checked before minting), so no second declaration drifted.
+NOT a delegate claim (R5): no reachable local model is a verifier, so no signature is claimed.

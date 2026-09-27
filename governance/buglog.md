@@ -7210,3 +7210,51 @@ MEASURED 2026-09-27 while attempting the declared de-duplication: governance/bug
 the text from the other to EOF. The dedupe therefore REFUSED (fail closed) and the file is untouched. Either
 the two blocks genuinely differ (then the duplicate is BLOAT, not a copy) or something follows the last one.
 The earlier session's "byte-identical" claim is RETRACTED here as unverified.
+
+## BUG-493 (CLOSED, MED): REGISTER VISIBILITY REPAIR - the id lived only in prose, so the register that a MINT joins to could not see it (2026-09-27)
+
+MEASURED. `grep -c '^## BUG-' governance/buglog.md` = 341 heading EVENTS -> 307 ids in governance/bug_status.json, and BUG-493 was NOT one of them: the id appears only inside bold prose (line 4966 `**BUG-493 (NEW).**` and three `**BUG-493 STATUS (...)**` lines). The parser anchors on `^#{2,3}` + `BUG-<n>`, so the id was invisible to the machine register - and therefore to the C15 count, to every handoff, and to the MINT GATE, which joins a decision's `bugs:` list to this register (D-2660 clause 2).
+MEASURED CONSEQUENCE (2026-09-27, this session): minting D-2671 - the PROMOTE (fe239df) that CLEARS this bug - was REFUSED: 'cites bug(s) that are NOT in the register: BUG-493'. A TRUE citation refused because the register could not see a real, closed bug; the alternative (minting without it) would have been a decision that closes a bug it does not name.
+REPAIR (an append, never a rewrite): this heading. It is a status EVENT in the shape the parser reads; the inline prose is untouched and the id now resolves for every join. The bug IS closed and has been since fe239df (rev 3, 526991cb, 203963 B, is the tracked revision of its own path - D-2671).
+FORWARD CONTROL, named as forward-only: a decision that cites an unregistered bug is REFUSED at the mint (seen to fire tonight). NOT covered: an id that lives only in prose and no decision cites - filed as BUG-571.
+
+## BUG-571 (OPEN, LOW): the register is fed by HEADINGS only, so an id written INLINE is real to every human and absent from every machine home (BUG-493 measured)
+
+CONTEXT. The repair above is INSTANCE-level; the class is that governance/buglog.md is the register's INPUT and its parser reads exactly one shape. An author who writes a status in bold prose, a table cell or a checklist item creates a bug no rail can see.
+MEASURED (2026-09-27): 341 heading events -> 307 ids; BUG-493 is the one id cited by a DECISION (D-2671) and by handoffs that the register did not carry, and the mint gate saw it exactly once - as a refusal.
+WHY NOT A PROSE SCAN. A regex over every `BUG-<n>` token would invent ids from archaeology, quoted decisions and this very block (it names three). A control that reads PROSE reports on the prose.
+REMEDY (owed): add the cited-by-decision join to scripts/bug_status.py - the register's own generator and declared writer - so the NEXT instance is an owner-owed RED LINE rather than a refusal discovered by hand at a mint (D-405: join both directions).
+
+## BUG-572 (OPEN, LOW): a status word in a heading's TITLE decides a bug's status when the parenthetical slot names none (measured, with the flip list)
+
+MEASURED. BUG-570 was filed OPEN and the register reads it CLOSED. Cause: when no candidate names a status word, the slot reader falls back to the WHOLE header, and this id's title carried a status word belonging to ANOTHER bug ('the duplicate BUG-493 CLOSED block is NOT byte-identical'). Same shape: BUG-562's last event folds to closed from 'the INCIDENT is closed by construction; the RAIL is still OWED'.
+MEASURED CORPUS DELTA (2026-09-27): tightening the rule to 'the status region is the header up to the first colon' flips 10 of 397 heading events, and the flips are MIXED - it corrects this id and BUG-562, and WRONGLY flips BUG-347 and BUG-388 (whose status sits after the colon by design). 2 corrections, 8 regressions: the blanket rule is REFUSED on measurement.
+REMEDY (owed): decide the slot question per SHAPE - a parenthetical slot that names no status word should not license a title read - with the 10-flip list pinned as known-answer controls, both directions.
+REMEDY LANDED FOR THIS ID ONLY: an appended REOPENED event, so the register states the truth while the rule is argued.
+
+## BUG-570 (LOW, REOPENED - the register read this id as CLOSED, see BUG-572): the duplicate BUG-493 block is NOT byte-identical (the earlier claim was FALSE)
+
+RE-STATED because the first heading's title carried a status word from another bug's record and the register folded this id to CLOSED. The finding is unchanged and the file is untouched: the dedupe of the two BUG-493 status blocks REFUSED (fail closed) because the last two occurrences are not byte-identical to EOF - the earlier session's 'byte-identical' claim is RETRACTED as unverified.
+
+## BUG-573 (OPEN, MED): a RED earlier in the ladder SHORT-CIRCUITS it, so every LATER fault is invisible (measured: the stale dormancy of scripts/check_session_plan.py)
+
+MEASURED 2026-09-27. `just health` stood RED at line 61 (reconcile's D-405 join, two unresolved citations) for a whole
+session. Repairing that red let the recipe CONTINUE, and the rail registry immediately fired a fault it had NEVER reported:
+'scripts/check_session_plan.py is declared dormant and IS invoked by the ladder' - a STALE dormancy left behind by D-2672
+when rail 4's --selftest was wired into the ladder. The fix did not create the fault; it UNHID it. The same prefix hid
+whatever else stands after line 61.
+WHY IT MATTERS. A recipe that aborts on the first failing line reports a PREFIX while it is read as a VERDICT: 'just health'
+said one thing was wrong while a second, independent fault stood behind it. That is the rail-registry's own class (i) - a
+rail nothing runs - in the mirror: a rail that runs and is never REACHED.
+REMEDY (owed): the ladder collects every fault before it exits, or the aborting rails are declared as KNOWN ABORTS with the
+count, so the prefix is visible rather than implied. Filed, not papered over.
+
+## BUG-574 (FIXED, HIGH): the adoption rule REFUSED the repository OWN index at a NORMAL commit, blocking every commit while all 13 synthetic controls stayed green (2026-09-27)
+
+MEASURED at the real write boundary: a NORMAL commit hands the pre-commit hook GIT_INDEX_FILE=<gitdir>/index, while a partial commit (git commit -- path) hands <gitdir>/next-index-<pid>.lock. adopt_index() applied the DECLARED minted-name globs FIRST, so the repository own index - which IS the pinned subject - was refused as if it were a foreign body. EVERY commit in this repository was blocked, and no rail could report it, because every control built a SYNTHETIC git dir and never exercised the value git actually passes.
+
+RULE ORDER FIXED (scripts/lib/git_subject.py#adopt_index): (a) a value whose realpath IS the pinned subject is ACCEPTED as the subject and named; (b) otherwise the three declared adoption conditions apply (directly inside the pinned git dir AND matching a declared owner_name_globs entry AND exists); (c) otherwise REFUSE (C16). The declared globs decide only what is NOT already the subject.
+
+CONTROL ADDED (14th known-answer control): the repository OWN index passed as GIT_INDEX_FILE is ACCEPTED as the pinned subject, NOT refused by the minted-name globs. Measured RED under the mutation that removes the rule, GREEN with it.
+
+CLASS (the mirror of BUG-492): a control that has never been seen to FAIL is not a control. 13/13 green while 100 percent of commits were refused - the write boundary was never part of the test.

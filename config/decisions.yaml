@@ -9079,3 +9079,208 @@ decisions:
     the ruler converts "which invariant has no owner" into a query, and restoring the bytes converts 38 findings
     into zero - which is what a gating ruler is FOR. It also unblocks the 7,000+ object depth/domain program, which
     would otherwise have re-derived labels against a document nobody had ruled on.
+- id: D-2667
+  state: ACTIVE
+  category: GOVERNANCE / SESSION PLAN
+  date: '2026-09-26'
+  title: the plan revision that made the tree committable again, and the PAIRING rule the pre-commit audit found
+    (BUG-562)
+  decision: 'governance/session_plan_20260924.yaml had an apostrophe landing literally inside a single-quoted scalar,
+    so the file no longer parsed and rail 4 could not read its own allow-list; the repair was NOT a patch of the
+    broken scalar - the TRACKED file was restored from git HEAD and both entries were REWRITTEN escape-free. Entries
+    21/22 record the two owner-gold grants BY NAME, never by a glob: a wildcard over the owner gold makes the instrument
+    editable by default, the BUG-548 shape in the GRANTING direction. The audit added the PAIRING rule (BUG-562):
+    a changed declaration and its declared consumer land TOGETHER - config/serving_gate.yaml was GRANTED while pipeline/serving_gate.py,
+    which reads it, was will_not_touch, so a commit declaring that gate would have manufactured its own mismatch.'
+  measured: just health rc=0; verify_handoffs rc=0 (6 paths / 13 digests / 3 revisions agree with their bytes);
+    rail 4 live-plan self-consistency rc=0 with widening_faults [] and no may_touch entry resolving into a will_not_touch
+    family; suite 261 collected / 256 passed / 0 failed / 0 declared red.
+  files:
+  - governance/session_plan_20260924.yaml
+  - config/serving_gate.yaml
+  - pipeline/serving_gate.py
+  bugs:
+  - BUG-562
+- id: D-2668
+  state: ACTIVE
+  category: GOVERNANCE / SESSION PLAN
+  date: '2026-09-26'
+  title: the owner's CROSS is a PERMIT with a SUBJECT, an ACK and a SPEND; and HEAD now names the tree the rails
+    actually measured (BUG-562 closed by construction)
+  decision: 'Before this decision crossing: true was a RECORD nothing consumed: the plan READ as if the boundary
+    had an owner ack while every pipeline/** path still returned rc=2 owner-owed and the hook refused. An owner-acked
+    crossing is now a PERMIT for the paths it NAMES (crossed:), only with a NAMED ACK (acked_by + acked_on), and
+    only until it is SPENT (spent_by, the commit that used it); a crossed: path outside every will_not_touch family
+    is REFUSED, or crossed: would be standing permission nobody granted. A may_touch widening was REJECTED for the
+    same reason: standing permission over production code cannot be closed later. Entry 23 named 8 pipeline/** paths,
+    was acked by the owner, and is SPENT by e3f94f4, which landed the plan''s grants WITH the 8 crossed paths -
+    including the serving-gate pair and its test - so the BUG-562 mismatch is closed by construction. BUG-561 was
+    CORRECTED: a diff against HEAD is not a clobber test; test the DECLARED revision.'
+  measured: 62 paths landed in e3f94f4; HEAD = 11c0fe4 names the measured tree; rail 4 rc=0; hook dry-run rc=0 with
+    four rails; verify_handoffs rc=0.
+  files:
+  - scripts/check_session_plan.py
+  - governance/session_plan_20260924.yaml
+  bugs:
+  - BUG-562
+  - BUG-561
+- id: D-2669
+  state: ACTIVE
+  category: GOVERNANCE / RAILS
+  date: '2026-09-26'
+  title: 'the CONSUMER JOIN: a declaration and the code that reads it are ONE object, at the WRITE moment and at
+    the STATE moment (BUG-562, BUG-564)'
+  decision: 'ONE home (config/declaration_consumers.yaml) plus ONE rail (scripts/check_declaration_consumers.py),
+    measured at TWO moments (the rail-3 precedent): the WRITE moment in the pre-commit hook (RAIL 5) and STATE mode
+    in the ladder. A staged declaration whose declared consumer is in NEITHER HEAD NOR the index is a WITHDRAWN
+    CONSUMER -> rc=1 and the commit is refused; worktree existence is deliberately NOT enough, because the BUG-562
+    state was a consumer that EXISTED and was UNTRACKED. An entry with no consumer must carry exempt_reason, and
+    there is no ''lands later'' escape. A filename census over config/*.yaml was MEASURED then REJECTED: config/anchor4_depth_annex.yaml
+    is read through a KEY, not a path. A may_touch permit was rejected for the same reason as D-2668: a rail that
+    refuses the SPLIT is a property and can be closed. SECOND CLAIM (BUG-564): config/rail_registry.yaml#commit_boundary
+    declares the hook''s REQUIRED TEXT and check_rail_registry.py verifies it against the bytes, because a dormancy
+    claim could say WHICH file exercises a rail but not that the file still DOES.'
+  measured: consumers 11/11 controls, write moment rc=0 and state rc=0 on the live tree; rail registry 9/9 + live
+    rc=0 (80 ladder invocations, 56 rails invoked, 41 on disk); hook dry-run rc=0 with all four commit rails; just
+    health rc=0; check_repo_integrity rc=0. A hand-edit of the hook was REFUSED by the ladder until the line was
+    declared in its tracked source scripts/install_git_hooks.sh.
+  files:
+  - config/declaration_consumers.yaml
+  - scripts/check_declaration_consumers.py
+  - config/rail_registry.yaml
+  - scripts/check_rail_registry.py
+  - scripts/install_git_hooks.sh
+  bugs:
+  - BUG-562
+  - BUG-564
+- id: D-2670
+  state: ACTIVE
+  category: GOVERNANCE / RECEIPTS
+  date: '2026-09-26'
+  title: 'the RECEIPT PROVENANCE JOIN: a receipt must be joined to a store that RE-DERIVES its bytes, and a same-length
+    live copy is not a join (BUG-559, BUG-558)'
+  decision: 'A receipt is a claim about BYTES and nothing in it said the bytes are a REVISION of this repo or a
+    declared derivation from one; MEASURED in BUG-558, the workbook held bytes present in NO revision of that path
+    while the rail printed unchanged because the receipt had been cut OVER them. Now every receipted (path, digest)
+    must be re-derivable from a declared store: head (this path at git HEAD), prefix (a RETAINED PREFIX of an append_only
+    path, the BUG-540 rule), revision (a declared locator), or declared (an escape named WITH its reason in config/handoffs.yaml#receipt_provenance,
+    joined in BOTH directions with a SHRINK-ONLY max_unrevisioned). Anything else is UNREVISIONED and reported owner-owed
+    with its remedy. head-only was REFUSED on measurement, not on taste: implemented literally it would refuse a
+    receipt cut YESTERDAY over a file COMMITTED SINCE, which is the BUG-492 failure. A same-length live copy is
+    NOT a join - the receipt and the artifact would be one copy and the claim becomes circular, exactly the shape
+    that blessed the foreign body. It is a CHECK CLASS on the rail that already owns receipts, never a second rail
+    (D-2646).'
+  measured: selftest rc=0 (7 provenance cases + the escape join, both directions); live rc=2 with exactly ONE finding
+    - the owner drop-in 526991cb (203963 B), re-derivable from no store while HEAD carried the superseded rev 2.
+    That single owner-owed line is cleared by D-2671. Stale-escape control rc=1; census-raise control rc=1.
+  files:
+  - scripts/verify_handoffs.py
+  - config/handoffs.yaml
+  - config/declaration_consumers.yaml
+  bugs:
+  - BUG-559
+  - BUG-558
+- id: D-2671
+  state: ACTIVE
+  category: OWNER GATE / PROVENANCE
+  date: '2026-09-26'
+  title: 'the PROMOTE: an owner''s one word lands a write-locked REVISION through a SPENT crossing permit (BUG-493
+    cleared, BUG-559''s live line cleared)'
+  decision: 'OWNER WORD: ''Promote''. rev 3 (526991cb, 203963 B) of the write-locked owner drop-in is landed as
+    the TRACKED revision of its own path, by the SAME mechanism the owner''s earlier CROSS used (D-2668): a widening_log
+    entry with crossing: true naming ONE subject, acked_by owner + acked_on, and spent_by naming the commit that
+    used it (fe239df). Never a may_touch widening: rail 4 matches BY FAMILY (BUG-528), so the path is forbidden
+    by default and a standing entry would be standing permission over an owner instrument. WHY NO revision_locator
+    for rev 3: a locator exists to make SUPERSEDED bytes resolvable, and once rev 3 is HEAD it is re-derived by
+    the HEAD join - a locator naming the same bytes would be a SECOND home for one fact (D-2646) that goes stale
+    on the next rewrite. WHY NO NEW RECEIPT: the journal already holds 13 records for this path, every one the same
+    bytes; the PROMOTE changed WHICH store re-derives them, not the bytes. The label fixes ride with it (config/handoffs.yaml,
+    config/human_instrument_locks.yaml) and the third, unconsumed home is reduced to a POINTER rather than a copy
+    of the digest.'
+  measured: 'staged bytes == 526991cb (i/crlf, w/crlf, no filter); verify_handoffs flipped from rc=2 owner-owed
+    on ONE object to ''provenance: anchor4_depth_sheet_owner_dropin -> head'', rc=0; hash_claims 13/13 and cross_declaration
+    11/11 unchanged; check_human_instruments byte-identical; just health rc=0. NOT BUG-431''s content promotion:
+    no sheet was written and config/anchor4_interim_state.json still stands.'
+  files:
+  - config/human_instrument_locks.yaml
+  - config/handoffs.yaml
+  - config/anchor4_depth_annex.yaml
+  - governance/session_plan_20260924.yaml
+  - governance/Copy of ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv
+  bugs:
+  - BUG-493
+  - BUG-559
+- id: D-2672
+  state: ACTIVE
+  category: GOVERNANCE / RAILS
+  date: '2026-09-26'
+  title: 'a git NAME-LIST read is not a name SPLIT: the staged set is NUL-separated in ONE home (BUG-565 fixed;
+    BUG-566 filed at the write boundary)'
+  decision: '8a84622. The staged name list is read --name-only -z and split on NUL, in ONE home: scripts/lib/git_subject.py#run_git_paths.
+    A newline split mis-reads a path containing a newline, and such a path SILENTLY leaves the audited set - which
+    turns a red gate green. Three known-answer controls over a REAL synthetic index are SEEN red on the pre-fix
+    code, so the rule was observed to refuse before it was trusted (BUG-492), and rail 4''s --selftest is wired
+    into the ladder rather than left to a hand-run. The same session FILED BUG-566: rail 4 REFUSED git''s own next-index-*.lock
+    at a PARTIAL commit while rail 5 TOLERATED and NAMED it - ONE fact with TWO homes, so no partial commit could
+    pass rail 4 until a DECLARED tolerance landed. It is filed rather than papered over because the remedy is a
+    decision (D-2673), not a patch.'
+  measured: three pre-fix controls SEEN red; rail 4 selftest 23/23 with the --selftest wired into just health; the
+    refusal was reproduced at a real partial commit before the tolerance existed.
+  files:
+  - scripts/lib/git_subject.py
+  - justfile
+  bugs:
+  - BUG-565
+  - BUG-566
+- id: D-2673
+  state: ACTIVE
+  category: GOVERNANCE / RAILS (WRITE BOUNDARY)
+  date: '2026-09-27'
+  title: 'ADOPT, never tolerate: git''s own temporary index is READ as the subject at the write boundary (BUG-566
+    and BUG-567 fixed)'
+  decision: 'An ambient GIT_INDEX_FILE is READ as the subject only when ALL THREE hold: (1) its realpath is a file
+    DIRECTLY inside the PINNED git dir, (2) its basename matches a DECLARED owner_name_globs entry, (3) it EXISTS.
+    Anything else ambient is REFUSED (C16). Mere tolerance was refused as a remedy: rail 5''s note NAMED git''s
+    temporary index while its child environment had DROPPED GIT_INDEX_FILE, so it audited <gitdir>/index and reported
+    on the temp one - the BUG-527 class at the write boundary, wrong in BOTH directions (over-refusal on a superset,
+    and under-refusal when the declaration lives only in the commit set). Condition (3) is not decoration: git reads
+    a MISSING index as EMPTY, so an absent file would report ''all declared'' over no bytes - the silent wrong-subject
+    audit. ONE home (scripts/lib/git_subject.py#index_subject) serves rails 3, 4 and 5; an explicit --index-file
+    still wins as a declared diagnostic home; the declaration itself lives in config/repo_integrity.yaml#git_subject.index_tolerance,
+    and the globs are joined to the name git ACTUALLY mints. The refusal is seen in both directions: a minted name
+    in a foreign git dir, a .. escape, a name git never mints, and a non-existent minted name are each refused.'
+  measured: module selftest 13/13 including the D-405 join to a live minted name (next-index-48081.lock read at
+    the commit's own hook), rails 16/16, 23/23 and 11/11; the landing commit 645aeae WAS a partial commit and all
+    three rails printed the ADOPTED note and read the commit set, rc=0 (8 files, 351 insertions, 57 deletions).
+  files:
+  - scripts/lib/git_subject.py
+  - config/repo_integrity.yaml
+  - scripts/verify_recalibration_pins.py
+  - scripts/check_session_plan.py
+  - scripts/check_declaration_consumers.py
+  bugs:
+  - BUG-566
+  - BUG-567
+- id: D-2674
+  state: RATIFIED
+  category: OWNER GATE / GOVERNANCE
+  date: '2026-09-27'
+  title: the owner's RATIFY puts the repo-integrity git-subject guard set IN FORCE and names its consumers as a
+    D-405 CLAIM (rail 0 exempt - BUG-568)
+  decision: 'OWNER WORD: RATIFY (approving the audit recommendation, including KEEP for the two foreign-body backups
+    and hooks ACTIVE). config/repo_integrity.yaml#git_subject carried decided: PENDING-OWNER because the guard set
+    landed as the BUG-527 fix and claimed no decision id; the RATIFY resolves that marker to a MINTED id, rather
+    than leaving a guard set in force with no declared authority - the same defect one level up as a rule nobody
+    ratified. The block now also names its consumers as a CLAIM joined by D-405: rails 3, 4 and 5 read the one home,
+    and RAIL 0 (scripts/check_repo_integrity.py) is DELIBERATELY EXEMPT because it must still run when git metadata
+    is BROKEN - pinning it would make the recovery rail fail closed on the very condition it reports, so its ambient
+    subject is FILED as BUG-568 rather than papered over.'
+  measured: config parses and its citations resolve against this record (the reconcile join that made the registry
+    lag visible); the module's selftest joins the declared globs to a name git mints live; the guard set is unchanged
+    by this decision - only its authority and its consumer list are declared.
+  files:
+  - config/repo_integrity.yaml
+  - scripts/lib/git_subject.py
+  bugs:
+  - BUG-527
+  - BUG-568

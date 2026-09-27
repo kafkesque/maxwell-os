@@ -21,9 +21,6 @@ recipes: [health, health-deep]     # the ladder(s) this registry governs; every 
 #: Rails the ladder does NOT invoke. Each MUST name the thing that exercises it, and that path MUST exist: a
 #: dormancy claim is a declaration, and a declaration whose subject is absent is an assertion (D-405/BUG-488).
 dormant:
-  scripts/check_session_plan.py:
-    exercised_by: ['gitdir:hooks/pre-commit']
-    reason: 'runs at COMMIT time over the STAGED set (--staged) from gitdir:hooks/pre-commit, not from the ladder; measured 2026-09-26: it ran inside `git commit` and reported "ok session plan: staged set touched 15 path(s)"'
   scripts/check_stale_toolcall_rows.py:
     exercised_by: ['governance/p0_p1_criteria.yaml']
     reason: 'a CRITERION of drift_monitor.py, declared as an args/cmd line in governance/p0_p1_criteria.yaml (measured 2026-09-26)'

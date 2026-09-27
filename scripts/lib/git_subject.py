@@ -161,7 +161,9 @@ def index_tolerance(doc: dict[str, Any]) -> list[str]:
 def adopt_index(doc: dict[str, Any], subj: Subject, raw: str) -> tuple[str, str]:
     """(adopted realpath, note) for git's OWN temporary index, or ("", refusal) - ADOPT, never merely tolerate.
 
-    Three conditions, ALL required, because a rail that NAMES an index it did not read is worse than one that
+    A value that already IS the pinned subject is the subject, and is returned as such (BUG-574: at a NORMAL
+    commit git hands the hook <gitdir>/index, and refusing that refuses every commit in the repository). Otherwise
+    three conditions, ALL required, because a rail that NAMES an index it did not read is worse than one that
     refuses: (1) the realpath is a file DIRECTLY inside the PINNED git dir (so a `../` escape or a sibling
     repository's temp index is refused), (2) its basename matches a declared owner_name_globs entry (so a
     foreign index parked in the git dir is refused), (3) it EXISTS - git reads a missing index as EMPTY, which
@@ -169,6 +171,13 @@ def adopt_index(doc: dict[str, Any], subj: Subject, raw: str) -> tuple[str, str]
     """
     if not raw:
         return "", ""
+    # BUG-574 (MEASURED at a real commit, 2026-09-27): a NORMAL commit hands the hook THIS repository's OWN index
+    # (<gitdir>/index) through GIT_INDEX_FILE. The declared globs decide only what is NOT already the pinned
+    # subject; a value that IS the pinned subject is the subject, and refusing it refuses every normal commit.
+    if os.path.realpath(raw) == os.path.realpath(subj.index_file):
+        return subj.index_file, ("GIT_INDEX_FILE=" + raw + " names THIS repository's own index ("
+                                 + subj.index_file + ") - the ambient value IS the pinned subject, so it is READ "
+                                 "as the subject and not refused (BUG-574)")
     cand = os.path.realpath(raw)
     if os.path.dirname(cand) != os.path.realpath(subj.git_dir):
         return "", ("GIT_INDEX_FILE=" + raw + " is not a file inside the pinned git dir " + subj.git_dir
@@ -373,6 +382,9 @@ def selftest() -> int:
              minted_declared),
             ("OVERREACH control: the repo's OWN index name is NOT adopted as a minted temp index (adoption cannot "
              "swallow the real index)", own_not_minted),
+             ("BUG-574 (MEASURED at a real commit): the repo OWN index passed as GIT_INDEX_FILE is ACCEPTED as the "
+              "pinned subject, NOT refused by the minted-name globs)",
+             adopt_index(doc, fake, own)[0] != ""),
             ("BUG-566: git's OWN minted temp index inside the PINNED git dir is ADOPTED, READ and NAMED (the "
              "legitimate partial commit must not be refused)",
              adopted == os.path.realpath(minted_in_gitdir) and "ADOPTED" in adopt_note),

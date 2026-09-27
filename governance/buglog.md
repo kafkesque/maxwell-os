@@ -7354,3 +7354,52 @@ died with a stack trace instead of reporting. FOUND BY the BUG-578 forensic audi
 
 FIX: main() wraps rehearse() and returns EXIT_FATAL naming the exception (a crash is a verdict, never a traceback).
 A declared overlay subject that matches no file still fails closed with its own message (D-405).
+
+## BUG-580 (FIXED, MED): the STANDING RULE's coverage was a HAND-MAINTAINED SECOND HOME of the commit boundary (2026-09-27)
+
+CLASS: `config/rail_mutations.yaml#coverage.required_subjects` restated, by hand, WHICH rails gate a commit - a fact
+that already has ONE home (`config/rail_registry.yaml#commit_boundary.must_contain`, verified against the bytes of
+`gitdir:hooks/pre-commit` by `scripts/check_rail_registry.py`). Two lists of one fact drift, and only one of them can
+be right: a rail ADDED to the commit boundary would have been covered by the standing rule only if a human remembered
+to edit the second list, and a rail covered there but not at the boundary was indistinguishable from either.
+MEASURED 2026-09-27: RAIL 3 (`scripts/verify_recalibration_pins.py`) and RAIL 5
+(`scripts/check_declaration_consumers.py`) ran at the commit boundary in EVERY commit while the coverage list did not
+name them and no mutation proved their rules were READ - and the gate printed `ok rail mutations: ... 3/3 declared
+subject(s) covered`, i.e. a coverage claim measured against the list it happened to hold. This is D-2676's own class
+(a rule that cannot be made to fail is not a rule) turned on the standing rule's own coverage.
+
+FOUND BY: the D-2679 forensic audit, run before landing the next step (the audit asked "is anything restated by hand,
+and is any list read against another list?").
+
+FIX: (1) `coverage.boundary_join` declares the ONE home (`registry`, dotted `key`, and the script `prefix`/`suffix`
+vocabulary, C12 - no path or pattern in code); (2) `scripts/check_rail_mutations.py#boundary_rails` READS it, returns
+a VERDICT on failure (never an exception: a crash is not a control, the BUG-579 rule one level up), and REFUSES a
+commit-boundary rail the coverage does not name; (3) the two owed rails got the mutations that prove their rules are
+read (`laundering_repin_rule_is_load_bearing` for BUG-535, `withdrawn_consumer_rule_is_load_bearing` for BUG-562) and
+were added to the coverage; (4) the gate's OWN rule got one too (`boundary_registry_join_is_load_bearing`), so the
+standing rule covers itself; (5) the SUPERSET direction is DECLARED in the config (a rail whose own rule gates the
+boundary - the rehearsal, D-2675 - is covered BEYOND the boundary), not left as a silent asymmetry; (6) `min_mutations`
+raised 5 -> 8 and `config/declaration_consumers.yaml` now declares this gate as a CONSUMER of
+`config/rail_registry.yaml`, because it now reads it.
+
+SEEN: `check_rail_mutations --selftest` 18/18 rc=0 (new: `boundary_rail_missing_from_coverage`, `coverage_join_to_nothing`,
+and the join "the COMMIT BOUNDARY is READ from its ONE home and every rail there is inside the declared coverage");
+`--check` rc=0 in 8.4s: `ok rail mutations: 7 declared rule(s) SEEN to red through their own control, 1 negative
+control(s) stayed green, 6/6 declared subject(s) covered (4 derived from the commit boundary, D-2679)`;
+`check_declaration_consumers --selftest` 11/11 and tree mode `ok declaration consumers: 5 declared home(s), 6
+consumer edge(s) all resolve for the tree`; `check_boundary_rehearsal --selftest` 21/21 (its own join reads this
+coverage list and still finds every rail inside the declared overlay).
+
+## BUG-581 (FIXED, LOW): a declaration's RATIONALE was attached to the WRONG edge (2026-09-27)
+
+CLASS: in `config/declaration_consumers.yaml` the edge for `config/handoffs.yaml` carried the RAIL REGISTRY's `why`
+("the rail registry is read by scripts/check_rail_registry.py::CFG ..."), while the `config/rail_registry.yaml` edge
+carried none. A rationale attached to a subject that does not contain it teaches the reader the wrong fact in a file
+that spells the right one two edges up - the same family as BUG-550 (a payload that names something other than its
+own subject) and the reason the mint gate refuses a record that names none of its own bugs.
+
+FOUND BY: the D-2679 forensic audit (the mismatch sweep over the files it was about to touch).
+
+FIX: the rail-registry rationale moved to `config/rail_registry.yaml`, amended to name BOTH consumers (the registry
+reader and, since D-2679, the coverage join) and both decisions; `config/handoffs.yaml` got its own accurate `why`
+(what a withheld handoff reader costs, BUG-559).

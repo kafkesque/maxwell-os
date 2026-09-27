@@ -577,3 +577,22 @@ RISK NOTE (now retired): before fe239df a worktree clean destroyed BOTH copies o
       BUG-573, BUG-571; TASK: declare homes for the 3 dirty rail outputs + backups/** (BUG-563).
 - [ ] OWNER GATE: CONSTITUTION promotion of the standing rule stays HOLD at the registered graduation bar;
       BUG-431 CONTENT promotion remains the one open owner gate.
+
+## D-2679 / BUG-580 + BUG-581 LANDED (2026-09-27)
+
+- [x] BUG-580 FIXED: the standing rule's coverage is DERIVED from `config/rail_registry.yaml#commit_boundary` (declared
+      in `coverage.boundary_join`), joined in `scripts/check_rail_mutations.py#boundary_rails`, and REFUSES a
+      commit-boundary rail that is not covered. RAIL 3 and RAIL 5 got the mutations that prove their rules are read
+      (BUG-535 laundering re-pin; BUG-562 withdrawn consumer); the gate got one for its own rule. `min_mutations` 5 -> 8.
+- [x] BUG-581 FIXED: the rail-registry rationale under the `config/handoffs.yaml` edge moved back to its own subject.
+- [x] D-2679 THE DERIVED-COVERAGE RULE minted (810 records, stamp b6e80486982b3b52).
+- [x] GRADUATION BAR (i) every commit-boundary rail covered - MET, by DERIVATION; (ii) >=3 rules landed under the
+      standing rule with a SEEN mutation - MET (7 entries); (iii) the gate caught >=1 real declaration defect - MET (it
+      caught its own single-quoted-escape no-op, the marker-printed-on-both-verdicts entry, and BUG-580).
+- [ ] NEXT: BUG-577 (ONE home `scripts/lib/fixture.py#outside_tree`, imported by both fixture rails, plus a refusal
+      control and a mutation) - it is the same fixture family D-2678/D-2679 just hardened.
+- [ ] NEXT: BUG-575 (supersession completeness, 24 pinned `legacy_debt_ids`) -> BUG-573 (the ladder must collect EVERY
+      fault) -> BUG-571 (the cited-by-decision join; BUG-492 is its live case).
+- [ ] NEXT (product): the 3 dirty rail outputs + `backups/**` need a declared home (BUG-563); BUG-560 write_guard route.
+- [ ] OWNER GATE: the standing-rule promotion ruling is now DUE (bar met; a promotion must be a POINTER, never a
+      restatement); BUG-431 CONTENT promotion remains the other open owner gate.

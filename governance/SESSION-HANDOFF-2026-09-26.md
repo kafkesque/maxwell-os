@@ -465,3 +465,26 @@ ORDERED NEXT: (1) coverage.required_subjects -> RAIL 3/4/5; (2) BUG-577 outside_
 mutation; (3) BUG-575 supersession completeness (24 pinned legacy_debt_ids); (4) BUG-573 the ladder must collect
 EVERY fault; (5) BUG-571 the cited-by-decision join (BUG-492 live case). OWNER GATE: CONSTITUTION promotion of the
 standing rule stays HOLD; BUG-431 CONTENT promotion is the one open gate.
+
+## 2026-09-27 (cont.) - D-2679 LANDED / BUG-580 + BUG-581 FIXED
+
+STRONGEST MEASURED EVIDENCE: `check_rail_mutations --check` rc=0 -> "7 declared rule(s) SEEN to red through their own
+control (unborn_head_branch_is_load_bearing, provenance_count_is_load_bearing, widening_record_rule_is_load_bearing,
+overlay_of_the_landing_bytes_is_load_bearing, laundering_repin_rule_is_load_bearing,
+withdrawn_consumer_rule_is_load_bearing, boundary_registry_join_is_load_bearing), 1 negative control(s) stayed green,
+6/6 declared subject(s) covered (4 derived from the commit boundary, D-2679)", 8.4s; `--selftest` 18/18;
+`check_boundary_rehearsal --selftest` 21/21; `check_declaration_consumers --selftest` 11/11; mint D-2679 (810 records,
+stamp b6e80486982b3b52); bug_status OPEN 138 / CLOSED 181 of 319.
+
+WHAT LANDED: the coverage of the standing rule is DERIVED from the ONE home of the commit boundary
+(`config/rail_registry.yaml#commit_boundary`), declared under `coverage.boundary_join` and joined in
+`scripts/check_rail_mutations.py#boundary_rails`; a commit-boundary rail that is not covered is FATAL. RAIL 3 and RAIL 5
+got the mutations proving their rules are read; the gate got one for its own rule; `min_mutations` 5 -> 8; the gate is
+now a declared consumer of the rail registry. BUG-581 fixed a rationale attached to the wrong edge.
+
+ORDERED NEXT: (1) BUG-577 (ONE home `scripts/lib/fixture.py#outside_tree` + refusal control + mutation - the same
+fixture family); (2) BUG-575 supersession completeness (24 pinned legacy_debt_ids); (3) BUG-573 (the ladder must collect
+EVERY fault: one RED currently hides the next); (4) BUG-571 (the cited-by-decision join; BUG-492 is its live case);
+(5) TASK: declared homes for the 3 dirty rail outputs + `backups/**` (BUG-563), and BUG-560 (write_guard route).
+OWNER GATE: the standing-rule promotion ruling is now DUE (the bar is met; any promotion must be a POINTER to
+`config/rail_mutations.yaml` + `scripts/check_rail_mutations.py`); BUG-431 CONTENT promotion remains the other gate.

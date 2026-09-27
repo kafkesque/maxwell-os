@@ -943,3 +943,40 @@ acceptance plus overlay_dropped_is_fatal), (iii) a NAMED oracle scripts/check_bo
 drift, so the rail SUBJECTS the standing rule covers are read from the gate's ONE home and joined here.
 
 MEASURED. MEASURED 2026-09-27: the rehearsal was GREEN over HEAD bytes while the working tree held a RAIL 0 that refused the FIRST commit of a fresh/recovered repository; overlaid, the same tree REDs. With the overlay: just health -> ok boundary rehearsal ... 436 working-tree file(s) of the declared subjects overlaid onto the materialized HEAD bytes, 5 rail selftest(s) fire, 0 declared debt(s) open; RAIL-MUTATION GATE: 4 declared rule(s) SEEN to red (incl. overlay_of_the_landing_bytes_is_load_bearing), 1 negative control green, 3/3 subjects covered. check_boundary_rehearsal --selftest 21/21 rc=0; HEALTH_RC=0.
+
+## D-2679 (2026-09-27) - THE DERIVED-COVERAGE RULE
+
+CONTEXT. The step after D-2678 was to extend `coverage.required_subjects` to the rails still owed a mutation (RAIL 3,
+RAIL 5). The audit run before implementing it found the shape instead: `required_subjects` was a HAND-MAINTAINED
+SECOND HOME of the fact "this rail gates a commit", a fact that already has ONE home
+(`config/rail_registry.yaml#commit_boundary.must_contain`, verified against the bytes of `gitdir:hooks/pre-commit` by
+`scripts/check_rail_registry.py`). MEASURED: RAIL 3 (`verify_recalibration_pins.py`) and RAIL 5
+(`check_declaration_consumers.py`) gated EVERY commit while the list did not name them, and the gate printed
+`3/3 declared subject(s) covered` - a coverage claim measured against the list it happened to hold. Hand-adding two
+entries would have fixed today and left the drift: BUG-580.
+
+DECISION. The coverage is DERIVED, never restated. `config/rail_mutations.yaml#coverage.boundary_join` declares the ONE
+home (`registry`, dotted `key`, and the script `prefix`/`suffix` vocabulary - C12: no path or pattern in code);
+`scripts/check_rail_mutations.py#boundary_rails` reads it and the classifier REFUSES a commit-boundary rail the coverage
+does not name, in a VERDICT rather than an exception (a crash is not a control, the BUG-579 rule one level up). The
+SUPERSET direction is DECLARED, not assumed - a rail whose own rule gates the boundary (the rehearsal, D-2675) is
+covered BEYOND it, so the asymmetry is a written reason and not an accident of who edited what. The two owed boundaries
+got the mutations that prove their rules are READ (`laundering_repin_rule_is_load_bearing` for BUG-535, RAIL 3;
+`withdrawn_consumer_rule_is_load_bearing` for BUG-562, RAIL 5) and the gate got one for its OWN rule
+(`boundary_registry_join_is_load_bearing`), so the standing rule covers itself. `min_mutations` 5 -> 8; the gate is now
+declared a CONSUMER of `config/rail_registry.yaml` in `config/declaration_consumers.yaml`, because it now reads it
+(BUG-581, found by the same audit, moved a rationale that had been attached to the wrong edge back to its subject).
+
+MEASURED. `check_rail_mutations --selftest` 18/18 rc=0 (new: `boundary_rail_missing_from_coverage`,
+`coverage_join_to_nothing`, and the join "the COMMIT BOUNDARY is READ from its ONE home and every rail there is inside
+the declared coverage"); `--check` rc=0 in 8.4s: `7 declared rule(s) SEEN to red through their own control
+(unborn_head_branch_is_load_bearing, provenance_count_is_load_bearing, widening_record_rule_is_load_bearing,
+overlay_of_the_landing_bytes_is_load_bearing, laundering_repin_rule_is_load_bearing,
+withdrawn_consumer_rule_is_load_bearing, boundary_registry_join_is_load_bearing), 1 negative control(s) stayed green,
+6/6 declared subject(s) covered (4 derived from the commit boundary, D-2679)`; `check_declaration_consumers --selftest`
+11/11 and `ok declaration consumers: 5 declared home(s), 6 consumer edge(s) all resolve`; `check_boundary_rehearsal
+--selftest` 21/21 (its own join reads this coverage list and still finds every rail inside the declared overlay);
+`bug_status` OPEN 138 / CLOSED 181 of 319; mint D-2679 (810 records, stamp b6e80486982b3b52). The registered
+GRADUATION BAR for promoting the standing rule to a CONSTITUTION section now reads MET on all three clauses, so the
+promotion ruling is the owner's (HOLD until it is given); the promotion, if given, must be a POINTER to
+`config/rail_mutations.yaml` + `scripts/check_rail_mutations.py`, never a restatement.

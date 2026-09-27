@@ -331,7 +331,11 @@ current_state:
 # D-2678 (2026-09-27): BUG-578 FIXED (the rehearsal holds the LANDING bytes - declared overlay, 436 file(s)) and
 # BUG-579 FIXED (a crash in the fixture builder is a verdict, not a traceback). Both were filed OPEN and FIXED in
 # the same commit, so the open count is unchanged. THE AUDIT FILED BUG-579.
-open_bugs_n: 139
+# D-2679 (2026-09-27): the coverage join landed (3 more mutations, floor 8, 7/7 rules SEEN to red); BUG-580 and
+# BUG-581 were filed and FIXED in the same commit, so the OPEN count is unchanged. RE-MEASURED from
+# scripts/bug_status.py: OPEN 138 / CLOSED 181 of 319 - the D-2678 note had left this number stale at 139, which is
+# what a hand-copied DERIVED count does; re-run scripts/bug_status.py before trusting it.
+open_bugs_n: 138
 
 # 2026-09-26T (D-2662/BUG-554) - session trail (comments only: this file stays PARSEABLE).
 # THE CLASS, STATED ONCE: a declared field read by NO machine is a claim, not a control. MEASURED 2026-09-26:

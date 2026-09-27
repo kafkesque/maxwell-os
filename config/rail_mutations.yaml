@@ -30,11 +30,32 @@ fixture:
   keep: false
   timeout_seconds: 600
 coverage:
-  min_mutations: 5            # FLOOR (shrink guard): deleting an entry means editing the floor in a diff a human reads
-  required_subjects:          # every path here MUST be the subject of >= 1 mutation (D-405: join BOTH directions)
+  min_mutations: 8            # FLOOR (shrink guard): deleting an entry means editing the floor in a diff a human reads
+  # D-2679: the coverage set is DERIVED, never restated. Which rails gate a COMMIT is one fact and it already has
+  # ONE home (config/rail_registry.yaml#commit_boundary), so restating it here would be a SECOND HOME - and two
+  # lists of one fact drift, and only one of them can be right. scripts/check_rail_mutations.py joins the two and
+  # REFUSES a rail that gates every commit and is not covered below.
+  boundary_join:
+    registry: config/rail_registry.yaml
+    key: commit_boundary.must_contain
+    script_prefix: scripts/
+    script_suffix: .py
+    why: >-
+      MEASURED 2026-09-27 (D-2679): RAIL 3 (scripts/verify_recalibration_pins.py) and RAIL 5
+      (scripts/check_declaration_consumers.py) ran at the commit boundary in every commit, and this list did not
+      name them - so the gate reported coverage of the list it happened to hold while two boundaries were covered
+      on PAPER only. The registry this join reads is itself verified against the bytes of gitdir:hooks/pre-commit
+      by scripts/check_rail_registry.py, so the derivation rests on a checked declaration, not on a copy.
+  required_subjects:          # SUPERSET of the derived boundary rails (D-2679): every path here MUST be the subject
+                              # of >= 1 mutation (D-405: join BOTH directions). A rail whose own rule gates the
+                              # BOUNDARY itself (the rehearsal, D-2675) is declared here BEYOND the boundary - the
+                              # superset direction is declared, not an accident, and is NOT a fault.
     - scripts/check_boundary_rehearsal.py
-    - scripts/check_session_plan.py
+    - scripts/check_declaration_consumers.py
+    - scripts/check_rail_mutations.py
     - scripts/check_repo_integrity.py
+    - scripts/check_session_plan.py
+    - scripts/verify_recalibration_pins.py
 budget:
   max_seconds_per_runner: 120 # a slower runner has an UNCONTROLLED INPUT (class iii of D-2665) -> OWNER-OWED, loud
 mutations:
@@ -119,3 +140,51 @@ mutations:
       the overlay is the whole of BUG-578: with the copy inert the fixture keeps its OWN bytes and the rehearsal is
       a verdict about the last commit. The control pre-seeds stale bytes at a path DERIVED from the declaration and
       requires them to be REPLACED, so it REDs whether or not the live tree happens to differ from HEAD.
+  # RAIL 3 (BUG-535) - the boundary every commit of a pinned artifact passes. Owed since D-2679 read the coverage
+  # list against the commit boundary: this rail gated every commit while no mutation proved its rule was READ.
+  - id: laundering_repin_rule_is_load_bearing
+    subject: scripts/verify_recalibration_pins.py
+    op: replace
+    find: '        if pin.get("sha256") != old.get("sha256") and pin.get("decision") == old.get("decision"):'
+    replace: '        if False:  # MUTATION (D-2676): the re-pin rule stops reading the pair'
+    runner: scripts/verify_recalibration_pins.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: 'FAIL BUG-535: a sha256 moved under the SAME decision'
+    why: >-
+      RAIL 3's BUG-535 rule: a pinned sha256 may move only in the SAME commit that re-mints its decision. With the
+      pair unread, the LAUNDERING move is TOLERATED again - the old decision keeps certifying a measurement nobody
+      re-ran while the scan goes green - and the control that names BUG-535 stops firing.
+  # RAIL 5 (BUG-562) - the same boundary, one commit earlier: a declaration may not land apart from its reader.
+  - id: withdrawn_consumer_rule_is_load_bearing
+    subject: scripts/check_declaration_consumers.py
+    op: replace
+    find: '        if withheld:'
+    replace: '        if False:  # MUTATION (D-2676): a withdrawn consumer stops being a fault'
+    runner: scripts/check_declaration_consumers.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: 'FAIL staged_withheld_consumer'
+    why: >-
+      RAIL 5's BUG-562 rule: a STAGED declaration whose consumer is in NEITHER HEAD NOR the index is refused. With
+      the fault unread, the declaration lands separated from the only code that reads it - the exact BUG-562 commit
+      set - and the control that names that shape stops firing.
+  # THE STANDING RULE APPLIED TO ITS OWN COVERAGE (D-2679). Inert, the join reads nothing and this list is a second
+  # home of the commit boundary again.
+  - id: boundary_registry_join_is_load_bearing
+    subject: scripts/check_rail_mutations.py
+    op: replace
+    find: '        if r not in declared:'
+    replace: '        if False:  # MUTATION (D-2676): the coverage join reads nothing'
+    runner: scripts/check_rail_mutations.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: 'FAIL selftest/boundary_rail_missing_from_coverage'
+    why: >-
+      D-2679: with the join inert, a rail that gates every commit can sit outside coverage and the gate still
+      reports the coverage it happens to hold. The control REMOVES a derived boundary rail from the coverage list
+      and requires the gate to refuse: a coverage claim that cannot be falsified is the BUG-492 shape one level up.
+

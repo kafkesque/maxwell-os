@@ -9438,3 +9438,36 @@ decisions:
     mutations: 4 declared rule(s) SEEN to red through their own control (incl. overlay_of_the_landing_bytes_is_load_bearing),
     1 negative control(s) stayed green, 3/3 subject(s) covered. check_boundary_rehearsal --selftest 21/21 rc=0.
     HEALTH_RC=0.'
+- id: D-2679
+  date: '2026-09-27'
+  state: ACTIVE
+  category: governance
+  title: 'THE DERIVED-COVERAGE RULE: the standing rule''s COVERAGE is READ from the ONE home of the commit boundary,
+    never restated'
+  bugs:
+  - BUG-580
+  - BUG-581
+  files:
+  - config/rail_mutations.yaml
+  - scripts/check_rail_mutations.py
+  - config/declaration_consumers.yaml
+  decision: 'BUG-580 FIXED by DERIVING the coverage instead of restating it: config/rail_mutations.yaml#coverage.boundary_join
+    declares the ONE home of the commit boundary (config/rail_registry.yaml#commit_boundary.must_contain, itself
+    verified against the bytes of gitdir:hooks/pre-commit), and scripts/check_rail_mutations.py#boundary_rails READS
+    it and REFUSES a rail that gates every commit and is not covered - a join that cannot be evaluated is a VERDICT,
+    never a traceback. The SUPERSET direction is declared, not assumed: a rail whose own rule gates the boundary
+    (the rehearsal, D-2675) is covered BEYOND the boundary. The two owed boundaries got the mutations that prove
+    their rules are READ (RAIL 3 laundering_repin_rule_is_load_bearing for BUG-535, RAIL 5 withdrawn_consumer_rule_is_load_bearing
+    for BUG-562) and the gate got one for its OWN rule (boundary_registry_join_is_load_bearing), so the standing
+    rule covers itself. min_mutations 5 -> 8; config/declaration_consumers.yaml now declares the gate a CONSUMER
+    of config/rail_registry.yaml because it now reads it. BUG-581 FIXED: the rail-registry rationale that sat under
+    the config/handoffs.yaml edge moved back to its own subject. D-2676 satisfied for the new rule: (i) one home,
+    (ii) a SEEN control, (iii) a NAMED oracle, (iv) a MUTATION.'
+  measured: 'BUG-580 was measured, not inferred: RAIL 3 and RAIL 5 gated EVERY commit while the coverage list did
+    not name them and the gate printed ok rail mutations: ... 3/3 declared subject(s) covered - a coverage claim
+    measured against the list it happened to hold. After the fix: check_rail_mutations --selftest 18/18 rc=0 (new
+    boundary_rail_missing_from_coverage and coverage_join_to_nothing, plus the join that reads the ONE home); --check
+    rc=0 in 8.4s -> ok rail mutations: 7 declared rule(s) SEEN to red through their own control, 1 negative control(s)
+    stayed green, 6/6 declared subject(s) covered (4 derived from the commit boundary, D-2679). check_declaration_consumers
+    --selftest 11/11 and ok declaration consumers: 5 declared home(s), 6 consumer edge(s) all resolve. check_boundary_rehearsal
+    --selftest 21/21 (its own join reads this coverage list). bug_status: OPEN 138 / CLOSED 181 of 319.'

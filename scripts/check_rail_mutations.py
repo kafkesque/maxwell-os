@@ -15,9 +15,22 @@ WHAT IT DECIDES (0 clean | 1 FATAL fail-closed C16 | 2 owner-owed: a runner over
             declared subject/runner is absent - a declaration that DRIFTED FROM REALITY (D-405).
     1 FATAL the NEGATIVE CONTROL reds: a no-op mutation changed a verdict, so the runner's input is uncontrolled.
     1 FATAL COVERAGE: fewer mutations than the declared FLOOR, or a declared subject with no mutation entry.
+    1 FATAL COVERAGE JOIN (D-2679): a rail at the COMMIT BOUNDARY that the declared coverage does not name, or a
+            join whose declared registry/key/line cannot be read at all (a join that cannot be evaluated is a
+            VERDICT, never a traceback: the BUG-579 rule, one level up).
     2 OWED  a runner slower than the declared ceiling (class iii of D-2665) - loud, never fatal (BUG-457).
 
 EVERY fact is DECLARED in config/rail_mutations.yaml (C12): no path, count, marker or verdict is written here.
+
+THE COVERAGE JOIN (D-2679). The rails the standing rule covers are a SUPERSET of the rails at the COMMIT BOUNDARY,
+and the boundary set is READ from its ONE home (config/rail_registry.yaml#commit_boundary, declared in
+config/rail_mutations.yaml#coverage.boundary_join) and JOINED here - never restated. MEASURED before the join:
+RAIL 3 (verify_recalibration_pins.py) and RAIL 5 (check_declaration_consumers.py) gated EVERY commit while this
+gate reported coverage of the list it happened to hold, so two boundaries were covered on PAPER only - the
+D-2676 class turned on the standing rule's own coverage. The registry the join reads is verified against the bytes
+of gitdir:hooks/pre-commit by scripts/check_rail_registry.py, so the derivation rests on a checked declaration. The
+SUPERSET direction is declared, not assumed: a rail whose own rule gates the boundary (the rehearsal, D-2675) is
+covered BEYOND the boundary, which is not a fault.
 The fixture is a REAL repository (git init + commit) built from DECLARED paths in the SYSTEM temp dir, so it is
 never inside the tree it audits (BUG-537) and the rails read a real ambient git subject (BUG-527). --selftest
 proves every decision above on synthetic observations, including the joins that read the DECLARATION itself.
@@ -73,8 +86,10 @@ def cfg() -> dict[str, Any]:
             raise SystemExit("FAIL-CLOSED (C16): mutation " + repr(m["id"]) + " appends without text")
         if str(m["expect"]) not in ("red", "green"):
             raise SystemExit("FAIL-CLOSED (C16): mutation " + repr(m["id"]) + " declares expect " + repr(m["expect"]))
-    if not doc["coverage"].get("required_subjects") or not doc.get("budget"):
-        raise SystemExit("FAIL-CLOSED (C16): coverage declares no required_subjects / budget declares no ceiling")
+    if (not doc["coverage"].get("required_subjects") or not doc["coverage"].get("boundary_join")
+            or not doc.get("budget")):
+        raise SystemExit("FAIL-CLOSED (C16): coverage declares no required_subjects / boundary_join, or budget "
+                         "declares no ceiling - the coverage join's ONE home is a declaration (D-2679)")
     return doc
 
 
@@ -163,6 +178,41 @@ def measure(doc: dict[str, Any]) -> tuple[dict[str, Obs], Path]:
     return obs, root
 
 
+def boundary_rails(doc: dict[str, Any]) -> tuple[list[str], list[str]]:
+    """The rails at the COMMIT BOUNDARY, READ from the ONE home of that fact (D-2679) - never restated here.
+
+    Returns (rails, faults): a fault is a FATAL string, never an exception, so a join that cannot be evaluated
+    produces a VERDICT instead of a traceback (the BUG-579 rule, one level up: a crash is not a control). The
+    registry read here is itself verified against the bytes of gitdir:hooks/pre-commit by
+    scripts/check_rail_registry.py, and config/declaration_consumers.yaml declares THIS gate as a consumer of it.
+    """
+    join = (doc.get("coverage") or {}).get("boundary_join") or {}
+    reg = REPO / str(join.get("registry") or "")
+    if not str(join.get("registry") or "") or not reg.is_file():
+        return [], ["the coverage join names " + repr(join.get("registry")) + ", which does not EXIST: a join to "
+                    "nothing is an assertion (D-405), and the standing rule's coverage would fall back to being "
+                    "restated here instead of derived (D-2679)"]
+    node: Any = yaml.safe_load(reg.read_text(encoding="utf-8"))
+    for part in [x for x in str(join.get("key") or "").split(".") if x]:
+        if not isinstance(node, dict) or part not in node:
+            return [], ["the coverage join reads " + str(join.get("registry")) + "#" + str(join.get("key"))
+                        + ", a key that is ABSENT: the standing rule's coverage cannot be derived from it (D-2679)"]
+        node = node[part]
+    lines = [str(x) for x in (node if isinstance(node, list) else [])]
+    if not lines:
+        return [], ["the coverage join reads " + str(join.get("registry")) + "#" + str(join.get("key")) + " and "
+                    "finds no line at all: a commit boundary nothing declares is a boundary nothing gates (D-405)"]
+    prefix, suffix = str(join.get("script_prefix") or ""), str(join.get("script_suffix") or "")
+    rails: list[str] = []
+    for line in lines:
+        here = [t for t in line.split() if t.startswith(prefix) and t.endswith(suffix)]
+        if not here:
+            return [], ["a commit-boundary line names no " + prefix + "*" + suffix + " script (" + line + "): a "
+                        "boundary rule that cannot be joined to a rail is a rule nothing can test (C16)"]
+        rails.extend(here)
+    return sorted(set(rails)), []
+
+
 def classify(obs: dict[str, Obs], doc: dict[str, Any]) -> tuple[int, list[str], list[str]]:
     """Every declared claim is either MEASURED or FATAL; a missing observation is never a pass (C16)."""
     fatal: list[str] = []
@@ -213,10 +263,23 @@ def classify(obs: dict[str, Obs], doc: dict[str, Any]) -> tuple[int, list[str], 
                      + str(doc["coverage"]["min_mutations"]) + " - the floor is the shrink guard: lower it in a "
                      "DIFF A HUMAN READS, never by quietly deleting an entry")
     covered = {str(m["subject"]) for m in red}
-    for s in doc["coverage"]["required_subjects"]:
-        if str(s) not in covered:
-            fatal.append("declared subject " + str(s) + " has no mutation entry: the standing rule covers it on "
+    declared = {str(s) for s in doc["coverage"]["required_subjects"]}
+    for s in sorted(declared):
+        if s not in covered:
+            fatal.append("declared subject " + s + " has no mutation entry: the standing rule covers it on "
                          "PAPER only (D-2676: a rule that cannot be made to fail is not a rule)")
+    # D-2679: the coverage set is JOINED to the ONE home of the commit boundary in the direction that matters - a
+    # rail that gates EVERY commit must be covered. The reverse is deliberately NOT a fault, and the reason is
+    # declared rather than assumed: a rail whose own rule gates the boundary (the rehearsal, D-2675) is covered
+    # BEYOND the boundary, so the coverage set is a declared SUPERSET, not a copy.
+    rails, join_faults = boundary_rails(doc)
+    fatal.extend(join_faults)
+    for r in rails:
+        if r not in declared:
+            fatal.append("D-2679: the commit boundary names " + r + " but the standing rule's coverage does not - "
+                         "a rail that gates EVERY commit must be the subject of a mutation (D-2676), and the "
+                         "coverage list must never be a SECOND HOME of 'this rail gates a commit': two lists of one "
+                         "fact drift, and only one of them can be right")
     return (EXIT_FATAL if fatal else (EXIT_OWED if owed else EXIT_CLEAN)), fatal, owed
 
 
@@ -276,7 +339,17 @@ def selftest() -> int:
     blind = copy.deepcopy(doc)
     blind["coverage"]["required_subjects"] = ["scripts/no_such_declared_rail.py"]
     cases.append(("required_subject_declaration_is_read", dict(base), EXIT_FATAL))
-    docs = {"coverage_floor_is_read": floor, "required_subject_declaration_is_read": blind}
+    # D-2679: the coverage list may not go STALE when the COMMIT BOUNDARY grows, and a join that cannot be
+    # evaluated must be a VERDICT rather than a traceback (the BUG-579 rule, applied to this gate's own join).
+    boundary = copy.deepcopy(doc)
+    uncovered = boundary_rails(doc)[0][0]
+    boundary["coverage"]["required_subjects"] = [s for s in doc["coverage"]["required_subjects"] if s != uncovered]
+    cases.append(("boundary_rail_missing_from_coverage", dict(base), EXIT_FATAL))
+    no_join = copy.deepcopy(doc)
+    no_join["coverage"]["boundary_join"]["registry"] = "config/no_such_registry.yaml"
+    cases.append(("coverage_join_to_nothing", dict(base), EXIT_FATAL))
+    docs = {"coverage_floor_is_read": floor, "required_subject_declaration_is_read": blind,
+            "boundary_rail_missing_from_coverage": boundary, "coverage_join_to_nothing": no_join}
     bad = 0
     for name, obs, expect in cases:
         rc, fatal, owed = classify(obs, docs.get(name, doc))
@@ -289,7 +362,11 @@ def selftest() -> int:
              ("the fixture is built from DECLARED paths under the SYSTEM temp dir, never inside the tree (BUG-537)",
               bool(doc["fixture"]["include_dirs"]) and str(doc["fixture"]["under"]) == "system_temp"),
              ("the gate has a NEGATIVE control: >=1 mutation that must NOT red (BUG-492, inverted)",
-              any(str(m["expect"]) == "green" for m in doc["mutations"]))]
+              any(str(m["expect"]) == "green" for m in doc["mutations"])),
+             ("the COMMIT BOUNDARY is READ from its ONE home and every rail there is inside the declared coverage "
+              "(D-2679: coverage cannot silently go stale when the boundary grows)",
+              not boundary_rails(doc)[1]
+              and all(r in {str(s) for s in doc["coverage"]["required_subjects"]} for r in boundary_rails(doc)[0]))]
     for why, good in joins:
         bad += 0 if good else 1
         print("  " + ("ok  " if good else "FAIL") + " selftest/" + why)
@@ -315,7 +392,8 @@ def main() -> int:
             print("ok rail mutations: " + str(len(red)) + " declared rule(s) SEEN to red through their own control ("
                   + ", ".join(str(m["id"]) for m in red) + "), " + str(len(doc["mutations"]) - len(red))
                   + " negative control(s) stayed green, " + str(len({str(m["subject"]) for m in red})) + "/"
-                  + str(len(doc["coverage"]["required_subjects"])) + " declared subject(s) covered, fixture "
+                  + str(len(doc["coverage"]["required_subjects"])) + " declared subject(s) covered ("
+                  + str(len(boundary_rails(doc)[0])) + " derived from the commit boundary, D-2679), fixture "
                   + str(root))
         else:
             print(("FAIL rail mutations" if rc == EXIT_FATAL else "OWED rail mutations")

@@ -1150,3 +1150,16 @@ scripts/check_boundary_rehearsal.py#overlay_subjects/overlay_control; teeth in
 config/rail_mutations.yaml#overlay_of_the_landing_bytes_is_load_bearing. SUPERSEDES the BUG-578 state (materialize
 - then-install was the whole fixture). OPEN AFTER IT: coverage.required_subjects still covers only RAIL 0/4/5 among
 the write-boundary rails; BUG-577 (ONE home for outside_tree) is the next hardening of this same fixture family.
+
+## THE DERIVED-COVERAGE RULE (D-2679, 2026-09-27) - the standing rule's coverage is READ, never restated
+
+WHERE: `config/rail_mutations.yaml#coverage.boundary_join` (ONE home: the `registry` it names is
+`config/rail_registry.yaml#commit_boundary.must_contain`, itself verified against the bytes of `gitdir:hooks/pre-commit`)
+and `scripts/check_rail_mutations.py#boundary_rails` (the join; its fault is a VERDICT, never a traceback). Teeth:
+`config/rail_mutations.yaml#boundary_registry_join_is_load_bearing`.
+SUPERSEDES: the hand-maintained `coverage.required_subjects` list as the source of WHICH rails are covered (BUG-580).
+NOW: 8 mutations (floor 8), 6/6 declared subjects covered, 4 of them DERIVED from the commit boundary; gate `--selftest`
+18/18, `--check` rc=0 in 8.4s. The superset direction is declared: a rail whose own rule gates the boundary (the
+rehearsal, D-2675) is covered BEYOND it.
+OPEN AFTER IT: the graduation bar reads MET on all three clauses, so the CONSTITUTION promotion of the standing rule is
+now a DUE owner ruling (a promotion must be a pointer, never a restatement - BUG-431 CONTENT promotion stays open).

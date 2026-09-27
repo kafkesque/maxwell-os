@@ -10,6 +10,7 @@ Exit 1 naming every unparsed heading.
 """
 from __future__ import annotations
 
+import hashlib
 import re
 import sys
 from pathlib import Path
@@ -23,8 +24,72 @@ HEADING_RE = re.compile(r"^#{1,6}\s+.*?BUG-\d+")
 ANNOTATION_RE = re.compile(r"^#{1,6}\s+(CORRECTION|RECEIPT|REFINEMENT|VERIFICATION|NOTE|APPENDIX|ERRATUM)\b")
 
 
-def main() -> int:
-    """Report any heading that names a bug id but is not a recognised status event."""
+BLOCK_START_RE = re.compile(r"^(?:#{2,3}\s.*?BUG-\d+|\*\*BUG-\d+)")
+
+
+def control_slug(name: str) -> str:
+    """The control's name as a marker a mutation can be SEEN to red through (D-2676 iv)."""
+    return re.sub(r"[^a-z0-9]+", "_", name.strip().lower()).strip("_")
+
+
+def blocks(lines: list[str]) -> list[tuple[int, int, str]]:
+    """Every BUG block as (start, end, text): a `^#{2,3}` status event or a `**BUG-...**` prose block."""
+    out: list[tuple[int, int, str]] = []
+    starts = [i for i, line in enumerate(lines) if BLOCK_START_RE.match(line)]
+    for n, start in enumerate(starts):
+        end = starts[n + 1] if n + 1 < len(starts) else len(lines)
+        out.append((start, end, "".join(lines[start:end])))
+    return out
+
+
+def duplicate_block_problems(lines: list[str]) -> list[str]:
+    """BUG-570: a block occurring TWICE with identical bytes is a COPY, and a copy is BLOAT.
+
+    The comparison is over the BLOCK, never `occurrence -> end of file`: the latter is length-dependent (two
+    copies can never satisfy it) and it REFUSED a true copy while claiming the bytes differed. Two DIFFERENT
+    blocks are NOT a fault - a dedupe that cannot tell them apart would delete a fact (BUG-492, both directions).
+    """
+    groups: dict[str, list[tuple[int, int]]] = {}
+    for start, end, text in blocks(lines):
+        groups.setdefault(hashlib.sha256(text.encode("utf-8")).hexdigest(), []).append((start, end))
+    problems: list[str] = []
+    for digest, spans in sorted(groups.items()):
+        if len(spans) > 1:
+            where = ", ".join(str(s + 1) + "-" + str(e) for s, e in spans)
+            problems.append("lines " + where + " are BYTE-IDENTICAL (sha256 " + digest[:12] + "): one is a COPY of "
+                            "a fact already stated - delete it, and never compare an occurrence to EOF (BUG-570)")
+    return problems
+
+
+def selftest() -> int:
+    """Known-answer controls in BOTH directions: a COPY fires, two DIFFERENT blocks do not (BUG-492)."""
+    same = ["**BUG-9001 STATUS (CLOSED).**\n", "the same body\n", "\n",
+            "**BUG-9001 STATUS (CLOSED).**\n", "the same body\n", "\n"]
+    differ = ["**BUG-9001 STATUS (CLOSED).**\n", "one body\n", "\n",
+              "**BUG-9002 STATUS (OPEN).**\n", "another body\n", "\n"]
+    rows = [
+        ("a block that occurs TWICE byte-identically is a NAMED fault (the BUG-493 copy)",
+         bool(duplicate_block_problems(same))),
+        ("two DIFFERENT blocks are NOT a fault - a dedupe that cannot tell them apart deletes a fact",
+         not duplicate_block_problems(differ)),
+    ]
+    for name, ok in rows:
+        print(("  ok  " if ok else "  !!  ") + name)
+    failed = [name for name, ok in rows if not ok]
+    if failed:
+        for name in failed:
+            print("  FAIL selftest/" + control_slug(name))
+        print("FAIL selftest: " + str(len(failed)) + " of " + str(len(rows)) + " known-answer control(s) did not fire")
+        return 1
+    print("ok buglog-coverage selftest: " + str(len(rows)) + "/" + str(len(rows)) + " known-answer control(s) fire")
+    return 0
+
+
+def main(argv: list[str] | None = None) -> int:
+    """Report any heading that names a bug id but is not a recognised status event, and any copied block."""
+    argv = list(sys.argv[1:] if argv is None else argv)
+    if "--selftest" in argv:
+        return selftest()
     unparsed: list[tuple[int, str]] = []
     for n, line in enumerate(BUGLOG.read_text(encoding="utf-8").splitlines(), start=1):
         if HEADING_RE.match(line) and not HEADER_RE.match(line) and not ANNOTATION_RE.match(line):
@@ -34,7 +99,16 @@ def main() -> int:
         for n, line in unparsed:
             print(f"  line {n}: {line}")
         return 1
-    print(f"ok buglog coverage: every heading naming a bug id is parsed ({BUGLOG.name})")
+    text = BUGLOG.read_text(encoding="utf-8")
+    text_lines = text.splitlines(keepends=True)
+    duplicated = duplicate_block_problems(text_lines)
+    if duplicated:
+        print("FAIL buglog coverage: " + str(len(duplicated)) + " duplicated block(s):")
+        for problem in duplicated:
+            print("  " + problem)
+        return 1
+    print("ok buglog coverage: every heading naming a bug id is parsed and no block is a byte-identical copy "
+          "(" + str(len(blocks(text_lines))) + " block(s), " + BUGLOG.name + ")")
     return 0
 
 

@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**133 open** / 195 closed of 328 ids.
+**130 open** / 198 closed of 328 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -137,6 +137,3 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-559 | (STRUCTURAL - D-2666, OPEN 2026-09-26): a receipt can be cut over bytes joined to NO revision, so `mutability: human_authored` certified a f | 1 |
 | BUG-568 | (OPEN, MED): RAIL 0 does not pin its own git subject | 1 |
 | BUG-569 | (OPEN, LOW): the adoption NOTE has no RAIL-LEVEL control at a real partial commit | 1 |
-| BUG-570 | (OPEN, LOW): the duplicate BUG-493 CLOSED block is NOT byte-identical (the earlier claim was FALSE) | 2 |
-| BUG-583 | (OPEN, LOW): 5 of 812 decision records spell the state 'active' in lowercase while 505 spell it 'ACTIVE' (2026-09-27, found by the D-2682 la | 1 |
-| BUG-588 | (FILED, LOW, D-2690): DECISION-LOG.md declares a decision COUNT that is stale by 169 - a second home | 1 |

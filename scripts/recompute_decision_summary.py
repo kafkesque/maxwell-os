@@ -169,6 +169,53 @@ def vocabulary_problems() -> list[str]:
     return problems
 
 
+def control_slug(name: str) -> str:
+    """The control's name as a marker a mutation can be SEEN to red through (D-2676 iv)."""
+    return re.sub(r"[^a-z0-9]+", "_", name.strip().lower()).strip("_")
+
+
+def legacy_spelling_ids() -> list[str] | None:
+    """The identity-pinned legacy state spellings, read from the RULES file; None when the block is absent."""
+    if not POLICY_YAML.exists():
+        return None
+    policy = yaml.safe_load(POLICY_YAML.read_text(encoding="utf-8")) or {}
+    ids = (policy.get("state_vocabulary") or {}).get("legacy_non_canonical_ids")
+    return None if ids is None else [normalized_id({"id": v}) for v in ids]
+
+
+def spelling_problems(decisions: list, pinned: list[str] | None = None) -> list[str]:
+    """BUG-583: a state is ONE value with ONE spelling, and a second spelling is a fault a reader can FAIL on.
+
+    canonical_state() upper-cases, so the census was right while the BYTES carried two forms of one state - the
+    BUG-572 family one level down. Rules live in config/decisions_policy.yaml#state_vocabulary (ONE home, C12);
+    the spellings already on disk are pinned BY IDENTITY and the pin is SHRINK-ONLY: a pinned id that is
+    canonical now is a STALE declaration (D-405), which is the other direction of the same join.
+    """
+    if pinned is None:
+        pinned = legacy_spelling_ids()
+        if pinned is None:
+            return [POLICY_YAML.relative_to(ROOT).as_posix() + "#state_vocabulary.legacy_non_canonical_ids: not "
+                    "declared - the rule that a state has ONE spelling must live where a reader can FAIL on it "
+                    "(D-2644/BUG-583)"]
+    pin = set(pinned)
+    problems: list[str] = []
+    for record in decisions:
+        raw = str(record.get("state") or "").strip()
+        if not raw:
+            continue  # canonical_state() refuses a record with no state at all (BUG-483)
+        if raw == canonical_state(record):
+            if normalized_id(record) in pin:
+                problems.append(normalized_id(record) + ": pinned as a legacy non-canonical spelling, but the "
+                                "record is canonical now - a pin that describes nothing is a STALE declaration "
+                                "(D-405/BUG-583)")
+            continue
+        if normalized_id(record) not in pin:
+            problems.append(normalized_id(record) + ": state " + repr(raw) + " is a SECOND spelling of "
+                            + repr(canonical_state(record)) + " - canonicalise it, or pin the id BY IDENTITY in "
+                            "config/decisions_policy.yaml#state_vocabulary.legacy_non_canonical_ids (BUG-583)")
+    return problems
+
+
 def record_problems(decisions: list) -> list[str]:
     """Well-formedness: duplicate normalised ids, duplicate spellings of the same fact, missing fields."""
     problems: list[str] = []
@@ -357,6 +404,7 @@ def registry_shape_problems(data: dict) -> list[str]:
                         " empty success (BUG-487)")
         return problems
     problems.extend(record_problems(records))
+    problems.extend(spelling_problems(records))
     problems.extend(vocabulary_problems())
     return problems
 
@@ -634,6 +682,11 @@ def mint_controls() -> list[tuple[str, bool]]:
          bool(arrival_problems(len(live) + 1, live + [dict(good), dict(good)], [good["id"]]))),
         ("a mint that does not move the count by its own size fires",
          bool(arrival_problems(len(live), live, [good["id"]]))),
+        ("a state spelled in a NON-CANONICAL case with no pin is a NAMED fault (BUG-583)",
+         bool(spelling_problems([{"id": "D-9001", "state": "active"}], pinned=[]))),
+        ("the same spelling is TOLERATED while pinned BY IDENTITY, and the pin goes STALE once canonical",
+         not spelling_problems([{"id": "D-9001", "state": "active"}], pinned=["D9001"])
+         and bool(spelling_problems([{"id": "D-9001", "state": "ACTIVE"}], pinned=["D9001"]))),
     ]
 
 
@@ -644,6 +697,8 @@ def mint_selftest() -> int:
         print(("  ok  " if ok else "  !!  ") + name)
     failed = [n for n, ok in rows if not ok]
     if failed:
+        for name in failed:
+            print("  FAIL selftest/" + control_slug(name))
         print("FAIL (" + WRITER + ") --selftest: " + str(len(failed)) + " of " + str(len(rows))
               + " known-answer control(s) did not fire - a mint gate nobody has seen refuse is a comment (BUG-492)")
         return 1

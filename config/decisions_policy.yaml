@@ -197,3 +197,42 @@ membership:
     An id NAMED in the human log with no TOP-LEVEL record in the registry is the signature of BUG-587: the record
     was ABSORBED into the previous record's files: list, its bytes are in the file, the file parses, and the
     decision is invisible. Declared so the rail has ONE home and cannot be satisfied by a restatement.
+
+# -------------------------------------------------------------------------------------------------------------
+# STATE SPELLING (BUG-583). A state is ONE value with ONE spelling.
+#
+# WHY. MEASURED 2026-09-27: the registry carried ACTIVE 515 and `active` 5 (3 bare, 2 quoted).
+# canonical_state() upper-cases, so the CENSUS was always right while the BYTES carried two forms of one state:
+# invisible to every rail, and fatal to any future consumer that compares state strings exactly. This is the
+# BUG-572 family one level down - a spelling that decides nothing is still a SECOND form of a governed value.
+#
+# WHY A PIN AND NOT A REWRITE. config/decisions.yaml is append_only with a PREFIX receipt (D-2655): no key may be
+# rewritten in place by any writer, so canonicalising the 5 records needs the registry's own writer plus a
+# refreshed receipt - an owner-gated structural edit, tracked separately. What is landable NOW, and what this
+# block is for, is the reader that FAILS: a NEW second spelling is refused the moment it is written.
+state_vocabulary:
+  canonical: 'the `STATES` vocabulary in scripts/recompute_decision_summary.py, upper-cased by canonical_state()'
+  # Pinned BY IDENTITY, never by a count (a ceiling would let a NEW spelling hide inside it), and SHRINK-ONLY:
+  # a pinned id that is canonical now is a STALE declaration and fails the rail (D-405).
+  legacy_non_canonical_ids: ['D-2642', 'D-2643', 'D-2644', 'D-2645', 'D-2646']
+  why: >-
+    The five records below spell the SAME state the other 515 spell ACTIVE. They predate the rule and are pinned,
+    not silently tolerated: scripts/recompute_decision_summary.py#spelling_problems() fails on any non-canonical
+    spelling that is NOT pinned, and fails on a pin that no longer describes anything.
+
+# -------------------------------------------------------------------------------------------------------------
+# LOG HEADER (BUG-588). The human log's header may POINT at the census; it may never RESTATE a count.
+#
+# MEASURED 2026-09-27: DECISION-LOG.md line 3 declared '(651 decisions)' while the canonical census read 822 -
+# stale by 171, and UNFALSIFIABLE where it sat (no rail joined a prose count to the derived one). A count in
+# prose is a SECOND HOME for a derived fact (D-2646/BUG-585 class). REWRITE-HEADER, executed: the header names the
+# census and states no count; this block is the reader that FAILS on a restatement.
+log_header:
+  file: DECISION-LOG.md
+  scan_lines: 5
+  census_pointer: config/decisions_summary.json
+  forbidden_count_pattern: '(\d+)\s+decisions'
+  why: >-
+    scripts/check_decision_membership.py#header_problems() reads this block. It is the same rail that joins the
+    log's IDs to the registry: one file, one header, one rule - the file's claims about the registry are checked
+    where the file is read, never by a human remembering to re-type the count.

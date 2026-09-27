@@ -7158,19 +7158,6 @@ INTO the tracked governance/ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv, then retire 
 - an OWNER GATE; this commit wrote no sheet.
 
 
-**BUG-493 STATUS (2026-09-26, CLOSED - MEASURED, not argued).** The owner's PROMOTE landed as `fe239df`:
-`git cat-file -p HEAD:<path> | shasum -a 256` = 526991cb172870066224c8eee2b2c8fb23a7a28062e2bfc5a604cde2757e90ed
-(203963 B). The receipt now joins by HEAD - `provenance: anchor4_depth_sheet_owner_dropin -> head` - and
-`scripts/verify_handoffs.py` is rc=0 (was rc=2 naming EXACTLY ONE owner-owed object). The label fixes landed WITH
-the bytes, so no declaration describes the superseded revision (config/handoffs.yaml REV 2->3;
-config/human_instrument_locks.yaml comment - the sha256 line is the RULE and is unchanged;
-config/anchor4_depth_annex.yaml's stale rev-2 digest reduced to a POINTER, D-2646). NO new receipt and NO rev-3
-locator: 13 records already carry 526991cb/203963, and a locator exists to resolve SUPERSEDED bytes while rev 3
-IS the head. **STILL OWED AND DISTINCT: BUG-431's CONTENT promotion** (merge the owner's complete 150/150 pass
-INTO the tracked governance/ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv, then retire config/anchor4_interim_state.json)
-- an OWNER GATE; this commit wrote no sheet.
-
-
 ## BUG-566 (FIXED, MED): TWO RAILS, ONE FACT - git's OWN temporary index was REFUSED by RAIL 4 and TOLERATED by RAIL 5
 
 MEASURED 2026-09-27 (git 2.39.5 Apple Git-154, --separate-git-dir layout). A PARTIAL commit (`git commit --
@@ -7795,3 +7782,10 @@ FIX (the filed remedy, one line): the snapshot key is RENAMED to `open_bugs_n_at
 has ONE home and the dated block can no longer be read as current. `grep -rn open_bugs_n` now returns exactly one
 UNQUALIFIED key (the derived one) plus one explicitly DATED key - the class (a derived count with two homes) goes
 to zero rather than being tolerated.
+
+## BUG-570 (FIXED, LOW, D-2692): the duplicated BUG-493 status block IS byte-identical - and the comparison that refused it was length-dependent
+MEASURED: governance/buglog.md carried TWO `**BUG-493 STATUS (2026-09-26, CLOSED ...)**` blocks, 1120 B each, sha256 eb6b050458b9e332 IDENTICAL, and they were the ONLY duplicated pair among 459 blocks. The earlier REFUSAL was itself the defect: it compared `occurrence -> EOF`, which two copies can never satisfy (it is length-dependent), so a true copy read as 'not identical'. FIX: the second block is DELETED (BLoat, not a fact), and scripts/check_buglog_coverage.py#duplicate_block_problems() compares BLOCK BYTES and REFUSES a copy of a stated fact - with both directions as controls (a COPY fires; two DIFFERENT blocks do NOT) and a mutation that is SEEN to red the copy control.
+## BUG-588 (FIXED, LOW, D-2692, REWRITE-HEADER): DECISION-LOG.md's header restated a count that had gone stale by 171
+MEASURED: line 3 declared '(651 decisions)' against a census of 822 - a second home for a derived fact, unfalsifiable where it sat, and not repairable by an append (it is line 3 of an append_only file). FIX: REWRITE-HEADER - the header names `config/decisions_summary.json` (the ONE home) and states no count; config/decisions_policy.yaml#log_header declares the rule and scripts/check_decision_membership.py#header_problems() FAILS on a restatement (2 controls both directions, 1 mutation).
+## BUG-583 (FIXED, LOW, D-2692, DECLARE): 5 of 822 decision records spelled the state 'active' while 515 spelled it 'ACTIVE'
+MEASURED: `active` 3 bare + 2 quoted = 5 records, both spellings of ONE state; canonical_state() upper-cases, so the CENSUS was right while the BYTES carried two forms - invisible to every rail and fatal to a consumer comparing state strings exactly. FIX (DECLARE limb of the filed remedy, the limb that needs no non-append write): config/decisions_policy.yaml#state_vocabulary declares the rule and pins the 5 ids BY IDENTITY (shrink-only); scripts/recompute_decision_summary.py#spelling_problems() - live through --check via registry_shape_problems() - FAILS on a non-canonical spelling that is NOT pinned AND on a pin that no longer describes anything (2 controls, 1 mutation). CANONICALISE (the rewrite limb) stays open and owner-gated: config/decisions.yaml is append_only with a PREFIX receipt, so rewriting 5 cells needs the writer's own structural path and a refreshed receipt (D-2655).

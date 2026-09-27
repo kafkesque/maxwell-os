@@ -3,8 +3,8 @@
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
   "total_ids": 328,
-  "open_n": 133,
-  "closed_n": 195,
+  "open_n": 130,
+  "closed_n": 198,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -657,21 +657,6 @@
       "id": "BUG-569",
       "title": "(OPEN, LOW): the adoption NOTE has no RAIL-LEVEL control at a real partial commit",
       "events": 1
-    },
-    {
-      "id": "BUG-570",
-      "title": "(OPEN, LOW): the duplicate BUG-493 CLOSED block is NOT byte-identical (the earlier claim was FALSE)",
-      "events": 2
-    },
-    {
-      "id": "BUG-583",
-      "title": "(OPEN, LOW): 5 of 812 decision records spell the state 'active' in lowercase while 505 spell it 'ACTIVE' (2026-09-27, found by the D-2682 la",
-      "events": 1
-    },
-    {
-      "id": "BUG-588",
-      "title": "(FILED, LOW, D-2690): DECISION-LOG.md declares a decision COUNT that is stale by 169 - a second home",
-      "events": 1
     }
   ],
   "closed": [
@@ -852,6 +837,7 @@
     "BUG-565",
     "BUG-566",
     "BUG-567",
+    "BUG-570",
     "BUG-571",
     "BUG-572",
     "BUG-573",
@@ -864,10 +850,12 @@
     "BUG-580",
     "BUG-581",
     "BUG-582",
+    "BUG-583",
     "BUG-584",
     "BUG-585",
     "BUG-586",
     "BUG-587",
+    "BUG-588",
     "BUG-589",
     "BUG-590"
   ]

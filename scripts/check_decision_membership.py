@@ -97,6 +97,41 @@ def faults(named: list[str], records: list, pinned: list[str]) -> list[str]:
     return problems
 
 
+def control_slug(name: str) -> str:
+    """The control's name as a marker a mutation can be SEEN to red through (D-2676 iv)."""
+    return re.sub(r"[^a-z0-9]+", "_", name.strip().lower()).strip("_")
+
+
+def header_problems(log_text: str, rules: dict | None = None) -> list[str]:
+    """BUG-588: the log's header may POINT at the census; it may never RESTATE a count.
+
+    A count in prose is a second home for a derived fact (D-2646/BUG-585 class) and it is UNFALSIFIABLE where it
+    sits: MEASURED 2026-09-27, line 3 declared '(651 decisions)' while the census read 820 - stale by 169, and
+    no rail joined the two. Rules live in config/decisions_policy.yaml#log_header (ONE home, C12).
+    """
+    if rules is None:
+        if not POLICY_YAML.exists():
+            return [POLICY_YAML.relative_to(ROOT).as_posix() + ": ABSENT - the header rule has no home on disk"]
+        policy_doc = yaml.safe_load(POLICY_YAML.read_text(encoding="utf-8")) or {}
+        rules = policy_doc.get("log_header") or {}
+        if not rules:
+            return [POLICY_YAML.relative_to(ROOT).as_posix() + "#log_header: not declared - the rule that a prose "
+                    "header may not restate a derived count must live where a reader can FAIL on it (D-2644)"]
+    name = str(rules.get("file") or "the log")
+    head = log_text.splitlines()[: int(rules.get("scan_lines") or 5)]
+    problems: list[str] = []
+    pointer = str(rules.get("census_pointer") or "")
+    if pointer and not any(pointer in line for line in head):
+        problems.append(name + ": its header does not name the census (" + pointer + ") - a count with no single "
+                        "home is the defect (D-2646/BUG-588)")
+    pattern = re.compile(str(rules.get("forbidden_count_pattern") or r"(\d+)\s+decisions"))
+    for n, line in enumerate(head, start=1):
+        if pattern.search(line):
+            problems.append(name + " line " + str(n) + ": the header RESTATES a decision count - the census is the "
+                            "ONE home; a prose count went stale by 169 (BUG-588)")
+    return problems
+
+
 def controls() -> list[tuple[str, bool]]:
     """Known-answer controls (BUG-492): a join nobody has seen fire is a comment. Synthetic, never the live tree."""
     recs = [{"id": "D-9001"}, {"id": "D-9002"}, {"id": "D-9003"}]
@@ -123,6 +158,20 @@ def controls() -> list[tuple[str, bool]]:
          bool(policy_problems({}))),
         ("a policy whose membership block is missing its subject set is a NAMED fault",
          bool(policy_problems({"membership": {"log": "DECISION-LOG.md", "legacy_orphan_ids": []}}))),
+        # D-2692: this control's input carried a count and NO census pointer, so it fired for the POINTER reason
+        # and stayed green when the count pattern was neutered - a control that cannot tell its two reasons apart
+        # proves neither (BUG-492), and the mutation gate REFUSED the entry until the input isolated the reason.
+        ("a header that POINTS at the census and STILL restates a count is a NAMED fault (BUG-588)",
+         any("RESTATES" in p for p in header_problems(
+             "> **Updated:** 2026-09-20 | **Count:** `config/decisions_summary.json` (651 decisions)\n",
+             {"file": "DECISION-LOG.md", "scan_lines": 5,
+              "census_pointer": "config/decisions_summary.json",
+              "forbidden_count_pattern": r"(\d+)\s+decisions"}))),
+        ("a header that POINTS at the census and states no count is quiet (both directions, BUG-492)",
+         not header_problems("# DECISION LOG\n\n> Count: `config/decisions_summary.json`\n",
+                             {"file": "DECISION-LOG.md", "scan_lines": 5,
+                              "census_pointer": "config/decisions_summary.json",
+                              "forbidden_count_pattern": r"(\d+)\s+decisions"})),
     ]
 
 
@@ -133,6 +182,8 @@ def selftest() -> int:
         print(("  ok  " if ok else "  !!  ") + name)
     failed = [n for n, ok in rows if not ok]
     if failed:
+        for name in failed:
+            print("  FAIL selftest/" + control_slug(name))
         print("FAIL selftest:" + str(len(failed)) + " of " + str(len(rows)) + " known-answer control(s) did not "
               "fire - a membership join nobody has seen refuse is a comment (BUG-492)")
         return 1
@@ -169,7 +220,7 @@ def main(argv: list[str]) -> int:
     named = named_ids(log_path.read_text(encoding="utf-8"), [str(p) for p in block["id_patterns"]])
     pinned = [normalized_id({"id": p}) for p in (block.get("legacy_orphan_ids") or [])]
     top = set(top_level_ids(records))
-    found = faults(named, records, pinned)
+    found = faults(named, records, pinned) + header_problems(log_path.read_text(encoding="utf-8"))
     if found:
         print("FAIL " + NAME + ": " + str(len(found)) + " fault(s):")
         for problem in found:

@@ -1,6 +1,6 @@
 # Maxwell OS v3.0 — DECISION LOG (tiered)
 
-> **Updated:** 2026-09-20 | **Machine source of truth:** `config/decisions.yaml` (651 decisions)
+> **Updated:** 2026-09-20 | **Machine source of truth:** `config/decisions.yaml` | **Count:** `config/decisions_summary.json` (the census is the ONE home - a count restated in prose is stale the moment it is written, BUG-588)
 > **Archive (full append-only history):** `archive/governance_pre_tiered_2026-09-03/DECISION-LOG.md`
 >
 > **Convention (standing rule):** OPEN/PENDING at the top (most critical first) → ACTIVE in-effect → DONE/CLOSED at the bottom. A decision is "done" only when its `state` is RESOLVED/SUPERSEDED/ARCHIVED/REJECTED.
@@ -1308,3 +1308,37 @@ file is append_only and line 3 is not append-repairable; the owner word is REWRI
 OWNER GATES (one word each; none due while the rails print rc 0): CLOSE/RE-RULE the freeze window; PROMOTE/HOLD
 the standing-rule CONSTITUTION promotion; PROMOTE/HOLD BUG-431; DECLARE/CANONICALISE BUG-583; RENAME/DELETE
 BUG-585 is now SPENT (executed here as RENAME by the filed one-line remedy); REWRITE-HEADER/LEAVE-STALE BUG-588.
+
+## D-2692 (2026-09-27) - the three DRAINED meta-lane ids: a buglog COPY is bloat, a header may not RESTATE a count,
+## a state has ONE spelling (BUG-570 + BUG-588 + BUG-583 FIXED)
+
+BUG-570: a block occurring TWICE with identical bytes is a COPY and a copy is BLOAT. The refusal that had REFUSED
+the real copy compared `occurrence -> EOF` - a length-dependent comparison two identical copies can never satisfy -
+so the REFUSAL was the defect, not the copy. The unit is now the BLOCK, compared by BYTES
+(scripts/check_buglog_coverage.py#duplicate_block_problems); the byte-identical BUG-493 block was DELETED (7797 ->
+7784 lines) and the rail now reports 459 block(s) with 0 copies.
+
+BUG-588: a prose header may POINT at the census but may never RESTATE a count. The ONE home of the rule is
+config/decisions_policy.yaml#log_header; it is READ by scripts/check_decision_membership.py#header_problems - the
+same rail that joins the log's ids - so the file's claims about the registry are checked where the file is read.
+Line 3 was REWRITTEN (owner word REWRITE-HEADER) to name config/decisions_summary.json, which is the census and
+the only place a count may be read.
+
+BUG-583: a state is ONE value with ONE spelling. `active` and `ACTIVE` were two spellings of one state; the census
+was always RIGHT while the BYTES of five records carried the other case (the D-2646 two-homes class). The DECLARE
+limb landed as a SHRINK-ONLY pin of the five ids BY IDENTITY in
+config/decisions_policy.yaml#state_vocabulary.legacy_non_canonical_ids, refused live by
+scripts/recompute_decision_summary.py#spelling_problems. The CANONICALISE limb stays owner-gated: the registry is
+append_only with a PREFIX receipt (D-2655), so rewriting five cells needs the writer's own structural path.
+
+D-2676 limb (iv) SATISFIED for all three: config/rail_mutations.yaml floor 25 -> 28, and the gate MEASURES 27
+declared rule(s) SEEN to red through their own control plus 1 negative control green, floor 28 == 28 declared.
+
+REFUSED ONCE, AND REPAIRED IN THE SAME CHANGE-SET: the first run of the BUG-588 entry REFUSED with rc=0 - the
+control's input carried a count and NO census pointer, so it fired for the POINTER reason and could never tell its
+two reasons apart (BUG-492, one level up). The control was repaired to isolate the count and to NAME the
+restatement; the entry's `why` records the measurement. A control that cannot be seen to fail is not a control,
+and this one was found by the gate the standing rule creates.
+
+NOT DONE, DECLARED: BUG-583's CANONICALISE limb (the five cells) is owner-gated; the last three held ids
+(BUG-568, BUG-569, BUG-559) are still parked, so the window's exit stays UNMET.

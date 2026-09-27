@@ -1315,3 +1315,32 @@ HUMAN GATE REGISTER (unchanged, one word each, none due while the rails print rc
 window; PROMOTE/HOLD the standing-rule CONSTITUTION promotion (POINTER only); PROMOTE/HOLD BUG-431;
 DECLARE/CANONICALISE BUG-583; REWRITE-HEADER/LEAVE-STALE BUG-588 (the one item whose remedy needs a non-append
 edit to an append_only file).
+
+## D-2692 (2026-09-27) - three DRAINED meta-lane ids: a buglog COPY is bloat, a header may not RESTATE a count, a
+## state has ONE spelling. SUPERSEDES the D-2691 row for the DECISION-LOG header, the buglog rail, the state
+## vocabulary and the register counts.
+
+WHERE THINGS LIVE. The buglog BLOAT comparison: scripts/check_buglog_coverage.py#duplicate_block_problems (the
+unit is the BLOCK; `occurrence -> EOF` is length-dependent and cannot refuse a copy); its controls are in the same
+file's selftest (a COPY fires, two DIFFERENT blocks do not) and its teeth are
+config/rail_mutations.yaml#a_duplicated_buglog_block_is_load_bearing. The header rule:
+config/decisions_policy.yaml#log_header (ONE home) read by scripts/check_decision_membership.py#header_problems,
+teeth at #a_log_header_that_restates_a_count_is_load_bearing. The state vocabulary:
+config/decisions_policy.yaml#state_vocabulary (canonical spelling + the five ids pinned BY IDENTITY, SHRINK-ONLY)
+read by scripts/recompute_decision_summary.py#spelling_problems, teeth at
+#a_second_spelling_of_a_state_is_load_bearing. The census a count may be read from: config/decisions_summary.json
+(D-2655) - the DECISION-LOG header NAMES it and states no count.
+CLAIMS SUPERSEDED: "DECISION-LOG.md line 3 may restate a count" -> it names the census, never a count;
+"the buglog's duplicate blocks are not byte-identical" -> they were, and the comparison was the defect;
+"5 records spelling the state 'active' is tolerated silently" -> declared as a shrink-only pin;
+"the mutation floor is 25" -> 28 == 28 declared; register "OPEN 133 / CLOSED 195" -> 130 / 198;
+"the meta-lane freeze holds 6 ids" -> 3 (BUG-568, BUG-569, BUG-559).
+MEASURED, KEPT: the fixture declaration was NOT widened - all three new runners' baselines are green without
+governance/buglog.md or DECISION-LOG.md (--selftest reads no log), and declaring an input no runner reads is the
+D-405 assertion shape (BUG-589 is one-directional: a file a runner READS must be IN).
+REFUSED ONCE: the first mutation run of the BUG-588 entry reported rc=0 - the control fired for its pointer reason
+too - so the control was repaired to isolate the count; a control that cannot be seen to fail is not a control
+(BUG-492), and the gate found it (D-2676 iv doing its job on its first new rule).
+HUMAN GATE REGISTER (unchanged, one word each, none due while the rails print rc 0): CLOSE/RE-RULE the freeze
+window (the drain now stands at 3 held, exit still UNMET); PROMOTE/HOLD the standing-rule CONSTITUTION promotion
+(POINTER only); PROMOTE/HOLD BUG-431; DECLARE/CANONICALISE BUG-583 (DECLARE done; CANONICALISE awaits the word).

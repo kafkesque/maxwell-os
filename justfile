@@ -20,7 +20,8 @@ health:
     python3 scripts/check_human_instruments.py || exit 1
     python3 scripts/check_instrument_cohorts.py governance/ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv || exit 1
     python3 scripts/check_existence_negatives.py || exit 1
-    python3 scripts/check_buglog_coverage.py || exit 1
+    python3 scripts/check_buglog_coverage.py --selftest || exit 1   # BUG-570/BUG-492: the buglog BLOAT rail's own controls - a byte-identical COPY must fire and two DIFFERENT blocks must not
+    python3 scripts/check_buglog_coverage.py || exit 1   # BUG-570: no block may be a byte-identical copy of another (the earlier 'not identical' refusal compared an occurrence to EOF - length-dependent, always unequal)
     python3 scripts/check_bug_status.py || exit 1
     python3 scripts/check_register_divergence.py --selftest || exit 1   # BUG-571/D-2683: BOTH divergence shapes must be SEEN to fire on synthetic logs (a control nothing runs is a comment, BUG-492)
     python3 scripts/check_register_divergence.py || exit 1

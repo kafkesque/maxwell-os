@@ -9906,3 +9906,59 @@ decisions:
   - MASTER-TASK-REGISTER.md
   - governance/CONTEXT_INDEX.md
   - governance/SESSION-HANDOFF-2026-09-26.md
+- id: D-2692
+  date: '2026-09-27'
+  state: ACTIVE
+  category: governance
+  title: THREE DRAINED META-LANE IDS - A BUGLOG COPY IS BLOAT, A HEADER MAY NOT RESTATE A COUNT, A STATE HAS ONE
+    SPELLING (BUG-570 + BUG-588 + BUG-583 FIXED)
+  decision: 'Drained three ids the freeze window HOLDS - the exit of META-LANE-FREEZE-1, never a breach of it -
+    each landing the standing rule''s four limbs (D-2676): (i) ONE HOME, (ii) a control SEEN in both directions,
+    (iii) a NAMED oracle, (iv) a MUTATION that REDs it. BUG-570: a block occurring TWICE with identical bytes is
+    a COPY and a copy is BLOAT; the refusal that had REFUSED the real copy compared `occurrence -> EOF`, a length-dependent
+    comparison two identical copies can never satisfy, so the REFUSAL was the defect - the unit is now the BLOCK,
+    compared by bytes (scripts/check_buglog_coverage.py#duplicate_block_problems) - and the copy was deleted. BUG-588:
+    a prose header may POINT at the census but may never RESTATE a count; the rule''s home is config/decisions_policy.yaml#log_header
+    and it is read by scripts/check_decision_membership.py#header_problems, the same rail that joins the log''s
+    ids, so the file''s claims about the registry are checked where the file is read; DECISION-LOG.md line 3 was
+    REWRITTEN to point at config/decisions_summary.json and state no count. BUG-583: a state is ONE value with ONE
+    spelling - `active` and `ACTIVE` were two spellings of one state, the census was always RIGHT while the BYTES
+    of five records carried the other case (the D-2646 two-homes class); the DECLARE limb landed as a SHRINK-ONLY
+    pin of the five ids BY IDENTITY in config/decisions_policy.yaml#state_vocabulary.legacy_non_canonical_ids, refused
+    by scripts/recompute_decision_summary.py#spelling_problems, while the CANONICALISE limb stays owner-gated because
+    the registry is append_only with a PREFIX receipt (D-2655) - rewriting five cells needs the writer''s own structural
+    path. All three rules were given their teeth in config/rail_mutations.yaml (floor 25 -> 28, the floor EQUALS
+    the measured count).'
+  measured: 'BEFORE: DECISION-LOG.md line 3 declared ''(651 decisions)'' while the registry carried 822 (stale by
+    171); the buglog carried two byte-identical BUG-493 blocks (1-based 7148-7160 and 7161-7173, 1120 B each, sha256
+    eb6b050458b9) and the rail that should have refused it compared an occurrence to EOF, so it reported the bytes
+    as DIFFERENT; 5 of 822 records spelled the state ''active'' while 515 spelled it ''ACTIVE'' and nothing read
+    the spelling; the mutation gate carried 25 entries with NO entry for any of the three new rules. AFTER: buglog
+    7797 -> 7784 lines and 459 block(s) with 0 copies; membership live rc 0 (196 ids NAMED, 822 TOP-LEVEL records,
+    5 pinned legacy orphans, 0 faults, 631 records carrying no log entry - the DECLARED direction); recompute --check
+    rc 0 (822 decisions, stamp 63da301eece7a685) and --selftest 16/16; membership --selftest 12/12; buglog --selftest
+    2/2; the mutation gate 27 declared rule(s) SEEN to red through their own control plus 1 negative control green,
+    floor 28 EQUALS the 28 declared, 18/13 declared subject(s) covered; register OPEN 133 -> 130 and CLOSED 195
+    -> 198; the freeze window''s parked set 6 -> 3 still OPEN (BUG-568, BUG-569, BUG-559). REFUSED ONCE AND REPAIRED:
+    this change-set''s own mutation run REFUSED with rc=0 - the BUG-588 control''s input carried a count and NO
+    census pointer, so it fired for the POINTER reason and could never tell its two reasons apart (BUG-492 one level
+    up); the control was repaired to isolate the count and now NAMES the restatement, and the entry''s `why` records
+    the measurement. Anchor status unchanged: 4.5 of 5 axes, extraction_type still the one axis with no anchor.'
+  bugs:
+  - BUG-570
+  - BUG-588
+  - BUG-583
+  files:
+  - governance/buglog.md
+  - scripts/check_buglog_coverage.py
+  - DECISION-LOG.md
+  - config/decisions_policy.yaml
+  - scripts/check_decision_membership.py
+  - scripts/recompute_decision_summary.py
+  - config/rail_mutations.yaml
+  - justfile
+  - governance/bug_status.json
+  - governance/bug_status.md
+  - agent/session_seed.yaml
+  - MASTER-TASK-REGISTER.md
+  - governance/CONTEXT_INDEX.md

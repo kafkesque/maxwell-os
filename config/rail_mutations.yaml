@@ -34,7 +34,7 @@ fixture:
   keep: false
   timeout_seconds: 600
 coverage:
-  min_mutations: 25            # FLOOR (shrink guard): deleting an entry means editing the floor in a diff a human reads
+  min_mutations: 28            # FLOOR (shrink guard): deleting an entry means editing the floor in a diff a human reads            # FLOOR (shrink guard): deleting an entry means editing the floor in a diff a human reads
   # D-2679: the coverage set is DERIVED, never restated. Which rails gate a COMMIT is one fact and it already has
   # ONE home (config/rail_registry.yaml#commit_boundary), so restating it here would be a SECOND HOME - and two
   # lists of one fact drift, and only one of them can be right. scripts/check_rail_mutations.py joins the two and
@@ -490,3 +490,67 @@ mutations:
       twice. With the census neutered the TWICE case is no longer refused, so the control that NAMES the rule
       stops firing while the live control (every declared recipe is clean) stays green: the differential is real
       and the marker is the control's own name.
+
+  # BUG-570 (D-2692) - the BUGLOG BLOAT rail. A block occurring TWICE with identical bytes is a COPY, and
+  # the comparison that REFUSED the real copy was `occurrence -> EOF`: length-dependent, so two identical
+  # copies could never satisfy it (BUG-492, both directions) - the REFUSAL was the defect, not the copy. The
+  # comparison now reads BLOCK BYTES (scripts/check_buglog_coverage.py#duplicate_block_problems); this entry
+  # makes that read SEEABLE to fail (D-2676 iv) - a guard nobody can red is a comment.
+  - id: a_duplicated_buglog_block_is_load_bearing
+    subject: scripts/check_buglog_coverage.py
+    op: replace
+    find: '        if len(spans) > 1:'
+    replace: '        if len(spans) > 1 and False:  # MUTATION (D-2676): a duplicated block stops being read'
+    runner: scripts/check_buglog_coverage.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: '  FAIL selftest/a_block_that_occurs_twice_byte_identically_is_a_named_fault_the_bug_493_copy'
+    why: >-
+      BUG-570: a block copied byte-for-byte is BLOAT, and the ONLY control that names the fault is the TWICE case; with the
+      comparison neutered that control stops firing while the control that refuses to delete a DIFFERENT block keeps
+      passing, so the differential is real and the marker is the control's own name - DERIVED from it, never transcribed.
+
+  # BUG-588 (D-2692, REWRITE-HEADER) - a prose header may POINT at the census; it may never RESTATE a
+  # count. The rule lives in config/decisions_policy.yaml#log_header and is READ where the log's own claims
+  # about the registry are read (scripts/check_decision_membership.py#header_problems), so the file that
+  # restated a count stale by 171 is checked by the same rail that joins its ids. MEASURED 2026-09-27: the
+  # FIRST run of this entry REFUSED with rc=0, because the control's input isolated no reason - the repair
+  # landed with the finding; this entry makes the read SEEABLE to fail (D-2676 iv).
+  - id: a_log_header_that_restates_a_count_is_load_bearing
+    subject: scripts/check_decision_membership.py
+    op: replace
+    find: '        if pattern.search(line):'
+    replace: '        if False:  # MUTATION (D-2676): the header count stops being read'
+    runner: scripts/check_decision_membership.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: '  FAIL selftest/a_header_that_points_at_the_census_and_still_restates_a_count_is_a_named_fault_bug_588'
+    why: >-
+      BUG-588: the header's count had drifted 171 records behind the registry because NOTHING read it; with the pattern
+      match neutered the control that NAMES the fault stops firing while the control that accepts a header POINTING at the
+      census keeps passing, so the differential is real. This entry's first run was REFUSED by the gate with rc=0 - the
+      control fired for its POINTER reason too, so the entry proved nothing until the control was repaired to isolate the
+      count (BUG-492, both directions).
+
+  # BUG-583 (D-2692, DECLARE) - a state is ONE value with ONE spelling, and `active` / `ACTIVE` were two
+  # spellings of one state. The census was always RIGHT while the BYTES of five records carried the other
+  # case (the D-2646 two-homes class); the record's declared pin lives in
+  # config/decisions_policy.yaml#state_vocabulary.legacy_non_canonical_ids and the refusal lives in
+  # scripts/recompute_decision_summary.py#spelling_problems, so the writer that OWNS the vocabulary is the
+  # file that refuses an undeclared spelling; this entry makes that read SEEABLE to fail (D-2676 iv).
+  - id: a_second_spelling_of_a_state_is_load_bearing
+    subject: scripts/recompute_decision_summary.py
+    op: replace
+    find: '        if normalized_id(record) not in pin:'
+    replace: '        if False:  # MUTATION (D-2676): a second spelling of a state stops being read'
+    runner: scripts/recompute_decision_summary.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: '  FAIL selftest/a_state_spelled_in_a_non_canonical_case_with_no_pin_is_a_named_fault_bug_583'
+    why: >-
+      BUG-583: an undeclared second spelling of a state is a NAMED fault, so a NEW one may never land silently; with the pin
+      lookup neutered that control stops firing while the stale-pin control (a pin that describes nothing) keeps passing, so
+      the differential is real and the marker is the control's own name - DERIVED from it, never transcribed.

@@ -797,3 +797,32 @@ list is already measured) and BUG-572/BUG-583 (the state-word pair); (3) BUG-599
 declared home for the leak scan (owed since D-2686); (5) the object-level program: extraction_type is the ONE axis
 of the five with NO anchor at all (251/251 rows empty) and no verifier (F-15), which is the single largest block
 in front of the 7,000+-object work.
+
+## D-2692 (2026-09-27) - DRAINED: BUG-570, BUG-588, BUG-583 FIXED; the mutation floor moved 25 -> 28.
+
+DONE: (1) BUG-570 - the buglog BLOAT rail compares BLOCK BYTES (the `occurrence -> EOF` comparison that refused a
+true copy is gone), the byte-identical BUG-493 block is DELETED (7797 -> 7784 lines, 459 block(s), 0 copies), and
+scripts/check_buglog_coverage.py carries controls in BOTH directions (a COPY fires; two DIFFERENT blocks do not).
+(2) BUG-588 - DECISION-LOG.md line 3 REWRITTEN by owner word REWRITE-HEADER: it names config/decisions_summary.json
+and states no count; the rule has ONE home (config/decisions_policy.yaml#log_header) and is read by
+scripts/check_decision_membership.py#header_problems (12/12 controls). (3) BUG-583 - the DECLARE limb landed: five
+ids pinned BY IDENTITY, SHRINK-ONLY, refused live by scripts/recompute_decision_summary.py#spelling_problems (16/16
+controls, --check rc 0); CANONICALISE is owner-gated (append_only registry + PREFIX receipt, D-2655).
+(4) D-2676 limb (iv) landed: three new mutation entries + the floor 25 -> 28; the gate is rc 0 with 27 declared
+rule(s) SEEN to red, 1 negative control green, floor 28 == 28, 18/13 declared subject(s) covered.
+(5) The BUG-588 control was FOUND DEFECTIVE by that gate (it fired for its pointer reason, so the mutation could
+not red it) and was REPAIRED in the same change-set - reported, not hidden.
+D-2692 minted through the canonical path (D-2660): 822 -> 823 records, census source_sha256 refreshed.
+CORRECTED COUNT: the register is OPEN 130 / CLOSED 198 (the drain moved 133/195 -> 130/198); agent/session_seed.yaml
+already carries the re-derived open_bugs_n (ONE home, D-2691) and it is unchanged by this change-set.
+NOT WIDENED, MEASURED: the mutation fixture's include_files was left at [justfile, governance/bug_status.json] -
+all three new runners' baselines are GREEN in a real fixture without governance/buglog.md or DECISION-LOG.md,
+because --selftest reads no log; declaring an input no runner reads would be the D-405 assertion shape.
+NEXT (consequential order): (1) the LAST THREE HELD IDS - BUG-569 (the adoption NOTE has no rail-level control at a
+real partial commit), BUG-568 (RAIL 0 does not pin its own git subject), BUG-559 (a receipt can be cut over bytes
+joined to NO revision); draining them takes the window's exit to MET so the owner can CLOSE it. (2) BUG-583
+CANONICALISE (owner word; needs the writer's structural path for an append_only registry). (3) The declared home
+for the leak scan (owed since D-2686). (4) The product lane: extraction_type is the ONE axis of five with NO
+anchor (0/251 rows), no verifier (F-15) and no consumer - the largest single block in front of the 7,000+ work.
+(5) The 10 soft depth/domain findings; the object-level sweep against the ratified ruler; S6 commit_non_fb_types
+sidecars; the Tier3 boundary corpus; F-14 (gated on G2).

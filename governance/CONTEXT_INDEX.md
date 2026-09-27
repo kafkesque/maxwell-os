@@ -1100,7 +1100,7 @@ permanent, and it did not consult the pin. `just health` was NOT run between 12:
 - **ALSO MEASURED**: a status word in a heading's TITLE decides a bug's status when the paren slot names none (BUG-570 read
   CLOSED while live). The blanket tightening flips 10 of 397 events - 2 corrections, 8 regressions - so it is REFUSED on
   measurement and filed as BUG-572.
-- **NEXT**: BUG-560 (write_guard for apply_workbook_rulings.py), BUG-571 (the cited-by-decision join), BUG-568 (a derived
+- **NEXT**: BUG-571 (the cited-by-decision join), BUG-568 (a derived
   rail-0 pin), the BUG-431 CONTENT promotion (OWNER GATE).
 
 ## REGISTERED 2026-09-27 - D-2675, the BOUNDARY REHEARSAL (the class-level closure of BUG-527/566/568/569/574)
@@ -1221,3 +1221,21 @@ SUPERSEDES-NOTHING. It AMENDS BUG-563's owed remedy ("an ignore rule carrying a 
 follow-up; the BUG-528b sequencing defect is why).
 NOW. `backups/**` and the per-run snapshots are excluded BY DECISION; the six indexed stores are committable;
 `just health` reports `0 in neither home`.
+
+## THE OWNER-RULING APPLIER IS GUARDED AND EVERY ARTIFACT READS ITS OWN TERMINATOR (D-2685, 2026-09-27)
+
+- **scripts/apply_workbook_rulings.py** (the ONLY writer of an owner ruling) now goes through
+  `write_guard.write_rows(mode="merge", owned_keys=<ruled columns>)` + `write_guard.append_lines` (SUFFIX-ONLY
+  ledger append). BUG-560 FIXED.
+- **The cell scope has ONE home**: `config/anchor_workbook_fixes.yaml#rulings_io.owned_columns`, joined to the
+  column map in code by `scope_faults()`. Never restate the scope in the script.
+- **`just health` runs `apply_workbook_rulings.py --selftest` and `--check`** - the `--check` line is the
+  anti-REVERT rail, and CONTEXT_INDEX line 843, the script docstring and config#rulings_io all claimed it was
+  wired into `just health` while NO home ran it. Those three claims are true as of D-2685; the claim itself was
+  the BUG-582 shape (declared in three homes, run in none) on the one rail that defends the owner's rulings.
+- **Every artifact's line terminator is READ from that artifact's own bytes** (`artifact_terminator`), never
+  inferred from a `read_text()` string (the old `"\r\n" in read_text()` branch could never fire) and never
+  borrowed from a sibling artifact (the fixlog once got the WORKBOOK's terminator).
+- **`append_lines` vs `append_rows`**: `append_rows` regenerates every pre-image line through csv.DictWriter, so
+  it RE-TERMINATES a ledger the writer does not own; `append_lines` proves the pre-image is a byte PREFIX and
+  that the bytes past it are exactly the declared suffix. Use it for append-only LEDGERS.

@@ -1076,3 +1076,38 @@ repo-integrity worktree: 14 dirty path(s) - 14 granted, 0 declared-excluded, 0 i
 repo-integrity worktree selftest: 6 known-answer control(s)` rc=0; mutation gate `worktree_undeclared_dirty_path_
 rule_is_load_bearing` SEEN to red (floor 12 -> 13). The previous turn's owed POST-change whole-set scan:
 `just health-full` = 91 line(s) RUN, 0 fault(s).
+
+## D-2685 (2026-09-27) - THE OWNER-RULING APPLIER PASSES THROUGH THE GUARD, AND EVERY TERMINATOR IS READ FROM ITS OWN ARTIFACT (BUG-560 FIXED)
+
+THE RULE. A writer of an owner's cells passes through write_guard - no exception for the ONE writer that exists
+to stop a normalize re-run from reverting the owner's rulings. The workbook goes through
+write_rows(mode="merge", owned_keys=<the ruled columns>); the fixlog goes through append_lines, a SUFFIX-ONLY
+append. The CELL SCOPE is DECLARED (config/anchor_workbook_fixes.yaml#rulings_io.owned_columns) and JOINED to
+the column map by a pure scope_faults(): a ruling whose target column is not in the declaration is refused
+before a byte is written, so a code edit cannot widen the applier's reach.
+WHY A SECOND APPEND API. append_rows judges CELLS and regenerates every pre-image line through csv.DictWriter.
+On this ledger that means re-terminating 23 lines the applier does not own (MEASURED: 14 CRLF + 9 LF), so the
+fixlog needed a proof that is about the BYTES IT APPENDS: suffix_faults() checks that the pre-image is a PREFIX
+of the post-image and that the bytes past it are exactly the declared suffix. The ledger's terminator is read
+from the LEDGER's own last line, never the workbook's - the old bug in one sentence: two artifacts, one
+convention, and the one that did not own it was rewritten.
+THE INERT GUESS (found while landing it). The workbook's terminator was inferred by `"\r\n" in read_text()`,
+which can never be true: read_text() has already translated CRLF away, so the branch was dead and the writer's
+convention was decided by a comparison that could not fire. artifact_terminator() reads BYTES from the artifact
+about to change, for BOTH artifacts, and fails closed (C16) rather than joining a last line to the next.
+WHY IT WAS INVISIBLE. The applier was DECLARED (config#rulings_io, artifact_ownership.yaml, CONTEXT_INDEX) - so
+no registry could call it undeclared while it left no receipt: declaration is not receipt. And `--check`, the
+anti-revert rail, was declared as "checked by `just health`" in three homes and run in none (the BUG-582 shape).
+THE STANDING RULE (D-2676) SATISFIED. (i) ONE HOME: config#rulings_io.owned_columns; (ii) SEEN boundary: the
+justfile `--selftest` and `--check` ladder lines (a control nothing runs is a comment, BUG-492); (iii) NAMED
+oracle: applier `--selftest` (14 controls) and write_guard `--selftest` (13 invariants); (iv) MUTATION: 4 new
+entries (the scope join, the suffix-only proof, the workbook's terminator, the ledger's terminator), floor
+13 -> 17, all SEEN to red through their own named markers.
+MEASURED. `ok apply_workbook_rulings selftest: 14 controls hold`; `ok workbook rulings: 4 cell ruling(s)
+present, 5 row declaration(s), scope [depth_final, depth_final_class, domains_final, domains_final_raw,
+primary_domain]`; `ok write_guard selftest: 13 invariants hold ... the 6 expected refusals`; `ok rail mutations:
+16 declared rule(s) SEEN to red through their own control`; `just health` = 0 fault(s), rc=0.
+OWED / NOT SILENT. (1) The selftest's own leak (5 fixture pre-images in the LIVE backups/, now removed and
+controlled) says the FIXTURE-ISOLATION rule needs a whole-set scan: which other `--selftest` writes default to
+backup=True and deposit into the tree they audit? (2) config/derivations.yaml carries a rail-written re-measure
+(shadowed_declared 211 -> 212) that still needs a commit-or-revert decision with a stated reason.

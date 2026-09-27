@@ -38,7 +38,7 @@
     {
       "id": "decision_supersession_complete",
       "state": "ok",
-      "evidence": "every SUPERSEDED record names a resolvable successor in 814 record(s); 12 pinned legacy id(s) still owed",
+      "evidence": "every SUPERSEDED record names a resolvable successor in 815 record(s); 12 pinned legacy id(s) still owed",
       "check": "decision_supersession_complete",
       "about": "config/decisions.yaml",
       "declares": "config/decisions_policy.yaml#graph"
@@ -102,7 +102,7 @@
     {
       "id": "reach",
       "state": "ok",
-      "evidence": "0 uninvoked of 107 reachable check script(s), 1 declared edge(s) (0 dead), debt_max 0",
+      "evidence": "0 uninvoked of 108 reachable check script(s), 1 declared edge(s) (0 dead), debt_max 0",
       "unwired": [],
       "edges": [
         {

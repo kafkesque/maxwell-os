@@ -30,7 +30,7 @@ fixture:
   keep: false
   timeout_seconds: 600
 coverage:
-  min_mutations: 13            # FLOOR (shrink guard): deleting an entry means editing the floor in a diff a human reads
+  min_mutations: 17            # FLOOR (shrink guard): deleting an entry means editing the floor in a diff a human reads
   # D-2679: the coverage set is DERIVED, never restated. Which rails gate a COMMIT is one fact and it already has
   # ONE home (config/rail_registry.yaml#commit_boundary), so restating it here would be a SECOND HOME - and two
   # lists of one fact drift, and only one of them can be right. scripts/check_rail_mutations.py joins the two and
@@ -220,6 +220,71 @@ mutations:
     expect: red
     mutated_rc: 1
     marker: 'FAIL repo-integrity selftest: an undeclared dirty path is a FAULT'
+  - id: ruling_scope_join_is_load_bearing
+    subject: scripts/apply_workbook_rulings.py
+    op: replace
+    find: '            if col not in owned:'
+    replace: '            if False:  # MUTATION (D-2676): a ruling may reach any column it likes'
+    runner: scripts/apply_workbook_rulings.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: 'FAIL selftest/ruling_outside_the_declared_scope_is_refused'
+    why: >-
+      BUG-560/D-2685: the applier writes cells the OWNER owns, and which cells those are is DECLARED in
+      config/anchor_workbook_fixes.yaml#rulings_io.owned_columns. With the join inert, the column map in
+      targets() becomes the authority instead of the declaration - a code edit silently widens what the applier
+      may overwrite, which is the D-401/BUG-478 class one layer down (the applier that exists to defend the
+      owner's rulings becomes the writer that overwrites them).
+
+  - id: append_lines_suffix_only_rule_is_load_bearing
+    subject: scripts/lib/write_guard.py
+    op: replace
+    find: '    if post[: len(pre)] != pre:'
+    replace: '    if False:  # MUTATION (D-2676): the suffix-only proof stops proving'
+    runner: scripts/lib/write_guard.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: 'FAIL selftest/suffix_only_append_reports_a_changed_pre_image'
+    why: >-
+      BUG-560/D-2685: append_lines exists because append_rows REGENERATES the pre-image lines it does not own
+      (MEASURED: the owner's fixlog holds 14 CRLF and 9 LF lines, so 23 lines would have been re-terminated).
+      With the prefix clause inert, the API still claims a suffix-only append while a changed pre-image passes:
+      a ledger whose earlier lines were rewritten would read as evidence of an append that never happened.
+
+  - id: workbook_write_term_follows_the_workbook
+    subject: scripts/apply_workbook_rulings.py
+    op: replace
+    find: '    newline = artifact_terminator(wb)'
+    replace: '    newline = "\n"  # MUTATION (D-2676): the workbook is rewritten with a terminator nobody measured'
+    runner: scripts/apply_workbook_rulings.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: 'FAIL selftest/the_workbook_keeps_its_own_terminator'
+    why: >-
+      BUG-560/D-2685: write_guard.write_rows REGENERATES every line of the workbook it rewrites, so the
+      terminator it is handed decides the bytes of the 149 lines this writer does not own. With the terminator
+      hardcoded to LF, a CRLF workbook comes back re-terminated end to end and the named control goes RED: the
+      convention is MEASURED from the artifact, never assumed by the writer.
+
+  - id: fixlog_terminator_is_not_borrowed_from_the_workbook
+    subject: scripts/apply_workbook_rulings.py
+    op: replace
+    find: '    term = artifact_terminator(fixlog)'
+    replace: "    term = newline  # MUTATION (D-2676): the ledger append borrows the workbook's terminator"
+    runner: scripts/apply_workbook_rulings.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: 'FAIL selftest/the_two_artifacts_keep_their_own_terminators'
+    why: >-
+      BUG-560/D-2685: the OLD applier handed the fixlog the WORKBOOK's terminator - two artifacts, one
+      convention, and the one that did not own it was destroyed (MEASURED: this ledger holds 14 CRLF and 9 LF
+      lines). With the terminator borrowed again, a CRLF ledger gains LF lines and the named control goes RED
+      through its own marker: each artifact's terminator is read from THAT artifact (D-2676 iv).
+
   - id: register_uncarried_rule_is_load_bearing
     subject: scripts/check_register_divergence.py
     op: replace

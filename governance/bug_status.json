@@ -3,8 +3,8 @@
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
   "total_ids": 322,
-  "open_n": 135,
-  "closed_n": 187,
+  "open_n": 134,
+  "closed_n": 188,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -644,11 +644,6 @@
       "events": 1
     },
     {
-      "id": "BUG-560",
-      "title": "(MED - D-2666, OPEN 2026-09-26): the sanctioned applier rewrites a `human_authored` artifact OUTSIDE write_guard and leaves no mutation rece",
-      "events": 1
-    },
-    {
       "id": "BUG-564",
       "title": "the COMMIT BOUNDARY was a claim; the pairing rail is now a PROPERTY (D-2669) - 2026-09-26",
       "events": 1
@@ -855,6 +850,7 @@
     "BUG-556",
     "BUG-557",
     "BUG-558",
+    "BUG-560",
     "BUG-561",
     "BUG-562",
     "BUG-563",

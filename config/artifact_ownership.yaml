@@ -70,7 +70,11 @@ artifacts:
   governance/anchor_adjudication_workbook_20260924.csv:
     mutability: human_authored
     id_column: item_id
-    owned_by: [owner_depth, owner_note, owner_date, domains_final, depth_final]
+    # BUG-560/D-2685: owned_by was INCOMPLETE - it omitted three columns this artifact's ruled cells occupy
+    # (depth_final_class, domains_final_raw, primary_domain), so the declaration under-declared the very
+    # ownership the guard arbitrates over. MEASURED against scripts/apply_workbook_rulings.py::targets().
+    owned_by: [owner_depth, owner_note, owner_date, domains_final, depth_final, depth_final_class,
+               domains_final_raw, primary_domain]
     writer_of_record: scripts/ingest_panel_column.py
     machine_writers_forbidden: [scripts/cross_examine_anchor_axes.py]
     note: >
@@ -85,6 +89,23 @@ artifacts:
       rows": MEASURED, this ingestor PRESERVES the row count (new_rows is a map over the pre-image), so the
       exemption described a mechanism the code does not have (BUG-491c, instance 2). Routing it also closed a
       latent whole-file edit - the local csv.DictWriter would have re-terminated all 149 LF lines with CRLF.
+
+  governance/anchor_adjudication_fixlog_20260925.csv:
+    mutability: append_only
+    id_column: item_id
+    writer_of_record: scripts/apply_workbook_rulings.py
+    unreconciled_reason: >-
+      BUG-560/D-2685: a LEDGER, not a declaration, so the cover rule (scripts/reconcile.py) would have to
+      compare an append log against a pointer that merely names it. Its reconciliation is BY CONSTRUCTION and
+      machine-checked instead: write_guard.append_lines proves the pre-image bytes survive as a PREFIX of the
+      post-image (suffix_faults, both directions), and the rule this applier follows is DECLARED in
+      config/anchor_workbook_fixes.yaml#owner_rulings. Declared here because write_guard --audit's population is
+      DECLARED writers only - until this entry the applier was INVISIBLE to the one rail that bounds this class.
+    note: >
+      MEASURED 2026-09-27: 14 CRLF and 9 LF lines - a mixed-terminator ledger. That is why this writer uses
+      append_lines and NOT append_rows (which regenerates every pre-image line through csv.DictWriter), and why
+      the terminator is read from the ledger's own last line rather than from the workbook's: the old code fed
+      this file the WORKBOOK's convention.
 
   governance/RECONCILIATION.json:
     mutability: derived_regenerable

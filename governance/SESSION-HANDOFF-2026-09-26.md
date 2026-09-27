@@ -581,3 +581,27 @@ follow-up: the hook moment for the BUG-563 rule once a plan entry can land WITH 
 frozen background (BUG-564 remainder, BUG-572, BUG-583, BUG-584, BUG-559).
 OWNER GATE (DUE). META-LANE FREEZE ruling; the standing-rule CONSTITUTION promotion (POINTER only); BUG-431
 CONTENT promotion; BUG-583 (canonicalise the 5 lowercase 'active' spellings vs declare the rule).
+
+## 2026-09-27 (later) - BUG-560 FIXED (D-2685): the owner-ruling applier passes through write_guard
+
+LANDED. scripts/apply_workbook_rulings.py writes the workbook through write_guard.write_rows(mode="merge",
+owned_keys=<the ruled columns>) and appends the fixlog through the new write_guard.append_lines (SUFFIX-ONLY).
+The CELL SCOPE has ONE home (config/anchor_workbook_fixes.yaml#rulings_io.owned_columns) joined by a pure
+scope_faults(); config#rulings_io.backup_dir/backup_suffix DELETED; config/artifact_ownership.yaml#owned_by
+completed (+3 columns) and the fixlog declared append_only with a writer_of_record.
+STANDING RULE (D-2676) SATISFIED: ONE HOME (config#rulings_io.owned_columns); SEEN boundary (justfile --selftest
++ --check - both DECLARED in three homes since D-387 and RUN in none, the BUG-582 shape on the anti-revert rail);
+NAMED oracle (applier --selftest 14 controls; write_guard --selftest 13 invariants / 6 refusals, both counts now
+DERIVED from the source that ran); MUTATION (4 entries, floor 13 -> 17, all SEEN to red).
+FOUND IN THE PRE-COMMIT AUDIT OF THIS CHANGE-SET (two defects of my own): the fixlog control's expectation named
+ONE line while the ruling writes TWO cells; and the selftest deposited 5 fixture pre-images in the LIVE
+backups/ (write_rows backs up by default) - removed through pipeline/safe_delete.py, and a NAMED control now
+asserts nothing under backups/ appears.
+MEASURED. applier --selftest 14/14; --check green (4 cell rulings, 5 row declarations, scope 5 columns);
+write_guard --selftest green; `just health` rc=0; mutation gate `ok rail mutations: 16 declared rule(s) SEEN`
+(floor 17); write_guard --audit 7/10 declared writers guarded (ceiling 3, owner-owed, not fatal).
+NEXT. (1) product lane: BUG-564 remainder (the hook ROUTE as a declared subject), BUG-572, BUG-583, BUG-584;
+(2) OWED: a whole-set scan for the leak class this fix found in its OWN selftest (which `--selftest` writes
+deposit pre-images into the tree they audit?); (3) DECIDE config/derivations.yaml (rail re-measure 211 -> 212);
+(4) the frozen background is unchanged. OWNER GATE (DUE): META-LANE FREEZE ruling; the standing-rule CONSTITUTION
+promotion (POINTER only); BUG-431 CONTENT promotion; BUG-583.

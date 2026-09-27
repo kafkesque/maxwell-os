@@ -20,6 +20,7 @@ Usage:
     from scripts.lib.write_guard import write_rows, append_rows, WriteRefused, OWNED_ANY
     report = write_rows(path, rows, owned_keys={"depth_final"}, writer="scripts/foo.py", mode="merge")
     report = append_rows(path, new_rows, owned_keys={"machine_depth"}, writer="scripts/foo.py")  # additions only
+    report = append_lines(path, ["a,b,c"], writer="scripts/foo.py")  # a LEDGER: suffix-only, pre-image bytes preserved
 
 Self-test (runs in CI, asserts the refusals it claims):  python3 scripts/lib/write_guard.py --selftest
 """
@@ -44,7 +45,7 @@ JOURNAL = REPO / "governance" / "MUTATION_JOURNAL.jsonl"
 OWNERSHIP = REPO / "config" / "artifact_ownership.yaml"
 #: The guard's public call sites. A mention of the module is not a call: an import with no call is a script
 #: that DECLARES the discipline and does not apply it (D-401/I1).
-GUARD_CALLS = ("write_rows", "append_rows", "write_document", "plan")
+GUARD_CALLS = ("write_rows", "append_rows", "append_lines", "write_document", "plan")
 
 #: Sentinel for a legitimate whole-file regeneration (a fresh derived artifact). It is EXPLICIT because
 #: "I own everything" must be a declared decision, never a default that silently skips the guard.
@@ -366,6 +367,82 @@ def append_rows(path: Path, rows: list[dict[str, str]], *, owned_keys: set[str],
     return rep
 
 
+def suffix_faults(pre: bytes, post: bytes, suffix: bytes) -> list[str]:
+    """PURE: the SUFFIX-ONLY verdict over three byte strings (BUG-560/D-2685).
+
+    Every input is a PARAMETER, so the controls that drive this are synthetic and this repository's own bytes can
+    never make one pass (BUG-492). It states the only thing an appender to a ledger has to prove: the bytes that
+    were there are STILL there, unchanged and in place, and everything after them is what the writer declared.
+    """
+    faults: list[str] = []
+    if post[: len(pre)] != pre:
+        faults.append("the write CHANGED bytes before the append point (the pre-image is not a prefix of the "
+                      "post-image - an append may never rewrite a line it does not own)")
+    if post[len(pre):] != suffix:
+        faults.append("the bytes past the pre-image are not the lines this writer declared ("
+                      + repr(post[len(pre):][:80]) + " != " + repr(suffix[:80]) + ")")
+    return faults
+
+
+def append_lines(path: Path, lines: list[str], *, writer: str, encoding: str = "utf-8",
+                 lineterminator: str = "\n", backup: bool = False, journal: bool = True) -> WriteReport:
+    """APPEND whole lines to a LEDGER under the SUFFIX-ONLY invariant, or refuse (BUG-560/D-2685).
+
+    WHY A SECOND APPEND API: append_rows judges CELLS and then regenerates every pre-image line's bytes through
+    csv.DictWriter - MEASURED on the owner's fixlog (14 CRLF and 9 LF lines), a declared append that way would
+    re-terminate 23 lines of a ledger whose bytes the appender does not own, which is the whole-file byte change
+    disguised as an addition that _write_csv_atomic's own docstring warns about. An append that only ever ADDS a
+    suffix cannot destroy a foreign cell, so it needs no ownership arbitration - it needs a PROOF of that shape:
+    suffix_faults() is checked on the composed bytes BEFORE the write and on the artifact AFTER it (C16).
+
+    backup defaults to False, for write_document's reason: an append does not destroy the pre-image that R-D410
+    exists to preserve, and the receipt still records the digest it replaced.
+    """
+    pre = path.read_bytes()
+    if pre and not pre.endswith((b"\n", b"\r")):
+        print("REFUSED append to " + _label(path) + " by " + writer)
+        print("  !! the ledger does not END with a line terminator, so an append would JOIN its last line - repair "
+              "the artifact, never the appender (C16). Nothing was written.")
+        raise WriteRefused(1)
+    if not lines:
+        print("REFUSED append to " + _label(path) + " by " + writer)
+        print("  !! no lines were declared: an append with nothing to add cannot leave a receipt that says "
+              "anything (C16). Nothing was written.")
+        raise WriteRefused(1)
+    for ln in lines:
+        if "\n" in ln or "\r" in ln:
+            print("REFUSED append to " + _label(path) + " by " + writer)
+            print("  !! a 'line' carries its own terminator " + repr(ln) + " - a terminator smuggled inside a line "
+                  "is a rewrite of the ledger's convention wearing an append's clothes (C16). Nothing was written.")
+            raise WriteRefused(1)
+    suffix = "".join(ln + lineterminator for ln in lines).encode(encoding)
+    pre16 = _sha16(path)
+    backup_path: Path | None = _backup(path, writer) if backup else None
+    if journal:
+        JOURNAL.parent.mkdir(parents=True, exist_ok=True)
+    fd, tmp = tempfile.mkstemp(dir=str(path.parent), prefix=".wg_", suffix=path.suffix)
+    try:
+        with os.fdopen(fd, "wb") as fh:
+            fh.write(pre + suffix)
+            fh.flush()
+            os.fsync(fh.fileno())
+        os.replace(tmp, path)
+    finally:
+        if os.path.exists(tmp):
+            os.unlink(tmp)
+    on_disk = path.read_bytes()
+    faults = suffix_faults(pre, on_disk, suffix)
+    if faults:
+        raise WriteRefused("FAIL-CLOSED: append_lines post-write verification failed for " + str(path) + ": "
+                           + str(faults))
+    rep = WriteReport(path=str(path), writer=writer, mode="append_lines", owned_keys=[], touched=[], added=len(lines),
+                      rows=len(on_disk.decode(encoding, "replace").splitlines()), kind="lines",
+                      backup=str(backup_path) if backup_path else None, pre_sha16=pre16, post_sha16=_sha16(path))
+    if journal:
+        rep.record()
+    return rep
+
+
 def write_document(path: Path, text: str, *, writer: str, owned_keys: set[str],
                    backup: bool = False, journal: bool = True) -> WriteReport:
     """Write a WHOLE-DOCUMENT artifact (JSON/YAML/text) crash-safely, or refuse (D-401/I1).
@@ -540,6 +617,27 @@ def audit() -> int:
     return 0
 
 
+def _selftest_counts() -> tuple[int, int]:
+    """The two counts the selftest's verdict PRINTS, DERIVED from the selftest that just ran (BUG-492 class).
+
+    MEASURED 2026-09-27: the verdict claimed "13 invariants ... the 5 expected refusals" while the body held 10
+    numbered invariants and 6 refusal sites, and HEAD claimed "10 ... the 5" before the append_lines work. A
+    number in prose that nothing measures is the defect BUG-582 names, one level down: it drifts the moment an
+    invariant is added, and the verdict is the one line a reader trusts. So both are READ off the source of the
+    function that just ran - the numbered `# N.` invariants and the `except WriteRefused` refusal sites - and
+    counting beats transcribing (the session_seed rule: a derived count is never restated).
+    """
+    import inspect as _inspect
+    import re as _re
+
+    src = _inspect.getsource(selftest)
+    # a numbered comment may DECLARE A RANGE ("# 11-13." tells the reader three invariants), so the count is
+    # the SIZE of the spans the author wrote, not the number of comments - and it is the author's own claim.
+    spans = _re.findall(r"^\s+# (\d+)(?:-(\d+))?\.", src, _re.M)
+    invariants = sum((int(hi) - int(lo) + 1) if hi else 1 for lo, hi in spans)
+    return invariants, src.count("except WriteRefused")
+
+
 def selftest() -> int:
     """Assert the refusals this module claims, on a throwaway artifact. A guard nobody tested is a hope.
 
@@ -626,10 +724,37 @@ def selftest() -> int:
         off = plan_append([{"item_id": "R001", "mine": "x"}], [], {"mine"}, "item_id")
         assert off and "truncation" in off[0], off
         assert a.read_text(encoding="utf-8") == body, "a refused append still mutated the artifact"
-    print("ok write_guard selftest: 10 invariants hold (own-cell edit lands, foreign-cell edit refused, row-count "
+        # 11-13. the SUFFIX-ONLY append rule (BUG-560/D-2685): printed BY NAME, because a mutation is SEEN through
+        #    its own marker (D-2676(iv)) and an assert names a line, not a control.
+        _ctl = [("suffix_only_append_reports_a_changed_pre_image", bool(suffix_faults(b"a\n", b"z\n", b"")), True),
+                ("suffix_only_append_reports_bytes_the_writer_did_not_declare",
+                 bool(suffix_faults(b"a\n", b"a\nx\n", b"")), True),
+                ("suffix_only_append_is_silent_for_the_declared_suffix",
+                 bool(suffix_faults(b"a\n", b"a\nb\n", b"b\n")), False)]
+        for _n, _got, _want in _ctl:
+            print(("ok   selftest/" if _got == _want else "FAIL selftest/") + _n)
+        if any(_got != _want for _n, _got, _want in _ctl):
+            return 1
+        led = Path(td) / "led.csv"
+        led.write_text("a,b\r\nc,d\n", encoding="utf-8")   # a MIXED-terminator ledger (the MEASURED fixlog shape)
+        _pre = led.read_bytes()
+        _rep = append_lines(led, ["e,f"], writer="selftest", lineterminator="\n", journal=False)
+        _post = led.read_bytes()
+        assert _post[:_pre.__len__()] == _pre, "the append changed the pre-image bytes"
+        assert _post[_pre.__len__():] == b"e,f\n", repr(_post[_pre.__len__():])
+        assert _rep.added == 1 and _rep.mode == "append_lines", _rep
+        try:
+            with contextlib.redirect_stdout(io.StringIO()):
+                append_lines(led, ["g,h\n"], writer="selftest", journal=False)
+            raise AssertionError("a line carrying its own terminator was NOT refused")
+        except WriteRefused:
+            pass
+        assert led.read_bytes() == _post, "a refused append still mutated the ledger"
+    _inv, _ref = _selftest_counts()
+    print("ok write_guard selftest: " + str(_inv) + " invariants hold (own-cell edit lands, foreign-cell edit refused, row-count "
           "change refused, OWNED_ANY honoured, cell-scoped DOCUMENT write refused, document pre-image receipted, a "
           "declared APPEND lands without re-terminating lines, an edit to the pre-image is an offence, a foreign "
-          "column in an added row is refused, truncation is refused and a refused append writes nothing); the 5 "
+          "column in an added row is refused, truncation is refused and a refused append writes nothing, a SUFFIX-ONLY append to a mixed-terminator ledger leaves the pre-image bytes as a prefix of the post-image, and a terminator smuggled inside a line is refused); the " + str(_ref) + " "
           "expected refusals are asserted with their output captured")
     return 0
 

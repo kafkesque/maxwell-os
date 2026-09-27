@@ -32,6 +32,8 @@ health:
     python3 scripts/lib/operator_env.py --selftest || exit 1    # BUG-519: the operator-key rule has ONE home; its controls never print the value
     python3 scripts/check_encoding_homes.py --selftest || exit 1  # BUG-492 controls for the D-2646 decode-home rail  # D-2644/D-2649: declared-encoding controls - a guess at an owner artifact is measured, not assumed
     python3 scripts/lib/write_guard.py --audit || [ $? -eq 2 ]   # 2 = declared unguarded writers: loud, NOT fatal (BUG-457); D-401/I1
+    python3 scripts/apply_workbook_rulings.py --selftest || exit 1   # BUG-560/D-2685: the applier's known-answer controls (scope join, header join, out-of-scope refusal) - a control nothing runs is a comment (BUG-492)
+    python3 scripts/apply_workbook_rulings.py --check || exit 1   # BUG-560: the anti-REVERT rail - DECLARED in three homes since D-387 and RUN in none until now; a normalize re-run must never revert an owner ruling silently
     python3 scripts/check_depth_load_bearing.py || exit 1
     python3 scripts/check_serving_gate.py --selftest || exit 1   # the D274a invariant's known-answer controls (a guardrail never seen failing is not a guardrail)
     python3 scripts/check_serving_gate.py || [ $? -eq 2 ]        # D274a CI invariant over every stored row: 1 defect | 2 owner-owed label/status ontology (BUG-499), loud NOT fatal

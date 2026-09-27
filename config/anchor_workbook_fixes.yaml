@@ -87,8 +87,12 @@ column_renames:            # D-383: a column NAME is config, not code. The renam
 rulings_io:
   workbook: governance/anchor_adjudication_workbook_20260924.csv
   fixlog: governance/anchor_adjudication_fixlog_20260925.csv
-  backup_dir: backups
-  backup_suffix: PRE_RULINGS_20260925
+  # BUG-560/D-2685: THE ONE HOME of the CELL SCOPE this applier may change. The column map in
+  # scripts/apply_workbook_rulings.py::targets() is a CLAIM; a ruling whose target falls outside this list is
+  # REFUSED (exit 2) rather than applied, so the applier cannot widen its own reach by an edit (C12d/C16).
+  owned_columns: [depth_final, depth_final_class, domains_final, domains_final_raw, primary_domain]
+  # backup_dir/backup_suffix DELETED (D-2685): the pre-image rule has ONE home - write_guard._backup(), which
+  # records the path it wrote in the mutation receipt instead of leaving a name no reader can join.
 
 # Expectation for the CURRENT workbook. Amended from [R140]/[R070,R080,R130]: nothing is blank now.
 # Kept as a key so normalize_owner_workbook.py still reads a declaration rather than assuming one.

@@ -680,5 +680,15 @@ RISK NOTE (now retired): before fe239df a worktree clean destroyed BOTH copies o
 - [x] TEETH: mutation `worktree_undeclared_dirty_path_rule_is_load_bearing` SEEN to red; floor 12 -> 13
 - [x] GRANTS: 7 NAMED paths in `may_touch` (`.gitignore` + 6 indexed stores) + widening_log entry 26
 - [ ] OWED (declared, not silent): widen the SAME rule into the pre-commit hook once the plan can grant an artifact in the commit that creates it (item 5 of D-2684)
+
+## D-2685 / BUG-560 FIXED - THE OWNER-RULING APPLIER PASSES THROUGH THE GUARD (2026-09-27)
+
+- [x] scripts/apply_workbook_rulings.py writes through write_guard.write_rows(mode="merge", owned_keys=<ruled columns>) and appends through the new write_guard.append_lines (SUFFIX-ONLY): the owner-cell write is RECEIPTED, not silent.
+- [x] The cell scope has ONE home (config/anchor_workbook_fixes.yaml#rulings_io.owned_columns), joined by a pure scope_faults(): a ruling outside the declaration is refused with nothing written.
+- [x] `--check` is a justfile line: the anti-revert rail was DECLARED in three homes and RUN in none since D-387 (the BUG-582 shape).
+- [x] config#rulings_io.backup_dir/backup_suffix DELETED (pre-image rule has one home: write_guard._backup); config/artifact_ownership.yaml#owned_by completed (+3 columns the applier occupied) and the fixlog declared append_only with a writer_of_record.
+- [x] Mutation entry floor 13 -> 17; 4 entries for this fix, all SEEN to red through their own named markers.
+- [ ] OWED (declared, not silent): a whole-set scan for the leak class this fix found in its OWN selftest - which other `--selftest` writes default to backup=True and deposit pre-images into the tree they audit?
+- [x] DECIDED (2026-09-27): config/derivations.yaml COMMITTED with its rail-written re-measure (shadowed_declared 211 -> 212 + the REMEASURED line). REASON: the rail owns that number (D-2642), `just health` is GREEN with this value, and a revert would be re-written by the next rail run - a revert would state a fact about the tree that is not true. The RAISE is loud-not-fatal by design (rc 2 = the declared ceiling was stale and is now recorded).
 - [ ] NEXT (product): BUG-560 (route `scripts/apply_workbook_rulings.py` through `scripts/lib/write_guard.py`); then BUG-564 remainder / BUG-572 / BUG-583 / BUG-584
 - [ ] OWNER GATE (DUE, one word each): META-LANE FREEZE ruling; standing-rule CONSTITUTION promotion (POINTER only); BUG-431 CONTENT promotion; BUG-583 (lowercase 'active')

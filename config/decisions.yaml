@@ -9628,3 +9628,33 @@ decisions:
   - config/rail_mutations.yaml
   - justfile
   - governance/session_plan_20260924.yaml
+- id: D-2685
+  date: '2026-09-27'
+  state: ACTIVE
+  category: governance
+  title: THE OWNER-RULING APPLIER PASSES THROUGH THE GUARD, AND EVERY TERMINATOR IS READ FROM ITS OWN ARTIFACT (BUG-560
+    FIXED)
+  decision: 'A writer of an owner''s cells passes through write_guard - no exception for the one writer that exists
+    to stop a normalize re-run from reverting the owner''s rulings. scripts/apply_workbook_rulings.py writes the
+    workbook via write_rows(mode="merge", owned_keys=<the ruled columns>) and appends the fixlog via the new write_guard.append_lines
+    (a SUFFIX-ONLY append). The CELL SCOPE has ONE home (config/anchor_workbook_fixes.yaml#rulings_io.owned_columns)
+    joined to the column map by a pure scope_faults(), so a code edit cannot silently widen what the applier may
+    overwrite (C12d). append_lines exists because append_rows REGENERATES every pre-image line through csv.DictWriter
+    and would re-terminate a ledger the writer does not own (MEASURED: 14 CRLF + 9 LF lines). Every artifact''s
+    terminator is READ from that artifact''s own bytes (artifact_terminator): the old workbook guess was INERT ("\r\n"
+    in read_text() can never fire) and the old fixlog append borrowed the WORKBOOK''s terminator.'
+  measured: 'applier --selftest 14/14 controls; --check green (4 cell ruling(s), 5 row declaration(s), scope 5 columns);
+    write_guard --selftest green (13 invariants, 6 expected refusals, both counts DERIVED from the source that ran
+    - the old verdict claimed "10 ... the 5"); just health 0 fault(s) rc=0; mutation gate "16 declared rule(s) SEEN
+    to red through their own control" (floor 13 -> 17, 4 entries for this fix); the pre-commit audit of this change-set
+    found and closed a leak of MY OWN: 5 fixture pre-images in the LIVE backups/ (removed through pipeline/safe_delete.py,
+    now a NAMED control asserts nothing under backups/ appears).'
+  bugs:
+  - BUG-560
+  files:
+  - scripts/apply_workbook_rulings.py
+  - scripts/lib/write_guard.py
+  - config/anchor_workbook_fixes.yaml
+  - config/artifact_ownership.yaml
+  - config/rail_mutations.yaml
+  - justfile

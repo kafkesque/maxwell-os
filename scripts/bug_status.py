@@ -10,7 +10,16 @@ Status rule: a "## BUG-<id>" header is a status EVENT and the LAST one wins, exc
 event cannot un-close a REOPEN. Keywords: RESOLVED/CLOSED/FIXED/INVALID/RETRACTED -> closed;
 REOPEN/REGRESS/RECURRED -> open; anything else -> open (no closure claim is not a closure).
 
-Usage:  python3 scripts/bug_status.py
+THE STATUS SLOT IS A POSITION AT A HEADER BOUNDARY, NEVER PROSE (BUG-572, MEASURED 2026-09-27). Only four
+positions may decide a bug's status - the LEADING parenthetical, the FIRST segment before the first colon, the
+FIRST WORD after that colon, and the TRAILING parenthetical - and a status word in the TITLE may not. The
+substring fallback ("read the whole header") is GONE: it read a bug's status off a word in a sentence about the
+bug, which is how the duplicate BUG-493 block read CLOSED and how BUG-419/BUG-570 were misread. Alternatives
+were measured over 422 heading events and REFUSED: a blanket "everything before the first colon" slot flips 8
+events (it destroys the legal trailing slot) and a paren-only slot flips 3 (it ignores a real post-colon FIXED).
+
+Usage:  python3 scripts/bug_status.py            (re-derive the register)
+        python3 scripts/bug_status.py --selftest (the known-answer controls, touching nothing else)
 """
 from __future__ import annotations
 
@@ -52,20 +61,34 @@ PAREN_RE = re.compile("[(]([^)]*)[)]")
 
 def status_slot(rest: str) -> str:
     """
-    Return only the header STATUS SLOT (BUG-350), never the prose title.
+    Return only the header STATUS SLOT (BUG-350/BUG-572), never the prose title.
 
-    Order: the parenthetical after the bug id, then the text before the first colon.
-    Quoted spans are dropped, so a title that merely quotes a status word cannot decide it.
-    If no candidate names a status word the whole header is read, so an unlabelled header stays OPEN
-    (no closure claim is not a closure).
+    The slot is a POSITION AT A HEADER BOUNDARY and prose in between may NOT decide. The candidates, in order:
+
+      1. the LEADING parenthetical, directly after the bug id - "(MED, FIXED 2026-09-21) ...";
+      2. the FIRST segment, before the first colon - "MED - FIXED 2026-09-21: ...";
+      3. the FIRST WORD after that colon - how a header writes "UPDATE 2026-09-23: FIXED code-side ...";
+      4. the TRAILING parenthetical - "... (HIGH, fixed 2026-09-21)".
+
+    Quoted spans are dropped, so a title that merely quotes a status word cannot decide it. When NO candidate
+    names a status word the slot is EMPTY and the event is OPEN: an unlabelled header makes no closure claim, and
+    no closure claim is not a closure (C16 fail-safe - an open bug that is really closed costs a look; a closed
+    bug that is really open costs the work being silently abandoned).
     """
     m = PAREN_RE.match(rest)
-    cands = ([m.group(1)] if m else []) + [rest.split(chr(58))[0], rest]
+    pre, sep, post = rest.partition(chr(58))
+    cands: list[str] = [m.group(1)] if m else []
+    cands.append(pre)
+    if sep and post.strip():
+        cands.append(post.split()[0])
+    trailing = PAREN_RE.findall(rest)
+    if trailing:
+        cands.append(trailing[-1])
     for cand in cands:
         clean = QUOTE_RE.sub(chr(32), cand).strip()
         if any(w in clean.upper() for w in STATUS_WORDS):
             return clean
-    return QUOTE_RE.sub(chr(32), rest).strip()
+    return ""
 
 
 # BUG-350: status is read from status_slot(); a title that QUOTES a status word cannot decide.
@@ -90,8 +113,51 @@ def classify(text: str) -> str:
     return "open"
 
 
-def self_test() -> None:
-    """Assert the classifier's registered edge cases before its output is trusted (BUG-347)."""
+# BUG-572 (D-2689): the slot rule's KNOWN-ANSWER CONTROLS. Each case is a LIVE header (or the exact shape of
+# one) and the status it must read. The FIRST three are the defect itself - a status word in a TITLE that the
+# header is merely describing - and each of them read CLOSED before this rule: a closed bug whose fix nobody
+# had done. The rest are the SHAPES THAT MUST NOT MOVE (a fix that tightens one direction must not lose the
+# legal slot in another); the alternatives measured on 2026-09-27 broke exactly these.
+SLOT_CASES: tuple[tuple[str, str, str], ...] = (
+    ("the_title_may_not_decide",
+     "(OPEN, LOW): the duplicate BUG-493 CLOSED block is NOT byte-identical (the earlier claim was FALSE)", "open"),
+    ("a_noun_in_the_title_may_not_decide",
+     "(LOW, OPEN 2026-09-23) - bug_status.json is schema-ASYMMETRIC: open is a list of objects, closed is a list "
+     "of plain id strings", "open"),
+    ("a_clause_about_the_incident_may_not_decide",
+     "UPDATE (2026-09-26): the INCIDENT is closed by construction; the RAIL is still OWED", "open"),
+    ("a_filename_in_the_title_may_not_decide",
+     "\u2014 R2 verification provenance gap: r5 override set is unstamped; closed_menu.py has a dead constant "
+     "(HIGH, 2026-09-20)", "open"),
+    ("the_trailing_slot_still_decides",
+     "No degenerate-arm guard: a collapsed arm could be read as a tie (HIGH, fixed 2026-09-21)", "closed"),
+    ("the_trailing_slot_still_decides_a_quote",
+     "Name collision: two different human instruments both called \"ANCHOR-1\" (MED, FIXED 2026-09-21)", "closed"),
+    ("the_trailing_slot_still_decides_a_path",
+     "decision numbering collision: DECISION-LOG.md leads config/decisions.yaml by 3 (FIXED, 2026-09-23)", "closed"),
+    ("a_status_named_after_the_colon_still_decides",
+     "(MED) - UPDATE 2026-09-23: FIXED code-side (the export re-run is an owner gate)", "closed"),
+    ("the_leading_slot_outranks_the_title",
+     "(MED \u2014 FIXED 2026-09-21): the C15 classifier treated \"PARTIALLY FIXED\" as CLOSED", "closed"),
+)
+
+
+def slot_faults() -> list[str]:
+    """Every live header shape the slot rule must read a given way; the first fault names itself (BUG-572)."""
+    faults: list[str] = []
+    for name, text, want in SLOT_CASES:
+        got = classify(status_slot(text))
+        if got != want:
+            faults.append("FAIL selftest/" + name + ": " + repr(text[:52]) + " reads " + got + ", expected " + want)
+    return faults
+
+
+def self_test() -> int:
+    """Assert the classifier's registered edge cases before its output is trusted (BUG-347/BUG-572).
+
+    Returns how many KNOWN-ANSWER CONTROLS fired (C20: a count is REPORTED, never hardcoded), so a caller can see
+    that the controls RAN and not merely that nothing was printed.
+    """
     cases = {
         "MED - FIXED 2026-09-21": "closed",
         "HIGH - OPEN 2026-09-21": "open",
@@ -111,6 +177,11 @@ def self_test() -> None:
         got = classify(status_slot(text))
         if got != want:
             raise SystemExit(f"FAIL-CLOSED: bug_status self-test {text!r} -> {got}, expected {want}")
+    faults = slot_faults()
+    if faults:
+        raise SystemExit("FAIL-CLOSED (C16): " + faults[0] + " (BUG-572: a status word in a header's TITLE may "
+                         "not decide a bug's status)")
+    return len(cases) + len(SLOT_CASES)
 
 
 def scan(text_lines: list[str]) -> dict[str, dict]:
@@ -176,12 +247,19 @@ def emit(target: Path, text: str) -> None:
 
 def main() -> int:
     """Re-derive the status index, write it, and state the C15 consequence."""
-    self_test()
     ap = argparse.ArgumentParser()
-    outs = declared_outputs()   # the defaults ARE the declared artifact paths - one home (D-2646)
-    ap.add_argument("--json-out", default=outs[".json"])
-    ap.add_argument("--md-out", default=outs[".md"])
+    ap.add_argument("--selftest", action="store_true",
+                    help="the known-answer controls only: no log is read and no artifact is written")
+    ap.add_argument("--json-out")
+    ap.add_argument("--md-out")
     args = ap.parse_args()
+    controls = self_test()
+    if args.selftest:
+        print("ok selftest: bug_status " + str(controls) + " known-answer control(s) fire (BUG-347/429/572)")
+        return 0
+    outs = declared_outputs()   # the defaults ARE the declared artifact paths - one home (D-2646)
+    json_out = args.json_out or outs[".json"]
+    md_out = args.md_out or outs[".md"]
     bugs = scan(BUGLOG.read_text(encoding="utf-8").splitlines())
     open_ids = sorted((b for b in bugs.values() if b["status"] == "open"), key=lambda b: int(b["id"][4:]))
     closed_ids = sorted((b for b in bugs.values() if b["status"] == "closed"), key=lambda b: int(b["id"][4:]))
@@ -191,14 +269,14 @@ def main() -> int:
                "c15_must_append_to_handoffs": len(open_ids) >= C15_THRESHOLD,
                "open": [{"id": b["id"], "title": b["title"], "events": len(b["events"])} for b in open_ids],
                "closed": [b["id"] for b in closed_ids]}
-    emit(REPO / args.json_out, json.dumps(payload, indent=2) + "\n")
+    emit(REPO / json_out, json.dumps(payload, indent=2) + "\n")
     rows = ["| id | title (last header) | events |", "|---|---|---|"]
     rows += ["| " + b["id"] + " | " + str(b["title"]) + " | " + str(len(b["events"])) + " |" for b in open_ids]
     head = ["# Bug status index (mechanical, re-derived)", "",
             "Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).", "",
             "**" + str(payload["open_n"]) + " open** / " + str(payload["closed_n"]) + " closed of " + str(payload["total_ids"]) + " ids.",
             "C15 append-to-handoffs required: **" + str(payload["c15_must_append_to_handoffs"]) + "** (threshold " + str(C15_THRESHOLD) + ").", ""]
-    emit(REPO / args.md_out, "\n".join(head + rows) + "\n")
+    emit(REPO / md_out, "\n".join(head + rows) + "\n")
     print("OPEN " + str(payload["open_n"]) + " / CLOSED " + str(payload["closed_n"]) + " of " + str(payload["total_ids"]))
     print("open ids: " + ", ".join(b["id"] for b in open_ids))
     return 0

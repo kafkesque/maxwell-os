@@ -647,3 +647,14 @@ registry rc=0 (guards tri_state + fatal pinned); consumer join 6 homes / 8 edges
 260.9s; R5 (gemma-4-E4B-it-MLX-4bit): APPROVE.
 OWED (owner): CLOSE or RE-RULE the window when rc 2 appears. NEXT: BUG-585 through the DRAIN PATH (`released:`) -
 the mechanism's first real test; the leak scan's declared home; BUG-584, BUG-572, BUG-583.
+
+## 2026-09-27 (later) - D-2689 LANDED: THE STATUS SLOT IS A POSITION AT A HEADER BOUNDARY (BUG-572 FIXED, BUG-562 CLOSED)
+The register's own parser read a bug's status off a word in a SENTENCE about the bug, and that register is the
+FREEZE WINDOW's oracle: a misreading register can silently drain the parked set. The slot is now one of four
+positions at a header boundary and the whole-header fallback is GONE (9 new named controls; --selftest touches
+nothing). MEASURED: --selftest 20 controls; check_bug_status rc=0; register OPEN 135 / CLOSED 190 of 325; the whole
+ladder rc=0 (temp/health1.log); freeze window parked 9 of ceiling 9, still OPEN 8; registry rc=0; consumer join rc=0.
+THE AUDIT FIRED ON THE FIX: the 2 moved ids are BUG-419 (GENUINELY OPEN - the register schema asymmetry is live) and
+BUG-562 (GENUINELY CLOSED - its rail was verified by running it), so the change-set carries BUG-562's closure.
+FILED: BUG-587 (a mint is not asserted to ARRIVE; scripts/check_decision_membership.py is named by its own tombstone
+and does not exist) - PARKED, not worked. NEXT: BUG-587's arrival assertion; then BUG-584; then BUG-585; BUG-583.

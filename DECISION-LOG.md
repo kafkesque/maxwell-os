@@ -1236,3 +1236,37 @@ MEASURED AFTER: selftest 15/15; live rc=0; registry rc=0 (95 ladder invocations,
 declared homes, 8 edges); mutation gate rc=0 (19 rules SEEN to red, 1 negative control green); ladder 96 line(s)
 RUN, 0 fault(s), 260.9s; R5 review by gemma-4-E4B-it-MLX-4bit: VERDICT APPROVE. Register: OPEN 134 / CLOSED 190 of
 324. session_seed.open_bugs_n stays DERIVED at 134 (no bug opened or closed against the OPEN count).
+
+## D-2689 (2026-09-27) - THE STATUS SLOT IS A POSITION AT A HEADER BOUNDARY, NEVER PROSE
+
+A bug's status is decided ONLY at a header BOUNDARY - the LEADING parenthetical, the FIRST segment before the first
+colon, the FIRST WORD after that colon, or the TRAILING parenthetical. Prose between those positions may not decide,
+the whole-header substring fallback is REMOVED, and no candidate means EMPTY, which is OPEN.
+
+WHY IT OUTRANKS ITS SIZE: this generator writes the register that the FREEZE WINDOW reads
+(scripts/check_freeze_window.py), so a register misread off a word in a sentence ABOUT a bug can silently DRAIN the
+parked set. MEASURED over 422 heading events, the old fallback read the duplicate BUG-493 block, BUG-570 and BUG-419
+as CLOSED, and let a FILENAME in BUG-307's title (closed_menu.py) decide one too.
+
+REFUSED, WITH NUMBERS: "everything before the first colon" flips 8 events (it destroys the legal TRAILING slot,
+BUG-320/337/371/388); paren-only flips 3 (it ignores BUG-388's real post-colon FIXED); a boundary rule WITHOUT the
+post-colon first word flips 5. THE ADOPTED RULE flips 4 events / 2 final statuses.
+
+THE AUDIT FIRED ON THE FIX ITSELF: those 2 ids are BUG-419 (GENUINELY OPEN - the register's schema asymmetry is
+LIVE: open is a list of OBJECTS, closed a list of plain id STRINGS) and BUG-562 (GENUINELY CLOSED - its owed rail
+landed and was verified by RUNNING it). Landing the parser ALONE would have newly mislabelled a fixed bug, so this
+change-set carries BUG-562's named CLOSURE event with it.
+
+MEASURED AFTER: --selftest 20 controls (9 new); check_bug_status rc=0; register OPEN 135 / CLOSED 190 of 325; freeze
+window rc=0 (parked 9 of ceiling 9, still OPEN 8); registry rc=0; consumer join rc=0; mutation
+status_slot_is_a_boundary_not_prose, floor 20 -> 21; the whole ladder rc=0 on the change-set before this mint.
+
+FILED, NOT FIXED: BUG-587 - a MINT is not ASSERTED to ARRIVE. A hand-rolled append of one record added 32 lines,
+deleted none, LOADED, left every rail GREEN, and moved the census by NOTHING (819 records, last D-2688), because a
+record's files: items and a record's own "- id:" marker occupy the same column when a writer re-indents the block.
+--mint validates BEFORE the write and re-derives the registry SHAPE after it, but nothing compares the census before
+and after. The membership rail its own tombstone names (scripts/check_decision_membership.py) does not exist.
+PARKED by META-LANE-FREEZE-1 (max_held 8 -> 9).
+
+session_seed.open_bugs_n: RE-MEASURED from scripts/bug_status.py at 135 (BUG-587 was FILED and is OPEN; BUG-572 and
+BUG-562 were CLOSED in this change-set).

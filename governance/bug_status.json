@@ -2,8 +2,8 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 324,
-  "open_n": 134,
+  "total_ids": 325,
+  "open_n": 135,
   "closed_n": 190,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
@@ -424,6 +424,11 @@
       "events": 1
     },
     {
+      "id": "BUG-419",
+      "title": "(LOW, OPEN 2026-09-23) - bug_status.json is schema-ASYMMETRIC: open is a list of objects, closed is a list of plain id strings",
+      "events": 1
+    },
+    {
       "id": "BUG-420",
       "title": "(MED, OPEN 2026-09-24) - the anchor family has NO fb_id bridge: its item_id is a sheet-local row label (R001...), so existing human depth wo",
       "events": 2
@@ -659,11 +664,6 @@
       "events": 2
     },
     {
-      "id": "BUG-572",
-      "title": "(OPEN, LOW): a status word in a heading's TITLE decides a bug's status when the parenthetical slot names none (measured, with the flip list)",
-      "events": 1
-    },
-    {
       "id": "BUG-583",
       "title": "(OPEN, LOW): 5 of 812 decision records spell the state 'active' in lowercase while 505 spell it 'ACTIVE' (2026-09-27, found by the D-2682 la",
       "events": 1
@@ -676,6 +676,11 @@
     {
       "id": "BUG-585",
       "title": "(LOW - filed 2026-09-27, D-2686 audit, HELD behind the META-LANE FREEZE): `agent/session_seed.yaml` states the open-bug count TWICE and the ",
+      "events": 1
+    },
+    {
+      "id": "BUG-587",
+      "title": "(FILED, HIGH, D-2689): a MINT is not ASSERTED to ARRIVE - the registry's write path has no arrival oracle",
       "events": 1
     }
   ],
@@ -761,7 +766,6 @@
     "BUG-413",
     "BUG-414",
     "BUG-418",
-    "BUG-419",
     "BUG-421",
     "BUG-422",
     "BUG-423",
@@ -859,6 +863,7 @@
     "BUG-566",
     "BUG-567",
     "BUG-571",
+    "BUG-572",
     "BUG-573",
     "BUG-574",
     "BUG-575",

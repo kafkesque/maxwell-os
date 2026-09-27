@@ -48,7 +48,9 @@ window:
     - BUG-568     # a machinery defect, filed and unworked behind the window
     - BUG-569     # a machinery defect, filed and unworked behind the window
     - BUG-559     # filed before this window; a machinery defect, not a product one
-  max_held: 8
+    - BUG-587     # FILED by D-2689 while minting D-2689: the registry's write path cannot be SEEN to lose
+                  # a record - the same class as this window's own oracle, one file over
+  max_held: 9
 
   # AN OWNER RULING, recorded where its reader is. A released id MUST also be in `held` (else the ruling is
   # about nothing), and its reason is REQUIRED: `released: {}` is the honest empty case.

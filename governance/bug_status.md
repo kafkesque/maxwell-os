@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**134 open** / 190 closed of 324 ids.
+**135 open** / 190 closed of 325 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -90,6 +90,7 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-415 | (MED, OPEN 2026-09-23) - depth is the only production axis with NO anchor row, while D2577 plans a fine-tuned depth model that D274f says re | 1 |
 | BUG-416 | (MED, OPEN 2026-09-23) - the depth axis is not a MENU: no config surface declares its 4 classes, so nothing can verify, route or pin them | 1 |
 | BUG-417 | (HIGH, OPEN 2026-09-23) - the A2 corrected list's headline candidate is NOT a duplicate: `blobs/` is the target store of 14 live symlinks, a | 1 |
+| BUG-419 | (LOW, OPEN 2026-09-23) - bug_status.json is schema-ASYMMETRIC: open is a list of objects, closed is a list of plain id strings | 1 |
 | BUG-420 | (MED, OPEN 2026-09-24) - the anchor family has NO fb_id bridge: its item_id is a sheet-local row label (R001...), so existing human depth wo | 2 |
 | BUG-425 | (MED, OPEN 2026-09-24) - the `domains` axis is owned by a DIFFERENT cohort (intersection 2/150) and the family registry never said so | 2 |
 | BUG-426 | (HIGH, OPEN - UNRESOLVED) - twice asserted "the 150's domain axis was never asked" while the owner states it WAS done. My search was methodo | 1 |
@@ -137,7 +138,7 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-568 | (OPEN, MED): RAIL 0 does not pin its own git subject | 1 |
 | BUG-569 | (OPEN, LOW): the adoption NOTE has no RAIL-LEVEL control at a real partial commit | 1 |
 | BUG-570 | (OPEN, LOW): the duplicate BUG-493 CLOSED block is NOT byte-identical (the earlier claim was FALSE) | 2 |
-| BUG-572 | (OPEN, LOW): a status word in a heading's TITLE decides a bug's status when the parenthetical slot names none (measured, with the flip list) | 1 |
 | BUG-583 | (OPEN, LOW): 5 of 812 decision records spell the state 'active' in lowercase while 505 spell it 'ACTIVE' (2026-09-27, found by the D-2682 la | 1 |
 | BUG-584 | (OPEN, LOW): the BUG-582 fix wrote three of its lines TWICE in `just health` (the ladder runs them twice and over-reports its own size) | 1 |
 | BUG-585 | (LOW - filed 2026-09-27, D-2686 audit, HELD behind the META-LANE FREEZE): `agent/session_seed.yaml` states the open-bug count TWICE and the  | 1 |
+| BUG-587 | (FILED, HIGH, D-2689): a MINT is not ASSERTED to ARRIVE - the registry's write path has no arrival oracle | 1 |

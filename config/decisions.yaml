@@ -9773,3 +9773,47 @@ decisions:
   - governance/SESSION-HANDOFF-2026-09-26.md
   - governance/buglog.md
   - agent/session_seed.yaml
+- id: D-2689
+  date: '2026-09-27'
+  state: ACTIVE
+  category: governance
+  title: THE STATUS SLOT IS A POSITION AT A HEADER BOUNDARY, NEVER PROSE (BUG-572 FIXED, BUG-562 CLOSED; BUG-587
+    FILED)
+  decision: 'A bug''s status is decided ONLY at a header BOUNDARY: (1) the LEADING parenthetical, (2) the FIRST
+    segment before the first colon, (3) the FIRST WORD after that colon, (4) the TRAILING parenthetical. Prose between
+    those positions may NOT decide, the whole-header substring fallback is REMOVED, and no candidate means EMPTY,
+    which is OPEN. The register this generator writes is the FREEZE WINDOW''s oracle (scripts/check_freeze_window.py
+    reads it), so a register misread off a word in a sentence about the bug can silently DRAIN the parked set: BUG-572
+    is fixed here, BUG-562 was exposed by the CORRECTED parser as wrongly CLOSED and its owed rail was verified
+    by RUNNING it (scripts/check_declaration_consumers.py rc=0, wired justfile:104/114), and that closure event
+    lands in the SAME change-set so a right parser cannot mislabel a fixed bug. BUG-587 was FILED while minting
+    this record and is PARKED by the window (max_held 8 -> 9): the registry''s write path can LOSE a record and
+    still print a plausible total, because nothing compares the census before and after a mint, and the membership
+    rail its own tombstone names (scripts/check_decision_membership.py) does not exist.'
+  measured: 'MEASURED 2026-09-27. --selftest reports 20 known-answer controls, 9 of them new: 3 defect shapes that
+    each read CLOSED before (a status word in the TITLE; a FILENAME, closed_menu.py; a sentence about an incident)
+    and 6 must-not-move shapes. REFUSED, with numbers over 422 heading events: everything-before-the-first-colon
+    flips 8 (it destroys the legal trailing slot, BUG-320/337/371/388), paren-only flips 3 (it ignores BUG-388''s
+    real post-colon FIXED), boundary-without-the-post-colon-word flips 5. ADOPTED rule flips 4 events / 2 final
+    statuses: BUG-419 (GENUINELY OPEN - the register schema asymmetry is live) and BUG-562 (GENUINELY CLOSED - rail
+    verified by running it). check_bug_status rc=0; register re-derived OPEN 135 / CLOSED 190 of 325; freeze window
+    rc=0 (parked 9 of ceiling 9, still OPEN 8); registry rc=0; consumer join rc=0; mutation status_slot_is_a_boundary_not_prose
+    (floor 20 -> 21); the whole ladder rc=0 on the change-set before this mint. A first mint attempt was ABORTED
+    and REVERTED to HEAD: an append that LOADED, left every rail GREEN and moved the census by nothing - filed as
+    BUG-587.'
+  bugs:
+  - BUG-572
+  - BUG-562
+  - BUG-587
+  files:
+  - scripts/bug_status.py
+  - config/rail_mutations.yaml
+  - config/freeze_window.yaml
+  - governance/buglog.md
+  - governance/bug_status.json
+  - governance/bug_status.md
+  - governance/CONTEXT_INDEX.md
+  - governance/SESSION-HANDOFF-2026-09-26.md
+  - MASTER-TASK-REGISTER.md
+  - agent/session_seed.yaml
+  - DECISION-LOG.md

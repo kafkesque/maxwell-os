@@ -732,3 +732,23 @@ RISK NOTE (now retired): before fe239df a worktree clean destroyed BOTH copies o
 - [ ] OWED (owner): CLOSE the window the moment rc 2 says its exit is MET, or RE-RULE it when review_by passes.
 - [ ] NEXT: BUG-585 through the DRAIN PATH (`released:`) - the mechanism's first real test; then the leak scan's
       declared home; then BUG-584, BUG-572, BUG-583.
+
+## D-2689 - THE STATUS SLOT IS A POSITION AT A HEADER BOUNDARY, NEVER PROSE (2026-09-27) - BUG-572 FIXED, BUG-562 CLOSED
+- [x] ONE HOME: scripts/bug_status.py#status_slot - the slot is (1) the LEADING parenthetical, (2) the FIRST segment
+      before the first colon, (3) the FIRST WORD after that colon, (4) the TRAILING parenthetical. Prose between them
+      may NOT decide; no candidate -> EMPTY -> OPEN. The whole-header substring fallback is GONE.
+- [x] ORACLE: --selftest reports 20 named controls, 9 of them new (3 defect shapes that each read CLOSED before, 6
+      must-not-move shapes); --selftest reads no log, no declaration and writes nothing.
+- [x] MUTATION: status_slot_is_a_boundary_not_prose restores the prose fallback and the FIRST named control
+      (the_title_may_not_decide) stops firing; floor 20 -> 21; scripts/bug_status.py in coverage.required_subjects.
+- [x] SEEN: register re-derived and its own reader agrees (ok bug_status: register equals its re-derivation); the
+      whole ladder rc=0 (temp/health1.log); registry rc=0; consumer join rc=0; freeze window re-read below.
+- [x] THE AUDIT FIRED ON THE FIX ITSELF: the 2 ids whose final status moves are BUG-419 (GENUINELY OPEN - the
+      register schema asymmetry is LIVE: open is a list of OBJECTS, closed a list of plain id STRINGS) and BUG-562
+      (GENUINELY CLOSED - its owed rail landed and was verified by running it). Landing the parser ALONE would have
+      newly mislabelled a fixed bug, so this change-set carries BUG-562's named closure event.
+- [x] FILED: BUG-587 (a MINT is not ASSERTED to ARRIVE - the registry's write path has no arrival oracle; its own
+      tombstone names a membership rail that does not exist). PARKED by the window, max_held 8 -> 9.
+- [ ] OWED: BUG-587's fix (census +1 and the minted id present as a TOP-LEVEL record, failing closed BY NAME).
+- [ ] NEXT: BUG-587's arrival assertion, then BUG-584 (one line, 96 -> 95 declaring lines), then BUG-585
+      (open_bugs_n_at_2026_09_22), then BUG-583 (DECLARE the spelling set).

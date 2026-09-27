@@ -7623,3 +7623,70 @@ table applied a per-clause subject rule to a clause whose subject is window.held
 still failed and had been RED FOR THE WRONG REASON, masked by the first fault - the synthetic register fixture
 conflated "the ids the window NAMES" with "the ids the register carries as OPEN", so three controls could never
 have passed. A control that cannot pass, read as "the code is wrong", is the BUG-492 class aimed at the oracle.
+
+## BUG-572 (FIXED, LOW, D-2689): a status word in a heading's TITLE decided a bug's status when the parenthetical slot named none
+
+STATUS CLOSED. MEASURED 2026-09-27: the parser's third candidate was the WHOLE HEADER, so any status word anywhere
+in a header - including a word in a sentence ABOUT a bug - decided that bug's status. Over 422 heading events the
+fallback read BUG-419 (the register's open/closed SCHEMA ASYMMETRY, still live) and BUG-570 as CLOSED, read the
+duplicate BUG-493 block CLOSED because its title said the word, and read BUG-307 CLOSED because a FILENAME
+(`closed_menu.py`) appeared in its title. A bug whose fix nobody had done was therefore retired from the count by
+prose - and this register is the META-LANE FREEZE's ORACLE (check_freeze_window.py reads governance/bug_status.json),
+so a misreading register can silently drain the window.
+
+FIX (D-2689): the status slot is a POSITION AT A HEADER BOUNDARY, never prose - (1) the LEADING parenthetical,
+(2) the FIRST segment before the first colon, (3) the FIRST WORD after that colon (how a header writes
+"UPDATE ...: FIXED code-side"), (4) the TRAILING parenthetical. No candidate -> EMPTY -> OPEN. The whole-header
+fallback is GONE. 9 new NAMED CONTROLS (3 defect shapes that each read CLOSED, 6 must-not-move shapes), the
+self_test now REPORTS its control count (C20) and `--selftest` touches NOTHING (no log, no declaration, no write),
+mutation `status_slot_is_a_boundary_not_prose` (floor 20 -> 21).
+
+MEASURED, NOT OPINION - three alternatives were REFUSED on the corpus: a blanket "everything before the first
+colon" slot flips 8 of 422 events (it destroys the legal TRAILING slot: BUG-320/337/371 and BUG-388's real
+post-colon FIXED); a paren-only slot flips 3 and ignores that same FIXED; a boundary rule WITHOUT the post-colon
+first word flips 5, including BUG-388 `closed -> open`. The adopted rule flips 4 events / 2 final statuses.
+
+THE AUDIT FIRED ON THE FIX ITSELF: the 2 changed ids are BUG-419 (GENUINELY OPEN - verified against the register's
+own schema: open is a list of OBJECTS, closed a list of plain id STRINGS) and BUG-562 (GENUINELY CLOSED - its owed
+RAIL landed and was verified by RUNNING it: scripts/check_declaration_consumers.py rc=0, wired justfile:104/114).
+Landing the parser alone would therefore have newly MISLABELLED a fixed bug, so this change-set carries BUG-562's
+closure event with it: a parser that is RIGHT cannot be landed without stating the facts it exposes.
+
+## BUG-562 (CLOSED, MED, D-2689): RAIL 5 - a declaration may not land apart from its reader
+
+STATUS CLOSED - the event this id was missing. MEASURED 2026-09-27: the rule is READ, not merely declared -
+scripts/check_declaration_consumers.py runs `ok declaration consumers: 6 declared home(s), 8 consumer edge(s) all
+resolve for the tree` (rc=0), its `--selftest` runs in the ladder (justfile:104) and its live verdict at the
+COMMIT BOUNDARY (justfile:114), and the boundary carries a mutation that reds its own named control
+(`withdrawn_consumer_rule_is_load_bearing`). Exposed by the BUG-572 fix: the register had this id CLOSED for the
+WRONG reason (a status word in a heading title) and the corrected parser would have reported it OPEN - the fix and
+the fact are landed together, and this heading is the NAMED event that says so.
+
+
+
+## BUG-587 (FILED, HIGH, D-2689): a MINT is not ASSERTED to ARRIVE - the registry's write path has no arrival oracle
+
+STATUS FILED - PARKED by META-LANE-FREEZE-1 (its scope: a NEW governance bug is FILED, with a remedy, and NOT
+WORKED inside the window).
+
+MEASURED 2026-09-27 WHILE MINTING D-2689. A hand-rolled append of ONE record to config/decisions.yaml produced
+32 lines ADDED and 0 deleted, and the census did NOT move: records 819, last D-2688. CAUSE, exact: a record's
+files: sequence emits its items at indent 2 (two spaces + "- path"), the SAME column a record's own "- id:" marker
+takes when a writer re-indents the dumped block, so the new record parsed as ONE MORE ENTRY of the PREVIOUS
+record's files: list. The file LOADED, every rail stayed GREEN, and the decision was INVISIBLE.
+
+THE SECOND FACE, measured in the same audit: the tombstone tools/sync_decisions.py names its own remedy - "What it
+never did: membership (registry ids vs log headings). That check is scripts/check_decision_membership.py" - and
+scripts/check_decision_membership.py DOES NOT EXIST. The ONE oracle that would have caught the absorbed mint (an
+id in the registry with no heading in DECISION-LOG.md, or a heading with no record) is named by a declaration and
+exists nowhere (D-405: a declaration whose subject is absent is an assertion).
+
+WHY IT OUTRANKS ITS SIZE. scripts/recompute_decision_summary.py --mint validates the record BEFORE the write,
+checks that the new bytes are an APPEND, and re-derives the registry SHAPE after it - but NOTHING compares the
+census before and after, so the write path can LOSE a record and still print a plausible total. That is the
+BUG-492 class aimed at the registry: a write that cannot be SEEN to fail.
+
+FIX (OWED, drawn and NOT landed - the window holds it): in mint_main, assert post_total == total_before +
+len(records) AND that every minted id is present exactly once as a TOP-LEVEL record id, failing closed BY NAME;
+land the membership rail its own tombstone names; one known-answer control and one mutation that REDs it
+(a_mint_must_be_seen_to_arrive). The remedy is declared here so the drain has a subject.

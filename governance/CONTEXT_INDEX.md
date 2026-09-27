@@ -1274,3 +1274,19 @@ NOW. `backups/**` and the per-run snapshots are excluded BY DECISION; the six in
 - **THE AUDIT FIRED ON THE CHANGE**: the synthetic register fixture conflated "the ids the window NAMES" with "the
   ids the register carries as OPEN", so THREE controls were RED for the wrong reason - a control that cannot pass is
   BUG-492 aimed at the oracle.
+
+## THE STATUS SLOT IS A BOUNDARY, NOT PROSE (D-2689, 2026-09-27) - BUG-572 FIXED, BUG-562 CLOSED, BUG-587 FILED
+- **SUPERSEDES the D-2688 row above on ONE measured number**: max_held is now 9 (BUG-587 is parked), so the window
+  reads parked 9 / still OPEN 8 - the D-2688 row's "max_held 8 / parked 8" was true when it was measured.
+- **THE ONE HOME**: scripts/bug_status.py#status_slot. A header decides a status only at ONE of four positions (the
+  leading parenthetical, the first segment, the first word after the colon, the trailing parenthetical); a status
+  word in a TITLE may not decide it, and no candidate -> EMPTY -> OPEN (fail-safe).
+- **WHY IT MATTERS**: this generator writes the register that scripts/check_freeze_window.py READS, so a misreading
+  register can silently drain the window (BUG-572). MEASURED over 422 heading events: the old fallback read the
+  duplicate BUG-493 block, BUG-570 and BUG-419 as CLOSED, and let a FILENAME in BUG-307's title decide.
+- **REFUSED, WITH NUMBERS**: "everything before the first colon" flips 8 events (it destroys the legal trailing
+  slot); paren-only flips 3 (it ignores a real post-colon FIXED); boundary-without-the-post-colon-word flips 5.
+- **TEETH**: 20 named controls (9 new), mutation status_slot_is_a_boundary_not_prose, floor 20 -> 21.
+- **BUG-587 FILED AND PARKED**: a mint is not ASSERTED to arrive - the write path can lose a record and print a
+  plausible total (MEASURED: 32 lines added, 0 deleted, census 819 unchanged). Its tombstone names
+  scripts/check_decision_membership.py, which does not exist.

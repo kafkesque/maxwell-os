@@ -30,7 +30,7 @@ fixture:
   keep: false
   timeout_seconds: 600
 coverage:
-  min_mutations: 20            # FLOOR (shrink guard): deleting an entry means editing the floor in a diff a human reads
+  min_mutations: 21            # FLOOR (shrink guard): deleting an entry means editing the floor in a diff a human reads
   # D-2679: the coverage set is DERIVED, never restated. Which rails gate a COMMIT is one fact and it already has
   # ONE home (config/rail_registry.yaml#commit_boundary), so restating it here would be a SECOND HOME - and two
   # lists of one fact drift, and only one of them can be right. scripts/check_rail_mutations.py joins the two and
@@ -62,6 +62,7 @@ coverage:
     - scripts/reconcile.py
     - scripts/check_freeze_window.py
     - scripts/verify_recalibration_pins.py
+    - scripts/bug_status.py
 budget:
   max_seconds_per_runner: 120 # a slower runner has an UNCONTROLLED INPUT (class iii of D-2665) -> OWNER-OWED, loud
 mutations:
@@ -388,3 +389,28 @@ mutations:
       POLICY, the D-337 trap) and counted nothing. With the drain condition reduced to a no-op, a window whose
       parked set is empty can never be seen to be DUE TO CLOSE, and the named control goes RED through its own
       marker (D-2676(iv)). The entry FAILS if that line is renamed or re-shaped.
+
+  # BUG-572 / D-2689: the register's STATUS SLOT. Reduced to "read the whole header", the parser takes a bug's
+  # status off a word in a sentence ABOUT the bug - MEASURED 2026-09-27 over 422 heading events: BUG-419 (the
+  # schema asymmetry, still live), BUG-570 and the duplicate BUG-493 block read CLOSED, and a FILENAME in
+  # BUG-307's title ("closed_menu.py") decided it too. This is the freeze window's OWN ORACLE - the reader
+  # check_freeze_window.py consumes the register this generator writes, so a misreading register can silently
+  # drain the parked set.
+  - id: status_slot_is_a_boundary_not_prose
+    subject: scripts/bug_status.py
+    op: replace
+    find: '    return ""'
+    replace: '    return rest  # MUTATION (D-2689): the PROSE TITLE is read as a status slot again'
+    runner: scripts/bug_status.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: 'FAIL selftest/the_title_may_not_decide'
+    why: >-
+      D-2689/BUG-572: the slot is a POSITION AT A HEADER BOUNDARY (the leading parenthetical, the first segment,
+      the first word after the colon, the trailing parenthetical) and prose in between may not decide. Restoring the
+      whole-header fallback makes the FIRST named control - a heading whose title merely DESCRIBES a closed block -
+      read CLOSED as an event, and the control that names that shape stops firing: a rule that cannot be made to
+      fail is not a rule (D-2676 iv). FIND-TEXT: the EMPTY slot is the rule; it is one line so the declaration
+      cannot drift into a shape a reader would have to interpret.
+

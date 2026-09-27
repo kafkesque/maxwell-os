@@ -9507,3 +9507,34 @@ decisions:
     check_rail_registry rc=0 (85 ladder invocations, 43 rails on disk, 5 declared writers); check_declaration_consumers
     rc=0 (5 declared homes, 7 consumer edge(s)) with the new consumer edge staged in the SAME commit (the BUG-562
     class); no new bug was FILED by this change - it closes one.'
+- id: D-2681
+  date: '2026-09-27'
+  state: ACTIVE
+  category: governance
+  title: 'THE ONE-HOME FIXTURE RULE: scripts/lib/fixture.py is the single home of the BUG-537 refusal and the BUG-576
+    repository builder (three rails import it, all copies deleted), and a rail oracle is a LADDER LINE, because
+    the D-2680 justfile landing was declared in four governance homes and written in none'
+  bugs:
+  - BUG-577
+  - BUG-582
+  files:
+  - scripts/lib/fixture.py
+  - scripts/check_boundary_rehearsal.py
+  - scripts/check_rail_mutations.py
+  - scripts/check_repo_integrity.py
+  - justfile
+  - config/rail_mutations.yaml
+  decision: 'BUG-577: outside_tree (BUG-537) and real_repo (BUG-576) move to ONE home, scripts/lib/fixture.py, which
+    DERIVES the audited tree from its own location and declares no caller identity or message, so no config edit
+    can re-point the rule (C12/C12d); scripts/check_boundary_rehearsal.py, scripts/check_rail_mutations.py and scripts/check_repo_integrity.py
+    import it and every copy is DELETED so no third home survives. BUG-582: the oracle is a LADDER LINE - python3
+    scripts/lib/fixture.py --selftest || exit 1 runs in health, and the D-2680 prefix banner is the FIRST line of
+    health so it prints before any rail can abort, because a declaration is only a declaration where a machine READS
+    it. A crash in a fixture helper is a verdict, not a traceback: git() returns EXIT_CANNOT_RUN when its command
+    cannot be launched at all (BUG-579 one level down, found by the new control first run).'
+  measured: 'just health-full -> 89 line(s) RUN, 0 fault(s), 262.3s, SCAN_RC=0. scripts/lib/fixture.py --selftest
+    6/6 known-answer control(s) fire. Mutation gate: 9 declared rule(s) SEEN to red through their own control, 8/8
+    declared subject(s) covered (4 derived from the commit boundary, D-2679), 1 negative control stayed green, min_mutations
+    floor 9 -> 10. Rail registry rc=0 (88 ladder invocations, 61 rails invoked). Declaration consumers rc=0 (5 homes,
+    7 edges). repo-integrity selftest 15 controls, boundary-rehearsal selftest 21/21. OPEN 137 -> 136, CLOSED 182
+    -> 184.'

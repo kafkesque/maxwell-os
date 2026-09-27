@@ -990,3 +990,27 @@ one red UNHID a stale dormancy nothing had been able to report.
 DECISION. The ladder reports a PREFIX while it is read as a VERDICT, so each repair round could discover only ONE fault (BUG-573, MEASURED by the D-2679 audit). The remedy is landed as a mechanism, not as a promise: scripts/run_ladder.py READS the recipe body from the ladder's ONE home (config/rail_registry.yaml#ladder and #recipes) and, in --collect mode, RUNS every declaring line as written - so the line's own guard decides what counts as a fault and a fault never hides the lines after it - reporting every fault with its own rc and seconds and exiting with the WORST collected code (1 FATAL outranks 2 owner-owed, BUG-457), never the first. `just health` keeps the fast, human-readable ladder and now prints the prefix declaration FIRST, before any rail can abort it, naming `just health-full` as the whole-set entry point; a recipe the declaration does not govern is REFUSED (C16) and a self-invoking line is skipped (a ladder that collects itself would recurse).
 
 MEASURED. BUG-573 FIXED and MEASURED after the change: `just health-full` RUNS all 87 declaring lines of the declared recipe in one pass - 'ok ladder scan: 87 line(s) RUN, 0 fault(s), 203.0s', SCAN_RC=0 - so at HEAD the remaining fault set is EMPTY, and that is now a measurement rather than an assumption (before, the same ladder reported a prefix that read as a verdict). The cost is MEASURED too, per line, so the next 8 minutes are attributable: check_tests 82.1s, yaml_guard 45.3s, boundary rehearsal 14.4s, store-columns 10.2s, rail mutations 8.6s. The banner is DERIVED from the text: '87 declaring line(s) stand in it (63 declared a HARD gate)'. SEEN: run_ladder --selftest 12/12 rc=0 (late_fault_is_visible, a_late_line_still_RAN, the_line_own_guard_decides, an_unknown_code_is_FATAL_not_owner_owed, the negative control, the undeclared-recipe refusal, both-directions D-405); the standing rule's own teeth: the new mutation ladder_scan_reports_every_fault_is_load_bearing (runner scripts/run_ladder.py --selftest, marker 'FAIL selftest/late_fault_is_visible') SEEN to red, gate --check rc=0 with 8 declared rules SEEN to red and 7/7 subjects covered (4 derived from the commit boundary, D-2679); check_rail_registry rc=0 (85 ladder invocations, 43 rails on disk, 5 declared writers); check_declaration_consumers rc=0 (5 declared homes, 7 consumer edge(s)) with the new consumer edge staged in the SAME commit (the BUG-562 class); no new bug was FILED by this change - it closes one.
+
+## D-2681 (2026-09-27) - THE ONE-HOME FIXTURE RULE, and the landing that was declared but not written
+
+CONTEXT. BUG-577, MEASURED 2026-09-27: scripts/check_boundary_rehearsal.py and scripts/check_rail_mutations.py
+restated the BUG-537 rule "a fixture must resolve OUTSIDE the tree it audits" VERBATIM, and
+scripts/check_repo_integrity.py built the same throwaway repository inline - one rule in three files, measured in
+the same change-set that adopted the standing rule (D-2676). BUG-582, measured at HEAD e13eddc while auditing this
+landing: the D-2680 commit added ONLY the health-full recipe to the justfile, so the prefix BANNER and the
+collector --selftest - both declared in four governance homes as landed - were in NO file.
+
+DECISION. (1) The fixture rules have ONE home: scripts/lib/fixture.py#outside_tree + #real_repo; the three rails
+IMPORT it and every copy is DELETED. The module DERIVES the audited tree from its own location and declares no
+caller's identity or message, so no config edit can re-point the rule and no caller's vocabulary becomes a second
+home (C12/C12d). (2) A RAIL's oracle is a ladder LINE: 'python3 scripts/lib/fixture.py --selftest || exit 1' runs
+in 'health', and the D-2680 banner is the FIRST line of 'health' so the prefix declaration prints before any rail
+can abort (BUG-573's remedy is only real where a machine READS it - a declaration in four prose homes and in no
+file is exactly the class this repository keeps re-learning). (3) A crash in a fixture HELPER is a verdict: git()
+returns EXIT_CANNOT_RUN when its command cannot be launched at all (BUG-579 one level down - found by the new
+control's own first run).
+
+MEASURED. just health-full -> 89 line(s) RUN, 0 fault(s), 262.3s, SCAN_RC=0. scripts/lib/fixture.py --selftest
+6/6. Mutation gate: 9 declared rule(s) SEEN to red through their own control, 8/8 declared subject(s) covered (4
+derived from the commit boundary, D-2679), 1 negative control stayed green. Rail registry rc=0 (88 ladder
+invocations). Declaration consumers rc=0. OPEN 137 -> 136, CLOSED 182 -> 184.

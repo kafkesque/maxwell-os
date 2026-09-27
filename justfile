@@ -4,6 +4,8 @@
 # ── Health ───────────────────────────────────────────────────
 health:
     @echo "=== Maxwell OS v3.0 Health Check ==="
+    python3 scripts/run_ladder.py --banner health --full health-full   # D-2680/BUG-573/BUG-582: the ladder reports a PREFIX (it stops at the first non-zero line) - declared HERE, before any rail can abort, with the entry point that reports the whole set
+    python3 scripts/run_ladder.py --banner health --full health-full   # D-2680/BUG-573/BUG-582: the ladder reports a PREFIX (it stops at the first non-zero line) - declared HERE, before any rail can abort, with the entry point that reports the whole set
     python3 scripts/check_repo_integrity.py || [ $? -eq 2 ]   # RAIL 0: 0 git metadata intact | 1 repository defect (P0-A/P0-B, BUG-400) | 2 owner-owed
     @just --list >/dev/null || { echo "FAIL justfile does not parse - the health rail cannot verify itself"; exit 1; }
     python3 scripts/guard_stacks_single_source.py || exit 1
@@ -98,6 +100,10 @@ health:
     python3 scripts/check_boundary_rehearsal.py || [ $? -eq 2 ]           # D-2675: the write boundary at a REAL commit
     python3 scripts/check_rail_mutations.py --selftest || exit 1          # D-2676: the standing rule's own teeth (a gate never seen to PASS is not a gate)
     python3 scripts/check_rail_mutations.py || [ $? -eq 2 ]               # D-2676: every declared rule SEEN to red through its own named control at a MUTATION
+    python3 scripts/lib/fixture.py --selftest || exit 1                   # BUG-577: the shared fixture rules own known-answer controls (ONE home; a control nothing runs is a comment, BUG-492)
+    python3 scripts/run_ladder.py --selftest || exit 1                    # D-2680/BUG-582: the ladder collector own known-answer controls (a control nothing runs is a comment, BUG-492)
+    python3 scripts/lib/fixture.py --selftest || exit 1                   # BUG-577: the shared fixture rules own known-answer controls (ONE home; a control nothing runs is a comment, BUG-492)
+    python3 scripts/run_ladder.py --selftest || exit 1                    # D-2680/BUG-582: the ladder collector own known-answer controls (a control nothing runs is a comment, BUG-492)
     python3 scripts/check_declaration_consumers.py || exit 1              # D-2669: no declaration without its reader - BUG-562 landed the pair in one commit; this makes the JOIN a property, not an act
 
 healthcheck: health

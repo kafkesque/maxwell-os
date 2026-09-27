@@ -30,7 +30,7 @@ fixture:
   keep: false
   timeout_seconds: 600
 coverage:
-  min_mutations: 8            # FLOOR (shrink guard): deleting an entry means editing the floor in a diff a human reads
+  min_mutations: 10            # FLOOR (shrink guard): deleting an entry means editing the floor in a diff a human reads
   # D-2679: the coverage set is DERIVED, never restated. Which rails gate a COMMIT is one fact and it already has
   # ONE home (config/rail_registry.yaml#commit_boundary), so restating it here would be a SECOND HOME - and two
   # lists of one fact drift, and only one of them can be right. scripts/check_rail_mutations.py joins the two and
@@ -56,6 +56,7 @@ coverage:
     - scripts/check_repo_integrity.py
     - scripts/check_session_plan.py
     - scripts/run_ladder.py
+    - scripts/lib/fixture.py
     - scripts/verify_recalibration_pins.py
 budget:
   max_seconds_per_runner: 120 # a slower runner has an UNCONTROLLED INPUT (class iii of D-2665) -> OWNER-OWED, loud
@@ -203,3 +204,19 @@ mutations:
       D-2680/BUG-573: every fault of the ladder is COLLECTED, so a red line never hides the lines after it. With
       the collection inert, the scan reports a clean ladder while a red stands in it - the prefix-read-as-a-verdict
       defect one level up, in the very report that exists to end it.
+  - id: fixture_outside_tree_rule_is_load_bearing
+    subject: scripts/lib/fixture.py
+    op: replace
+    find: '    if root == AUDITED or AUDITED in root.parents:'
+    replace: '    if False:  # MUTATION (D-2676): the BUG-537 refusal is reduced to a no-op'
+    runner: scripts/lib/fixture.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: 'FAIL selftest/outside_tree_refuses_the_audited_tree'
+    why: >-
+      BUG-577 / D-2676(i): the BUG-537 rule "a fixture must resolve OUTSIDE the tree it audits" was restated
+      VERBATIM by two rails and built inline by a third, so a repair could land in one and leave the others
+      silently stale - and a mis-derived temp root cleans, commits in and rmtrees the LIVE tree. With the refusal
+      inert, the rule ACCEPTS the audited tree itself and the named control goes RED through its own marker: the
+      shared rule is READ, not merely declared.

@@ -339,7 +339,11 @@ current_state:
 # declared ladder in ONE pass (0 fault(s), 203.0s), so the remaining fault set is measured, not implied;
 # BUG-573 closed and NO new bug was filed by the change. RE-MEASURE, never transcribe: the count below is
 # DERIVED by scripts/bug_status.py.
-open_bugs_n: 137
+# D-2681 (2026-09-27): the ONE-HOME FIXTURE RULE landed (scripts/lib/fixture.py; three rails import it, all
+# copies deleted) and BUG-582 closed the PARTIAL D-2680 justfile landing (banner + collector --selftest were
+# declared in four prose homes and in no file). RE-MEASURE, never transcribe: this count is DERIVED by
+# scripts/bug_status.py.
+open_bugs_n: 136
 
 # 2026-09-26T (D-2662/BUG-554) - session trail (comments only: this file stays PARSEABLE).
 # THE CLASS, STATED ONCE: a declared field read by NO machine is a claim, not a control. MEASURED 2026-09-26:

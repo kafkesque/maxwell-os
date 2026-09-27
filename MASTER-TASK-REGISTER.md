@@ -620,3 +620,23 @@ RISK NOTE (now retired): before fe239df a worktree clean destroyed BOTH copies o
 - [ ] OWNER GATE (DUE): the standing-rule CONSTITUTION promotion (bar MET on all three clauses; any promotion must
       be a POINTER to config/rail_mutations.yaml + scripts/check_rail_mutations.py, never a restatement);
       BUG-431 CONTENT promotion.
+
+## D-2681 / BUG-577 + BUG-582 FIXED - THE FIXTURE RULE HAS ONE HOME (2026-09-27)
+
+- [x] BUG-577 FIXED: scripts/lib/fixture.py - outside_tree (BUG-537) + real_repo (BUG-576) in ONE home;
+      scripts/check_boundary_rehearsal.py, scripts/check_rail_mutations.py, scripts/check_repo_integrity.py now
+      IMPORT it and every inline copy is DELETED (no third home).
+- [x] The module is config-free by construction: the audited tree is DERIVED from its own location, so no config
+      edit can re-point the rule; the builder declares no caller's identity/message (C12/C12d).
+- [x] BUG-582 FIXED (filed + fixed here): the D-2680 justfile landing was PARTIAL - the banner and the collector
+      --selftest were declared in MTR/DECISION-LOG/CONTEXT_INDEX/handoff and present in NO file. Both are now in
+      'health', the banner FIRST so no rail can abort ahead of it.
+- [x] Standing-rule satisfaction (D-2676): (i) ONE home scripts/lib/fixture.py; (ii) SEEN control
+      scripts/lib/fixture.py --selftest as its OWN ladder line; (iii) NAMED oracle --selftest (6/6);
+      (iv) MUTATION fixture_outside_tree_rule_is_load_bearing (floor 9 -> 10, subjects 7 -> 8).
+- [x] MEASURED: just health-full -> 89 line(s) RUN, 0 fault(s), 262.3s; gate 9 rules SEEN to red, 8/8 subjects.
+- [x] NO new bug hidden: BUG-582 was FOUND and CLOSED in this change-set (OPEN 137 -> 136, CLOSED 182 -> 184).
+- [ ] NEXT (meta, in order - the freeze target): BUG-575, then BUG-571; the META LANE IS THEN CLOSED.
+- [ ] NEXT (product, the DEFAULT lane): BUG-563 (the 3 dirty rail outputs + backups/**), then BUG-560.
+- [ ] OWNER GATE (DUE): META-LANE FREEZE ruling; standing-rule CONSTITUTION promotion (POINTER only);
+      BUG-431 CONTENT promotion.

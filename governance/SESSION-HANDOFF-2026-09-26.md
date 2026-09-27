@@ -511,3 +511,22 @@ OWNER GATE (DUE). The standing-rule promotion ruling (bar MET; a promotion must 
 restatement) and BUG-431 CONTENT promotion. RECOMMENDATION: rule the META-LANE FREEZE now - the machinery has
 spent ~37 of the last 40 bugs on itself, and it has just proven the ladder is clean in one pass, which is the
 precondition for switching to product work.
+
+## 2026-09-27 (cont.) - D-2681 LANDED / BUG-577 FIXED + BUG-582 FIXED (THE ONE-HOME FIXTURE RULE)
+
+STRONGEST MEASURED EVIDENCE. just health-full -> 89 line(s) RUN, 0 fault(s), 262.3s, SCAN_RC=0. scripts/lib/
+fixture.py --selftest 6/6. Mutation gate: 9 declared rule(s) SEEN to red, 8/8 subjects covered (4 derived from the
+commit boundary), 1 negative control green. Rail registry rc=0, declaration consumers rc=0.
+
+WHAT LANDED. (1) BUG-577: ONE home scripts/lib/fixture.py (outside_tree + real_repo), three callers import it,
+the inline copies DELETED - the module declares nothing from config (C12) and no caller's vocabulary (C12d).
+(2) BUG-582: the D-2680 justfile landing was PARTIAL - the banner line and the collector --selftest were declared
+in four governance homes and present in NO file; both are now in 'health', banner FIRST.
+
+ORDERED NEXT. (1) BUG-575 supersession completeness (24 pinned legacy_debt_ids, D-2645); (2) BUG-571 the
+cited-by-decision join (BUG-492 cited 32x and unregistered is its live case) - the DECISION LAYER is the least
+railed surface, and until these two land a decision is declared, not gated; (3) PRODUCT (default lane): BUG-563
+declared homes for the 3 dirty rail outputs + backups/**, then BUG-560 (write_guard route).
+
+OWNER GATE (DUE). (a) rule the META-LANE FREEZE; (b) the standing-rule CONSTITUTION promotion (bar MET, POINTER
+never a restatement); (c) BUG-431 CONTENT promotion.

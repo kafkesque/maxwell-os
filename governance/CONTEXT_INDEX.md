@@ -1176,3 +1176,16 @@ NOW. `just health-full` -> 87 line(s) RUN, 0 fault(s), 203.0s, SCAN_RC=0: the re
 EMPTY, measured. `just health` stays fast and prints the prefix declaration FIRST.
 OPEN AFTER IT: the meta-lane freeze (BUG-577 -> BUG-575 -> BUG-571, then product: BUG-563 declared homes,
 BUG-560 write_guard) and the DUE owner gate on promoting the standing rule (POINTER, never restatement).
+
+## THE FIXTURE RULE HAS ONE HOME (D-2681, 2026-09-27)
+
+WHERE. scripts/lib/fixture.py#outside_tree (the BUG-537 refusal: a fixture must resolve OUTSIDE the tree it
+audits) and #real_repo (the BUG-576 builder: a REAL repository, BORN or UNBORN). Consumers:
+scripts/check_boundary_rehearsal.py, scripts/check_rail_mutations.py, scripts/check_repo_integrity.py.
+SEEN. The ladder runs 'python3 scripts/lib/fixture.py --selftest || exit 1' as its own line (6/6 controls).
+SUPERSEDES. TWO verbatim copies of outside_tree and one inline builder (BUG-577): a rule in three files is a rule
+that can be repaired in one and left silently stale in the others.
+ALSO FIXED HERE. BUG-582: the D-2680 justfile landing was PARTIAL - the prefix BANNER and the collector
+--selftest were declared in MTR/DECISION-LOG/CONTEXT_INDEX/handoff and present in NO file. A declaration is only a
+declaration where a machine READS it; verify a landing by READING THE BYTES, never the patch driver's summary.
+NOW. just health-full -> 89 line(s) RUN, 0 fault(s), 262.3s, SCAN_RC=0.

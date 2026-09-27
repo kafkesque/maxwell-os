@@ -67,6 +67,10 @@ from typing import Any
 import yaml
 
 REPO = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(REPO / "scripts"))
+
+from lib import fixture  # noqa: E402 - BUG-577: the fixture builder has ONE home, never a copy
+
 CONFIG = REPO / "config" / "repo_integrity.yaml"
 # The DECLARED probes that decide whether HEAD is born, unborn or broken (BUG-576); validated in load_config.
 UNBORN_KEYS = ("head_born_probe", "head_unborn_probe", "head_unborn_ref_probe")
@@ -484,18 +488,15 @@ def selftest() -> int:
             ok = False
         # BUG-576, FOUR controls. A rule about a repository can only be tested by RUNNING it in one (BUG-574),
         # so each control builds a REAL repository with git and drives the SHIPPING functions - head_state(),
-        # resolve_git_dir() and checks() - never a lookalike. The fixture lives in the SYSTEM temp dir, so no
-        # rule about the audited tree is restated here; when BUG-577 lands this builder moves to its ONE home
-        # (scripts/lib/fixture.py) and this copy is DELETED.
+        # resolve_git_dir() and checks() - never a lookalike. BUG-577: the builder now has ONE home
+        # (scripts/lib/fixture.py#real_repo) and the inline copy that used to live here is DELETED; the identity
+        # and the message are THIS control's own facts and are passed IN, so the shared builder declares no
+        # caller's vocabulary (C12d).
+        _ident, _msg = ("repo-integrity-selftest@localhost", "repo-integrity-selftest"), "repo-integrity selftest"
+
         def _fixture(name: str, *, commit: bool) -> Path | None:
-            """A real repository built by git itself in the system temp dir; None if git refused (never a pass)."""
-            root = t / name
-            if git_at(t, "init", "-q", str(root))[0] != 0:
-                return None
-            if commit and git_at(root, "-c", "user.email=selftest@localhost", "-c", "user.name=selftest",
-                                 "commit", "-q", "--allow-empty", "-m", "repo-integrity selftest")[0] != 0:
-                return None
-            return root
+            """A real repository built by the ONE home (BUG-577); None when git refused (never a pass, BUG-492)."""
+            return fixture.real_repo(t, name, commit=commit, identity=_ident, message=_msg)
 
         fresh = _fixture("unborn", commit=False)
         born = _fixture("born", commit=True)

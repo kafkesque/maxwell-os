@@ -7430,3 +7430,43 @@ point. No fixture and no writer: the controls are synthetic, so this rail adds n
 SEEN. run_ladder --selftest 12/12 rc=0; mutation ladder_scan_reports_every_fault_is_load_bearing SEEN to red
 through its own named marker; gate --check rc=0 (8 rules, 7/7 subjects); registry rc=0; declaration consumers
 rc=0 (7 edges). This change FILED no new bug - it closes one.
+
+## BUG-577 (FIXED, MED): the BUG-537 rule "a fixture must resolve OUTSIDE the tree it audits" had TWO HOMES and a THIRD inline copy (2026-09-27, D-2681)
+
+FIX (D-2681, ONE HOME). scripts/lib/fixture.py is now the single home of BOTH fixture rules: outside_tree(root,
+where=...) (the BUG-537 refusal) and real_repo(parent, name, commit=, identity=, message=) (the BUG-576 builder).
+scripts/check_boundary_rehearsal.py and scripts/check_rail_mutations.py DELETE their copies and IMPORT it;
+the nested builder in scripts/check_repo_integrity.py#selftest is DELETED and calls the shared one, passing ITS
+OWN identity and message, so the shared builder declares no caller's vocabulary (C12d). The module declares
+NOTHING from config: the audited tree is DERIVED from its own location, so no config edit can re-point the rule.
+
+SEEN. scripts/lib/fixture.py --selftest: 6/6 known-answer control(s) fire, run by the ladder as its OWN declaring
+line (D-2676 ii). The refusal FIRES on the audited tree AND on a descendant, does NOT fire on a system-temp root
+(two-sided: a rule that refuses everything is not a rule), and the builder drives BOTH HEAD states.
+
+TEETH (D-2676 iv). config/rail_mutations.yaml#fixture_outside_tree_rule_is_load_bearing reduces the refusal to a
+no-op and requires 'FAIL selftest/outside_tree_refuses_the_audited_tree'; floor 9 -> 10, subjects 7 -> 8. Gate
+MEASURED: 9 declared rule(s) SEEN to red, 8/8 subjects covered, 1 negative control stayed green.
+
+FOUND BY THE CONTROL ITSELF (BUG-579's rule, one level down). The FIRST run of the new selftest DIED with
+NotADirectoryError instead of reading a refusal, because a cwd that is not a directory cannot even be LAUNCHED:
+git() is now TOTAL (EXIT_CANNOT_RUN = 125). A crash in a fixture helper was a traceback, not a verdict.
+
+## BUG-582 (FIXED, HIGH): the D-2680 landing declared a BANNER and a SELFTEST in the justfile, and NEITHER was in the bytes - the claim lived in four governance homes and in no file (2026-09-27, D-2681)
+
+CLASS. A declaration is only a declaration where a machine READS it. MEASURED at HEAD e13eddc: 'justfile | 7
++++++++' added ONLY the health-full recipe; 'git show HEAD:justfile | grep run_ladder' returned ONE line, the
+--collect call. The --banner line inside 'health' (the SEEN control that must print BEFORE any rail can abort) and
+'run_ladder.py --selftest' were ABSENT - while MASTER-TASK-REGISTER.md, DECISION-LOG.md, CONTEXT_INDEX.md and the
+session handoff all stated the banner prints and the oracle runs. THE TELL: the D-2680 ladder table listed 87 lines
+and NEVER printed the selftest line - the evidence was already on disk and was read as a summary.
+
+WHY IT MATTERS. BUG-573's harm is a human READING a prefix as a verdict; the mechanism that ends it was not wired
+in. The bug was CLOSED while its own remedy was half-landed - the standing rule's clause (ii) (a SEEN boundary
+control) was satisfied in prose.
+
+FIX. The banner line is FIRST in 'health' (before RAIL 0, so nothing can abort ahead of it) and the collector's
+--selftest line runs in the ladder. Root cause of the partial write is the PATCH DRIVER, not the rail: a
+multi-substitution script wrote ONE substitution's text and reported success for three - the LESSON already in
+this repository: verify a landing by READING THE BYTES, never the driver's own summary (C12d extended: a patch
+driver's stdout is a CLAIM, and a claim is not a measurement).

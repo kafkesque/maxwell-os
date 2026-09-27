@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 319,
-  "open_n": 137,
-  "closed_n": 182,
+  "total_ids": 320,
+  "open_n": 136,
+  "closed_n": 184,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -687,11 +687,6 @@
       "id": "BUG-575",
       "title": "(OPEN, MED): the decision graph is a SET of labels where it must be a GRAPH - a decision can be RETIRED without naming a successor, and no r",
       "events": 1
-    },
-    {
-      "id": "BUG-577",
-      "title": "(OPEN, MED): the BUG-537 rule \"a fixture must resolve OUTSIDE the tree it audits\" now has TWO HOMES, restated verbatim by two rails (2026-09",
-      "events": 1
     }
   ],
   "closed": [
@@ -873,9 +868,11 @@
     "BUG-573",
     "BUG-574",
     "BUG-576",
+    "BUG-577",
     "BUG-578",
     "BUG-579",
     "BUG-580",
-    "BUG-581"
+    "BUG-581",
+    "BUG-582"
   ]
 }

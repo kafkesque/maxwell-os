@@ -58,7 +58,7 @@ import yaml
 REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO / "scripts"))
 
-from lib import git_subject  # noqa: E402
+from lib import fixture, git_subject  # noqa: E402 - BUG-577: the fixture rules have ONE home
 
 CFG = REPO / "config" / "boundary_rehearsal.yaml"
 NOTE_LINE = re.compile(r"^note [^\n]*$", re.MULTILINE)
@@ -166,15 +166,6 @@ def mutate(path: Path, op: str, text: str) -> None:
         path.write_text(text, encoding="utf-8")
 
 
-def outside_tree(root: Path) -> None:
-    """The fixture must not live inside the tree it audits (BUG-537): `git clean -qfdx` and rmtree run
-    here, so a mis-derived temp root would DELETE the live tree. Derived from REPO, never declared, so it
-    cannot be re-pointed by a config edit (C12)."""
-    if root == REPO or REPO in root.parents:
-        raise SystemExit("FAIL-CLOSED (C16): the rehearsal fixture resolved INSIDE the tree it audits ("
-                         + str(root) + "): refusing to clean, commit or delete there")
-
-
 def excluded(rel: Path, patterns: list[str]) -> bool:
     """True when a DECLARED exclusion names this path or one of its parts (C19: a build artifact never enters a
     fixture - a stale bytecode file in a replica is a second, undeclared source of behaviour)."""
@@ -226,7 +217,7 @@ def overlay_control(doc: dict[str, Any]) -> tuple[bool, str]:
     except SystemExit as exc:
         return False, str(exc)
     root = Path(tempfile.mkdtemp(prefix=str(doc["temp"]["prefix"]) + "overlay_")).resolve()
-    outside_tree(root)
+    fixture.outside_tree(root, where="the rehearsal fixture")
     try:
         stale = b"STALE FIXTURE BYTES - never the LANDING bytes (BUG-578)\n"
         rel = files[0]
@@ -258,7 +249,8 @@ def build(doc: dict[str, Any], obs: dict[str, Obs], t: int) -> tuple[Path, Path,
     """A REAL repository in the system temp dir, in the LIVE layout, holding TRACKED HEAD bytes only."""
     tp = doc["temp"]
     root = Path(tempfile.mkdtemp(prefix=str(tp["prefix"]))).resolve()
-    outside_tree(root)   # FAIL CLOSED before anything here is deleted, cleaned or committed
+    fixture.outside_tree(root, where="the rehearsal fixture")   # FAIL CLOSED before anything here is
+    # deleted, cleaned or committed (BUG-537; the rule's ONE home is scripts/lib/fixture.py, BUG-577)
     work, gitdir = root / str(tp["work_name"]), root / str(tp["git_dir_name"])
     work.mkdir(parents=True)
     gitdir.mkdir(parents=True)

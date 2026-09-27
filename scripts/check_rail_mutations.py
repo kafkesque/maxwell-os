@@ -51,6 +51,10 @@ from typing import Any
 import yaml
 
 REPO = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(REPO / "scripts"))
+
+from lib import fixture  # noqa: E402 - BUG-577: the fixture rules have ONE home, never a copy
+
 CFG = REPO / "config" / "rail_mutations.yaml"
 EXIT_CLEAN, EXIT_FATAL, EXIT_OWED = 0, 1, 2
 REQUIRED_KEYS = ("id", "subject", "op", "runner", "runner_args", "expect", "mutated_rc", "marker", "why")
@@ -93,20 +97,11 @@ def cfg() -> dict[str, Any]:
     return doc
 
 
-def outside_tree(root: Path) -> None:
-    """The fixture must lie OUTSIDE the tree it audits (BUG-537): copies, git metadata and rmtree run here.
-
-    Derived from REPO, never declared, so a config edit cannot re-point it (C12)."""
-    if root == REPO or REPO in root.parents:
-        raise SystemExit("FAIL-CLOSED (C16): the mutation fixture resolved INSIDE the tree it audits (" + str(root)
-                         + "): refusing to copy into, commit in, or delete there")
-
-
 def build(doc: dict[str, Any]) -> Path:
     """Materialize a REAL repository of the DECLARED paths in the system temp dir; fail closed at every step."""
     f = doc["fixture"]
     root = Path(tempfile.mkdtemp(prefix=str(f["prefix"]))).resolve()
-    outside_tree(root)
+    fixture.outside_tree(root, where="the mutation fixture")
     for d in f["include_dirs"]:
         shutil.copytree(REPO / str(d), root / str(d), symlinks=True,
                         ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))

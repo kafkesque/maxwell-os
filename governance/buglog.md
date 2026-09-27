@@ -7258,3 +7258,18 @@ RULE ORDER FIXED (scripts/lib/git_subject.py#adopt_index): (a) a value whose rea
 CONTROL ADDED (14th known-answer control): the repository OWN index passed as GIT_INDEX_FILE is ACCEPTED as the pinned subject, NOT refused by the minted-name globs. Measured RED under the mutation that removes the rule, GREEN with it.
 
 CLASS (the mirror of BUG-492): a control that has never been seen to FAIL is not a control. 13/13 green while 100 percent of commits were refused - the write boundary was never part of the test.
+
+## BUG-575 (OPEN, MED): the decision graph is a SET of labels where it must be a GRAPH - a decision can be RETIRED without naming a successor, and no rail reads whether a CITING declaration names a decision that is actually IN FORCE (2026-09-27)
+
+MEASURED (read-only forensic pass over config/decisions.yaml + config/*.yaml, 2026-09-27):
+  - 805 records, 805 distinct normalised ids, 0 collisions (the dash spelling is collapsed by normalized_id, C21) - CLEAN.
+  - 0 of 138 config citation sites name a RETIRED decision (SUPERSEDED/ARCHIVED/REVOKED/REJECTED) - CLEAN.
+  - 0 knobs carry two different decided ids - CLEAN.
+  - 16 records are state=SUPERSEDED, but only 4 name their successor (superseded_by). 12 ORPHANS: D2070, D2080, D2085, D2087, D2091, D2223, D2224, D2293, D2317, D2318, D2430, D2582. Only 1 record declares supersedes. So "what replaced X" is answerable from human memory, never from the registry.
+  - 4 declaration sites cite a decision that is NOT IN FORCE as their authoring authority: config/evidence_floors.yaml (D-403, state=PROPOSED), config/handoffs.yaml (D-403, PROPOSED), config/instrument_controls.yaml (D-400, PROPOSED), config/recalibration_pins.yaml (#pins/r2_meter, D-2663, state=OPEN).
+  - scripts/reconcile.py#decision_registry_wellformed passes ALL of the above: it checks that a cited id RESOLVES, never that it is in force.
+  - The DECISION-LOG.md SUPERSEDED list and the registry superseded set agree exactly (16/16, both directions) - that one two-home join is currently CLEAN and must stay so.
+
+CLASS: this is the D-328 defect the registry already ruled on - a citation that asserts a protection which enforces nothing - generalised to the whole registry. A rule whose authority is PROPOSED is enforced by nobody, and a SUPERSEDED rule whose successor is unnamed cannot be retired by any machine.
+
+REMEDY (two small rails, no new vocabulary): (1) supersession COMPLETENESS - state=SUPERSEDED requires a resolvable successor, except the 24 pinned legacy_debt_ids in config/decisions_policy.yaml (D-2645); (2) IN-FORCE - a cited decision must be in the in-force set, or the citing site must declare a forward reference explicitly (the mint gate already refuses a forward citation, so the vocabulary exists). MADR is the real-world precedent: it carries status = "superseded by ADR-0123" as a LINK, not a label.

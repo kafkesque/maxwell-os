@@ -2,8 +2,8 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 312,
-  "open_n": 136,
+  "total_ids": 313,
+  "open_n": 137,
   "closed_n": 176,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
@@ -686,6 +686,11 @@
     {
       "id": "BUG-573",
       "title": "(OPEN, MED): a RED earlier in the ladder SHORT-CIRCUITS it, so every LATER fault is invisible (measured: the stale dormancy of scripts/check",
+      "events": 1
+    },
+    {
+      "id": "BUG-575",
+      "title": "(OPEN, MED): the decision graph is a SET of labels where it must be a GRAPH - a decision can be RETIRED without naming a successor, and no r",
       "events": 1
     }
   ],

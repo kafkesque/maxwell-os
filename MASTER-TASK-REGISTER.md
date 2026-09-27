@@ -779,3 +779,21 @@ NEXT (in strategically logical order):
 OWNER GATES (one word each, none due while the rails are green): CLOSE/RE-RULE (freeze window) | PROMOTE/HOLD
 (standing rule -> CONSTITUTION, POINTER only) | PROMOTE/HOLD (BUG-431) | DECLARE/CANONICALISE (BUG-583, re-measure
 first) | RENAME/DELETE (BUG-585).
+
+## D-2691 - the ladder's own size, and a derived count with two homes (BUG-584 + BUG-585 FIXED)
+
+OWED nothing: the refusal is SEEN to fire in both synthetic directions and on the live ladder, and its mutation is
+SEEN to red through the control's own name.
+DRAINED: BUG-584 FIXED (the ladder refused a duplicated declaring line; the three duplicated justfile lines
+removed) and BUG-585 FIXED (the stale snapshot key renamed). The meta-lane freeze's parked set falls by two; the
+window stays OPEN with its exit UNMET while the remaining 8 ids are parked.
+CORRECTED IN THE FILED BLOCK: BUG-584's "the census is inflated by 4" is the RAW count - the CENSUS was inflated
+by 1, because parse() drops a line naming the collector itself. Recorded in the FIXED block rather than left to be
+quoted.
+ADDED: the mutation a_duplicated_declaring_line_is_refused (floor 24 -> 25).
+NEXT (consequential order): (1) BUG-588 - the stale count on DECISION-LOG.md line 3, owner-owed (REWRITE-HEADER /
+LEAVE-STALE); (2) the remaining parked machinery defects BUG-570 (the per-SHAPE status-slot rule, whose 10-flip
+list is already measured) and BUG-572/BUG-583 (the state-word pair); (3) BUG-599/559-class held ids; (4) the
+declared home for the leak scan (owed since D-2686); (5) the object-level program: extraction_type is the ONE axis
+of the five with NO anchor at all (251/251 rows empty) and no verifier (F-15), which is the single largest block
+in front of the 7,000+-object work.

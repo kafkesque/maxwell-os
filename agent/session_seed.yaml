@@ -252,7 +252,7 @@ book_library:
   - Pricing subset (3 books, 237 segments — E2E test)
   source: knowledge pipeline/books/
 current_state:
-  open_bugs_n: 77
+  open_bugs_n_at_2026_09_22: 77   # BUG-585 (D-2691): a DERIVED count has ONE home; this dated snapshot key cannot be read as CURRENT
   c15_register: governance/SESSION-HANDOFF-2026-09-23.md
   date: 2026-09-22
   critical_finding: 'BUG-299 / D-274a — the serving gate is a LABEL, not a verification
@@ -346,8 +346,7 @@ current_state:
 # D-2689 (2026-09-27): the status slot became a POSITION AT A HEADER BOUNDARY (BUG-572) and BUG-562 was CLOSED
 # in the SAME change-set (its owed rail was verified by RUNNING it); BUG-587 was FILED and PARKED by the
 # window (ceiling 8 -> 9), so the OPEN count MOVED by one. RE-MEASURE, never transcribe:
-open_bugs_n: 135
-
+open_bugs_n: 133
 # 2026-09-26T (D-2662/BUG-554) - session trail (comments only: this file stays PARSEABLE).
 # THE CLASS, STATED ONCE: a declared field read by NO machine is a claim, not a control. MEASURED 2026-09-26:
 # table:/column: (BUG-553, joined by D-2661) and parity_rail (BUG-554, joined by D-2662) were each read by nobody,

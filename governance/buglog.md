@@ -7762,3 +7762,36 @@ pass or fail through the top-level clause it names. MEASURED after the fix: the 
 is ABSENT from the top level fires (the BUG-587 ABSORBED shape)" and exits 1, and the live gate reads "ok rail
 mutations: 23 declared rule(s) SEEN to red through their own control ... 1 negative control(s) stayed green, 17/13
 declared subject(s) covered (4 derived from the commit boundary, D-2679)".
+
+## BUG-584 (FIXED, LOW, D-2691): the BUG-582 fix wrote three of its lines TWICE in the health ladder (the ladder ran them twice and over-reported its own size)
+
+MEASURED BEFORE (this landing's own audit): the `health` recipe carried 4 duplicated lines in the raw file (the
+banner at justfile:7/8, `scripts/lib/fixture.py --selftest` at 112/114, `scripts/run_ladder.py --selftest` at
+113/115) while the CENSUS read 98 line(s) where only 97 are DISTINCT. WHY THE TWO NUMBERS DIFFER: `parse()` drops
+any line naming the collector ITSELF, so the banner and the collector's own `--selftest` duplicates never entered
+the count - the census was inflated by 1, the raw text by 4, and `just health` EXECUTED three extra lines (the
+banner twice, each `--selftest` twice). The filed block's "inflated by 4" is corrected here to the measured pair
+(raw 4 / census 1): a number nobody re-measured is a number nobody can be wrong about.
+WHY NO RAIL SAW IT. scripts/check_rail_registry.py keys its census by INVOCATION + FLAGS (a dict), so a duplicated
+line collapses into ONE key BY CONSTRUCTION and cannot be counted twice there; scripts/run_ladder.py counted RAW
+lines - two numbers for one fact (D-2646) living inside the health instrument itself.
+FIX. scripts/run_ladder.py#duplicate_declaring_lines() is the census of declaring lines standing MORE THAN ONCE,
+and body() REFUSES a recipe whose census is non-empty through duplicated_refusal(), which NAMES the ladder, the
+count and the line. The three duplicated justfile lines are removed. Controls 12 -> 15: the twice case fires, the
+unique case does NOT (BUG-492), and the LIVE ladder is clean in every declared recipe - the control that would
+have caught this at the boundary.
+TEETH (D-2676): ONE HOME (scripts/run_ladder.py, where the counted unit is decided) | SEEN (both synthetic
+directions plus the live census) | NAMED ORACLE (the ladder's own reader) | MUTATION
+(a_duplicated_declaring_line_is_refused; floor 24 -> 25, SEEN to red through the control's own name).
+MEASURED AFTER: `health` census 97 == 97 DISTINCT, 0 duplicated declaring line(s) in any declared recipe, ladder
+controls 15/15.
+
+## BUG-585 (FIXED, LOW, D-2691): `agent/session_seed.yaml` stated the open-bug count TWICE
+
+MEASURED (2026-09-27, D-2686 audit): the file that BOOTS every session carried `open_bugs_n: 77` inside the dated
+`current_state:` block (line 255, date 2026-09-22) beside the live DERIVED `open_bugs_n: 134` - a count with no
+reader, which a session could read as CURRENT and boot on a fact five days old.
+FIX (the filed remedy, one line): the snapshot key is RENAMED to `open_bugs_n_at_2026_09_22`, so the derived count
+has ONE home and the dated block can no longer be read as current. `grep -rn open_bugs_n` now returns exactly one
+UNQUALIFIED key (the derived one) plus one explicitly DATED key - the class (a derived count with two homes) goes
+to zero rather than being tolerated.

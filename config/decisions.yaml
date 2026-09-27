@@ -9873,3 +9873,36 @@ decisions:
   - governance/CONTEXT_INDEX.md
   - governance/SESSION-HANDOFF-2026-09-26.md
   - agent/session_seed.yaml
+- id: D-2691
+  date: '2026-09-27'
+  state: ACTIVE
+  category: governance
+  title: A LADDER LINE STANDS EXACTLY ONCE, AND A DERIVED COUNT HAS ONE HOME (BUG-584 + BUG-585 FIXED)
+  decision: 'The health ladder''s own CENSUS is the count of its declaring lines and every one of them is EXECUTED,
+    so a duplicated declaring line is two defects at once: the instrument over-reports its own size and the work
+    is done twice. The refusal lives where the counted unit is decided - scripts/run_ladder.py#duplicate_declaring_lines()
+    plus duplicated_refusal() - and body() refuses any declared recipe whose census is non-empty, naming the ladder,
+    the count and the line. The registry''s own census keys by INVOCATION + FLAGS, so a duplicate collapses into
+    one key BY CONSTRUCTION there; that is why the refusal could not live there. In the same change-set, the derived
+    open-bug count loses its second home: agent/session_seed.yaml''s dated snapshot key is renamed open_bugs_n_at_2026_09_22
+    so the derived count can be read in exactly ONE place.'
+  measured: 'BEFORE: recipe health carried 98 declaring line(s) where 97 are DISTINCT (parse() drops a line naming
+    the collector itself, so the census was inflated by 1 while the raw file carried 4 duplicated lines and just
+    health EXECUTED three extra lines). AFTER: 97 == 97 DISTINCT, 0 duplicated declaring line(s) in any declared
+    recipe, ladder controls 12 -> 15, mutation floor 24 -> 25 with a_duplicated_declaring_line_is_refused SEEN to
+    red through the control''s own name, register OPEN 135 -> 133.'
+  bugs:
+  - BUG-584
+  - BUG-585
+  files:
+  - scripts/run_ladder.py
+  - justfile
+  - config/rail_mutations.yaml
+  - agent/session_seed.yaml
+  - governance/buglog.md
+  - governance/bug_status.json
+  - governance/bug_status.md
+  - DECISION-LOG.md
+  - MASTER-TASK-REGISTER.md
+  - governance/CONTEXT_INDEX.md
+  - governance/SESSION-HANDOFF-2026-09-26.md

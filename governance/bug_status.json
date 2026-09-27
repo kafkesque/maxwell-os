@@ -3,8 +3,8 @@
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
   "total_ids": 328,
-  "open_n": 135,
-  "closed_n": 193,
+  "open_n": 133,
+  "closed_n": 195,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -669,16 +669,6 @@
       "events": 1
     },
     {
-      "id": "BUG-584",
-      "title": "(OPEN, LOW): the BUG-582 fix wrote three of its lines TWICE in `just health` (the ladder runs them twice and over-reports its own size)",
-      "events": 1
-    },
-    {
-      "id": "BUG-585",
-      "title": "(LOW - filed 2026-09-27, D-2686 audit, HELD behind the META-LANE FREEZE): `agent/session_seed.yaml` states the open-bug count TWICE and the ",
-      "events": 1
-    },
-    {
       "id": "BUG-588",
       "title": "(FILED, LOW, D-2690): DECISION-LOG.md declares a decision COUNT that is stale by 169 - a second home",
       "events": 1
@@ -874,6 +864,8 @@
     "BUG-580",
     "BUG-581",
     "BUG-582",
+    "BUG-584",
+    "BUG-585",
     "BUG-586",
     "BUG-587",
     "BUG-589",

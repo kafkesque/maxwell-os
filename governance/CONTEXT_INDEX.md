@@ -1301,3 +1301,17 @@ fixture declaration in config/rail_mutations.yaml#fixture (include_files is FILE
 "max_held 9" -> max_held 10 (BUG-588 HELD); "BUG-587 FILED" -> BUG-587 FIXED; the claim that the arrival rule has no
 oracle -> it has one that is SEEN to red (a_mint_must_be_seen_to_arrive); the claim that membership is unchecked ->
 it is a rail with 10/10 controls. HUMAN GATE REGISTER: no new gate; BUG-588 is the one item awaiting a word.
+
+## D-2691 (2026-09-27) - the ladder's own size; a derived count with one home. SUPERSEDES the D-2690 row for the
+## ladder census (98 line(s)) and for `open_bugs_n` (135).
+
+WHERE THINGS LIVE. The refusal for a duplicated declaring line: scripts/run_ladder.py#duplicate_declaring_lines()
+(the census) and #duplicated_refusal() (the message), asked of every declared recipe by body(). Its teeth:
+config/rail_mutations.yaml#a_duplicated_declaring_line_is_refused (floor 24 -> 25). The derived open-bug count:
+agent/session_seed.yaml#open_bugs_n (ONE home; the dated snapshot key is now open_bugs_n_at_2026_09_22).
+CLAIMS SUPERSEDED: "the ladder census is 98" -> 97 (and 97 DISTINCT); "the open-bug count has two homes"
+-> one; "floor 24" -> 25; "ladder controls 12/12" -> 15/15.
+HUMAN GATE REGISTER (unchanged, one word each, none due while the rails print rc 0): CLOSE/RE-RULE the freeze
+window; PROMOTE/HOLD the standing-rule CONSTITUTION promotion (POINTER only); PROMOTE/HOLD BUG-431;
+DECLARE/CANONICALISE BUG-583; REWRITE-HEADER/LEAVE-STALE BUG-588 (the one item whose remedy needs a non-append
+edit to an append_only file).

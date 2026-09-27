@@ -34,7 +34,7 @@ fixture:
   keep: false
   timeout_seconds: 600
 coverage:
-  min_mutations: 24            # FLOOR (shrink guard): deleting an entry means editing the floor in a diff a human reads
+  min_mutations: 25            # FLOOR (shrink guard): deleting an entry means editing the floor in a diff a human reads
   # D-2679: the coverage set is DERIVED, never restated. Which rails gate a COMMIT is one fact and it already has
   # ONE home (config/rail_registry.yaml#commit_boundary), so restating it here would be a SECOND HOME - and two
   # lists of one fact drift, and only one of them can be right. scripts/check_rail_mutations.py joins the two and
@@ -470,3 +470,23 @@ mutations:
       file AND a glob matching nothing must each be a fault, while the LIVE declaration must be clean): the
       differential is real, the marker is the control's own name, and a refactor that stops reading the fixture
       declaration loses its control instead of silently misdiagnosing.
+
+  # BUG-584 (D-2691) - the LADDER'S OWN SIZE. The census IS the count of declaring lines and every line is
+  # EXECUTED, so a duplicated line over-reports the ladder AND repeats the work. The refusal lives where the
+  # counted unit is decided (scripts/run_ladder.py#duplicate_declaring_lines); this entry makes that read SEEABLE
+  # to fail (D-2676 iv) - a guard nobody can red is a comment.
+  - id: a_duplicated_declaring_line_is_refused
+    subject: scripts/run_ladder.py
+    op: replace
+    find: '    return [(line, n) for line, n in seen.items() if n > 1]'
+    replace: '    return []  # MUTATION (D-2676): the duplicate census stops being read'
+    runner: scripts/run_ladder.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: '  FAIL selftest/a_duplicated_declaring_line_is_refused'
+    why: >-
+      BUG-584: `just health` carried 98 declaring line(s) where 97 are DISTINCT and every duplicated line ran
+      twice. With the census neutered the TWICE case is no longer refused, so the control that NAMES the rule
+      stops firing while the live control (every declared recipe is clean) stays green: the differential is real
+      and the marker is the control's own name.

@@ -89,8 +89,35 @@ def parse(text: str, recipe: str) -> list[str]:
     return out
 
 
+def duplicate_declaring_lines(lines: list[str]) -> list[tuple[str, int]]:
+    """Every declaring line that stands MORE THAN ONCE, with its count - one line, one home, EXACTLY ONCE.
+
+    BUG-584: this census IS the ladder's own size, and every line in it is EXECUTED, so a duplicated line is two
+    defects at once - the census over-reports the ladder AND the work is done twice. The registry's own census
+    (config/rail_registry.yaml) keys by INVOCATION + FLAGS, so a duplicate collapses into ONE key BY CONSTRUCTION
+    and cannot be counted twice THERE; the counted unit is decided HERE, so the refusal lives HERE.
+    PURE on purpose: a known-answer control drives it on a synthetic ladder (BUG-582 is the zero case, this is
+    the twice case).
+    """
+    seen: dict[str, int] = {}
+    for line in lines:
+        seen[line] = seen.get(line, 0) + 1
+    return [(line, n) for line, n in seen.items() if n > 1]
+
+
+def duplicated_refusal(recipe: str, ladder: str, dups: list[tuple[str, int]]) -> str:
+    """The refusal a duplicated declaring line earns: it NAMES the ladder, the count and the line itself."""
+    return ("FAIL-CLOSED (C16): recipe " + recipe + " in the declared ladder " + ladder + " declares "
+            + str(len(dups)) + " line(s) MORE THAN ONCE ("
+            + "; ".join("x" + str(n) + " " + line for line, n in dups)
+            + ") - one line, one home, EXACTLY ONCE: a duplicated declaring line inflates this collector's own "
+            "census AND is executed twice (BUG-584; BUG-582 is the zero case, this is the twice case)")
+
+
 def body(recipe: str) -> list[str]:
-    """The declaring lines of one recipe of the DECLARED ladder, refused unless that declaration governs it."""
+    """The declaring lines of one recipe of the DECLARED ladder, refused unless that declaration
+    governs it AND unless every line in it stands exactly ONCE (BUG-584).
+    """
     ladder, recipes = declared()
     if recipe not in recipes:
         raise SystemExit("FAIL-CLOSED (C16): " + repr(recipe) + " is not one of the recipes that config/"
@@ -104,6 +131,9 @@ def body(recipe: str) -> list[str]:
     if not lines:
         raise SystemExit("FAIL-CLOSED (C16): recipe " + recipe + " in the declared ladder " + ladder + " has no "
                          "declaring line - an empty scan is not a clean scan (D-405/D-2680)")
+    dups = duplicate_declaring_lines(lines)
+    if dups:
+        raise SystemExit(duplicated_refusal(recipe, ladder, dups))
     return lines
 
 
@@ -232,12 +262,31 @@ def selftest() -> int:
     except SystemExit as e:
         named = "declared ladder" in str(e) or "rail_registry.yaml" in str(e)
     check("the_refusal_names_the_declaration", named, "the refusal names the home that decides, never a bare exit")
+    dup_text = ladder(["echo MARK", "python3 scripts/lib/fixture.py --selftest || exit 1",
+                       "python3 scripts/lib/fixture.py --selftest || exit 1"])
+    dup_lines = parse(dup_text, "probe")
+    dups = duplicate_declaring_lines(dup_lines)
+    refused = duplicated_refusal("probe", "justfile", dups)
+    check("a_duplicated_declaring_line_is_refused",
+          len(dups) == 1 and dups[0][1] == 2 and dup_lines.count(dups[0][0]) == 2 and "justfile" in refused
+          and "x2" in refused and dups[0][0] in refused,
+          "BUG-584: a declaring line standing TWICE is refused, and the refusal NAMES the ladder, the count and "
+          "the line - the census IS the count of these lines, so one line stands ONCE")
+    check("negative_control_a_unique_ladder_is_refused_by_nothing",
+          not duplicate_declaring_lines(parse(ladder(["echo A", "echo B"]), "probe")),
+          "a ladder whose declaring lines are UNIQUE earns no refusal - a rule that refuses everything is not a "
+          "rule (BUG-492; BUG-582 is the zero case)")
     ladder_path, recipes = declared()
     live = REPO / ladder_path
     both = live.is_file() and all(parse(live.read_text(encoding="utf-8"), r) for r in recipes)
     check("every_declared_recipe_has_declaring_lines", both,
           "D-405 both directions: each recipe config/rail_registry.yaml#recipes names yields >= 1 line ("
           + ", ".join(recipes) + ")")
+    live_census = {r: duplicate_declaring_lines(parse(live.read_text(encoding="utf-8"), r)) for r in recipes}
+    check("the_live_ladder_declares_each_line_once", not any(live_census.values()),
+          "the LIVE ladder is clean in every declared recipe - the control that would have caught BUG-584 at the "
+          "boundary (MEASURED 2026-09-27 before this landing: recipe health carried 98 line(s) where 97 are "
+          "DISTINCT)")
     print("ladder controls: " + str(ok) + "/" + str(ok + fail) + " known-answer control(s) fire")
     return EXIT_FATAL if fail else EXIT_CLEAN
 

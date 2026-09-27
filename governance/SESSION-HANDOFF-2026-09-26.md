@@ -692,3 +692,22 @@ NEXT: BUG-584 dedupe (declaring lines 96 -> 95, plus a decision on whether run_l
 declaring line); the leak scan's DECLARED HOME (owed since D-2686); BUG-570 / BUG-568 / BUG-569 / BUG-559; BUG-588
 pending an owner word. OWNER GATES (one word each): CLOSE/RE-RULE | PROMOTE/HOLD (standing rule) | PROMOTE/HOLD
 (BUG-431) | DECLARE/CANONICALISE (BUG-583) | RENAME/DELETE (BUG-585).
+
+## 2026-09-27 - D-2691 LANDED: the ladder refuses a duplicated declaring line; a derived count loses its second home
+
+WHAT LANDED. (1) scripts/run_ladder.py: duplicate_declaring_lines() + duplicated_refusal(), asked by body() of
+every declared recipe, so a recipe whose declaring lines are not unique is REFUSED by name. Controls 12 -> 15:
+the TWICE case fires, the UNIQUE case does not (BUG-492), and the LIVE ladder is clean in every declared recipe -
+the control that would have caught this at the boundary. (2) justfile: the 4 duplicated lines removed (the banner,
+scripts/lib/fixture.py --selftest, scripts/run_ladder.py --selftest). (3) config/rail_mutations.yaml:
+a_duplicated_declaring_line_is_refused, floor 24 -> 25. (4) agent/session_seed.yaml: the dated snapshot key
+renamed open_bugs_n_at_2026_09_22 (BUG-585).
+MEASURED. BEFORE: health 98 declaring line(s), 97 DISTINCT. AFTER: 97/97, 0 duplicates in any declared recipe.
+The filed "inflated by 4" was the RAW count; the census was inflated by 1, because parse() drops a line naming the
+collector itself - corrected in the FIXED block.
+WHY THIS ORDER. The instrument that reports every other defect was over-reporting its own size; and draining a
+parked bug is the freeze window's exit, not a breach of it. The window stays OPEN, parked set 10 -> 8.
+NEXT (consequential order). (1) BUG-588 (owner-owed: REWRITE-HEADER / LEAVE-STALE); (2) BUG-570's per-SHAPE
+status-slot rule with the measured 10-flip list as controls, then the BUG-572/BUG-583 state-word pair; (3) the leak
+scan's declared home (owed since D-2686); (4) the object-level program - extraction_type is the ONE axis carrying
+NO anchor at all (251/251 rows), which is the largest single block in front of the 7,000+-object work.

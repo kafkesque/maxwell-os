@@ -1287,3 +1287,24 @@ OWNER GATES (one word each, none due while the rails are green): CLOSE/RE-RULE t
 standing rule's CONSTITUTION promotion (POINTER only, never a restatement) | PROMOTE/HOLD BUG-431 | DECLARE/CANONICALISE
 BUG-583 | RENAME/DELETE BUG-585. BUG-588 needs a token of its own: the count sits on line 3 of an append_only file,
 so the remedy is an owner-gated non-append edit or a header rewrite that declares NO count.
+
+## D-2691 - A LADDER LINE STANDS EXACTLY ONCE, AND A DERIVED COUNT HAS ONE HOME (BUG-584 + BUG-585 FIXED)
+
+| D-2691 | ACTIVE | A LADDER LINE STANDS EXACTLY ONCE, AND A DERIVED COUNT HAS ONE HOME. scripts/run_ladder.py#duplicate_declaring_lines() is the census of declaring lines standing MORE THAN ONCE and body() REFUSES a declared recipe whose census is non-empty (the refusal NAMES the ladder, the count and the line): the census IS the count of these lines and every one is EXECUTED, so a duplicate over-reports the instrument AND repeats the work. agent/session_seed.yaml's dated snapshot key is renamed open_bugs_n_at_2026_09_22 so the DERIVED count has ONE home. MEASURED: health census 98 -> 97 (97 DISTINCT, 0 duplicates), ladder controls 12 -> 15, mutation floor 24 -> 25, register OPEN 135 -> 133. |
+
+MEASURED AFTER (D-2691): `health` 97 line(s) where 97 are DISTINCT (was 98/97); the raw justfile lost 4 duplicated
+lines and `just health` no longer executes three of them twice; `scripts/run_ladder.py --selftest` 15/15 (the twice
+case fires, the unique case does NOT, and the LIVE ladder is clean in every declared recipe); the mutation gate
+SEES a_duplicated_declaring_line_is_refused go red through '  FAIL selftest/a_duplicated_declaring_line_is_refused';
+`grep -rn open_bugs_n` returns one UNQUALIFIED key (the derived one) plus one DATED key.
+
+WHY THIS ORDER. BUG-584 is a two-homes defect INSIDE the instrument that reports every other defect: while the
+ladder over-reported its own size, every number it printed about the tree was suspect. Closing it and BUG-585
+DRAINS the meta-lane freeze (the window's exit is `nothing_still_held`; the parked set falls by two).
+
+NOT DONE, DECLARED: BUG-588 (DECISION-LOG.md line 3 declares a decision COUNT stale by 169) is still HELD - this
+file is append_only and line 3 is not append-repairable; the owner word is REWRITE-HEADER or LEAVE-STALE.
+
+OWNER GATES (one word each; none due while the rails print rc 0): CLOSE/RE-RULE the freeze window; PROMOTE/HOLD
+the standing-rule CONSTITUTION promotion; PROMOTE/HOLD BUG-431; DECLARE/CANONICALISE BUG-583; RENAME/DELETE
+BUG-585 is now SPENT (executed here as RENAME by the filed one-line remedy); REWRITE-HEADER/LEAVE-STALE BUG-588.

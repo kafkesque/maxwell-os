@@ -867,3 +867,33 @@ NEXT CONSEQUENTIAL (in order, all inside the open freeze window as DRAIN, not as
   5. PRODUCT LANE: extraction_type is the ONE axis of five with no anchor (0/251), no verifier (F-15), no
      consumer; BUG-431's PROMOTE is step 1 (owner word owed).
 
+
+## D-2696 DONE (2026-09-27) - BUG-568 DRAINED: RAIL 0 pins its own subject (TOLERANT: broken repositories REPORTED, decoys REFUSED), MUTATION-SEEN (floor 30 -> 31)
+Landed: scripts/lib/git_subject.py#recovery_subject()/cleared_env()/discover_or_none() (+root= threading);
+scripts/check_repo_integrity.py pins EVERY child git read and NAMES its subject in every mode (+2 controls,
+15 -> 17); config/repo_integrity.yaml keeps ONE home (exemption prose REPLACED, no new key);
+config/rail_mutations.yaml#the_rail0_subject_pin_is_load_bearing + floor 31. MEASURED: baseline rc 0, marker
+ABSENT -> mutated rc 1, marker the SINGLE red, restored byte-identical, gate rc 0. FILED and PARKED: BUG-591
+(the fixture builder inherits the ambient git subject) joins window.held (10 -> 11, max_held raised with it).
+NEXT (in order): (1) BUG-591 - the fixture builder's own pin (cleared_env + a control + a mutation entry), the
+last measured instance of the BUG-527 class in the machinery; (2) BUG-559 (STRUCTURAL, D-2666): a receipt can be
+cut over bytes joined to NO revision - draining BOTH takes the freeze window's nothing_still_held to MET, which
+makes the owner's one-word CLOSE due (review_by 2026-10-11); (3) the rest of the parked set (BUG-585/584/583/572/
+570/588/587) - list before working, several are OWNER-OWED; (4) agent/session_seed.yaml registry.decisions: 639
+and highest_bug: BUG-301 are DATED SNAPSHOTS awaiting the D-2691 rename treatment (open_bugs_n is the one home);
+(5) the leak scan's DECLARED HOME (owed since D-2686); (6) PRODUCT LANE: extraction_type is the one axis of five
+with no anchor (0/251), no verifier (F-15), no consumer - BUG-431's PROMOTE is step 1 (owner word owed).
+
+## D-2696 (cont., 2026-09-27) - the BOUNDARY REHEARSAL declares the pin it now rehearses
+config/boundary_rehearsal.yaml#rails[RAIL 0] declared ambient_note: none / partial_note: none and quoted the
+WITHDRAWN D-2674 exemption, so the rehearsal RED'd on the reality it exists to observe: 4 note(s) of each
+provenance at the real normal and partial commits against 3 declared. It now declares ambient_note: own_index
+and partial_note: adopted, and NAMES the exemption as WITHDRAWN rather than softened. The declared COUNTS are
+DERIVED from this block (check_boundary_rehearsal.classify), so no count was edited by hand (C12).
+MEASURED: check_boundary_rehearsal.py --selftest 21/21 rc 0; the rehearsal at a REAL commit rc 0 (4 pinned
+note(s) at the normal commit, 4 at the partial one, 2 planted violation(s) refused by their declared rail);
+just health HEALTH_RC=0; the four commit-boundary rails rc 0 against the staged set.
+TEETH were NOT duplicated: selftest/wrong_note_provenance (BUG-567 shape) and selftest/partial_note_declaration_is_read
+already RED when the declaration is mutated, so this declaration is MUTATION-COVERED without a new entry.
+D-2696 is COMPLETE and COMMITTED; NEXT unchanged: (1) BUG-591 (fixture builder pin); (2) BUG-559
+(STRUCTURAL) - draining both takes the freeze window exit nothing_still_held to MET.

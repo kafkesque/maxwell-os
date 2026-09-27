@@ -7808,3 +7808,49 @@ further defects were found by the instrumentation and fixed in the same change: 
 next-index-<pid>.lock IN THE GIT DIR (now a try/finally cleanup that is itself asserted), and the control's own
 anti-vacuity guard (a harness that cannot mint a name, or a blob that does not resolve, FAILS the control rather
 than passing it).
+
+## BUG-568 (CLOSED, MED, D-2696): RAIL 0 audited whichever repository the AMBIENT environment named - it CERTIFIED A FOREIGN REPOSITORY
+MEASURED 2026-09-27, instrumentation FIRST (temp/b568_probe.py: measurement only, no assertions, before any
+control was written). With an ambient GIT_DIR/GIT_WORK_TREE naming a DECOY this rail printed 'ok repo-integrity:
+git dir <decoy>/.git, HEAD resolves and logs/HEAD agrees, 0 conflict-marked names in 2 sweeps' rc=0 - a recovery
+rail CREDITING A REPOSITORY NOBODY ASKED IT ABOUT; --worktree under the same decoy reported 723 phantom dirty
+paths (incl. 'D decoy.txt') read through the decoy's index; --selftest CRASHED with FileNotFoundError instead of
+verdicting (that traceback is a SECOND defect, filed as BUG-591). The hook's OWN environment was measured too: a
+NORMAL commit hands the pre-commit hook GIT_DIR=<gitdir> + GIT_INDEX_FILE=<gitdir>/index, a PARTIAL commit hands
+GIT_INDEX_FILE=<gitdir>/next-index-<pid>.lock - so the pin must TOLERATE both, or it refuses every commit (the
+BUG-574 class: a rule that cannot fire on the legitimate case).
+FIX: scripts/lib/git_subject.py gains the TOLERANT variant - cleared_env(), discover_or_none(), recovery_subject()
+- with root= threaded through discover()/index_subject() so the variant can be RUN against a repository whose
+metadata is broken, never merely argued. scripts/check_repo_integrity.py pins EVERY child git read (git_at() AND
+the raw 'git status' behind --worktree) and NAMES its subject in every mode through 'note repo-integrity: '. The
+exemption is HONOURED, not dropped: where NOTHING resolves the rail pins nothing, runs its children with the
+guards CLEARED and REPORTS the broken repository (a recovery rail must not fail closed on the condition it exists
+to name); where something resolves, an ambient value naming a DIFFERENT subject is REFUSED (C16) and git's own
+minted index is ADOPTED exactly as rails 3/4/5 do. config/repo_integrity.yaml keeps ONE home (the exemption prose
+is REPLACED by the tolerant-pin rule with the measured evidence; no new key). Controls 15 -> 17 known-answer
+control(s), rc 0, incl. the decoy limb, the hook's-own-values limb, an anti-vacuity limb and
+a_broken_repository_is_reported_not_refused (two-sided: an intact repository still PINS).
+MUTATION-SEEN (D-2676 iv): config/rail_mutations.yaml gains the_rail0_subject_pin_is_load_bearing and the FLOOR
+30 -> 31 in ONE human-read diff. MEASURED: baseline rc 0 with the marker ABSENT -> mutated rc 1 with the marker
+the SINGLE red line ('a DECOY GIT_DIR was NOT refused: rc=0 out=note repo-integrity: '), the broken-repository
+control STAYING GREEN because it calls recovery_subject() directly (a differential that moves two controls proves
+neither); restored byte-identical; gate rc 0 (30 declared rule(s) SEEN to red + 1 negative control = 31 = floor).
+
+## BUG-591 (OPEN, MED, FILED by D-2696): the fixture BUILDER inherits the ambient git subject, so a known-answer fixture can be built into a FOREIGN repository
+MEASURED 2026-09-27 while instrumenting BUG-568 (temp/b568_probe.py): scripts/lib/fixture.py#git() runs
+subprocess.run(['git', ...], cwd=...) with an INHERITED environment, so under an ambient GIT_DIR the builder does
+not build its own fixture. MEASURED: 'git init <tmp>/child_fixture' with an ambient GIT_DIR=<decoy> returned rc=0
+with fixture_has_own_gitdir=False (the metadata went into the DECOY's git dir), and fixture.real_repo(...) under
+the same value returned None - which is why the BUG-568 decoy limb then crashed on
+(neither/'.git'/'HEAD').write_text(...) with FileNotFoundError instead of verdicting. This is the BUG-527 class
+ONE LEVEL DOWN: the machinery that BUILDS the known-answer fixtures is itself decided by the ambient subject. The
+case that needs NO decoy is the PRE-COMMIT HOOK, where GIT_DIR=<this repository's git dir> is the LEGITIMATE value
+- no pin refuses it, and that is exactly when a fixture builder must not write into the live git dir. The D-2696
+pin closes the ROUTE that was measured (a decoy is refused before any fixture is built) but not the DEFECT: any
+caller importing lib/fixture.py under a legitimate ambient GIT_DIR is still uncontrolled and no control would fire.
+REMEDY (owed): fixture.git() runs with git_subject.cleared_env() - the ONE home of the guard set (D-2646), never a
+second copy - plus a known-answer control that builds a fixture under an ambient GIT_DIR naming THIS repository and
+asserts (a) the fixture has its OWN git dir, (b) the ambient git dir is unchanged, (c) real_repo returns a
+repository rather than None; MUTATION-SEEN per D-2676 (iv). FILED AND PARKED: config/freeze_window.yaml#scope
+allows a NEW governance bug to be FILED but not WORKED while META-LANE-FREEZE-1 is open, so the id joins
+window.held (10 -> 11) with max_held raised in the SAME change that parks it.

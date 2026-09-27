@@ -69,7 +69,7 @@ import yaml
 REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO / "scripts"))
 
-from lib import fixture  # noqa: E402 - BUG-577: the fixture builder has ONE home, never a copy
+from lib import fixture, git_subject  # noqa: E402 - BUG-577/BUG-568: the fixture rules and the git-subject pin have ONE home each, never a copy
 
 CONFIG = REPO / "config" / "repo_integrity.yaml"
 # The DECLARED probes that decide whether HEAD is born, unborn or broken (BUG-576); validated in load_config.
@@ -95,6 +95,39 @@ def load_config() -> dict[str, Any]:
     return cfg
 
 
+_PIN: tuple[dict[str, str], str] | None = None
+
+
+def subject_bits() -> tuple[dict[str, str], str]:
+    """(the environment EVERY child git read in this rail runs with, the note naming the subject audited).
+
+    BUG-568, MEASURED 2026-09-27 before this fix: with `GIT_DIR=<decoy>/.git` ambient this rail printed
+    `ok repo-integrity: git dir <decoy>/.git ...` rc=0 - it CERTIFIED A FOREIGN REPOSITORY - and `--worktree`
+    reported 723 phantom dirty paths read through the decoy's index, while `--selftest` crashed with a
+    FileNotFoundError instead of reporting. The rule has ONE home (D-2646, config/repo_integrity.yaml#git_subject
+    via scripts/lib/git_subject.py): the subject is DERIVED from the WORKTREE with every guard variable removed,
+    an ambient value naming a DIFFERENT subject is REFUSED, and every child run here writes that pinned subject.
+    A repository whose metadata is BROKEN pins nothing and is REPORTED, never refused - which is why THIS rail may
+    pin at all, and why it pins through recovery_subject() rather than discover().
+    """
+    global _PIN
+    if _PIN is None:
+        doc = git_subject.config()
+        subj, note = git_subject.recovery_subject()
+        _PIN = ((subj.env(os.environ, git_subject.guard_vars(doc)) if subj
+                 else git_subject.cleared_env(doc)), note)
+    return _PIN
+
+
+def env_for(root: Path) -> dict[str, str]:
+    """The child environment for a read at 'root': the PINNED subject for THIS repository, guards CLEARED for any
+    other root - a fixture MUST resolve from its own worktree, or the known-answer controls below would read the
+    live repository (the other half of the same rule, BUG-568)."""
+    if os.path.realpath(str(root)) == os.path.realpath(str(REPO)):
+        return subject_bits()[0]
+    return git_subject.cleared_env(git_subject.config())
+
+
 def git_at(root: Path, *argv: str) -> tuple[int, str]:
     """Run git with an EXPLICIT root; returns (returncode, stdout+stderr stripped). Never raises on a failure.
 
@@ -102,7 +135,7 @@ def git_at(root: Path, *argv: str) -> tuple[int, str]:
     only be tested by RUNNING it in one: the known-answer controls below build REAL repositories in the system
     temp dir and drive THIS function, never a lookalike.
     """
-    p = subprocess.run(["git", *argv], cwd=str(root), capture_output=True, text=True)
+    p = subprocess.run(["git", *argv], cwd=str(root), capture_output=True, text=True, env=env_for(root))
     return p.returncode, (p.stdout + p.stderr).strip()
 
 
@@ -458,7 +491,7 @@ def dirty_entries() -> list[tuple[str, str]]:
     # two-character status field (" M .gitignore" -> "M .gitignore") and turned the path into "gitignore". A
     # parser may not depend on a whitespace convention it does not own (C16), so the records are read RAW.
     r = subprocess.run(["git", "status", "--porcelain", "-z", "--untracked-files=all"], cwd=REPO,
-                       capture_output=True)
+                       capture_output=True, env=env_for(REPO))
     if r.returncode != 0:
         raise SystemExit("REFUSED (C16): `git status` did not resolve - the worktree subject is unavailable "
                          "(rail 0's own subject, BUG-568: it is deliberately NOT pinned to an ambient index)")
@@ -717,6 +750,64 @@ def selftest() -> int:
                       "BORN repository was renamed away and the rail reported " + repr(renamed[:1]) + " - the "
                       "UNBORN rule (BUG-576) must not weaken the 2026-09-25 detection (C16)")
                 ok = False
+    # BUG-568, the PIN - measured before it: a decoy ambient subject CERTIFIED, and --selftest CRASHED.
+    with tempfile.TemporaryDirectory() as td:
+        t = Path(td)
+        _ident, _msg = ("repo-integrity-pin@localhost", "repo-integrity-pin"), "repo-integrity pin selftest"
+        decoy = fixture.real_repo(t, "decoy_subject", commit=True, identity=_ident, message=_msg)
+        broken = fixture.real_repo(t, "pin_broken", commit=False, identity=_ident, message=_msg)
+        if decoy is None or broken is None:
+            print("FAIL repo-integrity selftest/rail0_pins_its_own_subject: git refused to build the DECOY or "
+                  "BROKEN fixture - a control that cannot run is never a pass (BUG-492)")
+            ok = False
+        else:
+            n += 1
+            me = [sys.executable, str(Path(__file__).resolve())]
+            clean = {k: v for k, v in os.environ.items()
+                     if k not in git_subject.guard_vars(git_subject.config())}
+            decoy_env = dict(clean, GIT_DIR=str(decoy / ".git"), GIT_WORK_TREE=str(decoy))
+            own = git_subject.discover(git_subject.config()).git_dir
+            hook_env = dict(clean, GIT_DIR=own, GIT_INDEX_FILE=os.path.join(own, "index"))
+
+            def _rail(argv: list[str], env: dict[str, str]) -> tuple[int, str]:
+                r = subprocess.run(argv, cwd=str(REPO), capture_output=True, text=True, env=env)
+                return r.returncode, r.stdout + r.stderr
+
+            rc_clean, out_clean = _rail(me, clean)
+            rc_decoy, out_decoy = _rail(me, decoy_env)
+            rc_doc, out_doc = _rail(me + ["--selftest"], decoy_env)
+            rc_hook, out_hook = _rail(me, hook_env)
+            bad: list[str] = []
+            if rc_clean != 0:
+                bad.append("anti-vacuity: the SAME command with NO ambient guard values is rc " + str(rc_clean)
+                           + ", so a red here would prove nothing about the decoy")
+            if not (rc_decoy == 1 and "REFUSED git-subject" in out_decoy and "ok repo-integrity" not in out_decoy):
+                bad.append("a DECOY GIT_DIR was NOT refused: rc=" + str(rc_decoy) + " out="
+                           + out_decoy.strip()[:140])
+            if not (rc_hook == 0 and "note repo-integrity: " in out_hook and own in out_hook):
+                bad.append("the HOOK'S OWN ambient values (GIT_DIR=" + own + " + its index) were not TOLERATED and "
+                           "NAMED: rc=" + str(rc_hook) + " - a rule that refuses every commit is not a rule "
+                           "(BUG-574), and a note that names no subject is the lie BUG-567 closed")
+            if not (rc_doc == 1 and "REFUSED" in out_doc and "Traceback" not in out_doc):
+                bad.append("the decoy CRASHED --selftest instead of being refused: rc=" + str(rc_doc) + " tail="
+                           + out_doc.strip()[-200:])
+            if bad:
+                print("FAIL repo-integrity selftest/rail0_pins_its_own_subject: " + " | ".join(bad))
+                ok = False
+            # TOLERANCE, two-sided: a BROKEN repository is REPORTED (never refused) while an INTACT one still pins.
+            n += 1
+            os.rename(str(broken / ".git"), str(broken / "gitdir_renamed_away"))
+            subj_here, _n1 = git_subject.recovery_subject(environ={})
+            subj_broken, note_broken = git_subject.recovery_subject(environ={}, root=broken)
+            if not (subj_here is not None and subj_here.git_dir == os.path.realpath(own)
+                    and subj_broken is None and "NO SUBJECT PINNED" in note_broken
+                    and resolve_git_dir(cfg, broken) is None):
+                print("FAIL repo-integrity selftest/a_broken_repository_is_reported_not_refused: the tolerant pin "
+                      "must (a) PIN an intact repository (got " + repr(bool(subj_here)) + "), (b) return NO subject "
+                      "for one whose git metadata was renamed away (got " + repr(subj_broken) + ", note="
+                      + note_broken[:80] + "), and (c) let the rail's own probe REPORT it (resolve_git_dir=None) "
+                      "- the recovery rail cannot fail closed on the condition it exists to name")
+                ok = False
     # BUG-547, two-sided control: the archive rule must excuse its OWN history and nothing else.
     n += 1
     if not archived_under("archive/conflicted_20260926/",
@@ -744,6 +835,10 @@ def main() -> int:
                     help="audit the DIRTY WORKTREE against its two declared homes (BUG-563; never the "
                          "staged set, which is rail 4's subject)")
     a = ap.parse_args()
+    # BUG-568: the subject is derived BEFORE any mode reads a repository, so no mode of this rail can run under a
+    # subject nobody declared (a decoy is refused in EVERY mode, --selftest included: MEASURED before this fix,
+    # that mode crashed with a traceback while the decoy's git dir was being used to build its own fixtures).
+    print("note repo-integrity: " + subject_bits()[1])
     if a.selftest:
         rc = worktree_selftest()
         return selftest() or rc

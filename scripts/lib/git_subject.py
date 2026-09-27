@@ -50,10 +50,12 @@ ADOPTION (BUG-566/BUG-567, D-2673): ADOPT git's OWN index, NEVER merely tolerate
 ONE HOME (D-2646): this module is the only implementation of the rule; every child `git` call in a rail that
 imports it goes through run_git()/run_git_raw()/run_git_paths(), so there is one call site to audit, not three.
 Consumers (a CLAIM, D-405/D-2674): scripts/verify_recalibration_pins.py (RAIL 3), scripts/check_session_plan.py
-(RAIL 4) and scripts/check_declaration_consumers.py (RAIL 5). DELIBERATELY EXEMPT: scripts/check_repo_integrity.py
-(RAIL 0) does NOT import this module and must not - it is the rail that reports BROKEN git metadata, so pinning it
-would make the recovery rail fail closed on the condition it exists to name; its own subject is still ambient,
-which is FILED as BUG-568 rather than papered over by this list. Controls: --selftest (wired into `just health`).
+(RAIL 4), scripts/check_declaration_consumers.py (RAIL 5) and - since D-2696 - scripts/check_repo_integrity.py
+(RAIL 0) through recovery_subject(), the TOLERANT variant of this pin: the recovery rail must still RUN on a broken
+repository, so where nothing resolves it pins NOTHING, runs its children with the guards CLEARED and REPORTS the
+breakage instead of refusing (the exemption BUG-568 filed, honoured rather than papered over); where something
+DOES resolve, the ambient values are compared and git's own minted index adopted exactly as for rails 3/4/5.
+Controls: --selftest (wired into `just health`).
 
 Usage: python3 scripts/lib/git_subject.py --selftest | --discover-git-dir | --print-git-dir | --minted-index-name
 """
@@ -138,17 +140,24 @@ def guard_vars(doc: dict[str, Any]) -> list[str]:
     return [str(v) for v in list(block["subject_env"]) + list(block["clear_env"])]
 
 
-def discover(doc: dict[str, Any], index_file: str | None = None) -> Subject:
-    """Resolve this repo's subject with every guard variable REMOVED from the child: discovery, not inheritance."""
+def discover(doc: dict[str, Any], index_file: str | None = None,
+             root: Path | str | None = None) -> Subject:
+    """Resolve this subject with every guard variable REMOVED from the child: discovery, not inheritance.
+
+    'root' defaults to THIS repository and is a parameter for the same reason every probe in the machinery
+    takes one (BUG-574): the TOLERANT variant below can only be tested by RUNNING it against a repository
+    whose metadata is broken. It is the WORKTREE, never an ambient value, that says where the git dir is.
+    """
     clean = {k: v for k, v in os.environ.items() if k not in guard_vars(doc)}
+    where = str(root) if root is not None else str(REPO)
     probe = str(doc["git"].get("resolve_from") or "").split() or ["rev-parse", "--absolute-git-dir"]
     got: dict[str, str] = {}
     for key, argv in (("GIT_DIR", probe), ("GIT_WORK_TREE", ["rev-parse", "--show-toplevel"])):
-        p = subprocess.run(["git", "-C", str(REPO), *argv], capture_output=True, text=True, env=clean)
+        p = subprocess.run(["git", "-C", where, *argv], capture_output=True, text=True, env=clean)
         val = p.stdout.strip().splitlines()[-1].strip() if p.returncode == 0 and p.stdout.strip() else ""
         if not val:
             raise SubjectRefused("FAIL-CLOSED (BUG-527): `git " + " ".join(argv) + "` does not resolve from "
-                                 + str(REPO) + " with the git environment cleared (rc=" + str(p.returncode)
+                                 + where + " with the git environment cleared (rc=" + str(p.returncode)
                                  + ") - there is no subject to audit")
         got[key] = os.path.realpath(val)
     idx = os.path.realpath(index_file) if index_file else os.path.join(got["GIT_DIR"], "index")
@@ -159,6 +168,32 @@ def _names_same_subject(raw: str, want: str) -> bool:
     """True when the ambient value resolves to the pinned path (relative values resolved as git would read them)."""
     candidates = [raw] if os.path.isabs(raw) else [str(Path(os.getcwd()) / raw), str(REPO / raw)]
     return any(os.path.realpath(c) == os.path.realpath(want) for c in candidates)
+
+
+def cleared_env(doc: dict[str, Any], environ: Mapping[str, str] | None = None) -> dict[str, str]:
+    """A child environment with EVERY guard variable REMOVED and nothing else changed (BUG-568).
+
+    For a rail whose subject must stay WORKTREE-derived (RAIL 0 resolves the git dir BY READING THE WORKTREE, so
+    its own resolution is the fact it reports) clearing is the whole protection: the ambient value cannot decide
+    the read, and clearing cannot fail closed on the broken repository that rail exists to report. The guard set
+    has ONE home (D-2646), so this is a second USE of the declaration, never a second copy of it.
+    """
+    env = os.environ if environ is None else environ
+    return {k: v for k, v in env.items() if k not in guard_vars(doc)}
+
+
+def discover_or_none(doc: dict[str, Any], index_file: str | None = None,
+                     root: Path | str | None = None) -> Subject | None:
+    """discover() that returns None instead of refusing when NOTHING resolves (BUG-568, the RAIL 0 variant).
+
+    None is a VERDICT - there is no subject - and never a silent substitute for one: the caller must still
+    REPORT the breakage (C16). It exists because the recovery rail cannot fail closed on the very condition it
+    names, and the difference is measured, not argued.
+    """
+    try:
+        return discover(doc, index_file, root=root)
+    except SubjectRefused:
+        return None
 
 
 def index_tolerance(doc: dict[str, Any]) -> list[str]:
@@ -210,8 +245,8 @@ def adopt_index(doc: dict[str, Any], subj: Subject, raw: str) -> tuple[str, str]
                   "that IS the commit set, so it is READ as the subject, not merely accepted (BUG-566/D-2673)")
 
 
-def index_subject(index_file: str | None = None,
-                  environ: Mapping[str, str] | None = None) -> tuple[Subject, str]:
+def index_subject(index_file: str | None = None, environ: Mapping[str, str] | None = None,
+                  root: Path | str | None = None) -> tuple[Subject, str]:
     """THE entry point for the index as well as the repository: the pinned subject AND the index's provenance.
 
     An explicit index_file (a rail's own --index-file flag) is a DECLARED home and always wins. Without it, an
@@ -225,17 +260,37 @@ def index_subject(index_file: str | None = None,
     if not chosen:
         raw = str(env.get("GIT_INDEX_FILE") or "")
         if raw:
-            adopt, note = adopt_index(doc, discover(doc), raw)
+            adopt, note = adopt_index(doc, discover(doc, root=root), raw)
             if not adopt:
                 raise SubjectRefused("REFUSED git-index (BUG-566, fail closed, C16):\n  " + note
                                      + "\n  Pass the explicit --index-file flag this rail documents for a "
                                        "diagnostic read, or unset GIT_INDEX_FILE: there is no silent override.")
             chosen = adopt
-    subj = discover(doc, chosen)
+    subj = discover(doc, chosen, root=root)
     bad = faults(doc, subj, chosen, env)
     if bad:
         raise SubjectRefused("REFUSED git-subject (BUG-527, fail closed, C16):\n  " + "\n  ".join(bad))
     return subj, note
+
+
+def recovery_subject(environ: Mapping[str, str] | None = None,
+                     root: Path | str | None = None) -> tuple[Subject | None, str]:
+    """RAIL 0's pin (BUG-568): the SAME subject rule, TOLERANT of a repository whose metadata is BROKEN.
+
+    The ORDER is the rule. (1) NOTHING RESOLVES -> (None, note): the recovery rail exists to report a broken
+    repository, so refusing here would make it fail closed on the very condition it names; it runs its children
+    with cleared_env() and goes on to REPORT. (2) SOMETHING RESOLVES -> index_subject(): the ambient guard values
+    are COMPARED (one naming a DIFFERENT repository/worktree/index is REFUSED, C16) and git's own minted
+    partial-commit index is ADOPTED, exactly as the write-boundary rails do. Refusing is safe HERE because the
+    repository is readable: a divergence can then only mean the caller meant to audit another subject, and a rail
+    that reports on a subject nobody asked about is the BUG-527 class.
+    """
+    doc = config()
+    if discover_or_none(doc, root=root) is None:
+        return None, ("NO SUBJECT PINNED: " + str(root if root is not None else REPO) + " does not resolve with "
+                      "the git environment cleared, so this rail pins nothing, runs with every guard variable "
+                      "REMOVED and REPORTS the broken repository instead of refusing it (BUG-568)")
+    return index_subject(None, environ, root=root)
 
 
 def faults(doc: dict[str, Any], subj: Subject, index_file: str | None = None,

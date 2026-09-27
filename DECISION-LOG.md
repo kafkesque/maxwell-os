@@ -1386,3 +1386,17 @@ REGISTER: buglog 463 block(s), 0 copies; register equals its re-derivation; OPEN
 a HELD bug is the window's EXIT, not a breach of it (`config/freeze_window.yaml#not_frozen`).
 STAMPS: config/decisions.yaml 826 records, stamp `995142daf2c3bafa`; census `6c3a03c2c3aa7f61`.
 
+
+## D-2696 (2026-09-27) - the RECOVERY RAIL pins its own subject: RAIL 0's pin is TOLERANT and MUTATION-SEEN (floor 30 -> 31; BUG-568 DRAINED, BUG-591 FILED and PARKED)
+BUG-568 was a rail that audits whichever repository the AMBIENT environment names. Its exemption from the D-2646
+pin was principled - RAIL 0 must still run when git metadata is BROKEN, so pinning it naively would make the
+recovery rail fail closed on the very condition it exists to report - so the fix is the TOLERANT variant of the
+SAME rule: nothing resolves -> no subject, guards CLEARED, the broken repository REPORTED; something resolves ->
+the ordinary compared-and-adopted subject, a divergent ambient value REFUSED (C16). MEASURED before the fix (a
+decoy GIT_DIR): 'ok repo-integrity: git dir <decoy>/.git' rc=0 - a FOREIGN REPOSITORY CERTIFIED - 723 phantom
+dirty paths under --worktree, a FileNotFoundError traceback under --selftest. After: 17/17 controls, every mode
+green, the subject NAMED. MUTATION-SEEN per D-2676 (iv): the new entry's mutation reds EXACTLY ONE control (the
+broken-repository control calls recovery_subject() directly and stays green), restored byte-identical, gate rc 0,
+floor 30 -> 31 in one human-read diff. The same instrumentation measured a SECOND defect - lib/fixture.py#git()
+inherits the ambient subject, so a known-answer fixture can be built into a foreign repository - FILED as BUG-591
+with a remedy and PARKED (window.held 10 -> 11, max_held raised in the same change). BUG-568 is CLOSED.

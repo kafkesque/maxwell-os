@@ -55,11 +55,15 @@ rails:
     invocation: scripts/check_repo_integrity.py
     why: 'the recovery rail: it must refuse a commit through BROKEN git metadata, and ACCEPT a healthy one'
     staged_rc: 0
-    ambient_note: none
-    partial_note: none
+    ambient_note: own_index
+    partial_note: adopted
     ambient_note_why: >-
-      RAIL 0 does NOT pin the ambient subject: it is the rail that REPORTS broken metadata, so pinning it would
-      make it fail closed on the condition it exists to name (BUG-568, declared debt - not papered over here).
+      RAIL 0 pins its OWN subject through scripts/lib/git_subject.py#recovery_subject() (D-2696, BUG-568
+      DRAINED): at a NORMAL commit git hands the hook THIS repository OWN index, and the rail READS it as the
+      subject and SAYS so - at a PARTIAL commit it names git OWN minted temp index, the same provenance the
+      other three rails declare (BUG-566/D-2673). The pin is TOLERANT and never an unconditional refusal: where
+      NOTHING resolves, RAIL 0 clears every guard variable, REPORTS the broken repository and still RUNS - which
+      is why the exemption this line used to declare (D-2674) is WITHDRAWN here rather than merely softened.
     selftest: scripts/check_repo_integrity.py --selftest
   - role: RAIL 3
     invocation: scripts/verify_recalibration_pins.py --staged

@@ -10085,3 +10085,55 @@ decisions:
   - DECISION-LOG.md
   - governance/CONTEXT_INDEX.md
   - agent/session_seed.yaml
+- id: D-2696
+  date: '2026-09-27'
+  state: ACTIVE
+  category: governance
+  title: 'THE RECOVERY RAIL PINS ITS OWN SUBJECT: RAIL 0''s pin is TOLERANT (broken repositories REPORTED, decoys
+    REFUSED) and MUTATION-SEEN (floor 30 -> 31; BUG-568 DRAINED, BUG-591 FILED and PARKED)'
+  decision: 'BUG-568 filed a rail that audits whichever repository the AMBIENT environment names: GIT_DIR / GIT_WORK_TREE
+    / GIT_INDEX_FILE are inherited by every child process, so RAIL 0 read a repository nobody asked it about. Its
+    exemption from the D-2646 pin was PRINCIPLED (it must still run when git metadata is BROKEN, so pinning it naively
+    would make the recovery rail fail closed on the very condition it exists to report), which is why the fix is
+    the TOLERANT variant of the SAME rule rather than an exemption removed. scripts/lib/git_subject.py gains recovery_subject():
+    (1) NOTHING RESOLVES -> no subject, children run with the guards CLEARED, the broken repository REPORTED and
+    never refused; (2) SOMETHING RESOLVES -> the ordinary index_subject() path, so a divergent ambient value is
+    REFUSED (C16) and git''s own minted partial-commit index is ADOPTED (D-2673). discover()/index_subject() take
+    root= so the variant can be RUN against a broken fixture. MEASURED before the fix: a decoy GIT_DIR made this
+    rail print ''ok repo-integrity: git dir <decoy>/.git'' rc=0 - it CERTIFIED A FOREIGN REPOSITORY - with 723 phantom
+    dirty paths under --worktree and a FileNotFoundError traceback under --selftest. The same instrumentation measured
+    a SECOND, previously unfiled defect: lib/fixture.py#git() inherits the ambient subject, so the fixture BUILDER
+    itself can write into a foreign git dir; the pin closes that route but not the defect, so it is FILED as BUG-591
+    and PARKED (window.held 10 -> 11, max_held raised in the same change, per that file''s own rule). BUG-568 is
+    CLOSED.'
+  measured: 'INSTRUMENTATION FIRST (temp/b568_probe.py, measurement only): (A) the hook''s environment MEASURED
+    in this --separate-git-dir layout (normal commit: GIT_DIR=<gitdir> + GIT_INDEX_FILE=<gitdir>/index; partial
+    commit: GIT_INDEX_FILE=<gitdir>/next-index-<pid>.lock); (B) the decoy behaviour in DEFAULT (rc 0, foreign repository
+    CERTIFIED), --worktree (rc 1, 723 phantom paths) and --selftest (a CRASH); (C) the fixture-builder defect (BUG-591);
+    (D) baselines green. AFTER the fix: --selftest 17/17 rc 0, default rc 0, --worktree rc 0 (6 dirty paths all
+    granted), the subject NAMED in every mode. THE TEETH (a driver that REFUSES on a drifted anchor and prints its
+    baseline BEFORE writing - the temp/d2696_land.py attempt refused at its own anchor; no blind write happened,
+    and that refusal is the feature): baseline rc 0 marker ABSENT -> mutated rc 1 with the marker the SINGLE red
+    line, the broken-repository control staying green, restored byte-identical (sha256 re-checked), and the gate
+    rc 0: 30 declared rule(s) SEEN to red + 1 negative control = 31 entries = floor.'
+  bugs:
+  - BUG-568
+  - BUG-591
+  files:
+  - scripts/lib/git_subject.py
+  - scripts/check_repo_integrity.py
+  - config/repo_integrity.yaml
+  - config/rail_mutations.yaml
+  - config/freeze_window.yaml
+  - temp/b568_probe.py
+  - temp/d2696_land2.py
+  - temp/d2696_gov.py
+  - governance/buglog.md
+  - governance/bug_status.json
+  - governance/bug_status.md
+  - config/decisions.yaml
+  - config/decisions_summary.json
+  - DECISION-LOG.md
+  - MASTER-TASK-REGISTER.md
+  - governance/CONTEXT_INDEX.md
+  - agent/session_seed.yaml

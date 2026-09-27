@@ -52,7 +52,11 @@ window:
                   # file where no append can repair it
     - BUG-587     # FILED by D-2689 while minting D-2689: the registry's write path cannot be SEEN to lose
                   # a record - the same class as this window's own oracle, one file over
-  max_held: 10
+    - BUG-591     # FILED by D-2696, MEASURED while instrumenting BUG-568: scripts/lib/fixture.py#git() INHERITS
+                  # the ambient git subject, so a known-answer fixture can be built into a FOREIGN repository -
+                  # or into THIS one, under the hook's legitimate GIT_DIR. A new governance bug may be FILED and
+                  # PARKED while this window is open, never WORKED: which is why max_held moves with it.
+  max_held: 11
 
   # AN OWNER RULING, recorded where its reader is. A released id MUST also be in `held` (else the ruling is
   # about nothing), and its reason is REQUIRED: `released: {}` is the honest empty case.

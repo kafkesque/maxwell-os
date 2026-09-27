@@ -1365,3 +1365,18 @@ window (the drain now stands at 3 held, exit still UNMET); PROMOTE/HOLD the stan
 28). The floor is SHRINK-ONLY: RAISING it is a decision with a diff a human reads. BUG-569 is CLOSED and
 META-LANE-FREEZE-1 reads **still OPEN 2** (BUG-568, BUG-559) - draining a HELD bug is the window's EXIT. Stamps:
 config/decisions.yaml 826 records, stamp `995142daf2c3bafa`; census `6c3a03c2c3aa7f61`; register OPEN 129 / CLOSED 199.
+
+## D-2696 (2026-09-27) - the RECOVERY RAIL pins its own subject: BUG-568 DRAINED (RAIL 0's pin is TOLERANT and MUTATION-SEEN); BUG-591 FILED and PARKED; SUPERSEDES every earlier statement of the mutation FLOOR in this index
+config/rail_mutations.yaml#coverage.min_mutations is now **31** (was 30; the D-2694/D-2695 rows and every earlier
+row stating a floor are SUPERSEDED). The FLOOR is a SHRINK-ONLY guard: raising it is a decision with a diff a
+human reads. BUG-568's fix has ONE home: scripts/lib/git_subject.py#recovery_subject() (the TOLERANT pin - nothing
+resolves -> guards CLEARED and the broken repository REPORTED; something resolves -> compared, divergent REFUSED,
+git's own minted index ADOPTED), consumed by scripts/check_repo_integrity.py for EVERY child git read. BUG-591 (a
+fixture builder that inherits the ambient subject) is FILED and PARKED in config/freeze_window.yaml#held
+(10 -> 11, max_held raised in the same change) and may not be WORKED while META-LANE-FREEZE-1 is open.
+
+## D-2696 (cont., 2026-09-27) - the rehearsal declaration caught up to the pin (no index fact changes)
+config/boundary_rehearsal.yaml#rails[RAIL 0] now declares ambient_note: own_index / partial_note: adopted; the
+D-2674 exemption it used to state is WITHDRAWN. The declared note counts remain DERIVED from that block.
+The mutation FLOOR stated in the D-2696 row above is unchanged: config/rail_mutations.yaml#coverage.min_mutations
+is 31. Nothing else in this index is superseded by this line.

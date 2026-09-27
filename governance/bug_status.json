@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 328,
+  "total_ids": 329,
   "open_n": 129,
-  "closed_n": 199,
+  "closed_n": 200,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -649,8 +649,8 @@
       "events": 1
     },
     {
-      "id": "BUG-568",
-      "title": "(OPEN, MED): RAIL 0 does not pin its own git subject",
+      "id": "BUG-591",
+      "title": "(OPEN, MED, FILED by D-2696): the fixture BUILDER inherits the ambient git subject, so a known-answer fixture can be built into a FOREIGN re",
       "events": 1
     }
   ],
@@ -832,6 +832,7 @@
     "BUG-565",
     "BUG-566",
     "BUG-567",
+    "BUG-568",
     "BUG-569",
     "BUG-570",
     "BUG-571",

@@ -34,7 +34,7 @@ fixture:
   keep: false
   timeout_seconds: 600
 coverage:
-  min_mutations: 30            # FLOOR (shrink guard): deleting an entry means editing the floor in a diff a human reads
+  min_mutations: 31            # FLOOR (shrink guard): deleting an entry means editing the floor in a diff a human reads
   # D-2679: the coverage set is DERIVED, never restated. Which rails gate a COMMIT is one fact and it already has
   # ONE home (config/rail_registry.yaml#commit_boundary), so restating it here would be a SECOND HOME - and two
   # lists of one fact drift, and only one of them can be right. scripts/check_rail_mutations.py joins the two and
@@ -601,3 +601,26 @@ mutations:
       cosmetic. With the note suppressed the rail still adopts and still reads the minted index (rc stays 1 and
       the probe path is still named), so the red isolates the PRINT: measured baseline 24/24 rc 0 -> mutated
       23/24 rc 1 with this control the single FAIL, restored byte-identical (D-2676 iv).
+  # D-2696 (BUG-568): the subject pin is a RAIL-level rule for RAIL 0 too, and this entry is where that claim
+  # stops being prose. MEASURED 2026-09-27 before the fix (temp/b568_probe.py): with an ambient GIT_DIR naming a
+  # DECOY repository this rail printed "ok repo-integrity: git dir <decoy>/.git" rc=0 - it CERTIFIED A FOREIGN
+  # REPOSITORY - --worktree reported 723 phantom dirty paths through the decoy's index, and --selftest crashed
+  # with a FileNotFoundError instead of reporting. The mutant below makes the pin inert (no subject, no note),
+  # which leaves every OTHER control intact: the broken-repository control calls recovery_subject() directly, so
+  # the differential moves exactly ONE control and isolates the PIN itself.
+  - id: the_rail0_subject_pin_is_load_bearing
+    subject: scripts/check_repo_integrity.py
+    op: replace
+    find: '        subj, note = git_subject.recovery_subject()'
+    replace: '        subj, note = None, ""  # MUTATION (D-2676): the pin comes out - the ambient subject decides again (BUG-568)'
+    runner: scripts/check_repo_integrity.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: 'FAIL repo-integrity selftest/rail0_pins_its_own_subject'
+    why: >-
+      BUG-568: RAIL 0 derives its subject from the WORKTREE with the guard variables cleared, refuses an ambient
+      value naming a DIFFERENT subject, and REPORTS (never refuses) a repository whose metadata is broken. With
+      the pin inert the rail still RUNS and still prints ok, so the red isolates one fact: the ambient
+      environment is deciding what the recovery rail reads. MEASURED: baseline rc 0 with the marker ABSENT ->
+      mutated rc 1 with the marker the SINGLE red line; restored byte-identical (D-2676 iv).

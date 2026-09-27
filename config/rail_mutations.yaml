@@ -30,7 +30,7 @@ fixture:
   keep: false
   timeout_seconds: 600
 coverage:
-  min_mutations: 17            # FLOOR (shrink guard): deleting an entry means editing the floor in a diff a human reads
+  min_mutations: 18            # FLOOR (shrink guard): deleting an entry means editing the floor in a diff a human reads
   # D-2679: the coverage set is DERIVED, never restated. Which rails gate a COMMIT is one fact and it already has
   # ONE home (config/rail_registry.yaml#commit_boundary), so restating it here would be a SECOND HOME - and two
   # lists of one fact drift, and only one of them can be right. scripts/check_rail_mutations.py joins the two and
@@ -333,3 +333,19 @@ mutations:
       if it were a retirement, so the fixture's ACTIVE and PROPOSED records are reported as gaps and the named
       control goes RED through its own marker: the rule is READ, not merely declared (BUG-492, one level up).
       This is also what makes the rail refactor-proof: the entry FAILS if this line is renamed or re-shaped.
+  - id: pre_image_containment_is_load_bearing
+    subject: scripts/lib/write_guard.py
+    op: replace
+    find: '    if resolved != REPO and REPO not in resolved.parents:'
+    replace: '    if False:  # MUTATION (D-2676): a pre-image may be kept for an artifact of any tree'
+    runner: scripts/lib/write_guard.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: 'FAIL selftest/the_pre_image_store_refuses_an_out_of_tree_artifact'
+    why: >-
+      D-2686 (the BUG-560 class): the ONE store an auditor reads must hold the pre-images of the tree's OWN
+      artifacts - a pre-image's name carries the artifact's STEM only, so a fixture's is indistinguishable from a
+      tracked artifact's. MEASURED 2026-09-27: the applier's own --selftest left five of them in the live
+      backups/. With the containment predicate reduced to a no-op, the guard keeps a system-temp fixture's
+      pre-image, deposits it, and the named control goes RED through its own marker (D-2676(iv)).

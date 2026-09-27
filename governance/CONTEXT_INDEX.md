@@ -1239,3 +1239,16 @@ NOW. `backups/**` and the per-run snapshots are excluded BY DECISION; the six in
 - **`append_lines` vs `append_rows`**: `append_rows` regenerates every pre-image line through csv.DictWriter, so
   it RE-TERMINATES a ledger the writer does not own; `append_lines` proves the pre-image is a byte PREFIX and
   that the bytes past it are exactly the declared suffix. Use it for append-only LEDGERS.
+
+## A PRE-IMAGE IS EVIDENCE OF THE AUDITED TREE (D-2686, 2026-09-27)
+- **`scripts/lib/write_guard.py#_backup` keeps a pre-image ONLY for an artifact of the audited tree** (fails
+  CLOSED with `WriteRefused`, nothing written); `pre_image_faults(path)` is the PURE predicate. A caller whose
+  artifact is not the tree's owns no pre-image: pass `backup=False`.
+- **WHY**: a pre-image's name carries the artifact's STEM only, so a fixture's pre-image is INDISTINGUISHABLE
+  from a tracked artifact's in the ONE store an auditor reads. MEASURED 2026-09-27: the applier's own
+  `--selftest` left five such files in the live `backups/` (BUG-560).
+- **THE WHOLE SET WAS MEASURED, not assumed**: 33 declared `--selftest` commands + the 261-test suite, each with
+  a before/after snapshot of `backups/`, `governance/MUTATION_JOURNAL.jsonl` and `git status --porcelain`:
+  clean. BUG-560's leak was the only instance. The scan is scratch (`temp/scan_fixture_leaks.py`) - hoisting it
+  into a declared rehearsal is OWED.
+- **TEETH**: `config/rail_mutations.yaml#pre_image_containment_is_load_bearing` (floor 17 -> 18).

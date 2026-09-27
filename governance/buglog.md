@@ -7572,3 +7572,20 @@ as known-answer controls, both directions, and a mutation that REDs it.
   hook - the hook's strictest gate would refuse a commit that carries a legitimately new artifact before the plan
   entry can land, which is the BUG-528b sequencing defect. The hook widening is a declared follow-up, not a
   silent gap.
+## BUG-585 (LOW - filed 2026-09-27, D-2686 audit, HELD behind the META-LANE FREEZE): `agent/session_seed.yaml` states the open-bug count TWICE and the two disagree - a stale `77` in the dated `current_state` block (line 255) beside the live DERIVED `134` (line 346)
+
+MEASURED 2026-09-27 (the D-2686 whole-set audit): the file that BOOTS every session carries the open-bug count in
+TWO homes. `open_bugs_n: 134` (line 346) is DERIVED by `scripts/bug_status.py` (D-2656: a derived count is never
+restated). `open_bugs_n: 77` (line 255) sits inside `current_state:`, a dated snapshot block (`date: 2026-09-22`).
+`grep -rn open_bugs_n` over the tree returns exactly two hits, BOTH literals in this one file, so NOTHING reads
+line 255 - and that is the defect, not the excuse: it is a count with no reader that a session (or a summary
+written from the seed) can read as CURRENT, which boots the session with a fact that was true five days earlier.
+The class is BUG-491's (one fact, two homes, only one of them right) one level up: the count is not merely stale,
+it is UNFALSIFIABLE where it sits - no rail joins a key no code reads.
+
+REMEDY (one line, no owner ruling needed): rename the block's key so it cannot be read as current
+(`open_bugs_n_at_2026_09_22`), or delete the key and let the dated block keep only its date - ONE HOME for a
+derived count. NOT WORKED HERE: the META-LANE FREEZE holds new GOVERNANCE bugs as FILED so the product lane can
+advance; this block is the filing, with its measurement and its remedy.
+
+

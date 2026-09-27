@@ -212,6 +212,28 @@ class WriteReport:
             fh.write(json.dumps(self.__dict__, sort_keys=True) + "\n")
 
 
+def pre_image_faults(path: Path) -> list[str]:
+    """PURE: a pre-image is evidence of an artifact of the AUDITED tree, and of nothing else (BUG-560 class).
+
+    `backups/` is the ONE store an auditor reads to reconstruct what a writer replaced (C13/R-D410), and a
+    pre-image's name carries the artifact's STEM only - so a copy taken from a path OUTSIDE the tree is
+    indistinguishable from the pre-image of a same-named tracked artifact. MEASURED 2026-09-27 (BUG-560/D-2685):
+    the owner-ruling applier's own `--selftest` built its fixture under temp/ and called write_rows with the
+    DEFAULT backup=True, leaving five throwaway pre-images (`wb.PRE_apply_workbook_rulings_*.csv`, 81-83 bytes
+    each) in the live backups/ - the CONTROL run polluted the evidence of the tree it audits, and nothing in the
+    store said which artifact they addressed. A pre-image of a fixture is evidence of nothing; the whole declared
+    selftest set was then scanned (33 declared commands, 2026-09-27) and this was the only deposit, so the rule
+    lands as CONTAINMENT - the mechanism that produced it - rather than as a per-run observation.
+    """
+    resolved = path.resolve()
+    if resolved != REPO and REPO not in resolved.parents:
+        return ["the artifact at " + str(resolved) + " lies OUTSIDE the audited tree " + str(REPO)
+                + ": its pre-image is evidence of nothing and would be stored under " + str(BACKUP_DIR)
+                + " beside the pre-images of the tree's own artifacts, indistinguishable from them (BUG-560). "
+                  "A caller whose artifact is not the tree's owns no pre-image to keep: pass backup=False."]
+    return []
+
+
 def _backup(path: Path, writer: str) -> Path | None:
     """Byte-exact pre-image copy under backups/ (C13/R-D410), or None when the artifact does not exist yet.
 
@@ -220,6 +242,12 @@ def _backup(path: Path, writer: str) -> Path | None:
     """
     if not path.exists():
         return None
+    _faults = pre_image_faults(path)
+    if _faults:
+        print("REFUSED pre-image of " + _label(path) + " for " + writer)
+        for _f in _faults:
+            print("  !! " + _f)
+        raise WriteRefused(1)
     BACKUP_DIR.mkdir(exist_ok=True)
     bp = BACKUP_DIR / f"{path.stem}.PRE_{Path(writer).stem}_{_stamp()}{path.suffix}"
     bp.write_bytes(path.read_bytes())
@@ -750,12 +778,39 @@ def selftest() -> int:
         except WriteRefused:
             pass
         assert led.read_bytes() == _post, "a refused append still mutated the ledger"
+        # 14-16. the PRE-IMAGE STORE'S CONTAINMENT rule (BUG-560 class): the artifact whose pre-image a writer
+        #    keeps must BE an artifact of the audited tree, or the store an auditor reads cannot be read.
+        _outside = Path(td) / "a.csv"                       # a system-temp fixture: OUTSIDE the audited tree
+        _deposits = sorted(q.name for q in BACKUP_DIR.iterdir()) if BACKUP_DIR.is_dir() else []
+        _pre_rows = read_rows(_outside)
+        _refused = False
+        try:
+            with contextlib.redirect_stdout(io.StringIO()):
+                write_rows(_outside, [{"item_id": "R001", "mine": "z2", "owner": "REGEN"}], owned_keys={OWNED_ANY},
+                           writer="selftest", journal=False)   # backup=DEFAULT True on purpose: the leak's own call
+        except WriteRefused:
+            _refused = True
+        _post = sorted(q.name for q in BACKUP_DIR.iterdir()) if BACKUP_DIR.is_dir() else []
+        _ctl2 = [
+            ("an_out_of_tree_artifact_is_reported_where_its_pre_image_would_land", bool(pre_image_faults(_outside)), True),
+            ("an_artifact_of_the_tree_owns_its_pre_image",
+             pre_image_faults(REPO / "config" / "artifact_ownership.yaml"), []),
+            ("the_pre_image_store_refuses_an_out_of_tree_artifact", _refused, True),
+            ("a_refused_pre_image_deposits_nothing_and_writes_nothing",
+             _post == _deposits and read_rows(_outside) == _pre_rows, True),
+        ]
+        for _n, _got, _want in _ctl2:
+            print(("ok   selftest/" if _got == _want else "FAIL selftest/") + _n)
+        if any(_got != _want for _n, _got, _want in _ctl2):
+            return 1
     _inv, _ref = _selftest_counts()
     print("ok write_guard selftest: " + str(_inv) + " invariants hold (own-cell edit lands, foreign-cell edit refused, row-count "
           "change refused, OWNED_ANY honoured, cell-scoped DOCUMENT write refused, document pre-image receipted, a "
           "declared APPEND lands without re-terminating lines, an edit to the pre-image is an offence, a foreign "
           "column in an added row is refused, truncation is refused and a refused append writes nothing, a SUFFIX-ONLY append to a mixed-terminator ledger leaves the pre-image bytes as a prefix of the post-image, and a terminator smuggled inside a line is refused); the " + str(_ref) + " "
-          "expected refusals are asserted with their output captured")
+          "expected refusals are asserted with their output captured, and a PRE-IMAGE IS KEPT ONLY FOR AN "
+          "ARTIFACT OF THE AUDITED TREE (a fixture's pre-image would land in the ONE store "
+          "an auditor reads, BUG-560)")
     return 0
 
 

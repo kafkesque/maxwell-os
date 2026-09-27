@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**134 open** / 188 closed of 322 ids.
+**135 open** / 188 closed of 323 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -141,3 +141,4 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-572 | (OPEN, LOW): a status word in a heading's TITLE decides a bug's status when the parenthetical slot names none (measured, with the flip list) | 1 |
 | BUG-583 | (OPEN, LOW): 5 of 812 decision records spell the state 'active' in lowercase while 505 spell it 'ACTIVE' (2026-09-27, found by the D-2682 la | 1 |
 | BUG-584 | (OPEN, LOW): the BUG-582 fix wrote three of its lines TWICE in `just health` (the ladder runs them twice and over-reports its own size) | 1 |
+| BUG-585 | (LOW - filed 2026-09-27, D-2686 audit, HELD behind the META-LANE FREEZE): `agent/session_seed.yaml` states the open-bug count TWICE and the  | 1 |

@@ -2,8 +2,8 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 322,
-  "open_n": 134,
+  "total_ids": 323,
+  "open_n": 135,
   "closed_n": 188,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
@@ -676,6 +676,11 @@
     {
       "id": "BUG-584",
       "title": "(OPEN, LOW): the BUG-582 fix wrote three of its lines TWICE in `just health` (the ladder runs them twice and over-reports its own size)",
+      "events": 1
+    },
+    {
+      "id": "BUG-585",
+      "title": "(LOW - filed 2026-09-27, D-2686 audit, HELD behind the META-LANE FREEZE): `agent/session_seed.yaml` states the open-bug count TWICE and the ",
       "events": 1
     }
   ],

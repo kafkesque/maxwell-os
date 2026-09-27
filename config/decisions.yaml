@@ -9658,3 +9658,36 @@ decisions:
   - config/artifact_ownership.yaml
   - config/rail_mutations.yaml
   - justfile
+- id: D-2686
+  date: 2026-09-27
+  state: ACTIVE
+  category: governance
+  title: A PRE-IMAGE IS EVIDENCE OF THE AUDITED TREE, AND THE STORE THAT HOLDS IT REFUSES A FIXTURE'S (the D-2685
+    owed item, closed structurally)
+  decision: scripts/lib/write_guard.py#_backup keeps a pre-image ONLY for an artifact that resolves inside the audited
+    tree, and fails CLOSED (WriteRefused, nothing written) otherwise; pre_image_faults(path) is the PURE predicate
+    and the tree is derived from the guard's own location, so no config can re-point it (C12). A caller whose artifact
+    is not the tree's owns no pre-image and passes backup=False.
+  measured: 'The D-2685 owed item was ANSWERED by measurement, then closed by construction - every `python3 ...
+    --selftest` command the ladder''s own text declares (33, deduplicated) and the 261-test suite were run with
+    before/after snapshots of backups/, governance/MUTATION_JOURNAL.jsonl and git status --porcelain: ALL CLEAN
+    (0 pre-images, 0 journal records, 0 dirty paths), so the five 81-83 byte `wb.PRE_apply_workbook_rulings_*.csv`
+    the applier''s own selftest left in the live backups/ (BUG-560) were the ONLY instance in the declared set.
+    write_guard --selftest: 16 invariants / the 7 expected refusals, both DERIVED from the source, with 4 new NAMED
+    controls (an out-of-tree artifact is reported where its pre-image would land; an artifact of the tree owns its
+    pre-image; the store REFUSES an out-of-tree artifact; a refused pre-image deposits nothing and writes nothing).
+    check_rail_mutations: `ok rail mutations: 17 declared rule(s) SEEN to red through their own control`, rc 0,
+    floor 17 -> 18 via pre_image_containment_is_load_bearing. run_ladder --collect health: 94 lines RUN, 0 faults,
+    rc 0 (224.6s) - the refusal is live and nothing cascaded. apply_workbook_rulings --selftest 14/14, --check green.
+    backups/ 118 = 118.'
+  bugs:
+  - BUG-560
+  files:
+  - scripts/lib/write_guard.py
+  - config/rail_mutations.yaml
+  - governance/buglog.md
+  - MASTER-TASK-REGISTER.md
+  - DECISION-LOG.md
+  - governance/CONTEXT_INDEX.md
+  - governance/SESSION-HANDOFF-2026-09-26.md
+  - agent/session_seed.yaml

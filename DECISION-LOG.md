@@ -1111,3 +1111,53 @@ OWED / NOT SILENT. (1) The selftest's own leak (5 fixture pre-images in the LIVE
 controlled) says the FIXTURE-ISOLATION rule needs a whole-set scan: which other `--selftest` writes default to
 backup=True and deposit into the tree they audit? (2) config/derivations.yaml carries a rail-written re-measure
 (shadowed_declared 211 -> 212) that still needs a commit-or-revert decision with a stated reason.
+
+## D-2686 (2026-09-27) - A PRE-IMAGE IS EVIDENCE OF THE AUDITED TREE, AND THE STORE THAT HOLDS IT REFUSES A FIXTURE'S (the D-2685 OWED item, closed structurally)
+
+THE RULE. `backups/` holds the pre-images of the audited tree's OWN artifacts. `scripts/lib/write_guard.py#_backup`
+now fails CLOSED (`WriteRefused`, nothing written) when the artifact it is asked to back up resolves outside the
+tree, and `pre_image_faults(path)` is the PURE predicate that decides it. The tree is derived from the guard's own
+location: no config edit can re-point the rule (C12).
+
+WHY IT WAS NEEDED - AND WHY IT WAS NOT VISIBLE. MEASURED 2026-09-27 (BUG-560/D-2685): the owner-ruling applier's
+OWN `--selftest` built its fixture under `temp/`, called `write_rows` with the DEFAULT `backup=True`, and left five
+throwaway pre-images (`wb.PRE_apply_workbook_rulings_*.csv`, 81-83 bytes) in the live `backups/`. Nothing in the
+store said which artifact they addressed: a pre-image's name carries the artifact's STEM only, so the pre-image of
+a fixture is INDISTINGUISHABLE from the pre-image of a tracked artifact of the same name. The ONE store an auditor
+reads (C13/R-D410) had been polluted by a CONTROL RUN, and the run that did it was auditing the tree.
+
+WHY CONTAINMENT AND NOT A SCAN. The D-2685 owed item was "which other `--selftest` runs deposit pre-images?".
+That question was ANSWERED by measurement - 33 declared selftest commands and the 261-test suite, each run with a
+before/after snapshot of `backups/`, of the mutation journal and of `git status --porcelain`: 33/33 clean. But a
+measurement is a fact about TODAY, and the leak was found by accident; so the MECHANISM that produced it (a
+pre-image is written for whatever path the caller names) was closed instead. A scan can only re-find the class; a
+containment rule makes it unrepresentable, and a fixture that wants no pre-image says `backup=False` (which the
+applier's own fixture now does - that half of BUG-560 was landed in D-2685).
+
+THE FOUR LIMBS OF D-2676. (i) ONE HOME: the containment rule lives in `write_guard`, the module that owns the
+backup store; there is no path list, threshold or config key (the tree is derived from `__file__`). (ii) SEEN:
+`write_guard --selftest` is a declared line of `just health`, and the new controls print BY NAME. (iii) NAMED
+oracle: 4 new controls - the predicate answers BOTH ways (an out-of-tree path is reported, an artifact of the tree
+owns its pre-image), the store REFUSES an out-of-tree artifact, and a refused pre-image deposits nothing and
+writes nothing (the live `backups/` listing is compared before and after). (iv) MUTATION:
+`config/rail_mutations.yaml#pre_image_containment_is_load_bearing` reduces the predicate to `if False:` and
+requires `FAIL selftest/the_pre_image_store_refuses_an_out_of_tree_artifact`; floor 17 -> 18.
+
+MEASURED. `write_guard --selftest`: 16 invariants hold / the 7 expected refusals, both counts DERIVED from the
+selftest source (D-2685's rule), 8 controls printed by name. `check_rail_mutations.py`: `ok rail mutations: 17
+declared rule(s) SEEN to red through their own control`, rc 0. `run_ladder.py --collect health`: 94 lines RUN, 0
+faults, rc 0 (224.6s) - the refusal is live and NOTHING cascaded (every production writer names an artifact inside
+the tree; the refusal is reached by no declared line). `apply_workbook_rulings.py --selftest` 14/14 and `--check`
+green. `backups/` before = after = 118 entries.
+
+WHAT IT DOES NOT COVER (loud, not silent). (1) A control run that WRITES an artifact OF the tree is not refused by
+this rule: containment is about the pre-image store, not about a control's right to mutate the tree. The same
+measurement says there is no instance today (0 dirty paths across the 33 commands and the suite), and the class
+that has fired (BUG-546, the suite rmtree'ing a live run dir) is already guarded by `scripts/lib/fixture.py`.
+(2) The scan itself is a scratch measurement: it lives in `temp/` (gitignored), so it is not reproducible from the
+repo - OWED as a declared event-driven rehearsal or a `dormant` registry entry with a real path. (3) A writer that
+passes `backup=False` for a live-tree artifact still keeps no pre-image; that remains a declared caller choice
+(`write_document` documents the same default), not a hole this rule tries to close.
+
+FILED, NOT WORKED: BUG-585 (the same audit found `agent/session_seed.yaml` stating the open-bug count in two homes
+- a stale `77` beside the DERIVED `134`), held as FILED behind the META-LANE FREEZE.

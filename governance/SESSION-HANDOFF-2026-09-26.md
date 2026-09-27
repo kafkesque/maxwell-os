@@ -605,3 +605,22 @@ NEXT. (1) product lane: BUG-564 remainder (the hook ROUTE as a declared subject)
 deposit pre-images into the tree they audit?); (3) DECIDE config/derivations.yaml (rail re-measure 211 -> 212);
 (4) the frozen background is unchanged. OWNER GATE (DUE): META-LANE FREEZE ruling; the standing-rule CONSTITUTION
 promotion (POINTER only); BUG-431 CONTENT promotion; BUG-583.
+
+## 2026-09-27 (later) - D-2686 LANDED: A PRE-IMAGE IS EVIDENCE OF THE AUDITED TREE (the D-2685 OWED item)
+LANDED. `scripts/lib/write_guard.py`: `pre_image_faults(path)` (PURE) + `_backup()` fails CLOSED on an artifact
+outside the audited tree. `config/rail_mutations.yaml`: `pre_image_containment_is_load_bearing`, floor 17 -> 18.
+FOUND (the whole-set measurement the D-2685 fix owed): running every declared `--selftest` (33) and the 261-test
+suite with before/after snapshots of `backups/`, the mutation journal and `git status --porcelain` - 33/33 and the
+suite CLEAN. The applier leak was the only instance, so the rule landed as CONTAINMENT (the mechanism), not as a
+per-run observation.
+ALSO FOUND (filed, held): BUG-585 - `agent/session_seed.yaml` states the open-bug count TWICE (stale `77` in the
+dated `current_state` block beside the DERIVED `134`); nothing reads line 255, so it is unfalsifiable where it
+sits. One-line remedy; NOT worked (META-LANE FREEZE holds new governance bugs as FILED).
+MEASURED: `write_guard --selftest` 16 invariants / 7 refusals (both DERIVED) with 4 new named controls;
+`check_rail_mutations` `ok ... 17 declared rule(s) SEEN to red`, rc 0; `run_ladder --collect health` 94 lines RUN,
+0 faults, rc 0 (224.6s); applier `--selftest` 14/14 + `--check` green; `backups/` 118 before = 118 after; open
+bugs 134 -> 135 (DERIVED by `scripts/bug_status.py`).
+OWED: hoist the leak scan into a declared event-driven rehearsal (or a `dormant` registry entry with a real path).
+NEXT (product): BUG-564 remainder (the hook ROUTE as a declared subject) -> BUG-572 -> BUG-583 -> BUG-584.
+OWNER GATE (DUE, one word each): META-LANE FREEZE ruling; standing-rule CONSTITUTION promotion (POINTER only);
+BUG-431 CONTENT promotion; BUG-583.

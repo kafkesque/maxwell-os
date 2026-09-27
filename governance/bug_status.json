@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 320,
+  "total_ids": 321,
   "open_n": 136,
-  "closed_n": 184,
+  "closed_n": 185,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -684,8 +684,8 @@
       "events": 1
     },
     {
-      "id": "BUG-575",
-      "title": "(OPEN, MED): the decision graph is a SET of labels where it must be a GRAPH - a decision can be RETIRED without naming a successor, and no r",
+      "id": "BUG-583",
+      "title": "(OPEN, LOW): 5 of 812 decision records spell the state 'active' in lowercase while 505 spell it 'ACTIVE' (2026-09-27, found by the D-2682 la",
       "events": 1
     }
   ],
@@ -867,6 +867,7 @@
     "BUG-567",
     "BUG-573",
     "BUG-574",
+    "BUG-575",
     "BUG-576",
     "BUG-577",
     "BUG-578",

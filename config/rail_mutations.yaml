@@ -30,7 +30,7 @@ fixture:
   keep: false
   timeout_seconds: 600
 coverage:
-  min_mutations: 10            # FLOOR (shrink guard): deleting an entry means editing the floor in a diff a human reads
+  min_mutations: 11            # FLOOR (shrink guard): deleting an entry means editing the floor in a diff a human reads
   # D-2679: the coverage set is DERIVED, never restated. Which rails gate a COMMIT is one fact and it already has
   # ONE home (config/rail_registry.yaml#commit_boundary), so restating it here would be a SECOND HOME - and two
   # lists of one fact drift, and only one of them can be right. scripts/check_rail_mutations.py joins the two and
@@ -57,6 +57,7 @@ coverage:
     - scripts/check_session_plan.py
     - scripts/run_ladder.py
     - scripts/lib/fixture.py
+    - scripts/reconcile.py
     - scripts/verify_recalibration_pins.py
 budget:
   max_seconds_per_runner: 120 # a slower runner has an UNCONTROLLED INPUT (class iii of D-2665) -> OWNER-OWED, loud
@@ -220,3 +221,20 @@ mutations:
       silently stale - and a mis-derived temp root cleans, commits in and rmtrees the LIVE tree. With the refusal
       inert, the rule ACCEPTS the audited tree itself and the named control goes RED through its own marker: the
       shared rule is READ, not merely declared.
+
+  - id: decision_supersession_rule_is_load_bearing
+    subject: scripts/reconcile.py
+    op: replace
+    find: '        if _norm_state(r) != state_word or _token(r) in pinned:'
+    replace: '        if False:  # MUTATION (D-2676): the SUPERSESSION filter stops filtering'
+    runner: scripts/reconcile.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: 'FAIL selftest/supersession_reports_a_gap'
+    why: >-
+      BUG-575 / D-2676(iv): the succession rule is the graph's whole point - a SUPERSEDED record must name a
+      machine-followable successor unless it is PINNED debt. With the filter inert, EVERY record is examined as
+      if it were a retirement, so the fixture's ACTIVE and PROPOSED records are reported as gaps and the named
+      control goes RED through its own marker: the rule is READ, not merely declared (BUG-492, one level up).
+      This is also what makes the rail refactor-proof: the entry FAILS if this line is renamed or re-shaped.

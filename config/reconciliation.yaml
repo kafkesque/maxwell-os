@@ -69,6 +69,30 @@ entries:
       provably NOT in the workbook); THIS entry pins the declared `measured_rows` to the workbook's ACTUAL
       row count, so a row silently added or dropped cannot keep the arithmetic closed.
 
+  - id: decision_supersession_complete
+    declares: config/decisions_policy.yaml#graph
+    about: config/decisions.yaml
+    check: decision_supersession_complete
+    why: >
+      BUG-575 - MEASURED 2026-09-27: 16 records are state=SUPERSEDED and only 4 name their successor, so "what
+      replaced X" was answerable from human memory and from NO machine home. decision_registry_wellformed
+      checks that a cited id RESOLVES and never that it was REPLACED; this entry reads the registry as a GRAPH.
+      The 12 orphans are DECLARED debt, pinned BY IDENTITY in config/decisions_policy.yaml#graph (never by a
+      count, and NOT backfilled: a successor reconstructed by a tool is not evidence), and the pin list is
+      SHRINK-ONLY - a pin that now names a successor, changed state or vanished is STALE and fails the rail.
+
+  - id: decision_citations_in_force
+    declares: config/decisions_policy.yaml#graph
+    about: config/decisions.yaml
+    check: decision_citations_in_force
+    why: >
+      BUG-575 - MEASURED 2026-09-27: 4 of the 59 config citation sites name a decision that is NOT IN FORCE
+      (D-403 x2 PROPOSED, D-400 PROPOSED, D-2663 OPEN), i.e. the D-328 defect - a citation asserting a
+      protection that enforces nothing - generalised to the whole registry. Each is the authoring authority of
+      a LIVE config file, so they are DECLARED forward references in the policy's ONE home (visible, reasoned,
+      shrink-only) rather than silent exemptions. The same check fails closed on a state word the policy
+      classifies neither in force nor not in force, so a new state cannot enter unread.
+
   - id: decision_registry_wellformed
     declares: config/decisions.yaml#decisions
     about: config/decisions.yaml

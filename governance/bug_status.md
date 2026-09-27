@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**136 open** / 184 closed of 320 ids.
+**136 open** / 185 closed of 321 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -142,4 +142,4 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-570 | (OPEN, LOW): the duplicate BUG-493 CLOSED block is NOT byte-identical (the earlier claim was FALSE) | 2 |
 | BUG-571 | (OPEN, LOW): the register is fed by HEADINGS only, so an id written INLINE is real to every human and absent from every machine home (BUG-49 | 1 |
 | BUG-572 | (OPEN, LOW): a status word in a heading's TITLE decides a bug's status when the parenthetical slot names none (measured, with the flip list) | 1 |
-| BUG-575 | (OPEN, MED): the decision graph is a SET of labels where it must be a GRAPH - a decision can be RETIRED without naming a successor, and no r | 1 |
+| BUG-583 | (OPEN, LOW): 5 of 812 decision records spell the state 'active' in lowercase while 505 spell it 'ACTIVE' (2026-09-27, found by the D-2682 la | 1 |

@@ -42,6 +42,9 @@ OWNERSHIP = REPO / "config" / "artifact_ownership.yaml"
 JUSTFILE = REPO / "justfile"
 OUT = REPO / "governance" / "RECONCILIATION.json"
 CHECK_SCRIPTS = ("check_", "verify_")
+# BUG-575/D-2682: the decision-GRAPH rules (succession + force) have ONE home, like every other rule in this
+# engine: the policy file. A second copy in this script is the copy that goes stale (D-2646).
+POLICY = REPO / "config" / "decisions_policy.yaml"
 
 
 def _yaml(path: Path) -> dict:
@@ -205,6 +208,203 @@ def _citations() -> list[tuple[str, str, object]]:
     return out
 
 
+
+# ------------------------------------------------------------------------------------------------------------
+# THE DECISION GRAPH (BUG-575/D-2682): succession COMPLETENESS and citation FORCE.
+#
+# The registry is read as a GRAPH here, where decision_registry_wellformed reads it as a SET of ids: that check
+# answers "does this citation RESOLVE", never "is the cited decision IN FORCE" and never "what replaced it".
+# These predicates are PURE (records + rules in, findings out) so the SAME code answers for the live registry
+# and for the in-memory fixtures of --selftest. A rule whose control cannot feed it a counterexample has no
+# teeth (BUG-492), and a mutation must be able to RED that control (D-2676 iv).
+def _graph_policy() -> dict:
+    """The decision-GRAPH rules, from their ONE home (config/decisions_policy.yaml#graph; BUG-575/D-2682).
+
+    FAIL CLOSED (C16): with no declaration this rail cannot tell a ruled state from a proposed one, so it would
+    decide nothing while reporting clean.
+    """
+    rules = _yaml(POLICY).get("graph")
+    if not isinstance(rules, dict):
+        raise SystemExit("FAIL-CLOSED (BUG-575/C12): config/decisions_policy.yaml declares no `graph:` section "
+                         "- the succession and in-force rules would have no home")
+    return rules
+
+
+def _norm_state(rec: dict) -> str:
+    """A record's state, normalised (C21): 'active' and 'ACTIVE' are ONE state, as 'D-1' and 'D1' are one id."""
+    return str(rec.get("state") or "").strip().upper()
+
+
+def _token(rec: dict) -> str:
+    """A record's id as the registry compares it (the dash spelling is collapsed, C21)."""
+    return str(rec.get("id") or "").strip().replace("D-", "D").upper()
+
+
+def _pinned(rules: dict, key: str) -> list[str]:
+    """A pin list, in the order the policy declares it - the order the stale report reads in."""
+    return [str(x) for x in (rules.get(key) or [])]
+
+
+def supersession_gaps(recs: list[dict], rules: dict) -> list[str]:
+    """SUPERSEDED records that name no RESOLVABLE successor and are not PINNED legacy debt (BUG-575).
+
+    'What replaced X' must be answerable by a machine, so a retirement must carry its successor as a LINK. The
+    pinned ids are the debt measured before the rule: pinned BY IDENTITY so the list can only SHRINK (D-2645).
+    """
+    field = str(rules.get("successor_field") or "superseded_by")
+    state_word = str(rules.get("supersession_state") or "SUPERSEDED")
+    pinned = {_citation_token(x) for x in _pinned(rules, "pinned_supersession_ids")}
+    known = {_token(r) for r in recs}
+    gaps: list[str] = []
+    for r in recs:
+        if _norm_state(r) != state_word or _token(r) in pinned:
+            continue
+        if not _resolves_citation(_citation_token(r.get(field)), known):
+            gaps.append(str(r.get("id")))
+    return gaps
+
+
+def supersession_stale_pins(recs: list[dict], rules: dict) -> list[str]:
+    """Pins that no longer need to exist: a declaration that outlives its subject fails the rail (BUG-542).
+
+    The idiom is config/decisions_policy.yaml#revocation.legacy_debt_ids: a listed id that now carries a
+    declaration, or no longer exists, is a STALE declaration and fails the rail.
+    """
+    field = str(rules.get("successor_field") or "superseded_by")
+    state_word = str(rules.get("supersession_state") or "SUPERSEDED")
+    by = {_token(r): r for r in recs}
+    known = set(by)
+    stale: list[str] = []
+    for x in _pinned(rules, "pinned_supersession_ids"):
+        rec = by.get(_citation_token(x))
+        if rec is None:
+            stale.append(x + " (no such record)")
+        elif _norm_state(rec) != state_word:
+            stale.append(x + " (state is now " + _norm_state(rec) + ")")
+        elif _resolves_citation(_citation_token(rec.get(field)), known):
+            stale.append(x + " (now names a successor)")
+    return stale
+
+
+def citations_out_of_force(cites: list[tuple[str, str, object]], recs: list[dict],
+                           rules: dict) -> list[str]:
+    """Citation SITES whose decision is not in force - the D-328 defect generalised (BUG-575).
+
+    A rule whose authority is PROPOSED is enforced by nobody. A site is RED unless it is pinned as a declared
+    forward reference in the ONE home. Blank and non-id-shaped values, and ids that do not resolve, belong to
+    decision_registry_wellformed: reported twice they would read as two faults.
+    """
+    in_force = {str(s).strip().upper() for s in (rules.get("in_force_states") or [])}
+    pinned = set(_pinned(rules, "pinned_forward_citations"))
+    by = {_token(r): r for r in recs}
+    known = set(by)
+    out: list[str] = []
+    for rel, key, val in cites:
+        if val is None or not str(val).strip() or not _id_shaped(val):
+            continue
+        resolved = _resolves_citation(_citation_token(val), known)
+        if not resolved:
+            continue
+        states = sorted({_norm_state(by[t]) for t in resolved})
+        site = f"{rel}:{key}={val}"
+        if set(states) <= in_force or site in pinned:
+            continue
+        out.append(site + " -> " + str(val) + " (" + "/".join(states) + ")")
+    return out
+
+
+def citations_stale_pins(cites: list[tuple[str, str, object]], rules: dict) -> list[str]:
+    """Pinned forward citations that name no site any more: the same stale rule (BUG-542)."""
+    sites = {f"{rel}:{key}={val}" for rel, key, val in cites}
+    return [p for p in _pinned(rules, "pinned_forward_citations") if p not in sites]
+
+
+def unclassified_states(recs: list[dict], rules: dict) -> list[str]:
+    """States present in the registry that the policy classifies as NEITHER in force NOR not in force (BUG-575).
+
+    The two declared sets ARE the vocabulary: a new state word is a fail-closed finding, never a state no rule
+    reads (the BUG-572 class - a word deciding a verdict that no declaration governs).
+    """
+    declared = {str(s).strip().upper() for s in (rules.get("in_force_states") or [])}
+    declared |= {str(s).strip().upper() for s in (rules.get("not_in_force_states") or [])}
+    return sorted({_norm_state(r) for r in recs} - declared)
+
+
+SELFTEST = "selftest/"
+
+
+def _expect(name: str, got: object, want: object, fails: list[str]) -> None:
+    """One known-answer control, both directions asserted, and a failure NAMES itself through its own marker."""
+    if got == want:
+        print("  ok " + SELFTEST + name + ": " + repr(got)[:100])
+        return
+    print("FAIL " + SELFTEST + name + ": got " + repr(got)[:100] + ", expected " + repr(want)[:100])
+    fails.append(name)
+
+
+def selftest() -> int:
+    """Known-answer controls for the decision-GRAPH rules (BUG-575/D-2682; BUG-492: a rule never seen to fail).
+
+    The RECORDS and SITES are in-memory fixtures from the RESERVED id namespace
+    (config/decisions_policy.yaml#reference_rail.reserved_fixture_ids); the RULES - which states are in force,
+    which ids and sites are pinned - are READ from the live policy, because a fixture that restated them would
+    be a second home for the very rule under test. The pinned arms therefore use the LIVE pins.
+    """
+    rules = _graph_policy()
+    pins = _pinned(rules, "pinned_supersession_ids")
+    fpins = _pinned(rules, "pinned_forward_citations")
+    fails: list[str] = []
+    if not pins or not fpins:
+        print("FAIL " + SELFTEST + "preconditions: the policy pins no id or no site, so the pinned arms of these "
+              "controls cannot be exercised at all")
+        return 1
+    pinned_id, pinned_site = pins[0], fpins[0]
+    head, val = pinned_site.rsplit("=", 1)
+    site_rel, site_key = head.rsplit(":", 1)
+    in_force = [str(s).strip().upper() for s in (rules.get("in_force_states") or [])]
+    # A fixture that OFFENDS: one ruled retirement without a successor, one that names one, one pinned gap, and
+    # a record per declared in-force state so the ACCEPT arm is exercised for every state the policy names.
+    live = [{"id": "D-9001", "state": "ACTIVE"},
+            {"id": "D-9002", "state": "SUPERSEDED", "superseded_by": "D-9001"},
+            {"id": "D-9003", "state": "SUPERSEDED"},
+            {"id": pinned_id, "state": "SUPERSEDED"},
+            {"id": "D-9004", "state": "PROPOSED"},
+            {"id": val, "state": "PROPOSED"}]
+    for i, word in enumerate(in_force):
+        live.append({"id": "D-901" + str(i), "state": word})
+    _expect("supersession_reports_a_gap", supersession_gaps(live, rules), ["D-9003"], fails)
+    _expect("supersession_accepts_a_named_successor",
+            supersession_gaps([{"id": "D-9005", "state": "SUPERSEDED", "superseded_by": "D-9001"},
+                               {"id": "D-9001", "state": "ACTIVE"}], rules), [], fails)
+    _expect("supersession_stale_reports_pins_with_no_subject",
+            supersession_stale_pins(live, rules), [x + " (no such record)" for x in pins[1:]], fails)
+    # EVERY pin is present so that exactly ONE is stale: a control whose fixture omits the other pins would
+    # report them as "(no such record)" and would be measuring the fixture, not the rule.
+    all_pins = [{"id": x, "state": "SUPERSEDED"} for x in pins]
+    all_pins[0]["superseded_by"] = "D-9001"
+    _expect("supersession_stale_reports_a_pin_that_now_names_a_successor",
+            supersession_stale_pins(all_pins + [{"id": "D-9001", "state": "ACTIVE"}], rules),
+            [pinned_id + " (now names a successor)"], fails)
+    _expect("citations_report_a_proposed_authority",
+            [s.split(" ->")[0] for s in citations_out_of_force([("config/fixture.yaml", "decision", "D-9004")],
+                                                               live, rules)],
+            ["config/fixture.yaml:decision=D-9004"], fails)
+    _expect("citations_accept_every_declared_in_force_state",
+            citations_out_of_force([("config/fixture.yaml", "decision", "D-901" + str(i))
+                                    for i in range(len(in_force))], live, rules), [], fails)
+    _expect("citations_accept_a_declared_forward_reference",
+            citations_out_of_force([(site_rel, site_key, val)], live, rules), [], fails)
+    _expect("citations_stale_join_is_exact",
+            citations_stale_pins([(site_rel, site_key, val)], rules), fpins[1:], fails)
+    _expect("unclassified_state_is_reported",
+            unclassified_states(live + [{"id": "D-9006", "state": "PENDING"}], rules), ["PENDING"], fails)
+    if fails:
+        print("FAIL reconcile selftest: " + str(len(fails)) + " control(s) fired: " + ", ".join(fails))
+        return 1
+    print("ok reconcile selftest: " + str(9) + " known-answer control(s) fire, both directions")
+    return 0
+
+
 def check_entry(entry: dict) -> tuple[str, str]:
     """Evaluate one declared entry. Returns (state, evidence): state in ok / drift / owner_owed."""
     kind = entry.get("check")
@@ -296,6 +496,34 @@ def check_entry(entry: dict) -> tuple[str, str]:
             return state, (f"cited decision(s) {bad} do not exist in config/decisions.yaml - a provenance "
                            f"stamp naming an undefined decision is a claim, not a source (R14/BUG-483)")
         return "ok", f"{len(ids)} cited decision(s) resolve in the registry"
+
+    if kind in ("decision_supersession_complete", "decision_citations_in_force"):
+        # BUG-575/D-2682: the registry read as a GRAPH. Both branches read the RULES from the ONE home and the
+        # RECORDS from the registry itself (D-402: never another rail's output).
+        rules = _graph_policy()
+        _, recs = _registry()
+        if kind == "decision_supersession_complete":
+            gaps = supersession_gaps(recs, rules)
+            stale = supersession_stale_pins(recs, rules)
+            if gaps or stale:
+                return state, (f"supersession: {len(gaps)} SUPERSEDED record(s) name no RESOLVABLE successor "
+                               f"{gaps} (pinned legacy debt: "
+                               f"{len(_pinned(rules, 'pinned_supersession_ids'))} id(s) declared in "
+                               f"config/decisions_policy.yaml#graph); {len(stale)} STALE pin(s) {stale} - a "
+                               f"declaration that outlives its subject is the BUG-542 class")
+            return "ok", (f"every SUPERSEDED record names a resolvable successor in {len(recs)} record(s); "
+                          f"{len(_pinned(rules, 'pinned_supersession_ids'))} pinned legacy id(s) still owed")
+        cites = _citations()
+        out = citations_out_of_force(cites, recs, rules)
+        stale = citations_stale_pins(cites, rules)
+        unknown = unclassified_states(recs, rules)
+        if out or stale or unknown:
+            return state, (f"citations: {len(out)} site(s) rest on a decision that is NOT IN FORCE and is not a "
+                           f"declared forward reference {out}; {len(stale)} STALE pin(s) {stale}; "
+                           f"{len(unknown)} state word(s) the policy classifies neither way {unknown}")
+        return "ok", (f"{len(cites)} citation site(s) all name a decision IN FORCE; "
+                      f"{len(_pinned(rules, 'pinned_forward_citations'))} declared forward reference(s) still "
+                      f"owed; every state word in the registry is classified")
 
     if kind == "decision_registry_wellformed":
         known, recs = _registry()
@@ -487,7 +715,10 @@ def main() -> int:
     """Evaluate every entry + the two meta-checks, write RECONCILIATION.json, and state the tri-state."""
     ap = argparse.ArgumentParser()
     ap.add_argument("--check", action="store_true")
+    ap.add_argument("--selftest", action="store_true", help="known-answer controls for the graph rules")
     a = ap.parse_args()
+    if a.selftest:   # BUG-575/D-2682: the NAMED oracle (D-2676 iii). It reads the policy, never the
+        return selftest()   # live config, so a control cannot depend on today's registry contents.
     cfg = _yaml(CONFIG)
     results: list[dict] = []
     drift, owed = [], []

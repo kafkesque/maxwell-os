@@ -9538,3 +9538,23 @@ decisions:
     floor 9 -> 10. Rail registry rc=0 (88 ladder invocations, 61 rails invoked). Declaration consumers rc=0 (5 homes,
     7 edges). repo-integrity selftest 15 controls, boundary-rehearsal selftest 21/21. OPEN 137 -> 136, CLOSED 182
     -> 184.'
+- id: D-2682
+  date: '2026-09-27'
+  state: ACTIVE
+  category: governance
+  title: 'THE DECISION GRAPH: succession must be a LINK and a citation must rest on a decision IN FORCE - config/decisions_policy.yaml#graph
+    is the ONE home of the in-force state sets and the two debt pins, scripts/reconcile.py reads the registry as
+    a GRAPH with PURE predicates and a NAMED oracle (9/9), and the 12 orphan retirements and 4 not-in-force citations
+    are pinned BY IDENTITY, shrink-only (BUG-575 FIXED)'
+  decision: 'The decision GRAPH gets ONE home (config/decisions_policy.yaml#graph) and TWO declared entries evaluated
+    by the engine that already owns the citation walker: a SUPERSEDED record must name a resolvable successor and
+    a citation must rest on a decision IN FORCE, with the measured debt PINNED BY IDENTITY, shrink-only, and a PURE-predicate
+    oracle (9/9) the mutation gate REDs (BUG-575).'
+  bugs:
+  - BUG-575
+  files:
+  - config/decisions_policy.yaml
+  - scripts/reconcile.py
+  - config/reconciliation.yaml
+  - config/rail_mutations.yaml
+  - justfile

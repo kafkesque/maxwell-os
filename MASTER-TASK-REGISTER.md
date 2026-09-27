@@ -640,3 +640,13 @@ RISK NOTE (now retired): before fe239df a worktree clean destroyed BOTH copies o
 - [ ] NEXT (product, the DEFAULT lane): BUG-563 (the 3 dirty rail outputs + backups/**), then BUG-560.
 - [ ] OWNER GATE (DUE): META-LANE FREEZE ruling; standing-rule CONSTITUTION promotion (POINTER only);
       BUG-431 CONTENT promotion.
+
+## D-2682 / BUG-575 FIXED - THE DECISION GRAPH IS A GRAPH (2026-09-27)
+- [x] config/decisions_policy.yaml#graph - ONE HOME: in_force_states [ACTIVE, RESOLVED, RATIFIED], not_in_force_states (7 more), supersession_state, successor_field, pinned_supersession_ids (12), pinned_forward_citations (4), both with a measured note.
+- [x] scripts/reconcile.py - two new check kinds + PURE predicates + --selftest (9 known-answer controls, both directions). The citation walker is REUSED, never restated (BUG-577/D-2646).
+- [x] config/reconciliation.yaml - decision_supersession_complete + decision_citations_in_force (both GREEN at the landing).
+- [x] MEASURED: selftest 9/9 rc=0; reconcile --check rc=0; mutation entry SEEN to red (floor 10 -> 11, subjects 8 -> 9); rail registry rc=0; ladder 89 -> 90 declaring line(s).
+- [x] NO new bug hidden: the lowercase-'active' spelling (5 of 812) is filed as BUG-583 (LOW), NOT folded into this landing.
+- [ ] NEXT (meta, in order): BUG-571 (the cited-by-decision join) - then the META LANE IS CLOSED.
+- [ ] NEXT (product, the DEFAULT lane): BUG-563 (declared homes for the 3 dirty rail outputs + backups/**), then BUG-560.
+- [ ] OWNER GATE (DUE): META-LANE FREEZE ruling; standing-rule CONSTITUTION promotion (POINTER only); BUG-431 CONTENT promotion; BUG-583 (the lowercase state spelling - census or canonicalise).

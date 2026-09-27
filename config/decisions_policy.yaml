@@ -68,6 +68,65 @@ revocation:
     carry its scope, reason, evidence, date and tokens or it is not a revocation.
   reference_rail: scripts/check_revoked_references.py
 
+
+# -------------------------------------------------------------------------------------------------------------
+# graph - the decision GRAPH (succession + force). BUG-575, D-2682.
+#
+# WHY. MEASURED 2026-09-27 (BUG-575): 16 records are state=SUPERSEDED and only 4 name their successor, so "what
+# replaced X" was answerable from human memory and from NO machine home; and 4 config citation sites name a
+# decision that is NOT IN FORCE (D-403 x2 PROPOSED, D-400 PROPOSED, D-2663 OPEN), i.e. a protection enforced by
+# nobody - the D-328 defect generalised to the whole registry. MADR is the real-world precedent: status =
+# "superseded by ADR-0123" is a LINK, never a label.
+#
+# DIRECTION OF AUTHORITY (unchanged). config/decisions.yaml owns WHICH record is SUPERSEDED and WHAT replaced
+# it; this file owns the RULES - which states are in force, which state means retired, the measured debt. No
+# value here may be re-typed in scripts/ (C12/C12c/C20). Authority is a COMMENT, never a `decided:` key: a
+# value under a citation key would make this file a citation site of a decision minted after its own rail ran.
+#
+# DEBT IS PINNED BY IDENTITY, NEVER BY A COUNT (the legacy_debt_ids idiom above). Both pin lists are
+# SHRINK-ONLY: a pinned id that now names a successor, no longer exists or changed state, or a pinned citation
+# site that no longer exists or now names an in-force decision, is a STALE declaration and FAILS the rail.
+#
+# authority: D-2682
+graph:
+  successor_field: superseded_by
+  # The state a record must carry to make succession COMPULSORY (a retirement a machine can follow).
+  supersession_state: SUPERSEDED
+  # The states a CITING site may rest on. Every state present in the registry must be classified by one of
+  # these two sets or the rail FAILS CLOSED, so a new state word cannot enter silently. MEASURED 2026-09-27:
+  # 812 records across exactly these words (case-insensitively - 'active' is the same state as 'ACTIVE', C21).
+  in_force_states: [ACTIVE, RESOLVED, RATIFIED]
+  not_in_force_states: [PROPOSED, OPEN, DEFERRED, PLANNED, DRAFT, SUPERSEDED, ARCHIVED, REJECTED]
+  pinned_supersession_ids:
+  - D2070
+  - D2080
+  - D2085
+  - D2087
+  - D2091
+  - D2223
+  - D2224
+  - D2293
+  - D2317
+  - D2318
+  - D2430
+  - D2582
+  pinned_supersession_measured: >-
+    MEASURED 2026-09-27 (BUG-575): of the 16 state=SUPERSEDED records, 4 name their successor (D2100->D2094,
+    D2253->D2362, D2294->D2298, D2296->D2298) and these 12 do not. They are NOT backfilled: a successor
+    reconstructed by a tool is not evidence, and inventing one to make a rail green is the corruption this
+    register exists to prevent (the legacy_debt_ids reasoning is unchanged). One record (D2104) carries a
+    `supersedes:` key in the other direction and is not a successor claim for any of these ids.
+  pinned_forward_citations:
+  - config/evidence_floors.yaml:decided=D-403
+  - config/handoffs.yaml:decided=D-403
+  - config/instrument_controls.yaml:decided=D-400
+  - config/recalibration_pins.yaml:decision=D-2663
+  pinned_forward_citations_measured: >-
+    MEASURED 2026-09-27 (BUG-575): 4 of the 59 config citation sites name a decision that is not in force, and
+    each is the AUTHORING AUTHORITY of a live config file. They are DECLARED forward references, not
+    exemptions: the honest remedy is a visible, reasoned declaration a rail reads and can shrink - NOT the
+    owner silently ratifying four decisions that no ruling has in fact made.
+
 # What counts as LIVE code. governance/** and archive/** are deliberately NOT scanned: those files are the
 # archaeology, and a rail that forbids writing down what was abandoned would delete the only evidence that it
 # was abandoned (D-2643: keep the archaeology, close the path).

@@ -60,6 +60,7 @@ health:
     python3 scripts/check_store_columns.py --selftest || exit 1    # BUG-492: the column-lifecycle detector must be SEEN to fire
     python3 scripts/check_store_columns.py --check || [ $? -eq 2 ]  # BUG-524/COLUMNS: a label that cannot vary, a blank a count(col) cannot see; 2 = declared debt
     python3 scripts/resolve_dropbox_conflicts.py --check || [ $? -eq 2 ]  # D-2647: a Dropbox-reverted artifact must never pass silently; 2 = siblings only the owner can settle
+    python3 scripts/reconcile.py --selftest || exit 1  # BUG-575/D-2682: the decision-graph rules (succession + force) must be SEEN to fire (a control nothing runs is a comment, BUG-492)
     python3 scripts/reconcile.py --check || [ $? -eq 2 ]    # 2 = owner-owed debt: loud, NOT fatal (BUG-457)
     python3 scripts/lib/measure.py --gaps || exit 1
     # ^ ORDER IS LOAD-BEARING (BUG-489/BUG-490): every resolver rail runs BEFORE these two checker rails.

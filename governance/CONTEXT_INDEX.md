@@ -1189,3 +1189,11 @@ ALSO FIXED HERE. BUG-582: the D-2680 justfile landing was PARTIAL - the prefix B
 --selftest were declared in MTR/DECISION-LOG/CONTEXT_INDEX/handoff and present in NO file. A declaration is only a
 declaration where a machine READS it; verify a landing by READING THE BYTES, never the patch driver's summary.
 NOW. just health-full -> 89 line(s) RUN, 0 fault(s), 262.3s, SCAN_RC=0.
+
+## THE DECISION GRAPH HAS ONE HOME (D-2682, 2026-09-27)
+WHERE. config/decisions_policy.yaml#graph - in_force_states, not_in_force_states, supersession_state, successor_field, pinned_supersession_ids (12), pinned_forward_citations (4).
+SEEN. The ladder runs 'python3 scripts/reconcile.py --selftest || exit 1' as its own line (9 known-answer controls, both directions).
+CONSUMERS. config/reconciliation.yaml#decision_supersession_complete and #decision_citations_in_force, evaluated by scripts/reconcile.py (SAME engine, SAME citation walker as decision_registry_wellformed - no second home).
+SUPERSEDES. Nothing. It EXTENDS: decision_registry_wellformed read the registry as a SET (a citation need only RESOLVE); these read it as a GRAPH (a retirement must name a LINK; a citation must rest on a decision IN FORCE).
+ALSO. BUG-575 FIXED. BUG-583 filed (LOW: 5 of 812 records spell the state 'active' lowercase).
+NOW. selftest 9/9 rc=0; reconcile --check rc=0 (13 declared object(s) agree); mutation gate SEEN to red.

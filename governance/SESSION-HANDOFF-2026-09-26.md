@@ -530,3 +530,9 @@ declared homes for the 3 dirty rail outputs + backups/**, then BUG-560 (write_gu
 
 OWNER GATE (DUE). (a) rule the META-LANE FREEZE; (b) the standing-rule CONSTITUTION promotion (bar MET, POINTER
 never a restatement); (c) BUG-431 CONTENT promotion.
+
+## 2026-09-27 (cont. 2) - D-2682 LANDED / BUG-575 FIXED (THE DECISION GRAPH: succession is a LINK, force is READ)
+STRONGEST MEASURED EVIDENCE. python3 scripts/reconcile.py --selftest -> 9/9 known-answer control(s), both directions, rc=0. python3 scripts/reconcile.py --check -> 'decision_supersession_complete: every SUPERSEDED record names a resolvable successor in 812 record(s); 12 pinned legacy id(s) still owed' and 'decision_citations_in_force: 59 citation site(s) all name a decision IN FORCE; 4 declared forward reference(s) still owed; every state word in the registry is classified' -> rc=0. Mutation gate: config/rail_mutations.yaml#decision_supersession_rule_is_load_bearing SEEN to red through its own marker; floor 10 -> 11, subjects 8 -> 9. Rail registry: 89 ladder invocation(s), rc=0.
+WHAT LANDED. config/decisions_policy.yaml#graph (the RULES, one home); scripts/reconcile.py (two declared check kinds + PURE predicates + the NAMED oracle --selftest, reusing the existing citation walker); config/reconciliation.yaml (two entries); config/rail_mutations.yaml (the teeth); justfile (the selftest is its OWN declaring line, so the boundary control is SEEN, D-2676 ii).
+ORDERED NEXT. (1) BUG-571 - the cited-by-decision join (a decision citing an unregistered bug must become an owner-owed RED LINE; BUG-492, cited 32x and unregistered, is the live case) - after which the META LANE CLOSES; (2) PRODUCT (default lane): BUG-563 then BUG-560; (3) BUG-583 (LOW, filed here).
+OWNER GATE (DUE). (a) rule the META-LANE FREEZE; (b) the standing-rule CONSTITUTION promotion (bar MET, POINTER never a restatement); (c) BUG-431 CONTENT promotion.

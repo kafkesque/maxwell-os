@@ -67,8 +67,8 @@ guards:
 #: would show a line someone deleted, and the strictest gate in the system (RAIL 0/3/4/5) would silently disarm.
 #: Its REQUIRED TEXT is therefore a declaration, verified against the bytes on disk, fail closed (C16).
 commit_boundary:
-  path: gitdir:hooks/pre-commit
-  why: 'a commit is the one act that makes a conflicted tree permanent (RAIL 0); four rails run ONLY there, so a deleted line is a rail that nothing runs - class (i) at the commit boundary'
+  path: git-path:hooks/pre-commit
+  why: 'a commit is the one act that makes a conflicted tree permanent (RAIL 0); four rails run ONLY there, so a deleted line is a rail that nothing runs - class (i) at the commit boundary. TWO SMALLER ACTS DISARM IT JUST AS SILENTLY, and neither was the subject of any rail (D-2687). (1) THE ROUTE: this declaration used to name a PATH SHAPE (gitdir: + hooks/). git does not promise to run that file - core.hooksPath decides, and the --git-dir of a linked worktree is not where hooks live. MEASURED 2026-09-27 in a real repository: with core.hooksPath set, `git rev-parse --git-path hooks/pre-commit` answered hooks/pre-commit while --git-dir answered .git, the file at gitdir:hooks/pre-commit DID NOT EXIST, and a DIFFERENT file received the commit and refused it. The route is therefore declared as git-path:<rel>: GIT ITSELF, never a path shape. (2) THE MODE: MEASURED the same day, a mode-644 hook is IGNORED - git LANDS the commit (rc=0), runs none of the four rails, and prints only a `hint:` git documents how to suppress. A byte-perfect verification of a file that may not be executed is class (i) with a green verdict, so the declared subject is the RESOLVED path, its bytes, AND its mode'
   must_contain:
   - 'python3 scripts/check_repo_integrity.py'
   - 'python3 scripts/verify_recalibration_pins.py --staged'

@@ -1252,3 +1252,12 @@ NOW. `backups/**` and the per-run snapshots are excluded BY DECISION; the six in
   clean. BUG-560's leak was the only instance. The scan is scratch (`temp/scan_fixture_leaks.py`) - hoisting it
   into a declared rehearsal is OWED.
 - **TEETH**: `config/rail_mutations.yaml#pre_image_containment_is_load_bearing` (floor 17 -> 18).
+
+## THE COMMIT BOUNDARY IS A ROUTE AND A MODE (D-2687, 2026-09-27) - BUG-564 remainder closed
+- **`config/rail_registry.yaml#commit_boundary.path` is a ROUTE (`git-path:hooks/pre-commit`), never a path
+  shape**; the declared subject is the path GIT resolves + its bytes + its MODE, decided by the PURE
+  `scripts/check_rail_registry.py#boundary_faults`.
+- **MEASURED**: `core.hooksPath` sends git to a DIFFERENT file (the declared one need not exist); a mode-644 hook
+  is SKIPPED and the commit LANDS rc=0 with only a suppressible `hint:` - byte-only verification stayed GREEN.
+- **`scripts/install_git_hooks.sh` asks git the same question**, so the printed remedy can actually clear the fault.
+- **TEETH**: 7 new named controls (14/14), mutation `commit_boundary_route_and_mode_is_load_bearing`, floor 18 -> 19.

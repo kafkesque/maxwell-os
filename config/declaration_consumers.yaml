@@ -5,7 +5,7 @@
 # property held only because a session looked.
 #
 # Consumed by scripts/check_declaration_consumers.py at TWO moments of the SAME home (the RAIL 3 precedent,
-# config/recalibration_pins.yaml): --staged at the WRITE moment (gitdir:hooks/pre-commit) and the default STATE mode
+# config/recalibration_pins.yaml): --staged at the WRITE moment (the commit boundary, git-path:hooks/pre-commit) and the default STATE mode
 # in the ladder (justfile: health).
 #
 # Rules the rail enforces, all mechanical:
@@ -50,7 +50,7 @@ declarations:
     D-2680: scripts/run_ladder.py::declared() reads #ladder and #recipes from this registry, so the recipe the
     collector runs, and the lines it collects, have ONE home and no rail name is restated in code.
         the rail registry is read by scripts/check_rail_registry.py::CFG (which verifies its commit_boundary against the
-    bytes of gitdir:hooks/pre-commit) AND by scripts/check_rail_mutations.py#boundary_rails (D-2679), which derives
+    bytes at the path GIT resolves (git-path:hooks/pre-commit)) AND by scripts/check_rail_mutations.py#boundary_rails (D-2679), which derives
     the standing rule's COVERAGE from commit_boundary.must_contain instead of restating it. A registry whose reader
     is withheld is a declaration that no rail reports on - the class (i) shape this registry exists to catch.
 - declaration: config/handoffs.yaml

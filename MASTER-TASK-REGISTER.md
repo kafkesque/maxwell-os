@@ -703,3 +703,18 @@ RISK NOTE (now retired): before fe239df a worktree clean destroyed BOTH copies o
 - [ ] OWED (declared, not silent): the scan itself is a SCRATCH measurement (`temp/scan_fixture_leaks.py`, gitignored). Hoist it into a DECLARED event-driven rehearsal (change time, NOT `just health`: it re-runs the whole control set) or declare it `dormant` in `config/rail_registry.yaml#dormant` with a real `exercised_by` path.
 - [ ] NEXT (product lane): BUG-564 remainder (the hook ROUTE as a declared subject), then BUG-572 / BUG-583 / BUG-584.
 - [ ] OWNER GATE (DUE, one word each): the META-LANE FREEZE ruling; the standing-rule CONSTITUTION promotion (POINTER only, never a restatement); BUG-431 CONTENT promotion; BUG-583.
+
+## D-2687 - THE COMMIT BOUNDARY IS A ROUTE AND A MODE (2026-09-27) - BUG-564 remainder CLOSED
+
+- [x] MEASURED: `core.hooksPath` redirects git's hook (declared file ABSENT; a different file refused the commit);
+      a mode-644 hook is SKIPPED and the commit LANDS rc=0 (only a suppressible `hint:`).
+- [x] LANDED: `config/rail_registry.yaml#commit_boundary.path = git-path:hooks/pre-commit`;
+      `scripts/check_rail_registry.py#boundary_faults` (PURE) + `Boundary` facts; the dead `readx` removed (C19);
+      `commit_boundary` is now a REQUIRED registry key (fail closed); `scripts/install_git_hooks.sh` resolves the
+      hook the same way (the remedy can clear the fault).
+- [x] ORACLE: `--selftest` 14/14 named controls; live `--check` rc=0; `install_git_hooks.sh --check` rc=0.
+- [x] MUTATION: `commit_boundary_route_and_mode_is_load_bearing`, floor 18 -> 19; `check_rail_registry.py` added
+      to `coverage.required_subjects` (13/11 covered).
+- [x] SEEN (no cascade): whole ladder 94 line(s) RUN, 0 fault(s), 227.7s, rc 0.
+- [ ] OWED: BUG-585 (session_seed states open_bugs_n twice) and the freeze WINDOW/exit declaration.
+- [ ] NEXT: the leak scan's declared home, then BUG-584, BUG-572, BUG-583.

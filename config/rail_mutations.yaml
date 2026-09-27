@@ -30,7 +30,7 @@ fixture:
   keep: false
   timeout_seconds: 600
 coverage:
-  min_mutations: 18            # FLOOR (shrink guard): deleting an entry means editing the floor in a diff a human reads
+  min_mutations: 19            # FLOOR (shrink guard): deleting an entry means editing the floor in a diff a human reads
   # D-2679: the coverage set is DERIVED, never restated. Which rails gate a COMMIT is one fact and it already has
   # ONE home (config/rail_registry.yaml#commit_boundary), so restating it here would be a SECOND HOME - and two
   # lists of one fact drift, and only one of them can be right. scripts/check_rail_mutations.py joins the two and
@@ -44,7 +44,7 @@ coverage:
       MEASURED 2026-09-27 (D-2679): RAIL 3 (scripts/verify_recalibration_pins.py) and RAIL 5
       (scripts/check_declaration_consumers.py) ran at the commit boundary in every commit, and this list did not
       name them - so the gate reported coverage of the list it happened to hold while two boundaries were covered
-      on PAPER only. The registry this join reads is itself verified against the bytes of gitdir:hooks/pre-commit
+      on PAPER only. The registry this join reads is itself verified against the bytes AT THE PATH GIT RESOLVES (git-path:hooks/pre-commit)
       by scripts/check_rail_registry.py, so the derivation rests on a checked declaration, not on a copy.
   required_subjects:          # SUPERSET of the derived boundary rails (D-2679): every path here MUST be the subject
                               # of >= 1 mutation (D-405: join BOTH directions). A rail whose own rule gates the
@@ -54,6 +54,7 @@ coverage:
     - scripts/check_declaration_consumers.py
     - scripts/check_rail_mutations.py
     - scripts/check_register_divergence.py
+    - scripts/check_rail_registry.py
     - scripts/check_repo_integrity.py
     - scripts/check_session_plan.py
     - scripts/run_ladder.py
@@ -349,3 +350,23 @@ mutations:
       tracked artifact's. MEASURED 2026-09-27: the applier's own --selftest left five of them in the live
       backups/. With the containment predicate reduced to a no-op, the guard keeps a system-temp fixture's
       pre-image, deposits it, and the named control goes RED through its own marker (D-2676(iv)).
+
+  - id: commit_boundary_route_and_mode_is_load_bearing
+    subject: scripts/check_rail_registry.py
+    op: replace
+    find: '    if not b.executable:'
+    replace: '    if False:  # MUTATION (D-2676): a hook git may not execute is still a declared boundary'
+    runner: scripts/check_rail_registry.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: 'FAIL selftest/boundary_hook_is_not_executable'
+    why: >-
+      D-2687 (the BUG-564 remainder): the boundary was declared as a PATH SHAPE and verified BY BYTES ONLY, so
+      two small acts disarmed the strictest gate in the system with no verdict anywhere. MEASURED 2026-09-27 in
+      real repositories outside the tree: (1) with core.hooksPath set, `git rev-parse --git-path hooks/pre-commit`
+      answered hooks/pre-commit while --git-dir answered .git, the declared file DID NOT EXIST and a DIFFERENT file
+      received the commit and refused it; (2) a mode-644 pre-commit is SKIPPED - the commit LANDS (rc=0), none of
+      the four rails run, and the only sign is a `hint:` git documents how to suppress. With the executability
+      limb reduced to a no-op the rail calls a hook that cannot run a verified boundary, and the named control goes
+      RED through its own marker (D-2676(iv)). The entry FAILS if that line is renamed or re-shaped.

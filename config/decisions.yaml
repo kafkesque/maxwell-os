@@ -9691,3 +9691,32 @@ decisions:
   - governance/CONTEXT_INDEX.md
   - governance/SESSION-HANDOFF-2026-09-26.md
   - agent/session_seed.yaml
+- id: D-2687
+  date: 2026-09-27
+  state: ACTIVE
+  category: governance
+  title: THE COMMIT BOUNDARY IS A ROUTE AND A MODE, NOT A PATH OF BYTES (BUG-564 remainder CLOSED)
+  decision: 'config/rail_registry.yaml#commit_boundary.path declares a ROUTE (git-path:hooks/pre-commit), never
+    a path shape; scripts/check_rail_registry.py#boundary_faults is the PURE predicate and the declared subject
+    is the path GIT resolves (git rev-parse --git-path: core.hooksPath, common git dir) plus its bytes plus its
+    EXECUTABILITY; scripts/install_git_hooks.sh asks git the same question so the remedy can clear the fault.'
+  measured: 'MEASURED 2026-09-27 in real repositories outside the tree: with core.hooksPath set, --git-path answered
+    hooks/pre-commit while --git-dir answered .git, the declared file did not exist and a DIFFERENT file refused
+    the commit; a mode-644 pre-commit is SKIPPED, the commit LANDS rc=0, only a suppressible hint: - byte-only verification
+    stayed GREEN with a byte-perfect inert hook. AFTER: selftest 14/14, check rc=0, install --check rc=0, mutation
+    gate rc=0 (18 rules red, floor 19), ladder 94 lines 0 faults 227.7s.'
+  bugs:
+  - BUG-564
+  files:
+  - config/rail_registry.yaml
+  - scripts/check_rail_registry.py
+  - scripts/install_git_hooks.sh
+  - config/rail_mutations.yaml
+  - config/declaration_consumers.yaml
+  - scripts/check_rail_mutations.py
+  - governance/buglog.md
+  - DECISION-LOG.md
+  - MASTER-TASK-REGISTER.md
+  - governance/CONTEXT_INDEX.md
+  - governance/SESSION-HANDOFF-2026-09-26.md
+  - agent/session_seed.yaml

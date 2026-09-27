@@ -624,3 +624,14 @@ OWED: hoist the leak scan into a declared event-driven rehearsal (or a `dormant`
 NEXT (product): BUG-564 remainder (the hook ROUTE as a declared subject) -> BUG-572 -> BUG-583 -> BUG-584.
 OWNER GATE (DUE, one word each): META-LANE FREEZE ruling; standing-rule CONSTITUTION promotion (POINTER only);
 BUG-431 CONTENT promotion; BUG-583.
+
+## 2026-09-27 (later) - D-2687 LANDED: THE COMMIT BOUNDARY IS A ROUTE AND A MODE (BUG-564 remainder CLOSED)
+
+LANDED: the registry declares the route `git-path:hooks/pre-commit`; `check_rail_registry.py` resolves it with
+`git rev-parse --git-path` (honours `core.hooksPath` and the COMMON git dir), requires the resolved file to be
+READABLE and EXECUTABLE, and keeps the 4 must_contain lines; the installer resolves the same way.
+FOUND: `chmod -x` on the hook disarms RAIL 0/3/4/5 while a byte-only verifier stays GREEN (measured: commit lands,
+rc=0, only a `hint:`); `core.hooksPath` points git at a file the declaration never named.
+MEASURED: `--selftest` 14/14; live `--check` rc=0; `install_git_hooks.sh --check` rc=0; mutation gate rc=0 (18
+rules red, floor 19); ladder 94 line(s), 0 fault(s), 227.7s.
+OWED: BUG-585; the leak scan has no declared home; the freeze WINDOW + written EXIT; BUG-584/572/583 behind it.

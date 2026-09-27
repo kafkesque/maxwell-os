@@ -13,7 +13,10 @@ This rail settles, without judgement, what a machine can settle:
     declaration, D-405/BUG-488);
   * every rail the registry DECLARES a writer must have its own `--selftest` run BY THE LADDER (class iii: a rail
     that replaces bytes makes a CLAIM, and an unproven claim is where BUG-537 and BUG-556 came from);
-  * a declared `guard:` is matched against the ladder's own text: a disagreement is class (ii), fail closed.
+  * a declared `guard:` is matched against the ladder's own text: a disagreement is class (ii), fail closed;
+  * the COMMIT BOUNDARY is the file GIT RUNS (git rev-parse --git-path: core.hooksPath and the COMMON git dir
+    decide it, not this registry) and it must be EXECUTABLE, because git silently skips a hook it may not
+    execute (D-2687, the BUG-564 remainder).
 It does NOT decide policy and it does NOT read the rails' internals - it reports which invariant has no owner.
 
 Exit: 0 ok | 1 fault(s) | 2 the config itself is unreadable/incomplete (fail closed, C16).
@@ -22,6 +25,8 @@ Exit: 0 ok | 1 fault(s) | 2 the config itself is unreadable/incomplete (fail clo
 from __future__ import annotations
 
 import argparse
+import dataclasses
+import os
 import pathlib
 import re
 import subprocess
@@ -73,8 +78,64 @@ def guard_of(body: str) -> str:
     return "unguarded"
 
 
+ROUTE = "git-path:"
+
+
+@dataclasses.dataclass(frozen=True)
+class Boundary:
+    """The commit boundary AS GIT SEES IT, never as a declaration spells it (D-2687, the BUG-564 remainder).
+
+    Git decides WHICH file to run (core.hooksPath, and the COMMON git dir - a linked worktree's --git-dir is
+    not where hooks live), and git decides WHETHER to run it (a hook it may not execute is SKIPPED, silently).
+    So a declaration that names a path shape is a claim about a file git may never open: `resolved` is GIT'S
+    OWN answer, and `text` / `executable` are the bytes and the MODE at THAT answer.
+    """
+    declared: str
+    resolved: str | None
+    text: str | None
+    executable: bool
+
+
+def boundary_faults(cb: dict, b: "Boundary | None") -> list[str]:
+    """PURE (ONE reader): is the DECLARED commit boundary the file git actually runs, and may it run?
+
+    The executability requirement is a PROPERTY of the boundary, not a configurable flag - a key here could
+    only turn the check OFF, and the subject being declared is git's own behaviour (the D-2686 precedent:
+    nothing in config may re-point the audited subject).
+    """
+    if not cb:
+        return []
+    faults: list[str] = []
+    declared = str(cb.get("path") or "")
+    if b is None:
+        return ["(i) commit_boundary declares " + (declared or "<nothing>") + " and the ROUTE WAS NEVER RESOLVED: the question 'which file will git run' was never put to git, so every verdict below is a belief about a path rather than a check of the boundary (D-405/BUG-564)"]
+    if not declared.startswith(ROUTE):
+        faults.append("(i) commit_boundary names " + repr(declared) + ", a PATH SHAPE - not git's own "
+                      "answer. MEASURED 2026-09-27: with core.hooksPath set, a DIFFERENT file received the commit "
+                      "and " + repr(declared) + " did not exist, so a declaration verified at a path shape can be "
+                      "GREEN while the boundary is disarmed. Declare " + ROUTE + "<rel> instead")
+    if not b.resolved:
+        return faults + ["(i) commit_boundary " + declared + ": git could not resolve the route (git rev-parse --git-path) - a boundary whose path git will not answer for has no verifier (C16)"]
+    if b.text is None:
+        return faults + ["(i) commit_boundary " + declared + " resolves to " + b.resolved + ", which is NOT A "
+                         "READABLE FILE - the commit-time rails have no exerciser at the path git will run (BUG-564)"]
+    if not b.executable:
+        faults.append("(i) commit_boundary " + b.resolved + " is NOT EXECUTABLE, so git runs NOTHING there: "
+                      "MEASURED 2026-09-27, a mode-644 pre-commit is SKIPPED, the commit LANDS (rc=0) and the only "
+                      "sign is a `hint:` git documents how to suppress. The strictest gate in the system, "
+                      "byte-perfect and inert - class (i) WITH a green verdict (BUG-564)")
+    mc = [str(x) for x in (cb.get("must_contain") or [])]
+    if not mc:
+        faults.append("(i) commit_boundary " + b.resolved + " declares NO must_contain - a claim with no subject")
+    for want in mc:
+        if want not in b.text:
+            faults.append("(i) commit_boundary " + b.resolved + " does NOT contain " + repr(want) + ": the rail the "
+                          "registry says runs at COMMIT time would silently not run (BUG-564)")
+    return faults
+
+
 def audit(ladder: str, discovered: list[str], cfg: dict, exists=lambda p: True,
-          read=lambda p: None) -> tuple[list[str], dict]:
+          boundary: "Boundary | None" = None) -> tuple[list[str], dict]:
     """Return (faults, census) for one ladder text, one set of discovered rails, one declaration."""
     inv = ladder_invocations(ladder, [str(r) for r in cfg.get("recipes") or []])
     invoked = {SCRIPT.search(c).group(1) for c in inv}  # type: ignore[union-attr]
@@ -108,24 +169,11 @@ def audit(ladder: str, discovered: list[str], cfg: dict, exists=lambda p: True,
         if script in invoked:
             faults.append(f"(i) STALE dormancy: {script} is declared dormant and IS invoked by the ladder")
 
-    # COMMIT BOUNDARY (BUG-564): a dormancy claim says WHICH file exercises a rail; it cannot say the file still
-    # DOES. This hook lives OUTSIDE the synced tree (BUG-500), so no diff would show a deleted line: its required
-    # text is a declaration here, verified against the bytes on disk, fail closed (C16).
-    cb = cfg.get("commit_boundary") or {}
-    if cb:
-        bp = str(cb.get("path") or "")
-        btext = read(bp) if bp else None
-        mc = [str(x) for x in (cb.get("must_contain") or [])]
-        if not bp or btext is None:
-            faults.append("(i) commit_boundary declares " + (bp or "<nothing>") + ", which is not a readable file - the "
-                          "commit-time rails would have no verifiable exerciser (C16/BUG-564)")
-        elif not mc:
-            faults.append("(i) commit_boundary " + bp + " declares NO must_contain - a claim with no subject")
-        else:
-            for want in mc:
-                if want not in btext:
-                    faults.append("(i) commit_boundary " + bp + " does NOT contain " + repr(want) + ": the rail the "
-                                  "registry says runs at COMMIT time would silently not run (BUG-564)")
+    # COMMIT BOUNDARY (BUG-564/D-2687): a dormancy claim says WHICH file exercises a rail; it cannot say the file
+    # still DOES, nor that it is the file GIT RUNS. This hook lives OUTSIDE the synced tree (BUG-500), so no diff
+    # would show a deleted line - and no diff would show a deleted EXEC BIT either. Both are settled by ONE pure
+    # predicate against git's own answers, fail closed (C16).
+    faults.extend(boundary_faults(cfg.get("commit_boundary") or {}, boundary))
 
     # (ii) a declared guard that disagrees with the ladder's own text
     for key, want in guards.items():
@@ -167,7 +215,7 @@ def load_cfg() -> dict:
         raise SystemExit("FAIL-CLOSED: config/rail_registry.yaml is absent - a registry that decides nothing "
                          "cannot be a registry")
     cfg = yaml.safe_load(CFG.read_text(encoding="utf-8")) or {}
-    for key in ("ladder", "recipes", "dormant"):
+    for key in ("ladder", "recipes", "dormant", "commit_boundary"):
         if key not in cfg:
             raise SystemExit(f"FAIL-CLOSED: config/rail_registry.yaml must declare '{key}'")
     return cfg
@@ -226,15 +274,45 @@ def selftest() -> int:
     check("writer_with_selftest", len(f), 0, "a declared writer whose --selftest the ladder runs is clean")
 
     HB = "#/bin/bash" + chr(10) + "python3 scripts/check_a.py --staged" + chr(10)
-    b2 = {**base, "commit_boundary": {"path": "gitdir:hooks/pre-commit",
-                                      "must_contain": ["scripts/check_a.py --staged"]}}
-    f, _ = audit(L, ["scripts/check_a.py"], b2, read=lambda p: HB)
-    check("boundary_line_present", len(f), 0, "a declared commit-boundary line that IS in the file is silent")
+    REL = "hooks/pre-commit"
+    RES = "/system/temp/rail-registry-fixture/" + REL
+    CB = {"path": ROUTE + REL, "must_contain": ["scripts/check_a.py --staged"]}
 
-    f, _ = audit(L, ["scripts/check_a.py"], {**base, "commit_boundary": {"path": "gitdir:hooks/pre-commit",
-                "must_contain": ["scripts/check_declaration_consumers.py --staged"]}}, read=lambda p: HB)
+    def bnd(declared: str = ROUTE + REL, resolved: 'str | None' = RES,
+            text: 'str | None' = HB, executable: bool = True) -> Boundary:
+        """The boundary FACTS a caller injects: git's answer, and the bytes and mode AT that answer."""
+        return Boundary(declared=declared, resolved=resolved, text=text, executable=executable)
+
+    f, _ = audit(L, ["scripts/check_a.py"], {**base, "commit_boundary": CB}, boundary=bnd())
+    check("boundary_route_holds_the_declared_line", len(f), 0,
+          "git's own answer, executable, holding the declared line is silent (route + mode)")
+
+    f, _ = audit(L, ["scripts/check_a.py"], {**base, "commit_boundary":
+                  {**CB, "must_contain": ["scripts/check_declaration_consumers.py --staged"]}}, boundary=bnd())
     check("boundary_line_deleted", len([x for x in f if "commit_boundary" in x]), 1,
           "a commit-boundary line DELETED from the out-of-tree hook is reported, not trusted (i/BUG-564)")
+
+    f, _ = audit(L, ["scripts/check_a.py"], {**base, "commit_boundary":
+                  {"path": "gitdir:" + REL, "must_contain": CB["must_contain"]}},
+                 boundary=bnd(declared="gitdir:" + REL))
+    check("boundary_declared_as_a_path_shape", len([x for x in f if "PATH SHAPE" in x]), 1,
+          "a boundary declared as a PATH SHAPE is refused: git may run a different file (measured) (BUG-564)")
+
+    f, _ = audit(L, ["scripts/check_a.py"], {**base, "commit_boundary": CB}, boundary=None)
+    check("boundary_route_never_resolved", len([x for x in f if "ROUTE WAS NEVER RESOLVED" in x]), 1,
+          "a boundary whose route was never put to git is a belief, not a verification (D-405)")
+
+    f, _ = audit(L, ["scripts/check_a.py"], {**base, "commit_boundary": CB}, boundary=bnd(resolved=None))
+    check("boundary_route_git_cannot_answer", len([x for x in f if "could not resolve" in x]), 1,
+          "a route git will not answer for has no verifier (C16)")
+
+    f, _ = audit(L, ["scripts/check_a.py"], {**base, "commit_boundary": CB}, boundary=bnd(text=None))
+    check("boundary_hook_is_absent", len([x for x in f if "NOT A READABLE FILE" in x]), 1,
+          "git's answer names no readable file: the commit-time rails have no exerciser")
+
+    f, _ = audit(L, ["scripts/check_a.py"], {**base, "commit_boundary": CB}, boundary=bnd(executable=False))
+    check("boundary_hook_is_not_executable", len([x for x in f if "NOT EXECUTABLE" in x]), 1,
+          "a byte-perfect hook git may not execute runs NOTHING (measured): the gate is inert, not armed")
 
     print(f"rail-registry controls: {ok}/{ok + fail} known-answer control(s) fire")
     return 1 if fail else 0
@@ -260,20 +338,32 @@ def main() -> int:
             return bool(gitdir) and (gitdir / p.split(":", 1)[1]).exists()
         return (REPO / p).exists()
 
-    def readx(p: str) -> str | None:
-        """The declared exerciser's TEXT: gitdir:<rel> resolves against THIS repo's out-of-tree git dir (BUG-500)."""
-        if p.startswith("gitdir:"):
-            if not gitdir:
-                return None
-            q = gitdir / p.split(":", 1)[1]
-        else:
-            q = REPO / p
-        try:
-            return q.read_text(encoding="utf-8")
-        except OSError:
-            return None
+    def git_answer(rel: str) -> str | None:
+        """GIT'S OWN ANSWER to "which file will you run for <rel>?" - the ONE home of the route (D-2687).
 
-    faults, census = audit(text, declared, cfg, exists=exists, read=readx)
+        --git-path honours core.hooksPath and the COMMON git dir; --git-dir does not, which is why the
+        registry may not answer this question on git's behalf. A relative answer is git's answer RELATIVE TO
+        THE CALLER's cwd, so it is resolved here against REPO (the directory the call is made from).
+        """
+        r = subprocess.run(["git", "rev-parse", "--git-path", rel], cwd=REPO, capture_output=True, text=True)
+        ans = r.stdout.strip() if r.returncode == 0 else ""
+        if not ans:
+            return None
+        p = pathlib.Path(ans)
+        return str(p if p.is_absolute() else (REPO / p).resolve())
+
+    cb = cfg.get("commit_boundary") or {}
+    route = str(cb.get("path") or "")
+    boundary = None
+    if cb:
+        res = git_answer(route.split(":", 1)[1] if route.startswith(ROUTE) else route.split(":", 1)[-1])
+        try:
+            btext = pathlib.Path(res).read_text(encoding="utf-8") if res else None
+        except (OSError, UnicodeDecodeError):
+            btext = None
+        boundary = Boundary(declared=route, resolved=res, text=btext, executable=bool(res) and os.access(res, os.X_OK))
+
+    faults, census = audit(text, declared, cfg, exists=exists, boundary=boundary)
     print(f"rail registry: {census['invocations']} ladder invocation(s), {len(census['rails_invoked'])} rail(s) "
           f"invoked, {census['discovered']} rail script(s) on disk, {len(census['dormant'])} declared dormant, "
           f"{len(census['writers'])} declared writer(s)")
@@ -285,7 +375,8 @@ def main() -> int:
             print("  - " + x)
         return 1
     print("  ok   no rail is unowned: every rail is invoked or declared dormant with an existing exerciser, every "
-          "declared writer's remedy is proven by the ladder, and no declared guard disagrees with the ladder")
+          "declared writer's remedy is proven by the ladder, no declared guard disagrees with the ladder, and the "
+          "COMMIT BOUNDARY is the file git runs (" + str(boundary.resolved) + "), executable, holding every line")
     return 0
 
 

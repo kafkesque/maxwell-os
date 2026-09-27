@@ -7588,4 +7588,15 @@ REMEDY (one line, no owner ruling needed): rename the block's key so it cannot b
 derived count. NOT WORKED HERE: the META-LANE FREEZE holds new GOVERNANCE bugs as FILED so the product lane can
 advance; this block is the filing, with its measurement and its remedy.
 
+## BUG-564 (FIXED 2026-09-27, D-2687 - the last remainder): the commit boundary was verified as a PATH OF BYTES
 
+STATUS CLOSED. The declaration said `gitdir:hooks/pre-commit` and the reader joined it to `git rev-parse
+--git-dir`. Git does not promise to run that file, and it does not promise to run ANY file it may not execute.
+MEASURED 2026-09-27 in real repositories OUTSIDE the tree: (1) with `core.hooksPath` set, `git rev-parse
+--git-path hooks/pre-commit` answered `hooks/pre-commit` while `--git-dir` answered `.git`, the declared file DID
+NOT EXIST, and a DIFFERENT file received the commit and refused it; (2) a mode-644 `pre-commit` is SKIPPED - the
+commit LANDS (rc=0), none of the four rails run, and the only sign is a `hint:` git documents how to suppress.
+Both were invisible to a byte-only verifier: (2) was GREEN with a byte-perfect hook. FIX (D-2687): the route is
+declared as `git-path:<rel>` (GIT ITSELF is the answer), the declared subject is the RESOLVED path + its bytes +
+its MODE, `scripts/install_git_hooks.sh` resolves the SAME way (so the remedy can clear the fault), 7 new named
+controls (14/14), mutation `commit_boundary_route_and_mode_is_load_bearing` (floor 18 -> 19).

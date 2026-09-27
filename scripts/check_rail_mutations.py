@@ -28,7 +28,7 @@ config/rail_mutations.yaml#coverage.boundary_join) and JOINED here - never resta
 RAIL 3 (verify_recalibration_pins.py) and RAIL 5 (check_declaration_consumers.py) gated EVERY commit while this
 gate reported coverage of the list it happened to hold, so two boundaries were covered on PAPER only - the
 D-2676 class turned on the standing rule's own coverage. The registry the join reads is verified against the bytes
-of gitdir:hooks/pre-commit by scripts/check_rail_registry.py, so the derivation rests on a checked declaration. The
+of the path GIT resolves for the commit boundary (git-path:hooks/pre-commit) by scripts/check_rail_registry.py, so the derivation rests on a checked declaration. The
 SUPERSET direction is declared, not assumed: a rail whose own rule gates the boundary (the rehearsal, D-2675) is
 covered BEYOND the boundary, which is not a fault.
 The fixture is a REAL repository (git init + commit) built from DECLARED paths in the SYSTEM temp dir, so it is

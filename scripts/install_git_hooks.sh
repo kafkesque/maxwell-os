@@ -11,10 +11,14 @@
 # scripts/check_bug_status.py: a derived artifact must equal its own re-derivation.
 set -euo pipefail
 cd "$(dirname "$0")/.."
-git_dir="$(git rev-parse --absolute-git-dir)"
-[ -n "$git_dir" ] && [ -d "$git_dir" ] || { echo "FAIL install-git-hooks: git dir does not resolve"; exit 1; }
-mkdir -p "$git_dir/hooks"
-hook="$git_dir/hooks/pre-commit"
+git rev-parse --absolute-git-dir >/dev/null 2>&1 || { echo "FAIL install-git-hooks: git dir does not resolve"; exit 1; }
+# THE HOOK'S PATH IS GIT'S OWN ANSWER (D-2687), never "$git_dir/hooks" - a PATH SHAPE. git decides with
+# core.hooksPath (and a linked worktree's hooks live in the COMMON dir), so joining the git dir here can
+# install a hook git never runs while --check confirms its bytes. MEASURED 2026-09-27. check_rail_registry.py
+# puts the SAME question to git, so the installer and its verifier cannot disagree about WHERE the boundary is.
+hook="$(git rev-parse --git-path hooks/pre-commit)"
+case "$hook" in /*) ;; *) hook="$PWD/$hook" ;; esac   # git answers relative to the caller; the caller is the repo root
+mkdir -p "$(dirname "$hook")"
 
 render_hook() {
 cat <<'HOOK'

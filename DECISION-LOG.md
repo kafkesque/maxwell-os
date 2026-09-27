@@ -1161,3 +1161,33 @@ passes `backup=False` for a live-tree artifact still keeps no pre-image; that re
 
 FILED, NOT WORKED: BUG-585 (the same audit found `agent/session_seed.yaml` stating the open-bug count in two homes
 - a stale `77` beside the DERIVED `134`), held as FILED behind the META-LANE FREEZE.
+
+## D-2687 (2026-09-27) - THE COMMIT BOUNDARY IS A ROUTE AND A MODE, NOT A PATH OF BYTES (BUG-564 remainder, CLOSED)
+
+THE RULE. `config/rail_registry.yaml#commit_boundary.path` names a ROUTE (`git-path:hooks/pre-commit`), never a
+path shape; `scripts/check_rail_registry.py#boundary_faults` is the PURE predicate (ONE reader) and the declared
+subject is the path GIT resolves, its bytes, AND its executability.
+
+WHY IT WAS NEEDED (measured 2026-09-27, in real repositories outside the tree). (1) THE ROUTE: with
+`core.hooksPath` set, `git rev-parse --git-path hooks/pre-commit` answered `hooks/pre-commit` while `--git-dir`
+answered `.git`; the file at `gitdir:hooks/pre-commit` did not exist and a DIFFERENT file received the commit and
+refused it - and a linked worktree's `--git-dir` is not where hooks live either. (2) THE MODE: a mode-644
+`pre-commit` is IGNORED - the commit LANDS (rc=0), none of the four rails run, and the only sign is a `hint:` git
+documents how to suppress. So the strictest gate in the system could be disarmed by `chmod -x`, and byte-only
+verification stayed GREEN - class (i) WITH a green verdict.
+
+WHY BOTH ARMS IN ONE CHANGE. Landing the rail alone would have created a fault whose printed remedy could not
+clear it: `scripts/install_git_hooks.sh` joined `$git_dir/hooks` too, so "re-install" would have re-written the
+file git does not run. The installer now asks GIT the SAME question, so writer and verifier cannot disagree.
+
+FOUR LIMBS (D-2676). (i) ONE HOME: the route is git's own answer, asked once in the reader and once in the
+installer - no path is restated (C12). (ii) SEEN: `check_rail_registry.py --selftest` is a declared ladder line.
+(iii) NAMED ORACLE: 7 controls, every fault printed by name (`boundary_declared_as_a_path_shape`,
+`boundary_route_never_resolved`, `boundary_hook_is_not_executable`, ...), 14/14. (iv) MUTATION:
+`config/rail_mutations.yaml#commit_boundary_route_and_mode_is_load_bearing`, floor 18 -> 19.
+
+MEASURED AFTER. `check_rail_registry.py` rc=0 naming `/Users/barn/maxwell_os_gitdirs/maxwell_os_2_0.git/hooks/pre-commit`,
+executable, holding every line; `install_git_hooks.sh --check` rc=0 (byte-identical today: `core.hooksPath` is
+unset, so the route is a no-op change for THIS repo and a real one for a clone, a worktree, or a global config);
+`check_rail_mutations.py` rc=0 - 18 rules SEEN to red, 1 negative control green, 13/11 subjects covered; the whole
+ladder 94 lines, 0 faults, 227.7s.

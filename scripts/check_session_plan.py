@@ -376,6 +376,49 @@ def selftest() -> int:
          "set never contained that path, so the owner's PROMOTE was refused for a reason that did not exist",
          permit_b.returncode == 0),
     ]
+    # BUG-569 (D-2675 MEASURED it, D-2673 wrote the rule): the ADOPTION wiring at the RAIL level. The one
+    # home's controls prove the RULE; what no control proved is the WIRING - that THIS rail, run the way the
+    # pre-commit hook runs it (an ambient GIT_INDEX_FILE at a name git REALLY mints, no --index-file), PRINTS
+    # the ADOPTED note, NAMES that index and AUDITS it. Both limbs are asserted, because a note naming an index
+    # the rail did not read would be a claim, not a subject (their divergence was BUG-567).
+    # MEASURED while instrumenting this control (temp/b569_probe.py): with the index built from
+    # `read-tree --empty` the rail refuses at the BUG-528 family check (rc=2 over 1314 deletions) and NEVER
+    # PRINTS the probe path - so the audited-bytes limb can only be satisfied by the `read-tree HEAD` + ONE
+    # added path shape, and the earlier attempt that used --empty failed its own baseline for exactly that
+    # reason. The plan is SYNTHETIC (may_touch: []): rc=1 is then a fact about the AUDITED SET, never about
+    # what the live plan happens to permit today (a control that rides the live plan rots with it).
+    minted = git_subject.minted_index_name()
+    rail_rel = str(Path(__file__).resolve().relative_to(REPO))
+    blob = subprocess.run(["git", "rev-parse", "HEAD:" + rail_rel], cwd=REPO, capture_output=True,
+                          text=True).stdout.strip()
+    probe_path = "docs/not_in_the_plan_minted_index_probe.md"
+    probe_before = _staged_count_raw()
+    minted_idx = os.path.join(git_subject.discover(git_subject.config()).git_dir, minted) if minted else ""
+    adopt_note, adopt_rc, adopt_sees_probe, adopt_clean = "", None, False, False
+    if minted_idx:
+        env_m = dict(os.environ, GIT_INDEX_FILE=minted_idx)
+        try:
+            subprocess.run(["git", "read-tree", "HEAD"], cwd=REPO, env=env_m, capture_output=True)
+            subprocess.run(["git", "update-index", "--add", "--cacheinfo", "100644," + blob + "," + probe_path],
+                           cwd=REPO, env=env_m, capture_output=True)
+            p_m = subprocess.run([sys.executable, str(Path(__file__)), "--staged", "--plan", plan_plain],
+                                 cwd=REPO, env=env_m, capture_output=True, text=True)
+            adopt_rc = p_m.returncode
+            adopt_note = next((ln for ln in p_m.stdout.splitlines() if ln.startswith("note session plan: ")), "")
+            adopt_sees_probe = probe_path in p_m.stdout
+        finally:
+            # CRASH-SAFE (C6): the first instrumented probe crashed and left next-index-<pid>.lock IN THE GIT
+            # DIR - a control that leaks an index into the git dir is itself the defect it exists to catch, so
+            # the cleanup is not on the happy path and the leak is asserted GONE rather than assumed.
+            if os.path.exists(minted_idx):
+                os.unlink(minted_idx)
+            adopt_clean = not os.path.exists(minted_idx)
+    controls.append((
+        "BUG-569: run with NO --index-file at a REAL minted ambient index, the rail PRINTS the ADOPTED note "
+        "naming THAT path and AUDITS it (the wiring the pre-commit hook depends on)",
+        bool(minted) and bool(blob) and adopt_note.startswith("note session plan: " + git_subject.NOTE_ADOPTED)
+        and minted_idx in adopt_note and adopt_rc == 1 and adopt_sees_probe and adopt_clean
+        and probe_before == _staged_count_raw()))
     for _f in (idx_a, idx_b, plan_plain, plan_permit):
         if os.path.exists(_f):
             os.unlink(_f)

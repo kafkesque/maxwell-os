@@ -7789,3 +7789,22 @@ MEASURED: governance/buglog.md carried TWO `**BUG-493 STATUS (2026-09-26, CLOSED
 MEASURED: line 3 declared '(651 decisions)' against a census of 822 - a second home for a derived fact, unfalsifiable where it sat, and not repairable by an append (it is line 3 of an append_only file). FIX: REWRITE-HEADER - the header names `config/decisions_summary.json` (the ONE home) and states no count; config/decisions_policy.yaml#log_header declares the rule and scripts/check_decision_membership.py#header_problems() FAILS on a restatement (2 controls both directions, 1 mutation).
 ## BUG-583 (FIXED, LOW, D-2692, DECLARE): 5 of 822 decision records spelled the state 'active' while 515 spelled it 'ACTIVE'
 MEASURED: `active` 3 bare + 2 quoted = 5 records, both spellings of ONE state; canonical_state() upper-cases, so the CENSUS was right while the BYTES carried two forms - invisible to every rail and fatal to a consumer comparing state strings exactly. FIX (DECLARE limb of the filed remedy, the limb that needs no non-append write): config/decisions_policy.yaml#state_vocabulary declares the rule and pins the 5 ids BY IDENTITY (shrink-only); scripts/recompute_decision_summary.py#spelling_problems() - live through --check via registry_shape_problems() - FAILS on a non-canonical spelling that is NOT pinned AND on a pin that no longer describes anything (2 controls, 1 mutation). CANONICALISE (the rewrite limb) stays open and owner-gated: config/decisions.yaml is append_only with a PREFIX receipt, so rewriting 5 cells needs the writer's own structural path and a refreshed receipt (D-2655).
+
+## BUG-569 (CLOSED, LOW, D-2695): the adoption NOTE has no RAIL-LEVEL control at a real partial commit
+MEASURED 2026-09-27: the rule's controls lived in scripts/lib/git_subject.py --selftest (13/13, both directions,
+incl. a live minted name) while the WIRING was unproven - that a rail, run the way the pre-commit hook runs it
+(an ambient GIT_INDEX_FILE at a name git really mints, no --index-file), PRINTS the ADOPTED note, NAMES that
+index and AUDITS it. FIX: scripts/check_session_plan.py --selftest gains that control (24/24 controls fire) and
+config/rail_mutations.yaml gains `the_adopted_index_note_is_load_bearing` (floor 29 -> 30), so the wiring is now
+MUTATION-SEEN: with the note suppressed the suite goes 24/24 rc 0 -> 23/24 rc 1 with this control the SINGLE
+red and the adoption itself untouched (a mutation that removed the adoption would red the BUG-527 refusal
+control as well, and a differential that moves two controls proves neither). INSTRUMENTATION (temp/b569_probe.py,
+run before the control was written): an index built from `read-tree --empty` makes the rail refuse at the
+BUG-528 family check (rc=2 over 1314 deletions) and NEVER name the probe path, so the audited-bytes limb can
+only be satisfied by the `read-tree HEAD` + one-added-path shape - the earlier attempt that used --empty failed
+its own baseline for exactly that reason. The probe is SYNTHETIC-plan and SYNTHETIC-index: rc=1 is a fact about
+the AUDITED SET, never about the live plan's current contents, and the real index is asserted untouched. Two
+further defects were found by the instrumentation and fixed in the same change: a crashing probe LEFT
+next-index-<pid>.lock IN THE GIT DIR (now a try/finally cleanup that is itself asserted), and the control's own
+anti-vacuity guard (a harness that cannot mint a name, or a blob that does not resolve, FAILS the control rather
+than passing it).

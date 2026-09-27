@@ -10037,3 +10037,51 @@ decisions:
   - MASTER-TASK-REGISTER.md
   - DECISION-LOG.md
   - governance/CONTEXT_INDEX.md
+- id: D-2695
+  date: '2026-09-27'
+  state: ACTIVE
+  category: governance
+  title: 'THE ADOPTION IS A RAIL-LEVEL RULE: the ADOPTED note is MUTATION-SEEN at a REAL minted index (floor 29
+    -> 30, BUG-569 drained)'
+  decision: 'BUG-569 recorded the gap precisely: the rule''s controls lived in scripts/lib/git_subject.py --selftest,
+    while nothing proved the WIRING - that a rail, run the way the pre-commit hook runs it (an ambient GIT_INDEX_FILE
+    at a name git really mints, no --index-file), PRINTS the ADOPTED note, NAMES that index and AUDITS it. D-2676
+    limb (iv) is owed on that wiring, so scripts/check_session_plan.py --selftest gains the rail-level control (24/24
+    controls fire) and config/rail_mutations.yaml gains the entry `the_adopted_index_note_is_load_bearing` with
+    the coverage FLOOR 29 -> 30. The floor is SHRINK-ONLY, so raising it is a decision with a diff a human reads.
+    BUG-569 is CLOSED by this change; the META-LANE-FREEZE-1 exit clause nothing_still_held now reads 2 still parked
+    (BUG-568, BUG-559) instead of 3 - draining a HELD bug is the window''s EXIT, not a breach of it (config/freeze_window.yaml#not_frozen).'
+  measured: 'MEASURED 2026-09-27, instrumentation FIRST (temp/b569_probe.py, before any control was written). THE
+    PREVIOUS ATTEMPT FAILED ITS OWN BASELINE and the cause was structural, not a typo: with the probe index built
+    from `read-tree --empty` the rail refuses at the BUG-528 family check (rc=2, 1314 HEAD paths reading as deletions)
+    and NEVER NAMES the probe path, so the control''s audited-bytes limb was unsatisfiable; with `read-tree HEAD`
+    + ONE added path the diff is exactly 1 path, rc=1, and the probe path IS named. The note was always correct
+    and carries the FULL realpath of the minted index. THE CONTROL: minted name measured live (next-index-<pid>.lock),
+    SYNTHETIC plan (may_touch: []) so rc=1 is a fact about the AUDITED SET and not about the live plan, ambient
+    GIT_INDEX_FILE and NO --index-file so the adoption branch is the one exercised; both limbs asserted (note NAMES
+    the index; the index''s bytes ARE what was audited), plus an anti-vacuity guard (a harness that cannot mint
+    a name, or a blob that does not resolve, FAILS the control) and a control-on-the- control (the real index count
+    is unchanged). TWO FURTHER DEFECTS were found by the instrumentation and fixed in the same change: a crashing
+    probe LEFT next-index-<pid>.lock IN THE GIT DIR (now try/finally, with the absence asserted rather than assumed),
+    and the earlier driver SELF-REPORTED a landing while its baseline read 23/24 - a driver must paste the baseline
+    output before it may claim a landing. THE TEETH (measured, then restored byte-identical): baseline 24/24 rc
+    0 -> mutated 23/24 rc 1 with this control the SINGLE red (the adoption itself untouched, so the BUG-527 refusal
+    control stays green - a mutation that removed the adoption would move two controls and prove neither), declared
+    marker ABSENT in the baseline. THE GATE on a real fixture: 29 declared rule(s) SEEN to red through their own
+    control + 1 negative control green = 30 entries, floor 30, rc 0. REGISTER: buglog 463 block(s) 0 copies, register
+    equals its re-derivation, OPEN 129 / CLOSED 199.'
+  bugs:
+  - BUG-569
+  files:
+  - scripts/check_session_plan.py
+  - temp/b569_probe.py
+  - config/rail_mutations.yaml
+  - governance/buglog.md
+  - governance/bug_status.json
+  - governance/bug_status.md
+  - config/decisions.yaml
+  - config/decisions_summary.json
+  - MASTER-TASK-REGISTER.md
+  - DECISION-LOG.md
+  - governance/CONTEXT_INDEX.md
+  - agent/session_seed.yaml

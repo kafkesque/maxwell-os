@@ -1357,3 +1357,11 @@ window (the drain now stands at 3 held, exit still UNMET); PROMOTE/HOLD the stan
 - `config/rail_mutations.yaml#coverage.min_mutations` is 29 (was 28 at D-2693); the new entry is `the_canonicalisation_licence_is_load_bearing` (subject: the `extra` clause of `scripts/recompute_decision_summary.py#splice_problems`), so the D-2693 route's licence - "no cell moved that the pin did not NAME" - can now be SEEN to fail.
 - The owed D-2676 limb (iv) for the D-2693 rule is PAID. Nothing else moved: register OPEN 130 / CLOSED 198; registry 824 -> 825 records, stamp 7e3d49ee7c5846aa, census source_sha256 325fd899e0e80994.
 - The mutation FLOOR is SHRINK-ONLY: any earlier "floor 28" in this index is a DATED MEASUREMENT, not a current value.
+
+
+## D-2695 (2026-09-27) - the ADOPTION is a RAIL-LEVEL rule: the ADOPTED note is MUTATION-SEEN at a REAL minted index (floor 29 -> 30); SUPERSEDES every earlier statement of the mutation FLOOR in this index
+
+`config/rail_mutations.yaml#coverage.min_mutations` is now **30** (was 29; D-2694 said 29, D-2693 and earlier said
+28). The floor is SHRINK-ONLY: RAISING it is a decision with a diff a human reads. BUG-569 is CLOSED and
+META-LANE-FREEZE-1 reads **still OPEN 2** (BUG-568, BUG-559) - draining a HELD bug is the window's EXIT. Stamps:
+config/decisions.yaml 826 records, stamp `995142daf2c3bafa`; census `6c3a03c2c3aa7f61`; register OPEN 129 / CLOSED 199.

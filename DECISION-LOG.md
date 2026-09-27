@@ -1359,3 +1359,30 @@ NOT DONE, DECLARED: BUG-583's CANONICALISE limb (the five cells) is owner-gated;
 - MEASURED: PROBE first, on the LIVE tree - `extra` neutered gives rc 1 through EXACTLY ONE of the runner's 18 controls while the ACCEPTING control (a pinned-cell-only splice is legitimate) stays green, so the differential isolates the read rather than a crash. Then the GATE on a real fixture: 28 declared rule(s) SEEN to red + 1 negative control green = 29 entries, floor 29 == 29 declared, 18/13 declared subject(s) covered, rc 0; gate selftest 19/19; runner baseline GREEN.
 - REPAIRED in the same human-read diff: the floor line carried its own comment TWICE (`FLOOR (shrink guard)` 2 time(s), now 1). A duplicated COMMENT restates no value a reader derives, so it is BLOAT rather than a defect and no block was filed (C19).
 - NO receipt re-baseline is owed: this change APPENDS to config/decisions.yaml, and an append leaves the declared PREFIX receipt re-derivable. The second commit of D-2693 exists because a SPLICE moves bytes INSIDE the receipted region - the case this one is not.
+
+
+## D-2695 (2026-09-27) - the ADOPTION is a RAIL-LEVEL rule: the ADOPTED note is MUTATION-SEEN at a REAL minted index (floor 29 -> 30, BUG-569 DRAINED)
+
+BUG-569 was exact: the rule's controls lived in `scripts/lib/git_subject.py --selftest` (13/13) while NOTHING
+proved the WIRING - that a rail, run the way the pre-commit hook runs it (an ambient `GIT_INDEX_FILE` at a name
+git really mints, NO `--index-file`), PRINTS the ADOPTED note, NAMES that index and AUDITS it. D-2676 limb (iv)
+is owed on that wiring, so `scripts/check_session_plan.py --selftest` gains the rail-level control (24/24
+controls fire) and `config/rail_mutations.yaml` gains `the_adopted_index_note_is_load_bearing` (floor 29 -> 30;
+SHRINK-ONLY, so RAISING it is a decision with a diff a human reads).
+
+MEASURED, instrumentation first (the whole reason the first attempt failed): with the probe index built from
+`read-tree --empty` the rail refuses at the BUG-528 family check (rc=2 over 1314 deletions) and NEVER names the
+probe path - the audited-bytes limb was UNSATISFIABLE, not flaky; with `read-tree HEAD` + ONE added path it is
+rc=1 and the probe path IS named. Teeth: baseline 24/24 rc 0 -> mutated 23/24 rc 1 with this control the SINGLE
+red (the adoption itself untouched, so the BUG-527 control stays green - a mutation that removed the adoption
+would move two controls and prove neither), marker ABSENT in the baseline, restored byte-identical. Gate: 29
+declared rule(s) SEEN to red + 1 negative = 30, floor 30, rc 0. Two further defects fixed in the same change: a
+crashing probe LEFT `next-index-<pid>.lock` IN THE GIT DIR (try/finally, absence asserted), and the previous
+driver SELF-REPORTED a landing while its baseline read 23/24 - a driver must paste the baseline before claiming
+a landing.
+
+REGISTER: buglog 463 block(s), 0 copies; register equals its re-derivation; OPEN 129 / CLOSED 199 of 328 (was
+130/198). FREEZE: META-LANE-FREEZE-1 `nothing_still_held` now reads **2 still parked** (BUG-568, BUG-559) - draining
+a HELD bug is the window's EXIT, not a breach of it (`config/freeze_window.yaml#not_frozen`).
+STAMPS: config/decisions.yaml 826 records, stamp `995142daf2c3bafa`; census `6c3a03c2c3aa7f61`.
+

@@ -841,3 +841,29 @@ sidecars; the Tier3 boundary corpus; F-14 (gated on G2).
 - REGISTER: OPEN 130 / CLOSED 198 (no bug filed by this change). Registry 824 -> 825 records, stamp 7e3d49ee7c5846aa, census source_sha256 325fd899e0e80994.
 - NEXT CONSEQUENTIAL: (1) drain the LAST 3 HELD ids - BUG-569 (the adoption NOTE has no rail-level control at a real partial commit) -> BUG-568 (RAIL 0 does not pin its own git subject) -> BUG-559 (a receipt cut over bytes joined to NO revision) - which is what takes the freeze window's exit to MET; (2) agent/session_seed.yaml `registry: decisions` dated-snapshot rename treatment (D-2691); (3) the declared home for the leak scan (owed since D-2686); (4) product lane: extraction_type is the one axis of five with no anchor, no verifier, no consumer.
 - OWNER WORDS OWED (recommendations recorded in the session report): CLOSE the freeze window ONLY after the drain; HOLD the standing-rule CONSTITUTION promotion (POINTER only); HOLD BUG-431.
+
+
+## D-2695 (2026-09-27) - the ADOPTION is a RAIL-LEVEL rule: the ADOPTED note is MUTATION-SEEN at a REAL minted index (floor 29 -> 30, BUG-569 DRAINED)
+
+DONE: `scripts/check_session_plan.py` gains the rail-level adoption control (ambient minted index, NO
+`--index-file`, synthetic plan, both limbs + anti-vacuity + control-on-the-control + crash-safe cleanup);
+`config/rail_mutations.yaml` gains `the_adopted_index_note_is_load_bearing`, floor 29 -> 30; BUG-569 CLOSED in the
+register; D-2695 minted (826 records, stamp `995142daf2c3bafa`); gov sync landed.
+
+MEASURED: baseline 24/24 rc 0 -> mutated 23/24 rc 1, this control the SINGLE red; gate rc 0 with 29 red SEEN +
+1 negative = 30, floor 30; buglog 463 blocks 0 copies; register == re-derivation; OPEN 129 / CLOSED 199.
+
+REGISTER OPEN 129 / CLOSED 199 (was 130 / 198).
+
+NEXT CONSEQUENTIAL (in order, all inside the open freeze window as DRAIN, not as new machinery):
+  1. BUG-568 - RAIL 0 does not pin its own git subject (same class, one rail over).
+  2. BUG-559 - a receipt can be cut over bytes joined to NO revision.
+     Draining BOTH takes `nothing_still_held` to MET, which makes the owner's one-word CLOSE due (review_by
+     2026-10-11).
+  3. agent/session_seed.yaml `registry.decisions: 639` is a DATED SNAPSHOT (stale by ~187) -> D-2691 rename
+     treatment; `highest_bug: BUG-301` is likewise stale.
+  4. The leak scan's DECLARED HOME (owed since D-2686): hoist `temp/scan_fixture_leaks.py` into a declared
+     rehearsal with its four limbs, or a dormant registry entry with a real exercised_by path.
+  5. PRODUCT LANE: extraction_type is the ONE axis of five with no anchor (0/251), no verifier (F-15), no
+     consumer; BUG-431's PROMOTE is step 1 (owner word owed).
+

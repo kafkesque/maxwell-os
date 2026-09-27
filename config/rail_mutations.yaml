@@ -34,7 +34,7 @@ fixture:
   keep: false
   timeout_seconds: 600
 coverage:
-  min_mutations: 29            # FLOOR (shrink guard): deleting an entry means editing the floor in a diff a human reads
+  min_mutations: 30            # FLOOR (shrink guard): deleting an entry means editing the floor in a diff a human reads
   # D-2679: the coverage set is DERIVED, never restated. Which rails gate a COMMIT is one fact and it already has
   # ONE home (config/rail_registry.yaml#commit_boundary), so restating it here would be a SECOND HOME - and two
   # lists of one fact drift, and only one of them can be right. scripts/check_rail_mutations.py joins the two and
@@ -578,3 +578,26 @@ mutations:
       With the `extra` read neutered, splice_problems() returns [] for a registry whose unpinned record moved a
       state; the fault that NAMES that move stops firing while the accepting control still passes, so the red is
       the read failing and not a crash (D-2676 iv).
+
+  # D-2695 (BUG-569): the ADOPTION is a RAIL-level rule, not a property of its one home. MEASURED 2026-09-27 while
+  # instrumenting the control (temp/b569_probe.py): the rail run with NO --index-file at an ambient minted name
+  # PRINTS the ADOPTED note naming that path and AUDITS that index (rc=1 over the one probe path). The mutant
+  # below removes the NOTE only - the adoption itself is untouched, so exactly ONE control flips: a mutation that
+  # removed the adoption would red the BUG-527 refusal control as well, and a differential that moves two
+  # controls proves neither.
+  - id: the_adopted_index_note_is_load_bearing
+    subject: scripts/check_session_plan.py
+    op: replace
+    find: '    if adoption:'
+    replace: '    if False:  # MUTATION (D-2676): the ADOPTED note stops being printed'
+    runner: scripts/check_session_plan.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: '  FAIL BUG-569: run with NO --index-file at a REAL minted ambient index, the rail PRINTS the ADOPTED note naming THAT path and AUDITS it (the wiring the pre-commit hook depends on)'
+    why: >-
+      BUG-569: the ADOPTED note is the ONLY thing that tells a human or a log WHICH index was audited, and the
+      note and the audited subject diverging is BUG-567 - so the wiring that prints it is load-bearing, not
+      cosmetic. With the note suppressed the rail still adopts and still reads the minted index (rc stays 1 and
+      the probe path is still named), so the red isolates the PRINT: measured baseline 24/24 rc 0 -> mutated
+      23/24 rc 1 with this control the single FAIL, restored byte-identical (D-2676 iv).

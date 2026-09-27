@@ -1112,3 +1112,20 @@ permanent, and it did not consult the pin. `just health` was NOT run between 12:
 | WHICH provenance a printed note names (`own_index` at a normal commit, `adopted` at a partial one) | `scripts/lib/git_subject.py#NOTE_MARKERS` + `note_kind()` | **D-2675 / D-2646** (ONE home; the rehearsal READS it and never restates it) |
 | **SUPERSEDES the claim that a synthetic fixture proves a rule about the ambient hook environment**: 13/13 git-subject controls were GREEN while 100 percent of commits in this repository were REFUSED (BUG-574) | `scripts/check_boundary_rehearsal.py` | **D-2675** (the mirror of BUG-492: a control never seen to FAIL is not a control; a boundary never seen to ACCEPT a legitimate commit is not a boundary) |
 | **OPEN DEBT (declared, not papered over): BUG-576** - a FRESH repository cannot make its FIRST commit: RAIL 0 reads an UNBORN HEAD as broken metadata, which is exactly the state the BUG-400/BUG-564 RECOVERY route produces | `config/boundary_rehearsal.yaml#declared_debt` + `#temp.bootstrap` | **BUG-576, OPEN**: the rehearsal re-measures it every run, and a PAID debt returns 2 OWNER-OWED so the declaration must be WITHDRAWN |
+
+## THE STANDING RULE (D-2676, 2026-09-27) - mechanical, not prose
+
+WHERE: `config/rail_mutations.yaml` (the ONE home of every declared mutation, authority D-2676) and
+`scripts/check_rail_mutations.py` (the gate), wired into `just health` (--selftest + tri-state exit 0/1/2).
+WHAT IT SETTLES FOR A READER RESUMING HERE: (i) ONE HOME for a rule, (ii) a SEEN boundary control, (iii) a NAMED
+oracle, (iv) a MUTATION that REDs that oracle. (iv) is the element that had no rail, so a rule could pass every
+check here without anyone showing it CAN FAIL - the class behind BUG-527/566/568/569/574.
+HOW TO USE IT: a new rule is not landed until it has an entry in `config/rail_mutations.yaml` whose declared
+control has been SEEN to go red through its own marker. `coverage.required_subjects` joins BOTH directions
+(D-405). A run that takes longer than `budget.max_seconds_per_runner` is OWNER-OWED (2), never fatal (BUG-457).
+SUPERSEDED CLAIMS: none - it ADDS a rail; the mutation FLOOR (`coverage.min_mutations`) is SHRINK-ONLY and may
+only be lowered inside a diff a human reads.
+OWED / NEXT (2026-09-27): BUG-576 is its FIRST APPLICATION (RAIL 0 must tell an UNBORN HEAD from broken metadata, and
+the declared --no-verify bootstrap in `config/boundary_rehearsal.yaml` must then be WITHDRAWN); BUG-577 owns the
+one-home debt this audit found (`outside_tree` restated in two rails); `coverage.required_subjects` still names
+only 2 rails. LANDED IN COMMIT 1c42f75 with D-2675.

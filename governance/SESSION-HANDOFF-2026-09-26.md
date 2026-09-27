@@ -635,3 +635,15 @@ rc=0, only a `hint:`); `core.hooksPath` points git at a file the declaration nev
 MEASURED: `--selftest` 14/14; live `--check` rc=0; `install_git_hooks.sh --check` rc=0; mutation gate rc=0 (18
 rules red, floor 19); ladder 94 line(s), 0 fault(s), 227.7s.
 OWED: BUG-585; the leak scan has no declared home; the freeze WINDOW + written EXIT; BUG-584/572/583 behind it.
+
+## 2026-09-27 (later) - D-2688 LANDED: A FREEZE IS A WINDOW, AND A WINDOW ENDS BY ITS OWN TERMS (BUG-586 FIXED)
+config/freeze_window.yaml is the ONE home of the META-LANE FREEZE and scripts/check_freeze_window.py the ONE
+reader (justfile:health). The freeze was asserted in ~15 prose homes and read by NO machine, so it could not fail,
+declared no exit and counted nothing - BUG-586, FILED and FIXED here. rc 2 = OWNER-OWED (exit MET -> close it;
+horizon passed -> re-rule it), LOUD, NOT fatal (BUG-457).
+MEASURED: selftest 15/15; live rc=0 (parked 8, still OPEN 8 of ceiling 8; exit MET: opening_set_closed; exit
+UNMET: nothing_still_held); mutation gate rc=0 (19 rules red incl. freeze_window_exit_is_load_bearing, floor 20);
+registry rc=0 (guards tri_state + fatal pinned); consumer join 6 homes / 8 edges; ladder 96 line(s), 0 fault(s),
+260.9s; R5 (gemma-4-E4B-it-MLX-4bit): APPROVE.
+OWED (owner): CLOSE or RE-RULE the window when rc 2 appears. NEXT: BUG-585 through the DRAIN PATH (`released:`) -
+the mechanism's first real test; the leak scan's declared home; BUG-584, BUG-572, BUG-583.

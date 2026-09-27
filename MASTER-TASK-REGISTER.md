@@ -611,7 +611,7 @@ RISK NOTE (now retired): before fe239df a worktree clean destroyed BOTH copies o
 - [ ] NEXT (meta, in order - the freeze target): BUG-577 (ONE home scripts/lib/fixture.py#outside_tree), then
       BUG-575 (supersession completeness: 24 pinned legacy_debt_ids), then BUG-571 (the cited-by-decision join;
       BUG-492 cited 32x is its live case).
-- [ ] META-LANE FREEZE (recommended, needs one owner word): from D-2680 forward, the governance machinery is
+- [x] META-LANE FREEZE RULED 2026-09-27 (D-2688): ONE HOME `config/freeze_window.yaml`; POINTER ONLY, never a restatement (D-2688): from D-2680 forward, the governance machinery is
       touched ONLY to close a bug already registered - a NEW governance bug may be filed but NOT worked until the
       three named bugs above are closed and the product lane has produced a build artifact. Rationale MEASURED:
       ~37 of the last 40 filed bugs are about the machinery itself.
@@ -718,3 +718,17 @@ RISK NOTE (now retired): before fe239df a worktree clean destroyed BOTH copies o
 - [x] SEEN (no cascade): whole ladder 94 line(s) RUN, 0 fault(s), 227.7s, rc 0.
 - [ ] OWED: BUG-585 (session_seed states open_bugs_n twice) and the freeze WINDOW/exit declaration.
 - [ ] NEXT: the leak scan's declared home, then BUG-584, BUG-572, BUG-583.
+
+## D-2688 - A FREEZE IS A WINDOW, AND A WINDOW ENDS BY ITS OWN TERMS (2026-09-27) - BUG-586 FIXED
+- [x] ONE HOME: `config/freeze_window.yaml` (META-LANE-FREEZE-1) - the parked set pinned BY IDENTITY, `max_held` 8,
+      `released {}` (the DRAIN PATH), a WRITTEN exit and `review_by 2026-10-11`.
+- [x] ONE READER: `scripts/check_freeze_window.py` in `justfile:health` (--selftest fatal + live tri_state). It reads
+      the DERIVED `governance/bug_status.json` - never a second parser of the log (D-2646).
+- [x] ORACLE: 15 named controls; live rc=0 (parked 8, still OPEN 8 of ceiling 8; exit MET: opening_set_closed).
+- [x] MUTATION: `freeze_window_exit_is_load_bearing`, floor 19 -> 20; the registry pins BOTH guards; the consumer
+      join declares the window's single reader (6 homes / 8 edges, BUG-562 shape refused at the boundary).
+- [x] SEEN: ladder 96 line(s) RUN, 0 fault(s), 260.9s, rc 0. R5 review (gemma-4-E4B-it-MLX-4bit): APPROVE.
+- [x] RULED: the META-LANE FREEZE is retired as a RECOMMENDATION - it is a declared window with a reader.
+- [ ] OWED (owner): CLOSE the window the moment rc 2 says its exit is MET, or RE-RULE it when review_by passes.
+- [ ] NEXT: BUG-585 through the DRAIN PATH (`released:`) - the mechanism's first real test; then the leak scan's
+      declared home; then BUG-584, BUG-572, BUG-583.

@@ -1191,3 +1191,48 @@ executable, holding every line; `install_git_hooks.sh --check` rc=0 (byte-identi
 unset, so the route is a no-op change for THIS repo and a real one for a clone, a worktree, or a global config);
 `check_rail_mutations.py` rc=0 - 18 rules SEEN to red, 1 negative control green, 13/11 subjects covered; the whole
 ladder 94 lines, 0 faults, 227.7s.
+
+
+D-2688 (2026-09-27) - A FREEZE IS A WINDOW, AND A WINDOW ENDS BY ITS OWN TERMS (BUG-586 FIXED)
+BUG-586. MEASURED BEFORE: the META-LANE FREEZE was asserted in ~15 prose homes (MASTER-TASK-REGISTER.md,
+governance/SESSION-HANDOFF-2026-09-26.md, governance/buglog.md, governance/CONTEXT_INDEX.md) and in NO file a
+machine could read. A freeze is the one governance act that takes effect by being BELIEVED, so it failed three
+ways at once: NOTHING READ IT ("held behind the freeze" is a claim about work NOT done, so it can never fail -
+BUG-492 one level up), IT HAD NO EXIT (an unwritten exit makes a WINDOW indistinguishable from a POLICY, and a
+policy has no horizon: the D-337 permanent-freeze trap), and IT COUNTED NOTHING (the parked set could grow for
+ever, so "we are frozen" and "we are stuck" print the same way).
+
+ONE HOME, ONE READER. config/freeze_window.yaml declares window META-LANE-FREEZE-1: the parked set pinned BY
+IDENTITY, max_held 8 (raising it is a one-line diff in the SAME change that parks a bug), released {} (the DRAIN
+PATH - a ruling recorded where its reader is), a WRITTEN exit and review_by 2026-10-11. scripts/check_freeze_window.py
+is the ONE reader, wired into justfile:health as --selftest (fatal) plus the live verdict (tri_state). It reads the
+DERIVED register governance/bug_status.json and never re-parses the log: "which bugs are open" already has ONE home
+(scripts/bug_status.py, certified by scripts/check_bug_status.py), so a second parser would be the D-2646 two-homes
+defect. THE EXIT-CODE CONTRACT: 0 = open, exit UNMET, inside the horizon (normal); 1 = FAULT (a parked id the
+register does not carry, a parked set past its ceiling, a release about nothing, a closed window with an unmet exit,
+a malformed declaration); 2 = OWNER-OWED, LOUD, NOT fatal (BUG-457) - the exit is MET (CLOSE it) or the horizon
+passed (RE-RULE it), because renewing a window by default is how a window becomes a policy.
+
+FOUR LIMBS (D-2676). (i) ONE HOME: config/freeze_window.yaml. (ii) SEEN: both rails run BY the ladder. (iii) NAMED
+ORACLE: 15 known-answer controls, every fault printed by clause name; live rc=0 (parked 8, still OPEN 8 of ceiling
+8; exit MET: opening_set_closed; exit UNMET: nothing_still_held). (iv) MUTATION: freeze_window_exit_is_load_bearing -
+the drain condition reduced to a no-op means a window whose parked set is EMPTY can never be seen to be DUE TO
+CLOSE, and the named control goes RED through its own marker; floor 19 -> 20.
+
+THE FORENSIC AUDIT FIRED ON THE CHANGE ITSELF. (1) The clause table applied a per-clause subject rule to BOTH clause
+shapes, so nothing_still_held - whose subject is window.held - read as "a clause with no subject" and the newly
+wired ladder line went rc=1 on day 0; the rule is now keyed by CLAUSE SHAPE. (2) With that fixed, THREE controls
+still failed, and they had been RED FOR THE WRONG REASON, masked by (1): the synthetic register fixture conflated
+"the ids the window NAMES" with "the ids the register carries as OPEN", so three controls could NEVER have passed.
+A control that cannot pass, read as "the code is wrong", is the BUG-492 class aimed at the oracle. (3) TWO GAPS
+closed while auditing: a malformed declaration produced a traceback instead of a NAMED fault (shape_faults: C16 says
+fail closed, not fail ugly) and a criterion carrying a key no reader reads was silently ignored (now faulted,
+D-405). (4) TWO HOMES JOINED: the registry pins both guards (tri_state + fatal) so the day someone writes || exit 1
+the ladder cannot silently turn "the window is due to CLOSE" into a broken build, and
+config/declaration_consumers.yaml declares the window's single reader, so the BUG-562 shape (declaration staged,
+reader withheld) is refused at the commit boundary.
+
+MEASURED AFTER: selftest 15/15; live rc=0; registry rc=0 (95 ladder invocations, 63 rails); consumer join rc=0 (6
+declared homes, 8 edges); mutation gate rc=0 (19 rules SEEN to red, 1 negative control green); ladder 96 line(s)
+RUN, 0 fault(s), 260.9s; R5 review by gemma-4-E4B-it-MLX-4bit: VERDICT APPROVE. Register: OPEN 134 / CLOSED 190 of
+324. session_seed.open_bugs_n stays DERIVED at 134 (no bug opened or closed against the OPEN count).

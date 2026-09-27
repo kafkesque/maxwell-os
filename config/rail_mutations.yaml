@@ -30,7 +30,7 @@ fixture:
   keep: false
   timeout_seconds: 600
 coverage:
-  min_mutations: 19            # FLOOR (shrink guard): deleting an entry means editing the floor in a diff a human reads
+  min_mutations: 20            # FLOOR (shrink guard): deleting an entry means editing the floor in a diff a human reads
   # D-2679: the coverage set is DERIVED, never restated. Which rails gate a COMMIT is one fact and it already has
   # ONE home (config/rail_registry.yaml#commit_boundary), so restating it here would be a SECOND HOME - and two
   # lists of one fact drift, and only one of them can be right. scripts/check_rail_mutations.py joins the two and
@@ -60,6 +60,7 @@ coverage:
     - scripts/run_ladder.py
     - scripts/lib/fixture.py
     - scripts/reconcile.py
+    - scripts/check_freeze_window.py
     - scripts/verify_recalibration_pins.py
 budget:
   max_seconds_per_runner: 120 # a slower runner has an UNCONTROLLED INPUT (class iii of D-2665) -> OWNER-OWED, loud
@@ -370,3 +371,20 @@ mutations:
       the four rails run, and the only sign is a `hint:` git documents how to suppress. With the executability
       limb reduced to a no-op the rail calls a hook that cannot run a verified boundary, and the named control goes
       RED through its own marker (D-2676(iv)). The entry FAILS if that line is renamed or re-shaped.
+
+  - id: freeze_window_exit_is_load_bearing
+    subject: scripts/check_freeze_window.py
+    op: replace
+    find: '            if not held_open:'
+    replace: '            if False:  # MUTATION (D-2676): a window whose exit can never be MET is a POLICY'
+    runner: scripts/check_freeze_window.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: 'FAIL selftest/exit_is_met_when_every_clause_is_satisfied'
+    why: >-
+      D-2688: MEASURED 2026-09-27 - the META-LANE FREEZE was asserted in fifteen prose homes and existed in NO
+      file a machine could read, so it could not fail, declared no exit (an unwritten exit makes a WINDOW a
+      POLICY, the D-337 trap) and counted nothing. With the drain condition reduced to a no-op, a window whose
+      parked set is empty can never be seen to be DUE TO CLOSE, and the named control goes RED through its own
+      marker (D-2676(iv)). The entry FAILS if that line is renamed or re-shaped.

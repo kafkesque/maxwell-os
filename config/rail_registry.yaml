@@ -57,6 +57,11 @@ writers:
 #: entry that disagrees with the ladder is class (ii) and fails CLOSED. fatal = `|| exit 1`; tri_state =
 #: `|| [ $? -eq 2 ]` (2 is owner-owed: loud, NOT fatal, BUG-457); report_only = `--report-only`.
 guards:
+  #: D-2688: the freeze window's EXIT is settled by rc 2 (owner-owed, LOUD, not fatal, BUG-457). Pinned here so that
+  #: the day someone writes `|| exit 1` - or drops the guard - the registry calls it class (ii) instead of letting
+  #: the ladder silently turn "the window is due to CLOSE" into a broken build.
+  scripts/check_freeze_window.py: tri_state
+  scripts/check_freeze_window.py --selftest: fatal
   scripts/build_archive_index.py --check: fatal
   scripts/build_archive_index.py --selftest: fatal
   scripts/recompute_decision_summary.py --check: fatal

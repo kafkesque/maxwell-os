@@ -9720,3 +9720,56 @@ decisions:
   - governance/CONTEXT_INDEX.md
   - governance/SESSION-HANDOFF-2026-09-26.md
   - agent/session_seed.yaml
+- id: D-2688
+  date: 2026-09-27
+  state: ACTIVE
+  category: governance
+  title: A FREEZE IS A WINDOW, AND A WINDOW ENDS BY ITS OWN TERMS (the META-LANE FREEZE gets a home and a reader)
+  decision: 'config/freeze_window.yaml is the ONE home of the META-LANE FREEZE (window META-LANE-FREEZE-1: the parked
+    set pinned BY IDENTITY, a max_held ceiling, a released ruling map, a written EXIT and a review_by horizon);
+    scripts/check_freeze_window.py is the ONE reader, wired into justfile:health as --selftest (fatal) plus the
+    live verdict (tri_state: rc 2 = OWNER-OWED, loud, NOT fatal, BUG-457). It reads the DERIVED register governance/bug_status.json
+    and never re-parses the log: "which bugs are open" already has ONE home (scripts/bug_status.py, certified by
+    scripts/check_bug_status.py), so a second parser here would be the D-2646 two-homes defect. A freeze is the
+    one governance act that takes effect by being BELIEVED, so it was pure prose by construction; it failed three
+    ways at once - NOTHING READ IT ("held behind the freeze" is a claim about work NOT done, so it can never fail:
+    BUG-492 one level up), IT HAD NO EXIT (an unwritten exit makes a WINDOW indistinguishable from a POLICY, and
+    a policy has no horizon: the D-337 permanent-freeze trap), and IT COUNTED NOTHING (the parked set could grow
+    for ever, so "we are frozen" and "we are stuck" print the same way).'
+  measured: 'BUG-586. MEASURED 2026-09-27 BEFORE: grep found the freeze asserted in ~15 prose homes (MASTER-TASK-REGISTER.md,
+    governance/SESSION-HANDOFF-2026-09-26.md, governance/buglog.md, governance/CONTEXT_INDEX.md) and in NO file
+    a machine could read. AFTER: selftest 15/15 known-answer controls; live verdict rc=0 (exit MET: opening_set_closed;
+    exit UNMET: nothing_still_held, 8 still parked of ceiling 8); mutation gate rc=0 - 19 rules SEEN to red including
+    freeze_window_exit_is_load_bearing, floor 19 -> 20; rail registry rc=0 with BOTH guards pinned (scripts/check_freeze_window.py
+    = tri_state, --selftest = fatal); consumer join rc=0 (6 declared homes, 8 edges); ladder 96 line(s) RUN, 0 fault(s),
+    260.9s; R5 review by gemma-4-E4B-it-MLX-4bit: VERDICT APPROVE. THE FORENSIC AUDIT FIRED ON THIS CHANGE ITSELF:
+    (1) get the clause table right - window_faults applied a per-clause subject rule to BOTH clause shapes, so nothing_still_held,
+    whose subject is window.held, read as "a clause with no subject" and the newly wired ladder line went rc=1;
+    the rule is now keyed by CLAUSE SHAPE (VALID_CLAUSES[cid] is None means the subject is window.held, validated
+    where held is validated); (2) with that fixed three controls STILL failed, and they had been RED for the WRONG
+    reason, masked by (1) - the synthetic register fixture conflated "the ids the window NAMES" with "the ids the
+    register carries as OPEN", so three controls could never have passed; the fixture now mirrors the MEASURED live
+    day-0 shape (held_open). A control that cannot pass, read as "the code is wrong", is the BUG-492 class aimed
+    at the oracle; (3) TWO GAPS closed while auditing - a malformed declaration produced a traceback instead of
+    a NAMED fault (shape_faults: C16 says fail closed, not fail ugly) and a criterion carrying a key no reader reads
+    was silently ignored (now faulted, D-405); (4) TWO HOMES JOINED - the registry pins the rc-2 guard class so
+    the day someone writes || exit 1 the ladder cannot silently turn "the window is due to CLOSE" into a broken
+    build, and config/declaration_consumers.yaml declares the window''s single reader, so the BUG-562 shape (declaration
+    staged, reader withheld) is refused at the commit boundary. Standing rule (D-2676) limbs: ONE HOME config/freeze_window.yaml;
+    SEEN both rails run BY the ladder; NAMED ORACLE 15 controls, every fault printed by name; MUTATION freeze_window_exit_is_load_bearing
+    (a no-op drain condition -> the window can never be seen to be due to close -> the named control goes red).'
+  bugs:
+  - BUG-586
+  files:
+  - config/freeze_window.yaml
+  - scripts/check_freeze_window.py
+  - justfile
+  - config/rail_mutations.yaml
+  - config/rail_registry.yaml
+  - config/declaration_consumers.yaml
+  - DECISION-LOG.md
+  - MASTER-TASK-REGISTER.md
+  - governance/CONTEXT_INDEX.md
+  - governance/SESSION-HANDOFF-2026-09-26.md
+  - governance/buglog.md
+  - agent/session_seed.yaml

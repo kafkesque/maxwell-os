@@ -1,0 +1,72 @@
+# config/freeze_window.yaml - THE FREEZE WINDOW (D-2688). The ONE home of "what is parked, and what ENDS it".
+#
+# WHY THIS FILE EXISTS. MEASURED 2026-09-27: the META-LANE FREEZE was asserted in fifteen prose homes
+# (MASTER-TASK-REGISTER.md, governance/SESSION-HANDOFF-2026-09-26.md, governance/buglog.md,
+# governance/CONTEXT_INDEX.md) and existed in NO file a machine could read. It therefore failed three ways at
+# once: NOTHING READ IT (a claim about work not done can never fail), IT DECLARED NO EXIT (an unwritten exit
+# makes a WINDOW indistinguishable from a POLICY, and a policy has no horizon - it outlives the reason it was
+# opened for: the D-337 permanent-freeze trap), and IT COUNTED NOTHING (the parked set could grow for ever
+# with no reader to notice, so "we are frozen" and "we are stuck" print the same way).
+# This file is the ONE home; scripts/check_freeze_window.py is the ONE reader.
+#
+# WHAT A WINDOW IS NOT. It is not a ban on work. The lane the window protects stays the DEFAULT lane, closing
+# a parked bug DRAINS the window rather than breaching it, and a red rail outranks the freeze.
+schema_version: '1'
+authority: D-2688
+
+window:
+  id: META-LANE-FREEZE-1
+  state: open                  # open | closed - a window outliving its MET exit is a policy, and the rail is loud
+  opened: 2026-09-27
+  ruled_by: 'the owner, 2026-09-27 ("ok freeze window + your recommendations")'
+  scope: >-
+    The governance MACHINERY: the rails, the registries and the controls that make the tree auditable. A NEW
+    governance bug may be FILED (measured, with a remedy) but NOT WORKED while this window is open; the product
+    lane is the DEFAULT lane.
+  why_measured: >-
+    MEASURED 2026-09-27: ~37 of the last 40 filed bugs were about the machinery itself. The precondition for
+    switching to product work was that the ladder report its WHOLE fault set in one pass, and it does: 94
+    line(s) RUN, 0 fault(s), 227.7s.
+  not_frozen:
+    - 'the PRODUCT lane: it is the default lane, and nothing in this file may be cited to refuse product work'
+    - 'closing a bug this window HOLDS: draining the parked set is the exit, not a breach of it'
+    - 'a defect a rail reports RED mid-flight: a red rail outranks the freeze (C16)'
+  exceptions_spent:
+    - 'BUG-575 and BUG-571 were worked after this window was proposed and BEFORE it was ruled: the one exception, now spent (measured: both CLOSED)'
+    - 'BUG-586 was FILED and FIXED by the very change that opened this window (the freeze had no home and no reader): a change that OPENS a window cannot be behind it, and filing the defect it fixes is not working a new bug - the exception, now spent'
+
+  # THE PARKED SET, pinned BY IDENTITY. A parked id the register does NOT carry is a STALE declaration (D-405),
+  # and the set outgrowing `max_held` is FATAL - a window whose parked set grows silently is exactly the policy
+  # this file exists to remove. Raising the ceiling is a one-line diff a human reads, in the SAME change that
+  # parks the bug.
+  held:
+    - BUG-585     # agent/session_seed.yaml states the open-bug count TWICE (a stale 77 beside the DERIVED 134)
+    - BUG-584     # the BUG-582 fix wrote three of its justfile lines TWICE (the ladder over-reports its own size)
+    - BUG-583     # 5 of 812 decision records spell the state 'active' while 505 spell it 'ACTIVE'
+    - BUG-572     # a state word that enters the decision registry unread (the BUG-575 class, one level down)
+    - BUG-570     # a machinery defect, filed and unworked behind the window
+    - BUG-568     # a machinery defect, filed and unworked behind the window
+    - BUG-569     # a machinery defect, filed and unworked behind the window
+    - BUG-559     # filed before this window; a machinery defect, not a product one
+  max_held: 8
+
+  # AN OWNER RULING, recorded where its reader is. A released id MUST also be in `held` (else the ruling is
+  # about nothing), and its reason is REQUIRED: `released: {}` is the honest empty case.
+  released: {}
+
+  # THE WRITTEN EXIT. Each clause is a fact a reader settles WITHOUT judgement; `review_by` is the horizon a
+  # WINDOW must have and a POLICY never does.
+  exit:
+    criteria:
+      - id: opening_set_closed
+        claim: 'every bug this window was opened to finish is CLOSED in the register'
+        bugs: [BUG-577, BUG-575, BUG-571]
+      - id: nothing_still_held
+        claim: 'nothing is still parked: every held id is CLOSED in the register, or RELEASED here by a ruling with a reason'
+    review_by: 2026-10-11
+    on_exit_met: >-
+      The owner CLOSES the window (state: closed) or re-rules its exit. The rail goes OWNER-OWED (rc 2, loud,
+      NOT fatal) the moment the exit is MET: a window that outlives its own exit is a policy.
+    on_horizon_passed: >-
+      The owner RE-RULES the window (a new review_by with a reason) or closes it. Renewing by default is how a
+      window becomes a policy, which is the defect this file was written to remove.

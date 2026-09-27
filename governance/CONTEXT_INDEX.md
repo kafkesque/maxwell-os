@@ -1261,3 +1261,16 @@ NOW. `backups/**` and the per-run snapshots are excluded BY DECISION; the six in
   is SKIPPED and the commit LANDS rc=0 with only a suppressible `hint:` - byte-only verification stayed GREEN.
 - **`scripts/install_git_hooks.sh` asks git the same question**, so the printed remedy can actually clear the fault.
 - **TEETH**: 7 new named controls (14/14), mutation `commit_boundary_route_and_mode_is_load_bearing`, floor 18 -> 19.
+
+## A FREEZE IS A WINDOW (D-2688, 2026-09-27) - BUG-586 FIXED
+- **THE ONE HOME**: `config/freeze_window.yaml` (META-LANE-FREEZE-1) - the parked set pinned BY IDENTITY, `max_held`
+  8, `released {}` (the DRAIN PATH), a WRITTEN exit, `review_by 2026-10-11`. Prose homes are POINTERS, not copies.
+- **THE ONE READER**: `scripts/check_freeze_window.py` in `justfile:health`. rc 0 = open, exit unmet, in horizon;
+  rc 1 = FAULT (a parked id the register does not carry, a set past its ceiling, a malformed declaration);
+  rc 2 = OWNER-OWED, LOUD, NOT fatal (BUG-457): the exit is MET (close it) or the horizon passed (re-rule it).
+- **IT READS THE DERIVED REGISTER** (`governance/bug_status.json`), never the log: a second parser is the D-2646 defect.
+- **MEASURED**: 15/15 controls; live rc=0 (parked 8, still OPEN 8 of ceiling 8); mutation
+  `freeze_window_exit_is_load_bearing`, floor 19 -> 20; registry rc=0; ladder 96 lines, 0 faults, 260.9s; R5 APPROVE.
+- **THE AUDIT FIRED ON THE CHANGE**: the synthetic register fixture conflated "the ids the window NAMES" with "the
+  ids the register carries as OPEN", so THREE controls were RED for the wrong reason - a control that cannot pass is
+  BUG-492 aimed at the oracle.

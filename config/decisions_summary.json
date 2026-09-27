@@ -1,15 +1,15 @@
 {
   "schema_version": "1.0",
   "source_path": "config/decisions.yaml",
-  "source_sha256": "dcadf0e25da9e5fcc959a46453d11cac8bb5860743d326be254abe7619712a63",
+  "source_sha256": "a388fe502b9900984e3f71e2ad5727d988e79abc25793ce58e9b7ca356c6aa62",
   "written_by": "scripts/recompute_decision_summary.py",
-  "decisions_sha256_16": "029ea5e4818d6082",
-  "total_decisions": 818,
+  "decisions_sha256_16": "c53610b53a7b416d",
+  "total_decisions": 819,
   "summary": {
-    "total": 818,
+    "total": 819,
     "proposed": 13,
     "draft": 1,
-    "active": 516,
+    "active": 517,
     "stale": 0,
     "superseded": 16,
     "archived": 8,
@@ -195,7 +195,7 @@
       "VERIFICATION/INSTRUMENT": 5,
       "VERIFICATION/MEASUREMENT": 1,
       "VERIFICATION/PROCESS": 1,
-      "governance": 14,
+      "governance": 15,
       "pipeline-fix": 2,
       "validation": 1
     }

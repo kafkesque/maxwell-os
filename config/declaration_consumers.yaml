@@ -62,3 +62,11 @@ declarations:
     MEASURED 2026-09-27 (BUG-581, found by the D-2679 audit): this edge carried the RAIL REGISTRY's rationale -
     a why attached to a subject that does not contain it, which is how a reader is taught the wrong fact by a
     file that spells the right one two edges up. The rationale moved back to config/rail_registry.yaml.
+- declaration: config/freeze_window.yaml
+  consumers: [scripts/check_freeze_window.py]
+  decisions: [D-2688]
+  why: >-
+    D-2688: the freeze window is the ONE home of what is parked and what ENDS it, read by scripts/check_freeze_window.py
+    (ONE reader, wired into justfile:health). MEASURED 2026-09-27: the META-LANE FREEZE was asserted in fifteen prose
+    homes and read by NOTHING, so it could not fail, declared no exit and counted nothing. A window whose only reader
+    is withheld is that same defect with a filename on it, which is what this edge refuses.

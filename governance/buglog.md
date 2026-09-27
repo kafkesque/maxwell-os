@@ -7600,3 +7600,26 @@ Both were invisible to a byte-only verifier: (2) was GREEN with a byte-perfect h
 declared as `git-path:<rel>` (GIT ITSELF is the answer), the declared subject is the RESOLVED path + its bytes +
 its MODE, `scripts/install_git_hooks.sh` resolves the SAME way (so the remedy can clear the fault), 7 new named
 controls (14/14), mutation `commit_boundary_route_and_mode_is_load_bearing` (floor 18 -> 19).
+
+## BUG-586 (FIXED, MED, D-2688): the META-LANE FREEZE was asserted in ~15 prose homes and read by NO machine - it declared no exit and counted nothing
+
+STATUS CLOSED. A freeze is the one governance act that takes effect by being BELIEVED: it is pure prose by
+construction, so nothing could ever refuse it. MEASURED 2026-09-27 (grep): the freeze was asserted in
+MASTER-TASK-REGISTER.md, governance/SESSION-HANDOFF-2026-09-26.md, governance/buglog.md and
+governance/CONTEXT_INDEX.md (15 lines) and in NO file a machine could read. It therefore failed three ways at
+once: (i) NOTHING READ IT - "held behind the freeze" is a claim about work NOT DONE, and a claim about an absence
+can never fail (BUG-492 one level up); (ii) IT HAD NO EXIT - an unwritten exit makes a WINDOW indistinguishable
+from a POLICY, and a policy has no horizon, so it outlives the reason it was opened for (the D-337 permanent-freeze
+trap); (iii) IT COUNTED NOTHING - the parked set could grow for ever, so "we are frozen" and "we are stuck" printed
+the same way. FIX (D-2688): config/freeze_window.yaml is the ONE home (window META-LANE-FREEZE-1: the parked set
+pinned BY IDENTITY, a max_held ceiling, a released ruling map, a written EXIT and a review_by horizon) and
+scripts/check_freeze_window.py is the ONE reader, wired into justfile:health (--selftest fatal + live verdict
+tri_state: rc 2 = OWNER-OWED, loud, NOT fatal, BUG-457). It reads the DERIVED register governance/bug_status.json
+and never re-parses the log (a second parser would be the D-2646 two-homes defect). 15 named controls, mutation
+freeze_window_exit_is_load_bearing (floor 19 -> 20). MEASURED AFTER: rc=0, exit MET: opening_set_closed, exit
+UNMET: nothing_still_held (8 still parked of ceiling 8); ladder 96 lines RUN, 0 faults, 260.9s.
+THE FORENSIC AUDIT FIRED ON THE CHANGE ITSELF: the newly wired ladder line went rc=1 on day 0 because the clause
+table applied a per-clause subject rule to a clause whose subject is window.held; with that fixed, THREE controls
+still failed and had been RED FOR THE WRONG REASON, masked by the first fault - the synthetic register fixture
+conflated "the ids the window NAMES" with "the ids the register carries as OPEN", so three controls could never
+have passed. A control that cannot pass, read as "the code is wrong", is the BUG-492 class aimed at the oracle.

@@ -25,6 +25,8 @@ health:
     python3 scripts/check_bug_status.py || exit 1
     python3 scripts/check_register_divergence.py --selftest || exit 1   # BUG-571/D-2683: BOTH divergence shapes must be SEEN to fire on synthetic logs (a control nothing runs is a comment, BUG-492)
     python3 scripts/check_register_divergence.py || exit 1
+    python3 scripts/check_freeze_window.py --selftest || exit 1   # D-2688: the freeze WINDOW's declared EXIT must be SEEN to fire (a control nothing runs is a comment, BUG-492)
+    python3 scripts/check_freeze_window.py || [ $? -eq 2 ]        # D-2688: a freeze is a WINDOW - the parked set is COUNTED and the exit is DECLARED; 2 = OWNER-OWED (exit MET -> close it, or horizon PASSED -> re-rule it), loud NOT fatal (BUG-457)
     python3 scripts/lib/write_guard.py --selftest || exit 1
     python3 scripts/lib/yaml_guard.py --selftest || exit 1       # D-2648 controls: a guard whose controls nothing runs is a comment (BUG-492)
     python3 scripts/lib/yaml_guard.py --check || [ $? -eq 2 ]    # BUG-525/D-2649: a key declared TWICE in one mapping is SILENTLY last-wins; 2 = owner-owed artifacts

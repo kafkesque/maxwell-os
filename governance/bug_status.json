@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 321,
+  "total_ids": 322,
   "open_n": 136,
-  "closed_n": 185,
+  "closed_n": 186,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -674,11 +674,6 @@
       "events": 2
     },
     {
-      "id": "BUG-571",
-      "title": "(OPEN, LOW): the register is fed by HEADINGS only, so an id written INLINE is real to every human and absent from every machine home (BUG-49",
-      "events": 1
-    },
-    {
       "id": "BUG-572",
       "title": "(OPEN, LOW): a status word in a heading's TITLE decides a bug's status when the parenthetical slot names none (measured, with the flip list)",
       "events": 1
@@ -686,6 +681,11 @@
     {
       "id": "BUG-583",
       "title": "(OPEN, LOW): 5 of 812 decision records spell the state 'active' in lowercase while 505 spell it 'ACTIVE' (2026-09-27, found by the D-2682 la",
+      "events": 1
+    },
+    {
+      "id": "BUG-584",
+      "title": "(OPEN, LOW): the BUG-582 fix wrote three of its lines TWICE in `just health` (the ladder runs them twice and over-reports its own size)",
       "events": 1
     }
   ],
@@ -865,6 +865,7 @@
     "BUG-565",
     "BUG-566",
     "BUG-567",
+    "BUG-571",
     "BUG-573",
     "BUG-574",
     "BUG-575",

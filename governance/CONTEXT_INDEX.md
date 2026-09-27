@@ -1197,3 +1197,16 @@ CONSUMERS. config/reconciliation.yaml#decision_supersession_complete and #decisi
 SUPERSEDES. Nothing. It EXTENDS: decision_registry_wellformed read the registry as a SET (a citation need only RESOLVE); these read it as a GRAPH (a retirement must name a LINK; a citation must rest on a decision IN FORCE).
 ALSO. BUG-575 FIXED. BUG-583 filed (LOW: 5 of 812 records spell the state 'active' lowercase).
 NOW. selftest 9/9 rc=0; reconcile --check rc=0 (13 declared object(s) agree); mutation gate SEEN to red.
+
+## THE REGISTER'S SECOND DIVERGENCE SHAPE HAS ONE HOME (D-2683, 2026-09-27)
+
+WHERE. config/register_divergence.yaml - declared_divergent (BUG-481: closed in prose, counted OPEN) and
+declared_uncarried (BUG-571: named in the log, carried by no header) + their two shrink guards. ONE reader:
+scripts/check_register_divergence.py (pure carried_ids / uncarried_ids / faults).
+SEEN. The ladder runs `check_register_divergence.py --selftest` as its own line (10 known-answer controls, both
+directions) before the check line. TEETH: mutation register_uncarried_rule_is_load_bearing (floor 11 -> 12).
+SUPERSEDES NOTHING, AMENDS ONE REMEDY. The recorded remedy for BUG-571 (a cited-by-decision join inside
+scripts/bug_status.py) is REFUSED and replaced: bug_status.py re-derives from the same HEADER projection the rail
+exists to look past, and the decision-citation direction is already closed at the mint (39 cited ids, 0
+unregistered). NOW. `just health` is green; the whole-set audit is empty; the meta lane is closed and the default
+lane is PRODUCT (BUG-563 -> BUG-560). Filed behind the freeze: BUG-584, BUG-583, BUG-572, BUG-570, BUG-568/569.

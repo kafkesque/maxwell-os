@@ -1020,3 +1020,31 @@ invocations). Declaration consumers rc=0. OPEN 137 -> 136, CLOSED 182 -> 184.
 CONTEXT. BUG-575, re-measured at the landing: 16 records state=SUPERSEDED, only 4 naming their successor (12 orphans); 4 of 59 config citation sites name a NOT-IN-FORCE decision (D-403 x2 PROPOSED, D-400 PROPOSED, D-2663 OPEN). scripts/reconcile.py#decision_registry_wellformed read the registry as a SET of ids: a citation had to RESOLVE, never to be IN FORCE, and nothing read "what replaced X". MADR carries status = "superseded by ADR-0123" as a LINK; here it was a label no machine could follow.
 DECISION. (1) The decision-GRAPH rules have ONE home: config/decisions_policy.yaml#graph - the in-force and not-in-force state sets, the supersession state and its successor field, and the two debt pins. Every state word in the registry must be classified, so a new state cannot enter unread. (2) TWO declared entries evaluate them in the ONE engine that already owns the citation walker: decision_supersession_complete and decision_citations_in_force. (3) The measured debt is PINNED BY IDENTITY and SHRINK-ONLY, never backfilled (a successor reconstructed by a tool is not evidence) and never exempted silently - a stale pin FAILS the rail (BUG-542). (4) The predicates are PURE (records + rules in, findings out), so the SAME code answers for the live registry and for the known-answer fixtures: a rule whose control cannot be fed a counterexample has no teeth.
 MEASURED. python3 scripts/reconcile.py --selftest 9/9 rc=0; reconcile --check: decision_supersession_complete and decision_citations_in_force both ok, 13 declared object(s) agree, rc=0; mutation gate: the named entry is SEEN to red (floor 10 -> 11, subjects 8 -> 9); rail registry 89 ladder invocation(s), rc=0; just --list parses.
+
+## D-2683 (2026-09-27) - THE REGISTER'S SECOND DIVERGENCE SHAPE: an id the LOG names and no HEADER carries is a declared, shrink-only debt (BUG-571 FIXED)
+
+CONTEXT. governance/buglog.md is the register's INPUT and scripts/bug_status.py folds it as STATUS EVENTS, which
+are HEADERS. MEASURED 2026-09-27: the file names 383 distinct ids, the register carries 321 - 62 names (legacy
+table rows, legacy bullets, and BUG-492 x33) exist for every human and for no machine home. BUG-481's rail already
+owned the same divergence one notch over (closed in prose, counted OPEN) and its own docstring states why the
+register's generator cannot see it: a rail that re-derives from the same projection certifies the PARSER, never
+the LOG.
+DECISION. (1) The rule has ONE home: config/register_divergence.yaml, extended - not duplicated - with
+declared_uncarried (62 ids PINNED BY IDENTITY, each with the line that first names it) and the shrink guard
+declared_max_uncarried: 62. (2) ONE reader: scripts/check_register_divergence.py gains a PURE walker
+carried_ids()/uncarried_ids() and ONE pure verdict faults() that evaluates BOTH shapes and BOTH directions -
+undeclared, stale, and ceiling - so the live log and the rehearsal run the same code (D-405). (3) The debt is NOT
+BACKFILLED (D-2645): promoting a prose name to a header would stamp a status no author wrote and manufacture 62
+OPEN bugs. (4) The walker is a TOKEN read and the record states what that does and does not mean: it does not
+decide what a bug IS or what state it has, it lists the NAMES the register cannot answer for, and a list a human
+must edit cannot invent debt. (5) The AMMENDED remedy: the recorded remedy (a cited-by-decision join inside
+bug_status.py) is REFUSED - the generator cannot see its own input's other shape, and the decision-citation
+direction is already closed forward at the mint (39 cited ids, 0 unregistered, MEASURED), so a second reader would
+be the two-homes defect (D-2646) the repo fixed last night (D-2682).
+MEASURED. --check: "ok register divergence: 0 declared divergence(s), all still divergent; 62 named-but-uncarried
+id(s) declared, all still uncarried; ceilings 0/62 (shrink-only); 321 id(s) carried" rc=0. SEEN: --selftest 10/10
+known-answer controls, both directions, rc=0. TEETH: register_uncarried_rule_is_load_bearing SEEN to red (marker
+'FAIL selftest/uncarried_id_is_reported'); gate 11 declared rules red, 10/10 subjects, floor 11 -> 12. The ladder
+runs the control as its own line, and the pre-change whole-set audit is EMPTY: "ok ladder scan: 90 line(s) RUN, 0
+fault(s), 220.3s". FILED in the same change-set (not worked): BUG-584, the duplicated declaring lines the BUG-582
+fix left in `just health`, which the rail census cannot count BY CONSTRUCTION - the meta-lane freeze keeps it filed.

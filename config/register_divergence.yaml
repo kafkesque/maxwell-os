@@ -1,5 +1,5 @@
-# register_divergence.yaml - bugs closed in PROSE but still counted OPEN (BUG-481, the register's own instance
-# of the RC-2/RC-3 disease).
+# register_divergence.yaml - the LOG and the REGISTER diverge in TWO shapes, both declared and both
+# SHRINK-ONLY (BUG-481: closed in prose, counted OPEN. BUG-571: named in the log, carried by no header).
 #
 # WHY: scripts/bug_status.py folds STATUS EVENTS and a status event is a HEADER. A closure written as a body
 # paragraph is invisible, so the machine register over-reports: MEASURED 2026-09-25, 8 ids carry an explicit
@@ -21,3 +21,82 @@ declared_max: 0
 declared_divergent: []   # EMPTIED 2026-09-25: all eight were promoted to header events (see governance/buglog.md,
                          # REGISTER PROMOTION 20260925). SHRINK-ONLY: a new prose-only closure must be promoted
                          # to a header event, never declared here.
+
+# BUG-571 (2026-09-27) - THE SECOND DIVERGENCE SHAPE. The first shape (above) is a bug closed in
+# prose and counted OPEN. This one is the same disease one notch over: the register is a HEADER projection
+# of the log, so an id the LOG NAMES but no HEADER carries is real to every human and absent from every
+# machine home. MEASURED 2026-09-27: the log names 62 distinct id(s) the register does not
+# carry, out of 383 distinct id(s) named in the file - they sit in the LEGACY shapes of the log (a
+# `| BUG-099 | date | title |` row, a `- **BUG-098** - ...` bullet) and in BUG-492's 33 citations, which is
+# the id the standing rule itself quotes as evidence.
+#
+# NOT BACKFILLED (D-2645, the same judgement as the revoked-reference debt): an id a tool PROMOTED to a
+# header would carry a status no author ever wrote, and 'no closure claim is not a closure' would count
+# every legacy record OPEN. The list is therefore PINNED BY IDENTITY and SHRINK-ONLY, and nothing in this
+# file decides what a bug IS: it declares which NAMES the register cannot answer for. A NEW name is RED.
+declared_max_uncarried: 62   # CEILING (shrink guard): raising it requires a declared decision, not an edit
+declared_uncarried:
+  - BUG-085   # first named at governance/buglog.md:32
+  - BUG-098   # first named at governance/buglog.md:63
+  - BUG-099   # first named at governance/buglog.md:43
+  - BUG-104   # first named at governance/buglog.md:61
+  - BUG-148   # first named at governance/buglog.md:28
+  - BUG-150   # first named at governance/buglog.md:60
+  - BUG-151   # first named at governance/buglog.md:27
+  - BUG-159   # first named at governance/buglog.md:31
+  - BUG-160   # first named at governance/buglog.md:33
+  - BUG-168   # first named at governance/buglog.md:32
+  - BUG-169   # first named at governance/buglog.md:42
+  - BUG-170   # first named at governance/buglog.md:30
+  - BUG-181   # first named at governance/buglog.md:1274
+  - BUG-182   # first named at governance/buglog.md:29
+  - BUG-185   # first named at governance/buglog.md:48
+  - BUG-188   # first named at governance/buglog.md:79
+  - BUG-193   # first named at governance/buglog.md:73
+  - BUG-195   # first named at governance/buglog.md:80
+  - BUG-196   # first named at governance/buglog.md:74
+  - BUG-197   # first named at governance/buglog.md:75
+  - BUG-198   # first named at governance/buglog.md:76
+  - BUG-199   # first named at governance/buglog.md:78
+  - BUG-200   # first named at governance/buglog.md:78
+  - BUG-205   # first named at governance/buglog.md:77
+  - BUG-214   # first named at governance/buglog.md:72
+  - BUG-215   # first named at governance/buglog.md:67
+  - BUG-216   # first named at governance/buglog.md:69
+  - BUG-217   # first named at governance/buglog.md:70
+  - BUG-218   # first named at governance/buglog.md:71
+  - BUG-219   # first named at governance/buglog.md:68
+  - BUG-220   # first named at governance/buglog.md:25
+  - BUG-221   # first named at governance/buglog.md:61
+  - BUG-222   # first named at governance/buglog.md:26
+  - BUG-223   # first named at governance/buglog.md:41
+  - BUG-224   # first named at governance/buglog.md:25
+  - BUG-225   # first named at governance/buglog.md:57
+  - BUG-226   # first named at governance/buglog.md:58
+  - BUG-227   # first named at governance/buglog.md:59
+  - BUG-228   # first named at governance/buglog.md:22
+  - BUG-229   # first named at governance/buglog.md:39
+  - BUG-230   # first named at governance/buglog.md:40
+  - BUG-231   # first named at governance/buglog.md:23
+  - BUG-232   # first named at governance/buglog.md:24
+  - BUG-233   # first named at governance/buglog.md:55
+  - BUG-234   # first named at governance/buglog.md:45
+  - BUG-235   # first named at governance/buglog.md:46
+  - BUG-236   # first named at governance/buglog.md:47
+  - BUG-237   # first named at governance/buglog.md:48
+  - BUG-238   # first named at governance/buglog.md:44
+  - BUG-239   # first named at governance/buglog.md:54
+  - BUG-240   # first named at governance/buglog.md:53
+  - BUG-241   # first named at governance/buglog.md:15
+  - BUG-242   # first named at governance/buglog.md:21
+  - BUG-243   # first named at governance/buglog.md:14
+  - BUG-262   # first named at governance/buglog.md:364
+  - BUG-267   # first named at governance/buglog.md:13
+  - BUG-430   # first named at governance/buglog.md:3731
+  - BUG-492   # first named at governance/buglog.md:4946
+  - BUG-494   # first named at governance/buglog.md:5020
+  - BUG-495   # first named at governance/buglog.md:5026
+  - BUG-496   # first named at governance/buglog.md:5034
+  - BUG-498   # first named at governance/buglog.md:5092
+                         # SHRINK-ONLY: an id that gets a HEADER event (or whose name is removed) must be
+                         # deleted from this list in a diff a human reads, or this rail FAILS as STALE.

@@ -9558,3 +9558,42 @@ decisions:
   - config/reconciliation.yaml
   - config/rail_mutations.yaml
   - justfile
+- id: D-2683
+  date: '2026-09-27'
+  state: ACTIVE
+  category: governance
+  title: 'THE REGISTER''S SECOND DIVERGENCE SHAPE: an id the LOG names and no HEADER carries is a declared, shrink-only
+    debt (scripts/check_register_divergence.py)'
+  decision: 'The fact that governance/buglog.md and the register diverge has TWO shapes and ONE home. Shape i (BUG-481)
+    is a bug closed in prose and counted OPEN; shape ii (BUG-571) is an id the log NAMES and no header carries -
+    MEASURED 2026-09-27 at 62 ids out of 383 named. The rail that already owned shape i gained shape ii in the SAME
+    declared home (config/register_divergence.yaml#declared_uncarried, each id pinned BY IDENTITY with the line
+    that first names it, declared_max_uncarried as the shrink guard) and ONE pure verdict (faults()) evaluates both
+    shapes and both directions - undeclared, stale, ceiling - so the live log and the rehearsal run the same code
+    (D-405). The debt is NOT backfilled (D-2645): promoting a prose name to a header would stamp a status no author
+    wrote and manufacture 62 OPEN bugs. The recorded remedy for BUG-571 (a cited-by-decision join inside scripts/bug_status.py)
+    is AMENDED to this one: the register''s generator re-derives from the same HEADER projection the rail exists
+    to look past (the BUG-467 class), and the decision-citation direction is already closed forward at the mint
+    gate (39 cited ids, 0 unregistered), so a second reader would be the two-homes defect (D-2646). The walker is
+    a TOKEN read and says so: it does not decide what a bug IS or what state it has, it lists the NAMES the register
+    cannot answer for, and a list a human must edit cannot invent debt.'
+  measured: '--check rc=0: ''ok register divergence: 0 declared divergence(s), all still divergent; 62 named-but-uncarried
+    id(s) declared, all still uncarried; ceilings 0/62 (shrink-only); 321 id(s) carried''. --selftest 10/10 known-answer
+    controls, both directions, rc=0. TEETH: config/rail_mutations.yaml#register_uncarried_rule_is_load_bearing (runner
+    scripts/check_register_divergence.py --selftest, marker ''FAIL selftest/uncarried_id_is_reported'') SEEN to
+    red; the gate reports 11 declared rule(s) SEEN to red, 1 negative control green, 10/10 declared subject(s) covered,
+    floor 11 -> 12, subjects 9 -> 10 in the same diff. check_rail_registry rc=0 (90 ladder invocation(s), 43 rail(s)
+    on disk, 5 declared writers); check_declaration_consumers rc=0; just --list parses; yaml-guard --check rc=2
+    = 4 declared owner-owed artifacts (unchanged). The pre-change whole-set audit owed from the previous turn is
+    EMPTY: ''ok ladder scan: 90 line(s) RUN, 0 fault(s), 220.3s''. FILED in the same change-set, NOT worked (the
+    meta-lane freeze): BUG-584 - the BUG-582 fix left 4 justfile lines where 2 were intended (justfile:7 == justfile:8
+    byte-identical, and two --selftest lines duplicated), so three lines RUN TWICE and the ladder over-reports its
+    own size; no rail could see it, because check_rail_registry.py keys its census by invocation (a set) while run_ladder.py
+    counts raw lines - two numbers for one fact (D-2646) inside the health instrument.'
+  bugs:
+  - BUG-571
+  files:
+  - config/register_divergence.yaml
+  - scripts/check_register_divergence.py
+  - config/rail_mutations.yaml
+  - justfile

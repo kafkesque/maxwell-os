@@ -7487,3 +7487,50 @@ CLASS. The BUG-572 family one level down: a spelling that decides nothing is sti
 NOT FIXED HERE. Folding a 5-record rewrite of an append-only registry into a rail landing is exactly the scope creep the meta-lane freeze forbids; the finding is filed and the D-2682 rail normalises rather than silently tolerating. REMEDY (owed): either canonicalise the 5 records through the registry's own writer (a structural edit, receipt refreshed in the same sequence - D-2655) or declare the spelling rule where a reader can FAIL on it.
 REMEDY (OWED), not a silent pass.
 
+## BUG-571 (FIXED, LOW): the register is fed by HEADINGS only, so an id written INLINE is real to every human and absent from every machine home (BUG-493 measured)
+
+MEASURED (2026-09-27, at HEAD): governance/buglog.md names 383 distinct ids and the register carries 321, so 62 ids
+have NO machine home at all. Their provenance is not archaeology: legacy record shapes (`| BUG-099 | date | title |`
+rows, `- **BUG-098** - ...` bullets - BUG-085, BUG-104, and 58 more) plus BUG-492, named 33 times by the standing
+rule's own prose as its evidence. Every one of them is a name a human can cite and no rail can answer for.
+FIX (D-2683, scripts/check_register_divergence.py + config/register_divergence.yaml). The rail that already owns
+"the LOG and the REGISTER diverge" gained the SECOND shape of that fact, in the SAME home: shape i (BUG-481) is a
+bug closed in prose and counted OPEN; shape ii (this bug) is an id named in the log and carried by no header. Both
+are declared, both are pinned BY IDENTITY and SHRINK-ONLY, both FAIL on a new instance and on a stale pin, and both
+are evaluated by ONE pure `faults()` so the same code answers the live log and the rehearsal.
+DEVIATION FROM THE RECORDED REMEDY (stated, not hidden). The remedy filed here was "add the cited-by-decision join
+to scripts/bug_status.py". REFUSED on two grounds. (1) TWO HOMES: the register's own generator cannot see the log's
+other shape - check_bug_status.py re-derives from the same HEADER projection and byte-compares, so it certifies the
+PARSER, never the LOG (the BUG-467 class, and the reason this rail exists at all). (2) The decision-citation
+direction is ALREADY closed forward: MEASURED 2026-09-27, the 39 ids cited by decision records in
+config/decisions.yaml resolve, 0 unregistered, because the mint gate REFUSES a citation naming an unregistered bug
+(D-2660). Adding a second reader for it would have created the two-homes defect (D-2646) one turn after fixing it.
+NOT BACKFILLED (D-2645, the revoked-reference judgement): promoting 62 prose names to header events would stamp
+them with a status no author ever wrote, and "no closure claim is not a closure" would count every legacy record
+OPEN - a tool would be manufacturing 62 bugs. The list can only be SHORTENED, by a human, in a diff.
+SEEN. python3 scripts/check_register_divergence.py --selftest: 10 known-answer control(s) fire, both directions
+(the walker reports an uncarried name; a carried name stays silent; a pin the register now carries is STALE; an
+undeclared name is a fault; both ceilings are read; the negative control) rc=0. --check: "ok register divergence: 0
+declared divergence(s), all still divergent; 62 named-but-uncarried id(s) declared, all still uncarried; ceilings
+0/62 (shrink-only); 321 id(s) carried" rc=0.
+TEETH (D-2676 iv). config/rail_mutations.yaml#register_uncarried_rule_is_load_bearing (runner
+scripts/check_register_divergence.py --selftest, marker 'FAIL selftest/uncarried_id_is_reported') SEEN to red; the
+gate reports 11 declared rule(s) SEEN to red, 1 negative control green, 10/10 declared subject(s) covered; floor
+11 -> 12, subjects 9 -> 10, both in the same diff.
+
+## BUG-584 (OPEN, LOW): the BUG-582 fix wrote three of its lines TWICE in `just health` (the ladder runs them twice and over-reports its own size)
+
+MEASURED (2026-09-27). Commit 29a0a37 landed 4 added lines in justfile where 2 were intended: justfile:7 and
+justfile:8 are BYTE-IDENTICAL banner invocations, and `scripts/lib/fixture.py --selftest` and
+`scripts/run_ladder.py --selftest` each stand TWICE. MEASURED consequence, pre-change `just health-full`: "ok
+ladder scan: 90 line(s) RUN, 0 fault(s), 220.3s" for a recipe whose DISTINCT declaring lines number 86 - the
+collector's own census and the banner's "N declaring line(s) stand in it" are inflated by 4, and every duplicated
+line is executed twice.
+WHY NO RAIL SAW IT. scripts/check_rail_registry.py keys its census by INVOCATION + FLAGS (a dict), so a duplicated
+line collapses into one key BY CONSTRUCTION and cannot be counted twice; scripts/run_ladder.py counts RAW lines.
+That is two numbers for one fact (D-2646, the two-homes defect) living inside the health instrument itself - and
+the duplicated lines were introduced by the commit that FIXED "declared in four homes, written in none" (BUG-582).
+REMEDY (owed, deliberately NOT worked here - the meta-lane freeze says a new governance bug is FILED, not chased,
+until BUG-571 closes and a product artifact is built): the ladder's own reader REFUSES a duplicated declaring line
+(one line, one home, exactly once - BUG-582 is the zero case, this is the twice case), with the pinned duplicates
+as known-answer controls, both directions, and a mutation that REDs it.

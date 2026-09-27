@@ -30,7 +30,7 @@ fixture:
   keep: false
   timeout_seconds: 600
 coverage:
-  min_mutations: 11            # FLOOR (shrink guard): deleting an entry means editing the floor in a diff a human reads
+  min_mutations: 12            # FLOOR (shrink guard): deleting an entry means editing the floor in a diff a human reads
   # D-2679: the coverage set is DERIVED, never restated. Which rails gate a COMMIT is one fact and it already has
   # ONE home (config/rail_registry.yaml#commit_boundary), so restating it here would be a SECOND HOME - and two
   # lists of one fact drift, and only one of them can be right. scripts/check_rail_mutations.py joins the two and
@@ -53,6 +53,7 @@ coverage:
     - scripts/check_boundary_rehearsal.py
     - scripts/check_declaration_consumers.py
     - scripts/check_rail_mutations.py
+    - scripts/check_register_divergence.py
     - scripts/check_repo_integrity.py
     - scripts/check_session_plan.py
     - scripts/run_ladder.py
@@ -205,6 +206,21 @@ mutations:
       D-2680/BUG-573: every fault of the ladder is COLLECTED, so a red line never hides the lines after it. With
       the collection inert, the scan reports a clean ladder while a red stands in it - the prefix-read-as-a-verdict
       defect one level up, in the very report that exists to end it.
+  - id: register_uncarried_rule_is_load_bearing
+    subject: scripts/check_register_divergence.py
+    op: replace
+    find: '            if tok not in carried:'
+    replace: '            if False:  # MUTATION (D-2676): every name counts as carried'
+    runner: scripts/check_register_divergence.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: 'FAIL selftest/uncarried_id_is_reported'
+    why: >-
+      D-2683/BUG-571: with the walker inert, the register reports the ids it happens to carry while an id the log
+      NAMES has no machine home at all - the BUG-481 shape one notch over, and the reason check_bug_status.py
+      cannot see it: a rail that re-derives from the same projection certifies the PARSER, never the LOG.
+
   - id: fixture_outside_tree_rule_is_load_bearing
     subject: scripts/lib/fixture.py
     op: replace

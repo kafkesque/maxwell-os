@@ -536,3 +536,26 @@ STRONGEST MEASURED EVIDENCE. python3 scripts/reconcile.py --selftest -> 9/9 know
 WHAT LANDED. config/decisions_policy.yaml#graph (the RULES, one home); scripts/reconcile.py (two declared check kinds + PURE predicates + the NAMED oracle --selftest, reusing the existing citation walker); config/reconciliation.yaml (two entries); config/rail_mutations.yaml (the teeth); justfile (the selftest is its OWN declaring line, so the boundary control is SEEN, D-2676 ii).
 ORDERED NEXT. (1) BUG-571 - the cited-by-decision join (a decision citing an unregistered bug must become an owner-owed RED LINE; BUG-492, cited 32x and unregistered, is the live case) - after which the META LANE CLOSES; (2) PRODUCT (default lane): BUG-563 then BUG-560; (3) BUG-583 (LOW, filed here).
 OWNER GATE (DUE). (a) rule the META-LANE FREEZE; (b) the standing-rule CONSTITUTION promotion (bar MET, POINTER never a restatement); (c) BUG-431 CONTENT promotion.
+
+## 2026-09-27 (cont. 3) - D-2683 LANDED / BUG-571 FIXED / THE META LANE IS CLOSED
+
+STRONGEST MEASURED EVIDENCE. `just health-full` (pre-change, owed from the previous turn): "ok ladder scan: 90
+line(s) RUN, 0 fault(s), 220.3s" - the whole fault set in ONE pass, and it is EMPTY. check_register_divergence
+--check: "ok register divergence: 0 declared divergence(s), all still divergent; 62 named-but-uncarried id(s)
+declared, all still uncarried; ceilings 0/62 (shrink-only); 321 id(s) carried" rc=0. --selftest 10/10 rc=0.
+Mutation gate rc=0: 11 declared rule(s) SEEN to red, 10/10 subjects covered, floor 11 -> 12. Rail registry rc=0 (90
+ladder invocation(s), 43 rails, 2 dormant, 5 declared writers). Declaration consumers rc=0. yaml-guard --check rc=2
+= 4 declared owner-owed artifacts (unchanged, loud, not fatal).
+WHAT LANDED. The register's SECOND divergence shape: 62 ids the LOG names and no HEADER carries are now a declared,
+identity-pinned, shrink-only debt in the SAME home that already owned the first shape (config/register_divergence
+.yaml), evaluated by ONE pure verdict, SEEN by 10 synthetic controls, and given teeth by a mutation. Nothing was
+backfilled (D-2645). The recorded remedy (a join inside bug_status.py) was AMENDED, not silently dropped.
+ALSO MEASURED (filed, not worked - the freeze). BUG-584: the BUG-582 fix added 4 justfile lines where 2 were
+intended (justfile:7 == justfile:8 byte-identical), so three lines RUN TWICE and the ladder over-reports its own
+size - invisible to every rail, because check_rail_registry.py keys its census by invocation (a set) while
+run_ladder.py counts raw lines.
+ORDERED NEXT (product lane, default). BUG-563 (declared homes for governance/bench_preflight_latest.json,
+governance/human_review_ledger.json, governance/remaining_verification_audit.csv + backups/**), then BUG-560
+(scripts/apply_workbook_rulings.py through scripts/lib/write_guard.py).
+OWNER GATE (DUE). The META-LANE FREEZE ruling (its one exception is spent); the standing-rule CONSTITUTION
+promotion (POINTER only); BUG-431 CONTENT promotion; BUG-583 (5 lowercase 'active' spellings vs a declared rule).

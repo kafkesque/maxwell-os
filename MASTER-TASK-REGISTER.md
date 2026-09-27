@@ -650,3 +650,24 @@ RISK NOTE (now retired): before fe239df a worktree clean destroyed BOTH copies o
 - [ ] NEXT (meta, in order): BUG-571 (the cited-by-decision join) - then the META LANE IS CLOSED.
 - [ ] NEXT (product, the DEFAULT lane): BUG-563 (declared homes for the 3 dirty rail outputs + backups/**), then BUG-560.
 - [ ] OWNER GATE (DUE): META-LANE FREEZE ruling; standing-rule CONSTITUTION promotion (POINTER only); BUG-431 CONTENT promotion; BUG-583 (the lowercase state spelling - census or canonicalise).
+
+## D-2683 / BUG-571 FIXED - THE SECOND DIVERGENCE SHAPE IS DECLARED (2026-09-27)
+
+- [x] config/register_divergence.yaml - ONE HOME extended: declared_uncarried (62 ids, pinned BY IDENTITY, each with
+      the line that first names it) + declared_max_uncarried: 62 (shrink guard; raising it needs a decision).
+- [x] scripts/check_register_divergence.py - PURE carried_ids()/uncarried_ids()/faults(): BOTH divergence shapes,
+      BOTH directions (undeclared / stale / ceiling), one code path for the live log and the rehearsal (D-405).
+- [x] NOT BACKFILLED (D-2645): 62 prose names are debt, not bugs - a tool must not manufacture 62 OPEN bugs.
+- [x] RECORDED REMEDY AMENDED: no cited-by-decision join inside bug_status.py (the generator cannot see the log's
+      other shape; the mint already closes that direction; a second reader is the D-2646 two-homes defect).
+- [x] SEEN: --selftest 10/10 rc=0 (both directions) + --check rc=0 (0 divergence; 62 pinned, all still uncarried;
+      321 carried) + the control wired as its own ladder line.
+- [x] TEETH: mutation register_uncarried_rule_is_load_bearing SEEN to red; floor 11 -> 12, subjects 9 -> 10.
+- [x] NO new bug hidden: the duplicated declaring lines found by the owed whole-set audit are FILED as BUG-584 (LOW).
+- [ ] NEXT (meta): NONE - BUG-571 was the LAST registered meta bug; the META LANE IS CLOSED.
+- [ ] NEXT (product, the DEFAULT lane): BUG-563 (declared homes for the 3 dirty rail outputs + backups/**), then
+      BUG-560 (route scripts/apply_workbook_rulings.py through scripts/lib/write_guard.py).
+- [ ] NEXT (filed, behind the freeze): BUG-584 (the ladder refuses a duplicated declaring line), BUG-583, BUG-572,
+      BUG-570, BUG-568/569, BUG-566, BUG-564 remainder, BUG-559.
+- [ ] OWNER GATE (DUE): the META-LANE FREEZE ruling (the exception it needed - 575 -> 571 before product work - is
+      now SPENT); the standing-rule CONSTITUTION promotion (POINTER only); BUG-431 CONTENT promotion; BUG-583.

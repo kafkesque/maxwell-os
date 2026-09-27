@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""check_register_divergence.py - a bug closed in PROSE but still counted OPEN is RED (BUG-481).
+"""check_register_divergence.py - the LOG and the REGISTER diverge: TWO shapes, both RED (BUG-481, BUG-571).
 
 WHY. scripts/bug_status.py folds STATUS EVENTS, and a status event is a HEADER. A closure written as a body
 paragraph is invisible, so the machine register over-reports: MEASURED 2026-09-25, 8 ids carry an explicit
@@ -22,6 +22,11 @@ import importlib.util
 import re
 import sys
 from pathlib import Path
+
+# BUG-571: the id SHAPE as the log writes it. This is a TOKEN read, and the rail is careful about what that
+# means - see uncarried_ids(): it does not decide what a bug IS, it reports which NAMES the register cannot
+# answer for, and the resulting set is pinned BY IDENTITY (D-2645).
+TOKEN_RE = re.compile(r"BUG-\d+")
 
 REPO = Path(__file__).resolve().parents[1]
 BUGLOG = REPO / "governance" / "buglog.md"
@@ -67,36 +72,148 @@ def divergent_ids(lines: list[str]) -> dict[str, str]:
     return out
 
 
+def carried_ids(lines: list[str]) -> set[str]:
+    """The ids the REGISTER carries - its own projection of the log: one HEADER event per id (BUG-428)."""
+    return {m.group(1) for m in (HEADER_RE.match(l) for l in lines) if m}
+
+
+def uncarried_ids(lines: list[str], carried: set[str]) -> dict[str, int]:
+    """
+    Return {id: 1-based first line naming it} for every id the LOG names that the register does NOT carry (BUG-571).
+
+    PURE on purpose (no parser, no filesystem): a rule that can only be run against the LIVE log cannot be
+    REHEARSED, and a rule that cannot be made to fail is not a rule (D-2676).
+
+    WHY A TOKEN READ IS NOT THE REFUSED PROSE SCAN. buglog.md refused 'a regex over every BUG-<n> token' because
+    such a control would 'invent ids from archaeology, quoted decisions and this very block'. MEASURED
+    2026-09-27, that objection is now a NUMBER rather than a fear: the walker reports 62 ids, and every one of
+    them is a real name in real use (a legacy row, a legacy bullet, or BUG-492, quoted 33 times by the standing
+    rule). Nothing here decides what a bug IS or what state it has: it decides which NAMES the machine register
+    cannot answer for, and that set is declared, pinned by identity and SHRINK-ONLY - so the walker cannot
+    invent debt, it can only ADD TO A LIST A HUMAN MUST EDIT.
+    """
+    out: dict[str, int] = {}
+    for i, line in enumerate(lines, start=1):
+        for tok in TOKEN_RE.findall(line):
+            if tok not in carried:
+                out.setdefault(tok, i)
+    return out
+
+
+def _sorted(ids) -> list[str]:
+    """Register order: by id NUMBER, so a diff is readable (a set's order is not evidence)."""
+    return sorted(ids, key=lambda b: int(re.sub(r"\D", "", str(b)) or 0))
+
+
+def faults(live: dict[str, str], declared: set[str], declared_max: int,
+           uncarried: dict[str, int], declared_uncarried: set[str], declared_max_uncarried: int,
+           limit: int = 8) -> list[str]:
+    """BOTH divergence shapes against their declared, shrink-only lists. PURE (D-405): same code, live and rehearsed."""
+    bad: list[str] = []
+    new = _sorted(set(live) - declared)
+    stale = _sorted(declared - set(live))
+    if new:
+        bad.append("UNDECLARED divergence (" + str(len(new)) + "): "
+                   + ", ".join(str(b) + " (" + str(live[b]) + ")" for b in new[:limit]))
+    if stale:
+        bad.append("STALE declaration (" + str(len(stale)) + "): " + ", ".join(stale[:limit]) + " - no longer "
+                   "divergent; the list is SHRINK-ONLY, remove the entry (BUG-481)")
+    if len(declared) > declared_max:
+        bad.append("declared " + str(len(declared)) + " exceeds declared_max " + str(declared_max) + " - raising "
+                   "the ceiling requires a declared decision, not an edit")
+    named = _sorted(set(uncarried) - declared_uncarried)
+    carried_again = _sorted(declared_uncarried - set(uncarried))
+    if named:
+        bad.append("UNDECLARED uncarried id (" + str(len(named)) + "): "
+                   + ", ".join(b + " @line " + str(uncarried[b]) for b in named[:limit]) + " - the log NAMES an id "
+                   "no machine home carries (BUG-571). Give it a HEADER event (it is a bug) or remove the name (it "
+                   "is not): a citation naming nothing is worse than no citation (D-2660), and the register cannot "
+                   "count what no header carries.")
+    if carried_again:
+        bad.append("STALE uncarried declaration (" + str(len(carried_again)) + "): " + ", ".join(carried_again[:limit])
+                   + " - the register now CARRIES it; the list is SHRINK-ONLY, remove the entry (BUG-571)")
+    if len(declared_uncarried) > declared_max_uncarried:
+        bad.append("declared_uncarried " + str(len(declared_uncarried)) + " exceeds declared_max_uncarried "
+                   + str(declared_max_uncarried) + " - raising the ceiling requires a declared decision, not an edit")
+    return bad
+
+
+def selftest() -> int:
+    """Known-answer controls over SYNTHETIC logs and lists: BOTH shapes, BOTH directions (D-2676, BUG-492)."""
+    ok = fail = 0
+
+    def check(name: str, got, want, why: str) -> None:
+        nonlocal ok, fail
+        if got == want:
+            ok += 1
+            print("  ok  selftest/" + name)
+        else:
+            fail += 1
+            print("FAIL selftest/" + name + ": got " + repr(got) + ", expected " + repr(want) + " - " + why)
+
+    def count(bad: list[str], needle: str) -> int:
+        return len([b for b in bad if needle in b])
+
+    log = ["# Bug log", "", "## BUG-001 (LOW): a real bug", "see BUG-999 for the cause", "| BUG-002 | 2026-01-01 | x |"]
+    carried = carried_ids(log)
+    check("the_register_projection_ignores_prose", carried, {"BUG-001"},
+          "the register's domain is HEADER events, not tokens")
+    check("uncarried_id_is_reported", uncarried_ids(log, carried), {"BUG-999": 4, "BUG-002": 5},
+          "an id the log names and no header carries must be reported with its first line")
+    check("carried_id_is_silent", uncarried_ids(log, {"BUG-001", "BUG-002", "BUG-999"}), {},
+          "the negative control: nothing named is uncarried -> nothing is reported")
+    check("a_fault_is_not_the_first_only", len(uncarried_ids(log, {"BUG-001"})), 2,
+          "an id is not a prefix of another id's report")
+    one = faults({}, set(), 0, {"BUG-999": 4}, set(), 0)
+    check("undeclared_uncarried_id_is_a_fault", count(one, "UNDECLARED uncarried id"), 1, "a NEW name is RED")
+    two = faults({}, set(), 0, {}, {"BUG-999"}, 62)
+    check("a_pin_that_is_now_carried_is_stale", count(two, "STALE uncarried declaration"), 1,
+          "the pin is SHRINK-ONLY: it may not go stale (D-2645)")
+    pins = {"BUG-" + str(i).zfill(3) for i in range(62)}
+    three = faults({}, set(), 0, {}, pins, 61)
+    check("the_uncarried_ceiling_is_read", count(three, "exceeds declared_max_uncarried"), 1,
+          "raising the ceiling is an edit a human reads, not a quiet growth")
+    four = faults({"BUG-007": "header is OPEN but the body asserts **Status: FIXED**"}, set(), 0, {}, set(), 0)
+    check("the_first_shape_still_fires", count(four, "UNDECLARED divergence"), 1, "BUG-481 is not weakened")
+    five = faults({"BUG-007": "ev"}, {"BUG-007"}, 1, {"BUG-002": 5}, {"BUG-002"}, 1)
+    check("clean_is_silent", five, [], "the negative control over BOTH shapes")
+    six = faults({"BUG-007": "ev"}, {"BUG-007"}, 0, {}, set(), 0)
+    check("the_divergence_ceiling_is_read", count(six, "exceeds declared_max "), 1, "BUG-481's ceiling is read")
+    print("ok register divergence selftest: " + str(ok) + " known-answer control(s) fire, both directions")
+    if fail:
+        print("FAIL register divergence selftest: " + str(fail) + " control(s) did not fire")
+        return 1
+    return 0
+
+
 def main() -> int:
     """Compare the live divergence with the declared, shrink-only list. Require exact agreement."""
     import yaml
     ap = argparse.ArgumentParser()
-    ap.parse_args()
+    ap.add_argument("--selftest", action="store_true",
+                    help="known-answer controls over SYNTHETIC logs and lists (BUG-492)")
+    a = ap.parse_args()
+    if a.selftest:
+        return selftest()
     cfg = yaml.safe_load(CONFIG.read_text(encoding="utf-8")) or {}
-    declared = {e["id"] for e in (cfg.get("declared_divergent") or [])}
-    live = divergent_ids(BUGLOG.read_text(encoding="utf-8").splitlines())
-    declared_max = int(cfg.get("declared_max", 0))
-
-    new = sorted(set(live) - declared, key=lambda b: int(b[4:]))
-    stale = sorted(declared - set(live), key=lambda b: int(b[4:]))
-    bad = []
-    if new:
-        bad.append(f"UNDECLARED divergence ({len(new)}): " + ", ".join(f"{b} ({live[b]})" for b in new))
-    if stale:
-        bad.append(f"STALE declaration ({len(stale)}): {', '.join(stale)} - no longer divergent; the list is "
-                   f"SHRINK-ONLY, remove the entry (BUG-481)")
-    if len(declared) > declared_max:
-        bad.append(f"declared {len(declared)} exceeds declared_max {declared_max} - raising the ceiling "
-                   f"requires a declared decision, not an edit")
+    lines = BUGLOG.read_text(encoding="utf-8").splitlines()
+    carried = carried_ids(lines)
+    declared = {str(e["id"]) for e in (cfg.get("declared_divergent") or [])}
+    declared_uncarried = {str(x) for x in (cfg.get("declared_uncarried") or [])}
+    bad = faults(divergent_ids(lines), declared, int(cfg.get("declared_max", 0)),
+                 uncarried_ids(lines, carried), declared_uncarried,
+                 int(cfg.get("declared_max_uncarried", 0)))
     if bad:
-        print("FAIL register divergence (BUG-481):")
+        print("FAIL register divergence (BUG-481/BUG-571):")
         for b in bad:
             print("  !!", b)
-        print("  a closure belongs in the HEADER, where the register can see it; the body is made loud, not "
-              "silent. Reconcile governance/buglog.md, then re-run scripts/bug_status.py.")
+        print("  a bug belongs in a HEADER, where the register can see it; the body is made loud, not silent. "
+              "Reconcile governance/buglog.md, then re-run scripts/bug_status.py.")
         return 1
-    print(f"ok register divergence: {len(live)} declared, all still divergent; ceiling {declared_max} "
-          f"(shrink-only)")
+    print("ok register divergence: " + str(len(declared)) + " declared divergence(s), all still divergent; "
+          + str(len(declared_uncarried)) + " named-but-uncarried id(s) declared, all still uncarried; ceilings "
+          + str(int(cfg.get("declared_max", 0))) + "/" + str(int(cfg.get("declared_max_uncarried", 0)))
+          + " (shrink-only); " + str(len(carried)) + " id(s) carried")
     return 0
 
 

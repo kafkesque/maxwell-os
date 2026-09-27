@@ -206,19 +206,33 @@ membership:
 # invisible to every rail, and fatal to any future consumer that compares state strings exactly. This is the
 # BUG-572 family one level down - a spelling that decides nothing is still a SECOND form of a governed value.
 #
-# WHY A PIN AND NOT A REWRITE. config/decisions.yaml is append_only with a PREFIX receipt (D-2655): no key may be
-# rewritten in place by any writer, so canonicalising the 5 records needs the registry's own writer plus a
-# refreshed receipt - an owner-gated structural edit, tracked separately. What is landable NOW, and what this
-# block is for, is the reader that FAILS: a NEW second spelling is refused the moment it is written.
+# WHY A NAMED ROUTE AND NOT A BLANKET REWRITE. config/decisions.yaml is append_only with a PREFIX receipt
+# (D-2655): no writer may rewrite a key in place, so canonicalising the pinned cells needs the registry's OWN
+# writer, a PROOF that the edit touched those cells only, and a refreshed receipt. That exception is not granted
+# to a willing script - it is DECLARED here (canonicalisation_route), the way the reservation and the debt lists
+# are, so a future author cannot re-invent it and a reader can FAIL on its absence. The reader that FAILS on a
+# NEW second spelling is scripts/recompute_decision_summary.py#spelling_problems(); this block is the pin AND the
+# route, which is why the pin can now be EMPTY and the rule universal (a debt that can never be paid down is a
+# permanent exemption wearing a debt's clothes).
 state_vocabulary:
   canonical: 'the `STATES` vocabulary in scripts/recompute_decision_summary.py, upper-cased by canonical_state()'
+  # The ONLY sanctioned in-place edit of that registry, named as a command so a reader can join it to a writer.
+  canonicalisation_route: 'scripts/recompute_decision_summary.py --canonicalise-states [--apply]'
   # Pinned BY IDENTITY, never by a count (a ceiling would let a NEW spelling hide inside it), and SHRINK-ONLY:
-  # a pinned id that is canonical now is a STALE declaration and fails the rail (D-405).
-  legacy_non_canonical_ids: ['D-2642', 'D-2643', 'D-2644', 'D-2645', 'D-2646']
+  # a pinned id that is canonical now is a STALE declaration and fails the rail (D-405). EMPTY after 2026-09-27:
+  # all five were canonicalised, so a pin here would now be the stale declaration the rule exists to catch.
+  legacy_non_canonical_ids: []
+  canonicalised: >-
+    MEASURED 2026-09-27: the five records that spelled the SAME state the others spell ACTIVE were replaced in
+    place by the declared route (D-2693). The five cells are the WHOLE diff: same record count, same id set, no
+    other key of any record moved, and the registry re-derives canonical EVERYWHERE, which is what let the pin
+    shrink to empty. The content stamp MOVED (a state is part of it) and the decisions_registry PREFIX receipt was
+    re-baselined in the same sitting - a splice moves bytes inside the receipted region by construction, and
+    verify_handoffs is the reader that would have caught a forgotten re-baseline.
   why: >-
-    The five records below spell the SAME state the other 515 spell ACTIVE. They predate the rule and are pinned,
-    not silently tolerated: scripts/recompute_decision_summary.py#spelling_problems() fails on any non-canonical
-    spelling that is NOT pinned, and fails on a pin that no longer describes anything.
+    spelling_problems() fails on any non-canonical spelling that is NOT pinned, and fails on a pin that no longer
+    describes anything. Both directions are live: the pin is empty and a SECOND spelling is still refused the
+    moment it is written, so the rule is now universal rather than a five-record exemption.
 
 # -------------------------------------------------------------------------------------------------------------
 # LOG HEADER (BUG-588). The human log's header may POINT at the census; it may never RESTATE a count.

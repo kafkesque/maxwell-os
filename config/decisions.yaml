@@ -8625,32 +8625,32 @@ decisions:
     policy is declared in config and an unknown value is fatal, so the guard cannot be turned into an off switch.
   measured: 'pre_write_verdict refuses 0 of 7,995 stored rows; rail 7995 MATCH; 10/10 + 6/6 known-answer controls'
 - id: D-2642
-  state: active
+  state: ACTIVE
   category: GOVERNANCE/INVARIANT
   title: 'A rule about the verification record has exactly ONE implementation, and the corpus it produced is the only acceptable proof of a refactor'
   measured: 'the S5 score axis was a verbatim copy in stage5_verify.py AND reinject_bug198_singletons.py; after collapsing it into serving_gate.derive_conf_and_review the stored corpus re-derives 7995/7995 on confidence_score AND needs_human_review with 8/8 known-answer controls; a probe fed a column SUBSET produced 5023 false mismatches (a partial row is not the record)'
   decision: 'The score axis lives in pipeline/serving_gate.py::derive_conf_and_review and both call sites import it. Equivalence is proven against the STORED corpus WITH FULL ROWS, never by reading the code.'
 - id: D-2643
-  state: active
+  state: ACTIVE
   category: GOVERNANCE/SAFETY
   title: 'An abandoned ontology must not have a REACHABLE write path - unreachability, not a speed bump'
   measured: 'just migrate-epistemic/-dry/-verify reached 8 D2205 ALTERs on fbs incl. a fourth epistemic column with DEFAULT corroborated; none of the 8 columns exist on fbs (75 columns); after the tombstone rc=2 (owner-owed) and 0 recipes reachable'
   decision: 'The D2205 migration recipes are removed and the script refuses with exit 2 unless the owner passes --i-understand-D2205-is-abandoned. Deleting the archaeology is NOT the fix; closing the reachable path is.'
 - id: D-2644
-  state: active
+  state: ACTIVE
   category: GOVERNANCE/CONFIG
   title: 'A config value read with a code default is an UNDECLARED value - a config miss must be the error'
   measured: 'all five S5 score-axis weights were governed by _CFG.get(..., <code default>) with no stage5.confidence block in config/pipeline_config.yaml; they are now declared with byte-identical values and read through a loud _s5_conf() that names the file and the key'
   decision: 'C12/C16 extended to constants: if the caller supplies a default, the value is not declared. Declare it and read it loudly; .get(..., default) on config is a defect, not a convenience.'
 
 - id: D-2645
-  state: 'active'
+  state: ACTIVE
   category: 'GOVERNANCE'
   title: 'Revocation ontology - a revoked scope is a DECLARED SUB-FACT with a rail'
   measured: 'MEASURED 2026-09-25: the D2205 P3 migration is abandoned while the D2205 roadmap is ACTIVE (live retrieval P0/P1 and CRAG citations), so a whole-record state would be FALSE. Declared with prefixed scalar keys on the record (audit F2: no record carries a mapping-shaped value, so no new shape enters a governed registry). 24 pre-rule SUPERSEDED/ARCHIVED records are pinned BY IDENTITY, never by a count.'
   decision: 'A tombstone stops EXECUTION; a registry stops RE-PROPOSAL (D-2643). Required fields scope/reason/evidence/date/tokens; whole-record states REVOKED/ABANDONED; rules in config/decisions_policy.yaml; rail scripts/check_revoked_references.py with known-answer controls and a RESERVED fixture namespace. First subject: D2205 P3. Declaring a revocation is a structural edit of an append_only registry: the handoff receipt is refreshed in the same sequence and a forgotten refresh is LOUD (verify_handoffs), never silent.'
 - id: D-2646
-  state: 'active'
+  state: ACTIVE
   category: 'GOVERNANCE'
   title: 'One derived value, one home - a rule that decides a stored value has ONE implementation'
   measured: 'MEASURED 2026-09-25 by a tree-wide AST scan: BUG-499 and BUG-502 were one defect three times - a rule deciding a stored value existed verbatim in TWO scripts with nothing reporting divergence. config/derivations.yaml holds 9 rows: 6 homed, 1 orphan_magic_threshold (an undeclared literal 10), 1 dead_but_read (borp_score: 7995/7995 constant 0.0, no writer, still ORDER BY-ed), 1 declared_but_empty (feedback_score 0/7995).'
@@ -9962,3 +9962,45 @@ decisions:
   - agent/session_seed.yaml
   - MASTER-TASK-REGISTER.md
   - governance/CONTEXT_INDEX.md
+- id: D-2693
+  date: '2026-09-27'
+  state: ACTIVE
+  category: governance
+  title: A STATE HAS ONE SPELLING, AND THE DEBT IS PAID BY A DECLARED ROUTE, NOT BY A PERMISSION (BUG-583 CANONICALISE
+    LIMB EXECUTED)
+  decision: 'The CANONICALISE limb of BUG-583 is EXECUTED, and the exception it needed is DECLARED rather than granted.
+    scripts/recompute_decision_summary.py gains --canonicalise-states [--apply]: the ONLY sanctioned in-place edit
+    of the append_only registry (D-2655 forbids a key rewrite by any writer). It replaces the `state:` cell of the
+    ids PINNED in config/decisions_policy.yaml#state_vocabulary.legacy_non_canonical_ids by BYTE SPLICE - never
+    a YAML re-render, so THE DIFF IS THE PROOF - and it earns the exception by PROVING three things about the would-be
+    bytes BEFORE the write: the id set is unmoved, no cell moved that the pin did not name, and the registry re-derives
+    canonical EVERYWHERE afterwards (that third clause is what lets the pin shrink to EMPTY and the rule become
+    universal instead of a five-record exemption). state_cell_problems() refuses a pin that names a missing id or
+    an already-canonical one, so a stale pin REDs instead of being silently satisfied. The route is DECLARED where
+    a reader can fail on it: state_vocabulary.canonicalisation_route - a rule with no home is a favour. The three
+    obligations are LOUD, never silent: the splice; the pin shrinks in the SAME sitting (a pin over a canonical
+    cell is the STALE declaration the spelling reader fails on); and the decisions_registry PREFIX receipt is re-baselined
+    AFTER the commit, because a splice moves bytes inside the receipted region BY CONSTRUCTION. The first run of
+    this route REFUSED ITSELF: it asked registry_shape_problems() with the LIVE pin, so the post-state could not
+    be clean - a check that cannot tell its two reasons apart proves neither, one level up.'
+  measured: 'MEASURED 2026-09-27. The five cells (D-2642/D-2643/D-2644 bare, D-2645/D-2646 quoted) were replaced
+    in place: the WHOLE diff is those five `state:` lines, the record count did not move (823), the id set is unmoved,
+    and no other key of any record changed - asserted by splice_problems() before the write, not after. The content
+    stamp MOVED (11008e971cb25a52 -> re-derived: a state is part of it, unlike the strip''s deliberately unmoved
+    stamp) and the census was re-derived in the SAME invocation from the bytes ON DISK. Controls: 18/18 known-answer
+    controls fire, including the new pair - a splice that moves a state the pin never NAMED is a NAMED fault, and
+    a splice that canonicalises the pinned cell and nothing else is ACCEPTED. The pin is EMPTY afterwards and the
+    reader still refuses a NEW second spelling the moment it is written.'
+  bugs:
+  - BUG-583
+  files:
+  - scripts/recompute_decision_summary.py
+  - config/decisions_policy.yaml
+  - config/decisions.yaml
+  - config/artifact_ownership.yaml
+  - config/decisions_summary.json
+  - config/rail_mutations.yaml
+  - MASTER-TASK-REGISTER.md
+  - DECISION-LOG.md
+  - governance/CONTEXT_INDEX.md
+  - agent/session_seed.yaml

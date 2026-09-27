@@ -166,9 +166,11 @@ artifacts:
     writer_scope: append_only_new_records
     writer_of_record: scripts/recompute_decision_summary.py
     guard_note: >-
-      ROUTED 2026-09-25 (BUG-503 session, audit F5); RE-ROUTED 2026-09-26 (D-2655 HALF B). The guard call
-      sites are now the CHECKED APPEND in --mint and the one-shot strip that removed owned_by's former
-      subjects, so write_guard --audit joins this writer as ok guarded and the artifact owes NO guard debt -
+      ROUTED 2026-09-25 (BUG-503 session, audit F5); RE-ROUTED 2026-09-26 (D-2655 HALF B); EXTENDED
+      2026-09-27 (D-2693/BUG-583). The guard call sites are now the CHECKED APPEND in --mint, the one-shot
+      strip that removed owned_by's former subjects, and the PROVED IN-PLACE SPLICE in --canonicalise-states
+      (the declared route in config/decisions_policy.yaml#state_vocabulary.canonicalisation_route),
+      so write_guard --audit joins this writer as ok guarded and the artifact owes NO guard debt -
       the field is therefore guard_note, not guard_exemption: a debt field on an artifact that owes nothing is
       itself a false declaration, and it is exactly the declaration-vs-reality drift every rail here exists to
       catch. The earlier text named _surgical_write, which HALF B deleted (C19): a declaration citing a
@@ -179,7 +181,12 @@ artifacts:
     note: >
       The registry is the source of truth for decision ids. Records are APPEND-ONLY and EXTEND TO
       END-OF-FILE: a record is never deleted, retitled or rewritten in place, and NO existing key may be
-      rewritten by any writer - which is why owned_by is EMPTY rather than a list of columns. D-2655
+      rewritten by any writer - which is why owned_by is EMPTY rather than a list of columns. ONE exception,
+      and it is a NAMED route rather than a permission: --canonicalise-states (D-2693/BUG-583) may replace the
+      `state:` cell of an id PINNED in config/decisions_policy.yaml#state_vocabulary, and only after proving
+      the splice moves those cells and nothing else, that the registry re-derives canonical everywhere, and
+      that the receipt is re-baselined in the same sitting. A rule enforced by nobody is why the exception is
+      a declared route with its own controls and mutation teeth, not a writer's willingness. D-2655
       (2026-09-26) removed the derived head (total_decisions, summary, last_sync, decisions_sha256_16,
       written_by) from this file: an append_only artifact whose handoff receipt is a PREFIX rule cannot hold a
       value that changes on every mint, so the only sanctioned write is a pure byte-APPEND (--mint) and the

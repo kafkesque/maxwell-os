@@ -1342,3 +1342,12 @@ and this one was found by the gate the standing rule creates.
 
 NOT DONE, DECLARED: BUG-583's CANONICALISE limb (the five cells) is owner-gated; the last three held ids
 (BUG-568, BUG-569, BUG-559) are still parked, so the window's exit stays UNMET.
+
+## D-2693 (2026-09-27) - the CANONICALISE limb of BUG-583 is EXECUTED, and the debt is paid by a DECLARED ROUTE rather than a permission
+
+- scripts/recompute_decision_summary.py gains `--canonicalise-states [--apply]`: the ONLY sanctioned IN-PLACE edit of the append_only registry (D-2655 forbids a key rewrite by any writer). It replaces the `state:` cell of the ids PINNED in config/decisions_policy.yaml#state_vocabulary.legacy_non_canonical_ids by BYTE SPLICE - never a YAML re-render, so THE DIFF IS THE PROOF.
+- It EARNS the exception before a byte moves: `splice_problems()` proves the id set is unmoved, that no cell moved the pin did not name, and that the registry re-derives canonical EVERYWHERE afterwards - the third clause is what lets the pin shrink to EMPTY and the rule become universal instead of a five-record exemption. `state_cell_problems()` refuses a pin naming a missing or already-canonical id, so a STALE pin REDs.
+- The route is DECLARED where a reader can FAIL on it (`canonicalisation_route`): a rule with no home is a favour.
+- MEASURED: the whole diff is five `state:` lines (823 records, id set unmoved, no other key of any record changed); stamp 11008e971cb25a52 -> 1d866228c74eb195 (it MOVES - a state is part of the content stamp); census re-derived in the SAME invocation from the bytes ON DISK; 18/18 controls fire (the new pair: a splice moving an UNPINNED state is a NAMED fault; a pinned-cell-only splice is ACCEPTED); pin EMPTY afterwards.
+- The first run of the route REFUSED ITSELF: it asked `registry_shape_problems()` with the LIVE pin, so the post-state could never be clean - a check that cannot tell its two reasons apart proves neither.
+- OWED, LOUD: the two new controls have no mutation entry yet (D-2676 limb iv); the receipt re-baseline is the second commit of this change-set.

@@ -826,3 +826,10 @@ for the leak scan (owed since D-2686). (4) The product lane: extraction_type is 
 anchor (0/251 rows), no verifier (F-15) and no consumer - the largest single block in front of the 7,000+ work.
 (5) The 10 soft depth/domain findings; the object-level sweep against the ratified ruler; S6 commit_non_fb_types
 sidecars; the Tier3 boundary corpus; F-14 (gated on G2).
+
+## D-2693 (2026-09-27) - CANONICALISE limb of BUG-583 EXECUTED: one spelling, one declared route, pin EMPTY
+
+- DONE: `--canonicalise-states` (proved in-place splice: id set unmoved, pinned cells only, canonical everywhere) + `canonicalisation_route` in config/decisions_policy.yaml + the pin shrunk to [] + the artifact_ownership declaration EXTENDED (guard_note names the third guard call site; `note:` names the one declared exception) + 2 controls (18/18).
+- MEASURED: diff = 5 `state:` lines, -4 bytes; stamp 11008e971cb25a52 -> 1d866228c74eb195; census re-derived same-invocation; `--check` rc 0.
+- REGISTER (unchanged by this change): OPEN 130 / CLOSED 198.
+- NEXT CONSEQUENTIAL: (1) mutation teeth for the two new controls (floor 28 -> 29) - D-2676 limb iv owed for this rule; (2) drain the last 3 HELD ids (BUG-569 -> BUG-568 -> BUG-559) so the freeze window's exit goes MET; (3) session_seed `registry: decisions: 639` is a dated SNAPSHOT key (higher than the census by 184) -> D-2691 rename treatment.

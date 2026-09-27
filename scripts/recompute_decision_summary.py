@@ -216,6 +216,214 @@ def spelling_problems(decisions: list, pinned: list[str] | None = None) -> list[
     return problems
 
 
+CANONICALISE_FLAG: str = "--canonicalise-states"
+ID_LINE_RE = re.compile(r"^- id: (D-?\d+[a-z]?)$")
+
+
+def legacy_spelling_route() -> str | None:
+    """The DECLARED home of the in-place route, read from the RULES file; None when it is not declared (C12).
+
+    An in-place edit of an append_only artifact is a RULE, not a capability: it lives where a reader can FAIL on
+    it, so a writer cannot grant itself the exception by being willing to take it (D-2655/BUG-583).
+    """
+    if not POLICY_YAML.exists():
+        return None
+    policy = yaml.safe_load(POLICY_YAML.read_text(encoding="utf-8")) or {}
+    route = (policy.get("state_vocabulary") or {}).get("canonicalisation_route")
+    return None if route is None else str(route)
+
+
+def state_cell_problems(decisions: list, targets: list[str]) -> list[str]:
+    """Every reason a set of PINNED ids may NOT be canonicalised - asked of the record BEFORE a byte moves.
+
+    The pin in config/decisions_policy.yaml#state_vocabulary is a DEBT declaration and SHRINK-ONLY: a target that
+    no longer exists, or that is canonical already, must RED rather than be silently satisfied - a pin that can
+    never be paid down is a permanent exemption wearing a debt's clothes (D-405/BUG-583).
+    """
+    problems: list[str] = []
+    want = [str(t) for t in targets]
+    if len(set(want)) != len(want):
+        problems.append("the pin names an id twice: " + str(sorted(want)))
+    index = {normalized_id(r): r for r in decisions if isinstance(r, dict)}
+    for target in want:
+        record = index.get(target)
+        if record is None:
+            problems.append(target + ": pinned as a legacy spelling, but no record carries that id - a pin that "
+                            "names nothing cannot be canonicalised (D-405/BUG-583)")
+            continue
+        if str(record.get("state") or "").strip() == canonical_state(record):
+            problems.append(target + ": is canonical ALREADY - the pin describes nothing now, so shrink the pin "
+                            "rather than rewriting a canonical cell (D-405/BUG-583)")
+    return problems
+
+
+def splice_problems(pre_decls: list, post_decls: list, targets: list[str]) -> list[str]:
+    """Prove a canonicalising splice touched the PINNED state cells and NOTHING else.
+
+    WHY THIS FUNCTION IS THE WHOLE LICENCE. config/decisions.yaml is append_only with a PREFIX receipt and no
+    writer may rewrite a key in place (D-2655). An in-place route therefore has to EARN the exception instead of
+    being granted one, and it earns it by proving three things about the WOULD-BE bytes BEFORE the write: the id
+    set is unmoved (a canonicalisation may touch a state, never a record); no cell moved that the pin did not name
+    (a route that can move an unpinned cell is a licence to rewrite the registry); and the registry is canonical
+    EVERYWHERE afterwards, which is what lets the pin shrink to empty and the reader's rule become universal.
+    """
+    problems: list[str] = []
+    pin = {str(t) for t in targets}
+    pre = {normalized_id(r): r for r in pre_decls if isinstance(r, dict)}
+    post = {normalized_id(r): r for r in post_decls if isinstance(r, dict)}
+    if set(pre) != set(post):
+        return ["the splice moved the registry's ID SET (" + str(sorted(set(pre) ^ set(post))) + ") - a "
+                "canonicalisation may touch a state, never a record (C21/BUG-583)"]
+    moved = sorted(i for i in post if str(pre[i].get("state")) != str(post[i].get("state")))
+    extra = [i for i in moved if i not in pin]
+    if extra:
+        problems.append("the splice moved the state of " + str(extra) + ", which the pin never named - an in-place "
+                        "route that can move a cell nobody pinned is a licence to rewrite an append_only registry "
+                        "(D-2655/BUG-583)")
+    unpinned = [i for i in sorted(post) if str(post[i].get("state") or "").strip() != canonical_state(post[i])]
+    if unpinned:
+        problems.append("the would-be registry still spells " + str(unpinned) + " non-canonically, so the pin "
+                        "could NOT shrink after this write - the only reason this route exists would not be met "
+                        "(BUG-583)")
+    for i in sorted(post):
+        rest_pre = {k: v for k, v in pre[i].items() if k != "state"}
+        rest_post = {k: v for k, v in post[i].items() if k != "state"}
+        if rest_pre != rest_post:
+            problems.append(i + ": the splice moved a key OTHER than `state:` - a canonicalisation edits ONE "
+                            "governed value, never a record (D-2655/BUG-583)")
+    return problems
+
+
+def canonicalise_plan(text: str, targets: list[str]) -> tuple[str, list[str]]:
+    """Return (would-be registry text, problems): the PINNED `state:` cells replaced by BYTE SPLICE.
+
+    WHY A SPLICE AND NOT A RE-RENDER (the D-2655 HALF B lesson). Re-emitting the registry through the YAML
+    emitter would produce a document that merely happens to parse: every line of 9,800 would be a new byte, the
+    diff would be unreadable, and any hand-authored formatting or ordering would be lost. The splice rewrites the
+    `state:` LINE of a pinned record and nothing else, so THE DIFF IS THE PROOF - which is exactly what a writer
+    touching a cell of an append_only artifact has to show before it may write.
+    """
+    data = yaml.safe_load(text) or {}
+    decisions = [r for r in (data.get("decisions") or []) if isinstance(r, dict)]
+    problems = state_cell_problems(decisions, targets)
+    if problems:
+        return text, problems
+    pin = {str(t) for t in targets}
+    index = {normalized_id(r): r for r in decisions}
+    lines = text.split(chr(10))
+    starts = [i for i, ln in enumerate(lines) if ln.startswith("- id: ")]
+    blocks: dict[str, tuple[int, int]] = {}
+    for at, start in enumerate(starts):
+        end = starts[at + 1] if at + 1 < len(starts) else len(lines)
+        match = ID_LINE_RE.match(lines[start])
+        if match:
+            blocks[normalized_id({"id": match.group(1)})] = (start, end)
+    missing = sorted(pin - set(blocks))
+    if missing:
+        problems.append(str(missing) + ": pinned id(s) whose bare `- id:` record block this route cannot locate - "
+                        "refusing rather than rewriting a cell by guesswork (C16/BUG-583)")
+        return text, problems
+    moves: list[tuple[int, str]] = []
+    for target in sorted(pin):
+        start, end = blocks[target]
+        cells = [i for i in range(start, end) if lines[i].startswith("  state: ")]
+        if len(cells) != 1:
+            problems.append(target + ": carries " + str(len(cells)) + " `  state: ` cell(s) at record indent - the "
+                            "route replaces exactly one cell per pinned record (C16/BUG-583)")
+            continue
+        cell = cells[0]
+        try:
+            raw = yaml.safe_load(lines[cell][len("  state: "):].strip())
+        except yaml.YAMLError as exc:
+            problems.append(target + ": the `state:` cell does not parse (" + type(exc).__name__ + ") - a cell "
+                            "this route cannot read is not a cell it may rewrite (C16)")
+            continue
+        if str(raw) != str(index[target].get("state")):
+            problems.append(target + ": the `state:` line parses to " + repr(raw) + " but the record's state is "
+                            + repr(index[target].get("state")) + " - refusing to rewrite a cell that does not "
+                            "match the record (C16/BUG-583)")
+            continue
+        moves.append((cell, "  state: " + canonical_state(index[target])))
+    if problems:
+        return text, problems
+    out = list(lines)
+    for cell, new_line in moves:
+        out[cell] = new_line
+    touched = sum(1 for a, b in zip(lines, out) if a != b)
+    if len(out) != len(lines) or touched != len(moves):
+        return text, ["the splice moved " + str(touched) + " line(s), not the " + str(len(moves)) + " pinned "
+                      "cell(s) - an edit that changes a line it did not declare is not a canonicalisation (C16)"]
+    new_text = chr(10).join(out)
+    post = [r for r in ((yaml.safe_load(new_text) or {}).get("decisions") or []) if isinstance(r, dict)]
+    return new_text, splice_problems(decisions, post, targets)
+
+
+def canonicalise_main(argv: list[str]) -> int:
+    """`--canonicalise-states [--apply]`: pay the spelling debt down by an in-place, PROVED splice (BUG-583).
+
+    THE DECLARED SEQUENCE (three obligations, all LOUD): the splice; then the pin shrinks to empty in the SAME
+    sitting, because a pin over a canonical cell is a STALE declaration the spelling reader FAILS on; then the
+    decisions_registry PREFIX receipt is re-baselined, because the splice moved bytes inside the receipted region
+    by construction - and a receipt that is merely forgotten is caught by verify_handoffs, never by silence.
+    """
+    if argv[1:] not in ([CANONICALISE_FLAG], [CANONICALISE_FLAG, "--apply"]):
+        raise SystemExit("FAIL-CLOSED (" + WRITER + "): usage: " + CANONICALISE_FLAG + " [--apply]")
+    route = legacy_spelling_route()
+    if route is None or WRITER not in route:
+        raise SystemExit("FAIL-CLOSED (" + WRITER + "): "
+                         + POLICY_YAML.relative_to(ROOT).as_posix()
+                         + "#state_vocabulary.canonicalisation_route is " + repr(route) + ", which does not name "
+                         + WRITER + " - an in-place edit of an append_only artifact is a RULE, and a rule with no "
+                         "home is a favour (C12/D-2655/BUG-583)")
+    targets = legacy_spelling_ids() or []
+    if not targets:
+        print("ALREADY CANONICALISED - nothing to do: the pin is empty and every state on disk spells the "
+              "canonical form (BUG-583)")
+        return 0
+    text = DECISIONS_YAML.read_text(encoding="utf-8")
+    new_text, problems = canonicalise_plan(text, targets)
+    if problems:
+        raise SystemExit("FAIL-CLOSED (" + WRITER + "): refusing to canonicalise: " + "; ".join(map(str, problems)))
+    pre_data = yaml.safe_load(text) or {}
+    post_data = yaml.safe_load(new_text) or {}
+    pre_total, _pre_summary, pre_stamp = recompute(pre_data)
+    post_total, _post_summary, post_stamp = recompute(post_data)
+    if post_total != pre_total:
+        raise SystemExit("FAIL-CLOSED (" + WRITER + "): the splice moved the RECORD COUNT (" + str(pre_total)
+                         + "->" + str(post_total) + ") - refusing")
+    yaml_guard.assert_yaml(new_text, "config/decisions.yaml", WRITER)
+    # The postcondition is asked with the pin EMPTIED (pinned=[]), never with the live pin: the whole point of a
+    # canonicalisation is that the pin SHRINKS to nothing, so asking the live pin would make this route refuse by
+    # construction - MEASURED on the first run, which is how this clause came to read the pin it will leave
+    # behind rather than the one it found (a check that cannot distinguish its two reasons proves neither).
+    post_records = [r for r in (post_data.get("decisions") or []) if isinstance(r, dict)]
+    shape = ["derived key " + repr(k) + " came back into the append_only registry (D-2655)"
+             for k in REGISTRY_DERIVED_KEYS if k in post_data]
+    shape += record_problems(post_records) + spelling_problems(post_records, pinned=[]) + vocabulary_problems()
+    if shape:
+        raise SystemExit("FAIL-CLOSED (" + WRITER + "): the spliced registry does not re-derive cleanly: "
+                         + "; ".join(map(str, shape)))
+    print("PRE  " + str(len(text.encode("utf-8"))) + " B sha256 " + hashlib.sha256(text.encode("utf-8")).hexdigest())
+    print("SPLICE " + str(len(targets)) + " pinned `state:` cell(s): " + ", ".join(targets))
+    print("POST " + str(len(new_text.encode("utf-8"))) + " B sha256 "
+          + hashlib.sha256(new_text.encode("utf-8")).hexdigest() + " - stamp " + pre_stamp + " -> " + post_stamp
+          + " (it MOVES: a state is part of the content stamp, unlike the strip's unmoved stamp)")
+    if "--apply" not in argv:
+        print("PREVIEW (nothing written): re-run with --apply")
+        return 0
+    write_document(DECISIONS_YAML, new_text, writer=WRITER, owned_keys={OWNED_ANY}, backup=True, journal=True)
+    disk = DECISIONS_YAML.read_text(encoding="utf-8")
+    disk_data = yaml.safe_load(disk) or {}
+    d_total, d_summary, d_digest = recompute(disk_data)
+    write_census(census_document(disk_data, d_total, d_summary, d_digest, disk))
+    print("ok " + str(d_total) + " record(s), stamp " + d_digest + ", census re-derived from the bytes ON DISK")
+    print("NEXT (SAME sitting, the readers are LOUD otherwise): (1) shrink "
+          + POLICY_YAML.relative_to(ROOT).as_posix() + "#state_vocabulary.legacy_non_canonical_ids to []; "
+          "(2) re-baseline the decisions_registry receipt (scripts/lib/handoff.py --backfill) and run "
+          "scripts/verify_handoffs.py; (3) " + WRITER + " --check")
+    return 0
+
+
 def record_problems(decisions: list) -> list[str]:
     """Well-formedness: duplicate normalised ids, duplicate spellings of the same fact, missing fields."""
     problems: list[str] = []
@@ -687,6 +895,13 @@ def mint_controls() -> list[tuple[str, bool]]:
         ("the same spelling is TOLERATED while pinned BY IDENTITY, and the pin goes STALE once canonical",
          not spelling_problems([{"id": "D-9001", "state": "active"}], pinned=["D9001"])
          and bool(spelling_problems([{"id": "D-9001", "state": "ACTIVE"}], pinned=["D9001"]))),
+        ("a splice that moves a state the PIN never named is a NAMED fault (D-2655/BUG-583)",
+         bool(splice_problems([{"id": "D-9001", "state": "active"}, {"id": "D-9002", "state": "ACTIVE"}],
+                              [{"id": "D-9001", "state": "ACTIVE"}, {"id": "D-9002", "state": "PROPOSED"}],
+                              ["D9001"]))),
+        ("a splice that canonicalises the PINNED cell and NOTHING else is accepted, so the pin may shrink to empty",
+         not splice_problems([{"id": "D-9001", "state": "active"}], [{"id": "D-9001", "state": "ACTIVE"}],
+                             ["D9001"])),
     ]
 
 
@@ -862,6 +1077,8 @@ def main(argv: list[str]) -> int:
         return mint_main(argv)
     if STRIP_FLAG in argv:
         return strip_main(argv)
+    if CANONICALISE_FLAG in argv:
+        return canonicalise_main(argv)
     check_only = "--check" in argv
     text = DECISIONS_YAML.read_text(encoding="utf-8")
     data = yaml.safe_load(text) or {}

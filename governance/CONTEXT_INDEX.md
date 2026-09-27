@@ -1344,3 +1344,10 @@ too - so the control was repaired to isolate the count; a control that cannot be
 HUMAN GATE REGISTER (unchanged, one word each, none due while the rails print rc 0): CLOSE/RE-RULE the freeze
 window (the drain now stands at 3 held, exit still UNMET); PROMOTE/HOLD the standing-rule CONSTITUTION promotion
 (POINTER only); PROMOTE/HOLD BUG-431; DECLARE/CANONICALISE BUG-583 (DECLARE done; CANONICALISE awaits the word).
+
+## D-2693 (2026-09-27) - CANONICALISE limb of BUG-583 executed; SUPERSEDES the D-2692 row for the state vocabulary and the registry stamp
+
+- WHERE THE RULE LIVES: config/decisions_policy.yaml#state_vocabulary - `canonicalisation_route` (the ONLY sanctioned in-place edit of an append_only registry) and `legacy_non_canonical_ids: []` (the debt is PAID, so the pin is empty and a SECOND spelling is refused the moment it is written).
+- WHERE THE CODE LIVES: scripts/recompute_decision_summary.py - `--canonicalise-states`, `canonicalise_plan()`, `splice_problems()`, `state_cell_problems()`.
+- SUPERSEDED: the registry stamp 11008e971cb25a52 and the five pin entries - read config/decisions_summary.json for the count and the bytes it describes (ONE home, D-2655).
+- HUMAN GATE REGISTER: CANONICALISE (BUG-583) is now SPENT - executed by the owner's word. Still open: CLOSE/RE-RE-RULE the freeze window (exit UNMET, 3 still parked); PROMOTE/HOLD the standing-rule CONSTITUTION promotion (POINTER only); PROMOTE/HOLD BUG-431.

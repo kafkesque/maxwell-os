@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**139 open** / 177 closed of 316 ids.
+**138 open** / 179 closed of 317 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -145,4 +145,3 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-573 | (OPEN, MED): a RED earlier in the ladder SHORT-CIRCUITS it, so every LATER fault is invisible (measured: the stale dormancy of scripts/check | 1 |
 | BUG-575 | (OPEN, MED): the decision graph is a SET of labels where it must be a GRAPH - a decision can be RETIRED without naming a successor, and no r | 1 |
 | BUG-577 | (OPEN, MED): the BUG-537 rule "a fixture must resolve OUTSIDE the tree it audits" now has TWO HOMES, restated verbatim by two rails (2026-09 | 1 |
-| BUG-578 | (OPEN, MED): the BOUNDARY REHEARSAL rehearses HEAD, so it cannot gate the change that LANDS - it was GREEN while the working tree already co | 1 |

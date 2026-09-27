@@ -7303,7 +7303,7 @@ REMEDY (OWED): ONE HOME - scripts/lib/fixture.py#outside_tree, imported by both 
 
 ALSO MEASURED IN THE SAME AUDIT (no new id - it is the evidence for BUG-571's remedy): BUG-492 is named 32 times in governance/buglog.md and is cited by the standing rule's own prose, yet it is NOT in the register (314 ids). A decision that cites a bug that does not exist is a citation naming nothing (D-2660), and it is exactly the owner-owed RED LINE BUG-571 owes.
 
-## BUG-578 (OPEN, MED): the BOUNDARY REHEARSAL rehearses HEAD, so it cannot gate the change that LANDS - it was GREEN while the working tree already contained a rail that refused every fresh commit (2026-09-27)
+## BUG-578 (FIXED, MED): the BOUNDARY REHEARSAL rehearses HEAD, so it cannot gate the change that LANDS - it was GREEN while the working tree already contained a rail that refused every fresh commit (2026-09-27)
 
 MEASURED (forensic audit of the BUG-576 landing, inside the fixture the rehearsal itself builds): with the fix
 present in the WORKING TREE and absent from HEAD, the rehearsal own acceptance control returned
@@ -7326,3 +7326,31 @@ the installed hook is still its own re-derivation (BUG-526).
 NOTE (D-2646/D-2674): the four new RAIL 0 controls (BUG-576) build their fixtures with 'git init' in the SYSTEM
 temp dir and copy NOTHING, so they do not restate the BUG-537 outside-tree rule and must NOT become its third
 home (BUG-577) - when scripts/lib/fixture.py lands, the nested builder moves there and the copy is deleted.
+
+## BUG-578 (FIXED, MED): the BOUNDARY REHEARSAL rehearsed HEAD, so it could not gate the change that LANDS (2026-09-27)
+
+MEASURED: the fixture was materialized with `git archive HEAD`, so its rails were the ones that LANDED. With the
+BUG-576 fix in the working tree and absent from HEAD its own acceptance control returned FRESH_FIRST_COMMIT rc=1,
+and rc=0 the moment the same bytes were overlaid. The rehearsal would have stayed GREEN while a change that refuses
+every legitimate commit landed - and the repair could then only have landed with --no-verify.
+
+FIX: config/boundary_rehearsal.yaml#temp.overlay declares the subjects (scripts, config, justfile, the session-plan
+glob) and their exclusions; scripts/check_boundary_rehearsal.py#overlay_subjects copies them OVER the materialized
+HEAD bytes BEFORE the hooks are installed, and `setup.overlay` is a DECLARED premise the classifier REQUIRES (a
+missing observation is never a pass, C16). An inert overlay is now impossible: a declared subject matching no file
+fails closed (D-405), and a copy that does nothing REDs the new control.
+
+SEEN: --selftest 21/21 (new: overlay_dropped_is_fatal, `the overlay replaces the fixture bytes with the LANDING
+bytes` - a control that pre-seeds stale bytes at a path DERIVED from the declaration, so it fires whether or not the
+live tree differs from HEAD). D-2676 teeth: config/rail_mutations.yaml#overlay_of_the_landing_bytes_is_load_bearing
+REDs that control (min_mutations 4 -> 5). just health: 436 file(s) overlaid, mutation gate 4/4 rules SEEN to red.
+
+## BUG-579 (FIXED, LOW): a CRASH in the rehearsal was a traceback, not a verdict (2026-09-27)
+
+CLASS: the mutation gate already declares `a RED for an undeclared reason is a crash, not a control`; the rehearsal
+had no such boundary. A fixture precondition defect (a declared scenario path absent from the base commit, or a
+failed bootstrap commit) raised out of rehearse() -> main() as an exception: no verdict, no reason, and the rail
+died with a stack trace instead of reporting. FOUND BY the BUG-578 forensic audit.
+
+FIX: main() wraps rehearse() and returns EXIT_FATAL naming the exception (a crash is a verdict, never a traceback).
+A declared overlay subject that matches no file still fails closed with its own message (D-405).

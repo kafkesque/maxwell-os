@@ -925,3 +925,21 @@ CONTEXT. BUG-576 was measured inside the boundary rehearsal: RAIL 0 read an UNBO
 DECISION. (1) RAIL 0 reads HEAD as BORN / UNBORN / BROKEN from three probes DECLARED in config/repo_integrity.yaml (head_born_probe, head_unborn_probe, head_unborn_ref_probe), validated fail-closed, with the D-405 join that keeps the born probe inside git.must_resolve so the declaration cannot be inert. UNBORN is not a blanket excuse (C16): the ref HEAD names must still NOT resolve as an object, and a ref that DOES resolve while the born probe does not is BROKEN. (2) THE BYPASS RULE: the --no-verify bootstrap is WITHDRAWN in the same commit that re-measures it, and replaced by a declared refusal (bootstrap.whole_tree_refused, RAIL 4, commit rc 1, marker 'FORBIDDEN session plan') re-measured on EVERY run - a bypass that loses its justification now REDs the rail instead of surviving as prose. declared_debt becomes empty while the LIFECYCLE stays SEEN: --selftest drives the paid-debt OWNER-OWED path with a synthetic declaration. (3) The rehearsal first commit is an ACCEPTANCE control: a FRESH repository commits ONE plan-granted path THROUGH the hook and must be ACCEPTED.
 
 MEASURED. RAIL 0 --selftest 15/15 (four controls in REAL repositories: unborn_head_is_accepted, unborn_branch_does_not_swallow_born, head_that_is_neither_is_broken, renamed_reflog_in_a_born_repo_still_fails - the counterweight that keeps the 2026-09-25 reflog detection honest) and --check rc=0. At a REAL commit through the REAL hook in the rehearsal fixture: fresh first commit rc=0 with 3 own_index notes; whole-tree commit rc=1 refused by RAIL 4; bypass base rc=0. check_boundary_rehearsal --selftest 18/18. check_rail_mutations --selftest 15/15 and --check rc=0 with the standing-rule gate (D-2676) extended to RAIL 0 (mutation unborn_head_branch_is_load_bearing; floor raised to 4; 3/3 declared subjects covered). FILES: config/repo_integrity.yaml, scripts/check_repo_integrity.py, config/boundary_rehearsal.yaml, scripts/check_boundary_rehearsal.py, config/rail_mutations.yaml.
+
+## D-2678 (2026-09-27) - THE LANDING-BYTES RULE
+
+CONTEXT. D-2675 rehearses the write boundary in a REAL repository, but its fixture was materialized from HEAD: the
+rail that LANDED, not the rail that is LANDING. Found by the forensic audit of BUG-576 and filed as BUG-578: the
+rehearsal was GREEN while the working tree already held a RAIL 0 that refused every fresh commit.
+
+DECISION. A boundary rehearsal performs its verdict on the bytes that are LANDING. config/boundary_rehearsal.yaml
+#temp.overlay is the ONE home of the subjects (and their exclusions); the overlay is applied after materialize and
+BEFORE the hooks are installed, and `setup.overlay` is a declared premise the classifier requires. The evidence is
+NOT borrowed from the live tree: the control builds its own differential (stale bytes at a path derived from the
+declaration must be REPLACED), which is also what makes the mutation state-independent. The standing rule (D-2676)
+is satisfied in full: (i) ONE HOME the overlay declaration, (ii) a SEEN boundary control (fresh/normal/partial
+acceptance plus overlay_dropped_is_fatal), (iii) a NAMED oracle scripts/check_boundary_rehearsal.py, (iv) a MUTATION
+(config/rail_mutations.yaml#overlay_of_the_landing_bytes_is_load_bearing) that REDs it. Two lists of the same fact
+drift, so the rail SUBJECTS the standing rule covers are read from the gate's ONE home and joined here.
+
+MEASURED. MEASURED 2026-09-27: the rehearsal was GREEN over HEAD bytes while the working tree held a RAIL 0 that refused the FIRST commit of a fresh/recovered repository; overlaid, the same tree REDs. With the overlay: just health -> ok boundary rehearsal ... 436 working-tree file(s) of the declared subjects overlaid onto the materialized HEAD bytes, 5 rail selftest(s) fire, 0 declared debt(s) open; RAIL-MUTATION GATE: 4 declared rule(s) SEEN to red (incl. overlay_of_the_landing_bytes_is_load_bearing), 1 negative control green, 3/3 subjects covered. check_boundary_rehearsal --selftest 21/21 rc=0; HEALTH_RC=0.

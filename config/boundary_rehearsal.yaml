@@ -22,6 +22,14 @@ temp:
   materialize: [archive, HEAD]  # TRACKED HEAD bytes only: deterministic, and free of the live tree's dirt
   identity: {name: boundary-rehearsal, email: boundary-rehearsal@localhost}
   timeout_seconds: 300
+  overlay:              # BUG-578: the rehearsal's subject is the boundary that is LANDING, not the one that LANDED
+    why: >-
+      materialize is TRACKED HEAD bytes, so without this overlay the whole rehearsal is a verdict about the LAST
+      commit. MEASURED 2026-09-27 (BUG-578): the rehearsal was GREEN while the working tree already held a RAIL 0
+      that refused every fresh commit of a recovered repository; overlaid, that same tree REDs. A rail's behaviour
+      is a function of its OWN bytes, so the bytes about to LAND must be the bytes rehearsed.
+    subjects: [scripts, config, justfile, 'governance/session_plan_*.yaml']
+    exclude: [__pycache__, '*.pyc', .DS_Store]
   bootstrap:
     message: boundary-rehearsal base
     flags: [--no-verify]

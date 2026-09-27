@@ -1142,3 +1142,11 @@ a `--no-verify` bypass without a declared refusal now FAILS CLOSED.
 OPEN AFTER IT: BUG-578 (the rehearsal rehearses HEAD, so it cannot gate the change that LANDS - overlay the
 WORKING TREE subjects before installing the hooks), then BUG-577 (ONE home for outside_tree), BUG-575, BUG-573,
 BUG-571. The standing-rule graduation bar for a CONSTITUTION-level section stays HOLD (D-2676, owner gate).
+
+## THE LANDING-BYTES RULE (D-2678, 2026-09-27) - a rehearsal on HEAD bytes is a verdict about the LAST commit
+
+WHERE: config/boundary_rehearsal.yaml#temp.overlay (ONE home of the subjects + exclusions) and
+scripts/check_boundary_rehearsal.py#overlay_subjects/overlay_control; teeth in
+config/rail_mutations.yaml#overlay_of_the_landing_bytes_is_load_bearing. SUPERSEDES the BUG-578 state (materialize
+- then-install was the whole fixture). OPEN AFTER IT: coverage.required_subjects still covers only RAIL 0/4/5 among
+the write-boundary rails; BUG-577 (ONE home for outside_tree) is the next hardening of this same fixture family.

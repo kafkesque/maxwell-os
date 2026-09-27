@@ -454,3 +454,14 @@ so overlay the WORKING TREE bytes of the declared subjects into the fixture BEFO
 dropped; (2) BUG-577 - ONE home for outside_tree (scripts/lib/fixture.py) plus a refusal control and a mutation,
 and move the nested RAIL 0 fixture builder there; (3) BUG-575 supersession completeness; (4) BUG-573 the ladder
 must collect EVERY fault; (5) BUG-571 the cited-by-decision join.
+
+## 2026-09-27 (cont.) - D-2678 LANDED / BUG-578 + BUG-579 FIXED
+
+The rehearsal now rehearses the bytes that LAND. `just health` HEALTH_RC=0 with the strongest evidence to date:
+`ok boundary rehearsal: ... 436 working-tree file(s) of the declared subjects overlaid onto the materialized HEAD
+bytes, 5 rail selftest(s) fire, 0 declared debt(s) open` and `ok rail mutations: 4 declared rule(s) SEEN to red
+through their own control, 1 negative control(s) stayed green, 3/3 declared subject(s) covered`.
+ORDERED NEXT: (1) coverage.required_subjects -> RAIL 3/4/5; (2) BUG-577 outside_tree ONE home + refusal control +
+mutation; (3) BUG-575 supersession completeness (24 pinned legacy_debt_ids); (4) BUG-573 the ladder must collect
+EVERY fault; (5) BUG-571 the cited-by-decision join (BUG-492 live case). OWNER GATE: CONSTITUTION promotion of the
+standing rule stays HOLD; BUG-431 CONTENT promotion is the one open gate.

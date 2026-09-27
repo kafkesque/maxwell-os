@@ -30,7 +30,7 @@ fixture:
   keep: false
   timeout_seconds: 600
 coverage:
-  min_mutations: 4            # FLOOR (shrink guard): deleting an entry means editing the floor in a diff a human reads
+  min_mutations: 5            # FLOOR (shrink guard): deleting an entry means editing the floor in a diff a human reads
   required_subjects:          # every path here MUST be the subject of >= 1 mutation (D-405: join BOTH directions)
     - scripts/check_boundary_rehearsal.py
     - scripts/check_session_plan.py
@@ -102,3 +102,20 @@ mutations:
       THE NEGATIVE CONTROL, and the reason this gate is not a red-generator: a gate never seen to PASS is not a
       gate (the mirror of BUG-492). A no-op mutation must leave the runner CLEAN; if it reds, the runner's INPUT
       is uncontrolled and every red this gate reports is suspect.
+  # BUG-578 / D-2678: the OVERLAY of the LANDING bytes. Reduced to a no-op, the rehearsal rehearses the bytes that
+  # LANDED again - measured 2026-09-27: it was GREEN while the working tree already held a RAIL 0 that refused every
+  # fresh commit of a recovered repository (the BUG-576 fix, invisible to the rail that exists to catch it).
+  - id: overlay_of_the_landing_bytes_is_load_bearing
+    subject: scripts/check_boundary_rehearsal.py
+    op: replace
+    find: '            shutil.copy2(src / rel, dst)'
+    replace: '            continue  # MUTATION (D-2676): the overlay copies NOTHING'
+    runner: scripts/check_boundary_rehearsal.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: 'FAIL selftest/the overlay replaces the fixture bytes with the LANDING bytes'
+    why: >-
+      the overlay is the whole of BUG-578: with the copy inert the fixture keeps its OWN bytes and the rehearsal is
+      a verdict about the last commit. The control pre-seeds stale bytes at a path DERIVED from the declaration and
+      requires them to be REPLACED, so it REDs whether or not the live tree happens to differ from HEAD.

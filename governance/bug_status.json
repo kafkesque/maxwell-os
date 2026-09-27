@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 316,
-  "open_n": 139,
-  "closed_n": 177,
+  "total_ids": 317,
+  "open_n": 138,
+  "closed_n": 179,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -697,11 +697,6 @@
       "id": "BUG-577",
       "title": "(OPEN, MED): the BUG-537 rule \"a fixture must resolve OUTSIDE the tree it audits\" now has TWO HOMES, restated verbatim by two rails (2026-09",
       "events": 1
-    },
-    {
-      "id": "BUG-578",
-      "title": "(OPEN, MED): the BOUNDARY REHEARSAL rehearses HEAD, so it cannot gate the change that LANDS - it was GREEN while the working tree already co",
-      "events": 1
     }
   ],
   "closed": [
@@ -881,6 +876,8 @@
     "BUG-566",
     "BUG-567",
     "BUG-574",
-    "BUG-576"
+    "BUG-576",
+    "BUG-578",
+    "BUG-579"
   ]
 }

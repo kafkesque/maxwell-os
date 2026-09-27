@@ -565,3 +565,15 @@ RISK NOTE (now retired): before fe239df a worktree clean destroyed BOTH copies o
       EVERY fault; BUG-571 the cited-by-decision join (BUG-492 cited 32x, unregistered, is its first live case).
 - [ ] OWNER GATE (unchanged): BUG-431 CONTENT promotion; `just health-deep` stays honestly RED until the owner
       rules on the depth/domain contract; hooks ACTIVE.
+
+## D-2678 / BUG-578 + BUG-579 LANDED (2026-09-27)
+
+- [x] BUG-578 FIXED: the rehearsal holds the LANDING bytes (declared overlay, 436 file(s) overlaid; `setup.overlay`
+      is a required premise; an inert overlay fails closed, D-405). SEEN: 21/21 controls, gate 4/4 rules red.
+- [x] BUG-579 FIXED (found by the audit): a crash in the fixture builder is now a FATAL verdict, not a traceback.
+- [x] D-2678 THE LANDING-BYTES RULE minted; the standing-rule join now reads the gate's ONE home for subjects.
+- [ ] NEXT: extend coverage.required_subjects to EVERY write-boundary rail (RAIL 0 done, RAIL 3/4/5 owed).
+- [ ] NEXT: BUG-577 (ONE home for outside_tree in scripts/lib + a refusal control + a mutation), then BUG-575,
+      BUG-573, BUG-571; TASK: declare homes for the 3 dirty rail outputs + backups/** (BUG-563).
+- [ ] OWNER GATE: CONSTITUTION promotion of the standing rule stays HOLD at the registered graduation bar;
+      BUG-431 CONTENT promotion remains the one open owner gate.

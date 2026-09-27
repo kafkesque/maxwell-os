@@ -328,6 +328,9 @@ current_state:
 # (temp.bootstrap.refusal; declared_debt EMPTY, the paid-debt lifecycle driven synthetically; rehearsal 18/18) +
 # the standing-rule gate extended to RAIL 0 (mutation unborn_head_branch_is_load_bearing, 3/3 subjects, rc=0).
 # MINTED D-2677 (808 records, stamp 80c07d4142d20208). THE AUDIT FILED BUG-578 (the rehearsal rehearses HEAD).
+# D-2678 (2026-09-27): BUG-578 FIXED (the rehearsal holds the LANDING bytes - declared overlay, 436 file(s)) and
+# BUG-579 FIXED (a crash in the fixture builder is a verdict, not a traceback). Both were filed OPEN and FIXED in
+# the same commit, so the open count is unchanged. THE AUDIT FILED BUG-579.
 open_bugs_n: 139
 
 # 2026-09-26T (D-2662/BUG-554) - session trail (comments only: this file stays PARSEABLE).

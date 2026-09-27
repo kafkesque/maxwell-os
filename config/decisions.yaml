@@ -9407,3 +9407,34 @@ decisions:
     15/15 and --check rc=0 (3 rules SEEN to red through their own control, 1 negative control green, 3/3 declared
     subjects covered). THE FORENSIC AUDIT FOUND ONE REAL CLASS DEFECT AND FILED IT: BUG-578 (the rehearsal rehearses
     HEAD, so it cannot gate the change that lands). Nothing here is committed by this record (D-381 owner gate).'
+- id: D-2678
+  date: '2026-09-27'
+  state: ACTIVE
+  category: governance
+  title: 'THE LANDING-BYTES RULE: a boundary rehearsal performs its verdict on the bytes that are LANDING, never
+    on the bytes that LANDED'
+  bugs:
+  - BUG-578
+  - BUG-579
+  - BUG-576
+  - BUG-574
+  files:
+  - config/boundary_rehearsal.yaml
+  - scripts/check_boundary_rehearsal.py
+  - config/rail_mutations.yaml
+  decision: 'BUG-578 FIXED by the LANDING-BYTES RULE; the audit also filed and fixed BUG-579 (a crash in the fixture
+    builder was a traceback, not a verdict). config/boundary_rehearsal.yaml#temp.overlay is the ONE home of the
+    overlay subjects and exclusions; scripts/check_boundary_rehearsal.py copies them OVER the materialized HEAD
+    bytes AFTER materialize and BEFORE the hooks are installed, and `setup.overlay` is a declared premise the classifier
+    REQUIRES (a missing observation is never a pass). An inert overlay fails closed (a declared subject matching
+    no file is D-405) and a copy that does nothing REDs the control, which builds its OWN differential (stale bytes
+    at a DERIVED path must be REPLACED) so it fires whether or not the live tree differs from HEAD. The rail subjects
+    the standing rule covers are READ from the gate ONE home and joined here, never restated. D-2676 satisfied:
+    (i) one home, (ii) a SEEN control, (iii) a NAMED oracle, (iv) a MUTATION.'
+  measured: 'BUG-578: before the fix the rehearsal was GREEN over HEAD bytes while the working tree held a RAIL
+    0 that refused the FIRST commit of a recovered repository (FRESH_FIRST_COMMIT rc=1 -> rc=0 the moment the same
+    bytes were overlaid); after it, just health -> ok boundary rehearsal: 436 working-tree file(s) of the declared
+    subjects overlaid onto the materialized HEAD bytes, 5 rail selftest(s) fire, 0 declared debt(s) open; ok rail
+    mutations: 4 declared rule(s) SEEN to red through their own control (incl. overlay_of_the_landing_bytes_is_load_bearing),
+    1 negative control(s) stayed green, 3/3 subject(s) covered. check_boundary_rehearsal --selftest 21/21 rc=0.
+    HEALTH_RC=0.'

@@ -9817,3 +9817,59 @@ decisions:
   - MASTER-TASK-REGISTER.md
   - agent/session_seed.yaml
   - DECISION-LOG.md
+- id: D-2690
+  date: '2026-09-27'
+  state: ACTIVE
+  category: governance
+  title: A MINT MUST BE SEEN TO ARRIVE, AND THE LOG'S IDS MUST NAME TOP-LEVEL RECORDS (BUG-587 FIXED; BUG-589 +
+    BUG-590 FIXED IN THE REPAIR; BUG-588 FILED AND PARKED)
+  decision: 'A mint is decided by ARRIVAL, never by bytes written. scripts/recompute_decision_summary.py now asks
+    arrival_problems(total_before, decisions_after, minted_ids) of the WOULD-BE bytes BEFORE the write and again
+    of the bytes ON DISK before the census is rewritten: the record count must move by EXACTLY the mint size and
+    every minted id must be a TOP-LEVEL record exactly ONCE. The ABSORBED shape is refused BY NAME - a record''s
+    files items emit at indent 2, the same column a record''s own ''- id:'' marker takes when a writer re-indents
+    a dumped block, so a hand append parses as ONE MORE ENTRY of the previous record''s files list (32 lines added,
+    0 deleted, the file LOADED, every rail GREEN, the census did not move): BUG-587. The membership direction that
+    is SETTLEABLE is landed as the oracle its own tombstone named and no file implemented (tools/sync_decisions.py,
+    D-405): scripts/check_decision_membership.py - every id NAMED in DECISION-LOG.md (the D2552 table rows AND the
+    historical headings) must name a TOP-LEVEL record in config/decisions.yaml, with the REVERSE direction DECLARED
+    and never asserted, because the log is a TIERED face of the registry and an equality join would RED on 631 legitimate
+    records (BUG-540: a rail nobody can satisfy is not a rail). Five ids are PINNED BY IDENTITY as legacy orphans
+    (D-271, D-272, D-275, D2537, D637) in config/decisions_policy.yaml#membership: a ceiling would let a NEW omission
+    hide inside the list, so the list may only SHRINK, and an id that becomes a record or stops being named is a
+    STALE declaration. BUG-588 (DECISION-LOG.md line 3 declares 651 decisions while the derived census reads 820)
+    is FILED and PARKED (max_held 9 -> 10): DECISION-LOG.md is append_only, no append can repair a line 3, and the
+    remedy is an owner-gated non-append edit or a header rewrite that declares NO count.'
+  measured: 'MEASURED 2026-09-27. Registry: 820 records, 820 top-level ids, 0 duplicates, last D-2689. The join
+    reads 194 id(s) NAMED in DECISION-LOG.md, 5 pinned legacy orphan(s), 0 fault(s); 631 record(s) carry no log
+    entry BY DECLARATION. recompute --selftest 14/14 (4 new: the ACCEPT shape, the ABSORBED shape, a doubled top-level
+    id, a count that does not move); check_decision_membership --selftest 10/10; both wired into just health and
+    pinned FATAL in config/rail_registry.yaml#guards. The mutation gate found TWO defects inside this change-set,
+    both filed and fixed here: BUG-589 (the fixture declared only justfile while recompute --selftest reads governance/bug_status.json,
+    so EVERY baseline of that runner was red and the gate blamed the MUTATION for it - a misdiagnosis of WHICH fact
+    was broken) and BUG-590 (the arrival control passed through the COUNT clause instead of the TOP-LEVEL clause
+    it names: with the mutation applied, 14/14 controls still fired). After both repairs the gate reads rc=0 - 23
+    declared rule(s) SEEN to red through their own control, 1 negative control stayed green, 17/13 declared subject(s)
+    covered (4 derived from the commit boundary, D-2679), floor 24 == declared 24, 19/19 controls. Register after:
+    OPEN 135 / CLOSED 193 of 328. freeze window rc=0: parked 10 of ceiling 10, still OPEN 8, exit UNMET nothing_still_held.'
+  bugs:
+  - BUG-587
+  - BUG-588
+  - BUG-589
+  - BUG-590
+  files:
+  - scripts/recompute_decision_summary.py
+  - scripts/check_decision_membership.py
+  - scripts/check_rail_mutations.py
+  - config/rail_mutations.yaml
+  - config/decisions_policy.yaml
+  - config/rail_registry.yaml
+  - config/freeze_window.yaml
+  - governance/buglog.md
+  - governance/bug_status.json
+  - justfile
+  - DECISION-LOG.md
+  - MASTER-TASK-REGISTER.md
+  - governance/CONTEXT_INDEX.md
+  - governance/SESSION-HANDOFF-2026-09-26.md
+  - agent/session_seed.yaml

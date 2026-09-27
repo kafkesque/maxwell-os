@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 325,
+  "total_ids": 328,
   "open_n": 135,
-  "closed_n": 190,
+  "closed_n": 193,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -679,8 +679,8 @@
       "events": 1
     },
     {
-      "id": "BUG-587",
-      "title": "(FILED, HIGH, D-2689): a MINT is not ASSERTED to ARRIVE - the registry's write path has no arrival oracle",
+      "id": "BUG-588",
+      "title": "(FILED, LOW, D-2690): DECISION-LOG.md declares a decision COUNT that is stale by 169 - a second home",
       "events": 1
     }
   ],
@@ -874,6 +874,9 @@
     "BUG-580",
     "BUG-581",
     "BUG-582",
-    "BUG-586"
+    "BUG-586",
+    "BUG-587",
+    "BUG-589",
+    "BUG-590"
   ]
 }

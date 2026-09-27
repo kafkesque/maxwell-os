@@ -98,6 +98,8 @@ health:
     python3 scripts/check_rail_registry.py || exit 1   # D-2665: the rail set had NO registry - classes (i) a rail nothing runs, (ii) a printed verdict that disagrees with its exit code, (iii) a remedy or INPUT nobody controls (BUG-537/BUG-556)
     python3 scripts/recompute_decision_summary.py --selftest || exit 1  # D-2660/BUG-492: the MINT gate's own controls - a record is joined to the tree BEFORE a byte is written
     python3 scripts/recompute_decision_summary.py --check || exit 1
+    python3 scripts/check_decision_membership.py --selftest || exit 1  # BUG-587/BUG-492: the MEMBERSHIP rail's own known-answer controls (the ABSORBED-mint shape, a STALE pin) - a control nothing runs is a comment
+    python3 scripts/check_decision_membership.py || exit 1             # BUG-587/D-2690: an id NAMED in DECISION-LOG.md must name a TOP-LEVEL record in config/decisions.yaml - the oracle the BUG-402 tombstone names and no file implemented
     python3 scripts/check_tests.py --selftest || exit 1   # BUG-492: the suite rail's OWN decisions (floor breach, regression, paid red, strict) must be SEEN to fire
     python3 scripts/check_tests.py --check || exit 1      # D-2656: the SUITE is a RAIL - a failing test no rail runs is a control that never fires (BUG-470 class). 3 failures are DECLARED red and SHRINK-ONLY (the depth/domain contract is 'proposed'/owner gate); a 4th is FATAL, 0 collected is FATAL, a paid red is OWNER-OWED (2)
 

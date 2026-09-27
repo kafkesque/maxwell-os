@@ -1290,3 +1290,14 @@ NOW. `backups/**` and the per-run snapshots are excluded BY DECISION; the six in
 - **BUG-587 FILED AND PARKED**: a mint is not ASSERTED to arrive - the write path can lose a record and print a
   plausible total (MEASURED: 32 lines added, 0 deleted, census 819 unchanged). Its tombstone names
   scripts/check_decision_membership.py, which does not exist.
+
+## D-2690 (2026-09-27) - the LATEST decision; it SUPERSEDES the D-2689 row above.
+
+A MINT IS DECIDED BY ARRIVAL (BUG-587 FIXED). Where everything lives: the arrival rule and the canonical mint path
+in scripts/recompute_decision_summary.py (arrival_problems/top_level_ids, asked BEFORE the write and again ON DISK);
+the membership join in scripts/check_decision_membership.py with its ONE HOME config/decisions_policy.yaml#membership
+(log DEcision-LOG.md, two id_patterns, legacy_orphan_ids pinned by identity and SHRINK-ONLY); the mutation gate's
+fixture declaration in config/rail_mutations.yaml#fixture (include_files is FILE-GRANULAR). CLAIMS SUPERSEDED:
+"max_held 9" -> max_held 10 (BUG-588 HELD); "BUG-587 FILED" -> BUG-587 FIXED; the claim that the arrival rule has no
+oracle -> it has one that is SEEN to red (a_mint_must_be_seen_to_arrive); the claim that membership is unchecked ->
+it is a rail with 10/10 controls. HUMAN GATE REGISTER: no new gate; BUG-588 is the one item awaiting a word.

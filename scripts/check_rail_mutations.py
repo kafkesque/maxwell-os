@@ -34,6 +34,12 @@ covered BEYOND the boundary, which is not a fault.
 The fixture is a REAL repository (git init + commit) built from DECLARED paths in the SYSTEM temp dir, so it is
 never inside the tree it audits (BUG-537) and the rails read a real ambient git subject (BUG-527). --selftest
 proves every decision above on synthetic observations, including the joins that read the DECLARATION itself.
+
+A DECLARED FIXTURE INPUT MUST EXIST (BUG-589). MEASURED 2026-09-27: the first subject whose runner reads a
+path the fixture never carried (governance/bug_status.json, read by recompute_decision_summary.py --selftest)
+made that runner's BASELINE red, and this gate blamed the MUTATION - a MISDIAGNOSIS of which of the two facts
+was wrong (D-405: a declaration whose subject is absent is an assertion). The declaration is now read BEFORE
+the fixture is built and the verdict names the missing input.
 """
 from __future__ import annotations
 
@@ -97,16 +103,51 @@ def cfg() -> dict[str, Any]:
     return doc
 
 
+def fixture_declaration_problems(f: dict[str, Any], repo: Path) -> list[str]:
+    """Every DECLARED fixture input must EXIST; a missing one is a fault about the FIXTURE, never about a mutation.
+
+    WHY THIS EXISTS (BUG-589). A runner reads the fixture, so an input the fixture never carried reds that
+    runner's BASELINE - and this gate's verdict then says "the oracle's BASELINE is not green ... so its red
+    after one proves nothing" and "the runner DID go red, but not through the declared control". MEASURED
+    2026-09-27: both sentences were TRUE and both named the wrong object. scripts/recompute_decision_summary.py
+    --selftest reads governance/bug_status.json (its bug citations are checked against the register), the
+    fixture declared only justfile, and the FIRST subject whose runner needed an undeclared input was reported
+    as a bad MUTATION. A declaration that cannot be evaluated against reality is how a gate misdiagnoses its own
+    subject (D-405: a declaration whose subject is absent is an assertion).
+    """
+    problems: list[str] = []
+    for bucket, kind in (("include_dirs", "dir"), ("include_files", "file")):
+        for x in f.get(bucket) or []:
+            here = repo / str(x)
+            exists = here.is_dir() if kind == "dir" else here.is_file()
+            if not exists:
+                problems.append("fixture." + bucket + " names " + repr(x) + ", which does not EXIST: a declared "
+                                "input the fixture never carries is an assertion (D-405), and a runner that reads "
+                                "it reds in its BASELINE (BUG-589)")
+    for g in f.get("include_globs") or []:
+        if not [p for p in sorted(repo.glob(str(g)))]:
+            problems.append("fixture.include_globs names " + repr(g) + ", which matches NOTHING: a glob that "
+                            "silently carries no input is an assertion (D-405)")
+    return problems
+
+
 def build(doc: dict[str, Any]) -> Path:
     """Materialize a REAL repository of the DECLARED paths in the system temp dir; fail closed at every step."""
     f = doc["fixture"]
+    absent = fixture_declaration_problems(f, REPO)
+    if absent:
+        raise SystemExit("FAIL-CLOSED (C16): the fixture does not carry the inputs its runners read, so a "
+                         "BASELINE would red for a reason that is not the mutation's and this gate would "
+                         "blame the MUTATION (BUG-589): " + "; ".join(absent))
     root = Path(tempfile.mkdtemp(prefix=str(f["prefix"]))).resolve()
     fixture.outside_tree(root, where="the mutation fixture")
     for d in f["include_dirs"]:
         shutil.copytree(REPO / str(d), root / str(d), symlinks=True,
                         ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
     for x in f["include_files"]:
-        shutil.copy2(REPO / str(x), root / str(x))
+        here = root / str(x)
+        here.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(REPO / str(x), here)
     for g in f["include_globs"]:
         for p in sorted(REPO.glob(str(g))):
             here = root / p.relative_to(REPO).parent
@@ -356,6 +397,11 @@ def selftest() -> int:
               all((REPO / str(m[k])).is_file() for m in doc["mutations"] for k in ("subject", "runner"))),
              ("the fixture is built from DECLARED paths under the SYSTEM temp dir, never inside the tree (BUG-537)",
               bool(doc["fixture"]["include_dirs"]) and str(doc["fixture"]["under"]) == "system_temp"),
+             ("a declared fixture input that does not EXIST is a fault, so an under-declared fixture is caught "
+              "before it is blamed on a mutation (BUG-589)",
+              not fixture_declaration_problems(doc["fixture"], REPO)
+              and bool(fixture_declaration_problems({"include_files": ["governance/no_such_input.json"]}, REPO))
+              and bool(fixture_declaration_problems({"include_globs": ["governance/no_such_glob_*.yaml"]}, REPO))),
              ("the gate has a NEGATIVE control: >=1 mutation that must NOT red (BUG-492, inverted)",
               any(str(m["expect"]) == "green" for m in doc["mutations"])),
              ("the COMMIT BOUNDARY is READ from its ONE home and every rail there is inside the declared coverage "

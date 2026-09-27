@@ -22,7 +22,11 @@ fixture:
   under: system_temp
   prefix: rail_mutations_
   include_dirs: [scripts, config]
-  include_files: [justfile]
+  # BUG-589: the list is FILE-GRANULAR on purpose - a whole directory would carry inputs no runner reads.
+  # MEASURED 2026-09-27: recompute_decision_summary.py --selftest checks its own bug citations against the
+  # register, so it reads governance/bug_status.json; while the fixture did not carry it, EVERY baseline of that
+  # runner was red and the gate reported the MUTATION as the fault. A declared input that EXISTS is the point.
+  include_files: [justfile, governance/bug_status.json]
   include_globs: [governance/session_plan_*.yaml]   # MEASURED: check_session_plan.py --selftest reads the LIVE plan
   git: [init, add, commit]                               # a REAL repository: the rails read the ambient subject
   commit_message: rail-mutations fixture base
@@ -30,7 +34,7 @@ fixture:
   keep: false
   timeout_seconds: 600
 coverage:
-  min_mutations: 21            # FLOOR (shrink guard): deleting an entry means editing the floor in a diff a human reads
+  min_mutations: 24            # FLOOR (shrink guard): deleting an entry means editing the floor in a diff a human reads
   # D-2679: the coverage set is DERIVED, never restated. Which rails gate a COMMIT is one fact and it already has
   # ONE home (config/rail_registry.yaml#commit_boundary), so restating it here would be a SECOND HOME - and two
   # lists of one fact drift, and only one of them can be right. scripts/check_rail_mutations.py joins the two and
@@ -414,3 +418,55 @@ mutations:
       fail is not a rule (D-2676 iv). FIND-TEXT: the EMPTY slot is the rule; it is one line so the declaration
       cannot drift into a shape a reader would have to interpret.
 
+
+  # BUG-587 (D-2690) - the ARRIVAL rule of the mint path: an append that moved the census by NOTHING stayed GREEN
+  # everywhere because nothing asked whether the mint ARRIVED.
+  - id: a_mint_must_be_seen_to_arrive
+    subject: scripts/recompute_decision_summary.py
+    op: replace
+    find: '        if not hits:'
+    replace: '        if False:  # MUTATION (D-2676): the arrival rule stops reading the TOP LEVEL'
+    runner: scripts/recompute_decision_summary.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: '  !!  a mint whose id is ABSENT from the top level fires'
+    why: >-
+      BUG-587: the mint appends a record it VALIDATED and re-derives the registry SHAPE, and never asked whether the
+      record ARRIVED at the top level. The clause this mutation removes is the only one that reads the top level.
+
+  # BUG-587 (D-2690) - the membership join: the oracle a RETIRED tool NAMED and no file implemented (D-405).
+  - id: a_logged_id_that_names_no_record_is_load_bearing
+    subject: scripts/check_decision_membership.py
+    op: replace
+    find: '        if n not in top and n not in pinned:'
+    replace: '        if False:  # MUTATION (D-2676): the membership join stops reading the log'
+    runner: scripts/check_decision_membership.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: '  !!  an id named in the log with no record fires'
+    why: >-
+      BUG-587 second face: the oracle that would have caught the absorbed mint was NAMED by a tombstone and existed
+      nowhere. Landing the file is not enough - the join must be SEEABLE to fail.
+
+  # BUG-589 (D-2690) - the FIXTURE DECLARATION. The gate reads a fixture built from DECLARED paths; the first
+  # subject whose runner read a path the fixture never carried made that runner red in its BASELINE, and the
+  # verdict named the MUTATION. The declaration is now read BEFORE the fixture is built, and this entry makes
+  # that read SEEABLE to fail (D-2676 iv) - a guard nobody can red is a comment.
+  - id: fixture_declaration_is_read
+    subject: scripts/check_rail_mutations.py
+    op: replace
+    find: '    for bucket, kind in (("include_dirs", "dir"), ("include_files", "file")):'
+    replace: '    for bucket, kind in ():  # MUTATION (D-2676): the fixture declaration stops being read'
+    runner: scripts/check_rail_mutations.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: 'FAIL selftest/a declared fixture input that does not EXIST is a fault, so an under-declared fixture is caught before it is blamed on a mutation (BUG-589)'
+    why: >-
+      BUG-589: a runner reads the fixture, so a declared input the fixture never carries reds a BASELINE and the
+      gate blames the mutation. With both loops neutered the two-sided control stops firing (a missing include
+      file AND a glob matching nothing must each be a fault, while the LIVE declaration must be clean): the
+      differential is real, the marker is the control's own name, and a refactor that stops reading the fixture
+      declaration loses its control instead of silently misdiagnosing.

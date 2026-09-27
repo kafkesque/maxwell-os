@@ -658,3 +658,37 @@ THE AUDIT FIRED ON THE FIX: the 2 moved ids are BUG-419 (GENUINELY OPEN - the re
 BUG-562 (GENUINELY CLOSED - its rail was verified by running it), so the change-set carries BUG-562's closure.
 FILED: BUG-587 (a mint is not asserted to ARRIVE; scripts/check_decision_membership.py is named by its own tombstone
 and does not exist) - PARKED, not worked. NEXT: BUG-587's arrival assertion; then BUG-584; then BUG-585; BUG-583.
+
+## D-2690 LANDED (2026-09-27) - A MINT MUST BE SEEN TO ARRIVE (BUG-587 FIXED; BUG-589 + BUG-590 FIXED IN THE REPAIR; BUG-588 FILED AND PARKED)
+
+WHAT LANDED. (1) scripts/recompute_decision_summary.py carries the ARRIVAL ORACLE: arrival_problems() + top_level_ids(),
+asked of the WOULD-BE bytes BEFORE write_document and again of the bytes ON DISK before the census rewrite - the count
+must move by EXACTLY the mint size and each minted id must be a TOP-LEVEL record exactly once; --selftest 14/14 (4
+new, including the ABSORBED-shape fixture). (2) scripts/check_decision_membership.py EXISTS - the oracle
+tools/sync_decisions.py NAMED and no file implemented (D-405): every id named in DECISION-LOG.md must name a TOP-LEVEL
+record in config/decisions.yaml, 5 legacy orphans pinned by identity, the reverse direction DECLARED (BUG-540);
+live rc=0, --selftest 10/10. (3) justfile wires both (--selftest + live), pinned FATAL in
+config/rail_registry.yaml#guards. (4) config/decisions_policy.yaml#membership is the ONE HOME. (5)
+config/freeze_window.yaml parks BUG-588 (max_held 9 -> 10) after BUG-587 closed (a HELD bug closed DRAINS the window).
+(6) D-2690 MINTED THROUGH THE CANONICAL PATH - the first mint in this repository SEEN TO ARRIVE (821 records, D-2690
+top-level exactly once), and the census was recomputed in the same invocation.
+
+FOUND AND FIXED INSIDE THIS CHANGE-SET (both by the mutation gate, both logged in governance/buglog.md):
+  - BUG-589 the gate's FIXTURE was UNDER-DECLARED: scripts/recompute_decision_summary.py --selftest reads
+    governance/bug_status.json, the fixture declared only justfile, so its BASELINE was red and the verdict blamed the
+    MUTATION. FIX: fixture.include_files carries the register, and fixture_declaration_problems() is asked BEFORE the
+    fixture is built so a missing input is a NAMED fault about the FIXTURE.
+  - BUG-590 the arrival control fired through the COUNT clause instead of the TOP-LEVEL clause it NAMES (with the
+    mutation applied, 14/14 controls still fired). FIX: the count is landed EXACTLY, and the mutant is MEASURED to
+    print the control's own name and exit 1.
+
+MEASURED AFTER: mutation gate rc=0 (23 declared rules SEEN to red through their own control, 1 negative control
+green, 17/13 declared subjects covered - 4 derived from the commit boundary, floor 24 == declared 24); membership
+rc=0; check_bug_status rc=0; register OPEN 135 / CLOSED 193 of 328; freeze window rc=0 (parked 10 of ceiling 10,
+still OPEN 8, exit UNMET nothing_still_held); session_seed.open_bugs_n RE-MEASURED from the register (never
+transcribed).
+
+NEXT: BUG-584 dedupe (declaring lines 96 -> 95, plus a decision on whether run_ladder.py must REFUSE a duplicated
+declaring line); the leak scan's DECLARED HOME (owed since D-2686); BUG-570 / BUG-568 / BUG-569 / BUG-559; BUG-588
+pending an owner word. OWNER GATES (one word each): CLOSE/RE-RULE | PROMOTE/HOLD (standing rule) | PROMOTE/HOLD
+(BUG-431) | DECLARE/CANONICALISE (BUG-583) | RENAME/DELETE (BUG-585).

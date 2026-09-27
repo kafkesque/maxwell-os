@@ -172,3 +172,28 @@ reference_rail:
       the TOMBSTONE must be able to name its own subject: it is the evidence for the revocation and it is
       unreachable without the explicit owner opt-in flag (D-2643). Exempting it is what lets the scan be
       strict everywhere else.
+
+# MEMBERSHIP (BUG-587, D-2690). The ONE home of the rule that joins the registry to the log its own header calls
+# its human face. A RETIRED tool declared this check and no file implemented it (D-405), so an id NAMED in the log
+# could name nothing and every rail stayed green. The REVERSE direction is NOT asserted: the log is a TIERED face
+# of the registry (its own header) and the full history lives in archive/, so an equality join would RED on ~680
+# legitimate records and become a rail nobody can satisfy (BUG-540). Rules live HERE, code lives in
+# scripts/check_decision_membership.py, and the id SPELLING rule is imported from the reconciler (D-2646/C21).
+membership:
+  log: DECISION-LOG.md
+  # The two surfaces the log NAMES a decision on: the D2552 table row ('| D-2689 | ACTIVE | ... |') and the
+  # historical heading ('## ... D-2689 ...'). MEASURED 2026-09-27: 152 rows + 53 headings, 194 distinct ids.
+  id_patterns:
+  - '^\|\s*(D-?\d+[a-z]?)\s*\|'
+  - '^#{1,4}[^\n]*?\b(D-?\d+[a-z]?)\b'
+  # Pinned BY IDENTITY, never by a count: a ceiling would let a NEW orphan hide inside it. The list may only
+  # SHRINK - an id here that becomes a record, or that the log stops naming, is a STALE declaration and fails
+  # the rail (D-405). MEASURED 2026-09-27, each classified: D-271 / D-272 / D-275 are DATED SECTION HEADINGS
+  # for groups of lettered records (D271a-d, D272a-e, D273a-g) that ARE in the registry; D2537 is a table row in
+  # the historical tier whose record does not exist under that spelling; D637 is a dated owner ruling recorded in
+  # governance/, not a minted record.
+  legacy_orphan_ids: [D-271, D-272, D-275, D2537, D637]
+  why: >-
+    An id NAMED in the human log with no TOP-LEVEL record in the registry is the signature of BUG-587: the record
+    was ABSORBED into the previous record's files: list, its bytes are in the file, the file parses, and the
+    decision is invisible. Declared so the rail has ONE home and cannot be satisfied by a restatement.

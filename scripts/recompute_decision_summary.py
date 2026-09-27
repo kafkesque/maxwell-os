@@ -543,6 +543,44 @@ def mint_validate(record: dict, decisions: list) -> list[str]:
 
 
 
+def arrival_problems(total_before: int, decisions_after: list, minted_ids: list[str]) -> list[str]:
+    """BUG-587 (D-2690): every minted id must be a TOP-LEVEL record, and the count must move by the mint size.
+
+    WHY. MEASURED 2026-09-27: a hand-rolled append of ONE record to config/decisions.yaml added 32 lines and
+    deleted none - and the census did NOT move (819 records, last D-2688). A record's files: items emit at indent
+    2, the SAME column a record's own '- id:' marker takes when a writer re-indents the dumped block, so the new
+    record parsed as ONE MORE ENTRY of the PREVIOUS record's files: list. The file LOADED, every rail stayed
+    GREEN, and the decision was INVISIBLE. The write path validated the record BEFORE the write and re-derived
+    the registry SHAPE after it - but nothing ever asked whether the mint ARRIVED. That is the BUG-492 class
+    aimed at the registry: a write that cannot be SEEN to fail.
+
+    Checked on the WOULD-BE bytes BEFORE the write, so a record that would be absorbed is REFUSED rather than
+    landed invisibly, and again on the bytes ON DISK after it.
+    """
+    problems: list[str] = []
+    expected = total_before + len(minted_ids)
+    if len(decisions_after) != expected:
+        problems.append("the registry holds " + str(len(decisions_after)) + " record(s) after the write, expected "
+                        + str(expected) + " (" + str(total_before) + " before + " + str(len(minted_ids))
+                        + " minted) - a mint that moves the count by anything else did NOT arrive (BUG-587)")
+    top = top_level_ids(decisions_after)
+    for minted in minted_ids:
+        norm = normalized_id({"id": minted})
+        hits = [t for t in top if t == norm]
+        if not hits:
+            problems.append(str(minted) + ": the minted id is NOT a TOP-LEVEL record after the write - the record "
+                            "was ABSORBED into another record's list (its bytes are in the file, the file parses, "
+                            "and the decision is invisible; MEASURED 2026-09-27, BUG-587)")
+        elif len(hits) > 1:
+            problems.append(str(minted) + ": appears " + str(len(hits)) + " time(s) as a TOP-LEVEL record, expected "
+                            "exactly once - a registry that can hold one id twice cannot answer what is decided")
+    return problems
+
+
+def top_level_ids(decisions: list) -> list[str]:
+    """The NORMALISED ids of the TOP-LEVEL records: an id nested inside a record's list is not a record (BUG-587)."""
+    return [normalized_id(r) for r in decisions if isinstance(r, dict)]
+
 
 def mint_controls() -> list[tuple[str, bool]]:
     """Known-answer controls for the D-2660 MINT gate (BUG-492: a detector nobody has seen fail is not a detector)."""
@@ -568,6 +606,8 @@ def mint_controls() -> list[tuple[str, bool]]:
         return bool(mint_validate(dict(record), live))
 
     last = live[-1] if live else {"id": "D-0"}
+    # BUG-587: the ABSORBED shape - the minted record lands as ONE MORE ENTRY of the previous record's files: list.
+    absorbed_after = live[:-1] + [dict(live[-1], files=list(_file_list(live[-1])) + [dict(good)])] if live else [dict(good)]
     skipped = "D-" + str(int(next_free_decision_id(live).split("-")[1]) + 1)
     return [
         ("the control record itself PASSES - a gate that refuses everything proves nothing", not fires(good)),
@@ -582,6 +622,18 @@ def mint_controls() -> list[tuple[str, bool]]:
         ("a WHOLE-PAYLOAD CLONE of the last record on disk fires",
          fires(dict(last, id=next_free_decision_id(live)))),
         ("a missing required key fires", fires(rec(title=""))),
+        ("a mint that ARRIVES is accepted - the count moves by exactly the mint size and the id is TOP-LEVEL",
+         not arrival_problems(len(live), live + [dict(good)], [good["id"]])),
+        ("a mint whose id is ABSENT from the top level fires (the BUG-587 ABSORBED shape)",
+         bool(arrival_problems(len(live) - 1, absorbed_after, [good["id"]]))),
+    # BUG-590 (D-2690): the COUNT is landed EXACTLY here (len(live) - 1 before + 1 minted == len(absorbed_after)),
+    # so this control can only PASS or FAIL through the TOP-LEVEL clause it names. MEASURED by the mutation gate:
+    # with len(live) the control fired through the COUNT clause instead, and the arrival mutation could not be
+    # seen to red it - a control whose NAME and REASON disagree is not a control (D-2676 iv, one level down).
+        ("a minted id that lands TWICE as a top-level record fires",
+         bool(arrival_problems(len(live) + 1, live + [dict(good), dict(good)], [good["id"]]))),
+        ("a mint that does not move the count by its own size fires",
+         bool(arrival_problems(len(live), live, [good["id"]]))),
     ]
 
 
@@ -652,7 +704,8 @@ def mint_main(argv: list[str]) -> int:
     # MEASURED 2026-09-26 by this path's own first run: writing the record on its own left 784 records under a
     # 783 header, and the rail that caught it was the NEXT reader, not this writer.
     yaml_guard.assert_yaml(new_text, "config/decisions.yaml", WRITER)
-    post = registry_shape_problems(yaml.safe_load(new_text) or {})
+    would_be = yaml.safe_load(new_text) or {}
+    post = registry_shape_problems(would_be)
     if post:
         raise SystemExit("FAIL-CLOSED (" + WRITER + "): the minted registry does not re-derive cleanly: "
                          + "; ".join(map(str, post)))

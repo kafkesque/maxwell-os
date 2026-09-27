@@ -1270,3 +1270,20 @@ PARKED by META-LANE-FREEZE-1 (max_held 8 -> 9).
 
 session_seed.open_bugs_n: RE-MEASURED from scripts/bug_status.py at 135 (BUG-587 was FILED and is OPEN; BUG-572 and
 BUG-562 were CLOSED in this change-set).
+
+## 🟢 ACTIVE
+
+| ID | State | Decision |
+| D-2690 | ACTIVE | A MINT IS DECIDED BY ARRIVAL, NEVER BY BYTES WRITTEN. arrival_problems(total_before, decisions_after, minted_ids) is asked of the WOULD-BE bytes BEFORE the write and of the bytes ON DISK before the census is rewritten: the record count must move by EXACTLY the mint size and every minted id must be a TOP-LEVEL record exactly ONCE, so the ABSORBED shape (BUG-587) is refused BY NAME instead of landing invisibly. The membership oracle a RETIRED tombstone NAMED and no file implemented now exists (scripts/check_decision_membership.py, D-405): every id NAMED in this log - the D2552 table rows and the historical headings - must name a TOP-LEVEL record in config/decisions.yaml; five legacy orphans are PINNED BY IDENTITY (D-271, D-272, D-275, D2537, D637) in config/decisions_policy.yaml#membership and the list may only SHRINK; the reverse direction is DECLARED, never asserted, because this log is a TIERED face of the registry (an equality join would RED on 631 legitimate records, BUG-540). BUG-589 and BUG-590 were found by the mutation gate INSIDE this change-set and fixed here; BUG-588 is FILED and HELD (max_held 9 -> 10) because this file is append_only and line 3 declares a count no append can repair. |
+
+MEASURED AFTER (2026-09-27): registry 821 records, D-2690 TOP-LEVEL exactly once, census stamp re-derived in the
+same invocation; membership rail rc=0 (194 ids named, 5 pinned orphans, 0 faults, 631 records with no log entry BY
+DECLARATION); recompute --selftest 14/14; membership --selftest 10/10; mutation gate rc=0 (24 declared == floor 24,
+23 seen to red through their own control, 1 negative control green, 17/13 subjects covered, 19/19 controls);
+check_bug_status rc=0; register OPEN 135 / CLOSED 193 of 328; freeze window rc=0 (parked 10 of ceiling 10, still
+OPEN 8, exit UNMET nothing_still_held).
+
+OWNER GATES (one word each, none due while the rails are green): CLOSE/RE-RULE the freeze window | PROMOTE/HOLD the
+standing rule's CONSTITUTION promotion (POINTER only, never a restatement) | PROMOTE/HOLD BUG-431 | DECLARE/CANONICALISE
+BUG-583 | RENAME/DELETE BUG-585. BUG-588 needs a token of its own: the count sits on line 3 of an append_only file,
+so the remedy is an owner-gated non-append edit or a header rewrite that declares NO count.

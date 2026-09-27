@@ -7690,3 +7690,75 @@ FIX (OWED, drawn and NOT landed - the window holds it): in mint_main, assert pos
 len(records) AND that every minted id is present exactly once as a TOP-LEVEL record id, failing closed BY NAME;
 land the membership rail its own tombstone names; one known-answer control and one mutation that REDs it
 (a_mint_must_be_seen_to_arrive). The remedy is declared here so the drain has a subject.
+
+## BUG-587 (FIXED, HIGH, D-2690): a MINT is not ASSERTED to ARRIVE - the registry's write path has no arrival oracle
+
+STATUS FIXED (was FILED 2026-09-27 and PARKED by META-LANE-FREEZE-1; closing a HELD bug is that window's DRAIN,
+never a breach of it). MEASURED BEFORE: an append of ONE record added 32 lines, deleted 0, the census DID NOT MOVE
+(819, last D-2688) and every rail stayed GREEN - a record's files: items and a record's own '- id:' marker occupy
+the SAME column, so the record parsed as ONE MORE ENTRY of the PREVIOUS record's files: list. The file LOADED and
+the decision was INVISIBLE. FIX, one limb per face. (i) THE WRITE PATH IS SEEN TO ARRIVE: arrival_problems() joins
+the COUNT (total_before + len(minted)) AND the TOP LEVEL (every minted id exactly once as a top-level record), and
+it is asked of the WOULD-BE bytes BEFORE the write - an absorbed record is REFUSED, never landed invisibly - then
+again of the bytes ON DISK, where a failure refuses to rewrite the census and names --check as the reader. (ii) THE
+ORACLE THE TOMBSTONE NAMED EXISTS: tools/sync_decisions.py declares 'That check is
+scripts/check_decision_membership.py' and no such file existed (D-405). The rail now does: every id NAMED in
+DECISION-LOG.md (D2552 table rows AND historical headings, normalised through the reconciler's OWN spelling rule,
+never restated) must name a TOP-LEVEL record. MEASURED live: 194 named, 820 top-level, 5 pinned legacy orphans,
+0 faults. THE DIRECTION NOT ASSERTED (declared): the log is a TIERED face of the registry (its own header) and the
+full history is in archive/, so ~631 records carry no log entry by design - an equality join is a rail nobody can
+satisfy (BUG-540). TEETH (D-2676): ONE HOME = config/decisions_policy.yaml#membership; SEEN = two justfile lines;
+NAMED ORACLE = --selftest 10 controls + the reconciler's 14; MUTATION = a_mint_must_be_seen_to_arrive +
+a_logged_id_that_names_no_record_is_load_bearing (floor -> 23).
+
+## BUG-588 (FILED, LOW, D-2690): DECISION-LOG.md declares a decision COUNT that is stale by 169 - a second home
+
+MEASURED 2026-09-27 by the BUG-587 audit, in the file the membership rail reads: line 3 declares 'Machine source of
+truth: config/decisions.yaml (651 decisions)' while the derived census reads 820. It is the BUG-585 class one file
+over (one fact, two homes, only one right) and it is UNFALSIFIABLE where it sits: no rail joins a count in a prose
+header to the census. NOT repairable by append - DECISION-LOG.md is declared append_only (pipeline/doc_guard.py)
+and this is line 3, so the repair is an owner-gated non-append edit or a rewrite of the header to declare no count.
+NOT fixed here because the new rail's scope is membership of IDS; widening it to the count would RED it on a defect
+whose remedy is not landable in this change-set. FILED with its remedy; PARKED (max_held 9 -> 10).
+
+## BUG-589 (FIXED, MEDIUM, D-2690): the mutation gate's FIXTURE was UNDER-DECLARED - a runner read a path the fixture never carried, and the verdict blamed the MUTATION
+
+FILED and FIXED by D-2690. MEASURED 2026-09-27, on the first run of the mutation gate after D-2690 covered
+scripts/recompute_decision_summary.py: "mutation a_mint_must_be_seen_to_arrive: the oracle's BASELINE is not green
+(rc=1): the runner is already red before any mutation, so its red after one proves nothing" and "the runner DID go
+red, but not through the declared control". BOTH SENTENCES WERE TRUE AND BOTH NAMED THE WRONG OBJECT. The cause was
+MEASURED by materialising the gate's own fixture and running that runner's baseline inside it: "FAIL-CLOSED
+(scripts/recompute_decision_summary.py): governance/bug_status.json is absent - a bug citation checked against
+nothing is a citation nobody checked (C16)". The runner checks its own bug citations against the register
+(BUG_REGISTER = ROOT/governance/bug_status.json) and the fixture declared only justfile, so EVERY baseline of that
+runner was red. CLASS: a DECLARATION that cannot be evaluated against reality (D-405). The gate was right to be red
+and wrong about WHICH fact was broken - a misdiagnosis sends the next reader to the wrong file (it named the
+MUTATION, not the fixture).
+FIX, two clauses: (1) config/rail_mutations.yaml#fixture.include_files now carries governance/bug_status.json, and
+the list stays FILE-GRANULAR on purpose - a whole directory would carry inputs no runner reads; (2)
+scripts/check_rail_mutations.py gains fixture_declaration_problems(f, repo), asked BEFORE the fixture is built, so a
+missing include path OR an include_glob that matches NOTHING is a NAMED fault about the FIXTURE; the include_files
+loop also creates the parent directory, because a file-granular declaration may name a path no other declaration
+creates.
+TEETH (D-2676): ONE HOME (config/rail_mutations.yaml#fixture) | SEEN (a two-sided control in --selftest: the LIVE
+declaration must be clean AND a synthetic missing include_file AND a synthetic empty glob must EACH be a fault) |
+NAMED ORACLE (scripts/check_rail_mutations.py --selftest, 19/19) | MUTATION (fixture_declaration_is_read, seen to
+red through that control's own name; floor 23 -> 24). LANDED INSIDE THE FREEZE WINDOW because a RED rail outranks
+the freeze, and this rail gates the ladder.
+
+## BUG-590 (FIXED, MEDIUM, D-2690): the arrival control fired through the COUNT clause, not the TOP-LEVEL clause it names
+
+FILED and FIXED by D-2690, found by BUG-589's repair. With the fixture carrying its input the gate's verdict became
+exact: "mutation a_mint_must_be_seen_to_arrive DID NOT RED the oracle: rc=0, declared 1". MEASURED by applying the
+mutation by hand to a copy and running its --selftest: 14/14 controls still fired, including "  ok  a mint whose id
+is ABSENT from the top level fires (the BUG-587 ABSORBED shape)".
+WHY: that control asked arrival_problems(len(live), absorbed_after, [good["id"]]) while absorbed_after has len(live)
+elements, so the COUNT clause fired (expected len(live)+1, measured len(live)) and the control passed for a reason
+other than the one it NAMES. With the mutation applied the count clause still spoke, so the arrival rule could be
+neutered with EVERY control green - a control whose name and reason disagree is not a control (D-2676 iv, one level
+down: the exact class the mutation gate exists to see).
+FIX: the count is landed EXACTLY (len(live) - 1 before + 1 minted == len(absorbed_after)), so the control can only
+pass or fail through the top-level clause it names. MEASURED after the fix: the mutant prints "  !!  a mint whose id
+is ABSENT from the top level fires (the BUG-587 ABSORBED shape)" and exits 1, and the live gate reads "ok rail
+mutations: 23 declared rule(s) SEEN to red through their own control ... 1 negative control(s) stayed green, 17/13
+declared subject(s) covered (4 derived from the commit boundary, D-2679)".

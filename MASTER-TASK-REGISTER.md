@@ -752,3 +752,30 @@ RISK NOTE (now retired): before fe239df a worktree clean destroyed BOTH copies o
 - [ ] OWED: BUG-587's fix (census +1 and the minted id present as a TOP-LEVEL record, failing closed BY NAME).
 - [ ] NEXT: BUG-587's arrival assertion, then BUG-584 (one line, 96 -> 95 declaring lines), then BUG-585
       (open_bugs_n_at_2026_09_22), then BUG-583 (DECLARE the spelling set).
+
+## D-2690 (2026-09-27) - A MINT MUST BE SEEN TO ARRIVE (BUG-587 FIXED; BUG-589 + BUG-590 FIXED IN THE REPAIR; BUG-588 FILED AND PARKED)
+
+OWED: nothing from this change-set - the ARRIVAL oracle and the membership rail are landed and SEEN (registry 821
+records, D-2690 top-level exactly once; membership rc=0; mutation gate rc=0 with 24 declared == floor 24 and 19/19
+controls; register OPEN 135 / CLOSED 193 of 328; freeze window rc=0, parked 10 of ceiling 10).
+
+DRAINED: BUG-587 CLOSED (a HELD bug closed DRAINS the window rather than breaching it). ADDED TO THE WINDOW:
+BUG-588 (a decision COUNT declared on line 3 of an append_only log, stale by 169) - FILED and PARKED, max_held
+9 -> 10. FIXED INSIDE THIS CHANGE-SET, NOT PARKED: BUG-589 (the mutation gate's fixture was UNDER-DECLARED - a
+runner read governance/bug_status.json, the fixture carried only justfile, so every BASELINE of that runner was red
+and the gate blamed the MUTATION for it) and BUG-590 (the arrival control passed through the COUNT clause instead
+of the TOP-LEVEL clause it names, so the arrival rule could be neutered with 14/14 controls still green).
+
+NEXT (in strategically logical order):
+  1. BUG-584 DEDUPE (the next window drain, one measurable line): remove the byte-identical banner line and the two
+     duplicated --selftest invocations from justfile (declaring lines 96 -> 95) AND decide whether
+     scripts/run_ladder.py must REFUSE a duplicated declaring line - with the pinned duplicates as controls in BOTH
+     directions plus a mutation (a rail that counts raw lines while another keys by invocation is the blind spot).
+  2. THE LEAK SCAN'S DECLARED HOME (owed since D-2686): hoist the temp/ leak probe into a declared event-driven
+     rehearsal with its own four limbs, or a dormant registry entry with a real exercised_by path.
+  3. BUG-570 (register per-SHAPE rule + the duplicate BUG-493 block), BUG-568, BUG-569, BUG-559.
+  4. BUG-588 pending the owner's word (needs a token of its own: a count on line 3 of an append_only file).
+
+OWNER GATES (one word each, none due while the rails are green): CLOSE/RE-RULE (freeze window) | PROMOTE/HOLD
+(standing rule -> CONSTITUTION, POINTER only) | PROMOTE/HOLD (BUG-431) | DECLARE/CANONICALISE (BUG-583, re-measure
+first) | RENAME/DELETE (BUG-585).

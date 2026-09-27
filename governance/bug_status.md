@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**135 open** / 190 closed of 325 ids.
+**135 open** / 193 closed of 328 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -141,4 +141,4 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-583 | (OPEN, LOW): 5 of 812 decision records spell the state 'active' in lowercase while 505 spell it 'ACTIVE' (2026-09-27, found by the D-2682 la | 1 |
 | BUG-584 | (OPEN, LOW): the BUG-582 fix wrote three of its lines TWICE in `just health` (the ladder runs them twice and over-reports its own size) | 1 |
 | BUG-585 | (LOW - filed 2026-09-27, D-2686 audit, HELD behind the META-LANE FREEZE): `agent/session_seed.yaml` states the open-bug count TWICE and the  | 1 |
-| BUG-587 | (FILED, HIGH, D-2689): a MINT is not ASSERTED to ARRIVE - the registry's write path has no arrival oracle | 1 |
+| BUG-588 | (FILED, LOW, D-2690): DECISION-LOG.md declares a decision COUNT that is stale by 169 - a second home | 1 |

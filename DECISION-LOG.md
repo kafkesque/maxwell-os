@@ -1400,3 +1400,60 @@ broken-repository control calls recovery_subject() directly and stays green), re
 floor 30 -> 31 in one human-read diff. The same instrumentation measured a SECOND defect - lib/fixture.py#git()
 inherits the ambient subject, so a known-answer fixture can be built into a foreign repository - FILED as BUG-591
 with a remedy and PARKED (window.held 10 -> 11, max_held raised in the same change). BUG-568 is CLOSED.
+
+## D-2697 (2026-09-27) - the FIXTURE BUILDER does not inherit the ambient subject: env DERIVED from the pin ONE
+home, a REAL DECOY control, MUTATION-SEEN (floor 31 -> 32; BUG-591 DRAINED)
+
+BUG-591 was filed by D-2696 while it instrumented BUG-568: scripts/lib/fixture.py#git() handed its child git the
+AMBIENT environment, so GIT_DIR / GIT_WORK_TREE / GIT_INDEX_FILE were inherited and a known-answer fixture could
+be built into a FOREIGN repository - or into THIS one under the hook own legitimate GIT_DIR, which is the case
+with no decoy needed and therefore the case no pin can refuse. MEASURED before the fix (twice, before any write):
+inherited, the child read <decoy>/.git and real_repo() returned None for a fixture it had never created; cleared,
+the child read .git and the fixture landed in its own worktree. The caller then died on a <fixture>/.git/HEAD that
+git never wrote (FileNotFoundError) instead of verdicting - a machinery defect reported as a traceback.
+
+THE FIX IS A DERIVATION, NOT A COPY. The child environment comes from git_subject.cleared_env(git_subject.
+config()) - the ONE home of the guard set (D-2646/D-2647): restating the guard list here would be a SECOND home,
+and two lists of one fact drift while only one of them can be right. CLEARING is the correct verb for a BUILDER
+(unlike a rail): a rail may be handed a legitimate ambient subject and must be TOLERANT of it, but a builder has
+no legitimate ambient value to tolerate - its whole job is to build a repository of its own.
+
+THE CONTROL IS A DECOY, NOT A CLAIM. A real repository is built first, the ambient GIT_DIR/GIT_WORK_TREE are
+ARMED at it and the ARMING IS ASSERTED (anti-vacuity), the builder is then asked to build a second fixture, and
+the control requires that fixture to have ITS OWN .git. The caller environment is restored EXACTLY in a finally
+(prior values saved and put back, not popped). The negative case is real: under the mutation the fixture lands in
+the decoy, the assertion fails, and the control prints its own marker.
+
+MUTATION-SEEN (D-2676 iv): the new registry entry restores env=None, the exact inheritance the defect had.
+MEASURED baseline rc 0 with the new control GREEN and its marker ABSENT from the output; mutated rc 1 with
+EXACTLY ONE red line - the marker - every other control still GREEN, so the differential isolates the
+ENVIRONMENT rather than the builder; restored byte-identical; gate rc 0 over 32 entries = floor 32. The coverage
+floor moves 31 -> 32 in the same human-read diff, and the D-2679 join still holds (the entry subject is a module
+whose controls the ladder already runs).
+
+IN-FLIGHT DEFECT, RECORDED: the first landing collapsed the newlines of BOTH files, so the control was one
+comment line (Python comments run to end of line: the control did not exist) and the YAML entry was one comment
+line that silently dropped decision_supersession_rule_is_load_bearing (31 entries -> 30 under a floor of 32).
+Neither was caught by the write; both were caught by COUNTING the artifacts afterwards - parse the registry, grep
+the control name in the bytes, re-run the selftest and read its count. LESSON WORTH THE TWO HOMES IT TOUCHES: an
+artifact write is not a landing until a READER has counted it.
+
+BUG-591 is CLOSED and RELEASED in the freeze window (a release keeps the id in window.held, by the rail own
+rule), so nothing_still_held reads 1 still parked: BUG-559.
+
+## D-2698 - THE PIN CONTROL IS BOUNDED: a control that re-enters its own rail must not outlive the rail (2026-09-27)
+
+BUG-592, found while draining BUG-591 and closed with it. The standing rule (D-2676 iv) requires the pin to be SEEN to red, and the run that proves it did not red - it HUNG. Measured: rc=124 in 600.0s, stack `:773 in _rail` <- `:778 in selftest`, the pin control re-entering `--selftest` with a decoy environment, the child reaching the same control, nesting for ever.
+
+The shape is worth keeping: the OLD fixture builder was the accidental bound. Handing its child git the AMBIENT environment (BUG-591) meant that under a decoy it returned None and failed the child fast. Fixing THAT removed the bound and exposed this. Nothing regressed - a hidden dependency was deleted, and what depends on a bug must be measured when the bug goes. That is why the drain of a bug must re-run the gate that guards the bug.
+
+THE BOUND IS NOT A SOFTENING, and this is the load-bearing distinction: `--no-pin-probe` skips the PROBE, never the RULE. The refusal the probe exists to measure is produced by `subject_bits()` in main first act - before argparse mode is reached - so a child given the flag still REFUSES the decoy. What is removed is only the recursion: the probe no longer spawns a copy of the rail that spawns the probe. MEASURED both directions: 17/17 rc=0 baseline and 17/17 rc=0 after (the count does not move, so the bound hid no control); mutated rc=1 in 4.4s with EXACTLY ONE red line, the declared marker `FAIL repo-integrity selftest/rail0_pins_its_own_subject`, restored byte-identical.
+
+AND THE GATE, which is the point of the exercise: `ok rail mutations: 31 declared rule(s) SEEN to red through their own control` rc=0 over 32 entries = floor 32, with BOTH the D-2696 pin entry and the D-2697 fixture entry in the SEEN list. Before this line the D-2697 standings were true only by the author word; now the engine says them. BUG-592 is CLOSED, and the freeze window is untouched: filed and closed in one block, it was never HELD, so the window owes no release and nothing_still_held still reads 1 (BUG-559).
+
+## D-2699 - THE ATTEMPT THAT MEASURED A GAP IN THE STANDING RULE (2026-09-27)
+The BUG-559 drain was the standing rule's own debt: D-2670 landed the receipt-provenance join on 2026-09-26, D-2676 adopted limb (iv) - a MUTATION that REDs the oracle - the day AFTER. So the rule that stopped a foreign body from being certified was, by the standing rule, verified on PAPER only.
+THE ENTRY WAS SOUND AND THE FIXTURE WAS NOT. Pre-measured outside the fixture: the fall-through of receipt_provenance() reduced to 'declared' makes the rail's own selftest red with EXACTLY TWO declared controls - 'a receipt over a SAME-LENGTH live copy is REFUSED (the BUG-559 shape)' and 'a receipt over a FOREIGN body is REFUSED' - while the digestless limb keeps its own early return and stays GREEN; restored byte-identical. Inside the gate's fixture the BASELINE went red: three revision locators cannot re-derive, because the fixture is built from `git: [init, add, commit]` - ONE commit, no history - and the rail's oracle joins git refs of the live repository. The gate refused to blame the mutation ('its red after one proves nothing'), which is BUG-589's lesson working exactly as designed.
+THE GAP IS IN THE RULE, NOT IN THE ENTRY: limb (iv) is satisfiable only where the oracle is FIXTURE-PORTABLE, and nothing DECLARED that condition - so the next agent walks into the same wall. The fixture therefore owes a DECLARED HISTORY (`fixture.history`), or the rule must be declared uncoverable WITH its reason, joined in both directions (D-405).
+THE THREE OPTIONS WERE WEIGHED, NOT GUESSED: keep the entry by weakening the oracle (drop the revision controls from --selftest) REFUSED - it buys a green gate with a real control; keep the entry red FAILED the gate by construction; WITHDRAW and file the blocker is the only move that leaves both the rule and the ruler intact. The withdrawal is byte-exact - the floor stays 32, the fixture input list stays 2, the subject is not declared - so nothing in the gate's coverage moved, and the entry text survives in temp/d2699_entry.yaml with its pre-measurement in temp/d2699_mutcheck.py for the session that lands it.
+BUG-593 is FILED and PARKED (held, max_held 11 -> 12) and BUG-559 stays OPEN: its store-level half awaits the history fixture and its PROSE half (a truncated digest, outside the 64-hex ruler) is a different mechanism with its own small remedy. nothing_still_held reads 2 still parked - BUG-559 and the newly held BUG-593 - inside a ceiling of 12, so the window's exit stays UNMET and open (the reader is the oracle: this sentence was corrected BEFORE the append, not after).

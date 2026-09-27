@@ -34,7 +34,7 @@ fixture:
   keep: false
   timeout_seconds: 600
 coverage:
-  min_mutations: 31            # FLOOR (shrink guard): deleting an entry means editing the floor in a diff a human reads
+  min_mutations: 32            # FLOOR (shrink guard): deleting an entry means editing the floor in a diff a human reads
   # D-2679: the coverage set is DERIVED, never restated. Which rails gate a COMMIT is one fact and it already has
   # ONE home (config/rail_registry.yaml#commit_boundary), so restating it here would be a SECOND HOME - and two
   # lists of one fact drift, and only one of them can be right. scripts/check_rail_mutations.py joins the two and
@@ -324,6 +324,24 @@ mutations:
       inert, the rule ACCEPTS the audited tree itself and the named control goes RED through its own marker: the
       shared rule is READ, not merely declared.
 
+  # BUG-591 / D-2697: the fixture BUILDER handed its child git the AMBIENT environment. MEASURED 2026-09-27 while
+  # instrumenting BUG-568: with GIT_DIR=<decoy>/.git ambient, real_repo() built into a FOREIGN repository and
+  # returned None, and a caller selftest died with FileNotFoundError on a <fixture>/.git/HEAD git never wrote.
+  - id: the_fixture_builder_does_not_inherit_the_ambient_subject
+    subject: scripts/lib/fixture.py
+    op: replace
+    find: '                              env=git_subject.cleared_env(git_subject.config())).returncode'
+    replace: '                              env=None).returncode  # MUTATION (D-2676): the AMBIENT subject is inherited again (BUG-591)'
+    runner: scripts/lib/fixture.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: 'FAIL selftest/a_fixture_is_built_in_its_own_worktree_under_a_decoy_git_dir'
+    why: >-
+      BUG-591: the shared builder runs every child git with the guard variables CLEARED, derived from the pin ONE
+      home (git_subject.cleared_env, D-2646). With the ambient environment inherited again, the DECOY control goes
+      RED through its own marker: the builder lands in whichever repository the environment names. The other
+      controls stay GREEN (they run with a clean environment), so the differential isolates the ENVIRONMENT.
   - id: decision_supersession_rule_is_load_bearing
     subject: scripts/reconcile.py
     op: replace
@@ -624,3 +642,7 @@ mutations:
       the pin inert the rail still RUNS and still prints ok, so the red isolates one fact: the ambient
       environment is deciding what the recovery rail reads. MEASURED: baseline rc 0 with the marker ABSENT ->
       mutated rc 1 with the marker the SINGLE red line; restored byte-identical (D-2676 iv).
+      BUG-592 (D-2698): the control's NESTED run is BOUNDED with --no-pin-probe, because the probe re-enters
+      this rail through --selftest; before that bound this entry measured rc=124 at 600.0s (a
+      DID-NOT-RED) instead of the single red line above.
+

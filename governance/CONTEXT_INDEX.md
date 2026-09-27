@@ -1380,3 +1380,16 @@ config/boundary_rehearsal.yaml#rails[RAIL 0] now declares ambient_note: own_inde
 D-2674 exemption it used to state is WITHDRAWN. The declared note counts remain DERIVED from that block.
 The mutation FLOOR stated in the D-2696 row above is unchanged: config/rail_mutations.yaml#coverage.min_mutations
 is 31. Nothing else in this index is superseded by this line.
+
+## D-2697 (2026-09-27) - the fixture BUILDER is pinned to its own worktree (BUG-591 DRAINED)
+scripts/lib/fixture.py#git() derives the child git environment from the pin ONE home
+(git_subject.cleared_env, D-2646); the control builds a REAL DECOY repository, asserts the arming, and requires
+the fixture to land in its OWN worktree; the caller environment is restored exactly.
+SUPERSEDES every earlier statement of the mutation FLOOR in this index:
+config/rail_mutations.yaml#coverage.min_mutations is now **32** (was 31 in the D-2696 rows above), matching 32
+declared entries. config/freeze_window.yaml#released names BUG-591 while the id STAYS in window.held, so
+nothing_still_held reads 1 still parked (BUG-559). No other fact in this index changes.
+
+- 2026-09-27 | D-2698 (BUG-592 CLOSED): `scripts/check_repo_integrity.py` BOUNDS its own BUG-568 pin probe. The probe proved a decoy subject was refused by RE-ENTERING the rail with --selftest, so under the D-2696 pin mutation the nested run re-entered the probe and NESTED FOR EVER (rc=124, 600.0s at the runner ceiling). The probe is now the module-level `pin_controls(cfg, ok, n)` and the nested run passes the new `--no-pin-probe`. The refusal it measures happens in `subject_bits()` BEFORE any mode runs, so the bound costs the control nothing: baseline 17/17 rc=0, mutated rc=1 with ONE red line = `FAIL repo-integrity selftest/rail0_pins_its_own_subject`, gate rc=0 over 32 entries = floor 32. Any earlier line reporting that gate RED on `the_rail0_subject_pin_is_load_bearing`, or a 600s runner on it, is SUPERSEDED by this line.
+
+- 2026-09-27 | D-2699 (BUG-593 FILED + PARKED / BUG-559 still OPEN): the receipt-provenance rule CANNOT be mutation-covered yet. Entry `the_receipt_provenance_join_is_load_bearing` was pre-measured sound OUTSIDE the fixture and then WITHDRAWN: inside the gate's fixture the ORACLE's BASELINE is red because the fixture carries ONE commit while the rail's oracle joins git refs of the live repo (3 revision FAIL lines, reproduced in a hand-built fixture). `config/rail_mutations.yaml` is back at 32 = floor 32. Any earlier line claiming the provenance reach is mutation-seen, or claiming BUG-559 is closed, is SUPERSEDED by this line. SUPERSEDED TOO: the `nothing_still_held` = 1 line above - with BUG-593 parked the freeze reader prints 2 still parked (BUG-559 + BUG-593) inside a ceiling of 12. MEASURED CAVEAT: the preserved entry text (temp/d2699_entry.yaml, temp/d2699_mutcheck.py) sits in temp/, which .gitignore excludes (line 38) - it survives for the session that lands it, NOT across a worktree clean, so BUG-593's drain must re-measure rather than trust it.

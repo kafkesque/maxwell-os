@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**129 open** / 200 closed of 329 ids.
+**129 open** / 202 closed of 331 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -135,4 +135,4 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-532 | (OPEN 2026-09-26) - one lock, two homes: the session plan RESTATED the owner-instrument lock that a rail already checks | 1 |
 | BUG-545 | (MEDIUM - OPEN, MEASURED 2026-09-26): 17 of the 60 rails the health ladder invokes are NOT tracked by git - the control plane has no history | 1 |
 | BUG-559 | (STRUCTURAL - D-2666, OPEN 2026-09-26): a receipt can be cut over bytes joined to NO revision, so `mutability: human_authored` certified a f | 1 |
-| BUG-591 | (OPEN, MED, FILED by D-2696): the fixture BUILDER inherits the ambient git subject, so a known-answer fixture can be built into a FOREIGN re | 1 |
+| BUG-593 | (OPEN, MED - the MUTATION GATE's fixture carries ONE commit, so a rule whose oracle joins GIT HISTORY cannot satisfy limb (iv) - FILED 2026- | 1 |

@@ -7854,3 +7854,62 @@ asserts (a) the fixture has its OWN git dir, (b) the ambient git dir is unchange
 repository rather than None; MUTATION-SEEN per D-2676 (iv). FILED AND PARKED: config/freeze_window.yaml#scope
 allows a NEW governance bug to be FILED but not WORKED while META-LANE-FREEZE-1 is open, so the id joins
 window.held (10 -> 11) with max_held raised in the SAME change that parks it.
+
+## BUG-591 (CLOSED, MED, D-2697 - FILED by D-2696): the fixture BUILDER does not inherit the ambient subject
+
+STATUS: CLOSED. WORKED under META-LANE-FREEZE-1, whose not_frozen clause names exactly this case: closing a bug
+this window HOLDS is the exit, not a breach of it (config/freeze_window.yaml#not_frozen).
+
+MEASURED BEFORE (receipt taken twice, before any write, 2026-09-27): with GIT_DIR=<decoy>/.git and
+GIT_WORK_TREE=<decoy> ambient, fixture.real_repo(...) handed its child git the INHERITED environment, so the
+child read the DECOY git dir and the builder returned None for a fixture it never created; the caller then died
+on <fixture>/.git/HEAD with FileNotFoundError. The D-2696 pin closed the ROUTE that was measured; the DEFECT
+belongs to the BUILDER, which every caller (rails, selftests, rehearsals) reaches with no pin at all.
+
+FIX (scripts/lib/fixture.py): fixture.git() runs every child git with env=git_subject.cleared_env(git_subject.
+config()) - the ONE home of the guard set (D-2646), never a second copy. The test is a REAL DECOY: a genuine
+repository is built first, the ambient GIT_DIR/GIT_WORK_TREE are ARMED at it, the arming is ASSERTED (anti-
+vacuity: a control that cannot see its own precondition passes for the wrong reason), the caller environment is
+RESTORED EXACTLY in a finally (prior values saved and put back, not popped, so the control observes ambient
+state without editing it), and the builder must land in ITS OWN worktree. TEETH (D-2676 iv):
+config/rail_mutations.yaml#the_fixture_builder_does_not_inherit_the_ambient_subject sets the child env back to
+None; MEASURED baseline rc 0 with the control GREEN and the marker ABSENT, mutated rc 1 with EXACTLY ONE red
+line (its own marker), restored byte-identical, gate rc 0; the coverage FLOOR moves 31 -> 32 in the same
+human-read diff (SHRINK-ONLY, D-2676).
+
+LANDING DEFECT FOUND AND REPAIRED IN FLIGHT (recorded, not hidden): the first landing wrote BOTH files with the
+NEWLINES COLLAPSED. The new control became ONE 1409-character line OPENING WITH A COMMENT - and a comment runs
+to the end of its line, so the control did NOT exist and no control would ever have fired while the selftest kept
+printing its usual count. The YAML entry likewise became a comment line, silently dropping
+decision_supersession_rule_is_load_bearing: 31 entries became 30 while the floor had just been raised to 32.
+BOTH were caught by COUNTING the artifact instead of trusting the write (the registry was PARSED: 30 != 32, and
+the control name was grepped in the BYTES). temp/d2697_fix_ctrl.py and temp/d2697_fix_mut.py refuse unless the
+collapsed line occurs exactly once and no copy of the new name exists elsewhere, then re-count.
+
+RELEASED, NOT DELETED: config/freeze_window.yaml#released now names BUG-591 with its reason, and the id STAYS in
+window.held - the freeze rail itself refuses a release of an id held does not name (D-2688), because a release is
+a ruling ABOUT a hold, not a quiet deletion of it. nothing_still_held therefore reads 1 still parked (BUG-559).
+BUG-591 is CLOSED.
+
+## BUG-592 (CLOSED, MED, D-2698 - FILED by D-2698): the BUG-568 pin control RECURSES through its own --selftest
+
+STATUS: CLOSED. Found while draining BUG-591/D-2697: not a defect of the pin RULE (the pin is correct) but of its CONTROL, which was unbounded.
+
+MEASURED 2026-09-27 (temp/d2697_diag.py, then temp/d2698_mutcheck.py): with the pin mutated as the standing rule requires (config/rail_mutations.yaml#the_rail0_subject_pin_is_load_bearing sets subj, note = None, "") `scripts/check_repo_integrity.py --selftest` did NOT red - it HUNG: rc=124 in 600.0s at the 120s runner ceiling, the DID-NOT-RED the gate reports as "the rule is DECLARED but not READ" (class iii of D-2665, BUG-457 owner-owed). Stack: check_repo_integrity.py:773 in _rail <- :778 in selftest <- :844 in main.
+
+ROOT CAUSE: the pin control proves the decoy is refused by RE-ENTERING the rail with --selftest. With the pin intact the child refuses the decoy in subject_bits() and returns fast; with the pin MUTATED the child tolerates the decoy, runs the WHOLE selftest, reaches the same control and nests for ever. The old fixture BUILDER - which handed its child git the ambient environment (BUG-591) - was the ACCIDENTAL BOUND: under a decoy it returned None and failed the child fast. D-2697 removed that accident and EXPOSED this pre-existing defect. Nothing regressed; a hidden dependency was deleted.
+
+FIX (D-2698): the probe is extracted into the module-level `pin_controls(cfg, ok, n)` and the nested run is given `--no-pin-probe`, which skips the PROBE and never the RULE - the decoy is still refused BEFORE any mode runs (subject_bits() is main() first act), so the bound costs the control nothing.
+
+TEETH (D-2676 iv): BASELINE `--selftest` rc=0 with 17 control(s) and rc=0 with 17 AFTER (the count does not move); MUTATED rc=1 in 4.4s with EXACTLY ONE red line, the declared marker `FAIL repo-integrity selftest/rail0_pins_its_own_subject`, restored byte-identical. Gate: `ok rail mutations: 31 declared rule(s) SEEN to red through their own control` rc=0 over 32 entries = floor 32, with BOTH the D-2696 pin entry and the D-2697 fixture entry in the SEEN list. BUG-592 is CLOSED.
+
+## BUG-593 (OPEN, MED - the MUTATION GATE's fixture carries ONE commit, so a rule whose oracle joins GIT HISTORY cannot satisfy limb (iv) - FILED 2026-09-27 while attempting the BUG-559 drain, D-2699)
+FOUND BY: the BUG-559 drain. The owed remedy was the standing rule's limb (iv) (D-2676): the receipt-provenance join (D-2670) had NO mutation entry, so the rule was verified by its own known-answer controls only. An entry was written exactly to the declared schema (`the_receipt_provenance_join_is_load_bearing`, subject/runner scripts/verify_handoffs.py, `--selftest`, marker 'a receipt over a FOREIGN body is REFUSED').
+MEASURED, BOTH HALVES: (1) OUTSIDE the fixture the entry is SOUND - the fall-through of receipt_provenance() reduced to 'declared' makes the rail's own selftest rc=1 with EXACTLY TWO declared red lines ('a receipt over a SAME-LENGTH live copy is REFUSED (the BUG-559 shape)' and 'a receipt over a FOREIGN body is REFUSED') while the digestless limb keeps its own early return and stays GREEN, so the differential isolates the fall-through and not a crash; restored byte-identical. (2) INSIDE the fixture the ORACLE's BASELINE IS RED: `FAIL verify_handoffs selftest: revision bc1cc956cbd07fd7 does not re-derive from git:65a13c3cff5b89f584f6411c65082e2e479434cb` (and be1a39e04c378af9 from git:075ae65, f2778a488610cbf1 from git:44c249b). REPRODUCED OUTSIDE THE GATE in a hand-built fixture (scripts+config+justfile+governance/bug_status.json+governance/HANDOFFS.jsonl, `git init/add/commit`): the same three FAIL lines, rc=1.
+MECHANISM: the gate's fixture is built from `git: [init, add, commit]` - it carries ONE synthetic commit and NO history. This rail's oracle joins the declared revision LOCATORS, which name git refs of the LIVE repository, so in any fresh fixture those bytes cannot exist. The fixture therefore cannot make this oracle green, and the gate (correctly, per BUG-589) REFUSED to blame the mutation: 'the oracle's BASELINE is not green (rc=1) ... its red after one proves nothing'.
+WHY THIS IS A GAP IN THE STANDING RULE AND NOT A DEFECT OF THE ENTRY: (iv) is satisfiable only where the oracle is FIXTURE-PORTABLE, and NOTHING declares that condition - so the next agent walks into the same wall. Two remedies, both explicit: (a) the fixture owes a DECLARED HISTORY - a list of {path, blob or bytes, message} applied as successive commits under `fixture.history`, so a history-reading oracle has a green baseline BY CONSTRUCTION (the preferred remedy: it strengthens every future rail of this class); (b) declare the rule UNCOVERABLE-BY-MUTATION with its reason, joined in both directions (D-405) so a rule that cannot be covered is named rather than silently absent. The third option - weakening the oracle (dropping the revision controls from --selftest) - is REFUSED: it would trade a real control for a green gate.
+STATUS: the entry was WITHDRAWN and the floor returned to 32 (D-2699); the receipt-provenance rule keeps its own 7-case known-answer control and the live join (6/6 re-derivable, rc=0). BUG-559 stays OPEN.
+
+**BUG-559 STATUS (2026-09-27, the DRAIN was ATTEMPTED and its blocker is MEASURED - D-2699).** The owed fix LANDED on 2026-09-26: D-2670 joined every receipt to a store that re-derives its bytes (head/prefix/revision/declared, live rc=0, 6/6 re-derivable) and D-2671 promoted the one unjoined object. What was OWED SINCE is the STANDING RULE's limb (iv) - a MUTATION that REDs the join's oracle - because D-2676 was adopted the day AFTER D-2670, so the rule was covered by its own controls only. The entry was written, pre-measured green outside the fixture (rc=1 with EXACTLY TWO declared red lines, restored byte-identical) and then WITHDRAWN, because inside the gate's fixture the ORACLE'S BASELINE is red for a reason that is the FIXTURE'S: the revision controls re-derive locators from git refs the fixture cannot carry (BUG-593, filed and parked). NOT WEAKENED: the rule keeps its 7-case control; nothing in the rail changed.
+REMAINING, unchanged and NARROWED: (1) the STORE-LEVEL half - a receipt over an EARLIER COMMITTED revision is reported unrevisioned (remedy: a declared revision locator), and the two run-root escapes are held by census, declared with reasons and SHRINK-ONLY; (2) the PROSE half - the SECOND INSTANCE named at filing, a digest quoted with an ELLIPSIS (governance/ANCHOR_ADJUDICATION_NORMALIZATION_20260925.md line 9, `f2778a488610cbf1...`), is OUTSIDE the hash-claim ruler (which joins 64-HEX digests), so it is not refused - it is not even a SUBJECT. Remedy (owed, small): teach the digest-claim domain to join a truncated hex prefix against the same stores, so a truncation RESOLVES or is DRIFT.
+THEREFORE the freeze window reads nothing_still_held = 2 still parked (BUG-559 and the newly parked BUG-593, ceiling 11 -> 12) and this id is NOT released: the drain's remaining work is the PROSE join plus the fixture HISTORY that lets limb (iv) cover the store-level rule.

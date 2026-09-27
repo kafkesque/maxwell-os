@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 329,
+  "total_ids": 331,
   "open_n": 129,
-  "closed_n": 200,
+  "closed_n": 202,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -649,8 +649,8 @@
       "events": 1
     },
     {
-      "id": "BUG-591",
-      "title": "(OPEN, MED, FILED by D-2696): the fixture BUILDER inherits the ambient git subject, so a known-answer fixture can be built into a FOREIGN re",
+      "id": "BUG-593",
+      "title": "(OPEN, MED - the MUTATION GATE's fixture carries ONE commit, so a rule whose oracle joins GIT HISTORY cannot satisfy limb (iv) - FILED 2026-",
       "events": 1
     }
   ],
@@ -854,6 +854,8 @@
     "BUG-587",
     "BUG-588",
     "BUG-589",
-    "BUG-590"
+    "BUG-590",
+    "BUG-591",
+    "BUG-592"
   ]
 }

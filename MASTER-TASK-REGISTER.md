@@ -897,3 +897,53 @@ TEETH were NOT duplicated: selftest/wrong_note_provenance (BUG-567 shape) and se
 already RED when the declaration is mutated, so this declaration is MUTATION-COVERED without a new entry.
 D-2696 is COMPLETE and COMMITTED; NEXT unchanged: (1) BUG-591 (fixture builder pin); (2) BUG-559
 (STRUCTURAL) - draining both takes the freeze window exit nothing_still_held to MET.
+
+## D-2697 DONE (2026-09-27) - BUG-591 DRAINED: the FIXTURE BUILDER does not inherit the ambient subject
+
+FIX: scripts/lib/fixture.py#git() runs every child git with env=git_subject.cleared_env(git_subject.config()) -
+the guard set DERIVED from the pin ONE home (D-2646), never restated. New known-answer control:
+selftest/a_fixture_is_built_in_its_own_worktree_under_a_decoy_git_dir - a REAL decoy repository is built, the
+ambient GIT_DIR/GIT_WORK_TREE are ARMED and the arming ASSERTED (anti-vacuity), the builder must land in its OWN
+worktree, and the caller environment is RESTORED EXACTLY in a finally.
+
+MEASURED: fixture --selftest 7/7 control(s) rc 0 with the new control GREEN; mutated (env=None, the inherited
+environment restored) rc 1 with EXACTLY ONE red line = its own marker, restored byte-identical; the mutation gate
+rc 0 over 32 entries against a floor of 32 (config/rail_mutations.yaml#coverage.min_mutations 31 -> 32). Defect
+receipt BEFORE the fix: with GIT_DIR=<decoy>/.git ambient the child read the DECOY git dir and real_repo()
+returned None for a fixture it never created (FileNotFoundError at the caller).
+
+IN-FLIGHT DEFECT (recorded): the first landing collapsed the newlines of BOTH files - the control became one
+1409-character COMMENT line (it did not exist) and the YAML entry became a comment line that silently dropped
+decision_supersession_rule_is_load_bearing (31 entries -> 30 under the just-raised floor of 32). Both were caught
+by COUNTING the artifacts (registry parse, control name grepped in the bytes) and repaired by temp/d2697_fix_ctrl.py
+and temp/d2697_fix_mut.py, then re-verified: a write is not a landing until a reader has counted it.
+
+GOVERNANCE SYNC: buglog BUG-591 CLOSED block; decision D-2697 minted; DECISION-LOG.md, this register and
+governance/CONTEXT_INDEX.md appended; bug_status re-derived; agent/session_seed.yaml#open_bugs_n rewritten from
+the DERIVATION; config/freeze_window.yaml#released names BUG-591 while the id STAYS in window.held (the freeze
+rail refuses a release of an id held does not name), so nothing_still_held reads 1 still parked: BUG-559.
+
+NEXT (strategically logical order): (1) BUG-559 (STRUCTURAL) - the LAST parked id, and draining it takes
+nothing_still_held to MET (owner CLOSE approved; review_by 2026-10-11): a receipt can be cut over bytes joined to
+NO revision, so verify_handoffs must REFUSE a receipt whose (path, digest) is neither the live bytes AND
+git_bytes(HEAD, path), nor a declared revision locator + declared applier run, shipped with a seen-refusal control
+(R5) and the workbook receipt re-cut. (2) the rest of the parked set (BUG-585/584/583/572/570/588/587).
+(3) agent/session_seed.yaml#registry.decisions 639 / highest_bug BUG-301 are DATED SNAPSHOTS (D-2691 rename
+treatment); open_bugs_n is the ONE home of the count. (4) the leak scan DECLARED HOME (owed since D-2686).
+(5) PRODUCT LANE: extraction_type (0/251 anchors, no verifier, no consumer) - BUG-431 PROMOTE is step 1.
+
+## D-2698 DONE (2026-09-27) - BUG-592 CLOSED: the pin control is BOUNDED, the gate is GREEN over 32
+
+FIX: scripts/check_repo_integrity.py - the BUG-568 pin probe becomes module-level `pin_controls(cfg, ok, n)`; `selftest(skip_pin: bool = False)` gates it; the new `--no-pin-probe` bounds its own nested run.
+MEASURED: baseline 17/17 rc=0 -> after 17/17 rc=0 (same count, so the bound hid no control); MUTATED rc=1 in 4.4s, ONE red line = `FAIL repo-integrity selftest/rail0_pins_its_own_subject` (was rc=124 at 600.0s); restored byte-identical. Live modes unaffected: rc=0, --worktree rc=0 (13 dirty paths granted).
+GATE: rc=0, 31 rules SEEN to red, 0 DID-NOT-RED, 32 entries = floor 32 - the D-2697 landing is now ENGINE-validated, not self-reported.
+NOT DONE, DELIBERATELY: D-2697 `files` is NOT amended - its committed artifacts are the ones it names (fixture.py + governance), scripts/check_repo_integrity.py is D-2698 own landing, and an in-place edit of the append-only registry would owe a PREFIX re-baseline in a SEPARATE commit (D-2655) for no factual gain. The complete artifact set is stated in D-2698 instead.
+
+NEXT (strategically logical order): (1) BUG-559 (STRUCTURAL, D-2666) - the LAST parked id: a receipt can be cut over bytes joined to NO revision; draining it takes the freeze window nothing_still_held to MET. (2) the rest of the parked set (BUG-585/584/583/572/570/588/587) - list before working. (3) the leak scan DECLARED HOME (owed since D-2686). (4) agent/session_seed.yaml registry.decisions 639 / highest_bug BUG-301 - dated snapshots awaiting the D-2691 rename treatment. (5) PRODUCT LANE: extraction_type (0/251 anchors), BUG-431 PROMOTE is step 1.
+
+## D-2699 DONE (2026-09-27) - THE ATTEMPT THAT MEASURED A GAP IN THE STANDING RULE: the receipt-provenance rule (BUG-559) CANNOT be covered by limb (iv) yet - the entry is WITHDRAWN, not weakened; BUG-593 filed and parked
+FIX: none landed in the rail (deliberately). config/rail_mutations.yaml was returned BYTE-EXACTLY to its pre-attempt state (32 entries = floor 32, include_files back to 2, no scripts/verify_handoffs.py subject) after the gate refused the entry it was written for. What landed is a MEASUREMENT and a FILED DEFECT.
+MEASURED: (a) outside the fixture the entry IS sound - the fall-through of receipt_provenance() reduced to 'declared' gives rc=1 with EXACTLY TWO declared red lines, restored byte-identical; (b) inside the fixture the oracle's BASELINE is red (3 revision re-derivation FAIL lines, reproduced in a hand-built fixture outside the gate), because the fixture carries ONE commit and the rail's oracle joins git refs of the LIVE repo. The gate REFUSED to blame the mutation (the BUG-589 lesson working as designed).
+NOT DONE DELIBERATELY: the entry was NOT kept by weakening the oracle (dropping --selftest's revision controls) - that trades a real control for a green gate; BUG-559 was NOT closed - its store-level half is unfixed by limb (iv) and its PROSE half (a truncated digest outside the 64-hex ruler) is untouched.
+GATE: scripts/check_rail_mutations.py rc=0 over 32 entries = floor 32 (restored state); just health HEALTH_RC=0.
+NEXT (strategically logical order): (1) BUG-593 - declare fixture.history in config/rail_mutations.yaml so a history-reading oracle has a green baseline, then land the_receipt_provenance_join_is_load_bearing at floor 33 (the entry text is preserved in temp/d2699_entry.yaml with its pre-measurement in temp/d2699_mutcheck.py). (2) BUG-559's PROSE half - join truncated hex digests against the same three stores, with a control SEEN to refuse an unresolvable truncation. (3) the rest of the parked set (BUG-585/584/583/572/570/568/569/588/587) - list before working. (4) the leak scan's DECLARED HOME (owed since D-2686). (5) PRODUCT LANE: extraction_type (0/251 anchors), BUG-431 PROMOTE is step 1.

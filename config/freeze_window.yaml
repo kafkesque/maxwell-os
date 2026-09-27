@@ -56,11 +56,25 @@ window:
                   # the ambient git subject, so a known-answer fixture can be built into a FOREIGN repository -
                   # or into THIS one, under the hook's legitimate GIT_DIR. A new governance bug may be FILED and
                   # PARKED while this window is open, never WORKED: which is why max_held moves with it.
-  max_held: 11
+    - BUG-593     # FILED by D-2699, MEASURED while attempting the BUG-559 drain (D-2676 limb iv): the
+                  # mutation gate's fixture is built from git init + add + commit - ONE commit, NO history -
+                  # so a rail whose oracle joins git refs of the LIVE repository has a RED baseline inside
+                  # the fixture, and limb (iv) cannot be satisfied for it. Remedy declared in the block: a
+                  # fixture.history recipe (preferred), or a rule declared uncoverable with its reason and
+                  # joined both ways (D-405). A new governance bug may be FILED and PARKED while this window
+                  # is open, never WORKED: which is why max_held moves with it.
+  max_held: 12
 
   # AN OWNER RULING, recorded where its reader is. A released id MUST also be in `held` (else the ruling is
   # about nothing), and its reason is REQUIRED: `released: {}` is the honest empty case.
-  released: {}
+  released:
+    BUG-591: >-
+      DRAINED by D-2697, under this window own not_frozen clause (closing a bug the window HOLDS is the exit, not
+      a breach of it). The defect was the fixture BUILDER handing its child git the ambient environment; the fix
+      DERIVES the child env from the pin ONE home (git_subject.cleared_env, D-2646) and the control is a REAL
+      DECOY with its own marker, MUTATION-SEEN (floor 31 -> 32). The id STAYS in window.held above: a release is
+      a ruling ABOUT a hold, not a deletion of it, and the freeze rail refuses a release of an id held does not
+      name (D-2688).
 
   # THE WRITTEN EXIT. Each clause is a fact a reader settles WITHOUT judgement; `review_by` is the horizon a
   # WINDOW must have and a POLICY never does.

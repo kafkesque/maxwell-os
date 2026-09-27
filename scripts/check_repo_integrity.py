@@ -626,7 +626,76 @@ def worktree_selftest() -> int:
     return 1
 
 
-def selftest() -> int:
+def pin_controls(cfg: dict, ok: bool, n: int) -> tuple[bool, int]:
+    """The BUG-568 PIN control, extracted so that its own nested run can be BOUNDED (BUG-592/D-2698).
+
+    It re-enters this rail through --selftest to prove a decoy ambient subject is REFUSED, so it must
+    never be the reason a nested run recurses. Returns the running (ok, n) pair: it COUNTS two controls,
+    may set ok False, and the caller keeps whatever it hands back.
+    """
+
+    # BUG-568, the PIN - measured before it: a decoy ambient subject CERTIFIED, and --selftest CRASHED.
+    with tempfile.TemporaryDirectory() as td:
+        t = Path(td)
+        _ident, _msg = ("repo-integrity-pin@localhost", "repo-integrity-pin"), "repo-integrity pin selftest"
+        decoy = fixture.real_repo(t, "decoy_subject", commit=True, identity=_ident, message=_msg)
+        broken = fixture.real_repo(t, "pin_broken", commit=False, identity=_ident, message=_msg)
+        if decoy is None or broken is None:
+            print("FAIL repo-integrity selftest/rail0_pins_its_own_subject: git refused to build the DECOY or "
+                  "BROKEN fixture - a control that cannot run is never a pass (BUG-492)")
+            ok = False
+        else:
+            n += 1
+            me = [sys.executable, str(Path(__file__).resolve())]
+            clean = {k: v for k, v in os.environ.items()
+                     if k not in git_subject.guard_vars(git_subject.config())}
+            decoy_env = dict(clean, GIT_DIR=str(decoy / ".git"), GIT_WORK_TREE=str(decoy))
+            own = git_subject.discover(git_subject.config()).git_dir
+            hook_env = dict(clean, GIT_DIR=own, GIT_INDEX_FILE=os.path.join(own, "index"))
+
+            def _rail(argv: list[str], env: dict[str, str]) -> tuple[int, str]:
+                r = subprocess.run(argv, cwd=str(REPO), capture_output=True, text=True, env=env)
+                return r.returncode, r.stdout + r.stderr
+
+            rc_clean, out_clean = _rail(me, clean)
+            rc_decoy, out_decoy = _rail(me, decoy_env)
+            rc_doc, out_doc = _rail(me + ["--selftest", "--no-pin-probe"], decoy_env)
+            rc_hook, out_hook = _rail(me, hook_env)
+            bad: list[str] = []
+            if rc_clean != 0:
+                bad.append("anti-vacuity: the SAME command with NO ambient guard values is rc " + str(rc_clean)
+                           + ", so a red here would prove nothing about the decoy")
+            if not (rc_decoy == 1 and "REFUSED git-subject" in out_decoy and "ok repo-integrity" not in out_decoy):
+                bad.append("a DECOY GIT_DIR was NOT refused: rc=" + str(rc_decoy) + " out="
+                           + out_decoy.strip()[:140])
+            if not (rc_hook == 0 and "note repo-integrity: " in out_hook and own in out_hook):
+                bad.append("the HOOK'S OWN ambient values (GIT_DIR=" + own + " + its index) were not TOLERATED and "
+                           "NAMED: rc=" + str(rc_hook) + " - a rule that refuses every commit is not a rule "
+                           "(BUG-574), and a note that names no subject is the lie BUG-567 closed")
+            if not (rc_doc == 1 and "REFUSED" in out_doc and "Traceback" not in out_doc):
+                bad.append("the decoy CRASHED the BOUNDED --selftest run instead of being refused: rc=" + str(rc_doc) + " tail="
+                           + out_doc.strip()[-200:])
+            if bad:
+                print("FAIL repo-integrity selftest/rail0_pins_its_own_subject: " + " | ".join(bad))
+                ok = False
+            # TOLERANCE, two-sided: a BROKEN repository is REPORTED (never refused) while an INTACT one still pins.
+            n += 1
+            os.rename(str(broken / ".git"), str(broken / "gitdir_renamed_away"))
+            subj_here, _n1 = git_subject.recovery_subject(environ={})
+            subj_broken, note_broken = git_subject.recovery_subject(environ={}, root=broken)
+            if not (subj_here is not None and subj_here.git_dir == os.path.realpath(own)
+                    and subj_broken is None and "NO SUBJECT PINNED" in note_broken
+                    and resolve_git_dir(cfg, broken) is None):
+                print("FAIL repo-integrity selftest/a_broken_repository_is_reported_not_refused: the tolerant pin "
+                      "must (a) PIN an intact repository (got " + repr(bool(subj_here)) + "), (b) return NO subject "
+                      "for one whose git metadata was renamed away (got " + repr(subj_broken) + ", note="
+                      + note_broken[:80] + "), and (c) let the rail's own probe REPORT it (resolve_git_dir=None) "
+                      "- the recovery rail cannot fail closed on the condition it exists to name")
+                ok = False
+    return ok, n
+
+
+def selftest(skip_pin: bool = False) -> int:
     """Known-answer controls for the repair vocabulary (BUG-492: a control must be SEEN to fire).
 
     Control 1 IS the measured BUG-541 regression: before the fix it raised IsADirectoryError.
@@ -750,64 +819,15 @@ def selftest() -> int:
                       "BORN repository was renamed away and the rail reported " + repr(renamed[:1]) + " - the "
                       "UNBORN rule (BUG-576) must not weaken the 2026-09-25 detection (C16)")
                 ok = False
-    # BUG-568, the PIN - measured before it: a decoy ambient subject CERTIFIED, and --selftest CRASHED.
-    with tempfile.TemporaryDirectory() as td:
-        t = Path(td)
-        _ident, _msg = ("repo-integrity-pin@localhost", "repo-integrity-pin"), "repo-integrity pin selftest"
-        decoy = fixture.real_repo(t, "decoy_subject", commit=True, identity=_ident, message=_msg)
-        broken = fixture.real_repo(t, "pin_broken", commit=False, identity=_ident, message=_msg)
-        if decoy is None or broken is None:
-            print("FAIL repo-integrity selftest/rail0_pins_its_own_subject: git refused to build the DECOY or "
-                  "BROKEN fixture - a control that cannot run is never a pass (BUG-492)")
-            ok = False
-        else:
-            n += 1
-            me = [sys.executable, str(Path(__file__).resolve())]
-            clean = {k: v for k, v in os.environ.items()
-                     if k not in git_subject.guard_vars(git_subject.config())}
-            decoy_env = dict(clean, GIT_DIR=str(decoy / ".git"), GIT_WORK_TREE=str(decoy))
-            own = git_subject.discover(git_subject.config()).git_dir
-            hook_env = dict(clean, GIT_DIR=own, GIT_INDEX_FILE=os.path.join(own, "index"))
 
-            def _rail(argv: list[str], env: dict[str, str]) -> tuple[int, str]:
-                r = subprocess.run(argv, cwd=str(REPO), capture_output=True, text=True, env=env)
-                return r.returncode, r.stdout + r.stderr
-
-            rc_clean, out_clean = _rail(me, clean)
-            rc_decoy, out_decoy = _rail(me, decoy_env)
-            rc_doc, out_doc = _rail(me + ["--selftest"], decoy_env)
-            rc_hook, out_hook = _rail(me, hook_env)
-            bad: list[str] = []
-            if rc_clean != 0:
-                bad.append("anti-vacuity: the SAME command with NO ambient guard values is rc " + str(rc_clean)
-                           + ", so a red here would prove nothing about the decoy")
-            if not (rc_decoy == 1 and "REFUSED git-subject" in out_decoy and "ok repo-integrity" not in out_decoy):
-                bad.append("a DECOY GIT_DIR was NOT refused: rc=" + str(rc_decoy) + " out="
-                           + out_decoy.strip()[:140])
-            if not (rc_hook == 0 and "note repo-integrity: " in out_hook and own in out_hook):
-                bad.append("the HOOK'S OWN ambient values (GIT_DIR=" + own + " + its index) were not TOLERATED and "
-                           "NAMED: rc=" + str(rc_hook) + " - a rule that refuses every commit is not a rule "
-                           "(BUG-574), and a note that names no subject is the lie BUG-567 closed")
-            if not (rc_doc == 1 and "REFUSED" in out_doc and "Traceback" not in out_doc):
-                bad.append("the decoy CRASHED --selftest instead of being refused: rc=" + str(rc_doc) + " tail="
-                           + out_doc.strip()[-200:])
-            if bad:
-                print("FAIL repo-integrity selftest/rail0_pins_its_own_subject: " + " | ".join(bad))
-                ok = False
-            # TOLERANCE, two-sided: a BROKEN repository is REPORTED (never refused) while an INTACT one still pins.
-            n += 1
-            os.rename(str(broken / ".git"), str(broken / "gitdir_renamed_away"))
-            subj_here, _n1 = git_subject.recovery_subject(environ={})
-            subj_broken, note_broken = git_subject.recovery_subject(environ={}, root=broken)
-            if not (subj_here is not None and subj_here.git_dir == os.path.realpath(own)
-                    and subj_broken is None and "NO SUBJECT PINNED" in note_broken
-                    and resolve_git_dir(cfg, broken) is None):
-                print("FAIL repo-integrity selftest/a_broken_repository_is_reported_not_refused: the tolerant pin "
-                      "must (a) PIN an intact repository (got " + repr(bool(subj_here)) + "), (b) return NO subject "
-                      "for one whose git metadata was renamed away (got " + repr(subj_broken) + ", note="
-                      + note_broken[:80] + "), and (c) let the rail's own probe REPORT it (resolve_git_dir=None) "
-                      "- the recovery rail cannot fail closed on the condition it exists to name")
-                ok = False
+    # BUG-592 (D-2698): THIS probe RE-ENTERS the rail with --selftest to prove a decoy ambient subject is
+    # REFUSED, so the nested run must not re-enter the probe. MEASURED 2026-09-27: with the pin itself
+    # mutated the nested run reached this line again and NESTED FOR EVER (rc=124, 600.0s at the runner
+    # ceiling) - a DID-NOT-RED that reads as the rule DECLARED but not READ. The bound is sound: the
+    # refusal the probe measures happens in subject_bits() BEFORE argparse mode is reached, so a child
+    # given --no-pin-probe still refuses the decoy and the differential still isolates the PIN.
+    if not skip_pin:
+        ok, n = pin_controls(cfg, ok, n)
     # BUG-547, two-sided control: the archive rule must excuse its OWN history and nothing else.
     n += 1
     if not archived_under("archive/conflicted_20260926/",
@@ -831,6 +851,10 @@ def main() -> int:
     ap.add_argument("--plan", action="store_true", help="print the deterministic repair as mv commands")
     ap.add_argument("--quiet", action="store_true", help="print one summary line only (for rails)")
     ap.add_argument("--selftest", action="store_true", help="known-answer controls; no repo access")
+    ap.add_argument("--no-pin-probe", action="store_true",
+                    help="SKIP the BUG-568 pin probe, which RE-ENTERS this rail through --selftest: the nested "
+                         "run must be BOUNDED (BUG-592). Nothing else changes - a decoy is still REFUSED "
+                         "before any mode runs")
     ap.add_argument("--worktree", action="store_true",
                     help="audit the DIRTY WORKTREE against its two declared homes (BUG-563; never the "
                          "staged set, which is rail 4's subject)")
@@ -841,7 +865,7 @@ def main() -> int:
     print("note repo-integrity: " + subject_bits()[1])
     if a.selftest:
         rc = worktree_selftest()
-        return selftest() or rc
+        return selftest(skip_pin=a.no_pin_probe) or rc
     cfg = load_config()
     if a.worktree:
         return worktree_main(cfg)

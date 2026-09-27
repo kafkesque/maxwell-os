@@ -1,0 +1,87 @@
+# config/rail_mutations.yaml - THE MUTATION GATE (D-2676): the ONE HOME of the STANDING RULE's teeth (iv).
+#
+# THE STANDING RULE (adopted 2026-09-27, D-2676): no rule lands without (i) ONE HOME for the rule, (ii) a
+# BOUNDARY CONTROL that has been SEEN, (iii) a NAMED oracle, (iv) a MUTATION that REDs that oracle.
+# (iv) is the only one a machine can settle without judgement, and it is the one that was never mechanized.
+# MEASURED: every instance of the class behind BUG-527/566/568/569/574 was a rule whose DECLARATION was read
+# while its SUBJECT was never mutated. A rule that cannot be made to fail is not a rule (BUG-492, one level
+# up), and a rule nobody can mutate is a rule nobody can keep true after a refactor.
+#
+# WHAT THE GATE MEASURES, per entry: the oracle's BASELINE is GREEN, the mutation is APPLIED, the declared
+# control goes RED through its own named marker, and that marker was ABSENT before. Two runs, ONE difference.
+# An entry whose 'find' text no longer matches the bytes is a DECLARATION THAT DRIFTED FROM REALITY and is
+# FATAL, never a quiet pass: that is what stops a refactored rail from silently losing its own control.
+schema_version: '1'
+authority: D-2676
+why: >-
+  Every entry claims: if THIS text changes, THAT control must go RED. The gate tests the claim in a REAL
+  repository (git init + commit) in the SYSTEM temp dir, because a rail derives its ambient git subject from
+  REPO = Path(__file__).parents[1], and a fixture that is NOT a repository would red for a reason that is not
+  the mutation's (the BUG-527 lesson: the environment a rail actually reads is part of its subject).
+fixture:
+  under: system_temp
+  prefix: rail_mutations_
+  include_dirs: [scripts, config]
+  include_files: [justfile]
+  include_globs: [governance/session_plan_*.yaml]   # MEASURED: check_session_plan.py --selftest reads the LIVE plan
+  git: [init, add, commit]                               # a REAL repository: the rails read the ambient subject
+  commit_message: rail-mutations fixture base
+  commit_identity: {email: mutation-gate@localhost, name: mutation-gate}
+  keep: false
+  timeout_seconds: 600
+coverage:
+  min_mutations: 3            # FLOOR (shrink guard): deleting an entry means editing the floor in a diff a human reads
+  required_subjects:          # every path here MUST be the subject of >= 1 mutation (D-405: join BOTH directions)
+    - scripts/check_boundary_rehearsal.py
+    - scripts/check_session_plan.py
+budget:
+  max_seconds_per_runner: 120 # a slower runner has an UNCONTROLLED INPUT (class iii of D-2665) -> OWNER-OWED, loud
+mutations:
+  - id: provenance_count_is_load_bearing
+    subject: scripts/check_boundary_rehearsal.py
+    op: replace
+    find: '        if got_n != want_n:'
+    replace: '        if False:  # MUTATION (D-2676)'
+    runner: scripts/check_boundary_rehearsal.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: 'FAIL selftest/wrong_note_provenance'
+    why: >-
+      the count of notes of a DECLARED provenance is the whole of D-2675: with the count uncompared, a note whose
+      provenance is wrong (a PARTIAL commit read as this repository's OWN index, BUG-567) is ACCEPTED. Removing
+      one comparison must red the control that exists for exactly that shape.
+  - id: widening_record_rule_is_load_bearing
+    subject: scripts/check_session_plan.py
+    op: replace
+    find: '            if pat in gone or any(fnmatch.fnmatch(pat, a) for a in allow):'
+    replace: '            if True:  # MUTATION (D-2676)'
+    runner: scripts/check_session_plan.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: 'BUG-548: an entry that RECORDS a widening may_touch does not GRANT'
+    # MEASURED: this rail prints the control's LABEL on BOTH verdicts (an ok line and a FAIL line), so absence in
+    # the baseline cannot be required here - the differential is the EXIT CODE (0 -> 1) plus the label. Declared
+    # per entry rather than assumed: every other red entry keeps the ABSENCE requirement (its marker names a FAIL).
+    marker_absent_in_baseline: false
+    why: >-
+      BUG-548's rule stops an entry from RECORDING a permission the contract does not GRANT (may_touch is the
+      rule; the record is not). Short-circuit that comparison and the record becomes the rule again, so the
+      control that NAMES BUG-548 must red: a rule that cannot be unhooked silently.
+  - id: no_op_comment_is_the_negative_control
+    subject: scripts/check_boundary_rehearsal.py
+    op: append
+    # MEASURED (the gate's own first run): single-quoted YAML does NOT process an escape, so this was appended as
+    # the literal two characters backslash-n and the subject died with a SyntaxError - a no-op mutation that was not
+    # a no-op. Double quotes are REQUIRED here (C12: the declaration must mean what the reader thinks it means).
+    append: "\n# MUTATION (D-2676, NEGATIVE CONTROL): a comment changes no behaviour and must NOT red anything.\n"
+    runner: scripts/check_boundary_rehearsal.py
+    runner_args: [--selftest]
+    expect: green
+    mutated_rc: 0
+    marker: 'boundary-rehearsal controls:'
+    why: >-
+      THE NEGATIVE CONTROL, and the reason this gate is not a red-generator: a gate never seen to PASS is not a
+      gate (the mirror of BUG-492). A no-op mutation must leave the runner CLEAN; if it reds, the runner's INPUT
+      is uncontrolled and every red this gate reports is suspect.

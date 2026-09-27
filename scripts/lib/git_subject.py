@@ -74,6 +74,21 @@ REPO = Path(__file__).resolve().parents[2]
 CONFIG = REPO / "config" / "repo_integrity.yaml"
 
 
+#: The NOTE MARKERS (D-2675): the two provenances a pinned rail can NAME at the write boundary - the repository's
+#: OWN index (a normal commit) and git's OWN minted temp index (a partial commit). They live HERE because the
+#: BOUNDARY REHEARSAL (scripts/check_boundary_rehearsal.py) asserts what the hooks actually PRINT: an assertion on
+#: a copy of that text would be a second home for one fact (D-2646), and editing a note could then silently
+#: disarm the rehearsal. The notes below are BUILT from these markers, so the two cannot drift.
+NOTE_OWN_INDEX = "names THIS repository's own index"
+NOTE_ADOPTED = "ADOPTED git's OWN temporary index for this commit"
+NOTE_MARKERS = {"own_index": NOTE_OWN_INDEX, "adopted": NOTE_ADOPTED}
+
+
+def note_kind(note: str) -> str:
+    """'own_index' | 'adopted' | 'none': WHICH provenance a printed note names, decided by the ONE home."""
+    return next((k for k, marker in NOTE_MARKERS.items() if marker in (note or "")), "none")
+
+
 class SubjectRefused(SystemExit):
     """The environment names a subject this rail did not audit: refuse rather than report (C16, fail closed)."""
 
@@ -175,7 +190,7 @@ def adopt_index(doc: dict[str, Any], subj: Subject, raw: str) -> tuple[str, str]
     # (<gitdir>/index) through GIT_INDEX_FILE. The declared globs decide only what is NOT already the pinned
     # subject; a value that IS the pinned subject is the subject, and refusing it refuses every normal commit.
     if os.path.realpath(raw) == os.path.realpath(subj.index_file):
-        return subj.index_file, ("GIT_INDEX_FILE=" + raw + " names THIS repository's own index ("
+        return subj.index_file, ("GIT_INDEX_FILE=" + raw + " " + NOTE_OWN_INDEX + " ("
                                  + subj.index_file + ") - the ambient value IS the pinned subject, so it is READ "
                                  "as the subject and not refused (BUG-574)")
     cand = os.path.realpath(raw)
@@ -190,7 +205,7 @@ def adopt_index(doc: dict[str, Any], subj: Subject, raw: str) -> tuple[str, str]
     if not os.path.isfile(cand):
         return "", ("GIT_INDEX_FILE=" + raw + " does not exist - git reads a missing index as EMPTY, so the audit "
                     "would report over no bytes at all (the silent audit of BUG-527)")
-    return cand, ("ADOPTED git's OWN temporary index for this commit (" + cand + ": basename matches the declared "
+    return cand, (NOTE_ADOPTED + " (" + cand + ": basename matches the declared "
                   "index_tolerance.owner_name_globs and it is inside the pinned git dir) - at the WRITE moment "
                   "that IS the commit set, so it is READ as the subject, not merely accepted (BUG-566/D-2673)")
 

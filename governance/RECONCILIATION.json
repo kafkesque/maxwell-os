@@ -86,7 +86,7 @@
     {
       "id": "reach",
       "state": "ok",
-      "evidence": "0 uninvoked of 103 reachable check script(s), 1 declared edge(s) (0 dead), debt_max 0",
+      "evidence": "0 uninvoked of 105 reachable check script(s), 1 declared edge(s) (0 dead), debt_max 0",
       "unwired": [],
       "edges": [
         {

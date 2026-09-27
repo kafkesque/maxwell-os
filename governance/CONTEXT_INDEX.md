@@ -1102,3 +1102,13 @@ permanent, and it did not consult the pin. `just health` was NOT run between 12:
   measurement and filed as BUG-572.
 - **NEXT**: BUG-560 (write_guard for apply_workbook_rulings.py), BUG-571 (the cited-by-decision join), BUG-568 (a derived
   rail-0 pin), the BUG-431 CONTENT promotion (OWNER GATE).
+
+## REGISTERED 2026-09-27 - D-2675, the BOUNDARY REHEARSAL (the class-level closure of BUG-527/566/568/569/574)
+
+| fact | home | authority |
+| --- | --- | --- |
+| the write boundary at a REAL commit (a real NORMAL commit and a real PARTIAL commit must PASS through the hook; a PLANTED violation must be REFUSED by its DECLARED rail; every write-boundary rail's `--selftest` must fire) | `scripts/check_boundary_rehearsal.py` (writer: system temp dir ONLY, never inside the synced tree) | **D-2675, 2026-09-27**: 13/13 controls; rc=0 in 11.5s; declared a WRITER in `config/rail_registry.yaml` and wired into `just health` |
+| every fact the rehearsal asserts (rails, staged rc, note provenance, planted violations, the declared debt) | `config/boundary_rehearsal.yaml` | **D-2675** (C12: no path, count or verdict is written in code) |
+| WHICH provenance a printed note names (`own_index` at a normal commit, `adopted` at a partial one) | `scripts/lib/git_subject.py#NOTE_MARKERS` + `note_kind()` | **D-2675 / D-2646** (ONE home; the rehearsal READS it and never restates it) |
+| **SUPERSEDES the claim that a synthetic fixture proves a rule about the ambient hook environment**: 13/13 git-subject controls were GREEN while 100 percent of commits in this repository were REFUSED (BUG-574) | `scripts/check_boundary_rehearsal.py` | **D-2675** (the mirror of BUG-492: a control never seen to FAIL is not a control; a boundary never seen to ACCEPT a legitimate commit is not a boundary) |
+| **OPEN DEBT (declared, not papered over): BUG-576** - a FRESH repository cannot make its FIRST commit: RAIL 0 reads an UNBORN HEAD as broken metadata, which is exactly the state the BUG-400/BUG-564 RECOVERY route produces | `config/boundary_rehearsal.yaml#declared_debt` + `#temp.bootstrap` | **BUG-576, OPEN**: the rehearsal re-measures it every run, and a PAID debt returns 2 OWNER-OWED so the declaration must be WITHDRAWN |

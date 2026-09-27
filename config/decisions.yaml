@@ -9284,3 +9284,89 @@ decisions:
   bugs:
   - BUG-527
   - BUG-568
+- id: D-2675
+  date: '2026-09-27'
+  state: ACTIVE
+  category: governance
+  title: 'the BOUNDARY REHEARSAL: the write boundary is exercised at a REAL commit in a REAL repository, so a rule
+    about the ambient git environment git hands its own hook can never again be tested only against synthetic fixtures'
+  bugs:
+  - BUG-527
+  - BUG-566
+  - BUG-568
+  - BUG-569
+  - BUG-574
+  - BUG-576
+  files:
+  - scripts/check_boundary_rehearsal.py
+  - config/boundary_rehearsal.yaml
+  - scripts/lib/git_subject.py
+  - config/rail_registry.yaml
+  - justfile
+  decision: 'The write boundary is REHEARSED, not asserted. A bound control (scripts/check_boundary_rehearsal.py,
+    13 known-answer controls) builds a REAL repository in the SYSTEM temp dir in the LIVE --separate-git-dir layout,
+    materializes TRACKED HEAD bytes (git archive HEAD), installs the hook with THIS repository''s OWN installer
+    (scripts/install_git_hooks.sh, whose --check re-derivation is asserted), then performs a REAL normal commit
+    and a REAL partial commit THROUGH the hook, runs every write-boundary rail ALONE with the ambient GIT_INDEX_FILE
+    the hook receives, asserts each in-place PLANTED violation is REFUSED by its DECLARED rail, and runs every rail''s
+    own --selftest plus the git-subject module''s. Every fact it asserts is DECLARED in config/boundary_rehearsal.yaml
+    (C12): which rails, which staged rc, which NOTE PROVENANCE (ambient_note at a normal commit, partial_note at
+    a partial one), which planted violation, which debt. The note provenance is READ from its ONE home (scripts/lib/git_subject.py#note_kind,
+    D-2646), never restated. The fixture must resolve OUTSIDE the tree it audits (fail-closed, derived from the
+    rail''s own location, BUG-537). It writes ONLY in the system temp dir, so it is declared as a WRITER in config/rail_registry.yaml.
+    A declared debt (BUG-576) is re-measured every run: a refusal the declaration NAMES is tolerated and printed,
+    a refusal it does NOT name is FATAL, and a PAID debt returns 2 OWNER-OWED because the declaration must then
+    be WITHDRAWN by a decision (BUG-542 class).'
+  measured: '--selftest: 13/13 controls, each SEEN to fire, including partial_note_declaration_is_read (the control
+    for the declaration this fix added; it was the 11/12 RED that found provenance is SCENARIO-DEPENDENT and can
+    never be declared once per rail). On the live tree: rc=0 in 11.5s - a real NORMAL commit and a real PARTIAL
+    commit both PASSED through the hook with 3 notes of the declared provenance each, 2 planted violations REFUSED
+    by RAIL 4 (pipeline/stage5_verify.py -> rc=2 FORBIDDEN, out-of-plan path -> rc=1), 5 rail selftests fire, and
+    the declared debt BUG-576 is re-measured (a FRESH repository''s first commit is refused by RAIL 0 because an
+    UNBORN HEAD looks like broken metadata - the same state the BUG-400/BUG-564 recovery route produces). BLAST
+    RADIUS MEASURED, not asserted: the fixture is /var/folders/.../T/boundary_rehearsal_<rand> (system temp), the
+    live tree''s dirty count (117) and the installed hook''s sha (fc4baec26489c0f6) are IDENTICAL before and after,
+    the fixture is clean after every scenario, and the rails inside it read the FIXTURE''s own config and plan.
+    WHY IT IS THE CLASS-LEVEL CLOSURE: BUG-527/566/568/569/574 were ONE defect - a rule about the value git HANDS
+    the hook, tested only in fixtures that built their own git init - MEASURED as 13/13 green controls while 100
+    percent of commits were refused.'
+- id: D-2676
+  date: '2026-09-27'
+  state: ACTIVE
+  category: governance
+  title: 'THE STANDING RULE, mechanized: no rule lands without ONE HOME, a SEEN boundary control, a NAMED oracle
+    and a MUTATION that REDs it (the class-level brake on blindfolded rules)'
+  bugs:
+  - BUG-527
+  - BUG-566
+  - BUG-568
+  - BUG-569
+  - BUG-574
+  - BUG-576
+  - BUG-542
+  files:
+  - scripts/check_rail_mutations.py
+  - config/rail_mutations.yaml
+  - justfile
+  - config/rail_registry.yaml
+  decision: 'Adopt as the STANDING RULE: no rule lands without (i) ONE HOME for the rule, (ii) a BOUNDARY CONTROL
+    that has been SEEN, (iii) a NAMED oracle, (iv) a MUTATION that REDs that oracle. (iv) is mechanized as scripts/check_rail_mutations.py
+    plus config/rail_mutations.yaml (the ONE home of every declared mutation), wired into just health with its own
+    selftest and a tri-state exit. The gate MEASURES, per entry: the oracle baseline is GREEN, the mutation is applied
+    in a REAL fixture repository (git init + add + commit) built from DECLARED paths in the SYSTEM temp dir, the
+    declared control goes RED through its own named MARKER, and that marker was ABSENT before (two runs, one difference).
+    An entry whose find-text no longer matches the bytes is FATAL: a refactored rail cannot silently lose its own
+    control (the BUG-542 class, one level up). A declared subject with no mutation entry is FATAL, the mutation
+    count carries a declared FLOOR (shrink guard read in a diff a human reads), and a runner slower than the declared
+    ceiling is OWNER-OWED, never fatal (BUG-457).'
+  measured: '--selftest 15/15 known-answer controls (two joins read the DECLARATION itself; one NEGATIVE control:
+    a no-op mutation must NOT red). --check rc=0: 2 declared rules SEEN to red through their own control (provenance_count_is_load_bearing,
+    widening_record_rule_is_load_bearing), 1 negative control stayed green, 2/2 declared subjects covered. just
+    health rc=0; check_rail_registry rc=0 (43 rail scripts, 5 declared writers). THE GATE FOUND THREE REAL DEFECTS
+    IN ITS OWN FIRST RUNS, which is its evidence of teeth: (1) single-quoted YAML does not process an escape, so
+    the declared no-op append was the literal two characters backslash-n and the subject died with a SyntaxError
+    - a no-op mutation that was not a no-op; (2) a rail that prints a control LABEL on BOTH verdicts has no baseline
+    differential, now declared per entry (marker_absent_in_baseline: false); (3) the FORENSIC AUDIT BEFORE THE COMMIT
+    found a synthetic observation in the gate selftest restating the boundary rehearsal control count (a second
+    home of a declared fact, D-2646) and a docstring claiming the SUBJECT bytes are restored where the code restores
+    the FIXTURE copy - both fixed. Nothing here is committed by this record (D-381 owner gate).'

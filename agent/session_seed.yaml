@@ -319,7 +319,11 @@ current_state:
   - the F-14 pocket retarget (statistically null - BUG-296)
   - any PASS-only frame as an epistemic frame (it is a ROLE frame)
   - the golden retrieval set as ground truth (ids chosen from live search output)
-open_bugs_n: 128
+# D-2676 (2026-09-27): THE STANDING RULE mechanized - scripts/check_rail_mutations.py + config/rail_mutations.yaml.
+# No rule lands without (i) ONE HOME, (ii) a SEEN boundary control, (iii) a NAMED oracle, (iv) a MUTATION that REDs
+# it. Measured: selftest 15/15, check rc=0 (2 rules SEEN to red, 1 negative control green, 2/2 subjects covered), MINTED D-2676 (807 records, stamp 9090685c33a0f103),
+# just health rc=0, rail registry rc=0 (5 declared writers); BUG-577 filed by the audit. AUDITED before the commit (D-381).
+open_bugs_n: 139
 
 # 2026-09-26T (D-2662/BUG-554) - session trail (comments only: this file stays PARSEABLE).
 # THE CLASS, STATED ONCE: a declared field read by NO machine is a claim, not a control. MEASURED 2026-09-26:
@@ -438,3 +442,18 @@ open_bugs_n: 128
 # NEXT: (1) BUG-560 write_guard for scripts/apply_workbook_rulings.py; (2) BUG-571 the cited-by-decision join in
 # scripts/bug_status.py; (3) BUG-568 a DERIVED pin for RAIL 0; (4) BUG-431 CONTENT promotion (OWNER GATE); (5) BUG-563 one
 # home for backups/** + the rail output stores; (6) BUG-564 remainder (the hook ROUTE as a declared subject).
+# REGISTRY MINTED 2026-09-27 (D-2675): the BOUNDARY REHEARSAL - scripts/check_boundary_rehearsal.py +
+# config/boundary_rehearsal.yaml, 13/13 known-answer controls, rc=0 in 11.5s, wired into just health and declared a
+# WRITER in config/rail_registry.yaml. THE CLASS IT CLOSES: BUG-527/566/568/569/574 were ONE defect - a rule about the
+# value git HANDS its own pre-commit hook, tested only in fixtures that built their own `git init` - MEASURED as 13/13
+# green controls while 100 percent of commits were refused. The rehearsal builds a REAL repo in the system temp dir
+# (live --separate-git-dir layout, the repository's OWN hook installer), runs a REAL normal commit AND a REAL partial
+# commit through the hook, plants violations and asserts the DECLARED rail refuses them. Provenance is read from its ONE
+# home (scripts/lib/git_subject.py#note_kind, D-2646); the fixture must resolve OUTSIDE the tree it audits (fail closed).
+# BUG-576 FILED by it: a FRESH repository cannot make its FIRST commit - RAIL 0 reads an UNBORN HEAD as broken metadata,
+# which is the state the BUG-400/BUG-564 recovery route produces; the declared --no-verify bootstrap MUST BE WITHDRAWN
+# when it is fixed. Register: 314 ids, OPEN 138 / CLOSED 176. Decisions: 806 records, stamp 3e277d4070884474.
+# NEXT: (1) BUG-576 - RAIL 0 must tell an UNBORN HEAD from broken metadata; (2) BUG-575 - supersession COMPLETENESS +
+# IN-FORCE for cited decisions (16 measured findings); (3) BUG-573 - the ladder must collect EVERY fault before it exits
+# (one defect currently hides the next); (4) the MUTATION GATE (per rail: the mutation and the control that must go RED);
+# (5) DEFINITION OF DONE FOR A RULE - no new rule lands without one home, a boundary control, a named oracle and a mutation.

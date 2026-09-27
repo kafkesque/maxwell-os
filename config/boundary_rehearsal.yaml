@@ -1,0 +1,107 @@
+# config/boundary_rehearsal.yaml - the ONE home of the BOUNDARY REHEARSAL (D-2675).
+#
+# WHY THIS FILE EXISTS. BUG-527, BUG-566, BUG-568, BUG-569 and BUG-574 are ONE class: a rail's rule about the
+# AMBIENT git environment git hands its own pre-commit hook (GIT_DIR / GIT_INDEX_FILE / GIT_WORK_TREE) was tested
+# ONLY against SYNTHETIC fixtures - every control built its OWN `git init` - so the value git ACTUALLY hands the
+# hook was in NO test. MEASURED 2026-09-27: 13/13 git-subject controls GREEN while 100 percent of commits in this
+# repository were REFUSED (BUG-574). Every fact this rehearsal asserts is DECLARED here (C12); no RULE is
+# restated - the note provenance is read from its one home (scripts/lib/git_subject.py#note_kind, D-2646).
+schema_version: '1'
+authority: D-2675
+why: >-
+  A boundary never seen to ACCEPT a legitimate commit and a control never seen to FAIL are one defect seen from
+  two sides (BUG-574 / BUG-492). This file declares the facts MEASURED at a REAL commit in a REAL repository, so
+  the class is caught as a CLASS instead of one instance at a time.
+
+temp:
+  prefix: boundary_rehearsal_
+  work_name: work
+  git_dir_name: repo.git
+  under: system_temp            # NEVER inside the synced tree: a rehearsal that writes in the tree it audits is BUG-537
+  layout: separate_git_dir      # the LIVE layout (BUG-500): git metadata outside the worktree, hooks outside version control
+  materialize: [archive, HEAD]  # TRACKED HEAD bytes only: deterministic, and free of the live tree's dirt
+  identity: {name: boundary-rehearsal, email: boundary-rehearsal@localhost}
+  timeout_seconds: 300
+  bootstrap:
+    message: boundary-rehearsal base
+    flags: [--no-verify]
+    reason: >-
+      the fixture's FIRST commit cannot go through the hook, because the declared debt below (BUG-576) refuses a
+      commit in a repository whose HEAD is unborn. The bootstrap exists ONLY because of that refusal and is
+      declared here so it is WITHDRAWN the moment the debt is paid, never quietly relied upon.
+
+# TWO declared provenance fields PER RAIL, because provenance is a fact about the COMMIT SHAPE and not about
+# the rail: `ambient_note` = what git hands the hook at a NORMAL commit (this repository's OWN index),
+# `partial_note` = what it hands it at a PARTIAL commit (git's OWN minted temp index, next-index-<pid>.lock).
+# Each SCENARIO names the field it reads, so a count of notes is never a constant in code (C12) - the defect
+# the control `wrong_note_provenance` found when provenance was declared once per rail.
+rails:
+  - role: RAIL 0
+    invocation: scripts/check_repo_integrity.py
+    why: 'the recovery rail: it must refuse a commit through BROKEN git metadata, and ACCEPT a healthy one'
+    staged_rc: 0
+    ambient_note: none
+    partial_note: none
+    ambient_note_why: >-
+      RAIL 0 does NOT pin the ambient subject: it is the rail that REPORTS broken metadata, so pinning it would
+      make it fail closed on the condition it exists to name (BUG-568, declared debt - not papered over here).
+    selftest: scripts/check_repo_integrity.py --selftest
+  - role: RAIL 3
+    invocation: scripts/verify_recalibration_pins.py --staged
+    why: 'the pin WRITE gate: refuse a commit that makes a digest-pinned measurement unreproducible'
+    staged_rc: 0
+    ambient_note: own_index
+    partial_note: adopted
+    ambient_note_why: 'at a NORMAL commit git hands the hook this repository OWN index: it must be READ as the subject and SAID so (BUG-574)'
+    selftest: scripts/verify_recalibration_pins.py --selftest
+  - role: RAIL 4
+    invocation: scripts/check_session_plan.py --staged
+    why: 'the anti-drift lock: refuse a commit whose staged paths are outside the session plan'
+    staged_rc: 0
+    ambient_note: own_index
+    partial_note: adopted
+    ambient_note_why: 'the note names the index the rail READ; at a partial commit it must name git OWN minted temp index (BUG-566/D-2673)'
+    selftest: scripts/check_session_plan.py --selftest
+  - role: RAIL 5
+    invocation: scripts/check_declaration_consumers.py --staged
+    why: 'the consumer JOIN: refuse a commit that splits a declaration from the only code that reads it (D-2669)'
+    staged_rc: 0
+    ambient_note: own_index
+    partial_note: adopted
+    ambient_note_why: 'the note this rail printed was once FALSE in both directions (BUG-567): the provenance is now the module own string'
+    selftest: scripts/check_declaration_consumers.py --selftest
+
+module:
+  selftest: scripts/lib/git_subject.py --selftest
+  why: 'the ONE home of the git-subject rule (D-2646): its 14 known-answer controls are the rule own evidence'
+
+scenarios:
+  mutation: {op: append, text: "\n<!-- boundary rehearsal fixture -->\n"}
+  normal_commit: {expect_rc: 0, note_kind: own_index, note_field: ambient_note}
+  partial_commit: {path: governance/buglog.md, expect_rc: 0, note_kind: adopted, note_field: partial_note}
+  planted:
+    - name: will_not_touch
+      op: append
+      path: pipeline/stage5_verify.py
+      rail: RAIL 4
+      expect_rail_rc: 2
+      why: 'a will_not_touch family path (pipeline/**) staged for commit: owner-owed, refused'
+    - name: out_of_plan
+      op: create
+      path: rehearsal_out_of_plan_probe.txt
+      rail: RAIL 4
+      expect_rail_rc: 1
+      why: 'a NEW path no may_touch entry matches: a defect, refused'
+
+declared_debt:
+  - id: BUG-576
+    title: 'a FRESH repository cannot make its FIRST commit: RAIL 0 accuses an UNBORN HEAD of being broken metadata'
+    observation: fresh.first_commit
+    marker: 'FAIL repo-integrity'
+    rail: RAIL 0
+    reason: >-
+      MEASURED 2026-09-27 by this rehearsal: in a repository created by git init - and therefore in any repository
+      RECOVERED by re-creating its git dir (the BUG-400/BUG-564 route) - the first commit is REFUSED by RAIL 0
+      because HEAD^{commit} does not resolve and logs/HEAD does not exist yet. Both are the NORMAL state of an
+      unborn HEAD, not broken metadata. When fixed this rehearsal returns OWNER-OWED (2) and the declaration must
+      be WITHDRAWN by a decision (a declaration that outlives its subject is the BUG-542 class).

@@ -879,3 +879,41 @@ MEASURED AFTER. Mints: D-2667..D-2674 in ascending order, each rc=0 (797 -> 805 
 written in the same invocation). Register: 310 ids, OPEN 135 / CLOSED 175, BUG-493 CLOSED. `just health` rc=0. No other home
 quotes the registry's count or stamp (checked before minting), so no second declaration drifted.
 NOT a delegate claim (R5): no reachable local model is a verifier, so no signature is claimed.
+
+## D-2675 (2026-09-27) - the BOUNDARY REHEARSAL: the write boundary is exercised at a REAL commit in a REAL repository (BUG-527, BUG-566, BUG-568, BUG-569, BUG-574; BUG-576 FILED by it)
+
+CONTEXT. BUG-527, BUG-566, BUG-568, BUG-569 and BUG-574 were ONE defect seen five times: a rail's rule about the AMBIENT git
+environment git hands its own pre-commit hook (GIT_DIR / GIT_INDEX_FILE / GIT_WORK_TREE) was tested ONLY against synthetic
+fixtures - every control built its own `git init` - so the value git ACTUALLY hands the hook was in NO test. MEASURED: 13/13
+git-subject controls GREEN while 100 percent of commits in this repository were REFUSED. A control never seen to FAIL is not a
+control; a boundary never seen to ACCEPT a legitimate commit is not a boundary (the mirror of BUG-492).
+DECISION. The boundary is REHEARSED, not asserted. scripts/check_boundary_rehearsal.py (13 known-answer controls) builds a REAL
+repository in the SYSTEM temp dir in the LIVE --separate-git-dir layout, materializes TRACKED HEAD bytes (`git archive HEAD`),
+installs the hook with this repository's OWN installer (asserting its `--check` re-derivation), performs a REAL normal commit and
+a REAL partial commit THROUGH the hook, runs each write-boundary rail ALONE with the ambient GIT_INDEX_FILE the hook receives,
+PLANTS real violations and asserts the DECLARED rail refuses them, and runs every rail's own --selftest plus the git-subject
+module's. Every fact is DECLARED in config/boundary_rehearsal.yaml (C12): the rails, their staged rc, the NOTE PROVENANCE (a
+fact about the COMMIT SHAPE, not about the rail - `ambient_note` at a normal commit, `partial_note` at a partial one, each
+scenario naming the FIELD it reads), the planted violations, and the debt. Provenance is READ from its ONE home
+(scripts/lib/git_subject.py#note_kind, D-2646), never restated. The fixture must resolve OUTSIDE the tree it audits (fail-closed,
+derived from the rail's own location - `git clean -qfdx` and rmtree run there, BUG-537) and it writes only in the system temp
+dir, so it is declared a WRITER in config/rail_registry.yaml. A DECLARED DEBT is re-measured every run: a refusal the declaration
+NAMES is tolerated and printed, one it does NOT name is FATAL, and a PAID debt returns 2 OWNER-OWED because the declaration must
+then be WITHDRAWN by a decision (a declaration that outlives its subject is the BUG-542 class).
+MEASURED. --selftest 13/13, each control SEEN to fire - including the control for the declaration this session added
+(`partial_note_declaration_is_read`), which was found by the 11/12 RED that proved provenance is SCENARIO-DEPENDENT and can
+never be declared once per rail. On the live tree: rc=0 in 11.5s (a real normal commit and a real partial commit both PASSED
+with 3 notes of the declared provenance each; 2 planted violations REFUSED by RAIL 4 - pipeline/stage5_verify.py rc=2 FORBIDDEN,
+an out-of-plan path rc=1; 5 rail selftests fire; BUG-576 re-measured). BLAST RADIUS MEASURED, NOT ASSERTED: the fixture is a
+system-temp path, the live tree's dirty count and the installed hook's sha are IDENTICAL before and after, the fixture is clean
+after every scenario, and the rails inside it read the FIXTURE's own config and plan. BUG-576 FILED: a FRESH repository cannot
+make its FIRST commit - RAIL 0 accuses an UNBORN HEAD of being broken metadata, the same state the BUG-400/BUG-564 RECOVERY
+route produces - so the rehearsal declares a --no-verify bootstrap that MUST BE WITHDRAWN when it is fixed.
+
+## D-2676 (2026-09-27) - THE STANDING RULE, mechanized: no rule lands without ONE HOME, a SEEN boundary control, a NAMED oracle and a MUTATION that REDs it (the class-level brake on "blindfolded rules")
+
+CONTEXT. The owner asked why rules are created blindfolded and later conflict, and whether the project is running in circles. Forensically: 12 of 16 SUPERSEDED records name no successor, 4 sites cite a decision not in force, ~62% of BUG-520..574 are about the governance machinery itself - and every instance of the class behind BUG-527/566/568/569/574 was a rule whose DECLARATION was read while its SUBJECT was never mutated. The missing fourth element of a rule (a mutation that must red it) had no rail, so a rule could pass every check here without anyone ever showing that it CAN FAIL.
+
+DECISION. Adopt as the STANDING RULE: no rule lands without (i) ONE HOME for the rule, (ii) a BOUNDARY CONTROL that has been SEEN, (iii) a NAMED oracle, (iv) a MUTATION that REDs that oracle. (iv) is mechanized as scripts/check_rail_mutations.py + config/rail_mutations.yaml (one home of every declared mutation), wired into just health (--selftest + tri-state). The gate measures, per entry: the oracle's BASELINE is GREEN, the mutation is applied in a REAL fixture repository (git init + commit) under the system temp dir, the declared control goes RED through its own named MARKER, and that marker was ABSENT before (two runs, one difference). An entry whose find-text no longer matches the bytes is FATAL: a refactored rail cannot silently lose its own control (the BUG-542 class, one level up). A declared subject with no mutation entry is FATAL, and the mutation count has a declared FLOOR (shrink guard, edited only in a diff a human reads).
+
+MEASURED. --selftest 15/15 known-answer controls (incl. two joins that read the DECLARATION itself, and a NEGATIVE control: a no-op mutation must NOT red). --check: 2 declared rules SEEN to red through their own control (provenance_count_is_load_bearing, widening_record_rule_is_load_bearing), 1 negative control stayed green, 2/2 declared subjects covered, rc=0 in ~10s. The gate's OWN first two runs found two real defects in this session's declarations: single-quoted YAML does not process an escape (the "no-op" append was the literal two characters backslash-n, so the subject died with a SyntaxError) and a marker that a rail prints on BOTH verdicts has no baseline differential (now declared per entry: marker_absent_in_baseline). just health rc=0; rail registry rc=0 (43 rail scripts, 5 declared writers). Files: scripts/check_rail_mutations.py, config/rail_mutations.yaml, justfile, config/rail_registry.yaml.

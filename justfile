@@ -94,6 +94,10 @@ health:
 
     python3 scripts/check_declaration_consumers.py --selftest || exit 1   # D-2669/BUG-492: the CONSUMER JOIN's own decisions (a withheld consumer in the commit set, an over-reaching census, an unreadable registry) must be SEEN to fire
     python3 scripts/check_session_plan.py --selftest || exit 1   # BUG-565/BUG-492: RAIL 4's OWN controls, incl. that a path containing a SPACE is ONE path (fourth hardening); wired here because a control nothing runs is a comment
+    python3 scripts/check_boundary_rehearsal.py --selftest || exit 1     # D-2675: the boundary's own 13 controls
+    python3 scripts/check_boundary_rehearsal.py || [ $? -eq 2 ]           # D-2675: the write boundary at a REAL commit
+    python3 scripts/check_rail_mutations.py --selftest || exit 1          # D-2676: the standing rule's own teeth (a gate never seen to PASS is not a gate)
+    python3 scripts/check_rail_mutations.py || [ $? -eq 2 ]               # D-2676: every declared rule SEEN to red through its own named control at a MUTATION
     python3 scripts/check_declaration_consumers.py || exit 1              # D-2669: no declaration without its reader - BUG-562 landed the pair in one commit; this makes the JOIN a property, not an act
 
 healthcheck: health

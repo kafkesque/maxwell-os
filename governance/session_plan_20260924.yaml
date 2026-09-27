@@ -516,3 +516,29 @@ widening_log:
       governance/ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv, after which config/anchor4_interim_state.json is deleted)
       is a DIFFERENT act and REMAINS an owner gate; nothing here writes the tracked sheet, and this entry claims
       no path it does not name.
+
+  - entry: 25
+    session: 20260927A
+    widened: []
+    may_touch_untouched: true
+    will_not_touch_untouched: true
+    covered:
+      - pattern: 'scripts/*.py'
+        why: 'scripts/check_boundary_rehearsal.py (D-2675, NEW) and the BUG-574 fix in scripts/lib/git_subject.py (the NOTE MARKERS + note_kind, the ONE home of the provenance the rehearsal reads). Both are granted by the existing pattern; recorded because a may_touch pattern with no widening_log entry is UNVERIFIED.'
+      - pattern: 'config/*.yaml'
+        why: 'config/boundary_rehearsal.yaml (D-2675, NEW) - the ONE home of every declared fact the rehearsal asserts - and config/rail_registry.yaml (the new writer declaration).'
+      - pattern: 'justfile'
+        why: 'two rail lines (the rehearsal --selftest and the tri-state run) so the ladder EXERCISES the rail and the registry audit can see its --selftest.'
+      - pattern: 'governance/buglog.md'
+        why: 'BUG-576 filed (a FRESH repository cannot make its FIRST commit) plus one appended escaping correction.'
+      - pattern: 'governance/bug_status.json'
+        why: 'RE-DERIVED, not hand-edited: appending to the log makes the register stale the moment it grows (314 ids, OPEN 138 / CLOSED 176).'
+    why: >-
+      D-2675 (the BOUNDARY REHEARSAL). NOTHING WAS WIDENED: every path touched is already inside may_touch - scripts/*.py,
+      config/*.yaml, config/*.json, governance/buglog.md, governance/bug_status.json|md, governance/CONTEXT_INDEX.md,
+      governance/SESSION-HANDOFF-*.md, governance/session_plan_*.yaml, justfile, DECISION-LOG.md,
+      MASTER-TASK-REGISTER.md, agent/session_seed.yaml - so no glob was asked for and no new permission exists.
+      pipeline/** untouched; NO pinned artifact staged (the R2 meter stays OWNER-OWED rather than laundered).
+      temp/d2675_*.yaml|.md are scratch and are NEVER staged. The PREVIOUS session's owed record (the BUG-574 landing,
+      whose paths are all inside may_touch as well) is recorded HERE rather than as a second entry: a widening_log that
+      grows one entry per session while changing nothing is ceremony, and ceremony is what BUG-548 was about.

@@ -7273,3 +7273,32 @@ MEASURED (read-only forensic pass over config/decisions.yaml + config/*.yaml, 20
 CLASS: this is the D-328 defect the registry already ruled on - a citation that asserts a protection which enforces nothing - generalised to the whole registry. A rule whose authority is PROPOSED is enforced by nobody, and a SUPERSEDED rule whose successor is unnamed cannot be retired by any machine.
 
 REMEDY (two small rails, no new vocabulary): (1) supersession COMPLETENESS - state=SUPERSEDED requires a resolvable successor, except the 24 pinned legacy_debt_ids in config/decisions_policy.yaml (D-2645); (2) IN-FORCE - a cited decision must be in the in-force set, or the citing site must declare a forward reference explicitly (the mint gate already refuses a forward citation, so the vocabulary exists). MADR is the real-world precedent: it carries status = "superseded by ADR-0123" as a LINK, not a label.
+
+## BUG-576 (OPEN, MED): a FRESH repository cannot make its FIRST commit - RAIL 0 accuses an UNBORN HEAD of being broken metadata, and the RECOVERY route re-creates exactly that state (2026-09-27)
+
+MEASURED (2026-09-27, by scripts/check_boundary_rehearsal.py in a REAL repository in the system temp dir, --separate-git-dir layout, hooks installed by this repository's OWN installer): the FIRST \`git commit\` returns rc=1 with
+  FAIL repo-integrity: 2 repository integrity defect(s):
+    "git rev-parse --verify HEAD^{commit}" does not resolve (rc=128: fatal: Needed a single revision) - every rail below is reading a repository that is not there (P0-A)
+    <gitdir>/logs/HEAD is MISSING - git's reflog for HEAD has been renamed away, and 'git reflog' will silently serve a stale branch reflog (P0-A)
+Both facts are the NORMAL state of an UNBORN HEAD, not broken metadata: HEAD names a branch with no commit yet, and git creates logs/HEAD AT the first commit.
+
+WHY IT MATTERS: the SAME state is produced by the BUG-400/BUG-564 RECOVERY route (a git dir re-created by a clone, by hand, or by --separate-git-dir), so the rail whose purpose is to NAME broken metadata REFUSES the one commit that would repair the repository. This is the BUG-574 class again - a rule that cannot fire on the LEGITIMATE case - now on the recovery rail, and it was invisible for the same reason: every control built its own fixture and asserted refusals, never an acceptance.
+
+CLASS: a rule derived from "what a healthy repository LOOKS like" instead of "the states a healthy repository PASSES THROUGH". An unborn HEAD is a legitimate state.
+
+REMEDY (OWED): RAIL 0 must distinguish an UNBORN HEAD (HEAD resolves to a ref that does not exist yet, and the repository has an index but no commit) from a HEAD that is genuinely broken; only the latter is a defect. Filed here rather than fixed by weakening the rail. UNTIL THEN the rehearsal declares a --no-verify bootstrap in config/boundary_rehearsal.yaml#temp.bootstrap that MUST BE WITHDRAWN by a decision the moment this is fixed (a declaration that outlives its subject is the BUG-542 class).
+
+ESCAPING CORRECTION (appended 2026-09-27, the day the block above was filed): the three backtick PAIRS in the
+BUG-576 MEASURED block carry a stray leading backslash from the appending heredoc. Read each of them as a PLAIN
+backtick. Nothing else in the block is affected. Corrected by THIS APPEND, not by a rewrite, because buglog.md is
+append-only (R-D410).
+
+## BUG-577 (OPEN, MED): the BUG-537 rule "a fixture must resolve OUTSIDE the tree it audits" now has TWO HOMES, restated verbatim by two rails (2026-09-27)
+
+FOUND BY: the forensic audit run BEFORE the D-2675+D-2676 commit - D-2676 requires ONE HOME for every rule, so the landing was audited against its own rule.
+
+MEASURED (2026-09-27): scripts/check_boundary_rehearsal.py#outside_tree and scripts/check_rail_mutations.py#outside_tree are ONE rule in TWO files - both refuse a root that IS the audited tree or lies inside it, both derive REPO from the rail's own location and never from config. Fixing the rule in one rail leaves the other silently stale, which is precisely the fork D-2646 forbids, and it appeared in the same change-set that adopts the standing rule.
+
+REMEDY (OWED): ONE HOME - scripts/lib/fixture.py#outside_tree, imported by both rails - landed WITH the standing rule's teeth: a KNOWN-ANSWER control that calls the shared rule with the audited tree ITSELF and requires the refusal, plus a mutation entry in config/rail_mutations.yaml that REDs that control when the rule is reduced to a no-op. UNTIL THEN both copies are live and this block is the audit record.
+
+ALSO MEASURED IN THE SAME AUDIT (no new id - it is the evidence for BUG-571's remedy): BUG-492 is named 32 times in governance/buglog.md and is cited by the standing rule's own prose, yet it is NOT in the register (314 ids). A decision that cites a bug that does not exist is a citation naming nothing (D-2660), and it is exactly the owner-owed RED LINE BUG-571 owes.

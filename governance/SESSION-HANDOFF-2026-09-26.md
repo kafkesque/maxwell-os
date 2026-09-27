@@ -378,3 +378,65 @@ LINE differed from HEAD. Restored from the R-D410 backup. rev 3 exists in NO git
 (a) the BUG-562 PAIRING RAIL (a control SEEN to refuse a commit set whose granted artifact's consumer is withheld);
 (b) BUG-559 then BUG-560; (c) BUG-563 (`backups/**` neither granted nor ignored) + the unversioned receipt ledger;
 (d) the D-2667/D-2668 mints; (e) the owner drop-in rev 3 promotion (BUG-493, owner-gated).
+
+## 2026-09-27 - D-2675 LANDED: the BOUNDARY REHEARSAL (and BUG-576 filed by it)
+
+WHAT LANDED. `scripts/check_boundary_rehearsal.py` + `config/boundary_rehearsal.yaml`: the write boundary is exercised at a
+REAL commit in a REAL repository (system temp dir, live `--separate-git-dir` layout, TRACKED HEAD bytes via `git archive HEAD`,
+the hook installed by this repository's OWN installer). A real NORMAL commit and a real PARTIAL commit must both PASS through
+the hook; each in-place PLANTED violation must be REFUSED by its DECLARED rail; every write-boundary rail's `--selftest` and
+the git-subject module's must fire. 13/13 controls, rc=0 in 11.5s, wired into `just health` (`--selftest || exit 1` and
+`|| [ $? -eq 2 ]`) and declared a WRITER in `config/rail_registry.yaml`.
+WHY IT IS THE CLASS CLOSURE. BUG-527/566/568/569/574 were ONE defect: a rule about the value git HANDS its own pre-commit hook,
+tested ONLY in fixtures that built their own `git init`. MEASURED: 13/13 git-subject controls GREEN while 100 percent of
+commits in this repository were REFUSED. Control 12 was left RED for one session rather than papered over, and it FOUND that
+provenance is SCENARIO-DEPENDENT (the same rail prints `ambient_note` at a normal commit and `partial_note` at a partial one),
+which the config had declared once per rail; the fix is a declared per-rail `partial_note` plus a scenario-declared
+`note_field`, with a NEW control (`partial_note_declaration_is_read`) so the declaration itself is seen to be load-bearing.
+FORENSIC AUDIT (before landing, as instructed): blast radius MEASURED - the fixture is a system-temp path, the live tree's
+dirty count (117) and the installed hook's sha (fc4baec26489c0f6) are IDENTICAL before and after; the fixture is clean after
+every scenario; the rails inside it read the FIXTURE's own config and plan; no pinned artifact was staged. One finding was
+hardened on the spot: the fixture must resolve OUTSIDE the tree it audits, fail-closed and derived from the rail's own
+location, because `git clean -qfdx` and rmtree run there.
+FILED BY THE REHEARSAL: **BUG-576** - a FRESH repository cannot make its FIRST commit (RAIL 0 reads an UNBORN HEAD as broken
+metadata; the same state the BUG-400/BUG-564 recovery route produces). The rehearsal carries a declared `--no-verify`
+bootstrap that MUST BE WITHDRAWN when BUG-576 is fixed.
+GOV SYNC: D-2675 minted (806 records, stamp 3e277d4070884474); register re-derived (314 ids, OPEN 138 / CLOSED 176);
+session_plan entry 25 recorded with NOTHING WIDENED; DECISION-LOG.md, MASTER-TASK-REGISTER.md, agent/session_seed.yaml and this
+RECALL MAP updated in the same change-set.
+OPEN / NEXT (in consequential order): (1) BUG-576 - teach RAIL 0 to tell an UNBORN HEAD from broken metadata, then WITHDRAW
+the bootstrap declaration; (2) BUG-575 - supersession COMPLETENESS + IN-FORCE for cited decisions (16 measured findings);
+(3) BUG-573 - the ladder must collect EVERY fault before it exits, so one RED cannot hide the next; (4) the MUTATION GATE:
+`config/rail_mutations.yaml`, one declared mutation per rail and the control that must go RED under it; (5) the standing rule
+this session recommends: **no new rule lands without (i) one home, (ii) a boundary control, (iii) a named oracle, (iv) a
+mutation that reds it.**
+
+## 2026-09-27 (cont.) - D-2676 AUDITED, MINTED, COMMITTED; BUG-577 filed BY the audit
+
+FORENSIC AUDIT BEFORE THE COMMIT (the owner's standing instruction): breaks / cascade / drift / blindspot / gap / conflict / hidden
+failure / error leak / mismatch / bloat.
+- FIXED IN THE LANDING: (1) the gate's own selftest RESTATED the boundary rehearsal's control count (13/13) - a second home of a declared
+  fact (D-2646) inside the rail that enforces C12; (2) measure()'s docstring claimed the SUBJECT's bytes are restored while the code
+  restores the FIXTURE copy - a declaration/reality mismatch in the artifact about declaration/reality joins.
+- FILED: **BUG-577** - outside_tree (the BUG-537 rule) is ONE rule in TWO rails; remedy = ONE HOME scripts/lib/fixture.py + a refusal
+  known-answer control + a mutation entry that reds it.
+- THE MISSING MINT IS CLOSED: last session's --apply never landed, so DECISION-LOG carried D-2676 while config/decisions.yaml did not.
+  MEASURED now: 807 records, stamp 9090685c33a0f103, --check green, D-2676 present. The mint's OWN refusal (a record may cite only
+  REGISTERED bugs, D-2660) is what surfaced the finding below. BLINDSPOT, DECLARED: nothing in the ladder REDs on a DECISION-LOG entry with
+  no registry record - the mint is the only join, and it is run by hand.
+- MEASURED, NOT NEW: BUG-492 is cited 32 times in the buglog yet is NOT in the register - evidence for BUG-571's remedy.
+- DECLARED DEBT, DELIBERATELY NOT COMMITTED: coverage.required_subjects names 2 rails while the standing rule covers every rule;
+  governance/*.jsonl + drift_report_* + bench_preflight_* + backups/** are untracked RAIL OUTPUTS with no GRANTED or DECLARED-EXCLUDED home
+  (BUG-563). The commit is SELECTIVE; bench_preflight_latest.json, human_review_ledger.json and remaining_verification_audit.csv stay DIRTY
+  because no may_touch entry grants them (RAIL 4 would refuse them).
+- JUDGED ACCEPTABLE, NOT FIXED: a 200-character message truncation (presentation, not a fact about the world); the fixture copies all of
+  scripts/ + config/ (~725 files, ~10s) so a rail's own imports resolve; the gate NEVER writes the live tree.
+- TOOLING DEFECT THAT COST TWO SESSIONS, NOW NAMED: wrapping an SDK object return in String() throws 'Cannot convert object to primitive
+  value', so a call that DID land reports as failed - the exact reason D-2676's mint looked unlanded. Verify by READING, never by the wrapper.
+BASELINE + FINAL: just health rc=0 BEFORE and AFTER (rail-mutation controls 15/15 in both runs).
+COMMIT: the commit that CARRIES this line (re-derive with git log -1 --format=%h); D-2675 and D-2676 land together.
+NEXT (consequential): (1) BUG-576 - the standing rule's FIRST APPLICATION: teach RAIL 0 to tell an UNBORN HEAD from broken metadata, land it
+WITH a boundary control and a mutation entry that reds it, then WITHDRAW the declared --no-verify bootstrap in config/boundary_rehearsal.yaml
+(a paid debt returns 2 OWNER-OWED until withdrawn). (2) BUG-577 - one home for outside_tree. (3) BUG-575 - supersession COMPLETENESS +
+IN-FORCE for cited decisions. (4) BUG-573 - the ladder must collect EVERY fault before it exits. (5) extend coverage.required_subjects to
+RAIL 0 and the write-boundary rails.

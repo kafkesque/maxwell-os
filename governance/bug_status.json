@@ -2,8 +2,8 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 313,
-  "open_n": 137,
+  "total_ids": 315,
+  "open_n": 139,
   "closed_n": 176,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
@@ -691,6 +691,16 @@
     {
       "id": "BUG-575",
       "title": "(OPEN, MED): the decision graph is a SET of labels where it must be a GRAPH - a decision can be RETIRED without naming a successor, and no r",
+      "events": 1
+    },
+    {
+      "id": "BUG-576",
+      "title": "(OPEN, MED): a FRESH repository cannot make its FIRST commit - RAIL 0 accuses an UNBORN HEAD of being broken metadata, and the RECOVERY rout",
+      "events": 1
+    },
+    {
+      "id": "BUG-577",
+      "title": "(OPEN, MED): the BUG-537 rule \"a fixture must resolve OUTSIDE the tree it audits\" now has TWO HOMES, restated verbatim by two rails (2026-09",
       "events": 1
     }
   ],

@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 303,
-  "open_n": 131,
-  "closed_n": 172,
+  "total_ids": 307,
+  "open_n": 132,
+  "closed_n": 175,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -659,8 +659,13 @@
       "events": 1
     },
     {
-      "id": "BUG-566",
-      "title": "(OPEN, MED): TWO RAILS, ONE FACT - git's OWN next-index is TOLERATED by rail 5 and REFUSED by rail 4",
+      "id": "BUG-568",
+      "title": "(OPEN, MED): RAIL 0 does not pin its own git subject",
+      "events": 1
+    },
+    {
+      "id": "BUG-569",
+      "title": "(OPEN, LOW): the adoption NOTE has no RAIL-LEVEL control at a real partial commit",
       "events": 1
     }
   ],
@@ -836,6 +841,9 @@
     "BUG-558",
     "BUG-561",
     "BUG-562",
-    "BUG-565"
+    "BUG-565",
+    "BUG-566",
+    "BUG-567",
+    "BUG-570"
   ]
 }

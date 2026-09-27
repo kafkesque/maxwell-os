@@ -112,11 +112,15 @@ git_subject:
   # BUG-527 (MEASURED 2026-09-26). A rail that shells git audits whichever index/repository the ENVIRONMENT
   # names, because GIT_DIR / GIT_WORK_TREE / GIT_INDEX_FILE are inherited by every child process. This block is
   # the ONE home of the guard set (D-2646); scripts/lib/git_subject.py is the ONE implementation; consumers are
-  # scripts/check_repo_integrity.py (RAIL 0), scripts/verify_recalibration_pins.py (RAIL 3) and
-  # scripts/check_session_plan.py (RAIL 4). Measured bypass: `GIT_INDEX_FILE=/tmp/abidx ... --staged` returned
+  # scripts/verify_recalibration_pins.py (RAIL 3), scripts/check_session_plan.py (RAIL 4) and
+  # scripts/check_declaration_consumers.py (RAIL 5). DELIBERATELY EXEMPT: scripts/check_repo_integrity.py
+  # (RAIL 0), which must still run when git metadata is BROKEN - pinning it would make the recovery rail fail
+  # closed on the very condition it reports (BUG-568: its ambient subject is FILED, not papered over).
+  # Measured bypass: `GIT_INDEX_FILE=/tmp/abidx ... --staged` returned
   # rc=0 while the real staged set was never read; the same day an unflagged `git add` moved the commit set
   # 42 -> 43 and nothing observed it.
-  decided: PENDING-OWNER   # no decision id is spent by this change; minting is the owner's act
+  decided: D-2674   # the owner's RATIFY word put this guard set IN FORCE (see DECISION-LOG D-2674);
+                    # the change itself landed as the BUG-527 fix and claimed no decision id
   bug: BUG-527
   home: scripts/lib/git_subject.py
   # subject_env: compared against the DISCOVERED subject. An ambient value that names the SAME subject is
@@ -133,3 +137,35 @@ git_subject:
   # UNION CONTROL (--selftest): git's OWN `rev-parse --local-env-vars` (16 variables, measured 2026-09-26 on git
   # 2.39.5) must be covered by the two sets above, or a variable a FUTURE git adds escapes the pin silently.
   guard_union: 'rev-parse --local-env-vars'
+  # -- INDEX TOLERANCE (BUG-566/D-2673, MEASURED 2026-09-27) ------------------------------------------------
+  # git mints a TEMPORARY index for SOME of its own commits and hands it to the pre-commit hook through
+  # GIT_INDEX_FILE. MEASURED on git 2.39.5 (Apple Git-154), separate-git-dir layout, via
+  # `scripts/lib/git_subject.py --minted-index-name`: a PARTIAL commit (`git commit -- <path>`) hands the hook
+  # GIT_INDEX_FILE=<gitdir>/next-index-<pid>.lock, the file EXISTS at hook time, and git removes it on exit;
+  # a NORMAL commit hands <gitdir>/index. TWO rails read that one fact and disagreed - RAIL 4 REFUSED the
+  # minted name while RAIL 5 TOLERATED and NAMED it, and RAIL 5's note was FALSE because its child
+  # environment DROPPED GIT_INDEX_FILE, so it audited <gitdir>/index while NAMING the temp index (BUG-567,
+  # the BUG-527 class: a write-boundary rail reporting on a subject it never read).
+  #
+  # THE RULE (D-2673): ADOPT, never merely tolerate. An ambient index is READ as the subject when ALL THREE
+  # hold - (1) its realpath is a file DIRECTLY inside the PINNED git dir, (2) its basename matches one of
+  # owner_name_globs, (3) it EXISTS. Anything else ambient is REFUSED (C16). Mere tolerance is worse than a
+  # refusal: the rail would NAME an index it did not read. And (3) is not decoration - git reads a MISSING
+  # index as EMPTY, so an absent file would report 'all declared' over no bytes at all.
+  # ONE implementation: scripts/lib/git_subject.py#index_subject (explicit --index-file always wins).
+  index_tolerance:
+    decided: D-2673
+    bug: BUG-566
+    # The names git MINTS, not a shape we chose. Both spellings are declared because git's own minted name has
+    # carried the .lock suffix in every version measured here; a build that mints the bare name is covered too.
+    owner_name_globs: ['next-index-[0-9]*', 'next-index-[0-9]*.lock']
+    why: >-
+      git's OWN temporary index for a partial commit IS the commit set at the WRITE moment, so REFUSING it
+      blocks every partial commit (which pushes work toward --no-verify) and NAMING it without reading it
+      reports on the wrong bytes. Neither is acceptable at a write boundary.
+    control: >-
+      `python3 scripts/lib/git_subject.py --selftest` joins these globs to the name git ACTUALLY mints RIGHT
+      NOW (minted_index_name builds a temp repo with a hook that records $GIT_INDEX_FILE, then commits once
+      normally and once partially): a declared glob that no longer matches reality turns the control RED
+      (D-405 join to reality, never a remembered value). Further controls refuse a minted name in a FOREIGN
+      git dir, a `..` escape, a name git never mints, and a minted name that does not EXIST.

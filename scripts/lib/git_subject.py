@@ -32,18 +32,38 @@ THE RULE (both sets DECLARED in config/repo_integrity.yaml#git_subject - never r
         repository-local. The control asserts that list is covered by subject_env + clear_env, so a variable a
         future git adds cannot silently escape the pin.
 
-ONE HOME (D-2646): this module is the only implementation of the rule; every child `git` call in a rail that
-imports it goes through run_git(), so there is one call site to audit, not three.
-Consumers: scripts/check_repo_integrity.py (RAIL 0), scripts/verify_recalibration_pins.py (RAIL 3),
-scripts/check_session_plan.py (RAIL 4). Controls: --selftest (wired into `just health`).
+ADOPTION (BUG-566/BUG-567, D-2673): ADOPT git's OWN index, NEVER merely tolerate it
+    MEASURED 2026-09-26 (git 2.39.5, this --separate-git-dir layout, probe re-run 2026-09-27): `git commit --
+    <path>` (a PARTIAL commit) makes git hand the pre-commit hook GIT_INDEX_FILE=<gitdir>/next-index-<pid>.lock,
+    the file EXISTS at hook time, git removes it on exit, and that index IS exactly the commit set. TWO RAILS,
+    ONE FACT: rail 5 printed it as "accepted and NAMED" (while having DELETED it from its own child environment,
+    so it actually audited <gitdir>/index and its note was false in BOTH directions), and rail 4's pin REFUSED
+    it - so NO partial commit could pass, and a rule that cannot fire on the legitimate case is the shape this
+    module's own doc forbids. Mere tolerance would be WORSE than the refusal: a rail would then NAME an index it
+    did not read. So an ambient minted index is ADOPTED and BECOMES the subject (index_subject). It is adopted
+    only when ALL THREE declared conditions hold (adopt_index): the realpath is a file DIRECTLY inside the PINNED
+    git dir, its basename matches a declared owner_name_globs entry, and it EXISTS - a missing index reads as
+    EMPTY, which would return "all declared" over no bytes at all (the silent wrong-subject audit of BUG-527).
+    The globs have ONE home (config) and minted_index_name() MEASURES the name git actually mints, so a future
+    git renaming it cannot leave the adoption rule silently dead (D-405: join to reality, not to memory).
 
-Usage: python3 scripts/lib/git_subject.py --selftest | --discover-git-dir | --print-git-dir
+ONE HOME (D-2646): this module is the only implementation of the rule; every child `git` call in a rail that
+imports it goes through run_git()/run_git_raw()/run_git_paths(), so there is one call site to audit, not three.
+Consumers (a CLAIM, D-405/D-2674): scripts/verify_recalibration_pins.py (RAIL 3), scripts/check_session_plan.py
+(RAIL 4) and scripts/check_declaration_consumers.py (RAIL 5). DELIBERATELY EXEMPT: scripts/check_repo_integrity.py
+(RAIL 0) does NOT import this module and must not - it is the rail that reports BROKEN git metadata, so pinning it
+would make the recovery rail fail closed on the condition it exists to name; its own subject is still ambient,
+which is FILED as BUG-568 rather than papered over by this list. Controls: --selftest (wired into `just health`).
+
+Usage: python3 scripts/lib/git_subject.py --selftest | --discover-git-dir | --print-git-dir | --minted-index-name
 """
 from __future__ import annotations
 
+import fnmatch
 import os
 import subprocess
 import sys
+import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Mapping, Sequence
@@ -126,6 +146,74 @@ def _names_same_subject(raw: str, want: str) -> bool:
     return any(os.path.realpath(c) == os.path.realpath(want) for c in candidates)
 
 
+def index_tolerance(doc: dict[str, Any]) -> list[str]:
+    """The DECLARED names git mints for a partial commit's temporary index (ONE home, D-2646)."""
+    block = doc.get("git_subject") or {}
+    tol = block.get("index_tolerance") or {}
+    globs = [str(g) for g in (tol.get("owner_name_globs") or []) if str(g).strip()]
+    if not globs:
+        raise SubjectRefused("FAIL-CLOSED (BUG-566): config/repo_integrity.yaml declares no "
+                             "git_subject.index_tolerance.owner_name_globs - an adoption rule with no declared "
+                             "home would be prose again (BUG-462 class)")
+    return globs
+
+
+def adopt_index(doc: dict[str, Any], subj: Subject, raw: str) -> tuple[str, str]:
+    """(adopted realpath, note) for git's OWN temporary index, or ("", refusal) - ADOPT, never merely tolerate.
+
+    Three conditions, ALL required, because a rail that NAMES an index it did not read is worse than one that
+    refuses: (1) the realpath is a file DIRECTLY inside the PINNED git dir (so a `../` escape or a sibling
+    repository's temp index is refused), (2) its basename matches a declared owner_name_globs entry (so a
+    foreign index parked in the git dir is refused), (3) it EXISTS - git reads a missing index as EMPTY, which
+    would report "all declared" over no bytes at all (the silent wrong-subject audit BUG-527 closed).
+    """
+    if not raw:
+        return "", ""
+    cand = os.path.realpath(raw)
+    if os.path.dirname(cand) != os.path.realpath(subj.git_dir):
+        return "", ("GIT_INDEX_FILE=" + raw + " is not a file inside the pinned git dir " + subj.git_dir
+                    + " (resolved: " + cand + ") - another repository's index is not this one's subject")
+    globs = index_tolerance(doc)
+    if not any(fnmatch.fnmatch(os.path.basename(cand), g) for g in globs):
+        return "", ("GIT_INDEX_FILE=" + raw + " matches none of the declared "
+                    "git_subject.index_tolerance.owner_name_globs (" + ", ".join(globs) + ") - only an index git "
+                    "ITSELF mints in the pinned git dir is adopted")
+    if not os.path.isfile(cand):
+        return "", ("GIT_INDEX_FILE=" + raw + " does not exist - git reads a missing index as EMPTY, so the audit "
+                    "would report over no bytes at all (the silent audit of BUG-527)")
+    return cand, ("ADOPTED git's OWN temporary index for this commit (" + cand + ": basename matches the declared "
+                  "index_tolerance.owner_name_globs and it is inside the pinned git dir) - at the WRITE moment "
+                  "that IS the commit set, so it is READ as the subject, not merely accepted (BUG-566/D-2673)")
+
+
+def index_subject(index_file: str | None = None,
+                  environ: Mapping[str, str] | None = None) -> tuple[Subject, str]:
+    """THE entry point for the index as well as the repository: the pinned subject AND the index's provenance.
+
+    An explicit index_file (a rail's own --index-file flag) is a DECLARED home and always wins. Without it, an
+    ambient GIT_INDEX_FILE that is git's own minted temp index for the pinned git dir is ADOPTED and BECOMES the
+    subject, so the rail reads the COMMIT SET instead of the index it happens to find (BUG-566); anything else
+    ambient is REFUSED here rather than silently audited (C16, fail closed, nothing guessed).
+    """
+    doc = config()
+    env = os.environ if environ is None else environ
+    note, chosen = "", index_file
+    if not chosen:
+        raw = str(env.get("GIT_INDEX_FILE") or "")
+        if raw:
+            adopt, note = adopt_index(doc, discover(doc), raw)
+            if not adopt:
+                raise SubjectRefused("REFUSED git-index (BUG-566, fail closed, C16):\n  " + note
+                                     + "\n  Pass the explicit --index-file flag this rail documents for a "
+                                       "diagnostic read, or unset GIT_INDEX_FILE: there is no silent override.")
+            chosen = adopt
+    subj = discover(doc, chosen)
+    bad = faults(doc, subj, chosen, env)
+    if bad:
+        raise SubjectRefused("REFUSED git-subject (BUG-527, fail closed, C16):\n  " + "\n  ".join(bad))
+    return subj, note
+
+
 def faults(doc: dict[str, Any], subj: Subject, index_file: str | None = None,
            environ: Mapping[str, str] | None = None) -> list[str]:
     """Every ambient guard value naming a DIFFERENT subject ([] = the legitimate case, e.g. the live hook)."""
@@ -146,13 +234,43 @@ def faults(doc: dict[str, Any], subj: Subject, index_file: str | None = None,
 
 
 def subject(index_file: str | None = None, environ: Mapping[str, str] | None = None) -> Subject:
-    """THE entry point: the pinned subject, or a refusal that prints both paths. Never a guess (C16)."""
+    """THE pinned subject, or a refusal that prints both paths. Never a guess (C16)."""
+    return index_subject(index_file, environ)[0]
+
+
+def minted_index_name() -> str:
+    """MEASURE the basename git mints for a PARTIAL commit's temp index (D-405: join the globs to REALITY).
+
+    A probe repository in THIS layout (--separate-git-dir) with a pre-commit hook that records $GIT_INDEX_FILE:
+    one normal commit, then one partial commit. The control asserts the measured name matches a declared glob,
+    so a future git renaming it cannot leave the adoption rule silently dead (BUG-492: a rule never SEEN to fire
+    is not a rule). The hook receives LOG and the log path is baked in - the parent environment is not mutated.
+    """
     doc = config()
-    subj = discover(doc, index_file)
-    bad = faults(doc, subj, index_file, environ)
-    if bad:
-        raise SubjectRefused("REFUSED git-subject (BUG-527, fail closed, C16):\n  " + "\n  ".join(bad))
-    return subj
+    with tempfile.TemporaryDirectory(prefix="mint_probe_") as td:
+        work, gdir, log = os.path.join(td, "w"), os.path.join(td, "g.git"), os.path.join(td, "env.log")
+        os.makedirs(work)
+
+        def g(*argv: str) -> subprocess.CompletedProcess:
+            clean = {k: v for k, v in os.environ.items() if k not in guard_vars(doc)}
+            return subprocess.run(["git", *argv], cwd=work, capture_output=True, text=True, env=clean)
+
+        g("init", "-q", "--separate-git-dir", gdir)
+        hook = os.path.join(gdir, "hooks", "pre-commit")
+        os.makedirs(os.path.dirname(hook), exist_ok=True)
+        with open(hook, "w", encoding="utf-8") as fh:
+            fh.write('#!/bin/sh\necho "$GIT_INDEX_FILE" >> "' + log + '"\n')
+        os.chmod(hook, 0o755)
+        with open(os.path.join(work, "a.txt"), "w", encoding="utf-8") as fh:
+            fh.write("a\n")
+        g("add", "a.txt")
+        g("-c", "user.email=t@t", "-c", "user.name=t", "commit", "-qm", "one")
+        with open(os.path.join(work, "a.txt"), "w", encoding="utf-8") as fh:
+            fh.write("b\n")
+        g("-c", "user.email=t@t", "-c", "user.name=t", "commit", "-qm", "two", "--", "a.txt")
+        with open(log, encoding="utf-8") as fh:
+            seen = [os.path.basename(ln.strip()) for ln in fh.read().splitlines() if ln.strip()]
+        return next((m for m in reversed(seen) if m != "index"), "")
 
 
 def run_git(subj: Subject, argv: Sequence[str], doc: dict[str, Any] | None = None) -> tuple[int, str]:
@@ -220,22 +338,55 @@ def selftest() -> int:
                              text=True).stdout.split()
     rc_b, pinned = run_git(subj, ["diff", "--cached", "--name-only"], doc)
     same_read = rc_a == 0 and rc_b == 0 and sorted(ambient) == sorted(pinned.split())
-    controls = [
-        ("git's OWN local-env list is covered by the declared guard set (no variable escapes the pin)", union_ok),
-        ("discovery IGNORES an inherited GIT_DIR (a decoy ambient repo does not become the subject)", inherited_free),
-        ("an ambient GIT_DIR naming a DECOY repository is REFUSED (the executed bypass, BUG-527)", refused_decoy),
-        ("a synthetic GIT_INDEX_FILE is REFUSED (the A/B bypass that returned rc=0 before the fix)",
-         faults(doc, subj, None, dict(os.environ, GIT_INDEX_FILE="/tmp/not_the_index")) != []),
-        ("a relative index value that names no path is REFUSED (fail closed, nothing guessed)",
-         faults(doc, subj, None, dict(os.environ, GIT_INDEX_FILE=".git/index")) != []),
-        ("OVERREACH control: the LIVE hook's own GIT_DIR/GIT_INDEX_FILE (same subject) is TOLERATED",
-         live_hook),
-        ("DIFFERENTIAL control: the pinned read equals the unpinned read in this environment (the fix changes "
-         "no legitimate result)", same_read),
-    ]
+    # BUG-566/D-2673 controls: the adoption rule, BOTH directions, plus the D-405 join to what git MEASURES.
+    minted = minted_index_name()
+    globs = index_tolerance(doc)
+    minted_declared = bool(minted) and any(fnmatch.fnmatch(minted, g) for g in globs)
+    own_not_minted = not any(fnmatch.fnmatch("index", g) for g in globs)
+    with tempfile.TemporaryDirectory(prefix="adopt_probe_") as td:
+        gdir, other = os.path.join(td, "g.git"), os.path.join(td, "other")
+        os.makedirs(gdir)
+        os.makedirs(other)
+        fake = Subject(git_dir=gdir, work_tree=td, index_file=os.path.join(gdir, "index"))
+        name = minted or "next-index-0.lock"
+        own = os.path.join(gdir, "index")
+        minted_in_gitdir = os.path.join(gdir, name)
+        foreign = os.path.join(other, name)
+        escape = os.path.join(gdir, "..", name)
+        for f in (own, minted_in_gitdir, foreign, escape):
+            open(f, "w", encoding="utf-8").close()
+        adopted, adopt_note = adopt_index(doc, fake, minted_in_gitdir)
+        controls = [
+            ("git's OWN local-env list is covered by the declared guard set (no variable escapes the pin)", union_ok),
+            ("discovery IGNORES an inherited GIT_DIR (a decoy ambient repo does not become the subject)", inherited_free),
+            ("an ambient GIT_DIR naming a DECOY repository is REFUSED (the executed bypass, BUG-527)", refused_decoy),
+            ("a synthetic GIT_INDEX_FILE is REFUSED (the A/B bypass that returned rc=0 before the fix)",
+             faults(doc, subj, None, dict(os.environ, GIT_INDEX_FILE="/tmp/not_the_index")) != []),
+            ("a relative index value that names no path is REFUSED (fail closed, nothing guessed)",
+             faults(doc, subj, None, dict(os.environ, GIT_INDEX_FILE=".git/index")) != []),
+            ("OVERREACH control: the LIVE hook's own GIT_DIR/GIT_INDEX_FILE (same subject) is TOLERATED",
+             live_hook),
+            ("DIFFERENTIAL control: the pinned read equals the unpinned read in this environment (the fix changes "
+             "no legitimate result)", same_read),
+            ("D-405 JOIN TO REALITY: the declared owner_name_globs MATCH the index name git ACTUALLY mints for a "
+             "partial commit in this layout [measured: " + (minted or "<nothing recorded>") + "]",
+             minted_declared),
+            ("OVERREACH control: the repo's OWN index name is NOT adopted as a minted temp index (adoption cannot "
+             "swallow the real index)", own_not_minted),
+            ("BUG-566: git's OWN minted temp index inside the PINNED git dir is ADOPTED, READ and NAMED (the "
+             "legitimate partial commit must not be refused)",
+             adopted == os.path.realpath(minted_in_gitdir) and "ADOPTED" in adopt_note),
+            ("BUG-566: a minted NAME inside a FOREIGN git dir is REFUSED (a name is not a subject)",
+             adopt_index(doc, fake, foreign)[0] == ""),
+            ("BUG-566: a `..` escape out of the pinned git dir is REFUSED",
+             adopt_index(doc, fake, escape)[0] == ""),
+            ("BUG-566: a minted name in the pinned git dir that DOES NOT EXIST is REFUSED (a missing index reads "
+             "as EMPTY - the silent wrong-subject audit of BUG-527)",
+             adopt_index(doc, fake, os.path.join(gdir, "next-index-99999.lock"))[0] == ""),
+        ]
     bad = 0
-    for name, ok in controls:
-        print(("  ok   " if ok else "  FAIL ") + name)
+    for name_, ok in controls:
+        print(("  ok   " if ok else "  FAIL ") + name_)
         bad += 1 - int(ok)
     if missing:
         print("        uncovered variable(s): " + ", ".join(missing))
@@ -254,6 +405,9 @@ def main(argv: Sequence[str] | None = None) -> int:
         return 0
     if "--print-git-dir" in args:
         print(subject().git_dir)
+        return 0
+    if "--minted-index-name" in args:
+        print(minted_index_name())
         return 0
     print(__doc__.splitlines()[0])
     return 0

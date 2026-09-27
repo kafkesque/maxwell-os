@@ -241,8 +241,9 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--staged", action="store_true",
                     help="audit the STAGED set (for the pre-commit hook) instead of a finished commit")
     ap.add_argument("--index-file", default=None,
-                    help="audit an EXPLICIT index instead of this repo's (controls/diagnostics; an inherited "
-                         "GIT_INDEX_FILE is refused, not obeyed - BUG-527)")
+                    help="audit an EXPLICIT index instead of this repo's (controls/diagnostics). An inherited "
+                         "GIT_INDEX_FILE is never obeyed: if it is git's OWN minted temp index for a partial "
+                         "commit it is ADOPTED and READ (BUG-566/D-2673); anything else is REFUSED (BUG-527)")
     ap.add_argument("--selftest", action="store_true", help="known-answer controls, incl. the index control")
     a = ap.parse_args(argv)
     if a.selftest:
@@ -253,12 +254,20 @@ def main(argv: list[str] | None = None) -> int:
         return 1
     plan = yaml.safe_load(plan_path.read_text(encoding="utf-8"))
     pats = families(yaml.safe_load((REPO / "config" / "repo_integrity.yaml").read_text(encoding="utf-8")))
-    rc, lines = verdicts(plan, _paths(a), pats, a.plan)
+    # BUG-566/D-2673 (MEASURED 2026-09-27): at a PARTIAL commit git hands this hook its OWN temp index,
+    # <gitdir>/next-index-<pid>.lock. The ONE home ADOPTS it and NAMES it, and the audit then reads THAT index,
+    # so the subject the note names and the subject audited are ONE object (their divergence was BUG-567).
+    subj, adoption = git_subject.index_subject(a.index_file)
+    if adoption:
+        print("note session plan: " + adoption)
+    a.index_file = subj.index_file
+    paths = _paths(a)
+    rc, lines = verdicts(plan, paths, pats, a.plan)
     for line in lines:
         print(line)
     scope = "staged set" if a.staged else "commit " + a.commit
     if rc == 0:
-        print("ok session plan: " + scope + " touched " + str(len(_paths(a))) + " path(s), all declared in " + a.plan)
+        print("ok session plan: " + scope + " touched " + str(len(paths)) + " path(s), all declared in " + a.plan)
     return rc
 
 

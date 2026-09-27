@@ -67,6 +67,13 @@ _ENCODING = "utf-8"
 # as a default - a default is evaluated at def time, and this file's own rail caught that mistake (BUG-535).
 _UNSET = object()
 
+# BUG-566/D-2673 (MEASURED 2026-09-27): every git read below goes through the ONE git-subject home (D-2646).
+# This file was NAMED as a consumer by that module's docstring, by config/repo_integrity.yaml and by D-2672
+# while NOTHING here imported it - the declaration existed and the consumer did not (D-405 drift). The
+# landing that unified the index rule (BUG-566) makes the declaration TRUE: this rail is a real consumer now.
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+from lib import git_subject  # noqa: E402
+
 
 def digest(root: pathlib.Path, rel: str) -> str:
     """sha256 of a repo-relative file."""
@@ -193,10 +200,22 @@ def _repin_faults(cfg: dict, blob, head, tree_blob) -> list[str]:
     return faults
 
 
+_SUBJ = None
+_ADOPTION = ""
+
+
+def _subject():
+    """The PINNED subject, ADOPTING git's own minted temp index at a partial commit and READING it (BUG-566)."""
+    global _SUBJ, _ADOPTION
+    if _SUBJ is None:
+        _SUBJ, _ADOPTION = git_subject.index_subject()
+    return _SUBJ
+
+
 def _head_pins() -> bytes | None:
     """The committed predecessor of the pins file, or None when it has no predecessor (a first commit)."""
-    out = subprocess.run(["git", "show", "HEAD:" + _PINS_REL], cwd=_ROOT, capture_output=True)
-    return out.stdout if out.returncode == 0 else None
+    rc, out = git_subject.run_git_raw(["show", "HEAD:" + _PINS_REL], _subject().index_file)
+    return out if rc == 0 else None
 
 
 def _tree_blob(rel: str) -> bytes:
@@ -205,15 +224,19 @@ def _tree_blob(rel: str) -> bytes:
 
 
 def _staged_paths() -> list[str]:
-    """The staged set, read from git - never assumed."""
-    out = subprocess.run(["git", "diff", "--cached", "--name-only"], cwd=_ROOT, capture_output=True, text=True)
-    return out.stdout.split()
+    """The staged set from the PINNED subject - a NUL-separated LIST, so a path with a SPACE is ONE path."""
+    rc, out = git_subject.run_git_paths(_subject(), ["diff", "--cached", "--name-only"])
+    if rc != 0:
+        raise git_subject.SubjectRefused("FAIL-CLOSED (BUG-527/BUG-566): the name-list read failed against "
+                                        "the pinned subject (rc=" + str(rc) + ") - there is no staged set to "
+                                        "audit")
+    return out
 
 
 def _staged_blob(rel: str):
-    """The bytes that would become permanent, or None (deleted / unreadable)."""
-    out = subprocess.run(["git", "show", ":" + rel], cwd=_ROOT, capture_output=True)
-    return out.stdout if out.returncode == 0 else None
+    """The bytes that would become permanent, or None - from the SAME subject as the name list (BUG-565)."""
+    rc, out = git_subject.run_git_raw(["show", ":" + rel], _subject().index_file)
+    return out if rc == 0 else None
 
 
 def selftest() -> int:
@@ -324,9 +347,17 @@ def main(argv: list[str] | None = None) -> int:
         return selftest()
     cfg = yaml.safe_load(_PINS.read_text(encoding=_ENCODING))
     if a.staged:
-        staged = _staged_paths()
-        faults = staged_faults(cfg, staged, _staged_blob, lambda: all_faults(_ROOT, cfg),
-                               head=_head_pins(), tree_blob=_tree_blob)
+        try:
+            staged = _staged_paths()
+            faults = staged_faults(cfg, staged, _staged_blob, lambda: all_faults(_ROOT, cfg),
+                                   head=_head_pins(), tree_blob=_tree_blob)
+        except git_subject.SubjectRefused as exc:
+            # BUG-527/BUG-566: at the WRITE boundary a refusal IS the verdict (C16); this rail never falls back
+            # to reading whichever subject the process environment happened to name.
+            print(_RED + "REFUSED git-subject (BUG-527/BUG-566, fail closed, C16): " + str(exc))
+            return EXIT_DRIFT
+        if _ADOPTION:
+            print("note recalibration pins: " + _ADOPTION)
     else:
         faults = all_faults(_ROOT, cfg)
     if a.staged:

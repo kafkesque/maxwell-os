@@ -31,6 +31,14 @@ import yaml
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 REGISTRY = ROOT / "config/declaration_consumers.yaml"
 
+# BUG-566/D-2673 (MEASURED 2026-09-27): the ONE git-subject home (D-2646). This rail is a DECLARED consumer of
+# that rule and did not import it - worse, _git() DELETED GIT_INDEX_FILE from the child environment and the
+# rail then PRINTED that the index 'is the one git PASSED to this run ... accepted and NAMED' while auditing
+# <gitdir>/index: a false note over a subject it never read (BUG-567, the BUG-527 class at the write
+# boundary). The note is now the module's OWN provenance string, so it cannot drift from what was read.
+sys.path.insert(0, str(ROOT / "scripts"))
+from lib import git_subject  # noqa: E402
+
 
 def _git(root: pathlib.Path, args: list[str], index_file: pathlib.Path | None = None) -> subprocess.CompletedProcess:
     """Run git against root. GIT_INDEX_FILE is NEVER inherited: the audited subject is not inherited (BUG-527)."""
@@ -193,12 +201,14 @@ def main() -> int:
     a = ap.parse_args()
     if a.selftest:
         return selftest()
-    if os.environ.get("GIT_INDEX_FILE") and not a.index_file:
-        print("note declaration consumers: the index is the one git PASSED to this run ("
-              + str(os.environ["GIT_INDEX_FILE"]) + ") - at the WRITE moment that IS the commit's subject, so it is "
-              "accepted and NAMED; a DIAGNOSTIC run that inherits an index silently would be a different subject "
-              "(BUG-527), so pass --index-file explicitly there")
+    # BUG-567 (MEASURED 2026-09-27): the note this replaced was FALSE. git's OWN minted temp index for a
+    # partial commit is ADOPTED, READ and NAMED by the ONE home (BUG-566/D-2673); anything else ambient is
+    # REFUSED there (C16). An explicit --index-file still wins (a declared diagnostic home).
     idx = pathlib.Path(a.index_file) if a.index_file else None
+    if idx is None and os.environ.get("GIT_INDEX_FILE"):
+        subj, adoption = git_subject.index_subject()
+        idx = pathlib.Path(subj.index_file)
+        print("note declaration consumers: " + adoption)
     try:
         edges = load(pathlib.Path(a.registry))
     except SystemExit as e:

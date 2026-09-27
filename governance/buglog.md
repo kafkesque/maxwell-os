@@ -7165,3 +7165,48 @@ IS the head. **STILL OWED AND DISTINCT: BUG-431's CONTENT promotion** (merge the
 INTO the tracked governance/ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv, then retire config/anchor4_interim_state.json)
 - an OWNER GATE; this commit wrote no sheet.
 
+
+## BUG-566 (FIXED, MED): TWO RAILS, ONE FACT - git's OWN temporary index was REFUSED by RAIL 4 and TOLERATED by RAIL 5
+
+MEASURED 2026-09-27 (git 2.39.5 Apple Git-154, --separate-git-dir layout). A PARTIAL commit (`git commit --
+<path>`) makes git hand the pre-commit hook GIT_INDEX_FILE=<gitdir>/next-index-<pid>.lock; the file EXISTS at
+hook time and git removes it on exit. Two rails read that ONE fact and disagreed: RAIL 4 refused the name (so
+NO partial commit could pass) while RAIL 5 tolerated it. FIXED by D-2673: the ONE home
+(scripts/lib/git_subject.py#index_subject) ADOPTS git's own index - directory == the PINNED git dir, basename
+matches a DECLARED owner_name_globs entry, and the file EXISTS - and then READS it as the audit subject;
+anything else ambient is REFUSED. The must-exist condition is not decoration: git reads a MISSING index as
+EMPTY, so an absent file would report "all declared" over no bytes. MEASURED after: 13/13 module controls
+(the D-405 join matched a live minted name this run) and 16/23/11 rail controls still fire.
+
+## BUG-567 (FIXED, HIGH): RAIL 5's note was FALSE - it NAMED git's index while auditing a DIFFERENT one
+
+MEASURED 2026-09-27. scripts/check_declaration_consumers.py DELETES GIT_INDEX_FILE from its child environment
+(each of its git calls) and then printed "the index is the one git PASSED to this run (<path>) - at the WRITE
+moment that IS the commit's subject, so it is accepted and NAMED" - while the audit read <gitdir>/index. Wrong
+in BOTH directions: an OVER-refusal on a superset (the real index holds more than the commit set) and an
+UNDER-refusal when the declaration lives only in the commit set. This is the class BUG-527 closed: a write
+boundary rail reporting on a subject it never read. FIXED by D-2673 - the note is now the module's OWN
+provenance string, so it cannot drift from what was read.
+
+## BUG-568 (OPEN, MED): RAIL 0 does not pin its own git subject
+
+scripts/check_repo_integrity.py shells git with the INHERITED environment and does not import
+scripts/lib/git_subject.py, so a decoy GIT_DIR could decide what Layer 1 audits - at the moment the rail is
+asked whether git metadata is intact. FILED, not papered over: the EXEMPTION is principled (this rail must run
+when git metadata is BROKEN, so pinning it would make the recovery rail fail closed on the very condition it
+reports). REMEDY: a pin DERIVED from the same home that tolerates an already-broken repository.
+
+## BUG-569 (OPEN, LOW): the adoption NOTE has no RAIL-LEVEL control at a real partial commit
+
+The rule's controls live in scripts/lib/git_subject.py --selftest (13/13, both directions, incl. a live minted
+name). What is not yet seen to fire is the RAIL-level wiring: that a rail, run at a REAL minted ambient index
+with no --index-file, prints the ADOPTED note AND audits that index. A rule whose wiring is never seen to pass
+is a comment (BUG-492) - filed rather than left implicit.
+
+## BUG-570 (OPEN, LOW): the duplicate BUG-493 CLOSED block is NOT byte-identical (the earlier claim was FALSE)
+
+MEASURED 2026-09-27 while attempting the declared de-duplication: governance/buglog.md carries TWO
+`**BUG-493 STATUS (2026-09-26, CLOSED - MEASURED, not argued).**` blocks, and the last one is NOT identical to
+the text from the other to EOF. The dedupe therefore REFUSED (fail closed) and the file is untouched. Either
+the two blocks genuinely differ (then the duplicate is BLOAT, not a copy) or something follows the last one.
+The earlier session's "byte-identical" claim is RETRACTED here as unverified.

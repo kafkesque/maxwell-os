@@ -20,7 +20,14 @@ WHAT IT CHECKS (all probes READ FROM config/repo_integrity.yaml - never invented
     1. The git dir resolves as GIT resolves it ('git rev-parse --absolute-git-dir') and lies OUTSIDE every
        declared sync root. A '.git' that is a DIRECTORY inside a synced worktree is the pre-fix layout: it is
        reported as the defect it is (BUG-500), never silently accepted.
-    2. 'git rev-parse --verify HEAD^{commit}' and '--show-toplevel' resolve (a repository that resolves).
+    2. HEAD is BORN, UNBORN or BROKEN - three DECLARED states, never a guess (BUG-576). BORN: the born probe
+       resolves. UNBORN: HEAD names a ref that does not exist YET - a FRESH repository, and the state the
+       BUG-400/BUG-564 RECOVERY route produces. An unborn HEAD is INTACT: 'logs/HEAD' does not exist because git
+       creates it AT the first commit, so the reflog probe below is vacuous there and the born probe is the ONLY
+       must_resolve entry skipped. BROKEN: neither - the P0-A defect, which the unborn rule must never hide.
+       MEASURED 2026-09-27 (boundary rehearsal, real fresh repository): before this fix the rail called an
+       unborn HEAD broken metadata and so REFUSED the first commit of a recovered repository - the BUG-574 class
+       (a rule that cannot fire on the legitimate case, and a control that only ever asserted refusals).
     3. No conflict-marked name exists INSIDE the git dir (git metadata may not be renamed; P0-A).
     4. The git dir's 'logs/HEAD' exists and its last recorded commit equals HEAD (two records, one fact; P0-A).
     5. No conflict-marked name exists in the worktree; and no TRACKED path is missing from the worktree while
@@ -61,6 +68,8 @@ import yaml
 
 REPO = Path(__file__).resolve().parents[1]
 CONFIG = REPO / "config" / "repo_integrity.yaml"
+# The DECLARED probes that decide whether HEAD is born, unborn or broken (BUG-576); validated in load_config.
+UNBORN_KEYS = ("head_born_probe", "head_unborn_probe", "head_unborn_ref_probe")
 
 
 def load_config() -> dict[str, Any]:
@@ -71,19 +80,63 @@ def load_config() -> dict[str, Any]:
     cfg: Any = yaml.safe_load(CONFIG.read_text(encoding="utf-8"))
     if not isinstance(cfg, dict) or "conflict_marker" not in cfg or "git" not in cfg:
         raise SystemExit("FAIL repo-integrity: config declares no conflict_marker/git block")
+    for key in UNBORN_KEYS:
+        if not str(cfg["git"].get(key) or "").strip():
+            raise SystemExit(f"FAIL repo-integrity: config declares no git.{key} - the rail cannot tell an "
+                             f"UNBORN HEAD from broken metadata without inventing the probe here (C12, BUG-576)")
+    if str(cfg["git"]["head_born_probe"]).strip() not in [str(a).strip() for a in cfg["git"].get("must_resolve") or []]:
+        raise SystemExit("FAIL repo-integrity: git.head_born_probe is not one of git.must_resolve - the UNBORN "
+                         "rule would skip a probe that nothing requires, so the declaration would be inert and "
+                         "an unborn repository would be reported by no probe at all (BUG-576)")
     return cfg
 
 
-def git(*argv: str) -> tuple[int, str]:
-    """Run git in the repo; returns (returncode, stdout+stderr stripped). Never raises on a git failure."""
-    p = subprocess.run(["git", *argv], cwd=REPO, capture_output=True, text=True)
+def git_at(root: Path, *argv: str) -> tuple[int, str]:
+    """Run git with an EXPLICIT root; returns (returncode, stdout+stderr stripped). Never raises on a failure.
+
+    Every probe takes its repository as an ARGUMENT instead of a constant, because a rule about a repository can
+    only be tested by RUNNING it in one: the known-answer controls below build REAL repositories in the system
+    temp dir and drive THIS function, never a lookalike.
+    """
+    p = subprocess.run(["git", *argv], cwd=str(root), capture_output=True, text=True)
     return p.returncode, (p.stdout + p.stderr).strip()
 
 
-def resolve_git_dir(cfg: dict[str, Any]) -> Path | None:
-    """The git dir AS GIT RESOLVES IT - never as this file guesses it ('.git' may be a pointer FILE; BUG-500)."""
+def git(*argv: str) -> tuple[int, str]:
+    """Run git in THIS repository (the default root of every probe)."""
+    return git_at(REPO, *argv)
+
+
+def head_state(cfg: dict[str, Any], root: Path = REPO) -> tuple[str, str]:
+    """'born' | 'unborn' | 'broken', plus the ref HEAD names (or why it names none).
+
+    BUG-576. An UNBORN HEAD (HEAD names a branch with no commit yet; git creates logs/HEAD AT the first commit)
+    is LEGITIMATE and is the state the BUG-400/BUG-564 RECOVERY route produces - before this fix the rail
+    reported it as broken metadata and so refused the one commit that repairs the repository. The probes are
+    DECLARED (C12, validated in load_config). Unborn is NOT a blanket excuse: the ref HEAD names must still NOT
+    resolve as an object (C16), and a ref that DOES resolve while the born probe does not is 'broken'.
+    """
+    gcfg = cfg["git"]
+    born, unborn, ref_probe = (str(gcfg[k]).strip() for k in UNBORN_KEYS)
+    if git_at(root, *born.split())[0] == 0:
+        return "born", ""
+    rc, out = git_at(root, *unborn.split())
+    ref = out.splitlines()[-1].strip() if out else ""
+    if rc == 0 and ref:
+        if git_at(root, *ref_probe.split(), ref)[0] != 0:
+            return "unborn", ref
+        return "broken", ref + " resolves as an object while '" + born + "' does not"
+    return "broken", "'" + unborn + "' named no ref" + ((": " + ref) if ref else "")
+
+
+def resolve_git_dir(cfg: dict[str, Any], root: Path = REPO) -> Path | None:
+    """The git dir AS GIT RESOLVES IT - never as this file guesses it ('.git' may be a pointer FILE; BUG-500).
+
+    'root' is a parameter for the same reason every probe takes one: a known-answer control resolves the git dir
+    of a real fixture repository with THIS function, so the rule under test is the rule that ships.
+    """
     probe = str(cfg["git"].get("resolve_from") or "rev-parse --absolute-git-dir")
-    rc, out = git(*probe.split())
+    rc, out = git_at(root, *probe.split())
     if rc != 0 or not out:
         return None
     return Path(out.splitlines()[-1].strip())
@@ -267,9 +320,13 @@ def report_only(cfg: dict[str, Any], rel: str) -> bool:
     return any(fnmatch.fnmatch(rel, g) for g in cfg["severity"].get("report_only_globs") or [])
 
 
-def checks(cfg: dict[str, Any], git_dir: Path | None,
-           rows: list[dict[str, Any]]) -> tuple[list[str], list[str], list[str]]:
-    """Return (fails, owner_owed, notes) by evaluating every probe in the config."""
+def checks(cfg: dict[str, Any], git_dir: Path | None, rows: list[dict[str, Any]],
+           root: Path = REPO) -> tuple[list[str], list[str], list[str]]:
+    """Return (fails, owner_owed, notes) by evaluating every probe in the config against 'root'.
+
+    'root' defaults to this repository and is a parameter so a known-answer control can run EVERY probe (not a
+    lookalike) inside a real repository in the system temp dir.
+    """
     fails: list[str] = []
     owed: list[str] = []
     notes: list[str] = []
@@ -278,6 +335,11 @@ def checks(cfg: dict[str, Any], git_dir: Path | None,
         fails.append(f"the git dir does not resolve ('{gcfg.get('resolve_from')}') - this is not a readable "
                      "git worktree (P0-A)")
         return fails, owed, notes
+    state, ref = head_state(cfg, root)
+    if state == "broken":
+        fails.append(f"HEAD is NEITHER born nor UNBORN: '{gcfg['head_born_probe']}' does not resolve and "
+                     f"'{gcfg['head_unborn_probe']}' named no ref ({ref}) - a HEAD that resolves to nothing is "
+                     f"the P0-A defect, and the UNBORN rule (BUG-576) must not hide it")
     hit = sync_root_hit(cfg, git_dir)
     if hit and gcfg.get("require_git_dir_outside_sync_root"):
         fails.append(f"the git dir {git_dir} is INSIDE a sync domain (matched '{hit}') - a sync client RENAMES "
@@ -290,15 +352,23 @@ def checks(cfg: dict[str, Any], git_dir: Path | None,
     else:
         notes.append(f"git dir {git_dir} is outside every declared sync root")
     for argv in gcfg.get("must_resolve") or []:
-        rc, out = git(*argv.split())
+        if state == "unborn" and str(argv).strip() == str(gcfg["head_born_probe"]).strip():
+            notes.append(f"'{argv}' does not resolve YET: the repository is UNBORN - HEAD names {ref} with no "
+                         f"commit yet, which is the state a FRESH or freshly RECOVERED repository is in "
+                         f"(BUG-576). Every other probe below is still required")
+            continue
+        rc, out = git_at(root, *argv.split())
         if rc != 0:
             fails.append(f"'git {argv}' does not resolve (rc={rc}: {out.splitlines()[-1] if out else ''}) - "
                          "every rail below is reading a repository that is not there (P0-A)")
-    rc, head = git("rev-parse", "HEAD")
+    rc, head = git_at(root, "rev-parse", "HEAD")
     head = head if rc == 0 else ""
     reflog_rel = gcfg.get("head_reflog_relpath")
     reflog = git_dir / str(reflog_rel)
-    if reflog_rel and not reflog.exists():
+    if reflog_rel and state == "unborn":
+        notes.append(f"{git_dir}/{reflog_rel} does not exist YET: git creates it AT the first commit, and HEAD "
+                     f"names {ref} with no commit yet - an UNBORN repository, not renamed metadata (BUG-576)")
+    elif reflog_rel and not reflog.exists():
         fails.append(f"{git_dir}/{reflog_rel} is MISSING - git's reflog for HEAD has been renamed away, and "
                      "'git reflog' will silently serve a stale branch reflog (P0-A, measured 2026-09-25: "
                      "reflog said HEAD@{0}=a1061cd while HEAD was 96b1e9c)")
@@ -412,6 +482,74 @@ def selftest() -> int:
             print("FAIL repo-integrity selftest: the report path said " + repr(word)
                   + " for a directory canonical instead of UNCOMPARABLE")
             ok = False
+        # BUG-576, FOUR controls. A rule about a repository can only be tested by RUNNING it in one (BUG-574),
+        # so each control builds a REAL repository with git and drives the SHIPPING functions - head_state(),
+        # resolve_git_dir() and checks() - never a lookalike. The fixture lives in the SYSTEM temp dir, so no
+        # rule about the audited tree is restated here; when BUG-577 lands this builder moves to its ONE home
+        # (scripts/lib/fixture.py) and this copy is DELETED.
+        def _fixture(name: str, *, commit: bool) -> Path | None:
+            """A real repository built by git itself in the system temp dir; None if git refused (never a pass)."""
+            root = t / name
+            if git_at(t, "init", "-q", str(root))[0] != 0:
+                return None
+            if commit and git_at(root, "-c", "user.email=selftest@localhost", "-c", "user.name=selftest",
+                                 "commit", "-q", "--allow-empty", "-m", "repo-integrity selftest")[0] != 0:
+                return None
+            return root
+
+        fresh = _fixture("unborn", commit=False)
+        born = _fixture("born", commit=True)
+        neither = _fixture("neither", commit=False)
+        if fresh is None or born is None or neither is None:
+            print("FAIL repo-integrity selftest: git refused to build a fixture repository - the BUG-576 "
+                  "controls could not run (a control that cannot run is never a pass)")
+            ok = False
+        else:
+            (neither / ".git" / "HEAD").write_text("0" * 40 + chr(10), encoding="utf-8")
+            for label, root, want_state, why in [
+                    ("unborn_head_is_accepted", fresh, "unborn",
+                     "a FRESH repository - HEAD names a branch with no commit yet, the state the BUG-400/BUG-564 "
+                     "RECOVERY route produces - must be ACCEPTED by every probe, not called broken metadata"),
+                    ("unborn_branch_does_not_swallow_born", born, "born",
+                     "a repository WITH a commit must read BORN: the UNBORN rule must not excuse a probe in it"),
+                    ("head_that_is_neither_is_broken", neither, "broken",
+                     "a HEAD that resolves to nothing is the P0-A defect, and the UNBORN rule must not hide it")]:
+                n += 1
+                gdir = resolve_git_dir(cfg, root)
+                st = head_state(cfg, root)[0] if gdir else "no git dir"
+                fails = checks(cfg, gdir, [], root=root)[0] if gdir else []
+                if gdir is None or st != want_state:
+                    print("FAIL repo-integrity selftest/" + label + ": the rail read HEAD as " + repr(st)
+                          + " instead of " + repr(want_state) + " - " + why)
+                    ok = False
+                elif want_state == "broken" and not [f for f in fails if "NEITHER born nor UNBORN" in f]:
+                    print("FAIL repo-integrity selftest/" + label + ": a broken HEAD reported no NEITHER born "
+                          "nor UNBORN defect - the state is detected but nothing is SAID: " + why)
+                    ok = False
+                elif want_state != "broken" and fails:
+                    print("FAIL repo-integrity selftest/" + label + ": " + repr(want_state) + " is INTACT but "
+                          "the rail reports " + str(len(fails)) + " defect(s), first: " + fails[0][:140])
+                    ok = False
+            # TWO-SIDED: the UNBORN state must be SAID where it holds and NEVER where it does not - a skip the
+            # report does not name is indistinguishable from a probe that passed.
+            n += 1
+            said_unborn = any("UNBORN" in x for x in checks(cfg, resolve_git_dir(cfg, fresh), [], root=fresh)[2])
+            said_born = any("UNBORN" in x for x in checks(cfg, resolve_git_dir(cfg, born), [], root=born)[2])
+            if not said_unborn or said_born:
+                print("FAIL repo-integrity selftest/unborn_state_is_named: an unborn repository must SAY so "
+                      "(said=" + str(said_unborn) + ") and a born one must never (said=" + str(said_born) + ") - "
+                      "the UNBORN rule must not become a blanket excuse")
+                ok = False
+            # THE DIFFERENTIAL (the counterweight): in a BORN repository whose reflog was renamed away - the
+            # 2026-09-25 accident this rail exists for - the reflog probe must STILL fail.
+            n += 1
+            (resolve_git_dir(cfg, born) / str(cfg["git"]["head_reflog_relpath"])).unlink()
+            renamed = checks(cfg, resolve_git_dir(cfg, born), [], root=born)[0]
+            if not [f for f in renamed if "is MISSING" in f]:
+                print("FAIL repo-integrity selftest/renamed_reflog_in_a_born_repo_still_fails: the reflog of a "
+                      "BORN repository was renamed away and the rail reported " + repr(renamed[:1]) + " - the "
+                      "UNBORN rule (BUG-576) must not weaken the 2026-09-25 detection (C16)")
+                ok = False
     # BUG-547, two-sided control: the archive rule must excuse its OWN history and nothing else.
     n += 1
     if not archived_under("archive/conflicted_20260926/",
@@ -444,6 +582,7 @@ def main() -> int:
     if a.plan:
         print_plan(cfg, rows)
         return 0
+    state, ref = head_state(cfg)
     fails, owed, notes = checks(cfg, git_dir, rows)
     codes = cfg.get("exit_codes") or {"ok": 0, "fail": 1, "owner_owed": 2}
     if fails:
@@ -455,8 +594,10 @@ def main() -> int:
         for o in owed:
             print("   ", o)
     if not fails and not owed:
-        print(f"ok repo-integrity: HEAD resolves, git dir {git_dir}, "
-              f"{cfg['git']['head_reflog_relpath']} agrees, 0 conflict-marked names in 2 sweeps")
+        subject = (f"UNBORN: HEAD names {ref} with no commit yet - a fresh or freshly RECOVERED repository, "
+                   f"INTACT (BUG-576)" if state == "unborn"
+                   else f"HEAD resolves and {cfg['git']['head_reflog_relpath']} agrees")
+        print(f"ok repo-integrity: git dir {git_dir}, {subject}, 0 conflict-marked names in 2 sweeps")
         return int(codes["ok"])
     if fails:
         return int(codes["fail"])

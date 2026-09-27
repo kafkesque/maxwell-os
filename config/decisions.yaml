@@ -9370,3 +9370,40 @@ decisions:
     found a synthetic observation in the gate selftest restating the boundary rehearsal control count (a second
     home of a declared fact, D-2646) and a docstring claiming the SUBJECT bytes are restored where the code restores
     the FIXTURE copy - both fixed. Nothing here is committed by this record (D-381 owner gate).'
+- id: D-2677
+  date: '2026-09-27'
+  state: ACTIVE
+  category: governance
+  title: 'THE BYPASS RULE: a fixture bypass carries a MEASURED justification, never a debt - and the boundary rehearsal
+    FIRST commit becomes an ACCEPTANCE control (BUG-576 paid)'
+  bugs:
+  - BUG-576
+  - BUG-574
+  - BUG-542
+  - BUG-578
+  files:
+  - config/repo_integrity.yaml
+  - scripts/check_repo_integrity.py
+  - config/boundary_rehearsal.yaml
+  - scripts/check_boundary_rehearsal.py
+  - config/rail_mutations.yaml
+  decision: 'BUG-576 is FIXED: RAIL 0 reads HEAD as BORN, UNBORN or BROKEN through three probes DECLARED in config/repo_integrity.yaml
+    (a HEAD whose ref resolves while the born probe does not is BROKEN, never UNBORN - C16: unborn is not a blanket
+    excuse) and validated fail-closed, including the D-405 join that keeps the born probe inside git.must_resolve.
+    The --no-verify bootstrap the bug forced is WITHDRAWN in the same commit that re-measured it, and is replaced
+    by THE BYPASS RULE: a fixture bypass carries a MEASURED justification, never a debt. config/boundary_rehearsal.yaml#temp.bootstrap
+    now declares a refusal (bootstrap.whole_tree_refused, RAIL 4, rc 1, marker FORBIDDEN session plan) which the
+    rehearsal re-measures on EVERY run, so a bypass that loses its justification REDs the rail instead of surviving
+    as prose (the BUG-542 class). declared_debt becomes empty while the LIFECYCLE stays SEEN: a synthetic declaration
+    drives the paid-debt OWNER-OWED path in --selftest. The rehearsal first commit becomes an ACCEPTANCE control
+    (the control class that was MISSING, BUG-574): a FRESH repository commits ONE plan-granted path THROUGH the
+    hook and must be ACCEPTED. The withdrawal is protected by a mutation entry of its own (unborn_head_branch_is_load_bearing)
+    in the standing rule gate (D-2676).'
+  measured: 'RAIL 0 --selftest 15/15 (four new real-repository controls: unborn_head_is_accepted, unborn_branch_does_not_swallow_born,
+    head_that_is_neither_is_broken, renamed_reflog_in_a_born_repo_still_fails - the last one the counterweight that
+    keeps the 2026-09-25 reflog detection honest) and --check rc=0. MEASURED at a REAL commit through the REAL hook
+    in the rehearsal fixture: the fresh first commit rc=0 with 3 own_index notes; the whole-tree commit rc=1 refused
+    by RAIL 4; the bypass base rc=0. check_boundary_rehearsal --selftest 18/18; check_rail_mutations --selftest
+    15/15 and --check rc=0 (3 rules SEEN to red through their own control, 1 negative control green, 3/3 declared
+    subjects covered). THE FORENSIC AUDIT FOUND ONE REAL CLASS DEFECT AND FILED IT: BUG-578 (the rehearsal rehearses
+    HEAD, so it cannot gate the change that lands). Nothing here is committed by this record (D-381 owner gate).'

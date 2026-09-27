@@ -7274,7 +7274,7 @@ CLASS: this is the D-328 defect the registry already ruled on - a citation that 
 
 REMEDY (two small rails, no new vocabulary): (1) supersession COMPLETENESS - state=SUPERSEDED requires a resolvable successor, except the 24 pinned legacy_debt_ids in config/decisions_policy.yaml (D-2645); (2) IN-FORCE - a cited decision must be in the in-force set, or the citing site must declare a forward reference explicitly (the mint gate already refuses a forward citation, so the vocabulary exists). MADR is the real-world precedent: it carries status = "superseded by ADR-0123" as a LINK, not a label.
 
-## BUG-576 (OPEN, MED): a FRESH repository cannot make its FIRST commit - RAIL 0 accuses an UNBORN HEAD of being broken metadata, and the RECOVERY route re-creates exactly that state (2026-09-27)
+## BUG-576 (FIXED, MED): a FRESH repository cannot make its FIRST commit - RAIL 0 accuses an UNBORN HEAD of being broken metadata, and the RECOVERY route re-creates exactly that state (2026-09-27)
 
 MEASURED (2026-09-27, by scripts/check_boundary_rehearsal.py in a REAL repository in the system temp dir, --separate-git-dir layout, hooks installed by this repository's OWN installer): the FIRST \`git commit\` returns rc=1 with
   FAIL repo-integrity: 2 repository integrity defect(s):
@@ -7302,3 +7302,27 @@ MEASURED (2026-09-27): scripts/check_boundary_rehearsal.py#outside_tree and scri
 REMEDY (OWED): ONE HOME - scripts/lib/fixture.py#outside_tree, imported by both rails - landed WITH the standing rule's teeth: a KNOWN-ANSWER control that calls the shared rule with the audited tree ITSELF and requires the refusal, plus a mutation entry in config/rail_mutations.yaml that REDs that control when the rule is reduced to a no-op. UNTIL THEN both copies are live and this block is the audit record.
 
 ALSO MEASURED IN THE SAME AUDIT (no new id - it is the evidence for BUG-571's remedy): BUG-492 is named 32 times in governance/buglog.md and is cited by the standing rule's own prose, yet it is NOT in the register (314 ids). A decision that cites a bug that does not exist is a citation naming nothing (D-2660), and it is exactly the owner-owed RED LINE BUG-571 owes.
+
+## BUG-578 (OPEN, MED): the BOUNDARY REHEARSAL rehearses HEAD, so it cannot gate the change that LANDS - it was GREEN while the working tree already contained a rail that refused every fresh commit (2026-09-27)
+
+MEASURED (forensic audit of the BUG-576 landing, inside the fixture the rehearsal itself builds): with the fix
+present in the WORKING TREE and absent from HEAD, the rehearsal own acceptance control returned
+FRESH_FIRST_COMMIT rc=1 - REFUSED by HEAD RAIL 0 - and returned rc=0 the moment the same bytes were OVERLAID
+into the fixture. The rehearsal materializes 'git archive HEAD' (config/boundary_rehearsal.yaml#temp.materialize)
+and installs the hooks from that replica, so every rail it exercises is the LAST COMMITTED one, never the one
+about to be committed.
+
+CLASS: a control that measures the PREVIOUS state cannot refuse the commit that breaks the NEXT one. It is
+BUG-574 one level up: the rehearsal would stay GREEN while a rail change that refuses every legitimate commit is
+committed, and the very next commit - the one that would have to repair it - is then refused BY THE HOOK, so the
+repair can only land with --no-verify. The class this rehearsal exists for recurs THROUGH the rehearsal.
+
+REMEDY (OWED): overlay the WORKING TREE bytes of the DECLARED subjects the rehearsal exercises (scripts/**,
+config/**, justfile) into the fixture AFTER materializing HEAD and BEFORE installing the hooks, then re-run the
+installer own --check. DECLARED with a why, never inferred (C12), plus a control that REDs if the overlay is
+dropped. MEASURED in the audit: 'bash scripts/install_git_hooks.sh --check' returns rc=0 after the overlay, so
+the installed hook is still its own re-derivation (BUG-526).
+
+NOTE (D-2646/D-2674): the four new RAIL 0 controls (BUG-576) build their fixtures with 'git init' in the SYSTEM
+temp dir and copy NOTHING, so they do not restate the BUG-537 outside-tree rule and must NOT become its third
+home (BUG-577) - when scripts/lib/fixture.py lands, the nested builder moves there and the copy is deleted.

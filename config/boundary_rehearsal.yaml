@@ -25,10 +25,17 @@ temp:
   bootstrap:
     message: boundary-rehearsal base
     flags: [--no-verify]
-    reason: >-
-      the fixture's FIRST commit cannot go through the hook, because the declared debt below (BUG-576) refuses a
-      commit in a repository whose HEAD is unborn. The bootstrap exists ONLY because of that refusal and is
-      declared here so it is WITHDRAWN the moment the debt is paid, never quietly relied upon.
+    why: >-
+      the fixture's BASE state holds the WHOLE tracked-HEAD tree, and the write boundary REFUSES that commit:
+      RAIL 4 reports the declared will_not_touch paths (pipeline/** and every path no may_touch entry grants, by
+      name or as a sync-client RENAME) so the base cannot be created THROUGH the hook at all. This is a
+      FIXTURE-CONSTRUCTION bypass, NOT a debt (D-2677): it is justified by the refusal below, MEASURED on every
+      run, and it must be WITHDRAWN the moment that refusal disappears.
+    refusal:              # D-2677: the bypass ONE justification, re-measured on every run
+      observation: bootstrap.whole_tree_refused
+      rail: RAIL 4        # the rail whose reason appears in the refusal text
+      expect_rc: 1        # the rc of the whole-tree COMMIT (the rail own rc is 2, owner-owed)
+      marker: 'FORBIDDEN session plan'
 
 # TWO declared provenance fields PER RAIL, because provenance is a fact about the COMMIT SHAPE and not about
 # the rail: `ambient_note` = what git hands the hook at a NORMAL commit (this repository's OWN index),
@@ -77,6 +84,7 @@ module:
 
 scenarios:
   mutation: {op: append, text: "\n<!-- boundary rehearsal fixture -->\n"}
+  fresh_commit: {path: governance/buglog.md, expect_rc: 0, note_kind: own_index, note_field: ambient_note}
   normal_commit: {expect_rc: 0, note_kind: own_index, note_field: ambient_note}
   partial_commit: {path: governance/buglog.md, expect_rc: 0, note_kind: adopted, note_field: partial_note}
   planted:
@@ -93,15 +101,9 @@ scenarios:
       expect_rail_rc: 1
       why: 'a NEW path no may_touch entry matches: a defect, refused'
 
-declared_debt:
-  - id: BUG-576
-    title: 'a FRESH repository cannot make its FIRST commit: RAIL 0 accuses an UNBORN HEAD of being broken metadata'
-    observation: fresh.first_commit
-    marker: 'FAIL repo-integrity'
-    rail: RAIL 0
-    reason: >-
-      MEASURED 2026-09-27 by this rehearsal: in a repository created by git init - and therefore in any repository
-      RECOVERED by re-creating its git dir (the BUG-400/BUG-564 route) - the first commit is REFUSED by RAIL 0
-      because HEAD^{commit} does not resolve and logs/HEAD does not exist yet. Both are the NORMAL state of an
-      unborn HEAD, not broken metadata. When fixed this rehearsal returns OWNER-OWED (2) and the declaration must
-      be WITHDRAWN by a decision (a declaration that outlives its subject is the BUG-542 class).
+declared_debt: []          # EMPTY since 2026-09-27: BUG-576 was FIXED and the --no-verify bootstrap it forced
+                           # was WITHDRAWN and re-justified by the MEASURED refusal above (D-2677), in the SAME
+                           # commit that re-measured it - a declaration may not outlive its subject (BUG-542).
+                           # The lifecycle STAYS: a debt whose observation PASSES returns OWNER-OWED (2), and
+                           # scripts/check_boundary_rehearsal.py --selftest drives that with a SYNTHETIC
+                           # declaration, so the mechanism stays SEEN with no debt open.

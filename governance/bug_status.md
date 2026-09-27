@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**139 open** / 176 closed of 315 ids.
+**139 open** / 177 closed of 316 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -144,5 +144,5 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-572 | (OPEN, LOW): a status word in a heading's TITLE decides a bug's status when the parenthetical slot names none (measured, with the flip list) | 1 |
 | BUG-573 | (OPEN, MED): a RED earlier in the ladder SHORT-CIRCUITS it, so every LATER fault is invisible (measured: the stale dormancy of scripts/check | 1 |
 | BUG-575 | (OPEN, MED): the decision graph is a SET of labels where it must be a GRAPH - a decision can be RETIRED without naming a successor, and no r | 1 |
-| BUG-576 | (OPEN, MED): a FRESH repository cannot make its FIRST commit - RAIL 0 accuses an UNBORN HEAD of being broken metadata, and the RECOVERY rout | 1 |
 | BUG-577 | (OPEN, MED): the BUG-537 rule "a fixture must resolve OUTSIDE the tree it audits" now has TWO HOMES, restated verbatim by two rails (2026-09 | 1 |
+| BUG-578 | (OPEN, MED): the BOUNDARY REHEARSAL rehearses HEAD, so it cannot gate the change that LANDS - it was GREEN while the working tree already co | 1 |

@@ -543,3 +543,25 @@ RISK NOTE (now retired): before fe239df a worktree clean destroyed BOTH copies o
       config/anchor4_interim_state.json).
 - [ ] OWED (housekeeping): the two foreign-body backups are KEPT by owner word; hooks ACTIVE; `just health-deep` stays
       honestly RED until the owner rules on the depth/domain contract.
+
+## D-2677 / BUG-576 LANDED (2026-09-27)
+
+- [x] BUG-576 FIXED: RAIL 0 reads HEAD as BORN / UNBORN / BROKEN from three DECLARED probes (config/repo_integrity.yaml,
+      validated fail-closed incl. the D-405 join) - an UNBORN HEAD is now INTACT, so a FRESH or RECOVERED repository
+      can make its first commit. Four new controls build REAL repositories: unborn_head_is_accepted,
+      unborn_branch_does_not_swallow_born, head_that_is_neither_is_broken, renamed_reflog_in_a_born_repo_still_fails
+      (the counterweight). --selftest 15/15, --check rc=0.
+- [x] D-2677 THE BYPASS RULE: a fixture bypass carries a MEASURED justification, never a debt. The --no-verify
+      bootstrap is WITHDRAWN and replaced by a declared `refusal` (bootstrap.whole_tree_refused, RAIL 4, rc 1,
+      marker FORBIDDEN session plan) that is re-measured on EVERY run; declared_debt is empty and the paid-debt
+      OWNER-OWED lifecycle stays SEEN via a synthetic declaration. The rehearsal's fresh first commit is now an
+      ACCEPTANCE control. --selftest 18/18.
+- [x] Standing-rule gate (D-2676) covers RAIL 0: mutation unborn_head_branch_is_load_bearing, min_mutations 4,
+      3/3 declared subjects covered, --check rc=0 (3 rules SEEN to red, 1 negative control green).
+- [ ] NEXT (mine): BUG-578 - the rehearsal rehearses HEAD, so it cannot gate the change that LANDS; overlay the
+      WORKING TREE bytes of the declared subjects before installing the hooks (measured: install_git_hooks --check rc=0).
+- [ ] NEXT (mine): BUG-577 - ONE home for outside_tree (scripts/lib/fixture.py) + a refusal control + a mutation.
+- [ ] NEXT (mine): BUG-575 supersession completeness (24 pinned legacy_debt_ids); BUG-573 the ladder must collect
+      EVERY fault; BUG-571 the cited-by-decision join (BUG-492 cited 32x, unregistered, is its first live case).
+- [ ] OWNER GATE (unchanged): BUG-431 CONTENT promotion; `just health-deep` stays honestly RED until the owner
+      rules on the depth/domain contract; hooks ACTIVE.

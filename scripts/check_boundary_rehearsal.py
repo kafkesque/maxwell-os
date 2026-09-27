@@ -16,10 +16,13 @@ WHAT IT DECIDES (0 clean | 1 FATAL fail-closed C16 | 2 owner-owed: a declared DE
     1 FATAL a declared fact about the boundary is not what the boundary DOES: a legitimate commit REFUSED, a
             planted violation ACCEPTED (a boundary with no teeth), a note whose PROVENANCE is not the declared
             one (or is absent), a rail --selftest that fails, or an observation MISSING (never a silent pass).
+    1 FATAL the fixture BASE (the whole tracked tree) could be committed THROUGH the boundary: the declared
+            --no-verify bootstrap would then have NO justification and must be WITHDRAWN (D-2677).
     1 FATAL the fresh-repository first commit refused for a reason the declaration does NOT name - a NEW
-            instance of the class must not hide behind the declared one.
-    2 OWED  the fresh-repository first commit now PASSES: the declared debt (BUG-576) is PAID and the
-            declaration must be WITHDRAWN by a decision (a declaration that outlives its subject is BUG-542).
+            instance of the class must not hide behind a declared one.
+    2 OWED  a declared DEBT is no longer observed: it is PAID and the declaration must be WITHDRAWN by a
+            decision (a declaration that outlives its subject is BUG-542). NO debt is open today; the lifecycle
+            stays SEEN because --selftest drives it with a SYNTHETIC declaration.
 EVERY fact is DECLARED in config/boundary_rehearsal.yaml (C12: no path, count or verdict is written here) and
 the note PROVENANCE is read from its ONE home (scripts/lib/git_subject.py#note_kind), never restated. The
 fixture holds TRACKED HEAD bytes only (`git archive HEAD`) in the system temp dir, so it carries no dirt of the
@@ -88,7 +91,14 @@ def cfg() -> dict[str, Any]:
             if k not in rail:
                 raise SystemExit("FAIL-CLOSED (C16): rail " + repr(rail.get("role")) + " declares no " + repr(k)
                                  + " - a provenance that is not declared is an assertion with no home (C12)")
-    for key in ("normal_commit", "partial_commit"):
+    boot = doc["temp"].get("bootstrap") or {}
+    if "--no-verify" in [str(x) for x in boot.get("flags") or []]:
+        for k in ("observation", "rail", "expect_rc"):
+            if k not in (boot.get("refusal") or {}):
+                raise SystemExit("FAIL-CLOSED (C16): temp.bootstrap declares --no-verify but no refusal." + k
+                                 + " - a BYPASS enters this fixture only WITH the refusal that justifies it, and "
+                                 "that justification is re-MEASURED every run (D-2677, the BUG-542 class)")
+    for key in ("fresh_commit", "normal_commit", "partial_commit"):
         if "note_field" not in (doc["scenarios"].get(key) or {}):
             raise SystemExit("FAIL-CLOSED (C16): scenario " + repr(key) + " declares no note_field - the "
                              "provenance count would then be a constant in code (C12)")
@@ -183,11 +193,19 @@ def rehearse(doc: dict[str, Any]) -> tuple[Path, dict[str, Obs]]:
     if any(obs[k].rc != 0 for k in ("setup.init", "setup.materialize", "setup.hooks_rederive")):
         return root, obs      # a fixture that did not build cannot rehearse: reported, never papered over
     sc = doc["scenarios"]
-    # (1) THE FRESH REPOSITORY: its FIRST commit goes through the hook - the declared debt (BUG-576), and the
-    #     reason the bootstrap below exists at all.
+    # (1) THE FRESH REPOSITORY: its FIRST commit goes through the hook with ONE plan-granted path staged. This
+    #     is an ACCEPTANCE control - the class of control that was MISSING (BUG-574): before the BUG-576 fix
+    #     this commit was REFUSED (measured), and a boundary never seen to ACCEPT is not a boundary.
+    boot_msg = str(doc["temp"]["bootstrap"]["message"])
+    fresh_path = str(sc["fresh_commit"]["path"])
+    sh(["git", "add", "-f", "--", fresh_path], work, t)
+    obs["fresh.first_commit"] = sh(["git", "commit", "-qm", boot_msg], work, t)
+    # (1b) THE BYPASS ONE JUSTIFICATION, RE-MEASURED (D-2677): the fixture BASE is the WHOLE tracked tree and
+    #      the write boundary REFUSES it, so the base cannot be created through the hook at all. If that
+    #      refusal ever disappears the bypass has lost its only justification and this observation REDs.
     sh(["git", "add", "-A"], work, t)
-    obs["fresh.first_commit"] = sh(["git", "commit", "-qm", str(doc["temp"]["bootstrap"]["message"])], work, t)
-    obs["bootstrap.commit"] = sh(["git", "commit", "-qm", str(doc["temp"]["bootstrap"]["message"]),
+    obs["bootstrap.whole_tree_refused"] = sh(["git", "commit", "-qm", boot_msg], work, t)
+    obs["bootstrap.commit"] = sh(["git", "commit", "-qm", boot_msg,
                                   *[str(x) for x in doc["temp"]["bootstrap"]["flags"]]], work, t)
     # (2) A LEGITIMATE COMMIT: the case BUG-574 refused 100 percent of - a real staged change, full index.
     legit = str(sc["partial_commit"]["path"])
@@ -245,7 +263,9 @@ def classify(obs: dict[str, Obs], doc: dict[str, Any]) -> tuple[int, list[str], 
         need(name, 0, why)
     # A LEGITIMATE COMMIT MUST PASS. This is the BUG-574 control: every synthetic control was green while every
     # commit in the repository was refused, because the value git HANDS the hook was in no test.
-    for name, key, what in (("commit.normal", "normal_commit", "a real NORMAL commit through the hook"),
+    for name, key, what in (("fresh.first_commit", "fresh_commit", "the FIRST commit of a FRESH repository, "
+                             "staged with ONE plan-granted path"),
+                            ("commit.normal", "normal_commit", "a real NORMAL commit through the hook"),
                             ("commit.partial", "partial_commit", "a real PARTIAL commit (git OWN temp index)")):
         got = need(name, int(sc[key]["expect_rc"]), what + " must be ACCEPTED - a rule that cannot fire on the "
                                                           "legitimate case is the BUG-574 class")
@@ -288,7 +308,19 @@ def classify(obs: dict[str, Obs], doc: dict[str, Any]) -> tuple[int, list[str], 
         elif blocked.rc == 0:
             fatal.append("neg." + name + ".commit: the commit LANDED (rc=0) over " + str(planted["why"])
                          + " - the write boundary has no teeth at a real commit")
-    # DECLARED DEBT (BUG-576): a refusal the declaration NAMES is tolerated and re-measured; one it does NOT
+    # THE BYPASS (D-2677): --no-verify enters this fixture ONLY against a MEASURED refusal, and that refusal is
+    # re-measured on EVERY run, so the bypass cannot outlive its justification (the BUG-542 class).
+    boot = doc["temp"]["bootstrap"]
+    if "--no-verify" in [str(x) for x in boot.get("flags") or []]:
+        ref = boot["refusal"]
+        got = need(str(ref["observation"]), int(ref["expect_rc"]), "the fixture BASE may only be created with "
+                   "--no-verify while the boundary REFUSES the whole-tree commit; if it is ACCEPTED the bypass "
+                   "has no justification and must be WITHDRAWN (D-2677)")
+        if got is not None and str(ref["marker"]) not in got.text:
+            fatal.append(str(ref["observation"]) + ": refused (rc=" + str(got.rc) + ") but not for the declared "
+                         "reason " + repr(str(ref["marker"])) + " (" + str(ref["rail"]) + ") - a refusal that "
+                         "does not name its cause cannot justify a bypass")
+    # DECLARED DEBT: a refusal the declaration NAMES is tolerated and re-measured; one it does NOT
     # name is a NEW instance of the class and must not hide behind the declared one; and a PAID debt must be
     # withdrawn by a decision, never silently kept.
     for debt in doc["declared_debt"]:
@@ -321,7 +353,13 @@ def clean_obs(doc: dict[str, Any]) -> dict[str, Obs]:
     sc = doc["scenarios"]
     for k in ("setup.init", "setup.materialize", "setup.hooks_rederive", "bootstrap.commit", "module.selftest"):
         obs[k] = Obs(0, "")
-    for key, name in (("normal_commit", "commit.normal"), ("partial_commit", "commit.partial")):
+    boot = doc["temp"]["bootstrap"]
+    if "--no-verify" in [str(x) for x in boot.get("flags") or []]:
+        obs[str(boot["refusal"]["observation"])] = Obs(int(boot["refusal"]["expect_rc"]),
+                                                       str(boot["refusal"]["marker"]) + ": the whole tracked tree "
+                                                       "is refused by " + str(boot["refusal"]["rail"]))
+    for key, name in (("fresh_commit", "fresh.first_commit"), ("normal_commit", "commit.normal"),
+                      ("partial_commit", "commit.partial")):
         kind, field = str(sc[key]["note_kind"]), str(sc[key]["note_field"])
         n = sum(1 for r in doc["rails"] if str(r[field]) == kind)
         obs[name] = Obs(0, note_block(kind, n))
@@ -366,21 +404,40 @@ def selftest() -> int:
     m = dict(base)
     m["setup.hooks_rederive"] = Obs(1, "hook DIFFERS from its re-derivation")
     cases.append(("hook_not_the_declared_one", m, EXIT_FATAL))
-    for debt in doc["declared_debt"]:
-        obs_name = str(debt["observation"])
-        m = dict(base)
-        m[obs_name] = Obs(0, "")
-        cases.append(("debt_" + str(debt["id"]) + "_paid (stale declaration)", m, EXIT_OWED))
-        m = dict(base)
-        m[obs_name] = Obs(1, "FAIL something-else: refused for an undeclared reason")
-        cases.append(("undeclared_refusal_at_" + obs_name, m, EXIT_FATAL))
+    m = dict(base)
+    m["fresh.first_commit"] = Obs(1, "FAIL repo-integrity: 2 repository integrity defect(s)")
+    cases.append(("fresh_repo_first_commit_rejected (BUG-576 shape)", m, EXIT_FATAL))
+    m = dict(base)
+    m["fresh.first_commit"] = Obs(0, "")
+    cases.append(("fresh_commit_note_never_printed", m, EXIT_FATAL))
+    refusal = str(doc["temp"]["bootstrap"]["refusal"]["observation"])
+    m = dict(base)
+    m[refusal] = Obs(0, "the whole tracked tree COMMITTED")
+    cases.append(("bootstrap_bypass_no_longer_justified (WITHDRAW the bypass)", m, EXIT_FATAL))
+    m = dict(base)
+    m[refusal] = Obs(1, "FAIL some-other-rail: refused for an undeclared reason")
+    cases.append(("bootstrap_refusal_for_an_undeclared_reason", m, EXIT_FATAL))
+    # THE DECLARED-DEBT LIFECYCLE STAYS SEEN WITH NO DEBT OPEN: a declaration that outlives its subject must
+    # never pass silently (BUG-542), so the classifier is driven here with a SYNTHETIC declaration.
+    synthetic = copy.deepcopy(doc)
+    synthetic["declared_debt"] = [{"id": "BUG-0000", "title": "synthetic declaration", "rail": "RAIL 0",
+                                   "observation": "synthetic.obs", "marker": "FAIL synthetic"}]
+    syn = clean_obs(synthetic)
+    m = dict(syn)
+    m["synthetic.obs"] = Obs(0, "")
+    cases.append(("declared_debt_paid_returns_owner_owed (lifecycle stays SEEN)", m, EXIT_OWED))
+    m = dict(syn)
+    m["synthetic.obs"] = Obs(1, "FAIL something-else: refused for an undeclared reason")
+    cases.append(("undeclared_refusal_at_declared_debt", m, EXIT_FATAL))
     # A control for the DECLARED FIELD ITSELF (the defect this fix closes): if `partial_note` were IGNORED, the
     # wrong-provenance partial commit would pass. Mutating every rail's declaration to `none` must turn it RED.
     blind = copy.deepcopy(doc)
     for rail in blind["rails"]:
         rail["partial_note"] = "none"
     cases.append(("partial_note_declaration_is_read", dict(base), EXIT_FATAL))
-    docs = {"partial_note_declaration_is_read": blind}   # the ONE case classified against a MUTATED doc
+    docs = {"partial_note_declaration_is_read": blind,   # the cases classified against a MUTATED or EXTENDED doc
+            "declared_debt_paid_returns_owner_owed (lifecycle stays SEEN)": synthetic,
+            "undeclared_refusal_at_declared_debt": synthetic}
     bad = 0
     for name, obs, expect in cases:
         rc, fatal, owed = classify(obs, docs.get(name, doc))
@@ -392,8 +449,12 @@ def selftest() -> int:
               git_subject.note_kind(own) == "own_index"),
              ("a REFUSAL is never read as a note (provenance none)",
               git_subject.note_kind("REFUSED git-index (BUG-566, fail closed, C16): ...") == "none"),
-             ("the config declares the debt it re-measures and a bootstrap that exists only for it",
-              bool(doc["declared_debt"]) and "--no-verify" in [str(x) for x in doc["temp"]["bootstrap"]["flags"]])]
+             ("the fixture BASE is declared as a BYPASS with the refusal that justifies it, and no debt is open",
+              "--no-verify" in [str(x) for x in doc["temp"]["bootstrap"]["flags"]]
+              and bool((doc["temp"]["bootstrap"].get("refusal") or {}).get("observation"))
+              and not doc["declared_debt"]),
+             ("the bypass names a rail THIS file declares",
+              any(str(r["role"]) == str(doc["temp"]["bootstrap"]["refusal"]["rail"]) for r in doc["rails"]))]
     for why, good in joins:
         bad += 0 if good else 1
         print("  " + ("ok  " if good else "FAIL") + " selftest/" + why)
@@ -415,13 +476,15 @@ def main() -> int:
     rc, fatal, owed = classify(obs, doc)
     try:
         if rc == EXIT_CLEAN:
-            print("ok boundary rehearsal: a real NORMAL commit and a real PARTIAL commit both PASSED through the "
-                  "hook (" + str(len(note_kinds(obs["commit.normal"].text))) + " pinned note(s), "
-                  + str(len(note_kinds(obs["commit.partial"].text))) + " at the partial commit), "
-                  + str(len(doc["scenarios"]["planted"])) + " planted violation(s) REFUSED by their declared rail, "
-                  + str(len(doc["rails"]) + 1) + " rail selftest(s) fire, "
-                  + str(len(doc["declared_debt"])) + " declared debt re-measured ("
-                  + ", ".join(str(d["id"]) for d in doc["declared_debt"]) + ")")
+            boot = doc["temp"]["bootstrap"]
+            print("ok boundary rehearsal: a FRESH repository FIRST commit, a real NORMAL commit and a real "
+                  "PARTIAL commit all PASSED through the hook ("
+                  + str(len(note_kinds(obs["commit.normal"].text))) + " pinned note(s) at the normal commit, "
+                  + str(len(note_kinds(obs["commit.partial"].text))) + " at the partial one), the fixture BASE "
+                  "is REFUSED by " + str(boot["refusal"]["rail"]) + " and is therefore declared as a BYPASS "
+                  "(D-2677), " + str(len(doc["scenarios"]["planted"])) + " planted violation(s) REFUSED by their "
+                  "declared rail, " + str(len(doc["rails"]) + 1) + " rail selftest(s) fire, "
+                  + str(len(doc["declared_debt"])) + " declared debt(s) open")
         else:
             print(("FAIL boundary rehearsal" if rc == EXIT_FATAL else "OWED boundary rehearsal")
                   + ": the write boundary is not what the declarations say it is:")

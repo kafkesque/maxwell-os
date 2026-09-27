@@ -30,13 +30,30 @@ fixture:
   keep: false
   timeout_seconds: 600
 coverage:
-  min_mutations: 3            # FLOOR (shrink guard): deleting an entry means editing the floor in a diff a human reads
+  min_mutations: 4            # FLOOR (shrink guard): deleting an entry means editing the floor in a diff a human reads
   required_subjects:          # every path here MUST be the subject of >= 1 mutation (D-405: join BOTH directions)
     - scripts/check_boundary_rehearsal.py
     - scripts/check_session_plan.py
+    - scripts/check_repo_integrity.py
 budget:
   max_seconds_per_runner: 120 # a slower runner has an UNCONTROLLED INPUT (class iii of D-2665) -> OWNER-OWED, loud
 mutations:
+  # D-2677: the UNBORN branch of the HEAD rule (BUG-576). Reduced to a no-op, a FRESH repository is read as
+  # broken metadata again and the rail REFUSES the first commit of a RECOVERED one - the BUG-574 class (a rule
+  # that cannot fire on the legitimate case), caught because the control asserts ACCEPTANCE, not refusal.
+  - id: unborn_head_branch_is_load_bearing
+    subject: scripts/check_repo_integrity.py
+    op: replace
+    find: '    if rc == 0 and ref:'
+    replace: '    if False:  # MUTATION (D-2676)'
+    runner: scripts/check_repo_integrity.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: 'FAIL repo-integrity selftest/unborn_head_is_accepted'
+    why: >-
+      the UNBORN branch (BUG-576): with it inert, head_state() reads a FRESH repository as broken metadata, the
+      rail refuses the only commit that repairs it, and the acceptance control fires.
   - id: provenance_count_is_load_bearing
     subject: scripts/check_boundary_rehearsal.py
     op: replace

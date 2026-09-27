@@ -72,6 +72,17 @@ git:
   must_resolve:
     - 'rev-parse --verify HEAD^{commit}'
     - 'rev-parse --show-toplevel'
+  # BUG-576 (MEASURED 2026-09-27 by the BOUNDARY REHEARSAL, in a real fresh repository). An UNBORN HEAD is a
+  # LEGITIMATE state - HEAD names a branch with no commit yet, and git creates logs/HEAD AT the first commit -
+  # and it is EXACTLY the state the BUG-400/BUG-564 RECOVERY route produces (a git dir re-created by hand, by a
+  # clone, or by --separate-git-dir). Treating it as broken metadata made this rail REFUSE the one commit that
+  # repairs the repository: a rule that cannot fire on the legitimate case (the BUG-574 class).
+  # The three probes are DECLARED here so the verdict is never invented in the rail (C12). 'unborn' is not a
+  # blanket excuse: the ref HEAD names must still NOT resolve as an object, and a ref that DOES resolve while
+  # the born probe does not is BROKEN, never unborn (C16).
+  head_born_probe: 'rev-parse --verify HEAD^{commit}'   # HEAD is BORN iff this resolves
+  head_unborn_probe: 'symbolic-ref -q HEAD'             # ... UNBORN iff this names a ref that
+  head_unborn_ref_probe: 'rev-parse --verify --quiet'   # ... resolves to NOTHING (the ref is appended)
   # P0-A. The reflog for HEAD and the commit HEAD names are two records of one fact. `.git/logs/HEAD` was
   # renamed away on 2026-09-25 and `git reflog` silently served a STALE branch reflog instead.
   head_reflog_relpath: logs/HEAD

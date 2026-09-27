@@ -1129,3 +1129,16 @@ OWED / NEXT (2026-09-27): BUG-576 is its FIRST APPLICATION (RAIL 0 must tell an 
 the declared --no-verify bootstrap in `config/boundary_rehearsal.yaml` must then be WITHDRAWN); BUG-577 owns the
 one-home debt this audit found (`outside_tree` restated in two rails); `coverage.required_subjects` still names
 only 2 rails. LANDED IN COMMIT 1c42f75 with D-2675.
+
+## THE BYPASS RULE (D-2677, 2026-09-27) - a bypass is justified by a MEASUREMENT, not by a promise
+
+WHERE: `config/boundary_rehearsal.yaml#temp.bootstrap` (the bypass + its declared `refusal`) and
+`scripts/check_boundary_rehearsal.py#classify` (which re-measures that refusal on every run). The UNBORN rule
+has its ONE home in `config/repo_integrity.yaml` (`head_born_probe` / `head_unborn_probe` /
+`head_unborn_ref_probe`), read by `scripts/check_repo_integrity.py#head_state` (born | unborn | broken).
+SUPERSEDES: the declared_debt entry for BUG-576 (WITHDRAWN 2026-09-27 - BUG-576 is FIXED; the lifecycle stays
+SEEN through a synthetic declaration in `--selftest`). Do NOT read the old bootstrap `reason:` - the key is gone;
+a `--no-verify` bypass without a declared refusal now FAILS CLOSED.
+OPEN AFTER IT: BUG-578 (the rehearsal rehearses HEAD, so it cannot gate the change that LANDS - overlay the
+WORKING TREE subjects before installing the hooks), then BUG-577 (ONE home for outside_tree), BUG-575, BUG-573,
+BUG-571. The standing-rule graduation bar for a CONSTITUTION-level section stays HOLD (D-2676, owner gate).

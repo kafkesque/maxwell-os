@@ -440,3 +440,17 @@ WITH a boundary control and a mutation entry that reds it, then WITHDRAW the dec
 (a paid debt returns 2 OWNER-OWED until withdrawn). (2) BUG-577 - one home for outside_tree. (3) BUG-575 - supersession COMPLETENESS +
 IN-FORCE for cited decisions. (4) BUG-573 - the ladder must collect EVERY fault before it exits. (5) extend coverage.required_subjects to
 RAIL 0 and the write-boundary rails.
+
+
+## 2026-09-27 (cont.) - D-2677 LANDED / BUG-576 FIXED
+
+BUG-576 FIXED (RAIL 0 BORN/UNBORN/BROKEN from three DECLARED probes; 4 new real-repository controls; selftest
+15/15). The --no-verify bootstrap is WITHDRAWN and replaced by THE BYPASS RULE (D-2677): `temp.bootstrap.refusal`
+is re-measured every run, `declared_debt` is EMPTY, and the rehearsal's first commit is an ACCEPTANCE control
+(18/18). The standing-rule gate now covers RAIL 0 (`unborn_head_branch_is_load_bearing`, floor 4, 3/3 subjects).
+MINTED D-2677 (808 records, stamp 80c07d4142d20208). NEXT, in order: (1) BUG-578 - the rehearsal rehearses HEAD,
+so overlay the WORKING TREE bytes of the declared subjects into the fixture BEFORE installing the hooks (measured:
+'bash scripts/install_git_hooks.sh --check' rc=0 after the overlay), with a control that REDs if the overlay is
+dropped; (2) BUG-577 - ONE home for outside_tree (scripts/lib/fixture.py) plus a refusal control and a mutation,
+and move the nested RAIL 0 fixture builder there; (3) BUG-575 supersession completeness; (4) BUG-573 the ladder
+must collect EVERY fault; (5) BUG-571 the cited-by-decision join.

@@ -596,3 +596,27 @@ RISK NOTE (now retired): before fe239df a worktree clean destroyed BOTH copies o
 - [ ] NEXT (product): the 3 dirty rail outputs + `backups/**` need a declared home (BUG-563); BUG-560 write_guard route.
 - [ ] OWNER GATE: the standing-rule promotion ruling is now DUE (bar met; a promotion must be a POINTER, never a
       restatement); BUG-431 CONTENT promotion remains the other open owner gate.
+
+## D-2680 / BUG-573 FIXED - THE WHOLE-SET RULE (2026-09-27)
+
+- [x] BUG-573 FIXED: scripts/run_ladder.py (the collector) + `just health-full`; the ladder's fast path now
+      DECLARES its own prefix in the ladder's own units, before any rail can abort it.
+- [x] MEASURED: `just health-full` -> 87 line(s) RUN, 0 fault(s), 203.0s, SCAN_RC=0. The remaining fault set at
+      HEAD is EMPTY - the first time that claim is measured rather than assumed.
+- [x] Standing rule satisfied for the new rule: (i) ONE home config/rail_registry.yaml#ladder + #recipes;
+      (ii) a SEEN control (--banner printed by the ladder itself, run in every `just health`); (iii) the NAMED
+      oracle scripts/run_ladder.py --selftest; (iv) the MUTATION ladder_scan_reports_every_fault_is_load_bearing
+      SEEN to red (floor 8 -> 9, subjects 6 -> 7).
+- [x] NO new bug filed by this change (BUG-573 closed, OPEN 138 -> 137).
+- [ ] NEXT (meta, in order - the freeze target): BUG-577 (ONE home scripts/lib/fixture.py#outside_tree), then
+      BUG-575 (supersession completeness: 24 pinned legacy_debt_ids), then BUG-571 (the cited-by-decision join;
+      BUG-492 cited 32x is its live case).
+- [ ] META-LANE FREEZE (recommended, needs one owner word): from D-2680 forward, the governance machinery is
+      touched ONLY to close a bug already registered - a NEW governance bug may be filed but NOT worked until the
+      three named bugs above are closed and the product lane has produced a build artifact. Rationale MEASURED:
+      ~37 of the last 40 filed bugs are about the machinery itself.
+- [ ] NEXT (product lane, the DEFAULT): BUG-563 declared homes for the 3 dirty rail outputs + backups/**, then
+      BUG-560 (write_guard route). These are what stand between the ladder and BUILDING.
+- [ ] OWNER GATE (DUE): the standing-rule CONSTITUTION promotion (bar MET on all three clauses; any promotion must
+      be a POINTER to config/rail_mutations.yaml + scripts/check_rail_mutations.py, never a restatement);
+      BUG-431 CONTENT promotion.

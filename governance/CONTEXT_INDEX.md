@@ -1163,3 +1163,16 @@ NOW: 8 mutations (floor 8), 6/6 declared subjects covered, 4 of them DERIVED fro
 rehearsal, D-2675) is covered BEYOND it.
 OPEN AFTER IT: the graduation bar reads MET on all three clauses, so the CONSTITUTION promotion of the standing rule is
 now a DUE owner ruling (a promotion must be a pointer, never a restatement - BUG-431 CONTENT promotion stays open).
+
+## THE WHOLE-SET RULE (D-2680, 2026-09-27) - the ladder is run for EVERY fault, never until the first
+
+WHERE. scripts/run_ladder.py (the collector: --collect runs every declaring line, exits with the WORST code,
+never the first) and justfile#health-full (the entry point) + justfile#health (the fast path, whose FIRST line now
+declares its own prefix). The line list is READ from config/rail_registry.yaml#ladder + #recipes - the ladder
+itself is the ONE home, so this script names no rail (C12). Teeth: config/rail_mutations.yaml#
+ladder_scan_reports_every_fault_is_load_bearing.
+SUPERSEDES. Nothing - it ADDS the whole-set report to a ladder whose short-circuit was never declared (BUG-573).
+NOW. `just health-full` -> 87 line(s) RUN, 0 fault(s), 203.0s, SCAN_RC=0: the remaining fault set at HEAD is
+EMPTY, measured. `just health` stays fast and prints the prefix declaration FIRST.
+OPEN AFTER IT: the meta-lane freeze (BUG-577 -> BUG-575 -> BUG-571, then product: BUG-563 declared homes,
+BUG-560 write_guard) and the DUE owner gate on promoting the standing rule (POINTER, never restatement).

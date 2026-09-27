@@ -102,6 +102,13 @@ health:
 
 healthcheck: health
 
+# D-2680/BUG-573: the WHOLE fault set in ONE run. `health` above is the fast, human-readable ladder and it
+# reports a PREFIX - a red line hides every line after it, which is why each repair round used to cost a new
+# session to discover the next fault. This recipe runs the same declared lines through the same guards and
+# reports EVERY fault with its own rc and seconds, exiting with the WORST code, never the first.
+health-full:
+    python3 scripts/run_ladder.py --collect health
+
 # ── One-panel inference stack monitor (D2456): versions + drift + single-source ──
 stacks:
     @python3 scripts/monitor_stacks.py

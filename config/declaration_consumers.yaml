@@ -44,10 +44,12 @@ declarations:
     the flag registry is read by scripts/audit_flag_consumers.py::REGISTRY_PATH; a flag registry whose audit is
     withheld is a registry nothing joins to a decision.
 - declaration: config/rail_registry.yaml
-  consumers: [scripts/check_rail_registry.py, scripts/check_rail_mutations.py]
-  decisions: [D-2665, D-2679]
+  consumers: [scripts/check_rail_registry.py, scripts/check_rail_mutations.py, scripts/run_ladder.py]
+  decisions: [D-2665, D-2679, D-2680]
   why: >-
-    the rail registry is read by scripts/check_rail_registry.py::CFG (which verifies its commit_boundary against the
+    D-2680: scripts/run_ladder.py::declared() reads #ladder and #recipes from this registry, so the recipe the
+    collector runs, and the lines it collects, have ONE home and no rail name is restated in code.
+        the rail registry is read by scripts/check_rail_registry.py::CFG (which verifies its commit_boundary against the
     bytes of gitdir:hooks/pre-commit) AND by scripts/check_rail_mutations.py#boundary_rails (D-2679), which derives
     the standing rule's COVERAGE from commit_boundary.must_contain instead of restating it. A registry whose reader
     is withheld is a declaration that no rail reports on - the class (i) shape this registry exists to catch.

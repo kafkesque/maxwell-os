@@ -488,3 +488,26 @@ EVERY fault: one RED currently hides the next); (4) BUG-571 (the cited-by-decisi
 (5) TASK: declared homes for the 3 dirty rail outputs + `backups/**` (BUG-563), and BUG-560 (write_guard route).
 OWNER GATE: the standing-rule promotion ruling is now DUE (the bar is met; any promotion must be a POINTER to
 `config/rail_mutations.yaml` + `scripts/check_rail_mutations.py`); BUG-431 CONTENT promotion remains the other gate.
+
+## 2026-09-27 (cont.) - D-2680 LANDED / BUG-573 FIXED (THE WHOLE-SET RULE)
+
+STRONGEST MEASURED EVIDENCE. `just health-full` -> **87 line(s) RUN, 0 fault(s), 203.0s**, SCAN_RC=0. For the
+first time the question "what is left in the ladder?" has a measured answer instead of a prefix: EMPTY. Cost is
+attributable per line (check_tests 82.1s, yaml_guard 45.3s, boundary rehearsal 14.4s, rail mutations 8.6s).
+
+WHAT LANDED. scripts/run_ladder.py (collector + derived banner + 12 known-answer controls, no fixture, no
+writer); justfile#health gains the banner (printed BEFORE any rail can abort) and the collector's --selftest;
+justfile#health-full is the whole-set entry point; config/rail_registry.yaml stays the ONE home of the line list;
+config/rail_mutations.yaml floor 8 -> 9 and subjects 6 -> 7 with the new mutation SEEN to red; the new consumer
+edge (run_ladder reads the registry) staged in the SAME commit (BUG-562 class); BUG-573 closed - NO new bug was
+filed by this change.
+
+ORDERED NEXT. (1) BUG-577 ONE home scripts/lib/fixture.py#outside_tree (+ refusal control + mutation);
+(2) BUG-575 supersession completeness (24 pinned legacy_debt_ids); (3) BUG-571 cited-by-decision join (BUG-492
+its live case); (4) PRODUCT (default lane): BUG-563 declared homes for the 3 dirty rail outputs + backups/**,
+then BUG-560 write_guard route.
+
+OWNER GATE (DUE). The standing-rule promotion ruling (bar MET; a promotion must be a POINTER, never a
+restatement) and BUG-431 CONTENT promotion. RECOMMENDATION: rule the META-LANE FREEZE now - the machinery has
+spent ~37 of the last 40 bugs on itself, and it has just proven the ladder is clean in one pass, which is the
+precondition for switching to product work.

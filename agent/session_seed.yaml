@@ -335,7 +335,11 @@ current_state:
 # BUG-581 were filed and FIXED in the same commit, so the OPEN count is unchanged. RE-MEASURED from
 # scripts/bug_status.py: OPEN 138 / CLOSED 181 of 319 - the D-2678 note had left this number stale at 139, which is
 # what a hand-copied DERIVED count does; re-run scripts/bug_status.py before trusting it.
-open_bugs_n: 138
+# D-2680 (2026-09-27): THE WHOLE-SET RULE landed - `just health-full` runs all 87 declaring lines of the
+# declared ladder in ONE pass (0 fault(s), 203.0s), so the remaining fault set is measured, not implied;
+# BUG-573 closed and NO new bug was filed by the change. RE-MEASURE, never transcribe: the count below is
+# DERIVED by scripts/bug_status.py.
+open_bugs_n: 137
 
 # 2026-09-26T (D-2662/BUG-554) - session trail (comments only: this file stays PARSEABLE).
 # THE CLASS, STATED ONCE: a declared field read by NO machine is a claim, not a control. MEASURED 2026-09-26:

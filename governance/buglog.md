@@ -7403,3 +7403,30 @@ FOUND BY: the D-2679 forensic audit (the mismatch sweep over the files it was ab
 FIX: the rail-registry rationale moved to `config/rail_registry.yaml`, amended to name BOTH consumers (the registry
 reader and, since D-2679, the coverage join) and both decisions; `config/handoffs.yaml` got its own accurate `why`
 (what a withheld handoff reader costs, BUG-559).
+
+## BUG-573 (FIXED, MED): a RED earlier in the ladder SHORT-CIRCUITED it, so every LATER fault was invisible (2026-09-27, D-2680)
+
+CLASS. The ladder is a LINEAR recipe: it stops at the FIRST non-zero line, and the owner READS the result as the
+whole set. A red line therefore hid every line after it, so every repair round could only ever discover ONE fault -
+the cost the owner measured as "running in circles".
+MEASURED (before). A single RED at one line stood for a whole session; repairing it UNHID a stale dormancy the
+rail registry had never been able to report. Nothing about the fix caused the second fault - the prefix did.
+MEASURED (after). `just health-full` runs the same declared lines in one pass: **ok ladder scan: 87 line(s) RUN,
+0 fault(s), 203.0s** (SCAN_RC=0). The remaining fault set at HEAD is EMPTY, and it is now measurable instead of
+assumed. Per-line seconds make the cost attributable: check_tests 82.1s, yaml_guard 45.3s, boundary rehearsal
+14.4s, store-columns 10.2s, rail mutations 8.6s. The banner's numbers are DERIVED: '87 declaring line(s) stand
+in it (63 declared a HARD gate)'.
+FOUND BY the D-2680 step of the standing-rule programme (the registered next step was BUG-577; BUG-573 was taken
+FIRST because it is upstream of every other repair: it decides what a human can SEE).
+FIX (D-2680, scripts/run_ladder.py + justfile + config). --collect runs each line as written through a POSIX
+shell from the repository root, so the line's OWN guard decides (a line that tolerates rc=2 is not a fault),
+records every fault with rc + seconds, and exits with the WORST code (1 FATAL outranks 2 owner-owed, BUG-457),
+never the first. The recipe body is READ from its ONE home (config/rail_registry.yaml#ladder + #recipes): no rail
+name, path or count is written in code (C12), a recipe the declaration does not govern is REFUSED (C16, D-405),
+and a line invoking the collector itself is skipped (recursion). `just health` keeps the fast ladder and now
+declares the prefix FIRST - printed before any rail can abort - naming `just health-full` as the whole-set entry
+point. No fixture and no writer: the controls are synthetic, so this rail adds no second home of the fixture rule
+(BUG-577) and no entry to config/rail_registry.yaml#writers.
+SEEN. run_ladder --selftest 12/12 rc=0; mutation ladder_scan_reports_every_fault_is_load_bearing SEEN to red
+through its own named marker; gate --check rc=0 (8 rules, 7/7 subjects); registry rc=0; declaration consumers
+rc=0 (7 edges). This change FILED no new bug - it closes one.

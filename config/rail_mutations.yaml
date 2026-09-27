@@ -55,6 +55,7 @@ coverage:
     - scripts/check_rail_mutations.py
     - scripts/check_repo_integrity.py
     - scripts/check_session_plan.py
+    - scripts/run_ladder.py
     - scripts/verify_recalibration_pins.py
 budget:
   max_seconds_per_runner: 120 # a slower runner has an UNCONTROLLED INPUT (class iii of D-2665) -> OWNER-OWED, loud
@@ -188,3 +189,17 @@ mutations:
       reports the coverage it happens to hold. The control REMOVES a derived boundary rail from the coverage list
       and requires the gate to refuse: a coverage claim that cannot be falsified is the BUG-492 shape one level up.
 
+  - id: ladder_scan_reports_every_fault_is_load_bearing
+    subject: scripts/run_ladder.py
+    op: replace
+    find: '        if rc:'
+    replace: '        if False:  # MUTATION (D-2676): a fault stops being recorded'
+    runner: scripts/run_ladder.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: 'FAIL selftest/late_fault_is_visible'
+    why: >-
+      D-2680/BUG-573: every fault of the ladder is COLLECTED, so a red line never hides the lines after it. With
+      the collection inert, the scan reports a clean ladder while a red stands in it - the prefix-read-as-a-verdict
+      defect one level up, in the very report that exists to end it.

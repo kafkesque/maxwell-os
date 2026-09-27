@@ -36,6 +36,22 @@
       "declares": "config/cohort_declaration.yaml#cohorts.anchor4_depth.measured_rows"
     },
     {
+      "id": "decision_supersession_complete",
+      "state": "ok",
+      "evidence": "every SUPERSEDED record names a resolvable successor in 814 record(s); 12 pinned legacy id(s) still owed",
+      "check": "decision_supersession_complete",
+      "about": "config/decisions.yaml",
+      "declares": "config/decisions_policy.yaml#graph"
+    },
+    {
+      "id": "decision_citations_in_force",
+      "state": "ok",
+      "evidence": "59 citation site(s) all name a decision IN FORCE; 4 declared forward reference(s) still owed; every state word in the registry is classified",
+      "check": "decision_citations_in_force",
+      "about": "config/decisions.yaml",
+      "declares": "config/decisions_policy.yaml#graph"
+    },
+    {
       "id": "decision_registry_wellformed",
       "state": "owner_owed",
       "evidence": "8 citation value(s) are NOT id-shaped, so no rail can validate them - name the deciding decision or drop the key: [\"config/generator_pins.yaml:decided='PENDING'\", \"config/handoffs.yaml:decided='BUG-559'\", \"config/handoffs.yaml:decided='BUG-376'\", \"config/handoffs.yaml:decided='BUG-475'\", \"config/silent_repair.yaml:decided='BUG-518'\", \"config/store_authority.yaml:decided='PENDING-OWNER'\"]",
@@ -86,7 +102,7 @@
     {
       "id": "reach",
       "state": "ok",
-      "evidence": "0 uninvoked of 105 reachable check script(s), 1 declared edge(s) (0 dead), debt_max 0",
+      "evidence": "0 uninvoked of 107 reachable check script(s), 1 declared edge(s) (0 dead), debt_max 0",
       "unwired": [],
       "edges": [
         {

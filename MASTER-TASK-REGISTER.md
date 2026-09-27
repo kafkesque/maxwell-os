@@ -671,3 +671,14 @@ RISK NOTE (now retired): before fe239df a worktree clean destroyed BOTH copies o
       BUG-570, BUG-568/569, BUG-566, BUG-564 remainder, BUG-559.
 - [ ] OWNER GATE (DUE): the META-LANE FREEZE ruling (the exception it needed - 575 -> 571 before product work - is
       now SPENT); the standing-rule CONSTITUTION promotion (POINTER only); BUG-431 CONTENT promotion; BUG-583.
+
+## D-2684 / BUG-563 FIXED - A DIRTY PATH HAS TWO DECLARED HOMES (2026-09-27)
+- [x] `.gitignore` - DECLARED exclusions (`backups/`, `governance/drift_report_2*.json`, `governance/bench_preflight_2*.json`), each joined to a `why`; trailing comments REMOVED (they were literal patterns - caught by the new rail)
+- [x] `config/repo_integrity.yaml#worktree` - ONE HOME: `plan:` (the granting home, consumed) + `excluded:` (3 declarations) + `bug: BUG-563`
+- [x] `scripts/check_repo_integrity.py --worktree` - PURE `worktree_faults()` + raw NUL-separated `dirty_entries()` + git-joined `is_ignored()`; 6 new controls
+- [x] SEEN: `--selftest` rc=0 (6 worktree + 15 existing); `--worktree` rc=0 (14 dirty, 14 granted, 0 in neither home)
+- [x] TEETH: mutation `worktree_undeclared_dirty_path_rule_is_load_bearing` SEEN to red; floor 12 -> 13
+- [x] GRANTS: 7 NAMED paths in `may_touch` (`.gitignore` + 6 indexed stores) + widening_log entry 26
+- [ ] OWED (declared, not silent): widen the SAME rule into the pre-commit hook once the plan can grant an artifact in the commit that creates it (item 5 of D-2684)
+- [ ] NEXT (product): BUG-560 (route `scripts/apply_workbook_rulings.py` through `scripts/lib/write_guard.py`); then BUG-564 remainder / BUG-572 / BUG-583 / BUG-584
+- [ ] OWNER GATE (DUE, one word each): META-LANE FREEZE ruling; standing-rule CONSTITUTION promotion (POINTER only); BUG-431 CONTENT promotion; BUG-583 (lowercase 'active')

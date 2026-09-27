@@ -1210,3 +1210,14 @@ scripts/bug_status.py) is REFUSED and replaced: bug_status.py re-derives from th
 exists to look past, and the decision-citation direction is already closed at the mint (39 cited ids, 0
 unregistered). NOW. `just health` is green; the whole-set audit is empty; the meta lane is closed and the default
 lane is PRODUCT (BUG-563 -> BUG-560). Filed behind the freeze: BUG-584, BUG-583, BUG-572, BUG-570, BUG-568/569.
+
+## A DIRTY PATH HAS TWO DECLARED HOMES (D-2684, 2026-09-27)
+WHERE. GRANTED = `governance/session_plan_20260924.yaml#may_touch` (CONSUMED, never restated). EXCLUDED =
+`config/repo_integrity.yaml#worktree.excluded` (3 declarations + a `why` each), ENFORCED by `.gitignore`.
+ONE READER. `scripts/check_repo_integrity.py --worktree` (ladder line `|| exit 1`): asks GIT ITSELF
+(`check-ignore -q --no-index`) whether each declaration is honoured; a path in NEITHER home is FATAL.
+SUPERSEDES-NOTHING. It AMENDS BUG-563's owed remedy ("an ignore rule carrying a declared disposition, or a
+`may_touch` grant") by supplying BOTH arms and one reader, and it does NOT widen the pre-commit hook (declared
+follow-up; the BUG-528b sequencing defect is why).
+NOW. `backups/**` and the per-run snapshots are excluded BY DECISION; the six indexed stores are committable;
+`just health` reports `0 in neither home`.

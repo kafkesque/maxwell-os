@@ -1048,3 +1048,31 @@ known-answer controls, both directions, rc=0. TEETH: register_uncarried_rule_is_
 runs the control as its own line, and the pre-change whole-set audit is EMPTY: "ok ladder scan: 90 line(s) RUN, 0
 fault(s), 220.3s". FILED in the same change-set (not worked): BUG-584, the duplicated declaring lines the BUG-582
 fix left in `just health`, which the rail census cannot count BY CONSTRUCTION - the meta-lane freeze keeps it filed.
+
+## D-2684 (2026-09-27) - A DIRTY PATH HAS TWO DECLARED HOMES, AND THE RAIL FAILS ON A PATH IN NEITHER (BUG-563 FIXED)
+CONTEXT. BUG-563 filed the class on 2026-09-26 and it was still live: MEASURED 2026-09-27, 124 dirty paths and
+ONE granted. 112 of them are `backups/**` PRE_* pre-images that pipeline/backup_guardian.sh (C13) makes it a
+session's DUTY to write - so the system obliged a session to create paths it could not commit and git was never
+told to ignore, and the evidence trail was unversioned by accident rather than by decision. 11 more were rail
+outputs: three tracked-but-modified stores, and eight untracked run artifacts and journals.
+DECISION.
+(1) TWO HOMES, NO OVERLAP: GRANTED = the plan's `may_touch` (the pre-existing granting authority, CONSUMED and
+never restated - D-2646); EXCLUDED = `config/repo_integrity.yaml#worktree.excluded`, three declarations each with
+a `why`, ENFORCED by the `.gitignore` bytes. A path in neither home is FATAL (exit 1).
+(2) ONE READER, JOINED TO REALITY: `scripts/check_repo_integrity.py --worktree` reads the dirty set as a
+NUL-separated NAME LIST (BUG-565's one home for name lists) and asks GIT ITSELF (`check-ignore -q --no-index`)
+whether a declaration is honoured. A declaration git does not honour is a FAULT, not a quiet pass (D-405).
+(3) PURE RULE: `worktree_faults()` takes every input - including the ignore verdict - as a PARAMETER, so its six
+controls are synthetic and this repository's dirt cannot make a control pass (BUG-492).
+(4) GRANTS ARE NAMED, NEVER GLOBBED: seven exact paths, including `.gitignore` itself (the exclusion bytes are
+half of the rule, so a session that may not commit them could not land it).
+(5) SCAN MOMENT ONLY, STATED: the rail is in the ladder and deliberately NOT in the pre-commit hook - the hook
+would refuse a commit carrying a legitimately new artifact BEFORE its plan entry can land (the BUG-528b
+sequencing defect). The widening is a declared follow-up.
+MEASURED. Before: 124 dirty, 1 granted, 123 in no home; `declared-excluded 'backups/**' is NOT ignored by git`
+(the rail's first run refused MY OWN patch: a trailing `#` is not a comment in .gitignore); the shared git()
+helper strips output, eating the status field's leading space, so records are now read raw. After: `ok
+repo-integrity worktree: 14 dirty path(s) - 14 granted, 0 declared-excluded, 0 in neither home` rc=0; `ok
+repo-integrity worktree selftest: 6 known-answer control(s)` rc=0; mutation gate `worktree_undeclared_dirty_path_
+rule_is_load_bearing` SEEN to red (floor 12 -> 13). The previous turn's owed POST-change whole-set scan:
+`just health-full` = 91 line(s) RUN, 0 fault(s).

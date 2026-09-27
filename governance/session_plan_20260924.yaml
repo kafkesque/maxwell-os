@@ -74,6 +74,21 @@ may_touch:
   - # D-2666 (2026-09-26): NAMED grants for the TWO owner artifacts this session repaired. NOT globs:
   - # a wildcard over the owner gold would make the instrument editable by default - the BUG-548 shape
   - # in the GRANTING direction (a plan that permits more than it says). Named, per-session, reviewable.
+
+  # WIDENED 2026-09-27 (widening_log entry 26) - SEVEN NAMED PATHS, never globs (BUG-563/D-2684). The measured
+  # defect: of 124 dirty paths exactly ONE was granted, so 123 sat in no declared home - uncommittable and
+  # unignored. SIX are the INDEXED rail-output stores: each is a TRACKED artifact a regenerating session must be
+  # able to commit (and governance/MUTATION_JOURNAL.jsonl is R-D410's append-only RECEIPT ledger - a receipt no
+  # one can commit is not auditable, the accepted rationale for governance/HANDOFFS.jsonl). The SEVENTH is
+  # .gitignore itself: the declared-exclusion bytes are half of the BUG-563 rule, so a session that may not
+  # commit them could not land the fix at all.
+  - .gitignore
+  - governance/bench_preflight_latest.json
+  - governance/human_review_ledger.json
+  - governance/remaining_verification_audit.csv
+  - governance/METRICS.jsonl
+  - governance/INSTRUMENT_CONTROLS.jsonl
+  - governance/MUTATION_JOURNAL.jsonl
   - governance/anchor_adjudication_workbook_20260924.csv
   - governance/anchor_adjudication_fixlog_20260925.csv
 will_not_touch:
@@ -542,3 +557,36 @@ widening_log:
       temp/d2675_*.yaml|.md are scratch and are NEVER staged. The PREVIOUS session's owed record (the BUG-574 landing,
       whose paths are all inside may_touch as well) is recorded HERE rather than as a second entry: a widening_log that
       grows one entry per session while changing nothing is ceremony, and ceremony is what BUG-548 was about.
+
+  - entry: 26
+    session: 20260927B
+    widened:
+      - .gitignore
+      - governance/bench_preflight_latest.json
+      - governance/human_review_ledger.json
+      - governance/remaining_verification_audit.csv
+      - governance/METRICS.jsonl
+      - governance/INSTRUMENT_CONTROLS.jsonl
+      - governance/MUTATION_JOURNAL.jsonl
+    owner_ack: >-
+      GRANTED 2026-09-27 (owner: 'implement the next critical step in strategically logical consequential order
+      ... before you commit any serious implementation do a forensic audit to make sure that nothing breaks,
+      cascade, drift, no blindspot, gap, conflict, bug, hidden failure, error leak, mismatch, bloat'). The audit
+      IS the evidence for this entry and it was run BEFORE the write: MEASURED 124 dirty paths, 1 granted (123 in
+      NO declared home), and each of the seven grants justified individually above.
+    may_touch_untouched: false      # this entry IS an edit of may_touch; recorded BEFORE the write (BUG-445)
+    will_not_touch_untouched: true  # verified: no will_not_touch entry edited; NO pipeline/** path staged
+    why: >-
+      BUG-563/D-2684: 'an on-disk object is either INDEXED or DECLARED excluded, never silently absent' - the
+      archive-census rule (BUG-537/BUG-556) applied to the WORKTREE. TWO HOMES AND NO OVERLAP: the GRANTS are
+      here (rail 4's one home for 'a session may write/commit this') and the EXCLUSIONS are in
+      config/repo_integrity.yaml#worktree.excluded, enforced by the .gitignore bytes and joined to git's own
+      `check-ignore` verdict by scripts/check_repo_integrity.py --worktree. The 'excluded' disposition is NOT a
+      grant: an excluded path is one NO session commits, declared with a reason instead of left invisible.
+      NOT widened, and deliberately so: governance/RECONCILIATION.json was ALREADY granted (entry 15).
+    audit_findings: >-
+      (1) THREE of the four ` M` paths are TRACKED generated stores - gitignoring a tracked path fixes nothing,
+      so GRANT is the only disposition that can work for them; (2) the .gitignore edit is LOAD-BEARING for
+      112 of the 124 paths and is therefore granted rather than laundered through a temp file; (3) the four
+      untracked drift/bench SNAPSHOTS are declared EXCLUDED (their consumed output is declared separately), so
+      the disposition per path is one fact with one home rather than a pattern chosen per convenience.

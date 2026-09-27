@@ -110,3 +110,19 @@ maxwell.db
 
 # frozen stage pairs (C-3): large payloads are cited by manifest, never committed
 frozen/
+
+# -----------------------------------------------------------------------------------------------------------
+# BUG-563 / D-2684 (2026-09-27): THIS FILE IS A DECLARATION, NOT A CONVENIENCE LIST.
+# MEASURED before this: 124 dirty paths and 112 of them `backups/**` - PRE-IMAGES that C13/R-D410 OBLIGE a
+# session to write and that no plan may commit. So the tree could never be clean and the evidence trail was
+# unversioned BY ACCIDENT rather than by decision. A path is now either INDEXED (granted, named, in
+# governance/session_plan_20260924.yaml#may_touch) or DECLARED EXCLUDED - and the two homes are ONE fact with
+# ONE reader: scripts/check_repo_integrity.py --worktree, whose declarations and reasons live in
+# config/repo_integrity.yaml#worktree.excluded. An exclusion declared there but NOT honoured here is a FAULT
+# (the rail asks git itself: `git check-ignore --no-index`), so this block cannot drift from that one.
+# NOTE: an ignore rule does NOT untrack a tracked path. The three tracked owner revisions under backups/ and
+# the historical drift_report_*/bench_preflight_* snapshots stay in history and stay tracked.
+# -----------------------------------------------------------------------------------------------------------
+backups/
+governance/drift_report_2*.json
+governance/bench_preflight_2*.json

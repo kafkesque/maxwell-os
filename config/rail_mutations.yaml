@@ -30,7 +30,7 @@ fixture:
   keep: false
   timeout_seconds: 600
 coverage:
-  min_mutations: 12            # FLOOR (shrink guard): deleting an entry means editing the floor in a diff a human reads
+  min_mutations: 13            # FLOOR (shrink guard): deleting an entry means editing the floor in a diff a human reads
   # D-2679: the coverage set is DERIVED, never restated. Which rails gate a COMMIT is one fact and it already has
   # ONE home (config/rail_registry.yaml#commit_boundary), so restating it here would be a SECOND HOME - and two
   # lists of one fact drift, and only one of them can be right. scripts/check_rail_mutations.py joins the two and
@@ -206,6 +206,20 @@ mutations:
       D-2680/BUG-573: every fault of the ladder is COLLECTED, so a red line never hides the lines after it. With
       the collection inert, the scan reports a clean ladder while a red stands in it - the prefix-read-as-a-verdict
       defect one level up, in the very report that exists to end it.
+  - id: worktree_undeclared_dirty_path_rule_is_load_bearing
+    why: >-
+      BUG-563/D-2684: the rule is 'a dirty path must be GRANTED by the plan or DECLARED-EXCLUDED, never
+      tolerated'. Replacing the fault with a pass must make the declared control go RED through its own
+      named marker; if it does not, the rule is a comment and this entry is what refuses it (D-2676 iv).
+    subject: scripts/check_repo_integrity.py
+    op: replace
+    find: '        faults.append(dirty_msg(st, path))'
+    replace: '        pass  # MUTATION (D-2676): an undeclared dirty path is tolerated'
+    runner: scripts/check_repo_integrity.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: 'FAIL repo-integrity selftest: an undeclared dirty path is a FAULT'
   - id: register_uncarried_rule_is_load_bearing
     subject: scripts/check_register_divergence.py
     op: replace

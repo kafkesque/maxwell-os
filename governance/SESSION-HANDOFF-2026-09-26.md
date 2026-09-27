@@ -559,3 +559,25 @@ governance/human_review_ledger.json, governance/remaining_verification_audit.csv
 (scripts/apply_workbook_rulings.py through scripts/lib/write_guard.py).
 OWNER GATE (DUE). The META-LANE FREEZE ruling (its one exception is spent); the standing-rule CONSTITUTION
 promotion (POINTER only); BUG-431 CONTENT promotion; BUG-583 (5 lowercase 'active' spellings vs a declared rule).
+
+## 2026-09-27 (cont. 4) - D-2684 LANDED / BUG-563 FIXED / A DIRTY PATH HAS TWO DECLARED HOMES
+STRONGEST MEASURED EVIDENCE. `just health-full` (the POST-change whole-set scan owed from cont. 3): **91 line(s)
+RUN, 0 fault(s)** - the fault set is EMPTY in one pass. BUG-563 before: 124 dirty paths, 1 granted, 123 in NO
+declared home (112 `backups/**` pre-images C13 obliges, 3 modified stores, 8 untracked artifacts). After: `ok
+repo-integrity worktree: 14 dirty path(s) - 14 granted by governance/session_plan_20260924.yaml, 0
+declared-excluded, 0 in neither home` rc=0; `--selftest` 6+15 controls rc=0; mutation gate SEEN red, floor 12 ->
+13.
+WHAT LANDED. `.gitignore` declared exclusions; `config/repo_integrity.yaml#worktree` (the ONE HOME: the granting
+home is CONSUMED, the three exclusions are declared with a why); `scripts/check_repo_integrity.py --worktree`
+(PURE `worktree_faults()`, raw NUL-separated dirty read, git-joined `is_ignored()`), wired into the ladder; 7
+NAMED grants in the plan (`.gitignore` + 6 indexed stores, incl. the R-D410 receipt ledger) + widening_log entry
+26.
+ALSO MEASURED (the rail refusing ITS OWN patch, first run). A trailing `#` is NOT a comment in `.gitignore`, so
+the three lines I first wrote were literal patterns matching nothing: the rail answered `declared-excluded
+'backups/**' is NOT ignored by git (probe 'backups/x')`. And the shared `git()` helper STRIPS output, eating the
+leading space of the status field (" M .gitignore" -> path "gitignore"); `dirty_entries()` now reads raw bytes.
+ORDERED NEXT. (1) product lane: BUG-560 (write_guard routing for apply_workbook_rulings.py); (2) the declared
+follow-up: the hook moment for the BUG-563 rule once a plan entry can land WITH the artifact it grants; (3) the
+frozen background (BUG-564 remainder, BUG-572, BUG-583, BUG-584, BUG-559).
+OWNER GATE (DUE). META-LANE FREEZE ruling; the standing-rule CONSTITUTION promotion (POINTER only); BUG-431
+CONTENT promotion; BUG-583 (canonicalise the 5 lowercase 'active' spellings vs declare the rule).

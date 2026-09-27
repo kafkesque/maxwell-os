@@ -107,6 +107,41 @@ repair:
     - MERGE_MSG
     - TAG_EDITMSG
 
+
+worktree:
+  # BUG-563 (2026-09-27, D-2684). The invariant above is 'every TRACKED path is present'; this is its other
+  # half: 'every DIRTY path has a DECLARED HOME'. MEASURED 2026-09-27 before the fix: 124 dirty paths, 1 of
+  # which (governance/RECONCILIATION.json) the plan granted - so 123 paths could never be committed AND were
+  # never ignored, and the tree was permanently dirty for a reason no declaration named.
+  #
+  # TWO HOMES, ONE READER, NO OVERLAP:
+  #   * GRANTED  - the plan's may_touch. Rail 4 already owns 'a session may write/commit this', so the grant is
+  #     asked THERE (this file does not restate an allow-list - D-2646).
+  #   * EXCLUDED - declared below, joined to git's OWN verdict by `git check-ignore --no-index`, and enforced
+  #     by the .gitignore bytes. A declaration git does not honour is a FAULT, never a quiet pass (D-405).
+  # A path in NEITHER home can never be committed and will never be ignored: it is FATAL (exit 1), because the
+  # fix is a declaration (grant it, named, or declare the exclusion with a why) and never a silent cleanup.
+  bug: BUG-563
+  why: >-
+    BUG-563 filed the class: 'an on-disk object is either INDEXED or DECLARED excluded, never silently absent'
+    (the archive census rule, BUG-537/BUG-556), applied to the WORKTREE. Rail 4 audits the STAGED set and rail 0
+    audits git METADATA, so the dirty worktree sat between the two rails and no declaration named it.
+  plan: governance/session_plan_20260924.yaml    # the GRANTING home - consumed, never restated
+  excluded:
+    - pattern: 'backups/**'
+      why: >-
+        PRE_* PRE-IMAGES written by pipeline/backup_guardian.sh (C13) - evidence of a batch write, not content.
+        MEASURED 2026-09-27: 112 of the 124 dirty paths. Committing them would bloat history with pre-images
+        whose only reader is a human doing a revert, and leaving them untracked-but-visible is the defect filed.
+    - pattern: 'governance/drift_report_2*.json'
+      why: >-
+        per-RUN snapshots of drift_monitor.py. The CONSUMED output is governance/drift_report_latest (the
+        timestamped siblings are run artifacts); config/derivations.yaml already treats PRE-IMAGES this way.
+    - pattern: 'governance/bench_preflight_2*.json'
+      why: >-
+        per-RUN snapshots; the consumed output is governance/bench_preflight_latest.json, declared in
+        config/bench_preflight.yaml. Same disposition and same reason as the drift snapshots above.
+
 severity:
   # report_only_globs: a conflict copy here is real but not a repository-integrity defect, so it is reported
   # as owner-owed (loud, exit 2) rather than fatal (BUG-457 convention: 2 = owner-owed, never silent).

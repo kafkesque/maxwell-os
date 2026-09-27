@@ -1,18 +1,18 @@
 {
   "generated_by": "scan_review_artifacts.py (deterministic glob — no blindspots)",
   "governance_dir": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/governance",
-  "n_artifacts": 33,
+  "n_artifacts": 38,
   "artifacts": [
     {
       "file": "s4_discipline_review_sheet.csv",
-      "size_bytes": 39721,
+      "size_bytes": 39739,
       "rows": 63,
       "n_rows": 63,
       "verdict_cols": [
         "HUMAN_discipline_VERDICT"
       ],
       "verdict_fill": {
-        "HUMAN_discipline_VERDICT": 62
+        "HUMAN_discipline_VERDICT": 63
       }
     },
     {
@@ -52,18 +52,37 @@
       "rows": 2456
     },
     {
-      "file": "s4_review_queue.jsonl.bak_20260913_224755",
-      "size_bytes": 1052533,
-      "rows": -1
-    },
-    {
       "file": "depth_review_queue.yaml",
       "size_bytes": 399820,
       "rows": -1
     },
     {
+      "file": "anchor_adjudication_fixlog_20260925.csv",
+      "size_bytes": 1178,
+      "rows": 22,
+      "n_rows": 22,
+      "verdict_cols": [],
+      "verdict_fill": {}
+    },
+    {
+      "file": "anchor_adjudication_workbook_20260924 (M1 max's conflicted copy 2026-09-26).csv",
+      "size_bytes": 99232,
+      "rows": 148,
+      "n_rows": 148,
+      "verdict_cols": [],
+      "verdict_fill": {}
+    },
+    {
+      "file": "anchor_adjudication_workbook_20260924.csv",
+      "size_bytes": 92135,
+      "rows": 148,
+      "n_rows": 148,
+      "verdict_cols": [],
+      "verdict_fill": {}
+    },
+    {
       "file": "content_type_adjudication_form_unlabeled_217.md",
-      "size_bytes": 332093,
+      "size_bytes": 332085,
       "rows": 2848
     },
     {
@@ -110,6 +129,11 @@
       "file": "phase0_relabel_manifest.jsonl",
       "size_bytes": 594060,
       "rows": 1365
+    },
+    {
+      "file": "frontier_pack_20260924",
+      "size_bytes": 448,
+      "rows": -1
     },
     {
       "file": "frontier_qwen38_69_objects.json",
@@ -193,6 +217,16 @@
       "file": "s4_domain_verdicts.jsonl",
       "size_bytes": 193196,
       "rows": 216
+    },
+    {
+      "file": "t2_suffix_verdicts.json",
+      "size_bytes": 10991,
+      "rows": 7
+    },
+    {
+      "file": "voting_verdict_20260916.md",
+      "size_bytes": 4285,
+      "rows": 69
     }
   ]
 }

@@ -9597,3 +9597,34 @@ decisions:
   - scripts/check_register_divergence.py
   - config/rail_mutations.yaml
   - justfile
+- id: D-2684
+  date: '2026-09-27'
+  state: ACTIVE
+  category: governance
+  title: A DIRTY PATH HAS TWO DECLARED HOMES AND THE RAIL FAILS ON A PATH IN NEITHER (BUG-563 FIXED)
+  decision: 'BUG-563: a dirty path must be GRANTED by the plan''s may_touch (the pre-existing granting home, CONSUMED
+    and never restated - D-2646) or DECLARED-EXCLUDED in config/repo_integrity.yaml#worktree.excluded (each with
+    a why, enforced by the .gitignore bytes). A path in NEITHER home is FATAL. ONE READER: scripts/check_repo_integrity.py
+    --worktree, whose PURE worktree_faults() takes every input (including git''s own ignore verdict) as a parameter,
+    so its six controls are synthetic. A declared exclusion git does not honour is a FAULT, never a quiet pass (D-405).
+    The grants are SEVEN NAMED paths, never globs. The rule is wired at the SCAN moment only: widening it into the
+    pre-commit hook is a declared follow-up, because the hook would refuse a commit carrying a legitimately new
+    artifact before its plan entry can land (BUG-528b).'
+  measured: 'BEFORE: 124 dirty paths, exactly ONE granted; 123 in no declared home (112 backups/** PRE_* pre-images
+    a session is OBLIGED to write by C13, 3 tracked-but-modified rail outputs, 8 untracked run artifacts/journals),
+    so the tree could never be clean and the evidence trail was unversioned by accident. The rail refused its own
+    first patch: a trailing ''#'' is NOT a comment in .gitignore, so three declared patterns matched nothing (''declared-excluded
+    backups/** is NOT ignored by git (probe backups/x)''), and the shared git() helper STRIPS output, eating the
+    leading space of the status field, so dirty_entries() now reads raw bytes (C16). AFTER: ''ok repo-integrity
+    worktree: 14 dirty path(s) - 14 granted by governance/session_plan_20260924.yaml, 0 declared-excluded, 0 in
+    neither home'' rc=0; ''--selftest'' 6 worktree + 15 existing controls rc=0; mutation gate ''worktree_undeclared_dirty_path_rule_is_load_bearing''
+    SEEN to red (floor 12 -> 13); the owed POST-change whole-set scan ''just health-full'' = 91 line(s) RUN, 0 fault(s).'
+  bugs:
+  - BUG-563
+  files:
+  - .gitignore
+  - config/repo_integrity.yaml
+  - scripts/check_repo_integrity.py
+  - config/rail_mutations.yaml
+  - justfile
+  - governance/session_plan_20260924.yaml

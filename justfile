@@ -7,6 +7,7 @@ health:
     python3 scripts/run_ladder.py --banner health --full health-full   # D-2680/BUG-573/BUG-582: the ladder reports a PREFIX (it stops at the first non-zero line) - declared HERE, before any rail can abort, with the entry point that reports the whole set
     python3 scripts/run_ladder.py --banner health --full health-full   # D-2680/BUG-573/BUG-582: the ladder reports a PREFIX (it stops at the first non-zero line) - declared HERE, before any rail can abort, with the entry point that reports the whole set
     python3 scripts/check_repo_integrity.py || [ $? -eq 2 ]   # RAIL 0: 0 git metadata intact | 1 repository defect (P0-A/P0-B, BUG-400) | 2 owner-owed
+    python3 scripts/check_repo_integrity.py --worktree || exit 1   # BUG-563: every DIRTY path must be GRANTED by the plan's may_touch or DECLARED-EXCLUDED (joined to git's own ignore verdict); neither = FATAL
     @just --list >/dev/null || { echo "FAIL justfile does not parse - the health rail cannot verify itself"; exit 1; }
     python3 scripts/guard_stacks_single_source.py || exit 1
     python3 pipeline/status.py

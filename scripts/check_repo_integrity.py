@@ -427,6 +427,172 @@ def _row(cc: Path, canonical: Path, *, in_git: bool = False, git_rel: str | None
             "canonical_exists": canonical.exists(), "in_git": in_git, "git_rel": git_rel}
 
 
+
+
+def ignore_probe_path(pattern: str) -> str:
+    """The path git is ASKED about, DERIVED from the declared pattern - never typed twice.
+
+    BUG-563: a declaration that claims an exclusion must be joined to the verdict GIT ITSELF gives, or it is a
+    claim about a repository nobody asked. Each run of '*' becomes a literal 'x', so 'backups/**' probes
+    'backups/x' and the answer comes from .gitignore's bytes rather than from this file's belief (D-405).
+    """
+    return re.sub(r"\*+", "x", str(pattern))
+
+
+def dirty_msg(st: str, path: str) -> str:
+    """The ONE wording for 'dirty and in neither declared home' (a fault text is a fact, not a flourish)."""
+    return (st.strip() + " " + path + " is dirty and is NEITHER GRANTED by the plan's may_touch NOR "
+            "declared-excluded in config/repo_integrity.yaml#worktree.excluded (BUG-563): no plan may commit it "
+            "and git does not ignore it, so the tree can never be clean and its content is unversioned BY "
+            "ACCIDENT - grant it (named, in the plan) or declare the exclusion (with a why)")
+
+
+def dirty_entries() -> list[tuple[str, str]]:
+    """(status, path) for every dirty path in the worktree, from a NUL-separated read.
+
+    BUG-565: a NAME LIST, never a whitespace split - ELEVEN tracked paths here contain a space. `-z` with
+    --untracked-files=all lists an untracked directory's FILES individually, which is the granularity a
+    per-path disposition needs; a rename record carries TWO paths, so its origin is consumed with its status.
+    """
+    # MEASURED 2026-09-27: the shared git() helper STRIPS its output, which ate the leading space of the
+    # two-character status field (" M .gitignore" -> "M .gitignore") and turned the path into "gitignore". A
+    # parser may not depend on a whitespace convention it does not own (C16), so the records are read RAW.
+    r = subprocess.run(["git", "status", "--porcelain", "-z", "--untracked-files=all"], cwd=REPO,
+                       capture_output=True)
+    if r.returncode != 0:
+        raise SystemExit("REFUSED (C16): `git status` did not resolve - the worktree subject is unavailable "
+                         "(rail 0's own subject, BUG-568: it is deliberately NOT pinned to an ambient index)")
+    rows = [x for x in r.stdout.decode("utf-8", "replace").split("\0") if x]
+    dirty: list[tuple[str, str]] = []
+    i = 0
+    while i < len(rows):
+        rec = rows[i]
+        st, path = rec[:2], rec[3:]
+        dirty.append((st, path))
+        i += 2 if ("R" in st or "C" in st) else 1
+    return dirty
+
+
+def worktree_faults(dirty: list[tuple[str, str]], grants: list[str], excluded: list[dict[str, Any]],
+                    is_ignored: Any) -> tuple[list[str], int, int]:
+    """PURE (BUG-492): every input is a PARAMETER, including git's own ignore verdict (is_ignored).
+
+    THE RULE (BUG-563). A dirty path must sit in ONE of TWO declared homes - GRANTED by the plan's may_touch (it
+    can be committed) or DECLARED-EXCLUDED here AND actually ignored by git. MEASURED before the fix: 123 of
+    124 dirty paths sat in NEITHER, so a session was obliged to create paths (C13 evidence) that no plan could
+    commit and git would never ignore - the tree could not be clean, and the evidence trail was unversioned by
+    accident. Control (i) of D-2676: this returns the faults, so a control can be SEEN to fire on a synthetic
+    tree without touching this repository's dirt.
+    """
+    faults: list[str] = []
+    allow = [str(g) for g in grants]
+    n_granted = n_excluded = 0
+    for st, path in dirty:
+        if any(fnmatch.fnmatch(path, g) for g in allow):
+            n_granted += 1
+            continue
+        hit = [e for e in excluded
+               if isinstance(e, dict) and fnmatch.fnmatch(path, str(e.get("pattern")))]
+        if hit and is_ignored(path):
+            n_excluded += 1
+            continue
+        faults.append(dirty_msg(st, path))
+    for e in excluded:
+        if not isinstance(e, dict):
+            continue
+        pat = str(e.get("pattern"))
+        if not is_ignored(ignore_probe_path(pat)):
+            faults.append("declared-excluded '" + pat + "' is NOT ignored by git (probe '"
+                          + ignore_probe_path(pat) + "'): the declaration claims an exclusion this repository "
+                          "does not make - fix the declaration or the .gitignore bytes (D-405/BUG-563)")
+    return faults, n_granted, n_excluded
+
+
+def worktree_main(cfg: dict[str, Any]) -> int:
+    """The LIVE run: join BOTH declared homes to git's own verdicts over the real dirty set (BUG-563)."""
+    w = cfg.get("worktree") or {}
+    plan_rel = str(w.get("plan") or "")
+    if not plan_rel:
+        print("FAIL repo-integrity worktree: config/repo_integrity.yaml#worktree.plan is not declared - the "
+              "GRANTING home is unknown, so nothing can be classified (C16, fail closed)")
+        return int((cfg.get("exit_codes") or {}).get("fail", 1))
+    plan = yaml.safe_load((REPO / plan_rel).read_text(encoding="utf-8")) or {}
+    grants = [str(x) for x in (plan.get("may_touch") or [])]
+    excluded = list(w.get("excluded") or [])
+
+    def is_ignored(p: str) -> bool:
+        """git's OWN answer about one path - the only authority on what this repository ignores."""
+        return git("check-ignore", "-q", "--no-index", p)[0] == 0
+
+    dirty = dirty_entries()
+    faults, n_granted, n_excluded = worktree_faults(dirty, grants, excluded, is_ignored)
+    codes = cfg.get("exit_codes") or {"ok": 0, "fail": 1}
+    if faults:
+        print("FAIL repo-integrity worktree: " + str(len(faults)) + " path(s)/declaration(s) have NO declared "
+              "home (BUG-563) - a dirty path must be GRANTED by " + plan_rel + " or declared-excluded:")
+        for f in faults:
+            print("   ", f)
+        return int(codes["fail"])
+    print("ok repo-integrity worktree: " + str(len(dirty)) + " dirty path(s) - " + str(n_granted)
+          + " granted by " + plan_rel + ", " + str(n_excluded) + " declared-excluded (each joined to git's own "
+          "ignore verdict), 0 in neither home")
+    return int(codes["ok"])
+
+
+def worktree_selftest() -> int:
+    """Known-answer controls for the BUG-563 rule (BUG-492: a control that cannot fire is a comment).
+
+    The ignore verdict is an INPUT, so every control is SYNTHETIC and none depends on this repository's current
+    dirt: a control that can only pass while the live tree happens to be clean is not a control. The LIVE join to
+    git's own verdicts is performed by --worktree, which the ladder runs. The exclusion FIXTURE is the live
+    declaration's own first pattern, so this control and the declaration cannot drift apart (C12d).
+    """
+    cfg = load_config()
+    excluded = [e for e in ((cfg.get("worktree") or {}).get("excluded") or []) if isinstance(e, dict)]
+    if not excluded:
+        print("FAIL repo-integrity selftest: config/repo_integrity.yaml#worktree.excluded is empty - the rule has "
+              "no declared exclusion to be tested against (BUG-563)")
+        return 1
+    fixture = [dict(excluded[0])]
+    pat = str(fixture[0].get("pattern"))
+    sample = pat.replace("**", "one") if "**" not in pat else pat.replace("**", "one")
+    probe = ignore_probe_path(pat)
+    clean_exc = [{"pattern": "nothing/declared/*", "why": "selftest: a pattern that matches no case here"}]
+    cases: list[tuple[str, list[tuple[str, str]], list[str], list[dict[str, Any]], set[str], bool]] = [
+        ("an undeclared dirty path is a FAULT",
+         [("??", "governance/UNKNOWN.json")], [], [], set(), True),
+        ("a dirty path GRANTED by may_touch is NOT a fault",
+         [("??", "governance/UNKNOWN.json")], ["governance/*.json"], [], set(), False),
+        ("a dirty path DECLARED EXCLUDED and ignored by git is NOT a fault",
+         [("??", sample)], [], fixture, {sample, probe}, False),
+        ("a declaration git does NOT honour is a FAULT (the D-405 join)",
+         [("??", sample)], [], fixture, {sample, sample}, True),
+        ("a MIXED tree counts BOTH homes and faults neither",
+         [(" M", "governance/UNKNOWN.json"), ("??", sample)], ["governance/UNKNOWN.json"], fixture,
+         {sample, probe}, False),
+    ]
+    ok, n = True, 0
+    for label, dirty, grants, exc, ignored, want in cases:
+        n += 1
+        faults, _g, _e = worktree_faults(dirty, grants, exc, lambda p, s=ignored: p in s)
+        if bool(faults) != want:
+            print("FAIL repo-integrity selftest: " + label + " - the rule said " + repr(bool(faults))
+                  + " for " + repr(dirty) + " (faults: " + "; ".join(faults) + ")")
+            ok = False
+    n += 1
+    faults, ng, ne = worktree_faults([(" M", "governance/UNKNOWN.json"), ("??", sample)],
+                                     ["governance/UNKNOWN.json"], fixture, lambda p: p in {sample, probe})
+    if (ng, ne) != (1, 1):
+        print("FAIL repo-integrity selftest: the two homes are not COUNTED separately - granted=" + str(ng)
+              + " excluded=" + str(ne) + " (a count that cannot be wrong is not a measurement)")
+        ok = False
+    if ok:
+        print("ok repo-integrity worktree selftest: " + str(n) + " known-answer control(s) fire on BOTH homes "
+              "and on the git join")
+        return 0
+    return 1
+
+
 def selftest() -> int:
     """Known-answer controls for the repair vocabulary (BUG-492: a control must be SEEN to fire).
 
@@ -574,10 +740,16 @@ def main() -> int:
     ap.add_argument("--plan", action="store_true", help="print the deterministic repair as mv commands")
     ap.add_argument("--quiet", action="store_true", help="print one summary line only (for rails)")
     ap.add_argument("--selftest", action="store_true", help="known-answer controls; no repo access")
+    ap.add_argument("--worktree", action="store_true",
+                    help="audit the DIRTY WORKTREE against its two declared homes (BUG-563; never the "
+                         "staged set, which is rail 4's subject)")
     a = ap.parse_args()
     if a.selftest:
-        return selftest()
+        rc = worktree_selftest()
+        return selftest() or rc
     cfg = load_config()
+    if a.worktree:
+        return worktree_main(cfg)
     git_dir = resolve_git_dir(cfg)
     rows = scan(cfg, git_dir)
     if a.plan:

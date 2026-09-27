@@ -7534,3 +7534,36 @@ REMEDY (owed, deliberately NOT worked here - the meta-lane freeze says a new gov
 until BUG-571 closes and a product artifact is built): the ladder's own reader REFUSES a duplicated declaring line
 (one line, one home, exactly once - BUG-582 is the zero case, this is the twice case), with the pinned duplicates
 as known-answer controls, both directions, and a mutation that REDs it.
+
+## BUG-563 (FIXED, MED): `backups/**` and the rail-output stores were neither GRANTED by the plan nor IGNORED by git (D-2684)
+- **MEASURED before the fix (2026-09-27, `git status --porcelain -z -uall`)**: **124 dirty paths, and exactly ONE
+  of them was granted** (`governance/RECONCILIATION.json`, entry 15). The other **123** sat in NO declared home:
+  112 `backups/**` PRE_* pre-images that C13/R-D410 OBLIGE a session to write, plus 11 in `governance/` (3
+  tracked-but-modified rail outputs, 8 untracked run artifacts/journals). No plan could commit them and git did
+  not ignore them, so **the tree could never be clean** and the evidence trail was unversioned BY ACCIDENT.
+- **shape**: the archive-census rule (`archive/index.yaml#excluded`, BUG-537/BUG-556) applied to the WORKTREE:
+  "an on-disk object is either INDEXED or DECLARED excluded, never silently absent". It fell between the two
+  existing rails: rail 4 audits the STAGED set, rail 0 audits git METADATA - the dirty worktree was nobody's
+  subject.
+- **FIX (D-2684)**: TWO HOMES, NO OVERLAP, ONE READER. (1) the GRANTING home is the plan's `may_touch` (rail 4
+  already owns "a session may write/commit this"; the new rail CONSUMES it and never restates it) - SEVEN NAMED
+  paths added (`.gitignore` + the six indexed rail-output stores, `governance/MUTATION_JOURNAL.jsonl` among them
+  because an append-only receipt ledger nobody can commit is not auditable); (2) the EXCLUDING home is
+  `config/repo_integrity.yaml#worktree.excluded` (three declarations, each with a `why`, enforced by the
+  `.gitignore` bytes); (3) the ONE reader is `scripts/check_repo_integrity.py --worktree`, wired into the ladder.
+- **THE RAIL CAUGHT ITS OWN PATCH (MEASURED, first run)**: the `.gitignore` lines I first wrote carried TRAILING
+  comments - and in `.gitignore` a trailing `#` is NOT a comment, so each line became a literal pattern that
+  matched nothing. The rail reported `declared-excluded 'backups/**' is NOT ignored by git (probe 'backups/x')`
+  and exited 1. That is the D-405 join firing on its author: the declaration is checked against GIT'S OWN answer
+  (`git check-ignore -q --no-index`), not against a belief about it. A SECOND measured defect fell out of the
+  same run: the shared `git()` helper STRIPS output, which ate the leading space of the status field
+  (" M .gitignore" -> path "gitignore"), so `dirty_entries()` now reads the records RAW (C16).
+- **TEETH (D-2676)**: (i) ONE HOME = `config/repo_integrity.yaml#worktree`; (ii) SEEN control = the ladder line
+  `check_repo_integrity.py --worktree || exit 1`; (iii) NAMED oracle = `--selftest` (6 worktree controls + the 15
+  existing, rc=0); (iv) MUTATION = `config/rail_mutations.yaml#worktree_undeclared_dirty_path_rule_is_load_bearing`
+  (floor 12 -> 13). VERDICT after: `ok repo-integrity worktree: 14 dirty path(s) - 14 granted by
+  governance/session_plan_20260924.yaml, 0 declared-excluded, 0 in neither home` rc=0.
+- **NOT claimed**: the rail is wired at the SCAN moment (`just health`), deliberately NOT into the pre-commit
+  hook - the hook's strictest gate would refuse a commit that carries a legitimately new artifact before the plan
+  entry can land, which is the BUG-528b sequencing defect. The hook widening is a declared follow-up, not a
+  silent gap.

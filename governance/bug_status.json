@@ -3,8 +3,8 @@
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
   "total_ids": 322,
-  "open_n": 136,
-  "closed_n": 186,
+  "open_n": 135,
+  "closed_n": 187,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -649,11 +649,6 @@
       "events": 1
     },
     {
-      "id": "BUG-563",
-      "title": "(MED - OPEN 2026-09-26): `backups/**` is neither GRANTED by the plan nor IGNORED by git",
-      "events": 1
-    },
-    {
       "id": "BUG-564",
       "title": "the COMMIT BOUNDARY was a claim; the pairing rail is now a PROPERTY (D-2669) - 2026-09-26",
       "events": 1
@@ -862,6 +857,7 @@
     "BUG-558",
     "BUG-561",
     "BUG-562",
+    "BUG-563",
     "BUG-565",
     "BUG-566",
     "BUG-567",

@@ -343,7 +343,7 @@ current_state:
 # copies deleted) and BUG-582 closed the PARTIAL D-2680 justfile landing (banner + collector --selftest were
 # declared in four prose homes and in no file). RE-MEASURE, never transcribe: this count is DERIVED by
 # scripts/bug_status.py.
-open_bugs_n: 135
+open_bugs_n: 136
 
 # 2026-09-26T (D-2662/BUG-554) - session trail (comments only: this file stays PARSEABLE).
 # THE CLASS, STATED ONCE: a declared field read by NO machine is a claim, not a control. MEASURED 2026-09-26:

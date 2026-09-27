@@ -833,3 +833,11 @@ sidecars; the Tier3 boundary corpus; F-14 (gated on G2).
 - MEASURED: diff = 5 `state:` lines, -4 bytes; stamp 11008e971cb25a52 -> 1d866228c74eb195; census re-derived same-invocation; `--check` rc 0.
 - REGISTER (unchanged by this change): OPEN 130 / CLOSED 198.
 - NEXT CONSEQUENTIAL: (1) mutation teeth for the two new controls (floor 28 -> 29) - D-2676 limb iv owed for this rule; (2) drain the last 3 HELD ids (BUG-569 -> BUG-568 -> BUG-559) so the freeze window's exit goes MET; (3) session_seed `registry: decisions: 639` is a dated SNAPSHOT key (higher than the census by 184) -> D-2691 rename treatment.
+
+## D-2694 (2026-09-27) - the standing rule pays its own debt: the canonicalisation licence is a MUTATION-SEEN rule (floor 28 -> 29)
+
+- DONE: config/rail_mutations.yaml gains `the_canonicalisation_licence_is_load_bearing` (subject: the `extra` clause of scripts/recompute_decision_summary.py#splice_problems; a single unique `find` line) and `coverage.min_mutations` 28 -> 29 (SHRINK-ONLY raised by decision, never by an edit).
+- MEASURED: gate rc 0 - 28 declared rule(s) SEEN to red, 1 negative control green, floor 29 == 29 declared, 18/13 declared subject(s) covered; gate selftest 19/19; the mutated runner's baseline is GREEN and it reds through exactly one of its 18 controls (MEASURED on the live tree before the entry was written).
+- REGISTER: OPEN 130 / CLOSED 198 (no bug filed by this change). Registry 824 -> 825 records, stamp 7e3d49ee7c5846aa, census source_sha256 325fd899e0e80994.
+- NEXT CONSEQUENTIAL: (1) drain the LAST 3 HELD ids - BUG-569 (the adoption NOTE has no rail-level control at a real partial commit) -> BUG-568 (RAIL 0 does not pin its own git subject) -> BUG-559 (a receipt cut over bytes joined to NO revision) - which is what takes the freeze window's exit to MET; (2) agent/session_seed.yaml `registry: decisions` dated-snapshot rename treatment (D-2691); (3) the declared home for the leak scan (owed since D-2686); (4) product lane: extraction_type is the one axis of five with no anchor, no verifier, no consumer.
+- OWNER WORDS OWED (recommendations recorded in the session report): CLOSE the freeze window ONLY after the drain; HOLD the standing-rule CONSTITUTION promotion (POINTER only); HOLD BUG-431.

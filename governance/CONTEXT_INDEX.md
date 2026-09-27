@@ -1351,3 +1351,9 @@ window (the drain now stands at 3 held, exit still UNMET); PROMOTE/HOLD the stan
 - WHERE THE CODE LIVES: scripts/recompute_decision_summary.py - `--canonicalise-states`, `canonicalise_plan()`, `splice_problems()`, `state_cell_problems()`.
 - SUPERSEDED: the registry stamp 11008e971cb25a52 and the five pin entries - read config/decisions_summary.json for the count and the bytes it describes (ONE home, D-2655).
 - HUMAN GATE REGISTER: CANONICALISE (BUG-583) is now SPENT - executed by the owner's word. Still open: CLOSE/RE-RE-RULE the freeze window (exit UNMET, 3 still parked); PROMOTE/HOLD the standing-rule CONSTITUTION promotion (POINTER only); PROMOTE/HOLD BUG-431.
+
+## D-2694 (2026-09-27) - the standing rule pays its own debt: the CANONICALISATION LICENCE is MUTATION-SEEN (floor 28 -> 29); SUPERSEDES every earlier statement of the mutation FLOOR in this index
+
+- `config/rail_mutations.yaml#coverage.min_mutations` is 29 (was 28 at D-2693); the new entry is `the_canonicalisation_licence_is_load_bearing` (subject: the `extra` clause of `scripts/recompute_decision_summary.py#splice_problems`), so the D-2693 route's licence - "no cell moved that the pin did not NAME" - can now be SEEN to fail.
+- The owed D-2676 limb (iv) for the D-2693 rule is PAID. Nothing else moved: register OPEN 130 / CLOSED 198; registry 824 -> 825 records, stamp 7e3d49ee7c5846aa, census source_sha256 325fd899e0e80994.
+- The mutation FLOOR is SHRINK-ONLY: any earlier "floor 28" in this index is a DATED MEASUREMENT, not a current value.

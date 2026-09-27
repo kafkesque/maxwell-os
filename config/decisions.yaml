@@ -10004,3 +10004,36 @@ decisions:
   - DECISION-LOG.md
   - governance/CONTEXT_INDEX.md
   - agent/session_seed.yaml
+- id: D-2694
+  date: '2026-09-27'
+  state: ACTIVE
+  category: governance
+  title: 'THE STANDING RULE PAYS ITS OWN DEBT: the CANONICALISATION LICENCE is a MUTATION-SEEN rule (floor 28 ->
+    29)'
+  decision: 'D-2676 says no rule lands without (iv) a MUTATION that REDs its oracle. D-2693 landed the in-place
+    canonicalisation route of BUG-583 and its LICENCE is one clause of scripts/recompute_decision_summary.py#splice_problems:
+    `extra` - the check that every moved `state:` cell was an id the PIN NAMED. That clause is what makes the route
+    a RULE instead of a licence to rewrite an append_only registry (D-2655), and it had no teeth. This change pays
+    the debt in the ONE home (config/rail_mutations.yaml): the entry `the_canonicalisation_licence_is_load_bearing`,
+    and the coverage FLOOR 28 -> 29. The floor is SHRINK-ONLY, so RAISING it is a decision with a diff a human reads
+    rather than an edit - which is exactly why the teeth owe a record of their own.'
+  measured: 'MEASURED 2026-09-27. PROBE on the LIVE tree BEFORE the entry was written: with `extra` neutered the
+    oracle returns rc 1 through EXACTLY ONE of its 18 controls (a_splice_that_moves_a_state_the_pin_never_named_is_a_named_fault_d_2655_bug_583)
+    while the ACCEPTING control - a pinned-cell-only splice is legitimate, which is what lets the pin shrink to
+    empty - stays green, so the differential isolates that read and is not a crash. Then the GATE on a real fixture:
+    28 declared rule(s) SEEN to red through their own control + 1 negative control green = 29 entries, floor 29
+    == 29 declared, 18/13 declared subject(s) covered, rc 0; gate selftest 19/19. The runner''s BASELINE stayed
+    green, so the red is caused by the mutation alone. REPAIRED in the same human-read diff: the floor LINE carried
+    its own comment TWICE (a copy artifact) - `FLOOR (shrink guard)` occurred 2 time(s) and now 1. A duplicated
+    COMMENT restates no value and can mislead no reader, so it is BLOAT rather than a defect and no block was filed
+    for it (C19); the declaration restated twice in a DIFF a human reads - the BUG-584 shape - is not what this
+    was.'
+  bugs:
+  - BUG-583
+  files:
+  - config/rail_mutations.yaml
+  - config/decisions.yaml
+  - config/decisions_summary.json
+  - MASTER-TASK-REGISTER.md
+  - DECISION-LOG.md
+  - governance/CONTEXT_INDEX.md

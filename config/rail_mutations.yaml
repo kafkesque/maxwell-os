@@ -34,7 +34,7 @@ fixture:
   keep: false
   timeout_seconds: 600
 coverage:
-  min_mutations: 28            # FLOOR (shrink guard): deleting an entry means editing the floor in a diff a human reads            # FLOOR (shrink guard): deleting an entry means editing the floor in a diff a human reads
+  min_mutations: 29            # FLOOR (shrink guard): deleting an entry means editing the floor in a diff a human reads
   # D-2679: the coverage set is DERIVED, never restated. Which rails gate a COMMIT is one fact and it already has
   # ONE home (config/rail_registry.yaml#commit_boundary), so restating it here would be a SECOND HOME - and two
   # lists of one fact drift, and only one of them can be right. scripts/check_rail_mutations.py joins the two and
@@ -554,3 +554,27 @@ mutations:
       BUG-583: an undeclared second spelling of a state is a NAMED fault, so a NEW one may never land silently; with the pin
       lookup neutered that control stops firing while the stale-pin control (a pin that describes nothing) keeps passing, so
       the differential is real and the marker is the control's own name - DERIVED from it, never transcribed.
+
+  # BUG-583 (D-2693, CANONICALISE) - the debt is paid by a DECLARED ROUTE, and the clause that makes the route a
+  # RULE rather than a LICENCE is `extra` in scripts/recompute_decision_summary.py#splice_problems: the check that
+  # every moved `state:` cell was an id the pin NAMED. An in-place route that can move a cell nobody pinned is a
+  # licence to rewrite an append_only registry (D-2655), which is the whole reason the pin still exists at all.
+  # With that read neutered the named fault stops firing while the control that ACCEPTS a pinned-cell-only splice
+  # keeps passing - and that acceptance is what lets the pin shrink to empty - so the differential is real and the
+  # marker is the control's own name, DERIVED from it and never transcribed (D-2676 iv, MEASURED 1 of 18 red).
+  - id: the_canonicalisation_licence_is_load_bearing
+    subject: scripts/recompute_decision_summary.py
+    op: replace
+    find: '    extra = [i for i in moved if i not in pin]'
+    replace: '    extra = []  # MUTATION (D-2676): an unpinned moved cell stops being read'
+    runner: scripts/recompute_decision_summary.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: '  FAIL selftest/a_splice_that_moves_a_state_the_pin_never_named_is_a_named_fault_d_2655_bug_583'
+    why: >-
+      D-2693/BUG-583: the route EARNS its exception from an append_only artifact by proving, BEFORE a byte moves,
+      that it touched only cells the pin named and that the registry re-derives canonical EVERYWHERE afterwards.
+      With the `extra` read neutered, splice_problems() returns [] for a registry whose unpinned record moved a
+      state; the fault that NAMES that move stops firing while the accepting control still passes, so the red is
+      the read failing and not a crash (D-2676 iv).

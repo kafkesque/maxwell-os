@@ -10,8 +10,9 @@ depth-corrected artifact, which was joined from maxwell.db).
 Golden eligibility (deterministic, no LLM):
   * depth_golden_eligible      = depth_source in {canonical_adjudicated, owner_finalized}
                                  (excludes the 58 lower-provenance 'mapped' extras + R021 noise_drop)
-  * discipline_golden_eligible = discipline != 'emerging'
-                                 (excludes the 3 owner-confirmed 'emerging' catchall rows)
+  * discipline_golden_eligible = discipline != 'emerging' and not noise_drop
+                                 (excludes the 4 'emerging' catchall rows R040/R053/R080/R091
+                                  + the noise_drop row R021)
 
 Rationale (senior RAG engineer): 'emerging' is an abstention/catch-all bucket, not a
 positive exemplar — it teaches no boundary and pulls few-shot classifiers toward the
@@ -100,8 +101,20 @@ def main() -> int:
             dstatus = "owner_finalized"
             dsource = "owner_finalized"
 
-        is_noise = d["depth_label"] == "noise_drop"
+        # Noise detection must survive the R021 resolution (D-2813): the sentinel moved
+        # from depth_label="noise_drop" to depth_source="owner_finalized_noise_drop"
+        # (depth_label is now null). Check BOTH forms so the chain stays reproducible.
+        is_noise = (
+            d["depth_label"] == "noise_drop"
+            or "noise_drop" in str(d.get("depth_source", ""))
+        )
         is_emerging = discipline == "emerging"
+        if is_noise:
+            # A noise-dispositioned row carries no discipline label on any axis (D-2813):
+            # null it out so the consolidated artifact never emits a false canonical label.
+            discipline = None
+            dstatus = "noise_drop"
+            dsource = "noise_drop"
         out_rows.append({
             "item_id": iid,
             "name": _norm_name(d["name"]),
@@ -134,7 +147,7 @@ def main() -> int:
         "pipeline_commit": _commit(),
         "golden_eligibility": {
             "depth_golden_eligible": "depth_source in {canonical_adjudicated, owner_finalized} (149 human-provenanced rows; excludes 58 mapped + R021 noise_drop)",
-            "discipline_golden_eligible": "discipline != 'emerging' (excludes 3 owner-confirmed catchall rows R040/R080/R091)",
+            "discipline_golden_eligible": "discipline != 'emerging' and not noise_drop (excludes 4 catchall rows R040/R053/R080/R091 + R021 noise_drop)",
         },
         "name_note": "full names joined from maxwell.db via depth artifact; 208-view `name` column was truncated to 45 chars and R039 carried a non-breaking space (normalized).",
     }

@@ -2,6 +2,40 @@ version: '1.0'
 ratified: '2026-07-26'
 decisions:
 
+- id: D-2813
+  state: RESOLVED
+  category: GOVERNANCE / ANCHOR INTEGRITY
+  title: R021 noise clearing + 4 emerging-declared + deterministic split-manifest regeneration (46 golden / 162 eval)
+  decision: >
+    Group 1 — R021 (content_type=noise_drop): depth and discipline do NOT apply. Cleared to empty on
+    all five axes (both five-axis views, DEPTH_CORRECTED depth_label, CONSOLIDATED depth+discipline,
+    DISCIPLINE_NORMALIZED discipline). Noise is a disposition, not a depth/discipline class; the closed
+    menu stays clean. Group 2 — R040/R053/R080/R091: DECLARED 'emerging' (owner abstention). NOT assigned
+    disciplines now (the generator must never synthesize a golden label for an owner-abstained row); excluded
+    from the golden pool; tracked as a declared gap pending future owner+verifier adjudication. Golden-eligible
+    anchors = 203 (the earlier 204 was wrong: R053 is a 4th emerging row, universal depth, missed by the
+    prior tally). Fixed consolidate_anchor_208.py noise detection to survive the sentinel move (depth_label
+    'noise_drop' -> depth_source 'owner_finalized_noise_drop') so the consolidation chain is reproducible.
+    Built scripts/build_split_manifest.py: deterministic (no RNG) 46-golden / 162-eval split from the 203
+    golden pool — depth-proportional largest-remainder with a forced universal minority floor, then global
+    rarest-discipline-first coverage (45/51 disciplines covered; the 6 uncovered are the highest-frequency
+    labels where the frozen prior is strongest and zero-shot is most reliable). Manifest ids_sha256 canonical
+    form is now documented (BUG-603). Rails green: verify_split_manifest (disjoint 46/162/208) +
+    check_anchor_axis_consistency (ceiling 0) + apply_anchor_axis_authority --selftest.
+  bugs: [BUG-603]
+  files:
+  - scripts/build_split_manifest.py
+  - scripts/consolidate_anchor_208.py
+  - config/eval_integrity.yaml
+  - config/anchor_axis_authority.yaml
+  - governance/frontier_audit/split_manifest.json
+  - governance/ANCHOR_208_CONSOLIDATED_20261002.json
+  - governance/ANCHOR_208_DEPTH_CORRECTED_20261002.json
+  - governance/ANCHOR_208_DISCIPLINE_NORMALIZED_20261002.json
+  - governance/ANCHOR_208_FIVE_AXIS_VIEW_20260930.csv
+  - governance/ANCHOR_150_FIVE_AXIS_VIEW_20260927.csv
+  created: '2026-10-03'
+
 - id: D-2812
   state: RESOLVED
   category: GOVERNANCE / ANCHOR INTEGRITY

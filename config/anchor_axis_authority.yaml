@@ -73,21 +73,10 @@ propagation:
 
 # Declared known drift (owner-owed). Ceiling is SHRINK-ONLY: a declared cell that starts
 # agreeing must be REMOVED (the rail exits 2 on it), never left to hide a completed fix.
-declared_drift:
-# RESIDUAL 2 of 149. D-2812 propagated the other 147 (2026-10-03). R021 is the owner's
-# noise_drop row: the depth AUTHORITY carries the sentinel `noise_drop` in its depth_label
-# column, which is NOT a depth class - the propagator REFUSES to write it into a view
-# (C12d/C16), so the view keeps its historical label and the cell stays declared.
-  - axis: depth
-    item_id: R021
-    consumer_file: governance/ANCHOR_208_FIVE_AXIS_VIEW_20260930.csv
-    authority_value: "noise_drop"
-    consumer_value: "specialized"
-    why: RESIDUAL (D-2812/BUG-628) - authority carries a provenance sentinel, not a depth class; R021 is owner-dropped (excluded from the gold set)
-  - axis: depth
-    item_id: R021
-    consumer_file: governance/ANCHOR_150_FIVE_AXIS_VIEW_20260927.csv
-    authority_value: "noise_drop"
-    consumer_value: "specialized"
-    why: RESIDUAL (D-2812/BUG-628) - authority carries a provenance sentinel, not a depth class; R021 is owner-dropped (excluded from the gold set)
-declared_drift_ceiling: 2
+declared_drift: []
+# R021 RESOLVED 2026-10-03 (owner): content_type=noise_drop -> depth and discipline do NOT apply.
+# Depth + discipline cleared to empty in both views; R021 depth_label cleared in DEPTH_CORRECTED
+# and CONSOLIDATED (aligned with depth_anchor_conformance's 207-row exclusion). Ceiling 2 -> 0.
+# The 4 emerging-discipline rows (R040/R053/R080/R091) are DECLARED emerging: excluded from the
+# golden pool, pending future owner+verifier adjudication (D-2795). Never a synthesized golden label.
+declared_drift_ceiling: 0

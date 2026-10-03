@@ -26,6 +26,74 @@ anchor:
   overlap_shingle_chars: 40
   overlap_shingle_share: 0.4
 
+# S4 golden/eval split (D-2733, OG-1 = OPTION A): the sha256-pinned manifest whose disjointness
+# scripts/verify_split_manifest.py enforces fail-closed (a golden id re-entering eval is leakage).
+split_manifest:
+  file: governance/frontier_audit/split_manifest.json
+  # D-2813: the manifest is REGENERATED deterministically (scripts/build_split_manifest.py)
+  # from the consolidated anchor artifact, not hand-maintained. Config-first: nothing here
+  # is hardcoded into the builder.
+  source: governance/ANCHOR_208_CONSOLIDATED_20261002.json
+  golden_pool_count: 46
+  eval_count: 162
+  total_anchors: 208
+  # Depth-proportional allocation (largest remainder) with a forced minority floor so the
+  # single universal-depth golden anchor is ALWAYS a few-shot exemplar (F-10: universal was
+  # nearly empty). Within each depth stratum, rarest-discipline-first maximizes label coverage.
+  minority_depth_floor: {universal: 1}
+  depth_order: [universal, cross-domain, domain, specialized]
+  stratification: "depth-proportional largest-remainder + universal minority floor; global rarest-discipline-first coverage-maximizing (one exemplar per distinct discipline, gated by depth seats; deterministic, no RNG)"
+
+# Canonical source-identity invariant (D2176 / BUG-289 / D-273e). The 20+ duplicate-book-source
+# defect was source_diversity counting FILENAMES, so the same work under two editions counted as
+# two distinct sources and inflated is_convergent (the S1.5 merge criterion). scripts/
+# verify_source_identity.py enforces fail-closed that (a) the canonicalization collapses edition
+# variants and (b) the metadata cache resolves author+title for every book so the filename-fallback
+# branch of compute_source_id() — which WOULD reintroduce filename divergence — is never live.
+source_identity:
+  metadata_cache_file: "knowledge pipeline/checkpoints/book_metadata.jsonl"
+  max_both_unknown_ratio: 0.0   # books with BOTH author and title unresolved -> filename-fallback path
+
+# READ-ONLY near-duplicate detector (scripts/detect_title_renames.py, D-2735). Surfaces
+# candidate pairs the canonical source_id normalization did NOT collapse. Never merges;
+# owner gates each candidate. Truly-different-title renames are the alias map, not this.
+title_dedup:
+  metadata_cache_file: "knowledge pipeline/checkpoints/book_metadata.jsonl"
+  shingle_k: 3
+  jaccard_threshold: 0.60
+  min_title_chars: 8
+  report_file: "governance/title_rename_candidates.json"
+
+# READ-ONLY full-text content dedup (scripts/detect_same_work_content.py, D-2737, Option B).
+# Sovereign (local-only, no network): same work under DIFFERENT titles detected by full-text
+# word-shingle resemblance + seeded MinHash + exact Jaccard. Never merges; owner gates.
+same_work_content:
+  metadata_cache_file: "knowledge pipeline/checkpoints/book_metadata.jsonl"
+  shingle_k: 5
+  num_hashes: 128
+  recall_threshold: 0.30
+  report_threshold: 0.50
+  max_shingles_per_doc: 100000
+  min_words: 200
+  seed: 20260930
+  report_file: "governance/same_work_content_candidates.json"
+
+# OWNER-GATE ledger (scripts/gate_duplicate_candidates.py + verify_duplicate_gate.py, D-2738).
+# Merges the two detector outputs into one owner-adjudication ledger. NEVER auto-merges:
+# every pair is PENDING until the owner sets MERGE (alias the duplicate) or KEEP_SEPARATE
+# (distinct work / series volume). MERGE applies POST-RUN (a source_id change repins the
+# live fingerprint b9e924d5). `apply_threshold` is the fail-closed floor: any pair at/above
+# it that is still PENDING blocks the apply step (verify_duplicate_gate.py --gate).
+duplicate_gate:
+  ledger_file: "governance/duplicate_adjudication.json"
+  title_candidates_file: "governance/title_rename_candidates.json"
+  content_candidates_file: "governance/same_work_content_candidates.json"
+  apply_threshold: 0.50
+  # Splink escalation (D-2739): DEFERRED. Escalate to probabilistic record linkage ONLY
+  # if, AFTER the BUG-604 extractor fix + re-resolution + re-run of BOTH detectors, at
+  # least this many genuine same-work pairs remain that exact Jaccard missed. Config-first.
+  splink_escalation_residual_threshold: 3
+
 # Minimum share of labels that must come from a HUMAN-authoritative source before the axis may be
 # used as ground truth for a MODEL comparison (retrain, classifier swap, ensemble choice).
 # A floor is a gate for the retrain, not a blocker for reading the axis.

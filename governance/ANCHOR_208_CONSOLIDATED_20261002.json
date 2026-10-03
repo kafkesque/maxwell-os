@@ -3,15 +3,15 @@
     "schema_version": "1.0",
     "gen_model": "none",
     "generated_by": "scripts/consolidate_anchor_208.py",
-    "generated_at": "2026-10-03T11:44:52.439344+00:00",
+    "generated_at": "2026-10-03T12:44:48.473153+00:00",
     "inputs": {
-      "depth": "governance/ANCHOR_208_DEPTH_CORRECTED_20261002.json (0948e940e90066b0)",
-      "discipline": "governance/ANCHOR_208_DISCIPLINE_NORMALIZED_20261002.json (73287063e5603726)"
+      "depth": "governance/ANCHOR_208_DEPTH_CORRECTED_20261002.json (0fb3e153c5e59799)",
+      "discipline": "governance/ANCHOR_208_DISCIPLINE_NORMALIZED_20261002.json (1e0a376f6546d106)"
     },
-    "pipeline_commit": "933aea9f375f",
+    "pipeline_commit": "168cec85353c",
     "golden_eligibility": {
       "depth_golden_eligible": "depth_source in {canonical_adjudicated, owner_finalized} (149 human-provenanced rows; excludes 58 mapped + R021 noise_drop)",
-      "discipline_golden_eligible": "discipline != 'emerging' (excludes 3 owner-confirmed catchall rows R040/R080/R091)"
+      "discipline_golden_eligible": "discipline != 'emerging' and not noise_drop (excludes 4 catchall rows R040/R053/R080/R091 + R021 noise_drop)"
     },
     "name_note": "full names joined from maxwell.db via depth artifact; 208-view `name` column was truncated to 45 chars and R039 carried a non-breaking space (normalized)."
   },
@@ -320,12 +320,12 @@
       "item_id": "R021",
       "name": "Index Section",
       "depth": null,
-      "depth_label": "noise_drop",
+      "depth_label": null,
       "depth_source": "owner_finalized_noise_drop",
       "depth_golden_eligible": false,
-      "discipline": "information science",
-      "discipline_status": "ok",
-      "discipline_source": "anchor_adjudication",
+      "discipline": null,
+      "discipline_status": "noise_drop",
+      "discipline_source": "noise_drop",
       "discipline_golden_eligible": false,
       "golden_eligible": false,
       "domain": "information architecture",

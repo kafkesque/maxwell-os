@@ -10,7 +10,7 @@
 ## 🔴 MUST — open (strategic-consequential order)
 
 > **CURRENT OPEN INDEX (machine-derived 2026-10-03 — the live face; dated history follows below).**
-> Register: 942 decisions · 367 bugs (133 open / 234 closed; highest OPEN = BUG-628). Forensic audit + preflight GREEN.
+> Register: 943 decisions · 367 bugs (133 open / 234 closed; highest OPEN = BUG-628). Forensic audit + preflight GREEN.
 >
 > **OWNER-GATED — the pipeline is blocked until these two are resolved (D-2727):**
 > 1. **RATIFY-2 — full S4→S5→S6 rerun.** Launch under `caffeinate -dimsu`; `python3 pipeline/runner.py --dry-run` then full. Preflight already PASS.

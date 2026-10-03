@@ -143,7 +143,7 @@
     "item_id": "R021",
     "name": "Index Section",
     "depth": null,
-    "depth_label": "noise_drop",
+    "depth_label": null,
     "depth_source": "owner_finalized_noise_drop"
   },
   {

@@ -300,7 +300,7 @@ current_state:
   - G4a
   - G13
   registry:
-    decisions: 941
+    decisions: 943
     highest_bug: BUG-628
     buglog_entries: 367
   do_not:

@@ -19,7 +19,7 @@ R017,Chemical Reaction Equation Automation,quarantine,OK,normative_heuristic,OK,
 R018,Color and Typography Readability,principle,OK,normative_heuristic,OK,visual perception,OK,2,OK,graphic design|brand identity|user experience|editorial & advertising,OK,graphic design
 R019,Scientific Research Evaluation Framework,process_template,OK,causal_mechanism,OK,research methodology,OK,3,OK,research & methodology,OK,research & methodology
 R020,Dynamic System Complexity,principle,OK,descriptive_model,OK,complex adaptive systems,OK,2,OK,systems & frameworks|business development,OK,systems & frameworks
-R021,Index Section,noise_drop,OK,,MISSING,information science,OK,4,OK,information architecture,OK,information architecture
+R021,Index Section,noise_drop,OK,,MISSING,,OK,,OK,information architecture,OK,information architecture
 R022,Coupon Code Feature Placement Strategy,principle,OK,causal_mechanism,OK,human-computer interaction,OK,4,OK,digital product,OK,digital product
 R023,Focused Action Selection,principle,OK,normative_heuristic,OK,strategic thinking,OK,2,OK,business development|personal productivity|project management|leadership,OK,business development
 R024,Execution Gap From Technological Readine,principle,OK,normative_heuristic,OK,finance,OK,2,OK,business operations|organizational behavior|business development|finance & investment,OK,business operations

@@ -3,13 +3,14 @@
     "schema_version": "1.0",
     "gen_model": "none",
     "generated_by": "scripts/normalize_anchor_discipline.py",
-    "generated_at": "2026-10-03T11:44:52.367295+00:00",
+    "generated_at": "2026-10-03T12:44:42.919527+00:00",
     "input": "governance/ANCHOR_208_FIVE_AXIS_VIEW_20260930.csv",
-    "input_sha256": "35983e4d7843b4a8",
+    "input_sha256": "e41cac1d9e421747",
     "menu": "config/closed_menu_v5.json",
-    "pipeline_commit": "933aea9f375f",
+    "pipeline_commit": "168cec85353c",
     "status_counts": {
-      "ok": 202,
+      "ok": 201,
+      "empty": 1,
       "emerging": 3,
       "domain_bleed": 1,
       "whitespace_fixed": 2

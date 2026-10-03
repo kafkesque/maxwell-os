@@ -1,0 +1,533 @@
+{
+  "schema_version": "2.0",
+  "generated_by": "D-2813 (scripts/build_split_manifest.py)",
+  "owner_gate": "OG-1",
+  "option": "A",
+  "policy": "disjoint split + machine-enforced manifest",
+  "leakage_guard": "D-337/D-300/D-345",
+  "total_anchors": 208,
+  "golden_pool_count": 46,
+  "eval_count": 162,
+  "golden_pool_source": "governance/ANCHOR_208_CONSOLIDATED_20261002.json",
+  "stratification": {
+    "method": "depth-proportional largest-remainder + universal minority floor; global rarest-discipline-first coverage-maximizing (one exemplar per distinct discipline, gated by depth seats; deterministic, no RNG)",
+    "depth_seats": {
+      "universal": 1,
+      "cross-domain": 13,
+      "domain": 21,
+      "specialized": 11
+    },
+    "minority_depth_floor": {
+      "universal": 1
+    }
+  },
+  "golden_pool_ids": [
+    "R001",
+    "R002",
+    "R004",
+    "R005",
+    "R006",
+    "R007",
+    "R008",
+    "R009",
+    "R011",
+    "R012",
+    "R013",
+    "R014",
+    "R017",
+    "R018",
+    "R020",
+    "R024",
+    "R028",
+    "R029",
+    "R032",
+    "R033",
+    "R034",
+    "R039",
+    "R041",
+    "R042",
+    "R045",
+    "R046",
+    "R049",
+    "R058",
+    "R063",
+    "R066",
+    "R067",
+    "R068",
+    "R073",
+    "R081",
+    "R084",
+    "R090",
+    "R116",
+    "R123",
+    "R124",
+    "R131",
+    "R145",
+    "R163",
+    "R172",
+    "R173",
+    "R182",
+    "R191"
+  ],
+  "eval_ids": [
+    "R003",
+    "R010",
+    "R015",
+    "R016",
+    "R019",
+    "R021",
+    "R022",
+    "R023",
+    "R025",
+    "R026",
+    "R027",
+    "R030",
+    "R031",
+    "R035",
+    "R036",
+    "R037",
+    "R038",
+    "R040",
+    "R043",
+    "R044",
+    "R047",
+    "R048",
+    "R050",
+    "R051",
+    "R052",
+    "R053",
+    "R054",
+    "R055",
+    "R056",
+    "R057",
+    "R059",
+    "R060",
+    "R061",
+    "R062",
+    "R064",
+    "R065",
+    "R069",
+    "R070",
+    "R071",
+    "R072",
+    "R074",
+    "R075",
+    "R076",
+    "R077",
+    "R078",
+    "R079",
+    "R080",
+    "R082",
+    "R083",
+    "R085",
+    "R086",
+    "R087",
+    "R088",
+    "R089",
+    "R091",
+    "R092",
+    "R093",
+    "R094",
+    "R095",
+    "R096",
+    "R097",
+    "R098",
+    "R099",
+    "R100",
+    "R101",
+    "R102",
+    "R103",
+    "R104",
+    "R105",
+    "R106",
+    "R107",
+    "R108",
+    "R109",
+    "R110",
+    "R111",
+    "R112",
+    "R113",
+    "R114",
+    "R115",
+    "R117",
+    "R118",
+    "R119",
+    "R120",
+    "R121",
+    "R122",
+    "R125",
+    "R126",
+    "R127",
+    "R128",
+    "R129",
+    "R130",
+    "R132",
+    "R133",
+    "R134",
+    "R135",
+    "R136",
+    "R137",
+    "R138",
+    "R139",
+    "R140",
+    "R141",
+    "R142",
+    "R143",
+    "R144",
+    "R146",
+    "R147",
+    "R148",
+    "R149",
+    "R150",
+    "R151",
+    "R152",
+    "R153",
+    "R154",
+    "R155",
+    "R156",
+    "R157",
+    "R158",
+    "R159",
+    "R160",
+    "R162",
+    "R164",
+    "R165",
+    "R166",
+    "R167",
+    "R168",
+    "R169",
+    "R170",
+    "R171",
+    "R174",
+    "R175",
+    "R176",
+    "R177",
+    "R178",
+    "R179",
+    "R180",
+    "R181",
+    "R183",
+    "R184",
+    "R185",
+    "R186",
+    "R187",
+    "R188",
+    "R189",
+    "R190",
+    "R192",
+    "R193",
+    "R195",
+    "R196",
+    "R197",
+    "R198",
+    "R199",
+    "R200",
+    "R201",
+    "R202",
+    "R203",
+    "R204",
+    "R205",
+    "R206",
+    "R207",
+    "R208",
+    "R209",
+    "R210"
+  ],
+  "coverage": {
+    "depth_seats": {
+      "universal": 1,
+      "cross-domain": 13,
+      "domain": 21,
+      "specialized": 11
+    },
+    "discipline_distinct_in_golden_pool": 51,
+    "discipline_distinct_in_exemplars": 45,
+    "uncovered_disciplines": [
+      "cognitive science",
+      "design thinking",
+      "organizational theory",
+      "psychology",
+      "research methodology",
+      "strategic thinking"
+    ],
+    "uncovered_depth_discipline_cells": [
+      {
+        "depth": "cross-domain",
+        "discipline": "behavioral economics",
+        "n_examples": 0
+      },
+      {
+        "depth": "cross-domain",
+        "discipline": "cognitive science",
+        "n_examples": 0
+      },
+      {
+        "depth": "cross-domain",
+        "discipline": "communication theory",
+        "n_examples": 0
+      },
+      {
+        "depth": "cross-domain",
+        "discipline": "cultural design",
+        "n_examples": 0
+      },
+      {
+        "depth": "cross-domain",
+        "discipline": "cultural studies",
+        "n_examples": 0
+      },
+      {
+        "depth": "cross-domain",
+        "discipline": "decision making",
+        "n_examples": 0
+      },
+      {
+        "depth": "cross-domain",
+        "discipline": "design thinking",
+        "n_examples": 0
+      },
+      {
+        "depth": "cross-domain",
+        "discipline": "generative design",
+        "n_examples": 0
+      },
+      {
+        "depth": "cross-domain",
+        "discipline": "human-computer interaction",
+        "n_examples": 0
+      },
+      {
+        "depth": "cross-domain",
+        "discipline": "information science",
+        "n_examples": 0
+      },
+      {
+        "depth": "cross-domain",
+        "discipline": "linguistics",
+        "n_examples": 0
+      },
+      {
+        "depth": "cross-domain",
+        "discipline": "organizational theory",
+        "n_examples": 0
+      },
+      {
+        "depth": "cross-domain",
+        "discipline": "psychology",
+        "n_examples": 0
+      },
+      {
+        "depth": "cross-domain",
+        "discipline": "research methodology",
+        "n_examples": 0
+      },
+      {
+        "depth": "cross-domain",
+        "discipline": "strategic thinking",
+        "n_examples": 0
+      },
+      {
+        "depth": "cross-domain",
+        "discipline": "typography",
+        "n_examples": 0
+      },
+      {
+        "depth": "domain",
+        "discipline": "cognitive science",
+        "n_examples": 0
+      },
+      {
+        "depth": "domain",
+        "discipline": "creative process",
+        "n_examples": 0
+      },
+      {
+        "depth": "domain",
+        "discipline": "design psychology",
+        "n_examples": 0
+      },
+      {
+        "depth": "domain",
+        "discipline": "design thinking",
+        "n_examples": 0
+      },
+      {
+        "depth": "domain",
+        "discipline": "finance",
+        "n_examples": 0
+      },
+      {
+        "depth": "domain",
+        "discipline": "linguistics",
+        "n_examples": 0
+      },
+      {
+        "depth": "domain",
+        "discipline": "media studies",
+        "n_examples": 0
+      },
+      {
+        "depth": "domain",
+        "discipline": "operations research",
+        "n_examples": 0
+      },
+      {
+        "depth": "domain",
+        "discipline": "organizational theory",
+        "n_examples": 0
+      },
+      {
+        "depth": "domain",
+        "discipline": "performing arts",
+        "n_examples": 0
+      },
+      {
+        "depth": "domain",
+        "discipline": "psychology",
+        "n_examples": 0
+      },
+      {
+        "depth": "domain",
+        "discipline": "research methodology",
+        "n_examples": 0
+      },
+      {
+        "depth": "domain",
+        "discipline": "semiotics",
+        "n_examples": 0
+      },
+      {
+        "depth": "domain",
+        "discipline": "sociology",
+        "n_examples": 0
+      },
+      {
+        "depth": "domain",
+        "discipline": "strategic thinking",
+        "n_examples": 0
+      },
+      {
+        "depth": "specialized",
+        "discipline": "cognitive science",
+        "n_examples": 0
+      },
+      {
+        "depth": "specialized",
+        "discipline": "cultural design",
+        "n_examples": 0
+      },
+      {
+        "depth": "specialized",
+        "discipline": "design psychology",
+        "n_examples": 0
+      },
+      {
+        "depth": "specialized",
+        "discipline": "design thinking",
+        "n_examples": 0
+      },
+      {
+        "depth": "specialized",
+        "discipline": "finance",
+        "n_examples": 0
+      },
+      {
+        "depth": "specialized",
+        "discipline": "generative ai",
+        "n_examples": 0
+      },
+      {
+        "depth": "specialized",
+        "discipline": "human-computer interaction",
+        "n_examples": 0
+      },
+      {
+        "depth": "specialized",
+        "discipline": "information retrieval",
+        "n_examples": 0
+      },
+      {
+        "depth": "specialized",
+        "discipline": "information science",
+        "n_examples": 0
+      },
+      {
+        "depth": "specialized",
+        "discipline": "operations research",
+        "n_examples": 0
+      },
+      {
+        "depth": "specialized",
+        "discipline": "political economy",
+        "n_examples": 0
+      },
+      {
+        "depth": "specialized",
+        "discipline": "privacy & surveillance",
+        "n_examples": 0
+      },
+      {
+        "depth": "specialized",
+        "discipline": "psychology",
+        "n_examples": 0
+      },
+      {
+        "depth": "specialized",
+        "discipline": "research methodology",
+        "n_examples": 0
+      },
+      {
+        "depth": "specialized",
+        "discipline": "strategic thinking",
+        "n_examples": 0
+      },
+      {
+        "depth": "specialized",
+        "discipline": "typography",
+        "n_examples": 0
+      },
+      {
+        "depth": "specialized",
+        "discipline": "visual semiotics",
+        "n_examples": 0
+      }
+    ]
+  },
+  "non_golden_declared": [
+    {
+      "item_id": "R021",
+      "reason": "noise_drop",
+      "depth": null,
+      "discipline": null
+    },
+    {
+      "item_id": "R040",
+      "reason": "emerging",
+      "depth": "domain",
+      "discipline": "emerging"
+    },
+    {
+      "item_id": "R053",
+      "reason": "emerging",
+      "depth": "universal",
+      "discipline": "emerging"
+    },
+    {
+      "item_id": "R080",
+      "reason": "emerging",
+      "depth": "domain",
+      "discipline": "emerging"
+    },
+    {
+      "item_id": "R091",
+      "reason": "emerging",
+      "depth": "domain",
+      "discipline": "emerging"
+    }
+  ],
+  "ids_sha256": "b6ec66e62f7bf83e14bad2eba287736d384c5c216874f27e06421b5048bc9f18",
+  "ids_sha256_canonical_form": "sha256(\\n.join(sorted(golden_pool_ids)))",
+  "rail": "sha256-pinned: a check MUST fail if any golden_pool id re-enters eval (208->162 invariant)",
+  "bootstrap": "cross-model vote >=2/3 (D2362); POST-rerun; owner adjudicates disagreements only",
+  "generated_at": "2026-10-03T12:46:53.962290+00:00"
+}

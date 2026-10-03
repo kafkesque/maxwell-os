@@ -195,8 +195,13 @@ for i, cluster in enumerate(clusters, 1):
             'is_summary': principle.get('is_summary', False),
             'extraction_type': principle.get('extraction_type', ''),  # D2376: absent → "" (no over-claim)
             'content_type': principle.get('content_type', 'principle'),
-            'evidence_passages': evidence_passages if isinstance(evidence_passages, list) else json.loads(evidence_passages) if isinstance(evidence_passages, str) else [],
-            'evidence_passages_shown': principle.get('evidence_passages', []),
+            # BUG-596 (D-2721): align with production stage2_extract._build_fb_from_result.
+            # evidence_passages (STORED) = LLM self-reported evidence (fallback shown[:5]);
+            # evidence_passages_shown (SHOWN) = cluster passages actually passed to the LLM.
+            # The two MAY differ (model may reorder/truncate); storing both keeps the
+            # shown-vs-stored provenance verifiable downstream (golden_validate check #4b).
+            'evidence_passages': principle.get('evidence_passages', evidence_passages[:5]),
+            'evidence_passages_shown': evidence_passages if isinstance(evidence_passages, list) else json.loads(evidence_passages) if isinstance(evidence_passages, str) else [],
             'route': route,
             'source_cluster': cid,
             'source_books': cluster.get('source_books', []),

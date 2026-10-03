@@ -27,6 +27,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from pipeline.io_guard import safe_write, safe_write_jsonl  # D2487: atomic writes
+from pipeline.pipeline_paths import get_run_id  # BUG-597: no hardcoded "latest" run-id
 
 
 def load_clusters(checkpoint: Path) -> list[dict]:
@@ -286,8 +287,8 @@ def main() -> None:
 
     # Paths
     project_root = Path(__file__).resolve().parent.parent
-    s15_checkpoint = project_root / "knowledge pipeline" / "stage1_5_embed_cluster" / "latest" / "checkpoint.jsonl"
-    s1_checkpoint = project_root / "knowledge pipeline" / "stage1_chunk" / "latest" / "checkpoint.jsonl"
+    s15_checkpoint = project_root / "knowledge pipeline" / "stage1_5_embed_cluster" / get_run_id() / "checkpoint.jsonl"
+    s1_checkpoint = project_root / "knowledge pipeline" / "stage1_chunk" / get_run_id() / "checkpoint.jsonl"
     output_dir = Path(args.output)
     if not output_dir.is_absolute():
         output_dir = project_root / output_dir

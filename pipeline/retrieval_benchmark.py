@@ -158,6 +158,13 @@ def _run_method(conn, name: str, query: str, expected: list[str],
         fts = search_fts(conn, query, limit=pool)
         vec = search_vector(conn, query, limit=pool, vec_table="vec_fbs_ctx")
         got = _ids(_rrf_fuse([fts, vec]))
+    elif name == "vector+rerank":
+        # D-2723: rerank over the PURE VECTOR pool (no RRF fusion). Forensic gap:
+        # hybrid-RRF recall (0.833) < vector (0.900) — RRF fusion is recall-negative.
+        # This leg isolates whether rerank on the un-fused vector pool recovers the
+        # best of both: vector recall + cross-encoder MRR.
+        candidates = search_vector(conn, query, limit=pool)
+        got = _ids(_rerank(conn, query, candidates, top_k=k))
     elif name == "hybrid+rerank":
         # rerank=False → raw pool; explicit _rerank pass (S2 A/B control).
         candidates = search_hybrid(conn, query, limit=pool, rerank=False)
@@ -206,6 +213,7 @@ def main() -> int:
         methods.append("hybrid-ctx")
     if args.rerank:
         methods.append("hybrid+rerank")
+        methods.append("vector+rerank")
     if args.hyde:
         methods.append("hyde")
         methods.append("hybrid+hyde")

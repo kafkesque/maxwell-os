@@ -34,6 +34,7 @@ OMLX_BIN = os.environ.get("OMLX_BIN", "/Applications/oMLX.app/Contents/MacOS/oml
 OMLX_PORT = int(os.environ.get("OMLX_PORT", "11435"))
 RSS_THRESHOLD_GB = float(os.environ.get("OMLX_WATCHDOG_RSS_GB", "20.0"))  # D2115: 20GB for 35B model
 RSS_TREND_THRESHOLD_GB = float(os.environ.get("OMLX_WATCHDOG_TREND_GB", "2.0"))  # BUG-017: restart if grew >2GB
+RSS_TREND_MIN_GB = float(os.environ.get("OMLX_WATCHDOG_TREND_MIN_GB", "10.0"))  # BUG-608: only trend-fire above this RSS (skip the 0→8.6GB model-load spike)
 RESTART_WAIT_SECS = int(os.environ.get("OMLX_WATCHDOG_RESTART_WAIT", "30"))
 LOG_FILE = Path(os.environ.get("OMLX_WATCHDOG_LOG", "pipeline/omlx_watchdog.log"))
 STATE_FILE = Path(os.environ.get("OMLX_WATCHDOG_STATE", "pipeline/.omlx_watchdog_state.json"))
@@ -168,9 +169,9 @@ def check_and_restart() -> int:
     reason = ""
 
     # BUG-017: Trend detection — catch progressive memory leak
-    if rss_delta > RSS_TREND_THRESHOLD_GB:
+    if rss_delta > RSS_TREND_THRESHOLD_GB and rss_gb > RSS_TREND_MIN_GB:
         should_restart = True
-        reason = f"RSS grew {rss_delta:.1f}GB since last check (trend threshold {RSS_TREND_THRESHOLD_GB}GB)"
+        reason = f"RSS grew {rss_delta:.1f}GB since last check (trend threshold {RSS_TREND_THRESHOLD_GB}GB, min {RSS_TREND_MIN_GB}GB)"
     # Absolute threshold
     elif rss_gb > RSS_THRESHOLD_GB:
         should_restart = True

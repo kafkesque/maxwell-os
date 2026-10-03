@@ -43,6 +43,8 @@ from pipeline.pipeline_paths import (
     PARQUET_DIR,
     S15_EMBED_DIM,
     S6_MAX_FAILED_RATIO,  # D2338: fail-closed commit tolerance
+    S6_VEC_REQUIRE,  # D-2717: fail-closed vec0 gate (C16)
+
     STAGE5_CHECKPOINT,
     STAGE5_HUMAN_REVIEW,
     STAGE6_CHECKPOINT,
@@ -201,6 +203,7 @@ def init_db(db_path: Path) -> sqlite3.Connection:
     # BUG-104: distinguish ImportError (package missing) from AttributeError
     # (load_extension unavailable on python.org framework builds) — the broad
     # `except (ImportError, Exception)` masked the real remediation.
+    _vec_loaded = False  # D-2717: tracks vec0 load success for the fail-closed gate
     try:
         import sqlite_vec
     except ImportError:
@@ -212,6 +215,7 @@ def init_db(db_path: Path) -> sqlite3.Connection:
             conn.enable_load_extension(True)
             sqlite_vec.load(conn)
             conn.enable_load_extension(False)
+            _vec_loaded = True  # D-2717: vec0 load succeeded
         except AttributeError as e:
             print(f"  ⚠️  sqlite-vec installed but load_extension unavailable: {e}")
             print("     This Python build lacks enable_load_extension (python.org framework build).")
@@ -221,6 +225,13 @@ def init_db(db_path: Path) -> sqlite3.Connection:
             print(f"  ⚠️  sqlite-vec failed to load: {e}")
             print("     Vector search unavailable; FTS retrieval still works.")
 
+    if S6_VEC_REQUIRE and not _vec_loaded:
+        raise RuntimeError(
+            "stage6.vec_require=true but sqlite-vec/vec0 failed to load. "
+            "Run this stage under a vec0-capable Python (see stage6.vec_python; "
+            "Homebrew 3.14.6 verified) or set stage6.vec_require=false to accept "
+            "FTS-only (non-gating, D2185)."
+        )
     conn.execute(CREATE_FBS_TABLE)
     # BUG-004 FIX: Create vector embedding table (may fail if sqlite-vec not loaded)
     try:

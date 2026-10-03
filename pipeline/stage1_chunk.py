@@ -266,6 +266,11 @@ def run_stage1(chunk_size: int = CHUNK_SIZE_WORDS,
             }
             seg = stamp_record(seg, gen_model="python")
             seg["pipeline_commit"] = pipeline_commit
+            # parent_id: additive structural provenance (D-2709/D-2712). Pure
+            # function of (section_heading, source_book) so segments in the same
+            # section share a parent; empty heading -> book-root parent. Does NOT
+            # affect segment_id or SHA-256 dedup (segment_id stays sha256(text)).
+            seg["parent_id"] = make_hash_id(heading, book_name)
             all_segments.append(seg)
             book_segments += 1
 

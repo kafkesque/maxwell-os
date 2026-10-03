@@ -8,7 +8,7 @@ import json
 import time
 
 # D2175: Use DATA_DIR from pipeline_paths — no hardcoded paths (C12a)
-from pipeline.pipeline_paths import DATA_DIR
+from pipeline.pipeline_paths import DATA_DIR, get_run_id
 
 METRICS_PATH = DATA_DIR / "metrics.jsonl"
 
@@ -16,9 +16,9 @@ METRICS_PATH = DATA_DIR / "metrics.jsonl"
 class StageTimer:
     """Context manager for timing pipeline stages. Writes to metrics.jsonl."""
 
-    def __init__(self, stage: str, run_id: str = "latest", metadata: dict | None = None):
+    def __init__(self, stage: str, run_id: str | None = None, metadata: dict | None = None):
         self.stage = stage
-        self.run_id = run_id
+        self.run_id = run_id if run_id is not None else get_run_id()
         self.metadata = metadata or {}
         self.start_time: float = 0
         self.end_time: float = 0
@@ -56,8 +56,10 @@ def log_metric(stage: str, **kwargs) -> None:
         f.write(json.dumps(record) + "\n")
 
 
-def read_metrics(run_id: str = "latest") -> list[dict]:
+def read_metrics(run_id: str | None = None) -> list[dict]:
     """Read all metrics for a run. Returns list of records."""
+    if run_id is None:
+        run_id = get_run_id()
     if not METRICS_PATH.exists():
         return []
     records = []

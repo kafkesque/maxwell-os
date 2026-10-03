@@ -68,6 +68,7 @@ from pipeline.pipeline_paths import (
     S2_GOLDEN_SINGLE_SOURCE_PATH,
     S2_SINGLETON_BATCH_SIZE,                 # D2xxx: batched singleton extraction
     S2_SINGLETON_BATCH_MAX_TOKENS_PER_ITEM,  # D2xxx: per-item output budget in a batch call
+    S2_ACCEPT_CONDITIONAL,                   # BUG-609: allow S4 advance when failures are within tolerance
     S2_MAX_CLUSTER_SAMPLES,
     S2_MAX_FAILED_RATIO,   # D2331: fail-closed cluster-extraction tolerance
     S2_MAX_PROBE_PER_BOOK,  # D2357: per-book probe sample cap (was literal MAX_PER_BOOK=2)
@@ -2246,6 +2247,13 @@ def run_stage2(
     failed_clusters: int = 0  # D2331: terminal LLM failures (silent-skip audit)
     pipeline_commit: str = get_pipeline_commit()
 
+    # BUG-610: capture the FULL corpus target count BEFORE the resume filter shrinks
+    # target_clusters. The D2331 fail-closed ratio MUST be failed/total-corpus, NOT
+    # failed/remaining-subset — otherwise a resume with only 5 remaining clusters turns
+    # 2-3 deterministic schema failures into 60-67% and hard-fails (exit 1) instead of
+    # advancing within max_failed_ratio tolerance.
+    total_corpus_targets: int = len(target_clusters)
+
     # Resume support
     processed_ids: set[str] = set()
     gated_ids: set[str] = set()  # D2421: cluster IDs gated by is_summary (reprocessable)
@@ -2775,18 +2783,26 @@ def run_stage2(
     # cluster — previously this wrote a "successful" checkpoint with missing FBs.
     # Now we count terminal failures and refuse to advance silently.
     total_attempted: int = len(target_clusters)
-    print(f"❌ Failed clusters:     {failed_clusters}/{total_attempted}")
-    if total_attempted > 0:
-        failure_ratio: float = failed_clusters / total_attempted
+    print(f"❌ Failed clusters:     {failed_clusters}/{total_corpus_targets} "
+          f"(this run attempted {total_attempted})")
+    if total_corpus_targets > 0:
+        failure_ratio: float = failed_clusters / total_corpus_targets
         if failure_ratio > S2_MAX_FAILED_RATIO:
-            print(f"❌ Stage 2 FAILED: {failed_clusters}/{total_attempted} clusters failed extraction "
+            print(f"❌ Stage 2 FAILED: {failed_clusters}/{total_corpus_targets} clusters failed extraction "
                   f"({failure_ratio:.1%} > max_failed_ratio={S2_MAX_FAILED_RATIO}). "
                   f"Missing clusters = missing FBs — do NOT advance to S4.")
             sys.exit(1)
         if failed_clusters > 0:
             print(f"⚠️  Stage 2 CONDITIONAL_SUCCESS: {failed_clusters} cluster(s) failed within "
-                  f"tolerance ({failure_ratio:.1%} ≤ {S2_MAX_FAILED_RATIO}). Re-run to retry failed "
-                  f"clusters before advancing to S4.")
+                  f"tolerance ({failure_ratio:.1%} ≤ {S2_MAX_FAILED_RATIO}).")
+            if S2_ACCEPT_CONDITIONAL:
+                # BUG-609: at temp=0.0 a schema-invalid result is DETERMINISTIC — re-running can never
+                # clear it, so "re-run to retry" loops forever. When the operator accepts within-tolerance
+                # failures, advance to S4 (drop the failed clusters; they are < max_failed_ratio by definition).
+                print(f"   ✅ stage2.accept_conditional_within_tolerance=true — advancing to S4 "
+                      f"({failed_clusters} cluster(s) dropped, all within {S2_MAX_FAILED_RATIO:.1%}).")
+                sys.exit(0)
+            print("   Re-run to retry failed clusters before advancing to S4.")
             sys.exit(2)  # non-zero → runner does NOT auto-advance to S4
 
 

@@ -131,9 +131,33 @@ def validate(path: str) -> int:
                         f"NON_VERBATIM: {eid} [{fb_name}] evidence: {epn[:80]}"
                     )
 
-    # 5. Author/source diversity
+    # 4b. Shown-vs-stored provenance (BUG-596): if an FB records evidence_passages_shown,
+    # every stored evidence passage must be a verbatim substring of the SHOWN passages,
+    # so a downstream consumer can trust that stored evidence was actually shown to the LLM.
     for ex in examples:
-        if not ex.get("should_extract"):
+        eid = ex.get("id", "?")
+        ef = ex.get("expected_fb", {})
+        fbs = ef if isinstance(ef, list) else [ef]
+        for fb in fbs:
+            if not isinstance(fb, dict):
+                continue
+            shown = fb.get("evidence_passages_shown")
+            if not shown:
+                continue
+            shown_norm = [norm(s) for s in shown if isinstance(s, str)]
+            shown_norm = [s for s in shown_norm if s and len(s) > 5]
+            for ep in fb.get("evidence_passages", []):
+                epn = norm(ep)
+                if not epn or len(epn) < 5:
+                    continue
+                if not any(epn.lower() in s.lower() for s in shown_norm):
+                    failures.append(
+                        f"NON_VERBATIM_SHOWN: {eid} [{fb.get('name','?')}] evidence not in evidence_passages_shown: {epn[:80]}"
+                    )
+
+    # 5. Author/source diversity (convergent examples only; single-source is by design)
+    for ex in examples:
+        if not ex.get("should_extract") or not ex.get("is_convergent", True):
             continue
         eid = ex.get("id", "?")
         books = [cs.get("source_book", "") for cs in ex.get("cluster_segments", [])]

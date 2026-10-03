@@ -84,6 +84,59 @@ Return ONLY a JSON object:
   "evidence": "cited|axiomatic"
 }"""
 
+
+# ── D-2773 (2026-10-02): config-driven CLOSED discipline menu (BUG-622 fix, MEASURE-gated). ──
+# Forensic root-cause (D-2773): the merged S4 prompt had NO closed 62-discipline choice set;
+# it instructed "SINGLE most precise academic discipline" with "computational neuroscience >
+# neuroscience" (maximal specificity), so the model FREE-GENERATED off-menu names that
+# map_to_canonical_with_fallback then remapped to 'emerging' (~27%) or a WRONG synonym
+# (psychology/neuroscience, information-science/computer-graphics, economics/privacy&surveillance,
+# AI/information-retrieval). Depth already solves this exact problem via a config-driven
+# few-shot injection; this adds the discipline equivalent. GATED OFF by default (D-2767):
+# adopt only if a full-204 A/B shows Cohen's kappa >= 0.800.
+def _render_discipline_closed_menu() -> str:
+    """Render the closed discipline choice set + contrastive exemplars (config-driven).
+
+    Returns "" when the injection is disabled (D-2773 default) so prompts stay
+    byte-identical to the pre-fix baseline. Fail-closed (C16): enabled + empty
+    taxonomy menu or malformed negative-exemplars -> raise, never silently degrade.
+    """
+    from pipeline.pipeline_paths import (S4_DISCIPLINE_CLOSED_MENU_ENABLED,
+                                         S4_DISCIPLINE_NEGATIVE_EXEMPLARS_PATH)
+    if not S4_DISCIPLINE_CLOSED_MENU_ENABLED:
+        return ""
+    from pathlib import Path
+
+    import yaml
+    from pipeline.schemas import CANONICAL_DISCIPLINES
+    real = [d for d in CANONICAL_DISCIPLINES if d != "emerging"]
+    if not real:
+        raise RuntimeError("D-2773: discipline closed menu empty (taxonomy_v5.yaml has no disciplines)")
+    menu = "\n".join(f"- {d}" for d in real)
+    block = (
+        "DISCIPLINE CLOSED MENU (D-2773, config-driven):\n"
+        "`discipline` MUST be chosen from EXACTLY this list — one label, verbatim:\n"
+        + menu
+        + "\n- emerging  (fallback ONLY if none of the above is even approximately right)"
+        "\n\nChoose EXACTLY ONE label from the list above, verbatim. Do NOT invent a new\n"
+        "discipline name, do NOT emit a more-specific or hyphenated variant, and do NOT\n"
+        "merge two labels. If no listed label fits, output exactly `emerging`."
+    )
+    ex_path = Path(S4_DISCIPLINE_NEGATIVE_EXEMPLARS_PATH)
+    if not ex_path.is_absolute():
+        ex_path = Path(__file__).resolve().parent.parent / ex_path
+    if not ex_path.exists():
+        raise FileNotFoundError(f"D-2773: discipline negative exemplars missing: {ex_path}")
+    data = yaml.safe_load(ex_path.read_text(encoding="utf-8"))
+    pairs = (data or {}).get("confusable_pairs", [])
+    if not isinstance(pairs, list) or not pairs:
+        raise ValueError(f"D-2773: discipline negative exemplars empty: {ex_path}")
+    contrast = "; ".join(" ≠ ".join(str(x) for x in p) for p in pairs)
+    return block + "\n\nCONTRAST (D-2773 negative exemplars — do NOT conflate these pairs):\n" + contrast
+
+
+_DISCIPLINE_CLOSED_MENU_BLOCK = _render_discipline_closed_menu()
+
 # ── D2454 (2026-08-27): inject the config-driven S4 classification golden. ──
 # Fail-closed (D2463 pattern): enabled + missing/malformed/empty → raise.
 try:
@@ -98,6 +151,10 @@ try:
         )
 except Exception as _s4_golden_err:  # C16: fail-loud — never silently skip an enabled gate
     raise RuntimeError(f"D2454: stage4_golden injection failed: {_s4_golden_err}") from _s4_golden_err
+
+
+if _DISCIPLINE_CLOSED_MENU_BLOCK:
+    MERGED_CRIBS_CLASSIFY_SYSTEM = MERGED_CRIBS_CLASSIFY_SYSTEM + "\n\n" + _DISCIPLINE_CLOSED_MENU_BLOCK
 
 
 # ── D-325 (2026-09-21): inject the RULED boundary discriminators + default_home. ──
@@ -620,6 +677,10 @@ try:
         )
 except Exception as _s4_golden_err:  # C16: fail-loud — never silently skip an enabled gate
     raise RuntimeError(f"D2454: stage4_golden injection failed: {_s4_golden_err}") from _s4_golden_err
+
+
+if _DISCIPLINE_CLOSED_MENU_BLOCK:
+    BATCH_CRIBS_CLASSIFY_SYSTEM = BATCH_CRIBS_CLASSIFY_SYSTEM + "\n\n" + _DISCIPLINE_CLOSED_MENU_BLOCK
 
 
 def build_batch_prompt(fbs_data: list[dict]) -> str:

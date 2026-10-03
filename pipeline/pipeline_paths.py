@@ -2,6 +2,10 @@
 pipeline_paths.py — All paths from config/pipeline_config.yaml. Env vars override.
 Each stage/{run_id}/ is self-contained: output + checkpoint + log + meta.
 Stage N reads from Stage N-1/{run_id}/.
+
+EXCEPTION (BUG-598, D-2721): Stage 1.3 (S13) is a MUTATING pre-filter, not a self-contained
+stage. It rewrites Stage 1/{run_id}/checkpoint.jsonl in place and writes only a completion
+flag to S13/{run_id}/checkpoint.jsonl. Downstream S1.5 reads the MUTATED S1 checkpoint, not S13.
 """
 import os as _os
 from pathlib import Path
@@ -170,6 +174,7 @@ S2_MAX_PROBE_PER_BOOK=int(_CFG.get("stage2", {}).get("max_probe_per_book", 2))  
 S2_MAX_WORKERS=int(_CFG.get("stage2", {}).get("max_workers", 3))                     # T0.2 (C12)
 S2_SINGLETON_BATCH_SIZE=int(_CFG.get("stage2", {}).get("singleton_batch_size", 4))                 # D2xxx: batched singleton extraction (option-1 speedup)
 S2_SINGLETON_BATCH_MAX_TOKENS_PER_ITEM=int(_CFG.get("stage2", {}).get("singleton_batch_max_tokens_per_item", 1000))
+S2_ACCEPT_CONDITIONAL=bool(_CFG.get("stage2", {}).get("accept_conditional_within_tolerance", False))  # BUG-609: advance when failures are within max_failed_ratio (deterministic failures never clear on re-run)
 S2_SPLIT_KMEANS_RANDOM_STATE=int(_CFG.get("stage2", {}).get("split_probe_kmeans_random_state", 42))  # T0.1
 S2_SPLIT_PROBE_ENABLED=bool(_CFG.get("stage2", {}).get("split_probe_enabled", True))     # D2163: gate master switch
 S2_SPLIT_PROBE_MIN_SIZE=int(_CFG.get("stage2", {}).get("split_probe_min_size", 20))      # D2163: min cluster size for gate
@@ -217,6 +222,9 @@ S4_GOLDEN_MAX_EXAMPLES = int(_CFG.get("stage4", {}).get("golden_max_examples", 4
 # D-325 (2026-09-21): ruled boundary discriminators + default_home tie-breakers (D-324).
 S4_BOUNDARY_INJECT_ENABLED = bool(_CFG.get("stage4", {}).get("boundary_inject_enabled", False))
 S4_BOUNDARY_PATH = _CFG.get("stage4", {}).get("boundary_path", "config/boundary_discriminators.yaml")
+# D-2773 (2026-10-02): closed 62-discipline menu injection (BUG-622 fix, MEASURE-gated).
+S4_DISCIPLINE_CLOSED_MENU_ENABLED = bool(_CFG.get("stage4", {}).get("discipline_closed_menu_enabled", False))
+S4_DISCIPLINE_NEGATIVE_EXEMPLARS_PATH = _CFG.get("stage4", {}).get("discipline_negative_exemplars_path", "config/golden/discipline_negative_exemplars.yaml")
 S4_MAX_PRINCIPLES=int(_CFG["stage4"]["max_principles_per_cluster"])
 # BUG-075/D2247: Depth split into SHORT focused prompt (proven 62.5% vs 38% long combined).
 S4_DEPTH_FOCUSED_CLASSIFICATION=bool(_CFG.get("stage4", {}).get("depth_focused_classification", True))
@@ -348,6 +356,7 @@ S4_GRAMMAR_DECODING_ENABLED = bool(_CFG.get("stage4", {}).get("grammar_decoding_
 # ── Retrieve settings (D2231: C12 compliance) ─────────────────────────
 RETRIEVE_CONFIDENCE_THRESHOLD = float(_CFG.get("retrieval_eval", {}).get("confidence_threshold", 0.85))
 RERANK_ENABLED = bool(_CFG.get("rerank", {}).get("enabled", False))   # D2521 (S2): production rerank adoption gate
+RETRIEVAL_METHOD = str(_CFG.get("retrieval", {}).get("method", "rrf"))  # D-2724: production retrieval default ('vector' | 'rrf')
 FTS_STOPWORDS = frozenset(_CFG.get("retrieval", {}).get("fts_stopwords", []))  # C12: FTS stopwords from config (D2561)
 
 # D2537: opt-in fused quality ranking (replaces dead borp_score ordering)
@@ -391,6 +400,8 @@ S15_EMBED_CHECKPOINT_ENABLED = bool(_CFG.get("stage1_5", {}).get("embed_checkpoi
 
 # ── Stage 6 settings (D2084) ────────────────────────────────────────────
 S6_COMMIT_NON_FB=bool(_CFG["stage6"]["commit_non_fb_types"])
+S6_VEC_REQUIRE = bool(_CFG.get("stage6", {}).get("vec_require", False))  # D-2717: fail-closed vec0 gate (C16)
+S6_VEC_PYTHON = str(_CFG.get("stage6", {}).get("vec_python", ""))  # D-2717: vec0-capable interpreter (Homebrew 3.14 verified)
 
 def ensure_dirs():
     # D2178: S3_DIR removed (D2120/D2177) — no longer referenced
@@ -508,7 +519,8 @@ VERSION="3.0.0"; BUILD_DATE="2026-07-26"
 # ── Paths (D2115: C12 compliant — from config, not hardcoded) ──────────
 _PATHS = _CFG.get("paths", {})
 CHECKPOINT_DIR = PROJECT_ROOT / _PATHS.get("checkpoint_dir", "knowledge pipeline/checkpoints")
-DB_PATH = PROJECT_ROOT / _PATHS.get("db_path", "knowledge pipeline/maxwell.db")
+# D-2716: MAXWELL_DB_PATH env override for S6 test isolation (C12: config-first, env override mirrors run_id pattern)
+DB_PATH = PROJECT_ROOT / Path(_env("db_path", _PATHS.get("db_path", "knowledge pipeline/maxwell.db")))
 PARQUET_DIR = PROJECT_ROOT / _PATHS.get("parquet_dir", "knowledge pipeline/parquet")
 DATA_DIR = PROJECT_ROOT / _PATHS.get("data_dir", "knowledge pipeline")
 # D2184: Dynamic OMLX binary resolution (was hardcoded /Applications/...)

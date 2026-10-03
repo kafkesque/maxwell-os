@@ -52,6 +52,8 @@ from pipeline.content_types import (  # D2323: config-first enum source (C12)
     ROUTE_TO_CONTENT_TYPE,
     QUARANTINE_CONTENT_TYPE,  # D2616 Phase 0: BUG-148 route-deprecation (missing content_type → hold)
     NOISE_DROP_CONTENT_TYPE,  # D2616 Phase 0: disposition (drop) — never routed to principle
+    reroute_content_type,     # D-2747: deterministic non-principle reroute (BUG-611/BUG-170)
+    derive_applicability,     # D-2757: deterministic consumer/teleology axis (BUG-611 quarantine taxonomy)
 )
 from pipeline.omlx_call import call_omlx_json, check_omlx_health
 from pipeline.pipeline_paths import (
@@ -189,6 +191,38 @@ def _s2_input_fingerprint(run_id: str) -> str:
     return hashlib.sha256("|".join(parts).encode()).hexdigest()[:16]
 
 
+def _stage_code_fingerprint() -> str:
+    """BUG-614: content-hash the S4 routing/classification source modules.
+
+    The BUG-183 guard binds a checkpoint to its S2 input + pipeline_commit, but
+    pipeline_commit only advances on a GIT COMMIT. An UNCOMMITTED edit to
+    stage4_merge.py / content_types.py / config/content_types.yaml (the reroute
+    choke point) leaves pipeline_commit — and therefore the BUG-183 fingerprint —
+    unchanged, so a stale checkpoint is silently resumed (the live pre-reroute
+    process wrote 418 records this way). Hash the BYTE CONTENT of the modules
+    that determine S4 output so ANY edit (committed or not) invalidates the
+    checkpoint fail-closed.
+    """
+    import hashlib
+
+    _mod_dir = Path(__file__).resolve().parent
+    sources: list[Path] = [
+        Path(__file__).resolve(),                   # stage4_merge.py
+        _mod_dir / "content_types.py",              # reroute choke point (D-2747)
+        _CFG_PATH_S4,                               # pipeline_config.yaml
+        _CFG_PATH_S4.parent / "content_types.yaml",  # content-type axis + denylist
+    ]
+    h = hashlib.sha256()
+    for _p in sources:
+        try:
+            with open(_p, "rb") as _fh:
+                for _chunk in iter(lambda: _fh.read(1 << 20), b""):
+                    h.update(_chunk)
+        except OSError:
+            h.update(b"<missing>")
+    return h.hexdigest()[:16]
+
+
 def _temporal_signal_hit(text: str, signals: list[str]) -> bool:
     """Boundary-aware temporal-signal match (D2410).
 
@@ -265,7 +299,11 @@ def _resolve_content_type(fb: dict) -> str:
     """
     ct: str = (fb.get("content_type") or "").strip()
     if ct:
-        return ct
+        # D-2747 (BUG-611/BUG-170): non-principle records are ROUTED not classified, so a
+        # deterministic reroute corrects an S2 mislabel BEFORE it reaches the routing
+        # dispatch / S6. Pure rules (D-343: never LLM), and it is automatic here — not a
+        # post-hoc step. No-op for principles and for already-correct non-principle roles.
+        return reroute_content_type(fb)
     # BUG-148 (D2616 Phase 0): content_type missing → QUARANTINE, never route→principle.
     # `route` is legacy transport and must no longer carry the ontology (C16: loud).
     print(
@@ -1286,6 +1324,7 @@ def _write_s4_checkpoint(fbs: list[dict], processed_ids: set[str], scalar_state:
         _state = dict(scalar_state)
         if _S2_INPUT_FINGERPRINT is not None:
             _state["s2_input_fingerprint"] = _S2_INPUT_FINGERPRINT
+        _state["stage_code_fingerprint"] = _stage_code_fingerprint()  # BUG-614: bind checkpoint to its producing code
         _state["record_count"] = len(fbs)  # D2487: asserted on resume (clean-cut truncation guard)
         json.dump(_state, state_tmp)
         state_tmp.flush()
@@ -1433,6 +1472,21 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
                 for _stale_sidecar in (_depth_file, _cribs_file):  # stale pre-pass sidecars are also invalid
                     if os.path.exists(_stale_sidecar):
                         os.unlink(_stale_sidecar)
+            # BUG-614: stage-code drift guard — a checkpoint written by DIFFERENT
+            # stage code (e.g. the pre-reroute _resolve_content_type) is stale even
+            # when the S2 input fingerprint matches (uncommitted edits leave
+            # pipeline_commit unchanged). Unlike BUG-183 (S2-input drift), code drift
+            # does NOT invalidate the content-derived depth/cribs sidecars — PRESERVE
+            # them (BUG-616) so a reroute-only edit doesn't waste the ~1-2h depth
+            # pre-pass (7,149 clusters).
+            _saved_stage_fp = _scalar_state.get("stage_code_fingerprint") if isinstance(_scalar_state, dict) else None
+            if (not cluster_ids) and fbs and _saved_stage_fp != _stage_code_fingerprint():
+                print(f"   ⚠️  S4 resume STAGE-CODE mismatch — checkpoint was written by different stage code "
+                      f"(saved {_saved_stage_fp!r} != current {_stage_code_fingerprint()!r})")
+                print("   ⚠️  Starting fresh — stale S4 output discarded (BUG-614); depth/cribs sidecars PRESERVED (BUG-616)")
+                processed_ids = set()
+                fbs = []
+                _scalar_state = {"classification_errors": 0, "name_collisions": 0}
             # D2487: record-count guard — a checkpoint truncated at a `\n` boundary
             # (whole records dropped, every remaining line valid JSON) is invisible to
             # load_jsonl. Assert on-disk count matches the count recorded at the last
@@ -1494,9 +1548,11 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
     # D2404: classification failures are now retried on resume (like `failed`) — re-count per run
     classification_errors = 0
     name_collisions = int(_scalar_state.get("name_collisions", 0))
+    fb_id_dedup = 0  # BUG-615: cross-cluster duplicate fb_ids skipped (fail-closed)
     # D2069: rebuild the name-uniqueness set from the partial FBs (names already
     # normalized + disambiguated, so the set is exactly the taken names).
     existing_names: set[str] = {fb.get("name", "") for fb in fbs}
+    seen_fb_ids: set[str] = {fb.get("fb_id", "") for fb in fbs}  # BUG-615: identity is fixed at S2 (D2350)
     pipeline_commit = get_pipeline_commit()
     pipeline_run_id = get_pipeline_run_id()  # BUG-026 FIX: use singleton directly
 
@@ -2150,6 +2206,13 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
         # provenance: pipeline FBs are always llm_extracted_from_source (C29)
         provenance_val = "llm_extracted_from_source"
 
+        # D-2757: applicability axis (consumer/teleology) — DETERMINISTIC, never
+        # LLM-classified (D-343). Derived from the RESOLVED content_type so an
+        # adjudicated record carries its applicability regardless of role.
+        _applicability_val, _applicability_source = derive_applicability(
+            fb_data, _resolve_content_type(fb_data)
+        )
+
         # Build FB record (bloat removed per D2130: no s3_original_domain, no classification_method)
         # D2350 (ChatGPT re-audit): fb_id MUST come from S2 (identity fixed at
         # extraction time). A missing fb_id is a malformed/legacy record — never
@@ -2180,6 +2243,9 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
             "elaboration": fb_data.get("elaboration", "").strip(),
             "keywords": fb_data.get("keywords", "").strip(),
             "domains": class_data["domains"],
+            # D-2798 (BUG-622): discipline is ADVISORY-ONLY — a soft facet stamped for
+            # retrieval/analytics, NEVER a routing gate. Routing is content_type-based
+            # (fine-only); this field does NOT gate, re-route, or quarantine an FB.
             "discipline": class_data.get("discipline", "emerging"),
             "domains_raw": domains_raw,
             "discipline_raw": discipline_raw if discipline_raw else None,
@@ -2253,6 +2319,13 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
             "content_type_source": "llm_extracted_from_source",
             "discipline_source": "llm_extracted_from_source",
             "extraction_type_source": "llm_extracted_from_source",
+            # D-2757: applicability axis (consumer/teleology) — DETERMINISTIC, never
+            # LLM-classified (D-343). Provenance stamped alongside (owner_adjudicated
+            # for the owner's explicit dispositions, deterministic for lexical rules).
+            # Resolved against the RESOLVED content_type so an adjudicated record
+            # carries its applicability regardless of which role it landed in.
+            "applicability": _applicability_val,
+            "applicability_source": _applicability_source,
             "menu_hash": _current_menu_hash(),
         }
         # D2496/BUG-187: always emit jargon — omit-when-empty was the schema-drift
@@ -2265,6 +2338,26 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
             # D2404: failed classification must be retried on resume — do not checkpoint as done.
             print(f"→ ❌ '{name}' classification FAILED — will retry on resume")
         else:
+            # BUG-615 (D-2752): cross-cluster fb_id dedup. fb_id is identity-fixed
+            # at S2 (D2350), so two FBs sharing an fb_id are the SAME epistemic claim
+            # that cluster-before-extract split across clusters. dedup_fbs_by_cosine
+            # only dedups WITHIN a cluster (never fires under the 1-principle-per-
+            # cluster invariant), so identical cross-cluster FBs leaked through as N
+            # name-disambiguated records. Merge the duplicate's provenance into the
+            # kept record and skip it (fail-closed, deterministic).
+            if fb_id_val in seen_fb_ids:
+                _kept = next((x for x in fbs if x.get("fb_id") == fb_id_val), None)
+                if _kept is not None:
+                    for _sc in fb.get("source_clusters") or []:
+                        if _sc not in _kept.setdefault("source_clusters", []):
+                            _kept["source_clusters"].append(_sc)
+                    for _seg in fb.get("source_segments") or []:
+                        if _seg not in _kept.setdefault("source_segments", []):
+                            _kept["source_segments"].append(_seg)
+                fb_id_dedup += 1
+                print(f"→ ⏭️  Duplicate fb_id {fb_id_val[:8]}… skipped (cross-cluster dedup, BUG-615)")
+                continue
+            seen_fb_ids.add(fb_id_val)
             fbs.append(fb)
             processed_ids.add(cluster_id)
             elapsed = time.time() - start
@@ -2391,6 +2484,8 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
     print(f"🏷️  Classification errors:     {classification_errors}")
     if name_collisions:
         print(f"🔤 Name collisions:          {name_collisions} (auto-disambiguated)")
+    if fb_id_dedup:
+        print(f"⏭️  fb_id dedup (cross-cluster): {fb_id_dedup} skipped (BUG-615)")
     if fbs:
         depths = {}
         for fb in fbs:

@@ -87,6 +87,17 @@ def clean_markdown(text: str) -> str:
     for pattern in BOILERPLATE_PATTERNS:
         text = re.sub(pattern, '', text)
 
+    # ── D-2708 / BUG-595: strip Pandoc/calibre converter residue ──────────
+    # The S1 path must apply the SAME residue stripper proven conservative in
+    # clean_evidence_passage() (D2471), PLUS the generalized span-attribute
+    # grammar. Forensic scan measured 170,973 distinct brace-attr forms; a
+    # finite pattern list is a blindspot, so _S1_SPAN_SUBS captures the full
+    # Pandoc/calibre grammar: {.class}, {#id}, {=format}, {key="val"}.
+    for pat, rep in _CLEAN_SUBS:
+        text = re.sub(pat, rep, text)
+    for pat, rep in _S1_SPAN_SUBS:
+        text = re.sub(pat, rep, text)
+
     # Normalize whitespace: collapse multiple newlines, spaces
     text = re.sub(r'\n{3,}', '\n\n', text)
     text = re.sub(r'[ \t]{2,}', ' ', text)
@@ -119,6 +130,25 @@ _CLEAN_SUBS: tuple[tuple[str, str], ...] = (
     (r'&#\d+;', ' '),
     (r'\[\s*\]\{[^}]*\}', ' '),
     (r'\.\s*xhtml_p\d+', ' '),
+)
+
+
+# ── D-2708 / BUG-595: generalized Pandoc/calibre span-attribute grammar ──
+# The finite _CLEAN_SUBS list (D2471) misses the LONG TAIL. Forensic token scan
+# measured 170,973 distinct brace-attribute forms ({.calibreN}, {.bold}, {.italic},
+# {data-type="..."}, {style="..."}, {code-language="..."}, {#...}, {.No-Break}, ...).
+# A finite list is a blindspot; the attribute GRAMMAR is closed and prose-safe:
+#   {.class}      -> content starts with '.'
+#   {#id}         -> content starts with '#'
+#   {=format}     -> content starts with '='
+#   {key="val"} / {key=val} -> attribute pair (key = [A-Za-z][\w-]*)
+# Natural prose NEVER opens a brace group with '.', '#', '=', nor contains a
+# key="val" attribute inside braces; math/code (e.g. {x | x>0}, {1,2,3}) starts
+# with a letter/digit and carries no '=', so it is preserved (no false positives).
+_S1_SPAN_SUBS: tuple[tuple[str, str], ...] = (
+    (r'\{[.#=][^{}\n]{0,80}\}', ' '),
+    (r'\{[^{}\n]{0,80}\w[\w-]*\s*=\s*"[^"]*"[^{}\n]{0,80}\}', ' '),
+    (r'\{[^{}\n]{0,80}\w[\w-]*\s*=\s*[^{}\n]{0,80}\}', ' '),
 )
 
 

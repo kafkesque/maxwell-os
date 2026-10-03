@@ -10,7 +10,7 @@ Usage:
     python pipeline/runner.py                       # Full pipeline, latest run_id
     python pipeline/runner.py --domain pricing      # Single domain
     python pipeline/runner.py --smoke               # Fast smoke test
-    python pipeline/runner.py --resume-from stage2  # Resume after crash
+    python pipeline/runner.py --resume-from 2       # Resume after crash (stage ids are numeric: 0, 0.5, 1, 1.3, 1.5, 2, 4, 5, 6)
     python pipeline/runner.py --stages 0,1,1.5      # Specific stages only
     python pipeline/runner.py --quality fast        # Quality tier (C28)
     python pipeline/runner.py --books 10            # Limit books
@@ -331,6 +331,45 @@ def _get_stage_timeout(stage_id: str) -> float | None:
         return 3600.0  # fallback default
 
 
+def _get_preflight_timeout() -> float:
+    """BUG-606: Preflight watchdog timeout must exceed the watchdog restart cycle.
+
+    Watchdog restart worst case = kill (10s) + sleep(3s) + RESTART_WAIT_SECS (30s) ≈ 43s.
+    A hardcoded 30s preflight aborts the LLM-bound stage mid-restart. Read from config
+    (run.preflight_timeout_sec, default 90s) so the preflight waits for a restart to finish.
+    """
+    import yaml as _yaml_pf
+    try:
+        with open(_PROJECT_ROOT / "config" / "pipeline_config.yaml") as _f:
+            _cfg = _yaml_pf.safe_load(_f) or {}
+        return float(_cfg.get("run", {}).get("preflight_timeout_sec", 90.0))
+    except Exception as e:
+        print(f"   ⚠️  runner: run.preflight_timeout_sec unreadable ({type(e).__name__}: {e}) — fallback 90s (C16)", file=sys.stderr)
+        return 90.0
+
+
+def _get_python_bin() -> str:
+    """BUG-607: canonical interpreter for stage subprocesses + preflight.
+
+    The runner previously hardcoded bare "python3", which resolves via PATH and
+    thus drifts between shells: login zsh resolves to conda base (miniforge3),
+    non-login shells resolve to the Python.org framework 3.12. datasketch was
+    installed only in the framework env, so S2 raised ModuleNotFoundError under
+    the login shell (the user's actual launch env). Pin the interpreter in config
+    (run.python_bin, C12); fall back to sys.executable if unset/empty.
+    """
+    import yaml as _yaml_pybin
+    try:
+        with open(_PROJECT_ROOT / "config" / "pipeline_config.yaml") as _f:
+            _cfg = _yaml_pybin.safe_load(_f) or {}
+        _pin = str(_cfg.get("run", {}).get("python_bin", "") or "").strip()
+        if _pin:
+            return _pin
+    except Exception as e:
+        print(f"   ⚠️  runner: run.python_bin unreadable ({type(e).__name__}: {e}) — fallback sys.executable (C16)", file=sys.stderr)
+    return sys.executable
+
+
 def run_stage(
     stage_id: str,
     *,
@@ -354,7 +393,7 @@ def run_stage(
         print(f"   ⚠️  Script not found: {script}")
         return False
 
-    cmd = ["python3", str(script), *stage.get("args", [])]
+    cmd = [_get_python_bin(), str(script), *stage.get("args", [])]
     env = {}
 
     # Build environment overrides
@@ -382,18 +421,36 @@ def run_stage(
         try:
             watchdog = _PROJECT_ROOT / "pipeline" / "omlx_watchdog.py"
             preflight = subprocess.run(
-                ["python3", str(watchdog), "--pre-stage"],
+                [_get_python_bin(), str(watchdog), "--pre-stage"],
                 cwd=str(_PROJECT_ROOT),
                 capture_output=True,
-                timeout=30,
+                timeout=_get_preflight_timeout(),
             )
-            if preflight.returncode != 0:
+            # BUG-608: watchdog returns 0=OK, 1=restarted(recovered), 2=error. rc==1 means OMLX
+            # was unhealthy and the watchdog successfully restarted it (waited RESTART_WAIT_SECS).
+            # Treat as RECOVERED (not DOWN) — re-verify once, then proceed. Only rc==2 aborts.
+            if preflight.returncode == 1:
+                print("   🔄 OMLX restarted (recovered) — re-verifying health...")
+                preflight = subprocess.run(
+                    [_get_python_bin(), str(watchdog), "--pre-stage"],
+                    cwd=str(_PROJECT_ROOT),
+                    capture_output=True,
+                    timeout=_get_preflight_timeout(),
+                )
+            if preflight.returncode == 2:
                 if stage.get("llm_bound"):
                     print(f"   ❌ OMLX DOWN — LLM-bound stage {stage_id} cannot proceed")
                     print(f"   {preflight.stderr.decode()[-200:]}")
                     sys.exit(1)
                 else:
-                    print(f"   ⚠️  OMLX watchdog warning (continuing — non-LLM stage): {preflight.stderr.decode()[-200:]}")
+                    print(f"   ⚠️  OMLX watchdog error (continuing — non-LLM stage): {preflight.stderr.decode()[-200:]}")
+            elif preflight.returncode == 1:
+                if stage.get("llm_bound"):
+                    print(f"   ❌ OMLX failed to stabilize after restart — LLM-bound stage {stage_id} cannot proceed")
+                    print(f"   {preflight.stderr.decode()[-200:]}")
+                    sys.exit(1)
+                else:
+                    print(f"   ⚠️  OMLX still restarting (continuing — non-LLM stage)")
             else:
                 print("   ✅ OMLX healthy")
         except Exception as e:
@@ -518,6 +575,62 @@ def _check_version_consistency() -> None:
     print(f"   ✅ Version gate passed: schema_version={expected_schema}")
 
 
+def _acquire_singleton_lock() -> None:
+    """BUG-602: at most ONE pipeline runner may hold a run_id at a time.
+
+    The 2026-09-30 duplicate-runner incident: an accidental re-launch created a
+    second runner (pids 36748/36749/36750) writing the SAME S1.5 state.json as the
+    live run, which is what orphaned embedding batches 16256/16320 into quarantine.
+    Fail-closed: refuse to start while a LIVE holder exists; reclaim a dead one.
+    Disable via config (run.singleton_lock) only for a conscious re-drive.
+    """
+    import atexit
+    import os
+
+    cfg_path: Path = _PROJECT_ROOT / "config" / "pipeline_config.yaml"
+    enabled: bool = True
+    lock_rel: str = ".pipeline_runner.lock"
+    try:
+        import yaml as _y
+        with open(cfg_path) as _f:
+            _run_cfg = (_y.safe_load(_f) or {}).get("run", {}) or {}
+        enabled = bool(_run_cfg.get("singleton_lock", True))
+        lock_rel = str(_run_cfg.get("singleton_lock_path", lock_rel))
+    except Exception as e:
+        print(f"   ⚠️  run.singleton_lock config unreadable ({type(e).__name__}: {e}) — defaulting ON (C16)", file=sys.stderr)
+
+    if not enabled:
+        print("   ⚠️  runner singleton lock DISABLED by config — two runners can corrupt one run_id")
+        return
+
+    lock_path: Path = _PROJECT_ROOT / lock_rel
+    if lock_path.exists():
+        held: int = -1
+        try:
+            held = int(lock_path.read_text().split()[0])
+        except Exception:
+            held = -1
+        alive: bool = False
+        if held > 0:
+            try:
+                os.kill(held, 0)
+                alive = True
+            except OSError:
+                alive = False
+        if alive:
+            raise SystemExit(
+                f"🛑 BUG-602: another pipeline runner is LIVE (pid {held}, lock {lock_rel}) — refusing to "
+                f"start a second one. Wait for it, or stop it deliberately (kill {held}) if you are sure it "
+                f"is a leftover; the lock is reclaimed automatically once that pid is gone."
+            )
+        print(f"   ⚠️  reclaiming stale runner lock (pid {held} is gone)")
+        lock_path.unlink(missing_ok=True)
+
+    lock_path.write_text(f"{os.getpid()} {time.strftime('%Y-%m-%dT%H:%M:%S')}\n")
+    atexit.register(lambda: lock_path.unlink(missing_ok=True))
+    print(f"   🔒 runner singleton lock held (pid {os.getpid()})")
+
+
 def run_pipeline(
     *,
     resume_from: str | None = None,
@@ -553,6 +666,8 @@ def run_pipeline(
     # or any other file declares a different schema_version, the pipeline halts
     # rather than producing objects with ambiguous version provenance.
     _check_version_consistency()
+
+    _acquire_singleton_lock()  # BUG-602: no second runner on one run_id
 
     # Determine stages to run
     if stages:

@@ -34,6 +34,7 @@ from pathlib import Path
 from pipeline.label_traceability import traceability_of  # noqa: E402  BUG-497/D-2640: declared label provenance
 from pipeline.pipeline_paths import RETRIEVE_CONFIDENCE_THRESHOLD  # D2231: C12 compliance
 from pipeline.pipeline_paths import RERANK_ENABLED  # D2521 (S2): production rerank adoption gate
+from pipeline.pipeline_paths import RETRIEVAL_METHOD  # D-2724: production retrieval default (C21 swappable)
 from pipeline.pipeline_paths import FTS_STOPWORDS  # D2561: C12 stopwords from config
 from pipeline.pipeline_paths import (  # D2537: fused quality ranking (opt-in)
     RANKING_QUALITY_SCORE_ENABLED,
@@ -537,6 +538,60 @@ def search_hybrid(
     return results
 
 
+def search(
+    conn: sqlite3.Connection,
+    query: str,
+    domain: str | None = None,
+    discipline: str | None = None,
+    depth: str | None = None,
+    limit: int = 20,
+    include_quarantine: bool = False,
+    rerank: bool | None = None,
+    discipline_raw: str | None = None,
+    domains_raw: str | None = None,
+    method: str | None = None,
+) -> list[dict]:
+    """D-2724: config-driven production retrieval entry point (C21 swappable).
+
+    Routes on `retrieval.method` (overridable per-call via `method`):
+      - "vector" -> pure vector pool + optional cross-encoder rerank. With
+        `rerank.enabled` (the default) this is **vector+rerank** — the D-2723
+        recommendation, because RRF fusion is recall-negative (vector 0.900 ->
+        hybrid-RRF 0.833 on the 30-query golden set).
+      - "rrf"    -> search_hybrid (RRF fusion of FTS + vector + keyword; the
+        legacy hybrid / hybrid+rerank path).
+
+    `search_hybrid` remains the pure-RRF implementation (used by the retrieval
+    benchmark A/B harness and the CLI --hybrid), so those callers never drift.
+    C16: an unknown method raises (fail-loud, never silently FTS).
+
+    Args mirror `search_hybrid` so this is a drop-in for production call sites.
+    """
+    m: str = method if method is not None else RETRIEVAL_METHOD
+    if m == "vector":
+        should_rerank = RERANK_ENABLED if rerank is None else rerank
+        pool_size: int = min(max(limit * 5, 20), 100)
+        pool = search_vector(
+            conn, query, limit=pool_size, include_quarantine=include_quarantine,
+            domain=domain, discipline=discipline, depth=depth,
+            discipline_raw=discipline_raw, domains_raw=domains_raw,
+        )
+        if should_rerank:
+            try:
+                from pipeline.rerank import rerank_candidates
+                return rerank_candidates(query, pool, top_k=limit)
+            except Exception as e:  # C24: degrade gracefully but loudly
+                print(f"  ⚠️  rerank unavailable ({e}); returning pure vector list")
+        return pool[:limit]
+    if m == "rrf":
+        return search_hybrid(
+            conn, query, domain=domain, discipline=discipline, depth=depth,
+            limit=limit, include_quarantine=include_quarantine, rerank=rerank,
+            discipline_raw=discipline_raw, domains_raw=domains_raw,
+        )
+    raise ValueError(f"unknown retrieval method {m!r} (C16)")
+
+
 def _row_to_dict(row: sqlite3.Row) -> dict:
     """Convert sqlite3.Row to dict, parsing JSON fields."""
     d = dict(row)
@@ -788,8 +843,8 @@ def graph_aware_search(
     Returns:
         List of FB dicts with _graph and _is_seed metadata attached
     """
-    # 1. Seed retrieval via hybrid search
-    seeds: list[dict] = search_hybrid(
+    # 1. Seed retrieval via production search (config retrieval.method; D-2724)
+    seeds: list[dict] = search(
         conn, query,
         limit=limit,
         domain=domain,
@@ -965,7 +1020,7 @@ def agentic_search(
                 depth=depth,
             )
         else:
-            results = search_hybrid(
+            results = search(
                 conn, current_query,
                 limit=limit,
                 domain=domain,
@@ -1017,7 +1072,7 @@ def agentic_search(
 
         if critique.retrieval_quality == "INCORRECT":
             # Broaden search: drop domain/discipline/depth filters
-            broader = search_hybrid(
+            broader = search(
                 conn, query,
                 limit=limit * 2,
             )

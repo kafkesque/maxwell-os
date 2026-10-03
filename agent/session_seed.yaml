@@ -32,11 +32,12 @@ models:
     model: MoritzLaurer/DeBERTa-v3-large-mnli-fever-anli-ling-wanli
     provider: local
     family: deberta
-    notes: 'D2298: DeBERTa-v3-large sole NLI verifier, threshold 0.10. D2322 honest
-      auto-cal: P=0.647/R=0.386/F1=0.484 (D2293''s P=1.000 was on the broken pre-D2321
-      call — NOT reproducible). RoBERTa/ModernBERT removed (zero signal / superseded).
-      D2440 (pending): run AlignScore + MiniCheck through pipeline/calibrate.py harness
-      vs DeBERTa before any threshold change — F1>0.484 gate + fail-closed (D2093).'
+    notes: "D2298: DeBERTa-v3-large sole NLI verifier, threshold 0.10. D2322 honest\
+      \ auto-cal: P=0.647/R=0.386/F1=0.484 (D2293's P=1.000 was on the broken pre-D2321\
+      \ call \u2014 NOT reproducible). RoBERTa/ModernBERT removed (zero signal / superseded).\
+      \ D2440 (pending): run AlignScore + MiniCheck through pipeline/calibrate.py\
+      \ harness vs DeBERTa before any threshold change \u2014 F1>0.484 gate + fail-closed\
+      \ (D2093)."
   evidence_tier:
     axis: convergence
     values:
@@ -100,8 +101,8 @@ content_type:
   - descriptive_model
   - normative_heuristic
   - empirical_pattern
-  note: 2 orthogonal axes. Core body shared; per-type extension delta. D2150 (extraction→content)
-    + D2128 (route→content) mappings in registry.
+  note: "2 orthogonal axes. Core body shared; per-type extension delta. D2150 (extraction\u2192\
+    content) + D2128 (route\u2192content) mappings in registry."
 governance:
   constitution: CONSTITUTION.md
   decision_log: DECISION-LOG.md
@@ -122,150 +123,151 @@ boot:
   4: Verify OMLX + Ollama running
   5: python3 pipeline/status.py
 phase:
-  current: Phase 1 (v3.0 architecture validation) — pre-T1.1
-  status: 'T1.1 RUNNING (launched 2026-08-17 21:24, PID 26915, run-id t11, log knowledge
-    pipeline/runner_t11_20260817_212404.log). S0 ✅ 940/940, S0.5 ✅ cached, S1 chunking
-    → S1.5 embed (D2409 incremental cache) → S2 (~25-40h long pole) → S4 (~39h) →
-    S5 → S6. Fresh DB per D2396 (canary archived maxwell.db.pre_t11_20260817_211632.bak).
-    caffeinate -disu active, OMLX lazy-load on demand, watchdog per-stage. D2409/D2410
-    committed 3e6a383. Monitor: python3 pipeline/status.py; tail -f "knowledge pipeline/runner_t11_20260817_212404.log"
-    (block-buffered under nohup — bursts); resume: python3 pipeline/runner.py --run-id
-    t11 --resume-from <stage>.'
+  current: "Phase 1 (v3.0 architecture validation) \u2014 pre-T1.1"
+  status: "T1.1 RUNNING (launched 2026-08-17 21:24, PID 26915, run-id t11, log knowledge\
+    \ pipeline/runner_t11_20260817_212404.log). S0 \u2705 940/940, S0.5 \u2705 cached,\
+    \ S1 chunking \u2192 S1.5 embed (D2409 incremental cache) \u2192 S2 (~25-40h long\
+    \ pole) \u2192 S4 (~39h) \u2192 S5 \u2192 S6. Fresh DB per D2396 (canary archived\
+    \ maxwell.db.pre_t11_20260817_211632.bak). caffeinate -disu active, OMLX lazy-load\
+    \ on demand, watchdog per-stage. D2409/D2410 committed 3e6a383. Monitor: python3\
+    \ pipeline/status.py; tail -f \"knowledge pipeline/runner_t11_20260817_212404.log\"\
+    \ (block-buffered under nohup \u2014 bursts); resume: python3 pipeline/runner.py\
+    \ --run-id t11 --resume-from <stage>."
   completed:
-  - Phase 0: 14/14 foundation fixes ✅
+  - Phase 0: "14/14 foundation fixes \u2705"
   - Phase 0.5: cleaning pipeline spec'd, partially implemented
-  - Tier 1: architecture restructure (cluster-before-extract) ✅
-  - Tier 1: Stage 5 fail-closed + DeBERTa NLI ✅
-  - D2092-D2114: v3.0 architecture decisions recorded ✅
-  - B1-B10 (D2325-D2332): pre-T1.1 blockers — ALL IMPLEMENTED (9295ce0 + D2343 residual
-      closures)
+  - Tier 1: "architecture restructure (cluster-before-extract) \u2705"
+  - Tier 1: "Stage 5 fail-closed + DeBERTa NLI \u2705"
+  - D2092-D2114: "v3.0 architecture decisions recorded \u2705"
+  - B1-B10 (D2325-D2332): "pre-T1.1 blockers \u2014 ALL IMPLEMENTED (9295ce0 + D2343\
+      \ residual closures)"
   - B11 (P0): S6 SQLite persistence of D2323 axes + mechanism/boundary/consequence
       (D2337, BUG-095)
   - B12 (P0): S4/S6 fail-closed exit semantics (D2338, BUG-096)
   - B13 (P1): runner --run-id import-order isolation (D2339, BUG-097)
-  - B14 (P1): model-registry drift correction — session_seed rename done; config/path
-      rename deferred (D2340, BUG-099)
-  - B16 (P0): S1.5 embedding-drop index alignment — (filtered_segments, embeddings)
-      + len assert (D2346, BUG-102)
-  - B17 (P1): e2e convergence metric → sum(c["is_convergent"]) canonical IDs (D2347,
-      BUG-103)
-  - B18 (P0): embedding reliability — timeout 180s + keep_alive=-1 (D2348, BUG-105)
-  - V1-V6 (P0): T1.1 canary GREEN — 2255 clusters → 279 FBs → 239 PASS → 279 committed
+  - B14 (P1): "model-registry drift correction \u2014 session_seed rename done; config/path\
+      \ rename deferred (D2340, BUG-099)"
+  - B16 (P0): "S1.5 embedding-drop index alignment \u2014 (filtered_segments, embeddings)\
+      \ + len assert (D2346, BUG-102)"
+  - B17 (P1): "e2e convergence metric \u2192 sum(c[\"is_convergent\"]) canonical IDs\
+      \ (D2347, BUG-103)"
+  - B18 (P0): "embedding reliability \u2014 timeout 180s + keep_alive=-1 (D2348, BUG-105)"
+  - V1-V6 (P0): "T1.1 canary GREEN \u2014 2255 clusters \u2192 279 FBs \u2192 239\
+      \ PASS \u2192 279 committed"
   - V7 (D2368): DECISION-LOG D2351-D2363 backfilled
   - BUG-132 (D2368): thinking_budget per-call threading + depth_thinking_budget config
       key
-  - V8 (D2369): golden depth expansion — CONV-054 universal + CONV-055 specialized
-      (1→2 each)
+  - V8 (D2369): "golden depth expansion \u2014 CONV-054 universal + CONV-055 specialized\
+      \ (1\u21922 each)"
   - V9 (D2369): resume mechanism live-verified (run-scoped marker + --run-id + --resume-from)
-  - D2370: S4 intra-stage incremental checkpoint (39h-stage crash recovery) — checkpoint
-      every 5 clusters + .segids/.state.json skip-on-resume; live kill -9 + resume
-      verified on 20-cluster subset
-  - D2386: S4 gate relaxed 0.0→0.01 (cluster_6241 empty-application quarantine within
-      1% tolerance)
-  - D2391: S6 schema-migration gap fixed (is_summary + classification_status auto-heal)
-      — 278 committed cleanly
-  - D2392: grammar A/B RESOLVED — 0.6.0 xgrammar breaks gpt-oss-20b (Harmony conflict)
-      → keep grammar OFF; 0.5.1 stays on 11435
-  - D2393: depth skew fixed — focused prompts tightened (default-to-domain; cross-domain
-      = 2+ DISTINCT disciplines)
-  - D2394: taxonomy synonym-index kind-filter bug fixed + discipline alias expansion
-      — discipline emerging 32%→15.5%
-  - D2395: dropped dead legacy s3_original_domain column (DB 61→60 cols) — integrity
-      17/17 + audit green
-  - D2396: DB reset policy RESOLVED — fresh DB for T1.1 (676-row DB archived → maxwell.db.pre_t11_20260816.bak);
-      run-specific DB = G10 (P2)
-  - D2397: working tree committed `793fd26` + golden verbatim fix (5 NON_VERBATIM
-      → verbatim; meta 77→80) — golden_validate 80/80, hash re-stamped
-  - D2398: S4 reval CONFIRMED D2393/D2394 live — depth cross-domain 86.3%→21.6%, discipline
-      emerging 32.0%→15.5%
-  - D2399: domain-promotion defer RESOLVED — promote/demote on full-corpus counts
-      (post-T1.1+D2345), NOT canary
-  - D2400: field-production contract RESOLVED — S4 = producer, S6 = persistence-only;
-      orphan-field producers = post-S4 enrichment (F1)
-  - D2401: F1 IMPLEMENTED — post-S4 enrichment stage (stage4_5_enrich.py) produces
-      prerequisite_fbs/contradicts_fbs/procedural_skill (gated OFF for T1.1; 13 tests
-      pass)
-  - 'D2402: S4 runner timeout ''4'': 3600 → null (unlimited, like S2) — FIXED'
-  - D2403: S2 schema-invalid output rebranded as NULL → 3-state FB/NULL/FAILED — FIXED
-  - D2404: S4 classification-failed clusters unrecoverable on resume → exclude from
-      processed_ids — FIXED
-  - D2405: S4 fabricated evidence="cited" + S5 no FAILED gate → remove cited + gate
-      FAILED→QUARANTINE — FIXED
-  - D2406: session_seed.yaml YAML parse break (boot/integrity blocker) → quote status
-      + D2402 scalars — FIXED
-  - D2407: dead-code purge (run_production.py archived) + fail-closed regression tests
-      (9 tests) — DONE
-  - D2408: response_format=json_object → empty gpt-oss-20b (xgrammar/Harmony conflict)
-      → skip for reasoning models — FIXED
-  - R3 (D2408 validation): canary S4→S6 rerun COMPLETE — S4 279/279 FBs (0 failed
-      clusters, 52911 edges, 0 isolated), S5 236 PASS / 43 QUARANTINE / 0 FLAG, S6
-      279 committed (pipeline_run_id=canary) + Parquet 4482.4 KB, ~87 min; D2408 validated
-      live; no regression vs prior 235/43
+  - D2370: "S4 intra-stage incremental checkpoint (39h-stage crash recovery) \u2014\
+      \ checkpoint every 5 clusters + .segids/.state.json skip-on-resume; live kill\
+      \ -9 + resume verified on 20-cluster subset"
+  - D2386: "S4 gate relaxed 0.0\u21920.01 (cluster_6241 empty-application quarantine\
+      \ within 1% tolerance)"
+  - D2391: "S6 schema-migration gap fixed (is_summary + classification_status auto-heal)\
+      \ \u2014 278 committed cleanly"
+  - D2392: "grammar A/B RESOLVED \u2014 0.6.0 xgrammar breaks gpt-oss-20b (Harmony\
+      \ conflict) \u2192 keep grammar OFF; 0.5.1 stays on 11435"
+  - D2393: "depth skew fixed \u2014 focused prompts tightened (default-to-domain;\
+      \ cross-domain = 2+ DISTINCT disciplines)"
+  - D2394: "taxonomy synonym-index kind-filter bug fixed + discipline alias expansion\
+      \ \u2014 discipline emerging 32%\u219215.5%"
+  - D2395: "dropped dead legacy s3_original_domain column (DB 61\u219260 cols) \u2014\
+      \ integrity 17/17 + audit green"
+  - D2396: "DB reset policy RESOLVED \u2014 fresh DB for T1.1 (676-row DB archived\
+      \ \u2192 maxwell.db.pre_t11_20260816.bak); run-specific DB = G10 (P2)"
+  - D2397: "working tree committed `793fd26` + golden verbatim fix (5 NON_VERBATIM\
+      \ \u2192 verbatim; meta 77\u219280) \u2014 golden_validate 80/80, hash re-stamped"
+  - D2398: "S4 reval CONFIRMED D2393/D2394 live \u2014 depth cross-domain 86.3%\u2192\
+      21.6%, discipline emerging 32.0%\u219215.5%"
+  - D2399: "domain-promotion defer RESOLVED \u2014 promote/demote on full-corpus counts\
+      \ (post-T1.1+D2345), NOT canary"
+  - D2400: "field-production contract RESOLVED \u2014 S4 = producer, S6 = persistence-only;\
+      \ orphan-field producers = post-S4 enrichment (F1)"
+  - D2401: "F1 IMPLEMENTED \u2014 post-S4 enrichment stage (stage4_5_enrich.py) produces\
+      \ prerequisite_fbs/contradicts_fbs/procedural_skill (gated OFF for T1.1; 13\
+      \ tests pass)"
+  - "D2402: S4 runner timeout '4': 3600 \u2192 null (unlimited, like S2) \u2014 FIXED"
+  - D2403: "S2 schema-invalid output rebranded as NULL \u2192 3-state FB/NULL/FAILED\
+      \ \u2014 FIXED"
+  - D2404: "S4 classification-failed clusters unrecoverable on resume \u2192 exclude\
+      \ from processed_ids \u2014 FIXED"
+  - D2405: "S4 fabricated evidence=\"cited\" + S5 no FAILED gate \u2192 remove cited\
+      \ + gate FAILED\u2192QUARANTINE \u2014 FIXED"
+  - D2406: "session_seed.yaml YAML parse break (boot/integrity blocker) \u2192 quote\
+      \ status + D2402 scalars \u2014 FIXED"
+  - D2407: "dead-code purge (run_production.py archived) + fail-closed regression\
+      \ tests (9 tests) \u2014 DONE"
+  - D2408: "response_format=json_object \u2192 empty gpt-oss-20b (xgrammar/Harmony\
+      \ conflict) \u2192 skip for reasoning models \u2014 FIXED"
+  - R3 (D2408 validation): "canary S4\u2192S6 rerun COMPLETE \u2014 S4 279/279 FBs\
+      \ (0 failed clusters, 52911 edges, 0 isolated), S5 236 PASS / 43 QUARANTINE\
+      \ / 0 FLAG, S6 279 committed (pipeline_run_id=canary) + Parquet 4482.4 KB, ~87\
+      \ min; D2408 validated live; no regression vs prior 235/43"
   pending:
-  - 'D2394 remainder (governance review, D2399): domain taxonomy over-firing 93.9%
-    — promote ~15 business/psych/ops domains; run post-T1.1+D2345 on full-corpus counts
-    (not canary). NOTE (D2521): D2399 dynamic promotions now FROZEN (taxonomy.d2399_promotions_frozen=true)
-    — both post-BUG-197 treadmill candidates REJECTED by human review; no auto-promotions
-    until explicitly re-opened.'
-  - G10 (P2, post-T1.1): run-specific DB — scope DB_PATH by run_id + active-KB pointer
-      (D2396 follow-up)
+  - "D2394 remainder (governance review, D2399): domain taxonomy over-firing 93.9%\
+    \ \u2014 promote ~15 business/psych/ops domains; run post-T1.1+D2345 on full-corpus\
+    \ counts (not canary). NOTE (D2521): D2399 dynamic promotions now FROZEN (taxonomy.d2399_promotions_frozen=true)\
+    \ \u2014 both post-BUG-197 treadmill candidates REJECTED by human review; no auto-promotions\
+    \ until explicitly re-opened."
+  - G10 (P2, post-T1.1): "run-specific DB \u2014 scope DB_PATH by run_id + active-KB\
+      \ pointer (D2396 follow-up)"
   - D2345 (post-T1.1): single-source non-type second pass via stage2_extract_nontype.py
       (reuse S1.5 clusters)
-  - S4 SPEED (🟠 non-blocking): T1.1 is ~39h (not 142h); only viable speedup = thinking_budget=256
-      (gated, BUG-132)
-  - T-015 remainder: golden depth ≥5 universal + ≥5 specialized (currently 2/2; verbatim-mining
-      per-principle)
+  - "S4 SPEED (\U0001F7E0 non-blocking)": T1.1 is ~39h (not 142h); only viable speedup
+      = thinking_budget=256 (gated, BUG-132)
+  - T-015 remainder: "golden depth \u22655 universal + \u22655 specialized (currently\
+      \ 2/2; verbatim-mining per-principle)"
   - V9 remainder (optional, post-D2370): re-run full canary slice to confirm no fb_id
       dup/skip after a live resume
   - X8 accuracy gate: merged-call budget=256 vs null on post-relabel golden n=45 (now
       unblocked by BUG-132)
-  - BUG-104 (🟠 env, non-blocking, ACTION): switch runtime to Homebrew Python (`brew
-      install python@3.12`) or conda-forge to enable sqlite-vec (`vec_fbs`); FTS fallback
-      works meanwhile
-  - B15 (P2): schema corrections — three-axis status, typed edges, TI class, feedback
-      config-first (D2341)
-  - B14 remainder (post-T1.1): rename models.verifier→classifier + models.verifier_v2→probe
-      in pipeline_config.yaml/pipeline_paths.py/model_assignments.yaml
+  - "BUG-104 (\U0001F7E0 env, non-blocking, ACTION)": switch runtime to Homebrew Python
+      (`brew install python@3.12`) or conda-forge to enable sqlite-vec (`vec_fbs`);
+      FTS fallback works meanwhile
+  - B15 (P2): "schema corrections \u2014 three-axis status, typed edges, TI class,\
+      \ feedback config-first (D2341)"
+  - B14 remainder (post-T1.1): "rename models.verifier\u2192classifier + models.verifier_v2\u2192\
+      probe in pipeline_config.yaml/pipeline_paths.py/model_assignments.yaml"
   - Q6: 5+ book E2E test with meaningful convergent extraction
   - Tier 2: quality calibration (golden set audit, manual FB review)
   - Tier 3: speed benchmarks (MLX vs OMLX, FAISS GPU)
   - C8: D2066 dynamic canonical taxonomy
   - C9: D2067 cross-run incremental extraction
-  - MPS backend: renormalize after 1024→512 truncation (IndexFlatIP assumes unit vectors)
-      — post-T1.1 (ollama is prod backend)
-  - S1.5 K-means fallback: mark positional-split clusters degraded — post-T1.1
-  - S2 probe cache: fingerprint (not just counts) — post-T1.1
-  - S2 sampling: group by canonical source_id (not truncated basename) — post-T1.1
-  - S2 evidence: verbatim substring verification — post-T1.1
-  - S4.5: register in runner STAGE_ORDER — post-T1.1
-  - NLI calibration data (evals/nli_golden.jsonl) not committed → threshold not reproducible
-    — post-T1.1
-  - D2452 (D2451 follow-up): wire config/golden/stage4_golden.yaml into the 4 S4 classification
-      prompts (CLASSIFY_SYSTEM_PROMPT / MERGED_CRIBS_CLASSIFY_SYSTEM / BATCH_CRIBS_CLASSIFY_SYSTEM
-      / depth-focused) — extract hardcoded inline depth examples, config-first, live
-      smoke before BUG-165
-  next_phase: T1.1 full run → Tier 2 quality calibration
+  - MPS backend: "renormalize after 1024\u2192512 truncation (IndexFlatIP assumes\
+      \ unit vectors) \u2014 post-T1.1 (ollama is prod backend)"
+  - S1.5 K-means fallback: "mark positional-split clusters degraded \u2014 post-T1.1"
+  - S2 probe cache: "fingerprint (not just counts) \u2014 post-T1.1"
+  - S2 sampling: "group by canonical source_id (not truncated basename) \u2014 post-T1.1"
+  - S2 evidence: "verbatim substring verification \u2014 post-T1.1"
+  - S4.5: "register in runner STAGE_ORDER \u2014 post-T1.1"
+  - "NLI calibration data (evals/nli_golden.jsonl) not committed \u2192 threshold\
+    \ not reproducible \u2014 post-T1.1"
+  - D2452 (D2451 follow-up): "wire config/golden/stage4_golden.yaml into the 4 S4\
+      \ classification prompts (CLASSIFY_SYSTEM_PROMPT / MERGED_CRIBS_CLASSIFY_SYSTEM\
+      \ / BATCH_CRIBS_CLASSIFY_SYSTEM / depth-focused) \u2014 extract hardcoded inline\
+      \ depth examples, config-first, live smoke before BUG-165"
+  next_phase: "T1.1 full run \u2192 Tier 2 quality calibration"
 book_library:
   total_books: 852 MD (8 domains)
   test_domains:
   - DOMAIN 7 Influence + Power (21 books, 7,500 segments)
-  - Pricing subset (3 books, 237 segments — E2E test)
+  - "Pricing subset (3 books, 237 segments \u2014 E2E test)"
   source: knowledge pipeline/books/
 current_state:
-  open_bugs_n_at_2026_09_22: 77   # BUG-585 (D-2691): a DERIVED count has ONE home; this dated snapshot key cannot be read as CURRENT
+  open_bugs_n_at_2026_09_22: 77
   c15_register: governance/SESSION-HANDOFF-2026-09-23.md
   date: 2026-09-22
-  critical_finding: 'BUG-299 / D-274a — the serving gate is a LABEL, not a verification
-    verdict. scripts/apply_phase1_finalize.py:18 sets status = ''PASS'' if content_type
-    == ''principle'' else ''QUARANTINE'' (written at :163). 4,745/4,745 PASS rows
-    are content_type=''principle''; 0/1,470 non-principle rows pass. 2,447 rows (30.6%)
-    disagree with their own persisted verification_results[factual].passed: 138 NLI
-    CONTRA-majority and 1,514 NEUTRAL rows are SERVED, 278 served rows had all evidence
-    flagged non-evidence fragments, and 506 ENTAIL-majority rows are HIDDEN. Honest
-    gate: PASS 4,745 -> 3,310. => ROLE is the highest-leverage axis, not decorative
-    (D6 / BUG-280 / D272g INVERTED).
-
-    '
+  critical_finding: "BUG-299 / D-274a \u2014 the serving gate is a LABEL, not a verification\
+    \ verdict. scripts/apply_phase1_finalize.py:18 sets status = 'PASS' if content_type\
+    \ == 'principle' else 'QUARANTINE' (written at :163). 4,745/4,745 PASS rows are\
+    \ content_type='principle'; 0/1,470 non-principle rows pass. 2,447 rows (30.6%)\
+    \ disagree with their own persisted verification_results[factual].passed: 138\
+    \ NLI CONTRA-majority and 1,514 NEUTRAL rows are SERVED, 278 served rows had all\
+    \ evidence flagged non-evidence fragments, and 506 ENTAIL-majority rows are HIDDEN.\
+    \ Honest gate: PASS 4,745 -> 3,310. => ROLE is the highest-leverage axis, not\
+    \ decorative (D6 / BUG-280 / D272g INVERTED).\n"
   next_phase: '0a G17 re-derive status from the verification record (+ typed s5_reason,
     one writer, CI invariant). Then 0b G12 facet predicate in every leg. Then 0c G18
     guard split. Do NOT relabel, retrain, benchmark or rerun before 0a-0b.
@@ -300,9 +302,9 @@ current_state:
   - G4a
   - G13
   registry:
-    decisions: 639
-    highest_bug: BUG-301
-    buglog_entries: 50
+    decisions: 931
+    highest_bug: BUG-622
+    buglog_entries: 363
   do_not:
   - relabel the corpus
   - buy more stratum-A ruler rows
@@ -319,166 +321,4 @@ current_state:
   - the F-14 pocket retarget (statistically null - BUG-296)
   - any PASS-only frame as an epistemic frame (it is a ROLE frame)
   - the golden retrieval set as ground truth (ids chosen from live search output)
-# D-2676 (2026-09-27): THE STANDING RULE mechanized - scripts/check_rail_mutations.py + config/rail_mutations.yaml.
-# No rule lands without (i) ONE HOME, (ii) a SEEN boundary control, (iii) a NAMED oracle, (iv) a MUTATION that REDs
-# it. Measured: selftest 15/15, check rc=0 (2 rules SEEN to red, 1 negative control green, 2/2 subjects covered), MINTED D-2676 (807 records, stamp 9090685c33a0f103),
-# just health rc=0, rail registry rc=0 (5 declared writers); BUG-577 filed by the audit. AUDITED before the commit (D-381).
-# D-2677 (2026-09-27): BUG-576 FIXED (RAIL 0 BORN/UNBORN/BROKEN from declared probes; 4 real-repository
-# controls; selftest 15/15) + the --no-verify bootstrap WITHDRAWN and replaced by a MEASURED justification
-# (temp.bootstrap.refusal; declared_debt EMPTY, the paid-debt lifecycle driven synthetically; rehearsal 18/18) +
-# the standing-rule gate extended to RAIL 0 (mutation unborn_head_branch_is_load_bearing, 3/3 subjects, rc=0).
-# MINTED D-2677 (808 records, stamp 80c07d4142d20208). THE AUDIT FILED BUG-578 (the rehearsal rehearses HEAD).
-# D-2678 (2026-09-27): BUG-578 FIXED (the rehearsal holds the LANDING bytes - declared overlay, 436 file(s)) and
-# BUG-579 FIXED (a crash in the fixture builder is a verdict, not a traceback). Both were filed OPEN and FIXED in
-# the same commit, so the open count is unchanged. THE AUDIT FILED BUG-579.
-# D-2679 (2026-09-27): the coverage join landed (3 more mutations, floor 8, 7/7 rules SEEN to red); BUG-580 and
-# BUG-581 were filed and FIXED in the same commit, so the OPEN count is unchanged. RE-MEASURED from
-# scripts/bug_status.py: OPEN 138 / CLOSED 181 of 319 - the D-2678 note had left this number stale at 139, which is
-# what a hand-copied DERIVED count does; re-run scripts/bug_status.py before trusting it.
-# D-2680 (2026-09-27): THE WHOLE-SET RULE landed - `just health-full` runs all 87 declaring lines of the
-# declared ladder in ONE pass (0 fault(s), 203.0s), so the remaining fault set is measured, not implied;
-# BUG-573 closed and NO new bug was filed by the change. RE-MEASURE, never transcribe: the count below is
-# DERIVED by scripts/bug_status.py.
-# D-2681 (2026-09-27): the ONE-HOME FIXTURE RULE landed (scripts/lib/fixture.py; three rails import it, all
-# copies deleted) and BUG-582 closed the PARTIAL D-2680 justfile landing (banner + collector --selftest were
-# declared in four prose homes and in no file). RE-MEASURE, never transcribe: this count is DERIVED by
-# scripts/bug_status.py.
-# D-2689 (2026-09-27): the status slot became a POSITION AT A HEADER BOUNDARY (BUG-572) and BUG-562 was CLOSED
-# in the SAME change-set (its owed rail was verified by RUNNING it); BUG-587 was FILED and PARKED by the
-# window (ceiling 8 -> 9), so the OPEN count MOVED by one. RE-MEASURE, never transcribe:
-# D-2695 (2026-09-27): BUG-569 was CLOSED by the change that armed its rail-level control, so the OPEN
-# count MOVED by one (130 -> 129). RE-MEASURE, never transcribe: this count is DERIVED by
-# scripts/bug_status.py (measured: OPEN 129 / CLOSED 199 of 328).
-open_bugs_n: 129
-# 2026-09-26T (D-2662/BUG-554) - session trail (comments only: this file stays PARSEABLE).
-# THE CLASS, STATED ONCE: a declared field read by NO machine is a claim, not a control. MEASURED 2026-09-26:
-# table:/column: (BUG-553, joined by D-2661) and parity_rail (BUG-554, joined by D-2662) were each read by nobody,
-# and each rail that joined them is now IN the ladder (scripts/check_derivation_homes.py, 32/32 controls).
-# NEXT SESSION READS, in order: governance/CONTEXT_INDEX.md (recall map), governance/SESSION-HANDOFF-2026-09-26.md,
-# then the ladder: just health. The R2 pin is OWNER-OWED (a moved sha256 needs a NEW decision id, BUG-535).
-
-# 2026-09-26T (D-2663/BUG-555) - session trail (comments only: this file stays PARSEABLE).
-# THE CLASS, ONCE MORE: a provenance field is a CONTROL only if its question is the question it claims to ask.
-# "coder" in the whole file text answers a SUBSTRING question and printed true on 400/400 records with no coder key.
-# A PIN closed on prose ("the change is additive") is not closed; it is closed by an A/B anyone can re-run.
-
-# 2026-09-26T (D-2664/BUG-537/BUG-556) - session trail (comments only: this file stays PARSEABLE).
-# THE CLASS, ONCE MORE, AND THIS TIME AT THE RAIL'S OWN INPUT: a rail that reads a tree it shares with the
-# ladder is a rail whose verdict depends on who ran what last. archive/db_backups/...db-shm (mtime 21:44,
-# written by `just health`) was counted, so the index digest moved with ZERO content change
-# (files 3/135528448 B/2026-09-19 counted vs files 1/135495680 B/2026-09-17 declared excluded).
-# AND: the buglog block for BUG-537 named a pre-image that DISPROVED its own numbers (ecfe29517a941e1b... already had
-# 32 entries and no .DS_Store). A diff claim must carry the DIGESTS of both sides - D-2663's lesson, applied to
-# the audit trail itself. archive/index.yaml body now 47532fca72a9ab9a... (12 deletions / 31 insertions vs the
-# pre-image, which IS the fix: the census, plus the ignored class leaving the counts that had included it).
-
-# D-2666 (2026-09-26) - RATIFY EXECUTED (comments-only: this file must stay parseable, C12).
-#   * config/depth_domain_contract.yaml status: active (owner_gate: RATIFY). The ruler is GATING; re-derive
-#     depth/domain labels AGAINST IT, never against a proposed document.
-#   * BUG-558 FIXED: the live ANCHOR-4 workbook was a FOREIGN BODY; certified bytes restored from git HEAD
-#     (f2778a488610cbf1) + owner rulings applied through scripts/apply_workbook_rulings.py = 972def3224a1abba.
-#     NEVER hand-edit that CSV: it is human_authored, and the one sanctioned writer is the applier (BUG-560: it
-#     is not yet receipted - do not treat its silence as safety).
-#   * The workbook's encoding has ONE value (utf-8) in all three homes of config/reconciliation.yaml. A
-#     declaration derived from the bytes on disk is how a clobber becomes certified (BUG-558).
-#   * BUG-559 OPEN: a receipt may be cut over bytes joined to no revision. verify_handoffs rc=0 today because
-#     the live digest is recorded AND its pre-ruling image is a sealed revision locator - not because the class
-#     is closed.
-#   * RATIFIED-BY-DEFAULT READING: when a rail's exit code is suppressed by an owner gate, every green rail is
-#     green BECAUSE it is silent. The gate is the finding.
-
-# D-2667 (2026-09-26): the plan PARSES and the ladder is GREEN (just health rc=0, verify_handoffs rc=0), and the
-# reconciliation commit is BLOCKED BY A FOUND DEFECT (BUG-562), not by a missing edit: a GRANTED config
-# (config/serving_gate.yaml) whose CONSUMER (pipeline/serving_gate.py:22) is will_not_touch - one without the other
-# declares a gate whose implementation is absent. may_touch now grants the TWO owner artifacts BY NAME, never a glob.
-# BUG-561: a TRACKED rename-sibling of the owner blind sheet was rewritten wholesale in the working tree - a rail
-# auditing only the STAGED set cannot see it. OWNER GATE (one word): CROSS the pipeline/** boundary for the
-# serving-gate pair, or SPLIT the reconciliation per pair.
-
-# D-2668 (2026-09-26): the owner's CROSS is IMPLEMENTED - `crossing: true` is now a PERMIT with a SUBJECT (`crossed:`),
-# an ACK (`acked_by`/`acked_on`) and a SPEND (`spent_by`); entry 23 named 8 pipeline/** paths, acked by the owner,
-# and is SPENT by e3f94f4. HEAD = 11c0fe4 and it names the TREE THE RAILS MEASURED (62 paths landed: the plan's
-# grants + the 8 crossed, incl. config/serving_gate.yaml WITH its consumer and its test - BUG-562 closed by
-# construction). A may_touch widening was REJECTED: standing permission over production code cannot be closed later.
-# BUG-561 WAS CORRECTED: the worktree "clobber" was the DECLARED rev 3 of the owner drop-in; the REVERT orphaned a
-# write-locked digest and was repaired by restoring the bytes from the R-D410 backup (rev 3 exists in NO git ref -
-# one `git checkout` from losing it). The rule: a diff against HEAD is NOT a clobber test; test the DECLARED revision.
-# STILL OPEN: the BUG-562 PAIRING rail (nothing yet REFUSES a commit set whose granted consumer is withheld),
-# BUG-563 (backups/** neither granted nor ignored), BUG-559/560, the D-2667/D-2668 mints, the owner drop-in rev 3
-# promotion (BUG-493: HEAD carries the superseded rev 2).
-
-# D-2669 (2026-09-26): the CONSUMER JOIN is a property, not an act. config/declaration_consumers.yaml (4 edges) +
-# scripts/check_declaration_consumers.py: the WRITE moment in the pre-commit hook (RAIL 5, installed from
-# scripts/install_git_hooks.sh) refuses a commit set that withholds a declaration's reader; STATE mode + --selftest in
-# the ladder. BUG-562 CLOSED BY CONSTRUCTION. config/rail_registry.yaml#commit_boundary declares the hook's REQUIRED
-# TEXT and check_rail_registry.py verifies it (BUG-564: the hook ROUTE is not yet a declared subject).
-# MEASURED: health rc=0, registry 9/9 + live rc=0, consumers 11/11, hook dry-run rc=0 (4 rails), repo-integrity rc=0.
-# NEXT: BUG-559 -> BUG-560 -> BUG-563; the mints D-2667/2668/2669. OWNER (one word): PROMOTE rev 3 (526991cb).
-
-# D-2670 (2026-09-26): RECEIPT PROVENANCE is a property (BUG-559 fix landed). scripts/verify_handoffs.py gained the
-# `provenance` check class: every receipted (path, digest) must be re-derivable by git HEAD, by a RETAINED PREFIX
-# of an append_only path (BUG-540), or by a declared revision locator; the escape lives in ONE home,
-# config/handoffs.yaml#receipt_provenance (rule + unrevisioned_declared + SHRINK-ONLY max_unrevisioned: 2), joined
-# to a live receipt in BOTH directions (an unmatched escape is DRIFT). Its consumer edge is registered in
-# config/declaration_consumers.yaml (D-2669). MEASURED: selftest rc=0; live rc=2 naming ONE object - the owner
-# drop-in 526991cb (203963 B): UNREVISIONED because git HEAD still carries superseded rev 2. A same-length live
-# copy, a foreign body and a digestless receipt are each SEEN refused; a stale escape and a census raise are rc=1.
-# NEXT: (1) PROMOTE rev 3 -> the rail's single owner-owed line becomes `head` and BUG-493 closes; (2) BUG-560
-# write_guard for apply_workbook_rulings.py; (3) BUG-563 one home for backups/** + the rail output stores;
-# (4) BUG-564 remainder (the hook ROUTE as a declared subject); (5) MINT D-2667/2668/2669/2670.
-# D-2671 (2026-09-26, owner word 'Promote'): rev 3 (526991cb, 203963 B) of the write-locked owner drop-in is the
-# TRACKED revision of its own path - landed through a SPENT one-off crossing permit (session_plan entry 24), never a
-# may_touch widening (rail 4 matches by FAMILY, BUG-528). MEASURED: staged bytes == 526991cb (i/crlf w/crlf, no
-# filter); verify_handoffs flipped from rc=2 owner-owed on ONE object to 'provenance: ... -> head', rc=0; BUG-493
-# closed and BUG-559's live line cleared; NO new receipt and NO rev-3 locator (HEAD IS the store; a locator would be
-# a second home). ALSO: 6th owner gate ANSWERED - KEEP the two foreign-body backups (574aafef64f0cff7 is the only
-# evidence of the body a receipt once certified; PURGE would delete the specimen).
-# NEXT: (1) BUG-431's CONTENT promotion (owner gate; writes the tracked sheet + retires anchor4_interim_state.json);
-# (2) BUG-560 write_guard for apply_workbook_rulings.py; (3) BUG-563 backups/** + rail output stores; (4) BUG-564
-# remainder (the hook ROUTE); (5) MINT D-2667/2668/2669/2670/2671.
-
-# D-2672 (2026-09-26): BUG-565 FIXED in 8a84622 - the staged set is a NUL-separated NAME LIST
-# (scripts/lib/git_subject.py#run_git_paths, one home: -z + NUL parse); three controls over a REAL synthetic
-# index are SEEN red on the pre-fix code; RAIL 4's --selftest is wired into `just health`. BUG-566 filed: rail 4
-# REFUSES git's OWN next-index-*.lock at a PARTIAL commit while rail 5 tolerates and names it (two homes, one
-# fact) - no partial commit can pass rail 4 until a DECLARED tolerance lands.
-# D-2671 LANDED in fe239df: rev 3 (526991cb, 203963 B) of the write-locked owner drop-in is the TRACKED revision
-# of its own path; the entry-24 crossing permit is SPENT by that commit; verify_handoffs rc=2 -> rc=0
-# (`provenance: anchor4_depth_sheet_owner_dropin -> head`); BUG-493 CLOSED.
-# NEXT: (1) BUG-566 tolerance; (2) BUG-431 CONTENT promotion (OWNER GATE); (3) BUG-560 write_guard for
-# apply_workbook_rulings.py; (4) mints D-2671/D-2672; (5) BUG-563; (6) BUG-564 remainder (the hook ROUTE).
-
-# D-2673 (2026-09-27, LANDED 645aeae): git's OWN temporary index is ADOPTED, READ and NAMED at the write boundary - ONE home
-# (scripts/lib/git_subject.py#index_subject) serves rails 3/4/5; adoption requires (1) realpath inside the PINNED git dir,
-# (2) basename matching a DECLARED owner_name_globs entry, (3) the file EXISTS; anything else ambient is REFUSED (C16).
-# BUG-566 and BUG-567 FIXED; BUG-568 (rail 0 has no pin - principled exemption) and BUG-569 (the adoption NOTE has no
-# rail-level control) filed. MEASURED: module selftest 13/13 with the D-405 join to a LIVE minted name; rails 16/16, 23/23,
-# 11/11; the landing commit was a PARTIAL commit and all three rails printed the ADOPTED note (rc=0).
-# D-2674 (2026-09-27, OWNER WORD: RATIFY): the repo-integrity git-subject guard set is IN FORCE with a MINTED id (it had
-# carried decided: PENDING-OWNER) and its consumer list is a CLAIM joined by D-405 (rails 3/4/5; rail 0 exempt, BUG-568).
-# REGISTRY MINTED 2026-09-27: D-2667..D-2674 in ascending order (the gate requires the NEXT FREE id) -> 805 records, stamp
-# ec8f32ea8a61c80d; `just health` rc=0 (was RED at 'citations that do not resolve: D-2673, D-2674').
-# THE MINT REFUSED A TRUE CITATION, WHICH IS THE FINDING OF THIS SESSION: D-2671 cites BUG-493 and governance/bug_status.json
-# could not see that id - it was written in buglog.md ONLY as inline prose, never as a heading. REPAIR: an appended
-# `## BUG-493` status EVENT (append, never rewrite) + BUG-571 (the register is fed by HEADINGS only; the honest control is
-# the cited-by-decision join, not a prose scan). ALSO: BUG-570 was filed OPEN and read CLOSED - a status word in a heading's
-# TITLE decides when the paren slot names none; the blanket tightening flips 10 of 397 events (2 corrections, 8 REGRESSIONS)
-# so it was REFUSED on measurement and filed as BUG-572, with a REOPENED event landed for that id only.
-# NEXT: (1) BUG-560 write_guard for scripts/apply_workbook_rulings.py; (2) BUG-571 the cited-by-decision join in
-# scripts/bug_status.py; (3) BUG-568 a DERIVED pin for RAIL 0; (4) BUG-431 CONTENT promotion (OWNER GATE); (5) BUG-563 one
-# home for backups/** + the rail output stores; (6) BUG-564 remainder (the hook ROUTE as a declared subject).
-# REGISTRY MINTED 2026-09-27 (D-2675): the BOUNDARY REHEARSAL - scripts/check_boundary_rehearsal.py +
-# config/boundary_rehearsal.yaml, 13/13 known-answer controls, rc=0 in 11.5s, wired into just health and declared a
-# WRITER in config/rail_registry.yaml. THE CLASS IT CLOSES: BUG-527/566/568/569/574 were ONE defect - a rule about the
-# value git HANDS its own pre-commit hook, tested only in fixtures that built their own `git init` - MEASURED as 13/13
-# green controls while 100 percent of commits were refused. The rehearsal builds a REAL repo in the system temp dir
-# (live --separate-git-dir layout, the repository's OWN hook installer), runs a REAL normal commit AND a REAL partial
-# commit through the hook, plants violations and asserts the DECLARED rail refuses them. Provenance is read from its ONE
-# home (scripts/lib/git_subject.py#note_kind, D-2646); the fixture must resolve OUTSIDE the tree it audits (fail closed).
-# BUG-576 FILED by it: a FRESH repository cannot make its FIRST commit - RAIL 0 reads an UNBORN HEAD as broken metadata,
-# which is the state the BUG-400/BUG-564 recovery route produces; the declared --no-verify bootstrap MUST BE WITHDRAWN
-# when it is fixed. Register: 314 ids, OPEN 138 / CLOSED 176. Decisions: 806 records, stamp 3e277d4070884474.
-# NEXT: (1) BUG-576 - RAIL 0 must tell an UNBORN HEAD from broken metadata; (2) BUG-575 - supersession COMPLETENESS +
-# IN-FORCE for cited decisions (16 measured findings); (3) BUG-573 - the ladder must collect EVERY fault before it exits
-# (one defect currently hides the next); (4) the MUTATION GATE (per rail: the mutation and the control that must go RED);
-# (5) DEFINITION OF DONE FOR A RULE - no new rule lands without one home, a boundary control, a named oracle and a mutation.
+open_bugs_n: 143

@@ -13,6 +13,12 @@ Config: pipeline_config.yaml → stage1_3 section. All thresholds configurable.
 Input:  Stage 1 checkpoint (chunks.jsonl)
 Output: Filtered checkpoint → same path (in-place overwrite when --in-place)
 
+CONTRACT (BUG-598, D-2721): S1.3 is a MUTATING pre-filter, NOT a self-contained stage.
+  --in-place rewrites Stage1/{run_id}/checkpoint.jsonl in place (S1 is NOT immutable
+  after this), and writes only a {"completed": true, ...} completion flag to
+  Stage1_3/{run_id}/checkpoint.jsonl (no data). Downstream S1.5 reads the MUTATED S1
+  checkpoint, NOT S13. The pre-filter backup is preserved at checkpoint.jsonl.prefilter_backup.
+
 Usage:
     python3 pipeline/stage1_3_prefilter.py            # dry-run: show what would be dropped
     python3 pipeline/stage1_3_prefilter.py --in-place  # actually filter

@@ -91,11 +91,54 @@ may_touch:
   - governance/MUTATION_JOURNAL.jsonl
   - governance/anchor_adjudication_workbook_20260924.csv
   - governance/anchor_adjudication_fixlog_20260925.csv
+  # WIDENED 2026-10-03 (D-2800) - BUG-563 RECURRENCE. The 2026-10-02/03 discipline/depth/anchor audit sessions
+  # produced ~62 machine artifacts (reviews, conformance, adjudications, finalizations, A/B measurements) and a
+  # C19 bloat purge archived 18 depth/vote/eval checkpoint files into archive/bloat_20260929/. NONE were granted
+  # nor excluded, so check_repo_integrity.py --worktree FAILED (103 paths in no home). Each family below is a
+  # DURABLE governance/source artifact and is GRANTED (committable). The three EPHEMERAL owner/runtime families
+  # (.pipeline_runner.lock, *.numbers, anchor ruler*.csv) are DECLARED-EXCLUDED in config/repo_integrity.yaml.
+  # NOTE (D-2800): pipeline/** is will_not_touch-locked, yet 19 pipeline/*.py files are MODIFIED and
+  # pipeline/practicality.py is UNTRACKED - a BUG-528 conflict (edits landed against a live lock). NOT granted
+  # here (a may_touch grant resolving into will_not_touch is REFUSED by rail 4). OWNER-GATED: lift/narrow the
+  # pipeline/** lock or revert the edits. Flagged as a next-step decision, not silently resolved.
+  - feed.opml                         # tracked technology-feed source, modified
+  - benchmarks/*                      # benchmark_hnsw_recall.py (HNSW recall benchmark)
+  - governance/frontier_audit/**      # D-2703 chunking/anchor research sandbox (triage, prompts, verdicts)
+  - governance/FORENSIC_AUDIT_*.md    # forensic audit reports (20260929, 20261002, BLOAT)
+  - governance/MARKET_RESEARCH_*.md   # market research report
+  - governance/STRATEGIC_PLAN_*.md    # strategic plan
+  - governance/ANCHOR_150_*.csv       # 150-anchor five-axis view
+  - governance/ANCHOR_208_*.csv       # 208-anchor bridge ruler + five-axis view
+  - governance/ANCHOR_208_*.json      # 208-anchor consolidated/depth-corrected/discipline-normalized
+  - governance/discipline_*           # discipline review/conformance/finalization/A-B measurement artifacts
+  - governance/spot_check_*           # spot-check quarantine artifacts
+  - governance/quarantine_*           # quarantine owner-decisions draft
+  - governance/*_adjudication.json    # applicability/content_type/duplicate adjudications
+  - governance/*_candidates.json      # same_work_content / title_rename candidates
+  - governance/dedup_deletion_plan.json   # dedup deletion plan
+  - governance/depth_anchor_conformance_*.json  # depth conformance report (207 golden)
+  - governance/depth_finalization_*.json   # depth finalization owner record
+  - governance/anchored_depth_mismatch_review_*.md  # anchored depth mismatch review
+  # C19 bloat purge (D-2800): the 18 depth/vote/eval checkpoint files below were ARCHIVED to
+  # archive/bloat_20260929/governance/ (FORENSIC_AUDIT_BLOAT_20260929.md); their DELETION is granted so the
+  # purge can be committed. (governance/METRICS.jsonl is already granted above; its deletion is covered there.)
+  - governance/depth_*.yaml
+  - governance/depth_vote_*
+  - governance/joint_vote_*
+  - governance/model_eval_*
+  - governance/r2_definition_nli_*
+  - governance/s4_review_queue.*
+  # WIDENED 2026-10-03 (D-2801, OWNER ACKED "approve your recommendation"): the BUG-528 pipeline/** lock
+  # re-scope. pipeline/** moves OUT of will_not_touch (edit-gate) INTO may_touch (accountability-gate):
+  # pipeline code is now ordinary code governed by R5 generator!=verifier review + D-naming +
+  # stage_code_fingerprint (BUG-614), not an edit-prohibition lock. Owner instruments (F11_*, ANCHOR_RULER,
+  # DEPTH_BLIND_SHEET) keep their lock, untouched.
+  - governance/OWNER_GATE_BUG528_20261003.md
+  - pipeline/**                 # D-2801: pipeline code is ordinary code (R5 review + D-naming + fingerprint)
 will_not_touch:
   - governance/F11_*            # owner instruments (write-locked)
   - governance/ANCHOR_RULER_CONSOLIDATED_*.csv
   - governance/ANCHOR4_DEPTH_BLIND_SHEET_*.csv
-  - pipeline/**
 
 widening_log:
   # WHY THIS BLOCK EXISTS: on 2026-09-25 the assistant widened `may_touch` ITSELF so its own artifacts could
@@ -476,7 +519,7 @@ widening_log:
       digest(s) and 3 revision(s) agreeing with their bytes.
   - entry: 23
     session: 20260926T
-    crossing: true
+    crossing: false               # SUPERSEDED by D-2801 (2026-10-03): pipeline/** moved OUT of will_not_touch INTO may_touch
     crossed:
       - pipeline/migrate_D2205_epistemic.py
       - pipeline/pipeline_paths.py
@@ -590,3 +633,19 @@ widening_log:
       112 of the 124 paths and is therefore granted rather than laundered through a temp file; (3) the four
       untracked drift/bench SNAPSHOTS are declared EXCLUDED (their consumed output is declared separately), so
       the disposition per path is one fact with one home rather than a pattern chosen per convenience.
+
+  - entry: 27
+    session: 20261003A
+    owner_ack: 'GRANTED 2026-10-03 (owner: "approve your recommendation / implement the next critical steps")'
+    widened:
+      - pipeline/**
+    may_touch_untouched: false      # this entry ADDS pipeline/** to may_touch
+    will_not_touch_untouched: false # D-2801: pipeline/** REMOVED from will_not_touch (re-scope edit-gate -> accountability-gate)
+    why: >-
+      D-2801 (BUG-528/BUG-563-recurrence): pipeline/** was will_not_touch-locked while being the single most
+      actively-edited code directory (745 insertions + untracked practicality.py); the lock was honored only via
+      ~5 one-off `crossing: true` owner-acks in a week, so its semantic had drifted to a lie. Re-scoped: pipeline/**
+      removed from will_not_touch (edit-prohibition is for IMMUTABLE owner instruments, not actively developed
+      code) and granted in may_touch (ordinary code), governed by R5 generator!=verifier review + D-naming +
+      stage_code_fingerprint (BUG-614). Owner instruments (F11_*, ANCHOR_RULER, DEPTH_BLIND_SHEET) keep their
+      lock, untouched. Unblocks the 20 pipeline files for commit and the S4 rerun.

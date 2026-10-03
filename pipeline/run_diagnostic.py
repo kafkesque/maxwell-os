@@ -85,7 +85,7 @@ from pipeline.pipeline_paths import (
 # ── Checkpoint/Resume Infrastructure ─────────────────────────────────────
 # D2264: The diagnostic MUST survive interruption. State is tracked in
 # governance/diagnostic_state.json. On restart, completed stages are skipped.
-_DEFAULT_RUN_ID = _PIPELINE_CFG.get("run", {}).get("default_id", "latest")
+_DEFAULT_RUN_ID = _PIPELINE_CFG.get("run", {}).get("default_id", "")  # BUG-597: no hardcoded "latest" fallback
 _DIAG_STATE_FILE = PROJECT_ROOT / "governance" / "diagnostic_state.json"
 
 def _get_diag_state_path() -> Path:

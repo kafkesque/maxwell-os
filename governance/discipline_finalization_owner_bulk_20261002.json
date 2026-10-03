@@ -1,0 +1,17 @@
+{
+  "artifact_id": "discipline_finalization_owner_bulk_20261002",
+  "ruling": "all discipline are human approved (owner, 2026-10-02)",
+  "ratified_rows": 199,
+  "final_distribution": {
+    "owner_finalized": 208
+  },
+  "_provenance": {
+    "schema_version": "1.0",
+    "generated_by": "scripts/finalize_discipline_bulk.py",
+    "gen_model": "human_owner (bulk adjudication 2026-10-02)",
+    "pipeline_commit": "49c17e4f3e86befd572f9a5b7ceb858d960a51bd",
+    "source_sha256": "be4d21db7f82a5569bcdd3679128191e6e6c14a874e88e1b461329953da0b633",
+    "decision": "D-2766",
+    "timestamp": "2026-10-02T16:30:10.941699+00:00"
+  }
+}

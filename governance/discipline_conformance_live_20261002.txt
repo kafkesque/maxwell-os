@@ -1,0 +1,71 @@
+/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.7.0) or chardet (7.4.3)/charset_normalizer (3.4.9) doesn't match a supported version!
+  warnings.warn(
+discipline conformance anchor: governance/discipline_anchor_conformance_20261002.json
+  N = 204   model = gpt-oss-20b-MXFP4-Q8
+  gold distinct disciplines: 49
+  floor (kappa): 0.8  (reporting 0.667 / operative 0.8)
+   slim batch 1/51: 4/204 classified
+   slim batch 2/51: 8/204 classified
+   slim batch 3/51: 12/204 classified
+   slim batch 4/51: 16/204 classified
+   slim batch 5/51: 20/204 classified
+   slim batch 6/51: 24/204 classified
+   slim batch 7/51: 28/204 classified
+   slim batch 8/51: 32/204 classified
+   slim batch 9/51: 36/204 classified
+   slim batch 10/51: 40/204 classified
+   slim batch 11/51: 44/204 classified
+   slim batch 12/51: 48/204 classified
+   slim batch 13/51: 52/204 classified
+   slim batch 14/51: 56/204 classified
+   slim batch 15/51: 60/204 classified
+   slim batch 16/51: 64/204 classified
+   slim batch 17/51: 68/204 classified
+   slim batch 18/51: 72/204 classified
+   slim batch 19/51: 76/204 classified
+   slim batch 20/51: 80/204 classified
+   slim batch 21/51: 84/204 classified
+   slim batch 22/51: 88/204 classified
+   slim batch 23/51: 92/204 classified
+   slim batch 24/51: 96/204 classified
+   slim batch 25/51: 100/204 classified
+   slim batch 26/51: 104/204 classified
+   slim batch 27/51: 108/204 classified
+   slim batch 28/51: 112/204 classified
+   slim batch 29/51: 116/204 classified
+   slim batch 30/51: 120/204 classified
+   slim batch 31/51: 124/204 classified
+   slim batch 32/51: 128/204 classified
+   slim batch 33/51: 132/204 classified
+   slim batch 34/51: 136/204 classified
+   slim batch 35/51: 140/204 classified
+   slim batch 36/51: 144/204 classified
+   slim batch 37/51: 148/204 classified
+   slim batch 38/51: 152/204 classified
+   slim batch 39/51: 156/204 classified
+   slim batch 40/51: 160/204 classified
+   slim batch 41/51: 164/204 classified
+   slim batch 42/51: 168/204 classified
+   slim batch 43/51: 172/204 classified
+   slim batch 44/51: 176/204 classified
+   slim batch 45/51: 180/204 classified
+   slim batch 46/51: 184/204 classified
+   slim batch 47/51: 188/204 classified
+   slim batch 48/51: 192/204 classified
+   slim batch 49/51: 196/204 classified
+   slim batch 50/51: 200/204 classified
+   slim batch 51/51: 204/204 classified
+  raw agreement (accuracy): 0.0833   (reported, NOT gated)
+  Cohen's kappa:            0.0793   -> below reporting floor — report the disagreement, decide nothing
+  per-class (top gold counts):
+    research methodology         P=1.0 R=0.125 F1=0.2222 (gold n=16)
+    design thinking              P=0.0 R=0.0 F1=0.0 (gold n=12)
+    strategic thinking           P=0.0 R=0.0 F1=0.0 (gold n=12)
+    behavioral economics         P=0.0 R=0.0 F1=0.0 (gold n=9)
+    psychology                   P=0.0 R=0.0 F1=0.0 (gold n=9)
+    cognitive science            P=0.6667 R=0.25 F1=0.3636 (gold n=8)
+    operations research          P=0.0 R=0.0 F1=0.0 (gold n=8)
+    cultural design              P=0.0 R=0.0 F1=0.0 (gold n=7)
+    human-computer interaction   P=1.0 R=0.2857 F1=0.4444 (gold n=7)
+    organizational theory        P=1.0 R=0.1429 F1=0.25 (gold n=7)
+FAIL-CLOSED: kappa 0.0793 < operative floor 0.8

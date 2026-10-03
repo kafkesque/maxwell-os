@@ -1,6 +1,6 @@
 # Maxwell OS v3.0 — DECISION LOG (tiered)
 
-> **Updated:** 2026-09-20 | **Machine source of truth:** `config/decisions.yaml` | **Count:** `config/decisions_summary.json` (the census is the ONE home - a count restated in prose is stale the moment it is written, BUG-588)
+> **Updated:** 2026-10-03 | **Machine source of truth:** `config/decisions.yaml` | **Count:** `config/decisions_summary.json` (the census is the ONE home - a count restated in prose is stale the moment it is written, BUG-588)
 > **Archive (full append-only history):** `archive/governance_pre_tiered_2026-09-03/DECISION-LOG.md`
 >
 > **Convention (standing rule):** OPEN/PENDING at the top (most critical first) → ACTIVE in-effect → DONE/CLOSED at the bottom. A decision is "done" only when its `state` is RESOLVED/SUPERSEDED/ARCHIVED/REJECTED.
@@ -8,6 +8,73 @@
 > **Heading convention (D2552):** tier sections are `## 🔴 OPEN / PENDING`, `## 🟢 ACTIVE`, `## ⚪ DONE / CLOSED`. Entries use `| ID | State | Decision |` table rows. Historical `### D#### — Title` / bare `## D####` formats remain as-is (append-only history); NEW entries MUST use the table format. Reconcile `DECISION-LOG.md` ↔ `config/decisions.yaml` via `scripts/recompute_decision_summary.py`.
 
 ---
+
+## 🔴 CURRENT OPEN / PENDING INDEX (machine-derived 2026-10-03 — the live face; history below)
+
+**Register truth (do NOT restate counts elsewhere — BUG-588/D-2692):** 942 decisions · 367 bugs (133 open / 234 closed; highest OPEN = BUG-628). Forensic audit + preflight GREEN.
+
+1. **OWNER-GATED (D-2727): RATIFY-2 full S4→S5→S6 rerun** — launch under `caffeinate -dimsu` (`runner.py --dry-run` then full).
+2. **OWNER-GATED (D-2727 OG-1): train/eval split** — Option A recommended (KEEP(46)→S4 golden; pin 46 OUT of eval ruler 208→162; sha256-pinned split manifest).
+3. **D2622 ACTIVE** — practicality advisory wired into S5; RESOLVED flip lands at RATIFY-2 after a live S5 run populates the field.
+4. **D2621 PROPOSED** — distinct-facet dedup method landed (D2625/D2626/D2627); residual = owner choice: `pipeline/dedup` module vs keep ad-hoc scripts.
+5. **D2547 PLANNED** — per-label thresholds not yet populated.
+
+— everything below is dated change history / ACTIVE / DONE —
+
+## 2026-10-03 — D2622 wired into S5 (advisory tier); D2621 method confirmed landed (correction of prior "no work landed")
+
+Owner approved the D2621 + D2622 senior-RAG recommendations → implemented in strategically consequential order.
+
+1. **D2622 (practicality/applicability filter) — WIRED into S5.** `pipeline/practicality.py::classify_practicality()`
+   now annotates every verified FB in `pipeline/stage5_verify.py` with a `practicality` field
+   (immediately-applicable | context-dependent | abstract). This is an ADVISORY soft-facet for query-time
+   re-ranking — it NEVER drops/quarantines an FB (`status` derives independently in the same loop). C16: a
+   missing/malformed `config/practicality.yaml` fails loud. Registry state D2622 stays ACTIVE — the final
+   RESOLVED flip lands at RATIFY-2 after a full S5 run populates + validates the field.
+
+2. **D2621 (distinct-facet dedup) — CORRECTION, not new work.** The prior audit note ("genuinely OPEN — no
+   work landed") was INACCURATE. The method landed via D2625/D2626/D2627 (all RESOLVED 2026-09-14):
+   `scripts/dedup_scan.py` (SHA-256 + name-stem collision, NO embedding for the merge decision), `dedup_judge.py`
+   + `judge_suffix_duplicates.py` (mechanism-aware judge), `prefilter_dedup_groups.py`, `apply_dedup_marks.py`
+   (mark `duplicate_of` + QUARANTINE — never delete, R-D410). Artifacts present: `dedup_candidates.jsonl`,
+   `dedup_merge_plan.json`, `dedup_suffix_judgments.json`, `dedup_final_apply_plan.json`. D2621 umbrella stays
+   PROPOSED — residual is an OWNER choice: formalize as a reusable `pipeline/dedup` module vs accept the ad-hoc
+   scripts.
+
+Registry/buglog unchanged (938 / 366); `decisions.yaml` untouched → census NOT re-derived.
+
+## 2026-10-03 — Owner-authorized registry state-flips executed (D2546→RESOLVED, D2548→REJECTED, D2622→ACTIVE)
+
+Forensic audit → owner "approve those" → executed the three owner-owed state-flips the prior NOTE had queued:
+
+| ID | Before | After | Evidence |
+|---|---|---|---|
+| D2546 | PLANNED | RESOLVED | SHACL .ttl SHIPPED (D2555); OWL periodic + Track B re-scoped (not started) |
+| D2548 | PLANNED | REJECTED | grammar-decoding A/B RAN + REJECTED (D2392); `grammar_decoding_enabled=false` (D2556) |
+| D2622 | PROPOSED | ACTIVE | deterministic backend landed (D-2723); S5 wiring deferred to RATIFY-2 |
+
+**D2622 state-vocabulary blindspot also closed**: `config/practicality.yaml` carried `state: IMPLEMENTED` (a non-registry
+word) → renamed `backend_state: landed` (a config-local lifecycle word). The registry state word now lives ONLY in
+`config/decisions.yaml` D2622. Census re-derived (`source_sha256 15e1ff0b`); `decisions_registry` receipt re-baselined
+(origin=owner-rebaseline, 909223 B). Registry 938 decisions / buglog 366 unchanged; `session_seed.yaml` already in sync.
+Remaining ladder RED is owner-ruling only: `anchor4_workbook` + `depth_workbook_row_count` (both = R003/R146 AUTOFILL).
+
+## 2026-10-03 — Superseded/done/conflicting decision + bug audit; BUG-625 + BUG-626 filed (no new decision minted)
+
+### Audit result — superseded / done / conflicting decisions + superseded / fixed bugs (forensic, no registry change)
+- **Superseded decisions (16):** 4 name a successor (D2100→D2094, D2253→D2362, D2294→D2298, D2296→D2298); 12 are pinned as declared legacy debt in `config/decisions_policy.yaml#graph.pinned_supersession_ids` (D2070, D2080, D2085, D2087, D2091, D2223, D2224, D2293, D2317, D2318, D2430, D2582) — NOT backfilled by design (a tool-reconstructed successor is not evidence, BUG-575).
+- **Done decisions:** 270 RESOLVED (+ 8 ARCHIVED, 10 REJECTED). No separate "DONE" state — a decision is done when RESOLVED/SUPERSEDED/ARCHIVED/REJECTED.
+- **Conflicting decisions (2, both NEW):** (1) **D-328** carries `superseded_by: ['D338','D339']` — a LIST where the graph contract (`successor_field: superseded_by`) expects ONE scalar id → **BUG-626**; (2) **D-2104** declares `supersedes: D2085` in the reverse direction, but D2085's own record has no `superseded_by` and sits in `pinned_supersession_ids` (a forward/backward asymmetry, already noted in the pin's `pinned_supersession_measured` prose — LOW, not a fault).
+- **Superseded bugs:** NONE in the register — bugs are binary open/closed (no SUPERSEDED status word in `scripts/bug_status.py`).
+- **Fixed bugs:** 220 CLOSED of 365 (RESOLVED/CLOSED/FIXED/INVALID/RETRACTED), 145 OPEN. `governance/bug_status.json` re-derived (was 143/220/363 → 145/220/365).
+
+### BUG-625 + BUG-626 filed this turn (BOTH RESOLVED 2026-10-03)
+| ID | State | Decision |
+|---|---|---|
+| BUG-625 | RESOLVED | **C12 residuals from the D-2801 R5 review, filed as a follow-on bug (not yet fixed).** probe_run.py:36-37 hardcode run-id `latest` (BUG-597 class); probe_run.py:41 hardcodes `OMLX_URL=http://localhost:11435` (second home for the endpoint); the `"knowledge pipeline"` literal is duplicated across ≥10 pipeline modules instead of reading `pipeline_paths.py` DATA_DIR/CHECKPOINT_DIR/DB_PATH. NON-BLOCKING (probe tooling). FIX: config-first run-id + endpoint + ONE path home. |
+| BUG-626 | RESOLVED | **Decision-registry schema conflict.** D-328 `superseded_by` is a LIST `['D338','D339']` where `config/decisions_policy.yaml#graph.successor_field` expects ONE scalar. DORMANT (D-328 is RESOLVED, not SUPERSEDED, so the graph walker never reads it) but LATENT — any scalar reader or a future flip to SUPERSEDED raises a TypeError. LOW severity. FIX: canonicalize to a scalar successor + add a scalar-or-absent type-check to the supersession rail. |
+
+**[SUPERSEDED 2026-10-03 — this audit snapshot is stale. Machine truth (`config/decisions_summary.json` + `governance/bug_status.json`): decisions 940 / buglog 366 (132 open / 234 closed) / highest_bug BUG-604. See the D-2808 + NOTE entries at the bottom of this log.]**
 
 ## 2026-09-22 — D-332 (community-benchmark-first rule + mlx-dspark M1 net-loss + on-device sweep) — RESOLVED
 
@@ -48,14 +115,14 @@
 ### New from cross-model adjudication (2026-09-03)
 | ID | State | Decision |
 |---|---|---|
-| D2546 | PENDING | **SHACL hot-path + OWL periodic** (not OWL-DL everywhere). Formalize 105 canonicals as `sh:disjoint`/`sh:closed`/`sh:in` before Track B. |
-| D2547 | PENDING | **Per-label/per-axis cost-weighted thresholds** — retire the global 5% semantic-error rule. Calibration measurement DONE (D2561): 440 labels → `governance/d2547_calibration.json`; remaining = populate per-label thresholds. |
-| D2548 | PENDING | **Grammar-constrained decoding pilot** on S4 discipline/domain enums (Outlines/XGrammar) — latency A/B before adoption. |
+| D2546 | RESOLVED | **SHACL hot-path + OWL periodic** (not OWL-DL everywhere). Formalize 105 canonicals as `sh:disjoint`/`sh:closed`/`sh:in` before Track B. |
+| D2547 | PLANNED | **Per-label/per-axis cost-weighted thresholds** — retire the global 5% semantic-error rule. Calibration measurement DONE (D2561): 440 labels → `governance/d2547_calibration.json`; remaining = populate per-label thresholds. |
+| D2548 | REJECTED | **Grammar-constrained decoding pilot** on S4 discipline/domain enums (Outlines/XGrammar) — latency A/B before adoption. |
 
 ### Pending from registry
 | ID | State | Decision |
 |---|---|---|
-| D2622 | PROPOSED | **PRACTICALITY/APPLICABILITY FILTER (S5, use-case calibrated).** Separate practical (directly applicable ~20s, no over-analysis) from theoretical/abstract principles. Config-driven (C12) with the public Anytype use case (design + business) baked into `config/practicality.yaml`. Rubric: "in the context of {use_case_domains}, can an agent apply this principle to a concrete task within ~20s without over-analysis?" → immediately-applicable | context-dependent | abstract. Reuses existing signals (application / procedural_skill / is_summary / accessibility); swappable (C21). |
+| D2622 | ACTIVE | **PRACTICALITY/APPLICABILITY FILTER (S5, use-case calibrated).** Separate practical (directly applicable ~20s, no over-analysis) from theoretical/abstract principles. Config-driven (C12) with the public Anytype use case (design + business) baked into `config/practicality.yaml`. Rubric: "in the context of {use_case_domains}, can an agent apply this principle to a concrete task within ~20s without over-analysis?" → immediately-applicable | context-dependent | abstract. Reuses existing signals (application / procedural_skill / is_summary / accessibility); swappable (C21). |
 | D2621 | PROPOSED | **DISTINCT-FACET-AWARE SEMANTIC DEDUP.** SHA-256 + cluster-before-extract dedup is within-cluster only; S4 HDBSCAN cross-cluster dedup was REMOVED (D2120/D2198) → cross-cluster paraphrases survive. bge-m3 cosine scan of 6,525 pool: 1,381 pairs >0.80 (33 >0.90). KEY: embedding cosine OVER-MERGES distinct facets — Visual-Hierarchy-Through-[Contrast/Spacing/Proximity/…] are 9 DISTINCT mechanisms, NOT duplicates. Correct signal = same MECHANISM + definition + application → merge; different mechanism → keep. Method: MinHash LSH → SemDeDup-style cluster-then-dedup → mechanism-aware reliable-pair judge → human review. |
 | D2345 | DRAFT | Single-source non-type second pass (`stage2_extract_nontype.py`). |
 | D2399 | DEFERRED | Domain promote/demote — **FROZEN** (`d2399_promotions_frozen: true`); reopen only on full-corpus post-reclass counts. |
@@ -1796,6 +1863,28 @@ NO files deleted or moved — this is a ratification request.
 - Forensic audit re-run: governance census consistent (decisions 845 / bugs 334 / session_seed synced); no break/cascade/drift; rollback intact (stage1_chunk/t11 299,861 segs + maxwell.db integrity ok + 3 .bak).
 - Pointer flip D-2716 STILL HELD — remaining gate is OWNER Phase-A checkpoint inspection only.
 
+## 2026-10-03 - Owner FINAL ratification (DROP/QUARANTINE/re-ground) + R5 discharge (no new decision minted)
+
+### Owner FINAL ratification — DROP(13)/QUARANTINE(15)/re-ground(8) (owner: "Ratify DROP(13)/QUARANTINE(15)/re-ground(8)")
+- Confirms the already-minted dispositions (D-2711 RATIFIED, D-2719 RATIFY-3/RATIFY-4) and closes the ONE remaining
+  owner-owned item: the re-ground(8) FINAL disposition. re-ground(8) = 4 verbatim-confirmed (R020/R064/R137/R188) +
+  4 KEEP-as-semantic-paraphrase with abstractive flag (R037/R053/R083/R151) — recorded in
+  `governance/frontier_audit/reground8_final_verdict.json` (`owner_ratified` 2026-10-03). NOT hard-dropped; the 4
+  semantic concepts are verbatim-grounded via their other recovered passages.
+- No new decision minted: the dispositions are already in the registry; this is a confirmation, not a re-decision.
+  Registry unchanged (decisions 931).
+
+### R5 generator≠verifier review DISCHARGED — 20-file D-2801 pipeline diff (goose as verifier, ≠ Qwen3-Coder generator)
+- BUG-614 stage_code_fingerprint: PRESENT + fail-closed (stage4_merge.py 3 sites; checkpoint bound to producing code,
+  saved≠current fingerprint → checkpoint REFUSED, not silently reused).
+- C16 silent errors: 0 bare `except:` across all 20 files (no silent error swallow).
+- C12 residuals (follow-on, NON-blocking): probe_run.py:36-37 hardcode run-id `latest` (BUG-597-class residual — D-2716
+  fixed metrics/golden_sampler/stage1_5_domain_cluster/run_diagnostic but MISSED probe_run); probe_run.py:43 hardcodes
+  `OMLX_URL="http://localhost:11435"`; `"knowledge pipeline"` path literal duplicated in probe_run.py /
+  golden_sampler.py / stage1_5_domain_cluster.py (should be one shared constant).
+- C17 hygiene (NON-blocking): several untyped defs (pipeline_paths.py 10, stage6_commit.py 5, stage1_5_domain_cluster.py 4).
+- VERDICT: PASS — fail-closed gates hold; S4 rerun unblocked on the accountability gate. C12 residuals → follow-on bug/task.
+
 ## 2026-09-30 (cont.2) - D-2716 pointer flip EXECUTED (RATIFY-1 ratified) + governance synced
 - RATIFY-1 (pointer flip) + RATIFY-2 (full clean rerun) ratified by owner. Forensic audit re-run pre-flip: NO break/cascade/drift/blindspot. Census consistent (decisions 845 / bugs 334); rollback intact (t11 299,861 segs + maxwell.db integrity ok + 3 .bak + prefilter_backup 295,440); OMLX healthy (Ornith-1.5-35B, 4.28GB); ollama bge-m3 present; vec0 module still absent on vec_fbs/vec_fbs_ctx (LATENT, re-verify at S6).
 - D-2716 EXECUTED atomically: (a) run.default_id t11 -> rechunk-v4-20260929; (b) BUG-597 CLOSED - 4 hardcoded "latest" run-id defaults repointed to config-driven get_run_id() (metrics.py, golden_sampler.py, stage1_5_domain_cluster.py, run_diagnostic.py); (c) BUG-599 CLOSED - pipeline_run_id re-stamped t11 -> rechunk-v4-20260929 across 295079/295079 segments (fsync+os.replace C6); (d) MAXWELL_DB_PATH env override added (C12) for S6 test isolation -> maxwell.test.db. VERIFIED: get_run_id()=rechunk-v4-20260929, dry-run Run ID rechunk-v4-20260929 / stages 0..6c, segment_id invariant preserved.
@@ -2986,3 +3075,168 @@ Shortlist -> [Gemma-3-12b-it (download-gated fallback)]. Gate unchanged (faster 
   instruments (F11_*, ANCHOR_RULER, DEPTH_BLIND_SHEET) keep their lock, untouched.
 - BLOCKS: S4 rerun (runs uncommitted stage4_merge.py/content_types.py), D-2703 re-chunk (stage1_chunk.py dirty).
 - Registry UNCHANGED this turn: decisions 930 / buglog 363 (143 open / 220 closed) / highest open BUG-622.
+
+## 2026-10-03 (cont.) — BUG-625 + BUG-626 RESOLVED (no new decision minted)
+
+BUG-625 (C12 residuals) closed: probe_run.py run-id + OMLX_URL now config-first via pipeline_paths; the
+"knowledge pipeline" literal routed through pipeline_paths across 9 pipeline modules + safe_delete +
+backup_guardian.sh (student_classifier default also de-drifted to config's classifier_hierarchical).
+BUG-626 (D-328 superseded_by LIST) closed: scalarized to D339 + scalar-or-absent guard in
+scripts/reconcile.py supersession_gaps; decisions_summary re-derived (stamp a3af831f7768d055).
+Registry stays 931 decisions. Six forensic rails GREEN. session_seed synced (open_bugs_n 143, highest_bug BUG-622).
+
+## 2026-10-03 (cont.) — D-2802/D-2803/D-2804 minted + BUG-627 resolved (Tier-2/Tier-3 future-proofing)
+
+D-2802 (Tier-2 structural rail): check_session_plan.py#crossing_rate_faults counts ACTIVE (acked, unspent)
+crossings per will_not_touch family and refuses above config/repo_integrity.yaml#crossing_rate_limit
+(max_active_per_family=1, rc=2 owner gate). D-2803 (Tier-3 cadence): >=1 active crossing emits a lock-semantic
+RE-ASK note at every registry increment; >N escalates to the D-2802 fault. D-2804 (Q2 recording): fingerprint-
+everywhere (BUG-614) + classifier-family config-bound + human-parity advisory gate (measured ceiling 0.766<0.8,
+NOT the stale kappa>=0.7 hard gate). BUG-627 (D-2801 follow-on): D-2668 selftest controls crossed pipeline/** after
+it left will_not_touch -> --selftest RED (21/24); re-pointed to an owner-instrument family -> 25/25 GREEN.
+Registry: 931 -> 934 decisions. buglog 365 -> 366.
+
+
+## D-2805 (2026-10-03) - OWNER RATIFICATION: D-2802/D-2803/D-2804 APPROVED
+Owner ratified the three ACTIVE decisions that completed the BUG-528 lock re-scope recommendation. D-2802
+(Tier-2 structural rail: crossing-rate per will_not_touch family refuses above N=1, rc=2). D-2803 (Tier-3
+governance cadence: lock-semantic RE-ASK note at every registry increment, >N escalates to the D-2802 fault).
+D-2804 (Q2 reliability/accuracy recording: fingerprint-everywhere BUG-614 + classifier-family config-bound +
+human-parity advisory gate, measured ceiling 0.766<0.8, NOT the stale kappa>=0.7 hard gate). These extend the
+owner-acked D-2801 Tier-1 re-scope: the pipeline/** lock is now an accountability gate (R5 + D-naming +
+stage_code_fingerprint), not a stale edit prohibition. Registry: 934 -> 935 decisions. No bug movement.
+
+## D-2806 (2026-10-03) - BUG-614 fingerprint-everywhere ships to all pipeline stages
+Config-owned stage_code_fingerprint() (C12: {stage_key}.fingerprint_files in config/pipeline_config.yaml) + write/read/check
+sidecar helpers in pipeline/stamp.py, wired into the 7 checkpoint-writing stages that lacked a code fingerprint
+(stage0_convert, stage0_5_extract_metadata, stage1_chunk, stage1_3_prefilter, stage1_5_embed_cluster, stage2_extract,
+stage6_commit), completing the accountability gate that D-2801/D-2805 replaced the pipeline/** edit-lock with. Resume is
+fail-closed (C16) on code drift; legacy checkpoints (no sidecar) resume unchanged. Six rails + --selftest 25/25 GREEN.
+Registry 935 -> 936. Resolves BUG-614 and BUG-528 (its closing condition, fingerprint-everywhere, is now met).
+
+## D-2807 (2026-10-03) - stage4 fingerprint C12 migration (config-owned) + BUG-615/BUG-616 closure
+Migrated stage4's inline hardcoded `_stage_code_fingerprint()` to the shared config-owned
+`stage_code_fingerprint("stage4")` via `stage4.fingerprint_files` in config/pipeline_config.yaml (C12, mirroring
+stage5 D-330). Files: pipeline/stage4_merge.py, pipeline/content_types.py, config/pipeline_config.yaml,
+config/content_types.yaml. Confirms BUG-615 (cross-cluster seen_fb_ids dedup guard: skip duplicate fb_id + merge
+source_clusters/source_segments provenance) and BUG-616 (stage-code drift discards ONLY fbs+processed_ids+scalar_state
+and PRESERVES depth.json/.cribs.json) as RESOLVED — both guards implemented under D-2752, now closed. buglog OPEN
+141->139 / CLOSED 225->227. Registry 936 -> 937.
+
+## D-2808 (2026-10-03) - Owner ratification: D-2798 advisory-only BUG-622 contract APPROVED — BUG-622 CLOSED (no swap, no re-fit)
+Owner ratified the D-2798/D-2799 advisory-only BUG-622 discipline contract as FINAL: the discipline axis is
+advisory-only (fine-62 -> advisory multi-label soft-facet tags); routing never gates on discipline (content_type-based,
+fine-only). NO classifier swap and NO re-fit: D-2788 measured gemma-4-12B slower on both axes; D-2789 exhausted the
+swap 5/5; D-2792/D-2793 proved the axis measurement-bound (human 3-way ceiling 0.766 < 0.8, D-2795/D-2796). The
+advisory re-wire shipped in D-2799 (discipline_gate_mode=advisory, conformance gate report-only) is the END-STATE.
+BUG-622 CLOSED. Also closes BUG-617 (depth now has 207 human-provenanced golden rows — D-2757/D-2785/D-2787). buglog
+OPEN 139->137 / CLOSED 227->229. Registry 937 -> 938.
+
+## NOTE (2026-10-03) — BUG-621 CLOSED as a consequence of D-2788/D-2789 (no new decision minted)
+BUG-621 (S4 classifier has no head-to-head fit evidence; Pareto unverified) is CLOSED: the fit eval it demanded is
+DONE and NEGATIVE-on-swap — D-2788 (gemma-4-12B slower than gpt-oss-20b on both S4 + depth axes) + D-2789 (swap path
+exhausted 5/5) + D-2792/D-2793 (measurement-bound; human 3-way discipline ceiling 0.766 < 0.8). gpt-oss-20b stays; no
+swap, no re-fit (ratified D-2808). No new decision id: the decision basis is D-2767/D-2788/D-2789/D-2808.
+
+## NOTE (2026-10-03) — BUG-170/611/612/613 CLOSED (governance sync, no new decision minted)
+
+The four "remaining owner-gated classification-policy bugs" were ALREADY RESOLVED by decisions minted 2026-10-02:
+D-2747 (deterministic non-principle reroute — the A/B winner over "extend S4" and "tighten S2"), D-2748 (principle-purity
+audit), D-2749 (FORM-axis audit), D-2750 (owner-approved APPLY: D2417 flip ratified + tier-2 fail-closed FORM invariant +
+527-row owner map; "Files BUG-612 and BUG-613"), plus D-2755/D-2756/D-2757. The buglog headers still read
+"(OPEN, 2026-10-02)" — a stale-header drift, NOT an open decision. This note flips the four headers to RESOLVED and
+re-derives the register. buglog OPEN 136->132 / CLOSED 230->234 / 366; highest_bug BUG-613->BUG-604. session_seed synced.
+No new decision id: the basis is D-2747/D-2748/D-2749/D-2750/D-2755/D-2756/D-2757.
+
+## NOTE (2026-10-03) — SEVENTH RAIL: governance faces must not contradict the register (no new decision minted)
+
+Root cause of the recurring drift: the six rails watch the machine register (`bug_status.json` /
+`decisions_summary.json`) against its OWN re-derivation, but the hand-edited faces (`DECISION-LOG.md`,
+`MASTER-TASK-REGISTER.md`) restate derived facts (bug status, census) as prose — and those restatements are
+exactly what drifted (BUG-625/BUG-626 tabled "OPEN" while RESOLVED; a header restated "145 OPEN / 220 CLOSED /
+365" while 132/234/366). Built `scripts/check_governance_faces.py` — the SEVENTH fail-closed rail — comparing the
+faces' bug-status table rows and header census to the registers (deterministic, no LLM), wired into `just health`.
+`governance/OWNER_GATE_BUG528_20261003.md` header corrected (D-2801 LANDED / D-2805 RATIFIED). No new decision id:
+the basis is BUG-588 / D-2692 ("a count restated in prose is stale the moment it is written").
+
+## NOTE (2026-10-03) — FORENSIC AUDIT: OMLX healthy; 2 deterministic drifts fixed; 3 handoff violations owner-owed
+
+- OMLX API key was NOT broken: `config/pipeline_config.yaml` already carries `sk-maxwell-local`; `check_omlx_health()` True,
+  chat completes, memory 27.2 GB free, watchdog RSS 4.9 GB. The earlier "API key required" was a raw ping WITHOUT the
+  Bearer header. No code change needed.
+- `just health` surfaced three classes. FIXED two (deterministic, no LLM):
+  1. `config/menu_axis_hashes.yaml` STALE — definition-only drift (content_types/disciplines moved via D-2747/2749/2757;
+     answer_space `domains`+`abstention` invariant, hash 8436d9c9). Regenerated via `scripts/menu_axis_hashes.py`.
+  2. `scripts/check_instrument_cohorts.py` JSONDecodeError — D-2720/D-2785 repointed `axes.domains.artifact` from
+     fb_id-keyed JSONL to item_id-keyed CSV; consumer assumed JSONL. Fixed: config-driven key + format detection, plus
+     drop proper-superset cohorts (anchor 150 ⊂ domains 208 are nested, not two instruments).
+- REMAINING (owner-owed, `verify_handoffs` exit 1 — NOT silently re-sealed): `s4_enriched_checkpoint` (t11) rewritten
+  in place; `decisions.yaml` append_only violated (1 in-place deletion @ line 7426); `anchor4_workbook` human_authored+seal
+  bytes changed with no blob. All tied to the in-progress anchor consolidation (150→208) — re-seal/re-receipt is an owner
+  decision.
+
+## NOTE (2026-10-03) — OPEN/PENDING table reconciled; 4 decision IDs need an owner registry-flip
+
+Forensic audit result: the machine registers are IN SYNC (decisions.yaml <-> decisions_summary.json sha-consistent;
+session_seed registry matches bug_status.json). The 🔴 OPEN/PENDING summary table had drifted two ways, now reconciled:
+
+1. D2546 / D2547 / D2548 were tabled `PENDING` (a non-registry word) where the registry says `PLANNED` — corrected.
+2. Substance: four IDs were advanced under SUCCESSOR decisions without the originals being flipped, so the table
+   understated completion:
+
+| ID | Registry state | True status |
+|---|---|---|
+| D2546 SHACL+OWL | PLANNED | SHACL .ttl SHIPPED (D2555); OWL periodic + Track B NOT started |
+| D2547 per-label thresholds | PLANNED | infra DONE (gate D2571 + config D2556 + calibration D2561); per-label population + domain-axis frequency fix OPEN |
+| D2548 grammar decoding | PLANNED | A/B RAN + REJECTED (D2392); grammar_decoding_enabled=false (D2556) — keep-off |
+| D2622 practicality filter | PROPOSED | backend IMPLEMENTED (D-2723: config/practicality.yaml + pipeline/practicality.py); NOT wired into stage5 |
+| D2621 facet-aware dedup | PROPOSED | genuinely OPEN — no work landed |
+| D2345 single-source non-type pass | DRAFT | not started |
+
+OWNER-OWED (registry state-flips are a governance act, not a silent edit): D2546->RESOLVED, D2547->keep PLANNED
+until per-label populated, D2548->REJECTED, D2622->ACTIVE. session_seed.yaml already in sync (no edit).
+
+## NOTE (2026-10-03) — 2 of 3 handoff re-baselines executed; anchor4_workbook deferred (owner ruling pending)
+
+Owner authorized the 3 owner-owed re-baselines conditional on "no new bug/conflict/blindspot/future-tax/drift".
+Executed 2 of 3:
+1. `decisions_registry` append_only re-baselined — the in-place edit is the BUG-626 scalar canonicalization
+   (`[D338,D339]` -> `D339`), documented and correct; re-receipt records the post-fix prefix.
+2. `s4_enriched_checkpoint` re-receipted — gitignored run root rewritten by a legitimate run (mtime 2026-10-03 01:16);
+   receipt journal + `receipt_provenance.unrevisioned_declared` digest updated `0ca6f0f0 -> 3854250c`.
+3. `anchor4_workbook` DEFERRED (NOT re-sealed) — the workbook carries R003/R146 with
+   `owner_note 'AUTOFILL … OWNER RULING PEN'` (a pending, not final, state). Re-sealing would bless forbidden
+   imputation (`cohort_declaration.yaml`: "Neither may be imputed") and is the SAME event as the
+   `depth_workbook_row_count` 148->150 drift. Both wait on the owner's R003/R146 ruling.
+No new decision/bug minted; registry 938 decisions / 366 bugs unchanged. session_seed.yaml already in sync.
+
+## D-2811 (2026-10-03) - ANCHOR five-axis propagation rail: one AUTHORITY per axis + a rail that re-derives every consumer (closes the BUG-628 blindspot)
+CONTEXT: the owner asked whether the 150 and 208 anchors are consistent on all five axes after the
+2026-10-02 discipline+depth changes. MEASURED: NO. depth drifted 47 rows (208 view) / 37 (150 view); the
+owner's D-2795 discipline re-label landed in discipline_anchor_conformance_20261002.json but NOT in the
+consolidated (12), the 208 view (18), the 150 view (17) or the normalized view (18). 149 drifting cells,
+caught by NO rail because no rail compared the artifacts.
+DECISION: (1) config/anchor_axis_authority.yaml declares ONE authority per axis (depth ->
+ANCHOR_208_DEPTH_CORRECTED D-2760; discipline -> discipline_anchor_conformance D-2795; domain/primary ->
+208 five-axis view; content_type/extraction_type -> 208 view) and every CONSUMER that must follow it. (2)
+scripts/check_anchor_axis_consistency.py re-derives each consumer on the item_id intersection: exit 0 agree,
+exit 2 declared owner-owed (ceiling SHRINK-ONLY), exit 1 UNDECLARED drift (testable via --selftest).
+MEASURED NOW: 149 declared cells, ceiling 149, exit 2 (loud, not fatal - BUG-457).
+OWED (owner-gated, a gold rewrite): propagate the authority value into the 4 stale siblings, then delete the
+declared rows (the ceiling must shrink loudly). Until then NO S4 golden may be bootstrapped from a stale copy.
+
+## D-2812 (2026-10-03) - ANCHOR axis authority PROPAGATED (BUG-628 debt paid)
+
+**Context.** D-2811 declared one AUTHORITY per axis and shipped the rail that COUNTS drift (ceiling 149).
+A rail must not silently rewrite what it measures, so the debt stayed counted, not paid - and the 46-KEEP gold
+split (RATIFY-2) would have baked a contradicted label into the few-shot.
+
+**Decision.** `scripts/apply_anchor_axis_authority.py` is the WRITE limb. It walks `propagation.order` from
+`config/anchor_axis_authority.yaml`, writes the authority value into the two five-axis views, then re-derives
+`ANCHOR_208_DISCIPLINE_NORMALIZED` and `ANCHOR_208_CONSOLIDATED` from their own generators. Fail-closed (C16),
+refuses an off-menu authority value (C12d), timestamped backup + atomic write (C13/C6), receipts to
+`ANCHOR_AXIS_SYNC_20261003T114452Z.json` (R14), selftest registered in `just health` (BUG-492).
+
+**Result.** 117 cells rewritten + 30 resolved by regeneration; ceiling 149 -> 2. Residual = R021 in both views,
+whose depth AUTHORITY value is the provenance sentinel `noise_drop` (not a depth class) - refused by design.
+Reported, never silent: discipline authority covers 204/208 (R021/R040/R080/R091 uncovered).

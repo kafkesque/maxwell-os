@@ -1,0 +1,1458 @@
+[
+  {
+    "item_id": "R001",
+    "name": "Surveillance Capitalism Value Proposition",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R002",
+    "name": "Soviet Underground Discourse Reception",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R003",
+    "name": "Quantum Cognitive Effects in Survey Design",
+    "depth": 4,
+    "depth_label": "specialized",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R004",
+    "name": "Lockdown Effectiveness and Economic Impact",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R005",
+    "name": "Graphics Algebra Cross Operator",
+    "depth": 4,
+    "depth_label": "specialized",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R006",
+    "name": "Generative Algorithmic Composition",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R007",
+    "name": "Accessible Electronic Prototyping Ecosystem",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R008",
+    "name": "Inescapable Shock Syndrome",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R009",
+    "name": "Entrepreneurial Risk Assessment Framework",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R010",
+    "name": "Iterative Launch Process",
+    "depth": 2,
+    "depth_label": "cross-domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R011",
+    "name": "Agentic Decision-making Through Contextual Retrieval",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R012",
+    "name": "Evolution of Game Art and Design",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R013",
+    "name": "Innovation Fund Risk Management",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R014",
+    "name": "Sacred Geometry and Symbolic Resonance",
+    "depth": 2,
+    "depth_label": "cross-domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R015",
+    "name": "Long-term Strategic Planning in Different Industries",
+    "depth": 2,
+    "depth_label": "cross-domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R016",
+    "name": "Modelans-modelandum Relationship",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R017",
+    "name": "Chemical Reaction Equation Automation",
+    "depth": 4,
+    "depth_label": "specialized",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R018",
+    "name": "Color and Typography Readability",
+    "depth": 2,
+    "depth_label": "cross-domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R019",
+    "name": "Scientific Research Evaluation Framework",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R020",
+    "name": "Dynamic System Complexity",
+    "depth": 2,
+    "depth_label": "cross-domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R021",
+    "name": "Index Section",
+    "depth": null,
+    "depth_label": "noise_drop",
+    "depth_source": "owner_finalized_noise_drop"
+  },
+  {
+    "item_id": "R022",
+    "name": "Coupon Code Feature Placement Strategy",
+    "depth": 4,
+    "depth_label": "specialized",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R023",
+    "name": "Focused Action Selection",
+    "depth": 2,
+    "depth_label": "cross-domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R024",
+    "name": "Execution Gap From Technological Readiness",
+    "depth": 2,
+    "depth_label": "cross-domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R025",
+    "name": "Design for Management and Organizational Culture",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R026",
+    "name": "Index of Motion Graphic Title Design Terms",
+    "depth": 4,
+    "depth_label": "specialized",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R027",
+    "name": "Decentralized Strategic Command",
+    "depth": 2,
+    "depth_label": "cross-domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R028",
+    "name": "Gpu Acceleration Configuration",
+    "depth": 4,
+    "depth_label": "specialized",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R029",
+    "name": "Innovation Through Challenge to Assumptions",
+    "depth": 2,
+    "depth_label": "cross-domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R030",
+    "name": "Digital Iconic Reproduction in Computer Graphics",
+    "depth": 4,
+    "depth_label": "specialized",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R031",
+    "name": "Questionnaire Validation and Modification Risk",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R032",
+    "name": "Heckel's Diff Algorithm for Version Tracking",
+    "depth": 4,
+    "depth_label": "specialized",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R033",
+    "name": "Postmodern Critique of Realist Assumptions",
+    "depth": 2,
+    "depth_label": "cross-domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R034",
+    "name": "Negative Space Alphabet Challenge",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R035",
+    "name": "Visual Evidence Recognition",
+    "depth": 2,
+    "depth_label": "cross-domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R036",
+    "name": "Domain Name Call-to-action Strategy",
+    "depth": 4,
+    "depth_label": "specialized",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R037",
+    "name": "Style Precedence and Override Behavior",
+    "depth": 4,
+    "depth_label": "specialized",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R038",
+    "name": "Multiple Imputation Procedure",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R039",
+    "name": "Identity  As Social Positioning and Lifestyle Signifiers",
+    "depth": 2,
+    "depth_label": "cross-domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R040",
+    "name": "Commercial Advertising Souring of Artistic Vision",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R041",
+    "name": "Consumer Anticipation of Objections",
+    "depth": 2,
+    "depth_label": "cross-domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R042",
+    "name": "Destination-control Elevator Interaction Pattern",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R043",
+    "name": "Alpha State Thinking and Creative Problem-solving",
+    "depth": 2,
+    "depth_label": "cross-domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R044",
+    "name": "Cyclical Design Lifecycle",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R045",
+    "name": "Wpi Consumer Value Proposition Framework",
+    "depth": 2,
+    "depth_label": "cross-domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R046",
+    "name": "Bitcoin Mining As Digital Ownership Model",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R047",
+    "name": "Emotional Transaction Design",
+    "depth": 2,
+    "depth_label": "cross-domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R048",
+    "name": "Creative Process Through Drawing and Sketching",
+    "depth": 2,
+    "depth_label": "cross-domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R049",
+    "name": "Fermi Estimation Method",
+    "depth": 1,
+    "depth_label": "universal",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R050",
+    "name": "Methodological Accountability",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R051",
+    "name": "Central Emptiness in Urban Design",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R052",
+    "name": "Interior Design Fixture Selection Challenge",
+    "depth": 4,
+    "depth_label": "specialized",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R053",
+    "name": "Self-referential Incompleteness",
+    "depth": 1,
+    "depth_label": "universal",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R054",
+    "name": "Shap Explainability Framework",
+    "depth": 4,
+    "depth_label": "specialized",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R055",
+    "name": "Demand-side Sales Pattern",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R056",
+    "name": "Quiz Generation with Llm Integration",
+    "depth": 4,
+    "depth_label": "specialized",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R057",
+    "name": "Annual Percentage Rate Standardization",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R058",
+    "name": "Illustration As Propaganda Tool",
+    "depth": 2,
+    "depth_label": "cross-domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R059",
+    "name": "First Course Development Framework",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R060",
+    "name": "Aiga Transportation Symbol System Development",
+    "depth": 4,
+    "depth_label": "specialized",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R061",
+    "name": "Core Focus As Organizational Discipline",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R062",
+    "name": "Somatic Marker Decision Making",
+    "depth": 2,
+    "depth_label": "cross-domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R063",
+    "name": "Textbook Representation and State of Exception Legitimation",
+    "depth": 4,
+    "depth_label": "specialized",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R064",
+    "name": "Optical Alignment in Typography",
+    "depth": 2,
+    "depth_label": "cross-domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R065",
+    "name": "Media Construction of Crime Waves",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R066",
+    "name": "N-dimensional Sphere Volume Properties",
+    "depth": 4,
+    "depth_label": "specialized",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R067",
+    "name": "Schemat's Wasser Interactive Art Framework",
+    "depth": 4,
+    "depth_label": "specialized",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R068",
+    "name": "Imagination and the Image",
+    "depth": 2,
+    "depth_label": "cross-domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R069",
+    "name": "Falsifiable Variable Measurement",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R070",
+    "name": "Iterative Design Validation",
+    "depth": 2,
+    "depth_label": "cross-domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R071",
+    "name": "Lean Startup Experimentation Framework",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R072",
+    "name": "Park24 Nondisruptive Market Creation",
+    "depth": 4,
+    "depth_label": "specialized",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R073",
+    "name": "Evolution of Language Through Mental Models",
+    "depth": 4,
+    "depth_label": "specialized",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R074",
+    "name": "Attention Economy Externalities",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R075",
+    "name": "Paradigm Shift Through Disruption",
+    "depth": 2,
+    "depth_label": "cross-domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R076",
+    "name": "Linguistic Fetish in Visual Communication",
+    "depth": 2,
+    "depth_label": "cross-domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R077",
+    "name": "Symbolic Meaning Through Consumption",
+    "depth": 2,
+    "depth_label": "cross-domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R078",
+    "name": "Parameterized Design Generation",
+    "depth": 2,
+    "depth_label": "cross-domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R079",
+    "name": "Bar-hillel Paradox",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R080",
+    "name": "Information Design Community Networks",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R081",
+    "name": "Shift From Trend-chasing to Intentional Consumption",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R082",
+    "name": "Historical Data Sources for Manufacturing and Economic Analysis",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R083",
+    "name": "Self-herding Behavior",
+    "depth": 2,
+    "depth_label": "cross-domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R084",
+    "name": "Data Visualization Research Lab Leadership",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R085",
+    "name": "Discursive Strategy Abstraction",
+    "depth": 2,
+    "depth_label": "cross-domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R086",
+    "name": "Commitment and Consistency Principle (2)",
+    "depth": 2,
+    "depth_label": "cross-domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R087",
+    "name": "In-group Identity and Social Bonding",
+    "depth": 2,
+    "depth_label": "cross-domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R088",
+    "name": "Gradio Web Interface for Ml Models",
+    "depth": 4,
+    "depth_label": "specialized",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R089",
+    "name": "Vr Body Constraint and Physical Immersion",
+    "depth": 4,
+    "depth_label": "specialized",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R090",
+    "name": "Culture Jamming",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R091",
+    "name": "Autopoesis in Design Education",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R092",
+    "name": "Data Quality and Method Transparency in Journalism",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R093",
+    "name": "Numerical Symbolism in Design and Biology",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R094",
+    "name": "Progressive Feature Introduction",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R095",
+    "name": "Sensory Engagement As Quality Signal",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R096",
+    "name": "Transportation and Setup Costs in Construction Projects",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R097",
+    "name": "Minimin Decision Criterion",
+    "depth": 2,
+    "depth_label": "cross-domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R098",
+    "name": "Aesthetic Refinement Through Iteration",
+    "depth": 2,
+    "depth_label": "cross-domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R099",
+    "name": "Charismatic Brand Discipline",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R100",
+    "name": "Network Marketing Business Model",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R101",
+    "name": "Pragmatist View of Truth and Knowledge",
+    "depth": 2,
+    "depth_label": "cross-domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R102",
+    "name": "Social Entrepreneur's Playbook",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R103",
+    "name": "Temporal Consistency in Visual Narrative Analysis",
+    "depth": 2,
+    "depth_label": "cross-domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R104",
+    "name": "Strategic Information Gathering",
+    "depth": 2,
+    "depth_label": "cross-domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R105",
+    "name": "Probabilistic Forecasting with Prediction Intervals",
+    "depth": 2,
+    "depth_label": "cross-domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R106",
+    "name": "The Invisible Art of Film Editing",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R107",
+    "name": "Lived Experience Focus",
+    "depth": 2,
+    "depth_label": "cross-domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R108",
+    "name": "Typography in Brand Positioning and Magazine Design",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R109",
+    "name": "Project Completion Bias",
+    "depth": 2,
+    "depth_label": "cross-domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R110",
+    "name": "Federated Information Architecture",
+    "depth": 2,
+    "depth_label": "cross-domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R111",
+    "name": "Pmt Camera Typography Manipulation",
+    "depth": 4,
+    "depth_label": "specialized",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R112",
+    "name": "Content Analysis Approaches in Visual Research",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R113",
+    "name": "Traveling Salesman Problem Computational Complexity",
+    "depth": 4,
+    "depth_label": "specialized",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R114",
+    "name": "Measurable Outcome Focus",
+    "depth": 2,
+    "depth_label": "cross-domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R115",
+    "name": "Heuristic Reasoning in Problem Solving",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R116",
+    "name": "Ai Model Deployment Risk",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R117",
+    "name": "Sustained Purpose Over Temporary Gratification",
+    "depth": 2,
+    "depth_label": "cross-domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R118",
+    "name": "Pass@k Evaluation Method",
+    "depth": 4,
+    "depth_label": "specialized",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R119",
+    "name": "Strategic Human Resource Planning for Social Enterprises",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R120",
+    "name": "Nonlinear Magnification Fields",
+    "depth": 4,
+    "depth_label": "specialized",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R121",
+    "name": "Consumers Hero Refurbishment Strategy",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R122",
+    "name": "Visual Hierarchy Through Contrast (2)",
+    "depth": 2,
+    "depth_label": "cross-domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R123",
+    "name": "Superquadric Parameterization in 3d Space",
+    "depth": 4,
+    "depth_label": "specialized",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R124",
+    "name": "Foundation Model Integration Framework",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R125",
+    "name": "Dell Computer's Direct-sale Business Model",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R126",
+    "name": "Embodied Knowledge in Design",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R127",
+    "name": "Guild of Handicraft Educational Model",
+    "depth": 4,
+    "depth_label": "specialized",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R128",
+    "name": "Choice Architecture and Identity Framing",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R129",
+    "name": "Use of Proxies and Analogues in Market Sizing",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R130",
+    "name": "Typographic Principles of William Morris",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R131",
+    "name": "Differential Privacy in Data Collection",
+    "depth": 4,
+    "depth_label": "specialized",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R132",
+    "name": "Monte Carlo PDE Solution Method",
+    "depth": 4,
+    "depth_label": "specialized",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R133",
+    "name": "Three-holes-in-the-cheese Model of Error Cascades",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R134",
+    "name": "Holistic Interpretation Problem in Index-aware Retrieval",
+    "depth": 4,
+    "depth_label": "specialized",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R135",
+    "name": "Ase  Design Problem Solving Model",
+    "depth": 2,
+    "depth_label": "cross-domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R136",
+    "name": "Chatgpt Prompt Framework",
+    "depth": 4,
+    "depth_label": "specialized",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R137",
+    "name": "Desire-friction Conversion Formula",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R138",
+    "name": "Hjelmslev's Trichotomy and Linguistic Theory",
+    "depth": 2,
+    "depth_label": "cross-domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R139",
+    "name": "Learning Through Failure Process",
+    "depth": 2,
+    "depth_label": "cross-domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R140",
+    "name": "Digital Culture Integration in Graphic Design",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R141",
+    "name": "Contextual Redundancy and Representation Efficiency",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R142",
+    "name": "Global Village Conceptual Framework",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R143",
+    "name": "Figma Hamburger Icon Creation",
+    "depth": 4,
+    "depth_label": "specialized",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R144",
+    "name": "Abra-kadabra Number Classification",
+    "depth": 4,
+    "depth_label": "specialized",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R145",
+    "name": "Color As Cultural and Emotional Marker",
+    "depth": 2,
+    "depth_label": "cross-domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R146",
+    "name": "Debate As Leadership Tool",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R147",
+    "name": "Randomness in Data Measurement",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R148",
+    "name": "Professional Development Through Studio Experience",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R149",
+    "name": "Perceptual Mapping Through Camouflage",
+    "depth": 4,
+    "depth_label": "specialized",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R150",
+    "name": "Triple Bottom Line Business Approach",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "canonical_adjudicated"
+  },
+  {
+    "item_id": "R151",
+    "name": "Context-dependent Cognitive Processing",
+    "depth": 2,
+    "depth_label": "cross-domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R152",
+    "name": "Economic Politics of Obsolescence",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R153",
+    "name": "Cognitive Interview Analysis of Question Clarity Issues",
+    "depth": 4,
+    "depth_label": "specialized",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R154",
+    "name": "Aditya Birla Group's Parta System",
+    "depth": 4,
+    "depth_label": "specialized",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R155",
+    "name": "Persistence in Business Strategy",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R156",
+    "name": "Designers' Object World",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R157",
+    "name": "Perspective-driven Cognitive Shift",
+    "depth": 2,
+    "depth_label": "cross-domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R158",
+    "name": "Duality in Design",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R159",
+    "name": "Context-dependent Quality Assessment",
+    "depth": 2,
+    "depth_label": "cross-domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R160",
+    "name": "Resource-based Value Assessment",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R162",
+    "name": "Provincial Norms",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R163",
+    "name": "Metaphorically Selling How to Use the Ma",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R164",
+    "name": "Phenomenological Understanding",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R165",
+    "name": "Acknowledgment Attribution",
+    "depth": 4,
+    "depth_label": "specialized",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R166",
+    "name": "Agent-centric Economic Incentives",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R167",
+    "name": "Innocent Brand Identity Through Organic Development",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R168",
+    "name": "Hidden Issue Questioning Technique",
+    "depth": 4,
+    "depth_label": "specialized",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R169",
+    "name": "Charismatic Leadership Development",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R170",
+    "name": "Dream-driven Life Planning",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R171",
+    "name": "Alpha Blending Control",
+    "depth": 4,
+    "depth_label": "specialized",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R172",
+    "name": "Digital System Context Decomposition",
+    "depth": 2,
+    "depth_label": "cross-domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R173",
+    "name": "Linkedin Network Building Protocol",
+    "depth": 4,
+    "depth_label": "specialized",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R174",
+    "name": "Concept-first Prototyping",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R175",
+    "name": "Role-based Prompting Effect",
+    "depth": 4,
+    "depth_label": "specialized",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R176",
+    "name": "Harvest Time Strategic Planning",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R177",
+    "name": "Contextual Interpretation Framework",
+    "depth": 2,
+    "depth_label": "cross-domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R178",
+    "name": "If-then Plan for Moral Action",
+    "depth": 2,
+    "depth_label": "cross-domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R179",
+    "name": "Coincidence Wit in Graphic Design",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R180",
+    "name": "Intersectional Design Approaches for Underserved Communities",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R181",
+    "name": "Economic Industry Network Structure",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R182",
+    "name": "Cultural Mourning Rituals and Symbolism",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R183",
+    "name": "Pattern Language Implementation Process",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R184",
+    "name": "Doping in Professional Sports: Systemic Pressure and Rationalization",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R185",
+    "name": "Tv Advertising Consumer Behavior Pattern",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R186",
+    "name": "Cognitive Interview Analysis Framework",
+    "depth": 4,
+    "depth_label": "specialized",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R187",
+    "name": "Credibility Through Transparency",
+    "depth": 2,
+    "depth_label": "cross-domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R188",
+    "name": "Sensory-motor Basis of Conceptual Reasoning",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R189",
+    "name": "Higher-order Polynomial Approximation in Numerical Methods",
+    "depth": 4,
+    "depth_label": "specialized",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R190",
+    "name": "Design Thinking Integration Strategy",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R191",
+    "name": "Intentional Motion Design",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R192",
+    "name": "Long-term Investment Advantage",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R193",
+    "name": "Brent Spar Campaign Effectiveness",
+    "depth": 4,
+    "depth_label": "specialized",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R195",
+    "name": "Agentic Ai System Reliability",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R196",
+    "name": "Inclusive Design Adaptation",
+    "depth": 2,
+    "depth_label": "cross-domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R197",
+    "name": "Peripheral Cue Interference Effect",
+    "depth": 4,
+    "depth_label": "specialized",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R198",
+    "name": "Survivor Bias in Success Narratives",
+    "depth": 2,
+    "depth_label": "cross-domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R199",
+    "name": "Comfort Zone Constriction From Negative Influence",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R200",
+    "name": "Simplicity Cult in Saas Pricing",
+    "depth": 4,
+    "depth_label": "specialized",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R201",
+    "name": "Physical Activity and Brain Health",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R202",
+    "name": "Interactive Media Integration",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R203",
+    "name": "Iterative Problem-solving in Ux Design",
+    "depth": 2,
+    "depth_label": "cross-domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R204",
+    "name": "Expert Overconfidence and Cognitive Laziness",
+    "depth": 2,
+    "depth_label": "cross-domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R205",
+    "name": "Innovation Cycles in Art and Technology",
+    "depth": 2,
+    "depth_label": "cross-domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R206",
+    "name": "Directional Changes (dc) in Financial Data",
+    "depth": 4,
+    "depth_label": "specialized",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R207",
+    "name": "Generous Audacious Marketing",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R208",
+    "name": "Recovered Memory Therapy and False Accusations",
+    "depth": 4,
+    "depth_label": "specialized",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R209",
+    "name": "Procedural Vs Declarative Knowledge Retrieval",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "owner_finalized"
+  },
+  {
+    "item_id": "R210",
+    "name": "Same-age Peer Modeling",
+    "depth": 3,
+    "depth_label": "domain",
+    "depth_source": "owner_finalized"
+  }
+]

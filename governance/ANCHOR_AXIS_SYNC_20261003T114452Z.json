@@ -1,0 +1,79 @@
+{
+  "schema_version": "1.0",
+  "artifact_id": "ANCHOR_AXIS_SYNC_20261003T114452Z",
+  "decision": "D-2811",
+  "bug": "BUG-628",
+  "rule": "one declared AUTHORITY per axis, propagated into every consumer (D-2811)",
+  "authority_sha256": {
+    "governance/ANCHOR_208_FIVE_AXIS_VIEW_20260930.csv": "35983e4d7843b4a801735c5ea144ee33113561a781c440bf234abe5ad4d14f14",
+    "governance/ANCHOR_208_DEPTH_CORRECTED_20261002.json": "0948e940e90066b0642684b513a12c214e203b92c011fcc12b3d34c3bf989e68",
+    "governance/discipline_anchor_conformance_20261002.json": "e3bf464271f9c219710b5d1df1f37dfb25f6a2bdb1d8e8cdfe61d87efec04258"
+  },
+  "cells_changed": 117,
+  "uncovered": {
+    "governance/ANCHOR_208_FIVE_AXIS_VIEW_20260930.csv": {
+      "discipline": [
+        "R021",
+        "R040",
+        "R080",
+        "R091"
+      ]
+    },
+    "governance/ANCHOR_150_FIVE_AXIS_VIEW_20260927.csv": {
+      "discipline": [
+        "R021",
+        "R040",
+        "R080",
+        "R091"
+      ]
+    }
+  },
+  "steps": [
+    {
+      "step": "propagate",
+      "file": "governance/ANCHOR_208_FIVE_AXIS_VIEW_20260930.csv",
+      "cells_changed": 64,
+      "uncovered": {
+        "discipline": [
+          "R021",
+          "R040",
+          "R080",
+          "R091"
+        ]
+      }
+    },
+    {
+      "step": "propagate",
+      "file": "governance/ANCHOR_150_FIVE_AXIS_VIEW_20260927.csv",
+      "cells_changed": 53,
+      "uncovered": {
+        "discipline": [
+          "R021",
+          "R040",
+          "R080",
+          "R091"
+        ]
+      }
+    },
+    {
+      "step": "regenerate",
+      "script": "scripts/normalize_anchor_discipline.py",
+      "stdout": [
+        "normalized 208 rows -> ANCHOR_208_DISCIPLINE_NORMALIZED_20261002.json",
+        "status counts: {'ok': 202, 'emerging': 3, 'domain_bleed': 1, 'whitespace_fixed': 2}",
+        "owner review queue (4 rows) -> discipline_domain_bleed_review_20261002.json"
+      ]
+    },
+    {
+      "step": "regenerate",
+      "script": "scripts/consolidate_anchor_208.py",
+      "stdout": [
+        "consolidated 208 rows -> ANCHOR_208_CONSOLIDATED_20261002.json",
+        "depth labels: {'domain': 99, 'specialized': 48, 'cross-domain': 58, 'noise_drop': 1, 'universal': 2}",
+        "depth_golden_eligible: 207",
+        "discipline_golden_eligible: 203",
+        "remaining emerging (excluded from golden): ['R040', 'R053', 'R080', 'R091']"
+      ]
+    }
+  ]
+}

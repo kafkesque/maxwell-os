@@ -32,12 +32,11 @@ models:
     model: MoritzLaurer/DeBERTa-v3-large-mnli-fever-anli-ling-wanli
     provider: local
     family: deberta
-    notes: "D2298: DeBERTa-v3-large sole NLI verifier, threshold 0.10. D2322 honest\
-      \ auto-cal: P=0.647/R=0.386/F1=0.484 (D2293's P=1.000 was on the broken pre-D2321\
-      \ call \u2014 NOT reproducible). RoBERTa/ModernBERT removed (zero signal / superseded).\
-      \ D2440 (pending): run AlignScore + MiniCheck through pipeline/calibrate.py\
-      \ harness vs DeBERTa before any threshold change \u2014 F1>0.484 gate + fail-closed\
-      \ (D2093)."
+    notes: 'D2298: DeBERTa-v3-large sole NLI verifier, threshold 0.10. D2322 honest
+      auto-cal: P=0.647/R=0.386/F1=0.484 (D2293''s P=1.000 was on the broken pre-D2321
+      call — NOT reproducible). RoBERTa/ModernBERT removed (zero signal / superseded).
+      D2440 (pending): run AlignScore + MiniCheck through pipeline/calibrate.py harness
+      vs DeBERTa before any threshold change — F1>0.484 gate + fail-closed (D2093).'
   evidence_tier:
     axis: convergence
     values:
@@ -101,8 +100,8 @@ content_type:
   - descriptive_model
   - normative_heuristic
   - empirical_pattern
-  note: "2 orthogonal axes. Core body shared; per-type extension delta. D2150 (extraction\u2192\
-    content) + D2128 (route\u2192content) mappings in registry."
+  note: 2 orthogonal axes. Core body shared; per-type extension delta. D2150 (extraction→content)
+    + D2128 (route→content) mappings in registry.
 governance:
   constitution: CONSTITUTION.md
   decision_log: DECISION-LOG.md
@@ -123,151 +122,150 @@ boot:
   4: Verify OMLX + Ollama running
   5: python3 pipeline/status.py
 phase:
-  current: "Phase 1 (v3.0 architecture validation) \u2014 pre-T1.1"
-  status: "T1.1 RUNNING (launched 2026-08-17 21:24, PID 26915, run-id t11, log knowledge\
-    \ pipeline/runner_t11_20260817_212404.log). S0 \u2705 940/940, S0.5 \u2705 cached,\
-    \ S1 chunking \u2192 S1.5 embed (D2409 incremental cache) \u2192 S2 (~25-40h long\
-    \ pole) \u2192 S4 (~39h) \u2192 S5 \u2192 S6. Fresh DB per D2396 (canary archived\
-    \ maxwell.db.pre_t11_20260817_211632.bak). caffeinate -disu active, OMLX lazy-load\
-    \ on demand, watchdog per-stage. D2409/D2410 committed 3e6a383. Monitor: python3\
-    \ pipeline/status.py; tail -f \"knowledge pipeline/runner_t11_20260817_212404.log\"\
-    \ (block-buffered under nohup \u2014 bursts); resume: python3 pipeline/runner.py\
-    \ --run-id t11 --resume-from <stage>."
+  current: Phase 1 (v3.0 architecture validation) — pre-T1.1
+  status: 'T1.1 RUNNING (launched 2026-08-17 21:24, PID 26915, run-id t11, log knowledge
+    pipeline/runner_t11_20260817_212404.log). S0 ✅ 940/940, S0.5 ✅ cached, S1 chunking
+    → S1.5 embed (D2409 incremental cache) → S2 (~25-40h long pole) → S4 (~39h) →
+    S5 → S6. Fresh DB per D2396 (canary archived maxwell.db.pre_t11_20260817_211632.bak).
+    caffeinate -disu active, OMLX lazy-load on demand, watchdog per-stage. D2409/D2410
+    committed 3e6a383. Monitor: python3 pipeline/status.py; tail -f "knowledge pipeline/runner_t11_20260817_212404.log"
+    (block-buffered under nohup — bursts); resume: python3 pipeline/runner.py --run-id
+    t11 --resume-from <stage>.'
   completed:
-  - Phase 0: "14/14 foundation fixes \u2705"
+  - Phase 0: 14/14 foundation fixes ✅
   - Phase 0.5: cleaning pipeline spec'd, partially implemented
-  - Tier 1: "architecture restructure (cluster-before-extract) \u2705"
-  - Tier 1: "Stage 5 fail-closed + DeBERTa NLI \u2705"
-  - D2092-D2114: "v3.0 architecture decisions recorded \u2705"
-  - B1-B10 (D2325-D2332): "pre-T1.1 blockers \u2014 ALL IMPLEMENTED (9295ce0 + D2343\
-      \ residual closures)"
+  - Tier 1: architecture restructure (cluster-before-extract) ✅
+  - Tier 1: Stage 5 fail-closed + DeBERTa NLI ✅
+  - D2092-D2114: v3.0 architecture decisions recorded ✅
+  - B1-B10 (D2325-D2332): pre-T1.1 blockers — ALL IMPLEMENTED (9295ce0 + D2343 residual
+      closures)
   - B11 (P0): S6 SQLite persistence of D2323 axes + mechanism/boundary/consequence
       (D2337, BUG-095)
   - B12 (P0): S4/S6 fail-closed exit semantics (D2338, BUG-096)
   - B13 (P1): runner --run-id import-order isolation (D2339, BUG-097)
-  - B14 (P1): "model-registry drift correction \u2014 session_seed rename done; config/path\
-      \ rename deferred (D2340, BUG-099)"
-  - B16 (P0): "S1.5 embedding-drop index alignment \u2014 (filtered_segments, embeddings)\
-      \ + len assert (D2346, BUG-102)"
-  - B17 (P1): "e2e convergence metric \u2192 sum(c[\"is_convergent\"]) canonical IDs\
-      \ (D2347, BUG-103)"
-  - B18 (P0): "embedding reliability \u2014 timeout 180s + keep_alive=-1 (D2348, BUG-105)"
-  - V1-V6 (P0): "T1.1 canary GREEN \u2014 2255 clusters \u2192 279 FBs \u2192 239\
-      \ PASS \u2192 279 committed"
+  - B14 (P1): model-registry drift correction — session_seed rename done; config/path
+      rename deferred (D2340, BUG-099)
+  - B16 (P0): S1.5 embedding-drop index alignment — (filtered_segments, embeddings)
+      + len assert (D2346, BUG-102)
+  - B17 (P1): e2e convergence metric → sum(c["is_convergent"]) canonical IDs (D2347,
+      BUG-103)
+  - B18 (P0): embedding reliability — timeout 180s + keep_alive=-1 (D2348, BUG-105)
+  - V1-V6 (P0): T1.1 canary GREEN — 2255 clusters → 279 FBs → 239 PASS → 279 committed
   - V7 (D2368): DECISION-LOG D2351-D2363 backfilled
   - BUG-132 (D2368): thinking_budget per-call threading + depth_thinking_budget config
       key
-  - V8 (D2369): "golden depth expansion \u2014 CONV-054 universal + CONV-055 specialized\
-      \ (1\u21922 each)"
+  - V8 (D2369): golden depth expansion — CONV-054 universal + CONV-055 specialized
+      (1→2 each)
   - V9 (D2369): resume mechanism live-verified (run-scoped marker + --run-id + --resume-from)
-  - D2370: "S4 intra-stage incremental checkpoint (39h-stage crash recovery) \u2014\
-      \ checkpoint every 5 clusters + .segids/.state.json skip-on-resume; live kill\
-      \ -9 + resume verified on 20-cluster subset"
-  - D2386: "S4 gate relaxed 0.0\u21920.01 (cluster_6241 empty-application quarantine\
-      \ within 1% tolerance)"
-  - D2391: "S6 schema-migration gap fixed (is_summary + classification_status auto-heal)\
-      \ \u2014 278 committed cleanly"
-  - D2392: "grammar A/B RESOLVED \u2014 0.6.0 xgrammar breaks gpt-oss-20b (Harmony\
-      \ conflict) \u2192 keep grammar OFF; 0.5.1 stays on 11435"
-  - D2393: "depth skew fixed \u2014 focused prompts tightened (default-to-domain;\
-      \ cross-domain = 2+ DISTINCT disciplines)"
-  - D2394: "taxonomy synonym-index kind-filter bug fixed + discipline alias expansion\
-      \ \u2014 discipline emerging 32%\u219215.5%"
-  - D2395: "dropped dead legacy s3_original_domain column (DB 61\u219260 cols) \u2014\
-      \ integrity 17/17 + audit green"
-  - D2396: "DB reset policy RESOLVED \u2014 fresh DB for T1.1 (676-row DB archived\
-      \ \u2192 maxwell.db.pre_t11_20260816.bak); run-specific DB = G10 (P2)"
-  - D2397: "working tree committed `793fd26` + golden verbatim fix (5 NON_VERBATIM\
-      \ \u2192 verbatim; meta 77\u219280) \u2014 golden_validate 80/80, hash re-stamped"
-  - D2398: "S4 reval CONFIRMED D2393/D2394 live \u2014 depth cross-domain 86.3%\u2192\
-      21.6%, discipline emerging 32.0%\u219215.5%"
-  - D2399: "domain-promotion defer RESOLVED \u2014 promote/demote on full-corpus counts\
-      \ (post-T1.1+D2345), NOT canary"
-  - D2400: "field-production contract RESOLVED \u2014 S4 = producer, S6 = persistence-only;\
-      \ orphan-field producers = post-S4 enrichment (F1)"
-  - D2401: "F1 IMPLEMENTED \u2014 post-S4 enrichment stage (stage4_5_enrich.py) produces\
-      \ prerequisite_fbs/contradicts_fbs/procedural_skill (gated OFF for T1.1; 13\
-      \ tests pass)"
-  - "D2402: S4 runner timeout '4': 3600 \u2192 null (unlimited, like S2) \u2014 FIXED"
-  - D2403: "S2 schema-invalid output rebranded as NULL \u2192 3-state FB/NULL/FAILED\
-      \ \u2014 FIXED"
-  - D2404: "S4 classification-failed clusters unrecoverable on resume \u2192 exclude\
-      \ from processed_ids \u2014 FIXED"
-  - D2405: "S4 fabricated evidence=\"cited\" + S5 no FAILED gate \u2192 remove cited\
-      \ + gate FAILED\u2192QUARANTINE \u2014 FIXED"
-  - D2406: "session_seed.yaml YAML parse break (boot/integrity blocker) \u2192 quote\
-      \ status + D2402 scalars \u2014 FIXED"
-  - D2407: "dead-code purge (run_production.py archived) + fail-closed regression\
-      \ tests (9 tests) \u2014 DONE"
-  - D2408: "response_format=json_object \u2192 empty gpt-oss-20b (xgrammar/Harmony\
-      \ conflict) \u2192 skip for reasoning models \u2014 FIXED"
-  - R3 (D2408 validation): "canary S4\u2192S6 rerun COMPLETE \u2014 S4 279/279 FBs\
-      \ (0 failed clusters, 52911 edges, 0 isolated), S5 236 PASS / 43 QUARANTINE\
-      \ / 0 FLAG, S6 279 committed (pipeline_run_id=canary) + Parquet 4482.4 KB, ~87\
-      \ min; D2408 validated live; no regression vs prior 235/43"
+  - D2370: S4 intra-stage incremental checkpoint (39h-stage crash recovery) — checkpoint
+      every 5 clusters + .segids/.state.json skip-on-resume; live kill -9 + resume
+      verified on 20-cluster subset
+  - D2386: S4 gate relaxed 0.0→0.01 (cluster_6241 empty-application quarantine within
+      1% tolerance)
+  - D2391: S6 schema-migration gap fixed (is_summary + classification_status auto-heal)
+      — 278 committed cleanly
+  - D2392: grammar A/B RESOLVED — 0.6.0 xgrammar breaks gpt-oss-20b (Harmony conflict)
+      → keep grammar OFF; 0.5.1 stays on 11435
+  - D2393: depth skew fixed — focused prompts tightened (default-to-domain; cross-domain
+      = 2+ DISTINCT disciplines)
+  - D2394: taxonomy synonym-index kind-filter bug fixed + discipline alias expansion
+      — discipline emerging 32%→15.5%
+  - D2395: dropped dead legacy s3_original_domain column (DB 61→60 cols) — integrity
+      17/17 + audit green
+  - D2396: DB reset policy RESOLVED — fresh DB for T1.1 (676-row DB archived → maxwell.db.pre_t11_20260816.bak);
+      run-specific DB = G10 (P2)
+  - D2397: working tree committed `793fd26` + golden verbatim fix (5 NON_VERBATIM
+      → verbatim; meta 77→80) — golden_validate 80/80, hash re-stamped
+  - D2398: S4 reval CONFIRMED D2393/D2394 live — depth cross-domain 86.3%→21.6%, discipline
+      emerging 32.0%→15.5%
+  - D2399: domain-promotion defer RESOLVED — promote/demote on full-corpus counts
+      (post-T1.1+D2345), NOT canary
+  - D2400: field-production contract RESOLVED — S4 = producer, S6 = persistence-only;
+      orphan-field producers = post-S4 enrichment (F1)
+  - D2401: F1 IMPLEMENTED — post-S4 enrichment stage (stage4_5_enrich.py) produces
+      prerequisite_fbs/contradicts_fbs/procedural_skill (gated OFF for T1.1; 13 tests
+      pass)
+  - 'D2402: S4 runner timeout ''4'': 3600 → null (unlimited, like S2) — FIXED'
+  - D2403: S2 schema-invalid output rebranded as NULL → 3-state FB/NULL/FAILED — FIXED
+  - D2404: S4 classification-failed clusters unrecoverable on resume → exclude from
+      processed_ids — FIXED
+  - D2405: S4 fabricated evidence="cited" + S5 no FAILED gate → remove cited + gate
+      FAILED→QUARANTINE — FIXED
+  - D2406: session_seed.yaml YAML parse break (boot/integrity blocker) → quote status
+      + D2402 scalars — FIXED
+  - D2407: dead-code purge (run_production.py archived) + fail-closed regression tests
+      (9 tests) — DONE
+  - D2408: response_format=json_object → empty gpt-oss-20b (xgrammar/Harmony conflict)
+      → skip for reasoning models — FIXED
+  - R3 (D2408 validation): canary S4→S6 rerun COMPLETE — S4 279/279 FBs (0 failed
+      clusters, 52911 edges, 0 isolated), S5 236 PASS / 43 QUARANTINE / 0 FLAG, S6
+      279 committed (pipeline_run_id=canary) + Parquet 4482.4 KB, ~87 min; D2408 validated
+      live; no regression vs prior 235/43
   pending:
-  - "D2394 remainder (governance review, D2399): domain taxonomy over-firing 93.9%\
-    \ \u2014 promote ~15 business/psych/ops domains; run post-T1.1+D2345 on full-corpus\
-    \ counts (not canary). NOTE (D2521): D2399 dynamic promotions now FROZEN (taxonomy.d2399_promotions_frozen=true)\
-    \ \u2014 both post-BUG-197 treadmill candidates REJECTED by human review; no auto-promotions\
-    \ until explicitly re-opened."
-  - G10 (P2, post-T1.1): "run-specific DB \u2014 scope DB_PATH by run_id + active-KB\
-      \ pointer (D2396 follow-up)"
+  - 'D2394 remainder (governance review, D2399): domain taxonomy over-firing 93.9%
+    — promote ~15 business/psych/ops domains; run post-T1.1+D2345 on full-corpus counts
+    (not canary). NOTE (D2521): D2399 dynamic promotions now FROZEN (taxonomy.d2399_promotions_frozen=true)
+    — both post-BUG-197 treadmill candidates REJECTED by human review; no auto-promotions
+    until explicitly re-opened.'
+  - G10 (P2, post-T1.1): run-specific DB — scope DB_PATH by run_id + active-KB pointer
+      (D2396 follow-up)
   - D2345 (post-T1.1): single-source non-type second pass via stage2_extract_nontype.py
       (reuse S1.5 clusters)
-  - "S4 SPEED (\U0001F7E0 non-blocking)": T1.1 is ~39h (not 142h); only viable speedup
-      = thinking_budget=256 (gated, BUG-132)
-  - T-015 remainder: "golden depth \u22655 universal + \u22655 specialized (currently\
-      \ 2/2; verbatim-mining per-principle)"
+  - S4 SPEED (🟠 non-blocking): T1.1 is ~39h (not 142h); only viable speedup = thinking_budget=256
+      (gated, BUG-132)
+  - T-015 remainder: golden depth ≥5 universal + ≥5 specialized (currently 2/2; verbatim-mining
+      per-principle)
   - V9 remainder (optional, post-D2370): re-run full canary slice to confirm no fb_id
       dup/skip after a live resume
   - X8 accuracy gate: merged-call budget=256 vs null on post-relabel golden n=45 (now
       unblocked by BUG-132)
-  - "BUG-104 (\U0001F7E0 env, non-blocking, ACTION)": switch runtime to Homebrew Python
-      (`brew install python@3.12`) or conda-forge to enable sqlite-vec (`vec_fbs`);
-      FTS fallback works meanwhile
-  - B15 (P2): "schema corrections \u2014 three-axis status, typed edges, TI class,\
-      \ feedback config-first (D2341)"
-  - B14 remainder (post-T1.1): "rename models.verifier\u2192classifier + models.verifier_v2\u2192\
-      probe in pipeline_config.yaml/pipeline_paths.py/model_assignments.yaml"
+  - BUG-104 (🟠 env, non-blocking, ACTION): switch runtime to Homebrew Python (`brew
+      install python@3.12`) or conda-forge to enable sqlite-vec (`vec_fbs`); FTS fallback
+      works meanwhile
+  - B15 (P2): schema corrections — three-axis status, typed edges, TI class, feedback
+      config-first (D2341)
+  - B14 remainder (post-T1.1): rename models.verifier→classifier + models.verifier_v2→probe
+      in pipeline_config.yaml/pipeline_paths.py/model_assignments.yaml
   - Q6: 5+ book E2E test with meaningful convergent extraction
   - Tier 2: quality calibration (golden set audit, manual FB review)
   - Tier 3: speed benchmarks (MLX vs OMLX, FAISS GPU)
   - C8: D2066 dynamic canonical taxonomy
   - C9: D2067 cross-run incremental extraction
-  - MPS backend: "renormalize after 1024\u2192512 truncation (IndexFlatIP assumes\
-      \ unit vectors) \u2014 post-T1.1 (ollama is prod backend)"
-  - S1.5 K-means fallback: "mark positional-split clusters degraded \u2014 post-T1.1"
-  - S2 probe cache: "fingerprint (not just counts) \u2014 post-T1.1"
-  - S2 sampling: "group by canonical source_id (not truncated basename) \u2014 post-T1.1"
-  - S2 evidence: "verbatim substring verification \u2014 post-T1.1"
-  - S4.5: "register in runner STAGE_ORDER \u2014 post-T1.1"
-  - "NLI calibration data (evals/nli_golden.jsonl) not committed \u2192 threshold\
-    \ not reproducible \u2014 post-T1.1"
-  - D2452 (D2451 follow-up): "wire config/golden/stage4_golden.yaml into the 4 S4\
-      \ classification prompts (CLASSIFY_SYSTEM_PROMPT / MERGED_CRIBS_CLASSIFY_SYSTEM\
-      \ / BATCH_CRIBS_CLASSIFY_SYSTEM / depth-focused) \u2014 extract hardcoded inline\
-      \ depth examples, config-first, live smoke before BUG-165"
-  next_phase: "T1.1 full run \u2192 Tier 2 quality calibration"
+  - MPS backend: renormalize after 1024→512 truncation (IndexFlatIP assumes unit vectors)
+      — post-T1.1 (ollama is prod backend)
+  - S1.5 K-means fallback: mark positional-split clusters degraded — post-T1.1
+  - S2 probe cache: fingerprint (not just counts) — post-T1.1
+  - S2 sampling: group by canonical source_id (not truncated basename) — post-T1.1
+  - S2 evidence: verbatim substring verification — post-T1.1
+  - S4.5: register in runner STAGE_ORDER — post-T1.1
+  - NLI calibration data (evals/nli_golden.jsonl) not committed → threshold not reproducible
+    — post-T1.1
+  - D2452 (D2451 follow-up): wire config/golden/stage4_golden.yaml into the 4 S4 classification
+      prompts (CLASSIFY_SYSTEM_PROMPT / MERGED_CRIBS_CLASSIFY_SYSTEM / BATCH_CRIBS_CLASSIFY_SYSTEM
+      / depth-focused) — extract hardcoded inline depth examples, config-first, live
+      smoke before BUG-165
+  next_phase: T1.1 full run → Tier 2 quality calibration
 book_library:
   total_books: 852 MD (8 domains)
   test_domains:
   - DOMAIN 7 Influence + Power (21 books, 7,500 segments)
-  - "Pricing subset (3 books, 237 segments \u2014 E2E test)"
+  - Pricing subset (3 books, 237 segments — E2E test)
   source: knowledge pipeline/books/
 current_state:
   open_bugs_n_at_2026_09_22: 77
   c15_register: governance/SESSION-HANDOFF-2026-09-23.md
   date: 2026-09-22
-  critical_finding: "BUG-299 / D-274a \u2014 the serving gate is a LABEL, not a verification\
-    \ verdict. scripts/apply_phase1_finalize.py:18 sets status = 'PASS' if content_type\
-    \ == 'principle' else 'QUARANTINE' (written at :163). 4,745/4,745 PASS rows are\
-    \ content_type='principle'; 0/1,470 non-principle rows pass. 2,447 rows (30.6%)\
-    \ disagree with their own persisted verification_results[factual].passed: 138\
-    \ NLI CONTRA-majority and 1,514 NEUTRAL rows are SERVED, 278 served rows had all\
-    \ evidence flagged non-evidence fragments, and 506 ENTAIL-majority rows are HIDDEN.\
-    \ Honest gate: PASS 4,745 -> 3,310. => ROLE is the highest-leverage axis, not\
-    \ decorative (D6 / BUG-280 / D272g INVERTED).\n"
+  critical_finding: 'BUG-299 / D-274a — the serving gate is a LABEL, not a verification
+    verdict. scripts/apply_phase1_finalize.py:18 sets status = ''PASS'' if content_type
+    == ''principle'' else ''QUARANTINE'' (written at :163). 4,745/4,745 PASS rows
+    are content_type=''principle''; 0/1,470 non-principle rows pass. 2,447 rows (30.6%)
+    disagree with their own persisted verification_results[factual].passed: 138 NLI
+    CONTRA-majority and 1,514 NEUTRAL rows are SERVED, 278 served rows had all evidence
+    flagged non-evidence fragments, and 506 ENTAIL-majority rows are HIDDEN. Honest
+    gate: PASS 4,745 -> 3,310. => ROLE is the highest-leverage axis, not decorative
+    (D6 / BUG-280 / D272g INVERTED).
+
+    '
   next_phase: '0a G17 re-derive status from the verification record (+ typed s5_reason,
     one writer, CI invariant). Then 0b G12 facet predicate in every leg. Then 0c G18
     guard split. Do NOT relabel, retrain, benchmark or rerun before 0a-0b.
@@ -302,9 +300,9 @@ current_state:
   - G4a
   - G13
   registry:
-    decisions: 931
-    highest_bug: BUG-622
-    buglog_entries: 363
+    decisions: 941
+    highest_bug: BUG-628
+    buglog_entries: 367
   do_not:
   - relabel the corpus
   - buy more stratum-A ruler rows
@@ -321,4 +319,4 @@ current_state:
   - the F-14 pocket retarget (statistically null - BUG-296)
   - any PASS-only frame as an epistemic frame (it is a ROLE frame)
   - the golden retrieval set as ground truth (ids chosen from live search output)
-open_bugs_n: 143
+open_bugs_n: 133

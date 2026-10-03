@@ -1,0 +1,60 @@
+{
+  "_provenance": {
+    "schema_version": "1.0",
+    "gen_model": "none",
+    "generated_by": "scripts/normalize_anchor_discipline.py",
+    "generated_at": "2026-10-03T11:44:52.367295+00:00",
+    "input": "governance/ANCHOR_208_FIVE_AXIS_VIEW_20260930.csv",
+    "input_sha256": "35983e4d7843b4a8",
+    "menu": "config/closed_menu_v5.json",
+    "pipeline_commit": "933aea9f375f",
+    "status_counts": {
+      "ok": 202,
+      "emerging": 3,
+      "domain_bleed": 1,
+      "whitespace_fixed": 2
+    }
+  },
+  "review": [
+    {
+      "item_id": "R040",
+      "name": "Commercial Advertising Souring of Artist",
+      "discipline_raw": "emerging",
+      "discipline": "emerging",
+      "discipline_status": "emerging",
+      "domain": "arts & culture",
+      "primary_domain": "arts & culture",
+      "discipline_source": "anchor_adjudication"
+    },
+    {
+      "item_id": "R053",
+      "name": "Self-referential Incompleteness",
+      "discipline_raw": "emerging",
+      "discipline": "emerging",
+      "discipline_status": "emerging",
+      "domain": "systems & frameworks|code & computation",
+      "primary_domain": "systems & frameworks",
+      "discipline_source": "anchor_adjudication"
+    },
+    {
+      "item_id": "R080",
+      "name": "Information Design Community Networks",
+      "discipline_raw": "emerging",
+      "discipline": "emerging",
+      "discipline_status": "emerging",
+      "domain": "information architecture",
+      "primary_domain": "information architecture",
+      "discipline_source": "anchor_adjudication"
+    },
+    {
+      "item_id": "R091",
+      "name": "Autopoesis in Design Education",
+      "discipline_raw": "personal productivity",
+      "discipline": "personal productivity",
+      "discipline_status": "domain_bleed",
+      "domain": "education",
+      "primary_domain": "education",
+      "discipline_source": "domain_bleed"
+    }
+  ]
+}

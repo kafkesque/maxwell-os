@@ -30,7 +30,7 @@
     {
       "id": "depth_workbook_row_count",
       "state": "ok",
-      "evidence": "declared count == found count (148)",
+      "evidence": "declared count == found count (150)",
       "check": "count_matches",
       "about": "governance/anchor_adjudication_workbook_20260924.csv",
       "declares": "config/cohort_declaration.yaml#cohorts.anchor4_depth.measured_rows"
@@ -38,7 +38,7 @@
     {
       "id": "decision_supersession_complete",
       "state": "ok",
-      "evidence": "every SUPERSEDED record names a resolvable successor in 830 record(s); 12 pinned legacy id(s) still owed",
+      "evidence": "every SUPERSEDED record names a resolvable successor in 942 record(s); 12 pinned legacy id(s) still owed",
       "check": "decision_supersession_complete",
       "about": "config/decisions.yaml",
       "declares": "config/decisions_policy.yaml#graph"
@@ -46,15 +46,15 @@
     {
       "id": "decision_citations_in_force",
       "state": "ok",
-      "evidence": "59 citation site(s) all name a decision IN FORCE; 4 declared forward reference(s) still owed; every state word in the registry is classified",
+      "evidence": "60 citation site(s) all name a decision IN FORCE; 4 declared forward reference(s) still owed; every state word in the registry is classified",
       "check": "decision_citations_in_force",
       "about": "config/decisions.yaml",
       "declares": "config/decisions_policy.yaml#graph"
     },
     {
       "id": "decision_registry_wellformed",
-      "state": "owner_owed",
-      "evidence": "8 citation value(s) are NOT id-shaped, so no rail can validate them - name the deciding decision or drop the key: [\"config/generator_pins.yaml:decided='PENDING'\", \"config/handoffs.yaml:decided='BUG-559'\", \"config/handoffs.yaml:decided='BUG-376'\", \"config/handoffs.yaml:decided='BUG-475'\", \"config/silent_repair.yaml:decided='BUG-518'\", \"config/store_authority.yaml:decided='PENDING-OWNER'\"]",
+      "state": "ok",
+      "evidence": "942 decision id(s) unique under one namespace; 942 record(s) carry a canonical state; every citation resolves",
       "check": "decision_registry_wellformed",
       "about": "config/decisions.yaml",
       "declares": "config/decisions.yaml#decisions"
@@ -102,7 +102,7 @@
     {
       "id": "reach",
       "state": "ok",
-      "evidence": "0 uninvoked of 110 reachable check script(s), 1 declared edge(s) (0 dead), debt_max 0",
+      "evidence": "0 uninvoked of 119 reachable check script(s), 1 declared edge(s) (0 dead), debt_max 0",
       "unwired": [],
       "edges": [
         {

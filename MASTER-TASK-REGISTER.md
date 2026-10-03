@@ -1,6 +1,6 @@
 # Maxwell OS v3.0 — MASTER TASK REGISTER (tiered)
 
-> **Updated:** 2026-09-20 | **Archive (full history):** `archive/governance_pre_tiered_2026-09-03/MASTER-TASK-REGISTER.md`
+> **Updated:** 2026-10-03 | **Archive (full history):** `archive/governance_pre_tiered_2026-09-03/MASTER-TASK-REGISTER.md`
 > **Companion:** `governance/aggregated_remaining_tasks.md` (archived copy in same folder)
 >
 > **Convention (standing rule):** unresolved/undone tasks at the TOP (most critical first, MUST→SHOULD→WORTH); resolved/done at the BOTTOM.
@@ -8,6 +8,24 @@
 ---
 
 ## 🔴 MUST — open (strategic-consequential order)
+
+> **CURRENT OPEN INDEX (machine-derived 2026-10-03 — the live face; dated history follows below).**
+> Register: 942 decisions · 367 bugs (133 open / 234 closed; highest OPEN = BUG-628). Forensic audit + preflight GREEN.
+>
+> **OWNER-GATED — the pipeline is blocked until these two are resolved (D-2727):**
+> 1. **RATIFY-2 — full S4→S5→S6 rerun.** Launch under `caffeinate -dimsu`; `python3 pipeline/runner.py --dry-run` then full. Preflight already PASS.
+> 2. **Train/eval split (Option A recommended).** Disjoint split: KEEP(46)→S4 golden few-shot; pin those 46 OUT of the eval ruler (208→162); split manifest is a sha256-pinned rail.
+>
+> **PARKED — freeze window META-LANE-FREEZE-1 (day 6/14, review_by 2026-10-11):** BUG-559 (2 UNREVISIONED receipts — remedy: git-commit `config/decisions.yaml` + `governance/anchor_adjudication_workbook_20260924.csv`, then re-cut receipts) · BUG-593 (mutation-gate fixture carries ONE commit).
+>
+> **REGISTRY DEBT:** D2622 ACTIVE → RESOLVED at RATIFY-2 · D2621 PROPOSED (formalize `pipeline/dedup` module vs keep ad-hoc scripts) · D2547 PLANNED (per-label thresholds) · 12 pinned legacy supersession ids · 4 forward-reference decisions · 63 named-but-uncarried ids (shrink-only).
+>
+> — everything below this index is dated history / SHOULD / WORTH / DONE —
+
+> **2026-10-03 D2622 WIRED + D2621 CORRECTION: D2622 practicality now wired into stage5_verify.py as ADVISORY tier (`practicality` field on every verified FB; never drops; C16 fail-loud on missing config). D2621 prior "no work landed" note CORRECTED — method landed via D2625/D2626/D2627 (all RESOLVED 2026-09-14: dedup_scan/judge/prefilter/apply scripts; mark-not-delete R-D410). Registry/buglog UNCHANGED (938/366); no census re-derive. D2622 stays ACTIVE (RESOLVED at RATIFY-2); D2621 stays PROPOSED (residual = owner choice: formalize pipeline/dedup module vs keep ad-hoc).**
+> **2026-10-03 OWNER-AUTHORIZED STATE-FLIPS EXECUTED: D2546 PLANNED→RESOLVED (SHACL shipped D2555), D2548 PLANNED→REJECTED (grammar-decoding A/B rejected D2392), D2622 PROPOSED→ACTIVE (backend landed D-2723; S5 wiring deferred RATIFY-2). D2622 state-vocabulary blindspot closed: practicality.yaml `state: IMPLEMENTED`→`backend_state: landed`. Census re-derived + decisions_registry receipt re-baselined. Registry 938 / buglog 366 unchanged; session_seed in sync. Remaining RED = owner-ruling only (R003/R146 AUTOFILL → anchor4_workbook + depth_workbook_row_count).**
+> **2026-10-03 SUPERSEDED/DONE/CONFLICT AUDIT + BUG-625/BUG-626 FILED (no new decision, registry stays 931): superseded=16 (4 successor + 12 pinned legacy debt), done=270 RESOLVED, conflicting=2 NEW (D-328 list-typed superseded_by → BUG-626; D-2104→D-2085 reverse-direction supersedes, LOW), superseded-bugs=NONE, fixed-bugs=220 CLOSED. buglog re-derived 145 OPEN / 220 CLOSED / 365 [SUPERSEDED 2026-10-03: now 132 OPEN / 234 CLOSED / 366, highest BUG-604; BUG-625/BUG-626 RESOLVED]. session_seed synced. Six forensic rails GREEN.**
+> **2026-10-03 OWNER RATIFICATION + R5 DISCHARGE: DROP(13)/QUARANTINE(15)/re-ground(8) FINAL-ratified (re-ground(8) = 4 verbatim R020/R064/R137/R188 + 4 KEEP-as-semantic-paraphrase R037/R053/R083/R151; DROP/QUARANTINE already-minted D-2711/D-2719 re-confirmed — no new decision, registry stays 931). R5 generator≠verifier review of the 20-file D-2801 diff DISCHARGED → PASS (fingerprint fail-closed ✓, 0 silent errors ✓; C12 residuals: probe_run 'latest'+OMLX_URL hardcode → follow-on bug). S4 rerun now UNBLOCKED (D-2801 commit + R5 review both done).**
 > **MINTED 2026-10-03 (D-2801 ACTIVE, OWNER ACKED): BUG-528 pipeline/** lock re-scope LANDED — the critical-path unblock is DONE.**
 > 20 pipeline files (745 insertions + untracked practicality.py) are legitimate uncommitted work (D-2747 reroute,
 > D-2757 applicability, BUG-614 stage-code fingerprint, D-2622 practicality, D-2798 advisory, D-2703 chunking,
@@ -1772,3 +1790,68 @@ NEXT (refreshed D-2772):
 > **NEW — 2026-10-03 (D-2799): D-2798 ADVISORY RE-WIRE SHIPPED. config adds discipline_gate_mode=advisory; discipline_conformance_gate.py --gate is now REPORT-ONLY (no fail-closed) in advisory mode ('hard' restores legacy); stage4_merge.py documents discipline as soft facet (never gates routing — routing is content_type-based). Built scripts/discipline_advisory_rescore.py + measured COMMITTED fbs.discipline vs corrected 204 gold (zero inference / zero re-fit): FINE-62 kappa 0.4248 (raw 0.4412), MACRO-3 collapse 0.5534 (== Condition A, instrument validated). 44% = label-ambiguity ceiling, not model ceiling. Forensic rails GREEN. BUG-622 implementation leg CLOSED. NEXT: (1) [BUG] BUG-563 worktree hygiene (reconcile duplicate buglog MED-OPEN vs FIXED D-2684 + ~100 dirty paths); (2) [BUG] BUG-623 requirements.lock reconciliation (5.14.1/5.7.0 vs active env 5.8.1/5.6.1; urllib3/chardet/charset_normalizer warning); (3) [OWNER] optional ratification of final advisory-only BUG-622 contract (D-2798 shipped state); (4) [TASK] D-2703 anchor track: classify 150 locked anchors' primary_domain (closed_menu_v5) + evidence_passages vs evidence_passages_shown schema bug. Registry: decisions 929 / buglog 363 (143 open / 220 closed) / highest BUG-622.**
 
 > **NEW — 2026-10-03 (D-2800): BUG-563 WORKTREE RECURRENCE RECONCILED. 83 dirty paths granted (durable audit artifacts + C19 bloat-purge deletions) or excluded (owner/runtime); BUG-563 duplicate buglog entry marked SUPERSEDED. 20 pipeline paths remain owner-gated (BUG-528: pipeline/** will_not_touch vs 19 MODIFIED + practicality.py UNTRACKED). Registry: decisions 930 / buglog 363 (143 open / 220 closed) / highest BUG-622. NEXT: (1) owner-ratify pipeline/** lock lift-or-revert; (2) D-2703 re-chunk + verify 4660/4660; (3) classify 150 locked anchors primary_domain; (4) owner-ratify DROP13/QUAR15/re-ground8; (5) file evidence_passages schema bug.**
+
+> **2026-10-03 (cont.) BUG-625/BUG-626 RESOLVED (no new decision, registry 931): BUG-625 C12 residuals fixed (probe_run config-first; "knowledge pipeline" literal routed through pipeline_paths across 9 modules + safe_delete + backup_guardian.sh); BUG-626 D-328 scalarized to D339 + scalar guard in reconcile.py. bug_status re-derived 143 OPEN / 222 CLOSED / 365. session_seed synced (highest_bug BUG-622, open_bugs_n 143). Six rails GREEN.**
+
+> **2026-10-03 (cont.) D-2802/D-2803/D-2804 minted + BUG-627 resolved (registry 934): Tier-2 crossing-count rail (refuse >1 active crossing/family, rc=2) + Tier-3 lock-semantic re-ask cadence shipped in check_session_plan.py#crossing_rate_faults (config repo_integrity.yaml#crossing_rate_limit). Q2 recording D-2804 = fingerprint-everywhere + classifier-family config-bound + human-parity advisory gate. BUG-627 fixed (D-2668 selftest controls re-pointed off pipeline/** after D-2801; --selftest 25/25 GREEN). bug_status 143 OPEN / 223 CLOSED / 366. session_seed synced (decisions 934, highest_bug BUG-622, open_bugs_n 143).**
+
+
+> **2026-10-03 (cont.) D-2805 OWNER RATIFICATION (registry 935): D-2802/D-2803/D-2804 APPROVED — Tier-2 crossing-rate rail + Tier-3 lock-semantic re-ask cadence + Q2 fingerprint-everywhere/classifier-family-config-bound/human-parity-advisory-gate. BUG-528 lock is now an accountability gate (R5 + D-naming + stage_code_fingerprint). Forensic audit: six rails GREEN + --selftest 25/25; fixed a latent drift (session_seed decisions 931->935, buglog_entries 365->366). Registry 934->935.**
+
+> **2026-10-03 (cont.) D-2806 BUG-614 FINGERPRINT-EVERYWHERE (registry 936): config-owned stage_code_fingerprint() in pipeline/stamp.py wired into all 7 remaining checkpoint-writing stages (S0/S0.5/S1/S1.3/S1.5/S2/S6) + sidecar write/read/fail-closed-resume. The accountability gate (D-2801/D-2805) is now a mechanism, not a promise. Six rails + --selftest 25/25 GREEN. Resolves BUG-614 + BUG-528.**
+
+> **2026-10-03 (cont.) D-2807 STAGE4 FINGERPRINT C12 MIGRATION + BUG-615/BUG-616 CLOSED (registry 937): stage4's inline
+> _stage_code_fingerprint() migrated to shared config-owned stage_code_fingerprint("stage4") via stage4.fingerprint_files
+> (C12, mirroring stage5). BUG-615 (cross-cluster fb_id dedup) + BUG-616 (depth/cribs preserved on code drift) marked
+> RESOLVED (both guards implemented under D-2752). buglog OPEN 141->139 / CLOSED 225->227. Six rails + selftest GREEN.**
+
+> **2026-10-03 (cont.) D-2808 OWNER RATIFICATION — BUG-622 + BUG-617 CLOSED (registry 938): owner ratified the
+> D-2798/D-2799 advisory-only BUG-622 contract as FINAL (discipline axis advisory-only; NO swap, NO re-fit — D-2788
+> gemma slower, D-2789 swap 5/5 exhausted, D-2792/D-2793 measurement-bound). BUG-622 CLOSED. Also BUG-617 CLOSED
+> (depth now has 207 human-provenanced golden rows: D-2757 FIXES BUG-617 + D-2785 58 owner-adjudicated folded +
+> D-2787 rebuilt to 207). buglog OPEN 139->137 / CLOSED 227->229 / 366. highest_bug BUG-622->BUG-621.
+> Six rails + selftest GREEN.**
+>
+> **TICKED-THIS-TURN (already-fixed, now closed in register): BUG-622 (advisory contract), BUG-617 (depth human gold
+> 207). RE-CONFIRMED DONE (no re-examine): BUG-528/614/615/616/625/626/627 (RESOLVED), BUG-563 (FIXED + dup
+> SUPERSEDED), D-2703 chunking track, DROP13/QUAR15/re-ground8 (D-2715 ratified). DEFERRED/SUPERSEDED registers are
+> historical and internally consistent (register-divergence rail 0).**
+
+> **2026-10-03 (cont.) BUG-621 CLOSED + PIPELINE STATE CORRECTED (no new decision, registry 938): BUG-621 (S4 classifier
+> fit-evidence blindspot) RESOLVED — the demanded head-to-head FIT eval is DONE and NEGATIVE-on-swap (D-2788 gemma-4-12B
+> slower on BOTH axes; D-2789 swap exhausted 5/5; D-2792/D-2793 measurement-bound, human 3-way ceiling 0.766 < 0.8).
+> gpt-oss-20b STAYS — no swap, no re-fit (D-2808). buglog OPEN 137->136 / CLOSED 229->230 / 366; highest_bug BUG-621->BUG-613.
+> Six rails GREEN.**
+>
+> **PIPELINE STATE (corrected — do NOT re-run S1.3-S2 or re-chunk): the D-2716 pointer flip to rechunk-v4-20260929 is the
+> fresh re-chunk and it is ALREADY DONE through S2. Evidence on disk: S1.3 prefilter checkpoint.jsonl (2026-09-30 00:03);
+> S1.5 embed-cluster checkpoint.jsonl (2026-09-30 20:34); S2 extract checkpoint.jsonl (2026-10-02 05:53, 8,217 FBs /
+> 193,039 source_segments). S4/S5/S6 are EMPTY (S4 has only the depth.json sidecar). The "full rerun S1.3->S6" framing is
+> STALE: only S4 -> S5 -> S6 remain. The BUG-614 fingerprint mechanism is ADDITIVE (0 .code_fingerprint sidecars written
+> yet), so it does NOT invalidate the existing S1.3-S2 checkpoints.**
+>
+> **REMAINING (2026-10-03, CORRECTED — NO classification-policy bugs remain): BUG-170/611/612/613 are CLOSED — they were
+> already resolved 2026-10-02 by D-2747 (deterministic non-principle reroute), D-2748 (principle-purity audit), D-2749
+> (FORM-axis audit), D-2750 (owner-approved APPLY: D2417 flip + tier-2 fail-closed FORM invariant + 527-row map) +
+> D-2755/D-2756/D-2757. The stale buglog headers were the only drift. Only remaining blocker before S6 is EXECUTION: run
+> S4 -> S5 -> S6 on rechunk-v4-20260929 (S4 has only the depth.json sidecar). buglog OPEN 136->132 / CLOSED 230->234 / 366;
+> highest_bug BUG-613->BUG-604. Six rails GREEN.**
+
+> **2026-10-03 (cont.) SEVENTH RAIL SHIPPED (no new decision, registry 938): `scripts/check_governance_faces.py` —
+> the governance faces (DECISION-LOG/MTR) may no longer restate a bug status or census that contradicts the
+> register; wired into `just health`. `governance/OWNER_GATE_BUG528_20261003.md` corrected (D-2801 LANDED /
+> D-2805 RATIFIED). Six rails + seventh GREEN.**
+
+> **2026-10-03 (cont.) FORENSIC AUDIT (registry 938): OMLX key NOT broken (config `sk-maxwell-local`, health True,
+> mem 27.2 GB, RSS 4.9 GB — the earlier "API key required" was a headerless raw ping). `just health` fixed two
+> deterministic drifts: `menu_axis_hashes.yaml` STALE (definition-only, answer space invariant) → regenerated;
+> `check_instrument_cohorts.py` JSONDecodeError (D-2720/D-2785 JSONL→CSV artifact) → config-key + format detection +
+> superset-drop. THREE handoff violations remain OWNER-OWED (`verify_handoffs` exit 1): t11 checkpoint rewritten,
+> decisions.yaml append_only 1 in-place deletion @7426, anchor4_workbook seal bytes changed. Do NOT silently re-seal —
+> owner decision. S4 unblocked: OMLX healthy, S4→S5→S6 run pending on rechunk-v4-20260929.**
+
+> **2026-10-03 (cont.) OPEN/PENDING face reconciled: the 🔴 OPEN/PENDING table tabled D2546/D2547/D2548 `PENDING`
+> where the registry says `PLANNED` (corrected). Four IDs advanced under successors without a registry flip —
+> D2546 SHACL shipped (D2555, OWL open), D2547 infra done (D2571/D2556/D2561, per-label open), D2548 A/B rejected
+> (D2392, keep-off), D2622 backend implemented (D-2723, not wired). OWNER-OWED registry flips: D2546->RESOLVED,
+> D2548->REJECTED, D2622->ACTIVE, D2547->keep PLANNED. D2621 + D2345 genuinely open. session_seed.yaml already in sync.**

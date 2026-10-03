@@ -13,6 +13,16 @@ health:
     python3 pipeline/integrity_check.py --quick
     python3 scripts/audit_flag_consumers.py || exit 1
     python3 scripts/verify_anchor_manifest.py || exit 1
+    python3 scripts/verify_split_manifest.py --selftest || exit 1   # D-2733: golden/eval split leakage rail controls (BUG-492)
+    python3 scripts/verify_split_manifest.py || exit 1   # D-2733/BUG-603: a golden id re-entering eval FAILS (208->162 invariant)
+    python3 scripts/verify_source_identity.py --selftest || exit 1   # D-2734/BUG-289: canonical source_id controls — a control nothing runs is a comment (BUG-492)
+    python3 scripts/verify_source_identity.py || exit 1   # D-2734/BUG-289: source_diversity counts canonical source_ids, NOT filenames (20+ duplicate-book-source fix must hold)
+    python3 scripts/detect_title_renames.py --selftest || exit 1   # D-2735: near-duplicate detector controls (a control nothing runs is a comment, BUG-492)
+    python3 scripts/detect_title_renames.py || exit 1   # D-2735: READ-ONLY candidate report — surfaces near-dup pairs for OWNER gating, never auto-merge
+    python3 scripts/detect_same_work_content.py --selftest || exit 1   # D-2737: full-text content dedup controls (a control nothing runs is a comment, BUG-492); LIVE scan is opt-in (--report, ~2min)
+    python3 scripts/gate_duplicate_candidates.py --selftest || exit 1   # D-2738: owner-gate ledger generator controls (a control nothing runs is a comment, BUG-492)
+    python3 scripts/verify_duplicate_gate.py --selftest || exit 1   # D-2738: fail-closed dedup-gate rail controls (BUG-492)
+    python3 scripts/verify_duplicate_gate.py || exit 1   # D-2738: owner-gate ledger structural check — never auto-merge; --gate is POST-RUN apply only
     python3 scripts/consolidate_anchor4_context.py --check || exit 1
     python3 scripts/check_depth_menu.py || exit 1
     python3 scripts/menu_axis_hashes.py --check || exit 1   # the answer-space pin must not be STALE (D-371/BUG-453)
@@ -23,10 +33,15 @@ health:
     python3 scripts/check_buglog_coverage.py --selftest || exit 1   # BUG-570/BUG-492: the buglog BLOAT rail's own controls - a byte-identical COPY must fire and two DIFFERENT blocks must not
     python3 scripts/check_buglog_coverage.py || exit 1   # BUG-570: no block may be a byte-identical copy of another (the earlier 'not identical' refusal compared an occurrence to EOF - length-dependent, always unequal)
     python3 scripts/check_bug_status.py || exit 1
+    python3 scripts/check_governance_faces.py --selftest || exit 1   # SEVENTH rail - governance FACES must not contradict the register (BUG-588/D-2692); controls must fire (a control nothing runs is a comment, BUG-492)
+    python3 scripts/check_governance_faces.py || exit 1   # D-NEW: bug-status table rows + header census in DECISION-LOG/MTR must agree with bug_status.json / decisions_summary.json
     python3 scripts/check_register_divergence.py --selftest || exit 1   # BUG-571/D-2683: BOTH divergence shapes must be SEEN to fire on synthetic logs (a control nothing runs is a comment, BUG-492)
     python3 scripts/check_register_divergence.py || exit 1
     python3 scripts/check_freeze_window.py --selftest || exit 1   # D-2688: the freeze WINDOW's declared EXIT must be SEEN to fire (a control nothing runs is a comment, BUG-492)
     python3 scripts/check_freeze_window.py || [ $? -eq 2 ]        # D-2688: a freeze is a WINDOW - the parked set is COUNTED and the exit is DECLARED; 2 = OWNER-OWED (exit MET -> close it, or horizon PASSED -> re-rule it), loud NOT fatal (BUG-457)
+    python3 scripts/check_anchor_axis_consistency.py --selftest || exit 1   # D-2811/BUG-628: the ANCHOR five-axis propagation control must be SEEN to fire (a control nothing runs is a comment, BUG-492)
+    python3 scripts/apply_anchor_axis_authority.py --selftest || exit 1   # D-2812/BUG-628: the authority PROPAGATOR must be SEEN to fire before it rewrites an artifact (BUG-492)
+    python3 scripts/check_anchor_axis_consistency.py || [ $? -eq 2 ]        # D-2811/BUG-628: every ANCHOR consumer must agree with the ONE declared authority per axis; 2 = declared owner-owed debt, ceiling SHRINK-ONLY (BUG-457)
     python3 scripts/lib/write_guard.py --selftest || exit 1
     python3 scripts/lib/yaml_guard.py --selftest || exit 1       # D-2648 controls: a guard whose controls nothing runs is a comment (BUG-492)
     python3 scripts/lib/yaml_guard.py --check || [ $? -eq 2 ]    # BUG-525/D-2649: a key declared TWICE in one mapping is SILENTLY last-wins; 2 = owner-owed artifacts

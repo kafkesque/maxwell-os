@@ -1,0 +1,446 @@
+{
+  "anchor": "discipline_anchor_conformance_20261002.json",
+  "artifact_id": "discipline_advisory_rescore_20261003",
+  "committed_dist": {
+    "anthropology": 2,
+    "artificial intelligence": 2,
+    "behavioral economics": 8,
+    "cognitive science": 3,
+    "color theory": 1,
+    "communication theory": 3,
+    "computational geometry": 2,
+    "computational physics & simulation": 2,
+    "computer graphics": 4,
+    "creative process": 3,
+    "cultural design": 6,
+    "cultural studies": 1,
+    "decision making": 1,
+    "design thinking": 10,
+    "economics": 6,
+    "emerging": 16,
+    "engineering": 2,
+    "finance": 2,
+    "game design": 3,
+    "generative ai": 2,
+    "generative design": 1,
+    "health & medicine": 3,
+    "human-computer interaction": 15,
+    "information retrieval": 1,
+    "information science": 5,
+    "law": 2,
+    "linguistics": 3,
+    "machine learning": 3,
+    "media studies": 5,
+    "motion & time": 2,
+    "neuroscience": 4,
+    "operations research": 6,
+    "organizational theory": 3,
+    "performing arts": 1,
+    "philosophy": 4,
+    "political economy": 3,
+    "privacy & surveillance": 1,
+    "psychology": 22,
+    "research methodology": 11,
+    "risk management": 1,
+    "semiotics": 3,
+    "social network analysis": 1,
+    "sociology": 1,
+    "software engineering": 6,
+    "strategic thinking": 12,
+    "systems engineering": 1,
+    "typography": 4,
+    "visual semiotics": 1
+  },
+  "decision": "D-2798",
+  "fine_kappa": 0.4248,
+  "fine_raw_agreement": 0.4412,
+  "gold_dist": {
+    "aesthetics": 1,
+    "anthropology": 1,
+    "artificial intelligence": 2,
+    "behavioral economics": 9,
+    "cognitive science": 9,
+    "color theory": 1,
+    "communication theory": 2,
+    "complex adaptive systems": 1,
+    "computational geometry": 1,
+    "computational physics & simulation": 3,
+    "computer graphics": 3,
+    "creative coding": 1,
+    "creative process": 4,
+    "cultural design": 7,
+    "cultural studies": 3,
+    "decision making": 4,
+    "design psychology": 6,
+    "design thinking": 11,
+    "economics": 3,
+    "emerging": 1,
+    "engineering": 2,
+    "finance": 6,
+    "game design": 1,
+    "generative ai": 5,
+    "generative design": 2,
+    "human-computer interaction": 6,
+    "information retrieval": 2,
+    "information science": 6,
+    "information security": 1,
+    "linguistics": 4,
+    "machine learning": 4,
+    "media studies": 4,
+    "motion & time": 1,
+    "neuroscience": 2,
+    "operations research": 8,
+    "organizational theory": 10,
+    "performing arts": 2,
+    "philosophy": 3,
+    "political economy": 3,
+    "privacy & surveillance": 2,
+    "psychology": 9,
+    "research methodology": 15,
+    "risk management": 2,
+    "semiotics": 3,
+    "social network analysis": 1,
+    "sociology": 2,
+    "software engineering": 3,
+    "strategic thinking": 10,
+    "systems thinking": 1,
+    "typography": 5,
+    "visual perception": 2,
+    "visual semiotics": 4
+  },
+  "macro3_kappa": 0.5534,
+  "mode": "advisory (NO inference, NO re-fit, NO gate)",
+  "n": 204,
+  "per_class": {
+    "aesthetics": {
+      "f1": 0.0,
+      "n_gold": 1,
+      "precision": 0.0,
+      "recall": 0.0
+    },
+    "anthropology": {
+      "f1": 0.6667,
+      "n_gold": 1,
+      "precision": 0.5,
+      "recall": 1.0
+    },
+    "artificial intelligence": {
+      "f1": 0.0,
+      "n_gold": 2,
+      "precision": 0.0,
+      "recall": 0.0
+    },
+    "behavioral economics": {
+      "f1": 0.2353,
+      "n_gold": 9,
+      "precision": 0.25,
+      "recall": 0.2222
+    },
+    "cognitive science": {
+      "f1": 0.3333,
+      "n_gold": 9,
+      "precision": 0.6667,
+      "recall": 0.2222
+    },
+    "color theory": {
+      "f1": 0.0,
+      "n_gold": 1,
+      "precision": 0.0,
+      "recall": 0.0
+    },
+    "communication theory": {
+      "f1": 0.4,
+      "n_gold": 2,
+      "precision": 0.3333,
+      "recall": 0.5
+    },
+    "complex adaptive systems": {
+      "f1": 0.0,
+      "n_gold": 1,
+      "precision": 0.0,
+      "recall": 0.0
+    },
+    "computational geometry": {
+      "f1": 0.6667,
+      "n_gold": 1,
+      "precision": 0.5,
+      "recall": 1.0
+    },
+    "computational physics & simulation": {
+      "f1": 0.8,
+      "n_gold": 3,
+      "precision": 1.0,
+      "recall": 0.6667
+    },
+    "computer graphics": {
+      "f1": 0.8571,
+      "n_gold": 3,
+      "precision": 0.75,
+      "recall": 1.0
+    },
+    "creative coding": {
+      "f1": 0.0,
+      "n_gold": 1,
+      "precision": 0.0,
+      "recall": 0.0
+    },
+    "creative process": {
+      "f1": 0.2857,
+      "n_gold": 4,
+      "precision": 0.3333,
+      "recall": 0.25
+    },
+    "cultural design": {
+      "f1": 0.4615,
+      "n_gold": 7,
+      "precision": 0.5,
+      "recall": 0.4286
+    },
+    "cultural studies": {
+      "f1": 0.0,
+      "n_gold": 3,
+      "precision": 0.0,
+      "recall": 0.0
+    },
+    "decision making": {
+      "f1": 0.0,
+      "n_gold": 4,
+      "precision": 0.0,
+      "recall": 0.0
+    },
+    "design psychology": {
+      "f1": 0.0,
+      "n_gold": 6,
+      "precision": 0.0,
+      "recall": 0.0
+    },
+    "design thinking": {
+      "f1": 0.4762,
+      "n_gold": 11,
+      "precision": 0.5,
+      "recall": 0.4545
+    },
+    "economics": {
+      "f1": 0.4444,
+      "n_gold": 3,
+      "precision": 0.3333,
+      "recall": 0.6667
+    },
+    "emerging": {
+      "f1": 0.0,
+      "n_gold": 1,
+      "precision": 0.0,
+      "recall": 0.0
+    },
+    "engineering": {
+      "f1": 0.5,
+      "n_gold": 2,
+      "precision": 0.5,
+      "recall": 0.5
+    },
+    "finance": {
+      "f1": 0.25,
+      "n_gold": 6,
+      "precision": 0.5,
+      "recall": 0.1667
+    },
+    "game design": {
+      "f1": 0.5,
+      "n_gold": 1,
+      "precision": 0.3333,
+      "recall": 1.0
+    },
+    "generative ai": {
+      "f1": 0.2857,
+      "n_gold": 5,
+      "precision": 0.5,
+      "recall": 0.2
+    },
+    "generative design": {
+      "f1": 0.6667,
+      "n_gold": 2,
+      "precision": 1.0,
+      "recall": 0.5
+    },
+    "health & medicine": {
+      "f1": 0.0,
+      "n_gold": 0,
+      "precision": 0.0,
+      "recall": 0.0
+    },
+    "human-computer interaction": {
+      "f1": 0.5714,
+      "n_gold": 6,
+      "precision": 0.4,
+      "recall": 1.0
+    },
+    "information retrieval": {
+      "f1": 0.6667,
+      "n_gold": 2,
+      "precision": 1.0,
+      "recall": 0.5
+    },
+    "information science": {
+      "f1": 0.7273,
+      "n_gold": 6,
+      "precision": 0.8,
+      "recall": 0.6667
+    },
+    "information security": {
+      "f1": 0.0,
+      "n_gold": 1,
+      "precision": 0.0,
+      "recall": 0.0
+    },
+    "law": {
+      "f1": 0.0,
+      "n_gold": 0,
+      "precision": 0.0,
+      "recall": 0.0
+    },
+    "linguistics": {
+      "f1": 0.8571,
+      "n_gold": 4,
+      "precision": 1.0,
+      "recall": 0.75
+    },
+    "machine learning": {
+      "f1": 0.8571,
+      "n_gold": 4,
+      "precision": 1.0,
+      "recall": 0.75
+    },
+    "media studies": {
+      "f1": 0.6667,
+      "n_gold": 4,
+      "precision": 0.6,
+      "recall": 0.75
+    },
+    "motion & time": {
+      "f1": 0.0,
+      "n_gold": 1,
+      "precision": 0.0,
+      "recall": 0.0
+    },
+    "neuroscience": {
+      "f1": 0.3333,
+      "n_gold": 2,
+      "precision": 0.25,
+      "recall": 0.5
+    },
+    "operations research": {
+      "f1": 0.5714,
+      "n_gold": 8,
+      "precision": 0.6667,
+      "recall": 0.5
+    },
+    "organizational theory": {
+      "f1": 0.3077,
+      "n_gold": 10,
+      "precision": 0.6667,
+      "recall": 0.2
+    },
+    "performing arts": {
+      "f1": 0.6667,
+      "n_gold": 2,
+      "precision": 1.0,
+      "recall": 0.5
+    },
+    "philosophy": {
+      "f1": 0.8571,
+      "n_gold": 3,
+      "precision": 0.75,
+      "recall": 1.0
+    },
+    "political economy": {
+      "f1": 0.0,
+      "n_gold": 3,
+      "precision": 0.0,
+      "recall": 0.0
+    },
+    "privacy & surveillance": {
+      "f1": 0.0,
+      "n_gold": 2,
+      "precision": 0.0,
+      "recall": 0.0
+    },
+    "psychology": {
+      "f1": 0.4516,
+      "n_gold": 9,
+      "precision": 0.3182,
+      "recall": 0.7778
+    },
+    "research methodology": {
+      "f1": 0.7692,
+      "n_gold": 15,
+      "precision": 0.9091,
+      "recall": 0.6667
+    },
+    "risk management": {
+      "f1": 0.0,
+      "n_gold": 2,
+      "precision": 0.0,
+      "recall": 0.0
+    },
+    "semiotics": {
+      "f1": 0.6667,
+      "n_gold": 3,
+      "precision": 0.6667,
+      "recall": 0.6667
+    },
+    "social network analysis": {
+      "f1": 1.0,
+      "n_gold": 1,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "sociology": {
+      "f1": 0.0,
+      "n_gold": 2,
+      "precision": 0.0,
+      "recall": 0.0
+    },
+    "software engineering": {
+      "f1": 0.4444,
+      "n_gold": 3,
+      "precision": 0.3333,
+      "recall": 0.6667
+    },
+    "strategic thinking": {
+      "f1": 0.3636,
+      "n_gold": 10,
+      "precision": 0.3333,
+      "recall": 0.4
+    },
+    "systems engineering": {
+      "f1": 0.0,
+      "n_gold": 0,
+      "precision": 0.0,
+      "recall": 0.0
+    },
+    "systems thinking": {
+      "f1": 0.0,
+      "n_gold": 1,
+      "precision": 0.0,
+      "recall": 0.0
+    },
+    "typography": {
+      "f1": 0.8889,
+      "n_gold": 5,
+      "precision": 1.0,
+      "recall": 0.8
+    },
+    "visual perception": {
+      "f1": 0.0,
+      "n_gold": 2,
+      "precision": 0.0,
+      "recall": 0.0
+    },
+    "visual semiotics": {
+      "f1": 0.4,
+      "n_gold": 4,
+      "precision": 1.0,
+      "recall": 0.25
+    }
+  }
+}

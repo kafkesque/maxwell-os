@@ -1,6 +1,6 @@
 # Maxwell OS v3.0 — BUG LOG (tiered)
 
-> **Updated:** 2026-09-20 | **Archive (full history):** `archive/governance_pre_tiered_2026-09-03/buglog.md`
+> **Updated:** 2026-10-03 | **Archive (full history):** `archive/governance_pre_tiered_2026-09-03/buglog.md`
 >
 > **Convention (standing rule):** OPEN bugs at the TOP (most critical first, MUST→SHOULD→WORTH); CLOSED/RESOLVED at the BOTTOM. Protocol: `governance/buglog_protocol.md`.
 
@@ -27,7 +27,7 @@
 | BUG-151 | 2026-08-20 | taxonomy structural overlap (`education` dual-listed + 267 raw aliases) |
 | BUG-148 | 2026-08-20 | S2 `route` field stale/uniform (`route="FB"` on all 2,878). **THIRD DRIFT SOURCE (2026-09-08):** `config/pipeline_config.yaml:250` gates S2 route to `[FB, NULL]` but `route_to_content_type` maps 5 values (FB/PT/PI/GE/TI), and `stage4_merge.py:_resolve_content_type` falls back `ROUTE_TO_CONTENT_TYPE.get(route, "principle")` — so a record with a stale/missing content_type is silently forced to `principle`, bypassing D2587. Fix = deprecate route as ontology carrier; ABSTAIN → growth_edge/quarantine on missing content_type (§5.2.5). | **CLOSED D2616 (2026-09-13, Phase 0):** `_resolve_content_type` now returns `QUARANTINE_CONTENT_TYPE` ("quarantine") on missing content_type — route is fully deprecated as ontology carrier, never forced to principle. `quarantined` list + `S4_QUARANTINE_OUTPUT` (`quarantined.jsonl`) sidecar persist the held records (C16, no silent drop). Tests `test_resolve_content_type_route_deprecated` / `test_resolve_content_type_default_quarantine` assert the new behavior. |
 | BUG-182 | 2026-08-27 | 48 singleton empty-shells deterministically re-return empty after S2 rerun |
-| BUG-170 | 2026-08-24 | non-principle types (PT/PI/TI/GE) routed but NOT classified/enriched |
+| BUG-170 | 2026-08-24 | non-principle types (PT/PI/TI/GE) routed but NOT classified/enriched — **RESOLVED 2026-10-03 (D-2747 deterministic reroute; see `## BUG-170` header below)** |
 | BUG-159 | 2026-08-21 | prompt-injection contamination (cluster_11649, 0.007%) |
 | BUG-168 | 2026-08-24 | `pipeline/dspy_trainer.py` exists but NOT wired to any stage (built-not-wired, same pattern as BUG-085) — wire OR archive | **ARCHIVED D2592 (2026-09-08) + gate REVISED D2594 (2026-09-09):** wire-or-archive resolved → ARCHIVE (defer). DSPy optimizes on labels; golden content_type labels not yet spotless (286 unlabeled + 701 model-only of 1027), so wiring now = training on noise. **RE-OPEN GATE (tier-based, NOT all-1027):** re-open DSPy when the golden set is spotless under the 3-tier architecture (D2594) — Tier1 few-shot fully human-verified (content_type + extraction_type, 0 unlabeled + 0 model-only) + Tier2 training corpus statistically cleaned (label model + P4 + cleanlab) + Tier3 boundary corpus ≥150 cases 2-of-3 adjudicated. |
 | BUG-160 | 2026-08-21 | evidence-passage topical relevance not verified (1/30 drift sample cites carbon passage for maternal-health FB) |
@@ -5909,7 +5909,11 @@ FIX (owed, not applied - it edits rails, and the owner has not authorised the co
 STATUS: OPEN. Affects scripts/check_session_plan.py (RAIL 4), scripts/verify_recalibration_pins.py --staged
 (RAIL 3), and any other rail that shells `git diff --cached` / `git show`.
 
-## BUG-528 (OPEN 2026-09-26) - will_not_touch matches NAMES, so a Dropbox-renamed sibling of a protected artifact is out of scope; one such copy is ALREADY listed in may_touch
+## BUG-528 (RESOLVED 2026-10-03) - will_not_touch matches NAMES, so a Dropbox-renamed sibling of a protected artifact is out of scope; one such copy is ALREADY listed in may_touch
+RESOLUTION (D-2801/D-2805/D-2806): the pipeline/** edit-lock was re-scoped from a name-based edit-prohibition to an
+accountability gate (R5 generator!=verifier review + D-naming + stage_code_fingerprint), rail 4 now matches by FAMILY
+(selftest 25/25 GREEN, BUG-565 x BUG-528 spaced-rename control fires), and BUG-614 fingerprint-everywhere shipped to every
+pipeline stage — the closing condition D-2805 named.
 
 MEASURED 2026-09-26 (A/B of the will_not_touch set against the live working tree):
   will_not_touch = ['governance/F11_*', 'governance/ANCHOR_RULER_CONSOLIDATED_*.csv',
@@ -7058,6 +7062,9 @@ FIX (owed): a PAIRING check - refuse a commit in which a changed granted artifac
   re-create the mismatch silently. Until that lands, the property holds only because a session looked.
 
 ## BUG-563 (MED - OPEN 2026-09-26): `backups/**` is neither GRANTED by the plan nor IGNORED by git
+- **SUPERSEDED 2026-09-27 by D-2684 (canonical FIXED entry below)**: this is the PRE-FIX filing. The resolution
+  (two-homes worktree rule + `scripts/check_repo_integrity.py --worktree`) is recorded in the BUG-563 FIXED entry
+  below. Retained here as the original defect record, NOT a live open bug.
 - **detail**: 92 of the 163 dirty entries are `backups/*`, and those are EVIDENCE files that C13/R-D410 REQUIRE a
   session to write. So a session is obliged to create paths it may not commit, and git is not told to ignore them:
   the tree can never be clean, and the evidence trail is unversioned BY ACCIDENT rather than by decision.
@@ -7913,3 +7920,670 @@ STATUS: the entry was WITHDRAWN and the floor returned to 32 (D-2699); the recei
 **BUG-559 STATUS (2026-09-27, the DRAIN was ATTEMPTED and its blocker is MEASURED - D-2699).** The owed fix LANDED on 2026-09-26: D-2670 joined every receipt to a store that re-derives its bytes (head/prefix/revision/declared, live rc=0, 6/6 re-derivable) and D-2671 promoted the one unjoined object. What was OWED SINCE is the STANDING RULE's limb (iv) - a MUTATION that REDs the join's oracle - because D-2676 was adopted the day AFTER D-2670, so the rule was covered by its own controls only. The entry was written, pre-measured green outside the fixture (rc=1 with EXACTLY TWO declared red lines, restored byte-identical) and then WITHDRAWN, because inside the gate's fixture the ORACLE'S BASELINE is red for a reason that is the FIXTURE'S: the revision controls re-derive locators from git refs the fixture cannot carry (BUG-593, filed and parked). NOT WEAKENED: the rule keeps its 7-case control; nothing in the rail changed.
 REMAINING, unchanged and NARROWED: (1) the STORE-LEVEL half - a receipt over an EARLIER COMMITTED revision is reported unrevisioned (remedy: a declared revision locator), and the two run-root escapes are held by census, declared with reasons and SHRINK-ONLY; (2) the PROSE half - the SECOND INSTANCE named at filing, a digest quoted with an ELLIPSIS (governance/ANCHOR_ADJUDICATION_NORMALIZATION_20260925.md line 9, `f2778a488610cbf1...`), is OUTSIDE the hash-claim ruler (which joins 64-HEX digests), so it is not refused - it is not even a SUBJECT. Remedy (owed, small): teach the digest-claim domain to join a truncated hex prefix against the same stores, so a truncation RESOLVES or is DRIFT.
 THEREFORE the freeze window reads nothing_still_held = 2 still parked (BUG-559 and the newly parked BUG-593, ceiling 11 -> 12) and this id is NOT released: the drain's remaining work is the PROSE join plus the fixture HISTORY that lets limb (iv) cover the store-level rule.
+
+---
+
+## 🔴 OPEN — MUST (appended 2026-09-29; to be sorted into MUST tier)
+
+| Bug | Date | Issue |
+|---|---|---|
+| BUG-594 | 2026-09-29 | **Chunker structural heading-splitting is DEAD — clean_markdown strips `#` markers BEFORE split_on_headings, so `section_heading`/`section_title` are empty on 94.55% of segments.** 96.3% of books (905/940) contain 83,880 markdown headings, yet only 5.45% of 300,270 segments carry a heading. Root cause: `stage1_chunk.py` calls `clean_markdown()` (`text_cleaner.py:63` `re.sub(r'^#{1,6}\s+','')`) which strips heading markers, THEN `split_on_headings()` runs on heading-free text so `SECTION_HEADING_RE` never matches → one empty-heading section per book. Impact: chunks are 300-word sliding windows over the whole book (topical bleed across section boundaries), and the two highest-value enhancements — contextual retrieval and parent-child IDs — are both crippled (no heading context/parent). FIX: split on headings FIRST (capture `##` markers), THEN clean each section body. | UPDATE (D-2706, 2026-09-29): isolated smoke A/B (temp/_ab_heading_fix.py, 60 books) shows the reorder mechanically works (coverage 6.7%->97.5%, 0 boundary violations) BUT is COUNTERPRODUCTIVE — 58.1% segment_id churn (full cascade) AND captured headings are 80.5% converter artifacts (calibre `{#...}`/`.title`, DOI, ISBN, Anna's Archive hash). The "dead splitter" masks a deeper stage0 problem: calibre/Pandoc pollutes headings. RE-SCOPED: keep current chunker; build a heading SANITIZER first; re-evaluate structural splitting only after sanitization. |
+| BUG-595 | 2026-09-29 | **clean_markdown() never applies _CLEAN_SUBS (D2471) -> Pandoc/calibre residue survives into 41.4% of S1 chunk bodies (124,268/300,270).** The D2471 residue stripper exists ONLY in clean_evidence_passage(); the S1 path (stage0->stage1_chunk) runs clean_markdown() which strips Markdown/HTML/boilerplate but MISSES `{...}` attribute syntax, `[ ]{...}` empty links, `{#...}` heading anchors, `^n^` superscripts, `.xhtml_pN`. Measured: empty-link 69,983 segs / heading-anchor 43,358 / raw-brace 114,890. Impact: residue embedded into stage1_5 embeddings and stage2_extract input = model must see through noise; also pollutes section_heading if structural splitting is later revived. FIX: add _CLEAN_SUBS + 3 extra patterns to clean_markdown (deterministic, $0, proven-conservative), then ONE coordinated re-chunk. |
+| BUG-596 | 2026-09-29 | **probe_run.py:199 writes both `evidence_passages` (actual passages) and `evidence_passages_shown` (what the LLM saw) -> schema divergence / provenance gap.** The two can differ (truncated/re-ordered passages) and downstream consumers (golden_validate, nli_calibrate, calibrate, disagreement_sample) read only `evidence_passages`, so the SHOWN-vs-STORED provenance is unverified. FIX: join the two fields (assert shown subset-of stored, or store shown provenance) in probe_run.py + add a golden_validate check. |
+
+## BUG-594 (OPEN, 2026-09-29, D-2706) — chunker structural heading-splitting is DEAD (clean_markdown strips `#` before split_on_headings)
+Filed in the 2026-09-29 MUST-inbox table (full description above). D-2706 smoke A/B: the heading-first reorder
+mechanically works (coverage 6.7%->97.5%, 0 boundary violations) but is COUNTERPRODUCTIVE (58.1% segment_id churn;
+80.5% of captured headings are converter artifacts). RE-SCOPED: keep current chunker; build a heading SANITIZER
+first; re-evaluate structural splitting only after sanitization. OPEN.
+
+## BUG-595 (OPEN, 2026-09-29, D-2706) — clean_markdown() never applies _CLEAN_SUBS (D2471); Pandoc/calibre residue in 41.4% of S1 bodies
+Filed in the 2026-09-29 MUST-inbox table (full description above). FIX: add _CLEAN_SUBS + 3 extra patterns to
+clean_markdown (deterministic, $0, proven-conservative), then ONE coordinated re-chunk. OPEN.
+
+## BUG-596 (CLOSED, 2026-09-30, D-2721) — probe_run.py evidence_passages vs evidence_passages_shown provenance gap
+CLOSED by aligning probe_run.py with production stage2_extract._build_fb_from_result (line 2547-2548):
+`evidence_passages` (STORED) = `principle.get('evidence_passages', shown[:5])` (LLM self-report, fallback);
+`evidence_passages_shown` (SHOWN) = the cluster passages actually passed to the LLM. The prior probe code set
+BOTH to the shown passages and silently discarded the LLM self-report — drift vs production.
+golden_validate.py gained check #4b (NON_VERBATIM_SHOWN): if an FB records evidence_passages_shown, every stored
+evidence passage must be a verbatim substring of the shown passages. Verified: single-source 21/21, convergent 84/84.
+
+## BUG-597 (OPEN, 2026-09-30) — run.default_id=t11 vs hardcoded stale 'latest' run-id default
+BLINDSPOT (D-2713/D-2714 latent, now filed pre-flip): config/pipeline_config.yaml run.default_id=t11, but several scripts default to a hardcoded 'latest' run-id. If the pointer flip (D-2716) repoints default_id without repointing these, those scripts silently read the stale 'latest' dir.
+AFFECTED (grep '"latest"' run-id defaults): pipeline/metrics.py (default run_id='latest' x2), pipeline/golden_sampler.py (hardcoded 'latest' paths x2), pipeline/stage1_5_domain_cluster.py (hardcoded 'latest' path), pipeline/run_diagnostic.py (_DEFAULT_RUN_ID fallback 'latest'). NOTE: D-2713 claimed 7 scripts; exact count must be re-enumerated at flip time (this entry names 4 confirmed).
+REMEDY (D-2716, atomic with pointer flip): repoint default_id t11->rechunk-v4-20260929 AND every hardcoded 'latest' default in the same commit; prefer a single source (pipeline_paths.run_id) over per-script defaults.
+
+## BUG-598 (OPEN, 2026-09-30) — S1.3 --in-place mutates stage1_chunk, violating self-contained {stage}/{run_id} contract
+MISMATCH: pipeline_paths doc claims each stage path is self-contained ({stage}/{run_id}/checkpoint.jsonl). stage1_3_prefilter.py --in-place instead MUTATES stage1_chunk/{run_id}/checkpoint.jsonl in place and writes only a {"completed":true} flag to stage1_3_prefilter/{run_id}/checkpoint.jsonl. A downstream reader of the S13 dir sees no filtered data; a reader of S1 sees mutated data with no record of the filter step except the prefilter_backup file.
+OBSERVED: Phase A (2026-09-29) kept 295,079 of 295,440 (dropped 361 structural-garbage segments); prefilter_backup written; 0 needed anchor segments dropped (exact-hash intersection 0).
+REMEDY: document the contract explicitly (S1.3 is a MUTATING pre-filter of S1, not a self-contained stage), OR emit a self-contained S13 checkpoint + keep S1 immutable.
+
+## BUG-598 (CLOSED, 2026-09-30, D-2721) — S1.3 --in-place mutates stage1_chunk (contract documented)
+CLOSED by DOCUMENTING the contract (remedy option A — zero behavior change): S1.3 is a MUTATING pre-filter, NOT
+a self-contained stage. stage1_3_prefilter.py docstring + pipeline_paths.py module header now state the exception
+explicitly: --in-place rewrites S1/{run_id}/checkpoint.jsonl in place; S13/{run_id}/checkpoint.jsonl holds only a
+{"completed": true, ...} flag; downstream S1.5 reads the MUTATED S1 checkpoint, not S13. The self-contained S13
+checkpoint (option B) is deferred as an architectural decision (S1.5 read-source cascade).
+
+## BUG-599 (OPEN, 2026-09-30) — rechunk-v4-20260929 segments stamped pipeline_run_id=t11 (provenance mismatch)
+MISMATCH (forensic audit, 2026-09-30): the S1.3 Phase-A manifest declares run_id=rechunk-v4-20260929 (pipeline_commit=v3.0-D2485), but the 295,079 segments inside stage1_chunk/rechunk-v4-20260929/checkpoint.jsonl each carry pipeline_run_id=t11 / pipeline_commit=49c17e4 (sampled 200,002/200,002). The run DIR name and the segment-level stamp disagree — a downstream provenance reader cannot distinguish the live v4 run from the old t11 run.
+NON-BLOCKING: segment_id=sha256(text) is unaffected by the stamp, so dedup and data integrity hold; this is a metadata/provenance defect, NOT a content-loss defect.
+REMEDY (fold into D-2716 atomic flip): re-stamp pipeline_run_id t11->rechunk-v4-20260929 on the Phase-A checkpoint (metadata-only, segment_id unchanged), OR document the stamp as intentionally inherited and record a manifest_hash-based provenance. Also confirm stage1_chunk.py stamps pipeline_run_id from the resolved run-id (pipeline_paths._rid), not run.default_id, so post-flip chunks stamp correctly.
+
+## BUG-597 (CLOSED, 2026-09-30) — run.default_id=t11 vs hardcoded stale 'latest' run-id default
+CLOSED by D-2716 atomic pointer flip. All 4 hardcoded "latest" run-id defaults repointed to
+config-driven get_run_id() (metrics.py, golden_sampler.py, stage1_5_domain_cluster.py, run_diagnostic.py).
+Verified no "latest" run-id default remains in the 4 files; get_run_id() resolves rechunk-v4-20260929.
+
+## BUG-599 (CLOSED, 2026-09-30) — rechunk-v4-20260929 segments stamped pipeline_run_id=t11 (provenance mismatch)
+CLOSED by D-2716 atomic pointer flip. Re-stamped pipeline_run_id t11 -> rechunk-v4-20260929 across
+295079/295079 Phase-A segments (streaming replace, fsync+os.replace C6). 0 t11 stamps remain;
+segment_id=sha256(text) invariant confirmed unchanged on spot-check (first line sha256 identical).
+
+
+## BUG-600 (CLOSED 2026-09-30, D-2720) — single-source golden had 7 NON_VERBATIM + 14 INSUFFICIENT_SOURCES false positives
+SCOPE: config/golden/stage2_fewshot_single_source.yaml (21 examples, single-source role-balance few-shot).
+FINDING (golden_validate.py): 7 passages were PARAPHRASES of cluster_segments (SS-POS-001/002/004/009/010/011/014),
+NOT verbatim substrings; PLUS 14 INSUFFICIENT_SOURCES false positives because the source-diversity check did not
+skip non-convergent single-source examples (is_convergent=False). The original filing "14 NON_VERBATIM" was wrong —
+it conflated the 14 source-diversity false positives with the 7 actual paraphrase defects.
+FIX (D-2720): (1) re-verbatimized the 7 passages against their cluster_segments (SS-POS-014 replaced with full
+verbatim cluster_segments text; other six programmatically with best-overlap segment); (2) golden_validate.py check #5
+(source diversity) now skips `is_convergent=False` examples. RESULT: single-source 21/21 PASS, convergent 84/84 PASS.
+
+## BUG-601 (CLOSED 2026-09-30, D-2732) — verify_anchor_family_registry.py reads the D-2720 CSV domain artifact as JSONL (just health breaks)
+
+SCOPE: scripts/verify_anchor_family_registry.py derive() (~line 117) + config/anchor_family.yaml axes.domains.
+FINDING (2026-09-30 forensic audit): D-2720 consolidated the disowned domains axis into a CSV
+(governance/ANCHOR_208_FIVE_AXIS_VIEW_20260930.csv; axes.domains.artifact now points at it), but derive() still
+calls read_jsonl() on that path -> json.decoder.JSONDecodeError ("Expecting value: line 1 column 1") on the CSV
+first line. The domains block also still reads the OLD JSONL schema (dom_cfg["cohort_artifact_key"],
+d.get("domains_status") == "human-adjudicated") that no longer exists in the rewritten axes.domains config
+(now cohort / cohort_human_adjudicated / primary_domain_filled). Consequence: the verifier crashes before any
+count comparison, so `just health` FAILS and the anchor registry no longer self-verifies. NOT a dependency of the
+running RATIFY-2 pipeline (no stage imports this verifier).
+RESOLUTION (2026-09-30, D-2732): derive() now reads the domains artifact via read_csv_rows() (CSV, not JSONL);
+removed the obsolete intersection_default_key / intersection_alternate_key / intersection_rows checks; restored the
+D-2720 over-reach in config/anchor_family.yaml (content_type/discipline intersection 150, extraction_type 145,
+machine_observations anchor_domains_rows_with_values 150) so owned axes stay anchored to the 150-row ANCHOR-3 sheet
+while the domains axis is measured against the 208-row CSV. Verifier EXIT=0: "ok anchor family registry ... domains
+OWNED cohort 208 primary_domain_filled 208/208".
+
+## BUG-602 (OPEN, 2026-09-30) — pipeline/runner.py has no singleton/pidfile guard (duplicate-runner conflict on one checkpoint)
+
+SCOPE: pipeline/runner.py run_pipeline() + the launch invocation (no < /dev/null, no pidfile).
+FINDING (2026-09-30): pasting the RATIFY-2 launch command a second time (the tracking command accidentally carried
+the full `nohup caffeinate ... runner.py --stages 1.5,2,4,5,6` line) launched a SECOND runner (PIDs 36748/36749/36750)
+alongside the live one (33655); two stage1_5_embed_cluster.py processes wrote the same embeddings_cache/state.json
+concurrently. runner.py has no pidfile/singleton check to refuse a second instance. The duplicate `>` log redirect
+also TRUNCATED the live runner log (ratify2_rechunk-v4-20260929.log), which now shows its own "Stage 1.5 FAILED
+(exit code -15)" — a stale, deceptive log. Checkpoint verified clean (fingerprint unchanged, no dup indices, all
+multiples of 64), but the incident is fully preventable.
+FIX (deferred — post-run): add a singleton/pidfile guard in runner.py (refuse to start if a live runner owns the
+same run_id) and use < /dev/null in the launch so a backgrounded runner cannot hold the shell open.
+
+## BUG-603 (OPEN, 2026-09-30) — split_manifest.json ids_sha256 pin is irreproducible (no emitter + undocumented canonicalization)
+
+SCOPE: governance/frontier_audit/split_manifest.json (ids_sha256 field) + the missing emitter script.
+FINDING (2026-09-30 forensic audit): the manifest declares a sha256 pin (a3959dc153813b1e147ca148b4aea66ae4208b3dc3e102fd86b09f613cd0391d)
+as the drift seal for the 46-golden / 162-eval split, but no script in the tree emits it and the canonical
+serialization is undocumented. 11 candidate serializations (sorted/newline/space/json/self-seal) all fail to
+reproduce the pin, so a future rail cannot recompute it -> the drift seal is currently unenforceable (a decorative
+hash). The SEMANTIC leakage guard (golden ∩ eval = ∅) is verified independently and HOLDS (disjoint 46/162/208,
+no overlap; D-2733 rail enforces it fail-closed).
+FIX (owner-gated): re-pin ids_sha256 with a DOCUMENTED canonical form (e.g. sha256 of json.dumps(sorted(golden+eval)))
+and record the emitter + serialization in the manifest, so scripts/verify_split_manifest.py can enforce the drift
+seal alongside the disjointness rail (D-2733).
+
+## BUG-604 (OPEN, 2026-09-30) — stage0_5 metadata extractor mis-splits "liber3.md" filenames, leaking title words into the author field (split book identities)
+
+SCOPE: pipeline/book_metadata.py parse_filename_metadata() / stage0_5_extract_metadata.py; knowledge pipeline/checkpoints/book_metadata.jsonl.
+FINDING (2026-09-30 forensic audit, D-2736): the source_book filenames from the "liber3" corpus are formatted
+"<title words> <author name> liber3.md", and the author/title split boundary is mis-detected: trailing title words
+leak into `author` while the title is truncated. Verified examples (author | title | source_book):
+  - 'Contextual Perspective Alan Male' | 'Illustration A Theoretical and' | 'Illustration A Theoretical and Contextual Perspective Alan Male liber3.md'
+  - 'Services Jon Yablonski' | 'Laws of UX Using Psychology to Design Better Products &' | '...Better Products & Services Jon Yablonski liber3.md'
+  - 'Totalitarianism Mattias Desmet' | 'The Psychology of' | 'The Psychology of Totalitarianism Mattias Desmet liber3.md'
+  - 'Basics Daniel Chandler' | 'Semiotics The' | 'Semiotics The Basics Daniel Chandler liber3.md'
+  - 'Research Project Zina O'Leary' | 'The Essential Guide to Doing Your' | 'The Essential Guide to Doing Your Research Project Zina O'Leary liber3.md'
+EFFECT: each mis-split book produces a DIFFERENT canonical source_id than its correctly-split edition, so the same
+work counts as two distinct sources (BUG-289 tail). The new detector scripts/detect_title_renames.py surfaces 45
+candidate near-duplicate pairs (jaccard >= 0.60) of which ~40 are this class; the remainder are genuine series
+volumes ("The Great Mental Models" Vol 1-4) that MUST NOT be merged (false-positive proof that auto-merge corrupts).
+FIX (post-run, D-2736): repair parse_filename_metadata to strip the "liber3.md" suffix BEFORE splitting and to
+recognize the trailing-author-name boundary, then re-resolve the affected source_ids — POST RATIFY-2, because
+changing source_ids mid-run would change the live embedding fingerprint b9e924d5.
+
+## BUG-602 (CLOSED, 2026-09-30, D-2742) — pipeline/runner.py has no singleton/pidfile guard (duplicate-runner conflict on one checkpoint)
+SCOPE: pipeline/runner.py — no singleton/pidfile guard; run_pipeline() had no lock.
+SYMPTOM (2026-09-30): an accidental re-launch created a second runner (pids 36748/36749/36750) writing the SAME
+S1.5 state.json as the live run (pid 33655), which is what orphaned embedding batches 16256/16320 into quarantine
+(~128 segments now require re-embedding before S6). Two runners on one run_id = torn/duplicate writes.
+FIX (D-2742): added _acquire_singleton_lock() — reads run.singleton_lock (default true) + run.singleton_lock_path
+(C12 config-driven, .pipeline_runner.lock), refuses fail-closed while a LIVE holder pid exists (os.kill(pid,0)
+liveness probe), reclaims a dead pid, registers atexit cleanup. Wired into run_pipeline() right after the version
+gate. Verified: stale-reclaim exit 0, live-refuse exit 1 (SystemExit), atexit cleans the lock.
+
+## BUG-605 (CLOSED, 2026-09-30, D-2740) — scripts/watch_ratify2.py never detects S1.5 finalization; loops "WAIT state.json not written yet" forever
+SCOPE: scripts/watch_ratify2.py — S1.5 completion/finalization detection.
+SYMPTOM: when S1.5 completes it finalizes by REMOVING embeddings_cache/state.json and writing checkpoint.jsonl.
+The watch loop's `state is None` branch then prints "WAIT state.json not written yet" every poll forever — a
+misleading "stuck" signal while the pipeline is actually healthy and advancing through S2 (Principle Discovery
+Gate). Monitor-only (read-only); no pipeline I/O affected. Reported as "this doesn't work" on 2026-09-30.
+FIX (D-2740): added `_s15_finalized()` — when state.json is absent AND checkpoint.jsonl exists in the run dir,
+print "S1.5 COMPLETE" and exit 0 instead of looping. Killed the stale watcher (PID 34339).
+
+## BUG-606 (CLOSED, 2026-09-30, D-2744) — runner preflight timeout (30s) shorter than OMLX watchdog restart cycle (~43s)
+SCOPE: pipeline/runner.py preflight `timeout=30` (hardcoded) vs pipeline/omlx_watchdog.py check_and_restart()
+worst case kill(10s)+sleep(3s)+RESTART_WAIT_SECS(30s) ≈ 43s. When the watchdog restarts OMLX (e.g. BUG-017
+trend trigger on a normal model-load RSS spike 0.1→8.6GB), the preflight aborts the LLM-bound stage mid-restart,
+so S2 fails with "Preflight check failed ... timed out after 30 seconds" before any extraction.
+FIX: C12 config run.preflight_timeout_sec: 90 (+ _get_preflight_timeout() in runner.py). Verified: parses OK,
+watchdog healthy rc=0.
+
+## BUG-607 (CLOSED, 2026-09-30, D-2745) — Stage 2 ModuleNotFoundError: datasketch — bare "python3" in runner drifted across FOUR Python envs (root cause, NOT transient)
+SCOPE: pipeline/runner.py run_stage() — `subprocess.run(["python3", script])` (line 374) and the preflight
+`["python3", watchdog, "--pre-stage"]` (line 402) resolve "python3" via the LAUNCHER's PATH, not a pinned interpreter.
+SYMPTOM (recurring 3x, misdiagnosed "transient" in D-2742/D-2743): S2 fails with
+`ModuleNotFoundError: No module named 'datasketch'` at stage2_extract.py:1396 (init_minhash_lsh) → exit 1.
+FORENSIC ROOT CAUSE (2026-09-30): the machine has FOUR Python interpreters with DIVERGENT dependency sets:
+  - /Users/barn/miniforge3/bin/python3 (conda base, 3.13.12) — the USER's login-zsh `python3` (conda init in .zshrc);
+    has numpy/scipy/yaml/pandas/faiss/pyarrow/transformers/torch, NO datasketch (until this fix).
+  - /Library/Frameworks/Python.framework/Versions/3.12/bin/python3 (Python.org 3.12) — the ONLY env that had
+    datasketch 2.0.0, because a prior assistant ran `pip install datasketch` in a NON-login shell (does NOT source
+    .zshrc), so bare `python3` resolved to /usr/local/bin/python3 → framework 3.12.
+  - /Users/barn/miniforge3/envs/knowledge-pipeline (3.11.15) — named for the project but INCOMPLETE: no
+    pandas/pyarrow/datasketch.
+  - /opt/homebrew/bin/python3 (3.14.6) — reserved for S6 vec0 (stage6.vec_python); no datasketch.
+BLINDSPOT: "datasketch installed / transient" tests ran in a non-login shell → framework 3.12 → false PASS, while
+the user's actual launch env (login zsh → conda base) had no datasketch. The assistant tested the WRONG interpreter.
+FIX (D-2745): (1) `pip install datasketch` into conda base (the user's `python3`); (2) add run.python_bin to
+config/pipeline_config.yaml (C12) + _get_python_bin() in runner.py, used for BOTH the stage subprocess and the
+preflight, so stages can never drift to a different interpreter than the pinned full-dep-chain env.
+VERIFIED: init_minhash_lsh → MinHashLSH ok=True; MinHashLSH insert/query/jaccard round-trip passes under
+/Users/barn/miniforge3/bin/python3; `--dry-run --resume-from 2` previews stages 2,4,5,6,6b,6c.
+FOLLOW-UP: consolidate the 4-Python drift — either fully-provision knowledge-pipeline (3.11) or delete it and declare
+conda base canonical; remove the stray framework-3.12 datasketch install.
+
+## BUG-608 (CLOSED, 2026-09-30) — runner preflight treated watchdog rc==1 (restarted/recovered) as "OMLX DOWN"
+SCOPE: pipeline/runner.py preflight + pipeline/omlx_watchdog.py check_and_restart() return-code contract.
+ROOT CAUSE: check_and_restart() returns 0=OK, 1=restarted(recovered), 2=error, but the runner's preflight treated ANY
+non-zero as "OMLX DOWN" and aborted S2. The orphaned omlx-server (D-2743) was unhealthy → the watchdog restarted it
+(rc=1) → the runner aborted with "❌ OMLX DOWN". Compounded by the BUG-017 trend detector false-positives on the
+0→8.6GB model-load spike (delta 8.5GB > 2GB trend threshold), which triggered the spurious restart in the first place.
+FIX: (1) runner.py treats rc==1 as RECOVERED — re-verifies health once, only aborts on rc==2 or a repeated rc==1.
+(2) omlx_watchdog.py adds RSS_TREND_MIN_GB (default 10.0) so a trend restart only fires above 10GB (a genuine leak),
+never on the initial model-load spike. Verified: preflight rc=0, "OMLX OK: RSS 4.4GB (restarts: 1)".
+
+## BUG-609 (CLOSED, 2026-10-02) — S2 CONDITIONAL_SUCCESS (exit 2) never advances → deterministic schema failures loop forever
+SCOPE: pipeline/stage2_extract.py CONDITIONAL_SUCCESS exit path + config stage2.accept_conditional_within_tolerance.
+ROOT CAUSE: A handful of clusters (2–5 of 12,607) emit schema-invalid FBs at temp=0.0 (empty definition, 2-char
+  name, missing mechanism/boundary/consequence). At temp=0.0 the failure is DETERMINISTIC — re-running can never
+  clear it — yet the exit-2 "Re-run to retry failed clusters" path was the only route to advance, so S2 looped
+  forever (first run: 5 failed clusters, exit 2 at 110,814s; every retry hit the same clusters, same failures).
+FIX: C12 config stage2.accept_conditional_within_tolerance: true + S2_ACCEPT_CONDITIONAL in pipeline_paths.py.
+  When failed/total ≤ max_failed_ratio, CONDITIONAL_SUCCESS now exits 0 (advance to S4) instead of 2.
+  NOTE: BUG-609 alone did NOT end the loop — see BUG-610 (the denominator bug that masked this path).
+
+## BUG-610 (CLOSED, 2026-10-02) — S2 fail-closed ratio used the post-resume subset as denominator → hard-fail exit 1 masked the within-tolerance path
+SCOPE: pipeline/stage2_extract.py terminal failure-ratio logic (total_attempted).
+ROOT CAUSE: The fail-closed check ran BEFORE the CONDITIONAL_SUCCESS branch and computed
+  failure_ratio = failed_clusters / len(target_clusters), but on a resume target_clusters is already SHRUNK to only
+  the 2–5 unprocessed clusters. With 2–3 deterministic schema failures among 3–5 remaining, the ratio was 60–67% —
+  far over max_failed_ratio (0.01) — so it hard-failed exit 1 before ever reaching the within-tolerance branch that
+  BUG-609's flag gates. The denominator was "remaining subset", not "total corpus".
+FIX: capture total_corpus_targets = len(target_clusters) BEFORE the resume filter; compute
+  failure_ratio = failed_clusters / total_corpus_targets (12,607). Verified: S2 exits 0 — 2/12,607 clusters dropped
+  (0.016% ≤ 0.01), 8,217 FBs final, pipeline advances to S4.
+## BUG-611 (RESOLVED, 2026-10-03) — content-type sampled audit of rechunk-v4-20260929 finds ~18% tool_instruction + ~10% growth_edge misclassification; non-principle bins are routed-not-classified (BUG-170) so the drift reaches S6 unverified
+
+RESOLUTION (D-2747/D-2748/D-2755/D-2756/D-2757, 2026-10-02): the TI/GE mis-bin drift is CLOSED by the deterministic
+non-principle reroute (D-2747 — reroute_content_type() wired into stage4 _resolve_content_type) + quarantine
+subcategory taxonomy (D-2755) + owner first-pass dispositions (D-2756) + depth refinement (D-2757). Dry-run corrected
+627/8,217 records (TI→PT 34, TI→principle 14, TI→quarantine 3, TI→PI 1, GE→noise_drop 1). The owner chose OPTION C
+(deterministic reroute) over "extend S4" (a) and "tighten S2" (b) — auditable, fail-closed, no LLM variance.
+
+SCOPE: pipeline/stage2_extract/rechunk-v4-20260929/checkpoint.jsonl (8,217 FBs) — the content_type axis on the
+4 non-principle roles (process_template / process_instance / tool_instruction / growth_edge), as assigned by S2
+(Qwen3-Coder-30B) and ROUTED (not re-classified) by S4 (gpt-oss-20b classify prompt is principle-only).
+FINDING (2026-10-02 content-type sampled audit — 30 stratified non-principle records + full scan of all 27 GE and
+109 TI names): the role distribution is principle 7,151 (87.0%) / process_template 774 (9.4%) / process_instance
+156 (1.9%) / tool_instruction 109 (1.3%) / growth_edge 27 (0.3%). Structural contracts HOLD (PT 774/774 steps>=2 +
+trigger + done_condition; TI all carry tool_name/syntax/platform; PI 155/156 actors, 156/156 >=1 outcome field;
+GE all carry body/category). But the ROLE labels are materially wrong in two bins:
+
+(1) tool_instruction is a CATCH-ALL for "technical/code-adjacent" content, not "tool/software-specific command,
+syntax, or feature" (D2587 Q1). ~18% of the 109 TI records are mis-binned:
+  - design pattern  -> principle:  "Adapter Pattern for Square Peg to Round Hole" (tool_name="Adapter Pattern")
+  - math/physics    -> principle:  "Anisotropic Euclidean Metric Modification", "Spring Force Calculation Algorithm"
+  - hardware/device -> principle/descriptive: "Advanced Resistive Exercise Device (ARED)" (extraction_type=
+    descriptive_model), "Rheo Prosthetic Knee Control System"
+  - "system"/"protocol" descriptions -> process_template/principle: Store Fulfillment Optimization System, Supplier/
+    Inventory/Order Management System, Semantic Search Retrieval Protocol, AI Reporting Tool, Layout Analysis
+    System, Restaurant Data Extraction Tool, Prompt Routing System, Item Validation Protocol, LoanGraphState Workflow
+  - concrete single-use event -> process_instance/noise_drop: "Kite Cam Aerial Footage in Documentary"
+    (syntax="Kite Cam deployed during kite festival filming", parameters=[] — a description of one event, not a syntax)
+  - underspecified -> quarantine: "Third Party Random Selection Tool" (tool_name="Third Party")
+
+(2) growth_edge admits BARE concepts/facts with no articulated OPEN TENSION or UNVERIFIED CORRELATION (BUG-230 /
+D2596 criterion), ~10% of 27: "Airliner No. 4 Design Concept" (status=conceptual, a historical aircraft design),
+"Data Collection as Currency in Minority Report World" (a movie scenario); plus low-value speculation
+"Tavistock Institute's Influence" (conspiracy theory), "Great Pyramid Initiation Site Hypothesis" (esoteric).
+
+(3) Isolated PT<->PI boundary confusions: "Emergency Medical Response Protocol for Seizure and Trauma" is labelled
+process_instance but its name/definition are a prescriptive PROCEDURE (PT); "Eileen's Leadership Response to
+Partnership Crisis" is labelled PT but is a concrete personal case (PI); "PRISM Surveillance System" is labelled PT
+but is a descriptive system account (extraction_type=descriptive_model).
+
+ROOT CAUSE: BUG-170 (RESOLVED 2026-10-03, D-2747) — non-principle records were ROUTED from S2's content_type with NO S4 verification
+(classify_model + build_classify_prompt are principle-only; _resolve_content_type is a principle-only safety net).
+D2589's rule injection INCREASED non-principle DETECTION (correct direction) — TI grew 16→109 (~7x) and PT 179→774
+vs the D2616 Phase-0 relabels — but the accuracy inside the new bins is unverified and measurably flawed, and
+nothing downstream re-checks it before S6 commit.
+IMPACT: ~15-20% of the tool_instruction store and ~10% of the growth_edge store would land in S6 mis-binned,
+contaminating the PT/PI/TI/GE knowledge objects (and their downstream depth/verification consumers).
+FIX (proposed, owner-gated): (a) extend S4 classification to the 4 non-principle roles (close BUG-170) so a
+second model family verifies every content_type before S6; OR (b) if non-principle stays routed, tighten S2's
+single-source/singleton prompt so TI = tool/software command ONLY and GE = open-tension/unverified-correlation ONLY,
+routing design-patterns/math-concepts/devices to principle, "system"/"protocol" to process_template, and
+concrete single-use events to process_instance — then re-audit the 109 TI + 27 GE bins. Do NOT re-classify in place
+until the owner confirms (these are S2 checkpoint records feeding a live S4 run).
+
+## BUG-170 (RESOLVED, 2026-10-03) — non-principle types (PT/PI/TI/GE) routed but NOT classified/enriched (heading backfilled)
+
+RESOLUTION (D-2747/D-2748, 2026-10-02): the "routed but NOT classified" gap is CLOSED by the deterministic reroute
+(D-2747) — non-principle types are now deterministically classified at the S4 choke point via reroute_content_type() +
+the 573-row owner map, not merely routed. The "enriched" half is BY DESIGN: non-principle types are structurally
+complete from S2 (PT steps/trigger/done_condition; TI tool_name/syntax/platform), so S4 CRIBS enrichment
+(application/failure_mode/jargon) is principle-only by D-2323 — not a gap.
+
+REGISTERED 2026-08-24 (as a prose/table row only) but never gained a `## BUG-170` header, so it was UNCITABLE by the
+mint gate (D-2660: a cited bug must exist in governance/bug_status.json). This heading backfills that citation slot —
+the underlying issue is unchanged and still OPEN.
+ISSUE: S4's classify prompt + build_classify_prompt are principle-only; the 4 non-principle roles are ROUTED from S2's
+content_type with no second-family verification and no enrichment. This is the ROOT CAUSE of BUG-611 (non-principle
+misclassification drift reaching S6 unverified) and of BUG-612 (principles pass through the SAME principle-only safety
+net unverified).
+FIX (owner-gated, unchanged): extend S4 classification to the 4 non-principle roles, OR tighten S2's non-principle
+prompt so the bins are accurate at the source; then re-audit. See BUG-611 / BUG-612 for the full drift accounting.
+
+## BUG-612 (RESOLVED, 2026-10-03) — principle-purity drift: deterministic triage flags 2.1% of 7,151 principle records as definitional non-rules
+
+RESOLUTION (D-2748/D-2750, 2026-10-02): principle-purity audit + adjudication APPLIED. The 527 flagged principles
+(152 definitional_no_prescriptive + 238 definitional_with_prescriptive + 144 open_tension + 1 procedure + 5 exact_dup)
+were deterministically seeded into governance/content_type_adjudication.json (now 573 rows) via the D-2750 tier-2
+fail-closed FORM invariant (_principle_form_violation). No auto-DROP — noise_drop stays owner-gated via tier-1.
+Smoke tests green, 0 invalid proposed values.
+
+SCOPE: the SAME rechunk-v4-20260929 checkpoint (8,217 FBs), but the PRINCIPLE bin (7,151 = 87.0%) — which D-2747 /
+BUG-611 did NOT audit (that audit covered only the 4 non-principle bins). This is the blindspot the user asked about:
+"are all principles 100% transferable rules?" — NO, deterministically ~2.1% are not.
+FINDING (scripts/audit_principle_purity.py — pure deterministic rules, D-343 no LLM → temp/principle_purity_triage.json):
+527 principles (7.4%) fire a structural signal:
+  - definitional_no_prescriptive 152 (2.1%) — the definition asserts "X is / describes / involves" a concept AND no
+    prescriptive verb anywhere in the body → a descriptive fact, NOT a transferable rule (D275b: KNOW/APPLY). e.g.
+    "A knowledge graph is a data structure...", "The concept of childhood as a distinct developmental stage...".
+    HIGH-PRECISION candidate set → noise_drop / descriptive_model.
+  - definitional_with_prescriptive 238 (3.3%) — definitional framing BUT a prescriptive verb is present → AMBIGUOUS
+    (owner review: many are legitimate despite the framing, e.g. "Natural curiosity is a more reliable predictor...").
+  - open_tension 144 (2.0%) — articulates a contested/unverified correlation → growth_edge candidate per D275b/BUG-230
+    (mixed precision; false positives like "speaker's message contradicts their nonverbal behavior" are real principles).
+  - procedure 1 (false positive — "third rewrite... fourth rewrite" is NOT a step sequence; CONFIRMS D275b: step-count
+    is never the discriminator).
+  - exact_dup 5 (one definition string × 5 records — a SHA-256 dedup leak).
+CONSEQUENCE: the principle bin was ASSUMED 100% pure. ~2.1% are deterministically non-rules and would commit to S6
+mis-binned, plus a larger semantic-boundary set (~390) needs owner adjudication before the axis can be called clean.
+ROOT CAUSE: S4's classify prompt is principle-only (BUG-170), and _resolve_content_type() is a principle-only safety
+net — principles pass through reroute_content_type() as a NO-OP (only non-principle tiers exist). Nothing verifies a
+principle's OWN purity before S6.
+FIX (owner-gated, do NOT auto-flip — a 2% knowledge-base drop cascades): extend the D-2747 3-tier gate to principles
+with a structural invariant (definitional + no prescriptive → disposition), seeded by owner adjudication of
+temp/principle_purity_triage.json; then re-run the audit. See D-2748.
+
+## BUG-613 (RESOLVED, 2026-10-03) — extraction_type (FORM) axis is unverified + cross-contaminated; D2417 default `principle → descriptive_model` is a latent inversion
+
+RESOLUTION (D-2749/D-2750, 2026-10-02): D2417 flip RATIFIED — config/content_types.yaml
+content_to_extraction_type.principle = normative_heuristic (was descriptive_model; a principle is a transferable RULE).
+FORM declared best-effort metadata, never a routing/verification input. Tier-2 FORM invariant wired into
+reroute_content_type() (_principle_form_violation): principle whose FORM is not a rule reroutes fail-closed to a
+RETAINED disposition only (never auto-noise_drop).
+
+SCOPE: rechunk-v4-20260929 checkpoint (8,217 FBs), the extraction_type (epistemic FORM) axis — the "does content_type rely
+on FORM, and is FORM accurate" question.
+DEPENDENCY DIRECTION (verified in code): content_type (ROLE) does NOT depend on extraction_type (FORM) — D2323 decouples
+them and _resolve_content_type()/reroute_content_type() never read extraction_type. The REAL dependency is the REVERSE:
+D2417 CONTENT_TO_EXTRACTION_TYPE defaults extraction_type FROM content_type when S2 omits it. So FORM inherits ROLE's
+errors, not vice-versa.
+FINDING (scripts/audit_form_axis.py — deterministic signal lexicons, D-343 no LLM → temp/form_axis_audit.json):
+  (1) FORM signal agreement is LOW: causal_mechanism 19.5%, descriptive_model 37.3%, normative_heuristic 35.1%,
+      empirical_pattern 34.1%; high no-signal (up to 1,127) → the axis is largely UNVERIFIABLE by structure.
+  (2) systematic cross-contamination: causal_mechanism records fire a normative signal 726×; descriptive_model fires
+      normative 179× / causal 76×; empirical_pattern fires descriptive 387×.
+  (3) LATENT INVERSION: CONTENT_TO_EXTRACTION_TYPE['principle'] = 'descriptive_model' — a principle is a transferable RULE
+      (normative), so defaulting it to the "describes" FORM bakes in the descriptive leak. In THIS checkpoint 0 records were
+      defaulted (_extraction_type_defaulted == 0), so it is LATENT not ACTIVE — but any future batch where S2 omits
+      extraction_type silently stamps every principle as descriptive_model.
+ROOT CAUSE: the FORM axis has no downstream verifier (S4 classify is principle-only for content_type; nothing checks
+extraction_type before S6). Same class of drift as BUG-170 / BUG-611 / BUG-612 — an LLM-assigned label never re-verified.
+IMPACT: extraction_type feeds serving_gate epistemic_status derivation and downstream depth/verification consumers; an
+unverified FORM axis is a hidden-failure surface. Present-day blast radius is low (0 defaulted, axis is best-effort).
+FIX (owner-gated): (a) flip D2417 default principle → normative_heuristic (semantic correctness, needs owner ratification);
+(b) make explicit that extraction_type is BEST-EFFORT metadata, never a routing/verification input; (c) if FORM is ever
+relied upon, add a cross-contamination canary (D2376 _warn_extraction_type_dominance is the existing pattern).
+
+## BUG-614 (RESOLVED, 2026-10-03) — live S4 process executed PRE-REROUTE code for ~5.5h; 418-record partial checkpoint contaminated (50 provably mis-routed)
+RESOLUTION (D-2806): the stage-code fingerprint is now shipped to EVERY checkpoint-writing stage — a config-owned
+stage_code_fingerprint() + sidecar write/read/fail-closed-resume in pipeline/stamp.py wired into stage0/0_5/1/1_3/1_5/2/6
+(joining the existing stage4 inline + stage5 config-owned fingerprints). A long-running subprocess can no longer silently
+resume (or emit) against a stage module edited mid-run: any committed-or-uncommitted code drift invalidates the checkpoint.
+
+SCOPE: rechunk-v4-20260929 S4 (stage4_merge.py), live process PID 60590 started 05:55:45, running when the D-2747/D-2748/
+D-2749/D-2750 reroute was wired into pipeline/stage4_merge.py (mtime 10:41:29) and pipeline/content_types.py (mtime 11:11:18).
+FINDING (forensic audit): Python loads modules at process start, so the live S4 process had the OLD _resolve_content_type()
+that returned `ct` verbatim (no reroute_content_type call). The reroute is wired at stage4_merge.py:273 but the running
+process never saw it. Proof: 50 of the 418 already-written partial-checkpoint records have fb_ids present in
+governance/content_type_adjudication.json (28→quarantine, 17→noise_drop, 5→growth_edge) yet were committed as `principle`.
+Dry-run of reroute_content_type() over the full S2 checkpoint (8,217 FBs) confirms the NEW code corrects 627 records
+(principle→quarantine 231, principle→growth_edge 183, principle→noise_drop 151, TI→PT 34, TI→principle 14, principle→PT 9,
+TI→quarantine 3, TI→PI 1, GE→noise_drop 1).
+IMPACT: the partial checkpoint is a STALE artifact — it does not reflect the adjudicated ontology. If it were resumed or
+committed to S6, up to 50 (so far) records would reach SQLite under the wrong ROLE, silently re-opening BUG-611/BUG-612.
+ACTION TAKEN: SIGTERM/SIGINT sent to runner PID 60572 and stage4 PID 60590 (both now exited). Checkpoint frozen at 418
+records / state.json record_count 418. Remediation (owner-gated, long-running): back up the stale partial checkpoint, then
+restart S4 fresh so all 8,217 FBs pass through reroute_content_type() at the now-wired choke point.
+ROOT CAUSE (class): a hot-reload gap — a long-running subprocess is not invalidated when a stage module it imported is
+edited mid-run. The BUG-183 stale-resume guard only detects S2-input fingerprint drift, NOT code drift of stage4_merge.py
+itself. RECOMMENDATION: a cheap pipeline_commit / module-mtime guard in stage4_merge.py __main__ that aborts (or warns) when
+its own source mtime is newer than process start (same pattern as the existing s2_input_fingerprint guard).
+
+## BUG-615 (RESOLVED, 2026-10-03) — cross-cluster fb_id dedup leak: 5 identical FBs emitted as separate records (name-disambiguated)
+
+SCOPE: rechunk-v4-20260929 S2 checkpoint (8,217 lines) and S4 partial checkpoint (418 records).
+FINDING (forensic audit): the S2 checkpoint has 8,212 unique fb_ids over 8,217 lines — 5 duplicate records. One fb_id
+(334554e0…) appears 5× ("Value-first Demonstration"), another (f8b4e061…) appears 2×. All copies are BYTE-IDENTICAL
+(same definition, mechanism, source_segments, source_principle_ids). The S4 partial checkpoint already materialised 3 of
+them as "Value-first Demonstration", "(2)", "(3)" — the name-disambiguation suffix (D2069/D2350) fixes the NAME collision
+but NOT the fb_id identity collision.
+ROOT CAUSE: cluster-before-extract placed the SAME source segments into 5 distinct clusters, so S2 extracted the identical
+principle 5× under the same content-hash fb_id (fb_id is identity-fixed at S2, D2350). dedup_fbs_by_cosine (D2120) only
+dedups WITHIN a cluster — it never fires under the 1-principle-per-cluster invariant — so cross-cluster duplicates leak
+through S4 and would reach S5/S6 as N distinct rows with the same fb_id (violates DB unique constraint, inflates counts).
+IMPACT: 5 spurious records; a silent bloat + identity-collision surface at S6. The 5× case is the "5-record dedup leak"
+observed in the partial checkpoint state.
+FIX: cross-run fb_id dedup guard in stage4_merge.py — a seen_fb_ids set (rebuilt from resumed fbs) that skips a duplicate
+fb_id and merges its source_clusters/source_segments provenance into the kept record (fail-closed, deterministic). Upstream
+S1.5 cluster-assignment root cause (same segment → 5 clusters) is a SEPARATE investigation.
+
+RESOLUTION (D-2807): the cross-cluster seen_fb_ids dedup guard is implemented in the stage4_merge.py
+main classify loop — a duplicate fb_id is skipped and its source_clusters/source_segments provenance
+merged into the kept record (fail-closed, deterministic). 5 spurious records prevented at S4; the S6
+unique-constraint surface is closed.
+
+## BUG-616 (RESOLVED, 2026-10-03) — BUG-183 S2-input-drift guard deletes depth.json; a code-drift guard must PRESERVE it
+
+SCOPE: stage4_merge.py resume block (BUG-183 guard ~lines 1430-1490).
+FINDING: depth.json (checkpoint.jsonl.depth.json) is a content-derived sidecar — cluster_id → depth value, computed by
+batch_depth_classify from the principle's discipline/domains/mechanism. It is INDEPENDENT of content_type routing (the
+D-2747 reroute changes routing, not depth). It has 7,149 entries (~1-2h of compute) that are still valid after the reroute.
+The existing BUG-183 guard (and its D2487/format-guard siblings) DELETE depth.json (and .cribs.json) whenever it discards a
+stale checkpoint — correct for S2-INPUT drift (cluster_ids change), but WRONG for CODE drift (reroute changes routing only,
+depth values are unchanged).
+IMPACT: if the BUG-614 fix (stage-code drift guard) reuses the existing discard path, a code-only change would destroy the
+reusable depth.json sidecar, wasting ~1-2h of depth classification on every code edit.
+FIX: the new stage-code drift guard must discard ONLY fbs + processed_ids + scalar_state, and PRESERVE depth.json/.cribs.json
+(content-derived, code-independent). S2-input drift continues to delete them (cluster_ids are input-bound).
+
+
+RESOLUTION (D-2807): the stage-code drift guard (BUG-614) discards ONLY fbs+processed_ids+scalar_state
+and PRESERVES depth.json/.cribs.json (content-derived, code-independent); S2-input drift still deletes
+them. depth.json (~7,149 entries, ~1-2h compute) now survives code-only edits.
+
+## BUG-617 (RESOLVED, 2026-10-03) — depth axis has no human-provenanced ground truth; the retired "1,027 golden depth" was gpt-oss SILVER
+FINDING (forensic audit, owner question "are the 1,027 golden depth 100% accurate + human-verified?"): NO. The
+archive/golden_retired_D2618/stage4_golden_mined.yaml header states "silver-standard — gpt-oss teacher labels, NOT
+hand-reviewed" (provenance gpt-oss 1027 / DeepSeek 0 / human 0). D2613/D2616: 93.3% unverified silver, only 69 = 6.7%
+4-axis verified. The current eval target governance/verified_core.jsonl (443 rows) has only 71 human-verified rows total
+and 61 human-verified depth labels (13.8%); 169 rows are still pending-human.
+CONTAMINATION CHECK (no active leak): the silver-trained depth classifier (knowledge pipeline/classifier_depth) is
+DORMANT — S4_STUDENT_PRECLASSIFIER_ENABLED=false (D2607), measured macro-F1 0.34 silver / 0.48 clean (BELOW the 0.85
+gate, decisions 745-747), checkpoints archived (D-2713). Depth is now LLM-classified (D2220). So the S4 rerun's depth is
+NOT silver-steered — but NO depth label is ground-truth-eligible (D-274d: min_human_share unsatisfiable).
+ACTION (D-2754): extend the D-274f anchor to include DEPTH conformance sets (positive / near-neighbour negative /
+out-of-vocabulary), each stamped depth_source human provenance, before any depth classifier retrain. Until then, treat
+depth labels as operational outputs, not ground truth.
+
+RESOLUTION (D-2757 + D-2785/D-2787, 2026-10-03): depth now HAS human-provenanced ground truth. The gpt-oss SILVER
+1,027-row golden (archive/golden_retired_D2618) is RETIRED; the current depth golden is 207 human-provenanced rows =
+149 canonical_adjudicated/owner_finalized (D-2778) + 58 owner-adjudicated folded extras (D-2785), rebuilt into
+governance/depth_anchor_conformance_20261002.json at 207 rows (domain 99 / cross-domain 58 / specialized 48 /
+universal 2; D-2787). D-2757 (RESOLVED) FIXES BUG-617. Depth remains LLM-classified (D2220) with no silver steering
+(S4_STUDENT_PRECLASSIFIER_ENABLED=false). Residual (TASK, not a bug): build negative/OOV depth conformance sets
+before any future depth classifier retrain.
+
+## BUG-618 (RESOLVED, 2026-10-02) — ANCHOR_208 depth column is STALE: carries owner_depth (raw blind) not canonical depth_final_class (42/150 = 28% mismatch)
+RESOLUTION (D-2778, 2026-10-02): depth column REBUILT from canonical depth_final_class + provenance-stamped.
+ANCHOR_208_CONSOLIDATED_20261002.json depth_source dist = canonical_adjudicated 108 / owner_finalized 41 /
+owner_finalized_noise_drop 1 / mapped 58. Golden depth = depth_source in {canonical_adjudicated, owner_finalized}
+= 149 human-provenanced rows (ZERO universals, matching the corrected canonical dist). The 58 'mapped' extras are
+provenance-stamped 'mapped' (lower provenance, from categorical depth_final) and FAIL-CLOSED excluded from golden
+(depth_golden_eligible=False). NO imputation performed. Follow-up (TASK, not a bug): owner-adjudicate the 58 mapped
+depth cells to expand the depth golden pool from 149 toward 207.
+FINDING (forensic audit, owner question "are those depths accurate?"): NO. governance/ANCHOR_208_FIVE_AXIS_VIEW_20260930.csv
+`depth` column == `owner_depth` (the owner's raw blind call), NOT the declared-canonical `depth_final_class` from
+governance/anchor_adjudication_workbook_20260924.csv (config/anchor_family.yaml `measured_20260925.depth.canonical_column`
+= depth_final_class). Full diff over the 150 owner rows: 42/150 = 28.0% mismatch (matches intra_rater_alpha raw 0.710).
+Every mismatch row shows view==owner_blind != canonical. The 7 negative_set rows (R033/R049/R062/R085/R087/R101/R139,
+"blind class-1 calls RETRACTED by the owner") still carry depth=1 (universal) in the view but depth_final_class=2/3.
+CONSEQUENCE: the 208 view reports 7 spurious UNIVERSAL(1) depths; the canonical 150 have ZERO universals. Stale dist
+(view) universal 7 / cross-domain 50 / domain 92 / specialized 59 vs corrected (150 depth_final_class) universal 0 /
+cross-domain 44 / domain 75 / specialized 31, + 58 extras (mapped from categorical depth_final, lower provenance).
+IMPACT: wiring the 208 view as the S4 depth anchor (D-2758) as-is would inject a 28% stale depth signal.
+FIX: rebuild the 208 view depth column from depth_final_class (150) + verify the 58 extras' depth source; apply BEFORE
+any depth anchor wiring. Do NOT impute; provenance-stamp each depth cell (human_adjudicated vs mapped).
+
+## BUG-619 (RESOLVED, 2026-10-02) — ANCHOR_208 discipline axis contaminated: 4 domain-bleed cells + 2 whitespace dupes + 5 'emerging' catchall
+RESOLUTION (D-2778, 2026-10-02): contamination RESOLVED by owner adjudication (D-2766, 208/208 owner_finalized), NOT
+silent remap. 4 domain-bleed cells now correct: R042 'design strategy'→human-computer interaction, R086/R117
+'personal productivity'→behavioral economics, R091 'personal productivity'→emerging (correctly catchall). 2 whitespace
+dupes trimmed (discipline_anchor_conformance_20261002.json = 49 distinct, 0 off-menu). 5 emerging→3 (R040/R080/R091),
+all discipline_source=owner_finalized and FAIL-CLOSED excluded from golden via discipline_golden_eligible=False
+(204 golden rows). DECISION ratified: the 3 'emerging' catchall rows are excluded from the golden anchor to keep the
+conformance set contamination-free. Follow-up (TASK): owner-refine the 3 emerging rows into real disciplines.
+FINDING (forensic audit): governance/ANCHOR_208_FIVE_AXIS_VIEW_20260930.csv `discipline` column has 54 unique values;
+only 52 of the 62 closed_menu_v5 disciplines appear cleanly. Issues: (1) 2 trailing-space dupes 'economics ' / 'sociology '
+(fragment one discipline into two distinct values, defeating exact-match golden join); (2) 4 rows carry a DOMAIN in the
+discipline cell — R042 'design strategy' and R086/R091/R117 'personal productivity' (both are closed_menu_v5 DOMAINS, not
+disciplines) = a domain->discipline axis bleed; (3) 5 rows 'emerging' (the on-menu catchall = under-specified, awaiting
+refinement); (4) 2 ADVISORY disc-status rows R160/R205. IMPACT: a discipline golden built from these cells would inject
+4 non-discipline labels + 2 fragmented labels + 5 catchall = contaminated few-shot (root cause of discipline golden gap,
+D-2718 addendum), and exact-match discipline golden join would silently miss the 2 whitespace-duped rows.
+FIX: deterministic normalize (trim whitespace, 2 rows auto-fixed) + owner re-classify the 4 domain-bleed + 5 emerging
+rows (NO silent remap, C12d). Artifacts: governance/ANCHOR_208_DISCIPLINE_NORMALIZED_20261002.json +
+governance/discipline_domain_bleed_review_20261002.json.
+
+## BUG-620 (CLOSED, 2026-10-02) — discipline axis lacked human-provenanced ground truth: now 208/208 owner-finalized (D-2766)
+FINDING (forensic audit): governance/ANCHOR_208_CONSOLIDATED_20261002.json discipline_source = anchor_adjudication 197 /
+owner_finalized 9 / whitespace_fixed 2. Only 9/208 discipline labels are human-provenanced (the 9 review rows); the other
+197 are the anchor-view LLM adjudication (silver) — the SAME class of gap as BUG-617 (depth had 0 human, retired 1,027
+silver). CONSEQUENCE: a discipline conformance gate built now would measure LLM-vs-LLM (~95% circular), a false
+conformance reading that is itself contamination. IMPACT: the discipline conformance gate (the symmetric completion of
+the D-2761 depth gate) MUST WAIT until the owner adjudicates a meaningful discipline sample. FIX: mirror the depth path —
+collect ~150 human discipline labels (retire the 197 silver), then build the discipline conformance gate against human
+gold only. Do NOT inject the 208 anchor as discipline few-shot (D-274f: conformance set, not training set).
+
+RESOLUTION (D-2766, 2026-10-02): owner bulk-adjudicated ALL 199 unreviewed discipline rows ("all discipline are
+human approved"). discipline_source is now owner_finalized 208/208; the 204 golden-eligible rows form
+governance/discipline_anchor_conformance_20261002.json (human-provenanced). The discipline conformance gate is now
+UNBLOCKED (mirror the D-2761 depth gate).
+
+## BUG-621 (RESOLVED, 2026-10-03) — S4 classifier (gpt-oss-20b) has no head-to-head fit evidence against faster/more-accurate alternatives; Pareto status unverified
+FINDING (market research 2026-10-02): gpt-oss-20b (3.6B-active MoE) was chosen for S4 classification without a
+head-to-head "fit" eval against alternatives on Maxwell's own human gold (149 depth + 204 discipline). Its
+"faster AND more accurate" Pareto position is therefore UNVERIFIED — a hidden blindspot of the same epistemic class
+the project otherwise rejects (bare accuracy over kappa, LLM-vs-LLM circular conformance). IMPACT: we cannot claim
+the S4 classifier is optimal; any future swap is arbitrary without a measurement. FIX: a gated head-to-head FIT eval
+(Cohen's kappa + tok/s vs gold) before ANY classifier change (D-2767). Shortlist: Mistral-Small-3.1-24B (primary),
+Gemma-3-12b-it (secondary). Qwen3-* excluded by R5 (generator-family independence).
+
+RESOLUTION (D-2788/D-2789 + D-2808, 2026-10-03): the head-to-head FIT eval BUG-621 demanded is DONE and NEGATIVE-on-swap — the Pareto status is now VERIFIED, not assumed. D-2788 measured gemma-4-12B-it-qat-OptiQ-4bit SLOWER than gpt-oss-20b on BOTH axes (S4 + depth); D-2789 exhausted the swap path 5/5 (all candidates rejected/parked); D-2792/D-2793 proved the remaining gap is measurement-bound (human 3-way discipline ceiling 0.766 < 0.8 operative floor). Conclusion: gpt-oss-20b STAYS the S4 classifier — no swap, no re-fit (ratified in D-2808). BUG-621 CLOSED — the "no fit evidence" blindspot is now measured evidence.
+
+## BUG-622 (RESOLVED, 2026-10-03) — S4 discipline classifier (gpt-oss-20b) FAILS human-gold conformance: kappa ~0.45 << 0.8 operative floor (first live measurement)
+FINDING (forensic audit, first live conformance run): the production S4 discipline classifier of record
+(merged_cribs_classify -> map_to_canonical_with_fallback, gpt-oss-20b-MXFP4-Q8) scores Cohen's kappa ~0.45 against
+the 204-row human-owner discipline anchor (discipline_anchor_conformance_20261002.json, D-2766). Sample N=30:
+agreement 46.7%, kappa 0.452; N=12: 0.234. FAR below the 0.800 operative floor AND the 0.667 reporting floor
+(D-2611: never bare accuracy on a 49-class skewed prior). 27% of predictions remap to 'emerging' (off-menu /
+opposite-axis guard). Two-layer root cause: (1) the D-2769 gate itself mis-measured — it invoked
+slim_batch_discipline_classify (the BUG-197/D2532 *emerging-row* re-classifier, NOT the main S4 classifier) and
+compared RAW free-form strings WITHOUT the production remap: raw kappa 0.060 vs remapped-slim 0.268 vs correct
+merged+remap 0.452. (2) Even the correct classifier free-generates adjacent-but-wrong disciplines (e.g.
+'psychology' for 'neuroscience', 'information science' for 'computer graphics', 'economics' for 'privacy &
+surveillance', 'artificial intelligence' for 'information retrieval').
+IMPACT: the S4 discipline axis is NON-CONFORMANT to human ground truth. Committing discipline labels as-is would
+inject a ~55% wrong discipline signal into the knowledge store. This also strengthens BUG-621 (gpt-oss fit was
+never verified — and now it demonstrably fails the discipline sub-task).
+FIX: (a) D-2770 corrected the gate to mirror production (merged_cribs_classify + remap). (b) Root-cause the low
+kappa BEFORE any S4 discipline commit — candidates: inline label-list erosion in the merged prompt, absent
+negative-exemplar disambiguation, 49-class prior. (c) Do NOT commit discipline labels or swap the classifier until
+kappa >= 0.800 (D-2767 gate). NEXT: full 204-row run for a definitive kappa with proper CI (N=30/12 samples above
+are indicative, not final).
+UPDATE (D-2774, 2026-10-02): the D-2773 closed-menu fix was IMPLEMENTED behind stage4.discipline_closed_menu_enabled
+(default false) and live A/B'd on N=30 — menu ON kappa 0.344 vs menu OFF baseline 0.452 (net -0.11). The closed menu
+did NOT help; flag reverted to false. This REFINES the root cause: the binding constraint is gpt-oss-20b's
+discrimination QUALITY across the 62-label space, NOT the open-vocabulary generation. PIVOT to classifier FIT eval /
+swap (D-2767) rather than further prompt engineering on gpt-oss.
+
+UPDATE (D-2797, 2026-10-03): OWNER RATIFIED the 3-way macro re-scope as PRIMARY routing facet + human-parity gate
+(~0.73-0.77). CONDITION A (collapse of committed fbs.discipline -> 3-way, ZERO inference): kappa 0.5534 (raw 0.7255,
+N=204) — BELOW 0.65 ship threshold; 16 off-menu 'emerging' abstentions (7.8%) ALL WRONG (fine-axis remap failure).
+CONDITION C (dedicated 3-way classifier) BUILT (scripts/discipline_macro_classify.py, selftest + dry-run GREEN).
+
+UPDATE (D-2798, 2026-10-03): CONDITION C MEASURED — kappa 0.6066 (raw 0.7696, N=204), BELOW the 0.65 ship threshold
+AND below the 0.73 human-parity floor (human 3-way ceiling 0.766). 3-way macro NOT shipped as a routing facet;
+discipline is ADVISORY-ONLY (fine-62 -> advisory multi-label tags, soft facet; routing does not gate on discipline).
+Condition C beats Condition A (0.6066 vs 0.5534) by eliminating the 16 off-menu abstentions (now 1); residual error =
+adjacent-cluster confusion (H&D<->M&B 28, H&D<->Tech 9). ROOT-CAUSE of the prior 'cold-reload' blocker: MACRO_MAX_TOKENS
+=256 was too small for the Harmony reasoning CoT (billed against max_tokens) -> finish_reason='length' before content;
+'content missing (cold reload?)' was a MISDIAGNOSIS, not memory pressure. Fixed to 1024. REMAINING: re-wire S4 to the
+advisory contract (no swap, no re-fit).
+
+RESOLUTION (D-2808, 2026-10-03): owner ratified the D-2798/D-2799 advisory-only BUG-622 contract as FINAL. The
+discipline axis is advisory-only (fine-62 -> advisory multi-label soft-facet tags); routing never gates on discipline
+(content_type-based, fine-only). NO classifier swap and NO re-fit: D-2788 measured gemma-4-12B slower on both axes;
+D-2789 exhausted the swap (5/5 candidates failed); D-2792/D-2793 proved the axis measurement-bound (human 3-way
+ceiling 0.766 < 0.8, D-2795/D-2796). The advisory re-wire shipped in D-2799 (discipline_gate_mode=advisory,
+conformance gate report-only) is the END-STATE. BUG-622 CLOSED with no model swap.
+
+## BUG-623 (RESOLVED, 2026-10-02) — Dependency drift:
+RESOLUTION (D-2777, 2026-10-02): scripts/smoke_bug623_dependencies.py GREEN — bge-m3 embedding (sim 0.686>0.457) + DeBERTa-v3 NLI (entail 0.997 / contra 0.322) both load and discriminate under active 5.x (transformers 5.8.1 / ST 5.6.1). No silent regression; requests/urllib3/charset_normalizer warning ABSENT. NO pin-back warranted. Residual hygiene (follow-up): requirements.lock declares 5.14.1/5.7.0 while active env runs 5.8.1/5.6.1. transformers 5.14.1 / sentence-transformers 5.7.0 MAJOR-version jumps untested against S5 NLI + S1.5 embedding; requests/urllib3/charset_normalizer mismatch
+FINDING (OMLX/Goose update forensic audit, D-2772): requirements.txt declares lower-bound-only floors
+(transformers>=4.40, sentence-transformers>=2.2) but requirements.lock (uv) pins transformers==5.14.1 and
+sentence-transformers==5.7.0 — MAJOR-version jumps over the declared floors. Consumers NOT smoke-tested under 5.x:
+stage5_verify.py + rerank.py + student_classifier.py + bakeoff_typed_decision.py (AutoModelForSequenceClassification /
+AutoTokenizer / pipeline zero-shot) and stage1_5_embed_cluster.py + stage2_extract.py + coverage_check.py
+(SentenceTransformer device="mps"). Separately, requests 2.32.5 emits RequestsDependencyWarning at import
+("urllib3 (2.7.0) or chardet (7.4.3)/charset_normalizer (3.4.9) doesn't match a supported version") — a loud (not
+silent) tell of a partial pip upgrade. CONSEQUENCE: a silent S5-NLI or S1.5-embedding quality regression under the 5.x
+major versions would be invisible (fail-closed paths could silently score wrong); the requests warning fires on EVERY
+status.py invocation. IMPACT: unverified runtime correctness of the NLI verifier (S5) and the embedding/clustering leg
+(S1.5) — both on the quality critical path. FIX: (a) run an S5 NLI smoke test (known-answer entail/contradict pair) +
+S1.5 embedding smoke test under the CURRENT pinned versions; (b) reconcile requests/urllib3/charset_normalizer (either
+bump requests or pin urllib3<2.7/charset_normalizer to the requests-supported floor); (c) if 5.x breaks anything, pin
+transformers/sentence-transformers back to a verified 4.x/3.x floor in requirements.lock. No dependency change is made
+until the smoke test proves a need (avoids a partial-upgrade cascade).
+
+## BUG-624 (RESOLVED, 2026-10-02) — Depth conformance anchor STALE at 149 (golden is 207 after D-2785 fold)
+FINDING (S4-swap + fold forensic audit, 2026-10-02): scripts/build_depth_anchor_conformance.py HARDCODES
+`if len(examples) != 149` and its docstring still says the "58 mapped extras stay pending verification" — but
+those 58 rows are now OWNER-ADJUDICATED and folded (D-2785: depth golden 149 -> 207). The 58 folded rows
+(R151..R203) are NOT in governance/ANCHOR_STORE_BRIDGE_20260926.json (150 entries), so they cannot yet be joined
+to maxwell.db fb_ids. CONSEQUENCE: governance/depth_anchor_conformance_20261002.json still holds 149 examples, so
+scripts/fit_eval_model_swap.py + scripts/depth_conformance_gate.py run the swap/conformance on 149, NOT the 207
+golden — the classifier gate is underpowered and the D-2758/D-2759 golden few-shot injection stays only partially
+unblocked. IMPACT: silent under-coverage of the depth axis. FIX: (a) bridge the 58 folded item_ids -> fb_ids
+(name-join under collapse_whitespace, D-2658) into a new store-bridge; (b) update the hardcoded 149 -> 207 in
+build_depth_anchor_conformance.py; (c) rebuild the conformance anchor; (d) re-run the swap + conformance gates on 207.
+
+RESOLUTION (2026-10-02, D-2787): fixed at the SOURCE, not as a JSON patch. New scripts/build_anchor_bridge_ruler_208.py
+derives a 208-row bridge ruler (content ruler 150 + 58 folded depth extras, all name-joined EXACTLY) and
+config/anchor_family.yaml store_bridge.ruler_sheet re-points at it; the bridge was REGENERATED so
+build_anchor_store_bridge.py --check now reports "ok" (rows 208 / joined 208 / exact 207 / normalized 1 / ambiguous 0).
+build_depth_anchor_conformance.py hardcode 149 -> derived golden count, and governance/depth_anchor_conformance_20261002.json
+rebuilt to 207 golden rows (domain 99 / cross-domain 58 / specialized 48 / universal 2; R021 excluded). The (d) re-run
+of the swap/conformance gates on 207 is the FOLLOW-ON task (FIT eval gemma-4-12B vs gpt-oss-20b), tracked separately.
+
+## BUG-625 (RESOLVED, 2026-10-03) — C12 residuals: probe_run.py hardcodes run-id "latest" + OMLX_URL, and the "knowledge pipeline" literal is duplicated across >=10 pipeline modules
+FINDING (R5 generator≠verifier review of the D-2801 20-file diff, goose-as-verifier, 2026-10-03): three C12
+(never-hardcode) residuals survived the D-2801 pipeline re-scope. (1) pipeline/probe_run.py:36-37 hardcode the
+run-id "latest" in S15_CHECKPOINT and S1_CHECKPOINT (the SAME class as BUG-597, now CLOSED by D-2721). (2)
+pipeline/probe_run.py:41 hardcodes OMLX_URL = "http://localhost:11435" (a second home for the endpoint —
+pipeline_paths.py already derives it config-first). (3) the literal "knowledge pipeline" is duplicated across
+>=10 pipeline modules (probe_run.py, golden_sampler.py, student_classifier.py, run_monitor.py, integrity_check.py,
+enhance_md_headers.py, batch_convert_epubs.py, book_metadata.py, safe_delete.py, backup_guardian.sh) instead of
+reading pipeline_paths.py DATA_DIR / CHECKPOINT_DIR / DB_PATH. IMPACT: a config-first run-id or endpoint change
+would silently drift probe_run's probes off the live run and toward a wrong OMLX host, with no rail to catch it
+(module-level constants bound at import). NON-BLOCKING (probe tooling, not the S4 critical path). FIX: (a) read
+run-id from config/pipeline_config.yaml default_id (cf BUG-597 resolution); (b) read OMLX_URL from the same
+endpoint config pipeline_paths.py already derives; (c) route the "knowledge pipeline" literal through
+pipeline_paths.py DATA_DIR / CHECKPOINT_DIR / DB_PATH so there is ONE home.
+RESOLVED 2026-10-03 (no decision minted — a bug fix): (a)+(b) probe_run.py now imports get_run_id/OMLX_URL from
+pipeline.pipeline_paths (config-first; no hardcoded "latest"/endpoint). (c) the "knowledge pipeline" literal is
+routed through pipeline_paths: golden_sampler (S15_DIR/S1_DIR), student_classifier (S4_STUDENT_PRECLASSIFIER_CHECKPOINT
+— also de-drifts a stale default that config had already moved to classifier_hierarchical), integrity_check
+(DATA_DIR), enhance_md_headers + batch_convert_epubs (BOOKS_DIR), doc_guard + nli_calibrate (DATA_DIR),
+stage1_5_domain_cluster (S1_DIR), n2_watchdog (S2_DIR/S15_DIR), safe_delete (config data_dir name + permanent
+defense-in-depth), backup_guardian.sh (DB_PATH via pipeline_paths). run_monitor (D2175) and book_metadata (D2176)
+were already config-first. The literal now survives only as ImportError/config-read fallbacks (D2175/D2176
+convention) and in pipeline_paths.py itself (the single home). Six forensic rails GREEN.
+
+## BUG-626 (RESOLVED, 2026-10-03) — decision registry schema conflict: D-328 superseded_by is a LIST (['D338','D339']) where the supersession graph contract expects ONE successor id
+FINDING (superseded/done/conflicting decision audit, 2026-10-03): config/decisions_policy.yaml#graph declares
+successor_field "superseded_by" as a single id, and the supersession engine resolves ONE successor per SUPERSEDED
+record. D-328 (state RESOLVED) carries superseded_by: ['D338', 'D339'] — a LIST, not a scalar. Every other record
+is scalar-or-absent; the 16 SUPERSEDED records are all scalar (4 resolved: D2100->D2094, D2253->D2362,
+D2294->D2298, D2296->D2298; 12 pinned as declared legacy debt in pinned_supersession_ids). IMPACT: DORMANT today
+(D-328 is RESOLVED, not SUPERSEDED, so the graph walker never reads the field), but any consumer reading
+superseded_by expecting a scalar — or any future flip of D-328 to SUPERSEDED — raises a TypeError or mis-resolves
+the successor. It is a LATENT schema inconsistency, NOT a declared debt (absent from pinned_supersession_ids).
+LOW severity. FIX: (a) canonicalize D-328 to a scalar superseded_by (the single most-recent successor) or (b) if
+two successors are genuinely in force, mint a successor record and backfill a scalar; then add a scalar-or-absent
+type-check to the supersession rail so a list can never recur.
+RESOLVED 2026-10-03 (no decision minted — a bug fix): (a) D-328 superseded_by canonicalized to the scalar D339
+(single most-recent successor; both D-338 and D-339 remain named in superseded_by_note). (b)
+scripts/reconcile.py#supersession_gaps now REFUSES a non-scalar (list/dict) superseded_by before resolving the
+successor, so a list can never recur. config/decisions_summary.json re-derived (stamp a3af831f7768d055,
+source_sha256 09058cb88b19cb9e) to keep the records-only-append receipt valid. Supersession rails GREEN.
+
+## BUG-627 (RESOLVED, 2026-10-03) — D-2801 follow-on drift: D-2668 selftest controls crossed pipeline/** after it left will_not_touch, so --selftest went RED (21/24)
+FINDING (forensic audit, 2026-10-03): D-2801 removed pipeline/** from will_not_touch, but
+scripts/check_session_plan.py --selftest's D-2668 controls (_cross() + sib + 3 verdicts calls) still used
+pipeline/stage5_verify.py / pipeline/stage6_commit.py as the synthetic will_not_touch crossing subject. Their
+subject left will_not_touch, so crossing_permits refused the synthetic crossing as 'not in a family' and 3 controls
+went RED. LATENT: not caught by the six-rail forensic run (which omits --selftest); just health (which runs
+--selftest) was RED.
+RESOLVED 2026-10-03 (bug fix, no decision minted): re-pointed the D-2668 controls to a REAL owner-instrument
+family (protect = governance/ANCHOR4_DEPTH_BLIND_SHEET_20260923.csv, sib = ..._20260924.csv), which stays
+will_not_touch. --selftest back to 25/25 GREEN (incl. a new D-2802 rate-limit control).
+
+## BUG-628 (OPEN, 2026-10-03) — ANCHOR five-axis propagation FAILURE: the owner's D-2795 discipline re-label landed in ONE artifact; 4 siblings stayed stale (149 drifting cells, no rail)
+FINDING (forensic audit 2026-10-03, owner asked to check the 150 vs 208 anchors on all 5 axes after
+yesterday's discipline+depth changes). The ANCHOR family is read through FIVE artifacts regenerated by
+DIFFERENT scripts at DIFFERENT times, and NOTHING asserted they agree. MEASURED drift (item_id join):
+  depth      : ANCHOR_208_FIVE_AXIS_VIEW_20260930 stale on 47 rows; ANCHOR_150_..._20260927 stale on 37
+               (the owner's D-2760 corrected map is the authority; the VIEWS were never re-cut)
+  discipline : discipline_anchor_conformance_20261002 (its own source_sha256 be4d21db..., D-2795 30-anchor
+               re-label, 12 corrections) disagrees with ANCHOR_208_DISCIPLINE_NORMALIZED (18 rows),
+               ANCHOR_208_FIVE_AXIS_VIEW (18), ANCHOR_150_FIVE_AXIS_VIEW (17) and
+               ANCHOR_208_CONSOLIDATED (12). The consolidated (22:41) PREDATES the D-2795 re-label (23:25)
+               and was never re-emitted; ANCHOR_208_DISCIPLINE_NORMALIZED was re-derived from the STALE
+               Sep-30 view. content_type / extraction_type / domain / primary_domain: 0 drift.
+IMPACT (error leak, not cosmetic): the S4 golden few-shot bootstrapped from KEEP(46) is DERIVED from these
+anchors, so a golden example could carry a discipline the gold contradicts — and RATIFY-2 would bake it in.
+No rail caught it because NO rail compared the artifacts.
+RESOLVED 2026-10-03 (D-2811, rail + declared debt): added config/anchor_axis_authority.yaml (ONE authority
+per axis, config-first C12) + scripts/check_anchor_axis_consistency.py (re-derives every consumer, --selftest
+proves it FIRES). The rail is GREEN-loud: exit 2 owner-owed, 149 declared drifting cells, ceiling 149
+SHRINK-ONLY (a declared cell that starts agreeing makes it exit 2 and must be removed). The 149 propagations
+remain OWED (a gold rewrite, owner-gated) — the blindspot is CLOSED, the debt is COUNTED.
+DEBT PAID 2026-10-03 (D-2812): scripts/apply_anchor_axis_authority.py (the missing WRITE limb) propagated the authority into every consumer: 117 cells rewritten in the two five-axis views, 30 more resolved by re-deriving ANCHOR_208_DISCIPLINE_NORMALIZED (via normalize_anchor_discipline.py) and ANCHOR_208_CONSOLIDATED (via consolidate_anchor_208.py) from the corrected views. Rail ceiling 149 -> 2. The 2 residual cells are R021 (depth authority value is the provenance sentinel 'noise_drop', NOT a depth class - refused on purpose, C12d). REPORTED-GAP (not silent): the discipline authority covers 204/208, excluding R021/R040/R080/R091 (R021 noise_drop; R040/R080/R091 owner-confirmed 'emerging'), so 8 view cells cannot be re-derived from it - the rail joins on the intersection and therefore does not compare them. REMAINING: RATIFY-2 still gated on the 46-KEEP gold split (anchor_triage_v2 + sha256 split manifest), which must be cut AFTER this propagation (it was the whole reason).

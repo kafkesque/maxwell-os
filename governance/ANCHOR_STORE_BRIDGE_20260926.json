@@ -12,6 +12,13 @@
   ],
   "declared_unresolved": [],
   "entries": {
+    "0380358c6bb42d9c5821f55ac2b77b0770a4f3064506ca0921d2c0fa4dc01c12": {
+      "item_id": "R167",
+      "join": "exact",
+      "join_note": "byte-identical name",
+      "name": "Innocent Brand Identity Through Organic Development",
+      "name_sha256": "fd702e8a2d95e29cc958f9e7d2a9086a18a79947d2c84303fb5e6b2d36195806"
+    },
     "05c02782bec33b8f4753e1b390f8073946819e273f46c2bc58061d56939610ac": {
       "item_id": "R013",
       "join": "exact",
@@ -25,6 +32,13 @@
       "join_note": "byte-identical name",
       "name": "Commitment and Consistency Principle (2)",
       "name_sha256": "bf78dbe86b623e6f8054587d44c1048c099478f7a4783a68169ba02614294a52"
+    },
+    "0a03450c243e201ceb5c5d0206a554022606b10f03a28e45e3b317b50c64aee2": {
+      "item_id": "R203",
+      "join": "exact",
+      "join_note": "byte-identical name",
+      "name": "Iterative Problem-solving in Ux Design",
+      "name_sha256": "548f1f60046eb9377054a4f4210c80651cda2a7ff50106bbf89bd72794daac5b"
     },
     "0a1048873ece5178c7ef1f2947240fbe2b627e5cfa0f7e8ac76a3db943dede96": {
       "item_id": "R146",
@@ -46,6 +60,13 @@
       "join_note": "byte-identical name",
       "name": "Color and Typography Readability",
       "name_sha256": "b995db0a66a99c7a416dbea444df92781068554f1ce5e904a8f7646a199fb6f8"
+    },
+    "104861cffd5fc19d81dcea7a1db8c99a7a55c615a4d42ff352147116c73e7489": {
+      "item_id": "R151",
+      "join": "exact",
+      "join_note": "byte-identical name",
+      "name": "Context-dependent Cognitive Processing",
+      "name_sha256": "58f674d3fbafc4d24de9da9b025cf95978c399bec97cc1fd735c07ba323ad93e"
     },
     "108ffbdafd8fc2e549c5908cc9bbc6a35eec91ebf1330524f40850270f3e5cb0": {
       "item_id": "R061",
@@ -82,6 +103,13 @@
       "name": "Pmt Camera Typography Manipulation",
       "name_sha256": "e977445da0646acc33ee0f58e73b5c6b3c04551aabf30de6df70ae2a4af944eb"
     },
+    "17eb362bc1ff456ee8ae7c37709a5b3b387248599b8dae5bfc0a31fe5b70d706": {
+      "item_id": "R209",
+      "join": "exact",
+      "join_note": "byte-identical name",
+      "name": "Procedural Vs Declarative Knowledge Retrieval",
+      "name_sha256": "b14e1e65d68b16a45276b7ca42f03c8d4a6540b49d0a9581fad7a7fced4ba5db"
+    },
     "1817c07e0501c51a67b9c0709716994890019cb1b9e5481270d4a030c5d5b377": {
       "item_id": "R038",
       "join": "exact",
@@ -95,6 +123,27 @@
       "join_note": "byte-identical name",
       "name": "Chatgpt Prompt Framework",
       "name_sha256": "9198eb1ec8ca47e4ce33fe56b9d103c73cb202d13592b54b969c642d3ef4becd"
+    },
+    "1a5ea8517cf76b4206f97d79d41c697410bd3aaf68d801b545cc43ff5d408332": {
+      "item_id": "R179",
+      "join": "exact",
+      "join_note": "byte-identical name",
+      "name": "Coincidence Wit in Graphic Design",
+      "name_sha256": "998d0e19beebd6bcd67ad8a1f9e595cc393a3d67183e7026b3634e3e5bcaba9f"
+    },
+    "1bfafc5cc617c48fc57d3838a35b53f244835e8ef7e2fe9303acc9cb1f6c0513": {
+      "item_id": "R184",
+      "join": "exact",
+      "join_note": "byte-identical name",
+      "name": "Doping in Professional Sports: Systemic Pressure and Rationalization",
+      "name_sha256": "3d799423199a01d75e07c2cd1363557fec68d61163206f13819a26b0be2939bf"
+    },
+    "1c11f2c5273ad03d3900f6a959f37c54ad933c1a178603d6222798b844cf13e0": {
+      "item_id": "R204",
+      "join": "exact",
+      "join_note": "byte-identical name",
+      "name": "Expert Overconfidence and Cognitive Laziness",
+      "name_sha256": "72336525c73936b28f95e8a777a8604c79a73a002eba3fbaa9610d0d4ec0aef4"
     },
     "1c1612905cde0d48ea77bd91b6f48f35bc2c19a8b8b79275cdc0dc3d0bafdddd": {
       "item_id": "R030",
@@ -117,6 +166,20 @@
       "name": "Somatic Marker Decision Making",
       "name_sha256": "bcae7e0bcc16d27c4ca1752cc03a69dc265edb3ecca36a1dae969aa1e531228d"
     },
+    "20576945d8ca2e210b334d9acce56707276aafdc26a623792e6cad617cd7a0a8": {
+      "item_id": "R153",
+      "join": "exact",
+      "join_note": "byte-identical name",
+      "name": "Cognitive Interview Analysis of Question Clarity Issues",
+      "name_sha256": "cb5c7fdc4bf8fb3a885342546406d8b66a6caf9519ea8cab57a1687c4c55c964"
+    },
+    "20a580c62d1cd3b3fb3beb1c2d8eb3cb62d89656e04ca8c07f92da464b61ba4e": {
+      "item_id": "R199",
+      "join": "exact",
+      "join_note": "byte-identical name",
+      "name": "Comfort Zone Constriction From Negative Influence",
+      "name_sha256": "0e845818c66da3b99214421c69c2ca82a460f3282892a2f92a281800e8269ce8"
+    },
     "210bf321b1eba495dde655456603277df87542c0401f2d68978d5ea108831b7a": {
       "item_id": "R070",
       "join": "exact",
@@ -124,12 +187,33 @@
       "name": "Iterative Design Validation",
       "name_sha256": "a1ea28495b2ecf3e35975f8fc57290c45ea4dd1f0d17dbce636c41525e9e1d40"
     },
+    "2401f32fa7fef6032055c4dc8c6dd62ff5740ac990bc9dbcc292f43423909e6f": {
+      "item_id": "R193",
+      "join": "exact",
+      "join_note": "byte-identical name",
+      "name": "Brent Spar Campaign Effectiveness",
+      "name_sha256": "e997ec2da0d405c59fe008e85dd462bf48a3782fc5d8170329b05d60d7e3f106"
+    },
     "246ef2b4d3e4ee2d738f17686ad9ad3d23681fdb0a11e2b37ee758b40604adbd": {
       "item_id": "R106",
       "join": "exact",
       "join_note": "byte-identical name",
       "name": "The Invisible Art of Film Editing",
       "name_sha256": "e31c5763fc26dec44b18cd579743aa1c2a221b7f44aa348a0f3b62219a3c113c"
+    },
+    "248a12d85c5702cb9c2c5d04c174c633e92a37ffb1b2ee66fbc8bc84aabf7d22": {
+      "item_id": "R176",
+      "join": "exact",
+      "join_note": "byte-identical name",
+      "name": "Harvest Time Strategic Planning",
+      "name_sha256": "2a7526a83830357116ea0e6ff81f272114d610ac8221b389ab79e014841f2b0a"
+    },
+    "26009aa582740cd49ed40f85ee922b7f51bf7a4e6dac69312b72aa2a380f259c": {
+      "item_id": "R156",
+      "join": "exact",
+      "join_note": "byte-identical name",
+      "name": "Designers' Object World",
+      "name_sha256": "a216cfe504fbf2cbaf334c9256152357cded797fec25aed579db004a2a2293bb"
     },
     "28b925d3f3d0cc12319a49fa565d22a770dc869e19e8a05e172795141eb44673": {
       "item_id": "R079",
@@ -166,6 +250,13 @@
       "name": "Creative Process Through Drawing and Sketching",
       "name_sha256": "d5e6ccc07eff05319420513fabc9e4e36792c8d080825fdcbfe489ee0c3187bb"
     },
+    "301a0f4af27eadb4653811805a5e49f946c82f06966b66cf0045d839589a59a6": {
+      "item_id": "R183",
+      "join": "exact",
+      "join_note": "byte-identical name",
+      "name": "Pattern Language Implementation Process",
+      "name_sha256": "631d0935c44e209abbd437b4c5bef7133630150c87c265c2aaab0dfdf4f1f299"
+    },
     "302bb6d8bbc8b30685b8c3e2636ec3fc56c02cddd6ab77dba5a9b8bb957e2b89": {
       "item_id": "R066",
       "join": "exact",
@@ -180,12 +271,26 @@
       "name": "Execution Gap From Technological Readiness",
       "name_sha256": "249f831321bd05ba727265afc94a4646dd2bafa717906522c57d66812c70235e"
     },
+    "318eed66dc6c314dbb6cd1fee3b1c77d4a9e483f4a9559a3b2d69be47f3457f6": {
+      "item_id": "R189",
+      "join": "exact",
+      "join_note": "byte-identical name",
+      "name": "Higher-order Polynomial Approximation in Numerical Methods",
+      "name_sha256": "fb51f97a854ad3a5f00b00c08576fc30e691d7c81f0b08f75e5f5cfc21b88c11"
+    },
     "322c1ed0023485f298865312657d3caad0314275fa45642fd039ab0a0567dbc7": {
       "item_id": "R139",
       "join": "exact",
       "join_note": "byte-identical name",
       "name": "Learning Through Failure Process",
       "name_sha256": "e821489e649342a77f46740b41ed600241d18139cba76a5fd0c67e7c090c55c3"
+    },
+    "33666a900d6705b13090c82333e0bc5f8d9b7554cbfee4cad0841bfdf331856a": {
+      "item_id": "R200",
+      "join": "exact",
+      "join_note": "byte-identical name",
+      "name": "Simplicity Cult in Saas Pricing",
+      "name_sha256": "2b2d27438ad1a129adb995e97179a6fecf12d8230846d6941440b35ec0388546"
     },
     "33ba0166918ac0c5eafa88308658836bc78133b931b5a5724500b89406eebe44": {
       "item_id": "R109",
@@ -215,12 +320,26 @@
       "name": "Chemical Reaction Equation Automation",
       "name_sha256": "4b1934a01af507c5f5c13f8f9247cd5168490fd0bb23224194a8371ef773d07d"
     },
+    "3682aa15cb7119faf1b71b725a5d6eb173553d659506b6b94198778668d7839b": {
+      "item_id": "R205",
+      "join": "exact",
+      "join_note": "byte-identical name",
+      "name": "Innovation Cycles in Art and Technology",
+      "name_sha256": "c3eb97db4152aeb334b813c35bb0859f92d19d29b055e5b2a34ba9d05675cdf7"
+    },
     "370c44316d8755b4752b141335a1b630caec3f3b5cd5836c45a371e5ce88d29b": {
       "item_id": "R075",
       "join": "exact",
       "join_note": "byte-identical name",
       "name": "Paradigm Shift Through Disruption",
       "name_sha256": "6988ce710991670afb8b2715a580f7fbf819ff18eb67ce4bb6c2e9c89b538113"
+    },
+    "38c529d51a31dbb1c427f381ed6edb41660224ebc75ba60ecd6c6df58a1e86a6": {
+      "item_id": "R165",
+      "join": "exact",
+      "join_note": "byte-identical name",
+      "name": "Acknowledgment Attribution",
+      "name_sha256": "8caa9a46df508ae3c6022ec3253600c59a41a2b4fdb8d8d214f41fc7294ace21"
     },
     "38e2bf94ce95cbe510557ad9723cbc62604bb2b2583bd519ea4c3ffae42d9301": {
       "item_id": "R149",
@@ -264,12 +383,40 @@
       "name": "Surveillance Capitalism Value Proposition",
       "name_sha256": "377ee6428554fbb7934d7d44dfb69ac28486bb4219eeab8d71f395c31eef37f7"
     },
+    "402aadbc5ef550a117abe70cc0ead186c709dde7a42f2ecffc56da991e756a94": {
+      "item_id": "R181",
+      "join": "exact",
+      "join_note": "byte-identical name",
+      "name": "Economic Industry Network Structure",
+      "name_sha256": "1e789555ae17389db1676613ba27b791af66a8a2686b3b2b0991de042e88a406"
+    },
+    "41237b4764eeeb445077c6f12c1a6d42a32dd8963b918572c6ba661b995dabee": {
+      "item_id": "R170",
+      "join": "exact",
+      "join_note": "byte-identical name",
+      "name": "Dream-driven Life Planning",
+      "name_sha256": "659eef513bbafc757ca25cef1007aa2c2c379590778f48a7902ac58105145008"
+    },
     "41a4cc541bc6b2af1c455b23e7e7f88e185ec9dde8cce222158b2fc5c12ce0bf": {
       "item_id": "R029",
       "join": "exact",
       "join_note": "byte-identical name",
       "name": "Innovation Through Challenge to Assumptions",
       "name_sha256": "657a048fe0ea5c7cbbe6bf5aa58f42d1d209b56761a0f16135f5ecd81e134f46"
+    },
+    "4292dc32dc95d89ec2133b0e8cf27a65721689f4c477fe8460ea94a9729bd16d": {
+      "item_id": "R195",
+      "join": "exact",
+      "join_note": "byte-identical name",
+      "name": "Agentic Ai System Reliability",
+      "name_sha256": "108d31b95aa116a9e7333d882cca0dcb9890249b04e852a37fb4e04693be9516"
+    },
+    "42cebfbaa280169a8fccf0042ab3cfef215ffa49d0184a44398e2e0e59255750": {
+      "item_id": "R152",
+      "join": "exact",
+      "join_note": "byte-identical name",
+      "name": "Economic Politics of Obsolescence",
+      "name_sha256": "b88d43766d5f701c3f3c7d5f957d21eddc08b937e786c8c1eac34e6c9f7b4e3b"
     },
     "435b9cacb812f0034e1af794f9e45347ceac2f9d48ef7a095fbc10017ca26bb3": {
       "item_id": "R103",
@@ -292,6 +439,13 @@
       "name": "Probabilistic Forecasting with Prediction Intervals",
       "name_sha256": "824d0d32906346138cd3ffb1f326512e8395593907309865af8973694bf7bba8"
     },
+    "461f5d7a21fdb23b72b837832c2e96dd50eb730085eb0c9a76ef96c0c52fbd37": {
+      "item_id": "R154",
+      "join": "exact",
+      "join_note": "byte-identical name",
+      "name": "Aditya Birla Group's Parta System",
+      "name_sha256": "1bd46182e98f34c1118729794e71cb2525a0eddad7d0af40a94921487d751bd7"
+    },
     "46d4e1a8dfce09e03e54ee671928207a0b642d748760f95b3b501f75b071ea63": {
       "item_id": "R052",
       "join": "exact",
@@ -313,12 +467,33 @@
       "name": "Identity As Social Positioning and Lifestyle Signifiers",
       "name_sha256": "cae4976f47f18cbea91f300857cd08d3e180efb498b8f29bb181ac6308f46a0f"
     },
+    "4b7708cc94d7716e2a9b637ea423cd3611de5ab363fc0e7ed0d05816e92d6fc4": {
+      "item_id": "R168",
+      "join": "exact",
+      "join_note": "byte-identical name",
+      "name": "Hidden Issue Questioning Technique",
+      "name_sha256": "f05547f3a28153fe9a2b68999e6e54068f0b642a7de62fa4649e17cad1a1cc2a"
+    },
     "4c30b4f096d52dfe148b933fe702f00b2d9fa4c4f658a6f233be5f66086acf9e": {
       "item_id": "R016",
       "join": "exact",
       "join_note": "byte-identical name",
       "name": "Modelans-modelandum Relationship",
       "name_sha256": "ba1c0197bb98aad052df95cb4b92aaf8daa462f9587d1e883b21f3be6352aed9"
+    },
+    "4c7ffef7152a371127987cd1cd00512d9703fcba907ff47f55f962442f8fe6ef": {
+      "item_id": "R172",
+      "join": "exact",
+      "join_note": "byte-identical name",
+      "name": "Digital System Context Decomposition",
+      "name_sha256": "d4f38cbf2cd5a2bb98096e7beb027190f3fa0a458272bb02df32132dd57002b9"
+    },
+    "4eae9805b94e68d5cab26ba729a28b4a61a6187205fbc797006bd972b0fd5b7f": {
+      "item_id": "R157",
+      "join": "exact",
+      "join_note": "byte-identical name",
+      "name": "Perspective-driven Cognitive Shift",
+      "name_sha256": "d7e802de5413aec9cbc9f1c2207c156a1cdf61b550cb6c5fc3ee63df1a5bbc3e"
     },
     "4fac2ed4652246ff47f2ac62f404c94e8934f8aff1ead2d6cfbb554437f7a269": {
       "item_id": "R051",
@@ -348,6 +523,13 @@
       "name": "Progressive Feature Introduction",
       "name_sha256": "2370f4ea10ecf41afe7b3189fae15c83dac854626600e517af8c86c7defdb0ca"
     },
+    "54f0000cd1e48c3386651bfba9033f145f3a14e0bb0988f6a63e118840c4d7f1": {
+      "item_id": "R192",
+      "join": "exact",
+      "join_note": "byte-identical name",
+      "name": "Long-term Investment Advantage",
+      "name_sha256": "efb727aee7538425e0bb489fbe36e569c9add57009218aa6d798606f6602a977"
+    },
     "5583f213625a02611eee53c644fc23f2a408c260d7cba474044f0d84810f32f3": {
       "item_id": "R063",
       "join": "exact",
@@ -368,6 +550,13 @@
       "join_note": "byte-identical name",
       "name": "Holistic Interpretation Problem in Index-aware Retrieval",
       "name_sha256": "a117c2516b284ddaecbc97e3f541fedb95451c70d686d69f3739630df9baace8"
+    },
+    "57e259f3b82eccf02842bdfca763907cefe26d1eb6b3d792426e76180e26f5c4": {
+      "item_id": "R197",
+      "join": "exact",
+      "join_note": "byte-identical name",
+      "name": "Peripheral Cue Interference Effect",
+      "name_sha256": "266a45c973fa7addab6c98ba088ae558bf76443c4436c5f86967e941b5ad0587"
     },
     "5811c72772789a9cd7fb8f88477280053feccf8c8905deb0597148da0eeece9b": {
       "item_id": "R050",
@@ -397,12 +586,33 @@
       "name": "Heuristic Reasoning in Problem Solving",
       "name_sha256": "38c52c3df318634aa134e0e12f4bc85a124cae72005ff4880e0bc33b42da68b6"
     },
+    "5ffa5f5b1d75f7ee8a571ac58e384293415fd1ecf13bffc6419de7a5265c68a2": {
+      "item_id": "R171",
+      "join": "exact",
+      "join_note": "byte-identical name",
+      "name": "Alpha Blending Control",
+      "name_sha256": "d7c6f84924a3623c12b538c783a8d10f34aaf3c536d89d5720e0d457a9f7e2f1"
+    },
+    "64aa7982c9505fcc27e62581a50102e15ba0fc76bdce6c3b2113515b4db8a111": {
+      "item_id": "R166",
+      "join": "exact",
+      "join_note": "byte-identical name",
+      "name": "Agent-centric Economic Incentives",
+      "name_sha256": "d096a4dbfe1324cc66fe236f016489dc8977af0d2def73d2f99702c15c31a992"
+    },
     "656d2e8fd469247e961b17e9062790f93f4573c9811baa31ad59586b856f818c": {
       "item_id": "R009",
       "join": "exact",
       "join_note": "byte-identical name",
       "name": "Entrepreneurial Risk Assessment Framework",
       "name_sha256": "193c0d549157df88726bc6545f94ec0e44db2e5a97f95faad9309b5050acab63"
+    },
+    "664278dfd2096e45852dd3557605c1bc7fb71ed9d77864fd8a620af11bd2ce4e": {
+      "item_id": "R198",
+      "join": "exact",
+      "join_note": "byte-identical name",
+      "name": "Survivor Bias in Success Narratives",
+      "name_sha256": "cb926698c02bf1603982f0a60025702904e516e2b9c9528e737889f08cd368a0"
     },
     "667f49c75ba6360666ec27807f67781d191b6a457a14b25a9ce2c3ae2fcdcc34": {
       "item_id": "R093",
@@ -446,12 +656,26 @@
       "name": "Randomness in Data Measurement",
       "name_sha256": "41da3c5ef9bcfeec180f34f72e958ae27b84ea92e0480252e8f0a61c3a4ea41c"
     },
+    "72188d315b0353d70f9bb0f73b6a4daf42781c07f058920119414a5d6bd940a1": {
+      "item_id": "R158",
+      "join": "exact",
+      "join_note": "byte-identical name",
+      "name": "Duality in Design",
+      "name_sha256": "c27747d8f151970b7a8137da015e267452e6b9fb85adab84c19a9d2be54c7f72"
+    },
     "7294fe7b2d576c79089d2c3f4fbf9ccae56ec9fe3a00d198b0d6e92b8a307432": {
       "item_id": "R060",
       "join": "exact",
       "join_note": "byte-identical name",
       "name": "Aiga Transportation Symbol System Development",
       "name_sha256": "77f4611f93f91868170ce1ec60eb0a9df6238cf8660c0ecb40f91e2804093208"
+    },
+    "73de04523e4eb002700c3a7b32ebfb56ebe24012b6b865db40812f4ac446a618": {
+      "item_id": "R164",
+      "join": "exact",
+      "join_note": "byte-identical name",
+      "name": "Phenomenological Understanding",
+      "name_sha256": "0750aad3be80e8afa9cee3ef5b993817fca385cfd7519f9623ca8cf24926e480"
     },
     "7542dcd08b0006891847ab64bf2c86766d47d86b988409096d39bd40ca0a1bc3": {
       "item_id": "R128",
@@ -474,6 +698,13 @@
       "name": "Alpha State Thinking and Creative Problem-solving",
       "name_sha256": "c1dc1c28485ce86b48215216e7a0aadeb4dd4f4db74228c64c995178d046ade4"
     },
+    "77587b4669cd4345aeb4c4f22c6ae2547f2610874aac24ea57c21b58965be9d0": {
+      "item_id": "R190",
+      "join": "exact",
+      "join_note": "byte-identical name",
+      "name": "Design Thinking Integration Strategy",
+      "name_sha256": "15bf1af22c0d0e2733dc4e175ab6c23a24493764c0a3c40d271b176f64fcec1c"
+    },
     "7764620bb329cb591e8eac12084e21f0a006e1589fc12353ceb536243be5adc8": {
       "item_id": "R040",
       "join": "exact",
@@ -494,6 +725,13 @@
       "join_note": "byte-identical name",
       "name": "Culture Jamming",
       "name_sha256": "af0728be08e15e94631e7dff789f5bf8e698584cef1b11fbaee73c0ec861dc43"
+    },
+    "79bba415374aa526af77089d2c4b7409040fe2caae62f057f11d4d81c87b28ab": {
+      "item_id": "R160",
+      "join": "exact",
+      "join_note": "byte-identical name",
+      "name": "Resource-based Value Assessment",
+      "name_sha256": "22dc1c55bbdec27b51deb7e50d0c7df9191c77e0e4b98622c0d10de08b1fa639"
     },
     "7adfb08908a39c872b1bf641b30ab6831b1108567bb5842caa4742e9a3a81daf": {
       "item_id": "R064",
@@ -516,6 +754,20 @@
       "name": "Self-herding Behavior",
       "name_sha256": "6cea8463915eb31a78c43d17220b7edd725a96dc8c36829253d57c57b76d78f2"
     },
+    "7b7527feb9ae3187b6593ffbca5f6382b6928487b8a0fff9495ef9034c69e28a": {
+      "item_id": "R196",
+      "join": "exact",
+      "join_note": "byte-identical name",
+      "name": "Inclusive Design Adaptation",
+      "name_sha256": "c0f62b3afdeb911d0edb5c44314aa6ac28872dcb340ef7fc1f1b1efb2738568c"
+    },
+    "7d5e0b161a7bc13d2ff55ea60e0bff2b556afd780a859ab4bdd183ca67b3d6b5": {
+      "item_id": "R155",
+      "join": "exact",
+      "join_note": "byte-identical name",
+      "name": "Persistence in Business Strategy",
+      "name_sha256": "741f22d7dce2aeba18f29f621a2b5bee33a0cdef5082d6b0fe47b73548700584"
+    },
     "7d985625f304a4758ef817d5d8c7187f0a02aa0370009e4f18418fd2caa05537": {
       "item_id": "R042",
       "join": "exact",
@@ -536,6 +788,13 @@
       "join_note": "byte-identical name",
       "name": "Abra-kadabra Number Classification",
       "name_sha256": "57ec2d6cd4ddd7579cef39d7121de4362aeced54e4b1121d91a08f6d40797b1f"
+    },
+    "80cc1797ee047c2b5d5f888e1fb8db9048ca6188ef65b12b65c3b743da34fdb2": {
+      "item_id": "R177",
+      "join": "exact",
+      "join_note": "byte-identical name",
+      "name": "Contextual Interpretation Framework",
+      "name_sha256": "7064cfa4b658a4be9751cd877085803102f0d2137f4430f3f1142c922e91ab4a"
     },
     "846c0989cd832461d6e998efe8cb32050ca4d6e2afe7934489e3913923700610": {
       "item_id": "R099",
@@ -579,6 +838,13 @@
       "name": "Gpu Acceleration Configuration",
       "name_sha256": "691135e0e20507c105fe8d05a8d8c3fec9844132b68f1c447e271119996aa9c0"
     },
+    "89611938d68ce24b50765e10d58a96a28a61aa50ea5648c4b090b14d7ad895b0": {
+      "item_id": "R202",
+      "join": "exact",
+      "join_note": "byte-identical name",
+      "name": "Interactive Media Integration",
+      "name_sha256": "d9f074f440b9fee09fe3742a7f2784c16c6a6a00a882780f42c95362d2ffad71"
+    },
     "8b6956fe67c9874bd4e727679bfac7a9ac7c6514ff249d28c3a016252f740c8b": {
       "item_id": "R098",
       "join": "exact",
@@ -607,6 +873,13 @@
       "name": "Soviet Underground Discourse Reception",
       "name_sha256": "64e0ea13af07db429c916b1b0b8d4bc914cfb78add6a2ab80926df3c9caf82d4"
     },
+    "90ad8c926d4c649c5301724a06ed5bedc6d883add4d93051ebce159dc65df38f": {
+      "item_id": "R188",
+      "join": "exact",
+      "join_note": "byte-identical name",
+      "name": "Sensory-motor Basis of Conceptual Reasoning",
+      "name_sha256": "b83ac6820c5a26b7e07be67f0715d773e57a2e75dd3af02100c56e718ab3f654"
+    },
     "931f71e587a3242b42f058117bca4d489f5c9a129e0617ffe98d798431872ea9": {
       "item_id": "R087",
       "join": "exact",
@@ -634,6 +907,13 @@
       "join_note": "byte-identical name",
       "name": "First Course Development Framework",
       "name_sha256": "1b0a0104409ca3b1a43617e39c61a2fabac9b2f67215ccba18473e10288db5ed"
+    },
+    "97b0adf059e70efe24ca9896a025b41f1ceb6075bd80849f827fb51e0ee332d1": {
+      "item_id": "R185",
+      "join": "exact",
+      "join_note": "byte-identical name",
+      "name": "Tv Advertising Consumer Behavior Pattern",
+      "name_sha256": "876227c4e6259db7cda89082da76584fbb0cfb97e4977103917b46da284e9d16"
     },
     "98cd1442f675f33c2ff1e199cf99c2bfb03c332c2115f7175e42f6695c04e288": {
       "item_id": "R071",
@@ -691,6 +971,13 @@
       "name": "Global Village Conceptual Framework",
       "name_sha256": "159810e96b7d957bccec79ba66db30af3429ab425b8790f6075200c4d5f7f7ad"
     },
+    "a362a7790469b706e4356fdf1c4749a297da7f8144e589823180861d221332c2": {
+      "item_id": "R182",
+      "join": "exact",
+      "join_note": "byte-identical name",
+      "name": "Cultural Mourning Rituals and Symbolism",
+      "name_sha256": "b9b509664cffa8f520da4f473a13c5b54d8f4a565c5880e71b1591dd1ce49341"
+    },
     "a41dfcc5c4fb6291bbdb06a5ec042afd08d8fc8705abecef1d096454a0242e2e": {
       "item_id": "R022",
       "join": "exact",
@@ -698,12 +985,33 @@
       "name": "Coupon Code Feature Placement Strategy",
       "name_sha256": "98d4aa28c3790e5a98ab1bc5ef46d8b58853e5b3e600c69c1f4eb936bc68e58c"
     },
+    "a4f29d3dc0819d32d348103e7fe7d9ec18a252caadb14e38bcd8b9ce4e0b30cc": {
+      "item_id": "R178",
+      "join": "exact",
+      "join_note": "byte-identical name",
+      "name": "If-then Plan for Moral Action",
+      "name_sha256": "8ec1b566e217a228833f2e8c67dfd78e1cde8e29e8305c597ac4e15f8fae29ed"
+    },
     "a62c2c141f42b5bc4ea32f83de3d2c3037ea1613e4def36312bfaf9e9f304965": {
       "item_id": "R138",
       "join": "exact",
       "join_note": "byte-identical name",
       "name": "Hjelmslev's Trichotomy and Linguistic Theory",
       "name_sha256": "4b5ad3f07b7cd869c92247a0d3ec6dca16030d78e043550178e883082e788466"
+    },
+    "a7902b32946e4cf909c1fa6c6ea111ca5966d55817ec8c0881b994ac7ad6e200": {
+      "item_id": "R159",
+      "join": "exact",
+      "join_note": "byte-identical name",
+      "name": "Context-dependent Quality Assessment",
+      "name_sha256": "b0f57497c742773dda5e7b37c38e3cb66c7719d649787bd7f97c4259644d17da"
+    },
+    "a89322e86cca57f66e5aebd3f9fe95df52bd5c0967a0e79fd3bc1df2b76f501c": {
+      "item_id": "R207",
+      "join": "exact",
+      "join_note": "byte-identical name",
+      "name": "Generous Audacious Marketing",
+      "name_sha256": "0716e70f8fb2c10e67fe2fa65f4acb88c83b44279a8ba9fc4dde2129ff5d7468"
     },
     "ad69cb9e4aca3b745e5a304c44f0275fc71c7da779a27f7ceaced83c36d538bd": {
       "item_id": "R129",
@@ -747,12 +1055,26 @@
       "name": "Imagination and the Image",
       "name_sha256": "43281edca273da8e8e83773f1fa137baa0c33adf9563c13a56901372ab74f54c"
     },
+    "b484487ea0c395f21bab585b5f59a2acdc64e51583cfae480474f7671231dce2": {
+      "item_id": "R208",
+      "join": "exact",
+      "join_note": "byte-identical name",
+      "name": "Recovered Memory Therapy and False Accusations",
+      "name_sha256": "885764f92f123fe8e1441010d88ca83f9d4370aa2da51afa4a41ce921495a8fa"
+    },
     "b5076194f6cea1d4ee35ada62553330f9300473fe17b07af1e3f1873166fd554": {
       "item_id": "R121",
       "join": "exact",
       "join_note": "byte-identical name",
       "name": "Consumers Hero Refurbishment Strategy",
       "name_sha256": "047bcb1221230eda98d745f1868f412a70b2abaee2bae9dd4a6656761777d479"
+    },
+    "b52d1d379ae61cf873350b3aa82d971a09d2cc7de61dba7fd4d34d7534f50999": {
+      "item_id": "R191",
+      "join": "exact",
+      "join_note": "byte-identical name",
+      "name": "Intentional Motion Design",
+      "name_sha256": "a3b32da989136b813a88e6010d1252f566bb8547c57ddc966273c26761a169f9"
     },
     "b67252aad84514620796ce1f64e334b7d4d6aed27c865c3d918d18cd56247660": {
       "item_id": "R137",
@@ -782,12 +1104,40 @@
       "name": "Quantum Cognitive Effects in Survey Design",
       "name_sha256": "5c60c07cc77f308ab16a248962c84ea8f2412bf2f0d381d0cccd55cf071a7697"
     },
+    "babb07591d434f7fba4ec91e4483150c7af53cf65b1c2e85bafa8292af7b110d": {
+      "item_id": "R186",
+      "join": "exact",
+      "join_note": "byte-identical name",
+      "name": "Cognitive Interview Analysis Framework",
+      "name_sha256": "09f0f73feaca0f07bc98e9d24373e120f18fb3c68d59ebd6cc0603f352b7adec"
+    },
     "bb3e3bb3e36fc4b46115ee6d4d6dc66830fbff68c64aaedff11ed6f181e82796": {
       "item_id": "R011",
       "join": "exact",
       "join_note": "byte-identical name",
       "name": "Agentic Decision-making Through Contextual Retrieval",
       "name_sha256": "a630c2e605a62d98a68b62fef3e7e4de702e9dcb1e6155b4da621b4d4202c9d1"
+    },
+    "bda4b63ec9c6c9e9b06afac10ec45d6e6d7a4fee0b9e4a92317dfd63d4fa0cc9": {
+      "item_id": "R173",
+      "join": "exact",
+      "join_note": "byte-identical name",
+      "name": "Linkedin Network Building Protocol",
+      "name_sha256": "101e1a03265a4149381477b1d76cd13b39c5e7953ccab085a2f5e0511a54c242"
+    },
+    "bef863827c3ca3d1d53929806fc341cf83e9170109ea836b3b53a6ba19f2f4d8": {
+      "item_id": "R163",
+      "join": "exact",
+      "join_note": "byte-identical name",
+      "name": "Metaphorically Selling How to Use the Ma",
+      "name_sha256": "21467bd4b7a06716966745e1073288a724493632fa9cb8f0847e816ac6d6241b"
+    },
+    "c07895f800d3e4010c2fe651aa67c0f2641966505c47247427664e9288598d78": {
+      "item_id": "R210",
+      "join": "exact",
+      "join_note": "byte-identical name",
+      "name": "Same-age Peer Modeling",
+      "name_sha256": "23a103d901944efcc2f6ad27b07000adf8270064b5d89262952a321f0173a0c2"
     },
     "c270b423ea993eeab22fb43d050110b5c963bd953ec72d3a6cc5dbd65a8e1261": {
       "item_id": "R077",
@@ -880,6 +1230,13 @@
       "name": "Fermi Estimation Method",
       "name_sha256": "343dd7757a0710ec4d9afc782d3ba98a1c311f3843c28b8f64ea41d7fcc8320d"
     },
+    "ce7fa9dc636cc825b377edc50a78b2fb34920600c68337a4db52932cfcddd910": {
+      "item_id": "R180",
+      "join": "exact",
+      "join_note": "byte-identical name",
+      "name": "Intersectional Design Approaches for Underserved Communities",
+      "name_sha256": "d560a95c8bd906e76383d8cfc9583389c77f0348cba2e8d326ec5e1f1a4bdcfb"
+    },
     "d0ac52082210551c2bfda8197330087895f6188c87d7887595614478376de86d": {
       "item_id": "R124",
       "join": "exact",
@@ -893,6 +1250,13 @@
       "join_note": "byte-identical name",
       "name": "Typography in Brand Positioning and Magazine Design",
       "name_sha256": "77dbaa46a00b82ba80d618b5a4cdcd1e25ec389ab4a85e678434d155f010e9fd"
+    },
+    "d56d6ab49ba2b2ceb2b54467e1d6112fa61348e66fa3c22a3a2cc2dd19a0c587": {
+      "item_id": "R206",
+      "join": "exact",
+      "join_note": "byte-identical name",
+      "name": "Directional Changes (dc) in Financial Data",
+      "name_sha256": "6a9d073727d6f40723ad76e2499d2195c90af89edc74e3b14ccce8988d8f46f4"
     },
     "d57f8bf6cc1ff282cda769de0a403a127c627eb2fc7247219b7e8565326f6332": {
       "item_id": "R095",
@@ -957,6 +1321,13 @@
       "name": "Figma Hamburger Icon Creation",
       "name_sha256": "ad3c93b08b1c40e784486a126cca7d363ceaa48d584f4b2b6ea36e7b81390d22"
     },
+    "e7248fbf0d474024f57ebfbebad6a4118ff3a9c1665e55fb10bafce3b17f62c8": {
+      "item_id": "R175",
+      "join": "exact",
+      "join_note": "byte-identical name",
+      "name": "Role-based Prompting Effect",
+      "name_sha256": "a897b6c7ac45acb20a96f8757ab1d83b4e61aa68f2cd3890d1f4adf987e1e06c"
+    },
     "e7e317889a65313188350dcc4ac258644b570e4c0242bc2f2ce404acc8750ca6": {
       "item_id": "R140",
       "join": "exact",
@@ -970,6 +1341,13 @@
       "join_note": "byte-identical name",
       "name": "Social Entrepreneur's Playbook",
       "name_sha256": "c65e4a08adb783f46c6e2d8799bf6b669054c2a5e4f228429ea8201a3da55637"
+    },
+    "e827efc57c19319f3efa4886f3706703b882bc81a1cea99be6605388fa6bb473": {
+      "item_id": "R162",
+      "join": "exact",
+      "join_note": "byte-identical name",
+      "name": "Provincial Norms",
+      "name_sha256": "f7a13b8a5d263cf0a36167484c710d306ddf2c72c7f028ba09ec7ef455765f92"
     },
     "e98d6a211c8e31c9e8b5f7c7ba9229719b25bfb32e08ee33606e6f6c7abb8e9f": {
       "item_id": "R056",
@@ -1034,12 +1412,26 @@
       "name": "Lockdown Effectiveness and Economic Impact",
       "name_sha256": "a7915f3d9b9ce2c7521fa4bc1aa75d84c8adf4cbfe8cd9cafe29eae8595f5fde"
     },
+    "f4bbc48fb5aa289050c4dfb9c7c38d27881eb4175d5f2f084111d5f9f2d1e0f0": {
+      "item_id": "R201",
+      "join": "exact",
+      "join_note": "byte-identical name",
+      "name": "Physical Activity and Brain Health",
+      "name_sha256": "50bf77043803fe0937d91ff94a24f264a0983599ded34f0361414fdb6d053ec5"
+    },
     "f4d0b904a5ab728ad8e70db7b19c6fcd35283c0b9b9faf8f60a16fabdc5e9042": {
       "item_id": "R045",
       "join": "exact",
       "join_note": "byte-identical name",
       "name": "Wpi Consumer Value Proposition Framework",
       "name_sha256": "f783fe5ef3f648625cf58a167f1a5cf874cb55379d4fe8537f272c27c7fbfad0"
+    },
+    "f57e39b4a612a89945f01a5faf14ff539dadec6700858bf4d4330766946c204c": {
+      "item_id": "R169",
+      "join": "exact",
+      "join_note": "byte-identical name",
+      "name": "Charismatic Leadership Development",
+      "name_sha256": "d9ddc8b3713d1b13f8f6e6b67ac5adf79bc8bd629411ad6dee851853d0d56373"
     },
     "f641b501ebfd609711d632b0c202369490d54784add6851138875eec1005ec43": {
       "item_id": "R073",
@@ -1048,12 +1440,26 @@
       "name": "Evolution of Language Through Mental Models",
       "name_sha256": "6fe4ec2a44ae02b7f09486dc54eb90717b96ac6f2cc0cb0ada530acb3e3788c8"
     },
+    "fb726113259db56bd205137c43bacbf20b107f0269a5449fe6feb339bdc0e1a5": {
+      "item_id": "R174",
+      "join": "exact",
+      "join_note": "byte-identical name",
+      "name": "Concept-first Prototyping",
+      "name_sha256": "2ee8ffb038dc12f3423b0094ce924806fc47f0d6b377afc4c52b4ffe74bc877d"
+    },
     "fbe41b1b7db77430e252281b66c3021f354a3e34bee1ff85f5c9efe824acbe13": {
       "item_id": "R116",
       "join": "exact",
       "join_note": "byte-identical name",
       "name": "Ai Model Deployment Risk",
       "name_sha256": "2cd7a479324d7f3798f9cf423b4b20a935582e9dac9beb363b9b2168bb861652"
+    },
+    "fd273a01cf29ce644d5aaca7b5fcc2d8fa4b37605b71675b1a8f7eca714b9159": {
+      "item_id": "R187",
+      "join": "exact",
+      "join_note": "byte-identical name",
+      "name": "Credibility Through Transparency",
+      "name_sha256": "466cd96dafa3b96ddaea0a485b2aff5e98af5171556d1ed9607b3ae6489c7f0b"
     },
     "fdac2ca29b61ffce5deef71f43a231d24d275765f31fb6a11860be1983c357c9": {
       "item_id": "R072",
@@ -2128,9 +2534,9 @@
   },
   "inputs": {
     "ruler_sheet": {
-      "path": "governance/ANCHOR_RULER_CONSOLIDATED_20260923.csv",
-      "rows": 150,
-      "sha256": "29393d5f9d5292053a39986582578e140121d8987448648ad63f528062cd2698"
+      "path": "governance/ANCHOR_208_BRIDGE_RULER_20261002.csv",
+      "rows": 208,
+      "sha256": "84ba5418d0d727469b4c7a94259473edd61596f26cc3997eef4f1b063717c7b1"
     },
     "store": {
       "path": "knowledge pipeline/maxwell.db",
@@ -2143,10 +2549,10 @@
     "ambiguous": [],
     "counts": {
       "ambiguous": 0,
-      "exact": 149,
-      "joined": 150,
+      "exact": 207,
+      "joined": 208,
       "normalized": 1,
-      "rows": 150,
+      "rows": 208,
       "unresolved": 0
     },
     "key": "content_name",

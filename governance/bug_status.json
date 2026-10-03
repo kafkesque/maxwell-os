@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 331,
-  "open_n": 129,
-  "closed_n": 202,
+  "total_ids": 367,
+  "open_n": 133,
+  "closed_n": 234,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -624,11 +624,6 @@
       "events": 1
     },
     {
-      "id": "BUG-528",
-      "title": "(OPEN 2026-09-26) - will_not_touch matches NAMES, so a Dropbox-renamed sibling of a protected artifact is out of scope; one such copy is ALR",
-      "events": 1
-    },
-    {
       "id": "BUG-529",
       "title": "(OPEN 2026-09-26) - .pre-commit-config.yaml declares a C11/C12 gate that NOTHING invokes, and the hook slot has exactly ONE occupant",
       "events": 1
@@ -652,9 +647,35 @@
       "id": "BUG-593",
       "title": "(OPEN, MED - the MUTATION GATE's fixture carries ONE commit, so a rule whose oracle joins GIT HISTORY cannot satisfy limb (iv) - FILED 2026-",
       "events": 1
+    },
+    {
+      "id": "BUG-594",
+      "title": "(OPEN, 2026-09-29, D-2706) \u2014 chunker structural heading-splitting is DEAD (clean_markdown strips `#` before split_on_headings)",
+      "events": 1
+    },
+    {
+      "id": "BUG-595",
+      "title": "(OPEN, 2026-09-29, D-2706) \u2014 clean_markdown() never applies _CLEAN_SUBS (D2471); Pandoc/calibre residue in 41.4% of S1 bodies",
+      "events": 1
+    },
+    {
+      "id": "BUG-603",
+      "title": "(OPEN, 2026-09-30) \u2014 split_manifest.json ids_sha256 pin is irreproducible (no emitter + undocumented canonicalization)",
+      "events": 1
+    },
+    {
+      "id": "BUG-604",
+      "title": "(OPEN, 2026-09-30) \u2014 stage0_5 metadata extractor mis-splits \"liber3.md\" filenames, leaking title words into the author field (split book ide",
+      "events": 1
+    },
+    {
+      "id": "BUG-628",
+      "title": "(OPEN, 2026-10-03) \u2014 ANCHOR five-axis propagation FAILURE: the owner's D-2795 discipline re-label landed in ONE artifact; 4 siblings stayed ",
+      "events": 1
     }
   ],
   "closed": [
+    "BUG-170",
     "BUG-254",
     "BUG-256",
     "BUG-268",
@@ -797,6 +818,7 @@
     "BUG-518",
     "BUG-519",
     "BUG-522",
+    "BUG-528",
     "BUG-530",
     "BUG-531",
     "BUG-533",
@@ -856,6 +878,36 @@
     "BUG-589",
     "BUG-590",
     "BUG-591",
-    "BUG-592"
+    "BUG-592",
+    "BUG-596",
+    "BUG-597",
+    "BUG-598",
+    "BUG-599",
+    "BUG-600",
+    "BUG-601",
+    "BUG-602",
+    "BUG-605",
+    "BUG-606",
+    "BUG-607",
+    "BUG-608",
+    "BUG-609",
+    "BUG-610",
+    "BUG-611",
+    "BUG-612",
+    "BUG-613",
+    "BUG-614",
+    "BUG-615",
+    "BUG-616",
+    "BUG-617",
+    "BUG-618",
+    "BUG-619",
+    "BUG-620",
+    "BUG-621",
+    "BUG-622",
+    "BUG-623",
+    "BUG-624",
+    "BUG-625",
+    "BUG-626",
+    "BUG-627"
   ]
 }

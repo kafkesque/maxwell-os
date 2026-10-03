@@ -1,0 +1,212 @@
+{
+ "R004": {
+  "label": "domain",
+  "depth": 3,
+  "verbatim": "domain"
+ },
+ "R006": {
+  "label": "domain",
+  "depth": 3,
+  "verbatim": "domain"
+ },
+ "R007": {
+  "label": "domain",
+  "depth": 3,
+  "verbatim": "domain"
+ },
+ "R009": {
+  "label": "domain",
+  "depth": 3,
+  "verbatim": "domain"
+ },
+ "R011": {
+  "label": "domain",
+  "depth": 3,
+  "verbatim": "domain"
+ },
+ "R014": {
+  "label": "cross-domain",
+  "depth": 2,
+  "verbatim": "cross-domain"
+ },
+ "R021": {
+  "label": "noise_drop",
+  "depth": null,
+  "verbatim": "it doesnt matter its noise drop"
+ },
+ "R024": {
+  "label": "cross-domain",
+  "depth": 2,
+  "verbatim": "cross-domain"
+ },
+ "R029": {
+  "label": "cross-domain",
+  "depth": 2,
+  "verbatim": "cross-domain"
+ },
+ "R031": {
+  "label": "domain",
+  "depth": 3,
+  "verbatim": "domain"
+ },
+ "R033": {
+  "label": "cross-domain",
+  "depth": 2,
+  "verbatim": "cross-domain"
+ },
+ "R043": {
+  "label": "cross-domain",
+  "depth": 2,
+  "verbatim": "cross-domain"
+ },
+ "R044": {
+  "label": "domain",
+  "depth": 3,
+  "verbatim": "domain"
+ },
+ "R045": {
+  "label": "cross-domain",
+  "depth": 2,
+  "verbatim": "cross-domain"
+ },
+ "R049": {
+  "label": "universal",
+  "depth": 1,
+  "verbatim": "universal"
+ },
+ "R052": {
+  "label": "specialized",
+  "depth": 4,
+  "verbatim": "specialized"
+ },
+ "R053": {
+  "label": "universal",
+  "depth": 1,
+  "verbatim": "universal"
+ },
+ "R062": {
+  "label": "cross-domain",
+  "depth": 2,
+  "verbatim": "cross-domain"
+ },
+ "R065": {
+  "label": "domain",
+  "depth": 3,
+  "verbatim": "domain"
+ },
+ "R073": {
+  "label": "specialized",
+  "depth": 4,
+  "verbatim": "specialized"
+ },
+ "R076": {
+  "label": "cross-domain",
+  "depth": 2,
+  "verbatim": "cross-domain"
+ },
+ "R077": {
+  "label": "cross-domain",
+  "depth": 2,
+  "verbatim": "cross-domain"
+ },
+ "R078": {
+  "label": "cross-domain",
+  "depth": 2,
+  "verbatim": "cross-domain"
+ },
+ "R079": {
+  "label": "domain",
+  "depth": 3,
+  "verbatim": "domain"
+ },
+ "R085": {
+  "label": "cross-domain",
+  "depth": 2,
+  "verbatim": "cross-domain because it can be applied to advertising, branding"
+ },
+ "R086": {
+  "label": "cross-domain",
+  "depth": 2,
+  "verbatim": "cross-domain"
+ },
+ "R087": {
+  "label": "cross-domain",
+  "depth": 2,
+  "verbatim": "cross-domain it observable in humans, animals as well"
+ },
+ "R096": {
+  "label": "domain",
+  "depth": 3,
+  "verbatim": "domain"
+ },
+ "R101": {
+  "label": "cross-domain",
+  "depth": 2,
+  "verbatim": "cross-domain"
+ },
+ "R104": {
+  "label": "cross-domain",
+  "depth": 2,
+  "verbatim": "cross-domain"
+ },
+ "R105": {
+  "label": "cross-domain",
+  "depth": 2,
+  "verbatim": "cross-domain"
+ },
+ "R108": {
+  "label": "domain",
+  "depth": 3,
+  "verbatim": "domain"
+ },
+ "R118": {
+  "label": "specialized",
+  "depth": 4,
+  "verbatim": "specialized"
+ },
+ "R121": {
+  "label": "domain",
+  "depth": 3,
+  "verbatim": "domain"
+ },
+ "R123": {
+  "label": "specialized",
+  "depth": 4,
+  "verbatim": "specialized"
+ },
+ "R133": {
+  "label": "domain",
+  "depth": 3,
+  "verbatim": "domain"
+ },
+ "R135": {
+  "label": "cross-domain",
+  "depth": 2,
+  "verbatim": "cross-domain"
+ },
+ "R137": {
+  "label": "domain",
+  "depth": 3,
+  "verbatim": "domain"
+ },
+ "R138": {
+  "label": "cross-domain",
+  "depth": 2,
+  "verbatim": "cross-domain"
+ },
+ "R139": {
+  "label": "cross-domain",
+  "depth": 2,
+  "verbatim": "cross-domain"
+ },
+ "R140": {
+  "label": "domain",
+  "depth": 3,
+  "verbatim": "domain"
+ },
+ "R149": {
+  "label": "specialized",
+  "depth": 4,
+  "verbatim": "specailized"
+ }
+}

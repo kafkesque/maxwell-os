@@ -1,0 +1,17 @@
+discipline conformance anchor: governance/discipline_anchor_conformance_20261002.json
+  N = 12   model = gpt-oss-20b-MXFP4-Q8
+  gold distinct disciplines: 12
+  floor (kappa): 0.8  (reporting 0.667 / operative 0.8)
+  raw agreement (accuracy): 0.2500   (reported, NOT gated)
+  Cohen's kappa:            0.2340   -> below reporting floor — report the disagreement, decide nothing
+  per-class (top gold counts):
+    cognitive science            P=1.0 R=1.0 F1=1.0 (gold n=1)
+    computer graphics            P=0.0 R=0.0 F1=0.0 (gold n=1)
+    cultural studies             P=1.0 R=1.0 F1=1.0 (gold n=1)
+    decision making              P=0.0 R=0.0 F1=0.0 (gold n=1)
+    design thinking              P=0.0 R=0.0 F1=0.0 (gold n=1)
+    engineering                  P=0.0 R=0.0 F1=0.0 (gold n=1)
+    game design                  P=1.0 R=1.0 F1=1.0 (gold n=1)
+    generative design            P=0.0 R=0.0 F1=0.0 (gold n=1)
+    information retrieval        P=0.0 R=0.0 F1=0.0 (gold n=1)
+    neuroscience                 P=0.0 R=0.0 F1=0.0 (gold n=1)

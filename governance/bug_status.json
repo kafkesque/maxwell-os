@@ -3,8 +3,8 @@
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
   "total_ids": 367,
-  "open_n": 133,
-  "closed_n": 234,
+  "open_n": 132,
+  "closed_n": 235,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -659,11 +659,6 @@
       "events": 1
     },
     {
-      "id": "BUG-603",
-      "title": "(OPEN, 2026-09-30) \u2014 split_manifest.json ids_sha256 pin is irreproducible (no emitter + undocumented canonicalization)",
-      "events": 1
-    },
-    {
       "id": "BUG-604",
       "title": "(OPEN, 2026-09-30) \u2014 stage0_5 metadata extractor mis-splits \"liber3.md\" filenames, leaking title words into the author field (split book ide",
       "events": 1
@@ -886,6 +881,7 @@
     "BUG-600",
     "BUG-601",
     "BUG-602",
+    "BUG-603",
     "BUG-605",
     "BUG-606",
     "BUG-607",

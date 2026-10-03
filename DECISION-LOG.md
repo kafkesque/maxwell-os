@@ -11,7 +11,7 @@
 
 ## 🔴 CURRENT OPEN / PENDING INDEX (machine-derived 2026-10-03 — the live face; history below)
 
-**Register truth (do NOT restate counts elsewhere — BUG-588/D-2692):** 943 decisions · 367 bugs (133 open / 234 closed; highest OPEN = BUG-628). Forensic audit + preflight GREEN.
+**Register truth (do NOT restate counts elsewhere — BUG-588/D-2692):** 943 decisions · 367 bugs (132 open / 235 closed; highest OPEN = BUG-628). Forensic audit + preflight GREEN.
 
 1. **OWNER-GATED (D-2727): RATIFY-2 full S4→S5→S6 rerun** — launch under `caffeinate -dimsu` (`runner.py --dry-run` then full).
 2. **OWNER-GATED (D-2727 OG-1): train/eval split** — Option A recommended (KEEP(46)→S4 golden; pin 46 OUT of eval ruler 208→162; sha256-pinned split manifest).

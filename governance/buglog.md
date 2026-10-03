@@ -8023,7 +8023,7 @@ multiples of 64), but the incident is fully preventable.
 FIX (deferred — post-run): add a singleton/pidfile guard in runner.py (refuse to start if a live runner owns the
 same run_id) and use < /dev/null in the launch so a backgrounded runner cannot hold the shell open.
 
-## BUG-603 (OPEN, 2026-09-30) — split_manifest.json ids_sha256 pin is irreproducible (no emitter + undocumented canonicalization)
+## BUG-603 (CLOSED, 2026-09-30, D-2813) — split_manifest.json ids_sha256 pin is irreproducible (no emitter + undocumented canonicalization)
 
 SCOPE: governance/frontier_audit/split_manifest.json (ids_sha256 field) + the missing emitter script.
 FINDING (2026-09-30 forensic audit): the manifest declares a sha256 pin (a3959dc153813b1e147ca148b4aea66ae4208b3dc3e102fd86b09f613cd0391d)
@@ -8035,6 +8035,11 @@ no overlap; D-2733 rail enforces it fail-closed).
 FIX (owner-gated): re-pin ids_sha256 with a DOCUMENTED canonical form (e.g. sha256 of json.dumps(sorted(golden+eval)))
 and record the emitter + serialization in the manifest, so scripts/verify_split_manifest.py can enforce the drift
 seal alongside the disjointness rail (D-2733).
+RESOLVED 2026-10-03 (D-2813, debt paid): scripts/build_split_manifest.py now emits the pin with a DOCUMENTED
+canonical form — sha256 of the newline-joined, sorted golden_pool_ids — recorded in the manifest as
+`ids_sha256_canonical_form`, and scripts/verify_split_manifest.py now ENFORCES the pin fail-closed (recomputes it
+over golden_pool_ids and fails on any drift/tamper). Pin reproduced: b6ec66e62f7bf83e14bad2eba287736d384c5c216874f27e06421b5048bc9f18.
+Rail --selftest green (clean PASS, leak FAIL, option-C FAIL, tampered-pin FAIL); live rail rc=0 (ids_sha256 verified).
 
 ## BUG-604 (OPEN, 2026-09-30) — stage0_5 metadata extractor mis-splits "liber3.md" filenames, leaking title words into the author field (split book identities)
 

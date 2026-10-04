@@ -75,6 +75,7 @@ from pipeline.pipeline_paths import PROJECT_ROOT  # D-330: repo root for the pat
 # fb_definition/fb_source_texts/fb_source_texts_shown imported locally inside
 # deberta_check() to avoid a module-level circular import (schema_accessor ↔ stage5_verify).
 from pipeline.stamp import get_manifest_hash, get_pipeline_commit  # D2485: manifest fingerprint
+from pipeline.practicality import classify_practicality  # D2622: advisory applicability tier (C21 swappable backend)
 
 # ── Constants ──────────────────────────────────────────────────────────────
 NLI_PASS_THRESHOLD: float = S5_NLI_PASS_THRESHOLD  # D2298: from config (0.10, calibrated)
@@ -1035,6 +1036,11 @@ def run_stage5(strict: bool = False, skip_nli: bool = False):
         # these branches in the same order — proved by re-deriving all 7,995 stored labels, 0 mismatch.
         vfb["epistemic_status"] = derive_epistemic_status(fact_passed, isor["rating"])
         vfb["isor"] = isor  # D2284: Full ISOR scores embedded in verified FB
+        # D2622: advisory applicability tier (immediately-applicable | context-dependent | abstract).
+        # This is an ADVISORY soft-facet for query-time re-ranking — it NEVER drops or
+        # quarantines an FB (status is derived above, independent of practicality). C16:
+        # a missing/malformed config/practicality.yaml raises here (fail-loud), not silently.
+        vfb["practicality"] = classify_practicality(fb)
 
         elapsed = time.time() - start
         icon = {"PASS": "✅", "QUARANTINE": "🚫"}.get(status, "❓")

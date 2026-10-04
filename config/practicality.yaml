@@ -1,0 +1,82 @@
+# D2622 — PRACTICALITY/APPLICABILITY FILTER (S5 addition, use-case calibrated)
+# =============================================================================
+# Authority: D2622 (PROPOSED 2026-09-14), CONSTITUTION C12 (config-first),
+#            C21 (swappable), C28 (lightweight default), C1 ($0 marginal cost).
+#
+# Separates practical (directly applicable ~20s, no over-analysis) from
+# theoretical/abstract principles. This is an ONTOLOGICAL label, not a
+# factuality gate — it descends from the v1 binary 30-second actionability
+# gate (SESSION-HANDOFF-2026-08-09), upgraded to a 3-way typology.
+#
+# Rubric (applied per FB):
+#   "in the context of {use_case_domains}, can an agent apply this principle
+#    to a concrete task within ~20s without over-analysis?"
+#   -> immediately-applicable | context-dependent | abstract
+#
+# FORENSIC NOTE (2026-09-30, D-2723): measured on 3000 verified FBs (t11):
+#   - application     100% populated  ("When X -> do Y" imperative text)
+#   - accessibility   100% populated  (self-evident 2486 | prerequisite 514)
+#   - procedural_skill  0% populated  (INERT — declared but carries no signal)
+#   - is_summary        0% populated  (INERT)
+#   The "abstract" tier is near-empty by construction (~1/3000): S4 fills an
+#   imperative application for every FB. The filter's LIVE discrimination is
+#   immediately-applicable vs context-dependent; abstract is a near-zero
+#   catch-all retained for future theoretical/definitional FBs.
+# =============================================================================
+
+version: 1
+backend_state: landed   # D-2723: deterministic backend landed; S5 wiring deferred to RATIFY-2 (registry state lives in config/decisions.yaml D2622, NOT here)
+
+use_case_domains:
+  - design
+  - business
+
+# The three output labels, in descending practical strength.
+labels:
+  - immediately-applicable
+  - context-dependent
+  - abstract
+
+# Swappable backend (C21). `deterministic` is the only implemented backend today
+# (C1: no LLM, no marginal cost, temp irrelevant). An `llm` backend may be added
+# behind the same classify_practicality() protocol without touching callers.
+backend: deterministic
+
+# Signal declarations. `live: false` fields are present in the schema but
+# currently 0%-populated in the corpus — they are DECLARED (not hardcoded) so
+# the rubric is honest and the weights are visible, but they contribute zero
+# signal until the corpus populates them.
+signals:
+  application:
+    field: application
+    live: true
+    # "When <context> -> <imperative action>" — the primary practical signal.
+    trigger_pattern: '(?i)\bwhen\b'
+    imperative_pattern: '(?i)(→|->|\b(do|use|apply|adopt|implement|create|choose|prioritize|evaluate|downsample|integrate|set|place|keep|avoid|limit|add|remove|ensure|treat|frame|combine|layer|anchor|size|scale)\b)'
+  accessibility:
+    field: accessibility
+    live: true
+    self_evident: self-evident
+    prerequisite: prerequisite
+  procedural_skill:
+    field: procedural_skill
+    live: false   # 0% populated 2026-09-30 — inert
+  is_summary:
+    field: is_summary
+    live: false   # 0% populated 2026-09-30 — inert
+
+# Deterministic rules — evaluated top-to-bottom, first match wins.
+# Every threshold/pattern is config-owned (C12/C20): no magic values in code.
+rules:
+  - label: context-dependent
+    when:
+      - 'accessibility == prerequisite'          # needs a prior concept -> not ~20s
+  - label: immediately-applicable
+    when:
+      - 'application matches trigger_pattern AND imperative_pattern'
+  - label: context-dependent
+    when:
+      - 'application matches trigger_pattern'     # situational, no imperative action
+  - label: abstract
+    when:
+      - 'default'                                 # no practical application signal

@@ -340,6 +340,15 @@ stage4:
   quarantine_output: quarantined.jsonl
   max_principles_per_cluster: 25
   dedup_cosine_threshold: 0.92
+  # BUG-614 (D-2806): config-owned S4 code-fingerprint source list (C12), mirroring
+  # stage5.fingerprint_files (D-330). The S4 routing/classification modules + the
+  # content-type axis config determine S4 output; ANY edit (committed or not)
+  # invalidates the S4 checkpoint fail-closed via stamp.stage_code_fingerprint("stage4").
+  fingerprint_files:
+    - pipeline/stage4_merge.py
+    - pipeline/content_types.py
+    - config/pipeline_config.yaml
+    - config/content_types.yaml
   semantic_near_threshold: 0.8
   related_fbs_max_neighbors: 20
   related_fbs_exclude_domains:
@@ -534,6 +543,10 @@ stage6:
   commit_non_fb_types: true
   okf_export_enabled: true
   max_failed_ratio: 0.0
+  fingerprint_files:
+    - pipeline/stage6_commit.py
+    - pipeline/serving_gate.py
+    - pipeline/io_guard.py
 stage4_5:
   enabled: false
   model: gpt-oss-20b-MXFP4-Q8

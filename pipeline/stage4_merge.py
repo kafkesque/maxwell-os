@@ -119,7 +119,7 @@ from pipeline.stage4_merged_call import (
     merged_cribs_classify,
 )
 from pipeline.intimacy_lattice import derive_context, resolve_intimacy  # W6/D369/D2375: v1 intimacy lattice + shared context derivation
-from pipeline.stamp import get_pipeline_commit, get_pipeline_run_id, stamp_record
+from pipeline.stamp import get_pipeline_commit, get_pipeline_run_id, stage_code_fingerprint, stamp_record
 
 # ── Constants ──────────────────────────────────────────────────────────────
 MAX_PRINCIPLES_PER_CLUSTER = S4_MAX_PRINCIPLES  # D2080: from config, was hardcoded 20
@@ -193,36 +193,17 @@ def _s2_input_fingerprint(run_id: str) -> str:
 
 
 def _stage_code_fingerprint() -> str:
-    """BUG-614: content-hash the S4 routing/classification source modules.
+    """BUG-614/D-2806: content-hash the S4 routing/classification source modules.
 
     The BUG-183 guard binds a checkpoint to its S2 input + pipeline_commit, but
-    pipeline_commit only advances on a GIT COMMIT. An UNCOMMITTED edit to
-    stage4_merge.py / content_types.py / config/content_types.yaml (the reroute
-    choke point) leaves pipeline_commit — and therefore the BUG-183 fingerprint —
-    unchanged, so a stale checkpoint is silently resumed (the live pre-reroute
-    process wrote 418 records this way). Hash the BYTE CONTENT of the modules
-    that determine S4 output so ANY edit (committed or not) invalidates the
-    checkpoint fail-closed.
+    pipeline_commit only advances on a GIT COMMIT. An UNCOMMITTED edit to the S4
+    routing choke point leaves pipeline_commit unchanged, so a stale checkpoint
+    is silently resumed. The config-owned ``stage4.fingerprint_files`` list (C12)
+    declares the modules whose BYTE CONTENT determines S4 output; ANY edit
+    (committed or not) invalidates the checkpoint fail-closed. Delegates to the
+    shared config-owned helper (stage5/others use the same one).
     """
-    import hashlib
-
-    _mod_dir = Path(__file__).resolve().parent
-    sources: list[Path] = [
-        Path(__file__).resolve(),                   # stage4_merge.py
-        _mod_dir / "content_types.py",              # reroute choke point (D-2747)
-        _CFG_PATH_S4,                               # pipeline_config.yaml
-        _CFG_PATH_S4.parent / "content_types.yaml",  # content-type axis + denylist
-    ]
-    h = hashlib.sha256()
-    for _p in sources:
-        try:
-            with open(_p, "rb") as _fh:
-                for _chunk in iter(lambda: _fh.read(1 << 20), b""):
-                    h.update(_chunk)
-        except OSError:
-            h.update(b"<missing>")
-    return h.hexdigest()[:16]
-
+    return stage_code_fingerprint("stage4")
 
 def _temporal_signal_hit(text: str, signals: list[str]) -> bool:
     """Boundary-aware temporal-signal match (D2410).

@@ -66,7 +66,7 @@ from pipeline.schema_accessor import (
     fb_source_ids,
 )
 from pipeline.serving_gate import pre_write_verdict  # D274a/D274h: the pre-write half of the gate
-from pipeline.stamp import get_pipeline_commit, stamp_record
+from pipeline.stamp import get_pipeline_commit, stamp_record, write_stage_code_fingerprint
 from pipeline.schemas import (  # D2616 Phase 0: runtime ontology boundary
     validate_fb_content_type,
     validate_fb_depth,
@@ -906,6 +906,7 @@ def run_stage6(export_only: bool = False):
         STAGE6_CHECKPOINT,
         "\n".join(json.dumps(r, ensure_ascii=False) for r in commit_recs) + "\n",
     )
+    write_stage_code_fingerprint(STAGE6_CHECKPOINT, "stage6")  # BUG-614: bind checkpoint to producing code
 
     # Summary
     print(f"\n{'='*60}")

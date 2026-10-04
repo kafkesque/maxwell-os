@@ -13096,3 +13096,211 @@ decisions:
   bugs: [BUG-628]
   files: [config/anchor_axis_authority.yaml, scripts/check_anchor_axis_consistency.py]
   created: '2026-10-03'
+- id: D-2814
+  state: PROPOSED
+  category: TAXONOMY / ONTOLOGY
+  title: Definition-anchored (closed-menu) classification is the ROOT fix - D272c promoted from OPEN to EXECUTABLE-PENDING-S6;
+    the 999-rule alias layer is retired, not extended
+  decision: 'D272c is promoted from a recorded falsification to an EXECUTABLE plan, S6-GATED. Measured on the live
+    RATIFY-2 S4 corpus (rechunk-v4-20260929, in-flight 2026-10-04): discipline=emerging 1,321/4,860 = 27.2%; taxonomy_match_method
+    synonym 2,402 / emerging_real 1,321 / exact 1,137; the D272c human-agreement ceiling of ~0.61 sits AT the 0.60
+    floor, so no alias work can lift it. DECIDED: replace the free-generation CLASSIFY_SYSTEM_PROMPT (pipeline/stage4_merge.py)
+    with a definition-anchored closed menu (label + definition + explicit none), keep logging the raw answer for
+    drift measurement, and add a same-axis fall-through to map_to_canonical_with_fallback so the opposite-axis guard
+    stops over-abstaining (BUG-630). config/alias_map.yaml (999 rules) becomes a SHRINK-ONLY compensating control
+    to be retired after the swap. BUG-629 (the 27.2% regression) is the evidence, not a separate defect. NOTHING
+    may execute while S4 runs: menu_hash is stamped per row at classify time and a mid-run menu edit splits the
+    corpus into two epochs.'
+  rationale: The prompt instructs the model to invent labels; the mapper then rescues them with a hand-curated table
+    whose ceiling is measurable and already reached. Yin, Hay & Roth (EMNLP 2019, DOI 10.18653/v1/d19-1404) is the
+    referenced method.
+  verification: read-only measurement on the live checkpoint; R5 review of the new prompt required before the swap
+    (generator != verifier)
+  files:
+  - pipeline/stage4_merge.py
+  - config/alias_map.yaml
+  - config/closed_menu_v5.json
+  - config/boundary_discriminators.yaml
+  - governance/ONTOLOGY_ENFORCEMENT_ARCHITECTURE_20261004.md
+  - governance/MARKET_RESEARCH_ONTOLOGY_20260919.md
+  bugs:
+  - BUG-629
+  - BUG-630
+  created: '2026-10-04'
+  date: '2026-10-04'
+- id: D-2815
+  state: PROPOSED
+  category: TAXONOMY / ONTOLOGY
+  title: Additive menu bump - mint a Business & Management discipline group (marketing, management, entrepreneurship),
+    aligned to JEL M and ANZSRC 2020, BACKWARD-compatible for CRIBS
+  decision: 'BUG-629 (discipline=emerging 1,321/4,860 = 27.2% on the live RATIFY-2 S4 corpus) is a COVERAGE gap,
+    not a classifier defect, and its dominant component is a measured AXIS ASYMMETRY: the DOMAIN axis carries a
+    full Business & Strategy group while the DISCIPLINE axis has NO business/marketing/management group at all.
+    One ''consumer psychology'' principle therefore lands domain -> marketing & communications and discipline ->
+    emerging: a DOUBLE MISS on one object. Mode B (a genuine ontological gap with no same-axis home) is ~520 tokens
+    / ~39% of the demotion mass - marketing ~323, management ~136, entrepreneurship 16. DECIDED: mint ONE additive
+    discipline group of 3 slots aligned to JEL M (Business Administration / Marketing / Accounting / Personnel Economics)
+    and ANZSRC 2020 FoR divisions 35 (Commerce, Management, Tourism and Services) and 38 (Economics). This SPENDS
+    slots that are already budgeted (61 of TAXONOMY_MAX_DISCIPLINES 75, D2378/D2504) and never raises the ceiling.
+    Execution is POST-S6 and ADDITIVE-ONLY: every existing menu_hash must still resolve, which is exactly what makes
+    the bump CRIBS-safe; a removal or a rename would be a BREAKING bump requiring a new epoch plus a crosswalk (D-353
+    re-pin in the same commit). The promotion controls stay unchanged: min_raw_instances_to_promote 25, replacement_threshold_ratio
+    1.1, emerging_discipline_rate_max 0.35.'
+  rationale: 'Category-count sanity check against mature schemes (top level 12-20, second level <= 300, leaves <=
+    2,000) shows 43 domains / 61 disciplines are INSIDE range, so the budget is UNDER-used: the correct response
+    to a 27.2% abstention rate is to spend slots on the hole, not to relax the floor or widen the alias table. Completes
+    the fix that BUG-629 only measures.'
+  verification: measured raw-label census on the live S4 checkpoint; owner ratification required (C12); menu_axis_hashes
+    re-pin in the same commit
+  files:
+  - config/closed_menu_v5.json
+  - config/taxonomy_v5.yaml
+  - config/emerging_disciplines.yaml
+  - config/pipeline_config.yaml
+  - config/boundary_discriminators.yaml
+  - governance/ONTOLOGY_ENFORCEMENT_ARCHITECTURE_20261004.md
+  bugs:
+  - BUG-629
+  created: '2026-10-04'
+  date: '2026-10-04'
+- id: D-2816
+  state: PROPOSED
+  category: TAXONOMY / GOVERNANCE
+  title: Wire pySHACL against the EXISTING config/taxonomy_shacl.ttl plus an OntoClean lint into the menu-bump gate,
+    and enforce the domain cardinality cap at the write (BUG-631)
+  decision: 'config/taxonomy_shacl.ttl has existed since 2026-09-04 (4,054 bytes) and is enforced on NOTHING, and
+    the per-slot exclude: lists in config/taxonomy_v5.yaml are advisory prose whose tokens are partly NON-canonical
+    (marketing strategy, video game development, animation, web design, science research, engineering infrastructure,
+    social sciences), so they cannot be checked at all. DECIDED: (1) run pySHACL (Apache-2.0, offline) against the
+    EXISTING SHACL contract over the menu - prefLabel uniqueness, mandatory scope note, pairwise disjointness of
+    prefLabel/altLabel, no alias resolving to two canonicals (ISO 25964-1 USE/UF), status/replaced_by coherence;
+    (2) add an OntoClean lint (rigidity / identity / unity / dependence tags plus four graph constraints) to find
+    slots that cannot be defined; (3) require excluded tokens to BE canonical labels so exclusion becomes checkable;
+    (4) enforce pipeline_config max_domains_per_fb AT THE WRITE, fail-closed with a receipt (never a silent truncation)
+    and add a store-side cardinality rail - closing the WRITER limb of the existing BUG-273 that BUG-631 measured
+    (52 FBs carrying 6-7 domains, every one classification_status=CLEAN). Additive, config-first, S6-GATED: no taxonomy
+    file is mutated while S4 runs.'
+  rationale: A contract that nothing enforces is a comment - the standing C16 lesson, and the 2026-09-19 R8 recommendation
+    was already ADOPT (the artifact exists, the wire does not). BUG-631 is the measured consequence on the domain
+    axis.
+  verification: the rail must be SEEN to fire on a synthetic violating menu before it gates a real bump (a control
+    nothing runs is a comment)
+  files:
+  - config/taxonomy_shacl.ttl
+  - config/taxonomy_v5.yaml
+  - config/pipeline_config.yaml
+  - pipeline/pipeline_paths.py
+  - governance/ONTOLOGY_ENFORCEMENT_ARCHITECTURE_20261004.md
+  bugs:
+  - BUG-631
+  created: '2026-10-04'
+  date: '2026-10-04'
+- id: D-2817
+  state: PROPOSED
+  category: PIPELINE / GOVERNANCE
+  title: 'Declared-failure-aware count gate: persist failed_clusters in the D2496 sidecar and teach preflight --declared-failed
+    N so a declared failure is never read as a silent drop (BUG-632)'
+  decision: 'BUG-632: the D2496 sidecar persists expected_fb_count but not the stage''s own declared failed count,
+    so the S5/S6 preflight gate cannot distinguish 4 declared D2371 quarantines from 4 silently dropped records;
+    on any S4 run with >=1 failed cluster, on_disk + declared == expected yet the gate fails closed and S5/S6 are
+    UNREACHABLE. FIX (additive, never relax): (1) stage4_merge.py records failed_clusters + failed_cluster_ids alongside
+    the existing failed counter and persists them in .expected_count.json; (2) preflight_checkpoint_check.py gains
+    --declared-failed N so it passes only when on_disk + N == expected and still fails for any UNDECLARED shortfall
+    (relaxing to <= would re-open BUG-188); (3) the exit-2 conditional-success path writes the D2487 manifest so
+    a decided advance keeps its SHA-256 pin. exit 2 stays the human gate.'
+  bugs:
+  - BUG-632
+  files:
+  - pipeline/stage4_merge.py
+  - scripts/preflight_checkpoint_check.py
+  created: '2026-10-04'
+  date: '2026-10-04'
+- id: D-2818
+  state: RESOLVED
+  category: GOVERNANCE / REGISTER
+  title: 'bug_status parser structural fix: fence-mask scan(), bound the status slot, and stop prose from deciding
+    (BUG-633, BUG-634)'
+  decision: 'BUG-633 and BUG-634 are the recurring BUG-572 class on the bug register''s own parser. BUG-633: status_slot()
+    candidate 2 degenerates to the WHOLE header when there is no colon, so a trailing prose status word retires
+    a live bug. BUG-634: scan() carries no fence state, so a header QUOTED inside another bug''s fenced repro is
+    parsed as a real status event and LAST-wins makes the quote authoritative. FIX: (1) scan() tracks fence toggles
+    and skips header matching inside fenced code blocks (mask quoting, never forbid it - quoting is load-bearing
+    for auditability); (2) status_slot() makes the LEADING parenthetical authoritative: an explicit "(OPEN, ...)"
+    binds as OPEN and blocks prose fall-through (OPEN_WORDS recognised in the leading slot only, so candidates 2-4
+    are untouched and "(MED) - UPDATE: FIXED" / "MED - FIXED (...)" still read CLOSED - the em-dash/terminator plan
+    was measured and REGRESSED BUG-308 + BUG-436..442); (3) BUG-632''s exact as-written header added to SLOT_CASES as
+    a known-answer control, plus a fenced-quoted-header fixture to self_test. Verified: selftest 22 controls, census
+    unchanged 141 open / 235 closed / 376 ids, R5 gemma-4-E4B review APPROVE.'
+  bugs:
+  - BUG-633
+  - BUG-634
+  files:
+  - scripts/bug_status.py
+  created: '2026-10-04'
+  date: '2026-10-04'
+- id: D-2819
+  state: RATIFIED
+  category: TAXONOMY / GOVERNANCE
+  title: 'menu_hash provenance scope resolution: the committed 7,995-row corpus is a declared PRE-PROVENANCE epoch;
+    never synthesize a retroactive menu_hash; re-stamp only via the post-hoc re-map'
+  decision: 'menu_hash is NULL/empty on all 7,995 committed fbs rows while SET on the in-flight checkpoint, and config/label_provenance.yaml
+    already declares that manufacturing a retroactive menu_hash would manufacture a provenance claim. This is NOT
+    a verification footnote: it gates (1) the S6 F7 provenance stamp and (2) the entire drift-measurement premise
+    (River/PSI/BBSE and the menu_hash-based min_human_share gate). DECIDED: (1) the committed corpus is a declared
+    PRE-PROVENANCE EPOCH: menu_hash NULL means the row predates the per-row stamp, documented as the CLOSED SET of
+    generation runs in label_provenance.yaml (never a date, so a new run cannot silently join the boundary); (2) NO
+    retroactive menu_hash is ever synthesized on those rows; (3) the only path to a non-NULL menu_hash on the committed
+    corpus is the POST-HOC RE-MAP (P1-P7 under D-2814/D-2815), which re-points stored raw labels to the new menu and
+    stamps the menu_hash of the epoch the re-map executed against, with a documented crosswalk; (4) until then, drift
+    instruments (taxonomy_match_method, emerging rate, per-slot agreement) are defined ONLY on the in-flight and future
+    corpus, and min_human_share stays undefined on pre-provenance rows. Resolved BEFORE S6 commits so F7 stamps honestly.'
+  rationale: 'A provenance column that is silently NULL or retroactively filled is worse than absent: NULL is honest,
+    a synthetic hash is a fabricated claim (C16). label_provenance.yaml already encodes the correct stance; this
+    decision promotes it from a comment to an in-force gate and ties it to the S6 stamp order.'
+  verification: 'read-only confirmation that the 7,995 committed rows carry menu_hash NULL and that the re-map (not
+    a backfill) is the only writer of menu_hash on those rows; S6 F7 refuses to stamp a synthesized hash'
+  files:
+  - config/label_provenance.yaml
+  - pipeline/stage6_commit.py
+  - governance/ONTOLOGY_ENFORCEMENT_ARCHITECTURE_20261004.md
+  bugs: []
+  created: '2026-10-04'
+  date: '2026-10-04'
+- id: D-2820
+  state: RATIFIED
+  category: TAXONOMY / ANCHOR
+  title: 'Anchor domain/discipline axis is frozen-invalid until re-derived against the post-D-2814/2815 menu; defer
+    the D-2703 primary_domain auto-classification; re-derive and ratify BEFORE the 7000+ re-map'
+  decision: 'The 150 locked anchors carry EMPTY primary_domain (systemic) and their discipline labels were adjudicated
+    against the PRE-D-2814 free-generation menu. Using either as ground truth for the NEW definition-anchored classifier
+    is CIRCULAR: an anchor that is a function of the classifier cannot measure the classifier. DECIDED: (1) the anchor
+    retrieval/depth/content_type/noise axes remain valid (system-independent or owner-adjudicated); (2) the anchor
+    domain/discipline axis is FROZEN-INVALID until re-derived; (3) the D-2703 step to classify 150 locked anchors
+    primary_domain against closed_menu_v5.json is DEFERRED and re-scoped to classify against the post-D-2814/2815 menu
+    v6, definition-anchored, then owner-adjudicate + second-coder + independent verifier (DeBERTa NLI, R5), stamping
+    anchor_version/menu_hash/taxonomy_version/coder/date/abstention per D-274d; (4) anchor re-derivation PRECEDES the
+    7000+ post-hoc re-map so the re-map is measured against a valid referee, not its own output.'
+  rationale: 'This is the D-274d ANCHOR-2 contamination control applied to the domain axis: ground truth must come from
+    a source independent of the system being measured. BUG-622 (S4 discipline kappa ~0.45 vs human-gold, below the
+    0.80 floor) is only meaningful because that human-gold exists; auto-classifying the anchor via the old menu would
+    erase that independence.'
+  verification: 'the deferred step is gated on a non-empty menu_hash for menu v6; the anchor domain/discipline manifest
+    is owner-ratified and stamped, never LLM-only'
+  files:
+  - governance/frontier_audit/CHUNKING_RESEARCH_20260929.md
+  - governance/frontier_audit/anchor_triage_v2.json
+  - config/anchor_axis_authority.yaml
+  - MASTER-TASK-REGISTER.md
+  bugs: []
+  created: '2026-10-04'
+  date: '2026-10-04'
+- id: D-2821
+  state: RATIFIED
+  category: TAXONOMY / GOVERNANCE
+  title: 'D-2703 full clean rerun S4 stage is gated on menu v6 (post-D-2814/2815); never re-bake the 27.2% defect'
+  decision: 'The D-2703 full clean rerun (S1.3->S1.5->S2->S4->S5->S6) must not run its S4 stage against the current free-generation prompt. If it fires before D-2814/D-2815 land, it re-bakes the 27.2% discipline=emerging defect into a fresh corpus. DECIDED: the rerun S4 stage is GATED on menu v6 (post-D-2814/2815); the re-chunk, re-embed and S2 stages may proceed, but S4 waits for menu v6.'
+  files:
+  - MASTER-TASK-REGISTER.md
+  bugs: []
+  created: '2026-10-04'
+  date: '2026-10-04'

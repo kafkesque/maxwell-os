@@ -48,6 +48,10 @@ REOPEN_WORDS = ("REOPEN", "REGRESS", "RECURRED")
 # silently retiring a LIVE bug (BUG-333). A partial fix is an OPEN bug with progress attached.
 PARTIAL_WORDS = ("PARTIAL", "MITIGATED", "IN PROGRESS")
 STATUS_WORDS = CLOSE_WORDS + REOPEN_WORDS + PARTIAL_WORDS
+# BUG-633 (2026-10-04): "OPEN" is deliberately NOT a close word (an absent close-claim is OPEN, C16
+# fail-safe), but it IS a recognised claim in the LEADING-parenthetical slot: "(OPEN, ...)" is a
+# declaration that the bug is open and must bind before prose fall-through.
+OPEN_WORDS = ("OPEN",)
 # BUG-429 (2026-09-24): "UNRESOLVED" CONTAINS "RESOLVED", so `### BUG-426 (HIGH, OPEN - UNRESOLVED)` was
 # classified CLOSED - a HIGH, explicitly-unresolved bug auto-retired by substring. Same degeneracy class as
 # BUG-347 (PARTIAL FIXED), second occurrence. A negated status word is checked FIRST and forces OPEN, which is
@@ -57,6 +61,9 @@ NEGATED_WORDS = ("UNRESOLVED", "UNFIXED", "NOT RESOLVED", "NOT FIXED", "STILL OP
 QQ = chr(34) + chr(8220) + chr(8221) + chr(39)
 QUOTE_RE = re.compile("[" + QQ + "][^" + QQ + "]*[" + QQ + "]")
 PAREN_RE = re.compile("[(]([^)]*)[)]")
+# BUG-634 (2026-10-04): a fenced code block delimiter at column 0. A header QUOTED inside a repro fence is
+# documentation, not a status event, so scan() masks fenced regions instead of parsing them.
+FENCE_RE = re.compile(r"^(`{3,}|~{3,})")
 
 
 def status_slot(rest: str) -> str:
@@ -65,7 +72,8 @@ def status_slot(rest: str) -> str:
 
     The slot is a POSITION AT A HEADER BOUNDARY and prose in between may NOT decide. The candidates, in order:
 
-      1. the LEADING parenthetical, directly after the bug id - "(MED, FIXED 2026-09-21) ...";
+      1. the LEADING parenthetical, directly after the bug id - "(MED, FIXED 2026-09-21) ..." - and it is
+         AUTHORITATIVE: an explicit "(OPEN, ...)" binds as OPEN here and blocks prose fall-through (BUG-633);
       2. the FIRST segment, before the first colon - "MED - FIXED 2026-09-21: ...";
       3. the FIRST WORD after that colon - how a header writes "UPDATE 2026-09-23: FIXED code-side ...";
       4. the TRAILING parenthetical - "... (HIGH, fixed 2026-09-21)".
@@ -77,8 +85,14 @@ def status_slot(rest: str) -> str:
     """
     m = PAREN_RE.match(rest)
     pre, sep, post = rest.partition(chr(58))
-    cands: list[str] = [m.group(1)] if m else []
-    cands.append(pre)
+    # BUG-633: the LEADING parenthetical is the authoritative slot. It may carry an explicit OPEN claim,
+    # which must bind HERE and block the candidate-2 fall-through that let trailing prose
+    # ("... fixed for S2 only") retire a live bug whose slot read "(OPEN, ...)".
+    if m:
+        lead = QUOTE_RE.sub(chr(32), m.group(1)).strip()
+        if any(w in lead.upper() for w in STATUS_WORDS + OPEN_WORDS):
+            return lead
+    cands: list[str] = [pre]
     if sep and post.strip():
         cands.append(post.split()[0])
     trailing = PAREN_RE.findall(rest)
@@ -139,6 +153,9 @@ SLOT_CASES: tuple[tuple[str, str, str], ...] = (
      "(MED) - UPDATE 2026-09-23: FIXED code-side (the export re-run is an owner gate)", "closed"),
     ("the_leading_slot_outranks_the_title",
      "(MED \u2014 FIXED 2026-09-21): the C15 classifier treated \"PARTIALLY FIXED\" as CLOSED", "closed"),
+    ("an_explicit_open_leading_slot_outranks_trailing_prose",
+     "(OPEN, 2026-10-04) \u2014 the D2496 gate CANNOT DISTINGUISH a declared failure "
+     "(the BUG-609 class, fixed for S2 only)", "open"),
 )
 
 
@@ -181,13 +198,40 @@ def self_test() -> int:
     if faults:
         raise SystemExit("FAIL-CLOSED (C16): " + faults[0] + " (BUG-572: a status word in a header's TITLE may "
                          "not decide a bug's status)")
-    return len(cases) + len(SLOT_CASES)
+    # BUG-634: a header QUOTED inside a fenced repro block is documentation, not a status event.
+    fence_fixture = [
+        "## BUG-900 (CLOSED, 2026-10-04) — the real header",
+        "```",
+        "## BUG-900 (REOPEN, 2026-10-04) — quoted in a repro, must not re-open",
+        "```",
+    ]
+    fence_scanned = scan(fence_fixture)
+    if len(fence_scanned["BUG-900"]["events"]) != 1 or fence_scanned["BUG-900"]["status"] != "closed":
+        raise SystemExit("FAIL-CLOSED (BUG-634): a fenced header quoted in a repro was parsed as a status event")
+    return len(cases) + len(SLOT_CASES) + 1
 
 
 def scan(text_lines: list[str]) -> dict[str, dict]:
-    """Fold header events, in file order, into one status per bug id."""
+    """Fold header events, in file order, into one status per bug id.
+
+    BUG-634: fenced code blocks are masked. A header QUOTED inside a repro fence is documentation,
+    not a status event, so fence-delimited lines never match HEADER_RE.
+    """
     bugs: dict[str, dict] = {}
+    fence_char: str | None = None
+    fence_width: int = 0
     for i, line in enumerate(text_lines, start=1):
+        fm = FENCE_RE.match(line)
+        if fm:
+            marker = fm.group(1)
+            ch, w = marker[0], len(marker)
+            if fence_char is None:
+                fence_char, fence_width = ch, w
+            elif ch == fence_char and w >= fence_width:
+                fence_char, fence_width = None, 0
+            continue
+        if fence_char is not None:
+            continue  # inside a fenced block — a quoted header here is not an event
         m = HEADER_RE.match(line)
         if not m:
             continue

@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**132 open** / 235 closed of 367 ids.
+**139 open** / 237 closed of 376 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -139,3 +139,10 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-595 | (OPEN, 2026-09-29, D-2706) — clean_markdown() never applies _CLEAN_SUBS (D2471); Pandoc/calibre residue in 41.4% of S1 bodies | 1 |
 | BUG-604 | (OPEN, 2026-09-30) — stage0_5 metadata extractor mis-splits "liber3.md" filenames, leaking title words into the author field (split book ide | 1 |
 | BUG-628 | (OPEN, 2026-10-03) — ANCHOR five-axis propagation FAILURE: the owner's D-2795 discipline re-label landed in ONE artifact; 4 siblings stayed  | 1 |
+| BUG-629 | (OPEN, 2026-10-04) — S4 discipline=emerging regression 26.9% on the v4 re-chunk corpus (above the 15% threshold); 1,253 DEMOTIONS from valid | 1 |
+| BUG-630 | (OPEN, 2026-10-04) — the cross-axis guard is TOO BLUNT: a raw label that is canonical on the OPPOSITE axis is forced to 'emerging' instead o | 1 |
+| BUG-631 | (OPEN, 2026-10-04) — max_domains_per_fb = 5 is UNENFORCED on every post-commit path: 52 FBs carry 6-7 domains, all classification_status=CLE | 1 |
+| BUG-632 | (OPEN, 2026-10-04) — the D2496 "authoritative expected FB count" gate CANNOT DISTINGUISH a DECLARED failure from a SILENT drop, so S5 and S6 | 1 |
+| BUG-635 | (OPEN, 2026-10-04) — merged-call sparse classification is quarantined under D2371 as "empty application", masking the true failure and dropp | 1 |
+| BUG-636 | (OPEN, 2026-10-04) — S4 exit-2 clears the resume sidecars before the failure check, so the documented "re-run to retry failed clusters" inst | 1 |
+| BUG-637 | (OPEN, 2026-10-04) — 2 phantom principle FBs silently absent from S4 output (resume processed_ids bookkeeping) | 1 |

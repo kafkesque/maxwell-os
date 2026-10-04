@@ -8592,3 +8592,151 @@ proves it FIRES). The rail is GREEN-loud: exit 2 owner-owed, 149 declared drifti
 SHRINK-ONLY (a declared cell that starts agreeing makes it exit 2 and must be removed). The 149 propagations
 remain OWED (a gold rewrite, owner-gated) — the blindspot is CLOSED, the debt is COUNTED.
 DEBT PAID 2026-10-03 (D-2812): scripts/apply_anchor_axis_authority.py (the missing WRITE limb) propagated the authority into every consumer: 117 cells rewritten in the two five-axis views, 30 more resolved by re-deriving ANCHOR_208_DISCIPLINE_NORMALIZED (via normalize_anchor_discipline.py) and ANCHOR_208_CONSOLIDATED (via consolidate_anchor_208.py) from the corrected views. Rail ceiling 149 -> 2. The 2 residual cells are R021 (depth authority value is the provenance sentinel 'noise_drop', NOT a depth class - refused on purpose, C12d). REPORTED-GAP (not silent): the discipline authority covers 204/208, excluding R021/R040/R080/R091 (R021 noise_drop; R040/R080/R091 owner-confirmed 'emerging'), so 8 view cells cannot be re-derived from it - the rail joins on the intersection and therefore does not compare them. REMAINING: RATIFY-2 still gated on the 46-KEEP gold split (anchor_triage_v2 + sha256 split manifest), which must be cut AFTER this propagation (it was the whole reason).
+
+## BUG-629 (OPEN, 2026-10-04) — S4 discipline=emerging regression 26.9% on the v4 re-chunk corpus (above the 15% threshold); 1,253 DEMOTIONS from valid raw labels
+FINDING (RATIFY-2 S4 in-flight forensic audit, 2026-10-04; checkpoint sample 4,640/8,215 clusters): discipline=emerging is
+1,249 rows = 26.9%, UP from 21.2% at the [750] sample. Raw-label disposition: on-menu raw 23.5%, off-menu->MAPPED 49.6%,
+off-menu->EMERGING 27.0%. The classifier IS confident — 100% of emerging rows carry a VALID off-menu raw label
+(0 raw-emerging); the closed_menu_v5 (62 disciplines) + menu_merge_map routing fails-closed to the 'emerging' abstention slot.
+Top demoted raws: marketing 210, marketing science 81, graphic design 35 (+750 distinct off-menu raws). Not an error:
+classification_status=4645/4645 CLEAN.
+IMPACT: discipline-axis precision loss (~1 in 4 FBs abstain), exceeding the BUG-150 action threshold (<15%). Propagates to
+S5 verify + S6 commit. By-design fail-closed (config/boundary_discriminators.yaml: emerging = 'last resort, never a first
+choice'), so no crash — this is a taxonomy COVERAGE gap, not a hidden failure.
+RECOMMENDED FIX (owner-gated, C12): extend config/closed_menu_v5.json + config/menu_merge_map.yaml for the design/business
+sub-discipline family (marketing, marketing science, graphic design, ...); re-measure the final rate at S4 completion.
+
+## BUG-630 (OPEN, 2026-10-04) — the cross-axis guard is TOO BLUNT: a raw label that is canonical on the OPPOSITE axis is forced to 'emerging' instead of falling through to a SAME-axis home
+SCOPE: pipeline/stage4_merge.py map_to_canonical_with_fallback (~line 546, the _opposite guard) + pipeline/schemas.py
+_build_synonym_index (forbidden_keys). READ-ONLY forensic audit; the live S4 run was NOT touched.
+FINDING: the guard correctly blocks the BUG-200/D2422 coercion class (a raw discipline equal to a CANONICAL DOMAIN,
+e.g. 'software engineering' -> 'engineering practice'), but it returns 'emerging' UNCONDITIONALLY — it never retries the
+SAME axis. MEASURED on the in-flight checkpoint (rechunk-v4-20260929, 5,165 records, 2026-10-04 12:23):
+organizational behavior 26 -> emerging although organizational theory exists ON THE SAME AXIS; product design 10 ->
+emerging although design thinking exists; urban planning 9 -> emerging with NO discipline home (a genuine ontological
+gap, NOT this bug). Rescuable pool ~45 tokens (~0.9% of the checkpoint) with ZERO new labels.
+IMPACT: over-abstention on the discipline axis COMPOUNDS BUG-629 (26.9% -> 27.2% emerging). It is a MAPPING loss, not
+an extraction loss: the raw label is preserved on every row (discipline_source=llm_extracted_from_source), so the
+remedy is a deterministic REPLAY over stored raw labels — no re-extraction, no re-embedding, no re-run of S4.
+FIX (POST-S6, owner-gated, C12): after the opposite-axis rejection, retry the SAME-axis synonym index (kind-constrained)
+before returning 'emerging'; KEEP the guard (it is load-bearing). Config-first: the fall-through policy belongs in YAML,
+not in code. RELATED: BUG-200/D2422 (the guard), BUG-629 (the emerging-rate regression).
+
+## BUG-631 (OPEN, 2026-10-04) — max_domains_per_fb = 5 is UNENFORCED on every post-commit path: 52 FBs carry 6-7 domains, all classification_status=CLEAN
+SCOPE: config/pipeline_config.yaml#pipeline.max_domains_per_fb (=5) consumed at pipeline/pipeline_paths.py, versus the
+post-commit writers (stage4_merge classify/format, stage6_commit). This is the WRITER limb of BUG-273 ("the domains axis
+violates its own cardinality contract") — BUG-273 measured the POLICY breach; BUG-631 measures the ENFORCEMENT GAP.
+FINDING (read-only audit, 2026-10-04): 52 FBs exceed the declared cap (46 carry 6 domains, 6 carry 7; 0.65% of the
+measured 7,995). EVERY one of them is classification_status=CLEAN and no rail objects. The cap is enforced only on the
+LLM output path, not where the row is actually written, so a multi-domain label set passes every gate.
+IMPACT: retrieval/bloat — one principle cross-lists into up to 7 facets, inflating the domain axis and weakening recall
+precision. No crash, no silence-breaking rail: the contract is declared in config and enforced in one path only (C16).
+FIX (POST-S6): enforce the cap AT THE WRITE (fail-closed with a receipt, never a silent truncation), add
+scripts/check_domain_cardinality.py over the committed store, and re-measure after the replay in BUG-630.
+
+## BUG-632 (OPEN, 2026-10-04) — the D2496 "authoritative expected FB count" gate CANNOT DISTINGUISH a DECLARED failure from a SILENT drop, so S5 and S6 are UNREACHABLE on any S4 run with >=1 failed cluster (the BUG-609 class, applied to S2 only)
+
+**MEASURED** (run `rechunk-v4-20260929`, S4 complete 2026-10-04 18:22):
+- `checkpoint.jsonl` on disk = **6,587** records (verified `wc -l`).
+- `checkpoint.jsonl.expected_count.json` = `expected_fb_count: **6591**`.
+- `expected_fb_count` (`pipeline/stage4_merge.py:~1398`) counts every single-principle DEFAULT-content-type cluster — every cluster S4 *should* turn into an FB — and does **NOT** subtract the `failed` counter.
+- 4 clusters were QUARANTINED fail-closed by D2371 (empty/short application, 0 chars): `cluster_6030`, `cluster_26828`, `cluster_28517`, `cluster_40300` — **all `GEN skipped (single-FB)`**.
+- 6591 - 4 = 6587 exactly. The shortfall is entirely **declared**, recorded, and intentional.
+
+**CONSEQUENCE — a hard deadlock with two independent locks:**
+1. `pipeline/stage4_merge.py:2506` `sys.exit(2)` on CONDITIONAL_SUCCESS -> the runner does NOT advance (deliberate, documented).
+2. Even if the owner forces `--resume-from 5`: `stage5_verify._preflight_gate` -> `scripts/preflight_checkpoint_check.py --check <ckpt> --expect-count 6591` -> `AUTHORITATIVE COUNT MISMATCH: on-disk 6587 vs --expect-count 6591` -> **exit 1** -> `sys.exit(1)`. **REPRODUCED LIVE this session.**
+3. `scripts/pre_s6_gate.py:_expected_count()` reads the **same** sidecar -> S6 is blocked by the same defect.
+A re-run cannot clear it: the 4 failures are deterministic (`GEN skipped (single-FB)` + S2-extracted empty application), so re-running reproduces the identical state. S4 has **NO** `accept_conditional_within_tolerance` equivalent — only `stage2` has it (`config/pipeline_config.yaml:302`), because BUG-609 fixed S2 and S4 never got the same treatment.
+
+**WHY IT MATTERS:** D2496 added the sidecar to catch a SILENT S4-side record drop (BUG-188 class). Failing on `on_disk < expected` is correct. Failing when the entire shortfall is the stage's own declared, fail-closed `failed` count is wrong. The sidecar is **UNDER-SPECIFIED**: it persists `expected_fb_count` but not `failed_clusters`, so the gate cannot tell "4 declared failures" from "4 silently dropped records". The fix must **ADD** the declared number — never relax the inequality (relaxing to `<=` would re-open BUG-188).
+
+**SECONDARY FINDING** (same run, recorded, not a blocker): S4 exited 2, so `runner._write_resume_marker(4)` / `_write_checkpoint_manifest(4)` never ran -> the run dir has **NO** `pipeline_resume.json` and **NO** `.s4.manifest.json`. S5's preflight therefore degrades to "No manifest - boundary verified but content hash not pinned", i.e. the **D2487 SHA-256 pin is absent for this entire 77 MB checkpoint**. `safe_write` (os.replace) makes mid-record cuts unobservable, so this is a WEAKENED-but-not-broken control; reported because the fail-closed exit-2 path silently costs the manifest.
+
+**FIX (D-2817):** persist `failed_clusters` + `failed_cluster_ids` in the sidecar; teach the checker `--declared-failed N` so it passes only when `on_disk + N == expected` and still fails for any undeclared shortfall; forward it in S5 and S6. Preserve `exit 2` as the deliberate human gate — the fix makes the owner's **decided** advance work, it does not remove the decision. Also: the exit-2 path must write the manifest so a conditional success keeps its SHA-256 pin.
+
+## BUG-633 (CLOSED, 2026-10-04) — bug_status.status_slot() let PROSE decide the status: a header explicitly labelled "(OPEN, ...)" retired a LIVE bug because its trailing prose held a status word (third occurrence of the BUG-572 class)
+
+**RESOLUTION (D-2818, 2026-10-04):** the LEADING parenthetical is now AUTHORITATIVE — an explicit "(OPEN, ...)" binds as OPEN and blocks prose fall-through (OPEN_WORDS recognised in the leading slot only, so candidates 2-4 are untouched). BUG-632's exact as-written header added to SLOT_CASES. R5 gemma-4-E4B review APPROVE; census unchanged 141/235/376.
+
+**REPRODUCED LIVE this session** on BUG-632 as first written:
+
+```
+    ## BUG-632 (OPEN, 2026-10-04) — ... UNREACHABLE on any S4 run with >=1 failed cluster (the BUG-609 class, fixed for S2 only)
+   status_slot() -> '(OPEN, 2026-10-04) — the D2496   gate CANNOT DISTINGUISH ... (the BUG-609 class, fixed for S2 only)'   <- THE WHOLE HEADER
+   classify()    -> 'closed'
+   bug_status.json -> BUG-632 landed in `closed` (census read 135 open / 236 closed / 371 ids)
+```
+
+**MECHANISM.** `status_slot()` documents four candidate positions (BUG-350/BUG-572) and says a slot that names no status word is EMPTY, so an unlabelled header is OPEN. Candidate 1 is the LEADING parenthetical; candidate 2 is "the FIRST segment, before the first colon". `OPEN` is deliberately NOT a status word (absent a close-claim the event is OPEN, C16 fail-safe) - so candidate 1 `(OPEN, 2026-10-04)` **never wins**. When the header also has **NO COLON**, candidate 2 degenerates to **the entire header string**, so ANY status word anywhere in the prose becomes the deciding slot. BUG-632's trailing parenthetical "the BUG-609 class, fixed for S2 only" supplied it.
+
+**HARM.** Exactly the harm BUG-347 (PARTIALLY FIXED) and BUG-429 (UNRESOLVED contains RESOLVED) were filed for, and the harm the BUG-572 slot rule exists to prevent: a LIVE bug silently retired. Here it was a CRITICAL blocker (BUG-632, the S5/S6 deadlock) that vanished from the open count, the C15 threshold, and every handoff - i.e. a P0 that the register itself hid. It was caught only because the close count moved by one in the wrong direction.
+
+**SHAPE.** Trigger requires all three: (1) no colon in the header, (2) a leading `(OPEN, ...)`-style parenthetical that therefore never wins, and (3) any status word in the trailing prose. BUG-630 and BUG-631 were UNAFFECTED only because their trailing text has no status word - luck, not structure. `slot_faults()` is the self-test and does not cover this shape.
+
+**CANDIDATE REMEDIES (owner-gated, R5 review before apply).** (a) candidate 2 should be the text up to the first colon **or the first em-dash/terminator, whichever comes FIRST**, so it can never swallow a trailing parenthetical; (b) a candidate must be a SLOT, not a paragraph: reject any candidate longer than a bounded width (the four SLOT_CASES are all short), falling through to the trailing parenthetical; (c) reject candidates that span more than one clause. Add BUG-632's exact header to SLOT_CASES as a known-answer control in the same commit that changes the rule (D-353).
+
+**WORKAROUND APPLIED NOW (no code change, evidence preserved):** the word "fixed" was removed from BUG-632's header prose ("applied to S2 only"); the body and every count are unchanged.
+
+## BUG-634 (CLOSED, 2026-10-04) — bug_status.scan() does not mask fenced code blocks: a header QUOTED in another bug's repro is parsed as a genuine status event (BUG-572 class, fourth occurrence)
+
+**RESOLUTION (D-2818, 2026-10-04):** scan() now tracks fence toggles and masks fenced code blocks, so a header QUOTED inside a repro is documentation, not a status event. Fenced-quoted-header fixture added to self_test. R5 gemma-4-E4B review APPROVE.
+
+**REPRODUCED LIVE this session, unintentionally, by the BUG-633 write itself.** BUG-633's body quotes the pre-patch BUG-632 header inside a fenced block to document the mis-parse. `bug_status.scan()` walks the file LINE BY LINE applying `HEADER_RE = ^#{2,3}\s+(BUG-\d+)\b...`; a fence is NOT masked, so the quoted line was parsed as a real status event for BUG-632. Two events existed for one id and the "LAST event wins" rule made the QUOTED one authoritative -> BUG-632 read CLOSED and stayed closed even after the real header was patched.
+
+**HARM.** A parser must not be able to lose a bug (BUG-428). Here it is worse: any bug whose header is QUOTED ANYWHERE ELSE in the 5,000+ line register - to explain a fix, cite a prior event, document a repro, or in a handoff quote - silently acquires a SECOND status event, and the quoted text decides. That is a one-line-of-prose path to retiring a live P0, undetectable from the census alone.
+
+**SHAPE.** Trigger: any `#{2,3}\s+BUG-\d+` at the START OF A LINE anywhere in the file, including inside fenced blocks. `scan()` carries no fence state.
+
+**CANDIDATE REMEDIES (owner-gated, R5 review before apply).** (a) `scan()` should carry fence state (track the fence toggle) and skip header matching inside a fence - the masking a Markdown renderer already does; (b) additionally REFUSE a second header for an id without an explicit `REOPEN` token, raising instead of last-wins (C16 - a conflict must be loud, never resolved by order); (c) add a control to `self_test()` that asserts a quoted header inside a fence yields exactly ONE event. NOTE: the register's convention of quoting prior headers is LOAD-BEARING for auditability, so the remedy must mask quoting, never forbid it.
+
+**WORKAROUND APPLIED NOW:** the quoted line inside BUG-633's repro is indented so it can no longer match `^#{2,3}`; its text is otherwise byte-faithful.
+
+**META-NOTE (worth recording):** this bug was found, filed, but its own body was then LOST by a read-then-append-then-replace ordering mistake in the same session - i.e. the register's append-only convention (C6: append, never rewrite a snapshot) was violated by the very hand editing that was documenting the violation. Re-appended here. The lesson is that buglog edits must be APPEND-ONLY, one write, never read-modify-replace on the whole file.
+
+
+## BUG-635 (OPEN, 2026-10-04) — merged-call sparse classification is quarantined under D2371 as "empty application", masking the true failure and dropping valid applications
+
+**DISCOVERED** this session by replaying `merged_cribs_classify` on the four Stage-4 failures (rechunk-v4-20260929, exit code 2). The D2371 quarantine line in the ratify log reads "Empty/short application (0 chars < 10)" for all four clusters — but that is a SECONDARY symptom, not the actual failure.
+
+**MECHANISM.** `application` is a Stage-4-generated field (CRIBS enrichment), never a Stage-2 field — all 8,217 S2 FBs lack the `application` key entirely. For single-FB clusters the merge is skipped (`GEN skipped (single-FB)`) and the CRIBS fields are filled by `merged_cribs_classify`. When that call raises `SparseClassificationError` (empty/missing domains, or application too short), `stage4_merge.py`'s `_use_merged` branch catches the WHOLE exception as a generic enrichment failure (`⚠️merged`), sets `enrichment_status=FAILED`, and never copies `application` into `fb_data`. The D2371 gate then sees an empty `application` and quarantines the FB — even when the model actually RETURNED a valid application and only the domains were empty.
+
+**EVIDENCE (replay probe, temp=0.0, gpt-oss-20b-MXFP4-Q8).**
+- cluster_6030 "Boltzmann Distribution Principle" → OK on retry (application 254 chars, discipline "statistical mechanics"). TRANSIENT — a resume fixes it.
+- cluster_40300 "Quasi-Objects and Quasi-Minds" → SparseClassificationError: empty/missing domains (application WAS present).
+- cluster_26828 "Plural Realities Hypothesis" → SparseClassificationError: empty/missing domains (application WAS present).
+- cluster_28517 "Planck's Constant Derivation" → SparseClassificationError: application too short (4 chars).
+
+**HARM.** Two of the four failures are NOT application failures at all — the model produced a valid application but empty domains. The D2371 message sends future debugging to the wrong field, and the quarantine silently drops a valid application + mechanism + consequence + evidence that could be salvaged (domain deferred to "emerging"). Same harm class as BUG-630 (cross-axis guard too blunt) but on the merged-call exception path.
+
+**SHAPE.** Deterministic for philosophy FBs (empty domains: cluster_40300, cluster_26828) and one physics FB (short application: cluster_28517). GPT-OSS-20B returns a sparse classification for these inputs at temp=0.0, so a plain resume re-fails them.
+
+**CANDIDATE REMEDIES (owner-gated, R5 review before apply).** (a) in `stage4_merge.py`, distinguish the exception type: on empty-domains `SparseClassificationError`, salvage `application` + CRIBS fields and set `domains=["emerging"]` instead of quarantining; quarantine only on genuinely short/absent application (D2371 stays fail-closed on the application field itself); (b) surface the real exception in the summary line (currently just `⚠️merged`), not only `enrichment_error`; (c) align with D-2814/BUG-630 so sparse domains fall through to a same-axis home rather than aborting the whole FB.
+
+
+## BUG-636 (OPEN, 2026-10-04) — S4 exit-2 clears the resume sidecars before the failure check, so the documented "re-run to retry failed clusters" instead starts fresh and re-runs the whole 27h stage
+
+**DISCOVERED** auditing `--resume-from 4` before retrying the four rechunk-v4-20260929 failures. `ls` showed `checkpoint.jsonl.state.json` and `.segids` ABSENT even though the run ended in exit code 2 (CONDITIONAL_SUCCESS, 4 failed).
+
+**MECHANISM.** In `stage4_merge.py` the D2370 sidecar-clear loop (`os.unlink` on `.segids`, `.state.json`, `.depth.json`, `.cribs.json`) runs UNCONDITIONALLY at the end of the run, BEFORE the D2338 max_failed_ratio check that does `sys.exit(2)`. So a FAILED run also deletes its resume sidecars. On the next `--resume-from 4`, the BUG-614 stage-code guard reads `_saved_stage_fp = _scalar_state.get("stage_code_fingerprint")` which is `None` (state file gone), and the guard `if fbs and _saved_stage_fp != _stage_code_fingerprint()` has NO None-check (unlike BUG-183 and D2487 which both carry `and _saved` guards) — so `None != 'b6c9c20776a040fe'` is True and it "starts fresh", discarding all 6,587 FBs and re-running all 8,215 clusters.
+
+**HARM.** The runner's own advice ("Resume with: python pipeline/runner.py --resume-from 4") is a trap: following it throws away ~27h of LLM work and re-runs the whole stage. A silent correctness/ cost hazard, not a loud failure.
+
+**SHAPE.** Trigger: any S4 run that reaches the end with >=1 failed cluster (exit 2). The sidecars are cleared on the success AND failure paths alike.
+
+**CANDIDATE REMEDIES (owner-gated, R5 review before apply).** (a) move the D2370 sidecar-clear loop AFTER the exit-2 branch so only a clean exit 0 clears them; (b) add the missing `_saved_stage_fp and` None-guard to the BUG-614 check so a missing state file falls through to the D2424 reconstruction instead of "start fresh".
+
+**WORKAROUND APPLIED NOW (no code change):** recreated `checkpoint.jsonl.state.json` with `stage_code_fingerprint=b6c9c20776a040fe`, `s2_input_fingerprint=b284199758628beb`, `record_count=6587`, `name_collisions=12`, `classification_errors=0` — the exact values `_write_s4_checkpoint` would have persisted. With it present, all three resume guards pass and only the 4 unprocessed clusters retry.
+
+
+## BUG-637 (OPEN, 2026-10-04) — 2 phantom principle FBs silently absent from S4 output (resume processed_ids bookkeeping)
+
+**DISCOVERED** during the D-2496/D-2817 count reconciliation forensic audit before S5. Full S2→S4 accounting: S2 checkpoint 8,217 records = 8,212 unique fb_ids + 5 cross-cluster duplicate copies (BUG-615 dedup). S4 on-disk = 8,207 unique fb_ids. S2−S4 = 5 missing, of which 3 are the declared-failed clusters (cluster_40300 "Quasi-Objects and Quasi-Minds", cluster_26828 "Plural Realities Hypothesis", cluster_28517 "Planck's Constant Derivation") and **2 are phantom**: cluster_3776 "Blue Ocean Strategy" (fb_id 339041cf564f) and cluster_26074 "Memory Reconstruction Bias" (fb_id 91c455940966).
+
+**EVIDENCE.** Both are single-FB clusters (route=FB, content_type=principle, is_convergent=True, is_summary=False); `_resolve_content_type` returns `principle` for both (verified directly), so they MUST be counted in expected_fb_count and MUST produce an FB. They appear in NO S4 output (checkpoint/PT/PI/GE/TI/quarantined all checked; `source_clusters` merge-provenance scan = empty) and are NOT counted in `declared_failed_count` (3). Net effect: expected_fb_count=6,591 == on-disk 6,588 + declared 3 passes the D-2817 gate, but 2 clusters are neither on-disk nor declared — a silent 2-record drop (0.03% of 6,591).
+
+**MECHANISM (hypothesis, same class as BUG-632/633/634).** The S4 run was a resume; D2424 reconstructs `processed_ids` from the partial checkpoint's `source_clusters` list. If these 2 cluster_ids were recorded in the prior partial checkpoint's provenance (e.g. a cross-cluster merge wrote them into another FB's `source_clusters`) but their own FB record was NOT carried forward, the resume skips them as "already processed" without emitting their FB. Register-parser / resume-bookkeeping class — the D-2818 fence-mask scan + status_slot binding is the intended systemic fix.
+
+**HARM.** 2 principles ("Blue Ocean Strategy", "Memory Reconstruction Bias") will be absent from S5/S6. Low severity (2 records) but a silent-drop failure mode the D-2817 gate does not catch because the gate only sums on_disk + declared and cannot see a phantom that is in neither.
+
+**REMEDY (owner-gated).** (a) after D-2818 lands, re-run `--cluster 3776,26074` delta-merge to recover the 2 FBs; (b) extend the D-2496 preflight to assert `expected == on_disk + declared + dedup` so a phantom is loud instead of silent; (c) confirm the D2424 reconstruction never marks a cluster processed whose FB is absent from the reloaded checkpoint.

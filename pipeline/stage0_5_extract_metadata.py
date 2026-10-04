@@ -41,7 +41,7 @@ from pipeline.io_guard import safe_write_jsonl  # D2487: atomic JSONL writes
 
 from pipeline.omlx_call import call_omlx_json
 from pipeline.pipeline_paths import BOOKS_DIR, CHECKPOINT_DIR
-from pipeline.stamp import get_pipeline_commit, stamp_record
+from pipeline.stamp import check_stage_code_fingerprint, get_pipeline_commit, stamp_record, write_stage_code_fingerprint
 
 # ── Constants ──────────────────────────────────────────────────────────────
 METADATA_CACHE: str = "book_metadata.jsonl"
@@ -282,6 +282,9 @@ def run_stage0_5(model: str = DEFAULT_MODEL, force: bool = False, book_limit: in
         book_limit: Max books to process (reads MAXWELL_BOOK_LIMIT env if None).
     """
     cache_path: Path = CHECKPOINT_DIR / METADATA_CACHE
+    if not force:
+        # BUG-614: refuse to resume a cache produced by a different code version.
+        check_stage_code_fingerprint(cache_path, "stage0_5")
     cache: dict[str, dict] = load_cache(cache_path)
 
     # Resolve book limit from env if not explicitly set
@@ -399,6 +402,7 @@ def run_stage0_5(model: str = DEFAULT_MODEL, force: bool = False, book_limit: in
     records.sort(key=lambda r: r["source_book"])
 
     safe_write_jsonl(cache_path, records, force_shrink=True)  # D2487: atomic + fail-loud
+    write_stage_code_fingerprint(cache_path, "stage0_5")  # BUG-614: bind cache to producing code
 
     print(f"\n{'='*60}")
     print(f"📊 RESULTS: {len(md_files)} files")

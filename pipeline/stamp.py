@@ -20,8 +20,10 @@ Usage:
 
 import hashlib
 import json
+import os
 import subprocess
 import sys
+import tempfile
 import uuid
 from datetime import UTC, datetime
 from functools import wraps
@@ -214,3 +216,116 @@ def make_hash_id(*fields: str) -> str:
     """
     combined = "|".join(fields)
     return hashlib.sha256(combined.encode("utf-8")).hexdigest()
+
+
+# ── BUG-614 (D-2801/D-2805): config-owned stage code fingerprints ──────────
+# The pipeline/** lock was re-scoped from an edit-prohibition (will_not_touch) to an
+# accountability gate: R5 generator!=verifier review + D-naming + a stage code
+# fingerprint. This gate replaces the stale edit prohibition with a mechanism — the
+# checkpoint a stage writes is bound to the byte content of the code that produced it,
+# so an uncommitted (or committed) edit invalidates a stale resume fail-closed.
+# The file list is config-owned (C12: ``{stage_key}.fingerprint_files``), mirroring the
+# stage5_verify.py pattern (D-330/BUG-362). An empty/missing list is refused (C16).
+
+_STAGE_CFG: dict | None = None
+
+
+def _stage_config() -> dict:
+    """Load config/pipeline_config.yaml once per process (memoized), mirroring _load_manifest."""
+    global _STAGE_CFG
+    if _STAGE_CFG is None:
+        import yaml as _yaml
+        _cfg_path = Path(__file__).resolve().parent.parent / "config" / "pipeline_config.yaml"
+        with open(_cfg_path, encoding="utf-8") as _f:
+            _STAGE_CFG = _yaml.safe_load(_f) or {}
+    return _STAGE_CFG
+
+
+def stage_code_fingerprint(stage_key: str) -> str:
+    """BUG-614: content-hash a pipeline stage's producing code (config-owned file list).
+
+    The file list lives in ``config/pipeline_config.yaml`` under
+    ``{stage_key}.fingerprint_files`` (C12). An empty/missing list is refused (C16,
+    fail-closed): fingerprinting nothing would silently accept ANY code. Returns a
+    16-hex SHA-256 prefix over the sorted file list's byte content.
+    """
+    stage_cfg = _stage_config().get(stage_key) or {}
+    files = list(stage_cfg.get("fingerprint_files") or [])
+    if not files:
+        raise RuntimeError(
+            f"{stage_key}.fingerprint_files is empty — refusing to fingerprint nothing (C16)"
+        )
+    root = Path(__file__).resolve().parent.parent
+    h = hashlib.sha256()
+    for rel in sorted(files):
+        f = root / rel
+        if not f.exists():
+            raise RuntimeError(f"{stage_key}.fingerprint_files entry missing: {rel} (C16)")
+        h.update(rel.encode())
+        h.update(b"\0")
+        h.update(f.read_bytes())
+        h.update(b"\0")
+    return h.hexdigest()[:16]
+
+
+def stage_code_fingerprint_path(checkpoint_path) -> Path:
+    """The sidecar path that stores a checkpoint's producing-code fingerprint."""
+    return Path(str(checkpoint_path) + ".code_fingerprint")
+
+
+def write_stage_code_fingerprint(checkpoint_path, stage_key: str) -> str:
+    """Persist the current code fingerprint beside ``checkpoint_path`` (crash-safe, C6).
+
+    Returns the persisted fingerprint id. Written via tempfile + fsync + os.replace so a
+    crash never leaves a truncated sidecar that would spuriously fail a later resume.
+    """
+    fp = stage_code_fingerprint(stage_key)
+    sidecar = stage_code_fingerprint_path(checkpoint_path)
+    sidecar.parent.mkdir(parents=True, exist_ok=True)
+    payload = json.dumps({"fingerprint_id": fp, "stage_key": stage_key}, sort_keys=True)
+    fd, tmp = tempfile.mkstemp(dir=str(sidecar.parent), prefix=sidecar.name + ".", suffix=".tmp")
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as fh:
+            fh.write(payload + "\n")
+            fh.flush()
+            os.fsync(fh.fileno())
+        os.replace(tmp, sidecar)
+    except BaseException:
+        try:
+            os.unlink(tmp)
+        except OSError:
+            pass
+        raise
+    return fp
+
+
+def read_stage_code_fingerprint(checkpoint_path) -> str | None:
+    """Return the stored code fingerprint id, or None when absent/unreadable."""
+    sidecar = stage_code_fingerprint_path(checkpoint_path)
+    if not sidecar.exists():
+        return None
+    try:
+        return (json.loads(sidecar.read_text(encoding="utf-8")) or {}).get("fingerprint_id")
+    except Exception:
+        return None
+
+
+def check_stage_code_fingerprint(checkpoint_path, stage_key: str) -> None:
+    """BUG-614: refuse to resume a checkpoint whose producing code has drifted.
+
+    Fail-closed ONLY on a mismatch — a stored fingerprint that no longer equals the
+    current code. A checkpoint with NO sidecar (legacy, pre-BUG-614) is allowed to
+    resume unchanged: the mechanism is introduced incrementally without forcing a
+    re-run of every legacy checkpoint.
+    """
+    stored = read_stage_code_fingerprint(checkpoint_path)
+    if stored is None:
+        return
+    current = stage_code_fingerprint(stage_key)
+    if stored != current:
+        raise RuntimeError(
+            f"{stage_key} code fingerprint mismatch for {checkpoint_path}: "
+            f"stored {stored} != current {current} — the producing code changed since "
+            f"this checkpoint was written; re-run the stage (or --force) rather than "
+            f"silently resuming a stale checkpoint (BUG-614/C16)"
+        )

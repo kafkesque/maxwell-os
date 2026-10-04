@@ -37,7 +37,7 @@ from pipeline.pipeline_paths import (
     STAGE0_CHECKPOINT,
     STAGE1_CHECKPOINT,
 )
-from pipeline.stamp import get_pipeline_commit, make_hash_id, stamp_record
+from pipeline.stamp import get_pipeline_commit, make_hash_id, stamp_record, write_stage_code_fingerprint
 from pipeline.text_cleaner import clean_markdown, normalize_paragraphs
 
 # ── Constants (T1.1: de-hardcoded — sourced from pipeline_config.yaml) ────
@@ -283,6 +283,7 @@ def run_stage1(chunk_size: int = CHUNK_SIZE_WORDS,
         STAGE1_CHECKPOINT,
         "\n".join(json.dumps(s, ensure_ascii=False) for s in all_segments) + "\n",
     )
+    write_stage_code_fingerprint(STAGE1_CHECKPOINT, "stage1")  # BUG-614: bind checkpoint to producing code
 
     # Summary
     unique_hashes = len(set(s["segment_id"] for s in all_segments))

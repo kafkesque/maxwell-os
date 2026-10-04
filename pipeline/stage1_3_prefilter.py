@@ -241,6 +241,10 @@ def run_prefilter(in_place: bool = False, min_len: int = None,
         "dropped": len(dropped),
     }) + "\n")
 
+    # BUG-614: bind the prefilter completion flag to the code that produced it.
+    from pipeline.stamp import write_stage_code_fingerprint
+    write_stage_code_fingerprint(flag_path, "stage1_3")
+
     if not in_place:
         print("\n   ℹ️  Dry run. Use --in-place to actually filter.")
         print(f"   ℹ️  This would save ~{drop_pct:.0f}% of S2 LLM calls.")

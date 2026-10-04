@@ -232,12 +232,30 @@ stage1_5:
   embed_batch_size: 64
   max_embed_drop_rate: 0.005
   embed_checkpoint_enabled: true
+  fingerprint_files:
+    - pipeline/stage1_5_embed_cluster.py
+    - pipeline/io_guard.py
 stage0:
   max_failed_ratio: 0.0
+  fingerprint_files:
+    - pipeline/stage0_convert.py
+    - pipeline/io_guard.py
+stage0_5:
+  fingerprint_files:
+    - pipeline/stage0_5_extract_metadata.py
+    - pipeline/io_guard.py
+stage1:
+  fingerprint_files:
+    - pipeline/stage1_chunk.py
+    - pipeline/text_cleaner.py
+    - pipeline/io_guard.py
 stage1_3:
   min_len: 40
   cite_density: 0.6
   enabled: true
+  fingerprint_files:
+    - pipeline/stage1_3_prefilter.py
+    - pipeline/io_guard.py
   drop_patterns_extra:
   - author and publisher have provided this e-book
   - personal use only
@@ -301,6 +319,9 @@ stage2:
   relabel_judge_min_content_chars: 2
   relabel_apply_reasoning_off_prefix: true
   relabel_report_dir: governance
+  fingerprint_files:
+    - pipeline/stage2_extract.py
+    - pipeline/io_guard.py
 watchdog:
   interval_secs: 60
   stall_checks: 3

@@ -71,7 +71,7 @@ from pipeline.pipeline_paths import (
     STAGE1_CHECKPOINT,
     get_run_id,
 )
-from pipeline.stamp import get_pipeline_commit, stamp_record
+from pipeline.stamp import check_stage_code_fingerprint, get_pipeline_commit, stamp_record, write_stage_code_fingerprint
 
 # ── Constants ──────────────────────────────────────────────────────────────
 FAISS_SEED: int = 42
@@ -140,6 +140,7 @@ def _write_embed_state(fp: str, total: int, dim: int, done_batches: set[int]) ->
             "done_batches": sorted(done_batches),
         }),
     )
+    write_stage_code_fingerprint(state_path, "stage1_5")  # BUG-614: bind embed cache to producing code
 
 
 def load_segments() -> list[dict]:
@@ -335,6 +336,8 @@ def embed_segments(segments: list[dict], model: str = S15_EMBED_MODEL) -> tuple[
         cache_dir = _embed_cache_dir()
         state_path = _embed_state_path()
         fp = _segments_fingerprint(segments)
+        # BUG-614: refuse to resume embeddings produced by a different code version.
+        check_stage_code_fingerprint(state_path, "stage1_5")
 
         if state_path.exists():
             try:
@@ -792,6 +795,7 @@ def run_stage1_5(
             STAGE1_5_SINGLETONS,
             "\n".join(json.dumps(s, ensure_ascii=False) for s in singleton_records) + "\n",
         )
+    write_stage_code_fingerprint(STAGE1_5_CHECKPOINT, "stage1_5")  # BUG-614: bind checkpoint to producing code
 
     # D2409: the embedding cache is a regenerable intermediate — drop it once the
     # cluster checkpoint is safely on disk (avoids ~640MB/run of stale-cache bloat).

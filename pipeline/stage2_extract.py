@@ -89,7 +89,7 @@ from pipeline.pipeline_paths import (
     STAGE2_CHECKPOINT,
     STAGE2_PROBE_CACHE,
 )
-from pipeline.stamp import get_pipeline_commit, make_hash_id, stamp_record
+from pipeline.stamp import check_stage_code_fingerprint, get_pipeline_commit, make_hash_id, stamp_record, write_stage_code_fingerprint
 from pipeline.content_types import (  # D2323: config-first enum source (C12)
     CONTENT_TYPES,
     EXTRACTION_TYPES,
@@ -2260,6 +2260,8 @@ def run_stage2(
     segids_file: str = str(STAGE2_CHECKPOINT) + ".segids"
     gated_ids_file: str = str(STAGE2_CHECKPOINT) + ".gated_ids"
     if STAGE2_CHECKPOINT.exists() and os.path.exists(segids_file):
+        # BUG-614: refuse to resume a checkpoint produced by a different code version.
+        check_stage_code_fingerprint(STAGE2_CHECKPOINT, "stage2")
         try:
             # D2332: fail-closed JSONL read — a pretty-printed/multi-line checkpoint
             # must raise (caught below → fresh start), never silently subset-parse.
@@ -2736,6 +2738,7 @@ def run_stage2(
 
     # Write final checkpoint (BUG-106: self-verifying JSONL)
     _write_checkpoint_jsonl(STAGE2_CHECKPOINT, all_fbs)
+    write_stage_code_fingerprint(STAGE2_CHECKPOINT, "stage2")  # BUG-614: bind checkpoint to producing code
     # D2421: final atomic write of gated IDs (incremental write fires only every 5 clusters).
     import tempfile as _tmp_final
     try:

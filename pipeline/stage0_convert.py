@@ -36,7 +36,7 @@ from pipeline.pipeline_paths import (
     SMOKE_BOOK_LIMIT,
     STAGE0_CHECKPOINT,
 )
-from pipeline.stamp import get_pipeline_commit, stamp_record
+from pipeline.stamp import check_stage_code_fingerprint, get_pipeline_commit, stamp_record, write_stage_code_fingerprint
 from pipeline.text_cleaner import check_conversion_quality
 
 # ── Constants ──────────────────────────────────────────────────────────────
@@ -228,6 +228,9 @@ def run_stage0(
     if limit is not None and limit > 0 and not force:
         existing = {}  # Fresh checkpoint for limited runs
     else:
+        if not force:
+            # BUG-614: refuse to resume a checkpoint produced by a different code version.
+            check_stage_code_fingerprint(STAGE0_CHECKPOINT, "stage0")
         existing = load_existing_checkpoint() if not force else {}
     converted = []
     failed = []
@@ -334,6 +337,7 @@ def run_stage0(
         STAGE0_CHECKPOINT,
         "\n".join(json.dumps(r, ensure_ascii=False) for r in all_records) + "\n",
     )
+    write_stage_code_fingerprint(STAGE0_CHECKPOINT, "stage0")  # BUG-614: bind checkpoint to producing code
 
     # Summary
     print(f"\n{'=' * 60}")

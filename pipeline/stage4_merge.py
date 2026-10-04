@@ -112,6 +112,7 @@ from pipeline.closed_menu import menu_hash as _closed_menu_hash  # R1/D-279: men
 from pipeline.stage4_merged_call import (
     BATCH_SIZE_DEFAULT,
     SparseClassificationError,  # D2357: fail-closed semantic validation (all classification paths)
+    VALID_DEPTHS,  # BUG-635: salvage discriminator (empty-domains fallback)
     batch_depth_classify,  # D2477: batch the focused depth call (quality-neutral)
     batch_cribs_classify,
     classify_depth_focused,
@@ -1824,6 +1825,33 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
                 fb_data["_merged_classification"] = merged_result
                 _log_cribs_warnings(fb_data)
                 print("⚡merged", flush=True, end=" ")
+            except SparseClassificationError as e:
+                # BUG-635: the merged call LOST its partial result on sparse
+                # classification. Distinguish the deterministic empty-domains failure
+                # (valid application + discipline, only domains empty) from a genuine
+                # short application. Salvage the former instead of quarantining it as
+                # "empty application" (the old misleading D2371 message).
+                partial = getattr(e, "partial", {}) or {}
+                _app = str(partial.get("application") or "").strip()
+                _disc = str(partial.get("discipline") or "").strip()
+                _doms = partial.get("domains")
+                _doms_ok = (isinstance(_doms, list) and _doms
+                            and any(isinstance(d, str) and d.strip() for d in _doms))
+                if (len(_app) >= 10 and _disc and not _doms_ok
+                        and partial.get("depth") in VALID_DEPTHS
+                        and partial.get("evidence") in ("cited", "axiomatic")):
+                    for field in ("application", "failure_mode", "elaboration",
+                                  "keywords", "jargon"):
+                        if partial.get(field):
+                            fb_data[field] = partial[field]
+                    partial["domains"] = ["emerging"]
+                    fb_data["_merged_classification"] = partial
+                    fb_data["enrichment_status"] = "SALVAGED_EMPTY_DOMAINS"
+                    print("⚡merged-salvaged", flush=True, end=" ")
+                else:
+                    fb_data["enrichment_status"] = "FAILED"
+                    fb_data["enrichment_error"] = f"merged_call: {e}"[:200]
+                    print("⚠️merged", flush=True, end=" ")
             except Exception as e:
                 fb_data["enrichment_status"] = "FAILED"
                 fb_data["enrichment_error"] = f"merged_call: {e}"[:200]

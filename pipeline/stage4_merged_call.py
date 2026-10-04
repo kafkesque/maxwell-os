@@ -336,7 +336,8 @@ def merged_cribs_classify(
     app = result.get("application")
     if not isinstance(app, str) or len(app.strip()) < 10:
         raise SparseClassificationError(
-            f"merged: application missing/too short ({len(str(app))} chars < 10)"
+            f"merged: application missing/too short ({len(str(app))} chars < 10)",
+            partial=result,
         )
 
     # Semantic classification fields — FAIL-CLOSED: a sparse model response must
@@ -582,6 +583,13 @@ class SparseClassificationError(RuntimeError):
     — otherwise `max_failed_ratio: 0.0` cannot catch it.
     """
 
+    def __init__(self, message: str, partial: dict | None = None) -> None:
+        super().__init__(message)
+        # BUG-635: carry the (valid) partial model result so the caller can salvage
+        # what IS present (e.g. application + discipline) instead of losing it when
+        # only ONE semantic field (domains) is empty.
+        self.partial: dict = partial or {}
+
 
 def _validate_semantic_classification(result: dict, source: str) -> None:
     """Fail-closed validation of the four semantic classification fields (C16/D2355).
@@ -601,20 +609,20 @@ def _validate_semantic_classification(result: dict, source: str) -> None:
     """
     discipline = result.get("discipline")
     if not isinstance(discipline, str) or not discipline.strip():
-        raise SparseClassificationError(f"{source}: empty/missing discipline")
+        raise SparseClassificationError(f"{source}: empty/missing discipline", partial=result)
 
     domains = result.get("domains")
     if (not isinstance(domains, list) or not domains
             or not any(isinstance(d, str) and d.strip() for d in domains)):
-        raise SparseClassificationError(f"{source}: empty/missing domains")
+        raise SparseClassificationError(f"{source}: empty/missing domains", partial=result)
 
     depth = result.get("depth")
     if depth not in VALID_DEPTHS:
-        raise SparseClassificationError(f"{source}: invalid/missing depth={depth!r}")
+        raise SparseClassificationError(f"{source}: invalid/missing depth={depth!r}", partial=result)
 
     evidence = result.get("evidence")
     if evidence not in ("cited", "axiomatic"):
-        raise SparseClassificationError(f"{source}: invalid/missing evidence={evidence!r}")
+        raise SparseClassificationError(f"{source}: invalid/missing evidence={evidence!r}", partial=result)
 
 
 # ── D2265: Batch CRIBS + Classification ──────────────────────────────────────
@@ -807,7 +815,8 @@ def batch_cribs_classify(
         if not isinstance(app, str) or len(app.strip()) < 10:
             raise SparseClassificationError(
                 f"batch fb_index={i}: application missing/too short "
-                f"({len(str(app))} chars < 10)"
+                f"({len(str(app))} chars < 10)",
+                partial=entry,
             )
 
         # Clean up jargon

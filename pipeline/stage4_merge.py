@@ -1531,6 +1531,7 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
     tool_instructions = []   # D2072: tool-specific commands
     quarantined = []         # D2616 Phase 0 (BUG-148): missing-content_type → quarantine (HOLD, never principle)
     failed = 0  # D2370: failed clusters are NOT marked processed → retried on resume (re-counted, not restored)
+    failed_cluster_ids: list[dict] = []  # D-2817 Gate B(c): {cluster_id, reason} receipt for each failed cluster
     # D2404: classification failures are now retried on resume (like `failed`) — re-count per run
     classification_errors = 0
     name_collisions = int(_scalar_state.get("name_collisions", 0))
@@ -1866,6 +1867,7 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
         if not isinstance(fb_data, dict):
             print("→ ⚠️  Non-dict response, skipping")
             failed += 1
+            failed_cluster_ids.append({"cluster_id": cluster_id, "reason": "non_dict_response"})
             continue
 
         name = fb_data.get("name", "").strip()
@@ -1873,6 +1875,7 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
         if not name or not definition or len(definition) < 20:
             print(f"→ ⚠️  Incomplete FB (name={bool(name)}, def_len={len(definition)})")
             failed += 1
+            failed_cluster_ids.append({"cluster_id": cluster_id, "reason": "incomplete_fb"})
             continue
 
         # D2371: application is REQUIRED (schemas.FB.application, min_length=10).
@@ -1884,6 +1887,7 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
         if len(_app) < 10:
             print(f"→ ❌ Empty/short application ({len(_app)} chars < 10) — FB QUARANTINED (D2371)")
             failed += 1
+            failed_cluster_ids.append({"cluster_id": cluster_id, "reason": "empty_application"})
             continue
 
         # D2488: failure_mode is REQUIRED for every principle (schemas.FB.failure_mode,
@@ -1894,6 +1898,7 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
         if len(_fm) < 10:
             print(f"→ ❌ Empty/short failure_mode ({len(_fm)} chars < 10) — FB QUARANTINED (D2488)")
             failed += 1
+            failed_cluster_ids.append({"cluster_id": cluster_id, "reason": "empty_failure_mode"})
             continue
 
         # Phase 2: TWO-STAGE classification (D2138) + semantic depth (D2220)
@@ -2235,6 +2240,7 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
         if not fb_id_val:
             print(f"→ ❌ FB missing fb_id (name={name!r}) — QUARANTINED (D2350 invariant)")
             failed += 1
+            failed_cluster_ids.append({"cluster_id": cluster_id, "reason": "missing_fb_id"})
             continue
 
         fb = {
@@ -2400,6 +2406,7 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
         "s2_input_fingerprint": _S2_INPUT_FINGERPRINT,
         "pipeline_run_id": pipeline_run_id,
         "declared_failed_count": failed,
+        "failed_cluster_ids": failed_cluster_ids,
         "written_at": time.time(),
     }, indent=2))
 

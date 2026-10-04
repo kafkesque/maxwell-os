@@ -106,7 +106,7 @@ def write_manifest(path: Path) -> int:
     return 0
 
 
-def check(path: Path, expect_count: int | None, declared_failed: int = 0) -> int:
+def check(path: Path, expect_count: int | None, declared_failed: int = 0, failed_cluster_ids: list | None = None) -> int:
     """Verify boundary, then sha256 + record count against manifest / --expect-count."""
     if not path.exists():
         print(f"❌ Checkpoint not found: {path}")
@@ -142,6 +142,27 @@ def check(path: Path, expect_count: int | None, declared_failed: int = 0) -> int
     # manifest (the manifest record_count is written by the SAME writer that wrote
     # the checkpoint, so it cannot catch a silent record DROP). --expect-count is an
     # S2-derived authoritative total that a drop would violate.
+    # D-2817 Gate B(c): disjointness — a cluster declared failed must NOT appear in
+    # any checkpoint FB's source_clusters (a cluster cannot both fail AND emit an FB).
+    if failed_cluster_ids:
+        failed_ids = {str(x.get("cluster_id")) for x in failed_cluster_ids}
+        seen: set[str] = set()
+        with open(path, encoding="utf-8") as _fh:
+            for _line in _fh:
+                _line = _line.strip()
+                if not _line:
+                    continue
+                try:
+                    _rec = json.loads(_line)
+                except Exception:
+                    continue
+                for _sc in (_rec.get("source_clusters") or []):
+                    seen.add(str(_sc))
+        _overlap = failed_ids & seen
+        if _overlap:
+            print(f"❌ DISJOINTNESS VIOLATION: {len(_overlap)} failed clusters present in checkpoint source_clusters: {sorted(_overlap)}")
+            return 1
+        print(f"✅ Disjointness OK: {len(failed_ids)} failed clusters absent from {len(seen)} checkpoint source_clusters")
     if expect_count is not None:
         effective = count + declared_failed
         if effective != expect_count:
@@ -165,12 +186,15 @@ def main() -> int:
     parser.add_argument("--expect-count", type=int, default=None, help="Expected record count (no manifest fallback)")
     parser.add_argument("--declared-failed", type=int, default=0,
                         help="Declared failed/quarantined cluster count (D-2817): on_disk + declared == expected")
+    parser.add_argument("--failed-cluster-ids", type=str, default=None,
+                        help="JSON list of {cluster_id, reason} receipts (D-2817 Gate B(c)); disjointness-checked against checkpoint source_clusters")
     args = parser.parse_args()
 
     path = Path(args.path)
     if args.write_manifest:
         return write_manifest(path)
-    return check(path, args.expect_count, args.declared_failed)
+    _fcids = json.loads(args.failed_cluster_ids) if args.failed_cluster_ids else None
+    return check(path, args.expect_count, args.declared_failed, _fcids)
 
 
 if __name__ == "__main__":

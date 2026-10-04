@@ -351,6 +351,20 @@ def _load_expected_fb_count(source: Path) -> int | None:
     return None
 
 
+def _load_failed_cluster_ids(source: Path) -> list[dict]:
+    """D-2817 Gate B(c): read the failed-cluster receipt S4 persisted (legacy -> empty)."""
+    candidates = [Path(str(source) + ".expected_count.json")]
+    if source != STAGE4_CHECKPOINT:
+        candidates.append(Path(str(STAGE4_CHECKPOINT) + ".expected_count.json"))
+    for c in candidates:
+        if c.exists():
+            try:
+                return json.loads(c.read_text(encoding="utf-8")).get("failed_cluster_ids") or []
+            except Exception:
+                continue
+    return []
+
+
 def _load_declared_failed_count(source: Path) -> int:
     """D-2817: read the declared failed/quarantined cluster count S4 persisted."""
     candidates = [Path(str(source) + ".expected_count.json")]
@@ -383,6 +397,9 @@ def _preflight_gate(source: Path) -> None:
     declared_failed: int = _load_declared_failed_count(source)
     if declared_failed:
         cmd += ["--declared-failed", str(declared_failed)]
+    failed_cluster_ids: list[dict] = _load_failed_cluster_ids(source)
+    if failed_cluster_ids:
+        cmd += ["--failed-cluster-ids", json.dumps(failed_cluster_ids)]
     r = subprocess.run(cmd, capture_output=True, text=True)
     if r.returncode != 0:
         print(f"🛑 Preflight checkpoint gate FAILED for {source.name}:")

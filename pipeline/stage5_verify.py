@@ -350,6 +350,20 @@ def _load_expected_fb_count(source: Path) -> int | None:
     return None
 
 
+def _load_declared_failed_count(source: Path) -> int:
+    """D-2817: read the declared failed/quarantined cluster count S4 persisted."""
+    candidates = [Path(str(source) + ".expected_count.json")]
+    if source != STAGE4_CHECKPOINT:
+        candidates.append(Path(str(STAGE4_CHECKPOINT) + ".expected_count.json"))
+    for c in candidates:
+        if c.exists():
+            try:
+                return int(json.loads(c.read_text(encoding="utf-8")).get("declared_failed_count") or 0)
+            except Exception:
+                continue
+    return 0
+
+
 def _preflight_gate(source: Path) -> None:
     """D2490: BUG-188 checkpoint boundary + sha256 gate before S5 consumes S4.
 
@@ -365,6 +379,9 @@ def _preflight_gate(source: Path) -> None:
     expected_count: int | None = _load_expected_fb_count(source)
     if expected_count is not None:
         cmd += ["--expect-count", str(expected_count)]
+    declared_failed: int = _load_declared_failed_count(source)
+    if declared_failed:
+        cmd += ["--declared-failed", str(declared_failed)]
     r = subprocess.run(cmd, capture_output=True, text=True)
     if r.returncode != 0:
         print(f"🛑 Preflight checkpoint gate FAILED for {source.name}:")

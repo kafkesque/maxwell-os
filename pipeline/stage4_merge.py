@@ -2386,6 +2386,7 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
         "expected_fb_count": expected_fb_count,
         "s2_input_fingerprint": _S2_INPUT_FINGERPRINT,
         "pipeline_run_id": pipeline_run_id,
+        "declared_failed_count": failed,
         "written_at": time.time(),
     }, indent=2))
 

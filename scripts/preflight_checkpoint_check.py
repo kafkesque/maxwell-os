@@ -106,7 +106,7 @@ def write_manifest(path: Path) -> int:
     return 0
 
 
-def check(path: Path, expect_count: int | None) -> int:
+def check(path: Path, expect_count: int | None, declared_failed: int = 0) -> int:
     """Verify boundary, then sha256 + record count against manifest / --expect-count."""
     if not path.exists():
         print(f"❌ Checkpoint not found: {path}")
@@ -143,10 +143,16 @@ def check(path: Path, expect_count: int | None) -> int:
     # the checkpoint, so it cannot catch a silent record DROP). --expect-count is an
     # S2-derived authoritative total that a drop would violate.
     if expect_count is not None:
-        if expect_count != count:
-            print(f"❌ AUTHORITATIVE COUNT MISMATCH: on-disk {count} vs --expect-count {expect_count}")
+        effective = count + declared_failed
+        if effective != expect_count:
+            print(f"❌ AUTHORITATIVE COUNT MISMATCH: on-disk {count} + declared-failed {declared_failed} "
+                  f"= {effective} vs --expect-count {expect_count}")
             return 1
-        print(f"✅ Authoritative record count matches --expect-count: {count}")
+        if declared_failed:
+            print(f"✅ Authoritative count matches with declared failures: on-disk {count} + "
+                  f"{declared_failed} = {expect_count}")
+        else:
+            print(f"✅ Authoritative record count matches --expect-count: {count}")
     return 0
 
 
@@ -157,12 +163,14 @@ def main() -> int:
     group.add_argument("--check", action="store_true", help="Verify boundary + manifest/sha256/count")
     group.add_argument("--write-manifest", action="store_true", help="Write manifest after a successful run")
     parser.add_argument("--expect-count", type=int, default=None, help="Expected record count (no manifest fallback)")
+    parser.add_argument("--declared-failed", type=int, default=0,
+                        help="Declared failed/quarantined cluster count (D-2817): on_disk + declared == expected")
     args = parser.parse_args()
 
     path = Path(args.path)
     if args.write_manifest:
         return write_manifest(path)
-    return check(path, args.expect_count)
+    return check(path, args.expect_count, args.declared_failed)
 
 
 if __name__ == "__main__":

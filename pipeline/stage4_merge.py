@@ -1480,7 +1480,11 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
             # them (BUG-616) so a reroute-only edit doesn't waste the ~1-2h depth
             # pre-pass (7,149 clusters).
             _saved_stage_fp = _scalar_state.get("stage_code_fingerprint") if isinstance(_scalar_state, dict) else None
-            if (not cluster_ids) and fbs and _saved_stage_fp != _stage_code_fingerprint():
+            # BUG-636: None-guard — a MISSING fingerprint (state.json absent/cleared) must
+            # NOT read as "different stage code". Mirror BUG-183's `and _saved_fp` guard so
+            # a resume with no saved fingerprint falls through to the resume path instead of
+            # "starting fresh" and re-running the whole stage.
+            if (not cluster_ids) and fbs and _saved_stage_fp is not None and _saved_stage_fp != _stage_code_fingerprint():
                 print(f"   ⚠️  S4 resume STAGE-CODE mismatch — checkpoint was written by different stage code "
                       f"(saved {_saved_stage_fp!r} != current {_stage_code_fingerprint()!r})")
                 print("   ⚠️  Starting fresh — stale S4 output discarded (BUG-614); depth/cribs sidecars PRESERVED (BUG-616)")
@@ -2390,11 +2394,11 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
         "written_at": time.time(),
     }, indent=2))
 
-    # D2370: clear resume sidecars — a completed run must not read as a partial resume
-    for _sidecar in (str(STAGE4_CHECKPOINT) + ".segids", str(STAGE4_CHECKPOINT) + ".state.json",
-                     str(STAGE4_CHECKPOINT) + ".depth.json", str(STAGE4_CHECKPOINT) + ".cribs.json"):
-        if os.path.exists(_sidecar):
-            os.unlink(_sidecar)
+    # D2370: resume-sidecar clear MOVED to after the D2338 fail-closed gate (BUG-636).
+    # A completed run must not read as a partial resume, but the clear must ONLY fire on
+    # clean completion (exit 0). It previously ran here — BEFORE the exit-2 branch — so a
+    # CONDITIONAL_SUCCESS cleared .segids/.state.json before the failure check and a
+    # subsequent resume "started fresh" (BUG-614 None-guard), re-running the whole stage.
 
     # ── D2073: Save growth edges separately ───────────────────────────
     ge_path = STAGE4_CHECKPOINT.parent / S4_GE_OUTPUT
@@ -2524,6 +2528,14 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
             print(f"⚠️  Stage 4 CONDITIONAL_SUCCESS: {combined_failures} failure(s) within "
                   f"tolerance ({failure_ratio:.1%} ≤ {S4_MAX_FAILED_RATIO}). Re-run to retry failed clusters.")
             sys.exit(2)  # non-zero → runner does NOT auto-advance to S5
+
+    # D2370: clear resume sidecars — a completed run must not read as a partial resume.
+    # BUG-636: fire ONLY on clean completion. On exit-1/exit-2 the sidecars are PRESERVED
+    # so a retry can resume where it left off instead of starting fresh.
+    for _sidecar in (str(STAGE4_CHECKPOINT) + ".segids", str(STAGE4_CHECKPOINT) + ".state.json",
+                     str(STAGE4_CHECKPOINT) + ".depth.json", str(STAGE4_CHECKPOINT) + ".cribs.json"):
+        if os.path.exists(_sidecar):
+            os.unlink(_sidecar)
 
 
 def main():

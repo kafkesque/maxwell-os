@@ -543,6 +543,8 @@ stage6:
   commit_non_fb_types: true
   okf_export_enabled: true
   max_failed_ratio: 0.0
+  vec_require: true  # D-2727: fail-closed vec0 gate at RATIFY-2 launch (vec0 verified under /opt/homebrew/bin/python3)
+  vec_python: /opt/homebrew/bin/python3
   fingerprint_files:
     - pipeline/stage6_commit.py
     - pipeline/serving_gate.py

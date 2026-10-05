@@ -2459,7 +2459,17 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
             "failed_cluster_ids": _merged_receipt,
             "written_at": time.time(),
         }
-    safe_write(_expected_count_path, json.dumps(_sidecar_payload, indent=2))
+    # BUG-639: a `--cluster` delta merge that RECOVERS a previously-failed cluster
+    # legitimately SHRINKS the sidecar (failed_cluster_ids receipt drops, e.g. 1→0).
+    # The generic shrink guard above (io_guard.safe_write, BUG-487 class) treats any
+    # >10% reduction as a partial-state overwrite and blocks the write, leaving the
+    # sidecar STALE (declares failures already recovered) — which then trips the
+    # preflight on_disk+declared==expected invariant. The delta reconciliation is a
+    # deterministic, verified merge (D-2824/D-2825), so a shrink here is by-design.
+    # The full-run path (`not cluster_ids`) keeps the guard: a shrink there signals a
+    # genuine partial/subset overwrite of the full-corpus sidecar.
+    safe_write(_expected_count_path, json.dumps(_sidecar_payload, indent=2),
+               force_shrink=bool(cluster_ids))
 
     # D2370: resume-sidecar clear MOVED to after the D2338 fail-closed gate (BUG-636).
     # A completed run must not read as a partial resume, but the clear must ONLY fire on

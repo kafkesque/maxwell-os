@@ -301,7 +301,7 @@ current_state:
   - G13
   registry:
     decisions: 955
-    highest_bug: BUG-637
+    highest_bug: BUG-636
     buglog_entries: 377
   do_not:
   - relabel the corpus
@@ -319,4 +319,4 @@ current_state:
   - the F-14 pocket retarget (statistically null - BUG-296)
   - any PASS-only frame as an epistemic frame (it is a ROLE frame)
   - the golden retrieval set as ground truth (ids chosen from live search output)
-open_bugs_n: 139
+open_bugs_n: 138

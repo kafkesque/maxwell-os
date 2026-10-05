@@ -8731,7 +8731,7 @@ A re-run cannot clear it: the 4 failures are deterministic (`GEN skipped (single
 **WORKAROUND APPLIED NOW (no code change):** recreated `checkpoint.jsonl.state.json` with `stage_code_fingerprint=b6c9c20776a040fe`, `s2_input_fingerprint=b284199758628beb`, `record_count=6587`, `name_collisions=12`, `classification_errors=0` — the exact values `_write_s4_checkpoint` would have persisted. With it present, all three resume guards pass and only the 4 unprocessed clusters retry.
 
 
-## BUG-637 (OPEN, 2026-10-04) — 2 phantom principle FBs silently absent from S4 output (resume processed_ids bookkeeping)
+## BUG-637 (CLOSED, 2026-10-05) — 2 phantom principle FBs silently absent from S4 output (resume processed_ids bookkeeping) — CLOSED by D-2824 dedup-accept: clusters 3776/26074 are dedup near-duplicates (disposition, not a silent drop)
 
 **DISCOVERED** during the D-2496/D-2817 count reconciliation forensic audit before S5. Full S2→S4 accounting: S2 checkpoint 8,217 records = 8,212 unique fb_ids + 5 cross-cluster duplicate copies (BUG-615 dedup). S4 on-disk = 8,207 unique fb_ids. S2−S4 = 5 missing, of which 3 are the declared-failed clusters (cluster_40300 "Quasi-Objects and Quasi-Minds", cluster_26828 "Plural Realities Hypothesis", cluster_28517 "Planck's Constant Derivation") and **2 are phantom**: cluster_3776 "Blue Ocean Strategy" (fb_id 339041cf564f) and cluster_26074 "Memory Reconstruction Bias" (fb_id 91c455940966).
 

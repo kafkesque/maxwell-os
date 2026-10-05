@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**139 open** / 238 closed of 377 ids.
+**138 open** / 239 closed of 377 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -145,4 +145,3 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-632 | (OPEN, 2026-10-04) — the D2496 "authoritative expected FB count" gate CANNOT DISTINGUISH a DECLARED failure from a SILENT drop, so S5 and S6 | 1 |
 | BUG-635 | (OPEN, 2026-10-04) — merged-call sparse classification is quarantined under D2371 as "empty application", masking the true failure and dropp | 1 |
 | BUG-636 | (OPEN, 2026-10-04) — S4 exit-2 clears the resume sidecars before the failure check, so the documented "re-run to retry failed clusters" inst | 1 |
-| BUG-637 | (OPEN, 2026-10-04) — 2 phantom principle FBs silently absent from S4 output (resume processed_ids bookkeeping) | 1 |

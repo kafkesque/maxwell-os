@@ -3,8 +3,8 @@
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
   "total_ids": 377,
-  "open_n": 139,
-  "closed_n": 238,
+  "open_n": 138,
+  "closed_n": 239,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -697,11 +697,6 @@
       "id": "BUG-636",
       "title": "(OPEN, 2026-10-04) \u2014 S4 exit-2 clears the resume sidecars before the failure check, so the documented \"re-run to retry failed clusters\" inst",
       "events": 1
-    },
-    {
-      "id": "BUG-637",
-      "title": "(OPEN, 2026-10-04) \u2014 2 phantom principle FBs silently absent from S4 output (resume processed_ids bookkeeping)",
-      "events": 1
     }
   ],
   "closed": [
@@ -942,6 +937,7 @@
     "BUG-627",
     "BUG-633",
     "BUG-634",
+    "BUG-637",
     "BUG-639"
   ]
 }

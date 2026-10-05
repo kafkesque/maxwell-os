@@ -24,8 +24,10 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import subprocess
 import sys
+import tempfile
 from datetime import datetime, timezone
 import pathlib
 import re
@@ -33,6 +35,7 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[2]
 OUT = REPO / "governance" / "METRICS.jsonl"
+FLOOR_PATH = REPO / "governance" / "METRICS.jsonl.floor"
 FLOORS = REPO / "config" / "evidence_floors.yaml"
 DOMAINS = REPO / "config" / "resolution_domains.yaml"
 REQUIRED = ("name", "value", "population", "denominator", "ruler_sha", "code_sha", "stamp")
@@ -305,6 +308,59 @@ def code_sha() -> str:
         return f"no-git ({exc.__class__.__name__})"
 
 
+def _count_records(path: Path) -> int:
+    """Count non-empty records (matches read_metrics' skip-blank semantics)."""
+    if not path.exists():
+        return 0
+    n = 0
+    with path.open("r", encoding="utf-8") as fh:
+        for line in fh:
+            if line.strip():
+                n += 1
+    return n
+
+
+def _read_floor() -> int | None:
+    """Return the recorded record-count floor, or None if never written / corrupt.
+
+    A missing/corrupt floor is NOT evidence of truncation — it is re-established on
+    the next successful append (bootstrap). It disarms the guard for exactly ONE
+    append, never permanently (BUG-638: the floor must not silently accept a shrink).
+    """
+    if not FLOOR_PATH.exists():
+        return None
+    try:
+        return int(json.loads(FLOOR_PATH.read_text(encoding="utf-8")).get("record_count", 0))
+    except (OSError, ValueError, TypeError, json.JSONDecodeError):
+        return None
+
+
+def _write_all(fd: int, data: bytes) -> None:
+    """Loop os.write until all bytes are written (C16 fail-loud; macOS caps a single call)."""
+    view = memoryview(data)
+    written = 0
+    while written < len(view):
+        n = os.write(fd, view[written:])
+        if n <= 0:
+            raise OSError(f"os.write stalled after {written}/{len(view)} bytes")
+        written += n
+
+
+def _write_floor(count: int) -> None:
+    """Crash-safe floor write (tempfile → fsync → os.replace, C6)."""
+    fd, tmp = tempfile.mkstemp(dir=str(FLOOR_PATH.parent), prefix=".metrics.floor.", suffix=".tmp")
+    try:
+        payload = json.dumps({
+            "record_count": int(count),
+            "written_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        }, sort_keys=True)
+        _write_all(fd, payload.encode("utf-8"))
+        os.fsync(fd)
+    finally:
+        os.close(fd)
+    os.replace(tmp, FLOOR_PATH)
+
+
 def emit_metric(name: str, value: float, *, population: str, denominator: int, ruler: str,
                 ci: tuple[float, float] | None = None, note: str = "",
                 domain: dict | None = None) -> dict:
@@ -335,8 +391,20 @@ def emit_metric(name: str, value: float, *, population: str, denominator: int, r
            "ci": list(ci) if ci else None, "note": note, "domain": domain,
            "stamp": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")}
     OUT.parent.mkdir(parents=True, exist_ok=True)
+    # BUG-638: shrink-only floor guard. An append-only journal can only GROW; a
+    # record-count floor recorded on the prior append makes a silent truncation
+    # (the 817->70 loss) loud. Fail-closed BEFORE appending onto a truncated journal.
+    _floor = _read_floor()
+    _current = _count_records(OUT)
+    if _floor is not None and _current < _floor:
+        raise SystemExit(
+            f"FAIL-CLOSED (BUG-638): {OUT.name} SHRANK {_floor} -> {_current} records — "
+            f"append-only journal truncated. Restore from backup before re-emitting.")
     with OUT.open("a", encoding="utf-8") as fh:
         fh.write(json.dumps(rec, sort_keys=True) + "\n")
+        fh.flush()
+        os.fsync(fh.fileno())  # C6: durable append, not left in the OS buffer
+    _write_floor(_current + 1)
     return rec
 
 

@@ -92,6 +92,7 @@ governance/nli_label_audit.checkpoint.jsonl
 # Joint-vote runtime logs + backups + embedding cache (regenerable / redundant)
 governance/joint_vote_*.log
 governance/backups/
+governance/METRICS.jsonl.floor
 governance/.taxonomy_emb_v5.npz
 
 # S2 contamination audit + test-result artifacts (regenerable diagnostics)
@@ -126,3 +127,8 @@ frozen/
 backups/
 governance/drift_report_2*.json
 governance/bench_preflight_2*.json
+# D-2800 (BUG-563 recurrence, 2026-10-03): ephemeral runtime lock + owner source material.
+# Declared in config/repo_integrity.yaml#worktree.excluded (each with a why); these bytes are the EXCLUSION.
+.pipeline_runner.lock
+governance/*.numbers
+governance/anchor ruler*.csv

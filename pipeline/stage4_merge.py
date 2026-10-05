@@ -2565,11 +2565,16 @@ def main():
     cluster_ids = None
     if args.cluster:
         raw_ids = [c.strip() for c in args.cluster.split(",")]
-        # D2120: Cluster IDs can be hash strings (from Stage 2 FBs) or ints (legacy)
-        try:
-            cluster_ids = [int(c) for c in raw_ids]
-        except ValueError:
-            cluster_ids = raw_ids
+        # D2120: Cluster IDs can be hash strings (from Stage 2 FBs) or ints (legacy).
+        # BUG-637 (D-2823): S2 `source_cluster` ids are `cluster_N` STRINGS, so a
+        # bare int (`--cluster 3776`) must normalize to `cluster_3776` — else the
+        # delta-merge filters to zero clusters and exits "No clusters found".
+        cluster_ids = []
+        for c in raw_ids:
+            if c.isdigit():
+                cluster_ids.append(f"cluster_{c}")
+            else:
+                cluster_ids.append(c)
 
     only_fb_ids = _load_fb_id_allowlist(args.only_fb_ids) if args.only_fb_ids else None
     run_stage4(cluster_ids=cluster_ids, only_fb_ids=only_fb_ids, depth_only=args.depth_only)

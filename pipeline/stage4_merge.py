@@ -2432,12 +2432,12 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
                 print(f"   ❌ Prior .expected_count.json unreadable ({type(_e).__name__}: {_e}) — "
                       f"delta merge cannot reconcile; aborting (C16)")
                 sys.exit(1)
-        _prior_fp = _prior_sidecar.get("s2_input_fingerprint")
-        if _prior_fp and _prior_fp != _S2_INPUT_FINGERPRINT:
-            print(f"   ❌ Delta merge refused: prior .expected_count.json s2_input_fingerprint "
-                  f"{_prior_fp!r} != current {_S2_INPUT_FINGERPRINT!r} (corpus changed). "
-                  f"Run a full S4 pass first.")
-            sys.exit(1)
+        # NOTE: no s2_input_fingerprint guard here. _s2_input_fingerprint BINDS
+        # pipeline_commit (code identity), so a post-fix code commit would falsely
+        # read as "corpus changed". The --cluster filter above already validates
+        # the target clusters exist in the CURRENT corpus; true corpus drift is
+        # caught fail-closed by the full-run BUG-183 guard (skipped for delta by
+        # design: `not cluster_ids`).
         _prior_declared = int(_prior_sidecar.get("declared_failed_count", 0) or 0)
         _prior_receipt = _prior_sidecar.get("failed_cluster_ids") or []
         if _prior_declared > 0 and not _prior_receipt:

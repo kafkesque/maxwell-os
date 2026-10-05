@@ -1363,6 +1363,14 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
     # singleton FBs. Singleton clusters were loaded but their principle_ids never resolved.
     clusters, principles_idx = load_stage2_fbs_via_clusters(only_fb_ids=only_fb_ids)
 
+    # D2370 + BUG-637 (D-2824/D-2825): capture the FULL-corpus cluster total BEFORE
+    # the --cluster filter (and before D2120 dedup). The D2338 fail-closed gate must
+    # divide failures by the FULL corpus count, not the --cluster delta subset — a
+    # delta recovery (`--cluster ...`) whose targets are receipt-tracked in
+    # failed_cluster_ids (D-2817) must NOT trip the full-run "permanent data loss"
+    # gate just because one target still fails.
+    total_clusters: int = len(clusters)
+
     if cluster_ids:
         clusters = [c for c in clusters if c["cluster_id"] in cluster_ids]
         if not clusters:
@@ -1388,10 +1396,7 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
                 if any(pid in valid_ids for pid in c.get("principle_ids", []))
             ]
 
-    # D2370: capture the pre-resume cluster total BEFORE filtering. The D2338
-    # fail-closed gate must divide failures by the FULL cluster count, not the
-    # remaining-after-resume subset (which would understate the failure ratio).
-    total_clusters: int = len(clusters)
+    # total_clusters is captured BEFORE the --cluster filter (BUG-637, see above).
     # D2496: authoritative expected FB count (S2-derived) — the number of principle
     # clusters S4 MUST turn into FBs. Computed pre-resume (full corpus) so a resume
     # cannot understate the expectation, and INDEPENDENT of the on-disk record_count
@@ -2401,14 +2406,60 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
     # on-disk == S2-derived expectation (catches a silent S4-side record DROP).
     # Written AFTER the checkpoint and NOT deleted below (survives completion).
     _expected_count_path = str(STAGE4_CHECKPOINT) + ".expected_count.json"
-    safe_write(_expected_count_path, json.dumps({
+    _sidecar_payload: dict = {
         "expected_fb_count": expected_fb_count,
         "s2_input_fingerprint": _S2_INPUT_FINGERPRINT,
         "pipeline_run_id": pipeline_run_id,
         "declared_failed_count": failed,
         "failed_cluster_ids": failed_cluster_ids,
         "written_at": time.time(),
-    }, indent=2))
+    }
+    # BUG-637 (D-2824/D-2825): a `--cluster` delta merge must NOT overwrite the
+    # full-corpus sidecar with delta-subset values — expected_fb_count is computed
+    # from the FILTERED subset (above), and `failed` is the delta-subset failure
+    # count. A delta merge must (1) PRESERVE the full-corpus expected_fb_count, and
+    # (2) reconcile the failed_cluster_ids receipt: drop delta targets that
+    # succeeded, retain the ones that still fail, and add this run's fresh failures.
+    # Fail-closed on a legacy (pre-D-2817) sidecar that declares failures without a
+    # receipt — its retained failures cannot be named, so the merge is refused (C16).
+    if cluster_ids:
+        _prior_sidecar: dict = {}
+        if os.path.exists(_expected_count_path):
+            try:
+                with open(_expected_count_path, "r", encoding="utf-8") as _pf:
+                    _prior_sidecar = json.load(_pf)
+            except Exception as _e:
+                print(f"   ❌ Prior .expected_count.json unreadable ({type(_e).__name__}: {_e}) — "
+                      f"delta merge cannot reconcile; aborting (C16)")
+                sys.exit(1)
+        _prior_fp = _prior_sidecar.get("s2_input_fingerprint")
+        if _prior_fp and _prior_fp != _S2_INPUT_FINGERPRINT:
+            print(f"   ❌ Delta merge refused: prior .expected_count.json s2_input_fingerprint "
+                  f"{_prior_fp!r} != current {_S2_INPUT_FINGERPRINT!r} (corpus changed). "
+                  f"Run a full S4 pass first.")
+            sys.exit(1)
+        _prior_declared = int(_prior_sidecar.get("declared_failed_count", 0) or 0)
+        _prior_receipt = _prior_sidecar.get("failed_cluster_ids") or []
+        if _prior_declared > 0 and not _prior_receipt:
+            print(f"   ❌ Delta merge refused: prior .expected_count.json declares {_prior_declared} "
+                  f"failed clusters but carries no failed_cluster_ids receipt (legacy pre-D-2817 "
+                  f"sidecar). Migrate the sidecar first (D-2824/D-2825).")
+            sys.exit(1)
+        _delta_set: set[str] = set(cluster_ids)
+        _retained = [
+            _r for _r in _prior_receipt
+            if (isinstance(_r, dict) and _r.get("cluster_id") not in _delta_set)
+        ]
+        _merged_receipt = _retained + failed_cluster_ids
+        _sidecar_payload = {
+            "expected_fb_count": _prior_sidecar.get("expected_fb_count", expected_fb_count),
+            "s2_input_fingerprint": _S2_INPUT_FINGERPRINT,
+            "pipeline_run_id": pipeline_run_id,
+            "declared_failed_count": len(_merged_receipt),
+            "failed_cluster_ids": _merged_receipt,
+            "written_at": time.time(),
+        }
+    safe_write(_expected_count_path, json.dumps(_sidecar_payload, indent=2))
 
     # D2370: resume-sidecar clear MOVED to after the D2338 fail-closed gate (BUG-636).
     # A completed run must not read as a partial resume, but the clear must ONLY fire on

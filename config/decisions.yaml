@@ -13304,3 +13304,73 @@ decisions:
   bugs: []
   created: '2026-10-04'
   date: '2026-10-04'
+
+- id: D-2822
+  state: PROPOSED
+  category: VERIFICATION / GOVERNANCE
+  title: S5 aggregation gate A(d) — OR-entail across evidence + AND-no-contradiction, then recalibrate the D-2298 NLI threshold against the aggregation semantics
+  decision: >
+    Gate A(d) for stage5_verify.py: a convergent FB is VERIFIED only when the evidence set OR-entails the
+    claim (at least one passage entailed by DeBERTa NLI) AND no passage contradicts it (AND-no-contra). The
+    current per-passage aggregation can HIDE a supported claim (the D272g re-derivation counted 1,514 NEUTRAL
+    and 506 ENTAIL-majority rows) and can pass a claim that carries BOTH entailment and contradiction. DECIDED
+    (pending R5 cross-family review): implement OR-entail + AND-no-contra in S5, recalibrate the D-2298
+    entailment threshold against the aggregation semantics (a claim now survives on ONE entail, so the
+    per-passage threshold may need tightening), then re-run S5 on rechunk-v4-20260929 once S4 is final at 6,591.
+    Minted PROPOSED to carry the T9 scope; NOT yet executed.
+  bugs: []
+  files:
+  - pipeline/stage5_verify.py
+  - config/pipeline_config.yaml
+  created: '2026-10-05'
+  date: '2026-10-05'
+
+- id: D-2823
+  state: RESOLVED
+  category: PIPELINE / BUGFIX
+  title: Delta-merge arg normalization — bare --cluster ints normalized to cluster_N before the S4 --cluster recovery path (BUG-637 leg)
+  decision: >
+    BUG-637 (delta-aware .expected_count.json merge) required --cluster to name clusters in cluster_N form, but
+    a bare int (e.g. --cluster 28517) was accepted upstream and then mis-matched the receipt keys. FIX:
+    stage4_merge.py main() normalizes bare digit args to cluster_{N} before entering the delta path, so
+    --cluster 28517 and --cluster cluster_28517 are equivalent. One-line normalization; selftest covered by the
+    BUG-637 delta-merge cases.
+  bugs: [BUG-637]
+  files:
+  - pipeline/stage4_merge.py
+  created: '2026-10-05'
+  date: '2026-10-05'
+
+- id: D-2824
+  state: RATIFIED
+  category: TAXONOMY / DISPOSITION
+  title: Dedup-accept — phantoms cluster_3776 (Blue Ocean Strategy) and cluster_26074 (Memory Reconstruction Bias) are near-duplicates and stay dedup
+  decision: >
+    Owner accepts the assistant dedup-accept recommendation for two phantom clusters produced by the D2120 dedup
+    path: cluster_3776 "Blue Ocean Strategy" and cluster_26074 "Memory Reconstruction Bias" are near-duplicates
+    of already-committed FBs. They are removed from the failed_cluster_ids receipt (dedup, not a failure) and
+    expected_fb_count stays 6,591. A disposition, not a defect — no re-extraction, no re-classification.
+  bugs: []
+  files:
+  - pipeline/stage4_merge.py
+  created: '2026-10-05'
+  date: '2026-10-05'
+
+- id: D-2825
+  state: RATIFIED
+  category: TAXONOMY / DISPOSITION
+  title: cluster_28517 (Planck Constant Derivation) disposition = RECOVERED — a transient S4 classification failure, not an S2 extraction failure
+  decision: >
+    Owner asked whether cluster_28517 could be re-run on S2 to extract it properly. ANSWER: NO — S2 extraction
+    was already complete and coherent (full name/definition/mechanism/boundary/consequence/elaboration + 2
+    verbatim evidence passages from Hamming, The Art of Doing Science and Engineering). The failing application
+    field (0 chars < 10, D2371 gate) is produced at S4 by merged_cribs_classify (gpt-oss-20b) — a TRANSIENT
+    failure, not an extraction gap. A targeted --cluster 28517 retry recovered it cleanly: application 178 chars,
+    discipline theoretical physics, depth domain, evidence cited, classification_status CLEAN. All 6,591 S4 FBs
+    now on-disk, declared_failed_count 0. Disposition RECOVERED (was leaning accept-as-failed).
+  bugs: [BUG-639]
+  files:
+  - pipeline/stage4_merge.py
+  created: '2026-10-05'
+  date: '2026-10-05'
+

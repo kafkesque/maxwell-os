@@ -11,7 +11,7 @@
 
 ## 🔴 CURRENT OPEN / PENDING INDEX (machine-derived 2026-10-03 — the live face; history below)
 
-**Register truth (do NOT restate counts elsewhere — BUG-588/D-2692):** 943 decisions · 367 bugs (132 open / 235 closed; highest OPEN = BUG-628). Forensic audit + preflight GREEN.
+**Register truth (do NOT restate counts elsewhere — BUG-588/D-2692):** 955 decisions · 377 bugs (139 open / 238 closed; highest OPEN = BUG-637). Forensic audit + preflight GREEN.
 
 1. **OWNER-GATED (D-2727): RATIFY-2 full S4→S5→S6 rerun** — launch under `caffeinate -dimsu` (`runner.py --dry-run` then full).
 2. **OWNER-GATED (D-2727 OG-1): train/eval split** — Option A recommended (KEEP(46)→S4 golden; pin 46 OUT of eval ruler 208→162; sha256-pinned split manifest).
@@ -20,6 +20,17 @@
 5. **D2547 PLANNED** — per-label thresholds not yet populated.
 
 — everything below is dated change history / ACTIVE / DONE —
+
+## 2026-10-05 — BUG-638/BUG-639 + D-2822..D-2825 minted; cluster_28517 RECOVERED; S4 final at 6,591
+
+1. **D-2825 (RATIFIED)** — cluster_28517 "Planck's Constant Derivation" = **RECOVERED**. Owner asked whether it could be re-run on S2; answer **NO** — S2 extraction was already complete/coherent, the failing `application` field is S4-generated (`merged_cribs_classify`, gpt-oss-20b), a TRANSIENT failure. `--cluster 28517` retry recovered it cleanly (application 178 chars, discipline theoretical physics, CLEAN). All 6,591 S4 FBs on-disk, declared_failed_count=0.
+2. **D-2824 (RATIFIED)** — dedup-accept phantoms cluster_3776 (Blue Ocean Strategy) + cluster_26074 (Memory Reconstruction Bias); expected_fb_count stays 6,591.
+3. **D-2823 (RESOLVED)** — normalize bare `--cluster` ints to `cluster_N` before the delta path (BUG-637 leg).
+4. **D-2822 (PROPOSED)** — S5 aggregation gate A(d): OR-entail + AND-no-contradiction (T9; not yet executed).
+5. **BUG-639 (FIXED)** — S4 delta-merge shrink-guard false positive; `safe_write(..., force_shrink=bool(cluster_ids))`.
+6. **BUG-638 (FIXED)** — METRICS.jsonl append-only floor guard (shrink-only, crash-safe tempfile→fsync→os.replace, fail-closed).
+
+**Pipeline state:** S4 rechunk-v4-20260929 final = **6,591** (preflight GREEN, sha256 ef77e346). S5 stale at 6,588 (verified old sha256 d8fc670b) → **re-run S5**. S6 empty → run.
 
 ## 2026-10-03 — D2622 wired into S5 (advisory tier); D2621 method confirmed landed (correction of prior "no work landed")
 

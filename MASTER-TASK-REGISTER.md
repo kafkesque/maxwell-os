@@ -10,17 +10,21 @@
 ## 🔴 MUST — open (strategic-consequential order)
 
 > **CURRENT OPEN INDEX (machine-derived 2026-10-03 — the live face; dated history follows below).**
-> Register: 943 decisions · 367 bugs (132 open / 235 closed; highest OPEN = BUG-628). Forensic audit + preflight GREEN.
+> Register: 955 decisions · 377 bugs (139 open / 238 closed; highest OPEN = BUG-637). Forensic audit + preflight GREEN.
 >
-> **OWNER-GATED — the pipeline is blocked until these two are resolved (D-2727):**
-> 1. **RATIFY-2 — full S4→S5→S6 rerun.** Launch under `caffeinate -dimsu`; `python3 pipeline/runner.py --dry-run` then full. Preflight already PASS.
-> 2. **Train/eval split (Option A recommended).** Disjoint split: KEEP(46)→S4 golden few-shot; pin those 46 OUT of the eval ruler (208→162); split manifest is a sha256-pinned rail.
+> **OWNER-GATED — ONE action remains (D-2727 gate):**
+> 1. **RATIFY-2 — full S4→S5→S6 rerun.** Launch under `caffeinate -dimsu`; `python3 pipeline/runner.py --dry-run` then full. Preflight PASS; authority propagated (D-2812) + consistency rail rc=0 → now UNBLOCKED.
+> 2. ~~Train/eval split (Option A)~~ — **DONE (D-2813 ratified):** split_manifest.json 46 golden / 162 eval / 208 total; ids_sha256 pin enforced (BUG-603 CLOSED).
 >
 > **PARKED — freeze window META-LANE-FREEZE-1 (day 6/14, review_by 2026-10-11):** BUG-559 (2 UNREVISIONED receipts — remedy: git-commit `config/decisions.yaml` + `governance/anchor_adjudication_workbook_20260924.csv`, then re-cut receipts) · BUG-593 (mutation-gate fixture carries ONE commit).
 >
 > **REGISTRY DEBT:** D2622 ACTIVE → RESOLVED at RATIFY-2 · D2621 PROPOSED (formalize `pipeline/dedup` module vs keep ad-hoc scripts) · D2547 PLANNED (per-label thresholds) · 12 pinned legacy supersession ids · 4 forward-reference decisions · 63 named-but-uncarried ids (shrink-only).
 >
 > — everything below this index is dated history / SHOULD / WORTH / DONE —
+
+> **2026-10-05 BUG-638/BUG-639 + D-2822..D-2825 (registry 955): D-2825 cluster_28517 "Planck's Constant Derivation" RECOVERED (transient S4 `application` failure, NOT an S2 gap — S2 was complete/coherent; `--cluster 28517` retry cleaned it). D-2824 dedup-accept phantoms 3776/26074. D-2823 normalize bare `--cluster` ints. D-2822 PROPOSED (S5 gate A(d) OR-entail+AND-no-contra, T9). BUG-639 (S4 delta-merge shrink-guard false-positive → `force_shrink=bool(cluster_ids)`) + BUG-638 (METRICS.jsonl floor guard) both FIXED. S4 final 6,591 / preflight GREEN; S5 STALE (6,588) → re-run; S6 empty → run. Registry 955 decisions / 377 bugs (139 open / 238 closed; highest OPEN = BUG-637).**
+
+
 
 > **2026-10-03 D2622 WIRED + D2621 CORRECTION: D2622 practicality now wired into stage5_verify.py as ADVISORY tier (`practicality` field on every verified FB; never drops; C16 fail-loud on missing config). D2621 prior "no work landed" note CORRECTED — method landed via D2625/D2626/D2627 (all RESOLVED 2026-09-14: dedup_scan/judge/prefilter/apply scripts; mark-not-delete R-D410). Registry/buglog UNCHANGED (938/366); no census re-derive. D2622 stays ACTIVE (RESOLVED at RATIFY-2); D2621 stays PROPOSED (residual = owner choice: formalize pipeline/dedup module vs keep ad-hoc).**
 > **2026-10-03 OWNER-AUTHORIZED STATE-FLIPS EXECUTED: D2546 PLANNED→RESOLVED (SHACL shipped D2555), D2548 PLANNED→REJECTED (grammar-decoding A/B rejected D2392), D2622 PROPOSED→ACTIVE (backend landed D-2723; S5 wiring deferred RATIFY-2). D2622 state-vocabulary blindspot closed: practicality.yaml `state: IMPLEMENTED`→`backend_state: landed`. Census re-derived + decisions_registry receipt re-baselined. Registry 938 / buglog 366 unchanged; session_seed in sync. Remaining RED = owner-ruling only (R003/R146 AUTOFILL → anchor4_workbook + depth_workbook_row_count).**
@@ -1855,3 +1859,48 @@ NEXT (refreshed D-2772):
 > D2546 SHACL shipped (D2555, OWL open), D2547 infra done (D2571/D2556/D2561, per-label open), D2548 A/B rejected
 > (D2392, keep-off), D2622 backend implemented (D-2723, not wired). OWNER-OWED registry flips: D2546->RESOLVED,
 > D2548->REJECTED, D2622->ACTIVE, D2547->keep PLANNED. D2621 + D2345 genuinely open. session_seed.yaml already in sync.**
+
+> **2026-10-04 ONTOLOGY ENFORCEMENT + 2 BUGS + 3 PROPOSED DECISIONS (zero-risk; the live RATIFY-2 S4 run was NOT touched).**
+> MEASURED read-only at [6444/8215], checkpoint 5,165 records, 0 tracebacks, runner pid 97429, omlx-server healthy.
+> FILED: **BUG-630** (the cross-axis guard is over-blunt — organizational behavior 26 / product design 10 forced to
+> 'emerging' although a SAME-axis home exists; ~45 tokens rescuable with ZERO new labels; mapping loss only, so the
+> remedy is a replay over stored raw labels, no re-extraction) and **BUG-631** (max_domains_per_fb = 5 is unenforced at
+> the write: 52 FBs carry 6-7 domains, all classification_status=CLEAN — the WRITER limb of the existing BUG-273).
+> MINTED (all state=PROPOSED, all S6-GATED): **D-2814** (definition-anchored closed-menu classification = the ROOT fix;
+> promotes D272c from OPEN to EXECUTABLE-PENDING-S6; the 999-rule alias layer becomes SHRINK-ONLY and is retired, not
+> extended; root evidence BUG-629 at 1,321/4,860 = 27.2% emerging), **D-2815** (additive 'Business & Management' discipline
+> group — marketing / management / entrepreneurship — aligned to JEL M + ANZSRC 2020 divisions 35/38; ADDITIVE-ONLY so
+> every existing menu_hash still resolves => CRIBS-safe), **D-2816** (pySHACL against the EXISTING
+> config/taxonomy_shacl.ttl + OntoClean lint wired into the menu-bump gate; enforce the domain cap at the write).
+> ARCHITECTURE: governance/ONTOLOGY_ENFORCEMENT_ARCHITECTURE_20261004.md (7 layers, standards stack, post-hoc vs
+> next-batch integration map, declared non-claims).
+> **HARD GATE (unchanged, C12): NO taxonomy file may be edited while S4 runs.** menu_hash is stamped PER ROW at classify
+> time, so a mid-run menu edit splits the corpus into two epochs and DESTROYS the drift measurement that produced
+> BUG-629. DO NOT pause, DO NOT stop, DO NOT re-run S4.
+> **R021 + 4: ZERO owner action required** — already resolved by D-2813 (R021 = noise_drop: depth None, discipline None,
+> golden_eligible false; R040/R053/R080/R091 = owner abstentions, discipline = emerging, golden_eligible false).
+> **NEXT CRITICAL (ordered):** (1) let S4 -> S5 -> S6 finish untouched; (2) VERIFY the menu_hash scope conflict
+> (7,995 committed rows NULL vs 5,165 in-flight SET) — drift is not measurable against the committed corpus until this is
+> answered; (3) re-measure the emerging rate on the FULL corpus at S4 completion; (4) POST-S6: D-2814 -> D-2815 -> D-2816
+> -> BUG-630/BUG-631 -> Mode-A (~26 same-axis aliases) -> Mode-C long-tail triage (support >= 5) -> post-hoc replay;
+> (5) python3 pipeline/model_lazyload.py --reset after the run; (6) commit the uncommitted workstreams SEPARATELY
+> (never bundled).
+
+> **2026-10-04 TASK (NEW, POST-S6, owner-gated) - RETRY the D2371-quarantined single-FB clusters.** Three clusters were
+> fail-closed by the D2371 application gate in S4: cluster_6030 (log line 2498, progress [2463/8215]), cluster_26828
+> (line 5674, [5624]), cluster_28517 (line 5977, [5926]) - each logged "Empty/short application (0 chars < 10) - FB
+> QUARANTINED (D2371)" after "GEN skipped (single-FB)". They are NOT in the checkpoint (VERIFIED: 5,230/5,230 records
+> parse, 5,230 unique fb_id, 0 empty application/failure_mode), so nothing corrupted was persisted - the gate worked.
+> **RETRYABLE? YES by declared mechanism, WITH ONE MEASURED CATCH.** pipeline/stage4_merge.py ~1852 increments `failed`
+> and its comment states the FB is "retried on resume" (D2338 max_failed_ratio 0.0), so a resume re-attempts them. BUT all
+> three are single-FB clusters where generation was SKIPPED, so the empty application/failure_mode came from the
+> S2-extracted FB, not a fresh GEN call: a plain S4 re-run reproduces the SAME deterministic empty result and
+> re-quarantines them. A retry that can succeed must either (a) FORCE generation for these clusters (bypass the single-FB
+> GEN-skip so the generator writes the missing fields), or (b) repair the upstream S2 FB, or (c) owner-accept as
+> quarantine. R5: (a) is a code change, so a different-model-family review (gemma-4-E4B-it-MLX-4bit) is required BEFORE apply.
+> **STEPS:** (1) at S4 completion RE-MEASURE the quarantine count on the FULL 8,215 (the log is at ~6,524 - 3 is today's
+> count, not the final one); (2) run a single-cluster retry probe on ONE of the three to test the documented "retried on
+> resume" claim; (3) if the probe reproduces the empty application, the claim does NOT hold for the GEN-skip path and this
+> becomes a BUG (retry claim unverified for single-FB clusters) - file it then, with the probe as evidence, not now.
+> Impact if left: 3/8,215 = 0.037% of principles, no data loss (nothing written), fail-closed by design.
+> **Do NOT act on this while S4 runs.**

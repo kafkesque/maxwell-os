@@ -2710,7 +2710,7 @@ examples:
     principle extend it.
   tier: GOLD-A
 - id: CONV-028
-  domain: research & methodology
+  domain: research practice
   discipline: research methodology
   source_books:
   - The Book of Why — Judea Pearl
@@ -4920,7 +4920,7 @@ examples:
   tier: GOLD-A
 
 - id: CONV-058
-  domain: research & methodology
+  domain: research practice
   discipline: machine learning
   source_books:
   - 'GANs in Action — Jakub Langr & Vladimir Bok'

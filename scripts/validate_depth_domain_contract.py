@@ -373,7 +373,7 @@ def validate_menu_pin(ctx: Context) -> list[Finding]:
         _sys.path.insert(0, str(REPO))
         _sys.path.insert(0, str(REPO / "scripts"))
         from pipeline.closed_menu import canonical_json, menu_hash, render_closed_menu  # noqa: PLC0415
-        from menu_axis_hashes import axis_hash  # noqa: PLC0415 - ONE implementation, never a second
+        from menu_axis_hashes import axis_hash, axis_value_set  # noqa: PLC0415 - ONE implementation, never a second
 
         stored_menu = json.loads(read_text(REPO / ctx.cfg["inputs"]["menu"])[0])
         live_menu = render_closed_menu()
@@ -416,7 +416,7 @@ def validate_menu_pin(ctx: Context) -> list[Finding]:
                            f"{ctx.cfg['inputs']['menu_axis_hashes']} - the answer space is unpinned, so no "
                            f"answer-space claim is checkable"))
     else:
-        live_pin = hashlib.sha256(canonical_json({a: live_menu[a] for a in answer_axes}).encode()).hexdigest()
+        live_pin = hashlib.sha256(canonical_json({a: axis_value_set(live_menu, a) for a in answer_axes}).encode()).hexdigest()
         if live_pin != recorded_pin:
             out.append(Finding(ANSWER_SPACE_DRIFT, tier_for(ctx, ANSWER_SPACE_DRIFT), "-",
                                f"a classifier may EMIT something different today: the answer space "
@@ -452,7 +452,15 @@ def validate_menu_pin(ctx: Context) -> list[Finding]:
             # A stamp that is never CHECKED against the pin it claims to be is a decoration, not provenance.
             for mkey, pkey in (ctx.cfg["provenance"]["stamp_verify_keys"] or {}).items():
                 got, want = doc.get(mkey), pins.get(pkey)
-                if got and want and got != want:
+                if not got or not want:
+                    # BUG-644/D-2831: `if got and want` silently skipped a stamp key ABSENT from the manifest or
+                    # a pin key ABSENT from the pin file. A missing provenance fact is worse than a mismatched
+                    # one - fail closed, never skip (partial stamp coverage must not read as a pass).
+                    missing = mkey if not got else pkey
+                    out.append(Finding(MENU_VERSION_STAMP_MISMATCH, tier_for(ctx, MENU_VERSION_STAMP_MISMATCH),
+                                       "-", f"{missing} is declared in stamp_verify_keys but is ABSENT - a stamp "
+                                            f"or pin that is missing is worse than one that disagrees (fail closed)"))
+                elif got != want:
                     out.append(Finding(MENU_VERSION_STAMP_MISMATCH, tier_for(ctx, MENU_VERSION_STAMP_MISMATCH),
                                        "-", f"{mkey} on the manifest is {str(got)[:16]}... but {pkey} in "
                                             f"{ctx.cfg['inputs']['menu_axis_hashes']} is {str(want)[:16]}... - a "

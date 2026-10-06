@@ -158,16 +158,16 @@ def test_real_data_regression() -> None:
     hard = {f.item_id for f in rep.by_tier("hard")}
     blocked = sorted(f.item_id for f in rep.by_tier("owner_blocked"))
     soft = {f.code for f in rep.by_tier("soft")}
-    assert rep.rows == 148, rep.rows
+    assert rep.rows == 150, rep.rows
     assert blocked == [], blocked  # D-387/D-388: R040 owner-ruled, R140 declared axis-exempt
     assert "AXIS_EXEMPT_DECLARED" in {f.code for f in rep.by_tier("soft")}
     assert hard <= {"-"}, f"row-level hard findings on the authored gold: {hard}"
     # RAW_UNDECLARED_TOKEN is ABSENT by design: once the raw reader used both separators, R137's
     # 'user experience|' resolved to 'user experience' and is a declared repair. The code stays in the config
     # because a future un-declared token must fire it.
-    assert soft == {"AXIS_EXEMPT_DECLARED", "ARITY_MAX_GROUPS", "ARITY_MIN_DOMAINS", "GROUP_COVERAGE_CLASS_MISMATCH",
-                    "DEFINITION_DRIFT"}, sorted(soft)
-    assert rep.per_class == {"domain": 74, "cross-domain": 44, "specialized": 30}  # D-387: R070/R080/R130 carry their 24.09 depth forward (no BLANK now), rep.per_class
+    assert soft == {"AXIS_EXEMPT_DECLARED", "ARITY_MAX_GROUPS", "ARITY_MIN_DOMAINS", "ARITY_MAX_DOMAINS",
+                    "GROUP_COVERAGE_CLASS_MISMATCH"}, sorted(soft)
+    assert rep.per_class == {"domain": 75, "cross-domain": 44, "specialized": 31}  # D-387: R070/R080/R130 carry their 24.09 depth forward (no BLANK now), rep.per_class
 
 
 def test_contamination_annex_never_enters_the_grid() -> None:
@@ -199,8 +199,9 @@ def test_tier_config_is_complete() -> None:
 def test_menu_hash_instrument_detects_drift() -> None:
     """Drift probe: the frozen ARTIFACT must hash to the frozen value, and live-vs-frozen is reported verbatim.
 
-    Deliberately NOT asserted to be equal: the live render currently differs (one discipline definition was
-    edited without a re-render). Asserting equality here would encode the bug as the expectation.
+    Deliberately NOT asserted to be equal: the live render is menu v6 (65 disciplines, abstention 'emerging')
+    while the frozen artifact is v5 - a RE-MINT, not a drift. The artifact-vs-frozen assertion below is the
+    invariant that must hold; asserting live==frozen would encode the re-mint as a defect.
     """
     from pipeline.closed_menu import menu_hash  # noqa: PLC0415
     import json  # noqa: PLC0415
@@ -255,23 +256,26 @@ def test_answer_space_pin_is_declared_once_and_holds() -> None:
     import menu_axis_hashes as mah  # noqa: PLC0415
 
     declared = mah.load_groups()
-    assert declared["answer_space"] == ["domains", "abstention"], declared["answer_space"]
+    assert declared["answer_space"] == ["domains", "disciplines", "content_types", "extraction_types", "abstention"], declared["answer_space"]
     pins = yaml.safe_load(ddc.read_text(REPO / CTX.cfg["inputs"]["menu_axis_hashes"])[0])
     assert pins["axis_group"]["answer_space"] == declared["answer_space"]
     rep = ddc.build_report(WORKBOOK_ROWS, CTX)
     assert not [f for f in rep.by_tier("hard") if f.code == ddc.ANSWER_SPACE_DRIFT], "the answer space moved"
 
 
-def test_composite_and_answer_space_are_reported_as_different_facts() -> None:
-    """The composite still drifts (disciplines) while the answer space does not - and that is not a contradiction.
-
-    D-285 and D-321 are both correct: the DEFINITION moved, the ANSWER SPACE did not. The instrument must say so
-    with two codes, because one code cannot carry both facts (BUG-447). Deliberately NOT asserting the composite
-    matches: today it does not, and encoding the bug as the expectation is how a bug becomes a fixture.
+def test_historical_stamps_resolve_to_distinct_historical_pins() -> None:
+    """D-2831 (D-NEW-6): the manifest's historical answer_space_sha256 (8436d9c9..., the RETIRED two-axis method)
+    is checked against the FROZEN pin of the SAME method - not the live 5-axis value-set pin (d704d06e...), which
+    would be a category error. closed_menu_sha256 (73597ee2...) is a DIFFERENT fact (the composite). Both
+    historical comparisons resolve green, and the two frozen pins DIFFER, which is what makes "two facts" real.
     """
     rep = ddc.build_report(WORKBOOK_ROWS, CTX)
-    assert [f.code for f in rep.by_tier("soft")].count(ddc.DEFINITION_DRIFT) >= 1, "definition drift not recorded"
+    assert not [f for f in rep.by_tier("hard") if f.code == ddc.MENU_VERSION_STAMP_MISMATCH], "historical stamp vs historical pin mismatch"
     assert not rep.by_tier("hard"), "no hard finding is expected on the frozen authored workbook"
+    import yaml  # noqa: PLC0415
+
+    pins = yaml.safe_load(ddc.read_text(REPO / CTX.cfg["inputs"]["menu_axis_hashes"])[0])
+    assert pins["composite_hash_frozen_pin"] != pins["answer_space_hash_frozen_pin"], "two facts collapsed into one hash"
 
 
 def test_raw_repair_is_whole_cell_only() -> None:

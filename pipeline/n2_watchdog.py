@@ -17,9 +17,11 @@ import sys
 import time
 
 PROJECT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-LOG = os.path.join(PROJECT, "knowledge pipeline/stage2_extract/latest/n2_run.log")
-WATCH = os.path.join(PROJECT, "knowledge pipeline/stage2_extract/latest/n2_watchdog.log")
-CHECKPOINT = os.path.join(PROJECT, "knowledge pipeline/stage2_extract/latest/checkpoint.jsonl")
+sys.path.insert(0, PROJECT)  # BUG-625(c): allow `from pipeline.pipeline_paths import` (standalone-safe)
+from pipeline.pipeline_paths import S2_DIR, S15_DIR  # noqa: E402
+LOG = os.path.join(S2_DIR, "latest", "n2_run.log")
+WATCH = os.path.join(S2_DIR, "latest", "n2_watchdog.log")
+CHECKPOINT = os.path.join(S2_DIR, "latest", "checkpoint.jsonl")
 PID = int(sys.argv[1]) if len(sys.argv) > 1 else 13137  # argv override (relaunch-safe)
 INTERVAL = 300  # 5 minutes
 
@@ -47,7 +49,7 @@ def main() -> None:
 
     # Track probe position mapping (cluster id -> % through 2634 convergent)
     try:
-        with open(os.path.join(PROJECT, "knowledge pipeline/stage1_5_embed_cluster/latest/checkpoint.jsonl")) as f:
+        with open(os.path.join(S15_DIR, "latest", "checkpoint.jsonl")) as f:
             clusters = [json.loads(l) for l in f if l.strip()]
         conv = [c for c in clusters if c.get("is_convergent")]
         order = [c.get("cluster_id", "") for c in conv]

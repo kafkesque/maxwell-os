@@ -26,6 +26,9 @@ ANNOTATION_RE = re.compile(r"^#{1,6}\s+(CORRECTION|RECEIPT|REFINEMENT|VERIFICATI
 
 BLOCK_START_RE = re.compile(r"^(?:#{2,3}\s.*?BUG-\d+|\*\*BUG-\d+)")
 
+# A summary `| BUG-NNN | ... |` table row (the tiered OPEN/CLOSED face at the top, and any append-only row).
+TABLE_ROW_RE = re.compile(r"^\|\s*(BUG-\d+)\s*\|")
+
 
 def control_slug(name: str) -> str:
     """The control's name as a marker a mutation can be SEEN to red through (D-2676 iv)."""
@@ -61,6 +64,24 @@ def duplicate_block_problems(lines: list[str]) -> list[str]:
     return problems
 
 
+def table_rows_missing_heading(lines: list[str]) -> list[tuple[int, str]]:
+    """BUG-657: a summary `| BUG-NNN |` table row with NO `## BUG-NNN` heading section is INVISIBLE to
+    bug_status.py (HEADER_RE matches only headings), so it never enters the canonical register (C15 undercount).
+    This is the REVERSE of the existing heading->parser check: every summary-table row must name a bug that ALSO
+    has a heading section somewhere in the file."""
+    heading_ids: set[str] = set()
+    for line in lines:
+        m = HEADER_RE.match(line)
+        if m:
+            heading_ids.add(m.group(1))
+    missing: list[tuple[int, str]] = []
+    for n, line in enumerate(lines, start=1):
+        m = TABLE_ROW_RE.match(line)
+        if m and m.group(1) not in heading_ids:
+            missing.append((n, m.group(1)))
+    return missing
+
+
 def selftest() -> int:
     """Known-answer controls in BOTH directions: a COPY fires, two DIFFERENT blocks do not (BUG-492)."""
     same = ["**BUG-9001 STATUS (CLOSED).**\n", "the same body\n", "\n",
@@ -72,6 +93,10 @@ def selftest() -> int:
          bool(duplicate_block_problems(same))),
         ("two DIFFERENT blocks are NOT a fault - a dedupe that cannot tell them apart deletes a fact",
          not duplicate_block_problems(differ)),
+        ("a summary table row whose bug has NO heading section is a NAMED fault (BUG-657)",
+         bool(table_rows_missing_heading(["| BUG-9001 | 2026-10-06 | body |\n"]))),
+        ("a summary table row whose bug HAS a heading section is NOT a fault",
+         not table_rows_missing_heading(["## BUG-9001 (OPEN, 2026-10-06) — x\n", "| BUG-9001 | 2026-10-06 | body |\n"])),
     ]
     for name, ok in rows:
         print(("  ok  " if ok else "  !!  ") + name)
@@ -106,6 +131,13 @@ def main(argv: list[str] | None = None) -> int:
         print("FAIL buglog coverage: " + str(len(duplicated)) + " duplicated block(s):")
         for problem in duplicated:
             print("  " + problem)
+        return 1
+    missing_heading = table_rows_missing_heading(text_lines)
+    if missing_heading:
+        print(f"FAIL buglog coverage: {len(missing_heading)} summary table row(s) name a bug with no heading section "
+              "(invisible to bug_status.py — BUG-657):")
+        for n, bid in missing_heading:
+            print(f"  line {n}: | {bid} |")
         return 1
     print("ok buglog coverage: every heading naming a bug id is parsed and no block is a byte-identical copy "
           "(" + str(len(blocks(text_lines))) + " block(s), " + BUGLOG.name + ")")

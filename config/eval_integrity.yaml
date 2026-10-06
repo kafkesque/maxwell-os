@@ -252,6 +252,7 @@ label_axes:
         of academic research processes"). D2512-D2516 demoted applied-practice
         pseudo-disciplines to domains (66 -> 61 disciplines); this pair is an INCOMPLETE
         MIGRATION, not a deliberate split.
+      resolved_by: D-2853   # 2026-10-06: domain renamed 'research & methodology' -> 'research practice' (taxonomy_v7); DB relabelled 875 rows. SUPERSEDES D-271a 'CHANGE NOTHING'.
 
 # ─────────────────────────────────────────────────────────────────────────────
 # T2 — SUFFIX DUPLICATE POLICY (2026-09-17). "Is name B just name A + a suffix?" is a STRING

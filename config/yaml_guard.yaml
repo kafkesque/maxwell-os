@@ -12,7 +12,7 @@
 # ANY existing rail, because every neighbouring rail parses the file and PyYAML had already resolved the
 # ambiguity for them. That is the class: the reader cannot see what the parser silently dropped.
 schema_version: '1.0'
-decided: PENDING-OWNER
+decided: D-2809
 bug: BUG-525
 rule_home: scripts/lib/yaml_guard.py
 rail: scripts/lib/yaml_guard.py

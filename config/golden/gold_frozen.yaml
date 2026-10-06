@@ -153,7 +153,7 @@ examples:
   expected_classification:
     discipline: machine learning
     domains:
-    - research & methodology
+    - research practice
     depth: specialized
     evidence: cited
     is_specialized: true
@@ -710,7 +710,7 @@ examples:
   expected_classification:
     discipline: machine learning
     domains:
-    - research & methodology
+    - research practice
     depth: domain
     evidence: cited
     is_specialized: false
@@ -1043,7 +1043,7 @@ examples:
   expected_classification:
     discipline: cultural studies
     domains:
-    - research & methodology
+    - research practice
     depth: domain
     evidence: cited
     is_specialized: false
@@ -1207,7 +1207,7 @@ examples:
   expected_classification:
     discipline: cultural studies
     domains:
-    - research & methodology
+    - research practice
     - social sciences
     depth: domain
     evidence: cited
@@ -1321,7 +1321,7 @@ examples:
   expected_classification:
     discipline: literary theory
     domains:
-    - research & methodology
+    - research practice
     depth: cross-domain
     evidence: cited
     is_specialized: false
@@ -1456,7 +1456,7 @@ examples:
     discipline: creative process
     domains:
     - education
-    - research & methodology
+    - research practice
     depth: domain
     evidence: cited
     is_specialized: false
@@ -1700,7 +1700,7 @@ examples:
   expected_classification:
     discipline: machine learning
     domains:
-    - research & methodology
+    - research practice
     - ai & agents
     depth: specialized
     evidence: cited
@@ -2226,7 +2226,7 @@ examples:
     discipline: machine learning
     domains:
     - engineering & infrastructure
-    - research & methodology
+    - research practice
     depth: domain
     evidence: cited
     is_specialized: false
@@ -2253,7 +2253,7 @@ examples:
   expected_classification:
     discipline: research methodology
     domains:
-    - research & methodology
+    - research practice
     depth: domain
     evidence: cited
     is_specialized: false
@@ -2500,7 +2500,7 @@ examples:
     discipline: information science
     domains:
     - legal & public policy
-    - research & methodology
+    - research practice
     depth: domain
     evidence: cited
     is_specialized: false
@@ -3165,7 +3165,7 @@ examples:
   expected_classification:
     discipline: machine learning
     domains:
-    - research & methodology
+    - research practice
     - data visualization
     depth: domain
     evidence: cited
@@ -4842,7 +4842,7 @@ examples:
     - business operations
     - entrepreneurship
     - education
-    - research & methodology
+    - research practice
     depth: cross-domain
     evidence: cited
     is_specialized: false
@@ -5504,7 +5504,7 @@ examples:
   expected_classification:
     discipline: research methodology
     domains:
-    - research & methodology
+    - research practice
     depth: domain
     evidence: cited
     is_specialized: false
@@ -5671,7 +5671,7 @@ examples:
   expected_classification:
     discipline: research methodology
     domains:
-    - research & methodology
+    - research practice
     - marketing & communications
     depth: domain
     evidence: cited
@@ -5726,7 +5726,7 @@ examples:
     domains:
     - code & computation
     - engineering & infrastructure
-    - research & methodology
+    - research practice
     depth: domain
     evidence: cited
     is_specialized: false
@@ -5753,7 +5753,7 @@ examples:
   expected_classification:
     discipline: philosophy
     domains:
-    - research & methodology
+    - research practice
     depth: cross-domain
     evidence: cited
     is_specialized: false
@@ -6052,7 +6052,7 @@ examples:
     discipline: media studies
     domains:
     - editorial & advertising
-    - research & methodology
+    - research practice
     depth: domain
     evidence: cited
     is_specialized: false
@@ -6083,7 +6083,7 @@ examples:
     - health & wellness
     - legal & public policy
     - marketing & communications
-    - research & methodology
+    - research practice
     depth: domain
     evidence: cited
     is_specialized: false
@@ -6888,7 +6888,7 @@ examples:
   expected_classification:
     discipline: cultural studies
     domains:
-    - research & methodology
+    - research practice
     depth: domain
     evidence: cited
     is_specialized: false
@@ -7448,7 +7448,7 @@ examples:
     discipline: decision making
     domains:
     - business operations
-    - research & methodology
+    - research practice
     depth: domain
     evidence: cited
     is_specialized: false
@@ -7640,7 +7640,7 @@ examples:
   expected_classification:
     discipline: research methodology
     domains:
-    - research & methodology
+    - research practice
     depth: domain
     evidence: cited
     is_specialized: false
@@ -7749,7 +7749,7 @@ examples:
   expected_classification:
     discipline: complex adaptive systems
     domains:
-    - research & methodology
+    - research practice
     depth: cross-domain
     evidence: cited
     is_specialized: false
@@ -8155,7 +8155,7 @@ examples:
     discipline: operations research
     domains:
     - finance & investment
-    - research & methodology
+    - research practice
     depth: universal
     evidence: cited
     is_specialized: false
@@ -8346,7 +8346,7 @@ examples:
     discipline: research methodology
     domains:
     - business operations
-    - research & methodology
+    - research practice
     depth: domain
     evidence: cited
     is_specialized: false
@@ -8562,7 +8562,7 @@ examples:
     discipline: research methodology
     domains:
     - legal & public policy
-    - research & methodology
+    - research practice
     depth: domain
     evidence: cited
     is_specialized: false
@@ -8749,7 +8749,7 @@ examples:
     discipline: research methodology
     domains:
     - education
-    - research & methodology
+    - research practice
     depth: domain
     evidence: cited
     is_specialized: false
@@ -9054,7 +9054,7 @@ examples:
     discipline: research methodology
     domains:
     - marketing & communications
-    - research & methodology
+    - research practice
     depth: domain
     evidence: cited
     is_specialized: false
@@ -9136,7 +9136,7 @@ examples:
   expected_classification:
     discipline: information science
     domains:
-    - research & methodology
+    - research practice
     - user experience
     - data visualization
     depth: domain
@@ -9195,7 +9195,7 @@ examples:
     domains:
     - business operations
     - legal & public policy
-    - research & methodology
+    - research practice
     depth: domain
     evidence: cited
     is_specialized: false
@@ -9749,7 +9749,7 @@ examples:
     discipline: research methodology
     domains:
     - legal & public policy
-    - research & methodology
+    - research practice
     depth: domain
     evidence: cited
     is_specialized: false
@@ -9856,7 +9856,7 @@ examples:
     discipline: privacy & surveillance
     domains:
     - data visualization
-    - research & methodology
+    - research practice
     depth: domain
     evidence: cited
     is_specialized: false
@@ -10159,7 +10159,7 @@ examples:
     domains:
     - ai & agents
     - digital product
-    - research & methodology
+    - research practice
     depth: specialized
     evidence: cited
     is_specialized: true
@@ -10408,7 +10408,7 @@ examples:
     domains:
     - legal & public policy
     - organizational behavior
-    - research & methodology
+    - research practice
     - marketing & communications
     depth: domain
     evidence: cited
@@ -10436,7 +10436,7 @@ examples:
     discipline: information science
     domains:
     - digital product
-    - research & methodology
+    - research practice
     depth: domain
     evidence: cited
     is_specialized: false
@@ -10461,7 +10461,7 @@ examples:
     discipline: research methodology
     domains:
     - business operations
-    - research & methodology
+    - research practice
     depth: domain
     evidence: cited
     is_specialized: false
@@ -10600,7 +10600,7 @@ examples:
   expected_classification:
     discipline: information retrieval
     domains:
-    - research & methodology
+    - research practice
     - personal productivity
     depth: domain
     evidence: cited
@@ -10716,7 +10716,7 @@ examples:
     domains:
     - business operations
     - code & computation
-    - research & methodology
+    - research practice
     depth: cross-domain
     evidence: cited
     is_specialized: false
@@ -10741,7 +10741,7 @@ examples:
   expected_classification:
     discipline: social network analysis
     domains:
-    - research & methodology
+    - research practice
     depth: domain
     evidence: cited
     is_specialized: false
@@ -10823,7 +10823,7 @@ examples:
     discipline: information science
     domains:
     - education
-    - research & methodology
+    - research practice
     - semiotics & communication
     depth: domain
     evidence: cited
@@ -11367,7 +11367,7 @@ examples:
     discipline: information science
     domains:
     - code & computation
-    - research & methodology
+    - research practice
     - data visualization
     depth: domain
     evidence: cited
@@ -11479,7 +11479,7 @@ examples:
   expected_classification:
     discipline: generative ai
     domains:
-    - research & methodology
+    - research practice
     - ai & agents
     depth: specialized
     evidence: cited
@@ -11652,7 +11652,7 @@ examples:
   expected_classification:
     discipline: cultural studies
     domains:
-    - research & methodology
+    - research practice
     - legal & public policy
     - education
     - marketing & communications
@@ -11771,7 +11771,7 @@ examples:
     domains:
     - business operations
     - digital product
-    - research & methodology
+    - research practice
     - information architecture
     depth: domain
     evidence: cited
@@ -11799,7 +11799,7 @@ examples:
     discipline: creative process
     domains:
     - product design
-    - research & methodology
+    - research practice
     depth: domain
     evidence: cited
     is_specialized: false
@@ -12341,7 +12341,7 @@ examples:
   expected_classification:
     discipline: neuroscience
     domains:
-    - research & methodology
+    - research practice
     - health & wellness
     - user experience
     - education
@@ -13440,7 +13440,7 @@ examples:
     discipline: machine learning
     domains:
     - ai & agents
-    - research & methodology
+    - research practice
     - business operations
     - engineering & infrastructure
     depth: domain
@@ -13738,7 +13738,7 @@ examples:
   expected_classification:
     discipline: machine learning
     domains:
-    - research & methodology
+    - research practice
     depth: domain
     evidence: cited
     is_specialized: false
@@ -14283,7 +14283,7 @@ examples:
   expected_classification:
     discipline: sociology
     domains:
-    - research & methodology
+    - research practice
     depth: domain
     evidence: cited
     is_specialized: false
@@ -14964,7 +14964,7 @@ examples:
     domains:
     - ai & agents
     - product design
-    - research & methodology
+    - research practice
     depth: domain
     evidence: cited
     is_specialized: false
@@ -15019,7 +15019,7 @@ examples:
     discipline: privacy & surveillance
     domains:
     - social sciences
-    - research & methodology
+    - research practice
     depth: domain
     evidence: cited
     is_specialized: false
@@ -15073,7 +15073,7 @@ examples:
     domains:
     - education
     - legal & public policy
-    - research & methodology
+    - research practice
     depth: domain
     evidence: cited
     is_specialized: false
@@ -16076,7 +16076,7 @@ examples:
   expected_classification:
     discipline: machine learning
     domains:
-    - research & methodology
+    - research practice
     depth: domain
     evidence: cited
     is_specialized: false
@@ -16657,7 +16657,7 @@ examples:
   expected_classification:
     discipline: research methodology
     domains:
-    - research & methodology
+    - research practice
     - science & research
     depth: domain
     evidence: cited
@@ -16803,7 +16803,7 @@ examples:
     - entrepreneurship
     - organizational behavior
     - project management
-    - research & methodology
+    - research practice
     depth: domain
     evidence: cited
     is_specialized: false
@@ -17763,7 +17763,7 @@ examples:
   expected_classification:
     discipline: sociology
     domains:
-    - research & methodology
+    - research practice
     - social sciences
     depth: domain
     evidence: cited
@@ -18265,7 +18265,7 @@ examples:
     discipline: research methodology
     domains:
     - legal & public policy
-    - research & methodology
+    - research practice
     - education
     depth: cross-domain
     evidence: cited
@@ -18447,7 +18447,7 @@ examples:
     discipline: cognitive science
     domains:
     - product design
-    - research & methodology
+    - research practice
     depth: domain
     evidence: cited
     is_specialized: false
@@ -18680,7 +18680,7 @@ examples:
   expected_classification:
     discipline: philosophy
     domains:
-    - research & methodology
+    - research practice
     - semiotics & communication
     depth: cross-domain
     evidence: cited
@@ -18709,7 +18709,7 @@ examples:
   expected_classification:
     discipline: research methodology
     domains:
-    - research & methodology
+    - research practice
     depth: cross-domain
     evidence: cited
     is_specialized: false
@@ -19036,7 +19036,7 @@ examples:
     discipline: information science
     domains:
     - data visualization
-    - research & methodology
+    - research practice
     depth: domain
     evidence: cited
     is_specialized: false
@@ -19503,7 +19503,7 @@ examples:
   expected_classification:
     discipline: sociology
     domains:
-    - research & methodology
+    - research practice
     depth: domain
     evidence: cited
     is_specialized: false
@@ -19623,7 +19623,7 @@ examples:
     discipline: artificial intelligence
     domains:
     - digital product
-    - research & methodology
+    - research practice
     depth: domain
     evidence: cited
     is_specialized: false
@@ -19704,7 +19704,7 @@ examples:
   expected_classification:
     discipline: political economy
     domains:
-    - research & methodology
+    - research practice
     - urban planning
     depth: domain
     evidence: cited
@@ -20587,7 +20587,7 @@ examples:
   expected_classification:
     discipline: sociology
     domains:
-    - research & methodology
+    - research practice
     depth: domain
     evidence: cited
     is_specialized: false
@@ -20780,7 +20780,7 @@ examples:
     discipline: research methodology
     domains:
     - legal & public policy
-    - research & methodology
+    - research practice
     depth: domain
     evidence: cited
     is_specialized: false
@@ -20916,7 +20916,7 @@ examples:
     discipline: behavioral economics
     domains:
     - marketing & communications
-    - research & methodology
+    - research practice
     - product design
     depth: domain
     evidence: cited
@@ -21191,7 +21191,7 @@ examples:
   expected_classification:
     discipline: organizational theory
     domains:
-    - research & methodology
+    - research practice
     depth: domain
     evidence: cited
     is_specialized: false
@@ -21353,7 +21353,7 @@ examples:
   expected_classification:
     discipline: philosophy
     domains:
-    - research & methodology
+    - research practice
     depth: domain
     evidence: cited
     is_specialized: false
@@ -21901,7 +21901,7 @@ examples:
     discipline: communication theory
     domains:
     - legal & public policy
-    - research & methodology
+    - research practice
     - marketing & communications
     depth: cross-domain
     evidence: cited
@@ -22088,7 +22088,7 @@ examples:
     discipline: research methodology
     domains:
     - education
-    - research & methodology
+    - research practice
     depth: domain
     evidence: cited
     is_specialized: false
@@ -22138,7 +22138,7 @@ examples:
     discipline: information retrieval
     domains:
     - business operations
-    - research & methodology
+    - research practice
     depth: domain
     evidence: cited
     is_specialized: false
@@ -22239,7 +22239,7 @@ examples:
   expected_classification:
     discipline: sociology
     domains:
-    - research & methodology
+    - research practice
     - social sciences
     depth: domain
     evidence: cited
@@ -22352,7 +22352,7 @@ examples:
     discipline: research methodology
     domains:
     - education
-    - research & methodology
+    - research practice
     depth: domain
     evidence: cited
     is_specialized: false
@@ -22571,7 +22571,7 @@ examples:
   expected_classification:
     discipline: semiotics
     domains:
-    - research & methodology
+    - research practice
     depth: universal
     evidence: cited
     is_specialized: false
@@ -22962,7 +22962,7 @@ examples:
     - digital product
     - project management
     - marketing & communications
-    - research & methodology
+    - research practice
     depth: domain
     evidence: cited
     is_specialized: false
@@ -23069,7 +23069,7 @@ examples:
     discipline: information retrieval
     domains:
     - digital product
-    - research & methodology
+    - research practice
     depth: domain
     evidence: cited
     is_specialized: false
@@ -23409,7 +23409,7 @@ examples:
   expected_classification:
     discipline: machine learning
     domains:
-    - research & methodology
+    - research practice
     depth: domain
     evidence: cited
     is_specialized: false
@@ -23792,7 +23792,7 @@ examples:
   expected_classification:
     discipline: information science
     domains:
-    - research & methodology
+    - research practice
     - user experience
     - web & ui
     depth: domain
@@ -23821,7 +23821,7 @@ examples:
     domains:
     - business operations
     - project management
-    - research & methodology
+    - research practice
     depth: specialized
     evidence: cited
     is_specialized: true
@@ -24064,7 +24064,7 @@ examples:
     discipline: machine learning
     domains:
     - ai & agents
-    - research & methodology
+    - research practice
     depth: domain
     evidence: cited
     is_specialized: false
@@ -24285,7 +24285,7 @@ examples:
     discipline: information retrieval
     domains:
     - business operations
-    - research & methodology
+    - research practice
     depth: domain
     evidence: cited
     is_specialized: false
@@ -24585,7 +24585,7 @@ examples:
     - marketing & communications
     - digital product
     - business operations
-    - research & methodology
+    - research practice
     depth: domain
     evidence: cited
     is_specialized: false
@@ -25379,7 +25379,7 @@ examples:
   expected_classification:
     discipline: operations research
     domains:
-    - research & methodology
+    - research practice
     - science & research
     depth: domain
     evidence: cited
@@ -25680,7 +25680,7 @@ examples:
     - business operations
     - digital product
     - project management
-    - research & methodology
+    - research practice
     depth: domain
     evidence: cited
     is_specialized: false
@@ -25931,7 +25931,7 @@ examples:
     discipline: research methodology
     domains:
     - education
-    - research & methodology
+    - research practice
     depth: domain
     evidence: cited
     is_specialized: false
@@ -26306,7 +26306,7 @@ examples:
     domains:
     - digital product
     - project management
-    - research & methodology
+    - research practice
     depth: domain
     evidence: cited
     is_specialized: false
@@ -26545,7 +26545,7 @@ examples:
     discipline: machine learning
     domains:
     - ai & agents
-    - research & methodology
+    - research practice
     depth: specialized
     evidence: cited
     is_specialized: true
@@ -26634,7 +26634,7 @@ examples:
     discipline: semiotics
     domains:
     - education
-    - research & methodology
+    - research practice
     depth: domain
     evidence: cited
     is_specialized: false
@@ -27050,7 +27050,7 @@ examples:
   expected_classification:
     discipline: interdisciplinary studies
     domains:
-    - research & methodology
+    - research practice
     - semiotics & communication
     depth: cross-domain
     evidence: cited
@@ -27129,7 +27129,7 @@ examples:
   expected_classification:
     discipline: machine learning
     domains:
-    - research & methodology
+    - research practice
     depth: domain
     evidence: cited
     is_specialized: false
@@ -27271,7 +27271,7 @@ examples:
     discipline: sociology
     domains:
     - education
-    - research & methodology
+    - research practice
     depth: domain
     evidence: cited
     is_specialized: false

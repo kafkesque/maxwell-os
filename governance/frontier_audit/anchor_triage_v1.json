@@ -1,0 +1,838 @@
+{
+ "generated_by": "goose",
+ "schema": "verdict v1",
+ "verdicts": {
+  "R001": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R002": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R003": {
+   "verdict": "WAIT-ORPHAN",
+   "reason": "1 orphan passage(s) -> re-point chunk, then re-check"
+  },
+  "R004": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R005": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R006": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R007": {
+   "verdict": "QUARANTINE",
+   "reason": "ct=quarantine (pipeline already flagged)"
+  },
+  "R008": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R009": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R010": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R011": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R012": {
+   "verdict": "DROP",
+   "reason": "ct=noise_drop (models could not classify)"
+  },
+  "R013": {
+   "verdict": "QUARANTINE",
+   "reason": "ct=quarantine (pipeline already flagged)"
+  },
+  "R014": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R015": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R016": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R017": {
+   "verdict": "QUARANTINE",
+   "reason": "ct=quarantine (pipeline already flagged)"
+  },
+  "R018": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R019": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R020": {
+   "verdict": "FIX",
+   "reason": "2 abstractive passage(s) but empirical_pattern needs verbatim; domain_final empty"
+  },
+  "R021": {
+   "verdict": "DROP",
+   "reason": "ct=noise_drop (models could not classify)"
+  },
+  "R022": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R023": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R024": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R025": {
+   "verdict": "QUARANTINE",
+   "reason": "ct=quarantine (pipeline already flagged)"
+  },
+  "R026": {
+   "verdict": "DROP",
+   "reason": "ct=noise_drop (models could not classify)"
+  },
+  "R027": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R028": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R029": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R030": {
+   "verdict": "QUARANTINE",
+   "reason": "ct=quarantine (pipeline already flagged)"
+  },
+  "R031": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R032": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R033": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R034": {
+   "verdict": "DROP",
+   "reason": "ct=noise_drop (models could not classify)"
+  },
+  "R035": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R036": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R037": {
+   "verdict": "FIX",
+   "reason": "1 abstractive passage(s) but causal_mechanism needs verbatim; domain_final empty"
+  },
+  "R038": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R039": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R040": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R041": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R042": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R043": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R044": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R045": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R046": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R047": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R048": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R049": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R050": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R051": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R052": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R053": {
+   "verdict": "FIX",
+   "reason": "1 abstractive passage(s) but causal_mechanism needs verbatim; domain_final empty"
+  },
+  "R054": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R055": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R056": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R057": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R058": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R059": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R060": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R061": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R062": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R063": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R064": {
+   "verdict": "FIX",
+   "reason": "4 abstractive passage(s) but causal_mechanism needs verbatim; domain_final empty"
+  },
+  "R065": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R066": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R067": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R068": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R069": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R070": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R071": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R072": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R073": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R074": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R075": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R076": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R077": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R078": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R079": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R080": {
+   "verdict": "DROP",
+   "reason": "ct=noise_drop (models could not classify)"
+  },
+  "R081": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R082": {
+   "verdict": "DROP",
+   "reason": "ct=noise_drop (models could not classify)"
+  },
+  "R083": {
+   "verdict": "FIX",
+   "reason": "1 abstractive passage(s) but empirical_pattern needs verbatim; domain_final empty"
+  },
+  "R084": {
+   "verdict": "DROP",
+   "reason": "ct=noise_drop (models could not classify)"
+  },
+  "R085": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R086": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R087": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R088": {
+   "verdict": "WAIT-ORPHAN",
+   "reason": "1 orphan passage(s) -> re-point chunk, then re-check"
+  },
+  "R089": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R090": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R091": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R092": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R093": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R094": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R095": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R096": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R097": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R098": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R099": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R100": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R101": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R102": {
+   "verdict": "QUARANTINE",
+   "reason": "ct=quarantine (pipeline already flagged)"
+  },
+  "R103": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R104": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R105": {
+   "verdict": "WAIT-ORPHAN",
+   "reason": "1 orphan passage(s) -> re-point chunk, then re-check"
+  },
+  "R106": {
+   "verdict": "DROP",
+   "reason": "ct=noise_drop (models could not classify)"
+  },
+  "R107": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R108": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R109": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R110": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R111": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R112": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R113": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R114": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R115": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R116": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R117": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R118": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R119": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R120": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R121": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R122": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R123": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R124": {
+   "verdict": "QUARANTINE",
+   "reason": "ct=quarantine (pipeline already flagged)"
+  },
+  "R125": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R126": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R127": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R128": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R129": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R130": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R131": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R132": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R133": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R134": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R135": {
+   "verdict": "FIX",
+   "reason": "0 passages + domain_final empty (needs domain)"
+  },
+  "R136": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R137": {
+   "verdict": "FIX/DROP",
+   "reason": "abstractive + causal_mechanism requires verbatim grounding"
+  },
+  "R138": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R139": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R140": {
+   "verdict": "DROP",
+   "reason": "ct=noise_drop (models could not classify)"
+  },
+  "R141": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R142": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R143": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R144": {
+   "verdict": "QUARANTINE",
+   "reason": "ct=quarantine (pipeline already flagged)"
+  },
+  "R145": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R146": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R147": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R148": {
+   "verdict": "DROP",
+   "reason": "ct=noise_drop (models could not classify)"
+  },
+  "R149": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R150": {
+   "verdict": "FIX",
+   "reason": "domain_final empty"
+  },
+  "R151": {
+   "verdict": "FIX",
+   "reason": "1 abstractive passage(s) but empirical_pattern needs verbatim"
+  },
+  "R152": {
+   "verdict": "KEEP",
+   "reason": "full verbatim (2/2)"
+  },
+  "R153": {
+   "verdict": "QUARANTINE",
+   "reason": "ct=quarantine (pipeline already flagged)"
+  },
+  "R154": {
+   "verdict": "KEEP",
+   "reason": "full verbatim (1/1)"
+  },
+  "R155": {
+   "verdict": "KEEP",
+   "reason": "full verbatim (1/1)"
+  },
+  "R156": {
+   "verdict": "KEEP",
+   "reason": "full verbatim (2/2)"
+  },
+  "R157": {
+   "verdict": "KEEP",
+   "reason": "full verbatim (3/3)"
+  },
+  "R158": {
+   "verdict": "KEEP",
+   "reason": "full verbatim (1/1)"
+  },
+  "R159": {
+   "verdict": "KEEP*",
+   "reason": "1 orphan passage(s) recovered via fallback; re-point chunk for integrity"
+  },
+  "R160": {
+   "verdict": "KEEP",
+   "reason": "full verbatim (5/5)"
+  },
+  "R162": {
+   "verdict": "KEEP",
+   "reason": "full verbatim (5/5)"
+  },
+  "R163": {
+   "verdict": "KEEP",
+   "reason": "abstractive but normative_heuristic interpretive (paraphrase OK)"
+  },
+  "R164": {
+   "verdict": "KEEP",
+   "reason": "full verbatim (5/5)"
+  },
+  "R165": {
+   "verdict": "QUARANTINE",
+   "reason": "ct=quarantine (pipeline already flagged)"
+  },
+  "R166": {
+   "verdict": "KEEP",
+   "reason": "full verbatim (5/5)"
+  },
+  "R167": {
+   "verdict": "QUARANTINE",
+   "reason": "0 passages + DB QUARANTINE + empirical_pattern ungrounded"
+  },
+  "R168": {
+   "verdict": "KEEP",
+   "reason": "full verbatim (1/1)"
+  },
+  "R169": {
+   "verdict": "QUARANTINE",
+   "reason": "ct=quarantine (pipeline already flagged)"
+  },
+  "R170": {
+   "verdict": "KEEP",
+   "reason": "1 abstractive passage(s) but normative_heuristic interpretive (OK)"
+  },
+  "R171": {
+   "verdict": "KEEP",
+   "reason": "full verbatim (2/2)"
+  },
+  "R172": {
+   "verdict": "KEEP",
+   "reason": "full verbatim (1/1)"
+  },
+  "R173": {
+   "verdict": "KEEP",
+   "reason": "full verbatim (1/1)"
+  },
+  "R174": {
+   "verdict": "KEEP",
+   "reason": "full verbatim (2/2)"
+  },
+  "R175": {
+   "verdict": "KEEP",
+   "reason": "full verbatim (3/3)"
+  },
+  "R176": {
+   "verdict": "KEEP",
+   "reason": "full verbatim (2/2)"
+  },
+  "R177": {
+   "verdict": "KEEP",
+   "reason": "full verbatim (5/5)"
+  },
+  "R178": {
+   "verdict": "KEEP",
+   "reason": "full verbatim (2/2)"
+  },
+  "R179": {
+   "verdict": "KEEP",
+   "reason": "full verbatim (1/1)"
+  },
+  "R180": {
+   "verdict": "DROP",
+   "reason": "ct=noise_drop (models could not classify)"
+  },
+  "R181": {
+   "verdict": "KEEP",
+   "reason": "full verbatim (5/5)"
+  },
+  "R182": {
+   "verdict": "DROP",
+   "reason": "ct=noise_drop (models could not classify)"
+  },
+  "R183": {
+   "verdict": "QUARANTINE",
+   "reason": "ct=quarantine (pipeline already flagged)"
+  },
+  "R184": {
+   "verdict": "QUARANTINE",
+   "reason": "ct=quarantine (pipeline already flagged)"
+  },
+  "R185": {
+   "verdict": "KEEP",
+   "reason": "full verbatim (2/2)"
+  },
+  "R186": {
+   "verdict": "KEEP",
+   "reason": "1 abstractive passage(s) but normative_heuristic interpretive (OK)"
+  },
+  "R187": {
+   "verdict": "KEEP",
+   "reason": "full verbatim (2/2)"
+  },
+  "R188": {
+   "verdict": "FIX",
+   "reason": "1 abstractive passage(s) but causal_mechanism needs verbatim"
+  },
+  "R189": {
+   "verdict": "KEEP",
+   "reason": "full verbatim (1/1)"
+  },
+  "R190": {
+   "verdict": "KEEP",
+   "reason": "full verbatim (2/2)"
+  },
+  "R191": {
+   "verdict": "KEEP",
+   "reason": "1 abstractive passage(s) but normative_heuristic interpretive (OK)"
+  },
+  "R192": {
+   "verdict": "KEEP",
+   "reason": "full verbatim (5/5)"
+  },
+  "R193": {
+   "verdict": "KEEP",
+   "reason": "full verbatim (5/5)"
+  },
+  "R195": {
+   "verdict": "KEEP",
+   "reason": "full verbatim (5/5)"
+  },
+  "R196": {
+   "verdict": "KEEP",
+   "reason": "full verbatim (5/5)"
+  },
+  "R197": {
+   "verdict": "KEEP",
+   "reason": "full verbatim (2/2)"
+  },
+  "R198": {
+   "verdict": "KEEP",
+   "reason": "full verbatim (1/1)"
+  },
+  "R199": {
+   "verdict": "KEEP",
+   "reason": "full verbatim (2/2)"
+  },
+  "R200": {
+   "verdict": "DROP",
+   "reason": "ct=noise_drop (models could not classify)"
+  },
+  "R201": {
+   "verdict": "KEEP",
+   "reason": "full verbatim (1/1)"
+  },
+  "R202": {
+   "verdict": "KEEP",
+   "reason": "1 abstractive passage(s) but descriptive_model interpretive (OK)"
+  },
+  "R203": {
+   "verdict": "KEEP",
+   "reason": "full verbatim (5/5)"
+  },
+  "R204": {
+   "verdict": "KEEP",
+   "reason": "full verbatim (1/1)"
+  },
+  "R205": {
+   "verdict": "KEEP",
+   "reason": "full verbatim (1/1)"
+  },
+  "R206": {
+   "verdict": "QUARANTINE",
+   "reason": "ct=quarantine (pipeline already flagged)"
+  },
+  "R207": {
+   "verdict": "KEEP",
+   "reason": "full verbatim (3/3)"
+  },
+  "R208": {
+   "verdict": "KEEP",
+   "reason": "full verbatim (2/2)"
+  },
+  "R209": {
+   "verdict": "KEEP",
+   "reason": "full verbatim (1/1)"
+  },
+  "R210": {
+   "verdict": "KEEP",
+   "reason": "full verbatim (2/2)"
+  }
+ }
+}

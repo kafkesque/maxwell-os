@@ -29,8 +29,18 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 BACKUP_DIR = ROOT / "backup" / "deletions"
 
-# Protected trees — safe_delete is the only deletion path for these
+# Protected trees — safe_delete is the only deletion path for these.
+# BUG-625(c): the data-dir name is read config-first (paths.data_dir) so safe_delete protects whatever
+# tree is actually configured; "knowledge pipeline" is kept as a permanent defense-in-depth entry because
+# over-protection is the fail-safe direction for a deletion guard (must not depend on config readability).
+try:
+    import yaml as _yaml
+    _DATA_DIR_NAME = ((_yaml.safe_load(open(ROOT / "config" / "pipeline_config.yaml")) or {}).get("paths") or {}).get("data_dir", "knowledge pipeline")
+except Exception:
+    _DATA_DIR_NAME = "knowledge pipeline"
+
 PROTECTED_TREES = [
+    _DATA_DIR_NAME,
     "knowledge pipeline",
     "education",
     "5.generated",

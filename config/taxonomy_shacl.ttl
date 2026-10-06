@@ -1,7 +1,7 @@
 # config/taxonomy_shacl.ttl — SHACL formalization of Maxwell OS taxonomy (D2546)
 # AUTO-GENERATED from config/taxonomy_v5.yaml — do NOT edit by hand.
 # Regenerate: python3 scripts/generate_taxonomy_shacl.py
-# Canonicals: 43 domains + 61 disciplines = 104 (taxonomy v5.5)
+# Canonicals: 43 domains + 64 disciplines = 107 (taxonomy v5.7)
 
 @prefix maxwell: <https://maxwell.os/taxonomy#> .
 @prefix sh: <http://www.w3.org/ns/shacl#> .
@@ -26,7 +26,7 @@ maxwell:FoundationBlockShape
     sh:property [
         sh:path maxwell:taxonomy_version ;
         sh:minCount 1 ;
-        sh:in ( "v5.5" ) ;
+        sh:in ( "v5.7" ) ;
     ] .
 
 # ── Closed canonical sets ──────────────────────────────────────────────────
@@ -45,7 +45,7 @@ maxwell:CanonicalDisciplineShape
     sh:closed true ;
     sh:property [
         sh:path maxwell:label ;
-        sh:in ( "visual perception" "visual semiotics" "cultural design" "semiotics" "typography" "color theory" "motion & time" "design psychology" "creative process" "cognitive science" "behavioral economics" "organizational theory" "decision making" "psychology" "linguistics" "strategic thinking" "risk management" "systems thinking" "complex adaptive systems" "systems engineering" "research methodology" "operations research" "machine learning" "generative ai" "software engineering" "creative coding" "generative design" "computational physics & simulation" "computational geometry" "game design" "political economy" "privacy & surveillance" "philosophy" "artificial intelligence" "communication theory" "human-computer interaction" "interdisciplinary studies" "information science" "finance" "economics" "sociology" "anthropology" "cultural studies" "theoretical physics" "aesthetics" "media studies" "computer graphics" "law" "information security" "evolutionary biology" "social network analysis" "neuroscience" "robotics" "health & medicine" "performing arts" "literary theory" "engineering" "design thinking" "information retrieval" "computational theory" "computer networking" ) ;
+        sh:in ( "visual perception" "visual semiotics" "cultural design" "semiotics" "typography" "color theory" "motion & time" "design psychology" "creative process" "cognitive science" "behavioral economics" "organizational theory" "decision making" "psychology" "linguistics" "strategic thinking" "risk management" "systems thinking" "complex adaptive systems" "systems engineering" "research methodology" "operations research" "machine learning" "generative ai" "software engineering" "creative coding" "generative design" "computational physics & simulation" "computational geometry" "game design" "political economy" "privacy & surveillance" "philosophy" "artificial intelligence" "communication theory" "human-computer interaction" "interdisciplinary studies" "information science" "finance" "economics" "sociology" "anthropology" "cultural studies" "theoretical physics" "aesthetics" "media studies" "computer graphics" "law" "information security" "ecology" "evolutionary biology" "social network analysis" "neuroscience" "robotics" "health & medicine" "performing arts" "literary theory" "engineering" "design thinking" "information retrieval" "computational theory" "business administration" "marketing" "entrepreneurship studies" ) ;
     ] .
 
 # ── Kind-safety (D2500): domain and discipline canonicals are DISJOINT ─────

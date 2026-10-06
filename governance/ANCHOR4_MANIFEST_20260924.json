@@ -77,5 +77,5 @@
   "menu_version": "closed_menu_v5",
   "closed_menu_sha256": "73597ee2b1bb1eb92edb08e743ffa0654c1e5994edcd3535d814c7942a89df6f",
   "answer_space_sha256": "8436d9c985c0efdf92b035e48518537e0b6a29f458b4046ac8bca4d93369d5eb",
-  "menu_pin_policy": "D-371. closed_menu_sha256 is the COMPOSITE rendering the 2026-09-2x labels were written against; it is HISTORICAL and is never re-rendered. answer_space_sha256 (domains + abstention) is the live pin. The two differ because a discipline DEFINITION was reworded (D-321), which moves no answer slot."
+  "menu_pin_policy": "D-371 + D-2831. closed_menu_sha256 (73597ee2...) is the HISTORICAL composite the 2026-09-2x labels were written against. answer_space_sha256 (8436d9c9...) is the HISTORICAL answer-space stamp under the RETIRED two-axis method (domains full entries + abstention), NOT the live pin. Both are FROZEN and never re-rendered; re-stamping to the live 5-axis value-set (d704d06e...) is deferred to D-2820 (D-2832)."
 }

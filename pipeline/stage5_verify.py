@@ -245,6 +245,74 @@ def _b2_majority_verdict(
     )
 
 
+def _or_entail_and_no_contra_verdict(
+    entail_scores: list[float],
+    contra_scores: list[float],
+    neutral_scores: list[float],
+    thresh: float,
+) -> tuple[bool, float, str]:
+    """D-2822 (Gate A(d)): OR-entail + AND-no-contradiction aggregation (pure, model-free).
+
+    A convergent FB is VERIFIED only when the evidence set OR-entails the claim (at least
+    ONE clean passage entails, i.e. `entail >= thresh`) AND no passage contradicts it
+    (AND-no-contra: ZERO passages where contradiction is the top label).
+
+    Rationale (D-2822): the D2507/B2 majority rule can HIDE a supported claim (the D272g
+    re-derivation counted 1,514 NEUTRAL and 506 ENTAIL-majority rows where a single strong
+    entailment was buried under neutral passages) and can PASS a claim carrying BOTH
+    entailment and contradiction. Support is existential (OR), contradiction is universal
+    (AND-NOT).
+
+    The returned score remains `max(entail)` so `nli_calibrate.py`'s threshold sweep is
+    unaffected; only the DECISION changes. Because a claim now survives on ONE entail, the
+    per-passage threshold must be re-calibrated (D-2822 step 2) before enabling this mode.
+
+    Args:
+        entail_scores: Per-passage entailment probabilities (aligned 1:1).
+        contra_scores: Per-passage contradiction probabilities.
+        neutral_scores: Per-passage neutral probabilities.
+        thresh: Entailment threshold (a passage "entails" if entail >= thresh).
+
+    Returns:
+        (passed, score, detail) — same contract as deberta_check().
+    """
+    _max_entail = max(entail_scores, default=0.0)
+    _n_clean = len(entail_scores)
+    _n_entail = sum(1 for s in entail_scores if s >= thresh)
+    _n_contra = sum(
+        1 for (e, c, u) in zip(entail_scores, contra_scores, neutral_scores)
+        if c > e and c > u
+    )
+    if _n_entail >= 1 and _n_contra == 0:
+        return True, round(_max_entail, 4), (
+            f"ENTAIL (OR-entail + AND-no-contra): {_n_entail}/{_n_clean} entail, "
+            f"0 contra, max={_max_entail:.2f}"
+        )
+    if _n_contra >= 1:
+        return False, round(_max_entail, 4), (
+            f"CONTRA (AND-no-contra veto): {_n_contra}/{_n_clean} contra, "
+            f"{_n_entail}/{_n_clean} entail, max={_max_entail:.2f}"
+        )
+    return False, round(_max_entail, 4), (
+        f"NEUTRAL (no entailing passage): {_n_entail}/{_n_clean} entail, "
+        f"{_n_contra}/{_n_clean} contra, max={_max_entail:.2f}"
+    )
+
+
+def _aggregate_verdict(
+    entail_scores: list[float],
+    contra_scores: list[float],
+    neutral_scores: list[float],
+    thresh: float,
+) -> tuple[bool, float, str]:
+    """D-2822: dispatch the cross-passage aggregation primitive by config (C12)."""
+    if NLI_AGGREGATION == "or_entail_and_no_contra":
+        return _or_entail_and_no_contra_verdict(
+            entail_scores, contra_scores, neutral_scores, thresh
+        )
+    return _b2_majority_verdict(entail_scores, contra_scores, neutral_scores, thresh)
+
+
 def deberta_check(fb: dict) -> tuple[bool, float, str]:
     """D2298-calibrated NLI check, D2321-corrected pairing, D2322 raw-score return.
 
@@ -321,8 +389,8 @@ def deberta_check(fb: dict) -> tuple[bool, float, str]:
             )
         return False, 0.0, "NLI scoring failed — QUARANTINE"
 
-    # D2507 (B2): cross-passage MAJORITY aggregation (extracted — see _b2_majority_verdict).
-    return _b2_majority_verdict(_entail_scores, _contra_scores, _neutral_scores, _thresh)
+    # D2507/D-2822: cross-passage aggregation (majority OR or-entail+AND-no-contra, C12).
+    return _aggregate_verdict(_entail_scores, _contra_scores, _neutral_scores, _thresh)
 
 
 # nli_evidence_check REMOVED (D2298) — superseded by deberta_check(); referenced deleted
@@ -463,6 +531,20 @@ EVIDENCE_GARBAGE_MIN_ALPHA_RATIO: float = float(_cfg5.get("evidence_garbage_min_
 # majority must contradict to veto. Replaces the weak single-passage max-entailment rule
 # (ChatGPT B2 / MTR task 32). Read at import time alongside the other stage5.* keys.
 B2_MAJORITY_RATIO: float = float(_cfg5.get("b2_majority_ratio", 0.5))
+
+# ── D-2822 (Gate A(d)): S5 cross-passage NLI aggregation mode (config-first, C12) ──
+# 'majority' = D2507/B2 strict-majority (current, calibrated). 'or_entail_and_no_contra' =
+# D-2822 Gate A(d): a convergent FB is VERIFIED only when at least ONE clean passage entails
+# (OR-entail) AND ZERO passages contradict (AND-no-contra). FLIP ONLY after D-2822 threshold
+# recalibration — the new rule lets a claim survive on ONE entail, so the per-passage
+# threshold must be re-swept (nli_calibrate.py) first. Unknown value → fail-closed (C16).
+NLI_AGGREGATION: str = str(_cfg5.get("nli_aggregation", "majority")).strip()
+_AGGREGATION_MODES: tuple[str, ...] = ("majority", "or_entail_and_no_contra")
+if NLI_AGGREGATION not in _AGGREGATION_MODES:
+    raise ValueError(
+        f"C16: unknown stage5.nli_aggregation={NLI_AGGREGATION!r}; "
+        f"expected one of {_AGGREGATION_MODES}"
+    )
 
 
 def _check_enrichment_quality(fb: dict) -> tuple[bool, float, str]:

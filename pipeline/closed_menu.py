@@ -1,8 +1,8 @@
 """pipeline/closed_menu.py — Closed-menu renderer (R1 / D-279).
 
 Builds the canonical classification menu from config/taxonomy_v5.yaml +
-config/content_types.yaml, with `none` as a FIRST-CLASS abstention value
-(D-275b/D-277: the classifier may answer "does not fit" rather than force-fit).
+config/content_types.yaml, with `emerging` as a FIRST-CLASS abstention value
+(D-275b/D-277/D-2830: the classifier may answer "does not fit" rather than force-fit).
 
 Returns a stable canonical JSON. Its sha256 is the `menu_hash` provenance stamp
 (D-279): any label can be traced to the EXACT menu it was classified against,
@@ -39,7 +39,7 @@ _CONTENT_TYPE_DISPOSITIONS = (
     "noise_drop",
     "quarantine",
 )
-_ABSTENTION_VALUE = "none"
+_ABSTENTION_VALUE = "emerging"
 
 
 def _load_yaml(path: Path) -> dict:
@@ -113,8 +113,9 @@ def _extraction_type_entries(ct: dict) -> list[dict]:
 def render_closed_menu() -> dict:
     """Render the canonical closed menu (content_types, extraction_types, disciplines, domains).
 
-    Cached: the menu is deterministic given the config files. `none` is included as
-    a first-class abstention on BOTH the content_type and (implicitly) the label axes.
+    Cached: the menu is deterministic given the config files. `emerging` is included as
+    a first-class abstention on BOTH the content_type and (implicitly) the label axes
+    (D-2830 single abstention token; D-2834 confirms it for the definition-anchored path).
     """
     tax = _load_yaml(_TAXONOMY_PATH)
     ct = _load_yaml(_CONTENT_TYPES_PATH)
@@ -127,6 +128,43 @@ def render_closed_menu() -> dict:
         "disciplines": _taxonomy_entries("disciplines", tax),
         "domains": _taxonomy_entries("domains", tax),
     }
+
+
+def definition_anchored_block() -> str:
+    """Render the definition-anchored closed menu (label + definition + abstention).
+
+    D-2814 (2026-10-05): the free-generation prompt told the model to INVENT precise
+    labels ("computational neuroscience > neuroscience"); the mapper then remapped those
+    off-menu inventions to 'emerging' (~27%, BUG-629) or coerced them onto the wrong axis
+    (BUG-630). The definition-anchored closed menu is the ROOT fix: the model sees every
+    canonical label WITH its definition and picks VERBATIM, so it never free-generates.
+
+    Fail-closed (C16): an enabled-but-empty menu raises rather than silently degrading
+    back to free generation.
+
+    Returns:
+        A stable block (deterministic given config) for injection into the S4
+        classification system prompt. Uses the LIVE abstention token (menu["abstention"]).
+    """
+    menu = render_closed_menu()
+    abstention = menu["abstention"]
+    disciplines = [e for e in menu["disciplines"] if e["value"] != abstention]
+    domains = [e for e in menu["domains"] if e["value"] != abstention]
+    if not disciplines or not domains:
+        raise RuntimeError("D-2814: definition-anchored menu empty — fail closed (C16)")
+    disc_lines = "\n".join(f'- "{e["value"]}" = {e["definition"]}' for e in disciplines)
+    dom_lines = "\n".join(f'- "{e["value"]}" = {e["definition"]}' for e in domains)
+    return (
+        "CLOSED DISCIPLINE MENU — choose EXACTLY ONE label, verbatim; the definition is the anchor:\n"
+        + disc_lines
+        + "\n\nCLOSED DOMAIN MENU — choose 1-5 labels, verbatim; the definition is the anchor:\n"
+        + dom_lines
+        + f'\n\nABSTENTION — each axis abstains INDEPENDENTLY: if NO label fits ontologically AND '
+        f'pragmatically for a given axis, output the literal token "{abstention}" AS THE VALUE for '
+        f'that axis (in place of a label — e.g. discipline: "{abstention}", or "{abstention}" inside '
+        f'domains). A real label on one axis and "{abstention}" on the other is VALID. NEVER invent '
+        f'a new label, a more-specific variant, or a hyphenated merge — "{abstention}" is a valid answer.'
+    )
 
 
 def canonical_json(menu: dict | None = None) -> str:

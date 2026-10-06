@@ -23,9 +23,14 @@ import collections
 import csv
 import json
 import statistics
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT))
+
+from pipeline.anchor_menu_guard import assert_referee_menu_v6  # noqa: E402
+
 SHEET = ROOT / "governance" / "ANCHOR2_BLIND_SHEET_20260920.csv"
 KEY = ROOT / "governance" / "ANCHOR2_KEY_20260920.json"
 TAXONOMY = ROOT / "config" / "taxonomy_v5.yaml"
@@ -143,7 +148,12 @@ def main() -> int:
 
     disc_vocab, dom_vocab, alias, dom_alias = load_vocab()
     dom_list = sorted(dom_vocab)
-    key = json.loads(KEY.read_text(encoding="utf-8"))["key"]
+    key_doc = json.loads(KEY.read_text(encoding="utf-8"))
+    # BUG-650 / D-2839: ANCHOR-2's discipline/domains axis was written against menu v5
+    # (the key carries the frozen menu_hash 73597ee2...). Refuse kappa until re-derived
+    # against menu v6 (D-2820) — a pre-D-2820 kappa is CIRCULAR.
+    assert_referee_menu_v6(key_doc, label=KEY.name, axis="discipline")
+    key = key_doc["key"]
     sheet = read_sheet(SHEET)
 
     rows, invalid = [], []

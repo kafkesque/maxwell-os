@@ -259,7 +259,11 @@ def supersession_gaps(recs: list[dict], rules: dict) -> list[str]:
     for r in recs:
         if _norm_state(r) != state_word or _token(r) in pinned:
             continue
-        if not _resolves_citation(_citation_token(r.get(field)), known):
+        raw = r.get(field)
+        if raw is not None and not isinstance(raw, str):  # BUG-626: successor must be scalar-or-absent
+            gaps.append(str(r.get("id")))
+            continue
+        if not _resolves_citation(_citation_token(raw), known):
             gaps.append(str(r.get("id")))
     return gaps
 

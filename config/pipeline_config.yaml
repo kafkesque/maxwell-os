@@ -1,9 +1,13 @@
 pipeline_root: null
 run:
-  default_id: t11
+  default_id: rechunk-v4-20260929
+  singleton_lock: true                 # BUG-602: refuse a second runner on one run_id (duplicate-runner conflict)
+  singleton_lock_path: ".pipeline_runner.lock"  # BUG-602: pid lock, relative to pipeline_root (C12)
+  preflight_timeout_sec: 90            # BUG-606: must exceed watchdog restart cycle (kill 10s + sleep 3s + RESTART_WAIT 30s ≈ 43s)
+  python_bin: /Users/barn/miniforge3/bin/python3  # BUG-607: canonical stage interpreter. Bare "python3" drifted between shells (login zsh→conda base, non-login→framework 3.12) so S2 lost datasketch. Pin the full-dep-chain env (C12).
 pipeline_manifest:
   schema_version: '3.0'
-  taxonomy_version: v5.6
+  taxonomy_version: v5.7
   pipeline_commit: v3.0-D2485
   models:
     generator: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
@@ -96,7 +100,9 @@ services:
     # D-291 (2026-09-21): pin to 0.7.0.dev2 — 0.7.0.dev4 fails to start on
     # externally-accessible servers with API-key auth disabled (Maxwell exposes
     # external server_aliases). Enable auth in ~/.omlx/settings.json to use dev4.
-    pinned_version: 0.7.0.dev2
+    # D-2772 (2026-10-02): OMLX updated to 0.7.0 release (build 2987), verified
+    # healthy on this M1 Max. Pin synced to the now-running release.
+    pinned_version: 0.7.0
     # D-293: Lightning MTP drafter for Qwen3 adapters (+34-58% decode, lossless at
     # temp=0.0). Enabled per-model in ~/.omlx/model_settings.json; flag records intent.
     mtp_enabled: false
@@ -107,6 +113,15 @@ services:
     cold_reload_delay: 45
     read_timeout: 60
     wedge_recovery_sleep: 20
+    # BUG-658 (2026-10-06): TOTAL wall-clock deadline per inference call. The per-read
+    # read_timeout is defeated by OMLX SSE keepalive bytes (sse_keepalive_mode: 'chunk'),
+    # which reset the read timer forever and leave the client silently hung. This is a
+    # hard ceiling keepalive cannot reset; the A/B harness reads it until call_omlx does.
+    wall_clock_deadline_sec: 180
+    # BUG-658: preflight smoke classification deadline — proves the model is loaded AND
+    # chat completions return parseable JSON before an N-request run (a /v1/models ping
+    # cannot prove chat readiness; see stress_test_omlx for the distinction).
+    preflight_smoke_deadline_sec: 120
     circuit_breaker_enabled: true
     circuit_breaker_failure_threshold: 5
     circuit_breaker_failure_threshold_floor: 25
@@ -197,7 +212,7 @@ label_vote:
 pipeline:
   schema_version: '3.0'
   commit: v3.0-D2485
-  taxonomy_version: v5.6
+  taxonomy_version: v5.7
   max_domains_per_fb: 5
   chunk_size_words: 300
   chunk_overlap_words: 50
@@ -293,6 +308,7 @@ stage2:
   max_probe_per_book: 2
   split_probe_kmeans_random_state: 42
   omlx_retry_attempts: 2
+  accept_conditional_within_tolerance: true   # BUG-609: advance to S4 when failed/total ≤ max_failed_ratio (deterministic schema failures never clear on re-run → would loop forever)
   gen_max_tokens: 3072
   gen_max_tokens_retry: 4096
   batch_position_monitor: false
@@ -365,6 +381,8 @@ stage4:
   depth_max_tokens: 1024
   depth_batch_size: 4
   depth_batch_max_tokens: 2048
+  depth_anchor_path: governance/depth_anchor_conformance_20261002.json
+  depth_conformance_kappa_floor: 0.800
   depth_batch_enabled: true
   depth_prompt_variant: v3_contrastive
   depth_frugal_enabled: false
@@ -388,6 +406,57 @@ stage4:
   golden_path: config/golden/stage4_golden.yaml
   golden_inject_enabled: true
   golden_max_examples: 7
+  discipline_anchor_path: governance/discipline_anchor_conformance_20261002.json
+  discipline_conformance_kappa_floor: 0.8
+  # D-2798 (BUG-622): discipline is ADVISORY-ONLY — this floor is a REPORTING reference,
+  # NOT a hard gate. discipline_conformance_gate.py --gate is a NO-OP in advisory mode
+  # (discipline does NOT gate routing). Set 'hard' to restore the legacy fail-closed.
+  discipline_gate_mode: advisory
+  # BUG-622 (D-2796): discipline floors are HUMAN-UNREACHABLE — fine ceiling 0.581,
+  # coarse 0.728, macro-3way 0.766. Gate at human parity; fine-62 is advisory, macro is advisory-only (D-2798).
+  discipline_coarse_kappa_floor: 0.73   # re-targeted from 0.9 (D-2790) to the human coarse ceiling
+  discipline_macro_groups_path: config/discipline_macro_groups.yaml
+  # D-2797 (BUG-622): owner ratified the 3-way macro scheme + human-parity gate (~0.73-0.77).
+  # D-2798 (BUG-622): Condition C measured kappa 0.6066 < 0.65 ship threshold AND < 0.73 human-parity
+  # floor (human 3-way ceiling 0.766) -> macro NOT shipped as a routing facet; discipline is ADVISORY-ONLY
+  # (fine-62 -> advisory multi-label tags, soft facet). Flag kept false until the S4 advisory re-wire.
+  discipline_macro_kappa_floor: 0.73
+  discipline_macro_enabled: false
+  discipline_model: gpt-oss-20b-MXFP4-Q8
+  # D-2820 (2026-10-05): anchor re-derivation harness (scripts/rederive_anchor_axes_v6.py).
+  # generator produces CANDIDATE labels (INPUT only); the owner adjudicates (D-2839 c2); a
+  # second coder of a DIFFERENT model family cross-checks (R5 generator != verifier).
+  anchor_rederive_generator_model: gpt-oss-20b-MXFP4-Q8
+  anchor_rederive_second_coder_model: gemma-4-E4B-it-MLX-4bit
+  anchor_rederive_anchor_version: v6
+  swap_eval_baseline_model: gpt-oss-20b-MXFP4-Q8   # D-2767/D-2783 classifier-of-record (baseline)
+  swap_eval_candidate_model: gemma-4-12B-it-qat-OptiQ-4bit   # D-2788 REJECTED (slower on BOTH axes) — kept for audit trail; classifier-of-record remains gpt-oss-20b-MXFP4-Q8
+  swap_eval_kappa_bar: 0.7   # D-2782 classifier-kappa bar (Cohen, classifier-vs-gold), declared pre-eval
+  # D-2773 (2026-10-02): closed 62-discipline menu injection (BUG-622 fix, MEASURE-gated).
+  # OFF by default — when false the prompt is byte-identical to the pre-fix baseline.
+  # Adopt only if a full-204 discipline A/B shows Cohen's kappa >= 0.800 (D-2767).
+  # See pipeline/stage4_merged_call.py::_render_discipline_closed_menu.
+  discipline_closed_menu_enabled: false
+  # D-2814 (2026-10-05): definition-anchored closed menu (label + definition + explicit 'emerging')
+  # replaces the free-generation discipline/domains instruction in BOTH the merged S4 call and the
+  # direct classify fallback. OFF by default (byte-identical baseline); adopt only after R5 review
+  # (gemma != verifier) of the rendered prompt + a full-204 A/B (D-2767). C16: enabled + empty menu -> raise.
+  # D-2814 supersedes D-2773 (the label-only closed menu) — do not enable both. Enforced
+  # fail-closed in pipeline/stage4_merged_call.py (D-2833 / BUG-647): both true -> RuntimeError.
+  # D-2835: the rendered menu is a CONSTANT, byte-deterministic prefix (~5k tokens) — amortized by
+  # a serving-layer prefix cache; group-prefilter is DEFERRED (it risks re-opening BUG-629/630).
+  definition_anchored_menu_enabled: false
+  # D-2814/BUG-630 (2026-10-05): curated same-axis fall-through. The opposite-axis guard in
+  # map_to_canonical_with_fallback correctly blocks coercion, but must retry a declared SAME-axis home
+  # before abstaining. Keys are normalized raw labels; values are the same-axis canonical. Seeded with
+  # the two rescues MEASURED on rechunk-v4-20260929 (BUG-630): 'organizational behavior' -> 'organizational
+  # theory', 'product design' -> 'design thinking'. 'urban planning' is deliberately ABSENT (genuine gap).
+  same_axis_fallthrough:
+    discipline:
+      organizational behavior: organizational theory
+      product design: design thinking
+    domain: {}
+  discipline_negative_exemplars_path: config/golden/discipline_negative_exemplars.yaml
   context_signals:
     business:
     - business operations
@@ -415,7 +484,7 @@ stage4:
     - ai & agents
     - computational science & physics
     academic:
-    - research & methodology
+    - research practice
     - semiotics & communication
     - computational art
   temporal_signals:
@@ -506,6 +575,11 @@ stage5:
   evidence_garbage_max_underscore: 2
   evidence_garbage_min_alpha_ratio: 0.5
   b2_majority_ratio: 0.5
+  # D-2822: S5 cross-passage NLI aggregation mode. 'majority' = D2507/B2 strict-majority
+  # (current, calibrated). 'or_entail_and_no_contra' = D-2822 Gate A(d): a convergent FB is
+  # VERIFIED only when at least ONE clean passage entails (OR-entail) AND ZERO passages
+  # contradict (AND-no-contra). FLIP ONLY after D-2822 threshold recalibration (nli_calibrate.py).
+  nli_aggregation: majority
   banned_mechanism_prefixes:
   - because it enables
   - because it allows
@@ -564,6 +638,7 @@ coverage:
   threshold: 0.5
   flag_fraction: 0.3
 retrieval:
+  method: vector  # D-2724: production candidate pool. 'vector' = pure vector + cross-encoder rerank (vector+rerank, D-2723 recommendation — RRF fusion is recall-negative); 'rrf' = RRF fusion of FTS+vector+keyword (legacy hybrid/hybrid+rerank).
   fts_stopwords: [a, an, the, and, or, of, to, in, on, for, with, is, are, was, were, be, been, how, what, why, when, where, which, who, do, does, did, can, could, should, would, will, this, that, these, those, it, its, as, at, by, from, about, into, than, then, so, if, but, not, no, have, has, had, i, me, my, we, our, you, your, they, them, their]
 retrieval_eval:
   model: Phi-4-mini-instruct-8bit
@@ -719,7 +794,7 @@ taxonomy:
       personal productivity: 0.3736
       product design: 0.2437
       project management: 0.3914
-      research & methodology: 0.1587
+      research practice: 0.1587
       science & research: 0.0211
       semiotics & communication: 0.1569
       social sciences: 0.2061
@@ -760,7 +835,7 @@ test:
     output_subdir: full-run
     pipeline_commit: full-run-v3
     schema_version: '2.3'
-    taxonomy_version: v5.6
+    taxonomy_version: v5.7
     extract_model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
     extract_max_tokens: 2048
     classify_max_tokens: 512
@@ -802,7 +877,7 @@ test:
       - code & computation
       - computational art
       research:
-      - research & methodology
+      - research practice
       - semiotics & communication
       system:
       - systems & frameworks

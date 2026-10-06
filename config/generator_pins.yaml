@@ -26,7 +26,7 @@
 # `identity_sha256` wherever the snapshot is symlinked (the blob basename is the content digest).
 
 schema_version: '1'
-decided: PENDING            # a mint must arrive with a decision - the rail never writes this file (D-382)
+decided: D-2809            # minted by owner ruling (D-2809); was PENDING - the rail never writes this file (D-382)
 
 hf_cache: "~/.cache/huggingface/hub"
 ollama_manifests: "~/.ollama/models/manifests"

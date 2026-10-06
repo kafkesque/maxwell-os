@@ -3251,3 +3251,283 @@ refuses an off-menu authority value (C12d), timestamped backup + atomic write (C
 **Result.** 117 cells rewritten + 30 resolved by regeneration; ceiling 149 -> 2. Residual = R021 in both views,
 whose depth AUTHORITY value is the provenance sentinel `noise_drop` (not a depth class) - refused by design.
 Reported, never silent: discipline authority covers 204/208 (R021/R040/R080/R091 uncovered).
+
+
+## D-2826 / D-2827 (2026-10-05) - T4 menu v6 + T9 Gate A(d) OWNER-APPROVED, audit-gated
+
+**Context.** Owner approved both prior recommendations: T4 = ship the menu v6 bundle
+(D-2814 definition-anchored closed menu + D-2815 additive B&M group + D-2816 pySHACL/OntoClean/ISO 25964-1)
+as one atomic; T9 = ship D-2822 Gate A(d) (OR-entail + AND-no-contra) decoupled, after menu v6.
+
+**Decision.** Flipped D-2814/D-2815/D-2816/D-2822 PROPOSED -> RATIFIED. Minted D-2826 (T4 ratification
+record) and D-2827 (T9 disposition). The 11-category forensic audit (FORENSIC_AUDIT_20261005_MENU_V6_GATE.md)
+returned BLOCKED with four pre-implementation findings -> D-2828 (PROPOSED) + BUG-640/641/642/643.
+
+**Result.** Implementation deferred until: owner rules CF1 (B&M slot 'entrepreneurship' collides with the
+existing domain) and BL1 (single abstention token); assistant executes B1/MI2 (regenerate taxonomy_shacl.ttl)
+and C1 (alias_map 14-consumer shrink-then-remove). S5 re-run in progress (PID 91019, checkpoint.jsonl growing);
+S6 commit waits on S5 completion.
+
+## D-2829 / D-2830 (2026-10-05) — CF1 + BL1 owner rulings received; menu v6 gate unblocked on the human-decided findings
+- **CF1 (BUG-640):** B&M discipline slots = 'business administration' / 'marketing' / 'entrepreneurship studies' (JEL M discipline-scoped; kills the 'entrepreneurship' domain collision).
+- **BL1 (BUG-643):** single abstention token = 'emerging' (reconciles _ABSTENTION_VALUE 'none', closed_menu_v5.json catch_all, and the 27.2% emerging metric).
+- **Deterministic fixes applied (B1/MI2 + registry):** taxonomy_shacl.ttl regenerated v5.5→v5.6 via generate_taxonomy_shacl.py — including a CONTENT drift the audit's MI2 missed (discipline list +'ecology' / −'computer networking'); bug_status.json header-gap fixed (BUG-638/640/641/642/643 now registered, 382 total).
+- **D-2819 pre-provenance baseline COMPLETE:** S5 re-verified 6,591/6,591 FBs (PASS 3360 / QUARANTINE 3231) → S6 committed SQLite 14,574 rows vec0-READY + Parquet fbs_snapshot_20261005_114218.parquet (run under /opt/homebrew/bin/python3 3.14.6; framework Python 3.12 lacks enable_load_extension and fail-closed on vec_require=true).
+- **Remaining deterministic gate:** C1 alias_map shrink-then-remove (14 consumers), then D-2814→2815→2816 atomic menu v6 (S4-idle gated), then D-2820 anchor re-derivation, then D-2822 Gate A(d) + NLI recalibration.
+
+## D-2836 → D-2838 (2026-10-05) — D-2814 R5 gate closed; ADOPTION recommendation; writer-limb enforced
+- **D-2836:** R5 verifier (gemma) review of the D-2814 swap — FAIL→fixed (F1 schema placeholders, F2 'emerging' hidden, F3 batch path uncovered). Flag OFF, uncommitted.
+- **D-2837 (owner recommendation):** ADOPT the definition-anchored closed menu as the S4 target architecture (verbatim menu + definition anchors + per-axis 'emerging'). The flag flip is EMPIRICALLY GATED on the full-204 A/B (D-2767, kappa ≥ 0.800, emerging ≤ 0.35) against a RE-DERIVED anchor — D-2820 MUST PRECEDE the A/B or the kappa is circular (the 204-gold axis was adjudicated against the PRE-D-2814 free-gen menu).
+- **D-2838 (BUG-631 writer-limb):** max_domains_per_fb=5 was DETECTED but NOT ENFORCED (52 FBs carrying 6-7 domains, all CLEAN). `_enforce_domain_cardinality()` now truncates at write with a receipt and degrades CLEAN→FALLBACK; control test added.
+- **Forensic audit:** NO BREAK / NO CASCADE (governance/FORENSIC_AUDIT_20261005_D2837_ADOPTION.md). Census GREEN: 968 decisions, stamp 5a2565c1d692cb36.
+- **NEXT:** D-2820 anchor re-derivation → full-204 A/B → conditional flag flip; then D-2822 Gate A(d), C1 alias_map, bundled dirty-tree commit.
+
+## D-2839 (2026-10-05) — anchor-ratification gate minted; BUG-650 pre-A/B guard filed
+- **D-2839 (PROPOSED):** owner ratification gate — the re-derived 204-gold anchor (D-2820 output) becomes the
+  D-2767 A/B referee ONLY after owner sign-off. Four acceptance criteria: (1) menu-v6 hash-stamped; (2)
+  owner-adjudicated, never LLM-only; (3) second-coder + DeBERTa-NLI cross-checked (R5); (4) D-274d-stamped.
+  FIXES BUG-650 (fail-closed pre-A/B guard as the enforcement limb). Flips to RATIFIED only after re-derivation
+  — a HUMAN gate the agent cannot self-sign.
+- **BUG-650 (OPEN):** full-204 A/B has no fail-closed guard against a frozen-invalid anchor —
+  benchmark_s4_ab.py / anchor2_kappa.py / fit_eval_model_swap.py read the v5-stamped 204-gold with no menu_hash
+  pin check; a pre-D-2820 kappa is CIRCULAR and would silently pass the 0.800 floor.
+- **Forensic audit (governance/FORENSIC_AUDIT_20261005_D2839_ANCHOR_RATIFICATION.md):** NO BREAK / NO CASCADE.
+  Menu-v6 gate SATISFIED (composite 92f1a204 / answer-space d704d06e). Census GREEN: 969 decisions, stamp
+  6d1dbb3f77891cee. Flag OFF, tree uncommitted.
+
+## D-2840 (2026-10-05) — BUG-650 fail-closed pre-A/B anchor-referee guard LANDED
+- **D-2840 (RATIFIED):** `pipeline/anchor_menu_guard.py` refuses kappa on a no-stamp or frozen-v5-pin
+  menu-derived anchor (pins from config/menu_axis_hashes.yaml). Wired into
+  `discipline_conformance_gate.py` load_anchor() (the 204-row referee; covers fit_eval_model_swap via import)
+  + `anchor2_kappa.py`. Depth axis intentionally unguarded (not menu-derived).
+- **BUG-650 (PARTIAL):** guard landed + verified (9 control tests; --dry-run and anchor2_kappa both exit 1).
+  Still BLOCKED: A/B cannot run until D-2820 re-derives the anchor and D-2839 flips PROPOSED→RATIFIED.
+- **Forensic audit:** NO BREAK / NO CASCADE / NO DRIFT. Census GREEN: 970 decisions, stamp f5faa921f90f053a.
+
+## D-2841 (2026-10-05) — D-2820 anchor re-derivation harness LANDED (rederive_anchor_axes_v6.py)
+Built the PRODUCER limb of D-2820: scripts/rederive_anchor_axes_v6.py re-derives the discipline + domains axes
+against menu v6 (definition-anchored), owner-gated, second-coder + DeBERTa-NLI cross-checked, D-274d-stamped.
+5 fail-closed stages (--plan/--generate/--adjudicate/--verify/--finalize). Finalize refuses unless the BUG-650
+guard passes. 6 control tests + --selftest + --plan (204/204 join, pins verified). Forensic audit NO BREAK/NO
+CASCADE/NO DRIFT. Census 971/stamp a02e757bf66c8a93. D-2839 remains PROPOSED (owner sign-off is a human gate).
+
+## D-2842 (2026-10-05) — D-2822 Gate A(d) CODE limb LANDED (OR-entail + AND-no-contradiction)
+- pipeline/stage5_verify.py: `_or_entail_and_no_contra_verdict()` + `_aggregate_verdict()` dispatch on
+  config-first `stage5.nli_aggregation` (default 'majority' = current; 'or_entail_and_no_contra' = D-2822).
+  Unknown value → fail-closed (C16). Score contract preserved (nli_calibrate.py unaffected).
+- BUG-651 filed + registered (S5 majority aggregation hides supported claims / passes contradictory claims).
+- 8 control tests (tests/test_or_entail_no_contra.py); 16 total pass with the B2 suite.
+- Census 972 / stamp 109b972746d4a22c. FLIP gated on D-2822 recalibration + S5 re-run (OPERATOR step).
+
+## D-2843 (2026-10-05) — BUG-631 READER-limb LANDED (scripts/check_domain_cardinality.py)
+- Landed the READER half of the BUG-631 cardinality loop (D-2838 = WRITER half). The reader re-measures the
+  committed store (DB_PATH, config-first) for canonical `domains` arrays > max_domains_per_fb (5), counts ONLY
+  `domains` (never `domains_raw`), names parse-defects (never a silent zero, C16), writes a C6 receipt (--json),
+  and exits fail-closed (0 clean / 1 drift / 2 parse-defect). 9 control tests
+  (tests/test_domain_cardinality_reader.py) all pass.
+- LIVE re-measure reproduces BUG-631 exactly: **52 over-cap FBs** (46 @ 6 domains, 6 @ 7) of 14,574 total
+  (0.36%), every one CLEAN. The 52 historical FBs are STILL owed a re-derivation (BUG-631 stays OPEN).
+- Governance drift fixed: BUG-647 header/body reconciled (IN PROGRESS → FIXED, matches the D-2833 table row).
+- Census 973 / stamp ae6db643a2f879d6. Bug register 390 bugs: 145 open / 245 closed.
+- SECONDARY (flagged, not fixed): store_authority.yaml declares 7,995 fbs rows; store now holds 14,574
+  (rechunk-v4-20260929) — stale declaration to refresh at the menu-v6 commit.
+
+## 2026-10-05 — Store-authority reconciliation (post-bloat drift fixed; NO new decision minted)
+- `scripts/check_store_authority.py --check` was FAILING with 2 faults (cascade from the 2026-09-29 bloat cleanup):
+  (1) `knowledge pipeline/diagnostic_diagnostic_20260811_232853.db` declared `derived` but ABSENT (→ tombstone);
+  (2) `archive/bloat_20260929/knowledge pipeline/parquet` (22 old snapshots) UNDECLARED.
+- FIX: removed the stale diagnostic-db declaration (tombstone already covered by `preimage_regions`); added the
+  archived parquet collection as `archive`; refreshed authoritative `why` 7,995 → 14,574 fbs (75 cols unchanged);
+  refreshed `knowledge pipeline/parquet` count 25 → 4 snapshots + 1 diagnostic subdir.
+- Rail re-verified: 0 faults, exit 0. Census unchanged (973 / ae6db643a2f879d6). Forensic audit:
+  governance/FORENSIC_AUDIT_20261005_STORE_AUTHORITY.md.
+
+## D-2844 (2026-10-06) — PROPOSED — D-2820 owner adjudication normalized (204 rows) + taxonomy boundary clarifications
+- Owner adjudicated the 142 differing rows of the D-2820 re-derivation (Numbers: "Surveillance Capitalism and
+  Soviet Discourse.numbers", table rederive_v6_differences_only). Forensic audit CLEAN: 0 off-menu labels.
+- Normalized: 4 separator typos (`,`/`.` -> `|`), 6 note typos. 62 same rows carried forward -> full 204-row decision set.
+- Artifacts: governance/rederive_v6_owner_decisions_normalized.csv + governance/rederive_v6_owner_decisions.json
+  (schema owner_decisions_v1: decisions map + drops + emerging_mix_pending + abstain_discipline).
+- OWNER-GATED (none auto-applied):
+  (1) DROP 3 noise rows R084/R106/R148 (R148 domain still filled -> inconsistent) -> anchor 204->201;
+  (2) emerging-mix 4 rows R023/R112/R177/R188 (emerging alongside real domains) -> owner picks abstain vs keep;
+  (3) taxonomy boundary clarifications PROPOSED: strategic thinking vs decision making; business administration vs
+      operations research vs organizational theory; marketing vs design psychology vs behavioral economics;
+      generative ai vs artificial intelligence vs machine learning; + domain overlaps (BD/BO/entrepreneurship,
+      digital product/web & ui/product design, research & methodology/science & research). closed_menu_v6.json NOT edited (protected).
+- --adjudicate/--verify/--finalize DEFERRED: harness fail-closed requires all 204 rows non-empty on-menu;
+  finalize additionally gated on D-2839 sign-off + full-204 A/B (kappa>=0.800 AND emerging<=0.35).
+- Forensic audit: governance/FORENSIC_AUDIT_20261006_OWNER_DECISIONS.md
+
+## D-2845 (2026-10-06) — RATIFIED — D-2820 anchor re-cut 204→201 + emerging-mix resolved (owner-approved)
+- Owner resolved D-2844 items (1)+(2): DROP 3 noise rows R084/R106/R148; emerging-mix R023/R112/R177/R188
+  → **keep only real domains** (drop the stray `emerging` token). Rationale: `emerging` is a PURE abstention
+  signal — mixing it with real labels is self-contradictory, degrades DeBERTa-NLI verification precision, and
+  pollutes the emerging bucket used for future taxonomy-expansion triage. None of the 4 concepts is novel;
+  full abstention would discard correct disciplines + domains for zero gain.
+- Re-cut anchor: governance/discipline_anchor_conformance_20261006.json (204→201, provenance-stamped).
+- Flat decisions: governance/rederive_v6_owner_decisions_flat.json (201 entries, all on-menu, all non-empty).
+- --adjudicate → governance/rederive_v6_finalized_20261006.json (201 rows, owner_finalized, 0 off-menu).
+- Emerging census (post-resolution): discipline='emerging' 7 (R006/R059/R127/R140/R146/R165/R202),
+  domains=['emerging'] pure 7 (R032/R066/R101/R113/R141/R172/R209). 14/201 (6.97%) touch 'emerging' —
+  under the 0.35 A/B gate.
+- STILL OWNER-GATED: taxonomy boundary clarifications (strategic thinking/decision making; business admin/
+  ops research/organizational theory; marketing/design psychology/behavioral economics; genAI/AI/ML) → edit
+  closed_menu_v6.json (protected) → re-render + re-pin → re-derive (menu-hash change invalidates this anchor).
+  Also deferred: 7 mirror-pattern rows (discipline='emerging' + real domains) for owner review.
+- NEXT: --verify (second coder + DeBERTa NLI) → --finalize → flip D-2839 PROPOSED→RATIFIED (human gate) →
+  full-201 A/B (D-2767) kappa≥0.800 AND emerging≤0.35 → flip definition_anchored_menu_enabled iff pass.
+- Forensic audit: governance/FORENSIC_AUDIT_20261006_RESOLUTION.md
+
+## D-2846 (2026-10-06) — RATIFIED — D-2820 anchor re-derivation --verify + --finalize complete (menu-v6 stamped, guard PASSED)
+- --verify cross-checked all 201 rows: second coder gemma-4-E4B-it-MLX-4bit (R5 distinct family) + DeBERTa-NLI.
+  Result: 85 agree / 116 disagree (57.7%); NLI 82 entailed / 102 weak / 17 contra-dominant. All SURFACED, never
+  flipped (D-2839 c3). 12 of 17 contra-dominant rows sit exactly on the owner-flagged taxonomy boundaries
+  (strategic thinking/decision making; business admin/ops research/organizational theory; marketing/design
+  psychology; design thinking vs business admin/sociology).
+- --finalize minted the re-derived anchor: governance/discipline_anchor_rederived_v6_20261006.json (201 rows).
+  menu-v6 hash-stamped: composite 92f1a204c894376d84034084b33aabf6d07317cfa6b3fbeb5303b29525cc3681 +
+  answer_space d704d06e3d17a9b91266938a9837c4daf443cb73e5d0598d9a859f69d0228267 (both == declared live pins).
+  guard PASSED; gen_model = human_owner (adjudicated) — classifier output was INPUT only (D-2839 c2).
+- Emerging census (final): discipline='emerging' 7 (3.5%), domains touching 'emerging' 7 — under the 0.35 A/B gate.
+- Forensic note: the first --verify attempt's 300s-timeout left a stale duplicate PID running alongside the
+  relaunched job (double memory + OMLX contention); killed it, verify then completed clean. No output corruption
+  (crash-safe atomic writes, C6).
+- D-2839 REMAINS PROPOSED (human gate): the harness does NOT self-sign. Owner sign-off next, gated on eyeballing
+  the 17 contra-dominant rows (R155/R167/R168/R179 contra ≥ 0.97) + the 116 second-coder disagreements.
+- NEXT (owner-gated): D-2839 ratify → full-201 A/B (D-2767) kappa≥0.800 AND emerging≤0.35 → flip
+  definition_anchored_menu_enabled iff pass.
+
+## D-2847 (2026-10-06) — RATIFIED — Owner consolidation of 14 contra-dominant rows + re-derive (menu-v6 re-mint)
+- Owner resolved the 3 held consolidation items: R179 -> creative process; R143 -> design thinking;
+  R183 -> discipline 'emerging' + domain 'urban planning' (explicit owner choice: abstain discipline, keep real domain).
+- Applied 6 discipline changes (R155 business administration; R167 organizational theory; R183 emerging; R179 creative
+  process; R036 marketing; R143 design thinking) + 8 owner-confirmed no-ops to rederive_v6_owner_decisions_flat.json
+  (201). All 14 labels verified ON-MENU v6 (0 off-menu) BEFORE write.
+- Re-ran fail-closed chain with --run-id 20261006b (after fixing the dead --run-id flag, D-2848):
+  --adjudicate (201 rows, 0 off-menu) -> --verify -> --finalize.
+- Verify: 88 agree / 113 disagree (43.8%); NLI 85 entailed / 104 weak / 12 contra-dominant (down from 85/116 and
+  82/102/17). Owner consolidation resolved 5 of 17 contra-dominant rows. 14/14 consolidation rows landed correctly.
+- Minted: governance/discipline_anchor_rederived_v6_20261006b.json (201 rows; composite 92f1a204... + answer_space
+  d704d06e... == declared live pins; guard PASSED; gen_model human_owner adjudicated — classifier INPUT only, D-2839 c2).
+- Emerging census: discipline='emerging' 8 (7 mirror R006/R059/R127/R140/R146/R165/R202 + R183); under the 0.35 gate.
+- D-2839 REMAINS PROPOSED (human gate): 20261006b is a CANDIDATE referee, not yet the D-2767 A/B referee.
+
+## D-2848 (2026-10-06) — RATIFIED — Harness --run-id dead-flag fix (C16 hidden-failure remediation)
+- Forensic audit found --run-id was parsed but NEVER used: all path helpers (_worklist/_finalized/_verified/
+  _manifest_path) + finalize_manifest artifact_id hardcoded _run_id() (UTC date). The --finalize error said
+  "use --run-id for a new run" while the flag silently did nothing — a hidden failure blocking any same-day
+  re-mint (I2 mint-once guard).
+- Fix: threaded run_id through all path helpers + finalize_manifest (default _run_id()); added fail-closed validation
+  (reject path separators; --run-id ../evil -> SystemExit). --selftest passed before AND after (no regression);
+  --plan validated the fix. BUG-652 (RESOLVED).
+- Flagged, NOT auto-fixed (protected config): pipeline_config.yaml discipline_anchor_path still points to the 204-row
+  discipline_anchor_conformance_20261002.json while the re-cut is 201-row ..._20261006.json (drops R084/R106/R148).
+  Harness run with explicit --anchor ..._20261006.json. Owner decision to repoint pending.
+
+## D-2849 (2026-10-06) — PROPOSED — Effect-TS evaluation: adopt the patterns, not the TypeScript library
+- Evaluated github.com/Effect-TS/effect (effect 4.0.1, LTS): TypeScript-only (TS 5.9+/Node 18+) for typed errors,
+  dependency injection, structured concurrency, scheduling, tracing, unified schema validation.
+- VERDICT: do NOT integrate the TS library into the Python pipeline (C27 zero future tax; C28 quality-tiered;
+  C1/C3 sovereign local — a TS runtime + npm deps breaks the $0-local contract).
+- ADOPT the four disciplines in Python instead: (1) typed errors -> Result/Either type (formalize C16 log-AND-raise);
+  (2) structured concurrency -> asyncio.TaskGroup (fixes the stale-orphan process bug, D-2846 note);
+  (3) parse-don't-validate -> pydantic at every config/JSON/DB boundary (fixes truncation/mismatch);
+  (4) typed retry -> tenacity (fixes OMLX cold-load transient failures).
+- Effect's guarantees are ALREADY codified in iron rules (C6/C13/C16/C23/C24); the gap is type-level ENFORCEMENT,
+  not missing rules. No implementation yet — OWNER-GATED architectural decision.
+
+## D-2850 (2026-10-06) — RATIFIED — Owner final consolidation round 2 + re-mint 20261006c
+- Owner revised 3 discipline labels: R168 research methodology -> marketing; R153 research methodology -> cognitive science;
+  R143 design thinking -> computer graphics. Confirmed R183 stays emerging + urban planning (urban planning is domain-only on
+  menu v6, NOT a discipline — kept as discipline=emerging + domain=urban planning).
+- Forensic audit BEFORE re-run: full 201-row menu validation (0 empty / 0 off-menu discipline / 0 off-menu domain);
+  OMLX healthy (gemma-4 + gpt-oss loaded); no stale rederive processes (orphan double-load avoided).
+- Re-ran fail-closed chain --adjudicate -> --verify -> --finalize at --run-id 20261006c. Result:
+  contra-dominant 12 -> 9; second-coder disagreements 113 -> 110; NLI entailed 85 -> 87 / weak 105 / contra 9.
+  All 3 changed rows resolved out of contra (R168 entailed 0.893, R143 entailed 0.987, R153 weak + second-coder agree).
+- REMAINING 9 contra-dominant = 6 owner-confirmed labels still contra (R029/R098 design thinking, R047 design psychology,
+  R107 research methodology, R090 media studies, R067 HCI) + 3 non-consolidation (R014/R134/R147). Owner is final authority
+  (D-2839); noted, NOT auto-flipped.
+- Manifest: governance/discipline_anchor_rederived_v6_20261006c.json (201 rows, guard PASSED, menu-v6 stamped).
+- BUG-653 logged (off-menu domain-only trap; --adjudicate hint improvement proposed, not yet fixed).
+
+## D-2851 (2026-10-06) — RATIFIED — Owner final round 3 (5 label changes) + re-mint 20261006d
+- Owner revised 5 labels: R107 research methodology -> philosophy; R067 HCI -> interdisciplinary studies;
+  R029 design thinking -> business administration; R047 design psychology -> psychology; R098 design thinking -> aesthetics
+  (R098 was listed twice; owner resolved to aesthetics). Forensic audit: all 5 on-menu, defensive overwrite guard passed.
+- Re-ran fail-closed chain --adjudicate -> --verify -> --finalize at --run-id 20261006d. Result:
+  contra-dominant 9 -> 4 (R014/R090/R134/R147 remain); second-coder disagreements 110 -> 106; entailed 87 -> 89.
+  4 of 5 changes now second-coder-agree (R029 entailed .792, R047 entailed .994).
+- REMAINING 4 contra rows (R014 philosophy, R090 media studies, R134 information retrieval, R147 research methodology)
+  + 106 disagreements are OWNER-ACCEPTED AS-IS (owner is final authority, D-2839).
+- D-2839 FLIPPED PROPOSED -> RATIFIED (owner sign-off complete). The 20261006d manifest
+  (governance/discipline_anchor_rederived_v6_20261006d.json, guard PASSED) is NOW the D-2767 full-201 A/B referee.
+
+
+## D-2849 RATIFIED (2026-10-06)
+Owner approve-and-ratify. Effect-TS patterns (Result/Either, asyncio.TaskGroup, pydantic, tenacity) adopted in principle; implementation deferred and folded into the classifier-of-record swap (tenacity retry + Result/Either) and the A/B harness (pydantic). No standalone scaffolding commit (C28).
+
+## BUG-654 CORRECTED -> BUG-655 (2026-10-06)
+The 0.46 "kappa swing" was a measurement bug: kappa 0.3181 (flag-OFF cribs arm) vs 0.7794 (flag-ON definition-anchored arm) are two sides of definition_anchored_menu_enabled, not non-determinism. Deterministic gpt-oss settings already applied (D-2637 server + config verifier levers); live 2-pass check 3/3 byte-identical. Real flag-ON kappa ~0.7794 (2pt under floor) -> flip still blocked for a genuine ~43-row gap. scripts/d2767_ab_eval.py rewritten to measure the flag-ON arm + determinism self-check.
+
+## BUG-653 RESOLVED + BUG-656 OPEN (2026-10-06)
+- BUG-653 (off-menu adjudication hint) RESOLVED — validate_on_menu + _off_menu_discipline_hint + _closest_labels, selftest green.
+- BUG-656 (production-path vs rederive-path measurement) OPEN — D-2767 gate arm is the production prompt, not rederive `_classify_prompt`; harness now measures production path and emits a per-row disagreement CSV. No flip until owner rules the production-path disagreement rows.
+
+## D-2852 (2026-10-06) — RATIFIED — D-A: D-2767 A/B verdict kappa 0.4313 → D-2839 gate FAILED
+Owner ratified the A/B verdict. The full-201 flag-ON A/B (governance/d2767_ab_flagon_20261006d.json, 20:28) LANDED:
+
+| metric | value | gate | verdict |
+|---|---|---|---|
+| Cohen kappa | **0.4313** | >= 0.800 | **FAIL** |
+| emerging rate | 0.0299 | <= 0.35 | pass |
+| raw agreement | 0.4478 | — | — |
+| determinism | 8/8 | byte-identical | pass |
+| disagreements | 111 / 201 | — | 55% |
+
+The definition-anchored flag-ON classifier does NOT reproduce the owner referee → `definition_anchored_menu_enabled` stays OFF. Finding: the production prompt (`_apply_definition_anchored_menu` + `build_merged_prompt`, 10-field JSON menu in SYSTEM) underperforms the rederive path (0.4313 vs 0.7794) — the menu-in-system-prompt vs menu-in-user-prompt divergence is itself a taxonomy-work input. SUPERSEDES BUG-654 (0.3181 flag-OFF) and the BUG-655/656 0.7794 rederive number as the definitive measurement.
+
+## D-2853 (2026-10-06) — RATIFIED — D-3 (taxonomy C): freeze closed_menu_v6.json, build closed_menu_v7.json from disagreement clusters
+Owner approved decision C. Freeze v6 (menu_hash-pinned to the ratified 201-row referee). Build closed_menu_v7.json as a NEW versioned file from the 111 disagreement rows + confirmed collision clusters: (a) merge within-axis near-synonyms — machine learning/generative ai/artificial intelligence; systems thinking/systems engineering/complex adaptive systems; psychology/cognitive science/decision making/behavioral economics; visual perception/visual semiotics/semiotics; code & computation/computational art/creative technology; digital product/product design/web & ui/user experience/information architecture; business development/business operations/organizational behavior; (b) rename cross-axis near-identical collisions to axis-scoped labels — artificial intelligence↔ai & agents, finance↔finance & investment, marketing↔marketing & communications, entrepreneurship studies↔entrepreneurship, research methodology↔research & methodology, semiotics↔semiotics & communication; (c) add one-line discriminator fields. PREREQUISITE (drift guard): after consolidation, remap ALL anchors/golden/config/scripts referencing old labels, else drift returns. Gate v7 behind its own A/B — adopt only if kappa improves toward >= 0.800.
+
+## D-2854 (2026-10-06) — RATIFIED — D-B root fix: total wall-clock deadline in pipeline/omlx_call.py::call_omlx (BUG-658)
+Owner ack granted. Root fix landed: pipeline/omlx_call.py now wraps every `requests.post` in `_post_with_wall_clock` (daemon thread + `join(timeout=OMLX_WALL_CLOCK_DEADLINE=180s)`); `WallClockTimeout` is treated as a wedge (WEDGE_RECOVERY_SLEEP + retry, then RuntimeError). Config constant `OMLX_WALL_CLOCK_DEADLINE` sourced from `services.omlx.wall_clock_deadline_sec` (C12). This protects ALL callers (stage2/4 pipelines), not just the d2767_ab_eval harness (which retains its own `_call_omlx_json_with_deadline` + preflight smoke). BUG-658 stays OPEN until the harness relaunch reproduces the fix end-to-end.
+
+## BUG-655 RESOLVED + BUG-656 RESOLVED (2026-10-06)
+- BUG-656 RESOLVED: the definitive production-path kappa LANDED = 0.4313 (FAIL). The 0.7794 rederive-path number is confirmed non-gating (D-2852).
+- BUG-655 RESOLVED: the "0.46 swing" is fully explained — flag-OFF 0.3181 vs rederive flag-ON 0.7794 vs production flag-ON 0.4313 are three distinct prompt paths, NOT non-determinism. Determinism self-check 8/8 byte-identical.
+
+## D-2855 (2026-10-06) — RATIFIED — D-NEXT-1 (a,b,c): discriminator-first differentia + org-theory/BA + semiotics fold + 7th engineering pair
+Owner ratified D-NEXT-1. (a) Discriminator-first differentia generalized to every entry (genus + differentia + nearest-neighbor exclude). Org theory = EXPLANATORY/POSITIVE (organization as object of inquiry); business administration = PRESCRIPTIVE/NORMATIVE (managerial function as object). (b) Keep semiotics distinct; fold visual semiotics into semiotics. (c) Adopt the 7th engineering pair; strip academic raw from engineering & infrastructure domain. Addresses the axis-impurity root of BUG-630.
+
+## D-2856 (2026-10-06) — RATIFIED — stable opaque IDs + MECE partition validator + taxonomy_v7 build
+Every taxonomy entry gets a stable opaque id (disc-NNN/dom-NNN) so display renames cost zero remap (string-as-identity was the BUG-630 drift vector). scripts/validate_taxonomy_partition.py = fail-closed MECE validator (1 raw → exactly one (axis,id); canonical distinct within/across axes). scripts/build_taxonomy_v7.py built config/taxonomy_v7.yaml: 202 raw dedups, 178 partition resolutions, rename 'research & methodology'→'research practice' (D-2853). Validator: 0 violations. Fixes the axis-impurity root of BUG-630.
+
+## D-2857 (2026-10-06) — RATIFIED — split S4 classification (Call B) from CRIBS enrichment (Call A)
+Owner ratified the D-2856 split clarification. NO new stage, NO new LLM: same stage4, two calls. Call A = CRIBS enrichment on Qwen3-Coder-30B (no closed-menu preamble); Call B = classification {discipline,domains} on gpt-oss-20b-MXFP4-Q8 (definition-anchored closed menu). Bottleneck IMPROVES (classifier arm parallelizes, enrichment arm sheds ~5k-token menu). The focused Call B is the 0.7794 rederive path that must reach ≥0.800 before classifier-of-record. Fixes the attention-overload/menu-bloat root of BUG-648.
+
+## D-2858 (2026-10-06) — RATIFIED — D-NEXT-A: recalibrate D-2822 under or-entail semantics, THEN flip S5 aggregation (drift-pinned)
+Senior RAG/ontological recommendation (owner ratify). The BUG-651 fix (D-2842 `_or_entail_and_no_contra_verdict`) is LANDED but INERT — `stage5.nli_aggregation` is still `majority`, so an S4→S5 rerun will re-quarantine the 506 ENTAIL-majority rows. Sequence: (1) run `pipeline/nli_calibrate.py` against or-entail semantics (a claim now survives on ONE entail, so the per-passage threshold may need tightening from 0.10); (2) re-mint the calibrated threshold into `config/recalibration_pins.yaml` under a NEW decision id (D-353 — the existing `menu` pin there is ALREADY STALE: it pins `closed_menu_v5.json` while live menu is v7); (3) only then flip `nli_aggregation` → `or_entail_and_no_contra`; (4) add a fail-closed guard refusing or-entail mode without a matching calibration stamp. Do NOT flip before recalibration.
+
+## D-2859 (2026-10-06) — RATIFIED — D-NEXT-B: BUG-563 worktree triage (37 dirty paths → 3 buckets)
+Senior recommendation (owner ratify). `check_repo_integrity --worktree` FAILS on 37 un-homed paths. Buckets: (a) RUN ARTIFACTS (`governance/rederive_v6_*`, `governance/d2767_ab_*`, `logs/**`) → paired `.gitignore` + `worktree.excluded` (excluded REQUIRES git-ignore alignment — verified this session that excluded-without-.gitignore raised faults 39→42); (b) SOURCE-MATERIAL DROP-INS (`governance/Surveillance Capitalism and Soviet Discourse.csv`) → owner-gate commit-or-relocate with provenance, never silently git-ignore a corpus input; (c) DOCS/SCRIPTS (`ONTOLOGY_ENFORCEMENT_ARCHITECTURE_20261004.md`, `TAXONOMY_EVOLUTION_TOOLING_20261004.md`, `scripts/watch_run.sh`, `closed_menu_v6_reference.csv`, `domain_cardinality_receipt.json`) → may_touch grants or archive.
+
+## FORENSIC AUDIT 2026-10-06 (scope/drift corrections — supersedes earlier v7 "complete" framing)
+- v7 promotion is REAL at the source-of-truth layer: `config/taxonomy_v5.yaml` is byte-IDENTICAL to `config/taxonomy_v7.yaml` (64 disc / 43 dom, opaque ids, discriminators, 0 MECE violations). Verified.
+- anchors + golden + A/B referee are NOT consolidated to v7: `config/golden/gold_frozen.yaml` carries 123 "research methodology"-family hits, `stage4_golden.yaml` + `stage2_fewshot_*` carry v6 labels, and the D-2767 referee (`discipline_anchor_rederived_v6_20261006d.json`) has 46 rows with "research methodology"/"research & methodology" and 0 "research practice". A v7-menu classifier CANNOT be A/B-scored against a v6-label referee. REMAP blocks both the A/B and the S4 rerun.
+- D-2857 split (Call A/Call B) RATIFIED but NOT implemented: `pipeline/stage4_merged_call.py` still runs the single merged call (D2224); no Call A/B functions, no `call_a`/`call_b` config keys.
+- D-2855 discriminator-first differentia is only 2/107 entries done (organizational theory `disc-012`, business administration). The other 105 entries (incl. business operations, organizational behavior) have no `differentia`. D-2855(a) "generalized to every entry" is NOT yet materialized.
+- D-2856 opaque ids are minted in `taxonomy_v5.yaml` but NOT wired to serving/storage: `closed_menu_v7.json` carries `{value, definition, group}` with NO id; the DB stores display strings (relabel, not id-swap); golden/anchors key on strings. The "stable id prevents remap drift" claim holds only at build-time validation, not runtime identity.
+- stale pins: `config/recalibration_pins.yaml` still pins `closed_menu_v5.json` (live = v7); `scripts/render_closed_menu.py` default target still `closed_menu_v5.json`.
+
+## FORENSIC AUDIT 2026-10-06 v2 — re-verified read-only; CORRECTS the v1 audit's consolidation claim
+The v1 audit above OVERSTATED the remap scope. Re-verified facts:
+- The v7 "rename" is a DOMAIN rename ONLY: domain `research & methodology` → `research practice` (D-2853). The DISCIPLINE `research methodology` is UNCHANGED (valid v7; present in both closed_menu_v5 and v7). v1 conflated the two axes.
+- 3 NEW disciplines added in v7: `business administration`, `entrepreneurship studies`, `marketing` (menu disciplines 62→65 incl. `emerging` abstention; domains 44→44 with the 1 rename).
+- GOLDEN is ALREADY v7-consistent: `gold_frozen.yaml` has 0 `research & methodology` (93 `research practice` domain + 30 `research methodology` discipline, both correct); `stage2_fewshot_*` clean. v1's "123 v6 hits" was wrong.
+- ANCHORS already clean: `anchor_family.yaml` + `domain_anchors.yaml` have 0 `research & methodology`.
+- DB already relabelled: `eval_integrity.yaml` (D-2853) records "DB relabelled 875 rows" research & methodology → research practice.
+- REMAINING drift is NARROW: (1) A/B referee has 28 stale DOMAIN rows `research & methodology` (its disciplines are already v7, incl. the 3 new); (2) live config maps still reference the stale domain: `alias_map.yaml` (16), `synonym_map.yaml` (1), `domain_disciplines.yaml` (1 key), `anchor_workbook_fixes.yaml` (1), `eval_integrity.yaml` (1 example).
+- COVERAGE GAP: `gold_frozen` has 0 `business administration` + 0 `entrepreneurship studies` (2 of 3 new disciplines absent from golden regression; referee has them: BA 24, ES 8, marketing 47).
+NET: the #1 blocker is NOT "remap anchors+golden+referee" (mostly done) — it is a small mechanical finish-D-2853-rename: 28 referee domain rows + ~19 config-map refs, all `research & methodology` → `research practice`. D-2858/D-2859 RATIFIED this session.

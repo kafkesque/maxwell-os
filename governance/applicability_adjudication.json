@@ -1,0 +1,28 @@
+{
+  "schema_version": "1.0.0",
+  "decision": "D-2757",
+  "generated": "2026-10-02",
+  "source": "owner final dispositions (governance/quarantine_owner_decisions_draft.md)",
+  "n_rows": 3,
+  "note": "applicability axis adjudication — fb_id -> applicability (operational|educational|philosophical_educational|heuristic_tip). These records stay quarantine for content_type but carry an applicability label resolving WHY they were held.",
+  "rows": [
+    {
+      "fb_id": "98298a22d32d6bab8a5825ddf5a27a7bcaa8cff6fb9bd652ae692b1784a5a25f",
+      "applicability": "philosophical_educational",
+      "reason": "owner-adjudicated (D-2756)",
+      "confidence": "owner"
+    },
+    {
+      "fb_id": "7b2c3b780e0803766625ea5070401cb8496eb8745f9bd0088d9c011b845e1bac",
+      "applicability": "educational",
+      "reason": "owner-adjudicated (D-2756)",
+      "confidence": "owner"
+    },
+    {
+      "fb_id": "547f64610f4cf94399f240c3b8ba78b3b6cace4b0c3384a03ff20abdd3b07551",
+      "applicability": "educational",
+      "reason": "owner-adjudicated (D-2756)",
+      "confidence": "owner"
+    }
+  ]
+}

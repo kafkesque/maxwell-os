@@ -35,7 +35,13 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-SNAPSHOT_FILE = ROOT / "knowledge pipeline" / ".tmp" / ".doc_guard_snapshot.json"
+# BUG-625(c): data-dir name is config-first via pipeline_paths; literal kept only as degraded fallback.
+try:
+    sys.path.insert(0, str(ROOT))
+    from pipeline.pipeline_paths import DATA_DIR
+    SNAPSHOT_FILE = DATA_DIR / ".tmp" / ".doc_guard_snapshot.json"
+except ImportError:
+    SNAPSHOT_FILE = ROOT / "knowledge pipeline" / ".tmp" / ".doc_guard_snapshot.json"
 
 # D824: Protected files with minimum line counts
 PROTECTED_FILES = {

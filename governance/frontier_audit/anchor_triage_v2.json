@@ -1,0 +1,1054 @@
+{
+  "schema_version": "1.0",
+  "generated_by": "D-2730",
+  "source": "governance/frontier_audit/anchor_triage_v1.json",
+  "total_anchors": 208,
+  "split": {
+    "owner_gate": "OG-1",
+    "option": "A",
+    "golden_pool_count": 46,
+    "eval_count": 162
+  },
+  "dispositions": {
+    "R001": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R002": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R003": {
+      "verdict_v1": "WAIT-ORPHAN",
+      "resolution": "orphan-wait",
+      "split_assignment": "eval"
+    },
+    "R004": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R005": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R006": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R007": {
+      "verdict_v1": "QUARANTINE",
+      "resolution": "quarantine (D-2703)",
+      "split_assignment": "eval"
+    },
+    "R008": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R009": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R010": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R011": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R012": {
+      "verdict_v1": "DROP",
+      "resolution": "noise-drop (D-2711 soft-drop)",
+      "split_assignment": "eval"
+    },
+    "R013": {
+      "verdict_v1": "QUARANTINE",
+      "resolution": "quarantine (D-2703)",
+      "split_assignment": "eval"
+    },
+    "R014": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R015": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R016": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R017": {
+      "verdict_v1": "QUARANTINE",
+      "resolution": "quarantine (D-2703)",
+      "split_assignment": "eval"
+    },
+    "R018": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R019": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R020": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R021": {
+      "verdict_v1": "DROP",
+      "resolution": "noise-drop (D-2711 soft-drop)",
+      "split_assignment": "eval"
+    },
+    "R022": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R023": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R024": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R025": {
+      "verdict_v1": "QUARANTINE",
+      "resolution": "quarantine (D-2703)",
+      "split_assignment": "eval"
+    },
+    "R026": {
+      "verdict_v1": "DROP",
+      "resolution": "noise-drop (D-2711 soft-drop)",
+      "split_assignment": "eval"
+    },
+    "R027": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R028": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R029": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R030": {
+      "verdict_v1": "QUARANTINE",
+      "resolution": "quarantine (D-2703)",
+      "split_assignment": "eval"
+    },
+    "R031": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R032": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R033": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R034": {
+      "verdict_v1": "DROP",
+      "resolution": "noise-drop (D-2711 soft-drop)",
+      "split_assignment": "eval"
+    },
+    "R035": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R036": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R037": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R038": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R039": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R040": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R041": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R042": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R043": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R044": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R045": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R046": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R047": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R048": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R049": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R050": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R051": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R052": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R053": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R054": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R055": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R056": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R057": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R058": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R059": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R060": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R061": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R062": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R063": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R064": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R065": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R066": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R067": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R068": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R069": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R070": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R071": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R072": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R073": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R074": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R075": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R076": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R077": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R078": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R079": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R080": {
+      "verdict_v1": "DROP",
+      "resolution": "noise-drop (D-2711 soft-drop)",
+      "split_assignment": "eval"
+    },
+    "R081": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R082": {
+      "verdict_v1": "DROP",
+      "resolution": "noise-drop (D-2711 soft-drop)",
+      "split_assignment": "eval"
+    },
+    "R083": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R084": {
+      "verdict_v1": "DROP",
+      "resolution": "noise-drop (D-2711 soft-drop)",
+      "split_assignment": "eval"
+    },
+    "R085": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R086": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R087": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R088": {
+      "verdict_v1": "WAIT-ORPHAN",
+      "resolution": "orphan-wait",
+      "split_assignment": "eval"
+    },
+    "R089": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R090": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R091": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R092": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R093": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R094": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R095": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R096": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R097": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R098": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R099": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R100": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R101": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R102": {
+      "verdict_v1": "QUARANTINE",
+      "resolution": "quarantine (D-2703)",
+      "split_assignment": "eval"
+    },
+    "R103": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R104": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R105": {
+      "verdict_v1": "WAIT-ORPHAN",
+      "resolution": "orphan-wait",
+      "split_assignment": "eval"
+    },
+    "R106": {
+      "verdict_v1": "DROP",
+      "resolution": "noise-drop (D-2711 soft-drop)",
+      "split_assignment": "eval"
+    },
+    "R107": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R108": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R109": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R110": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R111": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R112": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R113": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R114": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R115": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R116": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R117": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R118": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R119": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R120": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R121": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R122": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R123": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R124": {
+      "verdict_v1": "QUARANTINE",
+      "resolution": "quarantine (D-2703)",
+      "split_assignment": "eval"
+    },
+    "R125": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R126": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R127": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R128": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R129": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R130": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R131": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R132": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R133": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R134": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R135": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R136": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R137": {
+      "verdict_v1": "FIX/DROP",
+      "resolution": "verbatim-confirmed -> keep (R137, reground8)",
+      "split_assignment": "eval"
+    },
+    "R138": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R139": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R140": {
+      "verdict_v1": "DROP",
+      "resolution": "noise-drop (D-2711 soft-drop)",
+      "split_assignment": "eval"
+    },
+    "R141": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R142": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R143": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R144": {
+      "verdict_v1": "QUARANTINE",
+      "resolution": "quarantine (D-2703)",
+      "split_assignment": "eval"
+    },
+    "R145": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R146": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R147": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R148": {
+      "verdict_v1": "DROP",
+      "resolution": "noise-drop (D-2711 soft-drop)",
+      "split_assignment": "eval"
+    },
+    "R149": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R150": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R151": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R152": {
+      "verdict_v1": "KEEP",
+      "resolution": "kept (verbatim-confirmed anchor)",
+      "split_assignment": "golden_pool"
+    },
+    "R153": {
+      "verdict_v1": "QUARANTINE",
+      "resolution": "quarantine (D-2703)",
+      "split_assignment": "eval"
+    },
+    "R154": {
+      "verdict_v1": "KEEP",
+      "resolution": "kept (verbatim-confirmed anchor)",
+      "split_assignment": "golden_pool"
+    },
+    "R155": {
+      "verdict_v1": "KEEP",
+      "resolution": "kept (verbatim-confirmed anchor)",
+      "split_assignment": "golden_pool"
+    },
+    "R156": {
+      "verdict_v1": "KEEP",
+      "resolution": "kept (verbatim-confirmed anchor)",
+      "split_assignment": "golden_pool"
+    },
+    "R157": {
+      "verdict_v1": "KEEP",
+      "resolution": "kept (verbatim-confirmed anchor)",
+      "split_assignment": "golden_pool"
+    },
+    "R158": {
+      "verdict_v1": "KEEP",
+      "resolution": "kept (verbatim-confirmed anchor)",
+      "split_assignment": "golden_pool"
+    },
+    "R159": {
+      "verdict_v1": "KEEP*",
+      "resolution": "kept (starred)",
+      "split_assignment": "golden_pool"
+    },
+    "R160": {
+      "verdict_v1": "KEEP",
+      "resolution": "kept (verbatim-confirmed anchor)",
+      "split_assignment": "golden_pool"
+    },
+    "R162": {
+      "verdict_v1": "KEEP",
+      "resolution": "kept (verbatim-confirmed anchor)",
+      "split_assignment": "golden_pool"
+    },
+    "R163": {
+      "verdict_v1": "KEEP",
+      "resolution": "kept (verbatim-confirmed anchor)",
+      "split_assignment": "golden_pool"
+    },
+    "R164": {
+      "verdict_v1": "KEEP",
+      "resolution": "kept (verbatim-confirmed anchor)",
+      "split_assignment": "golden_pool"
+    },
+    "R165": {
+      "verdict_v1": "QUARANTINE",
+      "resolution": "quarantine (D-2703)",
+      "split_assignment": "eval"
+    },
+    "R166": {
+      "verdict_v1": "KEEP",
+      "resolution": "kept (verbatim-confirmed anchor)",
+      "split_assignment": "golden_pool"
+    },
+    "R167": {
+      "verdict_v1": "QUARANTINE",
+      "resolution": "quarantine (D-2703)",
+      "split_assignment": "eval"
+    },
+    "R168": {
+      "verdict_v1": "KEEP",
+      "resolution": "kept (verbatim-confirmed anchor)",
+      "split_assignment": "golden_pool"
+    },
+    "R169": {
+      "verdict_v1": "QUARANTINE",
+      "resolution": "quarantine (D-2703)",
+      "split_assignment": "eval"
+    },
+    "R170": {
+      "verdict_v1": "KEEP",
+      "resolution": "kept (verbatim-confirmed anchor)",
+      "split_assignment": "golden_pool"
+    },
+    "R171": {
+      "verdict_v1": "KEEP",
+      "resolution": "kept (verbatim-confirmed anchor)",
+      "split_assignment": "golden_pool"
+    },
+    "R172": {
+      "verdict_v1": "KEEP",
+      "resolution": "kept (verbatim-confirmed anchor)",
+      "split_assignment": "golden_pool"
+    },
+    "R173": {
+      "verdict_v1": "KEEP",
+      "resolution": "kept (verbatim-confirmed anchor)",
+      "split_assignment": "golden_pool"
+    },
+    "R174": {
+      "verdict_v1": "KEEP",
+      "resolution": "kept (verbatim-confirmed anchor)",
+      "split_assignment": "golden_pool"
+    },
+    "R175": {
+      "verdict_v1": "KEEP",
+      "resolution": "kept (verbatim-confirmed anchor)",
+      "split_assignment": "golden_pool"
+    },
+    "R176": {
+      "verdict_v1": "KEEP",
+      "resolution": "kept (verbatim-confirmed anchor)",
+      "split_assignment": "golden_pool"
+    },
+    "R177": {
+      "verdict_v1": "KEEP",
+      "resolution": "kept (verbatim-confirmed anchor)",
+      "split_assignment": "golden_pool"
+    },
+    "R178": {
+      "verdict_v1": "KEEP",
+      "resolution": "kept (verbatim-confirmed anchor)",
+      "split_assignment": "golden_pool"
+    },
+    "R179": {
+      "verdict_v1": "KEEP",
+      "resolution": "kept (verbatim-confirmed anchor)",
+      "split_assignment": "golden_pool"
+    },
+    "R180": {
+      "verdict_v1": "DROP",
+      "resolution": "noise-drop (D-2711 soft-drop)",
+      "split_assignment": "eval"
+    },
+    "R181": {
+      "verdict_v1": "KEEP",
+      "resolution": "kept (verbatim-confirmed anchor)",
+      "split_assignment": "golden_pool"
+    },
+    "R182": {
+      "verdict_v1": "DROP",
+      "resolution": "noise-drop (D-2711 soft-drop)",
+      "split_assignment": "eval"
+    },
+    "R183": {
+      "verdict_v1": "QUARANTINE",
+      "resolution": "quarantine (D-2703)",
+      "split_assignment": "eval"
+    },
+    "R184": {
+      "verdict_v1": "QUARANTINE",
+      "resolution": "quarantine (D-2703)",
+      "split_assignment": "eval"
+    },
+    "R185": {
+      "verdict_v1": "KEEP",
+      "resolution": "kept (verbatim-confirmed anchor)",
+      "split_assignment": "golden_pool"
+    },
+    "R186": {
+      "verdict_v1": "KEEP",
+      "resolution": "kept (verbatim-confirmed anchor)",
+      "split_assignment": "golden_pool"
+    },
+    "R187": {
+      "verdict_v1": "KEEP",
+      "resolution": "kept (verbatim-confirmed anchor)",
+      "split_assignment": "golden_pool"
+    },
+    "R188": {
+      "verdict_v1": "FIX",
+      "resolution": "resolved post-D-2720/D-2715 (domain-resolved or reground); golden-eligible subject to split",
+      "split_assignment": "eval"
+    },
+    "R189": {
+      "verdict_v1": "KEEP",
+      "resolution": "kept (verbatim-confirmed anchor)",
+      "split_assignment": "golden_pool"
+    },
+    "R190": {
+      "verdict_v1": "KEEP",
+      "resolution": "kept (verbatim-confirmed anchor)",
+      "split_assignment": "golden_pool"
+    },
+    "R191": {
+      "verdict_v1": "KEEP",
+      "resolution": "kept (verbatim-confirmed anchor)",
+      "split_assignment": "golden_pool"
+    },
+    "R192": {
+      "verdict_v1": "KEEP",
+      "resolution": "kept (verbatim-confirmed anchor)",
+      "split_assignment": "golden_pool"
+    },
+    "R193": {
+      "verdict_v1": "KEEP",
+      "resolution": "kept (verbatim-confirmed anchor)",
+      "split_assignment": "golden_pool"
+    },
+    "R195": {
+      "verdict_v1": "KEEP",
+      "resolution": "kept (verbatim-confirmed anchor)",
+      "split_assignment": "golden_pool"
+    },
+    "R196": {
+      "verdict_v1": "KEEP",
+      "resolution": "kept (verbatim-confirmed anchor)",
+      "split_assignment": "golden_pool"
+    },
+    "R197": {
+      "verdict_v1": "KEEP",
+      "resolution": "kept (verbatim-confirmed anchor)",
+      "split_assignment": "golden_pool"
+    },
+    "R198": {
+      "verdict_v1": "KEEP",
+      "resolution": "kept (verbatim-confirmed anchor)",
+      "split_assignment": "golden_pool"
+    },
+    "R199": {
+      "verdict_v1": "KEEP",
+      "resolution": "kept (verbatim-confirmed anchor)",
+      "split_assignment": "golden_pool"
+    },
+    "R200": {
+      "verdict_v1": "DROP",
+      "resolution": "noise-drop (D-2711 soft-drop)",
+      "split_assignment": "eval"
+    },
+    "R201": {
+      "verdict_v1": "KEEP",
+      "resolution": "kept (verbatim-confirmed anchor)",
+      "split_assignment": "golden_pool"
+    },
+    "R202": {
+      "verdict_v1": "KEEP",
+      "resolution": "kept (verbatim-confirmed anchor)",
+      "split_assignment": "golden_pool"
+    },
+    "R203": {
+      "verdict_v1": "KEEP",
+      "resolution": "kept (verbatim-confirmed anchor)",
+      "split_assignment": "golden_pool"
+    },
+    "R204": {
+      "verdict_v1": "KEEP",
+      "resolution": "kept (verbatim-confirmed anchor)",
+      "split_assignment": "golden_pool"
+    },
+    "R205": {
+      "verdict_v1": "KEEP",
+      "resolution": "kept (verbatim-confirmed anchor)",
+      "split_assignment": "golden_pool"
+    },
+    "R206": {
+      "verdict_v1": "QUARANTINE",
+      "resolution": "quarantine (D-2703)",
+      "split_assignment": "eval"
+    },
+    "R207": {
+      "verdict_v1": "KEEP",
+      "resolution": "kept (verbatim-confirmed anchor)",
+      "split_assignment": "golden_pool"
+    },
+    "R208": {
+      "verdict_v1": "KEEP",
+      "resolution": "kept (verbatim-confirmed anchor)",
+      "split_assignment": "golden_pool"
+    },
+    "R209": {
+      "verdict_v1": "KEEP",
+      "resolution": "kept (verbatim-confirmed anchor)",
+      "split_assignment": "golden_pool"
+    },
+    "R210": {
+      "verdict_v1": "KEEP",
+      "resolution": "kept (verbatim-confirmed anchor)",
+      "split_assignment": "golden_pool"
+    }
+  }
+}

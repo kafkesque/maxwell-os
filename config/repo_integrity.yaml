@@ -141,6 +141,30 @@ worktree:
       why: >-
         per-RUN snapshots; the consumed output is governance/bench_preflight_latest.json, declared in
         config/bench_preflight.yaml. Same disposition and same reason as the drift snapshots above.
+    - pattern: '.pipeline_runner.lock'
+      why: >-
+        D-2800 (BUG-563 recurrence). A runtime lock written by pipeline/runner.py at every run; a transient
+        mutual-exclusion artifact, never content. Committing it would bloat history with a lock that is
+        re-created on the next run.
+    - pattern: 'governance/*.numbers'
+      why: >-
+        D-2800 (BUG-563 recurrence). Owner SOURCE MATERIAL (research books) dropped into the worktree by a
+        Dropbox sync - not repo content, never indexed. Declared excluded rather than left silently absent.
+    - pattern: 'governance/anchor ruler*.csv'
+      why: >-
+        D-2800 (BUG-563 recurrence). Owner anchor-ruler drop-in (human instrument, will_not_touch family), not a
+        machine artifact. Declared excluded so it stays on disk for the owner but is never tracked.
+
+crossing_rate_limit:
+  # D-2802 (Tier 2, 2026-10-03): a will_not_touch family that needs repeated one-off crossing permits has
+  # drifted semantically (the BUG-528 failure mode: pipeline/** was crossed ~5x/week while NOTHING counted the
+  # frequency). This ceiling converts that drift into a MACHINE signal, consumed by
+  # scripts/check_session_plan.py#crossing_rate_faults: an ACTIVE crossing is one that resolves into a
+  # will_not_touch family, has `acked_by` + `acked_on`, and carries no `spent_by:` yet. >N active crossings into
+  # ONE family is refused (rc=2, owner gate) - the fix is a FAMILY-level re-scope decision, never another
+  # file-level crossing. N=1: an owner-instrument family should never need even one; a single active crossing
+  # already emits the D-2803 Tier-3 re-ask note.
+  max_active_per_family: 1
 
 severity:
   # report_only_globs: a conflict copy here is real but not a repository-integrity defect, so it is reported

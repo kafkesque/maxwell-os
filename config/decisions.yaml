@@ -13097,7 +13097,7 @@ decisions:
   files: [config/anchor_axis_authority.yaml, scripts/check_anchor_axis_consistency.py]
   created: '2026-10-03'
 - id: D-2814
-  state: PROPOSED
+  state: RATIFIED
   category: TAXONOMY / ONTOLOGY
   title: Definition-anchored (closed-menu) classification is the ROOT fix - D272c promoted from OPEN to EXECUTABLE-PENDING-S6;
     the 999-rule alias layer is retired, not extended
@@ -13129,7 +13129,7 @@ decisions:
   created: '2026-10-04'
   date: '2026-10-04'
 - id: D-2815
-  state: PROPOSED
+  state: RATIFIED
   category: TAXONOMY / ONTOLOGY
   title: Additive menu bump - mint a Business & Management discipline group (marketing, management, entrepreneurship),
     aligned to JEL M and ANZSRC 2020, BACKWARD-compatible for CRIBS
@@ -13164,7 +13164,7 @@ decisions:
   created: '2026-10-04'
   date: '2026-10-04'
 - id: D-2816
-  state: PROPOSED
+  state: RATIFIED
   category: TAXONOMY / GOVERNANCE
   title: Wire pySHACL against the EXISTING config/taxonomy_shacl.ttl plus an OntoClean lint into the menu-bump gate,
     and enforce the domain cardinality cap at the write (BUG-631)
@@ -13306,7 +13306,7 @@ decisions:
   date: '2026-10-04'
 
 - id: D-2822
-  state: PROPOSED
+  state: RATIFIED
   category: VERIFICATION / GOVERNANCE
   title: S5 aggregation gate A(d) — OR-entail across evidence + AND-no-contradiction, then recalibrate the D-2298 NLI threshold against the aggregation semantics
   decision: >
@@ -13374,3 +13374,681 @@ decisions:
   created: '2026-10-05'
   date: '2026-10-05'
 
+
+
+- id: D-2826
+  state: RATIFIED
+  category: TAXONOMY / GOVERNANCE
+  title: Owner ratification - T4 menu v6 bundle (D-2814 + D-2815 + D-2816) APPROVED as one atomic, audit-gated
+  decision: >
+    Owner approves the T4 menu v6 bundle for shipment as ONE atomic commit, with the forensic-audit
+    (governance/FORENSIC_AUDIT_20261005_MENU_V6_GATE.md) amendments as preconditions: CF1 (B&M slot
+    disambiguation vs the existing 'entrepreneurship' domain), BL1 (single abstention token), B1/MI2
+    (regenerate taxonomy_shacl.ttl against v5.6+), C1 (alias_map shrink-then-remove with consumer
+    migration). Flips D-2814/D-2815/D-2816 PROPOSED -> RATIFIED. Sequencing unchanged: menu v6 lands
+    only when S4 is idle; re-derive anchors (D-2820) before the 7000+ post-hoc re-map.
+  files:
+  - config/closed_menu_v5.json
+  - config/taxonomy_v5.yaml
+  - config/taxonomy_shacl.ttl
+  - governance/FORENSIC_AUDIT_20261005_MENU_V6_GATE.md
+  bugs: [BUG-629, BUG-630, BUG-631, BUG-640, BUG-641, BUG-642, BUG-643]
+  created: '2026-10-05'
+  date: '2026-10-05'
+
+- id: D-2827
+  state: RATIFIED
+  category: VERIFICATION / GOVERNANCE
+  title: Owner ratification - T9 Gate A(d) (D-2822) APPROVED, decoupled, sequenced after menu v6
+  decision: >
+    Owner approves D-2822 (S5 aggregation Gate A(d): OR-entail across evidence + AND-no-contradiction,
+    then recalibrate the D-2298 NLI threshold) for shipment. Flips D-2822 PROPOSED -> RATIFIED.
+    Sequenced DECOUPLED and AFTER menu v6: accept one extra ~40-min S5 re-run. Recalibration
+    (pipeline/nli_calibrate.py) re-runs against the new OR-entail + AND-no-contra semantics, not the
+    B2-majority semantics the 0.10 threshold was calibrated under.
+  files:
+  - pipeline/stage5_verify.py
+  - pipeline/nli_calibrate.py
+  - config/pipeline_config.yaml
+  bugs: []
+  created: '2026-10-05'
+  date: '2026-10-05'
+
+- id: D-2828
+  state: PROPOSED
+  category: TAXONOMY / GOVERNANCE
+  title: Forensic audit gate - menu v6 implementation BLOCKED until CF1/BL1 owner rulings + B1/C1 deterministic fixes
+  decision: >
+    The 11-category forensic audit (governance/FORENSIC_AUDIT_20261005_MENU_V6_GATE.md) returns BLOCKED.
+    Four findings gate implementation: CF1 (D-2815 B&M slot 'entrepreneurship' string-collides with the
+    existing domain + D-2500 disjointness + BUG-200 opposite-axis guard make it unreachable), BL1 (dual
+    abstention token 'none' vs 'emerging' must be reconciled), B1/MI2 (taxonomy_shacl.ttl stale v5.5 pin
+    vs live v5.6 - regenerate before D-2816 enforcement), C1 (alias_map 14-consumer shrink-then-remove).
+    CF1 and BL1 require an owner ruling; B1/C1 are deterministic. Filed BUG-640/641/642/643.
+  bugs: [BUG-640, BUG-641, BUG-642, BUG-643]
+  files:
+  - governance/FORENSIC_AUDIT_20261005_MENU_V6_GATE.md
+  created: '2026-10-05'
+  date: '2026-10-05'
+
+- id: D-2829
+  state: RATIFIED
+  category: TAXONOMY / GOVERNANCE
+  title: Owner ruling CF1 - B&M discipline slots = 'business administration' / 'marketing' / 'entrepreneurship studies'
+  decision: >
+    Owner resolves CF1 (D-2828 / BUG-640). The three Business & Management discipline slots are renamed to
+    discipline-scoped JEL M forms: 'business administration', 'marketing', 'entrepreneurship studies'.
+    'entrepreneurship studies' removes the string-collision with the existing DOMAIN 'entrepreneurship'
+    (D-2500 owl:disjointWith + BUG-200 opposite-axis guard now satisfied); 'business administration' is a clean
+    new canonical (no collision); 'marketing' is a near-collision with the existing domain 'marketing &
+    communications' (advisory only - distinct string, disjointness preserved). This supersedes the earlier
+    D-2815 slot names {marketing, management, entrepreneurship}.
+  files:
+  - config/taxonomy_v5.yaml
+  - config/closed_menu_v5.json
+  bugs: [BUG-640]
+  created: '2026-10-05'
+  date: '2026-10-05'
+
+- id: D-2830
+  state: RATIFIED
+  category: TAXONOMY / GOVERNANCE
+  title: Owner ruling BL1 - single abstention token = 'emerging'
+  decision: >
+    Owner resolves BL1 (D-2828 / BUG-643). The single abstention token is 'emerging'. pipeline/closed_menu.py
+    _ABSTENTION_VALUE changes from 'none' to 'emerging' (or the constant is retired in favor of the existing
+    'emerging' catch-all), reconciling closed_menu_v5.json catch_all, emerging_disciplines.yaml status_value, and
+    the 27.2% emerging metric (BUG-629). emerging_discipline_rate_max 0.35 remains defined on 'emerging'. The
+    D-2814 wording 'explicit none' is superseded by this ruling.
+  files:
+  - pipeline/closed_menu.py
+  - config/closed_menu_v5.json
+  - config/emerging_disciplines.yaml
+  bugs: [BUG-643]
+  created: '2026-10-05'
+  date: '2026-10-05'
+
+- id: D-2831
+  state: RATIFIED
+  category: TAXONOMY / GOVERNANCE
+  title: D-NEW-6 - freeze historical answer-space pin under retired method, repoint stamp verification
+  decision: >
+    Owner ratifies D-NEW-6 (2026-10-05). The ANCHOR4 manifest's answer_space_sha256 (8436d9c9...) is a HISTORICAL
+    stamp minted under the RETIRED D-371 two-axis method (domains full entries + abstention), NOT the live 5-axis
+    value-set pin (d704d06e...). Comparing the historical stamp to the live pin was a category error that produced
+    a hard MENU_VERSION_STAMP_MISMATCH. FIX: scripts/menu_axis_hashes.py emits answer_space_hash_frozen_pin
+    (8436d9c9...) + answer_space_method_frozen (domains_full_plus_abstention_v1) + answer_space_method
+    (five_axis_value_set_v1); config/depth_domain_contract.yaml stamp_verify_keys repointed to
+    {closed_menu_sha256: composite_hash_frozen_pin, answer_space_sha256: answer_space_hash_frozen_pin}; the live
+    answer_space_hash (d704d06e...) stays drift-only. BUG-644 fixes the validator's silent-skip of a missing
+    stamp/pin key (fail-closed on partial stamp coverage).
+  files:
+  - scripts/menu_axis_hashes.py
+  - config/menu_axis_hashes.yaml
+  - config/depth_domain_contract.yaml
+  - scripts/validate_depth_domain_contract.py
+  - governance/ANCHOR4_MANIFEST_20260924.json
+  - governance/CONTEXT_INDEX.md
+  - tests/test_depth_domain_contract.py
+  bugs: [BUG-644]
+  created: '2026-10-05'
+  date: '2026-10-05'
+
+- id: D-2832
+  state: RATIFIED
+  category: TAXONOMY / GOVERNANCE
+  title: D-NEW-5 - defer manifest answer_space_sha256 re-stamp to D-2820
+  decision: >
+    Owner confirms D-NEW-5 (2026-10-05). The ANCHOR4 manifest's answer_space_sha256 (8436d9c9...) and
+    closed_menu_sha256 (73597ee2...) STAY at v5 now, because the anchors were classified against v5. Re-stamping
+    to the live v6 hashes (answer_space_sha256 d704d06e... / closed_menu_sha256 92f1a204...) is a D-2820 step-3
+    output (re-derive anchor axes against menu v6, then re-stamp), NOT a current act. Re-stamping now would falsify
+    provenance.
+  files:
+  - governance/ANCHOR4_MANIFEST_20260924.json
+  created: '2026-10-05'
+  date: '2026-10-05'
+- id: D-2833
+  state: RATIFIED
+  category: TAXONOMY / GOVERNANCE
+  title: Owner ratification - D-2814 implementation scope covers BOTH S4 classify paths, single menu source, D-2773
+    mutual-exclusion guard
+  decision: 'Owner ratifies (2026-10-05) the D-2814 implementation scope. Because config/pipeline_config.yaml has
+    merged_call_enabled: true, pipeline/stage4_merged_call.py is the ACTIVE S4 classify path and pipeline/stage4_merge.py
+    is the fallback; both are wired. Both consume the SINGLE byte-deterministic definition_anchored_block() (pipeline/closed_menu.py),
+    so the menu cannot drift between the two paths (BUG-645: the D-2814 files list omitted stage4_merged_call.py).
+    A fail-closed mutual-exclusion guard now raises RuntimeError when discipline_closed_menu_enabled (D-2773) AND
+    definition_anchored_menu_enabled (D-2814) are both true, retiring the D-2773 label-only path that would otherwise
+    inject two contradictory discipline menus (BUG-647). Flag stays OFF (byte-identical baseline) until the R5 gemma
+    review + full-204 A/B.
+
+    '
+  bugs:
+  - BUG-645
+  - BUG-647
+  files:
+  - pipeline/stage4_merged_call.py
+  - pipeline/stage4_merge.py
+  - pipeline/closed_menu.py
+  - config/pipeline_config.yaml
+  - pipeline/pipeline_paths.py
+  created: '2026-10-05'
+  date: '2026-10-05'
+- id: D-2834
+  state: RATIFIED
+  category: TAXONOMY / GOVERNANCE
+  title: Owner ratification - definition-anchored abstention token = 'emerging' (supersedes D-2814 'explicit none')
+  decision: 'Owner ratifies (2026-10-05) that the definition-anchored abstention token is ''emerging'', consistent
+    with D-2830 (single abstention token). definition_anchored_block() reads menu["abstention"] (= ''emerging'');
+    the D-2814 decision text "explicit none" and the stale ''none'' docstrings in pipeline/closed_menu.py are superseded/corrected
+    (BUG-646). No runtime change: the code already resolved to ''emerging''.
+
+    '
+  bugs:
+  - BUG-646
+  files:
+  - pipeline/closed_menu.py
+  created: '2026-10-05'
+  date: '2026-10-05'
+- id: D-2835
+  state: RATIFIED
+  category: TAXONOMY / GOVERNANCE
+  title: Owner ratification - definition-anchored menu cost model (prefix-cache amortization; group-prefilter deferred)
+  decision: 'Owner ratifies (2026-10-05) the cost model for the definition-anchored menu (~14,889 chars ≈ ~5k tokens
+    per classify call, BUG-648). The menu is a CONSTANT, byte-deterministic preamble — the textbook prefix-cache
+    case, so a serving-layer prefix cache amortizes it to ~once per contiguous run (cost scales with menu size,
+    not menu × corpus; C1 local hardware, $0 marginal). Group-prefilter is DEFERRED: a subset-selection prefilter
+    risks silently dropping the correct label and re-opening BUG-629/BUG-630, which D-2814 eliminates.
+
+    '
+  bugs:
+  - BUG-648
+  files:
+  - config/pipeline_config.yaml
+  - pipeline/closed_menu.py
+  created: '2026-10-05'
+  date: '2026-10-05'
+- id: D-2836
+  state: RATIFIED
+  category: TAXONOMY / GOVERNANCE
+  title: Owner ratification - R5 verifier review of D-2814 swap (FAIL then fixed); schema placeholder + batch coverage
+    + abstention wording
+  decision: 'Owner ratifies (2026-10-05) the R5 gate outcome for D-2814. gemma-4-E4B (verifier, generator≠verifier)
+    reviewed the assembled swap on the ACTIVE merged path and returned FAIL; independent analysis confirmed three
+    concrete defects (BUG-649): (F1) the merged-path JSON schema still carried free-generation placeholders ("discipline":
+    "precise_discipline_name" / "domains": ["domain1","domain2"]) that contradict the verbatim-menu instruction;
+    (F2) the abstention token was declared first-class in prose but not visible as a valid schema value on either
+    path; (F3) BATCH_CRIBS_CLASSIFY_SYSTEM (batch path, batch_enabled:false) was not covered by the swap. FIXED:
+    _apply_definition_anchored_schema swaps the placeholders on merged+batch; _apply_definition_anchored_menu_batch
+    covers the batch path; the direct path surfaces the token in its schema; the abstention wording now states per-axis
+    independence and value placement (discipline: "emerging" / "emerging" inside domains). Residual gemma findings
+    (rounds 2+) are philosophy on the ontologically-AND-pragmatically criterion (D-2830), deferred to the full-204
+    A/B (D-2767). Flag remains OFF. Verdict: concrete defects fixed and verified (py_compile clean, structural checks
+    pass, D-2833 guard trips, flag-off baseline byte-identical, pytest 12 passed).'
+  bugs:
+  - BUG-649
+  files:
+  - pipeline/stage4_merged_call.py
+  - pipeline/stage4_merge.py
+  - pipeline/closed_menu.py
+  created: '2026-10-05'
+  date: '2026-10-05'
+- id: D-2837
+  state: RATIFIED
+  category: TAXONOMY / GOVERNANCE
+  title: Owner recommendation - ADOPT definition-anchored closed menu as the S4 target architecture; flag flip gated
+    on empirical A/B (D-2767) against a RE-DERIVED anchor (D-2820 first)
+  decision: 'Owner ratifies (2026-10-05) the senior RAG/systems-engineer recommendation for the definition-anchored
+    closed menu (D-2814). ADOPT the architecture — verbatim closed menu + definition anchors + per-axis "emerging"
+    abstention — as the S4 target, because it is the ontologically-correct, future-proof direction: it converts
+    free-generation into a CONSTRAINED verbatim choice over a hash-stamped menu (menu_hash provenance, D-279), so
+    every label is traceable to the exact menu it was classified against and off-menu drift is structurally eliminated.
+    BUT "ontologically valid" != "ontologically accurate": the flag flip (definition_anchored_menu_enabled: true)
+    is EMPIRICALLY GATED on the full-204 A/B (D-2767) — Cohen kappa >= 0.800 AND emerging rate <= 0.35. The A/B
+    referee is currently FROZEN-INVALID (D-2820: the 204-gold discipline/domain axis was adjudicated against the
+    PRE-D-2814 free-gen menu), so D-2820 anchor re-derivation must PRECEDE the A/B or the kappa is circular (measuring
+    the classifier against its own output). Three-layer enforcement is the reliability guarantee: (1) prompt (D-2814,
+    done); (2) write-time structural rail (D-2816/D-2838 writer-limb: on-menu + cardinality, fail-closed); (3) verification
+    (D-2822 S5 OR-entail + AND-no-contradiction). The swap itself is the BUG-649 R5 verifier fail-and-fix (closed);
+    the write-time rail closes the BUG-631 cardinality enforcement gap. Flag stays OFF until the A/B numbers are
+    measured.'
+  bugs:
+  - BUG-631
+  - BUG-649
+  files:
+  - pipeline/stage4_merged_call.py
+  - pipeline/stage4_merge.py
+  - pipeline/closed_menu.py
+- id: D-2838
+  state: RATIFIED
+  category: TAXONOMY / GOVERNANCE
+  title: Enforce the per-FB domain cardinality cap AT THE WRITE (BUG-631 writer-limb) — D-2816 implementation, fail-closed
+    with a receipt
+  decision: 'Owner ratifies (2026-10-05) the D-2816 writer-limb. Forensic audit (F-01) found max_domains_per_fb=5
+    is DETECTED ("Too many domains" in validate_classification) but NOT ENFORCED: the write-path salvage drops only
+    NON-canonical labels, so a row carrying 6-7 VALID domains was written unchanged (the measured 52 FBs, every
+    one classification_status=CLEAN). FIX: _enforce_domain_cardinality() truncates deterministically to the cap
+    (keep the model first-5, preserve order) AND records a receipt in classification_error, degrading CLEAN -> FALLBACK
+    so a truncated row is never indistinguishable from a compliant one (C16, never a silent truncation). Wired into
+    the single validate_classification salvage chokepoint in pipeline/stage4_merge.py, so it covers ALL three S4
+    paths (merged/batch/direct). Control test tests/test_domain_cardinality_rail.py proves the rail fires (17 passed
+    incl. the 12 depth/domain contract tests). BUG-631 stays OPEN until the post-replay re-measure (scripts/check_domain_cardinality.py
+    over the committed store) and the 52 historical FBs are re-derived.'
+  bugs:
+  - BUG-631
+  files:
+  - pipeline/stage4_merge.py
+  - tests/test_domain_cardinality_rail.py
+- id: D-2839
+  state: RATIFIED
+  category: TAXONOMY / ANCHOR
+  title: Owner ratification gate — the re-derived 204-gold anchor (D-2820 output) is the D-2767 A/B referee ONLY
+    after owner sign-off; four acceptance criteria + fail-closed pre-A/B guard
+  decision: 'Owner ratifies the GATE (not yet the anchor): the 204-gold domain/discipline axis may serve as the
+    referee for the full-204 A/B (D-2767 — Cohen kappa >= 0.800, emerging rate <= 0.35) ONLY after it is re-derived
+    against menu v6 (D-2820) AND owner-signed-off. Four acceptance criteria make the anchor reliable, future-proof
+    and ontologically accurate: (1) MENU-V6 HASH-STAMPED — the manifest carries a non-empty menu_hash matching menu
+    v6 (composite 92f1a204... / answer-space d704d06e...), never the frozen v5 pins (73597ee2... / 8436d9c9...);
+    (2) OWNER-ADJUDICATED, NEVER LLM-ONLY — classifier output is INPUT, the owner is the only ground truth (D-2820
+    verification); (3) SECOND-CODER + DeBERTa-NLI CROSS-CHECKED — generator != verifier (R5), disagreements surfaced
+    not averaged; (4) STAMPED PER D-274d — anchor_version / menu_hash / taxonomy_version / coder / date / abstention
+    on every re-derived axis cell. FIXES BUG-650: the missing fail-closed pre-A/B guard is the ENFORCEMENT limb
+    of this gate — until D-2839 flips to RATIFIED the A/B must refuse to compute kappa against the frozen-invalid
+    anchor (a circular kappa); the guard exits non-zero on any anchor whose menu_hash is still the frozen v5 pin.
+    This is the bridge that makes D-2837''s empirical gate sound: a valid referee before a valid measurement.
+
+    '
+  rationale: 'D-2820 froze the domain/discipline axis as invalid-until-re-derived; D-2832 defers v6 re-stamping
+    to D-2820 step-3. D-2839 is the missing owner-gate that certifies the re-derived output and closes the loop
+    to D-2767. Minted PROPOSED, not RATIFIED, because the anchor has not been re-derived yet — flipping to RATIFIED
+    is a HUMAN gate the agent cannot self-sign.
+
+    '
+  bugs:
+  - BUG-650
+  files:
+  - governance/ANCHOR4_MANIFEST_20260924.json
+  - config/menu_axis_hashes.yaml
+  - governance/frontier_audit/split_manifest.json
+- id: D-2840
+  state: RATIFIED
+  category: TAXONOMY / ANCHOR
+  title: Implement the BUG-650 fail-closed pre-A/B anchor-referee guard — refuse kappa on a no-stamp or frozen-v5-pin
+    anchor
+  decision: 'Land the ENFORCEMENT limb of D-2839: pipeline/anchor_menu_guard.py is a fail-closed pre-A/B guard that
+    refuses to certify a menu-derived anchor as a valid kappa referee unless its declared menu stamp matches menu
+    v6''s LIVE pins (composite 92f1a204... / answer-space d704d06e...), and refuses (exits non-zero, C16) on a NO-stamp
+    anchor or a FROZEN v5 pin (73597ee2... / 8436d9c9...). Pins are read from config/menu_axis_hashes.yaml (C12,
+    single source — never hardcoded). Wired into the two menu-derived kappa paths: scripts/discipline_conformance_gate.py
+    load_anchor() (the 204-row full-204 A/B referee; fit_eval_model_swap.py is covered through that import) and
+    scripts/anchor2_kappa.py (the 60-row R2 key, which carries the frozen menu_hash 73597ee2...). The depth axis
+    is intentionally NOT guarded — depth is NOT menu-derived (menu v6 changed discipline/domain slots + the abstention
+    token, not the 4-way depth axis). Control test tests/test_anchor_menu_guard.py (9 cases) proves the rail fires
+    on no-stamp, frozen-composite, frozen-answer-space, unknown-stamp and frozen-over-live, and passes only a live
+    menu-v6 stamp. Verified live: discipline_conformance_gate.py --dry-run now exits 1 ("carries NO menu stamp");
+    anchor2_kappa.py exits 1 ("FROZEN menu-v5 pin"). This closes the CIRCULAR-kappa failure mode (a pre-D-2820 kappa
+    silently passing 0.800) but does NOT unblock the A/B — the anchor must still be re-derived (D-2820) and the
+    owner gate ratified (D-2839) before any kappa is computable.
+
+    '
+  rationale: 'BUG-650 measured that the D-2820 freeze was PROCESS-only (decision prose), not CODE: the A/B scripts
+    read the 204-gold / taxonomy_v5.yaml with no menu_hash pin check, so a pre-D-2820 kappa is circular and silently
+    green. The guard is the code-side fix; it is the fail-closed rail that makes the circular measurement impossible.
+
+    '
+  bugs:
+  - BUG-650
+  files:
+  - pipeline/anchor_menu_guard.py
+  - tests/test_anchor_menu_guard.py
+  - scripts/discipline_conformance_gate.py
+  - scripts/anchor2_kappa.py
+- id: D-2841
+  state: RATIFIED
+  category: TAXONOMY / ANCHOR
+  title: Build the D-2820 anchor re-derivation harness — scripts/rederive_anchor_axes_v6.py (owner-gated menu-v6
+    referee producer)
+  decision: 'Land the PRODUCER limb of D-2820: scripts/rederive_anchor_axes_v6.py re-derives BOTH menu-derived axes
+    (discipline + domains) of the 204-row gold anchor against menu v6 (definition-anchored) so its output can be
+    the D-2767 A/B referee ONLY after owner sign-off (D-2839). Five fail-closed stages: --plan (load + join + pin-verify),
+    --generate (LLM candidate labels = INPUT only), --adjudicate (owner decisions; refuses unadjudicated rows),
+    --verify (second-coder different family + DeBERTa-NLI cross-check, disagreements surfaced not averaged), --finalize
+    (D-274d per-cell stamp + live menu-v6 pins, refuses unless the BUG-650 guard passes). Depth axis intentionally
+    NOT re-derived (menu v6 did not change the 4-way depth axis, D-2820). Config-first (C12): generator/second-coder
+    models + anchor version in pipeline_config.yaml stage4; pins from menu_axis_hashes.yaml; taxonomy_version from
+    taxonomy_v5.yaml. generator == second coder is refused (R5). Control tests (6 passed) + --selftest + --plan
+    (204/204 join, pins verified).'
+  rationale: 'D-2840 landed the ENFORCEMENT guard that makes a pre-D-2820 kappa impossible; this harness is the
+    PRODUCER that makes a POST-D-2820 kappa POSSIBLE — it is the missing scripts/rederive_anchor_axes_v6.py named
+    as the sole remaining gap in the prior audit (F-07). It does NOT unblock the A/B by itself: the actual re-derivation
+    run and D-2839 PROPOSED->RATIFIED flip remain owner/human gates this script cannot self-sign.'
+  bugs:
+  - BUG-650
+  files:
+  - scripts/rederive_anchor_axes_v6.py
+  - tests/test_rederive_anchor_axes_v6.py
+  - config/pipeline_config.yaml
+- id: D-2842
+  state: RATIFIED
+  category: S5 / VERIFICATION / NLI
+  title: Implement D-2822 Gate A(d) — OR-entail + AND-no-contradiction aggregation primitive (config-gated, fail-closed)
+  decision: 'Land the CODE limb of D-2822 (fixes BUG-651): pipeline/stage5_verify.py gains _or_entail_and_no_contra_verdict()
+    (pure, model-free) — a convergent FB is VERIFIED only when the evidence set OR-entails the claim (at least one
+    clean passage entails) AND no passage contradicts it (AND-no-contra). _aggregate_verdict() dispatches on config-first
+    stage5.nli_aggregation (C12): default ''majority'' (D2507/B2, current calibrated behavior — NO silent change),
+    ''or_entail_and_no_contra'' = D-2822 Gate A(d). Unknown value → fail-closed (C16). This fixes BUG-651: the majority
+    rule HIDES a supported claim (506 ENTAIL-majority QUARANTINE + 1,514 NEUTRAL served, D272g) and can PASS a claim
+    carrying BOTH entailment and contradiction. Score contract preserved (max entail) so nli_calibrate.py is unaffected.
+    8 control tests (tests/test_or_entail_no_contra.py); 16 total pass with the B2 suite.
+
+    '
+  rationale: 'D-2822 was RATIFIED but "NOT yet executed". This lands the code limb; the flip to ''or_entail_and_no_contra''
+    is DELIBERATELY NOT done here — it requires the D-2822 threshold recalibration (nli_calibrate.py) because a
+    claim now survives on ONE entail, then a full S5 re-run on rechunk-v4-20260929. The config default stays ''majority''
+    so no behavior change leaks in before recalibration (fail-safe, C16).
+
+    '
+  bugs:
+  - BUG-651
+  files:
+  - pipeline/stage5_verify.py
+  - tests/test_or_entail_no_contra.py
+  - config/pipeline_config.yaml
+- id: D-2843
+  state: RATIFIED
+  category: TAXONOMY / GOVERNANCE
+  title: Land the BUG-631 READER-limb — scripts/check_domain_cardinality.py re-measures the committed store for
+    per-FB domain-cardinality violations (fail-closed)
+  decision: 'Land the READER half of the BUG-631 cardinality enforcement loop. D-2838 landed the WRITER-limb (_enforce_domain_cardinality
+    in pipeline/stage4_merge.py) that truncates over-cap domains at the write and degrades CLEAN -> FALLBACK. This
+    lands the READER-limb: scripts/check_domain_cardinality.py re-measures the committed store (DB_PATH, config-first)
+    and reports every FB whose canonical `domains` JSON array exceeds pipeline_config.max_domains_per_fb (=5). It
+    counts ONLY the canonical `domains` array (never `domains_raw`, the pre-canonical input), names parse-defects
+    instead of silently counting them as zero (C16), writes a C6 crash-safe receipt (--json), and exits fail-closed:
+    0 = clean, 1 = drift (over-cap found), 2 = parse-defect. Control tests tests/test_domain_cardinality_reader.py
+    (9 cases) prove the contract. LIVE re-measure confirms the BUG-631 finding: 52 over-cap FBs (46 @ 6 domains,
+    6 @ 7) of 14,574 total (0.36%), every one CLEAN.
+
+    '
+  bugs:
+  - BUG-631
+  files:
+  - scripts/check_domain_cardinality.py
+  - tests/test_domain_cardinality_reader.py
+- id: D-2844
+  state: PROPOSED
+  category: ANCHOR INTEGRITY / TAXONOMY
+  title: D-2820 owner adjudication normalized (204 rows) + taxonomy boundary clarifications + 3 drops + 4 emerging-mix
+  decision: >
+    Owner adjudicated the 142 differing rows of the D-2820 re-derivation (menu v6). Forensic audit CLEAN:
+    0 off-menu discipline/domain labels. Normalized 4 separator typos (comma/period -> pipe) and 6 note typos;
+    62 same rows carried forward to a full 204-row decision set. OWNER-GATED (not auto-applied): (1) DROP 3 noise
+    rows R084/R106/R148 -> anchor 204->201; (2) resolve emerging-mix R023/R112/R177/R188 (emerging alongside real
+    domains); (3) taxonomy boundary clarifications PROPOSED for strategic thinking/decision making, business
+    administration/operations research/organizational theory, marketing/design psychology/behavioral economics,
+    genAI/AI/ML, plus 4 domain overlaps. closed_menu_v6.json NOT edited (protected). --adjudicate/--verify/
+    --finalize deferred until owner sign-off (fail-closed requires all rows non-empty on-menu; finalize gated on
+    D-2839 + full-204 A/B kappa>=0.800 AND emerging<=0.35).
+  bugs: []
+  files:
+  - governance/rederive_v6_owner_decisions_normalized.csv
+  - governance/rederive_v6_owner_decisions.json
+  - governance/FORENSIC_AUDIT_20261006_OWNER_DECISIONS.md
+- id: D-2845
+  state: RATIFIED
+  category: ANCHOR INTEGRITY
+  title: D-2820 anchor re-cut 204->201 + emerging-mix resolved (owner-approved) — --adjudicate landed 201 rows
+  decision: >
+    Owner resolved D-2844 items (1)+(2): DROP 3 noise rows R084/R106/R148; emerging-mix R023/R112/R177/R188
+    -> keep only real domains (drop the stray 'emerging' token). Rationale: 'emerging' is a PURE abstention
+    signal; mixing it with real labels is self-contradictory, degrades DeBERTa-NLI verification precision, and
+    pollutes the emerging bucket used for future taxonomy-expansion triage. Re-cut anchor 204->201
+    (governance/discipline_anchor_conformance_20261006.json); flat 201-row decisions
+    (rederive_v6_owner_decisions_flat.json); --adjudicate -> rederive_v6_finalized_20261006.json (201 rows,
+    owner_finalized, 0 off-menu). Emerging census: discipline='emerging' 7, domains=['emerging'] pure 7;
+    14/201 (6.97%) touch 'emerging' — under the 0.35 A/B gate. STILL OWNER-GATED: taxonomy boundary
+    clarifications (edit closed_menu_v6.json -> re-render + re-pin -> re-derive); --verify/--finalize/D-2839
+    ratification/full-201 A/B (kappa>=0.800 AND emerging<=0.35) + flip definition_anchored_menu_enabled.
+  bugs: []
+  files:
+  - governance/discipline_anchor_conformance_20261006.json
+  - governance/rederive_v6_owner_decisions_flat.json
+  - governance/rederive_v6_owner_decisions_final.csv
+  - governance/rederive_v6_finalized_20261006.json
+  - governance/FORENSIC_AUDIT_20261006_RESOLUTION.md
+- id: D-2846
+  state: RATIFIED
+  category: ANCHOR INTEGRITY
+  title: D-2820 anchor re-derivation --verify + --finalize complete (menu-v6 stamped, guard PASSED)
+  decision: >
+    --verify cross-checked all 201 rows (second coder gemma-4-E4B-it-MLX-4bit, R5 distinct family, + DeBERTa-NLI):
+    85 agree / 116 disagree (57.7%); NLI 82 entailed / 102 weak / 17 contra-dominant — all SURFACED never flipped
+    (D-2839 c3); 12 of 17 contra-dominant rows sit on owner-flagged taxonomy boundaries. --finalize minted
+    discipline_anchor_rederived_v6_20261006.json (201 rows); menu hash composite 92f1a204... + answer_space
+    d704d06e... == declared live pins; guard PASSED; gen_model human_owner (adjudicated), classifier output was
+    INPUT only (D-2839 c2). Emerging 7/201 (3.5%). Killed stale duplicate --verify orphan (first-timeout survivor).
+    D-2839 REMAINS PROPOSED (human gate, script does not self-sign); owner sign-off -> full-201 A/B
+    kappa>=0.800 AND emerging<=0.35 -> flip definition_anchored_menu_enabled iff pass.
+  bugs: []
+  files:
+  - governance/rederive_v6_verified_20261006.json
+  - governance/discipline_anchor_rederived_v6_20261006.json
+
+- id: D-2847
+  state: RATIFIED
+  category: ANCHOR INTEGRITY
+  title: Owner consolidation of 14 contra-dominant rows + re-derive (menu-v6 re-mint 20261006b)
+  decision: >
+    Owner resolved the 3 held items: R179 -> creative process, R143 -> design thinking, R183 -> discipline
+    'emerging' + domain 'urban planning'. Applied 6 discipline changes (R155 business administration, R167
+    organizational theory, R183 emerging, R179 creative process, R036 marketing, R143 design thinking) + 8 no-ops
+    to rederive_v6_owner_decisions_flat.json (201); all 14 labels ON-MENU v6 verified before write. Re-ran
+    --adjudicate -> --verify -> --finalize with --run-id 20261006b (after D-2848 fixed the dead --run-id flag).
+    Verify: 88 agree / 113 disagree; NLI 85 entailed / 104 weak / 12 contra-dominant (down from 85/116, 82/102/17).
+    14/14 rows landed. Minted discipline_anchor_rederived_v6_20261006b.json (201 rows; composite 92f1a204... +
+    answer_space d704d06e... == live pins; guard PASSED; gen_model human_owner adjudicated). Emerging 8/201.
+    D-2839 REMAINS PROPOSED (human gate).
+  bugs: []
+  files:
+  - governance/rederive_v6_owner_decisions_flat.json
+  - governance/rederive_v6_finalized_20261006b.json
+  - governance/rederive_v6_verified_20261006b.json
+  - governance/discipline_anchor_rederived_v6_20261006b.json
+- id: D-2848
+  state: RATIFIED
+  category: RELIABILITY
+  title: Harness --run-id dead-flag fix (C16 hidden-failure remediation)
+  decision: >
+    Forensic audit found --run-id parsed but NEVER used (all path helpers + artifact_id hardcoded _run_id()).
+    The --finalize error said "use --run-id for a new run" while the flag silently did nothing — a hidden failure
+    blocking same-day re-mint (I2 mint-once). Fixed: threaded run_id through path helpers + finalize_manifest
+    (default _run_id()) + fail-closed validation (reject path separators). --selftest passed before/after;
+    --plan validated. BUG-652 RESOLVED. Also flagged: pipeline_config.yaml discipline_anchor_path still 204-row
+    20261002 while re-cut is 201-row 20261006 (owner repoint pending).
+  bugs: [BUG-652]
+  files:
+  - scripts/rederive_anchor_axes_v6.py
+- id: D-2849
+  state: RATIFIED
+  category: ARCHITECTURE
+  title: Effect-TS evaluation — adopt the patterns, not the TypeScript library
+  decision: >
+    Evaluated github.com/Effect-TS/effect (4.0.1 LTS, TypeScript-only). VERDICT: do NOT integrate the TS library
+    into the Python pipeline (C27/C28/C1/C3). ADOPT the four disciplines in Python: (1) typed errors -> Result type;
+    (2) structured concurrency -> asyncio.TaskGroup (fixes stale-orphan bug); (3) parse-don't-validate -> pydantic
+    (fixes truncation/mismatch); (4) typed retry -> tenacity (fixes OMLX cold-load). Guarantees already codified in
+    C6/C13/C16/C23/C24; gap is type-level enforcement.
+    RATIFIED 2026-10-06 by owner (approve-and-ratify). Implementation is NOT on the A/B kappa critical path, so
+    the four patterns are deferred and folded into the classifier-of-record work: tenacity retry + Result/Either
+    error handling land with the deterministic classifier swap (D-2767 shortlist), pydantic parse-don't-validate
+    lands with the A/B harness determinism self-check. No standalone scaffolding commit (C28: no bloat without a consumer).
+  bugs: []
+  files: []
+
+- id: D-2850
+  state: RATIFIED
+  category: ANCHOR INTEGRITY
+  title: Owner final consolidation round 2 (3 label changes) + re-mint 20261006c
+  decision: >
+    Owner revised R168 research methodology -> marketing, R153 research methodology -> cognitive science,
+    R143 design thinking -> computer graphics; confirmed R183 stays emerging + urban planning. Re-ran
+    --adjudicate -> --verify -> --finalize at --run-id 20261006c. Result: contra-dominant 12 -> 9,
+    second-coder disagreements 113 -> 110, entailed 85 -> 87 (weak 105, contra 9). 6 owner-confirmed labels
+    remain contra-dominant (R029/R098 design thinking, R047 design psychology, R107 research methodology,
+    R090 media studies, R067 human-computer interaction) plus 3 non-consolidation (R014/R134/R147); owner is
+    final authority (D-2839). Manifest discipline_anchor_rederived_v6_20261006c.json minted, guard PASSED.
+    D-2839 still PROPOSED (owner gate) - eyeball the 9 contra + 110 disagree, then flip to RATIFIED.
+  bugs: [BUG-653]
+  files: []
+
+- id: D-2851
+  state: RATIFIED
+  category: ANCHOR INTEGRITY
+  title: Owner final round 3 (5 label changes) + re-mint 20261006d; D-2839 sign-off complete
+  decision: >
+    Owner revised R107 research methodology -> philosophy, R067 HCI -> interdisciplinary studies,
+    R029 design thinking -> business administration, R047 design psychology -> psychology,
+    R098 design thinking -> aesthetics (R098 listed twice; owner resolved to aesthetics). Re-ran
+    --adjudicate -> --verify -> --finalize at --run-id 20261006d. Result: contra-dominant 9 -> 4
+    (R014/R090/R134/R147 remain, owner-accepted as-is), second-coder disagreements 110 -> 106,
+    entailed 87 -> 89. Manifest discipline_anchor_rederived_v6_20261006d.json minted, guard PASSED.
+    Owner sign-off complete -> D-2839 RATIFIED; 20261006d manifest is now the D-2767 A/B referee.
+  bugs: []
+  files: []
+- id: D-2852
+  state: RATIFIED
+  category: ANCHOR INTEGRITY
+  title: 'D-A: D-2767 A/B verdict kappa 0.4313 -> D-2839 gate FAILED'
+  decision: 'Owner ratified the A/B verdict. Full-201 flag-ON A/B (governance/d2767_ab_flagon_20261006d.json, 20:28):
+    Cohen kappa 0.4313 (FAIL <0.800), emerging 0.0299 (pass), raw agreement 0.4478, determinism 8/8, 111/201 disagreements.
+    The definition-anchored flag-ON classifier does NOT reproduce the owner referee -> definition_anchored_menu_enabled
+    stays OFF. Production prompt (0.4313) underperforms the rederive path (0.7794). Resolves BUG-656 (definitive
+    production-path kappa now landed).'
+  bugs:
+  - BUG-656
+  files:
+  - governance/d2767_ab_flagon_20261006d.json
+  - governance/d2767_ab_flagon_20261006d_disagreements.csv
+- id: D-2853
+  state: RATIFIED
+  category: ANCHOR INTEGRITY / TAXONOMY
+  title: 'D-3 (taxonomy C): freeze closed_menu_v6.json, build closed_menu_v7.json from disagreement clusters'
+  decision: 'Owner approved decision C. Freeze closed_menu_v6.json. Build closed_menu_v7.json from the 111 disagreement
+    rows + collision clusters: merge within-axis near-synonyms, rename cross-axis near-identical collisions to axis-scoped
+    labels (artificial intelligence<->ai & agents, finance<->finance & investment, marketing<->marketing & communications,
+    entrepreneurship studies<->entrepreneurship, research methodology<->research & methodology, semiotics<->semiotics
+    & communication), add discriminator fields. Addresses BUG-630 (cross-axis collision guard too blunt). PREREQUISITE:
+    remap ALL anchors/golden/config/scripts referencing old labels. Gate v7 behind its own A/B (adopt only if kappa
+    improves toward >=0.800).'
+  bugs:
+  - BUG-630
+  files:
+  - config/closed_menu_v6.json
+- id: D-2854
+  state: RATIFIED
+  category: BUGFIX / RELIABILITY
+  title: 'D-B root fix: total wall-clock deadline in pipeline/omlx_call.py::call_omlx (BUG-658)'
+  decision: 'Owner ack granted. Root fix landed: pipeline/omlx_call.py wraps every requests.post in _post_with_wall_clock
+    (daemon thread + join(timeout=OMLX_WALL_CLOCK_DEADLINE=180s)); WallClockTimeout treated as a wedge. Config constant
+    OMLX_WALL_CLOCK_DEADLINE from services.omlx.wall_clock_deadline_sec (C12). Protects ALL callers, not just the
+    d2767_ab_eval harness. Mitigates BUG-658; stays OPEN until harness relaunch reproduces the fix end-to-end.'
+  bugs:
+  - BUG-658
+  files:
+  - pipeline/omlx_call.py
+  - pipeline/pipeline_paths.py
+  - config/pipeline_config.yaml
+- id: D-2855
+  state: RATIFIED
+  category: TAXONOMY / ONTOLOGY
+  title: 'D-NEXT-1 (a,b,c): discriminator-first differentia + org-theory/BA differentia + semiotics fold + 7th engineering
+    pair'
+  decision: 'Owner ratified D-NEXT-1. (a) Discriminator-first differentia ADOPTED and to be generalized to every
+    entry: structured genus + differentia + nearest-neighbor exclude. The organizational theory vs business administration
+    differentia is now explicit: organizational theory is the EXPLANATORY/POSITIVE lens (the organization is the
+    OBJECT of inquiry — how formal organizations are structured, coordinate, change); business administration is
+    the PRESCRIPTIVE/NORMATIVE lens (the managerial FUNCTION is the OBJECT — how to steer an organization to objectives
+    under resource constraints). Probe test: ''explaining how organizations are structured/coordinate/change ->
+    organizational theory; prescribing how to steer them to objectives -> business administration; applied practice/technique
+    -> domain, not discipline''. (b) Keep semiotics distinct; fold visual semiotics into semiotics. (c) Adopt the
+    7th engineering pair; strip academic raw from the engineering & infrastructure domain. Addresses the axis-impurity
+    root of BUG-630.'
+  bugs:
+  - BUG-630
+  files:
+  - config/taxonomy_v5.yaml
+  - config/taxonomy_v7.yaml
+- id: D-2856
+  state: RATIFIED
+  category: TAXONOMY / ONTOLOGY
+  title: stable opaque IDs + MECE partition validator + taxonomy_v7 build (BUG-630 axis purity)
+  decision: 'Owner ratified. Every taxonomy entry gets a stable opaque id (disc-NNN / dom-NNN) so display labels
+    can be renamed without remap drift — string-as-identity was the drift vector behind BUG-630. scripts/validate_taxonomy_partition.py
+    is the build-time fail-closed MECE validator: every raw synonym maps to exactly one (axis, id); canonical labels
+    distinct within and across axes. scripts/build_taxonomy_v7.py built config/taxonomy_v7.yaml deterministically:
+    202 raw dedups, 178 partition resolutions (exact-canonical-match, else fewest-raws-most-specific), and the cross-axis
+    normalised-canonical collision ''research & methodology'' renamed to ''research practice'' (D-2853). Validator
+    reports 0 violations on v7. Fixes the axis-impurity root of BUG-630.'
+  bugs:
+  - BUG-630
+  files:
+  - scripts/validate_taxonomy_partition.py
+  - scripts/build_taxonomy_v7.py
+  - config/taxonomy_v7.yaml
+  - governance/taxonomy_v7_migration.json
+- id: D-2857
+  state: RATIFIED
+  category: PIPELINE / S4
+  title: split S4 discipline/domains classification (Call B) from CRIBS enrichment (Call A) — BUG-648
+  decision: 'Owner ratified the D-2856 split clarification. NO new stage and NO new LLM: same stage4, two calls.
+    Call A = CRIBS enrichment only, on the Generator Qwen3-Coder-30B, with NO closed-menu preamble. Call B = classification
+    {discipline, domains} only, on the S4 classifier gpt-oss-20b-MXFP4-Q8, with the definition-anchored closed menu.
+    Bottleneck IMPROVES: the classifier arm parallelizes and the enrichment arm sheds the ~5k-token menu preamble;
+    the focused Call B prompt is the 0.7794 rederive path that must reach >=0.800 before it becomes classifier-of-record.
+    Fixes the attention-overload / menu-bloat root of BUG-648.'
+  bugs:
+  - BUG-648
+  files:
+  - pipeline/stage4_merged_call.py
+  - config/pipeline_config.yaml
+- id: D-2858
+  state: RATIFIED
+  category: VERIFICATION / NLI
+  title: 'D-NEXT-A: recalibrate D-2822 under or-entail semantics, re-pin threshold (D-353), then flip stage5.nli_aggregation'
+  decision: >
+    The BUG-651 fix (D-2842 _or_entail_and_no_contra_verdict) is landed but inert: config
+    stage5.nli_aggregation is still majority, so an S4->S5 rerun re-quarantines the 506
+    ENTAIL-majority rows. Correct sequence: (1) run pipeline/nli_calibrate.py against the
+    or-entail semantics (a claim now survives on ONE entail, so the per-passage entailment
+    threshold may need tightening from the current 0.10, which was calibrated under B2-majority);
+    (2) re-mint the calibrated threshold into config/recalibration_pins.yaml under a NEW decision
+    id (D-353 rule; the existing menu pin there is already STALE - it pins closed_menu_v5.json
+    while the live menu is v7); (3) only then flip stage5.nli_aggregation majority ->
+    or_entail_and_no_contra; (4) add a fail-closed guard refusing or-entail mode unless a matching
+    calibration stamp is present. Do NOT flip before recalibration.
+  bugs:
+  - BUG-651
+  files:
+  - pipeline/nli_calibrate.py
+  - config/pipeline_config.yaml
+  - config/recalibration_pins.yaml
+- id: D-2859
+  state: RATIFIED
+  category: GOVERNANCE / REPO INTEGRITY
+  title: 'D-NEXT-B: BUG-563 worktree triage - 37 un-homed dirty paths into 3 buckets'
+  decision: >
+    check_repo_integrity --worktree FAILS on 37 un-homed paths. Three buckets: (a) RUN ARTIFACTS
+    (governance/rederive_v6_*, governance/d2767_ab_*, logs/**) -> paired .gitignore +
+    worktree.excluded entries (excluded patterns REQUIRE git-ignore alignment; verified this session
+    that adding excluded without .gitignore raised faults 39->42); (b) SOURCE-MATERIAL DROP-INS
+    (governance/Surveillance Capitalism and Soviet Discourse.csv) -> owner-gate commit-or-relocate
+    with provenance, never silently git-ignore a corpus input; (c) DOCS/SCRIPTS
+    (ONTOLOGY_ENFORCEMENT_ARCHITECTURE_20261004.md, TAXONOMY_EVOLUTION_TOOLING_20261004.md,
+    scripts/watch_run.sh, closed_menu_v6_reference.csv, domain_cardinality_receipt.json) -> may_touch
+    grants or archive. A dirty path that is neither granted nor excluded keeps the tree un-cleanable.
+  bugs:
+  - BUG-563
+  files:
+  - config/repo_integrity.yaml
+  - .gitignore
+  - governance/session_plan_20260924.yaml

@@ -137,6 +137,16 @@ def _render_discipline_closed_menu() -> str:
 
 _DISCIPLINE_CLOSED_MENU_BLOCK = _render_discipline_closed_menu()
 
+# D-2833 (2026-10-05): D-2814 (definition-anchored) supersedes D-2773 (label-only closed menu).
+# Fail-closed (C16 / BUG-647): enabling BOTH would inject TWO contradictory discipline menus
+# (a label-only list AND a label+definition list) into one prompt.
+from pipeline.pipeline_paths import (S4_DISCIPLINE_CLOSED_MENU_ENABLED,
+                                     S4_DEFINITION_ANCHORED_MENU_ENABLED)
+if S4_DISCIPLINE_CLOSED_MENU_ENABLED and S4_DEFINITION_ANCHORED_MENU_ENABLED:
+    raise RuntimeError(
+        "D-2833: discipline_closed_menu_enabled AND definition_anchored_menu_enabled are both true — "
+        "D-2814 supersedes D-2773; set discipline_closed_menu_enabled: false (C16)")
+
 # ── D2454 (2026-08-27): inject the config-driven S4 classification golden. ──
 # Fail-closed (D2463 pattern): enabled + missing/malformed/empty → raise.
 try:
@@ -203,6 +213,124 @@ if _BOUNDARY_BLOCK:
         raise RuntimeError("D-325: boundary injection anchor not unique — refusing to guess (C16)")
     MERGED_CRIBS_CLASSIFY_SYSTEM = MERGED_CRIBS_CLASSIFY_SYSTEM.replace(
         _BOUNDARY_ANCHOR, _BOUNDARY_BLOCK + "\n\n" + _BOUNDARY_ANCHOR, 1)
+
+
+def _apply_definition_anchored_schema(system: str) -> str:
+    """D-2814: rewrite the free-generation JSON schema placeholders to closed-menu phrasing.
+
+    The closed-menu instruction says "choose EXACTLY ONE label verbatim", but the JSON schema
+    still carried the free-generation placeholders ``"discipline": "precise_discipline_name"`` /
+    ``"domains": ["domain1", "domain2"]``, which contradict the menu and hide the abstention
+    token as a valid value (surfaced by the R5 verifier review — gemma FAIL: "emerging" is not
+    in the output schema). Without this swap the model gets a conflicting signal and may never
+    emit the abstention token.
+
+    Fail-closed (C16): each placeholder must appear EXACTLY once, else raise — never silently
+    leave a schema that contradicts the menu.
+    """
+    from pipeline.closed_menu import render_closed_menu
+
+    abstention = render_closed_menu()["abstention"]
+    disc_old = '"discipline": "precise_discipline_name",'
+    dom_old = '"domains": ["domain1", "domain2"],'
+    if system.count(disc_old) != 1 or system.count(dom_old) != 1:
+        raise RuntimeError(
+            "D-2814: free-gen JSON schema placeholder anchor not unique — refusing to guess (C16)")
+    disc_new = (
+        f'"discipline": "one label from CLOSED DISCIPLINE MENU (verbatim) or \'{abstention}\'",'
+    )
+    dom_new = (
+        f'"domains": ["1-5 labels from CLOSED DOMAIN MENU (verbatim); \'{abstention}\' if none fit"],'
+    )
+    system = system.replace(disc_old, disc_new, 1).replace(dom_old, dom_new, 1)
+    return system
+
+
+def _apply_definition_anchored_menu(system: str) -> str:
+    """D-2814 (2026-10-05): swap the free-generation discipline/domains instruction for the
+    definition-anchored closed menu.
+
+    The free-gen prompt tells the model to INVENT precise labels ("computational neuroscience >
+    neuroscience") and to NEVER use 'emerging'; the closed menu tells it to pick VERBATIM from a
+    label+definition list and to use the abstention token when nothing fits. This function swaps
+    the two instruction spans and drops the contradictory "DO NOT use emerging / Be PRECISE" tail.
+
+    Fail-closed (C16): each span marker must appear EXACTLY once, else raise — never silently
+    leave a half-swapped prompt.
+    """
+    from pipeline.closed_menu import definition_anchored_block, render_closed_menu
+
+    block = definition_anchored_block()
+    abstention = render_closed_menu()["abstention"]
+    start_a = "- discipline: SINGLE most precise academic discipline."
+    end_a = "- depth: ontological scope"
+    start_b = 'DO NOT use "emerging" as a discipline'
+    end_b = "closest real academic field."
+    if system.count(start_a) != 1 or system.count(end_a) != 1:
+        raise RuntimeError("D-2814: free-gen discipline/domains anchor not unique — refusing to guess (C16)")
+    if system.count(start_b) != 1 or system.count(end_b) != 1:
+        raise RuntimeError("D-2814: free-gen 'DO NOT use emerging' tail anchor not unique — refusing to guess (C16)")
+    i, j = system.index(start_a), system.index(end_a)
+    new_a = (
+        f"- discipline: choose EXACTLY ONE label from the CLOSED DISCIPLINE MENU below, verbatim, or '{abstention}' if none fits.\n"
+        f"- domains: choose 1-5 labels from the CLOSED DOMAIN MENU below, verbatim, or '{abstention}' if none fit.\n"
+        "- DISCIPLINE vs DOMAIN DISJOINTNESS (D2422 / BUG-197 — enforced, never mix the axes):\n"
+        "  * Pick each label from its OWN menu only; never emit a discipline-menu label into `domains`\n"
+        "    or a domain-menu label into `discipline`.\n"
+        "  * Never emit the same label in BOTH fields.\n\n"
+        + block
+        + "\n\n"
+    )
+    system = system[:i] + new_a + system[j:]
+    i2, j2 = system.index(start_b), system.index(end_b) + len(end_b)
+    system = system[:i2] + system[j2:].lstrip("\n")
+    return _apply_definition_anchored_schema(system)
+
+
+def _apply_definition_anchored_menu_batch(system: str) -> str:
+    """D-2814: apply the definition-anchored menu to the BATCH classify prompt.
+
+    ``BATCH_CRIBS_CLASSIFY_SYSTEM`` (gated by ``stage4.batch_enabled``) carries the same
+    free-generation discipline/domains rules and the same "DO NOT use emerging" tail, plus the
+    free-gen schema placeholders. D-2814 must cover EVERY S4 classify path (D-2833 / BUG-645);
+    the single-FB merged path is handled by :func:`_apply_definition_anchored_menu`, this
+    function handles the batch path.
+
+    Fail-closed (C16): the block markers must appear EXACTLY once.
+    """
+    from pipeline.closed_menu import definition_anchored_block, render_closed_menu
+
+    block = definition_anchored_block()
+    abstention = render_closed_menu()["abstention"]
+    start = "CLASSIFICATION RULES (D2422 / BUG-197 — enforced, never mix the axes):"
+    end = '- DO NOT use "emerging" as a discipline — use the most specific real discipline name.'
+    if system.count(start) != 1 or system.count(end) != 1:
+        raise RuntimeError(
+            "D-2814: batch classification-rules anchor not unique — refusing to guess (C16)")
+    i, j = system.index(start), system.index(end) + len(end)
+    new = (
+        f"- discipline: choose EXACTLY ONE label from the CLOSED DISCIPLINE MENU below, verbatim, or '{abstention}' if none fits.\n"
+        f"- domains: choose 1-5 labels from the CLOSED DOMAIN MENU below, verbatim, or '{abstention}' if none fit.\n"
+        "- DISCIPLINE vs DOMAIN DISJOINTNESS (D2422 / BUG-197 — enforced, never mix the axes):\n"
+        "  * Pick each label from its OWN menu only; never emit a discipline-menu label into `domains`\n"
+        "    or a domain-menu label into `discipline`.\n"
+        "  * Never emit the same label in BOTH fields.\n\n"
+        + block
+        + "\n"
+    )
+    system = system[:i] + new + system[j:].lstrip("\n")
+    return _apply_definition_anchored_schema(system)
+
+
+# D-2814 (2026-10-05): definition-anchored closed menu (label + definition + explicit 'emerging').
+# Applied LAST, after golden/D-2773/boundary injection, so the swap sees the fully-assembled prompt.
+# OFF by default (byte-identical baseline); adopt only after R5 review + full-204 A/B (D-2767).
+try:
+    from pipeline.pipeline_paths import S4_DEFINITION_ANCHORED_MENU_ENABLED
+    if S4_DEFINITION_ANCHORED_MENU_ENABLED:
+        MERGED_CRIBS_CLASSIFY_SYSTEM = _apply_definition_anchored_menu(MERGED_CRIBS_CLASSIFY_SYSTEM)
+except Exception as _d2814_err:  # C16: fail-loud
+    raise RuntimeError(f"D-2814: definition-anchored menu application failed: {_d2814_err}") from _d2814_err
 
 
 def system_prompt(boundary: bool | None = None) -> str:
@@ -689,6 +817,20 @@ except Exception as _s4_golden_err:  # C16: fail-loud — never silently skip an
 
 if _DISCIPLINE_CLOSED_MENU_BLOCK:
     BATCH_CRIBS_CLASSIFY_SYSTEM = BATCH_CRIBS_CLASSIFY_SYSTEM + "\n\n" + _DISCIPLINE_CLOSED_MENU_BLOCK
+
+
+# D-2814 (2026-10-05): apply the definition-anchored menu to the BATCH classify path too.
+# D-2833 / BUG-645: D-2814 must cover EVERY S4 classify path; the batch prompt is a THIRD path
+# that would otherwise keep the free-gen discipline/domains instruction when stage4.batch_enabled
+# flips true. Applied LAST so the swap sees the fully-assembled batch prompt.
+try:
+    from pipeline.pipeline_paths import S4_DEFINITION_ANCHORED_MENU_ENABLED
+    if S4_DEFINITION_ANCHORED_MENU_ENABLED:
+        BATCH_CRIBS_CLASSIFY_SYSTEM = _apply_definition_anchored_menu_batch(BATCH_CRIBS_CLASSIFY_SYSTEM)
+except Exception as _d2814_batch_err:  # C16: fail-loud
+    raise RuntimeError(
+        f"D-2814: definition-anchored menu (batch) application failed: {_d2814_batch_err}"
+    ) from _d2814_batch_err
 
 
 def build_batch_prompt(fbs_data: list[dict]) -> str:

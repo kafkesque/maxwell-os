@@ -40,11 +40,12 @@ import yaml
 
 # ── Paths ──────────────────────────────────────────────────────────────────
 REPO_ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(REPO_ROOT))  # D2478: allow `from pipeline.* import` in checks (check_canonical_promotion)
+from pipeline.pipeline_paths import DATA_DIR  # BUG-625(c): config-first data dir (one home)
 PIPELINE_DIR = REPO_ROOT / "pipeline"
 CONFIG_DIR = REPO_ROOT / "config"
-KNOWLEDGE_DIR = REPO_ROOT / "knowledge pipeline"
+KNOWLEDGE_DIR = DATA_DIR
 GOVERNANCE_DIR = REPO_ROOT / "governance"
-sys.path.insert(0, str(REPO_ROOT))  # D2478: allow `from pipeline.* import` in checks (check_canonical_promotion)
 
 # ── ANSI colours ───────────────────────────────────────────────────────────
 GREEN = "\033[92m"

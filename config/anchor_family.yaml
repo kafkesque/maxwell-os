@@ -72,41 +72,30 @@ axes:
     column: extraction_type_final
     cohort: 150
     intersection: 145
-    note: 5 rows declared-missing upstream — legitimately blank, never imputed
+    note: 5 rows declared-missing upstream (noise_drop) — legitimately blank, never imputed
   depth:
     owner: ANCHOR-4
     status: owned
     column: DEPTH (1-4)
-    cohort: 150
-    intersection: 0
-    note: blind sheet; blank until freeze; class menu still prose-only (BUG-416)
+    cohort: 208
+    intersection: 208
+    note: consolidated 2026-09-30 (1=universal, 2=cross-domain, 3=domain, 4=specialized); 58 extras mapped from categorical depth_final
   domains:
-    owner: external
-    status: disowned_deferred
-    # OWNER RULING (2026-09-24, verbatim intent): "those 216 domain classifications have nothing to do
-    # with the ANCHOR". Recorded so the axis cannot be re-described as existing-but-misfiled.
-    axis_absent_in_anchor: true            # ANCHOR-3 has NO domain column. The axis does not exist here.
-    # OWNER CORRECTION (2026-09-24): "domain are not absent by design those are absent because of your
-    # mismanagement". Correct and recorded: the axis was IN SCOPE (taxonomy v5 carries 44 domains; the
-    # 216-row cohort got the full frontier-pair + owner-adjudication path) while the F-11 instrument built
-    # for the ruler sample carried 26 columns and NO domain column. That is an omission owed back, NOT a
-    # deliberate deferral - so `axes_deferred: [depth, domains]` in config/eval_integrity.yaml must not be
-    # read as "no work owed" for domains. Work owed: one frontier-pair + one owner adjudication pass.
-    relationship: separate instrument (the D2618-P0 adjudication queue) - NOT this anchor's domain work
-    artifact: governance/s4_domain_verdicts.jsonl
-    review_sheet: governance/s4_domain_review_sheet.csv
-    cohort_artifact_key: out_id            # == fb_id (64-hex content address)
-    anchor_key: fb_id
-    cohort: 216
-    cohort_human_adjudicated: 216
-    cohort_authority: p5:human
-    intersection_default_key: 2            # SHARED ITEMS ONLY - not axis ownership, not a merge candidate
-    intersection_alternate_key: 2          # by exact name — two independent joins, same 2 rows
-    intersection_rows: [R109, R142]
-    provenance_of_anchor_domain_values: machine (S4/gpt-oss), NOT human
-    deferral_cited_in: config/eval_integrity.yaml   # axes_deferred: [depth, domains]
-    escalation: SCOPE_CHANGE — adding a domains column to this family requires a decision, not a consolidation
-    rule: a question about the domain axis is answered from THIS block, never from a copied column
+    owner: owner
+    status: owned
+    axis_absent_in_anchor: false
+    # HISTORICAL (2026-09-24): this axis was reported "absent" because the F-11 ruler instrument carried
+    # no domain column. SUPERSEDED 2026-09-30 (D-2720): the 150 locked anchors got a 3-LLM reliable-pair
+    # vote (D2610) -> anchor_adjudication_workbook_20260924.csv -> five-axis view; the 58 extras carried
+    # REVIEW_WORKBOOK_210.csv domain_final. Consolidated into one 208-row view below.
+    column: domain
+    artifact: governance/ANCHOR_208_FIVE_AXIS_VIEW_20260930.csv
+    cohort: 208
+    cohort_human_adjudicated: 208
+    primary_domain_filled: 208
+    advisory_rows_accepted_20260930: [R003, R140, R146]
+    provenance_of_anchor_domain_values: owner-adjudicated (reliable-pair machine vote + owner ruling)
+    rule: a question about the domain axis is answered from governance/ANCHOR_208_FIVE_AXIS_VIEW_20260930.csv
 
 # Machine-side observations about the 150 that are NOT owner labels (defect candidates).
 machine_observations:
@@ -164,7 +153,10 @@ measured_20260925:
 store_bridge:
   artifact: governance/ANCHOR_STORE_BRIDGE_20260926.json
   artifact_id: ANCHOR-STORE-BRIDGE
-  ruler_sheet: governance/ANCHOR_RULER_CONSOLIDATED_20260923.csv
+  # D-2785 folded 58 owner-adjudicated depth extras into the anchor family (150 -> 208 items). The bridge
+  # therefore joins a 208-row item list (content ruler + folded extras), not the 150-row content ruler alone,
+  # so `--check` re-derives the full bridge (BUG-624: the committed bridge no longer re-derived from 150 rows).
+  ruler_sheet: governance/ANCHOR_208_BRIDGE_RULER_20261002.csv
   ruler_encoding: utf-8-sig
   store: knowledge pipeline/maxwell.db
   store_table: fbs

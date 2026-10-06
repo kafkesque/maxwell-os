@@ -28,7 +28,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 from pipeline.io_guard import safe_write_jsonl  # D2487: atomic JSONL writes
-from pipeline.pipeline_paths import get_run_id  # BUG-597: import BEFORE SEGS_PATH (module-level eval)
+from pipeline.pipeline_paths import S1_DIR, get_run_id  # BUG-597: import BEFORE SEGS_PATH (module-level eval); BUG-625(c): S1 dir config-first
 
 import numpy as np
 import yaml
@@ -47,7 +47,7 @@ EMBED_DIM = int(S15.get("embed_dim", 512))  # D2118 Matryoshka truncation (ollam
 # S1 chunk output: config-driven with known fallback
 _segs_cfg = (_CFG.get("paths") or {}).get("stage1_chunk_output")
 SEGS_PATH = Path(_segs_cfg) if _segs_cfg else (
-    ROOT / "knowledge pipeline" / "stage1_chunk" / get_run_id() / "checkpoint.jsonl")
+    S1_DIR / get_run_id() / "checkpoint.jsonl")
 # D2137: output to the path stage2.load_clusters() reads (STAGE1_5_CHECKPOINT)
 from pipeline.pipeline_paths import STAGE1_5_CHECKPOINT as _S15_CP
 

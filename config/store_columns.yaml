@@ -14,7 +14,7 @@
 # A column that must vary but is constant is NOT a separate role: it is `role: value` + `status: debt`, which is how
 # the approved varying-column rule fails CLOSED instead of being remembered.
 schema_version: '1.0'
-decided: PENDING-OWNER
+decided: D-2809
 bug: BUG-524
 rail: scripts/check_store_columns.py
 store: knowledge pipeline/maxwell.db

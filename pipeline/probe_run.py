@@ -33,12 +33,12 @@ sys.path.insert(0, str(PROJECT_ROOT))
 from pipeline.io_guard import safe_write_jsonl  # D2487: atomic JSONL writes
 
 # ── Config paths ──────────────────────────────────────────────────────
-S15_CHECKPOINT = PROJECT_ROOT / "knowledge pipeline/stage1_5_embed_cluster/latest/checkpoint.jsonl"
-S1_CHECKPOINT = PROJECT_ROOT / "knowledge pipeline/stage1_chunk/latest/checkpoint.jsonl"
-PROBE_DIR = PROJECT_ROOT / "probe_output"
+# C12 (BUG-625): run-id + OMLX endpoint + data dir are config-first via pipeline_paths, NOT hardcoded.
+from pipeline.pipeline_paths import S15_DIR, S1_DIR, get_run_id, OMLX_URL  # noqa: E402
 
-# ── OMLX lazy loading ─────────────────────────────────────────────────
-OMLX_URL = "http://localhost:11435"
+S15_CHECKPOINT = S15_DIR / get_run_id() / "checkpoint.jsonl"
+S1_CHECKPOINT = S1_DIR / get_run_id() / "checkpoint.jsonl"
+PROBE_DIR = PROJECT_ROOT / "probe_output"
 
 def omlx_load_model(model_name: str) -> bool:
     """Load a model into OMLX memory. Returns True if successful."""

@@ -26,10 +26,10 @@ from pathlib import Path
 import pypandoc
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from pipeline.pipeline_paths import SOURCE_EPUB_DIR
+from pipeline.pipeline_paths import BOOKS_DIR, SOURCE_EPUB_DIR
 
 EPUB_BASE = SOURCE_EPUB_DIR
-MD_BASE = Path("knowledge pipeline/books")
+MD_BASE = BOOKS_DIR
 
 
 def find_matching_md(epub_path: Path) -> Path | None:

@@ -3,6 +3,7 @@ session:
   pipeline_commit: v3.0-D2370
   schema_version: '3.0'
   project_root: knowledge pipeline/
+  status: '2026-10-06 v7 PROMOTED: taxonomy_v7.yaml -> live taxonomy_v5.yaml (64 disc / 43 dom, opaque ids, 0 MECE violations); DB relabel 875 fbs + 1 taxonomy_counts (research & methodology -> research practice); closed_menu_v7.json minted (menu_hash 407f3dd45d9c766a); menu_axis_hashes regenerated (drift none); version.yaml taxonomy_version=v7; rederive scripts repointed v6->v7. D-2855/D-2856/D-2857 RATIFIED. NEXT: (1) D-2857 S4 prompt split (Call A CRIBS on Qwen3 no-menu, Call B classify on gpt-oss with menu); (2) discriminator rewrite of business operations + organizational behavior; (3) flip stage5.nli_aggregation -> or_entail_and_no_contra AFTER D-2822 recalibration (else S5 re-quarantines 506 ENTAIL-majority rows); (4) S4->S5->S6 rerun (no S1).'
 models:
   generator:
     model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
@@ -254,7 +255,7 @@ book_library:
 current_state:
   open_bugs_n_at_2026_09_22: 77
   c15_register: governance/SESSION-HANDOFF-2026-09-23.md
-  date: 2026-09-22
+  date: 2026-10-06
   critical_finding: 'BUG-299 / D-274a — the serving gate is a LABEL, not a verification
     verdict. scripts/apply_phase1_finalize.py:18 sets status = ''PASS'' if content_type
     == ''principle'' else ''QUARANTINE'' (written at :163). 4,745/4,745 PASS rows
@@ -300,9 +301,9 @@ current_state:
   - G4a
   - G13
   registry:
-    decisions: 955
-    highest_bug: BUG-636
-    buglog_entries: 377
+    decisions: 989
+    highest_bug: BUG-658
+    buglog_entries: 422
   do_not:
   - relabel the corpus
   - buy more stratum-A ruler rows
@@ -319,4 +320,33 @@ current_state:
   - the F-14 pocket retarget (statistically null - BUG-296)
   - any PASS-only frame as an epistemic frame (it is a ROLE frame)
   - the golden retrieval set as ground truth (ids chosen from live search output)
-open_bugs_n: 138
+open_bugs_n: 161
+
+# ── 2026-10-06 session status (supersedes stale current_state.date 2026-09-22) ──
+session_status_2026_10_06:
+  taxonomy_version: v7
+  summary: 'v7 PROMOTED (2026-10-06 apply). Domain rename research & methodology -> research practice
+    (D-2853) DONE in menu+golden+anchors+DB (875+1 rows relabelled); discipline "research methodology" UNCHANGED.
+    3 new disciplines (business administration / entrepreneurship studies / marketing). FORENSIC AUDIT 2026-10-07 v3
+    found the CIRCLES root cause: 34 decisions D-2826..D-2859 UNCOMMITTED (git HEAD=D-2825, worktree=D-2859) + ~70
+    modified + ~15 untracked files. NEW drift beyond v2: (1) taxonomy_shacl.ttl enum still lists research &
+    methodology (unenforced, future tax); (2) closed_menu_v7 = 65 disc/44 dom vs live taxonomy_v5 = 64/43
+    (off-by-one on BOTH axes, unreconciled); (3) 4 referee variants discipline_anchor_rederived_v6_20261006[.b.c.d].json
+    with NO canonical marker; (4) BUG-563 dirty paths GROWING 37->40; (5) decisions_summary.json stale 987 vs 989;
+    (6) CONTEXT_INDEX ~10 days behind (last D-2699 vs now D-2859); (7) ~24 stale config refs (alias_map 16 + shacl.ttl 1
+    + synonym 1 + domain_disciplines 1 + anchor_workbook_fixes 1 + eval_integrity 1 + v5/v6 menus). D-2857 split NOT
+    implemented; D-2822 recalib not run (nli_aggregation majority -> BUG-651 re-quarantine 506); opaque ids in taxonomy
+    only, not menu/storage/golden; gold_frozen 0 business-administration + 0 entrepreneurship studies.'
+  next_steps_ordered:
+  - '0 owner-gate: confirm referee = discipline_anchor_rederived_v6_20261006d.json + approve 28-row domain remap'
+  - '1 BREAK THE CIRCLE: commit D-2826..D-2859 + v7 apply + remap to git (stop accumulating uncommitted state)'
+  - '2 finish D-2853 rename: 28 referee rows + ~24 config refs INCL taxonomy_shacl.ttl enum -> research practice (deterministic, fail-closed, C13)'
+  - '3 reconcile menu 65/44 vs taxonomy 64/43 (off-by-one) + regenerate taxonomy_shacl.ttl + decisions_summary.json'
+  - '4 land D-2857 split (Call A CRIBS / Call B classify; R5 gemma review)'
+  - '5 D-2858: recalibrate D-2822 under or-entail, re-pin, flip nli_aggregation (fail-closed guard)'
+  - '6 new A/B split+v7 vs v7-remapped referee (adopt iff kappa >= 0.800)'
+  - '7 wire opaque ids into serving/storage/menu/golden (D-2856)'
+  - '8 add golden coverage business administration + entrepreneurship studies (gap)'
+  - '9 S4->S5->S6 rerun (no S1)'
+  - '10 D-2859: BUG-563 triage (40 dirty paths) + fix stale menu pins (recalibration_pins.yaml + render_closed_menu.py -> v7)'
+  - '11 sync CONTEXT_INDEX.md (~10 days stale) + regenerate decisions_summary.json'

@@ -166,6 +166,59 @@ def crossing_permits(plan: dict, forbid: list[str], pats: list[re.Pattern[str]])
                      "(D-2668)")
     return permits, faults, notes
 
+def crossing_rate_limit() -> dict:
+    """D-2802: the crossing-rate ceiling, consumed from its ONE home (config/repo_integrity.yaml).
+
+    A lock family that needs repeated one-off crossing permits has drifted semantically (BUG-528: pipeline/**
+    crossed ~5x/week while NOTHING counted it). The ceiling is DECLARED here, never defaulted in the rail (C12).
+    """
+    doc = yaml.safe_load((REPO / "config" / "repo_integrity.yaml").read_text(encoding="utf-8")) or {}
+    return doc.get("crossing_rate_limit") or {}
+
+
+def crossing_rate_faults(plan: dict, forbid: list[str], pats: list[re.Pattern[str]]) -> tuple[list[str], list[str]]:
+    """D-2802 (Tier 2) + D-2803 (Tier 3): count ACTIVE crossings per will_not_touch family; refuse above N.
+
+    The D-2668 `crossing: true` is a PERMIT (SUBJECT + ACK + SPENT) but carried no RATE LIMIT. BUG-528 was not an
+    unmonitored crossing - every one was owner-acked - it was ONE family (pipeline/**) crossed ~5x in a week with
+    NOTHING counting that frequency. A lock family that needs repeated one-off crossings has drifted semantically;
+    this makes that drift a MACHINE signal instead of a human-noticed one (C27: the lock cannot silently rot).
+
+    TWO THRESHOLDS ON ONE COUNT (per family, ACTIVE = acked + unspent crossings that resolve into it):
+      * Tier 3 (note): >=1 active crossing -> the lock-semantic RE-ASK is owed at the next registry increment.
+      * Tier 2 (fault, rc=2 owner gate): > max_active_per_family -> re-scope the FAMILY (one D-decision) instead
+        of granting another file-level crossing.
+    """
+    cfg = crossing_rate_limit()
+    max_active = int(cfg.get("max_active_per_family", 1))
+    counts: dict[str, int] = {}
+    for entry in plan.get("widening_log") or []:
+        if not isinstance(entry, dict) or entry.get("crossing") is not True:
+            continue
+        crossed = [str(p) for p in (entry.get("crossed") or [])]
+        if not crossed or entry.get("spent_by"):
+            continue  # a RECORD (no subject) or an already-SPENT ack: no standing permit
+        if not (str(entry.get("acked_by") or "").strip() and str(entry.get("acked_on") or "").strip()):
+            continue  # unacked crossing is a permit_fault in crossing_permits(), not a rate subject
+        for pat in crossed:
+            for f in forbid:
+                if any(fnmatch.fnmatch(n, f) for n in canonical_names(pat, pats)):
+                    counts[f] = counts.get(f, 0) + 1
+    faults: list[str] = []
+    notes: list[str] = []
+    for f, n in sorted(counts.items()):
+        if n > max_active:
+            faults.append("will_not_touch family '" + f + "' carries " + str(n) + " ACTIVE (acked, unspent) "
+                          "crossing permit(s) - the ceiling is " + str(max_active) + ". The lock's semantic has "
+                          "drifted: re-scope the FAMILY (one D-decision) instead of granting another file-level "
+                          "crossing (D-2802 Tier 2).")
+        else:
+            notes.append("RE-ASK session plan: will_not_touch family '" + f + "' carries " + str(n) + " active "
+                         "crossing - the lock-semantic re-ask is owed at the next registry increment (D-2803 "
+                         "Tier 3); re-scope or re-affirm the family's immutability.")
+    return faults, notes
+
+
 def verdicts(plan: dict, out: list[str], pats: list[re.Pattern[str]], plan_rel: str) -> tuple[int, list[str]]:
     """The whole rule as a pure function, so the controls can hand it a synthetic plan as easily as the live one."""
     allow = [str(x) for x in (plan.get("may_touch") or [])]
@@ -184,6 +237,12 @@ def verdicts(plan: dict, out: list[str], pats: list[re.Pattern[str]], plan_rel: 
         lines += ["  " + x for x in permit_faults]
         return 1, lines
     lines += permit_notes
+    rate_faults, rate_notes = crossing_rate_faults(plan, forbid, pats)
+    if rate_faults:
+        lines.append("FORBIDDEN session plan: a will_not_touch family exceeds its crossing-rate ceiling (D-2802):")
+        lines += ["  " + x for x in rate_faults]
+        return 2, lines
+    lines += rate_notes
     defect = [str(x) for x in (plan.get("may_touch") or [])
               if any(fnmatch.fnmatch(n, f) for n in canonical_names(str(x), pats) for f in forbid)]
     if defect:
@@ -447,27 +506,40 @@ def selftest() -> int:
          widening_faults(live, DEFAULT_PLAN) == []),
     ]
     def _cross(**over) -> dict:
-        """A SYNTHETIC baseline (BUG-492): the permit controls must not depend on the live plan's state."""
-        entry = {"crossing": True, "crossed": ["pipeline/stage5_verify.py"], "acked_by": "owner",
-                 "acked_on": "2026-09-26"}
+        """A SYNTHETIC baseline (BUG-492): the permit controls must not depend on the live plan's state.
+
+        BUG-627 (2026-10-03): D-2801 removed pipeline/** from will_not_touch, so the D-2668 controls that crossed
+        `pipeline/stage5_verify.py` silently stopped testing anything - their subject left will_not_touch, so
+        crossing_permits refused the synthetic crossing as 'not in a family' and the controls went RED. They now
+        cross a REAL owner-instrument family (protect = ANCHOR4_DEPTH_BLIND_SHEET), which stays will_not_touch.
+        """
+        entry = {"crossing": True, "crossed": [protect], "acked_by": "owner",
+                 "acked_on": "2026-10-03"}
         entry.update(over)
         return {"widening_log": [entry], "may_touch": list(clean["may_touch"]),
                 "will_not_touch": list(clean["will_not_touch"])}
-    sib = "pipeline/stage6_commit.py"
+    sib = "governance/ANCHOR4_DEPTH_BLIND_SHEET_20260924.csv"
     controls += [
         ("D-2668: a NAMED, ACKED crossing subject is PERMITTED (the owner's one-off CROSS, rc=0)",
-         verdicts(_cross(), ["pipeline/stage5_verify.py"], pats, DEFAULT_PLAN)[0] == 0),
+         verdicts(_cross(), [protect], pats, DEFAULT_PLAN)[0] == 0),
         ("D-2668 ANTI-OVERREACH: an UNNAMED SIBLING of the crossing subject stays FORBIDDEN (rc=2) - the permit "
          "names its subject or it is not a permit",
          verdicts(_cross(), [sib], pats, DEFAULT_PLAN)[0] == 2),
         ("D-2668: `crossed:` with NO ack is a FAIL (rc=1) - a permit without its ack only LOOKS like permission",
-         verdicts(_cross(acked_by="", acked_on=""), ["pipeline/stage5_verify.py"], pats, DEFAULT_PLAN)[0] == 1),
+         verdicts(_cross(acked_by="", acked_on=""), [protect], pats, DEFAULT_PLAN)[0] == 1),
         ("D-2668: a SPENT crossing permits NOTHING (rc=2) - an ack may not outlive the commit it was given for",
-         verdicts(_cross(spent_by="deadbeef"), ["pipeline/stage5_verify.py"], pats, DEFAULT_PLAN)[0] == 2),
+         verdicts(_cross(spent_by="deadbeef"), [protect], pats, DEFAULT_PLAN)[0] == 2),
         ("D-2668: a `crossed:` path OUTSIDE every will_not_touch family is a FAIL (crossed is not a 2nd may_touch)",
          verdicts(_cross(crossed=["docs/not_protected.md"]), ["docs/not_protected.md"], pats, DEFAULT_PLAN)[0] == 1),
         ("D-2668: the LIVE plan's crossing entries are well-formed (a FAIL here is a plan defect)",
          crossing_permits(live, list(live.get("will_not_touch") or []), pats)[1] == []),
+        ("D-2802: a will_not_touch family with TWO active crossings EXCEEDS the ceiling (rc=2) - re-scope the "
+         "family instead of granting a second file-level crossing",
+         verdicts({"may_touch": [], "will_not_touch": list(clean["will_not_touch"]),
+                   "widening_log": [
+                       {"crossing": True, "crossed": [protect], "acked_by": "owner", "acked_on": "2026-10-03"},
+                       {"crossing": True, "crossed": [protect], "acked_by": "owner", "acked_on": "2026-10-03"},
+                   ]}, [], pats, DEFAULT_PLAN)[0] == 2),
     ]
 
     bad = 0

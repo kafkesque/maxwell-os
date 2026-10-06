@@ -10,11 +10,15 @@
 
 | Bug | Date | Issue |
 |---|---|---|
-| BUG-639 | 2026-10-05 | **S4 `--cluster` delta-merge recovery SHRINK-GUARD false-positive: a recovered cluster (cluster_28517) legitimately shrinks `.expected_count.json` (302→214 bytes) and `safe_write`'s >10% shrink guard (BUG-487 class) blocks the write, leaving the sidecar STALE (declared_failed_count=1 while the recovered FB is on-disk at 6591).** Consequence: preflight invariant `on_disk+declared==expected` fails (6591+1≠6591) and S5/S6 is blocked. Fix: `safe_write(..., force_shrink=bool(cluster_ids))` — the delta reconciliation (D-2824/D-2825) is a deterministic verified merge so a shrink is by-design; the full-run path keeps the guard. Side effect discovery: cluster_28517 "Planck's Constant Derivation" was a TRANSIENT S4 classification failure (S2 extraction was already complete/coherent — re-running S2 would NOT have helped); recovered cleanly on `--cluster 28517` retry. | |
+| BUG-640 | 2026-10-05 | **D-2815 B&M slot "entrepreneurship" string-collides with the existing DOMAIN "entrepreneurship" (closed_menu_v5.json). Two rails reject it: D-2500 owl:disjointWith (domain/discipline must be disjoint) and the BUG-200/D2422 opposite-axis guard in map_to_canonical_with_fallback (returns "emerging" for a raw label canonical on the opposite axis). The new discipline slot is DEAD ON ARRIVAL. Fix: rename slots to discipline-scoped forms (JEL M "business administration" / "marketing" / "entrepreneurship studies"). OWNER-RULED 2026-10-05 (D-2829); IN PROGRESS — code changed, pending menu-v6 commit: slots = 'business administration' / 'marketing' / 'entrepreneurship studies'.** | |
+| BUG-642 | 2026-10-05 | **alias_map.yaml retirement (D-2814) has 14 consumers: pipeline/schemas.py get_synonym_index + 13 scripts (remap_emerging, apply_enrichment, rederive_kindsafe_domains, resolve_domains_emerging, etc.). Wholesale delete = cascade break + silent "emerging" fall-through (EL1). Fix: shrink-then-remove with consumer migration + fail-closed no-synonym mode (C1, D-2828).** | |
+| BUG-643 | 2026-10-05 | **Dual abstention token: pipeline/closed_menu.py uses "none" (_ABSTENTION_VALUE, D-275b/D-277) while closed_menu_v5.json + emerging_disciplines.yaml + the 27.2% emerging metric use "emerging" (catch_all). D-2814 says "explicit none". Must fix ONE abstention token and reconcile emerging_discipline_rate_max 0.35, else the drift metric silently re-targets (BL1, D-2828). OWNER-RULED 2026-10-05 (D-2830); IN PROGRESS — code changed, pending menu-v6 commit: single abstention token = 'emerging'; _ABSTENTION_VALUE 'none' -> 'emerging'.** | |
+| BUG-648 | 2026-10-05 | **Definition-anchored menu renders ~14,889 chars ≈ ~5k tokens per classify call (a CONSTANT byte-deterministic preamble). Not a correctness defect — a cost/bloat finding. D-2835: amortize via serving-layer prefix cache; group-prefilter DEFERRED (a subset-selection prefilter risks re-opening BUG-629/BUG-630).** | |
+| BUG-650 | 2026-10-05 | **Full-204 A/B (D-2767) has no fail-closed guard against a frozen-invalid anchor: benchmark_s4_ab.py / anchor2_kappa.py / fit_eval_model_swap.py read the v5-stamped 204-gold with no menu_hash pin check, so a kappa computed before D-2820 re-derivation would be CIRCULAR (classifier measured against its own pre-D-2814 output) and silently pass the 0.800 floor. Fix: fail-closed pre-A/B guard that refuses kappa unless the anchor manifest's menu_hash == menu v6 (composite 92f1a204... / answer-space d704d06e...); exits non-zero on a frozen-invalid anchor (C16). GUARD LANDED 2026-10-05 (D-2840): pipeline/anchor_menu_guard.py wired into discipline_conformance_gate.py + anchor2_kappa.py (fit_eval_model_swap.py covered via load_anchor import); refuses kappa on a no-stamp or frozen-v5-pin anchor. A/B still BLOCKED until D-2820 re-derivation + D-2839 owner sign-off.** | |
+| BUG-651 | 2026-10-05 | **S5 cross-passage NLI aggregation (D2507/B2 strict majority) is the WRONG ontology: it HIDES a supported claim (one strong entailment buried under neutral passages — D272g measured 506 ENTAIL-majority rows in QUARANTINE + 1,514 NEUTRAL rows served) and can PASS a claim carrying BOTH entailment and contradiction. FIX LANDED 2026-10-05 (D-2842): `_or_entail_and_no_contra_verdict` + config `stage5.nli_aggregation` (default 'majority'; flip to 'or_entail_and_no_contra' ONLY after D-2822 recalibration). Recalibrate + re-run S5 remain.** | |
 | BUG-638 | 2026-10-05 | **`governance/METRICS.jsonl` append-only journal TRUNCATED 817→70 lines (747 samples lost) between 2026-09-27 and 2026-10-03 — undocumented; no rotation logic exists (`emit_metric` opens `"a"` append).** The metric `claim_shape_gate_f1` (still declared in `config/resolution_domains.yaml` + `config/claim_shape_instrument.yaml`) was absent from the truncated journal. Violates C6 (crash-safe writes), C13 (backup after batch writes), R-D410 (never delete pipeline output). **RESTORED 2026-10-05:** HEAD 817 + 70 new 2026-10-03 lines re-joined → 887 lines / 6 metric names, crash-safe write. **OPEN — root cause UNCONFIRMED:** no truncate/rotate/unlink of METRICS found in scripts/; add a shrink-only floor guard so a future truncation is caught (BUG-487 class, fail-closed on a journal that shrinks). **FIXED 2026-10-05:** `emit_metric` now reads a record-count floor (`governance/METRICS.jsonl.floor`, crash-safe tempfile→fsync→os.replace), fails-closed if the journal shrank below it, fsyncs the append, and re-writes the floor. R5 gemma APPROVE; shrink-guard test PASS (truncation detected). | |
 | BUG-267 | 2026-09-17 | **The `min_human_share` floor metric is a substring classifier, and "human" provenance is semantically ambiguous — so the floors are measured against an UNKNOWN denominator.** `scripts/audit_eval_integrity.py::_tier()` returns HUMAN when the source string contains `human` OR `locked`, and checks that BEFORE `frontier`. Therefore `p5:human-frontier69` (48 cells across the anchor, incl. 7 content_type + 16 domains) is counted as a HUMAN label although its own name says *frontier*. Separately, the operator confirms that some labels recorded as `p5:human-*` were produced by *reviewing a frontier model's suggestion* (kimi / deepseek / claude), not by independent blind human adjudication — i.e. the source string cannot distinguish **human-decided** from **human-ratified-a-model-output**. CONSEQUENCE: the published human shares (content_type 0.116, discipline 0.347, depth 0.526, domains 0.920) are UPPER BOUNDS, and the anchoring bias of see-then-confirm makes the true figure plausibly lower still. Blast radius: the floor gate `AXB.axis_human_share` and the priority decision that rests on it. FIX: (a) make `_tier()` an exact-match allow-list read from config (no substring tests); (b) split provenance into `human-blind` vs `human-ratified-model` and count only the former as HUMAN; (c) re-measure the floors; (d) all FUTURE human adjudication must be **blind** — the model's proposed label is hidden until the human verdict is recorded. See F-16. | |
 | BUG-243 | 2026-09-13 | **DeepSeek-v4-pro / v4-flash return empty `content` on open-ended adjudication prompts (reasoning-passthrough bug — DELEGATE-001 family).** During the S2/S4/S5 forensic audit adjudication, DeepSeek-v4-pro repeatedly returned `finish_reason=stop` with `content_len=0` and only `reasoning_content` (31,176 chars) on the 6-proposition verification prompt; v4-flash returned `finish_reason=length` with empty content. A tiny probe (`Reply with exactly: OK`) works and returns `OK`, proving the failure is tied to long open-ended prompts (the reasoning model emits CoT into `reasoning_content` and never finalizes `content`), not auth. Balance dropped $9.44→$9.34 across the failed attempts. **MITIGATION:** DeepSeek is UNUSABLE for open-ended adjudication/fact-finding; use the local Qwen3.8-27B (OMLX) for reliable-pair rulings and deterministic repo checks as gold standard. The tight-JSON joint-vote prompt (`response_format: json_object` + short answer) still works (D2612/D2616 vote completed with 0 voter errors). | |
-| BUG-241 | 2026-09-11 | **"Golden" set is unverified silver — no ground truth for any semantic axis.** All 1,027 examples in `stage4_golden_mined.yaml` carry rationale "gpt-oss teacher labels (discipline/domains/depth). Silver-standard — NOT hand-reviewed" (provenance: gpt-oss 1027 / DeepSeek 0 / human 0). The 4-axis (content_type+depth+domain+discipline) human/DeepSeek-verified core is only **69 examples (frontier69) = 6.7%**. Every prior classifier/weak-supervision eval (0.18–0.29 macro-F1) is therefore silver-auditing-silver — the measured "data limitation" is a verified-label limitation, not model-selection. Fix = D2613 Phase 0: freeze a human+DeepSeek-verified core (69→~150, stratified) as the sole eval target before any further classification; demote the 1,027 to a silver candidate pool. | **CLOSED D2617 (2026-09-13):** `scripts/build_verified_core.py` froze `governance/verified_core.jsonl` = 443 unique rows (149-core + 298-sample; 4 fb_id overlap) as the sole eval target — R14-stamped, `verification_status` human-verified 28 / joint-vote-verified 121 / pending-human 294. The 1,027 `stage4_golden_mined.yaml` is demoted to a silver candidate pool (BUG-241 retired at the DATA level). Remaining honest gap: 294 pending-human rows + domain/discipline have never been DeepSeek+Qwen-voted (only 209/1,027 non-silver). |
 
 ## 🟠 OPEN — SHOULD
 
@@ -22,31 +26,21 @@
 |---|---|---|
 | BUG-242 | 2026-09-11 | **frontier69_v2 + extension80 audit outputs carry 2 data-quality defects.** (1) The `*_verdict` fields (depth/discipline/domains) are LLM SELF-REPORTS, not computed comparisons — they claim `override` even when the audit value equals silver (e.g. `S4-GOLD-MINED-00005` domains identical yet `domains_verdict=override`), so the cited "57.5% domain-override" and "80 flagged" figures are inflated. (2) Non-principle content_type rows (noise_drop/tool_instruction/process_template/process_instance/growth_edge) carry a spurious 4-way depth label, violating D2612 (depth only for principle). FIX (applied in `scripts/build_phase0_adjudication_form.py`): agreement recomputed deterministically (`differs` flag) + depth marked N/A for non-principle. REMAINS: recompute the override figures from the audit values (deterministic), and re-run the audit to null depth on non-principle if the raw artifacts are kept. |
 | BUG-228 | 2026-09-08 | **Dead/aspirational schema fields — 0 code references.** `parent_pt_id` (process_instance's tether to a template), `promoted_to_type`/`promoted_to_id`/`parent_fb_ids` (growth_edge promotion), MCP `annotations` (`readOnlyHint`/`destructiveHint`/`idempotentHint`), `consulted_fbs`/`template_source` — all declared in `content_types.yaml`, all 0 refs in `pipeline/`+`scripts/`. Consequence: `process_instance` is indistinguishable from an unlinked anecdote; `growth_edge` is a dead-end bucket with a staging-area description; MCP-promotion aspiration is unbacked. False affordances for future retrieval code. Fix = prune or ship; backfill `parent_pt_id` when a PT exists (§1.3.2 of the adjudication doc). |
-| BUG-231 | 2026-09-08 | **Convergent extraction path is principle-only BY DESIGN — refines the "vacuous 100%-principle" root cause.** `stage2_extract.py:build_convergent_prompt` emits "Extract the convergent principle(s)" + `route: FB|NULL` + a principle-only body schema (no `steps`/`trigger`/`done_condition`), so the convergent path CANNOT emit non-principle — and that is correct architecture (multi-source synthesis → Foundation Blocks). The convergent SYSTEM_PROMPT item 9 (listing all 5 roles) was therefore vestigial and contradicted its own user prompt. Refined root cause of 7,995/7,995 `principle`: (1) convergent = principle-only by design; (2) single-source path IS role-balanced (3/2/7/1/1 golden) but UNDER-detects non-principle (~15% per 818-row triage) because its prompt had only vague role definitions, not the D2587 Q1/Q2/Q3 rules; (3) detected non-principle (13.6% = 1,147/8,410) is never committed (`commit_non_fb_types: false`, D2418/D2467). **FIXED in D2589:** item 9 clarified + D2587 rules injected into SINGLE_SOURCE/SINGLETON prompts. REMAINS: `commit_non_fb_types` decision (P1) + whether convergent should ever emit non-principle (design question, P1). | **D2589:** item 9 clarified + rules injected into single-source/singleton. Remaining: `commit_non_fb_types` decision (D2590) + convergent-emits-non-principle design question.
-| BUG-232 | 2026-09-09 | **False convergence — 96/1012 golden FBs (~9.5%) are same-author echoes.** `source_diversity>=2` but <2 distinct authors (John Gall 22, "Rob Thomas et al." 15, Anne Miller 11, Gunther Kress 10, Parandeh 5, Harvard Business Review 5...). Root cause: source_diversity counts distinct source_ids (content hashes), so 2 editions/chapters/files of the SAME author/work register as "diverse" — violating the ≥2-INDEPENDENT-source convergence bar that the convergent few-shot explicitly rejects (`same_author_echo_negative` / `citation_echo_detection`). `scripts/audit_false_convergence.py` → `governance/false_convergence_echoes.json` (96). Fix = recompute source_diversity as distinct PRIMARY WORK (author+title dedup, not file/hash) + re-tier echoes → single-source + add CI gate. | **FIXED 2026-09-09:** `scripts/fix_false_convergence.py` (Qwen3.8-27B R5 code-review APPROVE) re-tiered all 96 echoes → `is_convergent=0` + `source_diversity=1` (author-floored) in `maxwell.db` (C13 backup `maxwell.db.bak_20260909_162749_pre_falseconv`; integrity ok). Manifest `governance/false_convergence_fix_manifest.{json,md}`. **REMAINS (CORRECTED 2026-09-14):** the source_diversity recompute is **ALREADY DONE** — D2176 made `resolve_source_id` = `sha256(author|title)` (not content hash), verified 2026-09-14 (`compute_source_id` same-work collision test passes). The buglog's "recompute as distinct primary works" is SUPERSEDED. Only genuinely remaining = **CI gate** that fails if a convergent golden FB has <2 distinct authors. |
 | BUG-224 | 2026-09-05 | OMLX server wedges under sustained load on Qwen3.8-27B: large-output calls (>~1200 tokens) hang BEYOND the requests timeout (call_omlx timeout not respected), then the server needs ~15-60s to recover before even tiny requests respond. Reproduced repeatedly during D2576 depth audit (single-FB calls OK ~7s, but batched/long-output calls wedge every ~6-12 requests). This blocked the delegated Qwen3.8 market research (D2576) and forced the audit to fall back to `delegate(custom_deepseek)` for the bulk + a small direct-OMLX overlap. Extends BUG-220/DELEGATE-001 (Qwen direct-call workaround itself is now flaky). Likely cause: 27B 4-bit model + concurrent/unreleased context on 64GB. **MITIGATION APPLIED (D2581, 2026-09-05):** `services.omlx.read_timeout=60` + `services.omlx.wedge_recovery_sleep=20` (config); `call_omlx` now uses `timeout=(connect, read)` so a mid-response stall trips fast, and distinguishes `ReadTimeout` (wedge) → 20s recovery sleep before retry instead of the 3s hammering. Remaining workload-shaping guidance: 3-model vote should still process Qwen3.8 in small single-FB calls. UNVERIFIED under a live sustained-load wedge (needs a re-run of the Qwen3.8 bulk audit to confirm). |
 | BUG-222 | 2026-09-04 | goose runtime drift: `active_provider=custom_deepseek` (deepseek-v4-pro) + `GOOSE_THINKING_EFFORT=high`. CORRECTION (2026-09-04, D2560 re-verify): DeepSeek is NOT dead — it is LIVE+AUTHENTICATED via macOS Keychain internet-password (`srvr=https://api.deepseek.com/v1`, `acct=Bearer`); prior "HTTP 401 / no credentials" was an ERROR (probed without key + wrong keychain service names). Real issue = remote CLOUD → C1 ($0, all generation local) + C3 (sovereignty) violation BY DESIGN. Fix = set `active_provider=maxwell_omlx` (user decision, affects goose runtime). D2560. |
 | BUG-151 | 2026-08-20 | taxonomy structural overlap (`education` dual-listed + 267 raw aliases) |
-| BUG-148 | 2026-08-20 | S2 `route` field stale/uniform (`route="FB"` on all 2,878). **THIRD DRIFT SOURCE (2026-09-08):** `config/pipeline_config.yaml:250` gates S2 route to `[FB, NULL]` but `route_to_content_type` maps 5 values (FB/PT/PI/GE/TI), and `stage4_merge.py:_resolve_content_type` falls back `ROUTE_TO_CONTENT_TYPE.get(route, "principle")` — so a record with a stale/missing content_type is silently forced to `principle`, bypassing D2587. Fix = deprecate route as ontology carrier; ABSTAIN → growth_edge/quarantine on missing content_type (§5.2.5). | **CLOSED D2616 (2026-09-13, Phase 0):** `_resolve_content_type` now returns `QUARANTINE_CONTENT_TYPE` ("quarantine") on missing content_type — route is fully deprecated as ontology carrier, never forced to principle. `quarantined` list + `S4_QUARANTINE_OUTPUT` (`quarantined.jsonl`) sidecar persist the held records (C16, no silent drop). Tests `test_resolve_content_type_route_deprecated` / `test_resolve_content_type_default_quarantine` assert the new behavior. |
 | BUG-182 | 2026-08-27 | 48 singleton empty-shells deterministically re-return empty after S2 rerun |
-| BUG-170 | 2026-08-24 | non-principle types (PT/PI/TI/GE) routed but NOT classified/enriched — **RESOLVED 2026-10-03 (D-2747 deterministic reroute; see `## BUG-170` header below)** |
 | BUG-159 | 2026-08-21 | prompt-injection contamination (cluster_11649, 0.007%) |
-| BUG-168 | 2026-08-24 | `pipeline/dspy_trainer.py` exists but NOT wired to any stage (built-not-wired, same pattern as BUG-085) — wire OR archive | **ARCHIVED D2592 (2026-09-08) + gate REVISED D2594 (2026-09-09):** wire-or-archive resolved → ARCHIVE (defer). DSPy optimizes on labels; golden content_type labels not yet spotless (286 unlabeled + 701 model-only of 1027), so wiring now = training on noise. **RE-OPEN GATE (tier-based, NOT all-1027):** re-open DSPy when the golden set is spotless under the 3-tier architecture (D2594) — Tier1 few-shot fully human-verified (content_type + extraction_type, 0 unlabeled + 0 model-only) + Tier2 training corpus statistically cleaned (label model + P4 + cleanlab) + Tier3 boundary corpus ≥150 cases 2-of-3 adjudicated. |
 | BUG-160 | 2026-08-21 | evidence-passage topical relevance not verified (1/30 drift sample cites carbon passage for maternal-health FB) |
 
 ## 🟡 OPEN — WORTH
 
 | Bug | Date | Issue |
 |---|---|---|
-| BUG-229 | 2026-09-08 | **Stale `content_types.py` docstring** (lines 12-17): claims convergent S2 "emits `content_type: principle`… golden file reflects this: 75/75 principle" — numerically wrong (actual = 59 principle / 61 positives) AND architecturally misleading (prompt item 9 offers all 5 roles; the 100%-principle skew is few-shot bias, not design). Risks a future engineer concluding the vacuous axis is invariant-by-design. Fix = correct docstring. **RESOLVED 2026-09-10:** docstring corrected — stage2_fewshot_convergent.yaml holds 84 examples / 61 should_extract with NO top-level content_type field; the all-principle skew is few-shot bias, not an invariant. |
-| BUG-230 | 2026-09-08 | **`growth_edge` lacks a positive entry criterion → catch-all migration risk.** Under D2587 Q3 (single prescriptive claims funneled to `principle`) + Q1 (single tool steps → `tool_instruction`), the residual ambiguity gets dumped into `growth_edge`, recreating the vacuous-axis failure mode one bucket over. Fix = add positive definition ("MUST contain an articulated open tension or unverified correlation; NOT a dump for failed depth-tests") (§5.2.8). | **OBSERVED 2026-09-09 (D2596):** 4 golden objects (00334/00385/00495/00882) were assigned growth_edge with rationale "utilizable fact" — the exact catch-all pattern. **RESOLVED option-1:** re-classified all 4 → noise_drop (established facts/trends, no prescriptive claim); growth_edge kept narrow. **REMAINS:** codify the positive entry criterion in content_types.yaml to prevent recurrence. **RESOLVED 2026-09-10:** criterion codified in config/content_types.yaml `growth_edge.description` (OPEN TENSION / UNVERIFIED CORRELATION; NOT a dump for failed depth-tests, NOT a bare 'utilizable fact'). |
 | BUG-223 | 2026-09-05 | `'[]'` literal-array hygiene: 54 `emerging` FBs store `discipline_raw = '[]'` (JSON-empty-array string) instead of `''`/NULL. Queries testing `discipline_raw != ''` will wrongly count these as "has raw". Correct empty-test = `(discipline_raw IS NULL OR TRIM(discipline_raw)='' OR discipline_raw='[]')`. Minor (all 54 are legitimately `emerging`); normalize `'[]'`→`''` or add a shared empty-check helper in `pipeline/schemas.py`. D2569. |
 | BUG-169 | 2026-08-24 | TI `parameters` empty on 31/143 single-source + 100/307 singleton TI — ontology nuance (technique-type vs API TI); verify at rerun |
 | BUG-099 | 2026-08-13 | Model registry drift: gpt-oss/Phi misnamed "verifier" (rename deferred) |
 | BUG-238 | 2026-09-10 | **`fbs.content_type` is a VACUOUS axis — "99.6% principle" is unverified and materially wrong.** All 7,995 rows carry `gen_model = Qwen3-Coder-30B-A3B-Instruct-MLX-4bit` (the model that matches the reliable-pair depth consensus only 44.7%), commits bae6662/24d2690, taxonomy v5.5 — and the field was NEVER human-verified. Two independent measurements put the true non-principle rate far above the stored 29/7,995 (0.4%): (1) the D2587/D2596 ledger `governance/content_type_human_decisions.jsonl` = 35/114 = **30.7%** non-principle; (2) a random 23-row read of `principle`-labelled rows (2026-09-10) found ~8-9 noise_drop / tool_instruction / methodology rows (~35%). `governance/content_type_verification_backlog.json` shows 217/1,027 UNLABELED + 341 medium + 332 high (all model-proposed). CONSEQUENCE: depth (D2610/D2611) is DOWNSTREAM of content_type — a depth label on a noise_drop history-summary is meaningless — so the 7,995-row depth rerun is BLOCKED until content_type is verified. FIX: verify content_type on the 1,027 golden backlog (rank unlabeled → low → medium → reswept → high), extrapolate a CI-tight non-principle rate from a >=150 random sample, then relabel depth only on the confirmed-principle subset. **REFINED 2026-09-10 (150-row audit, `governance/content_type_sample_audit_2026-09-10.json`): 19/150 clear non-principle (12.7%, 95% CI 7.3-18.0%) + 25 borderline = 29.3% (95% CI 22.0-36.6%) — uniform across extraction_type. So the corpus is ~13-29% non-principle, not 0.4%. **217 UNLABELED SLICE ADJUDICATED 2026-09-11 (D2612):** human + DeepSeek-v4-pro second-opinion → 201/217 = 92.6% agreement; frozen non-principle 15.7-16.6% (confirmed-principle 178/217 = 82.0%); 16 contested → `governance/content_type_contested_16_form.md`. REMAINING bands: model_low 13 + model_medium 341 + model_high 332. |
-| BUG-234 | 2026-09-10 | **`governance/depth_vote_checkpoint.jsonl` contains duplicate records:** 1780 lines for 996 unique FBs (784 dupes) because `--retry-failures` APPENDS a re-voted record instead of upserting. The builder's resume path keys by `fb_id` so labels are correct, but the artifact is ambiguous and 1.8× bloated, and any naive line-based consumer double-counts — measured: a naive list read inflated the 200-row held-out test to n=363 and skewed the DS↔Qwen3.8 agreement estimate. Fix = compact/upsert on retry (D2577). **RESOLVED 2026-09-10 (D2610):** save_checkpoint() upserts - the checkpoint is rewritten one line per fb_id after every run and via --compact; 1780 lines / 996 unique -> 996. |
-| BUG-235 | 2026-09-10 | **Depth fail-closed fabricates a label:** when no voter majority exists (1-1-1 split), `build_depth_vote_set.py` coerces the FB to `depth: domain` (81/996 = 8.1% of the clean set). This injects error straight into the default class — the D2577 encoder scores 0.300 accuracy on those 20 held-out rows vs 0.556 on vote-agreed rows. Fix = emit `depth_confidence: low` + `needs_review` instead of a fabricated label (never re-brand an abstention as `domain`). **RESOLVED 2026-09-10 (D2610):** the fail-closed-domain path is REMOVED - aggregate() abstains (depth empty, confidence low, needs_review) and the row goes to governance/depth_review_queue.yaml (318 records). |
-| BUG-236 | 2026-09-10 | **Qwen3-Coder-30B is an unreliable depth voter used as the tie-breaker.** It matches the DeepSeek+Qwen3.8 consensus on only **303/678 = 44.7%** of FBs; because 2-of-3 wins, it never overturns the reliable pair but it *decides* the 304 rows where DS≠Q38 — i.e. the hardest 31% — so those 2/3 "majorities" (612/996 of the clean set) are coin flips. Real reliable-pair agreement = **69.0%**, not the 91.9% the 3-voter unanimity rate implies; only 303/996 (30.4%) are unanimous. Every downstream depth number inherits this ceiling (D2577). **RESOLVED 2026-09-10 (D2610):** Qwen3-Coder-30B is demoted to label_vote.advisory_voters - recorded, never decisive; the label now requires reliable-pair unanimity and disagreement abstains instead of being coin-flipped. |
 | BUG-237 | 2026-09-10 | **Production `fbs.depth` is unverified silver presented as a semantic field.** On the 996 FBs the vote audited, the DB depth column is 100% identical to the raw gpt-oss silver label and agrees with the 3-model vote only **458/996 = 46.0%**; all 7995 rows are `gen_model = Qwen3-Coder-30B-A3B-Instruct-MLX-4bit` (commit bae6662/24d2690, pre-BUG-185 prompt era). Depth is the only S4 semantic field with no independent verification (S5 NLI does not cover it) and it feeds `S4_DIFFICULTY_MAP` → difficulty (D2410). Fix = relabel under the vote policy + add a depth contract test (D2577). **PARTIALLY ADDRESSED 2026-09-10 (D2610/D2611):** label policy + serving path decided; the 7995 production rows are still pre-BUG-185 silver and unverified - relabelling under D2610 is the open action. |
 
 ---
@@ -8633,8 +8627,17 @@ measured 7,995). EVERY one of them is classification_status=CLEAN and no rail ob
 LLM output path, not where the row is actually written, so a multi-domain label set passes every gate.
 IMPACT: retrieval/bloat — one principle cross-lists into up to 7 facets, inflating the domain axis and weakening recall
 precision. No crash, no silence-breaking rail: the contract is declared in config and enforced in one path only (C16).
-FIX (POST-S6): enforce the cap AT THE WRITE (fail-closed with a receipt, never a silent truncation), add
-scripts/check_domain_cardinality.py over the committed store, and re-measure after the replay in BUG-630.
+FIX (PARTIAL, D-2838 2026-10-05): the write-time cap enforcement is DONE — `_enforce_domain_cardinality()` in
+pipeline/stage4_merge.py truncates over-cap domains deterministically with a receipt and degrades CLEAN -> FALLBACK
+(control: tests/test_domain_cardinality_rail.py).
+PROGRESS (D-2843 2026-10-05): the READER-limb is LANDED — `scripts/check_domain_cardinality.py` re-measures the
+committed store (`DB_PATH`, config-first) for over-cap canonical `domains` arrays and exits fail-closed (0 clean /
+1 drift / 2 parse-defect). Control tests `tests/test_domain_cardinality_reader.py` (9 cases) prove canonical-only
+counting, parse-defect naming (never a silent zero), and the exit-code contract. LIVE re-measure: 52 over-cap FBs
+(46 @ 6 domains, 6 @ 7) of 14,574 total (0.36%) — all CLEAN, i.e. the 52 historical FBs are STILL owed a
+re-derivation. SECONDARY: the store grew 7,995 -> 14,574 rows (rechunk-v4-20260929) while `store_authority.yaml`
+still declares 7,995 — a stale declaration to refresh at the menu-v6 commit. REMAINING: re-derive the 52 and
+re-measure after the replay in BUG-630.
 
 ## BUG-632 (OPEN, 2026-10-04) — the D2496 "authoritative expected FB count" gate CANNOT DISTINGUISH a DECLARED failure from a SILENT drop, so S5 and S6 are UNREACHABLE on any S4 run with >=1 failed cluster (the BUG-609 class, applied to S2 only)
 
@@ -8743,6 +8746,10 @@ A re-run cannot clear it: the 4 failures are deterministic (`GEN skipped (single
 
 **REMEDY (owner-gated).** (a) after D-2818 lands, re-run `--cluster 3776,26074` delta-merge to recover the 2 FBs; (b) extend the D-2496 preflight to assert `expected == on_disk + declared + dedup` so a phantom is loud instead of silent; (c) confirm the D2424 reconstruction never marks a cluster processed whose FB is absent from the reloaded checkpoint.
 
+## BUG-638 (OPEN, 2026-10-05) — governance/METRICS.jsonl append-only journal truncated 817→70 lines (747 samples lost); root cause UNCONFIRMED
+
+**STATUS.** Root cause UNCONFIRMED — no truncate/rotate/unlink of METRICS.jsonl found in scripts/. Mitigation applied 2026-10-05: `emit_metric` reads a record-count floor (`governance/METRICS.jsonl.floor`), fails-closed if the journal shrinks below it, fsyncs the append, rewrites the floor (BUG-487 class). The 747 lost samples were RESTORED (HEAD 817 + 70 new lines re-joined → 887 lines / 6 metric names). Shrink-only floor guard is the remaining deterministic close.
+
 ## BUG-639 (FIXED, 2026-10-05) — S4 `--cluster` delta-merge recovery SHRINK-GUARD false-positive leaves the sidecar stale
 
 **DISCOVERED** while resolving D-2825 (owner asked whether cluster_28517 could be re-extracted). Answer to the owner's question: **re-running S2 would NOT help** — S2 extraction for cluster_28517 was already complete and coherent (full name/definition/mechanism/boundary/consequence/elaboration + 2 verbatim evidence passages from Hamming, `The Art of Doing Science and Engineering`). The `application` field that failed D2371 is NOT an S2 field — it is produced at S4 by the merged classification call (`merged_cribs_classify`, gpt-oss-20b). The failure was **transient**: `--cluster 28517` retried the classification and produced a clean result (application 178 chars, discipline `theoretical physics`, domains `[emerging]`, depth `domain`, evidence `cited`, `classification_status=CLEAN`).
@@ -8754,3 +8761,213 @@ A re-run cannot clear it: the 4 failures are deterministic (`GEN skipped (single
 **RECOVERY.** (a) re-ran `--cluster 28517` → recovered FB; (b) reconciled sidecar to declared_failed_count=0 / failed_cluster_ids=[] via crash-safe `safe_write(force_shrink=True)`; (c) refreshed `checkpoint.jsonl.manifest.json` (record_count 6588→6591, sha256 updated); (d) preflight GREEN: boundary OK + sha256 match + record_count 6591 + authoritative 6591. Final invariant: on_disk 6591 + declared 0 == expected 6591.
 
 **RELATED.** The D-2825 disposition changes from "accept-as-failed" to "recovered": all 6,591 S4 FBs are now on-disk, declared_failed_count=0.
+
+## BUG-640 (IN PROGRESS, 2026-10-05) — D-2815 B&M discipline slot "entrepreneurship" string-collides with existing DOMAIN; owner ruling D-2829
+
+**RULING.** Owner ruled (D-2829): the three B&M discipline slots are renamed to discipline-scoped JEL M forms — 'business administration' / 'marketing' / 'entrepreneurship studies'. 'entrepreneurship studies' removes the string-collision with the existing domain 'entrepreneurship' (D-2500 owl:disjointWith + BUG-200 opposite-axis guard satisfied). Implementation lands with the menu v6 atomic commit (D-2814→2815→2816), gated on S4 idle.
+
+## BUG-641 (RESOLVED, 2026-10-05) — taxonomy_shacl.ttl stale sh:in pin vs live; regenerated to v5.7 before D-2816 enforcement
+
+**STATUS.** RESOLVED: `config/taxonomy_shacl.ttl` regenerated to v5.7 — `sh:in ("v5.7")` and the canonical lists now carry 43 domains + 64 disciplines (the menu v6 bump: +business administration / +marketing / +entrepreneurship studies), matching `config/taxonomy_v5.yaml` (v5.7). The regen-after-menu-bump clause stays in force: any FUTURE taxonomy bump must regenerate the ttl atomically in the same commit (D-2828 C2). Wiring pySHACL (D-2816) remains OPEN as its own task — the stale pin that would have made that wiring reject every v5.7 FB is gone.
+
+## BUG-642 (OPEN, 2026-10-05) — alias_map.yaml retirement (D-2814) cascade: 14 consumers (pipeline/schemas.py + 13 scripts)
+
+**STATUS.** Shrink-then-remove with consumer migration, never a delete. Consumers: get_synonym_index + apply_alias_corrections / demote_disciplines_to_domains / resolve_domains_emerging / resolve_data_absent_domains / rederive_kindsafe_domains / extend_alias_index / consolidate_anchor_ruler / remap_emerging / revote_queue_59 / build_discipline_domain_vote / review_aliases / resolve_emerging_deterministic / apply_enrichment. Must fail-closed on no-synonym mode (EL1 — no silent 'emerging' fall-through).
+
+## BUG-643 (IN PROGRESS, 2026-10-05) — dual abstention token 'none' (_ABSTENTION_VALUE) vs 'emerging' (catch_all); owner ruling D-2830
+
+**RULING.** Owner ruled (D-2830): single abstention token = 'emerging'. `pipeline/closed_menu.py` `_ABSTENTION_VALUE` changes 'none' → 'emerging' (or the constant is retired in favor of the existing 'emerging' catch-all), reconciling closed_menu_v5.json + emerging_disciplines.yaml + the 27.2% emerging metric (BUG-629). `emerging_discipline_rate_max 0.35` stays defined on 'emerging'. Implementation lands with menu v6.
+
+
+## BUG-644 (FIXED, 2026-10-05) — stamp_verify_keys silent-skip of a missing stamp/pin key (fail-closed)
+**Blindspot.** `scripts/validate_depth_domain_contract.py` used `if got and want and got != want`, so a stamp key
+ABSENT from the manifest (or a pin key ABSENT from `config/menu_axis_hashes.yaml`) was silently skipped. Partial
+stamp coverage read as a green contract. `MISSING_MENU_VERSION` only fires when ALL stamp keys are absent.
+**FIX (D-2831).** Fail-closed: a declared-but-absent stamp or pin is now a `MENU_VERSION_STAMP_MISMATCH` (hard),
+never a skip. This is the companion to D-NEW-6: the historical `answer_space_sha256` (8436d9c9...) is now checked
+against `answer_space_hash_frozen_pin` (8436d9c9...), so the comparison is historical-vs-historical.
+
+
+## BUG-645 (RESOLVED, 2026-10-05) — D-2814 decision files list omits the ACTIVE S4 path (stage4_merged_call.py)
+**Record gap.** D-2814's `files:` names only `pipeline/stage4_merge.py`, but `merged_call_enabled: true` makes
+`pipeline/stage4_merged_call.py` the ACTIVE S4 classify path. A decision that omits the file it actually changes
+misroutes future audits and the R5 review scope. **RESOLVED (D-2833):** D-2833 ratifies BOTH paths and states the
+menu is single-sourced via `definition_anchored_block()`; both files are listed in the D-2833 record.
+
+## BUG-646 (RESOLVED, 2026-10-05) — D-2814 text "explicit none" contradicts the live 'emerging' abstention token
+**Drift.** D-2814 says "explicit none"; D-2830 already ruled the single abstention token = 'emerging'
+(`_ABSTENTION_VALUE`). `pipeline/closed_menu.py` module + `render_closed_menu` docstrings also said 'none'.
+**RESOLVED (D-2834):** 'emerging' confirmed as the definition-anchored abstention token; both stale docstrings
+corrected to 'emerging' (this sitting). The D-2814 record itself is left as the historical ratified text.
+
+## BUG-647 (FIXED, 2026-10-05) — D-2773 label-only menu coexists with D-2814; no mutual-exclusion guard
+**Conflict.** `discipline_closed_menu_enabled` (D-2773) and `definition_anchored_menu_enabled` (D-2814) are
+independent flags. Enabling both injects TWO contradictory discipline menus into one prompt (a label-only list
+PLUS a label+definition list, plus the free-gen "DO NOT use emerging / Be PRECISE" tail D-2814 is meant to remove).
+**FIX (D-2833, pending menu-v6 commit):** a module-scope guard in `pipeline/stage4_merged_call.py` raises
+`RuntimeError` when both flags are true (C16). Verified: flag-off import clean, both-true import trips the guard.
+
+## BUG-648 (OPEN, 2026-10-05) — definition-anchored menu ~5k tokens/call bloat (prefix-cache amortization)
+**Bloat.** `definition_anchored_block()` renders ~14,889 chars (64 disciplines + 43 domains + definitions), a
+CONSTANT byte-deterministic preamble ≈ ~5k tokens per classify call. Not a correctness defect. **D-2835 ruling:**
+amortize via a serving-layer prefix cache (the menu is a stable prefix, so it is paid once per contiguous run, and
+its cost scales with menu size, not menu × corpus). Group-prefilter is DEFERRED: a subset-selection prefilter
+risks silently dropping the correct label, re-opening BUG-629/BUG-630 that D-2814 eliminates.
+
+## BUG-649 (FIXED, 2026-10-05) — R5 review (gemma FAIL) surfaced D-2814 swap incompleteness
+**Conflict + Blindspot + Mismatch (R5 gate, generator≠verifier).** gemma-4-E4B (verifier) reviewed the
+fully-assembled D-2814 swap on the ACTIVE merged path and returned FAIL. Independent analysis confirmed three
+concrete defects: (F1) the merged path JSON schema still carried `"discipline": "precise_discipline_name"` /
+`"domains": ["domain1","domain2"]` — free-generation placeholders that CONTRADICT the "choose verbatim" menu;
+(F2) 'emerging' was declared a first-class answer in prose but not visible as a valid schema value on either path;
+(F3) `BATCH_CRIBS_CLASSIFY_SYSTEM` (batch path, `batch_enabled:false`) was NOT passed through the swap, so flipping
+batch on would re-introduce the free-gen prompt (same class as BUG-645). **FIX (D-2836, pending menu-v6 commit):**
+`_apply_definition_anchored_schema()` swaps the placeholders on merged+batch; `_apply_definition_anchored_menu_batch()`
+covers the batch path; direct path surfaces 'emerging' in schema; abstention wording tightened to per-axis
+independence + value placement. Flag stays OFF; residual gemma findings (round 2+) are philosophy on the
+"ontologically AND pragmatically" criterion (D-2830), deferred to the full-204 A/B (D-2767).
+
+## BUG-650 (PARTIAL, 2026-10-05) — full-204 A/B (D-2767) has no fail-closed guard against a frozen-invalid anchor; a pre-D-2820 kappa is circular
+**Blindspot + Hidden failure (fail-closed gap, C16).** D-2820 froze the 204-gold domain/discipline axis as
+FROZEN-INVALID until re-derived against menu v6 (the axis was adjudicated against the PRE-D-2814 free-gen menu).
+D-2837 gates the flag flip on the full-204 A/B (D-2767: kappa >= 0.800, emerging <= 0.35) "against a RE-DERIVED
+anchor (D-2820 first)". But that gate is PROCESS (decision prose), not CODE: benchmark_s4_ab.py, anchor2_kappa.py
+and fit_eval_model_swap.py read the 204-gold / taxonomy_v5.yaml with NO menu_hash pin check, so running the A/B
+before D-2820 computes kappa against the classifier's OWN pre-D-2814 output and silently reads GREEN at the 0.800
+floor. A circular measurement that passes is the worst failure mode — it masquerades as evidence. FIX: a
+fail-closed pre-A/B guard that refuses to compute kappa unless the anchor manifest's menu_hash / answer_space_sha256
+== menu v6 (composite 92f1a204... / answer-space d704d06e...); exits non-zero with a "frozen-invalid anchor"
+receipt otherwise. Land with the D-2820 re-derivation harness; nothing in the A/B path may bypass it.
+
+**PROGRESS 2026-10-05 (D-2840):** the guard is LANDED and verified fail-closed. `pipeline/anchor_menu_guard.py`
+reads the menu-v6 live/frozen pins from `config/menu_axis_hashes.yaml` (C12, single source) and refuses any
+menu-derived anchor that (a) carries NO menu stamp, (b) carries a FROZEN v5 pin (73597ee2... / 8436d9c9...), or
+(c) carries a stamp matching neither live pin. Wired into `scripts/discipline_conformance_gate.py` `load_anchor()`
+(the 204-row full-A/B referee; `fit_eval_model_swap.py` is covered via that import) and `scripts/anchor2_kappa.py`
+(the 60-row R2 key, frozen menu_hash 73597ee2...). Depth axis (`depth_conformance_gate.py`) is NOT guarded — the
+depth axis is NOT menu-derived (menu v6 changed discipline/domain slots + abstention, not the 4-way depth axis).
+Control test `tests/test_anchor_menu_guard.py` (9 cases) proves no-stamp / frozen / unknown / frozen-over-live all
+refuse and a live menu-v6 stamp passes. STILL BLOCKED: the A/B cannot RUN until D-2820 re-derives the anchor and
+D-2839 flips PROPOSED→RATIFIED (owner sign-off); the guard is the enforcement limb, not the re-derivation itself.
+
+## BUG-651 (PARTIAL, 2026-10-05) — S5 majority NLI aggregation hides supported claims + passes contradictory claims (D-2822 Gate A(d))
+
+The D2507/B2 cross-passage MAJORITY rule is the wrong ontology for claim verification. It requires a STRICT
+majority of clean evidence passages to entail before PASS, so a single strong entailment buried under neutral
+passages is QUARANTINED (hidden) — the D272g re-derivation measured 506 ENTAIL-majority rows in QUARANTINE and
+1,514 NEUTRAL rows served. Symmetrically, a claim carrying BOTH a strong entailment AND a strong contradiction
+can PASS on the majority, serving a contradicted claim. Support is existential (OR-entail: ONE passage is enough);
+contradiction is universal (AND-no-contra: ANY contradicting passage vetoes).
+
+**FIX LANDED (D-2842, 2026-10-05):** `pipeline/stage5_verify.py` gains `_or_entail_and_no_contra_verdict()`
+(pure, model-free) + `_aggregate_verdict()` dispatch on config-first `stage5.nli_aggregation` (C12), default
+'majority' (NO silent behavior change), 'or_entail_and_no_contra' = D-2822 Gate A(d). Unknown value → fail-closed
+(C16). 8 control tests (tests/test_or_entail_no_contra.py). REMAINS: flip to 'or_entail_and_no_contra' ONLY after
+D-2822 threshold recalibration (nli_calibrate.py) — the new rule lets a claim survive on ONE entail, so the
+per-passage threshold must be re-swept — then re-run S5 on rechunk-v4-20260929.
+
+## BUG-652 (RESOLVED, 2026-10-06) — scripts/rederive_anchor_axes_v6.py `--run-id` flag was DEAD (parsed but never used)
+
+`--run-id` was parsed but never used (all path helpers + `finalize_manifest` artifact_id hardcoded `_run_id()`).
+The `--finalize` error said "use --run-id for a new run" while the flag silently did nothing, blocking any same-day
+re-mint behind the I2 mint-once guard. RESOLVED 2026-10-06 (D-2848): run_id threaded through path helpers +
+`finalize_manifest` (default `_run_id()`) + fail-closed path-separator validation; `--selftest` passed before/after.
+
+## BUG-653 (RESOLVED, 2026-10-06) — off-menu discipline rejection lacked a domain-axis hint + closest-discipline suggestion
+
+Repeated owner off-menu trap: domain-only labels proposed as disciplines. After `design strategy`/`design system(s)`
+(earlier), owner proposed `urban planning` as R183's discipline; menu-v6 has it ONLY on the domain axis (44), not
+the discipline axis (65), so `--adjudicate` fail-closed C16 rejects it. Root cause: the off-menu rejection error
+names the invalid label but does NOT check the domain axis nor suggest closest valid disciplines, forcing owner
+round-trips. RESOLVED 2026-10-06: `validate_on_menu` now routes off-menu disciplines through `_off_menu_discipline_hint`,
+which (a) detects when the label is a DOMAIN-axis value and calls out the axis confusion, (b) suggests the 4 closest
+on-menu disciplines (token-overlap + difflib ratio, deterministic, no LLM), and (c) reminds of the `emerging`
+abstention token. Selftest passes.
+
+## BUG-654 (CLOSED, 2026-10-06) — D-2767 full-201 A/B FAILED (kappa 0.3181 < 0.800 floor); SUPERSEDED by BUG-655
+
+The SAME gpt-oss-20b-MXFP4-Q8 model, SAME prompt, IDENTICAL input (202/202 definition match vs maxwell.db), run twice
+against the SAME owner referee 20261006d produced kappa 0.7794 (D-2820 `--generate`, worklist 20261005
+candidate_discipline) vs 0.3181 (A/B fresh re-run) — a 0.46 run-to-run swing at temp=0.0. SUPERSEDED 2026-10-06:
+this was MISDIAGNOSED as model non-determinism — see BUG-655. The real root cause is a two-prompt measurement bug
+(the rederive `_classify_prompt` vs the production `build_merged_prompt`), NOT residual CoT/non-determinism.
+Deterministic settings were already in place (D-2637 server + config verifier levers); a 2-pass byte-identity check
+confirms greedy temp=0.0 is deterministic.
+
+## BUG-655 (RESOLVED, 2026-10-06) — the 0.46 "kappa swing" is a MEASUREMENT BUG (two prompts), NOT non-determinism
+
+Re-audit: the two kappa numbers come from TWO DIFFERENT PROMPTS, not two runs of one prompt. (a) kappa 0.3181 =
+`d2767_ab_eval.py` run_inference -> `merged_cribs_classify` -> `build_merged_prompt` (free-gen cribs path;
+`definition_anchored_menu_enabled: false`). (b) kappa 0.7794 = rederive `--generate` -> `_classify_prompt` +
+`definition_anchored_block()` (the flag-ON definition-anchored menu, the SAME block `_apply_definition_anchored_menu`
+injects when the flag is true). They measure the OFF vs ON arms of the ONE `definition_anchored_menu_enabled` flag.
+Deterministic settings ARE in place AND applied: D-2637 server (temp 0.0, cache on, guided_grammar on) + config
+verifier (enable_thinking=false, thinking_budget 256/128, Reasoning:low prefix). Empirical: temp=0.0 greedy
+byte-identical. REAL RESULT: flag-ON definition-anchored kappa = 0.7794 (158/201), emerging 6/201 = 0.03 — still 2pt
+below the 0.800 floor, so the flip STILL does not happen, for a genuine classifier-vs-owner gap (~43 rows), NOT
+determinism. RESOLVED (D-2852, 2026-10-06): three prompt paths now measured — flag-OFF 0.3181, rederive flag-ON 0.7794, production flag-ON 0.4313. NOT non-determinism (determinism self-check 8/8 byte-identical). The definitive gate number is the production 0.4313 (FAIL).
+
+## BUG-656 (RESOLVED, 2026-10-06) — the 0.7794 "flag-ON" kappa is the REDERIVE path, NOT the production gate arm
+
+Re-audit: the two "flag-ON" prompts DIFFER — (a) rederive `--generate` -> `_classify_prompt` (discipline+domains
+only, 2 output fields, menu in the USER prompt) = kappa 0.7794 / 43 disagreements; (b) production
+`definition_anchored_menu_enabled: true` -> `_apply_definition_anchored_menu(MERGED_CRIBS_CLASSIFY_SYSTEM)` +
+`build_merged_prompt` (full enrich+classify, 10 output fields, menu in the SYSTEM prompt) = the REAL D-2839 gate arm,
+whose kappa was NOT what 0.7794 measured. Smoke test proved divergence: R001 agrees on the rederive path but predicts
+'marketing' (a DOMAIN label leaking into discipline) on the production path. FIX: `d2767_ab_eval.py` now persists
+per-row gold/pred/agree AND emits a beginner-friendly owner-review CSV (`*_disagreements.csv`) so the owner reviews
+PRODUCTION-path rows. Determinism self-check 3/3 byte-identical. Definitive production-path kappa LANDED
+(governance/d2767_ab_flagon_20261006d.json): 0.4313 FAIL. RESOLVED (D-2852).
+
+## BUG-657 (RESOLVED, 2026-10-06) — bare `| BUG-NNN |` table rows without a `## BUG-NNN` heading are INVISIBLE to bug_status.py
+
+BUG-652..656 were appended to buglog.md as bare `| BUG-NNN |` table rows at the BOTTOM, with no `## BUG-NNN` heading
+section. `bug_status.py` HEADER_RE matches only `^#{2,3} BUG-NNN` headings, so those five bugs never entered the
+canonical status register (bug_status.json) — total_ids=390, open_n=145, highest=BUG-651 — while session_seed was
+hand-bumped to highest_bug=BUG-656. Consequence: C15 handoff undercounts unresolved bugs (misses BUG-655/656 as OPEN)
+and the session_seed registry drifts from the recomputable source. The coverage guard `check_buglog_coverage.py`
+passes (532 blocks) because it only checks heading->parser, NOT the reverse (table-row->heading) — an asymmetric
+blind spot (BUG-428 class). FIX: (1) convert BUG-652..656 to `## BUG-NNN` heading sections (done this session);
+(2) extend `check_buglog_coverage.py` to fail-closed on any `| BUG-NNN |` summary-table row lacking a `## BUG-NNN`
+heading; (3) re-sync session_seed registry from bug_status.json (recomputable, not hand-bumped). OPEN.
+
+
+
+
+
+
+
+---
+
+## Reconciliation block (2026-10-06)
+
+The 25 bugs below lost their `## BUG-NNN` heading sections during the 2026-09-03 tiering.
+Full history lives in `archive/governance_pre_tiered_2026-09-03/buglog.md`; these headings re-sync
+the canonical register to the verdict already recorded in each row's own prose (no re-adjudication).
+
+## BUG-099 (OPEN, 2026-08-13) — Model registry drift: gpt-oss/Phi misnamed 'verifier' (rename deferred)
+## BUG-148 (CLOSED, 2026-09-13) — S2 route field stale/uniform — route deprecated as ontology carrier (D2616)
+## BUG-151 (OPEN, 2026-08-20) — taxonomy structural overlap (education dual-listed + 267 raw aliases)
+## BUG-159 (OPEN, 2026-08-21) — prompt-injection contamination (cluster_11649, 0.007%)
+## BUG-160 (OPEN, 2026-08-21) — evidence-passage topical relevance not verified
+## BUG-168 (CLOSED, 2026-09-08) — dspy_trainer.py built-not-wired — ARCHIVED (D2592); re-open gate D2594
+## BUG-169 (OPEN, 2026-08-24) — TI parameters empty on 31/143 single-source + 100/307 singleton
+## BUG-182 (OPEN, 2026-08-27) — 48 singleton empty-shells re-return empty after S2 rerun
+## BUG-222 (OPEN, 2026-09-04) — goose runtime drift: active_provider=custom_deepseek (C1/C3 violation)
+## BUG-223 (OPEN, 2026-09-05) — '[]' literal-array hygiene (54 emerging FBs)
+## BUG-224 (OPEN, 2026-09-05) — OMLX server wedges under sustained load (MITIGATED D2581)
+## BUG-228 (OPEN, 2026-09-08) — Dead/aspirational schema fields — 0 code references
+## BUG-229 (RESOLVED, 2026-09-10) — Stale content_types.py docstring — corrected
+## BUG-230 (RESOLVED, 2026-09-10) — growth_edge lacked a positive entry criterion — codified in content_types.yaml
+## BUG-231 (FIXED, 2026-09-08) — Convergent extraction principle-only — item 9 clarified + rules injected (D2589)
+## BUG-232 (FIXED, 2026-09-09) — False convergence (96 same-author echoes) re-tiered (D2592); recompute superseded by D2176
+## BUG-234 (RESOLVED, 2026-09-10) — depth_vote_checkpoint duplicate records — save_checkpoint upsert (D2610)
+## BUG-235 (RESOLVED, 2026-09-10) — Depth fail-closed fabricated a label — abstain path (D2610)
+## BUG-236 (RESOLVED, 2026-09-10) — Qwen3-Coder-30B unreliable depth voter — demoted to advisory (D2610)
+## BUG-237 (OPEN, 2026-09-10) — production fbs.depth unverified silver (PARTIALLY ADDRESSED D2610/D2611)
+## BUG-238 (OPEN, 2026-09-10) — content_type is a VACUOUS axis (99.6% principle unverified)
+## BUG-241 (CLOSED, 2026-09-13) — 'Golden' set unverified silver — retired at the DATA level (D2617)
+## BUG-242 (OPEN, 2026-09-11) — frontier69_v2 data-quality defects — override figures still to recompute
+## BUG-243 (OPEN, 2026-09-13) — DeepSeek-v4 empty content on open-ended adjudication (MITIGATED: use local Qwen)
+## BUG-267 (OPEN, 2026-09-17) — min_human_share floor is a substring classifier (F-16)
+## BUG-658 (OPEN, 2026-10-06) — OMLX SSE keepalive defeats read_timeout → client wedge (no wall-clock deadline). HARNESS-MITIGATED 2026-10-06 (d2767_ab_eval.py wall-clock deadline + preflight smoke); ROOT-FIXED 2026-10-06 (D-2854) in pipeline/omlx_call.py::call_omlx (_post_with_wall_clock daemon-thread + join(timeout=180s) + WallClockTimeout, config services.omlx.wall_clock_deadline_sec). Stays OPEN until the harness relaunch reproduces no-wedge end-to-end. CORRECTION: the flag-ON A/B GATE RESULT DID LAND (20:28, kappa 0.4313 FAIL) — the wedge was a SEPARATE later re-run (PID 15071), not the gate run.

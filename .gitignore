@@ -132,3 +132,7 @@ governance/bench_preflight_2*.json
 .pipeline_runner.lock
 governance/*.numbers
 governance/anchor ruler*.csv
+
+# Transient run logs (results JSONs are the durable artifact; logs stay on disk, unversioned)
+logs/
+*.log

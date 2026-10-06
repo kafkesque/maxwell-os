@@ -1,0 +1,176 @@
+{
+  "schema_version": "1.0",
+  "kind": "noise_drop_quarantine",
+  "created_at": "2026-09-29",
+  "decision_ref": "D-2711",
+  "policy": "soft-drop (quarantine, NOT hard-delete); noise_drop anchors AND golden examples land here with reason + decision_ref + created_at; periodic re-check can restore false-drops",
+  "entries": [
+    {
+      "anchor_id": "R012",
+      "kind": "anchor",
+      "name": "Evolution of Game Art and Design",
+      "reason": "ct=noise_drop (models could not classify)",
+      "decision_ref": "D-2711",
+      "created_at": "2026-09-29",
+      "status": "quarantined",
+      "recheck_due": "2026-10-29"
+    },
+    {
+      "anchor_id": "R021",
+      "kind": "anchor",
+      "name": "Index Section",
+      "reason": "ct=noise_drop (models could not classify)",
+      "decision_ref": "D-2711",
+      "created_at": "2026-09-29",
+      "status": "quarantined",
+      "recheck_due": "2026-10-29"
+    },
+    {
+      "anchor_id": "R026",
+      "kind": "anchor",
+      "name": "Index of Motion Graphic Title Design Terms",
+      "reason": "ct=noise_drop (models could not classify)",
+      "decision_ref": "D-2711",
+      "created_at": "2026-09-29",
+      "status": "quarantined",
+      "recheck_due": "2026-10-29"
+    },
+    {
+      "anchor_id": "R034",
+      "kind": "anchor",
+      "name": "Negative Space Alphabet Challenge",
+      "reason": "ct=noise_drop (models could not classify)",
+      "decision_ref": "D-2711",
+      "created_at": "2026-09-29",
+      "status": "quarantined",
+      "recheck_due": "2026-10-29"
+    },
+    {
+      "anchor_id": "R080",
+      "kind": "anchor",
+      "name": "Information Design Community Networks",
+      "reason": "ct=noise_drop (models could not classify)",
+      "decision_ref": "D-2711",
+      "created_at": "2026-09-29",
+      "status": "quarantined",
+      "recheck_due": "2026-10-29"
+    },
+    {
+      "anchor_id": "R082",
+      "kind": "anchor",
+      "name": "Historical Data Sources for Manufacturing and Economic Analysis",
+      "reason": "ct=noise_drop (models could not classify)",
+      "decision_ref": "D-2711",
+      "created_at": "2026-09-29",
+      "status": "quarantined",
+      "recheck_due": "2026-10-29"
+    },
+    {
+      "anchor_id": "R084",
+      "kind": "anchor",
+      "name": "Data Visualization Research Lab Leadership",
+      "reason": "ct=noise_drop (models could not classify)",
+      "decision_ref": "D-2711",
+      "created_at": "2026-09-29",
+      "status": "quarantined",
+      "recheck_due": "2026-10-29"
+    },
+    {
+      "anchor_id": "R106",
+      "kind": "anchor",
+      "name": "The Invisible Art of Film Editing",
+      "reason": "ct=noise_drop (models could not classify)",
+      "decision_ref": "D-2711",
+      "created_at": "2026-09-29",
+      "status": "quarantined",
+      "recheck_due": "2026-10-29"
+    },
+    {
+      "anchor_id": "R140",
+      "kind": "anchor",
+      "name": "Digital Culture Integration in Graphic Design",
+      "reason": "ct=noise_drop (models could not classify)",
+      "decision_ref": "D-2711",
+      "created_at": "2026-09-29",
+      "status": "quarantined",
+      "recheck_due": "2026-10-29"
+    },
+    {
+      "anchor_id": "R148",
+      "kind": "anchor",
+      "name": "Professional Development Through Studio Experience",
+      "reason": "ct=noise_drop (models could not classify)",
+      "decision_ref": "D-2711",
+      "created_at": "2026-09-29",
+      "status": "quarantined",
+      "recheck_due": "2026-10-29"
+    },
+    {
+      "anchor_id": "R180",
+      "kind": "anchor",
+      "name": "Intersectional Design Approaches for Underserved Communities",
+      "reason": "ct=noise_drop (models could not classify)",
+      "decision_ref": "D-2711",
+      "created_at": "2026-09-29",
+      "status": "quarantined",
+      "recheck_due": "2026-10-29"
+    },
+    {
+      "anchor_id": "R182",
+      "kind": "anchor",
+      "name": "Cultural Mourning Rituals and Symbolism",
+      "reason": "ct=noise_drop (models could not classify)",
+      "decision_ref": "D-2711",
+      "created_at": "2026-09-29",
+      "status": "quarantined",
+      "recheck_due": "2026-10-29"
+    },
+    {
+      "anchor_id": "R200",
+      "kind": "anchor",
+      "name": "Simplicity Cult in Saas Pricing",
+      "reason": "ct=noise_drop (models could not classify)",
+      "decision_ref": "D-2711",
+      "created_at": "2026-09-29",
+      "status": "quarantined",
+      "recheck_due": "2026-10-29"
+    },
+    {
+      "example_id": "S4-GOLD-MINED-00548",
+      "kind": "golden",
+      "name": "Illustration-driven Book Quality",
+      "reason": "disposition=noise_drop (human review: historical description, no transferable value)",
+      "decision_ref": "D-2711",
+      "created_at": "2026-09-30",
+      "status": "quarantined",
+      "recheck_due": "2026-10-30"
+    },
+    {
+      "example_id": "S4-GOLD-MINED-00919",
+      "kind": "golden",
+      "name": "Standardized Mass Production",
+      "reason": "disposition=noise_drop (human review: closed manufacturing paradigm, no reusable method)",
+      "decision_ref": "D-2711",
+      "created_at": "2026-09-30",
+      "status": "quarantined",
+      "recheck_due": "2026-10-30"
+    },
+    {
+      "example_id": "S4-GOLD-MINED-00971",
+      "kind": "golden",
+      "name": "Perspective As Visual Representation Framework",
+      "reason": "disposition=noise_drop (human review: art-history description, no transferable value)",
+      "decision_ref": "D-2711",
+      "created_at": "2026-09-30",
+      "status": "quarantined",
+      "recheck_due": "2026-10-30"
+    }
+  ],
+  "golden_extended": "2026-09-30",
+  "owner_ratified": {
+    "by": "owner",
+    "at": "2026-09-30",
+    "ratify": "RATIFY-3 DROP(13)",
+    "ref": "D-2719"
+  }
+}

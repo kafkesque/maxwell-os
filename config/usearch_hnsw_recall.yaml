@@ -1,0 +1,38 @@
+# config/usearch_hnsw_recall.yaml
+# D-2725 (RATIFY-2 gate #1): USearch/HNSW vs IndexFlatIP KNN recall harness config.
+#
+# C12 config-first: every knob below is read here; NONE are hardcoded in the script.
+# The embedding MODEL + DIM are NOT re-declared here — they resolve from
+# config/pipeline_config.yaml via pipeline.embeddings.embed_texts_bge_m3
+# (bge-m3, 512d, L2-normalized). Keeping the harness on the SAME embedding contract
+# as the pipeline avoids the D-2721 dimension-contract class of bug (raw bge-m3 is
+# 1024d; the pipeline normalizes to 512d).
+
+schema_version: 1
+
+data:
+  # Live segment source (S1.5 input). Post-D-2716 pointer-flip default run.
+  checkpoint: "knowledge pipeline/stage1_chunk/rechunk-v4-20260929/checkpoint.jsonl"
+  sample_size: 2000          # segments to embed + query (deterministic sample)
+  min_text_chars: 40          # skip segments shorter than this (noise)
+  random_seed: 42             # deterministic sampling
+
+recall:
+  ks: [5, 10, 20, 50]        # neighbor depths for recall@k
+  ground_truth: "flatip"      # exact brute-force baseline (IndexFlatIP)
+  pass_k: 10                  # the k at which the gate verdict is assessed
+  pass_threshold: 0.95        # recall@pass_k >= this => HNSW acceptable for S1.5
+
+faiss_hnsw:
+  M: 32                       # connectivity (graph degree)
+  ef_construction: 40         # build-time search width
+  ef_search: 64               # query-time search width
+
+usearch:
+  metric: "ip"                # ip over L2-normalized vectors => ip == cosine
+  connectivity: 32            # == M
+  expansion_add: 40           # == efConstruction
+  expansion_search: 64        # == efSearch
+
+output:
+  path: "governance/evidence/USEARCH_HNSW_RECALL_20260930.json"

@@ -1,6 +1,6 @@
 # Maxwell OS v3.0 — MASTER TASK REGISTER (tiered)
 
-> **Updated:** 2026-10-03 | **Archive (full history):** `archive/governance_pre_tiered_2026-09-03/MASTER-TASK-REGISTER.md`
+> **Updated:** 2026-10-07 | **Archive (full history):** `archive/governance_pre_tiered_2026-09-03/MASTER-TASK-REGISTER.md`
 > **Companion:** `governance/aggregated_remaining_tasks.md` (archived copy in same folder)
 >
 > **Convention (standing rule):** unresolved/undone tasks at the TOP (most critical first, MUST→SHOULD→WORTH); resolved/done at the BOTTOM.
@@ -10,7 +10,7 @@
 ## 🔴 MUST — open (strategic-consequential order)
 
 > **CURRENT OPEN INDEX (machine-derived 2026-10-03 — the live face; dated history follows below).**
-> Register: 955 decisions · 377 bugs (139 open / 238 closed; highest OPEN = BUG-637). Forensic audit + preflight GREEN.
+> Register: 989 decisions · 422 bugs (161 open / 261 closed; highest OPEN = BUG-658). Forensic audit + preflight GREEN (v7 promoted + backlog committed).
 >
 > **OWNER-GATED — ONE action remains (D-2727 gate):**
 > 1. **RATIFY-2 — full S4→S5→S6 rerun.** Launch under `caffeinate -dimsu`; `python3 pipeline/runner.py --dry-run` then full. Preflight PASS; authority propagated (D-2812) + consistency rail rc=0 → now UNBLOCKED.
@@ -1904,3 +1904,223 @@ NEXT (refreshed D-2772):
 > becomes a BUG (retry claim unverified for single-FB clusters) - file it then, with the probe as evidence, not now.
 > Impact if left: 3/8,215 = 0.037% of principles, no data loss (nothing written), fail-closed by design.
 > **Do NOT act on this while S4 runs.**
+
+
+> **2026-10-05 T4 + T9 OWNER-APPROVED; menu v6 implementation BLOCKED by forensic audit (D-2828).**
+> T4 (menu v6 = D-2814/2815/2816) and T9 (Gate A(d) = D-2822) both RATIFIED. S5 re-run on final S4
+> (sha256 ef77e346…, 6,591) in progress — checkpoint.jsonl growing, monitor by line count (the launch log
+> is 32B and stale: the setsid error swallowed the redirect). 11-category forensic audit
+> (FORENSIC_AUDIT_20261005_MENU_V6_GATE.md) returns BLOCKED: CF1 (D-2815 slot 'entrepreneurship' collides
+> with existing domain + D-2500 disjointness + BUG-200 guard), BL1 (dual abstention 'none' vs 'emerging'),
+> B1/MI2 (taxonomy_shacl.ttl v5.5 pin vs live v5.6), C1 (alias_map 14 consumers). CF1/BL1 = OWNER-OWED;
+> B1/C1 = deterministic assistant work. Filed BUG-640/641/642/643. NEXT: (1) S5->S6 finish; (2) owner
+> rules CF1+BL1; (3) regenerate ttl + migrate alias_map; (4) implement D-2814->2815->2816 atomic + R5;
+> (5) re-derive anchors (D-2820); (6) Gate A(d) + recalibrate; (7) bundled dirty-tree commit.
+
+## 2026-10-05 (continued) — T4/T9 implementation: CF1+BL1 ruled, B1 fixed, D-2819 baseline committed
+- Owner ruled CF1 (D-2829: 'business administration'/'marketing'/'entrepreneurship studies') + BL1 (D-2830: 'emerging').
+- taxonomy_shacl.ttl regen v5.5→v5.6 (content drift +ecology/−computer networking caught beyond the audit's version-string finding).
+- bug_status.json synced: added missing header entries BUG-638/640/641/642/643 (382 total, 143 open).
+- S5→S6 COMPLETE: 6591 FBs re-verified (PASS 3360 / QUARANTINE 3231), SQLite 14574 rows vec0-READY + Parquet snapshot.
+- NEXT: (1) C1 alias_map migration; (2) menu v6 atomic D-2814→2815→2816 + R5 review; (3) D-2820 anchor re-derivation; (4) D-2822 Gate A(d) + nli_calibrate; (5) bundled dirty-tree commit.
+
+## 2026-10-05 (continued) — D-2837 adoption recommendation + D-2838 writer-limb (BUG-631)
+- R5 gate (D-2836) closed: D-2814 swap fixed (F1 schema placeholders / F2 emerging hidden / F3 batch path). Flag OFF.
+- D-2837: ADOPT definition-anchored menu as target; flag flip GATED on full-204 A/B (D-2767) against RE-DERIVED anchor (D-2820 first).
+- D-2838: enforced max_domains_per_fb at write (BUG-631) — `_enforce_domain_cardinality()` + receipt + CLEAN→FALLBACK; 17 tests green.
+- NEXT: (1) D-2820 anchor re-derivation (owner + 2nd coder + DeBERTa NLI); (2) full-204 A/B; (3) flip flag iff kappa ≥ 0.800; (4) D-2822 Gate A(d) + NLI recalibrate; (5) C1 alias_map shrink-then-remove; (6) bundled dirty-tree commit.
+
+## 2026-10-05 — D-2839 anchor-ratification gate + BUG-650 pre-A/B guard
+- D-2839 minted PROPOSED (owner gate certifying the re-derived anchor before it serves as the D-2767 referee).
+- BUG-650 filed (no fail-closed pre-A/B guard; circular-kappa risk on the frozen-invalid anchor).
+- NEXT (critical order): (1) BUG-650 fail-closed pre-A/B guard; (2) build + R5-review scripts/rederive_anchor_axes_v6.py;
+  (3) run D-2820 re-derivation → owner sign-off → D-2839 PROPOSED→RATIFIED; (4) full-204 A/B (D-2767: kappa≥0.800 AND
+  emerging≤0.35); (5) flip definition_anchored_menu_enabled iff A/B passes; (6) D-2822 S5 Gate A(d) + NLI recalibrate;
+  (7) C1/BUG-642 alias_map shrink-then-remove + re-freeze closed_menu_v6.json in the taxonomy commit.
+
+## 2026-10-05 — BUG-650 guard (D-2840) landed; D-2820 re-derivation is next
+- D-2840 RATIFIED: fail-closed pre-A/B anchor-referee guard (pipeline/anchor_menu_guard.py) wired into the
+  204-row discipline referee + anchor2_kappa; depth axis unguarded by design. Control test 9/9 pass.
+- BUG-650 → PARTIAL (guard done; A/B still blocked on D-2820 + D-2839).
+- NEXT (critical order): (1) build + R5-review scripts/rederive_anchor_axes_v6.py; (2) owner runs D-2820
+  re-derivation → D-2839 PROPOSED→RATIFIED; (3) full-204 A/B (D-2767) — now fail-closed safe; (4) flip
+  definition_anchored_menu_enabled iff A/B passes; (5) D-2822 S5 Gate A(d) + NLI; (6) C1 alias_map +
+  re-freeze closed_menu_v6.json; (7) ONE bundled commit (dirty tree + S5/S6 outputs).
+
+## D-2841 RATIFIED: re-derivation harness landed. NEXT (owner-gated): (1) run --generate -> owner adjudicates ->
+--adjudicate --decisions <file> -> --verify -> --finalize; (2) owner signs off -> flip D-2839 PROPOSED->RATIFIED;
+(3) run full-204 A/B (D-2767) kappa>=0.800 AND emerging<=0.35; (4) flip definition_anchored_menu_enabled true iff pass.
+
+## D-2842 RATIFIED: D-2822 Gate A(d) code landed (config-gated, default preserves current behavior)
+- OR-entail + AND-no-contradiction primitive + config `stage5.nli_aggregation`; BUG-651 filed; census 972.
+- NEXT (critical order):
+  (1) OWNER: run scripts/rederive_anchor_axes_v6.py --generate → adjudicate → --adjudicate → --verify → --finalize;
+  (2) OWNER: flip D-2839 PROPOSED→RATIFIED; (3) full-204 A/B (D-2767) kappa≥0.800 AND emerging≤0.35;
+  (4) flip definition_anchored_menu_enabled iff pass; (5) D-2822 OPERATOR: recalibrate NLI (nli_calibrate.py)
+  → flip nli_aggregation=or_entail_and_no_contra → re-run S5 (6591); (6) C1/BUG-642 alias_map shrink-then-remove
+  + re-freeze closed_menu_v6.json; (7) D-2816 pySHACL wiring (pyshacl); (8) BUG-631 reader-limb
+  check_domain_cardinality.py over committed store; (9) ONE bundled commit.
+
+## D-2843 RATIFIED: BUG-631 reader-limb landed (scripts/check_domain_cardinality.py)
+- Reader-limb re-measures the committed store; LIVE run reproduces 52 over-cap FBs (46@6 + 6@7) of 14,574.
+  BUG-631 stays OPEN (52 historical FBs still owed re-derivation). BUG-647 header/body drift reconciled.
+- NEXT (critical order):
+  (1) OWNER: run scripts/rederive_anchor_axes_v6.py --generate → adjudicate → --adjudicate → --verify → --finalize;
+  (2) OWNER: flip D-2839 PROPOSED→RATIFIED; (3) full-204 A/B (D-2767) kappa≥0.800 AND emerging≤0.35;
+  (4) flip definition_anchored_menu_enabled iff pass; (5) D-2822 OPERATOR: recalibrate NLI (nli_calibrate.py)
+  → flip nli_aggregation=or_entail_and_no_contra → re-run S5; (6) BUG-631 re-derive the 52 historical over-cap
+  FBs (re-run S4 on those clusters) + re-measure; (7) C1/BUG-642 alias_map shrink-then-remove + re-freeze
+  closed_menu_v6.json; (8) D-2816 pySHACL wiring (pyshacl); (9) refresh store_authority.yaml row count
+  (7,995 → 14,574); (10) ONE bundled commit.
+
+## 2026-10-05 — Store-authority reconciliation LANDED (task #9 done + extra drift fixed)
+- DONE: "refresh store_authority.yaml row count (7,995 → 14,574)". Also fixed two live rail faults
+  (stale diagnostic-db declaration → removed; undeclared archive parquet collection → declared `archive`).
+  Rail now 0 faults. BUG-631 stays OPEN (52 over-cap FBs still owed re-derivation).
+- NEXT (critical order) — UNCHANGED, owner-gated head:
+  (1) OWNER: run scripts/rederive_anchor_axes_v6.py --generate → adjudicate → --adjudicate --decisions <file>
+      → --verify → --finalize; (2) OWNER: flip D-2839 PROPOSED→RATIFIED; (3) full-204 A/B (D-2767)
+      kappa≥0.800 AND emerging≤0.35; (4) flip definition_anchored_menu_enabled iff pass; (5) D-2822 OPERATOR:
+      recalibrate NLI → flip nli_aggregation → re-run S5; (6) BUG-631 re-derive the 52 over-cap FBs;
+      (7) C1/BUG-642 alias_map shrink-then-remove + re-freeze closed_menu_v6.json; (8) D-2816 pySHACL wiring;
+      (9) ONE bundled commit.
+
+## 2026-10-06 — D-2844 PROPOSED: D-2820 owner adjudication normalized (204 rows) + taxonomy boundaries
+- Owner adjudicated 142 differing rows; forensic audit CLEAN (0 off-menu). 62 carried -> full 204 decisions.
+- Normalized 4 separator typos + 6 note typos. Artifacts: rederive_v6_owner_decisions_normalized.csv/.json.
+- OWNER-GATED head (D-2839): (1) sign off DROP R084/R106/R148 (anchor 204->201, fix R148 domain);
+  (2) resolve emerging-mix R023/R112/R177/R188 (abstain vs keep); (3) sign off taxonomy boundary clarifications
+  (strategic thinking/decision making; business administration/operations research/organizational theory;
+  marketing/design psychology/behavioral economics; genAI/AI/ML) -> then edit closed_menu_v6.json (re-render + re-pin);
+  (4) run --adjudicate --decisions governance/rederive_v6_owner_decisions.json -> --verify -> --finalize;
+  (5) flip D-2839 PROPOSED->RATIFIED; (6) full-204 A/B (D-2767) kappa>=0.800 AND emerging<=0.35;
+  (7) flip definition_anchored_menu_enabled iff pass.
+
+## 2026-10-06 — D-2845 RATIFIED: D-2820 anchor re-cut 204→201 + emerging-mix resolved; --adjudicate landed
+- Owner resolved D-2844 (1)+(2): dropped R084/R106/R148; emerging-mix R023/R112/R177/R188 → keep real domains.
+- Re-cut anchor → discipline_anchor_conformance_20261006.json (201); flat decisions → rederive_v6_owner_decisions_flat.json;
+  --adjudicate → rederive_v6_finalized_20261006.json (201 rows, 0 off-menu). Forensic audit CLEAN
+  (FORENSIC_AUDIT_20261006_RESOLUTION.md). Emerging 14/201 (6.97%).
+- NEXT (critical order, owner-gated head):
+  (1) OWNER: --verify (gemma second coder + DeBERTa NLI, watch cold-load) → --finalize (mints re-derived anchor);
+  (2) OWNER: flip D-2839 PROPOSED→RATIFIED; (3) full-201 A/B (D-2767) kappa≥0.800 AND emerging≤0.35;
+  (4) OWNER: flip definition_anchored_menu_enabled iff pass; (5) OWNER: sign off taxonomy boundary
+  clarifications → edit closed_menu_v6.json → re-render + re-pin → re-derive; (6) OWNER: review 7 mirror rows
+  (discipline=emerging + real domains: R006/R059/R127/R140/R146/R165/R202); (7) OPERATOR: D-2822 NLI
+  recalibrate; (8) BUG-631 re-derive 52 over-cap FBs; (9) D-2816 pySHACL wiring; (10) C1/BUG-642 alias_map
+  shrink-then-remove; (11) refresh store_authority.yaml row count (7,995→14,574); (12) ONE bundled commit.
+
+## 2026-10-06 — D-2846 RATIFIED: D-2820 --verify + --finalize complete (menu-v6 stamped, guard PASSED)
+- --verify: 201 rows cross-checked (gemma second coder + DeBERTa NLI): 85 agree / 116 disagree (57.7%);
+  NLI 82 entailed / 102 weak / 17 contra-dominant (surface-only, never flip, D-2839 c3). 12/17 contra rows on
+  owner-flagged taxonomy boundaries. --finalize: discipline_anchor_rederived_v6_20261006.json (201 rows);
+  menu hash == declared live pins; guard PASSED. Emerging 7/201 (3.5%). Killed stale duplicate --verify orphan.
+- NEXT (critical order, owner-gated head):
+  (1) OWNER: eyeball 17 contra-dominant rows + 116 disagreements -> flip D-2839 PROPOSED->RATIFIED;
+  (2) full-201 A/B (D-2767) kappa>=0.800 AND emerging<=0.35; (3) OWNER: flip definition_anchored_menu_enabled iff
+  pass; (4) OWNER: sign off taxonomy boundaries -> edit closed_menu_v6.json -> re-render + re-pin -> re-derive;
+  (5) OWNER: review 7 mirror rows (R006/R059/R127/R140/R146/R165/R202); (6) OPERATOR: D-2822 NLI recalibrate;
+  (7) BUG-631 re-derive 52 over-cap FBs; (8) D-2816 pySHACL wiring; (9) C1/BUG-642 alias_map shrink-then-remove;
+  (10) refresh store_authority.yaml row count; (11) ONE bundled commit.
+
+## 2026-10-06 — D-2847 RATIFIED: owner consolidation of 14 contra rows + re-derive (re-mint 20261006b)
+- Owner resolved R179->creative process, R143->design thinking, R183->emerging+urban planning. 6 discipline changes
+  + 8 no-ops applied; re-ran --adjudicate -> --verify -> --finalize (--run-id 20261006b). D-2848 fixed the dead
+  --run-id flag (C16 hidden failure). D-2849 (PROPOSED): Effect-TS -> adopt patterns, not the TS lib.
+- Verify: 88 agree / 113 disagree; NLI 85/104/12 (entailed/weak/contra). 14/14 rows landed. Manifest
+  discipline_anchor_rederived_v6_20261006b.json minted (guard PASSED).
+- NEXT (critical order, owner-gated head):
+  (1) OWNER: eyeball 12 contra-dominant rows (incl 9 consolidated taxonomy-boundary rows) + 113 disagreements ->
+      flip D-2839 PROPOSED->RATIFIED;
+  (2) OWNER: full-201 A/B (D-2767) kappa>=0.800 AND emerging<=0.35 (referee = 20261006b manifest);
+  (3) OWNER: flip definition_anchored_menu_enabled iff A/B passes;
+  (4) OWNER: ratify D-2849 (typed errors + TaskGroup + pydantic + tenacity scaffolding);
+  (5) OWNER: sign off taxonomy boundaries -> edit closed_menu_v6.json -> re-render + re-pin -> re-derive (invalidates 20261006b);
+  (6) OWNER: repoint discipline_anchor_path 20261002->20261006 (config drift, D-2848);
+  (7) OWNER: review 7 mirror rows (R006/R059/R127/R140/R146/R165/R202 discipline=emerging + real domains);
+  (8) OPERATOR: D-2822 NLI recalibrate; (9) BUG-631 re-derive 52 over-cap FBs; (10) D-2816 pySHACL;
+  (11) C1/BUG-642 alias_map shrink-then-remove; (12) refresh store_authority.yaml 7,995->14,574;
+  (13) refresh registry.decisions/highest_bug in session_seed (stale 955->979, BUG-636->BUG-652); (14) ONE bundled commit.
+
+## D-2850 RATIFIED (2026-10-06) — Owner consolidation round 2 -> discipline_anchor_rederived_v6_20261006c.json
+- 3 label changes (R168->marketing, R153->cognitive science, R143->computer graphics) + R183 stays emerging+urban planning.
+- Re-derivation: sc 91 agree / 110 disagree; NLI 87 entailed / 105 weak / 9 contra-dominant (was 12). Guard PASSED.
+- NEXT (critical order, owner-gated head):
+  (1) OWNER: eyeball 9 contra rows (6 owner-confirmed: R029/R098 design thinking, R047 design psychology, R107 research
+      methodology, R090 media studies, R067 HCI + 3 others R014/R134/R147) + 110 disagreements -> flip D-2839 PROPOSED->RATIFIED;
+  (2) OWNER: full-201 A/B (D-2767) kappa>=0.800 AND emerging<=0.35 (referee = 20261006c manifest);
+  (3) OWNER: flip definition_anchored_menu_enabled iff A/B passes;
+  (4) OWNER: ratify D-2849 (typed errors + TaskGroup + pydantic + tenacity);
+  (5) OWNER: sign off taxonomy boundaries -> edit closed_menu_v6.json -> re-render + re-pin -> re-derive (invalidates 20261006c);
+  (6) OWNER: repoint discipline_anchor_path 20261002->20261006 (config drift, D-2848);
+  (7) OWNER: review 8 emerging-discipline mirror rows (R006/R059/R127/R140/R146/R165/R183/R202);
+  (8) BUG-653: add domain-axis hint to --adjudicate off-menu rejection;
+  (9) OPERATOR: D-2822 NLI recalibrate; BUG-631 re-derive 52 over-cap FBs; D-2816 pySHACL; C1/BUG-642 alias_map;
+      refresh store_authority.yaml 7,995->14,574; ONE bundled commit.
+
+## D-2851 RATIFIED (2026-10-06) — Owner round 3 -> discipline_anchor_rederived_v6_20261006d.json; D-2839 RATIFIED
+- 5 label changes (R107->philosophy, R067->interdisciplinary studies, R029->business administration, R047->psychology, R098->aesthetics).
+- Re-derivation: sc 95 agree / 106 disagree; NLI 89 entailed / 108 weak / 4 contra. Guard PASSED.
+- D-2839 -> RATIFIED. Referee = 20261006d manifest. A/B RAN (20:28) → kappa 0.4313 FAIL (D-2852); flag stays OFF.
+- NEXT (critical order):
+  (1) TASK: full-201 A/B (D-2767) kappa>=0.800 AND emerging<=0.35 (referee = 20261006d manifest);
+  (2) DECISION: flip definition_anchored_menu_enabled iff A/B passes;
+  (3) DECISION: ratify D-2849 (typed errors + TaskGroup + pydantic + tenacity);
+  (4) TASK: taxonomy boundaries -> edit closed_menu_v6.json -> re-render + re-pin -> re-derive (invalidates 20261006d);
+  (5) TASK: repoint discipline_anchor_path 20261002->20261006 (D-2848 drift);
+  (6) BUG-653: --adjudicate domain-axis hint;
+  (7) TASK: operator backlog (D-2822 NLI recal; BUG-631 52 over-cap FBs; D-2816 pySHACL; C1/BUG-642 alias_map;
+      store_authority 7,995->14,574; one bundled commit).
+
+
+## D-2849 RATIFIED + BUG-654 CORRECTED -> BUG-655 (2026-10-06) — A/B "non-determinism" was a measurement bug
+- BUG-654 misdiagnosed: kappa 0.3181 (flag-OFF cribs arm) vs 0.7794 (flag-ON definition-anchored arm) are the OFF/ON arms of definition_anchored_menu_enabled, NOT two runs of one prompt.
+- Deterministic gpt-oss settings ALREADY applied: D-2637 server (temp 0.0, grammar ON, prefix cache ON) + config verifier (chat_template_kwargs enable_thinking=false, thinking_budget 256/128, Reasoning:low). Live 2-pass determinism self-check: 3/3 byte-identical.
+- D-2849 -> RATIFIED (owner approve-and-ratify). Implementation folded into classifier-of-record swap (tenacity retry + Result/Either) + A/B harness (pydantic). No standalone bloat commit (C28).
+- scripts/d2767_ab_eval.py REWRITTEN: primary arm = flag-ON (definition-anchored via _apply_definition_anchored_menu), determinism self-check, optional --baseline. Smoke PASSED. Full run PID 14573 in background.
+- Real A/B: flag-ON kappa ~0.7794 (158/201), emerging 6/201=0.03 — 2pt under 0.800 floor. Flip STILL blocked, for a genuine ~43-row classifier-vs-owner gap (NOT determinism).
+- NEXT (critical order):
+  (1) TASK: collect background flag-ON run -> definitive kappa + determinism proof + disagreement CSV;
+  (2) DECISION: owner rules ~43 disagreement rows + signs off closed_menu_v6.json label+definition pairs;
+  (3) DECISION: accept 0.7794 vs tighten definitions;
+  (4) TASK: edit closed_menu_v6.json -> re-render/re-pin -> re-derive (invalidates 20261006d);
+  (5) TASK: repoint discipline_anchor_path 20261002 -> menu-v6 manifest (D-2848 drift);
+  (6) BUG-653: --adjudicate domain-axis hint;
+  (7) TASK: operator backlog (D-2822 NLI recal; BUG-631 52 over-cap; D-2816 pySHACL; C1/BUG-642 alias_map; store_authority 7,995->14,574).
+
+## BUG-653 RESOLVED + BUG-656 OPEN (2026-10-06)
+- BUG-653 RESOLVED: `validate_on_menu` off-menu discipline now routes through `_off_menu_discipline_hint` (domain-axis detection + 4 closest disciplines + `emerging` reminder). Selftest passes.
+- BUG-656 OPEN: the 0.7794 kappa is the REDERIVE path (`_classify_prompt`), NOT the production gate arm (`build_merged_prompt` + `_apply_definition_anchored_menu`). Production path diverges (R001 -> 'marketing'). Harness now persists per-row + emits owner-review CSV. Definitive production-path kappa pending full-201 run.
+
+## D-2852/D-2853/D-2854 RATIFIED (2026-10-06) — D-A verdict, D-3 taxonomy C, D-B root fix
+- D-2852 (D-A): D-2767 flag-ON A/B VERDICT = kappa 0.4313 (FAIL <0.800), emerging 0.0299 (pass), determinism 8/8, 111/201 disagreements. D-2839 gate FAILED → `definition_anchored_menu_enabled` stays OFF. (Supersedes BUG-654/655/656 narrative; production-path kappa now definitive.)
+- D-2853 (D-3): taxonomy C APPROVED — freeze closed_menu_v6.json; build closed_menu_v7.json from the 111 disagreement rows + collision clusters; merge within-axis near-synonyms, rename cross-axis near-identical labels, add discriminator fields.
+- D-2854 (D-B): root fix LANDED in pipeline/omlx_call.py::call_omlx (`_post_with_wall_clock` + `WallClockTimeout`; OMLX_WALL_CLOCK_DEADLINE=180 from config). Protects all callers, not just the harness.
+- NEXT (strategic order):
+  (1) TASK: relaunch flag-ON A/B with the harness+root fix → confirm preflight runs, no wedge, reproduce kappa 0.4313;
+  (2) TASK: build closed_menu_v7.json from the 111-row disagreement CSV + collision clusters;
+  (3) TASK: remap ALL anchor/golden/config/script label references to v7 (drift guard prerequisite);
+  (4) TASK: re-run A/B on menu v7 → adopt only if kappa improves toward >= 0.800;
+  (5) TASK: sync DECISION-LOG/MTR/session_seed/bug_status with the above;
+  (6) BUG-658: OPEN until the relaunch reproduces the wedge fix end-to-end (root fix + harness both in place).
+
+---
+
+## D-2859 + v3 forensic audit (2026-10-07) — ANTI-CIRCLE COMMIT (backlog frozen; remaining work re-sequenced)
+
+- ROOT CAUSE of '2 weeks of circles': 34 decisions D-2826..D-2859 ratified in worktree but UNCOMMITTED (HEAD=D-2825=955, worktree=989) + 68 modified + 140 untracked. Every session re-read unstable state, re-derived the referee (4 variants), re-ran A/B, wrote another audit (7 on Oct 6 alone), never committed.
+- COMMITTED this session: full backlog (v7 promote + D-2826..D-2859 + D-2854 wall-clock root fix + governance sync + decisions_summary re-derived 989; census --check GREEN).
+- A/B ANSWER: NEW A/B MANDATORY (old D-2767 flag-ON kappa 0.4313 FAIL, D-2852; invalidated by v7 +3 disciplines + domain rename + 'emerging' abstention + D-2857 split NOT implemented).
+- OWNER REFERENCE: REUSE governance/discipline_anchor_rederived_v6_20261006d.json (latest of 4) + deterministic 28-row domain remap; do NOT rebuild (D-2839 owner judgments + sampling variance).
+- NEXT (critical order; [OG]=owner-gated):
+  (1) [OG] confirm 20261006d as canonical referee + approve 28-row 'research & methodology'→'research practice' remap;
+  (2) finish D-2853 rename: 28 referee rows + ~24 config refs incl taxonomy_shacl.ttl enum + regenerate shacl (C13 backup);
+  (3) reconcile menu 65/44 vs taxonomy 64/43 off-by-one; regenerate shacl.ttl;
+  (4) land D-2857 split in stage4_merged_call.py (Call A CRIBS / Call B classify; R5 gemma review);
+  (5) D-2858: recalibrate D-2822 under or-entail, re-pin (D-353), flip nli_aggregation→or_entail_and_no_contra (fail-closed);
+  (6) NEW A/B (split + v7 menu vs v7-remapped referee); adopt iff kappa>=0.800;
+  (7) wire opaque IDs into menu/storage/golden (D-2856);
+  (8) add golden coverage: business administration + entrepreneurship studies (0 each; marketing 176);
+  (9) rerun S4→S5→S6 (no S1);
+  (10) D-2859: BUG-563 triage (40 dirty paths → 3 buckets) + repoint recalibration_pins.yaml + render_closed_menu.py → v7;
+  (11) close BUG-630 (ID wiring), BUG-648 (D-2857), BUG-651 (recalib+flip), BUG-658 (no-wedge relaunch).

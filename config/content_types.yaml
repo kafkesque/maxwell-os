@@ -121,7 +121,7 @@ content_types:
       - { icon: "📤", section: "OUTPUT",             binds: [output] }
 
   growth_edge:
-    description: "Speculative/unresolved insight — idea inbox upstream of verified knowledge. POSITIVE ENTRY CRITERION (BUG-230): MUST articulate an OPEN TENSION or an UNVERIFIED CORRELATION — NOT a dump for failed depth-tests, and NOT a bare 'utilizable fact' (a bare fact/trend with no articulated tension → noise_drop)."
+    description: "Speculative/unresolved insight — idea inbox upstream of verified knowledge. POSITIVE ENTRY CRITERION (BUG-230): MUST articulate an OPEN TENSION or an UNVERIFIED CORRELATION — NOT a dump for failed depth-tests, and NOT a bare 'utilizable fact' (a bare fact/trend with no articulated tension → noise_drop). D-2747 (2026-10-02): also admits a CONTESTED/UNFALSIFIABLE claim — a conspiracy theory or disputed thesis whose sources contradict. Such records carry `contested: true` and are RETAINED (never noise_drop / never quarantine) by the retention guard in stage4_merge."
     route_to: "growth_edge"
     output_file: "growth_edges.jsonl"
     extension_fields:
@@ -130,6 +130,7 @@ content_types:
       - category
       - actionable
       - status            # open → investigating → implementing → promoted | archived
+      - contested         # D-2747: bool — disputed/unfalsifiable claim (sources contradict); retention guard never drops/quarantines it
       - parent_fb_ids
       - parent_pt_id
       - promoted_to_type
@@ -188,7 +189,7 @@ route_to_content_type:
 #   ASSUMPTIONS (e.g. tool_instruction→normative_heuristic), revisited post-R2.
 # ─────────────────────────────────────────────────────────────────────────────
 content_to_extraction_type:
-  principle: descriptive_model       # conceptual statement → structure/identity (weakest, no over-claim)
+  principle: normative_heuristic     # D-2749: a principle is a transferable RULE (normative), not a "describes" FORM
   process_template: normative_heuristic  # repeatable method → prescriptive "do X"
   process_instance: descriptive_model    # case study → what happened (structure)
   growth_edge: empirical_pattern         # speculative insight → correlation w/o proven cause
@@ -268,6 +269,28 @@ dispositions:
   quarantine: "carries SOME value but no clean role (ambiguous) → HOLD for later identification (does it carry steps? a method? an applicable mechanism? a transferable principle?)"
 
 # ─────────────────────────────────────────────────────────────────────────────
+# APPLICABILITY AXIS (D-2757, 2026-10-02) — consumer/teleology, AXIS 3.
+# ORTHOGONAL to content_type (role), extraction_type (form), and depth (scope).
+# Answers "WHO consumes this and WHY" — which the closed 5-role FORM axis cannot.
+# The 234-record quarantine blob (BUG-611) was heterogeneous precisely because it
+# lacked this axis: definitional/terminological (educational) records were
+# quarantined alongside prescriptive (operational) and ethics/values
+# (philosophical_educational) records as if they were one category.
+#
+# DETERMINISTIC (never LLM-classified — D-343 measured content_type LLM at
+# -2.98pp vs constant baseline; applicability shares that failure mode). Derived
+# from lexical markers + owner adjudication, provenance-stamped.
+# ─────────────────────────────────────────────────────────────────────────────
+applicability:
+  values: [operational, educational, philosophical_educational, heuristic_tip]
+  default: operational
+  operational: "prescriptive transferable rule you APPLY in practice (KNOW/APPLY, D275b) — the normal target of a principle/process_template/tool_instruction"
+  educational: "terminological/theoretical/descriptive (frontend, user-facing) — teaches WHAT something is; a definitional or explanatory object, not an applied rule"
+  philosophical_educational: "ethics/values/reflection — a normative stance on values, justice, cooperation, or the human condition (subtype of educational with a values teleology)"
+  heuristic_tip: "surface-level wisdom, tip, or trick — a low-cost practical suggestion without a causal skeleton or done-condition"
+  derive_order: [adjudication, lexical]
+
+# ─────────────────────────────────────────────────────────────────────────────
 # SHARED CORE BODY — the READABLE knowledge content an agent consumes.
 # S2 emits the name/definition skeleton for every content_type. S4 (CRIBS)
 # appends application / failure_mode (principle) / jargon (body-only, AFTER
@@ -341,6 +364,8 @@ classification:
   - evidence          # flag: cited | axiomatic (NOT evidence_passages — those are provenance metadata)
   - domains_raw        # raw LLM label preserved forever (G9)
   - discipline_raw     # raw LLM label preserved forever (G9)
+  - applicability      # D-2757: consumer/teleology axis (Axis 3, orthogonal to role+form+scope)
+  - applicability_source  # D-2757: provenance of the applicability label (deterministic|owner_adjudicated)
   - classify_model     # D2476: classifier model that labelled this record (gpt-oss-20b).
                        # PRINCIPLE-ONLY — non-principle sidecars are routed, not classified.
 
@@ -394,6 +419,22 @@ s2_body_fields:
     - actionable
     - status
     - priority
+
+# ─────────────────────────────────────────────────────────────────────────────
+# D-2747 — deterministic non-principle REROUTE (BUG-611 / BUG-170).
+#   S4 routes non-principle records WITHOUT re-classifying them (BUG-170), so an
+#   S2 mislabel reaches S6 unverified. D-343: content_type must NOT be LLM-classified
+#   (measured -2.98pp vs constant baseline), so the correction is DETERMINISTIC.
+#   Three tiers, first-match-wins: (1) owner-adjudicated map (fb_id → role, highest
+#   authority, lives in governance/content_type_adjudication.json); (2) keyword
+#   denylist below (config-driven, C12); (3) structural checks in code (a TI with
+#   neither syntax nor parameters is quarantine). The contested retention guard is a
+#   SEPARATE, orthogonal rule: a `contested: true` record is NEVER noise_drop/quarantine.
+# ─────────────────────────────────────────────────────────────────────────────
+reroute:
+  # tool_instruction whose tool_name matches one of these → process_template
+  # (a named system/protocol/workflow is a procedure, not a single command).
+  ti_to_pt_keywords: [system, protocol, workflow, framework, methodology, pipeline, process]
 
 # DROPPED — vestigial content_type enum values (were schema-only, never used)
 #   `fact`  (domain factoid): never emitted/validated/trained; a bare factoid

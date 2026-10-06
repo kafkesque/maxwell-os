@@ -1,0 +1,11 @@
+# D-2773 (2026-10-02) — discipline CLOSED-MENU negative exemplars (BUG-622 fix, config-driven).
+# Pairs the model previously conflated (D-2773 forensic root-cause): free-generated off-menu
+# names remapped to a WRONG canonical synonym instead of the correct one. Rendered by
+# pipeline/stage4_merged_call.py::_render_discipline_closed_menu as contrastive lines.
+# C12: the canonical MENU itself comes from config/taxonomy_v5.yaml (single source of truth);
+# this file only adds the confusable-pair contrasts.
+confusable_pairs:
+  - ["psychology", "neuroscience"]
+  - ["information science", "computer graphics"]
+  - ["economics", "privacy & surveillance"]
+  - ["artificial intelligence", "information retrieval"]

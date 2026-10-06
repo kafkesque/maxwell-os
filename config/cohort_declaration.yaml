@@ -20,9 +20,9 @@ cohorts:
     # in the one direction that matters: a row silently added or dropped is now a failure, not a new truth.
     # Two readers, independent oracles (D-402): scripts/depth_pass_agreement.py --check-cohort asserts it
     # against the workbook; config/reconciliation.yaml#depth_workbook_row_count pins it to the row count.
-    measured_rows: 148
+    measured_rows: 150
     measured_from: governance/anchor_adjudication_workbook_20260924.csv
-    absent_rows: [R003, R146]
+    absent_rows: []
     absent_reason: >-
       the owner review pass returned 148 of the 150 declared rows; R003 and R146 were never
       returned and no exclusion rule existed (BUG-466). They are ABSENT, not withdrawn and not

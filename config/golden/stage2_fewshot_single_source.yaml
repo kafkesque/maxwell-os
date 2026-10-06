@@ -72,7 +72,7 @@ examples:
     extraction_type: causal_mechanism
     content_type: principle
     evidence_passages:
-    - "Marginal gains of one percent per day accumulate into roughly thirty-seven times improvement over a year because each increment builds on the last."
+    - "Once a small habit is established, it compounds. Marginal gains of one percent per day accumulate into roughly thirty-seven times improvement over a year because each increment builds on the last rather than adding linearly."
   rationale: "Reusable conceptual statement (why small habits compound) with a demonstrated cause→effect chain. A principle, not a method."
   tier: CORE
 
@@ -106,7 +106,7 @@ examples:
     done_condition: "All critical information is externalized and only the immediately-needed items are held in memory"
     failure_mode: "Fails when the items cannot be externalized or must all be held simultaneously"
     evidence_passages:
-    - "Pilots remember critical information using three techniques: first they write it down, second they enter it into their equipment, and third they remember selectively."
+    - "Pilots remember critical information using three techniques: first they write it down, second they enter it into their equipment as it is read so minimal memory is required, and third they remember selectively, holding only the few items needed in the next few minutes."
   rationale: "A repeatable human how-to method with ordered steps a person follows. content_type=process_template (NOT principle, NOT tool_instruction)."
   tier: CORE
 
@@ -183,7 +183,7 @@ examples:
     example: "dfs(graph, start) visits each reachable node exactly once"
     caveats: "Requires a visited set to avoid infinite loops on cyclic graphs"
     evidence_passages:
-    - "Depth-first search visits a graph by pushing the start node onto a stack, then repeatedly popping a node, marking it visited, and pushing each unvisited neighbor."
+    - "Depth-first search visits a graph by pushing the start node onto a stack, then repeatedly popping a node, marking it visited, and pushing each unvisited neighbor back onto the stack until the stack is empty."
   rationale: "An algorithm/code description. content_type=tool_instruction, NOT process_template — it is a computational procedure, not a repeatable human how-to (BUG-147 contrastive)."
   tier: CORE
 
@@ -376,7 +376,7 @@ examples:
     example: "index = Index([text_space, cat_space]) then deploy as a REST API"
     caveats: "Fails when the framework is not configured or the vector database connection is unavailable"
     evidence_passages:
-    - "Frameworks such as Superlinked make multi-indexing easy. Define schema objects with specific fields, create a text similarity space and a categorical similarity space, then combine them into a single index."
+    - "Frameworks such as Superlinked make multi-indexing easy. Define schema objects with specific fields, create a text similarity space for content search and a categorical similarity space for platform filtering, then combine them into a single index structure for semantic-plus-categorical search."
   rationale: "A vector-search framework API pattern. content_type=tool_instruction, NOT process_template — it is a framework API, not a repeatable human how-to (BUG-166 PT-vs-TI contrastive)."
   tier: CORE
 
@@ -406,7 +406,7 @@ examples:
     extraction_type: descriptive_model
     content_type: principle
     evidence_passages:
-    - "Judgment errors come in two distinct kinds: bias and noise. Bias is a systematic error, while noise is random scatter, and the two require different remedies."
+    - "Judgment errors come in two distinct kinds: bias and noise. Bias is a systematic error that pushes judgments consistently in one direction, while noise is random scatter that pushes different judgments unpredictably in different directions, and the two require different remedies."
   rationale: "A reusable conceptual taxonomy (bias vs. noise), NOT a cause→effect chain. content_type=principle with extraction_type=descriptive_model — a principle is not always causal_mechanism."
   tier: CORE
 
@@ -444,7 +444,7 @@ examples:
     done_condition: "The failing test passes and the defect no longer reproduces"
     failure_mode: "Fails when the bug cannot be reproduced in a minimal case, blocking bisection"
     evidence_passages:
-    - "To debug effectively, first reproduce the failure with a minimal test case, then narrow the cause by bisecting, then write a failing test, and only then fix the cause."
+    - "To debug effectively, first reproduce the failure with a minimal test case, then narrow the cause by repeatedly bisecting the suspect code, then write a failing test that captures the bug, and only then fix the underlying cause so the test passes."
   rationale: "A repeatable HUMAN how-to method with ordered steps. content_type=process_template (NOT tool_instruction — mentioning tests/bisection does not make it a software API)."
   tier: CORE
 
@@ -736,6 +736,6 @@ examples:
     example: 'setwd("~/data"); dir(); data <- read.csv("prices.csv", na.strings = ""); View(data)'
     caveats: "Fails when the file is not a valid CSV, the path is wrong, or the package is not installed"
     evidence_passages:
-    - "setwd(\"C:/Users/USER/Desktop/House Pricing \") dir() data<-read.csv(\"Regression-Analysis-House Pricing.csv\", na.strings = \"\") View(data)"
+    - "Before analysis, import the data into R: setwd(\"C:/Users/USER/Desktop/House Pricing \"), then dir(), then data<-read.csv(\"Regression-Analysis-House Pricing.csv\", na.strings = \"\"), then View(data)."
   rationale: "A passage framed procedurally ('how to import data') but whose substance is executable R code (setwd/dir/read.csv/View). content_type=tool_instruction, NOT process_template — code commands, not a repeatable human how-to (the exact D2457 R Data Import misclassification this anchor corrects)."
   tier: CORE

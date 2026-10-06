@@ -29,6 +29,8 @@
                description="Approximate nearest neighbor search"/>
       <outline type="rss" text="HNSW" xmlUrl="https://github.com/topics/hnsw" 
                description="HNSW algorithm implementations"/>
+      <outline type="rss" text="Continual Learning" xmlUrl="https://github.com/topics/continual-learning" 
+               description="Incremental/continual learning methods and agent-memory libraries"/>
       <!-- D1031: Engineering & Agent Development feeds (2026-07-16) -->
       <outline type="rss" text="Engineering" xmlUrl="https://github.com/topics/engineering" 
                description="Software engineering tools and practices"/>

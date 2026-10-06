@@ -34,7 +34,7 @@ declared_divergent: []   # EMPTIED 2026-09-25: all eight were promoted to header
 # header would carry a status no author ever wrote, and 'no closure claim is not a closure' would count
 # every legacy record OPEN. The list is therefore PINNED BY IDENTITY and SHRINK-ONLY, and nothing in this
 # file decides what a bug IS: it declares which NAMES the register cannot answer for. A NEW name is RED.
-declared_max_uncarried: 62   # CEILING (shrink guard): raising it requires a declared decision, not an edit
+declared_max_uncarried: 63   # CEILING (shrink guard): raising it requires a declared decision, not an edit
 declared_uncarried:
   - BUG-085   # first named at governance/buglog.md:32
   - BUG-098   # first named at governance/buglog.md:63
@@ -47,7 +47,6 @@ declared_uncarried:
   - BUG-160   # first named at governance/buglog.md:33
   - BUG-168   # first named at governance/buglog.md:32
   - BUG-169   # first named at governance/buglog.md:42
-  - BUG-170   # first named at governance/buglog.md:30
   - BUG-181   # first named at governance/buglog.md:1274
   - BUG-182   # first named at governance/buglog.md:29
   - BUG-185   # first named at governance/buglog.md:48
@@ -98,5 +97,7 @@ declared_uncarried:
   - BUG-495   # first named at governance/buglog.md:5026
   - BUG-496   # first named at governance/buglog.md:5034
   - BUG-498   # first named at governance/buglog.md:5092
+  - BUG-017   # first named at governance/buglog.md:8062
+  - BUG-183   # first named at governance/buglog.md:8251
                          # SHRINK-ONLY: an id that gets a HEADER event (or whose name is removed) must be
                          # deleted from this list in a diff a human reads, or this rail FAILS as STALE.

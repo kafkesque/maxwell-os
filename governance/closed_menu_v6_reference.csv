@@ -1,0 +1,111 @@
+axis,value,definition
+discipline,aesthetics,"The philosophical study of beauty, taste, and the nature of artistic experience."
+discipline,anthropology,"The study of human societies, cultures, and their development across time and space."
+discipline,artificial intelligence,The broad field of creating systems capable of performing tasks that typically require human intelligence.
+discipline,behavioral economics,"The descriptive study of how psychological factors and cognitive biases cause systematic deviations from the rational or standard model in economic decision-making, market behavior and behavior-change interventions - where heuristics, framing, affect, social norms and peer influence change what people do (prices, incentives, markets, choice of behavior). It describes the bias; it does not exploit it to design persuasion."
+discipline,business administration,"The academic study of how organizations are structured, coordinated, and governed — spanning strategy, operations, human-resource management, and organizational design — to achieve objectives under resource constraints. A management lens applied across subject-matter domains (business operations, business development, project management), not the subject matter itself."
+discipline,cognitive science,"The interdisciplinary study of how the mind works — perception, memory, attention, reasoning, language, and learning. The default home for any claim about cognition, thinking, or a cognitive process."
+discipline,color theory,"The principles governing color mixing, harmony, contrast, and their psychological impact on design."
+discipline,communication theory,"The study of how information is transmitted, received, and interpreted across various channels."
+discipline,complex adaptive systems,The study of dynamic systems composed of interacting agents that adapt and evolve over time.
+discipline,computational geometry,The mathematical study of algorithms for solving problems involving geometric objects and structures.
+discipline,computational physics & simulation,The use of computer simulations to model and analyze physical systems and biological processes.
+discipline,computational theory,"The study of the theoretical foundations of computation, including complexity and computability."
+discipline,computer graphics,The technology and techniques for generating and manipulating visual images using computers.
+discipline,creative coding,The use of programming languages and tools to create artistic and interactive digital experiences.
+discipline,creative process,"The workflow, practices, and methodologies involved in generating and executing creative work."
+discipline,cultural design,"The historical and theoretical analysis of design practices, aesthetics, and their cultural significance."
+discipline,cultural studies,"The critical analysis of cultural practices, texts, and power relations in contemporary society — how meaning is produced, circulated, and contested within a culture, with attention to ideology, discourse, and social power."
+discipline,decision making,"The cognitive and strategic process of selecting a course of action from alternatives — how options are framed, evaluated, and committed to under uncertainty, including decision rules, criteria, and (bounded) rationality."
+discipline,design psychology,"The exploitation of cognitive science's known loopholes — biases, heuristics, and predictable errors of human thinking — to externally affect, persuade, or manipulate a user's or consumer's decision-making, and designing for those biases. It is applied persuasion psychology, not the study of cognition itself."
+discipline,design thinking,"A human-centered approach to innovation — an iterative process (empathise → define → ideate → prototype → test) that integrates user needs, technology feasibility, and business viability, whose output is a designed solution, not an explanation of the mind."
+discipline,ecology,The scientific study of the relationships between organisms and their physical and biological environments.
+discipline,economics,"The social science that studies the production, distribution, and consumption of goods and services."
+discipline,engineering,"The application of scientific principles to design, build, and maintain structures and machines."
+discipline,entrepreneurship studies,"The academic study of how new ventures are identified, created, and scaled — spanning opportunity recognition, resource mobilization, and entrepreneurial finance. The scholarly lens on the venture-creation process, distinct from the venture-building subject matter of the domain ""entrepreneurship""."
+discipline,evolutionary biology,The study of the origin and diversification of life through genetic and natural selection processes.
+discipline,finance,"The management of money, investments, and financial assets for individuals and organizations."
+discipline,game design,"The process of creating rules, mechanics, and interactive experiences for video games."
+discipline,generative ai,"Artificial intelligence systems capable of creating new content, such as text, images, or code."
+discipline,generative design,The use of algorithms and computational processes to generate design solutions and artistic forms.
+discipline,health & medicine,"The practice and science of maintaining, restoring, and promoting human physical and mental well-being."
+discipline,human-computer interaction,The design and evaluation of user interfaces and systems for effective human-computer interaction.
+discipline,information retrieval,"The field of finding unstructured information, typically from documents, in response to queries."
+discipline,information science,"The study of the collection, organization, and management of information and data systems."
+discipline,information security,"The practice of protecting information systems from unauthorized access, use, or disclosure."
+discipline,interdisciplinary studies,Academic approaches that integrate methods and knowledge from multiple distinct disciplines.
+discipline,law,The system of rules created by society or government to regulate behavior and resolve disputes.
+discipline,linguistics,"The scientific study of language structure, meaning, use, and its relationship to cognition."
+discipline,literary theory,The critical frameworks and methods used to analyze and interpret literary texts.
+discipline,machine learning,The field of artificial intelligence focused on algorithms that learn patterns from data.
+discipline,marketing,"The academic study of how value is created, communicated, and exchanged with customers — spanning consumer behavior, market segmentation, positioning, and marketing research. The explanatory lens on buyer behavior and market exchange, distinct from the professional practice domain ""marketing & communications""."
+discipline,media studies,"The academic analysis of media forms, technologies, and their social and cultural impacts."
+discipline,motion & time,"The design and animation of visual elements involving movement, timing, and temporal sequencing."
+discipline,neuroscience,"The scientific study of the nervous system, including the brain and neural circuits."
+discipline,operations research,The application of advanced analytical methods to decision-making and system optimization.
+discipline,organizational theory,"The study of structures, processes, and dynamics within formal organizations and institutions — how they are designed, how they coordinate, and how they change."
+discipline,performing arts,"Artistic disciplines involving live performance, including music, theater, and dance."
+discipline,philosophy,"The study of fundamental questions concerning existence, knowledge, values, reason, and mind."
+discipline,political economy,"The study of the relationship between political institutions, economic systems, and power structures."
+discipline,privacy & surveillance,"The study of data protection, monitoring practices, and the ethics of information observation."
+discipline,psychology,"The empirical study of mind and behavior in individuals and groups — emotion, personality, development, social behavior, and mental health — beyond the computational modelling of cognition. Broader and more behavioral than cognitive science, which models mental processes as computation."
+discipline,research methodology,The systematic frameworks and techniques used to conduct valid and reliable academic research.
+discipline,risk management,"The identification, assessment, prioritization, and mitigation of risks to minimize negative impact on operations, projects, or decisions — the practice of quantifying exposure and choosing responses (avoid / reduce / transfer / accept)."
+discipline,robotics,"The engineering and science of designing, building, and operating autonomous or controlled machines."
+discipline,semiotics,"The general study of signs, symbols, and their interpretation across biological and cognitive systems."
+discipline,social network analysis,The study of social ties and structures using graph theory and network science methods.
+discipline,sociology,"The scientific study of society, social institutions, and the patterns of human interaction."
+discipline,software engineering,The systematic application of engineering principles to the design and development of software.
+discipline,strategic thinking,The high-level planning and long-term goal setting involved in business and organizational management.
+discipline,systems engineering,"The interdisciplinary field focused on designing, integrating, and managing complex system architectures."
+discipline,systems thinking,An approach to understanding complex systems by analyzing their interrelationships and holistic behavior.
+discipline,theoretical physics,The branch of physics focused on mathematical models and abstract theories of natural phenomena.
+discipline,typography,"The art and technique of arranging typefaces, spacing, and layout for effective visual communication."
+discipline,visual perception,The biological and psychological process of interpreting visual sensory information and color stimuli.
+discipline,visual semiotics,"The study of how visual signs, symbols, and rhetoric communicate meaning within cultural contexts."
+discipline,emerging,Used when no canonical domain or discipline fits the principle ontologically and pragmatically. Preserves the raw S3A convergence label as s3_original_domain for future taxonomy expansion when enough principles accumulate under a label.
+domain,ai & agents,The design and implementation of autonomous artificial intelligence systems and agents.
+domain,arts & culture,"The practice and theory of visual arts, performance, and cultural expression."
+domain,brand identity,"The development of visual symbols, logos, and consistent aesthetic systems for corporate recognition."
+domain,business development,"Strategic activities focused on market expansion, sales psychology, and revenue generation."
+domain,business operations,"The management of internal processes, accounting, and administrative functions within organizations."
+domain,code & computation,The use of specific programming frameworks and tools for creative and computational design.
+domain,computational art,"The creation of artistic works using algorithms, generative systems, and code."
+domain,computational science & physics,"The application of computational models to simulate physical, biological, and social systems."
+domain,creative technology,The intersection of artistic practice and programming for interactive digital experiences.
+domain,data visualization,The graphical representation of quantitative data to facilitate understanding and analysis.
+domain,design strategy,The management and strategic direction of design practices and organizations.
+domain,design systems,The creation of reusable component libraries and design language standards.
+domain,digital product,The design and development of user interfaces and experiences for software applications.
+domain,editorial & advertising,"The design and copywriting of publications, advertisements, and promotional visual materials."
+domain,education,"The design of instructional strategies, academic policy, and learning environments."
+domain,engineering & infrastructure,"The design of mechanical, aerospace, and distributed cloud computing systems."
+domain,engineering practice,"The application of software architecture, programming languages, and development methodologies."
+domain,entrepreneurship,"The process of creating, managing, and scaling new business ventures and startups."
+domain,environmental design,"The design of physical spaces, interiors, and wayfinding systems for human interaction."
+domain,finance & investment,"The management of assets, portfolio theory, and financial planning strategies."
+domain,graphic design,"The practice of visual communication through layout, typography, and print media composition."
+domain,health & wellness,"The promotion of physical, mental, and public health through healthcare systems."
+domain,illustration,"The creation of original visual artwork for narrative, decorative, or explanatory purposes."
+domain,industrial design,The design of manufactured physical products for mass production and usability.
+domain,information architecture,The structural organization of information for websites and digital interfaces.
+domain,leadership,"The practice of guiding teams, strategic direction, and organizational dynamics."
+domain,legal & public policy,"The study of law, public administration, and regulatory policy frameworks."
+domain,marketing & communications,"Strategic promotion, public relations, and digital marketing for brand engagement."
+domain,media & entertainment,"The development of video games, media technology, and publishing platforms."
+domain,motion design,"The creation of animated visual content, motion graphics, and time-based digital media."
+domain,organizational behavior,"The study of human behavior, culture, and psychology within workplace structures."
+domain,packaging,The design of physical containers and structural materials for product protection and presentation.
+domain,personal productivity,"Individual techniques for personal development, effectiveness, and time management."
+domain,product design,The holistic design of physical and digital products from concept to market.
+domain,project management,"The planning, execution, and oversight of projects and product development lifecycles."
+domain,research & methodology,"The design, ethics, and execution of academic and empirical research processes."
+domain,science & research,"The study of biological, genetic, and statistical scientific disciplines."
+domain,semiotics & communication,"The study of signs, symbols, and visual rhetoric in human communication."
+domain,social sciences,"The study of human society, criminology, demography, and social work."
+domain,systems & frameworks,The theoretical analysis and design of complex interconnected systems and structures.
+domain,urban planning,"The strategic development of cities, towns, and regional land use infrastructure."
+domain,user experience,"The study of user behavior, research, and interaction design for digital products."
+domain,web & ui,The design and architecture of responsive websites and user interface components.
+domain,emerging,Used when no canonical domain or discipline fits the principle ontologically and pragmatically. Preserves the raw S3A convergence label as s3_original_domain for future taxonomy expansion when enough principles accumulate under a label.
+special,emerging,ABSTENTION token — choose this when NO menu label fits (counts toward the emerging-rate budget).

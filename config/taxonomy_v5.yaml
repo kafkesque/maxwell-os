@@ -1,5 +1,5 @@
-version: v5.6
-classification_version: v5.6
+version: v7
+classification_version: v7
 groups:
   domain:
   - Visual Practice
@@ -19,25 +19,24 @@ groups:
   - AI & Computing
   - Computational Craft
   - Heterodox
+  - Business & Management
 domains:
 - canonical: graphic design
   group: Visual Practice
   raw:
   - Graphic Design
-  - graphic_design
   - layout
   - print design
   - poster design
   - digital art
   - typographic style
   - typographic history
-  - Color Psychology
-  - color psychology
   definition: The practice of visual communication through layout, typography, and
     print media composition.
   exclude:
   - brand identity
   - illustration
+  id: dom-001
 - canonical: brand identity
   group: Visual Practice
   raw:
@@ -48,8 +47,6 @@ domains:
   - logo design
   - Visual Identity Design
   - brand strategy
-  - Brand Strategy
-  - Branding
   - brand communication
   - corporate branding
   - personal branding
@@ -63,13 +60,13 @@ domains:
   exclude:
   - graphic design
   - marketing strategy
+  id: dom-002
 - canonical: editorial & advertising
   group: Visual Practice
   raw:
   - editorial
   - Editorial Design
   - advertising
-  - Advertising
   - copywriting
   - presentation
   - Presentation Design
@@ -78,12 +75,12 @@ domains:
   - advertising research
   - media planning
   - printing technology
-  - Printing Technology
   definition: The design and copywriting of publications, advertisements, and promotional
     visual materials.
   exclude:
   - graphic design
   - brand identity
+  id: dom-003
 - canonical: motion design
   group: Visual Practice
   raw:
@@ -92,13 +89,13 @@ domains:
   - Motion Design
   - motiongraphic
   - animation
-  - Animation
   - After Effects
   definition: The creation of animated visual content, motion graphics, and time-based
     digital media.
   exclude:
   - video game development
   - animation
+  id: dom-004
 - canonical: environmental design
   group: Visual Practice
   raw:
@@ -110,6 +107,7 @@ domains:
   exclude:
   - urban planning
   - industrial design
+  id: dom-005
 - canonical: digital product
   group: Digital & Interactive
   raw:
@@ -118,36 +116,34 @@ domains:
   - DesignOps
   - Product Development
   - Product Management
-  - product management
   - SaaS
   definition: The design and development of user interfaces and experiences for software
     applications.
   exclude:
   - web design
   - user experience
+  id: dom-006
 - canonical: data visualization
   group: Digital & Interactive
   raw:
   - Data Visualization
   - Data Visualisation
   - DataVis
-  - datavis
   - Information Visualization
   - Data Storytelling
   - infographics
   - cartography
-  - Cartography
   definition: The graphical representation of quantitative data to facilitate understanding
     and analysis.
   exclude:
   - information architecture
   - graphic design
+  id: dom-007
 - canonical: creative technology
   group: Digital & Interactive
   raw:
   - Creative Technology
   - web development
-  - Web Development
   - interactive installations
   - new media art
   definition: The intersection of artistic practice and programming for interactive
@@ -155,6 +151,7 @@ domains:
   exclude:
   - software development
   - web design
+  id: dom-008
 - canonical: web & ui
   group: Digital & Interactive
   raw:
@@ -169,56 +166,53 @@ domains:
   exclude:
   - digital product
   - creative technology
+  id: dom-009
 - canonical: user experience
   group: Digital & Interactive
   raw:
   - User Experience
-  - User Experience Design
   - UX Design
   - UX Research
   - UX
   - Usability
-  - HCI
   - User Interface Design
   - UI Design
   - UI/UX Design
   - UI/UX
-  - Interaction Design
   - User-Centered Design
   - UCD
   - User Research
   - Service Design
   - Accessible Design
   - Inclusive Design
-  - User Experience (UX) Design
-  - usability
   - accessibility
   definition: The study of user behavior, research, and interaction design for digital
     products.
   exclude:
   - digital product
   - web design
+  id: dom-010
 - canonical: illustration
   group: Illustration & Craft
   raw:
   - Illustration
-  - illustration
   definition: The creation of original visual artwork for narrative, decorative, or
     explanatory purposes.
   exclude:
   - graphic design
   - computational art
+  id: dom-011
 - canonical: packaging
   group: Illustration & Craft
   raw:
   - Packaging
   - Packaging Design
-  - packaging design
   definition: The design of physical containers and structural materials for product
     protection and presentation.
   exclude:
   - industrial design
   - brand identity
+  id: dom-012
 - canonical: business operations
   group: Business & Strategy
   raw:
@@ -226,44 +220,26 @@ domains:
   - operations
   - Business Operations
   - accounting
-  - Accounting
-  - Corporate Finance
-  - business
-  - business management
-  - economic analysis
   - economic policy
   - Monetary Policy
   - financial control
-  - Financial Control
-  - surveillance capitalism
-  - Surveillance Capitalism
   - Business Model Innovation
   - Business Model
-  - Innovation
-  - Innovation Management
-  - Corporate Strategy
-  - Business Strategy
-  - Strategic Management
   - personal growth
-  - Personal Growth
   - Professional Services
   - Customer Service
   - Customer Experience
   - human resources
-  - Knowledge Management
-  - business analytics
   - operations management
   - human resource management
-  - Human Resource Management
   - retail management
-  - Retail Management
   - technology management
-  - Technology Management
   definition: The management of internal processes, accounting, and administrative
     functions within organizations.
   exclude:
   - project management
   - business development
+  id: dom-013
 - canonical: business development
   group: Business & Strategy
   raw:
@@ -273,29 +249,22 @@ domains:
   - Sales Psychology
   - Sales and Persuasion
   - sales management
-  - Sales Management
   definition: Strategic activities focused on market expansion, sales psychology,
     and revenue generation.
   exclude:
   - marketing communications
   - business operations
+  id: dom-014
 - canonical: entrepreneurship
   group: Business & Strategy
   raw:
   - Entrepreneurship
-  - entrepreneurship
   - startup strategy
-  - Startup Strategy
   - startup management
-  - Startup Management
   - indie hacking
-  - Indie Hacking
   - bootstrapping
-  - Bootstrapping
   - startup finance
-  - Startup Finance
   - startup fundraising
-  - Startup Fundraising
   - startup operations
   - startup governance
   - startup validation
@@ -304,40 +273,35 @@ domains:
   - startup leadership
   - startup financing
   - venture capital
-  - Venture Capital
   - startup
   - startups
   - founders
   - entrepreneurial management
-  - Entrepreneurial Management
   definition: The process of creating, managing, and scaling new business ventures
     and startups.
   exclude:
   - business development
   - leadership
+  id: dom-015
 - canonical: organizational behavior
   group: Business & Strategy
   raw:
   - Organizational Behavior
-  - organizational behavior
   - Organizational Design
   - Organizational Culture
   - Organizational Psychology
-  - Organizational Management
   - Corporate Governance
   - management
-  - Management
   - Human Resources Management
-  - organizational culture
   - team dynamics
   - workplace psychology
   - change management
-  - Change Management
   definition: The study of human behavior, culture, and psychology within workplace
     structures.
   exclude:
   - leadership
   - business operations
+  id: dom-016
 - canonical: ai & agents
   group: AI & Computing
   raw:
@@ -349,12 +313,9 @@ domains:
   - Agentic Architectural Patterns for Building Multi Agent Systems
   - Agentic Artificial Intelligence
   - Multi-Agent Systems
-  - multi-agent systems
   - Multi-Agent Systems Architecture
   - Agentic Systems
   - AI Agent Architecture
-  - AI
-  - AI agents
   - agentic workflows
   - agent frameworks
   definition: The design and implementation of autonomous artificial intelligence
@@ -362,11 +323,11 @@ domains:
   exclude:
   - software development
   - data visualization
+  id: dom-017
 - canonical: urban planning
   group: Business & Strategy
   raw:
   - Urban Planning
-  - urban planning
   - urbanism
   - city planning
   - town planning
@@ -375,6 +336,7 @@ domains:
   exclude:
   - environmental design
   - engineering infrastructure
+  id: dom-018
 - canonical: engineering practice
   group: AI & Computing
   raw:
@@ -383,8 +345,6 @@ domains:
   - Python Programming
   - JavaScript Programming
   - Computer Science
-  - computer science
-  - Control Systems Engineering
   - Network Engineering
   - cloud infrastructure
   - site reliability
@@ -393,15 +353,11 @@ domains:
   exclude:
   - creative technology
   - web design
+  id: dom-019
 - canonical: computational art
   group: Computational Art & Code
   raw:
   - computational art
-  - Computational Creativity
-  - Generative Art
-  - generative art
-  - Creative Programming
-  - Multimedia Programming
   - computational aesthetics
   - computational art and design
   - computational art and simulation
@@ -410,14 +366,10 @@ domains:
   exclude:
   - illustration
   - creative technology
+  id: dom-020
 - canonical: code & computation
   group: Computational Art & Code
   raw:
-  - openFrameworks
-  - Processing
-  - computational design
-  - computational graphics
-  - Data-Driven Graphic Design
   - programming
   - computer programming
   - software development
@@ -426,26 +378,11 @@ domains:
   exclude:
   - engineering practice
   - computational art
+  id: dom-021
 - canonical: computational science & physics
   group: Computational Art & Code
   raw:
-  - computational physics
-  - computational physics simulation
-  - computational simulation
-  - Computational Models of Social Life
-  - computational biology
-  - computational ecology
-  - computational neuroscience
-  - computational systems
-  - computational evolution
   - computational pedagogy
-  - Simulation
-  - Computer Graphics / Simulation
-  - Computer Graphics / Physics Simulation
-  - Physics Simulation
-  - Cellular Automata
-  - Genetic Algorithms
-  - Neuroevolution
   - scientific computing
   - numerical methods
   definition: The application of computational models to simulate physical, biological,
@@ -453,30 +390,12 @@ domains:
   exclude:
   - data visualization
   - engineering practice
+  id: dom-022
 - canonical: systems & frameworks
   group: Systems, Semiotics & Knowledge
   raw:
-  - Systems Theory
-  - Systems Science
-  - Systems Analysis
-  - systems analysis
-  - Systems Design
-  - Systems Management
-  - System Dynamics
-  - System Design
-  - System Behavior
-  - System Architecture
-  - Complex Systems
   - General Systems Theory
-  - General Systems
-  - Cybernetics
-  - Systems Bible
-  - Systemantics
-  - Social Systems
-  - Family Systems
-  - Control Systems
   - Digital Systems
-  - Communication Systems
   - Financial Systems
   - Social Life
   - Social Life and Computational Models
@@ -488,80 +407,37 @@ domains:
   exclude:
   - design systems
   - information architecture
+  id: dom-023
 - canonical: semiotics & communication
   group: Systems, Semiotics & Knowledge
   raw:
-  - Visual Rhetoric
-  - visual rhetoric
-  - Peircean Semiotics
-  - Peircean semiotics
-  - biosemiotics
-  - cognitive semiotics
-  - social semiotics
-  - Social Semiotics
-  - sociosemiotics
-  - media semiotics
-  - history of semiotics
-  - Cognitive Linguistics
-  - Philosophy of Language
   - Umwelt theory
   - Communication
-  - Communication Studies
   - Communication Strategy
   - Business Communication
-  - Interpersonal Communication
   - Nonverbal Communication
   - Nonverbal Communication Analysis
   - body language
   - Body Language Analysis
-  - Visual Communication
-  - visual communication
   - Communication Design
   - sign systems
   definition: The study of signs, symbols, and visual rhetoric in human communication.
   exclude:
   - marketing communications
   - graphic design
-- canonical: research & methodology
+  id: dom-024
+- canonical: research practice
   group: Systems, Semiotics & Knowledge
   raw:
-  - Research Methods
-  - Research Design
   - Research Ethics
   - Academic Research
   - Academic Writing
   - Academic Publishing
-  - Qualitative Research Methodology
-  - Qualitative Research Methods
-  - qualitative research methodology
-  - qualitative research methods
   - quantitative research methodology
-  - Grounded Theory
-  - Ethnography
-  - ethnography
   - ethnomethodology
-  - Ethnomethodology
-  - Phenomenology
-  - Action Research
-  - Program Evaluation
   - Social Science Research
   - Social Science Research Methodology
-  - social science research methodology
   - Social Sciences
-  - social sciences
-  - Statistics
-  - statistics
-  - Data Analysis
-  - Data Science
-  - Probability Theory
-  - Information Theory
-  - Library Science
-  - Decision Science
-  - Epistemology
-  - epistemology
-  - philosophy of science
-  - Philosophy of Science
-  - evaluation research
   - survey research
   - experimental design
   definition: The design, ethics, and execution of academic and empirical research
@@ -569,11 +445,11 @@ domains:
   exclude:
   - user experience
   - science research
+  id: dom-025
 - canonical: education
   group: Systems, Semiotics & Knowledge
   raw:
   - education
-  - Education
   - Education Policy
   - Academia
   - instructional design
@@ -582,45 +458,29 @@ domains:
   - e-learning
   - training
   - educational technology
-  - Educational Technology
   definition: The design of instructional strategies, academic policy, and learning
     environments.
   exclude:
   - personal productivity
   - leadership
+  id: dom-026
 - canonical: health & wellness
   group: Systems, Semiotics & Knowledge
   raw:
-  - healthcare
-  - Healthcare
-  - Health and Wellness
-  - Health Promotion
-  - mental health
-  - therapy
-  - counseling
-  - psychopharmacology
-  - Kinesiology
-  - medicine
-  - public health
   - wellness
-  - clinical psychology
   - spirituality
   - psychedelic studies
   - wellbeing
   - public health policy
-  - Public Health Policy
   definition: The promotion of physical, mental, and public health through healthcare
     systems.
   exclude:
   - personal productivity
   - social sciences
+  id: dom-027
 - canonical: finance & investment
   group: Business & Strategy
   raw:
-  - Investment Management
-  - Portfolio Theory
-  - Financial Planning
-  - financial analysis
   - asset management
   - wealth management
   - fintech
@@ -628,6 +488,7 @@ domains:
   exclude:
   - business operations
   - business development
+  id: dom-028
 - canonical: marketing & communications
   group: Business & Strategy
   raw:
@@ -637,7 +498,6 @@ domains:
   - public relations
   - sensory marketing
   - pricing strategy
-  - Market Research
   - Social Media Marketing
   - Influencer Marketing
   - Consumer Psychology
@@ -646,14 +506,10 @@ domains:
   - Social Media
   - Collaborative Platforms
   - brand marketing
-  - Marketing
-  - marketing
-  - Marketing Strategy
   - Brand Management
   - Content Strategy
   - e-commerce
   - growth marketing
-  - marketing science
   - marketing analytics
   - product marketing
   - marketing research
@@ -673,21 +529,18 @@ domains:
   - direct marketing
   - search engine marketing
   - marketing management
-  - Marketing Management
   definition: Strategic promotion, public relations, and digital marketing for brand
     engagement.
   exclude:
   - brand identity
   - business development
+  id: dom-029
 - canonical: legal & public policy
   group: Business & Strategy
   raw:
-  - legal studies
   - public policy
   - Public Administration
-  - public administration
   - nonprofit management
-  - non-profit management
   - social entrepreneurship
   - community development
   - governance
@@ -697,19 +550,11 @@ domains:
   exclude:
   - business operations
   - urban planning
+  id: dom-030
 - canonical: science & research
   group: Systems, Semiotics & Knowledge
   raw:
-  - genetics
-  - Genetics
-  - Bioinformatics
-  - bioinformatics
   - biostatistics
-  - pharmacology
-  - Developmental Biology
-  - Conservation Biology
-  - Comparative Genomics
-  - Ethnobotany
   - Biological Systems
   - food science
   - psychometrics
@@ -718,18 +563,12 @@ domains:
   exclude:
   - computational science physics
   - research methodology
+  id: dom-031
 - canonical: arts & culture
   group: Visual Practice
   raw:
   - art
-  - Art
   - Visual Arts
-  - Art Theory
-  - Performance Art
-  - theatre
-  - music
-  - literature
-  - criticism
   - art criticism
   - museum studies
   - cultural heritage
@@ -737,24 +576,16 @@ domains:
   exclude:
   - illustration
   - graphic design
+  id: dom-032
 - canonical: engineering & infrastructure
   group: AI & Computing
   raw:
-  - Mechanical Engineering
-  - Aerospace Engineering
   - Cloud Computing
-  - cloud computing
   - distributed systems
   - internet technologies
   - real-time systems
-  - autonomous systems
-  - Quality Assurance
   - Information Technology
   - infrastructure
-  - Data Governance
-  - Data Management
-  - Cybersecurity
-  - cybersecurity
   - data engineering
   - IT operations
   definition: The design of mechanical, aerospace, and distributed cloud computing
@@ -762,31 +593,21 @@ domains:
   exclude:
   - engineering practice
   - urban planning
+  id: dom-033
 - canonical: media & entertainment
   group: Digital & Interactive
   raw:
   - game development
   - video game development
   - video games
-  - Media Technology
-  - Publishing
-  - Media Production
-  - Interactive Media
-  - virtual reality
-  - Virtual Reality
-  - visual effects
   - streaming
   - entertainment
-  - Digital Media
-  - digital media
-  - Digital Media Studies
-  - film studies
   - audio engineering
-  - Audio Engineering
   definition: The development of video games, media technology, and publishing platforms.
   exclude:
   - motion design
   - web design
+  id: dom-034
 - canonical: social sciences
   group: Systems, Semiotics & Knowledge
   raw:
@@ -795,35 +616,31 @@ domains:
   - criminology
   - social research
   - demography
-  - Anthropological Linguistics
   definition: The study of human society, criminology, demography, and social work.
   exclude:
   - organizational behavior
   - health wellness
+  id: dom-035
 - canonical: product design
   group: Digital & Interactive
   raw:
   - product design
-  - Product Design
   definition: The holistic design of physical and digital products from concept to
     market.
   exclude:
   - industrial design
   - digital product
+  id: dom-036
 - canonical: design strategy
   group: Business & Strategy
   raw:
   - practice strategy
-  - Practice Strategy
   - Design Strategy
-  - design strategy
   - Design Management
   - Design Process
-  - design process
   - Design Research
   - Design Research Investigation
   - Scoping
-  - scoping
   - Product Strategy
   - UX Strategy
   - Design Education
@@ -833,11 +650,11 @@ domains:
   exclude:
   - business development
   - project management
+  id: dom-037
 - canonical: project management
   group: Business & Strategy
   raw:
   - Project Management
-  - project management
   - Product Discovery
   - Supply Chain Management
   - Resource Management
@@ -847,32 +664,29 @@ domains:
   exclude:
   - business operations
   - leadership
+  id: dom-038
 - canonical: leadership
   group: Business & Strategy
   raw:
   - Leadership
-  - leadership
   - Organizational Leadership
   - Strategic Leadership
   - Conflict Resolution
   - Stakeholder Engagement
   - people management
-  - organizational leadership
   - leadership studies
   - creative management
-  - Creative Management
   definition: The practice of guiding teams, strategic direction, and organizational
     dynamics.
   exclude:
   - organizational behavior
   - personal productivity
+  id: dom-039
 - canonical: personal productivity
   group: Business & Strategy
   raw:
   - Personal Productivity
-  - personal productivity
   - personal development
-  - Personal Development
   - Personal Effectiveness
   - Time Management
   - Career Development
@@ -881,28 +695,27 @@ domains:
   - Professional Practice
   - Execution
   - Productivity
-  - productivity
   - Remote Work and Burnout Prevention
   definition: Individual techniques for personal development, effectiveness, and time
     management.
   exclude:
   - leadership
   - education
+  id: dom-040
 - canonical: industrial design
   group: Illustration & Craft
   raw:
   - industrial design
-  - Industrial Design
   definition: The design of manufactured physical products for mass production and
     usability.
   exclude:
   - packaging
   - product design
+  id: dom-041
 - canonical: information architecture
   group: Digital & Interactive
   raw:
   - Information Architecture
-  - information architecture
   - Information Architecture For the Web and Beyond
   - Information Design
   - Information Graphics
@@ -922,15 +735,13 @@ domains:
   exclude:
   - user experience
   - data visualization
+  id: dom-042
 - canonical: design systems
   group: Digital & Interactive
   raw:
   - Design Systems
-  - design systems
   - Design System
-  - design system
   - Atomic Design
-  - atomic design
   - Building Design Systems
   - Design That Scales
   - Design Systems Governance
@@ -940,12 +751,12 @@ domains:
   exclude:
   - web design
   - user experience
+  id: dom-043
 disciplines:
 - canonical: visual perception
   group: Perception & Signal
   raw:
   - Visual Perception
-  - visual perception
   - Visual Culture
   - visual design
   definition: The biological and psychological process of interpreting visual sensory
@@ -954,18 +765,15 @@ disciplines:
   - visual semiotics
   - color theory
   - neuroscience
+  id: disc-001
 - canonical: visual semiotics
   group: Perception & Signal
   raw:
   - Visual Semiotics
-  - visual semiotics
   - visual rhetoric
-  - Visual Rhetoric
   - Visual Communication
-  - visual communication
   - Visual Communication Design
   - Multimodal Metaphor
-  - multimodal metaphor
   - Multimodal Discourse Analysis
   definition: The study of how visual signs, symbols, and rhetoric communicate meaning
     within cultural contexts.
@@ -973,13 +781,12 @@ disciplines:
   - visual perception
   - typography
   - media studies
+  id: disc-002
 - canonical: cultural design
   group: Perception & Signal
   raw:
   - cultural design
-  - Cultural Design
   - Design History
-  - design history
   - Design Theory
   - Design History and Theory
   - Art History
@@ -989,11 +796,11 @@ disciplines:
   - cultural studies
   - design psychology
   - art history
+  id: disc-003
 - canonical: semiotics
   group: Perception & Signal
   raw:
   - semiotics
-  - Semiotics
   - Peircean Semiotics
   - biosemiotics
   - cognitive semiotics
@@ -1008,19 +815,14 @@ disciplines:
   - visual semiotics
   - linguistics
   - philosophy
+  id: disc-004
 - canonical: typography
   group: Form & Structure
   raw:
   - typography
-  - Typography
-  - Web Typography
-  - web typography
-  - typographic style
   - typographic design
-  - typographic history
   - typographic symbols
   - Typography History
-  - typography history
   - history of typography
   - history of type design
   - typeface design
@@ -1031,11 +833,11 @@ disciplines:
   - visual semiotics
   - graphic design
   - linguistics
+  id: disc-005
 - canonical: color theory
   group: Form & Structure
   raw:
   - Color Theory
-  - color theory
   - Color Psychology
   - Color and design
   - Color Theory & Layout
@@ -1045,16 +847,13 @@ disciplines:
   - visual perception
   - typography
   - aesthetics
+  id: disc-006
 - canonical: motion & time
   group: Form & Structure
   raw:
   - motion+time
   - Motion and Time
-  - Motion Graphics
-  - motion graphics
   - Motion Graphic Design
-  - Animation
-  - animation
   - Compositing
   - Design for Motion
   - Motion Graphics Software Interface
@@ -1068,16 +867,13 @@ disciplines:
   - computer graphics
   - game design
   - visual perception
+  id: disc-007
 - canonical: design psychology
   group: Design Cognition
   raw:
   - Design Psychology
-  - design psychology
   - Emotional Design
-  - emotional design
-  - Design Psychology
   - Persuasion
-  - persuasion
   definition: The exploitation of cognitive science's known loopholes — biases, heuristics,
     and predictable errors of human thinking — to externally affect, persuade, or
     manipulate a user's or consumer's decision-making, and designing for those biases.
@@ -1089,26 +885,21 @@ disciplines:
   - human-computer interaction
   - design thinking
   - aesthetics
+  id: disc-008
 - canonical: creative process
   group: Design Cognition
   raw:
   - practice execution
-  - Practice Execution
   - creative process
-  - Creative Process
   - Creative Process and Workflow
   - Creative Practice
   - Creative Problem Solving
   - Creativity
-  - creativity
   - Creative Resistance
   - Creative Work
   - Creative Direction
   - Innovation
-  - Innovation Management
-  - innovation management
   - Organizational Creativity
-  - execution
   - creativity research
   - creative thinking
   - ideation
@@ -1118,19 +909,17 @@ disciplines:
   - design thinking
   - creative coding
   - generative design
+  id: disc-009
 - canonical: cognitive science
   group: Behavioral & Cognitive
   raw:
   - Cognitive Science
-  - cognitive science
   - Cognitive Psychology
   - Cognitive Ergonomics
   - Cognitive Bias
   - Cognitive Load
   - Cognitive Load Management
-  - cognitive psychology
   - problem-solving
-  - problem solving
   - cognition
   - Cognitive Studies
   definition: The interdisciplinary study of how the mind works — perception, memory,
@@ -1144,27 +933,31 @@ disciplines:
   - design thinking
   - behavioral economics
   - human-computer interaction
+  id: disc-010
 - canonical: behavioral economics
   group: Behavioral & Cognitive
   raw:
   - Behavioral Economics
-  - behavioral economics
   - Behavioral Analysis
-  - behavioral analysis
   - Consumer Behavior
   - behavioural economics
-  definition: The descriptive study of how psychological factors and cognitive biases cause systematic deviations from the rational or standard model in economic decision-making, market behavior and behavior-change interventions - where heuristics, framing, affect, social norms and peer influence change what people do (prices, incentives, markets, choice of behavior). It describes the bias; it does not exploit it to design persuasion.
+  definition: The descriptive study of how psychological factors and cognitive biases
+    cause systematic deviations from the rational or standard model in economic decision-making,
+    market behavior and behavior-change interventions - where heuristics, framing,
+    affect, social norms and peer influence change what people do (prices, incentives,
+    markets, choice of behavior). It describes the bias; it does not exploit it to
+    design persuasion.
   exclude:
   - economics
   - psychology
   - cognitive science
   - design psychology
   - decision making
+  id: disc-011
 - canonical: organizational theory
   group: Behavioral & Cognitive
   raw:
   - Organizational Theory
-  - organizational theory
   - organization theory
   - organisational theory
   - organizational studies
@@ -1173,12 +966,15 @@ disciplines:
   exclude:
   - sociology
   - strategic thinking
-  - management
+  - business administration
+  id: disc-012
+  differentia: 'EXPLANATORY/POSITIVE lens: the organization is the OBJECT of inquiry
+    — how formal organizations are structured, coordinate, and change. Asks ''how
+    do they work?'', never ''how should I steer one?'''
 - canonical: decision making
   group: Behavioral & Cognitive
   raw:
   - Decision Making
-  - decision making
   - Decision Science
   - Decision Making and Creativity
   - Forecasting
@@ -1195,13 +991,12 @@ disciplines:
   - strategic thinking
   - behavioral economics
   - operations research
+  id: disc-013
 - canonical: psychology
   group: Behavioral & Cognitive
   raw:
   - Psychology
-  - psychology
   - Social Psychology
-  - Organizational Psychology
   - psychology of creativity
   - clinical psychology
   - behavioral psychology
@@ -1212,9 +1007,7 @@ disciplines:
   - developmental psychology
   - industrial-organizational psychology
   - environmental psychology
-  - Environmental Psychology
   - Creative Psychology
-  - creative psychology
   definition: The empirical study of mind and behavior in individuals and groups —
     emotion, personality, development, social behavior, and mental health — beyond
     the computational modelling of cognition. Broader and more behavioral than cognitive
@@ -1225,34 +1018,31 @@ disciplines:
   - sociology
   - design psychology
   - behavioral economics
+  id: disc-014
 - canonical: linguistics
   group: Behavioral & Cognitive
   raw:
   - Cognitive Linguistics
   - linguistics
-  - Linguistics
   - Philosophy of Language
-  - cognitive linguistics
   - computational linguistics
   - sociolinguistics
   - pragmatics
   - Rhetoric
-  - rhetoric
   definition: The scientific study of language structure, meaning, use, and its relationship
     to cognition.
   exclude:
   - semiotics
   - philosophy
   - communication theory
+  id: disc-015
 - canonical: strategic thinking
   group: Operational & Strategy
   raw:
   - Strategic Thinking
-  - strategic thinking
   - Strategic Management
   - Strategic Planning
   - Business Strategy
-  - business strategy
   - Corporate Strategy
   - Strategic Decision Making
   - strategy formulation
@@ -1264,11 +1054,11 @@ disciplines:
   - decision making
   - operations research
   - finance
+  id: disc-016
 - canonical: risk management
   group: Operational & Strategy
   raw:
   - Risk Management
-  - risk management
   - Quality Assurance
   - compliance
   - safety engineering
@@ -1279,13 +1069,12 @@ disciplines:
   - quality assurance
   - compliance
   - safety engineering
+  id: disc-017
 - canonical: systems thinking
   group: Systems & Method
   raw:
   - Systems Thinking
-  - systems thinking
   - Systems Theory
-  - systems theory
   - Systems Science
   - Systems Analysis
   - General Systems
@@ -1298,8 +1087,6 @@ disciplines:
   - Social Systems
   - Control Systems
   - Communication Systems
-  - Biological Systems
-  - system dynamics
   - cybernetics
   definition: An approach to understanding complex systems by analyzing their interrelationships
     and holistic behavior.
@@ -1307,17 +1094,16 @@ disciplines:
   - systems engineering
   - complex adaptive systems
   - engineering
+  id: disc-018
 - canonical: complex adaptive systems
   group: Systems & Method
   raw:
   - Complex Adaptive Systems
   - Complex Systems
-  - complex systems
   - Computational Models of Social Life
   - Computational Social Science
   - Computational Modeling
   - emergence
-  - Emergence
   - complex systems science
   - complex systems theory
   - complexity science
@@ -1328,11 +1114,11 @@ disciplines:
   - systems thinking
   - computational physics
   - social network analysis
+  id: disc-019
 - canonical: systems engineering
   group: Systems & Method
   raw:
   - Systems Engineering
-  - systems engineering
   - System Design
   - System Architecture
   - Systems Design
@@ -1347,11 +1133,11 @@ disciplines:
   - systems thinking
   - software engineering
   - engineering
+  id: disc-020
 - canonical: research methodology
   group: Systems & Method
   raw:
   - Research Methodology
-  - research methodology
   - Research Methods
   - Research Design
   - Qualitative Research
@@ -1366,8 +1152,6 @@ disciplines:
   - Exploratory Data Analysis
   - Statistical Graphics
   - Data Science
-  - biostatistics
-  - psychometrics
   - business analytics
   - statistical methods
   - evaluation research
@@ -1376,18 +1160,17 @@ disciplines:
   - qualitative research methodology
   - qualitative research methods
   - survey methodology
-  - Survey Methodology
   definition: The systematic frameworks and techniques used to conduct valid and reliable
     academic research.
   exclude:
   - information science
   - statistics
   - data management
+  id: disc-021
 - canonical: operations research
   group: Systems & Method
   raw:
   - Operations Research
-  - operations research
   - Probability Theory
   - Information Theory
   - Game Theory
@@ -1398,11 +1181,11 @@ disciplines:
   - strategic thinking
   - decision making
   - systems engineering
+  id: disc-022
 - canonical: machine learning
   group: AI & Computing
   raw:
   - Machine Learning
-  - machine learning
   - Machine Learning Engineering
   - Machine Learning Systems
   - Neural Networks
@@ -1414,20 +1197,18 @@ disciplines:
   - LLM Application Development
   - pattern recognition
   - supervised learning
-  - deep learning
   - reinforcement learning
-  - Reinforcement Learning
   definition: The field of artificial intelligence focused on algorithms that learn
     patterns from data.
   exclude:
   - artificial intelligence
   - generative ai
   - software engineering
+  id: disc-023
 - canonical: generative ai
   group: AI & Computing
   raw:
   - Generative AI
-  - generative ai
   - Generative AI Systems
   - Generative AI Engineering
   - Generative AI Infrastructure
@@ -1445,29 +1226,14 @@ disciplines:
   - machine learning
   - artificial intelligence
   - generative design
+  id: disc-024
 - canonical: software engineering
   group: AI & Computing
   raw:
   - Software Engineering
-  - software engineering
-  - Software Development
-  - Object-Oriented Programming
-  - Python Programming
-  - JavaScript Programming
-  - Web Development
   - Front-End Development
-  - Computer Science
-  - computer science
-  - Programming
   - Image Processing
-  - distributed systems
-  - real-time systems
-  - internet technologies
-  - cloud computing
-  - Cloud Computing
-  - Network Engineering
   - systems programming
-  - software architecture
   - DevOps
   - frontend web development
   definition: The systematic application of engineering principles to the design and
@@ -1476,11 +1242,11 @@ disciplines:
   - computer networking
   - information security
   - creative coding
+  id: disc-025
 - canonical: creative coding
   group: Computational Craft
   raw:
   - Creative Coding
-  - creative coding
   - Creative Programming
   - openFrameworks
   - Processing
@@ -1494,21 +1260,20 @@ disciplines:
   - software engineering
   - computer graphics
   - generative design
+  id: disc-026
 - canonical: generative design
   group: Computational Craft
   raw:
   - Generative Design
-  - generative design
   - Generative Art
-  - generative art
   - Computational Creativity
-  - computational creativity
   definition: The use of algorithms and computational processes to generate design
     solutions and artistic forms.
   exclude:
   - creative coding
   - generative ai
   - computer graphics
+  id: disc-027
 - canonical: computational physics & simulation
   group: Computational Craft
   raw:
@@ -1533,6 +1298,7 @@ disciplines:
   - theoretical physics
   - computational geometry
   - complex adaptive systems
+  id: disc-028
 - canonical: computational geometry
   group: Computational Craft
   raw:
@@ -1540,18 +1306,17 @@ disciplines:
   - Geometry
   - Geometry and Proportions
   - Mathematics
-  - mathematics
   definition: The mathematical study of algorithms for solving problems involving
     geometric objects and structures.
   exclude:
   - mathematics
   - computer graphics
   - computational physics
+  id: disc-029
 - canonical: game design
   group: Computational Craft
   raw:
   - Game Design
-  - game design
   - Game Studies
   - Interactive Design
   definition: The process of creating rules, mechanics, and interactive experiences
@@ -1560,35 +1325,26 @@ disciplines:
   - game studies
   - interactive design
   - computer graphics
+  id: disc-030
 - canonical: political economy
   group: Heterodox
   raw:
   - political economy
-  - Political Economy
   - geopolitical strategy
   - geopolitics
   - political science
-  - Political Science
   - political theory
   - economic analysis
   - economic history
-  - public policy
-  - Public Administration
-  - public administration
-  - nonprofit management
-  - non-profit management
-  - social entrepreneurship
-  - community development
-  - governance
   - public policy analysis
   - international relations
-  - International Relations
   definition: The study of the relationship between political institutions, economic
     systems, and power structures.
   exclude:
   - economics
   - political science
   - geopolitics
+  id: disc-031
 - canonical: privacy & surveillance
   group: Heterodox
   raw:
@@ -1610,56 +1366,49 @@ disciplines:
   - information security
   - law
   - cybersecurity
+  id: disc-032
 - canonical: philosophy
   group: Heterodox
   raw:
   - Philosophy
-  - philosophy
   - Epistemology
-  - epistemology
   - Philosophy of Science
-  - philosophy of science
   - Phenomenology
-  - phenomenology
   - Ethics
   - philosophy of mind
   - philosophy of technology
   - business ethics
-  - ethics
   - moral philosophy
   - design ethics
   - artificial intelligence ethics
   - bioethics
-  - Bioethics
   - formal logic
-  - Formal Logic
   definition: The study of fundamental questions concerning existence, knowledge,
     values, reason, and mind.
   exclude:
   - epistemology
   - philosophy of science
   - aesthetics
+  id: disc-033
 - canonical: artificial intelligence
   group: AI & Computing
   raw:
   - Artificial Intelligence
-  - artificial intelligence
   - AI
   - AGI
   - general intelligence
   - AI safety
-  - AI Safety
   definition: The broad field of creating systems capable of performing tasks that
     typically require human intelligence.
   exclude:
   - machine learning
   - robotics
   - computational theory
+  id: disc-034
 - canonical: communication theory
   group: Perception & Signal
   raw:
   - communication theory
-  - Communication Theory
   - Multimodal Communication
   - communications
   - Communication Studies
@@ -1671,6 +1420,7 @@ disciplines:
   - media studies
   - linguistics
   - visual semiotics
+  id: disc-035
 - canonical: human-computer interaction
   group: Design Cognition
   raw:
@@ -1678,7 +1428,6 @@ disciplines:
   - HCI
   - User Experience (UX) Design
   - virtual reality
-  - Virtual Reality
   - VR
   - interactive systems
   - interaction design
@@ -1690,6 +1439,7 @@ disciplines:
   - design psychology
   - software engineering
   - virtual reality
+  id: disc-036
 - canonical: interdisciplinary studies
   group: Heterodox
   raw:
@@ -1704,29 +1454,28 @@ disciplines:
   - multidisciplinary
   - transdisciplinary
   - cultural studies
+  id: disc-037
 - canonical: information science
   group: Systems & Method
   raw:
   - Information Science
-  - information science
   - Knowledge Management
   - Data Governance
   - Data Management
   - bioinformatics
   - information studies
   - library science
-  - information visualization
   definition: The study of the collection, organization, and management of information
     and data systems.
   exclude:
   - information retrieval
   - data management
   - computer networking
+  id: disc-038
 - canonical: finance
   group: Operational & Strategy
   raw:
   - Finance
-  - finance
   - Investment Management
   - Portfolio Theory
   - Financial Planning
@@ -1739,11 +1488,11 @@ disciplines:
   - economics
   - strategic thinking
   - risk management
+  id: disc-039
 - canonical: economics
   group: Operational & Strategy
   raw:
   - Economics
-  - economics
   - Educational Economics
   - Human Capital Economics
   - Labor Economics
@@ -1756,7 +1505,6 @@ disciplines:
   - auction theory
   - business economics
   - econometrics
-  - Econometrics
   - macroeconomics
   definition: The social science that studies the production, distribution, and consumption
     of goods and services.
@@ -1764,34 +1512,30 @@ disciplines:
   - finance
   - political economy
   - behavioral economics
+  id: disc-040
 - canonical: sociology
   group: Heterodox
   raw:
   - Sociology
-  - sociology
   - Sociology of Professions
-  - social science
-  - Social Work
   - social theory
   - sociological theory
   - Sociology of Work and Organizations
   - sociology of work
   - sociology of science
   - social movement theory
-  - Social Movement Theory
   definition: The scientific study of society, social institutions, and the patterns
     of human interaction.
   exclude:
   - anthropology
   - cultural studies
   - psychology
+  id: disc-041
 - canonical: anthropology
   group: Heterodox
   raw:
   - anthropology
-  - Anthropology
   - ethnobotany
-  - Ethnobotany
   - Anthropology of Religion
   - Anthropological Linguistics
   - cultural anthropology
@@ -1801,11 +1545,11 @@ disciplines:
   - sociology
   - cultural studies
   - archaeology
+  id: disc-042
 - canonical: cultural studies
   group: Heterodox
   raw:
   - cultural studies
-  - Cultural Studies
   - culture studies
   - cultural theory
   definition: The critical analysis of cultural practices, texts, and power relations
@@ -1815,13 +1559,12 @@ disciplines:
   - anthropology
   - sociology
   - media studies
+  id: disc-043
 - canonical: theoretical physics
   group: Systems & Method
   raw:
   - Theoretical Physics
-  - theoretical physics
   - Quantum Mechanics
-  - quantum mechanics
   - particle physics
   - physics
   definition: The branch of physics focused on mathematical models and abstract theories
@@ -1830,13 +1573,12 @@ disciplines:
   - computational physics
   - engineering
   - quantum mechanics
+  id: disc-044
 - canonical: aesthetics
   group: Design Cognition
   raw:
   - Aesthetics
-  - aesthetics
   - art theory
-  - Art Theory
   - neuroaesthetics
   - philosophy of art
   definition: The philosophical study of beauty, taste, and the nature of artistic
@@ -1845,11 +1587,11 @@ disciplines:
   - art theory
   - philosophy
   - design psychology
+  id: disc-045
 - canonical: media studies
   group: Perception & Signal
   raw:
   - Media Studies
-  - media studies
   - Digital Media Studies
   - Media Technology
   - Digital Media
@@ -1863,11 +1605,11 @@ disciplines:
   - communication theory
   - cultural studies
   - visual semiotics
+  id: disc-046
 - canonical: computer graphics
   group: Computational Craft
   raw:
   - computer graphics
-  - Computer Graphics
   - visual effects
   - rendering
   - image synthesis
@@ -1878,31 +1620,29 @@ disciplines:
   - computer vision
   - creative coding
   - motion & time
+  id: disc-047
 - canonical: law
   group: Heterodox
   raw:
   - law
-  - Law
   - Intellectual Property Law
   - legal studies
   - Privacy Law
   - jurisprudence
   - legal theory
   - constitutional law
-  - Constitutional Law
   definition: The system of rules created by society or government to regulate behavior
     and resolve disputes.
   exclude:
   - political science
   - philosophy
   - privacy & surveillance
+  id: disc-048
 - canonical: information security
   group: Heterodox
   raw:
   - Information Security
-  - information security
   - Cybersecurity
-  - cybersecurity
   - network security
   - infosec
   - computer security
@@ -1912,21 +1652,20 @@ disciplines:
   - privacy & surveillance
   - computer networking
   - software engineering
+  id: disc-049
 - canonical: ecology
   group: Systems & Method
   raw:
   - Ecology
-  - ecology
   definition: The scientific study of the relationships between organisms and their
     physical and biological environments.
   exclude: []
+  id: disc-050
 - canonical: evolutionary biology
   group: Systems & Method
   raw:
   - Evolutionary Biology
-  - evolutionary biology
   - genetics
-  - Genetics
   - Comparative Genomics
   - Developmental Biology
   - Conservation Biology
@@ -1938,11 +1677,11 @@ disciplines:
   - genetics
   - complex adaptive systems
   - theoretical physics
+  id: disc-051
 - canonical: social network analysis
   group: Systems & Method
   raw:
   - social network analysis
-  - Social Network Analysis
   - network theory
   - network science
   - graph theory applications
@@ -1952,13 +1691,12 @@ disciplines:
   - complex adaptive systems
   - sociology
   - computational geometry
+  id: disc-052
 - canonical: neuroscience
   group: Behavioral & Cognitive
   raw:
   - neuroscience
-  - Neuroscience
   - neurology
-  - Neurology
   - cognitive neuroscience
   - neurobiology
   - psychoneuroimmunology
@@ -1968,11 +1706,11 @@ disciplines:
   - cognitive science
   - psychology
   - health & medicine
+  id: disc-053
 - canonical: robotics
   group: AI & Computing
   raw:
   - robotics
-  - Robotics
   - autonomous systems
   - mechatronics
   - robot control
@@ -1982,11 +1720,11 @@ disciplines:
   - artificial intelligence
   - software engineering
   - systems engineering
+  id: disc-054
 - canonical: health & medicine
   group: Heterodox
   raw:
   - healthcare
-  - Healthcare
   - Health and Wellness
   - Health Promotion
   - mental health
@@ -2003,15 +1741,14 @@ disciplines:
   - neuroscience
   - psychology
   - public health
+  id: disc-055
 - canonical: performing arts
   group: Heterodox
   raw:
   - music
-  - Music
   - theatre
   - theater
   - performance art
-  - Performance Art
   - drama
   - musical composition
   - performance studies
@@ -2021,11 +1758,11 @@ disciplines:
   - literary theory
   - cultural studies
   - aesthetics
+  id: disc-056
 - canonical: literary theory
   group: Perception & Signal
   raw:
   - literature
-  - Literature
   - literary theory
   - criticism
   - literary criticism
@@ -2037,6 +1774,7 @@ disciplines:
   - cultural studies
   - philosophy
   - media studies
+  id: disc-057
 - canonical: engineering
   group: Systems & Method
   raw:
@@ -2049,18 +1787,17 @@ disciplines:
   - design engineering
   - computer architecture
   - manufacturing engineering
-  - Manufacturing Engineering
   definition: The application of scientific principles to design, build, and maintain
     structures and machines.
   exclude:
   - systems engineering
   - software engineering
   - theoretical physics
+  id: disc-058
 - canonical: design thinking
   group: Design Cognition
   raw:
   - design thinking
-  - Design Thinking
   definition: A human-centered approach to innovation — an iterative process (empathise
     → define → ideate → prototype → test) that integrates user needs, technology feasibility,
     and business viability, whose output is a designed solution, not an explanation
@@ -2070,30 +1807,90 @@ disciplines:
   - design psychology
   - cognitive science
   - strategic thinking
+  id: disc-059
 - canonical: information retrieval
   group: AI & Computing
   raw:
   - information retrieval
-  - Information Retrieval
   definition: The field of finding unstructured information, typically from documents,
     in response to queries.
   exclude:
   - information science
   - machine learning
   - database systems
+  id: disc-060
 - canonical: computational theory
   group: AI & Computing
   raw:
   - computational theory
-  - Computational Theory
   - theory of computation
-  - Theory of Computation
   definition: The study of the theoretical foundations of computation, including complexity
     and computability.
   exclude:
   - software engineering
   - artificial intelligence
   - computer networking
+  id: disc-061
+- canonical: business administration
+  group: Business & Management
+  raw:
+  - business administration
+  - organisational management
+  - organizational management
+  - business management
+  - administration
+  definition: The academic study of how organizations are structured, coordinated,
+    and governed — spanning strategy, operations, human-resource management, and organizational
+    design — to achieve objectives under resource constraints. A management lens applied
+    across subject-matter domains (business operations, business development, project
+    management), not the subject matter itself.
+  exclude:
+  - organizational theory
+  - strategic thinking
+  - decision making
+  - risk management
+  id: disc-062
+  differentia: 'PRESCRIPTIVE/NORMATIVE lens: the managerial FUNCTION is the OBJECT
+    — how to steer an organization toward objectives under resource constraints (strategy,
+    operations, HR, organizational design). Asks ''how should I run it?'', never ''how
+    does it naturally work?'''
+- canonical: marketing
+  group: Business & Management
+  raw:
+  - marketing
+  - marketing science
+  - consumer behaviour
+  - market research
+  - marketing strategy
+  definition: The academic study of how value is created, communicated, and exchanged
+    with customers — spanning consumer behavior, market segmentation, positioning,
+    and marketing research. The explanatory lens on buyer behavior and market exchange,
+    distinct from the professional practice domain "marketing & communications".
+  exclude:
+  - behavioral economics
+  - psychology
+  - economics
+  - communication theory
+  id: disc-063
+- canonical: entrepreneurship studies
+  group: Business & Management
+  raw:
+  - entrepreneurship studies
+  - entrepreneurial studies
+  - venture creation
+  - new venture creation
+  - startup studies
+  - innovation management
+  definition: The academic study of how new ventures are identified, created, and
+    scaled — spanning opportunity recognition, resource mobilization, and entrepreneurial
+    finance. The scholarly lens on the venture-creation process, distinct from the
+    venture-building subject matter of the domain "entrepreneurship".
+  exclude:
+  - business administration
+  - strategic thinking
+  - economics
+  - finance
+  id: disc-064
 discipline_groups:
   design & visual arts:
   - aesthetics
@@ -2130,9 +1927,12 @@ discipline_groups:
   - privacy & surveillance
   - software engineering
   economics & business:
+  - business administration
   - decision making
   - economics
+  - entrepreneurship studies
   - finance
+  - marketing
   - organizational theory
   - political economy
   - strategic thinking
@@ -2179,13 +1979,15 @@ meta:
 
     '
   menu_repair_20260921_added_domains: []
-  menu_repair_20260921_result: 'no-op - all 8 proposed gap domains already existed in v5.5,
-    so NO slot was added and the version is NOT bumped; the v6.0 string was an audit marker
-    written by scripts/apply_menu_repair_v6.py and reverted by D-309. Ontology bytes are
-    unchanged from v5.5 (see governance/TAXONOMY_v6_MIGRATION_20260921.md).'
+  menu_repair_20260921_result: no-op - all 8 proposed gap domains already existed
+    in v5.5, so NO slot was added and the version is NOT bumped; the v6.0 string was
+    an audit marker written by scripts/apply_menu_repair_v6.py and reverted by D-309.
+    Ontology bytes are unchanged from v5.5 (see governance/TAXONOMY_v6_MIGRATION_20260921.md).
   be_definition_widened_20260921:
     decision: D-321
     slots_added: 0
     denotation_not_spelling: true
     sha256_before: 8d3c90e949ab1988e097c9fc58c80b6f4279477c9651436dddf4d8ffa91d3ae0
-    note: 'behavioral economics definition widened to name the mechanism class (heuristics, framing, affect, social norms, peer influence) and the second object class (behavior-change interventions); excludes unchanged; fixes BUG-357 (row 60).'
+    note: behavioral economics definition widened to name the mechanism class (heuristics,
+      framing, affect, social norms, peer influence) and the second object class (behavior-change
+      interventions); excludes unchanged; fixes BUG-357 (row 60).

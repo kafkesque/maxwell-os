@@ -1,0 +1,68 @@
+{
+  "artifact_id": "discipline_macro_conditionA_20261003",
+  "schema_version": "1.0",
+  "decision": "D-2797",
+  "condition": "A (collapse of committed fbs.discipline -> 3-way macro)",
+  "scheme": "3-way",
+  "model": "gpt-oss-20b-MXFP4-Q8 (committed classifier-of-record, fbs.discipline)",
+  "n": 204,
+  "raw_agreement": 0.7255,
+  "cohen_kappa": 0.5534,
+  "human_ceiling_3way": 0.766,
+  "ship_threshold": 0.65,
+  "verdict": "BELOW ship threshold \u2014 collapse alone insufficient; 16 off-menu emerging abstentions (7.8%) all wrong",
+  "gold_dist": {
+    "Human & Design": 114,
+    "Technical": 34,
+    "Method & Business": 55,
+    "emerging": 1
+  },
+  "pred_dist": {
+    "Human & Design": 108,
+    "Method & Business": 47,
+    "Technical": 33,
+    "emerging": 16
+  },
+  "confusion_matrix_gold_rows_pred_cols": {
+    "Human & Design": {
+      "Human & Design": 87,
+      "Method & Business": 10,
+      "Technical": 5,
+      "emerging": 12
+    },
+    "Technical": {
+      "Technical": 26,
+      "Method & Business": 2,
+      "Human & Design": 5,
+      "emerging": 1
+    },
+    "Method & Business": {
+      "Method & Business": 35,
+      "Human & Design": 15,
+      "emerging": 3,
+      "Technical": 2
+    },
+    "emerging": {
+      "Human & Design": 1
+    }
+  },
+  "off_menu_emerging_preds_wrong": [
+    "R036",
+    "R041",
+    "R045",
+    "R046",
+    "R052",
+    "R071",
+    "R072",
+    "R081",
+    "R095",
+    "R111",
+    "R122",
+    "R146",
+    "R167",
+    "R169",
+    "R185",
+    "R193"
+  ],
+  "n_off_menu_emerging_wrong": 16
+}

@@ -114,23 +114,19 @@ def derive(cfg: dict[str, Any]) -> dict[str, Any]:
         1 for r in derived_sheet if not norm(r.get(cfg["axes"]["depth"]["column"]))
     )
 
-    # The disowned axis: cohort size and BOTH joins into the anchor.
+    # Domains axis is now OWNED (D-2720): the 208-row five-axis view carries the domain +
+    # primary_domain columns directly, so the cohort IS the CSV (no JSONL join into the 150).
     dom_cfg = cfg["axes"]["domains"]
-    cohort = read_jsonl(REPO / dom_cfg["artifact"])
+    cohort = read_csv_rows(REPO / dom_cfg["artifact"])
     out["domains_cohort"] = len(cohort)
     out["domains_cohort_human_adjudicated"] = sum(
-        1 for d in cohort if d.get("domains_status") == "human-adjudicated"
+        1 for d in cohort if (d.get("domain") or "").strip()
+    )
+    out["domains_primary_domain_filled"] = sum(
+        1 for d in cohort if (d.get("primary_domain") or "").strip()
     )
     key_rows = json.loads((REPO / "governance" / "ruler_sheet_key_20260917.json").read_text(encoding="utf-8"))
     fb_by_item = {r["item_id"]: r.get("fb_id") for r in key_rows}
-    name_by_item = {r["item_id"]: (r.get("name") or "").strip() for r in key_rows}
-    cohort_fb = {d.get(dom_cfg["cohort_artifact_key"]) for d in cohort}
-    cohort_names = {(d.get("name") or "").strip() for d in cohort}
-    hits_fb = sorted(item for item, fb in fb_by_item.items() if fb in cohort_fb)
-    hits_name = sorted(item for item, nm in name_by_item.items() if nm in cohort_names)
-    out["domains_intersection_default_key"] = len(hits_fb)
-    out["domains_intersection_alternate_key"] = len(hits_name)
-    out["domains_intersection_rows"] = hits_fb
 
     # Machine-side observations about the anchor rows (NOT owner labels).
     machine = cfg["machine_observations"]
@@ -181,10 +177,7 @@ def compare(cfg: dict[str, Any], got: dict[str, Any]) -> list[str]:
     dom = cfg["axes"]["domains"]
     need("domains_cohort", dom["cohort"])
     need("domains_cohort_human_adjudicated", dom["cohort_human_adjudicated"])
-    need("domains_intersection_default_key", dom["intersection_default_key"])
-    need("domains_intersection_alternate_key", dom["intersection_alternate_key"])
-    if got["domains_intersection_rows"] != sorted(dom["intersection_rows"]):
-        bad.append(f"domains_intersection_rows: config={sorted(dom['intersection_rows'])} measured={got['domains_intersection_rows']}")
+    need("domains_primary_domain_filled", dom["primary_domain_filled"])
     for key in (
         "anchor_domains_rows_with_values",
         "anchor_domains_tokens",
@@ -225,8 +218,8 @@ def main() -> int:
         f"owned axes CT/DISC/ET {got['anchor_filled_content_type']}/"
         f"{got['anchor_filled_discipline']}/{got['anchor_filled_extraction_type']} | "
         f"depth blind {got['derived_sheet_depth_blank']}/{got['derived_sheet_rows']} | "
-        f"domains DISOWNED cohort {got['domains_cohort']} intersection "
-        f"{got['domains_intersection_default_key']}/{got['anchor_rows']} {got['domains_intersection_rows']}"
+        f"domains OWNED cohort {got['domains_cohort']} "
+        f"primary_domain_filled {got['domains_primary_domain_filled']}/{got['domains_cohort']}"
     )
     return 0
 

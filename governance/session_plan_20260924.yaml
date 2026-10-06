@@ -17,8 +17,10 @@ may_touch:
   - governance/bug_status.json
   - config/*.yaml
   - config/*.json
+  - config/closed_menu_v7.sha256                    # D-2856: pin companion to closed_menu_v7.json (not matched by *.json/*.yaml)
   - scripts/*.py
   - governance/buglog.md
+  - governance/taxonomy_v7_migration.json           # D-2856: v7 migration report (source-of-truth, not matched by existing globs)
   - governance/bug_status.json
   - governance/bug_status.md
   - governance/SESSION-HANDOFF-*.md
@@ -135,6 +137,16 @@ may_touch:
   # DEPTH_BLIND_SHEET) keep their lock, untouched.
   - governance/OWNER_GATE_BUG528_20261003.md
   - pipeline/**                 # D-2801: pipeline code is ordinary code (R5 review + D-naming + fingerprint)
+  - config/*.ttl
+  - governance/ONTOLOGY_ENFORCEMENT_*.md
+  - governance/rederive_v6_*
+  - governance/d2767_ab_*
+  - governance/domain_cardinality_*.json
+  - governance/closed_menu_v6_reference.csv
+  - governance/Surveillance Capitalism and Soviet Discourse.csv
+  - research/*.md
+  - scripts/*.sh
+
 will_not_touch:
   - governance/F11_*            # owner instruments (write-locked)
   - governance/ANCHOR_RULER_CONSOLIDATED_*.csv
@@ -649,3 +661,20 @@ widening_log:
       code) and granted in may_touch (ordinary code), governed by R5 generator!=verifier review + D-naming +
       stage_code_fingerprint (BUG-614). Owner instruments (F11_*, ANCHOR_RULER, DEPTH_BLIND_SHEET) keep their
       lock, untouched. Unblocks the 20 pipeline files for commit and the S4 rerun.
+  - entry: 28
+    session: '20261007A'
+    owner_ack: 'GRANTED 2026-10-07 (owner: "implement the next critical steps in strategically consequential order ... update and sync gov dependencies")'
+    widened:
+      - config/*.ttl
+      - governance/ONTOLOGY_ENFORCEMENT_*.md
+      - governance/rederive_v6_*
+      - governance/d2767_ab_*
+      - governance/domain_cardinality_*.json
+      - governance/closed_menu_v6_reference.csv
+      - governance/Surveillance Capitalism and Soviet Discourse.csv
+      - research/*.md
+      - scripts/*.sh
+    may_touch_untouched: false
+    will_not_touch_untouched: true
+    why: 'anti-circle backlog commit (D-2826..D-2859): 28 v7/rederive/A-B artifacts produced over the prior 2 weeks but never declared in may_touch. Declaring them homes the artifacts (the exact drift the session-plan gate + BUG-563 exist to catch); nothing in will_not_touch is touched.'
+

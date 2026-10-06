@@ -5,7 +5,7 @@
 # a repoint to the one decode home. Both numbers are a MEASUREMENT; `ceiling.debt` is SHRINK-ONLY (D-2642), and an
 # entry with no measured site is reported STALE rather than left to rot (BUG-424 class).
 schema_version: '1.0'
-decided: BUG-518
+decided: D-2809
 home: scripts/lib/artifact_encoding.py          # the ONE place a byte-level repair is allowed to be replaced by a declaration
 rail: scripts/check_silent_repair.py
 scan_roots: [scripts, pipeline, tools]          # tools/ was OUTSIDE the first census and is audited by this rail now

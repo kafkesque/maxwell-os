@@ -92,6 +92,7 @@ OMLX_RETRY_DELAY = int(_CFG.get("services", {}).get("omlx", {}).get("retry_delay
 OMLX_COLD_RELOAD_DELAY = int(_CFG.get("services", {}).get("omlx", {}).get("cold_reload_delay", 45))  # D2301: reasoning-model cold reload wait
 OMLX_READ_TIMEOUT = int(_CFG.get("services", {}).get("omlx", {}).get("read_timeout", 60))  # BUG-224: per-read socket timeout — bounds a wedged/stalled server (decode collapse) that otherwise hangs beyond default_timeout
 OMLX_WEDGE_RECOVERY_SLEEP = int(_CFG.get("services", {}).get("omlx", {}).get("wedge_recovery_sleep", 20))  # BUG-224: recovery sleep after a mid-response wedge (server needs 15-60s to recover)
+OMLX_WALL_CLOCK_DEADLINE = int(_CFG.get("services", {}).get("omlx", {}).get("wall_clock_deadline_sec", 180))  # BUG-658: TOTAL wall-clock deadline per request — SSE keepalive resets the per-read timer, so a (connect, read) tuple alone can hang forever
 # D2187: OMLX circuit breaker (P1-3) — config-driven, no hardcoding
 OMLX_CB_ENABLED = bool(_CFG.get("services", {}).get("omlx", {}).get("circuit_breaker_enabled", True))
 OMLX_CB_FAILURE_THRESHOLD = int(_CFG.get("services", {}).get("omlx", {}).get("circuit_breaker_failure_threshold", 5))
@@ -225,6 +226,13 @@ S4_BOUNDARY_PATH = _CFG.get("stage4", {}).get("boundary_path", "config/boundary_
 # D-2773 (2026-10-02): closed 62-discipline menu injection (BUG-622 fix, MEASURE-gated).
 S4_DISCIPLINE_CLOSED_MENU_ENABLED = bool(_CFG.get("stage4", {}).get("discipline_closed_menu_enabled", False))
 S4_DISCIPLINE_NEGATIVE_EXEMPLARS_PATH = _CFG.get("stage4", {}).get("discipline_negative_exemplars_path", "config/golden/discipline_negative_exemplars.yaml")
+# D-2814 (2026-10-05): definition-anchored closed menu (label + definition + explicit 'emerging').
+# Replaces the free-generation discipline/domains instruction in the merged + direct S4 classify
+# prompts. OFF by default; adopt only after R5 review + full-204 A/B (D-2767).
+S4_DEFINITION_ANCHORED_MENU_ENABLED = bool(_CFG.get("stage4", {}).get("definition_anchored_menu_enabled", False))
+# D-2814/BUG-630: curated same-axis fall-through crosswalk. When a raw label is canonical on the OPPOSITE
+# axis, retry a declared SAME-axis home before abstaining (never coerces: only a curated key rescues).
+S4_SAME_AXIS_FALLTHROUGH = _CFG.get("stage4", {}).get("same_axis_fallthrough", {}) or {}
 S4_MAX_PRINCIPLES=int(_CFG["stage4"]["max_principles_per_cluster"])
 # BUG-075/D2247: Depth split into SHORT focused prompt (proven 62.5% vs 38% long combined).
 S4_DEPTH_FOCUSED_CLASSIFICATION=bool(_CFG.get("stage4", {}).get("depth_focused_classification", True))

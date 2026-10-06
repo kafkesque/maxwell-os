@@ -1,0 +1,2515 @@
+{
+  "source": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/config/taxonomy_v5.yaml",
+  "output": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/config/taxonomy_v7.yaml",
+  "schema": "taxonomy v7",
+  "disciplines": 64,
+  "domains": 43,
+  "deduped_raw": 202,
+  "partition_resolutions": 178,
+  "canonical_renames": [
+    "rename: domains 'research & methodology' -> 'research practice'"
+  ],
+  "discriminator_edits": [
+    "organizational theory: discriminator set (explanatory lens; excludes BA)",
+    "business administration: discriminator set (prescriptive lens; excludes OT)"
+  ],
+  "partition_log": [
+    {
+      "raw": "visual rhetoric",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-002",
+      "owner_canonical": "visual semiotics",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-024",
+          "canonical": "semiotics & communication"
+        }
+      ]
+    },
+    {
+      "raw": "Visual Communication",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-002",
+      "owner_canonical": "visual semiotics",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-024",
+          "canonical": "semiotics & communication"
+        }
+      ]
+    },
+    {
+      "raw": "Peircean Semiotics",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-004",
+      "owner_canonical": "semiotics",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-024",
+          "canonical": "semiotics & communication"
+        }
+      ]
+    },
+    {
+      "raw": "biosemiotics",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-004",
+      "owner_canonical": "semiotics",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-024",
+          "canonical": "semiotics & communication"
+        }
+      ]
+    },
+    {
+      "raw": "cognitive semiotics",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-004",
+      "owner_canonical": "semiotics",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-024",
+          "canonical": "semiotics & communication"
+        }
+      ]
+    },
+    {
+      "raw": "social semiotics",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-004",
+      "owner_canonical": "semiotics",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-024",
+          "canonical": "semiotics & communication"
+        }
+      ]
+    },
+    {
+      "raw": "sociosemiotics",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-004",
+      "owner_canonical": "semiotics",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-024",
+          "canonical": "semiotics & communication"
+        }
+      ]
+    },
+    {
+      "raw": "media semiotics",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-004",
+      "owner_canonical": "semiotics",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-024",
+          "canonical": "semiotics & communication"
+        }
+      ]
+    },
+    {
+      "raw": "history of semiotics",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-004",
+      "owner_canonical": "semiotics",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-024",
+          "canonical": "semiotics & communication"
+        }
+      ]
+    },
+    {
+      "raw": "Web Typography",
+      "owner_axis": "domains",
+      "owner_id": "dom-009",
+      "owner_canonical": "web & ui",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "disciplines",
+          "id": "disc-005",
+          "canonical": "typography"
+        }
+      ]
+    },
+    {
+      "raw": "typographic style",
+      "owner_axis": "domains",
+      "owner_id": "dom-001",
+      "owner_canonical": "graphic design",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "disciplines",
+          "id": "disc-005",
+          "canonical": "typography"
+        }
+      ]
+    },
+    {
+      "raw": "typographic history",
+      "owner_axis": "domains",
+      "owner_id": "dom-001",
+      "owner_canonical": "graphic design",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "disciplines",
+          "id": "disc-005",
+          "canonical": "typography"
+        }
+      ]
+    },
+    {
+      "raw": "Color Psychology",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-006",
+      "owner_canonical": "color theory",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-001",
+          "canonical": "graphic design"
+        }
+      ]
+    },
+    {
+      "raw": "Motion Graphics",
+      "owner_axis": "domains",
+      "owner_id": "dom-004",
+      "owner_canonical": "motion design",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "disciplines",
+          "id": "disc-007",
+          "canonical": "motion & time"
+        }
+      ]
+    },
+    {
+      "raw": "Animation",
+      "owner_axis": "domains",
+      "owner_id": "dom-004",
+      "owner_canonical": "motion design",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "disciplines",
+          "id": "disc-007",
+          "canonical": "motion & time"
+        }
+      ]
+    },
+    {
+      "raw": "Film Studies",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-007",
+      "owner_canonical": "motion & time",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-034",
+          "canonical": "media & entertainment"
+        }
+      ]
+    },
+    {
+      "raw": "Innovation",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-009",
+      "owner_canonical": "creative process",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-013",
+          "canonical": "business operations"
+        }
+      ]
+    },
+    {
+      "raw": "Innovation Management",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-064",
+      "owner_canonical": "entrepreneurship studies",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "disciplines",
+          "id": "disc-009",
+          "canonical": "creative process"
+        },
+        {
+          "axis": "domains",
+          "id": "dom-013",
+          "canonical": "business operations"
+        }
+      ]
+    },
+    {
+      "raw": "execution",
+      "owner_axis": "domains",
+      "owner_id": "dom-040",
+      "owner_canonical": "personal productivity",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "disciplines",
+          "id": "disc-009",
+          "canonical": "creative process"
+        }
+      ]
+    },
+    {
+      "raw": "Consumer Behavior",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-011",
+      "owner_canonical": "behavioral economics",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "disciplines",
+          "id": "disc-063",
+          "canonical": "marketing"
+        }
+      ]
+    },
+    {
+      "raw": "Decision Science",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-013",
+      "owner_canonical": "decision making",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-025",
+          "canonical": "research practice"
+        }
+      ]
+    },
+    {
+      "raw": "Organizational Psychology",
+      "owner_axis": "domains",
+      "owner_id": "dom-016",
+      "owner_canonical": "organizational behavior",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "disciplines",
+          "id": "disc-014",
+          "canonical": "psychology"
+        }
+      ]
+    },
+    {
+      "raw": "clinical psychology",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-014",
+      "owner_canonical": "psychology",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-027",
+          "canonical": "health & wellness"
+        }
+      ]
+    },
+    {
+      "raw": "Cognitive Linguistics",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-015",
+      "owner_canonical": "linguistics",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-024",
+          "canonical": "semiotics & communication"
+        }
+      ]
+    },
+    {
+      "raw": "Philosophy of Language",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-015",
+      "owner_canonical": "linguistics",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-024",
+          "canonical": "semiotics & communication"
+        }
+      ]
+    },
+    {
+      "raw": "Strategic Management",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-016",
+      "owner_canonical": "strategic thinking",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-013",
+          "canonical": "business operations"
+        }
+      ]
+    },
+    {
+      "raw": "Business Strategy",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-016",
+      "owner_canonical": "strategic thinking",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-013",
+          "canonical": "business operations"
+        }
+      ]
+    },
+    {
+      "raw": "Corporate Strategy",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-016",
+      "owner_canonical": "strategic thinking",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-013",
+          "canonical": "business operations"
+        }
+      ]
+    },
+    {
+      "raw": "Quality Assurance",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-017",
+      "owner_canonical": "risk management",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-033",
+          "canonical": "engineering & infrastructure"
+        }
+      ]
+    },
+    {
+      "raw": "Systems Theory",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-018",
+      "owner_canonical": "systems thinking",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-023",
+          "canonical": "systems & frameworks"
+        }
+      ]
+    },
+    {
+      "raw": "Systems Science",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-018",
+      "owner_canonical": "systems thinking",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-023",
+          "canonical": "systems & frameworks"
+        }
+      ]
+    },
+    {
+      "raw": "Systems Analysis",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-018",
+      "owner_canonical": "systems thinking",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-023",
+          "canonical": "systems & frameworks"
+        }
+      ]
+    },
+    {
+      "raw": "General Systems",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-018",
+      "owner_canonical": "systems thinking",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-023",
+          "canonical": "systems & frameworks"
+        }
+      ]
+    },
+    {
+      "raw": "Systems Bible",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-018",
+      "owner_canonical": "systems thinking",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-023",
+          "canonical": "systems & frameworks"
+        }
+      ]
+    },
+    {
+      "raw": "Systemantics",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-018",
+      "owner_canonical": "systems thinking",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-023",
+          "canonical": "systems & frameworks"
+        }
+      ]
+    },
+    {
+      "raw": "System Dynamics",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-018",
+      "owner_canonical": "systems thinking",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-023",
+          "canonical": "systems & frameworks"
+        }
+      ]
+    },
+    {
+      "raw": "Systems Management",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-018",
+      "owner_canonical": "systems thinking",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-023",
+          "canonical": "systems & frameworks"
+        }
+      ]
+    },
+    {
+      "raw": "System Behavior",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-018",
+      "owner_canonical": "systems thinking",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-023",
+          "canonical": "systems & frameworks"
+        }
+      ]
+    },
+    {
+      "raw": "Family Systems",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-018",
+      "owner_canonical": "systems thinking",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-023",
+          "canonical": "systems & frameworks"
+        }
+      ]
+    },
+    {
+      "raw": "Social Systems",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-018",
+      "owner_canonical": "systems thinking",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-023",
+          "canonical": "systems & frameworks"
+        }
+      ]
+    },
+    {
+      "raw": "Control Systems",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-018",
+      "owner_canonical": "systems thinking",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-023",
+          "canonical": "systems & frameworks"
+        }
+      ]
+    },
+    {
+      "raw": "Communication Systems",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-018",
+      "owner_canonical": "systems thinking",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-023",
+          "canonical": "systems & frameworks"
+        }
+      ]
+    },
+    {
+      "raw": "Biological Systems",
+      "owner_axis": "domains",
+      "owner_id": "dom-031",
+      "owner_canonical": "science & research",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "disciplines",
+          "id": "disc-018",
+          "canonical": "systems thinking"
+        }
+      ]
+    },
+    {
+      "raw": "cybernetics",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-018",
+      "owner_canonical": "systems thinking",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-023",
+          "canonical": "systems & frameworks"
+        }
+      ]
+    },
+    {
+      "raw": "Complex Systems",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-019",
+      "owner_canonical": "complex adaptive systems",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-023",
+          "canonical": "systems & frameworks"
+        }
+      ]
+    },
+    {
+      "raw": "Computational Models of Social Life",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-019",
+      "owner_canonical": "complex adaptive systems",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-022",
+          "canonical": "computational science & physics"
+        }
+      ]
+    },
+    {
+      "raw": "System Design",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-020",
+      "owner_canonical": "systems engineering",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-023",
+          "canonical": "systems & frameworks"
+        }
+      ]
+    },
+    {
+      "raw": "System Architecture",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-020",
+      "owner_canonical": "systems engineering",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-023",
+          "canonical": "systems & frameworks"
+        }
+      ]
+    },
+    {
+      "raw": "Systems Design",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-020",
+      "owner_canonical": "systems engineering",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-023",
+          "canonical": "systems & frameworks"
+        }
+      ]
+    },
+    {
+      "raw": "Control Systems Engineering",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-020",
+      "owner_canonical": "systems engineering",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-019",
+          "canonical": "engineering practice"
+        }
+      ]
+    },
+    {
+      "raw": "Research Methods",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-021",
+      "owner_canonical": "research methodology",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-025",
+          "canonical": "research practice"
+        }
+      ]
+    },
+    {
+      "raw": "Research Design",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-021",
+      "owner_canonical": "research methodology",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-025",
+          "canonical": "research practice"
+        }
+      ]
+    },
+    {
+      "raw": "Grounded Theory",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-021",
+      "owner_canonical": "research methodology",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-025",
+          "canonical": "research practice"
+        }
+      ]
+    },
+    {
+      "raw": "Ethnography",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-021",
+      "owner_canonical": "research methodology",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-025",
+          "canonical": "research practice"
+        }
+      ]
+    },
+    {
+      "raw": "Action Research",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-021",
+      "owner_canonical": "research methodology",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-025",
+          "canonical": "research practice"
+        }
+      ]
+    },
+    {
+      "raw": "Program Evaluation",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-021",
+      "owner_canonical": "research methodology",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-025",
+          "canonical": "research practice"
+        }
+      ]
+    },
+    {
+      "raw": "Statistics",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-021",
+      "owner_canonical": "research methodology",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-025",
+          "canonical": "research practice"
+        }
+      ]
+    },
+    {
+      "raw": "Data Analysis",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-021",
+      "owner_canonical": "research methodology",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-025",
+          "canonical": "research practice"
+        }
+      ]
+    },
+    {
+      "raw": "Data Science",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-021",
+      "owner_canonical": "research methodology",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-025",
+          "canonical": "research practice"
+        }
+      ]
+    },
+    {
+      "raw": "biostatistics",
+      "owner_axis": "domains",
+      "owner_id": "dom-031",
+      "owner_canonical": "science & research",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "disciplines",
+          "id": "disc-021",
+          "canonical": "research methodology"
+        }
+      ]
+    },
+    {
+      "raw": "psychometrics",
+      "owner_axis": "domains",
+      "owner_id": "dom-031",
+      "owner_canonical": "science & research",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "disciplines",
+          "id": "disc-021",
+          "canonical": "research methodology"
+        }
+      ]
+    },
+    {
+      "raw": "business analytics",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-021",
+      "owner_canonical": "research methodology",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-013",
+          "canonical": "business operations"
+        }
+      ]
+    },
+    {
+      "raw": "evaluation research",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-021",
+      "owner_canonical": "research methodology",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-025",
+          "canonical": "research practice"
+        }
+      ]
+    },
+    {
+      "raw": "qualitative research methodology",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-021",
+      "owner_canonical": "research methodology",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-025",
+          "canonical": "research practice"
+        }
+      ]
+    },
+    {
+      "raw": "qualitative research methods",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-021",
+      "owner_canonical": "research methodology",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-025",
+          "canonical": "research practice"
+        }
+      ]
+    },
+    {
+      "raw": "Probability Theory",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-022",
+      "owner_canonical": "operations research",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-025",
+          "canonical": "research practice"
+        }
+      ]
+    },
+    {
+      "raw": "Information Theory",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-022",
+      "owner_canonical": "operations research",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-025",
+          "canonical": "research practice"
+        }
+      ]
+    },
+    {
+      "raw": "management science",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-022",
+      "owner_canonical": "operations research",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "disciplines",
+          "id": "disc-062",
+          "canonical": "business administration"
+        }
+      ]
+    },
+    {
+      "raw": "Software Development",
+      "owner_axis": "domains",
+      "owner_id": "dom-021",
+      "owner_canonical": "code & computation",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "disciplines",
+          "id": "disc-025",
+          "canonical": "software engineering"
+        }
+      ]
+    },
+    {
+      "raw": "Object-Oriented Programming",
+      "owner_axis": "domains",
+      "owner_id": "dom-019",
+      "owner_canonical": "engineering practice",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "disciplines",
+          "id": "disc-025",
+          "canonical": "software engineering"
+        }
+      ]
+    },
+    {
+      "raw": "Python Programming",
+      "owner_axis": "domains",
+      "owner_id": "dom-019",
+      "owner_canonical": "engineering practice",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "disciplines",
+          "id": "disc-025",
+          "canonical": "software engineering"
+        }
+      ]
+    },
+    {
+      "raw": "JavaScript Programming",
+      "owner_axis": "domains",
+      "owner_id": "dom-019",
+      "owner_canonical": "engineering practice",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "disciplines",
+          "id": "disc-025",
+          "canonical": "software engineering"
+        }
+      ]
+    },
+    {
+      "raw": "Web Development",
+      "owner_axis": "domains",
+      "owner_id": "dom-008",
+      "owner_canonical": "creative technology",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "disciplines",
+          "id": "disc-025",
+          "canonical": "software engineering"
+        }
+      ]
+    },
+    {
+      "raw": "Computer Science",
+      "owner_axis": "domains",
+      "owner_id": "dom-019",
+      "owner_canonical": "engineering practice",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "disciplines",
+          "id": "disc-025",
+          "canonical": "software engineering"
+        }
+      ]
+    },
+    {
+      "raw": "Programming",
+      "owner_axis": "domains",
+      "owner_id": "dom-021",
+      "owner_canonical": "code & computation",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "disciplines",
+          "id": "disc-025",
+          "canonical": "software engineering"
+        }
+      ]
+    },
+    {
+      "raw": "distributed systems",
+      "owner_axis": "domains",
+      "owner_id": "dom-033",
+      "owner_canonical": "engineering & infrastructure",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "disciplines",
+          "id": "disc-025",
+          "canonical": "software engineering"
+        }
+      ]
+    },
+    {
+      "raw": "real-time systems",
+      "owner_axis": "domains",
+      "owner_id": "dom-033",
+      "owner_canonical": "engineering & infrastructure",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "disciplines",
+          "id": "disc-025",
+          "canonical": "software engineering"
+        }
+      ]
+    },
+    {
+      "raw": "internet technologies",
+      "owner_axis": "domains",
+      "owner_id": "dom-033",
+      "owner_canonical": "engineering & infrastructure",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "disciplines",
+          "id": "disc-025",
+          "canonical": "software engineering"
+        }
+      ]
+    },
+    {
+      "raw": "cloud computing",
+      "owner_axis": "domains",
+      "owner_id": "dom-033",
+      "owner_canonical": "engineering & infrastructure",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "disciplines",
+          "id": "disc-025",
+          "canonical": "software engineering"
+        }
+      ]
+    },
+    {
+      "raw": "Network Engineering",
+      "owner_axis": "domains",
+      "owner_id": "dom-019",
+      "owner_canonical": "engineering practice",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "disciplines",
+          "id": "disc-025",
+          "canonical": "software engineering"
+        }
+      ]
+    },
+    {
+      "raw": "software architecture",
+      "owner_axis": "domains",
+      "owner_id": "dom-019",
+      "owner_canonical": "engineering practice",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "disciplines",
+          "id": "disc-025",
+          "canonical": "software engineering"
+        }
+      ]
+    },
+    {
+      "raw": "Creative Programming",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-026",
+      "owner_canonical": "creative coding",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-020",
+          "canonical": "computational art"
+        }
+      ]
+    },
+    {
+      "raw": "openFrameworks",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-026",
+      "owner_canonical": "creative coding",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-021",
+          "canonical": "code & computation"
+        }
+      ]
+    },
+    {
+      "raw": "Processing",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-026",
+      "owner_canonical": "creative coding",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-021",
+          "canonical": "code & computation"
+        }
+      ]
+    },
+    {
+      "raw": "Multimedia Programming",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-026",
+      "owner_canonical": "creative coding",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-020",
+          "canonical": "computational art"
+        }
+      ]
+    },
+    {
+      "raw": "computational design",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-026",
+      "owner_canonical": "creative coding",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-021",
+          "canonical": "code & computation"
+        }
+      ]
+    },
+    {
+      "raw": "computational graphics",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-026",
+      "owner_canonical": "creative coding",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-021",
+          "canonical": "code & computation"
+        }
+      ]
+    },
+    {
+      "raw": "Data-Driven Graphic Design",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-026",
+      "owner_canonical": "creative coding",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-021",
+          "canonical": "code & computation"
+        }
+      ]
+    },
+    {
+      "raw": "Generative Art",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-027",
+      "owner_canonical": "generative design",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-020",
+          "canonical": "computational art"
+        }
+      ]
+    },
+    {
+      "raw": "Computational Creativity",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-027",
+      "owner_canonical": "generative design",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-020",
+          "canonical": "computational art"
+        }
+      ]
+    },
+    {
+      "raw": "computational physics",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-028",
+      "owner_canonical": "computational physics & simulation",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-022",
+          "canonical": "computational science & physics"
+        }
+      ]
+    },
+    {
+      "raw": "computational physics simulation",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-028",
+      "owner_canonical": "computational physics & simulation",
+      "reason": "exact-canonical-match",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-022",
+          "canonical": "computational science & physics"
+        }
+      ]
+    },
+    {
+      "raw": "computational simulation",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-028",
+      "owner_canonical": "computational physics & simulation",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-022",
+          "canonical": "computational science & physics"
+        }
+      ]
+    },
+    {
+      "raw": "Physics Simulation",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-028",
+      "owner_canonical": "computational physics & simulation",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-022",
+          "canonical": "computational science & physics"
+        }
+      ]
+    },
+    {
+      "raw": "computational biology",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-028",
+      "owner_canonical": "computational physics & simulation",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-022",
+          "canonical": "computational science & physics"
+        }
+      ]
+    },
+    {
+      "raw": "computational ecology",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-028",
+      "owner_canonical": "computational physics & simulation",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-022",
+          "canonical": "computational science & physics"
+        }
+      ]
+    },
+    {
+      "raw": "computational neuroscience",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-028",
+      "owner_canonical": "computational physics & simulation",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-022",
+          "canonical": "computational science & physics"
+        }
+      ]
+    },
+    {
+      "raw": "Cellular Automata",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-028",
+      "owner_canonical": "computational physics & simulation",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-022",
+          "canonical": "computational science & physics"
+        }
+      ]
+    },
+    {
+      "raw": "Genetic Algorithms",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-028",
+      "owner_canonical": "computational physics & simulation",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-022",
+          "canonical": "computational science & physics"
+        }
+      ]
+    },
+    {
+      "raw": "Neuroevolution",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-028",
+      "owner_canonical": "computational physics & simulation",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-022",
+          "canonical": "computational science & physics"
+        }
+      ]
+    },
+    {
+      "raw": "Simulation",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-028",
+      "owner_canonical": "computational physics & simulation",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-022",
+          "canonical": "computational science & physics"
+        }
+      ]
+    },
+    {
+      "raw": "Computer Graphics / Simulation",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-028",
+      "owner_canonical": "computational physics & simulation",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-022",
+          "canonical": "computational science & physics"
+        }
+      ]
+    },
+    {
+      "raw": "Computer Graphics / Physics Simulation",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-028",
+      "owner_canonical": "computational physics & simulation",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-022",
+          "canonical": "computational science & physics"
+        }
+      ]
+    },
+    {
+      "raw": "computational evolution",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-028",
+      "owner_canonical": "computational physics & simulation",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-022",
+          "canonical": "computational science & physics"
+        }
+      ]
+    },
+    {
+      "raw": "computational systems",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-028",
+      "owner_canonical": "computational physics & simulation",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-022",
+          "canonical": "computational science & physics"
+        }
+      ]
+    },
+    {
+      "raw": "economic analysis",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-031",
+      "owner_canonical": "political economy",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-013",
+          "canonical": "business operations"
+        }
+      ]
+    },
+    {
+      "raw": "public policy",
+      "owner_axis": "domains",
+      "owner_id": "dom-030",
+      "owner_canonical": "legal & public policy",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "disciplines",
+          "id": "disc-031",
+          "canonical": "political economy"
+        }
+      ]
+    },
+    {
+      "raw": "Public Administration",
+      "owner_axis": "domains",
+      "owner_id": "dom-030",
+      "owner_canonical": "legal & public policy",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "disciplines",
+          "id": "disc-031",
+          "canonical": "political economy"
+        }
+      ]
+    },
+    {
+      "raw": "nonprofit management",
+      "owner_axis": "domains",
+      "owner_id": "dom-030",
+      "owner_canonical": "legal & public policy",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "disciplines",
+          "id": "disc-031",
+          "canonical": "political economy"
+        }
+      ]
+    },
+    {
+      "raw": "social entrepreneurship",
+      "owner_axis": "domains",
+      "owner_id": "dom-030",
+      "owner_canonical": "legal & public policy",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "disciplines",
+          "id": "disc-031",
+          "canonical": "political economy"
+        }
+      ]
+    },
+    {
+      "raw": "community development",
+      "owner_axis": "domains",
+      "owner_id": "dom-030",
+      "owner_canonical": "legal & public policy",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "disciplines",
+          "id": "disc-031",
+          "canonical": "political economy"
+        }
+      ]
+    },
+    {
+      "raw": "governance",
+      "owner_axis": "domains",
+      "owner_id": "dom-030",
+      "owner_canonical": "legal & public policy",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "disciplines",
+          "id": "disc-031",
+          "canonical": "political economy"
+        }
+      ]
+    },
+    {
+      "raw": "surveillance capitalism",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-032",
+      "owner_canonical": "privacy & surveillance",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-013",
+          "canonical": "business operations"
+        }
+      ]
+    },
+    {
+      "raw": "Epistemology",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-033",
+      "owner_canonical": "philosophy",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-025",
+          "canonical": "research practice"
+        }
+      ]
+    },
+    {
+      "raw": "Philosophy of Science",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-033",
+      "owner_canonical": "philosophy",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-025",
+          "canonical": "research practice"
+        }
+      ]
+    },
+    {
+      "raw": "Phenomenology",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-033",
+      "owner_canonical": "philosophy",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-025",
+          "canonical": "research practice"
+        }
+      ]
+    },
+    {
+      "raw": "AI",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-034",
+      "owner_canonical": "artificial intelligence",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-017",
+          "canonical": "ai & agents"
+        }
+      ]
+    },
+    {
+      "raw": "Communication Studies",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-035",
+      "owner_canonical": "communication theory",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-024",
+          "canonical": "semiotics & communication"
+        }
+      ]
+    },
+    {
+      "raw": "interpersonal communication",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-035",
+      "owner_canonical": "communication theory",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-024",
+          "canonical": "semiotics & communication"
+        }
+      ]
+    },
+    {
+      "raw": "HCI",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-036",
+      "owner_canonical": "human-computer interaction",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-010",
+          "canonical": "user experience"
+        }
+      ]
+    },
+    {
+      "raw": "User Experience (UX) Design",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-036",
+      "owner_canonical": "human-computer interaction",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-010",
+          "canonical": "user experience"
+        }
+      ]
+    },
+    {
+      "raw": "virtual reality",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-036",
+      "owner_canonical": "human-computer interaction",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-034",
+          "canonical": "media & entertainment"
+        }
+      ]
+    },
+    {
+      "raw": "interaction design",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-036",
+      "owner_canonical": "human-computer interaction",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-010",
+          "canonical": "user experience"
+        }
+      ]
+    },
+    {
+      "raw": "user experience design",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-036",
+      "owner_canonical": "human-computer interaction",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-010",
+          "canonical": "user experience"
+        }
+      ]
+    },
+    {
+      "raw": "Knowledge Management",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-038",
+      "owner_canonical": "information science",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-013",
+          "canonical": "business operations"
+        }
+      ]
+    },
+    {
+      "raw": "Data Governance",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-038",
+      "owner_canonical": "information science",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-033",
+          "canonical": "engineering & infrastructure"
+        }
+      ]
+    },
+    {
+      "raw": "Data Management",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-038",
+      "owner_canonical": "information science",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-033",
+          "canonical": "engineering & infrastructure"
+        }
+      ]
+    },
+    {
+      "raw": "bioinformatics",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-038",
+      "owner_canonical": "information science",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-031",
+          "canonical": "science & research"
+        }
+      ]
+    },
+    {
+      "raw": "library science",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-038",
+      "owner_canonical": "information science",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-025",
+          "canonical": "research practice"
+        }
+      ]
+    },
+    {
+      "raw": "information visualization",
+      "owner_axis": "domains",
+      "owner_id": "dom-007",
+      "owner_canonical": "data visualization",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "disciplines",
+          "id": "disc-038",
+          "canonical": "information science"
+        }
+      ]
+    },
+    {
+      "raw": "Investment Management",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-039",
+      "owner_canonical": "finance",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-028",
+          "canonical": "finance & investment"
+        }
+      ]
+    },
+    {
+      "raw": "Portfolio Theory",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-039",
+      "owner_canonical": "finance",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-028",
+          "canonical": "finance & investment"
+        }
+      ]
+    },
+    {
+      "raw": "Financial Planning",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-039",
+      "owner_canonical": "finance",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-028",
+          "canonical": "finance & investment"
+        }
+      ]
+    },
+    {
+      "raw": "financial analysis",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-039",
+      "owner_canonical": "finance",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-028",
+          "canonical": "finance & investment"
+        }
+      ]
+    },
+    {
+      "raw": "corporate finance",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-039",
+      "owner_canonical": "finance",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-013",
+          "canonical": "business operations"
+        }
+      ]
+    },
+    {
+      "raw": "social science",
+      "owner_axis": "domains",
+      "owner_id": "dom-035",
+      "owner_canonical": "social sciences",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "disciplines",
+          "id": "disc-041",
+          "canonical": "sociology"
+        }
+      ]
+    },
+    {
+      "raw": "Social Work",
+      "owner_axis": "domains",
+      "owner_id": "dom-035",
+      "owner_canonical": "social sciences",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "disciplines",
+          "id": "disc-041",
+          "canonical": "sociology"
+        }
+      ]
+    },
+    {
+      "raw": "ethnobotany",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-042",
+      "owner_canonical": "anthropology",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-031",
+          "canonical": "science & research"
+        }
+      ]
+    },
+    {
+      "raw": "Anthropological Linguistics",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-042",
+      "owner_canonical": "anthropology",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-035",
+          "canonical": "social sciences"
+        }
+      ]
+    },
+    {
+      "raw": "art theory",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-045",
+      "owner_canonical": "aesthetics",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-032",
+          "canonical": "arts & culture"
+        }
+      ]
+    },
+    {
+      "raw": "Digital Media Studies",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-046",
+      "owner_canonical": "media studies",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-034",
+          "canonical": "media & entertainment"
+        }
+      ]
+    },
+    {
+      "raw": "Media Technology",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-046",
+      "owner_canonical": "media studies",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-034",
+          "canonical": "media & entertainment"
+        }
+      ]
+    },
+    {
+      "raw": "Digital Media",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-046",
+      "owner_canonical": "media studies",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-034",
+          "canonical": "media & entertainment"
+        }
+      ]
+    },
+    {
+      "raw": "Interactive Media",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-046",
+      "owner_canonical": "media studies",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-034",
+          "canonical": "media & entertainment"
+        }
+      ]
+    },
+    {
+      "raw": "Publishing",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-046",
+      "owner_canonical": "media studies",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-034",
+          "canonical": "media & entertainment"
+        }
+      ]
+    },
+    {
+      "raw": "Media Production",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-046",
+      "owner_canonical": "media studies",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-034",
+          "canonical": "media & entertainment"
+        }
+      ]
+    },
+    {
+      "raw": "visual effects",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-047",
+      "owner_canonical": "computer graphics",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-034",
+          "canonical": "media & entertainment"
+        }
+      ]
+    },
+    {
+      "raw": "legal studies",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-048",
+      "owner_canonical": "law",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-030",
+          "canonical": "legal & public policy"
+        }
+      ]
+    },
+    {
+      "raw": "Cybersecurity",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-049",
+      "owner_canonical": "information security",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-033",
+          "canonical": "engineering & infrastructure"
+        }
+      ]
+    },
+    {
+      "raw": "genetics",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-051",
+      "owner_canonical": "evolutionary biology",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-031",
+          "canonical": "science & research"
+        }
+      ]
+    },
+    {
+      "raw": "Comparative Genomics",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-051",
+      "owner_canonical": "evolutionary biology",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-031",
+          "canonical": "science & research"
+        }
+      ]
+    },
+    {
+      "raw": "Developmental Biology",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-051",
+      "owner_canonical": "evolutionary biology",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-031",
+          "canonical": "science & research"
+        }
+      ]
+    },
+    {
+      "raw": "Conservation Biology",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-051",
+      "owner_canonical": "evolutionary biology",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-031",
+          "canonical": "science & research"
+        }
+      ]
+    },
+    {
+      "raw": "autonomous systems",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-054",
+      "owner_canonical": "robotics",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-033",
+          "canonical": "engineering & infrastructure"
+        }
+      ]
+    },
+    {
+      "raw": "healthcare",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-055",
+      "owner_canonical": "health & medicine",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-027",
+          "canonical": "health & wellness"
+        }
+      ]
+    },
+    {
+      "raw": "Health and Wellness",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-055",
+      "owner_canonical": "health & medicine",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-027",
+          "canonical": "health & wellness"
+        }
+      ]
+    },
+    {
+      "raw": "Health Promotion",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-055",
+      "owner_canonical": "health & medicine",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-027",
+          "canonical": "health & wellness"
+        }
+      ]
+    },
+    {
+      "raw": "mental health",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-055",
+      "owner_canonical": "health & medicine",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-027",
+          "canonical": "health & wellness"
+        }
+      ]
+    },
+    {
+      "raw": "therapy",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-055",
+      "owner_canonical": "health & medicine",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-027",
+          "canonical": "health & wellness"
+        }
+      ]
+    },
+    {
+      "raw": "counseling",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-055",
+      "owner_canonical": "health & medicine",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-027",
+          "canonical": "health & wellness"
+        }
+      ]
+    },
+    {
+      "raw": "psychopharmacology",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-055",
+      "owner_canonical": "health & medicine",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-027",
+          "canonical": "health & wellness"
+        }
+      ]
+    },
+    {
+      "raw": "medicine",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-055",
+      "owner_canonical": "health & medicine",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-027",
+          "canonical": "health & wellness"
+        }
+      ]
+    },
+    {
+      "raw": "Kinesiology",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-055",
+      "owner_canonical": "health & medicine",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-027",
+          "canonical": "health & wellness"
+        }
+      ]
+    },
+    {
+      "raw": "pharmacology",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-055",
+      "owner_canonical": "health & medicine",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-031",
+          "canonical": "science & research"
+        }
+      ]
+    },
+    {
+      "raw": "public health",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-055",
+      "owner_canonical": "health & medicine",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-027",
+          "canonical": "health & wellness"
+        }
+      ]
+    },
+    {
+      "raw": "music",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-056",
+      "owner_canonical": "performing arts",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-032",
+          "canonical": "arts & culture"
+        }
+      ]
+    },
+    {
+      "raw": "theatre",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-056",
+      "owner_canonical": "performing arts",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-032",
+          "canonical": "arts & culture"
+        }
+      ]
+    },
+    {
+      "raw": "performance art",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-056",
+      "owner_canonical": "performing arts",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-032",
+          "canonical": "arts & culture"
+        }
+      ]
+    },
+    {
+      "raw": "literature",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-057",
+      "owner_canonical": "literary theory",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-032",
+          "canonical": "arts & culture"
+        }
+      ]
+    },
+    {
+      "raw": "criticism",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-057",
+      "owner_canonical": "literary theory",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-032",
+          "canonical": "arts & culture"
+        }
+      ]
+    },
+    {
+      "raw": "Mechanical Engineering",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-058",
+      "owner_canonical": "engineering",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-033",
+          "canonical": "engineering & infrastructure"
+        }
+      ]
+    },
+    {
+      "raw": "Aerospace Engineering",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-058",
+      "owner_canonical": "engineering",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-033",
+          "canonical": "engineering & infrastructure"
+        }
+      ]
+    },
+    {
+      "raw": "organizational management",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-062",
+      "owner_canonical": "business administration",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-016",
+          "canonical": "organizational behavior"
+        }
+      ]
+    },
+    {
+      "raw": "business management",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-062",
+      "owner_canonical": "business administration",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-013",
+          "canonical": "business operations"
+        }
+      ]
+    },
+    {
+      "raw": "marketing",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-063",
+      "owner_canonical": "marketing",
+      "reason": "exact-canonical-match",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-029",
+          "canonical": "marketing & communications"
+        }
+      ]
+    },
+    {
+      "raw": "marketing science",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-063",
+      "owner_canonical": "marketing",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-029",
+          "canonical": "marketing & communications"
+        }
+      ]
+    },
+    {
+      "raw": "market research",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-063",
+      "owner_canonical": "marketing",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-029",
+          "canonical": "marketing & communications"
+        }
+      ]
+    },
+    {
+      "raw": "marketing strategy",
+      "owner_axis": "disciplines",
+      "owner_id": "disc-063",
+      "owner_canonical": "marketing",
+      "reason": "fewest-raws-most-specific",
+      "dropped_from": [
+        {
+          "axis": "domains",
+          "id": "dom-029",
+          "canonical": "marketing & communications"
+        }
+      ]
+    }
+  ]
+}

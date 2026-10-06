@@ -490,6 +490,40 @@ except Exception as _s4_golden_err:  # C16: fail-loud — never silently skip an
     raise RuntimeError(f"D2454: stage4_golden injection failed: {_s4_golden_err}") from _s4_golden_err
 
 
+# ── D-2814 (2026-10-05): definition-anchored closed menu replaces the free-generation prompt. ──
+# OFF by default (byte-identical baseline); adopt only after R5 review (gemma != verifier) +
+# full-204 A/B (D-2767). C16: enabled + empty menu -> raise via definition_anchored_block().
+# NOTE: when enabled, the D2454 golden few-shot is NOT appended (this prompt is self-contained for
+# discipline/domains; depth is re-derived by the focused depth call, S4_DEPTH_FOCUSED_CLASSIFICATION).
+try:
+    from pipeline.pipeline_paths import S4_DEFINITION_ANCHORED_MENU_ENABLED
+    if S4_DEFINITION_ANCHORED_MENU_ENABLED:
+        from pipeline.closed_menu import definition_anchored_block, render_closed_menu
+        _abstention = render_closed_menu()["abstention"]
+        CLASSIFY_SYSTEM_PROMPT = (
+            "You are a scientific taxonomy classifier working from a CLOSED menu of disciplines and "
+            "domains. Classify based on what the principle IS, but express every label as an EXACT "
+            "verbatim entry from the menu below — the menu definitions are the anchor.\n\n"
+            + definition_anchored_block()
+            + "\n\nRules:\n"
+            f"- discipline: the SINGLE discipline from the CLOSED DISCIPLINE MENU this FB belongs to, or '{_abstention}' if none fits.\n"
+            f"- domains: 1-5 domains from the CLOSED DOMAIN MENU where a practitioner would apply it, or '{_abstention}' if none fit.\n"
+            "- is_specialized: true ONLY for a narrow sub-technique within a sub-field. Default false.\n"
+            "- evidence: \"cited\" (grounded in source text) or \"axiomatic\" (self-evident truth).\n"
+            "\nDEPTH CLASSIFICATION — ONTOLOGICAL, NOT STRUCTURAL (physicist-chef-poet test):\n"
+            "  universal = mechanism applies to ALL systems (physics, cooking, poetry)\n"
+            "  cross-domain = bridges 2+ DISTINCT disciplines via shared structure\n"
+            "  domain = operates within one field, needs domain context\n"
+            "  specialized = narrow sub-technique within a single sub-field\n"
+            "  DEFAULT to \"domain\" unless the mechanism clearly transcends it.\n"
+            f"\nReturn ONLY a JSON object: {{\"discipline\": \"<CLOSED DISCIPLINE MENU label, verbatim, or '{_abstention}'>\", \"domains\": [\"1-5 CLOSED DOMAIN MENU labels, verbatim, or '{_abstention}'\"], "
+            "\"depth\": \"universal|cross-domain|domain|specialized\", \"is_specialized\": true/false, "
+            "\"evidence\": \"...\"}"
+        )
+except Exception as _d2814_err:  # C16: fail-loud
+    raise RuntimeError(f"D-2814: definition-anchored prompt build failed: {_d2814_err}") from _d2814_err
+
+
 def build_classify_prompt(
     fb_name: str,
     fb_definition: str,
@@ -576,6 +610,17 @@ def map_to_canonical_with_fallback(raw_label: str, kind: str,
     # (e.g. 'software engineering' → 'engineering practice' via the flat index).
     _opposite = CANONICAL_DOMAINS if kind == "discipline" else CANONICAL_DISCIPLINES
     if raw_lower in {normalize_label(c) for c in _opposite}:
+        # BUG-630/D-2814: the opposite-axis guard is LOAD-BEARING but TOO BLUNT — a raw label canonical on
+        # the OPPOSITE axis (e.g. 'organizational behavior' is a DOMAIN) was forced straight to 'emerging'
+        # and never retried on its SAME axis, even when a curated same-axis home exists ('organizational
+        # theory' is a DISCIPLINE). Retry the config-driven same-axis fall-through before abstaining; the
+        # guard still blocks uncurated coercion (a label with no declared home stays 'emerging').
+        from pipeline.pipeline_paths import S4_SAME_AXIS_FALLTHROUGH  # noqa: PLC0415
+        home = (S4_SAME_AXIS_FALLTHROUGH.get(kind, {}) or {}).get(raw_lower)
+        if home:
+            for c in canonical_list:
+                if normalize_label(c) == normalize_label(home):
+                    return c
         return "emerging"
 
     # 1. Exact canonical match (case-insensitive) — principle fits 100%
@@ -865,6 +910,38 @@ def validate_classification(result: dict) -> tuple[bool, list[str]]:
         errors.append(f"Invalid evidence: '{evidence}'")
 
     return len(errors) == 0, errors
+
+
+def _enforce_domain_cardinality(
+    domains: list[str],
+    class_data: dict,
+    max_domains: int = MAX_DOMAINS_PER_FB,
+) -> list[str]:
+    """D-2838/BUG-631 writer-limb: enforce the per-FB domain cardinality cap AT the write.
+
+    ``validate_classification`` only *DETECTS* "Too many domains"; the write-path
+    salvage drops NON-canonical labels, so a row carrying 6-7 VALID domains was
+    written unchanged (the measured 52 FBs, every one classification_status=CLEAN).
+    Enforce the cap deterministically (keep the model's first ``max_domains``,
+    preserve order) and record a receipt in ``class_data["classification_error"]``,
+    degrading CLEAN -> FALLBACK so a truncated row is never indistinguishable from a
+    compliant one (C16 — never a silent truncation).
+    """
+    if len(domains) <= max_domains:
+        return domains
+    dropped = domains[max_domains:]
+    truncated = domains[:max_domains]
+    receipt = (
+        f"domain cardinality {len(domains)}>{max_domains}: truncated to cap "
+        f"(dropped {dropped!r})"
+    )
+    existing = class_data.get("classification_error") or ""
+    class_data["classification_error"] = (
+        f"{existing}; {receipt}" if existing else receipt
+    )
+    if class_data.get("classification_status", "CLEAN") == "CLEAN":
+        class_data["classification_status"] = "FALLBACK"
+    return truncated
 
 
 def normalize_fb_name(name: str, max_words: int = FB_NAME_MAX_WORDS) -> str:
@@ -2139,6 +2216,10 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
                     fixed_domains.append(d)
             if not fixed_domains:
                 fixed_domains = ["emerging"]
+            # D-2838/BUG-631 writer-limb: enforce the per-FB domain cardinality cap.
+            # validate_classification only DETECTS the over-cap; the salvage above drops
+            # NON-canonical labels only, so 6-7 VALID domains were written unchanged.
+            fixed_domains = _enforce_domain_cardinality(fixed_domains, class_data)
             class_data["domains"] = fixed_domains
 
         # Collect source books

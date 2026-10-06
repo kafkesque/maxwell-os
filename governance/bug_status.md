@@ -2,11 +2,25 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**138 open** / 239 closed of 377 ids.
+**161 open** / 261 closed of 422 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
 |---|---|---|
+| BUG-099 | (OPEN, 2026-08-13) — Model registry drift: gpt-oss/Phi misnamed 'verifier' (rename deferred) | 1 |
+| BUG-151 | (OPEN, 2026-08-20) — taxonomy structural overlap (education dual-listed + 267 raw aliases) | 1 |
+| BUG-159 | (OPEN, 2026-08-21) — prompt-injection contamination (cluster_11649, 0.007%) | 1 |
+| BUG-160 | (OPEN, 2026-08-21) — evidence-passage topical relevance not verified | 1 |
+| BUG-169 | (OPEN, 2026-08-24) — TI parameters empty on 31/143 single-source + 100/307 singleton | 1 |
+| BUG-182 | (OPEN, 2026-08-27) — 48 singleton empty-shells re-return empty after S2 rerun | 1 |
+| BUG-222 | (OPEN, 2026-09-04) — goose runtime drift: active_provider=custom_deepseek (C1/C3 violation) | 1 |
+| BUG-223 | (OPEN, 2026-09-05) — '[]' literal-array hygiene (54 emerging FBs) | 1 |
+| BUG-224 | (OPEN, 2026-09-05) — OMLX server wedges under sustained load (MITIGATED D2581) | 1 |
+| BUG-228 | (OPEN, 2026-09-08) — Dead/aspirational schema fields — 0 code references | 1 |
+| BUG-237 | (OPEN, 2026-09-10) — production fbs.depth unverified silver (PARTIALLY ADDRESSED D2610/D2611) | 1 |
+| BUG-238 | (OPEN, 2026-09-10) — content_type is a VACUOUS axis (99.6% principle unverified) | 1 |
+| BUG-242 | (OPEN, 2026-09-11) — frontier69_v2 data-quality defects — override figures still to recompute | 1 |
+| BUG-243 | (OPEN, 2026-09-13) — DeepSeek-v4 empty content on open-ended adjudication (MITIGATED: use local Qwen) | 1 |
 | BUG-253 | reasoning models scored 0 under a small max_tokens budget (harness artifact, NOT model failure) | 1 |
 | BUG-255 | `POST /admin/api/reload` swaps the single resident model and silently wedges an in-flight benchmark | 1 |
 | BUG-257 | the niah top tier exceeded oMLX's context window, making it unmeasurable | 2 |
@@ -18,6 +32,7 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-264 | poisoned rows survive every re-run (found by drift_monitor, 2026-09-17) | 1 |
 | BUG-265 | toolcalling scored the HARNESS, not the model: native tool_calls ignored | 2 |
 | BUG-266 | gpt-oss toolcalling is truncated, not incapable | 1 |
+| BUG-267 | (OPEN, 2026-09-17) — min_human_share floor is a substring classifier (F-16) | 1 |
 | BUG-270 | OPEN (2026-09-17) — the frontier69 audit artifact disagrees with the runtime KB on 10 of 69 objects, and two concepts exist in BOTH taxonomi | 1 |
 | BUG-273 | the domains axis violates its own cardinality contract (2026-09-17) | 1 |
 | BUG-274 | the `related_fbs` graph is 56.8% asymmetric (2026-09-17) | 1 |
@@ -145,3 +160,11 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-632 | (OPEN, 2026-10-04) — the D2496 "authoritative expected FB count" gate CANNOT DISTINGUISH a DECLARED failure from a SILENT drop, so S5 and S6 | 1 |
 | BUG-635 | (OPEN, 2026-10-04) — merged-call sparse classification is quarantined under D2371 as "empty application", masking the true failure and dropp | 1 |
 | BUG-636 | (OPEN, 2026-10-04) — S4 exit-2 clears the resume sidecars before the failure check, so the documented "re-run to retry failed clusters" inst | 1 |
+| BUG-638 | (OPEN, 2026-10-05) — governance/METRICS.jsonl append-only journal truncated 817→70 lines (747 samples lost); root cause UNCONFIRMED | 1 |
+| BUG-640 | (IN PROGRESS, 2026-10-05) — D-2815 B&M discipline slot "entrepreneurship" string-collides with existing DOMAIN; owner ruling D-2829 | 1 |
+| BUG-642 | (OPEN, 2026-10-05) — alias_map.yaml retirement (D-2814) cascade: 14 consumers (pipeline/schemas.py + 13 scripts) | 1 |
+| BUG-643 | (IN PROGRESS, 2026-10-05) — dual abstention token 'none' (_ABSTENTION_VALUE) vs 'emerging' (catch_all); owner ruling D-2830 | 1 |
+| BUG-648 | (OPEN, 2026-10-05) — definition-anchored menu ~5k tokens/call bloat (prefix-cache amortization) | 1 |
+| BUG-650 | (PARTIAL, 2026-10-05) — full-204 A/B (D-2767) has no fail-closed guard against a frozen-invalid anchor; a pre-D-2820 kappa is circular | 1 |
+| BUG-651 | (PARTIAL, 2026-10-05) — S5 majority NLI aggregation hides supported claims + passes contradictory claims (D-2822 Gate A(d)) | 1 |
+| BUG-658 | (OPEN, 2026-10-06) — OMLX SSE keepalive defeats read_timeout → client wedge (no wall-clock deadline). HARNESS-MITIGATED 2026-10-06 (d2767_ab | 1 |

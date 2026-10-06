@@ -1,0 +1,54 @@
+{
+  "artifact_id": "discipline_macro_conditionC_20261003",
+  "schema_version": "1.0",
+  "decision": "D-2798",
+  "condition": "C (dedicated 3-way macro classifier, direct bucket inference)",
+  "scheme": "3-way",
+  "model": "gpt-oss-20b-MXFP4-Q8",
+  "n": 204,
+  "raw_agreement": 0.7696,
+  "cohen_kappa": 0.6066,
+  "human_ceiling_3way": 0.766,
+  "human_parity_floor": 0.73,
+  "ship_threshold": 0.65,
+  "conditionA_collapse_kappa": 0.5534,
+  "verdict": "BELOW ship threshold 0.65 AND below human parity 0.73. Dedicated classifier improves on collapse (0.6066 vs 0.5534, +0.053) but is measurement-bound: discipline axis is advisory-only, not a routing facet.",
+  "gold_dist": {
+    "Human & Design": 114,
+    "Technical": 34,
+    "Method & Business": 55,
+    "emerging": 1
+  },
+  "pred_dist": {
+    "Human & Design": 115,
+    "Method & Business": 56,
+    "Technical": 31,
+    "emerging": 2
+  },
+  "confusion_matrix_gold_rows_pred_cols": {
+    "Human & Design": {
+      "Human & Design": 96,
+      "Method & Business": 17,
+      "Technical": 1
+    },
+    "Technical": {
+      "Technical": 23,
+      "Human & Design": 8,
+      "Method & Business": 2,
+      "emerging": 1
+    },
+    "Method & Business": {
+      "Technical": 7,
+      "Method & Business": 37,
+      "Human & Design": 11
+    },
+    "emerging": {
+      "emerging": 1
+    }
+  },
+  "off_menu_emerging_preds_wrong": [
+    "R144"
+  ],
+  "n_off_menu_emerging_wrong": 1,
+  "root_cause_note": "Prior live runs failed with 'content missing (cold reload?)' — misdiagnosed. Root cause: MACRO_MAX_TOKENS=256 too small for gpt-oss-20b Harmony reasoning (CoT billed against max_tokens); model hit finish_reason='length' before emitting content. Fixed to 1024. See D-2798."
+}

@@ -22,7 +22,9 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
-DB="$ROOT/knowledge pipeline/maxwell.db"
+# BUG-625(c): DB path config-first via pipeline_paths.DB_PATH (config + MAXWELL_DB_PATH override);
+# literal kept only as a fallback so backup never silently targets a stale path.
+DB="$(cd "$ROOT" && python3 -c 'from pipeline.pipeline_paths import DB_PATH; print(DB_PATH)' 2>/dev/null || printf '%s' "$ROOT/knowledge pipeline/maxwell.db")"
 TIMESTAMP=$(date "+%Y%m%d_%H%M%S")
 TAG=""
 QUIET=false

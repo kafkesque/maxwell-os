@@ -26,6 +26,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from pipeline.pipeline_paths import (
+    BOOKS_DIR,
     ENHANCE_MIN_HEADER_GAP_CHARS,
     SOURCE_EPUB_DIR,
     SOURCE_PDF_DIR,
@@ -231,7 +232,7 @@ def main():
     parser.add_argument('--domain', type=str, help='Only process specific domain folder')
     args = parser.parse_args()
 
-    pipeline_books = Path("knowledge pipeline/books")
+    pipeline_books = BOOKS_DIR
     orig_epub_base = SOURCE_EPUB_DIR
     orig_pdf_base = SOURCE_PDF_DIR
 

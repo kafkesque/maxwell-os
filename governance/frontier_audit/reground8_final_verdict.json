@@ -1,0 +1,29 @@
+{
+  "schema_version": "1.0",
+  "artifact": "reground8_final_verdict",
+  "decision_ref": "D-2715",
+  "created_at": "2026-09-30",
+  "generated_by": "goose (forensic audit turn)",
+  "scope": "re-ground(8) — the 8 anchors carrying an abstractive passage that must be re-grounded to verbatim source",
+  "verdict": "COMPLETE — all 8 anchors have a definitive disposition",
+  "confirmed_verbatim": [
+    {"anchor_id": "R020", "name": "Dynamic System Complexity"},
+    {"anchor_id": "R064", "name": "Optical Alignment in Typography"},
+    {"anchor_id": "R137", "name": "Desire-friction Conversion Formula"},
+    {"anchor_id": "R188", "name": "Sensory-motor Basis of Conceptual Reasoning"}
+  ],
+  "semantic_paraphrase_unrecoverable": [
+    {"anchor_id": "R037", "name": "Style Precedence and Override Behavior", "field": "causal_mechanism"},
+    {"anchor_id": "R053", "name": "Self-referential Incompleteness", "field": "causal_mechanism"},
+    {"anchor_id": "R083", "name": "Self-herding Behavior", "field": "empirical_pattern"},
+    {"anchor_id": "R151", "name": "Context-dependent Cognitive Processing", "field": "empirical_pattern"}
+  ],
+  "disposition_for_4_semantic": "KEEP as semantic-paraphrase with abstractive flag; the anchor concept IS verbatim-grounded via its OTHER recovered passages (source_text present in sanitized v4), but the single abstractive passage is a paraphrase whose verbatim source is NOT phrase-match recoverable in the corpus. Do NOT hard-drop (concept is valid); mark the abstractive passage field abstractive=true pending a future manual verbatim rewrite.",
+  "note": "This completes re-ground(8) for the D-2716 pointer-flip gate. The 4 semantic entries are a known, bounded limitation (semantic paraphrase, not content loss), consistent with RESOLUTION_V4_AUTHORITATIVE_20260929.json NO-CONTENT-LOSS.",
+  "owner_ratified": {
+    "by": "owner",
+    "at": "2026-10-03",
+    "instruction": "Ratify DROP(13)/QUARANTINE(15)/re-ground(8)",
+    "scope": "FINAL disposition of re-ground(8): 4 verbatim-confirmed (R020/R064/R137/R188) + 4 KEEP-as-semantic-paraphrase with abstractive flag (R037/R053/R083/R151). DROP(13) and QUARANTINE(15) re-confirmed (already ratified D-2711/D-2719). No hard-drop; the 4 semantic concepts remain verbatim-grounded via their other recovered passages."
+  }
+}

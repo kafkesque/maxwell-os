@@ -1,0 +1,33 @@
+{
+  "decision_gate": "D-2709",
+  "created_at": "2026-09-29",
+  "verdict": "NO-CONTENT-LOSS (pointer flip still HELD pending re-ground(8) + owner ratification)",
+  "source_segments": {
+    "needed": 4660,
+    "exact_sha256": 3463,
+    "content_phrase": 1172,
+    "residue_artifact_confirmed_present": 25,
+    "true_missing": 0
+  },
+  "orphans": {
+    "needed": 223,
+    "confirmed_present": 223,
+    "true_missing": 0
+  },
+  "reground_8": {
+    "confirmed_verbatim": [
+      "R020",
+      "R064",
+      "R137",
+      "R188"
+    ],
+    "pending_recovery": [
+      "R037",
+      "R053",
+      "R083",
+      "R151"
+    ],
+    "note": "pending 4 have abstractive passages (n_recovered < n_passages); verbatim recovery is a separate task, not a v4 loss"
+  },
+  "residual": "1.91% truncated kobo-xmlns dangling spans in v4; residue is matching-artifact only, no prose loss"
+}

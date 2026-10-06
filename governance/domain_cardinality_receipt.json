@@ -1,0 +1,272 @@
+{
+  "db_path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/maxwell.db",
+  "max_domains_per_fb": 5,
+  "measured_at": "2026-10-05T13:50:37.653869+00:00",
+  "over_cap": [
+    {
+      "classification_status": "CLEAN",
+      "domain_count": 6,
+      "fb_id": "5f8f02a82c3ccc087b02157a0428a6684c2d1e37a922caa41371cce786b006c7"
+    },
+    {
+      "classification_status": "CLEAN",
+      "domain_count": 6,
+      "fb_id": "b557ce34a784ccd47d05ac2744d1e6da5bdb3ea70b0fc632fe2edc1f8a762a3d"
+    },
+    {
+      "classification_status": "CLEAN",
+      "domain_count": 6,
+      "fb_id": "8af0fe50f057696ea970d64c600aef3bd89494765f1e8c23f05e36f813111f42"
+    },
+    {
+      "classification_status": "CLEAN",
+      "domain_count": 6,
+      "fb_id": "31c3424215083762e50dc0930917723aa0b93ee183dc5911621ba33455482255"
+    },
+    {
+      "classification_status": "CLEAN",
+      "domain_count": 6,
+      "fb_id": "336637cf37dc0a7f6a85fa716985e76c0a7aab1b86733b36d447a8f60e485c98"
+    },
+    {
+      "classification_status": "CLEAN",
+      "domain_count": 6,
+      "fb_id": "c6ad4226c31b204b8b1c837b955d3996e9d63db55bb6747a296de501e529ad12"
+    },
+    {
+      "classification_status": "CLEAN",
+      "domain_count": 6,
+      "fb_id": "2b821e627acbea56fb6006d8d74abdd63bb6e783775dae890d54b47f62c16c6a"
+    },
+    {
+      "classification_status": "CLEAN",
+      "domain_count": 6,
+      "fb_id": "aef0abcaa03cb11da1b938f66cfa0369a45021ed1d69faf99fb1c596266714b9"
+    },
+    {
+      "classification_status": "CLEAN",
+      "domain_count": 6,
+      "fb_id": "4eae0548261a5190cfbc22ed0199de7a32e234b98238b76f85a6abe285ceff22"
+    },
+    {
+      "classification_status": "CLEAN",
+      "domain_count": 6,
+      "fb_id": "88175ceb04cc3ada3f4e2817cc042a2f2b844af3cec6f55790b932612f4365f6"
+    },
+    {
+      "classification_status": "CLEAN",
+      "domain_count": 6,
+      "fb_id": "6655b95be5c5afa78b1cca282b0b9740b969576c2c9a73e434a91596d8824c82"
+    },
+    {
+      "classification_status": "CLEAN",
+      "domain_count": 6,
+      "fb_id": "e5cdf72d79e5e625c543fafaff7c15599d65d10b44b1e5041b30c92589c2ea14"
+    },
+    {
+      "classification_status": "CLEAN",
+      "domain_count": 6,
+      "fb_id": "64ae9e127758f5701023d0955baaba765cfa3b0fcf92f324db09f74bec35148f"
+    },
+    {
+      "classification_status": "CLEAN",
+      "domain_count": 6,
+      "fb_id": "8a4a6d39346793d34e6ce4b44a5c447c215e095c782f53d407d1d8fffa2e180f"
+    },
+    {
+      "classification_status": "CLEAN",
+      "domain_count": 6,
+      "fb_id": "c21e489a155b27c4032fac042fdf0708971e9ff2dca4ee74122e5b6b2cee388a"
+    },
+    {
+      "classification_status": "CLEAN",
+      "domain_count": 6,
+      "fb_id": "3fc12bf86e20555948d29f5c6784198d77fe6807a280c07bd78f8f470126878c"
+    },
+    {
+      "classification_status": "CLEAN",
+      "domain_count": 6,
+      "fb_id": "972938d1ef28ad60344cf25cf213c61c49ea18aee885468a6401deab12e7ff56"
+    },
+    {
+      "classification_status": "CLEAN",
+      "domain_count": 7,
+      "fb_id": "3038798eac2799d6b39cb1b2d6987802911c9d5a15a36b8e300795ba2c4eaa9c"
+    },
+    {
+      "classification_status": "CLEAN",
+      "domain_count": 6,
+      "fb_id": "2be074028d75b9b1c3d2896a9c55bb1edfe0a01e8b872875b9660925d344630f"
+    },
+    {
+      "classification_status": "CLEAN",
+      "domain_count": 6,
+      "fb_id": "89ed52040206b2c8d511f78caf16c01359fd831a59c30eb73b035485bcf0c0a8"
+    },
+    {
+      "classification_status": "CLEAN",
+      "domain_count": 6,
+      "fb_id": "943e1c05904df0bce08d23f933bc389dc988e37494dc11d630285a61a1921301"
+    },
+    {
+      "classification_status": "CLEAN",
+      "domain_count": 6,
+      "fb_id": "1566b957c605f6ac293221ce3634cf9b7886b6714756587ff372b2b9547ecddd"
+    },
+    {
+      "classification_status": "CLEAN",
+      "domain_count": 6,
+      "fb_id": "b441c99990f53a888809f965263b4120ac69095bfbcd94eea4049bf23be72bb1"
+    },
+    {
+      "classification_status": "CLEAN",
+      "domain_count": 6,
+      "fb_id": "f33c2bd4156a658433d2daefed570442136b0032d9b9240543aa3ccf11aea606"
+    },
+    {
+      "classification_status": "CLEAN",
+      "domain_count": 6,
+      "fb_id": "baf45ee954eda5d08617bc3c428e6bc7a075bd24e3313c3cf9c3a929525b3741"
+    },
+    {
+      "classification_status": "CLEAN",
+      "domain_count": 6,
+      "fb_id": "e827efc57c19319f3efa4886f3706703b882bc81a1cea99be6605388fa6bb473"
+    },
+    {
+      "classification_status": "CLEAN",
+      "domain_count": 6,
+      "fb_id": "d340cf30b1a8d71988aacde556868546df5ddbd6defe3915eeb54f2ec7286cfa"
+    },
+    {
+      "classification_status": "CLEAN",
+      "domain_count": 6,
+      "fb_id": "e236d31210d80a372503977bea18289cb5c220fa5a16562e9d7a039f43d4d7a8"
+    },
+    {
+      "classification_status": "CLEAN",
+      "domain_count": 7,
+      "fb_id": "0a19e28c4ccaf2307b43596a418c6ffa51dc01c087c32ac1a02b70069d83e240"
+    },
+    {
+      "classification_status": "CLEAN",
+      "domain_count": 7,
+      "fb_id": "bc1437003ccb9a08e18ff13a8337393013fe12405d53d08c6013e976473a22a8"
+    },
+    {
+      "classification_status": "CLEAN",
+      "domain_count": 6,
+      "fb_id": "a046cc1f0d941ed8a275defc2e09e74bfc29edb873041b03cb923270eea8031e"
+    },
+    {
+      "classification_status": "CLEAN",
+      "domain_count": 6,
+      "fb_id": "1469ce137e6d2d9676de7f16e8ca8b4e25cd1b4f17c4d805a062878e848d2774"
+    },
+    {
+      "classification_status": "CLEAN",
+      "domain_count": 6,
+      "fb_id": "88da16a022433e3c9300753362b44127771a0110ee9b8ac6f3b4f5a92987df89"
+    },
+    {
+      "classification_status": "CLEAN",
+      "domain_count": 6,
+      "fb_id": "8ec1aad647042c83a118418f44ac956a7a66d56ca6fa210d42f8f3c0e06b5fe0"
+    },
+    {
+      "classification_status": "CLEAN",
+      "domain_count": 7,
+      "fb_id": "376384a861251785ea319ea034002a9115520d61fb3ec95dbe17870ab05b9047"
+    },
+    {
+      "classification_status": "CLEAN",
+      "domain_count": 6,
+      "fb_id": "779d1fc2b66aa276eda5e5ecbb4db840b079d0fae6a0c18533b290eae40a2604"
+    },
+    {
+      "classification_status": "CLEAN",
+      "domain_count": 6,
+      "fb_id": "017cd29d8265b714f32a1b62ba1a48dd1a4b3501c93a8e6cbae407e3a97be018"
+    },
+    {
+      "classification_status": "CLEAN",
+      "domain_count": 7,
+      "fb_id": "4e6451a263be7fd53ed1b6c88c6277d2245c22ccabffb8400b20fada3633afd3"
+    },
+    {
+      "classification_status": "CLEAN",
+      "domain_count": 6,
+      "fb_id": "1afc79c30cc8915e96ddf1facfc8dfeb27fdd24ec170af14f0615455694f0ef4"
+    },
+    {
+      "classification_status": "CLEAN",
+      "domain_count": 6,
+      "fb_id": "85e31a4ccc68f2e8b2283887dc4a769e70c4d4a6a7708b86f8b320177a6abf33"
+    },
+    {
+      "classification_status": "CLEAN",
+      "domain_count": 6,
+      "fb_id": "dca2b389c9848edab13a112d07a15b1d5f5cc0652d57df711509f7bac55462be"
+    },
+    {
+      "classification_status": "CLEAN",
+      "domain_count": 6,
+      "fb_id": "da3a73b840cf39078fc732790766999b5b786331bd45ef12818e00a834148322"
+    },
+    {
+      "classification_status": "CLEAN",
+      "domain_count": 6,
+      "fb_id": "f045fd4ffef1119c7ccb0c5c0712d9dcb29573bd7cdf31751ad46bb43903eef2"
+    },
+    {
+      "classification_status": "CLEAN",
+      "domain_count": 6,
+      "fb_id": "cead9543d9561947342d741d16f183e6c845bd996088e7fac618440ba591977d"
+    },
+    {
+      "classification_status": "CLEAN",
+      "domain_count": 6,
+      "fb_id": "7a4d58fcbabbc3cc0d86649cb211641d145c516585a0ba900e3836a4bb1b8b1a"
+    },
+    {
+      "classification_status": "CLEAN",
+      "domain_count": 6,
+      "fb_id": "453505351fccf078015e380468e2ccb16ea9d2d5e9ca5a2fc344d268d0bca18c"
+    },
+    {
+      "classification_status": "CLEAN",
+      "domain_count": 6,
+      "fb_id": "95d9df5a1fc4bff2c172de3762a55bfb2c7fde5bec6d0d387ec0e9d47b6cf155"
+    },
+    {
+      "classification_status": "CLEAN",
+      "domain_count": 7,
+      "fb_id": "6f27ea594e2f435d18da175f36ed49bd30b9f9e3184304f0404cb4450c2195bb"
+    },
+    {
+      "classification_status": "CLEAN",
+      "domain_count": 6,
+      "fb_id": "93b6b9025051bffab9d9f1d5388edd8f1c3b343bca38bef475d9758fb8dab286"
+    },
+    {
+      "classification_status": "CLEAN",
+      "domain_count": 6,
+      "fb_id": "e55d07d3b44b82cf6e9f232a72d03f8bd3b8255deb76a0655b1b952e0f3651bb"
+    },
+    {
+      "classification_status": "CLEAN",
+      "domain_count": 6,
+      "fb_id": "ee9728e34987f6a60a16f9a3800cb64298af20b370c3e20f8399d9f29f8edbe0"
+    },
+    {
+      "classification_status": "CLEAN",
+      "domain_count": 6,
+      "fb_id": "7bb4d78c1886a8a2413c9605d43adc8f43333fe4a1b96e7925a1b06b316401cb"
+    }
+  ],
+  "over_cap_count": 52,
+  "parse_defect_count": 0,
+  "parse_defects": [],
+  "schema_version": "1.0",
+  "total_fbs": 14574
+}

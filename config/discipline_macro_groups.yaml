@@ -1,0 +1,46 @@
+# Discipline MACRO re-scope — BUG-622 fix path (D-2792/D-2793/D-2795/D-2796).
+#
+# Collapses the 9 discipline groups (closed_menu_v5.json disciplines[].group) into a
+# coarser MACRO axis. This is the stable routing facet; the fine 62-way discipline
+# becomes advisory (multi-label tags), NOT a hard gate.
+#
+# WHY (D-2796 measurement): the inter-rater ceiling is FINE 0.581 / 9-way 0.728 /
+# 4-way 0.729 / 3-way 0.766 — even a human cannot reach the 0.800 operative floor on
+# this taxonomy. Therefore the discipline operative floor is HUMAN-UNREACHABLE; the
+# classifier gate must be set to HUMAN PARITY (~0.73-0.77), never 0.8 or 0.9.
+#
+# group source of truth: closed_menu_v5.json disciplines[].group (9 groups + 'emerging').
+# 'emerging' (empty group) is an explicit routing bucket and is NEVER folded into a macro.
+
+scheme: "3-way"          # PRIMARY recommendation (highest human ceiling, kappa 0.766)
+
+macros:
+  "3-way":
+    Technical:
+      - "AI & Computing"
+      - "Computational Craft"
+      - "Form & Structure"
+    Human & Design:
+      - "Behavioral & Cognitive"
+      - "Heterodox"
+      - "Design Cognition"
+      - "Perception & Signal"
+    Method & Business:
+      - "Systems & Method"
+      - "Operational & Strategy"
+  "4-way":
+    Science & Engineering:
+      - "AI & Computing"
+      - "Computational Craft"
+    Mind & Society:
+      - "Behavioral & Cognitive"
+      - "Heterodox"
+    Design & Perception:
+      - "Design Cognition"
+      - "Perception & Signal"
+      - "Form & Structure"
+    Method & Operations:
+      - "Systems & Method"
+      - "Operational & Strategy"
+
+emerging_routing: "emerging"   # explicit routing bucket, never a macro bucket

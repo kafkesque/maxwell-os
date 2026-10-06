@@ -60,6 +60,19 @@ def _expected_count() -> int | None:
     return None
 
 
+def _declared_failed() -> int:
+    """D-2817: declared failed/quarantined cluster count persisted by S4."""
+    candidates = [Path(str(STAGE4_5_CHECKPOINT) + ".expected_count.json"),
+                  Path(str(STAGE4_CHECKPOINT) + ".expected_count.json")]
+    for c in candidates:
+        if c.exists():
+            try:
+                return int(json.loads(c.read_text()).get("declared_failed_count") or 0)
+            except Exception:
+                continue
+    return 0
+
+
 def _severe_evidence_ids(fbs: list[dict]) -> set[str]:
     """Reuse the S5 evidence-cleanliness gate (BUG-181#1/BUG-202 fail-closed)."""
     from pipeline.stage5_verify import _evidence_cleanliness_gate
@@ -77,12 +90,13 @@ def main() -> int:
 
     # 1. record count
     expected = _expected_count()
+    declared = _declared_failed()
     if expected is None:
         print("⚠️  no .expected_count.json sidecar — cannot verify count (proceeding, WARN)")
-    elif n != expected:
-        problems.append(f"record count {n} != expected {expected}")
+    elif n + declared != expected:
+        problems.append(f"record count {n} + declared-failed {declared} != expected {expected}")
     else:
-        print(f"✅ record count {n} == expected {expected}")
+        print(f"✅ record count {n} + declared-failed {declared} == expected {expected}")
 
     # 2. boundary — _load_jsonl() above already raises on any non-standalone-JSON
     # line (BUG-188 partial-tail class); whole-record truncation is caught by the

@@ -14,12 +14,16 @@
 # (a finding whose tier is written in two places is a finding with two tiers).
 
 schema_version: '1.0'
-source: config/closed_menu_v5.json
+source: config/closed_menu_v7.json
 axis_groups:
-  # what a classifier may EMIT. A change here changes an ANSWER, so every stored label count is incomparable.
-  answer_space: [domains, abstention]
-  # definitions that FEED the rendering. A change here changes wording, not the answer set.
-  definition_axes: [disciplines, content_types, extraction_types]
+  # what a classifier may EMIT - their VALUE SET (canonical slots), never the definition wording (D-NEW-1).
+  # A change here changes an ANSWER, so every stored label count is incomparable. domains/disciplines/
+  # content_types/extraction_types are ALL answer vocabularies the pipeline emits; disciplines was miscategorized
+  # as a definition axis (BL3), which made the D-2815 B&M slot addition invisible to this pin.
+  answer_space: [domains, disciplines, content_types, extraction_types, abstention]
+  # axes whose DEFINITION/description wording feeds the rendering. A wording edit moves these per-axis
+  # whole-object hashes but NOT the answer-space pin (D-371: the DEFINITION moved, the ANSWER SPACE did not).
+  definition_axes: [domains, disciplines, content_types, extraction_types]
   # bookkeeping carried inside the same composite object.
   housekeeping: [decision, schema_version]
 require_every_axis_grouped: true   # an axis in no group is pinned by nothing, so a change to it is invisible

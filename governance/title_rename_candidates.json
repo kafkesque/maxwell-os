@@ -1,0 +1,326 @@
+{
+  "schema_version": "1.0",
+  "detector": "scripts/detect_title_renames.py",
+  "mode": "READ-ONLY candidates — owner gate required, never auto-merge (D-2735)",
+  "shingle_k": 3,
+  "jaccard_threshold": 0.6,
+  "distinct_source_ids": 919,
+  "candidate_count": 45,
+  "candidates": [
+    {
+      "a_id": "3a0c20ab274efcd5",
+      "b_id": "8fbfcb06f27bf76a",
+      "a": "Charles J. Forceville, Eduardo Urios-Aparisi — Multimodal Metaphor",
+      "b": "Charles-J. Forceville, Eduardo Urios-Aparisi — Multimodal Metaphor",
+      "similarity": 1.0
+    },
+    {
+      "a_id": "c7c8ac54d033a233",
+      "b_id": "ac839d447627ab79",
+      "a": "Ellen Lupton — Thinking with Type: A Critical Guide for Designers, Writers, Editors, Students (Second and Revised Edition)",
+      "b": "Ellen Lupton — Thinking with Type, A",
+      "similarity": 0.9615
+    },
+    {
+      "a_id": "c70098af41f6a043",
+      "b_id": "3e53876ae0c135d6",
+      "a": "Shane Parrish and Rhiannon Beaubien — The Great Mental Models, Volume 2: Physics, Chemistry, and Biology",
+      "b": "Shane Parrish, Rhiannon Beaubien, Rosie Leizrowice — The Great Mental Models, Volume 3: Systems and Mathematics",
+      "similarity": 0.9474
+    },
+    {
+      "a_id": "c70098af41f6a043",
+      "b_id": "795f336c09c85fed",
+      "a": "Shane Parrish and Rhiannon Beaubien — The Great Mental Models, Volume 2: Physics, Chemistry, and Biology",
+      "b": "Shane Parrish, Rhiannon Beaubien — The Great Mental Models, Volume 4: Economics and Art",
+      "similarity": 0.9474
+    },
+    {
+      "a_id": "3e53876ae0c135d6",
+      "b_id": "795f336c09c85fed",
+      "a": "Shane Parrish, Rhiannon Beaubien, Rosie Leizrowice — The Great Mental Models, Volume 3: Systems and Mathematics",
+      "b": "Shane Parrish, Rhiannon Beaubien — The Great Mental Models, Volume 4: Economics and Art",
+      "similarity": 0.9474
+    },
+    {
+      "a_id": "9937c0ce3b89dec8",
+      "b_id": "7e87fcd1064b6bc8",
+      "a": "Jon Yablonski — Laws of UX Using Psychology to Design Better Products  Services",
+      "b": "Services Jon Yablonski — Laws of UX Using Psychology to Design Better Products &",
+      "similarity": 0.9385
+    },
+    {
+      "a_id": "77b05e5db2b15e28",
+      "b_id": "b73510ed035932b6",
+      "a": "Robert Bringhurst — The Elements of Typographic Style v3.0",
+      "b": "Robert Bringhurst — The Elements of Typographic Style",
+      "similarity": 0.9348
+    },
+    {
+      "a_id": "f572dfec14c42a6c",
+      "b_id": "9a5b825832946cb8",
+      "a": "Research Project Zina O’Leary — The Essential Guide to Doing Your",
+      "b": "Zina O’Leary — The Essential Guide to Doing Your Research Project",
+      "similarity": 0.9231
+    },
+    {
+      "a_id": "396295ca7e029a37",
+      "b_id": "70edb4aca420d4a5",
+      "a": "Alan Male — Illustration A Theoretical & Contextual Perspective",
+      "b": "Contextual Perspective Alan Male — Illustration A Theoretical and",
+      "similarity": 0.9074
+    },
+    {
+      "a_id": "e7c89f9eca43ad96",
+      "b_id": "7c35b2bfd3b9aa6e",
+      "a": "Totalitarianism Mattias Desmet — The Psychology of",
+      "b": "Mattias Desmet — The Psychology of Totalitarianism",
+      "similarity": 0.907
+    },
+    {
+      "a_id": "17ac019eeffeb320",
+      "b_id": "8a6f826c6481cc72",
+      "a": "Trish and Chris Meyer — After Effects Apprentice Real-World Skills for the Aspiring Motion Graphics Artist",
+      "b": "Trish and Chris Meyer — After Effects Apprentice: Real-World Skills for the Aspiring Motion Graphics Artist",
+      "similarity": 0.8929
+    },
+    {
+      "a_id": "8c779e40a844d9ed",
+      "b_id": "d7acaa5ac0b13cb0",
+      "a": "David J. Bland — Testing Business Ideas A Field Guide for Rapid",
+      "b": "Bland, David J. — Testing Business Ideas A Field Guide for Rapid",
+      "similarity": 0.8723
+    },
+    {
+      "a_id": "d17be236beda3451",
+      "b_id": "cbd1b1cf5ce18def",
+      "a": "Benedikt Gro — Generative Design Visualize, Program, and Create with JavaScript in P5.js",
+      "b": " — Generative Design_ Visualize, Program, and Create with JavaScript in P5.js",
+      "similarity": 0.8676
+    },
+    {
+      "a_id": "90ca5a74b674a9c0",
+      "b_id": "767c0001e6462818",
+      "a": "Centered Worlds — Things We Could Design For More Than Human",
+      "b": "Centered Worlds_clean — Things We Could Design For More Than Human",
+      "similarity": 0.8333
+    },
+    {
+      "a_id": "09a825fd5e0076f0",
+      "b_id": "55a01a633ab04de5",
+      "a": "50 Cent — Hustle Harder, Hustle Smarter",
+      "b": " — Hustle Harder, Hustle Smarter",
+      "similarity": 0.8261
+    },
+    {
+      "a_id": "bc31fd7c7f6f920d",
+      "b_id": "5482d1921cd4b03a",
+      "a": "Ellen Lupton and Jennifer Cole Phillips — Graphic Design: The New Basics, Revised and Expanded",
+      "b": "Ellen Lupton, Jennifer Cole Phillips — Graphic De",
+      "similarity": 0.8182
+    },
+    {
+      "a_id": "aa81a4e244b4ba87",
+      "b_id": "24a728a76ed2ee6c",
+      "a": "Daniel Chandler — Semiotics The Basics",
+      "b": "Basics Daniel Chandler — Semiotics The",
+      "similarity": 0.8077
+    },
+    {
+      "a_id": "ec3a3dc1ce55b4a6",
+      "b_id": "b75d8f2ca67dca1f",
+      "a": "Rajat Bhargava, Will Herman — The Startup Playbook",
+      "b": "Rajat Bhargava — The Startup Playbook Founder-to-Founder Advice from Two Startup Veterans",
+      "similarity": 0.8056
+    },
+    {
+      "a_id": "85e5f7261d361da1",
+      "b_id": "06278c8851862405",
+      "a": "Sarrah Vesselov and Taurie Davis — Building Design Systems Unify User Experiences Through a",
+      "b": "Sarrah Vesselov — Building Design Systems Unify User Experiences through a Shared Design Language",
+      "similarity": 0.7922
+    },
+    {
+      "a_id": "26d9bd396aa6df4a",
+      "b_id": "752ca7c654003f32",
+      "a": "Rob Thomas, Paul Zikopoulos, Kate Soule — AI Value Creators",
+      "b": "Rob Thomas, Paul Zikopoulos, Kate Soule — AI Value Creators Beyond the Generative AI User Mindset",
+      "similarity": 0.7857
+    },
+    {
+      "a_id": "bc3df1c395735588",
+      "b_id": "f1c9502036714bae",
+      "a": "Marty Neumeier — The Brand Flip",
+      "b": "Neumeier, Marty — The Brand Flip: Why Customers Now Run Companies and How to Profit From It",
+      "similarity": 0.7826
+    },
+    {
+      "a_id": "fc9cb21c0c4779fc",
+      "b_id": "d5dc6c40e181151a",
+      "a": "Sean Adams — The Designer's Dictionary of Color",
+      "b": "Sean Adams — The Designer s Dictionary of Type",
+      "similarity": 0.775
+    },
+    {
+      "a_id": "88a6204e56252eb2",
+      "b_id": "bc31fd7c7f6f920d",
+      "a": "Lupton, Ellen_Phillips, Jennifer Cole — Graphic design the new basics",
+      "b": "Ellen Lupton and Jennifer Cole Phillips — Graphic Design: The New Basics, Revised and Expanded",
+      "similarity": 0.7727
+    },
+    {
+      "a_id": "a690232baa303dc2",
+      "b_id": "49f059e0cc2e23a9",
+      "a": "David Airey — Logo Design Love: A Guide to Creating Iconic Brand Identities",
+      "b": "Airey, David — Logo Design Love: A Guide to Creating Iconic Brand Identities",
+      "similarity": 0.7727
+    },
+    {
+      "a_id": "6ec1d7b227afc802",
+      "b_id": "8c779e40a844d9ed",
+      "a": "David J. Bland, Alex Osterwalder — Testing Business Ideas A Field Guide for Rapid Experimentation",
+      "b": "David J. Bland — Testing Business Ideas A Field Guide for Rapid",
+      "similarity": 0.7705
+    },
+    {
+      "a_id": "bc3df1c395735588",
+      "b_id": "5f50fc481e0aaadb",
+      "a": "Marty Neumeier — The Brand Flip",
+      "b": "Marty Neumeier — The Brand Gap: How to Bridge the Distance Between Business Strategy and Design",
+      "similarity": 0.7308
+    },
+    {
+      "a_id": "987bdd0e7bcb67d9",
+      "b_id": "089ae477486ca75b",
+      "a": "Anonymous — Silent Weapons for Quiet Wars",
+      "b": " — Silent Weapons for Quiet Wars - An Introduction Programming Manual",
+      "similarity": 0.7188
+    },
+    {
+      "a_id": "fe45048f38027a23",
+      "b_id": "afe2779e9b7c2035",
+      "a": "Erika Hall — Just Enough Research",
+      "b": "Edition Erika Hall — Just Enough Research, 2nd",
+      "similarity": 0.7143
+    },
+    {
+      "a_id": "3f9db214c55f5f1d",
+      "b_id": "d901dbc7ea701603",
+      "a": "Alireza Parandeh — Building Generative AI Services with FastAPI A Practical Approach to Developing Context-Rich Generative AI Applications",
+      "b": "Alireza Parandeh — Building Generative AI Services with FastAPI_ A Practical",
+      "similarity": 0.7045
+    },
+    {
+      "a_id": "71633d2a02d9446c",
+      "b_id": "2d757b44c89e7a29",
+      "a": "Primer Donella H. Meadows — Thinking in Systems A",
+      "b": "Donella Meadows — Thinking in Systems: A Primer",
+      "similarity": 0.6923
+    },
+    {
+      "a_id": "5616e5a77b28d51a",
+      "b_id": "d517f49b3278aa67",
+      "a": "Louise J. Ravelli and T h e o V an L e e u w e n — Modality in the digital age",
+      "b": "Ravelli, L. J. — Modality in the digital age",
+      "similarity": 0.6818
+    },
+    {
+      "a_id": "9f0dfc50f7667f7c",
+      "b_id": "2715f0b59a2a59f9",
+      "a": "Joey Korenman — The Freelance Manifesto A Field Guide for the Modern Motion Designer",
+      "b": "Joey Korenman — The Freelance Manifesto: A Field Guide for the Modern Motion Designer",
+      "similarity": 0.6818
+    },
+    {
+      "a_id": "15da781a87b25405",
+      "b_id": "adbfa0ad879f1034",
+      "a": "Addy Osmani — Beyond Vibe Coding (for True Epub)",
+      "b": "Addy Osmani — Beyond Vibe Coding",
+      "similarity": 0.6765
+    },
+    {
+      "a_id": "0f4ebf6c2f9ca322",
+      "b_id": "45090cadc255f013",
+      "a": "STEVEN PRESSFIELD — The War of Art Break Through the Blocks and Win your Inner Creative Battles",
+      "b": "Steven Pressfield — The War of Art: Winning the Inner Creative Battle",
+      "similarity": 0.6757
+    },
+    {
+      "a_id": "6ec1d7b227afc802",
+      "b_id": "d7acaa5ac0b13cb0",
+      "a": "David J. Bland, Alex Osterwalder — Testing Business Ideas A Field Guide for Rapid Experimentation",
+      "b": "Bland, David J. — Testing Business Ideas A Field Guide for Rapid",
+      "similarity": 0.6721
+    },
+    {
+      "a_id": "65349eb7a2874b3e",
+      "b_id": "33fcb21d5b85c8bc",
+      "a": "Ali Arsanjani, Juan Pablo Bustos — Agentic Architectural Patterns for Building Multi-Agent Systems",
+      "b": "Agent Systems — Agentic Architectural Patterns for Building Multi",
+      "similarity": 0.6667
+    },
+    {
+      "a_id": "ac839d447627ab79",
+      "b_id": "b493cb22642868f1",
+      "a": "Ellen Lupton — Thinking with Type, A",
+      "b": "Ellen Lupton — Thinking with Type  A Critical Guid(z-lib.org)",
+      "similarity": 0.6667
+    },
+    {
+      "a_id": "e38e14fd1487a10d",
+      "b_id": "09ec3009985929d3",
+      "a": "Nathan Yau — Visualize This The FlowingData Guide to Design, Visualization, and Statistics, 2nd Edition",
+      "b": "Yau Nathan — Visualize This: The FlowingData Guide to Design, Visualization, and Statistics",
+      "similarity": 0.6667
+    },
+    {
+      "a_id": "cc6280f2cd05b823",
+      "b_id": "508acab3c32d2f69",
+      "a": "Theo van Leeuwen and Emilia Djonov — Notes towards a semiotics of kinetic typography",
+      "b": "Theo van Leeuwen — Towards a semiotics of typography",
+      "similarity": 0.6607
+    },
+    {
+      "a_id": "8e0a6ee7e4597cdc",
+      "b_id": "8a8e0cb5400fc738",
+      "a": "Anna Feigenbaum, Aria Alamalhodaei — The Data Storytelling Workbook",
+      "b": "Anna Feigenbaum Aria Alamalhodaei — The Data Storytelling Workbook",
+      "similarity": 0.6491
+    },
+    {
+      "a_id": "c7c8ac54d033a233",
+      "b_id": "b493cb22642868f1",
+      "a": "Ellen Lupton — Thinking with Type: A Critical Guide for Designers, Writers, Editors, Students (Second and Revised Edition)",
+      "b": "Ellen Lupton — Thinking with Type  A Critical Guid(z-lib.org)",
+      "similarity": 0.641
+    },
+    {
+      "a_id": "71611635480f8595",
+      "b_id": "d73821bf7a38fde9",
+      "a": "Dan Mall — Pricing Design",
+      "b": "Mall Dan — Pricing Design",
+      "similarity": 0.6364
+    },
+    {
+      "a_id": "265a59860aab522d",
+      "b_id": "2c6b27274224cb2f",
+      "a": "George Bokhua — Principles of Logo Design",
+      "b": " — Principles of Logo Design: A Practical Guide to Creating",
+      "similarity": 0.625
+    },
+    {
+      "a_id": "dd0b4ab4338a47af",
+      "b_id": "96091b4b9f8d1614",
+      "a": "Philip Kotler, Hermawan Kartajaya, Iwan Setiawan — Marketing 7.0",
+      "b": "Philip Kotler, Kevin Lane Keller, Alexander Chernev, Jagdish N. Sheth, G. Shainesh — Marketing Management",
+      "similarity": 0.6129
+    },
+    {
+      "a_id": "5f50fc481e0aaadb",
+      "b_id": "5a928a9cd4cac955",
+      "a": "Marty Neumeier — The Brand Gap: How to Bridge the Distance Between Business Strategy and Design",
+      "b": "Marty Neumeier — The Brand Gap, Revised Edition",
+      "similarity": 0.6111
+    }
+  ]
+}

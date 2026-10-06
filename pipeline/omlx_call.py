@@ -46,6 +46,7 @@ from pipeline.pipeline_paths import (
     OMLX_READ_TIMEOUT,
     OMLX_RETRY_DELAY,
     OMLX_URL,
+    OMLX_WALL_CLOCK_DEADLINE,
     OMLX_WEDGE_RECOVERY_SLEEP,
     VERIFY_MODEL,
     VERIFY_CHAT_TEMPLATE_KWARGS,
@@ -60,6 +61,7 @@ RETRY_DELAY: int = OMLX_RETRY_DELAY             # seconds (from config)
 COLD_RELOAD_DELAY: int = OMLX_COLD_RELOAD_DELAY  # D2301: reasoning-model cold reload wait (from config)
 READ_TIMEOUT: int = OMLX_READ_TIMEOUT            # BUG-224: per-read socket timeout (from config)
 WEDGE_RECOVERY_SLEEP: int = OMLX_WEDGE_RECOVERY_SLEEP  # BUG-224: recovery sleep after a mid-response wedge (from config)
+WALL_CLOCK_DEADLINE: int = OMLX_WALL_CLOCK_DEADLINE  # BUG-658: TOTAL wall-clock deadline per request — SSE keepalive resets the per-read timer, so a (connect, read) tuple alone can hang forever
 
 # temp=0.0 — NEVER override (R7)
 TEMPERATURE: float = GEN_TEMPERATURE            # 0.0 from config
@@ -70,6 +72,47 @@ TEMPERATURE: float = GEN_TEMPERATURE            # 0.0 from config
 _UNSET = object()
 
 CHAT_ENDPOINT = f"{OMLX_URL}/v1/chat/completions"
+
+
+class WallClockTimeout(RuntimeError):
+    """BUG-658: total wall-clock deadline exceeded (SSE keepalive defeated the read timeout)."""
+
+
+def _post_with_wall_clock(
+    payload: dict,
+    headers: dict,
+    connect_timeout: int,
+    read_timeout: int,
+    wall_clock_deadline: int,
+) -> requests.Response:
+    """POST under a TOTAL wall-clock deadline (BUG-658).
+
+    ``requests.post(timeout=(connect, read))`` bounds only the *between-byte* read gap.
+    OMLX ``sse_keepalive_mode: 'chunk'`` emits periodic keepalive bytes, which resets the
+    read timer forever — a wedged server hangs the request with no total deadline. This
+    wraps the POST in a daemon thread and ``join(timeout=wall_clock_deadline)`` so the
+    caller regains control even when keepalive bytes keep arriving. On expiry the leaked
+    daemon thread is abandoned (killed at process exit) and ``WallClockTimeout`` is raised.
+    """
+    holder: dict = {}
+
+    def _target() -> None:
+        holder["resp"] = requests.post(
+            CHAT_ENDPOINT,
+            json=payload,
+            headers=headers,
+            timeout=(connect_timeout, read_timeout),
+        )
+
+    t = threading.Thread(target=_target, daemon=True, name="omlx-wall-clock")
+    t.start()
+    t.join(timeout=wall_clock_deadline)
+    if t.is_alive():
+        raise WallClockTimeout(
+            f"total wall-clock deadline ({wall_clock_deadline}s) exceeded — "
+            "SSE keepalive defeated the per-read timeout (BUG-658)"
+        )
+    return holder["resp"]
 
 
 # ── Circuit breaker (D2187, P1-3) ────────────────────────────────────────
@@ -303,12 +346,7 @@ def call_omlx(
             # A (connect, read) tuple bounds the READ separately: a server that
             # stalls mid-response (no byte for READ_TIMEOUT) now trips fast instead
             # of holding the request open for the full `timeout`.
-            resp = requests.post(
-                CHAT_ENDPOINT,
-                json=payload,
-                headers=headers,
-                timeout=(timeout, READ_TIMEOUT),
-            )
+            resp = _post_with_wall_clock(payload, headers, timeout, READ_TIMEOUT, WALL_CLOCK_DEADLINE)
             resp.raise_for_status()
             data = resp.json()
             msg = data["choices"][0]["message"]
@@ -329,6 +367,14 @@ def call_omlx(
             last_error = f"Read timeout (wedge) after {READ_TIMEOUT}s without a byte"
             if attempt < MAX_RETRIES:
                 print(f"      🧊  OMLX wedge (read stall) — sleeping {WEDGE_RECOVERY_SLEEP}s to let server recover", flush=True)
+                time.sleep(WEDGE_RECOVERY_SLEEP)
+        except WallClockTimeout as e:
+            # BUG-658: total wall-clock deadline exceeded — SSE keepalive kept resetting
+            # the read timer so the (connect, read) tuple never tripped. Same recovery as
+            # the read stall (the server needs time to drain the wedged generation).
+            last_error = str(e)
+            if attempt < MAX_RETRIES:
+                print(f"      🧊  OMLX wall-clock wedge — sleeping {WEDGE_RECOVERY_SLEEP}s to let server recover (BUG-658)", flush=True)
                 time.sleep(WEDGE_RECOVERY_SLEEP)
         except requests.exceptions.ConnectTimeout:
             last_error = f"Connect timeout after {timeout}s"

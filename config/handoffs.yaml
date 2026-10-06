@@ -154,7 +154,7 @@ revision_locators:
 # SHRINK-ONLY, HONESTLY: `max_unrevisioned` is a CENSUS, not the enforcement (the enforcement is the refusal
 # above) - its value is that raising the census requires two coordinated edits that a diff SHOWS.
 receipt_provenance:
-  decided: BUG-559
+  decided: D-2809
   direction: shrink_only
   max_unrevisioned: 2
   rule: >-
@@ -162,8 +162,8 @@ receipt_provenance:
     exceptions AND the reason no store can re-derive them.
   unrevisioned_declared:
     - path: "knowledge pipeline/stage4_merge/t11/checkpoint_enriched.jsonl"
-      digest: 0ca6f0f08bea8f2dfbafb7a598e934e4f2afc3b98a894ee847e3ca1183c3d1b0
-      decided: BUG-376
+      digest: 3854250c3fbcfddfcb28a2ca861b4032ca4db5a27f3136c4a7946c90d6162303
+      decided: D-2809
       why: >-
         .gitignore:73 declares the run root `knowledge pipeline/` untracked BY DESIGN (a pipeline run's
         checkpoint is not source), so no revision of this path exists in any store and no revision_locator can be
@@ -172,7 +172,7 @@ receipt_provenance:
         and bounded by the census rather than silently tolerated.
     - path: "knowledge pipeline/stage5_verify/t11/checkpoint.jsonl"
       digest: 8f82daf8a96faa67a693b3c178f92ff1a1bc6c8e1736e6a989091af5cd660380
-      decided: BUG-475
+      decided: D-2809
       why: >-
         same run root, same reason (untracked by design, no bytes_at to locate). Its declared mutability IS
         append_only, so the BUG-540 prefix join applies the moment the file GROWS; today the receipt and the live

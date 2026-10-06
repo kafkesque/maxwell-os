@@ -41,7 +41,13 @@ NUM_DOMAIN_CLASSES: int = 43
 MIN_EXAMPLES_PER_CLASS: int = 5
 MAX_LENGTH: int = 320
 
-DEFAULT_CHECKPOINT: str = "knowledge pipeline/classifier_modernbert_p5final"
+# BUG-625(c): default checkpoint is config-first via pipeline_paths (one home); the literal is kept
+# only as a degraded-standalone fallback (mirrors book_metadata D2176 / run_monitor D2175).
+try:
+    from pipeline.pipeline_paths import S4_STUDENT_PRECLASSIFIER_CHECKPOINT
+    DEFAULT_CHECKPOINT: str = S4_STUDENT_PRECLASSIFIER_CHECKPOINT
+except ImportError:
+    DEFAULT_CHECKPOINT: str = "knowledge pipeline/classifier_modernbert_p5final"
 # BUG-397(a)/D-2618: the golden was retired to archive/ by D-2618, so this default
 # resolved to NOTHING. The archived path is the convention the sibling training
 # scripts already use (train_discipline_classifier.py:51, train_depth_classifier.py:69).

@@ -1,7 +1,8 @@
-# OWNER GATE — BUG-528 pipeline/** lock re-scope (D-2801 PROPOSED, PENDING OWNER ACK)
+# OWNER GATE — BUG-528 pipeline/** lock re-scope (D-2801 LANDED — RESOLVED 2026-10-03)
 
-> **Status:** PROPOSED — not minted, not implemented. This is the owner decision the whole S4 rerun
-> critical path waits on. **Owner: ack (`ok`) or veto (`revert`)** — see "Your decision" at the bottom.
+> **Status:** RESOLVED 2026-10-03 — D-2801 LANDED (git HEAD 933aea9) and D-2805 OWNER RATIFIED
+> (BUG-528 lock re-scoped to an accountability gate: R5 + D-naming + stage_code_fingerprint). The S4 rerun
+> is UNBLOCKED. This proposal is now historical record of the owner decision that landed.
 > Written 2026-10-03 by the assistant (R5 generator). Forensic audit state at time of writing: 4 rails
 > GREEN, session-plan GREEN, worktree RED on exactly the 20 paths below (BUG-528, owner-gated).
 

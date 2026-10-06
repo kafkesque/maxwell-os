@@ -167,7 +167,10 @@ provenance:
   menu_version_stamp_keys: [menu_version, closed_menu_sha256, answer_space_sha256, menu_sha256]
   # A stamp that is never CHECKED against the pin it claims to be is a decoration. Each manifest key must
   # resolve to the recorded pin of the same fact, or it is a MISMATCH (hard) - never a pass.
-  stamp_verify_keys: {closed_menu_sha256: composite_hash_frozen_pin, answer_space_sha256: answer_space_hash}
+  # D-2831 (D-NEW-6): both manifest stamps are HISTORICAL - closed_menu_sha256 (73597ee2..., composite) and
+  # answer_space_sha256 (8436d9c9..., RETIRED two-axis method). Each is checked against the FROZEN pin of the
+  # SAME method, never the live 5-axis value-set pin (d704d06e...), which is a category error.
+  stamp_verify_keys: {closed_menu_sha256: composite_hash_frozen_pin, answer_space_sha256: answer_space_hash_frozen_pin}
 
 load_bearing:
   # D-394 (2026-09-25). Written as a RAIL, not as a paragraph: scripts/check_depth_load_bearing.py resolves

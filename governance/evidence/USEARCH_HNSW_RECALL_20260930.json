@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "gen_model": "BAAI/bge-m3 (ollama, 512d, L2-normalized)",
+  "pipeline_commit": "49c17e4",
+  "n_segments": 2000,
+  "dim": 512,
+  "embed_seconds": 196.38,
+  "embed_rate_seg_per_s": 10.2,
+  "ks": [
+    5,
+    10,
+    20,
+    50
+  ],
+  "ground_truth": {
+    "backend": "faiss.IndexFlatIP",
+    "build_seconds": 0.0004,
+    "note": "exact brute force O(N); recall@k baseline"
+  },
+  "candidates": [
+    {
+      "backend": "faiss.IndexHNSWFlat",
+      "params": {
+        "M": 32,
+        "ef_construction": 40,
+        "ef_search": 64
+      },
+      "build_seconds": 0.0891,
+      "query_seconds": 0.0258,
+      "recall_at_k": {
+        "5": 0.9998,
+        "10": 0.9996,
+        "20": 0.9991,
+        "50": 0.9962
+      }
+    },
+    {
+      "backend": "usearch.Index",
+      "params": {
+        "metric": "ip",
+        "connectivity": 32,
+        "expansion_add": 40,
+        "expansion_search": 64
+      },
+      "build_seconds": 0.0311,
+      "query_seconds": 0.0389,
+      "recall_at_k": {
+        "5": 0.9837,
+        "10": 0.9837,
+        "20": 0.9811,
+        "50": 0.9714
+      }
+    }
+  ],
+  "gate": {
+    "pass_k": 10,
+    "pass_threshold": 0.95,
+    "faiss_hnsw_recall": 0.9996,
+    "usearch_recall": 0.9837,
+    "verdict": "PASS"
+  }
+}

@@ -1,0 +1,162 @@
+{
+  "schema_version": "1.0",
+  "kind": "anchor_quarantine",
+  "created_at": "2026-09-30",
+  "decision_ref": "D-2703",
+  "ratified_by": "owner",
+  "ratified_at": "2026-09-30",
+  "ratify_ref": "D-2719",
+  "policy": "Owner-ratified QUARANTINE(15): pipeline already flagged ct=quarantine; owner confirms these STAY quarantined (not re-classified, not dropped). Soft-quarantine, never hard-delete; periodic re-check can restore.",
+  "entries": [
+    {
+      "anchor_id": "R007",
+      "kind": "anchor",
+      "name": "Accessible Electronic Prototyping Ecosystem",
+      "reason": "ct=quarantine (pipeline already flagged)",
+      "decision_ref": "D-2703",
+      "created_at": "2026-09-30",
+      "status": "quarantined",
+      "recheck_due": "2026-10-30"
+    },
+    {
+      "anchor_id": "R013",
+      "kind": "anchor",
+      "name": "Innovation Fund Risk Management",
+      "reason": "ct=quarantine (pipeline already flagged)",
+      "decision_ref": "D-2703",
+      "created_at": "2026-09-30",
+      "status": "quarantined",
+      "recheck_due": "2026-10-30"
+    },
+    {
+      "anchor_id": "R017",
+      "kind": "anchor",
+      "name": "Chemical Reaction Equation Automation",
+      "reason": "ct=quarantine (pipeline already flagged)",
+      "decision_ref": "D-2703",
+      "created_at": "2026-09-30",
+      "status": "quarantined",
+      "recheck_due": "2026-10-30"
+    },
+    {
+      "anchor_id": "R025",
+      "kind": "anchor",
+      "name": "Design for Management and Organizational Culture",
+      "reason": "ct=quarantine (pipeline already flagged)",
+      "decision_ref": "D-2703",
+      "created_at": "2026-09-30",
+      "status": "quarantined",
+      "recheck_due": "2026-10-30"
+    },
+    {
+      "anchor_id": "R030",
+      "kind": "anchor",
+      "name": "Digital Iconic Reproduction in Computer Graphics",
+      "reason": "ct=quarantine (pipeline already flagged)",
+      "decision_ref": "D-2703",
+      "created_at": "2026-09-30",
+      "status": "quarantined",
+      "recheck_due": "2026-10-30"
+    },
+    {
+      "anchor_id": "R102",
+      "kind": "anchor",
+      "name": "Social Entrepreneur's Playbook",
+      "reason": "ct=quarantine (pipeline already flagged)",
+      "decision_ref": "D-2703",
+      "created_at": "2026-09-30",
+      "status": "quarantined",
+      "recheck_due": "2026-10-30"
+    },
+    {
+      "anchor_id": "R124",
+      "kind": "anchor",
+      "name": "Foundation Model Integration Framework",
+      "reason": "ct=quarantine (pipeline already flagged)",
+      "decision_ref": "D-2703",
+      "created_at": "2026-09-30",
+      "status": "quarantined",
+      "recheck_due": "2026-10-30"
+    },
+    {
+      "anchor_id": "R144",
+      "kind": "anchor",
+      "name": "Abra-kadabra Number Classification",
+      "reason": "ct=quarantine (pipeline already flagged)",
+      "decision_ref": "D-2703",
+      "created_at": "2026-09-30",
+      "status": "quarantined",
+      "recheck_due": "2026-10-30"
+    },
+    {
+      "anchor_id": "R153",
+      "kind": "anchor",
+      "name": "Cognitive Interview Analysis of Question Clarity Issues",
+      "reason": "ct=quarantine (pipeline already flagged)",
+      "decision_ref": "D-2703",
+      "created_at": "2026-09-30",
+      "status": "quarantined",
+      "recheck_due": "2026-10-30"
+    },
+    {
+      "anchor_id": "R165",
+      "kind": "anchor",
+      "name": "Acknowledgment Attribution",
+      "reason": "ct=quarantine (pipeline already flagged)",
+      "decision_ref": "D-2703",
+      "created_at": "2026-09-30",
+      "status": "quarantined",
+      "recheck_due": "2026-10-30"
+    },
+    {
+      "anchor_id": "R167",
+      "kind": "anchor",
+      "name": "Innocent Brand Identity Through Organic Development",
+      "reason": "ct=quarantine (pipeline already flagged)",
+      "decision_ref": "D-2703",
+      "created_at": "2026-09-30",
+      "status": "quarantined",
+      "recheck_due": "2026-10-30"
+    },
+    {
+      "anchor_id": "R169",
+      "kind": "anchor",
+      "name": "Charismatic Leadership Development",
+      "reason": "ct=quarantine (pipeline already flagged)",
+      "decision_ref": "D-2703",
+      "created_at": "2026-09-30",
+      "status": "quarantined",
+      "recheck_due": "2026-10-30"
+    },
+    {
+      "anchor_id": "R183",
+      "kind": "anchor",
+      "name": "Pattern Language Implementation Process",
+      "reason": "ct=quarantine (pipeline already flagged)",
+      "decision_ref": "D-2703",
+      "created_at": "2026-09-30",
+      "status": "quarantined",
+      "recheck_due": "2026-10-30"
+    },
+    {
+      "anchor_id": "R184",
+      "kind": "anchor",
+      "name": "Doping in Professional Sports: Systemic Pressure and Rationalization",
+      "reason": "ct=quarantine (pipeline already flagged)",
+      "decision_ref": "D-2703",
+      "created_at": "2026-09-30",
+      "status": "quarantined",
+      "recheck_due": "2026-10-30"
+    },
+    {
+      "anchor_id": "R206",
+      "kind": "anchor",
+      "name": "Directional Changes (dc) in Financial Data",
+      "reason": "ct=quarantine (pipeline already flagged)",
+      "decision_ref": "D-2703",
+      "created_at": "2026-09-30",
+      "status": "quarantined",
+      "recheck_due": "2026-10-30"
+    }
+  ]
+}

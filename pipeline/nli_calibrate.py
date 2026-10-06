@@ -36,7 +36,7 @@ from pipeline.io_guard import safe_write  # D2496: C6 crash-safe writes
 
 import numpy as np
 
-from pipeline.pipeline_paths import S5_NLI_MODEL
+from pipeline.pipeline_paths import DATA_DIR, S5_NLI_MODEL
 from pipeline.stage5_verify import _load_dual_encoders, _nli_pair_scores
 
 
@@ -269,7 +269,7 @@ def print_report(calibration: dict) -> None:
               f"differs from default by {drift:.2f}. Update pipeline_config.yaml.")
 
     # Save raw scores for analysis
-    out_path = Path("knowledge pipeline/metrics/nli_calibration.json")
+    out_path = DATA_DIR / "metrics" / "nli_calibration.json"
     out_path.parent.mkdir(parents=True, exist_ok=True)
     safe_write(out_path, json.dumps(calibration, indent=2, default=str))  # D2496: C6
     print(f"\n💾 Full results saved to {out_path}")
@@ -283,7 +283,7 @@ def main():
                         help="Path to hand-labeled JSONL calibration file")
     parser.add_argument("--dry-run", action="store_true",
                         help="Validate inputs without loading NLI model")
-    parser.add_argument("--output", type=str, default="knowledge pipeline/metrics/nli_calibration.json",
+    parser.add_argument("--output", type=str, default=str(DATA_DIR / "metrics" / "nli_calibration.json"),
                         help="Output path for calibration results")
 
     args = parser.parse_args()

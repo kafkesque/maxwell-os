@@ -15,7 +15,7 @@
 # BOUNDARY (a rail's blindness IS its boundary): the walk is depth-bounded by `max_depth` and prunes hidden and
 # cache directories. A store deeper than that bound is NOT seen. The bound is declared here, not hidden.
 schema_version: '1.0'
-decided: PENDING-OWNER
+decided: D-2809
 bug: BUG-524
 rail: scripts/check_store_authority.py
 scan_roots: ['.']
@@ -25,18 +25,8 @@ stores:
     kind: sqlite
     status: authoritative
     why: >-
-      The governed knowledge store: 7995 fbs / 75 columns, FTS5 + sqlite-vec. Every knowledge answer must come
+      The governed knowledge store: 14574 fbs / 75 columns, FTS5 + sqlite-vec. Every knowledge answer must come
       from here; it is the only store with a commit pipeline (stage6_commit.py) writing to it.
-  - path: knowledge pipeline/diagnostic_diagnostic_20260811_232853.db
-    kind: sqlite
-    status: derived
-    shares_tables: true
-    shares_why: >-
-      Declared and checked: the diagnostic snapshot carries copies of the fbs and taxonomy_counts schema, so a
-      consumer pointed here is reading a frozen 2026-08-11 snapshot, not the truth.
-    why: >-
-      A diagnostic snapshot (4,964,352 bytes) written by the diagnostic runner on 2026-08-11. Derived from the
-      governed store, carries its own run id, and is never a source of truth for a knowledge answer.
   - path: data/maxwell.db
     kind: sqlite
     status: stale
@@ -51,8 +41,8 @@ stores:
     kind: parquet_collection
     status: derived
     why: >-
-      25 parquet snapshots exported by stage6_commit.py beside the governed store. A read-only projection of the
-      truth, regenerated from it, and never authoritative for a knowledge answer.
+      4 parquet snapshots + 1 diagnostic subdir exported by stage6_commit.py beside the governed store. A
+      read-only projection of the truth, regenerated from it, and never authoritative for a knowledge answer.
   - path: knowledge pipeline/parquet/diagnostic_20260811_232853
     kind: parquet_collection
     status: derived
@@ -75,6 +65,13 @@ stores:
     shares_why: >-
       Declared and checked: it is a full fidelity copy (18 shared tables incl. fbs, taxonomy_counts and the
       vec_* shadows), so any consumer pointed at it reads a frozen 2026-09-17 state, not the truth.
+
+  - path: archive/bloat_20260929/knowledge pipeline/parquet
+    kind: parquet_collection
+    status: archive
+    why: >-
+      22 pre-2026-09-29 parquet snapshots moved here by the 2026-09-29 bloat cleanup (safe_delete pre-image +
+      archive). A frozen pre-cleanup projection of the governed store; never read to answer a knowledge query.
 
 # PRE-IMAGE REGIONS (BUG-549, 2026-09-26). The sanctioned deletion path (pipeline/safe_delete.py) COPIES a target
 # into backup/deletions/{timestamp}/ before deleting it; that copy is a TOMBSTONE, not a candidate truth. The rail

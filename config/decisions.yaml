@@ -14052,3 +14052,14 @@ decisions:
   - config/repo_integrity.yaml
   - .gitignore
   - governance/session_plan_20260924.yaml
+- id: 'D-2860'
+  state: 'ACTIVE'
+  category: 'GOVERNANCE / REPO INTEGRITY'
+  title: 'commit-frontier gate: refuse to proceed with uncommitted ratified governance state (anti-circle)'
+  decision: 'Add scripts/check_commit_frontier.py + config/commit_frontier.yaml (wired into just health) as the missing anti-circle rail. Fails closed when (1) any governance-critical file carries uncommitted changes, or (2) a decision with an accepted state (RATIFIED/ACTIVE/RESOLVED) exists in the worktree but not in HEAD. This is the rail whose absence let 34 decisions D-2826..D-2859 sit uncommitted for two weeks (the circles root cause, D-2859). Owner ratification owed before hardening beyond fatal.'
+  bugs:
+  - BUG-563
+  files:
+  - scripts/check_commit_frontier.py
+  - config/commit_frontier.yaml
+  - justfile

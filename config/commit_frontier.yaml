@@ -1,0 +1,35 @@
+# commit_frontier.yaml — the ANTI-CIRCLE gate (D-2860).
+#
+# WHY. The "2 weeks of circles" (2026-09-23 -> 2026-10-07) had ONE root cause: 34 decisions
+# D-2826..D-2859 were RATIFIED in the WORKTREE but never COMMITTED (HEAD held 955 decisions while the
+# worktree held 989). Every session re-derived referee variants, re-ran the A/B, wrote more audits — and
+# never committed, because NOTHING compared "what the worktree has ACCEPTED" against "what HEAD holds
+# DURABLY." A rail nothing runs is a comment (BUG-492); the missing rail here cost two weeks.
+#
+# This file declares the frontier. scripts/check_commit_frontier.py re-derives both facts from git itself,
+# never from another rail's output (BUG-467 class). It is a BOOT + health gate, NOT a commit hook: at the
+# commit moment a staged file is by definition uncommitted, so the hook would always refuse the very act
+# that clears the frontier.
+
+schema_version: "1.0"
+decided: D-2860
+
+# Files whose uncommitted state is a frontier violation (dirty = fatal, "commit first").
+critical_files:
+  - config/decisions.yaml
+  - config/decisions_summary.json
+  - governance/buglog.md
+  - governance/bug_status.json
+  - MASTER-TASK-REGISTER.md
+  - governance/CONTEXT_INDEX.md
+  - agent/session_seed.yaml
+
+# Decision states that represent ACCEPTED work (owner-ratified or actively implemented). A record carrying
+# one of these that exists in the worktree but NOT in HEAD (absent, or present with a non-accepted state) is
+# uncommitted ratified work = the circle. PROPOSED/PLANNED/DRAFT/OPEN are excluded: in-flight proposals may
+# legitimately sit uncommitted until accepted.
+accepted_states: [RATIFIED, ACTIVE, RESOLVED]
+
+# fatal (exit 1) stops the boot/health ladder; warn (exit 2) is loud but non-fatal (BUG-457 convention).
+# owner ratification owed before hardening beyond fatal.
+mode: fatal

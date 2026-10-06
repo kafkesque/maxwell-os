@@ -338,6 +338,7 @@ session_status_2026_10_06:
     implemented; D-2822 recalib not run (nli_aggregation majority -> BUG-651 re-quarantine 506); opaque ids in taxonomy
     only, not menu/storage/golden; gold_frozen 0 business-administration + 0 entrepreneurship studies.'
   next_steps_ordered:
+  - 'RESUME: read governance/SESSION-HANDOFF-2026-10-07.md — D-2860 commit-frontier gate LANDED+committed (bb72985); next = owner-gate (referee + 28-row remap) then Phase 2 bugs/tasks.yaml canonicalization'
   - '0 owner-gate: confirm referee = discipline_anchor_rederived_v6_20261006d.json + approve 28-row domain remap'
   - '1 BREAK THE CIRCLE: commit D-2826..D-2859 + v7 apply + remap to git (stop accumulating uncommitted state)'
   - '2 finish D-2853 rename: 28 referee rows + ~24 config refs INCL taxonomy_shacl.ttl enum -> research practice (deterministic, fail-closed, C13)'

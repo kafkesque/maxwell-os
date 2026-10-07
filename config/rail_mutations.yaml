@@ -427,7 +427,7 @@ mutations:
     runner_args: [--selftest]
     expect: red
     mutated_rc: 1
-    marker: 'FAIL selftest/the_title_may_not_decide'
+    marker: 'FAIL selftest/a_clause_about_the_incident_may_not_decide'
     why: >-
       D-2689/BUG-572: the slot is a POSITION AT A HEADER BOUNDARY (the leading parenthetical, the first segment,
       the first word after the colon, the trailing parenthetical) and prose in between may not decide. Restoring the

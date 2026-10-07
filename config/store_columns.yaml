@@ -41,7 +41,7 @@ columns:
   last_retrieved_at: {role: reserved, filled_by: "the knowledge layer query path (T4)", why: "blank on 7995/7995 rows - retrieval has never been recorded"}
   feedback_score: {role: reserved, filled_by: "the feedback loop that does not exist yet", why: "NULL on 7995/7995 rows while 14 files name it; part of the unwired 4-column feedback subsystem"}
   menu_hash: {role: sparse, why: "6591 of 14574 rows carry content - the S4 menu provenance is now stamped on the post-boundary rows and correctly blank on the 7983 pre-boundary rows (never imputed, D-277)"}
-  classification_error: {role: reserved, filled_by: "nobody - superseded by classification_errors", why: "blank on 7995/7995 rows while a plural sibling carries the real values; one rule with two homes, one of them dead (D-2646)"}
+  classification_error: {role: sparse, why: "52 of 14574 rows carry content - the D-2838 writer-limb (BUG-631) appends the domain-cardinality truncation receipt here; a scalar diagnostic on the rows that hit the cap, correctly blank on the rest"}
   # ---- sparse: a row-carried diagnostic ----
   classification_errors: {role: sparse, why: "2 of 7995 rows carry content ('Too many domains: 6 > 5' and 7 > 5) - a diagnostic carried by the rows that failed, which is the correct shape for it"}
   # ---- debt: KNOWN defects, OWED and shrink-only ----
@@ -95,10 +95,10 @@ measured:
       nonnull: 14574
       rows: 14574
     classification_error:
-      distinct: 0
+      distinct: 22
       hollow: 0
-      mentions: 7
-      nonblank: 0
+      mentions: 8
+      nonblank: 52
       nonnull: 14574
       rows: 14574
     classification_errors:
@@ -109,9 +109,9 @@ measured:
       nonnull: 2
       rows: 14574
     classification_status:
-      distinct: 1
+      distinct: 2
       hollow: 0
-      mentions: 14
+      mentions: 15
       nonblank: 14574
       nonnull: 14574
       rows: 14574
@@ -214,16 +214,16 @@ measured:
       nonnull: 14574
       rows: 14574
     domains:
-      distinct: 2995
+      distinct: 2994
       hollow: 0
-      mentions: 151
+      mentions: 152
       nonblank: 14574
       nonnull: 14574
       rows: 14574
     domains_raw:
       distinct: 13413
       hollow: 39
-      mentions: 35
+      mentions: 36
       nonblank: 14574
       nonnull: 14574
       rows: 14574
@@ -293,7 +293,7 @@ measured:
     fb_id:
       distinct: 14574
       hollow: 0
-      mentions: 165
+      mentions: 166
       nonblank: 14574
       nonnull: 14574
       rows: 14574
@@ -447,7 +447,7 @@ measured:
     provenance:
       distinct: 1
       hollow: 0
-      mentions: 93
+      mentions: 94
       nonblank: 14574
       nonnull: 14574
       rows: 14574
@@ -531,7 +531,7 @@ measured:
     status:
       distinct: 2
       hollow: 0
-      mentions: 109
+      mentions: 110
       nonblank: 14574
       nonnull: 14574
       rows: 14574

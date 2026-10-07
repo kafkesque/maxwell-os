@@ -93,7 +93,7 @@ def cfg() -> dict[str, Any]:
         raise SystemExit("FAIL-CLOSED (C16): " + str(CFG) + " is absent - a rehearsal with no declarations "
                          "rehearses nothing, and an undeclared expectation is an assertion")
     doc = yaml.safe_load(CFG.read_text(encoding="utf-8")) or {}
-    missing = [k for k in ("authority", "temp", "rails", "module", "scenarios", "declared_debt") if k not in doc]
+    missing = [k for k in ("authority", "session_plan", "temp", "rails", "module", "scenarios", "declared_debt") if k not in doc]
     if missing:
         raise SystemExit("FAIL-CLOSED (C16): " + str(CFG) + " declares no " + ", ".join(missing) + " - the "
                          "boundary would then be rehearsed against a default, which has no home (C12)")
@@ -119,6 +119,14 @@ def cfg() -> dict[str, Any]:
             raise SystemExit("FAIL-CLOSED (C16): temp.overlay declares no " + repr(k) + " - the overlay is the ONE "
                              "thing that makes this rehearsal a verdict about the bytes that are LANDING; absent or "
                              "empty is not a default here, it is the BUG-578 hole (C12)")
+    # BUG-666: a planted will_not_touch subject that LEFT its family (D-2801 moved pipeline/** into may_touch)
+    # would make the rehearsal assert a refusal RAIL 4 no longer owes and see the planted violation LAND - a
+    # DRIFTED DECLARATION, not a toothless boundary. Validate against the plan's ONE home, fail closed.
+    for stale in planted_will_not_touch_drift(doc, live_will_not_touch(doc)):
+        raise SystemExit("FAIL-CLOSED (C16): planted violation names " + repr(stale) + " which is no longer "
+                         "under a LIVE will_not_touch family " + repr(live_will_not_touch(doc)) + " (BUG-666/D-2801) "
+                         "- the rehearsal would then assert a refusal RAIL 4 no longer owes; repoint the path in "
+                         "config/boundary_rehearsal.yaml")
     return doc
 
 
@@ -155,6 +163,32 @@ def rail_by_role(doc: dict[str, Any], role: str) -> dict[str, Any]:
             return rail
     raise SystemExit("FAIL-CLOSED (C16): config/boundary_rehearsal.yaml names rail role " + repr(role)
                      + " which it does not declare")
+
+
+def live_will_not_touch(doc: dict[str, Any]) -> list[str]:
+    """The LIVE will_not_touch families, read from the session plan's ONE home (D-2646), so a planted
+    will_not_touch subject is validated against the plan instead of a restated, drifting copy (BUG-666)."""
+    plan_rel = str(doc.get("session_plan") or "")
+    if not plan_rel:
+        return []
+    plan_path = REPO / plan_rel
+    if not plan_path.is_file():
+        return []
+    live = yaml.safe_load(plan_path.read_text(encoding="utf-8")) or {}
+    return [str(x) for x in (live.get("will_not_touch") or [])]
+
+
+def planted_will_not_touch_drift(doc: dict[str, Any], forbid: list[str]) -> list[str]:
+    """BUG-666: planted will_not_touch subjects that are NO LONGER under a LIVE family. A rehearsal that asserts
+    RAIL 4 refuses a path that LEFT will_not_touch (D-2801 moved pipeline/** into may_touch) would see the planted
+    violation LAND and report a toothless boundary that in fact has teeth - the DECLARATION drifted, not the
+    boundary. The family names have ONE home (the session plan); this rehearsal must not restate a stale one."""
+    out: list[str] = []
+    for planted in (doc.get("scenarios", {}).get("planted") or []):
+        path = str(planted.get("path") or "")
+        if path and str(planted.get("expect_rail_rc")) == "2" and not any(fnmatch.fnmatch(path, f) for f in forbid):
+            out.append(path)
+    return out
 
 
 def mutate(path: Path, op: str, text: str) -> None:
@@ -547,6 +581,10 @@ def selftest() -> int:
         print("  " + ("ok  " if good else "FAIL") + " selftest/" + name + ": rc=" + str(rc) + " expected="
               + str(expect) + ("" if good else " :: " + "; ".join((fatal + owed)[:1])))
     ov_ok, ov_why = overlay_control(doc)
+    drift_doc = copy.deepcopy(doc)
+    for p in drift_doc["scenarios"]["planted"]:
+        if str(p.get("name")) == "will_not_touch":
+            p["path"] = "pipeline/stage5_verify.py"   # the drifted subject BUG-666 caught (D-2801)
     joins = [("the note the RULE actually builds for the repo OWN index is read as provenance own_index",
               git_subject.note_kind(own) == "own_index"),
              ("a REFUSAL is never read as a note (provenance none)",
@@ -561,7 +599,11 @@ def selftest() -> int:
               + ("" if ov_ok else " :: " + ov_why), ov_ok),
              ("every rail subject the standing rule covers is inside the declared overlay (D-2676 x BUG-578)",
               bool(gate_subjects())
-              and all(covered_by(s, [str(x) for x in doc["temp"]["overlay"]["subjects"]]) for s in gate_subjects()))]
+              and all(covered_by(s, [str(x) for x in doc["temp"]["overlay"]["subjects"]]) for s in gate_subjects())),
+             ("every planted will_not_touch subject is under a LIVE family (BUG-666: a restated family drifted on D-2801)",
+              not planted_will_not_touch_drift(doc, live_will_not_touch(doc))),
+             ("the drift DETECTOR fires on the exact path BUG-666 caught (pipeline/stage5_verify.py is no longer forbidden)",
+              planted_will_not_touch_drift(drift_doc, live_will_not_touch(doc)) == ["pipeline/stage5_verify.py"])]
     for why, good in joins:
         bad += 0 if good else 1
         print("  " + ("ok  " if good else "FAIL") + " selftest/" + why)

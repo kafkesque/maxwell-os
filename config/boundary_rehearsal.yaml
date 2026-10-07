@@ -8,6 +8,7 @@
 # restated - the note provenance is read from its one home (scripts/lib/git_subject.py#note_kind, D-2646).
 schema_version: '1'
 authority: D-2675
+session_plan: governance/session_plan_20260924.yaml   # BUG-666: the ONE home of will_not_touch families; consumed, never restated
 why: >-
   A boundary never seen to ACCEPT a legitimate commit and a control never seen to FAIL are one defect seen from
   two sides (BUG-574 / BUG-492). This file declares the facts MEASURED at a REAL commit in a REAL repository, so
@@ -35,8 +36,8 @@ temp:
     flags: [--no-verify]
     why: >-
       the fixture's BASE state holds the WHOLE tracked-HEAD tree, and the write boundary REFUSES that commit:
-      RAIL 4 reports the declared will_not_touch paths (pipeline/** and every path no may_touch entry grants, by
-      name or as a sync-client RENAME) so the base cannot be created THROUGH the hook at all. This is a
+      RAIL 4 reports the declared will_not_touch paths (governance/F11_* and every path no may_touch entry grants,
+      by name or as a sync-client RENAME) so the base cannot be created THROUGH the hook at all. This is a
       FIXTURE-CONSTRUCTION bypass, NOT a debt (D-2677): it is justified by the refusal below, MEASURED on every
       run, and it must be WITHDRAWN the moment that refusal disappears.
     refusal:              # D-2677: the bypass ONE justification, re-measured on every run
@@ -102,10 +103,10 @@ scenarios:
   planted:
     - name: will_not_touch
       op: append
-      path: pipeline/stage5_verify.py
+      path: governance/F11_ANCHOR_REVIEW_20260923.csv
       rail: RAIL 4
       expect_rail_rc: 2
-      why: 'a will_not_touch family path (pipeline/**) staged for commit: owner-owed, refused'
+      why: 'a path under a LIVE will_not_touch family (governance/F11_*) staged for commit: owner-owed, refused (BUG-666: was pipeline/**, which D-2801 moved out of will_not_touch)'
     - name: out_of_plan
       op: create
       path: rehearsal_out_of_plan_probe.txt

@@ -3555,3 +3555,12 @@ false claim. Re-minted the pin to the on-disk bytes (3854250c…; byte size unch
 (2026-10-07).
 Bugs: BUG-667.
 Files: knowledge pipeline/stage4_merge/t11/ARTIFACT_AUTHORITY.json.
+
+## D-2864 (2026-10-07) — RATIFIED — D-2853 close-out: re-mint the A/B referee to menu v7 (28-row domain remap)
+
+Owner signed off the 28-row referee remap (owner_decision = 'research practice' on all 28 rows).
+scripts/remap_referee_v7_28rows.py deterministically renamed the stale DOMAIN 'research & methodology' ->
+'research practice' in exactly 28 rows and re-stamped the manifest to menu v7 (menu_hash 407f3dd4... /
+answer_space_hash 6d7c08de..., taxonomy v7, anchor v7). DISCIPLINE 'research methodology' UNCHANGED.
+New artifact governance/discipline_anchor_rederived_v7_20261007.json (D-353 re-mint); v6 manifest untouched.
+Verified: 0 stale / 0 off-domain / 0 off-discipline / 0 discipline-vs-v6 drift. Unblocks A/B + S4 rerun.

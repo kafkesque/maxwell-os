@@ -14121,3 +14121,26 @@ decisions:
   - config/pipeline_config.yaml
   - config/recalibration_pins.yaml
   - pipeline/nli_calibrate.py
+
+- id: D-2864
+  state: RATIFIED
+  category: ANCHOR / TAXONOMY
+  title: D-2853 close-out — re-mint the A/B referee to menu v7 (28-row domain remap)
+  decision: >
+    Owner signed off the 28-row A/B referee remap (governance/rederive_v6_referee_28row_remap_20261007.csv,
+    every row owner_decision = 'research practice'). scripts/remap_referee_v7_28rows.py deterministically
+    (LLM-free) renamed the stale DOMAIN 'research & methodology' -> 'research practice' in exactly 28 rows of
+    discipline_anchor_rederived_v6_20261006d.json and re-stamped the whole manifest to menu v7
+    (menu_hash 407f3dd4... / answer_space_hash 6d7c08de... from config/menu_axis_hashes.yaml, C12),
+    taxonomy_version v7, anchor_version v7. Discipline 'research methodology' is UNCHANGED (valid v7;
+    distinct name, no longer collides with the domain). New artifact
+    governance/discipline_anchor_rederived_v7_20261007.json (D-353 re-mint under a NEW id, never a quiet
+    re-hash); the v6 manifest is untouched as the historical D-2820/D-2839 record. Fail-closed guards:
+    exactly 28 CSV rows, 1:1 item_id match, post-rename all rows on-menu-v7. Verified: 0 stale labels,
+    0 off-domain, 0 off-discipline, 0 discipline-vs-v6 drift. This unblocks the A/B and the S4 rerun
+    against a v7-menu classifier.
+  bugs: []
+  files:
+  - scripts/remap_referee_v7_28rows.py
+  - governance/discipline_anchor_rederived_v7_20261007.json
+  - governance/rederive_v6_referee_28row_remap_20261007.csv

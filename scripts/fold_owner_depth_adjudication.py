@@ -21,7 +21,7 @@ VALID_LABELS = {"domain", "cross-domain", "specialized", "universal"}
 
 def load_owner_decisions(path: Path) -> dict[str, str]:
     """Return {item_id: owner_depth} from the owner-filled worksheet CSV."""
-    with path.open(newline="") as f:
+    with path.open(newline="", encoding="utf-8") as f:
         rows = list(csv.DictReader(f))
     out: dict[str, str] = {}
     for r in rows:
@@ -79,7 +79,7 @@ def main() -> int:
     print(f"owner decisions loaded: {len(owner)}")
 
     # --- depth-map source of truth (list) ---
-    depth_map = json.load(open(args.depth_map))
+    depth_map = json.load(open(args.depth_map, encoding="utf-8"))
     l2d = label_to_depth(depth_map)
     print(f"label->depth map: {l2d}")
     changed = []
@@ -92,7 +92,7 @@ def main() -> int:
             changed.append(oid)
 
     # --- consolidated anchor (dict with rows) ---
-    cons = json.load(open(args.consolidated))
+    cons = json.load(open(args.consolidated, encoding="utf-8"))
     for r in cons["rows"]:
         oid = r["item_id"]
         if oid in owner:

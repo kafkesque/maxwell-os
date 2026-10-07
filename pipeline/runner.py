@@ -340,7 +340,7 @@ def _get_preflight_timeout() -> float:
     """
     import yaml as _yaml_pf
     try:
-        with open(_PROJECT_ROOT / "config" / "pipeline_config.yaml") as _f:
+        with open(_PROJECT_ROOT / "config" / "pipeline_config.yaml", encoding="utf-8") as _f:
             _cfg = _yaml_pf.safe_load(_f) or {}
         return float(_cfg.get("run", {}).get("preflight_timeout_sec", 90.0))
     except Exception as e:
@@ -360,7 +360,7 @@ def _get_python_bin() -> str:
     """
     import yaml as _yaml_pybin
     try:
-        with open(_PROJECT_ROOT / "config" / "pipeline_config.yaml") as _f:
+        with open(_PROJECT_ROOT / "config" / "pipeline_config.yaml", encoding="utf-8") as _f:
             _cfg = _yaml_pybin.safe_load(_f) or {}
         _pin = str(_cfg.get("run", {}).get("python_bin", "") or "").strip()
         if _pin:
@@ -592,7 +592,7 @@ def _acquire_singleton_lock() -> None:
     lock_rel: str = ".pipeline_runner.lock"
     try:
         import yaml as _y
-        with open(cfg_path) as _f:
+        with open(cfg_path, encoding="utf-8") as _f:
             _run_cfg = (_y.safe_load(_f) or {}).get("run", {}) or {}
         enabled = bool(_run_cfg.get("singleton_lock", True))
         lock_rel = str(_run_cfg.get("singleton_lock_path", lock_rel))
@@ -607,7 +607,7 @@ def _acquire_singleton_lock() -> None:
     if lock_path.exists():
         held: int = -1
         try:
-            held = int(lock_path.read_text().split()[0])
+            held = int(lock_path.read_text(encoding="utf-8").split()[0])
         except Exception:
             held = -1
         alive: bool = False
@@ -626,7 +626,7 @@ def _acquire_singleton_lock() -> None:
         print(f"   ⚠️  reclaiming stale runner lock (pid {held} is gone)")
         lock_path.unlink(missing_ok=True)
 
-    lock_path.write_text(f"{os.getpid()} {time.strftime('%Y-%m-%dT%H:%M:%S')}\n")
+    lock_path.write_text(f"{os.getpid()} {time.strftime('%Y-%m-%dT%H:%M:%S')}\n", encoding="utf-8")
     atexit.register(lambda: lock_path.unlink(missing_ok=True))
     print(f"   🔒 runner singleton lock held (pid {os.getpid()})")
 

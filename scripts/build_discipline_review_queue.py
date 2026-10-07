@@ -50,9 +50,9 @@ def git_commit() -> str:
 
 
 def build() -> dict:
-    consolidated = json.loads(CONSOLIDATED.read_text())
+    consolidated = json.loads(CONSOLIDATED.read_text(encoding="utf-8"))
     rows = consolidated["rows"]
-    menu = {x["value"] for x in json.loads(MENU.read_text())["disciplines"]}
+    menu = {x["value"] for x in json.loads(MENU.read_text(encoding="utf-8"))["disciplines"]}
 
     # Invariants — fail closed.
     assert len(rows) == 208, f"expected 208 consolidated rows, got {len(rows)}"
@@ -161,8 +161,8 @@ def write_md(artifact: dict) -> str:
 
 def main() -> int:
     artifact = build()
-    OUT_JSON.write_text(json.dumps(artifact, indent=2, ensure_ascii=False) + "\n")
-    OUT_MD.write_text(write_md(artifact))
+    OUT_JSON.write_text(json.dumps(artifact, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    OUT_MD.write_text(write_md(artifact), encoding="utf-8")
     print(f"wrote {OUT_JSON.name} ({len(artifact['rows'])} rows)")
     print(f"wrote {OUT_MD.name}")
     print(f"counts: {json.dumps(artifact['counts'], sort_keys=True)}")

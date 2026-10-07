@@ -80,8 +80,8 @@ def _norm_name(s: str) -> str:
 
 
 def main() -> int:
-    depth_rows = json.loads(DEPTH.read_text())
-    disc = json.loads(DISC.read_text())["rows"]
+    depth_rows = json.loads(DEPTH.read_text(encoding="utf-8"))
+    disc = json.loads(DISC.read_text(encoding="utf-8"))["rows"]
 
     depth = {r["item_id"]: r for r in depth_rows}
     disc_by_id = {r["item_id"]: r for r in disc}
@@ -153,7 +153,7 @@ def main() -> int:
     }
 
     artifact = {"_provenance": stamp, "rows": out_rows}
-    OUT.write_text(json.dumps(artifact, indent=2, ensure_ascii=False) + "\n")
+    OUT.write_text(json.dumps(artifact, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
     # owner's 9 finalizations provenance
     owner9 = {
@@ -167,7 +167,7 @@ def main() -> int:
             for iid in sorted(OWNER9_IDS)
         },
     }
-    OWNER9.write_text(json.dumps(owner9, indent=2, ensure_ascii=False) + "\n")
+    OWNER9.write_text(json.dumps(owner9, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
     from collections import Counter
     dl = Counter(r["depth_label"] for r in out_rows)

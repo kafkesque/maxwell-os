@@ -82,7 +82,7 @@ heading; (3) re-sync session_seed registry from bug_status.json (recomputable, n
 
 
 def main() -> int:
-    text = BUGLOG.read_text()
+    text = BUGLOG.read_text(encoding="utf-8")
 
     # Remove the 5 bare table rows (each is a single long line, reorder-insensitive).
     ids = ("652", "653", "654", "655", "656")

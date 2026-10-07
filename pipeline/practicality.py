@@ -49,7 +49,7 @@ def _load_config() -> dict[str, Any]:
             f"config/practicality.yaml missing — refusing to classify (C16)"
         )
     try:
-        cfg = yaml.safe_load(_CONFIG_PATH.read_text()) or {}
+        cfg = yaml.safe_load(_CONFIG_PATH.read_text(encoding="utf-8")) or {}
     except yaml.YAMLError as e:
         raise PracticalityConfigError(f"config/practicality.yaml unparseable: {e}") from e
     return cfg

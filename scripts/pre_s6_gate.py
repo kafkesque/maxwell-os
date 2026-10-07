@@ -67,7 +67,7 @@ def _declared_failed() -> int:
     for c in candidates:
         if c.exists():
             try:
-                return int(json.loads(c.read_text()).get("declared_failed_count") or 0)
+                return int(json.loads(c.read_text(encoding="utf-8")).get("declared_failed_count") or 0)
             except Exception:
                 continue
     return 0

@@ -9052,23 +9052,25 @@ test_label_normalization_d2515, test_taxonomy_disjointness).
 comment (BUG-492). Fix: wire it into `just health` — it is the D-2838 reader-limb that re-measures the committed store for
 over-cap FBs (BUG-631 stays OPEN until it runs).
 
-## BUG-665 — OPEN (2026-10-07) — encoding debt above shrink-only ceilings (3 rails) from new anchor-axis code
+## BUG-665 — FIXED (2026-10-07) — encoding debt above shrink-only ceilings (3 rails) from new anchor-axis code
 
 Root cause (D-2646/D-2644/C16/C12): the D-2811/D-2812 anchor-axis code bypassed the decode-home discipline
 (scripts/lib/artifact_encoding.py) — hardcoded `utf-8-sig` literals (magic strings, C12), a silent `errors="replace"`
 (C16), and undeclared text reads/writes (BUG-521 class).
 
-PARTIAL FIX (2026-10-07): rails 1+2 resolved at root cause, NOT by raising a ceiling or adding allow entries.
+FIXED (2026-10-07): all three rails resolved at root cause, NOT by raising a ceiling or adding allow entries.
   * check_encoding_homes: repointed build_anchor_bridge_ruler_208.py (write now sources `cfg["ruler_encoding"]` from
     config/anchor_family.yaml, C12 — the same declared fact its sibling build_anchor_store_bridge.py reads) and
     check_anchor_axis_consistency.py (CSV read now delegates to artifact_encoding.open_artifact, D-2646). Rail CLEAN (0).
   * check_silent_repair: removed the new errors="replace" in detect_same_work_content.py:142 (strict read now); converted
     pipeline/enhance_md_headers.py `lines: [182,248]` -> `match:` (BUG-542: the coordinate outlived its site). Rail OWED
     (2): debt 17/17 declared, 0 unknown, 0 stale.
-STILL OPEN (rail 3): check_undeclared_encoding census 161 files / 156 ceiling (411/392 sites, 82/74 writes) — the
-D-2811/D-2812 code added 5 files with undeclared encodings. Root-cause fix is to REPAIR those files (name their
-encodings / delegate to the home), never to raise the shrink-only ceiling (D-2642); a re-baseline, if any, is an
-OWNER-RATIFIED DECISION (owner gate).
+RAIL 3 FIXED (2026-10-07): a forensic diff against the D-2644 ceiling (2026-09-26) showed the growth was broader
+than "5 anchor files" — 8 NEW files + 5 regressed sites in pipeline/runner.py + 1 in scripts/pre_s6_gate.py (net
++5 files / +19 sites / +8 writes). All 25 sites repaired at root cause by NAMING the encoding (`encoding="utf-8"`;
+every artifact verified UTF-8, no BOM), never by raising the shrink-only ceiling (D-2642). Census now 153/156
+files, 386/392 sites, 74/74 writes -> OWED (exit 2, non-fatal). The 153-file pre-existing BUG-521 debt stays
+counted by the ceiling; any re-baseline remains an OWNER-RATIFIED DECISION (owner gate).
 
 ## BUG-666 (FIXED 2026-10-07) — write-boundary rehearsal: the commit boundary has no teeth at a real commit
 

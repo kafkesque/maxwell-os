@@ -198,7 +198,7 @@ def main() -> int:
 
     out = ROOT / cfg["file"]
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n")
+    out.write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
     print(f"split manifest -> {out.relative_to(ROOT)}")
     print(f"  golden {len(selected_sorted)} / eval {len(eval_ids)} / total {cfg['total_anchors']}")

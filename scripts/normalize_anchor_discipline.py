@@ -47,7 +47,7 @@ def _pipeline_commit() -> str:
 
 
 def load_menu() -> tuple[set[str], set[str], dict[str, str], dict[str, str]]:
-    menu = json.loads(MENU.read_text())
+    menu = json.loads(MENU.read_text(encoding="utf-8"))
     disc_norm: dict[str, str] = {}
     dom_norm: dict[str, str] = {}
     for x in menu["disciplines"]:
@@ -82,7 +82,7 @@ def classify(raw: str, disc_menu: set[str], dom_menu: set[str]) -> tuple[str, st
 def main() -> int:
     disc_set, dom_set, disc_norm, dom_norm = load_menu()
 
-    with VIEW.open(newline="") as f:
+    with VIEW.open(newline="", encoding="utf-8") as f:
         rows = list(csv.DictReader(f))
 
     out_rows: list[dict] = []
@@ -122,10 +122,10 @@ def main() -> int:
     }
     out_rows.sort(key=lambda x: x["item_id"])
     artifact = {"_provenance": stamp, "rows": out_rows}
-    OUT.write_text(json.dumps(artifact, indent=2, ensure_ascii=False) + "\n")
+    OUT.write_text(json.dumps(artifact, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
     review = {"_provenance": stamp, "review": review_rows}
-    REVIEW.write_text(json.dumps(review, indent=2, ensure_ascii=False) + "\n")
+    REVIEW.write_text(json.dumps(review, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
     print(f"normalized {len(out_rows)} rows -> {OUT.name}")
     print(f"status counts: {stats}")

@@ -3,8 +3,8 @@
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
   "total_ids": 432,
-  "open_n": 162,
-  "closed_n": 270,
+  "open_n": 161,
+  "closed_n": 271,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -812,11 +812,6 @@
       "id": "BUG-658",
       "title": "(OPEN, 2026-10-06) \u2014 OMLX SSE keepalive defeats read_timeout \u2192 client wedge (no wall-clock deadline). HARNESS-MITIGATED 2026-10-06 (d2767_ab",
       "events": 1
-    },
-    {
-      "id": "BUG-665",
-      "title": "OPEN (2026-10-07) \u2014 encoding debt above shrink-only ceilings (3 rails) from new anchor-axis code",
-      "events": 1
     }
   ],
   "closed": [
@@ -1087,6 +1082,7 @@
     "BUG-662",
     "BUG-663",
     "BUG-664",
+    "BUG-665",
     "BUG-666",
     "BUG-667",
     "BUG-668"

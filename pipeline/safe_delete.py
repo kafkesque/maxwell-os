@@ -35,7 +35,7 @@ BACKUP_DIR = ROOT / "backup" / "deletions"
 # over-protection is the fail-safe direction for a deletion guard (must not depend on config readability).
 try:
     import yaml as _yaml
-    _DATA_DIR_NAME = ((_yaml.safe_load(open(ROOT / "config" / "pipeline_config.yaml")) or {}).get("paths") or {}).get("data_dir", "knowledge pipeline")
+    _DATA_DIR_NAME = ((_yaml.safe_load(open(ROOT / "config" / "pipeline_config.yaml", encoding="utf-8")) or {}).get("paths") or {}).get("data_dir", "knowledge pipeline")
 except Exception:
     _DATA_DIR_NAME = "knowledge pipeline"
 

@@ -12,13 +12,26 @@ The TTL is DERIVED from the YAML — regenerate, never hand-edit (C12 single sou
 """
 from __future__ import annotations
 
+import os
 import sys
+import tempfile
 from pathlib import Path
 
 _ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_ROOT))
 
 import yaml  # noqa: E402
+
+
+def _write_atomic(path: Path, text: str) -> None:
+    """C6 crash-safe write: tempfile -> fsync -> os.replace."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fd, tmp = tempfile.mkstemp(dir=str(path.parent), prefix=path.name, suffix=".tmp")
+    with os.fdopen(fd, "w", encoding="utf-8") as fh:
+        fh.write(text)
+        fh.flush()
+        os.fsync(fh.fileno())
+    os.replace(tmp, path)
 
 
 def _iri(s: str) -> str:
@@ -95,7 +108,7 @@ maxwell:CanonicalDiscipline
     owl:disjointWith maxwell:CanonicalDomain .
 """
     out = _ROOT / "config" / "taxonomy_shacl.ttl"
-    out.write_text(ttl, encoding="utf-8")
+    _write_atomic(out, ttl)
     print(f"✅ Wrote {out} ({len(domains)} domains + {len(disciplines)} disciplines, taxonomy {version})")
     return 0
 

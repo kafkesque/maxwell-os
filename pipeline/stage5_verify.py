@@ -546,6 +546,33 @@ if NLI_AGGREGATION not in _AGGREGATION_MODES:
         f"expected one of {_AGGREGATION_MODES}"
     )
 
+# ── D-2858: fail-closed guard — or-entail mode requires a matching calibration stamp ──
+# A flip to 'or_entail_and_no_contra' is REFUSED (C16) unless config stage5.nli_calibration carries a
+# stamp that (a) names the SAME aggregation mode, (b) records a threshold equal to the live
+# nli_pass_threshold, and (c) names the decision id that minted the recalibration. This is the
+# machine-enforced form of "do NOT flip before recalibration" (D-2822 step 2 / D-2858 step 4): the
+# D-2842 code limb is inert by default, and no config edit alone can flip the semantics without the
+# freshly re-minted calibration stamp (D-353 rule — a re-pin is a re-mint, never a quiet re-hash).
+_NLI_CAL: dict = _cfg5.get("nli_calibration") or {}
+if NLI_AGGREGATION == "or_entail_and_no_contra":
+    _cal_agg = str(_NLI_CAL.get("aggregation", "")).strip()
+    _cal_threshold = _NLI_CAL.get("threshold")
+    _cal_decision = str(_NLI_CAL.get("decision", "")).strip()
+    _cal_ok = (
+        _cal_agg == "or_entail_and_no_contra"
+        and _cal_threshold is not None
+        and float(_cal_threshold) == float(NLI_PASS_THRESHOLD)
+        and bool(_cal_decision)
+    )
+    if not _cal_ok:
+        raise ValueError(
+            "C16/D-2858: stage5.nli_aggregation='or_entail_and_no_contra' requires a matching "
+            "stage5.nli_calibration stamp {aggregation, threshold, decision} where aggregation equals "
+            "the mode, threshold equals nli_pass_threshold, and decision names the minting decision id. "
+            "Recalibrate (pipeline/nli_calibrate.py) and re-mint the threshold under a NEW decision id "
+            "BEFORE flipping this flag."
+        )
+
 
 def _check_enrichment_quality(fb: dict) -> tuple[bool, float, str]:
     """D2277: Lightweight enrichment verification — checks S4 fields don't contradict core.

@@ -3,8 +3,8 @@
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
   "total_ids": 432,
-  "open_n": 166,
-  "closed_n": 266,
+  "open_n": 165,
+  "closed_n": 267,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -814,11 +814,6 @@
       "events": 1
     },
     {
-      "id": "BUG-659",
-      "title": "OPEN (2026-10-07) \u2014 check_config_defaults silently auto-RAISES the shrink-only config_defaults ceiling",
-      "events": 1
-    },
-    {
       "id": "BUG-660",
       "title": "OPEN (2026-10-07) \u2014 `just health` is not read-only: it writes tracked files as a side effect",
       "events": 1
@@ -1101,6 +1096,7 @@
     "BUG-655",
     "BUG-656",
     "BUG-657",
+    "BUG-659",
     "BUG-661",
     "BUG-662",
     "BUG-663",

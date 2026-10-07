@@ -8982,9 +8982,15 @@ the canonical register to the verdict already recorded in each row's own prose (
 ## BUG-267 (OPEN, 2026-09-17) — min_human_share floor is a substring classifier (F-16)
 ## BUG-658 (OPEN, 2026-10-06) — OMLX SSE keepalive defeats read_timeout → client wedge (no wall-clock deadline). HARNESS-MITIGATED 2026-10-06 (d2767_ab_eval.py wall-clock deadline + preflight smoke); ROOT-FIXED 2026-10-06 (D-2854) in pipeline/omlx_call.py::call_omlx (_post_with_wall_clock daemon-thread + join(timeout=180s) + WallClockTimeout, config services.omlx.wall_clock_deadline_sec). Stays OPEN until the harness relaunch reproduces no-wedge end-to-end. CORRECTION: the flag-ON A/B GATE RESULT DID LAND (20:28, kappa 0.4313 FAIL) — the wedge was a SEPARATE later re-run (PID 15071), not the gate run.
 
-## BUG-659 — OPEN (2026-10-07) — check_config_defaults silently auto-RAISES the shrink-only config_defaults ceiling
+## BUG-659 (FIXED 2026-10-07): check_config_defaults silently auto-RAISED the shrink-only ceiling (by_rail dead code)
 
-`scripts/check_config_defaults.py` re-writes the SHRINK-ONLY ceiling when it finds MORE shadowed/undeclared config keys than the declared ceiling (shadowed 221→229, undeclared 2→3, dirtying config/derivations.yaml). A shrink-only ceiling must never be raised by the check itself; the 9 new keys need owner review and a deliberate re-baseline, not a silent commit. D-2861 (health re-baseline) reverted the side-effect edit.
+Root cause: `by_rail` read `measured_by` from the `config_reads` level, but `record_ceiling` writes it INSIDE
+`ceilings` for a block mapping (D-2642). So `by_rail` was always False, the `grew and by_rail` fail-closed
+branch was dead code, and the check fell through to `record_ceiling` — silently raising the ceiling 221→229 /
+2→3 instead of exiting DRIFT. Fix: `by_rail` reads `reads.measured_by` OR `ceilings.measured_by` (either YAML
+shape). Verified: with the ceiling restored to 221/2, the check now exits 1 and writes NOTHING. The deliberate
+owner-approved re-baseline (229/3) is recorded; the 9 new keys (8 shadowed + 1 undeclared, introduced with the
+D-2811/D-2812 anchor-axis code) remain flagged for declaration review — declared, not silent debt.
 
 ## BUG-660 — OPEN (2026-10-07) — `just health` is not read-only: it writes tracked files as a side effect
 

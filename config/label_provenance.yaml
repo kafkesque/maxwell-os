@@ -64,8 +64,8 @@ label_provenance:
     # A DECLARED denominator (BUG-501/D-2638): a population that is only COMPUTED cannot disagree with
     # anything, so the measured count is declared and the rail compares. If it changes, that is drift
     # (or an explicit owner-authored update of this file), never a silent edit.
-    measured_rows: 7995
-    measured: "t11 7,867 | bug198_reinject 6 | e2e 122 (7,995 rows; menu_hash and all three *_source columns empty on every one)"
+    measured_rows: 7983
+    measured: "t11 7,855 | bug198_reinject 6 | e2e 122 (7,983 rows; menu_hash and all three *_source columns empty on every one)"
     rule: >-
       Inside the boundary a label is declared pre_boundary: its provenance is NOT imputed and NOT
       backfilled (D-277). Outside the boundary every row MUST carry the full quartet; a row that does

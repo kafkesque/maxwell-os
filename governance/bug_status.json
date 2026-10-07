@@ -2,8 +2,8 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 422,
-  "open_n": 161,
+  "total_ids": 424,
+  "open_n": 163,
   "closed_n": 261,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
@@ -811,6 +811,16 @@
     {
       "id": "BUG-658",
       "title": "(OPEN, 2026-10-06) \u2014 OMLX SSE keepalive defeats read_timeout \u2192 client wedge (no wall-clock deadline). HARNESS-MITIGATED 2026-10-06 (d2767_ab",
+      "events": 1
+    },
+    {
+      "id": "BUG-659",
+      "title": "OPEN (2026-10-07) \u2014 check_config_defaults silently auto-RAISES the shrink-only config_defaults ceiling",
+      "events": 1
+    },
+    {
+      "id": "BUG-660",
+      "title": "OPEN (2026-10-07) \u2014 `just health` is not read-only: it writes tracked files as a side effect",
       "events": 1
     }
   ],

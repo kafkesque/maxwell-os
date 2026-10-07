@@ -9,8 +9,8 @@
 
 ## 🔴 MUST — open (strategic-consequential order)
 
-> **CURRENT OPEN INDEX (machine-derived 2026-10-03 — the live face; dated history follows below).**
-> Register: 990 decisions · 422 bugs (161 open / 261 closed; highest OPEN = BUG-658). Anti-circle commit-frontier gate landed (D-2860) + backlog committed.
+> **CURRENT OPEN INDEX (machine-derived 2026-10-07 — the live face; dated history follows below).**
+> Register: 991 decisions · 424 bugs (163 open / 261 closed; highest OPEN = BUG-660). Anti-circle commit-frontier gate landed (D-2860) + backlog committed.
 >
 > **OWNER-GATED — ONE action remains (D-2727 gate):**
 > 1. **RATIFY-2 — full S4→S5→S6 rerun.** Launch under `caffeinate -dimsu`; `python3 pipeline/runner.py --dry-run` then full. Preflight PASS; authority propagated (D-2812) + consistency rail rc=0 → now UNBLOCKED.

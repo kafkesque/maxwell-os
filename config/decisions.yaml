@@ -14053,7 +14053,7 @@ decisions:
   - .gitignore
   - governance/session_plan_20260924.yaml
 - id: 'D-2860'
-  state: 'ACTIVE'
+  state: 'RATIFIED'
   category: 'GOVERNANCE / REPO INTEGRITY'
   title: 'commit-frontier gate: refuse to proceed with uncommitted ratified governance state (anti-circle)'
   decision: 'Add scripts/check_commit_frontier.py + config/commit_frontier.yaml (wired into just health) as the missing anti-circle rail. Fails closed when (1) any governance-critical file carries uncommitted changes, or (2) a decision with an accepted state (RATIFIED/ACTIVE/RESOLVED) exists in the worktree but not in HEAD. This is the rail whose absence let 34 decisions D-2826..D-2859 sit uncommitted for two weeks (the circles root cause, D-2859). Owner ratification owed before hardening beyond fatal.'
@@ -14063,3 +14063,23 @@ decisions:
   - scripts/check_commit_frontier.py
   - config/commit_frontier.yaml
   - justfile
+- id: D-2861
+  state: RATIFIED
+  category: GOVERNANCE / REPO INTEGRITY
+  title: re-baseline the three red health drifts (label provenance boundary, anchor bridge, decisions receipt)
+  decision: 'Forensic audit found three fatal (rc=1) health drifts after the BUG-571 register-divergence fix. (1)
+    check-label-provenance: boundary population 7983 vs declared 7995 - t11 re-chunked 7,867->7,855 under rechunk-v4-20260929,
+    a 12-row store change (BUG-501). (2) build_anchor_store_bridge: the committed bridge no longer re-derived after
+    the store change (BUG-420). (3) verify_handoffs: decisions_registry prefix receipt broken by in-place edits
+    (BUG-376). Re-baselined all three: measured_rows 7995->7983, re-derived the bridge (11 ambiguous rows recorded,
+    never picked), re-cut the receipt via handoff.py --backfill. Owner ratified.
+
+    '
+  bugs:
+  - BUG-501
+  - BUG-420
+  - BUG-376
+  files:
+  - config/label_provenance.yaml
+  - governance/ANCHOR_STORE_BRIDGE_20260926.json
+  - config/handoffs.yaml

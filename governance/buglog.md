@@ -9,6 +9,8 @@
 ## 🔴 OPEN — MUST (data integrity / correctness / safety)
 
 | Bug | Date | Issue |
+| BUG-659 | 2026-10-07 | **check_config_defaults silently auto-RAISES the shrink-only config_defaults ceiling (shadowed 221->229, undeclared 2->3) — a shrink-only ceiling must never be raised by the check itself; the 9 new config keys need owner review, not a silent commit.** | |
+| BUG-660 | 2026-10-07 | **`just health` is not read-only: run_ladder.py --collect dirties config/derivations.yaml, RECONCILIATION.json, METRICS.jsonl, MUTATION_JOURNAL.jsonl as a side effect; a health check that writes is a blindspot, and a git-checkout revert of an append-only journal truncates it (BUG-638 recurrence, 895->887).** | |
 |---|---|---|
 | BUG-640 | 2026-10-05 | **D-2815 B&M slot "entrepreneurship" string-collides with the existing DOMAIN "entrepreneurship" (closed_menu_v5.json). Two rails reject it: D-2500 owl:disjointWith (domain/discipline must be disjoint) and the BUG-200/D2422 opposite-axis guard in map_to_canonical_with_fallback (returns "emerging" for a raw label canonical on the opposite axis). The new discipline slot is DEAD ON ARRIVAL. Fix: rename slots to discipline-scoped forms (JEL M "business administration" / "marketing" / "entrepreneurship studies"). OWNER-RULED 2026-10-05 (D-2829); IN PROGRESS — code changed, pending menu-v6 commit: slots = 'business administration' / 'marketing' / 'entrepreneurship studies'.** | |
 | BUG-642 | 2026-10-05 | **alias_map.yaml retirement (D-2814) has 14 consumers: pipeline/schemas.py get_synonym_index + 13 scripts (remap_emerging, apply_enrichment, rederive_kindsafe_domains, resolve_domains_emerging, etc.). Wholesale delete = cascade break + silent "emerging" fall-through (EL1). Fix: shrink-then-remove with consumer migration + fail-closed no-synonym mode (C1, D-2828).** | |
@@ -8971,3 +8973,11 @@ the canonical register to the verdict already recorded in each row's own prose (
 ## BUG-243 (OPEN, 2026-09-13) — DeepSeek-v4 empty content on open-ended adjudication (MITIGATED: use local Qwen)
 ## BUG-267 (OPEN, 2026-09-17) — min_human_share floor is a substring classifier (F-16)
 ## BUG-658 (OPEN, 2026-10-06) — OMLX SSE keepalive defeats read_timeout → client wedge (no wall-clock deadline). HARNESS-MITIGATED 2026-10-06 (d2767_ab_eval.py wall-clock deadline + preflight smoke); ROOT-FIXED 2026-10-06 (D-2854) in pipeline/omlx_call.py::call_omlx (_post_with_wall_clock daemon-thread + join(timeout=180s) + WallClockTimeout, config services.omlx.wall_clock_deadline_sec). Stays OPEN until the harness relaunch reproduces no-wedge end-to-end. CORRECTION: the flag-ON A/B GATE RESULT DID LAND (20:28, kappa 0.4313 FAIL) — the wedge was a SEPARATE later re-run (PID 15071), not the gate run.
+
+## BUG-659 — OPEN (2026-10-07) — check_config_defaults silently auto-RAISES the shrink-only config_defaults ceiling
+
+`scripts/check_config_defaults.py` re-writes the SHRINK-ONLY ceiling when it finds MORE shadowed/undeclared config keys than the declared ceiling (shadowed 221→229, undeclared 2→3, dirtying config/derivations.yaml). A shrink-only ceiling must never be raised by the check itself; the 9 new keys need owner review and a deliberate re-baseline, not a silent commit. D-2861 (health re-baseline) reverted the side-effect edit.
+
+## BUG-660 — OPEN (2026-10-07) — `just health` is not read-only: it writes tracked files as a side effect
+
+`run_ladder.py --collect health` dirties config/derivations.yaml, governance/RECONCILIATION.json, governance/METRICS.jsonl, governance/MUTATION_JOURNAL.jsonl. A health check that writes is a blindspot; the prior session's `git checkout` revert of the append-only METRICS.jsonl truncated it 895→887 (BUG-638 recurrence), losing 8 metric records. Fix: health must be read-only, or its writes declared + committed as part of the run (never reverted).

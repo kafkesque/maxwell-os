@@ -1,6 +1,6 @@
 # Maxwell OS v3.0 — DECISION LOG (tiered)
 
-> **Updated:** 2026-10-03 | **Machine source of truth:** `config/decisions.yaml` | **Count:** `config/decisions_summary.json` (the census is the ONE home - a count restated in prose is stale the moment it is written, BUG-588)
+> **Updated:** 2026-10-07 | **Machine source of truth:** `config/decisions.yaml` | **Count:** `config/decisions_summary.json` (the census is the ONE home - a count restated in prose is stale the moment it is written, BUG-588)
 > **Archive (full append-only history):** `archive/governance_pre_tiered_2026-09-03/DECISION-LOG.md`
 >
 > **Convention (standing rule):** OPEN/PENDING at the top (most critical first) → ACTIVE in-effect → DONE/CLOSED at the bottom. A decision is "done" only when its `state` is RESOLVED/SUPERSEDED/ARCHIVED/REJECTED.
@@ -11,7 +11,7 @@
 
 ## 🔴 CURRENT OPEN / PENDING INDEX (machine-derived 2026-10-03 — the live face; history below)
 
-**Register truth (do NOT restate counts elsewhere — BUG-588/D-2692):** 955 decisions · 377 bugs (139 open / 238 closed; highest OPEN = BUG-637). Forensic audit + preflight GREEN.
+**Register truth (do NOT restate counts elsewhere — BUG-588/D-2692):** 991 decisions · 424 bugs (163 open / 261 closed; highest OPEN = BUG-660). Forensic audit + preflight GREEN.
 
 1. **OWNER-GATED (D-2727): RATIFY-2 full S4→S5→S6 rerun** — launch under `caffeinate -dimsu` (`runner.py --dry-run` then full).
 2. **OWNER-GATED (D-2727 OG-1): train/eval split** — Option A recommended (KEEP(46)→S4 golden; pin 46 OUT of eval ruler 208→162; sha256-pinned split manifest).

@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**161 open** / 261 closed of 422 ids.
+**163 open** / 261 closed of 424 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -168,3 +168,5 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-650 | (PARTIAL, 2026-10-05) — full-204 A/B (D-2767) has no fail-closed guard against a frozen-invalid anchor; a pre-D-2820 kappa is circular | 1 |
 | BUG-651 | (PARTIAL, 2026-10-05) — S5 majority NLI aggregation hides supported claims + passes contradictory claims (D-2822 Gate A(d)) | 1 |
 | BUG-658 | (OPEN, 2026-10-06) — OMLX SSE keepalive defeats read_timeout → client wedge (no wall-clock deadline). HARNESS-MITIGATED 2026-10-06 (d2767_ab | 1 |
+| BUG-659 | OPEN (2026-10-07) — check_config_defaults silently auto-RAISES the shrink-only config_defaults ceiling | 1 |
+| BUG-660 | OPEN (2026-10-07) — `just health` is not read-only: it writes tracked files as a side effect | 1 |

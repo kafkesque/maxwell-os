@@ -66,7 +66,7 @@ health:
     python3 scripts/check_derivation_homes.py --selftest || exit 1     # D-2646: ONE DERIVED VALUE, ONE HOME - the known-answer controls
     python3 scripts/check_derivation_homes.py || [ $? -eq 2 ]          # D-2646: a rival definition of a registered home is the BUG-499/BUG-502 class
     python3 scripts/build_anchor_store_bridge.py --selftest || exit 1   # BUG-420: the anchor<->corpus bridge known-answer controls
-    python3 scripts/build_anchor_store_bridge.py --check || [ $? -eq 2 ]   # BUG-420/BUG-551: the join is keyed by CONTENT (D-2658); 2 = a row the config DECLARES (golden side included), 1 = a BRIDGE GAP
+    python3 scripts/build_anchor_store_bridge.py --check || [ $? -eq 2 ]   # BUG-420/BUG-551: the join is keyed by CONTENT (D-2658); 2 = owner-owed (a SAFE ambiguous refusal, or a row the config DECLARES incl. golden), 1 = a BRIDGE GAP
     python3 scripts/check_config_defaults.py --selftest || exit 1      # D-2644: the undeclared-default census known-answer controls
     python3 scripts/check_config_defaults.py || [ $? -eq 2 ]           # D-2644: a config value read with a code default is UNDECLARED; 2 = the declared ceiling was stale and is now recorded
     python3 scripts/lib/handoff.py --selftest || exit 1
@@ -81,6 +81,7 @@ health:
     python3 scripts/check_store_authority.py --check || exit 1     # BUG-524/STORES: exactly ONE authoritative store; a shared table name fails closed
     python3 scripts/check_store_columns.py --selftest || exit 1    # BUG-492: the column-lifecycle detector must be SEEN to fire
     python3 scripts/check_store_columns.py --check || [ $? -eq 2 ]  # BUG-524/COLUMNS: a label that cannot vary, a blank a count(col) cannot see; 2 = declared debt
+    python3 scripts/check_domain_cardinality.py || [ $? -eq 2 ]   # D-2838/BUG-631: reader-limb re-measures the committed store for over-cap FBs; 1 = over-cap (historical re-derivation owed), 2 = parse-defect
     python3 scripts/resolve_dropbox_conflicts.py --check || [ $? -eq 2 ]  # D-2647: a Dropbox-reverted artifact must never pass silently; 2 = siblings only the owner can settle
     python3 scripts/reconcile.py --selftest || exit 1  # BUG-575/D-2682: the decision-graph rules (succession + force) must be SEEN to fire (a control nothing runs is a comment, BUG-492)
     python3 scripts/reconcile.py --check || [ $? -eq 2 ]    # 2 = owner-owed debt: loud, NOT fatal (BUG-457)

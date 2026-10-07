@@ -8989,7 +8989,7 @@ the canonical register to the verdict already recorded in each row's own prose (
 ## BUG-660 — OPEN (2026-10-07) — `just health` is not read-only: it writes tracked files as a side effect
 
 `run_ladder.py --collect health` dirties config/derivations.yaml, governance/RECONCILIATION.json, governance/METRICS.jsonl, governance/MUTATION_JOURNAL.jsonl. A health check that writes is a blindspot; the prior session's `git checkout` revert of the append-only METRICS.jsonl truncated it 895→887 (BUG-638 recurrence), losing 8 metric records. Fix: health must be read-only, or its writes declared + committed as part of the run (never reverted).
-## BUG-661 — OPEN (2026-10-07) — build_anchor_store_bridge --check prints "ok" but exits 1 (verdict/exit-code mismatch)
+## BUG-661 (FIXED 2026-10-07): build_anchor_store_bridge --check prints "ok" but exits 1 (verdict/exit-code mismatch)
 
 `verdict()` returns EXIT_DRIFT (1) when ANY ambiguous rows exist (the safe "a name matching two corpus rows is never picked"
 outcome), and the ratified rechunk-v4-20260929 store change introduced 11 such ambiguous name collisions. `main()` `--check`
@@ -8998,7 +8998,7 @@ is a BUG-492 class defect, and it misled the prior sitting into believing the ra
 read as a pass). Fix: ambiguous rows are a SAFE never-picked outcome → return EXIT_CLEAN (or a distinct EXIT_OWED), and never
 print "ok" for a non-zero code.
 
-## BUG-662 — OPEN (2026-10-07) — store-change re-baseline incomplete: 256 MEASUREMENT-DRIFT cells + menu_hash RESERVED-VIOLATION
+## BUG-662 (FIXED 2026-10-07): store-change re-baseline incomplete: 256 MEASUREMENT-DRIFT cells + menu_hash RESERVED-VIOLATION
 
 The ratified rechunk-v4-20260929 grew `fbs` 7,995→14,574 rows, but config/store_columns.yaml `measured:` still records 7,995/7,994
 for ~256 census cells (now measuring 14,574/14,573), and `menu_hash` is still `role: reserved, filled_by: "the S4 classifier menu
@@ -9012,7 +9012,7 @@ Six NEW failures outside the declared red set: test_golden_meta_hash_matches_act
 test_compound_is_not_long_tail, test_resolve_content_type_explicit_wins, test_taxonomy_cross_kind_collision_resolves_correctly,
 test_guard_detects_punctuation_hidden_collision. A regression is never absorbed by editing the ceiling (D-2656).
 
-## BUG-664 — OPEN (2026-10-07) — check_domain_cardinality.py (D-2838/BUG-631 reader-limb) added but never wired into the ladder
+## BUG-664 (FIXED 2026-10-07): check_domain_cardinality.py (D-2838/BUG-631 reader-limb) added but never wired into the ladder
 
 `scripts/check_domain_cardinality.py` is invoked by no declared ladder recipe and declared dormant nowhere → check_rail_registry
 (i) "a rail NOTHING RUNS" + reconcile "1 uninvoked check script exceeds the declared debt_max 0". A control nothing runs is a
@@ -9037,7 +9037,7 @@ The t11 checkpoint_enriched.jsonl was rewritten 65 min AFTER the 7,995-record S5
 on disk 3854250c3fbc… vs marker 0ca6f0f0…). The authority marker is a false claim until re-minted; a pin is re-minted by a
 DECISION (D-382/BUG-535), never by a quiet re-hash.
 
-## BUG-668 — OPEN (2026-10-07) — build_archive_index: archive/bloat_20260929 on disk but neither indexed nor declared-excluded
+## BUG-668 (FIXED 2026-10-07): build_archive_index: archive/bloat_20260929 on disk but neither indexed nor declared-excluded
 
 `archive/index.yaml` fails the coverage invariant: bloat_20260929 is on disk but in NEITHER the index nor the declared exclusions.
 Run `python3 scripts/build_archive_index.py` (or declare the exclusion) — an on-disk object is INDEXED or DECLARED excluded, never

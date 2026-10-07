@@ -40,7 +40,7 @@ columns:
   contradicts_fbs: {role: reserved, filled_by: "pipeline/stage4_5_enrich.py contradiction pass", why: "NULL on 7995/7995 rows while 9 files name it"}
   last_retrieved_at: {role: reserved, filled_by: "the knowledge layer query path (T4)", why: "blank on 7995/7995 rows - retrieval has never been recorded"}
   feedback_score: {role: reserved, filled_by: "the feedback loop that does not exist yet", why: "NULL on 7995/7995 rows while 14 files name it; part of the unwired 4-column feedback subsystem"}
-  menu_hash: {role: reserved, filled_by: "the S4 classifier menu writer", why: "blank on 7995/7995 rows - the S4 menu provenance was never stamped, so a re-classification cannot be tied to the menu that produced it"}
+  menu_hash: {role: sparse, why: "6591 of 14574 rows carry content - the S4 menu provenance is now stamped on the post-boundary rows and correctly blank on the 7983 pre-boundary rows (never imputed, D-277)"}
   classification_error: {role: reserved, filled_by: "nobody - superseded by classification_errors", why: "blank on 7995/7995 rows while a plural sibling carries the real values; one rule with two homes, one of them dead (D-2646)"}
   # ---- sparse: a row-carried diagnostic ----
   classification_errors: {role: sparse, why: "2 of 7995 rows carry content ('Too many domains: 6 > 5' and 7 > 5) - a diagnostic carried by the rows that failed, which is the correct shape for it"}
@@ -62,527 +62,527 @@ measured:
     accessibility:
       distinct: 2
       hollow: 0
-      mentions: 10
-      nonblank: 7995
-      nonnull: 7995
-      rows: 7995
+      mentions: 11
+      nonblank: 14574
+      nonnull: 14574
+      rows: 14574
     application:
-      distinct: 7994
+      distinct: 14573
       hollow: 0
-      mentions: 70
-      nonblank: 7994
-      nonnull: 7995
-      rows: 7995
+      mentions: 72
+      nonblank: 14573
+      nonnull: 14574
+      rows: 14574
     borp_score:
       distinct: 1
       hollow: 0
       mentions: 13
-      nonblank: 7995
-      nonnull: 7995
-      rows: 7995
+      nonblank: 14574
+      nonnull: 14574
+      rows: 14574
     boundary:
-      distinct: 7994
+      distinct: 14573
       hollow: 0
-      mentions: 106
-      nonblank: 7995
-      nonnull: 7995
-      rows: 7995
+      mentions: 127
+      nonblank: 14574
+      nonnull: 14574
+      rows: 14574
     citation:
-      distinct: 752
+      distinct: 787
       hollow: 0
-      mentions: 30
-      nonblank: 7995
-      nonnull: 7995
-      rows: 7995
+      mentions: 32
+      nonblank: 14574
+      nonnull: 14574
+      rows: 14574
     classification_error:
       distinct: 0
       hollow: 0
       mentions: 7
       nonblank: 0
-      nonnull: 7995
-      rows: 7995
+      nonnull: 14574
+      rows: 14574
     classification_errors:
       distinct: 2
       hollow: 0
       mentions: 11
       nonblank: 2
       nonnull: 2
-      rows: 7995
+      rows: 14574
     classification_status:
       distinct: 1
       hollow: 0
       mentions: 14
-      nonblank: 7995
-      nonnull: 7995
-      rows: 7995
+      nonblank: 14574
+      nonnull: 14574
+      rows: 14574
     committed_at:
-      distinct: 7995
+      distinct: 14574
       hollow: 0
       mentions: 6
-      nonblank: 7995
-      nonnull: 7995
-      rows: 7995
+      nonblank: 14574
+      nonnull: 14574
+      rows: 14574
     confidence_score:
-      distinct: 175
+      distinct: 243
       hollow: 0
       mentions: 8
-      nonblank: 7995
-      nonnull: 7995
-      rows: 7995
+      nonblank: 14574
+      nonnull: 14574
+      rows: 14574
     consequence:
-      distinct: 7994
+      distinct: 14573
       hollow: 0
-      mentions: 43
-      nonblank: 7995
-      nonnull: 7995
-      rows: 7995
+      mentions: 52
+      nonblank: 14574
+      nonnull: 14574
+      rows: 14574
     content_type:
+      distinct: 2
+      hollow: 0
+      mentions: 108
+      nonblank: 14574
+      nonnull: 14574
+      rows: 14574
+    content_type_source:
       distinct: 1
       hollow: 0
-      mentions: 107
-      nonblank: 7995
-      nonnull: 7995
-      rows: 7995
-    content_type_source:
-      distinct: 0
-      hollow: 0
       mentions: 12
-      nonblank: 0
-      nonnull: 7995
-      rows: 7995
+      nonblank: 6591
+      nonnull: 14574
+      rows: 14574
     context:
       distinct: 16
       hollow: 0
-      mentions: 66
-      nonblank: 7995
-      nonnull: 7995
-      rows: 7995
+      mentions: 69
+      nonblank: 14574
+      nonnull: 14574
+      rows: 14574
     contradicts_fbs:
       distinct: 0
       hollow: 0
       mentions: 9
       nonblank: 0
       nonnull: 0
-      rows: 7995
+      rows: 14574
     created_at:
-      distinct: 7995
+      distinct: 14574
       hollow: 0
-      mentions: 37
-      nonblank: 7995
-      nonnull: 7995
-      rows: 7995
+      mentions: 39
+      nonblank: 14574
+      nonnull: 14574
+      rows: 14574
     definition:
-      distinct: 7995
+      distinct: 14574
       hollow: 0
-      mentions: 155
-      nonblank: 7995
-      nonnull: 7995
-      rows: 7995
+      mentions: 173
+      nonblank: 14574
+      nonnull: 14574
+      rows: 14574
     depth:
       distinct: 4
       hollow: 0
-      mentions: 125
-      nonblank: 7995
-      nonnull: 7995
-      rows: 7995
+      mentions: 139
+      nonblank: 14574
+      nonnull: 14574
+      rows: 14574
     difficulty_level:
       distinct: 3
       hollow: 0
       mentions: 8
-      nonblank: 7995
-      nonnull: 7995
-      rows: 7995
+      nonblank: 14574
+      nonnull: 14574
+      rows: 14574
     discipline:
       distinct: 62
       hollow: 0
-      mentions: 164
-      nonblank: 7995
-      nonnull: 7995
-      rows: 7995
+      mentions: 186
+      nonblank: 14574
+      nonnull: 14574
+      rows: 14574
     discipline_raw:
-      distinct: 1423
+      distinct: 1918
       hollow: 54
-      mentions: 39
-      nonblank: 7995
-      nonnull: 7995
-      rows: 7995
+      mentions: 41
+      nonblank: 14574
+      nonnull: 14574
+      rows: 14574
     discipline_source:
-      distinct: 0
+      distinct: 1
       hollow: 0
-      mentions: 13
-      nonblank: 0
-      nonnull: 7995
-      rows: 7995
+      mentions: 18
+      nonblank: 6591
+      nonnull: 14574
+      rows: 14574
     domains:
-      distinct: 2081
+      distinct: 2995
       hollow: 0
-      mentions: 142
-      nonblank: 7995
-      nonnull: 7995
-      rows: 7995
+      mentions: 151
+      nonblank: 14574
+      nonnull: 14574
+      rows: 14574
     domains_raw:
-      distinct: 7631
+      distinct: 13413
       hollow: 39
-      mentions: 34
-      nonblank: 7995
-      nonnull: 7995
-      rows: 7995
+      mentions: 35
+      nonblank: 14574
+      nonnull: 14574
+      rows: 14574
     duplicate_of:
       distinct: 0
       hollow: 0
       mentions: 11
       nonblank: 0
-      nonnull: 7995
-      rows: 7995
+      nonnull: 14574
+      rows: 14574
     elaboration:
-      distinct: 7995
+      distinct: 14574
       hollow: 0
-      mentions: 34
-      nonblank: 7995
-      nonnull: 7995
-      rows: 7995
+      mentions: 38
+      nonblank: 14574
+      nonnull: 14574
+      rows: 14574
     epistemic_status:
       distinct: 4
       hollow: 0
-      mentions: 10
-      nonblank: 7995
-      nonnull: 7995
-      rows: 7995
+      mentions: 11
+      nonblank: 14574
+      nonnull: 14574
+      rows: 14574
     evidence:
       distinct: 2
       hollow: 0
-      mentions: 94
-      nonblank: 7995
-      nonnull: 7995
-      rows: 7995
+      mentions: 101
+      nonblank: 14574
+      nonnull: 14574
+      rows: 14574
     evidence_passages:
-      distinct: 7991
+      distinct: 14149
       hollow: 0
       mentions: 44
-      nonblank: 7995
-      nonnull: 7995
-      rows: 7995
+      nonblank: 14574
+      nonnull: 14574
+      rows: 14574
     evidence_passages_shown:
-      distinct: 7991
+      distinct: 14038
       hollow: 0
-      mentions: 13
-      nonblank: 7995
-      nonnull: 7995
-      rows: 7995
+      mentions: 14
+      nonblank: 14574
+      nonnull: 14574
+      rows: 14574
     extraction_type:
       distinct: 4
       hollow: 0
-      mentions: 69
-      nonblank: 7995
-      nonnull: 7995
-      rows: 7995
+      mentions: 73
+      nonblank: 14574
+      nonnull: 14574
+      rows: 14574
     extraction_type_source:
-      distinct: 0
+      distinct: 1
       hollow: 0
       mentions: 4
-      nonblank: 0
-      nonnull: 7995
-      rows: 7995
+      nonblank: 6591
+      nonnull: 14574
+      rows: 14574
     failure_mode:
-      distinct: 7995
+      distinct: 14574
       hollow: 0
-      mentions: 27
-      nonblank: 7995
-      nonnull: 7995
-      rows: 7995
+      mentions: 28
+      nonblank: 14574
+      nonnull: 14574
+      rows: 14574
     fb_id:
-      distinct: 7995
+      distinct: 14574
       hollow: 0
-      mentions: 158
-      nonblank: 7995
-      nonnull: 7995
-      rows: 7995
+      mentions: 165
+      nonblank: 14574
+      nonnull: 14574
+      rows: 14574
     fb_version:
       distinct: 1
       hollow: 0
       mentions: 9
-      nonblank: 7995
-      nonnull: 7995
-      rows: 7995
+      nonblank: 14574
+      nonnull: 14574
+      rows: 14574
     feedback_count:
       distinct: 1
       hollow: 0
       mentions: 11
-      nonblank: 7995
-      nonnull: 7995
-      rows: 7995
+      nonblank: 14574
+      nonnull: 14574
+      rows: 14574
     feedback_score:
       distinct: 0
       hollow: 0
       mentions: 14
       nonblank: 0
       nonnull: 0
-      rows: 7995
+      rows: 14574
     gen_model:
       distinct: 1
       hollow: 0
-      mentions: 58
-      nonblank: 7995
-      nonnull: 7995
-      rows: 7995
+      mentions: 68
+      nonblank: 14574
+      nonnull: 14574
+      rows: 14574
     intimacy_boundary:
       distinct: 3
       hollow: 0
       mentions: 11
-      nonblank: 7995
-      nonnull: 7995
-      rows: 7995
+      nonblank: 14574
+      nonnull: 14574
+      rows: 14574
     is_convergent:
       distinct: 2
       hollow: 0
-      mentions: 44
-      nonblank: 7995
-      nonnull: 7995
-      rows: 7995
+      mentions: 45
+      nonblank: 14574
+      nonnull: 14574
+      rows: 14574
     is_summary:
       distinct: 1
       hollow: 0
       mentions: 23
-      nonblank: 7995
-      nonnull: 7995
-      rows: 7995
+      nonblank: 14574
+      nonnull: 14574
+      rows: 14574
     isor:
-      distinct: 622
+      distinct: 855
       hollow: 0
       mentions: 9
-      nonblank: 7995
-      nonnull: 7995
-      rows: 7995
+      nonblank: 14574
+      nonnull: 14574
+      rows: 14574
     jargon:
-      distinct: 5868
+      distinct: 10226
       hollow: 0
       mentions: 19
-      nonblank: 5904
-      nonnull: 7995
-      rows: 7995
+      nonblank: 10315
+      nonnull: 14574
+      rows: 14574
     keywords:
-      distinct: 7995
+      distinct: 14573
       hollow: 0
       mentions: 22
-      nonblank: 7995
-      nonnull: 7995
-      rows: 7995
+      nonblank: 14574
+      nonnull: 14574
+      rows: 14574
     last_retrieved_at:
       distinct: 0
       hollow: 0
       mentions: 6
       nonblank: 0
-      nonnull: 7995
-      rows: 7995
+      nonnull: 14574
+      rows: 14574
     mechanism:
-      distinct: 7995
+      distinct: 14574
       hollow: 0
-      mentions: 120
-      nonblank: 7995
-      nonnull: 7995
-      rows: 7995
+      mentions: 132
+      nonblank: 14574
+      nonnull: 14574
+      rows: 14574
     menu_hash:
-      distinct: 0
+      distinct: 1
       hollow: 0
-      mentions: 18
-      nonblank: 0
-      nonnull: 7995
-      rows: 7995
+      mentions: 22
+      nonblank: 6591
+      nonnull: 14574
+      rows: 14574
     name:
-      distinct: 7990
+      distinct: 14121
       hollow: 0
-      mentions: 270
-      nonblank: 7995
-      nonnull: 7995
-      rows: 7995
+      mentions: 315
+      nonblank: 14574
+      nonnull: 14574
+      rows: 14574
     needs_human_review:
       distinct: 2
       hollow: 0
       mentions: 9
-      nonblank: 7995
-      nonnull: 7995
-      rows: 7995
+      nonblank: 14574
+      nonnull: 14574
+      rows: 14574
     origin:
       distinct: 3
       hollow: 0
-      mentions: 19
-      nonblank: 7995
-      nonnull: 7995
-      rows: 7995
+      mentions: 20
+      nonblank: 14574
+      nonnull: 14574
+      rows: 14574
     pipeline_commit:
-      distinct: 2
-      hollow: 0
-      mentions: 57
-      nonblank: 7995
-      nonnull: 7995
-      rows: 7995
-    pipeline_run_id:
       distinct: 3
       hollow: 0
+      mentions: 65
+      nonblank: 14574
+      nonnull: 14574
+      rows: 14574
+    pipeline_run_id:
+      distinct: 4
+      hollow: 0
       mentions: 15
-      nonblank: 7995
-      nonnull: 7995
-      rows: 7995
+      nonblank: 14574
+      nonnull: 14574
+      rows: 14574
     prerequisite_fbs:
       distinct: 1
-      hollow: 7995
+      hollow: 14574
       mentions: 13
-      nonblank: 7995
-      nonnull: 7995
-      rows: 7995
+      nonblank: 14574
+      nonnull: 14574
+      rows: 14574
     primary_source:
-      distinct: 1320
+      distinct: 1571
       hollow: 0
       mentions: 18
-      nonblank: 7995
-      nonnull: 7995
-      rows: 7995
+      nonblank: 14574
+      nonnull: 14574
+      rows: 14574
     procedural_skill:
       distinct: 0
       hollow: 0
       mentions: 11
       nonblank: 0
-      nonnull: 7995
-      rows: 7995
+      nonnull: 14574
+      rows: 14574
     provenance:
       distinct: 1
       hollow: 0
-      mentions: 76
-      nonblank: 7995
-      nonnull: 7995
-      rows: 7995
+      mentions: 93
+      nonblank: 14574
+      nonnull: 14574
+      rows: 14574
     related_fbs:
-      distinct: 7983
+      distinct: 14562
       hollow: 13
       mentions: 15
-      nonblank: 7995
-      nonnull: 7995
-      rows: 7995
+      nonblank: 14574
+      nonnull: 14574
+      rows: 14574
     s5_reason:
       distinct: 7
       hollow: 0
       mentions: 8
-      nonblank: 7995
-      nonnull: 7995
-      rows: 7995
+      nonblank: 14574
+      nonnull: 14574
+      rows: 14574
     schema_version:
       distinct: 1
       hollow: 0
-      mentions: 83
-      nonblank: 7995
-      nonnull: 7995
-      rows: 7995
+      mentions: 101
+      nonblank: 14574
+      nonnull: 14574
+      rows: 14574
     source_authors:
-      distinct: 2867
+      distinct: 3751
       hollow: 0
       mentions: 22
-      nonblank: 7995
-      nonnull: 7995
-      rows: 7995
+      nonblank: 14574
+      nonnull: 14574
+      rows: 14574
     source_books:
-      distinct: 2851
+      distinct: 3729
       hollow: 0
       mentions: 43
-      nonblank: 7995
-      nonnull: 7995
-      rows: 7995
+      nonblank: 14574
+      nonnull: 14574
+      rows: 14574
     source_clusters:
-      distinct: 7993
+      distinct: 14246
       hollow: 0
-      mentions: 17
-      nonblank: 7995
-      nonnull: 7995
-      rows: 7995
+      mentions: 18
+      nonblank: 14574
+      nonnull: 14574
+      rows: 14574
     source_diversity:
-      distinct: 77
+      distinct: 104
       hollow: 0
-      mentions: 25
-      nonblank: 7995
-      nonnull: 7995
-      rows: 7995
+      mentions: 26
+      nonblank: 14574
+      nonnull: 14574
+      rows: 14574
     source_ids:
-      distinct: 2615
+      distinct: 3413
       hollow: 0
-      mentions: 22
-      nonblank: 7995
-      nonnull: 7995
-      rows: 7995
+      mentions: 24
+      nonblank: 14574
+      nonnull: 14574
+      rows: 14574
     source_principle_ids:
-      distinct: 7995
+      distinct: 14574
       hollow: 0
       mentions: 12
-      nonblank: 7995
-      nonnull: 7995
-      rows: 7995
+      nonblank: 14574
+      nonnull: 14574
+      rows: 14574
     source_segments:
-      distinct: 7991
+      distinct: 14185
       hollow: 0
       mentions: 19
-      nonblank: 7995
-      nonnull: 7995
-      rows: 7995
+      nonblank: 14574
+      nonnull: 14574
+      rows: 14574
     source_text:
-      distinct: 7995
+      distinct: 14574
       hollow: 0
-      mentions: 15
-      nonblank: 7995
-      nonnull: 7995
-      rows: 7995
+      mentions: 23
+      nonblank: 14574
+      nonnull: 14574
+      rows: 14574
     status:
       distinct: 2
       hollow: 0
-      mentions: 100
-      nonblank: 7995
-      nonnull: 7995
-      rows: 7995
+      mentions: 109
+      nonblank: 14574
+      nonnull: 14574
+      rows: 14574
     taxonomy_match_method:
       distinct: 4
       hollow: 0
       mentions: 18
-      nonblank: 7995
-      nonnull: 7995
-      rows: 7995
+      nonblank: 14574
+      nonnull: 14574
+      rows: 14574
     taxonomy_version:
-      distinct: 2
+      distinct: 3
       hollow: 0
-      mentions: 14
-      nonblank: 7995
-      nonnull: 7995
-      rows: 7995
+      mentions: 15
+      nonblank: 14574
+      nonnull: 14574
+      rows: 14574
     temporal_scope:
       distinct: 2
       hollow: 0
       mentions: 8
-      nonblank: 7995
-      nonnull: 7995
-      rows: 7995
+      nonblank: 14574
+      nonnull: 14574
+      rows: 14574
     usage_count:
       distinct: 1
       hollow: 0
       mentions: 12
-      nonblank: 7995
-      nonnull: 7995
-      rows: 7995
+      nonblank: 14574
+      nonnull: 14574
+      rows: 14574
     verification_method:
       distinct: 3
       hollow: 0
       mentions: 7
-      nonblank: 7995
-      nonnull: 7995
-      rows: 7995
+      nonblank: 14574
+      nonnull: 14574
+      rows: 14574
     verification_results:
-      distinct: 6058
+      distinct: 10351
       hollow: 0
       mentions: 15
-      nonblank: 7995
-      nonnull: 7995
-      rows: 7995
+      nonblank: 14574
+      nonnull: 14574
+      rows: 14574
     verifier_model:
       distinct: 1
       hollow: 0
       mentions: 7
-      nonblank: 7995
-      nonnull: 7995
-      rows: 7995
-  rows: 7995
+      nonblank: 14574
+      nonnull: 14574
+      rows: 14574
+  rows: 14574
 measured_by: scripts/check_store_columns.py

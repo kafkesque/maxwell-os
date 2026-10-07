@@ -11,8 +11,8 @@ never guesses (D-2658: a declared SITE is keyed by CONTENT, never by a line numb
 WHAT IT IS NOT. It copies NO stored value - only the JOIN, the METHOD and the input DIGESTS. Every axis value stays
 owned by ANCHOR-3 (the ruler) and by the store; a second copy of a value is the BUG-402 class.
 
-TRI-STATE (BUG-457): 0 clean | 1 drift (ambiguity, undeclared unresolved row, stale artifact) | 2 owner-owed
-(rows the config DECLARES). A row that does not join is NEVER silently downgraded to owner-owed: the GOLDEN side
+TRI-STATE (BUG-457): 0 clean | 1 drift (undeclared unresolved row, stale artifact) | 2 owner-owed (a SAFE
+never-picked ambiguity, or a row the config DECLARES). A row that does not join is NEVER silently downgraded to owner-owed: the GOLDEN side
 obeys the SAME rule as the corpus side (BUG-551) - an UNDECLARED unjoined golden row is DRIFT (1), a DECLARED one
 is owner-owed (2), a declaration with no adequate why is DRIFT (1), and a declaration whose row now JOINS is
 owner-owed (2): the ceiling shrinks LOUDLY, it never silently stops applying.
@@ -202,7 +202,8 @@ def verdict(doc: dict, cfg: dict) -> Tuple[int, str]:
     """Tri-state verdict for a freshly derived document."""
     c, j = doc["join"]["counts"], doc["join"]
     if c["ambiguous"]:
-        return EXIT_DRIFT, f"{c['ambiguous']} AMBIGUOUS row(s) - a name matching two corpus rows is never picked"
+        return EXIT_OWED, (f"{c['ambiguous']} AMBIGUOUS row(s) - a name matching two corpus rows is never "
+                           f"picked; a SAFE refusal is OWNER-OWED, never DRIFT (BUG-661)")
     extra = sorted(set(j["unresolved"]) - set(cfg.get("declared_unresolved") or []))
     if extra:
         return EXIT_DRIFT, f"{len(extra)} UNDECLARED unresolved row(s): {extra[:8]}"
@@ -277,7 +278,7 @@ def selftest() -> int:
         ("clean exits 0", verdict(clean, {})[0], EXIT_CLEAN),
         ("undeclared unresolved exits 1", verdict(un, {})[0], EXIT_DRIFT),
         ("DECLARED unresolved exits 2", verdict(un, {"declared_unresolved": ["R004"]})[0], EXIT_OWED),
-        ("ambiguity exits 1", verdict(amb, {})[0], EXIT_DRIFT),
+        ("ambiguity exits 2 (safe, owner-owed)", verdict(amb, {})[0], EXIT_OWED),
         ("golden unjoined UNDECLARED exits 1", verdict(g_un, {})[0], EXIT_DRIFT),
         ("golden unjoined DECLARED exits 2", verdict(g_un, g_decl)[0], EXIT_OWED),
         ("a declaration without an adequate why exits 1", verdict(g_un, g_thin)[0], EXIT_DRIFT),
@@ -323,7 +324,8 @@ def main(argv: Optional[List[str]] = None) -> int:
         if strip_volatile(json.loads(path.read_text(encoding="utf-8"))) != strip_volatile(doc):
             print(f"{PREFIX}: DRIFT - the committed bridge no longer re-derives (a join, a name or an input moved)")
             return EXIT_DRIFT
-        print(f"{PREFIX}: ok {why}")
+        verdict_word = {EXIT_CLEAN: "ok", EXIT_OWED: "owed", EXIT_DRIFT: "drift"}.get(code, f"code={code}")
+        print(f"{PREFIX}: {verdict_word} {why}")
         return code
     write_doc(path, doc)
     print(f"{PREFIX}: wrote {cfg['artifact']} - {why}")

@@ -564,9 +564,9 @@ stage5:
   - tool_instruction
   factscore_enabled: false
   nli_model: MoritzLaurer/DeBERTa-v3-large-mnli-fever-anli-ling-wanli
-  nli_entailment_threshold: 0.1
-  nli_pass_threshold: 0.1
-  nli_marginal_threshold: 0.1
+  nli_entailment_threshold: 0.05
+  nli_pass_threshold: 0.5
+  nli_marginal_threshold: 0.0
   nli_max_premise_chars: 1500
   nli_max_hypothesis_chars: 500
   evidence_contamination_ratio: 0.15
@@ -580,7 +580,14 @@ stage5:
   # (current, calibrated). 'or_entail_and_no_contra' = D-2822 Gate A(d): a convergent FB is
   # VERIFIED only when at least ONE clean passage entails (OR-entail) AND ZERO passages
   # contradict (AND-no-contra). FLIP ONLY after D-2822 threshold recalibration (nli_calibrate.py).
-  nli_aggregation: majority
+  nli_aggregation: or_entail_and_no_contra
+  # D-2858/D-2863: fail-closed calibration stamp. stage5_verify.py (D-2858 step 4 guard) refuses
+  # or-entail mode unless aggregation matches, threshold == nli_pass_threshold, decision non-empty.
+  # Re-minted from the 2026-10-07 recalibration (best_precision_threshold 0.5, precision 0.852).
+  nli_calibration:
+    aggregation: or_entail_and_no_contra
+    threshold: 0.5
+    decision: D-2863
   banned_mechanism_prefixes:
   - because it enables
   - because it allows

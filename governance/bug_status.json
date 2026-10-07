@@ -2,8 +2,8 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 433,
-  "open_n": 161,
+  "total_ids": 434,
+  "open_n": 162,
   "closed_n": 272,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
@@ -811,6 +811,11 @@
     {
       "id": "BUG-669",
       "title": "(OPEN, 2026-10-07) \u2014 check_governance_faces.py scope blindspot: the LIVE census face it exists to guard is unguarded",
+      "events": 1
+    },
+    {
+      "id": "BUG-670",
+      "title": "(OPEN, 2026-10-07) \u2014 nli_calibrate.py print_report: C20 magic-number \"marginal\" recommendation violates the D2185 threshold invariant",
       "events": 1
     }
   ],

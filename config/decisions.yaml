@@ -14096,3 +14096,28 @@ decisions:
   - BUG-667
   files:
   - 'knowledge pipeline/stage4_merge/t11/ARTIFACT_AUTHORITY.json'
+- id: D-2863
+  state: RATIFIED
+  category: VERIFICATION / NLI
+  title: re-mint NLI or-entail PASS threshold 0.5 (best_precision P=0.852) under D-2858 step 2
+  decision: >
+    D-2858 step 2 re-mint (D-353: a pin change is a re-mint under a NEW id, never a quiet re-hash).
+    pipeline/nli_calibrate.py ran against or-entail semantics on the STAGE4_CHECKPOINT (6,591 FBs to
+    16,015 positive + 16,015 negative pairs = 32,030, DeBERTa-v3-large, MPS). best_f1_threshold =
+    0.05 (F1=0.612); best_precision_threshold = 0.5 (precision=0.852, >= 0.85 floor, recall=0.414).
+    or-entail lets ONE clean passage decide the FB (D-2822 Gate A(d)), so the per-passage PASS bar is
+    the precision-favoring 0.5, NOT the B2-majority-calibrated 0.10. Re-minted stage5.nli_calibration
+    {aggregation: or_entail_and_no_contra, threshold: 0.5, decision: D-2863} and the
+    nli_calibration.json sha256 pin bf36e008... under this id; flipped stage5.nli_aggregation
+    majority -> or_entail_and_no_contra ONLY after the stamp landed (D-2858 step 4 fail-closed guard).
+    Sibling thresholds nli_entailment_threshold 0.05 (best_f1) and nli_marginal_threshold 0.0 (domain
+    floor; or-entail has no neutral-marginal tier) satisfy the D2185 invariant
+    0 <= marginal < entailment < pass. The calibrate report's own marginal recommendation
+    max(0.40, best_f1 - 0.10) is a C20 magic number that would raise FATAL on import (BUG-670).
+  bugs:
+  - BUG-651
+  - BUG-670
+  files:
+  - config/pipeline_config.yaml
+  - config/recalibration_pins.yaml
+  - pipeline/nli_calibrate.py

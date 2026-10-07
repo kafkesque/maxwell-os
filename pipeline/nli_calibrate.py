@@ -36,8 +36,18 @@ from pipeline.io_guard import safe_write  # D2496: C6 crash-safe writes
 
 import numpy as np
 
-from pipeline.pipeline_paths import DATA_DIR, S5_NLI_MODEL
+from pipeline.pipeline_paths import (
+    DATA_DIR,
+    S5_NLI_ENTAILMENT_THRESHOLD,
+    S5_NLI_MARGINAL_THRESHOLD,
+    S5_NLI_MODEL,
+    S5_NLI_PASS_THRESHOLD,
+)
 from pipeline.stage5_verify import _load_dual_encoders, _nli_pair_scores
+
+# C20 (BUG-670): named constants, not magic numbers.
+_MARGINAL_BELOW_ENTAILMENT = 0.10  # the marginal band sits this far below the entailment bar
+_DRIFT_TOLERANCE = 0.10            # warn when the recommended entailment bar drifts this far from config
 
 
 def load_fbs_from_stage4() -> list[dict]:
@@ -253,20 +263,26 @@ def print_report(calibration: dict) -> None:
     print("\n📊 RECOMMENDED THRESHOLDS:")
     best_f1 = calibration["best_f1_threshold"]
     best_prec = calibration["best_precision_threshold"]
+    # BUG-670 / D2185: the marginal band must sit STRICTLY BELOW the entailment bar
+    # (invariant 0 <= marginal < entailment < pass). The old max(0.40, ...) floor returned
+    # 0.40 when best_f1 = 0.05, i.e. 0.40 > 0.05, which would FATAL
+    # pipeline_paths._validate_nli_thresholds() if blindly applied.
+    marginal = max(0.0, best_f1["threshold"] - _MARGINAL_BELOW_ENTAILMENT)
     print(f"   NLI_ENTAILMENT_THRESHOLD = {best_f1['threshold']:.2f}  (F1={best_f1['f1']:.3f})")
     print(f"   NLI_PASS_THRESHOLD      = {best_prec['threshold']:.2f}  (precision={best_prec['precision']:.3f})")
-    print(f"   NLI_MARGINAL_THRESHOLD  = {max(0.40, best_f1['threshold'] - 0.10):.2f}  (lower bound)")
+    print(f"   NLI_MARGINAL_THRESHOLD  = {marginal:.2f}  (invariant-safe lower bound)")
 
-    # Compare with current defaults (D2298: DeBERTa-only single threshold 0.10)
-    print("\n📋 CURRENT DEFAULTS (pipeline_config.yaml):")
-    print("   NLI_ENTAILMENT_THRESHOLD = 0.10")
-    print("   NLI_PASS_THRESHOLD      = 0.10")
-    print("   NLI_MARGINAL_THRESHOLD  = 0.10")
+    # Compare with the CURRENT config (C20/BUG-670: read, do not hardcode — the defaults
+    # drifted 0.10 -> 0.05/0.5/0.0 under D-2863).
+    print("\n📋 CURRENT CONFIG (pipeline_config.yaml):")
+    print(f"   NLI_ENTAILMENT_THRESHOLD = {S5_NLI_ENTAILMENT_THRESHOLD:.2f}")
+    print(f"   NLI_PASS_THRESHOLD      = {S5_NLI_PASS_THRESHOLD:.2f}")
+    print(f"   NLI_MARGINAL_THRESHOLD  = {S5_NLI_MARGINAL_THRESHOLD:.2f}")
 
-    drift = abs(best_f1["threshold"] - 0.10)
-    if drift > 0.10:
+    drift = abs(best_f1["threshold"] - S5_NLI_ENTAILMENT_THRESHOLD)
+    if drift > _DRIFT_TOLERANCE:
         print(f"\n⚠️  THRESHOLD DRIFT: recommended NLI_ENTAILMENT_THRESHOLD "
-              f"differs from default by {drift:.2f}. Update pipeline_config.yaml.")
+              f"differs from config by {drift:.2f}. Update pipeline_config.yaml.")
 
     # Save raw scores for analysis
     out_path = DATA_DIR / "metrics" / "nli_calibration.json"

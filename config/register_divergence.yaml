@@ -34,21 +34,13 @@ declared_divergent: []   # EMPTIED 2026-09-25: all eight were promoted to header
 # header would carry a status no author ever wrote, and 'no closure claim is not a closure' would count
 # every legacy record OPEN. The list is therefore PINNED BY IDENTITY and SHRINK-ONLY, and nothing in this
 # file decides what a bug IS: it declares which NAMES the register cannot answer for. A NEW name is RED.
-declared_max_uncarried: 63   # CEILING (shrink guard): raising it requires a declared decision, not an edit
+declared_max_uncarried: 39   # CEILING (shrink guard): raising it requires a declared decision, not an edit
 declared_uncarried:
   - BUG-085   # first named at governance/buglog.md:32
   - BUG-098   # first named at governance/buglog.md:63
-  - BUG-099   # first named at governance/buglog.md:43
   - BUG-104   # first named at governance/buglog.md:61
-  - BUG-148   # first named at governance/buglog.md:28
   - BUG-150   # first named at governance/buglog.md:60
-  - BUG-151   # first named at governance/buglog.md:27
-  - BUG-159   # first named at governance/buglog.md:31
-  - BUG-160   # first named at governance/buglog.md:33
-  - BUG-168   # first named at governance/buglog.md:32
-  - BUG-169   # first named at governance/buglog.md:42
   - BUG-181   # first named at governance/buglog.md:1274
-  - BUG-182   # first named at governance/buglog.md:29
   - BUG-185   # first named at governance/buglog.md:48
   - BUG-188   # first named at governance/buglog.md:79
   - BUG-193   # first named at governance/buglog.md:73
@@ -67,30 +59,13 @@ declared_uncarried:
   - BUG-219   # first named at governance/buglog.md:68
   - BUG-220   # first named at governance/buglog.md:25
   - BUG-221   # first named at governance/buglog.md:61
-  - BUG-222   # first named at governance/buglog.md:26
-  - BUG-223   # first named at governance/buglog.md:41
-  - BUG-224   # first named at governance/buglog.md:25
   - BUG-225   # first named at governance/buglog.md:57
   - BUG-226   # first named at governance/buglog.md:58
   - BUG-227   # first named at governance/buglog.md:59
-  - BUG-228   # first named at governance/buglog.md:22
-  - BUG-229   # first named at governance/buglog.md:39
-  - BUG-230   # first named at governance/buglog.md:40
-  - BUG-231   # first named at governance/buglog.md:23
-  - BUG-232   # first named at governance/buglog.md:24
   - BUG-233   # first named at governance/buglog.md:55
-  - BUG-234   # first named at governance/buglog.md:45
-  - BUG-235   # first named at governance/buglog.md:46
-  - BUG-236   # first named at governance/buglog.md:47
-  - BUG-237   # first named at governance/buglog.md:48
-  - BUG-238   # first named at governance/buglog.md:44
   - BUG-239   # first named at governance/buglog.md:54
   - BUG-240   # first named at governance/buglog.md:53
-  - BUG-241   # first named at governance/buglog.md:15
-  - BUG-242   # first named at governance/buglog.md:21
-  - BUG-243   # first named at governance/buglog.md:14
   - BUG-262   # first named at governance/buglog.md:364
-  - BUG-267   # first named at governance/buglog.md:13
   - BUG-430   # first named at governance/buglog.md:3731
   - BUG-492   # first named at governance/buglog.md:4946
   - BUG-494   # first named at governance/buglog.md:5020
@@ -99,5 +74,6 @@ declared_uncarried:
   - BUG-498   # first named at governance/buglog.md:5092
   - BUG-017   # first named at governance/buglog.md:8062
   - BUG-183   # first named at governance/buglog.md:8251
+  - BUG-429   # first named at governance/buglog.md:8678
                          # SHRINK-ONLY: an id that gets a HEADER event (or whose name is removed) must be
                          # deleted from this list in a diff a human reads, or this rail FAILS as STALE.

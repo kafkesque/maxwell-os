@@ -3,6 +3,23 @@
 > **Resume:** say `continue` — this file + `governance/CONTEXT_INDEX.md` are the entry points.
 > The previous handoff (D-2860 commit-frontier gate) is SUPERSEDED by this one for state and next-steps.
 
+## CURRENT STATE (2026-10-07, post-BUG-666-fix — SUPERSEDES all below for resume)
+
+- HEAD **0272192**. This turn landed: 92dedbb (BUG-666 fix + drift detector), 38bee18 (BUG-666 gov sync),
+  930d700 (mutation journal), 0272192 (D-2860 header RATIFIED). Tree clean.
+- BUG-666 FIXED (root cause): NOT a toothless boundary — a DRIFTED DECLARATION. config/boundary_rehearsal.yaml's
+  planted `will_not_touch` scenario still named `pipeline/stage5_verify.py` (a family D-2801 moved OUT of
+  will_not_touch into may_touch). RAIL 4 HAS teeth (25/25 selftest fires "a will_not_touch path is FORBIDDEN");
+  the rehearsal was asserting a refusal RAIL 4 no longer owed, so the planted violation LANDED rc=0. BUG-542 class
+  (declaration outliving its subject) + D-2646 (family restated in a 2nd home). Fix: repoint subject to LIVE
+  immutable family `governance/F11_ANCHOR_REVIEW_20260923.csv` + fail-closed `planted_will_not_touch_drift`
+  detector consuming `session_plan` (the plan's ONE home). Rehearsal GREEN (2 violations REFUSED), 23/23 controls.
+- D-2860 header FIXED: DECISION-LOG.md ACTIVE -> RATIFIED to match config/decisions.yaml state.
+- Register **432 = 163 open / 269 closed**, highest OPEN **BUG-667**. Decisions 991.
+- STILL OPEN (priority order): BUG-667 (t11 re-mint via D-2862), BUG-665 (encoding repoint to artifact_encoding.py),
+  BUG-631 (52 over-cap FBs via D-2838 writer-limb), D-2853 close-out (28-row referee remap + closed-menu v5->v7 +
+  D-2859 off-by-one).
+
 ## CURRENT STATE (2026-10-07, post-BUG-659-fix — SUPERSEDES all below for resume)
 
 - HEAD **97a9fb2**. Three commits landed this turn: 403fb63 (BUG-663 + D-2853 fan-out + gov deps),

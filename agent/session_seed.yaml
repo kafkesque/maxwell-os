@@ -302,7 +302,7 @@ current_state:
   - G13
   registry:
     decisions: 990
-    highest_bug: BUG-658
+    highest_bug: BUG-668
     buglog_entries: 422
   do_not:
   - relabel the corpus

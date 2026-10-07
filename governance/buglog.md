@@ -11,6 +11,14 @@
 | Bug | Date | Issue |
 | BUG-659 | 2026-10-07 | **check_config_defaults silently auto-RAISES the shrink-only config_defaults ceiling (shadowed 221->229, undeclared 2->3) — a shrink-only ceiling must never be raised by the check itself; the 9 new config keys need owner review, not a silent commit.** | |
 | BUG-660 | 2026-10-07 | **`just health` is not read-only: run_ladder.py --collect dirties config/derivations.yaml, RECONCILIATION.json, METRICS.jsonl, MUTATION_JOURNAL.jsonl as a side effect; a health check that writes is a blindspot, and a git-checkout revert of an append-only journal truncates it (BUG-638 recurrence, 895->887).** | |
+| BUG-661 | 2026-10-07 | **build_anchor_store_bridge --check prints "ok" but exits 1 (EXIT_DRIFT) — the store change introduced 11 AMBIGUOUS rows, `verdict()` returns DRIFT for the safe "never-picked" outcome, yet `--check` hardcodes the "ok" prefix (verdict/exit mismatch, BUG-492 class). Misled the prior sitting into a false-green.** | |
+| BUG-662 | 2026-10-07 | **Store-change re-baseline INCOMPLETE: check_store_columns reports 256 MEASUREMENT-DRIFT cells (census 7995 vs store 14574 after rechunk-v4-20260929) + menu_hash RESERVED-VIOLATION (declared nothing-written, now 6591 rows carry content). Fix = --record + re-rule menu_hash role reserved→sparse.** | |
+| BUG-663 | 2026-10-07 | **6 NEW test regressions (check_tests RED): 305 passed / 6 failed / 0 error — golden-meta hash + label-normalization compound-domain + taxonomy-disjointness contracts. A regression is never absorbed by the ceiling (D-2656).** | |
+| BUG-664 | 2026-10-07 | **check_domain_cardinality.py (D-2838/BUG-631 reader-limb) added but never wired into just health → check_rail_registry "(i) a rail NOTHING RUNS" + reconcile "1 uninvoked check script exceeds debt_max 0". A control nothing runs is a comment (BUG-492).** | |
+| BUG-665 | 2026-10-07 | **Encoding debt above shrink-only ceilings (3 rails): encoding-homes 2 unknown utf-8-sig sites, silent-repair 3 unknown sites, undeclared-encoding files 161/156 + sites 411/392 + writes 82/74 — from the new D-2811/D-2812 anchor-axis code.** | |
+| BUG-666 | 2026-10-07 | **Write-boundary rehearsal has no teeth: a will_not_touch family path (pipeline/**) staged for commit was NOT refused by RAIL 4 and the rehearsal commit LANDED rc=0 — the write boundary is not what the declarations say it is (D-2675).** | |
+| BUG-667 | 2026-10-07 | **verify_artifact_authority: stage4_merge/t11 checkpoint_enriched.jsonl sha256 DRIFT (rewritten 65 min post-S5; C-3/BUG-376 acknowledged move) — the authority marker is a false claim until re-minted by a DECISION, never a quiet re-hash.** | |
+| BUG-668 | 2026-10-07 | **build_archive_index: archive/bloat_20260929 on disk but in NEITHER the index nor the declared exclusions — an on-disk object is INDEXED or DECLARED excluded, never silently absent (BUG-537 coverage invariant).** | |
 |---|---|---|
 | BUG-640 | 2026-10-05 | **D-2815 B&M slot "entrepreneurship" string-collides with the existing DOMAIN "entrepreneurship" (closed_menu_v5.json). Two rails reject it: D-2500 owl:disjointWith (domain/discipline must be disjoint) and the BUG-200/D2422 opposite-axis guard in map_to_canonical_with_fallback (returns "emerging" for a raw label canonical on the opposite axis). The new discipline slot is DEAD ON ARRIVAL. Fix: rename slots to discipline-scoped forms (JEL M "business administration" / "marketing" / "entrepreneurship studies"). OWNER-RULED 2026-10-05 (D-2829); IN PROGRESS — code changed, pending menu-v6 commit: slots = 'business administration' / 'marketing' / 'entrepreneurship studies'.** | |
 | BUG-642 | 2026-10-05 | **alias_map.yaml retirement (D-2814) has 14 consumers: pipeline/schemas.py get_synonym_index + 13 scripts (remap_emerging, apply_enrichment, rederive_kindsafe_domains, resolve_domains_emerging, etc.). Wholesale delete = cascade break + silent "emerging" fall-through (EL1). Fix: shrink-then-remove with consumer migration + fail-closed no-synonym mode (C1, D-2828).** | |
@@ -8981,3 +8989,56 @@ the canonical register to the verdict already recorded in each row's own prose (
 ## BUG-660 — OPEN (2026-10-07) — `just health` is not read-only: it writes tracked files as a side effect
 
 `run_ladder.py --collect health` dirties config/derivations.yaml, governance/RECONCILIATION.json, governance/METRICS.jsonl, governance/MUTATION_JOURNAL.jsonl. A health check that writes is a blindspot; the prior session's `git checkout` revert of the append-only METRICS.jsonl truncated it 895→887 (BUG-638 recurrence), losing 8 metric records. Fix: health must be read-only, or its writes declared + committed as part of the run (never reverted).
+## BUG-661 — OPEN (2026-10-07) — build_anchor_store_bridge --check prints "ok" but exits 1 (verdict/exit-code mismatch)
+
+`verdict()` returns EXIT_DRIFT (1) when ANY ambiguous rows exist (the safe "a name matching two corpus rows is never picked"
+outcome), and the ratified rechunk-v4-20260929 store change introduced 11 such ambiguous name collisions. `main()` `--check`
+then prints the literal `f"{PREFIX}: ok {why}"` while returning `code`=1. A printed verdict that disagrees with its exit code
+is a BUG-492 class defect, and it misled the prior sitting into believing the rail was green (its "ok 11 AMBIGUOUS" line was
+read as a pass). Fix: ambiguous rows are a SAFE never-picked outcome → return EXIT_CLEAN (or a distinct EXIT_OWED), and never
+print "ok" for a non-zero code.
+
+## BUG-662 — OPEN (2026-10-07) — store-change re-baseline incomplete: 256 MEASUREMENT-DRIFT cells + menu_hash RESERVED-VIOLATION
+
+The ratified rechunk-v4-20260929 grew `fbs` 7,995→14,574 rows, but config/store_columns.yaml `measured:` still records 7,995/7,994
+for ~256 census cells (now measuring 14,574/14,573), and `menu_hash` is still `role: reserved, filled_by: "the S4 classifier menu
+writer"` while 6,591 rows now carry content (RESERVED-VIOLATION). The prior sitting's D-2861 re-baseline fixed ONLY
+label_provenance and missed this census. Fix: re-record via `check_store_columns.py --record` (deterministic), and re-rule
+menu_hash's role reserved→sparse (a deliberate lifecycle change, not a quiet re-record).
+
+## BUG-663 — OPEN (2026-10-07) — 6 test regressions (check_tests RED): 305 passed / 6 failed / 0 error
+
+Six NEW failures outside the declared red set: test_golden_meta_hash_matches_actual, test_compound_domain_decomposes,
+test_compound_is_not_long_tail, test_resolve_content_type_explicit_wins, test_taxonomy_cross_kind_collision_resolves_correctly,
+test_guard_detects_punctuation_hidden_collision. A regression is never absorbed by editing the ceiling (D-2656).
+
+## BUG-664 — OPEN (2026-10-07) — check_domain_cardinality.py (D-2838/BUG-631 reader-limb) added but never wired into the ladder
+
+`scripts/check_domain_cardinality.py` is invoked by no declared ladder recipe and declared dormant nowhere → check_rail_registry
+(i) "a rail NOTHING RUNS" + reconcile "1 uninvoked check script exceeds the declared debt_max 0". A control nothing runs is a
+comment (BUG-492). Fix: wire it into `just health` — it is the D-2838 reader-limb that re-measures the committed store for
+over-cap FBs (BUG-631 stays OPEN until it runs).
+
+## BUG-665 — OPEN (2026-10-07) — encoding debt above shrink-only ceilings (3 rails) from new anchor-axis code
+
+check_encoding_homes (2 unknown utf-8-sig sites: build_anchor_bridge_ruler_208.py, check_anchor_axis_consistency.py),
+check_silent_repair (3 unknown repair sites: pipeline/enhance_md_headers.py ×2, scripts/detect_same_work_content.py),
+check_undeclared_encoding (files 161/156, sites 411/392, writes 82/74). The D-2811/D-2812 anchor-axis code introduced utf-8-sig
+reads and silent replace repairs with no allow entries.
+
+## BUG-666 — OPEN (2026-10-07) — write-boundary rehearsal: the commit boundary has no teeth at a real commit
+
+check_boundary_rehearsal: a will_not_touch family path (pipeline/**) staged for commit was NOT refused by RAIL 4, and the
+rehearsal commit LANDED (rc=0) over it. The write boundary is not what the declarations say it is (D-2675).
+
+## BUG-667 — OPEN (2026-10-07) — verify_artifact_authority: t11 checkpoint_enriched.jsonl sha256 DRIFT (authority marker false)
+
+The t11 checkpoint_enriched.jsonl was rewritten 65 min AFTER the 7,995-record S5 run completed (C-3/BUG-376 acknowledged move;
+on disk 3854250c3fbc… vs marker 0ca6f0f0…). The authority marker is a false claim until re-minted; a pin is re-minted by a
+DECISION (D-382/BUG-535), never by a quiet re-hash.
+
+## BUG-668 — OPEN (2026-10-07) — build_archive_index: archive/bloat_20260929 on disk but neither indexed nor declared-excluded
+
+`archive/index.yaml` fails the coverage invariant: bloat_20260929 is on disk but in NEITHER the index nor the declared exclusions.
+Run `python3 scripts/build_archive_index.py` (or declare the exclusion) — an on-disk object is INDEXED or DECLARED excluded, never
+silently absent (BUG-537).

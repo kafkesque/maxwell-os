@@ -10,7 +10,7 @@
 ## 🔴 MUST — open (strategic-consequential order)
 
 > **CURRENT OPEN INDEX (machine-derived 2026-10-07 — the live face; dated history follows below).**
-> Register: 991 decisions · 424 bugs (163 open / 261 closed; highest OPEN = BUG-660). Anti-circle commit-frontier gate landed (D-2860) + backlog committed.
+> Register: 991 decisions · 432 bugs (171 open / 261 closed; highest OPEN = BUG-668). Forensic audit RED: 11 fatal (rc=1) rails — store-change re-baseline INCOMPLETE (BUG-661..668 filed).
 >
 > **OWNER-GATED — ONE action remains (D-2727 gate):**
 > 1. **RATIFY-2 — full S4→S5→S6 rerun.** Launch under `caffeinate -dimsu`; `python3 pipeline/runner.py --dry-run` then full. Preflight PASS; authority propagated (D-2812) + consistency rail rc=0 → now UNBLOCKED.

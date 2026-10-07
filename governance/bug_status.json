@@ -2,8 +2,8 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 424,
-  "open_n": 163,
+  "total_ids": 432,
+  "open_n": 171,
   "closed_n": 261,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
@@ -821,6 +821,46 @@
     {
       "id": "BUG-660",
       "title": "OPEN (2026-10-07) \u2014 `just health` is not read-only: it writes tracked files as a side effect",
+      "events": 1
+    },
+    {
+      "id": "BUG-661",
+      "title": "OPEN (2026-10-07) \u2014 build_anchor_store_bridge --check prints \"ok\" but exits 1 (verdict/exit-code mismatch)",
+      "events": 1
+    },
+    {
+      "id": "BUG-662",
+      "title": "OPEN (2026-10-07) \u2014 store-change re-baseline incomplete: 256 MEASUREMENT-DRIFT cells + menu_hash RESERVED-VIOLATION",
+      "events": 1
+    },
+    {
+      "id": "BUG-663",
+      "title": "OPEN (2026-10-07) \u2014 6 test regressions (check_tests RED): 305 passed / 6 failed / 0 error",
+      "events": 1
+    },
+    {
+      "id": "BUG-664",
+      "title": "OPEN (2026-10-07) \u2014 check_domain_cardinality.py (D-2838/BUG-631 reader-limb) added but never wired into the ladder",
+      "events": 1
+    },
+    {
+      "id": "BUG-665",
+      "title": "OPEN (2026-10-07) \u2014 encoding debt above shrink-only ceilings (3 rails) from new anchor-axis code",
+      "events": 1
+    },
+    {
+      "id": "BUG-666",
+      "title": "OPEN (2026-10-07) \u2014 write-boundary rehearsal: the commit boundary has no teeth at a real commit",
+      "events": 1
+    },
+    {
+      "id": "BUG-667",
+      "title": "OPEN (2026-10-07) \u2014 verify_artifact_authority: t11 checkpoint_enriched.jsonl sha256 DRIFT (authority marker false)",
+      "events": 1
+    },
+    {
+      "id": "BUG-668",
+      "title": "OPEN (2026-10-07) \u2014 build_archive_index: archive/bloat_20260929 on disk but neither indexed nor declared-excluded",
       "events": 1
     }
   ],

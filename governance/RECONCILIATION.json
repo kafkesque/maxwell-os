@@ -38,7 +38,7 @@
     {
       "id": "decision_supersession_complete",
       "state": "ok",
-      "evidence": "every SUPERSEDED record names a resolvable successor in 942 record(s); 12 pinned legacy id(s) still owed",
+      "evidence": "every SUPERSEDED record names a resolvable successor in 991 record(s); 12 pinned legacy id(s) still owed",
       "check": "decision_supersession_complete",
       "about": "config/decisions.yaml",
       "declares": "config/decisions_policy.yaml#graph"
@@ -46,7 +46,7 @@
     {
       "id": "decision_citations_in_force",
       "state": "ok",
-      "evidence": "60 citation site(s) all name a decision IN FORCE; 4 declared forward reference(s) still owed; every state word in the registry is classified",
+      "evidence": "62 citation site(s) all name a decision IN FORCE; 4 declared forward reference(s) still owed; every state word in the registry is classified",
       "check": "decision_citations_in_force",
       "about": "config/decisions.yaml",
       "declares": "config/decisions_policy.yaml#graph"
@@ -54,7 +54,7 @@
     {
       "id": "decision_registry_wellformed",
       "state": "ok",
-      "evidence": "942 decision id(s) unique under one namespace; 942 record(s) carry a canonical state; every citation resolves",
+      "evidence": "991 decision id(s) unique under one namespace; 991 record(s) carry a canonical state; every citation resolves",
       "check": "decision_registry_wellformed",
       "about": "config/decisions.yaml",
       "declares": "config/decisions.yaml#decisions"
@@ -101,9 +101,11 @@
     },
     {
       "id": "reach",
-      "state": "ok",
-      "evidence": "0 uninvoked of 119 reachable check script(s), 1 declared edge(s) (0 dead), debt_max 0",
-      "unwired": [],
+      "state": "owner_owed",
+      "evidence": "1 uninvoked of 120 reachable check script(s), 1 declared edge(s) (0 dead), debt_max 0",
+      "unwired": [
+        "scripts/check_domain_cardinality.py"
+      ],
       "edges": [
         {
           "file": "governance/p0_p1_criteria.yaml",
@@ -114,6 +116,6 @@
       ]
     }
   ],
-  "drift_n": 0,
+  "drift_n": 1,
   "owner_owed_n": 0
 }

@@ -3,21 +3,31 @@
 > **Resume:** say `continue` — this file + `governance/CONTEXT_INDEX.md` are the entry points.
 > The previous handoff (D-2860 commit-frontier gate) is SUPERSEDED by this one for state and next-steps.
 
-## HEADLINE (the audit answer)
+## HEADLINE (the audit answer, 2nd pass)
 
-The prior sitting's handoff claimed "Rails GREEN" for three rails (`check_decision_membership`,
-`check_bug_status`, `check_commit_frontier`) but did **not** run the full ladder. A full `just health`
-this sitting is **RED**: **4 fatal (rc=1) drifts** + several owner-owed (rc=2) drifts. This sitting fixed
-the one that is unambiguously mechanical (register divergence); the other three are re-baseline/decision
-drifts and are left RED, classified below. Do **not** build Phase 2/3/4 on a red baseline.
+Commit **98471a3** (D-2861) re-baselined only 3 rails and declared victory without a full ladder run. A full
+`run_ladder.py --collect health` this sitting is **RED with 11 fatal (rc=1) faults** + 256 measurement-drift cells.
+Root cause: the ratified store change (rechunk-v4-20260929, fbs 7,995→14,574) was propagated to
+`label_provenance` only, NOT to `store_columns`, the archive index, or the checkpoint authority. Do NOT build
+Phase 2/3/4 on this red baseline — complete the re-baseline first.
 
 ## STATE VERIFIED (measured, not assumed)
 
-- git HEAD **`1426df9`** (unchanged this sitting; no commit yet at audit time). Porcelain after the fix:
-  `config/register_divergence.yaml` only.
-- `just health` = **RED** (aborts at `check_register_divergence`, line 40). Full `run_ladder.py --collect health`
-  shows 4 fatal faults (below).
-- Bug register 422 carried (unchanged). Decisions 990 (D-2860 = last, still ACTIVE).
+- git HEAD **98471a3**. Working tree: `governance/METRICS.jsonl` (+3 metric records from verify_handoffs, uncommitted).
+- Full ladder = **RED**: 11 fatal (rc=1) faults → BUG-661..668 filed this sitting (below). Owner-owed rc=2 unchanged.
+- Bug register **432** (171 open / 261 closed; highest OPEN = BUG-668). Decisions **991** (D-2861 = last).
+
+## THE 11 FATAL FAULTS (this sitting's finding — prior D-2861 missed all but one)
+
+1. build_anchor_store_bridge --check prints "ok" but exits 1 (BUG-661 — verdict/exit mismatch).
+2. check_store_columns 256 MEASUREMENT-DRIFT + menu_hash RESERVED-VIOLATION (BUG-662 — census not re-recorded).
+3. check_tests 6 regressions (BUG-663).
+4. check_domain_cardinality.py unwired (BUG-664 — rail registry + reconcile).
+5. encoding debt above ceilings, 3 rails (BUG-665).
+6. check_boundary_rehearsal no teeth (BUG-666).
+7. verify_artifact_authority t11 checkpoint sha drift (BUG-667).
+8. build_archive_index bloat_20260929 unindexed (BUG-668).
+9-11. encoding-homes / silent-repair / undeclared-encoding (folded into BUG-665).
 
 ## WHAT LANDED THIS SITTING
 

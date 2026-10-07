@@ -8992,9 +8992,17 @@ shape). Verified: with the ceiling restored to 221/2, the check now exits 1 and 
 owner-approved re-baseline (229/3) is recorded; the 9 new keys (8 shadowed + 1 undeclared, introduced with the
 D-2811/D-2812 anchor-axis code) remain flagged for declaration review — declared, not silent debt.
 
-## BUG-660 — OPEN (2026-10-07) — `just health` is not read-only: it writes tracked files as a side effect
+## BUG-660 (FIXED 2026-10-07): `just health` was not read-only — four rails wrote tracked files as a side effect
 
-`run_ladder.py --collect health` dirties config/derivations.yaml, governance/RECONCILIATION.json, governance/METRICS.jsonl, governance/MUTATION_JOURNAL.jsonl. A health check that writes is a blindspot; the prior session's `git checkout` revert of the append-only METRICS.jsonl truncated it 895→887 (BUG-638 recurrence), losing 8 metric records. Fix: health must be read-only, or its writes declared + committed as part of the run (never reverted).
+Root cause: four health rails conflated a PROBE with a RESOLVE act. `run_ladder.py --collect health`
+dirtied config/derivations.yaml (check_config_defaults record_ceiling), governance/RECONCILIATION.json
+(reconcile write_document), and the append-only governance/METRICS.jsonl + MUTATION_JOURNAL.jsonl
+(emit_metric / write_guard.record). A check that writes is a BUG-492 class blindspot, and the prior
+session's `git checkout` revert of METRICS.jsonl truncated it 895→887 (BUG-638 recurrence).
+
+Fix: each rail now separates --check (read-only probe, the health default) from --record/--audit (explicit
+resolve act that publishes). The ladder invokes --check for all four; append-only journals are published on
+--record and committed, never reverted.
 ## BUG-661 (FIXED 2026-10-07): build_anchor_store_bridge --check prints "ok" but exits 1 (verdict/exit-code mismatch)
 
 `verdict()` returns EXIT_DRIFT (1) when ANY ambiguous rows exist (the safe "a name matching two corpus rows is never picked"

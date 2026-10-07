@@ -9075,11 +9075,16 @@ matches `governance/F11_*`) and add a fail-closed drift detector that consumes t
 will_not_touch commit (2 planted violations REFUSED by RAIL 4) and the drift DETECTOR has a known-answer
 control on the exact path BUG-666 caught (pipeline/stage5_verify.py).
 
-## BUG-667 — OPEN (2026-10-07) — verify_artifact_authority: t11 checkpoint_enriched.jsonl sha256 DRIFT (authority marker false)
+## BUG-667 (FIXED 2026-10-07) — verify_artifact_authority: t11 checkpoint_enriched.jsonl sha256 DRIFT (authority marker false)
 
 The t11 checkpoint_enriched.jsonl was rewritten 65 min AFTER the 7,995-record S5 run completed (C-3/BUG-376 acknowledged move;
 on disk 3854250c3fbc… vs marker 0ca6f0f0…). The authority marker is a false claim until re-minted; a pin is re-minted by a
 DECISION (D-382/BUG-535), never by a quiet re-hash.
+
+Root cause: a stale authority pin (D-382/BUG-535 class). The marker's sha256 was minted before the post-S5 rewrite and was
+never re-minted after it — the marker outlived its subject (BUG-542 family). Fix: re-minted the pin to the on-disk bytes
+(3854250c…; byte size unchanged 96902142, mtime 2026-10-03T01:16) under D-2862 (owner ratified), a DECISION — never a quiet
+re-hash. verify_artifact_authority now exits 0 (2 markers, 17 files, 0 RED).
 
 ## BUG-668 (FIXED 2026-10-07): build_archive_index: archive/bloat_20260929 on disk but neither indexed nor declared-excluded
 

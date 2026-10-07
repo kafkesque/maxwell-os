@@ -3,8 +3,8 @@
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
   "total_ids": 432,
-  "open_n": 163,
-  "closed_n": 269,
+  "open_n": 162,
+  "closed_n": 270,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -817,11 +817,6 @@
       "id": "BUG-665",
       "title": "OPEN (2026-10-07) \u2014 encoding debt above shrink-only ceilings (3 rails) from new anchor-axis code",
       "events": 1
-    },
-    {
-      "id": "BUG-667",
-      "title": "OPEN (2026-10-07) \u2014 verify_artifact_authority: t11 checkpoint_enriched.jsonl sha256 DRIFT (authority marker false)",
-      "events": 1
     }
   ],
   "closed": [
@@ -1093,6 +1088,7 @@
     "BUG-663",
     "BUG-664",
     "BUG-666",
+    "BUG-667",
     "BUG-668"
   ]
 }

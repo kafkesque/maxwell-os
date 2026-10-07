@@ -14083,3 +14083,16 @@ decisions:
   - config/label_provenance.yaml
   - governance/ANCHOR_STORE_BRIDGE_20260926.json
   - config/handoffs.yaml
+- id: D-2862
+  state: RATIFIED
+  category: GOVERNANCE / REPO INTEGRITY
+  title: re-mint t11 checkpoint_enriched.jsonl authority marker (BUG-667)
+  decision: 'The t11 checkpoint_enriched.jsonl was legitimately rewritten 65 min after the S5 run completed (C-3/BUG-376
+    acknowledged move). Its ARTIFACT_AUTHORITY.json sha256 pin (0ca6f0f0...) predated the rewrite, so the marker was
+    a false claim. Re-minted the pin to the on-disk bytes (3854250c...; byte size unchanged 96902142, mtime
+    2026-10-03T01:16). A pin is re-minted by a DECISION (D-382/BUG-535), never a quiet re-hash. Owner ratified
+    (2026-10-07).'
+  bugs:
+  - BUG-667
+  files:
+  - 'knowledge pipeline/stage4_merge/t11/ARTIFACT_AUTHORITY.json'

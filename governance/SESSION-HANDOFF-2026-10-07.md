@@ -1,3 +1,17 @@
+## CURRENT STATE (2026-10-07, post-BUG-667-fix — SUPERSEDES all below for resume)
+
+- HEAD was 6d08336. This turn landed the BUG-667 re-mint (authority marker) + D-2862 RATIFIED (owner-approved re-mint).
+- BUG-667 FIXED (root cause): a STALE authority pin (D-382/BUG-535 class). The t11 `checkpoint_enriched.jsonl`
+  sha256 pin (0ca6f0f0…) was minted before the post-S5 rewrite (C-3/BUG-376 acknowledged move) and never re-minted
+  after — the marker outlived its subject (BUG-542 family). Fix: re-minted the pin to the on-disk bytes
+  (3854250c…; byte size unchanged 96902142, mtime 2026-10-03T01:16) under D-2862 — a DECISION, never a quiet
+  re-hash (D-382/BUG-535). verify_artifact_authority now exits 0 (2 markers, 17 files, 0 RED). The marker itself is
+  gitignored (data artifact); the re-mint decision D-2862 is committed in DECISION-LOG.md + config/decisions.yaml.
+- Register **432 = 162 open / 270 closed**, highest OPEN **BUG-665**. Decisions 992 (D-2862 = last).
+- STILL OPEN (priority order): BUG-665 (encoding repoint to artifact_encoding.py), BUG-631 (52 over-cap FBs via
+  D-2838 writer-limb), D-2853 close-out (28-row referee remap + closed-menu v5->v7 + D-2859 off-by-one).
+- OWNER-GATE (do NOT cross unilaterally): referee = governance/discipline_anchor_rederived_v6_20261006d.json + 28-row remap.
+
 # SESSION HANDOFF — 2026-10-07 (continuation: forensic audit + register-divergence reconciliation)
 
 > **Resume:** say `continue` — this file + `governance/CONTEXT_INDEX.md` are the entry points.

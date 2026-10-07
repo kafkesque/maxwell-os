@@ -3545,3 +3545,13 @@ Re-baselined all three: measured_rows 7995->7983, re-derived the bridge (11 ambi
 re-cut the receipt via handoff.py --backfill. Owner ratified.
 Bugs: BUG-501, BUG-420, BUG-376.
 Files: config/label_provenance.yaml, governance/ANCHOR_STORE_BRIDGE_20260926.json, config/handoffs.yaml.
+
+## D-2862 (2026-10-07) — RATIFIED — re-mint t11 checkpoint_enriched.jsonl authority marker (BUG-667)
+
+The t11 `checkpoint_enriched.jsonl` was legitimately rewritten 65 min after the S5 run completed (C-3/BUG-376
+acknowledged move). Its ARTIFACT_AUTHORITY.json sha256 pin (0ca6f0f0…) predated the rewrite, so the marker was a
+false claim. Re-minted the pin to the on-disk bytes (3854250c…; byte size unchanged 96902142, mtime
+2026-10-03T01:16). A pin is re-minted by a DECISION (D-382/BUG-535), never a quiet re-hash. Owner ratified
+(2026-10-07).
+Bugs: BUG-667.
+Files: knowledge pipeline/stage4_merge/t11/ARTIFACT_AUTHORITY.json.

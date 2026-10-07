@@ -241,7 +241,11 @@ def main(argv: list[str]) -> int:
     line = ("measured " + str(sites) + " config-default SITE(s) over " + str(files) + " module(s) under "
             + str(roots) + ": " + str(measured["shadowed_declared"]) + " distinct SHADOWED-DECLARED key(s), "
             + str(measured["undeclared"]) + " distinct UNDECLARED key(s)")
-    by_rail = str(reads.get("measured_by") or "").strip() == RAIL_REL
+    # BUG-659: `measured_by` lives INSIDE `ceilings` for a block mapping and at the `config_reads`
+    # level for a flow mapping (record_ceiling writes it in whichever shape the file has). Reading only
+    # `reads` made `by_rail` always False -> the shrink-only guard was dead and the ceiling was silently
+    # auto-raised (221->229 shadowed / 2->3 undeclared). The rail owns its number in EITHER location.
+    by_rail = str(reads.get("measured_by") or ceilings.get("measured_by") or "").strip() == RAIL_REL
     grew = sorted(k for k in measured if measured[k] > before[k])
     if grew and by_rail:
         print("FAIL " + PREFIX + ": the undeclared-default debt GREW - " + line)

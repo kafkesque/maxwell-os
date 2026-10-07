@@ -3,6 +3,25 @@
 > **Resume:** say `continue` — this file + `governance/CONTEXT_INDEX.md` are the entry points.
 > The previous handoff (D-2860 commit-frontier gate) is SUPERSEDED by this one for state and next-steps.
 
+## CURRENT STATE (2026-10-07, post-BUG-659-fix — SUPERSEDES all below for resume)
+
+- HEAD **97a9fb2**. Three commits landed this turn: 403fb63 (BUG-663 + D-2853 fan-out + gov deps),
+  2b7958c (BUG-659 by_rail dead-code fix + revert premature D-2853 anchor token_fix fan-out), 97a9fb2 (gov deps).
+- BUG-659 FIXED (root cause): check_config_defaults `by_rail` read `measured_by` from `config_reads` but
+  record_ceiling wrote it INSIDE `ceilings` (block-mapping) -> by_rail always False -> shrink-only fail-closed
+  guard was dead -> ceiling silently auto-raised 221->229/2->3. Fix reads both locations; VERIFIED exit 1 + no
+  write on growth. Deliberate owner-approved re-baseline 229/3 kept; 9 new keys flagged for declaration review.
+- DRIFT REVERTED: anchor_workbook_fixes token_fix 'research & methodolog' -> 'research & methodology' (v5 menu
+  name). The anchor workbook validates against closed_menu_v5.json (still v5), NOT the v7 taxonomy. The prior
+  segment's premature v7 fan-out of this ONE token_fix broke validate_depth_domain_contract (3 RAW_REDERIVE_
+  MISMATCH). Reverted; contract GREEN (hard:0 owner_blocked:0).
+- Register **432 = 165 open / 267 closed**, highest OPEN **BUG-667**. Decisions 991.
+- STILL OWNER-GATED (approved this turn, NOT yet implemented): BUG-660 (health read-only / --check modes),
+  BUG-665 (encoding repoint), BUG-666 (write-boundary teeth), BUG-667 (t11 re-mint via D-2862),
+  BUG-631 (52 over-cap FBs via D-2838), D-2853 close-out (28-row referee remap + closed-menu v5->v7 migration,
+  D-2859 off-by-one).
+- D-2860 header in DECISION-LOG still reads ACTIVE while config/decisions.yaml is RATIFIED (sync drift).
+
 ## CURRENT STATE (2026-10-07, post-BUG-663-fix — SUPERSEDES sections below for resume)
 
 - git HEAD **d3f372f**. Working tree carries the BUG-663 + D-2853 fan-out fix (uncommitted): alias_map, synonym_map,

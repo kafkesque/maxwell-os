@@ -268,6 +268,16 @@ def print_report(calibration: dict) -> None:
     # 0.40 when best_f1 = 0.05, i.e. 0.40 > 0.05, which would FATAL
     # pipeline_paths._validate_nli_thresholds() if blindly applied.
     marginal = max(0.0, best_f1["threshold"] - _MARGINAL_BELOW_ENTAILMENT)
+    # R5 (BUG-670): the F1-optimal and precision-optimal bars are independent measurements;
+    # the marginal leg of the invariant is safe by construction above, but the
+    # entailment < pass leg is NOT if best_f1 >= best_prec. Surface it rather than emit a
+    # self-contradictory trio (report is a footgun — do not let a human paste it in blind).
+    if best_f1["threshold"] >= best_prec["threshold"]:
+        print("\n⚠️  DEGENERATE CALIBRATION: best_f1 threshold "
+              f"({best_f1['threshold']:.2f}) >= best_precision threshold "
+              f"({best_prec['threshold']:.2f}); the D2185 invariant "
+              "(entailment < pass) would be violated. Do NOT apply these two "
+              "thresholds together — re-run calibration or pin a manual split.")
     print(f"   NLI_ENTAILMENT_THRESHOLD = {best_f1['threshold']:.2f}  (F1={best_f1['f1']:.3f})")
     print(f"   NLI_PASS_THRESHOLD      = {best_prec['threshold']:.2f}  (precision={best_prec['precision']:.3f})")
     print(f"   NLI_MARGINAL_THRESHOLD  = {marginal:.2f}  (invariant-safe lower bound)")

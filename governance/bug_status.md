@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**162 open** / 272 closed of 434 ids.
+**160 open** / 274 closed of 434 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -167,5 +167,3 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-650 | (PARTIAL, 2026-10-05) — full-204 A/B (D-2767) has no fail-closed guard against a frozen-invalid anchor; a pre-D-2820 kappa is circular | 1 |
 | BUG-651 | (PARTIAL, 2026-10-05) — S5 majority NLI aggregation hides supported claims + passes contradictory claims (D-2822 Gate A(d)) | 1 |
 | BUG-658 | (OPEN, 2026-10-06) — OMLX SSE keepalive defeats read_timeout → client wedge (no wall-clock deadline). HARNESS-MITIGATED 2026-10-06 (d2767_ab | 1 |
-| BUG-669 | (OPEN, 2026-10-07) — check_governance_faces.py scope blindspot: the LIVE census face it exists to guard is unguarded | 1 |
-| BUG-670 | (OPEN, 2026-10-07) — nli_calibrate.py print_report: C20 magic-number "marginal" recommendation violates the D2185 threshold invariant | 1 |

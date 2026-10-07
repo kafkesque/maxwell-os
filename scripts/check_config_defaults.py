@@ -209,7 +209,13 @@ def controls() -> list[tuple[str, bool]]:
 
 
 def main(argv: list[str]) -> int:
-    """Run the known-answer controls, or measure the census and join it to the declared ceilings."""
+    """Run the known-answer controls, or measure the census and join it to the declared ceilings.
+
+    BUG-660: a health rail is a PROBE - it measures and reports, never writes. The census is joined to the
+    declared ceilings read-only by default; `--record` is the explicit resolve act that may re-record the
+    ceiling in config/derivations.yaml (and only ever LOWER it, D-2644). `--check` is the read-only default
+    and is accepted for explicitness.
+    """
     if "--selftest" in argv:
         rows = controls()
         for name, ok in rows:
@@ -222,6 +228,8 @@ def main(argv: list[str]) -> int:
         print("ok " + PREFIX + " --selftest: " + str(len(rows)) + "/" + str(len(rows))
               + " known-answer control(s) fire")
         return EXIT_CLEAN
+
+    record = "--record" in argv
 
     registry = load_yaml(REGISTRY)
     reads = declared(registry, "config_reads", "config/derivations.yaml")
@@ -257,6 +265,13 @@ def main(argv: list[str]) -> int:
         return EXIT_DRIFT
     changed = sorted(k for k in measured if measured[k] != before[k])
     if changed:
+        if not record:
+            print("owner-owed (loud, NOT fatal - BUG-457): the declared ceiling is stale - " + line)
+            for key in changed:
+                print("  ->  " + key + ": " + str(before[key]) + " -> " + str(measured[key])
+                      + " (NOT recorded: a health check is read-only - BUG-660; re-run with --record to "
+                      "re-record in config/derivations.yaml#config_reads.ceiling_changed)")
+            return EXIT_OWED
         record_ceiling(measured, before)
         print("owner-owed (loud, NOT fatal - BUG-457): the declared ceiling was stale - " + line)
         for key in changed:

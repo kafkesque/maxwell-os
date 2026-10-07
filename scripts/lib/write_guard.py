@@ -570,8 +570,11 @@ def guard_call_sites(path: Path) -> tuple[bool, str]:
     return True, "calls " + ", ".join(sorted(set(calls)))
 
 
-def audit() -> int:
+def audit(record: bool = False) -> int:
     """Join the DECLARED writer_of_record set to reality (D-401/I1): who actually goes through the guard.
+
+    BUG-660: `record` gates the coverage-metric emission. An audit is a PROBE - it reports, never writes; the
+    guard_writers_guarded metric is only published into governance/METRICS.jsonl when --record is given.
 
     MEASURED 2026-09-25: 0 of 6 declared script writers imported this module, so the ownership invariant that
     exists to prevent BUG-478 was DECLARED and UNENFORCED. A writer with no call site is therefore either DRIFT
@@ -620,11 +623,12 @@ def audit() -> int:
                      "guard, above the SHRINK-ONLY ceiling " + str(ceiling) + " - the audit is not a formality, "
                      "and an exemption may never RAISE this number (that is a decision, not an edit)")
     total = len(guarded) + len(unguarded)
-    emit_metric("guard_writers_guarded", float(len(guarded)),
-                population="every script declared as writer_of_record in config/artifact_ownership.yaml",
-                denominator=total, ruler="config/artifact_ownership.yaml",
-                note=str(len(unguarded)) + " unguarded (declared debt, ceiling " + str(ceiling) + "); "
-                     + str(len(non_code)) + " declared non-script writer(s)")
+    if record:
+        emit_metric("guard_writers_guarded", float(len(guarded)),
+                    population="every script declared as writer_of_record in config/artifact_ownership.yaml",
+                    denominator=total, ruler="config/artifact_ownership.yaml",
+                    note=str(len(unguarded)) + " unguarded (declared debt, ceiling " + str(ceiling) + "); "
+                         + str(len(non_code)) + " declared non-script writer(s)")
     for g in guarded:
         print("  ok  guarded: " + g[:150])
     for u in unguarded:
@@ -819,11 +823,12 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--selftest", action="store_true")
     ap.add_argument("--audit", action="store_true")
+    ap.add_argument("--record", action="store_true", help="publish the guard_writers_guarded metric (BUG-660)")
     a = ap.parse_args()
     if a.selftest:
         return selftest()
     if a.audit:
-        return audit()
+        return audit(record=a.record)
     ap.print_help()
     return 0
 

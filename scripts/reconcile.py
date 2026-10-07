@@ -719,6 +719,9 @@ def main() -> int:
     """Evaluate every entry + the two meta-checks, write RECONCILIATION.json, and state the tri-state."""
     ap = argparse.ArgumentParser()
     ap.add_argument("--check", action="store_true")
+    ap.add_argument("--record", action="store_true",
+                    help="write RECONCILIATION.json + publish the reconcile resolver metric (BUG-660); "
+                         "--check is read-only")
     ap.add_argument("--selftest", action="store_true", help="known-answer controls for the graph rules")
     a = ap.parse_args()
     if a.selftest:   # BUG-575/D-2682: the NAMED oracle (D-2676 iii). It reads the policy, never the
@@ -777,23 +780,28 @@ def main() -> int:
            "resolved": len([r for r in results if r.get("state") == "ok"])}
     print("  domain reconcile_entries: " + str(dom["identifier"]) + " resolved against " + str(len(dom["stores"]))
           + " store(s) " + str(dom["stores"]) + " -> " + str(dom["resolved"]) + "/" + str(len(results)))
-    emit_metric("reconcile_objects_agreeing", float(dom["resolved"]),
-                population="every declared object in config/reconciliation.yaml#entries plus the cover, domain "
-                           "and floors meta-checks",
-                denominator=len(results), ruler="config/reconciliation.yaml",
-                note=str(len(drift)) + " drift, " + str(len(owed)) + " owner-owed", domain=dom)
+    if a.record:
+        emit_metric("reconcile_objects_agreeing", float(dom["resolved"]),
+                    population="every declared object in config/reconciliation.yaml#entries plus the cover, domain "
+                               "and floors meta-checks",
+                    denominator=len(results), ruler="config/reconciliation.yaml",
+                    note=str(len(drift)) + " drift, " + str(len(owed)) + " owner-owed", domain=dom)
 
     # I1 (D-401): the engine's OWN artifact is written through the guard, so governance/MUTATION_JOURNAL.jsonl
     # carries its first receipt. This artifact is DERIVED_REGENERABLE, so the declaration is the whole-file
     # regeneration (OWNED_ANY) - a derived document has no cells to arbitrate, and write_document REFUSES any
     # other ownership set rather than letting "the guard ran" read as "every cell was protected".
     from lib.write_guard import OWNED_ANY, write_document  # noqa: E402 (cycle-safe: write_guard is leaf-ward)
-    rep = write_document(OUT, json.dumps({"schema_version": "1.0", "decided": "D-405",
-                                          "declaration": "config/reconciliation.yaml", "results": results,
-                                          "drift_n": len(drift), "owner_owed_n": len(owed)}, indent=2) + "\n",
-                         writer="scripts/reconcile.py", owned_keys={OWNED_ANY})
-    print("  ok  reconcile artifact: written through write_guard (OWNED_ANY, derived_regenerable, "
-          + rep.pre_sha16 + " -> " + rep.post_sha16 + ") - I1/D-401")
+    if a.record:
+        rep = write_document(OUT, json.dumps({"schema_version": "1.0", "decided": "D-405",
+                                              "declaration": "config/reconciliation.yaml", "results": results,
+                                              "drift_n": len(drift), "owner_owed_n": len(owed)}, indent=2) + "\n",
+                             writer="scripts/reconcile.py", owned_keys={OWNED_ANY})
+        print("  ok  reconcile artifact: written through write_guard (OWNED_ANY, derived_regenerable, "
+              + rep.pre_sha16 + " -> " + rep.post_sha16 + ") - I1/D-401")
+    else:
+        print("  ok  reconcile --check: read-only (BUG-660) - RECONCILIATION.json and the resolver metric are "
+              "NOT written; re-run with --record to publish")
 
     for r in results:
         print(f"  {r['state']:>10}  {r['id']}: {r['evidence']}")

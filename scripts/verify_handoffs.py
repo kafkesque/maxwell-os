@@ -180,8 +180,13 @@ def receipt_provenance(path: str, rec: dict, cur: bytes | None, head: str | None
                             "named in config/handoffs.yaml#receipt_provenance.unrevisioned_declared")
 
 
-def check() -> int:
-    """Evaluate every declared artifact, print one line per finding, and return the tri-state exit code."""
+def check(record: bool = False) -> int:
+    """Evaluate every declared artifact, print one line per finding, and return the tri-state exit code.
+
+    BUG-660: `record` gates the metric emission. A health rail is a PROBE - it measures and reports, never
+    writes. Publishing the three handoff metrics into the append-only governance/METRICS.jsonl is a RESOLVE
+    act, so it is refused unless --record is given.
+    """
     cfg = handoff.config()
     receipts = handoff.latest()
     loc = locators(cfg)
@@ -284,13 +289,14 @@ def check() -> int:
         drift.append("provenance: " + str(len(declared)) + " declared escape(s) exceed the SHRINK-ONLY census "
                      "max_unrevisioned " + str(ceiling) + " - adding an escape weakens the rule for every path, "
                      "so it takes a decision (config/handoffs.yaml) and two coordinated edits, not one")
-    emit_metric("handoff_receipts_revisioned", float(joined),
-                population="every receipted declared handoff path whose receipted digest is re-derivable",
-                denominator=joined + joins.get("unrevisioned", 0), ruler="config/handoffs.yaml",
-                note=str(joins.get("head", 0)) + " at git HEAD, " + str(joins.get("prefix", 0))
-                     + " retained prefix, " + str(joins.get("revision", 0)) + " declared revision, "
-                     + str(joins.get("declared", 0)) + " declared unrevisioned, "
-                     + str(joins.get("unrevisioned", 0)) + " UNREVISIONED (BUG-559)")
+    if record:
+        emit_metric("handoff_receipts_revisioned", float(joined),
+                    population="every receipted declared handoff path whose receipted digest is re-derivable",
+                    denominator=joined + joins.get("unrevisioned", 0), ruler="config/handoffs.yaml",
+                    note=str(joins.get("head", 0)) + " at git HEAD, " + str(joins.get("prefix", 0))
+                         + " retained prefix, " + str(joins.get("revision", 0)) + " declared revision, "
+                         + str(joins.get("declared", 0)) + " declared unrevisioned, "
+                         + str(joins.get("unrevisioned", 0)) + " UNREVISIONED (BUG-559)")
     print("  ok  provenance: " + str(joined) + "/" + str(joined + joins.get("unrevisioned", 0))
           + " receipt(s) re-derivable (" + ", ".join(k + "=" + str(joins[k]) for k in PROVENANCE_JOINS if k in joins)
           + ("; unrevisioned=" + str(joins["unrevisioned"]) if joins.get("unrevisioned") else "")
@@ -445,25 +451,27 @@ def check() -> int:
            "searched": denom, "resolved": denom - unresolved_total - len(orphans)}
     print("  domain handoff_hash_claims: " + str(dom["identifier"]) + " resolved against " + str(len(dom["stores"]))
           + " store(s) " + str(dom["stores"]) + " -> " + str(dom["resolved"]) + "/" + str(denom))
-    emit_metric("handoff_digests_resolved", float(dom["resolved"]),
-                population="every digest quoted by a declared hash claim and every digest declared about a "
-                           "path in the cross-declaration sources",
-                denominator=denom, ruler="config/handoffs.yaml",
-                note=str(len(loc)) + " declared revision(s), " + str(unresolved_total) + " quoted digest(s) "
-                     "unresolved, " + str(len(orphans)) + " orphan declared digest(s)",
-                domain=dom)
+    if record:
+        emit_metric("handoff_digests_resolved", float(dom["resolved"]),
+                    population="every digest quoted by a declared hash claim and every digest declared about a "
+                               "path in the cross-declaration sources",
+                    denominator=denom, ruler="config/handoffs.yaml",
+                    note=str(len(loc)) + " declared revision(s), " + str(unresolved_total) + " quoted digest(s) "
+                         "unresolved, " + str(len(orphans)) + " orphan declared digest(s)",
+                    domain=dom)
     dom_paths = declared_resolver_metrics().get("handoff_paths_unchanged") or {}
     domp = {"identifier": dom_paths.get("identifier"),
             "stores": [str(s.get("name")) for s in (dom_paths.get("stores") or [])],
             "searched": checked, "resolved": checked - len(owed)}
     print("  domain handoff_paths: " + str(domp["identifier"]) + " resolved against " + str(len(domp["stores"]))
           + " store(s) " + str(domp["stores"]) + " -> " + str(domp["resolved"]) + "/" + str(domp["searched"]))
-    emit_metric("handoff_paths_unchanged", float(domp["resolved"]),
-                population="declared handoff paths in config/handoffs.yaml", denominator=checked,
-                ruler="config/handoffs.yaml",
-                note=str(len(drift)) + " drift, " + str(len(owed)) + " owner-owed, " + str(sealed)
-                     + " sealed blob(s)",
-                domain=domp)
+    if record:
+        emit_metric("handoff_paths_unchanged", float(domp["resolved"]),
+                    population="declared handoff paths in config/handoffs.yaml", denominator=checked,
+                    ruler="config/handoffs.yaml",
+                    note=str(len(drift)) + " drift, " + str(len(owed)) + " owner-owed, " + str(sealed)
+                         + " sealed blob(s)",
+                    domain=domp)
 
     if drift:
         print(chr(10) + "FAIL verify_handoffs: a handoff claim no longer describes the bytes (D-403):")
@@ -595,10 +603,12 @@ def main() -> int:
     """CLI: --selftest (the meter's known-answer control) or the full rail, which has no weakening options."""
     ap = argparse.ArgumentParser()
     ap.add_argument("--selftest", action="store_true")
+    ap.add_argument("--check", action="store_true", help="read-only (default): report without publishing (BUG-660)")
+    ap.add_argument("--record", action="store_true", help="publish the three handoff metrics (BUG-660)")
     a = ap.parse_args()
     if a.selftest:
         return selftest()
-    return check()
+    return check(record=a.record)
 
 
 if __name__ == "__main__":

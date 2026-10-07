@@ -3,8 +3,8 @@
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
   "total_ids": 432,
-  "open_n": 164,
-  "closed_n": 268,
+  "open_n": 163,
+  "closed_n": 269,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -819,11 +819,6 @@
       "events": 1
     },
     {
-      "id": "BUG-666",
-      "title": "OPEN (2026-10-07) \u2014 write-boundary rehearsal: the commit boundary has no teeth at a real commit",
-      "events": 1
-    },
-    {
       "id": "BUG-667",
       "title": "OPEN (2026-10-07) \u2014 verify_artifact_authority: t11 checkpoint_enriched.jsonl sha256 DRIFT (authority marker false)",
       "events": 1
@@ -1097,6 +1092,7 @@
     "BUG-662",
     "BUG-663",
     "BUG-664",
+    "BUG-666",
     "BUG-668"
   ]
 }

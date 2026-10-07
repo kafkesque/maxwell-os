@@ -9059,10 +9059,21 @@ check_silent_repair (3 unknown repair sites: pipeline/enhance_md_headers.py ×2,
 check_undeclared_encoding (files 161/156, sites 411/392, writes 82/74). The D-2811/D-2812 anchor-axis code introduced utf-8-sig
 reads and silent replace repairs with no allow entries.
 
-## BUG-666 — OPEN (2026-10-07) — write-boundary rehearsal: the commit boundary has no teeth at a real commit
+## BUG-666 (FIXED 2026-10-07) — write-boundary rehearsal: the commit boundary has no teeth at a real commit
 
-check_boundary_rehearsal: a will_not_touch family path (pipeline/**) staged for commit was NOT refused by RAIL 4, and the
-rehearsal commit LANDED (rc=0) over it. The write boundary is not what the declarations say it is (D-2675).
+Root cause: a DRIFTED DECLARATION, not a toothless boundary. config/boundary_rehearsal.yaml's planted
+`will_not_touch` scenario still named `pipeline/stage5_verify.py` (and its `why` claimed "pipeline/** is a
+will_not_touch family"), but D-2801 (2026-10-03) moved `pipeline/**` OUT of will_not_touch into may_touch.
+RAIL 4 (check_session_plan.py) HAS teeth — its 25/25 selftest fires "a will_not_touch path is FORBIDDEN" — so
+the rehearsal was asserting a refusal RAIL 4 no longer owed: the planted violation staged ordinary code and
+LANDED rc=0. This is the BUG-542 class in the granting direction (a declaration outliving its subject) PLUS a
+D-2646 violation (the will_not_touch family restated in a second home instead of consumed from the session plan).
+
+Fix: repoint the planted subject to a LIVE immutable family (`governance/F11_ANCHOR_REVIEW_20260923.csv`,
+matches `governance/F11_*`) and add a fail-closed drift detector that consumes the plan's ONE home
+(config/boundary_rehearsal.yaml#session_plan) instead of restating a family. The rehearsal now refuses a real
+will_not_touch commit (2 planted violations REFUSED by RAIL 4) and the drift DETECTOR has a known-answer
+control on the exact path BUG-666 caught (pipeline/stage5_verify.py).
 
 ## BUG-667 — OPEN (2026-10-07) — verify_artifact_authority: t11 checkpoint_enriched.jsonl sha256 DRIFT (authority marker false)
 

@@ -1,6 +1,6 @@
 # Maxwell OS v3.0 — BUG LOG (tiered)
 
-> **Updated:** 2026-10-05 | **Archive (full history):** `archive/governance_pre_tiered_2026-09-03/buglog.md`
+> **Updated:** 2026-10-07 | **Archive (full history):** `archive/governance_pre_tiered_2026-09-03/buglog.md`
 >
 > **Convention (standing rule):** OPEN bugs at the TOP (most critical first, MUST→SHOULD→WORTH); CLOSED/RESOLVED at the BOTTOM. Protocol: `governance/buglog_protocol.md`.
 
@@ -24,6 +24,7 @@
 
 | Bug | Date | Issue |
 |---|---|---|
+| BUG-669 | 2026-10-07 | **check_governance_faces.py (the SEVENTH governance rail, BUG-588/D-2692) has a scope blindspot: the LIVE census face it exists to guard is unguarded. (1) Position — MTR "CURRENT OPEN INDEX" sits INSIDE the `## 🔴 MUST` section (below the first tiered header), so header_block() never scans it; that exact line drifted (167→160 open / 265→272 closed, highest BUG-667→658, RED→GREEN) this session and was caught MANUALLY, not by the rail. (2) Format — its census is 2-part `(160 open / 272 closed; ...)`, which CENSUS_RE (3-part `N OPEN / N CLOSED / N`) does not match; DECISION-LOG.md "Register truth" restates the same 2-part form and is likewise stale/unguarded. (3) Surface — the tiered buglog.md face (🔴/🟠/🟡/✅ tables) is not in FACES at all. Fix: add a 2-part census regex + CURRENT-OPEN-INDEX marker scan regardless of section position; add the buglog.md tiered face to FACES; R5 gemma review the rail extension.** | |
 | BUG-242 | 2026-09-11 | **frontier69_v2 + extension80 audit outputs carry 2 data-quality defects.** (1) The `*_verdict` fields (depth/discipline/domains) are LLM SELF-REPORTS, not computed comparisons — they claim `override` even when the audit value equals silver (e.g. `S4-GOLD-MINED-00005` domains identical yet `domains_verdict=override`), so the cited "57.5% domain-override" and "80 flagged" figures are inflated. (2) Non-principle content_type rows (noise_drop/tool_instruction/process_template/process_instance/growth_edge) carry a spurious 4-way depth label, violating D2612 (depth only for principle). FIX (applied in `scripts/build_phase0_adjudication_form.py`): agreement recomputed deterministically (`differs` flag) + depth marked N/A for non-principle. REMAINS: recompute the override figures from the audit values (deterministic), and re-run the audit to null depth on non-principle if the raw artifacts are kept. |
 | BUG-228 | 2026-09-08 | **Dead/aspirational schema fields — 0 code references.** `parent_pt_id` (process_instance's tether to a template), `promoted_to_type`/`promoted_to_id`/`parent_fb_ids` (growth_edge promotion), MCP `annotations` (`readOnlyHint`/`destructiveHint`/`idempotentHint`), `consulted_fbs`/`template_source` — all declared in `content_types.yaml`, all 0 refs in `pipeline/`+`scripts/`. Consequence: `process_instance` is indistinguishable from an unlinked anecdote; `growth_edge` is a dead-end bucket with a staging-area description; MCP-promotion aspiration is unbacked. False affordances for future retrieval code. Fix = prune or ship; backfill `parent_pt_id` when a PT exists (§1.3.2 of the adjudication doc). |
 | BUG-224 | 2026-09-05 | OMLX server wedges under sustained load on Qwen3.8-27B: large-output calls (>~1200 tokens) hang BEYOND the requests timeout (call_omlx timeout not respected), then the server needs ~15-60s to recover before even tiny requests respond. Reproduced repeatedly during D2576 depth audit (single-FB calls OK ~7s, but batched/long-output calls wedge every ~6-12 requests). This blocked the delegated Qwen3.8 market research (D2576) and forced the audit to fall back to `delegate(custom_deepseek)` for the bulk + a small direct-OMLX overlap. Extends BUG-220/DELEGATE-001 (Qwen direct-call workaround itself is now flaky). Likely cause: 27B 4-bit model + concurrent/unreleased context on 64GB. **MITIGATION APPLIED (D2581, 2026-09-05):** `services.omlx.read_timeout=60` + `services.omlx.wedge_recovery_sleep=20` (config); `call_omlx` now uses `timeout=(connect, read)` so a mid-response stall trips fast, and distinguishes `ReadTimeout` (wedge) → 20s recovery sleep before retry instead of the 3s hammering. Remaining workload-shaping guidance: 3-model vote should still process Qwen3.8 in small single-FB calls. UNVERIFIED under a live sustained-load wedge (needs a re-run of the Qwen3.8 bulk audit to confirm). |
@@ -9096,6 +9097,30 @@ re-hash. verify_artifact_authority now exits 0 (2 markers, 17 files, 0 RED).
 `archive/index.yaml` fails the coverage invariant: bloat_20260929 is on disk but in NEITHER the index nor the declared exclusions.
 Run `python3 scripts/build_archive_index.py` (or declare the exclusion) — an on-disk object is INDEXED or DECLARED excluded, never
 silently absent (BUG-537).
+
+## BUG-669 (OPEN, 2026-10-07) — check_governance_faces.py scope blindspot: the LIVE census face it exists to guard is unguarded
+
+The SEVENTH governance rail (scripts/check_governance_faces.py, BUG-588/D-2692) fails closed when the hand-edited Markdown
+FACES contradict the machine register. Its docstring scopes the check to "(1) bug-status TABLE rows, and (2) census
+restatements in the HEADER BLOCK ONLY (above the first tiered ## <icon> section)". That scope is a blindspot for exactly
+the surface the rail exists to protect — the LIVE census face.
+
+Gap 1 — position. The MTR "CURRENT OPEN INDEX" (MASTER-TASK-REGISTER.md, the machine-derived live face) and the
+DECISION-LOG "Register truth" line both sit INSIDE a `## 🔴` section, BELOW the first tiered header, so header_block()
+(which stops at the first TIER_RE match) never scans them. This session the MTR live face drifted (167→160 open /
+265→272 closed, highest OPEN BUG-667→BUG-658, audit RED→GREEN) and was caught by MANUAL inspection, not by the rail.
+
+Gap 2 — format. Even if scanned, the live-face census is `432 bugs (160 open / 272 closed; ...)` — a 2-part parenthetical
+— and CENSUS_RE requires 3 parts (`N OPEN / N CLOSED / N TOTAL`), so it would not match. DECISION-LOG.md's "Register truth"
+line restates the same 2-part form and is stale for the same reason (it said 167/265 while the register said 160/272).
+
+Gap 3 — surface. FACES = (DECISION-LOG.md, MASTER-TASK-REGISTER.md) only; the tiered buglog.md face (the 🔴/🟠/🟡/✅
+summary tables restating the same census) is unguarded entirely.
+
+Fix (recommended): (a) add a 2-part census regex (N open / N closed) plus a CURRENT-OPEN-INDEX / "Register truth" marker
+check that scans the whole face regardless of section position (a "machine-derived ... live face" marker is a current-state
+claim, not append-only history); (b) add the buglog.md tiered face to FACES; (c) R5 gemma review the rail extension
+(generator != verifier, R5).
 
 ## BUG-631 — FIXED (2026-10-07) — max_domains_per_fb=5 was DETECTED but not ENFORCED on 52 historical rows: re-derived through the D-2838 writer-limb
 

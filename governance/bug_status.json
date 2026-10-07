@@ -2,8 +2,8 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 432,
-  "open_n": 160,
+  "total_ids": 433,
+  "open_n": 161,
   "closed_n": 272,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
@@ -806,6 +806,11 @@
     {
       "id": "BUG-658",
       "title": "(OPEN, 2026-10-06) \u2014 OMLX SSE keepalive defeats read_timeout \u2192 client wedge (no wall-clock deadline). HARNESS-MITIGATED 2026-10-06 (d2767_ab",
+      "events": 1
+    },
+    {
+      "id": "BUG-669",
+      "title": "(OPEN, 2026-10-07) \u2014 check_governance_faces.py scope blindspot: the LIVE census face it exists to guard is unguarded",
       "events": 1
     }
   ],

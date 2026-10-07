@@ -49,9 +49,13 @@ def test_synonym_index_kind_safe() -> None:
     'graphic design' (domain) and 'software engineering' → 'engineering practice'."""
     dom_canon = {c.lower() for c in CANONICAL_DOMAINS} - {"emerging"}
     disc_canon = {c.lower() for c in CANONICAL_DISCIPLINES} - {"emerging"}
+    # D-2814: a DECLARED same-axis home (ratified homonym) is a ruling, not pollution.
+    from pipeline.pipeline_paths import S4_SAME_AXIS_FALLTHROUGH  # noqa: PLC0415
+    declared_domain = {str(k).lower() for k in (S4_SAME_AXIS_FALLTHROUGH.get("domain") or {})}
+    declared_disc = {str(k).lower() for k in (S4_SAME_AXIS_FALLTHROUGH.get("discipline") or {})}
 
-    dom_leak = [k for k in get_synonym_index("domain") if k in disc_canon and k not in dom_canon]
-    disc_leak = [k for k in get_synonym_index("discipline") if k in dom_canon and k not in disc_canon]
+    dom_leak = [k for k in get_synonym_index("domain") if k in disc_canon and k not in dom_canon and k not in declared_domain]
+    disc_leak = [k for k in get_synonym_index("discipline") if k in dom_canon and k not in disc_canon and k not in declared_disc]
 
     assert not dom_leak, f"discipline canonicals leaked into domain index: {sorted(dom_leak)}"
     assert not disc_leak, f"domain canonicals leaked into discipline index: {sorted(disc_leak)}"
@@ -60,14 +64,21 @@ def test_synonym_index_kind_safe() -> None:
 def test_match_to_canonical_no_cross_kind_coercion() -> None:
     """BUG-200: match_to_canonical must return None (→ 'emerging') when asked to
     resolve a canonical of the OPPOSITE axis, never a coerced cross-kind label."""
+    from pipeline.pipeline_paths import S4_SAME_AXIS_FALLTHROUGH  # noqa: PLC0415
+    declared_domain = {str(k).lower() for k in (S4_SAME_AXIS_FALLTHROUGH.get("domain") or {})}
+    declared_disc = {str(k).lower() for k in (S4_SAME_AXIS_FALLTHROUGH.get("discipline") or {})}
     for disc in CANONICAL_DISCIPLINES:
         if disc.lower() == "emerging":
             continue
+        if disc.lower() in declared_domain:
+            continue  # D-2814: declared same-axis home (ratified homonym), not coercion
         assert match_to_canonical(disc, "domain") is None, (
             f"discipline canonical {disc!r} coerced into a domain"
         )
     for dom in CANONICAL_DOMAINS:
         if dom.lower() == "emerging":
+            continue
+        if dom.lower() in declared_disc:
             continue
         assert match_to_canonical(dom, "discipline") is None, (
             f"domain canonical {dom!r} coerced into a discipline"
@@ -138,13 +149,14 @@ def test_vocabularies_disjoint_under_normalisation() -> None:
 
 
 def test_guard_detects_punctuation_hidden_collision() -> None:
-    """D273b/G18: a DECLARED collision is LEGAL for the row guard, REPORTED by the lint."""
-    # Row guard: the D-271a declared collision no longer fails closed.
-    assert validate_discipline_domain("research methodology", ["research & methodology"]) == []
-    # Vocabulary lint: the declared collision is still reported (never rejected).
-    lint_flags = lint_discipline_domain_vocabulary("research methodology", ["research & methodology"])
-    assert lint_flags, "lint returned clean for a declared cross-axis collision"
-    assert all(f.startswith("DECLARED: declared-axis-collision") for f in lint_flags), lint_flags
+    """D-2853: the D-271a declared collision was RESOLVED by renaming the domain
+    'research & methodology' -> 'research practice'. The old domain label is now
+    non-canonical; the discipline 'research methodology' and the new domain
+    'research practice' are DISJOINT (no declared collision remains)."""
+    assert validate_discipline_domain("research methodology", ["research practice"]) == []
+    assert validate_discipline_domain("research methodology", ["research & methodology"]) == [
+        "non-canonical-domain: 'research & methodology'"
+    ]
 
 
 if __name__ == "__main__":

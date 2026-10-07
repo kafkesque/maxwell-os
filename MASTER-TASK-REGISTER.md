@@ -2124,3 +2124,24 @@ NEXT (refreshed D-2772):
   (9) rerun S4→S5→S6 (no S1);
   (10) D-2859: BUG-563 triage (40 dirty paths → 3 buckets) + repoint recalibration_pins.yaml + render_closed_menu.py → v7;
   (11) close BUG-630 (ID wiring), BUG-648 (D-2857), BUG-651 (recalib+flip), BUG-658 (no-wedge relaunch).
+
+---
+
+## BUG-661/662/663/664/668 FIXED + D-2861 RATIFIED + D-2853 fan-out complete (2026-10-07)
+
+- BUG-661 FIXED: bridge ambiguity is a SAFE refusal -> EXIT_OWED (2); verdict word now matches exit code (BUG-492).
+- BUG-662 FIXED: check_store_columns --record re-baseline (256 drift cells -> 0); menu_hash re-ruled reserved->sparse.
+- BUG-663 FIXED: 6 test regressions from the D-2853 v7-rename fan-out (NOT absorbed by any ceiling edit, D-2656).
+  Root cause: alias_map(16)/synonym_map(1)/taxonomy(dom-010 raw alias)/schemas-fallthrough fan-out incomplete +
+  D-2814 same-axis homonym ('marketing' discipline vs domain). Fixed via dom-010 raw alias + S4_SAME_AXIS_FALLTHROUGH.domain
+  'marketing -> marketing & communications' wired into match_to_canonical + _build_synonym_index. 45/45 pass.
+- BUG-664 FIXED: check_domain_cardinality wired into just health (reader-limb now fires red on 52 over-cap FBs = BUG-631).
+- BUG-668 FIXED: archive/index.yaml rebuilt (bloat_20260929 indexed, coverage invariant green).
+- D-2861 RATIFIED: re-baseline 3 red health drifts (label_provenance boundary 7995->7983, anchor bridge re-derived,
+  decisions receipt re-cut).
+- D-2853 fan-out COMPLETE (live config maps): alias_map(16), synonym_map(1), domain_disciplines(1 key),
+  anchor_workbook_fixes(1), eval_integrity known_collisions entry removed. Remaining: 28-row referee remap = OWNER-GATED.
+- Bug register 432 = 166 open / 266 closed. Decisions 991. Highest OPEN = BUG-667.
+- STILL OWNER-GATED (do NOT cross unilaterally): BUG-659 (shrink-only ceiling re-baseline), BUG-660 (health read-only),
+  BUG-665 (encoding repoint to artifact_encoding.py), BUG-666 (write-boundary teeth), BUG-667 (t11 authority re-mint
+  via D-2862), BUG-631 (52 over-cap FB re-derive via D-2838 writer-limb).

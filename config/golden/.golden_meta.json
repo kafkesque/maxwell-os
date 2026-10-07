@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
   "algorithm": "sha256",
-  "golden_sha256": "25e8339179e55b07d282843c8d1cab373f265cfefad4fd2b9420c6c8baa0b519",
-  "pipeline_commit": "6e621fd",
+  "golden_sha256": "23f9b68bad588d04a2bc82b9345a374a46ab85b4f3a9d825fa9ba1ec134922a2",
+  "pipeline_commit": "d3f372f",
   "trimmed_ids": [
     "PRO-002",
     "LEA-001",
@@ -51,5 +51,5 @@
   "convergent_positives": 61,
   "hard_negatives": 23,
   "golden_path": "config/golden/stage2_fewshot_convergent.yaml",
-  "restamped_note": "D2506: surgical line-level canonicalization of dormant stage2 golden domain/discipline alias->canonical (45 values); cross-kind/missing untouched"
+  "restamped_note": "D-2853 fan-out: re-stamp golden_sha256 after golden file edit (no canonicalization), at HEAD d3f372f"
 }

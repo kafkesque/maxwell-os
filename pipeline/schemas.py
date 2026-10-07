@@ -978,6 +978,16 @@ def _build_synonym_index(kind: str | None = None) -> dict[str, str]:
             if normalize_label(raw) not in forbidden_keys:
                 lookup[normalize_label(raw)] = str(target).strip()
 
+    # 4. same_axis_fallthrough (D-2814/BUG-630): curated same-axis homes. A raw label
+    # canonical on the OPPOSITE axis but with a ratified home on THIS axis (e.g. 'marketing'
+    # → domain 'marketing & communications') is a DECLARED homonym, not pollution. Overlay
+    # LAST so it wins over the forbidden_keys filter above; kind-constrained only (the flat
+    # index stays combined and is verified downstream).
+    if kind is not None:
+        from pipeline.pipeline_paths import S4_SAME_AXIS_FALLTHROUGH  # noqa: PLC0415
+        for raw, home in (S4_SAME_AXIS_FALLTHROUGH.get(kind, {}) or {}).items():
+            lookup[normalize_label(raw)] = str(home).strip()
+
     return lookup
 
 
@@ -1023,6 +1033,16 @@ def match_to_canonical(label: str, kind: str = "domain") -> str | None:
     # index/synonym_map (e.g. 'software engineering' → 'engineering practice').
     opposite = CANONICAL_DISCIPLINES if kind == "domain" else CANONICAL_DOMAINS
     if label_lower in {normalize_label(c) for c in opposite}:
+        # D-2814/BUG-630: the opposite-axis guard is LOAD-BEARING but must retry a
+        # declared SAME-axis home before abstaining (mirrors map_to_canonical_with_fallback).
+        # 'marketing' (a discipline canonical) is also a declared DOMAIN alias for
+        # 'marketing & communications' — the curated home resolves, never coerces.
+        from pipeline.pipeline_paths import S4_SAME_AXIS_FALLTHROUGH  # noqa: PLC0415
+        home = (S4_SAME_AXIS_FALLTHROUGH.get(kind, {}) or {}).get(label_lower)
+        if home:
+            for c in canonical_list:
+                if normalize_label(c) == normalize_label(home):
+                    return c
         return None
 
     # 1. Direct canonical match (case-insensitive)

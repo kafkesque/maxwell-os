@@ -34,7 +34,7 @@ trailing_separator_trim: ['|', ',']   # the owner's trailing separators are TRIM
 token_fixes:
   "business developmen": business development
   "media & entertainmen": media & entertainment
-  "research & methodolog": research & methodology
+  "research & methodolog": research practice
   "user experienc": user experience
   "esign systems": design systems
   "systems & framework": systems & frameworks

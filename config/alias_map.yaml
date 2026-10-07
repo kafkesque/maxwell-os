@@ -396,10 +396,10 @@ domain_aliases:
   nlp research: ai & agents
   education & training: education
   human resources development: organizational behavior
-  research management: research & methodology
+  research management: research practice
   social media design: marketing & communications
   user experience research: user experience
-  research & development: research & methodology
+  research & development: research practice
   digital product development: digital product
   usability engineering: user experience
   digital product management: digital product
@@ -487,7 +487,7 @@ domain_aliases:
   leadership & management:
   - leadership
   - organizational behavior
-  research & analytics: research & methodology
+  research & analytics: research practice
   ai & machine learning engineering: ai & agents
   interactive media development: media & entertainment
   ai & nlp: ai & agents
@@ -500,7 +500,7 @@ domain_aliases:
   marketing & consumer behavior: marketing & communications
   cultural heritage management: arts & culture
   sales & negotiation: marketing & communications
-  research analytics: research & methodology
+  research analytics: research practice
   dashboard design: data visualization
   e-learning development: education
   simulation engineering: computational science & physics
@@ -567,11 +567,11 @@ domain_aliases:
   virtual reality design: digital product
   virtual reality & game design: media & entertainment
   research & academia:
-  - research & methodology
+  - research practice
   - education
   product research: digital product
   public health studies: health & wellness
-  qualitative studies: research & methodology
+  qualitative studies: research practice
   simulation & modeling: computational science & physics
   infrastructure development: engineering & infrastructure
   information technology & software maintenance: code & computation
@@ -595,7 +595,7 @@ domain_aliases:
   visual arts management: arts & culture
   art practice: arts & culture
   law and governance: legal & public policy
-  innovation studies: research & methodology
+  innovation studies: research practice
   public policy & social change: legal & public policy
   ux/ui development: user experience
   graphic design practice: graphic design
@@ -606,9 +606,9 @@ domain_aliases:
   communication research: semiotics & communication
   music analysis: arts & culture
   product development research: product design
-  qualitative methodology: research & methodology
+  qualitative methodology: research practice
   social science studies: social sciences
-  scientific methodology: research & methodology
+  scientific methodology: research practice
   humanities & social sciences: social sciences
   design & ux: user experience
   communication engineering: engineering practice
@@ -630,7 +630,7 @@ domain_aliases:
   governance and anti-corruption: legal & public policy
   editorial practice: editorial & advertising
   research & innovation:
-  - research & methodology
+  - research practice
   - entrepreneurship
   complex systems studies: systems & frameworks
   quality assurance & control: engineering practice
@@ -727,7 +727,7 @@ domain_aliases:
   - arts & culture
   - design strategy
   agile & scrum: business operations
-  research & evaluation: research & methodology
+  research & evaluation: research practice
   writing and publishing: media & entertainment
   design & innovation: design strategy
   accessibility design: user experience
@@ -783,14 +783,14 @@ domain_aliases:
   management & leadership:
   - organizational behavior
   - leadership
-  research & development strategy: research & methodology
+  research & development strategy: research practice
   marketing & sales management:
   - marketing & communications
   - business development
   innovation & technology transfer: entrepreneurship
   marketing & consumer behaviour: marketing & communications
   fitness & wellness: health & wellness
-  academic research management: research & methodology
+  academic research management: research practice
   management & strategy:
   - organizational behavior
   - design strategy
@@ -908,7 +908,7 @@ domain_aliases:
   customer relationship management: marketing & communications
   personal finance: finance & investment
   visual storytelling: illustration
-  consumer research: research & methodology
+  consumer research: research practice
   coaching & mentoring: leadership
   financial services: finance & investment
   business consulting: business operations
@@ -940,7 +940,7 @@ domain_aliases:
   consumer goods: product design
   medical education: education
   legal compliance: legal & public policy
-  interdisciplinary research: research & methodology
+  interdisciplinary research: research practice
   policy design: legal & public policy
   interactive storytelling: media & entertainment
   technology policy: legal & public policy
@@ -1028,7 +1028,7 @@ domain_aliases:
   business process improvement: business operations
   organizational strategy: design strategy
   mobile app design: digital product
-  research evaluation: research & methodology
+  research evaluation: research practice
   music industry: media & entertainment
   agile project management: project management
   stress management: health & wellness

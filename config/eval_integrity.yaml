@@ -221,39 +221,7 @@ label_axes:
   multi_label: [domains]
   shared_labels:
     - emerging          # fail-closed catch-all; documented as NOT a real assignment
-  known_collisions:
-    - discipline: research methodology
-      domain: research & methodology
-      rows_discipline: 261
-      rows_domain: 648
-      decision: >    # D-271a RULED + REVISED 2026-09-17 (see governance/DECISION_D271_IDENTITY_20260917.md section 2a)
-        D-271a DECLARED HOMONYM — CHANGE NOTHING. Both labels stay canonical exactly as they are.
-        This is not one concept mis-migrated and not a contamination: the discipline and the domain
-        are different objects that happen to share a name, so no rename, no merge, no migration and
-        no relabelling is required. RETRIEVAL PRECEDENCE: discipline is authoritative for
-        partitioning (single-valued, exact '=' filter, 100% coverage) AND is load-bearing for depth
-        ('cross-domain' = bridges 2+ distinct DISCIPLINES, 789 rows); domains is a recall broadener
-        (1..7 labels per row). Consequence: if a collapse is ever forced, the DISCIPLINE side
-        survives — the reverse of a 'keep the larger bucket' heuristic, which counted rows (648 vs
-        261) instead of weighing the axis. Cost of this ruling: 0 migrated, 0 relabelled, 0 human
-        labelling. G8 is downgraded from 'adjudicate the 167 rows carrying BOTH' (they are coherent
-        as-is: a research-methodology object inside the research & methodology domain) to
-        'ratify this declaration'. Enforceable requirements only: (1) the namespace is enforced on
-        write, so a domain can never be typed into the discipline field or vice versa (guard +
-        scripts/audit_taxonomy_disjointness.py, criterion AXC); (2) no NORMALISED union of the two
-        vocabularies may fuse them — verified 2026-09-17: config/taxonomy_v5.yaml keeps
-        'disciplines' and 'domains' as separate keys and the runtime audit reports 0 undeclared
-        normalised collisions over 7,995 rows; (3) any cross-taxonomy set operation must be
-        namespace-qualified (discipline:X vs domain:X). Under D-271c each label also receives its
-        own concept_id, which makes the separation mechanical rather than conventional.
-      note: >
-        One concept in both taxonomies, definitions near-identical ("frameworks and
-        techniques used to conduct valid academic research" vs "design, ethics and execution
-        of academic research processes"). D2512-D2516 demoted applied-practice
-        pseudo-disciplines to domains (66 -> 61 disciplines); this pair is an INCOMPLETE
-        MIGRATION, not a deliberate split.
-      resolved_by: D-2853   # 2026-10-06: domain renamed 'research & methodology' -> 'research practice' (taxonomy_v7); DB relabelled 875 rows. SUPERSEDES D-271a 'CHANGE NOTHING'.
-
+  known_collisions: []   # D-2853 (2026-10-06) resolved the sole declared collision: domain 'research & methodology' -> 'research practice'; discipline 'research methodology' unchanged (distinct names, no longer collide).
 # ─────────────────────────────────────────────────────────────────────────────
 # T2 — SUFFIX DUPLICATE POLICY (2026-09-17). "Is name B just name A + a suffix?" is a STRING
 # OPERATION, not a judgement. Measured: gemma and gpt-oss both scored lift 0.00 against the

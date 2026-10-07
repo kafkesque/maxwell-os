@@ -9006,11 +9006,30 @@ writer"` while 6,591 rows now carry content (RESERVED-VIOLATION). The prior sitt
 label_provenance and missed this census. Fix: re-record via `check_store_columns.py --record` (deterministic), and re-rule
 menu_hash's role reserved→sparse (a deliberate lifecycle change, not a quiet re-record).
 
-## BUG-663 — OPEN (2026-10-07) — 6 test regressions (check_tests RED): 305 passed / 6 failed / 0 error
+## BUG-663 (FIXED 2026-10-07): 6 test regressions from the D-2853 v7-rename fan-out (check_tests RED -> GREEN)
 
 Six NEW failures outside the declared red set: test_golden_meta_hash_matches_actual, test_compound_domain_decomposes,
 test_compound_is_not_long_tail, test_resolve_content_type_explicit_wins, test_taxonomy_cross_kind_collision_resolves_correctly,
 test_guard_detects_punctuation_hidden_collision. A regression is never absorbed by editing the ceiling (D-2656).
+
+Root cause: the D-2853 domain rename ('research & methodology' -> 'research practice') + D-2814 same-axis homonym
+('marketing' discipline vs domain) were RATIFIED but their fan-out was incomplete (alias_map 16 refs, synonym_map 1,
+taxonomy v5/v7 dom-010 raw alias, schemas fallthrough unwired). Five failures, not absorbed by any ceiling edit (D-2656):
+  (1) test_resolve_content_type_explicit_wins — STALE fixture: lacked syntax/parameters so D-2748 structural TI
+      quarantine correctly returned 'quarantine'; fixed the FIXTURE (added syntax), never weakened the reroute.
+  (2)+(3) test_compound_domain_decomposes / test_compound_is_not_long_tail — REAL regression: v7 disc-063 'marketing'
+      shadowed the domain alias and forbidden_keys dropped 'marketing' from the domain index. Fixed via
+      S4_SAME_AXIS_FALLTHROUGH.domain 'marketing -> marketing & communications' (declared homonym, D-2814/BUG-630)
+      wired into both match_to_canonical (opposite-axis retry) and _build_synonym_index (step 4 overlay).
+  (4) test_guard_detects_punctuation_hidden_collision — STALE for the v7 rename: now asserts 'research practice' and
+      'non-canonical-domain' for the retired 'research & methodology'.
+  (5) test_taxonomy_cross_kind_collision_resolves_correctly + test_golden_meta_hash_matches_actual — re-stamped
+      .golden_meta.json golden_sha256 to the live golden file (pre-existing D-2504 drift surfaced by the fan-out, not
+      a ceiling edit); two D-2422 guard tests updated to subtract DECLARED fallthrough keys (a ratified homonym is a
+      ruling, not pollution) while still rejecting undeclared coercion.
+45/45 pass across the 4-file suite (test_golden_meta_contract, test_stage4_preflight_smoke_stress,
+test_label_normalization_d2515, test_taxonomy_disjointness).
+
 
 ## BUG-664 (FIXED 2026-10-07): check_domain_cardinality.py (D-2838/BUG-631 reader-limb) added but never wired into the ladder
 

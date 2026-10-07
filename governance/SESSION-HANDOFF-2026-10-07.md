@@ -3,6 +3,20 @@
 > **Resume:** say `continue` — this file + `governance/CONTEXT_INDEX.md` are the entry points.
 > The previous handoff (D-2860 commit-frontier gate) is SUPERSEDED by this one for state and next-steps.
 
+## CURRENT STATE (2026-10-07, post-BUG-663-fix — SUPERSEDES sections below for resume)
+
+- git HEAD **d3f372f**. Working tree carries the BUG-663 + D-2853 fan-out fix (uncommitted): alias_map, synonym_map,
+  taxonomy v5/v7 dom-010 raw alias, pipeline/schemas.py fallthrough, pipeline_config same_axis_fallthrough,
+  golden .golden_meta.json re-stamp, 2 test files, plus this sitting's governance sync + fan-out completion
+  (domain_disciplines, anchor_workbook_fixes, eval_integrity, buglog, bug_status, session_seed, DECISION-LOG, MTR).
+- 4 fatal rails landed in d3f372f (BUG-661/662/664/668). BUG-663 (6 test regressions) now FIXED this sitting — NOT
+  ceiling-absorbed (D-2656): root cause = incomplete D-2853 v7-rename fan-out + D-2814 same-axis homonym. 45/45 pass.
+- D-2853 fan-out COMPLETE over live config maps: alias_map(16), synonym_map(1), domain_disciplines(1 key),
+  anchor_workbook_fixes(1), eval_integrity known_collisions entry removed. Remaining drift = 28-row A/B referee
+  domain remap (OWNER-GATED) + frozen menus (v5/v6 intentional) + schemas docstrings (historical).
+- Bug register **432** = **166 open / 266 closed**; highest OPEN = **BUG-667**. Decisions **991** (D-2861 = last).
+- MUTATION_JOURNAL.jsonl carries 2 append-only no-op regenerate rows (BUG-660 class): COMMIT them, do NOT revert.
+
 ## HEADLINE (the audit answer, 2nd pass)
 
 Commit **98471a3** (D-2861) re-baselined only 3 rails and declared victory without a full ladder run. A full

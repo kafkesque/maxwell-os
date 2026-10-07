@@ -201,7 +201,9 @@ def test_stage2_filter_zero_match_fails_closed(tmp_path: Path, monkeypatch: pyte
 # PREFLIGHT — content-type routing (D2323 axis-1 + D2616 route-deprecation)
 # ═══════════════════════════════════════════════════════════════════════════
 def test_resolve_content_type_explicit_wins() -> None:
-    assert _resolve_content_type({"content_type": "tool_instruction", "route": "FB"}) == "tool_instruction"
+    # D-2748: TI MUST carry syntax/params; the fixture declares syntax so the
+    # structural quarantine (TI with neither → quarantine) does not apply.
+    assert _resolve_content_type({"content_type": "tool_instruction", "route": "FB", "syntax": "cmd [--flag] <arg>"}) == "tool_instruction"
 
 
 def test_resolve_content_type_route_deprecated() -> None:

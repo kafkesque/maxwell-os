@@ -455,7 +455,8 @@ stage4:
     discipline:
       organizational behavior: organizational theory
       product design: design thinking
-    domain: {}
+    domain:
+      marketing: marketing & communications
   discipline_negative_exemplars_path: config/golden/discipline_negative_exemplars.yaml
   context_signals:
     business:

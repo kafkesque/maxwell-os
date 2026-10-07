@@ -3534,3 +3534,14 @@ NET: the #1 blocker is NOT "remap anchors+golden+referee" (mostly done) — it i
 
 ## D-2860 (2026-10-07) — ACTIVE — commit-frontier gate: refuse to proceed with uncommitted ratified governance state (anti-circle)
 Senior agentic-engineer recommendation (owner ratification owed). The 2-week circle had ONE root cause: 34 decisions D-2826..D-2859 RATIFIED in the worktree but uncommitted (HEAD 955 vs worktree 989), and NOTHING compared "accepted in the worktree" against "committed in HEAD." This lands `scripts/check_commit_frontier.py` + `config/commit_frontier.yaml` (wired into `just health`) as a fail-closed BOOT+health gate: it refuses when any governance-critical file is dirty, or when a RATIFIED/ACTIVE/RESOLVED decision exists in the worktree but not HEAD. Not a commit hook (a staged file is uncommitted by definition). Owner ratification owed before hardening beyond fatal.
+
+## D-2861 (2026-10-07) — RATIFIED — re-baseline the three red health drifts (label provenance boundary, anchor bridge, decisions receipt)
+
+Forensic audit found three fatal (rc=1) health drifts after the BUG-571 register-divergence fix:
+(1) check-label-provenance boundary population 7983 vs declared 7995 — a 12-row store change under
+rechunk-v4-20260929 (BUG-501); (2) build_anchor_store_bridge committed bridge no longer re-derived after the
+store change (BUG-420); (3) verify_handoffs decisions_registry prefix receipt broken by in-place edits (BUG-376).
+Re-baselined all three: measured_rows 7995->7983, re-derived the bridge (11 ambiguous rows recorded, never picked),
+re-cut the receipt via handoff.py --backfill. Owner ratified.
+Bugs: BUG-501, BUG-420, BUG-376.
+Files: config/label_provenance.yaml, governance/ANCHOR_STORE_BRIDGE_20260926.json, config/handoffs.yaml.

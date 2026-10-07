@@ -301,9 +301,9 @@ current_state:
   - G4a
   - G13
   registry:
-    decisions: 990
+    decisions: 991
     highest_bug: BUG-667
-    buglog_entries: 422
+    buglog_entries: 432
   do_not:
   - relabel the corpus
   - buy more stratum-A ruler rows
@@ -320,7 +320,7 @@ current_state:
   - the F-14 pocket retarget (statistically null - BUG-296)
   - any PASS-only frame as an epistemic frame (it is a ROLE frame)
   - the golden retrieval set as ground truth (ids chosen from live search output)
-open_bugs_n: 161
+open_bugs_n: 166
 
 # ── 2026-10-06 session status (supersedes stale current_state.date 2026-09-22) ──
 session_status_2026_10_06:

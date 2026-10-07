@@ -3,8 +3,8 @@
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
   "total_ids": 432,
-  "open_n": 167,
-  "closed_n": 265,
+  "open_n": 166,
+  "closed_n": 266,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -824,11 +824,6 @@
       "events": 1
     },
     {
-      "id": "BUG-663",
-      "title": "OPEN (2026-10-07) \u2014 6 test regressions (check_tests RED): 305 passed / 6 failed / 0 error",
-      "events": 1
-    },
-    {
       "id": "BUG-665",
       "title": "OPEN (2026-10-07) \u2014 encoding debt above shrink-only ceilings (3 rails) from new anchor-axis code",
       "events": 1
@@ -1108,6 +1103,7 @@
     "BUG-657",
     "BUG-661",
     "BUG-662",
+    "BUG-663",
     "BUG-664",
     "BUG-668"
   ]

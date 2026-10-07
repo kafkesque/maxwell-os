@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**167 open** / 265 closed of 432 ids.
+**166 open** / 266 closed of 432 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -170,7 +170,6 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-658 | (OPEN, 2026-10-06) — OMLX SSE keepalive defeats read_timeout → client wedge (no wall-clock deadline). HARNESS-MITIGATED 2026-10-06 (d2767_ab | 1 |
 | BUG-659 | OPEN (2026-10-07) — check_config_defaults silently auto-RAISES the shrink-only config_defaults ceiling | 1 |
 | BUG-660 | OPEN (2026-10-07) — `just health` is not read-only: it writes tracked files as a side effect | 1 |
-| BUG-663 | OPEN (2026-10-07) — 6 test regressions (check_tests RED): 305 passed / 6 failed / 0 error | 1 |
 | BUG-665 | OPEN (2026-10-07) — encoding debt above shrink-only ceilings (3 rails) from new anchor-axis code | 1 |
 | BUG-666 | OPEN (2026-10-07) — write-boundary rehearsal: the commit boundary has no teeth at a real commit | 1 |
 | BUG-667 | OPEN (2026-10-07) — verify_artifact_authority: t11 checkpoint_enriched.jsonl sha256 DRIFT (authority marker false) | 1 |

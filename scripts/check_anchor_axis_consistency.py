@@ -46,6 +46,8 @@ from pathlib import Path
 import yaml
 
 REPO = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(REPO / "scripts"))
+from lib import artifact_encoding  # noqa: E402 - D-2646: the decode rule has ONE home
 CONFIG = REPO / "config" / "anchor_axis_authority.yaml"
 
 
@@ -66,7 +68,7 @@ def _load_rows(path: Path, kind: str, rows_key: str | None) -> dict[str, dict]:
     if not path.exists():
         raise FileNotFoundError(f"check_anchor_axis_consistency: declared artifact missing: {path}")
     if kind == "csv":
-        with path.open(encoding="utf-8-sig") as handle:
+        with artifact_encoding.open_artifact(path, REPO) as handle:
             rows = list(csv.DictReader(handle))
     else:
         payload = json.loads(path.read_text(encoding="utf-8"))

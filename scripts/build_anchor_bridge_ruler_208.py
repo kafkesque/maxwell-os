@@ -43,7 +43,6 @@ ROOT = Path(__file__).resolve().parents[1]
 REGISTRY = ROOT / "config" / "anchor_family.yaml"
 DEPTH_MAP = ROOT / "governance" / "ANCHOR_208_DEPTH_CORRECTED_20261002.json"
 OUT = ROOT / "governance" / "ANCHOR_208_BRIDGE_RULER_20261002.csv"
-ENCODING = "utf-8-sig"  # the bridge reads its ruler with this declared encoding
 
 
 def _collapse(value: str) -> str:
@@ -117,11 +116,11 @@ def build(cfg: dict, content_ruler_path: Path, item_key: str) -> tuple[list[dict
     return rows, problems
 
 
-def write_csv(path: Path, rows: list[dict[str, str]]) -> None:
-    """Crash-safe write (C6): tempfile -> fsync -> os.replace, utf-8-sig so the bridge reads it as declared."""
+def write_csv(path: Path, rows: list[dict[str, str]], encoding: str) -> None:
+    """Crash-safe write (C6): tempfile -> fsync -> os.replace, in the declared ruler encoding (C12)."""
     fd, tmp = tempfile.mkstemp(dir=str(path.parent), prefix=".bridge_ruler_", suffix=".tmp")
     try:
-        with open(fd, "w", newline="", encoding=ENCODING) as fh:
+        with open(fd, "w", newline="", encoding=encoding) as fh:
             writer = csv.DictWriter(fh, fieldnames=["item_id", "name"])
             writer.writeheader()
             writer.writerows(rows)
@@ -164,7 +163,7 @@ def main() -> int:
         bak = OUT.with_suffix(OUT.suffix + f".bak_{int(datetime.now().timestamp())}")
         shutil.copy2(OUT, bak)
         print(f"backup at {bak.name}")
-    write_csv(OUT, rows)
+    write_csv(OUT, rows, cfg["ruler_encoding"])
     print(f"APPLIED: wrote {len(rows)} rows to {OUT}")
     return 0
 

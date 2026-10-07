@@ -1,3 +1,19 @@
+## CURRENT STATE (2026-10-07, post-BUG-665-rails-1+2 — SUPERSEDES all below for resume)
+
+- HEAD was f629b7f. This turn fixed BUG-665 rails 1+2 at ROOT CAUSE (D-2646/D-2644/C16/C12), never by ceiling/allow.
+  * check_encoding_homes CLEAN: build_anchor_bridge_ruler_208.py write now sources `cfg["ruler_encoding"]` (C12);
+    check_anchor_axis_consistency.py CSV read delegates to artifact_encoding.open_artifact (D-2646).
+  * check_silent_repair OWED (2): removed errors="replace" in detect_same_work_content.py:142; converted
+    pipeline/enhance_md_headers.py `lines:[182,248]` -> `match:` (BUG-542 stale coordinate).
+- BUG-665 STILL OPEN (rail 3): undeclared-encoding census 161/156 (411/392, 82/74) — 5 new D-2811 files. Root-cause
+  fix = REPAIR those files; a ceiling re-baseline is an OWNER-RATIFIED DECISION (D-2642 shrink-only). OWNER-GATE.
+- Register **432 = 162 open / 270 closed**, highest OPEN **BUG-665** (rail 3 remainder).
+- FINDING (pre-existing, NOT this turn): build_anchor_bridge_ruler_208.py --apply fails-closed on 3 ambiguous folded
+  extras (R152/R192/R197 match 2 corpus rows) — owner data adjudication, not encoding.
+- NEXT (priority): BUG-665 rail 3 (repair 5 files / owner re-baseline), BUG-631 (52 over-cap FBs, D-2838 writer-limb),
+  D-2853 close-out (28-row referee remap + closed-menu v5->v7 + D-2859), D-2858 (or-entail recalibration).
+- OWNER-GATE (do NOT cross unilaterally): referee = governance/discipline_anchor_rederived_v6_20261006d.json + 28-row remap.
+
 ## CURRENT STATE (2026-10-07, post-BUG-667-fix — SUPERSEDES all below for resume)
 
 - HEAD was 6d08336. This turn landed the BUG-667 re-mint (authority marker) + D-2862 RATIFIED (owner-approved re-mint).

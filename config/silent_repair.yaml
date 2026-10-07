@@ -95,9 +95,11 @@ debt:
     mode: replace
     why: pipeline/** is will_not_touch this session (rail 4); the convert path READS BACK the md it will write.
   - path: pipeline/enhance_md_headers.py
-    lines: [182, 248]
+    # BUG-542: was `lines: [182, 248]`, a COORDINATE that went stale when the header pass grew a line above each
+    # site (182->183, 248->249) - ONE site reported twice (STALE + FATAL DRIFT). Keyed by CONTENT now.
+    match: 'md_path.read_text(errors'
     mode: replace
-    why: pipeline/** is will_not_touch this session (rail 4); the header pass writes the text it repaired.
+    why: the header pass writes the text it repaired; repoint to scripts/lib/artifact_encoding.py.
   - path: pipeline/fix_remaining.py
     lines: [235, 263]
     mode: replace

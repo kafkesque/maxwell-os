@@ -139,7 +139,7 @@ def _full_text_hashes(path: str, cfg: dict[str, Any]) -> np.ndarray:
     """Read MD file -> word shingles -> sorted unique int64 hashes (capped)."""
     k = int(cfg["shingle_k"])
     cap = int(cfg["max_shingles_per_doc"])
-    with open(path, encoding="utf-8", errors="replace") as fh:
+    with open(path, encoding="utf-8") as fh:
         text = fh.read()
     sh = word_shingles(text, k)
     if not sh:

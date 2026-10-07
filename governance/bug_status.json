@@ -3,8 +3,8 @@
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
   "total_ids": 432,
-  "open_n": 161,
-  "closed_n": 271,
+  "open_n": 160,
+  "closed_n": 272,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -754,11 +754,6 @@
       "events": 1
     },
     {
-      "id": "BUG-631",
-      "title": "(OPEN, 2026-10-04) \u2014 max_domains_per_fb = 5 is UNENFORCED on every post-commit path: 52 FBs carry 6-7 domains, all classification_status=CLE",
-      "events": 1
-    },
-    {
       "id": "BUG-632",
       "title": "(OPEN, 2026-10-04) \u2014 the D2496 \"authoritative expected FB count\" gate CANNOT DISTINGUISH a DECLARED failure from a SILENT drop, so S5 and S6",
       "events": 1
@@ -1060,6 +1055,7 @@
     "BUG-625",
     "BUG-626",
     "BUG-627",
+    "BUG-631",
     "BUG-633",
     "BUG-634",
     "BUG-637",

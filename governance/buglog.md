@@ -9104,3 +9104,21 @@ re-hash. verify_artifact_authority now exits 0 (2 markers, 17 files, 0 RED).
 `archive/index.yaml` fails the coverage invariant: bloat_20260929 is on disk but in NEITHER the index nor the declared exclusions.
 Run `python3 scripts/build_archive_index.py` (or declare the exclusion) — an on-disk object is INDEXED or DECLARED excluded, never
 silently absent (BUG-537).
+
+## BUG-631 — FIXED (2026-10-07) — max_domains_per_fb=5 was DETECTED but not ENFORCED on 52 historical rows: re-derived through the D-2838 writer-limb
+
+Root cause (D-2838/BUG-631): the writer-limb `_enforce_domain_cardinality` (D-2838) landed AFTER 52 FBs carrying 6-7 VALID
+domains were already committed (every one classification_status=CLEAN). The reader-limb (scripts/check_domain_cardinality.py)
+measured them as over-cap (46@6 + 6@7 = 52) but detection without re-derivation left the committed store violating its own
+cardinality contract.
+
+FIXED (2026-10-07): scripts/rederive_domain_cardinality.py re-derives the 52 rows THROUGH the writer-limb — it IMPORTS
+`_enforce_domain_cardinality` from pipeline/stage4_merge (one rule, one home, D-2644) rather than re-implementing the
+truncation, so a re-derivation can never drift from the writer that enforces new rows. Per FB: `domains` truncated to the
+first 5 (model order preserved), `classification_status` CLEAN->FALLBACK, receipt appended to `classification_error`
+("domain cardinality N>5: truncated to cap (dropped [...])"), `domains_raw` (pre-canonical classifier input) left UNTOUCHED.
+C6: a transaction-consistent backup via SQLite online-backup API before the first write, all 52 updates in one transaction.
+Deterministic (LLM-free), idempotent (a re-run finds 0 and writes nothing). R5: gemma GO (6/6 checks).
+
+VERIFIED: check_domain_cardinality.py -> EXIT=0 (0 over-cap of 14574, cap=5); PRAGMA integrity_check ok; 52 FBs now FALLBACK
+with receipt; control tests 14/14 pass (rail + reader).

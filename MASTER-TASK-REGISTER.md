@@ -2145,3 +2145,22 @@ NEXT (refreshed D-2772):
 - STILL OWNER-GATED (do NOT cross unilaterally): BUG-659 (shrink-only ceiling re-baseline), BUG-660 (health read-only),
   BUG-665 (encoding repoint to artifact_encoding.py), BUG-666 (write-boundary teeth), BUG-667 (t11 authority re-mint
   via D-2862), BUG-631 (52 over-cap FB re-derive via D-2838 writer-limb).
+
+---
+
+## BUG-631 FIXED (2026-10-07) — 52 over-cap FBs re-derived through the D-2838 writer-limb
+
+- BUG-631 FIXED: `scripts/rederive_domain_cardinality.py` re-derives the 52 historical over-cap FBs (46@6 + 6@7, all CLEAN)
+  THROUGH the writer-limb — it IMPORTS `_enforce_domain_cardinality` from `pipeline/stage4_merge` (one rule, one home, D-2644),
+  never re-implements the truncation. Per FB: `domains` truncated to first 5 (model order), `classification_status`
+  CLEAN->FALLBACK, receipt appended to `classification_error`, `domains_raw` UNTOUCHED. C6: SQLite online-backup API +
+  single transaction. Deterministic (LLM-free), idempotent. R5 gemma GO (6/6).
+- VERIFIED: check_domain_cardinality.py -> EXIT=0 (0 over-cap of 14574); PRAGMA integrity_check ok; 14/14 control tests.
+- Bug register now 160 open / 272 closed of 432 (session_seed open_bugs_n 161->160).
+- STILL OWNER-GATED (do NOT cross unilaterally): BUG-659, BUG-660, BUG-665 (--record 156->153), BUG-667 (done via D-2862),
+  D-2853 (28-row referee remap 'research & methodology'->'research practice'), bridge-ruler 3 folded extras (R152/R192/R197).
+- NEXT (critical order; [OG]=owner-gated):
+  (1) [OG] BUG-665 tail: ratify --record re-baseline 156->153 (genuine shrink, no drift);
+  (2) [OG] D-2853: confirm 20261006d canonical referee + approve 28-row domain remap, then finish rename + config refs + closed_menu v5->v7 + D-2859 off-by-one;
+  (3) D-2858: recalibrate D-2822 under or-entail -> re-pin threshold (D-353) -> flip nli_aggregation (fail-closed guard);
+  (4) [OG] bridge-ruler 3 folded extras (R152/R192/R197) owner adjudication.

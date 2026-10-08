@@ -9451,6 +9451,28 @@ discipline abstention as the token - including for R140, which is now a DROP, so
 residue there. The correct fix remains the consolidation chain (stamp \`discipline: ""\` +
 \`discipline_status: abstained\` + \`discipline_source: owner_abstained\`), never a hand edit.
 
+## BUG-687 (OPEN, 2026-10-08) — `config/recalibration_pins.yaml` pins a GITIGNORED derived artifact: `nli_calibration` → `knowledge pipeline/metrics/nli_calibration.json` (D-2863)
+
+Root cause of BUG-681(c). `config/recalibration_pins.yaml#pins.nli_calibration` (D-2863) pins
+`knowledge pipeline/metrics/nli_calibration.json` — a 16 MB regenerable calibration-run OUTPUT (keys:
+`pair_count`, `threshold_candidates`, `best_f1_threshold`, `best_precision_threshold`, `raw_scores`) — under the
+gitignored `knowledge pipeline/` directory (.gitignore line 73). A pin certifies IMMUTABILITY of a TRACKED
+artifact; a gitignored subject can never hold in `git archive HEAD` (fixture / fresh clone / recovered repo —
+the BUG-574/BUG-578 class), so the pin is a no-op in the live tree (file present on disk, sha256 matches the pin
+exactly) and a HARD failure in any fresh materialization. It is a CATEGORY ERROR: all 6 sibling pins point to
+TRACKED source files; this one points to a gitignored derived cache.
+
+MEASURED (check_boundary_rehearsal, fault BUG-681(c)): the whole-tree commit's ACTUAL refusal text is now
+`RED staged config/recalibration_pins.yaml declares the pins themselves — nli_calibration: pinned path is
+missing: knowledge pipeline/metrics/nli_calibration.json` from RAIL 3 (recalibration pins), NOT the declared
+RAIL 4 `FORBIDDEN session plan`. RAIL 3 fires before RAIL 4 (hook order) because `git add -A` stages the pins
+file, whose SCAN fails on the absent gitignored subject.
+
+FIX (OWNER-GATED, D-353): retire the pin (with a `retired:` marker) — the NLI threshold's durable source of
+truth is already `config/pipeline_config.yaml#stage5.nli_calibration` {aggregation, threshold: 0.5, decision:
+D-2863}, which is tracked — or re-scope it to a tracked artifact. Do NOT hand-edit the rehearsal's declared
+marker (that hides the drift) and do NOT track the 16 MB derived blob (C28 bloat, contradicts "regenerable").
+
 ## BUG-682 (CLOSED, 2026-10-08 — Stage 2 projection landed) — the axis had TWO homes: the owner's rulings are absent from the face the PIPELINE reads, and the rail that should have caught it compared an artifact with its own copy
 
 MEASURED this round (not inferred):

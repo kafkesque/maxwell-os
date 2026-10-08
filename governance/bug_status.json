@@ -2,8 +2,8 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 450,
-  "open_n": 163,
+  "total_ids": 451,
+  "open_n": 164,
   "closed_n": 287,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
@@ -822,6 +822,11 @@
       "id": "BUG-681",
       "title": "(OPEN, 2026-10-08) \u2014 `just health-full` found 6 faults in one pass; 2 fixed deterministically, 4 remain (3 red contract tests + 3 rails) and",
       "events": 2
+    },
+    {
+      "id": "BUG-687",
+      "title": "(OPEN, 2026-10-08) \u2014 `config/recalibration_pins.yaml` pins a GITIGNORED derived artifact: `nli_calibration` \u2192 `knowledge pipeline/metrics/nl",
+      "events": 1
     }
   ],
   "closed": [

@@ -1,15 +1,6 @@
 {
   "artifact_id": "ANCHOR-STORE-BRIDGE",
-  "declared_golden_unjoined": [
-    {
-      "id": "S4-GOLD-MINED-00478",
-      "why": "Ambiguous under the declared normalization: two corpus rows share the folded name, so the join refuses to pick one (D-2658 - a join is by content, never by position). OWED: an explicit fb_id before this row enters any train/eval set. It is NOT evidence that the anchor and the corpus disagree."
-    },
-    {
-      "id": "S4-GOLD-MINED-00600",
-      "why": "Same cause as S4-GOLD-MINED-00478: two candidate corpus rows under collapse_whitespace, recorded and never picked. OWED: an explicit fb_id. Keeping it declared forever would hide the owed repair, which is exactly why a declaration that starts JOINING is reported as owner-owed."
-    }
-  ],
+  "declared_golden_unjoined": [],
   "declared_unresolved": [],
   "entries": {
     "0380358c6bb42d9c5821f55ac2b77b0770a4f3064506ca0921d2c0fa4dc01c12": {

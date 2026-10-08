@@ -218,6 +218,15 @@ def strip_volatile(doc: dict) -> dict:
     return clone
 
 
+def golden_gated(cfg: dict) -> bool:
+    """Whether the golden join is an ACTIVE eval gate. D-2618 retired the 1,027-example gpt-oss silver pool to
+    TRAIN-ONLY (archive/golden_retired_D2618/); a retired golden's unjoined rows are EXPECTED (it is not an eval
+    target), so the bridge still RECORDS the join (the D-2618 re-adoption path) but does NOT fail the verdict on
+    it. A golden is gated unless config declares `status: retired` (the default 'active' keeps the BUG-551 gate
+    for any re-adopted ACTIVE eval golden)."""
+    return (cfg.get("golden") or {}).get("status", "active") != "retired"
+
+
 def verdict(doc: dict, cfg: dict) -> Tuple[int, str]:
     """Tri-state verdict for a freshly derived document."""
     c, j = doc["join"]["counts"], doc["join"]
@@ -229,25 +238,30 @@ def verdict(doc: dict, cfg: dict) -> Tuple[int, str]:
         return EXIT_DRIFT, f"{len(extra)} UNDECLARED unresolved row(s): {extra[:8]}"
     if j["unresolved"]:
         return EXIT_OWED, f"{len(j['unresolved'])} unresolved row(s), all DECLARED in config"
-    # GOLDEN side - the SAME rule as the corpus side (BUG-551). Before the declared ceiling existed, ANY unjoined
-    # golden row exited 2 while the config declared nothing: the verdict claimed a declaration nobody made and a
-    # real receiving-side breakage would have been filed as owner-owed instead of DRIFT.
-    gdecl = [d for d in (cfg.get("declared_golden_unjoined") or []) if isinstance(d, dict)]
-    gthin = [str(d.get("id")) for d in gdecl if len(str(d.get("why") or "").strip()) < MIN_WHY]
-    if gthin:
-        return EXIT_DRIFT, f"declared_golden_unjoined entr(y/ies) carry no adequate why: {gthin[:4]}"
-    gdecl_ids = {str(d.get("id")) for d in gdecl}
-    gunjoined = list(doc["golden_join"]["unjoined"])
-    gundeclared = sorted(set(gunjoined) - gdecl_ids)
-    if gundeclared:
-        return EXIT_DRIFT, (f"golden: {len(gundeclared)} UNDECLARED unjoined row(s): {gundeclared[:8]} - an "
-                            f"unjoined golden row is a BRIDGE GAP (BUG-551), not owner-owed until config declares it")
-    gstale = sorted(gdecl_ids - set(gunjoined))
-    if gstale:
-        return EXIT_OWED, (f"golden: declared_golden_unjoined names {len(gstale)} row(s) that now JOIN "
-                           f"({gstale[:4]}) - a declaration that no longer applies is OWNER-OWED; shrink the ceiling")
-    if gunjoined:
-        return EXIT_OWED, f"golden: {len(gunjoined)} row(s) unjoined, all DECLARED in config ({gunjoined[:4]})"
+    # GOLDEN side - the SAME rule as the corpus side (BUG-551) applies ONLY while the golden is an ACTIVE eval
+    # gate. D-2618 retired the 1,027-example gpt-oss silver pool to TRAIN-ONLY
+    # (archive/golden_retired_D2618/): a retired golden's unjoined rows are EXPECTED (it is not an eval target),
+    # so the bridge still RECORDS the join (the D-2618 re-adoption path) but does NOT fail the verdict on it.
+    # Before the declared ceiling existed, ANY unjoined golden row exited 2 while the config declared nothing:
+    # the verdict claimed a declaration nobody made and a real receiving-side breakage would have been filed as
+    # owner-owed instead of DRIFT.
+    if golden_gated(cfg):
+        gdecl = [d for d in (cfg.get("declared_golden_unjoined") or []) if isinstance(d, dict)]
+        gthin = [str(d.get("id")) for d in gdecl if len(str(d.get("why") or "").strip()) < MIN_WHY]
+        if gthin:
+            return EXIT_DRIFT, f"declared_golden_unjoined entr(y/ies) carry no adequate why: {gthin[:4]}"
+        gdecl_ids = {str(d.get("id")) for d in gdecl}
+        gunjoined = list(doc["golden_join"]["unjoined"])
+        gundeclared = sorted(set(gunjoined) - gdecl_ids)
+        if gundeclared:
+            return EXIT_DRIFT, (f"golden: {len(gundeclared)} UNDECLARED unjoined row(s): {gundeclared[:8]} - an "
+                                f"unjoined golden row is a BRIDGE GAP (BUG-551), not owner-owed until config declares it")
+        gstale = sorted(gdecl_ids - set(gunjoined))
+        if gstale:
+            return EXIT_OWED, (f"golden: declared_golden_unjoined names {len(gstale)} row(s) that now JOIN "
+                               f"({gstale[:4]}) - a declaration that no longer applies is OWNER-OWED; shrink the ceiling")
+        if gunjoined:
+            return EXIT_OWED, f"golden: {len(gunjoined)} row(s) unjoined, all DECLARED in config ({gunjoined[:4]})"
     return EXIT_CLEAN, (f"{c['joined']}/{c['rows']} anchor rows bridged (exact {c['exact']}, "
                         f"normalised {c['normalized']}); golden {doc['golden_join']['joined']}/"
                         f"{doc['golden_join']['rows']} joined")
@@ -285,6 +299,7 @@ def selftest() -> int:
     g_un = json.loads(json.dumps(clean)); g_un["golden_join"]["unjoined"] = ["G9"]
     g_decl = {"declared_golden_unjoined": [{"id": "G9", "why": "declared: the name matches two corpus rows, so the bridge refuses to pick (owner-owed)"}]}
     g_thin = {"declared_golden_unjoined": [{"id": "G9", "why": "declared"}]}
+    g_retired = {"golden": {"status": "retired"}}
     cases: List[Tuple[str, Any, Any]] = [
         ("exact join counted", c["exact"], 1),
         ("normalised join counted", c["normalized"], 1),
@@ -303,6 +318,8 @@ def selftest() -> int:
         ("golden unjoined DECLARED exits 2", verdict(g_un, g_decl)[0], EXIT_OWED),
         ("a declaration without an adequate why exits 1", verdict(g_un, g_thin)[0], EXIT_DRIFT),
         ("a declaration whose row now JOINS is owner-owed (shrink-only)", verdict(clean, g_decl)[0], EXIT_OWED),
+        ("a RETIRED golden does not gate unjoined rows (D-2618: recorded, never gated)", verdict(g_un, g_retired)[0], EXIT_CLEAN),
+        ("a RETIRED golden ignores a stale declaration too (no gate)", verdict(clean, {**g_decl, "golden": {"status": "retired"}})[0], EXIT_CLEAN),
         ("volatile stamp ignored", "pipeline_commit" in strip_volatile({"pipeline_commit": "a", "inputs": {}}), False),
     ]
     bad = 0

@@ -15153,3 +15153,33 @@ decisions:
   - config/recalibration_pins.yaml
   - config/pipeline_config.yaml
   - governance/buglog.md
+- id: D-2883
+  state: RATIFIED
+  category: GOVERNANCE / BRIDGE
+  title: Retire the D-2618 golden out of the bridge drift check (BUG-688)
+  decision: 'BUG-688 (owner approved 2026-10-08): the anchor<->corpus bridge golden-side verdict (BUG-551) treated
+    every
+
+    unjoined row of the D-2618 RETIRED golden as a BRIDGE GAP. Correct only while the golden was an ACTIVE eval
+
+    target; D-2618 retired the 1,027-example gpt-oss silver pool to TRAIN-ONLY (93.3% unverified, never eval), so
+
+    its unjoined rows are EXPECTED, not a breakage. The golden''s role is now `status: retired`
+
+    (config/anchor_family.yaml#store_bridge.golden): the bridge RECORDS the join (the D-2618 re-adoption path) but
+
+    no longer GATES the verdict on it (build_anchor_store_bridge.py#golden_gated; default ''active'' keeps the
+
+    BUG-551 gate for any re-adopted ACTIVE golden). Two prior declarations superseded (ambiguity stays in
+
+    golden_join.unjoined_detail). NOT declaring 60 exceptions, NOT force-joining (D-2658). VERIFIED: --check ok,
+
+    selftest 21/21.'
+  bugs:
+  - BUG-688
+  files:
+  - scripts/build_anchor_store_bridge.py
+  - config/anchor_family.yaml
+  - justfile
+  - governance/ANCHOR_STORE_BRIDGE_20260926.json
+  - governance/buglog.md

@@ -9475,6 +9475,26 @@ durable NLI source of truth remains TRACKED and unchanged: config/pipeline_confi
 derived-blob pin is withdrawn. VERIFIED: verify_recalibration_pins.py scan 6 pinned / 0 DRIFT / 0 OWNER-OWED
 (selftest 16/16); check_boundary_rehearsal whole-tree commit refused by the DECLARED RAIL 4 again (not RAIL 3).
 
+## BUG-688 (CLOSED, 2026-10-08 — golden gated-out, D-2883) — the anchor↔corpus bridge DRIFT-gated on the D-2618 RETIRED golden, so `--check` exited 1 on 58 expected unjoined rows
+
+The bridge's golden-side verdict (BUG-551) treated every unjoined row of `archive/golden_retired_D2618/stage4_golden_mined.yaml`
+as a BRIDGE GAP. That rule was correct only while the golden was an ACTIVE eval target; it is a CATEGORY ERROR after
+D-2618 retired that 1,027-example gpt-oss silver pool to TRAIN-ONLY (93.3% unverified per D-2616, never eval). A
+retired train-only pool's unjoined rows are EXPECTED (the silver pool carries ambiguous/duplicate names by
+construction), not a receiving-side breakage.
+
+MEASURED: `python3 scripts/build_anchor_store_bridge.py --check` → `drift golden: 58 UNDECLARED unjoined row(s) ...`
+(rc=1, a BRIDGE GAP). The golden joins 967/1027; the 60 unjoined are all `ambiguous` under collapse_whitespace
+(D-2658: the bridge refuses to pick, never a positional pick). Only 2 were declared — declaring 60 exceptions would
+be a permission-slip anti-pattern and force-joining them would violate D-2658.
+
+RESOLUTION (D-2883, owner approved 2026-10-08): the golden's ROLE is declared `status: retired` in
+config/anchor_family.yaml#store_bridge.golden; the bridge still RECORDS the join (the D-2618 re-adoption path) but no
+longer GATES the verdict on it (`build_anchor_store_bridge.py#golden_gated`; the default 'active' keeps the BUG-551
+gate for any re-adopted ACTIVE eval golden). The two prior declarations (S4-GOLD-MINED-00478, -00600) are superseded
+by the retirement (their ambiguity stays recorded in golden_join.unjoined_detail, not lost). VERIFIED: bridge --check
+ok (rc=0); selftest 21/21 (2 new retired-golden controls).
+
 ## BUG-682 (CLOSED, 2026-10-08 — Stage 2 projection landed) — the axis had TWO homes: the owner's rulings are absent from the face the PIPELINE reads, and the rail that should have caught it compared an artifact with its own copy
 
 MEASURED this round (not inferred):

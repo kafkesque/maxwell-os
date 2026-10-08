@@ -183,25 +183,20 @@ store_bridge:
   canonical_run: rechunk-v4-20260929
   declared_unresolved: []
   golden:
+    # D-2618 retired the 1,027-example gpt-oss silver pool to TRAIN-ONLY (archive/golden_retired_D2618/;
+    # 93.3% unverified per D-2616). A retired golden is NOT an eval target, so its unjoined rows are EXPECTED:
+    # the bridge still RECORDS the join (the D-2618 re-adoption path) but does NOT gate the verdict on it
+    # (build_anchor_store_bridge.py#golden_gated). When a clean subset is re-adopted as an ACTIVE eval golden,
+    # flip this to `status: active` and the BUG-551 gate re-engages automatically.
+    status: retired
     path: archive/golden_retired_D2618/stage4_golden_mined.yaml
     id_key: id
     name_path: input_fb.name
 
-  # DECLARED GOLDEN-SIDE BRIDGE GAPS (BUG-551, 2026-09-26). MEASURED: both rows below do NOT join because their
-  # `input_fb.name` normalises onto TWO corpus rows (`histogram: {ambiguous: 2}`) - the bridge refuses to PICK, so
-  # the row is OWNER-OWED until it carries an explicit fb_id. Before this key existed the rail exited 2 on ANY
-  # unjoined golden row while the config declared NOTHING: the verdict claimed a declaration nobody made and a real
-  # receiving-side breakage would have been filed as owner-owed instead of DRIFT (the BUG-548 class). ONE rule for
-  # BOTH sides now: UNDECLARED unjoined = 1 (DRIFT), DECLARED = 2, no adequate why = 1, and a declaration whose row
-  # now JOINS = 2 - the ceiling is SHRINK-ONLY and it shrinks LOUDLY.
-  declared_golden_unjoined:
-    - id: S4-GOLD-MINED-00478
-      why: >-
-        Ambiguous under the declared normalization: two corpus rows share the folded name, so the join refuses to
-        pick one (D-2658 - a join is by content, never by position). OWED: an explicit fb_id before this row enters
-        any train/eval set. It is NOT evidence that the anchor and the corpus disagree.
-    - id: S4-GOLD-MINED-00600
-      why: >-
-        Same cause as S4-GOLD-MINED-00478: two candidate corpus rows under collapse_whitespace, recorded and never
-        picked. OWED: an explicit fb_id. Keeping it declared forever would hide the owed repair, which is exactly
-        why a declaration that starts JOINING is reported as owner-owed.
+  # DECLARED GOLDEN-SIDE BRIDGE GAPS (BUG-551). EMPTY while the golden is RETIRED (D-2618): the two prior
+  # declarations (S4-GOLD-MINED-00478, S4-GOLD-MINED-00600) were made under the ACTIVE-golden BUG-551 gate and are
+  # superseded by the retirement; the fact they are ambiguous is still recorded in the artifact's
+  # golden_join.unjoined_detail (cause + candidates), not lost. Repopulate ONLY when a golden is re-adopted as an
+  # ACTIVE eval gate: UNDECLARED unjoined = 1 (DRIFT), DECLARED = 2, no adequate why = 1, a declaration whose row
+  # now JOINS = 2 (SHRINK-ONLY, loudly).
+  declared_golden_unjoined: []

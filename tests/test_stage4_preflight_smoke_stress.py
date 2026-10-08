@@ -234,11 +234,12 @@ def test_taxonomy_exact_and_synonym() -> None:
 
 
 def test_taxonomy_cross_kind_collision_resolves_correctly() -> None:
-    """`user experience design` is a DOMAIN alias (→ user experience) AND a
-    discipline alias (→ human-computer interaction). Kind-constrained index must
-    route each correctly (D2133)."""
+    """`user experience design` is a DOMAIN alias (→ user experience); its
+    DISCIPLINE alias (→ human-computer interaction) was dropped by D-2865 C
+    (cross-axis MECE violation, BUG-630), so the discipline axis now abstains
+    → 'emerging'. Kind-constrained index must route each correctly (D2133)."""
     assert map_to_canonical_with_fallback("user experience design", "domain", SYN, CANONICAL_DOMAINS) == "user experience"
-    assert map_to_canonical_with_fallback("user experience design", "discipline", SYN, CANONICAL_DISCIPLINES) == "human-computer interaction"
+    assert map_to_canonical_with_fallback("user experience design", "discipline", SYN, CANONICAL_DISCIPLINES) == "emerging"
     assert map_to_canonical_with_fallback("ux design", "domain", SYN, CANONICAL_DOMAINS) == "user experience"
     assert map_to_canonical_with_fallback("ux design", "discipline", SYN, CANONICAL_DISCIPLINES) == "emerging"
 

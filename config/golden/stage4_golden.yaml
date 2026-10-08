@@ -40,7 +40,7 @@ examples:
     boundary: "Applies to systems with multiplicative growth or preferential attachment. Fails for quantities with a characteristic scale (normal distribution) or hard upper bounds."
   expected_classification:
     discipline: "complex adaptive systems"
-    domains: ["science & research", "business operations"]
+    domains: ["research practice", "business operations"]
     depth: "universal"
     evidence: "cited"
     is_specialized: false
@@ -108,7 +108,7 @@ examples:
     boundary: "Applies when there is sufficient structural similarity between domains to enable meaningful analogy. Fails when the domains are completely dissimilar or when the transfer requires extensive adaptation that loses the original solution's effectiveness."
   expected_classification:
     discipline: "creative process"
-    domains: ["business operations", "science & research"]
+    domains: ["business operations", "research practice"]
     depth: "cross-domain"
     evidence: "cited"
     is_specialized: false

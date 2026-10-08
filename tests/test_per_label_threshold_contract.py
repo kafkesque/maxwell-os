@@ -24,11 +24,13 @@ ROOT = Path(__file__).resolve().parent.parent
 CONFIG_YAML = ROOT / "config" / "pipeline_config.yaml"
 TAXONOMY_YAML = ROOT / "config" / "taxonomy_v5.yaml"
 
-# Current expected count (53 disciplines + 43 domains, labels with >= min-sample
-# corpus presence). If a legitimate re-population changes this, update the constant
-# AND verify the delta is explained in DECISION-LOG before bumping.
-EXPECTED_LABEL_COUNT = 96
-EXPECTED_DOMAIN_COUNT = 43  # domains are multi-valued, so all 43 always have samples
+# Current expected count (53 disciplines + 41 domains, labels with >= min-sample
+# corpus presence). D-2865 merged 'science & research' into 'research practice' and
+# demoted 'social sciences' (both folded into 'research practice'), dropping the v7
+# domain count 43 -> 41. If a legitimate re-population changes this, update the
+# constant AND verify the delta is explained in DECISION-LOG before bumping.
+EXPECTED_LABEL_COUNT = 94
+EXPECTED_DOMAIN_COUNT = 41  # domains are multi-valued, so all 41 always have samples
 
 
 def _canonical_labels() -> tuple[set[str], set[str]]:

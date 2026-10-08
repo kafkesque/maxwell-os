@@ -120,3 +120,37 @@ primary!=domains[0], off-menu-domain, undeclared-sheet-fragment, face-divergence
 ceiling (rc=2, owner-owed) · `check_buglog_coverage` GREEN (596 blocks) · `check_bug_status` GREEN ·
 `check_anchor_axis_consistency` GREEN (ceiling 0 holds) · `check_rail_registry` GREEN ·
 `check_derivation_homes` GREEN · `check_repo_integrity --worktree` GREEN · `check_commit_frontier` GREEN.
+
+## 7. Independent verification (R5: a DIFFERENT model family — gemma-4-E4B-it-MLX-4bit), and where it DRIFTED
+
+Two independent delegates ran against embedded source (they have no filesystem access, so the excerpts were injected —
+the first attempt, which asked them to READ files, returned nothing useful and was discarded rather than counted).
+
+**Code review (adversarial, 6 questions).** Verdict reported as "6 PASS" — but the verdict LABELS were unreliable and are
+recorded as such, not as corroboration:
+
+* it marked the ledger guard "FAIL" while its own quoted line proves the guard FIRES ("If a drop exists but has no
+  corresponding entry ... it raises") — a labelling error, and the guard's behaviour was independently SEEN empirically
+  on its first run (R040 had no entry). Recorded as VERIFIER ERROR.
+* it flagged "hardcoded thresholds: D-2711, BUG-679, D150" — REJECTED as a misapplied finding: those are decision ids
+  quoted inside error messages (provenance citations), not configurable values; moving them to config would let the code
+  cite the WRONG policy with no failure. The C12 rule this round did catch a real instance of the defect it names: the
+  D150 cap was declared TWICE (an unread `cap_domains_per_fb` in this config vs the ONE home
+  `config/pipeline_config.yaml#max_domains_per_fb` that the applier actually reads) — the rival declaration is REMOVED
+  and replaced by a pointer comment (D-2646/D-2649: one derived value, one home).
+* it confirmed the scope checks in `build_reinstated` are exhaustive, and that no selftest control is tautological.
+
+**Ontology adjudication (3 rulings, blind-ish).** AGREE on all three (R040 95, R091 90, R158 100) — and it VOLUNTEERED
+that the framing pushed it toward agreement ("presenting the rulings as established facts ... biases the verification
+toward confirmation"). Its RULING C verdict (confidence 100, "None" as the counterargument, reasoning: "the primary
+domain was agreed upon by an owner, so my role is to uphold the consensus, not overturn it") is DEFERENCE, not
+verification: recorded as a **verifier-drift signal** and NOT averaged into consensus — exactly the shape the round-2
+verifier showed when it anchored on the protected-primary hint.
+
+The two SUBSTANTIVE counterarguments it produced are kept as caveats on the record:
+1. **R040** — the drop rests on the item being a case description; if the item's analysis of WHY the souring happens is
+   present, it could carry a transferable mechanism. This is why the drop is a SOFT quarantine with `recheck_due`
+   2026-11-07 (D-2711): a false drop is reversible by construction, never a deletion.
+2. **R091** — the abstention is "a procedural constraint failure, not a conceptual one". Correct, and the design already
+   treats it that way: the abstention is DECLARED (config#discipline_abstention), it warns on every run, and the owner
+   holds a one-word upgrade (§5.1). No synthesized label was written (D-2813).

@@ -28,9 +28,10 @@ source:
 answers_sheet:
   file: governance/OWNER_CONFIRMATION_SHEET_20261008.csv
   sha256: 8e02e65cc5708d5545b76f326221f98b0dcf06376176eb04f1a78a144f2a6d1b
-# D150 per-FB domain cardinality cap (OntoClean: domain = anti-rigid application role; a principle rarely
-# applies in more than a handful of fields).
-cap_domains_per_fb: 7
+# NOTE (D-2646/D-2649: ONE DERIVED VALUE, ONE HOME): the D150 per-FB domain cardinality cap is NOT declared
+# here. Its ONE home is config/pipeline_config.yaml (key max_domains_per_fb), which is what the applier reads
+# via cap_domains(); a second declaration of the same number in this file would be a rival home, and a value
+# here that no reader consumes is the BUG-548 shape (a record with no consumer). Do not re-add it.
 # Abstention placeholder for the domain axis - a catch-all, NEVER a menu value, and never coexists with a
 # concrete domain (enforced by scripts/check_anchor_axis_consistency.py). On the DISCIPLINE axis the
 # abstention is an ABSENCE, not this token (BUG-676).

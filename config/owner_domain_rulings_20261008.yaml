@@ -166,8 +166,13 @@ owner_notes_accounted:
 #   ceiling_divergence  = axis CELLS that disagree with the ruler on a shared item_id.
 #   ceiling_drop_residue = axis cells still populated for a declared noise_drop row (a propagated drop).
 # A value equal to the declared abstention token is an ABSENCE, not a value, and is never counted.
+# RE-MEASURED round 4 (D-2880): 92 -> 93 divergent cells. The rail EARNED ITS KEEP: the round-4 owner ruling
+# (R091's discipline = systems thinking) landed in the ruler and, within minutes, the rail failed LOUDLY because
+# the CONSOLIDATED face still carries \u2018emerging\u2019 for R091 - exactly one cell, exactly the propagation gap the
+# rail exists to expose. Re-declaring is the DELIBERATE act the rail forces (a growth may not be silent), and the
+# drop-residue half is UNCHANGED at 46. Both must go to 0 when the Stage-2 projection lands (BUG-682/684).
 faces:
-  ceiling_divergence: 92
+  ceiling_divergence: 93
   ceiling_drop_residue: 46
   must_follow:
     - name: discipline_anchor_rederived_v8

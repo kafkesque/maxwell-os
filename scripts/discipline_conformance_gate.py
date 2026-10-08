@@ -6,8 +6,8 @@ WHAT IT MEASURES
 Conformance of the PRODUCTION S4 discipline labeler of record
 (merged_cribs_classify → map_to_canonical_with_fallback, D2224/D2138,
 gpt-oss-20b-MXFP4-Q8) against the human-owner discipline anchor
-(governance/discipline_anchor_conformance_20261002.json, 204 owner-finalized rows,
-D-2766). NOTE (D-2770): the FIRST version of this gate measured
+(governance/discipline_anchor_rederived_v8_20261007.json, 201 owner-finalized rows,
+D-2868, superseding the D-2766 204-row conformance). NOTE (D-2770): the FIRST version of this gate measured
 slim_batch_discipline_classify (the BUG-197/D2532 *emerging-row* re-classifier,
 NOT the main S4 classifier) and compared RAW free-form strings without the
 production remap — that under-measured the classifier-of-record and was WRONG.
@@ -52,9 +52,9 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO))
 
-from pipeline.anchor_menu_guard import assert_referee_menu_v6  # noqa: E402
+from pipeline.anchor_menu_guard import assert_referee_menu_current  # noqa: E402
 
-DEFAULT_ANCHOR = REPO / "governance" / "discipline_anchor_conformance_20261002.json"
+DEFAULT_ANCHOR = REPO / "governance" / "discipline_anchor_rederived_v8_20261007.json"
 STORE = REPO / "knowledge pipeline" / "maxwell.db"
 DEFAULT_MODEL = "gpt-oss-20b-MXFP4-Q8"  # classifier of record (stage4_merge.py D2249)
 REPORTING_FLOOR = 0.667
@@ -95,7 +95,7 @@ def load_anchor(path: str) -> list[dict]:
     # BUG-650 / D-2839: the discipline+domain axes are menu-derived and the 204-gold
     # was adjudicated against the PRE-D-2814 free-gen menu. Refuse kappa unless the
     # anchor is re-derived against menu v6 (D-2820) — a pre-D-2820 kappa is CIRCULAR.
-    assert_referee_menu_v6(doc, label=Path(path).name, axis="discipline")
+    assert_referee_menu_current(doc, label=Path(path).name, axis="discipline")
     rows = doc.get("rows", [])
     if not rows:
         raise SystemExit(f"FAIL: discipline anchor has no rows: {path}")

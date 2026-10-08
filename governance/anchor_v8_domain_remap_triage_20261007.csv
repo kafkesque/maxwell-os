@@ -1,0 +1,22 @@
+item_id,name,discipline,old_domains,proposed_domains,change_type,removed,ruling
+R003,Quantum Cognitive Effects in Survey Design,cognitive science,"[""research practice"", ""social sciences""]","[""research practice""]",DROP,social sciences,
+R004,Lockdown Effectiveness and Economic Impact,political economy,"[""research practice"", ""social sciences""]","[""legal & public policy""]",DROP,social sciences,owner
+R033,Postmodern Critique of Realist Assumptions,philosophy,"[""social sciences"", ""research practice""]","[""research practice""]",DROP,social sciences,
+R049,Fermi Estimation Method,operations research,"[""research practice"", ""systems & frameworks"", ""project management"", ""personal productivity"", ""science & research""]","[""research practice"", ""systems & frameworks"", ""project management"", ""personal productivity""]",DROP,science & research,
+R062,Somatic Marker Decision Making,behavioral economics,"[""marketing & communications"", ""social sciences"", ""user experience""]","[""marketing & communications"", ""user experience""]",DROP,social sciences,
+R065,Media Construction of Crime Waves,media studies,"[""social sciences""]","[""media & entertainment""]",ROUTED,social sciences,owner
+R074,Attention Economy Externalities,cognitive science,"[""user experience"", ""social sciences""]","[""user experience""]",DROP,social sciences,
+R075,Paradigm Shift Through Disruption,philosophy,"[""science & research"", ""systems & frameworks"", ""arts & culture""]","[""systems & frameworks"", ""arts & culture""]",DROP,science & research,
+R077,Symbolic Meaning Through Consumption,cultural studies,"[""social sciences"", ""semiotics & communication"", ""marketing & communications""]","[""semiotics & communication"", ""marketing & communications""]",DROP,social sciences,
+R083,Self-herding Behavior,behavioral economics,"[""marketing & communications"", ""social sciences"", ""user experience""]","[""marketing & communications"", ""user experience""]",DROP,social sciences,
+R085,Discursive Strategy Abstraction,cultural studies,"[""research practice""]","[""emerging""]",ROUTED,,owner
+R087,In-group Identity and Social Bonding,psychology,"[""social sciences"", ""organizational behavior""]","[""organizational behavior""]",DROP,social sciences,
+R104,Strategic Information Gathering,operations research,"[""research practice"", ""information architecture"", ""data visualization"", ""science & research""]","[""research practice"", ""information architecture"", ""data visualization""]",DROP,science & research,
+R107,Lived Experience Focus,philosophy,"[""research practice"", ""social sciences""]","[""education"", ""user experience"", ""research practice""]",DROP,social sciences,owner
+R112,Content Analysis Approaches in Visual Research,research methodology,"[""science & research"", ""research practice""]","[""research practice""]",DROP,science & research,
+R115,Heuristic Reasoning in Problem Solving,operations research,"[""science & research"", ""research practice""]","[""research practice""]",DROP,science & research,
+R162,Provincial Norms,psychology,"[""social sciences""]","[""organizational behavior"", ""education"", ""leadership""]",ROUTED,social sciences,owner
+R184,Doping in Professional Sports: Systemic Pressure and Rationalization,behavioral economics,"[""organizational behavior"", ""social sciences""]","[""health & wellness""]",DROP,social sciences,owner
+R198,Survivor Bias in Success Narratives,behavioral economics,"[""research practice""]","[""personal productivity"", ""finance & investment"", ""entrepreneurship""]",ROUTED,,owner
+R204,Expert Overconfidence and Cognitive Laziness,psychology,"[""user experience"", ""social sciences"", ""organizational behavior""]","[""user experience"", ""organizational behavior""]",DROP,social sciences,
+R210,Same-age Peer Modeling,behavioral economics,"[""education"", ""user experience""]","[""education"", ""user experience"", ""marketing & communications""]",ROUTED,,owner

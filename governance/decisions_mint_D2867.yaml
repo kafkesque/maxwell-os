@@ -1,0 +1,21 @@
+- id: D-2867
+  state: RATIFIED
+  category: ANCHOR / TAXONOMY
+  title: 'Regenerate ANCHOR_208_CONSOLIDATED to v8 (201 domains + 7 dropped) + re-point eval_integrity anchor source'
+  decision: |
+    Closes the authority orphan left by BUG-630 / D-2865 / D-2866: the legacy ANCHOR_208_CONSOLIDATED_20261002.json
+    (208 rows) still carried pre-v8 'social sciences' / 'science & research' domains and 86 discipline disagreements
+    vs the owner-finalized rederived lineage. scripts/regenerate_anchor_208_v8.py deterministically (LLM-free) re-joins
+    ANCHOR_208_DEPTH_CORRECTED_20261002.json (depth axis, 208 rows; not menu-derived D-2820) with
+    discipline_anchor_rederived_v8_20261007.json (discipline+domain authority, 201 rows) and emits
+    ANCHOR_208_CONSOLIDATED_20261007.json (208 rows): 201 with v8 domains, 193 golden_eligible, 0 stale domains,
+    primary_domain == first pipe token (0 drift). The 7 depth-only rows carry their D-2844 drop disposition
+    (R021/R084/R106/R148 noise_drop -> null; R040/R080/R091 emerging) — never a stale v8 domain. config/eval_integrity.yaml
+    anchor.source re-pointed to the regenerated artifact (total_anchors unchanged 208). This unblocks the S4 re-run
+    against menu v8 and the anchor2 kappa re-measure.
+  bugs: [BUG-630]
+  files:
+    - scripts/regenerate_anchor_208_v8.py
+    - governance/ANCHOR_208_CONSOLIDATED_20261007.json
+    - governance/discipline_anchor_rederived_v8_20261007.json
+    - config/eval_integrity.yaml

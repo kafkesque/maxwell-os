@@ -1,0 +1,34 @@
+discipline,current_default_domain,n_anchors,observed_applied_domains,modal_domain,recommendation,owner_final_domain
+aesthetics,arts & culture,7,design strategy | design systems | digital product | editorial & advertising | graphic design | product design,design strategy,MISMATCH (default not observed → remove→fallback or correct),design strategy
+behavioral economics,marketing & communications,20,digital product | education | entrepreneurship | finance & investment | health & wellness | marketing & communications | personal productivity | user experience,user experience,REVIEW (default present but not modal),
+cognitive science,research practice,17,arts & culture | design strategy | design systems | education | emerging | personal productivity | research practice | user experience,user experience,REVIEW (default present but not modal),user experience
+complex adaptive systems,systems & frameworks,2,business development | systems & frameworks,systems & frameworks,KEEP (default == modal applied domain),
+computational geometry,computational science & physics,3,code & computation | creative technology | emerging,emerging,MISMATCH (default not observed → remove→fallback or correct),
+creative process,research practice,5,arts & culture | graphic design | illustration | semiotics & communication,graphic design,MISMATCH (default not observed → remove→fallback or correct),graphic design
+cultural studies,research practice,19,arts & culture | business development | design strategy | digital product | education | emerging | marketing & communications | media & entertainment | research practice | semiotics & communication | systems & frameworks | user experience,media & entertainment,REVIEW (default present but not modal),media & entertainment
+decision making,research practice,13,business development | business operations | design strategy | entrepreneurship | finance & investment | personal productivity | project management | user experience,personal productivity,MISMATCH (default not observed → remove→fallback or correct),personal productivity
+design thinking,design strategy,17,business operations | design strategy | design systems | digital product | graphic design | leadership | product design | project management | user experience,user experience,REVIEW (default present but not modal),
+ecology,systems & frameworks,0,,,NO_EVIDENCE (remove→fallback unless owner has external knowledge),
+economics,finance & investment,3,ai & agents | finance & investment | systems & frameworks,finance & investment,KEEP (default == modal applied domain),
+engineering,engineering practice,6,design strategy | education | emerging | engineering & infrastructure | product design | user experience,engineering & infrastructure,MISMATCH (default not observed → remove→fallback or correct),engineering & infrastructure
+evolutionary biology,health & wellness,0,,,NO_EVIDENCE (remove→fallback unless owner has external knowledge),
+generative ai,ai & agents,5,ai & agents | education | engineering & infrastructure | information architecture,ai & agents,KEEP (default == modal applied domain),
+health & medicine,health & wellness,1,health & wellness,health & wellness,KEEP (default == modal applied domain),
+information retrieval,information architecture,3,ai & agents | information architecture,ai & agents,REVIEW (default present but not modal),
+interdisciplinary studies,research practice,3,creative technology | media & entertainment | user experience,creative technology,MISMATCH (default not observed → remove→fallback or correct),
+linguistics,education,2,semiotics & communication,semiotics & communication,MISMATCH (default not observed → remove→fallback or correct),semiotics & communication
+machine learning,ai & agents,2,code & computation | engineering practice,engineering practice,MISMATCH (default not observed → remove→fallback or correct),
+media studies,media & entertainment,6,design strategy | design systems | editorial & advertising | media & entertainment | semiotics & communication,media & entertainment,KEEP (default == modal applied domain),
+neuroscience,health & wellness,0,,,NO_EVIDENCE (remove→fallback unless owner has external knowledge),
+operations research,research practice,14,business development | business operations | data visualization | finance & investment | information architecture | marketing & communications | personal productivity | project management | research practice | systems & frameworks,research practice,KEEP (default == modal applied domain),
+organizational theory,organizational behavior,10,brand identity | design strategy | leadership | marketing & communications | organizational behavior,organizational behavior,KEEP (default == modal applied domain),
+philosophy,research practice,10,arts & culture | education | emerging | research practice | semiotics & communication | systems & frameworks | user experience,research practice,KEEP (default == modal applied domain),
+political economy,legal & public policy,5,business development | legal & public policy | marketing & communications,legal & public policy,KEEP (default == modal applied domain),
+privacy & surveillance,legal & public policy,4,digital product | information architecture | marketing & communications,information architecture,MISMATCH (default not observed → remove→fallback or correct),
+research methodology,research practice,12,ai & agents | research practice | user experience,research practice,KEEP (default == modal applied domain),
+risk management,finance & investment,8,business operations | engineering & infrastructure | finance & investment | organizational behavior | project management | research practice | systems & frameworks,business operations,REVIEW (default present but not modal),
+semiotics,semiotics & communication,5,design strategy | design systems | semiotics & communication,semiotics & communication,KEEP (default == modal applied domain),
+social network analysis,systems & frameworks,1,business development,business development,MISMATCH (default not observed → remove→fallback or correct),
+systems engineering,engineering & infrastructure,0,,,NO_EVIDENCE (remove→fallback unless owner has external knowledge),
+systems thinking,systems & frameworks,3,design strategy | environmental design | product design,product design,MISMATCH (default not observed → remove→fallback or correct),
+visual semiotics,semiotics & communication,4,graphic design | illustration | media & entertainment | motion design,graphic design,MISMATCH (default not observed → remove→fallback or correct),graphic design

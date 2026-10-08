@@ -40,17 +40,26 @@ systems engineering, systems thinking, typography, visual perception,
 visual semiotics
 ```
 
-### Domains (27 — pick 1-5 per FB, D150)
+### Domains (41 — closed menu in config/taxonomy_v8.yaml; pick 1-7 per FB, D150)
 
 ```
-ai & agents, ml systems & infrastructure, brand identity, business development,
+ai & agents, arts & culture, brand identity, business development,
 business operations, code & computation, computational art,
-computational science & physics, creative technology, data visualization,
-digital product, editorial & advertising, emerging, engineering practice,
-entrepreneurship, environmental design, graphic design, illustration,
-motion design, organizational behavior, packaging, research & methodology,
-semiotics & communication, systems & frameworks, user experience, web & ui
+computational science & physics, creative technology,
+data visualization, design strategy, design systems, digital product,
+editorial & advertising, education, engineering & infrastructure,
+engineering practice, entrepreneurship, environmental design,
+finance & investment, graphic design, health & wellness, illustration,
+industrial design, information architecture, leadership,
+legal & public policy, marketing & communications,
+media & entertainment, motion design, organizational behavior,
+packaging, personal productivity, product design, project management,
+research practice, semiotics & communication, systems & frameworks,
+urban planning, user experience, web & ui
 ```
+
+
+
 
 ### Depth (D2024)
 ```
@@ -207,7 +216,7 @@ Context is derived from domain membership:
 - Are all assigned domains genuinely spanned by this FB?
 - Any domains MISSING that this FB clearly applies to?
 - Any domains INCLUDED that this FB does NOT actually span?
-- Domain count violates D150 (1-5 max)? [yes/no]
+- Domain count violates D150 (1-7 max)? [yes/no]
 - Issues: [list or "none"]
 
 **B3. Depth** | Score: __/5

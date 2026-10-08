@@ -1,0 +1,58 @@
+{
+  "source": "config/taxonomy_v5.yaml",
+  "version_before": "v7",
+  "version_after": "v8",
+  "merge": {
+    "from": "dom-031:science & research",
+    "into": "dom-025:research practice",
+    "raw_src_count": 5,
+    "raw_dst_before": 11,
+    "exclude_src": [
+      "computational science physics",
+      "research methodology"
+    ],
+    "exclude_dst_before": [
+      "user experience",
+      "science research"
+    ],
+    "definition_before": "The design, ethics, and execution of academic and empirical research processes.",
+    "raw_dst_after": 16,
+    "exclude_dst_after": [
+      "user experience",
+      "computational science physics",
+      "research methodology"
+    ],
+    "definition_after": "The professional activity of conducting, publishing, and applying scholarly and scientific research."
+  },
+  "demote": {
+    "id": "dom-035",
+    "canonical": "social sciences",
+    "raw": [
+      "Social Work",
+      "social science",
+      "criminology",
+      "social research",
+      "demography"
+    ],
+    "raw_dst_before_fold": 16,
+    "raw_dst_after_fold": 21
+  },
+  "raw_dedup": {
+    "discipline": "disc-036:human-computer interaction",
+    "dropped_raw": "user experience design",
+    "kept_in": "dom-010:user experience",
+    "raw_before": 9,
+    "raw_after": 8
+  },
+  "displaced_canonicals": [
+    "social engineering",
+    "ml systems & infrastructure",
+    "computer networking",
+    "science & research",
+    "social sciences"
+  ],
+  "counts": {
+    "domains": 41,
+    "disciplines": 64
+  }
+}

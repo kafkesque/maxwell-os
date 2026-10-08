@@ -1,0 +1,34 @@
+- id: D-2875
+  state: RATIFIED
+  category: ANCHOR / TAXONOMY
+  title: 'ANCHOR-2 golden referee R172/R209 reconciliation — propagate the D-2874 domain-axis rulings to the 60-row kappa referee (referee drift close-out)'
+  bugs: [BUG-672]
+  decision: |
+    Follow-through to D-2874's documented KNOWN FOLLOW-UP; closes BUG-672 (the ANCHOR-2 referee
+    carried stale R172/R209 domain verdicts after D-2874 ruled). D-2874 finalized the 8 owner-gated
+    domain-axis rulings, including R172 ("Digital System Context Decomposition") -> engineering
+    practice | engineering & infrastructure, product design (primary=engineering practice) and R209
+    ("Procedural Vs Declarative Knowledge Retrieval") -> ai & agents | education (primary=ai & agents).
+    The 60-row ANCHOR-2 kappa referee still carried the pre-ruling verdicts, so the human truth and the
+    authority disagreed (referee drift). Deterministic, LLM-free propagation (R5 not implicated).
+
+    Changes (ANCHOR2_V8_REMINT_TRIAGE_20261007.csv OWNER_APPLY rows):
+      SHEET row 22 (R172): systems & frameworks|engineering practice|product design
+                           -> engineering practice|engineering & infrastructure|product design
+      SHEET row 59 (R209): user experience|education -> ai & agents|education
+
+    Re-minted remint_anchor2_v8.py (CHECK PASS, 60 keys / 60 sheet rows, 0 OOV, referee menu-current),
+    then re-measured anchor2_kappa.py. Domains-axis micro-kappa 0.6463 (unchanged at 4dp: the
+    reconciliation swaps one mismatched domain for another per row, so pipeline-vs-human agreement is
+    unaffected); the fix corrects the referee to the authority, not the pipeline score.
+
+    NOT in scope (flagged): R172's discipline axis — blind sheet still annotates "systems thinking" while
+    the re-derived authority says "engineering" and the pipeline key says "software engineering". This is a
+    pre-existing discipline-axis discrepancy, not a D-2874 domain ruling; queued for a separate owner
+    review.
+  files:
+    - governance/ANCHOR2_V8_REMINT_TRIAGE_20261007.csv
+    - governance/ANCHOR2_KEY_V8_20261007.json
+    - governance/ANCHOR2_BLIND_SHEET_V8_20261007.csv
+    - governance/anchor2_kappa_v8_20261007.json
+    - governance/anchor2_kappa_v8_20261007.md

@@ -1,0 +1,48 @@
+- id: D-2874
+  state: RATIFIED
+  category: ANCHOR / TAXONOMY
+  title: 'Domain-axis emerging finalization — 8 owner-gated rulings folded into the v8 authority (ruler re-freeze)'
+  bugs: [BUG-671]
+  decision: |
+    Owner-gated (2026-10-08) finalization of the 8 "emerging-primary" domain-axis rows (closes BUG-671, the domain-axis `emerging` catch-all blindspot). Deterministic,
+    LLM-free data transform (R5 not implicated; same reasoning as remint_anchor2_v8.py). OntoClean
+    two-axis rule (Guarino & Welty 2002): discipline=rigid kind, domain=anti-rigid application role;
+    primary_domain MUST be domains[0]; every label validated against the 41-domain closed menu (0 OOV,
+    max 3 labels <= 5 cap).
+
+    Rulings (primary | secondaries):
+      R032 engineering practice
+      R066 computational science & physics | code & computation
+      R085 education | health & wellness, semiotics & communication
+      R101 research practice | education
+      R113 engineering practice | computational science & physics
+      R141 engineering practice | code & computation
+      R172 engineering practice | engineering & infrastructure, product design
+      R209 ai & agents | education
+
+    Write limb (authority -> deterministic consumers, never hand-patched):
+      scripts/apply_owner_domain_rulings_v8.py (config/owner_domain_rulings_20261008.yaml, fail-closed)
+      -> discipline_anchor_rederived_v8_20261007.json (authority, 8 rows folded)
+      -> regenerate_anchor_208_v8.py -> ANCHOR_208_CONSOLIDATED_20261007.json (208 rows, 0 stale)
+      -> build_domain_ruler.py -> DOMAIN_RULER_FROZEN_20261008.json (re-freeze)
+      -> export_anchor_all_axes_csv.py -> ANCHOR_208_ALL_AXIS_VIEW_20261007.csv
+      + DOMAIN_RULER_REVIEW_20261008.csv (8 rows backfilled owner_review=finalized)
+
+    Ruler re-freeze: sha256 01f9ee6def0d33797cafd3855353ed697e3fc7599a099dba8a59895f6a1d79a4
+    (was affe259e1c5a12daa666ffb1ad3fcd263878c9b340cafc8f9b82319e0ee99f67), n_ruler_rows=201, skipped_empty=7.
+
+    Checks GREEN: check_anchor_axis_consistency rc=0 (ceiling 0 holds; catch-all never coexists with a
+    concrete domain), check_decision_membership rc=0, check_governance_faces rc=0.
+
+    KNOWN FOLLOW-UP (not in scope here): ANCHOR-2 golden referee (60-row) still carries the 2026-10-07
+    domain verdicts for R172 ("systems & frameworks, engineering practice, product design") and R209
+    ("user experience, education"), now superseded by these rulings. Reconcile via ANCHOR2_V8_REMINT_TRIAGE
+    OWNER_APPLY + remint_anchor2_v8.py in a follow-up owner-gated mint.
+  files:
+    - config/owner_domain_rulings_20261008.yaml
+    - scripts/apply_owner_domain_rulings_v8.py
+    - governance/discipline_anchor_rederived_v8_20261007.json
+    - governance/ANCHOR_208_CONSOLIDATED_20261007.json
+    - governance/DOMAIN_RULER_FROZEN_20261008.json
+    - governance/DOMAIN_RULER_REVIEW_20261008.csv
+    - governance/ANCHOR_208_ALL_AXIS_VIEW_20261007.csv

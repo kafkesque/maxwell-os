@@ -33,7 +33,7 @@ split_manifest:
   # D-2813: the manifest is REGENERATED deterministically (scripts/build_split_manifest.py)
   # from the consolidated anchor artifact, not hand-maintained. Config-first: nothing here
   # is hardcoded into the builder.
-  source: governance/ANCHOR_208_CONSOLIDATED_20261002.json
+  source: governance/ANCHOR_208_CONSOLIDATED_20261007.json
   golden_pool_count: 46
   eval_count: 162
   total_anchors: 208

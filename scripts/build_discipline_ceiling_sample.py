@@ -5,7 +5,7 @@ measurement (D-2792/D-2793 step 1, D-2794).
 Produces a BLANK labeling sheet (gold discipline HIDDEN) + a closed-menu
 reference so two independent raters can label the same 30 anchors. The owner
 scores the returned labels against the gold key
-(governance/discipline_anchor_conformance_20261002.json) AFTER both raters
+(governance/discipline_anchor_rederived_v8_20261007.json) AFTER both raters
 finish — never before, to avoid anchoring. Deterministic (seed 42). No model,
 $0 marginal cost (C1).
 """
@@ -23,7 +23,7 @@ import numpy as np
 
 REPO = Path(__file__).resolve().parent.parent
 
-DEFAULT_ANCHOR: str = "governance/discipline_anchor_conformance_20261002.json"
+DEFAULT_ANCHOR: str = "governance/discipline_anchor_rederived_v8_20261007.json"
 DEFAULT_MENU: str = "config/closed_menu_v5.json"
 DEFAULT_DB: str = "knowledge pipeline/maxwell.db"
 DEFAULT_N: int = 30

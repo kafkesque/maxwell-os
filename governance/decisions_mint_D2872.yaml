@@ -1,0 +1,45 @@
+- id: D-2872
+  state: RATIFIED
+  category: ANCHOR / TAXONOMY
+  title: 'Sociology default-route removal (D2D map) — mirror psychology: sociology has no single default application field'
+  decision: |
+    Owner ruling (2026-10-08): sociology re-routing MUST follow the same content-driven logic as the other
+    lenses — examine which domain(s) the principle is practically applied in; the highest-confidence domain is
+    PRIMARY, plus the remaining co-applicable domains when it applies to more than one. This mirrors the
+    psychology ruling (D-2870 item 2), which removed `psychology: organizational behavior` as a rubber stamp.
+
+    EVIDENCE (201-row authority governance/discipline_anchor_rederived_v8_20261007.json): the sole sociology
+    anchor R039 'Identity As Social Positioning and Lifestyle Signifiers' applies to
+    `marketing & communications | design strategy | semiotics & communication` — primary `marketing &
+    communications` — NOT `organizational behavior`. Sociology, like psychology, has NO single default
+    application field (sociology of work -> organizational behavior, sociology of consumption -> marketing,
+    sociology of health -> health & wellness, sociology of education -> education, etc.). The
+    `sociology: organizational behavior` entry in config/discipline_domain_map.yaml is therefore a rubber-stamp
+    default, not a content-driven classification (OntoClean rigidity — Guarino & Welty 2002): it asserts one
+    application field for an epistemic lens whose application is content-dependent.
+
+    FIX (deterministic, LLM-free): removed `sociology: organizational behavior` from
+    config/discipline_domain_map.yaml. Sociology now falls through to the neutral `fallback: research practice`
+    when a sociology row empties after the v8 drops ({science & research, social sciences} — the D-2865 removals
+    that BUG-630's D2D map exists to remediate).
+
+    ZERO CASCADE (verified): the entry was UNEXERCISED — R039's domains never empty after drops (none are in the
+    drop set), so no anchor obtained its domain via this default. build_anchor_v8_remap_triage.py still emits
+    21 rows (16 DROP + 5 ROUTED), build_anchor_v8_apply.py --check PASSES (exactly 21), and
+    check_anchor_axis_consistency.py exits 0 (declared ceiling 0 holds; catch-all never coexists with a concrete
+    domain).
+
+    STRUCTURAL DEBT QUEUED (same content-driven rule, owner owes the same examination): the REMAINING single-point
+    D2D defaults carry the identical rubber-stamp signature and must be audited per-principle before they are
+    trusted — (1) `behavioral economics: marketing & communications` (measured 8 distinct application fields:
+    digital product, education, entrepreneurship, finance & investment, health & wellness, marketing &
+    communications, personal productivity, user experience); (2) `linguistics: education` (sole anchor maps to
+    `semiotics & communication`, not education); (3) `social network analysis: systems & frameworks` (sole anchor
+    maps to `business development`, not systems & frameworks). None are exercised by the current anchor set, so
+    this is a correctness debt, not a live drift.
+  bugs: [BUG-630]
+  files:
+    - config/discipline_domain_map.yaml
+    - scripts/build_anchor_v8_remap_triage.py
+    - scripts/build_anchor_v8_apply.py
+    - scripts/check_anchor_axis_consistency.py

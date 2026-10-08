@@ -32,33 +32,28 @@ axes:
   depth:
     authority: {file: governance/ANCHOR_208_DEPTH_CORRECTED_20261002.json, column: depth_label, kind: json}
     consumers:
-      - {file: governance/ANCHOR_208_CONSOLIDATED_20261002.json, column: depth_label, kind: json}
+      - {file: governance/ANCHOR_208_CONSOLIDATED_20261007.json, column: depth_label, kind: json}
       - {file: governance/depth_anchor_conformance_20261002.json, column: depth_label, kind: json, rows_key: examples}
       - {file: governance/ANCHOR_208_FIVE_AXIS_VIEW_20260930.csv, column: depth, kind: csv, normalizer: depth_numeric_to_label}
       - {file: governance/ANCHOR_150_FIVE_AXIS_VIEW_20260927.csv, column: depth, kind: csv, normalizer: depth_numeric_to_label}
 
-  # --- DISCIPLINE: the owner's D-2795 re-label gold (the discipline gate's anchor) is the authority ---
+  # --- DISCIPLINE: the owner-finalized rederived v8 lineage (201 rows, D-2844/D-2864/D-2866) is the
+  #     authority. The legacy 204-row conformance + normalized/5-axis-view copies are SUPERSEDED (D-2868). ---
   discipline:
-    authority: {file: governance/discipline_anchor_conformance_20261002.json, column: discipline, kind: json}
+    authority: {file: governance/discipline_anchor_rederived_v8_20261007.json, column: discipline, kind: json}
     consumers:
-      - {file: governance/ANCHOR_208_CONSOLIDATED_20261002.json, column: discipline, kind: json}
-      - {file: governance/ANCHOR_208_DISCIPLINE_NORMALIZED_20261002.json, column: discipline, kind: json}
-      - {file: governance/ANCHOR_208_FIVE_AXIS_VIEW_20260930.csv, column: discipline, kind: csv}
-      - {file: governance/ANCHOR_150_FIVE_AXIS_VIEW_20260927.csv, column: discipline, kind: csv}
+      - {file: governance/ANCHOR_208_CONSOLIDATED_20261007.json, column: discipline, kind: json}
 
-  # --- DOMAIN / PRIMARY_DOMAIN: the 208 five-axis view owns these (D-2720; measured 0 drift) ---
+  # --- DOMAIN / PRIMARY_DOMAIN: the rederived v8 lineage owns these (D-2866/D-2868; pipe-joined
+  #     `domain` + first-token `primary_domain`, schema-compatible columns added by D-2868). ---
   domain:
-    authority: {file: governance/ANCHOR_208_FIVE_AXIS_VIEW_20260930.csv, column: domain, kind: csv}
+    authority: {file: governance/discipline_anchor_rederived_v8_20261007.json, column: domain, kind: json}
     consumers:
-      - {file: governance/ANCHOR_208_CONSOLIDATED_20261002.json, column: domain, kind: json}
-      - {file: governance/discipline_anchor_conformance_20261002.json, column: domain, kind: json}
-      - {file: governance/ANCHOR_150_FIVE_AXIS_VIEW_20260927.csv, column: domain, kind: csv}
+      - {file: governance/ANCHOR_208_CONSOLIDATED_20261007.json, column: domain, kind: json}
   primary_domain:
-    authority: {file: governance/ANCHOR_208_FIVE_AXIS_VIEW_20260930.csv, column: primary_domain, kind: csv}
+    authority: {file: governance/discipline_anchor_rederived_v8_20261007.json, column: primary_domain, kind: json}
     consumers:
-      - {file: governance/ANCHOR_208_CONSOLIDATED_20261002.json, column: primary_domain, kind: json}
-      - {file: governance/discipline_anchor_conformance_20261002.json, column: primary_domain, kind: json}
-      - {file: governance/ANCHOR_150_FIVE_AXIS_VIEW_20260927.csv, column: primary_domain, kind: csv}
+      - {file: governance/ANCHOR_208_CONSOLIDATED_20261007.json, column: primary_domain, kind: json}
 
 # PROPAGATION ORDER (the WRITE limb, D-2812 / BUG-628). `scripts/apply_anchor_axis_authority.py`
 # walks this list: `propagate` overwrites the axis column of a VIEW archive from the authority;
@@ -68,8 +63,7 @@ propagation:
   order:
     - {kind: propagate, file: governance/ANCHOR_208_FIVE_AXIS_VIEW_20260930.csv}
     - {kind: propagate, file: governance/ANCHOR_150_FIVE_AXIS_VIEW_20260927.csv}
-    - {kind: regenerate, script: scripts/normalize_anchor_discipline.py}
-    - {kind: regenerate, script: scripts/consolidate_anchor_208.py}
+    - {kind: regenerate, script: scripts/regenerate_anchor_208_v8.py}
 
 # Declared known drift (owner-owed). Ceiling is SHRINK-ONLY: a declared cell that starts
 # agreeing must be REMOVED (the rail exits 2 on it), never left to hide a completed fix.

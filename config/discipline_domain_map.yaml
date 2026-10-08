@@ -1,0 +1,74 @@
+# discipline_domain_map.yaml — deterministic discipline -> default practical-applicability domain.
+#
+# Purpose (D-2866): when an anchor/golden row's ONLY domain label was a v8-removed epistemic
+# catch-all ('science & research' merged / 'social sciences' demoted), the domain axis is empty
+# after the drop. The discipline axis already carries the explanatory lens, so this map codifies
+# where that lens is APPLIED in practice — the domain axis's job. LLM-free + deterministic (D-2864).
+#
+# Two-axis rule being enforced: discipline = epistemic provenance (single lens); domain = practical
+# applicability (multi, <=5). A "lens family" (social sciences) is never a domain; an "application
+# field" (media, health, org behavior) is never a discipline.
+#
+# Grounded in the 97-row v8 anchor/gold remap audit (discipline_anchor_rederived_v7 + gold_4axis).
+# Entries are DEFAULTS used ONLY when a row has no surviving applied domain; co-present applied
+# domains always win.
+#
+schema_version: 1
+gen_model: none            # deterministic, human-authored — no LLM inference
+pipeline_commit: pending   # stamped at D-2866 apply
+
+fallback: research practice   # safe default when a discipline is unlisted (the activity domain)
+
+map:
+  # --- research/method disciplines -> the research activity itself ---
+  research methodology: research practice
+  operations research: research practice
+  decision making: personal productivity
+  cognitive science: user experience
+  interdisciplinary studies: research practice
+  creative process: graphic design
+
+  # --- applied social/behavioral lenses -> their application field ---
+  media studies: media & entertainment
+  # D-2870 owner ruling: psychology has NO single default application field (health & wellness,
+  # user experience, product design, leadership, productivity, org behavior all co-occur).  It must
+  # NOT auto-route to `organizational behavior`; psychology falls through to the neutral fallback.
+  # D-2872 owner ruling: sociology mirrors psychology. Sociology has NO single default application
+  # field (sociology of work -> organizational behavior, sociology of consumption -> marketing,
+  # sociology of health -> health & wellness, sociology of education -> education, etc.). The sole
+  # sociology anchor R039 'Identity As Social Positioning and Lifestyle Signifiers' applies to
+  # marketing & communications | design strategy | semiotics & communication — NOT org behavior.
+  # So `sociology: organizational behavior` is a rubber stamp; sociology falls through to the
+  # neutral `fallback: research practice` when a row empties after v8 drops.
+  behavioral economics: marketing & communications
+  linguistics: semiotics & communication
+  economics: finance & investment
+  political economy: legal & public policy
+  cultural studies: media & entertainment
+  philosophy: research practice
+  aesthetics: design strategy
+  semiotics: semiotics & communication
+  visual semiotics: graphic design
+
+  # --- life/health sciences -> health & wellness ---
+  neuroscience: health & wellness
+  health & medicine: health & wellness
+  evolutionary biology: health & wellness
+
+  # --- engineering / computational / systems ---
+  engineering: engineering & infrastructure
+  systems engineering: engineering & infrastructure
+  computational geometry: computational science & physics
+  complex adaptive systems: systems & frameworks
+  systems thinking: systems & frameworks
+  social network analysis: systems & frameworks
+  ecology: systems & frameworks
+
+  # --- organizational / risk / information ---
+  organizational theory: organizational behavior
+  risk management: finance & investment
+  information retrieval: information architecture
+  design thinking: design strategy
+  generative ai: ai & agents
+  machine learning: ai & agents
+  privacy & surveillance: legal & public policy

@@ -1,0 +1,23 @@
+- id: D-2865
+  state: RATIFIED
+  category: ANCHOR / TAXONOMY
+  title: 'A/B/C taxonomy v8 — merge science & research + demote social sciences + HCI/UX dedup (closes BUG-630)'
+  decision: |
+    Owner ratified A/B/C. build_taxonomy_v8.py deterministically (LLM-free) merged dom-031 science & research
+    into dom-025 research practice (union raw + excludes, rewritten definition), demoted dom-035 social sciences
+    to raw synonyms folded into research practice (no new canonical), and dropped raw 'user experience design'
+    from disc-036 human-computer interaction (kept under dom-010), closing the cross-axis MECE violation BUG-630
+    that made the D-2856 0-violation claim stale after commit 65339ae. validate_taxonomy_partition.py now reports
+    0 violations on v8 (41 domains / 64 disciplines). Promoted to live config/taxonomy_v5.yaml, minted
+    closed_menu_v8.json (menu_hash 8218d6db...), re-pinned menu_axis_hashes.yaml (answer_space_hash 5bd94568...),
+    regenerated taxonomy_shacl.ttl, bumped version.yaml + normalization_map + pipeline_config per_label/max_domains.
+    Anchor domain remap to v8 (20 anchor rows: 16 DROP + 4 ROUTED) is owner-signed 2026-10-07 and closed out by
+    D-2866; triage CSV = governance/anchor_v8_domain_remap_triage_20261007.csv, applied artifact =
+    governance/discipline_anchor_rederived_v8_20261007.json (201 rows).
+  bugs: [BUG-630]
+  files:
+    - scripts/build_taxonomy_v8.py
+    - scripts/apply_taxonomy_v8.py
+    - config/taxonomy_v8.yaml
+    - config/closed_menu_v8.json
+    - governance/anchor_v8_domain_remap_triage_20261007.csv

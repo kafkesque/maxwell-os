@@ -131,7 +131,7 @@ def _ontology_text() -> str:
     return (
         "DEPTH (choose EXACTLY ONE):\n" + depth_lines +
         "\n\nDISCIPLINE (choose EXACTLY ONE canonical label):\n" + disc_lines +
-        "\n\nDOMAIN (choose 1-5 canonical labels that apply):\n" + dom_lines
+        "\n\nDOMAIN (choose 1-7 canonical labels that apply):\n" + dom_lines
     )
 
 

@@ -14,7 +14,7 @@
 # (a finding whose tier is written in two places is a finding with two tiers).
 
 schema_version: '1.0'
-source: config/closed_menu_v7.json
+source: config/closed_menu_v8.json
 axis_groups:
   # what a classifier may EMIT - their VALUE SET (canonical slots), never the definition wording (D-NEW-1).
   # A change here changes an ANSWER, so every stored label count is incomparable. domains/disciplines/

@@ -211,12 +211,12 @@ class FB(StampedRecord):
     )
 
     # ── Classification (Literal types enforce validity at construction) ──
-    # D316: Multi-label applies to DOMAINS only (max 5). Discipline is ALWAYS singular.
+    # D316: Multi-label applies to DOMAINS only (max 7). Discipline is ALWAYS singular.
     # D2066 amendment: discipline was incorrectly made multi-label; reverted per D316 original.
     domains: list[str] = Field(  # type: ignore[valid-type]
-        description="1-5 canonical domains (D150: max 5). Validated via synonym matching; 'emerging' if no match.",
+        description="1-7 canonical domains (D150: max 7). Validated via synonym matching; 'emerging' if no match.",
         min_length=1,
-        max_length=5,
+        max_length=7,
     )
     discipline: str = Field(  # type: ignore[valid-type]
         description="Single canonical discipline from 48-discipline taxonomy. Validated; 'emerging' if no match."

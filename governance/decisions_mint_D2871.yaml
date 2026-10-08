@@ -1,0 +1,29 @@
+- id: D-2871
+  state: RATIFIED
+  category: ANCHOR / TAXONOMY
+  title: 'Option 2 — content_type kind/disposition split: 8 quarantine → principle + disposition_verdict column (owner-gated)'
+  decision: |
+    Owner accepted Option 2 (2026-10-08) for the 8 quarantine content_type rows. Deterministic, LLM-free.
+
+    Ontology finding: config/content_types.yaml (D2323) ALREADY declares `quarantine` and `noise_drop` as
+    DISPOSITIONS ("NOT content_types — the 5-role axis stays CLOSED — no 6th type"), not as content_types.
+    The ANCHOR-2 sheet's content_type_verdict column (col 6) had been recording dispositions into the kind
+    axis, violating the closed-5-role rule. The pipeline correctly emits `principle` 60/60 (kind axis closed);
+    the human column mixed kinds with dispositions → 10 distinct labels → kappa 0.0 (BUG-238 hybrid-axis conflation).
+
+    Fix (scripts/fix_anchor2_content_type_v8.py, deterministic): (1) collapse kind-axis surface variants
+    'growth edge'→'growth_edge' (×8) and 'process template'→'process_template' (×1); (2) relabel the 8
+    'quarantine' rows to kind 'principle' (they ARE extractable principles — uncertainty preserved, never
+    discarded); (3) move the 2 noise_drop rows off the kind axis (kind='' — no clean extractable principle);
+    (4) add a `disposition_verdict` column (classified | quarantine | noise_drop) so the human's uncertainty
+    signal lives on the correct axis. Result: kind distribution {principle:43, growth_edge:9, process_template:3,
+    tool_instruction:2, process_instance:1, '':2} + disposition {classified:50, quarantine:8, noise_drop:2}.
+
+    NOT done (deferred): BUG-238 corpus-scale remediation (verify 341 model_medium + 332 model_high bands,
+    re-run depth on confirmed-principle subset) and the calibrated+conformal disposition layer (selective
+    prediction / conformal prediction / confident learning on the golden hold-out). The hybrid-axis kind-vs-
+    disposition split is logged as structural debt against BUG-238.
+  bugs: [BUG-238]
+  files:
+    - scripts/fix_anchor2_content_type_v8.py
+    - governance/ANCHOR2_BLIND_SHEET_V8_CTFIX_20261008.csv

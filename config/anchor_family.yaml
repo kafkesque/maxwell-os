@@ -89,13 +89,24 @@ axes:
     # vote (D2610) -> anchor_adjudication_workbook_20260924.csv -> five-axis view; the 58 extras carried
     # REVIEW_WORKBOOK_210.csv domain_final. Consolidated into one 208-row view below.
     column: domain
-    artifact: governance/ANCHOR_208_FIVE_AXIS_VIEW_20260930.csv
-    cohort: 208
-    cohort_human_adjudicated: 208
-    primary_domain_filled: 208
+    artifact: governance/discipline_anchor_rederived_v8_20261007.json
+    # D-2868 split of TWO questions that `artifact` used to answer at once:
+    #   * "which artifact OWNS the domain values?" -> `artifact` = rederived_v8 (201 rows, the
+    #     golden-pool population; 7 emerging/noise rows R021/R040/R080/R084/R091/R106/R148 are
+    #     excluded per D-2795 and carry no domain label).
+    #   * "what is the full item population of the ANCHOR family instrument?" -> `cohort_artifact`
+    #     = the 208-row consolidated (a proper SUPERSET of the 150 anchor ruler). This is what
+    #     check_instrument_cohorts.py's concat-guard must compare a candidate sheet against; using
+    #     the 201-row authority there made the 7 exclusions read as a SECOND instrument (false
+    #     "spans 2 cohorts" on the 150-row depth-blind sheet).
+    cohort_artifact: governance/ANCHOR_208_CONSOLIDATED_20261007.json
+    cohort_artifact_key: item_id
+    cohort: 201
+    cohort_human_adjudicated: 201
+    primary_domain_filled: 201
     advisory_rows_accepted_20260930: [R003, R140, R146]
     provenance_of_anchor_domain_values: owner-adjudicated (reliable-pair machine vote + owner ruling)
-    rule: a question about the domain axis is answered from governance/ANCHOR_208_FIVE_AXIS_VIEW_20260930.csv
+    rule: a question about the domain axis is answered from governance/discipline_anchor_rederived_v8_20261007.json (D-2868)
 
 # Machine-side observations about the 150 that are NOT owner labels (defect candidates).
 machine_observations:

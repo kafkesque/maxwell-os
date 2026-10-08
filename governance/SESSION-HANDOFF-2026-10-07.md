@@ -164,3 +164,34 @@ rulings RED (R001 depth_final), write_guard 7/10 writers, config-default ceiling
 
 `config/register_divergence.yaml` (BUG-571 list reconciled) · this handoff. No decision minted, so
 `decisions.yaml` / `decisions_summary.json` / `DECISION-LOG.md` / census unchanged (990).
+
+
+## 2026-10-08 ADDENDUM — D-2878 owner review ROUND 2 (supersedes the register figures above)
+
+Register (derived, never hand-typed): **1008 decisions · 444 bugs (163 open / 281 closed; highest OPEN = BUG-680)**.
+
+C15 (5+ unresolved -> carry them in every handoff): this handoff carries **163 unresolved ids** - the register is the only list of truth
+(`scripts/bug_status.py`); do not restate counts anywhere else (BUG-588/D-2692).
+
+WHAT LANDED THIS TURN (D-2878, RATIFIED): the owner's round-2 answers
+(`governance/OWNER_CONFIRMATION_SHEET_20261008.csv`, sha256-pinned, asserted fail-closed) were folded into the frozen domain
+ruler: (a) 8 owner-confirmed discipline abstentions now declare `discipline=""` - BUG-676 FIXED (an out-of-menu token may not stand
+in a value slot; the guard now fires in BOTH directions); (b) R158 domain drop re-ranked BY APPLICABILITY (`editorial & advertising`,
+`motion design` out; `graphic design` RE-INSTATED); (c) R005 - `engineering practice` cannot be primary with high conviction, primary
+stays `data visualization`; (d) R113 - primary `engineering practice`, `computational science & physics` kept, `systems & frameworks`
+excluded. Ruler re-stamped: 201 rows, 9 rows changed, 15 declared warnings, `--check` reproduces it byte-identically.
+
+NEW OPEN DEFECTS: **BUG-679** - the owner-RATIFIED RATIFY-3 DROP(13) (D-2711/D-2719) reached only 5 of 13 anchor rows; 8 ratified
+drops (R012 R026 R034 R082 R140 R180 R182 R200) are STILL live axis-bearing rows in the frozen ruler, contradicting D-2813
+("for a noise_drop row depth and discipline do NOT apply"). OWNER GATE: propagate (201 -> 193) or supersede RATIFY-3.
+**BUG-680** - the two upstream anchor faces still carry the out-of-menu token in the discipline slot (BUG-676 residual; fix belongs in
+the consolidation chain, never a hand edit).
+
+STILL OWNER-GATED (do not proceed without a written word): R040 and R091 dispositions (evidence + recommendations in
+`governance/OWNER_RULINGS_ROUND2_20261008.md`); R140 (ratified drop vs round-2 abstain); whether to move R158's primary
+(the agreed primary `design strategy` ranks low on intrinsic applicability); the DROP(13) propagation; and the RATIFY-2 full
+S4 -> S5 -> S6 rerun (D-2727).
+
+NEXT CONSEQUENTIAL WORK: BUG-679 propagation (one owner word), then D-2879 = the ANCHOR-2 authority-aligned sheet + key re-mint +
+kappa re-measurement (BUG-677; mint ONLY after the run carries measured numbers), then BUG-680's consolidation-chain fix, then the
+optional student domain_confidences provenance in `_maybe_student_override`.

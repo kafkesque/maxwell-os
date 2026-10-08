@@ -1,5 +1,5 @@
-version: v7
-classification_version: v7
+version: v8
+classification_version: v8
 groups:
   domain:
   - Visual Practice
@@ -31,8 +31,7 @@ domains:
   - digital art
   - typographic style
   - typographic history
-  definition: The practice of visual communication through layout, typography, and
-    print media composition.
+  definition: The practice of visual communication through layout, typography, and print media composition.
   exclude:
   - brand identity
   - illustration
@@ -55,8 +54,7 @@ domains:
   - brand development
   - brand storytelling
   - brand identity design
-  definition: The development of visual symbols, logos, and consistent aesthetic systems
-    for corporate recognition.
+  definition: The development of visual symbols, logos, and consistent aesthetic systems for corporate recognition.
   exclude:
   - graphic design
   - marketing strategy
@@ -75,8 +73,7 @@ domains:
   - advertising research
   - media planning
   - printing technology
-  definition: The design and copywriting of publications, advertisements, and promotional
-    visual materials.
+  definition: The design and copywriting of publications, advertisements, and promotional visual materials.
   exclude:
   - graphic design
   - brand identity
@@ -90,8 +87,7 @@ domains:
   - motiongraphic
   - animation
   - After Effects
-  definition: The creation of animated visual content, motion graphics, and time-based
-    digital media.
+  definition: The creation of animated visual content, motion graphics, and time-based digital media.
   exclude:
   - video game development
   - animation
@@ -102,8 +98,7 @@ domains:
   - Environmental Design
   - interior design
   - wayfinding
-  definition: The design of physical spaces, interiors, and wayfinding systems for
-    human interaction.
+  definition: The design of physical spaces, interiors, and wayfinding systems for human interaction.
   exclude:
   - urban planning
   - industrial design
@@ -117,8 +112,7 @@ domains:
   - Product Development
   - Product Management
   - SaaS
-  definition: The design and development of user interfaces and experiences for software
-    applications.
+  definition: The design and development of user interfaces and experiences for software applications.
   exclude:
   - web design
   - user experience
@@ -133,8 +127,7 @@ domains:
   - Data Storytelling
   - infographics
   - cartography
-  definition: The graphical representation of quantitative data to facilitate understanding
-    and analysis.
+  definition: The graphical representation of quantitative data to facilitate understanding and analysis.
   exclude:
   - information architecture
   - graphic design
@@ -146,8 +139,7 @@ domains:
   - web development
   - interactive installations
   - new media art
-  definition: The intersection of artistic practice and programming for interactive
-    digital experiences.
+  definition: The intersection of artistic practice and programming for interactive digital experiences.
   exclude:
   - software development
   - web design
@@ -161,8 +153,7 @@ domains:
   - Web Typography
   - Web Architecture
   - Web Strategy
-  definition: The design and architecture of responsive websites and user interface
-    components.
+  definition: The design and architecture of responsive websites and user interface components.
   exclude:
   - digital product
   - creative technology
@@ -187,8 +178,7 @@ domains:
   - Accessible Design
   - Inclusive Design
   - accessibility
-  definition: The study of user behavior, research, and interaction design for digital
-    products.
+  definition: The study of user behavior, research, and interaction design for digital products.
   exclude:
   - digital product
   - web design
@@ -197,8 +187,7 @@ domains:
   group: Illustration & Craft
   raw:
   - Illustration
-  definition: The creation of original visual artwork for narrative, decorative, or
-    explanatory purposes.
+  definition: The creation of original visual artwork for narrative, decorative, or explanatory purposes.
   exclude:
   - graphic design
   - computational art
@@ -208,8 +197,7 @@ domains:
   raw:
   - Packaging
   - Packaging Design
-  definition: The design of physical containers and structural materials for product
-    protection and presentation.
+  definition: The design of physical containers and structural materials for product protection and presentation.
   exclude:
   - industrial design
   - brand identity
@@ -235,8 +223,7 @@ domains:
   - human resource management
   - retail management
   - technology management
-  definition: The management of internal processes, accounting, and administrative
-    functions within organizations.
+  definition: The management of internal processes, accounting, and administrative functions within organizations.
   exclude:
   - project management
   - business development
@@ -250,8 +237,7 @@ domains:
   - Sales Psychology
   - Sales and Persuasion
   - sales management
-  definition: Strategic activities focused on market expansion, sales psychology,
-    and revenue generation.
+  definition: Strategic activities focused on market expansion, sales psychology, and revenue generation.
   exclude:
   - marketing communications
   - business operations
@@ -278,8 +264,7 @@ domains:
   - startups
   - founders
   - entrepreneurial management
-  definition: The process of creating, managing, and scaling new business ventures
-    and startups.
+  definition: The process of creating, managing, and scaling new business ventures and startups.
   exclude:
   - business development
   - leadership
@@ -297,8 +282,7 @@ domains:
   - team dynamics
   - workplace psychology
   - change management
-  definition: The study of human behavior, culture, and psychology within workplace
-    structures.
+  definition: The study of human behavior, culture, and psychology within workplace structures.
   exclude:
   - leadership
   - business operations
@@ -319,8 +303,7 @@ domains:
   - AI Agent Architecture
   - agentic workflows
   - agent frameworks
-  definition: The design and implementation of autonomous artificial intelligence
-    systems and agents.
+  definition: The design and implementation of autonomous artificial intelligence systems and agents.
   exclude:
   - software development
   - data visualization
@@ -349,8 +332,7 @@ domains:
   - Network Engineering
   - cloud infrastructure
   - site reliability
-  definition: The application of software architecture, programming languages, and
-    development methodologies.
+  definition: The application of software architecture, programming languages, and development methodologies.
   exclude:
   - creative technology
   - web design
@@ -362,8 +344,7 @@ domains:
   - computational aesthetics
   - computational art and design
   - computational art and simulation
-  definition: The creation of artistic works using algorithms, generative systems,
-    and code.
+  definition: The creation of artistic works using algorithms, generative systems, and code.
   exclude:
   - illustration
   - creative technology
@@ -374,8 +355,7 @@ domains:
   - programming
   - computer programming
   - software development
-  definition: The use of specific programming frameworks and tools for creative and
-    computational design.
+  definition: The use of specific programming frameworks and tools for creative and computational design.
   exclude:
   - engineering practice
   - computational art
@@ -386,8 +366,7 @@ domains:
   - computational pedagogy
   - scientific computing
   - numerical methods
-  definition: The application of computational models to simulate physical, biological,
-    and social systems.
+  definition: The application of computational models to simulate physical, biological, and social systems.
   exclude:
   - data visualization
   - engineering practice
@@ -403,8 +382,7 @@ domains:
   - frameworks
   - models
   - conceptual frameworks
-  definition: The theoretical analysis and design of complex interconnected systems
-    and structures.
+  definition: The theoretical analysis and design of complex interconnected systems and structures.
   exclude:
   - design systems
   - information architecture
@@ -441,11 +419,21 @@ domains:
   - Social Sciences
   - survey research
   - experimental design
-  definition: The design, ethics, and execution of academic and empirical research
-    processes.
+  - biostatistics
+  - Biological Systems
+  - food science
+  - psychometrics
+  - laboratory research
+  - Social Work
+  - social science
+  - criminology
+  - social research
+  - demography
+  definition: The professional activity of conducting, publishing, and applying scholarly and scientific research.
   exclude:
   - user experience
-  - science research
+  - computational science physics
+  - research methodology
   id: dom-025
 - canonical: education
   group: Systems, Semiotics & Knowledge
@@ -459,8 +447,7 @@ domains:
   - e-learning
   - training
   - educational technology
-  definition: The design of instructional strategies, academic policy, and learning
-    environments.
+  definition: The design of instructional strategies, academic policy, and learning environments.
   exclude:
   - personal productivity
   - leadership
@@ -473,8 +460,7 @@ domains:
   - psychedelic studies
   - wellbeing
   - public health policy
-  definition: The promotion of physical, mental, and public health through healthcare
-    systems.
+  definition: The promotion of physical, mental, and public health through healthcare systems.
   exclude:
   - personal productivity
   - social sciences
@@ -530,8 +516,7 @@ domains:
   - direct marketing
   - search engine marketing
   - marketing management
-  definition: Strategic promotion, public relations, and digital marketing for brand
-    engagement.
+  definition: Strategic promotion, public relations, and digital marketing for brand engagement.
   exclude:
   - brand identity
   - business development
@@ -552,19 +537,6 @@ domains:
   - business operations
   - urban planning
   id: dom-030
-- canonical: science & research
-  group: Systems, Semiotics & Knowledge
-  raw:
-  - biostatistics
-  - Biological Systems
-  - food science
-  - psychometrics
-  - laboratory research
-  definition: The study of biological, genetic, and statistical scientific disciplines.
-  exclude:
-  - computational science physics
-  - research methodology
-  id: dom-031
 - canonical: arts & culture
   group: Visual Practice
   raw:
@@ -589,8 +561,7 @@ domains:
   - infrastructure
   - data engineering
   - IT operations
-  definition: The design of mechanical, aerospace, and distributed cloud computing
-    systems.
+  definition: The design of mechanical, aerospace, and distributed cloud computing systems.
   exclude:
   - engineering practice
   - urban planning
@@ -609,25 +580,11 @@ domains:
   - motion design
   - web design
   id: dom-034
-- canonical: social sciences
-  group: Systems, Semiotics & Knowledge
-  raw:
-  - Social Work
-  - social science
-  - criminology
-  - social research
-  - demography
-  definition: The study of human society, criminology, demography, and social work.
-  exclude:
-  - organizational behavior
-  - health wellness
-  id: dom-035
 - canonical: product design
   group: Digital & Interactive
   raw:
   - product design
-  definition: The holistic design of physical and digital products from concept to
-    market.
+  definition: The holistic design of physical and digital products from concept to market.
   exclude:
   - industrial design
   - digital product
@@ -660,8 +617,7 @@ domains:
   - Supply Chain Management
   - Resource Management
   - business process management
-  definition: The planning, execution, and oversight of projects and product development
-    lifecycles.
+  definition: The planning, execution, and oversight of projects and product development lifecycles.
   exclude:
   - business operations
   - leadership
@@ -677,8 +633,7 @@ domains:
   - people management
   - leadership studies
   - creative management
-  definition: The practice of guiding teams, strategic direction, and organizational
-    dynamics.
+  definition: The practice of guiding teams, strategic direction, and organizational dynamics.
   exclude:
   - organizational behavior
   - personal productivity
@@ -697,8 +652,7 @@ domains:
   - Execution
   - Productivity
   - Remote Work and Burnout Prevention
-  definition: Individual techniques for personal development, effectiveness, and time
-    management.
+  definition: Individual techniques for personal development, effectiveness, and time management.
   exclude:
   - leadership
   - education
@@ -707,8 +661,7 @@ domains:
   group: Illustration & Craft
   raw:
   - industrial design
-  definition: The design of manufactured physical products for mass production and
-    usability.
+  definition: The design of manufactured physical products for mass production and usability.
   exclude:
   - packaging
   - product design
@@ -731,8 +684,7 @@ domains:
   - Search Systems
   - Web Navigation
   - Web Navigation Design
-  definition: The structural organization of information for websites and digital
-    interfaces.
+  definition: The structural organization of information for websites and digital interfaces.
   exclude:
   - user experience
   - data visualization
@@ -760,8 +712,7 @@ disciplines:
   - Visual Perception
   - Visual Culture
   - visual design
-  definition: The biological and psychological process of interpreting visual sensory
-    information and color stimuli.
+  definition: The biological and psychological process of interpreting visual sensory information and color stimuli.
   exclude:
   - visual semiotics
   - color theory
@@ -776,8 +727,7 @@ disciplines:
   - Visual Communication Design
   - Multimodal Metaphor
   - Multimodal Discourse Analysis
-  definition: The study of how visual signs, symbols, and rhetoric communicate meaning
-    within cultural contexts.
+  definition: The study of how visual signs, symbols, and rhetoric communicate meaning within cultural contexts.
   exclude:
   - visual perception
   - typography
@@ -791,8 +741,7 @@ disciplines:
   - Design Theory
   - Design History and Theory
   - Art History
-  definition: The historical and theoretical analysis of design practices, aesthetics,
-    and their cultural significance.
+  definition: The historical and theoretical analysis of design practices, aesthetics, and their cultural significance.
   exclude:
   - cultural studies
   - design psychology
@@ -810,8 +759,7 @@ disciplines:
   - media semiotics
   - history of semiotics
   - classical semiotic theory
-  definition: The general study of signs, symbols, and their interpretation across
-    biological and cognitive systems.
+  definition: The general study of signs, symbols, and their interpretation across biological and cognitive systems.
   exclude:
   - visual semiotics
   - linguistics
@@ -828,8 +776,7 @@ disciplines:
   - history of type design
   - typeface design
   - Typographic Hierarchy
-  definition: The art and technique of arranging typefaces, spacing, and layout for
-    effective visual communication.
+  definition: The art and technique of arranging typefaces, spacing, and layout for effective visual communication.
   exclude:
   - visual semiotics
   - graphic design
@@ -842,8 +789,7 @@ disciplines:
   - Color Psychology
   - Color and design
   - Color Theory & Layout
-  definition: The principles governing color mixing, harmony, contrast, and their
-    psychological impact on design.
+  definition: The principles governing color mixing, harmony, contrast, and their psychological impact on design.
   exclude:
   - visual perception
   - typography
@@ -862,8 +808,7 @@ disciplines:
   - Film Production
   - Film Studies
   - motion graphics design
-  definition: The design and animation of visual elements involving movement, timing,
-    and temporal sequencing.
+  definition: The design and animation of visual elements involving movement, timing, and temporal sequencing.
   exclude:
   - computer graphics
   - game design
@@ -875,10 +820,7 @@ disciplines:
   - Design Psychology
   - Emotional Design
   - Persuasion
-  definition: The exploitation of cognitive science's known loopholes — biases, heuristics,
-    and predictable errors of human thinking — to externally affect, persuade, or
-    manipulate a user's or consumer's decision-making, and designing for those biases.
-    It is applied persuasion psychology, not the study of cognition itself.
+  definition: The exploitation of cognitive science's known loopholes — biases, heuristics, and predictable errors of human thinking — to externally affect, persuade, or manipulate a user's or consumer's decision-making, and designing for those biases. It is applied persuasion psychology, not the study of cognition itself.
   exclude:
   - cognitive science
   - psychology
@@ -904,8 +846,7 @@ disciplines:
   - creativity research
   - creative thinking
   - ideation
-  definition: The workflow, practices, and methodologies involved in generating and
-    executing creative work.
+  definition: The workflow, practices, and methodologies involved in generating and executing creative work.
   exclude:
   - design thinking
   - creative coding
@@ -923,9 +864,7 @@ disciplines:
   - problem-solving
   - cognition
   - Cognitive Studies
-  definition: The interdisciplinary study of how the mind works — perception, memory,
-    attention, reasoning, language, and learning. The default home for any claim about
-    cognition, thinking, or a cognitive process.
+  definition: The interdisciplinary study of how the mind works — perception, memory, attention, reasoning, language, and learning. The default home for any claim about cognition, thinking, or a cognitive process.
   exclude:
   - psychology
   - neuroscience
@@ -942,12 +881,7 @@ disciplines:
   - Behavioral Analysis
   - Consumer Behavior
   - behavioural economics
-  definition: The descriptive study of how psychological factors and cognitive biases
-    cause systematic deviations from the rational or standard model in economic decision-making,
-    market behavior and behavior-change interventions - where heuristics, framing,
-    affect, social norms and peer influence change what people do (prices, incentives,
-    markets, choice of behavior). It describes the bias; it does not exploit it to
-    design persuasion.
+  definition: The descriptive study of how psychological factors and cognitive biases cause systematic deviations from the rational or standard model in economic decision-making, market behavior and behavior-change interventions - where heuristics, framing, affect, social norms and peer influence change what people do (prices, incentives, markets, choice of behavior). It describes the bias; it does not exploit it to design persuasion.
   exclude:
   - economics
   - psychology
@@ -962,16 +896,13 @@ disciplines:
   - organization theory
   - organisational theory
   - organizational studies
-  definition: The study of structures, processes, and dynamics within formal organizations
-    and institutions — how they are designed, how they coordinate, and how they change.
+  definition: The study of structures, processes, and dynamics within formal organizations and institutions — how they are designed, how they coordinate, and how they change.
   exclude:
   - sociology
   - strategic thinking
   - business administration
   id: disc-012
-  differentia: 'EXPLANATORY/POSITIVE lens: the organization is the OBJECT of inquiry
-    — how formal organizations are structured, coordinate, and change. Asks ''how
-    do they work?'', never ''how should I steer one?'''
+  differentia: 'EXPLANATORY/POSITIVE lens: the organization is the OBJECT of inquiry — how formal organizations are structured, coordinate, and change. Asks ''how do they work?'', never ''how should I steer one?'''
 - canonical: decision making
   group: Behavioral & Cognitive
   raw:
@@ -985,9 +916,7 @@ disciplines:
   - psychology of judgment and decision making
   - Decisions
   - choice theory
-  definition: The cognitive and strategic process of selecting a course of action
-    from alternatives — how options are framed, evaluated, and committed to under
-    uncertainty, including decision rules, criteria, and (bounded) rationality.
+  definition: The cognitive and strategic process of selecting a course of action from alternatives — how options are framed, evaluated, and committed to under uncertainty, including decision rules, criteria, and (bounded) rationality.
   exclude:
   - strategic thinking
   - behavioral economics
@@ -1009,10 +938,7 @@ disciplines:
   - industrial-organizational psychology
   - environmental psychology
   - Creative Psychology
-  definition: The empirical study of mind and behavior in individuals and groups —
-    emotion, personality, development, social behavior, and mental health — beyond
-    the computational modelling of cognition. Broader and more behavioral than cognitive
-    science, which models mental processes as computation.
+  definition: The empirical study of mind and behavior in individuals and groups — emotion, personality, development, social behavior, and mental health — beyond the computational modelling of cognition. Broader and more behavioral than cognitive science, which models mental processes as computation.
   exclude:
   - cognitive science
   - neuroscience
@@ -1030,8 +956,7 @@ disciplines:
   - sociolinguistics
   - pragmatics
   - Rhetoric
-  definition: The scientific study of language structure, meaning, use, and its relationship
-    to cognition.
+  definition: The scientific study of language structure, meaning, use, and its relationship to cognition.
   exclude:
   - semiotics
   - philosophy
@@ -1049,8 +974,7 @@ disciplines:
   - strategy formulation
   - competitive strategy
   - organizational change management
-  definition: The high-level planning and long-term goal setting involved in business
-    and organizational management.
+  definition: The high-level planning and long-term goal setting involved in business and organizational management.
   exclude:
   - decision making
   - operations research
@@ -1063,9 +987,7 @@ disciplines:
   - Quality Assurance
   - compliance
   - safety engineering
-  definition: The identification, assessment, prioritization, and mitigation of risks
-    to minimize negative impact on operations, projects, or decisions — the practice
-    of quantifying exposure and choosing responses (avoid / reduce / transfer / accept).
+  definition: The identification, assessment, prioritization, and mitigation of risks to minimize negative impact on operations, projects, or decisions — the practice of quantifying exposure and choosing responses (avoid / reduce / transfer / accept).
   exclude:
   - quality assurance
   - compliance
@@ -1089,8 +1011,7 @@ disciplines:
   - Control Systems
   - Communication Systems
   - cybernetics
-  definition: An approach to understanding complex systems by analyzing their interrelationships
-    and holistic behavior.
+  definition: An approach to understanding complex systems by analyzing their interrelationships and holistic behavior.
   exclude:
   - systems engineering
   - complex adaptive systems
@@ -1109,8 +1030,7 @@ disciplines:
   - complex systems theory
   - complexity science
   - chaos theory
-  definition: The study of dynamic systems composed of interacting agents that adapt
-    and evolve over time.
+  definition: The study of dynamic systems composed of interacting agents that adapt and evolve over time.
   exclude:
   - systems thinking
   - computational physics
@@ -1128,8 +1048,7 @@ disciplines:
   - Control Systems Engineering
   - systems architecture
   - requirements engineering
-  definition: The interdisciplinary field focused on designing, integrating, and managing
-    complex system architectures.
+  definition: The interdisciplinary field focused on designing, integrating, and managing complex system architectures.
   exclude:
   - systems thinking
   - software engineering
@@ -1161,8 +1080,7 @@ disciplines:
   - qualitative research methodology
   - qualitative research methods
   - survey methodology
-  definition: The systematic frameworks and techniques used to conduct valid and reliable
-    academic research.
+  definition: The systematic frameworks and techniques used to conduct valid and reliable academic research.
   exclude:
   - information science
   - statistics
@@ -1176,8 +1094,7 @@ disciplines:
   - Information Theory
   - Game Theory
   - management science
-  definition: The application of advanced analytical methods to decision-making and
-    system optimization.
+  definition: The application of advanced analytical methods to decision-making and system optimization.
   exclude:
   - strategic thinking
   - decision making
@@ -1199,8 +1116,7 @@ disciplines:
   - pattern recognition
   - supervised learning
   - reinforcement learning
-  definition: The field of artificial intelligence focused on algorithms that learn
-    patterns from data.
+  definition: The field of artificial intelligence focused on algorithms that learn patterns from data.
   exclude:
   - artificial intelligence
   - generative ai
@@ -1221,8 +1137,7 @@ disciplines:
   - foundation models
   - large language models
   - LLMs
-  definition: Artificial intelligence systems capable of creating new content, such
-    as text, images, or code.
+  definition: Artificial intelligence systems capable of creating new content, such as text, images, or code.
   exclude:
   - machine learning
   - artificial intelligence
@@ -1237,8 +1152,7 @@ disciplines:
   - systems programming
   - DevOps
   - frontend web development
-  definition: The systematic application of engineering principles to the design and
-    development of software.
+  definition: The systematic application of engineering principles to the design and development of software.
   exclude:
   - computer networking
   - information security
@@ -1255,8 +1169,7 @@ disciplines:
   - computational design
   - computational graphics
   - Data-Driven Graphic Design
-  definition: The use of programming languages and tools to create artistic and interactive
-    digital experiences.
+  definition: The use of programming languages and tools to create artistic and interactive digital experiences.
   exclude:
   - software engineering
   - computer graphics
@@ -1268,8 +1181,7 @@ disciplines:
   - Generative Design
   - Generative Art
   - Computational Creativity
-  definition: The use of algorithms and computational processes to generate design
-    solutions and artistic forms.
+  definition: The use of algorithms and computational processes to generate design solutions and artistic forms.
   exclude:
   - creative coding
   - generative ai
@@ -1293,8 +1205,7 @@ disciplines:
   - Computer Graphics / Physics Simulation
   - computational evolution
   - computational systems
-  definition: The use of computer simulations to model and analyze physical systems
-    and biological processes.
+  definition: The use of computer simulations to model and analyze physical systems and biological processes.
   exclude:
   - theoretical physics
   - computational geometry
@@ -1307,8 +1218,7 @@ disciplines:
   - Geometry
   - Geometry and Proportions
   - Mathematics
-  definition: The mathematical study of algorithms for solving problems involving
-    geometric objects and structures.
+  definition: The mathematical study of algorithms for solving problems involving geometric objects and structures.
   exclude:
   - mathematics
   - computer graphics
@@ -1320,8 +1230,7 @@ disciplines:
   - Game Design
   - Game Studies
   - Interactive Design
-  definition: The process of creating rules, mechanics, and interactive experiences
-    for video games.
+  definition: The process of creating rules, mechanics, and interactive experiences for video games.
   exclude:
   - game studies
   - interactive design
@@ -1339,8 +1248,7 @@ disciplines:
   - economic history
   - public policy analysis
   - international relations
-  definition: The study of the relationship between political institutions, economic
-    systems, and power structures.
+  definition: The study of the relationship between political institutions, economic systems, and power structures.
   exclude:
   - economics
   - political science
@@ -1361,8 +1269,7 @@ disciplines:
   - information privacy
   - data protection
   - privacy engineering
-  definition: The study of data protection, monitoring practices, and the ethics of
-    information observation.
+  definition: The study of data protection, monitoring practices, and the ethics of information observation.
   exclude:
   - information security
   - law
@@ -1384,8 +1291,7 @@ disciplines:
   - artificial intelligence ethics
   - bioethics
   - formal logic
-  definition: The study of fundamental questions concerning existence, knowledge,
-    values, reason, and mind.
+  definition: The study of fundamental questions concerning existence, knowledge, values, reason, and mind.
   exclude:
   - epistemology
   - philosophy of science
@@ -1399,8 +1305,7 @@ disciplines:
   - AGI
   - general intelligence
   - AI safety
-  definition: The broad field of creating systems capable of performing tasks that
-    typically require human intelligence.
+  definition: The broad field of creating systems capable of performing tasks that typically require human intelligence.
   exclude:
   - machine learning
   - robotics
@@ -1415,8 +1320,7 @@ disciplines:
   - Communication Studies
   - interpersonal communication
   - political communication
-  definition: The study of how information is transmitted, received, and interpreted
-    across various channels.
+  definition: The study of how information is transmitted, received, and interpreted across various channels.
   exclude:
   - media studies
   - linguistics
@@ -1432,10 +1336,8 @@ disciplines:
   - VR
   - interactive systems
   - interaction design
-  - user experience design
   - human-centered design
-  definition: The design and evaluation of user interfaces and systems for effective
-    human-computer interaction.
+  definition: The design and evaluation of user interfaces and systems for effective human-computer interaction.
   exclude:
   - design psychology
   - software engineering
@@ -1449,8 +1351,7 @@ disciplines:
   - cross-disciplinary studies
   - transdisciplinary
   - multidisciplinary
-  definition: Academic approaches that integrate methods and knowledge from multiple
-    distinct disciplines.
+  definition: Academic approaches that integrate methods and knowledge from multiple distinct disciplines.
   exclude:
   - multidisciplinary
   - transdisciplinary
@@ -1466,8 +1367,7 @@ disciplines:
   - bioinformatics
   - information studies
   - library science
-  definition: The study of the collection, organization, and management of information
-    and data systems.
+  definition: The study of the collection, organization, and management of information and data systems.
   exclude:
   - information retrieval
   - data management
@@ -1483,8 +1383,7 @@ disciplines:
   - financial analysis
   - corporate finance
   - entrepreneurial finance
-  definition: The management of money, investments, and financial assets for individuals
-    and organizations.
+  definition: The management of money, investments, and financial assets for individuals and organizations.
   exclude:
   - economics
   - strategic thinking
@@ -1507,8 +1406,7 @@ disciplines:
   - business economics
   - econometrics
   - macroeconomics
-  definition: The social science that studies the production, distribution, and consumption
-    of goods and services.
+  definition: The social science that studies the production, distribution, and consumption of goods and services.
   exclude:
   - finance
   - political economy
@@ -1525,8 +1423,7 @@ disciplines:
   - sociology of work
   - sociology of science
   - social movement theory
-  definition: The scientific study of society, social institutions, and the patterns
-    of human interaction.
+  definition: The scientific study of society, social institutions, and the patterns of human interaction.
   exclude:
   - anthropology
   - cultural studies
@@ -1540,8 +1437,7 @@ disciplines:
   - Anthropology of Religion
   - Anthropological Linguistics
   - cultural anthropology
-  definition: The study of human societies, cultures, and their development across
-    time and space.
+  definition: The study of human societies, cultures, and their development across time and space.
   exclude:
   - sociology
   - cultural studies
@@ -1553,9 +1449,7 @@ disciplines:
   - cultural studies
   - culture studies
   - cultural theory
-  definition: The critical analysis of cultural practices, texts, and power relations
-    in contemporary society — how meaning is produced, circulated, and contested within
-    a culture, with attention to ideology, discourse, and social power.
+  definition: The critical analysis of cultural practices, texts, and power relations in contemporary society — how meaning is produced, circulated, and contested within a culture, with attention to ideology, discourse, and social power.
   exclude:
   - anthropology
   - sociology
@@ -1568,8 +1462,7 @@ disciplines:
   - Quantum Mechanics
   - particle physics
   - physics
-  definition: The branch of physics focused on mathematical models and abstract theories
-    of natural phenomena.
+  definition: The branch of physics focused on mathematical models and abstract theories of natural phenomena.
   exclude:
   - computational physics
   - engineering
@@ -1582,8 +1475,7 @@ disciplines:
   - art theory
   - neuroaesthetics
   - philosophy of art
-  definition: The philosophical study of beauty, taste, and the nature of artistic
-    experience.
+  definition: The philosophical study of beauty, taste, and the nature of artistic experience.
   exclude:
   - art theory
   - philosophy
@@ -1600,8 +1492,7 @@ disciplines:
   - Publishing
   - Media Production
   - media theory
-  definition: The academic analysis of media forms, technologies, and their social
-    and cultural impacts.
+  definition: The academic analysis of media forms, technologies, and their social and cultural impacts.
   exclude:
   - communication theory
   - cultural studies
@@ -1615,8 +1506,7 @@ disciplines:
   - rendering
   - image synthesis
   - CGI
-  definition: The technology and techniques for generating and manipulating visual
-    images using computers.
+  definition: The technology and techniques for generating and manipulating visual images using computers.
   exclude:
   - computer vision
   - creative coding
@@ -1632,8 +1522,7 @@ disciplines:
   - jurisprudence
   - legal theory
   - constitutional law
-  definition: The system of rules created by society or government to regulate behavior
-    and resolve disputes.
+  definition: The system of rules created by society or government to regulate behavior and resolve disputes.
   exclude:
   - political science
   - philosophy
@@ -1647,8 +1536,7 @@ disciplines:
   - network security
   - infosec
   - computer security
-  definition: The practice of protecting information systems from unauthorized access,
-    use, or disclosure.
+  definition: The practice of protecting information systems from unauthorized access, use, or disclosure.
   exclude:
   - privacy & surveillance
   - computer networking
@@ -1658,8 +1546,7 @@ disciplines:
   group: Systems & Method
   raw:
   - Ecology
-  definition: The scientific study of the relationships between organisms and their
-    physical and biological environments.
+  definition: The scientific study of the relationships between organisms and their physical and biological environments.
   exclude: []
   id: disc-050
 - canonical: evolutionary biology
@@ -1672,8 +1559,7 @@ disciplines:
   - Conservation Biology
   - population genetics
   - biology
-  definition: The study of the origin and diversification of life through genetic
-    and natural selection processes.
+  definition: The study of the origin and diversification of life through genetic and natural selection processes.
   exclude:
   - genetics
   - complex adaptive systems
@@ -1686,8 +1572,7 @@ disciplines:
   - network theory
   - network science
   - graph theory applications
-  definition: The study of social ties and structures using graph theory and network
-    science methods.
+  definition: The study of social ties and structures using graph theory and network science methods.
   exclude:
   - complex adaptive systems
   - sociology
@@ -1701,8 +1586,7 @@ disciplines:
   - cognitive neuroscience
   - neurobiology
   - psychoneuroimmunology
-  definition: The scientific study of the nervous system, including the brain and
-    neural circuits.
+  definition: The scientific study of the nervous system, including the brain and neural circuits.
   exclude:
   - cognitive science
   - psychology
@@ -1715,8 +1599,7 @@ disciplines:
   - autonomous systems
   - mechatronics
   - robot control
-  definition: The engineering and science of designing, building, and operating autonomous
-    or controlled machines.
+  definition: The engineering and science of designing, building, and operating autonomous or controlled machines.
   exclude:
   - artificial intelligence
   - software engineering
@@ -1736,8 +1619,7 @@ disciplines:
   - Kinesiology
   - pharmacology
   - public health
-  definition: The practice and science of maintaining, restoring, and promoting human
-    physical and mental well-being.
+  definition: The practice and science of maintaining, restoring, and promoting human physical and mental well-being.
   exclude:
   - neuroscience
   - psychology
@@ -1753,8 +1635,7 @@ disciplines:
   - drama
   - musical composition
   - performance studies
-  definition: Artistic disciplines involving live performance, including music, theater,
-    and dance.
+  definition: Artistic disciplines involving live performance, including music, theater, and dance.
   exclude:
   - literary theory
   - cultural studies
@@ -1769,8 +1650,7 @@ disciplines:
   - literary criticism
   - poetics
   - narratology
-  definition: The critical frameworks and methods used to analyze and interpret literary
-    texts.
+  definition: The critical frameworks and methods used to analyze and interpret literary texts.
   exclude:
   - cultural studies
   - philosophy
@@ -1788,8 +1668,7 @@ disciplines:
   - design engineering
   - computer architecture
   - manufacturing engineering
-  definition: The application of scientific principles to design, build, and maintain
-    structures and machines.
+  definition: The application of scientific principles to design, build, and maintain structures and machines.
   exclude:
   - systems engineering
   - software engineering
@@ -1799,10 +1678,7 @@ disciplines:
   group: Design Cognition
   raw:
   - design thinking
-  definition: A human-centered approach to innovation — an iterative process (empathise
-    → define → ideate → prototype → test) that integrates user needs, technology feasibility,
-    and business viability, whose output is a designed solution, not an explanation
-    of the mind.
+  definition: A human-centered approach to innovation — an iterative process (empathise → define → ideate → prototype → test) that integrates user needs, technology feasibility, and business viability, whose output is a designed solution, not an explanation of the mind.
   exclude:
   - creative process
   - design psychology
@@ -1813,8 +1689,7 @@ disciplines:
   group: AI & Computing
   raw:
   - information retrieval
-  definition: The field of finding unstructured information, typically from documents,
-    in response to queries.
+  definition: The field of finding unstructured information, typically from documents, in response to queries.
   exclude:
   - information science
   - machine learning
@@ -1825,8 +1700,7 @@ disciplines:
   raw:
   - computational theory
   - theory of computation
-  definition: The study of the theoretical foundations of computation, including complexity
-    and computability.
+  definition: The study of the theoretical foundations of computation, including complexity and computability.
   exclude:
   - software engineering
   - artificial intelligence
@@ -1840,21 +1714,14 @@ disciplines:
   - organizational management
   - business management
   - administration
-  definition: The academic study of how organizations are structured, coordinated,
-    and governed — spanning strategy, operations, human-resource management, and organizational
-    design — to achieve objectives under resource constraints. A management lens applied
-    across subject-matter domains (business operations, business development, project
-    management), not the subject matter itself.
+  definition: The academic study of how organizations are structured, coordinated, and governed — spanning strategy, operations, human-resource management, and organizational design — to achieve objectives under resource constraints. A management lens applied across subject-matter domains (business operations, business development, project management), not the subject matter itself.
   exclude:
   - organizational theory
   - strategic thinking
   - decision making
   - risk management
   id: disc-062
-  differentia: 'PRESCRIPTIVE/NORMATIVE lens: the managerial FUNCTION is the OBJECT
-    — how to steer an organization toward objectives under resource constraints (strategy,
-    operations, HR, organizational design). Asks ''how should I run it?'', never ''how
-    does it naturally work?'''
+  differentia: 'PRESCRIPTIVE/NORMATIVE lens: the managerial FUNCTION is the OBJECT — how to steer an organization toward objectives under resource constraints (strategy, operations, HR, organizational design). Asks ''how should I run it?'', never ''how does it naturally work?'''
 - canonical: marketing
   group: Business & Management
   raw:
@@ -1863,10 +1730,7 @@ disciplines:
   - consumer behaviour
   - market research
   - marketing strategy
-  definition: The academic study of how value is created, communicated, and exchanged
-    with customers — spanning consumer behavior, market segmentation, positioning,
-    and marketing research. The explanatory lens on buyer behavior and market exchange,
-    distinct from the professional practice domain "marketing & communications".
+  definition: The academic study of how value is created, communicated, and exchanged with customers — spanning consumer behavior, market segmentation, positioning, and marketing research. The explanatory lens on buyer behavior and market exchange, distinct from the professional practice domain "marketing & communications".
   exclude:
   - behavioral economics
   - psychology
@@ -1882,10 +1746,7 @@ disciplines:
   - new venture creation
   - startup studies
   - innovation management
-  definition: The academic study of how new ventures are identified, created, and
-    scaled — spanning opportunity recognition, resource mobilization, and entrepreneurial
-    finance. The scholarly lens on the venture-creation process, distinct from the
-    venture-building subject matter of the domain "entrepreneurship".
+  definition: The academic study of how new ventures are identified, created, and scaled — spanning opportunity recognition, resource mobilization, and entrepreneurial finance. The scholarly lens on the venture-creation process, distinct from the venture-building subject matter of the domain "entrepreneurship".
   exclude:
   - business administration
   - strategic thinking
@@ -1972,23 +1833,18 @@ meta:
   - social engineering
   - ml systems & infrastructure
   - computer networking
+  - science & research
+  - social sciences
   catch_all_domain: emerging
   catch_all_discipline: emerging
-  catch_all_description: 'Used when no canonical domain or discipline fits the principle
-    ontologically and pragmatically. Preserves the raw S3A convergence label as s3_original_domain
-    for future taxonomy expansion when enough principles accumulate under a label.
+  catch_all_description: 'Used when no canonical domain or discipline fits the principle ontologically and pragmatically. Preserves the raw S3A convergence label as s3_original_domain for future taxonomy expansion when enough principles accumulate under a label.
 
     '
   menu_repair_20260921_added_domains: []
-  menu_repair_20260921_result: no-op - all 8 proposed gap domains already existed
-    in v5.5, so NO slot was added and the version is NOT bumped; the v6.0 string was
-    an audit marker written by scripts/apply_menu_repair_v6.py and reverted by D-309.
-    Ontology bytes are unchanged from v5.5 (see governance/TAXONOMY_v6_MIGRATION_20260921.md).
+  menu_repair_20260921_result: no-op - all 8 proposed gap domains already existed in v5.5, so NO slot was added and the version is NOT bumped; the v6.0 string was an audit marker written by scripts/apply_menu_repair_v6.py and reverted by D-309. Ontology bytes are unchanged from v5.5 (see governance/TAXONOMY_v6_MIGRATION_20260921.md).
   be_definition_widened_20260921:
     decision: D-321
     slots_added: 0
     denotation_not_spelling: true
     sha256_before: 8d3c90e949ab1988e097c9fc58c80b6f4279477c9651436dddf4d8ffa91d3ae0
-    note: behavioral economics definition widened to name the mechanism class (heuristics,
-      framing, affect, social norms, peer influence) and the second object class (behavior-change
-      interventions); excludes unchanged; fixes BUG-357 (row 60).
+    note: behavioral economics definition widened to name the mechanism class (heuristics, framing, affect, social norms, peer influence) and the second object class (behavior-change interventions); excludes unchanged; fixes BUG-357 (row 60).

@@ -376,8 +376,17 @@ class StudentClassifier:
 
         dom_probs = torch.sigmoid(dom_logits)[0]
         result["discipline"] = self._idx_disc[max_idx]
-        result["domains"] = [self._idx_dom[i] for i in range(self._n_dom)
-                             if float(dom_probs[i]) >= DOMAIN_SIGMOID_THRESHOLD]
+        # Confidence-ranked domain emission: list order IS the confidence ranking, so the
+        # per-FB cardinality cap (top-N) keeps the MOST confident labels, never an arbitrary
+        # menu-order prefix (confidence = per-domain sigmoid probability).
+        hits = [
+            (float(dom_probs[i]), self._idx_dom[i])
+            for i in range(self._n_dom)
+            if float(dom_probs[i]) >= DOMAIN_SIGMOID_THRESHOLD
+        ]
+        hits.sort(key=lambda t: t[0], reverse=True)
+        result["domains"] = [name for _, name in hits]
+        result["domain_confidences"] = {name: round(prob, 4) for prob, name in hits}
         return result
 
     def predict_coarse(self, text: str) -> Dict[str, Any]:

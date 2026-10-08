@@ -6,7 +6,8 @@ The owner ruled (2026-10-02): "all discipline are human approved" — i.e. every
 as-is.  This converts the discipline axis to 208/208 human-provenanced labels and closes BUG-620.
 
 Deterministic + fail-closed (C12d: no silent remap).  Emits three provenance-stamped artifacts:
-  1. governance/discipline_anchor_conformance_20261002.json  (204 golden-eligible gold rows)
+  1. [RETIRED, D-2868] governance/discipline_anchor_conformance_20261002.json (204 gold rows) —
+     superseded by governance/discipline_anchor_rederived_v8_20261007.json; this one-shot is COMPLETE.
   2. governance/discipline_finalization_owner_bulk_20261002.json (the ruling record)
   3. an UPDATED governance/ANCHOR_208_CONSOLIDATED_20261002.json (discipline_source -> owner_finalized)
 
@@ -24,7 +25,7 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
 CONSOLIDATED = REPO / "governance" / "ANCHOR_208_CONSOLIDATED_20261002.json"
-OUT_CONFORMANCE = REPO / "governance" / "discipline_anchor_conformance_20261002.json"
+OUT_CONFORMANCE = REPO / "governance" / "discipline_anchor_conformance_20261002.json"  # RETIRED (D-2868): superseded by rederived_v8; one-shot COMPLETE, self-guarded vs re-run
 OUT_BULK = REPO / "governance" / "discipline_finalization_owner_bulk_20261002.json"
 BACKUP = REPO / "governance" / "ANCHOR_208_CONSOLIDATED_20261002.json.bak_20261002_discipline"
 

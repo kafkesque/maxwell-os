@@ -54,7 +54,7 @@ from discipline_conformance_gate import (  # noqa: E402
 )
 
 # C20: named constants (no magic numbers).
-DEFAULT_ANCHOR = "governance/discipline_anchor_conformance_20261002.json"
+DEFAULT_ANCHOR = "governance/discipline_anchor_rederived_v8_20261007.json"
 DEFAULT_MENU = "config/closed_menu_v5.json"
 DEFAULT_MACRO_GROUPS = "config/discipline_macro_groups.yaml"
 # BUG-622/D-2797 (2026-10-03): gpt-oss-20b-MXFP4-Q8 is a HARMONY reasoning model.

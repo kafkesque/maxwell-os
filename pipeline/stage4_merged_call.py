@@ -42,7 +42,7 @@ PART 1 — CRIBS ENRICHMENT:
 
 PART 2 — CLASSIFICATION:
 - discipline: SINGLE most precise academic discipline. "computational neuroscience" > "neuroscience."
-- domains: 1-5 applied domains where a practitioner would USE this knowledge.
+- domains: 1-7 applied domains where a practitioner would USE this knowledge.
 - DISCIPLINE vs DOMAIN DISJOINTNESS (D2422 / BUG-197 — enforced, never mix the axes):
   * discipline = an ACADEMIC FIELD OF STUDY (e.g., cognitive science, economics, philosophy,
     computer science, psychology, linguistics, systems engineering).
@@ -240,7 +240,7 @@ def _apply_definition_anchored_schema(system: str) -> str:
         f'"discipline": "one label from CLOSED DISCIPLINE MENU (verbatim) or \'{abstention}\'",'
     )
     dom_new = (
-        f'"domains": ["1-5 labels from CLOSED DOMAIN MENU (verbatim); \'{abstention}\' if none fit"],'
+        f'"domains": ["1-7 labels from CLOSED DOMAIN MENU (verbatim); \'{abstention}\' if none fit"],'
     )
     system = system.replace(disc_old, disc_new, 1).replace(dom_old, dom_new, 1)
     return system
@@ -273,7 +273,7 @@ def _apply_definition_anchored_menu(system: str) -> str:
     i, j = system.index(start_a), system.index(end_a)
     new_a = (
         f"- discipline: choose EXACTLY ONE label from the CLOSED DISCIPLINE MENU below, verbatim, or '{abstention}' if none fits.\n"
-        f"- domains: choose 1-5 labels from the CLOSED DOMAIN MENU below, verbatim, or '{abstention}' if none fit.\n"
+        f"- domains: choose 1-7 labels from the CLOSED DOMAIN MENU below, verbatim, or '{abstention}' if none fit.\n"
         "- DISCIPLINE vs DOMAIN DISJOINTNESS (D2422 / BUG-197 — enforced, never mix the axes):\n"
         "  * Pick each label from its OWN menu only; never emit a discipline-menu label into `domains`\n"
         "    or a domain-menu label into `discipline`.\n"
@@ -310,7 +310,7 @@ def _apply_definition_anchored_menu_batch(system: str) -> str:
     i, j = system.index(start), system.index(end) + len(end)
     new = (
         f"- discipline: choose EXACTLY ONE label from the CLOSED DISCIPLINE MENU below, verbatim, or '{abstention}' if none fits.\n"
-        f"- domains: choose 1-5 labels from the CLOSED DOMAIN MENU below, verbatim, or '{abstention}' if none fit.\n"
+        f"- domains: choose 1-7 labels from the CLOSED DOMAIN MENU below, verbatim, or '{abstention}' if none fit.\n"
         "- DISCIPLINE vs DOMAIN DISJOINTNESS (D2422 / BUG-197 — enforced, never mix the axes):\n"
         "  * Pick each label from its OWN menu only; never emit a discipline-menu label into `domains`\n"
         "    or a domain-menu label into `discipline`.\n"

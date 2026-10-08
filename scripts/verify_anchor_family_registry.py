@@ -117,7 +117,10 @@ def derive(cfg: dict[str, Any]) -> dict[str, Any]:
     # Domains axis is now OWNED (D-2720): the 208-row five-axis view carries the domain +
     # primary_domain columns directly, so the cohort IS the CSV (no JSONL join into the 150).
     dom_cfg = cfg["axes"]["domains"]
-    cohort = read_csv_rows(REPO / dom_cfg["artifact"])
+    if Path(dom_cfg["artifact"]).suffix.lower() == ".json":
+        cohort = json.loads((REPO / dom_cfg["artifact"]).read_text(encoding="utf-8")).get("rows", [])
+    else:
+        cohort = read_csv_rows(REPO / dom_cfg["artifact"])
     out["domains_cohort"] = len(cohort)
     out["domains_cohort_human_adjudicated"] = sum(
         1 for d in cohort if (d.get("domain") or "").strip()

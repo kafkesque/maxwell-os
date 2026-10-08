@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """check_domain_cardinality.py — BUG-631 READER-limb: re-measure the committed store for per-FB domain-cardinality violations.
 
-WHY THIS EXISTS (BUG-631, D-2838). ``pipeline_config.yaml`` declares ``max_domains_per_fb: 5``, but the value
+WHY THIS EXISTS (BUG-631, D-2838). ``pipeline_config.yaml`` declared ``max_domains_per_fb: 5`` at filing (now 7 via C12), but the value
 was DETECTED ("Too many domains") and NOT ENFORCED: the write-path salvage dropped only NON-canonical labels, so a
 row carrying 6-7 VALID domains was written unchanged (52 FBs, every one ``classification_status=CLEAN``). D-2838
 landed the WRITER-limb (``_enforce_domain_cardinality`` in ``pipeline/stage4_merge.py``) that truncates

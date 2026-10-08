@@ -1,0 +1,209 @@
+item_id,name,depth,depth_label,discipline,domain,primary_domain,has_domain
+R001,Surveillance Capitalism Value Proposition,3,domain,privacy & surveillance,marketing & communications|digital product|information architecture,marketing & communications,yes
+R002,Soviet Underground Discourse Reception,3,domain,cultural studies,media & entertainment|semiotics & communication,media & entertainment,yes
+R003,Quantum Cognitive Effects in Survey Design,4,specialized,cognitive science,research practice,research practice,yes
+R004,Lockdown Effectiveness and Economic Impact,3,domain,political economy,legal & public policy,legal & public policy,yes
+R005,Graphics Algebra Cross Operator,4,specialized,computer graphics,data visualization,data visualization,yes
+R006,Generative Algorithmic Composition,3,domain,emerging,computational art|creative technology|code & computation,computational art,yes
+R007,Accessible Electronic Prototyping Ecosystem,3,domain,engineering,engineering & infrastructure|design strategy|user experience|education|product design,engineering & infrastructure,yes
+R008,Inescapable Shock Syndrome,3,domain,psychology,health & wellness,health & wellness,yes
+R009,Entrepreneurial Risk Assessment Framework,3,domain,decision making,entrepreneurship,entrepreneurship,yes
+R010,Iterative Launch Process,2,cross-domain,design thinking,product design|user experience|project management|digital product,product design,yes
+R011,Agentic Decision-making Through Contextual Retrieval,3,domain,information retrieval,ai & agents,ai & agents,yes
+R012,Evolution of Game Art and Design,3,domain,game design,media & entertainment|creative technology|design strategy|user experience,media & entertainment,yes
+R013,Innovation Fund Risk Management,3,domain,risk management,business operations|finance & investment,business operations,yes
+R014,Sacred Geometry and Symbolic Resonance,2,cross-domain,philosophy,arts & culture|semiotics & communication,arts & culture,yes
+R015,Long-term Strategic Planning in Different Industries,2,cross-domain,business administration,business development|business operations,business development,yes
+R016,Modelans-modelandum Relationship,3,domain,semiotics,semiotics & communication,semiotics & communication,yes
+R017,Chemical Reaction Equation Automation,4,specialized,computational physics & simulation,computational science & physics,computational science & physics,yes
+R018,Color and Typography Readability,2,cross-domain,color theory,graphic design|brand identity|user experience|editorial & advertising|design systems,graphic design,yes
+R019,Scientific Research Evaluation Framework,3,domain,research methodology,research practice,research practice,yes
+R020,Dynamic System Complexity,2,cross-domain,complex adaptive systems,systems & frameworks|business development,systems & frameworks,yes
+R021,Index Section,,,,,,no
+R022,Coupon Code Feature Placement Strategy,4,specialized,human-computer interaction,user experience|design strategy|marketing & communications,user experience,yes
+R023,Focused Action Selection,2,cross-domain,decision making,personal productivity|project management,personal productivity,yes
+R024,Execution Gap From Technological Readiness,2,cross-domain,business administration,business operations|business development|finance & investment,business operations,yes
+R025,Design for Management and Organizational Culture,3,domain,organizational theory,design strategy|organizational behavior|leadership,design strategy,yes
+R026,Index of Motion Graphic Title Design Terms,4,specialized,information science,information architecture,information architecture,yes
+R027,Decentralized Strategic Command,2,cross-domain,organizational theory,leadership|organizational behavior,leadership,yes
+R028,Gpu Acceleration Configuration,4,specialized,machine learning,engineering practice,engineering practice,yes
+R029,Innovation Through Challenge to Assumptions,2,cross-domain,business administration,design strategy|marketing & communications|product design|business development|brand identity,design strategy,yes
+R030,Digital Iconic Reproduction in Computer Graphics,4,specialized,computer graphics,code & computation,code & computation,yes
+R031,Questionnaire Validation and Modification Risk,3,domain,risk management,research practice,research practice,yes
+R032,Heckel's Diff Algorithm for Version Tracking,4,specialized,computational theory,engineering practice,engineering practice,yes
+R033,Postmodern Critique of Realist Assumptions,2,cross-domain,philosophy,research practice,research practice,yes
+R034,Negative Space Alphabet Challenge,3,domain,design thinking,graphic design|design systems,graphic design,yes
+R035,Visual Evidence Recognition,2,cross-domain,visual perception,data visualization|systems & frameworks,data visualization,yes
+R036,Domain Name Call-to-action Strategy,4,specialized,marketing,marketing & communications|design strategy|user experience|brand identity,marketing & communications,yes
+R037,Style Precedence and Override Behavior,4,specialized,software engineering,engineering practice,engineering practice,yes
+R038,Multiple Imputation Procedure,3,domain,research methodology,research practice,research practice,yes
+R039,Identity  As Social Positioning and Lifestyle Signifiers,2,cross-domain,sociology,marketing & communications|design strategy|semiotics & communication,marketing & communications,yes
+R040,Commercial Advertising Souring of Artistic Vision,3,domain,emerging,,,no
+R041,Consumer Anticipation of Objections,2,cross-domain,marketing,product design|user experience|design strategy,product design,yes
+R042,Destination-control Elevator Interaction Pattern,3,domain,human-computer interaction,user experience,user experience,yes
+R043,Alpha State Thinking and Creative Problem-solving,2,cross-domain,cognitive science,personal productivity|arts & culture,personal productivity,yes
+R044,Cyclical Design Lifecycle,3,domain,systems thinking,product design|design strategy|environmental design,product design,yes
+R045,Wpi Consumer Value Proposition Framework,2,cross-domain,marketing,marketing & communications|brand identity,marketing & communications,yes
+R046,Bitcoin Mining As Digital Ownership Model,3,domain,economics,finance & investment,finance & investment,yes
+R047,Emotional Transaction Design,2,cross-domain,psychology,user experience|design strategy,user experience,yes
+R048,Creative Process Through Drawing and Sketching,2,cross-domain,creative process,graphic design|arts & culture|illustration,graphic design,yes
+R049,Fermi Estimation Method,1,universal,operations research,research practice|systems & frameworks|project management|personal productivity,research practice,yes
+R050,Methodological Accountability,3,domain,research methodology,research practice,research practice,yes
+R051,Central Emptiness in Urban Design,3,domain,cultural design,urban planning,urban planning,yes
+R052,Interior Design Fixture Selection Challenge,4,specialized,design thinking,design strategy,design strategy,yes
+R053,Self-referential Incompleteness,1,universal,computational theory,code & computation|computational science & physics|systems & frameworks,code & computation,yes
+R054,Shap Explainability Framework,4,specialized,machine learning,code & computation,code & computation,yes
+R055,Demand-side Sales Pattern,3,domain,marketing,marketing & communications,marketing & communications,yes
+R056,Quiz Generation with Llm Integration,4,specialized,generative ai,education,education,yes
+R057,Annual Percentage Rate Standardization,3,domain,finance,finance & investment,finance & investment,yes
+R058,Illustration As Propaganda Tool,2,cross-domain,communication theory,illustration|marketing & communications|semiotics & communication|editorial & advertising,illustration,yes
+R059,First Course Development Framework,3,domain,emerging,entrepreneurship|business development|education|product design|user experience,entrepreneurship,yes
+R060,Aiga Transportation Symbol System Development,4,specialized,visual semiotics,graphic design,graphic design,yes
+R061,Core Focus As Organizational Discipline,3,domain,organizational theory,leadership|organizational behavior,leadership,yes
+R062,Somatic Marker Decision Making,2,cross-domain,behavioral economics,marketing & communications|user experience,marketing & communications,yes
+R063,Textbook Representation and State of Exception Legitimation,4,specialized,cultural studies,education|media & entertainment|semiotics & communication|digital product,education,yes
+R064,Optical Alignment in Typography,2,cross-domain,typography,graphic design|design systems|web & ui|brand identity|editorial & advertising,graphic design,yes
+R065,Media Construction of Crime Waves,3,domain,media studies,media & entertainment,media & entertainment,yes
+R066,N-dimensional Sphere Volume Properties,4,specialized,computational geometry,computational science & physics|code & computation,computational science & physics,yes
+R067,Schemat's Wasser Interactive Art Framework,4,specialized,interdisciplinary studies,creative technology|media & entertainment|user experience,creative technology,yes
+R068,Imagination and the Image,2,cross-domain,aesthetics,editorial & advertising|design strategy|design systems,editorial & advertising,yes
+R069,Falsifiable Variable Measurement,3,domain,research methodology,research practice,research practice,yes
+R070,Iterative Design Validation,2,cross-domain,design thinking,design strategy|user experience|product design,design strategy,yes
+R071,Lean Startup Experimentation Framework,3,domain,entrepreneurship studies,entrepreneurship|research practice|business development,entrepreneurship,yes
+R072,Park24 Nondisruptive Market Creation,4,specialized,entrepreneurship studies,business development|urban planning|design strategy,business development,yes
+R073,Evolution of Language Through Mental Models,4,specialized,anthropology,education|research practice,education,yes
+R074,Attention Economy Externalities,3,domain,cognitive science,user experience,user experience,yes
+R075,Paradigm Shift Through Disruption,2,cross-domain,philosophy,systems & frameworks|arts & culture,systems & frameworks,yes
+R076,Linguistic Fetish in Visual Communication,2,cross-domain,marketing,brand identity|marketing & communications|semiotics & communication,brand identity,yes
+R077,Symbolic Meaning Through Consumption,2,cross-domain,cultural studies,semiotics & communication|marketing & communications,semiotics & communication,yes
+R078,Parameterized Design Generation,2,cross-domain,generative design,code & computation|computational art|creative technology|design systems,code & computation,yes
+R079,Bar-hillel Paradox,3,domain,linguistics,semiotics & communication,semiotics & communication,yes
+R080,Information Design Community Networks,3,domain,emerging,,,no
+R081,Shift From Trend-chasing to Intentional Consumption,3,domain,behavioral economics,marketing & communications,marketing & communications,yes
+R082,Historical Data Sources for Manufacturing and Economic Analysis,3,domain,research methodology,research practice,research practice,yes
+R083,Self-herding Behavior,2,cross-domain,behavioral economics,marketing & communications|user experience,marketing & communications,yes
+R084,Data Visualization Research Lab Leadership,3,domain,,,,no
+R085,Discursive Strategy Abstraction,2,cross-domain,cultural studies,education|health & wellness|semiotics & communication,education,yes
+R086,Commitment and Consistency Principle (2),2,cross-domain,behavioral economics,marketing & communications|user experience|digital product,marketing & communications,yes
+R087,In-group Identity and Social Bonding,2,cross-domain,psychology,organizational behavior,organizational behavior,yes
+R088,Gradio Web Interface for Ml Models,4,specialized,human-computer interaction,digital product|user experience|web & ui,digital product,yes
+R089,Vr Body Constraint and Physical Immersion,4,specialized,human-computer interaction,design strategy|user experience|engineering & infrastructure,design strategy,yes
+R090,Culture Jamming,3,domain,media studies,media & entertainment|editorial & advertising|design strategy|design systems|semiotics & communication,media & entertainment,yes
+R091,Autopoesis in Design Education,3,domain,emerging,,,no
+R092,Data Quality and Method Transparency in Journalism,3,domain,research methodology,research practice,research practice,yes
+R093,Numerical Symbolism in Design and Biology,3,domain,semiotics,design strategy|design systems|semiotics & communication,design strategy,yes
+R094,Progressive Feature Introduction,3,domain,human-computer interaction,user experience,user experience,yes
+R095,Sensory Engagement As Quality Signal,3,domain,psychology,product design|marketing & communications|environmental design,product design,yes
+R096,Transportation and Setup Costs in Construction Projects,3,domain,finance,project management|business operations|engineering & infrastructure,project management,yes
+R097,Minimin Decision Criterion,2,cross-domain,decision making,business development|business operations|finance & investment|design strategy,business development,yes
+R098,Aesthetic Refinement Through Iteration,2,cross-domain,aesthetics,design strategy|graphic design|digital product|product design,design strategy,yes
+R099,Charismatic Brand Discipline,3,domain,marketing,brand identity|marketing & communications|design strategy,brand identity,yes
+R100,Network Marketing Business Model,3,domain,business administration,entrepreneurship|business development|marketing & communications,entrepreneurship,yes
+R101,Pragmatist View of Truth and Knowledge,2,cross-domain,philosophy,research practice|education,research practice,yes
+R102,Social Entrepreneur's Playbook,3,domain,entrepreneurship studies,entrepreneurship,entrepreneurship,yes
+R103,Temporal Consistency in Visual Narrative Analysis,2,cross-domain,visual semiotics,media & entertainment|motion design|illustration,media & entertainment,yes
+R104,Strategic Information Gathering,2,cross-domain,operations research,research practice|information architecture|data visualization,research practice,yes
+R105,Probabilistic Forecasting with Prediction Intervals,2,cross-domain,operations research,business operations|research practice|finance & investment,business operations,yes
+R106,The Invisible Art of Film Editing,3,domain,,,,no
+R107,Lived Experience Focus,2,cross-domain,philosophy,education|user experience|research practice,education,yes
+R108,Typography in Brand Positioning and Magazine Design,3,domain,typography,graphic design|design strategy|brand identity,graphic design,yes
+R109,Project Completion Bias,2,cross-domain,behavioral economics,personal productivity|user experience,personal productivity,yes
+R110,Federated Information Architecture,2,cross-domain,information science,design systems|information architecture|systems & frameworks|web & ui,design systems,yes
+R111,Pmt Camera Typography Manipulation,4,specialized,typography,graphic design,graphic design,yes
+R112,Content Analysis Approaches in Visual Research,3,domain,research methodology,research practice,research practice,yes
+R113,Traveling Salesman Problem Computational Complexity,4,specialized,computational theory,engineering practice|computational science & physics,engineering practice,yes
+R114,Measurable Outcome Focus,2,cross-domain,decision making,business operations|personal productivity,business operations,yes
+R115,Heuristic Reasoning in Problem Solving,3,domain,operations research,research practice,research practice,yes
+R116,Ai Model Deployment Risk,3,domain,risk management,business operations|engineering & infrastructure|organizational behavior|project management,business operations,yes
+R117,Sustained Purpose Over Temporary Gratification,2,cross-domain,behavioral economics,finance & investment|personal productivity,finance & investment,yes
+R118,Pass@k Evaluation Method,4,specialized,research methodology,ai & agents,ai & agents,yes
+R119,Strategic Human Resource Planning for Social Enterprises,3,domain,business administration,entrepreneurship|business operations|leadership,entrepreneurship,yes
+R120,Nonlinear Magnification Fields,4,specialized,computer graphics,data visualization,data visualization,yes
+R121,Consumers Hero Refurbishment Strategy,3,domain,business administration,business development|business operations|product design|marketing & communications,business development,yes
+R122,Visual Hierarchy Through Contrast (2),2,cross-domain,visual perception,graphic design|editorial & advertising|user experience|web & ui,graphic design,yes
+R123,Superquadric Parameterization in 3d Space,4,specialized,computational geometry,code & computation|creative technology,code & computation,yes
+R124,Foundation Model Integration Framework,3,domain,artificial intelligence,engineering practice|systems & frameworks,engineering practice,yes
+R125,Dell Computer's Direct-sale Business Model,3,domain,business administration,business development|business operations|marketing & communications,business development,yes
+R126,Embodied Knowledge in Design,3,domain,cultural design,design systems|design strategy|industrial design,design systems,yes
+R127,Guild of Handicraft Educational Model,4,specialized,emerging,design strategy|design systems|education,design strategy,yes
+R128,Choice Architecture and Identity Framing,3,domain,decision making,personal productivity|design strategy|user experience,personal productivity,yes
+R129,Use of Proxies and Analogues in Market Sizing,3,domain,marketing,research practice|business development,research practice,yes
+R130,Typographic Principles of William Morris,3,domain,typography,editorial & advertising|graphic design,editorial & advertising,yes
+R131,Differential Privacy in Data Collection,4,specialized,privacy & surveillance,information architecture,information architecture,yes
+R132,Monte Carlo PDE Solution Method,4,specialized,computational physics & simulation,computational science & physics,computational science & physics,yes
+R133,Three-holes-in-the-cheese Model of Error Cascades,3,domain,risk management,systems & frameworks,systems & frameworks,yes
+R134,Holistic Interpretation Problem in Index-aware Retrieval,4,specialized,information retrieval,information architecture|ai & agents,information architecture,yes
+R135,Ase  Design Problem Solving Model,2,cross-domain,design thinking,design strategy,design strategy,yes
+R136,Chatgpt Prompt Framework,4,specialized,generative ai,information architecture|ai & agents,information architecture,yes
+R137,Desire-friction Conversion Formula,3,domain,behavioral economics,user experience,user experience,yes
+R138,Hjelmslev's Trichotomy and Linguistic Theory,2,cross-domain,linguistics,semiotics & communication,semiotics & communication,yes
+R139,Learning Through Failure Process,2,cross-domain,cognitive science,education|personal productivity,education,yes
+R140,Digital Culture Integration in Graphic Design,3,domain,emerging,creative technology|digital product|graphic design|user experience|web & ui,creative technology,yes
+R141,Contextual Redundancy and Representation Efficiency,3,domain,information science,engineering practice|code & computation,engineering practice,yes
+R142,Global Village Conceptual Framework,3,domain,communication theory,media & entertainment|systems & frameworks,media & entertainment,yes
+R143,Figma Hamburger Icon Creation,4,specialized,computer graphics,design systems,design systems,yes
+R144,Abra-kadabra Number Classification,4,specialized,software engineering,code & computation,code & computation,yes
+R145,Color As Cultural and Emotional Marker,2,cross-domain,color theory,brand identity|design strategy|graphic design|semiotics & communication|marketing & communications,brand identity,yes
+R146,Debate As Leadership Tool,3,domain,emerging,leadership|organizational behavior,leadership,yes
+R147,Randomness in Data Measurement,3,domain,research methodology,research practice,research practice,yes
+R148,Professional Development Through Studio Experience,3,domain,,,,no
+R149,Perceptual Mapping Through Camouflage,4,specialized,visual perception,design strategy|creative technology,design strategy,yes
+R150,Triple Bottom Line Business Approach,3,domain,strategic thinking,business development|marketing & communications|organizational behavior|design strategy|systems & frameworks,business development,yes
+R151,Context-dependent Cognitive Processing,2,cross-domain,cognitive science,education|research practice,education,yes
+R152,Economic Politics of Obsolescence,3,domain,political economy,business development|marketing & communications|legal & public policy,business development,yes
+R153,Cognitive Interview Analysis of Question Clarity Issues,4,specialized,cognitive science,user experience,user experience,yes
+R154,Aditya Birla Group's Parta System,4,specialized,finance,business operations|finance & investment|leadership,business operations,yes
+R155,Persistence in Business Strategy,3,domain,business administration,business development|leadership,business development,yes
+R156,Designers' Object World,3,domain,cognitive science,design strategy|design systems|user experience,design strategy,yes
+R157,Perspective-driven Cognitive Shift,2,cross-domain,cognitive science,education|user experience,education,yes
+R158,Duality in Design,3,domain,cultural design,design strategy|design systems|user experience,design strategy,yes
+R159,Context-dependent Quality Assessment,2,cross-domain,research methodology,user experience|research practice,user experience,yes
+R160,Resource-based Value Assessment,3,domain,operations research,business development|marketing & communications|finance & investment,business development,yes
+R162,Provincial Norms,3,domain,psychology,organizational behavior|education|leadership,organizational behavior,yes
+R163,Metaphorically Selling How to Use the Ma,3,domain,communication theory,marketing & communications,marketing & communications,yes
+R164,Phenomenological Understanding,3,domain,philosophy,research practice,research practice,yes
+R165,Acknowledgment Attribution,4,specialized,emerging,editorial & advertising,editorial & advertising,yes
+R166,Agent-centric Economic Incentives,3,domain,economics,ai & agents,ai & agents,yes
+R167,Innocent Brand Identity Through Organic Development,3,domain,organizational theory,brand identity|marketing & communications|organizational behavior,brand identity,yes
+R168,Hidden Issue Questioning Technique,4,specialized,marketing,research practice,research practice,yes
+R169,Charismatic Leadership Development,3,domain,psychology,leadership,leadership,yes
+R170,Dream-driven Life Planning,3,domain,decision making,personal productivity,personal productivity,yes
+R171,Alpha Blending Control,4,specialized,computer graphics,code & computation,code & computation,yes
+R172,Digital System Context Decomposition,2,cross-domain,engineering,engineering practice|engineering & infrastructure|product design,engineering practice,yes
+R173,Linkedin Network Building Protocol,4,specialized,social network analysis,business development,business development,yes
+R174,Concept-first Prototyping,3,domain,design thinking,user experience,user experience,yes
+R175,Role-based Prompting Effect,4,specialized,artificial intelligence,ai & agents,ai & agents,yes
+R176,Harvest Time Strategic Planning,3,domain,finance,finance & investment,finance & investment,yes
+R177,Contextual Interpretation Framework,2,cross-domain,semiotics,semiotics & communication,semiotics & communication,yes
+R178,If-then Plan for Moral Action,2,cross-domain,psychology,personal productivity,personal productivity,yes
+R179,Coincidence Wit in Graphic Design,3,domain,creative process,graphic design|semiotics & communication,graphic design,yes
+R180,Intersectional Design Approaches for Underserved Communities,3,domain,cultural studies,design strategy|user experience|research practice,design strategy,yes
+R181,Economic Industry Network Structure,3,domain,economics,systems & frameworks,systems & frameworks,yes
+R182,Cultural Mourning Rituals and Symbolism,3,domain,anthropology,arts & culture,arts & culture,yes
+R183,Pattern Language Implementation Process,3,domain,emerging,urban planning,urban planning,yes
+R184,Doping in Professional Sports: Systemic Pressure and Rationalization,3,domain,behavioral economics,health & wellness,health & wellness,yes
+R185,Tv Advertising Consumer Behavior Pattern,3,domain,marketing,editorial & advertising|marketing & communications,editorial & advertising,yes
+R186,Cognitive Interview Analysis Framework,4,specialized,research methodology,research practice,research practice,yes
+R187,Credibility Through Transparency,2,cross-domain,communication theory,marketing & communications,marketing & communications,yes
+R188,Sensory-motor Basis of Conceptual Reasoning,3,domain,cognitive science,education,education,yes
+R189,Higher-order Polynomial Approximation in Numerical Methods,4,specialized,computational physics & simulation,engineering practice|systems & frameworks,engineering practice,yes
+R190,Design Thinking Integration Strategy,3,domain,design thinking,design strategy|business operations|leadership|project management,design strategy,yes
+R191,Intentional Motion Design,3,domain,motion & time,motion design,motion design,yes
+R192,Long-term Investment Advantage,3,domain,finance,finance & investment,finance & investment,yes
+R193,Brent Spar Campaign Effectiveness,4,specialized,political economy,legal & public policy,legal & public policy,yes
+R195,Agentic Ai System Reliability,3,domain,generative ai,ai & agents|engineering & infrastructure,ai & agents,yes
+R196,Inclusive Design Adaptation,2,cross-domain,human-computer interaction,design systems,design systems,yes
+R197,Peripheral Cue Interference Effect,4,specialized,cognitive science,user experience,user experience,yes
+R198,Survivor Bias in Success Narratives,2,cross-domain,behavioral economics,personal productivity|finance & investment|entrepreneurship,personal productivity,yes
+R199,Comfort Zone Constriction From Negative Influence,3,domain,psychology,user experience,user experience,yes
+R200,Simplicity Cult in Saas Pricing,4,specialized,cultural studies,business development|marketing & communications|user experience,business development,yes
+R201,Physical Activity and Brain Health,3,domain,health & medicine,health & wellness,health & wellness,yes
+R202,Interactive Media Integration,3,domain,emerging,creative technology|media & entertainment|user experience,creative technology,yes
+R203,Iterative Problem-solving in Ux Design,2,cross-domain,design thinking,user experience,user experience,yes
+R204,Expert Overconfidence and Cognitive Laziness,2,cross-domain,psychology,user experience|organizational behavior,user experience,yes
+R205,Innovation Cycles in Art and Technology,2,cross-domain,cultural studies,arts & culture|media & entertainment|design strategy|systems & frameworks,arts & culture,yes
+R206,Directional Changes (dc) in Financial Data,4,specialized,finance,finance & investment,finance & investment,yes
+R207,Generous Audacious Marketing,3,domain,marketing,marketing & communications,marketing & communications,yes
+R208,Recovered Memory Therapy and False Accusations,4,specialized,psychology,health & wellness,health & wellness,yes
+R209,Procedural Vs Declarative Knowledge Retrieval,3,domain,cognitive science,ai & agents|education,ai & agents,yes
+R210,Same-age Peer Modeling,3,domain,behavioral economics,education|user experience|marketing & communications,education,yes

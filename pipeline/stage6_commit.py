@@ -97,7 +97,7 @@ CREATE TABLE IF NOT EXISTS fbs (
     keywords TEXT,
     jargon TEXT,
     -- Classification (D316: discipline singular, D150: domains multi-label)
-    domains TEXT NOT NULL,         -- JSON array (canonical, 1-5)
+    domains TEXT NOT NULL,         -- JSON array (canonical, 1-7)
     domains_raw TEXT,              -- JSON array (LLM original, preserved)
     discipline TEXT NOT NULL,      -- SINGULAR canonical discipline (D316)
     discipline_raw TEXT,           -- LLM original, preserved (singular)

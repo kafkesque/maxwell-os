@@ -7,7 +7,7 @@ Whether TWO-STAGE generative classification — (1) coarse group (~9 from the
 taxonomy `group` field) then (2) fine discipline within the predicted group's
 SMALL menu — beats the flat single-shot production classifier of record for S4
 discipline conformance against the human-owner discipline anchor
-(governance/discipline_anchor_conformance_20261002.json, 204 owner-finalized rows).
+(governance/discipline_anchor_rederived_v8_20261007.json, 204 owner-finalized rows).
 
 RATIONALE (D-2775): the D-2774 closed-62-menu injection was NEGATIVE (0.344 vs
 0.452 baseline) — the binding constraint is gpt-oss-20b's discrimination QUALITY
@@ -69,7 +69,7 @@ TAXONOMY = Path(os.environ.get("TAXONOMY_YAML", REPO / "config" / "taxonomy_v5.y
 ANCHOR = Path(
     os.environ.get(
         "DISCIPLINE_ANCHOR",
-        REPO / "governance" / "discipline_anchor_conformance_20261002.json",
+        REPO / "governance" / "discipline_anchor_rederived_v8_20261007.json",
     )
 )
 

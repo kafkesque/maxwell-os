@@ -70,7 +70,7 @@ DEFAULT_BASELINE = "gpt-oss-20b-MXFP4-Q8"
 DEFAULT_CANDIDATE = "Ornith-1.5-35B-A3B-REAP-19B"
 DEFAULT_KAPPA_BAR = 0.7  # D-2782 classifier-kappa bar, declared pre-eval
 DEPTH_ANCHOR = REPO / "governance" / "depth_anchor_conformance_20261002.json"
-DISCIPLINE_ANCHOR = REPO / "governance" / "discipline_anchor_conformance_20261002.json"
+DISCIPLINE_ANCHOR = REPO / "governance" / "discipline_anchor_rederived_v8_20261007.json"
 
 
 def load_config() -> tuple[str, str, float]:

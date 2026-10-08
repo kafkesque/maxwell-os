@@ -1,0 +1,54 @@
+- id: D-2870
+  state: RATIFIED
+  category: ANCHOR / TAXONOMY
+  title: 'Owner correction — Same-age Peer Modeling 3rd domain + psychology default-route removal + emerging solo guard'
+  decision: |
+    Owner-gated corrections (2026-10-07) closing three classification-integrity issues. Deterministic, LLM-free.
+
+    (1) Same-age Peer Modeling (R210 / SHEET+KEY row 60): owner adds `marketing & communications` as a THIRD
+        applied domain (behavioral economics lens applies to social learning: education, user experience, and
+        peer-influence marketing). domain: education | user experience | marketing & communications.
+        This also converges the previously-divergent ANCHOR-2 SHEET row 60 ("education" only) with the 201-row
+        authority ("education | user experience"): both now carry all three.
+
+    (2) Psychology default-route removal (D2D map): config/discipline_domain_map.yaml entry
+        `psychology: organizational behavior` removed. Psychology has NO single default application field
+        (health & wellness, user experience, product design, leadership, personal productivity, and org behavior
+        all legitimately co-occur across the 201 anchors), so auto-routing it to organizational behavior is a
+        rubber stamp, not a content-driven classification (OntoClean rigidity — Guarino & Welty 2002). Psychology
+        now falls through to the neutral `fallback: research practice` when a row empties. Zero cascade: no
+        anchor currently obtained its domain via this entry (the only 5 ROUTED rows are owner adjudications).
+
+    (3) Emerging-solo guard (fail-closed abstention): `emerging` is the taxonomy catch-all abstention token
+        (meta.catch_all_domain), NOT a kind/role in the 41-domain menu. It is an AXIS-LEVEL open-set rejection
+        (Chow 1970; Scheirer et al. 2013) and must therefore be cardinality EXACTLY 1 (solo), never a co-token
+        beside a concrete domain — that would assert "I cannot classify" AND "I classified X" on one axis
+        (law of non-contradiction). New fail-closed guard added at both the mint point
+        (scripts/build_anchor_v8_apply.py raises SystemExit on catch-all + concrete coexistence) and the rail
+        (scripts/check_anchor_axis_consistency.py::_emerging_abstention_guard, exit 1 on any violation). Partial
+        application (some raw labels map, some do not) is handled by persisting the unmapped raw label in
+        provenance (s3_original_domain), NOT by injecting `emerging` into the domain list.
+
+    Propagation + verification:
+      - build_anchor_v8_remap_triage.py OWNER_OVERRIDES += R210; triage CSV now 21 rows (16 DROP + 5 ROUTED).
+      - build_anchor_v8_apply.py --check re-pinned to exactly 21 changes; re-minted 201-row authority.
+      - regenerate_anchor_208_v8.py -> 208 rows, 201 with v8 domain, 0 stale.
+      - remint_anchor2_v8.py -> KEY + SHEET (60 rows each), OOV=0, BUG-650 referee ok=True.
+      - export_anchor_all_axes_csv.py (new) -> governance/ANCHOR_208_ALL_AXIS_VIEW_20261007.csv (208 rows, all axes).
+      - anchor2_kappa.py re-measured: active_domains 37, macro_kappa_active 0.518, content_type kappa 0.0
+        (degenerate: pipeline 1 distinct vs 10 human), OOV 0.
+      - check_anchor_axis_consistency.py exit 0 (ceiling 0 holds; catch-all never coexists with a concrete domain).
+  bugs: [BUG-643, BUG-650]
+  files:
+    - scripts/build_anchor_v8_remap_triage.py
+    - scripts/build_anchor_v8_apply.py
+    - scripts/check_anchor_axis_consistency.py
+    - scripts/export_anchor_all_axes_csv.py
+    - config/discipline_domain_map.yaml
+    - governance/discipline_anchor_rederived_v8_20261007.json
+    - governance/ANCHOR_208_CONSOLIDATED_20261007.json
+    - governance/ANCHOR_208_ALL_AXIS_VIEW_20261007.csv
+    - governance/ANCHOR2_KEY_V8_20261007.json
+    - governance/ANCHOR2_BLIND_SHEET_V8_20261007.csv
+    - governance/ANCHOR2_V8_REMINT_TRIAGE_20261007.csv
+    - governance/anchor_v8_domain_remap_triage_20261007.csv

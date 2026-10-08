@@ -1,0 +1,64 @@
+- id: D-2878
+  state: RATIFIED
+  category: ANCHOR / TAXONOMY
+  title: 'Owner review ROUND 2: BUG-676 abstention fix (8 rows -> discipline="") + R158 applicability-ranked domain drop + R005/R113 adjudications; the ratified DROP(13) propagation gap opened as BUG-679'
+  bugs: [BUG-667, BUG-676, BUG-678, BUG-679, BUG-680]
+  decision: |
+    Owner-gated (2026-10-08, round 2) rulings folded into the frozen DOMAIN ruler from the OWNER'S OWN answers,
+    written by the owner into governance/OWNER_CONFIRMATION_SHEET_20261008.csv (sha256 8e02e65cc5708d55...,
+    pinned in config and asserted FAIL-CLOSED on every run). Deterministic, LLM-free data transform.
+
+    ABSTENTION IS AN ABSENCE, NOT A TOKEN (BUG-676 FIXED). The owner answered "abstain" for 8 rows; those rows
+    now carry discipline="" and are declared in config#discipline_abstention. Justification: 'emerging' is the
+    DOMAIN-axis catch-all, not one of the 64 canonical disciplines, so an authority row asserted a rigid kind the
+    closed menu does not contain (OntoClean: discipline = rigid kind; D-2813 forbids a generator-synthesized
+    label). The script is FAIL-CLOSED in BOTH directions (an undeclared token-bearing row aborts; a declared id
+    absent from the ruler aborts).
+
+    R158 "Duality in Design" - APPLICABILITY-RANKED DROP, never positional. remove_domains = [editorial &
+    advertising, motion design]; graphic design is RE-INSTATED (the prior tail truncation had dropped the FB's own
+    core vocabulary). Precedence respected: the sheet's domains column is the base and is never overridden by the
+    oov candidates, and the owner-agreed primary (design strategy, empty owner_review = agreement) is untouched
+    even though it ranks low on intrinsic applicability - that is raised as an owner question, never inferred.
+
+    R005 "Graphics Algebra Cross Operator" - engineering practice CANNOT be primary with high conviction
+    (a graphics-algebra rendering operator's application role is data visualization; the FB is QUARANTINE /
+    speculative with a NEUTRAL factual NLI check). Primary stays data visualization; information architecture
+    NOT added. R113 - primary=engineering practice, computational science & physics KEPT as additional,
+    systems & frameworks EXCLUDED (no high confidence). Declared divergence: the live store carries
+    discipline=operations research + domains [code & computation, education] for R113; the ruler stands.
+
+    MEASURED CONTRADICTION OPENED AS BUG-679: the owner-ratified RATIFY-3 DROP(13) (D-2711/D-2719, owner,
+    2026-09-30) reached only 5 of 13 anchor rows - 8 ratified drops (R012 R026 R034 R082 R140 R180 R182 R200)
+    are still LIVE rows with full axes in the frozen ruler, contradicting D-2813 ("for a noise_drop row depth and
+    discipline do NOT apply"). Impact: the owner was asked in round 2 to confirm axes for rows already dropped.
+    Fix = one owner word (propagate: 201 -> 193, rows retained in the soft-quarantine ledger) or a superseding
+    decision re-affirming them as live. BUG-680 declares the residual: the two upstream anchor faces still carry
+    the out-of-menu token in the discipline slot.
+
+    BUG-667: the owner explicitly approved the t11 authority re-mint ("BUG 667 ok approve") - D-2862 stands.
+
+    Ruler re-freeze: sha256 b766ae912401d7da3f5e1bff3c4ddc1515696a11174e0f2adafe0277ea6ed569
+    -> 5fcde5619e04fbdaebeb02270ca9a189e13e903ad2cf61318fb75285fed5e22c; 201 rows; 9 rows changed
+    (8 abstentions + R158); 15 declared warnings; scripts/apply_owner_domain_review.py --check reproduces it
+    byte-identically. Invariants verified: no row over the D150 cap of 7, primary_domain == domains[0] on every
+    row, 0 non-canonical domains, 0 rows left carrying the token.
+
+    Independent verification (R5, different model family - gemma-4-E4B-it-MLX-4bit): the R158 ranking was
+    re-derived blind; it AGREED on the load-bearing correction (graphic design is high-applicability; design
+    systems is the weakest candidate) and DIVERGED on the two drops (its own answer: design systems + arts &
+    culture). Its reasoning anchored on the protected-primary hint ("since it is the PRIMARY domain, it must be
+    ranked highly") - recorded as a verifier-drift signal, not as consensus. Divergence is reported to the owner
+    in governance/OWNER_RULINGS_ROUND2_20261008.md rather than averaged away.
+
+    Rails after the change: recompute --check, check_governance_faces, check_decision_membership,
+    check_anchor_axis_consistency (ceiling 0 holds), verify_handoffs, check_repo_integrity,
+    check_declaration_consumers - all rc=0.
+  files:
+    - governance/OWNER_CONFIRMATION_SHEET_20261008.csv
+    - governance/OWNER_RULINGS_ROUND2_20261008.md
+    - config/owner_domain_rulings_20261008.yaml
+    - scripts/apply_owner_domain_review.py
+    - governance/DOMAIN_RULER_FROZEN_20261008.json
+    - governance/OWNER_DOMAIN_REVIEW_SOURCE_20261008.csv
+    - governance/buglog.md

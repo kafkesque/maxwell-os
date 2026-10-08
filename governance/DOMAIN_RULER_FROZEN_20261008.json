@@ -1,0 +1,2112 @@
+{
+  "schema_version": 1,
+  "gen_model": "none",
+  "pipeline_commit": "569dcc4",
+  "source": "ANCHOR_208_CONSOLIDATED_20261007.json",
+  "n_anchor_rows": 208,
+  "n_ruler_rows": 201,
+  "n_skipped_empty": 7,
+  "sha256": "5fcde5619e04fbdaebeb02270ca9a189e13e903ad2cf61318fb75285fed5e22c",
+  "rows": [
+    {
+      "item_id": "R001",
+      "name": "Surveillance Capitalism Value Proposition",
+      "discipline": "privacy & surveillance",
+      "domains": [
+        "marketing & communications",
+        "digital product",
+        "information architecture"
+      ],
+      "primary_domain": "marketing & communications"
+    },
+    {
+      "item_id": "R002",
+      "name": "Soviet Underground Discourse Reception",
+      "discipline": "cultural studies",
+      "domains": [
+        "media & entertainment",
+        "semiotics & communication"
+      ],
+      "primary_domain": "media & entertainment"
+    },
+    {
+      "item_id": "R003",
+      "name": "Quantum Cognitive Effects in Survey Design",
+      "discipline": "cognitive science",
+      "domains": [
+        "research practice",
+        "user experience",
+        "education"
+      ],
+      "primary_domain": "research practice"
+    },
+    {
+      "item_id": "R004",
+      "name": "Lockdown Effectiveness and Economic Impact",
+      "discipline": "political economy",
+      "domains": [
+        "legal & public policy"
+      ],
+      "primary_domain": "legal & public policy"
+    },
+    {
+      "item_id": "R005",
+      "name": "Graphics Algebra Cross Operator",
+      "discipline": "computer graphics",
+      "domains": [
+        "data visualization"
+      ],
+      "primary_domain": "data visualization"
+    },
+    {
+      "item_id": "R006",
+      "name": "Generative Algorithmic Composition",
+      "discipline": "",
+      "domains": [
+        "computational art",
+        "creative technology",
+        "code & computation"
+      ],
+      "primary_domain": "computational art"
+    },
+    {
+      "item_id": "R007",
+      "name": "Accessible Electronic Prototyping Ecosystem",
+      "discipline": "engineering",
+      "domains": [
+        "engineering & infrastructure",
+        "design strategy",
+        "user experience",
+        "education",
+        "product design"
+      ],
+      "primary_domain": "engineering & infrastructure"
+    },
+    {
+      "item_id": "R008",
+      "name": "Inescapable Shock Syndrome",
+      "discipline": "psychology",
+      "domains": [
+        "health & wellness"
+      ],
+      "primary_domain": "health & wellness"
+    },
+    {
+      "item_id": "R009",
+      "name": "Entrepreneurial Risk Assessment Framework",
+      "discipline": "decision making",
+      "domains": [
+        "entrepreneurship"
+      ],
+      "primary_domain": "entrepreneurship"
+    },
+    {
+      "item_id": "R010",
+      "name": "Iterative Launch Process",
+      "discipline": "design thinking",
+      "domains": [
+        "product design",
+        "user experience",
+        "project management",
+        "digital product",
+        "business development"
+      ],
+      "primary_domain": "product design"
+    },
+    {
+      "item_id": "R011",
+      "name": "Agentic Decision-making Through Contextual Retrieval",
+      "discipline": "information retrieval",
+      "domains": [
+        "ai & agents"
+      ],
+      "primary_domain": "ai & agents"
+    },
+    {
+      "item_id": "R012",
+      "name": "Evolution of Game Art and Design",
+      "discipline": "game design",
+      "domains": [
+        "media & entertainment",
+        "creative technology",
+        "design strategy",
+        "user experience"
+      ],
+      "primary_domain": "media & entertainment"
+    },
+    {
+      "item_id": "R013",
+      "name": "Innovation Fund Risk Management",
+      "discipline": "risk management",
+      "domains": [
+        "business operations",
+        "finance & investment"
+      ],
+      "primary_domain": "business operations"
+    },
+    {
+      "item_id": "R014",
+      "name": "Sacred Geometry and Symbolic Resonance",
+      "discipline": "philosophy",
+      "domains": [
+        "arts & culture",
+        "semiotics & communication"
+      ],
+      "primary_domain": "arts & culture"
+    },
+    {
+      "item_id": "R015",
+      "name": "Long-term Strategic Planning in Different Industries",
+      "discipline": "business administration",
+      "domains": [
+        "business development"
+      ],
+      "primary_domain": "business development"
+    },
+    {
+      "item_id": "R016",
+      "name": "Modelans-modelandum Relationship",
+      "discipline": "semiotics",
+      "domains": [
+        "semiotics & communication"
+      ],
+      "primary_domain": "semiotics & communication"
+    },
+    {
+      "item_id": "R017",
+      "name": "Chemical Reaction Equation Automation",
+      "discipline": "computational physics & simulation",
+      "domains": [
+        "computational science & physics"
+      ],
+      "primary_domain": "computational science & physics"
+    },
+    {
+      "item_id": "R018",
+      "name": "Color and Typography Readability",
+      "discipline": "color theory",
+      "domains": [
+        "graphic design",
+        "brand identity",
+        "user experience",
+        "editorial & advertising",
+        "design systems"
+      ],
+      "primary_domain": "graphic design"
+    },
+    {
+      "item_id": "R019",
+      "name": "Scientific Research Evaluation Framework",
+      "discipline": "research methodology",
+      "domains": [
+        "research practice"
+      ],
+      "primary_domain": "research practice"
+    },
+    {
+      "item_id": "R020",
+      "name": "Dynamic System Complexity",
+      "discipline": "complex adaptive systems",
+      "domains": [
+        "systems & frameworks",
+        "business development",
+        "entrepreneurship",
+        "ai & agents"
+      ],
+      "primary_domain": "systems & frameworks"
+    },
+    {
+      "item_id": "R022",
+      "name": "Coupon Code Feature Placement Strategy",
+      "discipline": "human-computer interaction",
+      "domains": [
+        "user experience",
+        "design strategy",
+        "marketing & communications"
+      ],
+      "primary_domain": "user experience"
+    },
+    {
+      "item_id": "R023",
+      "name": "Focused Action Selection",
+      "discipline": "decision making",
+      "domains": [
+        "personal productivity",
+        "project management",
+        "leadership"
+      ],
+      "primary_domain": "personal productivity"
+    },
+    {
+      "item_id": "R024",
+      "name": "Execution Gap From Technological Readiness",
+      "discipline": "business administration",
+      "domains": [
+        "business operations",
+        "business development",
+        "finance & investment"
+      ],
+      "primary_domain": "business operations"
+    },
+    {
+      "item_id": "R025",
+      "name": "Design for Management and Organizational Culture",
+      "discipline": "organizational theory",
+      "domains": [
+        "design strategy",
+        "organizational behavior",
+        "leadership"
+      ],
+      "primary_domain": "design strategy"
+    },
+    {
+      "item_id": "R026",
+      "name": "Index of Motion Graphic Title Design Terms",
+      "discipline": "information science",
+      "domains": [
+        "information architecture",
+        "motion design"
+      ],
+      "primary_domain": "information architecture"
+    },
+    {
+      "item_id": "R027",
+      "name": "Decentralized Strategic Command",
+      "discipline": "organizational theory",
+      "domains": [
+        "leadership",
+        "organizational behavior"
+      ],
+      "primary_domain": "leadership"
+    },
+    {
+      "item_id": "R028",
+      "name": "Gpu Acceleration Configuration",
+      "discipline": "machine learning",
+      "domains": [
+        "engineering practice"
+      ],
+      "primary_domain": "engineering practice"
+    },
+    {
+      "item_id": "R029",
+      "name": "Innovation Through Challenge to Assumptions",
+      "discipline": "business administration",
+      "domains": [
+        "design strategy",
+        "marketing & communications",
+        "product design",
+        "business development",
+        "brand identity"
+      ],
+      "primary_domain": "design strategy"
+    },
+    {
+      "item_id": "R030",
+      "name": "Digital Iconic Reproduction in Computer Graphics",
+      "discipline": "computer graphics",
+      "domains": [
+        "code & computation"
+      ],
+      "primary_domain": "code & computation"
+    },
+    {
+      "item_id": "R031",
+      "name": "Questionnaire Validation and Modification Risk",
+      "discipline": "risk management",
+      "domains": [
+        "research practice"
+      ],
+      "primary_domain": "research practice"
+    },
+    {
+      "item_id": "R032",
+      "name": "Heckel's Diff Algorithm for Version Tracking",
+      "discipline": "computational theory",
+      "domains": [
+        "engineering practice",
+        "data visualization"
+      ],
+      "primary_domain": "engineering practice"
+    },
+    {
+      "item_id": "R033",
+      "name": "Postmodern Critique of Realist Assumptions",
+      "discipline": "philosophy",
+      "domains": [
+        "research practice"
+      ],
+      "primary_domain": "research practice"
+    },
+    {
+      "item_id": "R034",
+      "name": "Negative Space Alphabet Challenge",
+      "discipline": "design thinking",
+      "domains": [
+        "graphic design",
+        "design systems"
+      ],
+      "primary_domain": "graphic design"
+    },
+    {
+      "item_id": "R035",
+      "name": "Visual Evidence Recognition",
+      "discipline": "visual perception",
+      "domains": [
+        "data visualization",
+        "systems & frameworks"
+      ],
+      "primary_domain": "data visualization"
+    },
+    {
+      "item_id": "R036",
+      "name": "Domain Name Call-to-action Strategy",
+      "discipline": "marketing",
+      "domains": [
+        "marketing & communications",
+        "design strategy",
+        "user experience",
+        "brand identity"
+      ],
+      "primary_domain": "marketing & communications"
+    },
+    {
+      "item_id": "R037",
+      "name": "Style Precedence and Override Behavior",
+      "discipline": "software engineering",
+      "domains": [
+        "engineering practice"
+      ],
+      "primary_domain": "engineering practice"
+    },
+    {
+      "item_id": "R038",
+      "name": "Multiple Imputation Procedure",
+      "discipline": "research methodology",
+      "domains": [
+        "research practice",
+        "data visualization"
+      ],
+      "primary_domain": "research practice"
+    },
+    {
+      "item_id": "R039",
+      "name": "Identity  As Social Positioning and Lifestyle Signifiers",
+      "discipline": "sociology",
+      "domains": [
+        "marketing & communications",
+        "design strategy",
+        "semiotics & communication"
+      ],
+      "primary_domain": "marketing & communications"
+    },
+    {
+      "item_id": "R041",
+      "name": "Consumer Anticipation of Objections",
+      "discipline": "marketing",
+      "domains": [
+        "editorial & advertising",
+        "product design",
+        "user experience",
+        "design strategy",
+        "marketing & communications"
+      ],
+      "primary_domain": "editorial & advertising"
+    },
+    {
+      "item_id": "R042",
+      "name": "Destination-control Elevator Interaction Pattern",
+      "discipline": "human-computer interaction",
+      "domains": [
+        "user experience"
+      ],
+      "primary_domain": "user experience"
+    },
+    {
+      "item_id": "R043",
+      "name": "Alpha State Thinking and Creative Problem-solving",
+      "discipline": "cognitive science",
+      "domains": [
+        "personal productivity",
+        "arts & culture"
+      ],
+      "primary_domain": "personal productivity"
+    },
+    {
+      "item_id": "R044",
+      "name": "Cyclical Design Lifecycle",
+      "discipline": "systems thinking",
+      "domains": [
+        "product design",
+        "design strategy",
+        "environmental design",
+        "industrial design"
+      ],
+      "primary_domain": "product design"
+    },
+    {
+      "item_id": "R045",
+      "name": "Wpi Consumer Value Proposition Framework",
+      "discipline": "marketing",
+      "domains": [
+        "marketing & communications",
+        "brand identity"
+      ],
+      "primary_domain": "marketing & communications"
+    },
+    {
+      "item_id": "R046",
+      "name": "Bitcoin Mining As Digital Ownership Model",
+      "discipline": "economics",
+      "domains": [
+        "finance & investment"
+      ],
+      "primary_domain": "finance & investment"
+    },
+    {
+      "item_id": "R047",
+      "name": "Emotional Transaction Design",
+      "discipline": "psychology",
+      "domains": [
+        "user experience",
+        "design strategy"
+      ],
+      "primary_domain": "user experience"
+    },
+    {
+      "item_id": "R048",
+      "name": "Creative Process Through Drawing and Sketching",
+      "discipline": "creative process",
+      "domains": [
+        "graphic design",
+        "arts & culture",
+        "illustration"
+      ],
+      "primary_domain": "graphic design"
+    },
+    {
+      "item_id": "R049",
+      "name": "Fermi Estimation Method",
+      "discipline": "operations research",
+      "domains": [
+        "research practice",
+        "systems & frameworks",
+        "project management",
+        "personal productivity"
+      ],
+      "primary_domain": "research practice"
+    },
+    {
+      "item_id": "R050",
+      "name": "Methodological Accountability",
+      "discipline": "research methodology",
+      "domains": [
+        "research practice"
+      ],
+      "primary_domain": "research practice"
+    },
+    {
+      "item_id": "R051",
+      "name": "Central Emptiness in Urban Design",
+      "discipline": "cultural design",
+      "domains": [
+        "urban planning"
+      ],
+      "primary_domain": "urban planning"
+    },
+    {
+      "item_id": "R052",
+      "name": "Interior Design Fixture Selection Challenge",
+      "discipline": "design thinking",
+      "domains": [
+        "design strategy"
+      ],
+      "primary_domain": "design strategy"
+    },
+    {
+      "item_id": "R053",
+      "name": "Self-referential Incompleteness",
+      "discipline": "computational theory",
+      "domains": [
+        "code & computation",
+        "computational science & physics",
+        "systems & frameworks"
+      ],
+      "primary_domain": "code & computation"
+    },
+    {
+      "item_id": "R054",
+      "name": "Shap Explainability Framework",
+      "discipline": "machine learning",
+      "domains": [
+        "code & computation"
+      ],
+      "primary_domain": "code & computation"
+    },
+    {
+      "item_id": "R055",
+      "name": "Demand-side Sales Pattern",
+      "discipline": "marketing",
+      "domains": [
+        "marketing & communications"
+      ],
+      "primary_domain": "marketing & communications"
+    },
+    {
+      "item_id": "R056",
+      "name": "Quiz Generation with Llm Integration",
+      "discipline": "generative ai",
+      "domains": [
+        "education"
+      ],
+      "primary_domain": "education"
+    },
+    {
+      "item_id": "R057",
+      "name": "Annual Percentage Rate Standardization",
+      "discipline": "finance",
+      "domains": [
+        "finance & investment"
+      ],
+      "primary_domain": "finance & investment"
+    },
+    {
+      "item_id": "R058",
+      "name": "Illustration As Propaganda Tool",
+      "discipline": "communication theory",
+      "domains": [
+        "illustration",
+        "marketing & communications",
+        "semiotics & communication",
+        "editorial & advertising"
+      ],
+      "primary_domain": "illustration"
+    },
+    {
+      "item_id": "R059",
+      "name": "First Course Development Framework",
+      "discipline": "",
+      "domains": [
+        "entrepreneurship",
+        "business development",
+        "education",
+        "product design",
+        "user experience"
+      ],
+      "primary_domain": "entrepreneurship"
+    },
+    {
+      "item_id": "R060",
+      "name": "Aiga Transportation Symbol System Development",
+      "discipline": "visual semiotics",
+      "domains": [
+        "graphic design"
+      ],
+      "primary_domain": "graphic design"
+    },
+    {
+      "item_id": "R061",
+      "name": "Core Focus As Organizational Discipline",
+      "discipline": "organizational theory",
+      "domains": [
+        "leadership",
+        "organizational behavior"
+      ],
+      "primary_domain": "leadership"
+    },
+    {
+      "item_id": "R062",
+      "name": "Somatic Marker Decision Making",
+      "discipline": "behavioral economics",
+      "domains": [
+        "marketing & communications",
+        "user experience",
+        "media & entertainment"
+      ],
+      "primary_domain": "marketing & communications"
+    },
+    {
+      "item_id": "R063",
+      "name": "Textbook Representation and State of Exception Legitimation",
+      "discipline": "cultural studies",
+      "domains": [
+        "education",
+        "media & entertainment",
+        "semiotics & communication",
+        "digital product"
+      ],
+      "primary_domain": "education"
+    },
+    {
+      "item_id": "R064",
+      "name": "Optical Alignment in Typography",
+      "discipline": "typography",
+      "domains": [
+        "graphic design",
+        "design systems",
+        "web & ui",
+        "brand identity",
+        "editorial & advertising"
+      ],
+      "primary_domain": "graphic design"
+    },
+    {
+      "item_id": "R065",
+      "name": "Media Construction of Crime Waves",
+      "discipline": "media studies",
+      "domains": [
+        "media & entertainment"
+      ],
+      "primary_domain": "media & entertainment"
+    },
+    {
+      "item_id": "R066",
+      "name": "N-dimensional Sphere Volume Properties",
+      "discipline": "computational geometry",
+      "domains": [
+        "computational science & physics",
+        "code & computation",
+        "engineering practice"
+      ],
+      "primary_domain": "computational science & physics"
+    },
+    {
+      "item_id": "R067",
+      "name": "Schemat's Wasser Interactive Art Framework",
+      "discipline": "interdisciplinary studies",
+      "domains": [
+        "creative technology",
+        "media & entertainment",
+        "user experience"
+      ],
+      "primary_domain": "creative technology"
+    },
+    {
+      "item_id": "R068",
+      "name": "Imagination and the Image",
+      "discipline": "aesthetics",
+      "domains": [
+        "editorial & advertising",
+        "design strategy",
+        "design systems",
+        "graphic design"
+      ],
+      "primary_domain": "editorial & advertising"
+    },
+    {
+      "item_id": "R069",
+      "name": "Falsifiable Variable Measurement",
+      "discipline": "research methodology",
+      "domains": [
+        "research practice",
+        "engineering practice"
+      ],
+      "primary_domain": "research practice"
+    },
+    {
+      "item_id": "R070",
+      "name": "Iterative Design Validation",
+      "discipline": "design thinking",
+      "domains": [
+        "design strategy",
+        "user experience",
+        "product design"
+      ],
+      "primary_domain": "design strategy"
+    },
+    {
+      "item_id": "R071",
+      "name": "Lean Startup Experimentation Framework",
+      "discipline": "entrepreneurship studies",
+      "domains": [
+        "entrepreneurship",
+        "research practice",
+        "business development"
+      ],
+      "primary_domain": "entrepreneurship"
+    },
+    {
+      "item_id": "R072",
+      "name": "Park24 Nondisruptive Market Creation",
+      "discipline": "entrepreneurship studies",
+      "domains": [
+        "entrepreneurship",
+        "business development",
+        "urban planning",
+        "design strategy"
+      ],
+      "primary_domain": "entrepreneurship"
+    },
+    {
+      "item_id": "R073",
+      "name": "Evolution of Language Through Mental Models",
+      "discipline": "anthropology",
+      "domains": [
+        "education",
+        "research practice"
+      ],
+      "primary_domain": "education"
+    },
+    {
+      "item_id": "R074",
+      "name": "Attention Economy Externalities",
+      "discipline": "cognitive science",
+      "domains": [
+        "user experience"
+      ],
+      "primary_domain": "user experience"
+    },
+    {
+      "item_id": "R075",
+      "name": "Paradigm Shift Through Disruption",
+      "discipline": "philosophy",
+      "domains": [
+        "systems & frameworks",
+        "arts & culture"
+      ],
+      "primary_domain": "systems & frameworks"
+    },
+    {
+      "item_id": "R076",
+      "name": "Linguistic Fetish in Visual Communication",
+      "discipline": "marketing",
+      "domains": [
+        "brand identity",
+        "marketing & communications",
+        "semiotics & communication",
+        "arts & culture"
+      ],
+      "primary_domain": "brand identity"
+    },
+    {
+      "item_id": "R077",
+      "name": "Symbolic Meaning Through Consumption",
+      "discipline": "cultural studies",
+      "domains": [
+        "semiotics & communication",
+        "marketing & communications"
+      ],
+      "primary_domain": "semiotics & communication"
+    },
+    {
+      "item_id": "R078",
+      "name": "Parameterized Design Generation",
+      "discipline": "generative design",
+      "domains": [
+        "code & computation",
+        "computational art",
+        "creative technology",
+        "design systems"
+      ],
+      "primary_domain": "code & computation"
+    },
+    {
+      "item_id": "R079",
+      "name": "Bar-hillel Paradox",
+      "discipline": "linguistics",
+      "domains": [
+        "semiotics & communication",
+        "arts & culture",
+        "editorial & advertising",
+        "design strategy",
+        "graphic design",
+        "brand identity",
+        "marketing & communications"
+      ],
+      "primary_domain": "semiotics & communication"
+    },
+    {
+      "item_id": "R081",
+      "name": "Shift From Trend-chasing to Intentional Consumption",
+      "discipline": "behavioral economics",
+      "domains": [
+        "marketing & communications"
+      ],
+      "primary_domain": "marketing & communications"
+    },
+    {
+      "item_id": "R082",
+      "name": "Historical Data Sources for Manufacturing and Economic Analysis",
+      "discipline": "research methodology",
+      "domains": [
+        "research practice"
+      ],
+      "primary_domain": "research practice"
+    },
+    {
+      "item_id": "R083",
+      "name": "Self-herding Behavior",
+      "discipline": "behavioral economics",
+      "domains": [
+        "marketing & communications",
+        "user experience"
+      ],
+      "primary_domain": "marketing & communications"
+    },
+    {
+      "item_id": "R085",
+      "name": "Discursive Strategy Abstraction",
+      "discipline": "cultural studies",
+      "domains": [
+        "education",
+        "health & wellness",
+        "semiotics & communication"
+      ],
+      "primary_domain": "education"
+    },
+    {
+      "item_id": "R086",
+      "name": "Commitment and Consistency Principle (2)",
+      "discipline": "behavioral economics",
+      "domains": [
+        "marketing & communications",
+        "user experience",
+        "digital product"
+      ],
+      "primary_domain": "marketing & communications"
+    },
+    {
+      "item_id": "R087",
+      "name": "In-group Identity and Social Bonding",
+      "discipline": "psychology",
+      "domains": [
+        "organizational behavior"
+      ],
+      "primary_domain": "organizational behavior"
+    },
+    {
+      "item_id": "R088",
+      "name": "Gradio Web Interface for Ml Models",
+      "discipline": "human-computer interaction",
+      "domains": [
+        "digital product",
+        "user experience",
+        "web & ui"
+      ],
+      "primary_domain": "digital product"
+    },
+    {
+      "item_id": "R089",
+      "name": "Vr Body Constraint and Physical Immersion",
+      "discipline": "human-computer interaction",
+      "domains": [
+        "design strategy",
+        "user experience",
+        "engineering & infrastructure"
+      ],
+      "primary_domain": "design strategy"
+    },
+    {
+      "item_id": "R090",
+      "name": "Culture Jamming",
+      "discipline": "media studies",
+      "domains": [
+        "media & entertainment",
+        "editorial & advertising",
+        "design strategy",
+        "design systems",
+        "semiotics & communication"
+      ],
+      "primary_domain": "media & entertainment"
+    },
+    {
+      "item_id": "R092",
+      "name": "Data Quality and Method Transparency in Journalism",
+      "discipline": "research methodology",
+      "domains": [
+        "research practice",
+        "media & entertainment",
+        "data visualization"
+      ],
+      "primary_domain": "research practice"
+    },
+    {
+      "item_id": "R093",
+      "name": "Numerical Symbolism in Design and Biology",
+      "discipline": "semiotics",
+      "domains": [
+        "design strategy",
+        "design systems",
+        "semiotics & communication"
+      ],
+      "primary_domain": "design strategy"
+    },
+    {
+      "item_id": "R094",
+      "name": "Progressive Feature Introduction",
+      "discipline": "human-computer interaction",
+      "domains": [
+        "user experience",
+        "digital product",
+        "product design",
+        "web & ui"
+      ],
+      "primary_domain": "user experience"
+    },
+    {
+      "item_id": "R095",
+      "name": "Sensory Engagement As Quality Signal",
+      "discipline": "psychology",
+      "domains": [
+        "product design",
+        "marketing & communications",
+        "environmental design",
+        "arts & culture"
+      ],
+      "primary_domain": "product design"
+    },
+    {
+      "item_id": "R096",
+      "name": "Transportation and Setup Costs in Construction Projects",
+      "discipline": "finance",
+      "domains": [
+        "project management",
+        "business operations",
+        "engineering & infrastructure"
+      ],
+      "primary_domain": "project management"
+    },
+    {
+      "item_id": "R097",
+      "name": "Minimin Decision Criterion",
+      "discipline": "decision making",
+      "domains": [
+        "business development",
+        "business operations",
+        "finance & investment",
+        "design strategy"
+      ],
+      "primary_domain": "business development"
+    },
+    {
+      "item_id": "R098",
+      "name": "Aesthetic Refinement Through Iteration",
+      "discipline": "aesthetics",
+      "domains": [
+        "design strategy",
+        "graphic design",
+        "digital product",
+        "product design",
+        "arts & culture"
+      ],
+      "primary_domain": "design strategy"
+    },
+    {
+      "item_id": "R099",
+      "name": "Charismatic Brand Discipline",
+      "discipline": "marketing",
+      "domains": [
+        "brand identity",
+        "marketing & communications",
+        "design strategy"
+      ],
+      "primary_domain": "brand identity"
+    },
+    {
+      "item_id": "R100",
+      "name": "Network Marketing Business Model",
+      "discipline": "business administration",
+      "domains": [
+        "entrepreneurship",
+        "business development",
+        "marketing & communications"
+      ],
+      "primary_domain": "entrepreneurship"
+    },
+    {
+      "item_id": "R101",
+      "name": "Pragmatist View of Truth and Knowledge",
+      "discipline": "philosophy",
+      "domains": [
+        "research practice",
+        "education"
+      ],
+      "primary_domain": "research practice"
+    },
+    {
+      "item_id": "R102",
+      "name": "Social Entrepreneur's Playbook",
+      "discipline": "entrepreneurship studies",
+      "domains": [
+        "entrepreneurship"
+      ],
+      "primary_domain": "entrepreneurship"
+    },
+    {
+      "item_id": "R103",
+      "name": "Temporal Consistency in Visual Narrative Analysis",
+      "discipline": "visual semiotics",
+      "domains": [
+        "media & entertainment",
+        "motion design",
+        "illustration"
+      ],
+      "primary_domain": "media & entertainment"
+    },
+    {
+      "item_id": "R104",
+      "name": "Strategic Information Gathering",
+      "discipline": "operations research",
+      "domains": [
+        "research practice",
+        "information architecture",
+        "data visualization"
+      ],
+      "primary_domain": "research practice"
+    },
+    {
+      "item_id": "R105",
+      "name": "Probabilistic Forecasting with Prediction Intervals",
+      "discipline": "operations research",
+      "domains": [
+        "business operations",
+        "research practice",
+        "finance & investment"
+      ],
+      "primary_domain": "business operations"
+    },
+    {
+      "item_id": "R107",
+      "name": "Lived Experience Focus",
+      "discipline": "philosophy",
+      "domains": [
+        "education",
+        "user experience",
+        "research practice"
+      ],
+      "primary_domain": "education"
+    },
+    {
+      "item_id": "R108",
+      "name": "Typography in Brand Positioning and Magazine Design",
+      "discipline": "typography",
+      "domains": [
+        "graphic design",
+        "design strategy",
+        "brand identity"
+      ],
+      "primary_domain": "graphic design"
+    },
+    {
+      "item_id": "R109",
+      "name": "Project Completion Bias",
+      "discipline": "behavioral economics",
+      "domains": [
+        "personal productivity",
+        "user experience",
+        "organizational behavior"
+      ],
+      "primary_domain": "personal productivity"
+    },
+    {
+      "item_id": "R110",
+      "name": "Federated Information Architecture",
+      "discipline": "information science",
+      "domains": [
+        "design systems",
+        "information architecture",
+        "systems & frameworks",
+        "web & ui"
+      ],
+      "primary_domain": "design systems"
+    },
+    {
+      "item_id": "R111",
+      "name": "Pmt Camera Typography Manipulation",
+      "discipline": "typography",
+      "domains": [
+        "graphic design",
+        "arts & culture"
+      ],
+      "primary_domain": "graphic design"
+    },
+    {
+      "item_id": "R112",
+      "name": "Content Analysis Approaches in Visual Research",
+      "discipline": "research methodology",
+      "domains": [
+        "research practice"
+      ],
+      "primary_domain": "research practice"
+    },
+    {
+      "item_id": "R113",
+      "name": "Traveling Salesman Problem Computational Complexity",
+      "discipline": "computational theory",
+      "domains": [
+        "engineering practice",
+        "computational science & physics"
+      ],
+      "primary_domain": "engineering practice"
+    },
+    {
+      "item_id": "R114",
+      "name": "Measurable Outcome Focus",
+      "discipline": "decision making",
+      "domains": [
+        "business operations",
+        "personal productivity"
+      ],
+      "primary_domain": "business operations"
+    },
+    {
+      "item_id": "R115",
+      "name": "Heuristic Reasoning in Problem Solving",
+      "discipline": "operations research",
+      "domains": [
+        "research practice"
+      ],
+      "primary_domain": "research practice"
+    },
+    {
+      "item_id": "R116",
+      "name": "Ai Model Deployment Risk",
+      "discipline": "risk management",
+      "domains": [
+        "business operations",
+        "engineering & infrastructure",
+        "organizational behavior",
+        "project management"
+      ],
+      "primary_domain": "business operations"
+    },
+    {
+      "item_id": "R117",
+      "name": "Sustained Purpose Over Temporary Gratification",
+      "discipline": "behavioral economics",
+      "domains": [
+        "finance & investment",
+        "personal productivity"
+      ],
+      "primary_domain": "finance & investment"
+    },
+    {
+      "item_id": "R118",
+      "name": "Pass@k Evaluation Method",
+      "discipline": "research methodology",
+      "domains": [
+        "ai & agents"
+      ],
+      "primary_domain": "ai & agents"
+    },
+    {
+      "item_id": "R119",
+      "name": "Strategic Human Resource Planning for Social Enterprises",
+      "discipline": "business administration",
+      "domains": [
+        "entrepreneurship",
+        "business operations",
+        "leadership"
+      ],
+      "primary_domain": "entrepreneurship"
+    },
+    {
+      "item_id": "R120",
+      "name": "Nonlinear Magnification Fields",
+      "discipline": "computer graphics",
+      "domains": [
+        "data visualization"
+      ],
+      "primary_domain": "data visualization"
+    },
+    {
+      "item_id": "R121",
+      "name": "Consumers Hero Refurbishment Strategy",
+      "discipline": "business administration",
+      "domains": [
+        "business development",
+        "business operations",
+        "product design",
+        "marketing & communications"
+      ],
+      "primary_domain": "business development"
+    },
+    {
+      "item_id": "R122",
+      "name": "Visual Hierarchy Through Contrast (2)",
+      "discipline": "visual perception",
+      "domains": [
+        "graphic design",
+        "editorial & advertising",
+        "user experience",
+        "web & ui"
+      ],
+      "primary_domain": "graphic design"
+    },
+    {
+      "item_id": "R123",
+      "name": "Superquadric Parameterization in 3d Space",
+      "discipline": "computational geometry",
+      "domains": [
+        "code & computation",
+        "creative technology"
+      ],
+      "primary_domain": "code & computation"
+    },
+    {
+      "item_id": "R124",
+      "name": "Foundation Model Integration Framework",
+      "discipline": "artificial intelligence",
+      "domains": [
+        "engineering practice",
+        "systems & frameworks"
+      ],
+      "primary_domain": "engineering practice"
+    },
+    {
+      "item_id": "R125",
+      "name": "Dell Computer's Direct-sale Business Model",
+      "discipline": "business administration",
+      "domains": [
+        "business development",
+        "business operations",
+        "marketing & communications"
+      ],
+      "primary_domain": "business development"
+    },
+    {
+      "item_id": "R126",
+      "name": "Embodied Knowledge in Design",
+      "discipline": "cultural design",
+      "domains": [
+        "design systems",
+        "design strategy",
+        "industrial design",
+        "user experience",
+        "business operations",
+        "marketing & communications"
+      ],
+      "primary_domain": "design systems"
+    },
+    {
+      "item_id": "R127",
+      "name": "Guild of Handicraft Educational Model",
+      "discipline": "",
+      "domains": [
+        "design strategy",
+        "design systems",
+        "education"
+      ],
+      "primary_domain": "design strategy"
+    },
+    {
+      "item_id": "R128",
+      "name": "Choice Architecture and Identity Framing",
+      "discipline": "decision making",
+      "domains": [
+        "personal productivity",
+        "design strategy",
+        "user experience"
+      ],
+      "primary_domain": "personal productivity"
+    },
+    {
+      "item_id": "R129",
+      "name": "Use of Proxies and Analogues in Market Sizing",
+      "discipline": "marketing",
+      "domains": [
+        "research practice",
+        "business development",
+        "finance & investment"
+      ],
+      "primary_domain": "research practice"
+    },
+    {
+      "item_id": "R130",
+      "name": "Typographic Principles of William Morris",
+      "discipline": "typography",
+      "domains": [
+        "editorial & advertising",
+        "graphic design"
+      ],
+      "primary_domain": "editorial & advertising"
+    },
+    {
+      "item_id": "R131",
+      "name": "Differential Privacy in Data Collection",
+      "discipline": "privacy & surveillance",
+      "domains": [
+        "information architecture"
+      ],
+      "primary_domain": "information architecture"
+    },
+    {
+      "item_id": "R132",
+      "name": "Monte Carlo PDE Solution Method",
+      "discipline": "computational physics & simulation",
+      "domains": [
+        "computational science & physics"
+      ],
+      "primary_domain": "computational science & physics"
+    },
+    {
+      "item_id": "R133",
+      "name": "Three-holes-in-the-cheese Model of Error Cascades",
+      "discipline": "risk management",
+      "domains": [
+        "systems & frameworks"
+      ],
+      "primary_domain": "systems & frameworks"
+    },
+    {
+      "item_id": "R134",
+      "name": "Holistic Interpretation Problem in Index-aware Retrieval",
+      "discipline": "information retrieval",
+      "domains": [
+        "information architecture",
+        "ai & agents"
+      ],
+      "primary_domain": "information architecture"
+    },
+    {
+      "item_id": "R135",
+      "name": "Ase  Design Problem Solving Model",
+      "discipline": "design thinking",
+      "domains": [
+        "design strategy"
+      ],
+      "primary_domain": "design strategy"
+    },
+    {
+      "item_id": "R136",
+      "name": "Chatgpt Prompt Framework",
+      "discipline": "generative ai",
+      "domains": [
+        "information architecture",
+        "ai & agents"
+      ],
+      "primary_domain": "information architecture"
+    },
+    {
+      "item_id": "R137",
+      "name": "Desire-friction Conversion Formula",
+      "discipline": "behavioral economics",
+      "domains": [
+        "user experience"
+      ],
+      "primary_domain": "user experience"
+    },
+    {
+      "item_id": "R138",
+      "name": "Hjelmslev's Trichotomy and Linguistic Theory",
+      "discipline": "linguistics",
+      "domains": [
+        "semiotics & communication"
+      ],
+      "primary_domain": "semiotics & communication"
+    },
+    {
+      "item_id": "R139",
+      "name": "Learning Through Failure Process",
+      "discipline": "cognitive science",
+      "domains": [
+        "education",
+        "personal productivity"
+      ],
+      "primary_domain": "education"
+    },
+    {
+      "item_id": "R140",
+      "name": "Digital Culture Integration in Graphic Design",
+      "discipline": "",
+      "domains": [
+        "creative technology",
+        "digital product",
+        "graphic design",
+        "user experience",
+        "web & ui"
+      ],
+      "primary_domain": "creative technology"
+    },
+    {
+      "item_id": "R141",
+      "name": "Contextual Redundancy and Representation Efficiency",
+      "discipline": "machine learning",
+      "domains": [
+        "engineering practice",
+        "code & computation"
+      ],
+      "primary_domain": "engineering practice"
+    },
+    {
+      "item_id": "R142",
+      "name": "Global Village Conceptual Framework",
+      "discipline": "communication theory",
+      "domains": [
+        "media & entertainment",
+        "systems & frameworks"
+      ],
+      "primary_domain": "media & entertainment"
+    },
+    {
+      "item_id": "R143",
+      "name": "Figma Hamburger Icon Creation",
+      "discipline": "computer graphics",
+      "domains": [
+        "design systems"
+      ],
+      "primary_domain": "design systems"
+    },
+    {
+      "item_id": "R144",
+      "name": "Abra-kadabra Number Classification",
+      "discipline": "software engineering",
+      "domains": [
+        "code & computation"
+      ],
+      "primary_domain": "code & computation"
+    },
+    {
+      "item_id": "R145",
+      "name": "Color As Cultural and Emotional Marker",
+      "discipline": "color theory",
+      "domains": [
+        "brand identity",
+        "design strategy",
+        "graphic design",
+        "semiotics & communication",
+        "marketing & communications"
+      ],
+      "primary_domain": "brand identity"
+    },
+    {
+      "item_id": "R146",
+      "name": "Debate As Leadership Tool",
+      "discipline": "",
+      "domains": [
+        "leadership",
+        "organizational behavior"
+      ],
+      "primary_domain": "leadership"
+    },
+    {
+      "item_id": "R147",
+      "name": "Randomness in Data Measurement",
+      "discipline": "research methodology",
+      "domains": [
+        "research practice",
+        "data visualization"
+      ],
+      "primary_domain": "research practice"
+    },
+    {
+      "item_id": "R149",
+      "name": "Perceptual Mapping Through Camouflage",
+      "discipline": "visual perception",
+      "domains": [
+        "design strategy",
+        "creative technology"
+      ],
+      "primary_domain": "design strategy"
+    },
+    {
+      "item_id": "R150",
+      "name": "Triple Bottom Line Business Approach",
+      "discipline": "strategic thinking",
+      "domains": [
+        "business development",
+        "marketing & communications",
+        "organizational behavior",
+        "design strategy",
+        "systems & frameworks"
+      ],
+      "primary_domain": "business development"
+    },
+    {
+      "item_id": "R151",
+      "name": "Context-dependent Cognitive Processing",
+      "discipline": "cognitive science",
+      "domains": [
+        "education",
+        "research practice"
+      ],
+      "primary_domain": "education"
+    },
+    {
+      "item_id": "R152",
+      "name": "Economic Politics of Obsolescence",
+      "discipline": "political economy",
+      "domains": [
+        "business development",
+        "marketing & communications",
+        "legal & public policy"
+      ],
+      "primary_domain": "business development"
+    },
+    {
+      "item_id": "R153",
+      "name": "Cognitive Interview Analysis of Question Clarity Issues",
+      "discipline": "cognitive science",
+      "domains": [
+        "user experience"
+      ],
+      "primary_domain": "user experience"
+    },
+    {
+      "item_id": "R154",
+      "name": "Aditya Birla Group's Parta System",
+      "discipline": "finance",
+      "domains": [
+        "business operations",
+        "finance & investment",
+        "leadership"
+      ],
+      "primary_domain": "business operations"
+    },
+    {
+      "item_id": "R155",
+      "name": "Persistence in Business Strategy",
+      "discipline": "business administration",
+      "domains": [
+        "personal productivity",
+        "business development",
+        "leadership"
+      ],
+      "primary_domain": "personal productivity"
+    },
+    {
+      "item_id": "R156",
+      "name": "Designers' Object World",
+      "discipline": "cognitive science",
+      "domains": [
+        "design strategy",
+        "design systems",
+        "user experience",
+        "education"
+      ],
+      "primary_domain": "design strategy"
+    },
+    {
+      "item_id": "R157",
+      "name": "Perspective-driven Cognitive Shift",
+      "discipline": "cognitive science",
+      "domains": [
+        "marketing & communications",
+        "education",
+        "user experience",
+        "personal productivity",
+        "semiotics & communication",
+        "arts & culture"
+      ],
+      "primary_domain": "marketing & communications"
+    },
+    {
+      "item_id": "R158",
+      "name": "Duality in Design",
+      "discipline": "cultural design",
+      "domains": [
+        "design strategy",
+        "design systems",
+        "user experience",
+        "semiotics & communication",
+        "arts & culture",
+        "illustration",
+        "graphic design"
+      ],
+      "primary_domain": "design strategy"
+    },
+    {
+      "item_id": "R159",
+      "name": "Context-dependent Quality Assessment",
+      "discipline": "risk management",
+      "domains": [
+        "research practice",
+        "user experience",
+        "digital product",
+        "product design"
+      ],
+      "primary_domain": "research practice"
+    },
+    {
+      "item_id": "R160",
+      "name": "Resource-based Value Assessment",
+      "discipline": "operations research",
+      "domains": [
+        "business development",
+        "marketing & communications",
+        "finance & investment"
+      ],
+      "primary_domain": "business development"
+    },
+    {
+      "item_id": "R162",
+      "name": "Provincial Norms",
+      "discipline": "psychology",
+      "domains": [
+        "organizational behavior",
+        "education",
+        "leadership"
+      ],
+      "primary_domain": "organizational behavior"
+    },
+    {
+      "item_id": "R163",
+      "name": "Metaphorically Selling How to Use the Ma",
+      "discipline": "communication theory",
+      "domains": [
+        "marketing & communications",
+        "editorial & advertising",
+        "packaging",
+        "semiotics & communication"
+      ],
+      "primary_domain": "marketing & communications"
+    },
+    {
+      "item_id": "R164",
+      "name": "Phenomenological Understanding",
+      "discipline": "philosophy",
+      "domains": [
+        "research practice",
+        "education",
+        "semiotics & communication"
+      ],
+      "primary_domain": "research practice"
+    },
+    {
+      "item_id": "R165",
+      "name": "Acknowledgment Attribution",
+      "discipline": "",
+      "domains": [
+        "editorial & advertising"
+      ],
+      "primary_domain": "editorial & advertising"
+    },
+    {
+      "item_id": "R166",
+      "name": "Agent-centric Economic Incentives",
+      "discipline": "economics",
+      "domains": [
+        "ai & agents",
+        "engineering & infrastructure"
+      ],
+      "primary_domain": "ai & agents"
+    },
+    {
+      "item_id": "R167",
+      "name": "Innocent Brand Identity Through Organic Development",
+      "discipline": "organizational theory",
+      "domains": [
+        "brand identity",
+        "marketing & communications",
+        "organizational behavior"
+      ],
+      "primary_domain": "brand identity"
+    },
+    {
+      "item_id": "R168",
+      "name": "Hidden Issue Questioning Technique",
+      "discipline": "marketing",
+      "domains": [
+        "research practice"
+      ],
+      "primary_domain": "research practice"
+    },
+    {
+      "item_id": "R169",
+      "name": "Charismatic Leadership Development",
+      "discipline": "psychology",
+      "domains": [
+        "leadership"
+      ],
+      "primary_domain": "leadership"
+    },
+    {
+      "item_id": "R170",
+      "name": "Dream-driven Life Planning",
+      "discipline": "decision making",
+      "domains": [
+        "personal productivity"
+      ],
+      "primary_domain": "personal productivity"
+    },
+    {
+      "item_id": "R171",
+      "name": "Alpha Blending Control",
+      "discipline": "computer graphics",
+      "domains": [
+        "code & computation"
+      ],
+      "primary_domain": "code & computation"
+    },
+    {
+      "item_id": "R172",
+      "name": "Digital System Context Decomposition",
+      "discipline": "engineering",
+      "domains": [
+        "engineering practice",
+        "engineering & infrastructure",
+        "product design"
+      ],
+      "primary_domain": "engineering practice"
+    },
+    {
+      "item_id": "R173",
+      "name": "Linkedin Network Building Protocol",
+      "discipline": "social network analysis",
+      "domains": [
+        "business development"
+      ],
+      "primary_domain": "business development"
+    },
+    {
+      "item_id": "R174",
+      "name": "Concept-first Prototyping",
+      "discipline": "design thinking",
+      "domains": [
+        "user experience",
+        "product design",
+        "digital product",
+        "industrial design"
+      ],
+      "primary_domain": "user experience"
+    },
+    {
+      "item_id": "R175",
+      "name": "Role-based Prompting Effect",
+      "discipline": "artificial intelligence",
+      "domains": [
+        "ai & agents"
+      ],
+      "primary_domain": "ai & agents"
+    },
+    {
+      "item_id": "R176",
+      "name": "Harvest Time Strategic Planning",
+      "discipline": "finance",
+      "domains": [
+        "finance & investment"
+      ],
+      "primary_domain": "finance & investment"
+    },
+    {
+      "item_id": "R177",
+      "name": "Contextual Interpretation Framework",
+      "discipline": "semiotics",
+      "domains": [
+        "semiotics & communication",
+        "marketing & communications"
+      ],
+      "primary_domain": "semiotics & communication"
+    },
+    {
+      "item_id": "R178",
+      "name": "If-then Plan for Moral Action",
+      "discipline": "psychology",
+      "domains": [
+        "personal productivity"
+      ],
+      "primary_domain": "personal productivity"
+    },
+    {
+      "item_id": "R179",
+      "name": "Coincidence Wit in Graphic Design",
+      "discipline": "creative process",
+      "domains": [
+        "graphic design",
+        "semiotics & communication",
+        "editorial & advertising",
+        "marketing & communications",
+        "brand identity"
+      ],
+      "primary_domain": "graphic design"
+    },
+    {
+      "item_id": "R180",
+      "name": "Intersectional Design Approaches for Underserved Communities",
+      "discipline": "cultural studies",
+      "domains": [
+        "design strategy",
+        "user experience",
+        "research practice"
+      ],
+      "primary_domain": "design strategy"
+    },
+    {
+      "item_id": "R181",
+      "name": "Economic Industry Network Structure",
+      "discipline": "economics",
+      "domains": [
+        "systems & frameworks"
+      ],
+      "primary_domain": "systems & frameworks"
+    },
+    {
+      "item_id": "R182",
+      "name": "Cultural Mourning Rituals and Symbolism",
+      "discipline": "anthropology",
+      "domains": [
+        "arts & culture",
+        "semiotics & communication"
+      ],
+      "primary_domain": "arts & culture"
+    },
+    {
+      "item_id": "R183",
+      "name": "Pattern Language Implementation Process",
+      "discipline": "",
+      "domains": [
+        "urban planning"
+      ],
+      "primary_domain": "urban planning"
+    },
+    {
+      "item_id": "R184",
+      "name": "Doping in Professional Sports: Systemic Pressure and Rationalization",
+      "discipline": "behavioral economics",
+      "domains": [
+        "health & wellness"
+      ],
+      "primary_domain": "health & wellness"
+    },
+    {
+      "item_id": "R185",
+      "name": "Tv Advertising Consumer Behavior Pattern",
+      "discipline": "marketing",
+      "domains": [
+        "editorial & advertising",
+        "marketing & communications",
+        "media & entertainment"
+      ],
+      "primary_domain": "editorial & advertising"
+    },
+    {
+      "item_id": "R186",
+      "name": "Cognitive Interview Analysis Framework",
+      "discipline": "research methodology",
+      "domains": [
+        "research practice",
+        "marketing & communications"
+      ],
+      "primary_domain": "research practice"
+    },
+    {
+      "item_id": "R187",
+      "name": "Credibility Through Transparency",
+      "discipline": "communication theory",
+      "domains": [
+        "marketing & communications"
+      ],
+      "primary_domain": "marketing & communications"
+    },
+    {
+      "item_id": "R188",
+      "name": "Sensory-motor Basis of Conceptual Reasoning",
+      "discipline": "cognitive science",
+      "domains": [
+        "education"
+      ],
+      "primary_domain": "education"
+    },
+    {
+      "item_id": "R189",
+      "name": "Higher-order Polynomial Approximation in Numerical Methods",
+      "discipline": "computational physics & simulation",
+      "domains": [
+        "engineering practice",
+        "systems & frameworks"
+      ],
+      "primary_domain": "engineering practice"
+    },
+    {
+      "item_id": "R190",
+      "name": "Design Thinking Integration Strategy",
+      "discipline": "design thinking",
+      "domains": [
+        "design strategy",
+        "business operations",
+        "leadership",
+        "project management"
+      ],
+      "primary_domain": "design strategy"
+    },
+    {
+      "item_id": "R191",
+      "name": "Intentional Motion Design",
+      "discipline": "motion & time",
+      "domains": [
+        "motion design"
+      ],
+      "primary_domain": "motion design"
+    },
+    {
+      "item_id": "R192",
+      "name": "Long-term Investment Advantage",
+      "discipline": "finance",
+      "domains": [
+        "finance & investment"
+      ],
+      "primary_domain": "finance & investment"
+    },
+    {
+      "item_id": "R193",
+      "name": "Brent Spar Campaign Effectiveness",
+      "discipline": "political economy",
+      "domains": [
+        "legal & public policy"
+      ],
+      "primary_domain": "legal & public policy"
+    },
+    {
+      "item_id": "R195",
+      "name": "Agentic Ai System Reliability",
+      "discipline": "generative ai",
+      "domains": [
+        "ai & agents",
+        "engineering & infrastructure"
+      ],
+      "primary_domain": "ai & agents"
+    },
+    {
+      "item_id": "R196",
+      "name": "Inclusive Design Adaptation",
+      "discipline": "human-computer interaction",
+      "domains": [
+        "design systems",
+        "user experience",
+        "semiotics & communication"
+      ],
+      "primary_domain": "design systems"
+    },
+    {
+      "item_id": "R197",
+      "name": "Peripheral Cue Interference Effect",
+      "discipline": "cognitive science",
+      "domains": [
+        "user experience"
+      ],
+      "primary_domain": "user experience"
+    },
+    {
+      "item_id": "R198",
+      "name": "Survivor Bias in Success Narratives",
+      "discipline": "behavioral economics",
+      "domains": [
+        "personal productivity",
+        "finance & investment",
+        "entrepreneurship"
+      ],
+      "primary_domain": "personal productivity"
+    },
+    {
+      "item_id": "R199",
+      "name": "Comfort Zone Constriction From Negative Influence",
+      "discipline": "psychology",
+      "domains": [
+        "user experience"
+      ],
+      "primary_domain": "user experience"
+    },
+    {
+      "item_id": "R200",
+      "name": "Simplicity Cult in Saas Pricing",
+      "discipline": "cultural studies",
+      "domains": [
+        "business development",
+        "marketing & communications",
+        "user experience"
+      ],
+      "primary_domain": "business development"
+    },
+    {
+      "item_id": "R201",
+      "name": "Physical Activity and Brain Health",
+      "discipline": "health & medicine",
+      "domains": [
+        "health & wellness"
+      ],
+      "primary_domain": "health & wellness"
+    },
+    {
+      "item_id": "R202",
+      "name": "Interactive Media Integration",
+      "discipline": "",
+      "domains": [
+        "creative technology",
+        "media & entertainment",
+        "user experience"
+      ],
+      "primary_domain": "creative technology"
+    },
+    {
+      "item_id": "R203",
+      "name": "Iterative Problem-solving in Ux Design",
+      "discipline": "design thinking",
+      "domains": [
+        "user experience"
+      ],
+      "primary_domain": "user experience"
+    },
+    {
+      "item_id": "R204",
+      "name": "Expert Overconfidence and Cognitive Laziness",
+      "discipline": "psychology",
+      "domains": [
+        "user experience",
+        "organizational behavior"
+      ],
+      "primary_domain": "user experience"
+    },
+    {
+      "item_id": "R205",
+      "name": "Innovation Cycles in Art and Technology",
+      "discipline": "cultural studies",
+      "domains": [
+        "arts & culture",
+        "media & entertainment",
+        "design strategy",
+        "systems & frameworks"
+      ],
+      "primary_domain": "arts & culture"
+    },
+    {
+      "item_id": "R206",
+      "name": "Directional Changes (dc) in Financial Data",
+      "discipline": "finance",
+      "domains": [
+        "finance & investment"
+      ],
+      "primary_domain": "finance & investment"
+    },
+    {
+      "item_id": "R207",
+      "name": "Generous Audacious Marketing",
+      "discipline": "marketing",
+      "domains": [
+        "marketing & communications"
+      ],
+      "primary_domain": "marketing & communications"
+    },
+    {
+      "item_id": "R208",
+      "name": "Recovered Memory Therapy and False Accusations",
+      "discipline": "psychology",
+      "domains": [
+        "health & wellness"
+      ],
+      "primary_domain": "health & wellness"
+    },
+    {
+      "item_id": "R209",
+      "name": "Procedural Vs Declarative Knowledge Retrieval",
+      "discipline": "cognitive science",
+      "domains": [
+        "ai & agents",
+        "education",
+        "information architecture"
+      ],
+      "primary_domain": "ai & agents"
+    },
+    {
+      "item_id": "R210",
+      "name": "Same-age Peer Modeling",
+      "discipline": "behavioral economics",
+      "domains": [
+        "education",
+        "user experience",
+        "marketing & communications"
+      ],
+      "primary_domain": "education"
+    }
+  ],
+  "note": "re-derived from the 2026-10-08 owner review sheet (governance/OWNER_DOMAIN_REVIEW_SOURCE_20261008.csv, sha256-pinned) + the owner's round-2 answers (governance/OWNER_CONFIRMATION_SHEET_20261008.csv, sha256-pinned) + owner discipline rulings (R141->machine learning, R159->risk management); declared drops: owner noise_drop rows R021/R084/R106/R148; owner-confirmed discipline abstentions declare discipline='' (BUG-676 fix); the R158 domain drop is APPLICABILITY-ranked (D-2878), never positional; rows still pending the owner: R040, R080, R091 (see governance/OWNER_RULINGS_ROUND2_20261008.md); verify with: python3 scripts/apply_owner_domain_review.py --check"
+}

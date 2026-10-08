@@ -213,7 +213,7 @@ pipeline:
   schema_version: '3.0'
   commit: v3.0-D2485
   taxonomy_version: v5.7
-  max_domains_per_fb: 5
+  max_domains_per_fb: 7
   chunk_size_words: 300
   chunk_overlap_words: 50
   min_chunk_words: 10
@@ -406,7 +406,7 @@ stage4:
   golden_path: config/golden/stage4_golden.yaml
   golden_inject_enabled: true
   golden_max_examples: 7
-  discipline_anchor_path: governance/discipline_anchor_conformance_20261002.json
+  discipline_anchor_path: governance/discipline_anchor_rederived_v8_20261007.json
   discipline_conformance_kappa_floor: 0.8
   # D-2798 (BUG-622): discipline is ADVISORY-ONLY — this floor is a REPORTING reference,
   # NOT a hard gate. discipline_conformance_gate.py --gate is a NO-OP in advisory mode
@@ -694,7 +694,7 @@ taxonomy:
   flood_threshold_ratio: 0.2
   replacement_threshold_ratio: 1.1
   emerging_freq_threshold: 10
-  max_domains: 43
+  max_domains: 41
   max_disciplines: 61
   emerging_discipline_rate_max: 0.35
   emerging_domain_rate_max: 0.3
@@ -803,9 +803,7 @@ taxonomy:
       product design: 0.2437
       project management: 0.3914
       research practice: 0.1587
-      science & research: 0.0211
       semiotics & communication: 0.1569
-      social sciences: 0.2061
       systems & frameworks: 0.1731
       urban planning: 0.2766
       user experience: 0.2389

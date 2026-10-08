@@ -17,8 +17,8 @@ LIVE pins (never the frozen v5 pins).
 
 CONTRACT
 --------
-    assert_referee_menu_v6(doc, label=..., axis=...)  -> raises SystemExit unless valid
-    referee_menu_v6_verdict(doc, label=..., axis=...) -> verdict dict, NEVER raises (testable)
+    assert_referee_menu_current(doc, label=..., axis=...)  -> raises SystemExit unless valid
+    referee_menu_current_verdict(doc, label=..., axis=...) -> verdict dict, NEVER raises (testable)
 
 The pins (live + frozen) are read from config/menu_axis_hashes.yaml (C12: single
 source, never hardcoded). A missing/corrupt pin file fails closed (C16).
@@ -95,7 +95,7 @@ def _find_menu_stamp(doc: dict[str, Any]) -> dict[str, str | None]:
     }
 
 
-def referee_menu_v6_verdict(
+def referee_menu_current_verdict(
     doc: dict[str, Any], *, label: str, axis: str
 ) -> dict[str, Any]:
     """Return the menu-v6 referee verdict for a menu-derived anchor. NEVER raises.
@@ -157,14 +157,14 @@ def referee_menu_v6_verdict(
     }
 
 
-def assert_referee_menu_v6(
+def assert_referee_menu_current(
     doc: dict[str, Any], *, label: str, axis: str
 ) -> dict[str, Any]:
     """Fail-closed (C16): raise SystemExit unless the anchor is a valid menu-v6 referee.
 
     Returns the verdict dict on success so callers can log/attach the live hits.
     """
-    verdict = referee_menu_v6_verdict(doc, label=label, axis=axis)
+    verdict = referee_menu_current_verdict(doc, label=label, axis=axis)
     if not verdict["ok"]:
         raise SystemExit("BUG-650 FAIL-CLOSED: " + verdict["reason"])
     return verdict

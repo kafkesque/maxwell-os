@@ -41,7 +41,7 @@ from discipline_conformance_gate import (  # noqa: E402
 # in the prior session (BUG-622 / D-2774). This is a MEASUREMENT, not a floor.
 BASELINE_FLAT_KAPPA: float = 0.45
 
-DEFAULT_ANCHOR: str = "governance/discipline_anchor_conformance_20261002.json"
+DEFAULT_ANCHOR: str = "governance/discipline_anchor_rederived_v8_20261007.json"
 DEFAULT_MENU: str = "config/closed_menu_v5.json"
 DEFAULT_DB: str = "knowledge pipeline/maxwell.db"
 

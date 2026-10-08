@@ -91,7 +91,7 @@ def _domain_section() -> str:
     """
     first, second = bddv._canonical_defs()
     doms = first if all(n in bddv.DOM_NAMES for n, _ in first) else second
-    return "DOMAIN (choose 1-5 canonical labels that apply):\n" + "\n".join(f"- {n}: {d}" for n, d in doms)
+    return "DOMAIN (choose 1-7 canonical labels that apply):\n" + "\n".join(f"- {n}: {d}" for n, d in doms)
 
 
 def prompt_for(row: dict[str, str]) -> str:

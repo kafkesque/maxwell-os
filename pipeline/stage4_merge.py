@@ -383,7 +383,7 @@ Rules:
   Be specific. "computational neuroscience" > "neuroscience" > "cognitive science".
   D316: discipline is ALWAYS singular — pick the ONE discipline the FB fundamentally
   belongs to, even if it spans multiple domains.
-- domains: 1-5 applied domains/fields/industries where this principle is relevant.
+- domains: 1-7 applied domains/fields/industries where this principle is relevant.
   Think: where would a practitioner USE this knowledge? What fields does it span?
 - is_specialized: true ONLY if this is a narrow sub-technique within a sub-field.
   "Kerning Pair Adjustment" → true. "Design Strategy" → false. "Color harmony in brand" → true.
@@ -507,7 +507,7 @@ try:
             + definition_anchored_block()
             + "\n\nRules:\n"
             f"- discipline: the SINGLE discipline from the CLOSED DISCIPLINE MENU this FB belongs to, or '{_abstention}' if none fits.\n"
-            f"- domains: 1-5 domains from the CLOSED DOMAIN MENU where a practitioner would apply it, or '{_abstention}' if none fit.\n"
+            f"- domains: 1-7 domains from the CLOSED DOMAIN MENU where a practitioner would apply it, or '{_abstention}' if none fit.\n"
             "- is_specialized: true ONLY for a narrow sub-technique within a sub-field. Default false.\n"
             "- evidence: \"cited\" (grounded in source text) or \"axiomatic\" (self-evident truth).\n"
             "\nDEPTH CLASSIFICATION — ONTOLOGICAL, NOT STRUCTURAL (physicist-chef-poet test):\n"
@@ -516,7 +516,7 @@ try:
             "  domain = operates within one field, needs domain context\n"
             "  specialized = narrow sub-technique within a single sub-field\n"
             "  DEFAULT to \"domain\" unless the mechanism clearly transcends it.\n"
-            f"\nReturn ONLY a JSON object: {{\"discipline\": \"<CLOSED DISCIPLINE MENU label, verbatim, or '{_abstention}'>\", \"domains\": [\"1-5 CLOSED DOMAIN MENU labels, verbatim, or '{_abstention}'\"], "
+            f"\nReturn ONLY a JSON object: {{\"discipline\": \"<CLOSED DISCIPLINE MENU label, verbatim, or '{_abstention}'>\", \"domains\": [\"1-7 CLOSED DOMAIN MENU labels, verbatim, or '{_abstention}'\"], "
             "\"depth\": \"universal|cross-domain|domain|specialized\", \"is_specialized\": true/false, "
             "\"evidence\": \"...\"}"
         )
@@ -564,7 +564,7 @@ def build_classify_prompt(
         "1. What academic/intellectual discipline does this principle fundamentally belong to?",
         "   (Use the most precise discipline name you know — not generic buckets)",
         "2. What applied domains/fields/industries does this principle span?",
-        "   (1-5 domains where a practitioner would apply this knowledge)",
+        "   (1-7 domains where a practitioner would apply this knowledge)",
         "3. DEPTH (ontological scope): universal, cross-domain, domain, or specialized?",
         "   Apply the physicist-chef-poet test. Does the mechanism apply across ALL reality",
         "   (universal), bridge two distinct disciplines via shared structure (cross-domain),",

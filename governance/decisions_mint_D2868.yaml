@@ -1,0 +1,27 @@
+- id: D-2868
+  state: RATIFIED
+  category: ANCHOR / TAXONOMY
+  title: 'Re-point anchor-axis authority (discipline/domain/primary_domain) to rederived_v8 + schema-compatible columns'
+  decision: |
+    Closes BUG-630's authority-propagation orphan (left by D-2866/D-2867): config/anchor_axis_authority.yaml still declared
+    discipline authority = discipline_anchor_conformance_20261002.json (204 rows) and domain/primary_domain authority =
+    ANCHOR_208_FIVE_AXIS_VIEW_20260930.csv (pre-v8 pipe strings), so the v8 domain remap had not propagated into the
+    one-declared-authority-per-axis rail. This decision (deterministic, LLM-free):
+      (1) adds schema-compatible `domain` (pipe-joined) + `primary_domain` (first token) columns to
+          discipline_anchor_rederived_v8_20261007.json via scripts/build_anchor_v8_apply.py, and fixes its stale
+          artifact_id (was 'rederived_v7_20261007');
+      (2) re-points the discipline / domain / primary_domain axes to rederived_v8 (201 rows) while depth stays on
+          ANCHOR_208_DEPTH_CORRECTED_20261002.json (208 rows) and content_type/extraction_type stay on the 5-axis view;
+      (3) supersedes the legacy consumers (discipline_anchor_conformance_20261002, ANCHOR_208_DISCIPLINE_NORMALIZED,
+          ANCHOR_208_FIVE_AXIS_VIEW / ANCHOR_150_FIVE_AXIS_VIEW as discipline/domain copies) in favour of the single
+          regenerated consumer ANCHOR_208_CONSOLIDATED_20261007.json (208 rows, 201 with v8 domain);
+      (4) swaps propagation.order to scripts/regenerate_anchor_208_v8.py.
+    Verification: scripts/check_anchor_axis_consistency.py exits 0 — every consumer agrees with its declared authority
+    on every axis, declared ceiling 0 holds. 0 domain!=pipe-join drift, 0 primary_domain!=first-token drift.
+  bugs: [BUG-630]
+  files:
+    - scripts/build_anchor_v8_apply.py
+    - scripts/regenerate_anchor_208_v8.py
+    - governance/discipline_anchor_rederived_v8_20261007.json
+    - governance/ANCHOR_208_CONSOLIDATED_20261007.json
+    - config/anchor_axis_authority.yaml

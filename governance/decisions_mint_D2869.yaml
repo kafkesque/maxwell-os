@@ -1,0 +1,42 @@
+- id: D-2869
+  state: RATIFIED
+  category: ANCHOR / TAXONOMY
+  title: 'Owner correction — three anchor applied-domain re-adjudications (Survivor Bias / Provincial Norms / Doping)'
+  decision: |
+    Owner-gated correction (2026-10-07) resolving the forensic drift flagged between the F2 ANCHOR-2 triage,
+    the 201-row rederived_v8 authority, and the legacy 208-row consolidated artifact. Three applied domains
+    re-adjudicated content-driven (OntoClean rigidity — Guarino & Welty 2002; kind-vs-role, BFO/Arp-Smith-Spear 2015):
+      (1) Survivor Bias (R198 / SHEET+KEY row 48): marketing & communications ->
+          personal productivity | finance & investment | entrepreneurship (NOT marketing).
+      (2) Provincial Norms (R162 / SHEET+KEY row 12): education | leadership ->
+          organizational behavior | education | leadership (NOT legal & public policy).
+      (3) Doping (R184 / SHEET+KEY row 34): organizational behavior -> health & wellness
+          (NOT organizational behavior).
+    Deterministic, LLM-free propagation:
+      - scripts/build_anchor_v8_remap_triage.py OWNER_OVERRIDES updated (R198/R162/R184) and
+        governance/anchor_v8_domain_remap_triage_20261007.csv regenerated (still 20 rows = 16 DROP + 4 ROUTED).
+      - scripts/build_anchor_v8_apply.py re-minted governance/discipline_anchor_rederived_v8_20261007.json (201 rows).
+      - scripts/regenerate_anchor_208_v8.py regenerated governance/ANCHOR_208_CONSOLIDATED_20261007.json
+        (208 rows, 201 with v8 domain, 0 stale) — ALL AXES (depth + discipline + domain) in ONE document.
+      - scripts/remint_anchor2_v8.py re-minted ANCHOR-2 KEY + BLIND SHEET (60 rows each) and corrected the
+        THREE stale-v5 pipeline predictions (KEY rows 12/34/48) that had never been migrated; SHEET rows 12/48
+        corrected. F2 triage CSV grew 38 -> 41 rows (3 KEY OWNER_APPLY additions).
+      - scripts/anchor2_kappa.py re-pointed to V8 artifacts + config/taxonomy_v8.yaml and re-measured:
+        discipline kappa 0.4314, domains micro-kappa 0.652, content_type kappa 0.0
+        (degenerate: pipeline 1 distinct vs 10 human), out_of_vocab 0.
+    Verification: check_anchor_axis_consistency.py exit 0 (ceiling 0 holds); BUG-650 referee guard ok=True
+    (live pins 5bd94568.../8218d6db...); 0 OOV domains/disciplines. 'entrepreneurship' is the canonical
+    taxonomy_v8 spelling (owner's 'enterpreneurship' was a typo — never minted as an OOV token).
+  bugs: [BUG-630, BUG-650]
+  files:
+    - scripts/build_anchor_v8_remap_triage.py
+    - scripts/build_anchor_v8_apply.py
+    - scripts/regenerate_anchor_208_v8.py
+    - scripts/remint_anchor2_v8.py
+    - scripts/anchor2_kappa.py
+    - governance/discipline_anchor_rederived_v8_20261007.json
+    - governance/ANCHOR_208_CONSOLIDATED_20261007.json
+    - governance/ANCHOR2_KEY_V8_20261007.json
+    - governance/ANCHOR2_BLIND_SHEET_V8_20261007.csv
+    - governance/ANCHOR2_V8_REMINT_TRIAGE_20261007.csv
+    - governance/anchor_v8_domain_remap_triage_20261007.csv

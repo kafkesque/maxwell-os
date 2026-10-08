@@ -50,15 +50,15 @@ def test_measure_store_counts_only_canonical_domains(tmp_path):
     db = _make_store(
         tmp_path,
         [
-            ("ok1", json.dumps(["a", "b", "c", "d", "e"]), "CLEAN"),  # == cap
-            ("over", json.dumps(["a", "b", "c", "d", "e", "f"]), "CLEAN"),  # 6 > 5
+            ("ok1", json.dumps(["a", "b", "c", "d", "e", "f", "g"]), "CLEAN"),  # == cap (7)
+            ("over", json.dumps(["a", "b", "c", "d", "e", "f", "g", "h"]), "CLEAN"),  # 8 > 7
             ("ok2", json.dumps(["a"]), "CLEAN"),
         ],
     )
-    result = reader.measure_store(db, 5)
+    result = reader.measure_store(db, reader.MAX_DOMAINS_PER_FB)
     assert result["total_fbs"] == 3
     assert [fb["fb_id"] for fb in result["over_cap"]] == ["over"]
-    assert result["over_cap"][0]["domain_count"] == 6
+    assert result["over_cap"][0]["domain_count"] == 8
     assert result["parse_defects"] == []
 
 
@@ -70,7 +70,7 @@ def test_measure_store_reports_parse_defect(tmp_path):
             ("fine", json.dumps(["a", "b"]), "CLEAN"),
         ],
     )
-    result = reader.measure_store(db, 5)
+    result = reader.measure_store(db, reader.MAX_DOMAINS_PER_FB)
     assert [d["fb_id"] for d in result["parse_defects"]] == ["bad"]
     assert result["over_cap"] == []
 
@@ -83,16 +83,16 @@ def test_receipt_stamps_all_fields():
             "parse_defects": [],
         },
         Path("knowledge pipeline/maxwell.db"),
-        5,
+        reader.MAX_DOMAINS_PER_FB,
     )
     assert receipt["schema_version"] == "1.0"
-    assert receipt["max_domains_per_fb"] == 5
+    assert receipt["max_domains_per_fb"] == 7
     assert receipt["over_cap_count"] == 1
     assert receipt["total_fbs"] == 3
 
 
 def test_main_exit_drift_when_over_cap(tmp_path, monkeypatch):
-    db = _make_store(tmp_path, [("over", json.dumps(["a", "b", "c", "d", "e", "f"]), "CLEAN")])
+    db = _make_store(tmp_path, [("over", json.dumps(["a", "b", "c", "d", "e", "f", "g", "h"]), "CLEAN")])
     monkeypatch.setattr(reader, "DB_PATH", db)
     assert reader.main([]) == reader.EXIT_DRIFT
 

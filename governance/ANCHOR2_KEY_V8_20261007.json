@@ -1,0 +1,912 @@
+{
+  "schema_version": "1.0",
+  "n": 60,
+  "menu_hash": "8218d6db91add9888d2b1f96ecb134a34ce7c300379d07886c998bc8f8148c71",
+  "r5_hash": "7fe8a2d6df435819085fbfcf51b3c2e5085437bda265bb0f514292739cf0a1be",
+  "contra_n": 30,
+  "clean_n": 30,
+  "key": {
+    "104861cffd5fc19d81dcea7a1db8c99a7a55c615a4d42ff352147116c73e7489": {
+      "row": 1,
+      "stratum": "contra",
+      "max_contra": 0.999,
+      "name": "Context-dependent Cognitive Processing",
+      "pipeline_discipline": "psychology",
+      "pipeline_domains": [
+        "research practice",
+        "user experience"
+      ],
+      "pipeline_content_type": "principle"
+    },
+    "42cebfbaa280169a8fccf0042ab3cfef215ffa49d0184a44398e2e0e59255750": {
+      "row": 2,
+      "stratum": "contra",
+      "max_contra": 0.999,
+      "name": "Economic Politics of Obsolescence",
+      "pipeline_discipline": "economics",
+      "pipeline_domains": [
+        "legal & public policy",
+        "product design"
+      ],
+      "pipeline_content_type": "principle"
+    },
+    "20576945d8ca2e210b334d9acce56707276aafdc26a623792e6cad617cd7a0a8": {
+      "row": 3,
+      "stratum": "contra",
+      "max_contra": 0.999,
+      "name": "Cognitive Interview Analysis of Question Clarity Issues",
+      "pipeline_discipline": "research methodology",
+      "pipeline_domains": [
+        "marketing & communications",
+        "research practice"
+      ],
+      "pipeline_content_type": "principle"
+    },
+    "461f5d7a21fdb23b72b837832c2e96dd50eb730085eb0c9a76ef96c0c52fbd37": {
+      "row": 4,
+      "stratum": "contra",
+      "max_contra": 0.999,
+      "name": "Aditya Birla Group's Parta System",
+      "pipeline_discipline": "strategic thinking",
+      "pipeline_domains": [
+        "business operations"
+      ],
+      "pipeline_content_type": "principle"
+    },
+    "7d5e0b161a7bc13d2ff55ea60e0bff2b556afd780a859ab4bdd183ca67b3d6b5": {
+      "row": 5,
+      "stratum": "contra",
+      "max_contra": 0.999,
+      "name": "Persistence in Business Strategy",
+      "pipeline_discipline": "strategic thinking",
+      "pipeline_domains": [
+        "entrepreneurship"
+      ],
+      "pipeline_content_type": "principle"
+    },
+    "26009aa582740cd49ed40f85ee922b7f51bf7a4e6dac69312b72aa2a380f259c": {
+      "row": 6,
+      "stratum": "contra",
+      "max_contra": 0.999,
+      "name": "Designers' Object World",
+      "pipeline_discipline": "cognitive science",
+      "pipeline_domains": [
+        "digital product",
+        "user experience",
+        "product design",
+        "industrial design",
+        "design strategy"
+      ],
+      "pipeline_content_type": "principle"
+    },
+    "4eae9805b94e68d5cab26ba729a28b4a61a6187205fbc797006bd972b0fd5b7f": {
+      "row": 7,
+      "stratum": "contra",
+      "max_contra": 0.999,
+      "name": "Perspective-driven Cognitive Shift",
+      "pipeline_discipline": "psychology",
+      "pipeline_domains": [
+        "education",
+        "legal & public policy"
+      ],
+      "pipeline_content_type": "principle"
+    },
+    "72188d315b0353d70f9bb0f73b6a4daf42781c07f058920119414a5d6bd940a1": {
+      "row": 8,
+      "stratum": "contra",
+      "max_contra": 0.999,
+      "name": "Duality in Design",
+      "pipeline_discipline": "cultural design",
+      "pipeline_domains": [
+        "graphic design",
+        "user experience",
+        "engineering practice",
+        "arts & culture",
+        "product design"
+      ],
+      "pipeline_content_type": "principle"
+    },
+    "a7902b32946e4cf909c1fa6c6ea111ca5966d55817ec8c0881b994ac7ad6e200": {
+      "row": 9,
+      "stratum": "contra",
+      "max_contra": 0.999,
+      "name": "Context-dependent Quality Assessment",
+      "pipeline_discipline": "risk management",
+      "pipeline_domains": [
+        "product design"
+      ],
+      "pipeline_content_type": "principle"
+    },
+    "79bba415374aa526af77089d2c4b7409040fe2caae62f057f11d4d81c87b28ab": {
+      "row": 10,
+      "stratum": "contra",
+      "max_contra": 0.999,
+      "name": "Resource-based Value Assessment",
+      "pipeline_discipline": "strategic thinking",
+      "pipeline_domains": [
+        "business operations"
+      ],
+      "pipeline_content_type": "principle"
+    },
+    "a1efe32a3ce09a4a6543db03ddb0755b7005206af4e44ccfe9948a527282bf41": {
+      "row": 11,
+      "stratum": "contra",
+      "max_contra": 0.999,
+      "name": "Demand-side Sales Pattern",
+      "pipeline_discipline": "behavioral economics",
+      "pipeline_domains": [
+        "business development",
+        "business operations",
+        "marketing & communications"
+      ],
+      "pipeline_content_type": "principle"
+    },
+    "e827efc57c19319f3efa4886f3706703b882bc81a1cea99be6605388fa6bb473": {
+      "row": 12,
+      "stratum": "contra",
+      "max_contra": 0.999,
+      "name": "Provincial Norms",
+      "pipeline_discipline": "psychology",
+      "pipeline_domains": [
+        "organizational behavior",
+        "education",
+        "leadership"
+      ],
+      "pipeline_content_type": "principle"
+    },
+    "bef863827c3ca3d1d53929806fc341cf83e9170109ea836b3b53a6ba19f2f4d8": {
+      "row": 13,
+      "stratum": "contra",
+      "max_contra": 0.999,
+      "name": "Metaphorically Selling How to Use the Ma",
+      "pipeline_discipline": "communication theory",
+      "pipeline_domains": [
+        "semiotics & communication",
+        "marketing & communications"
+      ],
+      "pipeline_content_type": "principle"
+    },
+    "73de04523e4eb002700c3a7b32ebfb56ebe24012b6b865db40812f4ac446a618": {
+      "row": 14,
+      "stratum": "contra",
+      "max_contra": 0.999,
+      "name": "Phenomenological Understanding",
+      "pipeline_discipline": "research methodology",
+      "pipeline_domains": [
+        "user experience"
+      ],
+      "pipeline_content_type": "principle"
+    },
+    "38c529d51a31dbb1c427f381ed6edb41660224ebc75ba60ecd6c6df58a1e86a6": {
+      "row": 15,
+      "stratum": "contra",
+      "max_contra": 0.999,
+      "name": "Acknowledgment Attribution",
+      "pipeline_discipline": "media studies",
+      "pipeline_domains": [
+        "editorial & advertising",
+        "research practice"
+      ],
+      "pipeline_content_type": "principle"
+    },
+    "64aa7982c9505fcc27e62581a50102e15ba0fc76bdce6c3b2113515b4db8a111": {
+      "row": 16,
+      "stratum": "contra",
+      "max_contra": 0.999,
+      "name": "Agent-centric Economic Incentives",
+      "pipeline_discipline": "economics",
+      "pipeline_domains": [
+        "ai & agents",
+        "engineering & infrastructure"
+      ],
+      "pipeline_content_type": "principle"
+    },
+    "0380358c6bb42d9c5821f55ac2b77b0770a4f3064506ca0921d2c0fa4dc01c12": {
+      "row": 17,
+      "stratum": "contra",
+      "max_contra": 0.999,
+      "name": "Innocent Brand Identity Through Organic Development",
+      "pipeline_discipline": "emerging",
+      "pipeline_domains": [
+        "marketing & communications",
+        "organizational behavior",
+        "business operations"
+      ],
+      "pipeline_content_type": "principle"
+    },
+    "4b7708cc94d7716e2a9b637ea423cd3611de5ab363fc0e7ed0d05816e92d6fc4": {
+      "row": 18,
+      "stratum": "contra",
+      "max_contra": 0.999,
+      "name": "Hidden Issue Questioning Technique",
+      "pipeline_discipline": "behavioral economics",
+      "pipeline_domains": [
+        "marketing & communications"
+      ],
+      "pipeline_content_type": "principle"
+    },
+    "f57e39b4a612a89945f01a5faf14ff539dadec6700858bf4d4330766946c204c": {
+      "row": 19,
+      "stratum": "contra",
+      "max_contra": 0.999,
+      "name": "Charismatic Leadership Development",
+      "pipeline_discipline": "emerging",
+      "pipeline_domains": [
+        "organizational behavior",
+        "leadership"
+      ],
+      "pipeline_content_type": "principle"
+    },
+    "41237b4764eeeb445077c6f12c1a6d42a32dd8963b918572c6ba661b995dabee": {
+      "row": 20,
+      "stratum": "contra",
+      "max_contra": 0.998,
+      "name": "Dream-driven Life Planning",
+      "pipeline_discipline": "psychology",
+      "pipeline_domains": [
+        "business operations",
+        "personal productivity"
+      ],
+      "pipeline_content_type": "principle"
+    },
+    "5ffa5f5b1d75f7ee8a571ac58e384293415fd1ecf13bffc6419de7a5265c68a2": {
+      "row": 21,
+      "stratum": "contra",
+      "max_contra": 0.998,
+      "name": "Alpha Blending Control",
+      "pipeline_discipline": "computer graphics",
+      "pipeline_domains": [
+        "media & entertainment"
+      ],
+      "pipeline_content_type": "principle"
+    },
+    "4c7ffef7152a371127987cd1cd00512d9703fcba907ff47f55f962442f8fe6ef": {
+      "row": 22,
+      "stratum": "contra",
+      "max_contra": 0.998,
+      "name": "Digital System Context Decomposition",
+      "pipeline_discipline": "software engineering",
+      "pipeline_domains": [
+        "engineering practice",
+        "product design"
+      ],
+      "pipeline_content_type": "principle"
+    },
+    "bda4b63ec9c6c9e9b06afac10ec45d6e6d7a4fee0b9e4a92317dfd63d4fa0cc9": {
+      "row": 23,
+      "stratum": "contra",
+      "max_contra": 0.998,
+      "name": "Linkedin Network Building Protocol",
+      "pipeline_discipline": "social network analysis",
+      "pipeline_domains": [
+        "business development",
+        "marketing & communications",
+        "personal productivity"
+      ],
+      "pipeline_content_type": "principle"
+    },
+    "fb726113259db56bd205137c43bacbf20b107f0269a5449fe6feb339bdc0e1a5": {
+      "row": 24,
+      "stratum": "contra",
+      "max_contra": 0.998,
+      "name": "Concept-first Prototyping",
+      "pipeline_discipline": "design thinking",
+      "pipeline_domains": [
+        "user experience",
+        "business operations",
+        "product design"
+      ],
+      "pipeline_content_type": "principle"
+    },
+    "e7248fbf0d474024f57ebfbebad6a4118ff3a9c1665e55fb10bafce3b17f62c8": {
+      "row": 25,
+      "stratum": "contra",
+      "max_contra": 0.998,
+      "name": "Role-based Prompting Effect",
+      "pipeline_discipline": "human-computer interaction",
+      "pipeline_domains": [
+        "ai & agents",
+        "product design"
+      ],
+      "pipeline_content_type": "principle"
+    },
+    "248a12d85c5702cb9c2c5d04c174c633e92a37ffb1b2ee66fbc8bc84aabf7d22": {
+      "row": 26,
+      "stratum": "contra",
+      "max_contra": 0.998,
+      "name": "Harvest Time Strategic Planning",
+      "pipeline_discipline": "strategic thinking",
+      "pipeline_domains": [
+        "business operations",
+        "entrepreneurship"
+      ],
+      "pipeline_content_type": "principle"
+    },
+    "80cc1797ee047c2b5d5f888e1fb8db9048ca6188ef65b12b65c3b743da34fdb2": {
+      "row": 27,
+      "stratum": "contra",
+      "max_contra": 0.998,
+      "name": "Contextual Interpretation Framework",
+      "pipeline_discipline": "psychology",
+      "pipeline_domains": [
+        "graphic design",
+        "user experience",
+        "marketing & communications",
+        "brand identity"
+      ],
+      "pipeline_content_type": "principle"
+    },
+    "a4f29d3dc0819d32d348103e7fe7d9ec18a252caadb14e38bcd8b9ce4e0b30cc": {
+      "row": 28,
+      "stratum": "contra",
+      "max_contra": 0.998,
+      "name": "If-then Plan for Moral Action",
+      "pipeline_discipline": "behavioral economics",
+      "pipeline_domains": [
+        "health & wellness",
+        "legal & public policy"
+      ],
+      "pipeline_content_type": "principle"
+    },
+    "1a5ea8517cf76b4206f97d79d41c697410bd3aaf68d801b545cc43ff5d408332": {
+      "row": 29,
+      "stratum": "contra",
+      "max_contra": 0.998,
+      "name": "Coincidence Wit in Graphic Design",
+      "pipeline_discipline": "cultural design",
+      "pipeline_domains": [
+        "editorial & advertising",
+        "brand identity",
+        "graphic design"
+      ],
+      "pipeline_content_type": "principle"
+    },
+    "ce7fa9dc636cc825b377edc50a78b2fb34920600c68337a4db52932cfcddd910": {
+      "row": 30,
+      "stratum": "contra",
+      "max_contra": 0.998,
+      "name": "Intersectional Design Approaches for Underserved Communities",
+      "pipeline_discipline": "human-computer interaction",
+      "pipeline_domains": [
+        "user experience"
+      ],
+      "pipeline_content_type": "principle"
+    },
+    "402aadbc5ef550a117abe70cc0ead186c709dde7a42f2ecffc56da991e756a94": {
+      "row": 31,
+      "stratum": "clean",
+      "max_contra": 0.009,
+      "name": "Economic Industry Network Structure",
+      "pipeline_discipline": "economics",
+      "pipeline_domains": [
+        "emerging"
+      ],
+      "pipeline_content_type": "principle"
+    },
+    "a362a7790469b706e4356fdf1c4749a297da7f8144e589823180861d221332c2": {
+      "row": 32,
+      "stratum": "clean",
+      "max_contra": 0.009,
+      "name": "Cultural Mourning Rituals and Symbolism",
+      "pipeline_discipline": "anthropology",
+      "pipeline_domains": [
+        "emerging"
+      ],
+      "pipeline_content_type": "principle"
+    },
+    "301a0f4af27eadb4653811805a5e49f946c82f06966b66cf0045d839589a59a6": {
+      "row": 33,
+      "stratum": "clean",
+      "max_contra": 0.279,
+      "name": "Pattern Language Implementation Process",
+      "pipeline_discipline": "design thinking",
+      "pipeline_domains": [
+        "urban planning"
+      ],
+      "pipeline_content_type": "principle"
+    },
+    "1bfafc5cc617c48fc57d3838a35b53f244835e8ef7e2fe9303acc9cb1f6c0513": {
+      "row": 34,
+      "stratum": "clean",
+      "max_contra": 0.023,
+      "name": "Doping in Professional Sports: Systemic Pressure and Rationalization",
+      "pipeline_discipline": "psychology",
+      "pipeline_domains": [
+        "health & wellness"
+      ],
+      "pipeline_content_type": "principle"
+    },
+    "97b0adf059e70efe24ca9896a025b41f1ceb6075bd80849f827fb51e0ee332d1": {
+      "row": 35,
+      "stratum": "clean",
+      "max_contra": 0.084,
+      "name": "Tv Advertising Consumer Behavior Pattern",
+      "pipeline_discipline": "emerging",
+      "pipeline_domains": [
+        "marketing & communications",
+        "editorial & advertising"
+      ],
+      "pipeline_content_type": "principle"
+    },
+    "babb07591d434f7fba4ec91e4483150c7af53cf65b1c2e85bafa8292af7b110d": {
+      "row": 36,
+      "stratum": "clean",
+      "max_contra": 0.403,
+      "name": "Cognitive Interview Analysis Framework",
+      "pipeline_discipline": "research methodology",
+      "pipeline_domains": [
+        "user experience",
+        "research practice"
+      ],
+      "pipeline_content_type": "principle"
+    },
+    "fd273a01cf29ce644d5aaca7b5fcc2d8fa4b37605b71675b1a8f7eca714b9159": {
+      "row": 37,
+      "stratum": "clean",
+      "max_contra": 0.221,
+      "name": "Credibility Through Transparency",
+      "pipeline_discipline": "psychology",
+      "pipeline_domains": [
+        "marketing & communications"
+      ],
+      "pipeline_content_type": "principle"
+    },
+    "90ad8c926d4c649c5301724a06ed5bedc6d883add4d93051ebce159dc65df38f": {
+      "row": 38,
+      "stratum": "clean",
+      "max_contra": 0.027,
+      "name": "Sensory-motor Basis of Conceptual Reasoning",
+      "pipeline_discipline": "neuroscience",
+      "pipeline_domains": [
+        "user experience",
+        "education",
+        "arts & culture"
+      ],
+      "pipeline_content_type": "principle"
+    },
+    "318eed66dc6c314dbb6cd1fee3b1c77d4a9e483f4a9559a3b2d69be47f3457f6": {
+      "row": 39,
+      "stratum": "clean",
+      "max_contra": 0.051,
+      "name": "Higher-order Polynomial Approximation in Numerical Methods",
+      "pipeline_discipline": "computational physics & simulation",
+      "pipeline_domains": [
+        "computational science & physics"
+      ],
+      "pipeline_content_type": "principle"
+    },
+    "77587b4669cd4345aeb4c4f22c6ae2547f2610874aac24ea57c21b58965be9d0": {
+      "row": 40,
+      "stratum": "clean",
+      "max_contra": 0.357,
+      "name": "Design Thinking Integration Strategy",
+      "pipeline_discipline": "creative process",
+      "pipeline_domains": [
+        "business operations",
+        "digital product"
+      ],
+      "pipeline_content_type": "principle"
+    },
+    "b52d1d379ae61cf873350b3aa82d971a09d2cc7de61dba7fd4d34d7534f50999": {
+      "row": 41,
+      "stratum": "clean",
+      "max_contra": 0.008,
+      "name": "Intentional Motion Design",
+      "pipeline_discipline": "human-computer interaction",
+      "pipeline_domains": [
+        "digital product",
+        "user experience"
+      ],
+      "pipeline_content_type": "principle"
+    },
+    "54f0000cd1e48c3386651bfba9033f145f3a14e0bb0988f6a63e118840c4d7f1": {
+      "row": 42,
+      "stratum": "clean",
+      "max_contra": 0.01,
+      "name": "Long-term Investment Advantage",
+      "pipeline_discipline": "economics",
+      "pipeline_domains": [
+        "finance & investment"
+      ],
+      "pipeline_content_type": "principle"
+    },
+    "2401f32fa7fef6032055c4dc8c6dd62ff5740ac990bc9dbcc292f43423909e6f": {
+      "row": 43,
+      "stratum": "clean",
+      "max_contra": 0.016,
+      "name": "Brent Spar Campaign Effectiveness",
+      "pipeline_discipline": "emerging",
+      "pipeline_domains": [
+        "marketing & communications"
+      ],
+      "pipeline_content_type": "principle"
+    },
+    "db9f4c89ff9f952fc7504047aed8fad73ef80e3eee211a582e46a97abdc9377d": {
+      "row": 44,
+      "stratum": "clean",
+      "max_contra": 0.057,
+      "name": "Consumer Anticipation of Objections",
+      "pipeline_discipline": "emerging",
+      "pipeline_domains": [
+        "product design",
+        "project management"
+      ],
+      "pipeline_content_type": "principle"
+    },
+    "4292dc32dc95d89ec2133b0e8cf27a65721689f4c477fe8460ea94a9729bd16d": {
+      "row": 45,
+      "stratum": "clean",
+      "max_contra": 0.34,
+      "name": "Agentic Ai System Reliability",
+      "pipeline_discipline": "software engineering",
+      "pipeline_domains": [
+        "emerging",
+        "engineering practice"
+      ],
+      "pipeline_content_type": "principle"
+    },
+    "7b7527feb9ae3187b6593ffbca5f6382b6928487b8a0fff9495ef9034c69e28a": {
+      "row": 46,
+      "stratum": "clean",
+      "max_contra": 0.004,
+      "name": "Inclusive Design Adaptation",
+      "pipeline_discipline": "human-computer interaction",
+      "pipeline_domains": [
+        "digital product",
+        "user experience"
+      ],
+      "pipeline_content_type": "principle"
+    },
+    "57e259f3b82eccf02842bdfca763907cefe26d1eb6b3d792426e76180e26f5c4": {
+      "row": 47,
+      "stratum": "clean",
+      "max_contra": 0.351,
+      "name": "Peripheral Cue Interference Effect",
+      "pipeline_discipline": "psychology",
+      "pipeline_domains": [
+        "user experience"
+      ],
+      "pipeline_content_type": "principle"
+    },
+    "664278dfd2096e45852dd3557605c1bc7fb71ed9d77864fd8a620af11bd2ce4e": {
+      "row": 48,
+      "stratum": "clean",
+      "max_contra": 0.133,
+      "name": "Survivor Bias in Success Narratives",
+      "pipeline_discipline": "psychology",
+      "pipeline_domains": [
+        "personal productivity",
+        "finance & investment",
+        "entrepreneurship"
+      ],
+      "pipeline_content_type": "principle"
+    },
+    "20a580c62d1cd3b3fb3beb1c2d8eb3cb62d89656e04ca8c07f92da464b61ba4e": {
+      "row": 49,
+      "stratum": "clean",
+      "max_contra": 0.208,
+      "name": "Comfort Zone Constriction From Negative Influence",
+      "pipeline_discipline": "psychology",
+      "pipeline_domains": [
+        "business operations",
+        "organizational behavior",
+        "personal productivity"
+      ],
+      "pipeline_content_type": "principle"
+    },
+    "33666a900d6705b13090c82333e0bc5f8d9b7554cbfee4cad0841bfdf331856a": {
+      "row": 50,
+      "stratum": "clean",
+      "max_contra": 0.373,
+      "name": "Simplicity Cult in Saas Pricing",
+      "pipeline_discipline": "strategic thinking",
+      "pipeline_domains": [
+        "marketing & communications"
+      ],
+      "pipeline_content_type": "principle"
+    },
+    "f4bbc48fb5aa289050c4dfb9c7c38d27881eb4175d5f2f084111d5f9f2d1e0f0": {
+      "row": 51,
+      "stratum": "clean",
+      "max_contra": 0.241,
+      "name": "Physical Activity and Brain Health",
+      "pipeline_discipline": "neuroscience",
+      "pipeline_domains": [
+        "health & wellness"
+      ],
+      "pipeline_content_type": "principle"
+    },
+    "89611938d68ce24b50765e10d58a96a28a61aa50ea5648c4b090b14d7ad895b0": {
+      "row": 52,
+      "stratum": "clean",
+      "max_contra": 0.006,
+      "name": "Interactive Media Integration",
+      "pipeline_discipline": "performing arts",
+      "pipeline_domains": [
+        "arts & culture",
+        "creative technology"
+      ],
+      "pipeline_content_type": "principle"
+    },
+    "0a03450c243e201ceb5c5d0206a554022606b10f03a28e45e3b317b50c64aee2": {
+      "row": 53,
+      "stratum": "clean",
+      "max_contra": 0.007,
+      "name": "Iterative Problem-solving in Ux Design",
+      "pipeline_discipline": "human-computer interaction",
+      "pipeline_domains": [
+        "digital product",
+        "user experience"
+      ],
+      "pipeline_content_type": "principle"
+    },
+    "1c11f2c5273ad03d3900f6a959f37c54ad933c1a178603d6222798b844cf13e0": {
+      "row": 54,
+      "stratum": "clean",
+      "max_contra": 0.114,
+      "name": "Expert Overconfidence and Cognitive Laziness",
+      "pipeline_discipline": "psychology",
+      "pipeline_domains": [
+        "organizational behavior",
+        "leadership"
+      ],
+      "pipeline_content_type": "principle"
+    },
+    "3682aa15cb7119faf1b71b725a5d6eb173553d659506b6b94198778668d7839b": {
+      "row": 55,
+      "stratum": "clean",
+      "max_contra": 0.035,
+      "name": "Innovation Cycles in Art and Technology",
+      "pipeline_discipline": "cultural design",
+      "pipeline_domains": [
+        "creative technology",
+        "arts & culture"
+      ],
+      "pipeline_content_type": "principle"
+    },
+    "d56d6ab49ba2b2ceb2b54467e1d6112fa61348e66fa3c22a3a2cc2dd19a0c587": {
+      "row": 56,
+      "stratum": "clean",
+      "max_contra": 0.047,
+      "name": "Directional Changes (dc) in Financial Data",
+      "pipeline_discipline": "finance",
+      "pipeline_domains": [
+        "emerging"
+      ],
+      "pipeline_content_type": "principle"
+    },
+    "a89322e86cca57f66e5aebd3f9fe95df52bd5c0967a0e79fd3bc1df2b76f501c": {
+      "row": 57,
+      "stratum": "clean",
+      "max_contra": 0.131,
+      "name": "Generous Audacious Marketing",
+      "pipeline_discipline": "behavioral economics",
+      "pipeline_domains": [
+        "business development",
+        "marketing & communications"
+      ],
+      "pipeline_content_type": "principle"
+    },
+    "b484487ea0c395f21bab585b5f59a2acdc64e51583cfae480474f7671231dce2": {
+      "row": 58,
+      "stratum": "clean",
+      "max_contra": 0.304,
+      "name": "Recovered Memory Therapy and False Accusations",
+      "pipeline_discipline": "health & medicine",
+      "pipeline_domains": [
+        "health & wellness"
+      ],
+      "pipeline_content_type": "principle"
+    },
+    "17eb362bc1ff456ee8ae7c37709a5b3b387248599b8dae5bfc0a31fe5b70d706": {
+      "row": 59,
+      "stratum": "clean",
+      "max_contra": 0.449,
+      "name": "Procedural Vs Declarative Knowledge Retrieval",
+      "pipeline_discipline": "psychology",
+      "pipeline_domains": [
+        "education",
+        "health & wellness"
+      ],
+      "pipeline_content_type": "principle"
+    },
+    "c07895f800d3e4010c2fe651aa67c0f2641966505c47247427664e9288598d78": {
+      "row": 60,
+      "stratum": "clean",
+      "max_contra": 0.033,
+      "name": "Same-age Peer Modeling",
+      "pipeline_discipline": "psychology",
+      "pipeline_domains": [
+        "emerging"
+      ],
+      "pipeline_content_type": "principle"
+    }
+  },
+  "answer_space_hash": "5bd9456802db9efe807c89f3b837ae18a70d32de795793f6c1705c192cc67ebd",
+  "taxonomy_version": "v8",
+  "_provenance": {
+    "schema_version": "1.0",
+    "generated_by": "scripts/remint_anchor2_v8.py (F2 owner-gated v8 re-mint)",
+    "gen_model": "none",
+    "decision": "Follow-through 5 (D-2865/D-2866 F2 close-out)",
+    "generated_at": "2026-10-08T13:32:39.428635+00:00",
+    "inputs": {
+      "key_source": "governance/ANCHOR2_KEY_20260920.json",
+      "sheet_source": "governance/ANCHOR2_BLIND_SHEET_20260920.csv",
+      "triage": "governance/ANCHOR2_V8_REMINT_TRIAGE_20261007.csv"
+    },
+    "frozen_menu_hash_v5": "73597ee2b1bb1eb92edb08e743ffa0654c1e5994edcd3535d814c7942a89df6f",
+    "remap_log": [
+      {
+        "row": 1,
+        "fb_id": "104861cffd5fc19d81dcea7a1db8c99a7a55c615a4d42ff352147116c73e7489",
+        "name": "Context-dependent Cognitive Processing",
+        "old_domains": [
+          "research & methodology",
+          "user experience"
+        ],
+        "new_domains": [
+          "research practice",
+          "user experience"
+        ],
+        "mode": "AUTO_RENAME/AUTO_FIX"
+      },
+      {
+        "row": 3,
+        "fb_id": "20576945d8ca2e210b334d9acce56707276aafdc26a623792e6cad617cd7a0a8",
+        "name": "Cognitive Interview Analysis of Question Clarity Issues",
+        "old_domains": [
+          "marketing & communications",
+          "research & methodology"
+        ],
+        "new_domains": [
+          "marketing & communications",
+          "research practice"
+        ],
+        "mode": "AUTO_RENAME/AUTO_FIX"
+      },
+      {
+        "row": 12,
+        "fb_id": "e827efc57c19319f3efa4886f3706703b882bc81a1cea99be6605388fa6bb473",
+        "name": "Provincial Norms",
+        "old_domains": [
+          "organizational behavior",
+          "legal & public policy",
+          "education",
+          "business operations",
+          "marketing & communications",
+          "leadership"
+        ],
+        "new_domains": [
+          "organizational behavior",
+          "education",
+          "leadership"
+        ],
+        "mode": "OWNER_APPLY"
+      },
+      {
+        "row": 14,
+        "fb_id": "73de04523e4eb002700c3a7b32ebfb56ebe24012b6b865db40812f4ac446a618",
+        "name": "Phenomenological Understanding",
+        "old_domains": [
+          "education",
+          "social sciences"
+        ],
+        "new_domains": [
+          "user experience"
+        ],
+        "mode": "OWNER_APPLY"
+      },
+      {
+        "row": 15,
+        "fb_id": "38c529d51a31dbb1c427f381ed6edb41660224ebc75ba60ecd6c6df58a1e86a6",
+        "name": "Acknowledgment Attribution",
+        "old_domains": [
+          "editorial & advertising",
+          "research & methodology"
+        ],
+        "new_domains": [
+          "editorial & advertising",
+          "research practice"
+        ],
+        "mode": "AUTO_RENAME/AUTO_FIX"
+      },
+      {
+        "row": 32,
+        "fb_id": "a362a7790469b706e4356fdf1c4749a297da7f8144e589823180861d221332c2",
+        "name": "Cultural Mourning Rituals and Symbolism",
+        "old_domains": [
+          "social sciences"
+        ],
+        "new_domains": [
+          "emerging"
+        ],
+        "mode": "OWNER_APPLY"
+      },
+      {
+        "row": 34,
+        "fb_id": "1bfafc5cc617c48fc57d3838a35b53f244835e8ef7e2fe9303acc9cb1f6c0513",
+        "name": "Doping in Professional Sports: Systemic Pressure and Rationalization",
+        "old_domains": [
+          "legal & public policy"
+        ],
+        "new_domains": [
+          "health & wellness"
+        ],
+        "mode": "OWNER_APPLY"
+      },
+      {
+        "row": 36,
+        "fb_id": "babb07591d434f7fba4ec91e4483150c7af53cf65b1c2e85bafa8292af7b110d",
+        "name": "Cognitive Interview Analysis Framework",
+        "old_domains": [
+          "marketing & communications",
+          "research & methodology",
+          "social sciences"
+        ],
+        "new_domains": [
+          "user experience",
+          "research practice"
+        ],
+        "mode": "OWNER_APPLY"
+      },
+      {
+        "row": 38,
+        "fb_id": "90ad8c926d4c649c5301724a06ed5bedc6d883add4d93051ebce159dc65df38f",
+        "name": "Sensory-motor Basis of Conceptual Reasoning",
+        "old_domains": [
+          "education",
+          "science & research"
+        ],
+        "new_domains": [
+          "user experience",
+          "education",
+          "arts & culture"
+        ],
+        "mode": "OWNER_APPLY"
+      },
+      {
+        "row": 43,
+        "fb_id": "2401f32fa7fef6032055c4dc8c6dd62ff5740ac990bc9dbcc292f43423909e6f",
+        "name": "Brent Spar Campaign Effectiveness",
+        "old_domains": [
+          "marketing & communications",
+          "organizational behavior",
+          "science & research"
+        ],
+        "new_domains": [
+          "marketing & communications"
+        ],
+        "mode": "OWNER_APPLY"
+      },
+      {
+        "row": 48,
+        "fb_id": "664278dfd2096e45852dd3557605c1bc7fb71ed9d77864fd8a620af11bd2ce4e",
+        "name": "Survivor Bias in Success Narratives",
+        "old_domains": [
+          "business operations",
+          "legal & public policy"
+        ],
+        "new_domains": [
+          "personal productivity",
+          "finance & investment",
+          "entrepreneurship"
+        ],
+        "mode": "OWNER_APPLY"
+      },
+      {
+        "row": 58,
+        "fb_id": "b484487ea0c395f21bab585b5f59a2acdc64e51583cfae480474f7671231dce2",
+        "name": "Recovered Memory Therapy and False Accusations",
+        "old_domains": [
+          "health & wellness",
+          "social sciences"
+        ],
+        "new_domains": [
+          "health & wellness"
+        ],
+        "mode": "OWNER_APPLY"
+      }
+    ]
+  }
+}

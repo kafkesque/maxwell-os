@@ -2,7 +2,7 @@
 
 A rail that nothing runs is a comment (D-2816 verification requirement). These tests
 import the helper directly (no OMLX needed) and prove: (1) a within-cap label set is
-unchanged and stays CLEAN; (2) a 7-label set is truncated to the cap with a receipt and
+unchanged and stays CLEAN; (2) an 8-label set is truncated to the cap with a receipt and
 degraded CLEAN -> FALLBACK; (3) a pre-degraded row is never re-labelled CLEAN; (4) the
 detector still flags the over-cap before the helper enforces it.
 """
@@ -33,11 +33,11 @@ def test_within_cap_is_noop_and_stays_clean():
 
 def test_over_cap_truncates_with_receipt_and_degrades():
     cd = {"classification_status": "CLEAN"}
-    out = _enforce_domain_cardinality(["a", "b", "c", "d", "e", "f", "g"], cd)
-    assert out == ["a", "b", "c", "d", "e"]
+    out = _enforce_domain_cardinality(["a", "b", "c", "d", "e", "f", "g", "h"], cd)
+    assert out == ["a", "b", "c", "d", "e", "f", "g"]
     assert cd["classification_status"] == "FALLBACK"
-    assert "7>5" in cd["classification_error"]
-    assert "dropped ['f', 'g']" in cd["classification_error"]
+    assert "8>7" in cd["classification_error"]
+    assert "dropped ['h']" in cd["classification_error"]
 
 
 def test_predegraded_row_not_relabelled_clean():
@@ -45,7 +45,7 @@ def test_predegraded_row_not_relabelled_clean():
         "classification_status": "FALLBACK",
         "classification_error": "depth: invalid raw_depth",
     }
-    out = _enforce_domain_cardinality(["a", "b", "c", "d", "e", "f"], cd)
+    out = _enforce_domain_cardinality(["a", "b", "c", "d", "e", "f", "g", "h"], cd)
     assert len(out) == MAX_DOMAINS_PER_FB
     assert cd["classification_status"] == "FALLBACK"
     assert "depth: invalid raw_depth" in cd["classification_error"]
@@ -56,7 +56,7 @@ def test_detector_flags_over_cap_before_enforcement():
     # The detector (validate_classification) is the trigger; the helper is the enforce.
     result = {
         "discipline": "physics",
-        "domains": ["a", "b", "c", "d", "e", "f", "g"],
+        "domains": ["a", "b", "c", "d", "e", "f", "g", "h"],
         "depth": "domain",
         "evidence": "cited",
     }

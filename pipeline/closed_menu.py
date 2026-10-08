@@ -157,7 +157,7 @@ def definition_anchored_block() -> str:
     return (
         "CLOSED DISCIPLINE MENU — choose EXACTLY ONE label, verbatim; the definition is the anchor:\n"
         + disc_lines
-        + "\n\nCLOSED DOMAIN MENU — choose 1-5 labels, verbatim; the definition is the anchor:\n"
+        + "\n\nCLOSED DOMAIN MENU — choose 1-7 labels, verbatim; the definition is the anchor:\n"
         + dom_lines
         + f'\n\nABSTENTION — each axis abstains INDEPENDENTLY: if NO label fits ontologically AND '
         f'pragmatically for a given axis, output the literal token "{abstention}" AS THE VALUE for '

@@ -1,7 +1,7 @@
 # config/taxonomy_shacl.ttl — SHACL formalization of Maxwell OS taxonomy (D2546)
 # AUTO-GENERATED from config/taxonomy_v5.yaml — do NOT edit by hand.
 # Regenerate: python3 scripts/generate_taxonomy_shacl.py
-# Canonicals: 43 domains + 64 disciplines = 107 (taxonomy v7)
+# Canonicals: 41 domains + 64 disciplines = 105 (taxonomy v8)
 
 @prefix maxwell: <https://maxwell.os/taxonomy#> .
 @prefix sh: <http://www.w3.org/ns/shacl#> .
@@ -26,7 +26,7 @@ maxwell:FoundationBlockShape
     sh:property [
         sh:path maxwell:taxonomy_version ;
         sh:minCount 1 ;
-        sh:in ( "v7" ) ;
+        sh:in ( "v8" ) ;
     ] .
 
 # ── Closed canonical sets ──────────────────────────────────────────────────
@@ -36,7 +36,7 @@ maxwell:CanonicalDomainShape
     sh:closed true ;
     sh:property [
         sh:path maxwell:label ;
-        sh:in ( "graphic design" "brand identity" "editorial & advertising" "motion design" "environmental design" "digital product" "data visualization" "creative technology" "web & ui" "user experience" "illustration" "packaging" "business operations" "business development" "entrepreneurship" "organizational behavior" "ai & agents" "urban planning" "engineering practice" "computational art" "code & computation" "computational science & physics" "systems & frameworks" "semiotics & communication" "research practice" "education" "health & wellness" "finance & investment" "marketing & communications" "legal & public policy" "science & research" "arts & culture" "engineering & infrastructure" "media & entertainment" "social sciences" "product design" "design strategy" "project management" "leadership" "personal productivity" "industrial design" "information architecture" "design systems" ) ;
+        sh:in ( "graphic design" "brand identity" "editorial & advertising" "motion design" "environmental design" "digital product" "data visualization" "creative technology" "web & ui" "user experience" "illustration" "packaging" "business operations" "business development" "entrepreneurship" "organizational behavior" "ai & agents" "urban planning" "engineering practice" "computational art" "code & computation" "computational science & physics" "systems & frameworks" "semiotics & communication" "research practice" "education" "health & wellness" "finance & investment" "marketing & communications" "legal & public policy" "arts & culture" "engineering & infrastructure" "media & entertainment" "product design" "design strategy" "project management" "leadership" "personal productivity" "industrial design" "information architecture" "design systems" ) ;
     ] .
 
 maxwell:CanonicalDisciplineShape

@@ -25,7 +25,11 @@ def cohort_sets() -> dict[str, set[str]]:
     anchor = {r["item_id"] for r in csv.DictReader((REPO / cfg["anchor"]["sheet"]).open(encoding="utf-8"))}
     ext = cfg["axes"]["domains"]
     other: set[str] = set()
-    p = REPO / ext["artifact"]
+    # D-2868: `artifact` now names the domains AXIS authority (201-row rederived_v8 golden pool),
+    # whose 7 emerging/noise exclusions make it a NON-superset of the 150 anchor ruler. The
+    # concat-guard must compare a candidate against the full FAMILY instrument population
+    # (208 rows), declared as `cohort_artifact`; fall back to `artifact` only when absent.
+    p = REPO / ext.get("cohort_artifact", ext["artifact"])
     if p.exists():
         # D-2720/D-2785 repointed the domains artifact from the fb_id-keyed
         # s4_domain_verdicts.jsonl to the item_id-keyed 208-row five-axis CSV.
@@ -34,6 +38,9 @@ def cohort_sets() -> dict[str, set[str]]:
         if p.suffix.lower() == ".jsonl":
             import json
             other = {json.loads(l).get(key, "") for l in p.read_text(encoding="utf-8").splitlines() if l.strip()}
+        elif p.suffix.lower() == ".json":
+            import json
+            other = {r.get(key, "").strip() for r in json.loads(p.read_text(encoding="utf-8")).get("rows", [])}
         else:
             other = {r.get(key, "").strip() for r in csv.DictReader(p.open(encoding="utf-8"))}
     cs = {"anchor": anchor, "domains_cohort": {o for o in other if o}}

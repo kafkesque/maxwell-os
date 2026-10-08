@@ -1,0 +1,25 @@
+- id: D-2876
+  state: RATIFIED
+  category: ANCHOR / TAXONOMY
+  title: ANCHOR-2 blind-sheet hygiene + 8 D2D default-domain corrections (owner-gated)
+  decision: |
+    Owner-gated close-out of the two referee defects named in BUG-673 plus the 8 dormant D2D
+    default-domain corrections. Closes BUG-673 (two ANCHOR-2 referee domain cells were malformed:
+    row 6 carried 11 domains > cap 7, row 39 carried a rigid-kind science label in the domain slot).
+    Blind-sheet: row 6 re-adjudicated to 7 object-design application fields (primary=product design);
+    row 39 domain replaced with 'code & computation' (application role, numerical methods applied via
+    code). D2D: 8 disciplines' default applied domain corrected to the observed modal (aesthetics->design
+    strategy, cognitive science->user experience, creative process->graphic design, cultural studies->
+    media & entertainment, decision making->personal productivity, engineering->engineering &
+    infrastructure, linguistics->semiotics & communication, visual semiotics->graphic design) — all 8
+    verified DORMANT (zero live fallback), so zero cascade. Also fixed the inert owner_decision gate in
+    remint_anchor2_v8.py (load_triage now prefers owner_decision over proposed_v8_target).
+  bugs: [BUG-673]
+  files:
+    - governance/ANCHOR2_V8_REMINT_TRIAGE_20261007.csv
+    - governance/ANCHOR2_BLIND_SHEET_V8_20261007.csv
+    - governance/ANCHOR2_KEY_V8_20261007.json
+    - governance/anchor2_kappa_v8_20261007.json
+    - governance/D2D_DOMAIN_REVIEW_20261008.csv
+    - config/discipline_domain_map.yaml
+    - scripts/remint_anchor2_v8.py

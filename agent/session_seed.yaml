@@ -65,7 +65,7 @@ pipeline:
   classification:
     method: multi_label
     model: classifier
-    max_domains_per_fb: 5
+    max_domains_per_fb: 7
   verification:
     borp_min_sources: 2
     nli_model: MoritzLaurer/DeBERTa-v3-large-mnli-fever-anli-ling-wanli

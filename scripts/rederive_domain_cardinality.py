@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """rederive_domain_cardinality.py — BUG-631 re-derivation: apply the D-2838 writer-limb to the historical over-cap FBs.
 
-WHY THIS EXISTS (BUG-631, D-2838). ``pipeline_config.yaml`` declares ``max_domains_per_fb: 5``, but the value
+WHY THIS EXISTS (BUG-631, D-2838). ``pipeline_config.yaml`` declared ``max_domains_per_fb: 5`` at filing (now 7 via C12), but the value
 was DETECTED ("Too many domains") and NOT ENFORCED on the post-commit paths that wrote the 52 historical FBs now
 carrying 6-7 VALID domains (every one ``classification_status=CLEAN``). D-2838 landed the WRITER-limb
 (``pipeline/stage4_merge._enforce_domain_cardinality``) that truncates deterministically at the cap and degrades

@@ -10,7 +10,7 @@ honest 4-axis claim.
 
 Policy (D2610 v2, identical to build_joint_vote_set.py):
   - reliable voters must be UNANIMOUS on BOTH discipline (61-way, single) and
-    domains (43-way, 1-5 multi-label) -> agreed, high confidence.
+    domains (43-way, 1-7 multi-label) -> agreed, high confidence.
   - any disagreement / missing voter -> ABSTAIN (empty discipline, empty domains,
     needs_review=true). A fabricated label is NEVER written (C16 spirit).
   - advisory voters recorded but never decisive.
@@ -122,7 +122,7 @@ def _ontology_text() -> str:
     dom_lines = "\n".join(f"- {c}: {_short(d)}" for c, d in DOMAINS)
     return (
         "DISCIPLINE (choose EXACTLY ONE canonical label):\n" + disc_lines +
-        "\n\nDOMAIN (choose 1-5 canonical labels that apply):\n" + dom_lines
+        "\n\nDOMAIN (choose 1-7 canonical labels that apply):\n" + dom_lines
     )
 
 

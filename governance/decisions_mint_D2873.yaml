@@ -1,0 +1,41 @@
+- id: D-2873
+  state: RATIFIED
+  category: CLASSIFICATION / VERIFICATION
+  title: 'Domain-axis calibrated abstention — extend D-312/D-349 (never transplant); freeze the domain ruler as the prerequisite'
+  decision: |
+    Owner recommendation (c) was "per-principle content-driven domains + a calibrated confidence limit to
+    prevent over-assignment." The correct implementation is to EXTEND the calibrated-abstention framework
+    Maxwell already ships (D-312/D-337/D-338/D-339/D-348/D-349), NOT to bolt on a parallel conformal/Platt
+    library. The existing framework already IS distribution-free, set-level abstention (conformal-style) in
+    Maxwell's own idiom: measure a selective-error-vs-abstain curve on a frozen fingerprinted ruler, pick a
+    rank-margin operating point, stay enabled:false until a shadow run. A second confidence system would be
+    bloat + conflict + drift.
+
+    GAP (documented, not guessed): governance/R2_GATE_MEASUREMENT_20260923.json (D-348) declared
+    unmeasurable_axes.domains = "no ruler truth column exists". The domains axis had no frozen truth column,
+    so its over-assignment could not be bounded — BUG-273 (the domains axis violates its own cardinality
+    contract, 2026-09-17). This is the precise "confidence limit to prevent over-assignment" gap.
+
+    FIX (deterministic, read-only): the 208-row consolidated anchor authority DOES carry owner-finalized
+    domain truth. scripts/build_domain_ruler.py freezes it into
+    governance/DOMAIN_RULER_FROZEN_20261008.json (201 rows, 7 empty skipped; cardinality 91 single / 110
+    multi up to 5). This closes BUG-273's prerequisite: the domain axis now has a frozen ruler on which a
+    domain-specific abstention curve can be MEASURED — never transplanted from discipline/content_type
+    (D-312 role-specificity: the same sweep is flat outside a role).
+
+    STRUCTURAL GUARD (verified, no change): scripts/build_anchor_v8_remap_triage.py::remap fires the D2D
+    default ONLY when kept is empty after v8 drops — the map is already a fallback prior and can never
+    override a content-driven domain (OntoClean rigidity: role is read from content, never from kind).
+
+    ZERO CASCADE: build_domain_ruler.py is read-only (writes only the new ruler artifact); no pipeline
+    output, anchor authority, or decision record is mutated.
+
+    QUEUED (gated, not executed): measure the domains abstention curve on the frozen ruler; add a `domains`
+    operating point to ABSTENTION_CALIBRATION + abstention_policy (enabled:false) with a shadow-run receipt
+    before any flip (D-339). The operating point is PROPOSED until measured, mirroring D-312.
+  bugs: [BUG-273]
+  files:
+    - scripts/build_domain_ruler.py
+    - governance/DOMAIN_RULER_FROZEN_20261008.json
+    - governance/DOMAIN_AXIS_ABSTENTION_PLAN_20261008.md
+    - config/verify_abstention.yaml

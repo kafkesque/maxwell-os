@@ -92,7 +92,7 @@ def test_validate_on_menu_fails_closed_off_menu() -> None:
 
 
 def test_manifest_passes_bug650_guard() -> None:
-    from pipeline.anchor_menu_guard import referee_menu_v6_verdict
+    from pipeline.anchor_menu_guard import referee_menu_current_verdict
     from scripts.rederive_anchor_axes_v6 import load_pins
 
     rows = [{**_row(0), "discipline": "physics", "domains": ["ai & agents"],
@@ -107,6 +107,6 @@ def test_manifest_passes_bug650_guard() -> None:
     assert manifest["menu_hash"] == real_pins["composite"]
     assert manifest["answer_space_hash"] == real_pins["answer_space"]
     assert manifest["total"] == 1
-    v = referee_menu_v6_verdict(manifest, label="test.json", axis="discipline")
+    v = referee_menu_current_verdict(manifest, label="test.json", axis="discipline")
     assert v["ok"], f"guard rejected: {v['reason']}"
     assert not v["frozen_hits"]

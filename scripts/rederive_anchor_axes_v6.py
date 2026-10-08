@@ -3,7 +3,7 @@
 
 WHY
 ---
-The 204-row human-owner discipline/domain anchor (governance/discipline_anchor_conformance_20261002.json)
+The 201-row v8 discipline/domain authority (governance/discipline_anchor_rederived_v8_20261007.json)
 was adjudicated against the PRE-D-2814 free-generation menu (menu v5). Menu v6 (D-2814/D-2815/D-2816)
 changed the discipline slots, the domain slots and the abstention token to 'emerging', so the anchor's
 discipline/domain axis is FROZEN-INVALID (D-2820) and a full-204 A/B (D-2767) against it would be CIRCULAR
@@ -53,7 +53,7 @@ import yaml  # noqa: E402
 
 from pipeline.closed_menu import canonical_json, definition_anchored_block, render_closed_menu  # noqa: E402
 
-DEFAULT_ANCHOR = REPO / "governance" / "discipline_anchor_conformance_20261002.json"
+DEFAULT_ANCHOR = REPO / "governance" / "discipline_anchor_rederived_v8_20261007.json"
 DEFAULT_STORE = REPO / "knowledge pipeline" / "maxwell.db"
 MENU_JSON = REPO / "config" / "closed_menu_v7.json"
 TAXONOMY_YAML = REPO / "config" / "taxonomy_v5.yaml"
@@ -137,7 +137,7 @@ def load_taxonomy_version() -> str:
 
 
 def load_anchor_rows(path: Path) -> list[dict]:
-    """Load the 204 anchor rows, enforcing the declared count (count-drift guard)."""
+    """Load the anchor rows, enforcing the declared count (count-drift guard)."""
     doc = json.loads(path.read_text(encoding="utf-8"))
     rows = doc.get("rows", [])
     declared = doc.get("total")
@@ -398,7 +398,7 @@ def _classify_prompt(fb: dict, block: str) -> str:
     json_instruction = (
         'Return ONLY a JSON object: {"discipline": "<CLOSED DISCIPLINE MENU label, verbatim, or '
         + repr(ABSTENTION)[1:-1]
-        + '>", "domains": ["1-5 CLOSED DOMAIN MENU labels, verbatim, or '
+        + '>", "domains": ["1-7 CLOSED DOMAIN MENU labels, verbatim, or '
         + repr(ABSTENTION)[1:-1]
         + '"]}'
     )
@@ -558,14 +558,14 @@ def _selftest() -> int:
     print("  OK adjudication fail-closed (unadjudicated / off-menu)")
     # the manifest must be accepted as a menu-v6 referee by the BUG-650 guard, which
     # reads the REAL live pins from config — so this check uses the real pins.
-    from pipeline.anchor_menu_guard import referee_menu_v6_verdict
+    from pipeline.anchor_menu_guard import referee_menu_current_verdict
 
     real_pins = load_pins()
     real_manifest = finalize_manifest(
         finalized=final, pins=real_pins, taxonomy_version=load_taxonomy_version(),
         anchor_version="v6", coder="owner", second_coder="gemma",
     )
-    verdict = referee_menu_v6_verdict(real_manifest, label="selftest.json", axis="discipline")
+    verdict = referee_menu_current_verdict(real_manifest, label="selftest.json", axis="discipline")
     assert verdict["ok"], f"manifest rejected by guard: {verdict['reason']}"
     print("  OK manifest assembly + BUG-650 guard acceptance")
     return 0
@@ -658,9 +658,9 @@ def main() -> int:
             run_id=run_id,
         )
         # the re-derived manifest MUST be a valid menu-v6 referee (BUG-650 guard)
-        from pipeline.anchor_menu_guard import assert_referee_menu_v6
+        from pipeline.anchor_menu_guard import assert_referee_menu_current
 
-        assert_referee_menu_v6(manifest, label=_manifest_path(run_id).name, axis="discipline")
+        assert_referee_menu_current(manifest, label=_manifest_path(run_id).name, axis="discipline")
         out = _manifest_path(run_id)
         if out.exists():
             raise SystemExit(f"REFUSED: {out.name} exists — a re-derived anchor is minted once (I2); use --run-id for a new run")

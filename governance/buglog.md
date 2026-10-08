@@ -1,6 +1,6 @@
 # Maxwell OS v3.0 — BUG LOG (tiered)
 
-> **Updated:** 2026-10-07 | **Archive (full history):** `archive/governance_pre_tiered_2026-09-03/buglog.md`
+> **Updated:** 2026-10-08 | **Archive (full history):** `archive/governance_pre_tiered_2026-09-03/buglog.md`
 >
 > **Convention (standing rule):** OPEN bugs at the TOP (most critical first, MUST→SHOULD→WORTH); CLOSED/RESOLVED at the BOTTOM. Protocol: `governance/buglog_protocol.md`.
 
@@ -24,6 +24,8 @@
 
 | Bug | Date | Issue |
 |---|---|---|
+| BUG-679 | 2026-10-08 | **An owner-RATIFIED `noise_drop` (RATIFY-3 DROP(13), D-2711/D-2719) reached only 5 of 13 anchor rows: 8 dropped anchors (R012 R026 R034 R082 R140 R180 R182 R200) are STILL LIVE in the frozen domain ruler with full discipline + domains, contradicting D-2813 ("for a noise_drop row depth and discipline do NOT apply"). Measured consequence: the owner was asked in round 2 to confirm axis values for rows the owner had already dropped. FIX = one owner word: propagate uniformly (ruler 201 -> 193, rows kept in the soft-quarantine ledger) OR re-affirm the 8 rows as live, which supersedes RATIFY-3.** |
+| BUG-680 | 2026-10-08 | **BUG-676 residual: the UPSTREAM anchor faces still encode discipline abstention as the out-of-menu token 'emerging'** (ANCHOR_208_CONSOLIDATED_20261007.json, 11 rows; discipline_anchor_rederived_v8_20261007.json). They are the discipline authority/consumer read by check_anchor_axis_consistency.py, so the fix is a consolidation-chain change (stamp `discipline: ""` + `discipline_status: abstained` + `discipline_source: owner_abstained` - the slots already exist), never a hand edit. |
 | BUG-242 | 2026-09-11 | **frontier69_v2 + extension80 audit outputs carry 2 data-quality defects.** (1) The `*_verdict` fields (depth/discipline/domains) are LLM SELF-REPORTS, not computed comparisons — they claim `override` even when the audit value equals silver (e.g. `S4-GOLD-MINED-00005` domains identical yet `domains_verdict=override`), so the cited "57.5% domain-override" and "80 flagged" figures are inflated. (2) Non-principle content_type rows (noise_drop/tool_instruction/process_template/process_instance/growth_edge) carry a spurious 4-way depth label, violating D2612 (depth only for principle). FIX (applied in `scripts/build_phase0_adjudication_form.py`): agreement recomputed deterministically (`differs` flag) + depth marked N/A for non-principle. REMAINS: recompute the override figures from the audit values (deterministic), and re-run the audit to null depth on non-principle if the raw artifacts are kept. |
 | BUG-228 | 2026-09-08 | **Dead/aspirational schema fields — 0 code references.** `parent_pt_id` (process_instance's tether to a template), `promoted_to_type`/`promoted_to_id`/`parent_fb_ids` (growth_edge promotion), MCP `annotations` (`readOnlyHint`/`destructiveHint`/`idempotentHint`), `consulted_fbs`/`template_source` — all declared in `content_types.yaml`, all 0 refs in `pipeline/`+`scripts/`. Consequence: `process_instance` is indistinguishable from an unlinked anecdote; `growth_edge` is a dead-end bucket with a staging-area description; MCP-promotion aspiration is unbacked. False affordances for future retrieval code. Fix = prune or ship; backfill `parent_pt_id` when a PT exists (§1.3.2 of the adjudication doc). |
 | BUG-224 | 2026-09-05 | OMLX server wedges under sustained load on Qwen3.8-27B: large-output calls (>~1200 tokens) hang BEYOND the requests timeout (call_omlx timeout not respected), then the server needs ~15-60s to recover before even tiny requests respond. Reproduced repeatedly during D2576 depth audit (single-FB calls OK ~7s, but batched/long-output calls wedge every ~6-12 requests). This blocked the delegated Qwen3.8 market research (D2576) and forced the audit to fall back to `delegate(custom_deepseek)` for the bulk + a small direct-OMLX overlap. Extends BUG-220/DELEGATE-001 (Qwen direct-call workaround itself is now flaky). Likely cause: 27B 4-bit model + concurrent/unreleased context on 64GB. **MITIGATION APPLIED (D2581, 2026-09-05):** `services.omlx.read_timeout=60` + `services.omlx.wedge_recovery_sleep=20` (config); `call_omlx` now uses `timeout=(connect, read)` so a mid-response stall trips fast, and distinguishes `ReadTimeout` (wedge) → 20s recovery sleep before retry instead of the 3s hammering. Remaining workload-shaping guidance: 3-model vote should still process Qwen3.8 in small single-FB calls. UNVERIFIED under a live sustained-load wedge (needs a re-run of the Qwen3.8 bulk audit to confirm). |
@@ -46,6 +48,9 @@
 ---
 
 ## ✅ CLOSED / RESOLVED — bottom (recent)
+
+- **BUG-676** — **discipline abstention was an out-of-menu TOKEN ('emerging') inside the frozen authority FIXED** — owner-confirmed abstentions now declare `discipline: ""` via `config/owner_domain_rulings_20261008.yaml#discipline_abstention` (8 rows); the script is fail-closed in both directions and the ruler was re-stamped (`b766ae912401d7da` -> `5fcde5619e04fbda`). Residuals declared as BUG-680 (upstream faces) + BUG-679 (R140 is also a ratified drop). ✅ (2026-10-08)
+- **BUG-678** — **the derived review CSV was a lossy, contradictory face of the owner sheet FIXED** — replaced by the pinned faithful export + data-driven rulings + a re-derivable ruler (`--check` reproduces it byte-identically). ✅ (2026-10-08)
 
 - **BUG-669** — **check_governance_faces.py scope blindspot (the LIVE census face it guards was unguarded) FIXED** — added a 2-part live-census regex (Register/Register-truth marker anywhere) + a buglog.md tiered-table scan (stops at the first non-tier `##` header) + 8 two-direction selftest controls; live rail green on 434 bug ids. R5 gemma reviewed. ✅ (2026-10-07)
 - **BUG-670** — **nli_calibrate.py print_report C20 magic-number "marginal" FIXED** — dropped the 0.40 floor for an invariant-safe `max(0.0, best_f1 - 0.10)`, read live config thresholds instead of hardcoded 0.10 defaults, and added a degenerate-calibration guard (best_f1 >= best_prec would violate D2185 entailment < pass). R5 gemma reviewed. ✅ (2026-10-07)
@@ -8623,6 +8628,15 @@ FIX (POST-S6, owner-gated, C12): after the opposite-axis rejection, retry the SA
 before returning 'emerging'; KEEP the guard (it is load-bearing). Config-first: the fall-through policy belongs in YAML,
 not in code. RELATED: BUG-200/D2422 (the guard), BUG-629 (the emerging-rate regression).
 
+D-2872 ANCHOR-SIDE REFINEMENT (2026-10-08): the D2D map (config/discipline_domain_map.yaml) that closes BUG-630's
+anchor-side consequence (D-2866) carried two rubber-stamp defaults, removed by owner rulings — `psychology:
+organizational behavior` (D-2870) and `sociology: organizational behavior` (D-2872). Sociology, like psychology, has
+no single default application field (the sole sociology anchor R039 applies to marketing & communications, not org
+behavior); it now falls through to the neutral `fallback: research practice`. Zero cascade (both entries were
+unexercised — no anchor obtained its domain via them). Remaining single-point D2D defaults (behavioral economics /
+linguistics / social network analysis) carry the identical rubber-stamp signature and are queued for the same
+per-principle examination (D-2872).
+
 ## BUG-631 (OPEN, 2026-10-04) — max_domains_per_fb = 5 is UNENFORCED on every post-commit path: 52 FBs carry 6-7 domains, all classification_status=CLEAN
 SCOPE: config/pipeline_config.yaml#pipeline.max_domains_per_fb (=5) consumed at pipeline/pipeline_paths.py, versus the
 post-commit writers (stage4_merge classify/format, stage6_commit). This is the WRITER limb of BUG-273 ("the domains axis
@@ -8971,6 +8985,17 @@ the canonical register to the verdict already recorded in each row's own prose (
 ## BUG-236 (RESOLVED, 2026-09-10) — Qwen3-Coder-30B unreliable depth voter — demoted to advisory (D2610)
 ## BUG-237 (OPEN, 2026-09-10) — production fbs.depth unverified silver (PARTIALLY ADDRESSED D2610/D2611)
 ## BUG-238 (OPEN, 2026-09-10) — content_type is a VACUOUS axis (99.6% principle unverified)
+
+**REFEREE-AXIS SPLIT (2026-10-08, D-2871):** the ANCHOR-2 60-row sheet's content_type_verdict column was
+conflating the closed 5-role KIND axis with the DISPOSITION axis (quarantine ×8, noise_drop ×2 — which
+config/content_types.yaml already declares as dispositions, NOT content_types). Applied scripts/
+fix_anchor2_content_type_v8.py (deterministic): 8 quarantine → principle (uncertainty preserved on a NEW
+disposition_verdict column), 2 noise_drop moved off the kind axis, 9 surface-variant typos collapsed.
+Result kind {principle:43, growth_edge:9, process_template:3, tool_instruction:2, process_instance:1, '':2}
++ disposition {classified:50, quarantine:8, noise_drop:2} → governance/ANCHOR2_BLIND_SHEET_V8_CTFIX_20261008.csv.
+This resolves the referee-side hybrid-axis conflation; the corpus-scale 341 medium + 332 high verification
+and the calibrated/conformal disposition layer remain the OPEN remediation body below.
+
 ## BUG-241 (CLOSED, 2026-09-13) — 'Golden' set unverified silver — retired at the DATA level (D2617)
 ## BUG-242 (OPEN, 2026-09-11) — frontier69_v2 data-quality defects — override figures still to recompute
 ## BUG-243 (OPEN, 2026-09-13) — DeepSeek-v4 empty content on open-ended adjudication (MITIGATED: use local Qwen)
@@ -9094,6 +9119,8 @@ never re-minted after it — the marker outlived its subject (BUG-542 family). F
 (3854250c…; byte size unchanged 96902142, mtime 2026-10-03T01:16) under D-2862 (owner ratified), a DECISION — never a quiet
 re-hash. verify_artifact_authority now exits 0 (2 markers, 17 files, 0 RED).
 
+OWNER APPROVAL (2026-10-08, round 2): the owner explicitly approved the t11 authority re-mint ("BUG 667 ok approve") - D-2862 RATIFIED stands, no further action.
+
 ## BUG-668 (FIXED 2026-10-07): build_archive_index: archive/bloat_20260929 on disk but neither indexed nor declared-excluded
 
 `archive/index.yaml` fails the coverage invariant: bloat_20260929 is on disk but in NEITHER the index nor the declared exclusions.
@@ -9155,3 +9182,165 @@ Deterministic (LLM-free), idempotent (a re-run finds 0 and writes nothing). R5: 
 
 VERIFIED: check_domain_cardinality.py -> EXIT=0 (0 over-cap of 14574, cap=5); PRAGMA integrity_check ok; 52 FBs now FALLBACK
 with receipt; control tests 14/14 pass (rail + reader).
+
+
+## BUG-671 (FIXED, 2026-10-08) — domain-axis authority: 8 rows carried the `emerging` catch-all (no concrete domain) — closed by the 8 owner-gated rulings (D-2874)
+
+After the D-2865/D-2866 v8 domain remap, eight rows of the 201-row domain authority
+(governance/discipline_anchor_rederived_v8_20261007.json) still carried `domains=["emerging"]`
+(domain-axis abstention) because no applied-domain role had been owner-adjudicated: R032,R066,R085,
+R101,R113,R141,R172,R209. That is a domain-axis blindspot — 8 anchors with NO concrete domain
+assignment, silently indistinguishable from a genuine abstention.
+
+FIXED (2026-10-08, D-2874): owner finalized all eight (config/owner_domain_rulings_20261008.yaml);
+scripts/apply_owner_domain_rulings_v8.py (deterministic, fail-closed, LLM-free) folded the rulings into
+the authority. OntoClean two-axis rule holds: primary_domain = domains[0], all labels in the 41-domain
+closed menu, max 3 labels. Deterministic consumers re-derived (regenerate_anchor_208_v8.py ->
+build_domain_ruler.py -> export_anchor_all_axes_csv.py); ruler re-frozen (sha256
+01f9ee6def0d33797cafd3855353ed697e3fc7599a099dba8a59895f6a1d79a4). check_anchor_axis_consistency:
+0 residual `emerging` domain rows (201 scanned), catch-all never coexists with a concrete domain.
+
+KNOWN FOLLOW-UP (separate, owner-gated): ANCHOR2 golden referee (60-row) still carries the superseded
+2026-10-07 domain verdicts for R172/R209; reconcile via ANCHOR2_V8_REMINT_TRIAGE OWNER_APPLY + remint_anchor2_v8.py.
+
+
+## BUG-672 (FIXED, 2026-10-08) — ANCHOR2 golden referee carried stale R172/R209 domain verdicts (pre-D-2874) — reconciled via remint_anchor2_v8.py (D-2875)
+
+D-2874 finalized the 8 owner-gated domain-axis rulings, including R172 (engineering practice | engineering & infrastructure, product design) and R209 (ai & agents | education). The 60-row ANCHOR-2 kappa referee (ANCHOR2_BLIND_SHEET_V8_20261007.csv) still carried the pre-ruling verdicts: R172 "systems & frameworks, engineering practice, product design" and R209 "user experience, education". This drift made the human truth (referee) disagree with the authority, corrupting the domains-axis kappa measurement.
+
+Fix: added/updated OWNER_APPLY triage rows in ANCHOR2_V8_REMINT_TRIAGE_20261007.csv and re-ran remint_anchor2_v8.py (deterministic, LLM-free — R5 not implicated) + anchor2_kappa.py. Referee now matches D-2874. Closed by D-2875.
+## BUG-673 (FIXED, 2026-10-08) — ANCHOR2 golden referee carried two malformed domain cells
+Row 6 'Designers' Object World' carried 11 domains (> the cap of 7) and row 39 'Higher-order
+Polynomial Approximation' carried the rigid-kind science label 'computational science & physics'
+in the domain slot (a field-of-study, not an application role). Both corrupt the domains kappa.
+FIXED by owner-gated blind-sheet hygiene remint (D-2876): row 6 re-adjudicated to 7 object-design
+application fields (primary=product design); row 39 replaced with 'code & computation'.
+
+## BUG-674 (FIXED, 2026-10-08) — frozen ruler dropped 42 owner domain additions from .numbers
+- Root cause: DOMAIN_RULER_FROZEN_20261008.json was minted from the `domains` column only
+  (plus 8 owner_review rows), ignoring the `oov_domains` column which carries the owner's
+  additional domain assignments (46 rows non-empty) and the 11 free-text owner_notes.
+- Fix: merged .numbers `oov_domains` into frozen `domains` (dropping legacy `emerging`
+  placeholder, normalizing `educational`->`education`, cap 7), applied 5 primary-domain
+  overrides (R041,R072,R155,R157,R159) + 1 removal (R015 business operations).
+- Result: 42 rows updated; 8 finalized owner rulings preserved. sha256 9a02fc04...
+- Ambiguous (NOT auto-applied, needs owner): R005 (info architecture?), R113 (undecided),
+  R141 (discipline=ML only).
+
+## BUG-675 (FIXED, 2026-10-08) — owner discipline rulings for R141/R159 not applied
+- Root cause: BUG-674 merge applied the 5 primary-domain overrides + 1 removal from owner_notes,
+  but dropped the two free-text DISCIPLINE directives in the same column: R141 "discipline is
+  machine learning" and R159 "Discipline is rather risk management". Only the domain axis was
+  reconciled; the discipline axis stayed at the pipeline value (information science / research
+  methodology).
+- Fix (owner-gated, this turn): R141 discipline information science -> machine learning;
+  R159 discipline research methodology -> risk management. Mirrored into all three frozen
+  artifacts: DOMAIN_RULER_FROZEN (sha256 9a02fc04.. -> b766ae91..), ANCHOR_208_CONSOLIDATED,
+  and discipline_anchor_rederived_v8 (upstream source).
+- Owner-confirmed this turn: R005 primary=data visualization (NOT engineering practice) — already
+  correct, no change; R113 primary=engineering practice, secondary=computational science & physics
+  — already correct, no change.
+
+
+## BUG-676 (OPEN, 2026-10-08) — discipline abstention is encoded as an out-of-menu TOKEN ('emerging') inside the frozen authority (11 rows)
+
+- **Symptom.** 11 rows of the authority set carry `discipline = 'emerging'`: R006, R040, R059, R080, R091, R127, R140, R146, R165, R183, R202 (ANCHOR_208_CONSOLIDATED_20261007.json, `discipline_status=owner_finalized`). 8 of them are exposed in governance/DOMAIN_RULER_FROZEN_20261008.json; the other 3 (R040, R080, R091) carry an EMPTY domain cell, so they were skipped by the ruler (201/208) and never reached the owner's domain review sheet.
+- **Root cause.** The domain-axis 'emerging' catch-all was removed when the owner finalised the domain axis (D-2874), but the SAME anti-pattern survived on the DISCIPLINE axis: an abstention was written into a value slot. `emerging` is not a member of the 64-canonical discipline menu (config/taxonomy_v8.yaml), so a frozen authority currently contains a token that no menu admits.
+- **Why it matters (ontological).** discipline = RIGID kind, domain = ANTI-RIGID application role (OntoClean, Guarino & Welty 2002). Abstaining on a rigid kind is legitimate and already first-class in this system (`_stamp.discipline_abstained`), but abstention must be encoded as ABSENCE + FLAG, never as a pseudo-class: any consumer (S4 discipline classification, golden-set eval, conformance joins) can read 'emerging' as a 65th class and pollute its label space. The axis rail (scripts/check_anchor_axis_consistency.py) enforces this for the DOMAIN axis only.
+- **Deterministic fix (no LLM, R5 not implicated).** Replace the token with `discipline = ''` + `discipline_abstained = true` + `discipline_status = 'abstained'` on all 11 rows, and mirror into ANCHOR_208_CONSOLIDATED + discipline_anchor_rederived_v8 (the ruler re-stamp follows via scripts/apply_owner_domain_review.py --apply).
+- **OWNER GATE.** Per row, confirm ONE of: (a) abstention accepted (discipline stays empty, flagged), or (b) name the discipline from the closed menu. Blind fill is refused: a rigid kind is not inferable from a domain list.
+
+## BUG-677 (OPEN, 2026-10-08) — two owner-facing truths for the SAME 60 items (ANCHOR-2 sheet vs frozen ruler)
+
+- **Symptom.** ANCHOR-2 rows ARE anchor items R151-R210 (59/60 matched by name; the 60th, row 17, is R080, a bug-676 row with no domain cell). Comparing the two HUMAN sides: **45/60 rows disagree on domains, 31/60 on discipline.** Example R159/row 9: sheet `research practice, product design` vs ruler `research practice, user experience, digital product, product design`. Example R041/row 44: sheet `product design, user experience` vs ruler 5 domains.
+- **Root cause.** The ANCHOR-2 v8 re-mint (D-2865/D-2866, scripts/remint_anchor2_v8.py) corrects the sheet ONLY where a triage row exists (4 rows: 6, 7, 9, 39). The owner's later adjudication of the same items (D-2874, D-2875, D-2876 and the 2026-10-08 review sheet) was applied to the ruler, NOT back-propagated to the sheet. Two owner-gated authorities therefore describe one item set and are unreconciled.
+- **Impact.** governance/anchor2_kappa_v8_20261007.json (domains micro_kappa 0.6408, exact_set_match 14/60, mean_jaccard 0.54) measures the pipeline against labels the owner has since corrected; worse, the per-row repair queue would instruct the pipeline to adopt SUPERSEDED labels (directed drift). The kappa numbers, and any abstention calibration derived from them, are VOID as current evidence.
+- **Fix (non-mutating).** Keep the sheet byte-identical (immutable provenance; it also carries the independent-pass signal) and DERIVE an authority-aligned artefact; report sheet-vs-ruler divergence explicitly as the annotation-reliability ceiling; then re-mint the key, re-measure kappa, and forbid citing an ANCHOR-2 kappa without naming the freeze (sha256) it was measured against.
+
+## BUG-678 (OPEN, 2026-10-08) — the derived review CSV is a LOSSY, contradictory face of the owner sheet
+
+- **Symptom.** governance/DOMAIN_RULER_REVIEW_20261008.csv carries **0 of 46** `oov_domains` cells, **8 `owner_notes`** (the 'finalized' markers) against **11** in the owner's sheet (the free-text directives, including `discipline is machine learning` for R141), and its `domains` column contradicts the frozen ruler on **42/201 rows**.
+- **Root cause.** The CSV is a POST-MERGE derived face (159/201 rows equal the ruler only because the merge left them unchanged) that kept a stale pre-merge `domains` column and empty annotation columns. The owner's raw rulings existed only as a binary .numbers file plus two throw-away scripts in /tmp.
+- **Impact.** Any future agent re-deriving the ruler from this "review" face silently loses all 86 owner domain assignments and both discipline rulings - i.e. BUG-674 and BUG-675 recurring, undetectably. It also means the artefact a reviewer is handed disagrees with the authority it claims to review.
+- **Fix (this turn).** Durability + reproducibility restored: governance/OWNER_DOMAIN_REVIEW_SOURCE_20261008.csv is a faithful 9-column export of the owner sheet (201 rows, 46 oov, 11 notes, sha256 a1aa5bfe205ab5af8e82ce9f518602e586ad0693f2d5065608e5aa0d7128e53b), pinned to the .numbers sha256 14726d947959451f7b99715d5b036e94c574f8e63bccb59c3263fbd081beed3d; every ruling lives in config/owner_domain_rulings_20261008.yaml; and scripts/apply_owner_domain_review.py --check PROVES the frozen ruler is re-derivable (201 rows, sha256 b766ae91...). The derived CSV must be regenerated from the ruler or retired.
+
+
+### Update 2026-10-08 (D-2877 follow-through) — BUG-676 / BUG-677 owner confirmation round materialized
+
+governance/OWNER_CONFIRMATION_SHEET_20261008.csv (14 rows) is the ask for BUG-676 and the two unassigned domain
+questions: 8 rows carrying `discipline='emerging'` + 3 rows (R040/R080/R091) that are 'emerging' with an EMPTY
+domain cell and were skipped by the ruler (201/208) + R158 (9 owner-flagged domains vs the D150 cap of 7; the 2
+declared cap-drops) + R005 (information architecture) + R113 (systems & frameworks). BUG-677's fix is a FOLLOW-THROUGH
+DECISION, not a bug fix: derive an authority-aligned ANCHOR-2 sheet without mutating the original, report the
+sheet-vs-ruler divergence as the annotation-reliability ceiling, re-mint the key, re-measure kappa - the next
+decision must carry the measured numbers, so it is minted after the run, never before.
+## BUG-676 (FIXED, 2026-10-08) — the frozen authority encoded discipline ABSTENTION as an out-of-menu TOKEN ('emerging'); 8 rows fixed, 2 residuals declared
+
+The frozen domain ruler carried `discipline: "emerging"` on 8 rows (R006 R059 R127 R140 R146 R165 R183 R202).
+'emerging' is the DOMAIN-axis catch-all (open-set rejection); it is NOT one of the 64 canonical disciplines, so
+an authority row asserted a rigid kind the closed menu does not contain (law of non-contradiction on one axis -
+the mirror of the D-2870 guard, which already forbids the catch-all coexisting with a concrete DOMAIN).
+
+ROOT CAUSE: abstention was stored as a TOKEN in the value slot instead of as a declared ABSENCE. Evidence that no
+discipline was ever assigned: the owner's round-2 answer "abstain" for all 8
+(governance/OWNER_CONFIRMATION_SHEET_20261008.csv, sha256 8e02e65cc5708d55...). Synthesizing a label would have
+been a generator-invented golden value, forbidden by D-2813.
+
+FIX (D-2878): `config/owner_domain_rulings_20261008.yaml#discipline_abstention` declares the 8 ids; the ruler now
+carries `discipline: ""` for exactly those rows. `scripts/apply_owner_domain_review.py` is FAIL-CLOSED in BOTH
+directions - an undeclared row still carrying the token aborts the run, and a declared id that is not in the ruler
+aborts the run (an abstention for a dropped row is a category error). Ruler re-stamped b766ae912401d7da ->
+5fcde5619e04fbda (9 rows changed = the 8 abstentions + R158's applicability-ranked domain drop; 15 declared
+warnings; `--check` reproduces it byte-identically).
+
+RESIDUAL 1 (declared, BUG-680): the two UPSTREAM anchor faces still carry the token.
+RESIDUAL 2 (declared, BUG-679 / owner gate): R140 is ALSO an owner-ratified noise_drop, so its axis disposition
+is the DROP-13 propagation question, not an abstention.
+
+## BUG-678 (FIXED, 2026-10-08) — the derived review CSV was a LOSSY, contradictory face of the owner sheet
+
+`governance/DOMAIN_RULER_REVIEW_20261008.csv` claimed to be the owner-review face but carried 0/46 `oov_domains`
+cells, 8 of 11 `owner_notes`, an all-empty `owner_review` column, and a `domains` column that contradicted the
+ruler on 42/201 rows. An agent re-deriving from that file would silently LOSE 86 owner domain assignments.
+
+FIX: authority chain re-established as data - `governance/OWNER_DOMAIN_REVIEW_SOURCE_20261008.csv` (faithful
+9-column export, 201 rows, 46 oov / 11 notes, sha256 a1aa5bfe205ab5af8...) generated by
+`scripts/apply_owner_domain_review.py --export-source` from the pinned `.numbers`
+(sha256 14726d947959451f...); every ruling in `config/owner_domain_rulings_20261008.yaml`; and the round-2
+answers pinned in the same config with a fail-closed sha256 assertion. `--check` now reproduces the frozen ruler
+byte-identically, so the ruler is PROVABLY re-derivable rather than hand-patched.
+
+## BUG-679 (OPEN, 2026-10-08) — an owner-RATIFIED `noise_drop` (RATIFY-3 DROP(13), D-2711/D-2719) reached only 5 of 13 anchor rows: 8 dropped anchors are STILL LIVE in the frozen domain ruler
+
+The owner ratified 13 anchor drops: R012 R021 R026 R034 R080 R082 R084 R106 R140 R148 R180 R182 R200
+(`governance/frontier_audit/noise_drop_quarantine.json`, `owner_ratified.ratify = "RATIFY-3 DROP(13)"`,
+`by: owner`, `at: 2026-09-30`, `ref: D-2719`). Only 5 rows reached the anchor/ruler faces:
+R021 (cleared on all axes, D-2813 Group 1) + R084/R106/R148 (`discipline_status = noise_drop`) + R080 (left the
+ruler only because its domain cell was empty, but its `discipline_status` is still `owner_finalized` with
+`discipline: "emerging"`).
+
+MEASURED CONTRADICTION: **8 of the 13 ratified drops (R012 R026 R034 R082 R140 R180 R182 R200) are still live
+rows in `governance/DOMAIN_RULER_FROZEN_20261008.json` with full discipline + domains**, and D-2813 is explicit
+that for a `noise_drop` row "depth and discipline do NOT apply". So the frozen authority currently contradicts an
+owner ratification for 8 rows - and this is what surfaced in round 2: the owner was asked to confirm axis values
+for rows the owner had already dropped (e.g. R140), which cannot be answered coherently.
+
+IMPACT: the ruler is 201 rows of which 8 should not be axis-bearing; the discipline/domain abstention curves
+measured on it are computed over a cohort that includes owner-dropped rows; and every future "confirm this row"
+question re-opens a settled decision.
+
+FIX (owner gate, one word): propagate the ratified disposition uniformly - clear depth/discipline/domain for the
+8 rows and keep R021/R080/R084/R106/R148 as already done -> ruler 201 -> 193, with the rows retained in the
+soft-quarantine ledger (policy: quarantine, NEVER hard-delete). Alternative: the owner re-affirms the 8 rows as
+live items, which UNDOES RATIFY-3 DROP(13) and must then be recorded as a superseding decision.
+
+## BUG-680 (OPEN, 2026-10-08) — the upstream anchor faces still encode discipline abstention as the out-of-menu token 'emerging' (BUG-676 residual)
+
+BUG-676's fix landed in the FROZEN RULER (`discipline: ""` for the 8 owner-confirmed abstained rows). The two
+UPSTREAM faces still carry the out-of-menu token for those rows:
+`governance/ANCHOR_208_CONSOLIDATED_20261007.json` (11 rows: R006 R040 R059 R080 R091 R127 R140 R146 R165 R183
+R202) and `governance/discipline_anchor_rederived_v8_20261007.json`. Both are read as the `discipline` authority /
+consumer by `scripts/check_anchor_axis_consistency.py`, so the correct fix is NOT a hand edit: extend the
+consolidation chain so an abstained row is stamped `discipline: ""` + `discipline_status: "abstained"` +
+`discipline_source: "owner_abstained"` (the schema already has those slots), which makes the ruler derivable with
+one fewer config override. Declared so the residual is visible rather than assumed away.

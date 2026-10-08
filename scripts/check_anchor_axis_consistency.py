@@ -12,7 +12,7 @@ DIFFERENT scripts at DIFFERENT times:
   * governance/ANCHOR_208_DISCIPLINE_NORMALIZED_20261002.json (normalised view)
   * governance/ANCHOR_208_CONSOLIDATED_20261002.json         (merged verdicts)
   * governance/depth_anchor_conformance_20261002.json        (gold: depth gate)
-  * governance/discipline_anchor_conformance_20261002.json   (gold: discipline gate)
+  * governance/discipline_anchor_rederived_v8_20261007.json  (gold: discipline/domain authority, D-2868)
 
 Nothing asserted that they AGREE. So a correction landed in one (the owner's
 D-2795 30-anchor discipline re-label, 12 rows) while the others stayed stale —
@@ -167,6 +167,40 @@ def _coverage(config: dict, cache: dict[str, dict[str, dict]]) -> list[str]:
     return lines
 
 
+def _emerging_abstention_guard(config: dict) -> int:
+    """D-2870 fail-closed: the catch-all abstention token must never coexist with a concrete
+    domain in the same anchor list.  'emerging' is an AXIS-LEVEL verdict (open-set rejection),
+    not a token that can sit beside 'education' etc. (law of non-contradiction on one axis)."""
+    tax = yaml.safe_load((REPO / "config" / "taxonomy_v8.yaml").read_text(encoding="utf-8"))
+    catch_all = tax["meta"]["catch_all_domain"]
+    axis = config.get("axes", {}).get("domain")
+    if not axis:
+        return 0
+    path = REPO / axis["authority"]["file"]
+    rows = json.loads(path.read_text(encoding="utf-8"))
+    data = rows.get("rows", rows if isinstance(rows, list) else [])
+    violations: list[tuple[str, list[str]]] = []
+    for r in data:
+        dom = r.get("domain")
+        if isinstance(dom, str):
+            toks = [t.strip() for t in dom.split("|") if t.strip()]
+        elif isinstance(dom, list):
+            toks = [str(t) for t in dom]
+        else:
+            continue
+        if catch_all in toks and len(toks) > 1:
+            violations.append((str(r.get("item_id", "?")), toks))
+    if violations:
+        print(f"  FAIL  {len(violations)} anchor(s) carry catch-all '{catch_all}' beside a "
+              f"concrete domain (abstention is axis-level, never a co-token):")
+        for iid, toks in violations:
+            print(f"    {iid}: {toks}")
+        return 1
+    print(f"  ok  catch-all '{catch_all}' never coexists with a concrete domain "
+          f"({len(data)} rows scanned)")
+    return 0
+
+
 def main() -> int:
     """CLI entry point: --check (default), --selftest, --emit-declared."""
     parser = argparse.ArgumentParser(description="ANCHOR five-axis propagation rail")
@@ -175,6 +209,10 @@ def main() -> int:
     args = parser.parse_args()
 
     config = yaml.safe_load(CONFIG.read_text(encoding="utf-8"))
+
+    guard_rc = _emerging_abstention_guard(config)
+    if guard_rc:
+        return guard_rc
 
     if args.selftest:
         return _selftest(config)

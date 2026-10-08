@@ -15093,3 +15093,32 @@ decisions:
   - governance/OWNER_RULINGS_ROUND3_20261008.md
   - governance/buglog.md
   - governance/SESSION-HANDOFF-2026-10-07.md
+- id: D-2881
+  state: RATIFIED
+  category: ANCHOR / TAXONOMY
+  title: 'The 11 ambiguous anchor-store bridge rows are RUN-COLLISIONS, resolved deterministically to the ratified canonical run'
+  bugs:
+  - BUG-662
+  - BUG-685
+  decision: |-
+    The 11 join.ambiguous rows (R002 R039 R049 R065 R070 R097 R102 R107 R152 R192 R197) were NOT concept
+    collisions: each folded name matched exactly TWO corpus rows from DIFFERENT extraction runs - a pre-rechunk
+    t11 row and a rechunk-v4-20260929 row (same name, same source_ids, different fb_id). D-2658 "never pick"
+    correctly refused, but the refusal hid a deterministic answer.
+
+    RULE (deterministic, LLM-free): a run-collision is not a concept collision. When a folded name matches rows
+    from more than one run and EXACTLY ONE candidate is from the declared canonical run, that candidate resolves
+    the collision (never a positional pick). Any other multi-candidate name (same-run or no-canonical-run row)
+    stays AMBIGUOUS and is still refused.
+
+    IMPLEMENTED: config/anchor_family.yaml#store_bridge.canonical_run = rechunk-v4-20260929 (the owner-ratified
+    re-chunk, BUG-662); build_anchor_store_bridge.py now reads pipeline_run_id and resolves via join
+    run_canonical. Bridge 197 -> 208 joined, join.ambiguous 11 -> 0, join.counts.run_canonical = 11. Conformance
+    regenerated 183 -> 194 examples + 14 excluded (noise_drop only). Selftest 19/19; axis-consistency ceiling 0
+    holds; conformance --check byte-re-derivable.
+  files:
+  - scripts/build_anchor_store_bridge.py
+  - config/anchor_family.yaml
+  - governance/ANCHOR_STORE_BRIDGE_20260926.json
+  - governance/depth_anchor_conformance_20261002.json
+  - governance/buglog.md

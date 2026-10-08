@@ -177,6 +177,10 @@ store_bridge:
   item_key: item_id
   join: content_name
   normalization: collapse_whitespace
+  # D-2881: the canonical extraction run. A run-collision (one folded name matching rows from TWO runs,
+  # e.g. a pre-rechunk t11 row and a rechunk-v4-20260929 row) is NOT a concept collision (D-2658): the
+  # canonical run resolves it. Never a positional pick.
+  canonical_run: rechunk-v4-20260929
   declared_unresolved: []
   golden:
     path: archive/golden_retired_D2618/stage4_golden_mined.yaml

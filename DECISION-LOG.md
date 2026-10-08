@@ -11,7 +11,15 @@
 
 ## 🔴 CURRENT OPEN / PENDING INDEX (machine-derived 2026-10-03 — the live face; history below)
 
-Register truth (do NOT restate counts elsewhere — BUG-588/D-2692): 1010 decisions · 449 bugs (163 open / 286 closed; highest OPEN = BUG-681). Forensic audit GREEN: 0 fatal rails — store-change re-baseline cascade (BUG-659..668) FIXED at root cause.
+Register truth (do NOT restate counts elsewhere — BUG-588/D-2692): 1011 decisions · 449 bugs (163 open / 286 closed; highest OPEN = BUG-681). Forensic audit GREEN: 0 fatal rails — store-change re-baseline cascade (BUG-659..668) FIXED at root cause.
+
+## D-2881 (2026-10-08) — the 11 ambiguous anchor-bridge rows are RUN-COLLISIONS, resolved to the ratified canonical run
+
+The 11 `join.ambiguous` rows (R002 R039 R049 R065 R070 R097 R102 R107 R152 R192 R197) were NOT concept collisions: each folded name matched exactly TWO corpus rows from DIFFERENT extraction runs — a pre-rechunk `t11` row and a `rechunk-v4-20260929` row (same name, same source_ids, different fb_id). D-2658's "never pick" correctly refused, but the refusal hid a deterministic answer.
+
+RULE (deterministic, LLM-free): a run-collision is not a concept collision. When a folded name matches rows from >1 run and EXACTLY ONE candidate is from the declared canonical run, that candidate resolves the collision (never a positional pick). Any other multi-candidate name (same-run or no-canonical-run row) stays AMBIGUOUS and is still refused.
+
+IMPLEMENTED: `config/anchor_family.yaml#store_bridge.canonical_run = rechunk-v4-20260929` (the owner-ratified re-chunk, BUG-662); `build_anchor_store_bridge.py` reads `pipeline_run_id` and resolves via `join: run_canonical`. Bridge 197→208 joined, `join.ambiguous` 11→0, `join.counts.run_canonical=11`. Conformance regenerated 183→194 examples + 14 excluded (noise_drop only). Selftest 19/19; axis-consistency ceiling 0 holds; conformance --check byte-re-derivable.
 
 1. **OWNER-GATED (D-2727): RATIFY-2 full S4→S5→S6 rerun** — launch under `caffeinate -dimsu` (`runner.py --dry-run` then full).
 2. **OWNER-GATED (D-2727 OG-1): train/eval split** — Option A recommended (KEEP(46)→S4 golden; pin 46 OUT of eval ruler 208→162; sha256-pinned split manifest).

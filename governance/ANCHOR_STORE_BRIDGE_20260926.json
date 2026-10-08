@@ -117,6 +117,13 @@
       "name": "Multiple Imputation Procedure",
       "name_sha256": "a8ed8557adc35285b756b38fc40600efaa762cb78455db04f3cd6af121124d2e"
     },
+    "18d9bd7b4c8c5791dc3a1945dedaacfcd8868a60df6e13dab43343c967086b82": {
+      "item_id": "R065",
+      "join": "run_canonical",
+      "join_note": "run-collision resolved to canonical run rechunk-v4-20260929 (D-2881)",
+      "name": "Media Construction of Crime Waves",
+      "name_sha256": "d02bcd28f9556b1ac8dd23355198162c42a8e4404723b3cdac278788ea4a5595"
+    },
     "195b0c7c822d9b2ec149a77a7f5f070073f938781b9f74f8a14e011cda929858": {
       "item_id": "R136",
       "join": "exact",
@@ -278,6 +285,13 @@
       "name": "Learning Through Failure Process",
       "name_sha256": "e821489e649342a77f46740b41ed600241d18139cba76a5fd0c67e7c090c55c3"
     },
+    "32a684889757c395b1b3846c37667ce7e65239e6dac5b4b72ad96be32b40ae97": {
+      "item_id": "R102",
+      "join": "run_canonical",
+      "join_note": "run-collision resolved to canonical run rechunk-v4-20260929 (D-2881)",
+      "name": "Social Entrepreneur's Playbook",
+      "name_sha256": "c65e4a08adb783f46c6e2d8799bf6b669054c2a5e4f228429ea8201a3da55637"
+    },
     "33666a900d6705b13090c82333e0bc5f8d9b7554cbfee4cad0841bfdf331856a": {
       "item_id": "R200",
       "join": "exact",
@@ -327,6 +341,13 @@
       "name": "Paradigm Shift Through Disruption",
       "name_sha256": "6988ce710991670afb8b2715a580f7fbf819ff18eb67ce4bb6c2e9c89b538113"
     },
+    "37541b1665eeaf5ccb2d2309c52585d05cb5b4b1ef5321d7777e15a5631a43bc": {
+      "item_id": "R049",
+      "join": "run_canonical",
+      "join_note": "run-collision resolved to canonical run rechunk-v4-20260929 (D-2881)",
+      "name": "Fermi Estimation Method",
+      "name_sha256": "343dd7757a0710ec4d9afc782d3ba98a1c311f3843c28b8f64ea41d7fcc8320d"
+    },
     "38c529d51a31dbb1c427f381ed6edb41660224ebc75ba60ecd6c6df58a1e86a6": {
       "item_id": "R165",
       "join": "exact",
@@ -354,6 +375,13 @@
       "join_note": "byte-identical name",
       "name": "Color As Cultural and Emotional Marker",
       "name_sha256": "8381be28b6c7c736102bbf6449c05b4ec43581bf2a50a5c12133e6f830721232"
+    },
+    "3a0c83565ea4576f01531a338175019cb9cf4f7838cd3a526b9f547341515010": {
+      "item_id": "R197",
+      "join": "run_canonical",
+      "join_note": "run-collision resolved to canonical run rechunk-v4-20260929 (D-2881)",
+      "name": "Peripheral Cue Interference Effect",
+      "name_sha256": "266a45c973fa7addab6c98ba088ae558bf76443c4436c5f86967e941b5ad0587"
     },
     "3a86d5e6c658a4cd0e52c0a33af693ddb85f2ae8e2501d8a90644422176f8743": {
       "item_id": "R007",
@@ -607,6 +635,20 @@
       "name": "Generative Algorithmic Composition",
       "name_sha256": "725c86f2d2eb6431566657a2d5b3bbe2f7222ae09878b655b25bbef49fac87d9"
     },
+    "6d34617a752a081c653f485968851d5c4cab346efcf5b98b171718d77f85187f": {
+      "item_id": "R152",
+      "join": "run_canonical",
+      "join_note": "run-collision resolved to canonical run rechunk-v4-20260929 (D-2881)",
+      "name": "Economic Politics of Obsolescence",
+      "name_sha256": "b88d43766d5f701c3f3c7d5f957d21eddc08b937e786c8c1eac34e6c9f7b4e3b"
+    },
+    "6d3eaf96a83e12c0b37f408bb918511434cbd524944236af93526f0f0efd519f": {
+      "item_id": "R002",
+      "join": "run_canonical",
+      "join_note": "run-collision resolved to canonical run rechunk-v4-20260929 (D-2881)",
+      "name": "Soviet Underground Discourse Reception",
+      "name_sha256": "64e0ea13af07db429c916b1b0b8d4bc914cfb78add6a2ab80926df3c9caf82d4"
+    },
     "7007133a9b27f997e7cd4934480ce81ace299596dfb0a81ebfb40301b4866712": {
       "item_id": "R147",
       "join": "exact",
@@ -718,6 +760,13 @@
       "join_note": "byte-identical name",
       "name": "Inclusive Design Adaptation",
       "name_sha256": "c0f62b3afdeb911d0edb5c44314aa6ac28872dcb340ef7fc1f1b1efb2738568c"
+    },
+    "7b896794ebe6036a650b302f3aec354e9f59f87c099deb55e100f5a579496fc9": {
+      "item_id": "R107",
+      "join": "run_canonical",
+      "join_note": "run-collision resolved to canonical run rechunk-v4-20260929 (D-2881)",
+      "name": "Lived Experience Focus",
+      "name_sha256": "737525a1e5fa2cb9c19e06adf54caf512adf0c3a2bf4553cc5ce434749dac6a3"
     },
     "7d5e0b161a7bc13d2ff55ea60e0bff2b556afd780a859ab4bdd183ca67b3d6b5": {
       "item_id": "R155",
@@ -985,6 +1034,13 @@
       "name": "Heckel's Diff Algorithm for Version Tracking",
       "name_sha256": "0647a425ed1667f1c42639189b2fc9a639b98f711194a30d4467421b8845eabe"
     },
+    "b2a44148b7ccbbbab9e5100a4154766eddd0444d57f7cdfc1ba0b7dc194f9846": {
+      "item_id": "R097",
+      "join": "run_canonical",
+      "join_note": "run-collision resolved to canonical run rechunk-v4-20260929 (D-2881)",
+      "name": "Minimin Decision Criterion",
+      "name_sha256": "c3d2fb176eefbf0f9e539629eb2d3400993aa5fc9ade2e7982ee31e3c49a97f1"
+    },
     "b2b71ed81ac4169ff308a5152b988757a9e737579aba6dbd14576adb1c8982c3": {
       "item_id": "R068",
       "join": "exact",
@@ -1124,6 +1180,20 @@
       "join_note": "byte-identical name",
       "name": "Nonlinear Magnification Fields",
       "name_sha256": "8cf7ffc5c4f945d8829157000fad3bf6548388315fdb56fc072c3acca298f287"
+    },
+    "c782bcdc0898e7bd30075ad30254fb1681ae025d9461358de32be08a3b2d568b": {
+      "item_id": "R070",
+      "join": "run_canonical",
+      "join_note": "run-collision resolved to canonical run rechunk-v4-20260929 (D-2881)",
+      "name": "Iterative Design Validation",
+      "name_sha256": "a1ea28495b2ecf3e35975f8fc57290c45ea4dd1f0d17dbce636c41525e9e1d40"
+    },
+    "c8ce3e82270913bdcfae6575fbdfd23bb1018ea47bdc9a8c9a8072a4e734489f": {
+      "item_id": "R192",
+      "join": "run_canonical",
+      "join_note": "run-collision resolved to canonical run rechunk-v4-20260929 (D-2881)",
+      "name": "Long-term Investment Advantage",
+      "name_sha256": "efb727aee7538425e0bb489fbe36e569c9add57009218aa6d798606f6602a977"
     },
     "c90edfd914cd6a2b7cccb395415e3f073f61f207f2d4405e99121b6fde00d9e2": {
       "item_id": "R014",
@@ -1299,6 +1369,13 @@
       "join_note": "byte-identical name",
       "name": "Self-referential Incompleteness",
       "name_sha256": "05655702068aefc5532f4e64ada4768871e1cc9c426a584fba657c7b6c24f89d"
+    },
+    "ef337999f9d447dcb91fcfda3e0792b567473e8b028af290ac0de412e56f269e": {
+      "item_id": "R039",
+      "join": "run_canonical",
+      "join_note": "run-collision resolved to canonical run rechunk-v4-20260929 (D-2881)",
+      "name": "Identity As Social Positioning and Lifestyle Signifiers",
+      "name_sha256": "cae4976f47f18cbea91f300857cd08d3e180efb498b8f29bb181ac6308f46a0f"
     },
     "ef95c4ed6eb9beb6546022107178fe8bdaa18b79cce1557a74bb5a2ab07c70eb": {
       "item_id": "R114",
@@ -2988,107 +3065,19 @@
     "store": {
       "path": "knowledge pipeline/maxwell.db",
       "rows": 14574,
-      "sha256": "e0656038ef0e4cf523e9446bfe22daa438c36d2d7e6ee8c0b9cc1c7d111cb3f2",
+      "sha256": "180b5d0bd561917747a8586dc095c972a8f0d5b724ad1b32f3255297e7c94b89",
       "table": "fbs"
     }
   },
   "join": {
-    "ambiguous": [
-      {
-        "candidates": [
-          "6d3eaf96a83e12c0b37f408bb918511434cbd524944236af93526f0f0efd519f",
-          "8f02e94dec8a9299903c2e26e2f0ad7d0e55c84327a53e3998c8d201e9bcfa81"
-        ],
-        "item_id": "R002",
-        "name": "Soviet Underground Discourse Reception"
-      },
-      {
-        "candidates": [
-          "49cc57c71690f8e175f7254c37a5565f6a867ae3723fd56cc1318db1b41b3906",
-          "ef337999f9d447dcb91fcfda3e0792b567473e8b028af290ac0de412e56f269e"
-        ],
-        "item_id": "R039",
-        "name": "Identity As Social Positioning and Lifestyle Signifiers"
-      },
-      {
-        "candidates": [
-          "37541b1665eeaf5ccb2d2309c52585d05cb5b4b1ef5321d7777e15a5631a43bc",
-          "cbd462e8b840ba3520edacc957da7fb6f6b56bcf10725e648ab3fb617749e165"
-        ],
-        "item_id": "R049",
-        "name": "Fermi Estimation Method"
-      },
-      {
-        "candidates": [
-          "18d9bd7b4c8c5791dc3a1945dedaacfcd8868a60df6e13dab43343c967086b82",
-          "9a6ca0e54b82560552d0c8a5d15c08a254b1ba398642491a81b19879d00197fe"
-        ],
-        "item_id": "R065",
-        "name": "Media Construction of Crime Waves"
-      },
-      {
-        "candidates": [
-          "210bf321b1eba495dde655456603277df87542c0401f2d68978d5ea108831b7a",
-          "c782bcdc0898e7bd30075ad30254fb1681ae025d9461358de32be08a3b2d568b"
-        ],
-        "item_id": "R070",
-        "name": "Iterative Design Validation"
-      },
-      {
-        "candidates": [
-          "6b4b26497c299fe82095995b2fd1c168c9b96768b1e09264acd784bed5bf48ab",
-          "b2a44148b7ccbbbab9e5100a4154766eddd0444d57f7cdfc1ba0b7dc194f9846"
-        ],
-        "item_id": "R097",
-        "name": "Minimin Decision Criterion"
-      },
-      {
-        "candidates": [
-          "32a684889757c395b1b3846c37667ce7e65239e6dac5b4b72ad96be32b40ae97",
-          "e80176e84e7a7d5404e24ea60c2e5ea4309bd800283abd8ed8faf15a43ef299c"
-        ],
-        "item_id": "R102",
-        "name": "Social Entrepreneur's Playbook"
-      },
-      {
-        "candidates": [
-          "7b896794ebe6036a650b302f3aec354e9f59f87c099deb55e100f5a579496fc9",
-          "ae9023a021dfc501f70b1ed0abe8a65b7cf8df3665dd7a89c257b6a9fda08329"
-        ],
-        "item_id": "R107",
-        "name": "Lived Experience Focus"
-      },
-      {
-        "candidates": [
-          "42cebfbaa280169a8fccf0042ab3cfef215ffa49d0184a44398e2e0e59255750",
-          "6d34617a752a081c653f485968851d5c4cab346efcf5b98b171718d77f85187f"
-        ],
-        "item_id": "R152",
-        "name": "Economic Politics of Obsolescence"
-      },
-      {
-        "candidates": [
-          "54f0000cd1e48c3386651bfba9033f145f3a14e0bb0988f6a63e118840c4d7f1",
-          "c8ce3e82270913bdcfae6575fbdfd23bb1018ea47bdc9a8c9a8072a4e734489f"
-        ],
-        "item_id": "R192",
-        "name": "Long-term Investment Advantage"
-      },
-      {
-        "candidates": [
-          "3a0c83565ea4576f01531a338175019cb9cf4f7838cd3a526b9f547341515010",
-          "57e259f3b82eccf02842bdfca763907cefe26d1eb6b3d792426e76180e26f5c4"
-        ],
-        "item_id": "R197",
-        "name": "Peripheral Cue Interference Effect"
-      }
-    ],
+    "ambiguous": [],
     "counts": {
-      "ambiguous": 11,
+      "ambiguous": 0,
       "exact": 196,
-      "joined": 197,
+      "joined": 208,
       "normalized": 1,
       "rows": 208,
+      "run_canonical": 11,
       "unresolved": 0
     },
     "key": "content_name",

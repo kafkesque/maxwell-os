@@ -10,7 +10,7 @@
 ## 🔴 MUST — open (strategic-consequential order)
 
 > **CURRENT OPEN INDEX (machine-derived 2026-10-07 — the live face; dated history follows below).**
-> Register: 1010 decisions · 449 bugs (163 open / 286 closed; highest OPEN = BUG-681). Forensic audit GREEN: 0 fatal rails — store-change re-baseline cascade (BUG-659..668) FIXED at root cause.
+> Register: 1011 decisions · 449 bugs (163 open / 286 closed; highest OPEN = BUG-681). Forensic audit GREEN: 0 fatal rails — store-change re-baseline cascade (BUG-659..668) FIXED at root cause. The 11 ambiguous anchor-bridge rows resolved to the ratified canonical run (D-2881); depth conformance 183→194.
 >
 > **OWNER-GATED — ONE action remains (D-2727 gate):**
 > 1. **RATIFY-2 — full S4→S5→S6 rerun.** Launch under `caffeinate -dimsu`; `python3 pipeline/runner.py --dry-run` then full. Preflight PASS; authority propagated (D-2812) + consistency rail rc=0 → now UNBLOCKED.

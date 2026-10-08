@@ -5,7 +5,7 @@
   "gen_model": "none (deterministic join; no LLM)",
   "pipeline_commit": "unknown",
   "maxwell_schema_version": "unknown",
-  "created_at": "2026-10-08T18:32:54.579836+00:00",
+  "created_at": "2026-10-08T18:43:43.032755+00:00",
   "authority": [
     "D-2760 (owner finalized 42 depth mismatches; corrected depth map)",
     "D-274f (anchor is a conformance set, NOT a training set)",
@@ -21,7 +21,7 @@
     },
     "store_bridge": {
       "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/governance/ANCHOR_STORE_BRIDGE_20260926.json",
-      "sha256": "6b648018afbc20b3ee826e046f8ad84b0f8e232322cad5ff11d2201c61ae6a3b"
+      "sha256": "c63986552a7547e3d71505100ceac6ebaac4bfa248101af1525cd7afffcef2a6"
     },
     "store": {
       "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/maxwell.db",
@@ -33,20 +33,20 @@
     "normalization": "collapse_whitespace"
   },
   "counts": {
-    "total": 183,
+    "total": 194,
     "by_depth_label": {
-      "domain": 83,
-      "cross-domain": 54,
-      "specialized": 45,
-      "universal": 1
+      "domain": 88,
+      "cross-domain": 58,
+      "specialized": 46,
+      "universal": 2
     },
     "by_depth_source": {
-      "owner_finalized": 90,
-      "canonical_adjudicated": 93
+      "owner_finalized": 95,
+      "canonical_adjudicated": 99
     },
     "name_normalized": [],
     "excluded_noise_drop": 14,
-    "excluded_ambiguous": 11
+    "excluded_ambiguous": 0
   },
   "depth_labels": [
     "universal",
@@ -110,50 +110,6 @@
     {
       "item_id": "R148",
       "reason": "owner noise_drop (D-2760 depth_source sentinel; D-2813: depth does not apply)"
-    },
-    {
-      "item_id": "R002",
-      "reason": "ambiguous join (D-2658 name-collision refusal, 2 candidates) — OWED explicit fb_id (separate owner decision)"
-    },
-    {
-      "item_id": "R039",
-      "reason": "ambiguous join (D-2658 name-collision refusal, 2 candidates) — OWED explicit fb_id (separate owner decision)"
-    },
-    {
-      "item_id": "R049",
-      "reason": "ambiguous join (D-2658 name-collision refusal, 2 candidates) — OWED explicit fb_id (separate owner decision)"
-    },
-    {
-      "item_id": "R065",
-      "reason": "ambiguous join (D-2658 name-collision refusal, 2 candidates) — OWED explicit fb_id (separate owner decision)"
-    },
-    {
-      "item_id": "R070",
-      "reason": "ambiguous join (D-2658 name-collision refusal, 2 candidates) — OWED explicit fb_id (separate owner decision)"
-    },
-    {
-      "item_id": "R097",
-      "reason": "ambiguous join (D-2658 name-collision refusal, 2 candidates) — OWED explicit fb_id (separate owner decision)"
-    },
-    {
-      "item_id": "R102",
-      "reason": "ambiguous join (D-2658 name-collision refusal, 2 candidates) — OWED explicit fb_id (separate owner decision)"
-    },
-    {
-      "item_id": "R107",
-      "reason": "ambiguous join (D-2658 name-collision refusal, 2 candidates) — OWED explicit fb_id (separate owner decision)"
-    },
-    {
-      "item_id": "R152",
-      "reason": "ambiguous join (D-2658 name-collision refusal, 2 candidates) — OWED explicit fb_id (separate owner decision)"
-    },
-    {
-      "item_id": "R192",
-      "reason": "ambiguous join (D-2658 name-collision refusal, 2 candidates) — OWED explicit fb_id (separate owner decision)"
-    },
-    {
-      "item_id": "R197",
-      "reason": "ambiguous join (D-2658 name-collision refusal, 2 candidates) — OWED explicit fb_id (separate owner decision)"
     }
   ],
   "examples": [
@@ -336,6 +292,18 @@
       "depth_label": "domain",
       "depth_source": "canonical_adjudicated",
       "fb_id": "1817c07e0501c51a67b9c0709716994890019cb1b9e5481270d4a030c5d5b377"
+    },
+    {
+      "item_id": "R065",
+      "name": "Media Construction of Crime Waves",
+      "definition": "Media reporting on crime constructs new types of crime through thematic classification and symbolic representation, creating media waves that amplify certain crime categories while marginalizing others.",
+      "mechanism": "Media outlets categorize crime events thematically (immigrants' crime, crimes against the elderly, drug-induced crime) and construct symbolic narratives that dramatize and stereotype these categories, thereby creating new crime types that may not exist in reality but gain cultural significance through repeated media portrayal.",
+      "boundary": "Applies to media coverage of crime in news reporting and thematic classification systems. Fails when media coverage does not engage in thematic categorization or symbolic construction of crime types.",
+      "extraction_type": "causal_mechanism",
+      "depth": 3,
+      "depth_label": "domain",
+      "depth_source": "owner_finalized",
+      "fb_id": "18d9bd7b4c8c5791dc3a1945dedaacfcd8868a60df6e13dab43343c967086b82"
     },
     {
       "item_id": "R136",
@@ -590,6 +558,18 @@
       "fb_id": "322c1ed0023485f298865312657d3caad0314275fa45642fd039ab0a0567dbc7"
     },
     {
+      "item_id": "R102",
+      "name": "Social Entrepreneur's Playbook",
+      "definition": "A resource or framework that provides guidance for aspiring social entrepreneurs to address global problems through self-sufficiency rather than dependency.",
+      "mechanism": "The playbook serves as a practical guide that demonstrates how altruistic resources can be strategically deployed to build sustainable solutions rather than creating dependency, offering a structured approach to social impact.",
+      "boundary": "Applies to social entrepreneurs seeking practical frameworks for addressing global challenges. Fails when the approach is not adaptable to specific local contexts or when the framework does not account for the complexity of particular social problems.",
+      "extraction_type": "normative_heuristic",
+      "depth": 3,
+      "depth_label": "domain",
+      "depth_source": "canonical_adjudicated",
+      "fb_id": "32a684889757c395b1b3846c37667ce7e65239e6dac5b4b72ad96be32b40ae97"
+    },
+    {
       "item_id": "R109",
       "name": "Project Completion Bias",
       "definition": "A pattern where people gravitate toward smaller, easier projects that provide immediate satisfaction rather than tackling larger, more meaningful goals, often because the smaller projects are more accessible and less effortful to return to.",
@@ -662,6 +642,18 @@
       "fb_id": "370c44316d8755b4752b141335a1b630caec3f3b5cd5836c45a371e5ce88d29b"
     },
     {
+      "item_id": "R049",
+      "name": "Fermi Estimation Method",
+      "definition": "A problem-solving approach for estimating quantities with limited data by breaking down complex questions into simpler components, making reasonable assumptions, and combining them to form a final estimate.",
+      "mechanism": "The method decomposes complex questions into knowable and unknowable parts, flushes ignorance into the open, and exposes assumptions to make testable guesses rather than hiding errors.",
+      "boundary": "Applies to estimation problems where precise data is unavailable or impractical to obtain. Fails when the decomposition is too coarse or assumptions are fundamentally flawed.",
+      "extraction_type": "normative_heuristic",
+      "depth": 1,
+      "depth_label": "universal",
+      "depth_source": "owner_finalized",
+      "fb_id": "37541b1665eeaf5ccb2d2309c52585d05cb5b4b1ef5321d7777e15a5631a43bc"
+    },
+    {
       "item_id": "R165",
       "name": "Acknowledgment Attribution",
       "definition": "The practice of listing specific individuals and their roles in the creation or publication of a book as a form of recognition and professional courtesy. This mechanism involves identifying contributors who provided direct assistance or held leadership positions within the publishing organization.",
@@ -708,6 +700,18 @@
       "depth_label": "cross-domain",
       "depth_source": "canonical_adjudicated",
       "fb_id": "3a01753c570912440287df4c4ba2872f061b71d55354f33d21c7161f3b3f9c37"
+    },
+    {
+      "item_id": "R197",
+      "name": "Peripheral Cue Interference Effect",
+      "definition": "A phenomenon where peripheral cues designed to mislead or interfere with central task performance lead to reduced performance on the central task, particularly in aroused subjects.",
+      "mechanism": "Peripheral cues that mislead or interfere with central task processing create cognitive load and attentional competition, causing aroused subjects to perform worse on the central task than non-aroused subjects or those with facilitative cues.",
+      "boundary": "Applies when subjects are engaged in a central task with peripheral cues that either mislead or facilitate performance. Fails when the peripheral cues are irrelevant or when subjects are not in an aroused state.",
+      "extraction_type": "empirical_pattern",
+      "depth": 4,
+      "depth_label": "specialized",
+      "depth_source": "owner_finalized",
+      "fb_id": "3a0c83565ea4576f01531a338175019cb9cf4f7838cd3a526b9f547341515010"
     },
     {
       "item_id": "R007",
@@ -1142,6 +1146,30 @@
       "fb_id": "6c98af237315fd0cde140d96771f21f9086ff0ad26582c3c708ff8a7425f192c"
     },
     {
+      "item_id": "R152",
+      "name": "Economic Politics of Obsolescence",
+      "definition": "A systemic economic force that maintains consumer dependence on frequent replacement of goods through planned obsolescence, which resists shifts toward durable and recyclable products.",
+      "mechanism": "The economics of obsolescence creates a self-reinforcing cycle where manufacturers and consumers are locked into a system of frequent replacement, where the cost of durability and recyclability is not shared or incentivized by current market structures.",
+      "boundary": "Applies to consumer goods markets where planned obsolescence is a dominant economic model. Fails when durable or recyclable alternatives are economically incentivized or when regulatory frameworks force material recovery.",
+      "extraction_type": "causal_mechanism",
+      "depth": 3,
+      "depth_label": "domain",
+      "depth_source": "owner_finalized",
+      "fb_id": "6d34617a752a081c653f485968851d5c4cab346efcf5b98b171718d77f85187f"
+    },
+    {
+      "item_id": "R002",
+      "name": "Soviet Underground Discourse Reception",
+      "definition": "A pattern where Soviet audiences misinterpreted Western cultural references like Fantômas as new genres rather than parodies, and where underground cultural messages were received within the context of official Soviet ideological discourse.",
+      "mechanism": "The Soviet audience's lack of cultural referents led to misinterpretation of Western texts as novel genres, while the official ideological framework shaped how underground messages were understood and received.",
+      "boundary": "Applies to Soviet cultural reception of Western texts and the interaction between official and underground discourse. Fails when the audience has adequate cultural context or when the official discourse is not present.",
+      "extraction_type": "empirical_pattern",
+      "depth": 3,
+      "depth_label": "domain",
+      "depth_source": "canonical_adjudicated",
+      "fb_id": "6d3eaf96a83e12c0b37f408bb918511434cbd524944236af93526f0f0efd519f"
+    },
+    {
       "item_id": "R147",
       "name": "Randomness in Data Measurement",
       "definition": "The phenomenon where observed variations in data are not due to systematic factors but rather to unpredictable fluctuations that cannot be controlled or predicted.",
@@ -1308,6 +1336,18 @@
       "depth_label": "cross-domain",
       "depth_source": "owner_finalized",
       "fb_id": "7b7527feb9ae3187b6593ffbca5f6382b6928487b8a0fff9495ef9034c69e28a"
+    },
+    {
+      "item_id": "R107",
+      "name": "Lived Experience Focus",
+      "definition": "Understanding the subjective, first-person experience of phenomena is a distinct research approach that prioritizes phenomenological description over causal explanation or outcome analysis.",
+      "mechanism": "This is a descriptive model of research orientation: researchers can choose to focus on either causal mechanisms (why things happen), outcome implications (what happens as a result), or phenomenological description (what it feels like to experience something). The lived experience approach deliberately selects the third category as the primary lens for inquiry.",
+      "boundary": "Applies when research design explicitly prioritizes subjective experience as the core phenomenon of study. Fails when research questions require causal analysis or outcome evaluation, or when the phenomenon under study lacks subjective experiential dimension (e.g., physical measurements, statistical distributions).",
+      "extraction_type": "descriptive_model",
+      "depth": 2,
+      "depth_label": "cross-domain",
+      "depth_source": "canonical_adjudicated",
+      "fb_id": "7b896794ebe6036a650b302f3aec354e9f59f87c099deb55e100f5a579496fc9"
     },
     {
       "item_id": "R155",
@@ -1730,6 +1770,18 @@
       "fb_id": "afe73bb08c27c51ff32749a6e0a021377e515f1863581918f12c8dcce586ff00"
     },
     {
+      "item_id": "R097",
+      "name": "Minimin Decision Criterion",
+      "definition": "A decision-making approach where the optimizer assumes Nature is deliberately helpful and chooses the option that minimizes the maximum possible loss.",
+      "mechanism": "The criterion identifies the worst-case loss for each decision alternative (Di), finds the minimum of these worst-case losses, and selects the decision that achieves this minimum worst-case outcome.",
+      "boundary": "Applies when decision-makers face uncertainty about Nature's behavior and assume the worst-case scenario for each option. Fails when the decision context allows for probabilistic assessment or when the assumption of helpful Nature is unreasonable.",
+      "extraction_type": "descriptive_model",
+      "depth": 2,
+      "depth_label": "cross-domain",
+      "depth_source": "canonical_adjudicated",
+      "fb_id": "b2a44148b7ccbbbab9e5100a4154766eddd0444d57f7cdfc1ba0b7dc194f9846"
+    },
+    {
       "item_id": "R068",
       "name": "Imagination and the Image",
       "definition": "The relationship between conceptual imagination and visual representation in design is such that poor translation of imaginative concepts into visual form often results in trite or unimaginative outcomes. This principle describes a recurring tension in design practice where creative vision is not effectively rendered in the final visual product.",
@@ -1944,6 +1996,30 @@
       "depth_label": "specialized",
       "depth_source": "canonical_adjudicated",
       "fb_id": "c6ea8e7a3afcc731c29cae55f58b733f297480a1a1a2bd77a122a5e4b7e7a791"
+    },
+    {
+      "item_id": "R070",
+      "name": "Iterative Design Validation",
+      "definition": "Design teams validate their approach by presenting incremental iterations to stakeholders, showing both the current state and a forward progression to confirm alignment and gather feedback before full implementation.",
+      "mechanism": "This is a practical heuristic: teams present a design at a certain level of development, then show a subsequent iteration that builds on the feedback and initial direction. This allows stakeholders to confirm they are on the right track and to provide input before committing to a full design path. The process involves showing what was heard and what is next, creating a feedback loop that guides the design process.",
+      "boundary": "Applies when stakeholders are involved in the design process and can provide meaningful feedback. Fails when stakeholders are not engaged or when the design process is so rigid that feedback loops are not possible. Also fails when the design team does not have a clear way to articulate the progression or when the feedback is not actionable.",
+      "extraction_type": "normative_heuristic",
+      "depth": 2,
+      "depth_label": "cross-domain",
+      "depth_source": "canonical_adjudicated",
+      "fb_id": "c782bcdc0898e7bd30075ad30254fb1681ae025d9461358de32be08a3b2d568b"
+    },
+    {
+      "item_id": "R192",
+      "name": "Long-term Investment Advantage",
+      "definition": "Long-term investment in quality companies at reasonable prices generates superior returns over time, with rare losses when managed properly. The principle reflects a disciplined approach to equity investing that emphasizes patience, value selection, and psychological resilience.",
+      "mechanism": "This is a practical heuristic: consistent long-term investment in well-chosen companies at fair prices, combined with psychological ability to tolerate short-term volatility and losses, leads to exceptional cumulative returns. The approach works because it leverages the power of compound growth, avoids the costs of frequent trading, and benefits from the market's long-term upward trend. The strategy is not about market timing or prediction, but about systematic execution of a proven process.",
+      "boundary": "Applies when investors have the psychological capacity to hold positions through market volatility and can identify companies with sustainable competitive advantages. Fails when investors lack patience, cannot distinguish between good and bad companies, or are unable to maintain discipline during market downturns. The principle also fails in environments where market efficiency is extremely high and alpha generation is nearly impossible.",
+      "extraction_type": "normative_heuristic",
+      "depth": 3,
+      "depth_label": "domain",
+      "depth_source": "owner_finalized",
+      "fb_id": "c8ce3e82270913bdcfae6575fbdfd23bb1018ea47bdc9a8c9a8072a4e734489f"
     },
     {
       "item_id": "R014",
@@ -2196,6 +2272,18 @@
       "depth_label": "universal",
       "depth_source": "owner_finalized",
       "fb_id": "edf9ed2c8bfcc2651d2452c436839adcb6fa1a05a5dbced2be50d657a759ef6d"
+    },
+    {
+      "item_id": "R039",
+      "name": "Identity As Social Positioning and Lifestyle Signifiers",
+      "definition": "A conceptual framework linking identity to both social positioning (stable sociological dimensions like age, gender, class) and lifestyle expression through consumer goods that communicate expressive meaning.",
+      "mechanism": "Identity operates on two dimensions: social positioning that situates individuals within societal structures, and lifestyle expression that connects consumption to personal meaning and social communication through 'lifestyle signifiers'.",
+      "boundary": "Applies to the analysis of how individuals relate to social structures and consumption patterns. Fails when applied to contexts without stable sociological dimensions or lifestyle expression.",
+      "extraction_type": "descriptive_model",
+      "depth": 2,
+      "depth_label": "cross-domain",
+      "depth_source": "canonical_adjudicated",
+      "fb_id": "ef337999f9d447dcb91fcfda3e0792b567473e8b028af290ac0de412e56f269e"
     },
     {
       "item_id": "R114",

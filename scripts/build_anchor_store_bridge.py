@@ -83,39 +83,58 @@ def read_ruler(cfg: dict) -> List[Dict[str, str]]:
         return [r for r in csv.DictReader(fh) if (r.get(cfg["item_key"]) or "").strip()]
 
 
-def read_store(cfg: dict) -> Tuple[Dict[str, str], Dict[str, List[str]]]:
-    """Read the corpus READ-ONLY and return (fb_id -> raw name, normalised name -> [fb_id]). Writes nothing."""
+def read_store(cfg: dict) -> Tuple[Dict[str, str], Dict[str, List[str]], Dict[str, str]]:
+    """Read the corpus READ-ONLY and return (fb_id -> raw name, normalised name -> [fb_id], fb_id -> run_id).
+    The run_id (pipeline_run_id) powers the D-2881 run-collision resolution (canonical run wins). Writes nothing."""
     con = sqlite3.connect(f"file:{ROOT / cfg['store']}?mode=ro", uri=True)
     con.row_factory = sqlite3.Row
     try:
-        sql = f'SELECT {cfg["store_key"]}, {cfg["store_name_column"]} FROM {cfg["store_table"]}'
+        sql = (f'SELECT {cfg["store_key"]}, {cfg["store_name_column"]}, pipeline_run_id '
+               f'FROM {cfg["store_table"]}')
         names: Dict[str, str] = {}
+        run_of: Dict[str, str] = {}
         index: Dict[str, List[str]] = {}
         for r in con.execute(sql):
             fid = str(r[cfg["store_key"]]).strip()
             raw = str(r[cfg["store_name_column"]] or "")
             names[fid] = raw
+            run_of[fid] = str(r["pipeline_run_id"] or "")
             index.setdefault(norm_name(raw, cfg["normalization"]), []).append(fid)
-        return names, index
+        return names, index, run_of
     finally:
         con.close()
 
 
 def resolve(ruler: List[Dict[str, str]], index: Dict[str, List[str]], cfg: dict,
-            raw_names: Dict[str, str]) -> dict:
+            raw_names: Dict[str, str], run_of: Optional[Dict[str, str]] = None,
+            canonical_run: Optional[str] = None) -> dict:
     """Resolve every ruler row to a corpus fb_id by CONTENT. Pure over its inputs so the known-answer controls can
     drive it with synthetic rows. Exact before normalised; >=2 candidates is AMBIGUOUS (recorded, never picked);
-    zero candidates is UNRESOLVED."""
+    zero candidates is UNRESOLVED.
+
+    D-2881: a run-collision is NOT a concept collision. When a folded name matches rows from MORE THAN ONE
+    extraction run (e.g. a pre-rechunk t11 row and a rechunk-v4-20260929 row) and EXACTLY ONE candidate is from
+    the declared `canonical_run`, that candidate resolves the collision — never a positional pick. Any other
+    multi-candidate name (two rows in the SAME run, or no canonical-run row present) stays AMBIGUOUS (D-2658)."""
     mode, item_key = cfg["normalization"], cfg["item_key"]
     entries: Dict[str, dict] = {}
     ambiguous: List[dict] = []
     unresolved: List[str] = []
-    exact_n = normalised_n = 0
+    exact_n = normalised_n = run_canonical_n = 0
     for r in ruler:
         item = (r.get(item_key) or "").strip()
         name = (r.get("name") or "").strip()
         cands = index.get(norm_name(name, mode), [])
         if len(cands) > 1:
+            if canonical_run and run_of:
+                canon = [c for c in cands if run_of.get(c) == canonical_run]
+                if len(canon) == 1:
+                    fid = canon[0]
+                    run_canonical_n += 1
+                    entries[fid] = {"item_id": item, "name": name, "name_sha256": sha256_text(name),
+                                    "join": "run_canonical",
+                                    "join_note": f"run-collision resolved to canonical run {canonical_run} (D-2881)"}
+                    continue
             ambiguous.append({"item_id": item, "name": name, "candidates": sorted(cands)})
             continue
         if not cands:
@@ -131,6 +150,7 @@ def resolve(ruler: List[Dict[str, str]], index: Dict[str, List[str]], cfg: dict,
     return {"entries": entries, "ambiguous": sorted(ambiguous, key=lambda a: a["item_id"]),
             "unresolved": sorted(unresolved),
             "counts": {"rows": len(ruler), "joined": len(entries), "exact": exact_n, "normalized": normalised_n,
+                       "run_canonical": run_canonical_n,
                        "ambiguous": len(ambiguous), "unresolved": len(unresolved)}}
 
 
@@ -166,8 +186,8 @@ def read_golden(cfg: dict, index: Dict[str, List[str]]) -> dict:
 def build(cfg: dict) -> dict:
     """Derive the whole bridge document from the declared inputs."""
     ruler = read_ruler(cfg)
-    raw_names, index = read_store(cfg)
-    res = resolve(ruler, index, cfg, raw_names)
+    raw_names, index, run_of = read_store(cfg)
+    res = resolve(ruler, index, cfg, raw_names, run_of, cfg.get("canonical_run"))
     return {
         "schema_version": "1.0",
         "artifact_id": cfg["artifact_id"],

@@ -24,6 +24,7 @@
 
 | Bug | Date | Issue |
 |---|---|---|
+| BUG-681 | 2026-10-08 | **`just health-full` = 6 faults in one pass; 2 FIXED (buglog heading not parsed; an archived retirement missing from archive/index.yaml). 4 REMAIN: 3 red contract tests outside a declared-red=0 ceiling (incl. `test_s4_golden_conforms_to_ontology` - a golden set that does not conform to the ontology) + check_encoding_homes + check_undeclared_encoding + check_boundary_rehearsal. ATTRIBUTED away from D-2878 by grep (the tests read pipeline_config.yaml/taxonomy_v5.yaml, 0 hits on any D-2878 artifact) - they are pre-existing regressions the ratified-but-uncommitted state was hiding. Diagnose (a) FIRST.** |
 | BUG-679 | 2026-10-08 | **An owner-RATIFIED `noise_drop` (RATIFY-3 DROP(13), D-2711/D-2719) reached only 5 of 13 anchor rows: 8 dropped anchors (R012 R026 R034 R082 R140 R180 R182 R200) are STILL LIVE in the frozen domain ruler with full discipline + domains, contradicting D-2813 ("for a noise_drop row depth and discipline do NOT apply"). Measured consequence: the owner was asked in round 2 to confirm axis values for rows the owner had already dropped. FIX = one owner word: propagate uniformly (ruler 201 -> 193, rows kept in the soft-quarantine ledger) OR re-affirm the 8 rows as live, which supersedes RATIFY-3.** |
 | BUG-680 | 2026-10-08 | **BUG-676 residual: the UPSTREAM anchor faces still encode discipline abstention as the out-of-menu token 'emerging'** (ANCHOR_208_CONSOLIDATED_20261007.json, 11 rows; discipline_anchor_rederived_v8_20261007.json). They are the discipline authority/consumer read by check_anchor_axis_consistency.py, so the fix is a consolidation-chain change (stamp `discipline: ""` + `discipline_status: abstained` + `discipline_source: owner_abstained` - the slots already exist), never a hand edit. |
 | BUG-242 | 2026-09-11 | **frontier69_v2 + extension80 audit outputs carry 2 data-quality defects.** (1) The `*_verdict` fields (depth/discipline/domains) are LLM SELF-REPORTS, not computed comparisons — they claim `override` even when the audit value equals silver (e.g. `S4-GOLD-MINED-00005` domains identical yet `domains_verdict=override`), so the cited "57.5% domain-override" and "80 flagged" figures are inflated. (2) Non-principle content_type rows (noise_drop/tool_instruction/process_template/process_instance/growth_edge) carry a spurious 4-way depth label, violating D2612 (depth only for principle). FIX (applied in `scripts/build_phase0_adjudication_form.py`): agreement recomputed deterministically (`differs` flag) + depth marked N/A for non-principle. REMAINS: recompute the override figures from the audit values (deterministic), and re-run the audit to null depth on non-principle if the raw artifacts are kept. |
@@ -9265,7 +9266,7 @@ application fields (primary=product design); row 39 replaced with 'code & comput
 - **Fix (this turn).** Durability + reproducibility restored: governance/OWNER_DOMAIN_REVIEW_SOURCE_20261008.csv is a faithful 9-column export of the owner sheet (201 rows, 46 oov, 11 notes, sha256 a1aa5bfe205ab5af8e82ce9f518602e586ad0693f2d5065608e5aa0d7128e53b), pinned to the .numbers sha256 14726d947959451f7b99715d5b036e94c574f8e63bccb59c3263fbd081beed3d; every ruling lives in config/owner_domain_rulings_20261008.yaml; and scripts/apply_owner_domain_review.py --check PROVES the frozen ruler is re-derivable (201 rows, sha256 b766ae91...). The derived CSV must be regenerated from the ruler or retired.
 
 
-### Update 2026-10-08 (D-2877 follow-through) — BUG-676 / BUG-677 owner confirmation round materialized
+### Update 2026-10-08 (D-2877 follow-through) — owner confirmation round materialized (see the per-bug sections below)
 
 governance/OWNER_CONFIRMATION_SHEET_20261008.csv (14 rows) is the ask for BUG-676 and the two unassigned domain
 questions: 8 rows carrying `discipline='emerging'` + 3 rows (R040/R080/R091) that are 'emerging' with an EMPTY
@@ -9344,3 +9345,45 @@ consumer by `scripts/check_anchor_axis_consistency.py`, so the correct fix is NO
 consolidation chain so an abstained row is stamped `discipline: ""` + `discipline_status: "abstained"` +
 `discipline_source: "owner_abstained"` (the schema already has those slots), which makes the ruler derivable with
 one fewer config override. Declared so the residual is visible rather than assumed away.
+
+## BUG-681 (OPEN, 2026-10-08) — `just health-full` found 6 faults in one pass; 2 fixed deterministically, 4 remain (3 red contract tests + 3 rails) and NONE is attributable to D-2878
+
+The full ladder (`just health-full`, D-2680/BUG-573: the whole fault set in ONE run - a prefix report hides
+everything after the first red) was run end-to-end for the first time this session and reported 6 faults over
+115 lines (worst rc=1, 462.7s). Two were repaired deterministically in this same round:
+
+  1. `check_buglog_coverage.py` FAIL - "1 heading(s) name a bug but are not parsed": a 2026-10-08 D-2877
+     follow-through block used `### Update ... - BUG-676 / BUG-677 ...`, and every bug-naming heading must be a
+     parsed `## BUG-` block (otherwise a reader and a parser see two different registers). FIXED: the heading no
+     longer names ids (they are referenced in the body); rail GREEN (589 blocks).
+  2. `build_archive_index.py --check` RED - `archive/discipline_anchor_conformance_20261002.json.retired_D2868_20261007`
+     was on disk but in NEITHER the index nor a declared exclusion (the BUG-537/BUG-668 class: an on-disk object
+     is indexed or DECLARED excluded, never silently absent). This is the artifact of a declared retirement
+     (D-2868), so the retirement's own bookkeeping was incomplete. FIXED: `build_archive_index.py` -> index in
+     sync (34 entries, 1 declared exclusion, 27.2 GB). Rail GREEN.
+
+STILL RED (4 faults, attributed away from D-2878):
+
+  a. `check_tests.py --check`: "3 NEW failure(s) outside the declared red set" - declared red = 0, measured 316
+     collected / 308 passed / 3 failed / 0 error:
+       - tests/test_per_label_threshold_contract.py::test_per_label_is_populated_dict
+       - tests/test_stage4_golden_contract.py::test_s4_golden_conforms_to_ontology
+       - tests/test_stage4_preflight_smoke_stress.py::test_taxonomy_cross_kind_collision_resolves_correctly
+     ATTRIBUTION (measured, not assumed): the test sources were grepped for every artifact D-2878 touched
+     (DOMAIN_RULER*, owner_domain_rulings*, the frozen anchor faces) - ZERO hits; they read
+     config/pipeline_config.yaml + config/taxonomy_v5.yaml and the S4 golden fixtures, i.e. the state changed by
+     the D-2862..D-2878 backlog (taxonomy v5->v8 migration, menu/axis changes, pipeline/stage4_merge.py), which
+     was RATIFIED-BUT-UNCOMMITTED before this round. So they are pre-existing regressions the anti-circle state
+     was hiding, NOT D-2878 fallout. The rail is explicit that a new red is a REGRESSION, never something to
+     absorb by editing the declared ceiling - hence this bug rather than a ceiling edit.
+     NOTE `test_s4_golden_conforms_to_ontology` is the material one: a golden set that does not conform to the
+     ontology is a direct hit on the ontology axis, and it must be diagnosed before any further anchor work.
+  b. `check_encoding_homes.py --check` rc=1 (D-2646: a second decode implementation is DETECTED, not remembered).
+  c. `check_undeclared_encoding.py --check` rc=1 (D-2644/BUG-521: an encoding the ENVIRONMENT decides is
+     undeclared; the class is SHRINK-ONLY, so rc=1 is a live violation).
+  d. `check_boundary_rehearsal.py` rc=1 at a REAL commit (D-2675) - the write boundary must be rehearsed at the
+     commit boundary, so this is the rail whose red matters AT the commit this round introduced.
+
+SCOPE RECOMMENDATION (next round, in this order): (1) diagnose (a) first - it is the only one on the ontology
+axis and it gates honest anchor/eval work; then (b) and (c) together (they share the decode/encoding home), then
+(d) at the next commit. Do NOT edit the declared red ceiling for any of them.

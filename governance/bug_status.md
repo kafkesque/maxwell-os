@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**163 open** / 281 closed of 444 ids.
+**164 open** / 281 closed of 445 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -170,3 +170,4 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-677 | (OPEN, 2026-10-08) — two owner-facing truths for the SAME 60 items (ANCHOR-2 sheet vs frozen ruler) | 1 |
 | BUG-679 | (OPEN, 2026-10-08) — an owner-RATIFIED `noise_drop` (RATIFY-3 DROP(13), D-2711/D-2719) reached only 5 of 13 anchor rows: 8 dropped anchors a | 1 |
 | BUG-680 | (OPEN, 2026-10-08) — the upstream anchor faces still encode discipline abstention as the out-of-menu token 'emerging' (BUG-676 residual) | 1 |
+| BUG-681 | (OPEN, 2026-10-08) — `just health-full` found 6 faults in one pass; 2 fixed deterministically, 4 remain (3 red contract tests + 3 rails) and | 1 |

@@ -240,3 +240,23 @@ domain/discipline authority to the owner-derived ruler and lower `ceiling_diverg
 **No pins block it:** audited `config/recalibration_pins.yaml`, `config/artifact_authority.yaml`,
 `config/derivations.yaml` and `config/generator_pins.yaml` — none pins either face, so the projection itself
 triggers no owner re-mint gate.
+
+### 8.5 The new cross-face rail's FIRST LIVE CATCH (2026-10-08, same round)
+
+Minutes after the ladder was unblocked, \`--check-faces\` FAILED the health recipe: **93 divergent cells against a
+declared ceiling of 92**. Exactly one cell, and it was the owner's own round-4 ruling:
+
+> R091's discipline = \`systems thinking\` landed in the owner-derived ruler, while the CONSOLIDATED face — the
+> one the PIPELINE reads — still carries \`emerging\` for R091.
+
+That is the most useful possible first catch: the rail exposed a genuine propagation gap in a ruling made minutes
+earlier, and it did so as a HARD failure (\`rc=1\` aborts the ladder), not a note. The ceiling was then
+**re-declared to the re-measured 93** — the deliberate act the rail forces, because a growth may not be silent —
+with the drop-residue half UNCHANGED at 46. `discipline_anchor_rederived_v8` = 45 divergent / 23 residue;
+`ANCHOR_208_CONSOLIDATED` = 48 / 23. Both ceilings must reach **0** when the Stage-2 projection lands; until then
+the gap is measured on every run and can neither grow silently nor be forgotten.
+
+VERIFICATION AFTER THE RE-DECLARATION: the recipe runs PAST the rail (line 45) and PAST the old encoding blocker
+(`check_encoding_homes --check`: debt 0 of ceiling 0 | unknown 0) all the way to the end of the ladder — the prefix
+is unblocked for the first time this session. The ladder's remaining faults are exactly the two pre-existing ones
+(the 3 red contract tests of BUG-681(a) and the boundary-rehearsal marker drift of BUG-681(c)).

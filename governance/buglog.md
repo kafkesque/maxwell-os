@@ -26,7 +26,7 @@
 |---|---|---|
 | BUG-682 | 2026-10-08 | **The discipline/domain/primary_domain axis had TWO homes: the OWNER's rulings (round 2+3) exist only in the owner-sheet-derived ruler, while the face the pipeline reads (\`discipline_anchor_rederived_v8_20261007.json\`, declared authority by config/anchor_axis_authority.yaml + config/anchor_family.yaml, D-2868) still carries the pre-ruling values. MEASURED: 92 divergent + 46 drop-residue axis cells (rederived_v8 45/23, CONSOLIDATED 47/23) on 194 shared ids. It stayed invisible because (i) the ladder's axis rail compared the authority with ANCHOR_208_CONSOLIDATED, which is REGENERATED FROM it - a control that cannot fire - and (ii) the ruler had a SECOND writer (build_domain_ruler.py, deriving from the stale face) that a re-run would have used to SILENTLY REVERT the owner's rulings (D-387 class). LANDED THIS ROUND: a tri-state cross-face rail in the ladder (--check-faces, measured SHRINK-ONLY ceiling 92/46), the rival writer RETIRED as a writer (it now refuses), and a hardcoded column-name literal in the D-2870 guard replaced by the declared column (a guard that would have scanned 0 rows and printed green). NEXT: ONE projection (ruler -> rederived_v8 -> regenerate CONSOLIDATED/views + flip the axis registry) then ceiling -> 0.** |
 
-| BUG-683 | 2026-10-08 | **\`scripts/apply_owner_domain_rulings_v8.py\` is a rival WRITER of the declared authority whose input contract no longer exists: it reads \`config/owner_domain_rulings_20261008.yaml["rows"]\`, and the round-2 rewrite of that config replaced the \`rows:\` block with declarative columns, so it raises KeyError on its first line of work. It is invoked by NO rail, so the break was silent - while its docstring still asserts that folding into the authority is how the rulings become real. FIX (folds into BUG-682 Stage 2): re-point it at the RULER and make it the projection limb, or retire it as a writer like build_domain_ruler.py.** |
+| BUG-684 | 2026-10-08 | **`scripts/regenerate_anchor_208_v8.py` carries a SECOND, HARDCODED copy of the drop list and of the emerging set as PYTHON LITERALS: `NOISE_DROP = {"R021","R084","R106","R148"}` and `EMERGING = {"R040","R080","R091"}` (C12 violation: a value that is configurable by nature, declared in code). This is the MECHANISM by which the owner-ratified DROP(13) could never reach `ANCHOR_208_CONSOLIDATED`: the ruler said "drop", the regenerator had its own four-id literal and re-populated every other dropped row from the stale authority - which is why BUG-679's residues were invisible in the face the pipeline reads. Consequence today: R040/R080 would still be written as `discipline="emerging"` (an out-of-menu token) and R140/R012/etc. would still get full axes. FIX (part of BUG-682 Stage 2): read the drop / abstention / emerging sets from config and project the regenerator's three axis columns from the ruler, never from literals.** | **\`scripts/apply_owner_domain_rulings_v8.py\` is a rival WRITER of the declared authority whose input contract no longer exists: it reads \`config/owner_domain_rulings_20261008.yaml["rows"]\`, and the round-2 rewrite of that config replaced the \`rows:\` block with declarative columns, so it raises KeyError on its first line of work. It is invoked by NO rail, so the break was silent - while its docstring still asserts that folding into the authority is how the rulings become real. FIX (folds into BUG-682 Stage 2): re-point it at the RULER and make it the projection limb, or retire it as a writer like build_domain_ruler.py.** |
 | BUG-681 | 2026-10-08 | **`just health-full` = the ladder's WHOLE fault set. Round 2 measured 6; round 3 measures `FAIL ladder scan: 3 fault(s) in ONE pass` over 118 lines (503s), worst rc=1 (D-2680/BUG-573). FIXED so far: the unparsed buglog heading, the missing archive-index entry, and `check_undeclared_encoding`. THE 3 REMAINING: (a) `check_tests --check` = 3 red contract tests outside a declared-red=0 ceiling, incl. `test_s4_golden_conforms_to_ontology` (a golden set that does not conform to the ontology) - pre-existing, attributed away from the ANCHOR work by grep; (b) `check_encoding_homes --check` rc=1 - **this one BLOCKS the `just health` prefix**, offender NAMED with a line number: `scripts/remap_referee_v7_28rows.py:69` opens the owner remap CSV with a local `encoding="utf-8-sig"` instead of the ONE declared decode home (`scripts/lib/artifact_encoding.py`, D-2644/D-2646) - the honest fix needs a DECLARATION for that CSV; (c) `check_boundary_rehearsal` rc=1, newly diagnosed: `bootstrap.whole_tree_refused: refused (rc=1) but not for the declared reason 'FORBIDDEN session plan' (RAIL 4) - a refusal that does not name its cause cannot justify a bypass` - i.e. a whole-tree commit is still refused, but by a DIFFERENT rail than the declared one, so either the declared marker is stale or an earlier rail now refuses; do NOT hand-edit the declared reason (that hides the drift) - retain the fixture and print the ACTUAL refusal text. Diagnose (b) FIRST: it is the blocker that hides (a) and (c).** |
 | BUG-242 | 2026-09-11 | **frontier69_v2 + extension80 audit outputs carry 2 data-quality defects.** (1) The `*_verdict` fields (depth/discipline/domains) are LLM SELF-REPORTS, not computed comparisons — they claim `override` even when the audit value equals silver (e.g. `S4-GOLD-MINED-00005` domains identical yet `domains_verdict=override`), so the cited "57.5% domain-override" and "80 flagged" figures are inflated. (2) Non-principle content_type rows (noise_drop/tool_instruction/process_template/process_instance/growth_edge) carry a spurious 4-way depth label, violating D2612 (depth only for principle). FIX (applied in `scripts/build_phase0_adjudication_form.py`): agreement recomputed deterministically (`differs` flag) + depth marked N/A for non-principle. REMAINS: recompute the override figures from the audit values (deterministic), and re-run the audit to null depth on non-principle if the raw artifacts are kept. |
 | BUG-228 | 2026-09-08 | **Dead/aspirational schema fields — 0 code references.** `parent_pt_id` (process_instance's tether to a template), `promoted_to_type`/`promoted_to_id`/`parent_fb_ids` (growth_edge promotion), MCP `annotations` (`readOnlyHint`/`destructiveHint`/`idempotentHint`), `consulted_fbs`/`template_source` — all declared in `content_types.yaml`, all 0 refs in `pipeline/`+`scripts/`. Consequence: `process_instance` is indistinguishable from an unlinked anecdote; `growth_edge` is a dead-end bucket with a staging-area description; MCP-promotion aspiration is unbacked. False affordances for future retrieval code. Fix = prune or ship; backfill `parent_pt_id` when a PT exists (§1.3.2 of the adjudication doc). |
@@ -9477,7 +9477,13 @@ WHY NOTHING SAID SO (four compounding limbs, three fixed this round):
      CONSOLIDATED face; \`apply_owner_domain_review.py\` derives it from the pinned owner sheet. A re-run of the
      first would have SILENTLY REVERTED every owner ruling (the D-387 anti-REVERT class). FIXED: retired as a
      writer - it now refuses and names the ONE derivation.
-  3. **A guard read a column name as a LITERAL.** The D-2870 catch-all guard
+  3b. **The regenerator carried a hardcoded copy of the drop set.** `scripts/regenerate_anchor_208_v8.py`
+     declares `NOISE_DROP = {"R021","R084","R106","R148"}` and `EMERGING = {"R040","R080","R091"}` as Python
+     literals, so the drop list had TWO homes (the config AND a code literal) and the CONSOLIDATED face was
+     re-populated from the stale authority for every row the literal did not name. That is the exact mechanism
+     that made BUG-679's residues invisible in the face the pipeline reads -> filed as **BUG-684** (C12: a
+     configurable value in code); its fix is Stage 2's first step.
+  4. **A guard read a column name as a LITERAL.** The D-2870 catch-all guard
      (scripts/check_anchor_axis_consistency.py) read \`r.get("domain")\` - so the day the declared authority's
      column changes (the ruler's is \`domains\`), it would scan ZERO rows and print a green line: a control that
      cannot fire, the worst kind of green. FIXED: the column name now comes from the declared authority (C12);
@@ -9519,6 +9525,14 @@ CSV with a local \`encoding="utf-8-sig"\` instead of delegating to the ONE decla
 does not crash, it silently changes text two readers then compare, BUG-511). The declared ceiling is 0 with an
 empty allow list (shrink-only, D-2642).
 
+LIMB (b) FIXED THIS ROUND (round 4). `scripts/remap_referee_v7_28rows.py` line 69 opened the owner remap
+CSV with a local `encoding="utf-8-sig"` - a SECOND implementation of the decode rule the rail exists to remove.
+The read now delegates to the ONE home (`scripts/lib/artifact_encoding.py#open_artifact`, D-2644/D-2646) and the
+substitution was PROVEN behaviour-preserving before the change was kept: the retired literal and the home return
+IDENTICAL rows (28/28, `rows_old == rows_new` True), the artifact is plain valid UTF-8 (so the home returns
+utf-8, not a guess) and no declaration is needed. `check_encoding_homes --check`: debt 0 of ceiling 0, unknown 0.
+**THE `just health` PREFIX IS UNBLOCKED** - the ladder now reaches every declaring line below it again.
+
 NEW THIRD FAULT, DIAGNOSED THIS ROUND (the ladder now reports 3, not 6 - three of the round-2 faults are fixed):
 \`check_boundary_rehearsal\` rc=1 - "bootstrap.whole_tree_refused: refused (rc=1) but not for the declared reason
 'FORBIDDEN session plan' (RAIL 4) - a refusal that does not name its cause cannot justify a bypass". So a whole-tree
@@ -9533,3 +9547,32 @@ FIX (needs a decision, so it is queued as the next critical step rather than imp
 (\`config/reconciliation.yaml\` / \`config/cohort_declaration.yaml\`) - the honest fix, because the declaration is a
 FACT about the artifact and \`open_artifact\` fails closed on an undeclared path. The alternative (an \`allow\`
 entry) is a declared second implementation, i.e. the debt this rail exists to remove.
+
+## BUG-684 (OPEN, 2026-10-08) — the regenerator carries a HARDCODED second home of the drop list, which is why the owner-ratified drop could never reach the face the pipeline reads
+
+MEASURED (the mechanism behind BUG-679, found while auditing the Stage-2 projection before writing it):
+
+    NOISE_DROP = {"R021", "R084", "R106", "R148"}       # D-2844 noise rows
+    EMERGING   = {"R040", "R080", "R091"}               # emerging-discipline rows (dropped from rederive)
+
+Those two PYTHON LITERALS live in `scripts/regenerate_anchor_208_v8.py`, the script that writes
+`governance/ANCHOR_208_CONSOLIDATED_20261007.json` - the face the pipeline actually reads. Its row loop takes
+discipline/domains FROM `discipline_anchor_rederived_v8_20261007.json` for every row it finds there, falls back to
+`EMERGING` for three named ids and to `noise_drop` for the rest.
+
+CONSEQUENCE (the whole reason BUG-679 was invisible): the drop list had **TWO homes** - the config
+(`noise_drop_excluded`, which the owner-derived ruler reads) and this literal (which the pipeline-facing face
+reads). The owner-ratified DROP(13) could therefore only ever remove the four ids the literal happened to contain;
+every other dropped row was RE-POPULATED from the stale authority on the next regeneration. The remaining ids
+(R012 R026 R034 R082 R140 R180 R182 R200) settled back into the face the pipeline reads at every run, so the
+ruler could say "dropped" while the pipeline saw a full label - two homes, one fact, silent disagreement.
+
+CLASS: C12 - a value that is configurable BY NATURE (the owner's drop set) declared in code. Two more C12 limbs in
+the same literal pair: `EMERGING` names R040/R080 (both now declared DROPS) and R091 (now owner-KEPT with a ruled
+discipline), so all three entries are stale in the wrong direction at once.
+
+FIX (Stage 2's FIRST step, and it must come before the projection): read the drop / abstention / emerging sets
+from config and project the three axis columns FROM the owner-derived ruler - never from a literal, and never
+from the stale authority. Then `ANCHOR_208_CONSOLIDATED` can only ever carry what the ruler says, and the
+cross-face rail (`apply_owner_domain_review.py --check-faces`) can be lowered to a ceiling of 0 with nothing left
+to hide behind.

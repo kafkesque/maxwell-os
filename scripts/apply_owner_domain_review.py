@@ -244,7 +244,10 @@ def build_reinstated(cfg: dict[str, Any], dom_set: set[str], disc_set: set[str],
         if primary != doms[0]:
             raise SystemExit("FAIL-CLOSED: reinstated row " + item + " primary " + primary
                              + " != domains[0] " + doms[0] + " (OntoClean: primary IS the first role)")
-        disc = str(spec.get("discipline") or "")
+        # ONE home for every discipline ruling: config#discipline_override decides, and a reinstatement may
+        # only carry the value as a redundant echo (BUG-675's lesson: a ruling in a second place is a ruling
+        # that will disagree with itself).
+        disc = str((cfg.get("discipline_override") or {}).get(item) or spec.get("discipline") or "")
         if spec.get("abstain_discipline"):
             if disc:
                 raise SystemExit("FAIL-CLOSED: reinstated row " + item
@@ -353,6 +356,15 @@ def derive_rows(cfg: dict[str, Any]) -> tuple[list[dict[str, Any]], list[str]]:
     if absent:
         raise SystemExit("FAIL-CLOSED: config declares discipline_abstention for row(s) that are NOT in the "
                          "ruler: " + ", ".join(absent) + " - an abstention for a dropped row is a category error")
+    # ...and the OTHER direction (BUG-676's principle applied to the declaration itself): a row declared as an
+    # abstention must actually carry no discipline. Without this, a stale declaration survives a ruling that
+    # later NAMES the discipline - the config would say "abstained" while the authority says "systems thinking",
+    # and a reader would trust whichever file it opened (the BUG-682 shape, one level down).
+    ruled = {r["item_id"]: r["discipline"] for r in out}
+    misdeclared = sorted(i for i in abstained if ruled.get(i))
+    if misdeclared:
+        raise SystemExit("FAIL-CLOSED: row(s) are declared in discipline_abstention but the ruler carries a "
+                         "discipline for them: " + ", ".join(misdeclared))
     assert_partition(cons_ids, out, drops)
     for item, why in (cfg.get("pending_owner_rows") or {}).items():
         warnings.append("PENDING-OWNER: " + str(item) + " " + " ".join(str(why).split())[:190])
@@ -419,7 +431,10 @@ def apply(rulings: Path | None = None) -> int:
                  "rows " + "/".join(drops) + " are REMOVED (the RATIFY-3 DROP(13) now reaches 13/13 + R040, "
                  "BUG-679); owner-kept row(s) " + "/".join(sorted(cfg.get("reinstated_rows") or {}))
                  + " reinstated by declaration; owner-confirmed discipline abstentions declare discipline='' "
-                   "(BUG-676 fix); the R158 domain drop is APPLICABILITY-ranked (D-2878), never positional; "
+                   "(BUG-676 fix, now asserted in BOTH directions); the R158 domain drop is "
+                   "APPLICABILITY-ranked (D-2878), never positional, and R158's PRIMARY (design strategy) was "
+                   "ratified FINAL by the owner on 2026-10-08 (round 4) - not re-openable by inference; R091's "
+                   "discipline = systems thinking (round-4 owner-approved senior ruling, not an abstention); "
                    "verify with: python3 scripts/apply_owner_domain_review.py --check"),
     })
     art.pop("n_skipped_empty", None)  # superseded by the partition invariant (a skip is no longer a category)

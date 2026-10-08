@@ -40,7 +40,18 @@ abstention: emerging
 normalize:
   educational: education
 # BUG-675: the two free-text DISCIPLINE directives carried in the owner's owner_notes column.
+# R091 (round 4, owner-approved on the senior recommendation): the discipline of "Autopoesis in Design
+# Education" is the RIGID KIND of the content, i.e. the tradition the construct comes from - autopoiesis is
+# Maturana & Varela's SYSTEMS-THEORY construct (organisational closure, self-reference), so
+# `systems thinking` ("understanding complex systems by analyzing their interrelationships and holistic
+# behavior") is the fit. `complex adaptive systems` is REJECTED on the menu's own definition ("systems
+# composed of interacting agents that ADAPT and evolve over time"): autopoiesis is deliberately NOT an
+# adaptation/evolution account, it is a self-production/closure account - choosing CAS would import the
+# wrong rigid kind. `cognitive science` is rejected (this is not a claim about the mind) and
+# `design thinking` is rejected (its definition yields "a designed solution", not the explanation of a
+# self-producing system). This ruling lives in ONE home: this key, read for reinstated rows too.
 discipline_override:
+  R091: systems thinking
   R141: machine learning
   R159: risk management
 # Primary-domain overrides from owner_notes free text ("X primary ...").
@@ -98,9 +109,9 @@ reinstated_rows:
       - education
       - design strategy
     primary_domain: education
-    discipline: ''
-    abstain_discipline: true
-    why: "raw discipline 'creative education' is off the 64-menu -> declared abstention; the owner named the application roles (education, design strategy) but no discipline"
+    discipline: ''            # the ruling itself lives in discipline_override (ONE home); see its comment
+    abstain_discipline: false
+    why: "owner-kept (round 3) + discipline ruled round 4 = 'systems thinking' (the autopoiesis tradition), approved on the senior recommendation; the raw upstream 'creative education' is off the 64-menu and is NOT used"
 # Since D-2878 every cap overshoot is resolved by an explicit remove_domains directive above, so NO positional
 # (tail) cap-drop remains declared. An undeclared truncation is still reported as CAP-DROP(NEW/UNDECLARED).
 declared_cap_drops: {}
@@ -108,11 +119,13 @@ declared_cap_drops: {}
 # (open-set rejection), not a discipline: it may not sit in a frozen authority as if it were a menu value
 # (law of non-contradiction on one axis). The ruler therefore carries discipline='' plus a declared id here.
 # R140 left this list in round 3: the owner ruled it a DROP, and an abstention for a dropped row is a
-# category error (asserted fail-closed by the script).
+# category error (asserted fail-closed by the script). R091 left it in round 4: the owner approved the
+# senior discipline recommendation, so its discipline is ruled rather than abstained.
+# R158's PRIMARY (design strategy) was confirmed as FINAL by the owner in round 4 - it is not changed,
+# and it is not re-opened by inference (recorded in the frozen artifact's note).
 discipline_abstention:
   - R006
   - R059
-  - R091
   - R127
   - R146
   - R165

@@ -154,3 +154,89 @@ The two SUBSTANTIVE counterarguments it produced are kept as caveats on the reco
 2. **R091** — the abstention is "a procedural constraint failure, not a conceptual one". Correct, and the design already
    treats it that way: the abstention is DECLARED (config#discipline_abstention), it warns on every run, and the owner
    holds a one-word upgrade (§5.1). No synthesized label was written (D-2813).
+
+## 8. ROUND 4 (2026-10-08, 19:04) — the two micro-gates CLOSED, the ladder UNBLOCKED, and the mechanism behind the BUG-679 gap NAMED
+
+**Owner's words (verbatim):** `R158 keep it` · `R091 what is your stier senior rag enigineer recommendation ? I approve`.
+This section SUPERSEDES §5.1 and §5.2 (both micro-gates are now closed).
+
+### 8.1 R158 — the primary is ratified FINAL (no field changed)
+
+`design strategy` stays the primary of "Duality in Design". Nothing was changed by inference and nothing is
+re-openable by inference: the ratification is recorded in the **frozen artifact's own `note` field** — a
+machine-visible home with a reader — so a future agent cannot re-open a settled owner value without the artifact
+disagreeing with itself. (`design strategy` still ranks low on intrinsic applicability; that is now a
+*documented* characteristic of an owner-agreed value, not a pending question.)
+
+### 8.2 R091 — discipline ruled: **systems thinking** (recommendation + approval)
+
+**The recommendation, and the ontology behind it.** `discipline` is the RIGID KIND of the content — the tradition
+the construct comes from — not the area it is applied in and not the method the source recommends. Autopoiesis
+(Maturana & Varela: self-producing, self-referential, organisationally-closed systems) is a **systems-theory**
+construct. The menu's own definitions decide it:
+
+* **`systems thinking` — CHOSEN.** "An approach to understanding complex systems by analyzing their
+  interrelationships and holistic behavior." Organisational closure and self-reference ARE interrelationship and
+  holistic behaviour.
+* **`complex adaptive systems` — REJECTED, and its definition is the reason.** "Dynamic systems composed of
+  interacting agents that **adapt and evolve** over time." Autopoiesis is deliberately **not** an
+  adaptation/evolution account — it is a self-production/closure account, and adaptation is famously what it
+  brackets out. Choosing CAS would import the wrong rigid kind on the axis that is meant to be axis-of-record.
+* **`cognitive science` — rejected** (this is not a claim about the mind; its own definition calls itself the
+  default home for cognition claims) and **`design thinking` — rejected** (its definition yields "a designed
+  solution, not an explanation of the mind"; this item explains a self-producing system and prescribes a
+  reflective-practice application).
+
+**How it landed (one home, no mutation).** The ruling lives in `config#discipline_override`; the reinstatement
+spec no longer echoes a value (a ruling in two places is a ruling that will disagree with itself — BUG-675's
+lesson). `build_reinstated` now reads the override, so a reinstated row and a re-derived row are ruled in exactly
+the same way. R091 leaves `discipline_abstention` (7 rows remain: R006 R059 R127 R146 R165 R183 R202).
+
+**A NEW guard, because the change exposed a hole.** The abstention assertion ran in ONE direction (a declared
+abstention must be in the ruler). The moment a discipline was *named* for a previously-abstained row, the config
+could have said "abstained" while the authority said "systems thinking" — and a reader would trust whichever file
+it opened (the BUG-682 shape, one level down). It is now asserted in **both** directions: a row declared
+abstained must carry **no** discipline in the ruler, or the run fails closed.
+
+Ruler re-stamp: `d867ce5e059ac25d…` -> `5ce242edbbf3bc0c…` (194 rows, 22 declared warnings, `--check` byte-identical).
+
+### 8.3 The `just health` PREFIX IS UNBLOCKED (BUG-681 limb (b) closed), and the fix was PROVEN inert
+
+`scripts/remap_referee_v7_28rows.py` line 69 carried a local `encoding="utf-8-sig"` — a **second implementation**
+of the decode rule that `scripts/lib/artifact_encoding.py` exists to be the only home of (D-2644/D-2646). The
+rail's own docstring records why that matters: a *guessed* encoding does not crash, it silently changes text two
+readers then compare (BUG-511).
+
+Before keeping the change, the substitution was MEASURED, not assumed: the retired literal and the declared home
+return **identical rows** (28/28, `rows_old == rows_new` → True); the artifact is plain valid UTF-8, so the home
+returns `utf-8` and no declaration is needed. `check_encoding_homes --check`: **debt 0 of ceiling 0, unknown 0**.
+The ladder now reaches every declaring line below line 78 again — which is how the rest of this round's faults
+became visible in one pass.
+
+### 8.4 The MECHANISM behind the BUG-679 gap, named (BUG-684) — and the full Stage-2 audit
+
+Auditing the projection BEFORE writing it found the missing link, in code:
+
+> `scripts/regenerate_anchor_208_v8.py` declares `NOISE_DROP = {"R021","R084","R106","R148"}` and
+> `EMERGING = {"R040","R080","R091"}` as **Python literals**, and re-populates the CONSOLIDATED face from the
+> stale authority for every row those literals do not name.
+
+So the drop list had **two homes** (the config AND a code literal), and the owner's ratified drop could only ever
+remove the four ids the literal happened to contain. That is precisely why BUG-679's residues were invisible in
+the face the pipeline reads. Filed as **BUG-684** (C12: a value that is configurable by nature, declared in code).
+
+**Stage-2 blast radius, audited (6 places):** (1) `regenerate_anchor_208_v8.py` — take the drop / abstention /
+emerging sets from config and project from the ruler (BUG-684); (2)
+`discipline_anchor_rederived_v8_20261007.json` — project the three axis columns (drops cleared + stamped
+`noise_drop`; the 7 abstentions stamped `discipline:""` + `discipline_status: abstained`; R091 added if the frame
+becomes the ruler's 194-row set); (3) `config/anchor_family.yaml` — the cohort declarations (`cohort: 201`,
+`cohort_human_adjudicated: 201`, `primary_domain_filled: 201`, the 7-row exclusion comment, and
+`advisory_rows_accepted_20260930: [R003, R140, R146]` which names R140, now a DROP); (4) the DEPTH authority —
+D-2813 says depth does not apply to a noise_drop row, so the 8 newly-dropped rows need their depth cleared there
+too; (5) the five-axis views (regenerated from the consolidated face); (6) the registries — flip the
+domain/discipline authority to the owner-derived ruler and lower `ceiling_divergence` / `ceiling_drop_residue` to
+**0**.
+
+**No pins block it:** audited `config/recalibration_pins.yaml`, `config/artifact_authority.yaml`,
+`config/derivations.yaml` and `config/generator_pins.yaml` — none pins either face, so the projection itself
+triggers no owner re-mint gate.

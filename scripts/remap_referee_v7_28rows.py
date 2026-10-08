@@ -31,11 +31,14 @@ import hashlib
 import json
 import os
 import shutil
+import sys
 import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT / "scripts"))
+from lib import artifact_encoding  # noqa: E402 - D-2644/D-2646: the decode rule has ONE home
 SRC_MANIFEST = ROOT / "governance" / "discipline_anchor_rederived_v6_20261006d.json"
 CSV = ROOT / "governance" / "rederive_v6_referee_28row_remap_20261007.csv"
 PINS_YAML = ROOT / "config" / "menu_axis_hashes.yaml"
@@ -66,7 +69,11 @@ def load_pins() -> dict[str, str]:
 def load_csv() -> list[dict[str, str]]:
     """Load the 28-row owner review; every row must be owner-approved (fail-closed)."""
     rows: list[dict[str, str]] = []
-    with open(CSV, encoding="utf-8-sig", newline="") as fh:
+    # D-2644/D-2646: the decode rule has exactly ONE home. A local encoding= here is a SECOND implementation
+    # of that rule (the class this rail exists to remove), and a GUESSED encoding does not crash - it silently
+    # changes text two readers then compare (BUG-511). The CSV is plain valid UTF-8 (measured), so the home
+    # returns utf-8 and this read is byte-for-byte the same rows as the retired utf-8-sig literal.
+    with artifact_encoding.open_artifact(CSV, ROOT) as fh:
         for r in csv.DictReader(fh):
             rows.append(r)
     if len(rows) != 28:

@@ -249,3 +249,39 @@ owner-gated RUNTIME action (D-2727).
 
 **OWNER MICRO-GATES (nothing blocking; one word each):** (a) R091's discipline — name a canonical from the 64-menu or
 confirm the abstention; (b) R158's primary — `design strategy` ranks 8/9 on intrinsic applicability, move it or keep it.
+
+---
+
+## 2026-10-08 ADDENDUM 3 — D-2880 owner review ROUND 4 (both micro-gates closed; the ladder prefix unblocked; the BUG-679 mechanism named)
+
+**C15 CARRIED FORWARD: 166 unresolved ids** (register re-derived: **1010 decisions · 448 bugs, 166 open / 282 closed;
+highest OPEN = BUG-684**). Machine-derived open-id list: `governance/bug_status.json`.
+
+OWNER RULINGS IMPLEMENTED (D-2880, stamp c84d4b033f1be1bd): **R158 primary ratified FINAL** (`design strategy`;
+nothing changed, recorded in the artifact's own `note` so it cannot be re-opened by inference). **R091 discipline =
+`systems thinking`** (owner-approved on the senior recommendation; ontology: discipline = RIGID KIND, and
+autopoiesis is Maturana & Varela's systems-theory construct — `complex adaptive systems` REJECTED because its own
+menu definition is about systems that ADAPT AND EVOLVE, which autopoiesis deliberately is not; `cognitive science`
+and `design thinking` rejected on the same definition-first test). R091 left `discipline_abstention` (7 rows
+remain). A NEW GUARD now asserts the abstention declaration in BOTH directions. Ruler `d867ce5e…` -> `5ce242ed…`.
+
+**THE `just health` PREFIX IS UNBLOCKED** (BUG-681 limb (b) CLOSED, and it was the highest-value fix available):
+`scripts/remap_referee_v7_28rows.py:69` carried a second implementation of the decode rule; it now delegates to the
+ONE home and the substitution was MEASURED inert (identical 28/28 rows). Before this, the ladder stopped there and
+every rail below was invisible — the ladder's own observability is a control.
+
+**BUG-684 FILED — the mechanism behind BUG-679, in code:** `scripts/regenerate_anchor_208_v8.py` carries the drop
+set as PYTHON LITERALS (`NOISE_DROP = {R021,R084,R106,R148}`, `EMERGING = {R040,R080,R091}`) and re-populates the
+PIPELINE-FACING face from the stale authority for every row they do not name. Two homes, one fact: that is why the
+owner's ratified drop could never reach the face that matters.
+
+**NEXT CRITICAL STEP (Stage 2, blast radius audited, no pin blocks it — 6 places):** (1) fix BUG-684 (config-driven
+sets + project from the ruler); (2) project `discipline_anchor_rederived_v8_20261007.json`'s three axis columns
+(drops cleared + stamped `noise_drop`; abstentions stamped `discipline:""` + `discipline_status: abstained`);
+(3) update `config/anchor_family.yaml`'s cohort declarations (201 -> the projected set) and drop R140 from
+`advisory_rows_accepted_20260930`; (4) clear depth for the 8 newly-dropped rows in the DEPTH authority (D-2813);
+(5) regenerate the five-axis views; (6) flip the axis registries to the owner-derived ruler and lower
+`ceiling_divergence`/`ceiling_drop_residue` to **0** — which closes BUG-680, BUG-682, BUG-683 and BUG-684 together.
+Then: `check_tests` (3 pre-existing red contract tests) and `check_boundary_rehearsal` (a whole-tree commit is
+refused for a reason OTHER than the declared marker — never hand-edit the declaration). RATIFY-2 full S4->S5->S6
+rerun remains the only owner-gated RUNTIME action (D-2727).

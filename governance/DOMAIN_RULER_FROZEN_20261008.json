@@ -5,7 +5,7 @@
   "source": "ANCHOR_208_CONSOLIDATED_20261007.json",
   "n_anchor_rows": 208,
   "n_ruler_rows": 194,
-  "sha256": "d867ce5e059ac25d6d71d904cbc481a128599bac8ab3cf880be2071a21c05f4c",
+  "sha256": "5ce242edbbf3bc0cffbd2b8e0ecc1657d6a02c6f08f1a6b31463d30a18507b7c",
   "rows": [
     {
       "item_id": "R001",
@@ -870,7 +870,7 @@
     {
       "item_id": "R091",
       "name": "Autopoesis in Design Education",
-      "discipline": "",
+      "discipline": "systems thinking",
       "domains": [
         "education",
         "design strategy"
@@ -2031,7 +2031,7 @@
       "primary_domain": "education"
     }
   ],
-  "note": "re-derived from the 2026-10-08 owner review sheet (governance/OWNER_DOMAIN_REVIEW_SOURCE_20261008.csv, sha256-pinned) + the owner's round-2 answers (governance/OWNER_CONFIRMATION_SHEET_20261008.csv, sha256-pinned) + the owner's round-3 rulings (governance/OWNER_RULINGS_ROUND3_20261008.md); declared owner noise_drop rows R012/R021/R026/R034/R040/R080/R082/R084/R106/R140/R148/R180/R182/R200 are REMOVED (the RATIFY-3 DROP(13) now reaches 13/13 + R040, BUG-679); owner-kept row(s) R091 reinstated by declaration; owner-confirmed discipline abstentions declare discipline='' (BUG-676 fix); the R158 domain drop is APPLICABILITY-ranked (D-2878), never positional; verify with: python3 scripts/apply_owner_domain_review.py --check",
+  "note": "re-derived from the 2026-10-08 owner review sheet (governance/OWNER_DOMAIN_REVIEW_SOURCE_20261008.csv, sha256-pinned) + the owner's round-2 answers (governance/OWNER_CONFIRMATION_SHEET_20261008.csv, sha256-pinned) + the owner's round-3 rulings (governance/OWNER_RULINGS_ROUND3_20261008.md); declared owner noise_drop rows R012/R021/R026/R034/R040/R080/R082/R084/R106/R140/R148/R180/R182/R200 are REMOVED (the RATIFY-3 DROP(13) now reaches 13/13 + R040, BUG-679); owner-kept row(s) R091 reinstated by declaration; owner-confirmed discipline abstentions declare discipline='' (BUG-676 fix, now asserted in BOTH directions); the R158 domain drop is APPLICABILITY-ranked (D-2878), never positional, and R158's PRIMARY (design strategy) was ratified FINAL by the owner on 2026-10-08 (round 4) - not re-openable by inference; R091's discipline = systems thinking (round-4 owner-approved senior ruling, not an abstention); verify with: python3 scripts/apply_owner_domain_review.py --check",
   "n_noise_drop": 14,
   "n_reinstated": 1,
   "partition": "n_anchor_rows == n_ruler_rows + n_noise_drop (BUG-679 invariant)"

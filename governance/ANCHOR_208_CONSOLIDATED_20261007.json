@@ -2,11 +2,12 @@
   "_provenance": {
     "schema_version": "1.0",
     "gen_model": "none",
-    "generated_by": "scripts/regenerate_anchor_208_v8.py (D-2867)",
-    "generated_at": "2026-10-08T12:26:48.311908+00:00",
+    "generated_by": "scripts/regenerate_anchor_208_v8.py (D-2867, BUG-684 fixed)",
+    "generated_at": "2026-10-08T17:36:23.512917+00:00",
     "inputs": {
       "depth": "governance/ANCHOR_208_DEPTH_CORRECTED_20261002.json",
-      "discipline_domain": "governance/discipline_anchor_rederived_v8_20261007.json"
+      "ruler": "governance/DOMAIN_RULER_FROZEN_20261008.json",
+      "rulings": "config/owner_domain_rulings_20261008.yaml"
     }
   },
   "rows": [
@@ -52,7 +53,7 @@
       "discipline_source": "owner_finalized",
       "discipline_golden_eligible": true,
       "golden_eligible": true,
-      "domain": "research practice",
+      "domain": "research practice|user experience|education",
       "primary_domain": "research practice"
     },
     {
@@ -92,9 +93,9 @@
       "depth_label": "domain",
       "depth_source": "owner_finalized",
       "depth_golden_eligible": true,
-      "discipline": "emerging",
-      "discipline_status": "owner_finalized",
-      "discipline_source": "owner_finalized",
+      "discipline": "",
+      "discipline_status": "abstained",
+      "discipline_source": "abstained",
       "discipline_golden_eligible": false,
       "golden_eligible": false,
       "domain": "computational art|creative technology|code & computation",
@@ -157,7 +158,7 @@
       "discipline_source": "owner_finalized",
       "discipline_golden_eligible": true,
       "golden_eligible": true,
-      "domain": "product design|user experience|project management|digital product",
+      "domain": "product design|user experience|project management|digital product|business development",
       "primary_domain": "product design"
     },
     {
@@ -182,13 +183,13 @@
       "depth_label": "domain",
       "depth_source": "canonical_adjudicated",
       "depth_golden_eligible": true,
-      "discipline": "game design",
-      "discipline_status": "owner_finalized",
-      "discipline_source": "owner_finalized",
-      "discipline_golden_eligible": true,
-      "golden_eligible": true,
-      "domain": "media & entertainment|creative technology|design strategy|user experience",
-      "primary_domain": "media & entertainment"
+      "discipline": null,
+      "discipline_status": "noise_drop",
+      "discipline_source": "noise_drop",
+      "discipline_golden_eligible": false,
+      "golden_eligible": false,
+      "domain": null,
+      "primary_domain": null
     },
     {
       "item_id": "R013",
@@ -232,7 +233,7 @@
       "discipline_source": "owner_finalized",
       "discipline_golden_eligible": true,
       "golden_eligible": true,
-      "domain": "business development|business operations",
+      "domain": "business development",
       "primary_domain": "business development"
     },
     {
@@ -307,7 +308,7 @@
       "discipline_source": "owner_finalized",
       "discipline_golden_eligible": true,
       "golden_eligible": true,
-      "domain": "systems & frameworks|business development",
+      "domain": "systems & frameworks|business development|entrepreneurship|ai & agents",
       "primary_domain": "systems & frameworks"
     },
     {
@@ -352,7 +353,7 @@
       "discipline_source": "owner_finalized",
       "discipline_golden_eligible": true,
       "golden_eligible": true,
-      "domain": "personal productivity|project management",
+      "domain": "personal productivity|project management|leadership",
       "primary_domain": "personal productivity"
     },
     {
@@ -392,13 +393,13 @@
       "depth_label": "specialized",
       "depth_source": "canonical_adjudicated",
       "depth_golden_eligible": true,
-      "discipline": "information science",
-      "discipline_status": "owner_finalized",
-      "discipline_source": "owner_finalized",
-      "discipline_golden_eligible": true,
-      "golden_eligible": true,
-      "domain": "information architecture",
-      "primary_domain": "information architecture"
+      "discipline": null,
+      "discipline_status": "noise_drop",
+      "discipline_source": "noise_drop",
+      "discipline_golden_eligible": false,
+      "golden_eligible": false,
+      "domain": null,
+      "primary_domain": null
     },
     {
       "item_id": "R027",
@@ -487,7 +488,7 @@
       "discipline_source": "owner_finalized",
       "discipline_golden_eligible": true,
       "golden_eligible": true,
-      "domain": "engineering practice",
+      "domain": "engineering practice|data visualization",
       "primary_domain": "engineering practice"
     },
     {
@@ -512,13 +513,13 @@
       "depth_label": "domain",
       "depth_source": "canonical_adjudicated",
       "depth_golden_eligible": true,
-      "discipline": "design thinking",
-      "discipline_status": "owner_finalized",
-      "discipline_source": "owner_finalized",
-      "discipline_golden_eligible": true,
-      "golden_eligible": true,
-      "domain": "graphic design|design systems",
-      "primary_domain": "graphic design"
+      "discipline": null,
+      "discipline_status": "noise_drop",
+      "discipline_source": "noise_drop",
+      "discipline_golden_eligible": false,
+      "golden_eligible": false,
+      "domain": null,
+      "primary_domain": null
     },
     {
       "item_id": "R035",
@@ -577,7 +578,7 @@
       "discipline_source": "owner_finalized",
       "discipline_golden_eligible": true,
       "golden_eligible": true,
-      "domain": "research practice",
+      "domain": "research practice|data visualization",
       "primary_domain": "research practice"
     },
     {
@@ -602,9 +603,9 @@
       "depth_label": "domain",
       "depth_source": "canonical_adjudicated",
       "depth_golden_eligible": true,
-      "discipline": "emerging",
-      "discipline_status": "owner_finalized",
-      "discipline_source": "owner_finalized",
+      "discipline": null,
+      "discipline_status": "noise_drop",
+      "discipline_source": "noise_drop",
       "discipline_golden_eligible": false,
       "golden_eligible": false,
       "domain": null,
@@ -622,8 +623,8 @@
       "discipline_source": "owner_finalized",
       "discipline_golden_eligible": true,
       "golden_eligible": true,
-      "domain": "product design|user experience|design strategy",
-      "primary_domain": "product design"
+      "domain": "editorial & advertising|product design|user experience|design strategy|marketing & communications",
+      "primary_domain": "editorial & advertising"
     },
     {
       "item_id": "R042",
@@ -667,7 +668,7 @@
       "discipline_source": "owner_finalized",
       "discipline_golden_eligible": true,
       "golden_eligible": true,
-      "domain": "product design|design strategy|environmental design",
+      "domain": "product design|design strategy|environmental design|industrial design",
       "primary_domain": "product design"
     },
     {
@@ -887,9 +888,9 @@
       "depth_label": "domain",
       "depth_source": "canonical_adjudicated",
       "depth_golden_eligible": true,
-      "discipline": "emerging",
-      "discipline_status": "owner_finalized",
-      "discipline_source": "owner_finalized",
+      "discipline": "",
+      "discipline_status": "abstained",
+      "discipline_source": "abstained",
       "discipline_golden_eligible": false,
       "golden_eligible": false,
       "domain": "entrepreneurship|business development|education|product design|user experience",
@@ -937,7 +938,7 @@
       "discipline_source": "owner_finalized",
       "discipline_golden_eligible": true,
       "golden_eligible": true,
-      "domain": "marketing & communications|user experience",
+      "domain": "marketing & communications|user experience|media & entertainment",
       "primary_domain": "marketing & communications"
     },
     {
@@ -997,7 +998,7 @@
       "discipline_source": "owner_finalized",
       "discipline_golden_eligible": true,
       "golden_eligible": true,
-      "domain": "computational science & physics|code & computation",
+      "domain": "computational science & physics|code & computation|engineering practice",
       "primary_domain": "computational science & physics"
     },
     {
@@ -1027,7 +1028,7 @@
       "discipline_source": "owner_finalized",
       "discipline_golden_eligible": true,
       "golden_eligible": true,
-      "domain": "editorial & advertising|design strategy|design systems",
+      "domain": "editorial & advertising|design strategy|design systems|graphic design",
       "primary_domain": "editorial & advertising"
     },
     {
@@ -1042,7 +1043,7 @@
       "discipline_source": "owner_finalized",
       "discipline_golden_eligible": true,
       "golden_eligible": true,
-      "domain": "research practice",
+      "domain": "research practice|engineering practice",
       "primary_domain": "research practice"
     },
     {
@@ -1087,8 +1088,8 @@
       "discipline_source": "owner_finalized",
       "discipline_golden_eligible": true,
       "golden_eligible": true,
-      "domain": "business development|urban planning|design strategy",
-      "primary_domain": "business development"
+      "domain": "entrepreneurship|business development|urban planning|design strategy",
+      "primary_domain": "entrepreneurship"
     },
     {
       "item_id": "R073",
@@ -1147,7 +1148,7 @@
       "discipline_source": "owner_finalized",
       "discipline_golden_eligible": true,
       "golden_eligible": true,
-      "domain": "brand identity|marketing & communications|semiotics & communication",
+      "domain": "brand identity|marketing & communications|semiotics & communication|arts & culture",
       "primary_domain": "brand identity"
     },
     {
@@ -1192,7 +1193,7 @@
       "discipline_source": "owner_finalized",
       "discipline_golden_eligible": true,
       "golden_eligible": true,
-      "domain": "semiotics & communication",
+      "domain": "semiotics & communication|arts & culture|editorial & advertising|design strategy|graphic design|brand identity|marketing & communications",
       "primary_domain": "semiotics & communication"
     },
     {
@@ -1202,9 +1203,9 @@
       "depth_label": "domain",
       "depth_source": "canonical_adjudicated",
       "depth_golden_eligible": true,
-      "discipline": "emerging",
-      "discipline_status": "owner_finalized",
-      "discipline_source": "owner_finalized",
+      "discipline": null,
+      "discipline_status": "noise_drop",
+      "discipline_source": "noise_drop",
       "discipline_golden_eligible": false,
       "golden_eligible": false,
       "domain": null,
@@ -1232,13 +1233,13 @@
       "depth_label": "domain",
       "depth_source": "canonical_adjudicated",
       "depth_golden_eligible": true,
-      "discipline": "research methodology",
-      "discipline_status": "owner_finalized",
-      "discipline_source": "owner_finalized",
-      "discipline_golden_eligible": true,
-      "golden_eligible": true,
-      "domain": "research practice",
-      "primary_domain": "research practice"
+      "discipline": null,
+      "discipline_status": "noise_drop",
+      "discipline_source": "noise_drop",
+      "discipline_golden_eligible": false,
+      "golden_eligible": false,
+      "domain": null,
+      "primary_domain": null
     },
     {
       "item_id": "R083",
@@ -1367,13 +1368,13 @@
       "depth_label": "domain",
       "depth_source": "canonical_adjudicated",
       "depth_golden_eligible": true,
-      "discipline": "emerging",
+      "discipline": "systems thinking",
       "discipline_status": "owner_finalized",
       "discipline_source": "owner_finalized",
-      "discipline_golden_eligible": false,
-      "golden_eligible": false,
-      "domain": null,
-      "primary_domain": null
+      "discipline_golden_eligible": true,
+      "golden_eligible": true,
+      "domain": "education|design strategy",
+      "primary_domain": "education"
     },
     {
       "item_id": "R092",
@@ -1387,7 +1388,7 @@
       "discipline_source": "owner_finalized",
       "discipline_golden_eligible": true,
       "golden_eligible": true,
-      "domain": "research practice",
+      "domain": "research practice|media & entertainment|data visualization",
       "primary_domain": "research practice"
     },
     {
@@ -1417,7 +1418,7 @@
       "discipline_source": "owner_finalized",
       "discipline_golden_eligible": true,
       "golden_eligible": true,
-      "domain": "user experience",
+      "domain": "user experience|digital product|product design|web & ui",
       "primary_domain": "user experience"
     },
     {
@@ -1432,7 +1433,7 @@
       "discipline_source": "owner_finalized",
       "discipline_golden_eligible": true,
       "golden_eligible": true,
-      "domain": "product design|marketing & communications|environmental design",
+      "domain": "product design|marketing & communications|environmental design|arts & culture",
       "primary_domain": "product design"
     },
     {
@@ -1477,7 +1478,7 @@
       "discipline_source": "owner_finalized",
       "discipline_golden_eligible": true,
       "golden_eligible": true,
-      "domain": "design strategy|graphic design|digital product|product design",
+      "domain": "design strategy|graphic design|digital product|product design|arts & culture",
       "primary_domain": "design strategy"
     },
     {
@@ -1642,7 +1643,7 @@
       "discipline_source": "owner_finalized",
       "discipline_golden_eligible": true,
       "golden_eligible": true,
-      "domain": "personal productivity|user experience",
+      "domain": "personal productivity|user experience|organizational behavior",
       "primary_domain": "personal productivity"
     },
     {
@@ -1672,7 +1673,7 @@
       "discipline_source": "owner_finalized",
       "discipline_golden_eligible": true,
       "golden_eligible": true,
-      "domain": "graphic design",
+      "domain": "graphic design|arts & culture",
       "primary_domain": "graphic design"
     },
     {
@@ -1897,7 +1898,7 @@
       "discipline_source": "owner_finalized",
       "discipline_golden_eligible": true,
       "golden_eligible": true,
-      "domain": "design systems|design strategy|industrial design",
+      "domain": "design systems|design strategy|industrial design|user experience|business operations|marketing & communications",
       "primary_domain": "design systems"
     },
     {
@@ -1907,9 +1908,9 @@
       "depth_label": "specialized",
       "depth_source": "canonical_adjudicated",
       "depth_golden_eligible": true,
-      "discipline": "emerging",
-      "discipline_status": "owner_finalized",
-      "discipline_source": "owner_finalized",
+      "discipline": "",
+      "discipline_status": "abstained",
+      "discipline_source": "abstained",
       "discipline_golden_eligible": false,
       "golden_eligible": false,
       "domain": "design strategy|design systems|education",
@@ -1942,7 +1943,7 @@
       "discipline_source": "owner_finalized",
       "discipline_golden_eligible": true,
       "golden_eligible": true,
-      "domain": "research practice|business development",
+      "domain": "research practice|business development|finance & investment",
       "primary_domain": "research practice"
     },
     {
@@ -2102,13 +2103,13 @@
       "depth_label": "domain",
       "depth_source": "owner_finalized",
       "depth_golden_eligible": true,
-      "discipline": "emerging",
-      "discipline_status": "owner_finalized",
-      "discipline_source": "owner_finalized",
+      "discipline": null,
+      "discipline_status": "noise_drop",
+      "discipline_source": "noise_drop",
       "discipline_golden_eligible": false,
       "golden_eligible": false,
-      "domain": "creative technology|digital product|graphic design|user experience|web & ui",
-      "primary_domain": "creative technology"
+      "domain": null,
+      "primary_domain": null
     },
     {
       "item_id": "R141",
@@ -2192,9 +2193,9 @@
       "depth_label": "domain",
       "depth_source": "canonical_adjudicated",
       "depth_golden_eligible": true,
-      "discipline": "emerging",
-      "discipline_status": "owner_finalized",
-      "discipline_source": "owner_finalized",
+      "discipline": "",
+      "discipline_status": "abstained",
+      "discipline_source": "abstained",
       "discipline_golden_eligible": false,
       "golden_eligible": false,
       "domain": "leadership|organizational behavior",
@@ -2212,7 +2213,7 @@
       "discipline_source": "owner_finalized",
       "discipline_golden_eligible": true,
       "golden_eligible": true,
-      "domain": "research practice",
+      "domain": "research practice|data visualization",
       "primary_domain": "research practice"
     },
     {
@@ -2332,8 +2333,8 @@
       "discipline_source": "owner_finalized",
       "discipline_golden_eligible": true,
       "golden_eligible": true,
-      "domain": "business development|leadership",
-      "primary_domain": "business development"
+      "domain": "personal productivity|business development|leadership",
+      "primary_domain": "personal productivity"
     },
     {
       "item_id": "R156",
@@ -2347,7 +2348,7 @@
       "discipline_source": "owner_finalized",
       "discipline_golden_eligible": true,
       "golden_eligible": true,
-      "domain": "design strategy|design systems|user experience",
+      "domain": "design strategy|design systems|user experience|education",
       "primary_domain": "design strategy"
     },
     {
@@ -2362,8 +2363,8 @@
       "discipline_source": "owner_finalized",
       "discipline_golden_eligible": true,
       "golden_eligible": true,
-      "domain": "education|user experience",
-      "primary_domain": "education"
+      "domain": "marketing & communications|education|user experience|personal productivity|semiotics & communication|arts & culture",
+      "primary_domain": "marketing & communications"
     },
     {
       "item_id": "R158",
@@ -2377,7 +2378,7 @@
       "discipline_source": "owner_finalized",
       "discipline_golden_eligible": true,
       "golden_eligible": true,
-      "domain": "design strategy|design systems|user experience",
+      "domain": "design strategy|design systems|user experience|semiotics & communication|arts & culture|illustration|graphic design",
       "primary_domain": "design strategy"
     },
     {
@@ -2392,8 +2393,8 @@
       "discipline_source": "owner_finalized",
       "discipline_golden_eligible": true,
       "golden_eligible": true,
-      "domain": "user experience|research practice",
-      "primary_domain": "user experience"
+      "domain": "research practice|user experience|digital product|product design",
+      "primary_domain": "research practice"
     },
     {
       "item_id": "R160",
@@ -2437,7 +2438,7 @@
       "discipline_source": "owner_finalized",
       "discipline_golden_eligible": true,
       "golden_eligible": true,
-      "domain": "marketing & communications",
+      "domain": "marketing & communications|editorial & advertising|packaging|semiotics & communication",
       "primary_domain": "marketing & communications"
     },
     {
@@ -2452,7 +2453,7 @@
       "discipline_source": "owner_finalized",
       "discipline_golden_eligible": true,
       "golden_eligible": true,
-      "domain": "research practice",
+      "domain": "research practice|education|semiotics & communication",
       "primary_domain": "research practice"
     },
     {
@@ -2462,9 +2463,9 @@
       "depth_label": "specialized",
       "depth_source": "owner_finalized",
       "depth_golden_eligible": true,
-      "discipline": "emerging",
-      "discipline_status": "owner_finalized",
-      "discipline_source": "owner_finalized",
+      "discipline": "",
+      "discipline_status": "abstained",
+      "discipline_source": "abstained",
       "discipline_golden_eligible": false,
       "golden_eligible": false,
       "domain": "editorial & advertising",
@@ -2482,7 +2483,7 @@
       "discipline_source": "owner_finalized",
       "discipline_golden_eligible": true,
       "golden_eligible": true,
-      "domain": "ai & agents",
+      "domain": "ai & agents|engineering & infrastructure",
       "primary_domain": "ai & agents"
     },
     {
@@ -2602,7 +2603,7 @@
       "discipline_source": "owner_finalized",
       "discipline_golden_eligible": true,
       "golden_eligible": true,
-      "domain": "user experience",
+      "domain": "user experience|product design|digital product|industrial design",
       "primary_domain": "user experience"
     },
     {
@@ -2647,7 +2648,7 @@
       "discipline_source": "owner_finalized",
       "discipline_golden_eligible": true,
       "golden_eligible": true,
-      "domain": "semiotics & communication",
+      "domain": "semiotics & communication|marketing & communications",
       "primary_domain": "semiotics & communication"
     },
     {
@@ -2677,7 +2678,7 @@
       "discipline_source": "owner_finalized",
       "discipline_golden_eligible": true,
       "golden_eligible": true,
-      "domain": "graphic design|semiotics & communication",
+      "domain": "graphic design|semiotics & communication|editorial & advertising|marketing & communications|brand identity",
       "primary_domain": "graphic design"
     },
     {
@@ -2687,13 +2688,13 @@
       "depth_label": "domain",
       "depth_source": "owner_finalized",
       "depth_golden_eligible": true,
-      "discipline": "cultural studies",
-      "discipline_status": "owner_finalized",
-      "discipline_source": "owner_finalized",
-      "discipline_golden_eligible": true,
-      "golden_eligible": true,
-      "domain": "design strategy|user experience|research practice",
-      "primary_domain": "design strategy"
+      "discipline": null,
+      "discipline_status": "noise_drop",
+      "discipline_source": "noise_drop",
+      "discipline_golden_eligible": false,
+      "golden_eligible": false,
+      "domain": null,
+      "primary_domain": null
     },
     {
       "item_id": "R181",
@@ -2717,13 +2718,13 @@
       "depth_label": "domain",
       "depth_source": "owner_finalized",
       "depth_golden_eligible": true,
-      "discipline": "anthropology",
-      "discipline_status": "owner_finalized",
-      "discipline_source": "owner_finalized",
-      "discipline_golden_eligible": true,
-      "golden_eligible": true,
-      "domain": "arts & culture",
-      "primary_domain": "arts & culture"
+      "discipline": null,
+      "discipline_status": "noise_drop",
+      "discipline_source": "noise_drop",
+      "discipline_golden_eligible": false,
+      "golden_eligible": false,
+      "domain": null,
+      "primary_domain": null
     },
     {
       "item_id": "R183",
@@ -2732,9 +2733,9 @@
       "depth_label": "domain",
       "depth_source": "owner_finalized",
       "depth_golden_eligible": true,
-      "discipline": "emerging",
-      "discipline_status": "owner_finalized",
-      "discipline_source": "owner_finalized",
+      "discipline": "",
+      "discipline_status": "abstained",
+      "discipline_source": "abstained",
       "discipline_golden_eligible": false,
       "golden_eligible": false,
       "domain": "urban planning",
@@ -2767,7 +2768,7 @@
       "discipline_source": "owner_finalized",
       "discipline_golden_eligible": true,
       "golden_eligible": true,
-      "domain": "editorial & advertising|marketing & communications",
+      "domain": "editorial & advertising|marketing & communications|media & entertainment",
       "primary_domain": "editorial & advertising"
     },
     {
@@ -2782,7 +2783,7 @@
       "discipline_source": "owner_finalized",
       "discipline_golden_eligible": true,
       "golden_eligible": true,
-      "domain": "research practice",
+      "domain": "research practice|marketing & communications",
       "primary_domain": "research practice"
     },
     {
@@ -2917,7 +2918,7 @@
       "discipline_source": "owner_finalized",
       "discipline_golden_eligible": true,
       "golden_eligible": true,
-      "domain": "design systems",
+      "domain": "design systems|user experience|semiotics & communication",
       "primary_domain": "design systems"
     },
     {
@@ -2972,13 +2973,13 @@
       "depth_label": "specialized",
       "depth_source": "owner_finalized",
       "depth_golden_eligible": true,
-      "discipline": "cultural studies",
-      "discipline_status": "owner_finalized",
-      "discipline_source": "owner_finalized",
-      "discipline_golden_eligible": true,
-      "golden_eligible": true,
-      "domain": "business development|marketing & communications|user experience",
-      "primary_domain": "business development"
+      "discipline": null,
+      "discipline_status": "noise_drop",
+      "discipline_source": "noise_drop",
+      "discipline_golden_eligible": false,
+      "golden_eligible": false,
+      "domain": null,
+      "primary_domain": null
     },
     {
       "item_id": "R201",
@@ -3002,9 +3003,9 @@
       "depth_label": "domain",
       "depth_source": "owner_finalized",
       "depth_golden_eligible": true,
-      "discipline": "emerging",
-      "discipline_status": "owner_finalized",
-      "discipline_source": "owner_finalized",
+      "discipline": "",
+      "discipline_status": "abstained",
+      "discipline_source": "abstained",
       "discipline_golden_eligible": false,
       "golden_eligible": false,
       "domain": "creative technology|media & entertainment|user experience",
@@ -3112,7 +3113,7 @@
       "discipline_source": "owner_finalized",
       "discipline_golden_eligible": true,
       "golden_eligible": true,
-      "domain": "ai & agents|education",
+      "domain": "ai & agents|education|information architecture",
       "primary_domain": "ai & agents"
     },
     {

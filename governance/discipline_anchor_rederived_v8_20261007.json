@@ -1,6 +1,6 @@
 {
   "artifact_id": "discipline_anchor_rederived_v8_20261007",
-  "total": 201,
+  "total": 202,
   "menu_hash": "8218d6db91add9888d2b1f96ecb134a34ce7c300379d07886c998bc8f8148c71",
   "answer_space_hash": "5bd9456802db9efe807c89f3b837ae18a70d32de795793f6c1705c192cc67ebd",
   "taxonomy_version": "v8",
@@ -90,7 +90,9 @@
       "name": "Quantum Cognitive Effects in Survey Design",
       "discipline": "cognitive science",
       "domains": [
-        "research practice"
+        "research practice",
+        "user experience",
+        "education"
       ],
       "discipline_source": "owner_finalized",
       "domain_source": "owner_finalized",
@@ -117,7 +119,7 @@
           "verdict": "weak"
         }
       },
-      "domain": "research practice",
+      "domain": "research practice|user experience|education",
       "primary_domain": "research practice"
     },
     {
@@ -193,13 +195,13 @@
     {
       "item_id": "R006",
       "name": "Generative Algorithmic Composition",
-      "discipline": "emerging",
+      "discipline": "",
       "domains": [
         "computational art",
         "creative technology",
         "code & computation"
       ],
-      "discipline_source": "owner_finalized",
+      "discipline_source": "abstained",
       "domain_source": "owner_finalized",
       "_stamp": {
         "anchor_version": "v8",
@@ -344,7 +346,8 @@
         "product design",
         "user experience",
         "project management",
-        "digital product"
+        "digital product",
+        "business development"
       ],
       "discipline_source": "owner_finalized",
       "domain_source": "owner_finalized",
@@ -371,7 +374,7 @@
           "verdict": "weak"
         }
       },
-      "domain": "product design|user experience|project management|digital product",
+      "domain": "product design|user experience|project management|digital product|business development",
       "primary_domain": "product design"
     },
     {
@@ -412,15 +415,10 @@
     {
       "item_id": "R012",
       "name": "Evolution of Game Art and Design",
-      "discipline": "game design",
-      "domains": [
-        "media & entertainment",
-        "creative technology",
-        "design strategy",
-        "user experience"
-      ],
-      "discipline_source": "owner_finalized",
-      "domain_source": "owner_finalized",
+      "discipline": null,
+      "domains": [],
+      "discipline_source": "noise_drop",
+      "domain_source": "noise_drop",
       "_stamp": {
         "anchor_version": "v8",
         "menu_hash": "8218d6db91add9888d2b1f96ecb134a34ce7c300379d07886c998bc8f8148c71",
@@ -429,8 +427,8 @@
         "coder": "owner",
         "date": "2026-10-07T21:31:01.145332+00:00",
         "abstention": "emerging",
-        "discipline_abstained": false,
-        "domains_abstained": false,
+        "discipline_abstained": true,
+        "domains_abstained": true,
         "second_coder": "gemma-4-E4B-it-MLX-4bit"
       },
       "_crosscheck": {
@@ -444,8 +442,8 @@
           "verdict": "entailed"
         }
       },
-      "domain": "media & entertainment|creative technology|design strategy|user experience",
-      "primary_domain": "media & entertainment"
+      "domain": null,
+      "primary_domain": null
     },
     {
       "item_id": "R013",
@@ -524,8 +522,7 @@
       "name": "Long-term Strategic Planning in Different Industries",
       "discipline": "business administration",
       "domains": [
-        "business development",
-        "business operations"
+        "business development"
       ],
       "discipline_source": "owner_finalized",
       "domain_source": "owner_finalized",
@@ -552,7 +549,7 @@
           "verdict": "entailed"
         }
       },
-      "domain": "business development|business operations",
+      "domain": "business development",
       "primary_domain": "business development"
     },
     {
@@ -705,7 +702,9 @@
       "discipline": "complex adaptive systems",
       "domains": [
         "systems & frameworks",
-        "business development"
+        "business development",
+        "entrepreneurship",
+        "ai & agents"
       ],
       "discipline_source": "owner_finalized",
       "domain_source": "owner_finalized",
@@ -732,7 +731,7 @@
           "verdict": "weak"
         }
       },
-      "domain": "systems & frameworks|business development",
+      "domain": "systems & frameworks|business development|entrepreneurship|ai & agents",
       "primary_domain": "systems & frameworks"
     },
     {
@@ -778,7 +777,8 @@
       "discipline": "decision making",
       "domains": [
         "personal productivity",
-        "project management"
+        "project management",
+        "leadership"
       ],
       "discipline_source": "owner_finalized",
       "domain_source": "owner_finalized",
@@ -805,7 +805,7 @@
           "verdict": "entailed"
         }
       },
-      "domain": "personal productivity|project management",
+      "domain": "personal productivity|project management|leadership",
       "primary_domain": "personal productivity"
     },
     {
@@ -885,12 +885,10 @@
     {
       "item_id": "R026",
       "name": "Index of Motion Graphic Title Design Terms",
-      "discipline": "information science",
-      "domains": [
-        "information architecture"
-      ],
-      "discipline_source": "owner_finalized",
-      "domain_source": "owner_finalized",
+      "discipline": null,
+      "domains": [],
+      "discipline_source": "noise_drop",
+      "domain_source": "noise_drop",
       "_stamp": {
         "anchor_version": "v8",
         "menu_hash": "8218d6db91add9888d2b1f96ecb134a34ce7c300379d07886c998bc8f8148c71",
@@ -899,8 +897,8 @@
         "coder": "owner",
         "date": "2026-10-07T21:31:01.145332+00:00",
         "abstention": "emerging",
-        "discipline_abstained": false,
-        "domains_abstained": false,
+        "discipline_abstained": true,
+        "domains_abstained": true,
         "second_coder": "gemma-4-E4B-it-MLX-4bit"
       },
       "_crosscheck": {
@@ -914,8 +912,8 @@
           "verdict": "weak"
         }
       },
-      "domain": "information architecture",
-      "primary_domain": "information architecture"
+      "domain": null,
+      "primary_domain": null
     },
     {
       "item_id": "R027",
@@ -1102,7 +1100,8 @@
       "name": "Heckel's Diff Algorithm for Version Tracking",
       "discipline": "computational theory",
       "domains": [
-        "engineering practice"
+        "engineering practice",
+        "data visualization"
       ],
       "discipline_source": "owner_finalized",
       "domain_source": "owner_finalized",
@@ -1130,7 +1129,7 @@
           "verdict": "weak"
         }
       },
-      "domain": "engineering practice",
+      "domain": "engineering practice|data visualization",
       "primary_domain": "engineering practice"
     },
     {
@@ -1171,13 +1170,10 @@
     {
       "item_id": "R034",
       "name": "Negative Space Alphabet Challenge",
-      "discipline": "design thinking",
-      "domains": [
-        "graphic design",
-        "design systems"
-      ],
-      "discipline_source": "owner_finalized",
-      "domain_source": "owner_finalized",
+      "discipline": null,
+      "domains": [],
+      "discipline_source": "noise_drop",
+      "domain_source": "noise_drop",
       "_stamp": {
         "anchor_version": "v8",
         "menu_hash": "8218d6db91add9888d2b1f96ecb134a34ce7c300379d07886c998bc8f8148c71",
@@ -1186,8 +1182,8 @@
         "coder": "owner",
         "date": "2026-10-07T21:31:01.145332+00:00",
         "abstention": "emerging",
-        "discipline_abstained": false,
-        "domains_abstained": false,
+        "discipline_abstained": true,
+        "domains_abstained": true,
         "second_coder": "gemma-4-E4B-it-MLX-4bit"
       },
       "_crosscheck": {
@@ -1201,8 +1197,8 @@
           "verdict": "weak"
         }
       },
-      "domain": "graphic design|design systems",
-      "primary_domain": "graphic design"
+      "domain": null,
+      "primary_domain": null
     },
     {
       "item_id": "R035",
@@ -1318,7 +1314,8 @@
       "name": "Multiple Imputation Procedure",
       "discipline": "research methodology",
       "domains": [
-        "research practice"
+        "research practice",
+        "data visualization"
       ],
       "discipline_source": "owner_finalized",
       "domain_source": "owner_finalized",
@@ -1345,7 +1342,7 @@
           "verdict": "weak"
         }
       },
-      "domain": "research practice",
+      "domain": "research practice|data visualization",
       "primary_domain": "research practice"
     },
     {
@@ -1390,9 +1387,11 @@
       "name": "Consumer Anticipation of Objections",
       "discipline": "marketing",
       "domains": [
+        "editorial & advertising",
         "product design",
         "user experience",
-        "design strategy"
+        "design strategy",
+        "marketing & communications"
       ],
       "discipline_source": "owner_finalized",
       "domain_source": "owner_finalized",
@@ -1419,8 +1418,8 @@
           "verdict": "entailed"
         }
       },
-      "domain": "product design|user experience|design strategy",
-      "primary_domain": "product design"
+      "domain": "editorial & advertising|product design|user experience|design strategy|marketing & communications",
+      "primary_domain": "editorial & advertising"
     },
     {
       "item_id": "R042",
@@ -1500,7 +1499,8 @@
       "domains": [
         "product design",
         "design strategy",
-        "environmental design"
+        "environmental design",
+        "industrial design"
       ],
       "discipline_source": "owner_finalized",
       "domain_source": "owner_finalized",
@@ -1527,7 +1527,7 @@
           "verdict": "entailed"
         }
       },
-      "domain": "product design|design strategy|environmental design",
+      "domain": "product design|design strategy|environmental design|industrial design",
       "primary_domain": "product design"
     },
     {
@@ -2035,7 +2035,7 @@
     {
       "item_id": "R059",
       "name": "First Course Development Framework",
-      "discipline": "emerging",
+      "discipline": "",
       "domains": [
         "entrepreneurship",
         "business development",
@@ -2043,7 +2043,7 @@
         "product design",
         "user experience"
       ],
-      "discipline_source": "owner_finalized",
+      "discipline_source": "abstained",
       "domain_source": "owner_finalized",
       "_stamp": {
         "anchor_version": "v8",
@@ -2148,7 +2148,8 @@
       "discipline": "behavioral economics",
       "domains": [
         "marketing & communications",
-        "user experience"
+        "user experience",
+        "media & entertainment"
       ],
       "discipline_source": "owner_finalized",
       "domain_source": "owner_finalized",
@@ -2175,7 +2176,7 @@
           "verdict": "weak"
         }
       },
-      "domain": "marketing & communications|user experience",
+      "domain": "marketing & communications|user experience|media & entertainment",
       "primary_domain": "marketing & communications"
     },
     {
@@ -2296,7 +2297,8 @@
       "discipline": "computational geometry",
       "domains": [
         "computational science & physics",
-        "code & computation"
+        "code & computation",
+        "engineering practice"
       ],
       "discipline_source": "owner_finalized",
       "domain_source": "owner_finalized",
@@ -2324,7 +2326,7 @@
           "verdict": "entailed"
         }
       },
-      "domain": "computational science & physics|code & computation",
+      "domain": "computational science & physics|code & computation|engineering practice",
       "primary_domain": "computational science & physics"
     },
     {
@@ -2371,7 +2373,8 @@
       "domains": [
         "editorial & advertising",
         "design strategy",
-        "design systems"
+        "design systems",
+        "graphic design"
       ],
       "discipline_source": "owner_finalized",
       "domain_source": "owner_finalized",
@@ -2398,7 +2401,7 @@
           "verdict": "entailed"
         }
       },
-      "domain": "editorial & advertising|design strategy|design systems",
+      "domain": "editorial & advertising|design strategy|design systems|graphic design",
       "primary_domain": "editorial & advertising"
     },
     {
@@ -2406,7 +2409,8 @@
       "name": "Falsifiable Variable Measurement",
       "discipline": "research methodology",
       "domains": [
-        "research practice"
+        "research practice",
+        "engineering practice"
       ],
       "discipline_source": "owner_finalized",
       "domain_source": "owner_finalized",
@@ -2433,7 +2437,7 @@
           "verdict": "weak"
         }
       },
-      "domain": "research practice",
+      "domain": "research practice|engineering practice",
       "primary_domain": "research practice"
     },
     {
@@ -2515,6 +2519,7 @@
       "name": "Park24 Nondisruptive Market Creation",
       "discipline": "entrepreneurship studies",
       "domains": [
+        "entrepreneurship",
         "business development",
         "urban planning",
         "design strategy"
@@ -2544,8 +2549,8 @@
           "verdict": "entailed"
         }
       },
-      "domain": "business development|urban planning|design strategy",
-      "primary_domain": "business development"
+      "domain": "entrepreneurship|business development|urban planning|design strategy",
+      "primary_domain": "entrepreneurship"
     },
     {
       "item_id": "R073",
@@ -2661,7 +2666,8 @@
       "domains": [
         "brand identity",
         "marketing & communications",
-        "semiotics & communication"
+        "semiotics & communication",
+        "arts & culture"
       ],
       "discipline_source": "owner_finalized",
       "domain_source": "owner_finalized",
@@ -2688,7 +2694,7 @@
           "verdict": "entailed"
         }
       },
-      "domain": "brand identity|marketing & communications|semiotics & communication",
+      "domain": "brand identity|marketing & communications|semiotics & communication|arts & culture",
       "primary_domain": "brand identity"
     },
     {
@@ -2770,7 +2776,13 @@
       "name": "Bar-hillel Paradox",
       "discipline": "linguistics",
       "domains": [
-        "semiotics & communication"
+        "semiotics & communication",
+        "arts & culture",
+        "editorial & advertising",
+        "design strategy",
+        "graphic design",
+        "brand identity",
+        "marketing & communications"
       ],
       "discipline_source": "owner_finalized",
       "domain_source": "owner_finalized",
@@ -2797,7 +2809,7 @@
           "verdict": "weak"
         }
       },
-      "domain": "semiotics & communication",
+      "domain": "semiotics & communication|arts & culture|editorial & advertising|design strategy|graphic design|brand identity|marketing & communications",
       "primary_domain": "semiotics & communication"
     },
     {
@@ -2838,12 +2850,10 @@
     {
       "item_id": "R082",
       "name": "Historical Data Sources for Manufacturing and Economic Analysis",
-      "discipline": "research methodology",
-      "domains": [
-        "research practice"
-      ],
-      "discipline_source": "owner_finalized",
-      "domain_source": "owner_finalized",
+      "discipline": null,
+      "domains": [],
+      "discipline_source": "noise_drop",
+      "domain_source": "noise_drop",
       "_stamp": {
         "anchor_version": "v8",
         "menu_hash": "8218d6db91add9888d2b1f96ecb134a34ce7c300379d07886c998bc8f8148c71",
@@ -2852,8 +2862,8 @@
         "coder": "owner",
         "date": "2026-10-07T21:31:01.145332+00:00",
         "abstention": "emerging",
-        "discipline_abstained": false,
-        "domains_abstained": false,
+        "discipline_abstained": true,
+        "domains_abstained": true,
         "second_coder": "gemma-4-E4B-it-MLX-4bit"
       },
       "_crosscheck": {
@@ -2867,8 +2877,8 @@
           "verdict": "weak"
         }
       },
-      "domain": "research practice",
-      "primary_domain": "research practice"
+      "domain": null,
+      "primary_domain": null
     },
     {
       "item_id": "R083",
@@ -3130,11 +3140,41 @@
       "primary_domain": "media & entertainment"
     },
     {
+      "item_id": "R091",
+      "name": "Autopoesis in Design Education",
+      "discipline": "systems thinking",
+      "domains": [
+        "education",
+        "design strategy"
+      ],
+      "discipline_source": "owner_finalized",
+      "domain_source": "owner_finalized",
+      "_stamp": {
+        "anchor_version": "v8",
+        "menu_hash": "8218d6db91add9888d2b1f96ecb134a34ce7c300379d07886c998bc8f8148c71",
+        "answer_space_hash": "5bd9456802db9efe807c89f3b837ae18a70d32de795793f6c1705c192cc67ebd",
+        "taxonomy_version": "v8",
+        "coder": "owner",
+        "date": "2026-10-08T17:42:00.660738+00:00",
+        "abstention": "emerging",
+        "discipline_abstained": false,
+        "domains_abstained": false,
+        "second_coder": "gemma-4-E4B-it-MLX-4bit"
+      },
+      "_crosscheck": {
+        "note": "projected from the frozen ruler (BUG-682 Stage 2); no re-adjudication"
+      },
+      "domain": "education|design strategy",
+      "primary_domain": "education"
+    },
+    {
       "item_id": "R092",
       "name": "Data Quality and Method Transparency in Journalism",
       "discipline": "research methodology",
       "domains": [
-        "research practice"
+        "research practice",
+        "media & entertainment",
+        "data visualization"
       ],
       "discipline_source": "owner_finalized",
       "domain_source": "owner_finalized",
@@ -3161,7 +3201,7 @@
           "verdict": "weak"
         }
       },
-      "domain": "research practice",
+      "domain": "research practice|media & entertainment|data visualization",
       "primary_domain": "research practice"
     },
     {
@@ -3206,7 +3246,10 @@
       "name": "Progressive Feature Introduction",
       "discipline": "human-computer interaction",
       "domains": [
-        "user experience"
+        "user experience",
+        "digital product",
+        "product design",
+        "web & ui"
       ],
       "discipline_source": "owner_finalized",
       "domain_source": "owner_finalized",
@@ -3233,7 +3276,7 @@
           "verdict": "entailed"
         }
       },
-      "domain": "user experience",
+      "domain": "user experience|digital product|product design|web & ui",
       "primary_domain": "user experience"
     },
     {
@@ -3243,7 +3286,8 @@
       "domains": [
         "product design",
         "marketing & communications",
-        "environmental design"
+        "environmental design",
+        "arts & culture"
       ],
       "discipline_source": "owner_finalized",
       "domain_source": "owner_finalized",
@@ -3270,7 +3314,7 @@
           "verdict": "entailed"
         }
       },
-      "domain": "product design|marketing & communications|environmental design",
+      "domain": "product design|marketing & communications|environmental design|arts & culture",
       "primary_domain": "product design"
     },
     {
@@ -3356,7 +3400,8 @@
         "design strategy",
         "graphic design",
         "digital product",
-        "product design"
+        "product design",
+        "arts & culture"
       ],
       "discipline_source": "owner_finalized",
       "domain_source": "owner_finalized",
@@ -3383,7 +3428,7 @@
           "verdict": "weak"
         }
       },
-      "domain": "design strategy|graphic design|digital product|product design",
+      "domain": "design strategy|graphic design|digital product|product design|arts & culture",
       "primary_domain": "design strategy"
     },
     {
@@ -3723,7 +3768,8 @@
       "discipline": "behavioral economics",
       "domains": [
         "personal productivity",
-        "user experience"
+        "user experience",
+        "organizational behavior"
       ],
       "discipline_source": "owner_finalized",
       "domain_source": "owner_finalized",
@@ -3750,7 +3796,7 @@
           "verdict": "weak"
         }
       },
-      "domain": "personal productivity|user experience",
+      "domain": "personal productivity|user experience|organizational behavior",
       "primary_domain": "personal productivity"
     },
     {
@@ -3796,7 +3842,8 @@
       "name": "Pmt Camera Typography Manipulation",
       "discipline": "typography",
       "domains": [
-        "graphic design"
+        "graphic design",
+        "arts & culture"
       ],
       "discipline_source": "owner_finalized",
       "domain_source": "owner_finalized",
@@ -3823,7 +3870,7 @@
           "verdict": "entailed"
         }
       },
-      "domain": "graphic design",
+      "domain": "graphic design|arts & culture",
       "primary_domain": "graphic design"
     },
     {
@@ -4342,7 +4389,10 @@
       "domains": [
         "design systems",
         "design strategy",
-        "industrial design"
+        "industrial design",
+        "user experience",
+        "business operations",
+        "marketing & communications"
       ],
       "discipline_source": "owner_finalized",
       "domain_source": "owner_finalized",
@@ -4369,19 +4419,19 @@
           "verdict": "weak"
         }
       },
-      "domain": "design systems|design strategy|industrial design",
+      "domain": "design systems|design strategy|industrial design|user experience|business operations|marketing & communications",
       "primary_domain": "design systems"
     },
     {
       "item_id": "R127",
       "name": "Guild of Handicraft Educational Model",
-      "discipline": "emerging",
+      "discipline": "",
       "domains": [
         "design strategy",
         "design systems",
         "education"
       ],
-      "discipline_source": "owner_finalized",
+      "discipline_source": "abstained",
       "domain_source": "owner_finalized",
       "_stamp": {
         "anchor_version": "v8",
@@ -4452,7 +4502,8 @@
       "discipline": "marketing",
       "domains": [
         "research practice",
-        "business development"
+        "business development",
+        "finance & investment"
       ],
       "discipline_source": "owner_finalized",
       "domain_source": "owner_finalized",
@@ -4479,7 +4530,7 @@
           "verdict": "entailed"
         }
       },
-      "domain": "research practice|business development",
+      "domain": "research practice|business development|finance & investment",
       "primary_domain": "research practice"
     },
     {
@@ -4839,16 +4890,10 @@
     {
       "item_id": "R140",
       "name": "Digital Culture Integration in Graphic Design",
-      "discipline": "emerging",
-      "domains": [
-        "creative technology",
-        "digital product",
-        "graphic design",
-        "user experience",
-        "web & ui"
-      ],
-      "discipline_source": "owner_finalized",
-      "domain_source": "owner_finalized",
+      "discipline": null,
+      "domains": [],
+      "discipline_source": "noise_drop",
+      "domain_source": "noise_drop",
       "_stamp": {
         "anchor_version": "v8",
         "menu_hash": "8218d6db91add9888d2b1f96ecb134a34ce7c300379d07886c998bc8f8148c71",
@@ -4858,7 +4903,7 @@
         "date": "2026-10-07T21:31:01.145332+00:00",
         "abstention": "emerging",
         "discipline_abstained": true,
-        "domains_abstained": false,
+        "domains_abstained": true,
         "second_coder": "gemma-4-E4B-it-MLX-4bit"
       },
       "_crosscheck": {
@@ -4872,8 +4917,8 @@
           "verdict": "weak"
         }
       },
-      "domain": "creative technology|digital product|graphic design|user experience|web & ui",
-      "primary_domain": "creative technology"
+      "domain": null,
+      "primary_domain": null
     },
     {
       "item_id": "R141",
@@ -5060,12 +5105,12 @@
     {
       "item_id": "R146",
       "name": "Debate As Leadership Tool",
-      "discipline": "emerging",
+      "discipline": "",
       "domains": [
         "leadership",
         "organizational behavior"
       ],
-      "discipline_source": "owner_finalized",
+      "discipline_source": "abstained",
       "domain_source": "owner_finalized",
       "_stamp": {
         "anchor_version": "v8",
@@ -5098,7 +5143,8 @@
       "name": "Randomness in Data Measurement",
       "discipline": "research methodology",
       "domains": [
-        "research practice"
+        "research practice",
+        "data visualization"
       ],
       "discipline_source": "owner_finalized",
       "domain_source": "owner_finalized",
@@ -5125,7 +5171,7 @@
           "verdict": "contra-dominant"
         }
       },
-      "domain": "research practice",
+      "domain": "research practice|data visualization",
       "primary_domain": "research practice"
     },
     {
@@ -5353,6 +5399,7 @@
       "name": "Persistence in Business Strategy",
       "discipline": "business administration",
       "domains": [
+        "personal productivity",
         "business development",
         "leadership"
       ],
@@ -5381,8 +5428,8 @@
           "verdict": "entailed"
         }
       },
-      "domain": "business development|leadership",
-      "primary_domain": "business development"
+      "domain": "personal productivity|business development|leadership",
+      "primary_domain": "personal productivity"
     },
     {
       "item_id": "R156",
@@ -5391,7 +5438,8 @@
       "domains": [
         "design strategy",
         "design systems",
-        "user experience"
+        "user experience",
+        "education"
       ],
       "discipline_source": "owner_finalized",
       "domain_source": "owner_finalized",
@@ -5418,7 +5466,7 @@
           "verdict": "weak"
         }
       },
-      "domain": "design strategy|design systems|user experience",
+      "domain": "design strategy|design systems|user experience|education",
       "primary_domain": "design strategy"
     },
     {
@@ -5426,8 +5474,12 @@
       "name": "Perspective-driven Cognitive Shift",
       "discipline": "cognitive science",
       "domains": [
+        "marketing & communications",
         "education",
-        "user experience"
+        "user experience",
+        "personal productivity",
+        "semiotics & communication",
+        "arts & culture"
       ],
       "discipline_source": "owner_finalized",
       "domain_source": "owner_finalized",
@@ -5454,8 +5506,8 @@
           "verdict": "weak"
         }
       },
-      "domain": "education|user experience",
-      "primary_domain": "education"
+      "domain": "marketing & communications|education|user experience|personal productivity|semiotics & communication|arts & culture",
+      "primary_domain": "marketing & communications"
     },
     {
       "item_id": "R158",
@@ -5464,7 +5516,11 @@
       "domains": [
         "design strategy",
         "design systems",
-        "user experience"
+        "user experience",
+        "semiotics & communication",
+        "arts & culture",
+        "illustration",
+        "graphic design"
       ],
       "discipline_source": "owner_finalized",
       "domain_source": "owner_finalized",
@@ -5491,7 +5547,7 @@
           "verdict": "weak"
         }
       },
-      "domain": "design strategy|design systems|user experience",
+      "domain": "design strategy|design systems|user experience|semiotics & communication|arts & culture|illustration|graphic design",
       "primary_domain": "design strategy"
     },
     {
@@ -5499,8 +5555,10 @@
       "name": "Context-dependent Quality Assessment",
       "discipline": "risk management",
       "domains": [
+        "research practice",
         "user experience",
-        "research practice"
+        "digital product",
+        "product design"
       ],
       "discipline_source": "owner_finalized",
       "domain_source": "owner_finalized",
@@ -5527,8 +5585,8 @@
           "verdict": "weak"
         }
       },
-      "domain": "user experience|research practice",
-      "primary_domain": "user experience"
+      "domain": "research practice|user experience|digital product|product design",
+      "primary_domain": "research practice"
     },
     {
       "item_id": "R160",
@@ -5609,7 +5667,10 @@
       "name": "Metaphorically Selling How to Use the Ma",
       "discipline": "communication theory",
       "domains": [
-        "marketing & communications"
+        "marketing & communications",
+        "editorial & advertising",
+        "packaging",
+        "semiotics & communication"
       ],
       "discipline_source": "owner_finalized",
       "domain_source": "owner_finalized",
@@ -5636,7 +5697,7 @@
           "verdict": "entailed"
         }
       },
-      "domain": "marketing & communications",
+      "domain": "marketing & communications|editorial & advertising|packaging|semiotics & communication",
       "primary_domain": "marketing & communications"
     },
     {
@@ -5644,7 +5705,9 @@
       "name": "Phenomenological Understanding",
       "discipline": "philosophy",
       "domains": [
-        "research practice"
+        "research practice",
+        "education",
+        "semiotics & communication"
       ],
       "discipline_source": "owner_finalized",
       "domain_source": "owner_finalized",
@@ -5671,17 +5734,17 @@
           "verdict": "entailed"
         }
       },
-      "domain": "research practice",
+      "domain": "research practice|education|semiotics & communication",
       "primary_domain": "research practice"
     },
     {
       "item_id": "R165",
       "name": "Acknowledgment Attribution",
-      "discipline": "emerging",
+      "discipline": "",
       "domains": [
         "editorial & advertising"
       ],
-      "discipline_source": "owner_finalized",
+      "discipline_source": "abstained",
       "domain_source": "owner_finalized",
       "_stamp": {
         "anchor_version": "v8",
@@ -5714,7 +5777,8 @@
       "name": "Agent-centric Economic Incentives",
       "discipline": "economics",
       "domains": [
-        "ai & agents"
+        "ai & agents",
+        "engineering & infrastructure"
       ],
       "discipline_source": "owner_finalized",
       "domain_source": "owner_finalized",
@@ -5741,7 +5805,7 @@
           "verdict": "entailed"
         }
       },
-      "domain": "ai & agents",
+      "domain": "ai & agents|engineering & infrastructure",
       "primary_domain": "ai & agents"
     },
     {
@@ -5999,7 +6063,10 @@
       "name": "Concept-first Prototyping",
       "discipline": "design thinking",
       "domains": [
-        "user experience"
+        "user experience",
+        "product design",
+        "digital product",
+        "industrial design"
       ],
       "discipline_source": "owner_finalized",
       "domain_source": "owner_finalized",
@@ -6026,7 +6093,7 @@
           "verdict": "entailed"
         }
       },
-      "domain": "user experience",
+      "domain": "user experience|product design|digital product|industrial design",
       "primary_domain": "user experience"
     },
     {
@@ -6104,7 +6171,8 @@
       "name": "Contextual Interpretation Framework",
       "discipline": "semiotics",
       "domains": [
-        "semiotics & communication"
+        "semiotics & communication",
+        "marketing & communications"
       ],
       "discipline_source": "owner_finalized",
       "domain_source": "owner_finalized",
@@ -6131,7 +6199,7 @@
           "verdict": "weak"
         }
       },
-      "domain": "semiotics & communication",
+      "domain": "semiotics & communication|marketing & communications",
       "primary_domain": "semiotics & communication"
     },
     {
@@ -6175,7 +6243,10 @@
       "discipline": "creative process",
       "domains": [
         "graphic design",
-        "semiotics & communication"
+        "semiotics & communication",
+        "editorial & advertising",
+        "marketing & communications",
+        "brand identity"
       ],
       "discipline_source": "owner_finalized",
       "domain_source": "owner_finalized",
@@ -6202,20 +6273,16 @@
           "verdict": "entailed"
         }
       },
-      "domain": "graphic design|semiotics & communication",
+      "domain": "graphic design|semiotics & communication|editorial & advertising|marketing & communications|brand identity",
       "primary_domain": "graphic design"
     },
     {
       "item_id": "R180",
       "name": "Intersectional Design Approaches for Underserved Communities",
-      "discipline": "cultural studies",
-      "domains": [
-        "design strategy",
-        "user experience",
-        "research practice"
-      ],
-      "discipline_source": "owner_finalized",
-      "domain_source": "owner_finalized",
+      "discipline": null,
+      "domains": [],
+      "discipline_source": "noise_drop",
+      "domain_source": "noise_drop",
       "_stamp": {
         "anchor_version": "v8",
         "menu_hash": "8218d6db91add9888d2b1f96ecb134a34ce7c300379d07886c998bc8f8148c71",
@@ -6224,8 +6291,8 @@
         "coder": "owner",
         "date": "2026-10-07T21:31:01.145332+00:00",
         "abstention": "emerging",
-        "discipline_abstained": false,
-        "domains_abstained": false,
+        "discipline_abstained": true,
+        "domains_abstained": true,
         "second_coder": "gemma-4-E4B-it-MLX-4bit"
       },
       "_crosscheck": {
@@ -6239,8 +6306,8 @@
           "verdict": "weak"
         }
       },
-      "domain": "design strategy|user experience|research practice",
-      "primary_domain": "design strategy"
+      "domain": null,
+      "primary_domain": null
     },
     {
       "item_id": "R181",
@@ -6280,12 +6347,10 @@
     {
       "item_id": "R182",
       "name": "Cultural Mourning Rituals and Symbolism",
-      "discipline": "anthropology",
-      "domains": [
-        "arts & culture"
-      ],
-      "discipline_source": "owner_finalized",
-      "domain_source": "owner_finalized",
+      "discipline": null,
+      "domains": [],
+      "discipline_source": "noise_drop",
+      "domain_source": "noise_drop",
       "_stamp": {
         "anchor_version": "v8",
         "menu_hash": "8218d6db91add9888d2b1f96ecb134a34ce7c300379d07886c998bc8f8148c71",
@@ -6294,8 +6359,8 @@
         "coder": "owner",
         "date": "2026-10-07T21:31:01.145332+00:00",
         "abstention": "emerging",
-        "discipline_abstained": false,
-        "domains_abstained": false,
+        "discipline_abstained": true,
+        "domains_abstained": true,
         "second_coder": "gemma-4-E4B-it-MLX-4bit"
       },
       "_crosscheck": {
@@ -6309,17 +6374,17 @@
           "verdict": "entailed"
         }
       },
-      "domain": "arts & culture",
-      "primary_domain": "arts & culture"
+      "domain": null,
+      "primary_domain": null
     },
     {
       "item_id": "R183",
       "name": "Pattern Language Implementation Process",
-      "discipline": "emerging",
+      "discipline": "",
       "domains": [
         "urban planning"
       ],
-      "discipline_source": "owner_finalized",
+      "discipline_source": "abstained",
       "domain_source": "owner_finalized",
       "_stamp": {
         "anchor_version": "v8",
@@ -6388,7 +6453,8 @@
       "discipline": "marketing",
       "domains": [
         "editorial & advertising",
-        "marketing & communications"
+        "marketing & communications",
+        "media & entertainment"
       ],
       "discipline_source": "owner_finalized",
       "domain_source": "owner_finalized",
@@ -6415,7 +6481,7 @@
           "verdict": "entailed"
         }
       },
-      "domain": "editorial & advertising|marketing & communications",
+      "domain": "editorial & advertising|marketing & communications|media & entertainment",
       "primary_domain": "editorial & advertising"
     },
     {
@@ -6423,7 +6489,8 @@
       "name": "Cognitive Interview Analysis Framework",
       "discipline": "research methodology",
       "domains": [
-        "research practice"
+        "research practice",
+        "marketing & communications"
       ],
       "discipline_source": "owner_finalized",
       "domain_source": "owner_finalized",
@@ -6450,7 +6517,7 @@
           "verdict": "weak"
         }
       },
-      "domain": "research practice",
+      "domain": "research practice|marketing & communications",
       "primary_domain": "research practice"
     },
     {
@@ -6743,7 +6810,9 @@
       "name": "Inclusive Design Adaptation",
       "discipline": "human-computer interaction",
       "domains": [
-        "design systems"
+        "design systems",
+        "user experience",
+        "semiotics & communication"
       ],
       "discipline_source": "owner_finalized",
       "domain_source": "owner_finalized",
@@ -6770,7 +6839,7 @@
           "verdict": "entailed"
         }
       },
-      "domain": "design systems",
+      "domain": "design systems|user experience|semiotics & communication",
       "primary_domain": "design systems"
     },
     {
@@ -6883,14 +6952,10 @@
     {
       "item_id": "R200",
       "name": "Simplicity Cult in Saas Pricing",
-      "discipline": "cultural studies",
-      "domains": [
-        "business development",
-        "marketing & communications",
-        "user experience"
-      ],
-      "discipline_source": "owner_finalized",
-      "domain_source": "owner_finalized",
+      "discipline": null,
+      "domains": [],
+      "discipline_source": "noise_drop",
+      "domain_source": "noise_drop",
       "_stamp": {
         "anchor_version": "v8",
         "menu_hash": "8218d6db91add9888d2b1f96ecb134a34ce7c300379d07886c998bc8f8148c71",
@@ -6899,8 +6964,8 @@
         "coder": "owner",
         "date": "2026-10-07T21:31:01.145332+00:00",
         "abstention": "emerging",
-        "discipline_abstained": false,
-        "domains_abstained": false,
+        "discipline_abstained": true,
+        "domains_abstained": true,
         "second_coder": "gemma-4-E4B-it-MLX-4bit"
       },
       "_crosscheck": {
@@ -6914,8 +6979,8 @@
           "verdict": "entailed"
         }
       },
-      "domain": "business development|marketing & communications|user experience",
-      "primary_domain": "business development"
+      "domain": null,
+      "primary_domain": null
     },
     {
       "item_id": "R201",
@@ -6955,13 +7020,13 @@
     {
       "item_id": "R202",
       "name": "Interactive Media Integration",
-      "discipline": "emerging",
+      "discipline": "",
       "domains": [
         "creative technology",
         "media & entertainment",
         "user experience"
       ],
-      "discipline_source": "owner_finalized",
+      "discipline_source": "abstained",
       "domain_source": "owner_finalized",
       "_stamp": {
         "anchor_version": "v8",
@@ -7209,7 +7274,8 @@
       "discipline": "cognitive science",
       "domains": [
         "ai & agents",
-        "education"
+        "education",
+        "information architecture"
       ],
       "discipline_source": "owner_finalized",
       "domain_source": "owner_finalized",
@@ -7237,7 +7303,7 @@
           "verdict": "weak"
         }
       },
-      "domain": "ai & agents|education",
+      "domain": "ai & agents|education|information architecture",
       "primary_domain": "ai & agents"
     },
     {
@@ -7280,9 +7346,14 @@
   ],
   "_provenance": {
     "schema_version": "1.0",
-    "generated_by": "scripts/build_anchor_v8_apply.py (D-2866 anchor domain remap)",
-    "gen_model": "human_owner (adjudicated) + deterministic label remap (no LLM)",
-    "decision": "D-2866",
-    "date": "2026-10-07T21:31:01.145332+00:00"
+    "generated_by": "scripts/project_ruler_to_rederived_v8.py (BUG-682 Stage 2)",
+    "gen_model": "none (deterministic projection from the frozen ruler, LLM-free)",
+    "decision": "D-2867",
+    "date": "2026-10-08T17:42:00.661094+00:00",
+    "inputs": {
+      "ruler": "governance/DOMAIN_RULER_FROZEN_20261008.json",
+      "rulings": "config/owner_domain_rulings_20261008.yaml"
+    },
+    "note": "axis columns projected from the owner-derived RULER: drops cleared + stamped noise_drop, abstentions discipline='' + source abstained, R091 added; depth axis untouched (D-2820)"
   }
 }

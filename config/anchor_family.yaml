@@ -101,10 +101,10 @@ axes:
     #     "spans 2 cohorts" on the 150-row depth-blind sheet).
     cohort_artifact: governance/ANCHOR_208_CONSOLIDATED_20261007.json
     cohort_artifact_key: item_id
-    cohort: 201
-    cohort_human_adjudicated: 201
-    primary_domain_filled: 201
-    advisory_rows_accepted_20260930: [R003, R140, R146]
+    cohort: 202
+    cohort_human_adjudicated: 194
+    primary_domain_filled: 194
+    advisory_rows_accepted_20260930: [R003, R146]
     provenance_of_anchor_domain_values: owner-adjudicated (reliable-pair machine vote + owner ruling)
     rule: a question about the domain axis is answered from governance/discipline_anchor_rederived_v8_20261007.json (D-2868)
 

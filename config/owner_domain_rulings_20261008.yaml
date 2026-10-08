@@ -102,16 +102,14 @@ noise_drop_excluded:
 # Round 3: the owner ACCEPTED the round-2 recommendation for R091 - KEEP. The sheet cell said 'noise drop',
 # so this is a DECLARED divergence from the sheet cell in favour of the owner's later written word
 # (governance/OWNER_RULINGS_ROUND3_20261008.md). Declared here so the reinstatement is DATA, not a special case.
-reinstated_rows:
-  R091:
-    name: Autopoesis in Design Education
-    domains:
-      - education
-      - design strategy
-    primary_domain: education
-    discipline: ''            # the ruling itself lives in discipline_override (ONE home); see its comment
-    abstain_discipline: false
-    why: "owner-kept (round 3) + discipline ruled round 4 = 'systems thinking' (the autopoiesis tradition), approved on the senior recommendation; the raw upstream 'creative education' is off the 64-menu and is NOT used"
+# R091 (round-3 owner-kept, round-4 discipline ruled 'systems thinking') was FOLDED into the frozen ruler
+# (governance/DOMAIN_RULER_FROZEN_20261008.json) and is now projected into ANCHOR_208_CONSOLIDATED by
+# scripts/regenerate_anchor_208_v8.py. The reinstatement declaration is therefore RETIRED: R091 is
+# axis-bearing in the ruler, so a second declaration here would be a second home (D-2646/D-2649) and the
+# applier's "already axis-bearing" guard correctly fails closed on it.
+#   round-3 provenance: owner-kept (round 3); discipline ruled round 4 = 'systems thinking' (the autopoiesis
+#   tradition); the raw upstream 'creative education' is off the 64-menu and is NOT used.
+reinstated_rows: {}
 # Since D-2878 every cap overshoot is resolved by an explicit remove_domains directive above, so NO positional
 # (tail) cap-drop remains declared. An undeclared truncation is still reported as CAP-DROP(NEW/UNDECLARED).
 declared_cap_drops: {}
@@ -172,8 +170,8 @@ owner_notes_accounted:
 # rail exists to expose. Re-declaring is the DELIBERATE act the rail forces (a growth may not be silent), and the
 # drop-residue half is UNCHANGED at 46. Both must go to 0 when the Stage-2 projection lands (BUG-682/684).
 faces:
-  ceiling_divergence: 93
-  ceiling_drop_residue: 46
+  ceiling_divergence: 0
+  ceiling_drop_residue: 0
   must_follow:
     - name: discipline_anchor_rederived_v8
       file: governance/discipline_anchor_rederived_v8_20261007.json

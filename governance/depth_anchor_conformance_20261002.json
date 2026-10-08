@@ -15,7 +15,7 @@
   "inputs": {
     "depth_map": {
       "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/governance/ANCHOR_208_DEPTH_CORRECTED_20261002.json",
-      "sha256": "0948e940e90066b0642684b513a12c214e203b92c011fcc12b3d34c3bf989e68"
+      "sha256": "42652d36e417a619d7d93d391073e4162bdfbd3e635c23edf51bd83825b5dd7e"
     },
     "store_bridge": {
       "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/governance/ANCHOR_STORE_BRIDGE_20260926.json",
@@ -31,16 +31,16 @@
     "normalization": "collapse_whitespace"
   },
   "counts": {
-    "total": 207,
+    "total": 194,
     "by_depth_label": {
-      "domain": 99,
+      "domain": 88,
       "cross-domain": 58,
-      "specialized": 48,
+      "specialized": 46,
       "universal": 2
     },
     "by_depth_source": {
-      "owner_finalized": 99,
-      "canonical_adjudicated": 108
+      "owner_finalized": 95,
+      "canonical_adjudicated": 99
     },
     "name_normalized": []
   },
@@ -54,6 +54,58 @@
     {
       "item_id": "R021",
       "reason": "owner noise_drop (R021)"
+    },
+    {
+      "item_id": "R082",
+      "reason": "owner noise_drop (D-2813: depth does not apply)"
+    },
+    {
+      "item_id": "R106",
+      "reason": "owner noise_drop (D-2813: depth does not apply)"
+    },
+    {
+      "item_id": "R200",
+      "reason": "owner noise_drop (D-2813: depth does not apply)"
+    },
+    {
+      "item_id": "R040",
+      "reason": "owner noise_drop (D-2813: depth does not apply)"
+    },
+    {
+      "item_id": "R084",
+      "reason": "owner noise_drop (D-2813: depth does not apply)"
+    },
+    {
+      "item_id": "R034",
+      "reason": "owner noise_drop (D-2813: depth does not apply)"
+    },
+    {
+      "item_id": "R182",
+      "reason": "owner noise_drop (D-2813: depth does not apply)"
+    },
+    {
+      "item_id": "R012",
+      "reason": "owner noise_drop (D-2813: depth does not apply)"
+    },
+    {
+      "item_id": "R026",
+      "reason": "owner noise_drop (D-2813: depth does not apply)"
+    },
+    {
+      "item_id": "R180",
+      "reason": "owner noise_drop (D-2813: depth does not apply)"
+    },
+    {
+      "item_id": "R080",
+      "reason": "owner noise_drop (D-2813: depth does not apply)"
+    },
+    {
+      "item_id": "R140",
+      "reason": "owner noise_drop (D-2813: depth does not apply)"
+    },
+    {
+      "item_id": "R148",
+      "reason": "owner noise_drop (D-2813: depth does not apply)"
     }
   ],
   "examples": [
@@ -298,18 +350,6 @@
       "fb_id": "1c1612905cde0d48ea77bd91b6f48f35bc2c19a8b8b79275cdc0dc3d0bafdddd"
     },
     {
-      "item_id": "R082",
-      "name": "Historical Data Sources for Manufacturing and Economic Analysis",
-      "definition": "Various government and institutional sources provide historical data on manufacturing, economic statistics, and industrial production for research and analysis purposes.",
-      "mechanism": "Government agencies like the US Census Bureau, Department of Agriculture, and Department of the Air Force maintain and publish historical statistical data on manufacturing, economic indicators, and industrial production that researchers and analysts can access for historical analysis.",
-      "boundary": "Applies to historical economic and manufacturing data collection from official government sources. Fails to include private sector or non-governmental data sources.",
-      "extraction_type": "descriptive_model",
-      "depth": 3,
-      "depth_label": "domain",
-      "depth_source": "canonical_adjudicated",
-      "fb_id": "1dc7ee91e39f7c6aeaeed954e89463b51e7726840879afd3bc67b4793edf252f"
-    },
-    {
       "item_id": "R062",
       "name": "Somatic Marker Decision Making",
       "definition": "A decision-making process where unconscious associations between categories (like 'Germany' or 'Japan') and qualities (like 'technological excellence') guide choices without conscious awareness.",
@@ -368,18 +408,6 @@
       "depth_label": "specialized",
       "depth_source": "owner_finalized",
       "fb_id": "2401f32fa7fef6032055c4dc8c6dd62ff5740ac990bc9dbcc292f43423909e6f"
-    },
-    {
-      "item_id": "R106",
-      "name": "The Invisible Art of Film Editing",
-      "definition": "An empirical observation that film editing nominations are highly correlated with Best Picture wins, despite the editing award receiving little public attention.",
-      "mechanism": "The passage documents that since 1981, every Best Picture winner has been nominated for Best Film Editing, with about two-thirds of those editing nominees also winning Best Picture.",
-      "boundary": "Applies to the correlation between film editing and Best Picture recognition in the Academy Awards since 1981. Fails when the correlation doesn't hold for other time periods or award categories.",
-      "extraction_type": "empirical_pattern",
-      "depth": 3,
-      "depth_label": "domain",
-      "depth_source": "canonical_adjudicated",
-      "fb_id": "246ef2b4d3e4ee2d738f17686ad9ad3d23681fdb0a11e2b37ee758b40604adbd"
     },
     {
       "item_id": "R176",
@@ -524,18 +552,6 @@
       "depth_label": "cross-domain",
       "depth_source": "owner_finalized",
       "fb_id": "322c1ed0023485f298865312657d3caad0314275fa45642fd039ab0a0567dbc7"
-    },
-    {
-      "item_id": "R200",
-      "name": "Simplicity Cult in Saas Pricing",
-      "definition": "The belief that simple pricing structures are essential for SaaS growth, despite evidence that profitable SaaS businesses use complex pricing models.",
-      "mechanism": "The pricing industry has developed a cultural belief that simplicity equals growth, leading to the widespread adoption of simple pricing models despite contradictory evidence from successful businesses.",
-      "boundary": "Applies to SaaS pricing practices where cultural beliefs about simplicity override evidence-based approaches. Fails when pricing strategies are based on evidence rather than cultural assumptions.",
-      "extraction_type": "empirical_pattern",
-      "depth": 4,
-      "depth_label": "specialized",
-      "depth_source": "owner_finalized",
-      "fb_id": "33666a900d6705b13090c82333e0bc5f8d9b7554cbfee4cad0841bfdf331856a"
     },
     {
       "item_id": "R109",
@@ -1246,18 +1262,6 @@
       "fb_id": "77587b4669cd4345aeb4c4f22c6ae2547f2610874aac24ea57c21b58965be9d0"
     },
     {
-      "item_id": "R040",
-      "name": "Commercial Advertising Souring of Artistic Vision",
-      "definition": "The transformation of an artist's creative approach from commercial advertising work to exclusively artistic commentary due to disillusionment with commercial media practices.",
-      "mechanism": "The artist initially worked in commercial advertising for financial support, but over time became alienated from the industry's values and practices, leading to a complete shift in creative focus toward personal artistic expression.",
-      "boundary": "Applies when an artist experiences growing disillusionment with commercial media work to the point of complete abandonment. Fails when the artist continues to work in commercial media despite initial reservations.",
-      "extraction_type": "causal_mechanism",
-      "depth": 3,
-      "depth_label": "domain",
-      "depth_source": "canonical_adjudicated",
-      "fb_id": "7764620bb329cb591e8eac12084e21f0a006e1589fc12353ceb536243be5adc8"
-    },
-    {
       "item_id": "R078",
       "name": "Parameterized Design Generation",
       "definition": "A generative design approach where parameters control the variation and generation of design elements, creating infinite permutations from a single method.",
@@ -1304,18 +1308,6 @@
       "depth_label": "cross-domain",
       "depth_source": "canonical_adjudicated",
       "fb_id": "7adfb08908a39c872b1bf641b30ab6831b1108567bb5842caa4742e9a3a81daf"
-    },
-    {
-      "item_id": "R084",
-      "name": "Data Visualization Research Lab Leadership",
-      "definition": "A principle describing the role and contributions of Colin Ware in advancing data visualization as an applied science through academic research, software development, and institutional leadership.",
-      "mechanism": "Ware's dual academic background in computer science and perception psychology enables him to bridge technical implementation with human perception principles; his extensive publication record and software development work demonstrate practical application of visualization theory; his leadership in the Data Visualization Research Lab positions him to guide research in ocean mapping and visualization systems.",
-      "boundary": "Applies to Ware's specific institutional role at the University of New Hampshire and his contributions to visualization research. Fails when applied to other researchers or contexts without his specific institutional context.",
-      "extraction_type": "causal_mechanism",
-      "depth": 3,
-      "depth_label": "domain",
-      "depth_source": "canonical_adjudicated",
-      "fb_id": "7b3414f75d4f321efba065f1df3414b7f845d198e8a52302cdff13cb60f2f0ec"
     },
     {
       "item_id": "R083",
@@ -1546,18 +1538,6 @@
       "fb_id": "931f71e587a3242b42f058117bca4d489f5c9a129e0617ffe98d798431872ea9"
     },
     {
-      "item_id": "R034",
-      "name": "Negative Space Alphabet Challenge",
-      "definition": "A creative exercise where each letter of the alphabet is designed using negative space as a storytelling element, completed over 36 consecutive days as part of the 36 Days of Type challenge.",
-      "mechanism": "The exercise involves daily creation of a letter design using negative space as the primary design element, requiring creative problem-solving to transform the negative space into meaningful symbols for each letter, particularly challenging letters like 'L' and '1'.",
-      "boundary": "Applies to creative design exercises focused on negative space exploration and letterform design. Fails when the exercise lacks the structured daily commitment or when the design approach is not focused on negative space as the primary constraint.",
-      "extraction_type": "empirical_pattern",
-      "depth": 3,
-      "depth_label": "domain",
-      "depth_source": "canonical_adjudicated",
-      "fb_id": "94a72c96fe2bc224ec7f057751068d03e56ac4d53d30182e868edd6ac95a3dff"
-    },
-    {
       "item_id": "R037",
       "name": "Style Precedence and Override Behavior",
       "definition": "In integrated design and document systems, when multiple styling systems coexist (e.g., Word and InDesign), one system's styles can take precedence over another's based on naming conventions and system configuration. This creates a hierarchy where native styles from one platform override imported or external styles.",
@@ -1688,18 +1668,6 @@
       "depth_label": "domain",
       "depth_source": "canonical_adjudicated",
       "fb_id": "a344596e4e819020f2dd38ee9c1aaa5ac346ed858f7624f89e728282317b2ed3"
-    },
-    {
-      "item_id": "R182",
-      "name": "Cultural Mourning Rituals and Symbolism",
-      "definition": "Mourning practices across cultures and time periods consistently employ specific colors, garments, and symbols to communicate grief, social status, and cultural identity. These rituals often blend religious, social, and aesthetic elements into enduring traditions that reflect both collective memory and individual expression of loss.",
-      "mechanism": "This is a descriptive model of how mourning customs are structured and maintained across societies. Cultural mourning practices form a system of symbolic communication where specific visual elements (colors, garments, jewelry) carry meaning that transcends individual expression and becomes part of collective identity. The system includes both prescribed behaviors (like wearing black or white) and symbolic objects (such as armbands or jewelry) that serve as markers of grief and social recognition.",
-      "boundary": "Applies to societies where mourning is a recognized social and cultural practice with established visual codes. Fails when mourning is not formally recognized or when cultural norms do not incorporate visible symbols of grief. Also fails in cultures where mourning is expressed through silence or non-visual means rather than ritualized dress or objects.",
-      "extraction_type": "descriptive_model",
-      "depth": 3,
-      "depth_label": "domain",
-      "depth_source": "owner_finalized",
-      "fb_id": "a362a7790469b706e4356fdf1c4749a297da7f8144e589823180861d221332c2"
     },
     {
       "item_id": "R022",
@@ -1894,18 +1862,6 @@
       "fb_id": "b761116e60c7973193e181d0d4b1fd0bf5e541958b58f1934aac2bfa94158442"
     },
     {
-      "item_id": "R012",
-      "name": "Evolution of Game Art and Design",
-      "definition": "Digital games have evolved to embrace diverse audiences, platforms, aesthetics, and purposes, transforming into a vibrant and exciting art form that encompasses varied design approaches and narrative techniques.",
-      "mechanism": "The evolution occurs through the adaptation of game design elements including graphics, animations, narratives, and interactive mechanics to accommodate increasingly diverse audience preferences and technological capabilities.",
-      "boundary": "Applies to the transformation of digital games as an art form across different platforms and audience segments. Does not apply to specific game mechanics or technical implementations.",
-      "extraction_type": "descriptive_model",
-      "depth": 3,
-      "depth_label": "domain",
-      "depth_source": "canonical_adjudicated",
-      "fb_id": "b7f2185f86d477145ed4f7b489a208c6e69473c99f759f112b9b1501630532f9"
-    },
-    {
       "item_id": "R003",
       "name": "Quantum Cognitive Effects in Survey Design",
       "definition": "A theoretical framework explaining how question order in surveys fundamentally changes respondents' mental states and thinking patterns through quantum-like cognitive processes.",
@@ -2012,18 +1968,6 @@
       "depth_label": "specialized",
       "depth_source": "canonical_adjudicated",
       "fb_id": "c49d37c2748d6e9080e402cc2ff984b50c04c38d0c5c01cb2f9122c18baa502f"
-    },
-    {
-      "item_id": "R026",
-      "name": "Index of Motion Graphic Title Design Terms",
-      "definition": "A comprehensive index of technical terms and concepts related to motion graphic title design for film and video production, organized alphabetically with cross-references.",
-      "mechanism": "The index organizes technical terminology and concepts in alphabetical order, providing cross-references to relevant sections and figures in the source material.",
-      "boundary": "Applies to reference materials for motion graphic title design professionals. Fails when the index is incomplete or lacks cross-references to relevant content.",
-      "extraction_type": "descriptive_model",
-      "depth": 4,
-      "depth_label": "specialized",
-      "depth_source": "canonical_adjudicated",
-      "fb_id": "c589d4fe59aadeb990acfc40095a1b3f648003c2e4f35dfae127eac39f6cf047"
     },
     {
       "item_id": "R058",
@@ -2134,18 +2078,6 @@
       "fb_id": "cbd462e8b840ba3520edacc957da7fb6f6b56bcf10725e648ab3fb617749e165"
     },
     {
-      "item_id": "R180",
-      "name": "Intersectional Design Approaches for Underserved Communities",
-      "definition": "Design methods that address the specific challenges of conducting research and design with underserved communities by considering context, identity, and dissent voices.",
-      "mechanism": "The approach requires designers to understand and attend to context by exposing various identities and historical oppression, self-reflect on their own positionality and biases, and attend to and disclose dissent voices to ensure all interests are represented.",
-      "boundary": "Applies when designing for underserved communities who face unique challenges in participatory design methods. Fails when designers don't account for the specific barriers faced by these communities in traditional research and design approaches.",
-      "extraction_type": "normative_heuristic",
-      "depth": 3,
-      "depth_label": "domain",
-      "depth_source": "owner_finalized",
-      "fb_id": "ce7fa9dc636cc825b377edc50a78b2fb34920600c68337a4db52932cfcddd910"
-    },
-    {
       "item_id": "R124",
       "name": "Foundation Model Integration Framework",
       "definition": "A structured approach to incorporating foundation models into AI application development that emphasizes modular integration, scalable deployment, and operational reliability. The framework supports diverse model types and deployment contexts while maintaining consistency across development and production environments.",
@@ -2254,18 +2186,6 @@
       "fb_id": "dcd41e84237408a0ad4f588183a3046678819f052b9fc05596d3a48f20067f5f"
     },
     {
-      "item_id": "R080",
-      "name": "Information Design Community Networks",
-      "definition": "A community of practice emerges among information designers through shared professional identities, collaborative projects, and cross-regional connections that span multiple countries and organizational affiliations. This network structure enables knowledge exchange, collective problem-solving, and the development of shared design vocabularies across diverse geographic and institutional boundaries.",
-      "mechanism": "This is a descriptive model of how professional communities form and sustain themselves in the field of information design. The network is structured around individuals who maintain multiple affiliations (e.g., personal websites, institutional roles, collaborative projects) and who engage in cross-border professional relationships. These connections create a web of influence where design practices and innovations spread through shared participation in projects, conferences, and collaborative platforms rather than through hierarchical organization or single institutional control.",
-      "boundary": "Applies to information design professionals who maintain active participation in multiple collaborative contexts and geographic locations. Fails when professionals work in isolated silos or when design practices are strictly controlled by single organizations without cross-pollination.",
-      "extraction_type": "descriptive_model",
-      "depth": 3,
-      "depth_label": "domain",
-      "depth_source": "canonical_adjudicated",
-      "fb_id": "dd1b1430f8b974972288c6379d9a1d0e7f7e7c82a5c1bbb39d0b619a20fe521c"
-    },
-    {
       "item_id": "R100",
       "name": "Network Marketing Business Model",
       "definition": "A business model where individuals sell products or services through a network of distributors, earning commissions not only on their own sales but also on the sales of others they recruit.",
@@ -2300,18 +2220,6 @@
       "depth_label": "specialized",
       "depth_source": "owner_finalized",
       "fb_id": "e7248fbf0d474024f57ebfbebad6a4118ff3a9c1665e55fb10bafce3b17f62c8"
-    },
-    {
-      "item_id": "R140",
-      "name": "Digital Culture Integration in Graphic Design",
-      "definition": "The integration of digital culture and technology into graphic design practice fundamentally transforms design processes, tools, and the relationship between designers and their audiences. This shift necessitates adaptation to new media conventions, digital workflows, and the increasing influence of software and systems on creative output.",
-      "mechanism": "Digital culture has become a foundational element of contemporary graphic design, reshaping how designers approach problem-solving, audience engagement, and creative execution. The shift from traditional print-based practices to digital-first workflows has created new design paradigms where software tools, user experience considerations, and system integration are core components of the design process. This transformation is not merely additive but represents a fundamental reorientation of design thinking toward digital environments and their unique affordances.",
-      "boundary": "Applies when digital tools, platforms, and cultural norms shape design practices and outcomes. Fails when design work remains entirely print-based or operates in isolation from digital systems and user interaction patterns.",
-      "extraction_type": "empirical_pattern",
-      "depth": 3,
-      "depth_label": "domain",
-      "depth_source": "owner_finalized",
-      "fb_id": "e7e317889a65313188350dcc4ac258644b570e4c0242bc2f2ce404acc8750ca6"
     },
     {
       "item_id": "R102",
@@ -2360,18 +2268,6 @@
       "depth_label": "cross-domain",
       "depth_source": "canonical_adjudicated",
       "fb_id": "eb47077d0cec3419fa8a243163f17280e8ac0720c06b1e48eedf0c0aaa2a0e62"
-    },
-    {
-      "item_id": "R148",
-      "name": "Professional Development Through Studio Experience",
-      "definition": "A principle describing how early professional experiences in design studios provide essential training and mentorship that shape a designer's career trajectory.",
-      "mechanism": "Early studio experiences provide intense, hands-on training where designers learn through direct experience, mentorship from senior professionals, and immersion in professional design processes and standards.",
-      "boundary": "Applies to early career designers who work in established studios with experienced professionals. Fails when designers lack access to mentorship or hands-on experience in professional environments.",
-      "extraction_type": "causal_mechanism",
-      "depth": 3,
-      "depth_label": "domain",
-      "depth_source": "canonical_adjudicated",
-      "fb_id": "ec6e0735af87a91d770ee4e4067970c6f881520577022938341456f1f95e6f72"
     },
     {
       "item_id": "R053",
@@ -2541,5 +2437,24 @@
       "depth_source": "canonical_adjudicated",
       "fb_id": "fdac2ca29b61ffce5deef71f43a231d24d275765f31fb6a11860be1983c357c9"
     }
-  ]
+  ],
+  "_noise_drop_clear": {
+    "rule": "D-2813: depth does not apply to a noise_drop row",
+    "applied_at": "2026-10-08T17:55:32.450036+00:00",
+    "removed": [
+      "R082",
+      "R106",
+      "R200",
+      "R040",
+      "R084",
+      "R034",
+      "R182",
+      "R012",
+      "R026",
+      "R180",
+      "R080",
+      "R140",
+      "R148"
+    ]
+  }
 }

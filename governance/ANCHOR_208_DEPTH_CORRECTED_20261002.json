@@ -79,9 +79,9 @@
   {
     "item_id": "R012",
     "name": "Evolution of Game Art and Design",
-    "depth": 3,
-    "depth_label": "domain",
-    "depth_source": "canonical_adjudicated"
+    "depth": null,
+    "depth_label": null,
+    "depth_source": "owner_finalized_noise_drop"
   },
   {
     "item_id": "R013",
@@ -177,9 +177,9 @@
   {
     "item_id": "R026",
     "name": "Index of Motion Graphic Title Design Terms",
-    "depth": 4,
-    "depth_label": "specialized",
-    "depth_source": "canonical_adjudicated"
+    "depth": null,
+    "depth_label": null,
+    "depth_source": "owner_finalized_noise_drop"
   },
   {
     "item_id": "R027",
@@ -233,9 +233,9 @@
   {
     "item_id": "R034",
     "name": "Negative Space Alphabet Challenge",
-    "depth": 3,
-    "depth_label": "domain",
-    "depth_source": "canonical_adjudicated"
+    "depth": null,
+    "depth_label": null,
+    "depth_source": "owner_finalized_noise_drop"
   },
   {
     "item_id": "R035",
@@ -275,9 +275,9 @@
   {
     "item_id": "R040",
     "name": "Commercial Advertising Souring of Artistic Vision",
-    "depth": 3,
-    "depth_label": "domain",
-    "depth_source": "canonical_adjudicated"
+    "depth": null,
+    "depth_label": null,
+    "depth_source": "owner_finalized_noise_drop"
   },
   {
     "item_id": "R041",
@@ -555,9 +555,9 @@
   {
     "item_id": "R080",
     "name": "Information Design Community Networks",
-    "depth": 3,
-    "depth_label": "domain",
-    "depth_source": "canonical_adjudicated"
+    "depth": null,
+    "depth_label": null,
+    "depth_source": "owner_finalized_noise_drop"
   },
   {
     "item_id": "R081",
@@ -569,9 +569,9 @@
   {
     "item_id": "R082",
     "name": "Historical Data Sources for Manufacturing and Economic Analysis",
-    "depth": 3,
-    "depth_label": "domain",
-    "depth_source": "canonical_adjudicated"
+    "depth": null,
+    "depth_label": null,
+    "depth_source": "owner_finalized_noise_drop"
   },
   {
     "item_id": "R083",
@@ -583,9 +583,9 @@
   {
     "item_id": "R084",
     "name": "Data Visualization Research Lab Leadership",
-    "depth": 3,
-    "depth_label": "domain",
-    "depth_source": "canonical_adjudicated"
+    "depth": null,
+    "depth_label": null,
+    "depth_source": "owner_finalized_noise_drop"
   },
   {
     "item_id": "R085",
@@ -737,9 +737,9 @@
   {
     "item_id": "R106",
     "name": "The Invisible Art of Film Editing",
-    "depth": 3,
-    "depth_label": "domain",
-    "depth_source": "canonical_adjudicated"
+    "depth": null,
+    "depth_label": null,
+    "depth_source": "owner_finalized_noise_drop"
   },
   {
     "item_id": "R107",
@@ -975,9 +975,9 @@
   {
     "item_id": "R140",
     "name": "Digital Culture Integration in Graphic Design",
-    "depth": 3,
-    "depth_label": "domain",
-    "depth_source": "owner_finalized"
+    "depth": null,
+    "depth_label": null,
+    "depth_source": "owner_finalized_noise_drop"
   },
   {
     "item_id": "R141",
@@ -1031,9 +1031,9 @@
   {
     "item_id": "R148",
     "name": "Professional Development Through Studio Experience",
-    "depth": 3,
-    "depth_label": "domain",
-    "depth_source": "canonical_adjudicated"
+    "depth": null,
+    "depth_label": null,
+    "depth_source": "owner_finalized_noise_drop"
   },
   {
     "item_id": "R149",
@@ -1248,9 +1248,9 @@
   {
     "item_id": "R180",
     "name": "Intersectional Design Approaches for Underserved Communities",
-    "depth": 3,
-    "depth_label": "domain",
-    "depth_source": "owner_finalized"
+    "depth": null,
+    "depth_label": null,
+    "depth_source": "owner_finalized_noise_drop"
   },
   {
     "item_id": "R181",
@@ -1262,9 +1262,9 @@
   {
     "item_id": "R182",
     "name": "Cultural Mourning Rituals and Symbolism",
-    "depth": 3,
-    "depth_label": "domain",
-    "depth_source": "owner_finalized"
+    "depth": null,
+    "depth_label": null,
+    "depth_source": "owner_finalized_noise_drop"
   },
   {
     "item_id": "R183",
@@ -1381,9 +1381,9 @@
   {
     "item_id": "R200",
     "name": "Simplicity Cult in Saas Pricing",
-    "depth": 4,
-    "depth_label": "specialized",
-    "depth_source": "owner_finalized"
+    "depth": null,
+    "depth_label": null,
+    "depth_source": "owner_finalized_noise_drop"
   },
   {
     "item_id": "R201",

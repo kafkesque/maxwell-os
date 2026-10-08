@@ -14859,3 +14859,88 @@ decisions:
   - governance/DOMAIN_RULER_FROZEN_20261008.json
   - governance/OWNER_DOMAIN_REVIEW_SOURCE_20261008.csv
   - governance/buglog.md
+- id: D-2879
+  state: RATIFIED
+  category: ANCHOR / TAXONOMY
+  title: 'Owner review ROUND 3: the ratified DROP(13) propagated 13/13 + R040 (ruler 201 -> 194, partition invariant
+    as a RAIL) + R091 reinstated by declaration; the axis TWO-HOME error leak MEASURED (92 divergent / 46 residue
+    cells) and its rail wired (BUG-682); a rival ruler writer retired (anti-REVERT)'
+  bugs:
+  - BUG-676
+  - BUG-679
+  - BUG-680
+  - BUG-681
+  - BUG-682
+  - BUG-683
+  decision: "Owner-gated (2026-10-08, round 3) rulings, from the OWNER'S OWN WORDS: \"ok I accept your recommendations\n\
+    R40,R80,R91\" / \"R140 drop\" / \"BUG 679 those are noise drop\". Recorded verbatim with the machine ruling\
+    \ in\ngovernance/OWNER_RULINGS_ROUND3_20261008.md. Deterministic, LLM-free data transform.\n\nTHE RATIFIED DROP(13)\
+    \ NOW REACHES 13/13 (BUG-679 FIXED). The owner-ratified RATIFY-3 DROP(13) (D-2711/D-2719)\nhad reached 4 of\
+    \ 13 rows in the owner-derived authority; 8 dropped anchors (R012 R026 R034 R082 R140 R180\nR182 R200) were\
+    \ still LIVE rows with full discipline + domains, contradicting D-2813 (\"for a noise_drop row\ndepth and discipline\
+    \ do not apply\"). The owner authorized the propagation, and R040 joined the set (accepted\nrecommendation:\
+    \ content_type=principle but a NAMED PHENOMENON - the same family as R084/R148). Result:\n14 declared drops;\
+    \ the ruler is 201 - 8 residues + 1 reinstatement = 194 rows.\n\nTHE INVARIANT THAT WOULD HAVE CAUGHT IT IS\
+    \ NOW A RAIL: n_anchor_rows == n_ruler_rows + n_noise_drop\n(208 == 194 + 14), asserted fail-closed on every\
+    \ run; a row is axis-bearing or a declared drop, never\nneither and never both. Every declared drop must name\
+    \ a real anchor row AND carry a soft-quarantine ledger\nentry - the ledger guard FIRED ON ITS FIRST RUN (R040\
+    \ had no entry), which is why R040 was recorded in\ngovernance/frontier_audit/noise_drop_quarantine.json - together\
+    \ with the propagation record - BEFORE the\nruler was re-stamped. Soft-quarantine policy intact: dropped from\
+    \ the axis authority, never deleted (D-2711).\n\nWHY IT STAYED INVISIBLE FOR TWO ROUNDS (the durable lesson).\
+    \ (i) scripts/apply_owner_domain_review.py was\nnamed in DECISION-LOG.md as the way to verify the ruler (\"\
+    verify with: --check\") and was invoked by NO rail\nin the ladder - a rail nothing runs is a comment (D-2665/BUG-492).\
+    \ (ii) noise_drop_excluded was consumed as a\nWARNING, never as a rule: it printed \"DECLARED-DROP: ...\" and\
+    \ left the row where it was (the BUG-548 shape: a\nrecord with no consumer). BOTH limbs fixed: the ladder now\
+    \ runs --selftest (9 known-answer controls), --check\n(re-derivation proof + the partition invariant) and --check-faces\
+    \ (cross-face divergence), and the drop list\nnow EXCLUDES.\n\nR091 \"Autopoesis in Design Education\" REINSTATED\
+    \ BY DECLARATION. It has no domain cell in the owner sheet, so\nit cannot be re-derived - the reinstatement\
+    \ is data (config#reinstated_rows), never a special case in code:\ndomains [education, design strategy], primary\
+    \ education (owner-accepted), discipline = declared abstention\nbecause the upstream raw value 'creative education'\
+    \ is OFF the 64-discipline menu and naming a discipline\nwithout an owner word would be a generator-synthesized\
+    \ label (D-2813). DECLARED DIVERGENCE: the owner's own\nsheet CELL said \"noise drop\" for R091; the owner then\
+    \ accepted the KEEP recommendation in writing, so the\nlater written word governs and the divergence is recorded\
+    \ rather than silently resolved.\n\nBUG-682 - THE REAL DEFECT BEHIND BUG-679, NOW MEASURED. The discipline/domain/primary_domain\
+    \ axis has TWO\nhomes: the OWNER-SHEET-DERIVED ruler (which carries every round-2/round-3 ruling) and\ngovernance/discipline_anchor_rederived_v8_20261007.json\
+    \ (declared authority by\nconfig/anchor_axis_authority.yaml + config/anchor_family.yaml, D-2868), which still\
+    \ carries the pre-ruling\nvalues. MEASURED divergence: 45 divergent + 23 drop-residue cells in rederived_v8,\
+    \ 47 + 23 in\nANCHOR_208_CONSOLIDATED -> 92 / 46 total on 194 shared ids. So \"what is the domain of anchor\
+    \ Rxxx?\" depended\non WHICH FILE the reader opened: an error leak, not a cosmetic drift. It stayed invisible\
+    \ because (a) the\nladder's axis rail declares authority=rederived_v8 and consumer=ANCHOR_208_CONSOLIDATED,\
+    \ and CONSOLIDATED is\nREGENERATED FROM rederived_v8 - the rail compared an artifact with a copy of itself and\
+    \ CANNOT fire\n(BUG-492 class); (b) the ruler had a SECOND writer (build_domain_ruler.py, deriving from the\
+    \ stale\nconsolidated face) so a re-run would have SILENTLY REVERTED the owner's rulings (D-387 anti-REVERT\
+    \ class);\n(c) the D-2870 catch-all guard read a HARDCODED column key (\"domain\") - the day the declared authority's\n\
+    column changes, it scans ZERO rows and prints a green line.\n\nLANDED THIS ROUND (the three limbs of BUG-682\
+    \ that are fixable without a projection):\n(1) a tri-state cross-face rail, scripts/apply_owner_domain_review.py\
+    \ --check-faces, WIRED INTO THE LADDER\n    with a MEASURED, SHRINK-ONLY ceiling (92 / 46) declared in config#faces:\
+    \ 0 = agree, 2 = declared\n    owner-owed (loud, not fatal - the BUG-457 pattern), 1 = UNDECLARED propagation\
+    \ failure;\n(2) build_domain_ruler.py RETIRED AS A WRITER - it now REFUSES (rc=1) and names the ONE derivation,\
+    \ so no\n    re-run can revert the owner's words;\n(3) the guard's column name now comes from the declared authority\
+    \ (C12), behaviour byte-identical today,\n    and the ruler is covered by the abstention rule by construction\
+    \ (0 co-tokens in 194 rows).\n\nNEXT (Stage 2 - ONE projection, then the ceiling goes to 0): project the ruler\
+    \ onto rederived_v8\n(discipline/domain/primary_domain; the 14 dropped rows cleared on all three axes + stamped\
+    \ noise_drop; the\nabstained rows stamped discipline=\"\" + discipline_status=abstained + discipline_source=owner_abstained),\n\
+    regenerate ANCHOR_208_CONSOLIDATED + the five-axis views from it, FLIP the axis registry so the\nowner-derived\
+    \ ruler is the DOMAIN-axis authority and every lineage face is a consumer - then lower\nceiling_divergence/ceiling_drop_residue\
+    \ to 0. That single projection closes BUG-682, BUG-680 and BUG-683\n(BUG-683: apply_owner_domain_rulings_v8.py\
+    \ is a rival authority writer whose input contract no longer\nexists - it would raise KeyError and nothing runs\
+    \ it).\n\nBUG-681 UPDATE: check_encoding_homes --check is now rc=1 (a DRIFT, not the tolerated owner-owed rc=2),\
+    \ so\n\"just health\" STOPS THERE and every declaring line below it is invisible in the prefix. Offender diagnosed\n\
+    with a line number: scripts/remap_referee_v7_28rows.py line 69 opens the owner remap CSV with a local\nencoding=\"\
+    utf-8-sig\" instead of delegating to the ONE declared decode home (scripts/lib/artifact_encoding.py,\nD-2644/D-2646).\
+    \ Queued as the next critical step because the honest fix needs a DECLARATION for that CSV.\n\nRuler re-freeze:\
+    \ sha256 5fcde5619e04fbda... -> d867ce5e059ac25d...; 194 rows; 1 row changed (R091) + 8 rows\nREMOVED (the declared\
+    \ drops); 22 declared warnings; --check reproduces it byte-identically; --check-faces\n92/46 within the declared\
+    \ ceiling. Invariants: 0 rows over the D150 cap, primary_domain == domains[0]\neverywhere, 0 non-canonical domains,\
+    \ 0 rows carrying the token, and the partition EXACT at 208 = 194 + 14.\n"
+  files:
+  - governance/OWNER_RULINGS_ROUND3_20261008.md
+  - config/owner_domain_rulings_20261008.yaml
+  - scripts/apply_owner_domain_review.py
+  - scripts/build_domain_ruler.py
+  - scripts/check_anchor_axis_consistency.py
+  - governance/DOMAIN_RULER_FROZEN_20261008.json
+  - governance/frontier_audit/noise_drop_quarantine.json
+  - governance/buglog.md
+  - justfile
+  - config/rail_registry.yaml

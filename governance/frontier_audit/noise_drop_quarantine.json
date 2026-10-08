@@ -46,6 +46,16 @@
       "recheck_due": "2026-10-29"
     },
     {
+      "anchor_id": "R040",
+      "kind": "anchor",
+      "name": "Commercial Advertising Souring of Artistic Vision",
+      "reason": "content_type=principle but a NAMED PHENOMENON (an artist's career pivot under commercial pressure) - a case description in the same family as R084 (a named researcher's lab leadership) and R148 (a designer's career development); domains concept does NOT apply (D-2813)",
+      "decision_ref": "D-2879",
+      "created_at": "2026-10-08",
+      "status": "quarantined",
+      "recheck_due": "2026-11-07"
+    },
+    {
       "anchor_id": "R080",
       "kind": "anchor",
       "name": "Information Design Community Networks",
@@ -172,5 +182,30 @@
     "at": "2026-09-30",
     "ratify": "RATIFY-3 DROP(13)",
     "ref": "D-2719"
+  },
+  "propagation": {
+    "by": "pipeline",
+    "at": "2026-10-08",
+    "ref": "D-2879",
+    "rule": "the owner-RATIFIED RATIFY-3 DROP(13) is propagated uniformly into the axis-bearing ruler (config/owner_domain_rulings_20261008.yaml#noise_drop_excluded): a declared noise_drop row carries NO axis value in the owner-derived authority, even where an upstream face still holds a pre-drop residue (BUG-679). The rows REMAIN in this ledger - soft quarantine is reversible, deletion is not (D-2711).",
+    "rows_propagated": [
+      "R012",
+      "R021",
+      "R026",
+      "R034",
+      "R080",
+      "R082",
+      "R084",
+      "R106",
+      "R140",
+      "R148",
+      "R180",
+      "R182",
+      "R200"
+    ],
+    "round3_additions": [
+      "R040"
+    ],
+    "verified_by": "scripts/apply_owner_domain_review.py --check (partition invariant n_anchor_rows == n_ruler_rows + n_noise_drop)"
   }
 }

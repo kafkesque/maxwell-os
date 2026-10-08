@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**164 open** / 281 closed of 445 ids.
+**165 open** / 282 closed of 447 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -168,6 +168,7 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-651 | (PARTIAL, 2026-10-05) — S5 majority NLI aggregation hides supported claims + passes contradictory claims (D-2822 Gate A(d)) | 1 |
 | BUG-658 | (OPEN, 2026-10-06) — OMLX SSE keepalive defeats read_timeout → client wedge (no wall-clock deadline). HARNESS-MITIGATED 2026-10-06 (d2767_ab | 1 |
 | BUG-677 | (OPEN, 2026-10-08) — two owner-facing truths for the SAME 60 items (ANCHOR-2 sheet vs frozen ruler) | 1 |
-| BUG-679 | (OPEN, 2026-10-08) — an owner-RATIFIED `noise_drop` (RATIFY-3 DROP(13), D-2711/D-2719) reached only 5 of 13 anchor rows: 8 dropped anchors a | 1 |
-| BUG-680 | (OPEN, 2026-10-08) — the upstream anchor faces still encode discipline abstention as the out-of-menu token 'emerging' (BUG-676 residual) | 1 |
-| BUG-681 | (OPEN, 2026-10-08) — `just health-full` found 6 faults in one pass; 2 fixed deterministically, 4 remain (3 red contract tests + 3 rails) and | 1 |
+| BUG-680 | (OPEN, 2026-10-08) — the upstream anchor faces still encode discipline abstention as the out-of-menu token 'emerging' (BUG-676 residual) | 2 |
+| BUG-681 | (OPEN, 2026-10-08) — `just health-full` found 6 faults in one pass; 2 fixed deterministically, 4 remain (3 red contract tests + 3 rails) and | 2 |
+| BUG-682 | (OPEN, 2026-10-08 round 3) — the axis had TWO homes: the owner's rulings are absent from the face the PIPELINE reads, and the rail that shou | 1 |
+| BUG-683 | (OPEN, 2026-10-08 round 3) — a rival writer of the AUTHORITY whose input contract no longer exists (it would now crash, and nothing runs it) | 1 |

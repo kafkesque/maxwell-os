@@ -24,9 +24,10 @@
 
 | Bug | Date | Issue |
 |---|---|---|
+| BUG-682 | 2026-10-08 | **The discipline/domain/primary_domain axis had TWO homes: the OWNER's rulings (round 2+3) exist only in the owner-sheet-derived ruler, while the face the pipeline reads (\`discipline_anchor_rederived_v8_20261007.json\`, declared authority by config/anchor_axis_authority.yaml + config/anchor_family.yaml, D-2868) still carries the pre-ruling values. MEASURED: 92 divergent + 46 drop-residue axis cells (rederived_v8 45/23, CONSOLIDATED 47/23) on 194 shared ids. It stayed invisible because (i) the ladder's axis rail compared the authority with ANCHOR_208_CONSOLIDATED, which is REGENERATED FROM it - a control that cannot fire - and (ii) the ruler had a SECOND writer (build_domain_ruler.py, deriving from the stale face) that a re-run would have used to SILENTLY REVERT the owner's rulings (D-387 class). LANDED THIS ROUND: a tri-state cross-face rail in the ladder (--check-faces, measured SHRINK-ONLY ceiling 92/46), the rival writer RETIRED as a writer (it now refuses), and a hardcoded column-name literal in the D-2870 guard replaced by the declared column (a guard that would have scanned 0 rows and printed green). NEXT: ONE projection (ruler -> rederived_v8 -> regenerate CONSOLIDATED/views + flip the axis registry) then ceiling -> 0.** |
+
+| BUG-683 | 2026-10-08 | **\`scripts/apply_owner_domain_rulings_v8.py\` is a rival WRITER of the declared authority whose input contract no longer exists: it reads \`config/owner_domain_rulings_20261008.yaml["rows"]\`, and the round-2 rewrite of that config replaced the \`rows:\` block with declarative columns, so it raises KeyError on its first line of work. It is invoked by NO rail, so the break was silent - while its docstring still asserts that folding into the authority is how the rulings become real. FIX (folds into BUG-682 Stage 2): re-point it at the RULER and make it the projection limb, or retire it as a writer like build_domain_ruler.py.** |
 | BUG-681 | 2026-10-08 | **`just health-full` = 6 faults in one pass; 2 FIXED (buglog heading not parsed; an archived retirement missing from archive/index.yaml). 4 REMAIN: 3 red contract tests outside a declared-red=0 ceiling (incl. `test_s4_golden_conforms_to_ontology` - a golden set that does not conform to the ontology) + check_encoding_homes + check_undeclared_encoding + check_boundary_rehearsal. ATTRIBUTED away from D-2878 by grep (the tests read pipeline_config.yaml/taxonomy_v5.yaml, 0 hits on any D-2878 artifact) - they are pre-existing regressions the ratified-but-uncommitted state was hiding. Diagnose (a) FIRST.** |
-| BUG-679 | 2026-10-08 | **An owner-RATIFIED `noise_drop` (RATIFY-3 DROP(13), D-2711/D-2719) reached only 5 of 13 anchor rows: 8 dropped anchors (R012 R026 R034 R082 R140 R180 R182 R200) are STILL LIVE in the frozen domain ruler with full discipline + domains, contradicting D-2813 ("for a noise_drop row depth and discipline do NOT apply"). Measured consequence: the owner was asked in round 2 to confirm axis values for rows the owner had already dropped. FIX = one owner word: propagate uniformly (ruler 201 -> 193, rows kept in the soft-quarantine ledger) OR re-affirm the 8 rows as live, which supersedes RATIFY-3.** |
-| BUG-680 | 2026-10-08 | **BUG-676 residual: the UPSTREAM anchor faces still encode discipline abstention as the out-of-menu token 'emerging'** (ANCHOR_208_CONSOLIDATED_20261007.json, 11 rows; discipline_anchor_rederived_v8_20261007.json). They are the discipline authority/consumer read by check_anchor_axis_consistency.py, so the fix is a consolidation-chain change (stamp `discipline: ""` + `discipline_status: abstained` + `discipline_source: owner_abstained` - the slots already exist), never a hand edit. |
 | BUG-242 | 2026-09-11 | **frontier69_v2 + extension80 audit outputs carry 2 data-quality defects.** (1) The `*_verdict` fields (depth/discipline/domains) are LLM SELF-REPORTS, not computed comparisons — they claim `override` even when the audit value equals silver (e.g. `S4-GOLD-MINED-00005` domains identical yet `domains_verdict=override`), so the cited "57.5% domain-override" and "80 flagged" figures are inflated. (2) Non-principle content_type rows (noise_drop/tool_instruction/process_template/process_instance/growth_edge) carry a spurious 4-way depth label, violating D2612 (depth only for principle). FIX (applied in `scripts/build_phase0_adjudication_form.py`): agreement recomputed deterministically (`differs` flag) + depth marked N/A for non-principle. REMAINS: recompute the override figures from the audit values (deterministic), and re-run the audit to null depth on non-principle if the raw artifacts are kept. |
 | BUG-228 | 2026-09-08 | **Dead/aspirational schema fields — 0 code references.** `parent_pt_id` (process_instance's tether to a template), `promoted_to_type`/`promoted_to_id`/`parent_fb_ids` (growth_edge promotion), MCP `annotations` (`readOnlyHint`/`destructiveHint`/`idempotentHint`), `consulted_fbs`/`template_source` — all declared in `content_types.yaml`, all 0 refs in `pipeline/`+`scripts/`. Consequence: `process_instance` is indistinguishable from an unlinked anecdote; `growth_edge` is a dead-end bucket with a staging-area description; MCP-promotion aspiration is unbacked. False affordances for future retrieval code. Fix = prune or ship; backfill `parent_pt_id` when a PT exists (§1.3.2 of the adjudication doc). |
 | BUG-224 | 2026-09-05 | OMLX server wedges under sustained load on Qwen3.8-27B: large-output calls (>~1200 tokens) hang BEYOND the requests timeout (call_omlx timeout not respected), then the server needs ~15-60s to recover before even tiny requests respond. Reproduced repeatedly during D2576 depth audit (single-FB calls OK ~7s, but batched/long-output calls wedge every ~6-12 requests). This blocked the delegated Qwen3.8 market research (D2576) and forced the audit to fall back to `delegate(custom_deepseek)` for the bulk + a small direct-OMLX overlap. Extends BUG-220/DELEGATE-001 (Qwen direct-call workaround itself is now flaky). Likely cause: 27B 4-bit model + concurrent/unreleased context on 64GB. **MITIGATION APPLIED (D2581, 2026-09-05):** `services.omlx.read_timeout=60` + `services.omlx.wedge_recovery_sleep=20` (config); `call_omlx` now uses `timeout=(connect, read)` so a mid-response stall trips fast, and distinguishes `ReadTimeout` (wedge) → 20s recovery sleep before retry instead of the 3s hammering. Remaining workload-shaping guidance: 3-model vote should still process Qwen3.8 in small single-FB calls. UNVERIFIED under a live sustained-load wedge (needs a re-run of the Qwen3.8 bulk audit to confirm). |
@@ -9387,3 +9388,139 @@ STILL RED (4 faults, attributed away from D-2878):
 SCOPE RECOMMENDATION (next round, in this order): (1) diagnose (a) first - it is the only one on the ontology
 axis and it gates honest anchor/eval work; then (b) and (c) together (they share the decode/encoding home), then
 (d) at the next commit. Do NOT edit the declared red ceiling for any of them.
+
+## BUG-676 (FIXED, 2026-10-08 round 3) — abstention is an ABSENCE, not a TOKEN: the rule stands, the SET changed
+
+The round-2 rule is unchanged and now holds in both directions (the authority never carries the token; the
+token, if it ever reappears in a config override, is a hard failure). What changed in round 3 is the SET:
+
+  * **R140 LEFT the abstention set.** The owner ruled it a DROP ("R140 drop"), and an abstention declared for a
+    row that is not in the ruler is a CATEGORY ERROR - now asserted fail-closed (it was asserted before, and it
+    fired on the first run after the drop, which is exactly the point of the assertion).
+  * **R091 ENTERED the abstention set.** The owner accepted the round-2 recommendation to KEEP it
+    ("Autopoesis in Design Education"), and named its application roles (education, design strategy) but no
+    discipline - the raw upstream value \`creative education\` is OFF the 64-discipline menu. Naming a discipline
+    without an owner word would be a generator-synthesized label (D-2813), so the discipline axis carries the
+    declared abstention and the row enters the ruler with its domains only.
+
+Owner-derived authority after the change: 7 rows abstained (R006 R059 R127 R146 R165 R183 R202) + R091 abstained
++ 14 declared drops + the rest axis-bearing = the partition below.
+
+## BUG-679 (FIXED, 2026-10-08 round 3) — the owner-ratified DROP(13) now reaches 13/13, and the invariant that would have caught it is a RAIL
+
+Owner's word (round 3): **"BUG 679 those are noise drop"** - the propagation is authorized, no re-litigation.
+
+WHAT LANDED:
+  * The drop is now EXHAUSTIVE at its source. The 8 residues that were still live in the frozen ruler
+    (R012 R026 R034 R082 R140 R180 R182 R200) are removed; R040 joins them (the owner accepted the round-3
+    recommendation: a NAMED PHENOMENON, the same family as R084/R148) -> **14 declared drops**.
+  * The ruler is now 194 rows: 201 - 8 residues + 1 owner-kept reinstatement (R091).
+  * **The BUG-679 invariant is now a rail, not a sentence:**
+    \`n_anchor_rows == n_ruler_rows + n_noise_drop\` -> 208 == 194 + 14, asserted on every run. A row may be
+    axis-bearing or a declared drop, NEVER neither and never both. Measured result: EXACT (no silent skips).
+  * Every declared drop must name a real anchor row AND have a soft-quarantine ledger entry, or the run fails
+    closed. This guard fired on its FIRST run (R040 had no ledger entry) - which is why R040 was recorded in
+    \`governance/frontier_audit/noise_drop_quarantine.json\` before the ruler was re-stamped, together with the
+    propagation record (13 propagated + 1 round-3 addition, ref D-2879).
+  * Soft-quarantine policy is intact: the rows are REMOVED FROM THE AXIS AUTHORITY and stay in the ledger
+    (D-2711: quarantine is reversible, deletion is not).
+
+WHY IT STAYED INVISIBLE FOR TWO ROUNDS (the durable lesson - this is the part that generalises):
+  1. \`scripts/apply_owner_domain_review.py\` was named in DECISION-LOG.md as the way to verify the ruler
+     ("verify with: --check") and **was invoked by NO rail in the ladder**. A rail nothing runs is a comment
+     (D-2665 class i / BUG-492). FIXED: the ladder now runs \`--selftest\` (9 known-answer controls),
+     \`--check\` (re-derivation proof) and \`--check-faces\` (cross-face divergence).
+  2. \`noise_drop_excluded\` was consumed as a **warning**, never as a RULE: it printed "DECLARED-DROP: ..." and
+     then left the row exactly where it was. An exclusion list that cannot exclude is a record with no consumer
+     (the BUG-548 shape). FIXED: it now excludes, and the partition invariant proves the exclusion is complete.
+
+DECLARED RESIDUAL (NOT part of this fix): the dropped rows still carry axis values in the OTHER faces
+(45 divergent + 23 residue cells in rederived_v8, 47 + 23 in CONSOLIDATED) -> **BUG-682**.
+
+## BUG-680 (NARROWED, still OPEN, 2026-10-08 round 3) — the ruler is now INDEPENDENT of the upstream token; the upstream faces are not
+
+Impact NEUTRALIZED for the owner-derived authority: the ruler no longer copies any upstream discipline value
+for an abstained row (it is forced to \`''\` and declared) and no longer carries a dropped row at all, so the
+out-of-menu token cannot reach it by propagation. Measured: 0 rows in the 194-row ruler carry it.
+
+RESIDUAL (unchanged in scope, now attributable to BUG-682's Stage 2): the two upstream faces
+(\`discipline_anchor_rederived_v8_20261007.json\`, \`ANCHOR_208_CONSOLIDATED_20261007.json\`) still encode the
+discipline abstention as the token - including for R140, which is now a DROP, so it also carries an axis
+residue there. The correct fix remains the consolidation chain (stamp \`discipline: ""\` +
+\`discipline_status: abstained\` + \`discipline_source: owner_abstained\`), never a hand edit.
+
+## BUG-682 (OPEN, 2026-10-08 round 3) — the axis had TWO homes: the owner's rulings are absent from the face the PIPELINE reads, and the rail that should have caught it compared an artifact with its own copy
+
+MEASURED this round (not inferred):
+  * \`governance/discipline_anchor_rederived_v8_20261007.json\`: **45 divergent + 23 drop-residue** axis cells.
+  * \`governance/ANCHOR_208_CONSOLIDATED_20261007.json\`: **47 divergent + 23 drop-residue** axis cells.
+  * total **92 divergent / 46 residual**, on 194 shared item_ids.
+
+THE DEFECT. The discipline / domain / primary_domain axis is declared (config/anchor_axis_authority.yaml +
+config/anchor_family.yaml, D-2868) to be OWNED by \`discipline_anchor_rederived_v8_20261007.json\`. That face has
+NOT received the owner's round-2/round-3 rulings - R158's applicability-ranked domains, R015's removal,
+R041/R072/R155/R157/R159's primary overrides, the 14 drops, the 7 abstentions all live only in the
+owner-sheet-derived ruler. So the answer to "what is the domain of anchor Rxxx?" depends on WHICH FILE the
+reader opens: an error leak of the BUG-679 shape, one level up (it is not a drift of one row, it is a drift of
+the AUTHORITY).
+
+WHY NOTHING SAID SO (four compounding limbs, three fixed this round):
+  1. **The ladder's axis rail compared the authority with its own downstream copy.**
+     config/anchor_axis_authority.yaml declares for the domain axis: authority = rederived_v8, consumer =
+     ANCHOR_208_CONSOLIDATED - and CONSOLIDATED is REGENERATED FROM rederived_v8
+     (scripts/regenerate_anchor_208_v8.py, D-2867). The rail therefore compares an artifact with a copy of
+     itself: it is GREEN by construction and CANNOT fire on an authority/ruler divergence (BUG-492 class).
+     FIXED THIS ROUND: a rail that compares the ruler against every declared face, wired into the ladder,
+     tri-state (0 agree / 2 declared owner-owed, SHRINK-ONLY / 1 UNDECLARED), with the measured ceiling
+     declared as 92 / 46 in config/owner_domain_rulings_20261008.yaml#faces.
+  2. **The two writers of the ruler were never reconciled.** \`build_domain_ruler.py\` derived it from the stale
+     CONSOLIDATED face; \`apply_owner_domain_review.py\` derives it from the pinned owner sheet. A re-run of the
+     first would have SILENTLY REVERTED every owner ruling (the D-387 anti-REVERT class). FIXED: retired as a
+     writer - it now refuses and names the ONE derivation.
+  3. **A guard read a column name as a LITERAL.** The D-2870 catch-all guard
+     (scripts/check_anchor_axis_consistency.py) read \`r.get("domain")\` - so the day the declared authority's
+     column changes (the ruler's is \`domains\`), it would scan ZERO rows and print a green line: a control that
+     cannot fire, the worst kind of green. FIXED: the column name now comes from the declared authority (C12);
+     behaviour on today's declaration is byte-identical.
+  4. The catch-all guard is green over the AUTHORITY's rows; the owner-derived ruler was not covered by it at
+     all. Now it is covered transitively: the ruler has 0 co-tokens by construction (BUG-676).
+
+NEXT (Stage 2 = ONE projection, then the ceiling goes to 0): project the ruler onto rederived_v8
+(discipline / domain / primary_domain; the 14 dropped rows cleared on all three + stamped \`noise_drop\`; the
+abstained rows stamped \`discipline: ""\` + \`discipline_status: abstained\`), regenerate
+ANCHOR_208_CONSOLIDATED + the five-axis views from it, FLIP the axis registry so the owner-derived ruler is the
+DOMAIN-axis authority and every lineage face is a consumer, then lower \`ceiling_divergence\` /\`ceiling_drop_residue\`
+to 0. That single projection closes this bug, BUG-680 and BUG-683 together.
+
+## BUG-683 (OPEN, 2026-10-08 round 3) — a rival writer of the AUTHORITY whose input contract no longer exists (it would now crash, and nothing runs it)
+
+\`scripts/apply_owner_domain_rulings_v8.py\` was D-2874's fold limb: it read
+\`config/owner_domain_rulings_20261008.yaml["rows"]\` (a mapping of item_id -> {domains, primary}) and wrote the
+8 owner-gated rulings INTO the declared authority. The round-2 rewrite of that config replaced the \`rows:\`
+block with declarative columns (\`primary_override\` / \`remove_domains\` / \`noise_drop_excluded\` /
+\`discipline_abstention\` / \`reinstated_rows\`), so the script now raises \`KeyError: 'rows'\` on its first line of
+work. Nothing in the ladder invokes it, so the break was SILENT - and its docstring still claims that folding
+into the authority is how the rulings become real, which is the half-true claim that made BUG-682 possible.
+
+FIX (folds into BUG-682 Stage 2): re-point it at the RULER (the owner-derived truth) instead of a config
+\`rows:\` block, and make it the PROJECTION limb; or retire it as a writer exactly like
+\`build_domain_ruler.py\`. Until then it must not be run - a writer whose contract is stale is a revert trap.
+
+## BUG-681 (UPDATE, 2026-10-08 round 3) — the encoding fault is now a LADDER BLOCKER, and its offender is named with a line number
+
+New measurement: \`check_encoding_homes.py --check\` returns rc=1 - a **DRIFT**, not the owner-owed rc=2 the ladder
+tolerates (\`|| [ $? -eq 2 ]\`). Consequence: \`just health\` STOPS THERE and every declaring line after it is
+invisible in the prefix report - including \`check_tests\`, \`recompute_decision_summary --check\`,
+\`check_governance_faces\`, \`check_decision_membership\`, \`check_rail_registry\` (BUG-573's whole point).
+
+NAMED OFFENDER (diagnosed, not guessed): \`scripts/remap_referee_v7_28rows.py\` **line 69** opens the owner remap
+CSV with a local \`encoding="utf-8-sig"\` instead of delegating to the ONE declared decode home
+(\`scripts/lib/artifact_encoding.py\`, D-2646/D-2644 - the module whose docstring records that a GUESSED encoding
+does not crash, it silently changes text two readers then compare, BUG-511). The declared ceiling is 0 with an
+empty allow list (shrink-only, D-2642).
+
+FIX (needs a decision, so it is queued as the next critical step rather than improvised): delegate the read to
+\`artifact_encoding.open_artifact(...)\` AND declare that CSV's encoding in a declaration home
+(\`config/reconciliation.yaml\` / \`config/cohort_declaration.yaml\`) - the honest fix, because the declaration is a
+FACT about the artifact and \`open_artifact\` fails closed on an undeclared path. The alternative (an \`allow\`
+entry) is a declared second implementation, i.e. the debt this rail exists to remove.

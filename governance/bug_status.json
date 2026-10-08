@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 445,
-  "open_n": 164,
-  "closed_n": 281,
+  "total_ids": 447,
+  "open_n": 165,
+  "closed_n": 282,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -814,18 +814,23 @@
       "events": 1
     },
     {
-      "id": "BUG-679",
-      "title": "(OPEN, 2026-10-08) \u2014 an owner-RATIFIED `noise_drop` (RATIFY-3 DROP(13), D-2711/D-2719) reached only 5 of 13 anchor rows: 8 dropped anchors a",
-      "events": 1
-    },
-    {
       "id": "BUG-680",
       "title": "(OPEN, 2026-10-08) \u2014 the upstream anchor faces still encode discipline abstention as the out-of-menu token 'emerging' (BUG-676 residual)",
-      "events": 1
+      "events": 2
     },
     {
       "id": "BUG-681",
       "title": "(OPEN, 2026-10-08) \u2014 `just health-full` found 6 faults in one pass; 2 fixed deterministically, 4 remain (3 red contract tests + 3 rails) and",
+      "events": 2
+    },
+    {
+      "id": "BUG-682",
+      "title": "(OPEN, 2026-10-08 round 3) \u2014 the axis had TWO homes: the owner's rulings are absent from the face the PIPELINE reads, and the rail that shou",
+      "events": 1
+    },
+    {
+      "id": "BUG-683",
+      "title": "(OPEN, 2026-10-08 round 3) \u2014 a rival writer of the AUTHORITY whose input contract no longer exists (it would now crash, and nothing runs it)",
       "events": 1
     }
   ],
@@ -1110,6 +1115,7 @@
     "BUG-674",
     "BUG-675",
     "BUG-676",
-    "BUG-678"
+    "BUG-678",
+    "BUG-679"
   ]
 }

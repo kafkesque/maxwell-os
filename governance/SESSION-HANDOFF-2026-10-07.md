@@ -195,3 +195,57 @@ S4 -> S5 -> S6 rerun (D-2727).
 NEXT CONSEQUENTIAL WORK: BUG-679 propagation (one owner word), then D-2879 = the ANCHOR-2 authority-aligned sheet + key re-mint +
 kappa re-measurement (BUG-677; mint ONLY after the run carries measured numbers), then BUG-680's consolidation-chain fix, then the
 optional student domain_confidences provenance in `_maybe_student_override`.
+
+---
+
+## 2026-10-08 ADDENDUM 2 — D-2879 owner review ROUND 3 (the drop propagation + the axis TWO-HOME finding)
+
+**C15 CARRIED FORWARD: 165 unresolved ids** (register re-derived: **1009 decisions · 447 bugs, 165 open / 282 closed;
+highest OPEN = BUG-683**). Full open-id list: `governance/bug_status.json` (machine-derived from `governance/buglog.md`).
+
+WHAT LANDED THIS TURN (D-2879, RATIFIED, stamp 72ff70db866a4bfd): the owner's round-3 words — `ok I accpet your
+recommendations R40,R80,R91` / `R140 drop` / `BUG 679 those are noise drop` — implemented deterministically.
+
+* **BUG-679 FIXED.** The owner-ratified RATIFY-3 DROP(13) now reaches **13/13** (+ R040) = **14 declared drops**; the
+  owner-derived ruler is **194 rows** (201 − 8 residues + 1 reinstatement). The invariant that would have caught it is
+  now a **RAIL**: `n_anchor_rows == n_ruler_rows + n_noise_drop` → **208 == 194 + 14**, asserted on every run, plus a
+  guard that every declared drop must name a real anchor row AND carry a soft-quarantine ledger entry (it fired on its
+  first run: R040 had no entry → recorded in `governance/frontier_audit/noise_drop_quarantine.json` BEFORE the re-stamp).
+* **R091 REINSTATED by declaration** (`config#reinstated_rows`, data not code): domains [education, design strategy],
+  primary education, discipline = **declared abstention** (upstream `creative education` is off the 64-menu; no
+  synthesized label). **DECLARED DIVERGENCE:** the owner's sheet CELL said `noise drop`; the owner's later written word
+  (accepting the KEEP recommendation) governs — recorded, not silently resolved.
+* **BUG-676** rule unchanged, the SET changed: R140 left the abstention set (now a drop — an abstention for a dropped row
+  is a category error, asserted fail-closed), R091 entered it.
+* **BUG-682 OPENED (the real defect behind BUG-679): the axis had TWO homes, now MEASURED.** The owner's round-2/3 rulings
+  exist only in the owner-sheet-derived ruler; the DECLARED authority `discipline_anchor_rederived_v8_20261007.json`
+  still carries the pre-ruling values. Measured: **45 divergent + 23 drop-residue** cells there, **47 + 23** in
+  `ANCHOR_208_CONSOLIDATED` → **92 / 46**. It stayed invisible because (i) the ladder's axis rail declared
+  authority=rederived_v8 and consumer=CONSOLIDATED, which is **regenerated from** rederived_v8 — it compared an artifact
+  with its own copy and **cannot fire**; (ii) `build_domain_ruler.py` was a **SECOND writer** of the ruler deriving from
+  the stale face — a re-run would have SILENTLY REVERTED the owner's rulings (D-387 class); (iii) the D-2870 guard read a
+  **hardcoded column key** (it would scan 0 rows and print green the day the authority's column changes).
+  **FIXED this round:** the tri-state cross-face rail (`apply_owner_domain_review.py --check-faces`) is **in the ladder**
+  with a measured SHRINK-ONLY ceiling (92/46); the rival writer is **retired** (it now refuses, rc=1); the guard's column
+  comes from the declared authority.
+* **`scripts/apply_owner_domain_review.py` became a LADDER RAIL** (`--selftest` 9 known-answer controls, `--check`,
+  `--check-faces`). It had been named in DECISION-LOG.md for two rounds as the way to verify the ruler and was invoked by
+  **NOTHING** — a rail nothing runs is a comment (D-2665/BUG-492). That is how BUG-679 survived two rounds.
+* **BUG-683 OPENED:** `apply_owner_domain_rulings_v8.py` is a rival writer of the **authority** whose input contract no
+  longer exists (it reads `config[...]["rows"]`, removed in the round-2 rewrite) → `KeyError` if run, and nothing runs it.
+* **BUG-681 UPDATE:** `check_encoding_homes --check` is now rc=1 (a DRIFT, not the tolerated owner-owed rc=2), so
+  `just health` **stops there** and everything below it is invisible in the prefix (BUG-573's failure mode). Offender
+  diagnosed with a line number: `scripts/remap_referee_v7_28rows.py` **line 69** (a local `utf-8-sig` instead of the
+  declared decode home `scripts/lib/artifact_encoding.py`).
+
+**NEXT CRITICAL STEPS (strategic order):** (1) **BUG-682 Stage 2 = ONE projection**: ruler → rederived_v8
+(discipline/domain/primary_domain; 14 dropped rows cleared on all three axes + stamped `noise_drop`; abstained rows stamped
+`discipline:""` + `discipline_status: abstained`) → regenerate `ANCHOR_208_CONSOLIDATED` + the five-axis views → **flip the
+axis registry** (the owner-derived ruler becomes the DOMAIN-axis authority) → ceilings to **0**. Closes BUG-682/680/683
+together. (2) **BUG-681(b)**: delegate the remap CSV read to the declared decode home + declare that CSV's encoding
+(unblocks the whole ladder prefix). (3) **BUG-677 / D-2880**: the ANCHOR-2 authority-aligned sheet + key re-mint + kappa
+re-measurement (mint ONLY once the run carries measured numbers). (4) RATIFY-2 full S4→S5→S6 rerun remains the only
+owner-gated RUNTIME action (D-2727).
+
+**OWNER MICRO-GATES (nothing blocking; one word each):** (a) R091's discipline — name a canonical from the 64-menu or
+confirm the abstention; (b) R158's primary — `design strategy` ranks 8/9 on intrinsic applicability, move it or keep it.

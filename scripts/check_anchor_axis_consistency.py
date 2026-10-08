@@ -177,11 +177,15 @@ def _emerging_abstention_guard(config: dict) -> int:
     if not axis:
         return 0
     path = REPO / axis["authority"]["file"]
+    # C12/BUG-492: the column's NAME comes from the declared authority, never from a literal. A hardcoded
+    # key here would silently scan ZERO rows the day the authority's schema changes - a guard that cannot
+    # fire is a comment, and a vacuous green is worse than no guard at all.
+    column = axis["authority"].get("column", "domain")
     rows = json.loads(path.read_text(encoding="utf-8"))
     data = rows.get("rows", rows if isinstance(rows, list) else [])
     violations: list[tuple[str, list[str]]] = []
     for r in data:
-        dom = r.get("domain")
+        dom = r.get(column)
         if isinstance(dom, str):
             toks = [t.strip() for t in dom.split("|") if t.strip()]
         elif isinstance(dom, list):

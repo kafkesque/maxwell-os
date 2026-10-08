@@ -31,6 +31,13 @@ dormant:
 #: Rails that WRITE or REGENERATE an artifact. Each must be run with --selftest BY THE LADDER, because such a
 #: rail's remedy is a claim about bytes it replaces, and an unproven remedy is where BUG-537/BUG-556 came from.
 writers:
+  scripts/apply_owner_domain_review.py:
+    writes: ['governance/DOMAIN_RULER_FROZEN_20261008.json']
+    why: >-
+      BUG-678/BUG-679/BUG-682: the OWNER-derived authority for the discipline/domain/primary_domain axis.
+      It is a WRITER (it re-stamps the ruler from the pinned owner sheet + the declared rulings), so its
+      remedy is a claim about bytes and the ladder must run BOTH its --selftest (the known-answer controls)
+      and its --check (re-derivation proof + the partition invariant) before believing it.
   scripts/check_boundary_rehearsal.py:
     writes: ['<system temp>/boundary_rehearsal_*/ (NEVER inside the synced tree: BUG-537)']
     why: >-

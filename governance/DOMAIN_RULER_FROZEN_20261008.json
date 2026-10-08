@@ -4,9 +4,8 @@
   "pipeline_commit": "569dcc4",
   "source": "ANCHOR_208_CONSOLIDATED_20261007.json",
   "n_anchor_rows": 208,
-  "n_ruler_rows": 201,
-  "n_skipped_empty": 7,
-  "sha256": "5fcde5619e04fbdaebeb02270ca9a189e13e903ad2cf61318fb75285fed5e22c",
+  "n_ruler_rows": 194,
+  "sha256": "d867ce5e059ac25d6d71d904cbc481a128599bac8ab3cf880be2071a21c05f4c",
   "rows": [
     {
       "item_id": "R001",
@@ -121,18 +120,6 @@
         "ai & agents"
       ],
       "primary_domain": "ai & agents"
-    },
-    {
-      "item_id": "R012",
-      "name": "Evolution of Game Art and Design",
-      "discipline": "game design",
-      "domains": [
-        "media & entertainment",
-        "creative technology",
-        "design strategy",
-        "user experience"
-      ],
-      "primary_domain": "media & entertainment"
     },
     {
       "item_id": "R013",
@@ -260,16 +247,6 @@
       "primary_domain": "design strategy"
     },
     {
-      "item_id": "R026",
-      "name": "Index of Motion Graphic Title Design Terms",
-      "discipline": "information science",
-      "domains": [
-        "information architecture",
-        "motion design"
-      ],
-      "primary_domain": "information architecture"
-    },
-    {
       "item_id": "R027",
       "name": "Decentralized Strategic Command",
       "discipline": "organizational theory",
@@ -337,16 +314,6 @@
         "research practice"
       ],
       "primary_domain": "research practice"
-    },
-    {
-      "item_id": "R034",
-      "name": "Negative Space Alphabet Challenge",
-      "discipline": "design thinking",
-      "domains": [
-        "graphic design",
-        "design systems"
-      ],
-      "primary_domain": "graphic design"
     },
     {
       "item_id": "R035",
@@ -825,15 +792,6 @@
       "primary_domain": "marketing & communications"
     },
     {
-      "item_id": "R082",
-      "name": "Historical Data Sources for Manufacturing and Economic Analysis",
-      "discipline": "research methodology",
-      "domains": [
-        "research practice"
-      ],
-      "primary_domain": "research practice"
-    },
-    {
       "item_id": "R083",
       "name": "Self-herding Behavior",
       "discipline": "behavioral economics",
@@ -908,6 +866,16 @@
         "semiotics & communication"
       ],
       "primary_domain": "media & entertainment"
+    },
+    {
+      "item_id": "R091",
+      "name": "Autopoesis in Design Education",
+      "discipline": "",
+      "domains": [
+        "education",
+        "design strategy"
+      ],
+      "primary_domain": "education"
     },
     {
       "item_id": "R092",
@@ -1406,19 +1374,6 @@
       "primary_domain": "education"
     },
     {
-      "item_id": "R140",
-      "name": "Digital Culture Integration in Graphic Design",
-      "discipline": "",
-      "domains": [
-        "creative technology",
-        "digital product",
-        "graphic design",
-        "user experience",
-        "web & ui"
-      ],
-      "primary_domain": "creative technology"
-    },
-    {
       "item_id": "R141",
       "name": "Contextual Redundancy and Representation Efficiency",
       "discipline": "machine learning",
@@ -1811,17 +1766,6 @@
       "primary_domain": "graphic design"
     },
     {
-      "item_id": "R180",
-      "name": "Intersectional Design Approaches for Underserved Communities",
-      "discipline": "cultural studies",
-      "domains": [
-        "design strategy",
-        "user experience",
-        "research practice"
-      ],
-      "primary_domain": "design strategy"
-    },
-    {
       "item_id": "R181",
       "name": "Economic Industry Network Structure",
       "discipline": "economics",
@@ -1829,16 +1773,6 @@
         "systems & frameworks"
       ],
       "primary_domain": "systems & frameworks"
-    },
-    {
-      "item_id": "R182",
-      "name": "Cultural Mourning Rituals and Symbolism",
-      "discipline": "anthropology",
-      "domains": [
-        "arts & culture",
-        "semiotics & communication"
-      ],
-      "primary_domain": "arts & culture"
     },
     {
       "item_id": "R183",
@@ -1997,17 +1931,6 @@
       "primary_domain": "user experience"
     },
     {
-      "item_id": "R200",
-      "name": "Simplicity Cult in Saas Pricing",
-      "discipline": "cultural studies",
-      "domains": [
-        "business development",
-        "marketing & communications",
-        "user experience"
-      ],
-      "primary_domain": "business development"
-    },
-    {
       "item_id": "R201",
       "name": "Physical Activity and Brain Health",
       "discipline": "health & medicine",
@@ -2108,5 +2031,8 @@
       "primary_domain": "education"
     }
   ],
-  "note": "re-derived from the 2026-10-08 owner review sheet (governance/OWNER_DOMAIN_REVIEW_SOURCE_20261008.csv, sha256-pinned) + the owner's round-2 answers (governance/OWNER_CONFIRMATION_SHEET_20261008.csv, sha256-pinned) + owner discipline rulings (R141->machine learning, R159->risk management); declared drops: owner noise_drop rows R021/R084/R106/R148; owner-confirmed discipline abstentions declare discipline='' (BUG-676 fix); the R158 domain drop is APPLICABILITY-ranked (D-2878), never positional; rows still pending the owner: R040, R080, R091 (see governance/OWNER_RULINGS_ROUND2_20261008.md); verify with: python3 scripts/apply_owner_domain_review.py --check"
+  "note": "re-derived from the 2026-10-08 owner review sheet (governance/OWNER_DOMAIN_REVIEW_SOURCE_20261008.csv, sha256-pinned) + the owner's round-2 answers (governance/OWNER_CONFIRMATION_SHEET_20261008.csv, sha256-pinned) + the owner's round-3 rulings (governance/OWNER_RULINGS_ROUND3_20261008.md); declared owner noise_drop rows R012/R021/R026/R034/R040/R080/R082/R084/R106/R140/R148/R180/R182/R200 are REMOVED (the RATIFY-3 DROP(13) now reaches 13/13 + R040, BUG-679); owner-kept row(s) R091 reinstated by declaration; owner-confirmed discipline abstentions declare discipline='' (BUG-676 fix); the R158 domain drop is APPLICABILITY-ranked (D-2878), never positional; verify with: python3 scripts/apply_owner_domain_review.py --check",
+  "n_noise_drop": 14,
+  "n_reinstated": 1,
+  "partition": "n_anchor_rows == n_ruler_rows + n_noise_drop (BUG-679 invariant)"
 }

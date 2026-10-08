@@ -1,84 +1,39 @@
 #!/usr/bin/env python3
-"""Materialize a frozen domain-axis ruler from the 208-row anchor authority.
+"""build_domain_ruler.py — RETIRED as a writer (D-2879). It refuses to write. Use the ONE derivation.
 
-The domain axis of the D-312/D-349 calibrated-abstention framework was declared
-UNMEASURABLE because "no ruler truth column exists" (D-348,
-governance/R2_GATE_MEASUREMENT_20260923.json `unmeasurable_axes.domains`). The
-208-row consolidated anchor authority (ANCHOR_208_CONSOLIDATED_20261007.json)
-DOES carry owner-finalized domain truth (`domain` multi-label + `primary_domain`).
-This script freezes that truth into a fingerprinted ruler so a domain abstention
-curve can be measured — following the same "measure, never transplant" rule as the
-discipline/content_type axes (D-312 role-specificity).
+WHY (BUG-682, the anti-REVERT limb). Until 2026-10-08 this script materialized
+governance/DOMAIN_RULER_FROZEN_20261008.json from governance/ANCHOR_208_CONSOLIDATED_20261007.json -
+a face that had NOT received the owner's round-2/round-3 rulings. So the artifact had TWO writers with
+TWO different derivations: scripts/apply_owner_domain_review.py (the pinned owner-sheet derivation, which
+carries every owner ruling) and this script (a copy of the stale consolidated face). Nothing asserted they
+agreed, so a re-run of THIS script would have SILENTLY REVERTED the owner's rulings - the D-387 class
+("a normalize re-run must never revert an owner ruling"), one level up: a re-derivation that reverts the
+OWNER's own words.
 
-Read-only: modifies neither pipeline output nor the anchor authority.
+THE RULE NOW: the ruler has ONE derivation and ONE writer -
+    config/owner_domain_rulings_20261008.yaml + the pinned owner sheets
+      -> scripts/apply_owner_domain_review.py --apply -> governance/DOMAIN_RULER_FROZEN_20261008.json
+      -> scripts/apply_owner_domain_review.py --check  (re-derivation proof) / --check-faces (cross-face)
+
+This module is kept (rather than deleted) so that any older reference resolves to an EXPLANATION instead of
+a silent revert, and it exits non-zero so an automated re-run fails loudly (C16: no silent errors).
+Also note the cross-check that caught it: --check-faces reports the divergence between the ruler and the
+face the pipeline reads, with a SHRINK-ONLY ceiling (BUG-682).
 """
 from __future__ import annotations
 
-import hashlib
-import json
-import subprocess
 import sys
-from pathlib import Path
-
-ROOT = Path(__file__).resolve().parent.parent
-SRC = ROOT / "governance" / "ANCHOR_208_CONSOLIDATED_20261007.json"
-OUT = ROOT / "governance" / "DOMAIN_RULER_FROZEN_20261008.json"
-
-
-def _domain_list(raw: str) -> list[str]:
-    """Split a pipe-separated domain string into a de-duplicated ordered list."""
-    if not raw:
-        return []
-    return [d for d in (x.strip() for x in raw.split("|")) if d]
-
-
-def _git_head() -> str:
-    """Return the current git commit short hash, or 'unknown' if unavailable."""
-    try:
-        return subprocess.check_output(
-            ["git", "rev-parse", "--short", "HEAD"], cwd=str(ROOT), text=True
-        ).strip()
-    except (OSError, subprocess.CalledProcessError):
-        return "unknown"
 
 
 def main() -> int:
-    data = json.loads(SRC.read_text())
-    rows = data["rows"]
-
-    ruler_rows: list[dict] = []
-    skipped_empty: int = 0
-    for r in rows:
-        dom = _domain_list(r.get("domain", ""))
-        if not dom:
-            skipped_empty += 1
-            continue
-        ruler_rows.append({
-            "item_id": r["item_id"],
-            "name": r["name"],
-            "discipline": r.get("discipline", ""),
-            "domains": dom,
-            "primary_domain": (r.get("primary_domain") or "").strip(),
-        })
-
-    payload = json.dumps(ruler_rows, sort_keys=True, ensure_ascii=False)
-    artifact = {
-        "schema_version": 1,
-        "gen_model": "none",
-        "pipeline_commit": _git_head(),
-        "source": SRC.name,
-        "n_anchor_rows": len(rows),
-        "n_ruler_rows": len(ruler_rows),
-        "n_skipped_empty": skipped_empty,
-        "sha256": hashlib.sha256(payload.encode("utf-8")).hexdigest(),
-        "rows": ruler_rows,
-    }
-    OUT.write_text(json.dumps(artifact, indent=2, ensure_ascii=False) + "\n")
-    print(
-        f"wrote {OUT.name}: n_ruler_rows={len(ruler_rows)} "
-        f"skipped_empty={skipped_empty} sha256={artifact['sha256'][:16]}"
-    )
-    return 0
+    """Refuse to write: name the single derivation and the rail that proves it."""
+    print("REFUSED: build_domain_ruler.py is RETIRED as a writer (D-2879/BUG-682).")
+    print("  It derived the ruler from the CONSOLIDATED face, which does NOT carry the owner's")
+    print("  round-2/round-3 rulings - a re-run would silently revert them (D-387 class).")
+    print("  The ONE derivation is: python3 scripts/apply_owner_domain_review.py --apply")
+    print("  Proof/no-drift:        python3 scripts/apply_owner_domain_review.py --check")
+    print("  Cross-face divergence: python3 scripts/apply_owner_domain_review.py --check-faces")
+    return 1
 
 
 if __name__ == "__main__":

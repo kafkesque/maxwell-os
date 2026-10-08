@@ -9451,7 +9451,7 @@ discipline abstention as the token - including for R140, which is now a DROP, so
 residue there. The correct fix remains the consolidation chain (stamp \`discipline: ""\` +
 \`discipline_status: abstained\` + \`discipline_source: owner_abstained\`), never a hand edit.
 
-## BUG-687 (OPEN, 2026-10-08) — `config/recalibration_pins.yaml` pins a GITIGNORED derived artifact: `nli_calibration` → `knowledge pipeline/metrics/nli_calibration.json` (D-2863)
+## BUG-687 (CLOSED, 2026-10-08 — pin retired, D-2882) — `config/recalibration_pins.yaml` pins a GITIGNORED derived artifact: `nli_calibration` → `knowledge pipeline/metrics/nli_calibration.json` (D-2863)
 
 Root cause of BUG-681(c). `config/recalibration_pins.yaml#pins.nli_calibration` (D-2863) pins
 `knowledge pipeline/metrics/nli_calibration.json` — a 16 MB regenerable calibration-run OUTPUT (keys:
@@ -9468,10 +9468,12 @@ missing: knowledge pipeline/metrics/nli_calibration.json` from RAIL 3 (recalibra
 RAIL 4 `FORBIDDEN session plan`. RAIL 3 fires before RAIL 4 (hook order) because `git add -A` stages the pins
 file, whose SCAN fails on the absent gitignored subject.
 
-FIX (OWNER-GATED, D-353): retire the pin (with a `retired:` marker) — the NLI threshold's durable source of
-truth is already `config/pipeline_config.yaml#stage5.nli_calibration` {aggregation, threshold: 0.5, decision:
-D-2863}, which is tracked — or re-scope it to a tracked artifact. Do NOT hand-edit the rehearsal's declared
-marker (that hides the drift) and do NOT track the 16 MB derived blob (C28 bloat, contradicts "regenerable").
+RESOLUTION (D-2882, owner approved 2026-10-08): the pin is RETIRED with a `retired:` marker in
+config/recalibration_pins.yaml, never re-scoped to the 16 MB derived blob and never tracked (C28 bloat). The
+durable NLI source of truth remains TRACKED and unchanged: config/pipeline_config.yaml#stage5.nli_calibration
+{aggregation, threshold: 0.5, decision: D-2863} — D-2863's config decision stays RATIFIED; only the redundant
+derived-blob pin is withdrawn. VERIFIED: verify_recalibration_pins.py scan 6 pinned / 0 DRIFT / 0 OWNER-OWED
+(selftest 16/16); check_boundary_rehearsal whole-tree commit refused by the DECLARED RAIL 4 again (not RAIL 3).
 
 ## BUG-682 (CLOSED, 2026-10-08 — Stage 2 projection landed) — the axis had TWO homes: the owner's rulings are absent from the face the PIPELINE reads, and the rail that should have caught it compared an artifact with its own copy
 

@@ -30,7 +30,11 @@ pins:
     path: scripts/abstention_robustness.py
     sha256: 0218845e82a568529637db9b2d749cbf1f5bceaf2a686851230cd0ce0e154c9f
     decision: D-352
-  nli_calibration:
-    path: knowledge pipeline/metrics/nli_calibration.json
-    sha256: bf36e00803df457b82bfeba892656e279fe4f69e6116e1e1e584f5c33a7eea31
-    decision: D-2863
+# BUG-687 (CLOSED 2026-10-08): the nli_calibration pin (D-2863) is RETIRED, not re-scoped. It pinned
+# `knowledge pipeline/metrics/nli_calibration.json` — a 16 MB regenerable calibration-run OUTPUT under the
+# gitignored `knowledge pipeline/` directory (.gitignore:73), so it could never hold in `git archive HEAD`
+# (fresh clone / fixture / recovered repo). A pin certifies immutability of a TRACKED artifact; a gitignored
+# subject is a category error. The NLI threshold's durable source of truth is TRACKED and unchanged:
+# config/pipeline_config.yaml#stage5.nli_calibration {aggregation, threshold: 0.5, decision: D-2863}.
+retired:
+  - nli_calibration

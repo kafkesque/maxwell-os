@@ -15122,3 +15122,34 @@ decisions:
   - governance/ANCHOR_STORE_BRIDGE_20260926.json
   - governance/depth_anchor_conformance_20261002.json
   - governance/buglog.md
+- id: D-2882
+  state: RATIFIED
+  category: GOVERNANCE / PINS
+  title: 'Retire the nli_calibration pin (D-2863): it pinned a gitignored derived artifact (BUG-687)'
+  decision: 'BUG-687 (owner-gated D-353 re-scope, owner approved 2026-10-08): the nli_calibration pin is RETIRED,
+    not
+
+    re-scoped and not re-minted. D-2863 minted a sha256 pin on knowledge pipeline/metrics/nli_calibration.json,
+
+    a 16 MB regenerable calibration-run OUTPUT under the gitignored knowledge pipeline/ directory (.gitignore:73).
+
+    A pin certifies immutability of a TRACKED artifact; a gitignored subject can never hold in git archive HEAD,
+
+    so the pin was a no-op in the live tree and fatal in any fresh clone / fixture / recovered repo (the BUG-574
+    /
+
+    BUG-578 class). The durable NLI source of truth is TRACKED and UNCHANGED: config/pipeline_config.yaml
+
+    stage5.nli_calibration {aggregation: or_entail_and_no_contra, threshold: 0.5, decision: D-2863}. D-2863''s
+
+    config decision remains RATIFIED and in force; only the redundant derived-blob pin is withdrawn via the
+
+    retired: marker (BUG-535). This restores check_boundary_rehearsal: the whole-tree commit is again refused by
+
+    the DECLARED rail (RAIL 4 FORBIDDEN session plan), not RAIL 3.'
+  bugs:
+  - BUG-687
+  files:
+  - config/recalibration_pins.yaml
+  - config/pipeline_config.yaml
+  - governance/buglog.md

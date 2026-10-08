@@ -11,7 +11,7 @@
 
 ## 🔴 CURRENT OPEN / PENDING INDEX (machine-derived 2026-10-03 — the live face; history below)
 
-Register truth (do NOT restate counts elsewhere — BUG-588/D-2692): 1010 decisions · 448 bugs (166 open / 282 closed; highest OPEN = BUG-684). Forensic audit GREEN: 0 fatal rails — store-change re-baseline cascade (BUG-659..668) FIXED at root cause.
+Register truth (do NOT restate counts elsewhere — BUG-588/D-2692): 1010 decisions · 449 bugs (164 open / 285 closed; highest OPEN = BUG-685). Forensic audit GREEN: 0 fatal rails — store-change re-baseline cascade (BUG-659..668) FIXED at root cause.
 
 1. **OWNER-GATED (D-2727): RATIFY-2 full S4→S5→S6 rerun** — launch under `caffeinate -dimsu` (`runner.py --dry-run` then full).
 2. **OWNER-GATED (D-2727 OG-1): train/eval split** — Option A recommended (KEEP(46)→S4 golden; pin 46 OUT of eval ruler 208→162; sha256-pinned split manifest).

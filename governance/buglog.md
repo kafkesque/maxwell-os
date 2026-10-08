@@ -24,9 +24,7 @@
 
 | Bug | Date | Issue |
 |---|---|---|
-| BUG-682 | 2026-10-08 | **The discipline/domain/primary_domain axis had TWO homes: the OWNER's rulings (round 2+3) exist only in the owner-sheet-derived ruler, while the face the pipeline reads (\`discipline_anchor_rederived_v8_20261007.json\`, declared authority by config/anchor_axis_authority.yaml + config/anchor_family.yaml, D-2868) still carries the pre-ruling values. MEASURED: 92 divergent + 46 drop-residue axis cells (rederived_v8 45/23, CONSOLIDATED 47/23) on 194 shared ids. It stayed invisible because (i) the ladder's axis rail compared the authority with ANCHOR_208_CONSOLIDATED, which is REGENERATED FROM it - a control that cannot fire - and (ii) the ruler had a SECOND writer (build_domain_ruler.py, deriving from the stale face) that a re-run would have used to SILENTLY REVERT the owner's rulings (D-387 class). LANDED THIS ROUND: a tri-state cross-face rail in the ladder (--check-faces, measured SHRINK-ONLY ceiling 92/46), the rival writer RETIRED as a writer (it now refuses), and a hardcoded column-name literal in the D-2870 guard replaced by the declared column (a guard that would have scanned 0 rows and printed green). NEXT: ONE projection (ruler -> rederived_v8 -> regenerate CONSOLIDATED/views + flip the axis registry) then ceiling -> 0.** |
 
-| BUG-684 | 2026-10-08 | **`scripts/regenerate_anchor_208_v8.py` carries a SECOND, HARDCODED copy of the drop list and of the emerging set as PYTHON LITERALS: `NOISE_DROP = {"R021","R084","R106","R148"}` and `EMERGING = {"R040","R080","R091"}` (C12 violation: a value that is configurable by nature, declared in code). This is the MECHANISM by which the owner-ratified DROP(13) could never reach `ANCHOR_208_CONSOLIDATED`: the ruler said "drop", the regenerator had its own four-id literal and re-populated every other dropped row from the stale authority - which is why BUG-679's residues were invisible in the face the pipeline reads. Consequence today: R040/R080 would still be written as `discipline="emerging"` (an out-of-menu token) and R140/R012/etc. would still get full axes. FIX (part of BUG-682 Stage 2): read the drop / abstention / emerging sets from config and project the regenerator's three axis columns from the ruler, never from literals.** | **\`scripts/apply_owner_domain_rulings_v8.py\` is a rival WRITER of the declared authority whose input contract no longer exists: it reads \`config/owner_domain_rulings_20261008.yaml["rows"]\`, and the round-2 rewrite of that config replaced the \`rows:\` block with declarative columns, so it raises KeyError on its first line of work. It is invoked by NO rail, so the break was silent - while its docstring still asserts that folding into the authority is how the rulings become real. FIX (folds into BUG-682 Stage 2): re-point it at the RULER and make it the projection limb, or retire it as a writer like build_domain_ruler.py.** |
 | BUG-681 | 2026-10-08 | **`just health-full` = the ladder's WHOLE fault set. Round 2 measured 6; round 3 measures `FAIL ladder scan: 3 fault(s) in ONE pass` over 118 lines (503s), worst rc=1 (D-2680/BUG-573). FIXED so far: the unparsed buglog heading, the missing archive-index entry, and `check_undeclared_encoding`. THE 3 REMAINING: (a) `check_tests --check` = 3 red contract tests outside a declared-red=0 ceiling, incl. `test_s4_golden_conforms_to_ontology` (a golden set that does not conform to the ontology) - pre-existing, attributed away from the ANCHOR work by grep; (b) `check_encoding_homes --check` rc=1 - **this one BLOCKS the `just health` prefix**, offender NAMED with a line number: `scripts/remap_referee_v7_28rows.py:69` opens the owner remap CSV with a local `encoding="utf-8-sig"` instead of the ONE declared decode home (`scripts/lib/artifact_encoding.py`, D-2644/D-2646) - the honest fix needs a DECLARATION for that CSV; (c) `check_boundary_rehearsal` rc=1, newly diagnosed: `bootstrap.whole_tree_refused: refused (rc=1) but not for the declared reason 'FORBIDDEN session plan' (RAIL 4) - a refusal that does not name its cause cannot justify a bypass` - i.e. a whole-tree commit is still refused, but by a DIFFERENT rail than the declared one, so either the declared marker is stale or an earlier rail now refuses; do NOT hand-edit the declared reason (that hides the drift) - retain the fixture and print the ACTUAL refusal text. Diagnose (b) FIRST: it is the blocker that hides (a) and (c).** |
 | BUG-242 | 2026-09-11 | **frontier69_v2 + extension80 audit outputs carry 2 data-quality defects.** (1) The `*_verdict` fields (depth/discipline/domains) are LLM SELF-REPORTS, not computed comparisons — they claim `override` even when the audit value equals silver (e.g. `S4-GOLD-MINED-00005` domains identical yet `domains_verdict=override`), so the cited "57.5% domain-override" and "80 flagged" figures are inflated. (2) Non-principle content_type rows (noise_drop/tool_instruction/process_template/process_instance/growth_edge) carry a spurious 4-way depth label, violating D2612 (depth only for principle). FIX (applied in `scripts/build_phase0_adjudication_form.py`): agreement recomputed deterministically (`differs` flag) + depth marked N/A for non-principle. REMAINS: recompute the override figures from the audit values (deterministic), and re-run the audit to null depth on non-principle if the raw artifacts are kept. |
 | BUG-228 | 2026-09-08 | **Dead/aspirational schema fields — 0 code references.** `parent_pt_id` (process_instance's tether to a template), `promoted_to_type`/`promoted_to_id`/`parent_fb_ids` (growth_edge promotion), MCP `annotations` (`readOnlyHint`/`destructiveHint`/`idempotentHint`), `consulted_fbs`/`template_source` — all declared in `content_types.yaml`, all 0 refs in `pipeline/`+`scripts/`. Consequence: `process_instance` is indistinguishable from an unlinked anecdote; `growth_edge` is a dead-end bucket with a staging-area description; MCP-promotion aspiration is unbacked. False affordances for future retrieval code. Fix = prune or ship; backfill `parent_pt_id` when a PT exists (§1.3.2 of the adjudication doc). |
@@ -50,6 +48,7 @@
 ---
 
 ## ✅ CLOSED / RESOLVED — bottom (recent)
+- **BUG-682 / BUG-683 / BUG-684** — **Stage 2 projection LANDED: the frozen ruler is now the ONE authority** — `regenerate_anchor_208_v8.py` reads drop/abstention sets from config and projects from the RULER (no hardcoded literals, BUG-684); the ruler was projected onto rederived_v8 + both five-axis views (place 5, 614 cells) and the axis registry flipped to the ruler (place 6: `anchor_axis_authority.yaml` + `anchor_family.yaml` + `pipeline_config.yaml#discipline_anchor_path`); the five-axis views are now declared consumers (closes the place-5 verification blindspot); `apply_owner_domain_rulings_v8.py` RETIRED as a writer (refuses, rc=1 — BUG-683); cross-face ceiling at 0/0. ✅ (2026-10-08)
 
 - **BUG-676** — **discipline abstention was an out-of-menu TOKEN ('emerging') inside the frozen authority FIXED** — owner-confirmed abstentions now declare `discipline: ""` via `config/owner_domain_rulings_20261008.yaml#discipline_abstention` (8 rows); the script is fail-closed in both directions and the ruler was re-stamped (`b766ae912401d7da` -> `5fcde5619e04fbda`). Residuals declared as BUG-680 (upstream faces) + BUG-679 (R140 is also a ratified drop). ✅ (2026-10-08)
 - **BUG-678** — **the derived review CSV was a lossy, contradictory face of the owner sheet FIXED** — replaced by the pinned faithful export + data-driven rulings + a re-derivable ruler (`--check` reproduces it byte-identically). ✅ (2026-10-08)
@@ -9449,7 +9448,7 @@ discipline abstention as the token - including for R140, which is now a DROP, so
 residue there. The correct fix remains the consolidation chain (stamp \`discipline: ""\` +
 \`discipline_status: abstained\` + \`discipline_source: owner_abstained\`), never a hand edit.
 
-## BUG-682 (OPEN, 2026-10-08 round 3) — the axis had TWO homes: the owner's rulings are absent from the face the PIPELINE reads, and the rail that should have caught it compared an artifact with its own copy
+## BUG-682 (CLOSED, 2026-10-08 — Stage 2 projection landed) — the axis had TWO homes: the owner's rulings are absent from the face the PIPELINE reads, and the rail that should have caught it compared an artifact with its own copy
 
 MEASURED this round (not inferred):
   * \`governance/discipline_anchor_rederived_v8_20261007.json\`: **45 divergent + 23 drop-residue** axis cells.
@@ -9498,7 +9497,7 @@ ANCHOR_208_CONSOLIDATED + the five-axis views from it, FLIP the axis registry so
 DOMAIN-axis authority and every lineage face is a consumer, then lower \`ceiling_divergence\` /\`ceiling_drop_residue\`
 to 0. That single projection closes this bug, BUG-680 and BUG-683 together.
 
-## BUG-683 (OPEN, 2026-10-08 round 3) — a rival writer of the AUTHORITY whose input contract no longer exists (it would now crash, and nothing runs it)
+## BUG-683 (CLOSED, 2026-10-08 — retired as a writer, Stage 2 place 6) — a rival writer of the AUTHORITY whose input contract no longer exists (it would now crash, and nothing runs it)
 
 \`scripts/apply_owner_domain_rulings_v8.py\` was D-2874's fold limb: it read
 \`config/owner_domain_rulings_20261008.yaml["rows"]\` (a mapping of item_id -> {domains, primary}) and wrote the
@@ -9511,6 +9510,8 @@ into the authority is how the rulings become real, which is the half-true claim 
 FIX (folds into BUG-682 Stage 2): re-point it at the RULER (the owner-derived truth) instead of a config
 \`rows:\` block, and make it the PROJECTION limb; or retire it as a writer exactly like
 \`build_domain_ruler.py\`. Until then it must not be run - a writer whose contract is stale is a revert trap.
+
+RESOLVED (2026-10-08, Stage 2 place 6): retired as a writer. The script now REFUSES (rc=1) and names the ONE derivation (`apply_owner_domain_review.py --apply`) and its rails, exactly like `build_domain_ruler.py` (D-2879). Its stale `config["rows"]` contract is gone; it can no longer silently fold a ruling into the now-downstream rederived_v8 face.
 
 ## BUG-681 (UPDATE, 2026-10-08 round 3) — the encoding fault is now a LADDER BLOCKER, and its offender is named with a line number
 
@@ -9548,7 +9549,7 @@ FIX (needs a decision, so it is queued as the next critical step rather than imp
 FACT about the artifact and \`open_artifact\` fails closed on an undeclared path. The alternative (an \`allow\`
 entry) is a declared second implementation, i.e. the debt this rail exists to remove.
 
-## BUG-684 (OPEN, 2026-10-08) — the regenerator carries a HARDCODED second home of the drop list, which is why the owner-ratified drop could never reach the face the pipeline reads
+## BUG-684 (CLOSED, 2026-10-08 — Stage 2 projection landed) — the regenerator carries a HARDCODED second home of the drop list, which is why the owner-ratified drop could never reach the face the pipeline reads
 
 MEASURED (the mechanism behind BUG-679, found while auditing the Stage-2 projection before writing it):
 
@@ -9599,3 +9600,17 @@ owner decision, not part of the depth clear.
 
 CLASS: C16/reproducibility (a generator that cannot regenerate its own artifact) + BUG-492-adjacent (the builder is
 a rail nothing re-runs).
+
+## BUG-682 / BUG-683 / BUG-684 — CLOSED 2026-10-08 (Stage 2 projection landed)
+The single projection named in each OPEN entry has landed and is verified:
+- `regenerate_anchor_208_v8.py` reads drop/abstention sets from config + projects from the RULER (BUG-684).
+- `project_ruler_to_rederived_v8.py` projected the ruler onto rederived_v8 (R091 added, drops cleared, abstentions stamped).
+- Five-axis views projected from the ruler (place 5, `project_ruler_to_views.py`): 614 cells re-pointed.
+- Axis registry flipped to the ruler (place 6): `anchor_axis_authority.yaml` discipline/domain/primary_domain authority -> `DOMAIN_RULER_FROZEN_20261008.json` (domain column `domain` -> `domains` list), `pipeline_config.yaml#discipline_anchor_path` -> ruler, `anchor_family.yaml` domains.artifact -> ruler (cohort 202 -> 194).
+- The five-axis views are now declared consumers of the discipline/domain/primary_domain axes (closes the place-5 verification blindspot).
+- Write-limb discipline menu fixed `closed_menu_v5.json` -> `closed_menu_v8.json` (the v8 axis was being validated against the stale v5 menu; 3 v8 disciplines false-flagged off-menu).
+
+VERIFIED (all exit 0): `check_anchor_axis_consistency.py` (every consumer agrees, catch-all guard 194 rows), `apply_owner_domain_review.py --check` (ruler byte-re-derivable) + `--check-faces` (0 divergent / 0 residual), `verify_anchor_family_registry.py` (cohort 194, primary_domain_filled 194/194), selftests for both axis scripts.
+Ceilings at 0 (shrink-only). BUG-685 (depth conformance builder) remains OPEN — separate fix, not part of this projection.
+
+BUG-683 retired as a writer: `scripts/apply_owner_domain_rulings_v8.py` now REFUSES (rc=1), naming the ONE derivation (`apply_owner_domain_review.py --apply`) — the same pattern as `build_domain_ruler.py` (D-2879). Its stale `config["rows"]` contract is gone and its write target (rederived_v8) is now a downstream face, so it can no longer silently fold a ruling into a face that must FOLLOW the ruler.

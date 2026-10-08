@@ -406,7 +406,7 @@ stage4:
   golden_path: config/golden/stage4_golden.yaml
   golden_inject_enabled: true
   golden_max_examples: 7
-  discipline_anchor_path: governance/discipline_anchor_rederived_v8_20261007.json
+  discipline_anchor_path: governance/DOMAIN_RULER_FROZEN_20261008.json
   discipline_conformance_kappa_floor: 0.8
   # D-2798 (BUG-622): discipline is ADVISORY-ONLY — this floor is a REPORTING reference,
   # NOT a hard gate. discipline_conformance_gate.py --gate is a NO-OP in advisory mode

@@ -52,7 +52,13 @@ CONFIG = REPO / "config" / "anchor_axis_authority.yaml"
 
 
 def _collapse(value: object) -> str:
-    """Normalise a cell: collapse whitespace, keep an empty cell empty."""
+    """Normalise a cell: collapse whitespace, keep an empty cell empty.
+
+    A list (the ruler's `domains` column) is pipe-joined so the AUTHORITY's list form compares
+    equal to a consumer's `domain` string — one canonical serialisation for the axis (D-2866).
+    """
+    if isinstance(value, (list, tuple)):
+        return "|".join(" ".join(str(v).split()) for v in value if v)
     if value is None:
         return ""
     return " ".join(str(value).split())

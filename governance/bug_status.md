@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**166 open** / 282 closed of 448 ids.
+**164 open** / 285 closed of 449 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -170,6 +170,4 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-677 | (OPEN, 2026-10-08) — two owner-facing truths for the SAME 60 items (ANCHOR-2 sheet vs frozen ruler) | 1 |
 | BUG-680 | (OPEN, 2026-10-08) — the upstream anchor faces still encode discipline abstention as the out-of-menu token 'emerging' (BUG-676 residual) | 2 |
 | BUG-681 | (OPEN, 2026-10-08) — `just health-full` found 6 faults in one pass; 2 fixed deterministically, 4 remain (3 red contract tests + 3 rails) and | 2 |
-| BUG-682 | (OPEN, 2026-10-08 round 3) — the axis had TWO homes: the owner's rulings are absent from the face the PIPELINE reads, and the rail that shou | 1 |
-| BUG-683 | (OPEN, 2026-10-08 round 3) — a rival writer of the AUTHORITY whose input contract no longer exists (it would now crash, and nothing runs it) | 1 |
-| BUG-684 | (OPEN, 2026-10-08) — the regenerator carries a HARDCODED second home of the drop list, which is why the owner-ratified drop could never reac | 1 |
+| BUG-685 | (OPEN, 2026-10-08) — the depth conformance builder can no longer reproduce its own artifact (two latent defects) | 1 |

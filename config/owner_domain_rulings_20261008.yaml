@@ -16,11 +16,12 @@ source:
   consolidated: governance/ANCHOR_208_CONSOLIDATED_20261007.json
   ruler: governance/DOMAIN_RULER_FROZEN_20261008.json
   taxonomy: config/taxonomy_v8.yaml
-  # The face the PIPELINE actually reads for the domain axis (declared authority of record:
-  # config/anchor_family.yaml + config/anchor_axis_authority.yaml, D-2868). Declared HERE so the
-  # cross-face divergence rail can measure it: a ruling that lands in the ruler but not here is an
-  # error leak, not a cosmetic drift (BUG-682).
-  authority_of_record: governance/discipline_anchor_rederived_v8_20261007.json
+  # The face the PIPELINE actually reads for the domain axis. After Stage 2 place 6 the axis registry was
+  # FLIPPED so the frozen ruler IS the declared authority of record (config/anchor_family.yaml +
+  # config/anchor_axis_authority.yaml + config/pipeline_config.yaml#discipline_anchor_path all -> this ruler,
+  # D-2868). It is declared HERE for continuity with the pre-flip record; the cross-face divergence rail
+  # measures the faces.must_follow list below, not this key.
+  authority_of_record: governance/DOMAIN_RULER_FROZEN_20261008.json
   # The soft-quarantine ledger: the audit trail that makes a declared drop reversible (D-2711).
   quarantine_ledger: governance/frontier_audit/noise_drop_quarantine.json
 # The owner's ROUND-2 answers, written by the owner INTO the sheet. Pinned by sha256 and asserted fail-closed
@@ -158,9 +159,9 @@ owner_notes_accounted:
   R159: primary directive -> primary_override
   R141: discipline directive -> discipline_override
 # CROSS-FACE DIVERGENCE (BUG-682). The ruler is the OWNER-DERIVED truth for the discipline / domain /
-# primary_domain axis. The faces below are declared to FOLLOW it. The pipeline still reads the declared
-# authority_of_record, which has NOT yet received the round-2/round-3 rulings, so the divergence is measured
-# on every run and its declared ceiling is SHRINK-ONLY: it must go to 0 when the projection lands (Stage 2).
+# primary_domain axis. The faces below are declared to FOLLOW it. After Stage 2 place 6 the pipeline reads the
+# frozen ruler directly (the authority_of_record above IS the ruler), so the divergence is measured on every
+# run and its declared ceiling is SHRINK-ONLY (a growth may not be silent).
 #   ceiling_divergence  = axis CELLS that disagree with the ruler on a shared item_id.
 #   ceiling_drop_residue = axis cells still populated for a declared noise_drop row (a propagated drop).
 # A value equal to the declared abstention token is an ABSENCE, not a value, and is never counted.
@@ -168,7 +169,8 @@ owner_notes_accounted:
 # (R091's discipline = systems thinking) landed in the ruler and, within minutes, the rail failed LOUDLY because
 # the CONSOLIDATED face still carries \u2018emerging\u2019 for R091 - exactly one cell, exactly the propagation gap the
 # rail exists to expose. Re-declaring is the DELIBERATE act the rail forces (a growth may not be silent), and the
-# drop-residue half is UNCHANGED at 46. Both must go to 0 when the Stage-2 projection lands (BUG-682/684).
+# drop-residue half is UNCHANGED at 46. LANDED (Stage 2 place 5/6, 2026-10-08): the projection reached 0/0 and
+# the ceiling is now at its 0 floor; both faces agree with the ruler on every shared id (BUG-682/684 CLOSED).
 faces:
   ceiling_divergence: 0
   ceiling_drop_residue: 0

@@ -121,10 +121,18 @@ def derive(cfg: dict[str, Any]) -> dict[str, Any]:
         cohort = json.loads((REPO / dom_cfg["artifact"]).read_text(encoding="utf-8")).get("rows", [])
     else:
         cohort = read_csv_rows(REPO / dom_cfg["artifact"])
+    def _domains_filled(d: dict[str, Any]) -> bool:
+        """A row carries a domain value whether the authority stores a pipe-joined string (the
+        consumer's `domain` column) or a LIST (the ruler's `domains` column, D-2866 canonical form)."""
+        val = d.get("domain")
+        if val is None:
+            val = d.get("domains")
+        if isinstance(val, (list, tuple)):
+            return bool(val)
+        return bool((val or "").strip())
+
     out["domains_cohort"] = len(cohort)
-    out["domains_cohort_human_adjudicated"] = sum(
-        1 for d in cohort if (d.get("domain") or "").strip()
-    )
+    out["domains_cohort_human_adjudicated"] = sum(1 for d in cohort if _domains_filled(d))
     out["domains_primary_domain_filled"] = sum(
         1 for d in cohort if (d.get("primary_domain") or "").strip()
     )

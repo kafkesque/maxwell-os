@@ -67,7 +67,13 @@ def _load_yaml(path: Path) -> dict:
 
 
 def _collapse(value: object) -> str:
-    """Collapse whitespace + coerce to a comparable string (D-2658 join rule)."""
+    """Collapse whitespace + coerce to a comparable string (D-2658 join rule).
+
+    A list (the ruler's `domains` column) is pipe-joined to the consumer's `domain` string form
+    (D-2866: one canonical serialisation of the domain axis).
+    """
+    if isinstance(value, (list, tuple)):
+        return "|".join(" ".join(str(v).split()) for v in value if v)
     return " ".join(str(value if value is not None else "").split())
 
 
@@ -157,7 +163,10 @@ def _apply_cells(rows: list[dict], authority: dict[str, str], column: str,
             uncovered.append(iid)
             continue
         target = authority[iid]
-        if menu is not None and target not in menu:
+        # An EMPTY/None authority value is a legitimate CLEARED or ABSTAINED cell (BUG-676: a discipline
+        # abstention is an ABSENCE), never an off-menu label. Only a non-empty value is menu-checked, so
+        # the write limb never mis-reports an abstention as "off-menu refused" (C16/one-value-one-home).
+        if target and menu is not None and target not in menu:
             off_menu.append(iid)
             continue
         if to_numeric is not None:
@@ -199,7 +208,7 @@ def run(apply: bool) -> int:
     depth_menu = _load_yaml(REPO / config.get("depth_menu", "config/depth_classes.yaml"))
     menus = {"depth": {_collapse(c.get("label")) for c in depth_menu.get("classes", [])}, "discipline": set()}
     menus["discipline"] = {_collapse(d.get("value")) for d in json.loads(
-        (REPO / "config" / "closed_menu_v5.json").read_text(encoding="utf-8"))["disciplines"]}
+        (REPO / "config" / "closed_menu_v8.json").read_text(encoding="utf-8"))["disciplines"]}
     order = config.get("propagation", {}).get("order", [])
     if not order:
         raise ValueError("BUG-628/C16: config declares no propagation.order")

@@ -1,209 +1,209 @@
 item_id,name,content_type,ct,extraction_type,et,discipline,disc,depth,depth_status,domain,domain_status,primary_domain
-R001,Surveillance Capitalism Value Propositio,principle,OK,causal_mechanism,OK,privacy & surveillance,OK,3,OK,business development,OK,business development
-R002,Soviet Underground Discourse Reception,quarantine,OK,empirical_pattern,OK,cultural studies,OK,3,OK,arts & culture,OK,arts & culture
-R003,Quantum Cognitive Effects in Survey Desi,principle,OK,normative_heuristic,OK,cognitive science,OK,4,OK,research & methodology|social sciences,OK,research & methodology
-R004,Lockdown Effectiveness and Economic Impa,quarantine,OK,empirical_pattern,OK,political economy,OK,3,OK,social sciences,OK,social sciences
+R001,Surveillance Capitalism Value Propositio,principle,OK,causal_mechanism,OK,privacy & surveillance,OK,3,OK,marketing & communications|digital product|information architecture,OK,marketing & communications
+R002,Soviet Underground Discourse Reception,quarantine,OK,empirical_pattern,OK,cultural studies,OK,3,OK,media & entertainment|semiotics & communication,OK,media & entertainment
+R003,Quantum Cognitive Effects in Survey Desi,principle,OK,normative_heuristic,OK,cognitive science,OK,4,OK,research practice|user experience|education,OK,research practice
+R004,Lockdown Effectiveness and Economic Impa,quarantine,OK,empirical_pattern,OK,political economy,OK,3,OK,legal & public policy,OK,legal & public policy
 R005,Graphics Algebra Cross Operator,tool_instruction,OK,normative_heuristic,OK,computer graphics,OK,4,OK,data visualization,OK,data visualization
-R006,Generative Algorithmic Composition,principle,OK,descriptive_model,OK,generative design,OK,3,OK,computational art,OK,computational art
-R007,Accessible Electronic Prototyping Ecosys,noise_drop,OK,descriptive_model,OK,engineering,OK,3,OK,creative technology,OK,creative technology
-R008,Inescapable Shock Syndrome,principle,OK,descriptive_model,OK,neuroscience,OK,3,OK,health & wellness,OK,health & wellness
+R006,Generative Algorithmic Composition,principle,OK,descriptive_model,OK,,OK,3,OK,computational art|creative technology|code & computation,OK,computational art
+R007,Accessible Electronic Prototyping Ecosys,noise_drop,OK,descriptive_model,OK,engineering,OK,3,OK,engineering & infrastructure|design strategy|user experience|education|product design,OK,engineering & infrastructure
+R008,Inescapable Shock Syndrome,principle,OK,descriptive_model,OK,psychology,OK,3,OK,health & wellness,OK,health & wellness
 R009,Entrepreneurial Risk Assessment Framewor,principle,OK,normative_heuristic,OK,decision making,OK,3,OK,entrepreneurship,OK,entrepreneurship
-R010,Iterative Launch Process,process_template,OK,normative_heuristic,OK,design thinking,OK,2,OK,design strategy|digital product|product design|web & ui,OK,design strategy
+R010,Iterative Launch Process,process_template,OK,normative_heuristic,OK,design thinking,OK,2,OK,product design|user experience|project management|digital product|business development,OK,product design
 R011,Agentic Decision-making Through Contextu,principle,OK,causal_mechanism,OK,information retrieval,OK,3,OK,ai & agents,OK,ai & agents
-R012,Evolution of Game Art and Design,noise_drop,OK,,MISSING,game design,OK,,OK,arts & culture,OK,arts & culture
+R012,Evolution of Game Art and Design,noise_drop,OK,,MISSING,,OK,,OK,,OK,
 R013,Innovation Fund Risk Management,quarantine,OK,normative_heuristic,OK,risk management,OK,3,OK,business operations|finance & investment,OK,business operations
-R014,Sacred Geometry and Symbolic Resonance,principle,OK,descriptive_model,OK,semiotics,OK,2,OK,arts & culture|semiotics & communication,OK,arts & culture
-R015,Long-term Strategic Planning in Differen,principle,OK,normative_heuristic,OK,strategic thinking,OK,2,OK,business development|finance & investment|business operations,OK,business development
+R014,Sacred Geometry and Symbolic Resonance,principle,OK,descriptive_model,OK,philosophy,OK,2,OK,arts & culture|semiotics & communication,OK,arts & culture
+R015,Long-term Strategic Planning in Differen,principle,OK,normative_heuristic,OK,business administration,OK,2,OK,business development,OK,business development
 R016,Modelans-modelandum Relationship,principle,OK,descriptive_model,OK,semiotics,OK,3,OK,semiotics & communication,OK,semiotics & communication
 R017,Chemical Reaction Equation Automation,quarantine,OK,normative_heuristic,OK,computational physics & simulation,OK,4,OK,computational science & physics,OK,computational science & physics
-R018,Color and Typography Readability,principle,OK,normative_heuristic,OK,visual perception,OK,2,OK,graphic design|brand identity|user experience|editorial & advertising,OK,graphic design
-R019,Scientific Research Evaluation Framework,process_template,OK,causal_mechanism,OK,research methodology,OK,3,OK,research & methodology,OK,research & methodology
-R020,Dynamic System Complexity,principle,OK,descriptive_model,OK,complex adaptive systems,OK,2,OK,systems & frameworks|business development,OK,systems & frameworks
-R021,Index Section,noise_drop,OK,,MISSING,,OK,,OK,information architecture,OK,information architecture
-R022,Coupon Code Feature Placement Strategy,principle,OK,causal_mechanism,OK,human-computer interaction,OK,4,OK,digital product,OK,digital product
-R023,Focused Action Selection,principle,OK,normative_heuristic,OK,strategic thinking,OK,2,OK,business development|personal productivity|project management|leadership,OK,business development
-R024,Execution Gap From Technological Readine,principle,OK,normative_heuristic,OK,finance,OK,2,OK,business operations|organizational behavior|business development|finance & investment,OK,business operations
-R025,Design for Management and Organizational,quarantine,OK,normative_heuristic,OK,organizational theory,OK,3,OK,organizational behavior,OK,organizational behavior
-R026,Index of Motion Graphic Title Design Ter,noise_drop,OK,,MISSING,information science,OK,,OK,information architecture,OK,information architecture
+R018,Color and Typography Readability,principle,OK,normative_heuristic,OK,color theory,OK,2,OK,graphic design|brand identity|user experience|editorial & advertising|design systems,OK,graphic design
+R019,Scientific Research Evaluation Framework,process_template,OK,causal_mechanism,OK,research methodology,OK,3,OK,research practice,OK,research practice
+R020,Dynamic System Complexity,principle,OK,descriptive_model,OK,complex adaptive systems,OK,2,OK,systems & frameworks|business development|entrepreneurship|ai & agents,OK,systems & frameworks
+R021,Index Section,noise_drop,OK,,MISSING,,OK,,OK,,OK,
+R022,Coupon Code Feature Placement Strategy,principle,OK,causal_mechanism,OK,human-computer interaction,OK,4,OK,user experience|design strategy|marketing & communications,OK,user experience
+R023,Focused Action Selection,principle,OK,normative_heuristic,OK,decision making,OK,2,OK,personal productivity|project management|leadership,OK,personal productivity
+R024,Execution Gap From Technological Readine,principle,OK,normative_heuristic,OK,business administration,OK,2,OK,business operations|business development|finance & investment,OK,business operations
+R025,Design for Management and Organizational,quarantine,OK,normative_heuristic,OK,organizational theory,OK,3,OK,design strategy|organizational behavior|leadership,OK,design strategy
+R026,Index of Motion Graphic Title Design Ter,noise_drop,OK,,MISSING,,OK,,OK,,OK,
 R027,Decentralized Strategic Command,principle,OK,normative_heuristic,OK,organizational theory,OK,2,OK,leadership|organizational behavior,OK,leadership
-R028,Gpu Acceleration Configuration,tool_instruction,OK,causal_mechanism,OK,machine learning,OK,4,OK,ai & agents,OK,ai & agents
-R029,Innovation Through Challenge to Assumpti,principle,OK,normative_heuristic,OK,creative process,OK,2,OK,business development|brand identity,OK,business development
+R028,Gpu Acceleration Configuration,tool_instruction,OK,causal_mechanism,OK,machine learning,OK,4,OK,engineering practice,OK,engineering practice
+R029,Innovation Through Challenge to Assumpti,principle,OK,normative_heuristic,OK,business administration,OK,2,OK,design strategy|marketing & communications|product design|business development|brand identity,OK,design strategy
 R030,Digital Iconic Reproduction in Computer ,tool_instruction,OK,causal_mechanism,OK,computer graphics,OK,4,OK,code & computation,OK,code & computation
-R031,Questionnaire Validation and Modificatio,principle,OK,normative_heuristic,OK,research methodology,OK,3,OK,research & methodology,OK,research & methodology
-R032,Heckel's Diff Algorithm for Version Trac,principle,OK,causal_mechanism,OK,software engineering,OK,4,OK,code & computation,OK,code & computation
-R033,Postmodern Critique of Realist Assumptio,principle,OK,descriptive_model,OK,philosophy,OK,2,OK,social sciences|research & methodology,OK,social sciences
-R034,Negative Space Alphabet Challenge,noise_drop,OK,empirical_pattern,OK,typography,OK,,OK,graphic design,OK,graphic design
-R035,Visual Evidence Recognition,principle,OK,causal_mechanism,OK,cognitive science,OK,2,OK,research & methodology|data visualization|science & research|semiotics & communication,OK,research & methodology
-R036,Domain Name Call-to-action Strategy,principle,OK,normative_heuristic,OK,design psychology,OK,4,OK,brand identity,OK,brand identity
+R031,Questionnaire Validation and Modificatio,principle,OK,normative_heuristic,OK,risk management,OK,3,OK,research practice,OK,research practice
+R032,Heckel's Diff Algorithm for Version Trac,principle,OK,causal_mechanism,OK,computational theory,OK,4,OK,engineering practice|data visualization,OK,engineering practice
+R033,Postmodern Critique of Realist Assumptio,principle,OK,descriptive_model,OK,philosophy,OK,2,OK,research practice,OK,research practice
+R034,Negative Space Alphabet Challenge,noise_drop,OK,empirical_pattern,OK,,OK,,OK,,OK,
+R035,Visual Evidence Recognition,principle,OK,causal_mechanism,OK,visual perception,OK,2,OK,data visualization|systems & frameworks,OK,data visualization
+R036,Domain Name Call-to-action Strategy,principle,OK,normative_heuristic,OK,marketing,OK,4,OK,marketing & communications|design strategy|user experience|brand identity,OK,marketing & communications
 R037,Style Precedence and Override Behavior,tool_instruction,OK,causal_mechanism,OK,software engineering,OK,4,OK,engineering practice,OK,engineering practice
-R038,Multiple Imputation Procedure,process_template,OK,causal_mechanism,OK,research methodology,OK,3,OK,research & methodology,OK,research & methodology
-R039,Identity As Social Positioning and Lifes,principle,OK,descriptive_model,OK,sociology,OK,2,OK,social sciences|research & methodology|semiotics & communication,OK,social sciences
-R040,Commercial Advertising Souring of Artist,quarantine,OK,normative_heuristic,OK,emerging,OK,,OK,arts & culture,OK,arts & culture
-R041,Consumer Anticipation of Objections,principle,OK,normative_heuristic,OK,design psychology,OK,2,OK,marketing & communications|product design|user experience,OK,marketing & communications
+R038,Multiple Imputation Procedure,process_template,OK,causal_mechanism,OK,research methodology,OK,3,OK,research practice|data visualization,OK,research practice
+R039,Identity As Social Positioning and Lifes,principle,OK,descriptive_model,OK,sociology,OK,2,OK,marketing & communications|design strategy|semiotics & communication,OK,marketing & communications
+R040,Commercial Advertising Souring of Artist,quarantine,OK,normative_heuristic,OK,,OK,,OK,,OK,
+R041,Consumer Anticipation of Objections,principle,OK,normative_heuristic,OK,marketing,OK,2,OK,editorial & advertising|product design|user experience|design strategy|marketing & communications,OK,editorial & advertising
 R042,Destination-control Elevator Interaction,principle,OK,empirical_pattern,OK,human-computer interaction,OK,3,OK,user experience,OK,user experience
 R043,Alpha State Thinking and Creative Proble,principle,OK,normative_heuristic,OK,cognitive science,OK,2,OK,personal productivity|arts & culture,OK,personal productivity
-R044,Cyclical Design Lifecycle,principle,OK,normative_heuristic,OK,design thinking,OK,3,OK,design strategy,OK,design strategy
-R045,Wpi Consumer Value Proposition Framework,principle,OK,descriptive_model,OK,operations research,OK,2,OK,business development|brand identity,OK,business development
+R044,Cyclical Design Lifecycle,principle,OK,normative_heuristic,OK,systems thinking,OK,3,OK,product design|design strategy|environmental design|industrial design,OK,product design
+R045,Wpi Consumer Value Proposition Framework,principle,OK,descriptive_model,OK,marketing,OK,2,OK,marketing & communications|brand identity,OK,marketing & communications
 R046,Bitcoin Mining As Digital Ownership Mode,principle,OK,causal_mechanism,OK,economics,OK,3,OK,finance & investment,OK,finance & investment
-R047,Emotional Transaction Design,principle,OK,normative_heuristic,OK,design psychology,OK,2,OK,user experience|design strategy,OK,user experience
-R048,Creative Process Through Drawing and Ske,principle,OK,normative_heuristic,OK,creative process,OK,2,OK,graphic design|illustration|design strategy|product design|personal productivity,OK,graphic design
-R049,Fermi Estimation Method,process_template,OK,normative_heuristic,OK,operations research,OK,1,OK,research & methodology|systems & frameworks|project management|personal productivity|science & research,OK,research & methodology
-R050,Methodological Accountability,principle,OK,normative_heuristic,OK,research methodology,OK,3,OK,research & methodology,OK,research & methodology
-R051,Central Emptiness in Urban Design,principle,OK,descriptive_model,OK,engineering,OK,3,OK,urban planning,OK,urban planning
+R047,Emotional Transaction Design,principle,OK,normative_heuristic,OK,psychology,OK,2,OK,user experience|design strategy,OK,user experience
+R048,Creative Process Through Drawing and Ske,principle,OK,normative_heuristic,OK,creative process,OK,2,OK,graphic design|arts & culture|illustration,OK,graphic design
+R049,Fermi Estimation Method,process_template,OK,normative_heuristic,OK,operations research,OK,1,OK,research practice|systems & frameworks|project management|personal productivity,OK,research practice
+R050,Methodological Accountability,principle,OK,normative_heuristic,OK,research methodology,OK,3,OK,research practice,OK,research practice
+R051,Central Emptiness in Urban Design,principle,OK,descriptive_model,OK,cultural design,OK,3,OK,urban planning,OK,urban planning
 R052,Interior Design Fixture Selection Challe,principle,OK,causal_mechanism,OK,design thinking,OK,4,OK,design strategy,OK,design strategy
-R053,Self-referential Incompleteness,principle,OK,causal_mechanism,OK,emerging,OK,1,OK,systems & frameworks|code & computation,OK,systems & frameworks
-R054,Shap Explainability Framework,tool_instruction,OK,descriptive_model,OK,machine learning,OK,4,OK,ai & agents,OK,ai & agents
-R055,Demand-side Sales Pattern,principle,OK,normative_heuristic,OK,operations research,OK,3,OK,business development,OK,business development
-R056,Quiz Generation with Llm Integration,tool_instruction,OK,causal_mechanism,OK,generative ai,OK,4,OK,ai & agents,OK,ai & agents
+R053,Self-referential Incompleteness,principle,OK,causal_mechanism,OK,computational theory,OK,1,OK,code & computation|computational science & physics|systems & frameworks,OK,code & computation
+R054,Shap Explainability Framework,tool_instruction,OK,descriptive_model,OK,machine learning,OK,4,OK,code & computation,OK,code & computation
+R055,Demand-side Sales Pattern,principle,OK,normative_heuristic,OK,marketing,OK,3,OK,marketing & communications,OK,marketing & communications
+R056,Quiz Generation with Llm Integration,tool_instruction,OK,causal_mechanism,OK,generative ai,OK,4,OK,education,OK,education
 R057,Annual Percentage Rate Standardization,principle,OK,causal_mechanism,OK,finance,OK,3,OK,finance & investment,OK,finance & investment
-R058,Illustration As Propaganda Tool,principle,OK,causal_mechanism,OK,visual semiotics,OK,2,OK,illustration|marketing & communications|semiotics & communication|editorial & advertising,OK,illustration
-R059,First Course Development Framework,process_template,OK,normative_heuristic,OK,strategic thinking,OK,3,OK,education,OK,education
+R058,Illustration As Propaganda Tool,principle,OK,causal_mechanism,OK,communication theory,OK,2,OK,illustration|marketing & communications|semiotics & communication|editorial & advertising,OK,illustration
+R059,First Course Development Framework,process_template,OK,normative_heuristic,OK,,OK,3,OK,entrepreneurship|business development|education|product design|user experience,OK,entrepreneurship
 R060,Aiga Transportation Symbol System Develo,process_instance,OK,causal_mechanism,OK,visual semiotics,OK,4,OK,graphic design,OK,graphic design
 R061,Core Focus As Organizational Discipline,principle,OK,normative_heuristic,OK,organizational theory,OK,3,OK,leadership|organizational behavior,OK,leadership
-R062,Somatic Marker Decision Making,principle,OK,descriptive_model,OK,behavioral economics,OK,2,OK,marketing & communications|social sciences|user experience,OK,marketing & communications
-R063,Textbook Representation and State of Exc,quarantine,OK,descriptive_model,OK,media studies,OK,4,OK,education,OK,education
+R062,Somatic Marker Decision Making,principle,OK,descriptive_model,OK,behavioral economics,OK,2,OK,marketing & communications|user experience|media & entertainment,OK,marketing & communications
+R063,Textbook Representation and State of Exc,quarantine,OK,descriptive_model,OK,cultural studies,OK,4,OK,education|media & entertainment|semiotics & communication|digital product,OK,education
 R064,Optical Alignment in Typography,principle,OK,normative_heuristic,OK,typography,OK,2,OK,graphic design|design systems|web & ui|brand identity|editorial & advertising,OK,graphic design
-R065,Media Construction of Crime Waves,principle,OK,descriptive_model,OK,media studies,OK,3,OK,social sciences,OK,social sciences
-R066,N-dimensional Sphere Volume Properties,principle,OK,descriptive_model,OK,computational geometry,OK,4,OK,computational science & physics,OK,computational science & physics
-R067,Schemat's Wasser Interactive Art Framewo,principle,OK,causal_mechanism,OK,performing arts,OK,4,OK,arts & culture,OK,arts & culture
-R068,Imagination and the Image,principle,OK,empirical_pattern,OK,aesthetics,OK,2,OK,arts & culture|design strategy,OK,arts & culture
-R069,Falsifiable Variable Measurement,principle,OK,normative_heuristic,OK,research methodology,OK,3,OK,research & methodology,OK,research & methodology
+R065,Media Construction of Crime Waves,principle,OK,descriptive_model,OK,media studies,OK,3,OK,media & entertainment,OK,media & entertainment
+R066,N-dimensional Sphere Volume Properties,principle,OK,descriptive_model,OK,computational geometry,OK,4,OK,computational science & physics|code & computation|engineering practice,OK,computational science & physics
+R067,Schemat's Wasser Interactive Art Framewo,principle,OK,causal_mechanism,OK,interdisciplinary studies,OK,4,OK,creative technology|media & entertainment|user experience,OK,creative technology
+R068,Imagination and the Image,principle,OK,empirical_pattern,OK,aesthetics,OK,2,OK,editorial & advertising|design strategy|design systems|graphic design,OK,editorial & advertising
+R069,Falsifiable Variable Measurement,principle,OK,normative_heuristic,OK,research methodology,OK,3,OK,research practice|engineering practice,OK,research practice
 R070,Iterative Design Validation,process_template,OK,normative_heuristic,OK,design thinking,OK,2,OK,design strategy|user experience|product design,OK,design strategy
-R071,Lean Startup Experimentation Framework,process_template,OK,normative_heuristic,OK,design thinking,OK,3,OK,business development,OK,business development
-R072,Park24 Nondisruptive Market Creation,process_instance,OK,causal_mechanism,OK,strategic thinking,OK,4,OK,business development,OK,business development
-R073,Evolution of Language Through Mental Mod,growth_edge,OK,causal_mechanism,OK,linguistics,OK,4,OK,social sciences,OK,social sciences
-R074,Attention Economy Externalities,principle,OK,empirical_pattern,OK,design psychology,OK,3,OK,social sciences,OK,social sciences
-R075,Paradigm Shift Through Disruption,principle,OK,causal_mechanism,OK,philosophy,OK,2,OK,science & research|systems & frameworks|arts & culture,OK,science & research
-R076,Linguistic Fetish in Visual Communicatio,principle,OK,empirical_pattern,OK,visual semiotics,OK,2,OK,brand identity|marketing & communications,OK,brand identity
-R077,Symbolic Meaning Through Consumption,principle,OK,descriptive_model,OK,cultural studies,OK,2,OK,social sciences|semiotics & communication|marketing & communications,OK,social sciences
+R071,Lean Startup Experimentation Framework,process_template,OK,normative_heuristic,OK,entrepreneurship studies,OK,3,OK,entrepreneurship|research practice|business development,OK,entrepreneurship
+R072,Park24 Nondisruptive Market Creation,process_instance,OK,causal_mechanism,OK,entrepreneurship studies,OK,4,OK,entrepreneurship|business development|urban planning|design strategy,OK,entrepreneurship
+R073,Evolution of Language Through Mental Mod,growth_edge,OK,causal_mechanism,OK,anthropology,OK,4,OK,education|research practice,OK,education
+R074,Attention Economy Externalities,principle,OK,empirical_pattern,OK,cognitive science,OK,3,OK,user experience,OK,user experience
+R075,Paradigm Shift Through Disruption,principle,OK,causal_mechanism,OK,philosophy,OK,2,OK,systems & frameworks|arts & culture,OK,systems & frameworks
+R076,Linguistic Fetish in Visual Communicatio,principle,OK,empirical_pattern,OK,marketing,OK,2,OK,brand identity|marketing & communications|semiotics & communication|arts & culture,OK,brand identity
+R077,Symbolic Meaning Through Consumption,principle,OK,descriptive_model,OK,cultural studies,OK,2,OK,semiotics & communication|marketing & communications,OK,semiotics & communication
 R078,Parameterized Design Generation,principle,OK,causal_mechanism,OK,generative design,OK,2,OK,code & computation|computational art|creative technology|design systems,OK,code & computation
-R079,Bar-hillel Paradox,principle,OK,descriptive_model,OK,linguistics,OK,3,OK,semiotics & communication,OK,semiotics & communication
-R080,Information Design Community Networks,noise_drop,OK,descriptive_model,OK,emerging,OK,,OK,information architecture,OK,information architecture
+R079,Bar-hillel Paradox,principle,OK,descriptive_model,OK,linguistics,OK,3,OK,semiotics & communication|arts & culture|editorial & advertising|design strategy|graphic design|brand identity|marketing & communications,OK,semiotics & communication
+R080,Information Design Community Networks,noise_drop,OK,descriptive_model,OK,,OK,,OK,,OK,
 R081,Shift From Trend-chasing to Intentional ,principle,OK,empirical_pattern,OK,behavioral economics,OK,3,OK,marketing & communications,OK,marketing & communications
-R082,Historical Data Sources for Manufacturin,noise_drop,OK,descriptive_model,OK,research methodology,OK,,OK,research & methodology,OK,research & methodology
-R083,Self-herding Behavior,principle,OK,empirical_pattern,OK,behavioral economics,OK,2,OK,marketing & communications|social sciences,OK,marketing & communications
-R084,Data Visualization Research Lab Leadersh,noise_drop,OK,,MISSING,information science,OK,,OK,data visualization,OK,data visualization
-R085,Discursive Strategy Abstraction,principle,OK,descriptive_model,OK,cultural studies,OK,2,OK,arts & culture,OK,arts & culture
-R086,Commitment and Consistency Principle (2),principle,OK,normative_heuristic,OK,behavioral economics,OK,2,OK,marketing & communications|user experience|product design,OK,marketing & communications
-R087,In-group Identity and Social Bonding,principle,OK,descriptive_model,OK,psychology,OK,2,OK,social sciences|organizational behavior,OK,social sciences
-R088,Gradio Web Interface for Ml Models,tool_instruction,OK,descriptive_model,OK,machine learning,OK,4,OK,ai & agents,OK,ai & agents
-R089,Vr Body Constraint and Physical Immersio,principle,OK,causal_mechanism,OK,human-computer interaction,OK,4,OK,creative technology,OK,creative technology
-R090,Culture Jamming,principle,OK,causal_mechanism,OK,cultural design,OK,3,OK,arts & culture|design strategy,OK,arts & culture
-R091,Autopoesis in Design Education,principle,OK,causal_mechanism,OK,personal productivity,OK,3,OK,education,OK,education
-R092,Data Quality and Method Transparency in ,principle,OK,causal_mechanism,OK,research methodology,OK,3,OK,media & entertainment,OK,media & entertainment
-R093,Numerical Symbolism in Design and Biolog,growth_edge,OK,empirical_pattern,OK,semiotics,OK,3,OK,arts & culture,OK,arts & culture
-R094,Progressive Feature Introduction,principle,OK,causal_mechanism,OK,human-computer interaction,OK,3,OK,user experience,OK,user experience
-R095,Sensory Engagement As Quality Signal,principle,OK,empirical_pattern,OK,design psychology,OK,3,OK,marketing & communications,OK,marketing & communications
-R096,Transportation and Setup Costs in Constr,principle,OK,normative_heuristic,OK,economics,OK,3,OK,business operations,OK,business operations
-R097,Minimin Decision Criterion,process_template,OK,descriptive_model,OK,operations research,OK,2,OK,business development|business operations|finance & investment|design strategy,OK,business development
-R098,Aesthetic Refinement Through Iteration,principle,OK,empirical_pattern,OK,design thinking,OK,2,OK,design strategy|graphic design|digital product|product design,OK,design strategy
-R099,Charismatic Brand Discipline,principle,OK,normative_heuristic,OK,strategic thinking,OK,3,OK,brand identity,OK,brand identity
-R100,Network Marketing Business Model,principle,OK,descriptive_model,OK,organizational theory,OK,3,OK,business development,OK,business development
-R101,Pragmatist View of Truth and Knowledge,principle,OK,descriptive_model,OK,philosophy,OK,2,OK,social sciences,OK,social sciences
-R102,Social Entrepreneur's Playbook,process_template,OK,normative_heuristic,OK,strategic thinking,OK,3,OK,entrepreneurship,OK,entrepreneurship
-R103,Temporal Consistency in Visual Narrative,process_template,OK,descriptive_model,OK,cognitive science,OK,2,OK,arts & culture|media & entertainment|research & methodology,OK,arts & culture
-R104,Strategic Information Gathering,principle,OK,normative_heuristic,OK,operations research,OK,2,OK,research & methodology|science & research,OK,research & methodology
-R105,Probabilistic Forecasting with Predictio,principle,OK,normative_heuristic,OK,operations research,OK,2,OK,business operations|research & methodology|finance & investment,OK,business operations
-R106,The Invisible Art of Film Editing,noise_drop,OK,empirical_pattern,OK,media studies,OK,,OK,media & entertainment,OK,media & entertainment
-R107,Lived Experience Focus,principle,OK,descriptive_model,OK,research methodology,OK,2,OK,research & methodology|social sciences,OK,research & methodology
-R108,Typography in Brand Positioning and Maga,principle,OK,normative_heuristic,OK,typography,OK,3,OK,brand identity,OK,brand identity
-R109,Project Completion Bias,principle,OK,empirical_pattern,OK,behavioral economics,OK,2,OK,personal productivity|user experience,OK,personal productivity
+R082,Historical Data Sources for Manufacturin,noise_drop,OK,descriptive_model,OK,,OK,,OK,,OK,
+R083,Self-herding Behavior,principle,OK,empirical_pattern,OK,behavioral economics,OK,2,OK,marketing & communications|user experience,OK,marketing & communications
+R084,Data Visualization Research Lab Leadersh,noise_drop,OK,,MISSING,,OK,,OK,,OK,
+R085,Discursive Strategy Abstraction,principle,OK,descriptive_model,OK,cultural studies,OK,2,OK,education|health & wellness|semiotics & communication,OK,education
+R086,Commitment and Consistency Principle (2),principle,OK,normative_heuristic,OK,behavioral economics,OK,2,OK,marketing & communications|user experience|digital product,OK,marketing & communications
+R087,In-group Identity and Social Bonding,principle,OK,descriptive_model,OK,psychology,OK,2,OK,organizational behavior,OK,organizational behavior
+R088,Gradio Web Interface for Ml Models,tool_instruction,OK,descriptive_model,OK,human-computer interaction,OK,4,OK,digital product|user experience|web & ui,OK,digital product
+R089,Vr Body Constraint and Physical Immersio,principle,OK,causal_mechanism,OK,human-computer interaction,OK,4,OK,design strategy|user experience|engineering & infrastructure,OK,design strategy
+R090,Culture Jamming,principle,OK,causal_mechanism,OK,media studies,OK,3,OK,media & entertainment|editorial & advertising|design strategy|design systems|semiotics & communication,OK,media & entertainment
+R091,Autopoesis in Design Education,principle,OK,causal_mechanism,OK,systems thinking,OK,3,OK,education|design strategy,OK,education
+R092,Data Quality and Method Transparency in ,principle,OK,causal_mechanism,OK,research methodology,OK,3,OK,research practice|media & entertainment|data visualization,OK,research practice
+R093,Numerical Symbolism in Design and Biolog,growth_edge,OK,empirical_pattern,OK,semiotics,OK,3,OK,design strategy|design systems|semiotics & communication,OK,design strategy
+R094,Progressive Feature Introduction,principle,OK,causal_mechanism,OK,human-computer interaction,OK,3,OK,user experience|digital product|product design|web & ui,OK,user experience
+R095,Sensory Engagement As Quality Signal,principle,OK,empirical_pattern,OK,psychology,OK,3,OK,product design|marketing & communications|environmental design|arts & culture,OK,product design
+R096,Transportation and Setup Costs in Constr,principle,OK,normative_heuristic,OK,finance,OK,3,OK,project management|business operations|engineering & infrastructure,OK,project management
+R097,Minimin Decision Criterion,process_template,OK,descriptive_model,OK,decision making,OK,2,OK,business development|business operations|finance & investment|design strategy,OK,business development
+R098,Aesthetic Refinement Through Iteration,principle,OK,empirical_pattern,OK,aesthetics,OK,2,OK,design strategy|graphic design|digital product|product design|arts & culture,OK,design strategy
+R099,Charismatic Brand Discipline,principle,OK,normative_heuristic,OK,marketing,OK,3,OK,brand identity|marketing & communications|design strategy,OK,brand identity
+R100,Network Marketing Business Model,principle,OK,descriptive_model,OK,business administration,OK,3,OK,entrepreneurship|business development|marketing & communications,OK,entrepreneurship
+R101,Pragmatist View of Truth and Knowledge,principle,OK,descriptive_model,OK,philosophy,OK,2,OK,research practice|education,OK,research practice
+R102,Social Entrepreneur's Playbook,process_template,OK,normative_heuristic,OK,entrepreneurship studies,OK,3,OK,entrepreneurship,OK,entrepreneurship
+R103,Temporal Consistency in Visual Narrative,process_template,OK,descriptive_model,OK,visual semiotics,OK,2,OK,media & entertainment|motion design|illustration,OK,media & entertainment
+R104,Strategic Information Gathering,principle,OK,normative_heuristic,OK,operations research,OK,2,OK,research practice|information architecture|data visualization,OK,research practice
+R105,Probabilistic Forecasting with Predictio,principle,OK,normative_heuristic,OK,operations research,OK,2,OK,business operations|research practice|finance & investment,OK,business operations
+R106,The Invisible Art of Film Editing,noise_drop,OK,empirical_pattern,OK,,OK,,OK,,OK,
+R107,Lived Experience Focus,principle,OK,descriptive_model,OK,philosophy,OK,2,OK,education|user experience|research practice,OK,education
+R108,Typography in Brand Positioning and Maga,principle,OK,normative_heuristic,OK,typography,OK,3,OK,graphic design|design strategy|brand identity,OK,graphic design
+R109,Project Completion Bias,principle,OK,empirical_pattern,OK,behavioral economics,OK,2,OK,personal productivity|user experience|organizational behavior,OK,personal productivity
 R110,Federated Information Architecture,principle,OK,descriptive_model,OK,information science,OK,2,OK,design systems|information architecture|systems & frameworks|web & ui,OK,design systems
-R111,Pmt Camera Typography Manipulation,tool_instruction,OK,causal_mechanism,OK,typography,OK,4,OK,graphic design,OK,graphic design
-R112,Content Analysis Approaches in Visual Re,principle,OK,descriptive_model,OK,research methodology,OK,3,OK,research & methodology,OK,research & methodology
-R113,Traveling Salesman Problem Computational,principle,OK,normative_heuristic,OK,operations research,OK,4,OK,code & computation,OK,code & computation
+R111,Pmt Camera Typography Manipulation,tool_instruction,OK,causal_mechanism,OK,typography,OK,4,OK,graphic design|arts & culture,OK,graphic design
+R112,Content Analysis Approaches in Visual Re,principle,OK,descriptive_model,OK,research methodology,OK,3,OK,research practice,OK,research practice
+R113,Traveling Salesman Problem Computational,principle,OK,normative_heuristic,OK,computational theory,OK,4,OK,engineering practice|computational science & physics,OK,engineering practice
 R114,Measurable Outcome Focus,principle,OK,normative_heuristic,OK,decision making,OK,2,OK,business operations|personal productivity,OK,business operations
-R115,Heuristic Reasoning in Problem Solving,principle,OK,normative_heuristic,OK,decision making,OK,3,OK,research & methodology,OK,research & methodology
-R116,Ai Model Deployment Risk,principle,OK,causal_mechanism,OK,artificial intelligence,OK,3,OK,ai & agents,OK,ai & agents
+R115,Heuristic Reasoning in Problem Solving,principle,OK,normative_heuristic,OK,operations research,OK,3,OK,research practice,OK,research practice
+R116,Ai Model Deployment Risk,principle,OK,causal_mechanism,OK,risk management,OK,3,OK,business operations|engineering & infrastructure|organizational behavior|project management,OK,business operations
 R117,Sustained Purpose Over Temporary Gratifi,principle,OK,normative_heuristic,OK,behavioral economics,OK,2,OK,finance & investment|personal productivity,OK,finance & investment
-R118,Pass@k Evaluation Method,tool_instruction,OK,causal_mechanism,OK,machine learning,OK,4,OK,ai & agents,OK,ai & agents
-R119,Strategic Human Resource Planning for So,principle,OK,causal_mechanism,OK,organizational theory,OK,3,OK,business operations,OK,business operations
-R120,Nonlinear Magnification Fields,tool_instruction,OK,descriptive_model,OK,information science,OK,4,OK,data visualization,OK,data visualization
-R121,Consumers Hero Refurbishment Strategy,process_template,OK,descriptive_model,OK,organizational theory,OK,3,OK,business operations,OK,business operations
+R118,Pass@k Evaluation Method,tool_instruction,OK,causal_mechanism,OK,research methodology,OK,4,OK,ai & agents,OK,ai & agents
+R119,Strategic Human Resource Planning for So,principle,OK,causal_mechanism,OK,business administration,OK,3,OK,entrepreneurship|business operations|leadership,OK,entrepreneurship
+R120,Nonlinear Magnification Fields,tool_instruction,OK,descriptive_model,OK,computer graphics,OK,4,OK,data visualization,OK,data visualization
+R121,Consumers Hero Refurbishment Strategy,process_template,OK,descriptive_model,OK,business administration,OK,3,OK,business development|business operations|product design|marketing & communications,OK,business development
 R122,Visual Hierarchy Through Contrast (2),principle,OK,descriptive_model,OK,visual perception,OK,2,OK,graphic design|editorial & advertising|user experience|web & ui,OK,graphic design
-R123,Superquadric Parameterization in 3d Spac,tool_instruction,OK,causal_mechanism,OK,creative coding,OK,4,OK,code & computation,OK,code & computation
-R124,Foundation Model Integration Framework,noise_drop,OK,descriptive_model,OK,generative ai,OK,3,OK,ai & agents,OK,ai & agents
-R125,Dell Computer's Direct-sale Business Mod,principle,OK,causal_mechanism,OK,organizational theory,OK,3,OK,business development,OK,business development
-R126,Embodied Knowledge in Design,principle,OK,descriptive_model,OK,cultural design,OK,3,OK,arts & culture,OK,arts & culture
-R127,Guild of Handicraft Educational Model,process_instance,OK,normative_heuristic,OK,cultural design,OK,4,OK,arts & culture,OK,arts & culture
-R128,Choice Architecture and Identity Framing,principle,OK,descriptive_model,OK,psychology,OK,3,OK,marketing & communications,OK,marketing & communications
-R129,Use of Proxies and Analogues in Market S,principle,OK,causal_mechanism,OK,decision making,OK,3,OK,research & methodology,OK,research & methodology
+R123,Superquadric Parameterization in 3d Spac,tool_instruction,OK,causal_mechanism,OK,computational geometry,OK,4,OK,code & computation|creative technology,OK,code & computation
+R124,Foundation Model Integration Framework,noise_drop,OK,descriptive_model,OK,artificial intelligence,OK,3,OK,engineering practice|systems & frameworks,OK,engineering practice
+R125,Dell Computer's Direct-sale Business Mod,principle,OK,causal_mechanism,OK,business administration,OK,3,OK,business development|business operations|marketing & communications,OK,business development
+R126,Embodied Knowledge in Design,principle,OK,descriptive_model,OK,cultural design,OK,3,OK,design systems|design strategy|industrial design|user experience|business operations|marketing & communications,OK,design systems
+R127,Guild of Handicraft Educational Model,process_instance,OK,normative_heuristic,OK,,OK,4,OK,design strategy|design systems|education,OK,design strategy
+R128,Choice Architecture and Identity Framing,principle,OK,descriptive_model,OK,decision making,OK,3,OK,personal productivity|design strategy|user experience,OK,personal productivity
+R129,Use of Proxies and Analogues in Market S,principle,OK,causal_mechanism,OK,marketing,OK,3,OK,research practice|business development|finance & investment,OK,research practice
 R130,Typographic Principles of William Morris,principle,OK,descriptive_model,OK,typography,OK,3,OK,editorial & advertising|graphic design,OK,editorial & advertising
-R131,Differential Privacy in Data Collection,principle,OK,causal_mechanism,OK,information security,OK,4,OK,code & computation,OK,code & computation
-R132,Monte Carlo PDE Solution Method,process_template,OK,descriptive_model,OK,computational physics & simulation,OK,4,OK,code & computation,OK,code & computation
+R131,Differential Privacy in Data Collection,principle,OK,causal_mechanism,OK,privacy & surveillance,OK,4,OK,information architecture,OK,information architecture
+R132,Monte Carlo PDE Solution Method,process_template,OK,descriptive_model,OK,computational physics & simulation,OK,4,OK,computational science & physics,OK,computational science & physics
 R133,Three-holes-in-the-cheese Model of Error,principle,OK,descriptive_model,OK,risk management,OK,3,OK,systems & frameworks,OK,systems & frameworks
-R134,Holistic Interpretation Problem in Index,growth_edge,OK,normative_heuristic,OK,information retrieval,OK,4,OK,ai & agents,OK,ai & agents
+R134,Holistic Interpretation Problem in Index,growth_edge,OK,normative_heuristic,OK,information retrieval,OK,4,OK,information architecture|ai & agents,OK,information architecture
 R135,Ase  Design Problem Solving Model,process_template,OK,descriptive_model,OK,design thinking,OK,2,OK,design strategy,OK,design strategy
-R136,Chatgpt Prompt Framework,principle,OK,normative_heuristic,OK,generative ai,OK,4,OK,ai & agents,OK,ai & agents
-R137,Desire-friction Conversion Formula,principle,OK,causal_mechanism,OK,design psychology,OK,3,OK,user experience,OK,user experience
+R136,Chatgpt Prompt Framework,principle,OK,normative_heuristic,OK,generative ai,OK,4,OK,information architecture|ai & agents,OK,information architecture
+R137,Desire-friction Conversion Formula,principle,OK,causal_mechanism,OK,behavioral economics,OK,3,OK,user experience,OK,user experience
 R138,Hjelmslev's Trichotomy and Linguistic Th,principle,OK,normative_heuristic,OK,linguistics,OK,2,OK,semiotics & communication,OK,semiotics & communication
-R139,Learning Through Failure Process,process_template,OK,causal_mechanism,OK,linguistics,OK,2,OK,education|personal productivity,OK,education
-R140,Digital Culture Integration in Graphic D,noise_drop,OK,,MISSING,cultural design,OK,,OK,creative technology|digital product|graphic design|user experience|web & ui,OK,creative technology
-R141,Contextual Redundancy and Representation,principle,OK,normative_heuristic,OK,information science,OK,3,OK,ai & agents,OK,ai & agents
-R142,Global Village Conceptual Framework,principle,OK,descriptive_model,OK,media studies,OK,3,OK,media & entertainment,OK,media & entertainment
-R143,Figma Hamburger Icon Creation,tool_instruction,OK,normative_heuristic,OK,human-computer interaction,OK,4,OK,design systems,OK,design systems
+R139,Learning Through Failure Process,process_template,OK,causal_mechanism,OK,cognitive science,OK,2,OK,education|personal productivity,OK,education
+R140,Digital Culture Integration in Graphic D,noise_drop,OK,,MISSING,,OK,,OK,,OK,
+R141,Contextual Redundancy and Representation,principle,OK,normative_heuristic,OK,machine learning,OK,3,OK,engineering practice|code & computation,OK,engineering practice
+R142,Global Village Conceptual Framework,principle,OK,descriptive_model,OK,communication theory,OK,3,OK,media & entertainment|systems & frameworks,OK,media & entertainment
+R143,Figma Hamburger Icon Creation,tool_instruction,OK,normative_heuristic,OK,computer graphics,OK,4,OK,design systems,OK,design systems
 R144,Abra-kadabra Number Classification,quarantine,OK,normative_heuristic,OK,software engineering,OK,4,OK,code & computation,OK,code & computation
 R145,Color As Cultural and Emotional Marker,principle,OK,normative_heuristic,OK,color theory,OK,2,OK,brand identity|design strategy|graphic design|semiotics & communication|marketing & communications,OK,brand identity
-R146,Debate As Leadership Tool,principle,OK,causal_mechanism,OK,organizational theory,OK,3,OK,leadership|organizational behavior,OK,leadership
-R147,Randomness in Data Measurement,principle,OK,causal_mechanism,OK,research methodology,OK,3,OK,research & methodology,OK,research & methodology
-R148,Professional Development Through Studio ,quarantine,OK,causal_mechanism,OK,creative process,OK,,OK,education,OK,education
-R149,Perceptual Mapping Through Camouflage,principle,OK,normative_heuristic,OK,privacy & surveillance,OK,4,OK,creative technology,OK,creative technology
-R150,Triple Bottom Line Business Approach,principle,OK,descriptive_model,OK,strategic thinking,OK,3,OK,business development,OK,business development
-R151,Context-dependent Cognitive Processing,principle,OK,empirical_pattern,OK,cognitive science,OK,2,OK,user experience,OK,user experience
-R152,Economic Politics of Obsolescence,principle,OK,descriptive_model,ADVISORY,political economy,OK,3,OK,industrial design,OK,industrial design
-R153,Cognitive Interview Analysis of Question Clarity Issues,quarantine,OK,descriptive_model,OK,research methodology,OK,4,OK,research & methodology,OK,research & methodology
-R154,Aditya Birla Group's Parta System,process_instance,OK,descriptive_model,OK,finance,OK,4,OK,business operations,OK,business operations
-R155,Persistence in Business Strategy,principle,OK,normative_heuristic,OK,strategic thinking,OK,3,OK,entrepreneurship,OK,entrepreneurship
-R156,Designers' Object World,principle,OK,descriptive_model,OK,cognitive science,OK,3,OK,product design,OK,product design
-R157,Perspective-driven Cognitive Shift,principle,OK,causal_mechanism,OK,cognitive science,OK,2,OK,personal productivity|social sciences,OK,personal productivity
-R158,Duality in Design,growth_edge,OK,descriptive_model,OK,cultural design,OK,3,OK,design strategy,OK,design strategy
-R159,Context-dependent Quality Assessment,principle,OK,normative_heuristic,OK,research methodology,OK,2,OK,research & methodology,OK,research & methodology
-R160,Resource-based Value Assessment,principle,OK,normative_heuristic,OK,operations research,ADVISORY,3,OK,business operations,OK,business operations
-R162,Provincial Norms,growth_edge,OK,empirical_pattern,OK,behavioral economics,OK,3,OK,social sciences,OK,social sciences
-R163,Metaphorically Selling How to Use the Ma,principle,OK,normative_heuristic,OK,communication theory,OK,3,OK,marketing & communications,OK,marketing & communications
-R164,Phenomenological Understanding,principle,OK,descriptive_model,OK,research methodology,OK,3,OK,research & methodology,OK,research & methodology
-R165,Acknowledgment Attribution,quarantine,OK,descriptive_model,OK,information science,OK,4,OK,editorial & advertising,OK,editorial & advertising
-R166,Agent-centric Economic Incentives,principle,OK,normative_heuristic,ADVISORY,artificial intelligence,OK,3,OK,ai & agents,OK,ai & agents
-R167,Innocent Brand Identity Through Organic Development,growth_edge,OK,empirical_pattern,OK,cultural design,OK,3,OK,brand identity,OK,brand identity
-R168,Hidden Issue Questioning Technique,principle,OK,normative_heuristic,OK,research methodology,OK,4,OK,research & methodology,OK,research & methodology
-R169,Charismatic Leadership Development,quarantine,OK,descriptive_model,ADVISORY,organizational theory,OK,3,OK,leadership,OK,leadership
-R170,Dream-driven Life Planning,principle,OK,normative_heuristic,OK,psychology,OK,3,OK,personal productivity,OK,personal productivity
+R146,Debate As Leadership Tool,principle,OK,causal_mechanism,OK,,OK,3,OK,leadership|organizational behavior,OK,leadership
+R147,Randomness in Data Measurement,principle,OK,causal_mechanism,OK,research methodology,OK,3,OK,research practice|data visualization,OK,research practice
+R148,Professional Development Through Studio ,quarantine,OK,causal_mechanism,OK,,OK,,OK,,OK,
+R149,Perceptual Mapping Through Camouflage,principle,OK,normative_heuristic,OK,visual perception,OK,4,OK,design strategy|creative technology,OK,design strategy
+R150,Triple Bottom Line Business Approach,principle,OK,descriptive_model,OK,strategic thinking,OK,3,OK,business development|marketing & communications|organizational behavior|design strategy|systems & frameworks,OK,business development
+R151,Context-dependent Cognitive Processing,principle,OK,empirical_pattern,OK,cognitive science,OK,2,OK,education|research practice,OK,education
+R152,Economic Politics of Obsolescence,principle,OK,descriptive_model,ADVISORY,political economy,OK,3,OK,business development|marketing & communications|legal & public policy,OK,business development
+R153,Cognitive Interview Analysis of Question Clarity Issues,quarantine,OK,descriptive_model,OK,cognitive science,OK,4,OK,user experience,OK,user experience
+R154,Aditya Birla Group's Parta System,process_instance,OK,descriptive_model,OK,finance,OK,4,OK,business operations|finance & investment|leadership,OK,business operations
+R155,Persistence in Business Strategy,principle,OK,normative_heuristic,OK,business administration,OK,3,OK,personal productivity|business development|leadership,OK,personal productivity
+R156,Designers' Object World,principle,OK,descriptive_model,OK,cognitive science,OK,3,OK,design strategy|design systems|user experience|education,OK,design strategy
+R157,Perspective-driven Cognitive Shift,principle,OK,causal_mechanism,OK,cognitive science,OK,2,OK,marketing & communications|education|user experience|personal productivity|semiotics & communication|arts & culture,OK,marketing & communications
+R158,Duality in Design,growth_edge,OK,descriptive_model,OK,cultural design,OK,3,OK,design strategy|design systems|user experience|semiotics & communication|arts & culture|illustration|graphic design,OK,design strategy
+R159,Context-dependent Quality Assessment,principle,OK,normative_heuristic,OK,risk management,OK,2,OK,research practice|user experience|digital product|product design,OK,research practice
+R160,Resource-based Value Assessment,principle,OK,normative_heuristic,OK,operations research,ADVISORY,3,OK,business development|marketing & communications|finance & investment,OK,business development
+R162,Provincial Norms,growth_edge,OK,empirical_pattern,OK,psychology,OK,3,OK,organizational behavior|education|leadership,OK,organizational behavior
+R163,Metaphorically Selling How to Use the Ma,principle,OK,normative_heuristic,OK,communication theory,OK,3,OK,marketing & communications|editorial & advertising|packaging|semiotics & communication,OK,marketing & communications
+R164,Phenomenological Understanding,principle,OK,descriptive_model,OK,philosophy,OK,3,OK,research practice|education|semiotics & communication,OK,research practice
+R165,Acknowledgment Attribution,quarantine,OK,descriptive_model,OK,,OK,4,OK,editorial & advertising,OK,editorial & advertising
+R166,Agent-centric Economic Incentives,principle,OK,normative_heuristic,ADVISORY,economics,OK,3,OK,ai & agents|engineering & infrastructure,OK,ai & agents
+R167,Innocent Brand Identity Through Organic Development,growth_edge,OK,empirical_pattern,OK,organizational theory,OK,3,OK,brand identity|marketing & communications|organizational behavior,OK,brand identity
+R168,Hidden Issue Questioning Technique,principle,OK,normative_heuristic,OK,marketing,OK,4,OK,research practice,OK,research practice
+R169,Charismatic Leadership Development,quarantine,OK,descriptive_model,ADVISORY,psychology,OK,3,OK,leadership,OK,leadership
+R170,Dream-driven Life Planning,principle,OK,normative_heuristic,OK,decision making,OK,3,OK,personal productivity,OK,personal productivity
 R171,Alpha Blending Control,tool_instruction,OK,normative_heuristic,OK,computer graphics,OK,4,OK,code & computation,OK,code & computation
-R172,Digital System Context Decomposition,principle,OK,empirical_pattern,OK,systems thinking,OK,2,OK,systems & frameworks,OK,systems & frameworks
+R172,Digital System Context Decomposition,principle,OK,empirical_pattern,OK,engineering,OK,2,OK,engineering practice|engineering & infrastructure|product design,OK,engineering practice
 R173,Linkedin Network Building Protocol,process_template,OK,normative_heuristic,OK,social network analysis,OK,4,OK,business development,OK,business development
-R174,Concept-first Prototyping,process_template,OK,normative_heuristic,OK,design thinking,OK,3,OK,user experience,OK,user experience
-R175,Role-based Prompting Effect,principle,OK,causal_mechanism,OK,generative ai,OK,4,OK,ai & agents,OK,ai & agents
+R174,Concept-first Prototyping,process_template,OK,normative_heuristic,OK,design thinking,OK,3,OK,user experience|product design|digital product|industrial design,OK,user experience
+R175,Role-based Prompting Effect,principle,OK,causal_mechanism,OK,artificial intelligence,OK,4,OK,ai & agents,OK,ai & agents
 R176,Harvest Time Strategic Planning,process_template,OK,normative_heuristic,OK,finance,OK,3,OK,finance & investment,OK,finance & investment
-R177,Contextual Interpretation Framework,principle,OK,descriptive_model,OK,visual semiotics,OK,2,OK,semiotics & communication,OK,semiotics & communication
+R177,Contextual Interpretation Framework,principle,OK,descriptive_model,OK,semiotics,OK,2,OK,semiotics & communication|marketing & communications,OK,semiotics & communication
 R178,If-then Plan for Moral Action,principle,OK,normative_heuristic,OK,psychology,OK,2,OK,personal productivity,OK,personal productivity
-R179,Coincidence Wit in Graphic Design,principle,OK,normative_heuristic,OK,creative process,OK,3,OK,graphic design,OK,graphic design
-R180,Intersectional Design Approaches for Underserved Communities,noise_drop,OK,descriptive_model,OK,design thinking,OK,,OK,research & methodology,OK,research & methodology
+R179,Coincidence Wit in Graphic Design,principle,OK,normative_heuristic,OK,creative process,OK,3,OK,graphic design|semiotics & communication|editorial & advertising|marketing & communications|brand identity,OK,graphic design
+R180,Intersectional Design Approaches for Underserved Communities,noise_drop,OK,descriptive_model,OK,,OK,,OK,,OK,
 R181,Economic Industry Network Structure,principle,OK,descriptive_model,OK,economics ,OK,3,OK,systems & frameworks,OK,systems & frameworks
-R182,Cultural Mourning Rituals and Symbolism,noise_drop,OK,descriptive_model,OK,anthropology,OK,,OK,arts & culture,OK,arts & culture
-R183,Pattern Language Implementation Process,quarantine,OK,normative_heuristic,OK,design thinking,OK,3,OK,urban planning,OK,urban planning
-R184,Doping in Professional Sports: Systemic Pressure and Rationalization,quarantine,OK,empirical_pattern,ADVISORY,sociology ,OK,3,OK,social sciences,OK,social sciences
-R185,Tv Advertising Consumer Behavior Pattern,principle,OK,empirical_pattern,OK,behavioral economics,OK,3,OK,marketing & communications,OK,marketing & communications
-R186,Cognitive Interview Analysis Framework,principle,OK,normative_heuristic,OK,research methodology,OK,4,OK,research & methodology,OK,research & methodology
+R182,Cultural Mourning Rituals and Symbolism,noise_drop,OK,descriptive_model,OK,,OK,,OK,,OK,
+R183,Pattern Language Implementation Process,quarantine,OK,normative_heuristic,OK,,OK,3,OK,urban planning,OK,urban planning
+R184,Doping in Professional Sports: Systemic Pressure and Rationalization,quarantine,OK,empirical_pattern,ADVISORY,behavioral economics,OK,3,OK,health & wellness,OK,health & wellness
+R185,Tv Advertising Consumer Behavior Pattern,principle,OK,empirical_pattern,OK,marketing,OK,3,OK,editorial & advertising|marketing & communications|media & entertainment,OK,editorial & advertising
+R186,Cognitive Interview Analysis Framework,principle,OK,normative_heuristic,OK,research methodology,OK,4,OK,research practice|marketing & communications,OK,research practice
 R187,Credibility Through Transparency,principle,OK,normative_heuristic,ADVISORY,communication theory,OK,2,OK,marketing & communications,OK,marketing & communications
-R188,Sensory-motor Basis of Conceptual Reasoning,principle,OK,causal_mechanism,OK,cognitive science,OK,3,OK,education|science & research,OK,education
-R189,Higher-order Polynomial Approximation in Numerical Methods,principle,ADVISORY,normative_heuristic,OK,computational physics & simulation,OK,4,OK,computational science & physics,OK,computational science & physics
-R190,Design Thinking Integration Strategy,principle,OK,normative_heuristic,OK,organizational theory,OK,3,OK,design strategy,OK,design strategy
+R188,Sensory-motor Basis of Conceptual Reasoning,principle,OK,causal_mechanism,OK,cognitive science,OK,3,OK,education,OK,education
+R189,Higher-order Polynomial Approximation in Numerical Methods,principle,ADVISORY,normative_heuristic,OK,computational physics & simulation,OK,4,OK,engineering practice|systems & frameworks,OK,engineering practice
+R190,Design Thinking Integration Strategy,principle,OK,normative_heuristic,OK,design thinking,OK,3,OK,design strategy|business operations|leadership|project management,OK,design strategy
 R191,Intentional Motion Design,principle,OK,normative_heuristic,OK,motion & time,OK,3,OK,motion design,OK,motion design
 R192,Long-term Investment Advantage,growth_edge,OK,empirical_pattern,OK,finance,OK,3,OK,finance & investment,OK,finance & investment
 R193,Brent Spar Campaign Effectiveness,process_instance,OK,causal_mechanism,OK,political economy,OK,4,OK,legal & public policy,OK,legal & public policy
-R195,Agentic Ai System Reliability,principle,OK,normative_heuristic,ADVISORY,generative ai,OK,3,OK,ai & agents,OK,ai & agents
-R196,Inclusive Design Adaptation,principle,OK,normative_heuristic,OK,human-computer interaction,OK,2,OK,design systems,OK,design systems
-R197,Peripheral Cue Interference Effect,principle,OK,empirical_pattern,OK,psychology,OK,4,OK,science & research,OK,science & research
-R198,Survivor Bias in Success Narratives,principle,OK,empirical_pattern,OK,psychology,OK,2,OK,social sciences,OK,social sciences
-R199,Comfort Zone Constriction From Negative Influence,principle,OK,empirical_pattern,ADVISORY,psychology,OK,3,OK,personal productivity,OK,personal productivity
-R200,Simplicity Cult in Saas Pricing,noise_drop,OK,empirical_pattern,OK,strategic thinking,OK,,OK,business development,OK,business development
-R201,Physical Activity and Brain Health,principle,OK,empirical_pattern,OK,neuroscience,OK,3,OK,health & wellness,OK,health & wellness
-R202,Interactive Media Integration,principle,OK,descriptive_model,OK,performing arts,OK,3,OK,arts & culture,OK,arts & culture
+R195,Agentic Ai System Reliability,principle,OK,normative_heuristic,ADVISORY,generative ai,OK,3,OK,ai & agents|engineering & infrastructure,OK,ai & agents
+R196,Inclusive Design Adaptation,principle,OK,normative_heuristic,OK,human-computer interaction,OK,2,OK,design systems|user experience|semiotics & communication,OK,design systems
+R197,Peripheral Cue Interference Effect,principle,OK,empirical_pattern,OK,cognitive science,OK,4,OK,user experience,OK,user experience
+R198,Survivor Bias in Success Narratives,principle,OK,empirical_pattern,OK,behavioral economics,OK,2,OK,personal productivity|finance & investment|entrepreneurship,OK,personal productivity
+R199,Comfort Zone Constriction From Negative Influence,principle,OK,empirical_pattern,ADVISORY,psychology,OK,3,OK,user experience,OK,user experience
+R200,Simplicity Cult in Saas Pricing,noise_drop,OK,empirical_pattern,OK,,OK,,OK,,OK,
+R201,Physical Activity and Brain Health,principle,OK,empirical_pattern,OK,health & medicine,OK,3,OK,health & wellness,OK,health & wellness
+R202,Interactive Media Integration,principle,OK,descriptive_model,OK,,OK,3,OK,creative technology|media & entertainment|user experience,OK,creative technology
 R203,Iterative Problem-solving in Ux Design,process_template,OK,normative_heuristic,OK,design thinking,OK,2,OK,user experience,OK,user experience
-R204,Expert Overconfidence and Cognitive Laziness,principle,OK,empirical_pattern,OK,psychology,OK,2,OK,social sciences|organizational behavior,OK,social sciences
-R205,Innovation Cycles in Art and Technology,principle,OK,empirical_pattern,ADVISORY,cultural design,ADVISORY,2,OK,arts & culture,OK,arts & culture
+R204,Expert Overconfidence and Cognitive Laziness,principle,OK,empirical_pattern,OK,psychology,OK,2,OK,user experience|organizational behavior,OK,user experience
+R205,Innovation Cycles in Art and Technology,principle,OK,empirical_pattern,ADVISORY,cultural studies,ADVISORY,2,OK,arts & culture|media & entertainment|design strategy|systems & frameworks,OK,arts & culture
 R206,Directional Changes (dc) in Financial Data,quarantine,ADVISORY,normative_heuristic,OK,finance,OK,4,OK,finance & investment,OK,finance & investment
-R207,Generous Audacious Marketing,principle,OK,normative_heuristic,OK,strategic thinking,OK,3,OK,marketing & communications,OK,marketing & communications
+R207,Generous Audacious Marketing,principle,OK,normative_heuristic,OK,marketing,OK,3,OK,marketing & communications,OK,marketing & communications
 R208,Recovered Memory Therapy and False Accusations,growth_edge,OK,empirical_pattern,OK,psychology,OK,4,OK,health & wellness,OK,health & wellness
-R209,Procedural Vs Declarative Knowledge Retrieval,principle,OK,descriptive_model,OK,cognitive science,OK,3,OK,education,OK,education
-R210,Same-age Peer Modeling,principle,OK,empirical_pattern,OK,behavioral economics,OK,3,OK,social sciences,OK,social sciences
+R209,Procedural Vs Declarative Knowledge Retrieval,principle,OK,descriptive_model,OK,cognitive science,OK,3,OK,ai & agents|education|information architecture,OK,ai & agents
+R210,Same-age Peer Modeling,principle,OK,empirical_pattern,OK,behavioral economics,OK,3,OK,education|user experience|marketing & communications,OK,education

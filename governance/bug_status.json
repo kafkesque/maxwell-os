@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 448,
-  "open_n": 166,
-  "closed_n": 282,
+  "total_ids": 449,
+  "open_n": 164,
+  "closed_n": 285,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -824,18 +824,8 @@
       "events": 2
     },
     {
-      "id": "BUG-682",
-      "title": "(OPEN, 2026-10-08 round 3) \u2014 the axis had TWO homes: the owner's rulings are absent from the face the PIPELINE reads, and the rail that shou",
-      "events": 1
-    },
-    {
-      "id": "BUG-683",
-      "title": "(OPEN, 2026-10-08 round 3) \u2014 a rival writer of the AUTHORITY whose input contract no longer exists (it would now crash, and nothing runs it)",
-      "events": 1
-    },
-    {
-      "id": "BUG-684",
-      "title": "(OPEN, 2026-10-08) \u2014 the regenerator carries a HARDCODED second home of the drop list, which is why the owner-ratified drop could never reac",
+      "id": "BUG-685",
+      "title": "(OPEN, 2026-10-08) \u2014 the depth conformance builder can no longer reproduce its own artifact (two latent defects)",
       "events": 1
     }
   ],
@@ -1121,6 +1111,9 @@
     "BUG-675",
     "BUG-676",
     "BUG-678",
-    "BUG-679"
+    "BUG-679",
+    "BUG-682",
+    "BUG-683",
+    "BUG-684"
   ]
 }

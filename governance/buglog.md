@@ -9581,6 +9581,10 @@ from the stale authority. Then `ANCHOR_208_CONSOLIDATED` can only ever carry wha
 cross-face rail (`apply_owner_domain_review.py --check-faces`) can be lowered to a ceiling of 0 with nothing left
 to hide behind.
 
+## BUG-686 (CLOSED, 2026-10-08) — `regenerate_anchor_208_v8.py` derived `primary_domain` positionally instead of reading the owner-ratified ruler field
+
+`scripts/regenerate_anchor_208_v8.py` set `primary = domains[0]` — a positional pick (the D-2658 anti-pattern) over a field the ruler carries explicitly as `primary_domain` (owner-ratified, D-2868; present on 194/194 axis-bearing rows). A positional derivation would silently drift the primary-domain axis if the owner ever orders the domain list differently. Verified inert today (0 of 194 rows have `domains[0] != primary_domain`), but it is a latent correctness defect. FIXED: read `r.get("primary_domain")` directly. `--check` re-derives 208 rows / 194 axis-bearing / 0 stale, identical to HEAD. ✅ (2026-10-08)
+
 ## BUG-685 (CLOSED, 2026-10-08) — the depth conformance builder can no longer reproduce its own artifact (two latent defects)
 
 FOUND while auditing the D-2813 depth clear (Stage-2 place 4). `scripts/build_depth_anchor_conformance.py` was

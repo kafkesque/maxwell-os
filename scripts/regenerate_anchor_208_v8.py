@@ -67,7 +67,11 @@ def main() -> int:
             discipline = r["discipline"]
             domains = r["domains"]
             domain = "|".join(domains)
-            primary = domains[0] if domains else None
+            # BUG-686: primary_domain is an OWNER-RATIFIED field on the ruler (D-2868). Deriving
+            # primary = domains[0] was a positional pick (D-2658 anti-pattern) that would silently
+            # drift the primary-domain axis if the owner ever orders the domain list. Read the
+            # explicit field, never the list position.
+            primary = r.get("primary_domain")
             dstatus = "abstained" if iid in cfg["abstained"] else "owner_finalized"
             dsource = "abstained" if iid in cfg["abstained"] else "owner_finalized"
         elif iid in cfg["drop_set"]:

@@ -11,7 +11,7 @@
 
 ## 🔴 CURRENT OPEN / PENDING INDEX (machine-derived 2026-10-03 — the live face; history below)
 
-Register truth (do NOT restate counts elsewhere — BUG-588/D-2692): 1011 decisions · 449 bugs (163 open / 286 closed; highest OPEN = BUG-681). Forensic audit GREEN: 0 fatal rails — store-change re-baseline cascade (BUG-659..668) FIXED at root cause.
+Register truth (do NOT restate counts elsewhere — BUG-588/D-2692): 1011 decisions · 450 bugs (163 open / 287 closed; highest OPEN = BUG-681). Forensic audit GREEN: 0 fatal rails — store-change re-baseline cascade (BUG-659..668) FIXED at root cause.
 
 ## D-2881 (2026-10-08) — the 11 ambiguous anchor-bridge rows are RUN-COLLISIONS, resolved to the ratified canonical run
 

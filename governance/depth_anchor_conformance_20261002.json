@@ -5,11 +5,13 @@
   "gen_model": "none (deterministic join; no LLM)",
   "pipeline_commit": "unknown",
   "maxwell_schema_version": "unknown",
-  "created_at": "2026-10-02T21:25:03.916956+00:00",
+  "created_at": "2026-10-08T18:32:54.579836+00:00",
   "authority": [
     "D-2760 (owner finalized 42 depth mismatches; corrected depth map)",
     "D-274f (anchor is a conformance set, NOT a training set)",
     "D-2611 (report chance-corrected kappa, never bare accuracy)",
+    "D-2658 (join by content, never by position; ambiguous = refuse, declare, never pick)",
+    "D-2813 (depth does not apply to a noise_drop row)",
     "config/agreement_floor.yaml (operative floor 0.800)"
   ],
   "inputs": {
@@ -19,7 +21,7 @@
     },
     "store_bridge": {
       "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/governance/ANCHOR_STORE_BRIDGE_20260926.json",
-      "sha256": "9d4a32702f93c0130d1ca64c6e8542eb3ddd13bcc67da1d5864f8cd7a449d151"
+      "sha256": "6b648018afbc20b3ee826e046f8ad84b0f8e232322cad5ff11d2201c61ae6a3b"
     },
     "store": {
       "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/maxwell.db",
@@ -31,18 +33,20 @@
     "normalization": "collapse_whitespace"
   },
   "counts": {
-    "total": 194,
+    "total": 183,
     "by_depth_label": {
-      "domain": 88,
-      "cross-domain": 58,
-      "specialized": 46,
-      "universal": 2
+      "domain": 83,
+      "cross-domain": 54,
+      "specialized": 45,
+      "universal": 1
     },
     "by_depth_source": {
-      "owner_finalized": 95,
-      "canonical_adjudicated": 99
+      "owner_finalized": 90,
+      "canonical_adjudicated": 93
     },
-    "name_normalized": []
+    "name_normalized": [],
+    "excluded_noise_drop": 14,
+    "excluded_ambiguous": 11
   },
   "depth_labels": [
     "universal",
@@ -52,60 +56,104 @@
   ],
   "excluded": [
     {
-      "item_id": "R021",
-      "reason": "owner noise_drop (R021)"
-    },
-    {
       "item_id": "R082",
-      "reason": "owner noise_drop (D-2813: depth does not apply)"
+      "reason": "owner noise_drop (D-2760 depth_source sentinel; D-2813: depth does not apply)"
     },
     {
       "item_id": "R106",
-      "reason": "owner noise_drop (D-2813: depth does not apply)"
+      "reason": "owner noise_drop (D-2760 depth_source sentinel; D-2813: depth does not apply)"
     },
     {
       "item_id": "R200",
-      "reason": "owner noise_drop (D-2813: depth does not apply)"
+      "reason": "owner noise_drop (D-2760 depth_source sentinel; D-2813: depth does not apply)"
     },
     {
       "item_id": "R040",
-      "reason": "owner noise_drop (D-2813: depth does not apply)"
+      "reason": "owner noise_drop (D-2760 depth_source sentinel; D-2813: depth does not apply)"
     },
     {
       "item_id": "R084",
-      "reason": "owner noise_drop (D-2813: depth does not apply)"
+      "reason": "owner noise_drop (D-2760 depth_source sentinel; D-2813: depth does not apply)"
+    },
+    {
+      "item_id": "R021",
+      "reason": "owner noise_drop (D-2760 depth_source sentinel; D-2813: depth does not apply)"
     },
     {
       "item_id": "R034",
-      "reason": "owner noise_drop (D-2813: depth does not apply)"
+      "reason": "owner noise_drop (D-2760 depth_source sentinel; D-2813: depth does not apply)"
     },
     {
       "item_id": "R182",
-      "reason": "owner noise_drop (D-2813: depth does not apply)"
+      "reason": "owner noise_drop (D-2760 depth_source sentinel; D-2813: depth does not apply)"
     },
     {
       "item_id": "R012",
-      "reason": "owner noise_drop (D-2813: depth does not apply)"
+      "reason": "owner noise_drop (D-2760 depth_source sentinel; D-2813: depth does not apply)"
     },
     {
       "item_id": "R026",
-      "reason": "owner noise_drop (D-2813: depth does not apply)"
+      "reason": "owner noise_drop (D-2760 depth_source sentinel; D-2813: depth does not apply)"
     },
     {
       "item_id": "R180",
-      "reason": "owner noise_drop (D-2813: depth does not apply)"
+      "reason": "owner noise_drop (D-2760 depth_source sentinel; D-2813: depth does not apply)"
     },
     {
       "item_id": "R080",
-      "reason": "owner noise_drop (D-2813: depth does not apply)"
+      "reason": "owner noise_drop (D-2760 depth_source sentinel; D-2813: depth does not apply)"
     },
     {
       "item_id": "R140",
-      "reason": "owner noise_drop (D-2813: depth does not apply)"
+      "reason": "owner noise_drop (D-2760 depth_source sentinel; D-2813: depth does not apply)"
     },
     {
       "item_id": "R148",
-      "reason": "owner noise_drop (D-2813: depth does not apply)"
+      "reason": "owner noise_drop (D-2760 depth_source sentinel; D-2813: depth does not apply)"
+    },
+    {
+      "item_id": "R002",
+      "reason": "ambiguous join (D-2658 name-collision refusal, 2 candidates) — OWED explicit fb_id (separate owner decision)"
+    },
+    {
+      "item_id": "R039",
+      "reason": "ambiguous join (D-2658 name-collision refusal, 2 candidates) — OWED explicit fb_id (separate owner decision)"
+    },
+    {
+      "item_id": "R049",
+      "reason": "ambiguous join (D-2658 name-collision refusal, 2 candidates) — OWED explicit fb_id (separate owner decision)"
+    },
+    {
+      "item_id": "R065",
+      "reason": "ambiguous join (D-2658 name-collision refusal, 2 candidates) — OWED explicit fb_id (separate owner decision)"
+    },
+    {
+      "item_id": "R070",
+      "reason": "ambiguous join (D-2658 name-collision refusal, 2 candidates) — OWED explicit fb_id (separate owner decision)"
+    },
+    {
+      "item_id": "R097",
+      "reason": "ambiguous join (D-2658 name-collision refusal, 2 candidates) — OWED explicit fb_id (separate owner decision)"
+    },
+    {
+      "item_id": "R102",
+      "reason": "ambiguous join (D-2658 name-collision refusal, 2 candidates) — OWED explicit fb_id (separate owner decision)"
+    },
+    {
+      "item_id": "R107",
+      "reason": "ambiguous join (D-2658 name-collision refusal, 2 candidates) — OWED explicit fb_id (separate owner decision)"
+    },
+    {
+      "item_id": "R152",
+      "reason": "ambiguous join (D-2658 name-collision refusal, 2 candidates) — OWED explicit fb_id (separate owner decision)"
+    },
+    {
+      "item_id": "R192",
+      "reason": "ambiguous join (D-2658 name-collision refusal, 2 candidates) — OWED explicit fb_id (separate owner decision)"
+    },
+    {
+      "item_id": "R197",
+      "reason": "ambiguous join (D-2658 name-collision refusal, 2 candidates) — OWED explicit fb_id (separate owner decision)"
     }
   ],
   "examples": [
@@ -353,9 +401,9 @@
       "item_id": "R062",
       "name": "Somatic Marker Decision Making",
       "definition": "A decision-making process where unconscious associations between categories (like 'Germany' or 'Japan') and qualities (like 'technological excellence') guide choices without conscious awareness.",
-      "mechanism": "Somatic markers create automatic associations in the brain that link abstract concepts (like national origin) with perceived qualities (like technological excellence), influencing choices without deliberate reasoning.",
-      "boundary": "Applies when decisions are influenced by unconscious associations between categories and qualities. Fails when decisions are made through deliberate rational analysis or when the associations are consciously recognized.",
-      "extraction_type": "descriptive_model",
+      "mechanism": "Somatic markers are unconscious associations that activate when making decisions, creating emotional responses that bias choices toward familiar or culturally-linked categories. These markers bypass conscious deliberation and directly influence preference formation.",
+      "boundary": "Applies to decisions where cultural or categorical associations influence choice, particularly when the decision-maker is unaware of the influence. Fails when decisions are made purely on rational analysis or when the categories are not culturally loaded.",
+      "extraction_type": "causal_mechanism",
       "depth": 2,
       "depth_label": "cross-domain",
       "depth_source": "owner_finalized",
@@ -384,18 +432,6 @@
       "depth_label": "domain",
       "depth_source": "owner_finalized",
       "fb_id": "20a580c62d1cd3b3fb3beb1c2d8eb3cb62d89656e04ca8c07f92da464b61ba4e"
-    },
-    {
-      "item_id": "R070",
-      "name": "Iterative Design Validation",
-      "definition": "Design teams validate their approach by repeatedly presenting refined iterations to stakeholders, incorporating feedback to ensure alignment with user needs and organizational goals. This process involves cycles of design, feedback, and refinement to build consensus and reduce risk.",
-      "mechanism": "This is a practical design process pattern, not a causal mechanism. Teams present initial designs and subsequent iterations to stakeholders to gather feedback and confirm alignment. The process is iterative and cyclical, with each round of feedback informing the next design iteration. The mechanism describes how design validation unfolds in practice rather than asserting a single proven cause-effect relationship.",
-      "boundary": "Applies when design teams work with stakeholders who can provide meaningful feedback and when there is sufficient time and resources for multiple design cycles. Fails when stakeholders are unavailable for feedback, when design cycles are too constrained by time or budget, or when feedback is not incorporated into subsequent iterations.",
-      "extraction_type": "normative_heuristic",
-      "depth": 2,
-      "depth_label": "cross-domain",
-      "depth_source": "canonical_adjudicated",
-      "fb_id": "210bf321b1eba495dde655456603277df87542c0401f2d68978d5ea108831b7a"
     },
     {
       "item_id": "R193",
@@ -758,18 +794,6 @@
       "fb_id": "4292dc32dc95d89ec2133b0e8cf27a65721689f4c477fe8460ea94a9729bd16d"
     },
     {
-      "item_id": "R152",
-      "name": "Economic Politics of Obsolescence",
-      "definition": "The dominant economic model that prioritizes planned obsolescence over durability, maintaining consumer economy through continuous replacement cycles and resisting shifts toward sustainable manufacturing practices.",
-      "mechanism": "Economic systems are structured to favor short-term consumption cycles over long-term durability, with manufacturers and consumers both benefiting from the constant turnover of products, creating a self-reinforcing cycle that resists sustainable alternatives.",
-      "boundary": "Applies to consumer goods markets where planned obsolescence is the dominant business model. Fails when sustainable alternatives can demonstrate clear economic advantages that overcome the existing incentive structures.",
-      "extraction_type": "descriptive_model",
-      "depth": 3,
-      "depth_label": "domain",
-      "depth_source": "owner_finalized",
-      "fb_id": "42cebfbaa280169a8fccf0042ab3cfef215ffa49d0184a44398e2e0e59255750"
-    },
-    {
       "item_id": "R103",
       "name": "Temporal Consistency in Visual Narrative Analysis",
       "definition": "A principle for interpreting sequential visual narratives by maintaining temporal consistency of characters and their activities across panels, using visual cues and contextual reasoning to establish narrative continuity.",
@@ -840,18 +864,6 @@
       "depth_label": "cross-domain",
       "depth_source": "canonical_adjudicated",
       "fb_id": "4944504e85bdd6f3e5b219098d516d377574d88ecf98510e35216f37518846d5"
-    },
-    {
-      "item_id": "R039",
-      "name": "Identity As Social Positioning and Lifestyle Signifiers",
-      "definition": "Identity encompasses both social dimensions (age, gender, class) that position individuals in society and personal aspects that enable viewing individuals as social agents who make choices.",
-      "mechanism": "Social identity dimensions create stable positioning within societal structures, while personal identity aspects allow for agency in choice-making. Consumer goods provide lifestyle signifiers that connect consumption to expressive meaning.",
-      "boundary": "Applies when analyzing how social positioning and personal agency intersect with consumption patterns. Fails when only considering either social dimensions or personal agency in isolation.",
-      "extraction_type": "descriptive_model",
-      "depth": 2,
-      "depth_label": "cross-domain",
-      "depth_source": "canonical_adjudicated",
-      "fb_id": "49cc57c71690f8e175f7254c37a5565f6a867ae3723fd56cc1318db1b41b3906"
     },
     {
       "item_id": "R168",
@@ -950,18 +962,6 @@
       "fb_id": "53e4daf2f911871c61f90832138fcfec1c1da1ca560287719668b9bdbda33a4e"
     },
     {
-      "item_id": "R192",
-      "name": "Long-term Investment Advantage",
-      "definition": "Investing with a long-term horizon and focusing on quality companies at reasonable prices generates superior returns over time, while the investment management industry as a whole fails to add value for buyers. This principle reflects the reality that successful long-term investing requires patience, discipline, and a focus on fundamentals rather than market timing or industry-wide trends.",
-      "mechanism": "This is a descriptive model of investment outcomes and industry structure. The principle describes the relationship between investment approach and performance, as well as the structural characteristics of the investment management industry. It categorizes investment strategies and their expected outcomes, not a causal chain of specific actions leading to results.",
-      "boundary": "Applies to investors who maintain long-term perspectives and focus on fundamental value rather than market timing or industry-wide trends. Fails for investors who rely on short-term market predictions, actively trade, or expect consistent outperformance from investment managers who charge fees. Also fails for investors who do not have the psychological capacity to endure short-term volatility.",
-      "extraction_type": "descriptive_model",
-      "depth": 3,
-      "depth_label": "domain",
-      "depth_source": "owner_finalized",
-      "fb_id": "54f0000cd1e48c3386651bfba9033f145f3a14e0bb0988f6a63e118840c4d7f1"
-    },
-    {
       "item_id": "R063",
       "name": "Textbook Representation and State of Exception Legitimation",
       "definition": "Educational textbooks in Israel systematically represent Palestinian experiences and rights in ways that legitimize the state of exception under Israeli occupation by concealing violations of human dignity and freedom.",
@@ -996,18 +996,6 @@
       "depth_label": "specialized",
       "depth_source": "canonical_adjudicated",
       "fb_id": "571e318c33578f13b1bbd4fa59dc0b6573b86676d3cc34e090b6dc470cf996e3"
-    },
-    {
-      "item_id": "R197",
-      "name": "Peripheral Cue Interference Effect",
-      "definition": "The phenomenon where peripheral cues designed to mislead or interfere with central task performance lead to differential performance outcomes based on arousal levels.",
-      "mechanism": "Peripheral cues that mislead subjects interfere with central task processing, but when subjects are in a positive arousal state, they show superior performance on the central task while exhibiting inferior performance on secondary tasks compared to control subjects.",
-      "boundary": "Applies when subjects are exposed to peripheral cues that either mislead or facilitate central task performance, and when arousal levels are manipulated. Fails when subjects are not exposed to peripheral cues or when arousal is not a factor.",
-      "extraction_type": "empirical_pattern",
-      "depth": 4,
-      "depth_label": "specialized",
-      "depth_source": "owner_finalized",
-      "fb_id": "57e259f3b82eccf02842bdfca763907cefe26d1eb6b3d792426e76180e26f5c4"
     },
     {
       "item_id": "R050",
@@ -1128,18 +1116,6 @@
       "depth_label": "domain",
       "depth_source": "canonical_adjudicated",
       "fb_id": "696c54f5555b7d0e4d4845ef2d5d667395d1b3faeae71fb61ddfddbc59f585c8"
-    },
-    {
-      "item_id": "R097",
-      "name": "Minimin Decision Criterion",
-      "definition": "A decision-making approach where a practitioner selects the option that minimizes the maximum possible loss, assuming Nature deliberately helps by choosing the most favorable outcome for each option.",
-      "mechanism": "The criterion involves calculating the minimum loss for each decision alternative (Di) by finding min j (L i j ) and then choosing the decision that minimizes this minimum loss across all alternatives.",
-      "boundary": "Applies when a decision-maker adopts a pessimistic stance and assumes Nature will act to help them by selecting the most favorable outcome. Fails when the assumption of helpful Nature is invalid or when other decision criteria are more appropriate.",
-      "extraction_type": "descriptive_model",
-      "depth": 2,
-      "depth_label": "cross-domain",
-      "depth_source": "canonical_adjudicated",
-      "fb_id": "6b4b26497c299fe82095995b2fd1c168c9b96768b1e09264acd784bed5bf48ab"
     },
     {
       "item_id": "R023",
@@ -1502,18 +1478,6 @@
       "fb_id": "8b6bcaafab084c74bd9baa374c5fb3bc227b4d33d6622c26508f1901b1b53b75"
     },
     {
-      "item_id": "R002",
-      "name": "Soviet Underground Discourse Reception",
-      "definition": "A phenomenon where Soviet audiences misinterpreted Western cultural references as new genres rather than parodies, and where underground cultural messages were received as legitimate content despite official censorship.",
-      "mechanism": "The Soviet audience's lack of cultural referents to Western works like Fantômas caused misinterpretation, while the official cultural discourse's emphasis on underground struggle created a context where secret cultural transmission was normalized as legitimate.",
-      "boundary": "Applies specifically to Soviet cultural reception contexts where audiences lacked reference points for Western works and where official discourse legitimized underground messaging. Fails in contexts without similar cultural dissonance or official endorsement of underground content.",
-      "extraction_type": "empirical_pattern",
-      "depth": 3,
-      "depth_label": "domain",
-      "depth_source": "canonical_adjudicated",
-      "fb_id": "8f02e94dec8a9299903c2e26e2f0ad7d0e55c84327a53e3998c8d201e9bcfa81"
-    },
-    {
       "item_id": "R188",
       "name": "Sensory-motor Basis of Conceptual Reasoning",
       "definition": "Abstract conceptualization and reasoning emerge from neural representations that integrate sensory-motor experiences rather than from purely abstract mental processes. The principle describes how conceptual understanding is grounded in embodied experience and distributed neural activation patterns.",
@@ -1596,18 +1560,6 @@
       "depth_label": "specialized",
       "depth_source": "canonical_adjudicated",
       "fb_id": "9a54460d6acec846ac4e49206b7da708ac089f19256d72f4c5292f52b304560a"
-    },
-    {
-      "item_id": "R065",
-      "name": "Media Construction of Crime Waves",
-      "definition": "Media reporting on crime uses thematic classifications and ideological framing to construct new types of crime and create media waves that mirror crime waves.",
-      "mechanism": "Media outlets categorize crime through thematic lenses (immigrants' crime, crimes against the elderly, drug-induced crime) and frame these through exaggeration, stereotyping, symbolization, and dramatization to create media waves that align with reported crime waves.",
-      "boundary": "Applies when media coverage uses thematic classification and ideological framing to construct crime categories. Fails when media simply reports factual crime statistics without thematic construction or ideological bias.",
-      "extraction_type": "descriptive_model",
-      "depth": 3,
-      "depth_label": "domain",
-      "depth_source": "owner_finalized",
-      "fb_id": "9a6ca0e54b82560552d0c8a5d15c08a254b1ba398642491a81b19879d00197fe"
     },
     {
       "item_id": "R085",
@@ -1740,18 +1692,6 @@
       "depth_label": "domain",
       "depth_source": "canonical_adjudicated",
       "fb_id": "ad69cb9e4aca3b745e5a304c44f0275fc71c7da779a27f7ceaced83c36d538bd"
-    },
-    {
-      "item_id": "R107",
-      "name": "Lived Experience Focus",
-      "definition": "Understanding the subjective, first-person experience of individuals as central to research inquiry, distinct from causal analysis or outcome implications. This principle emphasizes phenomenological investigation as a core research method.",
-      "mechanism": "This is a descriptive model of research orientation that categorizes different approaches to inquiry. The principle identifies a specific research lens focused on 'what it feels like' for participants rather than 'why it happens' or 'what it means.' It describes a particular way of organizing research questions and methods that prioritizes participant perspective over explanatory frameworks.",
-      "boundary": "Applies when research design explicitly prioritizes participant subjective experience over causal explanation or outcome analysis. Fails when research questions are framed around determining causes, effects, or implications rather than describing lived phenomena.",
-      "extraction_type": "descriptive_model",
-      "depth": 2,
-      "depth_label": "cross-domain",
-      "depth_source": "canonical_adjudicated",
-      "fb_id": "ae9023a021dfc501f70b1ed0abe8a65b7cf8df3665dd7a89c257b6a9fda08329"
     },
     {
       "item_id": "R135",
@@ -2066,18 +2006,6 @@
       "fb_id": "cb7a3a157053e6640ce12f3951a6b10aa2d9ae1d753de0f260193f9aecc92892"
     },
     {
-      "item_id": "R049",
-      "name": "Fermi Estimation Method",
-      "definition": "A problem-solving approach for estimating quantities by breaking down complex questions into simpler components and using reasonable approximations.",
-      "mechanism": "The method involves decomposing a complex estimation problem into manageable sub-problems, setting confidence intervals for estimates, and using logical reasoning to arrive at a reasonable approximation rather than relying on direct knowledge.",
-      "boundary": "Applies to estimation problems where direct knowledge is unavailable but logical breakdown is possible. Fails when the problem cannot be meaningfully decomposed or when the required assumptions are not reasonable.",
-      "extraction_type": "normative_heuristic",
-      "depth": 1,
-      "depth_label": "universal",
-      "depth_source": "owner_finalized",
-      "fb_id": "cbd462e8b840ba3520edacc957da7fb6f6b56bcf10725e648ab3fb617749e165"
-    },
-    {
       "item_id": "R124",
       "name": "Foundation Model Integration Framework",
       "definition": "A structured approach to incorporating foundation models into AI application development that emphasizes modular integration, scalable deployment, and operational reliability. The framework supports diverse model types and deployment contexts while maintaining consistency across development and production environments.",
@@ -2220,18 +2148,6 @@
       "depth_label": "specialized",
       "depth_source": "owner_finalized",
       "fb_id": "e7248fbf0d474024f57ebfbebad6a4118ff3a9c1665e55fb10bafce3b17f62c8"
-    },
-    {
-      "item_id": "R102",
-      "name": "Social Entrepreneur's Playbook",
-      "definition": "A comprehensive guide and framework for social entrepreneurs to systematically address social problems through scalable, impactful ventures that create sustainable change rather than merely providing temporary relief.",
-      "mechanism": "The playbook provides structured methodology for identifying social problems, developing scalable solutions, and implementing systematic approaches to create lasting impact through organized planning, testing, and scaling processes.",
-      "boundary": "Applies to social entrepreneurs seeking systematic approaches to address social problems. Fails when applied to purely profit-driven ventures or when social impact is not the primary objective.",
-      "extraction_type": "normative_heuristic",
-      "depth": 3,
-      "depth_label": "domain",
-      "depth_source": "canonical_adjudicated",
-      "fb_id": "e80176e84e7a7d5404e24ea60c2e5ea4309bd800283abd8ed8faf15a43ef299c"
     },
     {
       "item_id": "R162",
@@ -2437,24 +2353,5 @@
       "depth_source": "canonical_adjudicated",
       "fb_id": "fdac2ca29b61ffce5deef71f43a231d24d275765f31fb6a11860be1983c357c9"
     }
-  ],
-  "_noise_drop_clear": {
-    "rule": "D-2813: depth does not apply to a noise_drop row",
-    "applied_at": "2026-10-08T17:55:32.450036+00:00",
-    "removed": [
-      "R082",
-      "R106",
-      "R200",
-      "R040",
-      "R084",
-      "R034",
-      "R182",
-      "R012",
-      "R026",
-      "R180",
-      "R080",
-      "R140",
-      "R148"
-    ]
-  }
+  ]
 }

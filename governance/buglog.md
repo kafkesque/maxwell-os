@@ -48,6 +48,8 @@
 ---
 
 ## ✅ CLOSED / RESOLVED — bottom (recent)
+- **BUG-685** — **depth conformance builder made byte-re-derivable** — exclusion sentinel moved to the D-2760 `depth_source` form (both-forms check); the 11 D-2658 ambiguous-join rows now fail-closed against the bridge's declared `join.ambiguous` and are ledgered in `excluded` (OWED explicit fb_id, a separate owner decision — never fabricated); added `--check`; artifact regenerated 194 → 183 examples + 25 excluded. VERIFIED GREEN. ✅ (2026-10-08)
+
 - **BUG-682 / BUG-683 / BUG-684** — **Stage 2 projection LANDED: the frozen ruler is now the ONE authority** — `regenerate_anchor_208_v8.py` reads drop/abstention sets from config and projects from the RULER (no hardcoded literals, BUG-684); the ruler was projected onto rederived_v8 + both five-axis views (place 5, 614 cells) and the axis registry flipped to the ruler (place 6: `anchor_axis_authority.yaml` + `anchor_family.yaml` + `pipeline_config.yaml#discipline_anchor_path`); the five-axis views are now declared consumers (closes the place-5 verification blindspot); `apply_owner_domain_rulings_v8.py` RETIRED as a writer (refuses, rc=1 — BUG-683); cross-face ceiling at 0/0. ✅ (2026-10-08)
 
 - **BUG-676** — **discipline abstention was an out-of-menu TOKEN ('emerging') inside the frozen authority FIXED** — owner-confirmed abstentions now declare `discipline: ""` via `config/owner_domain_rulings_20261008.yaml#discipline_abstention` (8 rows); the script is fail-closed in both directions and the ruler was re-stamped (`b766ae912401d7da` -> `5fcde5619e04fbda`). Residuals declared as BUG-680 (upstream faces) + BUG-679 (R140 is also a ratified drop). ✅ (2026-10-08)
@@ -9578,7 +9580,7 @@ from the stale authority. Then `ANCHOR_208_CONSOLIDATED` can only ever carry wha
 cross-face rail (`apply_owner_domain_review.py --check-faces`) can be lowered to a ceiling of 0 with nothing left
 to hide behind.
 
-## BUG-685 (OPEN, 2026-10-08) — the depth conformance builder can no longer reproduce its own artifact (two latent defects)
+## BUG-685 (CLOSED, 2026-10-08) — the depth conformance builder can no longer reproduce its own artifact (two latent defects)
 
 FOUND while auditing the D-2813 depth clear (Stage-2 place 4). `scripts/build_depth_anchor_conformance.py` was
 run to a temp out as a forensic check and FAILED: `FAIL: expected 208 golden rows, got 197`.
@@ -9600,6 +9602,26 @@ owner decision, not part of the depth clear.
 
 CLASS: C16/reproducibility (a generator that cannot regenerate its own artifact) + BUG-492-adjacent (the builder is
 a rail nothing re-runs).
+
+RESOLVED 2026-10-08. Two deterministic fixes, no LLM, no owner-ruling mutation:
+  1. EXCLUSION SENTINEL: the builder now checks BOTH forms of the noise_drop marker (`depth_label == "noise_drop"`
+     OR the D-2760 `depth_source == "owner_finalized_noise_drop"` sentinel) via `_is_noise_drop` — the consolidate /
+     regenerate idiom. The stale `depth_label`-only check could no longer fire after D-2760 nulled the label.
+  2. BRIDGE DRIFT: the builder reads the bridge's DECLARED `join.ambiguous` (11 D-2658 name-collision refusals) and
+     (a) fail-closes if the golden rows actually missing from the bridge do not EXACTLY equal that declared set
+     (C16, no silent drift), and (b) ledgers those 11 rows in `excluded` with reason "ambiguous join — OWED explicit
+     fb_id (separate owner decision)". They are NOT fabricated and NOT silently dropped.
+  Also added `--check`, a byte-re-derivability rail (compares examples/counts/excluded/depth_labels, modulo the
+  wall-clock `created_at` and the superseded one-time `_noise_drop_clear` ledger).
+
+  RESULT: the artifact regenerates deterministically to 183 examples + 25 excluded (14 noise_drop + 11 ambiguous);
+  the prior 194-example artifact was stale (it still carried the 11 pre-refusal rows). VERIFIED GREEN:
+  `--check` byte-re-derivable; `depth_conformance_gate --dry-run` (count-drift guard 183==183);
+  `check_anchor_axis_consistency` (depth consumer 208 vs 183 joined, 0 drift, ceiling 0);
+  `verify_anchor_family_registry` (ok).
+
+  REMAINS OPEN (separate owner decision, NOT part of this fix): assign an explicit fb_id to the 11 ambiguous rows
+  (R002 R039 R049 R065 R070 R097 R102 R107 R152 R192 R197) or leave them excluded from the depth conformance.
 
 ## BUG-682 / BUG-683 / BUG-684 — CLOSED 2026-10-08 (Stage 2 projection landed)
 The single projection named in each OPEN entry has landed and is verified:

@@ -3,8 +3,8 @@
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
   "total_ids": 449,
-  "open_n": 164,
-  "closed_n": 285,
+  "open_n": 163,
+  "closed_n": 286,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -822,11 +822,6 @@
       "id": "BUG-681",
       "title": "(OPEN, 2026-10-08) \u2014 `just health-full` found 6 faults in one pass; 2 fixed deterministically, 4 remain (3 red contract tests + 3 rails) and",
       "events": 2
-    },
-    {
-      "id": "BUG-685",
-      "title": "(OPEN, 2026-10-08) \u2014 the depth conformance builder can no longer reproduce its own artifact (two latent defects)",
-      "events": 1
     }
   ],
   "closed": [
@@ -1114,6 +1109,7 @@
     "BUG-679",
     "BUG-682",
     "BUG-683",
-    "BUG-684"
+    "BUG-684",
+    "BUG-685"
   ]
 }

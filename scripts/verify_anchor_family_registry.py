@@ -31,6 +31,11 @@ REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO / "scripts"))
 from lib import artifact_encoding  # noqa: E402 - D-2646: the decode rule has ONE home
 CONFIG = REPO / "config" / "anchor_family.yaml"
+# PINNED-BY-DESIGN (BUG-694 future-tax audit, 2026-10-09): the anchor family (config/anchor_family.yaml)
+# was classified against the v5 menu, so its discipline/domain vocabulary is v5 vocabulary. Re-pointing
+# this to live_menu_path() (v9) would validate a v5-era frozen artifact against a future menu and produce
+# false REDs on any v5 label that v9 demoted/renamed. This is a frozen-artifact VALIDATOR, not a
+# serving-path consumer — BUG-694 fixed only the serving-path consumers (discipline_macro.py et al.).
 MENU = REPO / "config" / "closed_menu_v5.json"
 
 

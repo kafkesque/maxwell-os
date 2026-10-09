@@ -90,6 +90,7 @@
   - Deterministic data-repair (SQL/scripts: T-311, kind-swap, FTS rebuild): EXECUTE directly (LLM-free). But delegate CODE REVIEW of any NEW repair script to gemma-4-E4B-it-MLX-4bit BEFORE --apply (R5: generator ≠ verifier).
   - Code review / classification sanity / summarization WITH source → gemma-4-E4B-it-MLX-4bit (CONFIRMED working; verified 2026-09-04 approving the T-311 script).
   - S4 discipline/domain classification → gpt-oss-20b-MXFP4-Q8 (OMLX classifier; batch via subprocess, NOT a delegate).
+  - Promotion (emerging→canonical, discipline/domain) → deterministic `match_to_canonical` + owner-gate; NEVER an LLM (D-2898, `no_llm_canonical_promotion:true`). gpt-oss-20b is ADVISORY-ONLY for promotion (its proposal is never auto-applied).
   - Single-shot code generation → Qwen3-Coder-30B (curl one-shot ONLY — never multi-turn).
   - Summarization WITH source text → Phi-4-mini-instruct-8bit (never open-ended; BUG-053).
   - Open-ended research/fact-finding → shell/curl directly (NEVER delegate).

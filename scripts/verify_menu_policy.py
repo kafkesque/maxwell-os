@@ -55,6 +55,12 @@ for axis, spec in ROUTING['axes'].items():
 
 evidence = json.loads((R / MERGE['evidence']).read_text())
 by_tail = {canon(r['tail_label']): r for r in evidence['map']}
+# PINNED-BY-DESIGN (BUG-694 future-tax audit, 2026-10-09): this reads closed_menu_v5.json
+# deliberately, NOT live_menu_path(). The merge map (config/menu_v6_merge_map.yaml) is a FROZEN
+# v5->v6 artifact; its ratified parents were chosen against the v5 menu. Re-pointing this to the
+# live v9 menu would time-travel-validate a historical artifact against a future menu (e.g. the
+# v9-demoted 'computational theory' is absent from v9, so a v6 parent that is now demoted would
+# RED spuriously). Do NOT "fix" this into live_menu_path() — see BUG-694 for the serving-path fix.
 axis_labels = {canon(d['value']) for d in json.loads((R / 'config/closed_menu_v5.json').read_text())['disciplines']}
 rat = MERGE['ratification']
 tails = set(by_tail)

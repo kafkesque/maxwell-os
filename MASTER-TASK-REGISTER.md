@@ -14,6 +14,7 @@
 >
 > **OWNER-RULED (D-2884, 2026-10-09) — D-2727 now gated on the (a)+(b) landing:**
 > 1. **D-2767 C+B gate = FAIL** (3-way coarse 0.5621 < 0.73 floor). Owner ruled **(a)** fine discipline → ADVISORY, 3-way macro + domains become the operative routing facet; **(b)** distinct-family decider A/B (autotrust/JEV-27B-VL or pplx-decider-v1.1-27b) in parallel. BUG-690 part 2 (macro drift v5→v8) FIXED; part 1 (coarse-kappa harness output) FIXED (commit 8895cbf: coarse_collapse/coarse_report + test_d2767_coarse_kappa.py 4/4) — the prerequisite instrumentation for (b) is in place. D-2884(a) macro operative routing is LANDED + R5 gemma-APPROVED (retrieve.py + maxwell_mcp_server.py, 2026-10-09).
+> 1b. **D-2884(b) A/B RESULTS (2026-10-09):** Arm A pplx FAIL coarse_kappa 0.6738 (emerging 0.0052); Arm B laya FAIL 0.0242 (position bias); Arm C clef-flash FAIL 0.5705 but **emerging recall 0.4286 (3/7) — NON-ZERO vs pplx 0.0** (empirically validates BUG-692: the emerging clause is ceiling-only, so an always-answer decider trivially passes with zero sensitivity). clef-4bit (27B) pending. **None clears 0.73 yet** — owner must rule on (a) an emerging-RECALL floor (BUG-692) and/or (b) whether 0.73 is reachable by ANY distinct-family decider.
 > 2. **RATIFY-2 (D-2727) — full S4→S5→S6 rerun** stays BLOCKED until (a)+(b) land. Then `caffeinate -dimsu`; `python3 pipeline/runner.py --dry-run` then full.
 > 3. ~~Train/eval split (Option A)~~ — **DONE (D-2813 ratified):** split_manifest.json 46 golden / 162 eval / 208 total; ids_sha256 pin enforced (BUG-603 CLOSED).
 >

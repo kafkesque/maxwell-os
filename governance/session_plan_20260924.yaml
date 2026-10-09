@@ -28,6 +28,7 @@ may_touch:
 - governance/SESSION-HANDOFF-*.md
 - governance/existence_negatives.yaml
 - governance/HANDOFFS.jsonl
+- governance/r5_reviews.jsonl
 - governance/session_plan_*.yaml
 - tests/**
 - archive/index.yaml
@@ -118,6 +119,13 @@ will_not_touch:
 - governance/ANCHOR_RULER_CONSOLIDATED_*.csv
 - governance/ANCHOR4_DEPTH_BLIND_SHEET_*.csv
 widening_log:
+- date: '2026-10-09'
+  actor: assistant
+  owner_ack: 'standing owner mandate 2026-10-09 ("continue with next critical steps ... update and sync gov dependencies")'
+  addendum: 'D-2884(a) R5 verification: r5_code_review.py appends generator!=verifier verdicts (gemma APPROVE on retrieve.py + maxwell_mcp_server.py macro routing) to the R5 review evidence journal.'
+  additions:
+  - pattern: governance/r5_reviews.jsonl
+    why: 'D-2884(a)/R5 - append-only R5 review evidence journal; a generator!=verifier verdict that cannot be committed is not evidence (BUG-333 class).'
 - date: '2026-10-09'
   actor: assistant
   owner_ack: 'standing owner mandate 2026-10-09 ("continue with next critical steps ... update and sync gov dependencies")'

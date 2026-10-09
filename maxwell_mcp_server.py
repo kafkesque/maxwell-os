@@ -91,6 +91,7 @@ async def _tool_query_knowledge(args: dict) -> list[TextContent]:
     query: str = str(args.get("query", ""))
     domain: str | None = args.get("domain")
     depth: str | None = args.get("depth")
+    macro: str | None = args.get("macro")
     graph_aware: bool = bool(args.get("graph_aware", True))
     agentic: bool = bool(args.get("agentic", False))
     limit: int = min(int(args.get("limit", 10)), 50)
@@ -99,7 +100,7 @@ async def _tool_query_knowledge(args: dict) -> list[TextContent]:
     try:
         if agentic:
             pack: EvidencePack = agentic_search(
-                conn, query, limit=limit, domain=domain, depth=depth,
+                conn, query, limit=limit, domain=domain, depth=depth, macro=macro,
                 graph_aware=graph_aware,
             )
             results: list[dict] = pack.fbs
@@ -110,12 +111,12 @@ async def _tool_query_knowledge(args: dict) -> list[TextContent]:
             }
         elif graph_aware:
             results = graph_aware_search(
-                conn, query, limit=limit, domain=domain, depth=depth,
+                conn, query, limit=limit, domain=domain, depth=depth, macro=macro,
             )
             agentic_meta = {}
         else:
             results = search_hybrid(
-                conn, query, limit=limit, domain=domain, depth=depth,
+                conn, query, limit=limit, domain=domain, depth=depth, macro=macro,
             )
             agentic_meta = {}
 
@@ -129,6 +130,7 @@ async def _tool_query_knowledge(args: dict) -> list[TextContent]:
                 "domains": fb.get("domains", ""),
                 "depth": fb.get("depth", ""),
                 "discipline": fb.get("discipline", ""),
+                "discipline_macro": fb.get("discipline_macro") or "emerging",
                 "borp_score": fb.get("borp_score"),
                 "feedback_score": fb.get("feedback_score"),
                 "confidence_score": fb.get("confidence_score"),
@@ -183,6 +185,7 @@ async def _tool_get_fb_detail(args: dict) -> list[TextContent]:
             "name": fb.get("name"),
             "definition": fb.get("definition"),
             "domains": fb.get("domains"),
+            "discipline_macro": fb.get("discipline_macro") or "emerging",
             "discipline": fb.get("discipline"),
             "depth": fb.get("depth"),
             "status": fb.get("status"),
@@ -230,7 +233,7 @@ async def _tool_get_fb_reliability(args: dict) -> list[TextContent]:
         row = conn.execute(
             """SELECT fb_id, name, borp_score, confidence_score,
                feedback_score, feedback_count, usage_count,
-               last_retrieved_at, status, classification_status
+               last_retrieved_at, status, classification_status, discipline_macro
                FROM fbs WHERE fb_id = ? AND pipeline_run_id = ?""",
             (fb_id, CANONICAL_RUN),
         ).fetchone()
@@ -242,6 +245,7 @@ async def _tool_get_fb_reliability(args: dict) -> list[TextContent]:
         output: dict[str, Any] = {
             "fb_id": fb.get("fb_id"),
             "name": fb.get("name"),
+            "discipline_macro": fb.get("discipline_macro") or "emerging",
             "trust_metrics": {
                 "borp_score": fb.get("borp_score"),
                 "confidence_score": fb.get("confidence_score"),
@@ -345,6 +349,7 @@ TOOLS: list[Tool] = [
             "properties": {
                 "query": {"type": "string", "description": "Natural language search query"},
                 "domain": {"type": "string", "description": "Optional domain filter (e.g., 'pricing')"},
+                "macro": {"type": "string", "description": "D-2884(a): operative 3-way macro routing filter (Technical / Human & Design / Method & Business / emerging)"},
                 "depth": {"type": "string", "enum": ["universal", "cross-domain", "domain", "specialized"]},
                 "graph_aware": {"type": "boolean", "default": True, "description": "Enable graph expansion"},
                 "agentic": {"type": "boolean", "default": False, "description": "Enable iterative critique loop"},

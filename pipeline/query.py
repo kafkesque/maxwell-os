@@ -87,6 +87,11 @@ def show_stats(conn: sqlite3.Connection):
         "GROUP BY discipline ORDER BY cnt DESC LIMIT 15",
         (CANONICAL_RUN,),
     ).fetchall()
+    by_macro = conn.execute(
+        "SELECT discipline_macro, COUNT(*) as cnt FROM fbs WHERE pipeline_run_id = ? "
+        "GROUP BY discipline_macro ORDER BY cnt DESC",
+        (CANONICAL_RUN,),
+    ).fetchall()
 
     print("\n╔══════════════════════════════════════╗")
     print("║   Maxwell OS — FB Database Stats     ║")
@@ -101,7 +106,11 @@ def show_stats(conn: sqlite3.Connection):
     for r in by_depth:
         print(f"    {r['depth']:15s} {r['cnt']:>6}")
     print()
-    print("  Top Disciplines:")
+    print("  By Macro (operative routing):")
+    for r in by_macro:
+        print(f"    {r['discipline_macro'] or 'emerging':30s} {r['cnt']:>6}")
+    print()
+    print("  Top Disciplines (advisory provenance):")
     for r in by_discipline:
         print(f"    {r['discipline']:30s} {r['cnt']:>6}")
 
@@ -166,6 +175,7 @@ def interactive(conn: sqlite3.Connection):
             print("    stats           — Database statistics")
             print("    domains         — List distinct domains")
             print("    disciplines     — List distinct disciplines")
+            print("    macros          — List operative macro routing buckets")
             print("    help            — This help")
             print("    quit            — Exit")
         elif action in ("show", "view"):
@@ -176,14 +186,15 @@ def interactive(conn: sqlite3.Connection):
         elif action in ("list", "ls"):
             n = int(arg) if arg.isdigit() else 10
             rows = conn.execute(
-                "SELECT fb_id, name, discipline, depth, status "
+                "SELECT fb_id, name, discipline_macro, discipline, depth, status "
                 "FROM fbs WHERE pipeline_run_id = ? ORDER BY created_at DESC LIMIT ?",
                 (CANONICAL_RUN, n),
             ).fetchall()
             print(f"\n  Recent {len(rows)} FBs:\n")
             for r in rows:
                 icon = {"PASS": "✅", "FLAG": "⚠️", "QUARANTINE": "🚫"}.get(r["status"], "❓")
-                print(f"  {icon} {r['fb_id'][:12]} | {r['name'][:40]:40s} | {r['discipline']:25s} | {r['depth']}")
+                macro = r["discipline_macro"] or "emerging"
+                print(f"  {icon} {r['fb_id'][:12]} | {r['name'][:38]:38s} | {macro:18s} | {r['discipline']:22s} | {r['depth']}")
             print()
         elif action in ("search", "find", "s"):
             if not arg:
@@ -239,6 +250,16 @@ def interactive(conn: sqlite3.Connection):
             for r in rows:
                 print(f"    {r['discipline']:35s} {r['cnt']:>5}")
             print()
+        elif action == "macros":
+            rows = conn.execute(
+                "SELECT discipline_macro, COUNT(*) as cnt FROM fbs "
+                "WHERE pipeline_run_id = ? GROUP BY discipline_macro ORDER BY cnt DESC",
+                (CANONICAL_RUN,),
+            ).fetchall()
+            print(f"\n  Macro routing buckets ({len(rows)}):\n")
+            for r in rows:
+                print(f"    {r['discipline_macro'] or 'emerging':35s} {r['cnt']:>5}")
+            print()
         else:
             print(f"  Unknown command: {action}. Type 'help'.")
 
@@ -252,7 +273,8 @@ def _print_fb_full(fb: dict):
     print(f"📌 {fb.get('name', 'unnamed')}")
     print(f"{'='*60}")
     print(f"  ID:          {fb.get('fb_id', 'N/A')}")
-    print(f"  Discipline:  {fb.get('discipline', 'N/A')}")
+    print(f"  Macro:       {fb.get('discipline_macro') or 'emerging'} (operative)")
+    print(f"  Discipline:  {fb.get('discipline', 'N/A')} (advisory)")
     print(f"  Depth:       {fb.get('depth', 'N/A')}")
     print(f"  Evidence:    {fb.get('evidence', 'N/A')}")
     print(f"  Status:      {fb.get('status', 'N/A')}")
@@ -296,9 +318,37 @@ def main():
     parser.add_argument("--show", help="Show a specific FB by ID or name")
     parser.add_argument("--stats", action="store_true", help="Show DB statistics")
     parser.add_argument("--export", action="store_true", help="Export all FBs as JSONL")
+    parser.add_argument("--by-macro", help="D-2884(a): list FBs in an operative macro bucket (e.g. 'Technical')")
+    parser.add_argument("--list-macros", action="store_true", help="D-2884(a): list macro routing buckets + counts")
     args = parser.parse_args()
 
     conn = get_conn()
+
+    if args.list_macros:
+        rows = conn.execute(
+            "SELECT discipline_macro, COUNT(*) as cnt FROM fbs WHERE pipeline_run_id = ? "
+            "GROUP BY discipline_macro ORDER BY cnt DESC",
+            (CANONICAL_RUN,),
+        ).fetchall()
+        print("\n  Macro routing buckets:\n")
+        for r in rows:
+            print(f"    {r['discipline_macro'] or 'emerging':30s} {r['cnt']:>6}")
+        print()
+        conn.close()
+        return
+    if args.by_macro:
+        rows = conn.execute(
+            "SELECT fb_id, name, discipline, depth, status FROM fbs "
+            "WHERE discipline_macro = ? AND pipeline_run_id = ? ORDER BY created_at DESC LIMIT 50",
+            (args.by_macro, CANONICAL_RUN),
+        ).fetchall()
+        print(f"\n  {len(rows)} FBs in macro '{args.by_macro}':\n")
+        for r in rows:
+            icon = {"PASS": "✅", "FLAG": "⚠️", "QUARANTINE": "🚫"}.get(r["status"], "❓")
+            print(f"  {icon} {r['fb_id'][:12]} | {r['name'][:45]:45s} | {r['discipline']:25s} | {r['depth']}")
+        print()
+        conn.close()
+        return
 
     if args.show:
         show_fb(conn, args.show)

@@ -43,16 +43,16 @@ def main() -> int:
     calls: dict[str, int] = {"keyword": 0}
 
     def fake_fts(conn, query, limit=20, include_quarantine=False,
-                 domain=None, discipline=None, depth=None,
+                 domain=None, discipline=None, macro=None, depth=None,
                  discipline_raw=None, domains_raw=None):
         return _fake_results(["fts_1", "fts_2"])
 
     def fake_vector(conn, query, limit=20, include_quarantine=False,
-                    domain=None, discipline=None, depth=None,
+                    domain=None, discipline=None, macro=None, depth=None,
                     discipline_raw=None, domains_raw=None):
         return _fake_results(["vec_1", "vec_2"])
 
-    def fake_keyword(conn, query=None, domain=None, discipline=None, depth=None, limit=20,
+    def fake_keyword(conn, query=None, domain=None, discipline=None, macro=None, depth=None, limit=20,
                      status="PASS", include_quarantine=False, exclude_summaries=True,
                      discipline_raw=None, domains_raw=None):
         calls["keyword"] += 1

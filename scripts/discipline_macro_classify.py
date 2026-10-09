@@ -53,6 +53,9 @@ from discipline_conformance_gate import (  # noqa: E402
     per_class_metrics,
 )
 
+# D-2884(a): fine->macro collapse lives in ONE home (C21) — this module is a consumer.
+from pipeline.discipline_macro import load_macro, to_macro  # noqa: E402
+
 # C20: named constants (no magic numbers).
 DEFAULT_ANCHOR = "governance/discipline_anchor_rederived_v8_20261007.json"
 DEFAULT_MENU = "config/closed_menu_v8.json"
@@ -78,55 +81,6 @@ def load_config() -> tuple[str, str, float]:
     anchor = str(s4.get("discipline_anchor_path", DEFAULT_ANCHOR))
     macro_floor = float(s4.get("discipline_macro_kappa_floor", 0.73))
     return model, anchor, macro_floor
-
-
-def load_macro() -> tuple[str, dict[str, list[str]], dict[str, str]]:
-    """Load the 3-way macro scheme and build discipline -> bucket maps.
-
-    Returns:
-        scheme:          the active scheme name ("3-way")
-        bucket_members:  bucket name -> [canonical discipline values]
-        disc_to_bucket:  canonical discipline -> macro bucket ('' -> emerging)
-    """
-    import yaml
-
-    macro = yaml.safe_load((REPO / DEFAULT_MACRO_GROUPS).read_text(encoding="utf-8"))
-    scheme = str(macro.get("scheme", "3-way"))
-    bucket_to_groups: dict[str, list[str]] = macro.get("macros", {}).get(scheme, {})
-    if not bucket_to_groups:
-        raise SystemExit(f"FAIL: macro scheme {scheme!r} has no bucket map in {DEFAULT_MACRO_GROUPS}")
-    emerging_routing = str(macro.get("emerging_routing", EMERGING_BUCKET))
-
-    group_to_bucket: dict[str, str] = {}
-    for bucket, groups in bucket_to_groups.items():
-        for g in groups:
-            group_to_bucket[g] = bucket
-
-    menu = json.loads((REPO / DEFAULT_MENU).read_text(encoding="utf-8"))
-    disc_to_bucket: dict[str, str] = {}
-    bucket_members: dict[str, list[str]] = {}
-    for d in menu.get("disciplines", []):
-        canon = d["value"]
-        group = d.get("group", "")
-        bucket = emerging_routing if group == "" else group_to_bucket.get(group)
-        if bucket is None:
-            raise SystemExit(
-                f"FAIL: macro scheme {scheme!r} does not cover group {group!r} "
-                f"(discipline {canon!r}) — config drift, BUG-622 class"
-            )
-        disc_to_bucket[canon] = bucket
-        bucket_members.setdefault(bucket, []).append(canon)
-
-    # Guard: every non-emerging bucket must have members (fail-closed on empty bucket).
-    for bucket in bucket_to_groups:
-        if bucket not in bucket_members:
-            raise SystemExit(f"FAIL: macro bucket {bucket!r} has zero member disciplines")
-    return scheme, bucket_members, disc_to_bucket
-
-
-def to_macro(disc: str, disc_to_bucket: dict[str, str]) -> str:
-    """Map a canonical fine discipline to its 3-way macro bucket (emerging for off-menu)."""
-    return disc_to_bucket.get(disc, EMERGING_BUCKET)
 
 
 def _fb_block(fb: dict[str, Any]) -> list[str]:

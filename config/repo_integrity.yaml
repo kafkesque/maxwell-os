@@ -154,6 +154,13 @@ worktree:
       why: >-
         D-2800 (BUG-563 recurrence). Owner anchor-ruler drop-in (human instrument, will_not_touch family), not a
         machine artifact. Declared excluded so it stays on disk for the owner but is never tracked.
+    - pattern: 'config/taxonomy_v9.yaml'
+      why: >-
+        D-2897 v9 menu-edit build intermediate. scripts/build_taxonomy_v9.py writes config/taxonomy_v9.yaml
+        from config/taxonomy_v8.yaml; scripts/apply_taxonomy_v9.py promotes it to the LIVE
+        config/taxonomy_v5.yaml (whose 'v5' name is a documented historical artifact, content now v9). The v9
+        intermediate is byte-identical to live and regenerable, so it is declared excluded (never indexed),
+        never left silently absent.
 
 crossing_rate_limit:
   # D-2802 (Tier 2, 2026-10-03): a will_not_touch family that needs repeated one-off crossing permits has

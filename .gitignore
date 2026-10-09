@@ -137,3 +137,6 @@ governance/anchor ruler*.csv
 # Transient run logs (results JSONs are the durable artifact; logs stay on disk, unversioned)
 logs/
 *.log
+
+# Build intermediates (regenerable from config/taxonomy_v8.yaml via scripts/build_taxonomy_v9.py)
+config/taxonomy_v9.yaml

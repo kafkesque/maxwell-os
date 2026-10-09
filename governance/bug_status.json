@@ -3,8 +3,8 @@
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
   "total_ids": 456,
-  "open_n": 164,
-  "closed_n": 292,
+  "open_n": 163,
+  "closed_n": 293,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -71,11 +71,6 @@
     {
       "id": "BUG-242",
       "title": "(OPEN, 2026-09-11) \u2014 frontier69_v2 data-quality defects \u2014 override figures still to recompute",
-      "events": 1
-    },
-    {
-      "id": "BUG-243",
-      "title": "(OPEN, 2026-09-13) \u2014 DeepSeek-v4 empty content on open-ended adjudication (MITIGATED: use local Qwen)",
       "events": 1
     },
     {
@@ -841,6 +836,7 @@
     "BUG-235",
     "BUG-236",
     "BUG-241",
+    "BUG-243",
     "BUG-254",
     "BUG-256",
     "BUG-268",

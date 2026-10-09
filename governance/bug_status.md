@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**164 open** / 292 closed of 456 ids.
+**163 open** / 293 closed of 456 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -20,7 +20,6 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-237 | (OPEN, 2026-09-10) — production fbs.depth unverified silver (PARTIALLY ADDRESSED D2610/D2611) | 1 |
 | BUG-238 | (OPEN, 2026-09-10) — content_type is a VACUOUS axis (99.6% principle unverified) | 1 |
 | BUG-242 | (OPEN, 2026-09-11) — frontier69_v2 data-quality defects — override figures still to recompute | 1 |
-| BUG-243 | (OPEN, 2026-09-13) — DeepSeek-v4 empty content on open-ended adjudication (MITIGATED: use local Qwen) | 1 |
 | BUG-253 | reasoning models scored 0 under a small max_tokens budget (harness artifact, NOT model failure) | 1 |
 | BUG-255 | `POST /admin/api/reload` swaps the single resident model and silently wedges an in-flight benchmark | 1 |
 | BUG-257 | the niah top tier exceeded oMLX's context window, making it unmeasurable | 2 |

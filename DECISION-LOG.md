@@ -3843,3 +3843,28 @@ NEXT: run clef-4bit; if it clears coarse_kappa >= 0.73 AND shows emerging recall
 arm under the SYMMETRIC gate. Otherwise the owner must rule on: (a) lowering the coarse_kappa floor (0.73 may be
 unreachable for ANY distinct-family decider), and/or (b) adopting the emerging-recall floor (BUG-692).
 
+## D-2885 (2026-10-09) — RATIFIED — HF model-ecosystem sweep: nothing to adopt; roster already benchmark-aligned + opt-in candidate shortlist
+
+Swept HF pipeline tags (sort=downloads): zero-shot-classification, text-ranking, text-generation, reinforcement-learning.
+VERDICT: NOTHING to adopt now — Maxwell's roster is already at/near the top of the community benchmark for its size tier.
+
+zero-shot-classification (NLI/decider task): Maxwell's S5 verifier MoritzLaurer/DeBERTa-v3-large-mnli-fever-anli-ling-wanli
+(135.9K dl, #11) remains the most comprehensive NLI in its class (fail-closed per D2298). Opt-in candidate (C28):
+tasksource/ModernBERT-large-nli (Apache-2.0, 15.9K dl) or ModernBERT-base-nli (113K dl) — modern architecture (rotary/GeGLU/
+8192 ctx, 2T-token pretrain) but less community-validated. NOT a swap; record only.
+
+text-ranking: Qwen/Qwen3-Reranker-4B (2.3M dl, Apache-2.0) and Alibaba-NLP/gte-reranker-modernbert-base (2.09M dl, Apache-2.0)
+are the strongest permissive rerankers. Maxwell stage 1.5 uses bge-m3 + FAISS cosine + source diversity with NO cross-encoder
+reranker — a reranker is an OPT-IN (C28) retrieval-quality upgrade, not a correctness gap. jina-reranker-v3 (CC-BY-NC-4.0)
+excluded for license friction vs the sovereign/permissive ethos.
+
+text-generation: dominated by the Qwen3 family (Apache-2.0), already represented (Qwen3-Coder-30B generator). nvidia/
+Qwen3.6-35B-A3B-NVFP4 (Apache-2.0) is newer but NVFP4 is not MLX-native (C26) — excluded.
+
+reinforcement-learning: the tag is dominated by gym environments (CartPole/Pendulum) + NSFW GGUF RP models — NOT applicable
+to Maxwell. No usable candidates.
+
+CANDIDATE SHORTLIST (opt-in, C28, none adopted now): (1) tasksource/ModernBERT-large-nli (S5 NLI modern fallback);
+(2) Qwen/Qwen3-Reranker-4B or gte-reranker-modernbert-base (stage 1.5 reranker); (3) wfzyx/von (already on radar for laya
+position-bias / order-invariant scoring). All Apache-2.0, local, $0 marginal cost (C1/C3).
+

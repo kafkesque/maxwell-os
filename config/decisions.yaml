@@ -15317,3 +15317,24 @@ decisions:
   files:
   - governance/buglog.md
   - governance/d2767_ab_v8_20261009.json
+- id: D-2893
+  state: RATIFIED
+  category: LABEL QUALITY / DATA
+  title: BUG-693 deterministic reclaim APPLIED — mapfail 280 + dombleed 190 on canonical run (offmenu 1309 + menu
+    gate remain)
+  bugs:
+  - BUG-693
+  decision: 'BUG-693 phase 1+2 APPLIED to the canonical run rechunk-v4-20260929 (6591 rows) via the new tightly-scoped
+    scripts/bug693_reclaim.py (fail-closed exact-match reclaim, generator was the script, verifier was local gemma-4-E4B-it-MLX-4bit
+    returning no defects across 7 audit categories). mapfail 280 (discipline_raw EXACTLY a canonical discipline:
+    marketing 259 + business administration 20 + entrepreneurship studies 1, the 3 disciplines added v5->v8) lifted
+    into discipline with discipline_macro kept 1:1 (all -> Method & Business) and discipline_source=''llm_extracted_from_source''.
+    dombleed 190 (discipline_raw EXACTLY a canonical domain) kind-swapped the label into domains + domains_raw and
+    cleared discipline_raw, discipline stays ''emerging'' pending re-classification. 470 row updates committed in
+    ONE SQLite transaction after backup_guardian.sh pre-write backup and post-write PRAGMA quick_check + foreign_key_check
+    clean. Post-reclaim canonical emerging = 1499 (= offmenu 1309 + dombleed 190 still emerging on the discipline
+    axis). Remaining BUG-693 work: offmenu 1309 promotion review (or emerging whitelist) + the structural menu-widening
+    re-classification gate.'
+  files:
+  - scripts/bug693_reclaim.py
+  - governance/buglog.md

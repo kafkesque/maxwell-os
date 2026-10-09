@@ -9841,6 +9841,12 @@ FIX (owner-gated; re-map/re-classification + any menu edit need sign-off):
   3. offmenu 1309 = promotion review (classify_promotion_labels.py) or stays an 'emerging' whitelist.
   4. Add a menu-widening re-classification gate: a discipline-slot addition MUST trigger a reclass pass.
 
+STATUS (2026-10-09): steps 1+2 APPLIED via scripts/bug693_reclaim.py --apply (D-2893, RATIFIED). 470 row
+  updates (280 mapfail + 190 dombleed) in ONE transaction on the canonical run; backup_guardian pre-write +
+  PRAGMA quick_check/foreign_key_check post-write clean; verifier gemma-4-E4B-it-MLX-4bit returned no defects
+  (7 categories). Post-reclaim canonical emerging = 1499 (offmenu 1309 + dombleed 190 still emerging on the
+  discipline axis). REMAINING: step 3 (offmenu 1309 promotion/whitelist) + step 4 (menu-widening reclass gate).
+
 D-2891 RATIFIED (owner 2026-10-09). Final gold-emerging adjudication: R127 Guild of Handicraft Educational Model
 -> cultural design + R202 Interactive Media Integration -> performing arts ACCEPTED (STier rec); R183 Pattern
 Language Implementation Process EXCLUDED from the sample (owner not convinced; verified no future tax — no

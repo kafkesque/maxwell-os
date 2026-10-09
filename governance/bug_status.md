@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**163 open** / 293 closed of 456 ids.
+**164 open** / 293 closed of 457 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -170,3 +170,4 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-680 | (OPEN, 2026-10-08) — the upstream anchor faces still encode discipline abstention as the out-of-menu token 'emerging' (BUG-676 residual) | 2 |
 | BUG-681 | (OPEN, 2026-10-08) — `just health-full` found 6 faults in one pass; 2 fixed deterministically, 4 remain (3 red contract tests + 3 rails) and | 2 |
 | BUG-692 | (OPEN, 2026-10-09) — D-2884(b) C+B emerging clause is a trivially-satisfied blindspot | 1 |
+| BUG-693 | (OPEN, 2026-10-09) — canonical-run 'emerging' (1779 rows) is MENU-WIDENING DRIFT, not a decider defect | 1 |

@@ -2,8 +2,8 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 456,
-  "open_n": 163,
+  "total_ids": 457,
+  "open_n": 164,
   "closed_n": 293,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
@@ -821,6 +821,11 @@
     {
       "id": "BUG-692",
       "title": "(OPEN, 2026-10-09) \u2014 D-2884(b) C+B emerging clause is a trivially-satisfied blindspot",
+      "events": 1
+    },
+    {
+      "id": "BUG-693",
+      "title": "(OPEN, 2026-10-09) \u2014 canonical-run 'emerging' (1779 rows) is MENU-WIDENING DRIFT, not a decider defect",
       "events": 1
     }
   ],

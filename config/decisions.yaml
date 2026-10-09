@@ -15217,3 +15217,103 @@ decisions:
   - governance/D2767_CB_CLASSIFICATION_RECOMMENDATION_20261009.md
   - config/pipeline_config.yaml
   - governance/buglog.md
+- id: D-2885
+  state: RATIFIED
+  category: ARCHITECTURE
+  title: 'HF model-ecosystem sweep: nothing to adopt; roster benchmark-aligned + opt-in shortlist'
+  bugs:
+  - BUG-243
+  decision: 'HF pipeline-tag sweep (zero-shot-classification/text-ranking/text-generation/reinforcement-learning):
+    NOTHING to adopt. Roster already at/near benchmark top for its size tier. Closes the model-registry/roster alignment
+    question BUG-243. Opt-in candidates (C28, none adopted): ModernBERT-large-nli, Qwen3-Reranker-4B/gte-reranker-modernbert-base,
+    wfzyx/von (all Apache-2.0, local, $0).'
+  files:
+  - governance/buglog.md
+- id: D-2886
+  state: RATIFIED
+  category: ANCHOR / TAXONOMY
+  title: Owner rulings D1/D2/D3 on the D-2884(b) emerging gate + coarse_kappa reachability
+  bugs:
+  - BUG-692
+  decision: 'Owner rulings D1/D2/D3 (all ADOPT). D1: symmetric emerging gate — keep emerging_rate<=0.35 ceiling
+    AND add emerging_recall floor (BUG-692). D2: gold-emerging 2-way adjudication (novel vs classifiable) as prerequisite.
+    D3: coarse_kappa 0.73 conditional on clef-4bit A/B. Implementation: recall-floor config + metric, then D2 adjudication,
+    then D3 ruling.'
+  files:
+  - config/pipeline_config.yaml
+- id: D-2887
+  state: RATIFIED
+  category: ARCHITECTURE
+  title: 'autotrust/GEV-26B-Decide (Jev Decide family): NO-ADOPT now, watch-list for MLX port'
+  bugs:
+  - BUG-243
+  decision: 'autotrust/GEV-26B-Decide (Decision Index 62.48, LoRA on gemma-4-26B-A4B): NO-ADOPT now — no MLX port
+    (bf16 51.6GB too heavy for 64GB; NVFP4 not MLX-native), and it is a decision/classifier model not scaffolding.
+    Extends BUG-243 model-registry/roster analysis. Watch-list (C28): MLX 4-bit port as a decider-arm upgrade. Not
+    on D-2727 critical path.'
+  files:
+  - governance/buglog.md
+- id: D-2888
+  state: RATIFIED
+  category: ANCHOR / TAXONOMY
+  title: D2 gold-emerging 2-way adjudication EXECUTED (owner-gated D2 prerequisite for D3)
+  bugs:
+  - BUG-692
+  decision: 'Split the 7 gold-emerging rows: genuinely-novel (R165 acknowledgment-attribution, R006 generative-music)
+    vs classifiable-into-established (R059/R127/R146/R183/R202). Finding: emerging dominated by classifiable rows,
+    so BUG-692 emerging_recall measures agreement with owner conservatism, not novelty detection. Recommendation:
+    re-adjudicate to shrink emerging gold to a whitelist.'
+  files:
+  - governance/d2767_ab_v8_20261009.json
+- id: D-2889
+  state: RATIFIED
+  category: ARCHITECTURE
+  title: 'Voz (Desert Ant) on-device STT: NO-ADOPT as core pipeline'
+  bugs:
+  - BUG-243
+  decision: 'Voz on-device STT (Parakeet-TDT 0.6B, Apple Neural Engine): NO-ADOPT as core — C4 closed runtime +
+    C21 Swift/JS non-MLX/Ollama; C26 Apple-only is LONG-TERM-only (short-term relaxable per owner) but NOT decisive.
+    Model-registry/roster scope (BUG-243 umbrella). For raw audio adopt faster-whisper/MLX-Whisper/Parakeet behind
+    a C21 Transcriber protocol; Voz watch-list as optional macOS accelerator.'
+  files:
+  - governance/buglog.md
+- id: D-2890
+  state: RATIFIED
+  category: ANCHOR / TAXONOMY
+  title: 'Ontology re-examination: ''emerging'' is a decider-abstention DUMP, not novelty'
+  bugs:
+  - BUG-693
+  decision: '''emerging'' is a decider-abstention DUMP not novelty (BUG-693). None of the 7 gold rows genuinely
+    novel; ~470 rows deterministically reclaimable (280 mapfail + 190 dombleed); Business & Management + Computational
+    Craft disciplines DEAD. Re-express ''emerging'' as a near-empty whitelist. Scope-corrected by D-2891 (canonical-only
+    numbers).'
+  files:
+  - governance/buglog.md
+- id: D-2891
+  state: RATIFIED
+  category: ANCHOR / TAXONOMY
+  title: SCOPE CORRECTION (t11 forever excluded) + owner adjudication + BUG-693 root-cause reframe
+  bugs:
+  - BUG-693
+  decision: 'Owner ruling: canonical run = rechunk-v4-20260929 (6591); t11 (7855) NEVER counted. emerging=1779=mapfail
+    280+dombleed 190+offmenu 1309. 6 dead disciplines. ROOT CAUSE of BUG-693 = MENU-WIDENING DRIFT (v5->v8 +3 disciplines),
+    NOT decider defect. Reclaim: mapfail 280 fully deterministic; dombleed 190 domain-axis kind-swap + re-classify;
+    offmenu 1309 promotion/whitelist; add menu-widening reclass gate. Owner adjudication PARTIAL (R006/R059/R146/R165
+    agreed).'
+  files:
+  - governance/buglog.md
+  - governance/bug693_reclaim_proposal.json
+  - governance/CONTEXT_INDEX.md
+- id: D-2892
+  state: RATIFIED
+  category: ANCHOR / TAXONOMY
+  title: D-2891 RATIFIED + final gold-emerging adjudication (R127/R202 accepted, R183 excluded)
+  bugs:
+  - BUG-693
+  decision: 'D-2891 RATIFIED (owner). Final gold-emerging adjudication: R127 Guild of Handicraft -> cultural design
+    + R202 Interactive Media -> performing arts ACCEPTED (STier rec); R183 Pattern Language EXCLUDED from sample
+    (owner not convinced; verified no future tax — no load-bearing reference; R183 stays discipline=''emerging''+domain=''urban
+    planning'' in DB). Closes BUG-693 adjudication; 6 gold rows final.'
+  files:
+  - governance/buglog.md
+  - governance/d2767_ab_v8_20261009.json

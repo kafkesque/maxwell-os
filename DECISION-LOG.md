@@ -11,7 +11,7 @@
 
 ## 🔴 CURRENT OPEN / PENDING INDEX (machine-derived 2026-10-03 — the live face; history below)
 
-Register truth (do NOT restate counts elsewhere — BUG-588/D-2692): 1013 decisions · 453 bugs (163 open / 290 closed; highest OPEN = BUG-681). Forensic audit GREEN: 0 fatal rails — store-change re-baseline cascade (BUG-659..668) FIXED at root cause. BUG-687 (CLOSED, D-2882): nli_calibration pin on a gitignored derived artifact RETIRED (owner approved). BUG-688 (CLOSED, D-2883): the D-2618 retired golden is recorded, never gated — bridge --check green again (owner approved). BUG-689 (CLOSED, D-2830): the D-2767 A/B harness crashed on the v8 referee's owner-absence rows — `noise_drop` excluded (out of scope), `abstained` → the declared abstention token 'emerging'. D-2884 (RATIFIED, 2026-10-09): D-2767 C+B gate measured FAIL (3-way coarse 0.5621 < 0.73 floor); owner RULED (a) fine discipline → advisory-only, 3-way macro + domains operative, (b) distinct-family decider A/B in parallel; BUG-690 macro drift part 2 fixed (v5→v8, Business & Management added), part 1 (coarse-kappa harness output) FIXED (commit 8895cbf). D-2884(a) macro operative routing LANDED + R5 gemma-APPROVED (2026-10-09).
+Register truth (do NOT restate counts elsewhere — BUG-588/D-2692): 1022 decisions · 457 bugs (164 open / 293 closed; highest OPEN = BUG-693). Forensic audit GREEN: 0 fatal rails — store-change re-baseline cascade (BUG-659..668) FIXED at root cause. BUG-687 (CLOSED, D-2882): nli_calibration pin on a gitignored derived artifact RETIRED (owner approved). BUG-688 (CLOSED, D-2883): the D-2618 retired golden is recorded, never gated — bridge --check green again (owner approved). BUG-689 (CLOSED, D-2830): the D-2767 A/B harness crashed on the v8 referee's owner-absence rows — `noise_drop` excluded (out of scope), `abstained` → the declared abstention token 'emerging'. D-2884 (RATIFIED, 2026-10-09): D-2767 C+B gate measured FAIL (3-way coarse 0.5621 < 0.73 floor); owner RULED (a) fine discipline → advisory-only, 3-way macro + domains operative, (b) distinct-family decider A/B in parallel; BUG-690 macro drift part 2 fixed (v5→v8, Business & Management added), part 1 (coarse-kappa harness output) FIXED (commit 8895cbf). D-2884(a) macro operative routing LANDED + R5 gemma-APPROVED (2026-10-09).
 
 ## D-2881 (2026-10-08) — the 11 ambiguous anchor-bridge rows are RUN-COLLISIONS, resolved to the ratified canonical run
 
@@ -3999,21 +3999,28 @@ ROOT-CAUSE REFRAME (revises BUG-693): mapfail is MENU-WIDENING DRIFT, not a deci
 RECLAIM PRECISION: only mapfail (280) is FULLY deterministic (discipline_raw == canonical discipline, exact).
   dombleed (190) is deterministic only on the DOMAIN axis (kind-swap the label into `domains`, BUG-150 machinery);
   its discipline field still needs re-classification. offmenu (1309) is promotion review or stays 'emerging'.
-OWNER ADJUDICATION (2026-10-09) — PARTIAL (4 agree, 3 unsure):
-  AGREED: R006 Generative Algorithmic Composition -> generative design; R059 First Course Development Framework
-    -> entrepreneurship studies; R146 Debate As Leadership Tool -> decision making; R165 Acknowledgment
-    Attribution -> information science.
-  UNSURE: R127, R183, R202. STier firm recommendations (anchored on v8 definitions):
-    * R127 Guild of Handicraft Educational Model -> cultural design ("historical/theoretical analysis of design
-      practices... and their cultural significance"; the Guild of Handicraft IS a design-history case; education
-      as the domain).
-    * R183 Pattern Language Implementation Process -> systems thinking ("individual actions -> communal patterns"
-      = emergence/interrelationships; v8's design thinking is the narrow IDEO empathize-define-ideate loop).
-    * R202 Interactive Media Integration -> performing arts (live media + audience co-construction = live
-      performance; media studies is academic ANALYSIS, this FB is artistic PRACTICE).
+OWNER ADJUDICATION (2026-10-09) — FINAL (ratified 2026-10-09; see D-2892):
+  AGREED (6 of 7): R006 Generative Algorithmic Composition -> generative design; R059 First Course Development
+    Framework -> entrepreneurship studies; R146 Debate As Leadership Tool -> decision making; R165 Acknowledgment
+    Attribution -> information science; R127 Guild of Handicraft Educational Model -> cultural design; R202
+    Interactive Media Integration -> performing arts (STier recommendations ACCEPTED).
+  EXCLUDED (1 of 7): R183 Pattern Language Implementation Process — owner not convinced; verified to create NO
+    future tax (no load-bearing reference). R183 stays discipline='emerging' + domain='urban planning' in DB.
 C26 RELAXATION (owner): C26 (cross-platform) is a LONG-TERM rule, short-term relaxable. Voz remains NO-ADOPT
   for C4 (closed runtime) + C21 (non-MLX/Ollama) — INDEPENDENT of C26.
 DEMOTE/PROMOTE corrected to canonical counts: merge visual semiotics (44) + semiotics (61) = 105; design
   psychology 3, information retrieval 9, color theory 14, computational theory 16 are small but non-zero; the
   three generative/coding labels are DEAD (0) — consolidate or retire, not "merge 12+6+9". Promote creative
   writing (14) + museum studies (13) only.
+
+## D-2892 — D-2891 RATIFIED + final gold-emerging adjudication (2026-10-09)
+
+Owner ratified D-2891 (scope correction + BUG-693 root-cause reframe) in full. Final gold-emerging adjudication
+on the 7 rows:
+  * ACCEPTED (STier recommendations): R127 Guild of Handicraft Educational Model -> cultural design; R202
+    Interactive Media Integration -> performing arts.
+  * EXCLUDED from the sample: R183 Pattern Language Implementation Process — owner not convinced; verified to
+    create NO future tax (no load-bearing reference). R183 stays discipline='emerging' + domain='urban planning'
+    in DB.
+Final gold rows (6): R006 generative design, R059 entrepreneurship studies, R127 cultural design, R146 decision
+  making, R165 information science, R202 performing arts. Closes BUG-693 adjudication.

@@ -954,29 +954,13 @@ def _build_synonym_index(kind: str | None = None) -> dict[str, str]:
                 if kw_clean and normalize_label(kw_clean) not in lookup and normalize_label(kw_clean) not in forbidden_keys:
                     lookup[normalize_label(kw_clean)] = canonical
 
-    # 3. alias_map.yaml (curated raw->canonical overrides; D2566)
-    #    domain_aliases / discipline_aliases are single-source curated overrides
-    #    layered on top of the taxonomy + synonym_map. Compound values (a list)
-    #    cannot be represented in this flat index and are skipped here — the
-    #    multi-domain enrichment path expands them separately.
-    alias_path = config_root / "alias_map.yaml"
-    if alias_path.exists():
-        with open(alias_path) as f:
-            alias_map = yaml.safe_load(f) or {}
-        for raw, target in (alias_map.get("domain_aliases", {}) or {}).items():
-            if isinstance(target, list):
-                continue
-            if not _accept(target):
-                continue
-            if normalize_label(raw) not in forbidden_keys:
-                lookup[normalize_label(raw)] = str(target).strip()
-        for raw, target in (alias_map.get("discipline_aliases", {}) or {}).items():
-            if isinstance(target, list):
-                continue
-            if not _accept(target):
-                continue
-            if normalize_label(raw) not in forbidden_keys:
-                lookup[normalize_label(raw)] = str(target).strip()
+    # 3. alias_map.yaml layer RETIRED (D-2814, 2026-10-09): the definition-anchored
+    #    closed menu (stage4.definition_anchored_menu_enabled: true) constrains the
+    #    classifier to verbatim canonical labels, so the 999-rule raw→canonical
+    #    compensating control (D2566) is redundant on the S4 classify path and is
+    #    removed here (shrink-then-remove, C1). The post-S4 fix scripts
+    #    (remap_emerging.py / apply_enrichment.py) still read alias_map.yaml directly
+    #    for the legacy free-gen checkpoint until the D-2727 rerun re-classifies it.
 
     # 4. same_axis_fallthrough (D-2814/BUG-630): curated same-axis homes. A raw label
     # canonical on the OPPOSITE axis but with a ratified home on THIS axis (e.g. 'marketing'

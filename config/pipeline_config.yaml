@@ -445,7 +445,7 @@ stage4:
   # fail-closed in pipeline/stage4_merged_call.py (D-2833 / BUG-647): both true -> RuntimeError.
   # D-2835: the rendered menu is a CONSTANT, byte-deterministic prefix (~5k tokens) — amortized by
   # a serving-layer prefix cache; group-prefilter is DEFERRED (it risks re-opening BUG-629/630).
-  definition_anchored_menu_enabled: false
+  definition_anchored_menu_enabled: true
   # D-2814/BUG-630 (2026-10-05): curated same-axis fall-through. The opposite-axis guard in
   # map_to_canonical_with_fallback correctly blocks coercion, but must retry a declared SAME-axis home
   # before abstaining. Keys are normalized raw labels; values are the same-axis canonical. Seeded with

@@ -2060,11 +2060,19 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
                 classification_errors += 1
 
         # ── Stage 1: Capture raw LLM output (D2138: preserved forever) ──
-        domains_raw = list(class_data.get("domains", []))
+        # D-2896: surface-fold (NFKC + dash-fold U+2010..U+2015 + case-fold + strip) at the
+        # WRITE boundary — deterministic, lossless, reversible. Removes BUG-279 free-generation
+        # dash/case fragmentation (e.g. "human-computer interaction" 70 / "human–computer
+        # interaction" 33 / "human‑computer interaction" 18 / "Human-Computer Interaction" 1
+        # all collapse to ONE token) at source with ZERO semantic judgment. Semantic aliasing
+        # (lossy/irreversible) stays at the canonicalization boundary only (alias_map.yaml /
+        # normalization_map.yaml), NEVER here. `isinstance(d, str)` preserves the prior pass-through
+        # for any malformed non-string entry (fail-closed validation rejects it upstream).
+        domains_raw = [normalize_label(d) if isinstance(d, str) else d for d in class_data.get("domains", [])]
         discipline_raw_raw = class_data.get("discipline", "")
         if isinstance(discipline_raw_raw, list):
             discipline_raw_raw = discipline_raw_raw[0] if discipline_raw_raw else ""
-        discipline_raw = str(discipline_raw_raw) if discipline_raw_raw else ""
+        discipline_raw = normalize_label(str(discipline_raw_raw)) if str(discipline_raw_raw).strip() else ""
         # BUG-186 (D2485): is_specialized is NOT LLM-classified anymore. It is derived
         # deterministically from depth (depth == "specialized") at FB assembly below,
         # so it can never silently default to False for a specialized FB (the old

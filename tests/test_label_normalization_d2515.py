@@ -72,6 +72,21 @@ def test_compound_is_not_long_tail() -> None:
     assert _is_long_tail("zzz & yyy", canon, syn) is True
 
 
+def test_d2896_write_boundary_surface_fold() -> None:
+    """D-2896: the four measured HCI surface variants (dash codepoint + case) collapse
+    to ONE folded token at the write boundary — zero semantic judgment, no aliasing."""
+    variants = [
+        "human-computer interaction",
+        "human\u2013computer interaction",  # EN DASH (U+2013)
+        "human\u2011computer interaction",  # NON-BREAKING HYPHEN (U+2011)
+        "Human-Computer Interaction",       # title case
+    ]
+    folded = {normalize_label(v) for v in variants}
+    assert folded == {"human-computer interaction"}
+    # surface fold must NOT alias semantics: a distinct term stays distinct
+    assert normalize_label("human-computer interaction") != normalize_label("human factors")
+
+
 if __name__ == "__main__":
     test_normalize_label_collapses_dash_variants()
     test_dash_variant_resolves_to_canonical_discipline()

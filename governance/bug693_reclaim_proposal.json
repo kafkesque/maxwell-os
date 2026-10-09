@@ -1,0 +1,90 @@
+{
+  "schema_version": "1.0",
+  "artifact": "bug693_reclaim_proposal",
+  "status": "PROPOSAL — owner sign-off required before any write",
+  "generated_at": "2026-10-09T16:21:02.666623+00:00",
+  "pipeline_commit": "b0c2f6c",
+  "canonical_run": "rechunk-v4-20260929",
+  "gen_model": "deterministic (no LLM)",
+  "scope_note": "t11 checkpoint (7855 rows) FOREVER excluded per D-2891 owner ruling",
+  "mapfail_280": {
+    "action": "set discipline = discipline_raw (exact match; raw label IS a canonical discipline)",
+    "fully_deterministic": true,
+    "disciplines": {
+      "marketing": 259,
+      "business administration": 20,
+      "entrepreneurship studies": 1
+    }
+  },
+  "dombleed_190": {
+    "action": "kind-swap: ensure domain label is in `domains`; discipline stays emerging pending re-classification",
+    "domain_axis_deterministic": true,
+    "discipline_axis": "needs re-classification (NOT deterministic)",
+    "labels": {
+      "graphic design": {
+        "total": 56,
+        "already_in_domains": 23,
+        "needs_add": 33
+      },
+      "organizational behavior": {
+        "total": 34,
+        "already_in_domains": 8,
+        "needs_add": 26
+      },
+      "entrepreneurship": {
+        "total": 28,
+        "already_in_domains": 17,
+        "needs_add": 11
+      },
+      "project management": {
+        "total": 23,
+        "already_in_domains": 6,
+        "needs_add": 17
+      },
+      "industrial design": {
+        "total": 13,
+        "already_in_domains": 1,
+        "needs_add": 12
+      },
+      "product design": {
+        "total": 12,
+        "already_in_domains": 0,
+        "needs_add": 12
+      },
+      "urban planning": {
+        "total": 10,
+        "already_in_domains": 7,
+        "needs_add": 3
+      },
+      "education": {
+        "total": 6,
+        "already_in_domains": 1,
+        "needs_add": 5
+      },
+      "information architecture": {
+        "total": 3,
+        "already_in_domains": 0,
+        "needs_add": 3
+      },
+      "design systems": {
+        "total": 3,
+        "already_in_domains": 0,
+        "needs_add": 3
+      },
+      "design strategy": {
+        "total": 1,
+        "already_in_domains": 0,
+        "needs_add": 1
+      },
+      "creative technology": {
+        "total": 1,
+        "already_in_domains": 0,
+        "needs_add": 1
+      }
+    }
+  },
+  "offmenu": {
+    "count": 1309,
+    "action": "promotion review via classify_promotion_labels.py OR stays emerging whitelist"
+  }
+}

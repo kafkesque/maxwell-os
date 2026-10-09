@@ -96,6 +96,7 @@ may_touch:
 - governance/rederive_v6_*
 - governance/d2767_ab_*
 - governance/d2884b_decider_ab_*
+- governance/bug693_reclaim_proposal.json
 - governance/domain_cardinality_*.json
 - governance/closed_menu_v6_reference.csv
 - governance/Surveillance Capitalism and Soviet Discourse.csv

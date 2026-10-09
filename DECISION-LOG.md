@@ -3931,3 +3931,46 @@ RECOMMENDATION (future-proof, ontologically accurate): re-adjudicate the 5 class
   disciplines (shrink the emerging gold to 2: R006, R165). This raises coarse_kappa (5 fewer forced-disagreement rows) and
   makes the emerging clause meaningful. With N=2, replace the fractional recall floor with a small whitelist ("catch
   R006+R165") — novelty detection is a WHITELIST, not a rate. Feeds the D3 owner ruling.
+
+## D-2889 — Voz (Desert Ant Labs) on-device STT: NO-ADOPT as core pipeline (2026-10-09)
+Assessed https://desertant.com/models/voz/ (STier RAG/system-engineering lens).
+WHAT: on-device speech-to-text on the Apple Neural Engine — a repackaged NVIDIA Parakeet-TDT 0.6B-v3 (CC BY 4.0
+weights) with a CLOSED Desert-Ant runtime ("the conversion, compression, and the Neural Engine runtime are ours").
+Swift/JS/TS SDK, iOS/macOS/Web/Node.js, 25 langs, 467MB, ~14x Whisper, WER 7.40% vs Whisper-large-v3-turbo 7.00%.
+VERDICT — NO-ADOPT as core STT:
+  * C26 VIOLATION: Neural Engine/CoreML = Apple-only; Maxwell targets macOS/Linux/Windows. No Linux/Windows runtime.
+  * C4 VIOLATION at the runtime layer: weights are open (CC BY 4.0) but the runtime is closed -> silicon lock-in.
+  * C21 VIOLATION: Swift/JS SDK, not MLX/Ollama; would need a new Transcriber protocol + subprocess bridge.
+  * CATEGORY ERROR vs the goose youtube-transcript skill: that skill FETCHES existing captions (text); Voz
+    TRANSCRIBES raw audio. Complementary, not competing — neither replaces the other.
+RECOMMENDATION: for raw-audio market research (podcasts/interviews/voice notes) adopt faster-whisper (CTranslate2,
+CPU/GPU, cross-platform, open) or MLX-Whisper / Parakeet-NeMo (open, Python-native) BEHIND a C21 Transcriber
+protocol. Watch-list Voz only as an optional macOS Neural-Engine accelerator behind that same protocol, never core.
+
+## D-2890 — Ontology re-examination: the "emerging" bucket is a decider-abstention DUMP, not novelty (2026-10-09)
+Measured on live maxwell.db (14574 fbs). Two owner questions examined; the DATA overturns both framings.
+(1) Are canonical labels pragmatically/ontologically close to the 7 gold-emerging rows? YES — all 7:
+  R006 generative-music -> generative design / creative coding; R059 course-launch -> entrepreneurship studies
+  (or the education DOMAIN); R127 guild-craft-education -> cultural design; R146 debate-as-leadership ->
+  decision making; R165 acknowledgment-attribution -> information science; R183 pattern-language -> design
+  thinking / systems thinking; R202 live-media-art -> media studies / performing arts.
+  => REVISES D-2888: NONE of the 7 is genuinely novel; "emerging" on all 7 is decider abstention, not ontology.
+(2) Which canonicals demote, which raw promote? The data reframes the question entirely:
+  * 2539 fbs (17.4%) sit in discipline='emerging'. Of the CURRENT canonical run (v5.6, 6591 rows), 1779 (27.0%)
+    are 'emerging'.
+  * 280 rows: discipline_raw IS a canonical discipline (map failure); 190 rows: IS a canonical domain (domain
+    bleed) => 470 deterministically reclaimable NOW (vs closed_menu_v8).
+  * 3 canonical disciplines are DEAD (0 fbs): marketing, business administration, entrepreneurship studies — the
+    entire Business & Management group — while ~520 "marketing family" raw labels (marketing 270, marketing
+    science 94, brand management 39, advertising 20, ...) sit trapped in 'emerging'.
+  * => the decider (gpt-oss-20b) emits 'emerging' when the raw label has a clear canonical home. Its 27%
+    abstention still "passes" the emerging_rate<=0.35 ceiling (BUG-692-class blindspot; now BUG-693).
+VERDICT: emerging is NOT a promotion problem; it is a ROUTING + MENU-hygiene problem.
+  * Re-adjudicate all 7 gold rows to established disciplines; re-express 'emerging' as an (nearly-empty) WHITELIST.
+  * Deterministically reclaim the 470 mappable rows (discipline_raw->canonical; domain-bleed->domains axis via
+    BUG-150 kind-swap) — owner sign-off on the re-map table.
+  * DEMOTE/merge ~6 over-granular near-duplicate canonicals: generative ai (12)+generative design (6)+creative
+    coding (9); visual semiotics (195) vs semiotics (158); design psychology (9); information retrieval (25);
+    color theory (22); computational theory (22).
+  * PROMOTE only genuinely-homeless coherent labels: creative writing (16), museum studies (13) — owner sign-off.
+Owner-gated: actual re-adjudication/re-classification of 2539 rows + any menu edit require owner sign-off.

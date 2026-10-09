@@ -2180,3 +2180,6 @@ NEXT (refreshed D-2772):
 - NEXT (critical order; [OG]=owner-gated): (1) [OG] D-2888 recommendation (re-adjudicate 5 classifiable emerging rows);
   (2) clef-4bit -> --arm clef A/B -> D3 owner ruling (lower floor vs advisory best-arm); (3) BUG-681(b) encoding blocker
   (named offender scripts/remap_referee_v7_28rows.py:69 utf-8-sig -> artifact_encoding.py) blocks `just health` prefix.
+
+- D-2889+D-2890 (2026-10-09): Voz no-adopt (C26/C4/C21); emerging-bucket reframe (abstention dump; 470 reclaimable; 3 dead business disciplines).
+- NEXT (critical order; [OG]=owner-gated): (1) [OG] D-2890 verdict (re-adjudicate all 7 gold rows; emerging as whitelist); (2) BUG-693: fix decider abstention on marketing-family (280 mapfail + 190 dombleed in the v5.6 run); (3) deterministic reclaim of 470 rows (discipline_raw->canonical + domain-bleed kind-swap, BUG-150 machinery) [OG sign-off on re-map table]; (4) BUG-681(b) RESOLVED (check_encoding_homes clean; remap_referee already uses artifact_encoding.open_artifact) -> now diagnose (a) check_tests 3-red and (c) check_boundary_rehearsal; (5) clef-4bit -> --arm clef A/B -> D3 owner ruling; (6) D-2727 full rerun still blocked until an arm clears C+B or owner re-scopes.

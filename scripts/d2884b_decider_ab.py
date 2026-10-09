@@ -29,8 +29,11 @@ MODES:
   --plan            NO model loaded. Validate referee join, gold collapse, criteria build
                     and gate math; print the exact per-row state + criteria + collapsed
                     gold; exit 0 on consistency, 1 on any drift. (Runs on the system python3.)
-  --arm pplx|laya   run the decider. pplx requires .venv_pplx/bin/python (mlx 0.32.3 /
+  --arm pplx|laya|clef-flash|clef
+                    run the decider. pplx requires .venv_pplx/bin/python (mlx 0.32.3 /
                     mlx-vlm 0.7.6 / transformers 5.19.0). laya requires .venv_laya/bin/python.
+                    clef-flash/clef require .venv_pplx/bin/python too (clef_mlx: mlx-vlm,
+                    no torch). clef (27B) downloads ~16.3 GB on first run.
 
 Determinism: the decider is a classifier (noncausal attention -> softmax over the 255-way
 readout); argmax is deterministic (no sampling), so no determinism self-check is required
@@ -48,6 +51,7 @@ import subprocess
 import sys
 import tempfile
 from datetime import datetime, timezone
+from functools import partial
 from pathlib import Path
 from typing import Callable
 
@@ -74,6 +78,17 @@ LAYA_SNAPSHOT = (
     Path.home() / ".cache/huggingface/hub/models--convaiinnovations--laya"
     / "snapshots/7b928d828b7b0e022f929d9bd2e44165aa270148"
 )
+# Clef (mlx-community/clef-*) — Cloudflare Clef/Clef-Flash Qwen3.5 backbone + joint schema
+# head, Apache-2.0, Jev/SystemOne wire protocol (same contract as pplx/laya). clef_mlx.py is
+# a generic loader bundled with each checkpoint; it is imported once from the (already-cached)
+# clef-flash snapshot and loads ANY clef checkpoint via clef_mlx.load(). clef-flash-4bit is
+# 9B (~7 GB, ~0.31 s/row); clef-4bit is the 27B capacity match (~16.3 GB, ~1.4 s/row) and
+# downloads on first run.
+CLEF_FLASH_SNAPSHOT = (
+    Path.home() / ".cache/huggingface/hub/models--mlx-community--clef-flash-4bit"
+    / "snapshots/140bf7e037f5fa95a96535feca112f46c15927cf"
+)
+CLEF_MLX_DIR = CLEF_FLASH_SNAPSHOT  # clef_mlx.py lives here (generic loader for all clef-*)
 SOURCE_MAX = 600  # source_text truncation, mirrors build_merged_prompt (C12 parity)
 
 
@@ -295,15 +310,57 @@ def _run_arm_laya(rows: list[dict], criteria: dict[str, str]) -> list[str]:
     return preds
 
 
+def _run_arm_clef(rows: list[dict], criteria: dict[str, str], model_path: str | Path, model_name: str) -> list[str]:
+    """Run a Clef decider arm (mlx-community/clef-*) — Jev/SystemOne choice over the
+    3-way+emerging criteria. Clef is NOT a chat model (clef_mlx README/docstring): it runs
+    the Qwen3.5 backbone + joint schema head in a single forward pass over {state, questions}.
+    The question is a bare {"type": "choice", "criteria": {...}} — no instructions field, the
+    joint head reads the schema directly. clef_mlx.py is a generic loader bundled with the
+    checkpoints, so it is imported once from CLEF_MLX_DIR (the cached clef-flash snapshot) and
+    used to load ANY clef checkpoint: clef_mlx.load() resolves a local dir or downloads a repo
+    id via huggingface_hub. Each row is one systemone() call (single-record joint head, no
+    batching in this loader). Distinct family from pplx (Qwen3.8-27B decision readout) and laya
+    (ModernBERT-large + 2-layer RL head) — a Cloudflare Clef joint-schema decision model.
+    """
+    sys.path.insert(0, str(CLEF_MLX_DIR))
+    try:
+        import clef_mlx  # noqa: F401  (lazy: requires .venv_pplx — mlx + mlx-vlm)
+    except ImportError as e:
+        raise SystemExit(
+            f"FAIL: cannot import clef_mlx — run with .venv_pplx/bin/python "
+            f"(mlx 0.32.3 / mlx-vlm 0.7.x): {e}"
+        ) from e
+
+    model = clef_mlx.load(str(model_path))
+    question = {"type": "choice", "criteria": criteria}
+    preds: list[str] = []
+    for r in rows:
+        request = {"model": model_name, "state": r["state"], "questions": {"q1": question}}
+        response = model.systemone(request)
+        choice = response["answers"]["q1"]["choice"]
+        if choice not in criteria:
+            raise SystemExit(f"FAIL: clef returned unknown label {choice!r} (criteria drift)")
+        preds.append(choice)
+    return preds
+
+
 # C21 swappable infrastructure: every decider arm is a callable behind the SAME
 # Jev/SystemOne contract — run_fn(rows, criteria) -> list[str] of argmax labels, where
 # criteria is {bucket: description} and each returned label is a criteria key. Adding a
 # decider (e.g. mlx-community/clef-flash-4bit, manjunathshiva/opendecider-small-mlx-4bit,
 # wfzyx/von) = add ONE registry entry + ONE run function; the referee/gate/criteria
 # machinery is shared (zero duplication, zero drift).
-DECIDER_ARMS: dict[str, tuple[Callable[[list[dict], dict[str, str]], list[str]], str]] = {
+DECIDER_ARMS: dict[str, tuple[Callable[..., list[str]], str]] = {
     "pplx": (_run_arm_pplx, "pplx-decider-v1.1-27b-4bit"),
     "laya": (_run_arm_laya, "convaiinnovations/laya"),
+    "clef-flash": (
+        partial(_run_arm_clef, model_path=CLEF_FLASH_SNAPSHOT, model_name="clef-flash-4bit"),
+        "mlx-community/clef-flash-4bit",
+    ),
+    "clef": (
+        partial(_run_arm_clef, model_path="mlx-community/clef-4bit", model_name="clef-4bit"),
+        "mlx-community/clef-4bit",
+    ),
 }
 
 
@@ -350,11 +407,11 @@ def main() -> int:
         print("\n  sample state (row 0):")
         print("    " + rows[0]["state"].replace("\n", "\n    "))
         print("\n  PLAN OK: referee join, gold collapse, criteria build and gate math are consistent.")
-        print("  Next: run the decider with `.venv_pplx/bin/python scripts/d2884b_decider_ab.py --arm pplx`")
+        print("  Next: run a decider arm, e.g. `.venv_pplx/bin/python scripts/d2884b_decider_ab.py --arm clef-flash`")
         return 0
 
     if args.arm is None:
-        print("Nothing to do: pass --plan or --arm pplx|laya.", file=sys.stderr)
+        print("Nothing to do: pass --plan or --arm pplx|laya|clef-flash|clef.", file=sys.stderr)
         return 1
 
     run_fn, gen_model = DECIDER_ARMS[args.arm]

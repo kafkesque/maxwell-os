@@ -697,6 +697,7 @@ taxonomy:
   max_domains: 41
   max_disciplines: 61
   emerging_discipline_rate_max: 0.35
+  emerging_discipline_recall_floor: 0.5   # D-2886 symmetric emerging clause (sensitivity on gold-emerging subset; BUG-692)
   emerging_domain_rate_max: 0.3
   emerging_unmapped_rate_max: 0.05
   # D2519 (D2399 policy A): promotion governance. promotions_frozen is a manual

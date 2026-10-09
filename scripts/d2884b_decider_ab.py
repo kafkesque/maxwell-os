@@ -11,8 +11,9 @@ can ship as a hard gate. D-2727 (full S4->S5->S6 rerun) stays BLOCKED until (a)+
 
 The gate (D-2767): the decider must reproduce the owner's 3-way macro routing at
 coarse_kappa >= discipline_coarse_kappa_floor (0.73, retargeted to the human coarse
-ceiling D-2796) AND emerging_rate <= emerging_discipline_rate_max (0.35). If it clears
-both, the decider becomes decider-of-record for the macro axis; otherwise the macro axis
+ceiling D-2796) AND emerging_rate <= emerging_discipline_rate_max (0.35) AND emerging_recall
+>= emerging_discipline_recall_floor (D-2886 symmetric emerging clause — BUG-692). If it clears
+all three, the decider becomes decider-of-record for the macro axis; otherwise the macro axis
 remains advisory and the owner re-scopes (no below-ceiling classifier ships — D-2796).
 
 REFEREE (frozen): governance/d2767_ab_v8_20261009.json (194 rows, owner-finalized gold
@@ -92,8 +93,14 @@ CLEF_MLX_DIR = CLEF_FLASH_SNAPSHOT  # clef_mlx.py lives here (generic loader for
 SOURCE_MAX = 600  # source_text truncation, mirrors build_merged_prompt (C12 parity)
 
 
-def load_thresholds() -> tuple[float, float]:
-    """Read the C+B gate floors from config (C12); fail-closed on missing."""
+def load_thresholds() -> tuple[float, float, float]:
+    """Read the C+B gate floors from config (C12); fail-closed on missing.
+
+    D-2886 symmetric gate: returns (coarse_floor, emerging_max, emerging_recall_floor).
+    The emerging clause is now SYMMETRIC — a rate CEILING (specificity) AND a recall FLOOR
+    (sensitivity on the gold-emerging subset), so an always-answer decider can no longer
+    trivially satisfy the emerging arm (BUG-692).
+    """
     import yaml
 
     cfg = yaml.safe_load((REPO / "config" / "pipeline_config.yaml").read_text(encoding="utf-8")) or {}
@@ -101,7 +108,8 @@ def load_thresholds() -> tuple[float, float]:
     tax = cfg.get("taxonomy", {})
     coarse_floor = float(s4.get("discipline_coarse_kappa_floor", 0.73))
     emerging_max = float(tax.get("emerging_discipline_rate_max", 0.35))
-    return coarse_floor, emerging_max
+    emerging_recall_floor = float(tax.get("emerging_discipline_recall_floor", 0.5))
+    return coarse_floor, emerging_max, emerging_recall_floor
 
 
 def criteria_from_config() -> dict[str, str]:
@@ -203,8 +211,14 @@ def collapse_gold(rows: list[dict]) -> tuple[list[str], str]:
     return gold_macro, scheme
 
 
-def gate_report(gold: list[str], pred: list[str], coarse_floor: float, emerging_max: float) -> dict:
-    """Compute the C+B gate: coarse_kappa + emerging_rate + per-bucket metrics."""
+def gate_report(
+    gold: list[str], pred: list[str], coarse_floor: float, emerging_max: float, emerging_recall_floor: float
+) -> dict:
+    """Compute the C+B gate: coarse_kappa + emerging_rate + emerging_recall + per-bucket metrics.
+
+    D-2886 symmetric emerging clause: recall is measured on the gold-emerging subset (sensitivity).
+    Vacuously 1.0 when the gold has no 'emerging' rows (nothing to recall; the rate ceiling still applies).
+    """
     n = len(gold)
     if n == 0:
         raise SystemExit("FAIL: empty referee — nothing to measure")
@@ -213,6 +227,11 @@ def gate_report(gold: list[str], pred: list[str], coarse_floor: float, emerging_
     kappa = cohen_kappa(gold, pred)
     acc = sum(1 for g, p in zip(gold, pred) if g == p) / n
     emerging_rate = sum(1 for p in pred if p == "emerging") / n
+    gold_emerging = [i for i, g in enumerate(gold) if g == "emerging"]
+    if gold_emerging:
+        emerging_recall = sum(1 for i in gold_emerging if pred[i] == "emerging") / len(gold_emerging)
+    else:
+        emerging_recall = 1.0
     return {
         "n": n,
         "raw_agreement": round(acc, 4),
@@ -222,7 +241,12 @@ def gate_report(gold: list[str], pred: list[str], coarse_floor: float, emerging_
         "emerging_rate": round(emerging_rate, 4),
         "emerging_max": emerging_max,
         "emerging_pass": bool(emerging_rate <= emerging_max),
-        "cb_gate_pass": bool(kappa >= coarse_floor and emerging_rate <= emerging_max),
+        "emerging_recall": round(emerging_recall, 4),
+        "emerging_recall_floor": emerging_recall_floor,
+        "emerging_recall_pass": bool(emerging_recall >= emerging_recall_floor),
+        "cb_gate_pass": bool(
+            kappa >= coarse_floor and emerging_rate <= emerging_max and emerging_recall >= emerging_recall_floor
+        ),
         "per_bucket": per_class_metrics(gold, pred),
     }
 
@@ -376,7 +400,7 @@ def main() -> int:
 
     referee_path = Path(args.referee)
     anchor_path = Path(args.anchor)
-    coarse_floor, emerging_max = load_thresholds()
+    coarse_floor, emerging_max, emerging_recall_floor = load_thresholds()
 
     rows = load_referee_rows(referee_path, anchor_path)
     if args.limit is not None:
@@ -396,7 +420,7 @@ def main() -> int:
         print(f"  referee = {referee_path}  ({len(rows)} rows after join)")
         print(f"  anchor  = {anchor_path}")
         print(f"  macro scheme = {scheme}")
-        print(f"  C+B gate: coarse_kappa >= {coarse_floor}  AND  emerging <= {emerging_max}")
+        print(f"  C+B gate: coarse_kappa >= {coarse_floor}  AND  emerging <= {emerging_max}  AND  emerging_recall >= {emerging_recall_floor}")
         from collections import Counter
 
         print(f"  gold macro distribution: {dict(Counter(gold_macro))}")
@@ -417,7 +441,7 @@ def main() -> int:
     run_fn, gen_model = DECIDER_ARMS[args.arm]
     pred = run_fn(rows, criteria)
 
-    report = gate_report(gold_macro, pred, coarse_floor, emerging_max)
+    report = gate_report(gold_macro, pred, coarse_floor, emerging_max, emerging_recall_floor)
     out_rows = [
         {
             "item_id": r["item_id"],
@@ -435,6 +459,7 @@ def main() -> int:
     print(f"  raw agreement (3-way+emerging): {report['raw_agreement']:.4f}")
     print(f"  coarse kappa: {report['coarse_kappa']:.4f}  (floor {coarse_floor})  -> {'PASS' if report['coarse_pass'] else 'FAIL'}")
     print(f"  emerging rate: {report['emerging_rate']:.4f}  (max {emerging_max})  -> {'PASS' if report['emerging_pass'] else 'FAIL'}")
+    print(f"  emerging recall: {report['emerging_recall']:.4f}  (floor {emerging_recall_floor})  -> {'PASS' if report['emerging_recall_pass'] else 'FAIL'}")
     print(f"  C+B GATE: {'PASS' if report['cb_gate_pass'] else 'FAIL'}")
 
     payload = {

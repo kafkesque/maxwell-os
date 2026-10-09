@@ -3868,3 +3868,18 @@ CANDIDATE SHORTLIST (opt-in, C28, none adopted now): (1) tasksource/ModernBERT-l
 (2) Qwen/Qwen3-Reranker-4B or gte-reranker-modernbert-base (stage 1.5 reranker); (3) wfzyx/von (already on radar for laya
 position-bias / order-invariant scoring). All Apache-2.0, local, $0 marginal cost (C1/C3).
 
+## D-2886 (2026-10-09) — RATIFIED — owner rulings D1/D2/D3 on the D-2884(b) emerging gate + coarse_kappa reachability
+
+OWNER RULINGS (2026-10-09, all ADOPT per STier recommendation):
+D1 — BUG-692 symmetric emerging gate ADOPTED: keep the emerging-rate CEILING (specificity, emerging_rate <= 0.35) AND add
+     an emerging-RECALL floor (sensitivity) as `taxonomy.emerging_discipline_recall_floor` (config-first, C12). The gate is
+     now symmetric — a decider must BOTH abstain at-or-below the ceiling AND catch the right gold-emerging rows.
+D2 — gold-emerging 2-way adjudication ADOPTED as a pre-requisite: split the 7 gold-emerging rows into genuinely-novel vs
+     classifiable-into-established BEFORE calibrating the recall floor value. Minimum meaningful bar on 7 rows ≈ 0.5 (≥4/7).
+D3 — coarse_kappa 0.73 reachability: CONDITIONAL ruling. If clef-4bit (27B, the only capacity match) also fails 0.73, the
+     owner accepts either (a) lower the floor to the best empirical κ, or (b) best-arm as an ADVISORY (non-fail-closed,
+     D-2798) decider with human arbitration on low-confidence rows — never a silent pass. Pending clef-4bit A/B.
+
+Implementation order: (1) D1 mechanism (recall floor config + recall metric in the A/B harness, advisory report); (2) D2
+adjudication (informs the floor value); (3) D3 ruling once clef-4bit lands.
+

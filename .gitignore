@@ -108,6 +108,7 @@ checkpoint.jsonl.depth.json
 # Stray root-level SQLite (real DB lives in "knowledge pipeline/maxwell.db")
 maxwell.db
 .venv_laya/
+.venv_pplx/
 
 # frozen stage pairs (C-3): large payloads are cited by manifest, never committed
 frozen/

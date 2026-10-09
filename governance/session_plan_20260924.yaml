@@ -95,6 +95,7 @@ may_touch:
 - governance/ONTOLOGY_ENFORCEMENT_*.md
 - governance/rederive_v6_*
 - governance/d2767_ab_*
+- governance/d2884b_decider_ab_*
 - governance/domain_cardinality_*.json
 - governance/closed_menu_v6_reference.csv
 - governance/Surveillance Capitalism and Soviet Discourse.csv
@@ -694,3 +695,11 @@ widening_log:
   may_touch_untouched: false
   will_not_touch_untouched: true
   why: 'D-2767 C+B owner ruling + BUG-690 part-2 macro-drift fix. The owner ruled the failed C+B gate: (a) fine discipline becomes advisory/multi-label provenance, routing gates on the 3-way macro + domains; (b) decider-model A/B (distinct family) against the owner referee. This path (the recommendation record) had NO may_touch home, so it is granted as ONE NAMED path (BUG-548: never a glob). Every other touched path in the same commit is already inside may_touch: config/discipline_macro_groups.yaml (config/*.yaml), scripts/discipline_macro_classify.py + scripts/discipline_advisory_rescore.py (scripts/*.py), governance/buglog.md, governance/MARKET_RESEARCH_TOOL_BENCHMARK_20261006.md (governance/MARKET_RESEARCH_*.md). pipeline/** untouched; no pinned artifact staged.'
+- entry: 36
+  session: 20261009C
+  owner_ack: 'owner RULED D-2884(b) = distinct-family decider-model A/B against the owner referee (the same C+B ruling recorded in entry 35); D-2884(a) already RATIFIED+LANDED+R5-APPROVED'
+  widened:
+  - governance/d2884b_decider_ab_*
+  may_touch_untouched: false
+  will_not_touch_untouched: true
+  why: 'D-2884(b) decider A/B OUTPUT artifacts (per-arm R14-stamped result JSONs). The owner ruling that opened D-2884(b) named the A/B but not its output path, so governance/d2884b_decider_ab_{pplx,laya}_*.json had no may_touch home; granted as a glob MIRRORING the existing governance/d2767_ab_* (same owner-gated A/B artifact family). The harness scripts/d2884b_decider_ab.py (scripts/*.py) + R5 evidence (governance/r5_reviews.jsonl) are already inside may_touch. pipeline/** untouched; no pinned artifact staged.'

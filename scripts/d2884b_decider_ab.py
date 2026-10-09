@@ -66,6 +66,13 @@ PPX_SNAPSHOT = (
     Path.home() / ".cache/huggingface/hub/models--mlx-community--pplx-decider-v1.1-27b-4bit"
     / "snapshots/66383f28b37637658b02b8e82b1029598b138642"
 )
+# Base (typed-decision bundle, BUG-364) — ModernBERT-large encoder + 2-layer RL head. The
+# 'typed-decisions' subfolder is a near-identical sibling; bakeoff_laya.yaml pins the BASE
+# model.safetensors (sha256 891102d3…) as the typed-decision bundle, so subfolder=None.
+LAYA_SNAPSHOT = (
+    Path.home() / ".cache/huggingface/hub/models--convaiinnovations--laya"
+    / "snapshots/7b928d828b7b0e022f929d9bd2e44165aa270148"
+)
 SOURCE_MAX = 600  # source_text truncation, mirrors build_merged_prompt (C12 parity)
 
 
@@ -259,15 +266,32 @@ def _run_arm_pplx(rows: list[dict], criteria: dict[str, str]) -> list[str]:
 
 
 def _run_arm_laya(rows: list[dict], criteria: dict[str, str]) -> list[str]:
-    """Run the laya decider (Arm B). Requires .venv_laya + the multilingual checkpoint (D-305).
+    """Run the laya decider (Arm B) — MLX RL-agent, typed-decision bundle (D-305/BUG-364).
 
-    NOT YET IMPLEMENTED — laya's typed-decisions API is under separate investigation.
-    Keeping this arm behind an explicit NotImplementedError (C16: no silent failure).
+    Distinct family from pplx (ModernBERT-large ~421M encoder + 2-layer RL head vs the
+    Qwen3.8-27B decision readout). Same 3-way+emerging choice criteria. laya REQUIRES an
+    explicit ``instructions`` field (its _to_internal raises without one) — unlike pplx's
+    instruction-free question — so a minimal neutral instruction names the choice task and
+    the bucket scope stays in the criteria (zero hardcode, C12). laya's 512-token context
+    truncates the state front-first and caps each option text at 48 tokens (its own
+    build_prefix); this is a documented Arm-B-only constraint, not a gate asymmetry.
     """
-    raise NotImplementedError(
-        "Arm B (laya) is not yet wired. Run Arm A (pplx) first via .venv_pplx/bin/python; "
-        "the laya typed-decisions API is a follow-up step (D-305 multilingual checkpoint)."
-    )
+    try:
+        from laya_mlx.agent import Agent  # lazy: requires .venv_laya
+    except ImportError as e:
+        raise SystemExit(f"FAIL: cannot import laya_mlx — run with .venv_laya/bin/python: {e}") from e
+
+    instructions = "Choose the single macro-discipline bucket that best fits the item."
+    question = {"type": "choice", "criteria": criteria, "instructions": instructions}
+    agent = Agent(model_id_or_path=str(LAYA_SNAPSHOT), batch_size=16)
+    preds: list[str] = []
+    for r in rows:
+        result = agent.system_one(r["state"], {"q1": question})
+        choice = result["answers"]["q1"]["choice"]
+        if choice not in criteria:
+            raise SystemExit(f"FAIL: laya returned unknown label {choice!r} (criteria drift)")
+        preds.append(choice)
+    return preds
 
 
 def main() -> int:

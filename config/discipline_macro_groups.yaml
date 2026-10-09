@@ -9,7 +9,7 @@
 # this taxonomy. Therefore the discipline operative floor is HUMAN-UNREACHABLE; the
 # classifier gate must be set to HUMAN PARITY (~0.73-0.77), never 0.8 or 0.9.
 #
-# group source of truth: closed_menu_v5.json disciplines[].group (9 groups + 'emerging').
+# group source of truth: closed_menu_v8.json disciplines[].group (10 groups + 'emerging').
 # 'emerging' (empty group) is an explicit routing bucket and is NEVER folded into a macro.
 
 scheme: "3-way"          # PRIMARY recommendation (highest human ceiling, kappa 0.766)
@@ -28,6 +28,7 @@ macros:
     Method & Business:
       - "Systems & Method"
       - "Operational & Strategy"
+      - "Business & Management"
   "4-way":
     Science & Engineering:
       - "AI & Computing"
@@ -42,5 +43,6 @@ macros:
     Method & Operations:
       - "Systems & Method"
       - "Operational & Strategy"
+      - "Business & Management"
 
 emerging_routing: "emerging"   # explicit routing bucket, never a macro bucket

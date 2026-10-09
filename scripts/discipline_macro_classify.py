@@ -10,7 +10,7 @@ so the gate is re-targeted to HUMAN PARITY (~0.73-0.77).
 
 Two competing Condition arms are measured:
   Condition A (collapse): take the committed fine classifier (fbs.discipline) and
-      deterministically collapse fine -> 9-group -> 3-way macro. Measured kappa 0.553
+      deterministically collapse fine -> 10-group -> 3-way macro. Measured kappa 0.553
       (D-2797) — BELOW the ~0.65 ship threshold, dominated by 16 off-menu 'emerging'
       abstentions that a fine-axis remap can never recover.
   Condition C (this script): a DEDICATED classifier that predicts the 3-way macro
@@ -19,9 +19,9 @@ Two competing Condition arms are measured:
 SOURCE OF TRUTH (C12 — no hardcoded ontology)
 ---------------------------------------------
 - Macro scheme + buckets:  config/discipline_macro_groups.yaml (3-way primary)
-- Discipline -> group:     config/closed_menu_v5.json (disciplines[].group)
+- Discipline -> group:     config/closed_menu_v8.json (disciplines[].group)
 - Model + anchor + floor:  config/pipeline_config.yaml stage4.discipline_*
-- Bucket -> members:       derived from closed_menu_v5.json via the macro group map
+- Bucket -> members:       derived from closed_menu_v8.json via the macro group map
 
 MODES (mirrors discipline_conformance_gate.py)
 ----------------------------------------------
@@ -55,7 +55,7 @@ from discipline_conformance_gate import (  # noqa: E402
 
 # C20: named constants (no magic numbers).
 DEFAULT_ANCHOR = "governance/discipline_anchor_rederived_v8_20261007.json"
-DEFAULT_MENU = "config/closed_menu_v5.json"
+DEFAULT_MENU = "config/closed_menu_v8.json"
 DEFAULT_MACRO_GROUPS = "config/discipline_macro_groups.yaml"
 # BUG-622/D-2797 (2026-10-03): gpt-oss-20b-MXFP4-Q8 is a HARMONY reasoning model.
 # Its chain-of-thought is billed against max_tokens (reasoning + content share the

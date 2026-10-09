@@ -63,7 +63,7 @@ def per_class_metrics(gold: list[str], pred: list[str]) -> dict[str, dict[str, f
 def load_macro_map() -> dict[str, str]:
     """Load fine-discipline -> 3-way macro bucket mapping (two-level: value->group->macro).
 
-    closed_menu_v5.json maps each fine `value` to a `group`; discipline_macro_groups.yaml
+    closed_menu_v8.json maps each fine `value` to a `group`; discipline_macro_groups.yaml
     maps each group to a 3-way macro bucket (Technical / Human & Design / Method & Business).
     """
     import yaml
@@ -75,7 +75,7 @@ def load_macro_map() -> dict[str, str]:
         for g in groups or []:
             group_to_bucket[str(g)] = str(bucket)
 
-    menu = json.loads((REPO / "config" / "closed_menu_v5.json").read_text(encoding="utf-8"))
+    menu = json.loads((REPO / "config" / "closed_menu_v8.json").read_text(encoding="utf-8"))
     mapping: dict[str, str] = {}
     for d in menu.get("disciplines", []):
         value = str(d.get("value", ""))

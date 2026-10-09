@@ -9850,6 +9850,16 @@ STATUS (2026-10-09): steps 1+2 APPLIED via scripts/bug693_reclaim.py --apply (D-
   read-only fail-closed detector comparing per-run menu_hash/taxonomy_version against the live menu. Confirms
   the canonical run is STALE (99e1df82 v5.6 vs live 8218d6db v8) and exits non-zero until re-classification lands.
 
+  step 3 (offmenu 1309) + v9 MENU-EDIT SPEC DRAFTED for owner sign-off (governance/menu_v9_edit_spec_20261009.md):
+  merge visual semiotics(44)->semiotics(61), merge information retrieval(9)->information science(122), demote
+  computational theory(16)->emerging, promote creative writing(14)+museum studies(13). D-2895 (RATIFIED): color
+  theory stays DISTINCT from visual perception (boundary codified; demotion rejected as ontological bleed).
+  D-2896 (RATIFIED): raw-label normalization boundary — surface fold (NFKC/dash/case) at write-time is SAFE
+  (BUG-279 dash/case noise); semantic aliasing (BUG-151) stays at canonical boundary only, NEVER raw. THREE owner
+  flags pending before config mutation: (a) computational theory demote-label vs keep-as-reserved, (b) IR->IS
+  cross-macro (Technical->Method & Business) acceptable, (c) promotion group/definition assignments for creative
+  writing (Heterodox) + museum studies (Systems & Method).
+
 D-2891 RATIFIED (owner 2026-10-09). Final gold-emerging adjudication: R127 Guild of Handicraft Educational Model
 -> cultural design + R202 Interactive Media Integration -> performing arts ACCEPTED (STier rec); R183 Pattern
 Language Implementation Process EXCLUDED from the sample (owner not convinced; verified no future tax — no

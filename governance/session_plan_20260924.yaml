@@ -30,6 +30,7 @@ may_touch:
 - governance/HANDOFFS.jsonl
 - governance/r5_reviews.jsonl
 - governance/session_plan_*.yaml
+- governance/menu_v9_edit_spec_20261009.md
 - tests/**
 - archive/index.yaml
 - governance/evidence/**
@@ -704,3 +705,11 @@ widening_log:
   may_touch_untouched: false
   will_not_touch_untouched: true
   why: 'D-2884(b) decider A/B OUTPUT artifacts (per-arm R14-stamped result JSONs). The owner ruling that opened D-2884(b) named the A/B but not its output path, so governance/d2884b_decider_ab_{pplx,laya}_*.json had no may_touch home; granted as a glob MIRRORING the existing governance/d2767_ab_* (same owner-gated A/B artifact family). The harness scripts/d2884b_decider_ab.py (scripts/*.py) + R5 evidence (governance/r5_reviews.jsonl) are already inside may_touch. pipeline/** untouched; no pinned artifact staged.'
+- entry: 37
+  session: 20261009D
+  owner_ack: 'owner RULED color theory stays distinct from visual perception (clear boundary) + asked to examine raw-label fragmentation; standing rules CONTINUE (implement unblocked critical steps; update and sync gov dependencies)'
+  widened:
+  - governance/menu_v9_edit_spec_20261009.md
+  may_touch_untouched: false
+  will_not_touch_untouched: true
+  why: 'D-2895 (color theory boundary) + D-2896 (raw-label normalization boundary) minted; the BUG-693 v9 menu-edit SPEC was drafted for owner sign-off (governance/menu_v9_edit_spec_20261009.md). This spec/recommendation record had NO may_touch home, so it is granted as ONE NAMED path (BUG-548: never a glob). All other touched paths (config/decisions.yaml + config/decisions_summary.json via config/*.yaml, DECISION-LOG.md, MASTER-TASK-REGISTER.md, governance/buglog.md, governance/CONTEXT_INDEX.md, governance/MUTATION_JOURNAL.jsonl) are already inside may_touch. pipeline/** untouched; no pinned artifact staged.'

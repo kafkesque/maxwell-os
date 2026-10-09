@@ -15355,3 +15355,43 @@ decisions:
   files:
   - scripts/check_menu_reclass_gate.py
   - governance/buglog.md
+- id: D-2895
+  state: RATIFIED
+  category: ONTOLOGY
+  title: Color theory stays distinct from visual perception — boundary codified; demotion to visual perception rejected
+    as ontological bleed
+  bugs:
+  - BUG-693
+  files:
+  - config/closed_menu_v8.json
+  decision: 'Owner ruling on the BUG-693 menu-edit review: ''color theory'' (14 canonical rows, group Form & Structure)
+    remains a DISTINCT discipline from ''visual perception'' (11 rows, group Perception & Signal). The earlier proposal
+    to demote color theory into visual perception is REJECTED as ontological bleed — color theory is a DESIGN-CRAFT
+    axis (principles governing color mixing/harmony/contrast and their use in design), while visual perception is
+    a PERCEPTUAL-SCIENCE axis (the biological/psychological process of interpreting visual stimuli and color stimuli).
+    They already sit in DIFFERENT macro groups (Form & Structure under Technical vs Perception & Signal under Human
+    & Design), so the boundary is structural, not merely definitional. No menu mutation for either label in the
+    v9 edit.'
+- id: D-2896
+  state: RATIFIED
+  category: ONTOLOGY
+  title: Raw-label normalization boundary — surface fold (NFKC/dash/case) at write-time is safe; semantic aliasing
+    stays at canonical boundary only
+  bugs:
+  - BUG-279
+  - BUG-151
+  files:
+  - pipeline/schemas.py
+  - config/alias_map.yaml
+  - config/normalization_map.yaml
+  decision: 'Answers the raw-label fragmentation question. Measured canonical-run HCI surface variants: ''human-computer
+    interaction'' 70 / ''human–computer interaction'' 33 / ''human‑computer interaction'' 18 / ''Human-Computer
+    Interaction'' 1 — all ONE token, fragmented only by dash codepoint + case. Two layers that MUST NOT be conflated:
+    (1) SURFACE/orthographic normalization (NFKC fold + dash-fold U+2010..U+2015 + case-fold + strip) is deterministic,
+    lossless, and reversible — safe to apply at the WRITE boundary inside the extraction scripts to prevent fragmentation
+    at source; it removes BUG-279 free-generation dash/case noise with ZERO semantic judgment. (2) SEMANTIC aliasing
+    (e.g. ''ai ethics'' -> ''artificial intelligence'') is lossy and irreversible — it stays at the CANONICALIZATION
+    boundary only, via versioned overlays (alias_map.yaml semantic raw->canonical, normalization_map.yaml surface
+    variants) + normalize_label(), NEVER at the raw layer, or contamination/bleed/drift re-enters. The existing
+    979 distinct discipline_raw labels stay VERBATIM as harmless provenance (they collapse deterministically via
+    normalize_label); BUG-151''s 267 raw aliases resolve at canonicalization, not by rewriting raw.'

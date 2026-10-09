@@ -21,7 +21,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from pipeline.pipeline_paths import DB_PATH
+from pipeline.pipeline_paths import DB_PATH, CANONICAL_RUN  # D-2881: serving canonical-run pin
 from pipeline.label_traceability import traceability_of  # BUG-497/D-2640
 
 
@@ -40,14 +40,15 @@ def show_fb(conn: sqlite3.Connection, fb_id: str) -> dict | None:
     """Show a specific FB by ID (full or partial match)."""
     # Try exact match first
     row = conn.execute(
-        "SELECT * FROM fbs WHERE fb_id = ?", (fb_id,)
+        "SELECT * FROM fbs WHERE fb_id = ? AND pipeline_run_id = ?",
+        (fb_id, CANONICAL_RUN),
     ).fetchone()
 
     if not row:
         # Try partial match on name
         rows = conn.execute(
-            "SELECT * FROM fbs WHERE name LIKE ? LIMIT 10",
-            (f"%{fb_id}%",),
+            "SELECT * FROM fbs WHERE name LIKE ? AND pipeline_run_id = ? LIMIT 10",
+            (f"%{fb_id}%", CANONICAL_RUN),
         ).fetchall()
         if not rows:
             print(f"❌ No FB found matching: {fb_id}")
@@ -70,16 +71,21 @@ def show_fb(conn: sqlite3.Connection, fb_id: str) -> dict | None:
 
 def show_stats(conn: sqlite3.Connection):
     """Show database statistics."""
-    total = conn.execute("SELECT COUNT(*) FROM fbs").fetchone()[0]
+    total = conn.execute(
+        "SELECT COUNT(*) FROM fbs WHERE pipeline_run_id = ?", (CANONICAL_RUN,)
+    ).fetchone()[0]
     by_status = conn.execute(
-        "SELECT status, COUNT(*) as cnt FROM fbs GROUP BY status"
+        "SELECT status, COUNT(*) as cnt FROM fbs WHERE pipeline_run_id = ? GROUP BY status",
+        (CANONICAL_RUN,),
     ).fetchall()
     by_depth = conn.execute(
-        "SELECT depth, COUNT(*) as cnt FROM fbs GROUP BY depth"
+        "SELECT depth, COUNT(*) as cnt FROM fbs WHERE pipeline_run_id = ? GROUP BY depth",
+        (CANONICAL_RUN,),
     ).fetchall()
     by_discipline = conn.execute(
-        "SELECT discipline, COUNT(*) as cnt FROM fbs GROUP BY discipline "
-        "ORDER BY cnt DESC LIMIT 15"
+        "SELECT discipline, COUNT(*) as cnt FROM fbs WHERE pipeline_run_id = ? "
+        "GROUP BY discipline ORDER BY cnt DESC LIMIT 15",
+        (CANONICAL_RUN,),
     ).fetchall()
 
     print("\n╔══════════════════════════════════════╗")
@@ -102,7 +108,9 @@ def show_stats(conn: sqlite3.Connection):
 
 def export_all(conn: sqlite3.Connection):
     """Export all FBs as JSONL to stdout."""
-    rows = conn.execute("SELECT * FROM fbs ORDER BY name").fetchall()
+    rows = conn.execute(
+        "SELECT * FROM fbs WHERE pipeline_run_id = ? ORDER BY name", (CANONICAL_RUN,)
+    ).fetchall()
     for row in rows:
         d = dict(row)
         for field in ["domains", "source_clusters", "source_books", "source_ids",
@@ -169,7 +177,8 @@ def interactive(conn: sqlite3.Connection):
             n = int(arg) if arg.isdigit() else 10
             rows = conn.execute(
                 "SELECT fb_id, name, discipline, depth, status "
-                "FROM fbs ORDER BY created_at DESC LIMIT ?", (n,)
+                "FROM fbs WHERE pipeline_run_id = ? ORDER BY created_at DESC LIMIT ?",
+                (CANONICAL_RUN, n),
             ).fetchall()
             print(f"\n  Recent {len(rows)} FBs:\n")
             for r in rows:
@@ -182,15 +191,16 @@ def interactive(conn: sqlite3.Connection):
             else:
                 try:
                     rows = conn.execute(
-                        "SELECT * FROM fbs WHERE fbs_fts MATCH ? ORDER BY rank LIMIT 10",
-                        (arg,),
+                        "SELECT * FROM fbs WHERE fbs_fts MATCH ? AND pipeline_run_id = ? "
+                        "ORDER BY rank LIMIT 10",
+                        (arg, CANONICAL_RUN),
                     ).fetchall()
                 except sqlite3.OperationalError:
                     like = f"%{arg}%"
                     rows = conn.execute(
                         "SELECT * FROM fbs WHERE name LIKE ? OR definition LIKE ? "
-                        "ORDER BY borp_score DESC LIMIT 10",
-                        (like, like),
+                        "AND pipeline_run_id = ? ORDER BY borp_score DESC LIMIT 10",
+                        (like, like, CANONICAL_RUN),
                     ).fetchall()
                 print(f"\n  Found {len(rows)} results for '{arg}':\n")
                 for i, r in enumerate(rows, 1):
@@ -203,7 +213,8 @@ def interactive(conn: sqlite3.Connection):
             show_stats(conn)
         elif action == "domains":
             rows = conn.execute(
-                "SELECT domains FROM fbs WHERE status = 'PASS'"
+                "SELECT domains FROM fbs WHERE status = 'PASS' AND pipeline_run_id = ?",
+                (CANONICAL_RUN,),
             ).fetchall()
             domain_counts = {}
             for r in rows:
@@ -220,7 +231,9 @@ def interactive(conn: sqlite3.Connection):
         elif action == "disciplines":
             rows = conn.execute(
                 "SELECT discipline, COUNT(*) as cnt FROM fbs "
-                "WHERE status = 'PASS' GROUP BY discipline ORDER BY cnt DESC"
+                "WHERE status = 'PASS' AND pipeline_run_id = ? "
+                "GROUP BY discipline ORDER BY cnt DESC",
+                (CANONICAL_RUN,),
             ).fetchall()
             print(f"\n  Disciplines ({len(rows)}):\n")
             for r in rows:

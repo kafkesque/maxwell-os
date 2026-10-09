@@ -46,7 +46,7 @@ from pipeline.pipeline_paths import (  # D2537: fused quality ranking (opt-in)
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from pipeline.feedback import mark_fb_retrieved  # D2188 (P1-2): usage tracking on retrieval
-from pipeline.pipeline_paths import DB_PATH
+from pipeline.pipeline_paths import DB_PATH, CANONICAL_RUN, canonical_run_clause  # D-2881: serving canonical-run pin
 
 
 def get_conn() -> sqlite3.Connection:
@@ -206,9 +206,15 @@ def search_keyword(
     db_cols: set[str] = {r[1] for r in conn.execute("PRAGMA table_info(fbs)")}
     has_class_status: bool = "classification_status" in db_cols
     has_is_summary: bool = "is_summary" in db_cols
+    has_run_id: bool = "pipeline_run_id" in db_cols  # D-2881: column-aware canonical-run pin
 
     conditions: list[str] = []
     params: list = []
+
+    # D-2881: serving layer must never surface non-canonical run rows (stale t11/e2e).
+    if has_run_id:
+        conditions.append(canonical_run_clause())
+        params.append(CANONICAL_RUN)
 
     if include_quarantine:
         conditions.append(_status_predicate(True))
@@ -283,10 +289,12 @@ def search_fts(conn: sqlite3.Connection, query: str, limit: int = 20,
     db_cols: set[str] = {r[1] for r in conn.execute("PRAGMA table_info(fbs)")}
     has_class_status: bool = "classification_status" in db_cols
     has_is_summary: bool = "is_summary" in db_cols
+    has_run_id: bool = "pipeline_run_id" in db_cols  # D-2881
 
     status_f: str = f"AND f.{_status_predicate(include_quarantine)}"
     summary_f: str = "AND (f.is_summary = 0 OR f.is_summary IS NULL)" if has_is_summary else ""
     class_f: str = "AND (f.classification_status IS NULL OR f.classification_status != 'FAILED')" if has_class_status else ""
+    run_f: str = "AND f.pipeline_run_id = ?" if has_run_id else ""
     facet_conds, facet_params = _facet_conditions(
         domain=domain, discipline=discipline, depth=depth,
         discipline_raw=discipline_raw, domains_raw=domains_raw, alias="f.",
@@ -294,6 +302,10 @@ def search_fts(conn: sqlite3.Connection, query: str, limit: int = 20,
     facet_f: str = "".join(f"AND {c} " for c in facet_conds)
 
     try:
+        fts_params: list = [_fts_query(query), *facet_params]
+        if has_run_id:
+            fts_params.append(CANONICAL_RUN)
+        fts_params.append(limit)
         rows = conn.execute(f"""
             SELECT f.* FROM fbs f
             JOIN fbs_fts ft ON f.rowid = ft.rowid
@@ -302,9 +314,10 @@ def search_fts(conn: sqlite3.Connection, query: str, limit: int = 20,
               {facet_f}
               {summary_f}
               {class_f}
+              {run_f}
             ORDER BY rank
             LIMIT ?
-        """, (_fts_query(query), *facet_params, limit)).fetchall()
+        """, tuple(fts_params)).fetchall()
         return [_row_to_dict(r) for r in rows]
     except sqlite3.OperationalError as e:
         # FTS5 may not be available — fall back to LIKE.
@@ -320,6 +333,11 @@ def search_fts(conn: sqlite3.Connection, query: str, limit: int = 20,
             discipline_raw=discipline_raw, domains_raw=domains_raw,
         )
         like_facet_f: str = "".join(f"AND {c} " for c in like_facet_conds)
+        like_run_f: str = "AND pipeline_run_id = ?" if has_run_id else ""
+        like_params: list = [like_query, like_query, like_query, *like_facet_params]
+        if has_run_id:
+            like_params.append(CANONICAL_RUN)
+        like_params.append(limit)
         rows = conn.execute(f"""
             SELECT * FROM fbs
             WHERE (name LIKE ? OR definition LIKE ? OR keywords LIKE ?)
@@ -327,9 +345,10 @@ def search_fts(conn: sqlite3.Connection, query: str, limit: int = 20,
               {like_facet_f}
               {like_summary}
               {like_class}
+              {like_run_f}
             ORDER BY {_rank_sql()}
             LIMIT ?
-        """, (like_query, like_query, like_query, *like_facet_params, limit)).fetchall()
+        """, tuple(like_params)).fetchall()
         return [_row_to_dict(r) for r in rows]
 
 
@@ -355,6 +374,8 @@ def search_vector(
     `vec_fbs_ctx` built by backfill --contextual) for A/B without touching the
     production vec_fbs.
     """
+    db_cols: set[str] = {r[1] for r in conn.execute("PRAGMA table_info(fbs)")}
+    has_run_id: bool = "pipeline_run_id" in db_cols  # D-2881: canonical-run pin
     try:
         import struct
 
@@ -387,6 +408,11 @@ def search_vector(
             discipline_raw=discipline_raw, domains_raw=domains_raw, alias="f.",
         )
         facet_f: str = "".join(f"AND {c} " for c in facet_conds)
+        run_f: str = "AND f.pipeline_run_id = ?" if has_run_id else ""
+        vec_params: list = [query_blob, *facet_params]
+        if has_run_id:
+            vec_params.append(CANONICAL_RUN)
+        vec_params.append(limit)
         # C12/D2511: vec_table is a caller-supplied identifier (validated, not
         # user-freeform) — sqlite-vec table names cannot be parameterized, and
         # f-string interpolation is safe here because vec_table is an internal
@@ -403,9 +429,10 @@ def search_vector(
                 JOIN fbs f ON f.rowid = v.rowid
                 WHERE f.{_status_predicate(include_quarantine)}
                   {facet_f}
+                  {run_f}
                 ORDER BY v.distance
                 LIMIT ?
-            """, (query_blob, *facet_params, limit)).fetchall()
+            """, tuple(vec_params)).fetchall()
 
             if rows:
                 return [_row_to_dict(r) for r in rows]
@@ -700,6 +727,10 @@ def graph_expand(
         Related entries include full FB dicts from DB.
         Contradicts/prerequisites are fb_id strings (fetch detail separately).
     """
+    db_cols: set[str] = {r[1] for r in conn.execute("PRAGMA table_info(fbs)")}
+    has_run_id: bool = "pipeline_run_id" in db_cols  # D-2881: canonical-run pin
+    run_clause: str = f"AND {canonical_run_clause()}" if has_run_id else ""
+    run_params: tuple = (CANONICAL_RUN,) if has_run_id else ()
     visited: set[str] = set(fb_ids)
     frontier: deque[str] = deque(fb_ids)
     result: dict[str, dict] = {
@@ -715,9 +746,9 @@ def graph_expand(
 
             # Fetch edges from DB
             row = conn.execute(
-                """SELECT fb_id, related_fbs, contradicts_fbs, prerequisite_fbs
-                   FROM fbs WHERE fb_id = ?""",
-                (current_id,),
+                f"""SELECT fb_id, related_fbs, contradicts_fbs, prerequisite_fbs
+                   FROM fbs WHERE fb_id = ? {run_clause}""",
+                (current_id, *run_params),
             ).fetchone()
 
             if not row:
@@ -746,9 +777,9 @@ def graph_expand(
                         frontier.append(rel_id)
                         # Fetch FB details for the related entry
                         rrow = conn.execute(
-                            "SELECT fb_id, name, definition, domains, borp_score "
-                            "FROM fbs WHERE fb_id = ?",
-                            (rel_id,),
+                            f"SELECT fb_id, name, definition, domains, borp_score "
+                            f"FROM fbs WHERE fb_id = ? {run_clause}",
+                            (rel_id, *run_params),
                         ).fetchone()
                         if current_id not in result:
                             result[current_id] = {"related": [], "contradicts": [], "prerequisites": []}
@@ -892,7 +923,11 @@ def graph_aware_search(
         "AND (classification_status IS NULL OR classification_status != 'FAILED')"
         if "classification_status" in db_cols_gas else ""
     )
+    run_filter_gas: str = "AND pipeline_run_id = ?" if "pipeline_run_id" in db_cols_gas else ""
     placeholders: str = ",".join("?" * len(all_fb_ids))
+    gas_params: list = list(all_fb_ids)
+    if run_filter_gas:
+        gas_params.append(CANONICAL_RUN)
     rows = conn.execute(
         f"""SELECT *,
             COALESCE({_quality_field()}, 0.5) AS _borp,
@@ -900,8 +935,9 @@ def graph_aware_search(
             FROM fbs
             WHERE fb_id IN ({placeholders})
             {class_filter_gas}
+            {run_filter_gas}
             ORDER BY _borp DESC, _feedback DESC""",
-        list(all_fb_ids),
+        gas_params,
     ).fetchall()
 
     results: list[dict] = [dict(r) for r in rows]
@@ -1142,7 +1178,8 @@ def main():
 
     if args.list_domains:
         rows = conn.execute(
-            "SELECT DISTINCT discipline, depth, status FROM fbs"
+            "SELECT DISTINCT discipline, depth, status FROM fbs WHERE pipeline_run_id = ?",
+            (CANONICAL_RUN,),
         ).fetchall()
         for r in rows:
             print(f"  {r['discipline']:30s} | {r['depth']:15s} | {r['status']}")

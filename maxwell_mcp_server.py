@@ -39,6 +39,7 @@ from typing import Any
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 PROJECT_ROOT: Path = Path(__file__).resolve().parent  # BUG-220-MCP: containment root for delegate_local file guard
 from pipeline.pipeline_paths import (
+    CANONICAL_RUN,
     DB_PATH,
     MCP_DELEGATE_ALLOW_ABSOLUTE_PATHS,
     MCP_DELEGATE_ALLOWED_MODELS,
@@ -169,7 +170,10 @@ async def _tool_get_fb_detail(args: dict) -> list[TextContent]:
 
     conn: sqlite3.Connection = _get_readonly_conn()
     try:
-        row = conn.execute("SELECT * FROM fbs WHERE fb_id = ?", (fb_id,)).fetchone()
+        row = conn.execute(
+            "SELECT * FROM fbs WHERE fb_id = ? AND pipeline_run_id = ?",
+            (fb_id, CANONICAL_RUN),
+        ).fetchone()
         if not row:
             return [TextContent(type="text", text=json.dumps({"error": f"FB not found: {fb_id}"}))]
 
@@ -227,8 +231,8 @@ async def _tool_get_fb_reliability(args: dict) -> list[TextContent]:
             """SELECT fb_id, name, borp_score, confidence_score,
                feedback_score, feedback_count, usage_count,
                last_retrieved_at, status, classification_status
-               FROM fbs WHERE fb_id = ?""",
-            (fb_id,),
+               FROM fbs WHERE fb_id = ? AND pipeline_run_id = ?""",
+            (fb_id, CANONICAL_RUN),
         ).fetchone()
 
         if not row:
@@ -472,11 +476,14 @@ def _run_test() -> None:
         print(f"{status} Tool '{name}' registered")
 
     conn: sqlite3.Connection = _get_readonly_conn()
-    count = conn.execute("SELECT COUNT(*) as cnt FROM fbs").fetchone()
+    count = conn.execute(
+        "SELECT COUNT(*) as cnt FROM fbs WHERE pipeline_run_id = ?", (CANONICAL_RUN,)
+    ).fetchone()
     print(f"✅ FBs in DB: {count['cnt']}")
 
     graph_cols = conn.execute(
-        "SELECT COUNT(*) as cnt FROM fbs WHERE related_fbs IS NOT NULL"
+        "SELECT COUNT(*) as cnt FROM fbs WHERE related_fbs IS NOT NULL AND pipeline_run_id = ?",
+        (CANONICAL_RUN,),
     ).fetchone()
     print(f"✅ FBs with graph edges: {graph_cols['cnt']}")
     conn.close()

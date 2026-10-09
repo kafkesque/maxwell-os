@@ -89,6 +89,7 @@ may_touch:
 - governance/s4_review_queue.*
 - governance/OWNER_GATE_BUG528_20261003.md
 - pipeline/**
+- maxwell_mcp_server.py
 - config/*.ttl
 - governance/ONTOLOGY_ENFORCEMENT_*.md
 - governance/rederive_v6_*
@@ -117,6 +118,13 @@ will_not_touch:
 - governance/ANCHOR_RULER_CONSOLIDATED_*.csv
 - governance/ANCHOR4_DEPTH_BLIND_SHEET_*.csv
 widening_log:
+- date: '2026-10-09'
+  actor: assistant
+  owner_ack: 'standing owner mandate 2026-10-09 ("continue with next critical steps ... update and sync gov dependencies")'
+  addendum: 'BUG-691 (D-2881): the serving-layer canonical-run pin touches maxwell_mcp_server.py (C25 agent-agnostic MCP serving path) in addition to the already-granted pipeline/** and governance/buglog.md.'
+  additions:
+  - pattern: maxwell_mcp_server.py
+    why: 'BUG-691/D-2881 - the MCP serving path (get_fb_detail/get_fb_reliability/_run_test counts) leaks stale non-canonical-run rows unless it carries the same CANONICAL_RUN filter as retrieve/query/status.'
 - date: '2026-09-25'
   actor: assistant
   owner_ack: 'ACCEPTED 2026-09-25 (owner: "ok approve")'

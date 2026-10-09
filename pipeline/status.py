@@ -25,6 +25,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from pipeline.omlx_call import check_omlx_health, get_omlx_version
 from pipeline.pipeline_paths import (
     BOOKS_DIR,
+    CANONICAL_RUN,
     DB_PATH,
     PARQUET_DIR,
     SCHEMA_VERSION,
@@ -77,13 +78,22 @@ def get_db_stats(db_path: Path) -> dict:
         conn = sqlite3.connect(str(db_path))
         conn.row_factory = sqlite3.Row
 
-        row = conn.execute("SELECT COUNT(*) as cnt FROM fbs").fetchone()
+        # D-2881: pin stats to the canonical run (column-aware for test DBs).
+        cols: set[str] = {r[1] for r in conn.execute("PRAGMA table_info(fbs)")}
+        run_where: str = "WHERE pipeline_run_id = ?" if "pipeline_run_id" in cols else ""
+        run_param: tuple = (CANONICAL_RUN,) if run_where else ()
+
+        row = conn.execute(
+            f"SELECT COUNT(*) as cnt FROM fbs {run_where}", run_param
+        ).fetchone()
         if row:
             stats["total_fbs"] = row["cnt"]
 
         for status in ["PASS", "FLAG", "QUARANTINE"]:
             row = conn.execute(
-                "SELECT COUNT(*) as cnt FROM fbs WHERE status = ?", (status,)
+                f"SELECT COUNT(*) as cnt FROM fbs WHERE status = ?"
+                + (f" AND pipeline_run_id = ?" if run_where else ""),
+                (status, *run_param),
             ).fetchone()
             if row:
                 stats[status.lower()] = row["cnt"]

@@ -25,6 +25,7 @@
 | Bug | Date | Issue |
 |---|---|---|
 
+| BUG-691 | 2026-10-09 | **Serving layer mixed stale non-canonical-run rows into every answer (FIXED).** retrieve.py/query.py/status.py/maxwell_mcp_server.py queried `fbs` with ZERO `pipeline_run_id` filter; 4 run_ids share the table (t11=7855, canonical rechunk-v4-20260929=6591, e2e=122, bug198_reinject=6), so 7983 stale rows (54.8%) leaked into every search/stats/MCP answer. Fixed via D-2881 config-first pin: `pipeline_paths.CANONICAL_RUN` + `canonical_run_clause()` (source of truth `anchor_family.yaml store_bridge.canonical_run`, env override `MAXWELL_CANONICAL_RUN`, fallback `run.default_id`), applied COLUMN-AWARE to all serving queries (skip when column absent → in-memory test fixture stays green). VERIFIED: query.py --stats 14574→6591; retrieve keyword+FTS return 0 leaked rows; quarantine/hybrid-RRF/vector-dim tests green. 5 files, no schema/data mutation. |
 | BUG-690 | 2026-10-09 | **D-2767 C+B coarse-kappa blindspot + macro-config drift.** (1) The D-2767 v8 A/B harness (`scripts/d2767_ab_eval.py`) reports only FINE-grained kappa (0.4216) and does NOT compute the coarse 3-way macro kappa the owner-ruled C+B gate requires (`coarse_kappa >= 0.73` = `pipeline_config.yaml` `discipline_coarse_kappa_floor`). Ad hoc collapse of the 194 rows: fine 0.4216 / 9-way group 0.5696 / 3-way coarse **0.5621** → C+B gate **FAILS** (0.5621 < 0.73) even though emerging 0.0155 passes. (2) `config/discipline_macro_groups.yaml` was built against closed_menu_v5 (9 groups) and is MISSING the 'Business & Management' group that first appeared in closed_menu_v6 (business administration / entrepreneurship studies / marketing). Any future coarse-kappa computation emits `UNMAPPED:Business & Management` for ~21 rows, corrupting the B-arm metric. Fix: add 'Business & Management' → Method & Business (3-way) and → Method & Operations (4-way); add a regression test; add coarse-kappa output to the A/B harness. **PART 2 FIXED 2026-10-09 (uncommitted):** added 'Business & Management' to 3-way Method & Business + 4-way Method & Operations; repointed `discipline_macro_classify.py` DEFAULT_MENU and `discipline_advisory_rescore.py` menu pin from closed_menu_v5 -> v8; verified the fail-closed `load_macro` guard now covers all 10 v8 groups (0 uncovered) and the 3 B&M values map to Method & Business. PART 1 (coarse-kappa output in `d2767_ab_eval.py`) REMAINS OPEN. |
 | BUG-681 | 2026-10-08 | **`just health-full` = the ladder's WHOLE fault set. Round 2 measured 6; round 3 measures `FAIL ladder scan: 3 fault(s) in ONE pass` over 118 lines (503s), worst rc=1 (D-2680/BUG-573). FIXED so far: the unparsed buglog heading, the missing archive-index entry, and `check_undeclared_encoding`. THE 3 REMAINING: (a) `check_tests --check` = 3 red contract tests outside a declared-red=0 ceiling, incl. `test_s4_golden_conforms_to_ontology` (a golden set that does not conform to the ontology) - pre-existing, attributed away from the ANCHOR work by grep; (b) `check_encoding_homes --check` rc=1 - **this one BLOCKS the `just health` prefix**, offender NAMED with a line number: `scripts/remap_referee_v7_28rows.py:69` opens the owner remap CSV with a local `encoding="utf-8-sig"` instead of the ONE declared decode home (`scripts/lib/artifact_encoding.py`, D-2644/D-2646) - the honest fix needs a DECLARATION for that CSV; (c) `check_boundary_rehearsal` rc=1, newly diagnosed: `bootstrap.whole_tree_refused: refused (rc=1) but not for the declared reason 'FORBIDDEN session plan' (RAIL 4) - a refusal that does not name its cause cannot justify a bypass` - i.e. a whole-tree commit is still refused, but by a DIFFERENT rail than the declared one, so either the declared marker is stale or an earlier rail now refuses; do NOT hand-edit the declared reason (that hides the drift) - retain the fixture and print the ACTUAL refusal text. Diagnose (b) FIRST: it is the blocker that hides (a) and (c).** |
 | BUG-242 | 2026-09-11 | **frontier69_v2 + extension80 audit outputs carry 2 data-quality defects.** (1) The `*_verdict` fields (depth/discipline/domains) are LLM SELF-REPORTS, not computed comparisons — they claim `override` even when the audit value equals silver (e.g. `S4-GOLD-MINED-00005` domains identical yet `domains_verdict=override`), so the cited "57.5% domain-override" and "80 flagged" figures are inflated. (2) Non-principle content_type rows (noise_drop/tool_instruction/process_template/process_instance/growth_edge) carry a spurious 4-way depth label, violating D2612 (depth only for principle). FIX (applied in `scripts/build_phase0_adjudication_form.py`): agreement recomputed deterministically (`differs` flag) + depth marked N/A for non-principle. REMAINS: recompute the override figures from the audit values (deterministic), and re-run the audit to null depth on non-principle if the raw artifacts are kept. |
@@ -9338,6 +9339,33 @@ FIX (owner gate, one word): propagate the ratified disposition uniformly - clear
 8 rows and keep R021/R080/R084/R106/R148 as already done -> ruler 201 -> 193, with the rows retained in the
 soft-quarantine ledger (policy: quarantine, NEVER hard-delete). Alternative: the owner re-affirms the 8 rows as
 live items, which UNDOES RATIFY-3 DROP(13) and must then be recorded as a superseding decision.
+
+## BUG-691 (FIXED, 2026-10-09) — serving layer mixed stale non-canonical-run rows into every answer
+
+The serving layer (`pipeline/retrieve.py`, `pipeline/query.py`, `pipeline/status.py`, `maxwell_mcp_server.py`)
+queried the `fbs` table with ZERO `pipeline_run_id` filtering. The table carries 4 run_ids
+(t11=7855, rechunk-v4-20260929=6591 CANONICAL, e2e=122, bug198_reinject=6 → 14574 total), so 7983 stale rows
+(54.8%) were fused into every search/stats/MCP answer alongside the canonical run. A correctness bug: serving
+surfaced stale/outdated FBs. `fb_id` is globally unique (0 fb_ids span >1 run_id), so the mixing is ADDITIVE,
+not a shadow — but still pollutes ranking/facets/counts.
+
+FIX (D-2881, already ratified): added a config-first canonical-run pin in `pipeline/pipeline_paths.py`
+(`CANONICAL_RUN` + `canonical_run_clause(alias)`), single source of truth = `config/anchor_family.yaml`
+`store_bridge.canonical_run` (env override `MAXWELL_CANONICAL_RUN`, fallback `run.default_id`). Applied
+COLUMN-AWARE (skip when `pipeline_run_id` column is absent, mirroring the existing `has_class_status`/
+`has_is_summary` pattern) to every serving query:
+- retrieve.py: search_keyword, search_fts (FTS5 + LIKE fallback), search_vector (KNN), graph_expand (2 edge
+  lookups), graph_aware_search (final fetch), `--list-domains`.
+- query.py: show_fb (exact + partial), show_stats (total/by_status/by_depth/by_discipline), export_all,
+  interactive (list/search-FTS/search-LIKE/domains/disciplines).
+- status.py: get_db_stats (total + PASS/FLAG/QUARANTINE).
+- maxwell_mcp_server.py: get_fb_detail, get_fb_reliability, connectivity-test counts.
+
+The column-aware guard was the one blindspot the naive fix would have broken: `tests/test_retrieval_quarantine_
+contract.py` builds an in-memory `fbs` table WITHOUT `pipeline_run_id` and calls search_keyword/search_fts
+directly — the filter must gracefully skip. VERIFIED GREEN: `py_compile` clean; quarantine/hybrid-RRF/vector-dim
+tests pass; live `query.py --stats` total 14574→6591; retrieve keyword+FTS return only `rechunk-v4-20260929`
+rows (0 leaked). 5 files, 132 insertions, no schema mutation, no data mutation.
 
 ## BUG-690 (OPEN, 2026-10-09) — D-2767 C+B coarse-kappa blindspot + macro-config drift
 

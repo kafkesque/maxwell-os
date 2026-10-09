@@ -25,6 +25,35 @@ def _rid():
     return _rid.v  # type: ignore
 def get_run_id(): return _rid()
 
+# ── D-2881: serving-layer canonical run ────────────────────────────────
+# Single source of truth: config/anchor_family.yaml store_bridge.canonical_run
+# (ratified D-2881). The serving layer (retrieve/query/status/MCP) must NEVER
+# surface stale rows from non-canonical runs (t11/e2e/bug198_reinject) that share
+# the same fbs table. Env override MAXWELL_CANONICAL_RUN; fallback run default_id.
+def _canonical_run() -> str:
+    env = _os.environ.get("MAXWELL_CANONICAL_RUN")
+    if env:
+        return env
+    try:
+        _anchor = PROJECT_ROOT / "config" / "anchor_family.yaml"
+        with open(_anchor) as _af:
+            _val = (yaml.safe_load(_af) or {}).get("store_bridge", {}).get("canonical_run")
+        if _val:
+            return str(_val)
+    except Exception:
+        pass  # anchor file may be absent in minimal contexts; fall back below
+    return str(_CFG["run"]["default_id"])
+
+CANONICAL_RUN: str = _canonical_run()
+
+def canonical_run_clause(alias: str = "") -> str:
+    """D-2881: SQL fragment pinning a serving query to the canonical run.
+
+    Callers must append CANONICAL_RUN as the parameter for this clause.
+    `alias` prefixes the column for JOINed queries (e.g. ``f.pipeline_run_id``).
+    """
+    return f"{alias}.pipeline_run_id = ?" if alias else "pipeline_run_id = ?"
+
 # ── Stage dirs ─────────────────────────────────────────────────────────
 S0=_CFG["stages"]["stage0_convert"]; S1=_CFG["stages"]["stage1_chunk"]
 S13=_CFG["stages"]["stage1_3_prefilter"]; S15=_CFG["stages"]["stage1_5_embed"]

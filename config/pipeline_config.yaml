@@ -423,6 +423,18 @@ stage4:
   discipline_macro_kappa_floor: 0.73
   discipline_macro_enabled: false
   discipline_model: gpt-oss-20b-MXFP4-Q8
+  # D-2886 D3(b) (owner 2026-10-09, "do b"): the distinct-family decider A/B (D-2884(b)) CLOSED with NO arm
+  # certifiable — pplx 0.6738 / clef-4bit 0.5752 / clef-flash 0.5705 all < discipline_coarse_kappa_floor 0.73,
+  # and pplx + clef-4bit FAIL the D-2886 D1 emerging_recall floor 0.5 (0.0/0.0 on the 7 gold-emerging rows).
+  # No below-ceiling decider ships as a hard gate (D-2796). Routing authority STAYS gpt-oss-20b-MXFP4-Q8
+  # (D2249, discipline_model above). pplx = ADVISORY best-arm (highest coarse_kappa) — advisory-only with
+  # human arbitration on low-confidence rows, never a silent pass (D-2798). clef-flash = ADVISORY
+  # emerging-abstention signal for emerging-sensitive rows (only arm with a real emerging output space,
+  # recall 0.4286 = 3/7). The symmetric emerging gate (rate ceiling + recall floor) STANDS as the future
+  # certification gate.
+  decider_mode: advisory   # D-2798 — the decider never fails closed on its own; promotion is owner-gated
+  decider_advisory_best_arm: pplx-decider-v1.1-27b-4bit
+  decider_emerging_abstention_signal: clef-flash-4bit
   # D-2820 (2026-10-05): anchor re-derivation harness (scripts/rederive_anchor_axes_v6.py).
   # generator produces CANDIDATE labels (INPUT only); the owner adjudicates (D-2839 c2); a
   # second coder of a DIFFERENT model family cross-checks (R5 generator != verifier).

@@ -11,7 +11,7 @@
 
 ## 🔴 CURRENT OPEN / PENDING INDEX (machine-derived 2026-10-03 — the live face; history below)
 
-Register truth (do NOT restate counts elsewhere — BUG-588/D-2692): 1030 decisions · 458 bugs (164 open / 294 closed; highest OPEN = BUG-693). Forensic audit GREEN: 0 fatal rails — store-change re-baseline cascade (BUG-659..668) FIXED at root cause. BUG-687 (CLOSED, D-2882): nli_calibration pin on a gitignored derived artifact RETIRED (owner approved). BUG-688 (CLOSED, D-2883): the D-2618 retired golden is recorded, never gated — bridge --check green again (owner approved). BUG-689 (CLOSED, D-2830): the D-2767 A/B harness crashed on the v8 referee's owner-absence rows — `noise_drop` excluded (out of scope), `abstained` → the declared abstention token 'emerging'. D-2884 (RATIFIED, 2026-10-09): D-2767 C+B gate measured FAIL (3-way coarse 0.5621 < 0.73 floor); owner RULED (a) fine discipline → advisory-only, 3-way macro + domains operative, (b) distinct-family decider A/B in parallel; BUG-690 macro drift part 2 fixed (v5→v8, Business & Management added), part 1 (coarse-kappa harness output) FIXED (commit 8895cbf). D-2884(a) macro operative routing LANDED + R5 gemma-APPROVED (2026-10-09).
+Register truth (do NOT restate counts elsewhere — BUG-588/D-2692): 1031 decisions · 458 bugs (163 open / 295 closed; highest OPEN = BUG-693). Forensic audit GREEN: 0 fatal rails — store-change re-baseline cascade (BUG-659..668) FIXED at root cause. BUG-687 (CLOSED, D-2882): nli_calibration pin on a gitignored derived artifact RETIRED (owner approved). BUG-688 (CLOSED, D-2883): the D-2618 retired golden is recorded, never gated — bridge --check green again (owner approved). BUG-689 (CLOSED, D-2830): the D-2767 A/B harness crashed on the v8 referee's owner-absence rows — `noise_drop` excluded (out of scope), `abstained` → the declared abstention token 'emerging'. D-2884 (RATIFIED, 2026-10-09): D-2767 C+B gate measured FAIL (3-way coarse 0.5621 < 0.73 floor); owner RULED (a) fine discipline → advisory-only, 3-way macro + domains operative, (b) distinct-family decider A/B in parallel; BUG-690 macro drift part 2 fixed (v5→v8, Business & Management added), part 1 (coarse-kappa harness output) FIXED (commit 8895cbf). D-2884(a) macro operative routing LANDED + R5 gemma-APPROVED (2026-10-09).
 
 ## D-2881 (2026-10-08) — the 11 ambiguous anchor-bridge rows are RUN-COLLISIONS, resolved to the ratified canonical run
 
@@ -4097,3 +4097,13 @@ OWNER-GATE. alias-merge + cross-axis = match_to_canonical() (reproducible, zero 
 whitelist = OWNER-GATE only. gpt-oss stays S4 classifier-of-record for CLOSED-menu classification (D2249); for
 promotion it is ADVISORY-ONLY, cross-checked against the closed menu + owner rulings. No local LLM auto-mints a
 canonical slot.
+
+## D-2901 — D-2886 D3(b) OWNER-APPROVED: no decider certifiable; routing authority stays gpt-oss-20b (2026-10-09)
+
+Owner ruled "do b". The distinct-family decider A/B (D-2884(b)) CLOSED with NO arm certifiable: pplx 0.6738 /
+clef-4bit 0.5752 / clef-flash 0.5705 all < coarse_kappa 0.73, and pplx + clef-4bit FAIL the D-2886 D1 emerging
+recall floor 0.5 (0/7 gold both). D3(a) rejected (lowering the floor to ~0.67 would certify pplx at ZERO emerging
+recall). D3(b): gpt-oss-20b-MXFP4-Q8 REMAINS routing authority (D2249); pplx = ADVISORY best-arm (human arbitration
+on low-confidence rows); clef-flash = ADVISORY emerging-abstention signal. Symmetric gate (rate ceiling + recall
+floor) stands as the future certification gate. Config: stage4.discipline decider_mode=advisory +
+decider_advisory_best_arm + decider_emerging_abstention_signal. BUG-692 RESOLVED.

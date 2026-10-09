@@ -15506,3 +15506,26 @@ decisions:
   - scripts/menu_axis_hashes.py
   - config/version.yaml
   - config/alias_map.yaml
+- id: D-2901
+  state: RATIFIED
+  category: ANCHOR / TAXONOMY
+  title: D-2886 D3(b) OWNER-APPROVED — no decider certifiable; gpt-oss-20b routing authority, pplx advisory best-arm,
+    clef-flash emerging-abstention signal
+  decision: "D-2886 D3(b) ADOPTED (owner: \"do b\", 2026-10-09). The distinct-family decider A/B (D-2884(b))\nCLOSES\
+    \ with NO arm certifiable under the D-2767 C+B gate:\n  pplx-decider-v1.1-27b-4bit  coarse_kappa 0.6738 (FAIL\
+    \ < 0.73), emerging_recall 0.0 (FAIL < 0.5)\n  clef-4bit (mlx-community)   coarse_kappa 0.5752 (FAIL), emerging_recall\
+    \ 0.0 (FAIL)\n  clef-flash-4bit             coarse_kappa 0.5705 (FAIL), emerging_recall 0.4286 (3/7, FAIL <\
+    \ 0.5)\n  laya                        0.0242 (position-bias collapse)\nD3(a) (lower coarse_kappa floor to ~0.67)\
+    \ REJECTED — it would certify pplx which has ZERO emerging\nrecall, collapsing the 3-way+emerging contract.\
+    \ D3(b) ADOPTED: gpt-oss-20b-MXFP4-Q8 REMAINS the\nrouting authority (D2249); pplx is the ADVISORY best-arm\
+    \ (highest coarse_kappa) — advisory-only with\nhuman arbitration on low-confidence rows, never a silent pass\
+    \ (D-2798); clef-flash is the ADVISORY\nemerging-abstention signal for emerging-sensitive rows (only arm with\
+    \ a real emerging output space).\nThe D-2886 D1 symmetric emerging gate (rate ceiling 0.35 + recall floor 0.5)\
+    \ STANDS as the future\ncertification gate. No below-ceiling decider ships (D-2796). Config: stage4.discipline\
+    \ decider_mode=\nadvisory + decider_advisory_best_arm + decider_emerging_abstention_signal. BUG-692 RESOLVED\
+    \ (symmetric\ngate landed D1 + validated: two always-answer arms fail recall 0.5; owner ruling closes the\n\
+    false-pass risk).\n"
+  bugs:
+  - BUG-692
+  files:
+  - config/pipeline_config.yaml

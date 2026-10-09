@@ -10,7 +10,7 @@
 ## 🔴 MUST — open (strategic-consequential order)
 
 > **CURRENT OPEN INDEX (machine-derived 2026-10-07 — the live face; dated history follows below).**
-> Register: 1013 decisions · 452 bugs (163 open / 289 closed; highest OPEN = BUG-681). Forensic audit GREEN: 0 fatal rails — store-change re-baseline cascade (BUG-659..668) FIXED at root cause. The 11 ambiguous anchor-bridge rows resolved to the ratified canonical run (D-2881); depth conformance 183→194. BUG-687 (CLOSED, D-2882): nli_calibration pin on a gitignored derived artifact RETIRED (owner approved). BUG-688 (CLOSED, D-2883): the D-2618 retired golden is recorded, never gated (owner approved).
+> Register: 1013 decisions · 453 bugs (163 open / 290 closed; highest OPEN = BUG-681). Forensic audit GREEN: 0 fatal rails — store-change re-baseline cascade (BUG-659..668) FIXED at root cause. The 11 ambiguous anchor-bridge rows resolved to the ratified canonical run (D-2881); depth conformance 183→194. BUG-687 (CLOSED, D-2882): nli_calibration pin on a gitignored derived artifact RETIRED (owner approved). BUG-688 (CLOSED, D-2883): the D-2618 retired golden is recorded, never gated (owner approved). BUG-689 (CLOSED, D-2830): the D-2767 A/B harness crashed on the v8 referee's owner-absence rows — `noise_drop` excluded (out of scope), `abstained` → 'emerging'.
 >
 > **OWNER-GATED — ONE action remains (D-2727 gate):**
 > 1. **RATIFY-2 — full S4→S5→S6 rerun.** Launch under `caffeinate -dimsu`; `python3 pipeline/runner.py --dry-run` then full. Preflight PASS; authority propagated (D-2812) + consistency rail rc=0 → now UNBLOCKED.

@@ -413,6 +413,21 @@ def main() -> int:
     out_path = Path(args.out)
 
     examples = load_anchor(anchor_path)
+    # BUG-689 (D-2830/D-2878/D-2880): the v8 referee carries owner-ABSENCE rows the v6 referee
+    # never had. `noise_drop` rows (no discipline AND no domains) are OUT OF SCOPE — measuring the
+    # classifier on items the owner threw away is meaningless; `abstained` rows have no discipline
+    # home but are real in-scope items, whose faithful gold is the referee's OWN declared abstention
+    # token (abstention: emerging, D-2830). Both are read from the referee's own discipline_source,
+    # never guessed; without this a None/'' gold crashed cohen_kappa (NoneType < str).
+    _doc = json.loads(Path(anchor_path).read_text(encoding="utf-8"))
+    _drop = {r.get("item_id") for r in _doc.get("rows", []) if r.get("discipline_source") == "noise_drop"}
+    _abstain = str(_doc.get("abstention") or "emerging")
+    examples = [e for e in examples if e.get("item_id") not in _drop]
+    for e in examples:
+        if not e.get("discipline"):
+            e["discipline"] = _abstain
+    print(f"  referee scope: {len(_drop)} noise_drop row(s) EXCLUDED (out of scope), "
+          f"{sum(1 for e in examples if e['discipline'] == _abstain)} abstention row(s) -> '{_abstain}' (D-2830)")
     if args.limit is not None:
         examples = examples[: args.limit]
 

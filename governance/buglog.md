@@ -9475,6 +9475,31 @@ durable NLI source of truth remains TRACKED and unchanged: config/pipeline_confi
 derived-blob pin is withdrawn. VERIFIED: verify_recalibration_pins.py scan 6 pinned / 0 DRIFT / 0 OWNER-OWED
 (selftest 16/16); check_boundary_rehearsal whole-tree commit refused by the DECLARED RAIL 4 again (not RAIL 3).
 
+## BUG-689 (CLOSED, 2026-10-09 — v8 referee absence rows, D-2830/D-2878) — the D-2767 A/B harness CRASHED on the referee's owner-ABSENCE rows (`cohen_kappa` compared `None` to `str`), a path the v6 referee never exercised
+
+`scripts/d2767_ab_eval.py` built `gold = [e["discipline"] for e in examples]` straight from the referee. The CURRENT
+referee - `governance/discipline_anchor_rederived_v8_20261007.json` (menu_hash `8218d6db...`, matched to the live v8
+menu) - carries 15 owner-ABSENCE rows that the v6 referee (`..._v6_20261006d.json`: 0 such rows) never had: 8
+`discipline_source: noise_drop` (discipline `null` AND `domains: []`) and 7 `discipline_source: abstained` (no
+discipline home, but real in-scope domains). `gold` therefore held `None`, and
+`discipline_conformance_gate.cohen_kappa:142` -> `sorted(set(gold) | set(pred))` raised
+`TypeError: '<' not supported between instances of 'NoneType' and 'str'`.
+
+MEASURED (pre-fix): `scripts/d2767_ab_eval.py --anchor .../v8... --limit 12` -> preflight OK (41.98s) then `TypeError`.
+The prior v6 201-row run was affected by NOTHING because its referee carried zero absence rows - so this is a LATENT
+instrument defect the v8 taxonomy exposed, NOT a regression from D-2865.
+
+FIX (ONE home, the harness; both facts read from the referee's OWN `discipline_source`/`abstention`, never guessed):
+`noise_drop` rows are EXCLUDED (measuring the classifier on items the owner threw away is meaningless - they carry
+neither a discipline nor a domain), and an absent discipline is set to the referee's own declared abstention token
+(`doc["abstention"] == "emerging"`, D-2830 - abstention is an ABSENCE in the ruler and the single TOKEN at
+classification time). Effective scope N = 194 (187 `owner_finalized` + 7 `abstained`).
+
+VERIFIED: the same harness runs to completion - smoke `--limit 6` -> kappa computed (0.1176 on 6 rows, advisory;
+determinism 2/2 byte-identical), and the full 194-row flag-ON measurement is emitted to
+`governance/d2767_ab_v8_20261009.json`. The prior v6-referee A/B remains a VALID historical measurement of the v6
+menu; it is superseded (not contradicted) by the v8-referee run.
+
 ## BUG-688 (CLOSED, 2026-10-08 — golden gated-out, D-2883) — the anchor↔corpus bridge DRIFT-gated on the D-2618 RETIRED golden, so `--check` exited 1 on 58 expected unjoined rows
 
 The bridge's golden-side verdict (BUG-551) treated every unjoined row of `archive/golden_retired_D2618/stage4_golden_mined.yaml`

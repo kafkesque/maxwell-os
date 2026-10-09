@@ -242,6 +242,7 @@ constraints:
   generator_neq_verifier: true
   pipeline_temp: 0.0
   max_resident_models: 4
+  no_llm_canonical_promotion: true   # D-2898: promotion = deterministic match_to_canonical + owner-gate; gpt-oss-20b advisory-only
 cloud_roles:
 - cloud_fallback
 _source: Merged from model_assignments.yaml + models.yaml + model_registry.yaml

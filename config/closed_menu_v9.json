@@ -1,0 +1,591 @@
+{
+  "abstention": "emerging",
+  "content_types": [
+    {
+      "description": "Conceptual knowledge — why/when something works. The Foundation Block. D275b/D283 (2026-09-20): a PRINCIPLE is a single self-contained epistemic claim you KNOW/APPLY (a transferable filter — ANY scope: universal/cross-domain/domain/specialized) that the text states as SETTLED knowledge — not as an open question or an unverified correlation. Discriminated from process_template by procedural INTENT + a done-condition (NOT step count: a 3-step causal chain and a 12-category taxonomy both have '>=2 steps' yet are principles), and from growth_edge by epistemic STATUS (established vs speculative) — NOT by scope. D282 (2026-09-20): scope is the SEPARATE depth axis, never the role discriminator — a 1-domain or specialized principle is still a principle.",
+      "value": "principle"
+    },
+    {
+      "description": "Repeatable how-to method with steps. Layer-2 product primitive (FB→PT→PI→Recipe). D275b (2026-09-20): a process_template is a procedure you EXECUTE — trigger + ordered steps + a done-condition/gate (procedural INTENT, not step count). D2587's 'SEQUENCE of >=2 steps' is necessary but NOT sufficient. A single step/instruction is NOT a template.",
+      "value": "process_template"
+    },
+    {
+      "description": "Concrete case study of a PT actually executed — the proof it works.",
+      "value": "process_instance"
+    },
+    {
+      "description": "Tool/software-specific command or feature. Knowledge object (NOT a live callable binding).",
+      "value": "tool_instruction"
+    },
+    {
+      "description": "Speculative/unresolved insight — idea inbox upstream of verified knowledge. POSITIVE ENTRY CRITERION (BUG-230): MUST articulate an OPEN TENSION or an UNVERIFIED CORRELATION — NOT a dump for failed depth-tests, and NOT a bare 'utilizable fact' (a bare fact/trend with no articulated tension → noise_drop). D-2747 (2026-10-02): also admits a CONTESTED/UNFALSIFIABLE claim — a conspiracy theory or disputed thesis whose sources contradict. Such records carry `contested: true` and are RETAINED (never noise_drop / never quarantine) by the retention guard in stage4_merge.",
+      "value": "growth_edge"
+    },
+    {
+      "description": "descriptive/historical summary or fact — no prescriptive filter, no template, no named method-execution, no transferable value → DROP",
+      "value": "noise_drop"
+    },
+    {
+      "description": "carries SOME value but no clean role (ambiguous) → HOLD for later identification (does it carry steps? a method? an applicable mechanism? a transferable principle?)",
+      "value": "quarantine"
+    },
+    {
+      "description": "first-class abstention (R1/D-279): does not fit any closed-menu value",
+      "value": "emerging"
+    }
+  ],
+  "decision": "D-279",
+  "disciplines": [
+    {
+      "definition": "The philosophical study of beauty, taste, and the nature of artistic experience.",
+      "group": "Design Cognition",
+      "value": "aesthetics"
+    },
+    {
+      "definition": "The study of human societies, cultures, and their development across time and space.",
+      "group": "Heterodox",
+      "value": "anthropology"
+    },
+    {
+      "definition": "The broad field of creating systems capable of performing tasks that typically require human intelligence.",
+      "group": "AI & Computing",
+      "value": "artificial intelligence"
+    },
+    {
+      "definition": "The descriptive study of how psychological factors and cognitive biases cause systematic deviations from the rational or standard model in economic decision-making, market behavior and behavior-change interventions - where heuristics, framing, affect, social norms and peer influence change what people do (prices, incentives, markets, choice of behavior). It describes the bias; it does not exploit it to design persuasion.",
+      "group": "Behavioral & Cognitive",
+      "value": "behavioral economics"
+    },
+    {
+      "definition": "The academic study of how organizations are structured, coordinated, and governed — spanning strategy, operations, human-resource management, and organizational design — to achieve objectives under resource constraints. A management lens applied across subject-matter domains (business operations, business development, project management), not the subject matter itself.",
+      "group": "Business & Management",
+      "value": "business administration"
+    },
+    {
+      "definition": "The interdisciplinary study of how the mind works — perception, memory, attention, reasoning, language, and learning. The default home for any claim about cognition, thinking, or a cognitive process.",
+      "group": "Behavioral & Cognitive",
+      "value": "cognitive science"
+    },
+    {
+      "definition": "The principles governing color mixing, harmony, contrast, and their psychological impact on design.",
+      "group": "Form & Structure",
+      "value": "color theory"
+    },
+    {
+      "definition": "The study of how information is transmitted, received, and interpreted across various channels.",
+      "group": "Perception & Signal",
+      "value": "communication theory"
+    },
+    {
+      "definition": "The study of dynamic systems composed of interacting agents that adapt and evolve over time.",
+      "group": "Systems & Method",
+      "value": "complex adaptive systems"
+    },
+    {
+      "definition": "The mathematical study of algorithms for solving problems involving geometric objects and structures.",
+      "group": "Computational Craft",
+      "value": "computational geometry"
+    },
+    {
+      "definition": "The use of computer simulations to model and analyze physical systems and biological processes.",
+      "group": "Computational Craft",
+      "value": "computational physics & simulation"
+    },
+    {
+      "definition": "The technology and techniques for generating and manipulating visual images using computers.",
+      "group": "Computational Craft",
+      "value": "computer graphics"
+    },
+    {
+      "definition": "The use of programming languages and tools to create artistic and interactive digital experiences.",
+      "group": "Computational Craft",
+      "value": "creative coding"
+    },
+    {
+      "definition": "The workflow, practices, and methodologies involved in generating and executing creative work.",
+      "group": "Design Cognition",
+      "value": "creative process"
+    },
+    {
+      "definition": "The craft and study of composing original narrative, prose, and poetry across forms and media.",
+      "group": "Heterodox",
+      "value": "creative writing"
+    },
+    {
+      "definition": "The historical and theoretical analysis of design practices, aesthetics, and their cultural significance.",
+      "group": "Perception & Signal",
+      "value": "cultural design"
+    },
+    {
+      "definition": "The critical analysis of cultural practices, texts, and power relations in contemporary society — how meaning is produced, circulated, and contested within a culture, with attention to ideology, discourse, and social power.",
+      "group": "Heterodox",
+      "value": "cultural studies"
+    },
+    {
+      "definition": "The cognitive and strategic process of selecting a course of action from alternatives — how options are framed, evaluated, and committed to under uncertainty, including decision rules, criteria, and (bounded) rationality.",
+      "group": "Behavioral & Cognitive",
+      "value": "decision making"
+    },
+    {
+      "definition": "The exploitation of cognitive science's known loopholes — biases, heuristics, and predictable errors of human thinking — to externally affect, persuade, or manipulate a user's or consumer's decision-making, and designing for those biases. It is applied persuasion psychology, not the study of cognition itself.",
+      "group": "Design Cognition",
+      "value": "design psychology"
+    },
+    {
+      "definition": "A human-centered approach to innovation — an iterative process (empathise → define → ideate → prototype → test) that integrates user needs, technology feasibility, and business viability, whose output is a designed solution, not an explanation of the mind.",
+      "group": "Design Cognition",
+      "value": "design thinking"
+    },
+    {
+      "definition": "The scientific study of the relationships between organisms and their physical and biological environments.",
+      "group": "Systems & Method",
+      "value": "ecology"
+    },
+    {
+      "definition": "The social science that studies the production, distribution, and consumption of goods and services.",
+      "group": "Operational & Strategy",
+      "value": "economics"
+    },
+    {
+      "definition": "The application of scientific principles to design, build, and maintain structures and machines.",
+      "group": "Systems & Method",
+      "value": "engineering"
+    },
+    {
+      "definition": "The academic study of how new ventures are identified, created, and scaled — spanning opportunity recognition, resource mobilization, and entrepreneurial finance. The scholarly lens on the venture-creation process, distinct from the venture-building subject matter of the domain \"entrepreneurship\".",
+      "group": "Business & Management",
+      "value": "entrepreneurship studies"
+    },
+    {
+      "definition": "The study of the origin and diversification of life through genetic and natural selection processes.",
+      "group": "Systems & Method",
+      "value": "evolutionary biology"
+    },
+    {
+      "definition": "The management of money, investments, and financial assets for individuals and organizations.",
+      "group": "Operational & Strategy",
+      "value": "finance"
+    },
+    {
+      "definition": "The process of creating rules, mechanics, and interactive experiences for video games.",
+      "group": "Computational Craft",
+      "value": "game design"
+    },
+    {
+      "definition": "Artificial intelligence systems capable of creating new content, such as text, images, or code.",
+      "group": "AI & Computing",
+      "value": "generative ai"
+    },
+    {
+      "definition": "The use of algorithms and computational processes to generate design solutions and artistic forms.",
+      "group": "Computational Craft",
+      "value": "generative design"
+    },
+    {
+      "definition": "The practice and science of maintaining, restoring, and promoting human physical and mental well-being.",
+      "group": "Heterodox",
+      "value": "health & medicine"
+    },
+    {
+      "definition": "The design and evaluation of user interfaces and systems for effective human-computer interaction.",
+      "group": "Design Cognition",
+      "value": "human-computer interaction"
+    },
+    {
+      "definition": "The study of the collection, organization, and management of information and data systems.",
+      "group": "Systems & Method",
+      "value": "information science"
+    },
+    {
+      "definition": "The practice of protecting information systems from unauthorized access, use, or disclosure.",
+      "group": "Heterodox",
+      "value": "information security"
+    },
+    {
+      "definition": "Academic approaches that integrate methods and knowledge from multiple distinct disciplines.",
+      "group": "Heterodox",
+      "value": "interdisciplinary studies"
+    },
+    {
+      "definition": "The system of rules created by society or government to regulate behavior and resolve disputes.",
+      "group": "Heterodox",
+      "value": "law"
+    },
+    {
+      "definition": "The scientific study of language structure, meaning, use, and its relationship to cognition.",
+      "group": "Behavioral & Cognitive",
+      "value": "linguistics"
+    },
+    {
+      "definition": "The critical frameworks and methods used to analyze and interpret literary texts.",
+      "group": "Perception & Signal",
+      "value": "literary theory"
+    },
+    {
+      "definition": "The field of artificial intelligence focused on algorithms that learn patterns from data.",
+      "group": "AI & Computing",
+      "value": "machine learning"
+    },
+    {
+      "definition": "The academic study of how value is created, communicated, and exchanged with customers — spanning consumer behavior, market segmentation, positioning, and marketing research. The explanatory lens on buyer behavior and market exchange, distinct from the professional practice domain \"marketing & communications\".",
+      "group": "Business & Management",
+      "value": "marketing"
+    },
+    {
+      "definition": "The academic analysis of media forms, technologies, and their social and cultural impacts.",
+      "group": "Perception & Signal",
+      "value": "media studies"
+    },
+    {
+      "definition": "The design and animation of visual elements involving movement, timing, and temporal sequencing.",
+      "group": "Form & Structure",
+      "value": "motion & time"
+    },
+    {
+      "definition": "The study of museums and heritage institutions — curation, collection management, interpretation, and public education.",
+      "group": "Heterodox",
+      "value": "museum studies"
+    },
+    {
+      "definition": "The scientific study of the nervous system, including the brain and neural circuits.",
+      "group": "Behavioral & Cognitive",
+      "value": "neuroscience"
+    },
+    {
+      "definition": "The application of advanced analytical methods to decision-making and system optimization.",
+      "group": "Systems & Method",
+      "value": "operations research"
+    },
+    {
+      "definition": "The study of structures, processes, and dynamics within formal organizations and institutions — how they are designed, how they coordinate, and how they change.",
+      "group": "Behavioral & Cognitive",
+      "value": "organizational theory"
+    },
+    {
+      "definition": "Artistic disciplines involving live performance, including music, theater, and dance.",
+      "group": "Heterodox",
+      "value": "performing arts"
+    },
+    {
+      "definition": "The study of fundamental questions concerning existence, knowledge, values, reason, and mind.",
+      "group": "Heterodox",
+      "value": "philosophy"
+    },
+    {
+      "definition": "The study of the relationship between political institutions, economic systems, and power structures.",
+      "group": "Heterodox",
+      "value": "political economy"
+    },
+    {
+      "definition": "The study of data protection, monitoring practices, and the ethics of information observation.",
+      "group": "Heterodox",
+      "value": "privacy & surveillance"
+    },
+    {
+      "definition": "The empirical study of mind and behavior in individuals and groups — emotion, personality, development, social behavior, and mental health — beyond the computational modelling of cognition. Broader and more behavioral than cognitive science, which models mental processes as computation.",
+      "group": "Behavioral & Cognitive",
+      "value": "psychology"
+    },
+    {
+      "definition": "The systematic frameworks and techniques used to conduct valid and reliable academic research.",
+      "group": "Systems & Method",
+      "value": "research methodology"
+    },
+    {
+      "definition": "The identification, assessment, prioritization, and mitigation of risks to minimize negative impact on operations, projects, or decisions — the practice of quantifying exposure and choosing responses (avoid / reduce / transfer / accept).",
+      "group": "Operational & Strategy",
+      "value": "risk management"
+    },
+    {
+      "definition": "The engineering and science of designing, building, and operating autonomous or controlled machines.",
+      "group": "AI & Computing",
+      "value": "robotics"
+    },
+    {
+      "definition": "The general study of signs, symbols, and their interpretation across biological and cognitive systems.",
+      "group": "Perception & Signal",
+      "value": "semiotics"
+    },
+    {
+      "definition": "The study of social ties and structures using graph theory and network science methods.",
+      "group": "Systems & Method",
+      "value": "social network analysis"
+    },
+    {
+      "definition": "The scientific study of society, social institutions, and the patterns of human interaction.",
+      "group": "Heterodox",
+      "value": "sociology"
+    },
+    {
+      "definition": "The systematic application of engineering principles to the design and development of software.",
+      "group": "AI & Computing",
+      "value": "software engineering"
+    },
+    {
+      "definition": "The high-level planning and long-term goal setting involved in business and organizational management.",
+      "group": "Operational & Strategy",
+      "value": "strategic thinking"
+    },
+    {
+      "definition": "The interdisciplinary field focused on designing, integrating, and managing complex system architectures.",
+      "group": "Systems & Method",
+      "value": "systems engineering"
+    },
+    {
+      "definition": "An approach to understanding complex systems by analyzing their interrelationships and holistic behavior.",
+      "group": "Systems & Method",
+      "value": "systems thinking"
+    },
+    {
+      "definition": "The branch of physics focused on mathematical models and abstract theories of natural phenomena.",
+      "group": "Systems & Method",
+      "value": "theoretical physics"
+    },
+    {
+      "definition": "The art and technique of arranging typefaces, spacing, and layout for effective visual communication.",
+      "group": "Form & Structure",
+      "value": "typography"
+    },
+    {
+      "definition": "The biological and psychological process of interpreting visual sensory information and color stimuli.",
+      "group": "Perception & Signal",
+      "value": "visual perception"
+    },
+    {
+      "definition": "Used when no canonical domain or discipline fits the principle ontologically and pragmatically. Preserves the raw S3A convergence label as s3_original_domain for future taxonomy expansion when enough principles accumulate under a label.",
+      "group": "",
+      "value": "emerging"
+    }
+  ],
+  "domains": [
+    {
+      "definition": "The design and implementation of autonomous artificial intelligence systems and agents.",
+      "group": "AI & Computing",
+      "value": "ai & agents"
+    },
+    {
+      "definition": "The practice and theory of visual arts, performance, and cultural expression.",
+      "group": "Visual Practice",
+      "value": "arts & culture"
+    },
+    {
+      "definition": "The development of visual symbols, logos, and consistent aesthetic systems for corporate recognition.",
+      "group": "Visual Practice",
+      "value": "brand identity"
+    },
+    {
+      "definition": "Strategic activities focused on market expansion, sales psychology, and revenue generation.",
+      "group": "Business & Strategy",
+      "value": "business development"
+    },
+    {
+      "definition": "The management of internal processes, accounting, and administrative functions within organizations.",
+      "group": "Business & Strategy",
+      "value": "business operations"
+    },
+    {
+      "definition": "The use of specific programming frameworks and tools for creative and computational design.",
+      "group": "Computational Art & Code",
+      "value": "code & computation"
+    },
+    {
+      "definition": "The creation of artistic works using algorithms, generative systems, and code.",
+      "group": "Computational Art & Code",
+      "value": "computational art"
+    },
+    {
+      "definition": "The application of computational models to simulate physical, biological, and social systems.",
+      "group": "Computational Art & Code",
+      "value": "computational science & physics"
+    },
+    {
+      "definition": "The intersection of artistic practice and programming for interactive digital experiences.",
+      "group": "Digital & Interactive",
+      "value": "creative technology"
+    },
+    {
+      "definition": "The graphical representation of quantitative data to facilitate understanding and analysis.",
+      "group": "Digital & Interactive",
+      "value": "data visualization"
+    },
+    {
+      "definition": "The management and strategic direction of design practices and organizations.",
+      "group": "Business & Strategy",
+      "value": "design strategy"
+    },
+    {
+      "definition": "The creation of reusable component libraries and design language standards.",
+      "group": "Digital & Interactive",
+      "value": "design systems"
+    },
+    {
+      "definition": "The design and development of user interfaces and experiences for software applications.",
+      "group": "Digital & Interactive",
+      "value": "digital product"
+    },
+    {
+      "definition": "The design and copywriting of publications, advertisements, and promotional visual materials.",
+      "group": "Visual Practice",
+      "value": "editorial & advertising"
+    },
+    {
+      "definition": "The design of instructional strategies, academic policy, and learning environments.",
+      "group": "Systems, Semiotics & Knowledge",
+      "value": "education"
+    },
+    {
+      "definition": "The design of mechanical, aerospace, and distributed cloud computing systems.",
+      "group": "AI & Computing",
+      "value": "engineering & infrastructure"
+    },
+    {
+      "definition": "The application of software architecture, programming languages, and development methodologies.",
+      "group": "AI & Computing",
+      "value": "engineering practice"
+    },
+    {
+      "definition": "The process of creating, managing, and scaling new business ventures and startups.",
+      "group": "Business & Strategy",
+      "value": "entrepreneurship"
+    },
+    {
+      "definition": "The design of physical spaces, interiors, and wayfinding systems for human interaction.",
+      "group": "Visual Practice",
+      "value": "environmental design"
+    },
+    {
+      "definition": "The management of assets, portfolio theory, and financial planning strategies.",
+      "group": "Business & Strategy",
+      "value": "finance & investment"
+    },
+    {
+      "definition": "The practice of visual communication through layout, typography, and print media composition.",
+      "group": "Visual Practice",
+      "value": "graphic design"
+    },
+    {
+      "definition": "The promotion of physical, mental, and public health through healthcare systems.",
+      "group": "Systems, Semiotics & Knowledge",
+      "value": "health & wellness"
+    },
+    {
+      "definition": "The creation of original visual artwork for narrative, decorative, or explanatory purposes.",
+      "group": "Illustration & Craft",
+      "value": "illustration"
+    },
+    {
+      "definition": "The design of manufactured physical products for mass production and usability.",
+      "group": "Illustration & Craft",
+      "value": "industrial design"
+    },
+    {
+      "definition": "The structural organization of information for websites and digital interfaces.",
+      "group": "Digital & Interactive",
+      "value": "information architecture"
+    },
+    {
+      "definition": "The practice of guiding teams, strategic direction, and organizational dynamics.",
+      "group": "Business & Strategy",
+      "value": "leadership"
+    },
+    {
+      "definition": "The study of law, public administration, and regulatory policy frameworks.",
+      "group": "Business & Strategy",
+      "value": "legal & public policy"
+    },
+    {
+      "definition": "Strategic promotion, public relations, and digital marketing for brand engagement.",
+      "group": "Business & Strategy",
+      "value": "marketing & communications"
+    },
+    {
+      "definition": "The development of video games, media technology, and publishing platforms.",
+      "group": "Digital & Interactive",
+      "value": "media & entertainment"
+    },
+    {
+      "definition": "The creation of animated visual content, motion graphics, and time-based digital media.",
+      "group": "Visual Practice",
+      "value": "motion design"
+    },
+    {
+      "definition": "The study of human behavior, culture, and psychology within workplace structures.",
+      "group": "Business & Strategy",
+      "value": "organizational behavior"
+    },
+    {
+      "definition": "The design of physical containers and structural materials for product protection and presentation.",
+      "group": "Illustration & Craft",
+      "value": "packaging"
+    },
+    {
+      "definition": "Individual techniques for personal development, effectiveness, and time management.",
+      "group": "Business & Strategy",
+      "value": "personal productivity"
+    },
+    {
+      "definition": "The holistic design of physical and digital products from concept to market.",
+      "group": "Digital & Interactive",
+      "value": "product design"
+    },
+    {
+      "definition": "The planning, execution, and oversight of projects and product development lifecycles.",
+      "group": "Business & Strategy",
+      "value": "project management"
+    },
+    {
+      "definition": "The professional activity of conducting, publishing, and applying scholarly and scientific research.",
+      "group": "Systems, Semiotics & Knowledge",
+      "value": "research practice"
+    },
+    {
+      "definition": "The study of signs, symbols, and visual rhetoric in human communication.",
+      "group": "Systems, Semiotics & Knowledge",
+      "value": "semiotics & communication"
+    },
+    {
+      "definition": "The theoretical analysis and design of complex interconnected systems and structures.",
+      "group": "Systems, Semiotics & Knowledge",
+      "value": "systems & frameworks"
+    },
+    {
+      "definition": "The strategic development of cities, towns, and regional land use infrastructure.",
+      "group": "Business & Strategy",
+      "value": "urban planning"
+    },
+    {
+      "definition": "The study of user behavior, research, and interaction design for digital products.",
+      "group": "Digital & Interactive",
+      "value": "user experience"
+    },
+    {
+      "definition": "The design and architecture of responsive websites and user interface components.",
+      "group": "Digital & Interactive",
+      "value": "web & ui"
+    },
+    {
+      "definition": "Used when no canonical domain or discipline fits the principle ontologically and pragmatically. Preserves the raw S3A convergence label as s3_original_domain for future taxonomy expansion when enough principles accumulate under a label.",
+      "group": "",
+      "value": "emerging"
+    }
+  ],
+  "extraction_types": [
+    {
+      "description": "X→Y because Z — a verified cause→effect chain.",
+      "value": "causal_mechanism"
+    },
+    {
+      "description": "A taxonomy/classification describing WHAT categories exist and how they relate.",
+      "value": "descriptive_model"
+    },
+    {
+      "description": "Strong correlation WITHOUT a proven causal chain — speculative.",
+      "value": "empirical_pattern"
+    },
+    {
+      "description": "Practical rule of thumb with clear steps, or a widely-applicable heuristic.",
+      "value": "normative_heuristic"
+    }
+  ],
+  "schema_version": "1.0"
+}

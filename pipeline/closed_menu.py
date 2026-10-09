@@ -27,6 +27,24 @@ _ROOT = Path(__file__).resolve().parent.parent
 _TAXONOMY_PATH = _ROOT / "config" / "taxonomy_v5.yaml"
 _CONTENT_TYPES_PATH = _ROOT / "config" / "content_types.yaml"
 
+
+def live_menu_path() -> Path:
+    """Return the live frozen closed-menu path from the SINGLE config pointer.
+
+    BUG-694 future-tax fix (C12/C27): the menu filename is owned by
+    ``config/version.yaml#closed_menu`` — every consumer reads this one key instead
+    of hardcoding ``closed_menu_v<N>.json``, so a menu revision can no longer
+    silently leave a stale consumer behind.
+    """
+    version = _load_yaml(_ROOT / "config" / "version.yaml")
+    rel = version.get("closed_menu")
+    if not rel:
+        raise RuntimeError(
+            "config/version.yaml is missing the 'closed_menu' pointer "
+            "(BUG-694 single-source fix)"
+        )
+    return _ROOT / rel
+
 # Content-type roles (the 5 closed roles, D2323) + 2 dispositions (D2591).
 _CONTENT_TYPE_ROLES = (
     "principle",

@@ -50,6 +50,10 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(REPO))
+
+from pipeline.closed_menu import live_menu_path  # noqa: E402
+
 CONFIG = REPO / "config" / "anchor_axis_authority.yaml"
 DEPTH_MENU = REPO / "config" / "depth_classes.yaml"
 
@@ -208,7 +212,7 @@ def run(apply: bool) -> int:
     depth_menu = _load_yaml(REPO / config.get("depth_menu", "config/depth_classes.yaml"))
     menus = {"depth": {_collapse(c.get("label")) for c in depth_menu.get("classes", [])}, "discipline": set()}
     menus["discipline"] = {_collapse(d.get("value")) for d in json.loads(
-        (REPO / "config" / "closed_menu_v8.json").read_text(encoding="utf-8"))["disciplines"]}
+        live_menu_path().read_text(encoding="utf-8"))["disciplines"]}
     order = config.get("propagation", {}).get("order", [])
     if not order:
         raise ValueError("BUG-628/C16: config declares no propagation.order")

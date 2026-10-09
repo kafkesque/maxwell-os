@@ -19,9 +19,9 @@ Two competing Condition arms are measured:
 SOURCE OF TRUTH (C12 — no hardcoded ontology)
 ---------------------------------------------
 - Macro scheme + buckets:  config/discipline_macro_groups.yaml (3-way primary)
-- Discipline -> group:     config/closed_menu_v8.json (disciplines[].group)
+- Discipline -> group:     live closed-menu (config/version.yaml#closed_menu) (disciplines[].group)
 - Model + anchor + floor:  config/pipeline_config.yaml stage4.discipline_*
-- Bucket -> members:       derived from closed_menu_v8.json via the macro group map
+- Bucket -> members:       derived from the live closed-menu via the macro group map
 
 MODES (mirrors discipline_conformance_gate.py)
 ----------------------------------------------
@@ -58,7 +58,6 @@ from pipeline.discipline_macro import load_macro, to_macro  # noqa: E402
 
 # C20: named constants (no magic numbers).
 DEFAULT_ANCHOR = "governance/discipline_anchor_rederived_v8_20261007.json"
-DEFAULT_MENU = "config/closed_menu_v8.json"
 DEFAULT_MACRO_GROUPS = "config/discipline_macro_groups.yaml"
 # BUG-622/D-2797 (2026-10-03): gpt-oss-20b-MXFP4-Q8 is a HARMONY reasoning model.
 # Its chain-of-thought is billed against max_tokens (reasoning + content share the

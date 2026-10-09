@@ -9866,3 +9866,31 @@ Language Implementation Process EXCLUDED from the sample (owner not convinced; v
 load-bearing reference; R183 stays discipline='emerging' + domain='urban planning' in DB). 6 gold rows final.
 
 SEVERITY: HIGH (classification ontology / governance). SOURCE: emerging-bucket decomposition of the canonical run.
+## BUG-694 (RESOLVED, 2026-10-09) — apply_taxonomy_v9.py missed `discipline_macro.py` + 4 live menu consumers (still `closed_menu_v8.json`); 28 v9-promoted rows got macro='emerging' instead of 'Human & Design'
+
+SCOPE. The v9 config mutation (D-2897 apply) repointed ONLY `menu_axis_hashes.py` and `menu_axis_groups.yaml`
+to `closed_menu_v9.json`. It did NOT repoint the OTHER live consumers that hardcode `config/closed_menu_v8.json`:
+  * pipeline/discipline_macro.py (the ONE home for fine->macro collapse — stage6_commit + reclass path)
+  * scripts/discipline_macro_classify.py, scripts/bug693_reclaim.py, scripts/d2884b_decider_ab.py,
+    scripts/apply_anchor_axis_authority.py
+
+ROOT CAUSE = REPOINT GAP, not a decider defect. `discipline_macro.macro_for('creative writing')` looked up the
+v8 menu, found no such discipline (it is NEW in v9), and fell through the empty-group fail-closed path to
+'emerging'. Same for 'museum studies'. So `reclass_v9.py` stamped 28 canonical rows with
+`discipline_macro='emerging'` instead of 'Human & Design' (Heterodox -> Human & Design, D-2897c).
+
+FIX (applied, deterministic, crash-safe):
+  1. Repointed the 5 files `closed_menu_v8.json` -> `closed_menu_v9.json` via tempfile->fsync->os.replace (C6).
+  2. Corrected the 28 rows (creative writing 15 + museum studies 13) discipline_macro -> 'Human & Design'
+     (DB backup + single txn, C13).
+  3. VERIFIED: macro_for('creative writing')/('museum studies') == 'Human & Design'; NO surviving discipline
+     changed group v8->v9 (the IR->IS merge is cross-macro but information science group is UNCHANGED), so the
+     6494 still-stale rows' macro values remain correct.
+
+SEVERITY: HIGH (classification ontology — wrong routing macro on 28 canonical rows, silently). SOURCE: forensic
+audit of the v9 apply (this session).
+
+FUTURE TAX (C27/C12). The frozen-snapshot repoint is a recurring tax: every menu revision must remember to
+repoint N consumers, and a missed one fails SILENTLY (this bug). RECOMMEND: a single config pointer
+(config/version.yaml `closed_menu` or equivalent) that every consumer reads, OR derive the group->bucket map
+directly from `render_closed_menu()` (the same live source as `menu_hash()`), so the map can never go stale.

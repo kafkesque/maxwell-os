@@ -1,5 +1,5 @@
-version: v8
-classification_version: v8
+version: v9
+classification_version: v9
 groups:
   domain:
   - Visual Practice
@@ -543,7 +543,6 @@ domains:
   - art
   - Visual Arts
   - art criticism
-  - museum studies
   - cultural heritage
   definition: The practice and theory of visual arts, performance, and cultural expression.
   exclude:
@@ -718,21 +717,6 @@ disciplines:
   - color theory
   - neuroscience
   id: disc-001
-- canonical: visual semiotics
-  group: Perception & Signal
-  raw:
-  - Visual Semiotics
-  - visual rhetoric
-  - Visual Communication
-  - Visual Communication Design
-  - Multimodal Metaphor
-  - Multimodal Discourse Analysis
-  definition: The study of how visual signs, symbols, and rhetoric communicate meaning within cultural contexts.
-  exclude:
-  - visual perception
-  - typography
-  - media studies
-  id: disc-002
 - canonical: cultural design
   group: Perception & Signal
   raw:
@@ -759,11 +743,19 @@ disciplines:
   - media semiotics
   - history of semiotics
   - classical semiotic theory
+  - Visual Semiotics
+  - visual rhetoric
+  - Visual Communication
+  - Visual Communication Design
+  - Multimodal Metaphor
+  - Multimodal Discourse Analysis
   definition: The general study of signs, symbols, and their interpretation across biological and cognitive systems.
   exclude:
-  - visual semiotics
   - linguistics
   - philosophy
+  - visual perception
+  - typography
+  - media studies
   id: disc-004
 - canonical: typography
   group: Form & Structure
@@ -1367,11 +1359,13 @@ disciplines:
   - bioinformatics
   - information studies
   - library science
+  - information retrieval
   definition: The study of the collection, organization, and management of information and data systems.
   exclude:
-  - information retrieval
   - data management
   - computer networking
+  - machine learning
+  - database systems
   id: disc-038
 - canonical: finance
   group: Operational & Strategy
@@ -1685,27 +1679,6 @@ disciplines:
   - cognitive science
   - strategic thinking
   id: disc-059
-- canonical: information retrieval
-  group: AI & Computing
-  raw:
-  - information retrieval
-  definition: The field of finding unstructured information, typically from documents, in response to queries.
-  exclude:
-  - information science
-  - machine learning
-  - database systems
-  id: disc-060
-- canonical: computational theory
-  group: AI & Computing
-  raw:
-  - computational theory
-  - theory of computation
-  definition: The study of the theoretical foundations of computation, including complexity and computability.
-  exclude:
-  - software engineering
-  - artificial intelligence
-  - computer networking
-  id: disc-061
 - canonical: business administration
   group: Business & Management
   raw:
@@ -1753,6 +1726,21 @@ disciplines:
   - economics
   - finance
   id: disc-064
+- id: disc-065
+  canonical: creative writing
+  group: Heterodox
+  raw:
+  - creative writing
+  - creative writing studies
+  definition: The craft and study of composing original narrative, prose, and poetry across forms and media.
+  exclude: []
+- id: disc-066
+  canonical: museum studies
+  group: Heterodox
+  raw:
+  - museum studies
+  definition: The study of museums and heritage institutions — curation, collection management, interpretation, and public education.
+  exclude: []
 discipline_groups:
   design & visual arts:
   - aesthetics
@@ -1769,7 +1757,6 @@ discipline_groups:
   - performing arts
   - typography
   - visual perception
-  - visual semiotics
   human & behavioral science:
   - anthropology
   - behavioral economics
@@ -1778,11 +1765,11 @@ discipline_groups:
   - neuroscience
   - psychology
   - sociology
+  - museum studies
   computing, ai & information:
   - artificial intelligence
   - generative ai
   - human-computer interaction
-  - information retrieval
   - information science
   - information security
   - machine learning
@@ -1804,6 +1791,7 @@ discipline_groups:
   - literary theory
   - media studies
   - semiotics
+  - creative writing
   systems & operations:
   - complex adaptive systems
   - operations research
@@ -1817,7 +1805,6 @@ discipline_groups:
   engineering, math & physics:
   - computational geometry
   - computational physics & simulation
-  - computational theory
   - engineering
   - robotics
   - theoretical physics
@@ -1835,6 +1822,9 @@ meta:
   - computer networking
   - science & research
   - social sciences
+  - visual semiotics
+  - information retrieval
+  - computational theory
   catch_all_domain: emerging
   catch_all_discipline: emerging
   catch_all_description: 'Used when no canonical domain or discipline fits the principle ontologically and pragmatically. Preserves the raw S3A convergence label as s3_original_domain for future taxonomy expansion when enough principles accumulate under a label.

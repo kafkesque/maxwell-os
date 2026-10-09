@@ -11,7 +11,7 @@
 
 ## 🔴 CURRENT OPEN / PENDING INDEX (machine-derived 2026-10-03 — the live face; history below)
 
-Register truth (do NOT restate counts elsewhere — BUG-588/D-2692): 1026 decisions · 457 bugs (164 open / 293 closed; highest OPEN = BUG-693). Forensic audit GREEN: 0 fatal rails — store-change re-baseline cascade (BUG-659..668) FIXED at root cause. BUG-687 (CLOSED, D-2882): nli_calibration pin on a gitignored derived artifact RETIRED (owner approved). BUG-688 (CLOSED, D-2883): the D-2618 retired golden is recorded, never gated — bridge --check green again (owner approved). BUG-689 (CLOSED, D-2830): the D-2767 A/B harness crashed on the v8 referee's owner-absence rows — `noise_drop` excluded (out of scope), `abstained` → the declared abstention token 'emerging'. D-2884 (RATIFIED, 2026-10-09): D-2767 C+B gate measured FAIL (3-way coarse 0.5621 < 0.73 floor); owner RULED (a) fine discipline → advisory-only, 3-way macro + domains operative, (b) distinct-family decider A/B in parallel; BUG-690 macro drift part 2 fixed (v5→v8, Business & Management added), part 1 (coarse-kappa harness output) FIXED (commit 8895cbf). D-2884(a) macro operative routing LANDED + R5 gemma-APPROVED (2026-10-09).
+Register truth (do NOT restate counts elsewhere — BUG-588/D-2692): 1030 decisions · 458 bugs (164 open / 294 closed; highest OPEN = BUG-693). Forensic audit GREEN: 0 fatal rails — store-change re-baseline cascade (BUG-659..668) FIXED at root cause. BUG-687 (CLOSED, D-2882): nli_calibration pin on a gitignored derived artifact RETIRED (owner approved). BUG-688 (CLOSED, D-2883): the D-2618 retired golden is recorded, never gated — bridge --check green again (owner approved). BUG-689 (CLOSED, D-2830): the D-2767 A/B harness crashed on the v8 referee's owner-absence rows — `noise_drop` excluded (out of scope), `abstained` → the declared abstention token 'emerging'. D-2884 (RATIFIED, 2026-10-09): D-2767 C+B gate measured FAIL (3-way coarse 0.5621 < 0.73 floor); owner RULED (a) fine discipline → advisory-only, 3-way macro + domains operative, (b) distinct-family decider A/B in parallel; BUG-690 macro drift part 2 fixed (v5→v8, Business & Management added), part 1 (coarse-kappa harness output) FIXED (commit 8895cbf). D-2884(a) macro operative routing LANDED + R5 gemma-APPROVED (2026-10-09).
 
 ## D-2881 (2026-10-08) — the 11 ambiguous anchor-bridge rows are RUN-COLLISIONS, resolved to the ratified canonical run
 
@@ -4048,3 +4048,24 @@ cause made visible and fail-closed (exit non-zero). Verifier gemma-4-E4B-it-MLX-
 drift, blindspots, config-first, types); 2 non-blocking error-handling notes accepted (no silent swallow — I/O
 errors propagate loudly per C16). REMAINING: the re-classification pass the gate enforces (owner-signed menu
 edits v8->v9 + offmenu promotion) must re-stamp rows to the live menu hash, after which the gate reports GREEN.
+
+## D-2897 — V9 menu edit: owner approves flags (a)(b)(c) (2026-10-09)
+
+Owner ratified the three v9 flags (BUG-693 menu-widening resolution). (a) computational theory (16) DEMOTE to
+'emerging' (confirmed default; discipline_raw verbatim). (b) information retrieval (9) MERGE into information
+science (122->131), cross-macro Technical -> Systems & Method ACCEPTED as advisory/reversible (IR is a sub-field
+of Library & Information Science). (c) creative writing (14) PROMOTE -> Heterodox AND museum studies (13)
+PROMOTE -> Heterodox — CORRECTING the draft's Systems & Method placement (museum/heritage is a
+humanistic-cultural discipline). Disciplines 65 -> 64; post-v9 emerging = 1488. Raw invariance (D-2896) holds.
+
+## D-2898 — Canonical promotion trust boundary (2026-10-09)
+
+gpt-oss-20b-MXFP4-Q8 is NOT trusted for CANONICAL PROMOTION (menu mutation). Measured drift on the 46-label v9
+offmenu head set: whitelisted creative writing/museum studies (contradicting D-2897), merged career development
+-> 'human resource management' (non-canonical hallucinated slot), education theory -> information science
+(semantic drift), promoted HRM while merging product management (inconsistent policy). Same failure class as
+BUG-279/BUG-693: free generation cannot hold the closed-menu invariant. RULING: promotion is DETERMINISTIC +
+OWNER-GATE. alias-merge + cross-axis = match_to_canonical() (reproducible, zero drift); new-slot + out_of_scope
+whitelist = OWNER-GATE only. gpt-oss stays S4 classifier-of-record for CLOSED-menu classification (D2249); for
+promotion it is ADVISORY-ONLY, cross-checked against the closed menu + owner rulings. No local LLM auto-mints a
+canonical slot.

@@ -738,7 +738,6 @@ taxonomy:
       generative ai: 0.0
       health & medicine: 0.1825
       human-computer interaction: 0.1429
-      information retrieval: 0.125
       information science: 0.0837
       information security: 0.0244
       interdisciplinary studies: 0.72
@@ -767,7 +766,6 @@ taxonomy:
       theoretical physics: 0.2308
       typography: 0.0
       visual perception: 0.0541
-      visual semiotics: 0.0714
       ai & agents: 0.0705
       arts & culture: 0.1163
       brand identity: 0.3841

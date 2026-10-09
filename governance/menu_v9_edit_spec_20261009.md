@@ -1,6 +1,6 @@
 # V9 Menu-Edit Spec — DRAFT for owner sign-off (2026-10-09)
 
-Status: **DRAFT — 3 owner flags pending** (see bottom). Do NOT mutate config until flags resolved.
+Status: **RESOLVED — owner approved flags (a)(b)(c) 2026-10-09 (D-2897); config mutation UNBLOCKED.**
 Source: owner-approved Layer A edits (BUG-693 menu-widening resolution) + D-2895 (color theory) + D-2896
 (normalization boundary). Canonical run = `rechunk-v4-20260929` (6591 rows); t11 FOREVER excluded.
 
@@ -13,10 +13,10 @@ Merge / demote / promote mutate **canonical** (`discipline`, `discipline_macro`,
 | # | Label | Rows | Action | Raw invariant | Group/macro delta |
 |---|-------|------|--------|---------------|-------------------|
 | 1 | `visual semiotics` | 44 | MERGE -> `semiotics` (61 -> 105) | discipline_raw stays `visual semiotics` | none (both Perception & Signal) |
-| 2 | `information retrieval` | 9 | MERGE -> `information science` (122 -> 131) | discipline_raw stays `information retrieval` | **CROSS-MACRO**: AI & Computing (Technical) -> Systems & Method (Method & Business) — FLAG (b) |
-| 3 | `computational theory` | 16 | DEMOTE -> `emerging` | discipline_raw stays `computational theory` | -> emerging_routing — FLAG (a) |
-| 4 | `creative writing` | 14 | PROMOTE (offmenu -> canonical) | discipline_raw stays `creative writing` | new: Heterodox (Human & Design) — FLAG (c) |
-| 5 | `museum studies` | 13 | PROMOTE (offmenu -> canonical) | discipline_raw stays `museum studies` | new: Systems & Method (Method & Business) — FLAG (c) |
+| 2 | `information retrieval` | 9 | MERGE -> `information science` (122 -> 131) | discipline_raw stays `information retrieval` | **CROSS-MACRO**: AI & Computing (Technical) -> Systems & Method (Method & Business) — RESOLVED (b) |
+| 3 | `computational theory` | 16 | DEMOTE -> `emerging` | discipline_raw stays `computational theory` | -> emerging_routing — RESOLVED (a) |
+| 4 | `creative writing` | 14 | PROMOTE (offmenu -> canonical) | discipline_raw stays `creative writing` | new: Heterodox (Human & Design) — RESOLVED (c) |
+| 5 | `museum studies` | 13 | PROMOTE (offmenu -> canonical) | discipline_raw stays `museum studies` | new: Heterodox (Human & Design) — RESOLVED (c) |
 
 ## No change (keep distinct, D-2895 + prior rulings)
 - `color theory` (14) vs `visual perception` (11) — distinct, boundary codified (D-2895).

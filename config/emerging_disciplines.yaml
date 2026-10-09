@@ -21,3 +21,11 @@ emerging_disciplines:
     - "decision row appended to DECISION-LOG.md + config/decisions.yaml"
     - "classifier head retrain check (label count change invalidates trained heads)"
     - "alias_map.yaml entry so raw strings canonicalise to the new label"
+  # D-2898 (2026-10-09): promotion is DETERMINISTIC + OWNER-GATE, never LLM-auto-minted.
+  promotion_path:
+    decision: D-2898
+    alias_merge: deterministic (match_to_canonical kind-constrained synonym index + same_axis_fallthrough)
+    cross_axis: deterministic (match_to_canonical opposite-axis placement)
+    new_slot: owner-gate only (mission-scope ontological judgment, never an LLM)
+    out_of_scope: owner-gate whitelist (never LLM promotion)
+    llm_role: advisory-only (gpt-oss-20b output MUST be cross-checked against the closed menu + owner rulings)

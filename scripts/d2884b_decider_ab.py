@@ -23,7 +23,7 @@ the production ``load_anchor`` (zero drift — the same text the gpt-oss arm saw
 
 ZERO-DRIFT REUSE: cohen_kappa / per_class_metrics / load_anchor (discipline_conformance_gate),
 load_macro / to_macro (discipline_macro_classify, C21 single home). The 3-way+emerging
-criteria are DERIVED from config (discipline_macro_groups.yaml + closed_menu_v8.json) — no
+criteria are DERIVED from config (discipline_macro_groups.yaml + live closed-menu) — no
 hardcoded ontology (C12).
 
 MODES:
@@ -64,6 +64,7 @@ for p in (str(REPO), str(SCRIPTS)):
 
 from discipline_conformance_gate import cohen_kappa, load_anchor, per_class_metrics  # noqa: E402
 from discipline_macro_classify import load_macro, to_macro  # noqa: E402
+from pipeline.closed_menu import live_menu_path  # noqa: E402
 
 # C12: paths are stable artifacts, but the model snapshot is version-pinned (R14 provenance).
 DEFAULT_REFEREE = REPO / "governance" / "d2767_ab_v8_20261009.json"
@@ -133,7 +134,7 @@ def criteria_from_config() -> dict[str, str]:
     if not macros:
         raise SystemExit(f"FAIL: macro scheme {scheme!r} has no bucket map (discipline_macro_groups.yaml)")
 
-    menu = json.loads((REPO / "config" / "closed_menu_v8.json").read_text(encoding="utf-8"))
+    menu = json.loads(live_menu_path().read_text(encoding="utf-8"))
     group_to_disciplines: dict[str, list[str]] = {}
     for d in menu.get("disciplines", []):
         g = str(d.get("group", ""))
@@ -147,7 +148,7 @@ def criteria_from_config() -> dict[str, str]:
         for g in groups:
             members = group_to_disciplines.get(g, [])
             if not members:
-                raise SystemExit(f"FAIL: macro bucket {bucket!r} group {g!r} has no disciplines (closed_menu_v8.json)")
+                raise SystemExit(f"FAIL: macro bucket {bucket!r} group {g!r} has no disciplines ({live_menu_path().name})")
             parts.append(f"{g} ({', '.join(members)})")
         criteria[bucket] = "Covers: " + "; ".join(parts) + "."
     criteria[emerging] = (

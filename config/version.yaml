@@ -1,6 +1,10 @@
 constitution_version: '3.0'
 schema_version: '3.0'
-taxonomy_version: v8
+taxonomy_version: v9
+# Single source of truth for the frozen closed-menu snapshot (BUG-694 future-tax fix).
+# Every menu consumer reads this ONE key instead of hardcoding closed_menu_v<N>.json.
+# Bump alongside taxonomy_version on the next menu edit (render_closed_menu --mint-version).
+closed_menu: config/closed_menu_v9.json
 requirements_version: '3.0'
 query_banner_version: '3.0'
 config_schema_version: '3.0'

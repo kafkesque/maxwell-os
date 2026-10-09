@@ -15395,3 +15395,114 @@ decisions:
     variants) + normalize_label(), NEVER at the raw layer, or contamination/bleed/drift re-enters. The existing
     979 distinct discipline_raw labels stay VERBATIM as harmless provenance (they collapse deterministically via
     normalize_label); BUG-151''s 267 raw aliases resolve at canonicalization, not by rewriting raw.'
+- id: D-2897
+  state: RATIFIED
+  category: ONTOLOGY
+  title: 'V9 menu edit — owner approves flags (a)(b)(c): computational theory demote, IR->IS cross-macro merge,
+    creative writing + museum studies -> Heterodox'
+  decision: 'Owner ratified the three v9 menu-edit flags (2026-10-09), resolving BUG-693 menu-widening drift. (a)
+    computational theory (16 rows) DEMOTE to ''emerging'' — confirmed default: the canonical slot is removed, discipline_raw
+    stays verbatim. (b) information retrieval (9) MERGE into information science (122->131) — the cross-macro move
+    (AI & Computing / Technical -> Systems & Method / Method & Business) is ACCEPTED as advisory/reversible: information
+    retrieval is a sub-field of Library & Information Science, so Systems & Method is the ontologically correct
+    home; discipline_raw stays ''information retrieval''. (c) creative writing (14) PROMOTE -> Heterodox (new slot,
+    Human & Design) AND museum studies (13) PROMOTE -> Heterodox — CORRECTING the earlier draft which placed museum
+    studies under Systems & Method; museum/heritage study is a humanistic-cultural discipline, ontologically closer
+    to Heterodox than to a business-methods group. Disciplines 65 -> 64 (two merges -2, one demote -1, two promotes
+    +2). Post-v9 emerging = 1488. Raw-label invariance (D-2896) holds: discipline_raw / domains_raw stay verbatim
+    on every affected row.'
+  bugs:
+  - BUG-693
+  files:
+  - governance/menu_v9_edit_spec_20261009.md
+- id: D-2898
+  state: RATIFIED
+  category: GOVERNANCE / MODEL TRUST
+  title: Canonical promotion trust boundary — gpt-oss-20b advisory-only; promotion is deterministic match + owner-gate
+  decision: 'gpt-oss-20b-MXFP4-Q8 is NOT trusted for CANONICAL PROMOTION (menu mutation). Measured drift during
+    the v9 offmenu head-label classification (46 labels): (1) whitelisted ''creative writing'' and ''museum studies'',
+    contradicting the owner''s promote ruling (D-2897); (2) merged ''career development'' -> ''human resource management'',
+    a NON-canonical target absent from the closed menu (hallucinated slot); (3) merged ''education theory'' -> ''information
+    science'' (semantic drift); (4) promoted ''human resource management'' while merging ''product management''
+    -> ''business administration'' (cross-batch policy inconsistency). This is the BUG-279 / BUG-693 failure class:
+    open-ended free generation cannot hold the closed-menu invariant. RULING: canonical promotion is DETERMINISTIC
+    + OWNER-GATED, never LLM-auto-minted. (A) alias-merge (raw -> existing canonical) and (B) cross-axis placement
+    are deterministic via match_to_canonical() (kind-constrained synonym index + same_axis_fallthrough) — 100% reproducible,
+    zero drift. (C) new-slot promotion and out_of_scope whitelisting require mission-scope ontological judgment
+    -> OWNER-GATE only. gpt-oss-20b remains the S4 classifier-of-record for CLOSED-menu per-row classification (D2249);
+    for promotion it is ADVISORY-ONLY and its output MUST be cross-checked against the closed menu + owner rulings
+    before any consideration. No local LLM (gpt-oss-20b, gemma-4-E4B, Qwen3-Coder-30B, Phi-4-mini) is authorized
+    to auto-mint a canonical slot.'
+  bugs:
+  - BUG-693
+  - BUG-279
+  files:
+  - config/model_assignments.yaml
+  - config/emerging_disciplines.yaml
+- id: D-2899
+  state: RATIFIED
+  category: ONTOLOGY
+  title: v9 menu edit APPLIED end-to-end - discipline_macro.py repoint gap (BUG-694) found+fixed, 28 rows macro-corrected,
+    post-v9 emerging=1487
+  decision: 'The D-2897 v9 menu edit was applied end-to-end and verified. CONFIG: config/taxonomy_v9.yaml built+validated
+    CLEAN (63 disciplines / 41 domains, MECE 0 violations); taxonomy_v5.yaml promoted to v9; version.yaml v8->v9;
+    pipeline_config.yaml dropped merged per_label rows (information retrieval, visual semiotics); closed_menu_v9.json
+    minted (menu_hash be3235433e765914); menu_axis_hashes.py + menu_axis_groups.yaml repointed; menu_axis_hashes.yaml
+    regenerated (answer_space_hash e11ac76443fa56c5, drift none). DB: 97 directly-affected rows deterministically
+    re-stamped (44 visual semiotics->semiotics, 9 information retrieval->information science, 16 computational theory->emerging,
+    15 creative writing/creative writing studies->creative writing, 13 museum studies->museum studies); discipline_raw
+    preserved verbatim (NULL count 0). FORENSIC FIND+FIX (BUG-694): apply_taxonomy_v9.py missed 5 live menu consumers
+    still pointing at closed_menu_v8.json - most critically pipeline/discipline_macro.py - so 28 promoted rows (creative
+    writing 15 + museum studies 13) were stamped discipline_macro=emerging instead of Human & Design (Heterodox);
+    repointed all 5 (atomic) + corrected 28 rows (backup + txn). EMERGING RECONCILIATION: post-v9 emerging = 1487,
+    not the 1488 in D-2897 - that arithmetic assumed 14 creative-writing rows, but the deterministic reclass found
+    15 because ''creative writing studies'' (1 row) canonicalises to creative writing per the alias-map note. CANONICAL
+    RUN REMAINS SPLIT: 6494 rows stale (99e1df82 v5.6) + 97 fresh (be3235433e765914 v9) - the gate correctly fails-closed;
+    full re-classification (RATIFY-2, v5.6->v9 incl. D-2815 +3 Business & Management widening) is BLOCKED on D-2884(a)+(b).'
+  bugs:
+  - BUG-694
+  - BUG-693
+  files:
+  - pipeline/discipline_macro.py
+  - scripts/discipline_macro_classify.py
+  - scripts/bug693_reclaim.py
+  - scripts/d2884b_decider_ab.py
+  - scripts/apply_anchor_axis_authority.py
+  - config/taxonomy_v9.yaml
+  - config/taxonomy_v5.yaml
+  - config/closed_menu_v9.json
+  - config/version.yaml
+  - config/pipeline_config.yaml
+  - config/menu_axis_groups.yaml
+  - config/menu_axis_hashes.yaml
+- id: D-2900
+  state: RATIFIED
+  category: ONTOLOGY
+  title: BUG-694 future-tax fix COMPLETE (live_menu_path single pointer + 5 live consumers repointed) + alias map
+    reconciliation (creative writing re-homed) + owner New(feeds v10) approval logged
+  decision: 'FUTURE-PROOFING C (BUG-694 future-tax, owner-approved): config/version.yaml#closed_menu is the SINGLE
+    pointer to the frozen closed-menu; pipeline/closed_menu.py::live_menu_path() reads it; pipeline/discipline_macro.py
+    + 5 live script consumers (discipline_macro_classify, bug693_reclaim, d2884b_decider_ab, apply_anchor_axis_authority,
+    menu_axis_hashes) repointed off hardcoded closed_menu_v9.json. Verified: py_compile clean x7, menu_axis_hashes
+    --check in-sync (byte-identical, drift none), load_macro 64 disciplines/4 buckets. ALIAS RECONCILIATION: removed
+    exact-match stale domain alias ''creative writing: arts & culture'' (creative writing is now disc-065 Heterodox)
+    via deterministic kind-constrained re-home; two compound labels (''literature & creative writing'', ''cultural
+    heritage & museum studies'') are cross-axis (promoted discipline + non-promoted concept) LEFT ALONE pending
+    owner adjudication per D-2896 no-mutation. MECE validator CLEAN 63/41/0. NEW(FEEDS v10): owner approved; concrete
+    feed-source list not found in repo (blindspot) - RATIFIED with additions pending enumeration. FLAGS: taxonomy_v5.yaml
+    carries content v9 while untracked taxonomy_v9.yaml exists (renderer reads v5 - resolve canonical filename);
+    ~15 legacy scripts hardcode closed_menu_v5/v7 (classify live/dead); D-2884(b) clef-4bit A/B not started (PID
+    32046 dead); BUG-693/RATIFY-2 remain blocked on D-2884(a)+(b).'
+  bugs:
+  - BUG-694
+  - BUG-693
+  files:
+  - pipeline/closed_menu.py
+  - pipeline/discipline_macro.py
+  - scripts/discipline_macro_classify.py
+  - scripts/bug693_reclaim.py
+  - scripts/d2884b_decider_ab.py
+  - scripts/apply_anchor_axis_authority.py
+  - scripts/menu_axis_hashes.py
+  - config/version.yaml
+  - config/alias_map.yaml

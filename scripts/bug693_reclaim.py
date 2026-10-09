@@ -63,6 +63,7 @@ from pipeline.taxonomy_manager import (  # noqa: E402
     reconcile_canonical_status,
     update_counts_from_fbs,
 )
+from pipeline.closed_menu import live_menu_path  # noqa: E402
 
 # Owner-signed scope (D-2891/D-2892, governance/bug693_reclaim_proposal.json).
 EXPECTED_MAPFAIL = 280
@@ -96,7 +97,7 @@ def _load_macro_owner() -> dict[str, str]:
     """Map discipline canonical -> 3-way macro bucket (config, C12)."""
     import yaml
 
-    menu = json.loads((_ROOT / "config" / "closed_menu_v8.json").read_text(encoding="utf-8"))
+    menu = json.loads(live_menu_path().read_text(encoding="utf-8"))
     groups_cfg = yaml.safe_load(
         (_ROOT / "config" / "discipline_macro_groups.yaml").read_text(encoding="utf-8")
     )

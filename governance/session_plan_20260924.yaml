@@ -109,6 +109,7 @@ may_touch:
 - governance/anchor2_*
 - governance/anchor_v8_domain_remap_*
 - governance/taxonomy_v8_migration.json
+- governance/taxonomy_v9_migration.json
 - governance/ANCHOR2_*
 - governance/ANCHOR_208_*
 - governance/D2D_*
@@ -713,3 +714,11 @@ widening_log:
   may_touch_untouched: false
   will_not_touch_untouched: true
   why: 'D-2895 (color theory boundary) + D-2896 (raw-label normalization boundary) minted; the BUG-693 v9 menu-edit SPEC was drafted for owner sign-off (governance/menu_v9_edit_spec_20261009.md). This spec/recommendation record had NO may_touch home, so it is granted as ONE NAMED path (BUG-548: never a glob). All other touched paths (config/decisions.yaml + config/decisions_summary.json via config/*.yaml, DECISION-LOG.md, MASTER-TASK-REGISTER.md, governance/buglog.md, governance/CONTEXT_INDEX.md, governance/MUTATION_JOURNAL.jsonl) are already inside may_touch. pipeline/** untouched; no pinned artifact staged.'
+- entry: 38
+  session: 20261009D
+  owner_ack: 'standing rules (CONTINUE: implement unblocked critical steps; update and sync gov dependencies)'
+  widened:
+  - governance/taxonomy_v9_migration.json
+  may_touch_untouched: false
+  will_not_touch_untouched: true
+  why: 'D-2897 v9 menu-edit LANDED (owner-ratified flags a/b/c). The deterministic migration RECEIPT (governance/taxonomy_v9_migration.json, written by scripts/build_taxonomy_v9.py) had NO may_touch home; granted as ONE NAMED path (BUG-548: never a glob), mirroring the existing governance/taxonomy_v8_migration.json home. All other touched paths are already inside may_touch: config/taxonomy_v5.yaml + config/version.yaml + config/pipeline_config.yaml + config/menu_axis_groups.yaml + config/emerging_disciplines.yaml + config/model_assignments.yaml (config/*.yaml), config/closed_menu_v9.json + config/closed_menu_v9.sha256 (config/*.json + config/*.sha256), scripts/build_taxonomy_v9.py + scripts/apply_taxonomy_v9.py + scripts/reclass_v9.py (scripts/*.py), pipeline/closed_menu.py + pipeline/discipline_macro.py (pipeline/**), DECISION-LOG.md, MASTER-TASK-REGISTER.md, governance/buglog.md, governance/bug_status.*, governance/MUTATION_JOURNAL.jsonl. config/taxonomy_v9.yaml is a transient build intermediate (byte-identical to the live config/taxonomy_v5.yaml) and stays UNVERSIONED.'

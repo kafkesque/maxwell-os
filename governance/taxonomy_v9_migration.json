@@ -1,0 +1,84 @@
+{
+  "source": "config/taxonomy_v8.yaml",
+  "decision": "D-2897",
+  "version_before": "v8",
+  "version_after": "v9",
+  "merge": [
+    {
+      "from": "disc-002:visual semiotics",
+      "into": "disc-004:semiotics",
+      "raw_src_count": 6,
+      "raw_dst_before": 9,
+      "raw_dst_after": 15
+    },
+    {
+      "from": "disc-060:information retrieval",
+      "into": "disc-038:information science",
+      "cross_macro": true,
+      "raw_src_count": 1,
+      "raw_dst_before": 7,
+      "raw_dst_after": 8
+    }
+  ],
+  "demote": [
+    {
+      "id": "disc-061",
+      "canonical": "computational theory",
+      "raw": [
+        "computational theory",
+        "theory of computation"
+      ],
+      "routing": "emerging"
+    }
+  ],
+  "promote": [
+    {
+      "id": "disc-065",
+      "canonical": "creative writing",
+      "group": "Heterodox",
+      "raw": [
+        "creative writing",
+        "creative writing studies"
+      ]
+    },
+    {
+      "id": "disc-066",
+      "canonical": "museum studies",
+      "group": "Heterodox",
+      "raw": [
+        "museum studies"
+      ]
+    }
+  ],
+  "rehome_raw": [
+    {
+      "from_domain": "arts & culture",
+      "raw_removed": [
+        "museum studies"
+      ],
+      "raw_before": 5,
+      "raw_after": 4,
+      "reason": "D-2897c promotes museum studies to a discipline; MECE forbids a raw synonym on two axes"
+    }
+  ],
+  "discipline_groups": {
+    "removed": [
+      "visual semiotics <- design & visual arts",
+      "information retrieval <- computing, ai & information",
+      "computational theory <- engineering, math & physics"
+    ],
+    "added": [
+      "creative writing -> communication & media",
+      "museum studies -> human & behavioral science"
+    ]
+  },
+  "displaced_canonicals": [
+    "visual semiotics",
+    "information retrieval",
+    "computational theory"
+  ],
+  "counts": {
+    "domains": 41,
+    "disciplines": 63
+  }
+}

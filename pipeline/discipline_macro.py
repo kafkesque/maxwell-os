@@ -12,7 +12,7 @@ This module is the single source of truth for the deterministic collapse. Consum
 
 Config (C12 — no hardcoded ontology):
   config/discipline_macro_groups.yaml  (scheme + group->bucket map)
-  config/closed_menu_v8.json           (disciplines[].group)
+  live closed-menu (config/version.yaml#closed_menu)  (disciplines[].group)
 
 Fail-closed: a menu group absent from the active scheme raises (BUG-622 class drift);
 a discipline with an empty group maps to the explicit ``emerging`` routing bucket
@@ -31,9 +31,10 @@ if str(_REPO) not in sys.path:
     sys.path.insert(0, str(_REPO))
 
 from pipeline.pipeline_paths import PROJECT_ROOT  # noqa: E402
+from pipeline.closed_menu import live_menu_path  # noqa: E402
 
 _MACRO_GROUPS = PROJECT_ROOT / "config" / "discipline_macro_groups.yaml"
-_MENU = PROJECT_ROOT / "config" / "closed_menu_v8.json"
+_MENU = live_menu_path()  # single source: config/version.yaml#closed_menu (BUG-694 fix)
 EMERGING = "emerging"
 
 

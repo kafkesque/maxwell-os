@@ -3883,3 +3883,51 @@ D3 — coarse_kappa 0.73 reachability: CONDITIONAL ruling. If clef-4bit (27B, th
 Implementation order: (1) D1 mechanism (recall floor config + recall metric in the A/B harness, advisory report); (2) D2
 adjudication (informs the floor value); (3) D3 ruling once clef-4bit lands.
 
+
+
+## D-2887 (2026-10-09) — RATIFIED — autotrust/GEV-26B-Decide (Jev "Decide" family): NO-ADOPT now, watch-list for MLX port
+
+FINDING (owner question: is GEV-26B-Decide worth testing / usable for Maxwell scaffolding?):
+- autotrust/GEV-26B-Decide is a DECISION-MODEL (text-classification), a LoRA adapter on google/gemma-4-26B-A4B-it
+  (26B MoE, ~4B active). Decision Index 0.2.1 = 62.48 (vs TypeSafe Jev 1.13 board 57.91). Apache-2.0, ~910k downloads.
+- Its tag vocabulary (jev / noul / choice / score / system-one / system-two / typed-decisions / calibrated-probabilities)
+  is the LITERAL namesake of Maxwell's "Jev/SystemOne" wire protocol — but it is a DIFFERENT ecosystem than the
+  Cloudflare clef/clef-flash arms Maxwell already runs (mlx-community/clef-* base_model = Cloudflare/clef). The
+  autotrust JEV family (JEV-27B = Qwen3.8-27B, JEV-9B = Qwen3.5-9B, JEV-Gemma4-26B-A4B, GEV-26B-Decide) has NO MLX port.
+- NOT adoptable now: (1) no MLX port exists (Maxwell runs MLX/OMLX, C1/C3/C26) — transformers bf16 = 51.6 GB merged
+  (too heavy for 64 GB) and the adapter-only form needs a gemma-4-26B MLX base that also lacks a clean port; only the
+  NVIDIA NVFP4 variant exists besides bf16. (2) It is a decision/classifier model, NOT a scaffolding/agentic model —
+  it would NOT help everyday scaffolding (same category as laya and clef).
+- SCAFFOLDING ANSWER: no. Everyday scaffolding stays on goose maxwell_omlx (Qwen3-Coder-30B) + single-shot patterns
+  (DELEGATE-002). No local model beats routing + single-shot for accuracy/token-cost — reaffirms D-2885.
+
+WATCH-LIST (C28 opt-in): if mlx-community ports JEV-Gemma4-26B-A4B or GEV-26B-Decide to MLX 4-bit, evaluate as a
+  DECIDER-ARM upgrade — its calibrated-probability typed decisions + higher Decision Index (62.48) could beat the
+  Cloudflare clef arms on coarse_kappa. Not on the D-2727 critical path.
+
+
+## D-2888 (2026-10-09) — D2 gold-emerging 2-way adjudication EXECUTED (owner-gated D2 pre-requisite for D3)
+
+STier ontological split of the 7 gold-emerging rows (full 65-value menu in view; FB text joined from maxwell.db by name):
+GENUINELY-NOVEL (ontology gap — no menu discipline names the domain):
+  R165 "Acknowledgment Attribution" — book-publishing / bibliographic attribution (no publishing discipline;
+      "literary theory" is analysis not publishing practice, "information science" is info org not attribution).
+  R006 "Generative Algorithmic Composition" — music/sound synthesis (closest "creative coding"/"performing arts"
+      but neither names MUSIC COMPOSITION; genuine gap, borderline).
+CLASSIFIABLE-INTO-ESTABLISHED (owner conservatively demoted; a menu discipline DOES name it):
+  R059 "First Course Development Framework"   -> entrepreneurship studies (expertise -> product -> launch)
+  R127 "Guild of Handicraft Educational Model" -> design thinking / cultural design (design-education history)
+  R146 "Debate As Leadership Tool"            -> decision making (explicit menu discipline)
+  R183 "Pattern Language Implementation Process" -> systems thinking / design thinking
+  R202 "Interactive Media Integration"        -> aesthetics / media studies
+
+FINDING: the emerging bucket is DOMINATED (5/7) by classifiable rows, not genuine novelty. Consequence for D3:
+- emerging_recall (sensitivity) is measuring agreement with OWNER CONSERVATISM, not novelty detection. A decider that
+  routes ontologically-correctly (R146 -> decision making, etc.) disagrees with the owner's "emerging" on 5 rows, scoring
+  2/7 = 0.286 < 0.5 — it FAILS the recall floor while being MORE correct.
+- To pass recall >= 0.5 the decider must reproduce >= 4 owner demotions (over-predict "emerging"), which collides with the
+  rate CEILING (emerging_rate <= 0.35). The symmetric gate is INTERNALLY IN TENSION under the current gold.
+RECOMMENDATION (future-proof, ontologically accurate): re-adjudicate the 5 classifiable rows into their established
+  disciplines (shrink the emerging gold to 2: R006, R165). This raises coarse_kappa (5 fewer forced-disagreement rows) and
+  makes the emerging clause meaningful. With N=2, replace the fractional recall floor with a small whitelist ("catch
+  R006+R165") — novelty detection is a WHITELIST, not a rate. Feeds the D3 owner ruling.

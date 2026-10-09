@@ -2166,3 +2166,17 @@ NEXT (refreshed D-2772):
   (2) [OG] D-2853: confirm 20261006d canonical referee + approve 28-row domain remap, then finish rename + config refs + closed_menu v5->v7 + D-2859 off-by-one;
   (3) D-2858: recalibrate D-2822 under or-entail -> re-pin threshold (D-353) -> flip nli_aggregation (fail-closed guard);
   (4) [OG] bridge-ruler 3 folded extras (R152/R192/R197) owner adjudication.
+
+
+## D-2887 + D-2888 (2026-10-09) — GEV-26B-Decide no-adopt + D2 gold-emerging 2-way adjudication EXECUTED
+
+- D-2887 RATIFIED: autotrust/GEV-26B-Decide NO-ADOPT (no MLX port, 51.6GB bf16 too heavy, decision-model not scaffolding).
+  Watch-list for an MLX port as a decider-arm upgrade. Everyday scaffolding stays on goose maxwell_omlx (Qwen3-Coder-30B).
+- D-2888 D2 adjudication EXECUTED: 7 gold-emerging rows = 2 genuinely-novel (R006, R165) + 5 classifiable (R059/R127/R146/
+  R183/R202). Emerging gold is owner-conservatism-dominated -> symmetric gate internally tense. Recommend: re-adjudicate
+  the 5 classifiable rows to established disciplines (shrink emerging to 2) + re-express emerging as a whitelist.
+- clef-4bit (27B) download: stalled twice (CLOSE_WAIT, VPN throttle); switched to self-healing curl (speed-limit abort +
+  retry-all-errors + resume) into ~/.cache/maxwell_models/clef-4bit — progressing ~1 MB/s. --arm clef A/B still pending.
+- NEXT (critical order; [OG]=owner-gated): (1) [OG] D-2888 recommendation (re-adjudicate 5 classifiable emerging rows);
+  (2) clef-4bit -> --arm clef A/B -> D3 owner ruling (lower floor vs advisory best-arm); (3) BUG-681(b) encoding blocker
+  (named offender scripts/remap_referee_v7_28rows.py:69 utf-8-sig -> artifact_encoding.py) blocks `just health` prefix.

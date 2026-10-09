@@ -89,6 +89,11 @@ CLEF_FLASH_SNAPSHOT = (
     Path.home() / ".cache/huggingface/hub/models--mlx-community--clef-flash-4bit"
     / "snapshots/140bf7e037f5fa95a96535feca112f46c15927cf"
 )
+# clef-4bit (27B) is downloaded to a LOCAL dir (~/.cache/maxwell_models/clef-4bit) via dl.sh —
+# NOT the HF hub cache (whose shard blobs are still *.incomplete). Point the arm at the complete
+# local dir so clef_mlx.load() resolves it directly (path.is_dir() short-circuits snapshot_download)
+# instead of re-downloading ~16.3 GB from the incomplete hub cache. (D-2884(b) harness note.)
+CLEF_SNAPSHOT = Path.home() / ".cache" / "maxwell_models" / "clef-4bit"
 CLEF_MLX_DIR = CLEF_FLASH_SNAPSHOT  # clef_mlx.py lives here (generic loader for all clef-*)
 SOURCE_MAX = 600  # source_text truncation, mirrors build_merged_prompt (C12 parity)
 
@@ -382,7 +387,7 @@ DECIDER_ARMS: dict[str, tuple[Callable[..., list[str]], str]] = {
         "mlx-community/clef-flash-4bit",
     ),
     "clef": (
-        partial(_run_arm_clef, model_path="mlx-community/clef-4bit", model_name="clef-4bit"),
+        partial(_run_arm_clef, model_path=CLEF_SNAPSHOT, model_name="clef-4bit"),
         "mlx-community/clef-4bit",
     ),
 }

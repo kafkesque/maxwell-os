@@ -1407,4 +1407,6 @@ nothing_still_held reads 1 still parked (BUG-559). No other fact in this index c
 - New "SystemOne/typed-decisions" decision-model family (Jev/SystemOne wire protocol). Aligned candidates:
   clef-flash-4bit (MLX 9B), clef-4bit (MLX 27B), opendecider-small-mlx-4bit (4B), wfzyx/von (order-invariant).
 - scripts/d2884b_decider_ab.py now has DECIDER_ARMS registry (C21 swappable). R5 APPROVE afe9d15d60ed11c4.
-- D-2884(b): laya FAIL (kappa 0.0242, position bias); pplx RUNNING. See DECISION-LOG D-2884(b) entry.
+- D-2884(b): laya FAIL (kappa 0.0242, position bias); pplx FAIL (coarse_kappa 0.6738 < 0.73 floor, emerging 0.0052). See DECISION-LOG D-2884(b) entry.
+- D-2884(b) Arm C: clef-flash + clef arms wired into DECIDER_ARMS (R5 gemma-APPROVE 41a98ffdb1231aaf, commit 48db64c). clef-flash A/B FAIL (coarse_kappa 0.5705 < 0.73; emerging recall 0.4286 = 3/7, NON-ZERO vs pplx 0.0 — validates BUG-692). clef (27B) downloading; --arm clef pending.
+- BUG-692 (OPEN, HIGH, 2026-10-09): the C+B emerging clause (`emerging_rate <= 0.35`) is a CEILING-ONLY guard — pplx has ZERO recall on the 7 gold-emerging rows (all forced into established macros), so an always-answer decider trivially passes. Owner-gated fix: add an emerging-RECALL floor (sensitivity) alongside the rate ceiling (specificity). Advisory-only (D-2798). See buglog BUG-692 body + DECISION-LOG D-2884(b) UPDATE.

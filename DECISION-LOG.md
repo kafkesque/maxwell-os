@@ -3781,3 +3781,65 @@ HARNESS: scripts/d2884b_decider_ab.py -> C21 swappable DECIDER_ARMS registry (ad
 one run fn; referee/gate/criteria machinery shared). R5 gemma-4 APPROVE (afe9d15d60ed11c4). Behavior-preserving.
 
 NEXT: await pplx; if it clears C+B consider owner promotion (D-2796: no below-ceiling classifier ships).
+
+
+## D-2884(b) UPDATE — Arm A pplx FAIL + BUG-692 emerging-clause blindspot + clef Arm C wired (2026-10-09)
+
+Arm A pplx (mlx-community/pplx-decider-v1.1-27b-4bit) COMPLETED: coarse_kappa 0.6738 (FAIL, floor 0.73),
+emerging 0.0052. Committed 01280b4. While the coarse-kappa margin is the headline FAIL, the emerging
+figure exposed a STRUCTURAL gate blindspot — logged as BUG-692 (HIGH, OPEN).
+
+BUG-692 (ontological gate defect, STier analysis): the C+B gate's emerging arm (`emerging_rate <= 0.35`,
+config `pipeline_config.yaml#taxonomy.emerging_discipline_rate_max`) is a CEILING-ONLY (specificity) guard.
+It measures how OFTEN a decider abstains into 'emerging' but never WHETHER it abstains on the RIGHT rows.
+pplx has ZERO recall on the 7 gold-emerging rows of the 194-row v8 referee (4→Human & Design, 2→Method &
+Business, 1→Technical); its readout cannot emit 'emerging' at all, so rate 0.0052 "passes" vacuously. An
+ALWAYS-ANSWER decider trivially satisfies the emerging clause, so the gate could false-PASS a decider that
+has COLLAPSED the 3-way+emerging ontology into 3-way-only. 'emerging' is an ONTOLOGICAL REQUIREMENT (the
+explicit routing bucket for disciplines that resist a single established macro), not an optional abstention
+artifact.
+
+OWNER-GATED RECOMMENDATION (advisory, D-2798 — does not fail-closed on its own): make the emerging clause
+SYMMETRIC — (1) KEEP the rate ceiling (specificity); (2) ADD an emerging-RECALL floor (sensitivity: recall
+on the gold-emerging subset >= floor, config-first `taxonomy.emerging_discipline_recall_floor`; granularity
+1/7 ≈ 0.143 so floor 0.5 = catch ≥4/7); (3) ALTERNATIVE: admit a calibration/threshold arm that CAN emit
+'emerging'. Arm A would then correctly FAIL the floor (0/7), reflecting its structural incompleteness.
+
+Arm C WIRED (commit 48db64c, R5 gemma-APPROVE 41a98ffdb1231aaf): mlx-community/clef-flash-4bit (Qwen3.5 9B)
+and mlx-community/clef-4bit (Qwen3.5 27B) added to DECIDER_ARMS. Clef is NOT a chat model — clef_mlx.load()
+runs the Qwen3.5 backbone + joint schema head in ONE forward pass over {state, questions}, and its output
+space INCLUDES the 'emerging' bucket (it is the first candidate family ontologically complete for the
+3-way+emerging contract). clef-flash A/B RUNNING; clef (27B) downloading in parallel.
+
+NEXT: await clef-flash + clef A/B; if an arm clears coarse_kappa >= 0.73 AND demonstrates emerging recall,
+the owner rules whether to (a) certify under the SYMMETRIC gate, or (b) keep the ceiling-only gate (would
+require an explicit owner ruling that emerging recall is out of scope). D-2727 stays BLOCKED until then.
+
+
+## D-2884(b) Arm C (clef-flash) RESULT — FAIL coarse_kappa 0.5705, but emerging recall 0.4286 (2026-10-09)
+
+clef-flash-4bit (Qwen3.5 9B, joint schema head) COMPLETED on the 194-row v8 referee:
+- raw_agreement 0.7113; coarse_kappa 0.5705 (FAIL, floor 0.73); emerging_rate 0.0876 (PASS, max 0.35); cb_gate FAIL.
+- Per-bucket (3-way+emerging): Technical f1 0.7536 (recall 0.7879), Human & Design f1 0.7907 (recall 0.701),
+  Method & Business f1 0.6667 (recall 0.7193), emerging f1 0.25 (recall 0.4286, precision 0.1765).
+
+KEY FINDING (validates BUG-692 empirically): clef-flash's emerging RECALL is 0.4286 (3/7), NON-ZERO, vs pplx 0.0.
+Its output space genuinely includes the 'emerging' bucket — it caught R127 (Guild of Handicraft Educational
+Model), R165 (Acknowledgment Attribution), R183 (Pattern Language Implementation Process) as emerging. pplx
+structurally CANNOT emit 'emerging' (always-answer readout), so its rate 0.0052 was a trivially-passed ceiling
+with ZERO sensitivity. The emerging-recall floor recommendation is now EMPIRICALLY DISCRIMINATIVE: the same
+gate clause pplx passes vacuously is one clef-flash fails-but-measurably (0.4286).
+
+STier nuance (gold-emerging audit owed): the 4 gold-emerging rows clef-flash MISSED are arguably classifiable —
+R006 (Generative Algorithmic Composition → Technical), R059 (First Course Development → Method & Business),
+R146 (Debate As Leadership → Method & Business), R202 (Interactive Media Integration → Human & Design). The
+gold 'emerging' label may itself need a 2-way adjudication (genuinely-novel vs classifiable-into-established)
+before a recall floor is calibrated; a floor of 1.0 would over-constrain a noisy gold subset.
+
+RANKING SO FAR (coarse_kappa): pplx 0.6738 > clef-flash 0.5705 > laya 0.0242. NONE clears 0.73. clef-4bit (27B,
+capacity match) is the remaining candidate in this sweep — downloading, then --arm clef.
+
+NEXT: run clef-4bit; if it clears coarse_kappa >= 0.73 AND shows emerging recall, it is the first certify-able
+arm under the SYMMETRIC gate. Otherwise the owner must rule on: (a) lowering the coarse_kappa floor (0.73 may be
+unreachable for ANY distinct-family decider), and/or (b) adopting the emerging-recall floor (BUG-692).
+

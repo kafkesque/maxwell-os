@@ -9339,6 +9339,25 @@ FIX (owner gate, one word): propagate the ratified disposition uniformly - clear
 soft-quarantine ledger (policy: quarantine, NEVER hard-delete). Alternative: the owner re-affirms the 8 rows as
 live items, which UNDOES RATIFY-3 DROP(13) and must then be recorded as a superseding decision.
 
+## BUG-690 (OPEN, 2026-10-09) — D-2767 C+B coarse-kappa blindspot + macro-config drift
+
+Two limbs:
+
+(1) The D-2767 v8 A/B harness (`scripts/d2767_ab_eval.py`) reports only FINE-grained kappa (0.4216) and does NOT
+compute the coarse 3-way macro kappa the owner-ruled C+B gate requires (`coarse_kappa >= 0.73` =
+`config/pipeline_config.yaml#discipline_coarse_kappa_floor`). Ad hoc collapse of the 194 rows: fine 0.4216 /
+9-way group 0.5696 / 3-way coarse 0.5621 -> the C+B gate FAILS (0.5621 < 0.73) while emerging 0.0155 passes.
+
+(2) `config/discipline_macro_groups.yaml` was built against closed_menu_v5 (9 groups) and MISSED the
+'Business & Management' group that first appeared in closed_menu_v6 (business administration / entrepreneurship
+studies / marketing). Any coarse-kappa collapse emitted 'UNMAPPED:Business & Management' for ~21 rows, corrupting
+the B-arm metric.
+
+STATUS: PART 2 FIXED 2026-10-09 (commit 5042962): added Business & Management to 3-way Method & Business + 4-way
+Method & Operations; repointed discipline_macro_classify.py DEFAULT_MENU + discipline_advisory_rescore.py menu pin
+v5 -> v8; verified the fail-closed load_macro guard covers all 10 v8 groups (0 uncovered). PART 1 (coarse-kappa
+3-way collapse output in d2767_ab_eval.py + a regression test) REMAINS OPEN.
+
 ## BUG-680 (OPEN, 2026-10-08) — the upstream anchor faces still encode discipline abstention as the out-of-menu token 'emerging' (BUG-676 residual)
 
 BUG-676's fix landed in the FROZEN RULER (`discipline: ""` for the 8 owner-confirmed abstained rows). The two

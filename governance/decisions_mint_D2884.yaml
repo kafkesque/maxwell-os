@@ -1,0 +1,40 @@
+- id: D-2884
+  state: RATIFIED
+  category: ANCHOR / TAXONOMY
+  title: 'D-2767 C+B gate measured FAIL (coarse 0.5621 < 0.73); owner RULED (a) fine discipline advisory-only + 3-way macro operative, (b) distinct-family decider A/B in parallel; BUG-690 macro drift (part 2) fixed'
+  bugs: [BUG-690]
+  decision: |
+    Owner-ruled 2026-10-09 (owner: "I accept your owner gated recommendation ... Rule on D-2767 C+B gate (a+b)").
+
+    MEASURED (D-2767 v8 A/B, flag-ON, n=194): fine 62-way 0.4216 / 9-way group 0.5696 / 3-way coarse 0.5621 /
+    emerging 0.0155. The owner-ruled C+B gate (emerging <= 0.35 AND coarse_kappa >= 0.73 =
+    config/pipeline_config.yaml#discipline_coarse_kappa_floor) FAILS: 0.5621 < 0.73. The fine axis is
+    ontologically UNREACHABLE at that floor (human ceiling measured D-2796: fine 0.581 / 3-way 0.766), so this is
+    a resolution mismatch, not an engineering gap.
+
+    OWNER RULING (a+b, in parallel):
+    (a) DEMOTE fine discipline to ADVISORY (multi-label provenance tags); the OPERATIVE routing facet becomes the
+        3-way macro (Technical / Human & Design / Method & Business) + domains. The 3-way macro is the coarsest
+        defensible granularity (human ceiling 0.766); coarsening further was REJECTED as lossy routing.
+    (b) DISTINCT-FAMILY DECIDER A/B: run a decider model (autotrust/JEV-27B-VL or
+        perplexity-ai/pplx-decider-v1.1-27b) against the owner referee as the candidate for the macro gate, in
+        parallel with (a). R5 satisfied: the decider is a different family from generator/classifier/verifier.
+
+    BUG-690 part 2 fixed in the same batch (commit 5042962): config/discipline_macro_groups.yaml was built against
+    closed_menu_v5 (9 groups) and MISSED 'Business & Management' (first in v6); ~21 rows collapsed to
+    UNMAPPED:Business & Management and corrupted the coarse kappa. Now added to 3-way Method & Business + 4-way
+    Method & Operations, and scripts/discipline_macro_classify.py DEFAULT_MENU +
+    scripts/discipline_advisory_rescore.py menu pin repointed v5 -> v8; the fail-closed load_macro guard covers all
+    10 v8 groups (0 uncovered). BUG-690 part 1 (coarse-kappa 3-way collapse output in scripts/d2767_ab_eval.py +
+    regression test) REMAINS OPEN and is the prerequisite instrumentation for the (b) decider A/B.
+
+    D-2727 (full S4->S5->S6 rerun) stays BLOCKED until (a)+(b) land: a below-gate fine-discipline classifier would
+    otherwise bake into all 6,591 canonical FBs.
+  files:
+    - config/discipline_macro_groups.yaml
+    - scripts/discipline_macro_classify.py
+    - scripts/discipline_advisory_rescore.py
+    - scripts/d2767_ab_eval.py
+    - governance/D2767_CB_CLASSIFICATION_RECOMMENDATION_20261009.md
+    - config/pipeline_config.yaml
+    - governance/buglog.md

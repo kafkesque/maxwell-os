@@ -111,6 +111,7 @@ may_touch:
 - governance/discipline_anchor_*
 - governance/DOMAIN_*
 - config/*.sha256
+- governance/D2767_CB_CLASSIFICATION_RECOMMENDATION_20261009.md
 will_not_touch:
 - governance/F11_*
 - governance/ANCHOR_RULER_CONSOLIDATED_*.csv
@@ -669,3 +670,11 @@ widening_log:
   may_touch_untouched: true
   will_not_touch_untouched: true
   why: 'D-2814 ATOMIC SWAP EXECUTED (owner-approved). (1) config/pipeline_config.yaml stage4.definition_anchored_menu_enabled false->true. (2) pipeline/schemas.py _build_synonym_index layer 3 (alias_map.yaml D2566 compensating control) RETIRED (shrink-then-remove, C1): the definition-anchored closed menu now constrains the classifier to verbatim canonical labels, so the 999-rule raw->canonical override is redundant on the S4 classify path. Both paths already inside may_touch (config/*.yaml, pipeline/**): NOTHING widened, no glob asked for. VERIFIED: flag import applies the definition-anchored menu to MERGED_CRIBS_CLASSIFY_SYSTEM + CLASSIFY_SYSTEM_PROMPT with no D-2833 conflict (discipline_closed_menu_enabled stays false); cross-kind collision still resolves "ux design"/"user experience design" -> "user experience" (domain) via TAXONOMY raw aliases (layer 1, taxonomy_v5.yaml:165-166) while alias_map-ONLY keys ("ux/ui development") now abstain -> "emerging" as intended; 51 contract tests green. Remaining alias_map consumers (remap_emerging.py / apply_enrichment.py read the file DIRECTLY) stay live for the legacy free-gen checkpoint until the D-2727 rerun. No pinned artifact changed (menu bytes untouched).'
+- entry: 35
+  session: 20261009C
+  owner_ack: 'owner RULED the D-2767 C+B gate (coarse 0.5621 < 0.73 FAIL) = (a) demote fine discipline to advisory-only, make the 3-way macro + domains the operative routing facets, and (b) distinct-family decider-model A/B in parallel; and approved committing the macro-drift fix + governance records'
+  widened:
+  - governance/D2767_CB_CLASSIFICATION_RECOMMENDATION_20261009.md
+  may_touch_untouched: false
+  will_not_touch_untouched: true
+  why: 'D-2767 C+B owner ruling + BUG-690 part-2 macro-drift fix. The owner ruled the failed C+B gate: (a) fine discipline becomes advisory/multi-label provenance, routing gates on the 3-way macro + domains; (b) decider-model A/B (distinct family) against the owner referee. This path (the recommendation record) had NO may_touch home, so it is granted as ONE NAMED path (BUG-548: never a glob). Every other touched path in the same commit is already inside may_touch: config/discipline_macro_groups.yaml (config/*.yaml), scripts/discipline_macro_classify.py + scripts/discipline_advisory_rescore.py (scripts/*.py), governance/buglog.md, governance/MARKET_RESEARCH_TOOL_BENCHMARK_20261006.md (governance/MARKET_RESEARCH_*.md). pipeline/** untouched; no pinned artifact staged.'

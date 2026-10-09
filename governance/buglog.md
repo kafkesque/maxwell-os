@@ -9793,6 +9793,12 @@ has ZERO recall on the 7 gold-emerging rows in the 194-row owner referee
 (governance/d2767_ab_v8_20261009.json) — it forced all 7 into established macros (4→Human & Design,
 2→Method & Business, 1→Technical). An ALWAYS-ANSWER decider (one whose readout cannot emit 'emerging' at all)
 therefore trivially satisfies the emerging clause: rate 0 <= 0.35 is vacuously true.
+SECOND CONFIRMATION (2026-10-09): Arm clef-4bit (mlx-community/clef-4bit, 27B — the D-2886 D3 capacity match)
+reproduces the defect: emerging_rate 0.0309 (6/194, PASS ceiling) but emerging_recall 0.0 (0/7 gold) — it
+labelled 6 rows 'emerging' and caught NONE of the 7 true gold-emerging rows (emerging precision 0.0). Both pplx
+and clef-4bit therefore pass the ceiling vacuously at zero sensitivity, while clef-flash (0.4286, 3/7) is the
+only arm with a real emerging output space (but fails coarse_kappa 0.5705). The D-2886 D1 symmetric gate (rate
+ceiling + recall floor) is now empirically necessary: a ceiling-only gate would false-PASS two of four arms.
 
 CONSEQUENCE (progression mutation risk): the C+B gate could false-PASS and promote a decider that has
 structurally COLLAPSED the 3-way+emerging taxonomy into 3-way-only. The 'emerging' routing bucket is an

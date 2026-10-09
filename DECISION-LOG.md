@@ -3843,6 +3843,34 @@ NEXT: run clef-4bit; if it clears coarse_kappa >= 0.73 AND shows emerging recall
 arm under the SYMMETRIC gate. Otherwise the owner must rule on: (a) lowering the coarse_kappa floor (0.73 may be
 unreachable for ANY distinct-family decider), and/or (b) adopting the emerging-recall floor (BUG-692).
 
+## D-2884(b) Arm clef-4bit (FINAL) RESULT — FAIL coarse_kappa 0.5752 + emerging_recall 0.0 (2026-10-09)
+
+mlx-community/clef-4bit (Qwen3.5 27B, MLX 4bit — the D-2886 D3 "only capacity match") COMPLETED on the 194-row
+v8 referee (governance/d2884b_decider_ab_clef_20261009.json):
+- raw_agreement 0.7216; coarse_kappa 0.5752 (FAIL, floor 0.73); emerging_rate 0.0309 (PASS, max 0.35);
+  emerging_recall 0.0 (FAIL, D-2886 D1 symmetric floor 0.5); cb_gate FAIL.
+- Per-bucket (3-way+emerging): Technical f1 0.8116 (recall 0.8485, n_gold 33), Human & Design f1 0.7701
+  (recall 0.6907, n_gold 97), Method & Business f1 0.6818 (recall 0.7895, n_gold 57), emerging f1 0.0
+  (recall 0.0, n_gold 7).
+
+FINAL RANKING (coarse_kappa): pplx 0.6738 > clef-4bit 0.5752 > clef-flash 0.5705 > laya 0.0242. NONE clears 0.73.
+BUG-692 now empirically validated by TWO arms: pplx (rate 0.0052) AND clef-4bit (rate 0.0309) both carry ZERO
+emerging recall — the ceiling-only clause passes vacuously while sensitivity is 0. Only clef-flash (0.4286, 3/7)
+has a real emerging output space, and it fails coarse_kappa too.
+
+D-2886 D3 CONDITION MET: clef-4bit FAILED 0.73, so the owner's conditional resolves to the "otherwise" branch —
+either (a) lower the coarse_kappa floor to the best empirical κ (pplx 0.6738), or (b) best-arm as ADVISORY
+(non-fail-closed, D-2798) decider with human arbitration on low-confidence rows — never a silent pass.
+OWNER GATE OPEN for the (a)/(b) choice (STier recommendation below).
+
+STier recommendation (ontological, future-proof): (b). Lowering the floor to ~0.67 (a) would promote pplx, which
+has ZERO emerging recall and therefore ontologically COLLAPSES the 3-way+emerging contract to 3-way (the exact
+BUG-692 defect). No distinct-family decider satisfies BOTH arms of the symmetric gate, so NONE is certify-able;
+the honest disposition is (b): keep gpt-oss-20b (closed-menu S4 classifier-of-record, D2249) as the ROUTING
+authority, run the best coarse-κ arm (pplx 0.6738) as ADVISORY-only with human arbitration on low-confidence
+rows, and use clef-flash's abstention signal (the only non-zero emerging recall) as the advisory reference for
+emerging-sensitive rows. The emerging-recall floor (0.5) stands as the gate for any FUTURE decider.
+
 ## D-2885 (2026-10-09) — RATIFIED — HF model-ecosystem sweep: nothing to adopt; roster already benchmark-aligned + opt-in candidate shortlist
 
 Swept HF pipeline tags (sort=downloads): zero-shot-classification, text-ranking, text-generation, reinforcement-learning.

@@ -1,0 +1,1612 @@
+{
+  "artifact_id": "d2884b_decider_ab_clef",
+  "schema_version": "1.0",
+  "gen_model": "mlx-community/clef-4bit",
+  "pipeline_commit": "17cc136",
+  "decision": "D-2884(b)",
+  "arm": "clef",
+  "referee": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/governance/d2767_ab_v8_20261009.json",
+  "anchor": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/governance/discipline_anchor_rederived_v8_20261007.json",
+  "macro_scheme": "3-way",
+  "criteria": {
+    "Technical": "Covers: AI & Computing (artificial intelligence, computational theory, generative ai, information retrieval, machine learning, robotics, software engineering); Computational Craft (computational geometry, computational physics & simulation, computer graphics, creative coding, game design, generative design); Form & Structure (color theory, motion & time, typography).",
+    "Human & Design": "Covers: Behavioral & Cognitive (behavioral economics, cognitive science, decision making, linguistics, neuroscience, organizational theory, psychology); Heterodox (anthropology, cultural studies, health & medicine, information security, interdisciplinary studies, law, performing arts, philosophy, political economy, privacy & surveillance, sociology); Design Cognition (aesthetics, creative process, design psychology, design thinking, human-computer interaction); Perception & Signal (communication theory, cultural design, literary theory, media studies, semiotics, visual perception, visual semiotics).",
+    "Method & Business": "Covers: Systems & Method (complex adaptive systems, ecology, engineering, evolutionary biology, information science, operations research, research methodology, social network analysis, systems engineering, systems thinking, theoretical physics); Operational & Strategy (economics, finance, risk management, strategic thinking); Business & Management (business administration, entrepreneurship studies, marketing).",
+    "emerging": "None of the established macro disciplines fit — the item is off-menu, novel, or ambiguous and must be routed for further review rather than forced into a bucket."
+  },
+  "coarse": {
+    "n": 194,
+    "raw_agreement": 0.7216,
+    "coarse_kappa": 0.5752,
+    "coarse_floor": 0.73,
+    "coarse_pass": false,
+    "emerging_rate": 0.0309,
+    "emerging_max": 0.35,
+    "emerging_pass": true,
+    "emerging_recall": 0.0,
+    "emerging_recall_floor": 0.5,
+    "emerging_recall_pass": false,
+    "cb_gate_pass": false,
+    "per_bucket": {
+      "Human & Design": {
+        "precision": 0.8701,
+        "recall": 0.6907,
+        "f1": 0.7701,
+        "n_gold": 97
+      },
+      "Method & Business": {
+        "precision": 0.6,
+        "recall": 0.7895,
+        "f1": 0.6818,
+        "n_gold": 57
+      },
+      "Technical": {
+        "precision": 0.7778,
+        "recall": 0.8485,
+        "f1": 0.8116,
+        "n_gold": 33
+      },
+      "emerging": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "n_gold": 7
+      }
+    }
+  },
+  "rows": [
+    {
+      "item_id": "R001",
+      "name": "Surveillance Capitalism Value Proposition",
+      "gold_fine": "privacy & surveillance",
+      "gold": "Human & Design",
+      "pred": "Method & Business",
+      "agree": false
+    },
+    {
+      "item_id": "R002",
+      "name": "Soviet Underground Discourse Reception",
+      "gold_fine": "cultural studies",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R003",
+      "name": "Quantum Cognitive Effects in Survey Design",
+      "gold_fine": "cognitive science",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R004",
+      "name": "Lockdown Effectiveness and Economic Impact",
+      "gold_fine": "political economy",
+      "gold": "Human & Design",
+      "pred": "Method & Business",
+      "agree": false
+    },
+    {
+      "item_id": "R005",
+      "name": "Graphics Algebra Cross Operator",
+      "gold_fine": "computer graphics",
+      "gold": "Technical",
+      "pred": "Technical",
+      "agree": true
+    },
+    {
+      "item_id": "R006",
+      "name": "Generative Algorithmic Composition",
+      "gold_fine": "emerging",
+      "gold": "emerging",
+      "pred": "Technical",
+      "agree": false
+    },
+    {
+      "item_id": "R007",
+      "name": "Accessible Electronic Prototyping Ecosystem",
+      "gold_fine": "engineering",
+      "gold": "Method & Business",
+      "pred": "emerging",
+      "agree": false
+    },
+    {
+      "item_id": "R008",
+      "name": "Inescapable Shock Syndrome",
+      "gold_fine": "psychology",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R009",
+      "name": "Entrepreneurial Risk Assessment Framework",
+      "gold_fine": "decision making",
+      "gold": "Human & Design",
+      "pred": "Method & Business",
+      "agree": false
+    },
+    {
+      "item_id": "R010",
+      "name": "Iterative Launch Process",
+      "gold_fine": "design thinking",
+      "gold": "Human & Design",
+      "pred": "Method & Business",
+      "agree": false
+    },
+    {
+      "item_id": "R011",
+      "name": "Agentic Decision-making Through Contextual Retrieval",
+      "gold_fine": "information retrieval",
+      "gold": "Technical",
+      "pred": "Technical",
+      "agree": true
+    },
+    {
+      "item_id": "R013",
+      "name": "Innovation Fund Risk Management",
+      "gold_fine": "risk management",
+      "gold": "Method & Business",
+      "pred": "Method & Business",
+      "agree": true
+    },
+    {
+      "item_id": "R014",
+      "name": "Sacred Geometry and Symbolic Resonance",
+      "gold_fine": "philosophy",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R015",
+      "name": "Long-term Strategic Planning in Different Industries",
+      "gold_fine": "business administration",
+      "gold": "Method & Business",
+      "pred": "Method & Business",
+      "agree": true
+    },
+    {
+      "item_id": "R016",
+      "name": "Modelans-modelandum Relationship",
+      "gold_fine": "semiotics",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R017",
+      "name": "Chemical Reaction Equation Automation",
+      "gold_fine": "computational physics & simulation",
+      "gold": "Technical",
+      "pred": "Technical",
+      "agree": true
+    },
+    {
+      "item_id": "R018",
+      "name": "Color and Typography Readability",
+      "gold_fine": "color theory",
+      "gold": "Technical",
+      "pred": "Human & Design",
+      "agree": false
+    },
+    {
+      "item_id": "R019",
+      "name": "Scientific Research Evaluation Framework",
+      "gold_fine": "research methodology",
+      "gold": "Method & Business",
+      "pred": "Method & Business",
+      "agree": true
+    },
+    {
+      "item_id": "R020",
+      "name": "Dynamic System Complexity",
+      "gold_fine": "complex adaptive systems",
+      "gold": "Method & Business",
+      "pred": "Method & Business",
+      "agree": true
+    },
+    {
+      "item_id": "R022",
+      "name": "Coupon Code Feature Placement Strategy",
+      "gold_fine": "human-computer interaction",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R023",
+      "name": "Focused Action Selection",
+      "gold_fine": "decision making",
+      "gold": "Human & Design",
+      "pred": "Method & Business",
+      "agree": false
+    },
+    {
+      "item_id": "R024",
+      "name": "Execution Gap From Technological Readiness",
+      "gold_fine": "business administration",
+      "gold": "Method & Business",
+      "pred": "Method & Business",
+      "agree": true
+    },
+    {
+      "item_id": "R025",
+      "name": "Design for Management and Organizational Culture",
+      "gold_fine": "organizational theory",
+      "gold": "Human & Design",
+      "pred": "Method & Business",
+      "agree": false
+    },
+    {
+      "item_id": "R027",
+      "name": "Decentralized Strategic Command",
+      "gold_fine": "organizational theory",
+      "gold": "Human & Design",
+      "pred": "Method & Business",
+      "agree": false
+    },
+    {
+      "item_id": "R028",
+      "name": "Gpu Acceleration Configuration",
+      "gold_fine": "machine learning",
+      "gold": "Technical",
+      "pred": "Technical",
+      "agree": true
+    },
+    {
+      "item_id": "R029",
+      "name": "Innovation Through Challenge to Assumptions",
+      "gold_fine": "business administration",
+      "gold": "Method & Business",
+      "pred": "Method & Business",
+      "agree": true
+    },
+    {
+      "item_id": "R030",
+      "name": "Digital Iconic Reproduction in Computer Graphics",
+      "gold_fine": "computer graphics",
+      "gold": "Technical",
+      "pred": "Technical",
+      "agree": true
+    },
+    {
+      "item_id": "R031",
+      "name": "Questionnaire Validation and Modification Risk",
+      "gold_fine": "risk management",
+      "gold": "Method & Business",
+      "pred": "Human & Design",
+      "agree": false
+    },
+    {
+      "item_id": "R032",
+      "name": "Heckel's Diff Algorithm for Version Tracking",
+      "gold_fine": "computational theory",
+      "gold": "Technical",
+      "pred": "Technical",
+      "agree": true
+    },
+    {
+      "item_id": "R033",
+      "name": "Postmodern Critique of Realist Assumptions",
+      "gold_fine": "philosophy",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R035",
+      "name": "Visual Evidence Recognition",
+      "gold_fine": "visual perception",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R036",
+      "name": "Domain Name Call-to-action Strategy",
+      "gold_fine": "marketing",
+      "gold": "Method & Business",
+      "pred": "Method & Business",
+      "agree": true
+    },
+    {
+      "item_id": "R037",
+      "name": "Style Precedence and Override Behavior",
+      "gold_fine": "software engineering",
+      "gold": "Technical",
+      "pred": "Technical",
+      "agree": true
+    },
+    {
+      "item_id": "R038",
+      "name": "Multiple Imputation Procedure",
+      "gold_fine": "research methodology",
+      "gold": "Method & Business",
+      "pred": "Method & Business",
+      "agree": true
+    },
+    {
+      "item_id": "R039",
+      "name": "Identity  As Social Positioning and Lifestyle Signifiers",
+      "gold_fine": "sociology",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R041",
+      "name": "Consumer Anticipation of Objections",
+      "gold_fine": "marketing",
+      "gold": "Method & Business",
+      "pred": "Method & Business",
+      "agree": true
+    },
+    {
+      "item_id": "R042",
+      "name": "Destination-control Elevator Interaction Pattern",
+      "gold_fine": "human-computer interaction",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R043",
+      "name": "Alpha State Thinking and Creative Problem-solving",
+      "gold_fine": "cognitive science",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R044",
+      "name": "Cyclical Design Lifecycle",
+      "gold_fine": "systems thinking",
+      "gold": "Method & Business",
+      "pred": "Method & Business",
+      "agree": true
+    },
+    {
+      "item_id": "R045",
+      "name": "Wpi Consumer Value Proposition Framework",
+      "gold_fine": "marketing",
+      "gold": "Method & Business",
+      "pred": "Method & Business",
+      "agree": true
+    },
+    {
+      "item_id": "R046",
+      "name": "Bitcoin Mining As Digital Ownership Model",
+      "gold_fine": "economics",
+      "gold": "Method & Business",
+      "pred": "emerging",
+      "agree": false
+    },
+    {
+      "item_id": "R047",
+      "name": "Emotional Transaction Design",
+      "gold_fine": "psychology",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R048",
+      "name": "Creative Process Through Drawing and Sketching",
+      "gold_fine": "creative process",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R049",
+      "name": "Fermi Estimation Method",
+      "gold_fine": "operations research",
+      "gold": "Method & Business",
+      "pred": "Method & Business",
+      "agree": true
+    },
+    {
+      "item_id": "R050",
+      "name": "Methodological Accountability",
+      "gold_fine": "research methodology",
+      "gold": "Method & Business",
+      "pred": "Method & Business",
+      "agree": true
+    },
+    {
+      "item_id": "R051",
+      "name": "Central Emptiness in Urban Design",
+      "gold_fine": "cultural design",
+      "gold": "Human & Design",
+      "pred": "emerging",
+      "agree": false
+    },
+    {
+      "item_id": "R052",
+      "name": "Interior Design Fixture Selection Challenge",
+      "gold_fine": "design thinking",
+      "gold": "Human & Design",
+      "pred": "Method & Business",
+      "agree": false
+    },
+    {
+      "item_id": "R053",
+      "name": "Self-referential Incompleteness",
+      "gold_fine": "computational theory",
+      "gold": "Technical",
+      "pred": "Technical",
+      "agree": true
+    },
+    {
+      "item_id": "R054",
+      "name": "Shap Explainability Framework",
+      "gold_fine": "machine learning",
+      "gold": "Technical",
+      "pred": "Technical",
+      "agree": true
+    },
+    {
+      "item_id": "R055",
+      "name": "Demand-side Sales Pattern",
+      "gold_fine": "marketing",
+      "gold": "Method & Business",
+      "pred": "Method & Business",
+      "agree": true
+    },
+    {
+      "item_id": "R056",
+      "name": "Quiz Generation with Llm Integration",
+      "gold_fine": "generative ai",
+      "gold": "Technical",
+      "pred": "Technical",
+      "agree": true
+    },
+    {
+      "item_id": "R057",
+      "name": "Annual Percentage Rate Standardization",
+      "gold_fine": "finance",
+      "gold": "Method & Business",
+      "pred": "Method & Business",
+      "agree": true
+    },
+    {
+      "item_id": "R058",
+      "name": "Illustration As Propaganda Tool",
+      "gold_fine": "communication theory",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R059",
+      "name": "First Course Development Framework",
+      "gold_fine": "emerging",
+      "gold": "emerging",
+      "pred": "Method & Business",
+      "agree": false
+    },
+    {
+      "item_id": "R060",
+      "name": "Aiga Transportation Symbol System Development",
+      "gold_fine": "visual semiotics",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R061",
+      "name": "Core Focus As Organizational Discipline",
+      "gold_fine": "organizational theory",
+      "gold": "Human & Design",
+      "pred": "Method & Business",
+      "agree": false
+    },
+    {
+      "item_id": "R062",
+      "name": "Somatic Marker Decision Making",
+      "gold_fine": "behavioral economics",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R063",
+      "name": "Textbook Representation and State of Exception Legitimation",
+      "gold_fine": "cultural studies",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R064",
+      "name": "Optical Alignment in Typography",
+      "gold_fine": "typography",
+      "gold": "Technical",
+      "pred": "Technical",
+      "agree": true
+    },
+    {
+      "item_id": "R065",
+      "name": "Media Construction of Crime Waves",
+      "gold_fine": "media studies",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R066",
+      "name": "N-dimensional Sphere Volume Properties",
+      "gold_fine": "computational geometry",
+      "gold": "Technical",
+      "pred": "emerging",
+      "agree": false
+    },
+    {
+      "item_id": "R067",
+      "name": "Schemat's Wasser Interactive Art Framework",
+      "gold_fine": "interdisciplinary studies",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R068",
+      "name": "Imagination and the Image",
+      "gold_fine": "aesthetics",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R069",
+      "name": "Falsifiable Variable Measurement",
+      "gold_fine": "research methodology",
+      "gold": "Method & Business",
+      "pred": "Method & Business",
+      "agree": true
+    },
+    {
+      "item_id": "R070",
+      "name": "Iterative Design Validation",
+      "gold_fine": "design thinking",
+      "gold": "Human & Design",
+      "pred": "Method & Business",
+      "agree": false
+    },
+    {
+      "item_id": "R071",
+      "name": "Lean Startup Experimentation Framework",
+      "gold_fine": "entrepreneurship studies",
+      "gold": "Method & Business",
+      "pred": "Method & Business",
+      "agree": true
+    },
+    {
+      "item_id": "R072",
+      "name": "Park24 Nondisruptive Market Creation",
+      "gold_fine": "entrepreneurship studies",
+      "gold": "Method & Business",
+      "pred": "Method & Business",
+      "agree": true
+    },
+    {
+      "item_id": "R073",
+      "name": "Evolution of Language Through Mental Models",
+      "gold_fine": "anthropology",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R074",
+      "name": "Attention Economy Externalities",
+      "gold_fine": "cognitive science",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R075",
+      "name": "Paradigm Shift Through Disruption",
+      "gold_fine": "philosophy",
+      "gold": "Human & Design",
+      "pred": "Method & Business",
+      "agree": false
+    },
+    {
+      "item_id": "R076",
+      "name": "Linguistic Fetish in Visual Communication",
+      "gold_fine": "marketing",
+      "gold": "Method & Business",
+      "pred": "Human & Design",
+      "agree": false
+    },
+    {
+      "item_id": "R077",
+      "name": "Symbolic Meaning Through Consumption",
+      "gold_fine": "cultural studies",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R078",
+      "name": "Parameterized Design Generation",
+      "gold_fine": "generative design",
+      "gold": "Technical",
+      "pred": "Technical",
+      "agree": true
+    },
+    {
+      "item_id": "R079",
+      "name": "Bar-hillel Paradox",
+      "gold_fine": "linguistics",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R081",
+      "name": "Shift From Trend-chasing to Intentional Consumption",
+      "gold_fine": "behavioral economics",
+      "gold": "Human & Design",
+      "pred": "Method & Business",
+      "agree": false
+    },
+    {
+      "item_id": "R083",
+      "name": "Self-herding Behavior",
+      "gold_fine": "behavioral economics",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R085",
+      "name": "Discursive Strategy Abstraction",
+      "gold_fine": "cultural studies",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R086",
+      "name": "Commitment and Consistency Principle (2)",
+      "gold_fine": "behavioral economics",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R087",
+      "name": "In-group Identity and Social Bonding",
+      "gold_fine": "psychology",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R088",
+      "name": "Gradio Web Interface for Ml Models",
+      "gold_fine": "human-computer interaction",
+      "gold": "Human & Design",
+      "pred": "Technical",
+      "agree": false
+    },
+    {
+      "item_id": "R089",
+      "name": "Vr Body Constraint and Physical Immersion",
+      "gold_fine": "human-computer interaction",
+      "gold": "Human & Design",
+      "pred": "Technical",
+      "agree": false
+    },
+    {
+      "item_id": "R090",
+      "name": "Culture Jamming",
+      "gold_fine": "media studies",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R091",
+      "name": "Autopoesis in Design Education",
+      "gold_fine": "systems thinking",
+      "gold": "Method & Business",
+      "pred": "Human & Design",
+      "agree": false
+    },
+    {
+      "item_id": "R092",
+      "name": "Data Quality and Method Transparency in Journalism",
+      "gold_fine": "research methodology",
+      "gold": "Method & Business",
+      "pred": "Human & Design",
+      "agree": false
+    },
+    {
+      "item_id": "R093",
+      "name": "Numerical Symbolism in Design and Biology",
+      "gold_fine": "semiotics",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R094",
+      "name": "Progressive Feature Introduction",
+      "gold_fine": "human-computer interaction",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R095",
+      "name": "Sensory Engagement As Quality Signal",
+      "gold_fine": "psychology",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R096",
+      "name": "Transportation and Setup Costs in Construction Projects",
+      "gold_fine": "finance",
+      "gold": "Method & Business",
+      "pred": "Method & Business",
+      "agree": true
+    },
+    {
+      "item_id": "R097",
+      "name": "Minimin Decision Criterion",
+      "gold_fine": "decision making",
+      "gold": "Human & Design",
+      "pred": "Method & Business",
+      "agree": false
+    },
+    {
+      "item_id": "R098",
+      "name": "Aesthetic Refinement Through Iteration",
+      "gold_fine": "aesthetics",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R099",
+      "name": "Charismatic Brand Discipline",
+      "gold_fine": "marketing",
+      "gold": "Method & Business",
+      "pred": "Method & Business",
+      "agree": true
+    },
+    {
+      "item_id": "R100",
+      "name": "Network Marketing Business Model",
+      "gold_fine": "business administration",
+      "gold": "Method & Business",
+      "pred": "Method & Business",
+      "agree": true
+    },
+    {
+      "item_id": "R101",
+      "name": "Pragmatist View of Truth and Knowledge",
+      "gold_fine": "philosophy",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R102",
+      "name": "Social Entrepreneur's Playbook",
+      "gold_fine": "entrepreneurship studies",
+      "gold": "Method & Business",
+      "pred": "Method & Business",
+      "agree": true
+    },
+    {
+      "item_id": "R103",
+      "name": "Temporal Consistency in Visual Narrative Analysis",
+      "gold_fine": "visual semiotics",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R104",
+      "name": "Strategic Information Gathering",
+      "gold_fine": "operations research",
+      "gold": "Method & Business",
+      "pred": "Method & Business",
+      "agree": true
+    },
+    {
+      "item_id": "R105",
+      "name": "Probabilistic Forecasting with Prediction Intervals",
+      "gold_fine": "operations research",
+      "gold": "Method & Business",
+      "pred": "Technical",
+      "agree": false
+    },
+    {
+      "item_id": "R107",
+      "name": "Lived Experience Focus",
+      "gold_fine": "philosophy",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R108",
+      "name": "Typography in Brand Positioning and Magazine Design",
+      "gold_fine": "typography",
+      "gold": "Technical",
+      "pred": "Human & Design",
+      "agree": false
+    },
+    {
+      "item_id": "R109",
+      "name": "Project Completion Bias",
+      "gold_fine": "behavioral economics",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R110",
+      "name": "Federated Information Architecture",
+      "gold_fine": "information science",
+      "gold": "Method & Business",
+      "pred": "Method & Business",
+      "agree": true
+    },
+    {
+      "item_id": "R111",
+      "name": "Pmt Camera Typography Manipulation",
+      "gold_fine": "typography",
+      "gold": "Technical",
+      "pred": "emerging",
+      "agree": false
+    },
+    {
+      "item_id": "R112",
+      "name": "Content Analysis Approaches in Visual Research",
+      "gold_fine": "research methodology",
+      "gold": "Method & Business",
+      "pred": "Human & Design",
+      "agree": false
+    },
+    {
+      "item_id": "R113",
+      "name": "Traveling Salesman Problem Computational Complexity",
+      "gold_fine": "computational theory",
+      "gold": "Technical",
+      "pred": "Technical",
+      "agree": true
+    },
+    {
+      "item_id": "R114",
+      "name": "Measurable Outcome Focus",
+      "gold_fine": "decision making",
+      "gold": "Human & Design",
+      "pred": "Method & Business",
+      "agree": false
+    },
+    {
+      "item_id": "R115",
+      "name": "Heuristic Reasoning in Problem Solving",
+      "gold_fine": "operations research",
+      "gold": "Method & Business",
+      "pred": "Method & Business",
+      "agree": true
+    },
+    {
+      "item_id": "R116",
+      "name": "Ai Model Deployment Risk",
+      "gold_fine": "risk management",
+      "gold": "Method & Business",
+      "pred": "Technical",
+      "agree": false
+    },
+    {
+      "item_id": "R117",
+      "name": "Sustained Purpose Over Temporary Gratification",
+      "gold_fine": "behavioral economics",
+      "gold": "Human & Design",
+      "pred": "Method & Business",
+      "agree": false
+    },
+    {
+      "item_id": "R118",
+      "name": "Pass@k Evaluation Method",
+      "gold_fine": "research methodology",
+      "gold": "Method & Business",
+      "pred": "Technical",
+      "agree": false
+    },
+    {
+      "item_id": "R119",
+      "name": "Strategic Human Resource Planning for Social Enterprises",
+      "gold_fine": "business administration",
+      "gold": "Method & Business",
+      "pred": "Method & Business",
+      "agree": true
+    },
+    {
+      "item_id": "R120",
+      "name": "Nonlinear Magnification Fields",
+      "gold_fine": "computer graphics",
+      "gold": "Technical",
+      "pred": "Technical",
+      "agree": true
+    },
+    {
+      "item_id": "R121",
+      "name": "Consumers Hero Refurbishment Strategy",
+      "gold_fine": "business administration",
+      "gold": "Method & Business",
+      "pred": "Method & Business",
+      "agree": true
+    },
+    {
+      "item_id": "R122",
+      "name": "Visual Hierarchy Through Contrast (2)",
+      "gold_fine": "visual perception",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R123",
+      "name": "Superquadric Parameterization in 3d Space",
+      "gold_fine": "computational geometry",
+      "gold": "Technical",
+      "pred": "Technical",
+      "agree": true
+    },
+    {
+      "item_id": "R124",
+      "name": "Foundation Model Integration Framework",
+      "gold_fine": "artificial intelligence",
+      "gold": "Technical",
+      "pred": "Technical",
+      "agree": true
+    },
+    {
+      "item_id": "R125",
+      "name": "Dell Computer's Direct-sale Business Model",
+      "gold_fine": "business administration",
+      "gold": "Method & Business",
+      "pred": "Method & Business",
+      "agree": true
+    },
+    {
+      "item_id": "R126",
+      "name": "Embodied Knowledge in Design",
+      "gold_fine": "cultural design",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R127",
+      "name": "Guild of Handicraft Educational Model",
+      "gold_fine": "emerging",
+      "gold": "emerging",
+      "pred": "Human & Design",
+      "agree": false
+    },
+    {
+      "item_id": "R128",
+      "name": "Choice Architecture and Identity Framing",
+      "gold_fine": "decision making",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R129",
+      "name": "Use of Proxies and Analogues in Market Sizing",
+      "gold_fine": "marketing",
+      "gold": "Method & Business",
+      "pred": "Method & Business",
+      "agree": true
+    },
+    {
+      "item_id": "R130",
+      "name": "Typographic Principles of William Morris",
+      "gold_fine": "typography",
+      "gold": "Technical",
+      "pred": "Technical",
+      "agree": true
+    },
+    {
+      "item_id": "R131",
+      "name": "Differential Privacy in Data Collection",
+      "gold_fine": "privacy & surveillance",
+      "gold": "Human & Design",
+      "pred": "emerging",
+      "agree": false
+    },
+    {
+      "item_id": "R132",
+      "name": "Monte Carlo PDE Solution Method",
+      "gold_fine": "computational physics & simulation",
+      "gold": "Technical",
+      "pred": "Technical",
+      "agree": true
+    },
+    {
+      "item_id": "R133",
+      "name": "Three-holes-in-the-cheese Model of Error Cascades",
+      "gold_fine": "risk management",
+      "gold": "Method & Business",
+      "pred": "Method & Business",
+      "agree": true
+    },
+    {
+      "item_id": "R134",
+      "name": "Holistic Interpretation Problem in Index-aware Retrieval",
+      "gold_fine": "information retrieval",
+      "gold": "Technical",
+      "pred": "Technical",
+      "agree": true
+    },
+    {
+      "item_id": "R135",
+      "name": "Ase  Design Problem Solving Model",
+      "gold_fine": "design thinking",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R136",
+      "name": "Chatgpt Prompt Framework",
+      "gold_fine": "generative ai",
+      "gold": "Technical",
+      "pred": "Technical",
+      "agree": true
+    },
+    {
+      "item_id": "R137",
+      "name": "Desire-friction Conversion Formula",
+      "gold_fine": "behavioral economics",
+      "gold": "Human & Design",
+      "pred": "Method & Business",
+      "agree": false
+    },
+    {
+      "item_id": "R138",
+      "name": "Hjelmslev's Trichotomy and Linguistic Theory",
+      "gold_fine": "linguistics",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R139",
+      "name": "Learning Through Failure Process",
+      "gold_fine": "cognitive science",
+      "gold": "Human & Design",
+      "pred": "Method & Business",
+      "agree": false
+    },
+    {
+      "item_id": "R141",
+      "name": "Contextual Redundancy and Representation Efficiency",
+      "gold_fine": "machine learning",
+      "gold": "Technical",
+      "pred": "Technical",
+      "agree": true
+    },
+    {
+      "item_id": "R142",
+      "name": "Global Village Conceptual Framework",
+      "gold_fine": "communication theory",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R143",
+      "name": "Figma Hamburger Icon Creation",
+      "gold_fine": "computer graphics",
+      "gold": "Technical",
+      "pred": "Technical",
+      "agree": true
+    },
+    {
+      "item_id": "R144",
+      "name": "Abra-kadabra Number Classification",
+      "gold_fine": "software engineering",
+      "gold": "Technical",
+      "pred": "Technical",
+      "agree": true
+    },
+    {
+      "item_id": "R145",
+      "name": "Color As Cultural and Emotional Marker",
+      "gold_fine": "color theory",
+      "gold": "Technical",
+      "pred": "Human & Design",
+      "agree": false
+    },
+    {
+      "item_id": "R146",
+      "name": "Debate As Leadership Tool",
+      "gold_fine": "emerging",
+      "gold": "emerging",
+      "pred": "Method & Business",
+      "agree": false
+    },
+    {
+      "item_id": "R147",
+      "name": "Randomness in Data Measurement",
+      "gold_fine": "research methodology",
+      "gold": "Method & Business",
+      "pred": "Method & Business",
+      "agree": true
+    },
+    {
+      "item_id": "R149",
+      "name": "Perceptual Mapping Through Camouflage",
+      "gold_fine": "visual perception",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R150",
+      "name": "Triple Bottom Line Business Approach",
+      "gold_fine": "strategic thinking",
+      "gold": "Method & Business",
+      "pred": "Method & Business",
+      "agree": true
+    },
+    {
+      "item_id": "R151",
+      "name": "Context-dependent Cognitive Processing",
+      "gold_fine": "cognitive science",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R152",
+      "name": "Economic Politics of Obsolescence",
+      "gold_fine": "political economy",
+      "gold": "Human & Design",
+      "pred": "Method & Business",
+      "agree": false
+    },
+    {
+      "item_id": "R153",
+      "name": "Cognitive Interview Analysis of Question Clarity Issues",
+      "gold_fine": "cognitive science",
+      "gold": "Human & Design",
+      "pred": "Method & Business",
+      "agree": false
+    },
+    {
+      "item_id": "R154",
+      "name": "Aditya Birla Group's Parta System",
+      "gold_fine": "finance",
+      "gold": "Method & Business",
+      "pred": "Method & Business",
+      "agree": true
+    },
+    {
+      "item_id": "R155",
+      "name": "Persistence in Business Strategy",
+      "gold_fine": "business administration",
+      "gold": "Method & Business",
+      "pred": "Method & Business",
+      "agree": true
+    },
+    {
+      "item_id": "R156",
+      "name": "Designers' Object World",
+      "gold_fine": "cognitive science",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R157",
+      "name": "Perspective-driven Cognitive Shift",
+      "gold_fine": "cognitive science",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R158",
+      "name": "Duality in Design",
+      "gold_fine": "cultural design",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R159",
+      "name": "Context-dependent Quality Assessment",
+      "gold_fine": "risk management",
+      "gold": "Method & Business",
+      "pred": "Technical",
+      "agree": false
+    },
+    {
+      "item_id": "R160",
+      "name": "Resource-based Value Assessment",
+      "gold_fine": "operations research",
+      "gold": "Method & Business",
+      "pred": "Method & Business",
+      "agree": true
+    },
+    {
+      "item_id": "R162",
+      "name": "Provincial Norms",
+      "gold_fine": "psychology",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R163",
+      "name": "Metaphorically Selling How to Use the Ma",
+      "gold_fine": "communication theory",
+      "gold": "Human & Design",
+      "pred": "Method & Business",
+      "agree": false
+    },
+    {
+      "item_id": "R164",
+      "name": "Phenomenological Understanding",
+      "gold_fine": "philosophy",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R165",
+      "name": "Acknowledgment Attribution",
+      "gold_fine": "emerging",
+      "gold": "emerging",
+      "pred": "Method & Business",
+      "agree": false
+    },
+    {
+      "item_id": "R166",
+      "name": "Agent-centric Economic Incentives",
+      "gold_fine": "economics",
+      "gold": "Method & Business",
+      "pred": "Method & Business",
+      "agree": true
+    },
+    {
+      "item_id": "R167",
+      "name": "Innocent Brand Identity Through Organic Development",
+      "gold_fine": "organizational theory",
+      "gold": "Human & Design",
+      "pred": "Method & Business",
+      "agree": false
+    },
+    {
+      "item_id": "R168",
+      "name": "Hidden Issue Questioning Technique",
+      "gold_fine": "marketing",
+      "gold": "Method & Business",
+      "pred": "Method & Business",
+      "agree": true
+    },
+    {
+      "item_id": "R169",
+      "name": "Charismatic Leadership Development",
+      "gold_fine": "psychology",
+      "gold": "Human & Design",
+      "pred": "Method & Business",
+      "agree": false
+    },
+    {
+      "item_id": "R170",
+      "name": "Dream-driven Life Planning",
+      "gold_fine": "decision making",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R171",
+      "name": "Alpha Blending Control",
+      "gold_fine": "computer graphics",
+      "gold": "Technical",
+      "pred": "Technical",
+      "agree": true
+    },
+    {
+      "item_id": "R172",
+      "name": "Digital System Context Decomposition",
+      "gold_fine": "engineering",
+      "gold": "Method & Business",
+      "pred": "Technical",
+      "agree": false
+    },
+    {
+      "item_id": "R173",
+      "name": "Linkedin Network Building Protocol",
+      "gold_fine": "social network analysis",
+      "gold": "Method & Business",
+      "pred": "Method & Business",
+      "agree": true
+    },
+    {
+      "item_id": "R174",
+      "name": "Concept-first Prototyping",
+      "gold_fine": "design thinking",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R175",
+      "name": "Role-based Prompting Effect",
+      "gold_fine": "artificial intelligence",
+      "gold": "Technical",
+      "pred": "Technical",
+      "agree": true
+    },
+    {
+      "item_id": "R176",
+      "name": "Harvest Time Strategic Planning",
+      "gold_fine": "finance",
+      "gold": "Method & Business",
+      "pred": "Method & Business",
+      "agree": true
+    },
+    {
+      "item_id": "R177",
+      "name": "Contextual Interpretation Framework",
+      "gold_fine": "semiotics",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R178",
+      "name": "If-then Plan for Moral Action",
+      "gold_fine": "psychology",
+      "gold": "Human & Design",
+      "pred": "Method & Business",
+      "agree": false
+    },
+    {
+      "item_id": "R179",
+      "name": "Coincidence Wit in Graphic Design",
+      "gold_fine": "creative process",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R181",
+      "name": "Economic Industry Network Structure",
+      "gold_fine": "economics",
+      "gold": "Method & Business",
+      "pred": "Method & Business",
+      "agree": true
+    },
+    {
+      "item_id": "R183",
+      "name": "Pattern Language Implementation Process",
+      "gold_fine": "emerging",
+      "gold": "emerging",
+      "pred": "Method & Business",
+      "agree": false
+    },
+    {
+      "item_id": "R184",
+      "name": "Doping in Professional Sports: Systemic Pressure and Rationalization",
+      "gold_fine": "behavioral economics",
+      "gold": "Human & Design",
+      "pred": "Method & Business",
+      "agree": false
+    },
+    {
+      "item_id": "R185",
+      "name": "Tv Advertising Consumer Behavior Pattern",
+      "gold_fine": "marketing",
+      "gold": "Method & Business",
+      "pred": "Method & Business",
+      "agree": true
+    },
+    {
+      "item_id": "R186",
+      "name": "Cognitive Interview Analysis Framework",
+      "gold_fine": "research methodology",
+      "gold": "Method & Business",
+      "pred": "Method & Business",
+      "agree": true
+    },
+    {
+      "item_id": "R187",
+      "name": "Credibility Through Transparency",
+      "gold_fine": "communication theory",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R188",
+      "name": "Sensory-motor Basis of Conceptual Reasoning",
+      "gold_fine": "cognitive science",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R189",
+      "name": "Higher-order Polynomial Approximation in Numerical Methods",
+      "gold_fine": "computational physics & simulation",
+      "gold": "Technical",
+      "pred": "Technical",
+      "agree": true
+    },
+    {
+      "item_id": "R190",
+      "name": "Design Thinking Integration Strategy",
+      "gold_fine": "design thinking",
+      "gold": "Human & Design",
+      "pred": "Method & Business",
+      "agree": false
+    },
+    {
+      "item_id": "R191",
+      "name": "Intentional Motion Design",
+      "gold_fine": "motion & time",
+      "gold": "Technical",
+      "pred": "Technical",
+      "agree": true
+    },
+    {
+      "item_id": "R192",
+      "name": "Long-term Investment Advantage",
+      "gold_fine": "finance",
+      "gold": "Method & Business",
+      "pred": "Method & Business",
+      "agree": true
+    },
+    {
+      "item_id": "R193",
+      "name": "Brent Spar Campaign Effectiveness",
+      "gold_fine": "political economy",
+      "gold": "Human & Design",
+      "pred": "Method & Business",
+      "agree": false
+    },
+    {
+      "item_id": "R195",
+      "name": "Agentic Ai System Reliability",
+      "gold_fine": "generative ai",
+      "gold": "Technical",
+      "pred": "Technical",
+      "agree": true
+    },
+    {
+      "item_id": "R196",
+      "name": "Inclusive Design Adaptation",
+      "gold_fine": "human-computer interaction",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R197",
+      "name": "Peripheral Cue Interference Effect",
+      "gold_fine": "cognitive science",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R198",
+      "name": "Survivor Bias in Success Narratives",
+      "gold_fine": "behavioral economics",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R199",
+      "name": "Comfort Zone Constriction From Negative Influence",
+      "gold_fine": "psychology",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R201",
+      "name": "Physical Activity and Brain Health",
+      "gold_fine": "health & medicine",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R202",
+      "name": "Interactive Media Integration",
+      "gold_fine": "emerging",
+      "gold": "emerging",
+      "pred": "Human & Design",
+      "agree": false
+    },
+    {
+      "item_id": "R203",
+      "name": "Iterative Problem-solving in Ux Design",
+      "gold_fine": "design thinking",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R204",
+      "name": "Expert Overconfidence and Cognitive Laziness",
+      "gold_fine": "psychology",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R205",
+      "name": "Innovation Cycles in Art and Technology",
+      "gold_fine": "cultural studies",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R206",
+      "name": "Directional Changes (dc) in Financial Data",
+      "gold_fine": "finance",
+      "gold": "Method & Business",
+      "pred": "Method & Business",
+      "agree": true
+    },
+    {
+      "item_id": "R207",
+      "name": "Generous Audacious Marketing",
+      "gold_fine": "marketing",
+      "gold": "Method & Business",
+      "pred": "Method & Business",
+      "agree": true
+    },
+    {
+      "item_id": "R208",
+      "name": "Recovered Memory Therapy and False Accusations",
+      "gold_fine": "psychology",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R209",
+      "name": "Procedural Vs Declarative Knowledge Retrieval",
+      "gold_fine": "cognitive science",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    },
+    {
+      "item_id": "R210",
+      "name": "Same-age Peer Modeling",
+      "gold_fine": "behavioral economics",
+      "gold": "Human & Design",
+      "pred": "Human & Design",
+      "agree": true
+    }
+  ],
+  "generated_at": "2026-10-09T20:03:45.426608+00:00"
+}

@@ -45,6 +45,7 @@ may_touch:
 - governance/backups/ANCHOR4_DEPTH_BLIND_SHEET.OWNER_PARTIAL18_UNCOMMITTED_*.csv
 - DECISION-LOG.md
 - MASTER-TASK-REGISTER.md
+- AGENTS.md
 - agent/session_seed.yaml
 - governance/RECONCILIATION.json
 - governance/ROOT_CAUSE_AND_DRIFT_ARCHITECTURE_20260925.md
@@ -123,6 +124,13 @@ will_not_touch:
 - governance/ANCHOR_RULER_CONSOLIDATED_*.csv
 - governance/ANCHOR4_DEPTH_BLIND_SHEET_*.csv
 widening_log:
+- date: '2026-10-09'
+  actor: assistant
+  owner_ack: 'standing owner mandate 2026-10-09 ("continue with next critical steps ... update and sync gov dependencies")'
+  addendum: 'D-2898 promotion trust boundary: the DELEGATION ROUTING map in AGENTS.md (protected) must carry the promotion routing rule (deterministic match_to_canonical + owner-gate, NEVER an LLM; gpt-oss advisory-only) so a future delegation cannot drift from the owner-gated promotion trust boundary.'
+  additions:
+  - pattern: AGENTS.md
+    why: 'D-2898 - the promotion trust boundary is a ROUTING constraint (D2549 delegation map), and AGENTS.md is the one home for DELEGATION ROUTING; a routing rule that cannot be committed is not a routing rule.'
 - date: '2026-10-09'
   actor: assistant
   owner_ack: 'standing owner mandate 2026-10-09 ("continue with next critical steps ... update and sync gov dependencies")'

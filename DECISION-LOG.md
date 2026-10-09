@@ -3974,3 +3974,46 @@ VERDICT: emerging is NOT a promotion problem; it is a ROUTING + MENU-hygiene pro
     color theory (22); computational theory (22).
   * PROMOTE only genuinely-homeless coherent labels: creative writing (16), museum studies (13) — owner sign-off.
 Owner-gated: actual re-adjudication/re-classification of 2539 rows + any menu edit require owner sign-off.
+
+## D-2891 — SCOPE CORRECTION (t11 forever excluded) + owner adjudication + BUG-693 root-cause reframe (2026-10-09)
+OWNER RULING: the canonical run is `rechunk-v4-20260929` (6591 rows). The t11 checkpoint (7855 rows) is
+NEVER to be counted again. D-2890's headline figures (14574 total / 2539 emerging / 17.4%) were t11-polluted
+(14574 = 6591 canonical + 7855 t11 + 122 e2e + 6 bug198_reinject). Corrected, canonical-only numbers:
+  * emerging = 1779 (27.0% of 6591), decomposed deterministically: mapfail 280 + dombleed 190 + offmenu 1309.
+  * mapfail 280 = discipline_raw IS a canonical discipline — marketing 259 + business administration 20 +
+    entrepreneurship studies 1. These are EXACTLY the 3 disciplines added v5->v8 (verified diff: v5 62 -> v8 65
+    disciplines, the +3 = Business & Management group). No discipline was removed.
+  * dombleed 190 = discipline_raw IS a canonical domain written into the discipline cell (graphic design 56,
+    organizational behavior 34, entrepreneurship 28, project management 23, industrial design 13, product design
+    12, urban planning 10, education 6, ...). The domain label is ALREADY in `domains` on 63 rows; missing on 127.
+  * offmenu 1309 = genuinely absent from both menus (marketing science 94, leadership studies 37, brand strategy,
+    creative writing 14, museum studies 13, ...).
+  * DEAD disciplines = 6 (not 3): marketing, business administration, entrepreneurship studies (Business &
+    Management) PLUS generative ai, creative coding, generative design (Computational Craft) — the latter three
+    are v5-present but NEVER chosen by the decider (0 fbs), confirming D-2890's over-granularity claim.
+ROOT-CAUSE REFRAME (revises BUG-693): mapfail is MENU-WIDENING DRIFT, not a decider defect. The 280 rows carry
+  discipline_raw EXACTLY equal to the 3 disciplines added v5->v8, so the decider correctly abstained ('emerging')
+  on labels absent from its menu at classification time; the menu then widened and the rows were never
+  re-classified. The fix is a re-classification pass gated on menu-widening (a governance process gap), not a
+  decider prompt fix. (The rate-ceiling/recall-floor tension from D-2886/D-2890 is INDEPENDENT and stands.)
+RECLAIM PRECISION: only mapfail (280) is FULLY deterministic (discipline_raw == canonical discipline, exact).
+  dombleed (190) is deterministic only on the DOMAIN axis (kind-swap the label into `domains`, BUG-150 machinery);
+  its discipline field still needs re-classification. offmenu (1309) is promotion review or stays 'emerging'.
+OWNER ADJUDICATION (2026-10-09) — PARTIAL (4 agree, 3 unsure):
+  AGREED: R006 Generative Algorithmic Composition -> generative design; R059 First Course Development Framework
+    -> entrepreneurship studies; R146 Debate As Leadership Tool -> decision making; R165 Acknowledgment
+    Attribution -> information science.
+  UNSURE: R127, R183, R202. STier firm recommendations (anchored on v8 definitions):
+    * R127 Guild of Handicraft Educational Model -> cultural design ("historical/theoretical analysis of design
+      practices... and their cultural significance"; the Guild of Handicraft IS a design-history case; education
+      as the domain).
+    * R183 Pattern Language Implementation Process -> systems thinking ("individual actions -> communal patterns"
+      = emergence/interrelationships; v8's design thinking is the narrow IDEO empathize-define-ideate loop).
+    * R202 Interactive Media Integration -> performing arts (live media + audience co-construction = live
+      performance; media studies is academic ANALYSIS, this FB is artistic PRACTICE).
+C26 RELAXATION (owner): C26 (cross-platform) is a LONG-TERM rule, short-term relaxable. Voz remains NO-ADOPT
+  for C4 (closed runtime) + C21 (non-MLX/Ollama) — INDEPENDENT of C26.
+DEMOTE/PROMOTE corrected to canonical counts: merge visual semiotics (44) + semiotics (61) = 105; design
+  psychology 3, information retrieval 9, color theory 14, computational theory 16 are small but non-zero; the
+  three generative/coding labels are DEAD (0) — consolidate or retire, not "merge 12+6+9". Promote creative
+  writing (14) + museum studies (13) only.

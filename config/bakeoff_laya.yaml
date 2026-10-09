@@ -13,7 +13,7 @@ licence:
 weights:
 - repo: convaiinnovations/laya
   role: typed-decision bundle (resolved from laya_mlx/router.py; the previous aac6fef/* ids were WRONG - BUG-364)
-  revision: 1c5edc17a7acd8701df6fc341c0d179f1c62c982
+  revision: 7b928d828b7b0e022f929d9bd2e44165aa270148
   sha256:
     encoder/config.json: bf3ab80598fdccf414855a2ce80f22859e4492d06ca8a62ddd1cfb63972f8979
     model.safetensors: 891102d372688fc2a094dac56a384bc537b87c63f21f9f3dac0be2b7cbc8d86c
@@ -25,8 +25,8 @@ provenance:
   recorded_at: '2026-09-22T19:09:46'
   recorded_by: BUG-364 pin recording (owner-approved); NO run performed
   hf_repo: convaiinnovations/laya
-  revision: 1c5edc17a7acd8701df6fc341c0d179f1c62c982
-  snapshot_path: ~/.cache/huggingface/hub/models--convaiinnovations--laya/snapshots/1c5edc17a7acd8701df6fc341c0d179f1c62c982
+  revision: 7b928d828b7b0e022f929d9bd2e44165aa270148
+  snapshot_path: ~/.cache/huggingface/hub/models--convaiinnovations--laya/snapshots/7b928d828b7b0e022f929d9bd2e44165aa270148
   total_bytes: 846195574
   files:
   - path: encoder/config.json

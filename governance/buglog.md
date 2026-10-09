@@ -25,6 +25,7 @@
 | Bug | Date | Issue |
 |---|---|---|
 
+| BUG-692 | 2026-10-09 | **D-2884(b) C+B emerging clause is a trivially-satisfied blindspot: pplx (Arm A) has ZERO recall on the 7 gold-emerging rows.** The gate's emerging arm (`emerging_rate <= 0.35`) measures only how OFTEN the decider abstains, not whether it abstains on the RIGHT rows. pplx never outputs 'emerging' (always-answer decision readout), so its rate 0.0052 "passes" while 7/7 gold-emerging rows were forced into established buckets (4→Human & Design, 2→Method & Business, 1→Technical). An always-answer decider therefore trivially satisfies the emerging clause, so coarse_kappa>=0.73 AND this clause could false-PASS and promote a decider that cannot route emerging. FIX (owner-gated D-2884(b) re-scope): require an emerging-RECALL floor (recall on the gold-emerging subset) in addition to the rate ceiling, or add a calibration/threshold arm that can emit 'emerging'. Advisory-only for now (D-2798: advisory verdicts never fail closed on their own). |
 | BUG-691 | 2026-10-09 | **Serving layer mixed stale non-canonical-run rows into every answer (FIXED).** retrieve.py/query.py/status.py/maxwell_mcp_server.py queried `fbs` with ZERO `pipeline_run_id` filter; 4 run_ids share the table (t11=7855, canonical rechunk-v4-20260929=6591, e2e=122, bug198_reinject=6), so 7983 stale rows (54.8%) leaked into every search/stats/MCP answer. Fixed via D-2881 config-first pin: `pipeline_paths.CANONICAL_RUN` + `canonical_run_clause()` (source of truth `anchor_family.yaml store_bridge.canonical_run`, env override `MAXWELL_CANONICAL_RUN`, fallback `run.default_id`), applied COLUMN-AWARE to all serving queries (skip when column absent → in-memory test fixture stays green). VERIFIED: query.py --stats 14574→6591; retrieve keyword+FTS return 0 leaked rows; quarantine/hybrid-RRF/vector-dim tests green. 5 files, no schema/data mutation. |
 | BUG-690 | 2026-10-09 | **D-2767 C+B coarse-kappa blindspot + macro-config drift.** (1) The D-2767 v8 A/B harness (`scripts/d2767_ab_eval.py`) reports only FINE-grained kappa (0.4216) and does NOT compute the coarse 3-way macro kappa the owner-ruled C+B gate requires (`coarse_kappa >= 0.73` = `pipeline_config.yaml` `discipline_coarse_kappa_floor`). Ad hoc collapse of the 194 rows: fine 0.4216 / 9-way group 0.5696 / 3-way coarse **0.5621** → C+B gate **FAILS** (0.5621 < 0.73) even though emerging 0.0155 passes. (2) `config/discipline_macro_groups.yaml` was built against closed_menu_v5 (9 groups) and is MISSING the 'Business & Management' group that first appeared in closed_menu_v6 (business administration / entrepreneurship studies / marketing). Any future coarse-kappa computation emits `UNMAPPED:Business & Management` for ~21 rows, corrupting the B-arm metric. Fix: add 'Business & Management' → Method & Business (3-way) and → Method & Operations (4-way); add a regression test; add coarse-kappa output to the A/B harness. **PART 2 FIXED 2026-10-09 (commit 5042962):** added 'Business & Management' to 3-way Method & Business + 4-way Method & Operations; repointed `discipline_macro_classify.py` DEFAULT_MENU and `discipline_advisory_rescore.py` menu pin from closed_menu_v5 -> v8; verified the fail-closed `load_macro` guard now covers all 10 v8 groups (0 uncovered) and the 3 B&M values map to Method & Business. PART 1 FIXED 2026-10-09 (commit 8895cbf): coarse_collapse()/coarse_report() + tests/test_d2767_coarse_kappa.py (4/4 pass). |
 | BUG-681 | 2026-10-08 | **`just health-full` = the ladder's WHOLE fault set. Round 2 measured 6; round 3 measures `FAIL ladder scan: 3 fault(s) in ONE pass` over 118 lines (503s), worst rc=1 (D-2680/BUG-573). FIXED so far: the unparsed buglog heading, the missing archive-index entry, and `check_undeclared_encoding`. THE 3 REMAINING: (a) `check_tests --check` = 3 red contract tests outside a declared-red=0 ceiling, incl. `test_s4_golden_conforms_to_ontology` (a golden set that does not conform to the ontology) - pre-existing, attributed away from the ANCHOR work by grep; (b) `check_encoding_homes --check` rc=1 - **this one BLOCKS the `just health` prefix**, offender NAMED with a line number: `scripts/remap_referee_v7_28rows.py:69` opens the owner remap CSV with a local `encoding="utf-8-sig"` instead of the ONE declared decode home (`scripts/lib/artifact_encoding.py`, D-2644/D-2646) - the honest fix needs a DECLARATION for that CSV; (c) `check_boundary_rehearsal` rc=1, newly diagnosed: `bootstrap.whole_tree_refused: refused (rc=1) but not for the declared reason 'FORBIDDEN session plan' (RAIL 4) - a refusal that does not name its cause cannot justify a bypass` - i.e. a whole-tree commit is still refused, but by a DIFFERENT rail than the declared one, so either the declared marker is stale or an earlier rail now refuses; do NOT hand-edit the declared reason (that hides the drift) - retain the fixture and print the ACTUAL refusal text. Diagnose (b) FIRST: it is the blocker that hides (a) and (c).** |
@@ -9758,3 +9759,41 @@ VERIFIED (all exit 0): `check_anchor_axis_consistency.py` (every consumer agrees
 Ceilings at 0 (shrink-only). BUG-685 (depth conformance builder) remains OPEN — separate fix, not part of this projection.
 
 BUG-683 retired as a writer: `scripts/apply_owner_domain_rulings_v8.py` now REFUSES (rc=1), naming the ONE derivation (`apply_owner_domain_review.py --apply`) — the same pattern as `build_domain_ruler.py` (D-2879). Its stale `config["rows"]` contract is gone and its write target (rederived_v8) is now a downstream face, so it can no longer silently fold a ruling into a face that must FOLLOW the ruler.
+
+
+## BUG-692 (OPEN, 2026-10-09) — D-2884(b) C+B emerging clause is a trivially-satisfied blindspot
+
+The D-2884(b) C+B gate's emerging arm (`emerging_rate <= 0.35`, stored as
+`pipeline_config.yaml#taxonomy.emerging_discipline_rate_max`) is a CEILING ONLY. It measures how OFTEN the
+decider routes a row to the 'emerging' bucket and caps the rate — but it never measures WHETHER the decider
+routes the RIGHT rows there. The gate therefore has a specificity guard (don't over-abstain) with NO matching
+sensitivity guard (do abstain on the gold-emerging subset).
+
+Measured on Arm A (pplx-decider-v1.1-27b-4bit): emerging_rate = 0.0052 (1/194) "passes" the ceiling, but pplx
+has ZERO recall on the 7 gold-emerging rows in the 194-row owner referee
+(governance/d2767_ab_v8_20261009.json) — it forced all 7 into established macros (4→Human & Design,
+2→Method & Business, 1→Technical). An ALWAYS-ANSWER decider (one whose readout cannot emit 'emerging' at all)
+therefore trivially satisfies the emerging clause: rate 0 <= 0.35 is vacuously true.
+
+CONSEQUENCE (progression mutation risk): the C+B gate could false-PASS and promote a decider that has
+structurally COLLAPSED the 3-way+emerging taxonomy into 3-way-only. The 'emerging' routing bucket is an
+ONTOLOGICAL REQUIREMENT of Maxwell's classification (explicit routing for disciplines that resist a single
+established macro), not an optional abstention artifact. A decider that can never emit it is ontologically
+INCOMPLETE for the 3-way+emerging contract, and the gate must detect that.
+
+FIX (owner-gated D-2884(b) re-scope, advisory-only per D-2798 — advisory verdicts never fail closed on their
+own): make the emerging clause SYMMETRIC —
+  (1) KEEP the rate ceiling (specificity: emerging_rate <= 0.35);
+  (2) ADD an emerging-RECALL floor (sensitivity: recall on the gold-emerging subset >= floor, config-first
+      e.g. `taxonomy.emerging_discipline_recall_floor`). On the current 7-row gold subset the granularity is
+      1/7 ≈ 0.143, so a floor of 0.5 (= catch ≥4/7) is the minimum meaningful bar.
+  (3) ALTERNATIVE: allow a calibration/threshold arm that can EMIT 'emerging' (rather than a hard recall
+      floor) — the point is the decider's OUTPUT SPACE must include the emerging bucket.
+
+Arm A (pplx) would then correctly FAIL the recall floor (0/7), reflecting its structural inability to emit
+'emerging'; the clef arms (clef-flash/clef, joint-schema head over the 3-way+emerging criteria) are the first
+candidates whose output space actually includes the bucket.
+
+SEVERITY: HIGH (gate integrity / classification ontology). SOURCE: D-2884(b) Arm A A/B result. PHASE: 0
+(owner ruling required before the gate can certify any decider).
+

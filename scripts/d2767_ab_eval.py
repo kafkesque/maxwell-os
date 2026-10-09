@@ -67,6 +67,9 @@ from discipline_conformance_gate import (  # noqa: E402
     per_class_metrics,
     run_inference,
 )
+# BUG-690 part 1: reuse the 3-way macro ontology (config/discipline_macro_groups.yaml) so the
+# harness reports the coarse C+B kappa, NOT only the fine 62-way kappa (D-2767/D-2884 gate).
+from discipline_macro_classify import load_macro, to_macro  # noqa: E402
 
 # C12: default referee is the owner-signed-off re-derived manifest (D-2839 RATIFIED).
 DEFAULT_ANCHOR = REPO / "governance" / "discipline_anchor_rederived_v6_20261006d.json"
@@ -87,6 +90,19 @@ def load_thresholds() -> tuple[float, float, str]:
     emerging_max = float(tax.get("emerging_discipline_rate_max", EMERGING_MAX))
     model = str(s4.get("discipline_model", "gpt-oss-20b-MXFP4-Q8"))
     return kappa_floor, emerging_max, model
+
+
+def _load_coarse_floor() -> float:
+    """Read the C+B coarse-kappa floor (3-way macro) from config (C12); fallback 0.73.
+
+    D-2884/D-2767: the C+B gate is emerging_rate <= 0.35 AND coarse_kappa >=
+    discipline_coarse_kappa_floor (re-targeted to the human coarse ceiling, D-2790).
+    """
+    import yaml
+
+    cfg = yaml.safe_load((REPO / "config" / "pipeline_config.yaml").read_text(encoding="utf-8")) or {}
+    s4 = cfg.get("stage4", {})
+    return float(s4.get("discipline_coarse_kappa_floor", 0.73))
 
 
 class WedgeError(RuntimeError):
@@ -338,6 +354,41 @@ def _report(gold: list[str], pred: list[str], kappa_floor: float, emerging_max: 
     }
 
 
+def coarse_collapse(labels: list[str], disc_to_bucket: dict[str, str]) -> list[str]:
+    """Collapse fine discipline labels to the 3-way macro bucket (BUG-690 part 1).
+
+    The D-2767 C+B gate (D-2884) needs BOTH the fine 62-way kappa AND the coarse
+    3-way macro kappa (config/pipeline_config.yaml#discipline_coarse_kappa_floor).
+    Fine -> macro is a pure, deterministic ontology collapse (D-2796:
+    config/discipline_macro_groups.yaml). 'emerging' is an explicit routing bucket
+    and is never folded into a macro (to_macro maps off-menu/empty to 'emerging').
+    """
+    return [to_macro(label, disc_to_bucket) for label in labels]
+
+
+def coarse_report(gold: list[str], pred: list[str], coarse_floor: float) -> dict:
+    """Collapse gold+pred to the 3-way macro and compute the coarse C+B kappa.
+
+    Fail-closed (C16): load_macro() raises SystemExit if the macro ontology drifts
+    (a group in closed_menu_v8.json without a 3-way bucket — BUG-622 class), so the
+    C+B gate can never silently skip the coarse axis.
+    """
+    scheme, _bucket_members, disc_to_bucket = load_macro()
+    cgold = coarse_collapse(gold, disc_to_bucket)
+    cpred = coarse_collapse(pred, disc_to_bucket)
+    kappa = cohen_kappa(cgold, cpred)
+    acc = sum(1 for g, p in zip(cgold, cpred) if g == p) / len(cgold)
+    return {
+        "scheme": scheme,
+        "n": len(cgold),
+        "raw_agreement": round(acc, 4),
+        "coarse_kappa": round(kappa, 4),
+        "coarse_floor": coarse_floor,
+        "coarse_pass": bool(kappa >= coarse_floor),
+        "per_bucket": per_class_metrics(cgold, cpred),
+    }
+
+
 def _build_rows(examples: list[dict], gold: list[str], pred: list[str]) -> list[dict]:
     """Persist per-row gold/pred/agree so the owner-review CSV and JSON stay reproducible.
 
@@ -408,6 +459,7 @@ def main() -> int:
     args = ap.parse_args()
 
     kappa_floor, emerging_max, model = load_thresholds()
+    coarse_floor = _load_coarse_floor()
     deadline_sec, preflight_deadline = _load_omlx_wall_clock()
     anchor_path = args.anchor
     out_path = Path(args.out)
@@ -447,6 +499,7 @@ def main() -> int:
     # Primary arm: flag-ON (definition-anchored).
     pred = run_inference_flag_on(examples, model, deadline_sec)
     result = _report(gold, pred, kappa_floor, emerging_max)
+    coarse = coarse_report(gold, pred, coarse_floor)
     rows = _build_rows(examples, gold, pred)
 
     print(f"\n[flag-ON definition-anchored]")
@@ -454,6 +507,12 @@ def main() -> int:
     print(f"  Cohen's kappa:            {result['cohen_kappa']:.4f}   -> {band(result['cohen_kappa'])}")
     print(f"  emerging rate:            {result['emerging_rate']:.4f}   (gold emerging rows: {sum(1 for g in gold if g == 'emerging')}/{n})")
     print(f"  VERDICT (advisory): kappa_pass={result['kappa_pass']}  emerging_pass={result['emerging_pass']}")
+
+    print(f"\n[coarse 3-way macro C+B gate (BUG-690 part 1)]")
+    print(f"  coarse kappa: {coarse['coarse_kappa']:.4f}   (floor {coarse_floor}; D-2796 human ceiling 0.766)")
+    print(f"  coarse VERDICT: coarse_pass={coarse['coarse_pass']}")
+    cb_pass = bool(result["emerging_pass"] and coarse["coarse_pass"])
+    print(f"  C+B GATE (emerging<=0.35 AND coarse>={coarse_floor}): {'PASS' if cb_pass else 'FAIL'}")
 
     # Determinism self-check (BUG-655): prove the once-for-all settings hold on this run.
     det_n = min(args.det_check, n)
@@ -477,6 +536,9 @@ def main() -> int:
         "determinism_check": det,
         "preflight": preflight,
         "flag_on": result,
+        "coarse_floor": coarse_floor,
+        "coarse": coarse,
+        "cb_gate_pass": bool(result["emerging_pass"] and coarse["coarse_pass"]),
         "rows": rows,
     }
 

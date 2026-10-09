@@ -11,7 +11,7 @@
 
 ## 🔴 CURRENT OPEN / PENDING INDEX (machine-derived 2026-10-03 — the live face; history below)
 
-Register truth (do NOT restate counts elsewhere — BUG-588/D-2692): 1023 decisions · 457 bugs (164 open / 293 closed; highest OPEN = BUG-693). Forensic audit GREEN: 0 fatal rails — store-change re-baseline cascade (BUG-659..668) FIXED at root cause. BUG-687 (CLOSED, D-2882): nli_calibration pin on a gitignored derived artifact RETIRED (owner approved). BUG-688 (CLOSED, D-2883): the D-2618 retired golden is recorded, never gated — bridge --check green again (owner approved). BUG-689 (CLOSED, D-2830): the D-2767 A/B harness crashed on the v8 referee's owner-absence rows — `noise_drop` excluded (out of scope), `abstained` → the declared abstention token 'emerging'. D-2884 (RATIFIED, 2026-10-09): D-2767 C+B gate measured FAIL (3-way coarse 0.5621 < 0.73 floor); owner RULED (a) fine discipline → advisory-only, 3-way macro + domains operative, (b) distinct-family decider A/B in parallel; BUG-690 macro drift part 2 fixed (v5→v8, Business & Management added), part 1 (coarse-kappa harness output) FIXED (commit 8895cbf). D-2884(a) macro operative routing LANDED + R5 gemma-APPROVED (2026-10-09).
+Register truth (do NOT restate counts elsewhere — BUG-588/D-2692): 1024 decisions · 457 bugs (164 open / 293 closed; highest OPEN = BUG-693). Forensic audit GREEN: 0 fatal rails — store-change re-baseline cascade (BUG-659..668) FIXED at root cause. BUG-687 (CLOSED, D-2882): nli_calibration pin on a gitignored derived artifact RETIRED (owner approved). BUG-688 (CLOSED, D-2883): the D-2618 retired golden is recorded, never gated — bridge --check green again (owner approved). BUG-689 (CLOSED, D-2830): the D-2767 A/B harness crashed on the v8 referee's owner-absence rows — `noise_drop` excluded (out of scope), `abstained` → the declared abstention token 'emerging'. D-2884 (RATIFIED, 2026-10-09): D-2767 C+B gate measured FAIL (3-way coarse 0.5621 < 0.73 floor); owner RULED (a) fine discipline → advisory-only, 3-way macro + domains operative, (b) distinct-family decider A/B in parallel; BUG-690 macro drift part 2 fixed (v5→v8, Business & Management added), part 1 (coarse-kappa harness output) FIXED (commit 8895cbf). D-2884(a) macro operative routing LANDED + R5 gemma-APPROVED (2026-10-09).
 
 ## D-2881 (2026-10-08) — the 11 ambiguous anchor-bridge rows are RUN-COLLISIONS, resolved to the ratified canonical run
 
@@ -4038,3 +4038,13 @@ quick_check + foreign_key_check clean.
     cleared, discipline stays 'emerging' pending re-classification.
 Post-reclaim canonical emerging = 1499 (offmenu 1309 + dombleed 190 still emerging on the discipline axis).
 REMAINING: offmenu 1309 promotion review/whitelist + the menu-widening re-classification gate (steps 3+4).
+
+## D-2894 — BUG-693 step 4: menu-widening re-classification gate (2026-10-09)
+
+Implemented scripts/check_menu_reclass_gate.py (read-only, fail-closed). Compares every pipeline_run's
+provenance stamps (menu_hash + taxonomy_version, D-279) against the LIVE menu identity. Verdict: the canonical
+run rechunk-v4-20260929 is STALE (classified under 99e1df82... v5.6; live 8218d6db... v8) — the BUG-693 root
+cause made visible and fail-closed (exit non-zero). Verifier gemma-4-E4B-it-MLX-4bit: core PASS (correctness,
+drift, blindspots, config-first, types); 2 non-blocking error-handling notes accepted (no silent swallow — I/O
+errors propagate loudly per C16). REMAINING: the re-classification pass the gate enforces (owner-signed menu
+edits v8->v9 + offmenu promotion) must re-stamp rows to the live menu hash, after which the gate reports GREEN.

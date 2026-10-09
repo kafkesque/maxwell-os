@@ -9845,7 +9845,10 @@ STATUS (2026-10-09): steps 1+2 APPLIED via scripts/bug693_reclaim.py --apply (D-
   updates (280 mapfail + 190 dombleed) in ONE transaction on the canonical run; backup_guardian pre-write +
   PRAGMA quick_check/foreign_key_check post-write clean; verifier gemma-4-E4B-it-MLX-4bit returned no defects
   (7 categories). Post-reclaim canonical emerging = 1499 (offmenu 1309 + dombleed 190 still emerging on the
-  discipline axis). REMAINING: step 3 (offmenu 1309 promotion/whitelist) + step 4 (menu-widening reclass gate).
+  discipline axis). REMAINING: step 3 (offmenu 1309 promotion/whitelist) + the re-classification pass the gate now enforces.
+  step 4 (menu-widening re-classification gate) IMPLEMENTED: scripts/check_menu_reclass_gate.py (D-2894) —
+  read-only fail-closed detector comparing per-run menu_hash/taxonomy_version against the live menu. Confirms
+  the canonical run is STALE (99e1df82 v5.6 vs live 8218d6db v8) and exits non-zero until re-classification lands.
 
 D-2891 RATIFIED (owner 2026-10-09). Final gold-emerging adjudication: R127 Guild of Handicraft Educational Model
 -> cultural design + R202 Interactive Media Integration -> performing arts ACCEPTED (STier rec); R183 Pattern

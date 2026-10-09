@@ -15338,3 +15338,20 @@ decisions:
   files:
   - scripts/bug693_reclaim.py
   - governance/buglog.md
+- id: D-2894
+  state: ACTIVE
+  category: GOVERNANCE
+  title: BUG-693 step 4 — menu-widening re-classification gate (scripts/check_menu_reclass_gate.py)
+  bugs:
+  - BUG-693
+  decision: 'BUG-693 step 4 IMPLEMENTED: the menu-widening re-classification gate scripts/check_menu_reclass_gate.py
+    (read-only, fail-closed). It compares every pipeline_run''s provenance stamps (menu_hash + taxonomy_version,
+    D-279) against the LIVE menu identity (pipeline.closed_menu.menu_hash() + config/version.yaml taxonomy_version).
+    Verdict: the canonical run rechunk-v4-20260929 is STALE (classified under 99e1df82... v5.6; live is 8218d6db...
+    v8) — the exact BUG-693 root cause made visible and fail-closed. The gate exits non-zero on a stale canonical
+    run so menu-widening drift can never recur silently. REMAINING after this: the re-classification pass the gate
+    now enforces (owner-signed menu edits v8->v9 + offmenu promotion) must re-stamp the rows to the live menu hash,
+    after which the gate reports GREEN.'
+  files:
+  - scripts/check_menu_reclass_gate.py
+  - governance/buglog.md

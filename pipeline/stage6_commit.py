@@ -40,6 +40,7 @@ from pipeline.io_guard import safe_write
 from pipeline.pipeline_paths import (
     CHECKPOINT_DIR,
     DB_PATH,
+    CANONICAL_RUN,  # D-2881: canonical pipeline_run_id (D-2884a backfill scoping)
     PARQUET_DIR,
     S15_EMBED_DIM,
     S6_MAX_FAILED_RATIO,  # D2338: fail-closed commit tolerance
@@ -66,6 +67,7 @@ from pipeline.schema_accessor import (
     fb_source_ids,
 )
 from pipeline.serving_gate import pre_write_verdict  # D274a/D274h: the pre-write half of the gate
+from pipeline.discipline_macro import macro_for  # D-2884(a): C21 single home for fine->macro collapse
 from pipeline.stamp import get_pipeline_commit, stamp_record, write_stage_code_fingerprint
 from pipeline.schemas import (  # D2616 Phase 0: runtime ontology boundary
     validate_fb_content_type,
@@ -101,6 +103,7 @@ CREATE TABLE IF NOT EXISTS fbs (
     domains_raw TEXT,              -- JSON array (LLM original, preserved)
     discipline TEXT NOT NULL,      -- SINGULAR canonical discipline (D316)
     discipline_raw TEXT,           -- LLM original, preserved (singular)
+    discipline_macro TEXT,         -- D-2884(a): operative 3-way macro routing facet (Technical/Human & Design/Method & Business/emerging); fine discipline is ADVISORY-only
     depth TEXT NOT NULL,
     evidence TEXT NOT NULL,
     -- v1 Anytype properties (parity)
@@ -264,6 +267,7 @@ def init_db(db_path: Path) -> sqlite3.Connection:
     # Add new columns if upgrading from older schema versions
     _migrate_add_column(conn, "fbs", "domains_raw", "TEXT")
     _migrate_add_column(conn, "fbs", "discipline_raw", "TEXT")  # D316: singular
+    _migrate_add_column(conn, "fbs", "discipline_macro", "TEXT")  # D-2884(a): operative 3-way macro routing facet
     _migrate_add_column(conn, "fbs", "pipeline_run_id", "TEXT")
     # v1 parity columns
     _migrate_add_column(conn, "fbs", "context", "TEXT")
@@ -337,6 +341,32 @@ def _migrate_drop_column(conn, table, column):
     cols = {r[1] for r in conn.execute(f"PRAGMA table_info({table})")}
     if column in cols:
         conn.execute(f"ALTER TABLE {table} DROP COLUMN {column}")
+
+
+def _backfill_discipline_macro(conn: sqlite3.Connection) -> int:
+    """D-2884(a): idempotently backfill fbs.discipline_macro for the canonical run.
+
+    The operative 3-way macro routing facet (Technical / Human & Design /
+    Method & Business / emerging) is a deterministic collapse of each row's fine
+    `discipline`, computed via the C21 single home (pipeline.discipline_macro.macro_for).
+    Scoped to the canonical run only (D-2881): the stale non-canonical rows are never
+    served (BUG-691) and correctly keep NULL rather than being imputed. Only NULL/blank
+    cells are filled, so re-runs are no-ops.
+    """
+    cols = {r[1] for r in conn.execute("PRAGMA table_info(fbs)")}
+    if "discipline_macro" not in cols:
+        return 0
+    rows = conn.execute(
+        "SELECT fb_id, discipline FROM fbs "
+        "WHERE pipeline_run_id = ? AND (discipline_macro IS NULL OR discipline_macro = '')",
+        (CANONICAL_RUN,),
+    ).fetchall()
+    for fb_id, discipline in rows:
+        conn.execute(
+            "UPDATE fbs SET discipline_macro = ? WHERE fb_id = ?",
+            (macro_for(discipline), fb_id),
+        )
+    return len(rows)
 
 
 def _get_pipeline_version() -> str:
@@ -520,7 +550,7 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
                 content_type_source, discipline_source, extraction_type_source, menu_hash,
                 keywords, jargon,
                 domains, domains_raw,
-                discipline, discipline_raw,
+                discipline, discipline_raw, discipline_macro,
                 depth, evidence,
                 context, accessibility, intimacy_boundary, provenance,
                 source_text, is_summary,
@@ -548,7 +578,7 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
                 ?, ?, ?, ?,
                 ?, ?,
                 ?, ?,
-                ?, ?,
+                ?, ?, ?,
                 ?, ?,
                 ?, ?, ?, ?,
                 ?, ?,
@@ -594,6 +624,7 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
             _safe_json(fb.get("domains_raw")),
             _safe_str(fb_discipline(fb), "emerging"),
             _safe_str(fb_discipline_raw(fb)),
+            _safe_str(fb.get("discipline_macro"), "emerging"),
             # depth, evidence
             _safe_str(fb_depth(fb), "domain"),
             _safe_str(fb_evidence_type(fb), "cited"),
@@ -793,6 +824,13 @@ def run_stage6(export_only: bool = False):
     # BUG-195/D2505: fail-loud duplicate guard (runs before any INSERT).
     _assert_fb_id_unique(fbs)
 
+    # D-2884(a): stamp the operative 3-way macro routing facet on every FB from the
+    # C21 single home (pipeline.discipline_macro). Fine discipline stays ADVISORY;
+    # routing gates on the macro + domains. Stamped BEFORE the export_only branch so
+    # both the SQLite INSERT and the Parquet snapshot carry it (R14 self-describing).
+    for fb in fbs:
+        fb["discipline_macro"] = macro_for(fb_discipline(fb))
+
     print(f"💾 Stage 6: Commit — {len(fbs)} verified FBs")
     print(f"{'='*60}")
 
@@ -808,6 +846,13 @@ def run_stage6(export_only: bool = False):
     commit_status: dict[str, str] = {}
 
     if not export_only:
+        # D-2884(a): idempotent backfill of the operative macro facet on the canonical
+        # run (fills NULL cells only; re-runs are no-ops). Stale non-canonical rows
+        # correctly keep NULL (never served, BUG-691).
+        backfilled = _backfill_discipline_macro(conn)
+        if backfilled:
+            print(f"  ♻️  backfilled discipline_macro on {backfilled} canonical row(s)")
+
         for i, fb in enumerate(fbs, 1):
             name = fb_name(fb)[:40]
             # BUG-387/D-359: capture the rowid the fb_id holds BEFORE the insert.

@@ -49,6 +49,7 @@ import sys
 import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Callable
 
 REPO = Path(__file__).resolve().parents[1]
 SCRIPTS = Path(__file__).resolve().parent
@@ -294,11 +295,23 @@ def _run_arm_laya(rows: list[dict], criteria: dict[str, str]) -> list[str]:
     return preds
 
 
+# C21 swappable infrastructure: every decider arm is a callable behind the SAME
+# Jev/SystemOne contract — run_fn(rows, criteria) -> list[str] of argmax labels, where
+# criteria is {bucket: description} and each returned label is a criteria key. Adding a
+# decider (e.g. mlx-community/clef-flash-4bit, manjunathshiva/opendecider-small-mlx-4bit,
+# wfzyx/von) = add ONE registry entry + ONE run function; the referee/gate/criteria
+# machinery is shared (zero duplication, zero drift).
+DECIDER_ARMS: dict[str, tuple[Callable[[list[dict], dict[str, str]], list[str]], str]] = {
+    "pplx": (_run_arm_pplx, "pplx-decider-v1.1-27b-4bit"),
+    "laya": (_run_arm_laya, "convaiinnovations/laya"),
+}
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description="D-2884(b) decider A/B against the owner 3-way macro referee.")
     ap.add_argument("--referee", default=str(DEFAULT_REFEREE))
     ap.add_argument("--anchor", default=str(DEFAULT_ANCHOR))
-    ap.add_argument("--arm", choices=["pplx", "laya"], default=None, help="run this decider arm (omit for --plan)")
+    ap.add_argument("--arm", choices=list(DECIDER_ARMS), default=None, help="run this decider arm (omit for --plan)")
     ap.add_argument("--plan", action="store_true", help="validate ontology + gate math WITHOUT loading a model")
     ap.add_argument("--limit", type=int, default=None, help="smoke: run only the first N rows")
     ap.add_argument("--out", default=None, help="R14-stamped JSON output path")
@@ -344,12 +357,8 @@ def main() -> int:
         print("Nothing to do: pass --plan or --arm pplx|laya.", file=sys.stderr)
         return 1
 
-    if args.arm == "pplx":
-        pred = _run_arm_pplx(rows, criteria)
-        gen_model = "pplx-decider-v1.1-27b-4bit"
-    else:
-        pred = _run_arm_laya(rows, criteria)
-        gen_model = "convaiinnovations/laya"
+    run_fn, gen_model = DECIDER_ARMS[args.arm]
+    pred = run_fn(rows, criteria)
 
     report = gate_report(gold_macro, pred, coarse_floor, emerging_max)
     out_rows = [

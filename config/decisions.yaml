@@ -15206,7 +15206,7 @@ decisions:
     \ the coarse kappa. Now added to 3-way Method & Business + 4-way\nMethod & Operations, and scripts/discipline_macro_classify.py\
     \ DEFAULT_MENU +\nscripts/discipline_advisory_rescore.py menu pin repointed v5 -> v8; the fail-closed load_macro\
     \ guard covers all\n10 v8 groups (0 uncovered). BUG-690 part 1 (coarse-kappa 3-way collapse output in scripts/d2767_ab_eval.py\
-    \ +\nregression test) REMAINS OPEN and is the prerequisite instrumentation for the (b) decider A/B.\n\nD-2727\
+    \ +\nregression test) FIXED at commit 8895cbf (scripts/d2767_ab_eval.py coarse_collapse + tests/test_d2767_coarse_kappa.py); part 2 fixed at 5042962 (menu v5->v8).\n\nD-2727\
     \ (full S4->S5->S6 rerun) stays BLOCKED until (a)+(b) land: a below-gate fine-discipline classifier would\n\
     otherwise bake into all 6,591 canonical FBs.\n"
   files:

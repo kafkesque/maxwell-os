@@ -3756,3 +3756,28 @@ Full ruling record: `governance/OWNER_RULINGS_ROUND3_20261008.md`.
 
 Minted D-2880 (total=1010, stamp c84d4b033f1be1bd). bugs: [BUG-676, BUG-679, BUG-681, BUG-682, BUG-683, BUG-684].
 Full ruling record + the Stage-2 audit: `governance/OWNER_RULINGS_ROUND3_20261008.md` (§8).
+
+
+## D-2884(b) decider A/B — model ecosystem discovery + C21 harness registry (2026-10-09)
+
+Owner-gated D-2884(b): distinct-family decider must clear the C+B gate (coarse_kappa >= 0.73 AND emerging <= 0.35)
+against the frozen 194-row v8 referee.
+
+EXECUTED ARMS:
+- Arm A pplx (mlx-community/pplx-decider-v1.1-27b-4bit, Qwen3.8-27B decision readout): RUNNING at record time (~40 min, no output yet).
+- Arm B laya (convaiinnovations/laya, ModernBERT-large 421M + 2-layer RL head): FAIL — raw_agreement 0.2062,
+  coarse_kappa 0.0242 (chance), emerging 0.0155; 167/194 collapsed to 'Technical' (label-order/position bias). Commit 0787ee8.
+
+DISCOVERY (STier sweep): a "SystemOne / typed-decisions decision-model" family now shares ONE Jev/SystemOne wire
+protocol ({state, questions:{type,instructions,criteria}} -> answers[qid][choice|score|noul]) — the same contract the harness uses.
+Maxwell-aligned (Apache-2.0 + MLX-native + local + $0 marginal):
+  - mlx-community/clef-flash-4bit  (Qwen3.5 9B,  MLX 4bit, 0.31s/7GB)   — best infra-ready swap
+  - mlx-community/clef-4bit        (Qwen3.5 27B, MLX 4bit, 16GB/1.4s)  — strongest-capacity aligned
+  - manjunathshiva/opendecider-small-mlx-4bit (4B, beats laya)         — lightweight
+  - wfzyx/von (ModernBERT-large 395M, ORDER-INVARIANT scoring)         — fixes laya position bias
+NOT aligned: openjev/openjev + Bespoke-Nimble-9B (cc-by-nc-4.0, no MLX); autotrust/JEV-27B-VL (vllm/VL); OpenThai-SystemOne (0.8B Thai-specific).
+
+HARNESS: scripts/d2884b_decider_ab.py -> C21 swappable DECIDER_ARMS registry (adding a decider = one registry entry +
+one run fn; referee/gate/criteria machinery shared). R5 gemma-4 APPROVE (afe9d15d60ed11c4). Behavior-preserving.
+
+NEXT: await pplx; if it clears C+B consider owner promotion (D-2796: no below-ceiling classifier ships).

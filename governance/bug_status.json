@@ -3,8 +3,8 @@
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
   "total_ids": 460,
-  "open_n": 164,
-  "closed_n": 296,
+  "open_n": 163,
+  "closed_n": 297,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -819,11 +819,6 @@
       "events": 2
     },
     {
-      "id": "BUG-693",
-      "title": "(OPEN, 2026-10-09) \u2014 canonical-run 'emerging' (1779 rows) is MENU-WIDENING DRIFT, not a decider defect",
-      "events": 1
-    },
-    {
       "id": "BUG-695",
       "title": "(OPEN, 2026-10-10) \u2014 `per_label` semantic-error-rate census is stale vs the v9 menu: 7 ratified disciplines (business administration 20 / co",
       "events": 1
@@ -1124,6 +1119,7 @@
     "BUG-690",
     "BUG-691",
     "BUG-692",
+    "BUG-693",
     "BUG-694",
     "BUG-696"
   ]

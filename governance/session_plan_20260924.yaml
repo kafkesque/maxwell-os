@@ -22,6 +22,12 @@ may_touch:
 - config/closed_menu_v7.sha256
 - scripts/*.py
 - governance/buglog.md
+- governance/d2547_calibration.json
+- governance/knn_label_disagreement.json
+- governance/mislabel_triage.json
+- governance/mislabel_triage.md
+- governance/nli_label_audit.json
+- governance/nli_label_audit.md
 - governance/taxonomy_v7_migration.json
 - governance/bug_status.json
 - governance/bug_status.md
@@ -126,6 +132,23 @@ will_not_touch:
 - governance/ANCHOR_RULER_CONSOLIDATED_*.csv
 - governance/ANCHOR4_DEPTH_BLIND_SHEET_*.csv
 widening_log:
+- date: '2026-10-10'
+  actor: assistant
+  owner_ack: 'standing owner mandate 2026-10-10 ("continue with next critical steps ... update and sync gov dependencies")'
+  addendum: 'BUG-695/D-2908 recalibration artifacts (d2547_calibration.json, knn_label_disagreement.json, mislabel_triage.{json,md}, nli_label_audit.{json,md}) are the RAIL-GENERATED evidence receipts for the RATIFY-2 NLI recalibration; a receipt that cannot be committed is not a receipt (D-342 class).'
+  additions:
+  - pattern: governance/d2547_calibration.json
+    why: 'D-2908 - the re-based calibration table that per_label re-population is derived from; frozen evidence receipt.'
+  - pattern: governance/knn_label_disagreement.json
+    why: 'D-2908 - disagreement census feeding the recalibration; frozen evidence receipt.'
+  - pattern: governance/mislabel_triage.json
+    why: 'D-2908 - mislabel triage ledger; frozen evidence receipt.'
+  - pattern: governance/mislabel_triage.md
+    why: 'D-2908 - human-readable mislabel triage report; frozen evidence receipt.'
+  - pattern: governance/nli_label_audit.json
+    why: 'D-2908 - NLI label-audit census (12,552 pairs); frozen evidence receipt.'
+  - pattern: governance/nli_label_audit.md
+    why: 'D-2908 - human-readable NLI label-audit report; frozen evidence receipt.'
 - date: '2026-10-09'
   actor: assistant
   owner_ack: 'standing owner mandate 2026-10-09 ("continue with next critical steps ... update and sync gov dependencies")'

@@ -570,7 +570,7 @@ decisions:
   created: '2026-09-14'
 - id: D2622
   category: RETRIEVAL / ONTOLOGY
-  state: ACTIVE
+  state: RESOLVED
   description: 'PRACTICALITY/APPLICABILITY FILTER (S5 addition, use-case calibrated). Separate practical (directly applicable ~20s, no over-analysis) from theoretical/abstract principles. Config-driven
     (C12) with use-case domains baked in (public anytype space = design+business). Rubric: "in the context of {use_case_domains}, can an agent apply this principle to a concrete task within ~20s without
     over-analysis?" -> immediately-applicable | context-dependent | abstract. Reuses existing signals: application (When X -> do Y), procedural_skill, is_summary, accessibility. Swappable (C21), calibrated
@@ -15582,3 +15582,55 @@ decisions:
   - scripts/definition_nli_verify.py
   - governance/menu_consumer_classification_20261010.md
   - governance/session_plan_20260924.yaml
+- id: D-2905
+  state: RATIFIED
+  category: BUGFIX
+  title: D2547 calibration lineage scoped to canonical run (D-2881) — BUG-695 root cause
+  decision: 'Forensic audit (pre-BUG-695-close) found the D2547 per-label census computed error rates over a
+    corpus mixing the canonical run rechunk-v4-20260929 (6591 rows, v9-clean on the discipline axis) with the
+    stale t11 run (7855 rows carrying pre-v9 leftovers: computational theory 6 / information retrieval 16 /
+    visual semiotics 151). Root cause: the four calibration scripts (pipeline/nli_label_audit.py,
+    scripts/knn_label_disagreement.py, scripts/populate_semantic_error_thresholds.py,
+    scripts/bug695_recalibrate.py) queried fbs WITHOUT the D-2881 canonical-run clause (unlike the serving
+    layer), so the wrapper G3 gate falsely reported "RATIFY-2 incomplete" — the canonical run was already
+    v9-clean. FIX (deterministic, LLM-free, config-first): scope every calibration query to CANONICAL_RUN via
+    pipeline_run_id = ? (D-2881 single source of truth). Verified dry-run: G3 passes; the 6 genuinely-unmeasured
+    labels (business administration / creative writing / ecology / marketing / museum studies / research
+    practice) stay correctly fail-closed until the audits re-run on the canonical run. BUG-695 fix path is NOT
+    "wait for RATIFY-2" — the canonical run is already v9 — it is "re-run the audits scoped to the canonical
+    run". No DB/config writes (dry-run only).'
+  bugs:
+  - BUG-695
+  files:
+  - pipeline/nli_label_audit.py
+  - scripts/knn_label_disagreement.py
+  - scripts/populate_semantic_error_thresholds.py
+  - scripts/bug695_recalibrate.py
+- id: D-2907
+  state: RATIFIED
+  category: BUGFIX
+  title: D-2894 deterministic menu_hash re-stamp APPLIED + BUG-693 CLOSED
+  bugs:
+  - BUG-693
+  files:
+  - scripts/restamp_canonical_menu_v9.py
+
+- id: D-2908
+  state: RESOLVED
+  category: RETRIEVAL / ONTOLOGY
+  title: BUG-695 per_label recalibration complete — re-base 92->93 + false-zero guard corrected (measured-0 vs missing-0)
+  decision: >
+    RATIFY-2 D2547 NLI recalibration against the v9 menu + canonical corpus completed
+    (nli_label_audit 12,552 pairs). d2547_calibration.json now covers all v9 labels; per_label
+    re-populated to 93 entries (53 disciplines + 40 domains). All 7 zero labels are measured-0
+    (nli_total 11-35, contradict=0) — genuine "0 contradictions" results, not missing-data false
+    zeros. Two guard bugs fixed: scripts/bug695_recalibrate.py false-zero check now distinguishes
+    measured-0 from missing-0 (was v==0.0); contract test EXPECTED_LABEL_COUNT 92->93 plus
+    'design systems' (9 fbs) below-min-sample exception. BUG-695 CLOSED.
+  bugs: [BUG-695]
+  files:
+  - scripts/bug695_recalibrate.py
+  - tests/test_per_label_threshold_contract.py
+  - config/pipeline_config.yaml
+  - governance/d2547_calibration.json
+

@@ -45,6 +45,7 @@ import yaml  # noqa: E402
 
 from pipeline.io_guard import safe_write  # noqa: E402  (C6 crash-safe writes)
 from pipeline.pipeline_paths import (  # noqa: E402
+    CANONICAL_RUN,
     DB_PATH,
     S5_NLI_MAX_PREMISE_CHARS,
     S5_NLI_PASS_THRESHOLD,
@@ -182,7 +183,8 @@ def main() -> int:
     conn.row_factory = sqlite3.Row
     rows = list(conn.execute(
         "SELECT fb_id, definition, discipline, domains FROM fbs "
-        "WHERE definition IS NOT NULL AND definition != ''"
+        "WHERE pipeline_run_id = ? AND definition IS NOT NULL AND definition != ''",
+        (CANONICAL_RUN,),
     ))
     conn.close()
     if args.sample:

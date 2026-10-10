@@ -34,6 +34,7 @@ columns:
   usage_count: {role: state, why: "constant 0 - the knowledge layer has never served this store, so nothing has ever been retrieved"}
   feedback_count: {role: state, why: "constant 0 - no feedback has ever been recorded against this store"}
   is_summary: {role: state, why: "constant 0 - this run produced no summary feedback objects, so the flag is true as declared"}
+  practicality: {role: value, why: "D2622 advisory applicability tier (immediately-applicable|context-dependent|abstract), deterministic; persisted 2026-10-10 and backfilled on the canonical serving run (6591 rows: 5092/1499/0), NULL on excluded non-canonical runs (D-2881)"}
   # ---- reserved: nothing has written it yet (blank or hollow), so `filled_by` is REQUIRED ----
   procedural_skill: {role: reserved, filled_by: "pipeline/stage4_5_enrich.py Phase 1", why: "BLANK on 7995/7995 rows (not NULL - count(col) cannot see it) while 11 files read the column; the skill-orchestration field exists and is unwritten"}
   prerequisite_fbs: {role: reserved, filled_by: "pipeline/stage4_5_enrich.py graph pass", why: "hollow literal '[]' on 7995/7995 rows - an empty JSON array is not a value, and a reader cannot tell it from 'no prerequisite'"}

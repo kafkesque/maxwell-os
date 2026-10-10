@@ -529,6 +529,9 @@ class VerifiedFB(FB):
     isor: dict | None = Field(
         default=None, description="Full ISOR scores from S5 (JSON in DB)"
     )
+    practicality: str | None = Field(
+        default=None, description="D2622 advisory applicability tier: immediately-applicable|context-dependent|abstract"
+    )
 
 
 # ═══════════════════════════════════════════════════════════════════════════

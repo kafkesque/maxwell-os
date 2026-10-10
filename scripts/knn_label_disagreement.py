@@ -38,6 +38,7 @@ import yaml  # noqa: E402
 
 from pipeline.io_guard import safe_write  # noqa: E402  (C6 crash-safe writes)
 from pipeline.pipeline_paths import (  # noqa: E402
+    CANONICAL_RUN,
     DB_PATH,
     OLLAMA_EMBED_TIMEOUT,
     OLLAMA_URL,
@@ -110,7 +111,9 @@ def main() -> int:
     conn = sqlite3.connect(args.db)
     conn.row_factory = sqlite3.Row
     rows = list(conn.execute(
-        "SELECT fb_id, definition, discipline, domains FROM fbs WHERE definition IS NOT NULL AND definition != ''"
+        "SELECT fb_id, definition, discipline, domains FROM fbs "
+        "WHERE pipeline_run_id = ? AND definition IS NOT NULL AND definition != ''",
+        (CANONICAL_RUN,),
     ))
     conn.close()
 

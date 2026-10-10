@@ -48,7 +48,7 @@ sys.path.insert(0, str(_ROOT))
 
 import yaml  # noqa: E402
 
-from pipeline.pipeline_paths import DB_PATH  # noqa: E402
+from pipeline.pipeline_paths import CANONICAL_RUN, DB_PATH  # noqa: E402
 
 _CALIBRATION = _ROOT / "governance" / "d2547_calibration.json"
 _TAXONOMY = _ROOT / "config" / "taxonomy_v5.yaml"
@@ -82,16 +82,26 @@ def _parse_domains(raw: str | None) -> list[str]:
 
 
 def _load_totals() -> tuple[dict[str, int], dict[str, int]]:
-    """Return (discipline_total, domain_total) from the live DB."""
+    """Return (discipline_total, domain_total) from the CANONICAL run (D-2881).
+
+    The D2547 census must reflect only the serving corpus (the canonical run),
+    never stale non-canonical runs (t11/e2e/bug198_reinject) that share the fbs
+    table — those carry pre-v9 labels and would corrupt the per-label rates.
+    """
     conn = sqlite3.connect(str(DB_PATH))
     try:
         disc: dict[str, int] = {}
         for (label, n) in conn.execute(
-            "SELECT discipline, COUNT(*) FROM fbs WHERE discipline IS NOT NULL AND discipline != '' GROUP BY discipline"
+            "SELECT discipline, COUNT(*) FROM fbs "
+            "WHERE pipeline_run_id = ? AND discipline IS NOT NULL AND discipline != '' "
+            "GROUP BY discipline",
+            (CANONICAL_RUN,),
         ):
             disc[label] = n
         dom: dict[str, int] = {}
-        for (raw,) in conn.execute("SELECT domains FROM fbs"):
+        for (raw,) in conn.execute(
+            "SELECT domains FROM fbs WHERE pipeline_run_id = ?", (CANONICAL_RUN,)
+        ):
             for d in _parse_domains(raw):
                 dom[d] = dom.get(d, 0) + 1
     finally:

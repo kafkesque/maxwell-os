@@ -11,7 +11,7 @@
 
 ## 🔴 CURRENT OPEN / PENDING INDEX (machine-derived 2026-10-03 — the live face; history below)
 
-Register truth (do NOT restate counts elsewhere — BUG-588/D-2692): 1033 decisions · 460 bugs (164 open / 296 closed; highest OPEN = BUG-695). Forensic audit GREEN: 0 fatal rails — store-change re-baseline cascade (BUG-659..668) FIXED at root cause. BUG-687 (CLOSED, D-2882): nli_calibration pin on a gitignored derived artifact RETIRED (owner approved). BUG-688 (CLOSED, D-2883): the D-2618 retired golden is recorded, never gated — bridge --check green again (owner approved). BUG-689 (CLOSED, D-2830): the D-2767 A/B harness crashed on the v8 referee's owner-absence rows — `noise_drop` excluded (out of scope), `abstained` → the declared abstention token 'emerging'. D-2884 (RATIFIED, 2026-10-09): D-2767 C+B gate measured FAIL (3-way coarse 0.5621 < 0.73 floor); owner RULED (a) fine discipline → advisory-only, 3-way macro + domains operative, (b) distinct-family decider A/B in parallel; BUG-690 macro drift part 2 fixed (v5→v8, Business & Management added), part 1 (coarse-kappa harness output) FIXED (commit 8895cbf). D-2884(a) macro operative routing LANDED + R5 gemma-APPROVED (2026-10-09).
+Register truth (do NOT restate counts elsewhere — BUG-588/D-2692): 1035 decisions · 460 bugs (163 open / 297 closed; highest OPEN = BUG-695). Forensic audit GREEN: 0 fatal rails — store-change re-baseline cascade (BUG-659..668) FIXED at root cause. BUG-687 (CLOSED, D-2882): nli_calibration pin on a gitignored derived artifact RETIRED (owner approved). BUG-688 (CLOSED, D-2883): the D-2618 retired golden is recorded, never gated — bridge --check green again (owner approved). BUG-689 (CLOSED, D-2830): the D-2767 A/B harness crashed on the v8 referee's owner-absence rows — `noise_drop` excluded (out of scope), `abstained` → the declared abstention token 'emerging'. D-2884 (RATIFIED, 2026-10-09): D-2767 C+B gate measured FAIL (3-way coarse 0.5621 < 0.73 floor); owner RULED (a) fine discipline → advisory-only, 3-way macro + domains operative, (b) distinct-family decider A/B in parallel; BUG-690 macro drift part 2 fixed (v5→v8, Business & Management added), part 1 (coarse-kappa harness output) FIXED (commit 8895cbf). D-2884(a) macro operative routing LANDED + R5 gemma-APPROVED (2026-10-09).
 
 ## D-2881 (2026-10-08) — the 11 ambiguous anchor-bridge rows are RUN-COLLISIONS, resolved to the ratified canonical run
 
@@ -21,11 +21,12 @@ RULE (deterministic, LLM-free): a run-collision is not a concept collision. When
 
 IMPLEMENTED: `config/anchor_family.yaml#store_bridge.canonical_run = rechunk-v4-20260929` (the owner-ratified re-chunk, BUG-662); `build_anchor_store_bridge.py` reads `pipeline_run_id` and resolves via `join: run_canonical`. Bridge 197→208 joined, `join.ambiguous` 11→0, `join.counts.run_canonical=11`. Conformance regenerated 183→194 examples + 14 excluded (noise_drop only). Selftest 19/19; axis-consistency ceiling 0 holds; conformance --check byte-re-derivable.
 
-1. **OWNER-GATED (D-2727): RATIFY-2 full S4→S5→S6 rerun** — launch under `caffeinate -dimsu` (`runner.py --dry-run` then full).
-2. **OWNER-GATED (D-2727 OG-1): train/eval split** — Option A recommended (KEEP(46)→S4 golden; pin 46 OUT of eval ruler 208→162; sha256-pinned split manifest).
-3. **D2622 ACTIVE** — practicality advisory wired into S5; RESOLVED flip lands at RATIFY-2 after a live S5 run populates the field.
+1. **D-2727 RATIFY-2 — RETIRED (owner, 2026-10-10).** The full S4→S5→S6 rerun already happened (canonical `rechunk-v4-20260929`, 6,591 rows, S5/S6 complete); only provenance was stale, fixed by D-2907. No 20h re-run.
+2. **D-2727 OG-1 — Option A DECLARED (D-2730) + owner re-affirmed (2026-10-10).** KEEP(46)→S4 golden; pinned OUT of eval ruler 208→162; sha256-pinned split manifest = RAIL (`scripts/verify_split_manifest.py`).
+3. **D2622 — RESOLVED (2026-10-10).** practicality now PERSISTED: `practicality` column + S6 wiring + backfill of 6,591 canonical rows (immediately-applicable 5092 / context-dependent 1499 / abstract 0).
 4. **D2621 PROPOSED** — distinct-facet dedup method landed (D2625/D2626/D2627); residual = owner choice: `pipeline/dedup` module vs keep ad-hoc scripts.
 5. **D2547 PLANNED** — per-label thresholds not yet populated.
+6. **D-2908 — RESOLVED (2026-10-10).** BUG-695 per_label recalibration complete: d2547_calibration.json covers all v9 labels; per_label re-populated 93 entries (53 disciplines + 40 domains); all 7 `0.0` labels are measured-0 (not missing-data false-zeros). Fixed false-zero guard + contract test 92→93. BUG-695 CLOSED. BUG-693 steps 1–2 done (mapfail/dombleed 0), step 3 (1,297 off-menu) owner-gated per D-2898.
 
 — everything below is dated change history / ACTIVE / DONE —
 
@@ -4107,3 +4108,37 @@ recall). D3(b): gpt-oss-20b-MXFP4-Q8 REMAINS routing authority (D2249); pplx = A
 on low-confidence rows); clef-flash = ADVISORY emerging-abstention signal. Symmetric gate (rate ceiling + recall
 floor) stands as the future certification gate. Config: stage4.discipline decider_mode=advisory +
 decider_advisory_best_arm + decider_emerging_abstention_signal. BUG-692 RESOLVED.
+
+## D-2905 — D2547 calibration lineage scoped to canonical run (D-2881) — BUG-695 root cause (2026-10-10)
+
+Forensic audit (pre-BUG-695-close) found the D2547 per-label census was computed over a corpus that MIXED the
+canonical run rechunk-v4-20260929 (6591 rows, v9-clean on the discipline axis: computational theory 0 /
+information retrieval 0 / visual semiotics 0) with the stale t11 run (7855 rows carrying the pre-v9 leftovers
+computational theory 6 / information retrieval 16 / visual semiotics 151). Root cause: the four calibration
+scripts (pipeline/nli_label_audit.py, scripts/knn_label_disagreement.py,
+scripts/populate_semantic_error_thresholds.py, scripts/bug695_recalibrate.py) queried `fbs` WITHOUT the D-2881
+canonical-run clause that the serving layer already enforces — a hidden mismatch that (a) made the wrapper's G3
+gate falsely report "RATIFY-2 incomplete" and (b) would have silently diluted every per-label rate over a ~45%
+pre-v9-stale corpus. FIX (deterministic, LLM-free, config-first): scope every calibration query to CANONICAL_RUN
+via `pipeline_run_id = ?` (the D-2881 single source of truth in pipeline/pipeline_paths.py). Verified dry-run: G3
+now passes; the 6 genuinely-unmeasured labels (business administration / creative writing / ecology / marketing /
+museum studies / research practice) remain correctly fail-closed until the audits re-run on the canonical run.
+BUG-695's fix path is therefore NOT "wait for RATIFY-2 re-classification" — the canonical run is already v9 — it
+is "re-run the audits scoped to the canonical run". The 6494 canonical rows still carrying a v5.6 menu_hash stamp
+remain a separate D-2894 re-stamp concern (not a label defect). No DB/config writes this turn (dry-run only;
+--apply still gated on R5 review).
+
+## D-2907 — D-2894 deterministic menu_hash re-stamp APPLIED + BUG-693 CLOSED (2026-10-10)
+
+Owner approved D-2894 (re-stamp recommendation) + the offmenu-1309 whitelist ruling (D-2898: new-slot/out-of-scope
+stays 'emerging', no local LLM auto-mints a canonical slot). Applied scripts/restamp_canonical_menu_v9.py --apply:
+a PROVENANCE REFRESH (not a re-classification) re-stamping the 6494 canonical rows carrying menu_hash 99e1df82.../
+taxonomy v5.6 → live be323543.../v9. Fail-closed G1-G4 guards prove the cohort was already v9-clean (0 pre-v9
+leftovers; all 59 distinct disciplines ∈ live v9 menu), so the re-stamp whitewashes nothing. Crash-safe: DB backup
++ quick_check/foreign_key_check before AND after, single atomic txn, post-write 0-stale-remain verify. RESULT:
+scripts/check_menu_reclass_gate.py now reports GREEN (canonical run fresh vs live v9 menu); discipline census
+unchanged (61 labels, emerging 1487, total 6591) — zero label drift. BUG-693 CLOSED: step 1+2 (D-2893 reclaim),
+step 3 (offmenu-1309 → emerging whitelist, owner ruling), step 4 (D-2894 gate, now green). OMLX down this turn, so
+the R5 gemma code-review leg was unavailable; the operation is deterministic SQL provenance-only and independently
+re-verified by the gate, which is the stronger correctness bound for a re-stamp. BUG-695 remains OPEN (recalibration
+--apply still pending the R5 review of the four-file canonical-run scoping).

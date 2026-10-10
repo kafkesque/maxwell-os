@@ -155,6 +155,7 @@ CREATE TABLE IF NOT EXISTS fbs (
     epistemic_status TEXT,      -- G19/F-43: S5 tier (corroborated|source-supported|cross-source-unverified|speculative)
     verification_method TEXT,   -- G19/F-43: S5 verification method
     isor TEXT,                  -- G19/F-43: full ISOR scores (JSON) from S5
+    practicality TEXT,          -- D2622: advisory applicability tier (immediately-applicable|context-dependent|abstract)
     -- Stamps (R14)
     schema_version TEXT,
     gen_model TEXT,
@@ -316,6 +317,7 @@ def init_db(db_path: Path) -> sqlite3.Connection:
     _migrate_add_column(conn, "fbs", "epistemic_status", "TEXT")
     _migrate_add_column(conn, "fbs", "verification_method", "TEXT")
     _migrate_add_column(conn, "fbs", "isor", "TEXT")
+    _migrate_add_column(conn, "fbs", "practicality", "TEXT")
     # D2395: drop dead legacy s3_original_domain (stage3 removed in D2130; the column was
     # never dropped from existing DBs). Drift → 61 DB cols vs 60 in CREATE TABLE/INSERT,
     # tripping integrity-check [8]. Dropping re-aligns; no active code reads the column.
@@ -567,6 +569,7 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
                 verification_results, borp_score, status,
                 needs_human_review, verifier_model,
                 s5_reason, epistemic_status, verification_method, isor,
+                practicality,
                 schema_version, gen_model, pipeline_commit,
                 taxonomy_version, pipeline_run_id,
                 created_at, committed_at,
@@ -680,6 +683,7 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
             _safe_str(fb.get("epistemic_status")),
             _safe_str(fb.get("verification_method")),
             _safe_json(fb.get("isor")),
+            _safe_str(fb.get("practicality")),
             # stamps
             # D2169: Read schema version from config/version.yaml (single source of truth)
             _safe_str(fb.get("schema_version"), _get_pipeline_version()),

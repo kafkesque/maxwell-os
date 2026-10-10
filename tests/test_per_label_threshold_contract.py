@@ -24,16 +24,16 @@ ROOT = Path(__file__).resolve().parent.parent
 CONFIG_YAML = ROOT / "config" / "pipeline_config.yaml"
 TAXONOMY_YAML = ROOT / "config" / "taxonomy_v5.yaml"
 
-# Current expected count = 51 disciplines + 41 domains = 92 (v9 menu). The v9 promotion
-# (D-2865/D-2897/D-2898) added 12 disciplines that were NEVER re-populated here:
-# 7 have >= emerging_freq_threshold (10) corpus presence but no D2547 calibration entry
-# (business administration, color theory, creative writing, ecology, marketing, museum
-# studies, robotics) -> they correctly fall back to `default: 0.05` (BUG-695); 5 are below
-# min-sample (design psychology, creative coding, generative design, privacy & surveillance,
-# entrepreneurship studies) and are absent by design. Post-RATIFY-2 re-calibration the
-# count becomes 58 disciplines + 41 domains = 99. Re-base only WITH a DECISION-LOG reason.
-EXPECTED_LABEL_COUNT = 92
-EXPECTED_DOMAIN_COUNT = 41  # domains are multi-valued, so all 41 always have samples
+# Current expected count = 53 disciplines + 40 domains = 93 (v9 menu, post-RATIFY-2
+# D2547 re-calibration — BUG-695). The re-population (scripts/bug695_recalibrate.py)
+# now writes an EMPIRICAL rate for every canonical label with >= min_sample (10)
+# corpus presence. 63 disciplines -> 53 (10 below min-sample: design psychology,
+# creative coding, generative design, privacy & surveillance, entrepreneurship
+# studies, robotics, and 4 more thin labels) + 41 domains -> 40 ('design systems'
+# has 9 fbs, below min-sample). Re-base only WITH a DECISION-LOG reason (D-2908).
+EXPECTED_LABEL_COUNT = 93
+EXPECTED_DOMAIN_COUNT = 40  # 41 v9 domains minus 'design systems' (9 fbs < min_sample 10)
+BELOW_MIN_SAMPLE_DOMAINS = frozenset({"design systems"})  # 9 fbs < min_sample (10)
 
 
 def _canonical_labels() -> tuple[set[str], set[str]]:
@@ -83,10 +83,12 @@ def test_per_label_keys_are_canonical() -> None:
 def test_per_label_all_domains_present() -> None:
     _, domains = _canonical_labels()
     pl = _per_label()
-    missing = sorted(d for d in domains if d not in pl)
+    missing = sorted(
+        d for d in domains if d not in pl and d not in BELOW_MIN_SAMPLE_DOMAINS
+    )
     assert not missing, (
-        f"all {EXPECTED_DOMAIN_COUNT} canonical domains must have a per_label rate; "
-        f"missing: {missing}"
+        f"all {EXPECTED_DOMAIN_COUNT} canonical domains with >= min_sample must have "
+        f"a per_label rate; missing: {missing}"
     )
 
 

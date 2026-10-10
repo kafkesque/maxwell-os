@@ -4,53 +4,53 @@
 
 | # | fb_id | knn min agree | nli contra gap | knn axes | nli axes |
 |---|-------|--------------:|---------------:|----------|----------|
-| 1 | `8d3809b024eff0a4cf4d6416eed846f3a784a5e4d1ba375f4ad3953c7fae5a61` | 0.0 | 0.9995 | discipline:software engineering | discipline:software engineering, domain:marketing & communications |
-| 2 | `dad393759b08c847a58ce2a3534d013dbba634d889a9d1213c3965d75963eab1` | 0.1 | 0.9995 | discipline:aesthetics | domain:engineering practice |
-| 3 | `015b40f08499323ba7dd08333988ab2514630fa3e3af29553d1cc06a3365b63e` | 0.2 | 0.9995 | domain:engineering practice|environmental design|product design | domain:engineering practice, domain:environmental design, domain:product design |
-| 4 | `8d0d8ab93ed841e1cf488a7b2d057141c502fd6a5b8d19c93322b9dce08252f5` | 0.0 | 0.9994 | discipline:philosophy | discipline:philosophy |
-| 5 | `e714509eeac5ed8149bd8a8bfc63e4b843fc2252a1c87a7e704f03b7a89fbdd8` | 0.1 | 0.9994 | discipline:political economy | domain:engineering & infrastructure |
-| 6 | `46d4e1a8dfce09e03e54ee671928207a0b642d748760f95b3b501f75b071ea63` | 0.2 | 0.9994 | domain:design strategy|engineering practice|environmental design|project management | domain:design strategy, domain:engineering practice, domain:environmental design, domain:project management |
-| 7 | `276e2f256075cb43baa1280d8d862722098f7e68400e8475e1fefc0a3c9574f7` | 0.0 | 0.9993 | discipline:philosophy, domain:health & wellness | discipline:philosophy, domain:health & wellness |
-| 8 | `d0b799314e05abae39f23cccc5ba5aa8e7d41f841b771aaabcb584432230ff53` | 0.0 | 0.9993 | discipline:decision making, domain:engineering & infrastructure|packaging | discipline:decision making, domain:engineering & infrastructure, domain:packaging |
-| 9 | `127edfab2c0fa00bc3391b7c8c805b43bfb05cec33c3905718f94f188c5ebf23` | 0.0 | 0.9993 | discipline:information science, domain:digital product | domain:digital product |
-| 10 | `4bf7c5a53525881538fc3a2b302bc05af6538086a393f8c3db6d348a697b9393` | 0.1 | 0.9993 | discipline:systems engineering, domain:engineering & infrastructure|health & wellness | domain:health & wellness |
-| 11 | `9f8c31e5030a65359a72442ec8024942275f1c998af3665b1a1a9175d61d02a4` | 0.2 | 0.9993 | discipline:motion & time | discipline:motion & time |
-| 12 | `ea0a48cbfaf764b2777927fa1cd56e2c5579cd7d08ece5169ce92832879afb59` | 0.0 | 0.9992 | discipline:cognitive science | domain:brand identity, domain:graphic design, domain:marketing & communications, domain:product design, domain:user experience |
-| 13 | `86a996c254b8756cc96336595926336f5415882aca52118fa60967c5136f1bce` | 0.0 | 0.9992 | discipline:information security, domain:engineering & infrastructure | domain:engineering & infrastructure |
-| 14 | `c819167859647ada2f05e8013cd8820b43a9de2d93ca57a4f570386a24d8bfc2` | 0.0 | 0.9992 | discipline:systems thinking | domain:personal productivity |
-| 15 | `8d6943fe6f9215bc4ba9bb90a92b89440d8397b82dbb70084e57f64eb1999b40` | 0.0 | 0.9992 | discipline:economics, domain:project management | discipline:economics, domain:project management |
-| 16 | `e83062e9cf96f1808c37e8d60fc6284db3a937b60abf6bb86afa56e658109fd0` | 0.1 | 0.9992 | domain:health & wellness|science & research | discipline:research methodology, domain:health & wellness |
-| 17 | `a34696fb9d0c7d3fe564da5de56cb89114e2e117b5c8023ac66c8b978e7b2719` | 0.1 | 0.9992 | discipline:computer graphics, domain:arts & culture|media & entertainment | domain:arts & culture, domain:media & entertainment |
-| 18 | `61e45b7d6dfe4933f94e9ab9b6ac92ecec39886d8f655dca824a5b8ba2c6a7f1` | 0.2 | 0.9992 | discipline:information security, domain:user experience | domain:user experience |
-| 19 | `554a22ebb2e5b9829eb343d6912a448d4eb396105c81a9a085fc673eaa0a0148` | 0.2 | 0.9992 | discipline:software engineering, domain:code & computation|media & entertainment | domain:media & entertainment |
-| 20 | `402fa50814c912bfee490da199bb4587adc04a383837c3cc985ddf49de91ca8b` | 0.2 | 0.9992 | discipline:cultural studies, domain:engineering & infrastructure|legal & public policy | discipline:cultural studies, domain:engineering & infrastructure |
-| 21 | `d6fe7483cc730356d854a0eb5b9cccc601499ce27875672b98dc1dbefc46177a` | 0.0 | 0.9991 | discipline:organizational theory, domain:education | domain:education |
-| 22 | `35f42d8ca5bc1c4cb1fd97f87c7918cdbaa25c188178e0c28abfab14b98f2261` | 0.0 | 0.9991 | discipline:linguistics | discipline:linguistics |
-| 23 | `4eaf655cb36e1d3f7292204930001a7cdfb16d61ddf1a6ce70d9d1ded3e228a1` | 0.0 | 0.9991 | discipline:economics | domain:engineering & infrastructure, domain:leadership |
-| 24 | `3d484e37cf1ffc2d52351203745669998af0bc4c1c60d7b28886140899156611` | 0.0 | 0.9991 | discipline:philosophy, domain:health & wellness | domain:health & wellness |
-| 25 | `b147a82b64686053fef559454ebd6cc0cc8199c506663756af4579b75519160a` | 0.1 | 0.9991 | discipline:philosophy, domain:social sciences | discipline:philosophy, domain:social sciences |
-| 26 | `dd6bb15b6c947e76a6b0b981d3e6ba59874c267602480009c46db5014f8fb228` | 0.1 | 0.9991 | discipline:cultural studies, domain:brand identity|editorial & advertising | domain:brand identity, domain:editorial & advertising |
-| 27 | `7d391e4c34671ac659d2badaa4143d1301187baecb0512a419efcd3f6a019419` | 0.0 | 0.999 | discipline:psychology, domain:user experience | discipline:psychology, domain:user experience |
-| 28 | `7daa9d225677ad6891b36aa4548a44589259cd06ed648f41fea90ea15aa4aa0c` | 0.0 | 0.999 | discipline:research methodology, domain:health & wellness|project management|urban planning | discipline:research methodology, domain:health & wellness |
-| 29 | `9f98c5fd5c652f4819adf5747c3ff8d29e7edde78f35a8edb8dbc5f5cdf7ed5a` | 0.0 | 0.999 | discipline:political economy | discipline:political economy |
-| 30 | `6c98af237315fd0cde140d96771f21f9086ff0ad26582c3c708ff8a7425f192c` | 0.0 | 0.999 | discipline:game design | discipline:game design |
-| 31 | `fad2d7486aa8e19a277c2c1c5bf3afc45f185f77a802afff6c7680c65fdd8481` | 0.0 | 0.999 | discipline:economics, domain:business operations|leadership | domain:leadership |
-| 32 | `b4a1eb9457e8f093c7593f118c979678860104e18412ec671f521081f0b827c8` | 0.1 | 0.999 | discipline:design thinking, domain:education|leadership | discipline:design thinking, domain:education, domain:leadership |
-| 33 | `1e5bf9207c96b77594342c70c85740fcdb3ad64a9b7573ba292cba80e4ea513d` | 0.1 | 0.999 | discipline:health & medicine, domain:education|health & wellness | domain:education |
-| 34 | `1bf8fda07f7a237c65415cdbc300e1dbdefc871534bd77adfb86d8a6a4a1ee16` | 0.1 | 0.999 | domain:engineering practice|health & wellness|urban planning | domain:health & wellness, domain:urban planning |
-| 35 | `13580ceac2467c8b150b0378289d8a799a6979f024f82b93792653a3b77e84b2` | 0.1 | 0.999 | discipline:performing arts, domain:education|graphic design | domain:education, domain:graphic design |
-| 36 | `302fd361096382c01edc060ff1cce8bf93b6230204f1ba114f3c5e3c933d6a0d` | 0.1 | 0.999 | discipline:behavioral economics | discipline:behavioral economics, domain:environmental design, domain:product design |
-| 37 | `a254e81bcea9a00ad65b590db3f73793576e2076d328d3dad75d7247930352b2` | 0.1 | 0.999 | discipline:research methodology | discipline:research methodology, domain:data visualization, domain:engineering & infrastructure, domain:leadership |
-| 38 | `e0a16d5687ea5d5bbf2109aba2ee698704fe0e19100885527251839d8d14f387` | 0.1 | 0.999 | discipline:communication theory, domain:engineering & infrastructure | domain:engineering & infrastructure |
-| 39 | `d0e2634eb710ebd43b27f01980501821552c4e7b5ae995b21084fcf74f87f9eb` | 0.1 | 0.999 | discipline:law, domain:engineering & infrastructure | domain:engineering & infrastructure |
-| 40 | `881759b2c3c2f6cf36ec5c1a6a146b0a6ee242079dc222f128988cd94c3357f8` | 0.2 | 0.999 | discipline:anthropology, domain:health & wellness|personal productivity | domain:health & wellness, domain:personal productivity |
-| 41 | `4a3b72f7b8740d83f27b0129a404436541867e1cb7ecabf065cdb510facefb0b` | 0.2 | 0.999 | domain:education|legal & public policy | domain:education, domain:legal & public policy |
-| 42 | `0b00ce6bfcaa4f01dfb12fe49718dfad5f289e6b2b4c91e65ca4554fcb968b62` | 0.2 | 0.999 | discipline:cultural design, domain:engineering practice|urban planning | discipline:cultural design, domain:engineering practice |
-| 43 | `59e10b16c55162734c219a55ca08c4e2acd4e9ca5e9f9f223c54794a6d91964d` | 0.2 | 0.999 | discipline:philosophy | discipline:philosophy, domain:engineering & infrastructure |
-| 44 | `41815a5831e9d3573b7d73556c8ad281c5a0aaac0b1a25db170002ee252c3c19` | 0.0 | 0.9989 | discipline:information science | domain:engineering & infrastructure |
-| 45 | `eff18efe43dd54d55de4b49d38f1bb0be9d81f92d76417ea11f62f67c04b1180` | 0.0 | 0.9989 | discipline:information science | discipline:information science, domain:education |
-| 46 | `65f35199042cf1775f97c30a973db98b6195edc6b46ad68d70c6a33229d4d1bf` | 0.0 | 0.9989 | discipline:research methodology, domain:engineering & infrastructure|finance & investment | discipline:research methodology, domain:engineering & infrastructure, domain:finance & investment |
-| 47 | `dd1b1430f8b974972288c6379d9a1d0e7f7e7c82a5c1bbb39d0b619a20fe521c` | 0.0 | 0.9989 | discipline:information science | domain:design strategy, domain:personal productivity |
-| 48 | `071870f90e5dcf4eac7ce40a5a8ec97b7492520c83f16045c8ca18a18d75e131` | 0.0 | 0.9989 | discipline:software engineering | discipline:software engineering, domain:graphic design |
-| 49 | `e7e317889a65313188350dcc4ac258644b570e4c0242bc2f2ce404acc8750ca6` | 0.0 | 0.9989 | discipline:game design | discipline:game design |
-| 50 | `2f8185358632b9bf490cc74c24ed5d73cd61bc8387bab55a26e0b1d14bcc67d9` | 0.0 | 0.9989 | discipline:communication theory | discipline:communication theory, domain:brand identity, domain:product design |
+| 1 | `7833ce70b0c4ed38215331d7726e9284b0d510d0ec3e1ecd67d9a81f4e7f9e82` | 0.0 | 0.9993 | discipline:philosophy | discipline:philosophy |
+| 2 | `f7e8a83f8273165a2540d765d4986ed753b17255a8d9191edec00ed00f3c2dd0` | 0.0 | 0.9993 | discipline:literary theory | domain:graphic design |
+| 3 | `12ccd8c88104b63de2d796b405902642b8890c280ea871a1e2b710ec34813c6e` | 0.0 | 0.9993 | discipline:philosophy | discipline:philosophy, domain:business operations |
+| 4 | `c15a53302fea3ba8892eb23903f71465ff1509f4993e7e3a40291ffe528dd628` | 0.2 | 0.9992 | discipline:philosophy | domain:personal productivity |
+| 5 | `eb4a73655de67455ba0919966e77a8d40d093967172ba221ad9e02b40f3e8151` | 0.1 | 0.9991 | discipline:organizational theory | domain:personal productivity |
+| 6 | `d873459542ccec49f52c4ebeba78c0d132358c6b5accf6090ac0cd1213dc061a` | 0.2 | 0.9991 | discipline:political economy | domain:engineering & infrastructure |
+| 7 | `f8e2472650a92b84e4e4728a28f83de0fb69b5716a94244a5e4f4323d5461f22` | 0.2 | 0.9991 | discipline:information science | domain:data visualization, domain:engineering & infrastructure |
+| 8 | `bfc2bc75b2d4433fc781d5408494f1522520abfe6cf89204a784824b048a5f68` | 0.2 | 0.9991 | discipline:cognitive science | discipline:cognitive science, domain:personal productivity |
+| 9 | `753c6edf95e08122424227da9c3473e7f3a17367593e7e44ed817780ae8b72be` | 0.2 | 0.9991 | discipline:machine learning | domain:health & wellness |
+| 10 | `649dcebfbe6fd6c73c4a3d6d2d62ecdb010a1a2558cebe5b327d8f1846d41822` | 0.0 | 0.999 | discipline:operations research | discipline:operations research |
+| 11 | `db50778cba0f82f6a17966743c3871c3f8759434243e5c208c49a972ea83878a` | 0.0 | 0.999 | discipline:sociology | domain:business operations, domain:organizational behavior |
+| 12 | `88a917b09ade9e3996f2b424309e9db7e9c71e0c5a78615a22360cce504cb4d0` | 0.1 | 0.999 | discipline:linguistics | discipline:linguistics |
+| 13 | `b48549b9f2a745345f18863378126d1f7f09a31e98d76dd8315e27ce30cec49e` | 0.1 | 0.999 | discipline:political economy | discipline:political economy, domain:engineering & infrastructure |
+| 14 | `b465e7866d1bd9b4f4585c66c7c7e4254152755639e0b8532e56973470d3ec25` | 0.2 | 0.999 | discipline:strategic thinking | domain:design strategy, domain:marketing & communications |
+| 15 | `f5d41fc33370cdb5e853f65c2935d8419b9770427bf1f9ede08e9c0f31bb0725` | 0.2 | 0.999 | discipline:marketing | domain:digital product |
+| 16 | `7b11605ffe4c672bff9f8c7f7c654aecb2ed80599c6ac6f8450f133796ad279d` | 0.3 | 0.999 | discipline:media studies | domain:motion design |
+| 17 | `a03273db4f9e5ca0c192b9c7fd45acb4f18a3d3a3e02bfba46153694e9f9dfa0` | 0.0 | 0.9989 | discipline:semiotics | discipline:semiotics |
+| 18 | `209fe626195cfbf5b86a4328ed3bd7d5c9c4bcf4215e870d3fa9425265511b34` | 0.1 | 0.9989 | discipline:creative process | discipline:creative process |
+| 19 | `cf9357f1fad7b90d67479d47654cb3c4e2a638a8e007d52190ee8853a1a207a7` | 0.2 | 0.9989 | discipline:sociology | domain:project management |
+| 20 | `f0bd37b0248017c0726afc1080184201b69ca53c95e10432dbd009fc7c94be5a` | 0.3 | 0.9989 | discipline:artificial intelligence | domain:health & wellness |
+| 21 | `2412d041e372525a9341bc521f881a356f612c1a11d0daddd793ce666fb95228` | 0.1 | 0.9988 | discipline:philosophy | domain:health & wellness |
+| 22 | `3a51aaab2c44ffad41ef6a472089da188e6476357faf000e0f3167aeed86338e` | 0.1 | 0.9988 | discipline:sociology | domain:personal productivity |
+| 23 | `baab3230adb97c4b073a24d23837c1f1f15b6d98728a4f717b54e21e0136d28e` | 0.0 | 0.9987 | discipline:anthropology | domain:personal productivity |
+| 24 | `d8ce13707ccef04c51caad8774bf7078433b5c850830373e47869f9d399ce9f0` | 0.0 | 0.9987 | discipline:health & medicine | discipline:health & medicine |
+| 25 | `3f45c164feba7e1ec24f15880abd981359172bfd70dd540b4f30749867ccb149` | 0.0 | 0.9987 | discipline:computational geometry | domain:engineering practice |
+| 26 | `4c6da2601c51d7ad9d04109b1118e299d70918976f854a1ed8ccea7421d28a76` | 0.1 | 0.9987 | discipline:software engineering | discipline:software engineering, domain:engineering & infrastructure |
+| 27 | `602d124fbb00866368649eb542d2c087ca038c25b671dc2d4d246250dc6e4ae6` | 0.1 | 0.9987 | discipline:law | domain:project management |
+| 28 | `4d9905752d06889dba87a75528363b5fa33dc2b7d7d8117fb68682bdd6d0e22a` | 0.2 | 0.9987 | discipline:cultural design | discipline:cultural design, domain:industrial design |
+| 29 | `dac290df6ff42331e8cab9a6ff31007c887faccbb49764ca16121315cc8e774b` | 0.2 | 0.9987 | discipline:philosophy | discipline:philosophy |
+| 30 | `073410105c9c4abba6bbcd53ef7b371d478561715122f8167afa19ae47659657` | 0.0 | 0.9986 | discipline:systems thinking | domain:health & wellness, domain:legal & public policy, domain:project management, domain:urban planning |
+| 31 | `4e89c948c01046dd9f8606cfc02da04b126541bc7c0789ab2beef30d253777a9` | 0.0 | 0.9986 | discipline:social network analysis | domain:brand identity |
+| 32 | `b455f08b95fc9b47068556fdc6fb6c776b5d9da7fdfe32ed593d22b601acb18e` | 0.1 | 0.9986 | discipline:linguistics | discipline:linguistics, domain:health & wellness |
+| 33 | `64a3a2f9f528a0e39be4248f0a46a32ddc93ea88ca913c55e3eaa002c995a97d` | 0.3 | 0.9986 | discipline:research methodology | discipline:research methodology, domain:engineering & infrastructure, domain:user experience |
+| 34 | `81e5267f4a9d9b7835556b577e5d22a9cebe1d077e752c1eb55dc762a695fb4f` | 0.0 | 0.9985 | discipline:economics | discipline:economics, domain:marketing & communications |
+| 35 | `79b6bde89195ac876e79e599d5d8861260aa83707213d8ec23012cfb6d5c71f6` | 0.0 | 0.9985 | discipline:creative process | discipline:creative process |
+| 36 | `6d71448442b29796257728b5f8f3152f0e3225717434ec9b87b17335bd647e06` | 0.0 | 0.9985 | discipline:creative process | discipline:creative process |
+| 37 | `44facab212962866d1afdbbde2d7c3a028d370937221589b709db7ebb73773b4` | 0.1 | 0.9985 | discipline:literary theory | domain:brand identity |
+| 38 | `28c38f9e6443dc1455098a2c62048f214e0b85823c29cb89a7910e4bffcf5b09` | 0.1 | 0.9985 | discipline:cultural design | discipline:cultural design, domain:engineering practice |
+| 39 | `d5e1f032fe2565d35b77859176c6dd3e9d0749d954a204db04d141dbecc4982f` | 0.2 | 0.9985 | discipline:law | domain:engineering & infrastructure |
+| 40 | `faa1fe14c20472834d0b2d8c1c4c5eb417cabcf9d174b06150b8df19c550a252` | 0.2 | 0.9985 | discipline:design thinking | discipline:design thinking, domain:engineering & infrastructure, domain:product design, domain:user experience |
+| 41 | `e624a0fc123e9070914e224517b278675f7957beff9b3b4c709b0832225d0b91` | 0.2 | 0.9985 | discipline:cognitive science | discipline:cognitive science, domain:business operations |
+| 42 | `ee4bb3b7da6c766454d210c4d5bf53ec8af236e95c8509f63209fdfc8b4696b6` | 0.3 | 0.9985 | discipline:information science | domain:business operations |
+| 43 | `e8c2a975b731c2dccbb3e893405ad40bf2b6bb3f355e0d91c192bc9bb1d10075` | 0.0 | 0.9984 | discipline:economics | domain:engineering & infrastructure |
+| 44 | `0fc2285827c1d79d2823876972d362c3f874bfbd757704957e7c5bac9af65538` | 0.0 | 0.9984 | discipline:creative process | discipline:creative process |
+| 45 | `9683d48971204f05cdcc755aaaf34c1c3908f3bb5d7d8a969d41485e679c49b2` | 0.0 | 0.9984 | discipline:anthropology | discipline:anthropology |
+| 46 | `ece9470c35dc7f04c0761d93903ea6e3504e4d710a05132de57384d7bd874ff1` | 0.1 | 0.9984 | discipline:information security | domain:engineering & infrastructure |
+| 47 | `8380d95144efad66fd62b7dbec0b89a652191428914511738b5347706db7d92a` | 0.2 | 0.9984 | discipline:information science | domain:data visualization, domain:engineering & infrastructure |
+| 48 | `612420bc14fc66370ab5656ad2668f248437db036b6b27392072337a4b1a856d` | 0.2 | 0.9984 | discipline:design thinking | domain:engineering & infrastructure |
+| 49 | `244a51e918d1c032c929d290dba71a791b0d1a99338d2c31070f6bde6fb12035` | 0.2 | 0.9984 | discipline:cultural design | discipline:cultural design |
+| 50 | `dbb02e4cacef8e2978eaa880aab45018f7ff7c9d726db81a311cb3b95c670344` | 0.3 | 0.9984 | discipline:strategic thinking | domain:digital product |

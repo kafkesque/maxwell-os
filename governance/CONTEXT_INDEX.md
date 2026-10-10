@@ -34,8 +34,8 @@ may restate them (C12).
 | 1 | `content_type` | functional **ROLE** — what job does this object do? | 7 | S4 router |
 | 2 | `extraction_type` | epistemic **FORM** — what kind of claim, how justified? | 4 | persisted S4->S6; **no verifier yet (F-15)** |
 | 3 | `depth` | how widely does it apply? | 5 (incl. `n/a-non-principle`) | depth filter |
-| 4 | `discipline` | which field owns it? (**singular**) | 61 | retrieval / routing |
-| 5 | `domains` | which topics does it touch? (**multi-label**) | 43 | retrieval |
+| 4 | `discipline` | which field owns it? (**singular**) | 63 (v9) | retrieval / routing |
+| 5 | `domains` | which topics does it touch? (**multi-label**) | 41 (v9) | retrieval |
 
 Role and FORM are **orthogonal** — one role accepts many forms. "Object type" is axis 1; the
 un-adjudicated 5th axis is the FORM (axis 2). See `governance/FORENSIC_AUDIT_20260917.md` F-14.

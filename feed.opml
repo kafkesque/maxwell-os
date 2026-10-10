@@ -3,7 +3,7 @@
   <head>
     <title>Maxwell OS — Pipeline Technology Feeds</title>
     <dateCreated>2026-07-16T07:59:00Z</dateCreated>
-    <dateModified>2026-09-22T19:45:00Z</dateModified>
+    <dateModified>2026-10-10T11:24:00Z</dateModified>
     <description>GitHub topic feeds, specific repos, YouTube channels, and X.com sources for pipeline technology evaluation. Updated 2026-07-27 with MLX + Apple Silicon ecosystem feeds.</description>
   </head>
   <body>
@@ -257,6 +257,30 @@
     </outline>
 
     <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- REPO RELEASE FEEDS — New(feeds v10) owner-approved (D-2902)   -->
+    <!-- releases.atom for starred repos so pipeline-adjacent tools     -->
+    <!-- surface new versions via RSS instead of manual star-checking   -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <outline text="Repo Release Feeds (New feeds v10)" description="Starred repo releases.atom feeds (D-2902)">
+      <outline type="rss" text="USearch releases" xmlUrl="https://github.com/unum-cloud/USearch/releases.atom"
+               description="FAISS replacement (S1.5 candidate) — release notes"/>
+      <outline type="rss" text="TurboVec releases" xmlUrl="https://github.com/RyanCodrai/turbovec/releases.atom"
+               description="Quantized vector search (installed v0.8.0) — release notes"/>
+      <outline type="rss" text="LEANN releases" xmlUrl="https://github.com/StarTrail-org/LEANN/releases.atom"
+               description="97% storage-savings RAG (FB retrieval) — release notes"/>
+      <outline type="rss" text="zvec releases" xmlUrl="https://github.com/alibaba/zvec/releases.atom"
+               description="Embedded vector DB (FAISS alternative) — release notes"/>
+      <outline type="rss" text="memvid releases" xmlUrl="https://github.com/memvid/memvid/releases.atom"
+               description="Agent memory layer — release notes"/>
+      <outline type="rss" text="sqlite-vss releases" xmlUrl="https://github.com/asg017/sqlite-vss/releases.atom"
+               description="SQLite vector extension — release notes"/>
+      <outline type="rss" text="LightRAG releases" xmlUrl="https://github.com/HKUDS/LightRAG/releases.atom"
+               description="Graph-based RAG — release notes"/>
+      <outline type="rss" text="nano-graphrag releases" xmlUrl="https://github.com/gusye1234/nano-graphrag/releases.atom"
+               description="Lightweight local GraphRAG — release notes"/>
+    </outline>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
     <!-- YOUTUBE CHANNELS — weekly review for techniques & talks       -->
     <!-- D2116: Added 2026-07-26                                       -->
     <!-- ═══════════════════════════════════════════════════════════════ -->
@@ -313,6 +337,14 @@
                description="D2607-D: color theory / color constancy (CRITICAL, convergent 3)"/>
       <outline type="rss" text="Populations &amp; Evolution (q-bio.PE)" xmlUrl="https://rss.arxiv.org/rss/q-bio.PE"
                description="D2607-D: ecology discipline (CRITICAL, convergent 1)"/>
+      <outline type="rss" text="Information Retrieval (cs.IR)" xmlUrl="https://rss.arxiv.org/rss/cs.IR"
+               description="New(feeds v10): directly serves S1.5 retrieval + S4 classification quality"/>
+      <outline type="rss" text="Computation &amp; Language (cs.CL)" xmlUrl="https://rss.arxiv.org/rss/cs.CL"
+               description="New(feeds v10): NLP/linguistics for retrieval + classification"/>
+      <outline type="rss" text="Machine Learning (cs.LG)" xmlUrl="https://rss.arxiv.org/rss/cs.LG"
+               description="New(feeds v10): embedding / clustering / classification methods"/>
+      <outline type="rss" text="Artificial Intelligence (cs.AI)" xmlUrl="https://rss.arxiv.org/rss/cs.AI"
+               description="New(feeds v10): general AI methods for the pipeline"/>
     </outline>
 
     <!-- ═══════════════════════════════════════════════════════════════ -->

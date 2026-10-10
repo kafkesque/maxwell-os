@@ -15529,3 +15529,29 @@ decisions:
   - BUG-692
   files:
   - config/pipeline_config.yaml
+- id: D-2902
+  state: RATIFIED
+  category: ONTOLOGY
+  title: Alias-map reconciliation (deterministic re-homes) + New(feeds v10) enumeration + governance axis-count
+    sync 61/43 -> 63/41
+  decision: 'BUG-693 menu-widening follow-through (D-2900 lineage) - ALIAS RECONCILIATION (D-2814 shrink-only follow-through,
+    DETERMINISTIC only): (1) discipline ''visual communication theory'' re-pointed visual semiotics -> semiotics
+    (D-2897 merge: visual semiotics folded into semiotics; semiotics.raw already carries Visual Semiotics/Visual
+    Communication/Visual Communication Design). (2) 12 domain aliases re-pointed ''science & research'' -> ''research
+    practice'' (D-2865 declared merge target). Both are FOLLOW-THROUGH of owner-ratified merges, NOT promotion:
+    no canonical slot minted, no raw label mutated (D-2896). REMAINING stale targets = OWNER-GATE per D-2898 (no
+    agent auto-mints canonical homes): discipline ''mathematical logic'' + ''computability theory'' -> computational
+    theory (DEMOTED to emerging, no merge home); 14 domain aliases -> social sciences (DEMOTED, heterogeneous: psycholinguistics/gender
+    studies/religious studies/behavioral science/consumer behavior/forensic+sports psychology/epidemiology/cross-cultural
+    - need per-alias ontological re-homing, NOT a blind single-target rewrite). NEW(FEEDS v10) enumerated: +8 repo
+    releases.atom feeds (USearch/TurboVec/LEANN/zvec/memvid/sqlite-vss/LightRAG/nano-graphrag) +4 missing arXiv
+    cats (cs.IR/cs.CL/cs.LG/cs.AI). GOVERNANCE SYNC: CONTEXT_INDEX axis ontology 61/43 -> 63/41 (v9). FLAGS: feed.opml
+    D2607-D still names ''computational theory'' as a CRITICAL starved discipline (now demoted) - re-map the 9-discipline
+    ingestion mapping next; taxonomy_v5.yaml carries v9 content (renderer reads v5; taxonomy_v9.yaml stays an unversioned
+    build intermediate per D-2897) - canonical-rename sweep is a follow-up, not a break.'
+  bugs:
+  - BUG-693
+  files:
+  - config/alias_map.yaml
+  - feed.opml
+  - governance/CONTEXT_INDEX.md

@@ -763,7 +763,6 @@ domain_aliases:
   food science & culinary arts: science & research
   construction & infrastructure: engineering & infrastructure
   automation & control systems: systems & frameworks
-  literature & creative writing: arts & culture
   architecture & urban planning:
   - engineering practice
   - urban planning
@@ -849,7 +848,6 @@ domain_aliases:
   ai & data strategy: ai & agents
   arts & entertainment: media & entertainment
   art and visual culture: arts & culture
-  cultural heritage & museum studies: arts & culture
   product design research: product design
   digital media research: media & entertainment
   visual communication research: graphic design

@@ -7193,6 +7193,16 @@ anything else ambient is REFUSED. The must-exist condition is not decoration: gi
 EMPTY, so an absent file would report "all declared" over no bytes. MEASURED after: 13/13 module controls
 (the D-405 join matched a live minted name this run) and 16/23/11 rail controls still fire.
 
+FOLLOW-THROUGH (2026-10-10, D-2909): the D-2646 two-homes-one-fact class had ONE more name-list reader.
+`scripts/check_declaration_consumers.py#staged_set()` read the staged set as TEXT and split on newlines
+(`git diff --cached --name-only` + `splitlines()`), so a staged path containing a SPACE became multiple
+phantom paths — the same defect D-2673 removed from the index-subject home. FIXED: `staged_set()` now reads a
+NUL-separated list (`-z`) and splits on NUL, mirroring `git_subject.run_git_paths` (BUG-565). It keeps its own
+`-z` read ONLY because its selftest must exercise a synthetic root repo the ONE home cannot (`run_git_paths`
+is pinned to the live REPO subject); the two reads are documented to stay in lockstep. TWO new known-answer
+controls (`space_path_is_one_path`, `space_path_not_split`) prove a space-path is ONE path and its whitespace
+tokens are NOT phantom standalone paths; selftest 13/13.
+
 ## BUG-567 (FIXED, HIGH): RAIL 5's note was FALSE - it NAMED git's index while auditing a DIFFERENT one
 
 MEASURED 2026-09-27. scripts/check_declaration_consumers.py DELETES GIT_INDEX_FILE from its child environment
@@ -9027,7 +9037,12 @@ ban), so the bug cannot recur on the open-ended path. Reopening is possible only
 introduced for open-ended work — a C1/C3 violation caught by the delegate-safe guard, not by this bug.
 
 ## BUG-267 (OPEN, 2026-09-17) — min_human_share floor is a substring classifier (F-16)
-## BUG-658 (OPEN, 2026-10-06) — OMLX SSE keepalive defeats read_timeout → client wedge (no wall-clock deadline). HARNESS-MITIGATED 2026-10-06 (d2767_ab_eval.py wall-clock deadline + preflight smoke); ROOT-FIXED 2026-10-06 (D-2854) in pipeline/omlx_call.py::call_omlx (_post_with_wall_clock daemon-thread + join(timeout=180s) + WallClockTimeout, config services.omlx.wall_clock_deadline_sec). Stays OPEN until the harness relaunch reproduces no-wedge end-to-end. CORRECTION: the flag-ON A/B GATE RESULT DID LAND (20:28, kappa 0.4313 FAIL) — the wedge was a SEPARATE later re-run (PID 15071), not the gate run.
+## BUG-658 (CLOSED, 2026-10-06) — OMLX SSE keepalive defeats read_timeout → client wedge (no wall-clock deadline). HARNESS-MITIGATED 2026-10-06 (d2767_ab_eval.py wall-clock deadline + preflight smoke); ROOT-FIXED 2026-10-06 (D-2854) in pipeline/omlx_call.py::call_omlx (_post_with_wall_clock daemon-thread + join(timeout=180s) + WallClockTimeout, config services.omlx.wall_clock_deadline_sec). CLOSED 2026-10-10 (no-wedge reproduced end-to-end, D-2910): (1) gemma-4-E4B-it-MLX-4bit clean JSON success in
+0.53s under the D-2854 wall-clock deadline; (2) gpt-oss-20b-MXFP4-Q8 in the KNOWN Harmony cold-reload
+empty-content state returned a clean RuntimeError in 46-73s (deadline fired, NO hang) — proving the
+SSE-keepalive wedge is gone. The full d2767_ab_eval.py A/B re-run remains separately blocked by BUG-650
+(default v6-d referee stale vs the live menu; assert_referee_menu_current fails closed) — that blocks the
+D-2767/D-2839 kappa gate, NOT this wedge closure. CORRECTION: the flag-ON A/B GATE RESULT DID LAND (20:28, kappa 0.4313 FAIL) — the wedge was a SEPARATE later re-run (PID 15071), not the gate run.
 
 ## BUG-659 (FIXED 2026-10-07): check_config_defaults silently auto-RAISED the shrink-only ceiling (by_rail dead code)
 

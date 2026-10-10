@@ -15634,3 +15634,32 @@ decisions:
   - config/pipeline_config.yaml
   - governance/d2547_calibration.json
 
+- id: D-2909
+  state: RESOLVED
+  category: GOVERNANCE / RAIL
+  title: BUG-566 remainder — check_declaration_consumers.py staged_set whitespace-split fixed (D-2646 class, one more reader)
+  decision: >
+    The D-2646 two-homes-one-fact class had ONE more name-list reader: scripts/check_declaration_consumers.py
+    #staged_set() read `git diff --cached --name-only` as TEXT and split on newlines, so a staged path with a
+    SPACE became phantom paths (the defect D-2673 removed from the index-subject home). Fixed: staged_set()
+    now reads NUL-separated (`-z`) and splits on NUL, mirroring git_subject.run_git_paths (BUG-565); it keeps
+    its own `-z` read ONLY because its selftest must exercise a synthetic root the ONE home cannot. Two new
+    known-answer controls (space_path_is_one_path, space_path_not_split); selftest 13/13.
+  bugs: [BUG-566]
+  files:
+  - scripts/check_declaration_consumers.py
+
+- id: D-2910
+  state: RESOLVED
+  category: INFRASTRUCTURE / OMLX
+  title: BUG-658 CLOSED — no-wedge reproduced end-to-end under the D-2854 wall-clock deadline
+  decision: >
+    OMLX relaunch reproduced no-wedge: (1) gemma-4-E4B-it-MLX-4bit clean JSON success in 0.53s under the
+    D-2854 wall-clock deadline; (2) gpt-oss-20b-MXFP4-Q8 in the KNOWN Harmony cold-reload empty-content state
+    returned a clean RuntimeError in 46-73s (deadline fired, NO hang) — the SSE-keepalive wedge is gone. The
+    full d2767_ab_eval.py A/B re-run remains separately blocked by BUG-650 (default v6-d referee stale vs the
+    live menu; assert_referee_menu_current fails closed) — that blocks the D-2767/D-2839 kappa gate, NOT this
+    wedge closure. BUG-658 CLOSED.
+  bugs: [BUG-658]
+  files: [pipeline/omlx_call.py]
+

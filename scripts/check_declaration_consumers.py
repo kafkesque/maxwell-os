@@ -49,9 +49,16 @@ def _git(root: pathlib.Path, args: list[str], index_file: pathlib.Path | None = 
 
 
 def staged_set(root: pathlib.Path, index_file: pathlib.Path | None = None) -> set[str]:
-    """The staged paths (the commit set) from the index the CALLER names - never from the environment."""
-    r = _git(root, ["diff", "--cached", "--name-only"], index_file)
-    return {ln for ln in r.stdout.splitlines() if ln.strip()} if r.returncode == 0 else set()
+    """The staged paths (the commit set) from the index the CALLER names - never from the environment.
+
+    BUG-566/D-2646 remainder (MEASURED 2026-10-10): read as a NUL-separated name list, so a path with a
+    SPACE is ONE path. The production ONE home for name-list reads is git_subject.run_git_paths (BUG-565:
+    the `-z` flag is not the caller's to pass); this rail keeps its own `-z` read ONLY because its selftest
+    must exercise a synthetic root repo the ONE home cannot (run_git_paths is pinned to the live REPO
+    subject). The two reads must stay in lockstep (D-2646).
+    """
+    r = _git(root, ["diff", "--cached", "--name-only", "-z"], index_file)
+    return {b for b in r.stdout.split("\0") if b} if r.returncode == 0 else set()
 
 
 def in_head(root: pathlib.Path, path: str, index_file: pathlib.Path | None = None) -> bool:
@@ -176,6 +183,16 @@ def selftest() -> int:
         _git(root, ["add", "config/z.yaml"])
         check("no_overreach", len(verdicts(root, edge(), staged=staged_set(root))[0]), 0,
               "a staged artifact the registry does not name is tolerated (this is NOT a config census)")
+        # BUG-566/D-2646 remainder: a staged path containing a SPACE is ONE path, not split into phantom tokens.
+        (root / "my space path.yaml").write_text("s: 1\n", encoding="utf-8")
+        _git(root, ["add", "my space path.yaml"])
+        space_set = staged_set(root)
+        check("space_path_is_one_path",
+              1 if "my space path.yaml" in space_set else 0, 1,
+              "a staged path with a space is ONE path (D-2646)")
+        check("space_path_not_split",
+              1 if ("my" not in space_set and "space" not in space_set and "path.yaml" not in space_set) else 0, 1,
+              "the space-path's whitespace tokens are NOT phantom standalone paths (D-2646)")
         rc = 0
         try:
             load(root / "bad.yaml")

@@ -27,6 +27,7 @@ IMPLEMENTED: `config/anchor_family.yaml#store_bridge.canonical_run = rechunk-v4-
 4. **D2621 PROPOSED** — distinct-facet dedup method landed (D2625/D2626/D2627); residual = owner choice: `pipeline/dedup` module vs keep ad-hoc scripts.
 5. **D2547 PLANNED** — per-label thresholds not yet populated.
 6. **D-2908 — RESOLVED (2026-10-10).** BUG-695 per_label recalibration complete: d2547_calibration.json covers all v9 labels; per_label re-populated 93 entries (53 disciplines + 40 domains); all 7 `0.0` labels are measured-0 (not missing-data false-zeros). Fixed false-zero guard + contract test 92→93. BUG-695 CLOSED. BUG-693 steps 1–2 done (mapfail/dombleed 0), step 3 (1,297 off-menu) owner-gated per D-2898.
+7. **D-2909 + D-2910 — RESOLVED (2026-10-10).** (a) BUG-566 remainder: `check_declaration_consumers.py#staged_set()` still whitespace-split the staged name list (D-2646 class); fixed to NUL-separated `-z` + 2 controls, selftest 13/13. (b) BUG-658 CLOSED: no-wedge reproduced end-to-end under the D-2854 wall-clock deadline (gemma 0.53s clean; gpt-oss cold-reload returned RuntimeError in 46–73s, no hang). Full d2767_ab_eval A/B re-run separately blocked by BUG-650 (stale v6-d referee).
 
 — everything below is dated change history / ACTIVE / DONE —
 

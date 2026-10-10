@@ -3,8 +3,8 @@
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
   "total_ids": 460,
-  "open_n": 162,
-  "closed_n": 298,
+  "open_n": 161,
+  "closed_n": 299,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -799,11 +799,6 @@
       "events": 1
     },
     {
-      "id": "BUG-658",
-      "title": "(OPEN, 2026-10-06) \u2014 OMLX SSE keepalive defeats read_timeout \u2192 client wedge (no wall-clock deadline). HARNESS-MITIGATED 2026-10-06 (d2767_ab",
-      "events": 1
-    },
-    {
       "id": "BUG-677",
       "title": "(OPEN, 2026-10-08) \u2014 two owner-facing truths for the SAME 60 items (ANCHOR-2 sheet vs frozen ruler)",
       "events": 1
@@ -1083,6 +1078,7 @@
     "BUG-655",
     "BUG-656",
     "BUG-657",
+    "BUG-658",
     "BUG-659",
     "BUG-660",
     "BUG-661",

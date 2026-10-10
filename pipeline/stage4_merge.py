@@ -1430,7 +1430,7 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
     except (ValueError, OSError):
         pass  # non-main thread / restricted platform — checkpointing still works
 
-    if not check_omlx_health():
+    if not os.environ.get("MAXWELL_SKIP_LLM") and not check_omlx_health():
         print("❌ OMLX is not running.")
         sys.exit(1)
 

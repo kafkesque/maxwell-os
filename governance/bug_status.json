@@ -3,8 +3,8 @@
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
   "total_ids": 460,
-  "open_n": 165,
-  "closed_n": 295,
+  "open_n": 164,
+  "closed_n": 296,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -827,11 +827,6 @@
       "id": "BUG-695",
       "title": "(OPEN, 2026-10-10) \u2014 `per_label` semantic-error-rate census is stale vs the v9 menu: 7 ratified disciplines (business administration 20 / co",
       "events": 1
-    },
-    {
-      "id": "BUG-696",
-      "title": "(OPEN, 2026-10-10) \u2014 `run_stage4()` unconditionally fails-closed on `check_omlx_health()` at pipeline/stage4_merge.py:1433 BEFORE the `MAXWE",
-      "events": 1
     }
   ],
   "closed": [
@@ -1129,6 +1124,7 @@
     "BUG-690",
     "BUG-691",
     "BUG-692",
-    "BUG-694"
+    "BUG-694",
+    "BUG-696"
   ]
 }

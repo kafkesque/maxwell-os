@@ -15555,3 +15555,30 @@ decisions:
   - config/alias_map.yaml
   - feed.opml
   - governance/CONTEXT_INDEX.md
+- id: D-2903
+  state: RATIFIED
+  category: BUGFIX
+  title: BUG-694 residual fix (definition_nli_verify provenance stamp) + menu-consumer 3-way classification
+  decision: 'BUG-694 residual (serving-path consumer audit): scripts/definition_nli_verify.py scored against the
+    LIVE menu (render_closed_menu(), v9 content) but its _provenance() stamped menu_version=closed_menu_v5 and read
+    closed_menu_v5.sha256 as closed_menu_sha256_pin - an error leak (a report claiming a v5 menu it did not score
+    against; menu_hash_rendered + answer_space_sha256 were already live). FIXED: both fields repointed to live_menu_path()
+    (config/version.yaml#closed_menu single pointer). CLASSIFICATION: audited all 23 scripts naming closed_menu_v<N>;
+    they split 3 serving-path / 10 frozen-validator (deliberately read v5 for v5-era artifacts, pinned by design)
+    / 10 builder (mint/repoint a specific revision). ZERO are truly dead; the earlier "~22 dead scripts" working
+    note was a BLINDSPOT - blind-archiving would have broken config/artifact_ownership.yaml, config/f11_llm_coder.yaml,
+    config/silent_repair.yaml and the test suite. Verdict: do NOT blind-archive; only menu_repair_worksheet.py +
+    f11_decision_sheet_v2.py are unreferenced-by-live-rail one-shots, and even those are auditable provenance (cosmetic,
+    not corrective). Manifest: governance/menu_consumer_classification_20261010.md.'
+  measured: 'A/B on the frozen stage5 probe (rechunk-v4-20260929/checkpoint.jsonl, --limit 40) 2026-10-10: HEAD
+    e2ced5fa4f5205c21192eb47480b0a36d16b50af2dc3c545016126a4139a28f1 vs final 5567cf10178db11c74bd82103a1815248e4e8fc55477671a32763a07ddacacae
+    -> scoring BIT-IDENTICAL (40 FBs, 178 label-definition pairs, 21 contra, 0 inference errors; results + menu_hash
+    + r5_hash + n_* all equal), differing ONLY in provenance: menu_version closed_menu_v5->closed_menu_v9 and
+    closed_menu_sha256_pin 73597ee2...->be323543... (now equals menu_hash - the BUG-694 leak closed). This is the
+    r2_meter re-pin (a re-pin is a re-mint, D-382/BUG-535): the pin moves from D-2663 to D-2903.'
+  bugs:
+  - BUG-694
+  files:
+  - scripts/definition_nli_verify.py
+  - governance/menu_consumer_classification_20261010.md
+  - governance/session_plan_20260924.yaml

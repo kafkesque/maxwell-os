@@ -24,12 +24,15 @@ ROOT = Path(__file__).resolve().parent.parent
 CONFIG_YAML = ROOT / "config" / "pipeline_config.yaml"
 TAXONOMY_YAML = ROOT / "config" / "taxonomy_v5.yaml"
 
-# Current expected count (53 disciplines + 41 domains, labels with >= min-sample
-# corpus presence). D-2865 merged 'science & research' into 'research practice' and
-# demoted 'social sciences' (both folded into 'research practice'), dropping the v7
-# domain count 43 -> 41. If a legitimate re-population changes this, update the
-# constant AND verify the delta is explained in DECISION-LOG before bumping.
-EXPECTED_LABEL_COUNT = 94
+# Current expected count = 51 disciplines + 41 domains = 92 (v9 menu). The v9 promotion
+# (D-2865/D-2897/D-2898) added 12 disciplines that were NEVER re-populated here:
+# 7 have >= emerging_freq_threshold (10) corpus presence but no D2547 calibration entry
+# (business administration, color theory, creative writing, ecology, marketing, museum
+# studies, robotics) -> they correctly fall back to `default: 0.05` (BUG-695); 5 are below
+# min-sample (design psychology, creative coding, generative design, privacy & surveillance,
+# entrepreneurship studies) and are absent by design. Post-RATIFY-2 re-calibration the
+# count becomes 58 disciplines + 41 domains = 99. Re-base only WITH a DECISION-LOG reason.
+EXPECTED_LABEL_COUNT = 92
 EXPECTED_DOMAIN_COUNT = 41  # domains are multi-valued, so all 41 always have samples
 
 

@@ -42,7 +42,7 @@ sys.path.insert(0, str(_ROOT))
 
 import yaml  # noqa: E402
 
-from pipeline.closed_menu import menu_hash, render_closed_menu  # noqa: E402
+from pipeline.closed_menu import live_menu_path, menu_hash, render_closed_menu  # noqa: E402
 from pipeline.io_guard import safe_write  # noqa: E402
 from pipeline.pipeline_paths import S5_NLI_MAX_PREMISE_CHARS, STAGE5_CHECKPOINT  # noqa: E402
 
@@ -254,7 +254,11 @@ def _provenance(path: Path, menu: dict, rows_scored: int, rows_with_coder: int) 
         return (yaml.safe_load(p.read_text(encoding="utf-8")) or {}).get(key)
 
     groups = _ROOT / "config" / "menu_axis_hashes.yaml"
-    composite = _ROOT / "config" / "closed_menu_v5.sha256"
+    # BUG-694 residual (2026-10-10): the provenance stamp must name the LIVE frozen menu
+    # (config/version.yaml#closed_menu), not the historical closed_menu_v5. The menu actually
+    # scored is render_closed_menu() (live content); stamping "v5" here was an error leak.
+    live_menu = live_menu_path()
+    composite = live_menu.with_suffix(".sha256")
     return {
         "schema_version": "1.0",
         "generator": "scripts/definition_nli_verify.py",
@@ -263,7 +267,7 @@ def _provenance(path: Path, menu: dict, rows_scored: int, rows_with_coder: int) 
                       "note": "an NLI meter proposes nothing: it scores proposed labels (Mechanism B, D-277)"},
         "label_source": {"artifact": str(path), "column": "discipline|domains|content_type|extraction_type",
                          "sha256": _sha(path), **coder_coverage(rows_scored, rows_with_coder)},
-        "menu_version": (_ROOT / "config" / "closed_menu_v5.json").name.replace(".json", ""),
+        "menu_version": live_menu.name.replace(".json", ""),
         "answer_space_sha256": _digest(groups, "answer_space_hash"),
         "closed_menu_sha256_pin": composite.read_text(encoding="utf-8").strip() if composite.exists() else None,
         "menu_hash_rendered": menu_hash(menu),

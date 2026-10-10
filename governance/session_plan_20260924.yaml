@@ -118,6 +118,7 @@ may_touch:
 - governance/discipline_anchor_*
 - governance/DOMAIN_*
 - governance/targeted_ingestion_*
+- governance/menu_consumer_classification_*
 - config/*.sha256
 - governance/D2767_CB_CLASSIFICATION_RECOMMENDATION_20261009.md
 will_not_touch:
@@ -739,3 +740,11 @@ widening_log:
   may_touch_untouched: false
   will_not_touch_untouched: true
   why: 'D-2897 follow-through (BUG-693 lineage): computational theory was DEMOTED to emerging (canonical slot removed). The D2607-D targeted-ingestion source map (governance/targeted_ingestion_sources.md) and its generated plan (governance/targeted_ingestion_plan.md) still named computational theory as a CRITICAL starved discipline; the family (governance/targeted_ingestion_*) had NO may_touch home, granted as a glob MIRRORING the targeted-ingestion artifact family. All other touched paths are already inside may_touch: feed.opml (named), scripts/remap_emerging.py (scripts/*.py). pipeline/** untouched; no pinned artifact staged.'
+- entry: 40
+  session: 20261010A
+  owner_ack: 'standing rules (CONTINUE: implement unblocked critical steps; update and sync gov dependencies)'
+  widened:
+  - governance/menu_consumer_classification_*
+  may_touch_untouched: false
+  will_not_touch_untouched: true
+  why: 'BUG-694 residual fixed (scripts/definition_nli_verify.py provenance stamp repointed closed_menu_v5 -> live_menu_path()) + the 3-way menu-consumer classification manifest (serving / frozen-validator / builder). The manifest (governance/menu_consumer_classification_*) had NO may_touch home; granted as a glob mirroring the classification-report artifact family. All other touched paths are already inside may_touch: scripts/definition_nli_verify.py (scripts/*.py), config/decisions.yaml + config/decisions_summary.json (config/*.yaml|*.json), DECISION-LOG.md, MASTER-TASK-REGISTER.md, governance/buglog.md, governance/CONTEXT_INDEX.md, governance/MUTATION_JOURNAL.jsonl. pipeline/** untouched; no pinned artifact staged.'

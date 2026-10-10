@@ -309,22 +309,17 @@
 
     <!-- ═══════════════════════════════════════════════════════════════ -->
     <!-- TARGETED INGESTION SOURCES — D2607-D (2026-09-10)             -->
-    <!-- Domain-knowledge feeds for the 9 CRITICAL starved disciplines   -->
+    <!-- Domain-knowledge feeds for the 8 CRITICAL starved disciplines   -->
     <!-- (design psychology, ecology, game design, generative design,    -->
-    <!-- computational theory, robotics, computational physics &         -->
-    <!-- simulation, color theory, creative coding). arXiv RSS =          -->
-    <!-- sovereign (C3) + machine-ingestible (S0). See governance/        -->
-    <!-- targeted_ingestion_sources.md for the full mapping.             -->
+    <!-- robotics, computational physics & simulation, color theory,     -->
+    <!-- creative coding). arXiv RSS = sovereign (C3) + machine-         -->
+    <!-- ingestible (S0). See governance/targeted_ingestion_sources.md   -->
+    <!-- for the full mapping. computational theory was dropped (D-2897: -->
+    <!-- demoted to emerging — canonical slot removed).                  -->
     <!-- ═══════════════════════════════════════════════════════════════ -->
-    <outline text="Targeted Ingestion (D2607-D)" description="arXiv domain feeds for the 9 CRITICAL starved disciplines">
+    <outline text="Targeted Ingestion (D2607-D)" description="arXiv domain feeds for the 8 CRITICAL starved disciplines">
       <outline type="rss" text="Robotics (cs.RO)" xmlUrl="https://rss.arxiv.org/rss/cs.RO"
                description="D2607-D: robotics discipline (CRITICAL, convergent 3)"/>
-      <outline type="rss" text="Computational Complexity (cs.CC)" xmlUrl="https://rss.arxiv.org/rss/cs.CC"
-               description="D2607-D: computational theory discipline (CRITICAL, convergent 2)"/>
-      <outline type="rss" text="Data Structures &amp; Algorithms (cs.DS)" xmlUrl="https://rss.arxiv.org/rss/cs.DS"
-               description="D2607-D: computational theory discipline (CRITICAL, convergent 2)"/>
-      <outline type="rss" text="Formal Languages (cs.FL)" xmlUrl="https://rss.arxiv.org/rss/cs.FL"
-               description="D2607-D: computational theory discipline (CRITICAL, convergent 2)"/>
       <outline type="rss" text="Computational Physics (physics.comp-ph)" xmlUrl="https://rss.arxiv.org/rss/physics.comp-ph"
                description="D2607-D: computational physics &amp; simulation discipline (CRITICAL, convergent 3)"/>
       <outline type="rss" text="Graphics (cs.GR)" xmlUrl="https://rss.arxiv.org/rss/cs.GR"

@@ -1,11 +1,17 @@
-# Targeted Ingestion — Source Map for the 9 CRITICAL Disciplines
+# Targeted Ingestion — Source Map for the 8 CRITICAL Disciplines
 
-> Generated 2026-09-10 (D2607-D: targeted ingestion). Cross-references the 9 CRITICAL
-> starved disciplines against `feed.opml` to determine which sources can supply the
-> convergent content the fine 61-way head needs. **Finding: `feed.opml` covers NONE of
-> them** — it is entirely ML-infrastructure / vector-search / agent-engineering focused.
+> Generated 2026-09-10 (D2607-D: targeted ingestion); revised 2026-10-10 for D-2897.
+> Cross-references the 8 CRITICAL starved disciplines against `feed.opml` to determine
+> which sources can supply the convergent content the fine 61-way head needs.
+> **Finding: `feed.opml` covers NONE of them** — it is entirely ML-infrastructure /
+> vector-search / agent-engineering focused.
+>
+> **D-2897 revision:** `computational theory` was DEMOTED to `emerging` (canonical slot
+> removed, discipline_raw stays verbatim). Its 3 arXiv feeds (cs.CC / cs.DS / cs.FL)
+> were removed from `feed.opml` — no surviving canonical discipline absorbs theoretical
+> CS, and re-promotion is owner-gated (D-2898). The starved set is now 8.
 
-## The 9 CRITICAL disciplines (convergent ≤ 3)
+## The 8 CRITICAL disciplines (convergent ≤ 3)
 
 | # | Discipline | Golden | Convergent | Shortfall |
 |---|---|---|---|---|
@@ -13,11 +19,10 @@
 | 2 | ecology | 4 | 1 | 19 |
 | 3 | game design | 3 | 2 | 18 |
 | 4 | generative design | 5 | 2 | 18 |
-| 5 | computational theory | 6 | 2 | 18 |
-| 6 | robotics | 4 | 3 | 17 |
-| 7 | computational physics & simulation | 4 | 3 | 17 |
-| 8 | color theory | 5 | 3 | 17 |
-| 9 | creative coding | 5 | 3 | 17 |
+| 5 | robotics | 4 | 3 | 17 |
+| 6 | computational physics & simulation | 4 | 3 | 17 |
+| 7 | color theory | 5 | 3 | 17 |
+| 8 | creative coding | 5 | 3 | 17 |
 
 ## feed.opml coverage vs. required sources
 
@@ -25,7 +30,7 @@
 Apple Silicon / speculative decoding), MLX inference-engine links, model-eval tools,
 FAISS alternatives, 3 YouTube channels, 1 X.com source, and a system monitor.
 
-**Zero of these produce convergent FB content for the 9 CRITICAL disciplines** — they
+**Zero of these produce convergent FB content for the 8 CRITICAL disciplines** — they
 are all about *running* the pipeline, not the *domain knowledge* the classifier needs.
 
 ## Recommended new sources (arXiv RSS, local-friendly, added to feed.opml)
@@ -36,7 +41,6 @@ aligned to the ingestion procedure. Mapping:
 | Discipline | arXiv category | RSS URL |
 |---|---|---|
 | robotics | cs.RO (Robotics) | `https://rss.arxiv.org/rss/cs.RO` |
-| computational theory | cs.CC (Complexity) + cs.DS + cs.FL | `https://rss.arxiv.org/rss/cs.CC` |
 | computational physics & simulation | physics.comp-ph (Comp. Physics) | `https://rss.arxiv.org/rss/physics.comp-ph` |
 | generative design | cs.GR (Graphics) + cs.CE (Comp. Eng.) | `https://rss.arxiv.org/rss/cs.GR` |
 | creative coding | cs.HC (HCI) + cs.GR | `https://rss.arxiv.org/rss/cs.HC` |

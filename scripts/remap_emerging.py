@@ -60,8 +60,16 @@ def fold_label(label: str) -> str:
     return s.strip().lower()
 
 
-def load_alias_map() -> dict[str, dict[str, str]]:
-    """Load config/alias_map.yaml; validate every target is a canonical label."""
+def load_alias_map() -> dict[str, dict[str, str] | dict[str, list[str]]]:
+    """Load config/alias_map.yaml; validate every target is a canonical label.
+
+    Discipline aliases are singular (scalar → str): the discipline axis owns a
+    field exclusively (CONTEXT_INDEX axis 4). Domain aliases are multi-label
+    (scalar → [str] or list → [str, ...]): the domain axis is a many-to-many
+    touch list (CONTEXT_INDEX axis 5). This mirrors apply_enrichment.py's
+    compound-alias convention (D2566). Every member of every target must be a
+    canonical label of its kind, else hard error at load (fail-closed).
+    """
     import yaml
     if not ALIAS_MAP_PATH.exists():
         return {"discipline": {}, "domain": {}}
@@ -73,35 +81,61 @@ def load_alias_map() -> dict[str, dict[str, str]]:
     disc_canon = {c.lower() for c in CANONICAL_DISCIPLINES}
     dom_canon = {c.lower() for c in CANONICAL_DOMAINS}
 
-    def _validate(aliases: dict, canon_set: set, kind: str) -> dict[str, str]:
+    def _validate_discipline(aliases: dict) -> dict[str, str]:
         out: dict[str, str] = {}
         for raw, target in aliases.items():
+            if isinstance(target, (list, tuple)):
+                print(f"❌ alias_map.yaml: discipline alias {raw!r} → {target!r} "
+                      f"is multi-valued; discipline is a SINGULAR axis.",
+                      file=sys.stderr)
+                sys.exit(2)
             t = str(target).lower().strip()
-            if t not in canon_set:
-                print(f"❌ alias_map.yaml: {kind} alias {raw!r} → {target!r} "
-                      f"is NOT a canonical {kind}.", file=sys.stderr)
+            if t not in disc_canon:
+                print(f"❌ alias_map.yaml: discipline alias {raw!r} → {target!r} "
+                      f"is NOT a canonical discipline.", file=sys.stderr)
                 sys.exit(2)
             out[fold_label(raw)] = str(target).strip()
         return out
 
+    def _validate_domain(aliases: dict) -> dict[str, list[str]]:
+        out: dict[str, list[str]] = {}
+        for raw, target in aliases.items():
+            members = target if isinstance(target, list) else [target]
+            canonicals: list[str] = []
+            for m in members:
+                t = str(m).lower().strip()
+                if t not in dom_canon:
+                    print(f"❌ alias_map.yaml: domain alias {raw!r} member {m!r} "
+                          f"is NOT a canonical domain.", file=sys.stderr)
+                    sys.exit(2)
+                canonicals.append(str(m).strip())
+            out[fold_label(raw)] = canonicals
+        return out
+
     return {
-        "discipline": _validate(disc_aliases, disc_canon, "discipline"),
-        "domain": _validate(dom_aliases, dom_canon, "domain"),
+        "discipline": _validate_discipline(disc_aliases),
+        "domain": _validate_domain(dom_aliases),
     }
 
 
-def resolve(raw_label: str, kind: str, aliases: dict[str, str],
-            syn_index: dict[str, str]) -> tuple[str | None, str | None]:
-    """Resolve a raw label to a canonical label. Returns (canonical, method)."""
+def resolve(raw_label: str, kind: str,
+            aliases: dict[str, str] | dict[str, list[str]],
+            syn_index: dict[str, str]) -> tuple[str | list[str] | None, str | None]:
+    """Resolve a raw label to canonical label(s). Returns (canonical, method).
+
+    For ``kind == "domain"`` the canonical is a list (multi-label axis); for
+    ``kind == "discipline"`` it is a scalar (singular axis).
+    """
     folded = fold_label(raw_label)
     if not folded:
         return None, None
     canon_list = CANONICAL_DOMAINS if kind == "domain" else CANONICAL_DISCIPLINES
     for c in canon_list:
         if folded == c.lower():
-            return c, "exact"
+            return ([c] if kind == "domain" else c), "exact"
     if folded in syn_index:
-        return syn_index[folded], "synonym"
+        v = syn_index[folded]
+        return ([v] if kind == "domain" else v), "synonym"
     if folded in aliases:
         return aliases[folded], "alias"
     return None, None
@@ -133,7 +167,7 @@ def _write_expected_count_sidecar(dst: Path, count: int) -> None:
     safe_write(sidecar, _json.dumps(data, indent=2))
 
 
-def remap_fb(fb: dict, disc_aliases: dict[str, str], dom_aliases: dict[str, str],
+def remap_fb(fb: dict, disc_aliases: dict[str, str], dom_aliases: dict[str, list[str]],
              disc_syn: dict[str, str], dom_syn: dict[str, str]) -> tuple[bool, bool]:
     """Rewrite canonical discipline/domains from raw labels in-place.
 
@@ -163,8 +197,12 @@ def remap_fb(fb: dict, disc_aliases: dict[str, str], dom_aliases: dict[str, str]
             if not isinstance(raw, str):
                 continue
             canon, _ = resolve(raw, "domain", dom_aliases, dom_syn)
-            if canon and canon != "emerging":
-                resolved.append(canon)
+            if canon:
+                real = [c for c in canon if c != "emerging"]
+                if real:
+                    resolved.extend(real)
+                else:
+                    unresolved += 1
             else:
                 unresolved += 1
         if resolved:

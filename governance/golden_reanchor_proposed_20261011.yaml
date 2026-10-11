@@ -1,0 +1,370 @@
+# PROPOSED re-anchor of config/golden/retrieval_queries.yaml — NOT APPLIED.
+# generated 2026-10-11T20:44:12.301186+00:00 by scripts/reanchor_retrieval_goldens.py
+# candidate leg: vector+rerank   (production = vector+rerank)   served run: rechunk-v4-20260929
+# BUG-717: rank-1 is EVIDENCE, never a proposal. Scores are NOT thresholds
+# (logits are uncalibrated: measured range -6.0..+8.6 on known-positive pairs).
+# D-2939: the anchor is the NAME; pipeline/golden.py resolves the fb_id per run.
+# D-2898: a human marks `decision` = anchor | rewrite-query | retire-query | ambiguous in the CSV.
+version: 3
+queries:
+- query: how do organizations recover from a major crisis
+  expected_names:
+  - Institutional Response to Crisis
+  expected: []
+  query_type: synonym
+  _needs_review: true
+  _old_name: Collective Intelligence Recovery
+  _replaces: 569e02f7758cd4b0
+  _evidence:
+    leg: vector+rerank
+    rank1_score: -2.522843
+    margin_to_2: 1.517
+- query: what makes teams psychologically safe
+  expected_names:
+  - Robert's Approachability Leadership Principle
+  expected: []
+  query_type: synonym
+  _needs_review: true
+  _old_name: Psychological Safety Through Shared Risk
+  _replaces: ab309999655e95c5
+  _evidence:
+    leg: vector+rerank
+    rank1_score: 1.039258
+    margin_to_2: 0.257
+- query: why do feedback loops stabilize a system
+  expected_names:
+  - Systemic Feedback Dynamics
+  expected: []
+  query_type: vocabulary-overlap
+  _needs_review: true
+  _old_name: Optimization Through Feedback Loops
+  _replaces: 46ff833cc83971dc
+  _evidence:
+    leg: vector+rerank
+    rank1_score: 0.774301
+    margin_to_2: 0.74
+- query: how to build resilient distributed systems
+  expected_names:
+  - Golden Goose System Creation
+  expected: []
+  query_type: synonym
+  _needs_review: true
+  _old_name: Site Reliability Engineering (sre) Principles
+  _replaces: cd98caf61c6ab956
+  _evidence:
+    leg: vector+rerank
+    rank1_score: -3.134541
+    margin_to_2: 0.498
+- query: how does the decoy effect influence choice
+  expected_names:
+  - Preferential Option Selection
+  expected: []
+  query_type: abstract
+  _needs_review: true
+  _old_name: Paradox of Choice Overload
+  _replaces: d5caf12be54189f5
+  _evidence:
+    leg: vector+rerank
+    rank1_score: -4.974668
+    margin_to_2: 0.231
+- query: can a large language model be compressed into a smaller one
+  expected_names:
+  - Interpretable Feature Extraction From Llms
+  expected: []
+  query_type: synonym
+  _needs_review: true
+  _old_name: Model Distillation Efficiency
+  _replaces: be2fda2c919d983b
+  _evidence:
+    leg: vector+rerank
+    rank1_score: -3.235417
+    margin_to_2: 0.931
+- query: why is time treated like money
+  expected_names:
+  - Time Arbitrage System
+  expected: []
+  query_type: abstract
+  _needs_review: true
+  _old_name: Time As Commodity
+  _replaces: 1cb6217d2ca696bf
+  _evidence:
+    leg: vector+rerank
+    rank1_score: -5.44715
+    margin_to_2: 0.436
+- query: why is a task that matches your skill level more engaging
+  expected_names:
+  - Educational Exploration Vs. Early Specialization Trade-off
+  expected: []
+  query_type: synonym
+  _needs_review: true
+  _old_name: Optimal Challenge Drive
+  _replaces: af3dddb499d8b5fb
+  _evidence:
+    leg: vector+rerank
+    rank1_score: -5.39411
+    margin_to_2: 0.218
+- query: why does the same color mean different things in different cultures
+  expected_names:
+  - Color Perception and Cultural Context
+  expected: []
+  query_type: abstract
+  _needs_review: true
+  _old_name: Color As Cultural and Emotional Marker
+  _replaces: 3a01753c57091244
+  _evidence:
+    leg: vector+rerank
+    rank1_score: -1.977143
+    margin_to_2: 0.714
+- query: how do signs and symbols get their meaning from context
+  expected_names:
+  - Signifier-signified Relationship in Language
+  expected: []
+  query_type: synonym
+  _needs_review: true
+  _old_name: Indexical Signification Through Contextual Relations
+  _replaces: 85f3d9ee31e5e055
+  _evidence:
+    leg: vector+rerank
+    rank1_score: 2.811014
+    margin_to_2: 1.805
+- query: why does too much information make it hard to understand a design
+  expected_names:
+  - Information Vs Understanding in Decision Making
+  expected: []
+  query_type: abstract
+  _needs_review: true
+  _old_name: Information Processing Load
+  _replaces: 14a097edd4af3831
+  _evidence:
+    leg: vector+rerank
+    rank1_score: 0.244735
+    margin_to_2: 2.359
+- query: how does brainstorming produce more ideas
+  expected_names:
+  - Expenditure Reduction Creative Challenge
+  expected: []
+  query_type: synonym
+  _needs_review: true
+  _old_name: Idea Generation Through Divergent Thinking
+  _replaces: 2351d0bdb479fda4
+  _evidence:
+    leg: vector+rerank
+    rank1_score: -0.743041
+    margin_to_2: 1.666
+- query: why should you accept that problems are too complex to fully solve
+  expected_names:
+  - Challenge Atomization Principle
+  expected: []
+  query_type: abstract
+  _needs_review: true
+  _old_name: Mindful Acceptance of Complexity
+  _replaces: 9eb33a81d599fd95
+  _evidence:
+    leg: vector+rerank
+    rank1_score: -3.451017
+    margin_to_2: 0.492
+- query: how do decision makers gather information before choosing
+  expected_names:
+  - Strategic Information Collection
+  expected: []
+  query_type: synonym
+  _needs_review: true
+  _old_name: Information-driven Decision Making
+  _replaces: 976a9ec288694754
+  _evidence:
+    leg: vector+rerank
+    rank1_score: 0.806015
+    margin_to_2: 1.387
+- query: how do machine learning systems get better over time automatically
+  expected_names:
+  - Reinforcement Learning From Experience
+  expected: []
+  query_type: synonym
+  _needs_review: true
+  _old_name: Adaptive Learning Through Feedback Loops
+  _replaces: cd0c3b87a00d7fd2
+  _evidence:
+    leg: vector+rerank
+    rank1_score: -2.860101
+    margin_to_2: 0.474
+- query: why do myths and symbols carry shared meaning across a society
+  expected_names:
+  - Symbolic Representation Through Visual and Linguistic Systems
+  expected: []
+  query_type: abstract
+  _needs_review: true
+  _old_name: Symbolic Meaning Translation
+  _replaces: 790421dac5e59d40
+  _evidence:
+    leg: vector+rerank
+    rank1_score: 0.961311
+    margin_to_2: 1.049
+- query: why does creating knowledge require collaboration across contributors
+  expected_names:
+  - Collaborative Learning and Knowledge Creation
+  expected: []
+  query_type: synonym
+  _needs_review: true
+  _old_name: Collaborative Knowledge Construction
+  _replaces: 1939bc62db425c8d
+  _evidence:
+    leg: vector+rerank
+    rank1_score: -1.350042
+    margin_to_2: 0.306
+- query: how does the style of a typeface convey meaning
+  expected_names:
+  - Dynamic Typographic Expression
+  expected: []
+  query_type: synonym
+  _needs_review: true
+  _old_name: Typeface As Communicative Medium
+  _replaces: b7c837fbf5ee70ae
+  _evidence:
+    leg: vector+rerank
+    rank1_score: 1.508547
+    margin_to_2: 1.431
+- query: how does combining doing, thinking, and refining produce creative change
+  expected_names:
+  - Morphological Box Method
+  expected: []
+  query_type: abstract
+  _needs_review: true
+  _old_name: Flow-state Integration
+  _replaces: d608b87f4681bdc5
+  _evidence:
+    leg: vector+rerank
+    rank1_score: -4.181156
+    margin_to_2: 0.606
+- query: why does ai not need full human intelligence to be useful
+  expected_names:
+  - Shift Left Ai Automation
+  expected: []
+  query_type: abstract
+  _needs_review: true
+  _old_name: Artificial Enough Intelligence
+  _replaces: 8b96113ad8c4f596
+  _evidence:
+    leg: vector+rerank
+    rank1_score: -3.749786
+    margin_to_2: 0.218
+- query: why must charts accurately represent the underlying data
+  expected_names:
+  - Essential Form Visualization Principle
+  expected: []
+  query_type: synonym
+  _needs_review: true
+  _old_name: Data Visualization Truthfulness
+  _replaces: 21e3916ee2c3b3ad
+  _evidence:
+    leg: vector+rerank
+    rank1_score: 0.169828
+    margin_to_2: 3.96
+- query: why does focused practice with feedback improve a skill
+  expected_names:
+  - Virtuous Cycle of Skill Development
+  expected: []
+  query_type: synonym
+  _needs_review: true
+  _old_name: Deliberate Practice Through Feedback Loops
+  _replaces: 6bb5b9da3adb938f
+  _evidence:
+    leg: vector+rerank
+    rank1_score: -0.019626
+    margin_to_2: 0.631
+- query: how does retrieval augmented generation keep answers coherent
+  expected_names:
+  - Retrieval-augmented Generation Process
+  expected: []
+  query_type: synonym
+  _needs_review: true
+  _old_name: Retrieval-augmented Generation for Contextual Coordination
+  _replaces: 46e671635de128dd
+  _evidence:
+    leg: vector+rerank
+    rank1_score: 1.347772
+    margin_to_2: 2.629
+- query: how to make ai systems dependable before adding features
+  expected_names:
+  - Create First, Compute Later Strategy
+  expected: []
+  query_type: synonym
+  _needs_review: true
+  _old_name: Reliability-first Ai Integration
+  _replaces: 49fe3a3b4cfbcaad
+  _evidence:
+    leg: vector+rerank
+    rank1_score: -4.462779
+    margin_to_2: 0.215
+- query: how do controlled experiments establish cause and effect
+  expected_names:
+  - Randomized Controlled Trial Principle
+  expected: []
+  query_type: synonym
+  _needs_review: true
+  _old_name: Controlled Experimentation
+  _replaces: ddc3f974d46918bd
+  _evidence:
+    leg: vector+rerank
+    rank1_score: -1.428371
+    margin_to_2: 1.087
+- query: how do ai systems amplify existing biases
+  expected_names:
+  - Beware of Bias in Ai Recommendations
+  expected: []
+  query_type: synonym
+  _needs_review: true
+  _old_name: Bias Amplification in Ai Systems
+  _replaces: 1ec884b263abc5bd
+  _evidence:
+    leg: vector+rerank
+    rank1_score: 1.809793
+    margin_to_2: 6.951
+- query: how do signs get their meaning from the relationship between sign, object,
+    and interpreter
+  expected_names:
+  - Signifier-signified Relationship in Language
+  expected: []
+  query_type: synonym
+  _needs_review: true
+  _old_name: Semiotic Sign Process
+  _replaces: 12a1f8b5b210a350
+  _evidence:
+    leg: vector+rerank
+    rank1_score: 2.369282
+    margin_to_2: 0.598
+- query: why does the first piece of information anchor our judgment
+  expected_names:
+  - Fear of Missing Out Anchoring Effect
+  expected: []
+  query_type: synonym
+  _needs_review: true
+  _old_name: First-information Bias
+  _replaces: 31d4c18164a3c895
+  _evidence:
+    leg: vector+rerank
+    rank1_score: -2.229039
+    margin_to_2: 2.573
+- query: how do small consistent investments compound over time
+  expected_names:
+  - Compound Effect
+  expected: []
+  query_type: synonym
+  _needs_review: true
+  _old_name: Compound Effect of Strategic Investment
+  _replaces: 318671a7afa2ca0a
+  _evidence:
+    leg: vector+rerank
+    rank1_score: 2.489403
+    margin_to_2: 3.704
+- query: how does visual tone and contrast shape a design
+  expected_names:
+  - Dynamic Juxtaposition in Layout Design
+  expected: []
+  query_type: synonym
+  _needs_review: true
+  _old_name: Visual Tone and Contrast in Design
+  _replaces: 211a5a82380864bc
+  _evidence:
+    leg: vector+rerank
+    rank1_score: -0.137868
+    margin_to_2: 0.227

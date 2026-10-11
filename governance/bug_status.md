@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**161 open** / 299 closed of 460 ids.
+**169 open** / 306 closed of 475 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -168,3 +168,11 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-677 | (OPEN, 2026-10-08) — two owner-facing truths for the SAME 60 items (ANCHOR-2 sheet vs frozen ruler) | 1 |
 | BUG-680 | (OPEN, 2026-10-08) — the upstream anchor faces still encode discipline abstention as the out-of-menu token 'emerging' (BUG-676 residual) | 2 |
 | BUG-681 | (OPEN, 2026-10-08) — `just health-full` found 6 faults in one pass; 2 fixed deterministically, 4 remain (3 red contract tests + 3 rails) and | 2 |
+| BUG-698 | (OPEN, 2026-10-10) — v8→v9 discipline-anchor off-menu rows are 22 in THREE categories, not the "7 delta rows" assumed in GATE-2; abstained r | 1 |
+| BUG-710 | (CRITICAL — OPEN): the D2511 retrieval gate is INERT — golden set anchored to the superseded run, and the documented fail-loud precondition  | 2 |
+| BUG-711 | (HIGH — OPEN): 173 canonical rows still carry a DISPLACED canonical domain label in the STORE | 1 |
+| BUG-712 | (CRITICAL — OPEN): content_type routing collapse — 6 of 8 declared primitives produce ZERO output | 3 |
+| BUG-713 | (CRITICAL — OPEN): superseded runs are STILL in the store and STILL in the KNN index | 1 |
+| BUG-714 | (HIGH — OPEN): content_type='tool_instruction' is populated with CODE SNIPPETS, not tool instructions | 1 |
+| BUG-715 | (MEDIUM - OPEN): 7 extracted S2 records reach neither the S4 checkpoint nor a sidecar | 1 |
+| BUG-718 | evidence (recorded, NOT yet conclusive) | 2 |

@@ -3,7 +3,7 @@ session:
   pipeline_commit: v3.0-D2370
   schema_version: '3.0'
   project_root: knowledge pipeline/
-  status: '2026-10-06 v7 PROMOTED: taxonomy_v7.yaml -> live taxonomy_v5.yaml (64 disc / 43 dom, opaque ids, 0 MECE violations); DB relabel 875 fbs + 1 taxonomy_counts (research & methodology -> research practice); closed_menu_v7.json minted (menu_hash 407f3dd45d9c766a); menu_axis_hashes regenerated (drift none); version.yaml taxonomy_version=v7; rederive scripts repointed v6->v7. D-2855/D-2856/D-2857 RATIFIED. NEXT: (1) D-2857 S4 prompt split (Call A CRIBS on Qwen3 no-menu, Call B classify on gpt-oss with menu); (2) discriminator rewrite of business operations + organizational behavior; (3) flip stage5.nli_aggregation -> or_entail_and_no_contra AFTER D-2822 recalibration (else S5 re-quarantines 506 ENTAIL-majority rows); (4) S4->S5->S6 rerun (no S1).'
+  status: '2026-10-06 v7 PROMOTED: taxonomy_v7.yaml -> live taxonomy.yaml (64 disc / 43 dom, opaque ids, 0 MECE violations); DB relabel 875 fbs + 1 taxonomy_counts (research & methodology -> research practice); closed_menu_v7.json minted (menu_hash 407f3dd45d9c766a); menu_axis_hashes regenerated (drift none); version.yaml taxonomy_version=v7; rederive scripts repointed v6->v7. D-2855/D-2856/D-2857 RATIFIED. NEXT: (1) D-2857 S4 prompt split (Call A CRIBS on Qwen3 no-menu, Call B classify on gpt-oss with menu); (2) discriminator rewrite of business operations + organizational behavior; (3) flip stage5.nli_aggregation -> or_entail_and_no_contra AFTER D-2822 recalibration (else S5 re-quarantines 506 ENTAIL-majority rows); (4) S4->S5->S6 rerun (no S1).'
 models:
   generator:
     model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit

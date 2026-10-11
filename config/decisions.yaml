@@ -15663,3 +15663,296 @@ decisions:
   bugs: [BUG-658]
   files: [pipeline/omlx_call.py]
 
+- id: D-2911
+  state: RESOLVED
+  category: GOVERNANCE / FORENSIC
+  title: Prior-decision resume (business model D2016/D2050, modularity D2300→D2306) + knowledge-layer advisory path fixed (BUG-697)
+  decision: >
+    STier-lens forensic audit (read-only) answering future-proofness / modularity / cross-platform /
+    business-model and standing up the 'utilize knowledge layer before advising' rule. (1) BUSINESS MODEL
+    already decided — D2016/D2050 Lifetime License Model (not SaaS): Beta Kit £750-1,000, Domain Expansion
+    £300-500, Major Upgrade £400-600, Custom Build £5,000-15,000; ADOPTED, deferred to Phase 4. RESUME not
+    re-invent. (2) MODULARITY already registered — D2300 (2026-08-12) logged the 4 gaps; D2306 ALREADY
+    implemented InferenceProvider (pipeline/providers/omlx_provider.py) + EmbeddingProvider
+    (pipeline/providers/ollama_provider.py) behind providers/base.py protocols; remaining gap =
+    StorageBackend (stage6 SQLite hardcoded) + per-model capability/context-window registry (no input
+    context budget, max_tokens controls OUTPUT only). (3) CROSS-PLATFORM — C26 relaxation ratified;
+    psutil+pathlib throughout; MLX is Apple-only (MLX-shaped not provider-shaped); MISSION.md swappable-layer
+    table is the canonical future-proof map. (4) KNOWLEDGE LAYER — retrieve.py operational; the documented
+    `python3 pipeline/retrieve.py` entry point was broken (BUG-697, fixed this turn); --fts/--hybrid/--agentic
+    resolve against the serving DB. (5) BUG-650/D-2820 status — anchor_rederive_anchor_version v6→v9 +
+    harness naming fix landed (--selftest/--plan green); still blocked on OMLX-up + two owner gates
+    (authoritative anchor input file, 7-row v8→v9 delta adjudication).
+  bugs: [BUG-697]
+  files:
+  - pipeline/retrieve.py
+  - config/pipeline_config.yaml
+  - scripts/rederive_anchor_axes_v6.py
+
+- id: D-2912
+  state: RESOLVED
+  category: KNOWLEDGE / ARCHITECTURE
+  title: context-mode (github.com/mksglu/context-mode) assessed — REFERENCE the four principles, do NOT adopt the code (ELv2 + Node.js + hosted Insight dashboard)
+  decision: >
+    STier agentic/knowledge-architect assessment of context-mode (an MCP server solving four context
+    problems: sandbox context-saving ~98% reduction, SQLite FTS5 BM25 session continuity on compaction,
+    'think in code' = program-don't-compute via ctx_execute, and no prose-style enforcement). VERDICT:
+    REFERENCE the four principles, do NOT adopt the codebase. WHY NOT ADOPT: (1) ELv2 (Elastic License 2.0)
+    is source-available NOT OSI — a hard dependency violates the C2/C4 open-formats posture; (2) Node.js
+    runtime vs Maxwell's Python — mixing runtimes breaks the coherent/swappable goal (C21); (3) the hosted
+    'Insight dashboard' (context-mode.com/insight) violates C3/C22 sovereignty (Hybrid Sovereignty = API
+    opt-in explicit); (4) its mechanics target the agent-harness layer, not the pipeline — Maxwell ALREADY
+    has the pipeline equivalents (retrieve.py top-k knowledge layer, stage6 FTS, D2549 deterministic LLM-free
+    repair). ADOPT AS PRINCIPLES, mapped: (a) 'think in code' -> the agent MUST batch tool calls into one
+    script (already an operating rule this session); (b) sandbox context isolation -> retrieve.py + D2622
+    practicality filter (partially present); (c) FTS5 BM25 compaction checkpoint -> a future 'compaction
+    checkpoint' writing in-flight state to the FB store; (d) per-tool context-budget accounting (ctx_stats
+    tokens/savings per tool) -> THE one genuinely new build, folds into D2300's per-model
+    capability/context-window registry (budget_input() for input-token limits; max_tokens is output-only).
+    Net effect on capabilities/accuracy/time/token: token YES (98%), time YES (fewer round-trips),
+    accuracy NEUTRAL-to-negative (their own note: aggressive brevity degrades kimi-k2.5 reasoning — keep
+    'no prose enforcement' out), capabilities YES for the agent layer only.
+  bugs: []
+  files: []
+
+- id: D-2913
+  state: RESOLVED
+  category: GOVERNANCE / FORENSIC
+  title: GATE-1 key split landed (anchor_rederive_input_anchor) + forensic blindspot — v8→v9 off-menu rows are 22 in THREE categories, NOT the assumed 7
+  decision: >
+    (1) GATE-1 OWNER-APPROVED key split IMPLEMENTED: new stage4 key anchor_rederive_input_anchor =
+    governance/discipline_anchor_rederived_v8_20261007.json; scripts/rederive_anchor_axes_v6.py anchor_path
+    now reads that key (was reading discipline_anchor_path -> DOMAIN_RULER_FROZEN_20261008.json, a 194-row
+    ruler/partition schema = schema overload). Dead MENU_JSON constant (closed_menu_v7.json, unused) removed
+    (C19). VERIFIED: --selftest exit 0; --plan resolves v8 anchor (202 rows joined, 0 missing), certifies
+    live v9 pin be323543, anchor_version v9, generator != second_coder. (2) FORENSIC BLINDSPOT (prior
+    '7 delta rows' claim incomplete): diffing v8 disciplines against the live v9 menu yields 22 off-menu rows
+    in THREE categories — (a) 7 removed-discipline rows R011/R032/R053/R060/R103/R113/R134 (GATE-2 re-homes,
+    all targets on-menu v9); (b) 7 abstained-empty rows R006/R059/R127/R146/R165/R183/R202
+    (discipline_source=abstained but discipline='' instead of the v9 'emerging' token); (c) 8 noise_drop rows
+    R012/R026/R034/R082/R140/R180/R182/R200 (discipline_source=noise_drop, discipline=None, domains=[] —
+    per D-2811 'discipline does NOT apply', correctly empty). ONTOLOGICAL RULING: (a) re-home per GATE-2;
+    (b) normalize ''->'emerging' (preserve abstention) unless owner upgrades via second-coder suggestions
+    (all on-menu v9); (c) EXCLUDE noise_drop rows from the discipline re-derivation (harness must skip them in
+    --generate, else it fabricates disciplines on no-extractable-object rows). GATE-3 owner confirmation
+    requested on (b)+(c).
+  bugs: [BUG-698]
+  files:
+  - config/pipeline_config.yaml
+  - scripts/rederive_anchor_axes_v6.py
+
+
+
+- id: D-2914
+  state: RESOLVED
+  category: GOVERNANCE / ANCHOR INTEGRITY
+  title: "GATE-3 owner-approved — (b) normalize 7 abstained-empty ''->emerging' + (c) exclude 8 noise_drop rows from discipline re-derivation; harness hardened + selftest/end-to-end verified"
+  decision: >
+    OWNER GATE-3 ACCEPTED the (b)+(c) recommendations from D-2913/BUG-698. IMPLEMENTED in
+    scripts/rederive_anchor_axes_v6.py (deterministic, LLM-free — no OMLX required): (1) partition_rows()
+    splits the 202-row v8 anchor into 194 re-derivable + 8 noise_drop rows keyed on
+    discipline_source=='noise_drop' (D-2811: discipline/domain do NOT apply); (2) --generate now classifies
+    ONLY the 194 re-derivable rows (noise_drop skipped — never fabricates a discipline on a
+    no-extractable-object row); (3) normalize_discipline() maps ''/None -> 'emerging' so the 7 abstained-empty
+    rows (R006/R059/R127/R146/R165/R183/R202) re-mint the on-menu abstention token, not an off-menu empty cell
+    (a missing 'discipline' KEY still fails closed); (4) finalize_manifest(noise_rows=...) merges the 8
+    noise_drop rows back verbatim (discipline=None, domains=[], noise_drop provenance, re-stamped to the live
+    v9 pins) and sorts the manifest by numeric item_id. VERIFIED: --selftest exit 0 (new cases: partition +
+    ''->emerging + noise preservation); end-to-end dry run builds a 202-row noise-inclusive manifest that the
+    BUG-650 referee guard ACCEPTS (menu-v6/v9-stamped be323543). Also fixed the 'menu v6' -> 'live menu'
+    naming drift in --plan. REMAINING (owner-owned): start OMLX -> run --generate -> owner adjudicate
+    (7 re-homes + 7 abstained decisions + keep-v8 for the other 180) -> --adjudicate -> --verify -> --finalize
+    to mint the v9 manifest.
+  bugs: [BUG-698]
+  files:
+  - scripts/rederive_anchor_axes_v6.py
+- id: D-2915
+  state: RESOLVED
+  category: KNOWLEDGE PIPELINE / RETRIEVAL
+  title: "sqlite-vec loader consolidated — shared loader + ctypes C-API fallback restores the vector leg on python.org framework builds (BUG-699)"
+  decision: >
+    The sqlite-vec load sequence was duplicated in FOUR call sites (retrieve.py, backfill_embeddings.py,
+    stage6_commit.py, repair_vec_integrity.py), each with a subtly different failure mode/message. On the
+    python.org framework build, sqlite3 lacks `enable_load_extension` (SQLITE_OMIT_LOAD_EXTENSION), so
+    `sqlite_vec.load()` raised AttributeError and the vector leg silently degraded to FTS (BUG-104/BUG-699)
+    even though sqlite-vec 0.1.9 was installed AND vec_fbs held 14574 rows. IMPLEMENTED: new
+    `pipeline/sqlite_vec_loader.py` (single home) exposing `load_sqlite_vec(conn) -> SqliteVecLoad{loaded,
+    method, error}` with a three-layer strategy: (1) standard enable_load_extension + sqlite_vec.load;
+    (2) ctypes C-API fallback (sqlite3_enable_load_extension + sqlite3_load_extension on the `_sqlite3`
+    shared lib) when the methods are absent; (3) graceful degrade with a precise reason (C16). Wired into
+    retrieve.py (query path), backfill_embeddings.py, and stage6_commit.py (preserving the S6_VEC_REQUIRE
+    fail-closed gate). VERIFIED: live `python3 pipeline/retrieve.py --vector` returns vector hits
+    (method=ctypes) with no FTS fallback. DEFERRED: scripts/repair_vec_integrity.py (standalone repair
+    script, already documents its Homebrew interpreter in config/vec_integrity.yaml).
+  bugs: [BUG-699]
+  files:
+  - pipeline/sqlite_vec_loader.py
+  - pipeline/retrieve.py
+  - pipeline/backfill_embeddings.py
+  - pipeline/stage6_commit.py
+- id: D-2916
+  state: RESOLVED
+  category: GOVERNANCE / ANCHOR HYGIENE
+  title: "Retire superseded v6 anchor artifacts + re-point stale v6d defaults (BUG-650) + mark D-2853 remap COMPLETE"
+  decision: >
+    Forensic audit of the v6/v7/v8/v9 anchor reference graph found d2767_ab_eval.py still defaulted to the
+    superseded v6d manifest (BUG-650 "stale v6-d referee") even though it already carried the BUG-689 v8
+    absence-row handling (noise_drop excluded, abstained -> emerging). d2767_ab_eval.py is NOT superseded by
+    d2884b_decider_ab.py: it measures a DISTINCT gate (gpt-oss flag-ON fine 62-way + coarse 3-way macro) and is
+    a live module (tests/test_d2767_coarse_kappa.py imports coarse_collapse/coarse_report). IMPLEMENTED: (1)
+    re-pointed DEFAULT_ANCHOR -> discipline_anchor_rederived_v8_20261007.json + DEFAULT_OUT ->
+    d2767_ab_eval_v8_20261010.json (non-colliding with the d2767_ab_v8_20261009.json referee); (2) marked
+    scripts/remap_referee_v7_28rows.py COMPLETE with a fail-closed self-guard (refuses to re-run; D-353
+    re-mint-under-new-id); (3) archived the four v6 anchor variants (a/b/c/d) + five v6-era d2767_ab outputs to
+    archive/ with .retired_D2916_20261010 (C19 one-in-one-out; bytes preserved not mutated, D-340). HELD: v7
+    anchor + build_anchor_v8_* chain (v7 is the declared input to the live v8 build chain; archiving breaks v8
+    reproducibility, D-340 frozen-pair). VERIFIED: py_compile OK; tests/test_d2767_coarse_kappa.py 4 passed;
+    remap guard fires; archive index regenerated 34->43 entries + --check OK.
+  bugs: [BUG-650]
+  files:
+  - scripts/d2767_ab_eval.py
+  - scripts/remap_referee_v7_28rows.py
+  - archive/index.yaml
+
+- id: D-2917
+  state: RATIFIED
+  category: ANCHOR / TAXONOMY
+  title: Anchor recommendation C owner-accepted + final forensic audit
+  decision: "Owner accepted anchor recommendation C (re-derive discipline anchor to v9 via D-2820)."
+
+- id: D-2918
+  state: RATIFIED
+  category: ANCHOR / TAXONOMY
+  title: Correction to D-2917 F3 + root cause of 'only 4 usable'
+  decision: "Correction to D-2917 F3 forensic finding."
+
+- id: D-2919
+  state: RATIFIED
+  category: VERIFICATION
+  title: "Root cause of 'only 4': S5 NLI-paraphrase + S4 62-way ceiling"
+  decision: "Root-caused 'only 4 usable' to S5 NLI-paraphrase path + S4 fine 62-way kappa ceiling."
+
+- id: D-2920
+  state: RATIFIED
+  category: GOVERNANCE / STRATEGY
+  title: "rerun vs post-hoc determination + D-A/D-B/D-C approval"
+  decision: "NO full S0-S6 rerun; two surgical post-hoc passes (S5 paraphrase re-verify + S4 macro re-classify) over 6,591 merged rows, then re-commit."
+
+- id: D-2921
+  state: RATIFIED
+  category: GOVERNANCE / FORENSIC
+  title: Forensic clarifications — anchors, keywords, retrieval surface, post-hoc vs pipeline
+  decision: "Forensic clarifications on anchors, keywords, retrieval surface, post-hoc vs pipeline."
+
+- id: D-2922
+  state: RATIFIED
+  category: RETRIEVAL
+  title: Retrieval contract for PT/TI as Layer-2 skill references
+  decision: "PT/TI require a DIFFERENT retrieval contract than principles (intent+linkage keyed, not discipline)."
+
+- id: D-2923
+  state: RATIFIED
+  category: RETRIEVAL
+  title: Layer-2 retrieval contract completed — PT/PI/GE/TI
+  decision: "Owner-approved 2026-10-11. Single invariant: principle = discipline/domain/depth/status keyed; PT/PI/GE/TI = intent+linkage keyed (trigger/parent_pt_id/tool_name+description/body+status), NEVER discipline/domain. Full spec: research/LAYER2_RETRIEVAL_CONTRACT_20261011.md."
+
+- id: D-2924
+  state: RATIFIED
+  category: ONTOLOGY
+  title: Growth-edge capability ontology (closed vocabulary + provenance + calibration)
+  decision: "Owner-approved 2026-10-11. growth_edge category/tags imply a skill/capability ontology the discipline axis does NOT cover. Define a CLOSED, provenance-stamped, calibrated vocabulary BEFORE Stage R emits GE in volume. Implemented: config/growth_edge_ontology.yaml + pipeline/growth_edge_ontology.py (C21 loader, fail-closed) + tests/test_growth_edge_ontology.py (4/4 pass). Gate advisory until gold set minted."
+  bugs: []
+  files:
+  - config/growth_edge_ontology.yaml
+  - pipeline/growth_edge_ontology.py
+  - tests/test_growth_edge_ontology.py
+
+- id: D-2925
+  state: RATIFIED
+  category: VERIFICATION
+  title: BUG-705-threshold fix — paraphrase RECALL path was a silent no-op
+  decision: "Forensic audit found the D-B paraphrase RECALL path counted _n_entail at nli_pass_threshold=0.5 (silent no-op). Fix: stage5.paraphrase_entail_threshold=0.10 (weak-entail pre-filter) + always-on guard if paraphrase_entail_threshold >= nli_pass_threshold."
+  bugs: [BUG-705]
+  files:
+  - pipeline/stage5_verify.py
+  - config/pipeline_config.yaml
+
+- id: D-2926
+  state: RATIFIED
+  category: ONTOLOGY
+  title: BUG-698 baseline-preserving migration — v8 anchor is baseline; only 7 menu-forced discipline rows change
+  decision: "rederive --generate reclassifies from scratch ignoring owner rulings (circular loop). v8->v9 menu delta = 3 disciplines removed, 0 domains removed. Keep all labels verbatim except 4 D-2897 deterministic renames + 3 owner-decide rows (R032/R053/R113). 164 generator deltas revert (over-abstraction to emerging, research-practice collapse, abstention violations)."
+  bugs: [BUG-698]
+  files:
+  - config/owner_decisions_v9_keep_verbatim_20261011.json
+  - governance/BUG698_migration_delta_20261011.csv
+  - governance/BUG698_discarded_generator_delta_20261011.csv
+
+
+- id: D-2927
+  state: RATIFIED
+  category: ONTOLOGY / TAXONOMY
+  title: "T5 version-neutral rename config/taxonomy_v5.yaml -> config/taxonomy.yaml (supersedes D2513 filename convention)"
+  decision: "Owner-approved 2026-10-11 (T5 option b). The v5 filename was a frozen major-version marker (D2513: file-stays-taxonomy_v5.yaml for minor bumps) while content advanced v5->v9, so the name drifted from its content (repo_integrity.yaml already documented it as a historical artifact). Renamed to config/taxonomy.yaml (version-neutral; future version bumps no longer touch the filename — C27 zero-future-tax). 78 live files updated: pipeline/*, scripts/*, tools, tests, active config pointers (anchor_family/eval_integrity/menu_routing), agent/session_seed.yaml, KNOWLEDGE-PIPELINE-ARCHITECTURE.md, prompts. scripts/apply_taxonomy_v9.py + v8 LIVE constant re-pointed to config/taxonomy.yaml so the next promotion no longer recreates v5. Verified: py_compile OK; smoke-load v9 (63 disciplines/41 domains); 0 residual source refs. Historical records (DECISION-LOG.md, MASTER-TASK-REGISTER.md, governance forensic+handoff docs, prior decisions.yaml entries) intentionally NOT rewritten — they record the filename as it was at the time; a blanket rename would falsify history."
+  files:
+  - config/taxonomy.yaml
+  - scripts/apply_taxonomy_v9.py
+  - scripts/apply_taxonomy_v8.py
+  - pipeline/closed_menu.py
+  - pipeline/schemas.py
+  - pipeline/taxonomy_manager.py
+  - config/anchor_family.yaml
+  - config/eval_integrity.yaml
+  - config/menu_routing.yaml
+
+- id: D-2928
+  state: RATIFIED
+  category: ONTOLOGY / TAXONOMY
+  title: "T7 definition re-scope (organizational theory vs business administration) + closed_menu_v10 mint, provenance-safe (anchor untouched)"
+  decision: "Owner-approved 2026-10-11. The two disciplines shared a definitional overlap ('how organizations are structured/coordinated/governed') — the exact ambiguity behind F12's gemma second-coder confusion pairs (risk management/organizational theory -> business administration). Re-scoped: organizational theory (disc-012) = descriptive/explanatory positive lens (object = the organization; 'how organizations work, never how to steer one'); business administration (disc-062) = prescriptive/normative applied lens (object = the managerial function; 'steering toward objectives under resource constraints'). ONLY the definition: field changed on both; raw/exclude/id/differentia/group untouched. Minted config/closed_menu_v10.json (+.sha256) per I2 (never overwrite v9); composite_hash_live moved be323543... -> cc800a32... while answer_space_hash stayed e11ac764... (D-371/D-NEW-1: wording moves the composite, NOT the answer space). Repointed config/version.yaml#closed_menu + config/menu_axis_groups.yaml#source -> v10; ran scripts/menu_axis_hashes.py (--check in sync). PROVENANCE CORRECTION (forensic): the prior plan's step (6) 'update anchor provenance menu_hash/taxonomy_version' was NOT executed — the frozen v9 anchor's menu_hash=be323543/taxonomy_version=v9 record what it was adjudicated against (I2 + D-2896 raw-invariance); rewriting them would falsify history. The anchor's true pin answer_space_hash=e11ac764 is unchanged, so BUG-650 assert_referee_menu_current still PASSES (live_hits=[e11ac764], frozen_hits=[]). taxonomy_version stays v9 (slot set 63/41 unchanged); only the menu REVISION advanced to v10."
+  files:
+  - config/taxonomy.yaml
+  - config/closed_menu_v10.json
+  - config/closed_menu_v10.sha256
+  - config/version.yaml
+  - config/menu_axis_groups.yaml
+  - config/menu_axis_hashes.yaml
+
+- id: D-2929
+  state: RESOLVED
+  category: ONTOLOGY / TAXONOMY
+  title: "T8 macro 3-way classifier RETIRED (option d+b) — macro is a deterministic derived facet (to_macro), never a predicted/gated axis; 'emerging' is abstention+noise, not a positive class"
+  decision: "RESOLVED 2026-10-11 (owner asked for the 'ultimate verified best solution'). FORENSIC PROOF the 3-way classifier can NEVER reach the 0.73 floor: (1) the gold macro label is BY CONSTRUCTION to_macro(anchor.discipline) — the deterministic collapse of the owner's fine discipline — so there is NO independent macro ground truth to learn, only a derived quantity; (2) the 16 'emerging' gold rows are NOT a semantic class — 8 are owner-adjudicated discipline='emerging' (novel FBs the owner placed in no discipline: R006/R053/R059/R127/R146/R165/R183/R202) and 8 are noise_drop rows with discipline=None (discarded artifacts: R012/R026/R034/R082/R140/R180/R182/R200) — a classifier predicting 'emerging' is asked to predict abstention + garbage, a category error; (3) Condition A (collapse of committed fine classifier) = 0.553 vs Condition C (independent 3-way) = 0.5684 — both ≈ the fine axis's own ceiling (0.581/0.728, D-2796), i.e. the macro classifier adds ZERO signal over collapsing the fine output. RESOLUTION: RETIRE the independent 3-way classifier + its kappa gate. Macro stays a DETERMINISTIC DERIVED advisory facet via pipeline/discipline_macro.py to_macro() (already persisted in stage6 fbs.discipline_macro; zero inference, zero gate). 'emerging' routing is ALREADY handled by D-2898 (match_to_canonical + owner gate) — never a predicted class. This closes the BUG-622 classifier-engineering loop per ratified D-2792/D-2793 ('STOP classifier engineering'). discipline_macro_enabled stays false PERMANENTLY (deterministic, not gated); discipline_macro_kappa_floor 0.73 retained as a measurement-only reference on the retired instrument."
+  files:
+  - scripts/discipline_macro_classify.py
+  - pipeline/discipline_macro.py
+  - config/pipeline_config.yaml
+  - governance/discipline_anchor_rederived_v9_20261011.json
+
+- id: D-2930
+  state: OPEN
+  category: CALIBRATION / RETRIEVAL
+  title: "T9 paraphrase gold scaffold built — deterministic blind-stratified extraction of the 2,258 recoverable NEUTRAL rows into a 50-row draft JSONL awaiting different-family labelling"
+  decision: "OPEN (unblocked step executed 2026-10-11). Built scripts/t9_paraphrase_gold_scaffold.py (deterministic, seeded, provenance-safe): extracts the canonical-run (rechunk-v4-20260929) NEUTRAL population, parses DeBERTa ent/cont counts from verification_results, and emits governance/t9_paraphrase_gold_draft.jsonl (50 rows: 30 recoverable + 10 ent0 + 10 contra controls). VERIFIED CENSUS: 3142 neutral rows = 2258 recoverable (ent>=1,cont=0) + 376 ent0 (ent=0,cont=0) + 508 contra (cont>0; includes the 54 ent=0 AND cont>0 rows — prior ad-hoc count had a precedence bug that mis-filed them as ent0). Stratification is proportional-to-discipline_macro (recoverable pool: Human&Design 1027, Method&Business 481, Technical 161, emerging 589) with min 1 per non-empty bucket. label='TBD' — NEVER guessed (R5 generator!=verifier). KNOWN LIMITATION (documented in script, not silently ignored): production _paraphrase_similarity takes MAX STS over up to 8 clean passages, paraphrase_calibrate.py computes single-string cosine, so a threshold calibrated on the joined-evidence string is a LOWER BOUND (conservative/fail-closed); a later enhancement may teach the calibration script to accept an evidence_passages list. NEXT (delegated, not owner-gated): label the 50 rows {paraphrase_true|non_paraphrase} with a different-family LLM proxy (gemma-4-E4B or Phi-4-mini), then run scripts/paraphrase_calibrate.py --gold <labelled> --decision D-XXXX before flipping paraphrase_path_enabled."
+  files:
+  - scripts/t9_paraphrase_gold_scaffold.py
+  - governance/t9_paraphrase_gold_draft.jsonl
+
+- id: D-2931
+  state: OPEN
+  category: CALIBRATION / ONTOLOGY
+  title: "T10 growth-edge category calibration script built (ge_category_calibrate.py) — kappa/F1 over the 4 REAL category values, emerging excluded from the kappa denominator"
+  decision: "OPEN (unblocked step executed 2026-10-11). Built scripts/ge_category_calibrate.py, the measurement instrument declared by config/growth_edge_ontology.yaml calibration block. Measures Cohen's kappa + per-class F1 over the 4 REAL category values (open_tension/unverified_correlation/contested_claim/capability_gap), EXCLUDING category=emerging from the kappa denominator (D-2929 LESSON applied: emerging is an abstention routing side-channel for D-2898, never a 5th predicted class). FAIL-CLOSED: refuses (<20 labelled rows, gold missing, or kappa < floor 0.65). FIXED A BUG during self-test: per-class F1 originally dropped emerging-predicted false-negatives (fn loop only iterated _REAL_VALUES), inflating F1 1.0 -> correct 0.9091 on the synthetic gold — the D-2929 lesson enforced at the instrument level. Verified with a 28-row synthetic gold (24 real + 4 emerging-excluded): kappa 0.7895, per-class F1 0.9091. Mints calibration_decision + flips gate_mode enforcing ONLY on --apply and kappa>=floor. BLOCKED on the gold set (config/golden/ge_category_gold.yaml does not exist — no GE rows exist in the corpus yet, Stage R does not emit GE until the gate is met). NEXT: mint the blind stratified GE category gold (human/LLM labelling) once Stage R produces candidate GE rows."
+  files:
+  - scripts/ge_category_calibrate.py
+  - config/growth_edge_ontology.yaml
+
+- id: D-2932
+  state: RESOLVED
+  category: CALIBRATION / RETRIEVAL
+  title: "T9 paraphrase recall path MEASURED and FAILS ship bar — bge-m3 STS cosine is not discriminative; gold labels suspect; RETIRED (D-2929 pattern, owner approved)"
+  decision: "RESOLVED 2026-10-11 (owner approved retirement). Measurement executed 2026-10-11, stamp NOT minted, path NOT enabled. Labelled the 50-row draft with gemma-4-E4B-it-MLX-4bit (different family, R5, temp=0.0) via scripts/t9_paraphrase_label.py: 50/50 labelled, 0 fail-closed -> governance/t9_paraphrase_gold_labelled.jsonl (31 paraphrase_true / 19 non_paraphrase). FOUND + FIXED an instrument mismatch: paraphrase_calibrate.py was computing SINGLE-STRING cosine against the joined evidence, while production _paraphrase_similarity takes MAX STS over up to 8 clean passages — the single-string path deflated recall catastrophically (P=1.0 R=0.032 at 0.86). FIXED: the calibrator now reuses production stage5._paraphrase_similarity directly (zero drift). RE-MEASURED with the fixed instrument: STILL FAILS the ship bar — at precision >= 0.85 the best recall is R=0.065 (2/31 paraphrase_true recovered at threshold 0.85); at useful recall (R=0.968 @ 0.53) precision is only 0.612. ROOT-CAUSE (forensic): (1) the bge-m3 STS cosine signal is NOT discriminative between paraphrase_true and non_paraphrase — recoverable bucket true-mean 0.734 vs false-mean 0.686 (Delta=0.048), and the ent0/contra control buckets are INVERTED (false-mean > true-mean: 0.720>0.679, 0.707>0.683); (2) the gold labels are UNRELIABLE — gemma-4-E4B conflates topical relatedness with paraphrase/support, labelling 5/10 ent0 controls (ent=0,cont=0, zero entailment) and 6/10 contra controls (cont>0, contradiction present) as paraphrase_true, including figure-caption garbage passages (e.g. 'FIGURE 88. The tertiary structure of a typoenzyme' judged paraphrase of 'a method for predicting 3D protein folding'); (3) residual mismatch — scaffold evidence_passages includes garbage passages that production _clean_eps would exclude via _is_garbage_passage. RECOMMENDATION (mirrors D-2929 'measure -> fail-closed -> retire'): RETIRE the paraphrase RECALL gate (paraphrase_path_enabled stays false PERMANENTLY); the correct ontological lever for recovering faithful-reworded NEUTRAL rows is the NLI entailment calibration (D-2822), NOT a semantic-similarity side-gate — bge-m3 STS measures semantic relatedness, not paraphrase/entailment, so it is the wrong primitive to override the stronger DeBERTa entailment signal. DOWNGRADE OPTION: keep a non-gated advisory similarity facet only if a future use is identified. paraphrase_calibration stamp NOT minted (calibrator correctly refuses to mint below ship bar without --apply)."
+  files:
+  - scripts/t9_paraphrase_label.py
+  - scripts/paraphrase_calibrate.py
+  - governance/t9_paraphrase_gold_labelled.jsonl

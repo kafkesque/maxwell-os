@@ -1,6 +1,6 @@
 # Maxwell OS v3.0 — BUG LOG (tiered)
 
-> **Updated:** 2026-10-10 | **Archive (full history):** `archive/governance_pre_tiered_2026-09-03/buglog.md`
+> **Updated:** 2026-10-11 | **Archive (full history):** `archive/governance_pre_tiered_2026-09-03/buglog.md`
 >
 > **Convention (standing rule):** OPEN bugs at the TOP (most critical first, MUST→SHOULD→WORTH); CLOSED/RESOLVED at the BOTTOM. Protocol: `governance/buglog_protocol.md`.
 
@@ -10,6 +10,10 @@
 
 | Bug | Date | Issue |
 |---|---|---|
+| BUG-702 | 2026-10-10 | **S5 `practicality` metadata is STORED but NOT SERVED as a first-class retrieval facet. Verified 2026-10-10: `practicality` is 100% populated in v9 (6,591/6,591: `immediately-applicable`=5,092, `context-dependent`=1,499) and IS returned in retrieve.py JSON output (SELECT *), but retrieve.py has NO `--practicality` filter flag (grep of add_argument list confirms only keyword/fts/vector/hybrid/agentic/graph-aware/domain/discipline/macro/depth/discipline-raw/domains-raw/status/limit). Consequence: the "20-sec practical applicability" signal cannot drive retrieval routing or skill-orchestration gating — a downstream consumer cannot ask "give me only immediately-applicable principles for scaffolding". FIX: add `--practicality` (choices immediately-applicable/context-dependent) to retrieve.py CLI + `_practicality_clause()` alongside discipline_macro/raw facet clauses.** | |
+| BUG-703 | 2026-10-10 | **190/6,591 v9 rows (2.9%) have EMPTY `discipline_raw` while canonical `discipline` is populated and `discipline_source`=`llm_extracted_from_source`. Verified: `SELECT discipline_source, COUNT(*), SUM(CASE WHEN discipline_raw IS NULL OR discipline_raw='' THEN 1 ELSE 0 END) FROM fbs WHERE taxonomy_version='v9' GROUP BY discipline_source` → all 6,591 rows are llm_extracted_from_source, 190 have empty discipline_raw. Consequence: the D2537 `--discipline-raw` surgical facet silently drops these 190 rows (invisible to raw-label routing), and raw-vs-canonical provenance is incomplete for them. Root cause likely S4 merge: raw label blanked during canonical projection while canonical landed. FIX: backfill discipline_raw from S4 checkpoint for the 190 ids, or relax the raw facet to fall back to canonical when raw is empty.** | |
+| BUG-700 | 2026-10-10 | **Cross-generation entity identity gap — ROOT CAUSE of the dual-generation store. `fb_id` is run-derived (hash of run-local name+content+taxonomy, NOT source-derived); `duplicate_of` has no writer (0 rows in every generation); stage6_commit appends by fb_id with no stable key / ON CONFLICT / supersede step. Re-running the SAME corpus (891 v5.1 vs 883 v9 source docs, 723 shared) under taxonomy v9 produced TWO un-reconciled generations in fbs (7,855 t11@v5.1 + 6,591 rechunk@v9), 0 fb_id overlap, only 444 name overlap (v9 reworded). stage1_chunk SHA-256 dedup is segment-level and stage1_5 cluster-before-extract is within-run, so re-chunking silently misses. D-2881/BUG-691 masked this at the SERVING layer (canonical_run filter) but the store is still physically dual-generation. FIX (design, not built): stable content-derived identity = hash(normalized name + source_ids), taxonomy-independent; stage6 INSERT..ON CONFLICT(identity) DO UPDATE with `superseded_by`; reconcile step marks prior-generation rows on new-generation landing.** | |
+| BUG-701 | 2026-10-10 | **Anchor store bridge joined 193/208 (93%) to t11@v5.1 rows while the serving layer (D-2881) serves ONLY rechunk-v4-20260929@v9. Bridge joins by exact folded name (`content_name`); v9 reworded names → 193 anchor items bind to t11 rows that are NO LONGER SERVED; only 12 resolve to v9 (11 run_canonical + 1). Consequence: ANCHOR_208 (eval reference) measures against t11-era rows the live store does not serve → anchor STALE/misaligned with served population. Bridge re-points run-COLLISIONS only (11), not REWORDED names (196). FIX (owner-gated on live population): after BUG-700 stable identity lands, re-derive the bridge against v9 by source identity (not name), or consciously re-run S4 on the anchor's source docs through v9.** | |
 | BUG-640 | 2026-10-05 | **D-2815 B&M slot "entrepreneurship" string-collides with the existing DOMAIN "entrepreneurship" (closed_menu_v5.json). Two rails reject it: D-2500 owl:disjointWith (domain/discipline must be disjoint) and the BUG-200/D2422 opposite-axis guard in map_to_canonical_with_fallback (returns "emerging" for a raw label canonical on the opposite axis). The new discipline slot is DEAD ON ARRIVAL. Fix: rename slots to discipline-scoped forms (JEL M "business administration" / "marketing" / "entrepreneurship studies"). OWNER-RULED 2026-10-05 (D-2829); IN PROGRESS — code changed, pending menu-v6 commit: slots = 'business administration' / 'marketing' / 'entrepreneurship studies'.** | |
 | BUG-642 | 2026-10-05 | **alias_map.yaml retirement (D-2814) has 14 consumers: pipeline/schemas.py get_synonym_index + 13 scripts (remap_emerging, apply_enrichment, rederive_kindsafe_domains, resolve_domains_emerging, etc.). Wholesale delete = cascade break + silent "emerging" fall-through (EL1). Fix: shrink-then-remove with consumer migration + fail-closed no-synonym mode (C1, D-2828).** | |
 | BUG-643 | 2026-10-05 | **Dual abstention token: pipeline/closed_menu.py uses "none" (_ABSTENTION_VALUE, D-275b/D-277) while closed_menu_v5.json + emerging_disciplines.yaml + the 27.2% emerging metric use "emerging" (catch_all). D-2814 says "explicit none". Must fix ONE abstention token and reconcile emerging_discipline_rate_max 0.35, else the drift metric silently re-targets (BL1, D-2828). OWNER-RULED 2026-10-05 (D-2830); IN PROGRESS — code changed, pending menu-v6 commit: single abstention token = 'emerging'; _ABSTENTION_VALUE 'none' -> 'emerging'.** | |
@@ -8889,6 +8893,14 @@ Control test `tests/test_anchor_menu_guard.py` (9 cases) proves no-stamp / froze
 refuse and a live menu-v6 stamp passes. STILL BLOCKED: the A/B cannot RUN until D-2820 re-derives the anchor and
 D-2839 flips PROPOSED→RATIFIED (owner sign-off); the guard is the enforcement limb, not the re-derivation itself.
 
+**PROGRESS 2026-10-10 (D-2916):** stale-default limb RESOLVED. The re-derivation + owner ratification long since
+landed (v6 -> v7 -> v8, D-2820/D-2839/D-2853/D-2866+/D-2879/D-2880), but d2767_ab_eval.py's DEFAULT_ANCHOR still
+pointed at the superseded v6d manifest — the residual "stale v6-d referee" blocker. Re-pointed DEFAULT_ANCHOR ->
+discipline_anchor_rederived_v8_20261007.json (the BUG-689 absence-row handling already makes the 202-row v8 safe)
+and DEFAULT_OUT -> d2767_ab_eval_v8_20261010.json. The full A/B re-run is now unblocked from the stale-referee side;
+it remains an ADVISORY measurement (D-2798, never fails closed) requiring OMLX (owner-owned to start) — not a
+correctness gate. d2767_ab_eval.py stays LIVE (distinct gpt-oss gate + live coarse_collapse/coarse_report consumers).
+
 ## BUG-651 (PARTIAL, 2026-10-05) — S5 majority NLI aggregation hides supported claims + passes contradictory claims (D-2822 Gate A(d))
 
 The D2507/B2 cross-passage MAJORITY rule is the wrong ontology for claim verification. It requires a STRICT
@@ -9934,3 +9946,691 @@ Deterministic fix applied (LLM-free, config-first): scope all calibration querie
 for the labels (the 6494 v5.6-STAMPED rows remain a separate D-2894 menu_hash re-stamp concern). G3 now passes.
 
 ## BUG-696 (CLOSED, 2026-10-10) — `run_stage4()` unconditionally fails-closed on `check_omlx_health()` at pipeline/stage4_merge.py:1433 BEFORE the `MAXWELL_SKIP_LLM=1` path, so the two LLM-off deterministic smoke tests (`test_smoke_d2371_quarantine_without_application`, `test_smoke_diverse_batch_writes_checkpoint_and_routes`) require a live OMLX server despite promising "no OMLX variance". `MAXWELL_SKIP_LLM=1` means "skip every LLM call", yet the OMLX check fires first and `sys.exit(1)`. FIX: `if not os.environ.get("MAXWELL_SKIP_LLM") and not check_omlx_health():` (one line). CLOSED: applied the one-line gate (the `pipeline/**` "will_not_touch" premise was STALE — session_plan_20260924.yaml lists `- pipeline/**` under `may_touch:` at line 94, NOT under `will_not_touch:`); both smoke tests pass offline (`MAXWELL_SKIP_LLM=1`). Environmental sibling of BUG-658 (harness still needs OMLX up).
+
+## BUG-697 (CLOSED, 2026-10-10) — `python3 pipeline/retrieve.py` fails `ModuleNotFoundError: No module named 'pipeline'` — the repo-root `sys.path.insert` shim sits AFTER the first `from pipeline...` import, so the documented CLI path (and every `just retrieve-*` target) aborts at import before the shim ever runs
+
+ROOT CAUSE. pipeline/retrieve.py inserts its repo-root shim
+(`sys.path.insert(0, str(Path(__file__).resolve().parent.parent))`) at ~line 45, but the first
+`from pipeline.label_traceability import traceability_of` fires at ~line 34 — BEFORE the shim. Run as a
+script (`python3 pipeline/retrieve.py`, the invocation every `just retrieve-*` target and the module
+docstring use), Python puts the SCRIPT DIRECTORY (`pipeline/`) on sys.path[0], not the repo root, so
+`import pipeline` fails. `python3 -m pipeline.retrieve` worked only by accident (CWD lands on sys.path).
+
+SEVERITY. MEDIUM — the "utilize knowledge layer before advising" rule (this session) and every
+`just retrieve-*` target were broken at the documented entry point, silently (no wrapper catches it).
+
+FIX (applied, deterministic, LLM-free, C12-compliant): moved the single
+`sys.path.insert(0, str(Path(__file__).resolve().parent.parent))` to immediately after
+`from pathlib import Path`, BEFORE any `from pipeline...` import, and removed the now-duplicate later copy.
+VERIFIED: `python3 pipeline/retrieve.py --fts "swappable infrastructure modularity" --limit 2 --status PASS`
+→ exit 0, 2 results; `python3 -m pipeline.retrieve` unchanged.
+
+## BUG-698 (OPEN, 2026-10-10) — v8→v9 discipline-anchor off-menu rows are 22 in THREE categories, not the "7 delta rows" assumed in GATE-2; abstained rows store `''` (not `emerging`) and noise_drop rows would be mis-classified by the re-derivation harness
+
+SCOPE ERROR. The prior plan framed the v8→v9 discipline re-derivation as a "7-row delta" (rows whose
+discipline was removed from the menu: computational theory / information retrieval / visual semiotics).
+A deterministic diff of governance/discipline_anchor_rederived_v8_20261007.json (202 rows) against the
+live v9 menu (config/closed_menu_v9.json, 64 disciplines incl 'emerging') shows 22 off-menu rows in 3
+categories:
+
+  (a) 7 removed-discipline rows (GATE-2 re-homes, all targets ON-menu v9):
+      R011 info retrieval->information science; R032 computational theory->software engineering;
+      R053 computational theory->philosophy; R060 visual semiotics->semiotics;
+      R103 visual semiotics->visual perception; R113 computational theory->operations research;
+      R134 info retrieval->information science.
+
+  (b) 7 abstained-empty rows (discipline_source='abstained', discipline='' not 'emerging'):
+      R006, R059, R127, R146, R165, R183, R202. v8 abstention stored as empty string, not the v9
+      'emerging' token. Second-coder (gemma-4-E4B) suggestions are all on-menu v9:
+      R006->generative design, R059->entrepreneurship studies, R127->cultural studies, R146->decision making,
+      R165->literary theory, R183->sociology, R202->performing arts.
+
+  (c) 8 noise_drop rows (discipline_source='noise_drop', discipline=None, domains=[]):
+      R012, R026, R034, R082, R140, R180, R182, R200. Per D-2811 ("depth and discipline do NOT apply;
+      cleared to empty on noise_drop") these correctly carry no discipline. The re-derivation harness
+      (scripts/rederive_anchor_axes_v6.py --generate) would WRONGLY ask the classifier to assign a
+      discipline to these no-extractable-object rows.
+
+SEVERITY. HIGH for re-derivation correctness — proceeding with only the 7 re-homes would (i) leave 7 rows
+with discipline='' instead of 'emerging', and (ii) fabricate disciplines on 8 noise_drop rows, mutating the
+ontology (D-272e: noise_drop is an ontological 'no extractable object' judgement, not a label gap).
+
+RECOMMENDED FIX (deterministic; owner GATE-3 on b+c): (a) apply the 7 re-homes; (b) normalize the 7
+abstained-empty rows ''->'emerging' (or owner upgrades via the second-coder suggestion above); (c) add a
+noise_drop guard to the harness — skip discipline_source=='noise_drop' rows in --generate and preserve them
+in the manifest with empty discipline + noise_drop provenance (provenance integrity, no fabricated labels).
+
+
+UPDATE 2026-10-10 (GATE-3 OWNER-APPROVED, harness hardened): owner accepted (b) normalize the 7
+abstained-empty rows ''->'emerging' (or upgrade via the on-menu second-coder suggestions) and (c) exclude the
+8 noise_drop rows from discipline re-derivation. Deterministic fix landed in
+scripts/rederive_anchor_axes_v6.py: partition_rows() isolates noise_drop rows (discipline_source=='noise_drop')
+so --generate classifies ONLY 194 re-derivable rows; normalize_discipline() maps ''/None -> 'emerging'
+(missing discipline KEY still fails closed); finalize_manifest(noise_rows=...) preserves the 8 noise_drop rows
+verbatim (empty discipline/domains + noise_drop provenance, re-stamped to v9 pins) and sorts by numeric
+item_id. VERIFIED: --selftest exit 0; end-to-end 202-row noise-inclusive manifest ACCEPTED by the BUG-650
+referee guard. STATUS: code fix RESOLVED; the bug remains OPEN only pending the LLM chain run
+(--generate -> adjudicate -> --verify -> --finalize), blocked on owner OMLX startup.
+
+## BUG-699 (RESOLVED, 2026-10-10) — vector leg silently dead on python.org framework builds: `_try_load_sqlite_vec` returned False on the missing `enable_load_extension` (AttributeError) with NO diagnostic, so `python3 pipeline/retrieve.py` (the documented CLI / every `just retrieve-*` target) fell back to FTS even though sqlite-vec 0.1.9 was installed AND vec_fbs held 14574 rows — a silent C16 violation that masked BUG-104's env limitation as "just use Homebrew python". The loader was duplicated in 4 call sites with divergent messages (retrieve/backfill/stage6/repair) — drift/bloat (C19). FIX (D-2915): new `pipeline/sqlite_vec_loader.py` single home with `load_sqlite_vec() -> SqliteVecLoad{loaded,method,error}`; a ctypes C-API fallback calls `sqlite3_enable_load_extension`+`sqlite3_load_extension` directly on the `_sqlite3` shared lib when the wrapper methods are absent. Wired into retrieve.py, backfill_embeddings.py, stage6_commit.py (S6_VEC_REQUIRE gate preserved). VERIFIED: live `--vector` returns vector hits (method=ctypes, vec_version v0.1.9), no FTS fallback. CLOSED for the pipeline trio; repair_vec_integrity.py deferred (already documents its Homebrew interpreter in config/vec_integrity.yaml).
+
+## STATUS 2026-10-10 (final forensic audit pass)
+- BUG-702 IMPLEMENTED: `--practicality` facet in retrieve.py (config-driven from config/practicality.yaml). Verified live.
+- BUG-703 root cause: 190 empty discipline_raw — raw label blanked during canonical projection; backfill source to be located (S2/S3 extraction, since S4 already lost it).
+- Anchor recommendation C OWNER-ACCEPTED (DECISION-LOG D-2917); stable key = source_ids + source_text (NOT source_principle_ids, which are run-derived).
+- NEW (uncounted, flagged not-yet-ID'd): 49% QUARANTINE rate (3231/6591; 3142 "neutral") never audited — see D-2917 F1.
+
+---
+STATUS 2026-10-10 (final forensic audit — CORRECTION + new findings, live-DB evidence):
+- CORRECTION (reverses prior F3): corpus-mission "general-knowledge only" was WRONG. Live DB shows
+  940 books on disk incl. 138 DOMAIN-6 "AI + Computing" mission-relevant books (Hands-On RAG, RAG from
+  First Principles, LLMOps, Knowledge Graphs & LLMs in Action, GraphRAG, AI Agents w/ LangChain+LangGraph+MCP,
+  Designing Multi-Agent Systems, Build an LLM from Scratch, Scaling Search & Retrieval, etc.).
+  These ARE ingested: ~404 v9 rows sourced from them (209 PASS + 195 QUARANTINE). The knowledge is PRESENT.
+- ROOT CAUSE of "only 4 usable" is S4 classification + S5 quarantine, NOT corpus absence:
+  (1) S4 taxonomy scatter: AI/agentic rows split 124→Human&Design, 97→Technical, 77→Method&Business, 46→emerging.
+      Only 24% get Technical. e.g. "Human-ai Synergy in Multi-agent Systems"→human-computer interaction.
+      Full PASS corpus: psychology 337, cognitive science 252, marketing 150 vs software-engineering 71, ML 28, AI 27.
+  (2) S5 quarantine: 195/404 AI rows QUARANTINE (143 neutral + 9 no_evidence + 1 contra). Default status=PASS drops them.
+      Lost principles include: "Agentic System Design for Reliability and Security", "Tool Calling As Agent Extension",
+      "Loop Processing in Rag and Agentic Systems".
+- BUG-704 (NEW): S4 taxonomy scatter — engineering/agentic principles misclassified into Human&Design/Method&Business/emerging.
+- F1 refined: neutral NLI is the largest loss term for engineering content specifically (143/195 AI rows).
+
+---
+STATUS 2026-10-10 (ROOT CAUSE of "only 4" — S5 + S4, live-DB + code evidence):
+- Cause A (S5 quarantine) ROOT CAUSE = S5 "factual" NLI check, NOT S2/S4 hallucination. Evidence:
+  quarantined AI rows have mechanism_quality=1.0 PASS and definition/mechanism FAITHFUL to source_text
+  (e.g. "Tool Calling As Agent Extension" from Hands-On RAG; "Loop Processing in Rag" from Agentic
+  Architectural Patterns). factual check = 5 entailment pairs → "ent 2/5 cont 0/5 max=0.46" → NEUTRAL.
+  DeBERTa-v3 MNLI scores FAITHFUL PARAPHRASES as "neutral" (NLI detects logical entailment, not
+  semantic equivalence). So good engineering principles are dropped because the verifier grades
+  reworded-but-true claims as neutral. FIX: replace NLI-entailment factual check with paraphrase-aware
+  claim-grounding (STS / NLI-neutral-reframe / claim→evidence grounding). S5 config+prompt+verifier only.
+- Cause B (S4 scatter) ROOT CAUSE = taxonomy GRANULARITY, not script/config/fewshot/model. Evidence:
+  discipline_macro_groups.yaml documents (D-2796) inter-rater ceiling FINE=0.581 (62-way, HUMAN-UNREACHABLE),
+  3-way=0.766. Yet stage4_merge.py still emits a SINGLE 62-way discipline (D316 "discipline is ALWAYS
+  singular") and derives macro from it. Engineering content ("Human-ai Synergy in Multi-agent Systems")
+  → "human-computer interaction" because 62-way has no signal to prefer software-engineering. Config
+  ALREADY says "fine 62-way → advisory multi-label, NOT hard gate" but production never flipped it.
+  FIX: emit 3-way macro as PRIMARY gate + faceted (multi-label ranked) discipline; demote 62-way to advisory.
+- Ontological root: single-inheritance ("ONE discipline") is the error — principles are multi-faceted.
+  Fix = faceted/dimensional classification (Ranganathan; SKOS/OWL/SHACL — taxonomy_shacl.ttl already exists).
+- No full pipeline re-engineer needed. Two targeted fixes: S5 verifier + S4 granularity flip.
+
+---
+STATUS 2026-10-10 (D-2920 — answer to "rerun vs post-hoc", D-A/B/C approved):
+- ANSWER: post-hoc two-pass, NOT a full re-run. S0–S2 extraction healthy; only S5 verdict + S4 label are broken.
+- BUG-705 (S5): D-2822/D-2863 (or-entail @ 0.5, precision 0.852) is already coded+configured but is a
+  PRECISION fix only — it does NOT recover paraphrase rows (max entail 0.13–0.46 < 0.5). The RECALL fix
+  (D-B paraphrase-aware grounding: parallel STS/similarity path) is still-pending NEW code. Recoverable
+  neutral rows = 2,258 (ent≥1+cont=0); keep 508 cont>0 + 376 no-signal.
+- BUG-706 (S4): post-hoc re-classify macro directly (Condition C, scripts/discipline_macro_classify.py),
+  fine 62-way → advisory (discipline_macro.py D-2884 already the single home).
+- v9 content types = principle(6,577)+tool_instruction(14) ONLY — no "other 4 content types" to re-run.
+- Menu v9-fresh (rows menu_hash == live composite); BUG-693 resolved.
+
+STATUS 2026-10-11 (D-2921 — four clarifications, live-code + live-DB):
+- Q1 anchors: 7 golden few-shot examples (config/golden/stage4_golden.yaml) are VALID canonical fine
+  disciplines authored under D316 single-inheritance; NOT raw-vs-canonical mislabels. Re-author under D-C.
+- Q2 keywords: per-FB retrieval label (S4 elaboration prompt), fbs.keywords, FTS5-indexed; not in
+  content-type ontology; not contaminated by the discipline/domain defect.
+- Q3 retrieval surface: PT/PI/GE = 0 DB rows (D-2371, never committed/indexed); TI = 14 rows w/ incidental
+  discipline_macro. content_type is not yet a first-class retrieval filter → Stage R gap.
+- Q4: fix pipeline (future) + post-hoc re-verify/re-classify (existing 6,591). No full rerun.
+
+STATUS 2026-10-11 (D-2922 — skill-reference retrieval contract):
+- PT/TI are Layer-2 skill references (FB→PT→PI→Recipe→MCP) keyed by intent (trigger/done_condition/
+  tool_name), NOT discipline. Current surface EMPTY: FTS=(name,def,keywords,jargon), vec=definition only,
+  no content_type facet, PT/PI/GE=0 rows, TI=14 unindexed fields. Root: S2/S4 emit ~0 PT/TI (corpus
+  collapses to principle). Fix order: decision layers → Stage R emit PT/TI in volume → wire content_type
+  facet + per-type key + commit/index → Layer-2 orchestration.
+
+STATUS 2026-10-11 (D-2923 — Layer-2 retrieval contract COMPLETED for all 4 non-principle types):
+- D-2922 covered PT/TI only; D-2923 completes PI + GE. Spec: research/LAYER2_RETRIEVAL_CONTRACT_20261011.md.
+- Single invariant: principle keyed by discipline/domain/depth/status; PT/PI/GE/TI keyed by intent+linkage
+  (PT=trigger, PI=parent_pt_id instance-of, GE=body+status promotion, TI=tool_name+description) — NEVER
+  discipline/domain (D2323 role axis). All keys sourced from content_types.yaml extension_fields.
+- Linkage graph: FB→PT (fb_query_*), PT→PI (parent_pt_id), FB→GE (parent_fb_ids), GE→promoted_to_*, TI→TI (alternatives).
+- NEW GAP flagged: GE `category`/`tags` imply a skill/capability ontology that does NOT exist; 48-discipline
+  taxonomy does NOT cover GE space → candidate D-2924 (define GE category facet) BEFORE Stage R emits GE.
+- Wiring still blocked on rows (PT/PI/GE = 0, TI = 14 unindexed). No code changed this step (decision-layer only).
+
+STATUS 2026-10-11 (D-B implementation — BUG-705 RECALL path, INERT):
+- Added stage5.paraphrase_* config keys (enabled=false → inert), serving_gate `paraphrase` reason
+  (passed=true, negative=false) + `PARAPHRASE` detail rule (no prefix collision), stage5_verify.py
+  D-B path (config constants + D-2858-style guard + `_paraphrase_similarity` pure-Python cosine +
+  deberta_check gate: only flips NEUTRAL→PASS on ent>=1 & contra=0 & STS>=threshold), and
+  scripts/paraphrase_calibrate.py (threshold sweep, ship bar precision 0.85, --apply mints stamp).
+- VERIFIED: py syntax OK, YAML OK, module imports with enabled=false (guard inert), end-to-end
+  derive_status('PARAPHRASE…') = (PASS, paraphrase), D274a invariant HOLDS, NEUTRAL detail → neutral
+  (no collision). No behavior change while enabled=false.
+- R5 REVIEW: gemma-4-E4B APPROVE (5/5 PASS: correctness/flip-only-NEUTRAL, fail-closed guard, cosine
+  math, spec drift, gap scan). Diff is inert (enabled=false) and safe in-tree.
+- NEXT (unblocked): seed gold set from 2,258 recoverable neutral rows + PASS/contra control →
+  paraphrase_calibrate.py mints threshold (NEW decision id, not D-2924) → flip enabled=true →
+  re-verify 6,591 → D274a serving rail.
+
+STATUS 2026-10-11 (golden-vs-anchor classification ANSWER + golden macro re-author, live evidence):
+- ANSWER to "are the S4 golden/anchor labels wrongly classified (raw + canonical)?":
+  GOLDEN few-shot (config/golden/stage4_golden.yaml, 7 examples) is NOT wrongly classified — all 7
+  disciplines + domains are valid v9 canonicals (closed_menu_v9.json), disjoint (D2422), no 'emerging',
+  none hit by reclass_v9.py MOVES (visual semiotics→semiotics / information retrieval→information
+  science / computational theory→emerging), and all collapse cleanly to a 3-way macro.
+  ANCHOR (eval referee) IS stale for v9 — already OPEN as BUG-698 (22 off-menu rows: 7 removed-
+  discipline + 7 abstained-empty '' + 8 noise_drop) and BUG-701 (bridge joins 193/208 to t11@v5.1 rows
+  the live store no longer serves). Both anchors FAIL BUG-650 fail-closed: rederived_v8 is stamped v8
+  (menu_hash 8218d6db…) ≠ live v9 (composite_hash_live be3235433e…); DOMAIN_RULER_FROZEN_20261008.json
+  carries NO menu stamp. stage4.discipline_anchor_path currently points at DOMAIN_RULER_FROZEN (an
+  un-stamped DOMAIN ruler) — a mis-pointing to be reverted after BUG-698 lands.
+- GOLDEN re-author DONE (D-2884a/BUG-622 contract): added discipline_macro to all 7 examples
+  (Technical×2, Human & Design×2, Method & Business×3 — full 3-bucket coverage) + new contract test
+  test_s4_golden_discipline_macro (macro present, in 3-way set, == deterministic macro_for collapse).
+  VERIFIED: 6/6 tests pass. This closes the golden contract-coverage gap; it does NOT touch the anchor.
+- BLOCKERS (runtime/owner-gated): BUG-698 LLM re-derive chain needs OMLX (DOWN at audit time);
+  BUG-706 macro gate needs a v9-stamped referee (downstream of BUG-698); BUG-701 needs BUG-700 stable
+  identity. Unblocked now: BUG-705 D-B gold-set labeling (Ollama UP for bge-m3 embeddings).
+
+## STATUS 2026-10-11 (forensic audit — RUNTIME CORRECTION + BUG-705-threshold, live evidence):
+- RUNTIME CORRECTION: OMLX is UP on port 11435 (not down). Live /health = healthy, engine_pool
+  loaded_count=2, models present: gemma-4-E4B-it-MLX-4bit, Qwen3-Coder-30B-A3B-Instruct-MLX-4bit,
+  Qwen3.8-27B-MLX-4bit, Phi-4-mini-instruct-8bit, gpt-oss-20b. The prior "OMLX DOWN at audit time"
+  was checking WRONG ports (8000/8080); OMLX is config-pinned to 11435. This UNBLOCKS BUG-698
+  (anchor re-derive) and BUG-706 (macro gate), and the R5 gemma review path.
+- BUG-705-threshold (NEW, blocking defect in the D-B RECALL path, now FIXED): the paraphrase gate
+  counted `_n_entail = sum(entail >= S5_NLI_PASS_THRESHOLD=0.5)`, but the ENTIRE target population
+  ("2,258 recoverable neutral", max entail 0.13–0.46) is BELOW 0.5. `_n_entail` was therefore
+  always 0 and the path could never flip a row — a SILENT NO-OP (C16 violation). The R5 gemma
+  review approved the original diff but MISSED this (blind spot recorded).
+- FIX (D-2925): new config key stage5.paraphrase_entail_threshold=0.10 (weak-entail pre-filter,
+  matches D-2920's documented "ent>=1" population); stage5_verify.py counts `_n_entail` against it;
+  added an ALWAYS-ON structural guard raising C16 if paraphrase_entail_threshold >= nli_pass_threshold
+  (prevents the no-op bug class from recurring). VERIFIED: imports clean, py_compile OK, guard inert
+  (enabled=false), weak-entail 0.10 < pass 0.50.
+- DB STALENESS (flagged, not a regression): v9 slice (6,591 rows) committed 2026-10-05 under
+  majority/0.10 mode (0 rows carry "OR-entail" detail); config has since flipped to
+  or_entail_and_no_contra @ 0.5 (D-2863). Re-verify under or_entail is the SAME post-hoc pass
+  already planned for BUG-705 — no new work, but the "2,258 recoverable" baseline is majority-mode
+  derived and must be re-derived under or_entail before gold-set seeding.
+- NEXT: (1) BUG-698 anchor re-derive to v9 (now UNBLOCKED, owner GATE-3 approved) →
+      (2) BUG-706 macro gate (needs v9-stamped referee) → (3) BUG-705 re-derive recoverable set
+      under or_entail, seed gold, calibrate (NEW decision id, not D-2924), flip enabled, re-verify
+      6,591, D274a rail. BUG-701 still blocked on BUG-700 stable identity.
+- R5 REVIEW (gemma-4-E4B-it-MLX-4bit, live OMLX): D-2925 threshold fix = CORRECT (one-line:
+  "correctly adjusts the threshold to allow counting relevant examples while maintaining the final
+  gate logic"; residual risk low). Generator=goose ≠ verifier=gemma, R5 satisfied.
+
+## STATUS 2026-10-11 (owner approvals D-2924/D-2884(a)/D-2923 + D-2924 implementation):
+- OWNER APPROVALS (unblocks): D-2924 (GE capability ontology), D-2884(a) (3-way macro operative,
+  62-way fine advisory), D-2923 (Layer-2 retrieval contract PT/PI/GE/TI intent+linkage keyed).
+- IMPLEMENTED D-2924: config/growth_edge_ontology.yaml + pipeline/growth_edge_ontology.py
+  (fail-closed closed vocabulary) + tests/test_growth_edge_ontology.py (4/4). Gate ADVISORY until
+  config/golden/ge_category_gold.yaml is minted + calibration_decision stamped.
+- GOVERNANCE SYNC: decisions.yaml was stale (stopped at D-2916; DECISION-LOG had D-2917..D-2925).
+  Appended D-2917..D-2925 (9 entries) to decisions.yaml; YAML re-validated (1053 decisions, no dupes).
+- FORENSIC: BUG-698 rederive chain --selftest passes (stamp/adjudication-fail-closed/manifest/
+  BUG-650-guard/noise-preservation). --generate is LLM-only (owner adjudication is the NEXT step,
+  human gate). script prose says "menu v6" but render_menu_v6() actually renders v9 (version.yaml
+  pointer) — vestigial label, no drift.
+- NEXT (unblocked): (1) BUG-698 --generate -> owner adjudicate -> --adjudicate -> --verify ->
+  --finalize (mints v9-stamped anchor); (2) BUG-706 macro gate on the v9 referee; (3) BUG-705
+  re-derive recoverable neutral under or_entail -> seed gold -> paraphrase_calibrate (NEW decision
+  id) -> flip enabled -> re-verify 6,591 -> D274a rail; (4) Stage R emit PT/PI/GE/TI in volume
+  (now gate-able via D-2924); (5) D-2923 retrieval wiring (content_type facet + per-type keys).
+
+## STATUS 2026-10-11 (forensic audit + R5 drift-audit — BUG-698 at owner gate, over-abstention found):
+- FORENSIC AUDIT: governance/FORENSIC_AUDIT_20261011.md (F1..F7). Runtime OMLX UP (11435, 8 models),
+  Ollama UP (11434). decisions.yaml synced 1053 (D-2917..D-2925 present, no dupes).
+- BUG-698 --generate COMPLETE + clean: 194 rows, 194 unique ids, 0 missing fields, 0 off-menu
+  discipline (47 distinct) / 0 off-menu domain, 163 sources. Candidate worklist adjudication-ready.
+- R5 DRIFT-AUDIT (gemma-4-E4B-it-MLX-4bit, verifier≠generator, temp=0): 14-row sample. Assigned labels
+  8/8 OK (no slope). BUT over-abstention to "emerging": 5/6 flagged — R059→entrepreneurship studies,
+  R061→organizational theory, R127→design thinking (all on-menu, fit missed); R051→urban planning and
+  R067→interactive media are MENU GAPS (no v9 architecture/installation-media discipline). R144 emerging
+  is correct. Owner must resolve at adjudication (never auto-decided, D-2839 c2).
+- BLINDSPOT (F5): BUG-705 gold seeding is NLI-structure-derived (recoverable-neutral→paraphrase_true) —
+  a mild circularity; requires an independent human/LLM-labelled SAMPLE (~40-60 rows) judged on the
+  definition↔evidence relationship, not NLI scores. Flag, don't block.
+- HYGIENE (F6): uncommitted git deletions of superseded v6/d2767_ab governance artifacts — C19 says
+  archive not delete; verify before next commit.
+- NEXT (strategic order, see F7): (1) [OWNER] BUG-698 adjudicate → --verify → --finalize;
+  (2) [blocked on 1] BUG-706 macro gate + anchor re-point; (3) [unblocked] BUG-705 re-derive+calibrate;
+  (4) [unblocked] D-2924 GE gold+enforce; (5) Stage R PT/PI/GE/TI; (6) D-2923 retrieval wiring;
+  (7) [blocked on BUG-700] BUG-701; (8) tail: SHACL gate, mission_relevance, BUG-703 backfill.
+
+
+## STATUS 2026-10-11 (BUG-698 middle-ground RESOLVED — baseline-preserving migration, circle broken):
+- ROOT CAUSE CONFIRMED: rederive_anchor_axes_v6.py --generate re-classifies all 194 rows from
+  scratch using ONLY FB text + menu, ignoring config/owner_domain_rulings_20261008.yaml. Every run
+  reinvents labels -> circular re-review. The generator ALSO got the 4 deterministic renames WRONG
+  (R011->artificial intelligence, R060->design psychology, R103->cognitive science; only R134
+  correct) — proving its discipline axis is untrustworthy even on forced rows.
+- MENU DELTA (verified v8->v9 from taxonomy files): disciplines removed computational theory /
+  information retrieval / visual semiotics; added creative writing / museum studies (assigned to
+  ZERO rows by the generator -> no migration opportunity materialised). DOMAINS: 41->41, 0 removed,
+  0 added. => NO domain change is menu-justified; the generator's 148 domain changes are all noise.
+- DEFINITIVE MIGRATION = 7 discipline rows ONLY: 4 deterministic (R011/R134 information retrieval->
+  information science; R060/R103 visual semiotics->semiotics) + 3 owner-decide (R032 Heckel->software
+  engineering proposal; R113 TSP->operations research proposal; R053 Goedel->ABSTAIN, menu gap).
+- MENU COVERAGE GAP (NEW): v9 removed computational theory with NO mathematics/logic/computer-science
+  replacement. Theoretical-computation content (R053 Goedel) has no on-menu home -> abstain (''), alt
+  philosophy. Log for taxonomy follow-up (not paper over).
+- GENERATOR DELTAS DISCARDED (164 total, all revert to v8 verbatim): 76 unsolicited-domain-reclass,
+  44 unsolicited-disc+domain, 12 unsolicited-discipline, 20 over-abstention->emerging, 7 abstention-
+  violation (generator promoted owner-declared abstentions R006/R059/R127/R146/R165/R183/R202),
+  5 domain-collapse->research_practice. These are NOT "valid new classifications": the domain menu is
+  unchanged, so there is no vocabulary to legitimately add.
+- ARTIFACTS: governance/BUG698_migration_delta_20261011.csv (7 rows) +
+  governance/BUG698_discarded_generator_delta_20261011.csv (164 rows, categorized) +
+  config/owner_decisions_v9_keep_verbatim_20261011.json (194 rows: 187 verbatim + 4 rename + 3 owner-
+  placeholder; 0 off-menu disciplines; domains kept verbatim). This is the --adjudicate --decisions input.
+- NEXT (unblocked): owner decides R032/R053/R113 (3 rows) -> BUG-698 --adjudicate --decisions
+  config/owner_decisions_v9_keep_verbatim_20261011.json -> --verify -> --finalize (mints v9 anchor) ->
+  re-point stage4.discipline_anchor_path off DOMAIN_RULER_FROZEN_20261008.json.
+
+## STATUS 2026-10-11 (BUG-698 owner-adjudication applied; new findings F8-F11)
+- R032 -> software engineering, R113 -> operations research, R053 -> emerging (owner ruled: raw discipline = 'mathematical logic', same family as removed 'computational theory' -> stay emerging, NOT empty abstain, NOT philosophy).
+- config/owner_decisions_v9_keep_verbatim_20261011.json flattened to the 194-item {item_id:{discipline,domains}} map the --adjudicate harness expects (top-level metadata moved to this log + D-2926).
+- --plan dry-run clean: 194 re-derivable + 8 noise_drop (R012,R026,R034,R082,R140,R180,R182,R200).
+- --adjudicate SUCCEEDED: 194 rows finalized, all on-menu -> governance/rederive_v6_finalized_20261011.json.
+- --verify (second-coder gemma + DeBERTa-NLI) RUNNING in background (PID 50926) — >5 min for 194 rows; log governance/rederive_v6_verify_20261011.log.
+- F8 (NEW): D-2896 surface-fold NOT uniform — pipeline/reclassify_merged_axis.py remap_discipline writes discipline_raw WITHOUT normalize_label (stage4_merge.py applies it, reclassify path does not). Current slice rechunk-v4-20260929 has 63 non-ascii-dash discipline_raw; HCI split human-computer interaction 70 / en-dash 33 / non-breaking-hyphen 18 / Titlecase 1.
+- F9 (NEW): config/normalization_map.yaml has 2 malformed keys ('marketing & communications"', '"leadership"') — trailing/leading quote artifacts.
+- F10 (NEW): organizational theory AND business administration BOTH exist in v9 disciplines with overlapping definitions (business administration subsumes organizational theory scope) — taxonomy redundancy, flag for follow-up.
+- F11 (NEW): --verify is slow (>5 min); consider batching/parallel or a --limit for interactive runs.
+
+## STATUS 2026-10-11 (F8/F9 fixed; raw-unification root-cause + backfill scope quantified)
+- F8 FIXED: pipeline/reclassify_merged_axis.py remap_discipline now applies normalize_label at the write boundary (added normalize_label to schemas import + surface-fold line mirroring stage4_merge.py:2073-2075). Forensic audit: single call site (line 392), single write (line 314), empty->emerging_unmapped preserved, py_compile OK.
+- F9 FIXED: config/normalization_map.yaml malformed keys cleaned — 'marketing & communications"' -> 'marketing & communications', '"leadership"' -> 'leadership'. YAML parses clean (5 domain keys).
+- ROOT-CAUSE of raw-unification slip: unification (D-2896 surface-fold + D2515 post-hoc script scripts/normalize_taxonomy_labels.py) was implemented in 2 places, but a THIRD recurring write path (reclassify_merged_axis.py, added D2532/D2534) mirrored only the canonical-mapping logic and omitted the surface-fold. The invariant lived in copy-paste code-convention, not a single shared write function.
+- BACKFILL SCOPE (scripts/normalize_taxonomy_labels.py --dry-run): 3340 FBs would change = 288 NFKC surface-fold (101 discipline_raw + 292 domains_raw non-ASCII-dash across e2e=3/rechunk-v4=63/t11=35) + 2005 domains-decomposed + 155 disciplines re-resolved. Surface-fold (288) is safe/mechanical; re-resolve (2160) is a SEMANTIC canonical change to gate AFTER BUG-698 --finalize (anchor is built from current label state).
+- BUG-703 (190 empty discipline_raw, all rechunk-v4) NOT covered by normalize_taxonomy_labels.py (empty stays empty) — needs separate anchor-family backfill, folded into BUG-698 abstained population.
+
+## STATUS 2026-10-11 (--finalize minted v9 anchor; F12 second-coder drift; F13 raw-fold blindspot fixed + 1838 folded)
+- BUG-698 --finalize DONE: minted governance/discipline_anchor_rederived_v9_20261011.json (202 rows = 194 owner_finalized + 8 noise_drop; menu_hash be323543…/answer_space e11ac764… = live pins; taxonomy v9). assert_referee_menu_current (BUG-650) PASSED. NOT RATIFIED: re-point stage4.discipline_anchor_path stays GATED on D-2839 owner sign-off + A/B kappa (mint != ratify).
+- F12 (NEW): second-coder gemma-4-E4B-it disagrees with owner on 97/194 (50%) but the signal is a COARSE-BUCKET COLLAPSE, not owner-label error — top confusion pairs are all "X → cognitive science" (behavioral economics ×4/×4, visual perception ×3, operations research ×3, psychology ×3, information science/software engineering/generative ai/HCI/communication theory ×2 each…) plus "X → business administration" (risk management, organizational theory ×2). DeBERTa-NLI (the fail-closed verifier) flags only 4/194 contra-dominant (R014 philosophy, R090 media studies, R103 semiotics, R147 research methodology) = 2%. CONCLUSION: gemma is a WEAK second-coder for the fine-grained 48/62-way discipline axis (dumps into broad buckets); DeBERTa-NLI is the real fail-closed signal. Surface the 4 contra-dominant rows to owner pre-ratification; do NOT treat 50% gemma-disagree as a re-adjudication trigger (D-2839 c3: never auto-flip).
+- F13 (NEW, FIXED): normalize_taxonomy_labels.py change-detection compared ONLY canonical fields (domains/discipline), so raw-only surface-folds (domains_raw/discipline_raw case/dash/NFKC) were silently skipped. Direct DB count = **1838** rows with raw-fold diffs (390 dash-fold + 1448 case-fold), NOT the "288" earlier reported (that was the nfkc_edits counter, which only counted rows ALREADY in a semantic change). FIXED: added domains_raw_changed/discipline_raw_changed to the change condition + a --surface-only flag (D-2896 fold only; skips the GATED emerging->canonical re-resolve). R5 gemma APPROVE (3/3 PASS). APPLIED --surface-only: 1838 FBs folded, backup maxwell.db.bak_20261011_155235, idempotent (re-run 0, 0 unfolded).
+- T2 REVISED SCOPE: --surface-only now = 1838 (was mis-reported 288); full (GATED) = 4890 (adds 2005 domains-decomposed + 155 disciplines re-resolved). The 2160 semantic re-resolve stays gated after anchor RATIFICATION.
+
+
+## STATUS 2026-10-11 16:02 (T1 ratified; T8 kappa launched; T5 re-scoped; T3 refined)
+- T1 RATIFIED: config/pipeline_config.yaml stage4.discipline_anchor_path re-pointed DOMAIN_RULER_FROZEN_20261008.json -> discipline_anchor_rederived_v9_20261011.json (owner-approved 2026-10-11; timestamped backup taken; verified at line 409 this turn). D-2839 re-point limb now executed.
+- T8 (macro kappa, 3-way Condition C vs human-parity floor 0.73): launched `scripts/discipline_macro_classify.py --gate --anchor governance/discipline_anchor_rederived_v9_20261011.json` (PID 54488). STALLED ~13 min — OMLX `loaded_count` stuck at 2, `current_model_memory` stuck 19.9 GB, gpt-oss-20b-MXFP4-Q8 classifier NOT loading (final_ceiling 42 GB; 19.9+~20=40 GB is tight). Dry-run already gave gold buckets (N=202: Human & Design 97 / Method & Business 60 / Technical 29 / emerging 16). Macro ship stays owner-gated (discipline_macro_enabled=false, decider_mode advisory). ACTION: diagnose OMLX memory-guard/model-load before retry.
+- T5 RE-SCOPED (forensic correction): the prior "repoint taxonomy_v5.yaml -> taxonomy_v9.yaml" plan is WRONG. scripts/apply_taxonomy_v9.py (L10/L30/L79: `LIVE = config/taxonomy_v5.yaml`) confirms taxonomy_v5.yaml is the LIVE source filename BY CONVENTION (build_v9 writes the v9 snapshot; apply_v9 promotes v9 -> v5). Repointing readers to taxonomy_v9.yaml would freeze them on the v9 snapshot and DIVERGE at the next version bump. taxonomy_v5.yaml is NOT stale — it is the live file carrying v9 content (byte-identical to the v9 snapshot by design). Correct: (a) document the convention now, or (b) version-neutral rename config/taxonomy.yaml (C27 zero-future-tax; touches D-2865/D-2897 build+apply pipeline = owner-gated). NO repoint executed.
+- T3 / BUG-703 refined: the 190 empty-discipline_raw rows are all pipeline_run_id='rechunk-v4-20260929', discipline='emerging', discipline_source='llm_extracted_from_source', classification_status='CLEAN', with domains_raw POPULATED (0 empty). Consistent with the buglog root-cause "S4 merge blanked raw during canonical projection" — raw existed at S4, dropped when discipline canonicalized to 'emerging'. Correct fix = RECOVER raw from the S4 checkpoint (NOT fabricate — fabrication violates D-2896 raw-invariance). NEXT: locate the rechunk-v4 S4 checkpoint artifact and confirm raw discipline presence.
+- Governance sync: scripts/bug_status.py re-run (OPEN 162 / CLOSED 301 of 463).
+
+## STATUS 2026-10-11 16:31 (T3-ii facet fallback landed; T5/T7 owner-gated)
+- T3 / BUG-703 (owner-approved option ii) LANDED: pipeline/retrieve.py discipline_raw facet now falls back to canonical discipline when raw is empty — SQL `COALESCE(NULLIF(TRIM(discipline_raw),''), discipline)` + in-memory filter `fb.get("discipline_raw") or fb.get("discipline")`. Verified on live DB: `--discipline-raw emerging` matches 190 (was 0 strict). No data mutation — the 190 discipline_raw cells stay empty (honest provenance); only the SERVING facet relaxes.
+
+
+## STATUS 2026-10-11 16:52 (T5 rename executed: taxonomy_v5.yaml -> taxonomy.yaml)
+- T5 (owner-approved option b) EXECUTED: git mv config/taxonomy_v5.yaml -> config/taxonomy.yaml (version-neutral; supersedes D2513 'v5 = major-version marker' convention that had already drifted — content v9, name frozen v5). 78 live files updated (pipeline/scripts/tools/tests + active config pointers anchor_family/eval_integrity/menu_routing + session_seed + prompts + KNOWLEDGE-PIPELINE-ARCHITECTURE). scripts/apply_taxonomy_v9.py + v8 LIVE constant -> config/taxonomy.yaml (next promotion no longer recreates v5). VERIFIED: py_compile OK; smoke-load taxonomy v9 (63 disc/41 dom); 0 residual source refs (excl decisions.yaml history + purged __pycache__). Decision D-2927.
+- HISTORY PRESERVED: DECISION-LOG.md / MASTER-TASK-REGISTER.md / governance forensic+handoff docs / prior decisions.yaml entries intentionally NOT rewritten (record the filename as it was at the time). config/decisions.yaml `files:` lists remain historical; superseded by D-2927.
+- NEXT (unblocked): T7 definition re-scope (org theory vs business admin) + re-render/re-pin/re-stamp/bump v9.1; T8 OMLX-stall diagnosis + macro kappa retry; T4 2160-row re-resolve (gated after anchor ratification).
+
+## STATUS 2026-10-11 17:03 (T7 executed provenance-safe; T8 macro kappa FAIL-CLOSED)
+- T7 (owner-approved) EXECUTED: re-scoped organizational theory (disc-012) = descriptive/explanatory (object = organization) + business administration (disc-062) = prescriptive/normative (object = managerial function). definition: fields only; raw/exclude/id/differentia/group untouched. Minted config/closed_menu_v10.json (+.sha256) per I2. Repointed version.yaml#closed_menu + menu_axis_groups.yaml#source -> v10; ran scripts/menu_axis_hashes.py (--check in sync). composite_hash_live be323543... -> cc800a32...; answer_space_hash UNCHANGED e11ac764...
+- PROVENANCE CORRECTION (forensic): did NOT mutate the frozen v9 anchor. Its menu_hash=be323543/taxonomy_version=v9 are immutable provenance (I2/D-2896 raw-invariance); the prior plan's 'update anchor provenance menu_hash/taxonomy_version' step would have falsified history. BUG-650 assert_referee_menu_current STILL PASSES via answer_space_hash e11ac764 (live_hits=[e11ac764], frozen_hits=[]). taxonomy_version stays v9 (63/41 slots unchanged); only the menu REVISION advanced. Decision D-2928.
+- T8 (macro kappa) COMPLETED (stall resolved on its own): gpt-oss-20b-MXFP4-Q8 3-way kappa 0.5684 < 0.73 floor -> FAIL-CLOSED. emerging F1=0.111 (R=0.0625, 1/16), Technical F1=0.610. discipline_macro_enabled stays false; the 3-way macro does NOT prove human parity -> not yet a trustworthy guardrail. Owner-gated next options (improve / emerging-abstention-split / lower advisory floor / abandon macro). Decision D-2929.
+
+## STATUS 2026-10-11 17:25 (D-2929 RESOLVED: macro 3-way classifier RETIRED — deterministic derived facet, not a predicted axis)
+- FORENSIC PROOF the 3-way macro can never hit 0.73: (1) gold macro = to_macro(anchor.discipline) BY CONSTRUCTION (deterministic collapse of the owner fine label; there is NO independent macro ground truth); (2) the 16 'emerging' gold rows are NOT a class — 8 owner-adjudicated discipline='emerging' (R006/R053/R059/R127/R146/R165/R183/R202) + 8 noise_drop discipline=None (R012/R026/R034/R082/R140/R180/R182/R200) = abstention + garbage; (3) Condition A (collapse of committed fine classifier) 0.553 ≈ Condition C (independent 3-way) 0.5684 ≈ fine ceiling 0.581/0.728 (D-2796) -> macro adds ZERO signal over collapsing the fine output.
+- RESOLUTION (option d+b): RETIRE Condition C + its kappa gate. Macro stays a DETERMINISTIC DERIVED advisory facet (pipeline/discipline_macro.to_macro, already persisted in stage6 fbs.discipline_macro; zero inference, zero gate). 'emerging' routing is ALREADY handled by D-2898 (match_to_canonical + owner gate), never a predicted class. Closes the BUG-622 classifier-engineering loop per ratified D-2792/D-2793 ('STOP classifier engineering'). discipline_macro_enabled false PERMANENTLY; discipline_macro_kappa_floor 0.73 = measurement-only reference on the retired instrument.
+- Files: config/decisions.yaml (D-2929 OPEN->RESOLVED), config/pipeline_config.yaml (comment), scripts/discipline_macro_classify.py (RETIRED banner). No data mutation, no pipeline logic change.
+
+## STATUS 2026-10-11 17:36 (D-2930/D-2931 scaffolds landed; T9/T10 calibration instruments ready, gold sets pending)
+- T9 paraphrase-gold scaffold (D-2930 OPEN): built scripts/t9_paraphrase_gold_scaffold.py — deterministic, seeded, provenance-safe extraction of the canonical-run (rechunk-v4-20260929) NEUTRAL population into governance/t9_paraphrase_gold_draft.jsonl (50 rows: 30 recoverable + 10 ent0 + 10 contra controls; label='TBD' NEVER guessed). VERIFIED CENSUS (corrected precedence bug): 3142 neutral = 2258 recoverable (ent>=1,cont=0) + 376 ent0 (ent=0,cont=0) + 508 contra (cont>0, includes the 54 ent=0 AND cont>0 rows). Stratified proportional-to-discipline_macro, min 1 per non-empty bucket. KNOWN LIMITATION (documented, not silent): production _paraphrase_similarity = MAX STS over ≤8 passages vs calibrate single-string cosine => calibrated threshold is a LOWER BOUND (conservative/fail-closed). NEXT (unblocked, delegated): label 50 rows {paraphrase_true|non_paraphrase} with gemma-4-E4B proxy (R5 generator!=verifier), then scripts/paraphrase_calibrate.py --gold <labelled> --decision D-XXXX before any paraphrase_path_enabled flip.
+- T10 GE category calibration script (D-2931 OPEN): built scripts/ge_category_calibrate.py — Cohen's kappa + per-class F1 over the 4 REAL category values (open_tension/unverified_correlation/contested_claim/capability_gap), emerging EXCLUDED from kappa denominator (D-2929 lesson enforced at instrument level). FAIL-CLOSED (<20 rows / gold missing / kappa < 0.65 floor). FIXED self-test F1 bug (emerging-predicted FNs now counted): synthetic gold kappa 0.7895, per-class F1 0.9091. BLOCKED on config/golden/ge_category_gold.yaml (no GE rows exist yet; Stage R does not emit GE until gate met). NEXT: mint blind stratified GE gold once Stage R produces candidates.
+- Governance census re-synced: config/decisions_summary.json = 1059 decisions, open 32, stamp f720b699867adfd4, source_sha256 dbd615ad6917a57b (recompute_decision_summary.py). No production path flipped; no data mutated.
+
+## STATUS 2026-10-11 18:02 (T9 paraphrase recall path MEASURED — FAILS ship bar; recommend retire per D-2929 pattern)
+- T9 gold LABELLED (unblocked delegation executed): scripts/t9_paraphrase_label.py drove gemma-4-E4B-it-MLX-4bit (different family, R5, temp=0.0) over the 50-row draft -> governance/t9_paraphrase_gold_labelled.jsonl. 50/50 labelled, 0 fail-closed. Distribution 31 paraphrase_true / 19 non_paraphrase.
+- INSTRUMENT MISMATCH FOUND + FIXED: paraphrase_calibrate.py computed SINGLE-STRING cosine against joined evidence while production _paraphrase_similarity takes MAX STS over up to 8 clean passages. Single-string deflated recall catastrophically (P=1.0 R=0.032 @0.86). FIXED: calibrator now reuses production stage5._paraphrase_similarity directly (zero drift). scripts/paraphrase_calibrate.py edited + py_compile OK.
+- RE-MEASURED (fixed instrument): STILL FAILS ship bar. At P>=0.85 best R=0.065 (2/31 @0.85); at useful recall R=0.968@0.53 P=0.612 only. NO ship-eligible operating point.
+- FORENSIC ROOT-CAUSE: (1) bge-m3 STS cosine NOT discriminative — recoverable true-mean 0.734 vs false-mean 0.686 (Delta=0.048); ent0/contra control buckets INVERTED (false-mean > true-mean). (2) Gold labels UNRELIABLE — gemma-4-E4B conflates topical relatedness with paraphrase/support: 5/10 ent0 (zero entailment) + 6/10 contra (contradiction present) labelled paraphrase_true, incl. figure-caption garbage (e.g. 'FIGURE 88 tertiary structure' judged paraphrase of 'method for predicting 3D protein folding'). (3) Residual mismatch: scaffold evidence_passages includes garbage passages production _clean_eps excludes via _is_garbage_passage.
+- CONCLUSION: paraphrase_path_enabled stays FALSE; paraphrase_calibration stamp NOT minted (calibrator correctly refuses without --apply). RECOMMEND RETIRE the paraphrase RECALL gate (D-2929 pattern) — bge-m3 STS measures semantic relatedness, not paraphrase/entailment, so it is the WRONG primitive to override the stronger DeBERTa entailment signal; the correct lever for faithful-reworded NEUTRAL recall is NLI entailment calibration (D-2822). Decision D-2932 OPEN.
+
+## STATUS 2026-10-11 18:40 (D-2932 RETIRED — owner approved; forensic: the REAL fix is already landed but never re-run)
+- D-2932 RESOLVED (owner approved). Paraphrase RECALL gate retired: bge-m3 STS = semantic relatedness, NOT paraphrase/entailment → wrong primitive to override DeBERTa. paraphrase_path_enabled stays FALSE PERMANENTLY (config banner added).
+- DECISIVE FORENSIC FINDING: the correct lever is ALREADY RATIFIED but NEVER RE-RUN. config/pipeline_config.yaml already carries nli_aggregation=or_entail_and_no_contra, threshold=0.5, decision=D-2863 (RATIFIED), and the D-2858 fail-closed guard imports clean. BUT the canonical DB run rechunk-v4-20260929 (6591 FBs, committed 2026-10-05) was verified under the OLD majority rule at threshold 0.1 — proven 3 ways: (1) verifier_model='...DeBERTa... (threshold 0.1)' on ALL 14,574 rows; (2) S5 log 'Threshold: 0.1 ... ENTAIL ≥ 0.1 → PASS'; (3) 0 rows carry 'OR-entail' detail string, 8,533 carry 'majority' format. D-2822 (RATIFIED) explicitly instructs "re-run S5 on rechunk-v4-20260929 once S4 is final at 6,591" — and S4 IS final (expected_count sidecar = 6591). The 2,258 'recoverable' NEUTRAL rows (ent≥1,cont=0) are the direct artifact of the old majority rule burying supported claims — the root cause of '130+ books → only 4 principles recalled'. NEXT: re-run S5+S6 on rechunk-v4-20260929 under the ratified or-entail + threshold 0.5 (backup first, C13).
+
+## STATUS 2026-10-11 19:45 (S5 or-entail re-run COMPLETE — +1143 PASS recovered; pre-s6 gate PASSED; C12 calibration-string drift FIXED)
+- S5 re-run (pid 59766) COMPLETED clean. Header confirms `Threshold: 0.5`, `ENTAIL ≥ 0.5 → PASS`, aggregation `or_entail_and_no_contra` (D-2822). D-2485 fingerprint guard correctly hard-discarded the old majority@0.1 checkpoint and re-verified all 6,591 FBs.
+- RESULT: **PASS 4503 / QUARANTINE 2088** (old majority@0.1: PASS 3360 / QUARANTINE 3231). fb_id-aligned transition matrix: QUARANTINE→PASS **1695 recovered**; PASS→PASS 2808 stable; PASS→QUARANTINE 552 demoted; QUARANTINE→QUARANTINE 1536 stable. Net **+1143 PASS**.
+- QUARANTINE breakdown (2088): 783 contra, 1255 neutral, 29 non-evidence, 20 mechanism-reject (D-2298 min-length/tautology), 1 BUG-181#1 contamination.
+- WHY 1695 recovered (not the 2,258 'recoverable at 0.1'): the 2,258 count was `ent≥1,cont=0` under the OLD 0.1 bar; the ratified 0.5 precision-favoring bar (D-2863, P=0.852) recovers only the subset whose max-entail clears 0.5. The 552 demotions are the deliberate precision trade — the old majority@0.1 passed at P=0.647 (~35% false-positive), the new rule at P=0.852 purges those marginal/contra rows. NET EFFECT on correct claims: old 3360×0.647≈2174 correct vs new 4503×0.852≈3836 correct → ~76% more correctly-verified claims. This is the direct fix for '130+ books → only 4 principles recalled'.
+- PRE-S6 GATE PASSED (scripts/pre_s6_gate.py, deterministic): record count 6591 == expected 6591; fb_id unique 6591/6591; BUG-181#1 contamination gate 1 severe → QUARANTINE; tally matches. Checkpoint is SAFE to commit.
+- C12 FORENSIC FIND + FIX: stage5_verify.py line 1139 hardcoded `(Calibrated: P=0.647 R=0.386 F1=0.484)` — the STALE D-2298 majority@0.10 metrics — printed next to the now-correct threshold 0.5 (provenance mismatch / C12 hardcode). FIXED: added `precision: 0.852`, `recall: 0.414` to config stage5.nli_calibration (D-2863 values); line 1139 now reads P/R from config and derives F1 (0.557); module docstring + deberta_check docstring updated to cite D-2863 or-entail@0.5 (supersedes D-2298). py_compile OK, YAML loads OK, D-2858 guard import clean. Logic UNCHANGED — cosmetic/provenance only, checkpoint results still valid for S6.
+- D-2485 note: this post-hoc cosmetic fix changes s5_code_sha256, so a FUTURE S5 run would re-verify (harmless). The just-written checkpoint (produced by pre-fix SHA f0e133...) remains valid — verification LOGIC is byte-identical.
+- NEXT (OWNER-GATED): run `just stage6` (stage6_commit.py, INSERT OR REPLACE by fb_id) to commit the re-verified or-entail results to the live DB. Awaiting owner approval — DB mutation is irreversible (C13 backup already taken at maxwell.db.bak_20261011_184434).
+
+## STATUS 2026-10-11 20:15 (S6 COMMIT ATTEMPT ABORTED SAFELY — 2 CRITICAL BUGS FOUND+FIXED (BUG-707/708); S6 BLOCKED BY THE D-2899 STALE-LABEL SPLIT (BUG-709); DB BYTE-IDENTICAL)
+- OWNER APPROVED S6. Pre-flight audit was CLEAR 3 ways: C13 backup fresh (maxwell.db.bak_20261011_200420); scripts/pre_s6_gate.py PASS (6,591 count / fb_id unique / BUG-181#1 contamination gate); fb_id alignment S5-checkpoint <-> DB canonical run is 1:1 (6,591 <-> 6,591; 0 rows added, 0 orphans) so INSERT OR REPLACE would be a pure in-place update. OUTCOME: **S6 CANNOT COMMIT YET — HELD. DB byte-identical: 14,574 rows; canonical 3,360 PASS / 3,231 QUARANTINE; 0 'OR-entail' rows; integrity ok.**
+
+- **BUG-707 (CRITICAL — FIXED) — the stage6 INSERT arity broke 100% of commits.** 'INSERT OR REPLACE INTO fbs' listed 77 columns but its VALUES clause had only 76 '?' placeholders (args tuple 77, correctly ordered) -> SQLite rejected EVERY row with '76 values for 77 columns' -> 0/6,591 inserted, 6,591/6,591 FAILED. The first attempt was fail-closed (0 rows written) so NO partial write occurred. GIT-VERIFIED HISTORY: every commit through cba0127 was arity-clean (76/76/76); commit **d149809** ('gov: widen session plan may_touch ... BUG-695/D-2908 recalibration evidence receipts') added 'practicality' to the COLUMN list AND to the ARGS tuple but never added its '?' -> 77 columns / 76 placeholders. That is a 'gov:' commit touching pipeline/** that the D-2801/BUG-528 edit-gate did not stop, so the S6 commit path has been 100% broken, silently, since 2026-10-10 15:20. FIX: restored the missing placeholder on its own line for 'practicality' (mirrors its own column line + its own arg line) -> arity 77/77/77 with column-lines <-> VALUES-lines aligned 1:1. VERIFIED: ast arity check; py_compile; **dry-run insert against a COPY of maxwell.db** (2 sampled FBs) where every audited column (fb_id, name, practicality, duplicate_of, isor, pipeline_run_id, verifier_model, schema_version) bound to the CORRECT value; repo-wide paren-aware sweep of static INSERT statements across pipeline/ + scripts/ (492 files) -> 0 other mismatches (the 6 initial hits in principle_index.py / taxonomy_manager.py were false positives: literal values such as 0/'canonical' in the VALUES clause). R5: independent review (gemma-4-E4B-it-MLX-4bit, temp 0.0) -> APPROVE.
+
+- **BUG-708 (CRITICAL — FIXED) — the fail-closed tolerance gate ran AFTER the write became durable.** run_stage6() called conn.commit() and only THEN evaluated failed/len(fbs) > S6_MAX_FAILED_RATIO (config value 0.0) -> an over-tolerance batch could be COMMITTED and then reported FAILED, leaving the live store half-migrated (some rows re-verified, some stale) with no record of which. OBSERVED LIVE: the D2620 gate rejected rows mid-loop (first S6 attempt: killed at row ~2,537 of 6,591, having already passed ~5,100 inserts; the earlier attempt had reached row 1,492). FIX: the tolerance gate now DECIDES the commit — over-tolerance -> conn.rollback() (rolled_back=True), else conn.commit(); the D2066 taxonomy post-commit hook (which WRITES taxonomy_counts) is skipped when rolled back; the summary no longer claims a commit; and the stage6 checkpoint records commit_status=ROLLED_BACK / committed_to_sqlite=false for every row (D2325/C16). The FIRST cut of this fix still printed 'Committed to SQLite: 6125 FBs' and would have stamped 6,125 rows INSERTED — caught by the live test, then fixed; the audit record is now truthful. VERIFIED LIVE (two runs): 'ROLLED BACK: 466/6591 rejected (7.1% > max_failed_ratio=0.0) — store UNCHANGED'; DB re-checked after each run (14,574 rows / canonical 3,360-3,231 / 0 OR-entail / integrity ok); checkpoint census {('ROLLED_BACK', False): 6591}. R5: independent review (gemma-4-E4B) -> APPROVE. Residual risk it raised (DDL outside the transaction is not rollbackable) was checked and does NOT materialise: fbs.discipline_macro / practicality / duplicate_of already exist so _migrate_add_column is a no-op.
+
+- **BUG-709 (CRITICAL — OPEN) — the S5 checkpoint's S4-derived ontology labels are STALE; committing them would REGRESS ratified labels.** fb_id-aligned diff, S5 checkpoint vs committed canonical rows: **770/6,591 rows (11.7%) differ.** The DB holds the RATIFIED, REPAIRED state; the checkpoint holds the pre-repair 2026-09-29 S4 state. Only 466 of the 770 are caught LOUDLY by the D2620 discipline<->domain gate: 'research & methodology' (domain, 245), 'social sciences' (dom, 91), 'science & research' (dom, 85), 'visual semiotics' (disc, 44), 'computational theory' (disc, 16), 'information retrieval' (disc, 9). ALL SIX already have OWNER-RATIFIED, deterministic, LLM-FREE targets: -> 'research practice' (D-2853 rename; D-2865 v8 merge of science & research into research practice + v8 demote of social sciences + 12 domain alias re-points); -> 'semiotics' / -> 'emerging' / -> 'information science' (D-2897 owner ruling, applied end-to-end by D-2899: '97 directly-affected rows deterministically re-stamped (44 visual semiotics->semiotics, 9 information retrieval->information science, 16 computational theory->emerging, ...)'). The remaining ~304 diffs would regress **SILENTLY** (no gate fires): ckpt 'research & methodology' -> db 'research practice' (239, +DB-extra-domain), ckpt extra 'emerging' domain -> cleaned in DB (92 + 27), DB-has-EXTRA-domain (34, D-2839 enrichment), ckpt discipline 'emerging' -> db 'marketing'/'business administration' (discipline-changed). ALSO: the current canon is a STAGED-BUT-UNCOMMITTED transition — config/taxonomy.yaml (renamed from taxonomy_v5.yaml), config/closed_menu_v10.json, menu_axis_*.yaml — while config/version.yaml holds taxonomy_version: v9 + closed_menu: config/closed_menu_v10.json (T7 2026-10-11: the definition re-scope moved the composite, not the answer space).
+- ROOT CAUSE (documented, NOT a surprise): **D-2899** — 'CANONICAL RUN REMAINS SPLIT: 6494 rows stale (v5.6) + 97 fresh (v9) — the gate correctly fails-closed; full re-classification (RATIFY-2, v5.6->v9 incl. D-2815) is BLOCKED on D-2884(a)+(b).' D-2884(a) has since LANDED (cba0127, discipline_macro persisted end-to-end; verified 6,591/6,591 canonical rows carry it). This is the SAME defect class as the user's retrieval complaint: 6,494 of 6,591 rows sit on a stale label vocabulary, so canonical-label retrieval cannot resolve them onto their principles — a first-class contributor to '130+ books -> only 4 principles recalled'.
+- WHY S6 IS HELD (decision-grade): committing the S5 checkpoint as-is would (a) be blocked by the gate on 466 rows and (b) silently undo ratified re-stamps on ~304 more, i.e. it would VIOLATE D-2853/D-2865/D-2897/D-2899. The store is the more-correct audited state; the artifact is stale. OWNER-GATED OPTIONS (D-NEW): **V (recommended)** verification-scoped commit — S6 writes ONLY S5-owned provenance columns (status, verification_results, verifier_model, s5_reason, needs_human_review, epistemic_status, isor, borp_score) and never overwrites S4-owned ontology columns: respects stage ownership, cannot regress a ratified label, cannot trip D2620, makes the store strictly better (3,360 -> 4,503 PASS). **S** store-authority reconciliation (prefer the ratified store labels; stamp ontology_source). **A** artifact-first normalization (apply a declared legacy->canonical remap to the artifact, then re-verify) — the full RATIFY-2 path, heaviest.
+- NEXT (in consequential order): (1) owner picks V/S/A for the commit contract; (2) land config/label_normalization.yaml (the 6 declared mappings, each citing its ratifying decision — C12-first, D-2898 LLM-free); (3) complete RATIFY-2 v5.6->v9 label coherence for the canonical run (this is the retrieval-correctness work); (4) D-2884(b) distinct-family decider A/B (still open; unblocks the macro gate); (5) then S6 + post-commit census (assert 4,503 PASS / verifier_model '(threshold 0.5)' / 0 OR-entail rows without threshold 0.5). Governance debt: commit the staged v10 canon or revert it (an uncommitted canon is a drift surface); BUG-563 (9 undeclared dirty worktree paths) still open.
+
+## BUG-707 (CRITICAL — FIXED): stage6 INSERT arity 77 columns / 76 placeholders broke 100% of commits
+pipeline/stage6_commit.py 'INSERT OR REPLACE INTO fbs' declared 77 columns with only 76 '?' in VALUES (args tuple 77, correctly ordered) -> SQLite rejected every row with '76 values for 77 columns' -> 0/6591 inserted. Introduced by commit d149809 (2026-10-10 15:20, a 'gov:' commit) which added 'practicality' to the column list and the args tuple but never added its placeholder; git history proves every commit through cba0127 was arity-clean (76/76/76). Fail-closed on the first attempt (0 rows written, no partial write). FIXED: placeholder restored (arity 77/77/77, column-lines <-> VALUES-lines 1:1). VERIFIED: ast arity check, py_compile, dry-run insert against a COPY of maxwell.db (all audited columns bound correctly), repo-wide paren-aware sweep of static INSERTs over 492 files -> 0 other mismatches. R5 review gemma-4-E4B -> APPROVE. FOUND 2026-10-11 20:00; FIXED 2026-10-11 20:05.
+
+## BUG-708 (CRITICAL — FIXED): fail-closed tolerance gate ran AFTER the commit was durable
+run_stage6() called conn.commit() and only afterwards evaluated failed/len(fbs) > S6_MAX_FAILED_RATIO (0.0) -> an over-tolerance batch could be committed and then reported FAILED, leaving the live store half-migrated (some rows re-verified, some stale) with no record of which. Observed live: D2620 gate rejected 466 rows mid-loop. FIXED: the tolerance gate now decides the commit (over-tolerance -> conn.rollback(), else conn.commit()); the D2066 taxonomy post-commit hook is skipped on rollback; the summary no longer claims a commit; the stage6 checkpoint records commit_status=ROLLED_BACK / committed_to_sqlite=false (the first cut still printed 'Committed to SQLite: 6125 FBs' — caught by live test and fixed). VERIFIED LIVE twice: ROLLED BACK 466/6591 (7.1%), store UNCHANGED (14,574 rows / canonical 3,360-3,231 / integrity ok), checkpoint census {('ROLLED_BACK', False): 6591}. R5 review gemma-4-E4B -> APPROVE. FOUND 2026-10-11 20:06; FIXED 2026-10-11 20:15.
+
+## BUG-709 (CRITICAL — OPEN): S5 checkpoint's S4-derived labels are stale — committing them would silently REGRESS ratified labels
+fb_id-aligned diff of the S5 checkpoint vs the committed canonical rows: 770/6591 (11.7%) differ. The DB holds the ratified repaired state (D-2853 / D-2865 / D-2897 / D-2899 applied); the checkpoint holds the pre-repair 2026-09-29 S4 state. Only 466 are caught loudly by the D2620 gate (research & methodology 245 / social sciences 91 / science & research 85 / visual semiotics 44 / computational theory 16 / information retrieval 9) — all six already have owner-ratified deterministic LLM-free targets (-> research practice; -> semiotics; -> emerging; -> information science). The other ~304 would regress SILENTLY (research & methodology -> research practice 239, ckpt-extra 'emerging' domain 92+27, DB-has-extra-domain 34, discipline 'emerging' -> 'marketing'/'business administration'). Root cause documented in D-2899: 'CANONICAL RUN REMAINS SPLIT: 6494 rows stale (v5.6) + 97 fresh (v9); the gate correctly fails-closed; full re-classification (RATIFY-2, v5.6->v9) is BLOCKED on D-2884(a)+(b)' — (a) has since landed. This is the same defect class as the retrieval complaint: 6,494/6,591 rows sit on a stale label vocabulary so canonical-label retrieval cannot resolve them onto their principles. RESOLUTION IS OWNER-GATED (pick V verification-scoped commit / S store-authority reconciliation / A artifact-first normalization). OPEN 2026-10-11 20:15.
+
+## STATUS 2026-10-11 21:20 (D-2933 RULE V EXECUTED — S6 COMMITTED; canonical run 3360 PASS -> 4503 PASS, S4 ontology provably untouched)
+
+Owner ruled V (verification-scoped commit). Executed end-to-end: config `stage6.commit_scope: verification_scoped`
++ the 10-column S5-owned set + a NEW `update_s5_provenance()` writer. An existing fb_id now receives ONLY the
+S5-owned provenance columns; the S4-owned ontology is never rewritten from the S5 checkpoint. A fb_id absent
+from the store still takes the full INSERT path (no data loss). `full_upsert` restores the legacy behaviour.
+
+FORENSIC AUDIT BEFORE THE WRITE (all read-only): definition drift checkpoint<->store = 0/6591 (fb_id is a
+content hash, so the VERIFIED INPUT is byte-identical across the menu change); status drift = 2247 = 1695 Q->P
++ 552 P->Q exactly; s5_reason 2755; needs_human_review 99; borp_score is ABSENT from the checkpoint and 0.0 in
+the store, so it is excluded from the owned set (writing it would default-inject). Practicality reads only
+config/practicality.yaml; stage5_verify.py touches the taxonomy ONLY in its fingerprint guard, never in the
+verdict — the NLI result is a function of (definition, evidence).
+
+DRY RUN ON A COPY (/tmp/s6_dryrun, real code, isolated DB/checkpoint/parquet): 6591/6591 provenance-updated,
+0 failed, status 3360/3231 -> 4503/2088, definitions changed 0, disciplines changed False. This is what
+surfaced the v5.6-vs-v9 skew blocker (see BUG-713/D-2934) BEFORE any live mutation.
+
+LIVE COMMIT (backup maxwell.db.bak_20261011_210907; pre_s6_gate PASS; exit 0): 0 inserted, 6591
+provenance-updated, 0 failed. POST-COMMIT CENSUS BY COLUMN-BY-COLUMN DIFF vs THE PRE-COMMIT BACKUP:
+  S4-owned columns changed: NONE ([])
+  S5-owned changed: verifier_model 6591, verification_results 6541, s5_reason 2755, status 2247,
+                    epistemic_status 2247, needs_human_review 99
+  status 3360 PASS/3231 QUARANTINE -> 4503 PASS/2088 QUARANTINE; verifier_model '(threshold 0.5)' x6591;
+  0 OR-entail rows lacking threshold 0.5; taxonomy_version v9 x6591 (preserved); discipline_macro
+  preserved exactly (3288/1353/463/1487); rows 14574 -> 14574 (no loss); integrity ok; vec 14574/14574;
+  S6 checkpoint per_fb_status UPDATED x6591, committed_to_sqlite false-as-row-flag.
+BUG-709's regression surface (466 loud at D2620 + ~304 silent) is now STRUCTURALLY IMPOSSIBLE: S6 writes no
+ontology at all. BUG-709 CLOSED (commit-path). The artifact-level staleness it exposed is tracked separately
+by D-2899/RATIFY-2 and BUG-711.
+
+## BUG-709 (CRITICAL — CLOSED): S5 checkpoint's S4-derived labels are stale — committing them would silently REGRESS ratified labels
+CLOSED 2026-10-11 21:20 by D-2933 (rule V). The regression cannot occur by construction: the S6 writer
+touches only S5-owned provenance columns (verified column-by-column against the pre-commit backup: 0 S4-owned
+columns changed). The stale S4 state remains in the artifact and is tracked by BUG-711 (domain cells) and
+D-2899/RATIFY-2 (label-vocabulary coherence). Mitigation chosen INSTEAD of the "A" (artifact-first
+normalization) option because it removes the risk without a full re-verification.
+
+## BUG-710 (CRITICAL — OPEN): the D2511 retrieval gate is INERT — golden set anchored to the superseded run, and the documented fail-loud precondition is missing
+`pipeline/retrieval_benchmark.py` reports 0.000 recall@k / MRR / P@k for all 30 golden queries on all 3 legs
+(fts, vector, hybrid). NOT a retrieval failure: all 30 expected ids resolve UNIQUELY by prefix in the store
+(the harness IS prefix-aware), but every one of them lives in run `t11` — superseded by the RATIFY-1 pointer
+flip to rechunk-v4-20260929 — while the harness evaluates against CANONICAL_RUN. recall is therefore pinned
+to 0.000 regardless of retrieval quality, so the S1/S2/S3 adoption gate (contextual/late-chunk, cross-encoder
+rerank, HyDE) has been BLIND: a regression or an improvement is equally invisible. Secondary defect: the
+harness docstring promises C16 ("a query with a missing expected FB aborts loudly instead of quietly
+reporting 0") but the code has no resolvability precondition. Name-based re-anchoring is impossible (0/30
+golden names exist in rechunk-v4 — rechunking re-extracted different FBs), so the golden set needs SEMANTIC
+re-anchoring plus an owner signature (gold labels are governance artifacts, D-2898 class). OPEN 2026-10-11 21:05.
+
+## BUG-711 (HIGH — OPEN): 173 canonical rows still carry a DISPLACED canonical domain label in the STORE
+`science & research` 85 tokens / `social sciences` 91 tokens over 173 rows. The classification layer is CLEAN
+(config/alias_map.yaml has 0 occurrences of any displaced canonical as key or value after D-2902) and the v9
+re-stamp touched only DISCIPLINE rows (D-2899, 97 rows). Root cause: the canonical run was classified
+2026-09-29 on a menu that still held dom-031/dom-035; D-2865 removed both at v8; D-2866 remapped ANCHORS ONLY
+and explicitly excluded silver. NO store-side step ever re-homed the canonical run's domain cells.
+Repair is staged and NOT applied: scripts/repair_displaced_canonical_domains.py (deterministic, LLM-free,
+dry-run by default) + governance/displaced_domain_repair_triage_20261011.csv (176 cell rows). Disposition
+split: 85 ratified_deterministic (science & research -> research practice, D-2865), 70 per_alias_derived
+(resolved through each row's own domains_raw, D-2902 — NOT a blind rewrite), 21 ratified_fold_owner_triage
+(no alias evidence; the D-2865 fold target needs an owner signature). 152 rows would change. OPEN 2026-10-11.
+
+## BUG-712 (CRITICAL — OPEN): content_type routing collapse — 6 of 8 declared primitives produce ZERO output
+Store census across ALL runs (14,574 FBs): principle 14,560 / tool_instruction 14 / process_template 0 /
+process_instance 0 / growth_edge 0. config/content_types.yaml and closed_menu_v10.json both DECLARE 8 values,
+and the declared Layer-2 chain FB -> PT -> PI -> Recipe therefore cannot fire. Corroboration: the canonical
+run's 374-row quarantine reservoir holds 0 process_template and 50 rows carrying explicit procedure signals
+(step|workflow|procedure|how to|checklist|template|process). This is a CLASSIFIER ROUTING COLLAPSE (99.9% of
+all FBs are principle), not data absence. Consequence for the mission: two of the four knowledge roles the
+product needs are structurally empty, and the retrieval test cannot return a process template or a growth
+edge because none exist. OPEN 2026-10-11 21:05.
+
+## STATUS 2026-10-11 21:40 (RETRIEVAL TRUTH AUDIT — t11 root-caused; instrument fixed; Phase-1 exclusion staged)
+ROOT CAUSE of the 0.000 recall is the INSTRUMENT, not retrieval: all 30 golden ids live in the superseded
+t11 run while serving is pinned to CANONICAL_RUN (D-2881) -> structurally unreturnable (0/30), and 0/30
+golden NAMES exist in the served run either, so mechanical re-anchoring is impossible (owner-signed semantic
+re-anchor required, D-2898). MEASURED SECONDARY DEFECT: scope is enforced by a WHERE clause, not by the
+index — of the vec_fbs top-100, only 19-26 candidates survive run-pin+PASS (53.9% of the index is t11);
+honest A/B k=100 vs k=1000 changed hit@10 17/20 -> 17/20 (latent risk + 4x smaller pool, NOT a proven
+hit@10 loss). MEASURED THIRD DEFECT: 1,695/4,503 (37.6%) served PASS rows carry NLI confidence <0.5 and
+still compete at rank 1-2, because ranking.quality_score_enabled=false makes _rank_sql() = ORDER BY
+borp_score DESC with borp_score ~= 0.0 for every row (a constant ORDER BY). FOURTH: the harness benches
+fts/vector/hybrid-RRF while production is retrieval.method=vector + rerank.enabled=true (D-2724).
+FIXED: pipeline/retrieval_benchmark.py now REFUSES (exit 2) to print recall for unreturnable goldens and
+names run/status/name per id (C16, BUG-710). STAGED (dry-run verified, NOT applied): serving: config block;
+scripts/purge_superseded_runs.py (archive-first, dry-run default, --index-only = reversible half; dry-run:
+7,983 rows = 54.8% of the store, 0 inbound graph refs); scripts/reanchor_retrieval_goldens.py -> 150
+candidate rows + proposed golden YAML for owner signature. Report:
+governance/RETRIEVAL_TRUTH_AND_UTILIZATION_20261011.md
+COUNTING CORRECTION: every earlier DB-wide figure counted the retired run. Served-run truth: 6,591 rows
+(4,503 PASS / 2,088 QUAR); content_type principle 6,577 / tool_instruction 14 / PT 0 / PI 0 / GE 0.
+
+## BUG-710 (CRITICAL — PARTIAL FIX 2026-10-11 21:40: harness fails loud; goldens NOT re-anchored)
+The C16 resolvability precondition is now implemented: _resolvability() classifies every expected id
+(found / run / in_scope / status / measurable) and main() aborts with exit 2 instead of printing 0.000,
+listing each unreturnable golden — live output "measurable goldens: 0/30" (2 of 30 are QUARANTINE even in
+t11). Escape hatches: --allow-unresolvable (diagnostic), --serving-scope all_runs. REMAINING: the 30 goldens
+still need an owner-signed semantic re-anchor; candidates are generated by
+scripts/reanchor_retrieval_goldens.py (150 rows) into governance/golden_reanchor_candidates_20261011.csv.
+Also still open under this id: the harness does not bench the PRODUCTION path (vector+rerank).
+
+## BUG-713 (CRITICAL — OPEN): superseded runs are STILL in the store and STILL in the KNN index
+fbs holds 4 runs: t11 7,855 / rechunk-v4-20260929 6,591 (canonical) / e2e 122 / bug198_reinject 6 — 7,983
+rows (54.8%) are superseded. vec_fbs holds 7,855 t11 vectors (53.9% of the index); fbs_fts indexes all
+14,574. Serving is run-pinned (D-2881) so nothing stale is returned, but (a) every census is inflated 2.2x
+(the "14,574 FB" figure), (b) sqlite-vec computes KNN BEFORE the run filter, so 53.9% of candidate slots are
+dead (measured 19-26/100 survivors). CASCADE AUDIT before any deletion: 0 fb_id collisions t11<->canonical;
+0 inbound refs from served rows in prerequisite_fbs/related_fbs/contradicts_fbs/source_principle_ids; fbs_fts
+is external-content with NO delete trigger (a delete requires an in-transaction 'rebuild'); vec_fbs_ctx is
+EMPTY (the S1 contextual leg is inert); taxonomy_counts + bug_status + parquet need re-derivation.
+BLOCKER on hard deletion: t11 uniquely covers 232 of the 939 corpus files (canonical uniquely covers 33) —
+t11 is a superseded METHOD over a partially reprocessed corpus, so deleting it would silently destroy the
+only committed extraction for ~25% of the corpus. THEREFORE two-phase: Phase 1 = index-only scoping
+(reversible, no row loss) NOW; Phase 2 = archive+delete only after the 232 files are reprocessed. Tool:
+scripts/purge_superseded_runs.py (dry-run verified). OPEN 2026-10-11 21:40.
+
+## BUG-714 (HIGH — OPEN): content_type='tool_instruction' is populated with CODE SNIPPETS, not tool instructions
+All 14 tool_instruction rows in the served run are code/API excerpts lifted from books ("Chat Completions
+Request Pattern", "Flask Methodview Endpoint Pattern", "Redis Stream Task Queue Pattern", "Triangle Depth
+Calculation", "Protein-disease Association Query Pattern"). 3 are PASS and retrievable by all three legs;
+11 are QUARANTINE. The label therefore means "a code excerpt" rather than "an instruction for how an agent
+should use a tool", which is the ONLY primitive that could feed the agent harness — so the harness-facing
+primitive is both mis-scoped and 97% empty, while process_template / process_instance / growth_edge are 0.
+Interacts with BUG-712 (routing collapse) and blocks principle->harness utilization. OPEN 2026-10-11 21:40.
+
+## BUG-712 (CRITICAL — OPEN) — MAGNITUDE CORRECTED 2026-10-11 21:40 (served run, not DB-wide)
+The earlier census (principle 14,560 / tool_instruction 14 across 14,574 FBs) counted the retired t11 run.
+Served-run truth: principle 6,577 / tool_instruction 14 / process_template 0 / process_instance 0 /
+growth_edge 0. The collapse is CONFIRMED, its denominator was wrong: 99.8% of the served corpus is
+principle, and three of the four mission-role primitives are empty. Additional served-run evidence:
+convergent PASS 938/4,503 (20.8%), source_diversity sd1 3,565/4,503 (79.2%).
+
+## BUG-712 (CRITICAL — OPEN) — ROOT CAUSE FOUND 2026-10-11 21:50: the corrected content_type is COMPUTED AND DISCARDED
+Not a classifier-capability gap and not the S2 prompt alone: pipeline/stage4_merge.py:2325 computes the
+D-2747/D-275b-corrected role via _resolve_content_type(fb_data) and uses it ONLY for the applicability axis,
+while line 2352 persists the RAW S2 value: "content_type": (fb_data.get("content_type") or
+DEFAULT_CONTENT_TYPE).strip(). Replaying the deterministic corrector (reroute_content_type, pure regex, no
+LLM per D-343) over the served run's 6,591 rows yields principle 6,490 / GROWTH_EDGE 100 / PROCESS_TEMPLATE 1
+/ quarantine 1 — i.e. 115 rows (1.7%) carry a wrong stored role against the pipeline's own determinstic
+verdict, while the store holds 0 growth_edge and 0 process_template. Contributing (not causal) factor: the
+S2 convergent prompt (stage2_extract.py:414) explicitly instructs "emit principle ... the non-principle roles
+are classified by the SINGLE-SOURCE / singleton paths, not here". FIX (one line, NOT APPLIED): persist
+_resolve_content_type(fb_data). Held back because content_type is S4-OWNED ontology (D-2933 forbids agent
+rewrites of it) and the raw value feeds per-cluster splitting (:1806), the ==DEFAULT_CONTENT_TYPE checks
+(:1486/:1730), applicability derivation and the Layer-2 FB->PT->PI->Recipe chain — applying it without
+revalidating those consumers would be a silent cascade. Route: owner ratification + governed re-stamp or an
+S2->S6 re-run, then re-measure. SEPARATE calibration note: 937 served rows carry procedure vocabulary but
+only 1 satisfies _PROCEDURE_STEPS + _DONE_CONDITION; fix the wiring first, calibrate after.
+
+
+## STATUS 2026-10-11 20:08 (t11 INDEX-ONLY EXCLUSION **APPLIED** · BUG-712 PRODUCER FIX APPLIED · BUG-715 NEW · BUG-716 FOUND+FIXED · COVERAGE NUMBER CORRECTED)
+
+**1. t11 index exclusion — EXECUTED (index-only, reversible).** `scripts/purge_superseded_runs.py
+--apply --index-only --confirm t11,e2e,bug198_reinject` removed **7,983 vectors** (t11 7,855 + e2e 122 +
+bug198_reinject 6) from `vec_fbs` — 54.8% of the KNN index. `fbs` rows (14,574) and `fbs_fts` (14,574)
+are UNTOUCHED by design (index-only), so the change is fully reversible via
+`scripts/backfill_embeddings.py`. C13 backup: `knowledge pipeline/backups/maxwell.db.pre_purge_20261011_220240`
+(sha256 9777da1413a713a7…). R-D410 archive written BEFORE any deletion:
+`archive/superseded_runs/20261011T200240Z/superseded_rows.jsonl` (7,983 rows, sha256 1f5ba4b1cddc79f4…).
+Post-verify: integrity=ok, vec_orphans=0, vec_rows_in_purged_runs=0, leaked_runs=[] on a live
+`search_hybrid` smoke query. Measured effect: of the `vec_fbs` top-100 for canonical queries,
+**19–26 survived run-pin+PASS before → 58–75 after (2.6–3.9×)**.
+**Full (row-deleting) purge is deliberately NOT applied yet**, for one evidence-preservation reason:
+the 30 golden ids live in t11 and `scripts/reanchor_retrieval_goldens.py` shows the owner the OLD
+name/status next to each candidate. Deleting t11 rows first would destroy that side-by-side evidence.
+Sequence: owner signs the re-anchor → then `--apply --confirm t11,e2e,bug198_reinject` (one command).
+
+**2. CORRECTION — the "t11 uniquely covers 232 of 939 corpus files (25%)" figure was WRONG.** It was a
+filename-normalisation artefact (t11's pre-rechunk corpus used `(z-lib.org)` / trailing-space / truncated
+`-- author -- publisher` names; the new batch uses canonical names). Re-measured with exact + 4-word
+prefix matching on `source_books`: t11 covers 1,066 files, canonical covers 915; the exact set-difference
+is 224 files, of which **129 are name variants of files the canonical run DID cover** → **95 genuinely
+distinct names**; of those, **86 match a canonical `source_books` entry** and only **9** remain unmatched
+(8 of them junk/variant names: `778409`, `kaczynski2`, `visual thinking … (art ebook)`, `after-effects-
+apprentice…`), with one book (`visual thinking - methods for making images memorable`) being the single
+file NOT re-chunked in the new batch. Consequence: **there is no 25% coverage hole.** The earlier
+"silent destruction" blocker was overstated; the correct residual risk is ≤9 name-form-unresolved books
+(1.4% of t11's 7,855 rows × 14.6% ≈ 1,148 rows at the very worst). Spot-proof: `beyond vibe coding`
+canonical=23/t11=48, `ai for finance` 10/18, `agentic architectural patterns` 26/67, `empire of signs` 7/9.
+
+**3. BUG-712 — PRODUCER FIX APPLIED (no retro-mutation).** Root cause: `stage4_merge.py` computed the
+D-2747/D-275b-corrected `content_type` and used it ONLY for the applicability axis, then persisted the
+RAW S2 label. Corroborating evidence measured this turn: the S4 `growth_edges.jsonl` sidecar holds
+**187 records still stamped `content_type="principle"`** and `quarantined.jsonl` holds **372 more** —
+i.e. the ROUTING was corrected while the PERSISTED label was not. Fix (D-2938, config-gated C12):
+`stage4.persist_resolved_content_type: true` in `config/pipeline_config.yaml`; `stage4_merge.py` now
+resolves ONCE into `_resolved_ct`, persists that, and increments a run-summary counter
+`_REROUTE_COUNTER["rerouted_nonprinciple"]` (D2590 observability pattern — a counter, NOT a new column,
+because `content_type_source` is a closed 3-value PROVENANCE_LITERAL). Scope: **affects the NEXT S2→S6
+run only**; the 6,591 committed rows are untouched, so there is no cascade on the live store. Expected
+yield delta on the next run: ~100 records that are routed to the growth_edge sidecar will no longer be
+committed as principles (they were never principles — the store was lying). Retro re-stamping the 6,591
+rows is a SEPARATE, owner-gated action (S4-owned ontology, D-2933) and is deliberately not done.
+
+**4. BUG-716 (HIGH — FOUND + FIXED this turn).** `scripts/purge_superseded_runs.py verify()` used
+`residual_rows_in_purged_runs == 0` as the success condition in BOTH modes, so a CORRECT `--index-only`
+run (which keeps the rows on purpose) raised a false `post-purge verification FAILED (C16)` AFTER doing
+its work. A false failure is the same C16 violation class as a silent pass. Fix: `verify(..., index_only)`
+now returns `index_only`, `vec_rows_in_purged_runs` and the mode-correct guard —
+index-only ⇒ fail only on `vec_rows_in_purged_runs | integrity != ok | vec_orphans | smoke leaked_runs`;
+full ⇒ also require `residual == 0` and `fts_matches_fbs`. Proof on the live store:
+`INDEX-ONLY guard bad = False | vec_in_purged = 0 | residual_rows(kept by design) = 7983 | orphans = 0 |
+integrity = ok | leaked = []`.
+
+**5. BUG-715 (MEDIUM — OPEN): 7 S2 records reach NEITHER the checkpoint NOR a sidecar.** Measured by the
+new rail (`scripts/audit_sidecar_commit.py`): S2 8,217 = S4 checkpoint 6,591 + sidecars 1,619 + **7
+unexplained** (principle 6, growth_edge 1) = 0.09%. Not a type-routing artefact — a genuine S2→S4 leak.
+The rail fails LOUD (exit 2) on any unexplained drop, so this can no longer be invisible.
+
+**6. NOT A NEW BUG — the Layer-2 sidecar commit gap is DECISION D2590's pending scoped-S6 build.**
+Measured this turn for the canonical run: **1,619 extracted records sit in S4 sidecars and are never
+committed** (`process_templates` 817: 774 PT + 34 TI + 9 principle; `quarantined` 374: 372 principle +
+1 GE + 1 TI; `growth_edges` 212: 187 principle + 25 GE; `process_instances` 157; `tool_instructions` 59).
+Per type: **PT 774 extracted → 0 committed; PI 156 → 0; GE 27 → 0; TI 109 → 14 committed + 95 in
+sidecars**. D2590 already ruled `commit_non_fb_types: ENABLE (recommended)` with a 4-part spec
+(a) ingest sidecars (b) type-specific body (c) wire the dead `S6_COMMIT_NON_FB` flag (d) defer the
+non-principle cross-ref producer. Registered as a MEASURED FINDING under D2590, NOT as a new bug
+(duplicate ids are governance bloat). New rail: `scripts/audit_sidecar_commit.py` (read-only,
+deterministic, LLM-free, `--json`/`--strict`).
+
+## BUG-715 (MEDIUM - OPEN): 7 extracted S2 records reach neither the S4 checkpoint nor a sidecar
+Registered 2026-10-11 22:25. Measured by scripts/audit_sidecar_commit.py for run rechunk-v4-20260929:
+S2 8,217 = S4 checkpoint 6,591 + S4 sidecars 1,619 + 7 unattributed (principle 6, growth_edge 1) =
+0.09%. Not a routing artefact (routed rows are all captured), so it is a genuine S2->S4 leak. The rail
+now fails LOUD (exit 2) on any unattributed residual (C16), so this class cannot be invisible again.
+Next: attribute the 7 against S4's cluster-level valid_ids gate, else fix the leak.
+
+## BUG-716 (HIGH - CLOSED 2026-10-11 22:25): purge verifier raised a FALSE C16 failure in --index-only mode
+scripts/purge_superseded_runs.py verify() required residual_rows_in_purged_runs == 0 in BOTH modes, so a
+CORRECT --index-only run (which keeps fbs rows on purpose) raised post-purge verification FAILED (C16)
+AFTER doing its work - a false failure, the same C16 violation class as a silent pass. FIXED: verify()
+now takes index_only and returns vec_rows_in_purged_runs; the guard is mode-correct (index-only: zero
+vectors left + no orphans + integrity ok + no leaked run in a live search; full: also residual == 0 and
+fts == fbs). Proof on the live store: INDEX-ONLY guard bad = False | vec_in_purged = 0 | residual = 7983
+(kept by design) | orphans = 0 | integrity = ok | leaked = []. R5-reviewed (gemma-4-E4B-it, temp 0.0).
+
+## STATUS 2026-10-11 20:38Z (GOLDEN-ANCHOR PASS · BUG-717 FOUND+FIXED · BUG-718 NEW · D-2939/D-2940 PROPOSED)
+**Owner-gated items touched: 0** (nothing was minted, nothing was signed, no store write).
+
+### Forensic audit finding (this pass) — the re-anchor artifact was NOT trustworthy
+`scripts/reanchor_retrieval_goldens.py` v1 screened candidates with
+`search_hybrid(..., rerank=False)` — the legacy RRF leg — while its own docstring called
+that "the SERVING path". Production is `retrieval.method: vector` + `rerank.enabled: true`
+(D-2724). Measured disagreement on one query:
+  `how to build resilient distributed systems`
+    - hybrid (v1 leg, rank 1)  : "Golden Goose System Creation"
+    - vector (production, 1)   : "Zapatista Power Dispersion Network"
+  `governance/golden_reanchor_proposed_20261011.yaml` therefore proposed an anchor chosen
+  by a leg the system does not serve, and v1 auto-proposed **rank-1** as `expected` — an
+  invitation to rubber-stamp a coin flip. **The 20261011_2133 artifact is SUPERSEDED and
+  must not be signed.** v1 preserved at `scripts/reanchor_retrieval_goldens.py.v1_bug717`.
+
+### BUG-718 evidence (recorded, NOT yet conclusive)
+Label-free self-retrieval (query = a served FB's own NAME, correct = itself; no gold label
+is minted, so no owner gate, D-2898 governs LABELS only), run `rechunk-v4-20260929`, n=30,
+k=10: fts 1.000 / vector 0.767 / vector+rerank 0.800 / hybrid 0.900 / hybrid+rerank 0.867
+(MRR 1.000 / 0.617 / 0.646 / 0.770 / 0.677). Index health is confirmed sound (an exact-name
+query is nearly always retrievable); the production leg is **not** the strongest leg on this
+proxy and D-2724's own rationale (vector 0.900 > hybrid-RRF 0.833) cannot be reproduced
+today because it rests on the now-structurally-invalid t11 golden set. A name query is
+LEXICAL, which flatters FTS/hybrid, so this does NOT settle retrieval.method for abstract
+queries — it only removes the claim that the current choice is validated.
+
+### Calibration honesty (blocked a bad gate)
+`BAAI/bge-reranker-v2-m3` ORDERS correctly (known-positive pair -6.76 vs unrelated -11.05)
+but is NOT calibrated in absolute terms (known-positive logits span -6.01..+8.63, median
++0.06). A proposed "top-1 < 0 => no answer exists" gate was DISCARDED as a hallucinated
+threshold; scores are recorded as EVIDENCE only (the reanchor generator prints them; no
+rule consumes them).
+
+### Implemented this pass (reversible, additive)
+- **NEW `pipeline/golden.py`** — golden-anchor resolver. D-2939: an owner approves the query
+  + the answer NAME; the fb_id is a content hash and is resolved per run. Unresolved name ->
+  reported; AMBIGUOUS (>1 PASS row) -> refused, never guessed; a query with no resolvable
+  anchor is EXCLUDED from the denominator (BUG-710: scoring it 0 measures the golden set).
+- **`pipeline/retrieval_benchmark.py`** — `expected_names` resolution + `--self-retrieval`
+  label-free slice (D-2940, config-driven legs); `q["expected"]` -> `q.get("expected", [])`.
+- **`scripts/reanchor_retrieval_goldens.py`** — rewritten on the PRODUCTION leg, records the
+  leg in the artifact header, prints readable candidate NAMEs + definition snippets, emits a
+  name-anchored v3 draft (`expected_names`, `_needs_review: true`), decision vocabulary
+  `anchor | rewrite-query | retire-query | ambiguous`.
+- **`config/pipeline_config.yaml`** — `retrieval_benchmark.self_retrieval`, `.reanchor`,
+  `serving.golden_anchor_mode: name_then_id` (comment-preserving, C12).
+
+## BUG-717 (MEDIUM - CLOSED 2026-10-11): the golden re-anchor generator screened candidates on a NON-PRODUCTION leg
+`scripts/reanchor_retrieval_goldens.py` v1 used `search_hybrid(..., rerank=False)` and labelled
+it the serving path, while production is vector+rerank (D-2724); it also auto-proposed rank-1
+as `expected`. Effect: the artifact presented as the owner's 20-minute gate carried evidence
+about a leg the system does not serve, and its "proposal" column could be signed without a
+human judgment ever being formed.
+**Fix:** rewritten v2 — production leg from config (overridable, recorded in the artifact
+header), rank-1 demoted to evidence, readable NAME + definition snippet per candidate, v3
+draft anchors by NAME (D-2939). Artifact regenerated; v1 kept at
+`scripts/reanchor_retrieval_goldens.py.v1_bug717`.
+**Prevention:** the same class (a claim of "the serving path" that is not read from config) is
+now visible because the leg string is written INTO the artifact. No gate depends on it.
+
+## BUG-718 (MEDIUM - OPEN): the D-2724 production retrieval leg is unvalidated, and its supporting measurement is unreproducible
+`retrieval.method: vector` + `rerank.enabled: true` was adopted on a t11-era golden-set
+measurement (vector 0.900 > hybrid-RRF 0.833). That golden set is now structurally invalid
+(0/30 ids and 0/30 names live in the served run — BUG-710), so the adoption rationale cannot
+be re-run. On the only label-free proxy available (self-retrieval, n=30, k=10) the production
+leg measures 0.800 recall / 0.646 MRR against hybrid 0.900 / 0.770 and fts 1.000 / 1.000.
+Index health is NOT the cause (an exact-name query is retrievable almost always).
+**Status:** recorded, not conclusive — a name query is lexical and flatters FTS/hybrid.
+**Blocking:** nothing (an A/B is a config flip + a re-run). **Needs:** the semantic golden
+slice (D-2939/D-2940) so the production leg can be validated on abstract queries, then an
+owner ruling on `retrieval.method`.

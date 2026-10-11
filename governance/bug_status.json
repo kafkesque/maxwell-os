@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 460,
-  "open_n": 161,
-  "closed_n": 299,
+  "total_ids": 475,
+  "open_n": 169,
+  "closed_n": 306,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -812,6 +812,46 @@
       "id": "BUG-681",
       "title": "(OPEN, 2026-10-08) \u2014 `just health-full` found 6 faults in one pass; 2 fixed deterministically, 4 remain (3 red contract tests + 3 rails) and",
       "events": 2
+    },
+    {
+      "id": "BUG-698",
+      "title": "(OPEN, 2026-10-10) \u2014 v8\u2192v9 discipline-anchor off-menu rows are 22 in THREE categories, not the \"7 delta rows\" assumed in GATE-2; abstained r",
+      "events": 1
+    },
+    {
+      "id": "BUG-710",
+      "title": "(CRITICAL \u2014 OPEN): the D2511 retrieval gate is INERT \u2014 golden set anchored to the superseded run, and the documented fail-loud precondition ",
+      "events": 2
+    },
+    {
+      "id": "BUG-711",
+      "title": "(HIGH \u2014 OPEN): 173 canonical rows still carry a DISPLACED canonical domain label in the STORE",
+      "events": 1
+    },
+    {
+      "id": "BUG-712",
+      "title": "(CRITICAL \u2014 OPEN): content_type routing collapse \u2014 6 of 8 declared primitives produce ZERO output",
+      "events": 3
+    },
+    {
+      "id": "BUG-713",
+      "title": "(CRITICAL \u2014 OPEN): superseded runs are STILL in the store and STILL in the KNN index",
+      "events": 1
+    },
+    {
+      "id": "BUG-714",
+      "title": "(HIGH \u2014 OPEN): content_type='tool_instruction' is populated with CODE SNIPPETS, not tool instructions",
+      "events": 1
+    },
+    {
+      "id": "BUG-715",
+      "title": "(MEDIUM - OPEN): 7 extracted S2 records reach neither the S4 checkpoint nor a sidecar",
+      "events": 1
+    },
+    {
+      "id": "BUG-718",
+      "title": "evidence (recorded, NOT yet conclusive)",
+      "events": 2
     }
   ],
   "closed": [
@@ -1113,6 +1153,13 @@
     "BUG-693",
     "BUG-694",
     "BUG-695",
-    "BUG-696"
+    "BUG-696",
+    "BUG-697",
+    "BUG-699",
+    "BUG-707",
+    "BUG-708",
+    "BUG-709",
+    "BUG-716",
+    "BUG-717"
   ]
 }

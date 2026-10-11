@@ -10623,7 +10623,15 @@ draft anchors by NAME (D-2939). Artifact regenerated; v1 kept at
 **Prevention:** the same class (a claim of "the serving path" that is not read from config) is
 now visible because the leg string is written INTO the artifact. No gate depends on it.
 
-## BUG-718 (MEDIUM - OPEN): the D-2724 production retrieval leg is unvalidated, and its supporting measurement is unreproducible
+## BUG-718 (MED - RESOLVED 2026-10-12): the D-2724 production retrieval leg is validated on the 29-query semantic slice
+**RESOLUTION (2026-10-12):** golden set re-anchored to the served run (D-2939/D-2940; 29 owner-reviewed anchors,
+1 rewrite-query dropped — BUG-710/BUG-717), then `retrieval_benchmark.py --rerank` measured the semantic slice
+(n=29, k=10): `vector+rerank` **recall@10 = 1.0, MRR = 0.9655** (hybrid+rerank 1.0 / 0.871; bare vector 0.862 /
+0.417; fts 0.655 / 0.342). The D-2724 production leg is now VALIDATED and reproducible.
+**Caveat (recorded, not closing the loop):** anchors were owner-approved FROM the same leg's top-5 candidates, so
+recall@10 = 1.0 is partly by construction; MRR is the honest signal. The independent rail is the label-free
+self-retrieval slice (D-2940) plus future anchors sourced without seeing the candidate leg.
+
 `retrieval.method: vector` + `rerank.enabled: true` was adopted on a t11-era golden-set
 measurement (vector 0.900 > hybrid-RRF 0.833). That golden set is now structurally invalid
 (0/30 ids and 0/30 names live in the served run — BUG-710), so the adoption rationale cannot

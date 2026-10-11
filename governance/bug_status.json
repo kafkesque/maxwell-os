@@ -3,8 +3,8 @@
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
   "total_ids": 475,
-  "open_n": 169,
-  "closed_n": 306,
+  "open_n": 168,
+  "closed_n": 307,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -847,11 +847,6 @@
       "id": "BUG-715",
       "title": "(MEDIUM - OPEN): 7 extracted S2 records reach neither the S4 checkpoint nor a sidecar",
       "events": 1
-    },
-    {
-      "id": "BUG-718",
-      "title": "evidence (recorded, NOT yet conclusive)",
-      "events": 2
     }
   ],
   "closed": [
@@ -1160,6 +1155,7 @@
     "BUG-708",
     "BUG-709",
     "BUG-716",
-    "BUG-717"
+    "BUG-717",
+    "BUG-718"
   ]
 }

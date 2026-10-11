@@ -1,146 +1,210 @@
-# Golden retrieval query set — D2511 (benchmark harness un-gates S1/S2/S3).
-# =============================================================================
-# Each entry maps a natural-language query to the fb_id(s) it MUST retrieve.
-# fb_ids are committed FBs (status=PASS) verified to be the semantically-correct
-# answer via live hybrid search BEFORE locking them in (no false-positive goldens).
-#
-# Contract:
-#   - `query`      : natural-language retrieval query (what a user would type)
-#   - `expected`   : list of fb_id prefixes (≥8 hex chars) that are correct hits
-#   - `query_type` : vocabulary-overlap | synonym | cross-domain | abstract
-#                    (used to segment benchmark results by difficulty)
-#
-# Vocabulary-overlap queries are "easy" for FTS; synonym/abstract queries are
-# where the VECTOR leg must carry the retrieval (the exact gap M1/D2509 fixed).
-# Do NOT edit expected ids without re-verifying against the live DB.
-
-version: 1
+# Golden retrieval query set — re-anchored by scripts/reanchor_retrieval_goldens.py --apply
+# 20261011T221956Z  served run: rechunk-v4-20260929
+# D-2939: anchors are NAMES (owner-approved); IDs are resolved per run by pipeline/golden.py
+# and are recorded here as the verified snapshot. Retired/rewritten this pass: 1
+version: 4
 queries:
-  - query: "how do organizations recover from a major crisis"
-    expected: ["569e02f7758cd4b0"]   # Collective Intelligence Recovery
-    query_type: synonym
-
-  - query: "what makes teams psychologically safe"
-    expected: ["ab309999655e95c5"]   # Psychological Safety Through Shared Risk
-    query_type: synonym
-
-  - query: "why do feedback loops stabilize a system"
-    expected: ["46ff833cc83971dc"]   # Optimization Through Feedback Loops
-    query_type: vocabulary-overlap
-
-  - query: "how to build resilient distributed systems"
-    expected: ["cd98caf61c6ab956"]   # Site Reliability Engineering (sre) Principles
-    query_type: synonym
-
-  - query: "how does the decoy effect influence choice"
-    expected: ["d5caf12be54189f5"]   # Paradox of Choice Overload
-    query_type: abstract
-
-  - query: "can a large language model be compressed into a smaller one"
-    expected: ["be2fda2c919d983b"]   # Model Distillation Efficiency
-    query_type: synonym
-
-  - query: "why is time treated like money"
-    expected: ["1cb6217d2ca696bf"]   # Time As Commodity
-    query_type: abstract
-
-  # ── D2511 enlargement: 9 clean PASS FBs (source_diversity ≥ 46, diverse disciplines) ──
-  # Each query→fb_id verified live (hybrid top-10) BEFORE locking. These are all
-  # "clean" = PASS + convergent (sd ≥ 2) + non-summary, so the golden set is not
-  # contaminated by quarantine or near-duplicate FBs.
-
-  - query: "why is a task that matches your skill level more engaging"
-    expected: ["af3dddb499d8b5fb"]   # Optimal Challenge Drive (psychology)
-    query_type: synonym
-
-  - query: "why does the same color mean different things in different cultures"
-    expected: ["3a01753c57091244"]   # Color As Cultural and Emotional Marker (cultural studies)
-    query_type: abstract
-
-  - query: "how do signs and symbols get their meaning from context"
-    expected: ["85f3d9ee31e5e055"]   # Indexical Signification Through Contextual Relation (semiotics)
-    query_type: synonym
-
-  - query: "why does too much information make it hard to understand a design"
-    expected: ["14a097edd4af3831"]   # Information Processing Load (psychology)
-    query_type: abstract
-
-  - query: "how does brainstorming produce more ideas"
-    expected: ["2351d0bdb479fda4"]   # Idea Generation Through Divergent Thinking (cognitive science)
-    query_type: synonym
-
-  - query: "why should you accept that problems are too complex to fully solve"
-    expected: ["9eb33a81d599fd95"]   # Mindful Acceptance of Complexity (operations research)
-    query_type: abstract
-
-  - query: "how do decision makers gather information before choosing"
-    expected: ["976a9ec288694754"]   # Information-driven Decision Making (operations research)
-    query_type: synonym
-
-  - query: "how do machine learning systems get better over time automatically"
-    expected: ["cd0c3b87a00d7fd2"]   # Adaptive Learning Through Feedback Loops (machine learning)
-    query_type: synonym
-
-  - query: "why do myths and symbols carry shared meaning across a society"
-    expected: ["790421dac5e59d40"]   # Symbolic Meaning Translation (anthropology)
-    query_type: abstract
-
-  # ── D2517 enlargement: 14 clean PASS FBs (source_diversity ≥ 39, diverse disciplines) ──
-  # Each query→fb_id verified live (hybrid top-10) BEFORE locking. Same contract
-  # as above: clean PASS + convergent + non-summary, no false-positive goldens.
-
-  - query: "why does creating knowledge require collaboration across contributors"
-    expected: ["1939bc62db425c8d"]   # Collaborative Knowledge Construction (information science)
-    query_type: synonym
-
-  - query: "how does the style of a typeface convey meaning"
-    expected: ["b7c837fbf5ee70ae"]   # Typeface As Communicative Medium (typography)
-    query_type: synonym
-
-  - query: "how does combining doing, thinking, and refining produce creative change"
-    expected: ["d608b87f4681bdc5"]   # Flow-state Integration (psychology)
-    query_type: abstract
-
-  - query: "why does ai not need full human intelligence to be useful"
-    expected: ["8b96113ad8c4f596"]   # Artificial Enough Intelligence (artificial intelligence)
-    query_type: abstract
-
-  - query: "why must charts accurately represent the underlying data"
-    expected: ["21e3916ee2c3b3ad"]   # Data Visualization Truthfulness (information science)
-    query_type: synonym
-
-  - query: "why does focused practice with feedback improve a skill"
-    expected: ["6bb5b9da3adb938f"]   # Deliberate Practice Through Feedback Loops (psychology)
-    query_type: synonym
-
-  - query: "how does retrieval augmented generation keep answers coherent"
-    expected: ["46e671635de128dd"]   # Retrieval-augmented Generation for Contextual Coordination (machine learning)
-    query_type: synonym
-
-  - query: "how to make ai systems dependable before adding features"
-    expected: ["49fe3a3b4cfbcaad"]   # Reliability-first Ai Integration (generative ai)
-    query_type: synonym
-
-  - query: "how do controlled experiments establish cause and effect"
-    expected: ["ddc3f974d46918bd"]   # Controlled Experimentation (research methodology)
-    query_type: synonym
-
-  - query: "how do ai systems amplify existing biases"
-    expected: ["1ec884b263abc5bd"]   # Bias Amplification in Ai Systems (artificial intelligence)
-    query_type: synonym
-
-  - query: "how do signs get their meaning from the relationship between sign, object, and interpreter"
-    expected: ["12a1f8b5b210a350"]   # Semiotic Sign Process (semiotics)
-    query_type: synonym
-
-  - query: "why does the first piece of information anchor our judgment"
-    expected: ["31d4c18164a3c895"]   # First-information Bias (psychology)
-    query_type: synonym
-
-  - query: "how do small consistent investments compound over time"
-    expected: ["318671a7afa2ca0a"]   # Compound Effect of Strategic Investment (operations research)
-    query_type: synonym
-
-  - query: "how does visual tone and contrast shape a design"
-    expected: ["211a5a82380864bc"]   # Visual Tone and Contrast in Design (visual perception)
-    query_type: synonym
+- query: how do organizations recover from a major crisis
+  expected_names:
+  - Institutional Response to Crisis
+  expected:
+  - 334e75a2f5d1d57ef40ecf864890b8a26aed71371a21a07a1ce043c73d9b6b44
+  query_type: synonym
+  verified_run: rechunk-v4-20260929
+- query: what makes teams psychologically safe
+  expected_names:
+  - Robert's Approachability Leadership Principle
+  expected:
+  - 790c8ced9e9d018d3a9c9b7b57ceb26704c4d96212673d38730d901fbf4d48e1
+  query_type: synonym
+  verified_run: rechunk-v4-20260929
+- query: why do feedback loops stabilize a system
+  expected_names:
+  - Systemic Feedback Dynamics
+  expected:
+  - 334c49ae6b7a2dadbc52e9e36f48006f77050062528d6a727127b211473262d5
+  query_type: vocabulary-overlap
+  verified_run: rechunk-v4-20260929
+- query: how to build resilient distributed systems
+  expected_names:
+  - Golden Goose System Creation
+  expected:
+  - 124724124bc5d11951ab22085fe28c4d351aa4dd2f8475c4511d0b0e0c740cd8
+  query_type: synonym
+  verified_run: rechunk-v4-20260929
+- query: how does the decoy effect influence choice
+  expected_names:
+  - Preferential Option Selection
+  expected:
+  - 1e76f09b3933ba9d8a5e4aa00e2ac49202f6a8f02a8a735953652805d2682d0b
+  query_type: abstract
+  verified_run: rechunk-v4-20260929
+- query: why is time treated like money
+  expected_names:
+  - Time Arbitrage System
+  expected:
+  - 276c65432e9faaf9221f9fb43d40470e755007b299db4669113432e1f8305217
+  query_type: abstract
+  verified_run: rechunk-v4-20260929
+- query: why is a task that matches your skill level more engaging
+  expected_names:
+  - Active Engagement in Ai-assisted Learning
+  expected:
+  - a2f1b07476c054e5d99c3f4bcc2f6fe2e71a80839b608ab3409bdf300e1d8809
+  query_type: synonym
+  verified_run: rechunk-v4-20260929
+- query: why does the same color mean different things in different cultures
+  expected_names:
+  - Color Perception and Cultural Context
+  expected:
+  - 7293175317be70cc305f51a54b8915ed35f03110510b6537e4e79f1c4cb9a2b6
+  query_type: abstract
+  verified_run: rechunk-v4-20260929
+- query: how do signs and symbols get their meaning from context
+  expected_names:
+  - Signifier-signified Relationship in Language
+  expected:
+  - efbc5010395c77acb29beda75e4bb8704ca95ae8d525449d617ee4e9633b5415
+  query_type: synonym
+  verified_run: rechunk-v4-20260929
+- query: why does too much information make it hard to understand a design
+  expected_names:
+  - Information Vs Understanding in Decision Making
+  expected:
+  - 9da66af3c99b1268bf48e124434193ddce7fa79caa6643464b559b4368f9783f
+  query_type: abstract
+  verified_run: rechunk-v4-20260929
+- query: how does brainstorming produce more ideas
+  expected_names:
+  - Expenditure Reduction Creative Challenge
+  expected:
+  - b60729a5680ead8c7b5cb212d705bc0af62be0a2b9693a840fb4f9c024274fd9
+  query_type: synonym
+  verified_run: rechunk-v4-20260929
+- query: why should you accept that problems are too complex to fully solve
+  expected_names:
+  - Challenge Atomization Principle
+  expected:
+  - 4b91d2b472486bd54b372d75680800eba806e5892c6b4552984987f47eaedf1b
+  query_type: abstract
+  verified_run: rechunk-v4-20260929
+- query: how do decision makers gather information before choosing
+  expected_names:
+  - Strategic Information Collection
+  expected:
+  - 94032f5ddbce3b1fea11b1ecaa3d84c0103146f307bb431070ac88c32b55cdc8
+  query_type: synonym
+  verified_run: rechunk-v4-20260929
+- query: how do machine learning systems get better over time automatically
+  expected_names:
+  - Reinforcement Learning From Experience
+  expected:
+  - 9769ffc7acb192e0071a9136408ce495a6a7956e1499f40251529e50d30563eb
+  query_type: synonym
+  verified_run: rechunk-v4-20260929
+- query: why do myths and symbols carry shared meaning across a society
+  expected_names:
+  - Symbolic Representation Through Visual and Linguistic Systems
+  expected:
+  - 7b6d031c3e35a403864354decf73a766316c8c5eb7cfcebee5459a36c718a197
+  query_type: abstract
+  verified_run: rechunk-v4-20260929
+- query: why does creating knowledge require collaboration across contributors
+  expected_names:
+  - Collaborative Learning and Knowledge Creation
+  expected:
+  - a13bab86d391537d29164dfcc174da2f6bd673bd1e0d0ce73c9055c115b83d05
+  query_type: synonym
+  verified_run: rechunk-v4-20260929
+- query: how does the style of a typeface convey meaning
+  expected_names:
+  - Dynamic Typographic Expression
+  expected:
+  - eb60ca8cd5112b29068e04d7a8aac3d8bc421b33c732dcf1237c9b8cd2c33e8d
+  query_type: synonym
+  verified_run: rechunk-v4-20260929
+- query: how does combining doing, thinking, and refining produce creative change
+  expected_names:
+  - Morphological Box Method
+  expected:
+  - 9a242beda541a6d3e834b927c103459aacb37b10fc7d48768be4f87067b5a2dd
+  query_type: abstract
+  verified_run: rechunk-v4-20260929
+- query: why does ai not need full human intelligence to be useful
+  expected_names:
+  - Shift Left Ai Automation
+  expected:
+  - ce34cc7efce7d1c9be7ae11e65a133a0a3d927f69d4f269176ae2422eac67e35
+  query_type: abstract
+  verified_run: rechunk-v4-20260929
+- query: why must charts accurately represent the underlying data
+  expected_names:
+  - Essential Form Visualization Principle
+  expected:
+  - 0ac4cd9a80475a429ace9332a1d96146a5f8501291a594ff5e8839fbd6c151ff
+  query_type: synonym
+  verified_run: rechunk-v4-20260929
+- query: why does focused practice with feedback improve a skill
+  expected_names:
+  - Virtuous Cycle of Skill Development
+  expected:
+  - 01a444c5eed39b08dd4c43bf351f62001a7d37f77e44f7dc9bbc58e6ed329d4c
+  query_type: synonym
+  verified_run: rechunk-v4-20260929
+- query: how does retrieval augmented generation keep answers coherent
+  expected_names:
+  - Retrieval-augmented Generation Process
+  expected:
+  - 9c881a1bab7ea7f0a40a6f7e77209d27fef44b8aa7e6aa24d2bd69b76a0c66cf
+  query_type: synonym
+  verified_run: rechunk-v4-20260929
+- query: how to make ai systems dependable before adding features
+  expected_names:
+  - Create First, Compute Later Strategy
+  expected:
+  - ab908a54c432b6f5906ff48de748c3ddf0e08da5cabc3bc8eea2d81fb53c32f5
+  query_type: synonym
+  verified_run: rechunk-v4-20260929
+- query: how do controlled experiments establish cause and effect
+  expected_names:
+  - Correlation-based Causal Hypothesis Formation
+  expected:
+  - 70e9b802df629b7a7ec33b65bc182457cbcbf62ff17d1e89fa86a71932dd020a
+  query_type: synonym
+  verified_run: rechunk-v4-20260929
+- query: how do ai systems amplify existing biases
+  expected_names:
+  - Beware of Bias in Ai Recommendations
+  expected:
+  - 50356efd05b249304b3f749f682bb81b51bec65125fca7e7c3347b0d4636274c
+  query_type: synonym
+  verified_run: rechunk-v4-20260929
+- query: how do signs get their meaning from the relationship between sign, object,
+    and interpreter
+  expected_names:
+  - Signifier-signified Relationship in Language
+  expected:
+  - efbc5010395c77acb29beda75e4bb8704ca95ae8d525449d617ee4e9633b5415
+  query_type: synonym
+  verified_run: rechunk-v4-20260929
+- query: why does the first piece of information anchor our judgment
+  expected_names:
+  - Fear of Missing Out Anchoring Effect
+  expected:
+  - fb47db46a18b5ee616e72be95acf1600e59a3bbbce2191ef5e719cee6144239b
+  query_type: synonym
+  verified_run: rechunk-v4-20260929
+- query: how do small consistent investments compound over time
+  expected_names:
+  - Compound Effect
+  expected:
+  - a7808b2f0a47eb89c57040f9ad1f7ec3bea942eddb082efa6fbb1c1d22939760
+  query_type: synonym
+  verified_run: rechunk-v4-20260929
+- query: how does visual tone and contrast shape a design
+  expected_names:
+  - Dynamic Juxtaposition in Layout Design
+  expected:
+  - 603a2de8b87986af40e42b21e7d360e6b50ed8b77866322f18812ebd23a79c03
+  query_type: synonym
+  verified_run: rechunk-v4-20260929

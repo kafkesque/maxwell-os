@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**169 open** / 306 closed of 475 ids.
+**168 open** / 307 closed of 475 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -175,4 +175,3 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-713 | (CRITICAL — OPEN): superseded runs are STILL in the store and STILL in the KNN index | 1 |
 | BUG-714 | (HIGH — OPEN): content_type='tool_instruction' is populated with CODE SNIPPETS, not tool instructions | 1 |
 | BUG-715 | (MEDIUM - OPEN): 7 extracted S2 records reach neither the S4 checkpoint nor a sidecar | 1 |
-| BUG-718 | evidence (recorded, NOT yet conclusive) | 2 |

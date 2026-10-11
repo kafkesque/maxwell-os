@@ -72,6 +72,8 @@ may_touch:
 - governance/MUTATION_JOURNAL.jsonl
 - governance/anchor_adjudication_workbook_20260924.csv
 - governance/anchor_adjudication_fixlog_20260925.csv
+- governance/golden_review_*.csv
+- governance/golden_reanchor_*
 - feed.opml
 - benchmarks/*
 - governance/frontier_audit/**

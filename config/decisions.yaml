@@ -15956,3 +15956,222 @@ decisions:
   - scripts/t9_paraphrase_label.py
   - scripts/paraphrase_calibrate.py
   - governance/t9_paraphrase_gold_labelled.jsonl
+- id: D-2933
+  state: RATIFIED
+  category: DATA INTEGRITY / COMMIT
+  title: 'S6 commit contract = V (verification-scoped): a commit writes only what its producing stage owns; closes
+    BUG-709'
+  decision: 'Owner-ratified 2026-10-11. S4 owns the ontology, S5 owns provenance, and a commit must write only what
+    its
+
+    producing stage owns. stage6.commit_scope: verification_scoped writes the 10 S5-owned columns on an existing
+
+    fb_id; an absent fb_id still takes the full INSERT path; full_upsert restores the legacy INSERT OR REPLACE.
+
+    Rationale: a commit can never be more correct than the store it overwrites — INSERT OR REPLACE from a stale
+    S5
+
+    checkpoint regressed ratified labels (BUG-709: 466 loud + ~304 silent). Evidence: 6,591/6,591 rows updated,
+    0
+
+    S4-owned columns changed, 0 rows lost, status 3360→4503 PASS. Supersedes the overwrite-everything default.
+
+    Closes BUG-709.
+
+    '
+  bugs:
+  - BUG-709
+  files:
+  - pipeline/stage6_commit.py
+  - config/pipeline_config.yaml
+- id: D-2934
+  state: RATIFIED
+  category: ONTOLOGY / TAXONOMY
+  title: Taxonomy-skew guard is COLUMN-SCOPED (not row-scoped) — prevents an indefinite block on the stale v5.6
+    stamp
+  decision: 'Owner-ratified 2026-10-11. The S5 checkpoint is permanently stamped v5.6 (menu_hash 99e1df82…) while
+    the store
+
+    is v9 (be323543…). The guard refuses a write only when a written column appears in
+
+    stage6.taxonomy_dependent_columns (declared empty with proof: the S5 verdict is a function of (definition,
+
+    evidence), definition drift is 0/6591, practicality reads only config/practicality.yaml). A skewed but
+
+    immaterial write is recorded as a loud advisory, never silenced. This prevents the indefinite block that the
+
+    BUG-713 v5.6-vs-v9 skew would otherwise impose on a stale stamp.
+
+    '
+  bugs:
+  - BUG-713
+  files:
+  - pipeline/stage6_commit.py
+  - config/pipeline_config.yaml
+- id: D-2935
+  state: RATIFIED
+  category: ONTOLOGY / TAXONOMY
+  title: 'meta.displaced_to: the executable, axis-aware counterpart of displaced_canonicals — fixes the BUG-711
+    root cause'
+  decision: 'Owner-ratified 2026-10-11. displaced_canonicals declares WHAT was retired; nothing declared WHERE a
+    retired
+
+    label lands, so the canonical run''s domain cells were never re-homed (BUG-711 root cause: D-2866 remapped
+
+    anchors only and excluded silver). displaced_to adds the target, the axis, the ratifying basis and a status
+
+    (ratified_deterministic vs owner_gate), so a repair can never mint a crossed-axis (D2620/BUG-197) label and
+    no
+
+    agent can auto-mint a home (D-2898). Home = taxonomy.yaml:meta (unhashed — menu_hash covers only
+
+    closed_menu_v10.json — and already owns displaced_canonicals); a new config/label_normalization.yaml was
+
+    rejected as a duplicate home (C12/C21). Applied by scripts/repair_displaced_canonical_domains.py.
+
+    '
+  bugs:
+  - BUG-711
+  files:
+  - scripts/repair_displaced_canonical_domains.py
+  - config/taxonomy.yaml
+- id: D-2936
+  state: RATIFIED
+  category: RETRIEVAL
+  title: Serving index scope MUST be enforced by the index (vec0 partition key on pipeline_run_id), not only a WHERE
+    clause
+  decision: 'Owner-ratified 2026-10-11. Scope must be enforced by the index, not only by a WHERE clause, so superseded
+    runs
+
+    cannot dilute the KNN neighborhood. serving.index_scope: canonical_run; target implementation = vec0 partition
+
+    key on pipeline_run_id so the filter is applied inside KNN (no dilution, no deletion, multi-run queryable).
+
+    Interim: index-only scoping. Basis: §2.3 (19–26/100 survivors), §6. This is the serving-scope half of the
+
+    retrieval-validity defect tracked with BUG-718.
+
+    '
+  bugs:
+  - BUG-718
+  files:
+  - config/serving_gate.yaml
+  - config/pipeline_config.yaml
+- id: D-2937
+  state: RATIFIED
+  category: RETRIEVAL
+  title: 'Superseded-run exclusion policy: archive-first, dry-run default, C13 backup, coverage-gap guard'
+  decision: 'Owner-ratified 2026-10-11. Archive-first (R-D410), dry-run default, C13 backup, 0-inbound-ref precondition,
+    FTS
+
+    rebuild inside the transaction, and a coverage-gap guard: a run may not be hard-deleted while it uniquely covers
+
+    corpus files the canonical run has not reprocessed (232 files today). Applied by
+
+    scripts/purge_superseded_runs.py; the index-only mode correctness is the BUG-716 fix (mode-correct verifier,
+
+    no false C16).
+
+    '
+  bugs:
+  - BUG-716
+  files:
+  - scripts/purge_superseded_runs.py
+- id: D-2938
+  state: RATIFIED
+  category: RETRIEVAL
+  title: Golden sets are run-bound artifacts — declare pipeline_run_id; a harness fails loud when goldens fall outside
+    scope
+  decision: 'Owner-ratified 2026-10-11. A retrieval golden set must declare the pipeline_run_id it was verified
+    against; a
+
+    harness must fail loud when its goldens fall outside serving.index_scope (C16). Re-anchoring is a semantic,
+
+    owner-signed act (D-2898), never an id rewrite. This is the structural cause of the BUG-710 golden rot: the
+
+    expected ids were content hashes of a superseded run, so a reprocess invalidated the whole signed set.
+
+    '
+  bugs:
+  - BUG-710
+  files:
+  - pipeline/golden.py
+  - config/golden/retrieval_queries.yaml
+- id: D-2939
+  state: RATIFIED
+  category: RETRIEVAL
+  title: Golden anchors separate the LABEL (owner-owned) from the POINTER (mechanical) — names resolve to ids per
+    run
+  decision: 'Owner-ratified 2026-10-11. The golden set is (query, query_type, expected_names) — the owner approves
+    the query
+
+    and the human-readable NAME of the correct answer. expected (ids) remains as a legacy fallback and as a resolved
+
+    snapshot. pipeline/golden.py resolves names -> fb_ids in the serving scope per run. Rails: a name resolving
+    to 0
+
+    PASS rows -> UNRESOLVED (reported); to >1 row -> AMBIGUOUS (refused, never guessed); a query with no resolvable
+
+    anchor is EXCLUDED from the denominator and the exclusion is printed. Config: serving.golden_anchor_mode:
+
+    name_then_id. This kills the BUG-710 rot class (ids rot) and the BUG-717 wrong-leg screening class.
+
+    '
+  bugs:
+  - BUG-710
+  - BUG-717
+  files:
+  - pipeline/golden.py
+  - config/golden/retrieval_queries.yaml
+- id: D-2940
+  state: RATIFIED
+  category: RETRIEVAL
+  title: 'Two-slice retrieval measurement: a label-free regression rail + the owner-signed semantic slice'
+  decision: 'Owner-ratified 2026-10-11. (a) the SEMANTIC slice = owner-approved abstract queries (quality claims
+    may only be
+
+    made here); (b) the LABEL-FREE slice = retrieval_benchmark.py --self-retrieval, which queries each sampled FB
+    by
+
+    its own NAME (no label minted, crosses no owner gate). Constraint (anti-slope): a name query is lexical, so
+
+    FTS/hybrid are flattered by construction; (b) is a regression rail and MUST NOT be quoted as retrieval quality
+
+    for abstract queries. Measured n=30, k=10: fts 1.000 · vector 0.767 · vector+rerank 0.800 · hybrid 0.900 ·
+
+    hybrid+rerank 0.867 (recall). Settles BUG-718 (production leg unvalidated) once the semantic slice is re-anchored.
+
+    '
+  bugs:
+  - BUG-718
+  files:
+  - pipeline/retrieval_benchmark.py
+- id: D-2941
+  state: RATIFIED
+  category: GOVERNANCE / RULES
+  title: Owner gates carry INTENT and POLICY only; derived data is applied by a verified script (the anti-loop rule)
+  decision: 'Owner-ratified 2026-10-11. An owner gate may decide only what a machine cannot derive: (1) INTENT (the
+    query set,
+
+    the target names, the ontology choice, the method choice); (2) POLICY (a threshold, a floor, a scope, a
+
+    vocabulary); (3) ADJUDICATION of a genuine tie (two rows share a name; two candidates are equally right).
+
+    Everything derived must be produced by a deterministic script that prints its evidence, refuses incomplete or
+
+    ambiguous input (C16), takes a C13 backup, is reversible, and writes one audit line naming the gate, the
+
+    leg/instrument, and the run it was verified against. Corollary (instrument rule): no metric may be quoted after
+
+    its instrument has been invalidated; every reported number carries (instrument, date, scope). This re-scopes
+    the
+
+    BUG-710 -> BUG-717 argument class: the owner signs INTENT, never content hashes.
+
+    '
+  bugs:
+  - BUG-710
+  - BUG-717
+  files:
+  - pipeline/golden.py
+  - scripts/audit_sidecar_commit.py

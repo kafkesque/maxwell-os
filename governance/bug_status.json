@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 507,
-  "open_n": 183,
-  "closed_n": 324,
+  "total_ids": 509,
+  "open_n": 184,
+  "closed_n": 325,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -391,7 +391,7 @@
     {
       "id": "BUG-376",
       "title": "(HIGH \u2014 OPEN, OWNER GATE = C-3): a completed S5 run's declared input was rewritten after the run, and the image is gone",
-      "events": 2
+      "events": 3
     },
     {
       "id": "BUG-377",
@@ -922,6 +922,11 @@
       "id": "BUG-743",
       "title": "(LOW - OPEN 2026-10-12) - a DELEGATED reviewer's verdict is not re-readable after the fact, so a receipt that cites it must CAPTURE THE TEXT",
       "events": 1
+    },
+    {
+      "id": "BUG-745",
+      "title": "(HIGH - OPEN 2026-10-12) - the S5 score-axis rail is RED again: 2,247 stored rows no longer reproduce from the ONE home, after the bug that ",
+      "events": 1
     }
   ],
   "closed": [
@@ -1248,6 +1253,7 @@
     "BUG-734",
     "BUG-739",
     "BUG-740",
-    "BUG-742"
+    "BUG-742",
+    "BUG-744"
   ]
 }

@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**183 open** / 324 closed of 507 ids.
+**184 open** / 325 closed of 509 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -83,7 +83,7 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-360 | (LOW — process, LOGGED 2026-09-21): a second stale carried claim in one session | 1 |
 | BUG-366 | (LOW - process, OPEN): an LLM coder silently under-delivered (79 of 122 rows) | 1 |
 | BUG-367 | (MED - OPEN, ruler data quality, found by the F-11 worksheet 2026-09-22): the human FORM column is mostly non-canonical spellings | 1 |
-| BUG-376 | (HIGH — OPEN, OWNER GATE = C-3): a completed S5 run's declared input was rewritten after the run, and the image is gone | 2 |
+| BUG-376 | (HIGH — OPEN, OWNER GATE = C-3): a completed S5 run's declared input was rewritten after the run, and the image is gone | 3 |
 | BUG-377 | (LOW-MED — OPEN 2026-09-23, found by the session-18 audit): pidfiles that outlive their pid, one of them recycled | 1 |
 | BUG-378 | (LOW-MED — OPEN 2026-09-23, found by the session-20 audit): repository hygiene drift | 1 |
 | BUG-381 |  | 1 |
@@ -190,3 +190,4 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-738 | (MED - OPEN 2026-10-12) - R5 code review had NO deterministic layer: 7 of 43 verdicts were not decisions, and the deep auditor was the gener | 2 |
 | BUG-741 | (MED - OPEN 2026-10-12) - the adjudication map's `proposed` field CONFLATES two vocabularies, so one owner adjudication is not expressible a | 3 |
 | BUG-743 | (LOW - OPEN 2026-10-12) - a DELEGATED reviewer's verdict is not re-readable after the fact, so a receipt that cites it must CAPTURE THE TEXT | 1 |
+| BUG-745 | (HIGH - OPEN 2026-10-12) - the S5 score-axis rail is RED again: 2,247 stored rows no longer reproduce from the ONE home, after the bug that  | 1 |

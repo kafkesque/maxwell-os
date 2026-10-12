@@ -11706,3 +11706,86 @@ E402 F841 I001 - the new import was inserted in SORTED position, so it did not a
 **REMAINING QUEUE (12 of 14, one at a time, each with its own reader audit):** accessibility, context, difficulty_level, discipline_raw, epistemic_status, intimacy_boundary, keywords, practicality, source_text, taxonomy_match_method, temporal_scope, verification_method. Specifically NOT in the queue, and OWED as declared: `failure_mode` (774 rows outside, `outside: unconstrained`) and `menu_hash` (the `NOT_APPLICABLE` sentinel - it must NOT be normalised until its readers are audited, F-44/D-279).
 
 **A NAMED OBSERVATION, NOT A FIX.** `pipeline/query.py` prints three SIBLINGS the same way the fixed line did (`definition`, `application`, `failure_mode`). None is in this queue (`definition` is never absent; `application`/`failure_mode` are declared `status: debt` with their own populations), so none is reachable by a reshape today - but each will need the SAME one-line guard IN ITS OWN column verdict, not in this one.
+
+## BUG-744 (MED - CLOSED 2026-10-12) - the D-2951 flag registration declared a consumer that NEVER READS the flag, and one wrong line stopped the health ladder
+
+**MEASURED, and the rail caught it.** `scripts/audit_flag_consumers.py` reported
+`RED config/pipeline_config.yaml::stage6.dedup_gate.enabled declares consumer(s) that never read it: ['pipeline/dedup_gate.py']`.
+The registry declared THREE consumers for that one flag, and the third is the BUG-375/BUG-562 class: a declaration
+naming a file that does not read it. PROVEN, not asserted - `pipeline/dedup_gate.py` references NO config at all
+(the rail's own rule is `config.name in body or config.stem in body`; the module's only mention of a config is
+`config/dedup_identity.yaml`, a DIFFERENT file). It is the pure, LLM-free DECISION home ("the gate only ever
+DECIDES; the caller applies"), so the switch belongs to the CALLER: `pipeline/pipeline_paths.py::S6_DEDUP_GATE_ENABLED`
+read at `pipeline/stage6_commit.py`. Both were declared correctly; the third was not.
+
+**FIX (one line, and the note says why so it cannot be re-added).** `config/flag_consumer_registry.yaml`: removed
+`- pipeline/dedup_gate.py` from `consumers`, keeping `required: true`, `decisions: [D-2951]` and both
+`consumer_symbols`. Post-fix: `flag consumers: 48 verified, 0 RED, 6 unregistered flag(s)`.
+
+**WHY IT MATTERS MORE THAN ONE REGISTRY LINE.** `audit_flag_consumers` is a HARD gate at LINE 15 of `just health`,
+so it aborted the ladder there - and the boot sequence runs `just health`. MEASURED with the collector designed
+for this (D-2680/BUG-573: `just health-full` = `run_ladder.py --collect health`): the same ladder holds
+**10 fatal reds below line 15**, none of which the default invocation reached - `check_s5_score_axis`,
+`build_anchor_store_bridge`, `verify_handoffs`, `check_silent_repair`, `check_undeclared_encoding`,
+`check_store_columns`, `reconcile`, `build_archive_index`, `check_rail_registry`, and this one. NOTHING was
+hidden - every one is reachable in ONE pass via `just health-full` - but the DEFAULT gate reported a PREFIX, so a
+defect introduced hours earlier by a registration line (commit 3db009e) was invisible to every session that ran
+`just health`. The class is BUG-573, already declared; the actionable residue is that the BOOT SEQUENCE should
+run the collector, not the prefix.
+
+**A/B (not assumed).** Every one of the 9 pre-existing reds was re-run and NONE names a path this session's change
+touched (`pipeline/query.py`, `pipeline/stage6_commit.py`, `config/store_columns.yaml`,
+`tests/test_absent_shape_reader.py`, `config/flag_consumer_registry.yaml`). The one that could plausibly have
+been mine - the score-axis rail, which re-derives from the stored row - was run against THIS session's pre-write
+backup and returned BYTE-IDENTICAL counts (BUG-745 below).
+
+## BUG-745 (HIGH - OPEN 2026-10-12) - the S5 score-axis rail is RED again: 2,247 stored rows no longer reproduce from the ONE home, after the bug that owns the rail was CLOSED on a GREEN measurement
+
+**MEASURED (live store, 7,640 rows).** `python3 scripts/check_s5_score_axis.py` -> `rc=1`:
+`{'MATCH': 4344, 'SCORE_MISMATCH': 2247, 'UNDECIDABLE': 1049}`. Samples: `ab7efee7e1f0: stored 0.9 but the record
+derives 0.25`; `4fd29bab24f7: stored 0.9332 but the record derives 0.25`; `ec40f498932a: stored 0.9332 but the
+record derives 0.25`. Every UNDECIDABLE row reports `no factual/mechanism_quality check in verification_results`
+(C16: an unevaluable row is never a pass) and those are the 1,049 sidecar rows.
+
+**WHY THIS IS A CLOSURE THAT DID NOT HOLD, not a stale reading.** BUG-502's closing proof was this rail GREEN -
+`7995 MATCH, 0 score mismatch, 0 review mismatch, 0 undecidable` - and the register carries BUG-502 as CLOSED
+while the rail that PROVES it is now red with 2,247 mismatches. The rail's own docstring states the rule this
+implicates: "A DECLARED recalibration of the weights re-baselines this rail by re-running S5, so a silent
+recalibration cannot pass." So the red is ONE of two things and the next act is to tell them apart - a weighted
+recalibration that WAS declared and never re-baselined (then the baseline is the owed act), or the derivation
+drifting away from the stored corpus (then the score axis is silently serving scores no home reproduces). A
+`stored 0.9x vs derived 0.25` gap on 2,247 rows is not a rounding artefact: 0.25 reads like a base term with an
+enrichment term missing.
+
+**A/B - THIS IS NOT THIS SESSION'S WRITE (BUG-739 method, run against the pre-write backup).** The rail was run
+against `backups/maxwell.db.bak_20261012_212114_pre_absent_shape_elaboration` (DB_PATH rebound, no write) and
+returned the IDENTICAL verdict and the identical counts: `{'MATCH': 4344, 'SCORE_MISMATCH': 2247, 'UNDECIDABLE':
+1049}`. So the elaboration reshape neither caused it nor can clear it, and the temptation to attribute a red to
+the change that just landed is refused with evidence.
+
+**NEXT ACT.** Determine whether the five score-axis values in `pipeline/pipeline_paths.py` moved after the corpus
+was committed (git log on `config/pipeline_config.yaml` + `pipeline/serving_gate.py` against the S5 run id), then
+either re-baseline with a DECLARED recalibration receipt or fix the derivation. Do NOT re-record a ceiling to make
+it quiet: the rail is a parity measurement, not a debt.
+
+## BUG-376 (OPEN) - UPDATE 2026-10-12: the receipted region of config/decisions.yaml was edited IN PLACE at TWO named commits (byte-exact bisect)
+
+**MEASURED.** `scripts/verify_handoffs.py --check` -> `rc=1`: `decisions_registry: config/decisions.yaml is
+declared append_only but its receipted bytes are not a prefix of the current bytes (rewritten): the first 979096
+bytes hash to 7be564ac6b539269, not the receipted de3acd304b638fdd - a byte inside the receipted region was edited
+in place (BUG-376 class)`. The rail names the right bug; what was missing was the OWNER.
+
+**BISECTED, byte-exact (the first 979,096 bytes hashed at 40 commits that touch the file).** The receipted value
+`de3acd304b638fdd` holds from `98471a3` up to and including `b5ce8ae`; the NEXT commit, **`d149809`**, changed
+it to `c52647c1bcd4ff7e`; then **`3db009e`** (the D-2860 frontier landing, whose stat shows
+`config/decisions.yaml | 19343 +++++---`) changed it again to `7be564ac6b539269`, where it stands at HEAD. TWO
+in-place rewrites of a receipted append-only region, each by a commit that was not a pure append.
+
+**NOT THIS SESSION, PROVEN BY OFFSET.** The D-2965 block this session minted starts at byte 1,188,477 and D-2963 at
+1,181,898 - both BEYOND the 979,096-byte receipted region - so the mint appended (as its prefix check promises) and
+cannot be the cause. `git show` of HEAD and of 3db009e hash IDENTICALLY for that region, which is the same
+instrument the rail uses, so the attribution is not a second reading of a different fact.
+
+**WHAT IS OWED.** Re-receipt the file at its current bytes with the rewrite NAMED (a rewrite that is invisible to
+the receipt is the whole defect), or restore the receipted region. The rail is HARD, so it is not a debt ceiling
+that can be re-recorded away (D-2642).

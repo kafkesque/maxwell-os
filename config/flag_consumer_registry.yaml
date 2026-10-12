@@ -373,7 +373,6 @@ flags:
   consumers:
   - pipeline/pipeline_paths.py
   - pipeline/stage6_commit.py
-  - pipeline/dedup_gate.py
   consumer_symbols:
     pipeline/pipeline_paths.py: S6_DEDUP_GATE_ENABLED
     pipeline/stage6_commit.py: 'if S6_DEDUP_GATE_ENABLED:'
@@ -383,7 +382,12 @@ flags:
     checkpoint/dedup_gate_receipt.json; mode: enforce links a CONVERGENT re-extraction as
     duplicate_of + QUARANTINE (D2625/D2630: mark, never delete). Sibling key stage6.dedup_gate.mode carries
     the report|enforce choice and is validated fail-closed in stage6_commit (C16). required = value observed
-    at registration (D-338).'
+    at registration (D-338). CORRECTED 2026-10-12 (BUG-744): pipeline/dedup_gate.py was declared as a THIRD
+    consumer and the audit PROVED it never reads this config - the module is the pure, LLM-free DECISION home
+    (it only ever DECIDES; the caller applies), so the switch belongs to the CALLER, stage6_commit.py. The
+    declaration named a file that does not read the flag, which is the BUG-375/BUG-562 class. Removed; do NOT
+    re-add it without a reader. This one wrong line made just health RED at line 15 and SKIPPED every rail
+    below it, so the cost of the class is not the entry - it is the whole downstream control set.'
 - config: config/pipeline_config.yaml
   path: services.omlx.circuit_breaker_enabled
   required: true

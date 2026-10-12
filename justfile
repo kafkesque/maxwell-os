@@ -34,6 +34,7 @@ health:
     python3 scripts/check_buglog_coverage.py --selftest || exit 1   # BUG-570/BUG-492: the buglog BLOAT rail's own controls - a byte-identical COPY must fire and two DIFFERENT blocks must not
     python3 scripts/check_buglog_coverage.py || exit 1   # BUG-570: no block may be a byte-identical copy of another (the earlier 'not identical' refusal compared an occurrence to EOF - length-dependent, always unequal)
     python3 scripts/r5_review_gate.py --selftest || exit 1   # D-2962/BUG-738: the R5 code-review gate's known-answer controls (a TRUNCATED file MUST fail the syntax layer, scripts/* MUST resolve to a declared tier, the Qwen-lineage model MUST stay declared not-a-candidate) - a control nothing runs is a comment (BUG-492)
+    python3 scripts/restamp_content_type_adjudications.py --selftest || exit 1   # BUG-712/BUG-741/BUG-742: the re-stamp gate's OWN decisions (a MOVED pre-state MUST be refused, a DISPOSITION MUST never be written as a content_type, an undeclared destination MUST fail closed, the authorship sentinel MUST keep --apply closed)
     python3 scripts/check_bug_status.py || exit 1
     python3 scripts/check_governance_faces.py --selftest || exit 1   # SEVENTH rail - governance FACES must not contradict the register (BUG-588/D-2692); controls must fire (a control nothing runs is a comment, BUG-492)
     python3 scripts/check_governance_faces.py || exit 1   # D-NEW: bug-status table rows + header census in DECISION-LOG/MTR must agree with bug_status.json / decisions_summary.json

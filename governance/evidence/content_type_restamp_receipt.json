@@ -1,0 +1,45 @@
+{
+  "applied": 0,
+  "apply_ids": [
+    "7888e1c65dc280fbc6746d6d07554ce97eebc4d001b88a8e3d58842ee93ac656",
+    "72135575d960027250927dc8f79fe43d65278aa0d9390b5d8dd539153f548671",
+    "4a8fc79549b4546b9320ad2c0f22a54cfa7d203f36fb7d6bb455019fd869bc96",
+    "59fea71c8b1e4190febb7b38b3b1649155f98027f8bce8d04b455aa842a3926d",
+    "54ef1892c6d8e4113ff0a57a59c542d2f0066512d4aefb69f307e1484b33d793",
+    "58e1f99e61ff91b5ffe36f9933c97092cdc1123c13be790cb31642c3d09fae97",
+    "104f38cd9840ffc3259d4b32854b00f56626e62c324f934d0cd53942889b8172",
+    "41579acf3900a9af17e529dba3a1fd1131c57f3e940ed7fbe0276a8167844fd6",
+    "ccbaae58f8f7d6363b007fce2e93253fc9952df52961d3726bc24a7a45533ffb",
+    "a06e68608c00c4f527900f7fe1159d10779b165b1e9a58c4a2ab9f0e9a37fe60",
+    "47e184f3d0956f6ffc9bd3dc11b06ec3c95a5df59da5da2cb56f788db6c8fb16"
+  ],
+  "counts": {
+    "absent": 527,
+    "already": 7,
+    "apply": 11,
+    "disposition": 1,
+    "stale": 0,
+    "unknown": 0
+  },
+  "generated": "2026-10-12T20:39:20",
+  "map": "governance/content_type_adjudication.json",
+  "provenance_ruling_owed": true,
+  "provenance_value": "OWNER_RULING_OWED",
+  "refused": {
+    "disposition": [
+      {
+        "current": "tool_instruction",
+        "fb_id": "27fabecb4f68cff1bd519ac65232544b8e3b98282c3e7e597bae5dc8aa5ce3cd",
+        "proposed": "noise_drop",
+        "reason": "physical equipment, descriptive \u2014 no prescriptive \"what to DO\" (owner 2026-10-12: ARED is noise drop)",
+        "warrant": "high"
+      }
+    ],
+    "stale": [],
+    "unknown": []
+  },
+  "schema_version": 1,
+  "store_rows_resolved": 19,
+  "tool": "scripts/restamp_content_type_adjudications.py",
+  "wrote": false
+}

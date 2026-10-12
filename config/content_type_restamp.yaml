@@ -1,0 +1,63 @@
+# config/content_type_restamp.yaml - the BUG-712 retro re-stamp GATE's declarations (C12/C20: no value is typed in code).
+#
+# WHY THIS FILE EXISTS (MEASURED 2026-10-12, live store, 7,640 rows).
+# The producer fix landed (D-2938: stage4_merge persists _resolve_content_type) and the router is calibrated
+# (D-2953: open_tension_strict RATIFIED+ENABLED), so the residual the governed re-stamp acts on is no longer 122
+# rows - it is the OWNER-ADJUDICATED residue. Re-derived here rather than restated (the buglog's "12" is a CLAIM
+# until this tool re-derives it): the adjudication map carries 546 rows, of which 527 do NOT resolve to the live
+# store at all, 7 sit ALREADY at their proposed value, 0 are STALE, and 12 are APPLICABLE.
+#
+# THE TWO VOCABULARIES (the finding, BUG-741): the map's `proposed` field mixes two DIFFERENT vocabularies -
+#   content_types  = {principle, process_template, process_instance, tool_instruction, growth_edge}   (5)
+#   dispositions   = {classified, noise_drop, quarantine}                                           (3)
+# 11 of the 12 applicable rows name a declared content_type; ONE (tool_instruction -> noise_drop) names a
+# DISPOSITION. Writing content_type='noise_drop' would mint a 6th content type that the schema does not declare
+# (config/content_types.yaml#dropped_content_types is the cemetery for exactly that mistake), and the store carries
+# ZERO rows with a disposition as their content_type (census: principle 6,577 | process_template 774 |
+# process_instance 156 | tool_instruction 108 | growth_edge 25). So the disposition row is REFUSED here and
+# escalated as an OWNER-RULING, never silently converted into a type.
+#
+# THE WARRANT RULE (why the router diff is NOT the write set): the calibrated router would move 14 rows; 12 have
+# an owner warrant and 2 (BUG-735) are the strict form's own survivors, 50% precise at n=2. A store label may be
+# moved by a PREDICTION only above a declared bench floor - below it an OWNER WARRANT is required. So the write
+# set is (the owner's map) JOIN (the live PRE-STATE), and a router-only move can never enter it by construction.
+schema_version: 1
+bug: [BUG-712, BUG-741, BUG-742]
+decision: D-2953
+
+# THE WARRANT - the owner's own adjudication map, the ONE home. Never re-typed here, never copied into a receipt.
+map: governance/content_type_adjudication.json
+map_rows_key: rows
+map_current_key: current
+map_proposed_key: proposed
+map_warrant_key: confidence
+
+# THE VOCABULARY HOMES. Both are READ, never restated in code (D-2646: one fact, one home).
+vocab_home: config/content_types.yaml
+vocab_type_keys: [content_types]
+vocab_disposition_keys: [dispositions]
+
+# THE STORE.
+table: fbs
+id_column: fb_id
+label_column: content_type
+provenance_column: content_type_source
+pre_state_required: true   # a row whose live label no longer equals the map's `current` is STALE: refuse it
+
+# THE AUTHORSHIP OF AN OWNER-ADJUDICATED LABEL IS AN OWNER RULING (BUG-742), so --apply REFUSES while this is a
+# sentinel. Today the column's two live values are llm_extracted_from_source (6,591) and deterministic (1,049);
+# neither is TRUE for a label a human ruled. Writing the label and leaving the source alone would be a provenance
+# LIE (the BUG-725 class, inverted), and inventing a third value without declaring it is a writer without a
+# declaration (BUG-562). The owner names the value; this gate is owner-gated BY CONSTRUCTION, not by intention.
+provenance_value: OWNER_RULING_OWED
+
+# EVIDENCE - the receipt is generated, never hand-written, and names every REFUSED id (C16: no silent skip).
+# NB: the receipt lives under governance/evidence/ (an already-declared may_touch family) so the evidence a
+# gate produces has a home ON THE DAY IT IS PRODUCED - a receipt that cannot be committed is not a receipt
+# (D-342 class; this is the same trap that left six governance artifacts uncommittable until D-2860 cleared them).
+receipt: governance/evidence/content_type_restamp_receipt.json
+backup_subdir: backups
+backup_prefix: maxwell.db.pre_restamp_
+
+# EXIT (BUG-457 tri-state): 0 the queue is exactly what the receipt says | 1 a ruling is OWED (loud) | 2 cannot evaluate.
+exit: {clean: 0, refused: 1, cannot_evaluate: 2}

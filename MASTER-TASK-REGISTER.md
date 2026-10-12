@@ -10,7 +10,7 @@
 ## 🔴 MUST — open (strategic-consequential order)
 
 > **CURRENT OPEN INDEX (machine-derived 2026-10-12 — the live face; dated history follows below).**
-> Register truth (do NOT restate counts elsewhere — BUG-588/D-2692): 1091 decisions · 504 bugs (182 open / 322 closed; highest OPEN = BUG-739).
+> Register truth (do NOT restate counts elsewhere — BUG-588/D-2692): 1091 decisions · 506 bugs (184 open / 322 closed; highest OPEN = BUG-742).
 > **D2590 NON-PRINCIPLE TIER
 > LANDED** — decisions **D-2942..D-2945**; the store went **6,591 → 7,640 rows in ONE run** (principle 6,577 /
 > process_template 774 / process_instance 156 / tool_instruction 108 / growth_edge 25). The 1,619 S4 sidecar records

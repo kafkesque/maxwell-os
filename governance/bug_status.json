@@ -2,8 +2,8 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 504,
-  "open_n": 182,
+  "total_ids": 506,
+  "open_n": 184,
   "closed_n": 322,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
@@ -861,7 +861,7 @@
     {
       "id": "BUG-712",
       "title": "(CRITICAL \u2014 OPEN): content_type routing collapse \u2014 6 of 8 declared primitives produce ZERO output",
-      "events": 8
+      "events": 9
     },
     {
       "id": "BUG-719",
@@ -916,6 +916,16 @@
     {
       "id": "BUG-739",
       "title": "(LOW - OPEN 2026-10-12) - the C11 rail is PERMANENTLY RED: it calls 3 stdlib modules undeclared imports, so every control that trusts it mus",
+      "events": 1
+    },
+    {
+      "id": "BUG-741",
+      "title": "(MED - OPEN 2026-10-12) - the adjudication map's `proposed` field CONFLATES two vocabularies, so one owner adjudication is not expressible a",
+      "events": 1
+    },
+    {
+      "id": "BUG-742",
+      "title": "(MED - OPEN 2026-10-12) - the AUTHORSHIP of an owner-adjudicated label is undeclared, so writing the label without it would be a provenance ",
       "events": 1
     }
   ],

@@ -22473,3 +22473,63 @@ decisions:
   - tests/test_s5_score_axis_write_scope.py
   - governance/evidence/s5_score_axis_repair_receipt.json
   - governance/buglog.md
+- id: D-2971
+  state: RESOLVED
+  category: GOVERNANCE / PROVENANCE / RECEIPT INTEGRITY
+  date: '2026-10-12'
+  title: 'BUG-376: a receipt whose region was REWRITTEN is re-baselined WITH THE REWRITE NAMED, and the act lives
+    in the receipt''s one home (plus the append_only state rule moves there with it)'
+  decision: 'BUG-376 (HIGH, closed here) — the decisions_registry receipt described bytes that no longer existed,
+    and the rail had no remedy that was not a laundry. (1) THE DEFECT, bisected byte-exact: d149809 (2026-10-10)
+    edited ONE `state:` cell in place at line 573 AND inserted 52 lines (D-2905/D-2907/D-2908) at line 15,585 —
+    both inside the receipted region — and 3db009e (2026-10-12) RE-SERIALISED the whole registry (13,025 lines added
+    / 6,448 removed, first differing byte = 49, `decisions:\n\n- id:` -> `decisions:\n- id:`). `3db009e -> HEAD`
+    is a PURE APPEND, so the current mint — which asserts `new_text.startswith(text)` and refuses otherwise (D-2655
+    HALF B) — is NOT the cause: the rewrites are historical. (2) WHY IT SURVIVED FIVE DAYS: the declared in-place
+    routes THREW THEIR OBLIGATION IN PROSE (`--strip-derived-head --apply` prints "NEXT (same sitting): re-baseline
+    the receipt"; `--canonicalise-states --apply` prints a three-part NEXT whose third part is the same re-baseline),
+    and a rule that lives in a `print` is a favour (C12/D-2655). The ordering is structural: the remedy needs the
+    edit COMMITTED first, because a receipt over a dirty worktree is UNREVISIONED by the rail''s own join rule (BUG-559),
+    so the two steps cannot be fused into one invocation. (3) THE ACT, in the receipt''s ONE home: `scripts/lib/handoff.py
+    --rebaseline <artifact> --because <D-id> --commit <sha>... [--apply]`, preview by default. It is refuse-closed
+    wherever it would be a laundry: the receipt''s MEASURED state must be `rewritten` (a legal APPEND needs no repair
+    and a TRUNCATION is restored, never re-baselined — D-2642), `--because` must name a record that EXISTS in config/decisions.yaml
+    (an act with no owner is a favour), at least one `--commit` must be given (a rewrite invisible to the receipt
+    is the whole defect), and the live bytes must BE the bytes of that path at git HEAD. Where it runs, the supersession
+    goes INTO the receipt — `because`, `rewrite_named`, `supersedes_sha256`, `supersedes_bytes`, `supersedes_bytes_at`,
+    `reason` — and an `extra` may not shadow a field the receipt MEASURES (C16), so the journal keeps what a quiet
+    re-hash deletes (D-382/BUG-535). It also RECORDS WHERE the superseded bytes still re-derive: MEASURED, commit
+    98471a36 holds exactly those 979,096 bytes, so the superseded claim stays a REVISION rather than prose (BUG-488/D-403);
+    when no store holds them the field is EMPTY and the act SAYS SO. (4) THE RULE MOVED TO ITS ONE HOME: `prefix_state`
+    (BUG-540) left the rail for `scripts/lib/handoff.py`, because the act must ask the IDENTICAL question before
+    it may move a baseline and two implementations of one rule drift (D-274a). The rail MEASURES with `handoff.prefix_state`
+    and stays read-only (BUG-660: a health rail is a PROBE); the act REFUSES with it — one home, two callers — and
+    the finding now prints the exact remedy command instead of naming a bug class with no act behind it. (5) THE
+    RAIL IS HARD AND WAS REPAIRED, NEVER RE-RECORDED QUIET: `--backfill` was rejected because it re-cuts EVERY declared
+    path (moving baselines nobody measured as broken) and remembers nothing about the rewrite. OWED, LOUD: the in-place
+    routes in `scripts/recompute_decision_summary.py` still PRINT their receipt obligation rather than calling the
+    act — they are one-shot and the canonicalising route is inert today (its pin is empty), so the live risk is
+    a hand edit, but wiring them is the class closure.
+
+    '
+  measured: '`scripts/verify_handoffs.py --check`: PRE = "rewritten" (the first 979,096 B hash to 7be564ac6b539269,
+    receipted de3acd304b638fdd) -> POST = the append_only rule GREEN and RE-ARMED on the committed bytes. Bisect
+    over the 213 commits that touch config/decisions.yaml: the receipted digest de3acd30 holds from 98471a3 up to
+    and including b5ce8ae, is broken by d149809 and again by 3db009e; commit 98471a36 holds EXACTLY 979,096 bytes,
+    so the superseded region is a real revision and the act could name it. Rewrite fixture in the controls is a
+    SAME-LENGTH change (a fixture that cannot tell an append from a rewrite would let the positive control pass
+    through the wrong door - MEASURED, and the control was repaired before it was trusted). The act''s known answers:
+    12/12 fire inside the SANDBOX (BUG-491), production journal byte-identical (a15c5b2e2da11497) - one POSITIVE
+    (a measured rewrite with an owner and named commits is accepted) and eleven refusals. tests/test_handoff_rebaseline.py:
+    9 controls. ruff A/B against HEAD: 1 finding per file before AND after (UP017 in handoff.py, I001 in verify_handoffs.py)
+    - both PRE-EXISTING, none introduced.
+
+    '
+  bugs:
+  - BUG-376
+  files:
+  - scripts/lib/handoff.py
+  - scripts/verify_handoffs.py
+  - tests/test_handoff_rebaseline.py
+  - governance/HANDOFFS.jsonl
+  - governance/buglog.md

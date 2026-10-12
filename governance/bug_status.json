@@ -3,8 +3,8 @@
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
   "total_ids": 510,
-  "open_n": 182,
-  "closed_n": 328,
+  "open_n": 181,
+  "closed_n": 329,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -387,11 +387,6 @@
       "id": "BUG-367",
       "title": "(MED - OPEN, ruler data quality, found by the F-11 worksheet 2026-09-22): the human FORM column is mostly non-canonical spellings",
       "events": 1
-    },
-    {
-      "id": "BUG-376",
-      "title": "(HIGH \u2014 OPEN, OWNER GATE = C-3): a completed S5 run's declared input was rewritten after the run, and the image is gone",
-      "events": 3
     },
     {
       "id": "BUG-377",
@@ -991,6 +986,7 @@
     "BUG-373",
     "BUG-374",
     "BUG-375",
+    "BUG-376",
     "BUG-379",
     "BUG-380",
     "BUG-383",

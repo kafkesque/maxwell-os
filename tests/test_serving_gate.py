@@ -13,6 +13,7 @@ import pytest
 
 from pipeline.serving_gate import (
     assert_invariant,
+    content_types_without_factual_claim,
     derive_epistemic_status,
     derive_status,
     load_label_config,
@@ -185,4 +186,56 @@ def test_pre_write_guard_refuses_an_unverifiable_row_instead_of_guessing():
 def test_pre_write_guard_accepts_the_declared_duplicate_quarantine():
     ok, complaint = pre_write_verdict(_fb("QUARANTINE", "duplicate", duplicate_of="fb_canon"))
     assert ok, complaint
+
+
+# ── D-2942 (D2590): the THIRD disposition — a non-principle role carries NO NLI factual claim ────
+# Three invariants: (1) an absent record on a role WITHOUT a factual claim derives
+# s5_not_applicable, NEVER undecidable and NEVER PASS; (2) the writer guard accepts the declared
+# not-applicable disposition and refuses a non-principle PASS; (3) the config declares EXACTLY the
+# four roles (a 5th would silently change the gate's partition — C12 fail-closed).
+
+def test_d2942_absent_record_on_non_principle_is_not_applicable_not_unknown():
+    """S5 verifies truth claims; a PT/PI/TI/GE has none, so 'no record' is DERIVABLE, not undecidable."""
+    for role in ("process_template", "process_instance", "tool_instruction", "growth_edge"):
+        status, reason = derive_status(json.dumps([]), content_type=role)
+        assert status == "QUARANTINE", (role, status)
+        assert reason == "s5_not_applicable", (role, reason)
+
+
+def test_d2942_absent_record_on_principle_is_still_unknown():
+    """A principle carries a factual claim; an absent record is still undecidable (fallback)."""
+    status, reason = derive_status(json.dumps([]), content_type="principle")
+    assert (status, reason) == ("QUARANTINE", "unknown")
+
+
+def test_d2942_non_principle_role_can_never_pass_without_a_record():
+    """NEVER PASS: an unverified non-principle row must not read as verified (R5/D2298)."""
+    for role in ("process_template", "process_instance", "tool_instruction", "growth_edge"):
+        status, _reason = derive_status(json.dumps([]), content_type=role)
+        assert status != "PASS", role
+
+
+def test_d2942_config_declares_exactly_the_four_roles_without_factual_claim():
+    """A role added/removed from the list is a gate-partition change, caught here (C12)."""
+    assert content_types_without_factual_claim() == frozenset(
+        {"process_template", "process_instance", "tool_instruction", "growth_edge"}
+    )
+
+
+def test_d2942_writer_guard_accepts_the_declared_not_applicable_disposition():
+    """The one writer may persist QUARANTINE + s5_not_applicable for a routed non-principle row."""
+    ok, complaint = pre_write_verdict(_fb(
+        "QUARANTINE", "s5_not_applicable", detail="", passed=False,
+        content_type="process_template", verification_results=json.dumps([]),
+    ))
+    assert ok, complaint
+
+
+def test_d2942_writer_guard_refuses_a_non_principle_pass():
+    """A non-principle row can never carry status=PASS (the invariant's writer half)."""
+    ok, complaint = pre_write_verdict(_fb(
+        "PASS", "entail", detail="ENTAIL (majority 1/1): ent=1.00", passed=True,
+        content_type="process_template", verification_results=json.dumps([]),
+    ))
+    assert not ok and complaint
 # ── BUG-502")[1].join(["

@@ -198,6 +198,7 @@ QUARANTINE scope plus a role facet — a deliberate consequence of D-2942, not a
 | "gemma scores 0.875 on suffix-merge" | **degenerate** — equal to the constant-answer baseline 0.875 (always `merge`) |
 | "the judge is 78% accurate" | **quote the lift, not the accuracy**: 0.778 with a 0.778 constant-answer baseline is zero information |
 | "re-verify the 6 decision lists with a different family" | only **1 of 4** testable tasks has a judge that beats a constant answer; the rest must be made deterministic or human-owned (F-17) |
+| "procedural/episodic tiers are at 0 committed rows" (research/PRIMITIVES §1/§3) | **superseded by D2590**: live store 7,640 rows — process_template 774 / process_instance 156 / tool_instruction 108 / growth_edge 25 (BUG-712 producer fix landed; only the retro re-stamp remains) |
 
 ---
 

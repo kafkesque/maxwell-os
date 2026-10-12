@@ -45,7 +45,17 @@ TEMPORAL_LITERAL = Literal["timeless", "contemporary", "era-specific"]
 ACCESSIBILITY_LITERAL = Literal["self-evident", "prerequisite"]
 INTIMACY_LITERAL = Literal["public", "selective", "private"]
 CONTEXT_LITERAL = Literal["business", "design", "system", "academic", "personal", "general"]
-PROVENANCE_LITERAL = Literal["human_verbatim", "llm_extracted_from_source", "llm_hypothesis"]
+PROVENANCE_LITERAL = Literal[
+    "human_verbatim",
+    "llm_extracted_from_source",
+    "llm_hypothesis",
+    # D-2947 (BUG-725): a label DERIVED by deterministic rule (reroute_content_type / D2417
+    # form default), never LLM-classified (D-343). NOT-APPLICABLE is deliberately NOT a member:
+    # it is an ABSENCE sentinel (the axis was never derived for a deterministically-routed
+    # non-principle row), not a provenance METHOD — it is declared in config/label_provenance.yaml
+    # and recognized by pipeline/label_traceability.py, never admitted into the C29 vocabulary.
+    "deterministic",
+]
 VERIFICATION_STATUS = Literal["PASS", "FLAG", "QUARANTINE", "PENDING"]
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -261,7 +271,7 @@ class FB(StampedRecord):
     )
     provenance: PROVENANCE_LITERAL = Field(  # type: ignore[valid-type]
         default="llm_extracted_from_source",
-        description="Provenance tier (C29): human_verbatim | llm_extracted_from_source | llm_hypothesis."
+        description="Provenance tier (C29): human_verbatim | llm_extracted_from_source | llm_hypothesis | deterministic."
     )
 
     # D2439: structural evidence tier (convergence axis) — must survive S4→S6 so
@@ -407,15 +417,18 @@ class FB(StampedRecord):
     content_type_source: PROVENANCE_LITERAL | None = Field(  # type: ignore[valid-type]
         default=None,
         description="C29 provenance tier for content_type (D-279). human_verbatim | "
-                    "llm_extracted_from_source | llm_hypothesis.",
+                    "llm_extracted_from_source | llm_hypothesis | deterministic (deterministic "
+                    "reroute, D-343/BUG-725).",
     )
     discipline_source: PROVENANCE_LITERAL | None = Field(  # type: ignore[valid-type]
         default=None,
-        description="C29 provenance tier for discipline (D-279).",
+        description="C29 provenance tier for discipline (D-279); may carry the NOT_APPLICABLE "
+                    "absence sentinel for deterministically-routed non-principle rows (BUG-725).",
     )
     extraction_type_source: PROVENANCE_LITERAL | None = Field(  # type: ignore[valid-type]
         default=None,
-        description="C29 provenance tier for extraction_type (D-279).",
+        description="C29 provenance tier for extraction_type (D-279); includes deterministic "
+                    "(D2417 form default, BUG-725).",
     )
     menu_hash: str | None = Field(
         default=None,

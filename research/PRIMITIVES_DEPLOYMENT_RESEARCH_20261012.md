@@ -1,5 +1,15 @@
 # Knowledge-Layer Primitives Deployment — Deep Market Research (2026-10-12)
 
+> **⚠️ SUPERSEDED (2026-10-12, post-D2590):** the "0 committed rows" claims in §1 and §3 were
+> written **before** the D2590 non-principle commit tier landed and are now **stale**. The live
+> served store (ONE run `rechunk-v4-20260929`) holds **7,640 rows** — principle 6,577 /
+> process_template 774 / process_instance 156 / tool_instruction 108 / growth_edge 25. The
+> procedural/episodic tiers are **no longer empty** (BUG-712 producer fix D-2938 landed; the
+> remaining gap is the retro re-stamp, not "no rows exist"). G6 ("content_type is not a first-class
+> facet") is **superseded** — `pipeline/retrieve.py` now has `--content-type`. The *analysis* below
+> (completion-not-pivot, four-tier memory mapping, A1/A2/A3) remains valid; the *population counts*
+> in §1/§3 do not. Do not re-quote them (see CONTEXT_INDEX §9 DO-NOT-QUOTE).
+
 **Question (owner):** before committing, is our plan to deploy the knowledge-layer primitives
 (FB / PT / PI / GE / TI) into the everyday agent harness the most sophisticated/effective approach —
 or are there better, more profoundly effective ways to keep a local *or* frontier LLM grounded,

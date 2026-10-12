@@ -4,13 +4,13 @@
   "generated": "2026-10-02",
   "source": "checkpoint.jsonl rechunk-v4-20260929",
   "n_rows": 573,
-  "note": "owner dispositions folded (D-2756): 13 role corrections applied; distribution {\"principle\": 16, \"process_template\": 28, \"process_instance\": 1, \"tool_instruction\": 2, \"noise_drop\": 153, \"quarantine\": 221, \"growth_edge\": 152}",
+  "note": "owner dispositions folded (D-2756): 13 role corrections applied; distribution {\"principle\": 16, \"process_template\": 28, \"process_instance\": 1, \"tool_instruction\": 2, \"noise_drop\": 153, \"quarantine\": 221, \"growth_edge\": 152} | BUG-714 (D-2947, owner 2026-10-12): 14 legacy tool_instruction rows re-adjudicated — 10 principle, 3 keep tool_instruction, 1 noise_drop (ARED).",
   "rows": [
     {
       "fb_id": "c848cbeb28c6eaffd40e0417f8515bf123726613c8aba82414d44d7dd6e851ac",
       "current": "tool_instruction",
-      "proposed": "principle",
-      "reason": "concept/pattern/algorithm, not a tool command",
+      "proposed": "tool_instruction",
+      "reason": "specific named tool/library invocation — signature+intent contract; keep as tool_instruction",
       "confidence": "high"
     },
     {
@@ -191,15 +191,15 @@
     {
       "fb_id": "27fabecb4f68cff1bd519ac65232544b8e3b98282c3e7e597bae5dc8aa5ce3cd",
       "current": "tool_instruction",
-      "proposed": "principle",
-      "reason": "hardware/device description (descriptive_model)",
+      "proposed": "noise_drop",
+      "reason": "physical equipment, descriptive — no prescriptive \"what to DO\" (owner 2026-10-12: ARED is noise drop)",
       "confidence": "high"
     },
     {
       "fb_id": "a5b28d901b9533449d67e478335a1a8de736928d5bcae77802e26c150515ced5",
       "current": "tool_instruction",
-      "proposed": "principle",
-      "reason": "concept/pattern/algorithm, not a tool command",
+      "proposed": "tool_instruction",
+      "reason": "specific named tool/library invocation — signature+intent contract; keep as tool_instruction",
       "confidence": "high"
     },
     {
@@ -212,8 +212,8 @@
     {
       "fb_id": "1a477c00823283744a765a3a7e3adb3d51ec6dff8c24801d27f0c57d23be0977",
       "current": "tool_instruction",
-      "proposed": "principle",
-      "reason": "concept/pattern/algorithm, not a tool command",
+      "proposed": "tool_instruction",
+      "reason": "specific named tool/library invocation — signature+intent contract; keep as tool_instruction",
       "confidence": "high"
     },
     {
@@ -4017,5 +4017,6 @@
       "reason": "principle-purity adjudication (D-2748, owner-approved 2026-10-02): definitional_with_prescriptive,open_tension",
       "confidence": "high"
     }
-  ]
+  ],
+  "last_updated": "2026-10-12"
 }

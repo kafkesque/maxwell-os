@@ -646,7 +646,9 @@ docs — that is drift (anti-drift rule 8).
 
 ## BUG-274 — the `related_fbs` graph is 56.8% asymmetric (2026-09-17)
 
-**Severity:** low-medium. **Status:** OPEN.
+**Severity:** low-medium. **Status:** RESOLVED (read-side) 2026-10-12 — see the closing block below.
+Store-level one-way edges are INTENTIONALLY retained per D-277 (backfilling would fabricate adjacency the
+BUG-188 neighbour cap dropped).
 
 Measured: 156,190 directed edges (dict-parsed `{"fb_id","relationships"}`), **0 dangling**.
 A→B implies B→A in only 43.2% of cases: **88,592 one-way edges**. Also **7 self-references**.
@@ -10870,3 +10872,64 @@ act):
 **RECOMMENDATION:** (b) — it removes the ambiguity at the source and leaves the rail's teeth intact for every
 other row. Until it is ruled, `just health` is RED on this ONE rail and the raiL is RIGHT to be red: the tier is
 persisted (D2590) but its label provenance is genuinely undeclared.
+
+## BUG-274 (RESOLVED read-side 2026-10-12): A2 undirected traversal — graph_expand now follows INCOMING symmetric edges
+
+The retrieval consequence of the one-way edges ("a reachability hole that depends on which node you start
+from") is FIXED read-side, no store mutation. `pipeline/retrieve.py::graph_expand` now builds a reverse
+adjacency index over the four SYMMETRIC relationship types (`semantic_near`/`source_crossover`/
+`discipline_overlap`/`domain_overlap` — all overlap/similarity signals, inherently undirected) and follows
+incoming edges during BFS, so a link pruned on one side by the BUG-188 neighbour cap is traversable from
+either node. Config-first (C12): `config/pipeline_config.yaml#retrieval.symmetric_relationship_types`, read via
+`pipeline/pipeline_paths.py::SYMMETRIC_RELATIONSHIP_TYPES`. No backfill (D-277): the store is untouched.
+
+MEASURED (live 7,640-row store): directed edges 131,358 unchanged; one-way 77,558 (59.0%) unchanged —
+proving no mutation; and a 200-edge deterministic sample of one-way edges is now 200/200 (100%) reachable
+from the pruned side (was 0/200 by construction). 5/5 deterministic tests green; retrieval + enrich suites
+13/13 green; rails green (faces / register / buglog / commit-frontier / repo-integrity). Store self-references
+are already 0 (the 7 self-refs from the 2026-09-17 census were dropped earlier).
+
+## BUG-714 (HIGH — OPEN, OWNER GATE): senior-architect recommendation appended 2026-10-12
+
+The user asked whether code/syntax/scripts can be a tool instruction, and for a disposition rule for the 14
+rows. Recommendation (grounded in the D2323 MCP/OpenAPI/man-page schema and the D275b decision procedure):
+
+RATIFICATION (signature + intent, never discipline/domain) is CORRECT and is the industry consensus. Every
+major tool contract keys on the invocation signature (MCP `name`+`inputSchema`; OpenAPI `operationId`+
+`parameters`; OpenAI function-calling `name`+`parameters`; man-page NAME+SYNOPSIS) plus intent (`description`/
+DESCRIPTION), and NONE keys on discipline/domain. The presence of code is the ILLUSTRATION MEDIUM, not the
+role. Discriminator: tool_instruction ⇔ "the invocation contract of a SPECIFIC named tool/software" (tool_name +
+syntax/parameters = signature; description + output = intent). A transferable pattern/algorithm that is only
+illustrated with code is a PRINCIPLE, not a TI.
+
+DISPOSITION of the 14 rows (heterogeneous — a single retype is the wrong mental model; the D275b procedure
+applied per-object yields three bins):
+  → PRINCIPLE (transferable pattern/algorithm/descriptive object): Adapter Pattern; Advanced Resistive Exercise
+    Device (physical equipment — descriptive, NOT a tool); Anisotropic Euclidean Metric Modification; Job
+    Recommendation Algorithm; Protein-disease Association Query Pattern; React Component Function Pattern;
+    Redis Stream Task Queue Pattern; Spring Force Calculation Algorithm (Hooke's law); Triangle Depth
+    Calculation; MongoDB Document Retrieval Pattern; Flask MethodView Endpoint Pattern.
+  → TOOL_INSTRUCTION (keep — specific named tool/library invocation): Chat Completions Request Pattern (OpenAI
+    API); TinyGPS Library Usage Pattern (Arduino library); Character Counting Tool Pattern (borderline —
+    demonstrates the `Tool` object abstraction, lean TI).
+  → NOISE_DROP (bare descriptive fact, no prescriptive filter/template/method): none of the 14 clearly qualifies,
+    but Advanced Resistive Exercise Device is the nearest — if it carries no "what to DO with it", it drops;
+    otherwise it is a principle (descriptive_model).
+
+BLOCKER NOTE: BUG-714 is downstream of BUG-712 (the corrected content_type is COMPUTED AND DISCARDED). Until
+the BUG-712 producer fix persists `_resolve_content_type`, retyping these 14 rows by hand is a band-aid that a
+re-run will silently undo. Recommend: ratify BUG-712 first, then this re-typing is automatic.
+
+## BUG-714 — OWNER GATE RESOLVED 2026-10-12: disposition APPLIED to the adjudication map (owner ratified)
+
+The owner ratified the senior-architect disposition and ruled **ARED = noise_drop**. The disposition is now
+recorded in the tier-1 authority `governance/content_type_adjudication.json` (the map `reroute_content_type`
+reads first): **10 → principle (already correct), 3 → keep tool_instruction (Chat Completions / TinyGPS /
+Character Counting — previously mis-mapped to principle), 1 → noise_drop (Advanced Resistive Exercise
+Device)**. 4 rows changed, verified by re-loading through `pipeline.content_types._load_adjudication_map`
+(14/14 OK). `n_rows` 573 unchanged.
+
+The producer fix (D-2938 `persist_resolved_content_type: true`) is ALREADY committed, so the corrected label
+lands automatically on the NEXT S2→S6 run. The RETRO re-stamp of the live 7,640-row store (apply
+`reroute_content_type` over the committed rows and re-derive status/type_body) is the remaining mechanical
+step — owner-gated on consumer revalidation, do NOT hand-edit the store.

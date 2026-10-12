@@ -38,8 +38,18 @@ SUBJECT_MATTER = {
 CLAIM_STATUS = {
     "mechanism": "The evidence is contested, and the causal link remains unresolved.",
 }
-TRUE_OPEN_QUESTION = {
+# D-2966 (BUG-735): this fixture used to sit in `boundary` ("...is an open question") and asserted that
+# the strict form FIRES - which is exactly the class BUG-735 removed: a status phrase with no epistemic
+# SUBJECT, in the field that states where a claim does NOT hold. It is a NEGATIVE pin now, and the positive
+# fixture names the subject the status is predicated of (a status must be PREDICATED of something).
+SUBJECT_ATTACHED_STATUS = {
+    "elaboration": "The findings are not yet established, and the correlation remains unproven for that mechanism.",
+}
+BARE_STATUS_IN_A_SCOPE_FIELD = {
     "boundary": "Whether the effect generalises beyond the sampled population is an open question.",
+}
+BARE_STATUS_IN_AN_ASSERTIVE_FIELD = {
+    "consequence": "Some nonfiction genres benefit from a looser arc; that remains an open question.",
 }
 
 
@@ -75,10 +85,27 @@ def test_both_forms_fire_on_a_genuine_claim_status() -> None:
     assert ct.principle_tension_hit(record, strict=True) is True
 
 
-def test_unambiguous_constructions_survive_the_strict_form() -> None:
-    """'open question' / 'unknown whether' / 'not established' stay standalone in both forms."""
-    record = _fb(**TRUE_OPEN_QUESTION)
+def test_a_status_predicated_of_an_epistemic_subject_survives_the_strict_form() -> None:
+    """D-2966: the third alternatives stay USABLE - a status predicated of a subject still fires. What the
+    narrowing removed is the BARE phrase (no subject named), not the meaning."""
+    record = _fb(**SUBJECT_ATTACHED_STATUS)
     assert ct.principle_tension_hit(record, strict=True) is True
+
+
+def test_a_bare_status_phrase_in_a_scope_field_is_not_a_tension() -> None:
+    """BUG-735, the defect this narrowing exists for: 9 of the strict form's 12 survivors were exactly this -
+    a bare epistemic phrase in `boundary`, which states where a claim does NOT hold and is therefore
+    STRUCTURAL to any honest principle. MEASURED before the narrowing: 12 survivors, 2 store moves."""
+    record = _fb(**BARE_STATUS_IN_A_SCOPE_FIELD)
+    assert ct.principle_tension_hit(record, strict=False) is True
+    assert ct.principle_tension_hit(record, strict=True) is False
+
+
+def test_a_bare_status_phrase_in_an_assertive_field_is_not_a_tension_either() -> None:
+    """The ONE measured false positive that VARIANT A (dropping `boundary` from the haystack) did NOT clear and
+    the ratified variant B does. This test is the DISCRIMINATOR between the two candidates, so the owner's
+    choice is pinned by a control rather than by a note in a comment."""
+    assert ct.principle_tension_hit(_fb(**BARE_STATUS_IN_AN_ASSERTIVE_FIELD), strict=True) is False
 
 
 def test_monkeypatching_the_flag_moves_the_router(monkeypatch: pytest.MonkeyPatch) -> None:

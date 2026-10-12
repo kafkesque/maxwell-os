@@ -221,13 +221,35 @@ TI_TO_PT_KEYWORDS: tuple[str, ...] = tuple(
     str(k).strip().lower() for k in _REROUTE["ti_to_pt_keywords"] if str(k).strip()
 )
 TI_TO_PT_REQUIRE_BODY_EVIDENCE: bool = bool(_REROUTE["ti_to_pt_require_body_evidence"])
-_ADJUDICATION_PATH: Path = Path(__file__).resolve().parent.parent / "governance" / "content_type_adjudication.json"
+# D-2967 (BUG-741): the map's PATH, rows key and destination keys are DECLARED (one home) in
+# config/content_types.yaml#adjudication_map and read LOUDLY, with no code default — a missing block is
+# an import defect (C16 fail-closed), never a silently empty tier 1.
+_MAP_SCHEMA: dict = dict(_CT["adjudication_map"])
+_ADJUDICATION_PATH: Path = Path(__file__).resolve().parent.parent / str(_MAP_SCHEMA["path"])
 CONTESTED_FLAG: str = "contested"
 GROWTH_EDGE_CONTENT_TYPE: str = "growth_edge"
 
 
 def _load_adjudication_map() -> dict[str, str]:
-    """Load the owner-adjudicated fb_id → corrected content_type map (C16: loud on corrupt)."""
+    """Load the owner-adjudicated fb_id → corrected ROLE map (C16: loud on corrupt).
+
+    D-2967 (BUG-741): the map's destination is SPLIT BY VOCABULARY — a row carries exactly one of the
+    declared `role_key` or `disposition_key` (config/content_types.yaml#adjudication_map is the ONE
+    home for the map's schema). The kind is a property of the VALUE, so the KEY names the vocabulary it
+    was drawn from; a per-row `destination_kind` tag would restate that fact per row and could
+    disagree with the value it tags (C12/D-2642).
+
+    This loader returns ROLES ONLY. MEASURED before the split: it admitted `CONTENT_TYPES_ALL`, which
+    INCLUDES the two dispositions, so tier 1 — the router's HIGHEST authority — returned 'quarantine'
+    or 'noise_drop' as a role for 375 of the 542 entries it admitted. With the D-2938 persist flag on,
+    that disposition is written into the FB checkpoint and the D-2965 leaf gate refuses it at S6, where
+    stage6.max_failed_ratio 0.0 turns ONE refused row into a HALTED, ROLLED-BACK commit.
+    Three shapes are REFUSED loudly rather than skipped (C16): a row still carrying the legacy
+    conflated key (a stale map would silently empty tier 1 for every adjudicated record), a row
+    carrying BOTH destination keys, and a role key naming a value the ontology does not declare.
+    A DISPOSITION is NOT an error here: the map is the home of the owner's own ruling and BUG-741 gives
+    a disposition its own act — it is simply not a role, so it is never admitted as one.
+    """
     if not _ADJUDICATION_PATH.exists():
         return {}
     try:
@@ -235,15 +257,35 @@ def _load_adjudication_map() -> dict[str, str]:
         doc = json.loads(_ADJUDICATION_PATH.read_text(encoding="utf-8"))
     except Exception as exc:  # noqa: BLE001 — C16: log AND raise
         raise RuntimeError(f"content_type adjudication map is corrupt ({_ADJUDICATION_PATH}): {exc}") from exc
-    rows = doc.get("rows", []) if isinstance(doc, dict) else []
+    rows = doc.get(str(_MAP_SCHEMA["rows_key"]), []) if isinstance(doc, dict) else []
     out: dict[str, str] = {}
-    for row in rows:
+    for idx, row in enumerate(rows):
         if not isinstance(row, dict):
             continue
         fb_id = str(row.get("fb_id") or "").strip()
-        proposed = str(row.get("proposed") or "").strip()
-        if fb_id and proposed in CONTENT_TYPES_ALL:
-            out[fb_id] = proposed
+        if str(_MAP_SCHEMA["legacy_conflated_key"]) in row:
+            raise RuntimeError(
+                f"content_type adjudication map row {idx} ({fb_id[:12]}) still carries the LEGACY conflated key "
+                f"'{_MAP_SCHEMA['legacy_conflated_key']}': the two vocabularies are split into "
+                f"'{_MAP_SCHEMA['role_key']}' / '{_MAP_SCHEMA['disposition_key']}' (D-2967/BUG-741) — re-derive the map; "
+                f"reading a legacy key would let a DISPOSITION become a role while a stale shape emptied tier 1"
+            )
+        role = str(row.get(str(_MAP_SCHEMA["role_key"])) or "").strip()
+        disposition = str(row.get(str(_MAP_SCHEMA["disposition_key"])) or "").strip()
+        if role and disposition:
+            raise RuntimeError(
+                f"content_type adjudication map row {idx} ({fb_id[:12]}) carries BOTH '{_MAP_SCHEMA['role_key']}' and "
+                f"'{_MAP_SCHEMA['disposition_key']}' — a destination is a role XOR a disposition (D-2967/BUG-741)"
+            )
+        if not role:
+            continue  # a disposition ruling: declared, not a role, and never read as one
+        if role not in CONTENT_TYPES:
+            raise RuntimeError(
+                f"content_type adjudication map row {idx} ({fb_id[:12]}) names an UNDECLARED role {role!r} "
+                f"(D-2967/C16): declared roles are {sorted(CONTENT_TYPES)}"
+            )
+        if fb_id:
+            out[fb_id] = role
     return out
 
 
@@ -320,12 +362,33 @@ _EPISTEMIC_SUBJECT = (
 #   (c) unambiguous constructions       "open question", "unknown whether", "not established"
 # A relational use ("X contradicts Y") or a subject-matter modifier ("contradictory information")
 # matches none of the three, which is the entire point of the narrowing.
+# D-2966 (BUG-735, owner-ratified 2026-10-12) — THE THIRD ALTERNATIVE NOW REQUIRES AN EPISTEMIC
+# SUBJECT TOO. MEASURED at the D-2953 flip (scripts/calibrate_content_type_router.py, SIDE D): 9 of
+# the strict form's 12 survivors fired on a token sitting in `boundary` ALONE, and 1 more was an
+# ordinary subject-matter "open question" in an ASSERTIVE field. A `boundary` states where a claim
+# does NOT hold, so an epistemic word there is STRUCTURAL to any honest principle; and a status phrase
+# with no subject named is not a statement ABOUT a claim at all.
+# TWO CANDIDATES were measured over the same 7,640 rows, both NARROWING (D-2953's safe direction):
+#   (A) drop `boundary` from the status haystack -> 3 survivors, **2 store moves**;
+#   (B) require an epistemic subject for the third alternative -> 3 survivors, **1 store move**.
+# THE MEASUREMENT FALSIFIED THE EARLIER NOTE THAT "either way the move count becomes 1" (D-2956
+# clause 3 — a declaration may not carry a claim the instrument contradicts): A does NOT clear the
+# assertive-field false positive ("open question" in a Nonfiction Writing record), B does. B also
+# leaves `_tension_haystack` UNTOUCHED — and that haystack is ALSO read by tier 3
+# (`_PROCEDURE_STEPS`/`_DONE_CONDITION`), by the definitional-quarantine branch and by
+# `_PRESCRIPTIVE`, so excluding a field there would have moved the PROCEDURE and QUARANTINE tiers with
+# an UNMEASURED blast radius. The invariant is now uniform: in all three alternatives a status must be
+# PREDICATED of an epistemic subject. PRECISION-ONLY (SIDE B recall 0 in every variant).
+# NOTE (D-2649/BUG-533): this comment names body FIELDS, never another store column, so it cannot move
+# a `mentions` census.
+_BARE_STATUS_PHRASE = r"(open question|unknown whether|not (yet )?(established|verified|proven))"
 _OPEN_TENSION_STRICT = re.compile(
     r"\b" + _EPISTEMIC_SUBJECT + r"\b[^.]{0,40}\b(is|are|was|were|remains?|seems?|appears?)\b"
     r"[^.]{0,20}\b(contested|disputed|unresolved|unverified|debated)\b"
     r"|\b(contested|disputed|unresolved|unverified|debated)\s+" + _EPISTEMIC_SUBJECT + r"\b"
-    r"|\b(open question|unknown whether|not (yet )?(established|verified|proven)|"
-    r"correlation .{0,20} unproven)\b",
+    r"|\b" + _EPISTEMIC_SUBJECT + r"\b[^.]{0,40}\b" + _BARE_STATUS_PHRASE + r"\b"
+    r"|\b" + _BARE_STATUS_PHRASE + r"\b[^.]{0,25}\b" + _EPISTEMIC_SUBJECT + r"\b"
+    r"|\bcorrelation .{0,20} unproven\b",
     re.IGNORECASE,
 )
 # C12: the mode is CONFIG-owned (config/content_types.yaml -> reroute.open_tension_strict) and the

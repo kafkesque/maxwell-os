@@ -26,10 +26,13 @@ bug: [BUG-712, BUG-741, BUG-742]
 decision: D-2953
 
 # THE WARRANT - the owner's own adjudication map, the ONE home. Never re-typed here, never copied into a receipt.
-map: governance/content_type_adjudication.json
-map_rows_key: rows
-map_current_key: current
-map_proposed_key: proposed
+# D-2967 (BUG-741): the map's PATH and its DESTINATION KEYS are declared ONCE, in
+# config/content_types.yaml#adjudication_map, and this gate READS them there instead of restating them. The router
+# (tier 1) and the migration read that same block, so a rename cannot leave this gate looking at a key nobody
+# writes while the router RAISES on the legacy one - one home, two readers, both loud.
+# The destination is a ROLE XOR a DISPOSITION: a row carries exactly one of map_schema.role_key /
+# map_schema.disposition_key, and the KEY names the vocabulary the value was drawn from.
+map_schema_home: config/content_types.yaml#adjudication_map
 map_warrant_key: confidence
 
 # THE VOCABULARY HOMES. Both are READ, never restated in code (D-2646: one fact, one home).
@@ -62,6 +65,33 @@ provenance_value: human_verbatim
 receipt: governance/evidence/content_type_restamp_receipt.json
 backup_subdir: backups
 backup_prefix: maxwell.db.pre_restamp_
+
+# -----------------------------------------------------------------------------------------------------------
+# BUG-741(b) - A DISPOSITION IS NOT A CONTENT_TYPE, AND THE ACT ITS RULING ASKS FOR.
+# A row the owner rules noise_drop is not a role, so this gate can never write it into content_type (measured: the
+# store carries ZERO rows whose content_type is a disposition). But a DISPOSITION RULING IS NOT A NO-OP EITHER,
+# and the store has no home for it today:
+#   * status CANNOT express it. status is a VERIFICATION verdict (PASS | FLAG | QUARANTINE | PENDING,
+#     pipeline/schemas.py#VERIFICATION_STATUS) about how far an artifact has been verified; a curation decision
+#     about whether we want the artifact at all is a DIFFERENT axis. Using one to say the other is the BUG-499
+#     drift class (two near-identical words for two different things).
+#   * A disposition COLUMN IS NOT BUILT YET, on purpose: D-2952 says create the column in the SAME change that has
+#     its WRITER, and C28 says bloat is opt-in. MEASURED 2026-10-12 with this gate: the ONE applicable disposition
+#     row is ALREADY not served, so the ruling is SATISFIED IN EFFECT and there is no row for such a writer to act
+#     on. A column that no reader consults at retrieval time would be an inert badge - the serving predicate reads
+#     status, not a disposition - i.e. a flag that enforces nothing.
+# SO THE ACT IS DECLARED AND THE GAP IS LOUD RATHER THAN SILENT: a disposition ruling on a row that IS served (the
+# general case) is a WITHDRAWAL from the served store, archive-first (R-D410). This gate BLOCKS on that state
+# (exit 1) and NAMES the id and the owed act, so the state can never be absorbed into a count. The writer lands
+# with the first row that needs it - a trigger the gate evaluates mechanically on every run.
+dispositions:
+  act_for_stored_row: withdraw_with_archive   # a role is WRITTEN; a disposition is ENACTED
+  writer: OWED                                # does not exist yet; named here and reported by the gate every run
+  writer_trigger: a disposition-ruled row whose stored state is in the SERVED path
+  # "is this row served?" is asked of the SERVING layer's own predicate (D2330), never restated here (C21).
+  served_predicate_home: pipeline/retrieve.py#_status_predicate
+  not_served_bucket: disposition              # the ruling is already true; nothing is owed
+  served_bucket: disposition_served           # BLOCKING: the act above is owed
 
 # EXIT (BUG-457 tri-state): 0 the queue is exactly what the receipt says | 1 a ruling is OWED (loud) | 2 cannot evaluate.
 exit: {clean: 0, refused: 1, cannot_evaluate: 2}

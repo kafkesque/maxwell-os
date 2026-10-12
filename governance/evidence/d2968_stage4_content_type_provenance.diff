@@ -1,0 +1,72 @@
+PURPOSE OF THIS FILE (a diff under review, D-2968/BUG-712).
+This is a REVIEW UNIT, not source: it is the complete change made to pipeline/stage4_merge.py on 2026-10-12,
+submitted to the R5 cross-family reviewer because the WHOLE file (152,853 chars) exceeds the reviewer's context
+and the model returns HTTP 400 for it (BUG-746: a crash must never be read as a rejection, so the gate refuses
+to send it). The change makes ONE line of the write path derive the content_type AUTHORSHIP from the same
+computation that chose the label, instead of stamping a literal on every row.
+
+WHY (measured). D-2938 made S4 persist the ROUTER's resolved content_type instead of the raw S2 label, but the
+write site kept stamping llm_extracted_from_source on EVERY row. The next S2->S6 run would therefore write
+~100 labels the DETERMINISTIC router authored (D-343/D-2747) while claiming an LLM authored them: the BUG-742
+class (a provenance value TRUE of the label the row no longer carries), and the same defect shape D-2938 itself
+fixed (a computed fact, discarded at the write site).
+
+THE CLOSED VOCABULARY IT CHOOSES FROM (pipeline/schemas.py#PROVENANCE_LITERAL, a Pydantic Literal, so an
+undeclared value is a ValidationError): human_verbatim | llm_extracted_from_source | llm_hypothesis |
+deterministic. The function never mints a value; it selects one of the four.
+
+REVIEW QUESTION: is this change CORRECT for that purpose and SAFE to run (no data loss, no irreversibility,
+no silent failure, does it verify its own work)? Note that when the router AGREES with S2 the LLM did author
+the persisted label, so the LLM stamp must (and does) stay.
+
+=== UNIFIED DIFF: pipeline/stage4_merge.py ===
+diff --git a/pipeline/stage4_merge.py b/pipeline/stage4_merge.py
+index dd66806..4b8e056 100644
+--- a/pipeline/stage4_merge.py
++++ b/pipeline/stage4_merge.py
+@@ -276,6 +276,29 @@ _PERSIST_RESOLVED_CONTENT_TYPE: bool = bool(
+ _REROUTE_COUNTER: dict = {"rerouted_nonprinciple": 0}
+ 
+ 
++def content_type_source(resolved_ct: str, raw_ct: str, persist: bool) -> str:
++    """The AUTHORSHIP of the persisted content_type label (D-2968/BUG-712).
++
++    D-2938 made S4 persist the ROUTER's resolved role instead of the raw S2 label, but the write site kept
++    stamping `llm_extracted_from_source` on EVERY row - so a label the deterministic router authored would
++    carry an LLM-authorship stamp. That is the BUG-742 class (a provenance value TRUE of the label the row no
++    longer carries), and it is D-2938's OWN defect shape: a computed fact, discarded at the write site.
++
++    Args:
++        resolved_ct: the router's verdict for this record (D-2747).
++        raw_ct: the S2 label the record arrived with.
++        persist: whether the resolved role is what gets written (stage4.persist_resolved_content_type).
++
++    Returns:
++        'deterministic' when the ROUTER replaced the S2 label (D-343/D-2747 authored the persisted value), else
++        'llm_extracted_from_source' - the S2 label survived, so the LLM did author what is persisted. BOTH are
++        members of the CLOSED C29 vocabulary (pipeline/schemas.py#PROVENANCE_LITERAL): this function chooses
++        between declared values and never mints one.
++    """
++    return ("deterministic" if persist and resolved_ct != (raw_ct or "").strip()
++            else "llm_extracted_from_source")
++
++
+ def _resolve_content_type(fb: dict) -> str:
+     """Resolve a principle's content_type.
+ 
+@@ -2456,7 +2479,14 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
+             # llm_extracted_from_source; a human pass (single-coder ceiling, D-280)
+             # stamps human_verbatim on the rows it verifies. menu_hash makes the
+             # label traceable to the exact menu it was classified against (F-44).
+-            "content_type_source": "llm_extracted_from_source",
++            # D-2968 (BUG-712): content_type_source is DERIVED from the same computation that chose the
++            # label (never a literal at this site). When the router REPLACED the S2 label the persisted
++            # value was authored by the router (D-343/D-2747), and one of the two declared values is
++            # exactly TRUE of it; when the S2 label survived, the LLM authored it and llm_extracted is TRUE.
++            # discipline/source and extraction_type/source stay LLM stamps - those labels are unchanged here.
++            "content_type_source": content_type_source(
++                _resolved_ct, str(fb_data.get("content_type") or ""), _PERSIST_RESOLVED_CONTENT_TYPE
++            ),
+             "discipline_source": "llm_extracted_from_source",
+             "extraction_type_source": "llm_extracted_from_source",
+             # D-2757: applicability axis (consumer/teleology) — DETERMINISTIC, never

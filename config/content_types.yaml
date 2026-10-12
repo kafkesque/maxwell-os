@@ -431,6 +431,30 @@ s2_body_fields:
 #   neither syntax nor parameters is quarantine). The contested retention guard is a
 #   SEPARATE, orthogonal rule: a `contested: true` record is NEVER noise_drop/quarantine.
 # ─────────────────────────────────────────────────────────────────────────────
+# D-2967 (BUG-741) — THE OWNER ADJUDICATION MAP'S SCHEMA: ONE HOME, and the DESTINATION SPLIT BY
+# VOCABULARY. The map's `proposed` field carried content_type values AND disposition values in ONE
+# key (measured over its 546 rows: 221 quarantine + 154 noise_drop + 171 roles), so every reader had
+# to GUESS which vocabulary a value came from. A row now carries EXACTLY ONE of two keys and the KEY
+# NAMES THE VOCABULARY the value was drawn from — the kind is a property of the VALUE (both
+# vocabularies are declared in this file, closed and disjoint), so a per-row `destination_kind` tag
+# would restate that fact 546 times and could disagree with the value it tags (C12/D-2642: one fact,
+# one home — and a tag that must agree with its own value is a second home by construction).
+# MEASURED CONSEQUENCE, FIXED IN THE SAME CHANGE: pipeline/content_types.py::_load_adjudication_map
+# admitted BOTH vocabularies (it tested membership in CONTENT_TYPES_ALL, which INCLUDES the two
+# dispositions), so TIER 1 — the router's HIGHEST authority — returned a DISPOSITION as a role for
+# 375 of the 542 entries it admitted. With stage4.persist_resolved_content_type enabled (D-2938) that
+# disposition is persisted into the FB checkpoint, and the D-2965 leaf gate then REFUSES it at S6
+# while stage6.max_failed_ratio 0.0 turns ONE refused row into a HALTED, ROLLED-BACK commit. The
+# router now admits ROLES ONLY; a map still carrying the conflated key RAISES at import rather than
+# silently emptying tier 1, and a DISPOSITION row is not an error there — the map is the home of the
+# owner's ruling, and BUG-741 gives a disposition its own act; it is simply not a role.
+adjudication_map:
+  path: governance/content_type_adjudication.json
+  rows_key: rows
+  current_key: current
+  role_key: proposed_content_type          # a declared content_type ROLE (the router's tier 1)
+  disposition_key: proposed_disposition    # a declared DISPOSITION (never a role; its own act, BUG-741)
+  legacy_conflated_key: proposed           # the key this split replaces, refused loudly if still present
 reroute:
   # tool_instruction → process_template promotion (D-2747 tier 3). TWO conditions — a NAME is a
   # PRIOR, never EVIDENCE:
@@ -476,7 +500,19 @@ reroute:
   # top-level `reroute:` block appended to this file silently REPLACED this one (PyYAML keeps the
   # last duplicate), which emptied `ti_to_pt_keywords` and killed the TI->process_template tier
   # without a single error. scripts/check_config_duplicate_keys.py now fails the build on that.
-  open_tension_strict: true   # RATIFIED by the owner 2026-10-12 (D-2953); was false pending ratification
+  #
+  # D-2966 (BUG-735, OWNER-RATIFIED 2026-10-12) — THE THIRD ALTERNATIVE NOW REQUIRES AN EPISTEMIC
+  # SUBJECT TOO, exactly as the first two already do. MEASURED at the D-2953 flip: 9 of the strict
+  # form's 12 survivors fired on a token sitting in `boundary` ALONE, and 1 more was an ordinary
+  # subject-matter "open question" in an ASSERTIVE field. TWO NARROWING CANDIDATES were measured over
+  # the same 7,640 rows: (A) drop `boundary` from the status haystack -> 3 survivors, 2 STORE MOVES;
+  # (B) gate the third alternative on an epistemic subject -> 3 survivors, 1 STORE MOVE. THE
+  # MEASUREMENT FALSIFIED THE EARLIER NOTE THAT "either way the move count becomes 1" (D-2956 clause
+  # 3): A does not clear the assertive-field false positive, so the owner ratified B. RE-MEASURED
+  # 2026-10-12 with scripts/calibrate_content_type_router.py: SIDE A = 1 move (1 claim_status, 0
+  # subject_matter, FP rate 0.0), SIDE B recall = 0, SIDE D survivors 12 -> 3. `_tension_haystack`
+  # is UNCHANGED, because tier 3 and the definitional-quarantine branch read the same haystack.
+  open_tension_strict: true   # RATIFIED by the owner 2026-10-12 (D-2953); narrowed by D-2966 (BUG-735)
 
 # DROPPED — vestigial content_type enum values (were schema-only, never used)
 #   `fact`  (domain factoid): never emitted/validated/trained; a bare factoid

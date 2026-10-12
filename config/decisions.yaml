@@ -22268,3 +22268,160 @@ decisions:
   - pipeline/stage6_commit.py
   - justfile
   - governance/buglog.md
+
+- id: D-2966
+  state: RESOLVED
+  category: ONTOLOGY / CONTENT-TYPE REROUTE
+  date: '2026-10-12'
+  title: 'BUG-735: the strict tier-2 tension form reads a SCOPE field no longer - a status must be PREDICATED
+    of an epistemic subject in ALL THREE alternatives, and the measurement FALSIFIED variant A'
+  decision: 'The strict form (D-2953, owner-ratified ENABLED) required an epistemic subject for its first two
+    alternatives but left the third BARE, so a status phrase with no subject - the structural content of a boundary
+    field - still fired. MEASURED (scripts/calibrate_content_type_router.py, SIDE D + an A/B over the 7,640-row
+    store): 9 of the 12 strict survivors fired on a token sitting in boundary ALONE, and 1 more was an ordinary
+    subject-matter "open question" in an ASSERTIVE field. TWO NARROWING CANDIDATES were measured: (A) drop boundary
+    from the status haystack -> 3 survivors, 2 STORE MOVES; (B) require an epistemic subject for the third
+    alternative -> 3 survivors, 1 STORE MOVE. (1) THE MEASUREMENT FALSIFIED THE EARLIER NOTE that "either way the
+    move count becomes 1" (D-2956 clause 3): A does NOT clear the assertive-field false positive, B does. (2) B is
+    also the SCOPED fix: _tension_haystack is read by tier 3 (_PROCEDURE_STEPS / _DONE_CONDITION), by the
+    definitional-quarantine branch and by _PRESCRIPTIVE, so excluding a FIELD there would have moved the PROCEDURE
+    and QUARANTINE tiers with an UNMEASURED blast radius, while B touches only the status test. (3) THE INVARIANT IS
+    NOW UNIFORM: a status must be predicated of an epistemic subject, in all three alternatives. (4) PRECISION-ONLY
+    (D-2953 safe direction): SIDE B recall is 0 in every variant, so no recall is at stake. (5) THE RATIFIED ARTIFACT
+    WAS RE-MEASURED, NOT SILENTLY RE-NARROWED: SIDE A is now 1 move / 1 claim_status / 0 subject_matter (FP rate
+    0.0, was 50%), SIDE D survivors 12 -> 3, and the config comment carries the new numbers beside the old ones.'
+  measured: 'BEFORE: SIDE A 2 moves (1 claim_status, 1 subject_matter, FP 50.0%); SIDE D 12 strict survivors, 9
+    boundary-only; loose fires 114. AFTER: SIDE A 1 move (1 claim_status, 0 subject_matter, FP 0.0%); SIDE D 3
+    strict survivors, 1 boundary-only; loose fires unchanged at 114 (the loose form is untouched and stays the
+    calibration instrument second side). SIDE B recall 0 both sides. Variant A measured on the same bytes: 3
+    survivors, 2 store moves - i.e. it leaves the "open question" false positive standing. CONTROLS: 8 tests in
+    tests/test_open_tension_strict.py, including the two that pin the REMOVED class (a bare status in a scope field;
+    a bare status in an assertive field - the discriminator between A and B) and one that pins the SURVIVING
+    meaning (a status predicated of a subject).'
+  bugs:
+  - BUG-735
+  - BUG-712
+  files:
+  - pipeline/content_types.py
+  - config/content_types.yaml
+  - tests/test_open_tension_strict.py
+  - governance/buglog.md
+- id: D-2967
+  state: RESOLVED
+  category: ONTOLOGY / ROUTING / DISPOSITION
+  date: '2026-10-12'
+  title: 'BUG-741: the map destination is SPLIT BY VOCABULARY (a role XOR a disposition), the router tier 1 admits
+    ROLES ONLY, and the general case has a DECLARED act instead of a silent refusal'
+  decision: 'The owner adjudication map carried content_type values AND disposition values in ONE key, and the ROUTER
+    tier 1 admitted BOTH (it tested membership in CONTENT_TYPES_ALL, which INCLUDES the two dispositions). (1) THE
+    SPLIT: each of the 546 rows now carries exactly one of proposed_content_type / proposed_disposition, and the KEY
+    names the vocabulary the value came from - the kind is a property of the VALUE (both vocabularies are closed and
+    disjoint in config/content_types.yaml), so a per-row destination_kind tag would restate that fact 546 times and
+    could disagree with the value it tags (C12/D-2642). (2) THE FOURTH FACET, MEASURED: tier 1 returned a DISPOSITION
+    as a role for 375 of the 542 entries it admitted, so a record the owner ruled noise_drop resolved to
+    content_type="noise_drop"; with stage4.persist_resolved_content_type enabled (D-2938) that value is persisted
+    into the FB checkpoint and the D-2965 leaf gate REFUSES it at S6, where stage6.max_failed_ratio 0.0 turns ONE
+    refused row into a HALTED, ROLLED-BACK commit. The router now admits roles only, and RAISES on the legacy
+    conflated key (a stale map would silently empty tier 1), on a row carrying BOTH keys, and on an undeclared role.
+    (3) THE GENERAL CASE IS DECLARED AND LOUD, NOT BUILT: a disposition ruling on a row that IS served is a
+    WITHDRAWAL from the served store, archive-first (R-D410), declared in config/content_type_restamp.yaml as
+    dispositions.act_for_stored_row with writer OWED and a mechanical trigger; the gate BLOCKS (exit 1) on that state
+    and names the id, while a disposition row that is NOT served is recorded as satisfied in effect. (4) NO COLUMN,
+    and no use of status: status is a VERIFICATION verdict, not a curation decision (BUG-499 drift class), and a
+    column no reader consults at retrieval time would be an inert badge (D-2952: a column arrives with its writer,
+    C28: bloat is opt-in). MEASURED: the one applicable disposition row is ALREADY not served, so no writer is owed
+    today.'
+  measured: 'MAP: 546 rows -> 171 role rows (167 distinct ids; ONE fb_id carries 5 rows, so a duplicate ruling is
+    silently last-wins in tier 1 - map hygiene, OWED) + 375 disposition rows (quarantine 221, noise_drop 154).
+    ROUTER: _ADJUDICATION_MAP 542 -> 167 entries, dispositions admitted as roles 375 -> 0. GATE (dry run): apply 0 |
+    already 18 | absent 527 | stale 0 | disposition 1 (NOT served, so no act is owed) | disposition_served 0 |
+    unknown 0 -> exit 0. CONTROLS: 12 controls in the gate selftest (including a disposition row that IS served
+    -> BLOCKING, and one that is NOT -> nothing owed) and 9 controls in tests/test_adjudication_map_split.py
+    (including the three LOUD refusals of a stale/incoherent map, and parity: the live map admits exactly the role
+    rows and drops nothing).'
+  bugs:
+  - BUG-741
+  - BUG-712
+  files:
+  - governance/content_type_adjudication.json
+  - config/content_types.yaml
+  - config/content_type_restamp.yaml
+  - pipeline/content_types.py
+  - scripts/restamp_content_type_adjudications.py
+  - tests/test_adjudication_map_split.py
+  - governance/buglog.md
+- id: D-2968
+  state: RESOLVED
+  category: PIPELINE / PROVENANCE
+  date: '2026-10-12'
+  title: 'BUG-712 durable half: the content_type LABEL and its AUTHORSHIP are persisted from ONE computation, so a
+    router-authored label can no longer carry an LLM authorship stamp'
+  decision: 'D-2938 made S4 persist the ROUTER resolved content_type instead of the raw S2 label, but the write site
+    kept stamping llm_extracted_from_source on EVERY row - so the very next S2->S6 run would write ~100 labels the
+    DETERMINISTIC router authored (D-343/D-2747) while claiming an LLM authored them. That is the BUG-742 class (a
+    provenance value TRUE of the label the row no longer carries) AND the same defect shape D-2938 itself fixed: a
+    computed fact, DISCARDED at the write site. (1) ONE RULE, ONE HOME: pipeline/stage4_merge.py::content_type_source
+    (resolved, raw, persist) returns "deterministic" when the router REPLACED the S2 label and
+    "llm_extracted_from_source" when the S2 label survived (the LLM did author the persisted value) or when the
+    persist flag is off (the raw label is written, so a deterministic stamp would be the lie). (2) NO NEW VOCABULARY:
+    both values are members of the CLOSED C29 vocabulary (pipeline/schemas.py#PROVENANCE_LITERAL, a Pydantic Literal,
+    so an undeclared value is a ValidationError); the function SELECTS from declared values and never mints one.
+    (3) THE LITERAL IS GONE FROM THE SITE, and a source-level control fails if it returns (no runtime assertion can
+    see a literal that simply looks correct). (4) WHAT THIS IS NOT: not a retro re-stamp (no stored cell was
+    written), not a change to discipline_source / extraction_type_source (those labels are unchanged by the router,
+    so their LLM stamps stay TRUE), and not a store-wide parity rail - a retro rail would measure HISTORY (the
+    committed rows predate the producer) and is exactly the BUG-745 shape, so the guarantee is FORWARD-ONLY.'
+  measured: 'MEASURED on the live store: content_type_source holds llm_extracted_from_source 6,581 | deterministic
+    1,048 | human_verbatim 11, so the column can already express the value the router-authored label needs, and no
+    row would be mis-stamped by this change (it has no retro effect). The router verdict differs from the stored
+    label on exactly 1 row today (D-2966), so the next run writes ~1-100 labels on this path, not a rewrite.
+    CONTROLS: 5 in tests/test_content_type_authorship.py (the router-authored case, the surviving-S2 case with
+    whitespace, the legacy persist path, membership in the closed vocabulary, and the source-level control). R5:
+    the file exceeds the reviewer context, so the CHANGE was reviewed as a diff
+    (governance/evidence/d2968_stage4_content_type_provenance.diff) by gemma-4-E4B-it-MLX-4bit -> APPROVE.'
+  bugs:
+  - BUG-712
+  - BUG-742
+  files:
+  - pipeline/stage4_merge.py
+  - tests/test_content_type_authorship.py
+  - governance/evidence/d2968_stage4_content_type_provenance.diff
+  - governance/buglog.md
+- id: D-2969
+  state: RESOLVED
+  category: GOVERNANCE / R5 / CODE REVIEW
+  date: '2026-10-12'
+  title: 'BUG-746: an EXIT CODE is not a VERDICT - a reviewer CRASH is now INDECISIVE (never a fabricated REJECT),
+    the reviewer stderr is printed, and an oversized source is refused by a declared cap'
+  decision: 'MEASURED 2026-10-12: the R5 gate ran the cross-family reviewer on pipeline/stage4_merge.py (152,853
+    chars), the oMLX server returned HTTP 400, the reviewer script CRASHED (rc=1) without printing a verdict, and
+    the gate recorded REJECT - with no verdict text, no journal line in governance/r5_reviews.jsonl, and the
+    traceback captured in stderr and DISCARDED. Three defects, one cause: the gate read HOW a process ENDED as WHAT
+    it DECIDED. (1) THE VERDICT RULE: a verdict exists only when scripts/r5_code_review.py WROTE one to its journal
+    for THIS file and digest; otherwise the record is INDECISIVE whatever the exit code - closing both directions
+    (a crash read as a rejection, and an exit code with no verdict read as an approval). (2) THE EVIDENCE IS PRINTED:
+    when no verdict was recorded, the reviewer stderr tail and the rc are printed and carried in the receipt (C16:
+    no silent error - the discarded traceback was the whole explanation). (3) THE CAUSE IS PREVENTED, 0 MODEL CALLS:
+    each tier declares max_source_chars and the gate REFUSES to send an oversized source (INDECISIVE(SIZE_GUARD),
+    naming the file the cap and the reason), because the failure mode of guessing is a verdict that never existed.
+    The cap is ANCHORED TO A MEASUREMENT - 98,664 chars returned a real verdict (pipeline/stage6_commit.py, APPROVE)
+    while 152,853 crashed - and sits under the largest SUCCESS rather than guessing the true context limit; raising
+    it needs a new measurement. (4) THE CONSEQUENCE IS NAMED: TWO pipeline modules exceed the cap
+    (pipeline/stage4_merge.py, pipeline/stage2_extract.py), so for those the review unit is the CHANGE (a diff), as
+    done here.'
+  measured: 'BEFORE: gate receipt verdict REJECT, verdict_exit 1, and ZERO journal lines for pipeline/stage4_merge.py
+    (the reviewer journal carries 43+ verdicts and had none for the repo largest module). AFTER: the same run
+    reports INDECISIVE(SIZE_GUARD) with the reason printed and no verdict recorded; the stage4 CHANGE was reviewed
+    as a diff (4,780 chars) -> APPROVE with its concerns in the journal. CONTROLS: 14 in the gate selftest, 5 of
+    them new (exit+verdict -> as it reads, in all three codes; a non-zero exit with NO verdict -> INDECISIVE; a
+    ZERO exit with NO verdict -> INDECISIVE; an unknown exit with no verdict -> INDECISIVE; every tier declares a
+    cap that admits the largest measured success).'
+  bugs:
+  - BUG-746
+  - BUG-743
+  - BUG-738
+  files:
+  - scripts/r5_review_gate.py
+  - config/r5_review_gate.yaml
+  - governance/evidence/d2968_stage4_content_type_provenance.diff
+  - governance/buglog.md

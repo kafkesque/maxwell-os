@@ -17,6 +17,26 @@ are 50% precise at n=2 (BUG-735); only an owner warrant moves a label. The map i
 REFUSALS, each fail-closed and each named in the receipt:
   * DISPOSITION destination - `noise_drop`/`quarantine` are DISPOSITIONS, not content types (BUG-741): writing one
     as a content_type mints a value the schema does not declare. Escalated as an owner ruling.
+
+D-2967 (BUG-741, 2026-10-12). THE DESTINATION IS SPLIT BY VOCABULARY: a map row carries exactly one of
+`proposed_content_type` (a declared role) or `proposed_disposition` (a declared disposition), so a disposition can
+never be read as a content_type BY CONSTRUCTION rather than by a membership test that has to remember the
+difference. The two keys are declared in ONE home (config/content_types.yaml#adjudication_map) and this gate READS
+them there instead of restating them. MEASURED CONSEQUENCE of the old conflated key, fixed in the same change:
+the ROUTER's tier 1 (pipeline/content_types.py::_load_adjudication_map) admitted `CONTENT_TYPES_ALL` - which
+INCLUDES the two dispositions - so it returned a DISPOSITION as a role for 375 of the 542 entries it admitted,
+which the D-2938 persist flag would write into the FB checkpoint and the D-2965 leaf gate would then refuse at S6,
+where stage6.max_failed_ratio 0.0 turns ONE refused row into a HALTED commit.
+
+BUG-741(b), THE GENERAL CASE, IS DECLARED AND LOUD RATHER THAN SILENT. A disposition ruling on a row that is IN
+the store splits in two:
+  * NOT served -> bucket `disposition`: the ruling is ALREADY TRUE (measured 2026-10-12: the one applicable
+    disposition row's stored state is not in the default answer path), so the store owes nothing.
+  * SERVED -> bucket `disposition_served`: BLOCKING (exit 1). The store has no home for the ruling - `status` is a
+    VERIFICATION verdict, not a curation decision (BUG-499 drift class), and a disposition COLUMN has no writer
+    (D-2952/C28) - so the act declared in config (`dispositions.act_for_stored_row`) is OWED and named by id.
+"whether this row is served" is ANSWERED BY THE SERVING LAYER'S OWN predicate (pipeline/retrieve.py, D2330), never
+by a copy of `status = 'PASS'` here: a copy would be a second home for the serving contract (C21).
   * UNKNOWN destination - neither a declared content_type nor a declared disposition: the map is not interpretable.
   * STALE warrant - the live label no longer equals the map's `current`: the adjudication was made against a
     pre-state that has since moved, so it grants nothing.
@@ -54,10 +74,32 @@ def load_config() -> dict[str, Any]:
     if not CONFIG.exists():
         raise SystemExit(f"FAIL-CLOSED: {CONFIG.relative_to(ROOT)} is absent - a gate with no declarations is not a gate")
     cfg = yaml.safe_load(CONFIG.read_text(encoding="utf-8")) or {}
-    for key in ("map", "label_column", "provenance_column", "provenance_value", "receipt", "vocab_home", "table", "id_column"):
+    for key in ("map_schema_home", "label_column", "provenance_column", "provenance_value", "receipt",
+                "vocab_home", "table", "id_column", "dispositions"):
         if not str(cfg.get(key) or "").strip():
             raise SystemExit(f"FAIL-CLOSED: {CONFIG.relative_to(ROOT)} is missing '{key}' - the gate cannot state what it acts on")
     return cfg
+
+
+def load_schema(cfg: dict[str, Any]) -> dict[str, Any]:
+    """Load the adjudication map's SCHEMA from its ONE home (config/content_types.yaml#adjudication_map).
+
+    The map's path and its destination keys are declared ONCE (D-2967/BUG-741). This gate needs them to find its
+    input and to tell a role from a disposition, and the ROUTER needs the same keys to read tier 1 - so restating
+    them here would let a rename leave one reader looking at a key the writer no longer produces. A missing block
+    is a DEFECT, never an empty default (C16).
+    """
+    home, _, keypath = str(cfg["map_schema_home"]).partition("#")
+    if not keypath:
+        raise SystemExit(f"FAIL-CLOSED: map_schema_home '{cfg['map_schema_home']}' names no block (expected <file>#<key>)")
+    doc = yaml.safe_load((ROOT / home).read_text(encoding="utf-8")) or {}
+    schema = doc.get(keypath)
+    if not isinstance(schema, dict):
+        raise SystemExit(f"FAIL-CLOSED: {cfg['map_schema_home']} is not a mapping - the gate cannot find the warrant map")
+    for key in ("path", "rows_key", "current_key", "role_key", "disposition_key"):
+        if not str(schema.get(key) or "").strip():
+            raise SystemExit(f"FAIL-CLOSED: {cfg['map_schema_home']} is missing '{key}'")
+    return schema
 
 
 def declared_vocab(cfg: dict[str, Any]) -> tuple[set[str], set[str]]:
@@ -74,13 +116,33 @@ def declared_vocab(cfg: dict[str, Any]) -> tuple[set[str], set[str]]:
     return types, dispositions
 
 
-def load_map(cfg: dict[str, Any]) -> list[dict[str, Any]]:
+def load_map(cfg: dict[str, Any], schema: dict[str, Any]) -> list[dict[str, Any]]:
     """Load the owner's adjudication map - the WARRANT. Rows that are not mappings are refused, not skipped."""
-    doc = json.loads((ROOT / str(cfg["map"])).read_text(encoding="utf-8"))
-    rows = doc.get(str(cfg.get("map_rows_key") or "rows"))
+    doc = json.loads((ROOT / str(schema["path"])).read_text(encoding="utf-8"))
+    rows = doc.get(str(schema["rows_key"]))
     if not isinstance(rows, list):
-        raise SystemExit(f"FAIL-CLOSED: {cfg['map']}#{cfg.get('map_rows_key')} is not a list")
+        raise SystemExit(f"FAIL-CLOSED: {schema['path']}#{schema['rows_key']} is not a list")
     return [r for r in rows if isinstance(r, dict)]
+
+
+def served_ids(con: sqlite3.Connection, cfg: dict[str, Any], ids: list[str]) -> set[str]:
+    """The ids the SERVING layer would place in the DEFAULT answer path - asked of its OWN home.
+
+    D2330's predicate lives in pipeline/retrieve.py; a copy of `status = 'PASS'` here would be a second home for
+    the serving contract (C21) and the two would be free to drift. Imported lazily: this gate needs the predicate,
+    not the retrieval stack.
+    """
+    from pipeline.retrieve import (
+        _status_predicate,  # noqa: PLC0415 - the serving layer owns this predicate
+    )
+
+    cur, out = con.cursor(), set()
+    for i in range(0, len(ids), 400):
+        part = ids[i:i + 400]
+        sql = (f"SELECT {cfg['id_column']} FROM {cfg['table']} "
+               f"WHERE {cfg['id_column']} IN ({','.join('?' * len(part))}) AND ({_status_predicate(False)})")
+        out |= {str(r[0]) for r in cur.execute(sql, part)}
+    return out
 
 
 def live_state(con: sqlite3.Connection, cfg: dict[str, Any], ids: list[str]) -> dict[str, dict[str, Any]]:
@@ -97,15 +159,26 @@ def live_state(con: sqlite3.Connection, cfg: dict[str, Any], ids: list[str]) -> 
     return out
 
 
-def classify(cfg: dict[str, Any], rows: list[dict[str, Any]], live: dict[str, dict[str, Any]],
-             types: set[str], dispositions: set[str]) -> dict[str, list[dict[str, Any]]]:
-    """Bucket every map row; nothing is dropped and every refusal carries its reason (C16)."""
-    cur_key, prop_key = str(cfg.get("map_current_key") or "current"), str(cfg.get("map_proposed_key") or "proposed")
+def classify(cfg: dict[str, Any], schema: dict[str, Any], rows: list[dict[str, Any]],
+             live: dict[str, dict[str, Any]], types: set[str], served: set[str]) -> dict[str, list[dict[str, Any]]]:
+    """Bucket every map row; nothing is dropped and every refusal carries its reason (C16).
+
+    D-2967 (BUG-741a): the destination is read from the SPLIT keys, so a DISPOSITION can never be read as a
+    content_type BY CONSTRUCTION rather than by a membership test that has to remember the difference.
+    D-2967 (BUG-741b): a disposition row then splits by whether the store ALREADY satisfies the ruling -
+    NOT served -> `disposition` (the ruling is already true, nothing is owed), SERVED -> `disposition_served`
+    (BLOCKING: the act declared in config is owed, and the gate names the id rather than absorbing it).
+    """
+    cur_key = str(schema["current_key"])
+    role_key, disp_key = str(schema["role_key"]), str(schema["disposition_key"])
     label = str(cfg["label_column"])
-    out: dict[str, list[dict[str, Any]]] = {k: [] for k in ("apply", "already", "absent", "stale", "disposition", "unknown")}
+    out: dict[str, list[dict[str, Any]]] = {k: [] for k in
+        ("apply", "already", "absent", "stale", "disposition", "disposition_served", "unknown")}
     for r in rows:
-        rid, current, proposed = str(r.get("fb_id")), str(r.get(cur_key) or ""), str(r.get(prop_key) or "")
-        entry = {"fb_id": rid, "current": current, "proposed": proposed,
+        rid, current = str(r.get("fb_id")), str(r.get(cur_key) or "")
+        role, disposition = str(r.get(role_key) or "").strip(), str(r.get(disp_key) or "").strip()
+        entry = {"fb_id": rid, "current": current, "proposed": role or disposition,
+                 "destination_kind": "content_type" if role else "disposition",
                  "warrant": str(r.get(str(cfg.get("map_warrant_key") or "confidence")) or ""),
                  "reason": str(r.get("reason") or "")}
         row = live.get(rid)
@@ -113,11 +186,11 @@ def classify(cfg: dict[str, Any], rows: list[dict[str, Any]], live: dict[str, di
             out["absent"].append(entry)
             continue
         got = str(row.get(label) or "")
-        if proposed in dispositions and proposed not in types:
-            out["disposition"].append(entry)
-        elif proposed not in types:
+        if disposition:
+            out["disposition_served" if rid in served else "disposition"].append(entry)
+        elif role not in types:
             out["unknown"].append(entry)
-        elif got == proposed:
+        elif got == role:
             out["already"].append(entry)
         elif got != current:
             entry["live"] = got
@@ -162,28 +235,46 @@ def main() -> int:
         return selftest()
 
     cfg = load_config()
+    schema = load_schema(cfg)
     types, dispositions = declared_vocab(cfg)
-    rows = load_map(cfg)
+    rows = load_map(cfg, schema)
     con = sqlite3.connect(DB_PATH)
     try:
-        live = live_state(con, cfg, [str(r.get("fb_id")) for r in rows])
-        buckets = classify(cfg, rows, live, types, dispositions)
+        ids = [str(r.get("fb_id")) for r in rows]
+        live = live_state(con, cfg, ids)
+        served = served_ids(con, cfg, ids)
+        buckets = classify(cfg, schema, rows, live, types, served)
         print(f"map rows {len(rows)} | resolve to store {len(rows) - len(buckets['absent'])} | "
               f"declared content_types {sorted(types)} | dispositions {sorted(dispositions)}")
-        for name in ("apply", "already", "absent", "stale", "disposition", "unknown"):
-            print(f"  {name:12} {len(buckets[name])}")
-        for name in ("stale", "disposition", "unknown"):
+        for name in ("apply", "already", "absent", "stale", "disposition", "disposition_served", "unknown"):
+            print(f"  {name:18} {len(buckets[name])}")
+        for name in ("stale", "unknown"):
             for e in buckets[name][:12]:
                 print(f"    REFUSED {name}: {e['fb_id'][:12]} {e.get('current')} -> {e['proposed']} "
-                      f"(live={e.get('live', '-')}, warrant={e['warrant']})")
+                      f"(kind={e['destination_kind']}, live={e.get('live', '-')}, warrant={e['warrant']})")
+        # A DISPOSITION is not a REFUSAL: this gate cannot write it into content_type (it is not a role), and
+        # whether anything is OWED depends on the store, so the two states are printed apart (D-2967/BUG-741b).
+        for e in buckets["disposition"][:12]:
+            print(f"    NOT OWED {e['fb_id'][:12]} {e.get('current')} -> {e['proposed']} (kind=disposition): the "
+                  f"ruling's practical content is ALREADY TRUE - the row is not in the served path, so nothing is written")
+        for e in buckets["disposition_served"][:12]:
+            print(f"    BLOCKING {e['fb_id'][:12]} {e.get('current')} -> {e['proposed']} (kind=disposition): SERVED, "
+                  f"so the declared act is OWED - the store has no home for a curation ruling")
+        if buckets["disposition_served"]:
+            disp = cfg.get("dispositions") or {}
+            print(f"    BLOCKING (BUG-741b): {len(buckets['disposition_served'])} disposition-ruled row(s) ARE in the "
+                  f"served path - the act '{disp.get('act_for_stored_row')}' is OWED (writer: {disp.get('writer')}). "
+                  f"The store has no home for a curation ruling: status is a VERIFICATION verdict (BUG-499 class).")
         value = str(cfg["provenance_value"])
         owed = value == SENTINEL
         receipt = {
             "schema_version": 1, "generated": time.strftime("%Y-%m-%dT%H:%M:%S"), "tool": "scripts/restamp_content_type_adjudications.py",
-            "map": str(cfg["map"]), "store_rows_resolved": len(rows) - len(buckets["absent"]),
+            "map": str(schema["path"]), "store_rows_resolved": len(rows) - len(buckets["absent"]),
             "counts": {k: len(v) for k, v in buckets.items()},
             "apply_ids": [e["fb_id"] for e in buckets["apply"]],
-            "refused": {k: buckets[k] for k in ("stale", "disposition", "unknown")},
+            "refused": {k: buckets[k] for k in ("stale", "disposition", "disposition_served", "unknown")},
+            "disposition_act": str((cfg.get("dispositions") or {}).get("act_for_stored_row") or ""),
+            "disposition_writer": str((cfg.get("dispositions") or {}).get("writer") or ""),
             "provenance_value": value, "provenance_ruling_owed": owed,
             "applied": 0, "wrote": False,
         }
@@ -219,7 +310,9 @@ def main() -> int:
         out.parent.mkdir(parents=True, exist_ok=True)
         out.write_text(json.dumps(receipt, indent=2, sort_keys=True) + "\n", encoding="utf-8")
         print(f"receipt -> {out.relative_to(ROOT)}")
-        refused = sum(len(buckets[k]) for k in ("stale", "disposition", "unknown"))
+        # A NOT-served disposition row is NOT a refusal: an inert RED is as uninformative as a green lie, so
+        # only a refusal and a SERVED disposition (the owed act) hold the exit code at "ruling OWED".
+        refused = sum(len(buckets[k]) for k in ("stale", "disposition_served", "unknown"))
         return int((cfg.get("exit") or {}).get("refused", 1)) if refused else int((cfg.get("exit") or {}).get("clean", 0))
     finally:
         con.close()
@@ -239,10 +332,13 @@ def selftest() -> int:
 
     The controls hand classify() a synthetic warrant map and a synthetic pre-state, so they assert the RULES -
     a granted row is granted, a row whose live label MOVED is refused rather than overwritten, a DISPOSITION is
-    never written as a content_type (BUG-741), an undeclared destination is refused, a row absent from the store
-    is REPORTED and never dropped, and a row already at its proposed value is not re-applied. No store is touched.
+    never written as a content_type (BUG-741a), a disposition-ruled row that IS served BLOCKS while one that is NOT
+    served owes nothing (BUG-741b), an undeclared destination is refused, a row absent from the store is REPORTED
+    and never dropped, a row already at its destination value is not re-applied, and the declared disposition act
+    is NAMED rather than implied. No store is touched.
     """
     cfg = load_config()
+    schema = load_schema(cfg)
     types, dispositions = declared_vocab(cfg)
     label, prov = str(cfg["label_column"]), str(cfg["provenance_column"])
 
@@ -253,28 +349,37 @@ def selftest() -> int:
     # NOR the proposed value. A live label that already EQUALS the proposed value is correctly bucketed as
     # ALREADY-AT-PROPOSED (it needs no warrant at all), so a fixture that reuses the proposed value tests the
     # wrong branch - the ordering (already before stale) is the rule, not a bug.
+    role_key, disp_key = str(schema["role_key"]), str(schema["disposition_key"])
     live = {"granted": live_row("tool_instruction"), "moved": live_row("growth_edge"),
-            "disposed": live_row("principle"), "undeclared": live_row("principle"), "stable": live_row("tool_instruction")}
+            "disposed": live_row("principle"), "served_disposed": live_row("principle"),
+            "undeclared": live_row("principle"), "stable": live_row("tool_instruction")}
     rows = [
-        {"fb_id": "granted", "current": "tool_instruction", "proposed": "principle", "confidence": "high"},
-        {"fb_id": "moved", "current": "tool_instruction", "proposed": "principle", "confidence": "high"},
-        {"fb_id": "disposed", "current": "principle", "proposed": "noise_drop", "confidence": "high"},
-        {"fb_id": "undeclared", "current": "principle", "proposed": "made_up_type", "confidence": "high"},
-        {"fb_id": "stable", "current": "tool_instruction", "proposed": "tool_instruction", "confidence": "high"},
-        {"fb_id": "gone", "current": "tool_instruction", "proposed": "principle", "confidence": "high"},
+        {"fb_id": "granted", "current": "tool_instruction", role_key: "principle", "confidence": "high"},
+        {"fb_id": "moved", "current": "tool_instruction", role_key: "principle", "confidence": "high"},
+        {"fb_id": "disposed", "current": "principle", disp_key: "noise_drop", "confidence": "high"},
+        {"fb_id": "served_disposed", "current": "principle", disp_key: "noise_drop", "confidence": "high"},
+        {"fb_id": "undeclared", "current": "principle", role_key: "made_up_type", "confidence": "high"},
+        {"fb_id": "stable", "current": "tool_instruction", role_key: "tool_instruction", "confidence": "high"},
+        {"fb_id": "gone", "current": "tool_instruction", role_key: "principle", "confidence": "high"},
     ]
-    b = classify(cfg, rows, live, types, dispositions)
+    b = classify(cfg, schema, rows, live, types, served={"served_disposed"})
     ids = lambda name: [e["fb_id"] for e in b[name]]  # noqa: E731 - a one-line projection, not a rule
 
     checks: list[tuple[str, bool]] = [
         ("a granted row (live == the map's pre-state) is APPLIED", ids("apply") == ["granted"]),
         ("a row whose live label MOVED is refused as STALE, never overwritten", ids("stale") == ["moved"]),
-        ("a DISPOSITION destination is refused, never written as a content_type (BUG-741)", ids("disposition") == ["disposed"]),
+        ("a DISPOSITION is never written as a content_type (BUG-741a)", ids("disposition") == ["disposed"]),
+        ("a disposition row NOT in the served path owes nothing (ruling already true)", ids("disposition") == ["disposed"]),
+        ("a disposition row IN the served path BLOCKS, by id (BUG-741b)", ids("disposition_served") == ["served_disposed"]),
         ("an UNDECLARED destination is refused (fail closed)", ids("unknown") == ["undeclared"]),
         ("a row ABSENT from the store is reported, never silently dropped", ids("absent") == ["gone"]),
-        ("a row already at its proposed value is NOT re-applied", ids("already") == ["stable"]),
+        ("a row already at its destination value is NOT re-applied", ids("already") == ["stable"]),
         ("the authorship SENTINEL keeps --apply closed (BUG-742)", apply_gate(SENTINEL) is not None),
         ("a NAMED authorship value opens --apply", apply_gate("owner_adjudication") is None),
+        ("the disposition ACT is DECLARED, not implied (BUG-741b)",
+         str((cfg.get("dispositions") or {}).get("act_for_stored_row") or "") != ""),
+        ("the act is not expressed through the verification verdict (BUG-499 class)",
+         str((cfg.get("dispositions") or {}).get("act_for_stored_row") or "") != "status"),
     ]
     bad = [name for name, ok in checks if not ok]
     for name, ok in checks:

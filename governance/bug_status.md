@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**184 open** / 325 closed of 509 ids.
+**183 open** / 327 closed of 510 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -177,17 +177,16 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-706 | (MED - OPEN 2026-10-10): the macro re-classify gate needs a v9-stamped referee | 1 |
 | BUG-710 | (CRITICAL — OPEN): the D2511 retrieval gate is INERT — golden set anchored to the superseded run, and the documented fail-loud precondition  | 2 |
 | BUG-711 | (HIGH — OPEN): 173 canonical rows still carry a DISPLACED canonical domain label in the STORE | 1 |
-| BUG-712 | (CRITICAL — OPEN): content_type routing collapse — 6 of 8 declared primitives produce ZERO output | 11 |
+| BUG-712 | (CRITICAL — OPEN): content_type routing collapse — 6 of 8 declared primitives produce ZERO output | 12 |
 | BUG-719 | (MED - OPEN 2026-10-12): the non-principle sidecars are not content-type pure, and the "81 tool_instruction remaining" figure was an arithme | 1 |
 | BUG-720 | (LOW - OPEN 2026-10-12): the S4 sidecar reconciliation tolerates a magic 7 instead of reconciling exactly | 1 |
 | BUG-721 | (HIGH - OPEN 2026-10-12): a DELEGATE returned a FABRICATED code-review verdict without reading the code (false assurance) | 1 |
 | BUG-723 | (MED - OPEN 2026-10-12): t11-unique corpus coverage debt after the superseded-run purge | 1 |
 | BUG-728 | (LOW - OPEN 2026-10-12) — `source_authors` (FILE layer) repeats one source: 31 rows literally, 90 by carrier key | 1 |
 | BUG-731 | (MED - OPEN 2026-10-12) — the undeclared-default census is 12 over its ceiling (PRE-EXISTING), and the rail's receiver list cannot see `pipe | 2 |
-| BUG-735 | (MED - OPEN 2026-10-12) — the strict tension form still reads a BOUNDARY condition as an open tension (9 of its 12 survivors) | 1 |
 | BUG-736 | (MED - OPEN 2026-10-12) — the verifier instruments, measured: the R5 reviewer is uninformative ~40-50% of the time and the S5 NLI's edge is  | 5 |
 | BUG-737 | (MED - OPEN 2026-10-12) — the store's ABSENT SHAPE is `''` on 20 of 78 columns while the code declares `None` | 5 |
 | BUG-738 | (MED - OPEN 2026-10-12) - R5 code review had NO deterministic layer: 7 of 43 verdicts were not decisions, and the deep auditor was the gener | 2 |
-| BUG-741 | (MED - OPEN 2026-10-12) - the adjudication map's `proposed` field CONFLATES two vocabularies, so one owner adjudication is not expressible a | 3 |
+| BUG-741 | (MED - OPEN 2026-10-12) - the adjudication map's `proposed` field CONFLATES two vocabularies, so one owner adjudication is not expressible a | 4 |
 | BUG-743 | (LOW - OPEN 2026-10-12) - a DELEGATED reviewer's verdict is not re-readable after the fact, so a receipt that cites it must CAPTURE THE TEXT | 1 |
 | BUG-745 | (HIGH - OPEN 2026-10-12) - the S5 score-axis rail is RED again: 2,247 stored rows no longer reproduce from the ONE home, after the bug that  | 1 |

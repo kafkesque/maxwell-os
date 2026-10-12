@@ -11789,3 +11789,120 @@ instrument the rail uses, so the attribution is not a second reading of a differ
 **WHAT IS OWED.** Re-receipt the file at its current bytes with the rewrite NAMED (a rewrite that is invisible to
 the receipt is the whole defect), or restore the receipted region. The rail is HARD, so it is not a debt ceiling
 that can be re-recorded away (D-2642).
+
+## BUG-735 (MED - CLOSED 2026-10-12) - the strict tension form no longer reads a SCOPE field as an open tension (D-2966)
+FIXED as D-2966, ONE narrowing, owner-ratified: the strict form's third alternative now requires an epistemic SUBJECT
+exactly as the first two already do, so a status must be PREDICATED of something in all three.
+THE CHOICE WAS MEASURED, NOT ARGUED. Both candidates were run over the same 7,640 rows: variant A (drop boundary from
+the status haystack) leaves 3 survivors and 2 STORE MOVES; variant B (gate the third alternative) leaves 3 survivors
+and 1 STORE MOVE. A does NOT clear the assertive-field false positive - an ordinary subject-matter "open question" in a
+Nonfiction Writing record - so THE EARLIER NOTE THAT "either way the move count becomes 1" WAS FALSIFIED by the
+instrument (D-2956 clause 3: a declaration may not carry a claim the store contradicts). B is also the SCOPED fix:
+_tension_haystack is read by tier 3 (_PROCEDURE_STEPS / _DONE_CONDITION), by the definitional-quarantine branch and by
+_PRESCRIPTIVE, so excluding a FIELD there would have moved the PROCEDURE and QUARANTINE tiers with an unmeasured blast
+radius; B touches only the status test.
+MEASURED AFTER (scripts/calibrate_content_type_router.py over the live 7,640-row store): SIDE A 1 move, 1
+claim_status, 0 subject_matter, FALSE-POSITIVE RATE 0.0 (was 50.0); SIDE D strict survivors 12 -> 3, boundary-only 1
+(was 9); SIDE B recall 0 (unchanged - precision-only, D-2953's safe direction); loose fires unchanged at 114 because
+the loose form is untouched and remains the calibration instrument's second side.
+CONTROLS: tests/test_open_tension_strict.py now 8 tests. TWO pin the REMOVED class (a bare status in a scope field; a
+bare status in an ASSERTIVE field - the discriminator between A and B, so the owner's choice is held by a control and
+not by a note), ONE pins the SURVIVING meaning (a status predicated of a subject still fires), and the previous
+"standalone open question" fixture became the NEGATIVE pin it always was.
+NOT DONE, DELIBERATELY: the 3 surviving rows are NOT written. A router PREDICTION may not move a store label below the
+declared bench floor (D-2953's warrant rule), and the strict form is 50% precise at n=2 historically and 100% at n=1
+now - a coin-flip written into the ontology is the defect this calibration exists to prevent. The residual is ONE
+named row (Open-mindedness in Scientific Disagreement, a genuine claim_status in its elaboration).
+
+## BUG-741 (MED - OPEN 2026-10-12) - UPDATE: the SPLIT is APPLIED, the ROUTER's tier 1 was the FOURTH facet, and the general case now has a DECLARED act (D-2967)
+THE FOURTH FACET, MEASURED. The conflation was not only in the map and not only in the write gate (D-2965): the ROUTER
+tier 1 - the highest authority in the deterministic content_type router - admitted BOTH vocabularies, because
+pipeline/content_types.py tested membership in CONTENT_TYPES_ALL, which INCLUDES the two dispositions. Measured:
+375 of the 542 entries tier 1 admitted named a DISPOSITION as if it were a role, so a record the owner had ruled
+noise_drop resolved to content_type="noise_drop". With stage4.persist_resolved_content_type enabled (D-2938) that value
+is persisted into the FB checkpoint, and the D-2965 leaf gate REFUSES it at S6 - where stage6.max_failed_ratio 0.0
+turns ONE refused row into a HALTED, ROLLED-BACK commit. The gate turned a silent wrong write into a loud halt; the
+PRODUCING defect was still there.
+(a) THE SPLIT IS APPLIED. governance/content_type_adjudication.json: 546 rows -> 171 rows carrying
+proposed_content_type + 375 carrying proposed_disposition (quarantine 221, noise_drop 154), schema_version 1.1, the
+conflated key GONE. The kind is a property of the VALUE (both vocabularies are closed and disjoint in
+config/content_types.yaml), so the KEY names the vocabulary - a per-row destination_kind tag would restate that fact
+546 times and could disagree with the value it tags (C12/D-2642). The map's path and keys now have ONE home
+(config/content_types.yaml#adjudication_map) read by BOTH the router and the restamp gate.
+(b) TIER 1 ADMITS ROLES ONLY. _ADJUDICATION_MAP 542 -> 167 entries (roles), dispositions admitted as roles: 0. Three
+shapes now RAISE at import instead of being skipped (C16): a row still carrying the legacy conflated key (a stale map
+would silently EMPTY tier 1 for every adjudicated record), a row carrying BOTH keys, and a role key naming a value the
+ontology does not declare. A DISPOSITION row is NOT an error there - the map is the home of the owner's ruling, and
+BUG-741 gives a disposition its own act; it is simply not a role.
+(c) THE GENERAL CASE IS DECLARED AND LOUD, NOT BUILT. A disposition ruling on a row that IS served is a WITHDRAWAL
+from the served store, archive-first (R-D410), declared in config/content_type_restamp.yaml
+(dispositions.act_for_stored_row = withdraw_with_archive, writer: OWED, with a mechanical trigger and the serving
+predicate read from ITS own home pipeline/retrieve.py rather than restated). The gate BLOCKS (exit 1) on that state and
+NAMES the id; a disposition row that is NOT served is recorded as SATISFIED IN EFFECT and is not a refusal (an inert
+RED would be as uninformative as a green lie). NO disposition column was created: D-2952 says a column arrives with its
+writer and C28 says bloat is opt-in, and status CANNOT express it - status is a VERIFICATION verdict, not a curation
+decision (BUG-499 drift class).
+MEASURED (gate dry run over the live store): apply 0 | already 18 | absent 527 | stale 0 | disposition 1 (NOT served,
+so nothing is owed) | disposition_served 0 | unknown 0 -> exit 0. CONTROLS: 12 in the gate selftest (a
+disposition-ruled row that IS served -> BLOCKING by id; one that is NOT -> nothing owed) and 9 in
+tests/test_adjudication_map_split.py (the three loud refusals, roles-only admission, and PARITY: the live map admits
+exactly the role rows and drops nothing).
+RESIDUAL (why this stays OPEN, MED): the WITHDRAWAL writer is OWED - the act is declared, the state is detected and
+blocked, but no tool enacts it, and it is built when the first SERVED disposition-ruled row appears. Two smaller items,
+both named and neither silent: (i) ONE fb_id (334554e09e9c) carries 5 role rows in the map, so a duplicate ruling is
+silently last-wins in tier 1 (167 distinct ids among 171 role rows) - map hygiene, OWED; (ii) the map's disposition
+rulings take effect through the declared act, never through a label.
+
+## BUG-712 (MED - OPEN 2026-10-12) - UPDATE: the DURABLE half landed (D-2968) - a router-authored label can no longer carry an LLM authorship stamp, and the residual is now ONE named row
+MEASURED, and it is D-2938's OWN defect shape one stage later. D-2938 made S4 persist the ROUTER's resolved
+content_type instead of the raw S2 label, but the write site kept stamping llm_extracted_from_source on EVERY row
+(a literal at line 2459, a comment above it asserting "provenance: pipeline FBs are always llm_extracted_from_source").
+So the next S2->S6 run would write ~100 labels the DETERMINISTIC router authored (D-343/D-2747) while claiming an LLM
+authored them: the BUG-742 class (a provenance value TRUE of the label the row no longer carries), produced by the very
+repair that made the label right. A computed fact, DISCARDED at the write site - the same sentence that names D-2938.
+FIXED: pipeline/stage4_merge.py::content_type_source(resolved, raw, persist) is the ONE home for the authorship rule -
+"deterministic" when the router REPLACED the S2 label, "llm_extracted_from_source" when the S2 label survived (the LLM
+did author what is persisted) or when the persist flag is off (the raw label is written, so a deterministic stamp
+would be the lie). Both values are members of the CLOSED C29 vocabulary (pipeline/schemas.py#PROVENANCE_LITERAL, a
+Pydantic Literal), so the function SELECTS and never mints. The literal is gone from the site, and a SOURCE-LEVEL
+control fails if it returns, because no runtime assertion can see a literal that simply looks correct.
+NOT A RETRO RAIL, ON PURPOSE. A store-wide "the router agrees with every stored label" parity rail would measure
+HISTORY (the committed rows predate the producer) and would have to be baselined and re-baselined as the corpus grows -
+that is exactly the BUG-745 shape this session found RED. The guarantee is FORWARD-ONLY: the label and its authorship
+are persisted from one computation, and the run-summary counter (D-2938) is the observable that joins them to the store
+census on the next run.
+RESIDUAL = ONE named row (plus one satisfied-in-effect): the strict form's single surviving genuine claim_status is NOT
+written (D-2953's warrant rule, above). The 11 owner-adjudicated cells were written earlier (D-2964). MEASURED
+content_type_source census: llm_extracted_from_source 6,581 | deterministic 1,048 | human_verbatim 11.
+MEASURED FINDING FOR THE NEXT RUN (registered here, NOT as a new bug - the owner of the shape is D-2590): the S4
+checkpoint now carries RESOLVED non-principle labels, so a record the router sends to growth_edge is no longer written
+as a principle - it stays in the fbs list and is COMMITTED with content_type="growth_edge", while the D-2590 sidecar
+path (which decides by the RAW label earlier in the run) never sees it. The store census will therefore move on the
+next S2->S6 run (principle down, growth_edge up) and the move must EQUAL the run-summary counter; the body shape of a
+committed non-principle row is D-2590's pending spec. Nothing is silent: the counter prints, and the leaf gate admits
+only declared roles.
+
+## BUG-746 (HIGH - CLOSED 2026-10-12) - the R5 gate read an EXIT CODE as a verdict: a reviewer CRASH was recorded as REJECT, and the reason was discarded
+FOUND by running R5 on this session's own change. MEASURED: scripts/r5_review_gate.py ran the cross-family reviewer on
+pipeline/stage4_merge.py (152,853 chars), the oMLX server returned HTTP 400, scripts/r5_code_review.py CRASHED (rc=1)
+without printing a verdict, and the gate recorded REJECT - with NO verdict text, NO line in the declared journal
+(governance/r5_reviews.jsonl) for that file and digest, and the traceback captured in stderr and THROWN AWAY. Three
+defects, one cause: the gate read HOW a process ENDED as WHAT it decided. Consequences: the repository's LARGEST
+pipeline module could not be reviewed at all (its verdict history is a fabricated rejection), the reasons were
+unrecoverable (BUG-743's class: a citation without its text), and in the OTHER direction the same rule would read an
+exit code with no verdict as approval.
+FIXED (D-2969): (1) THE VERDICT RULE - a verdict exists only when r5_code_review.py WROTE one to its journal for THIS
+file and digest; otherwise the record is INDECISIVE whatever the exit code (both directions closed). (2) THE EVIDENCE IS
+PRINTED - when no verdict was recorded, the reviewer stderr tail and the rc are printed and carried in the receipt (C16:
+no silent error). (3) THE CAUSE IS PREVENTED AT ZERO MODEL COST - each tier declares max_source_chars and the gate
+REFUSES to send an oversized source (INDECISIVE(SIZE_GUARD), naming the file, the cap and the reason), because the
+failure mode of guessing is a verdict that never existed. The cap is ANCHORED TO A MEASUREMENT: 98,664 chars returned a
+real verdict (pipeline/stage6_commit.py, APPROVE 2026-10-12) while 152,853 crashed, so the declared cap (100,000) sits
+under the largest SUCCESS; RAISING it needs a new measurement (C12/D-2956). (4) THE CONSEQUENCE IS NAMED: TWO pipeline
+modules exceed the cap (pipeline/stage4_merge.py, pipeline/stage2_extract.py), so for those the review unit is the
+CHANGE - and this session's stage4 change was reviewed that way
+(governance/evidence/d2968_stage4_content_type_provenance.diff, 4,780 chars -> APPROVE, concerns in the journal).
+CONTROLS: 14 in the gate selftest, 5 new (exit+verdict reads as it reads in all three codes; a NON-ZERO exit with no
+verdict -> INDECISIVE; a ZERO exit with no verdict -> INDECISIVE; an unknown exit with no verdict -> INDECISIVE; every
+tier declares a cap that admits the largest measured success). NOT CHANGED: r5_code_review.py itself and its verdict
+rule - the gate is an orchestrator and restates no verdict of its own (D-2646).

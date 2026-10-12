@@ -16,7 +16,7 @@
 # the LAYERS + the file digest + a pointer to the verdict line.
 schema_version: 1
 decision: D-2962
-bug: BUG-738
+bug: [BUG-738, BUG-746]
 reviewer_script: scripts/r5_code_review.py
 verdict_journal: governance/r5_reviews.jsonl
 receipt: governance/r5_review_gate.jsonl
@@ -69,10 +69,18 @@ tiers:
   fast:
     reviewer: gemma-4-E4B-it-MLX-4bit
     max_tokens: 2000
+    # BUG-746: the source cap the reviewer's CONTEXT can hold, and the guard that keeps an oversized source from
+    # being sent at all. The value is ANCHORED TO A MEASUREMENT, not to a guess about the true context window:
+    # pipeline/stage6_commit.py (98,664 chars) returned a real verdict (APPROVE 2026-10-12) while
+    # pipeline/stage4_merge.py (152,853 chars) returned HTTP 400 - a crash the gate used to record as REJECT.
+    # Refusing is fail-safe; raising this number needs a NEW measurement at the higher size, because the failure
+    # mode of guessing is a verdict that never existed (C16/D-2956).
+    max_source_chars: 100000
     why: cross-family vs the Qwen generator, live on oMLX, D2549 first pass
   deep:
     reviewer: gemma-4-E4B-it-MLX-4bit
     max_tokens: 2600
+    max_source_chars: 100000   # measured anchor: 98,664 chars reviewed; 152,853 crashed the server (BUG-746)
     status: PENDING_BENCH
     why: >-
       today the deep tier differs by BUDGET and CONTEXT only. The only LIVE cross-family reviewer on this host

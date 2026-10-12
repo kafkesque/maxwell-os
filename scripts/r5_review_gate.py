@@ -49,6 +49,40 @@ STATUS_NA: str = "N/A"
 STATUS_SKIPPED: str = "SKIPPED"
 VERDICT_LAYER_FAIL: str = "LAYER_FAIL"
 VERDICT_BY_RC: dict = {0: "APPROVE", 1: "REJECT", 2: "INDECISIVE"}
+VERDICT_NO_VERDICT: str = "INDECISIVE"
+VERDICT_SIZE_GUARD: str = "INDECISIVE(SIZE_GUARD)"
+
+
+def verdict_of(rc: int, journal_gained_verdict: bool) -> str:
+    """The VERDICT RULE: an exit code is not a verdict (D-2962/BUG-738, hardened by BUG-746).
+
+    A reviewer's exit code says HOW its process ENDED, not WHAT it decided. The model call can raise (measured
+    2026-10-12: HTTP 400 from the oMLX server on a 152,853-char source), time out, or die after printing nothing,
+    and every one of those exits non-zero - so an rc-only rule records a CRASH as a REJECT. The other direction is
+    worse: an rc with no verdict text would be read as an APPROVAL. A verdict exists ONLY when
+    scripts/r5_code_review.py WROTE one to its journal for this file and digest, so:
+      rc 0 + a journal verdict -> APPROVE | rc 1 + a journal verdict -> REJECT
+      rc 2 + a journal verdict -> INDECISIVE | NO journal verdict -> INDECISIVE, whatever the rc
+    """
+    if not journal_gained_verdict:
+        return VERDICT_NO_VERDICT
+    return VERDICT_BY_RC.get(rc, "INDECISIVE")
+
+
+def journal_has_verdict(journal: Path, rel: str, digest16: str) -> bool:
+    """Whether the reviewer's journal holds a verdict line for THIS file and digest (the verdict's ONE home)."""
+    if not journal.exists():
+        return False
+    for line in journal.read_text(encoding="utf-8").splitlines()[-50:]:
+        if not line.strip():
+            continue
+        try:
+            entry: dict = json.loads(line)
+        except Exception:  # noqa: BLE001 - a malformed line is not a verdict, and must not stop the scan
+            continue
+        if str(entry.get("file")) == rel and str(entry.get("sha256_16")) == digest16:
+            return True
+    return False
 
 
 def load_config(path: Path = CONFIG) -> dict:
@@ -64,6 +98,10 @@ def load_config(path: Path = CONFIG) -> dict:
             raise SystemExit("FAIL-CLOSED: tier has no reviewer: " + name)
         if int(tier.get("max_tokens") or 0) < 256:
             raise SystemExit("FAIL-CLOSED: tier budget too small to hold a verdict: " + name)
+        if int(tier.get("max_source_chars") or 0) < 1000:
+            raise SystemExit("FAIL-CLOSED: tier has no usable source cap (max_source_chars): " + name
+                             + " - without it a source too large for the reviewer's context is sent anyway and the"
+                             + " resulting HTTP 400 is indistinguishable from a rejection (BUG-746)")
     return cfg
 
 
@@ -167,6 +205,25 @@ def gate_one(rel: str, cfg: dict, tier_name: str, no_llm: bool, context: list, m
         append_jsonl(REPO / cfg["receipt"], record)
         print("  VERDICT  LAYERS_ONLY (--no-llm: the reviewer was not invoked, this is NOT an approval of the code)")
         return record
+    # BUG-746 (deterministic, 0 model calls): a source too large for the reviewer's context is REFUSED HERE rather
+    # than sent. MEASURED 2026-10-12: 98,664 chars returned a verdict (pipeline/stage6_commit.py, APPROVE) while
+    # 152,853 chars (pipeline/stage4_merge.py) returned HTTP 400 from the oMLX server - a crash whose exit code was
+    # recorded as REJECT with no verdict text and no journal line, i.e. the repo's largest module could not be
+    # reviewed at all and the failure looked like a decision. The cap is declared per tier (config-first) and sits
+    # UNDER the largest measured success rather than guessing the true context limit: refusing is fail-safe,
+    # fabricating a verdict is not. The unit of review for such a file is the CHANGE (a diff).
+    cap: int = int(cfg["tiers"][tier_name]["max_source_chars"])
+    source_chars: int = path.stat().st_size
+    if source_chars > cap:
+        record["verdict"] = VERDICT_SIZE_GUARD
+        record["verdict_exit"] = cfg["exit"]["indecisive"]
+        record["size_guard"] = {"source_chars": source_chars, "max_source_chars": cap}
+        append_jsonl(REPO / cfg["receipt"], record)
+        print("  VERDICT  " + VERDICT_SIZE_GUARD + " (0 model calls): " + str(source_chars) + " chars exceeds the"
+              " declared cap " + str(cap) + " for tier '" + tier_name + "'. NO verdict was recorded: this source"
+              " cannot be sent to " + str(cfg["tiers"][tier_name]["reviewer"]) + " without the model returning"
+              " HTTP 400, and a crash is not a decision. Review the CHANGE (its diff) instead of the whole file.")
+        return record
     evidence: Path = evidence_file(rel, layers, cfg)
     reviewer_argv: list = [
         sys.executable, str(REPO / cfg["reviewer_script"]),
@@ -183,13 +240,24 @@ def gate_one(rel: str, cfg: dict, tier_name: str, no_llm: bool, context: list, m
     proc = subprocess.run(reviewer_argv, cwd=str(REPO), capture_output=True, text=True, timeout=1800)
     for line in (proc.stdout or "").strip().splitlines():
         print("  " + line)
-    record["verdict"] = VERDICT_BY_RC.get(proc.returncode, "UNKNOWN")
-    record["verdict_exit"] = proc.returncode
+    # BUG-746: a VERDICT exists only if the reviewer WROTE one for this file+digest - never because a process
+    # exited 0 or 1. A crash, a timeout or an empty stdout must not be readable as a decision in either direction.
+    gained: bool = journal_has_verdict(REPO / cfg["verdict_journal"], rel, str(record["sha256_16"]))
+    record["verdict"] = verdict_of(proc.returncode, gained)
+    record["verdict_exit"] = (cfg["exit"]["approve"] if record["verdict"] == "APPROVE"
+                              else cfg["exit"]["fail"] if record["verdict"] == "REJECT"
+                              else cfg["exit"]["indecisive"])
+    record["reviewer_rc"] = proc.returncode
+    record["verdict_recorded_by_reviewer"] = gained
     record["verdict_journal"] = cfg["verdict_journal"]
+    if not gained:
+        for line in (proc.stderr or "").strip().splitlines()[-6:]:
+            print("  reviewer stderr: " + line[:200])
+        record["reviewer_stderr_tail"] = (proc.stderr or "").strip().splitlines()[-1:] or []
+        print("  NOTICE (C16): the reviewer recorded NO verdict for this file+digest, so this is INDECISIVE - an"
+              " exit code says how the process ENDED, not what it decided. A crash must never be read as a"
+              " rejection (BUG-746).")
     append_jsonl(REPO / cfg["receipt"], record)
-    if proc.returncode not in VERDICT_BY_RC:
-        print("  FAIL-CLOSED: unexpected reviewer rc " + str(proc.returncode) + " (treated as indecisive)")
-        record["verdict_exit"] = cfg["exit"]["indecisive"]
     print("  receipt  " + cfg["receipt"] + " (append-only)")
     return record
 
@@ -226,6 +294,22 @@ def selftest() -> int:
           cfg["tiers"]["deep"].get("not_candidates"))
     check("the verdict journal is the ONE home the reviewer script writes",
           cfg["verdict_journal"] == "governance/r5_reviews.jsonl", cfg["verdict_journal"])
+    # BUG-746: the verdict rule itself, both directions of the lie it had. An exit code is how a process ENDED.
+    check("an exit code WITH a reviewer verdict is read as it reads (0 APPROVE / 1 REJECT / 2 INDECISIVE)",
+          [verdict_of(0, True), verdict_of(1, True), verdict_of(2, True)] == ["APPROVE", "REJECT", "INDECISIVE"],
+          [verdict_of(0, True), verdict_of(1, True), verdict_of(2, True)])
+    check("a NON-ZERO exit with NO verdict is INDECISIVE, never a fabricated REJECT (the 2026-10-12 crash)",
+          verdict_of(1, False) == "INDECISIVE", verdict_of(1, False))
+    check("a ZERO exit with NO verdict is INDECISIVE, never a fabricated APPROVE",
+          verdict_of(0, False) == "INDECISIVE", verdict_of(0, False))
+    check("an unknown exit with NO verdict is INDECISIVE",
+          verdict_of(137, False) == "INDECISIVE", verdict_of(137, False))
+    check("every tier declares a source cap that a reviewer can actually be sent (BUG-746)",
+          all(int(t.get("max_source_chars") or 0) >= 1000 for t in cfg["tiers"].values()),
+          {n: t.get("max_source_chars") for n, t in cfg["tiers"].items()})
+    check("the declared cap admits the largest source this host has ever reviewed (98,664 chars, measured)",
+          all(int(t["max_source_chars"]) >= 98664 for t in cfg["tiers"].values()),
+          {n: t["max_source_chars"] for n, t in cfg["tiers"].items()})
     check("layers are declared with a why (no unexplained control)",
           all(str(layer.get("why") or "").strip() for layer in cfg["layers"]), len(cfg["layers"]))
     shutil.rmtree(tmp, ignore_errors=True)

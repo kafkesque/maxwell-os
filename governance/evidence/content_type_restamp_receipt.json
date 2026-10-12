@@ -6,10 +6,13 @@
     "already": 18,
     "apply": 0,
     "disposition": 1,
+    "disposition_served": 0,
     "stale": 0,
     "unknown": 0
   },
-  "generated": "2026-10-12T20:44:17",
+  "disposition_act": "withdraw_with_archive",
+  "disposition_writer": "OWED",
+  "generated": "2026-10-12T22:24:10",
   "map": "governance/content_type_adjudication.json",
   "provenance_ruling_owed": false,
   "provenance_value": "human_verbatim",
@@ -17,12 +20,14 @@
     "disposition": [
       {
         "current": "tool_instruction",
+        "destination_kind": "disposition",
         "fb_id": "27fabecb4f68cff1bd519ac65232544b8e3b98282c3e7e597bae5dc8aa5ce3cd",
         "proposed": "noise_drop",
         "reason": "physical equipment, descriptive \u2014 no prescriptive \"what to DO\" (owner 2026-10-12: ARED is noise drop)",
         "warrant": "high"
       }
     ],
+    "disposition_served": [],
     "stale": [],
     "unknown": []
   },

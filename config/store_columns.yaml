@@ -43,7 +43,7 @@ columns:
   # outside the tier are DECLARED legitimate and reported LOUD. Nothing here is declared `sparse`: sparse says the
   # field is OPTIONAL, while D2371/D2488/D2475 QUARANTINE a principle whose application/failure_mode/elaboration is
   # empty - so `sparse` would have been 20 lies (BUG-733), whereas a population is a measured claim.
-  elaboration: {role: value, population: s5_verified, outside: absent, why: "principle-only body field (D-2943): non-blank on 6,591/6,591 S5 rows, absent on the 1,049 sidecar rows whose body is type_body"}
+  elaboration: {role: value, population: s5_verified, outside: absent, why: "principle-only body field (D-2943): non-blank on 6,591/6,591 S5 rows - 6,587 principle PLUS 4 LEGACY tool_instruction rows that carry one too (measured 2026-10-12; pre-D2452 blanking, and NOT rewritten because it is a value the store really holds); absent on the 1,049 sidecar rows whose body is type_body. RESHAPED 2026-10-12 (BUG-737 column 2 of 14, scripts/normalize_absent_shape.py): the 1,049 sidecar rows now carry a TRUE NULL, so count(elaboration) reads 6,591 and can no longer claim a row that carries no elaboration at all (D-2957). The manufacturing point is closed: pipeline/stage6_commit.py now writes _safe_str(...) or None. The ONE store reader that could have emitted the literal None string for the reshaped rows was fixed WITH the write (pipeline/query.py, `or N/A`); measured, every other store reader is truthiness- or empty-string-guarded, the MCP server carries NO elaboration key, nothing re-validates a store row through pydantic, and all 1,049 rows are status=QUARANTINE so the default serving predicate never surfaces them."}
   taxonomy_match_method: {role: value, population: s5_verified, outside: absent, why: "non-blank 6,591/6,591 inside S5 with 3 distinct methods; the sidecar tier is not taxonomy-matched at all"}
   keywords: {role: value, population: s5_verified, outside: absent, why: "non-blank 6,591/6,591 inside S5; the sidecar tier carries its own role-specific body in type_body"}
   domains_raw: {role: value, population: s5_verified, outside: absent, why: "non-blank 6,591/6,591 inside S5 with 5,916 distinct; NULL outside it (the only tier column already NULL-shaped outside)"}
@@ -292,7 +292,7 @@ measured:
       hollow: 0
       mentions: 41
       nonblank: 6591
-      nonnull: 7640
+      nonnull: 6591
       rows: 7640
     epistemic_status:
       distinct: 4

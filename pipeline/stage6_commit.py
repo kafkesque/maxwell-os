@@ -821,7 +821,13 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
             _safe_str(fb_definition(fb)),
             _safe_str(fb.get("application"), ""),
             _safe_str(fb.get("failure_mode"), ""),
-            _safe_str(fb.get("elaboration"), ""),
+            # D-2957/BUG-737 (column 2 of 14): absent must be NULL, never a blank. config/store_columns.yaml
+            # declares outside: absent for the s5_verified population, and the 1,049 D-2590 sidecar rows
+            # carry no elaboration at all (they carry type_body) - so count(elaboration) must not claim
+            # them. In-tier there are ZERO blanks (measured 2026-10-12), so this cannot create an in-tier
+            # NULL, and a principle without elaboration is already refused upstream (D2448). A non-principle
+            # body legitimately has none, and NULL is that absence's declared shape.
+            _safe_str(fb.get("elaboration")) or None,
             _safe_str(fb.get("content_type"), ""),
             _safe_str(fb.get("extraction_type"), ""),
             _safe_str(fb.get("mechanism"), ""),

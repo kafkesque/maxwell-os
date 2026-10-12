@@ -11679,3 +11679,30 @@ E402 F841 I001 - the new import was inserted in SORTED position, so it did not a
 **SETTLED by ONE `--record`, as its own named act (D-2649/BUG-533).** The write moved EXACTLY ONE LINE - `mentions: 21` -> `22` - and no STORE ruler (a backup was taken first, `backups/store_columns.PRE_check_store_columns_20261012T191035Z.yaml`). `ceiling.debt` stayed 8 (a raise is forbidden, D-2642). Post-record: `census moves 0`.
 
 **WHAT IS STILL RED IS NOT THIS.** The `--check` FAIL that remains is the 14 pre-existing `DRIFT POPULATION-SHAPE` role faults plus 2 declared `OUTSIDE-COVERAGE` items (failure_mode, menu_hash) - BUG-737's queue. A re-record cannot clear a ROLE fault (BUG-732's ruling), and none of those faults names `origin`.
+
+## BUG-737 (MED - OPEN 2026-10-12) - UPDATE: the SECOND column is normalised END-TO-END (`elaboration`), and the reshape is INVISIBLE to serving
+
+**THE COLUMN.** `elaboration` (register: role `value`, population `s5_verified`, `outside: absent`) held a NON-NULL blank on all 1,049 D-2590 sidecar rows while 6,591/6,591 S5 rows carried a value. FIXED in one act: `scripts/normalize_absent_shape.py --column elaboration --apply` - 1,049 rows reshaped `''` -> NULL (C13 backup `backups/maxwell.db.bak_20261012_212114_pre_absent_shape_elaboration`, 219,467,776 bytes, ONE `BEGIN IMMEDIATE`, post-state verified). The manufacturing point is closed in the SAME change: `pipeline/stage6_commit.py` now writes `_safe_str(fb.get("elaboration")) or None`.
+
+**THE READER AUDIT (the part that bit `last_retrieved_at` when IT was reshaped).** MEASURED, not assumed - and it found exactly ONE reader that could render the new NULL as the literal string `None`:
+
+* `pipeline/query.py::_print_fb_full` used `fb.get('elaboration', 'N/A')`. A `.get(key, default)` does NOT fall back on a present-but-NULL key, so all 1,049 rows would have printed `None`. FIXED WITH the write (`fb.get('elaboration') or 'N/A'`) - the same idiom as the MCP fix for `last_retrieved_at`.
+* `maxwell_mcp_server.py` carries NO `elaboration` key in its output dict - CLEAR.
+* Every other store-touching reader is truthiness-guarded (`pipeline/stage6b_anytype_push.py`, `pipeline/stage6_okf_export.py`, `pipeline/stage6c_obsidian_export.py`) or `or ""`-guarded (`scripts/build_discipline_ceiling_sample.py`); `pipeline/schema_accessor.py::fb_consequence` and `pipeline/dedup_gate.py`'s `_nonempty` are None-safe - CLEAR.
+* NO reader re-validates a store row through pydantic, so `FB.elaboration`'s `min_length=20` cannot fire on a NULL. CLEAR (measured: the only `FBRecord` references are schema-presence NAME lists in `pipeline/integrity_check.py`).
+
+**WHY SERVING CANNOT SEE THE RESHAPE.** MEASURED: all 1,049 reshaped rows carry `status='QUARANTINE'`, so the default serving predicate (`status = 'PASS'`, `pipeline/retrieve.py`) and both exporters (`stage6b` skips FLAG/QUARANTINE; `stage6c` exports non-PASS only under an explicit flag) never surface them. Only an explicit `include_quarantine` opt-in (D-2942) reaches them - i.e. a caller that has ASKED for quarantined rows.
+
+**NO TRIGGER, NO REINDEX.** MEASURED: the only trigger on `fbs` is `fbs_ai` (`AFTER INSERT`) and the write is an UPDATE, so `fbs_fts` was untouched (7,640 docs before and after).
+
+**CONTROLS (`tests/test_absent_shape_reader.py`, 5/5).** Both halves of the change now have something that RUNS them: absent (`None` AND `''`) -> the stored cell IS NULL and `count(elaboration)` is 0; a present value survives VERBATIM (so the fix cannot become "blank the column"); the reader renders BOTH absent shapes as `N/A` and never the `None` string. The producer controls go through `insert_fb` PLUS the store's own D-2942 disposition gate, not a hand-tuned row.
+
+**REGISTER CORRECTED (D-2956 clause 3 - a declaration must not carry a claim the store falsifies).** The `why` said "principle-only ... non-blank on 6,591/6,591 S5 rows". MEASURED: it is 6,587 PRINCIPLE plus **4 LEGACY `tool_instruction`** rows that also carry one (pre-D2452 blanking). Those 4 are NOT rewritten - that is a value the store really holds, and rewriting it would be exactly the unmeasured change this queue exists to avoid. The `why` now states that, records the reshape, and names the reader fix.
+
+**RAIL.** `DRIFT POPULATION-SHAPE` 14 -> 13 -> **12**. The write moved a STORE ruler (`elaboration.nonnull` 7,640 -> 6,591), so ONE deliberate `--record` settled it (D-2642: the measured tail moves, the ceiling does NOT - `debt` stayed 8). Post-record: `MEASUREMENT-DRIFT 0`, `census moves 0`.
+
+**A COMMENT MUST NOT MOVE A CENSUS (caught in this change, not papered over).** The first version of the reader comment NAMED an unrelated column, which moved THAT column's `mentions` census 7 -> 8 (the ruler counts .py FILES naming a column, BUG-533). The tempting move was to `--record` it; the right move was to delete the column name from the prose (now an explicit note in the code), after which the census returned to 7 with NO record. A prose edit is not a store act and must never require one.
+
+**REMAINING QUEUE (12 of 14, one at a time, each with its own reader audit):** accessibility, context, difficulty_level, discipline_raw, epistemic_status, intimacy_boundary, keywords, practicality, source_text, taxonomy_match_method, temporal_scope, verification_method. Specifically NOT in the queue, and OWED as declared: `failure_mode` (774 rows outside, `outside: unconstrained`) and `menu_hash` (the `NOT_APPLICABLE` sentinel - it must NOT be normalised until its readers are audited, F-44/D-279).
+
+**A NAMED OBSERVATION, NOT A FIX.** `pipeline/query.py` prints three SIBLINGS the same way the fixed line did (`definition`, `application`, `failure_mode`). None is in this queue (`definition` is never absent; `application`/`failure_mode` are declared `status: debt` with their own populations), so none is reachable by a reshape today - but each will need the SAME one-line guard IN ITS OWN column verdict, not in this one.

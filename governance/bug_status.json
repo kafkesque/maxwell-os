@@ -906,7 +906,7 @@
     {
       "id": "BUG-737",
       "title": "(MED - OPEN 2026-10-12) \u2014 the store's ABSENT SHAPE is `''` on 20 of 78 columns while the code declares `None`",
-      "events": 4
+      "events": 5
     },
     {
       "id": "BUG-738",

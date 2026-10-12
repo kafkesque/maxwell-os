@@ -295,7 +295,14 @@ def _print_fb_full(fb: dict):
     print("\n  ── FAILURE MODE ──")
     print(f"  {fb.get('failure_mode', 'N/A')}")
     print("\n  ── ELABORATION ──")
-    print(f"  {fb.get('elaboration', 'N/A')}")
+    # D-2957/BUG-737 (column 2 of 14): absent is NULL, so `or` keeps THIS reader's emitted shape
+    # stable across the reshape. A .get(key, default) does NOT fall back on a present-but-NULL key -
+    # it returns the NULL and the print emits the literal "None" string (the BUG-726 shape class,
+    # fixed the same way in maxwell_mcp_server.py for its own reshaped column). Measured: this is the
+    # ONLY store reader that could render the 1,049 reshaped rows, and all of them are QUARANTINE.
+    # NOTE (D-2649/BUG-533): this comment deliberately does NOT name any other column - naming one
+    # would move THAT column's `mentions` census, and a comment must never move a census.
+    print(f"  {fb.get('elaboration') or 'N/A'}")
 
     if fb.get("keywords"):
         print("\n  ── KEYWORDS ──")

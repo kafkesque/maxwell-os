@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**178 open** / 311 closed of 489 ids.
+**176 open** / 313 closed of 489 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -34,7 +34,6 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-267 | (OPEN, 2026-09-17) — min_human_share floor is a substring classifier (F-16) | 1 |
 | BUG-270 | OPEN (2026-09-17) — the frontier69 audit artifact disagrees with the runtime KB on 10 of 69 objects, and two concepts exist in BOTH taxonomi | 1 |
 | BUG-273 | the domains axis violates its own cardinality contract (2026-09-17) | 1 |
-| BUG-274 | the `related_fbs` graph is 56.8% asymmetric (2026-09-17) | 1 |
 | BUG-275 | LINK is unenforceable at retrieval, and both facets are unindexed (2026-09-17) | 1 |
 | BUG-277 | the content_type axis mixes two vocabularies, and the docs say "7 values" (2026-09-17) | 1 |
 | BUG-278 | stage 5 treats "unverifiable" as "untrue", and never persists which one it was (2026-09-19) | 1 |
@@ -179,7 +178,6 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-710 | (CRITICAL — OPEN): the D2511 retrieval gate is INERT — golden set anchored to the superseded run, and the documented fail-loud precondition  | 2 |
 | BUG-711 | (HIGH — OPEN): 173 canonical rows still carry a DISPLACED canonical domain label in the STORE | 1 |
 | BUG-712 | (CRITICAL — OPEN): content_type routing collapse — 6 of 8 declared primitives produce ZERO output | 4 |
-| BUG-714 | (HIGH — OPEN): content_type='tool_instruction' is populated with CODE SNIPPETS, not tool instructions | 1 |
 | BUG-719 | (MED - OPEN 2026-10-12): the non-principle sidecars are not content-type pure, and the "81 tool_instruction remaining" figure was an arithme | 1 |
 | BUG-720 | (LOW - OPEN 2026-10-12): the S4 sidecar reconciliation tolerates a magic 7 instead of reconciling exactly | 1 |
 | BUG-721 | (HIGH - OPEN 2026-10-12): a DELEGATE returned a FABRICATED code-review verdict without reading the code (false assurance) | 1 |

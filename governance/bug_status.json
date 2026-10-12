@@ -3,8 +3,8 @@
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
   "total_ids": 489,
-  "open_n": 178,
-  "closed_n": 311,
+  "open_n": 176,
+  "closed_n": 313,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -141,11 +141,6 @@
     {
       "id": "BUG-273",
       "title": "the domains axis violates its own cardinality contract (2026-09-17)",
-      "events": 1
-    },
-    {
-      "id": "BUG-274",
-      "title": "the `related_fbs` graph is 56.8% asymmetric (2026-09-17)",
       "events": 1
     },
     {
@@ -869,11 +864,6 @@
       "events": 4
     },
     {
-      "id": "BUG-714",
-      "title": "(HIGH \u2014 OPEN): content_type='tool_instruction' is populated with CODE SNIPPETS, not tool instructions",
-      "events": 1
-    },
-    {
       "id": "BUG-719",
       "title": "(MED - OPEN 2026-10-12): the non-principle sidecars are not content-type pure, and the \"81 tool_instruction remaining\" figure was an arithme",
       "events": 1
@@ -918,6 +908,7 @@
     "BUG-269",
     "BUG-271",
     "BUG-272",
+    "BUG-274",
     "BUG-276",
     "BUG-283",
     "BUG-284",
@@ -1205,6 +1196,7 @@
     "BUG-708",
     "BUG-709",
     "BUG-713",
+    "BUG-714",
     "BUG-715",
     "BUG-716",
     "BUG-717",

@@ -30,6 +30,13 @@ _CT_PATH = Path(__file__).resolve().parent.parent / "config" / "content_types.ya
 with open(_CT_PATH, encoding="utf-8") as _f:
     _CT = yaml.safe_load(_f)
 
+# D-2644 / BUG-731 — EVERY read of `_CT` below is LOUD (subscript, no literal default). This module's
+# ontology is not optional: a renamed or deleted key must fail at IMPORT (C16) rather than resolve
+# silently to an empty mapping and quietly disable a rule — the BUG-730 defect class, where one
+# emptied key killed the whole tool_instruction→process_template tier with every rail green. Those
+# defaults were also why this file was invisible to the D-2644 census; `_CT` is now a declared census
+# receiver (config/derivations.yaml#config_reads.receivers).
+
 # ── AXIS 1 — content_type: functional ROLE (5 values) ─────────────────────
 CONTENT_TYPES: frozenset[str] = frozenset(_CT["content_types"].keys())
 
@@ -37,19 +44,19 @@ CONTENT_TYPES: frozenset[str] = frozenset(_CT["content_types"].keys())
 EXTRACTION_TYPES: frozenset[str] = frozenset(_CT["extraction_types"].keys())
 
 # ── D2128 — legacy S2 `route` field → content_type ────────────────────────
-ROUTE_TO_CONTENT_TYPE: dict[str, str] = dict(_CT.get("route_to_content_type", {}))
+ROUTE_TO_CONTENT_TYPE: dict[str, str] = dict(_CT["route_to_content_type"])
 
 # ── D2417 — content_type → extraction_type (conflation-rescue default) ─────
 # BUG-145: when the model writes a content_type ROLE into extraction_type, remap
 # to a weakest-honest epistemic default rather than fail-closed. S4 may re-derive.
 CONTENT_TO_EXTRACTION_TYPE: dict[str, str] = dict(
-    _CT.get("content_to_extraction_type", {})
+    _CT["content_to_extraction_type"]
 )
 
 # ── D2587 — content-type classification rules (Q1/Q2/Q3) ───────────────────
 # Loaded so the auditor can ENFORCE the rules (process_template.min_steps, etc.)
 # rather than leave them as decorative YAML. C12: read from YAML, never re-declare.
-CONTENT_TYPE_RULES: dict = dict(_CT.get("content_type_rules", {}))
+CONTENT_TYPE_RULES: dict = dict(_CT["content_type_rules"])
 PROCESS_TEMPLATE_MIN_STEPS: int = int(
     CONTENT_TYPE_RULES.get("process_template_min_steps", 2)
 )
@@ -62,7 +69,7 @@ PROCESS_TEMPLATE_MIN_STEPS: int = int(
 # role"), which is NOT a classification outcome — it is excluded from the axis.
 _DISPOSITION_STATUS_KEYS: frozenset[str] = frozenset({"classified"})
 CONTENT_TYPE_DISPOSITIONS: frozenset[str] = frozenset(
-    k for k in _CT.get("dispositions", {}).keys() if k not in _DISPOSITION_STATUS_KEYS
+    k for k in _CT["dispositions"].keys() if k not in _DISPOSITION_STATUS_KEYS
 )
 CONTENT_TYPES_ALL: frozenset[str] = CONTENT_TYPES | CONTENT_TYPE_DISPOSITIONS
 
@@ -79,9 +86,9 @@ CONTENT_TYPES_ALL: frozenset[str] = CONTENT_TYPES | CONTENT_TYPE_DISPOSITIONS
 # NOT the governed verification `status` column (S5-owned, D-2933): it survives namespaced inside
 # type_body, and the S6 commit path never writes an S5-owned column from a sidecar row.
 _S2_BODY_FIELDS: dict[str, tuple[str, ...]] = {
-    str(_k): tuple(str(_f) for _f in (_v or [])) for _k, _v in dict(_CT.get("s2_body_fields", {})).items()
+    str(_k): tuple(str(_f) for _f in (_v or [])) for _k, _v in dict(_CT["s2_body_fields"]).items()
 }
-CORE_BODY: frozenset[str] = frozenset(str(_f) for _f in (_CT.get("core_body") or []))
+CORE_BODY: frozenset[str] = frozenset(str(_f) for _f in (_CT["core_body"] or []))
 
 
 def type_body_fields(content_type: str | None) -> tuple[str, ...]:
@@ -97,7 +104,7 @@ def type_body_fields(content_type: str | None) -> tuple[str, ...]:
 
 # ── D2323 — vestigial content_type values, never used ─────────────────────
 DROPPED_CONTENT_TYPES: frozenset[str] = frozenset(
-    _CT.get("dropped_content_types", [])
+    _CT["dropped_content_types"]
 )
 
 # ── P2-1 — S2-extractable body fields per content_type (beyond core_body) ─
@@ -105,7 +112,7 @@ DROPPED_CONTENT_TYPES: frozenset[str] = frozenset(
 # prompt emits these fields when it chooses the corresponding content_type role.
 # Cross-reference/metadata fields are DERIVED later (S4.5/D2345), not extracted.
 S2_BODY_FIELDS: dict[str, list[str]] = {
-    str(k): [str(f) for f in v] for k, v in _CT.get("s2_body_fields", {}).items()
+    str(k): [str(f) for f in v] for k, v in _CT["s2_body_fields"].items()
 }
 
 # Default role emitted by convergent S2 extraction (foundation block).
@@ -134,10 +141,14 @@ EXTRACTION_TYPE_ENUM: str = '"' + '"|"'.join(sorted(EXTRACTION_TYPES)) + '"'
 # noise_drop/quarantine. `contested` is a growth_edge RECORD field (bool), NOT a new
 # epistemic_status value — the epistemic_status axis is S5-DERIVED (serving_gate) and
 # stays 4-valued; `contested` answers "do sources contradict?", not S5's tier question.
-_REROUTE: dict = dict(_CT.get("reroute", {}))
+_REROUTE: dict = dict(_CT["reroute"])
+# D-2955 (BUG-729): this vocabulary is PROCEDURE-DENOTING only ('system'/'framework' named software
+# ARTIFACTS and were removed), and even then it is a PRIOR — tier 3 below additionally requires BODY
+# evidence unless the owner turns that gate off.
 TI_TO_PT_KEYWORDS: tuple[str, ...] = tuple(
-    str(k).strip().lower() for k in _REROUTE.get("ti_to_pt_keywords", []) if str(k).strip()
+    str(k).strip().lower() for k in _REROUTE["ti_to_pt_keywords"] if str(k).strip()
 )
+TI_TO_PT_REQUIRE_BODY_EVIDENCE: bool = bool(_REROUTE["ti_to_pt_require_body_evidence"])
 _ADJUDICATION_PATH: Path = Path(__file__).resolve().parent.parent / "governance" / "content_type_adjudication.json"
 CONTESTED_FLAG: str = "contested"
 GROWTH_EDGE_CONTENT_TYPE: str = "growth_edge"
@@ -191,14 +202,21 @@ _PRESCRIPTIVE = re.compile(
     r"validate|frame|elicit|structure))\b",
     re.IGNORECASE,
 )
+# D-2949 (BUG-712 spot-check): the OLD _DONE_CONDITION matched a BARE "until"/"gate"/
+# "termination"/"once X then" and fired on ordinary prose ("first as analysis then as
+# communication until clarity emerges" → misrouted "Dual Nature of Information
+# Visualization" to process_template). The discriminator is a GENUINE loop/termination
+# condition, not a step-sequence width — so _PROCEDURE_STEPS stays loose (ordinal
+# sequence OR numbered steps) while _DONE_CONDITION now requires a real loop signal.
 _PROCEDURE_STEPS = re.compile(
     r"\b(first|second|third|fourth|finally|next|then|subsequently|thereafter)\b[^.]*"
     r"\b(then|next|finally|until|once|repeat)\b|\b(step|stage|phase)\s*[1-9]",
     re.IGNORECASE,
 )
 _DONE_CONDITION = re.compile(
-    r"\b(until|once .{0,40} (then|stop|complete|done)|repeat until|keep .{0,20} until|"
-    r"iterate .{0,20} (until|converge)|gate|exit condition|termination)\b",
+    r"\b(repeat until|iterate (until|while|over)|loop (until|while)|"
+    r"while .{0,60} (repeat|loop|continue)|until .{0,60} (stop|complete|done|converge|satisfied)|"
+    r"exit condition|termination condition)\b",
     re.IGNORECASE,
 )
 _OPEN_TENSION = re.compile(
@@ -207,6 +225,122 @@ _OPEN_TENSION = re.compile(
     r"correlation .{0,20} unproven)\b",
     re.IGNORECASE,
 )
+
+# ── D-2953 (BUG-712 CALIBRATION): the tier-2 tension test, STRICT form ─────────────────────
+# `_OPEN_TENSION` above fires on BARE words, so an ordinary first-order predicate about the
+# record's SUBJECT is read as an epistemic statement about the CLAIM: "generating untraceable or
+# contradictory information", "sites of contested identity", "visual cues contradict the
+# audience's expectations". MEASURED 2026-10-12 over 7,640 rows
+# (scripts/calibrate_content_type_router.py): of 100 `principle -> growth_edge` moves, 88 (88%)
+# are subject-matter FALSE POSITIVES and only 12 survive even a permissive claim-status test. The
+# strict form requires the token to be PREDICATED of an epistemic subject — the SAME discipline
+# D-2949 applied to `_DONE_CONDITION` (bare "until"/"gate"), applied here to its sibling.
+_EPISTEMIC_SUBJECT = (
+    r"(claim|claims|evidence|finding|findings|result|results|theory|hypothesis|assumption|"
+    r"correlation|causal link|conclusion|conclusions|knowledge|literature|research|consensus)"
+)
+# STATUS ASSERTION, not adjacency. Adjacency ALONE is not evidence of epistemic status: the first
+# draft of this regex accepted "the training data contains contradictory context cues" via a
+# generic subject noun, which measured 68% false positives — barely better than the loose form.
+# The strict form therefore requires AFFIRMATIVE STRUCTURE:
+#   (a) SUBJECT ... copula ... STATUS   "the evidence is/remains contested"
+#   (b) STATUS → SUBJECT                "contested claim", "disputed finding"
+#   (c) unambiguous constructions       "open question", "unknown whether", "not established"
+# A relational use ("X contradicts Y") or a subject-matter modifier ("contradictory information")
+# matches none of the three, which is the entire point of the narrowing.
+_OPEN_TENSION_STRICT = re.compile(
+    r"\b" + _EPISTEMIC_SUBJECT + r"\b[^.]{0,40}\b(is|are|was|were|remains?|seems?|appears?)\b"
+    r"[^.]{0,20}\b(contested|disputed|unresolved|unverified|debated)\b"
+    r"|\b(contested|disputed|unresolved|unverified|debated)\s+" + _EPISTEMIC_SUBJECT + r"\b"
+    r"|\b(open question|unknown whether|not (yet )?(established|verified|proven)|"
+    r"correlation .{0,20} unproven)\b",
+    re.IGNORECASE,
+)
+# C12: the mode is CONFIG-owned (config/content_types.yaml -> reroute.open_tension_strict) and the
+# default preserves today's behaviour exactly. Flipping it is an OWNER call — content_type is
+# S4-owned ontology (D-2933) — and the strict form's own move count is re-measured BEFORE any
+# re-stamp. The destructive direction is the loose one, so the flag's safe value is reachable
+# without an owner and its risky value is not.
+#
+# Read LOUDLY, with NO code default (D-2644: "declare the key and read it loudly, or stop reading
+# it"). The key IS declared in config/content_types.yaml, so a missing key is a CONFIG DEFECT and
+# must fail at import (C16 fail-closed) rather than be papered over by a fallback default.
+# NOTE (BUG-731): this module reads through `_CT`, which is NOT one of the receivers the D-2644
+# census watches (`[_CFG, cfg, config, conf, settings]`), so reads here are invisible to that rail —
+# which is exactly why the loud read is a convention this module must keep by hand.
+OPEN_TENSION_STRICT: bool = bool(_CT["reroute"]["open_tension_strict"])
+
+
+def _tension_haystack(fb: dict) -> str:
+    """The text every tier-2 test reads (C21: ONE home for this shape).
+
+    Args:
+        fb: A Stage 2 record dict.
+
+    Returns:
+        Lower-cased "definition + name/mechanism/boundary/consequence/elaboration".
+    """
+    return (
+        str(fb.get("definition") or "")
+        + " "
+        + " ".join(str(fb.get(k) or "") for k in ("name", "mechanism", "boundary", "consequence", "elaboration"))
+    ).lower()
+
+
+def principle_tension_hit(fb: dict, strict: bool | None = None) -> bool:
+    """Whether the tier-2 open-tension test would fire on `fb` (calibration/tests only).
+
+    Args:
+        fb: A Stage 2 record dict.
+        strict: force the strict or loose form; None uses the configured mode.
+
+    Returns:
+        True when the tension tier fires.
+    """
+    use_strict: bool = OPEN_TENSION_STRICT if strict is None else strict
+    return bool((_OPEN_TENSION_STRICT if use_strict else _OPEN_TENSION).search(_tension_haystack(fb)))
+
+
+_TI_BODY_KEYS: tuple[str, ...] = (
+    "tool_name", "platform", "description", "syntax", "parameters", "output", "example", "caveats"
+)
+
+
+def _ti_haystack(fb: dict) -> str:
+    """The text the tier-3 body-evidence test reads (C21: ONE home for this shape).
+
+    A tool_instruction's OWN body is the fields the ontology declares for that role
+    (`s2_body_fields.tool_instruction`, D-2943); the shared core body is appended because a TI may
+    carry it too (D2475 makes it optional for the non-principle roles, never forbidden).
+
+    Args:
+        fb: A Stage 2 record dict.
+
+    Returns:
+        Lower-cased shared body + the role's own TI fields.
+    """
+    own = " ".join(str(fb.get(k) or "") for k in _TI_BODY_KEYS)
+    return (_tension_haystack(fb) + " " + own).lower()
+
+
+def has_procedure_evidence(fb: dict) -> bool:
+    """Whether a record's BODY evidences a procedure: ordered steps AND a done-condition/gate.
+
+    D275b defines a process_template as "trigger + ordered steps + a done-condition/gate", and D-2747
+    tier 2 already decides `principle -> process_template` on exactly this pair. Tier 3 REUSES it
+    rather than inventing a second procedure test (C21: one rule, one home).
+
+    Public because the BUG-729 calibration measures it directly — the rule and the instrument that
+    judges it must read the SAME haystack and the SAME two regexes.
+
+    Args:
+        fb: A Stage 2 record dict.
+
+    Returns:
+        True when the body carries both an ordered sequence and a termination/loop condition.
+    """
+    hay = _ti_haystack(fb)
+    return bool(_PROCEDURE_STEPS.search(hay) and _DONE_CONDITION.search(hay))
 
 
 def _principle_form_violation(fb: dict) -> str | None:
@@ -218,11 +352,10 @@ def _principle_form_violation(fb: dict) -> str | None:
     owner-gated via the tier-1 map).
     """
     definition = str(fb.get("definition") or "")
-    body = " ".join(
-        str(fb.get(k) or "") for k in ("name", "mechanism", "boundary", "consequence", "elaboration")
-    )
-    hay = (definition + " " + body).lower()
-    if _OPEN_TENSION.search(hay):
+    hay = _tension_haystack(fb)
+    # Read the mode at CALL time (not import time) so the flag is monkeypatchable and a config
+    # change cannot be silently frozen into a long-lived process.
+    if (_OPEN_TENSION_STRICT if OPEN_TENSION_STRICT else _OPEN_TENSION).search(hay):
         return GROWTH_EDGE_CONTENT_TYPE            # retained — investigate the tension
     if _PROCEDURE_STEPS.search(hay) and _DONE_CONDITION.search(hay):
         return "process_template"                   # retained — a method, not a principle
@@ -231,20 +364,24 @@ def _principle_form_violation(fb: dict) -> str | None:
     return None
 
 
-def reroute_content_type(fb: dict) -> str:
+def reroute_content_type(fb: dict, require_body_evidence: bool | None = None) -> str:
     """Deterministically correct a non-principle record's content_type (D-2747).
 
     D-343: content_type must NOT be LLM-classified (worse than constant baseline), so
     this is pure deterministic rules — no model call. First-match-wins across three tiers:
       1. owner-adjudicated map (fb_id → role)  — highest authority
-      2. keyword denylist (TI tool_name → process_template)
-      3. structural (TI with neither syntax nor parameters → quarantine)
+      2. principle FORM invariant (D-2748/D-2749) — fail-closed, retained-only
+      3. TI → process_template: a PROCEDURE-denoting name PLUS body evidence of a procedure
+         (D-2955/BUG-729) — then structural (TI with neither syntax nor parameters → quarantine)
 
     The contested retention guard is applied FIRST: a `contested: true` record is
     growth_edge by construction, never dropped.
 
     Args:
         fb: A Stage 2 record dict with content_type + body fields.
+        require_body_evidence: force tier 3's evidence gate on/off; None (the normal path) uses the
+            configured policy. The override exists so the BUG-729 calibration can measure BOTH sides
+            without editing config — the same shape as `principle_tension_hit(strict=...)`.
 
     Returns:
         The corrected content_type role (or the original when no rule fires).
@@ -264,10 +401,16 @@ def reroute_content_type(fb: dict) -> str:
         violation = _principle_form_violation(fb)
         if violation:
             return violation
-    # Tier 3 — keyword denylist (TI named like a system/protocol/workflow → PT).
+    # Tier 3 — PROCEDURE-DENOTING NAME + BODY EVIDENCE (D-2747 tier 3, narrowed by D-2955/BUG-729).
+    # The name alone is not a discriminator: the ratified D275b procedure tests "tool/software-specific
+    # command, syntax, or feature" FIRST, so a name-suffix promotion both inverts that order and reads
+    # a software ARTIFACT as a method. Both conditions are read at CALL time so a config flip (or a
+    # monkeypatch in the calibration) cannot be frozen into a long-lived process.
     if current == "tool_instruction":
         tool_name = str(fb.get("tool_name") or "").strip().lower()
-        if tool_name and any(k in tool_name for k in TI_TO_PT_KEYWORDS):
+        name_prior = bool(tool_name) and any(k in tool_name for k in TI_TO_PT_KEYWORDS)
+        require: bool = TI_TO_PT_REQUIRE_BODY_EVIDENCE if require_body_evidence is None else require_body_evidence
+        if name_prior and (has_procedure_evidence(fb) or not require):
             return "process_template"
         # Tier 4 — structural: a TI with neither syntax nor parameters is underspecified.
         syntax = str(fb.get("syntax") or "").strip()
@@ -294,7 +437,7 @@ def _is_contested(fb: dict) -> bool:
 # one undifferentiated blob. This axis answers WHO consumes the object and WHY.
 # DETERMINISTIC (never LLM-classified — D-343): adjudication map first, then
 # lexical markers. Provenance is stamped alongside the label.
-_APPLICABILITY: dict = dict(_CT.get("applicability", {}))
+_APPLICABILITY: dict = dict(_CT["applicability"])
 APPLICABILITY_VALUES: tuple[str, ...] = tuple(str(v) for v in _APPLICABILITY.get("values", []))
 DEFAULT_APPLICABILITY: str = str(_APPLICABILITY.get("default", "operational"))
 _APPLICABILITY_ADJUDICATION_PATH: Path = (

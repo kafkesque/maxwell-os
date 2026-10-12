@@ -33,6 +33,7 @@ health:
     python3 scripts/check_existence_negatives.py || exit 1
     python3 scripts/check_buglog_coverage.py --selftest || exit 1   # BUG-570/BUG-492: the buglog BLOAT rail's own controls - a byte-identical COPY must fire and two DIFFERENT blocks must not
     python3 scripts/check_buglog_coverage.py || exit 1   # BUG-570: no block may be a byte-identical copy of another (the earlier 'not identical' refusal compared an occurrence to EOF - length-dependent, always unequal)
+    python3 scripts/r5_review_gate.py --selftest || exit 1   # D-2962/BUG-738: the R5 code-review gate's known-answer controls (a TRUNCATED file MUST fail the syntax layer, scripts/* MUST resolve to a declared tier, the Qwen-lineage model MUST stay declared not-a-candidate) - a control nothing runs is a comment (BUG-492)
     python3 scripts/check_bug_status.py || exit 1
     python3 scripts/check_governance_faces.py --selftest || exit 1   # SEVENTH rail - governance FACES must not contradict the register (BUG-588/D-2692); controls must fire (a control nothing runs is a comment, BUG-492)
     python3 scripts/check_governance_faces.py || exit 1   # D-NEW: bug-status table rows + header census in DECISION-LOG/MTR must agree with bug_status.json / decisions_summary.json
@@ -72,6 +73,8 @@ health:
     python3 scripts/build_anchor_store_bridge.py --check || [ $? -eq 2 ]   # BUG-420/BUG-551: the join is keyed by CONTENT (D-2658); 2 = owner-owed (a SAFE ambiguous refusal, or a row the config DECLARES), 1 = a BRIDGE GAP (the D-2618 retired golden is recorded, never gated)
     python3 scripts/check_config_defaults.py --selftest || exit 1      # D-2644: the undeclared-default census known-answer controls
     python3 scripts/check_config_defaults.py --check || [ $? -eq 2 ]   # D-2644: a config value read with a code default is UNDECLARED; 2 = the declared ceiling is stale (read-only; re-record via --record)
+    python3 scripts/check_config_duplicate_keys.py --selftest || exit 1   # BUG-730/BUG-492: the duplicate-config-key detector must be SEEN to fire
+    python3 scripts/check_config_duplicate_keys.py || exit 1  # BUG-730/C16: a duplicate config key REPLACES its twin SILENTLY (PyYAML last-wins) - one such key emptied ti_to_pt_keywords and killed a routing tier with every other rail green
     python3 scripts/lib/handoff.py --selftest || exit 1
     python3 scripts/verify_handoffs.py --check || [ $? -eq 2 ]      # 2 = owner-owed: loud, NOT fatal (BUG-457); D-403; read-only (publish via --record)
     python3 scripts/resolve_dropbox_conflicts.py --selftest || exit 1     # D-2647 tri-state controls (BUG-492)

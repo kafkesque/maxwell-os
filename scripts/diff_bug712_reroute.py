@@ -45,6 +45,11 @@ def _fb_from_row(row: sqlite3.Row) -> dict[str, Any]:
     """Reconstruct the S2-shaped dict reroute_content_type expects, from an S6 row."""
     fb: dict[str, Any] = {
         "fb_id": row["fb_id"],
+        # `name` MATTERS: `_principle_form_violation` builds its haystack from
+        # (name, mechanism, boundary, consequence, elaboration) — omitting it computes the verdict
+        # on a TRUNCATED haystack. Measured 2026-10-12 (BUG-712 calibration): 0 manifest effect on
+        # the then-current 7,640 rows, i.e. a latent unfaithfulness, not a live wrong number.
+        "name": row["name"] or "",
         "content_type": row["content_type"],
     }
     for k in _BODY_KEYS:

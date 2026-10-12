@@ -1,0 +1,103 @@
+# R5 CODE-REVIEW GATE - config-first (C12). Every layer, tier, budget and receipt path lives here.
+#
+# WHY (D-2962, BUG-738). R5 review used to be ONE LLM pass over a file. Measured on the verdict journal
+# (governance/r5_reviews.jsonl, 43 verdicts, read 2026-10-12): 30 APPROVE / 6 REJECT / 4 INSUFFICIENT /
+# 3 UNPARSED. Seven of 43 (16%) were NOT decisions, and every UNPARSED was a truncation - the verdict JSON
+# did not fit the output budget. Three of those failure modes are MECHANICAL, i.e. an LLM was being asked a
+# question a machine answers exactly, for free, with no chance of being wrong by opinion:
+#   syntax   - does the file compile (truncation, unbalanced paren, half-written line)?   0 calls
+#   lint     - does the repo's own ruff config flag it?                                   0 calls
+#   c11_c12  - is it inside the repo's import/path contract?                              0 calls
+# The reviewer is then asked ONLY what a machine cannot decide, and is TOLD what was already proved
+# (the BUG-269 T2/T3 rule - never ask an LLM what a machine can decide - applied to code).
+#
+# THE VERDICT RULE IS UNCHANGED: a verdict is evidence only when scripts/r5_code_review.py produced it, so the
+# gate INVOKES that script and never restates its verdict as its own claim (D-2646). The gate receipt carries
+# the LAYERS + the file digest + a pointer to the verdict line.
+schema_version: 1
+decision: D-2962
+bug: BUG-738
+reviewer_script: scripts/r5_code_review.py
+verdict_journal: governance/r5_reviews.jsonl
+receipt: governance/r5_review_gate.jsonl
+# THE REVIEWER QUESTION. Scoped to THE FILE BELOW and to its OWN docstring: the first live pass (2026-10-12,
+# gemma-4-E4B, INSUFFICIENT) showed that a question about "this change" is not answerable from a file that is itself
+# an orchestrator - the reviewer could not tell whether it was judging the gate or the gated artifact. A question
+# that cannot be decided from the source ALONE is a question that produces INSUFFICIENT (4 of the 43 journal
+# verdicts), so the scope is now stated explicitly.
+task: >-
+  Judge THE FILE BELOW, as written, against the purpose stated in ITS OWN docstring - nothing else. Is it CORRECT
+  for that purpose and SAFE to run: no data loss, no irreversibility, no silent failure, and does it verify its own
+  work? If the file is an orchestrator, judge it AS an orchestrator; judge what it would be used for ONLY when its
+  own docstring claims that use. The deterministic layers listed in the evidence file have ALREADY proved syntax,
+  lint and the C11/C12 contract - do not re-report those.
+
+# DETERMINISTIC LAYERS. Run in order, before any model is called. fatal=true -> the file never reaches a
+# reviewer (a file that does not compile is not reviewable). A non-fatal layer is LOUD, never silently green.
+layers:
+  - name: syntax
+    why: truncation and syntax errors; uses compile() so no __pycache__ is written (C19)
+    applies: ["*.py"]
+    argv: ["python3", "-c", "import sys; compile(open(sys.argv[1], encoding='utf-8').read(), sys.argv[1], 'exec')", "{file}"]
+    fatal: true
+    optional: false
+  - name: lint
+    why: the repo's ruff config is the arbiter of undefined names / unused imports; loud but NOT fatal (the review may be about exactly the line ruff flags)
+    applies: ["*.py"]
+    argv: ["python3", "-m", "ruff", "check", "--output-format=concise", "--no-cache", "{file}"]
+    fatal: false
+    optional: true
+  - name: c11_c12
+    why: >-
+      C11 imports subset of requirements+stdlib+local and C12 no hardcoded absolute path;
+      scripts/pre_commit_gate.py is the ONE implementation. NON-FATAL ON PURPOSE: the rail is REPO-WIDE, so a
+      pre-existing red (BUG-739: it misreads difflib/ctypes/_sqlite3 as undeclared) would fail every per-file
+      review for a defect the reviewed file did not cause - and a loud rail nobody can satisfy is not a rail
+      (BUG-540). The status is printed and recorded in the receipt either way, so it can never be silently green.
+    applies: ["*"]
+    argv: ["python3", "scripts/pre_commit_gate.py"]
+    fatal: false
+    optional: false
+
+# TIERS. A tier selects the reviewer and its output budget. Budget is not cosmetic: the 3 UNPARSED verdicts
+# in the journal were truncated verdict JSON.
+tiers:
+  fast:
+    reviewer: gemma-4-E4B-it-MLX-4bit
+    max_tokens: 2000
+    why: cross-family vs the Qwen generator, live on oMLX, D2549 first pass
+  deep:
+    reviewer: gemma-4-E4B-it-MLX-4bit
+    max_tokens: 2600
+    status: PENDING_BENCH
+    why: >-
+      today the deep tier differs by BUDGET and CONTEXT only. The only LIVE cross-family reviewer on this host
+      is the 4B gemma (governance/eval_models.txt = live oMLX registry). A MODEL promotion requires the bench
+      below AND a BUG-265-class preflight: the 26B-A4B OptiQ sibling is DISABLED as BROKEN
+      (config/model_assignments.yaml:145 - "5/5 calls fail"), and lmstudio-community/gemma-4-26B-A4B-it-QAT-MLX-4bit
+      is a DIFFERENT artifact that is NOT fetched and NOT registered here.
+    candidates: [gpt-oss-20b-MXFP4-Q8, gemma-4-26B-A4B-it-QAT-MLX-4bit, gemma-4-12B-it-qat-OptiQ-4bit]
+    not_candidates: [Qwen3.8-27B-MLX-4bit]
+    not_candidates_why: >-
+      Qwen3.8-27B shares the Qwen lineage with the generator (Qwen3-Coder-30B-A3B-Instruct-MLX-4bit), so it is
+      NOT a cross-family reviewer; it was used as the "deep auditor" in 5 journal verdicts and may stay only as
+      an ADVISORY second opinion. R5 means generator != verifier, family included.
+
+tier_by_path:
+  - {match: "*", tier: fast}
+  - {match: "scripts/*", tier: deep}
+  - {match: "pipeline/*", tier: deep}
+  - {match: "tools/*", tier: deep}
+
+# THE MEASUREMENT THAT DECIDES A REVIEWER PROMOTION (OWED - BUG-738). A survey is not a measurement (D-2956);
+# D2556's 5-bug snippet is a smoke test, not a ranking.
+bench:
+  status: OWED
+  harness: tools/model_eval_suite.py
+  suite: reviewing
+  min_n: 20
+  baseline: constant-answer
+  min_margin_over_baseline: 0.15
+  why: the harness already carries a seeded-bug + false-claim suite; report abstain rate SEPARATELY from error rate
+
+exit: {approve: 0, fail: 1, indecisive: 2}

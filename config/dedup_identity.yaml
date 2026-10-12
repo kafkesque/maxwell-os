@@ -1,0 +1,78 @@
+# D-2950 — deterministic dedup identity + edition supersession
+# GROUPING key  = (normalize_name(name), source_id)   -> candidate duplicates
+# MERGE gate    = semantic divergence of the body (definition + mechanism)
+#   convergent body -> same concept re-extracted -> MERGE (keep richer)
+#   divergent body  -> distinct concepts sharing a name inside ONE source -> KEEP BOTH
+# No LLM anywhere in identity/dedup (D-343). Thresholds live here, never hardcoded (C12).
+schema_version: 1
+created: '2026-10-12'
+divergence:
+  # token Jaccard (definition+mechanism) below this -> divergent
+  merge_jaccard_min: 0.5
+  # SequenceMatcher ratio (definition+mechanism) below this -> divergent
+  merge_seq_min: 0.55
+  # false -> EITHER metric below threshold flags divergence (fail-safe: keep both on doubt,
+  #          so a wrong merge never destroys a distinct concept; C6 "never delete output")
+  require_both: false
+
+# ── D-2952 RULING: edition supersession is a FILE-LAYER content rule ───────────────────────────
+# MEASURED 2026-10-12 before ruling (scripts/audit_edition_layers.py, read-only, 7,640 rows):
+#   • compute_source_id = SHA-256(normalize_author|normalize_title) and normalize_title DELIBERATELY
+#     strips subtitles so edition variants collapse (D2308/D2315/D2507). CONSEQUENCE, and the whole
+#     point: two editions of ONE work share ONE source_id — the store cannot see them as two sources,
+#     BY DESIGN (work-level identity).
+#   • so the edition population exists ONLY at the FILE layer: files>1 AND years>1 AND ONE source_id
+#     = 12 rows (Prompt Engineering for LLMs 2024|2025 -> f69844dc599c45be; The Elements of
+#     Typographic Style 1996|2004 -> b73510ed035932b6), plus 51 boundary rows holding 2 source_ids.
+#   • carrier duplicates (SAME edition, several files: *_clean.md, " (1)", z-library mirrors) are a
+#     NON-ISSUE at identity level: 0 rows in source_ids, because D2176 routes source_diversity
+#     through canonical source_ids, not filenames. CHECKED AND CLEAN — do not "fix" it again
+#     (BUG-527 class: re-fixing a fixed defect). At the FILE layer the blemish is real but
+#     DISPLAY-ONLY (BUG-728): 31 rows literally repeat a source_authors entry, 90 collide on carrier.
+#   • primary_source: 1,014 rows carry "earliest publication year (YYYY)" with ZERO violations of the
+#     earliest rule; 5,921 single-source; 705 (9.2%) fall back to source order ("no year metadata;
+#     first source") — an unranked pick, honestly recorded.
+#
+# THE THREE LAYERS, one home each. Supersession moves the BODY layer ONLY.
+#   WORK  a concept-carrier | identity = source_ids | editions COLLAPSE by design (D-2308)
+#   FILE  a text carrier    | source_authors[] = {book, author, title, year} | the ONLY place an
+#                             edition conflict is visible
+#   BODY  the FB's current statement | the body fields | what "newest edition wins" may change
+edition_supersession:
+  wired: false            # no consumer yet -> NO flag is registered until a WRITER exists (C27; C12)
+  enabled: false          # declared policy, not an active behaviour
+  principle: >
+    "Newest edition wins" is a CONTENT-FRESHNESS rule about the BODY of one FB. It is NOT an
+    identity rule and NOT a citation rule. Repurposing primary_source to mean "newest" would
+    invalidate 1,014 recorded reason strings, conflate ORIGIN with FRESHNESS, and give one column
+    two meanings across time — the exact defect class BUG-726 just fixed in duplicate_of, and the
+    BUG-498 class (a claim the code cannot keep).
+  scope:
+    body_fields_only: [definition, mechanism, consequence, boundary, failure_mode, elaboration, jargon, evidence_passages]
+    never_touches: [primary_source, citation, source_authors, status, s5_reason, verification_results, confidence_score, domains, discipline, content_type]
+    never_delete: true    # append the superseded source filename to source_ids (D2625/D2630)
+  citation_convention:
+    field: primary_source
+    meaning: 'ORIGIN attribution = "the earliest source we HOLD that states this work"'
+    rule: earliest recorded year (tie-break by source order) — UNCHANGED by this ruling
+    known_weakness: '705 rows (9.2%) fall back to source order; fix by METADATA COVERAGE, never by rewriting the recorded reason'
+  freshness_pointer:
+    column: content_basis          # RESERVED NAME — deliberately NOT created yet
+    semantics: 'the FILE (sanitized display name, matching source_authors[].book) whose text the CURRENT body was derived from'
+    absent_means: 'never superseded — the primary source IS the basis'
+    storage_rule: 'absent = SQL NULL, never "" (BUG-726 lesson applied prophylactically)'
+    companion: content_basis_updated_at
+    build_order: 'record it at EXTRACTION first; a supersession operation must never act on a fact nobody recorded'
+    why_not_created_now: >
+      a column with no WRITER is debt by definition (BUG-511 family) and the store_columns register
+      is shrink-only at debt 8 of ceiling 9 — creating it now would push the register to its ceiling
+      for zero readers. It is created in the same change that has a writer.
+  execution:
+    never_at_commit: true          # D-2933 rule V: a commit may never rewrite an existing row's body
+    shape: 'owner-gated operation: C13 backup -> ONE BEGIN IMMEDIATE -> dry-run default -> post-state verified'
+    queue: "CommitDedupGate decisions whose would == 'supersede_review' (a candidate RICHER than the incumbent)"
+
+thresholds_direction:            # fences the ONE destructive value (C6/C16)
+  may_tighten_without_owner: true    # stricter divergence = keep both = fail-safe
+  may_loosen_without_owner: false    # require_both: true, or raising the mins, merges on DOUBT -> owner-gated + labelled evidence
+

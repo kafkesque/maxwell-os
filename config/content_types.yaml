@@ -432,9 +432,51 @@ s2_body_fields:
 #   SEPARATE, orthogonal rule: a `contested: true` record is NEVER noise_drop/quarantine.
 # ─────────────────────────────────────────────────────────────────────────────
 reroute:
-  # tool_instruction whose tool_name matches one of these → process_template
-  # (a named system/protocol/workflow is a procedure, not a single command).
-  ti_to_pt_keywords: [system, protocol, workflow, framework, methodology, pipeline, process]
+  # tool_instruction → process_template promotion (D-2747 tier 3). TWO conditions — a NAME is a
+  # PRIOR, never EVIDENCE:
+  #  (1) VOCABULARY — the name must denote a PROCEDURE. D-2949 dropped 'protocol'/'pipeline'/'process'
+  #      ("Item Validation Protocol", "Transformers Pipeline API") as common TOOL-name suffixes but
+  #      KEPT 'system'/'framework', the same class pointing the other way: they name software
+  #      ARTIFACTS that are USED ('OpenFrameworks', a C++ creative-coding library, twice; 'Layout
+  #      Analysis System'; 'Inventory Management System'), not methods that are EXECUTED. MEASURED
+  #      2026-10-12 over the 108 stored tool_instruction rows: the four old keywords fired on 10 rows
+  #      and NOT ONE of the ten is a procedure under the ratified D275b procedure, which tests
+  #      "tool/software-specific command, syntax, or feature" FIRST — so a name-suffix promotion
+  #      INVERTS the owner-ratified order. 'system'/'framework' REMOVED; the survivors denote
+  #      procedures. The structural check (TI with neither syntax nor parameters) and the tier-1
+  #      owner map still catch genuinely-underspecified TIs.
+  ti_to_pt_keywords: [workflow, methodology]
+
+  # D-2955 (BUG-729) — require BODY EVIDENCE for the promotion above. true = a promoted record must
+  # carry an ordered procedure AND a done-condition/gate in its OWN body (D275b: "trigger + ordered
+  # steps + a done-condition"), i.e. the SAME test tier 2 applies to a principle. false restores the
+  # name-only behaviour, which is MEASURED WRONG on the current store (0 of 10 promotions survive it);
+  # it exists only as the calibration instrument's second side. Flipping it is an OWNER call
+  # (content_type is S4-owned ontology, D-2933) — same shape as open_tension_strict below, where the
+  # SAFE value ships and the DESTRUCTIVE one needs an owner.
+  ti_to_pt_require_body_evidence: true
+  # D-2953 (BUG-712 CALIBRATION) — tier-2 tension test MODE. false = the historical LOOSE form
+  # (`_OPEN_TENSION`, BARE words). true = the STRICT form, which requires an affirmative STATUS
+  # construction ("the evidence is contested", "contested claim") instead of reading an ordinary
+  # predicate about the record's SUBJECT as an epistemic statement about its CLAIM.
+  #
+  # MEASURED 2026-10-12 over the 7,640-row store (scripts/calibrate_content_type_router.py):
+  #   loose  = 100 `principle -> growth_edge` moves, 88 of them (88%) SUBJECT-MATTER FALSE
+  #            POSITIVES that a governed re-stamp would have written into the store (1.2% of it);
+  #   strict = far fewer moves with the FP rate in the D-2953 record;
+  #   recall (gated by the same status test) = 0 in BOTH forms — the token list is not too NARROW,
+  #            which is why this fix is PRECISION-ONLY.
+  # The strict form is the SAFE direction and the loose one is the DESTRUCTIVE value. It therefore
+  # shipped DISABLED (behaviour bit-for-bit unchanged, D-2953) until the owner RATIFIED it ENABLED on
+  # 2026-10-12, one word, after the two-sided measurement above. The strict form's own move count is
+  # what a governed BUG-712 re-stamp may act on: the loose form's 100 moves are 88% router error, so
+  # writing them would have injected a defect into the store FROM a repair pass.
+  #
+  # NOTE (see BUG-730): this key lives inside the EXISTING `reroute:` mapping on purpose. A second
+  # top-level `reroute:` block appended to this file silently REPLACED this one (PyYAML keeps the
+  # last duplicate), which emptied `ti_to_pt_keywords` and killed the TI->process_template tier
+  # without a single error. scripts/check_config_duplicate_keys.py now fails the build on that.
+  open_tension_strict: true   # RATIFIED by the owner 2026-10-12 (D-2953); was false pending ratification
 
 # DROPPED — vestigial content_type enum values (were schema-only, never used)
 #   `fact`  (domain factoid): never emitted/validated/trained; a bare factoid
@@ -466,3 +508,4 @@ nli_paraphrase:
   growth_edge: "This describes a speculative idea, an open question, or an unverified correlation."
   noise_drop: "This is a bare factual summary with no rule or method to apply."
   quarantine: "This has some value but does not clearly fit any single category."
+

@@ -298,6 +298,12 @@ S6_S5_OWNED_COLUMNS=tuple(_CFG.get("stage6", {}).get("s5_owned_columns", []))
 # refuses a write only when a written column appears here; an empty list means the skew is
 # immaterial for this write and is recorded as a loud advisory instead (see stage6_commit).
 S6_TAXONOMY_DEPENDENT_COLUMNS=frozenset(_CFG.get("stage6", {}).get("taxonomy_dependent_columns", []))
+# D-2951 (D-2949 prevention half): the commit-time dedup gate. C12 — enabled + mode live in
+# config/pipeline_config.yaml:stage6.dedup_gate, never in code. An unknown mode FAILS CLOSED at
+# the call site (C16) rather than silently defaulting to a no-op gate.
+_S6_DEDUP_GATE=dict(_CFG.get("stage6", {}).get("dedup_gate", {}) or {})
+S6_DEDUP_GATE_ENABLED=bool(_S6_DEDUP_GATE.get("enabled", False))
+S6_DEDUP_GATE_MODE=str(_S6_DEDUP_GATE.get("mode", "report"))
 
 # ── Stage 5 settings (D2083: Type-aware BORP) ──────────────────────────
 S5_BORP_BYPASS_TYPES=list(_CFG["stage5"]["borp_bypass_types"])

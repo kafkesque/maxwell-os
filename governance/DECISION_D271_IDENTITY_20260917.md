@@ -162,3 +162,26 @@ labels survive as altLabels.
 | D-271d: enforce the LINK=`QUARANTINE` pairing in config + add the facet indexes | no human | deterministic code, R5-reviewed (gemma APPROVE) |
 | implement `config/identity.yaml` (migration + alias backfill) | no human, **gated on G8** | must not migrate before the collision ruling lands |
 | 41 marker names → prefLabel + altLabel | no human | deterministic, defined in config |
+
+---
+
+## UPDATE 2026-10-12 (D-2952) — D-271d's MECHANISM is aligned: `duplicate_of` is a pointer, not a predicate
+
+§6 above already names the mechanism correctly ("enforce the LINK=`QUARANTINE` pairing in config +
+add the facet indexes") — and that IS done (`config/identity.yaml` `link_must_also_set`,
+`scripts/add_facet_indexes.py`, `idx_fbs_duplicate_of`). What is SUPERSEDED is only the stale
+imperative recorded elsewhere in the log ("wire `duplicate_of IS NULL` into `pipeline/retrieve.py`"),
+which was never implemented and must not be:
+
+- the retrieval guard is the STATUS guard — `pipeline/retrieve.py::_status_predicate` returns
+  `status = 'PASS'` (QUARANTINE opt-in via `include_quarantine`);
+- duplicates are therefore excluded from default retrieval by `status = 'QUARANTINE'`, which the
+  LINK writer is REQUIRED to set in the same update (`config/identity.yaml`: `link_must_also_set`);
+- `duplicate_of IS NULL` would be REDUNDANT on top of that, and the column is a provenance pointer
+  with no reader in `pipeline/` (`duplicate_of_reader: none`).
+
+**Measure before trusting the predicate.** With the pre-BUG-726 shape the predicate matched ZERO rows
+of 7,640 — a guard that looks like it protects retrieval while protecting nothing. After BUG-726 the
+column reads NULL on all 7,640 rows (0 real markers), so the predicate is *correct* — and still
+redundant. Corollary for the schema: a documented predicate no code executes is a claim the code
+cannot keep (BUG-498), which is why `governance/buglog.md` records where the real guard lives.

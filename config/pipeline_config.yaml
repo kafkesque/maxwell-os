@@ -739,6 +739,30 @@ stage6:
   - isor
   - practicality
   - committed_at
+  # D-2951 (2026-10-12): COMMIT-TIME DEDUP GATE — the PREVENTION half of D-2949.
+  # D-2949 #4 root-caused the 3 near-duplicate name groups to "stage1 SHA-256 EXACT-dedup +
+  # no name-level uniqueness at commit": stage1 dedups SEGMENTS, so two extractions of the
+  # same concept from the same work produced two fb_ids and both landed. This gate supplies
+  # the missing check AT THE COMMIT BOUNDARY, over the deterministic identity model of
+  # D-2950 (pipeline/dedup_identity.py): grouping key = (normalize_name(name), source_ids);
+  # merge gate = body divergence of definition+mechanism (thresholds in config/dedup_identity.yaml).
+  # No LLM in this path (D-343). It checks the store AND the rows already accepted by this
+  # batch, so a collision created WITHIN one run is caught too.
+  #   mode: report  -> compute every decision, write the receipt, CHANGE NOTHING. (default:
+  #                    evidence before enforcement; the flip is an owner call)
+  #   mode: enforce -> additionally LINK a convergent re-extraction: duplicate_of = incumbent
+  #                    fb_id + status QUARANTINE via serving_gate.derive_status (the ONE status
+  #                    rule, D274h). That is the locked policy "mark duplicate_of + QUARANTINE,
+  #                    NEVER delete" (D2625/D2630) — nothing is deleted and retrieval keeps
+  #                    serving the incumbent. Applied ONLY when the INCUMBENT is the richer row;
+  #                    a candidate richer than the store's row is reported as a supersede
+  #                    candidate for an owner call instead (D-2933 rule V: a commit never
+  #                    rewrites an existing row; D-2950 supersession ruling still pending).
+  #                    Divergent same-name rows are KEEP-BOTH and are only reported — renaming
+  #                    them is owner-gated (D-271a).
+  dedup_gate:
+    enabled: true
+    mode: report
   commit_non_fb_types: true
   okf_export_enabled: true
   max_failed_ratio: 0.0
@@ -748,6 +772,11 @@ stage6:
     - pipeline/stage6_commit.py
     - pipeline/serving_gate.py
     - pipeline/io_guard.py
+    # D-2951: the dedup gate decides what S6 writes, so a checkpoint produced by these two is no
+    # longer the checkpoint the list above describes. BUG-614: the fingerprint must cover every
+    # module that changes the OUTPUT, not only the ones that existed when it was written.
+    - pipeline/dedup_gate.py
+    - pipeline/dedup_identity.py
 stage4_5:
   enabled: false
   model: gpt-oss-20b-MXFP4-Q8

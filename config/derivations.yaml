@@ -182,8 +182,14 @@ derivations:
 #                       stage5.nli_model_fallback = "" case: a SILENT EMPTY NLI FALLBACK in the verifier path).
 # Ceilings are a DECLARATION of the measured state and the direction is shrink_only (D-401 precedent). The RAIL,
 # not the probe, owns the number: the first rail run re-measures and its value replaces this one.
+# RECEIVERS ARE A DECLARATION OF SCOPE (BUG-731, 2026-10-12). `_CT` was MISSING, so every config read
+# in pipeline/content_types.py — the module that owns the content-type enum, the reroute flags and the
+# applicability axis — was INVISIBLE to this census: a read WITH a literal default could have been added
+# there and the rail would not have noticed. A rail that cannot see the file cannot vouch for it. The
+# module's reads are now LOUD (subscript, no default), so adding it here changed the measured number by
+# exactly 0 — which is the honest outcome: the instrument now SEEKS in a place it finds nothing.
 config_reads:
-  receivers: [_CFG, cfg, config, conf, settings]
+  receivers: [_CFG, cfg, config, conf, settings, _CT]
   config_glob: 'config/*.yaml'
   ceilings:
     shadowed_declared: 229

@@ -24,574 +24,637 @@ default_role: value
 default_why: >-
   Declared default: every column not named under `columns:` carries a non-blank value on every row and the value
   varies (>= 2 distinct). Measured 2026-09-26: 52 of 75 columns; the exceptions are named below, each with a why.
+# ---- D-2960: the DECLARED ROW UNIVERSES. A role is a claim about a POPULATION, not about a table (D-2958) ----
+# MEASURED 2026-10-12: `s5_reason` splits the store into exactly two tiers, and they PARTITION it:
+#   s5_verified 6,591 rows (the S5 NLI rail adjudicated them - s5_reason carries a verdict)
+#   sidecar     1,049 rows (D-2590 non-principle tier - s5_reason = 's5_not_applicable', body in type_body)
+# 6,591 + 1,049 = 7,640 = every row. Every column named per-population below is 100% covered inside its tier and
+# structurally absent outside it, which is why 25 table-wide role faults were ONE missing concept (BUG-733).
+populations:
+  s5_verified:
+    predicate: "s5_reason <> 's5_not_applicable'"
+    why: "D-2590/D-2298: the rows the S5 NLI rail ADJUDICATED - s5_reason holds a verdict (entail/neutral/contra/...) instead of the not-applicable marker. MEASURED 2026-10-12: 6,591 of 7,640 rows; `elaboration`, `verifier_model` and 13 sibling fields are non-blank on exactly these rows."
+  sidecar:
+    predicate: "s5_reason = 's5_not_applicable'"
+    why: "D-2590: the non-principle tier S6 ingests from the S4 sidecars (process_template / process_instance / tool_instruction / growth_edge); its role-specific body is type_body. MEASURED 2026-10-12: 1,049 rows; type_body is non-blank on exactly these rows and blank on every other row."
 columns:
+  # ---- population-scoped: the role is evaluated WITHIN the declared tier, and the OUTSIDE is part of the claim.
+  # `outside: absent` = blank outside the tier AND NULL-shaped there (D-2957); `outside: unconstrained` = values
+  # outside the tier are DECLARED legitimate and reported LOUD. Nothing here is declared `sparse`: sparse says the
+  # field is OPTIONAL, while D2371/D2488/D2475 QUARANTINE a principle whose application/failure_mode/elaboration is
+  # empty - so `sparse` would have been 20 lies (BUG-733), whereas a population is a measured claim.
+  elaboration: {role: value, population: s5_verified, outside: absent, why: "principle-only body field (D-2943): non-blank on 6,591/6,591 S5 rows, absent on the 1,049 sidecar rows whose body is type_body"}
+  taxonomy_match_method: {role: value, population: s5_verified, outside: absent, why: "non-blank 6,591/6,591 inside S5 with 3 distinct methods; the sidecar tier is not taxonomy-matched at all"}
+  keywords: {role: value, population: s5_verified, outside: absent, why: "non-blank 6,591/6,591 inside S5; the sidecar tier carries its own role-specific body in type_body"}
+  domains_raw: {role: value, population: s5_verified, outside: absent, why: "non-blank 6,591/6,591 inside S5 with 5,916 distinct; NULL outside it (the only tier column already NULL-shaped outside)"}
+  context: {role: value, population: s5_verified, outside: absent, why: "principle-only dimension (13 distinct) non-blank on every S5 row; structurally absent outside the tier"}
+  accessibility: {role: value, population: s5_verified, outside: absent, why: "principle-only dimension (2 distinct) non-blank on every S5 row; structurally absent outside the tier"}
+  intimacy_boundary: {role: value, population: s5_verified, outside: absent, why: "principle-only dimension (3 distinct) non-blank on every S5 row; structurally absent outside the tier"}
+  source_text: {role: value, population: s5_verified, outside: absent, why: "non-blank 6,591/6,591 inside S5 (one per row, 6,591 distinct); the sidecar tier keeps its provenance elsewhere"}
+  difficulty_level: {role: value, population: s5_verified, outside: absent, why: "principle-only dimension (3 distinct) non-blank on every S5 row; structurally absent outside the tier"}
+  temporal_scope: {role: value, population: s5_verified, outside: absent, why: "principle-only dimension (2 distinct) non-blank on every S5 row; structurally absent outside the tier"}
+  confidence_score: {role: value, population: s5_verified, outside: absent, why: "non-blank 6,591/6,591 inside S5 (161 distinct), NULL outside it - a verification score exists only where a verification happened"}
+  related_fbs: {role: value, population: s5_verified, outside: absent, why: "non-blank 6,591/6,591 inside S5 (one per row); NULL outside it - cross-references are a principle-tier relation"}
+  epistemic_status: {role: value, population: s5_verified, outside: absent, why: "non-blank 6,591/6,591 inside S5 (4 distinct), written by the S5 rail; the sidecar tier is not epistemically adjudicated"}
+  verification_method: {role: value, population: s5_verified, outside: absent, why: "non-blank 6,591/6,591 inside S5 (3 distinct: deberta-nli / mech_quality / evidence_contaminated); it records HOW the S5 rail judged the row"}
+  isor: {role: value, population: s5_verified, outside: absent, why: "non-blank 6,591/6,591 inside S5 (362 distinct), NULL outside it - an S5-derived score, not artifact content"}
+  practicality: {role: value, population: s5_verified, outside: absent, why: "D2622 advisory applicability tier, non-blank 6,591/6,591 inside S5 (5,092 immediately-applicable / 1,499 context-dependent); the superseded declaration claimed NULL on the excluded runs while the store holds a NON-NULL blank - the shape this declaration now MEASURES."}
+  discipline_raw: {role: sparse, population: s5_verified, outside: absent, why: "the pre-canonicalisation label: non-blank on 6,401 of 6,591 S5 rows and absent outside the tier. The 190 in-tier blanks are a REAL coverage gap, kept visible by `sparse` (a row-carried label, not a required field) rather than silenced by declaring it required."}
+  failure_mode: {role: value, population: s5_verified, outside: unconstrained, why: "required on every S5 row (6,591/6,591) AND written on 774 process_template rows outside it - `unconstrained` is DECLARED, so those 774 rows are reported LOUD (OUTSIDE-COVERAGE) instead of being called a spill."}
+  type_body: {role: value, population: sidecar, outside: absent, why: "D-2590: the sidecar tier's own role-specific body - non-blank and distinct on all 1,049 sidecar rows, absent on every S5 row (whose body fields are the columns above)."}
+  menu_hash: {role: state, population: s5_verified, outside: unconstrained, why: "MEASURED 2026-10-12: ONE hash inside the S5 tier (6,591/6,591 rows, distinct 1) - the S4 closed menu this artifact was classified against, i.e. artifact state, not a label (D-2943). The 1,049 sidecar rows carry the literal 'NOT_APPLICABLE': an absent-as-literal shape, declared UNCONSTRAINED so it stays LOUD and OWED (BUG-737) rather than being silently accepted."}
+  pipeline_run_id: {role: state, why: "MEASURED 2026-10-12: one value on 7,640/7,640 rows - the store holds ONE run's artifact (D-2943 artifact-scoped store), so the run id is the artifact's identity, not a per-row label. The superseded default `value` rule read it as a constant label."}
+  verifier_model: {role: state, population: s5_verified, outside: absent, why: "MEASURED 2026-10-12: ONE value inside the S5 tier (6,591/6,591 rows, distinct 1) - the pinned DeBERTa-v3-large NLI + threshold that judged those rows. RESHAPED 2026-10-12 (BUG-737, scripts/normalize_absent_shape.py): the 1,049 sidecar rows now carry a TRUE NULL, so count(verifier_model) reads 6,591 and can no longer claim a value on a row no verifier judged (D-2957). The manufacturing point is closed too: pipeline/stage6_commit.py now writes _safe_str(...) or None, so a new run cannot reintroduce the blank."}
   # ---- state: one value that IS this run's fact (a stamp or a genuinely single-state flag) ----
   provenance: {role: state, why: "constant 'llm_extracted_from_source' - the store is entirely LLM-extracted, which is a fact about this run and not a label"}
-  verifier_model: {role: state, why: "constant 'MoritzLaurer/DeBERTa-v3-large-mnli-fever-anli-ling-wanli' - one NLI verifier, R5 satisfied, one run"}
   schema_version: {role: state, why: "constant '3.0' - the schema stamp of this run, R14 satisfied at row level"}
   gen_model: {role: state, why: "constant 'Qwen3-Coder-30B-A3B-Instruct-MLX-4bit' - one generator for this run"}
   fb_version: {role: state, why: "constant 1 - the first committed version of every feedback object in this run"}
-  usage_count: {role: state, why: "constant 0 - the knowledge layer has never served this store, so nothing has ever been retrieved"}
+  usage_count: {role: runtime, filled_by: "pipeline/feedback.mark_fb_retrieved (T4 serving path)", why: "MEASURED 2026-10-12: 0 on 7,552 rows, 1 on 65, 2 on 18, 3 on 4, 4 on 1 - the store HAS served 88 retrievals (over 88 distinct builds, spanning >=2 runs). The superseded declaration said `state` / `constant 0 - the knowledge layer has never served this store, so nothing has ever been retrieved`: FALSE in its measurement (the BUG-726 class) and wrong in its ROLE - `state` in this rail means one constant fact per row, which is the opposite of a counter."}
   feedback_count: {role: state, why: "constant 0 - no feedback has ever been recorded against this store"}
   is_summary: {role: state, why: "constant 0 - this run produced no summary feedback objects, so the flag is true as declared"}
-  practicality: {role: value, why: "D2622 advisory applicability tier (immediately-applicable|context-dependent|abstract), deterministic; persisted 2026-10-10 and backfilled on the canonical serving run (6591 rows: 5092/1499/0), NULL on excluded non-canonical runs (D-2881)"}
   # ---- reserved: nothing has written it yet (blank or hollow), so `filled_by` is REQUIRED ----
   procedural_skill: {role: reserved, filled_by: "pipeline/stage4_5_enrich.py Phase 1", why: "BLANK on 7995/7995 rows (not NULL - count(col) cannot see it) while 11 files read the column; the skill-orchestration field exists and is unwritten"}
   prerequisite_fbs: {role: reserved, filled_by: "pipeline/stage4_5_enrich.py graph pass", why: "hollow literal '[]' on 7995/7995 rows - an empty JSON array is not a value, and a reader cannot tell it from 'no prerequisite'"}
   contradicts_fbs: {role: reserved, filled_by: "pipeline/stage4_5_enrich.py contradiction pass", why: "NULL on 7995/7995 rows while 9 files name it"}
-  last_retrieved_at: {role: reserved, filled_by: "the knowledge layer query path (T4)", why: "blank on 7995/7995 rows - retrieval has never been recorded"}
+  # D-2957 / the BUG-726 class, applied to the two columns whose declarations the STORE contradicted. Neither is
+  # artifact content: both are mutated by the serving path AFTER commit, so `reserved` ("nothing has written it
+  # yet") and `state` ("one constant fact per row") were both false claims - and the store, not the code, was right.
+  # MEASURED 2026-10-12 (live 7,640-row store): the two columns agree PERFECTLY (88 rows filled each, 7,552 NULL
+  # each) because pipeline/feedback.mark_fb_retrieved writes them in ONE statement. No row was ever retrieved by
+  # any other path, and no producer stage writes either column.
+  last_retrieved_at: {role: runtime, filled_by: "pipeline/feedback.mark_fb_retrieved (T4 serving path)", why: "MEASURED 2026-10-12: 88 of 7,640 rows carry a retrieval timestamp, 7,552 are NULL. The superseded declaration said `reserved` / `blank on 7995/7995 rows - retrieval has never been recorded`, which was FALSE (this is the BUG-726 class: a declaration asserting a state the store contradicts) - 88 retrievals are recorded in usage_count in the same statement."}
   feedback_score: {role: reserved, filled_by: "the feedback loop that does not exist yet", why: "NULL on 7995/7995 rows while 14 files name it; part of the unwired 4-column feedback subsystem"}
-  menu_hash: {role: sparse, why: "6591 of 14574 rows carry content - the S4 menu provenance is now stamped on the post-boundary rows and correctly blank on the 7983 pre-boundary rows (never imputed, D-277)"}
-  classification_error: {role: sparse, why: "52 of 14574 rows carry content - the D-2838 writer-limb (BUG-631) appends the domain-cardinality truncation receipt here; a scalar diagnostic on the rows that hit the cap, correctly blank on the rest"}
-  discipline_macro: {role: sparse, why: "6591 of 14574 rows carry content - the D-2884(a) operative 3-way macro routing facet is stamped only on the canonical rechunk-v4-20260929 run that the serving layer reads; correctly NULL on the 7983 stale non-canonical rows (never served, BUG-691)"}
-  # ---- sparse: a row-carried diagnostic ----
-  classification_errors: {role: sparse, why: "2 of 7995 rows carry content ('Too many domains: 6 > 5' and 7 > 5) - a diagnostic carried by the rows that failed, which is the correct shape for it"}
+  # BUG-734/D-2960: both are diagnostics that fire ONLY on rows that hit the D-2838 domain-cardinality cap, so a
+  # store whose canonical run produced none measures EXACTLY empty. `sparse` (0 < nonblank < rows) would have called
+  # a clean run a violation; `reserved` names the writer and the measurement instead of asserting a count.
+  classification_error: {role: reserved, filled_by: "pipeline/stage4_merge.py (D-2838 domain-cardinality limb, BUG-631)", why: "MEASURED 2026-10-12: 0 of 7,640 rows carry content. The superseded declaration said 52 of 14,574 - that writer DID fire, on a run the store no longer holds (D-2881). `reserved` = the slot exists, its writer is NAMED and the store MEASURES it empty; it does not claim the writer never fired (D-2960)."}
+  classification_errors: {role: reserved, filled_by: "pipeline/stage4_merge.py (list form of the same D-2838 receipt)", why: "MEASURED 2026-10-12: 0 of 7,640 rows carry content (the 2026-09-26 census recorded 2 on the then-canonical run). Same role and reasoning as classification_error."}
   # ---- debt: KNOWN defects, OWED and shrink-only ----
   content_type: {role: value, status: debt, why: "constant 'principle' on 7995/7995 rows - the S4 content-type classifier never varied, so this column cannot carry the label authority the eval floor assumes"}
   classification_status: {role: value, status: debt, why: "constant 'CLEAN' on 7995/7995 rows while classification_errors records 2 real errors and status QUARANTINEs 2972 rows - a status column that is FALSE, not merely unvarying"}
   borp_score: {role: value, status: debt, why: "constant 0.0 on 7995/7995 rows - retired per T2, still NAMED by 13 files, so a reader can branch on a value nothing writes (the BUG-511 family)"}
   application: {role: value, status: debt, why: "blank on 1 of 7995 rows (measured nonblank 7994) - a single blank makes the column indistinguishable from unwritten for that row; repair the writer"}
   jargon: {role: value, status: debt, why: "blank on 2091 of 7995 rows (measured nonblank 5904) with 5868 distinct - a partially written field whose blank rows cannot be told from 'no jargon'"}
-  duplicate_of: {role: reserved, status: debt, filled_by: "a dedup stage that no longer exists (D2120/D2198)", why: "blank 0/7995 for a REMOVED stage while 11 files still name the column"}
+  duplicate_of: {role: reserved, filled_by: "pipeline/dedup_gate.CommitDedupGate via pipeline/stage6_commit.run_stage6 (D-2951, wired 2026-10-12)", why: "blank on 7640/7640 rows and THAT IS THE CORRECT STATE, not an unwritten one: D-2951 wired the writer (a CONVERGENT re-extraction is marked duplicate_of + QUARANTINE, D2625/D2630 'mark, never delete') and its read-only evidence run over the faithful S6 input measured 0 link candidates (MERGE 0), so nothing is owed a marker. DEBT RETIRED: the defect was 'readers name a column nothing writes' (the BUG-511 family) and the writer now exists. NOTE the shape: the writer emitted '' for absent until D-2951, so the documented predicate `duplicate_of IS NULL` (D-271d) matched zero rows - see BUG-726."}
   content_type_source: {role: reserved, status: debt, filled_by: "the S4 label-provenance stamping pass", why: "blank 0/7995 while governance/gold_4axis.jsonl is 100% stamped per axis - R14 holds at ROW level and FAILS at LABEL level"}
   discipline_source: {role: reserved, status: debt, filled_by: "the S4 label-provenance stamping pass", why: "blank 0/7995 while the anchor records 142 reliable-pair and 60 human labels for this axis"}
   extraction_type_source: {role: reserved, status: debt, filled_by: "the S4 label-provenance stamping pass", why: "blank 0/7995 - the weakest anchor axis (joint-vote 202 of 251) is also the one with no store-side provenance"}
 ceiling:
-  debt: 9
+  debt: 8
   direction: shrink_only
 measured:
   columns:
     accessibility:
       distinct: 2
       hollow: 0
-      mentions: 11
-      nonblank: 14574
-      nonnull: 14574
-      rows: 14574
+      mentions: 12
+      nonblank: 6591
+      nonnull: 7640
+      rows: 7640
     application:
-      distinct: 14573
+      distinct: 6591
       hollow: 0
-      mentions: 73
-      nonblank: 14573
-      nonnull: 14574
-      rows: 14574
+      mentions: 74
+      nonblank: 6591
+      nonnull: 7640
+      rows: 7640
     borp_score:
       distinct: 1
       hollow: 0
       mentions: 13
-      nonblank: 14574
-      nonnull: 14574
-      rows: 14574
+      nonblank: 7640
+      nonnull: 7640
+      rows: 7640
     boundary:
-      distinct: 14573
+      distinct: 7639
       hollow: 0
-      mentions: 127
-      nonblank: 14574
-      nonnull: 14574
-      rows: 14574
+      mentions: 134
+      nonblank: 7640
+      nonnull: 7640
+      rows: 7640
     citation:
-      distinct: 787
+      distinct: 720
       hollow: 0
-      mentions: 32
-      nonblank: 14574
-      nonnull: 14574
-      rows: 14574
+      mentions: 33
+      nonblank: 7640
+      nonnull: 7640
+      rows: 7640
     classification_error:
-      distinct: 22
+      distinct: 0
       hollow: 0
       mentions: 8
-      nonblank: 52
-      nonnull: 14574
-      rows: 14574
+      nonblank: 0
+      nonnull: 7640
+      rows: 7640
     classification_errors:
-      distinct: 2
+      distinct: 0
       hollow: 0
       mentions: 11
-      nonblank: 2
-      nonnull: 2
-      rows: 14574
+      nonblank: 0
+      nonnull: 0
+      rows: 7640
     classification_status:
-      distinct: 2
-      hollow: 0
-      mentions: 15
-      nonblank: 14574
-      nonnull: 14574
-      rows: 14574
-    committed_at:
-      distinct: 14574
-      hollow: 0
-      mentions: 6
-      nonblank: 14574
-      nonnull: 14574
-      rows: 14574
-    confidence_score:
-      distinct: 243
-      hollow: 0
-      mentions: 8
-      nonblank: 14574
-      nonnull: 14574
-      rows: 14574
-    consequence:
-      distinct: 14573
-      hollow: 0
-      mentions: 52
-      nonblank: 14574
-      nonnull: 14574
-      rows: 14574
-    content_type:
-      distinct: 2
-      hollow: 0
-      mentions: 111
-      nonblank: 14574
-      nonnull: 14574
-      rows: 14574
-    content_type_source:
       distinct: 1
       hollow: 0
-      mentions: 12
-      nonblank: 6591
-      nonnull: 14574
-      rows: 14574
-    context:
-      distinct: 16
+      mentions: 15
+      nonblank: 7640
+      nonnull: 7640
+      rows: 7640
+    committed_at:
+      distinct: 7640
       hollow: 0
-      mentions: 69
-      nonblank: 14574
-      nonnull: 14574
-      rows: 14574
+      mentions: 6
+      nonblank: 7640
+      nonnull: 7640
+      rows: 7640
+    confidence_score:
+      distinct: 161
+      hollow: 0
+      mentions: 9
+      nonblank: 6591
+      nonnull: 6591
+      rows: 7640
+    consequence:
+      distinct: 7640
+      hollow: 0
+      mentions: 56
+      nonblank: 7640
+      nonnull: 7640
+      rows: 7640
+    content_type:
+      distinct: 5
+      hollow: 0
+      mentions: 121
+      nonblank: 7640
+      nonnull: 7640
+      rows: 7640
+    content_type_source:
+      distinct: 2
+      hollow: 0
+      mentions: 13
+      nonblank: 7640
+      nonnull: 7640
+      rows: 7640
+    context:
+      distinct: 13
+      hollow: 0
+      mentions: 73
+      nonblank: 6591
+      nonnull: 7640
+      rows: 7640
     contradicts_fbs:
       distinct: 0
       hollow: 0
-      mentions: 9
+      mentions: 10
       nonblank: 0
       nonnull: 0
-      rows: 14574
+      rows: 7640
     created_at:
-      distinct: 14574
+      distinct: 7640
       hollow: 0
-      mentions: 39
-      nonblank: 14574
-      nonnull: 14574
-      rows: 14574
+      mentions: 40
+      nonblank: 7640
+      nonnull: 7640
+      rows: 7640
     definition:
-      distinct: 14574
+      distinct: 7640
       hollow: 0
-      mentions: 176
-      nonblank: 14574
-      nonnull: 14574
-      rows: 14574
+      mentions: 190
+      nonblank: 7640
+      nonnull: 7640
+      rows: 7640
     depth:
       distinct: 4
       hollow: 0
-      mentions: 143
-      nonblank: 14574
-      nonnull: 14574
-      rows: 14574
+      mentions: 144
+      nonblank: 7640
+      nonnull: 7640
+      rows: 7640
     difficulty_level:
       distinct: 3
       hollow: 0
       mentions: 8
-      nonblank: 14574
-      nonnull: 14574
-      rows: 14574
+      nonblank: 6591
+      nonnull: 7640
+      rows: 7640
     discipline:
-      distinct: 62
+      distinct: 61
       hollow: 0
-      mentions: 199
-      nonblank: 14574
-      nonnull: 14574
-      rows: 14574
+      mentions: 214
+      nonblank: 7640
+      nonnull: 7640
+      rows: 7640
     discipline_macro:
       distinct: 4
       hollow: 0
-      mentions: 2
-      nonblank: 6591
-      nonnull: 6591
-      rows: 14574
+      mentions: 10
+      nonblank: 7640
+      nonnull: 7640
+      rows: 7640
     discipline_raw:
-      distinct: 1918
-      hollow: 54
-      mentions: 41
-      nonblank: 14574
-      nonnull: 14574
-      rows: 14574
+      distinct: 972
+      hollow: 0
+      mentions: 46
+      nonblank: 6401
+      nonnull: 7640
+      rows: 7640
     discipline_source:
       distinct: 1
       hollow: 0
-      mentions: 21
-      nonblank: 6591
-      nonnull: 14574
-      rows: 14574
+      mentions: 23
+      nonblank: 7640
+      nonnull: 7640
+      rows: 7640
     domains:
-      distinct: 2994
-      hollow: 0
-      mentions: 168
-      nonblank: 14574
-      nonnull: 14574
-      rows: 14574
+      distinct: 1234
+      hollow: 1049
+      mentions: 175
+      nonblank: 7640
+      nonnull: 7640
+      rows: 7640
     domains_raw:
-      distinct: 13413
-      hollow: 39
-      mentions: 36
-      nonblank: 14574
-      nonnull: 14574
-      rows: 14574
+      distinct: 5916
+      hollow: 0
+      mentions: 39
+      nonblank: 6591
+      nonnull: 6591
+      rows: 7640
     duplicate_of:
       distinct: 0
       hollow: 0
-      mentions: 11
+      mentions: 15
       nonblank: 0
-      nonnull: 14574
-      rows: 14574
+      nonnull: 0
+      rows: 7640
     elaboration:
-      distinct: 14574
+      distinct: 6591
       hollow: 0
-      mentions: 38
-      nonblank: 14574
-      nonnull: 14574
-      rows: 14574
+      mentions: 41
+      nonblank: 6591
+      nonnull: 7640
+      rows: 7640
     epistemic_status:
       distinct: 4
       hollow: 0
       mentions: 11
-      nonblank: 14574
-      nonnull: 14574
-      rows: 14574
+      nonblank: 6591
+      nonnull: 7640
+      rows: 7640
     evidence:
       distinct: 2
       hollow: 0
-      mentions: 101
-      nonblank: 14574
-      nonnull: 14574
-      rows: 14574
+      mentions: 113
+      nonblank: 7640
+      nonnull: 7640
+      rows: 7640
     evidence_passages:
-      distinct: 14149
+      distinct: 7640
       hollow: 0
-      mentions: 44
-      nonblank: 14574
-      nonnull: 14574
-      rows: 14574
+      mentions: 47
+      nonblank: 7640
+      nonnull: 7640
+      rows: 7640
     evidence_passages_shown:
-      distinct: 14038
+      distinct: 7640
       hollow: 0
       mentions: 14
-      nonblank: 14574
-      nonnull: 14574
-      rows: 14574
+      nonblank: 7640
+      nonnull: 7640
+      rows: 7640
     extraction_type:
       distinct: 4
       hollow: 0
-      mentions: 74
-      nonblank: 14574
-      nonnull: 14574
-      rows: 14574
+      mentions: 76
+      nonblank: 7640
+      nonnull: 7640
+      rows: 7640
     extraction_type_source:
       distinct: 1
       hollow: 0
-      mentions: 4
-      nonblank: 6591
-      nonnull: 14574
-      rows: 14574
+      mentions: 5
+      nonblank: 7640
+      nonnull: 7640
+      rows: 7640
     failure_mode:
-      distinct: 14574
+      distinct: 7365
       hollow: 0
-      mentions: 28
-      nonblank: 14574
-      nonnull: 14574
-      rows: 14574
+      mentions: 30
+      nonblank: 7365
+      nonnull: 7640
+      rows: 7640
     fb_id:
-      distinct: 14574
+      distinct: 7640
       hollow: 0
-      mentions: 168
-      nonblank: 14574
-      nonnull: 14574
-      rows: 14574
+      mentions: 187
+      nonblank: 7640
+      nonnull: 7640
+      rows: 7640
     fb_version:
       distinct: 1
       hollow: 0
       mentions: 9
-      nonblank: 14574
-      nonnull: 14574
-      rows: 14574
+      nonblank: 7640
+      nonnull: 7640
+      rows: 7640
     feedback_count:
       distinct: 1
       hollow: 0
       mentions: 11
-      nonblank: 14574
-      nonnull: 14574
-      rows: 14574
+      nonblank: 7640
+      nonnull: 7640
+      rows: 7640
     feedback_score:
       distinct: 0
       hollow: 0
       mentions: 14
       nonblank: 0
       nonnull: 0
-      rows: 14574
+      rows: 7640
     gen_model:
       distinct: 1
       hollow: 0
-      mentions: 73
-      nonblank: 14574
-      nonnull: 14574
-      rows: 14574
+      mentions: 74
+      nonblank: 7640
+      nonnull: 7640
+      rows: 7640
     intimacy_boundary:
       distinct: 3
       hollow: 0
       mentions: 11
-      nonblank: 14574
-      nonnull: 14574
-      rows: 14574
+      nonblank: 6591
+      nonnull: 7640
+      rows: 7640
     is_convergent:
       distinct: 2
       hollow: 0
       mentions: 45
-      nonblank: 14574
-      nonnull: 14574
-      rows: 14574
+      nonblank: 7640
+      nonnull: 7640
+      rows: 7640
     is_summary:
       distinct: 1
       hollow: 0
       mentions: 23
-      nonblank: 14574
-      nonnull: 14574
-      rows: 14574
+      nonblank: 7640
+      nonnull: 7640
+      rows: 7640
     isor:
-      distinct: 855
+      distinct: 362
       hollow: 0
       mentions: 9
-      nonblank: 14574
-      nonnull: 14574
-      rows: 14574
+      nonblank: 6591
+      nonnull: 6591
+      rows: 7640
     jargon:
-      distinct: 10226
+      distinct: 4394
       hollow: 0
-      mentions: 19
-      nonblank: 10315
-      nonnull: 14574
-      rows: 14574
+      mentions: 20
+      nonblank: 4421
+      nonnull: 7640
+      rows: 7640
     keywords:
-      distinct: 14573
+      distinct: 6591
       hollow: 0
       mentions: 22
-      nonblank: 14574
-      nonnull: 14574
-      rows: 14574
-    last_retrieved_at:
-      distinct: 0
-      hollow: 0
-      mentions: 6
-      nonblank: 0
-      nonnull: 14574
-      rows: 14574
-    mechanism:
-      distinct: 14574
-      hollow: 0
-      mentions: 133
-      nonblank: 14574
-      nonnull: 14574
-      rows: 14574
-    menu_hash:
-      distinct: 1
-      hollow: 0
-      mentions: 25
       nonblank: 6591
-      nonnull: 14574
-      rows: 14574
-    name:
-      distinct: 14121
+      nonnull: 7640
+      rows: 7640
+    last_retrieved_at:
+      distinct: 88
       hollow: 0
-      mentions: 325
-      nonblank: 14574
-      nonnull: 14574
-      rows: 14574
+      mentions: 7
+      nonblank: 88
+      nonnull: 88
+      rows: 7640
+    mechanism:
+      distinct: 7640
+      hollow: 0
+      mentions: 140
+      nonblank: 7640
+      nonnull: 7640
+      rows: 7640
+    menu_hash:
+      distinct: 2
+      hollow: 0
+      mentions: 29
+      nonblank: 7640
+      nonnull: 7640
+      rows: 7640
+    name:
+      distinct: 7637
+      hollow: 0
+      mentions: 343
+      nonblank: 7640
+      nonnull: 7640
+      rows: 7640
     needs_human_review:
       distinct: 2
       hollow: 0
       mentions: 9
-      nonblank: 14574
-      nonnull: 14574
-      rows: 14574
+      nonblank: 7640
+      nonnull: 7640
+      rows: 7640
     origin:
-      distinct: 3
+      distinct: 2
       hollow: 0
-      mentions: 20
-      nonblank: 14574
-      nonnull: 14574
-      rows: 14574
+      mentions: 21
+      nonblank: 7640
+      nonnull: 7640
+      rows: 7640
     pipeline_commit:
-      distinct: 3
+      distinct: 2
       hollow: 0
-      mentions: 65
-      nonblank: 14574
-      nonnull: 14574
-      rows: 14574
+      mentions: 67
+      nonblank: 7640
+      nonnull: 7640
+      rows: 7640
     pipeline_run_id:
-      distinct: 4
+      distinct: 1
       hollow: 0
-      mentions: 20
-      nonblank: 14574
-      nonnull: 14574
-      rows: 14574
+      mentions: 38
+      nonblank: 7640
+      nonnull: 7640
+      rows: 7640
+    practicality:
+      distinct: 2
+      hollow: 0
+      mentions: 6
+      nonblank: 6591
+      nonnull: 7640
+      rows: 7640
     prerequisite_fbs:
       distinct: 1
-      hollow: 14574
-      mentions: 13
-      nonblank: 14574
-      nonnull: 14574
-      rows: 14574
+      hollow: 6591
+      mentions: 14
+      nonblank: 6591
+      nonnull: 6591
+      rows: 7640
     primary_source:
-      distinct: 1571
+      distinct: 968
       hollow: 0
-      mentions: 18
-      nonblank: 14574
-      nonnull: 14574
-      rows: 14574
+      mentions: 20
+      nonblank: 7640
+      nonnull: 7640
+      rows: 7640
     procedural_skill:
       distinct: 0
       hollow: 0
       mentions: 11
       nonblank: 0
-      nonnull: 14574
-      rows: 14574
+      nonnull: 7640
+      rows: 7640
     provenance:
       distinct: 1
       hollow: 0
-      mentions: 97
-      nonblank: 14574
-      nonnull: 14574
-      rows: 14574
+      mentions: 113
+      nonblank: 7640
+      nonnull: 7640
+      rows: 7640
     related_fbs:
-      distinct: 14562
-      hollow: 13
-      mentions: 15
-      nonblank: 14574
-      nonnull: 14574
-      rows: 14574
-    s5_reason:
-      distinct: 7
+      distinct: 6591
       hollow: 0
-      mentions: 8
-      nonblank: 14574
-      nonnull: 14574
-      rows: 14574
+      mentions: 16
+      nonblank: 6591
+      nonnull: 6591
+      rows: 7640
+    s5_reason:
+      distinct: 8
+      hollow: 0
+      mentions: 10
+      nonblank: 7640
+      nonnull: 7640
+      rows: 7640
     schema_version:
       distinct: 1
       hollow: 0
-      mentions: 105
-      nonblank: 14574
-      nonnull: 14574
-      rows: 14574
+      mentions: 107
+      nonblank: 7640
+      nonnull: 7640
+      rows: 7640
     source_authors:
-      distinct: 3751
-      hollow: 0
-      mentions: 22
-      nonblank: 14574
-      nonnull: 14574
-      rows: 14574
-    source_books:
-      distinct: 3729
-      hollow: 0
-      mentions: 43
-      nonblank: 14574
-      nonnull: 14574
-      rows: 14574
-    source_clusters:
-      distinct: 14246
-      hollow: 0
-      mentions: 18
-      nonblank: 14574
-      nonnull: 14574
-      rows: 14574
-    source_diversity:
-      distinct: 104
-      hollow: 0
-      mentions: 26
-      nonblank: 14574
-      nonnull: 14574
-      rows: 14574
-    source_ids:
-      distinct: 3413
-      hollow: 0
-      mentions: 24
-      nonblank: 14574
-      nonnull: 14574
-      rows: 14574
-    source_principle_ids:
-      distinct: 14574
-      hollow: 0
-      mentions: 12
-      nonblank: 14574
-      nonnull: 14574
-      rows: 14574
-    source_segments:
-      distinct: 14185
-      hollow: 0
-      mentions: 19
-      nonblank: 14574
-      nonnull: 14574
-      rows: 14574
-    source_text:
-      distinct: 14574
+      distinct: 1505
       hollow: 0
       mentions: 23
-      nonblank: 14574
-      nonnull: 14574
-      rows: 14574
+      nonblank: 7640
+      nonnull: 7640
+      rows: 7640
+    source_books:
+      distinct: 1504
+      hollow: 0
+      mentions: 43
+      nonblank: 7640
+      nonnull: 7640
+      rows: 7640
+    source_clusters:
+      distinct: 6592
+      hollow: 1049
+      mentions: 18
+      nonblank: 7640
+      nonnull: 7640
+      rows: 7640
+    source_diversity:
+      distinct: 99
+      hollow: 0
+      mentions: 29
+      nonblank: 7640
+      nonnull: 7640
+      rows: 7640
+    source_ids:
+      distinct: 1489
+      hollow: 0
+      mentions: 28
+      nonblank: 7640
+      nonnull: 7640
+      rows: 7640
+    source_principle_ids:
+      distinct: 6592
+      hollow: 1049
+      mentions: 13
+      nonblank: 7640
+      nonnull: 7640
+      rows: 7640
+    source_segments:
+      distinct: 7640
+      hollow: 0
+      mentions: 19
+      nonblank: 7640
+      nonnull: 7640
+      rows: 7640
+    source_text:
+      distinct: 6591
+      hollow: 0
+      mentions: 24
+      nonblank: 6591
+      nonnull: 7640
+      rows: 7640
     status:
       distinct: 2
       hollow: 0
-      mentions: 112
-      nonblank: 14574
-      nonnull: 14574
-      rows: 14574
+      mentions: 125
+      nonblank: 7640
+      nonnull: 7640
+      rows: 7640
     taxonomy_match_method:
-      distinct: 4
-      hollow: 0
-      mentions: 18
-      nonblank: 14574
-      nonnull: 14574
-      rows: 14574
-    taxonomy_version:
       distinct: 3
       hollow: 0
-      mentions: 20
-      nonblank: 14574
-      nonnull: 14574
-      rows: 14574
+      mentions: 18
+      nonblank: 6591
+      nonnull: 7640
+      rows: 7640
+    taxonomy_version:
+      distinct: 2
+      hollow: 0
+      mentions: 24
+      nonblank: 7640
+      nonnull: 7640
+      rows: 7640
     temporal_scope:
       distinct: 2
       hollow: 0
       mentions: 8
-      nonblank: 14574
-      nonnull: 14574
-      rows: 14574
+      nonblank: 6591
+      nonnull: 7640
+      rows: 7640
+    type_body:
+      distinct: 1049
+      hollow: 0
+      mentions: 5
+      nonblank: 1049
+      nonnull: 1049
+      rows: 7640
     usage_count:
-      distinct: 1
+      distinct: 5
       hollow: 0
       mentions: 12
-      nonblank: 14574
-      nonnull: 14574
-      rows: 14574
+      nonblank: 7640
+      nonnull: 7640
+      rows: 7640
     verification_method:
       distinct: 3
       hollow: 0
       mentions: 7
-      nonblank: 14574
-      nonnull: 14574
-      rows: 14574
+      nonblank: 6591
+      nonnull: 7640
+      rows: 7640
     verification_results:
-      distinct: 10351
-      hollow: 0
-      mentions: 15
-      nonblank: 14574
-      nonnull: 14574
-      rows: 14574
+      distinct: 4908
+      hollow: 1049
+      mentions: 16
+      nonblank: 7640
+      nonnull: 7640
+      rows: 7640
     verifier_model:
       distinct: 1
       hollow: 0
-      mentions: 7
-      nonblank: 14574
-      nonnull: 14574
-      rows: 14574
-  rows: 14574
+      mentions: 8
+      nonblank: 6591
+      nonnull: 6591
+      rows: 7640
+  populations:
+    s5_verified:
+      rows: 6591
+    sidecar:
+      rows: 1049
+  rows: 7640
 measured_by: scripts/check_store_columns.py

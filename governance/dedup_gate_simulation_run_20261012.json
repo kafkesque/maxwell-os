@@ -1,0 +1,79 @@
+{
+  "actions": {
+    "insert": 7640
+  },
+  "advisories": {
+    "keep_both_cross_source": [
+      {
+        "action": "insert",
+        "candidate_richer": false,
+        "canonical_fb_id": null,
+        "existing_count": 1,
+        "fb_id": "efd7d03dfca8113085376441fd81d8671df010bdadc329764d16b73bbcfe4762",
+        "kind": "keep_both_cross_source",
+        "mode": "report",
+        "name": "Design Thinking Process",
+        "normalized_name": "design thinking process",
+        "status_in": "QUARANTINE",
+        "would": "insert"
+      }
+    ],
+    "keep_both_divergent": [
+      {
+        "action": "insert",
+        "candidate_richer": false,
+        "canonical_fb_id": null,
+        "existing_count": 1,
+        "fb_id": "23bec53aab6f4a94979fa549c724e9181f4987ba901ad0e3f59ff88e79abc8da",
+        "kind": "keep_both_divergent",
+        "mode": "report",
+        "name": "Item Validation Protocol",
+        "normalized_name": "item validation protocol",
+        "status_in": "QUARANTINE",
+        "would": "insert"
+      },
+      {
+        "action": "insert",
+        "candidate_richer": false,
+        "canonical_fb_id": null,
+        "existing_count": 1,
+        "fb_id": "a990bf2cd4c01f90b0bd4924a2c5577f38722f319beac255a6fcd3d416feb73c",
+        "kind": "keep_both_divergent",
+        "mode": "report",
+        "name": "VJ Performance Method",
+        "normalized_name": "vj performance method",
+        "status_in": "QUARANTINE",
+        "would": "insert"
+      }
+    ],
+    "review": [],
+    "supersede_candidates": []
+  },
+  "candidates": 7640,
+  "decision": "D-2951",
+  "gate": "commit_dedup_gate",
+  "identity_model": "D-2950 (normalize_name, source_ids) + body-divergence merge gate",
+  "input": {
+    "checkpoint_rows": 6591,
+    "sidecar_by_role": {
+      "growth_edge": 25,
+      "process_instance": 156,
+      "process_template": 774,
+      "tool_instruction": 94
+    },
+    "sidecar_new_rows": 0,
+    "sidecar_rows": 1049,
+    "total_rows": 7640
+  },
+  "kinds": {
+    "insert": 7637,
+    "keep_both_cross_source": 1,
+    "keep_both_divergent": 2
+  },
+  "linked_duplicates": [],
+  "mode": "report",
+  "scope": "run",
+  "skipped_already_stored": 0,
+  "store_names_indexed": 0,
+  "store_rows_indexed": 0
+}

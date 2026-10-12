@@ -252,7 +252,8 @@ async def _tool_get_fb_reliability(args: dict) -> list[TextContent]:
                 "feedback_score": fb.get("feedback_score"),
                 "feedback_count": fb.get("feedback_count") or 0,
                 "usage_count": fb.get("usage_count") or 0,
-                "last_retrieved_at": str(fb.get("last_retrieved_at", "")),
+                # D-2957: absent is NULL, so `or ""` keeps this reader's emitted shape stable across the change.
+                "last_retrieved_at": str(fb.get("last_retrieved_at") or ""),
                 "status": fb.get("status"),
                 "classification_status": fb.get("classification_status"),
             },

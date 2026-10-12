@@ -3,8 +3,8 @@
   "decision": "D-2747",
   "generated": "2026-10-02",
   "source": "checkpoint.jsonl rechunk-v4-20260929",
-  "n_rows": 573,
-  "note": "owner dispositions folded (D-2756): 13 role corrections applied; distribution {\"principle\": 16, \"process_template\": 28, \"process_instance\": 1, \"tool_instruction\": 2, \"noise_drop\": 153, \"quarantine\": 221, \"growth_edge\": 152} | BUG-714 (D-2947, owner 2026-10-12): 14 legacy tool_instruction rows re-adjudicated — 10 principle, 3 keep tool_instruction, 1 noise_drop (ARED).",
+  "n_rows": 546,
+  "note": "owner dispositions folded (D-2756): 13 role corrections applied; distribution {\"principle\": 16, \"process_template\": 28, \"process_instance\": 1, \"tool_instruction\": 2, \"noise_drop\": 153, \"quarantine\": 221, \"growth_edge\": 152} | BUG-714 (D-2947, owner 2026-10-12): 14 legacy tool_instruction rows re-adjudicated — 10 principle, 3 keep tool_instruction, 1 noise_drop (ARED). | D-2946 (2026-10-12): removed 27 keyword-heuristic 'named system/protocol/workflow, not a single command' entries (conf=med) — baked ti_to_pt_keywords false positives; those fb_ids now fall through to the corrected tier-2/3/4 rules.",
   "rows": [
     {
       "fb_id": "c848cbeb28c6eaffd40e0417f8515bf123726613c8aba82414d44d7dd6e851ac",
@@ -14,31 +14,10 @@
       "confidence": "high"
     },
     {
-      "fb_id": "b51cdcfd9a95efd08f44c809ffbbb8c884b27b81b1ab2fb0a3fa53c7874509ad",
-      "current": "tool_instruction",
-      "proposed": "process_template",
-      "reason": "named system/protocol/workflow, not a single command",
-      "confidence": "med"
-    },
-    {
       "fb_id": "7888e1c65dc280fbc6746d6d07554ce97eebc4d001b88a8e3d58842ee93ac656",
       "current": "tool_instruction",
       "proposed": "process_instance",
       "reason": "concrete single-use event, no reusable syntax",
-      "confidence": "med"
-    },
-    {
-      "fb_id": "ecac42bf696b46a8649e386d7609501a59c712fd7449f18ef4c029f76c52c29d",
-      "current": "tool_instruction",
-      "proposed": "process_template",
-      "reason": "named system/protocol/workflow, not a single command",
-      "confidence": "med"
-    },
-    {
-      "fb_id": "15ff202f50a7893290049275ea7368276f63a3570476b533aa9ab4e5f64f33af",
-      "current": "tool_instruction",
-      "proposed": "process_template",
-      "reason": "named system/protocol/workflow, not a single command",
       "confidence": "med"
     },
     {
@@ -77,13 +56,6 @@
       "confidence": "high"
     },
     {
-      "fb_id": "8e80d96baa8761034f4a2880e4bb0974f3f40b11c4a5478fc1e4b6db6f42c21d",
-      "current": "tool_instruction",
-      "proposed": "process_template",
-      "reason": "named system/protocol/workflow, not a single command",
-      "confidence": "med"
-    },
-    {
       "fb_id": "54ef1892c6d8e4113ff0a57a59c542d2f0066512d4aefb69f307e1484b33d793",
       "current": "tool_instruction",
       "proposed": "principle",
@@ -96,76 +68,6 @@
       "proposed": "principle",
       "reason": "concept/pattern/algorithm, not a tool command",
       "confidence": "high"
-    },
-    {
-      "fb_id": "5bc5f775bc12c579b019f72e9e7b547f6adea1d88b50884d07ef6f8d07dc56cf",
-      "current": "tool_instruction",
-      "proposed": "process_template",
-      "reason": "named system/protocol/workflow, not a single command",
-      "confidence": "med"
-    },
-    {
-      "fb_id": "30b1667bbe13cc707f3c6b90595343c112d82278a142c404ad48d771e7bd899a",
-      "current": "tool_instruction",
-      "proposed": "process_template",
-      "reason": "named system/protocol/workflow, not a single command",
-      "confidence": "med"
-    },
-    {
-      "fb_id": "97094f4b3e106788967effd4822c5e34ebb675cf6eabe2c77dc32165ee7854d1",
-      "current": "tool_instruction",
-      "proposed": "process_template",
-      "reason": "named system/protocol/workflow, not a single command",
-      "confidence": "med"
-    },
-    {
-      "fb_id": "fbcb904e84642fa649171b12f156f528ab421325afa3b960dd9bb86ca9903da9",
-      "current": "tool_instruction",
-      "proposed": "process_template",
-      "reason": "named system/protocol/workflow, not a single command",
-      "confidence": "med"
-    },
-    {
-      "fb_id": "bed34d92a21ebb7bdefee6e68fb6add3749892c5f05279e8566e6f38547c1f7e",
-      "current": "tool_instruction",
-      "proposed": "process_template",
-      "reason": "named system/protocol/workflow, not a single command",
-      "confidence": "med"
-    },
-    {
-      "fb_id": "4c8033222a4504d5a8debbf36381c9f5d4c3095efab0d9bd411705148c144d12",
-      "current": "tool_instruction",
-      "proposed": "process_template",
-      "reason": "named system/protocol/workflow, not a single command",
-      "confidence": "med"
-    },
-    {
-      "fb_id": "d3edf218df1b112dddcec0595bf0ee2d0e27ca8cc172df02546155269b13b715",
-      "current": "tool_instruction",
-      "proposed": "process_template",
-      "reason": "named system/protocol/workflow, not a single command",
-      "confidence": "med"
-    },
-    {
-      "fb_id": "ec550f0b413fbcb67f001135c96bbed604bb3d211be7226f02e8d5f8b19c789c",
-      "current": "tool_instruction",
-      "proposed": "process_template",
-      "reason": "named system/protocol/workflow, not a single command",
-      "confidence": "med"
-    },
-    {
-      "fb_id": "8cd57c07766db82679c88ed53e95fe69f3558d65f3c7416a989180953496239f",
-      "current": "tool_instruction",
-      "proposed": "process_template",
-      "reason": "named system/protocol/workflow, not a single command",
-      "confidence": "med"
-    },
-    {
-      "fb_id": "1f9aa17a2d9a8578770a4c0850b53e9533af1ba73219bf659028557ffd633c26",
-      "current": "tool_instruction",
-      "proposed": "process_template",
-      "reason": "named system/protocol/workflow, not a single command",
-      "confidence": "med"
     },
     {
       "fb_id": "104f38cd9840ffc3259d4b32854b00f56626e62c324f934d0cd53942889b8172",
@@ -182,13 +84,6 @@
       "confidence": "high"
     },
     {
-      "fb_id": "37b37b25d6548150439f611f3924d98ed9fe1024339f059941efbe068f446544",
-      "current": "tool_instruction",
-      "proposed": "process_template",
-      "reason": "named system/protocol/workflow, not a single command",
-      "confidence": "med"
-    },
-    {
       "fb_id": "27fabecb4f68cff1bd519ac65232544b8e3b98282c3e7e597bae5dc8aa5ce3cd",
       "current": "tool_instruction",
       "proposed": "noise_drop",
@@ -203,67 +98,11 @@
       "confidence": "high"
     },
     {
-      "fb_id": "6158201eac37fa6a9d42a5ba045a766d06bdd2e4157067161b4869827e9ac280",
-      "current": "tool_instruction",
-      "proposed": "process_template",
-      "reason": "named system/protocol/workflow, not a single command",
-      "confidence": "med"
-    },
-    {
       "fb_id": "1a477c00823283744a765a3a7e3adb3d51ec6dff8c24801d27f0c57d23be0977",
       "current": "tool_instruction",
       "proposed": "tool_instruction",
       "reason": "specific named tool/library invocation — signature+intent contract; keep as tool_instruction",
       "confidence": "high"
-    },
-    {
-      "fb_id": "23bec53aab6f4a94979fa549c724e9181f4987ba901ad0e3f59ff88e79abc8da",
-      "current": "tool_instruction",
-      "proposed": "process_template",
-      "reason": "named system/protocol/workflow, not a single command",
-      "confidence": "med"
-    },
-    {
-      "fb_id": "6926ccbb0fe5910beb2018948f1a909d9a0ac0a9f33f4217a6615fdc53260300",
-      "current": "tool_instruction",
-      "proposed": "process_template",
-      "reason": "named system/protocol/workflow, not a single command",
-      "confidence": "med"
-    },
-    {
-      "fb_id": "f6e7c20ad13d502284573c8a7cb4abbc58c9c873458dbe1943c1e68010be2b18",
-      "current": "tool_instruction",
-      "proposed": "process_template",
-      "reason": "named system/protocol/workflow, not a single command",
-      "confidence": "med"
-    },
-    {
-      "fb_id": "ad12cb9255793565657dc8ce1e75bba2543838bdde380a1a785d3b74c6614b20",
-      "current": "tool_instruction",
-      "proposed": "process_template",
-      "reason": "named system/protocol/workflow, not a single command",
-      "confidence": "med"
-    },
-    {
-      "fb_id": "c2510c0ebbeebc9cf413532b07680f0e8f13a501dae2237ad0659eed3f94c6bf",
-      "current": "tool_instruction",
-      "proposed": "process_template",
-      "reason": "named system/protocol/workflow, not a single command",
-      "confidence": "med"
-    },
-    {
-      "fb_id": "b782a708bc371a5c166bbb683cc6c2eb9fd9d01ed6d8628eb554836d36424f1b",
-      "current": "tool_instruction",
-      "proposed": "process_template",
-      "reason": "named system/protocol/workflow, not a single command",
-      "confidence": "med"
-    },
-    {
-      "fb_id": "ce8c3630e20ed9b255f359cd93b00cdc83a8987e14dcab8691394d8e270650dc",
-      "current": "tool_instruction",
-      "proposed": "process_template",
-      "reason": "named system/protocol/workflow, not a single command",
-      "confidence": "med"
     },
     {
       "fb_id": "41a811148502730f5106bd1f9ea7795fb2b75d5bb39dcbf8a9431be00a4b1959",
@@ -278,13 +117,6 @@
       "proposed": "noise_drop",
       "reason": "owner-adjudicated (D-2756 final disposition)",
       "confidence": "owner"
-    },
-    {
-      "fb_id": "bc681723ef450492daec243506112ac578863daab1f6db3041428a7f842a6857",
-      "current": "tool_instruction",
-      "proposed": "process_template",
-      "reason": "named system/protocol/workflow, not a single command",
-      "confidence": "med"
     },
     {
       "fb_id": "ccbaae58f8f7d6363b007fce2e93253fc9952df52961d3726bc24a7a45533ffb",
@@ -306,27 +138,6 @@
       "proposed": "principle",
       "reason": "concept/pattern/algorithm, not a tool command",
       "confidence": "high"
-    },
-    {
-      "fb_id": "df4436929e37e529f6fdab4eb4d034c8442618d5e262dafda0f4fed9d14ebc8b",
-      "current": "tool_instruction",
-      "proposed": "process_template",
-      "reason": "named system/protocol/workflow, not a single command",
-      "confidence": "med"
-    },
-    {
-      "fb_id": "5c06973168f883c4b538a0c8c21fdbe619bf95fdfe685a3bc5c75f51c9c70287",
-      "current": "tool_instruction",
-      "proposed": "process_template",
-      "reason": "named system/protocol/workflow, not a single command",
-      "confidence": "med"
-    },
-    {
-      "fb_id": "15cb16d7b84005abc1e51a464023ed8c67f25238741edf0078f0b35a08442e2e",
-      "current": "tool_instruction",
-      "proposed": "process_template",
-      "reason": "named system/protocol/workflow, not a single command",
-      "confidence": "med"
     },
     {
       "fb_id": "769f40a58cb03a5dacde6d9530ce57911e11179a23254b9e0b03b40aaf8ab9f2",
@@ -4018,5 +3829,5 @@
       "confidence": "high"
     }
   ],
-  "last_updated": "2026-10-12"
+  "last_updated": "2026-10-12T16:58:52"
 }

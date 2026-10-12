@@ -14,10 +14,14 @@ pins:
     path: governance/ABSTENTION_CALIBRATION_20260923.json
     sha256: cf9400036681fb579f243be151c215463842a3bc02bf21783b4fc08a0cd96e78
     decision: D-349
+  # D-2963 (2026-10-12): re-pin after a DOCSTRING-ONLY move (taxonomy_v5.yaml -> taxonomy.yaml). A pin is pinned by
+  # BYTES, so a doc fix inside a pinned artifact is a re-mint by construction (BUG-535/BUG-740) - and the score-neutrality
+  # is certified DETERMINISTICALLY (ast.dump with docstrings stripped is byte-identical at HEAD and in the worktree), so no
+  # A/B is owed and no score can move.
   r2_meter:
     path: scripts/definition_nli_verify.py
-    sha256: 5567cf10178db11c74bd82103a1815248e4e8fc55477671a32763a07ddacacae
-    decision: D-2903
+    sha256: 8c3d4edd0de90daf47d68b2b0ea2389f46d0c11b7e42a5a26aca5f976e7a0595
+    decision: D-2963
   menu:
     path: config/closed_menu_v5.json
     sha256: bc53770103595f2a3674ced132e04297e87b590f6d7fb141c7eac6351c680544

@@ -1,0 +1,78 @@
+{
+  "rows": 7640,
+  "moves_total": 14,
+  "transitions": {
+    "principle->growth_edge": 2,
+    "tool_instruction->noise_drop": 1,
+    "tool_instruction->principle": 10,
+    "tool_instruction->process_instance": 1
+  },
+  "precision": {
+    "principle_to_growth_edge": 2,
+    "claim_status": 1,
+    "subject_matter": 1,
+    "false_positive_rate": 0.5,
+    "token_census": {
+      "contested": 1,
+      "open question": 1
+    }
+  },
+  "recall": {
+    "missed_rows_by_signal": {},
+    "total_missed": 0
+  },
+  "samples": {
+    "claim_status": [
+      {
+        "name": "Open-mindedness in Scientific Disagreement",
+        "token": "contested",
+        "sentence": "edge cases include situations where the expert consensus is weak or contested; here, the principle may still guide a cautious, provisional stance"
+      }
+    ],
+    "subject_matter": [
+      {
+        "name": "Nonfiction Writing Logical Design Principle",
+        "token": "open question",
+        "sentence": "while a tight logical arc improves clarity, some nonfiction genres\u2014like investigative journalism or reflective memoir\u2014benefit from a lingering open question to provoke thought"
+      }
+    ]
+  },
+  "recall_samples": [],
+  "side_c_ti_tier": {
+    "tool_instruction_rows": 108,
+    "name_prior_candidates": 1,
+    "by_keyword": {
+      "workflow": 1
+    },
+    "body_evidence_pass": 0,
+    "moves_name_only": 1,
+    "moves_with_evidence": 0,
+    "retired_vocabulary_hits": 9,
+    "retired_with_body_evidence": 0
+  },
+  "side_d_token_field": {
+    "loose_fires": 114,
+    "distribution": {
+      "elsewhere": 103,
+      "boundary+other": 2,
+      "boundary-only": 9
+    },
+    "boundary_only": 9,
+    "strict_survivors": 12,
+    "strict_boundary_only": 9,
+    "strict_names": [
+      "Open-mindedness in Scientific Disagreement",
+      "Nonfiction Writing Logical Design Principle",
+      "Temporary Mind-Blindness Hypothesis",
+      "Military Power Effectiveness Decline Hypothesis",
+      "Rabelais and Print Culture Vision",
+      "RTS International Protest Coordination",
+      "Cypher Query Execution Protocol",
+      "Neo4j MERGE and Relationship Creation Protocol",
+      "Animation Production Process",
+      "Youth Market Selection for DNP Technology",
+      "Sebeok Evaluation Committee Replacement Protocol",
+      "Popular Products Endpoint Implementation"
+    ]
+  }
+}

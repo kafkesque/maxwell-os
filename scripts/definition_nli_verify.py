@@ -57,7 +57,7 @@ _CONTRA_DOMINANT_THRESHOLD = 0.5
 def _load_r5_definitions() -> dict[str, dict[str, str]]:
     """Return {label: definition} for re-derived slots (content_type + discipline).
 
-    The r5 override is the repaired definition, which supersedes taxonomy_v5.yaml
+    The r5 override is the repaired definition, which supersedes taxonomy.yaml
     for the weak slots while the repair is BOUND (human review on write).
     """
     if not _R5_REPAIR_PATH.exists():

@@ -1,0 +1,9 @@
+# config/fsm/example.yaml — example FSM transition table (D-2948).
+# Determinism lives in pipeline/fsm.py (pure core); behaviour lives HERE (data).
+# Each use case gets its own table under config/fsm/ — never hardcoded in code (C12).
+states: [idle, running, done]
+initial: idle
+transitions:
+  - {state: idle, event: start, next: running}
+  - {state: running, event: finish, next: done}
+  - {state: running, event: fail, next: idle}

@@ -19,6 +19,7 @@
 | `governance/PRIORITY_DECISION_20260917.md` | **which work is top priority, and why** (lever test + circularity) | awaiting ratification | F-05, F-10, BUG-267 |
 | `governance/FORENSIC_AUDIT_20260917.md` | what is broken, invisible, or contradictory (F-01..F-16) | live, append-only | filesystem + DB re-derivation |
 | `governance/MARKET_RESEARCH_20260917.md` | what external methods/tools are worth adopting (A1..A12, B, C) | advisory | feed.opml + live arXiv/HF/PyPI |
+| `governance/VERIFIER_MODEL_SURVEY_20261012.md` | **which VERIFIER model is most reliable, and why** (HF adoption metrics + LLM-AggreFact + JudgeBench + Vectara HHEM) | advisory, awaiting ratification (tracker: BUG-736) | live HF API + HF/GitHub leaderboards (read 2026-10-12) |
 | `governance/STRATEGIC_PLAN_20260917.md` | the phased plan + rerun matrix + do-not list | live | priority decision |
 | `governance/SEQUENCE_STATUS_20260917.md` | execution tracker + **HUMAN GATE REGISTER** | live | all of the above |
 | `governance/buglog.md` (BUG-267 etc.) | the live defect register | live, append-only | — |

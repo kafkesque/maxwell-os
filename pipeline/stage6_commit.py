@@ -55,6 +55,8 @@ from pipeline.pipeline_paths import (
     S6_S5_OWNED_COLUMNS,  # D-2933: the S5-owned provenance column set (C12)
     S6_TAXONOMY_DEPENDENT_COLUMNS,  # D-2934: column-scoped taxonomy-skew guard
     S6_VEC_REQUIRE,  # D-2717: fail-closed vec0 gate (C16)
+    S6_DEDUP_GATE_ENABLED,  # D-2951 (D-2949 prevention half): commit-time dedup gate
+    S6_DEDUP_GATE_MODE,  # D-2951: report | enforce — validated fail-closed in run_stage6 (C16)
 
     STAGE5_CHECKPOINT,
     STAGE5_HUMAN_REVIEW,
@@ -81,6 +83,11 @@ from pipeline.serving_gate import (  # D274a/D274h: the pre-write half of the ga
     content_types_without_factual_claim,  # D-2942: the roles with no NLI factual claim (C12)
     derive_status,  # D-2942/D274h: the ONE status rule — S6 stamps its output, never a literal
     pre_write_verdict,
+)
+from pipeline.dedup_gate import (  # D-2951: commit-time dedup gate (D-2949 prevention half)
+    CommitDedupGate,
+    duplicate_marker,
+    load_committed_index,
 )
 from pipeline.discipline_macro import macro_for  # D-2884(a): C21 single home for fine->macro collapse
 from pipeline.stamp import get_pipeline_commit, stamp_record, write_stage_code_fingerprint
@@ -836,8 +843,15 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
             _safe_json(fb.get("contradicts_fbs")),
             _safe_json(fb.get("related_fbs")),
             # utilization tracking
+            # D-2957: `last_retrieved_at` is RUNTIME state (config/content_types.yaml -> runtime), owned by the
+            # serving path (pipeline/feedback.mark_fb_retrieved). A producer never INVENTS one - but this INSERT
+            # is `OR REPLACE`, so it must not DESTROY one either: the BUG-376 sync path carries the DB value
+            # through the S5 checkpoint and back, and that carriage is preserved here. What is fixed is the
+            # ABSENT SHAPE: `_safe_str`'s '' (the other shape for "absent", the BUG-726 class) becomes NULL,
+            # which is what pipeline/schemas.py declares (`str | None = Field(default=None)`) and what the
+            # register declares (`role: runtime`, D-2957). Legacy rows: scripts/normalize_runtime_absents.py.
             fb.get("usage_count", 0),
-            _safe_str(fb.get("last_retrieved_at")),
+            _safe_str(fb.get("last_retrieved_at")) or None,
             fb.get("feedback_score"),
             fb.get("feedback_count", 0),
             fb.get("fb_version", 1),
@@ -863,7 +877,12 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
             fb.get("borp_score", 0.0),
             _safe_str(fb.get("status"), "PENDING"),
             1 if fb.get("needs_human_review") else 0,
-            _safe_str(fb.get("verifier_model")),
+            # D-2957/BUG-737: absent must be NULL, never a blank. pipeline/schemas.py declares
+            # verifier_model as str | None with default None, and config/store_columns.yaml declares
+            # outside: absent for the s5_verified population - so a row no verifier judged (the
+            # D-2590 sidecar tier) must read as NULL, otherwise count(verifier_model) claims 1,049
+            # rows the column does not actually carry a value on.
+            _safe_str(fb.get("verifier_model")) or None,
             _safe_str(fb.get("s5_reason")),
             _safe_str(fb.get("epistemic_status")),
             _safe_str(fb.get("verification_method")),
@@ -883,7 +902,10 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
             _safe_str(fb.get("pipeline_run_id")),
             _safe_str(fb.get("created_at"), ""),
             datetime.now(UTC).isoformat(),
-            _safe_str(fb.get("duplicate_of")),  # D2627: canonical fb_id for dedup rows (NULL otherwise)
+            # D-2951: `duplicate_marker` is the ONE shape for this cell, and it keeps the truth of
+            # this column's own comment ("NULL otherwise") that `_safe_str` had broken — it wrote
+            # '' on EVERY row, so the D-271d predicate `duplicate_of IS NULL` matched zero rows.
+            duplicate_marker(fb.get("duplicate_of")),  # D2627: canonical fb_id for a dedup row
         ))
         return True
     except Exception as e:
@@ -1362,6 +1384,29 @@ def run_stage6(export_only: bool = False):
 
     # SQLite
     conn = init_db(DB_PATH)
+
+    # ── D-2951: COMMIT-TIME DEDUP GATE (the prevention half of D-2949 #4) ──
+    # D-2949 #4 measured 3 near-duplicate name groups and root-caused them to "stage1 SHA-256
+    # EXACT-dedup + no name-level uniqueness at commit". Stage1 dedups SEGMENTS; nothing deduped
+    # NAMES, so two extractions of the same concept produced two fb_ids and both landed. Built
+    # BEFORE the loop so the index is one snapshot, and consulted ONLY on the INSERT path (the
+    # verification_scoped branch above already took every fb_id the store holds). Deterministic
+    # and LLM-free (D-343). `report` changes nothing and writes the receipt; `enforce` additionally
+    # LINKS a convergent re-extraction (duplicate_of + QUARANTINE — D2625/D2630 "mark, never delete").
+    dedup: CommitDedupGate | None = None
+    if S6_DEDUP_GATE_ENABLED:
+        if S6_DEDUP_GATE_MODE not in CommitDedupGate.MODES:
+            raise RuntimeError(
+                f"stage6: unknown stage6.dedup_gate.mode {S6_DEDUP_GATE_MODE!r} — expected "
+                f"{CommitDedupGate.MODES}. Refusing to commit (C16 fail-closed)."
+            )
+        dedup = CommitDedupGate(load_committed_index(conn), mode=S6_DEDUP_GATE_MODE)
+        print(f"  🧬 dedup gate: mode={S6_DEDUP_GATE_MODE} · {dedup.stored_rows} committed row(s) "
+              f"over {dedup.stored_names} normalized name(s) (D-2950 identity model)")
+    else:
+        print("  ⏭️  dedup gate DISABLED (stage6.dedup_gate.enabled=false) — no name-level "
+              "uniqueness check at commit; D-2949 #4 stays open")
+
     inserted = 0
     updated = 0  # D-2933 (rule V): rows written through the verification-scoped path
     failed = 0
@@ -1435,6 +1480,26 @@ def run_stage6(export_only: bool = False):
                     commit_status[fb["fb_id"]] = "FAILED"
                     print(f"  [{i}] Failed (provenance): {name}")
                 continue
+            # ── D-2951: the dedup gate answers ONE question for this incoming row ──
+            # Is it a re-extraction of a concept the store (or this batch) already holds? Only a
+            # CONVERGENT body under the SAME name and the SAME work is the D-2949 duplicate. That
+            # row is LINKED, not dropped and not deleted: duplicate_of -> the incumbent's fb_id and
+            # status QUARANTINE through derive_status — the ONE status rule (D274h) — so the pair
+            # written here is exactly the pair the serving rail re-derives (D274a/request BUG-502).
+            # Every other kind is inserted unchanged and merely RECORDED in the receipt: divergent
+            # same-name rows are keep-both, and renaming them is owner-gated (D-271a). A candidate
+            # RICHER than the incumbent is never linked — demoting the store's richer row is a
+            # supersession act, reported for an owner call (D-2933 rule V).
+            if dedup is not None:
+                gate_decision = dedup.decide(fb)
+                if gate_decision["action"] == "link_duplicate":
+                    fb["duplicate_of"] = gate_decision["canonical_fb_id"]
+                    fb["status"], fb["s5_reason"] = derive_status(
+                        None, duplicate_of=gate_decision["canonical_fb_id"]
+                    )
+                    gate_decision["status_out"] = fb["status"]
+                    gate_decision["s5_reason_out"] = fb["s5_reason"]
+
             # BUG-387/D-359: capture the rowid the fb_id holds BEFORE the insert.
             # `INSERT OR REPLACE` re-issues a new rowid for an existing fb_id, and
             # the vec store is keyed by rowid — so the old rowid's vector must be
@@ -1443,6 +1508,10 @@ def run_stage6(export_only: bool = False):
             if insert_fb(conn, fb):
                 inserted += 1
                 commit_status[fb["fb_id"]] = "INSERTED"
+                if dedup is not None:
+                    # D-2951: the row IS in the store now, so a later candidate in this same
+                    # batch must see it — the within-run collision D-2949 #4 could not catch.
+                    dedup.observe(fb)
                 # BUG-004 FIX: Pre-compute embedding at commit time
                 definition = fb_definition(fb)
                 if definition:
@@ -1575,6 +1644,24 @@ def run_stage6(export_only: bool = False):
         receipt_rec["pipeline_commit"] = pipeline_commit
         safe_write(receipt_path, json.dumps(receipt_rec, indent=2, ensure_ascii=False, sort_keys=True) + "\n")
         print(f"🧾 D2590 receipt: {receipt_path}")
+
+    # ── D-2951 receipt: the dedup gate's audit trail (C16 — no silent verdict, and a declined
+    # enforcement is as auditable as an applied one). Written even for --export-only and after a
+    # ROLLBACK, because "the gate looked and decided nothing" is itself the evidence a reviewer
+    # needs before flipping mode to `enforce`.
+    if dedup is not None:
+        dedup_receipt = dedup.receipt()
+        dedup_receipt["rolled_back"] = rolled_back
+        dedup_receipt["invoked_with"] = "--export-only" if export_only else "commit"
+        dedup_rec = stamp_record(dedup_receipt, gen_model="python")
+        dedup_rec["pipeline_commit"] = pipeline_commit
+        dedup_path = CHECKPOINT_DIR / "dedup_gate_receipt.json"
+        safe_write(dedup_path, json.dumps(dedup_rec, indent=2, ensure_ascii=False, sort_keys=True) + "\n")
+        counts = dedup_receipt["actions"]
+        print(f"🧬 D-2951 dedup gate receipt: {dedup_path}")
+        print(f"   mode={dedup_receipt['mode']} · {dedup_receipt['candidates']} candidate(s): "
+              f"{counts.get('insert', 0)} insert, {counts.get('link_duplicate', 0)} linked duplicate "
+              f"— kinds {dedup_receipt['kinds']}")
 
     # Summary
     print(f"\n{'='*60}")

@@ -10933,3 +10933,633 @@ The producer fix (D-2938 `persist_resolved_content_type: true`) is ALREADY commi
 lands automatically on the NEXT S2→S6 run. The RETRO re-stamp of the live 7,640-row store (apply
 `reroute_content_type` over the committed rows and re-derive status/type_body) is the remaining mechanical
 step — owner-gated on consumer revalidation, do NOT hand-edit the store.
+
+
+## BUG-725 (CLOSED 2026-10-12) — OWNER RULING + FACTUAL CORRECTION
+
+The buglog's (b) said non-principle rows 'have no discipline label'. MEASURED: discipline IS populated 1,049/1,049 (process_template 774 / process_instance 156 / tool_instruction-new 94 / growth_edge 25). So NOT_APPLICABLE on discipline_source would FALSIFY traceability. Corrected stamp: content_type_source=deterministic (D-343), discipline_source=llm_extracted_from_source, extraction_type_source=llm_extracted_from_source, menu_hash=NOT_APPLICABLE (D-277: never backfill a hash). scripts/restamp_bug725_provenance.py (governed, --dry-run default, C13 backup) dry-run verified 1,049 target rows / 0 partial-quartet. APPLIED 2026-10-12: --apply stamped 1,049 rows (growth_edge 25 / process_instance 156 / process_template 774 / tool_instruction 94) with C13 backup maxwell.db.pre_bug725_20261012_173205; 0 partial-quartet refusals. Verified: all 4 content types show stamped==n. CLOSED (buglog (b) "no discipline label" was factually wrong — discipline was 1,049/1,049 populated).
+
+## BUG-712 — reroute de-noising + duplicate-name findings (2026-10-12)
+
+Owner spot-check surfaced 3 root defects, fixed in D-2949: (1) _DONE_CONDITION matched bare 'until'/'gate'; (2) ti_to_pt_keywords 'protocol'/'pipeline'/'process' suffixes misroute TI->PT; (3) 27 keyword-heuristic adjudication entries. DUPLICATES: 3 name-groups = 6 rows, root cause stage1 SHA-256 EXACT-dedup + no name-level uniqueness at stage4/commit; prevention = normalized-name uniqueness + duplicate_of (column exists, 0 populated).
+
+## BUG-712 — DEDUP CORRECTION (D-2950, 2026-10-12)
+
+The D-2949 "2 TRUE_DUP merge groups" finding was OVER-CLASSIFIED. Forensic body-divergence audit (token Jaccard + SequenceMatcher over definition+mechanism) shows the two same-source pairs are DISTINCT concepts sharing a name inside ONE source, NOT the same concept re-extracted: Item Validation Protocol (type-checking vs schema/quantity/unit validation, mech jaccard 0.28) and VJ Performance Method (memorize-and-pre-plan vs live-trigger-as-accompanist, mech jaccard 0.18). A (name, source_id)-only merge would DESTROY one concept each. Corrected live landscape: MERGE 0 / SAME_SOURCE_COLLIDE 2 / NAME_COLLIDE 1 (Design Thinking Process — 2 distinct works) / NO_SOURCE 0. NO destructive merge runs today. Final identity = (name, source_id) grouping key + body-divergence merge gate (pipeline/dedup_identity.py, dedup_gate.py).
+
+## BUG-726 (CLOSED 2026-10-12) — `duplicate_of` was written as '' on EVERY row, so the documented predicate `duplicate_of IS NULL` (D-271d) matched ZERO rows
+
+MEASURED (live store 2026-10-12): `SELECT typeof(duplicate_of), COUNT(*) FROM fbs GROUP BY 1` → text 7640; distinct values = {''} × 7640. The column's own schema comment reads "canonical fb_id when this row is a dedup (NULL otherwise)" and D-271d/D2627 document `duplicate_of IS NULL` as the retrieval guard — so the store held a claim the code could not keep (the BUG-498 class, met before on this same column: an archived note reads "duplicate_of is NOT NULL on every row"). Cause: `stage6_commit.insert_fb` passed the value through `_safe_str`, which maps None → "".
+
+Harmless while the column was reserved debt with no writer and no reader. It stops being harmless the moment the D-2951 gate WRITES the column: a marker would then coexist with 7,640 absent-but-non-NULL cells — two shapes for one meaning — and the first reader to trust the documented predicate would see the whole store as "marked".
+
+FIX half 1 (LANDED 2026-10-12, D-2951): the writer emits NULL for absent (`pipeline.dedup_gate.duplicate_marker`, wired into `insert_fb`), and one normalizer (`duplicate_marker`) lets every reader treat '' and NULL as the same absent state.
+FIX half 2 (DRY-RUN VERIFIED, --apply PENDING OWNER GO): `scripts/normalize_duplicate_of_marker.py` (dry-run default, C13 backup first, one `BEGIN IMMEDIATE`, post-state verified). Measure: marker shapes before `{'empty': 7640}`, rows to normalize 7,640, rows already carrying a real marker 0. Semantics-preserving — every reader uses truthiness, so this only removes the second shape.
+
+## BUG-727 (LOW - OPEN 2026-10-12) — the store_columns register is red: `measured:` was recorded against a 14,574-row store while the store holds 7,640
+
+MEASURED 2026-10-12: `python3 scripts/check_store_columns.py --check` → `FAIL store-columns: debt 8 of ceiling 9 | 27 declared column(s) | census moves 45`, with dozens of `MEASUREMENT-DRIFT: <column>.rows was recorded as 14574 and now measures 7640`. PRE-EXISTING, not caused by D-2951: the register's `measured:` tail predates the store's change of shape (post-reclaim / v9 canonical filtering, D-2881/BUG-693) and nothing re-recorded it. D-2951's only effect on this rail is (a) retiring one debt — `duplicate_of` 9 → 8, now BELOW the 9 ceiling — and (b) adding the OWED, non-fatal `mentions` census moves that D-2649/BUG-533 already classify as code-side.
+
+FIX: ONE deliberate `scripts/check_store_columns.py --record` AFTER the next S6 run settles the store; re-recording now would immediately re-drift on the pending commit. Never hand-edit `measured:`/`ceiling:` (D-2642: a hand edit there is DRIFT).
+
+## D-2951 — the commit-time dedup gate is WIRED, and `enforce` is measured NEUTRAL (2026-10-12)
+
+`stage6.dedup_gate {enabled: true, mode: report}` (C12). Wired into `run_stage6` on the INSERT path ONLY (D-2933 rule V sends every stored fb_id down the provenance path, so the gate sees exactly the rows the store does not hold) and over BOTH sides of "existing" — the committed store AND the rows this batch already accepted — which is the within-run collision D-2949 #4 could not catch.
+
+R5 (gemma-4-E4B-it-MLX-4bit, generator ≠ verifier) returned 3 defect claims, ALL false positives on trace: `jaccard` guards the empty-token case with `if not ta | tb`; `_same_work` is unreachable with a blank source because `classify_group` returns no_source first; `source_set`'s `str()` fallback IS the intended behaviour. It also produced one DRIFTED answer (Q1 inverted the branch — divergence yields `keep_both_divergent`, never a link). No change was made on the strength of it: a verifier's output is evidence to audit, not a verdict to apply.
+
+MEASURED while building, 2 real defects in the NEW code, both fixed before landing: (1) store rows carry `source_ids` as JSON TEXT, so `frozenset(text)` exploded a source id into its CHARACTERS — one normalizer (`dedup_identity.source_set`) now owns that shape; (2) the receipt filtered advisories by `classify_group`'s vocabulary while `kind` held `candidate_kind`'s, so it printed 0 advisories beside `kinds {'keep_both_divergent': 2}` — the `DISPOSITION_*` constants plus a regression test now make that impossible.
+
+EVIDENCE (read-only; `scripts/simulate_commit_dedup_gate.py --scope run`; receipt `governance/dedup_gate_simulation_run_20261012.json`): the faithful S6 input is 6,591 S5 rows + 1,049 D-2590 sidecar rows = 7,640; kinds `insert 7,637 / keep_both_cross_source 1 / keep_both_divergent 2`; WOULD LINK = 0. So `enforce` is NEUTRAL on the current artifact — the 3 D-2949 groups are keep-both under the D-2950 gate, which CONFIRMS D-2950's correction rather than contradicting it. Flip criterion is therefore evidence-driven: flip to `enforce` when a run shows ≥1 link candidate, or when the divergence thresholds are recalibrated.
+
+SIMULATION LESSON (recorded because it is D-2950's own error class): the first version of the simulation read the S5 checkpoint ALONE and reported 0 collisions in 6,591 rows while the store demonstrably held 3 duplicate-name groups — every one of them lives in the SIDECAR TIER (process_template / tool_instruction), not the S5 path. A simulation that reads the wrong population certifies a gate it never exercised.
+
+## BUG-726 (CLOSED 2026-10-12) — APPLIED AND VERIFIED: the marker has ONE shape (NULL = absent)
+
+`python3 scripts/normalize_duplicate_of_marker.py --apply` → 7,640 rows `''` → NULL, 0 rows already carrying a real marker, C13 backup `knowledge pipeline/backups/maxwell.db.pre_dupmarker_20261012_183020` written BEFORE the write, ONE `BEGIN IMMEDIATE`, post-state verified inside the transaction.
+
+VERIFICATION (independent reads, after the commit): shapes `{'null': 7640}`, real markers 0, `PRAGMA quick_check` ok, rows 7,640 unchanged (PASS 4,503 / QUARANTINE 3,137 unchanged), integrity ok. The status census is identical to the pre-write census, so the reshape moved no row between PASS and QUARANTINE. Tests 32/32 green.
+
+WHY IT WAS SAFE (checked BEFORE writing, not after): (1) NO executed code tests the predicate whose meaning flips — `pipeline/retrieve.py` guards on `status = 'PASS'` (`_status_predicate`), and `config/identity.yaml` already records `duplicate_of_reader: none`; (2) every reader uses TRUTHINESS (`serving_gate.py:114 if duplicate_of:`, `apply_dedup_marks.py`, `check/apply_serving_gate.py`), normalized by `dedup_gate.duplicate_marker()`; (3) `derive_status(None, duplicate_of=None)` and `derive_status(None, duplicate_of='')` BOTH return `('QUARANTINE','unknown')` while a real marker returns `('QUARANTINE','duplicate')` — the two shapes were decision-EQUIVALENT everywhere, so the reshape is identity-preserving.
+
+THE LESSON (why this bug existed): `_safe_str` made "absent" an empty string while the schema comment promised NULL. Nothing read the column, so nothing noticed — the BUG-498 class (a claim the code cannot keep), harmless only while the column was reserved debt, and no longer harmless the moment D-2951 gave it a writer. Fixed in BOTH halves: the writer emits NULL (`duplicate_marker`, D-2951) and the legacy rows are reshaped (this script).
+
+COMPANION ALIGNMENT (D-2952): D-271d's imperative "wire `duplicate_of IS NULL` into `pipeline/retrieve.py`" is SUPERSEDED as a MECHANISM (not as an outcome) — the real guard is `status = 'PASS'` plus the LINK⇒QUARANTINE pairing. The predicate was never wired and must not be: it would be redundant. See `governance/DECISION_D271_IDENTITY_20260917.md` → "UPDATE 2026-10-12".
+
+## BUG-728 (LOW - OPEN 2026-10-12) — `source_authors` (FILE layer) repeats one source: 31 rows literally, 90 by carrier key
+
+MEASURED (`scripts/audit_edition_layers.py`): 31 rows carry a LITERALLY IDENTICAL duplicate entry in `source_authors` (e.g. 'Pricing Creativity A Guide to Profit Beyond the Billable Hour (Blair Enns).md' twice in one row); 90 rows collide on carrier key (the same work reached through different file names — e.g. 'This Is Marketing You Can_t Be Seen Until You Learn to See.md' beside 'This Is Marketing You Cant Be Seen Until You Learn to See by Seth Godin.md'). It is a FILE-layer blemish in a DISPLAY field: `source_authors` feeds provenance display (`stage6b_anytype_push.py`) and a presence check (`integrity_check.py`) — NO consumer COUNTS it.
+
+NOT A CASCADE (checked): identity is unaffected because `source_ids` is work-level (`compute_source_id` collapses editions and carriers, D2308/D2176 — 0 carrier duplicates measured in `source_ids`), and the D-2951 dedup gate's `richness()` ranks by `source_diversity`, which derives from `source_ids`, so ranking is untouched. Confirms D-2950's landscape rather than disturbing it.
+
+FIX (design, NOT applied): dedupe `source_authors` at EMISSION in `stage2_extract._build_provenance` by carrier key / resolved work id, keeping the entry `primary_source` picked when present, else the earliest-year file — deterministic, no LLM (D-343). NOT a hotfix: a stage2 edit invalidates the S6 checkpoint binding (BUG-614), so it rides the next stage2-change window, with the population re-measured by the audit script before and after.
+
+R5 REVIEW (generator ≠ verifier, gemma-4-E4B-it-MLX-4bit, 2026-10-12) — unlike the D-2951 pass (3 claims, ALL false positives on trace), this pass produced **TWO REAL findings, both applied**, and they concern the audit INSTRUMENT rather than the store. (a) `carrier_key`'s `\s*\(?\d+\)?$` stripped a trailing number that may be PART OF THE TITLE: "Fahrenheit 451" → "fahrenheit", colliding with "Fahrenheit", and a wholly-numeric title reduced to the EMPTY key, so every numeric title would collide with every other. Tightened to the parenthesised copy marker `\(\d+\)$` only — a PATTERN fix, not a threshold, so no magic number is introduced (C12/C20). MEASURED: LATENT, 0 manifest instances — carrier rows 90 before AND after, 0 empty keys — therefore fixed as a TRAP, not reported as a live defect. (b) a redundant `if isinstance(files, list)` guard inside a comprehension (C19 dead code) — the cell shape is now normalised once at the boundary instead. Both fixes left the census byte-identical: 12 edition pairs / 51 boundary / 90 carrier rows / 0 citation violations. Its remaining two answers (Q2 an empty year is skipped, Q4 a `?mode=ro` URI cannot write) were correct on trace.
+
+## D-2952 — edition supersession is RULED a FILE-LAYER content rule (2026-10-12)
+
+Ruling, measurement and the fenced destructive direction live in `config/dedup_identity.yaml` (`edition_supersession`, `thresholds_direction`) and the D-2952 section of DECISION-LOG.md. The line that matters for anyone tempted to simplify it: **`primary_source` stays the ORIGIN attribution ("the earliest source we HOLD"), and freshness gets its own reserved pointer `content_basis`** — one column in use today, one reserved name, two meanings never merged into one cell.
+
+## BUG-712 (OPEN, severity REVISED CRITICAL → MED 2026-10-12 — see the UPDATE at the end of this file) — the 122-row router diff was the ROUTER's error, not the store's
+
+MEASURED (read-only; live 7,640-row store; new instrument `scripts/calibrate_content_type_router.py`). `scripts/diff_bug712_reroute.py` reports **122 rows** that disagree with their own deterministic router (100 `principle→growth_edge`, 10 `tool_instruction→process_template`, 10 `→principle`, 1 `→process_instance`, 1 `→noise_drop`). Those 122 are NOT a list of store defects. Both sides, calibrated:
+
+**PRECISION (side A).** Of the 100 `principle→growth_edge` moves, **88 (88%) are SUBJECT-MATTER FALSE POSITIVES**; only 12 survive even a permissive claim-status test. The firing tokens are BARE WORDS and the contexts are ordinary first-order predicates about the record's SUBJECT, not epistemic statements about its CLAIM: `contradict` 44 ("generating untraceable or contradictory information", "visual cues contradict the audience's expectations"), `contested` 34 ("sites of contested identity", "the belief system is contested or rapidly changing"), `unresolved` 14, `unverified` 6, `debated` 1, "open question" 1. A governed re-stamp on this form would have written ~88 WRONG ontology roles into 1.2% of the store — the exact drift the D-2933 owner gate exists to stop.
+
+**RECALL (side B).** Gated by the SAME claim-status test the miss count is **0**: the token list is not too NARROW. The defect is therefore ONE-SIDED (precision), which is why the fix is a narrowing rather than a vocabulary expansion. The instrument's FIRST run reported "106 missed" because its own recall vocabulary was bare too ("speculative capabilities", "mixed data", 77 of 77 "speculative" hits being ordinary adjectives) — the self-catch is the reason the gate exists.
+
+**ROOT CAUSE — AN UNFIXED SIBLING.** D-2949 fixed exactly this defect class in `_DONE_CONDITION` ("matched a BARE 'until'/'gate'/'termination' and misrouted descriptive models") but did NOT fix its sibling `_OPEN_TENSION`, whose alternatives are bare single words. The same pattern repeats in the keyword family: D-2949 dropped 'protocol'/'pipeline'/'process' from `ti_to_pt_keywords` as "tool-name suffixes" and left four of the identical class, so `OpenFrameworks` — a software LIBRARY — routes TI→process_template (BUG-729).
+
+**FIX PREPARED, OWNER-GATED (D-2953).** `config/content_types.yaml → reroute.open_tension_strict` (default **false** = today's behaviour, so nothing moves until an owner flips it) selects `_OPEN_TENSION_STRICT`, which requires an AFFIRMATIVE STATUS construction: SUBJECT…copula…STATUS ("the evidence is contested"), STATUS…SUBJECT ("contested claim"), or an unambiguous phrase ("open question", "unknown whether", "not established"). MEASURED both ways in one run: loose = **100** moves (88% FP) → strict = **2** moves (`contested` on "the expert consensus is weak or contested" — genuinely right — and one "open question"), recall 0 in both. The first strict draft accepted "the training data contains contradictory cues" via a generic subject noun and measured **68% FP**: adjacency is not evidence of status, so the form demands STRUCTURE, not proximity. `tests/test_open_tension_strict.py` 6/6 green.
+
+**STATE: no re-stamp is justified.** Work order is now (1) owner ratifies the strict form, (2) the TI keyword family is narrowed (BUG-729), (3) THEN re-run the calibration and re-stamp only what the CALIBRATED router still moves. NEW INSTRUMENTS: `scripts/calibrate_content_type_router.py` (two-sided, read-only, LLM-free per D-343) and a faithfulness fix in `scripts/diff_bug712_reroute.py`, which omitted `name` — a key `_principle_form_violation` READS (0 manifest effect measured, but a diff computed on a truncated haystack is not evidence).
+
+## BUG-729 (CLOSED 2026-10-12) — the TI→process_template tier promoted on a bare NAME; APPLIED as BODY evidence + a procedure-denoting vocabulary
+
+MEASURED (`scripts/calibrate_content_type_router.py`, live store): 10 of 108 `tool_instruction` rows move to `process_template`, and the firing keywords include `system` and `framework` applied to tool_name values that name software PRODUCTS, not methods: 'OpenFrameworks' (a C++ creative-coding LIBRARY, twice), 'Warichu Text Rendering System', 'Layout Analysis System', 'Python Prompt Routing System', 'Supplier Management System', 'Store Fulfillment Optimization System', 'Inventory Management System', 'Order Processing System'. Exactly one is clearly right: 'LoanGraphState Workflow' (`workflow`).
+
+**THIS IS D-2949's OWN CRITERION APPLIED INCOMPLETELY.** D-2949 removed 'protocol'/'pipeline'/'process' because they are "common TOOL-name suffixes"; 'system' and 'framework' are the same class and were left in. Ontologically the tier conflates two objects: a repeatable METHOD (process_template) and a software SYSTEM that is USED (tool_instruction) — a system's NAME is not evidence of a procedure.
+
+FIX (NOT APPLIED — owner-gated: content_type is S4-owned ontology, D-2933): replace the name-suffix test with an EVIDENCE-based discriminator — require a genuine procedure signal in the BODY (`_PROCEDURE_STEPS` ∧ `_DONE_CONDITION`, the D-2747 discipline) before promoting a TI to PT, keeping `workflow` only as a weak prior. Both ways measured before it lands; the same two-sided instrument is the gate.
+
+**APPLIED 2026-10-12 (owner-approved).** `config/content_types.yaml → reroute` now carries TWO INDEPENDENT controls, each with its rationale beside it:
+  1. `ti_to_pt_keywords: [workflow, methodology]` — the ARTIFACT nouns `system`/`framework` are REMOVED (they name software that is USED, not methods that are EXECUTED);
+  2. `ti_to_pt_require_body_evidence: true` — a promotion additionally requires the record's OWN body to evidence a procedure, exposed as `has_procedure_evidence()` so the rule and the instrument that judges it read the SAME haystack and the SAME two regexes (C21). The test is REUSED from tier 2 (`principle → process_template`), not re-invented.
+
+MEASURED BOTH WAYS (`scripts/calibrate_content_type_router.py` → SIDE C, read-only, 7,640 rows): tool_instruction rows 108 | name-prior candidates 1 (`workflow`) | body proves a procedure 0 | promotions with the gate OFF 1 → with the gate ON **0** | RETIRED-vocabulary control 9 rows named an artifact and **0** of them would have survived the evidence gate | router diff **122 → 14**. The 10 `tool_instruction → process_template` moves are GONE.
+
+HONEST SCOPE OF THE TWO CONTROLS — neither is redundant, and the reason is NOT the current store: on today's 108 TI rows the evidence gate ALONE is sufficient, and the vocabulary narrowing kills 9 of the 10. The vocabulary is a PRIOR that must also decide the case the store does not CONTAIN yet: a future S2 record whose body DOES carry a procedure under an artifact name ("... System" with a real step sequence) would pass the gate and be promoted wrongly. Two defects — a wrong trigger and a missing gate — two controls, one instrument.
+
+TESTS: `tests/test_ti_to_pt_evidence.py` (7) pins the measured defect shape, the preserved recall, the gate's NECESSITY (steps WITHOUT a done-condition do not move), the two-sided override (`reroute_content_type(fb, require_body_evidence=...)` — the measurement lever, same shape as `principle_tension_hit(strict=...)`), the vocabulary, and tier 4.
+
+FORWARD-ONLY, AND SELF-TERMINATING: the router is the PRODUCER (D-2938 `persist_resolved_content_type`), so this changes FUTURE commits. The store still holds those 10 rows as `tool_instruction`, which is also what the calibrated router now returns for them — so this bug owes NO re-stamp at all, and the diff fell by exactly those 10 rows.
+
+R5 REVIEW (generator ≠ verifier, gemma-4-E4B-it-MLX-4bit, 2026-10-12) — **the verifier DRIFTED on both attempts and its output was audited, not applied.** Pass 1 refused outright ("no code provided" — it had the code) and was re-dispatched with the code inline; pass 2 emitted meta-narration, truncated its own answer at the word cap, and produced 5 answers of which **1 is substantive, 1 correct, 1 "cannot construct", 1 FALSE, 1 unsupported**. Nothing was changed on the strength of it. Audited individually:
+  SUBSTANTIVE (Q1) — "the gate checks for step/phase markers AND a termination condition, which is NOT proof of execution". CORRECT as a residual risk: the gate is two regexes, so a tool manual that DESCRIBES someone else's procedure in prose would satisfy it. MEASURED manifest instances: **0 of 108**. It is still the best deterministic signal available (D-343 forbids an LLM within 10 miles of content_type) and the alternative — the name alone — measured 10 promotions of which 0 survived. Recorded as an ACKNOWLEDGED LIMIT and pinned by a test that a future narrowing must fail deliberately.
+  CORRECT (Q3) — tier 4 stays reachable; independently pinned by test (`_ti(name='Zorp Workflow', tool_name='Zorp Workflow', syntax='', parameters=[])` → `quarantine`), which is the point: the narrowing must not promote a record out of the structural check.
+  CANNOT CONSTRUCT (Q2) — agrees with the change's own analysis, which pins the same limit from the other side: the gate can only ever REMOVE a promotion, so a procedure under a non-procedure name was and remains untouched.
+  **FALSE (Q4)** — it claimed the config values are "set at module load time (import time)". The VALUES are initialised once from YAML (necessarily), but they are READ inside the function body at CALL time, which is what the claim denies; `test_monkeypatching_the_flag_moves_the_router` falsifies it by moving the router through a monkeypatch. A verifier's wrong claim costs a falsification, not a code change.
+  UNSUPPORTED (Q5) — truncated mid-sentence ("Yes. The purpose states that the 'OLD name-only rule pro…") and offered no input. The known callers are `stage4_merge.py:303` (passes no override → uses the configured policy, which is the intent), `diff_bug712_reroute.py` and `calibrate_content_type_router.py`; the 122 → 14 diff and a green 399-test suite are the evidence that none depends on the old behaviour.
+
+THE PATTERN, RECORDED FOR THE NEXT SESSION (same as D-2951's pass): a small local verifier is worth dispatching and is NOT worth trusting. Its single genuinely useful contribution here was a flaw in my own DESIGN, found by describing it back to me, and it was found by me auditing the answer — the delegation did not save the verification, it only proposed it.
+
+## BUG-730 (CLOSED 2026-10-12) — a duplicate YAML key SILENTLY killed the tool_instruction→process_template tier; rail added
+
+**SELF-INFLICTED AND DISCLOSED.** While adding `reroute.open_tension_strict` this session I APPENDED a second top-level `reroute:` block to `config/content_types.yaml`; the file already had a `reroute:` mapping holding `ti_to_pt_keywords`. PyYAML's `safe_load` keeps the LAST duplicate key and raises nothing, so `reroute.ti_to_pt_keywords` silently became empty → `TI_TO_PT_KEYWORDS = ()` → the whole TI→process_template tier went DEAD, with no error, no warning, and every existing test still green.
+
+**CAUGHT BY MEASUREMENT, NOT BY REVIEW:** the router diff moved 122 → 112 and the 10-row `tool_instruction→process_template` transition vanished. A behaviour diff over the live store found in one run what no rail and no reviewer had flagged — which is the argument for behavioural rails over reading code.
+
+**IMPACT: none on the store** — the broken config existed only in the working tree for ~10 minutes, no pipeline stage ran, and the fix (merge the key INTO the existing `reroute:` mapping — one home per key, C21) restored `TI_TO_PT_KEYWORDS = ('system','workflow','framework','methodology')` and the diff to exactly 122.
+
+**FIX + PREVENTION:** (1) the key now lives inside the ONE `reroute:` mapping with the incident recorded beside it; (2) new rail `scripts/check_config_duplicate_keys.py` — a duplicate-key-rejecting YAML loader plus a JSON `object_pairs_hook`, over every `config/**/*.{yaml,yml,json}` (116 files), exit 1 on any duplicate and exit 2 rather than passing vacuously (C16); it ships with a `--selftest` (three known-answer controls) and is WIRED into `just health`. Verified: PASS on config, FAIL on both a synthetic duplicate and the exact BUG-730 replay. This closes a WHOLE CLASS: every governed threshold, vocabulary and flag in this repo is loaded from config/, so one duplicate key could disable a rule an entire decision depends on while every other rail stayed green.
+
+## D-2953 — the content_type router is CALIBRATED before any re-stamp, and the loose tier-2 form is fenced (2026-10-12)
+
+Ruling and numbers in the BUG-712 calibration block above plus `config/content_types.yaml → reroute.open_tension_strict`: the strict form exists, is tested, is measured (100 → 2 moves), and ships DISABLED so today's behaviour is bit-for-bit unchanged until an owner flips it. The re-stamp stays blocked behind the calibration; content_type remains S4-owned (D-2933).
+
+## D-2954 — the config surface refuses duplicate keys (2026-10-12)
+
+`scripts/check_config_duplicate_keys.py` + `just health` wiring (see BUG-730). A duplicate key does not add to a mapping, it REPLACES it — silently, in PyYAML and in `json.load` alike. The rail answers one question for every config file: can this file silently LOSE a key that was written into it? Exit 1 when the answer is yes, exit 2 rather than passing vacuously when nothing was scanned.
+
+## BUG-731 (MED - OPEN 2026-10-12) — the undeclared-default census is 12 over its ceiling (PRE-EXISTING), and the rail's receiver list cannot see `pipeline/content_types.py` at all
+
+MEASURED while adding a config key (D-2953) and then PROVED to be not caused by it: `python3 scripts/check_config_defaults.py --check` → `FAIL: measured 486 config-default SITE(s) over 544 module(s) ... 241 distinct SHADOWED-DECLARED key(s)` against a declared ceiling of **229**. The census's own trail in `config/derivations.yaml` was last REMEASURED **2026-10-07** (221 → 229), so **+12 accumulated between 2026-10-07 and 2026-10-12** — the D-2590/D-2942..D-2951 sessions — with every intervening rail green.
+
+PROOF IT IS NOT MINE: my new read was `_CT.get("reroute", {}).get("open_tension_strict", False)`, and the rail's own control confirms such a read counts as 2 shadowed sites. Converting it to a LOUD read (`_CT["reroute"]["open_tension_strict"]`, no code default — which is what D-2644 demands anyway) left the measurement at **exactly 241**. Net contribution: 0.
+
+SECOND, SEPARATE DEFECT (a blindspot, found because my read was NOT flagged): the census declares `receivers: [_CFG, cfg, config, conf, settings]`. `pipeline/content_types.py` reads its ontology through `_CT`, which is NOT in that list, so EVERY config read in the module that owns the content-type enum and the reroute flags is invisible to this rail. The 229 ceiling was therefore never a measurement of that file, and a read WITH a literal default could be added there without the rail noticing.
+
+FIX (NOT applied — both steps move a governed ceiling and must not ride a session whose mandate is a different bug): (1) the 12 are a DECISION, not an edit (D-2644: "a ceiling may only be LOWERED") — either an owner raises the ceiling or the 12 shadowed reads become loud reads; re-recording is NOT the fix; (2) add `_CT` to `receivers` so the module is measured at all, then re-measure and re-record WITH owner sign-off, since that change will move the number again.
+## D-2953 (RATIFIED ENABLED 2026-10-12) — the strict tier-2 tension form is ON; the store diff fell 122 → 14
+
+The owner RATIFIED the strict form ENABLED on 2026-10-12, exactly as fenced: the flip is ONE config value (`config/content_types.yaml → reroute.open_tension_strict: true`) and the tests now bind CODE to CONFIG rather than to a constant, so the declared value can never drift from the file that owns it.
+
+RE-MEASURED AT THE FLIP (read-only; receipt `governance/content_type_calibration_20261012.json`):
+  router diff over the store **122 → 14** rows (the strict form's 2 `principle → growth_edge` moves replace the loose form's 100);
+  SIDE A precision of those 2 moves: 1 claim_status, 1 subject_matter → 50% (n=2). The strict form is BETTER and is still NOT a re-stamp licence; small-n precision does not authorise a write;
+  SIDE B recall (gated): 0 — unchanged; the token list is not too narrow, so this was precision work only;
+  SIDE D (new at the flip): of the 114 raw loose fires the token sits in consequence/elaboration **103** times and in `boundary` **9** times; the strict form leaves **12** survivors of which **9 are boundary-ONLY** → filed BUG-735 with the measured narrowing options.
+
+## D-2955 — the TI→process_template promotion requires BODY evidence; a name is a prior, never evidence (2026-10-12)
+
+Ruling and numbers live in the CLOSED BUG-729 record above and in `config/content_types.yaml → reroute`, where both controls sit beside their rationale. The line that matters: **the ratified D275b procedure tests "tool/software-specific command, syntax, or feature" FIRST, so promoting a tool_instruction by NAME alone both INVERTS the owner-ratified order and reads a software ARTIFACT as a method.** Landed with the owner's approval, forward-only, measured both ways by the same instrument that gates the tier.
+
+## D-2956 — a CEILING is a declaration, `measured:` is a MEASUREMENT, a ROLE is an ONTOLOGICAL claim; the three are never interchanged (2026-10-12)
+
+TWO RED RAILS, ONE MISFILING, THREE OBJECTS. Same-day forensics on both reds showed that each bug report named ONE cause where the rail measures THREE, and that the operator-facing verdict line does not distinguish them:
+
+  **BUG-727 (store-columns)** — the report says the red is a stale `measured:` block. MEASURED: the rail emits **305 FATAL faults** — 278 `MEASUREMENT-DRIFT` (the register's rulers were recorded against a 14,574-row store and now measure 7,640) **PLUS 27 ROLE-DECLARATION faults** (20 CONSTANT-OR-BLANK, 4 SPARSE-VIOLATION, 2 STATE-VIOLATION, 1 RESERVED-VIOLATION). `--record` clears the first 278 and leaves the rail RED: **a re-measurement is not a repair, and the 27 were never filed** (now BUG-733/BUG-734).
+  **BUG-731 (config-defaults)** — the report says the debt is 241 against a 229 ceiling. MEASURED: **183 of the 241 distinct keys (76%) sit in ONE file** (`pipeline/pipeline_paths.py`, 361 defaulted sites), and the census's `receivers` list could not see `pipeline/content_types.py` at all — a rail cannot vouch for a file it does not seek in.
+
+THE RULING — three directions, three different acts:
+  1. **NEVER RAISE A CEILING.** A ceiling declares a debt's measured size and is shrink-only (D-2642/D-2644). Raising it converts a FINDING into a permanently tolerated lie and destroys the only instrument that detects the class. Both reds are paid down or explicitly re-scoped — never accommodated by an edit.
+  2. **RE-RECORDING IS NOT A DECISION.** It is the rail doing its job and is legitimate ONLY on a SETTLED artifact, once, after the pending store mutation lands. A measurement taken while the artifact still moves is a claim, not a measurement (D-2642: the RAIL owns the number).
+  3. **A ROLE VIOLATION IS A FINDING, NOT A STALE NUMBER.** 20 of the 27 store-column faults are ONE missing concept: the register's vocabulary (`value|sparse|state|reserved`) cannot express "REQUIRED WITHIN A TIER", and this store is two-tiered BY CONSTRUCTION (D-2943: `elaboration`/`mechanism`/... are principle-ONLY and blank for the 1,049 non-principle sidecars — which is exactly why a column with 100% coverage inside its tier measures 6,591/7,640 and is flagged as if it were constant). Declaring those 20 `sparse` would write 20 LIES into the ontology register: the register must GROW the missing role, not lose the invariant.
+
+INSTRUMENT SCOPE IS PART OF THE INSTRUMENT — the half that LANDED: `_CT` is now a declared census receiver (`config/derivations.yaml#config_reads.receivers`), so the module that owns the content-type enum, the reroute flags and the applicability axis is MEASURED instead of assumed. It landed together with the loud reads it would otherwise have counted (`_CT[...]` subscripts, no literal defaults, D-2644), and the number is **exactly 241 before and after**: the instrument now seeks in a place where it finds nothing — the honest outcome, and the cleanest proof that the two changes belong together.
+
+## BUG-732 (MED - OPEN 2026-10-12) — the store-columns red is MISATTRIBUTED: 27 of its 305 fatal faults are LIVE role violations that `--record` cannot clear
+
+MEASURED 2026-10-12 (`python3 scripts/check_store_columns.py --check`): **305 fatal faults** = 278 `MEASUREMENT-DRIFT` + **27 role-declaration faults** (20 CONSTANT-OR-BLANK, 4 SPARSE-VIOLATION, 2 STATE-VIOLATION, 1 RESERVED-VIOLATION). The rail's verdict line (`FAIL store-columns: debt 8 of ceiling 9 | 27 declared column(s) | census moves 49`) reports the DEBT CEILING — a third, independent, shrink-only axis — and so reads as "one number is stale" when in fact two thirds of the fault text is a class the report never named.
+
+WHY IT MATTERS: `--record` is the action the report invites, and it will clear 278 faults and leave the rail FAILING. Anyone who follows the report and then sees red again will be tempted to edit the register by hand — which D-2642 declares DRIFT. The report must state the counts it measured and split them by cause (the BUG-521 class: a verdict that does not state what it measured).
+
+FIX (design, owner-gated): (a) ONE `--record` after the next S6 run settles the store, clearing ONLY the drift half; (b) the 27 role faults are BUG-733 (one missing role concept, 20 instances) + BUG-734 (7 per-column decisions) and must never be silenced by a re-measurement.
+
+## BUG-733 (MED - OPEN 2026-10-12) — the column-role vocabulary cannot express TIER-CONDITIONAL coverage: 20 faults are ONE missing concept
+
+MEASURED: 20 columns are flagged `CONSTANT-OR-BLANK ... declared role value but measures nonblank 6,591/7,640` — `elaboration`, `mechanism`-family and the other PRINCIPLE-ONLY body fields (D-2943), plus the S5-owned labels. Every one of them is 100% covered INSIDE its tier and structurally ABSENT outside it: the store holds 6,591 S5 rows and 1,049 D-2590 sidecar rows whose role-specific body is the sidecar fields.
+
+THE REGISTER HAS NO ROLE FOR THAT. `value` means "varies and is non-blank on every row"; `sparse` means "0 < nonblank < rows" — which those columns technically satisfy, and declaring them `sparse` is the tempting one-line "fix". It would be 20 LIES: `sparse` says OPTIONAL, while D2371/D2488/D2475 ENFORCE the opposite (an empty `application`/`failure_mode`/`elaboration` QUARANTINES a principle). The honest fix is a declared, measurable tier-scoped role — "required non-blank within <tier predicate>, absent outside it" — with the tier predicate read from config (C12), so the rail keeps the invariant AND the fault clears on evidence.
+
+NOT HYPOTHETICAL: this is the same shape as the BUG-611 quarantine blob (one undifferentiated bucket for two populations). A register that cannot say "inside this tier" will keep manufacturing one fault per principle-only column, and each will look like a new defect.
+
+## BUG-734 (CLOSED 2026-10-12) — the 7 residual role faults in the store-columns register, enumerated
+
+MEASURED 2026-10-12, none of them explained by BUG-732's stale rulers — each is a declaration that does not match the live store:
+  SPARSE-VIOLATION (4) — `classification_error` 0/7,640 and `classification_errors` 0/7,640 (declared sparse = 0 < nonblank < rows; the columns are EMPTY, so they are `reserved` with no writer or retired names); `menu_hash` 7,640/7,640 and `discipline_macro` 7,640/7,640 (declared sparse but FULL — they are not sparse at all).
+  STATE-VIOLATION (2) — `usage_count` (declared `state`, one fact per row: measures 7,640 nonblank / **5 distinct**) and `verifier_model` (measures 6,591 nonblank / **1 distinct**) — a single shared value is not a per-row state.
+  RESERVED-VIOLATION (1) — `last_retrieved_at` is declared `reserved` (nothing written yet) but **88 rows carry content**. Either a writer exists that the declaration denies, or 88 rows hold a value nothing produced. **This is the BUG-726 class one more time**: a reserved column whose declaration and content disagree.
+
+## BUG-735 (MED - OPEN 2026-10-12) — the strict tension form still reads a BOUNDARY condition as an open tension (9 of its 12 survivors)
+
+MEASURED at the D-2953 flip (SIDE D, `scripts/calibrate_content_type_router.py`): the strict form leaves 12 survivors among the 114 raw loose fires, and **9 of the 12 are boundary-ONLY** — the token sits in `boundary` and nowhere else. A `boundary` field exists to state where a claim does NOT hold, so an epistemic word there ("not established", "unresolved", "not yet established") is STRUCTURAL TO ANY HONEST PRINCIPLE rather than evidence that the record IS an open tension.
+
+ROOT CAUSE: the strict form's third alternative (`open question|unknown whether|not (yet )?(established|verified|proven)|correlation unproven`) is the one BARE alternative left — it requires no epistemic SUBJECT, so it fires inside a boundary. The first two alternatives (SUBJECT…copula…STATUS, STATUS→SUBJECT) are properly gated, which is why they do not leak.
+
+FIX (NOT applied — the strict form was just ratified at a measured 2 store moves, and re-narrowing the ratified artifact mid-session would make its number and its code disagree). MEASURED CANDIDATES, both NARROWING (the safe direction, D-2953): exclude `boundary` from the tier-2 haystack (loose fires 114 → 103, strict survivors 12 → 3) OR gate the third alternative on an epistemic subject as well (strict survivors 12 → 3). Either way the owner-ratified store move count becomes 1 (the surviving genuine claim_status: "expert consensus is weak or contested"). Both are precision-only; SIDE B recall is 0 in every variant, so no recall is at stake. OWNER CALL, one word.
+
+## BUG-731 (MED - OPEN 2026-10-12) — UPDATE: the instrument half LANDED (net-zero), the paydown half is now a sized work queue
+
+LANDED: `_CT` added to `config/derivations.yaml#config_reads.receivers`, together with the loud reads it would have counted (`pipeline/content_types.py`: 10 defaulted reads → subscripts, no literal default, fail-closed at import per C16). RE-MEASURED: **241 before, 241 after** — the blindness is closed and the number did not move, because the module's defaulted reads no longer exist. If the reads had been left alone, the receiver change alone would have measured 248.
+
+THE PAYDOWN, SIZED (measured 2026-10-12, per file): `pipeline/pipeline_paths.py` **183 distinct keys / 361 sites**; then `scripts/audit_sidecar_commit.py` 6, `pipeline/stage4_merged_call.py` 5, `scripts/d2767_ab_eval.py` 5, `pipeline/integrity_check.py` 4, `scripts/apply_anchor_axis_authority.py` 4, and a long thin tail. 76% of the debt is ONE file's accessor pattern, which makes this a bounded, mechanical workstream rather than 241 decisions.
+
+THE TWO WAYS TO PAY IT (owner call, and the ceiling is NOT raised either way): (a) DECLARE the key and read it LOUDLY (the value moves into config verbatim, so the read cannot silently fall back on a typo — strictly the D-2644 doctrine); (b) make the accessor VALIDATE the key against the declared key set and fail closed on an unknown key, after which a defaulted read is safe BY CONSTRUCTION and the class is gone rather than moved. The ceiling then re-records DOWNWARD from the measured number (autonomous, the allowed direction) and the rail goes green on evidence, not on an edit.
+
+## BUG-712 (OPEN - MED, was CRITICAL) — UPDATE 2026-10-12: the CALIBRATED residual is 14 rows, and 12 of them are the owner's OWN adjudications
+
+Both router defects behind this bug are now fixed (D-2953 strict form RATIFIED ENABLED; BUG-729 CLOSED), so the diff that the governed re-stamp would act on is no longer 122 — it is **14**, and every one of the 14 now has a named cause:
+  **12 = tier 1, the OWNER'S adjudication map** (`governance/content_type_adjudication.json`, confidence high×9/med×3): 10 `tool_instruction → principle` ("concept/pattern/algorithm, not a tool command"), 1 `tool_instruction → process_instance` ("concrete single-use event, no reusable syntax"), 1 `tool_instruction → noise_drop` ("physical equipment, descriptive — no prescriptive what to DO"). These rows were committed BEFORE their adjudication, so the store holds the pre-adjudication label. Applying them is not a re-classification: it is EXECUTING A DECISION THE OWNER ALREADY MADE.
+  **2 = the strict form's own survivors**, one genuine claim_status and one subject_matter false positive (BUG-735). **These two must NOT ride the re-stamp**: the strict form is 50% precise at n=2, and writing a coin-flip into the store is the exact defect class this calibration exists to prevent.
+
+SEVERITY REVISED CRITICAL → MED: nothing is WRONG in the sense of a corrupted artifact — the store holds a label the producer has since been fixed not to produce, plus 12 rows awaiting their owner's own already-recorded ruling. The remaining act is a governed, C13-backed, owner-gated write of 12 classification labels; it is NOT a correctness emergency and must not be bundled with BUG-735's resolution.
+
+## BUG-726 (CLOSED 2026-10-12) — UPDATE: the class is not one column — 20 of 78 columns carry a NON-NULL blank
+
+**MEASURED (live 7,640-row store, 2026-10-12).** The question "which columns use `''` as absent?" was asked of the
+whole table instead of one column, and the answer changes the diagnosis: **20 of the 78 columns carry a NON-NULL
+blank** (`last_retrieved_at` 7,552; `procedural_skill` 7,640; `classification_error` 7,640; `jargon` 3,219;
+`discipline_raw` 1,239; 14 columns at exactly 1,049 — the D-2590 sidecar tier — and `failure_mode` 275), while NULL
+appears only where a decision has already ruled it (`duplicate_of` via this bug, `feedback_score`). The single
+manufacturing point is `stage6_commit._safe_str`'s `default=""`, which maps an absent value to `""` for every TEXT
+cell it writes, while the code's OWN contract is `None` (`pipeline/schemas.py`: `Optional[str] = Field(default=None)`).
+
+**SO THIS BUG WAS THE FIRST INSTANCE, NOT THE WHOLE CLASS.** What made it *dangerous* was that a documented
+predicate (`duplicate_of IS NULL`) depended on the shape; what made it *possible* is the helper's default. The
+generalisation is filed as BUG-737 and the instrument that now sees it is the `runtime` role (D-2957). The second
+instance — `last_retrieved_at`, declared `reserved` while 88 rows carried a retrieval timestamp written by
+`feedback.mark_fb_retrieved` — was retired today: declaration corrected, producer set to shape-only, 7,552 legacy
+cells normalised to NULL by `scripts/normalize_runtime_absents.py` (C13 backup, ONE `BEGIN IMMEDIATE`, post-state
+verified). The other 19 columns are deliberately NOT touched: each needs its own verdict against its own schema
+field, and a bulk rewrite of 20 columns would be an unmeasured store-wide change.
+
+## BUG-733 (MED - OPEN 2026-10-12) — UPDATE: scope BROADENED from 20 faults to 25 — ALL of them are ONE missing concept (D-2958)
+
+**MEASURED.** With the role vocabulary now able to say `runtime` (D-2957), the residual role faults number 25 and
+every one of them is the same defect: a role evaluated against an implicit, unmeasured population (the whole
+table). The tier boundaries are exact, not approximate — **14 columns are blank on EXACTLY the 1,049 D-2590
+sidecar rows** (`nonblank` 6,591 = 7,640 − 1,049), `verifier_model` is present on exactly the 6,591 S5 rows,
+`classification_error`/`classification_errors` are present on 0 rows because their writers' population is "rows
+that hit the domain cap", and `menu_hash`/`discipline_macro` are full at 7,640 because the canonical artifact IS
+those rows. This is why the fix cannot be a declaration edit: declaring the 20 tier-conditional columns `sparse`
+would write 20 lies (D-2956 clause 3).
+
+**RULING (D-2958):** `role` must be paired with a DECLARED, MEASURED population, and the rules evaluate WITHIN it.
+The rail implementation is the next workstream and is **owner-gated** — it changes the vocabulary that decides
+governance red/green. Measured destination: 25 faults clear with zero lies, the rail's fatal set falls to the
+MEASUREMENT-DRIFT family alone (BUG-727's `--record`, still owed once, after the store settles).
+
+## BUG-734 (CLOSED 2026-10-12) — ABSORBED by BUG-733/D-2958: its 2 runtime faults were CLEARED, its 5 remaining faults are the SAME concept
+
+**CLOSED AS SUPERSESSION, NOT AS A FIX.** The 7 faults it enumerated were re-examined one at a time:
+* **2 were a ROLE error, not a coverage error, and are now DECLARED AND CLEARED.** `usage_count` was declared
+  `state` ("constant 0, never served") while measuring 5 distinct values and proving 88 retrievals — and
+  `last_retrieved_at` was declared `reserved` while 88 rows carried timestamps. Both are `role: runtime` now
+  (D-2957), the producer writes the correct shape, and the legacy cells are normalised; the rail's `RUNTIME-SHAPE`
+  and `STATE-VIOLATION` faults for these two columns are GONE (verified 2026-10-12).
+* **5 were never their own class.** `classification_error`/`classification_errors` (empty because no row hit the
+  domain cap), `menu_hash`/`discipline_macro` (full because the canonical artifact IS those rows) and
+  `verifier_model` (present on exactly the 6,591 S5 rows) are all the SAME population problem BUG-733 owns.
+  Keeping a second bug for them would double-count one defect, so they move to BUG-733/D-2958 and this bug closes.
+
+## BUG-737 (MED - OPEN 2026-10-12) — the store's ABSENT SHAPE is `''` on 20 of 78 columns while the code declares `None`
+
+**MEASURED (live store):** 20 of 78 columns carry a NON-NULL blank; NOT ONE column that needs NULL lacks it — NULL
+exists only where a decision put it (`duplicate_of` after BUG-726, `feedback_score`). The census: `procedural_skill`
+7,640; `classification_error` 7,640; `last_retrieved_at` 7,552 (retired today by D-2957); `jargon` 3,219;
+`discipline_raw` 1,239; `application`, `elaboration`, `taxonomy_match_method`, `keywords`, `context`,
+`accessibility`, `intimacy_boundary`, `source_text`, `difficulty_level`, `temporal_scope`, `verifier_model`,
+`epistemic_status`, `verification_method`, `practicality`, `failure_mode` — 1,049 each for the 14 sidecar-tier
+columns (the D-2590 tier, exactly) and 275 for `failure_mode`.
+
+**WHY IT MATTERS.** `pipeline/schemas.py` declares these fields `Optional[...] = Field(default=None)`: the CODE says
+absent is `None` and the STORE says absent is `''`. A shape the code cannot keep is the BUG-498 class, and it is
+invisible to every blank-sensitive ruler by construction — that is why BUG-726 hid behind `reserved` for a whole
+release, and why the `runtime` role (D-2957) is the first instrument able to state the difference.
+
+**NOT A BULK REWRITE — deliberately.** The destination is one shape (NULL), and the route is per column: a verdict
+against each column's own schema field, the producer's shape fixed at the same time, and the legacy cells retired
+the way `last_retrieved_at` was (C13 backup, ONE `BEGIN IMMEDIATE`, verified post-state, register-driven population).
+A single rewrite of 20 columns would be an unmeasured store-wide change with no reader-diff proof. The 14
+sidecar-tier columns additionally depend on BUG-733/D-2958's population work, because "absent" for them means
+"outside its tier" — the same concept, declared.
+
+## BUG-736 (MED - OPEN 2026-10-12) — the verifier instruments, measured: the R5 reviewer is uninformative ~40-50% of the time and the S5 NLI's edge is UNMEASURED
+
+**THE R5 LLM REVIEWER'S OWN RECORD (6 passes, every one audited on trace).** 2 clean/approve; 1 that produced two
+REAL findings (both instrument traps, both applied: a numeric-suffix strip that would have collided "Fahrenheit 451"
+with "Fahrenheit", and dead code in a comprehension); 1 that produced three defect claims that were ALL false
+positives on trace; 1 full drift (meta-narration, self-truncation, a claim falsified by an existing test); 1 refusal
+to engage with code it had been given. So the uninformative rate is roughly **40-50%** — the user's impression is
+CORRECT — while the failure that matters, a false positive that gets APPLIED, stands at **0**, because a verifier's
+output is evidence to audit, never a verdict to apply. Nothing here justifies a model swap: what a bad pass costs
+today is tokens, and what trusting a "better" model's pass would cost is a wrong change.
+
+**THE FENCE ALREADY EXISTS AND R5 IS ITS REASON.** `config/eval_integrity.yaml::judge_calibration` admits
+**gemma-4-E4B** and **gpt-oss-20b** only; Qwen3.8/Qwen3-Coder (the generator's family), REAP, Ornith, granite and
+Phi-4-mini are excluded by name. Checked against the live HuggingFace MLX population: the most-downloaded MLX
+text-generation models are `Qwen3.8-27B-MLX-4/5/6/8bit` at 3.9-4.1M downloads EACH — the naive "biggest and most
+popular" answer is the generator's own family, i.e. precisely the blind spot R5 exists to avoid. Among eligible
+non-Qwen families the field is thin (best alternative: `Mistral-Small-3.2-24B-Instruct-2506-MLX-4bit`, ~17k
+downloads = thin community validation), and more importantly BOTH eligible judges have ALREADY been measured
+**DEGENERATE** (BUG-269, 2026-09-17, 72 blind labelled calls: T2 gemma 0.875 == the constant baseline, T6 both
+0.778 == the constant, T3 worse than the constant at -0.56).
+
+**THE S5 NLI RAIL'S LIVE RECORD — reported without over-reading it.** Of 6,571 S5-eligible rows: `entail` 4,503
+(PASS), `neutral` 1,255, `contra` 783, `no_evidence` 29, `vacuous` 19, plus 1 `mech_fail` and 1
+`evidence_contaminated`; the remaining 1,049 rows are `s5_not_applicable` (the D-2590 sidecar tier, which never
+enters S5). So the rail ABSTAINS (NEUTRAL, fail-closed per D-2298) on **19.1%** of the rows it judges and rejects
+11.9%. Whether that is the verifier's own limit or a property of the extraction is **NOT MEASURED on the live
+artifact** — and this bug exists so that it stops being asserted either way. On the only frozen labelled ruler
+where the NLI was scored in a NON-production role it was DEGENERATE (error 0.931 == the constant baseline,
+error-set Jaccard 0.862, D-301/BUG-320), and in its production role the harness reproduces the pipeline's 0.474
+error exactly (D-302) — i.e. the harness is valid and the verifier's EDGE is what is unmeasured.
+
+**RULING (no model swap; the rule already has a home — C21).** The binding constraint is the TASK, not the model:
+BUG-269 already names each fix (T2 → a deterministic string operation, 0 calls; T3 → mechanise the D2587
+step-count test and judge only the residue; T6 → wire the per-FORM `verification_standard`). Two candidates are
+fielded for the benches, both evidence-gated against the EXISTING pre-registered bar
+(`min_margin_over_baseline: 0.15`): (i) `gemma-4-26B-A4B-it-QAT-MLX-4bit` — a same-family capacity step-up that
+keeps the fence, QAT-quantised, ~4B active so the same latency class as E4B (348k downloads); (ii) for the S5
+NLI, `tasksource/ModernBERT-large-nli` (8k context — long evidence passages are exactly where a 512-token
+truncation manufactures NEUTRAL; 16k downloads). BUG-269's caveat is binding: n = 7-9 can REJECT a judge, never
+CERTIFY one, so any adoption must state its n and its margin over the constant baseline, and the S5 side needs a
+labelled sample on the LIVE artifact before its abstention rate can be called a defect.
+
+## BUG-736 (MED - OPEN 2026-10-12) — R5 AUDIT PASS: 1 correct, 2 FALSE POSITIVES, 0 real findings (nothing applied)
+
+Dispatched `gemma-4-E4B-it-MLX-4bit` (provider maxwell_omlx, temperature 0.0) on the two hunks VERBATIM: the new
+`runtime` role branch in scripts/check_store_columns.py and the shape-only write in pipeline/stage6_commit.py.
+The output was AUDITED on trace, not applied.
+
+- **HUNK 2 (the producer half): NONE** — and its reasoning is CORRECT: `_safe_str(...) or None` maps the helper's
+  `''` to NULL while preserving a real timestamp. 1 correct answer.
+- **HUNK 1 claim (a): FALSE on trace.** It asserts that on an all-NULL fresh artifact the new rule flags non-zero
+  `nonnull`/`nonblank`/`hollow`. The rule is `nonnull != nonblank or hollow > 0`, which an all-NULL column
+  satisfies (0 == 0, hollow 0), and control `c20` exercises exactly that shape — a `[None, None]` column fires
+  ONLY the writer-less declaration fault. The claim is falsified by an existing known-answer control.
+- **HUNK 1 claim (b): not a defect.** `filled_by` is a DECLARATION requirement (C12: name the writer), not a
+  state check; on an all-NULL column the writer-less declaration is the intended fault, and `c20` pins it. The
+  claim restates the rule as if it were a bug and names no line.
+
+**Tally: 1 correct / 2 false positives / 0 real findings** — the same 40-50% uninformative band BUG-736 records,
+and this pass was CLEANER than the previous one (no meta-narration, no self-truncation). NOTHING was changed on
+its strength. Standing conclusion for machine-checkable changes: the known-answer controls plus the live
+pre/post measurement ARE the verification; this review added tokens and no information.
+
+
+## BUG-733 (CLOSED 2026-10-12) — LANDED as D-2960: a role is scoped to a DECLARED, MEASURED population
+
+THE FIX IS THE CONCEPT, NOT A RULE EDIT. `config/store_columns.yaml` now declares TWO populations
+(`s5_verified` = `s5_reason <> 's5_not_applicable'` → 6,591 rows; `sidecar` = `s5_reason = 's5_not_applicable'` →
+1,049 rows). They PARTITION the 7,640-row store, so every column has a declared universe and no tier stays
+implicit (D-2958: a role declaration is a claim about a POPULATION, not about a table). The rail gained
+`population` + `outside: absent|unconstrained`, `population_problems()` (a predicate that cannot run is a FAULT,
+never a traceback), `measure_populations()` (the rulers are measured INSIDE the population, never derived -
+`distinct` cannot be subtracted), and the OUTSIDE contract: POPULATION-SPILL / POPULATION-SHAPE /
+OUTSIDE-COVERAGE (the one non-fatal mode) / POPULATION-EMPTY / UNKNOWN-POPULATION / MISSING-OUTSIDE /
+DANGLING-OUTSIDE. Eight new known-answer controls (c21-c28) → 28/28 fire.
+
+WHY THE PREDICATE IS `s5_reason` AND NOT `content_type`: the tier is a property of the VERIFICATION PATH, not of a
+label. MEASURED 2026-10-12: `content_type='principle'` covers 6,577 rows while the S5-adjudicated tier is 6,591 -
+the 14-row gap is exactly the set whose LABEL disagrees with its BODY (12 the owner-adjudicated BUG-712 residue, 2
+the BUG-735 survivors). A label-based population would have written those 14 rows OUT of the tier they were
+verified in; `s5_reason` carries the rail's own verdict and cannot drift from it.
+
+LEDGER, MEASURED (`--check`, before → after):
+  25 role faults (20 CONSTANT-OR-BLANK + 4 SPARSE-VIOLATION + 1 STATE-VIOLATION) + 278 MEASUREMENT-DRIFT
+   → 0 role-coverage faults, 0 sparse/state/reserved violations, 0 drift, 0 census moves, PLUS 15 POPULATION-SHAPE
+     faults that were INVISIBLE under the old vocabulary (all one class: BUG-737) and 2 DECLARED loud notes.
+The 15 are not a new defect: they are the OUTSIDE SHAPE of the same columns (`''` where absent must be NULL,
+D-2957), which no previous declaration could express. The 25 coverage faults were artefacts of the QUESTION.
+
+TWO OF THE 25 WERE ALSO FALSE DECLARATIONS, corrected against the store (not "re-recorded"):
+  `menu_hash` declared `sparse` ("6,591 of 14,574") but measures non-blank on 7,640/7,640 with TWO values - the S4
+  closed-menu hash on the S5 tier and the literal `NOT_APPLICABLE` on the sidecar tier. Declared `state` +
+  population `s5_verified` + `outside: unconstrained`, so the 1,049-row sentinel stays OWED and LOUD.
+  `classification_error` / `classification_errors` declared `sparse` ("52 of 14,574" / "2 of 7,995") but measure
+  0/7,640: that writer DID fire, on a run the store no longer holds, and `sparse` (0 < nonblank < rows) calls a
+  CLEAN run a violation. Declared `reserved` + a `filled_by` naming the writer AND the measurement - `reserved` is
+  "the slot exists, its writer is named, the store MEASURES it empty", it does not claim the writer never fired.
+`failure_mode` is declared `outside: unconstrained` because it is required on every S5 row AND written on 774
+process_template rows: those 774 are DECLARED, so they are OWED, not a spill.
+`pipeline_run_id` was a `value` default reading a constant: the store holds ONE run's artifact (D-2943), so it is
+`state` with that fact as its why. `discipline_raw` is `sparse` INSIDE `s5_verified` (6,401 of 6,591): its 190
+in-tier blanks are a REAL coverage gap and stay visible instead of being declared required.
+D-2642 HOLDS: nothing was hand-edited in `measured:`/`ceiling:`. ONE `--record` wrote the new tail (78 columns +
+`populations.{s5_verified,sidecar}.rows`); the debt ceiling moved 9 → 8 DOWNWARD on measurement, the allowed way.
+
+## BUG-732 (CLOSED 2026-10-12) — the store-columns red is no longer misattributed: the live role faults ARE cleared
+
+The bug was that 27 of the rail's fatal faults were LIVE role violations that `--record` cannot clear, so a
+re-record was being blamed for a defect a re-record cannot reach. MEASURED 2026-10-12: the role faults were not
+"live defects" but a VOCABULARY GAP (BUG-733/D-2958); every one of them is gone by DECLARATION against a measured
+population, and the drift that DID belong to `--record` is gone by exactly one `--record`. The remaining 15 fatal
+faults are one class with one owner (BUG-737, the `''`-as-absent shape), which is a defect in the STORE, not in
+the register. Nothing is misattributed now: each fault names its cause.
+
+## BUG-727 (CLOSED 2026-10-12) — the deliberate `--record` was taken, and it is evidence-based
+
+MEASURED: `--record` → `measured_by: scripts/check_store_columns.py`, 78 columns, `populations.{s5_verified: 6591,
+sidecar: 1049}.rows`, `ceiling {debt: 8, direction: shrink_only}`. `--check` after it: census moves 0 (was 50),
+MEASUREMENT-DRIFT 0 (was 278), debt 8 of 8. The record was deliberately NOT taken in the previous session because
+the store was about to move; it is taken here because the store has settled AND because the declarations changed
+under it (a recorded tail that describes a vocabulary no longer in force is a second kind of stale claim).
+
+## BUG-737 (MED - OPEN 2026-10-12) — UPDATE: the `''`-as-absent shape is now MACHINE-DETECTED, per column
+
+The class is unchanged (the store's absent shape is `''` while the code declares `None`); what changed is that the
+register can now SAY it. `outside: absent` asserts "blank outside the population AND NULL-shaped there", and the
+rail prints one POPULATION-SHAPE fault per column that violates the second half. MEASURED 2026-10-12, the exact
+work queue (all 1,049 outside rows each, i.e. the D-2590 sidecar tier):
+  elaboration, taxonomy_match_method, keywords, discipline_raw, context, accessibility, intimacy_boundary,
+  source_text, difficulty_level, temporal_scope, verifier_model, epistemic_status, verification_method,
+  practicality  (15 columns × 1,049 rows)
+NOT in the queue, measured, with the reason: `domains_raw`, `confidence_score`, `related_fbs`, `isor`,
+`type_body`, `classification_error(s)`, `feedback_score`, `duplicate_of`, `contradicts_fbs`, `prerequisite_fbs`
+are ALREADY NULL-shaped outside their population (the store is right where a decision put it); `menu_hash` is not
+blank outside but carries the literal `NOT_APPLICABLE` (a sentinel standing in for absence - declared
+`unconstrained` so it stays LOUD, and it must NOT be normalized to NULL until its readers are audited, F-44 /
+D-279 label traceability); `application` and `jargon` are `status: debt` and are the same shape class.
+FIX (NOT applied here - it is a store mutation and needs its own reader audit): for each column, make the S6
+producer write NULL for absent (the `_safe_str(...)` default `''` in `pipeline/stage6_commit.py` is the
+manufacturing point) and reshape the legacy `''` → NULL with a C13-backed script in the established
+`scripts/normalize_runtime_absents.py` pattern, ONE column at a time with the readers audited (the MCP reader
+would have emitted the string "None" and had to be fixed for `last_retrieved_at`). NEVER a bulk rewrite.
+
+
+## BUG-736 (MED - OPEN 2026-10-12) — R5 AUDIT PASS on D-2960: UNINFORMATIVE (no findings, no evidence); the numbers were verified INDEPENDENTLY instead
+
+R5 (gemma-4-E4B-it-MLX-4bit, generator != verifier) reviewed the `scripts/check_store_columns.py` diff (451 lines)
+and returned ZERO findings with NO demonstration: it restated the function list ("the logic flow SEEMS to
+correctly branch", "the SQL query construction ... follows the pattern established in the base code"), asserted
+`no obvious logic bugs`, and narrated itself ("The analysis is complete. I will now review the diff"). That is the
+UNINFORMATIVE mode this bug measures, NOT a clean bill of health - BUG-269's meta-rule is that a pass with no
+evidence can never CERTIFY a judge or a diff. NOTHING was applied or reverted on its strength (standing rule: a
+verifier's output is EVIDENCE TO AUDIT, never a verdict to apply).
+
+INDEPENDENT VERIFICATION INSTEAD - the numbers this change rests on were re-derived with DIRECT SQL, not through
+the rail it changed: the store partitions into 6,591 + 1,049 = 7,640 rows; `s5_reason='s5_not_applicable'` is
+exactly the 1,049-row sidecar tier and `type_body` is non-blank on exactly those rows; the 15 POPULATION-SHAPE
+columns measure exactly 1,049 NON-NULL blanks outside their population while `domains_raw`, `confidence_score`,
+`related_fbs` and `isor` measure 0 (genuinely NULL-shaped outside); `failure_mode` is non-blank on 6,591/6,591
+inside and 774 outside; `menu_hash` takes exactly 2 values (the S4 hash on 6,591 / literal NOT_APPLICABLE on
+1,049); `classification_error` and `classification_errors` measure 0 non-blank AND 0 non-NULL. The rail's ledger
+reproduces every one of those numbers.
+
+RUNNING TALLY (7 passes): 2 clean, 1 with 2 REAL findings applied, 1 with 3 false positives, 1 full drift, 1
+refusal, 1 uninformative-with-no-evidence. False positives APPLIED: 0 - which is the whole reason a noisy reviewer
+is still worth running.
+
+## BUG-737 (MED - OPEN 2026-10-12) — CORRECTION of one number in the entry above: the work queue is 14 columns, not 15
+
+The list printed in the BUG-733/BUG-737 entries above is correct and the COUNT was one too high (a miscount, not a
+mis-statement of the queue). AUTHORITATIVE, MEASURED by the rail itself: 14 POPULATION-SHAPE faults -
+`elaboration`, `taxonomy_match_method`, `keywords`, `discipline_raw`, `context`, `accessibility`,
+`intimacy_boundary`, `source_text`, `difficulty_level`, `temporal_scope`, `epistemic_status`,
+`verification_method`, `practicality`, `verifier_model` - each holding exactly 1,049 NON-NULL blanks outside
+`s5_verified`. `type_body` is the control that proves the rule is not blanket: it is the 17th population-scoped
+column, it IS blank outside its population (the 6,591 S5 rows), and it measures NULL-shaped there, so it is
+correctly SILENT. A register that fires on all 17 would be firing on a shape that is already right.
+
+
+## BUG-737 (MED - OPEN 2026-10-12) — UPDATE: the FIRST column is normalised END-TO-END (verifier_model), and the repair is register-driven
+
+**Mechanism landed:** `scripts/normalize_absent_shape.py`. It does NOT carry a column list: the queue is
+DERIVED from the register (a column is in the queue iff it declares BOTH a `population` AND
+`outside: absent`), so it cannot be pointed at a column the ontology has not scoped (C12). Every number
+it prints is read THROUGH the rail (`scripts/check_store_columns.py` measures nonnull/nonblank/hollow in
+both scopes) and the outside numbers are the differences the rail itself uses — so the repair cannot
+disagree with the rail about the store (D-2642: no second home for a measured fact).
+
+**The write (verifier_model):** 1,049 rows OUTSIDE `s5_verified` whose value was a NON-NULL BLANK became
+NULL — ONE `BEGIN IMMEDIATE`, C13 backup first (`backups/maxwell.db.bak_20261012_200852_pre_absent_shape_verifier_model`,
+219,467,776 bytes), post-state verified, rollback on any mismatch. The write's own WHERE clause carries the
+blank test and the rows actually changed MUST equal the count the rail measured, so a drifting predicate
+cannot land.
+
+**The manufacturing point is closed:** `pipeline/stage6_commit.py` now writes `_safe_str(fb.get("verifier_model")) or None`
+(schemas.py already declared `str | None = Field(default=None)`), so a new run cannot reintroduce the blank.
+
+**Evidence, post-state (direct SQL):** `s5|value|6591` and `sidecar|NULL|1049`; rows 7,640; duplicate_of
+non-null 0 (BUG-726 still holds); last_retrieved_at 88 values untouched. In-tier census UNCHANGED — no
+in-population blank was touched, and no hollow was touched (a hollow is a written value, not an absence:
+the script REFUSES such a column rather than rewriting it).
+
+**Rail:** POPULATION-SHAPE 14 -> 13; MEASUREMENT-DRIFT 0 and census moves 0 after ONE deliberate `--record`
+(D-2642: the measured tail re-records, the ceiling does NOT move — debt 8 of ceiling 8, because
+verifier_model is not a `status: debt` column). Tests: 26 passed (test_non_fb_commit, test_checkpoint_resume_d2409).
+
+**R5 pass #8 (the new script): 3 findings, 0 real defects.** Two were already-covered or a misread — the
+pre-write complement check EXISTS, and the affected-row set is covered by the `out_null == old + changed`
+invariant. One was legitimate (C12: the script carried its OWN copy of the blank ruler) and was ACTIONED:
+every measurement now comes from the rail, and the single write predicate is cross-checked by the
+changed-row count. Nothing was applied on the reviewer's word; nothing was reverted.
+
+**Remaining queue (13, one at a time, each with its own reader audit):** accessibility, context,
+difficulty_level, discipline_raw, elaboration, epistemic_status, intimacy_boundary, keywords, practicality,
+source_text, taxonomy_match_method, temporal_scope, verification_method. `menu_hash`'s NOT_APPLICABLE
+sentinel and `failure_mode`'s 774 outside rows stay DECLARED (`outside: unconstrained`) and OWED — never normalised.
+
+## BUG-736 (MED - OPEN 2026-10-12) — VERIFIER MODEL SURVEY + RULING recorded; R5 tally now 8 passes
+
+**Record:** `governance/VERIFIER_MODEL_SURVEY_20261012.md` (HF adoption metrics read from the HF API on
+2026-10-12, LLM-AggreFact leaderboard, JudgeBench, Vectara's HHEM hallucination leaderboard).
+
+**RULING — S5 (grounded verification):** the right shape is a PANEL of purpose-built, non-generator-family
+fact-checkers, NOT a bigger LLM judge. Evidence: Bespoke-MiniCheck-7B averages 77.4 on LLM-AggreFact
+(above Claude-3.5 Sonnet 77.2 and gpt-4o-2024-05-13 75.9) and FactCG-DeBERTa-L at 0.4B averages 75.6;
+MiniCheck-Flan-T5-Large (0.8B, MIT) is the best <1B on the same benchmark at GPT-4 level and 400x cheaper;
+MiniCheck-DeBERTa-v3-Large (0.4B) is a same-size drop-in for the incumbent; HHEM-2.1-Open (Apache-2.0,
+flan-t5-base) gives a 0-1 consistency score with a threshold, i.e. a SECOND, independent family that is
+fail-closed by construction. NO pin changes on popularity: the incumbent stays pinned until a bench on OUR
+rows reports a stated n, the majority-class baseline (BUG-269) and a margin above it
+(min_margin_over_baseline 0.15). A survey is not a measurement (D-2956).
+
+**RULING — R5 (diff/artifact review):** the reviewer stays ADVISORY, and that is now backed by evidence, not
+taste: JudgeBench finds that even GPT-4o judges objective correctness only slightly better than random, so
+false-positives-APPLIED = 0 must remain the invariant. The ONE model change the ecosystem evidence supports
+is moving the reviewer from the 4B gemma to the ALREADY FIELDED 26B-A4B gemma
+(lmstudio-community/gemma-4-26B-A4B-it-QAT-MLX-4bit, 348,226 downloads; its family scores 94.8% factual
+consistency in Vectara's ranking) — and it must land WITH BUG-269's T2/T3 mechanisation, because those
+remove the passes an LLM judge should never have been asked to make.
+
+**REJECTED:** any Qwen-family verifier (the generator IS Qwen3-Coder-30B); swapping on downloads/likes
+alone — the most-downloaded LLMs AND the most-downloaded MLX quants are the generator's own family, which is
+the exact blind spot R5 exists to avoid.
+
+**Pass #8** (the new repair script, R5 = gemma-4-E4B-it-MLX-4bit, temp 0.0): 1 correct-but-already-covered
+concern, 2 misreads, 0 real defects — recorded above in the BUG-737 entry. Running tally: 8 passes =
+2 clean, 1 with 2 REAL findings applied, 1 with 3 false positives, 1 full drift, 1 refusal, 1
+uninformative-with-no-evidence, 1 review-with-0-real-defects.
+## BUG-736 (MED - OPEN 2026-10-12) - OWNER RATIFIED S3/S4; the recommended 26B reviewer was CORRECTED by the pre-commit forensic audit before any pin moved
+
+**Owner decision (2026-10-12):** approved. The verifier-model survey sections 3/4 are now **D-2961**. Ratified:
+S5 stays a PANEL of purpose-built, non-generator-family fact-checkers, and NO pin moves until a bench on OUR rows
+reports a stated n, the constant-majority baseline (BUG-269) and a margin above it (min_margin_over_baseline 0.15) -
+a survey is not a measurement (D-2956). R5 stays ADVISORY and cross-family; its invariant stays false-positives-APPLIED = 0.
+
+**The correction (the forensic audit doing its job, on MY OWN recommendation):** the survey named
+lmstudio-community/gemma-4-26B-A4B-it-QAT-MLX-4bit as 'the already-fielded 26B-A4B gemma'. IT IS NOT FIELDED.
+Evidence: config/model_assignments.yaml lines 145/149/210 DISABLE gemma-4-26B-A4B-it-OptiQ-4bit as a BROKEN model
+('Goose stress test: 5/5 calls fail'); line 70 records 'was gemma-4-26B (BROKEN - removed)'; the local HF cache carries
+only gemma-4-E4B-it-MLX-4bit and gemma-4-12B-it-qat-OptiQ-4bit; governance/eval_models.txt (the LIVE oMLX registry,
+7 models) lists no 26B at all. The QAT artifact is a DIFFERENT quantization from the broken OptiQ one - so it is a
+CANDIDATE, not a drop-in: it needs a fetch AND a BUG-265-class preflight before it may review anything.
+**No pin moved. The promotion is CONDITIONAL, not sanctioned.**
+
+**A second conflict, now named:** Qwen3.8-27B-MLX-4bit was used as the 'deep auditor' in 5 journal verdicts, but it
+shares the Qwen lineage with the generator (Qwen3-Coder-30B-A3B-Instruct-MLX-4bit). R5 means generator != verifier -
+FAMILY INCLUDED. It may stay only as an advisory second opinion, never as the R5 verifier.
+
+**Tally: 9 passes** = 2 clean, 1 with 2 REAL findings applied, 1 with 3 false positives, 1 full drift, 1 refusal,
+1 uninformative-with-no-evidence, 1 review-with-0-real-defects, 1 pass over the gate itself (recorded with BUG-738).
+
+## BUG-738 (MED - OPEN 2026-10-12) - R5 code review had NO deterministic layer: 7 of 43 verdicts were not decisions, and the deep auditor was the generator's own lineage
+
+**Measured (governance/r5_reviews.jsonl, 43 verdicts, read 2026-10-12):** APPROVE 30 / REJECT 6 / INSUFFICIENT 4 /
+UNPARSED 3. Seven of 43 (16%) were NOT decisions, and every UNPARSED was a TRUNCATED verdict JSON - the reviewer's
+output budget was smaller than the verdict it had to emit. Two further modes are structural, not accidental:
+
+(a) the reviewer was asked questions a MACHINE answers exactly - does the file compile (truncation, syntax)? is it
+inside C11/C12? - which need 0 LLM calls and about which a language model can simply be wrong;
+(b) the 'deep auditor' tier used Qwen3.8-27B-MLX-4bit (5 journal verdicts), the same Qwen lineage as the generator
+Qwen3-Coder-30B-A3B-Instruct-MLX-4bit - an R5 FAMILY violation (generator != verifier, family included).
+
+**Filed BEFORE the fix and fixed in the same session (D-2962):** scripts/r5_review_gate.py + config/r5_review_gate.yaml -
+deterministic layers FIRST (syntax via compile(), so no __pycache__ is written; ruff; C11/C12 via
+scripts/pre_commit_gate.py), then ONE advisory reviewer that is TOLD what the machine already proved. The verdict is
+still produced ONLY by scripts/r5_code_review.py (the standing verdict rule is untouched) and the gate restates no
+verdict of its own (D-2646: one fact, one home). Truncation is now a config-declared budget, not a hope.
+Exit codes: 0 APPROVE/layers pass, 1 fatal layer or REJECT, 2 INDECISIVE - and 2 is LOUD, never approval.
+
+**OWED (deliberately not fixed):** the reviewer's own bench. tools/model_eval_suite.py already carries a 'reviewing'
+suite (seeded-bug + false-claim detection). Promotion of ANY reviewer model (the 26B-A4B QAT included) requires that
+bench with a stated n >= 20, the constant-answer baseline and min_margin_over_baseline 0.15 - because D2556's 5-bug
+snippet is a smoke test, not a ranking, and a survey is not a measurement (D-2956).
+
+## BUG-739 (LOW - OPEN 2026-10-12) - the C11 rail is PERMANENTLY RED: it calls 3 stdlib modules undeclared imports, so every control that trusts it must first ignore it
+
+**Measured 2026-10-12 (`python3 scripts/pre_commit_gate.py`, rc=1):**
+  dedup_identity.py: imports difflib - not in stdlib, local, or known deps
+  sqlite_vec_loader.py: imports ctypes (x2) and _sqlite3 - not in stdlib, local, or known deps
+All three ARE stdlib (difflib, ctypes, and the C accelerator _sqlite3), so `check_import_dependencies` is
+classifying against an incomplete hand list instead of the interpreter's own answer.
+**Consequence:** (a) the C11 pre-commit hook fails on every commit, i.e. the hook is disabled by habit;
+(b) the new R5 gate (D-2962) may NOT treat its C11/C12 layer as fatal, because a per-file review would then fail
+on a defect the reviewed file did not cause - and 'a loud rail nobody can satisfy is not a rail' (BUG-540).
+**Fix (deterministic, no LLM):** source the stdlib set from `sys.stdlib_module_names` (3.10+) or `importlib.util.find_spec`
+rather than a literal list, then re-run `scripts/pre_commit_gate.py`; the exclusions the repo keeps deliberately
+(the 2 synthetic fixtures C12 exempts) stay declared.
+
+
+## BUG-738 (MED - OPEN 2026-10-12) - UPDATE: the gate's OWN first live passes, and why the question had to be scoped
+
+**Pass #9 (scripts/r5_review_gate.py reviewing itself, sha256_16 fca79e196c79ca22, gemma-4-E4B-it-MLX-4bit, 2600-token
+budget): INSUFFICIENT.** Not a code defect and not a truncation - the reviewer could not decide the question, because a
+question about "this change" is not answerable from a file that is ITSELF an orchestrator: it could not tell whether it was
+judging the gate or the artifact the gate reviews. That is the mechanism behind 4 of the 43 INSUFFICIENT verdicts: a
+question the source cannot decide produces INSUFFICIENT, which is the correct answer and a worthless review.
+
+**Pass #10 (same file, SAME digest, after the question was scoped in config to "judge THE FILE BELOW against ITS OWN
+docstring, and judge an orchestrator as an orchestrator"): APPROVE**, 0 findings requiring change. Same model, same file,
+same budget - only the QUESTION changed. That is the whole argument for mechanising the parts a machine can decide and
+scoping the rest: the uninformative band is mostly an artefact of the prompt, not of the model.
+
+**Tally: 10 passes** = 2 clean, 1 with 2 REAL findings applied, 1 with 3 false positives, 1 full drift, 1 refusal,
+1 uninformative-with-no-evidence, 1 review-with-0-real-defects, 1 INSUFFICIENT-then-APPROVE on scope (above).
+
+**Also filed while building the gate: BUG-739** (the C11 rail is permanently red - it reads difflib / ctypes / _sqlite3 as
+undeclared imports), which is why the gate's C11/C12 layer is loud-but-non-fatal instead of fatal.
+
+## BUG-740 (LOW - CLOSED 2026-10-12) - the pinned r2_meter's own docstring named a config that does not exist, so a DOC fix became a re-mint event
+
+**MEASURED (staging the D-2860 backlog, 2026-10-12).** `scripts/definition_nli_verify.py` is PINNED (r2_meter, D-2903,
+sha256 5567cf10...). Its working-tree bytes had moved by EXACTLY ONE LINE, inside `_load_r5_definitions`'s docstring:
+`taxonomy_v5.yaml` -> `taxonomy.yaml`. `config/taxonomy_v5.yaml` DOES NOT EXIST (measured: `ls config/taxonomy*.yaml` ->
+taxonomy.yaml, taxonomy_v7.yaml, taxonomy_v8.yaml, taxonomy_v9.yaml). So the meter's OWN documentation named a retired
+home - the D-405 drift class, inside the artifact that certifies a measurement.
+
+**CONSEQUENCE (the rail working, not failing).** `scripts/verify_recalibration_pins.py --staged` REFUSED the entire 51-path
+backlog. A pin certifies that the bytes at HEAD reproduce a measurement; ANY byte move, semantic or not, invalidates that
+certificate - so the rail forces a RE-MINT for a documentation fix. The failure mode it prevents is the tempting alternative:
+overwriting the sha256 under the OLD decision id, which turns the scan green while an old decision certifies a measurement
+nobody re-ran (BUG-391/BUG-526 class; BUG-535 declared the re-mint rule).
+
+**FIX IN THE SAME COMMIT (D-2963).** The docstring now names `config/taxonomy.yaml`; the delta is certified SCORE-NEUTRAL by a
+DETERMINISTIC proof instead of an A/B: `ast.dump(ast.parse(src))` with docstring nodes stripped is BYTE-IDENTICAL between HEAD
+and the worktree (sha 0a3452a1e8087d11 on BOTH), so no score can move - 0 LLM calls (BUG-269: never ask an LLM what a machine
+can decide). The pin is re-minted to sha256 8c3d4edd0de90daf47d68b2b0ea2389f46d0c11b7e42a5a26aca5f976e7a0595 under D-2963.
+CLASS NOTE (not this bug): any FUTURE doc fix inside a pinned artifact is a re-mint by construction - the pin certifies bytes,
+not semantics. CLOSED.

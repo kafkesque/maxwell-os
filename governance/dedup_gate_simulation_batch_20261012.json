@@ -1,0 +1,25 @@
+{
+  "actions": {
+    "insert": 6591
+  },
+  "advisories": {
+    "keep_both_cross_source": [],
+    "keep_both_divergent": [],
+    "review_missing_source": [],
+    "supersede_candidates": []
+  },
+  "candidates": 6591,
+  "checkpoint_rows": 6591,
+  "decision": "D-2951",
+  "gate": "commit_dedup_gate",
+  "identity_model": "D-2950 (normalize_name, source_ids) + body-divergence merge gate",
+  "kinds": {
+    "insert": 6591
+  },
+  "linked_duplicates": [],
+  "mode": "report",
+  "scope": "batch",
+  "skipped_already_stored": 0,
+  "store_names_indexed": 0,
+  "store_rows_indexed": 0
+}

@@ -28,7 +28,7 @@ from pipeline.omlx_call import call_omlx  # noqa: E402
 from pipeline.pipeline_paths import DB_PATH  # noqa: E402
 from pipeline.schemas import match_to_canonical  # noqa: E402
 
-_TAXONOMY = _ROOT / "config" / "taxonomy_v5.yaml"
+_TAXONOMY = _ROOT / "config" / "taxonomy.yaml"
 _OUT = _ROOT / "temp" / "promotion_classify_qwen38.jsonl"
 _MODEL = "Qwen3.8-27B-MLX-4bit"
 _SYSTEM = "You are a precise JSON generator. Return ONLY valid JSON. No markdown, no explanation."

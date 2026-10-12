@@ -13,8 +13,8 @@ D2509 (M1 fix). Two independent failures made vector search dead at D2508/S6:
      after the env was fixed.
 
 This script re-embeds every committed `fbs.definition` (bge-m3 → Matryoshka
-**512d** → L2-normalized) and populates `vec_fbs`. It MUST run under a Python
-build with `enable_load_extension`:
+**512d** → L2-normalized) and populates `vec_fbs`. It runs under any interpreter
+(shared loader's ctypes fallback covers python.org framework builds):
 
     /opt/homebrew/bin/python3 pipeline/backfill_embeddings.py
     /opt/homebrew/bin/python3 pipeline/backfill_embeddings.py --limit 50   # smoke
@@ -48,24 +48,14 @@ CREATE VIRTUAL TABLE IF NOT EXISTS vec_fbs USING vec0(
 
 
 def _load_sqlite_vec(conn: sqlite3.Connection) -> bool:
-    """Load sqlite-vec into the connection. Returns False (and logs) on failure."""
-    try:
-        import sqlite_vec
-    except ImportError:
-        print("  ❌ sqlite-vec not installed in this Python. Run: pip install sqlite-vec")
-        return False
-    try:
-        conn.enable_load_extension(True)
-        sqlite_vec.load(conn)
-        conn.enable_load_extension(False)
-        return True
-    except AttributeError as e:
-        print(f"  ❌ This Python build lacks enable_load_extension ({e}).")
+    """Load sqlite-vec via the shared loader (D-2915); log a precise reason (C16)."""
+    from pipeline.sqlite_vec_loader import load_sqlite_vec
+
+    result = load_sqlite_vec(conn)
+    if not result.loaded:
+        print(f"  ❌ {result.error}")
         print("     Use /opt/homebrew/bin/python3 or the knowledge-pipeline conda env.")
-        return False
-    except Exception as e:
-        print(f"  ❌ sqlite-vec failed to load: {e}")
-        return False
+    return result.loaded
 
 
 def _embed(texts: list[str]) -> list[list[float]]:

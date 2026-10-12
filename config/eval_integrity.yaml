@@ -418,7 +418,7 @@ ruler_measurement:                 # D272a (2026-09-19): the FIRST certified sto
 bakeoff:
   sheet: governance/RULER_BLIND_SHEET_20260917.csv
   key: governance/anchor1_frozen_20260920.json
-  taxonomy: config/taxonomy_v5.yaml
+  taxonomy: config/taxonomy.yaml
   axis: discipline                  # content_type is DEGENERATE here (pipeline constant) — F-17
   sheet_columns:                    # blind-sheet header -> axis (sheet keys rows by item_id)
     content_type: "CT (1-7)"

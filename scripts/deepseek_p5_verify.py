@@ -28,7 +28,7 @@ import yaml
 ROOT = Path(__file__).resolve().parent.parent
 QUEUE = ROOT / "governance" / "p5_freeze_plan.json"
 PROPOSAL = ROOT / "governance" / "p5_deepseek_review.json"
-TAXONOMY = ROOT / "config" / "taxonomy_v5.yaml"
+TAXONOMY = ROOT / "config" / "taxonomy.yaml"
 OUT_JSON = ROOT / "governance" / "p5_deepseek_verify.json"
 OUT_MD = ROOT / "governance" / "p5_deepseek_verify.md"
 

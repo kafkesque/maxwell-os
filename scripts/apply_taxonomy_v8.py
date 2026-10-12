@@ -7,7 +7,7 @@ crash-safe (tempfile -> fsync -> os.replace). Idempotent. Surgical text edits (n
 so YAML comments/formatting are preserved.
 
 Actions:
-  1. promote config/taxonomy_v8.yaml -> config/taxonomy_v5.yaml (LIVE source; renderer + validator
+  1. promote config/taxonomy_v8.yaml -> config/taxonomy.yaml (LIVE source; renderer + validator
      read this path hardcoded — the 'v5' filename is a historical artifact, content now v8).
   2. config/version.yaml taxonomy_version v7 -> v8.
   3. config/normalization_map.yaml: drop 'social science: social sciences' (canonical demoted).
@@ -28,7 +28,7 @@ import yaml
 
 ROOT = Path(__file__).resolve().parent.parent
 V8 = ROOT / "config" / "taxonomy_v8.yaml"
-LIVE = ROOT / "config" / "taxonomy_v5.yaml"
+LIVE = ROOT / "config" / "taxonomy.yaml"
 VERSION = ROOT / "config" / "version.yaml"
 NORM_MAP = ROOT / "config" / "normalization_map.yaml"
 PIPE_CFG = ROOT / "config" / "pipeline_config.yaml"

@@ -45,7 +45,7 @@ from pipeline.schemas import CANONICAL_DOMAINS, CANONICAL_DISCIPLINES
 
 HEX64 = re.compile(r"^[0-9a-f]{64}$")
 
-# D2323 two-axis ontology value sets (content_types.yaml + taxonomy_v5.yaml).
+# D2323 two-axis ontology value sets (content_types.yaml + taxonomy.yaml).
 CONTENT_TYPES = {"principle", "process_template", "process_instance",
                  "tool_instruction", "growth_edge"}
 EXTRACTION_TYPES = {"causal_mechanism", "descriptive_model",

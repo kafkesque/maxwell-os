@@ -48,7 +48,7 @@ from pipeline.json_fixer import parse_json_robust  # noqa: E402
 
 OBJECTS = ROOT / "governance" / "frontier_qwen38_69_objects.json"
 GOLDEN = ROOT / "config" / "golden" / "stage4_golden_mined.yaml"
-TAXONOMY = ROOT / "config" / "taxonomy_v5.yaml"
+TAXONOMY = ROOT / "config" / "taxonomy.yaml"
 EMBED_CACHE = ROOT / "governance" / ".taxonomy_emb_v5.npz"
 OUT_JSON = ROOT / "governance" / "deepseek_frontier69_audit.json"
 OUT_MD = ROOT / "governance" / "deepseek_frontier69_audit.md"

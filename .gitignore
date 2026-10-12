@@ -140,3 +140,6 @@ logs/
 
 # Build intermediates (regenerable from config/taxonomy_v8.yaml via scripts/build_taxonomy_v9.py)
 config/taxonomy_v9.yaml
+
+# goose session state (Todo/Memory/Chatrecall) - sovereign-local, NOT repo content (2026-10-12)
+.goose/

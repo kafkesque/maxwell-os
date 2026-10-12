@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """D2539: BUG-150 axis decisions — 5 domain moves + 5 discipline aliases (user-approved).
 
-Adds alias mappings to taxonomy_v5.yaml so the existing deterministic kind-swap
+Adds alias mappings to taxonomy.yaml so the existing deterministic kind-swap
 (bug197_kind_swap) resolves each both-axes label onto its correct axis:
   - 5 DOMAIN moves   → alias to a DOMAIN canonical;   kind-swap direction B moves the
                        label off the discipline axis (clears discipline_raw, adds domain).
@@ -13,7 +13,7 @@ Kept unique (no mapping here): technical communication, health informatics, urba
 Deferred (deeper review): human factors engineering.
 
 Mechanics (C13 / C6):
-1. Back up DB + taxonomy_v5.yaml + S4/S5 checkpoints.
+1. Back up DB + taxonomy.yaml + S4/S5 checkpoints.
 2. Append alias raw labels to the target canonicals' `raw:` lists (atomic).
 3. Re-run bug197_kind_swap (fresh process → re-reads taxonomy; deterministic, backed up).
 4. Re-sync S4/S5 checkpoints.
@@ -58,7 +58,7 @@ DISCIPLINE_ALIASES: dict[str, str] = {
     "formal logic": "philosophy",
 }
 
-TAXONOMY_PATH = _PROJECT_ROOT / "config" / "taxonomy_v5.yaml"
+TAXONOMY_PATH = _PROJECT_ROOT / "config" / "taxonomy.yaml"
 S4_CHECKPOINT = _PROJECT_ROOT / "knowledge pipeline" / "stage4_merge" / "t11" / "checkpoint_enriched.jsonl"
 S5_CHECKPOINT = _PROJECT_ROOT / "knowledge pipeline" / "stage5_verify" / "t11" / "checkpoint.jsonl"
 
@@ -131,7 +131,7 @@ def _edit_taxonomy(dry_run: bool) -> None:
         if os.path.exists(tmp):
             os.unlink(tmp)
         raise
-    print("  ✅ taxonomy_v5.yaml updated (atomic)")
+    print("  ✅ taxonomy.yaml updated (atomic)")
 
 
 def _sync_checkpoints() -> None:
@@ -179,7 +179,7 @@ def main() -> int:
     if not args.skip_integrity:
         _integrity_gate(db_path)
 
-    print("\n  ✏️  updating taxonomy_v5.yaml ...")
+    print("\n  ✏️  updating taxonomy.yaml ...")
     _edit_taxonomy(dry_run=False)
 
     print("\n  🔄 re-running deterministic kind-swap (fresh process) ...")

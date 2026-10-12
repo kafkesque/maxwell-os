@@ -34,7 +34,7 @@ constructive remediation instruction. Do NOT soften findings.
 ```
 CONSTITUTION.md, DECISION-LOG.md, MASTER-TASK-REGISTER.md, AGENTS.md
 config/
-  taxonomy_v5.yaml          # canonical domains (35) + disciplines (75) + raw aliases
+  taxonomy.yaml          # canonical domains (35) + disciplines (75) + raw aliases
   synonym_map.yaml          # domain synonyms + keywords (kind-scoped)
   alias_map.yaml            # discipline aliases (Phase 0b curated remap, 215 entries)
   content_types.yaml        # principle/PT/PI/GE/TI + extraction_type + body fields

@@ -5,7 +5,7 @@ WHY (Follow-through 4/5 close-out, D-2865/D-2866). ANCHOR-2 (the 60-row R2 annot
 kappas referee) still carries the frozen v5 menu stamp (menu_hash 73597ee2...) and
 pre-v8 domain tokens ('research & methodology' / 'social sciences' / 'science & research'
 + data-quality typos). menu v8 (D-2865) merged/demoted those domains and promoted to live
-`config/taxonomy_v5.yaml`, so the BUG-650 referee guard (pipeline/anchor_menu_guard.py)
+`config/taxonomy.yaml`, so the BUG-650 referee guard (pipeline/anchor_menu_guard.py)
 refuses ANCHOR-2 as a kappa referee until it is re-derived against v8 AND owner-signed.
 
 This script applies the owner-gated decisions banked in

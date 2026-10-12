@@ -9,9 +9,9 @@ contamination (none of the raw labels appear in the DOMAIN axis raw lists, and
 all 6 canonical targets exist in the DISCIPLINE list).
 
 Mechanics (C13 / C6 / C12):
-1. Back up DB + taxonomy_v5.yaml + S4/S5 checkpoints (timestamped, fsync'd).
+1. Back up DB + taxonomy.yaml + S4/S5 checkpoints (timestamped, fsync'd).
 2. Append the raw labels to the canonical entries' `raw:` lists in
-   taxonomy_v5.yaml (permanent alias so future classification maps them via
+   taxonomy.yaml (permanent alias so future classification maps them via
    match_to_canonical → get_synonym_index).
 3. Integrity gate (PRAGMA quick_check + foreign_key_check) — refuse on failure.
 4. Reclassify the affected FBs: discipline 'emerging' → canonical,
@@ -55,7 +55,7 @@ ALIASES: list[tuple[str, list[str]]] = [
     ("engineering", ["manufacturing engineering", "Manufacturing Engineering"]),
 ]
 
-TAXONOMY_PATH = _PROJECT_ROOT / "config" / "taxonomy_v5.yaml"
+TAXONOMY_PATH = _PROJECT_ROOT / "config" / "taxonomy.yaml"
 S4_CHECKPOINT = _PROJECT_ROOT / "knowledge pipeline" / "stage4_merge" / "t11" / "checkpoint_enriched.jsonl"
 S5_CHECKPOINT = _PROJECT_ROOT / "knowledge pipeline" / "stage5_verify" / "t11" / "checkpoint.jsonl"
 
@@ -115,7 +115,7 @@ def _edit_taxonomy_yaml(dry_run: bool) -> dict[str, list[str]]:
         if to_add:
             entry["raw"] = entry.get("raw", []) + to_add
     if dry_run:
-        print("  [dry-run] taxonomy_v5.yaml would add:")
+        print("  [dry-run] taxonomy.yaml would add:")
         for c, vs in added.items():
             if vs:
                 print(f"    {c}: {vs}")
@@ -133,7 +133,7 @@ def _edit_taxonomy_yaml(dry_run: bool) -> dict[str, list[str]]:
         if os.path.exists(tmp):
             os.unlink(tmp)
         raise
-    print("  ✅ taxonomy_v5.yaml updated (atomic)")
+    print("  ✅ taxonomy.yaml updated (atomic)")
     return added
 
 
@@ -246,7 +246,7 @@ def main() -> int:
         _integrity_gate(db_path)
 
     # ── 1. taxonomy YAML alias (permanent) ──
-    print("\n  ✏️  updating taxonomy_v5.yaml ...")
+    print("\n  ✏️  updating taxonomy.yaml ...")
     _edit_taxonomy_yaml(dry_run=False)
 
     # ── 2. reclassify FBs ──

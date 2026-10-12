@@ -65,7 +65,7 @@ FALLBACK_MAX_TOKENS: int = 2048
 COARSE_FLOOR: float = 0.90  # D-2790: coarse (9-way) kappa gate; two-stage viable only if >= this
 
 # C12: paths overridable via env (same convention as train_hierarchical_classifier.py).
-TAXONOMY = Path(os.environ.get("TAXONOMY_YAML", REPO / "config" / "taxonomy_v5.yaml"))
+TAXONOMY = Path(os.environ.get("TAXONOMY_YAML", REPO / "config" / "taxonomy.yaml"))
 ANCHOR = Path(
     os.environ.get(
         "DISCIPLINE_ANCHOR",

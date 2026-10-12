@@ -1,6 +1,12 @@
 #!/usr/bin/env python3
 """discipline_macro_classify.py — Condition C: DEDICATED 3-way MACRO discipline classifier.
 
+RETIRED (D-2929, 2026-10-11): Condition C is RETIRED as a gate. The macro facet is a
+DETERMINISTIC DERIVED projection of the fine discipline (pipeline/discipline_macro.to_macro),
+never a predicted axis; 'emerging' is an abstention+noise bucket (owner-adjudicated novel FBs +
+noise_drop rows), not a positive class. This instrument is retained for HISTORICAL A/B evidence
+only; --gate is fail-closed (exits 1 below the floor) and must never be re-wired to fail-open.
+
 WHAT THIS MEASURES (BUG-622 fix path, D-2792/D-2793/D-2795/D-2796/D-2797)
 -------------------------------------------------------------------------
 The discipline axis is measurement-design-bound, not model-bound. Inter-rater

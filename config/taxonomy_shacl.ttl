@@ -1,5 +1,5 @@
 # config/taxonomy_shacl.ttl — SHACL formalization of Maxwell OS taxonomy (D2546)
-# AUTO-GENERATED from config/taxonomy_v5.yaml — do NOT edit by hand.
+# AUTO-GENERATED from config/taxonomy.yaml — do NOT edit by hand.
 # Regenerate: python3 scripts/generate_taxonomy_shacl.py
 # Canonicals: 41 domains + 64 disciplines = 105 (taxonomy v8)
 

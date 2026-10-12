@@ -27,7 +27,7 @@ GOLDEN_DIR = CONFIG_DIR / "golden"
 # C12: the config files whose content materially shapes pipeline behaviour.
 CONFIG_FILES: list[str] = [
     "pipeline_config.yaml",
-    "taxonomy_v5.yaml",
+    "taxonomy.yaml",
     "content_types.yaml",
     "filtering.yaml",
     "synonym_map.yaml",

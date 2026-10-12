@@ -6,7 +6,7 @@ domains_verdict) and the pipeline-label key, then reports chance-corrected agree
 per axis (D-275a: report ERROR RATE / kappa, never "accuracy") plus a per-row repair queue.
 
 Deterministic measurement script, no generation. Vocabulary + alias resolution come from
-config/taxonomy_v5.yaml (C12: no hardcoded vocabulary).
+config/taxonomy.yaml (C12: no hardcoded vocabulary).
 
 Outputs:
   governance/anchor2_kappa_20260921.json   machine-readable (kappa, per-row verdicts, queue)

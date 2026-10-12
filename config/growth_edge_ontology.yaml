@@ -1,0 +1,94 @@
+# Maxwell OS v3.0 — Growth-Edge Ontology (single source of truth)
+# =============================================================================
+# Decision: D-2924 (owner-approved 2026-10-11) + D-2923 (Layer-2 retrieval contract)
+#
+# PURPOSE (D-2924): the growth_edge `category`/`tags` fields imply a SKILL/CAPABILITY
+# ontology that does NOT exist — the 48/62-way discipline taxonomy is a KNOWLEDGE-axis
+# and does NOT cover GE's open-tension / capability-growth space. Forcing GE into
+# discipline/domain is a category error (D-2923 invariant: GE is keyed by body+status,
+# NEVER discipline/domain). This file defines a CLOSED, provenance-stamped, calibrated
+# vocabulary for the GE category facet BEFORE Stage R emits GE in volume.
+#
+# C12 config-first. Append-only (D2066 self-evolving taxonomy): new categories/tags
+# accumulate via the `raw` label path + calibration, never deleted in place.
+#
+# GROUNDING (every category value maps to a prior decision):
+#   open_tension           → D-2587/BUG-230 entry criterion ("OPEN TENSION")
+#   unverified_correlation → D-2587/BUG-230 entry criterion ("UNVERIFIED CORRELATION")
+#   contested_claim        → D-2747 (CONTESTED/UNFALSIFIABLE, sources contradict)
+#   capability_gap         → D-2923/D-2924 (skill/capability growth space)
+
+schema_version: "1.0"
+decision: D-2924
+retrieval_contract: D-2923
+last_updated: "2026-10-11"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# AXIS 1 — category: WHAT KIND of growth edge (closed, singular, primary facet)
+# ─────────────────────────────────────────────────────────────────────────────
+category:
+  description: "The KIND of speculative/unresolved insight — its epistemic STATUS of
+    openness (the discriminator that separates GE from principle), NOT its domain."
+  cardinality: singular
+  abstention: emerging            # consistent with discipline/domain abstention token
+  values:
+    - open_tension                # an unresolved contradiction between two settled claims
+    - unverified_correlation      # an empirical pattern without a proven causal chain
+    - contested_claim             # disputed/unfalsifiable thesis (sources contradict, D-2747)
+    - capability_gap              # a missing skill/capability the corpus implies but lacks
+
+# ─────────────────────────────────────────────────────────────────────────────
+# AXIS 2 — tags: capability tags (closed bootstrap, append-only, multi-label)
+#   D-2924: "require closed vocabulary + provenance + calibration before Stage R
+#   emits GE in volume." The bootstrap below is the SEED — it is NOT final. It is
+#   extended ONLY through the calibrated raw→canonical path (D2066), never free-gen.
+# ─────────────────────────────────────────────────────────────────────────────
+tags:
+  description: "Capability tags naming the SKILL the growth edge points toward
+    (multi-label). These are NOT disciplines — they describe what Maxwell would
+    learn to DO if the edge is resolved and promoted."
+  cardinality: multi_label
+  abstention: emerging
+  bootstrap:                    # seed set, aligned to Maxwell OS mission surfaces
+    - extraction
+    - retrieval
+    - classification
+    - verification
+    - synthesis
+    - orchestration
+    - grounding
+    - sovereignty
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PROVENANCE — R14 stamps required on every GE category/tags emission
+# ─────────────────────────────────────────────────────────────────────────────
+provenance:
+  stamps:
+    - schema_version
+    - gen_model
+    - pipeline_commit
+    - category_source      # model | owner_adjudicated | raw | calibrated
+    - tags_source          # model | owner_adjudicated | raw | calibrated
+  source_vocabulary: [model, owner_adjudicated, raw, calibrated]
+
+# ─────────────────────────────────────────────────────────────────────────────
+# CALIBRATION CONTRACT (D-2924) — gate before Stage R emits GE in volume
+#   Mirrors the discipline macro gate (D-2884a): the category classifier must hit
+#   a human-parity kappa floor on a gold set before it is allowed to emit in volume.
+#   The gold set does NOT exist yet — this contract DECLARES it as a hard gate.
+# ─────────────────────────────────────────────────────────────────────────────
+calibration:
+  gate_mode: advisory          # flips to `enforcing` once the gold set is minted
+  kappa_floor: 0.65            # human-parity floor for the category axis (D-2924)
+  # D-2929 LESSON (2026-10-11): measure the 4 REAL category values ONLY. `emerging`
+  # (abstention token) is a routing side-channel, NEVER a 5th predicted class — the T8
+  # 3-way macro gate died precisely because it scored an abstention+noise bucket as a
+  # positive class (kappa 0.5684 < 0.73). The GE gold must exclude category=emerging
+  # rows from the kappa denominator (they exercise D-2898 match_to_canonical + owner
+  # gate, NOT this classifier). Mirrors the retired D-2884a gate ONLY in its fail-closed
+  # shape, never in its 'emerging as a class' scoring mistake.
+  gold_path: config/golden/ge_category_gold.yaml   # does NOT exist yet — the gate
+                                 # refuses volume emission until it is minted + stamped
+  requires_gold_before_volume: true
+  calibration_decision: null   # minted by a dedicated calibration script (like
+                               # scripts/paraphrase_calibrate.py) — NOT hand-set

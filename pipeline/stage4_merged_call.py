@@ -111,7 +111,7 @@ def _render_discipline_closed_menu() -> str:
     from pipeline.schemas import CANONICAL_DISCIPLINES
     real = [d for d in CANONICAL_DISCIPLINES if d != "emerging"]
     if not real:
-        raise RuntimeError("D-2773: discipline closed menu empty (taxonomy_v5.yaml has no disciplines)")
+        raise RuntimeError("D-2773: discipline closed menu empty (taxonomy.yaml has no disciplines)")
     menu = "\n".join(f"- {d}" for d in real)
     block = (
         "DISCIPLINE CLOSED MENU (D-2773, config-driven):\n"

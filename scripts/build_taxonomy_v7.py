@@ -27,7 +27,7 @@ from pathlib import Path
 import yaml
 
 ROOT = Path(__file__).resolve().parent.parent
-SRC = ROOT / "config" / "taxonomy_v5.yaml"
+SRC = ROOT / "config" / "taxonomy.yaml"
 OUT = ROOT / "config" / "taxonomy_v7.yaml"
 MIG = ROOT / "governance" / "taxonomy_v7_migration.json"
 

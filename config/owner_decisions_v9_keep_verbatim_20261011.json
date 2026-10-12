@@ -1,0 +1,1443 @@
+{
+  "R001": {
+    "discipline": "privacy & surveillance",
+    "domains": [
+      "digital product",
+      "information architecture",
+      "marketing & communications"
+    ]
+  },
+  "R002": {
+    "discipline": "cultural studies",
+    "domains": [
+      "media & entertainment",
+      "semiotics & communication"
+    ]
+  },
+  "R003": {
+    "discipline": "cognitive science",
+    "domains": [
+      "education",
+      "research practice",
+      "user experience"
+    ]
+  },
+  "R004": {
+    "discipline": "political economy",
+    "domains": [
+      "legal & public policy"
+    ]
+  },
+  "R005": {
+    "discipline": "computer graphics",
+    "domains": [
+      "data visualization"
+    ]
+  },
+  "R006": {
+    "discipline": "",
+    "domains": [
+      "code & computation",
+      "computational art",
+      "creative technology"
+    ]
+  },
+  "R007": {
+    "discipline": "engineering",
+    "domains": [
+      "design strategy",
+      "education",
+      "engineering & infrastructure",
+      "product design",
+      "user experience"
+    ]
+  },
+  "R008": {
+    "discipline": "psychology",
+    "domains": [
+      "health & wellness"
+    ]
+  },
+  "R009": {
+    "discipline": "decision making",
+    "domains": [
+      "entrepreneurship"
+    ]
+  },
+  "R010": {
+    "discipline": "design thinking",
+    "domains": [
+      "business development",
+      "digital product",
+      "product design",
+      "project management",
+      "user experience"
+    ]
+  },
+  "R011": {
+    "discipline": "information science",
+    "domains": [
+      "ai & agents"
+    ]
+  },
+  "R013": {
+    "discipline": "risk management",
+    "domains": [
+      "business operations",
+      "finance & investment"
+    ]
+  },
+  "R014": {
+    "discipline": "philosophy",
+    "domains": [
+      "arts & culture",
+      "semiotics & communication"
+    ]
+  },
+  "R015": {
+    "discipline": "business administration",
+    "domains": [
+      "business development"
+    ]
+  },
+  "R016": {
+    "discipline": "semiotics",
+    "domains": [
+      "semiotics & communication"
+    ]
+  },
+  "R017": {
+    "discipline": "computational physics & simulation",
+    "domains": [
+      "computational science & physics"
+    ]
+  },
+  "R018": {
+    "discipline": "color theory",
+    "domains": [
+      "brand identity",
+      "design systems",
+      "editorial & advertising",
+      "graphic design",
+      "user experience"
+    ]
+  },
+  "R019": {
+    "discipline": "research methodology",
+    "domains": [
+      "research practice"
+    ]
+  },
+  "R020": {
+    "discipline": "complex adaptive systems",
+    "domains": [
+      "ai & agents",
+      "business development",
+      "entrepreneurship",
+      "systems & frameworks"
+    ]
+  },
+  "R022": {
+    "discipline": "human-computer interaction",
+    "domains": [
+      "design strategy",
+      "marketing & communications",
+      "user experience"
+    ]
+  },
+  "R023": {
+    "discipline": "decision making",
+    "domains": [
+      "leadership",
+      "personal productivity",
+      "project management"
+    ]
+  },
+  "R024": {
+    "discipline": "business administration",
+    "domains": [
+      "business development",
+      "business operations",
+      "finance & investment"
+    ]
+  },
+  "R025": {
+    "discipline": "organizational theory",
+    "domains": [
+      "design strategy",
+      "leadership",
+      "organizational behavior"
+    ]
+  },
+  "R027": {
+    "discipline": "organizational theory",
+    "domains": [
+      "leadership",
+      "organizational behavior"
+    ]
+  },
+  "R028": {
+    "discipline": "machine learning",
+    "domains": [
+      "engineering practice"
+    ]
+  },
+  "R029": {
+    "discipline": "business administration",
+    "domains": [
+      "brand identity",
+      "business development",
+      "design strategy",
+      "marketing & communications",
+      "product design"
+    ]
+  },
+  "R030": {
+    "discipline": "computer graphics",
+    "domains": [
+      "code & computation"
+    ]
+  },
+  "R031": {
+    "discipline": "risk management",
+    "domains": [
+      "research practice"
+    ]
+  },
+  "R032": {
+    "discipline": "software engineering",
+    "domains": [
+      "data visualization",
+      "engineering practice"
+    ]
+  },
+  "R033": {
+    "discipline": "philosophy",
+    "domains": [
+      "research practice"
+    ]
+  },
+  "R035": {
+    "discipline": "visual perception",
+    "domains": [
+      "data visualization",
+      "systems & frameworks"
+    ]
+  },
+  "R036": {
+    "discipline": "marketing",
+    "domains": [
+      "brand identity",
+      "design strategy",
+      "marketing & communications",
+      "user experience"
+    ]
+  },
+  "R037": {
+    "discipline": "software engineering",
+    "domains": [
+      "engineering practice"
+    ]
+  },
+  "R038": {
+    "discipline": "research methodology",
+    "domains": [
+      "data visualization",
+      "research practice"
+    ]
+  },
+  "R039": {
+    "discipline": "sociology",
+    "domains": [
+      "design strategy",
+      "marketing & communications",
+      "semiotics & communication"
+    ]
+  },
+  "R041": {
+    "discipline": "marketing",
+    "domains": [
+      "design strategy",
+      "editorial & advertising",
+      "marketing & communications",
+      "product design",
+      "user experience"
+    ]
+  },
+  "R042": {
+    "discipline": "human-computer interaction",
+    "domains": [
+      "user experience"
+    ]
+  },
+  "R043": {
+    "discipline": "cognitive science",
+    "domains": [
+      "arts & culture",
+      "personal productivity"
+    ]
+  },
+  "R044": {
+    "discipline": "systems thinking",
+    "domains": [
+      "design strategy",
+      "environmental design",
+      "industrial design",
+      "product design"
+    ]
+  },
+  "R045": {
+    "discipline": "marketing",
+    "domains": [
+      "brand identity",
+      "marketing & communications"
+    ]
+  },
+  "R046": {
+    "discipline": "economics",
+    "domains": [
+      "finance & investment"
+    ]
+  },
+  "R047": {
+    "discipline": "psychology",
+    "domains": [
+      "design strategy",
+      "user experience"
+    ]
+  },
+  "R048": {
+    "discipline": "creative process",
+    "domains": [
+      "arts & culture",
+      "graphic design",
+      "illustration"
+    ]
+  },
+  "R049": {
+    "discipline": "operations research",
+    "domains": [
+      "personal productivity",
+      "project management",
+      "research practice",
+      "systems & frameworks"
+    ]
+  },
+  "R050": {
+    "discipline": "research methodology",
+    "domains": [
+      "research practice"
+    ]
+  },
+  "R051": {
+    "discipline": "cultural design",
+    "domains": [
+      "urban planning"
+    ]
+  },
+  "R052": {
+    "discipline": "design thinking",
+    "domains": [
+      "design strategy"
+    ]
+  },
+  "R053": {
+    "discipline": "emerging",
+    "domains": [
+      "code & computation",
+      "computational science & physics",
+      "systems & frameworks"
+    ]
+  },
+  "R054": {
+    "discipline": "machine learning",
+    "domains": [
+      "code & computation"
+    ]
+  },
+  "R055": {
+    "discipline": "marketing",
+    "domains": [
+      "marketing & communications"
+    ]
+  },
+  "R056": {
+    "discipline": "generative ai",
+    "domains": [
+      "education"
+    ]
+  },
+  "R057": {
+    "discipline": "finance",
+    "domains": [
+      "finance & investment"
+    ]
+  },
+  "R058": {
+    "discipline": "communication theory",
+    "domains": [
+      "editorial & advertising",
+      "illustration",
+      "marketing & communications",
+      "semiotics & communication"
+    ]
+  },
+  "R059": {
+    "discipline": "",
+    "domains": [
+      "business development",
+      "education",
+      "entrepreneurship",
+      "product design",
+      "user experience"
+    ]
+  },
+  "R060": {
+    "discipline": "semiotics",
+    "domains": [
+      "graphic design"
+    ]
+  },
+  "R061": {
+    "discipline": "organizational theory",
+    "domains": [
+      "leadership",
+      "organizational behavior"
+    ]
+  },
+  "R062": {
+    "discipline": "behavioral economics",
+    "domains": [
+      "marketing & communications",
+      "media & entertainment",
+      "user experience"
+    ]
+  },
+  "R063": {
+    "discipline": "cultural studies",
+    "domains": [
+      "digital product",
+      "education",
+      "media & entertainment",
+      "semiotics & communication"
+    ]
+  },
+  "R064": {
+    "discipline": "typography",
+    "domains": [
+      "brand identity",
+      "design systems",
+      "editorial & advertising",
+      "graphic design",
+      "web & ui"
+    ]
+  },
+  "R065": {
+    "discipline": "media studies",
+    "domains": [
+      "media & entertainment"
+    ]
+  },
+  "R066": {
+    "discipline": "computational geometry",
+    "domains": [
+      "code & computation",
+      "computational science & physics",
+      "engineering practice"
+    ]
+  },
+  "R067": {
+    "discipline": "interdisciplinary studies",
+    "domains": [
+      "creative technology",
+      "media & entertainment",
+      "user experience"
+    ]
+  },
+  "R068": {
+    "discipline": "aesthetics",
+    "domains": [
+      "design strategy",
+      "design systems",
+      "editorial & advertising",
+      "graphic design"
+    ]
+  },
+  "R069": {
+    "discipline": "research methodology",
+    "domains": [
+      "engineering practice",
+      "research practice"
+    ]
+  },
+  "R070": {
+    "discipline": "design thinking",
+    "domains": [
+      "design strategy",
+      "product design",
+      "user experience"
+    ]
+  },
+  "R071": {
+    "discipline": "entrepreneurship studies",
+    "domains": [
+      "business development",
+      "entrepreneurship",
+      "research practice"
+    ]
+  },
+  "R072": {
+    "discipline": "entrepreneurship studies",
+    "domains": [
+      "business development",
+      "design strategy",
+      "entrepreneurship",
+      "urban planning"
+    ]
+  },
+  "R073": {
+    "discipline": "anthropology",
+    "domains": [
+      "education",
+      "research practice"
+    ]
+  },
+  "R074": {
+    "discipline": "cognitive science",
+    "domains": [
+      "user experience"
+    ]
+  },
+  "R075": {
+    "discipline": "philosophy",
+    "domains": [
+      "arts & culture",
+      "systems & frameworks"
+    ]
+  },
+  "R076": {
+    "discipline": "marketing",
+    "domains": [
+      "arts & culture",
+      "brand identity",
+      "marketing & communications",
+      "semiotics & communication"
+    ]
+  },
+  "R077": {
+    "discipline": "cultural studies",
+    "domains": [
+      "marketing & communications",
+      "semiotics & communication"
+    ]
+  },
+  "R078": {
+    "discipline": "generative design",
+    "domains": [
+      "code & computation",
+      "computational art",
+      "creative technology",
+      "design systems"
+    ]
+  },
+  "R079": {
+    "discipline": "linguistics",
+    "domains": [
+      "arts & culture",
+      "brand identity",
+      "design strategy",
+      "editorial & advertising",
+      "graphic design",
+      "marketing & communications",
+      "semiotics & communication"
+    ]
+  },
+  "R081": {
+    "discipline": "behavioral economics",
+    "domains": [
+      "marketing & communications"
+    ]
+  },
+  "R083": {
+    "discipline": "behavioral economics",
+    "domains": [
+      "marketing & communications",
+      "user experience"
+    ]
+  },
+  "R085": {
+    "discipline": "cultural studies",
+    "domains": [
+      "education",
+      "health & wellness",
+      "semiotics & communication"
+    ]
+  },
+  "R086": {
+    "discipline": "behavioral economics",
+    "domains": [
+      "digital product",
+      "marketing & communications",
+      "user experience"
+    ]
+  },
+  "R087": {
+    "discipline": "psychology",
+    "domains": [
+      "organizational behavior"
+    ]
+  },
+  "R088": {
+    "discipline": "human-computer interaction",
+    "domains": [
+      "digital product",
+      "user experience",
+      "web & ui"
+    ]
+  },
+  "R089": {
+    "discipline": "human-computer interaction",
+    "domains": [
+      "design strategy",
+      "engineering & infrastructure",
+      "user experience"
+    ]
+  },
+  "R090": {
+    "discipline": "media studies",
+    "domains": [
+      "design strategy",
+      "design systems",
+      "editorial & advertising",
+      "media & entertainment",
+      "semiotics & communication"
+    ]
+  },
+  "R091": {
+    "discipline": "systems thinking",
+    "domains": [
+      "design strategy",
+      "education"
+    ]
+  },
+  "R092": {
+    "discipline": "research methodology",
+    "domains": [
+      "data visualization",
+      "media & entertainment",
+      "research practice"
+    ]
+  },
+  "R093": {
+    "discipline": "semiotics",
+    "domains": [
+      "design strategy",
+      "design systems",
+      "semiotics & communication"
+    ]
+  },
+  "R094": {
+    "discipline": "human-computer interaction",
+    "domains": [
+      "digital product",
+      "product design",
+      "user experience",
+      "web & ui"
+    ]
+  },
+  "R095": {
+    "discipline": "psychology",
+    "domains": [
+      "arts & culture",
+      "environmental design",
+      "marketing & communications",
+      "product design"
+    ]
+  },
+  "R096": {
+    "discipline": "finance",
+    "domains": [
+      "business operations",
+      "engineering & infrastructure",
+      "project management"
+    ]
+  },
+  "R097": {
+    "discipline": "decision making",
+    "domains": [
+      "business development",
+      "business operations",
+      "design strategy",
+      "finance & investment"
+    ]
+  },
+  "R098": {
+    "discipline": "aesthetics",
+    "domains": [
+      "arts & culture",
+      "design strategy",
+      "digital product",
+      "graphic design",
+      "product design"
+    ]
+  },
+  "R099": {
+    "discipline": "marketing",
+    "domains": [
+      "brand identity",
+      "design strategy",
+      "marketing & communications"
+    ]
+  },
+  "R100": {
+    "discipline": "business administration",
+    "domains": [
+      "business development",
+      "entrepreneurship",
+      "marketing & communications"
+    ]
+  },
+  "R101": {
+    "discipline": "philosophy",
+    "domains": [
+      "education",
+      "research practice"
+    ]
+  },
+  "R102": {
+    "discipline": "entrepreneurship studies",
+    "domains": [
+      "entrepreneurship"
+    ]
+  },
+  "R103": {
+    "discipline": "semiotics",
+    "domains": [
+      "illustration",
+      "media & entertainment",
+      "motion design"
+    ]
+  },
+  "R104": {
+    "discipline": "operations research",
+    "domains": [
+      "data visualization",
+      "information architecture",
+      "research practice"
+    ]
+  },
+  "R105": {
+    "discipline": "operations research",
+    "domains": [
+      "business operations",
+      "finance & investment",
+      "research practice"
+    ]
+  },
+  "R107": {
+    "discipline": "philosophy",
+    "domains": [
+      "education",
+      "research practice",
+      "user experience"
+    ]
+  },
+  "R108": {
+    "discipline": "typography",
+    "domains": [
+      "brand identity",
+      "design strategy",
+      "graphic design"
+    ]
+  },
+  "R109": {
+    "discipline": "behavioral economics",
+    "domains": [
+      "organizational behavior",
+      "personal productivity",
+      "user experience"
+    ]
+  },
+  "R110": {
+    "discipline": "information science",
+    "domains": [
+      "design systems",
+      "information architecture",
+      "systems & frameworks",
+      "web & ui"
+    ]
+  },
+  "R111": {
+    "discipline": "typography",
+    "domains": [
+      "arts & culture",
+      "graphic design"
+    ]
+  },
+  "R112": {
+    "discipline": "research methodology",
+    "domains": [
+      "research practice"
+    ]
+  },
+  "R113": {
+    "discipline": "operations research",
+    "domains": [
+      "computational science & physics",
+      "engineering practice"
+    ]
+  },
+  "R114": {
+    "discipline": "decision making",
+    "domains": [
+      "business operations",
+      "personal productivity"
+    ]
+  },
+  "R115": {
+    "discipline": "operations research",
+    "domains": [
+      "research practice"
+    ]
+  },
+  "R116": {
+    "discipline": "risk management",
+    "domains": [
+      "business operations",
+      "engineering & infrastructure",
+      "organizational behavior",
+      "project management"
+    ]
+  },
+  "R117": {
+    "discipline": "behavioral economics",
+    "domains": [
+      "finance & investment",
+      "personal productivity"
+    ]
+  },
+  "R118": {
+    "discipline": "research methodology",
+    "domains": [
+      "ai & agents"
+    ]
+  },
+  "R119": {
+    "discipline": "business administration",
+    "domains": [
+      "business operations",
+      "entrepreneurship",
+      "leadership"
+    ]
+  },
+  "R120": {
+    "discipline": "computer graphics",
+    "domains": [
+      "data visualization"
+    ]
+  },
+  "R121": {
+    "discipline": "business administration",
+    "domains": [
+      "business development",
+      "business operations",
+      "marketing & communications",
+      "product design"
+    ]
+  },
+  "R122": {
+    "discipline": "visual perception",
+    "domains": [
+      "editorial & advertising",
+      "graphic design",
+      "user experience",
+      "web & ui"
+    ]
+  },
+  "R123": {
+    "discipline": "computational geometry",
+    "domains": [
+      "code & computation",
+      "creative technology"
+    ]
+  },
+  "R124": {
+    "discipline": "artificial intelligence",
+    "domains": [
+      "engineering practice",
+      "systems & frameworks"
+    ]
+  },
+  "R125": {
+    "discipline": "business administration",
+    "domains": [
+      "business development",
+      "business operations",
+      "marketing & communications"
+    ]
+  },
+  "R126": {
+    "discipline": "cultural design",
+    "domains": [
+      "business operations",
+      "design strategy",
+      "design systems",
+      "industrial design",
+      "marketing & communications",
+      "user experience"
+    ]
+  },
+  "R127": {
+    "discipline": "",
+    "domains": [
+      "design strategy",
+      "design systems",
+      "education"
+    ]
+  },
+  "R128": {
+    "discipline": "decision making",
+    "domains": [
+      "design strategy",
+      "personal productivity",
+      "user experience"
+    ]
+  },
+  "R129": {
+    "discipline": "marketing",
+    "domains": [
+      "business development",
+      "finance & investment",
+      "research practice"
+    ]
+  },
+  "R130": {
+    "discipline": "typography",
+    "domains": [
+      "editorial & advertising",
+      "graphic design"
+    ]
+  },
+  "R131": {
+    "discipline": "privacy & surveillance",
+    "domains": [
+      "information architecture"
+    ]
+  },
+  "R132": {
+    "discipline": "computational physics & simulation",
+    "domains": [
+      "computational science & physics"
+    ]
+  },
+  "R133": {
+    "discipline": "risk management",
+    "domains": [
+      "systems & frameworks"
+    ]
+  },
+  "R134": {
+    "discipline": "information science",
+    "domains": [
+      "ai & agents",
+      "information architecture"
+    ]
+  },
+  "R135": {
+    "discipline": "design thinking",
+    "domains": [
+      "design strategy"
+    ]
+  },
+  "R136": {
+    "discipline": "generative ai",
+    "domains": [
+      "ai & agents",
+      "information architecture"
+    ]
+  },
+  "R137": {
+    "discipline": "behavioral economics",
+    "domains": [
+      "user experience"
+    ]
+  },
+  "R138": {
+    "discipline": "linguistics",
+    "domains": [
+      "semiotics & communication"
+    ]
+  },
+  "R139": {
+    "discipline": "cognitive science",
+    "domains": [
+      "education",
+      "personal productivity"
+    ]
+  },
+  "R141": {
+    "discipline": "machine learning",
+    "domains": [
+      "code & computation",
+      "engineering practice"
+    ]
+  },
+  "R142": {
+    "discipline": "communication theory",
+    "domains": [
+      "media & entertainment",
+      "systems & frameworks"
+    ]
+  },
+  "R143": {
+    "discipline": "computer graphics",
+    "domains": [
+      "design systems"
+    ]
+  },
+  "R144": {
+    "discipline": "software engineering",
+    "domains": [
+      "code & computation"
+    ]
+  },
+  "R145": {
+    "discipline": "color theory",
+    "domains": [
+      "brand identity",
+      "design strategy",
+      "graphic design",
+      "marketing & communications",
+      "semiotics & communication"
+    ]
+  },
+  "R146": {
+    "discipline": "",
+    "domains": [
+      "leadership",
+      "organizational behavior"
+    ]
+  },
+  "R147": {
+    "discipline": "research methodology",
+    "domains": [
+      "data visualization",
+      "research practice"
+    ]
+  },
+  "R149": {
+    "discipline": "visual perception",
+    "domains": [
+      "creative technology",
+      "design strategy"
+    ]
+  },
+  "R150": {
+    "discipline": "strategic thinking",
+    "domains": [
+      "business development",
+      "design strategy",
+      "marketing & communications",
+      "organizational behavior",
+      "systems & frameworks"
+    ]
+  },
+  "R151": {
+    "discipline": "cognitive science",
+    "domains": [
+      "education",
+      "research practice"
+    ]
+  },
+  "R152": {
+    "discipline": "political economy",
+    "domains": [
+      "business development",
+      "legal & public policy",
+      "marketing & communications"
+    ]
+  },
+  "R153": {
+    "discipline": "cognitive science",
+    "domains": [
+      "user experience"
+    ]
+  },
+  "R154": {
+    "discipline": "finance",
+    "domains": [
+      "business operations",
+      "finance & investment",
+      "leadership"
+    ]
+  },
+  "R155": {
+    "discipline": "business administration",
+    "domains": [
+      "business development",
+      "leadership",
+      "personal productivity"
+    ]
+  },
+  "R156": {
+    "discipline": "cognitive science",
+    "domains": [
+      "design strategy",
+      "design systems",
+      "education",
+      "user experience"
+    ]
+  },
+  "R157": {
+    "discipline": "cognitive science",
+    "domains": [
+      "arts & culture",
+      "education",
+      "marketing & communications",
+      "personal productivity",
+      "semiotics & communication",
+      "user experience"
+    ]
+  },
+  "R158": {
+    "discipline": "cultural design",
+    "domains": [
+      "arts & culture",
+      "design strategy",
+      "design systems",
+      "graphic design",
+      "illustration",
+      "semiotics & communication",
+      "user experience"
+    ]
+  },
+  "R159": {
+    "discipline": "risk management",
+    "domains": [
+      "digital product",
+      "product design",
+      "research practice",
+      "user experience"
+    ]
+  },
+  "R160": {
+    "discipline": "operations research",
+    "domains": [
+      "business development",
+      "finance & investment",
+      "marketing & communications"
+    ]
+  },
+  "R162": {
+    "discipline": "psychology",
+    "domains": [
+      "education",
+      "leadership",
+      "organizational behavior"
+    ]
+  },
+  "R163": {
+    "discipline": "communication theory",
+    "domains": [
+      "editorial & advertising",
+      "marketing & communications",
+      "packaging",
+      "semiotics & communication"
+    ]
+  },
+  "R164": {
+    "discipline": "philosophy",
+    "domains": [
+      "education",
+      "research practice",
+      "semiotics & communication"
+    ]
+  },
+  "R165": {
+    "discipline": "",
+    "domains": [
+      "editorial & advertising"
+    ]
+  },
+  "R166": {
+    "discipline": "economics",
+    "domains": [
+      "ai & agents",
+      "engineering & infrastructure"
+    ]
+  },
+  "R167": {
+    "discipline": "organizational theory",
+    "domains": [
+      "brand identity",
+      "marketing & communications",
+      "organizational behavior"
+    ]
+  },
+  "R168": {
+    "discipline": "marketing",
+    "domains": [
+      "research practice"
+    ]
+  },
+  "R169": {
+    "discipline": "psychology",
+    "domains": [
+      "leadership"
+    ]
+  },
+  "R170": {
+    "discipline": "decision making",
+    "domains": [
+      "personal productivity"
+    ]
+  },
+  "R171": {
+    "discipline": "computer graphics",
+    "domains": [
+      "code & computation"
+    ]
+  },
+  "R172": {
+    "discipline": "engineering",
+    "domains": [
+      "engineering & infrastructure",
+      "engineering practice",
+      "product design"
+    ]
+  },
+  "R173": {
+    "discipline": "social network analysis",
+    "domains": [
+      "business development"
+    ]
+  },
+  "R174": {
+    "discipline": "design thinking",
+    "domains": [
+      "digital product",
+      "industrial design",
+      "product design",
+      "user experience"
+    ]
+  },
+  "R175": {
+    "discipline": "artificial intelligence",
+    "domains": [
+      "ai & agents"
+    ]
+  },
+  "R176": {
+    "discipline": "finance",
+    "domains": [
+      "finance & investment"
+    ]
+  },
+  "R177": {
+    "discipline": "semiotics",
+    "domains": [
+      "marketing & communications",
+      "semiotics & communication"
+    ]
+  },
+  "R178": {
+    "discipline": "psychology",
+    "domains": [
+      "personal productivity"
+    ]
+  },
+  "R179": {
+    "discipline": "creative process",
+    "domains": [
+      "brand identity",
+      "editorial & advertising",
+      "graphic design",
+      "marketing & communications",
+      "semiotics & communication"
+    ]
+  },
+  "R181": {
+    "discipline": "economics",
+    "domains": [
+      "systems & frameworks"
+    ]
+  },
+  "R183": {
+    "discipline": "",
+    "domains": [
+      "urban planning"
+    ]
+  },
+  "R184": {
+    "discipline": "behavioral economics",
+    "domains": [
+      "health & wellness"
+    ]
+  },
+  "R185": {
+    "discipline": "marketing",
+    "domains": [
+      "editorial & advertising",
+      "marketing & communications",
+      "media & entertainment"
+    ]
+  },
+  "R186": {
+    "discipline": "research methodology",
+    "domains": [
+      "marketing & communications",
+      "research practice"
+    ]
+  },
+  "R187": {
+    "discipline": "communication theory",
+    "domains": [
+      "marketing & communications"
+    ]
+  },
+  "R188": {
+    "discipline": "cognitive science",
+    "domains": [
+      "education"
+    ]
+  },
+  "R189": {
+    "discipline": "computational physics & simulation",
+    "domains": [
+      "engineering practice",
+      "systems & frameworks"
+    ]
+  },
+  "R190": {
+    "discipline": "design thinking",
+    "domains": [
+      "business operations",
+      "design strategy",
+      "leadership",
+      "project management"
+    ]
+  },
+  "R191": {
+    "discipline": "motion & time",
+    "domains": [
+      "motion design"
+    ]
+  },
+  "R192": {
+    "discipline": "finance",
+    "domains": [
+      "finance & investment"
+    ]
+  },
+  "R193": {
+    "discipline": "political economy",
+    "domains": [
+      "legal & public policy"
+    ]
+  },
+  "R195": {
+    "discipline": "generative ai",
+    "domains": [
+      "ai & agents",
+      "engineering & infrastructure"
+    ]
+  },
+  "R196": {
+    "discipline": "human-computer interaction",
+    "domains": [
+      "design systems",
+      "semiotics & communication",
+      "user experience"
+    ]
+  },
+  "R197": {
+    "discipline": "cognitive science",
+    "domains": [
+      "user experience"
+    ]
+  },
+  "R198": {
+    "discipline": "behavioral economics",
+    "domains": [
+      "entrepreneurship",
+      "finance & investment",
+      "personal productivity"
+    ]
+  },
+  "R199": {
+    "discipline": "psychology",
+    "domains": [
+      "user experience"
+    ]
+  },
+  "R201": {
+    "discipline": "health & medicine",
+    "domains": [
+      "health & wellness"
+    ]
+  },
+  "R202": {
+    "discipline": "",
+    "domains": [
+      "creative technology",
+      "media & entertainment",
+      "user experience"
+    ]
+  },
+  "R203": {
+    "discipline": "design thinking",
+    "domains": [
+      "user experience"
+    ]
+  },
+  "R204": {
+    "discipline": "psychology",
+    "domains": [
+      "organizational behavior",
+      "user experience"
+    ]
+  },
+  "R205": {
+    "discipline": "cultural studies",
+    "domains": [
+      "arts & culture",
+      "design strategy",
+      "media & entertainment",
+      "systems & frameworks"
+    ]
+  },
+  "R206": {
+    "discipline": "finance",
+    "domains": [
+      "finance & investment"
+    ]
+  },
+  "R207": {
+    "discipline": "marketing",
+    "domains": [
+      "marketing & communications"
+    ]
+  },
+  "R208": {
+    "discipline": "psychology",
+    "domains": [
+      "health & wellness"
+    ]
+  },
+  "R209": {
+    "discipline": "cognitive science",
+    "domains": [
+      "ai & agents",
+      "education",
+      "information architecture"
+    ]
+  },
+  "R210": {
+    "discipline": "behavioral economics",
+    "domains": [
+      "education",
+      "marketing & communications",
+      "user experience"
+    ]
+  }
+}

@@ -28,12 +28,12 @@ from typing import Literal, get_args
 from pydantic import BaseModel, Field, field_validator
 
 # ═══════════════════════════════════════════════════════════════════════════
-# Taxonomy Literal Types — extracted from config/taxonomy_v5.yaml
+# Taxonomy Literal Types — extracted from config/taxonomy.yaml
 # Invalid labels are structurally impossible at the Pydantic boundary.
 # ═══════════════════════════════════════════════════════════════════════════
 
 # D2425: DOMAIN_LITERAL / DISCIPLINE_LITERAL removed. These hardcoded Literal enums
-# drifted from config/taxonomy_v5.yaml (26/48 vs 35/71 canonicals) and are dead code:
+# drifted from config/taxonomy.yaml (26/48 vs 35/71 canonicals) and are dead code:
 # the pydantic models below are never instantiated at runtime. Canonical validation
 # uses is_valid_domain()/is_valid_discipline() -> load_taxonomy() (single source of
 # truth per C12). Field annotations are plain str/list[str] to avoid re-introducing
@@ -551,7 +551,7 @@ class FBRecord(VerifiedFB):
 # ═══════════════════════════════════════════════════════════════════════════
 
 def load_taxonomy():
-    """Load taxonomy from config/taxonomy_v5.yaml.
+    """Load taxonomy from config/taxonomy.yaml.
 
     Returns (domains: list[str], disciplines: list[str], domain_to_group: dict).
     """
@@ -559,7 +559,7 @@ def load_taxonomy():
 
     import yaml
 
-    config_path = Path(__file__).resolve().parent.parent / "config" / "taxonomy_v5.yaml"
+    config_path = Path(__file__).resolve().parent.parent / "config" / "taxonomy.yaml"
     with open(config_path) as f:
         taxa = yaml.safe_load(f)
 
@@ -822,7 +822,7 @@ def validate_fb_depth(depth: str | None) -> str | None:
 
 
 # ═══════════════════════════════════════════════════════════════════════════
-# Synonym Index — built from taxonomy_v5.yaml raw aliases + synonym_map.yaml
+# Synonym Index — built from taxonomy.yaml raw aliases + synonym_map.yaml
 # Used by stage4 to match LLM labels to canonical labels before falling back
 # to "emerging". Reduces data loss and provides richer raw label accumulation.
 # ═══════════════════════════════════════════════════════════════════════════
@@ -918,7 +918,7 @@ def _build_synonym_index(kind: str | None = None) -> dict[str, str]:
         forbidden_keys = {normalize_label(c) for c in CANONICAL_DOMAINS}
 
     # 1. Taxonomy raw aliases (both domains and disciplines)
-    tax_path = config_root / "taxonomy_v5.yaml"
+    tax_path = config_root / "taxonomy.yaml"
     if tax_path.exists():
         with open(tax_path) as f:
             taxa = yaml.safe_load(f)

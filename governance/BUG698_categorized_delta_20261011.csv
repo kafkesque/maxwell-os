@@ -1,0 +1,165 @@
+item_id,name,old_discipline,new_discipline,old_domains,new_domains,category
+R001,Surveillance Capitalism Value Proposition,privacy & surveillance,privacy & surveillance,digital product|information architecture|marketing & communications,digital product|information architecture|marketing & communications|user experience,candidate_change
+R002,Soviet Underground Discourse Reception,cultural studies,cultural studies,media & entertainment|semiotics & communication,semiotics & communication,candidate_change
+R003,Quantum Cognitive Effects in Survey Design,cognitive science,cognitive science,education|research practice|user experience,education,candidate_change
+R004,Lockdown Effectiveness and Economic Impact,political economy,health & medicine,legal & public policy,research practice,candidate_change
+R006,Generative Algorithmic Composition,,artificial intelligence,code & computation|computational art|creative technology,computational art|creative technology|design systems,abstain_violation
+R009,Entrepreneurial Risk Assessment Framework,decision making,risk management,entrepreneurship,entrepreneurship,candidate_change
+R010,Iterative Launch Process,design thinking,design thinking,business development|digital product|product design|project management|user experience,product design|project management|user experience,candidate_change
+R011,Agentic Decision-making Through Contextual Retrieval,information retrieval,artificial intelligence,ai & agents,ai & agents,candidate_change
+R013,Innovation Fund Risk Management,risk management,risk management,business operations|finance & investment,business development|business operations|design strategy|entrepreneurship|project management,candidate_change
+R014,Sacred Geometry and Symbolic Resonance,philosophy,anthropology,arts & culture|semiotics & communication,semiotics & communication,candidate_change
+R015,Long-term Strategic Planning in Different Industries,business administration,strategic thinking,business development,business development|business operations,remove_domains_violation
+R016,Modelans-modelandum Relationship,semiotics,semiotics,semiotics & communication,design strategy|education,candidate_change
+R017,Chemical Reaction Equation Automation,computational physics & simulation,computational physics & simulation,computational science & physics,code & computation|engineering practice|systems & frameworks,candidate_change
+R018,Color and Typography Readability,color theory,color theory,brand identity|design systems|editorial & advertising|graphic design|user experience,graphic design,candidate_change
+R020,Dynamic System Complexity,complex adaptive systems,complex adaptive systems,ai & agents|business development|entrepreneurship|systems & frameworks,systems & frameworks,candidate_change
+R022,Coupon Code Feature Placement Strategy,human-computer interaction,design psychology,design strategy|marketing & communications|user experience,marketing & communications|user experience,candidate_change
+R023,Focused Action Selection,decision making,decision making,leadership|personal productivity|project management,business development|business operations|project management,candidate_change
+R024,Execution Gap From Technological Readiness,business administration,business administration,business development|business operations|finance & investment,business operations|leadership,candidate_change
+R025,Design for Management and Organizational Culture,organizational theory,business administration,design strategy|leadership|organizational behavior,design strategy|leadership|organizational behavior,candidate_change
+R027,Decentralized Strategic Command,organizational theory,organizational theory,leadership|organizational behavior,design strategy|leadership|organizational behavior|systems & frameworks,candidate_change
+R028,Gpu Acceleration Configuration,machine learning,engineering,engineering practice,engineering & infrastructure,candidate_change
+R029,Innovation Through Challenge to Assumptions,business administration,business administration,brand identity|business development|design strategy|marketing & communications|product design,design strategy|marketing & communications|product design,candidate_change
+R031,Questionnaire Validation and Modification Risk,risk management,research methodology,research practice,research practice,candidate_change
+R032,Heckel's Diff Algorithm for Version Tracking,computational theory,information science,data visualization|engineering practice,data visualization,candidate_change
+R033,Postmodern Critique of Realist Assumptions,philosophy,philosophy,research practice,education|research practice,candidate_change
+R035,Visual Evidence Recognition,visual perception,visual perception,data visualization|systems & frameworks,data visualization,candidate_change
+R036,Domain Name Call-to-action Strategy,marketing,marketing,brand identity|design strategy|marketing & communications|user experience,marketing & communications,candidate_change
+R037,Style Precedence and Override Behavior,software engineering,design thinking,engineering practice,design systems,candidate_change
+R038,Multiple Imputation Procedure,research methodology,research methodology,data visualization|research practice,research practice,doms_to_research_practice
+R039,Identity  As Social Positioning and Lifestyle Signifiers,sociology,sociology,design strategy|marketing & communications|semiotics & communication,marketing & communications|semiotics & communication,candidate_change
+R041,Consumer Anticipation of Objections,marketing,marketing,design strategy|editorial & advertising|marketing & communications|product design|user experience,product design|user experience,primary_override_violation
+R042,Destination-control Elevator Interaction Pattern,human-computer interaction,human-computer interaction,user experience,industrial design|user experience,candidate_change
+R043,Alpha State Thinking and Creative Problem-solving,cognitive science,cognitive science,arts & culture|personal productivity,design strategy|personal productivity|user experience,candidate_change
+R044,Cyclical Design Lifecycle,systems thinking,systems thinking,design strategy|environmental design|industrial design|product design,design strategy|product design,candidate_change
+R045,Wpi Consumer Value Proposition Framework,marketing,marketing,brand identity|marketing & communications,marketing & communications,candidate_change
+R046,Bitcoin Mining As Digital Ownership Model,economics,economics,finance & investment,business development|finance & investment,candidate_change
+R047,Emotional Transaction Design,psychology,psychology,design strategy|user experience,design strategy|organizational behavior|user experience,candidate_change
+R048,Creative Process Through Drawing and Sketching,creative process,creative process,arts & culture|graphic design|illustration,arts & culture,candidate_change
+R049,Fermi Estimation Method,operations research,decision making,personal productivity|project management|research practice|systems & frameworks,emerging,doms_to_emerging
+R051,Central Emptiness in Urban Design,cultural design,emerging,urban planning,environmental design|urban planning,disc_to_emerging
+R052,Interior Design Fixture Selection Challenge,design thinking,design thinking,design strategy,environmental design|product design,candidate_change
+R053,Self-referential Incompleteness,computational theory,philosophy,code & computation|computational science & physics|systems & frameworks,emerging,doms_to_emerging
+R057,Annual Percentage Rate Standardization,finance,law,finance & investment,legal & public policy,candidate_change
+R058,Illustration As Propaganda Tool,communication theory,communication theory,editorial & advertising|illustration|marketing & communications|semiotics & communication,editorial & advertising|marketing & communications|semiotics & communication,candidate_change
+R059,First Course Development Framework,,emerging,business development|education|entrepreneurship|product design|user experience,business development|design strategy|digital product|entrepreneurship|project management|user experience,abstain_violation
+R060,Aiga Transportation Symbol System Development,visual semiotics,design psychology,graphic design,design systems|graphic design|semiotics & communication,candidate_change
+R061,Core Focus As Organizational Discipline,organizational theory,emerging,leadership|organizational behavior,design strategy|organizational behavior,disc_to_emerging
+R062,Somatic Marker Decision Making,behavioral economics,behavioral economics,marketing & communications|media & entertainment|user experience,marketing & communications|user experience,candidate_change
+R063,Textbook Representation and State of Exception Legitimation,cultural studies,cultural studies,digital product|education|media & entertainment|semiotics & communication,education|media & entertainment|semiotics & communication,candidate_change
+R064,Optical Alignment in Typography,typography,cognitive science,brand identity|design systems|editorial & advertising|graphic design|web & ui,design systems|graphic design,candidate_change
+R065,Media Construction of Crime Waves,media studies,media studies,media & entertainment,semiotics & communication,candidate_change
+R066,N-dimensional Sphere Volume Properties,computational geometry,theoretical physics,code & computation|computational science & physics|engineering practice,emerging,doms_to_emerging
+R067,Schemat's Wasser Interactive Art Framework,interdisciplinary studies,emerging,creative technology|media & entertainment|user experience,creative technology|media & entertainment|user experience,disc_to_emerging
+R068,Imagination and the Image,aesthetics,creative process,design strategy|design systems|editorial & advertising|graphic design,editorial & advertising|graphic design,candidate_change
+R069,Falsifiable Variable Measurement,research methodology,research methodology,engineering practice|research practice,research practice|systems & frameworks,candidate_change
+R070,Iterative Design Validation,design thinking,design thinking,design strategy|product design|user experience,design strategy|design systems|user experience,candidate_change
+R071,Lean Startup Experimentation Framework,entrepreneurship studies,entrepreneurship studies,business development|entrepreneurship|research practice,entrepreneurship,candidate_change
+R072,Park24 Nondisruptive Market Creation,entrepreneurship studies,entrepreneurship studies,business development|design strategy|entrepreneurship|urban planning,business development|urban planning,primary_override_violation
+R073,Evolution of Language Through Mental Models,anthropology,linguistics,education|research practice,emerging,doms_to_emerging
+R074,Attention Economy Externalities,cognitive science,psychology,user experience,user experience,candidate_change
+R075,Paradigm Shift Through Disruption,philosophy,philosophy,arts & culture|systems & frameworks,research practice,doms_to_research_practice
+R076,Linguistic Fetish in Visual Communication,marketing,marketing,arts & culture|brand identity|marketing & communications|semiotics & communication,design strategy|design systems|editorial & advertising|semiotics & communication,candidate_change
+R077,Symbolic Meaning Through Consumption,cultural studies,cultural studies,marketing & communications|semiotics & communication,design strategy|marketing & communications|semiotics & communication,candidate_change
+R078,Parameterized Design Generation,generative design,cognitive science,code & computation|computational art|creative technology|design systems,creative technology|design systems,candidate_change
+R079,Bar-hillel Paradox,linguistics,linguistics,arts & culture|brand identity|design strategy|editorial & advertising|graphic design|marketing & communications|semiotics & communication,semiotics & communication,candidate_change
+R083,Self-herding Behavior,behavioral economics,behavioral economics,marketing & communications|user experience,business development|marketing & communications|organizational behavior,candidate_change
+R085,Discursive Strategy Abstraction,cultural studies,philosophy,education|health & wellness|semiotics & communication,design strategy,candidate_change
+R086,Commitment and Consistency Principle (2),behavioral economics,behavioral economics,digital product|marketing & communications|user experience,marketing & communications,candidate_change
+R088,Gradio Web Interface for Ml Models,human-computer interaction,artificial intelligence,digital product|user experience|web & ui,design systems|digital product|user experience,candidate_change
+R090,Culture Jamming,media studies,cultural studies,design strategy|design systems|editorial & advertising|media & entertainment|semiotics & communication,design strategy|editorial & advertising|media & entertainment,candidate_change
+R091,Autopoesis in Design Education,systems thinking,design thinking,design strategy|education,design systems|education|organizational behavior,override_violation
+R092,Data Quality and Method Transparency in Journalism,research methodology,research methodology,data visualization|media & entertainment|research practice,emerging,doms_to_emerging
+R093,Numerical Symbolism in Design and Biology,semiotics,semiotics,design strategy|design systems|semiotics & communication,design strategy|design systems,candidate_change
+R094,Progressive Feature Introduction,human-computer interaction,human-computer interaction,digital product|product design|user experience|web & ui,design strategy|user experience,candidate_change
+R095,Sensory Engagement As Quality Signal,psychology,marketing,arts & culture|environmental design|marketing & communications|product design,environmental design|industrial design|user experience,candidate_change
+R096,Transportation and Setup Costs in Construction Projects,finance,economics,business operations|engineering & infrastructure|project management,engineering & infrastructure,candidate_change
+R097,Minimin Decision Criterion,decision making,decision making,business development|business operations|design strategy|finance & investment,emerging,doms_to_emerging
+R098,Aesthetic Refinement Through Iteration,aesthetics,creative process,arts & culture|design strategy|digital product|graphic design|product design,design strategy|design systems,candidate_change
+R099,Charismatic Brand Discipline,marketing,design thinking,brand identity|design strategy|marketing & communications,brand identity|design strategy|marketing & communications,candidate_change
+R101,Pragmatist View of Truth and Knowledge,philosophy,philosophy,education|research practice,emerging,doms_to_emerging
+R103,Temporal Consistency in Visual Narrative Analysis,visual semiotics,cognitive science,illustration|media & entertainment|motion design,semiotics & communication,candidate_change
+R104,Strategic Information Gathering,operations research,decision making,data visualization|information architecture|research practice,emerging,doms_to_emerging
+R105,Probabilistic Forecasting with Prediction Intervals,operations research,risk management,business operations|finance & investment|research practice,data visualization,candidate_change
+R107,Lived Experience Focus,philosophy,research methodology,education|research practice|user experience,research practice,doms_to_research_practice
+R108,Typography in Brand Positioning and Magazine Design,typography,typography,brand identity|design strategy|graphic design,brand identity|editorial & advertising|graphic design,candidate_change
+R109,Project Completion Bias,behavioral economics,behavioral economics,organizational behavior|personal productivity|user experience,organizational behavior|personal productivity|project management,candidate_change
+R110,Federated Information Architecture,information science,information science,design systems|information architecture|systems & frameworks|web & ui,information architecture,candidate_change
+R111,Pmt Camera Typography Manipulation,typography,typography,arts & culture|graphic design,creative technology|graphic design|motion design,candidate_change
+R112,Content Analysis Approaches in Visual Research,research methodology,research methodology,research practice,emerging,doms_to_emerging
+R113,Traveling Salesman Problem Computational Complexity,computational theory,operations research,computational science & physics|engineering practice,code & computation,candidate_change
+R114,Measurable Outcome Focus,decision making,decision making,business operations|personal productivity,business development|business operations|product design|user experience,candidate_change
+R115,Heuristic Reasoning in Problem Solving,operations research,cognitive science,research practice,education,candidate_change
+R116,Ai Model Deployment Risk,risk management,risk management,business operations|engineering & infrastructure|organizational behavior|project management,business operations|organizational behavior,candidate_change
+R118,Pass@k Evaluation Method,research methodology,generative ai,ai & agents,research practice,candidate_change
+R119,Strategic Human Resource Planning for Social Enterprises,business administration,business administration,business operations|entrepreneurship|leadership,business operations|entrepreneurship|organizational behavior,candidate_change
+R121,Consumers Hero Refurbishment Strategy,business administration,business administration,business development|business operations|marketing & communications|product design,business development|business operations|marketing & communications,candidate_change
+R122,Visual Hierarchy Through Contrast (2),visual perception,visual perception,editorial & advertising|graphic design|user experience|web & ui,graphic design,candidate_change
+R123,Superquadric Parameterization in 3d Space,computational geometry,computer graphics,code & computation|creative technology,code & computation|creative technology,candidate_change
+R124,Foundation Model Integration Framework,artificial intelligence,software engineering,engineering practice|systems & frameworks,engineering practice|systems & frameworks,candidate_change
+R126,Embodied Knowledge in Design,cultural design,cultural design,business operations|design strategy|design systems|industrial design|marketing & communications|user experience,design strategy|design systems|industrial design,candidate_change
+R127,Guild of Handicraft Educational Model,,emerging,design strategy|design systems|education,design strategy|design systems|education,abstain_violation
+R128,Choice Architecture and Identity Framing,decision making,behavioral economics,design strategy|personal productivity|user experience,design strategy|user experience,candidate_change
+R129,Use of Proxies and Analogues in Market Sizing,marketing,marketing,business development|finance & investment|research practice,business development,candidate_change
+R131,Differential Privacy in Data Collection,privacy & surveillance,privacy & surveillance,information architecture,emerging,doms_to_emerging
+R132,Monte Carlo PDE Solution Method,computational physics & simulation,computational physics & simulation,computational science & physics,code & computation|computational science & physics,candidate_change
+R133,Three-holes-in-the-cheese Model of Error Cascades,risk management,cognitive science,systems & frameworks,organizational behavior|systems & frameworks,candidate_change
+R134,Holistic Interpretation Problem in Index-aware Retrieval,information retrieval,information science,ai & agents|information architecture,information architecture|systems & frameworks,candidate_change
+R136,Chatgpt Prompt Framework,generative ai,artificial intelligence,ai & agents|information architecture,design strategy|user experience,candidate_change
+R137,Desire-friction Conversion Formula,behavioral economics,human-computer interaction,user experience,user experience,candidate_change
+R139,Learning Through Failure Process,cognitive science,cognitive science,education|personal productivity,education,candidate_change
+R141,Contextual Redundancy and Representation Efficiency,machine learning,cognitive science,code & computation|engineering practice,emerging,doms_to_emerging
+R142,Global Village Conceptual Framework,communication theory,media studies,media & entertainment|systems & frameworks,semiotics & communication,candidate_change
+R143,Figma Hamburger Icon Creation,computer graphics,computer graphics,design systems,design systems|digital product|web & ui,candidate_change
+R144,Abra-kadabra Number Classification,software engineering,emerging,code & computation,emerging,doms_to_emerging
+R145,Color As Cultural and Emotional Marker,color theory,color theory,brand identity|design strategy|graphic design|marketing & communications|semiotics & communication,design strategy|graphic design|semiotics & communication,candidate_change
+R146,Debate As Leadership Tool,,decision making,leadership|organizational behavior,leadership|organizational behavior,abstain_violation
+R147,Randomness in Data Measurement,research methodology,research methodology,data visualization|research practice,emerging,doms_to_emerging
+R149,Perceptual Mapping Through Camouflage,visual perception,visual perception,creative technology|design strategy,creative technology|data visualization|design strategy,candidate_change
+R150,Triple Bottom Line Business Approach,strategic thinking,business administration,business development|design strategy|marketing & communications|organizational behavior|systems & frameworks,business development|business operations|design strategy|entrepreneurship|systems & frameworks,candidate_change
+R151,Context-dependent Cognitive Processing,cognitive science,cognitive science,education|research practice,emerging,doms_to_emerging
+R152,Economic Politics of Obsolescence,political economy,economics,business development|legal & public policy|marketing & communications,business development|legal & public policy|product design,candidate_change
+R153,Cognitive Interview Analysis of Question Clarity Issues,cognitive science,cognitive science,user experience,research practice,candidate_change
+R154,Aditya Birla Group's Parta System,finance,business administration,business operations|finance & investment|leadership,business operations,candidate_change
+R155,Persistence in Business Strategy,business administration,business administration,business development|leadership|personal productivity,business development|business operations|leadership,primary_override_violation
+R156,Designers' Object World,cognitive science,cognitive science,design strategy|design systems|education|user experience,design strategy|design systems|product design,candidate_change
+R157,Perspective-driven Cognitive Shift,cognitive science,cognitive science,arts & culture|education|marketing & communications|personal productivity|semiotics & communication|user experience,education,primary_override_violation
+R158,Duality in Design,cultural design,aesthetics,arts & culture|design strategy|design systems|graphic design|illustration|semiotics & communication|user experience,design strategy|design systems|user experience,candidate_change
+R159,Context-dependent Quality Assessment,risk management,research methodology,digital product|product design|research practice|user experience,design strategy|information architecture,primary_override_violation
+R160,Resource-based Value Assessment,operations research,business administration,business development|finance & investment|marketing & communications,business development|finance & investment|marketing & communications,candidate_change
+R162,Provincial Norms,psychology,psychology,education|leadership|organizational behavior,organizational behavior,candidate_change
+R163,Metaphorically Selling How to Use the Ma,communication theory,marketing,editorial & advertising|marketing & communications|packaging|semiotics & communication,design strategy|design systems|editorial & advertising|marketing & communications|user experience,candidate_change
+R164,Phenomenological Understanding,philosophy,philosophy,education|research practice|semiotics & communication,research practice,doms_to_research_practice
+R165,Acknowledgment Attribution,,business administration,editorial & advertising,editorial & advertising,abstain_violation
+R166,Agent-centric Economic Incentives,economics,economics,ai & agents|engineering & infrastructure,ai & agents|systems & frameworks,candidate_change
+R167,Innocent Brand Identity Through Organic Development,organizational theory,design thinking,brand identity|marketing & communications|organizational behavior,brand identity|design strategy,candidate_change
+R168,Hidden Issue Questioning Technique,marketing,research methodology,research practice,marketing & communications,candidate_change
+R169,Charismatic Leadership Development,psychology,decision making,leadership,leadership|personal productivity,candidate_change
+R172,Digital System Context Decomposition,engineering,systems thinking,engineering & infrastructure|engineering practice|product design,systems & frameworks,candidate_change
+R173,Linkedin Network Building Protocol,social network analysis,business administration,business development,business development,candidate_change
+R174,Concept-first Prototyping,design thinking,design thinking,digital product|industrial design|product design|user experience,design strategy|product design|user experience,candidate_change
+R175,Role-based Prompting Effect,artificial intelligence,generative ai,ai & agents,ai & agents,candidate_change
+R176,Harvest Time Strategic Planning,finance,business administration,finance & investment,business development|business operations|finance & investment|legal & public policy,candidate_change
+R177,Contextual Interpretation Framework,semiotics,communication theory,marketing & communications|semiotics & communication,semiotics & communication,candidate_change
+R179,Coincidence Wit in Graphic Design,creative process,creative process,brand identity|editorial & advertising|graphic design|marketing & communications|semiotics & communication,design strategy|graphic design|semiotics & communication,candidate_change
+R183,Pattern Language Implementation Process,,design thinking,urban planning,design strategy|legal & public policy|urban planning,abstain_violation
+R184,Doping in Professional Sports: Systemic Pressure and Rationalization,behavioral economics,health & medicine,health & wellness,organizational behavior,candidate_change
+R185,Tv Advertising Consumer Behavior Pattern,marketing,marketing,editorial & advertising|marketing & communications|media & entertainment,marketing & communications,candidate_change
+R186,Cognitive Interview Analysis Framework,research methodology,research methodology,marketing & communications|research practice,data visualization|information architecture|user experience,candidate_change
+R187,Credibility Through Transparency,communication theory,communication theory,marketing & communications,editorial & advertising|marketing & communications|semiotics & communication,candidate_change
+R188,Sensory-motor Basis of Conceptual Reasoning,cognitive science,cognitive science,education,emerging,doms_to_emerging
+R189,Higher-order Polynomial Approximation in Numerical Methods,computational physics & simulation,engineering,engineering practice|systems & frameworks,computational science & physics,candidate_change
+R190,Design Thinking Integration Strategy,design thinking,design thinking,business operations|design strategy|leadership|project management,business operations|design strategy|leadership,candidate_change
+R191,Intentional Motion Design,motion & time,design thinking,motion design,motion design|user experience,candidate_change
+R193,Brent Spar Campaign Effectiveness,political economy,political economy,legal & public policy,legal & public policy|marketing & communications,candidate_change
+R195,Agentic Ai System Reliability,generative ai,engineering,ai & agents|engineering & infrastructure,engineering & infrastructure|engineering practice|systems & frameworks,candidate_change
+R196,Inclusive Design Adaptation,human-computer interaction,human-computer interaction,design systems|semiotics & communication|user experience,design systems|user experience,candidate_change
+R198,Survivor Bias in Success Narratives,behavioral economics,behavioral economics,entrepreneurship|finance & investment|personal productivity,research practice,doms_to_research_practice
+R202,Interactive Media Integration,,creative process,creative technology|media & entertainment|user experience,creative technology|media & entertainment,abstain_violation
+R203,Iterative Problem-solving in Ux Design,design thinking,design thinking,user experience,design strategy|design systems|project management|user experience,candidate_change
+R204,Expert Overconfidence and Cognitive Laziness,psychology,cognitive science,organizational behavior|user experience,emerging,doms_to_emerging
+R205,Innovation Cycles in Art and Technology,cultural studies,cultural studies,arts & culture|design strategy|media & entertainment|systems & frameworks,arts & culture|design strategy|media & entertainment,candidate_change
+R208,Recovered Memory Therapy and False Accusations,psychology,psychology,health & wellness,health & wellness|legal & public policy,candidate_change
+R209,Procedural Vs Declarative Knowledge Retrieval,cognitive science,cognitive science,ai & agents|education|information architecture,emerging,doms_to_emerging
+R210,Same-age Peer Modeling,behavioral economics,psychology,education|marketing & communications|user experience,education,candidate_change

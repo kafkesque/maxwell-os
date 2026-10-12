@@ -136,6 +136,36 @@ def test_s4_golden_axis_disjointness() -> None:
             )
 
 
+def test_s4_golden_discipline_macro() -> None:
+    """D-2884(a)/BUG-622: the operative 3-way macro facet must be present AND must
+    equal the deterministic collapse of the fine discipline (single home C21).
+
+    The fine 62-way `discipline` became ADVISORY; routing gates on the 3-way macro
+    (Technical / Human & Design / Method & Business). The golden must teach the
+    macro explicitly and must never drift from the deterministic collapse.
+    """
+    from pipeline.discipline_macro import load_macro
+
+    _, bucket_members, disc_to_bucket = load_macro()
+    valid_macros = set(bucket_members) | {"emerging"}
+
+    golden = _load()
+    for ex in golden.get("examples", []):
+        eid = ex.get("id", "?")
+        exp = ex.get("expected_classification", {})
+        macro = exp.get("discipline_macro")
+        disc = exp.get("discipline", "")
+        assert macro is not None, f"{eid}: missing discipline_macro (D-2884a)"
+        assert macro in valid_macros, (
+            f"{eid}: discipline_macro {macro!r} not in 3-way macro {sorted(valid_macros)}"
+        )
+        expected = disc_to_bucket.get(disc, "emerging")
+        assert macro == expected, (
+            f"{eid}: discipline_macro {macro!r} != deterministic collapse {expected!r} "
+            f"of discipline {disc!r} (drift guard)"
+        )
+
+
 def test_s4_golden_no_raw_axis_fields() -> None:
     """D2532: the golden's expected_classification must carry ONLY canonical labels.
 

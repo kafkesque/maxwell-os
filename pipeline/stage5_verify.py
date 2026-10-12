@@ -10,9 +10,9 @@ Output: Verified FBs, checkpoint at stage5_verify.jsonl
 Process:
   1. Mechanism quality pre-filter: catch tautological mechanisms (regex, free)
   2. DeBERTa-v3-large (435M, MNLI+FEVER+ANLI+Ling+WANLI): sole NLI verifier
-  3. Threshold 0.10 — auto-calibrated (466 pairs, 88 FBs): P=0.647, R=0.386, F1=0.484
+  3. Aggregation: OR-entail + AND-no-contra (D-2822); PASS threshold 0.5 (D-2863): P=0.852, R=0.414
   4. Verdict (D2321: premise/hypothesis pairing + all-3-label scoring):
-     → ENTAIL ≥ 0.10 → PASS
+     → OR-entail (≥1 entail ≥ 0.5 AND 0 contra) → PASS
      → NEUTRAL (unverifiable) → QUARANTINE
      → CONTRA → QUARANTINE
   5. FAIL-CLOSED (D2093): any path failure → QUARANTINE, never PASS
@@ -28,7 +28,7 @@ R5 compliance (D2298):
 
 DeBERTa-v3-large: MoritzLaurer/DeBERTa-v3-large-mnli-fever-anli-ling-wanli (4.14GB)
   Benchmarks: MNLI 90.3%, FEVER 89.1%, ANLI 62.4%+
-  Calibration: Precision 0.647, Recall 0.386, F1 0.484 at threshold 0.10 (466 pairs, 88 FBs)
+  Calibration: D-2863 or-entail PASS threshold 0.5 (P=0.852, R=0.414); supersedes D-2298 majority@0.10 (P=0.647, R=0.386, F1=0.484)
   Speed: ~290ms per sentence pair on MPS (loaded in 6s)
 
 Usage:
@@ -313,10 +313,44 @@ def _aggregate_verdict(
     return _b2_majority_verdict(entail_scores, contra_scores, neutral_scores, thresh)
 
 
+def _paraphrase_similarity(definition: str, evidence_passages: list[str]) -> float:
+    """D-B (BUG-705): max STS cosine between the FB definition and its CLEAN evidence
+    passages via the repo embedding (bge-m3 → 512d L2-normalized).
+
+    Fail-closed: returns 0.0 on empty input, unknown backend, or any embed/import
+    failure, so the similarity path can never flip a NEUTRAL to PASS on a broken
+    signal. Vectors are L2-normalized, so cosine == dot product (pure Python — this
+    module has no numpy dependency). C21: the backend is selected by `paraphrase_model`;
+    add a branch here to swap the embedding primitive.
+    """
+    if not definition or not evidence_passages:
+        return 0.0
+    if PARAPHRASE_MODEL != "bge-m3":
+        return 0.0  # C21 seam: only bge-m3 is wired today; unknown backend → fail-closed
+    try:
+        from pipeline.embeddings import embed_texts_bge_m3
+    except Exception:
+        return 0.0
+    _def = definition[:PARAPHRASE_MAX_CHARS]
+    _eps = [p[:PARAPHRASE_MAX_CHARS] for p in evidence_passages]
+    try:
+        _vecs = embed_texts_bge_m3([_def] + _eps)
+    except Exception:
+        return 0.0
+    if _vecs is None or len(_vecs) < 2:
+        return 0.0
+    _def_v = list(_vecs[0])
+    _best = 0.0
+    for _row in _vecs[1:]:
+        _cos = sum(_a * _b for _a, _b in zip(_def_v, list(_row)))
+        _best = max(_best, _cos)
+    return _best
+
+
 def deberta_check(fb: dict) -> tuple[bool, float, str]:
     """D2298-calibrated NLI check, D2321-corrected pairing, D2322 raw-score return.
 
-    Threshold 0.10 from auto-calibration (466 pairs, 88 FBs): P=0.647, R=0.386, F1=0.484.
+    Threshold 0.5 from D-2863 or-entail recalibration: P=0.852, R=0.414 (supersedes D-2298 majority@0.10 P=0.647 R=0.386 F1=0.484).
     RoBERTa removed (D2298) — added zero signal on paraphrase-based evidence (D2227).
 
     D2321 FIX (BUG-092): previous code concatenated "definition evidence" into ONE
@@ -354,6 +388,7 @@ def deberta_check(fb: dict) -> tuple[bool, float, str]:
     _neutral_scores: list[float] = []
     _nli_errors: list[str] = []  # C16/BUG-177: observability — never silent
     _garbage_skipped: int = 0  # D2506/B2: non-evidence fragments excluded from NLI
+    _clean_eps: list[str] = []  # D-B (BUG-705): clean premises for the similarity pass
 
     for _ep in _eps[:8]:
         if not _ep.strip():
@@ -363,6 +398,7 @@ def deberta_check(fb: dict) -> tuple[bool, float, str]:
             continue  # D2506/B2: never score NLI against a caption/title/UI fragment
         _prem = _ep[:S5_NLI_MAX_PREMISE_CHARS]  # premise = evidence passage
         _hyp = _def[:S5_NLI_MAX_HYPOTHESIS_CHARS]  # hypothesis = FB definition
+        _clean_eps.append(_prem)  # D-B (BUG-705): retain clean premise for the similarity pass
         try:
             _ent, _neu, _con = _nli_pair_scores(_prem, _hyp, raise_on_error=True)
         except NLIInferenceError as e:
@@ -390,7 +426,27 @@ def deberta_check(fb: dict) -> tuple[bool, float, str]:
         return False, 0.0, "NLI scoring failed — QUARANTINE"
 
     # D2507/D-2822: cross-passage aggregation (majority OR or-entail+AND-no-contra, C12).
-    return _aggregate_verdict(_entail_scores, _contra_scores, _neutral_scores, _thresh)
+    _passed, _score, _detail = _aggregate_verdict(
+        _entail_scores, _contra_scores, _neutral_scores, _thresh
+    )
+    # D-B (BUG-705): paraphrase-aware grounding — RECALL path. Gated so it can ONLY flip a
+    # NEUTRAL to PASS (never downgrade a PASS). Inert unless PARAPHRASE_PATH_ENABLED.
+    if not _passed and PARAPHRASE_PATH_ENABLED:
+        _n_entail = sum(1 for s in _entail_scores if s >= PARAPHRASE_ENTAIL_THRESHOLD)
+        _n_contra = sum(
+            1 for (e, c, u) in zip(_entail_scores, _contra_scores, _neutral_scores)
+            if c > e and c > u
+        )
+        _no_contra_ok = (not PARAPHRASE_REQUIRE_NO_CONTRA) or (_n_contra == 0)
+        if _n_entail >= PARAPHRASE_MIN_ENTAIL and _no_contra_ok:
+            _sim = _paraphrase_similarity(_def, _clean_eps)
+            if _sim >= PARAPHRASE_SIMILARITY_THRESHOLD:
+                return True, round(_sim, 4), (
+                    f"PARAPHRASE (STS {_sim:.3f} >= {PARAPHRASE_SIMILARITY_THRESHOLD}): "
+                    f"faithful reworded-true claim ({_n_entail}/{len(_entail_scores)} entail, "
+                    f"0 contra)"
+                )
+    return _passed, _score, _detail
 
 
 # nli_evidence_check REMOVED (D2298) — superseded by deberta_check(); referenced deleted
@@ -571,6 +627,48 @@ if NLI_AGGREGATION == "or_entail_and_no_contra":
             "the mode, threshold equals nli_pass_threshold, and decision names the minting decision id. "
             "Recalibrate (pipeline/nli_calibrate.py) and re-mint the threshold under a NEW decision id "
             "BEFORE flipping this flag."
+        )
+
+# ── D-B (BUG-705): paraphrase-aware grounding — RECALL path (fail-closed, inert by default) ──
+# A parallel SECOND signal that can ONLY flip a NEUTRAL to PASS (never downgrade a PASS).
+# Gated on n_entail >= paraphrase_min_entail AND n_contra == 0 AND STS cosine >= threshold.
+# Inert unless paraphrase_path_enabled=true, which is REFUSED (C16) without a matching
+# paraphrase_calibration stamp (D-2858-style). D-2822/or-entail is the PRECISION path; this
+# is the RECALL path that recovers faithful reworded-true claims (max entail 0.13–0.46 < 0.5).
+PARAPHRASE_PATH_ENABLED: bool = bool(_cfg5.get("paraphrase_path_enabled", False))
+PARAPHRASE_SIMILARITY_THRESHOLD: float = float(_cfg5.get("paraphrase_similarity_threshold", 0.85))
+PARAPHRASE_MODEL: str = str(_cfg5.get("paraphrase_model", "bge-m3")).strip()
+PARAPHRASE_MIN_ENTAIL: int = int(_cfg5.get("paraphrase_min_entail", 1))
+# BUG-705-threshold: WEAK-entail pre-filter (NOT the pass threshold). Counting at the pass
+# threshold (0.5) made the RECALL path a silent no-op — every target row has max entail < 0.5.
+PARAPHRASE_ENTAIL_THRESHOLD: float = float(_cfg5.get("paraphrase_entail_threshold", 0.10))
+PARAPHRASE_REQUIRE_NO_CONTRA: bool = bool(_cfg5.get("paraphrase_require_no_contra", True))
+PARAPHRASE_MAX_CHARS: int = int(_cfg5.get("paraphrase_max_chars", 1500))
+_PARAPHRASE_CAL: dict = _cfg5.get("paraphrase_calibration") or {}
+# BUG-705-threshold: structural invariant — the weak-entail pre-filter MUST sit strictly below
+# the NLI pass threshold. If it ever equals/exceeds it, the RECALL path silently fires on zero
+# rows (the exact no-op this guard exists to prevent). Always-on (not gated on enabled).
+if PARAPHRASE_ENTAIL_THRESHOLD >= S5_NLI_PASS_THRESHOLD:
+    raise ValueError(
+        "C16/D-B: stage5.paraphrase_entail_threshold must be strictly below "
+        "stage5.nli_pass_threshold (weak-entail pre-filter, not the pass bar); "
+        f"got {PARAPHRASE_ENTAIL_THRESHOLD} >= {S5_NLI_PASS_THRESHOLD}."
+    )
+if PARAPHRASE_PATH_ENABLED:
+    _pcal_decision = str(_PARAPHRASE_CAL.get("decision", "")).strip()
+    _pcal_threshold = _PARAPHRASE_CAL.get("threshold")
+    _pcal_ok = (
+        bool(_pcal_decision)
+        and _pcal_threshold is not None
+        and float(_pcal_threshold) == float(PARAPHRASE_SIMILARITY_THRESHOLD)
+    )
+    if not _pcal_ok:
+        raise ValueError(
+            "C16/D-B: stage5.paraphrase_path_enabled=true requires a matching "
+            "stage5.paraphrase_calibration stamp {decision, threshold} where threshold equals "
+            "paraphrase_similarity_threshold and decision names the minting decision id. "
+            "Calibrate (scripts/paraphrase_calibrate.py) and re-mint the threshold under a NEW "
+            "decision id BEFORE enabling this flag."
         )
 
 
@@ -1031,14 +1129,21 @@ def run_stage5(strict: bool = False, skip_nli: bool = False):
     _write_input_fingerprint()
 
     total = len(fbs)
-    _thresh = S5_NLI_PASS_THRESHOLD  # config-driven (C12), calibrated: 0.10
+    _thresh = S5_NLI_PASS_THRESHOLD  # config-driven (C12), calibrated: 0.5 (D-2863)
 
     # Preload DeBERTa model
     _load_dual_encoders()
 
     print(f"🔍 Stage 5: DeBERTa-Only Verify — {total} FBs")
     print("   DeBERTa-v3-large (435M, MNLI+FEVER+ANLI+Ling+WANLI) — D2298 calibrated")
-    print(f"   Threshold: {_thresh} (Calibrated: P=0.647 R=0.386 F1=0.484) | Fail-closed: ✅ (D2093)")
+    _cal_p = _NLI_CAL.get("precision")
+    _cal_r = _NLI_CAL.get("recall")
+    if _cal_p is not None and _cal_r is not None:
+        _cal_f1 = round(2.0 * float(_cal_p) * float(_cal_r) / (float(_cal_p) + float(_cal_r)), 3)
+        _cal_note = f"P={_cal_p} R={_cal_r} F1={_cal_f1}"
+    else:
+        _cal_note = f"see {_NLI_CAL.get('decision', 'D-2298')}"
+    print(f"   Threshold: {_thresh} ({_NLI_CAL.get('decision', 'D-2298')} Calibrated: {_cal_note}) | Fail-closed: ✅ (D2093)")
     print(f"   ENTAIL ≥ {_thresh} → PASS | Otherwise → QUARANTINE")
     print(f"{'='*60}")
 

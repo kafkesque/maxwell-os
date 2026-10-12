@@ -51,7 +51,7 @@ import yaml  # noqa: E402
 from pipeline.pipeline_paths import CANONICAL_RUN, DB_PATH  # noqa: E402
 
 _CALIBRATION = _ROOT / "governance" / "d2547_calibration.json"
-_TAXONOMY = _ROOT / "config" / "taxonomy_v5.yaml"
+_TAXONOMY = _ROOT / "config" / "taxonomy.yaml"
 _CFG = _ROOT / "config" / "pipeline_config.yaml"
 
 # C20: match the whole `per_label:` block (key line + indented entries), so the

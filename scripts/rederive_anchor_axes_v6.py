@@ -31,7 +31,7 @@ The owner runs --generate, adjudicates, then --adjudicate -> --verify -> --final
 is the ONLY step that can flip D-2839 from PROPOSED to RATIFIED (a HUMAN gate this script cannot self-sign).
 
 Config-first (C12): generator/second-coder model names, anchor version and the anchor/menu/db paths are
-read from config/pipeline_config.yaml + config/taxonomy_v5.yaml + config/menu_axis_hashes.yaml. No pin value
+read from config/pipeline_config.yaml + config/taxonomy.yaml + config/menu_axis_hashes.yaml. No pin value
 and no model name is hardcoded here.
 """
 from __future__ import annotations
@@ -55,12 +55,12 @@ from pipeline.closed_menu import canonical_json, definition_anchored_block, rend
 
 DEFAULT_ANCHOR = REPO / "governance" / "discipline_anchor_rederived_v8_20261007.json"
 DEFAULT_STORE = REPO / "knowledge pipeline" / "maxwell.db"
-MENU_JSON = REPO / "config" / "closed_menu_v7.json"
-TAXONOMY_YAML = REPO / "config" / "taxonomy_v5.yaml"
+TAXONOMY_YAML = REPO / "config" / "taxonomy.yaml"
 PIPELINE_CFG = REPO / "config" / "pipeline_config.yaml"
 PINS_YAML = REPO / "config" / "menu_axis_hashes.yaml"
 
 ABSTENTION = "emerging"
+NOISE_DROP_SOURCE = "noise_drop"  # D-2811: discipline/domain do NOT apply; excluded from re-derivation (BUG-698c / GATE-3)
 _OUT_DIR = REPO / "governance"
 
 
@@ -131,7 +131,7 @@ def load_pins() -> dict[str, str]:
 
 
 def load_taxonomy_version() -> str:
-    """Return the taxonomy source version (single source: config/taxonomy_v5.yaml)."""
+    """Return the taxonomy source version (single source: config/taxonomy.yaml)."""
     tax = _load_yaml(TAXONOMY_YAML)
     return str(tax.get("version") or tax.get("classification_version") or "unknown").strip()
 
@@ -146,6 +146,36 @@ def load_anchor_rows(path: Path) -> list[dict]:
     if declared is not None and len(rows) != int(declared):
         raise SystemExit(f"FAIL: anchor drifted — {len(rows)} rows vs declared {declared}: {path}")
     return rows
+
+
+def partition_rows(rows: list[dict]) -> tuple[list[dict], list[dict]]:
+    """Split anchor rows into re-derivable vs noise_drop (D-2811 / BUG-698c / GATE-3).
+
+    noise_drop rows carry discipline=None + domains=[] and mean "no extractable object — the
+    discipline/domain axes do NOT apply". They must be EXCLUDED from the re-derivation (the
+    generator must never fabricate a discipline on a no-extractable-object row), and are instead
+    preserved verbatim in the final manifest with their noise_drop provenance intact.
+    Returns ``(rederive_rows, noise_rows)``, each in original relative order.
+    """
+    rederive: list[dict] = []
+    noise: list[dict] = []
+    for r in rows:
+        if (r.get("discipline_source") or "") == NOISE_DROP_SOURCE:
+            noise.append(r)
+        else:
+            rederive.append(r)
+    return rederive, noise
+
+
+def normalize_discipline(value: str) -> str:
+    """GATE-3(b)/BUG-698b: an empty discipline on an abstained row means abstention, not an error.
+
+    Normalize '' (or None) -> the 'emerging' abstention token so abstention is a first-class on-menu
+    cell. The v8 anchor stored discipline='' with discipline_source='abstained' — an invalid off-menu
+    value that the re-derivation must not re-mint.
+    """
+    v = (value or "").strip()
+    return ABSTENTION if v == "" else v
 
 
 def join_text(rows: list[dict], store: Path) -> list[dict]:
@@ -248,12 +278,12 @@ def apply_owner_decisions(rows: list[dict], decisions: dict) -> list[dict]:
     out: list[dict] = []
     for r in rows:
         d = decisions[r["item_id"]]
-        discipline = (d.get("discipline") or "").strip()
+        if "discipline" not in d:
+            raise SystemExit(f"FAIL: row {r['item_id']} owner decision is missing 'discipline' (D-2839 c2)")
+        discipline = normalize_discipline(d.get("discipline"))
         domains = d.get("domains") or []
         if not isinstance(domains, list) or not domains:
             raise SystemExit(f"FAIL: row {r['item_id']} owner decision has no domains list")
-        if not discipline:
-            raise SystemExit(f"FAIL: row {r['item_id']} owner decision has empty discipline")
         out.append(
             {
                 **r,
@@ -337,8 +367,14 @@ def finalize_manifest(
     coder: str,
     second_coder: str,
     run_id: str | None = None,
+    noise_rows: list[dict] | None = None,
 ) -> dict:
-    """Assemble the re-derived manifest: top-level menu-v6 pins + per-cell D-274d stamps."""
+    """Assemble the re-derived manifest: top-level menu-v6 pins + per-cell D-274d stamps.
+
+    noise_drop rows are merged back verbatim (empty discipline/domains + noise_drop provenance,
+    re-stamped to the live menu pins) so the manifest carries all declared rows without the
+    re-derivation fabricating a discipline on them (GATE-3c / BUG-698c / D-2811).
+    """
     date = _now()
     rows = []
     for r in finalized:
@@ -364,8 +400,37 @@ def finalize_manifest(
                 "_crosscheck": cross,
             }
         )
+    # GATE-3(c)/BUG-698c: preserve noise_drop rows verbatim — discipline/domain do NOT apply (D-2811).
+    for r in noise_rows or []:
+        rows.append(
+            {
+                "item_id": r["item_id"],
+                "name": r["name"],
+                "discipline": None,
+                "domains": [],
+                "discipline_source": NOISE_DROP_SOURCE,
+                "domain_source": NOISE_DROP_SOURCE,
+                "_stamp": build_cell_stamp(
+                    pins=pins,
+                    taxonomy_version=taxonomy_version,
+                    anchor_version=anchor_version,
+                    coder=coder,
+                    second_coder=second_coder,
+                    date=date,
+                    discipline_abstained=True,
+                    domains_abstained=True,
+                ),
+                "_crosscheck": {},
+            }
+        )
+
+    def _row_index(r: dict) -> int:
+        digits = "".join(c for c in str(r.get("item_id", "")) if c.isdigit())
+        return int(digits) if digits else 0
+
+    rows.sort(key=_row_index)
     return {
-        "artifact_id": f"discipline_anchor_rederived_v6_{run_id or _run_id()}",
+        "artifact_id": f"discipline_anchor_rederived_{anchor_version}_{run_id or _run_id()}",
         "total": len(rows),
         "menu_hash": pins["composite"],
         "answer_space_hash": pins["answer_space"],
@@ -514,8 +579,8 @@ def _verified_path(run_id: str | None = None) -> Path:
     return _OUT_DIR / f"rederive_v6_verified_{run_id or _run_id()}.json"
 
 
-def _manifest_path(run_id: str | None = None) -> Path:
-    return _OUT_DIR / f"discipline_anchor_rederived_v6_{run_id or _run_id()}.json"
+def _manifest_path(run_id: str | None = None, anchor_version: str = "v9") -> Path:
+    return _OUT_DIR / f"discipline_anchor_rederived_{anchor_version}_{run_id or _run_id()}.json"
 
 
 def _selftest() -> int:
@@ -568,6 +633,42 @@ def _selftest() -> int:
     verdict = referee_menu_current_verdict(real_manifest, label="selftest.json", axis="discipline")
     assert verdict["ok"], f"manifest rejected by guard: {verdict['reason']}"
     print("  OK manifest assembly + BUG-650 guard acceptance")
+
+    # GATE-3 / BUG-698: noise_drop partition + ''->'emerging' normalization + noise preservation.
+    noisy = [
+        {"item_id": "R010", "name": "n1", "discipline_source": "noise_drop", "discipline": None, "domains": []},
+        {"item_id": "R020", "name": "n2", "discipline_source": "noise_drop", "discipline": None, "domains": []},
+        {"item_id": "R030", "name": "k1", "discipline_source": "abstained", "discipline": "", "domains": ["ai & agents"]},
+    ]
+    rederive, noise = partition_rows(noisy)
+    assert [r["item_id"] for r in rederive] == ["R030"], "partition_rows must keep non-noise rows"
+    assert [r["item_id"] for r in noise] == ["R010", "R020"], "partition_rows must isolate noise_drop rows"
+    assert normalize_discipline("") == ABSTENTION and normalize_discipline("physics") == "physics", "normalize ''->emerging"
+    # owner abstention via empty discipline -> 'emerging' (GATE-3b); missing key still fails closed
+    abstain_final = apply_owner_decisions(
+        [{"item_id": "R030", "name": "k1", "definition": "d", "mechanism": "m", "boundary": "b", "consequence": "c", "source_text": "s"}],
+        {"R030": {"discipline": "", "domains": ["ai & agents"]}},
+    )
+    assert abstain_final[0]["discipline"] == ABSTENTION, "empty discipline must normalize to 'emerging'"
+    try:
+        apply_owner_decisions(
+            [{"item_id": "R030", "name": "k1", "definition": "d", "mechanism": "m", "boundary": "b", "consequence": "c", "source_text": "s"}],
+            {"R030": {"domains": ["ai & agents"]}},
+        )
+        assert False, "expected SystemExit on missing discipline key"
+    except SystemExit:
+        pass
+    # noise rows preserved verbatim (empty discipline/domains + noise_drop provenance) in the manifest
+    noise_manifest = finalize_manifest(
+        finalized=abstain_final, pins=real_pins, taxonomy_version=load_taxonomy_version(),
+        anchor_version="v9", coder="owner", second_coder="gemma", noise_rows=noise,
+    )
+    assert noise_manifest["total"] == 3, f"manifest must carry rederive + noise rows (got {noise_manifest['total']})"
+    by_id = {r["item_id"]: r for r in noise_manifest["rows"]}
+    assert by_id["R010"]["discipline"] is None and by_id["R010"]["domains"] == [], "noise row must stay empty"
+    assert by_id["R010"]["discipline_source"] == NOISE_DROP_SOURCE, "noise row must keep noise_drop provenance"
+    assert [r["item_id"] for r in noise_manifest["rows"]] == ["R010", "R020", "R030"], "manifest order must be numeric item_id"
+    print("  OK noise_drop partition + ''->emerging normalization + noise preservation (GATE-3/BUG-698)")
     return 0
 
 
@@ -590,7 +691,7 @@ def main() -> int:
         return _selftest()
 
     s4 = load_stage4_config()
-    anchor_path = Path(args.anchor or s4.get("discipline_anchor_path") or str(DEFAULT_ANCHOR))
+    anchor_path = Path(args.anchor or s4.get("anchor_rederive_input_anchor") or str(DEFAULT_ANCHOR))
     store = Path(args.store or str(DEFAULT_STORE))
     generator = str(s4.get("anchor_rederive_generator_model") or s4.get("discipline_model") or "gpt-oss-20b-MXFP4-Q8")
     second_coder = str(s4.get("anchor_rederive_second_coder_model") or "gemma-4-E4B-it-MLX-4bit")
@@ -602,15 +703,17 @@ def main() -> int:
     taxonomy_version = load_taxonomy_version()
     menu = render_menu_v6()
     rows = load_anchor_rows(anchor_path)
-    joined = join_text(rows, store)
+    rederive_rows, noise_rows = partition_rows(rows)
+    joined = join_text(rederive_rows, store)
 
     run_id = (args.run_id or _run_id()).strip()
     if not run_id or any(c in run_id for c in ("/", "\\")):
         raise SystemExit(f"FAIL: invalid --run-id {run_id!r} (no path separators)")
 
     if args.plan:
-        print(f"anchor: {anchor_path}  ({len(joined)} rows joined, 0 missing)")
-        print(f"menu v6: {len(menu['disciplines'])} disciplines, {len(menu['domains'])} domains, abstention='{ABSTENTION}'")
+        print(f"anchor: {anchor_path}  ({len(joined)} rows re-derivable, {len(noise_rows)} noise_drop excluded)")
+        print(f"noise_drop excluded (discipline/domain do NOT apply, D-2811): {[r['item_id'] for r in noise_rows]}")
+        print(f"live menu: {len(menu['disciplines'])} disciplines, {len(menu['domains'])} domains, abstention='{ABSTENTION}'")
         print(f"composite pin: {pins['composite'][:16]}  answer-space pin: {pins['answer_space'][:16]}")
         print(f"taxonomy_version: {taxonomy_version}  anchor_version: {anchor_version}")
         print(f"generator: {generator}   second coder: {second_coder}  (families distinct: {generator != second_coder})")
@@ -620,8 +723,8 @@ def main() -> int:
     if args.generate:
         cands = generate_candidates(joined, menu, generator, args.limit)
         _crash_safe_write(_worklist_path(run_id), {"total": len(cands), "generator_model": generator, "rows": cands})
-        print(f"wrote candidate worklist ({len(cands)} rows) -> {_worklist_path(run_id).name}")
-        print("NEXT: owner adjudicates every row, then: --adjudicate --decisions <file>")
+        print(f"wrote candidate worklist ({len(cands)} re-derivable rows; {len(noise_rows)} noise_drop excluded) -> {_worklist_path(run_id).name}")
+        print("NEXT: owner adjudicates every re-derivable row, then: --adjudicate --decisions <file>")
         return 0
 
     if args.adjudicate:
@@ -655,13 +758,13 @@ def main() -> int:
         manifest = finalize_manifest(
             finalized=verified, pins=pins, taxonomy_version=taxonomy_version,
             anchor_version=anchor_version, coder="owner", second_coder=second_coder,
-            run_id=run_id,
+            run_id=run_id, noise_rows=noise_rows,
         )
         # the re-derived manifest MUST be a valid menu-v6 referee (BUG-650 guard)
         from pipeline.anchor_menu_guard import assert_referee_menu_current
 
-        assert_referee_menu_current(manifest, label=_manifest_path(run_id).name, axis="discipline")
-        out = _manifest_path(run_id)
+        assert_referee_menu_current(manifest, label=_manifest_path(run_id, anchor_version).name, axis="discipline")
+        out = _manifest_path(run_id, anchor_version)
         if out.exists():
             raise SystemExit(f"REFUSED: {out.name} exists — a re-derived anchor is minted once (I2); use --run-id for a new run")
         _crash_safe_write(out, manifest)

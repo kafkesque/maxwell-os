@@ -30,7 +30,7 @@ import yaml  # noqa: E402
 
 def load_aliases() -> dict[str, str]:
     """Return raw/canonical surface → canonical discipline/domain map from the taxonomy."""
-    tax = yaml.safe_load((ROOT / "config" / "taxonomy_v5.yaml").read_text(encoding="utf-8"))
+    tax = yaml.safe_load((ROOT / "config" / "taxonomy.yaml").read_text(encoding="utf-8"))
     alias: dict[str, str] = {}
     for coll in (tax["disciplines"], tax["domains"]):
         for e in coll:

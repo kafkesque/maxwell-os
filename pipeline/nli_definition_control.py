@@ -8,7 +8,7 @@ under-entails on loose topic-membership) or a REAL mislabel signal?
 For a sample of FBs it runs the SAME DeBERTa NLI pair TWICE:
   premise        = FB definition (truncated, identical to nli_label_audit.py)
   hypothesis_flat = "This text is about {label}."
-  hypothesis_def  = the canonical `definition` from taxonomy_v5.yaml (D2570/P1)
+  hypothesis_def  = the canonical `definition` from taxonomy.yaml (D2570/P1)
 
 If hypothesis_def systematically yields HIGHER entail than hypothesis_flat on
 broad/catch-all labels, the flat template is the confound (anomaly C) and the
@@ -38,7 +38,7 @@ from pipeline.pipeline_paths import (  # noqa: E402
 )
 from pipeline.stage5_verify import NLIInferenceError, _nli_pair_scores  # noqa: E402
 
-_TAXONOMY_PATH = _ROOT / "config" / "taxonomy_v5.yaml"
+_TAXONOMY_PATH = _ROOT / "config" / "taxonomy.yaml"
 _JSON_FILE = _ROOT / "governance" / "nli_definition_control.json"
 _FLAT_TEMPLATE = "This text is about {label}."
 _DEFAULT_SAMPLE = 500  # C20: sample size (2 NLI pairs each -> 2*N inferences)

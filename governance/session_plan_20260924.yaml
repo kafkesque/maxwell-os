@@ -129,6 +129,18 @@ may_touch:
 - governance/menu_consumer_classification_*
 - config/*.sha256
 - governance/D2767_CB_CLASSIFICATION_RECOMMENDATION_20261009.md
+- KNOWLEDGE-PIPELINE-ARCHITECTURE.md
+- config/golden/MASTER-ROUNDTABLE-EVAL-PROMPT-v9-S4S5-BULLETPROOF.md
+- prompts/stage/n5_modular.md
+- tools/model_eval_suite.py
+- governance/BUG698_*
+- governance/DECISION_PROPOSALS_D2939_D2940_20261011.md
+- governance/LABEL_ONTOLOGY_PROOF_20261011.md
+- governance/RETRIEVAL_TRUTH_AND_UTILIZATION_20261011.md
+- governance/binary_rulings_confirmation_20261011.csv
+- governance/displaced_domain_repair_triage_20261011.csv
+- governance/owner_decisions_v9_template_20261010.json
+- governance/t9_paraphrase_gold_*
 will_not_touch:
 - governance/F11_*
 - governance/ANCHOR_RULER_CONSOLIDATED_*.csv
@@ -773,3 +785,22 @@ widening_log:
   may_touch_untouched: false
   will_not_touch_untouched: true
   why: 'BUG-694 residual fixed (scripts/definition_nli_verify.py provenance stamp repointed closed_menu_v5 -> live_menu_path()) + the 3-way menu-consumer classification manifest (serving / frozen-validator / builder). The manifest (governance/menu_consumer_classification_*) had NO may_touch home; granted as a glob mirroring the classification-report artifact family. All other touched paths are already inside may_touch: scripts/definition_nli_verify.py (scripts/*.py), config/decisions.yaml + config/decisions_summary.json (config/*.yaml|*.json), DECISION-LOG.md, MASTER-TASK-REGISTER.md, governance/buglog.md, governance/CONTEXT_INDEX.md, governance/MUTATION_JOURNAL.jsonl. pipeline/** untouched; no pinned artifact staged.'
+- entry: 41
+  session: 20261012A
+  owner_ack: 'standing rules (CONTINUE: implement unblocked critical steps; update and sync gov dependencies) + meta-request (drift-proof collaboration memory)'
+  widened:
+  - KNOWLEDGE-PIPELINE-ARCHITECTURE.md
+  - config/golden/MASTER-ROUNDTABLE-EVAL-PROMPT-v9-S4S5-BULLETPROOF.md
+  - prompts/stage/n5_modular.md
+  - tools/model_eval_suite.py
+  - governance/BUG698_*
+  - governance/DECISION_PROPOSALS_D2939_D2940_20261011.md
+  - governance/LABEL_ONTOLOGY_PROOF_20261011.md
+  - governance/RETRIEVAL_TRUTH_AND_UTILIZATION_20261011.md
+  - governance/binary_rulings_confirmation_20261011.csv
+  - governance/displaced_domain_repair_triage_20261011.csv
+  - governance/owner_decisions_v9_template_20261010.json
+  - governance/t9_paraphrase_gold_*
+  may_touch_untouched: false
+  will_not_touch_untouched: true
+  why: 'FORENSIC_AUDIT_20261012 step 1 (stabilize tree): the in-flight D-2933..D-2941 implementation left 16 legitimate artifacts with no may_touch home (BUG-563). Granted NAMED / family (BUG-548 no-glob): root architecture doc, config/golden S4S5 prompt, prompts/stage prompt, tools suite, BUG698 delta CSVs, D-2939/D-2940 proposal, LABEL_ONTOLOGY_PROOF, RETRIEVAL_TRUTH_AND_UTILIZATION, binary rulings confirmation, displaced-domain triage, owner_decisions_v9 template, t9 paraphrase gold. .goose/ session state gitignored (not repo content). 2 byte-identical hygiene snapshots deleted. pipeline/** otherwise untouched; no pinned artifact staged.'

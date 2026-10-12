@@ -33,7 +33,7 @@ _MD_IN = _ROOT / "governance" / "human_review_sample.md"
 _PLAN_JSON = _ROOT / "governance" / "relabel_plan.json"
 _PLAN_MD = _ROOT / "governance" / "relabel_plan.md"
 _TRIAGE = _ROOT / "governance" / "mislabel_triage.json"
-_TAXONOMY = _ROOT / "config" / "taxonomy_v5.yaml"
+_TAXONOMY = _ROOT / "config" / "taxonomy.yaml"
 
 # Proposed resolutions for "?" (undecided) marks — keyed by FB name.
 _UNDECIDED_RESOLUTIONS = {

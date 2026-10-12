@@ -13,7 +13,7 @@ Demote-to-raw (D2536/Q2): the demoted canonical is NOT deleted — its FBs rever
 remains retrievable via the raw-label surface.
 
 Mechanics (C13 / C6):
-1. Back up DB + taxonomy_v5.yaml + S4/S5 checkpoints.
+1. Back up DB + taxonomy.yaml + S4/S5 checkpoints.
 2. YAML: remove the demoted canonical entries; append the promoted canonicals
    (with group + raw alias list).
 3. fbs (single atomic txn):
@@ -63,7 +63,7 @@ SWAPS: list[dict] = [
     },
 ]
 
-TAXONOMY_PATH = _PROJECT_ROOT / "config" / "taxonomy_v5.yaml"
+TAXONOMY_PATH = _PROJECT_ROOT / "config" / "taxonomy.yaml"
 S4_CHECKPOINT = _PROJECT_ROOT / "knowledge pipeline" / "stage4_merge" / "t11" / "checkpoint_enriched.jsonl"
 S5_CHECKPOINT = _PROJECT_ROOT / "knowledge pipeline" / "stage5_verify" / "t11" / "checkpoint.jsonl"
 
@@ -126,7 +126,7 @@ def _edit_taxonomy_yaml(dry_run: bool) -> None:
         if os.path.exists(tmp):
             os.unlink(tmp)
         raise
-    print("  ✅ taxonomy_v5.yaml updated (atomic)")
+    print("  ✅ taxonomy.yaml updated (atomic)")
 
 
 def _counts(db_path: Path) -> dict:
@@ -223,7 +223,7 @@ def main() -> int:
     if not args.skip_integrity:
         _integrity_gate(db_path)
 
-    print("\n  ✏️  updating taxonomy_v5.yaml ...")
+    print("\n  ✏️  updating taxonomy.yaml ...")
     _edit_taxonomy_yaml(dry_run=False)
 
     print("\n  💾 applying swaps ...")

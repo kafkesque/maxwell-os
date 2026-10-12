@@ -33,7 +33,7 @@ import yaml  # noqa: E402
 from pipeline.omlx_call import call_omlx  # noqa: E402
 
 _ALIAS = _ROOT / "config" / "alias_map.yaml"
-_TAXONOMY = _ROOT / "config" / "taxonomy_v5.yaml"
+_TAXONOMY = _ROOT / "config" / "taxonomy.yaml"
 _OUT = _ROOT / "temp" / "alias_review_qwen38.jsonl"
 
 # C20 named constants — model routing mirrors extend_alias_index.py (R5 worker).

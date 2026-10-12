@@ -42,6 +42,10 @@ serving_gate:
       passed: true
       negative: false
       meaning: "NLI ENTAIL-majority — the claim is supported by its evidence"
+    paraphrase:
+      passed: true
+      negative: false
+      meaning: "D-B: NLI neutral (ent>=1, contra=0) + high STS similarity — faithful reworded-true claim"
     neutral:
       passed: false
       negative: false
@@ -75,6 +79,7 @@ serving_gate:
   # These map stage5's persisted factual `detail` string back to the typed reason.
   detail_rules:
     - {prefix: "ENTAIL",                         reason: entail}
+    - {prefix: "PARAPHRASE",                     reason: paraphrase}
     - {prefix: "NEUTRAL",                        reason: neutral}
     - {prefix: "CONTRA",                         reason: contra}
     - {prefix: "All ",                           reason: no_evidence}

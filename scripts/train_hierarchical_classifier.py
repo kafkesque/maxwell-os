@@ -71,7 +71,7 @@ from pipeline.pipeline_paths import PIPELINE_COMMIT, SCHEMA_VERSION  # noqa: E40
 GRAD_CLIP_NORM: float = 1.0
 
 # C12: paths overridable via env (same convention as the flat trainer).
-TAXONOMY = Path(os.environ.get("TAXONOMY_YAML", ROOT / "config" / "taxonomy_v5.yaml"))
+TAXONOMY = Path(os.environ.get("TAXONOMY_YAML", ROOT / "config" / "taxonomy.yaml"))
 # D2618 P0.5: silver training pool retired from the live golden path (BUG-241).
 # TRAINING may use silver (it is the only set large enough); EVAL must use
 # governance/gold_4axis.jsonl via GOLDEN_EVAL. The archived file is train-only.
@@ -84,7 +84,7 @@ def load_discipline_groups() -> Dict[str, List[str]]:
     data = yaml.safe_load(TAXONOMY.read_text(encoding="utf-8")) or {}
     groups = data.get("discipline_groups") or {}
     if not groups:
-        raise ValueError("taxonomy_v5.yaml has no discipline_groups (D2607 B)")
+        raise ValueError("taxonomy.yaml has no discipline_groups (D2607 B)")
     return {str(k): [str(d) for d in v] for k, v in groups.items()}
 
 
@@ -381,7 +381,7 @@ def main() -> None:
         "coarse_names": coarse_names,
         "group_to_disciplines": groups,
         "discipline_to_group": {d: group_of.get(d) for d in disciplines},
-        "note": "D2607 (B) hierarchical coarse groups (source: taxonomy_v5.yaml discipline_groups)",
+        "note": "D2607 (B) hierarchical coarse groups (source: taxonomy.yaml discipline_groups)",
         # R14 stamps.
         "schema_version": SCHEMA_VERSION,
         "gen_model": BASE_MODEL_NAME,

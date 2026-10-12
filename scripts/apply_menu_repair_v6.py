@@ -14,7 +14,7 @@ from pathlib import Path
 import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
-TAX = ROOT / "config" / "taxonomy_v5.yaml"
+TAX = ROOT / "config" / "taxonomy.yaml"
 NORM = ROOT / "config" / "normalization_map.yaml"
 QUEUE = ROOT / "governance" / "MENU_REPAIR_QUEUE_20260921.md"
 MIG = ROOT / "governance" / "TAXONOMY_v6_MIGRATION_20260921.md"

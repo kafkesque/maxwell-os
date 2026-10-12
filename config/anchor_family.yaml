@@ -19,7 +19,7 @@ schema_version: '1.0'
 generated: '2026-09-24'
 registry_doc: governance/ANCHOR_FAMILY_CONSOLIDATION_PLAN_20260924.md
 recall_map: governance/CONTEXT_INDEX.md
-taxonomy: config/taxonomy_v5.yaml
+taxonomy: config/taxonomy.yaml
 
 anchor:
   artifact_id: ANCHOR-3

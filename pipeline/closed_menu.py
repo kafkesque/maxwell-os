@@ -1,6 +1,6 @@
 """pipeline/closed_menu.py — Closed-menu renderer (R1 / D-279).
 
-Builds the canonical classification menu from config/taxonomy_v5.yaml +
+Builds the canonical classification menu from config/taxonomy.yaml +
 config/content_types.yaml, with `emerging` as a FIRST-CLASS abstention value
 (D-275b/D-277/D-2830: the classifier may answer "does not fit" rather than force-fit).
 
@@ -24,7 +24,7 @@ from functools import lru_cache
 from pathlib import Path
 
 _ROOT = Path(__file__).resolve().parent.parent
-_TAXONOMY_PATH = _ROOT / "config" / "taxonomy_v5.yaml"
+_TAXONOMY_PATH = _ROOT / "config" / "taxonomy.yaml"
 _CONTENT_TYPES_PATH = _ROOT / "config" / "content_types.yaml"
 
 

@@ -56,8 +56,8 @@ FLOOD_THRESHOLD_RATIO: float = TAXONOMY_FLOOD_THRESHOLD            # >20% unmatc
 # ── Path helpers ─────────────────────────────────────────────────────────
 
 def _get_taxonomy_path() -> Path:
-    """Return path to current taxonomy YAML (config/taxonomy_v5.yaml)."""
-    return PROJECT_ROOT / "config" / "taxonomy_v5.yaml"
+    """Return path to current taxonomy YAML (config/taxonomy.yaml)."""
+    return PROJECT_ROOT / "config" / "taxonomy.yaml"
 
 
 def _get_next_taxonomy_path() -> Path:
@@ -767,7 +767,7 @@ if __name__ == "__main__":
         if args.command == "init":
             init_taxonomy_counts_table(conn)
             n = seed_from_taxonomy_yaml(conn)
-            print(f"✅ taxonomy_counts initialized: {n} canonical entries seeded from taxonomy_v5.yaml")
+            print(f"✅ taxonomy_counts initialized: {n} canonical entries seeded from taxonomy.yaml")
 
         elif args.command == "check":
             init_taxonomy_counts_table(conn)

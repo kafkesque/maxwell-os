@@ -1,0 +1,48 @@
+{
+  "total": 3,
+  "generator_model": "gpt-oss-20b-MXFP4-Q8",
+  "rows": [
+    {
+      "item_id": "R001",
+      "name": "Surveillance Capitalism Value Proposition",
+      "definition": "Surveillance capitalism extracts value from human behavior data by creating personalized services that enable targeted advertising. The principle describes how user data becomes the raw material for economic value creation in digital platforms.",
+      "mechanism": "This is an empirical pattern describing how user behavior data is monetized through personalized services. The value is generated not from direct user payment but from the ability to predict and influence user actions for advertising purposes. The process involves collecting behavioral data, building predictive models, and using these to optimize ad targeting and user engagement.",
+      "boundary": "Applies when user behavior data can be collected and used for predictive advertising. Fails when data collection is restricted by privacy laws, user consent, or when the platform cannot generate sufficient user engagement to attract advertisers.",
+      "consequence": "Platforms that collect and analyze user behavior data can create economic value through targeted advertising, even when users do not directly pay for services. This creates a business model where the platform's value increases with the amount and quality of user data collected.",
+      "source_text": "[Strategic Analytics (Martin Kunc) (z-library.sk, 1lib.sk, z-lib.sk).md] Surveillance capitalism extracts value from human behavior data by creating personalized services that enable targeted advertising. The principle describes how user data becomes the raw material for economic value creation in digital platforms.",
+      "candidate_discipline": "privacy & surveillance",
+      "candidate_domains": [
+        "marketing & communications",
+        "data visualization",
+        "information architecture",
+        "user experience"
+      ]
+    },
+    {
+      "item_id": "R002",
+      "name": "Soviet Underground Discourse Reception",
+      "definition": "A pattern where Soviet audiences misinterpreted Western cultural references like Fantômas as new genres rather than parodies, and where underground cultural messages were received within the context of official Soviet ideological discourse.",
+      "mechanism": "The Soviet audience's lack of cultural referents led to misinterpretation of Western texts as novel genres, while the official ideological framework shaped how underground messages were understood and received.",
+      "boundary": "Applies to Soviet cultural reception of Western texts and the interaction between official and underground discourse. Fails when the audience has adequate cultural context or when the official discourse is not present.",
+      "consequence": "Western cultural works were reinterpreted through Soviet ideological lenses, and underground messages were filtered through official cultural narratives.",
+      "source_text": "[[Aleksei_Semenenko_(auth.)]_The_Texture_of_Culture.md] A pattern where Soviet audiences misinterpreted Western cultural references like Fantômas as new genres rather than parodies, and where underground cultural messages were received within the context of official Soviet ideological discourse.",
+      "candidate_discipline": "cultural studies",
+      "candidate_domains": [
+        "semiotics & communication"
+      ]
+    },
+    {
+      "item_id": "R003",
+      "name": "Quantum Cognitive Effects in Survey Design",
+      "definition": "A theoretical framework explaining how question order in surveys fundamentally changes respondents' mental states and thinking patterns through quantum-like cognitive processes.",
+      "mechanism": "Survey questions influence respondents' thinking by collapsing superposed mental states, where respondents exist in multiple potential viewpoints simultaneously until a question forces commitment to one perspective, fundamentally reshaping their mental framework rather than merely revealing existing opinions.",
+      "boundary": "Applies to survey design where question order and framing can significantly impact responses. Fails when survey designers do not account for quantum cognitive principles or when respondents are not in superposition states.",
+      "consequence": "Question sequence can dramatically alter survey responses by fundamentally changing how people think rather than simply revealing their existing opinions, requiring new approaches to survey construction.",
+      "source_text": "[The AI-Enabled Engineer_ A Comprehensive Framework for -- Kevin Cai; -- 2026 -- John Wiley & Sons, Incorporated -- isbn13 9781394375783] A theoretical framework explaining how question order in surveys fundamentally changes respondents' mental states and thinking patterns through quantum-like cognitive processes.",
+      "candidate_discipline": "cognitive science",
+      "candidate_domains": [
+        "education"
+      ]
+    }
+  ]
+}

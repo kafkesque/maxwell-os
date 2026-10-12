@@ -34,7 +34,7 @@ import yaml
 
 ROOT = Path(__file__).resolve().parent.parent
 DECISIONS = ROOT / "governance" / "p5_adjudication_final.json"
-TAXONOMY = ROOT / "config" / "taxonomy_v5.yaml"
+TAXONOMY = ROOT / "config" / "taxonomy.yaml"
 STAGE4 = ROOT / "config" / "golden" / "stage4_golden_mined.yaml"
 GOLD_FROZEN = ROOT / "config" / "golden" / "gold_frozen.yaml"
 SOURCE_MAP = ROOT / "temp" / "golden_source_map.json"

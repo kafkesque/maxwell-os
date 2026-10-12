@@ -102,7 +102,7 @@ def _fb_text(fb_id: str) -> Dict[str, Any]:
 
 
 def _discipline_ontology() -> str:
-    tax = yaml.safe_load((ROOT / "config" / "taxonomy_v5.yaml").read_text(encoding="utf-8"))
+    tax = yaml.safe_load((ROOT / "config" / "taxonomy.yaml").read_text(encoding="utf-8"))
     lines = ["DISCIPLINE (choose EXACTLY ONE canonical label from this list):"]
     for d in tax["disciplines"]:
         lines.append(f"- {d['canonical']}: {d.get('definition', '')[:80]}")

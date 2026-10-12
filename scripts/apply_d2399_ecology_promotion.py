@@ -9,7 +9,7 @@ replacement (option 1 of `governance/d2399_manual_review.md` §Ecology):
 
 This mirrors `scripts/apply_d2399_organizational_theory.py` (D2516) exactly — the
 D2378 closed-loop keeps discipline cardinality at 61 (promotion requires demotion).
-The YAML (`config/taxonomy_v5.yaml`) is ALREADY updated (ecology added as canonical,
+The YAML (`config/taxonomy.yaml`) is ALREADY updated (ecology added as canonical,
 computer networking moved to `meta.displaced_canonicals`); this script applies the
 corresponding DB mutation.
 

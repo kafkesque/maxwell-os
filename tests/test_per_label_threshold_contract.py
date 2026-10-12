@@ -6,7 +6,7 @@ that is machine-rewritten in place (not hand-authored), so a malformed write cou
 silently corrupt rates. This test is a second oracle (it does NOT import the populate
 script) and fails if:
 
-  * any key is not a canonical domain/discipline from `taxonomy_v5.yaml`,
+  * any key is not a canonical domain/discipline from `taxonomy.yaml`,
   * any value is not a numeric float in [0, 1] (e.g. YAML turned `0.3914` into `"0.3914"`),
   * the block does not round-trip through `yaml.safe_dump` → `yaml.safe_load`.
 
@@ -22,7 +22,7 @@ import yaml
 
 ROOT = Path(__file__).resolve().parent.parent
 CONFIG_YAML = ROOT / "config" / "pipeline_config.yaml"
-TAXONOMY_YAML = ROOT / "config" / "taxonomy_v5.yaml"
+TAXONOMY_YAML = ROOT / "config" / "taxonomy.yaml"
 
 # Current expected count = 53 disciplines + 40 domains = 93 (v9 menu, post-RATIFY-2
 # D2547 re-calibration — BUG-695). The re-population (scripts/bug695_recalibrate.py)
@@ -37,7 +37,7 @@ BELOW_MIN_SAMPLE_DOMAINS = frozenset({"design systems"})  # 9 fbs < min_sample (
 
 
 def _canonical_labels() -> tuple[set[str], set[str]]:
-    """Return (disciplines, domains) canonical sets from taxonomy_v5.yaml."""
+    """Return (disciplines, domains) canonical sets from taxonomy.yaml."""
     data = yaml.safe_load(TAXONOMY_YAML.read_text(encoding="utf-8")) or {}
 
     def _names(key: str) -> set[str]:
@@ -72,7 +72,7 @@ def test_per_label_is_populated_dict() -> None:
 def test_per_label_keys_are_canonical() -> None:
     disciplines, domains = _canonical_labels()
     canon = disciplines | domains
-    assert len(disciplines) and len(domains), "taxonomy_v5.yaml canonical sets empty"
+    assert len(disciplines) and len(domains), "taxonomy.yaml canonical sets empty"
     pl = _per_label()
     non_canonical = sorted(k for k in pl if k not in canon)
     assert not non_canonical, f"per_label has non-canonical keys: {non_canonical}"

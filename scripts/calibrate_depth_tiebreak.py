@@ -36,7 +36,7 @@ from pipeline.embeddings import embed_texts_bge_m3  # noqa: E402
 FRONTIER69 = ROOT / "governance" / "deepseek_frontier69_audit_v2.json"
 EXTENSION80 = ROOT / "governance" / "deepseek_extension80_audit.json"
 GOLDEN = ROOT / "config" / "golden" / "stage4_golden_mined.yaml"
-TAXONOMY = ROOT / "config" / "taxonomy_v5.yaml"
+TAXONOMY = ROOT / "config" / "taxonomy.yaml"
 EMBED_CACHE = ROOT / "governance" / ".taxonomy_emb_v5.npz"
 
 DEPTHS = ("universal", "cross-domain", "domain", "specialized")

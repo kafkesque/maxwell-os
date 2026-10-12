@@ -20,7 +20,7 @@ from datetime import datetime
 from pathlib import Path
 
 _ROOT = Path(__file__).resolve().parent.parent
-_TAX = _ROOT / "config" / "taxonomy_v5.yaml"
+_TAX = _ROOT / "config" / "taxonomy.yaml"
 
 # (wrong canonical, exact raw string to remove) — keep in the TRUE home, drop from the wrong one.
 REMOVE: list[tuple[str, str]] = [
@@ -86,7 +86,7 @@ def main() -> int:
         return 0
 
     ts = datetime.now().strftime("%Y%m%d_%H%M%S")
-    bak = _TAX.with_name(f"taxonomy_v5.yaml.bak_{ts}_pre_bug309")
+    bak = _TAX.with_name(f"taxonomy.yaml.bak_{ts}_pre_bug309")
     os.replace(_TAX, bak)
     fd, tmp = tempfile.mkstemp(dir=str(_TAX.parent), suffix=".tmp")
     try:

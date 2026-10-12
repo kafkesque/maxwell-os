@@ -18,7 +18,7 @@ atomic transaction → idempotent taxonomy_counts recount.
 
 No hardcoded domain names: the systematic set is derived from relabel_plan.json, the
 flagged set from mislabel_triage.json, and the catch-all placeholder from
-taxonomy_v5.yaml meta.
+taxonomy.yaml meta.
 
 Run:
     python3 scripts/cascade_deregister_domains.py            # dry-run
@@ -44,7 +44,7 @@ from pipeline.pipeline_paths import DB_PATH  # noqa: E402
 
 _RELABEL_PLAN = _ROOT / "governance" / "relabel_plan.json"
 _MISLABEL_TRIAGE = _ROOT / "governance" / "mislabel_triage.json"
-_TAXONOMY = _ROOT / "config" / "taxonomy_v5.yaml"
+_TAXONOMY = _ROOT / "config" / "taxonomy.yaml"
 
 _AXIS_PREFIX = "domain:"  # C20: the audit encodes axes as "domain:<label>"
 

@@ -888,7 +888,7 @@ disciplines:
   - organization theory
   - organisational theory
   - organizational studies
-  definition: The study of structures, processes, and dynamics within formal organizations and institutions — how they are designed, how they coordinate, and how they change.
+  definition: The descriptive and explanatory study of how formal organizations are structured, how they coordinate, and how they change — treating the organization itself as the object of inquiry. Asks how organizations work, never how to steer one.
   exclude:
   - sociology
   - strategic thinking
@@ -1687,7 +1687,7 @@ disciplines:
   - organizational management
   - business management
   - administration
-  definition: The academic study of how organizations are structured, coordinated, and governed — spanning strategy, operations, human-resource management, and organizational design — to achieve objectives under resource constraints. A management lens applied across subject-matter domains (business operations, business development, project management), not the subject matter itself.
+  definition: The prescriptive and applied discipline of steering an organization toward objectives under resource constraints — spanning strategy, operations, human-resource management, and organizational design. A management lens applied across subject-matter domains, not the subject matter itself.
   exclude:
   - organizational theory
   - strategic thinking
@@ -1825,6 +1825,58 @@ meta:
   - visual semiotics
   - information retrieval
   - computational theory
+  # D-2935 (2026-10-11): the EXECUTABLE counterpart of displaced_canonicals.
+  # displaced_canonicals declares WHAT was retired; displaced_to declares WHERE each
+  # retired label must land. It is axis-aware because the retired set mixes two axes,
+  # and a domain target must never be a discipline (or vice versa) — otherwise the
+  # repair itself would mint a D2620/BUG-197 non-contamination violation.
+  # status: ratified_deterministic = apply on sight (LLM-free, C12-first, D-2898).
+  #         owner_gate            = no agent may auto-mint a home (D-2898); `target`
+  #                                 must stay null until the owner signs a triage CSV.
+  # Rows are re-homed by scripts/repair_displaced_canonical_domains.py.
+  displaced_to:
+    science & research:
+      axis: domain
+      target: research practice
+      basis: D-2865 merge (dom-031 -> dom-025) + D-2902 (12 domain aliases re-pointed)
+      status: ratified_deterministic
+    social sciences:
+      axis: domain
+      target: research practice
+      basis: D-2865 demote (folded into research practice, no new canonical); D-2902 requires per-alias re-homing
+      status: ratified_deterministic
+      per_alias_required: true
+      per_alias_note: resolve each row through domains_raw via alias_map.domain_aliases FIRST; the ratified fold is the fallback, and any fallback row is flagged for owner triage
+    visual semiotics:
+      axis: discipline
+      target: semiotics
+      basis: D-2897 fold + D-2899 (44 rows re-stamped)
+      status: ratified_deterministic
+    information retrieval:
+      axis: discipline
+      target: information science
+      basis: D-2897 cross-macro merge + D-2899 (9 rows re-stamped)
+      status: ratified_deterministic
+    computational theory:
+      axis: discipline
+      target: emerging
+      basis: D-2897 demote (slot removed, discipline_raw verbatim) + D-2899 (16 rows)
+      status: ratified_deterministic
+    social engineering:
+      axis: domain
+      target: null
+      basis: displaced at v5.4; no ratified home
+      status: owner_gate
+    ml systems & infrastructure:
+      axis: domain
+      target: null
+      basis: displaced; no ratified home
+      status: owner_gate
+    computer networking:
+      axis: domain
+      target: null
+      basis: D-2399 moved to displaced_canonicals; no ratified home
+      status: owner_gate
   catch_all_domain: emerging
   catch_all_discipline: emerging
   catch_all_description: 'Used when no canonical domain or discipline fits the principle ontologically and pragmatically. Preserves the raw S3A convergence label as s3_original_domain for future taxonomy expansion when enough principles accumulate under a label.

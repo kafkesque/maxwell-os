@@ -2,7 +2,7 @@
 """scripts/apply_enrichment.py — cross-domain enrichment (D2566).
 
 Adds missing canonical domains to under-labeled FBs whose raw labels map through
-the FULL domain alias index (taxonomy_v5.yaml raw + synonym_map.yaml + alias_map.yaml
+the FULL domain alias index (taxonomy.yaml raw + synonym_map.yaml + alias_map.yaml
 domain_aliases + canonical-self), EXCLUDING the catch-all domains that the audits
 flagged as systematically over-assigned (those are removed in Phase 1, never
 re-added here). Updates only the `domains` canonical array; `domains_raw` untouched.
@@ -34,7 +34,7 @@ import yaml  # noqa: E402
 
 from pipeline.pipeline_paths import DB_PATH  # noqa: E402
 
-_TAXONOMY = _ROOT / "config" / "taxonomy_v5.yaml"
+_TAXONOMY = _ROOT / "config" / "taxonomy.yaml"
 _SYNONYM_MAP = _ROOT / "config" / "synonym_map.yaml"
 _ALIAS_MAP = _ROOT / "config" / "alias_map.yaml"
 
@@ -51,7 +51,7 @@ _COMPOUND_RE = re.compile(r"\s*(?:&|\+|/|\band\b|\bvs\.?\b|,)\s*", re.IGNORECASE
 def _domain_index() -> dict[str, list[str]]:
     """Build the full domain raw->canonical index (list-valued, D2566).
 
-    Sources: taxonomy_v5.yaml (raw + canonical-self), synonym_map.yaml (synonyms
+    Sources: taxonomy.yaml (raw + canonical-self), synonym_map.yaml (synonyms
     + keywords), alias_map.yaml domain_aliases (single OR compound list).
     """
     idx: dict[str, list[str]] = {}

@@ -54,7 +54,7 @@ PROTECTED_FILES = {
 
 # Extended config protection
 CONFIG_FILES = [
-    "config/taxonomy_v5.yaml",
+    "config/taxonomy.yaml",
     "config/model_assignments.yaml",
     "config/domain_anchors.yaml",
     "config/domain_disciplines.yaml",

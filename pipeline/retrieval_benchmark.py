@@ -42,8 +42,10 @@ import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from pipeline.pipeline_paths import DB_PATH, HYDE_MAX_TOKENS, HYDE_MODEL
+from pipeline.pipeline_paths import CANONICAL_RUN, DB_PATH, HYDE_MAX_TOKENS, HYDE_MODEL
 from pipeline.retrieve import get_conn, search_fts, search_vector, search_hybrid
+# D-2939: owner-approved NAMES -> current fb_ids (the pointer is mechanical).
+from pipeline.golden import resolve_golden_anchors, sample_self_retrieval  # noqa: E402
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 GOLDEN_PATH = PROJECT_ROOT / "config" / "golden" / "retrieval_queries.yaml"
@@ -51,14 +53,64 @@ GOLDEN_PATH = PROJECT_ROOT / "config" / "golden" / "retrieval_queries.yaml"
 with open(PROJECT_ROOT / "config" / "pipeline_config.yaml") as _f:
     _CFG = yaml.safe_load(_f) or {}
 _BENCH = _CFG.get("retrieval_benchmark", {})
+_SERVING: dict = _CFG.get("serving", {})
 DEFAULT_K: int = int(_BENCH.get("top_k", 10))
 DEFAULT_POOL: int = int(_BENCH.get("candidate_pool", 30))
+# D-2936: the scope a golden id must live in to be measurable at all.
+DEFAULT_SERVING_SCOPE: str = str(_SERVING.get("index_scope", "canonical_run"))
+# C16/BUG-710: never report a recall number for a golden the harness cannot resolve.
+_REQUIRE_RESOLVABLE: bool = bool(_SERVING.get("require_resolvable_goldens", True))
 
 
 def _load_golden(path: Path) -> list[dict]:
     with open(path) as f:
         data = yaml.safe_load(f)
     return data.get("queries", [])
+
+
+def _resolvability(conn, queries: list[dict], serving_scope: str) -> dict:
+    """C16 precondition: can each golden id be returned by the SERVING path at all?
+
+    BUG-710: this harness reported recall@k = 0.000 for 30/30 goldens and it was
+    read as a retrieval-quality regression. It was not: every golden fb_id belonged
+    to the superseded t11 run, while serving is pinned to CANONICAL_RUN (D-2881), so
+    the expected ids were STRUCTURALLY unreturnable. A benchmark that cannot fail
+    loud about that is worse than no benchmark — it inverts the signal.
+
+    For every expected id this reports:
+      * found          : the id exists in the store at all
+      * run            : the pipeline_run_id it belongs to
+      * in_scope       : run == CANONICAL_RUN when serving_scope == "canonical_run"
+      * status         : PASS / QUARANTINE (QUARANTINE is filtered out of serving
+                         unless include_quarantine is set, so it is also unreturnable)
+      * measurable     : in_scope AND status == 'PASS'
+    """
+    rows: list[dict] = []
+    for q in queries:
+        for expected in q.get("expected", []):
+            hit = conn.execute(
+                "SELECT fb_id, pipeline_run_id, status, name FROM fbs WHERE fb_id LIKE ? LIMIT 1",
+                (expected + "%",),
+            ).fetchone()
+            if hit is None:
+                rows.append({"query": q.get("query", ""), "expected": expected, "found": False,
+                             "run": None, "in_scope": False, "status": None, "name": None, "measurable": False})
+                continue
+            in_scope = serving_scope != "canonical_run" or hit["pipeline_run_id"] == CANONICAL_RUN
+            rows.append({
+                "query": q.get("query", ""), "expected": expected, "found": True,
+                "run": hit["pipeline_run_id"], "in_scope": in_scope, "status": hit["status"],
+                "name": hit["name"], "measurable": bool(in_scope and hit["status"] == "PASS"),
+            })
+    meas = sum(1 for r in rows if r["measurable"])
+    return {
+        "serving_scope": serving_scope,
+        "canonical_run": CANONICAL_RUN,
+        "total": len(rows),
+        "measurable": meas,
+        "unreturnable": len(rows) - meas,
+        "rows": rows,
+    }
 
 
 def _ids(results: list[dict]) -> list[str]:
@@ -190,6 +242,61 @@ def _run_method(conn, name: str, query: str, expected: list[str],
     }
 
 
+def _run_self_retrieval(conn, args) -> int:
+    """D-2940 — the LABEL-FREE slice: query every sampled FB by its own NAME.
+
+    Why this exists: every recall number in this harness needs an owner-signed
+    golden, and goldens rot on each reprocess (BUG-710/D-2939), so for months the
+    only true statement available was "no baseline exists". This slice mints NO
+    label (D-2898 governs LABELS, and there are none here), so it is not
+    owner-gated and it is always runnable.
+
+    What it measures: "can the stack find an object it already holds" — index
+    health and leg ordering, isolated from question-answering ability.
+
+    What it does NOT measure (guard against slope): a FB name is a LEXICAL query,
+    so FTS flatters itself here and this number must never be quoted as retrieval
+    quality for abstract questions. It is a REGRESSION rail for the semantic slice.
+    """
+    sc: dict = _BENCH.get("self_retrieval", {}) or {}
+    n: int = args.self_retrieval or int(sc.get("sample", 30))
+    legs: list[str] = list(sc.get("legs", ["fts", "vector", "hybrid"]))
+    rows = sample_self_retrieval(conn, n, order=str(sc.get("order", "fb_id")))
+    if not rows:
+        print("  ❌ self-retrieval sample is empty (C16)")
+        return 2
+
+    agg: dict[str, dict[str, float]] = {lg: {"recall": 0.0, "mrr": 0.0} for lg in legs}
+    for r in rows:
+        for lg in legs:
+            res = _run_method(conn, lg, r["name"], [r["fb_id"]], args.top_k, args.pool, True)
+            agg[lg]["recall"] += res["recall"]
+            agg[lg]["mrr"] += res["mrr"]
+    m: int = len(rows)
+    for lg in legs:
+        agg[lg]["recall"] = round(agg[lg]["recall"] / m, 4)
+        agg[lg]["mrr"] = round(agg[lg]["mrr"] / m, 4)
+
+    payload = {
+        "slice": "self-retrieval (label-free)", "sample": m, "k": args.top_k,
+        "canonical_run": CANONICAL_RUN, "aggregate": agg,
+        "caveat": "name queries are lexical; FTS is flattered. Regression rail only.",
+    }
+    if args.json:
+        print(json.dumps(payload, indent=2))
+        return 0
+
+    print(f"\n═══ D-2940 LABEL-FREE SLICE — self-retrieval (k={args.top_k}, n={m}) ═══")
+    print(f"  run={CANONICAL_RUN}  query = the FB's own NAME, correct = itself")
+    print(f"{'leg':<16} {'recall@k':>10} {'MRR':>8}")
+    print("-" * 36)
+    for lg in legs:
+        print(f"{lg:<16} {agg[lg]['recall']:>10.3f} {agg[lg]['mrr']:>8.3f}")
+    print("\n  ⚠  lexical proxy: it must never be quoted as retrieval quality for")
+    print("     abstract questions. It is the always-available regression rail.")
+    return 0
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Golden-set retrieval benchmark (D2511)")
     parser.add_argument("--db", type=Path, default=DB_PATH)
@@ -200,6 +307,15 @@ def main() -> int:
     parser.add_argument("--contextual", action="store_true", help="A/B contextual embedding (S1)")
     parser.add_argument("--hyde", action="store_true", help="A/B HyDE hypothetical-document embedding (S3)")
     parser.add_argument("--json", action="store_true", help="JSON output")
+    parser.add_argument("--serving-scope", default=DEFAULT_SERVING_SCOPE,
+                        choices=["canonical_run", "all_runs"],
+                        help="scope a golden id must live in to be measurable (config serving.index_scope)")
+    parser.add_argument("--allow-unresolvable", action="store_true",
+                        help="C16 override: report metrics even when goldens are outside the serving scope (diagnostic only)")
+    parser.add_argument("--self-retrieval", nargs="?", const=0, type=int, default=None,
+                        help="D-2940 label-free slice: query each sampled FB by its own NAME. "
+                             "Mints no gold label, so it needs no owner gate; it is a REGRESSION rail, "
+                             "not a substitute for the semantic golden slice (a name query is lexical).")
     args = parser.parse_args()
 
     queries = _load_golden(args.golden)
@@ -208,6 +324,43 @@ def main() -> int:
         return 1
 
     conn = get_conn()
+
+    if args.self_retrieval is not None:
+        return _run_self_retrieval(conn, args)
+
+    # D-2939 (label vs pointer): an owner approves a NAME, not a content hash.
+    # Resolve expected_names -> ids in the serving scope so the anchor survives a
+    # corpus reprocess. An unresolvable name is EXCLUDED from the denominator and
+    # reported — never scored 0 (BUG-710: a 0.000 recall on a structurally
+    # unreturnable anchor measures the GOLDEN SET, not retrieval).
+    queries, anchor_report = resolve_golden_anchors(conn, queries, args.serving_scope)
+    for _u in anchor_report["unresolved"]:
+        print(f"  ⚠️  golden anchor UNRESOLVED {_u['name']!r} ({_u['why']}) <- {_u['query'][:40]}")
+    for _a in anchor_report["ambiguous"]:
+        print(f"  ⚠️  golden anchor AMBIGUOUS  {_a['name']!r} ({_a['n']} rows) <- {_a['query'][:40]}")
+    if anchor_report["excluded_queries"]:
+        print(f"  ⚠️  {len(anchor_report['excluded_queries'])} golden query(ies) EXCLUDED from the "
+              f"denominator (no resolvable anchor — BUG-710)")
+    if not queries:
+        print("  ❌ every golden query was excluded — nothing measurable (C16)")
+        return 2
+
+    # D-2936 / BUG-710: refuse to emit a recall number for unreturnable goldens.
+    resolution = _resolvability(conn, queries, args.serving_scope)
+    if resolution["unreturnable"]:
+        print(f"\n  ❌ GOLDEN RESOLVABILITY FAILED (C16, BUG-710)")
+        print(f"     serving scope: {resolution['serving_scope']} (canonical run = {resolution['canonical_run']})")
+        print(f"     measurable goldens: {resolution['measurable']}/{resolution['total']}")
+        for r in resolution["rows"]:
+            if not r["measurable"]:
+                where = f"run={r['run']} status={r['status']}" if r["found"] else "NOT IN STORE"
+                print(f"       ✗ {r['expected']}  {where}  ({(r['name'] or '')[:40]})  <- {r['query'][:44]}")
+        print("     A 0.000 recall on these ids measures the GOLDEN SET, not retrieval.")
+        print("     Fix: re-anchor the goldens to the served run (scripts/reanchor_retrieval_goldens.py),")
+        print("     or pass --allow-unresolvable for a diagnostic run, or --serving-scope all_runs.")
+        if _REQUIRE_RESOLVABLE and not args.allow_unresolvable:
+            return 2
+
     methods = ["fts", "vector", "hybrid"]
     if args.contextual:
         methods.append("hybrid-ctx")
@@ -223,7 +376,7 @@ def main() -> int:
 
     for q in queries:
         query: str = q["query"]
-        expected: list[str] = q["expected"]
+        expected: list[str] = q.get("expected", [])
         row = {"query": query, "type": q.get("query_type", "?"), "methods": {}}
         for m in methods:
             res = _run_method(conn, m, query, expected, args.top_k, args.pool, args.rerank)

@@ -1,0 +1,13 @@
+item_id,category,what_it_is,proposed_default,owner_decision
+F-11,CALIBRATION,Second-coder gap: the ruler is human-mixed + llm-attested, not independent human truth. Cannot unfreeze eval floors or D-300.,KEEP FROZEN (advisory-only; no floor unfreeze),
+BUG-376,DATA INTEGRITY,Owner gate C-3: a completed S5 run's declared input was rewritten after the run and the image is gone.,ACCEPT mitigation (freeze the byte-stable S5/T11 pair; proceed),
+BUG-711,ONTOLOGY,21 quarantine triage cells whose domain labels were never re-homed (displaced_canonicals declared WHAT, not WHERE).,APPLY meta.displaced_to home (D-2935; deterministic, axis-aware),
+RATIFY-2,ONTOLOGY,v5.6->v9 label coherence for the S5 checkpoint (incl. D-2815 skew handling).,ACCEPT v9 labels (column-scoped guard, D-2934),
+D-2884(b),GOVERNANCE,Distinct-family decider A/B for generator!=verifier (owner referee vs LLM decider).,ACCEPT decider A/B outcome (clef-flash artifact),
+G2,CALIBRATION,S4 swap gate was mis-measured (raw LLM label scored against canonical gold; BUG-260).,RE-MEASURE with correct instrument (advisory; not a floor),
+G7,ONTOLOGY,F-11 anchor content-type ruling (ruled_ct_20260922) for the human ruler.,KEEP owner ruling (consolidated anchor; append-only),
+G14,DATA INTEGRITY,Work-identity dedup at ingestion (source_diversity counts filenames; 29.1% of convergence is one book twice).,RATIFY + implement,
+G15,RETRIEVAL,Index body fields into FTS first (11.1% of each FB searchable today); evidence_passages as a fourth leg later.,RATIFY + implement,
+G16,RETRIEVAL,Chunk/evidence leg: join is 100% (205,813/205,813); ~214k vectors ~438 MB; per-field vectors + weighted RRF.,RATIFY + implement,
+G19,DATA INTEGRITY,Persist the tier stage 5 already computes (epistemic_status/isor/verification_method); de-literal the verifier stamp.,RATIFY + implement,
+G20,ONTOLOGY,Priority-register ontology item (ratify the pending taxonomy slot/axis ruling).,REVIEW (owner to confirm exact ruling),

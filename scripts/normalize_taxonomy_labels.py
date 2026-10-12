@@ -23,7 +23,14 @@ placeholder is replaced. Crash-safe (C6): backs up the DB before writing; a sing
 transaction. Idempotent: re-running finds 0 changes.
 
 Usage:
-    /opt/homebrew/bin/python3 scripts/normalize_taxonomy_labels.py [--dry-run]
+    /opt/homebrew/bin/python3 scripts/normalize_taxonomy_labels.py [--dry-run] [--surface-only]
+
+--surface-only (D-2896): apply ONLY the NFKC/dash-fold surface normalization (fix 1).
+    Skips compound decomposition (fix 2) and alias re-resolution (fix 3). The latter
+    two flip "emerging" -> a real canonical and are therefore GATED behind the v9
+    anchor being RATIFIED (BUG-698 --finalize + owner sign-off + re-point), so the
+    anchor and the fbs state never diverge. The surface-fold is typographic-only and
+    safe to run at any time.
 """
 from __future__ import annotations
 
@@ -56,6 +63,8 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="NFKC-normalize + re-resolve FB taxonomy labels (D2515)")
     parser.add_argument("--db", type=Path, default=DB_PATH)
     parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--surface-only", action="store_true",
+                        help="D-2896: only NFKC/dash-fold surface normalization; skip emerging->canonical re-resolution")
     args = parser.parse_args()
 
     if not args.db.exists():
@@ -86,7 +95,7 @@ def main() -> int:
         # Merge-based domain re-resolution (only replaces the "emerging" placeholder).
         new_domains = list(domains_norm)
         resolved_domains: list[str] = []
-        if "emerging" in new_domains and domains_raw_norm:
+        if "emerging" in new_domains and domains_raw_norm and not args.surface_only:
             resolved_domains = match_domains_to_canonical(domains_raw_norm)
             existing = [d for d in new_domains if d != "emerging"]
             merged = list(existing)
@@ -99,26 +108,30 @@ def main() -> int:
 
         # Discipline re-resolution (only when currently "emerging").
         new_discipline = discipline_norm
-        if new_discipline == "emerging" and discipline_raw_norm:
+        if new_discipline == "emerging" and discipline_raw_norm and not args.surface_only:
             resolved_disc = match_to_canonical(discipline_raw_norm, "discipline")
             if resolved_disc:
                 new_discipline = resolved_disc
                 disc_resolved += 1
 
+        # D-2896/F8: detect raw-field surface-folds too. Raw provenance labels
+        # (domains_raw/discipline_raw) are folded at the write boundary and MUST be
+        # backfilled; the prior change-detection compared ONLY canonical fields and
+        # silently skipped raw-only folds (case/dash/NFKC) — a blindspot that left
+        # e.g. "Computer Science" (raw) unfolded.
         domains_changed = json.dumps(new_domains, sort_keys=True) != json.dumps(domains, sort_keys=True)
         discipline_changed = new_discipline != discipline
-        if domains_changed or discipline_changed:
-            # classify whether an NFKC-only edit contributed
-            if (json.dumps(domains_norm, sort_keys=True) != json.dumps(domains, sort_keys=True)
-                    or json.dumps(domains_raw_norm, sort_keys=True) != json.dumps(domains_raw, sort_keys=True)
-                    or discipline_norm != discipline
-                    or discipline_raw_norm != discipline_raw):
+        domains_raw_changed = json.dumps(domains_raw_norm, sort_keys=True) != json.dumps(domains_raw, sort_keys=True)
+        discipline_raw_changed = discipline_raw_norm != discipline_raw
+        if domains_changed or discipline_changed or domains_raw_changed or discipline_raw_changed:
+            if domains_raw_changed or discipline_raw_changed:
                 nfkc_edits += 1
             updates.append((r["rowid"], new_domains, domains_raw_norm, new_discipline, discipline_raw_norm))
 
+    mode = "surface-only (D-2896 fold, no emerging->canonical)" if args.surface_only else "full (fold + decompose + resolve)"
     if args.dry_run:
         conn.close()
-        print(f"  🔍 --dry-run: {len(updates)} FBs would change "
+        print(f"  🔍 --dry-run [{mode}]: {len(updates)} FBs would change "
               f"(domains decomposed: {dom_decomposed}, disciplines re-resolved: {disc_resolved}, NFKC edits: {nfkc_edits})")
         return 0
 
@@ -147,7 +160,7 @@ def main() -> int:
     conn.commit()
 
     conn.close()
-    print(f"  ✅ {len(updates)} FBs re-derived "
+    print(f"  ✅ [{mode}] {len(updates)} FBs re-derived "
           f"(domains decomposed: {dom_decomposed}, disciplines re-resolved: {disc_resolved}, NFKC edits: {nfkc_edits})")
     print(f"  ✅ taxonomy_counts reconciled + recounted")
     return 0

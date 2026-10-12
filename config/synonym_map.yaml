@@ -9,7 +9,7 @@
 # This expands D28's hardcoded pattern matching to cover actual S3 vocabulary.
 # Generation: python3 tools/synonym_generator.py --validate
 #
-# See also: config/taxonomy_v5.yaml, config/context_definitions.yaml
+# See also: config/taxonomy.yaml, config/context_definitions.yaml
 # Related FBs: C5 (Keyword Validation), K5 (FB Relations)
 
 version: "2026-07-08.K4"

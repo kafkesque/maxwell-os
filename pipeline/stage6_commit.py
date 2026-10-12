@@ -44,6 +44,9 @@ from pipeline.pipeline_paths import (
     PARQUET_DIR,
     S15_EMBED_DIM,
     S6_MAX_FAILED_RATIO,  # D2338: fail-closed commit tolerance
+    S6_COMMIT_SCOPE,  # D-2933 (rule V): verification-scoped commit
+    S6_S5_OWNED_COLUMNS,  # D-2933: the S5-owned provenance column set (C12)
+    S6_TAXONOMY_DEPENDENT_COLUMNS,  # D-2934: column-scoped taxonomy-skew guard
     S6_VEC_REQUIRE,  # D-2717: fail-closed vec0 gate (C16)
 
     STAGE5_CHECKPOINT,
@@ -69,6 +72,7 @@ from pipeline.schema_accessor import (
 from pipeline.serving_gate import pre_write_verdict  # D274a/D274h: the pre-write half of the gate
 from pipeline.discipline_macro import macro_for  # D-2884(a): C21 single home for fine->macro collapse
 from pipeline.stamp import get_pipeline_commit, stamp_record, write_stage_code_fingerprint
+from pipeline.sqlite_vec_loader import load_sqlite_vec  # D-2915: shared sqlite-vec loader (ctypes fallback)
 from pipeline.schemas import (  # D2616 Phase 0: runtime ontology boundary
     validate_fb_content_type,
     validate_fb_depth,
@@ -207,27 +211,13 @@ def init_db(db_path: Path) -> sqlite3.Connection:
     # BUG-104: distinguish ImportError (package missing) from AttributeError
     # (load_extension unavailable on python.org framework builds) — the broad
     # `except (ImportError, Exception)` masked the real remediation.
-    _vec_loaded = False  # D-2717: tracks vec0 load success for the fail-closed gate
-    try:
-        import sqlite_vec
-    except ImportError:
-        print("  ⚠️  sqlite-vec package not installed — vector search unavailable.")
-        print("     Install: pip install sqlite-vec")
-        sqlite_vec = None
-    else:
-        try:
-            conn.enable_load_extension(True)
-            sqlite_vec.load(conn)
-            conn.enable_load_extension(False)
-            _vec_loaded = True  # D-2717: vec0 load succeeded
-        except AttributeError as e:
-            print(f"  ⚠️  sqlite-vec installed but load_extension unavailable: {e}")
-            print("     This Python build lacks enable_load_extension (python.org framework build).")
-            print("     Vector search unavailable. Fix: use Homebrew Python (`brew install python@3.12`)")
-            print("     or conda-forge Python. FTS retrieval still works.")
-        except Exception as e:
-            print(f"  ⚠️  sqlite-vec failed to load: {e}")
-            print("     Vector search unavailable; FTS retrieval still works.")
+    # D-2717/D-2915: track vec0 load success for the fail-closed gate (C16).
+    _vec = load_sqlite_vec(conn)
+    _vec_loaded = _vec.loaded
+    if not _vec.loaded:
+        print(f"  ⚠️  sqlite-vec unavailable: {_vec.error}")
+        print("     Vector search unavailable; FTS retrieval still works. For a")
+        print("     vec0-capable interpreter see stage6.vec_python (Homebrew/conda Python).")
 
     if S6_VEC_REQUIRE and not _vec_loaded:
         raise RuntimeError(
@@ -509,8 +499,179 @@ def insert_embedding(conn: sqlite3.Connection, rowid: int, definition: str) -> b
         return False  # Non-critical — vector search will fall back to FTS
 
 
+# D-2934: taxonomy-skew advisories, recorded ONCE per (checkpoint, store) version pair so a
+# 6,591-row batch cannot emit 6,591 identical lines (C28: no log bloat) while still being loud.
+TAXONOMY_SKEW_ADVISORY: dict[tuple[str, str], int] = {}
+
+
+def _record_taxonomy_skew(checkpoint_taxonomy: str, store_taxonomy: str) -> None:
+    """Record (loudly, once) that provenance from one menu version is landing on a row stamped
+    with another. The skew is immaterial for the S5-owned columns (D-2934) but must never be
+    silent: it is printed on the first occurrence and carries the row count in the summary.
+
+    Args:
+        checkpoint_taxonomy: the taxonomy_version carried by the S5 checkpoint.
+        store_taxonomy: the taxonomy_version already stamped on the row in the store.
+    """
+    key = (checkpoint_taxonomy, store_taxonomy)
+    if key not in TAXONOMY_SKEW_ADVISORY:
+        print(f"  ⚠️  taxonomy skew: checkpoint {checkpoint_taxonomy!r} vs store {store_taxonomy!r} — "
+              f"no menu-derived column is written (D-2934); recording the skew, not refusing.")
+    TAXONOMY_SKEW_ADVISORY[key] = TAXONOMY_SKEW_ADVISORY.get(key, 0) + 1
+
+
+S5_COLUMN_COERCERS: dict[str, str] = {
+    "status": "str", "s5_reason": "str", "verifier_model": "str", "verification_method": "str",
+    "epistemic_status": "str", "practicality": "str", "committed_at": "str",
+    "verification_results": "json", "isor": "json", "needs_human_review": "bool",
+}
+
+
+def _coerce_s5_value(column: str, value: object) -> object:
+    """Coerce an S5-owned column to its storage shape (C12: shape declared once, above).
+
+    Args:
+        column: the target column name.
+        value: the raw checkpoint value.
+
+    Returns:
+        The value in storage shape.
+
+    Raises:
+        RuntimeError: an S5-owned column has no declared coercer (fail-closed, C16).
+    """
+    kind = S5_COLUMN_COERCERS.get(column)
+    if kind is None:
+        raise RuntimeError(
+            f"stage6: S5-owned column {column!r} has no declared coercer — refusing to write it "
+            "blind (C16). Add it to S5_COLUMN_COERCERS and to stage6.s5_owned_columns."
+        )
+    if kind == "json":
+        return _safe_json(value if value is not None else [])
+    if kind == "bool":
+        return 1 if value else 0
+    return _safe_str(value)
+
+
+def audit_stale_store_labels(conn: sqlite3.Connection, run_id: str) -> tuple[int, dict[str, int]]:
+    """D-2933/D2620 scope: report (loudly, never silently) stale ontology already IN the store.
+
+    In verification-scoped mode S6 writes no ontology at all, so the D2620
+    discipline<->domain non-contamination gate has nothing of its own to reject — the guard's
+    invariant ("S6 never persists a non-canonical label") is preserved by construction. What
+    remains is a PRE-EXISTING store defect (BUG-711: D-2866 remapped anchors only and excluded
+    silver), which must stay visible rather than be quietly inherited. This function reports it
+    as a counted advisory; it does NOT block the commit, because the commit cannot cause it and
+    refusing to write provenance would leave the store strictly less correct.
+
+    Args:
+        conn: open SQLite connection.
+        run_id: the run being committed.
+
+    Returns:
+        (number of affected rows, {retired_label: token_count}).
+    """
+    import yaml as _yaml  # noqa: PLC0415
+
+    taxonomy = _yaml.safe_load((Path(__file__).resolve().parent.parent / "config" / "taxonomy.yaml").read_text())
+    retired = set(taxonomy.get("meta", {}).get("displaced_canonicals", []))
+    affected = 0
+    tally: dict[str, int] = {}
+    for domains, discipline in conn.execute(
+        "SELECT domains, discipline FROM fbs WHERE pipeline_run_id = ?", (run_id,)
+    ):
+        tokens = _safe_json(domains) if domains else []
+        if not isinstance(tokens, list):
+            tokens = []
+        stale = [t for t in [*tokens, discipline] if t in retired]
+        if stale:
+            affected += 1
+            for token in stale:
+                tally[token] = tally.get(token, 0) + 1
+    return affected, tally
+
+
+def update_s5_provenance(conn: sqlite3.Connection, fb: dict) -> bool:
+    """D-2933 (rule V): write ONLY the S5-owned provenance columns onto an existing row.
+
+    Why this exists: `INSERT OR REPLACE` re-writes all 77 columns from the S5 checkpoint,
+    including the S4-owned ontology (name, definition, domains, discipline, content_type…).
+    When the checkpoint predates a ratified taxonomy repair its labels are STALE, so the
+    "replace" REGRESSES the store (BUG-709: 770/6591 rows differ; 466 rejected by D2620,
+    ~304 would have silently reverted). A commit can never be more correct than the store
+    it overwrites, so this path narrows the write to the columns S5 actually owns.
+
+    Invariants enforced here (all fail-closed — the row is simply not written):
+      * unknown commit scope is rejected before any write (C16, no silent fail-open);
+      * only columns PRESENT in the checkpoint are written, so a field the checkpoint does
+        not carry can never be default-injected over a live value (e.g. borp_score);
+      * the stored `definition` must equal the checkpoint's, so a scoped write can never sit
+        on top of diverged S4 content (fb_id is a content hash → they must match);
+      * D274a/D274h (pre_write_verdict) still gates the write — it validates exactly the S5
+        fields being written, so it remains a true precondition, not a formality;
+      * the taxonomy version is asserted before the write, so a version-skewed checkpoint
+        cannot stamp provenance from the wrong menu.
+
+    Called by run_stage6() only for a fb_id that already exists AND only when
+    `stage6.commit_scope == verification_scoped`. No vector work is needed: an UPDATE keeps
+    the rowid, so the k-NN slot cannot go stale (this class of BUG-387 cannot occur here),
+    and the embedding is derived from `definition`, which is not written.
+
+    Args:
+        conn: open SQLite connection inside the batch transaction.
+        fb: one S5 checkpoint record.
+
+    Returns:
+        True when the row was written; False when a guard rejected it (counted as failed).
+    """
+    fb_id = fb.get("fb_id")
+    name = fb.get("name", fb_id)
+    if S6_COMMIT_SCOPE not in ("verification_scoped", "full_upsert"):
+        print(f"   ❌ update_s5_provenance: unknown commit_scope {S6_COMMIT_SCOPE!r} — REJECTED (C16)")
+        return False
+    storable, complaint = pre_write_verdict(fb)
+    if not storable:
+        print(f"   ❌ update_s5_provenance: {complaint} on {name!r} — REJECTED (fail-closed, D274a)")
+        return False
+    stored = conn.execute("SELECT definition, taxonomy_version FROM fbs WHERE fb_id = ?",
+                          (fb_id,)).fetchone()
+    if stored is None:
+        raise RuntimeError(f"stage6: update_s5_provenance called for absent fb_id {fb_id!r} (C16)")
+    stored_definition, stored_taxonomy = stored[0], stored[1]
+    if _safe_str(fb.get("definition")) != _safe_str(stored_definition):
+        print(f"   ❌ update_s5_provenance: S4 content diverged on {name!r} — REJECTED (fail-closed, D-2933)")
+        return False
+    payload = {c: _coerce_s5_value(c, fb[c]) for c in S6_S5_OWNED_COLUMNS if c in fb}
+    payload["committed_at"] = datetime.now(UTC).isoformat()
+    if not payload:
+        raise RuntimeError("stage6: stage6.s5_owned_columns is empty — nothing would be written (C16)")
+    # D-2934: the taxonomy-skew guard is COLUMN-SCOPED. The checkpoint is permanently stamped
+    # v5.6 (its menu_hash proves it) while the store is v9 (D-2899), so a row-scoped guard would
+    # refuse every row forever — blocking on a stale stamp rather than on a real risk. The real
+    # risk is narrow: writing a MENU-DERIVED value from the v5.6 menu onto a v9 row. Every column
+    # in this payload is a function of (definition, evidence) or the write clock, and definition
+    # drift is 0/6591, so the skew cannot propagate. Fail-closed if that ever stops being true.
+    checkpoint_taxonomy = _safe_str(fb.get("taxonomy_version"))
+    if checkpoint_taxonomy and checkpoint_taxonomy != _safe_str(stored_taxonomy):
+        dependent = sorted(c for c in payload if c in S6_TAXONOMY_DEPENDENT_COLUMNS)
+        if dependent:
+            print(f"   ❌ update_s5_provenance: taxonomy skew on {name!r} "
+                  f"(checkpoint {checkpoint_taxonomy!r} vs store {stored_taxonomy!r}) would write "
+                  f"menu-derived column(s) {dependent} — REJECTED (fail-closed, C16)")
+            return False
+        _record_taxonomy_skew(checkpoint_taxonomy, _safe_str(stored_taxonomy))
+    assignments = ", ".join(f"{c} = ?" for c in payload)
+    conn.execute(f"UPDATE fbs SET {assignments} WHERE fb_id = ?", (*payload.values(), fb_id))
+    return True
+
+
 def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
-    """Insert or replace an FB into the database (D2130 schema)."""
+    """Insert or replace an FB into the database (D2130 schema).
+
+    NOTE (D-2933, rule V): this is the FULL upsert — it rewrites S4-owned ontology too.
+    run_stage6() only reaches it for a row absent from the store, or when
+    `stage6.commit_scope: full_upsert` is explicitly configured.
+    """
     # D2616 Phase 0: runtime ontology boundary (BUG-148 + C6 fail-closed).
     # A hallucinated content_type or depth is rejected here instead of being
     # silently persisted. `None` = invalid; `""` = empty (tolerated only when
@@ -598,6 +759,7 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
                 ?, ?, ?,
                 ?, ?,
                 ?, ?, ?, ?,
+                ?,
                 ?, ?, ?,
                 ?, ?,
                 ?, ?,
@@ -843,13 +1005,47 @@ def run_stage6(export_only: bool = False):
     # SQLite
     conn = init_db(DB_PATH)
     inserted = 0
+    updated = 0  # D-2933 (rule V): rows written through the verification-scoped path
     failed = 0
+    # BUG-708: a batch that breaches S6_MAX_FAILED_RATIO is ROLLED BACK, never committed.
+    # Tracked here so the tail summary cannot claim a commit that was undone.
+    rolled_back = False
     # D2325: per-FB commit status — INSERTED/FAILED/SKIPPED. Replaces the blanket
     # `committed_to_sqlite = not export_only` stamp that falsely recorded a failed
     # row as committed (C16 provenance truthfulness).
     commit_status: dict[str, str] = {}
 
     if not export_only:
+        # D-2933 (rule V): never let a typo in config silently select the legacy
+        # overwrite-everything path (C16: no silent fail-open).
+        if S6_COMMIT_SCOPE not in ("verification_scoped", "full_upsert"):
+            raise RuntimeError(
+                f"stage6: unknown stage6.commit_scope {S6_COMMIT_SCOPE!r} — expected "
+                "'verification_scoped' (D-2933 rule V) or 'full_upsert'. Refusing to commit."
+            )
+        if S6_COMMIT_SCOPE == "verification_scoped" and not S6_S5_OWNED_COLUMNS:
+            raise RuntimeError(
+                "stage6: commit_scope=verification_scoped but stage6.s5_owned_columns is empty — "
+                "a scoped commit would write nothing. Fix config/pipeline_config.yaml (C16)."
+            )
+        if S6_TAXONOMY_DEPENDENT_COLUMNS & set(S6_S5_OWNED_COLUMNS):
+            raise RuntimeError(
+                "stage6: a column is declared BOTH s5_owned AND taxonomy_dependent — the D-2934 "
+                "column-scoped skew guard could then never permit a skewed checkpoint to commit. "
+                "Resolve config/pipeline_config.yaml:stage6 before committing (C16)."
+            )
+        print(f"  🔒 commit scope: {S6_COMMIT_SCOPE} "
+              f"({len(S6_S5_OWNED_COLUMNS)} S5-owned column(s); S4-owned ontology is never rewritten)")
+        TAXONOMY_SKEW_ADVISORY.clear()  # per-run advisory census (D-2934)
+        if S6_COMMIT_SCOPE == "verification_scoped" and fbs:
+            stale_rows, stale_tally = audit_stale_store_labels(conn, fbs[0].get("pipeline_run_id", ""))
+            if stale_rows:
+                detail = ", ".join(f"{k} x{v}" for k, v in sorted(stale_tally.items()))
+                print(f"  ⚠️  BUG-711 ADVISORY: {stale_rows}/{len(fbs)} canonical row(s) already carry a "
+                      f"DISPLACED canonical label in the STORE ({detail}). This commit does NOT write "
+                      f"ontology, so it neither causes nor hides it; re-home with "
+                      f"scripts/repair_displaced_canonical_domains.py "
+                      f"(triage: governance/displaced_domain_repair_triage_20261011.csv).")
         # D-2884(a): idempotent backfill of the operative macro facet on the canonical
         # run (fills NULL cells only; re-runs are no-ops). Stale non-canonical rows
         # correctly keep NULL (never served, BUG-691).
@@ -859,6 +1055,21 @@ def run_stage6(export_only: bool = False):
 
         for i, fb in enumerate(fbs, 1):
             name = fb_name(fb)[:40]
+            # D-2933 (rule V): VERIFICATION-SCOPED COMMIT. An fb_id that already exists in the
+            # store receives ONLY the S5-owned provenance columns (update_s5_provenance); the
+            # S4-owned ontology is never rewritten from a possibly-stale checkpoint (BUG-709).
+            # A fb_id absent from the store still takes the full INSERT path below, because a
+            # genuinely new row has no ratified ontology to protect. `full_upsert` (explicit
+            # config) restores the legacy behaviour for a store known to be behind the artifact.
+            if S6_COMMIT_SCOPE == "verification_scoped" and fbs_rowid(conn, fb.get("fb_id")) is not None:
+                if update_s5_provenance(conn, fb):
+                    updated += 1
+                    commit_status[fb["fb_id"]] = "UPDATED"
+                else:
+                    failed += 1
+                    commit_status[fb["fb_id"]] = "FAILED"
+                    print(f"  [{i}] Failed (provenance): {name}")
+                continue
             # BUG-387/D-359: capture the rowid the fb_id holds BEFORE the insert.
             # `INSERT OR REPLACE` re-issues a new rowid for an existing fb_id, and
             # the vec store is keyed by rowid — so the old rowid's vector must be
@@ -885,11 +1096,33 @@ def run_stage6(export_only: bool = False):
                 commit_status[fb["fb_id"]] = "FAILED"
                 print(f"  [{i}] Failed: {name}")
 
-        conn.commit()
+        # ── BUG-708: the tolerance gate drives the COMMIT DECISION, not just the exit
+        # code. Committing first and evaluating S6_MAX_FAILED_RATIO afterwards made an
+        # over-tolerance batch DURABLE while the stage still reported FAILED — observed
+        # live 2026-10-11: 466 rows rejected by the D2620 discipline<->domain gate, so a
+        # completed run would have left the store holding a mix of re-verified rows and
+        # stale rows with no record of which. An over-tolerance batch is ROLLED BACK, so
+        # the store is never left half-migrated (C16/C23).
+        failure_ratio: float = (failed / len(fbs)) if fbs else 0.0
+        if failure_ratio > S6_MAX_FAILED_RATIO:
+            rolled_back = True
+            conn.rollback()
+            print(f"  ⛔ ROLLED BACK: {failed}/{len(fbs)} rejected "
+                  f"({failure_ratio:.1%} > max_failed_ratio={S6_MAX_FAILED_RATIO}) — store UNCHANGED (BUG-708)")
+        else:
+            conn.commit()
 
         # Count
         count = conn.execute("SELECT COUNT(*) FROM fbs").fetchone()[0]
-        print(f"  ✅ SQLite: {inserted} inserted, {failed} failed, {count} total rows")
+        if rolled_back:
+            print(f"  ⛔ SQLite: nothing committed — {failed}/{len(fbs)} rejected, transaction rolled back "
+                  f"({count} rows, store intact)")
+        else:
+            print(f"  ✅ SQLite: {inserted} inserted, {updated} provenance-updated, "
+                  f"{failed} failed, {count} total rows")
+            for (ck_tax, st_tax), n in sorted(TAXONOMY_SKEW_ADVISORY.items()):
+                print(f"  ⚠️  taxonomy skew advisory: {n} row(s) carry S5 provenance from {ck_tax!r} "
+                      f"onto a {st_tax!r}-stamped row — immaterial for the written columns (D-2934)")
 
         # ── D2185 R-016/R-017 completeness check, repaired by BUG-387/D-359 ──
         # A COUNT is not verification. The old check compared counts and printed
@@ -905,19 +1138,24 @@ def run_stage6(export_only: bool = False):
             )
 
         # ── D2066: Dynamic taxonomy post-commit (BEFORE conn.close) ──
-        try:
-            from pipeline.taxonomy_manager import run_post_commit_taxonomy
-            human_review_dir = STAGE5_HUMAN_REVIEW.parent
-            taxonomy_review = run_post_commit_taxonomy(conn, human_review_dir)
-            if taxonomy_review:
-                print(f"\n⏸️  TAXONOMY REVIEW REQUIRED (C8-G1): {taxonomy_review}")
-                print("   Review the candidates, set 'approved': true/false, then run:")
-                print(f"   python3 pipeline/taxonomy_manager.py --apply {taxonomy_review}")
-                print("   C8-G2: After applying, review the generated taxonomy YAML before activating.")
-            else:
-                print("\n✅ No taxonomy replacements needed.")
-        except Exception as e:
-            print(f"\n⚠️  Taxonomy post-commit hook failed (non-fatal): {e}")
+        # BUG-708: this hook WRITES to the store (taxonomy_counts), so it must not run
+        # after a rollback — there is no commit for it to be the post-commit of.
+        if rolled_back:
+            print("\n⏭️  Taxonomy post-commit hook SKIPPED — no commit was made (BUG-708).")
+        else:
+            try:
+                from pipeline.taxonomy_manager import run_post_commit_taxonomy
+                human_review_dir = STAGE5_HUMAN_REVIEW.parent
+                taxonomy_review = run_post_commit_taxonomy(conn, human_review_dir)
+                if taxonomy_review:
+                    print(f"\n⏸️  TAXONOMY REVIEW REQUIRED (C8-G1): {taxonomy_review}")
+                    print("   Review the candidates, set 'approved': true/false, then run:")
+                    print(f"   python3 pipeline/taxonomy_manager.py --apply {taxonomy_review}")
+                    print("   C8-G2: After applying, review the generated taxonomy YAML before activating.")
+                else:
+                    print("\n✅ No taxonomy replacements needed.")
+            except Exception as e:
+                print(f"\n⚠️  Taxonomy post-commit hook failed (non-fatal): {e}")
 
         conn.close()
     else:
@@ -938,6 +1176,9 @@ def run_stage6(export_only: bool = False):
         fb_id: str = fb["fb_id"]
         if export_only:
             per_fb_status: str = "SKIPPED"
+        elif rolled_back:
+            # BUG-708: nothing was written, so no row may be recorded as committed.
+            per_fb_status = "ROLLED_BACK"
         else:
             per_fb_status = commit_status.get(fb_id, "FAILED")  # untracked → FAILED (fail-closed)
         rec = stamp_record({
@@ -962,7 +1203,12 @@ def run_stage6(export_only: bool = False):
     if export_only:
         print(f"📦 Parquet-only: {len(fbs)} FBs (SQLite SKIPPED)")
     else:
-        print(f"✅ Committed to SQLite: {inserted} FBs")
+        if rolled_back:
+            print(f"⛔ SQLite commit ROLLED BACK: 0 of {len(fbs)} FBs written (store unchanged, BUG-708)")
+        else:
+            print(f"✅ Committed to SQLite: {inserted} FBs")
+            print(f"   (scope={S6_COMMIT_SCOPE}: {inserted} inserted as NEW rows, "
+                  f"{updated} existing row(s) updated with S5 provenance only)")
         if failed:
             print(f"❌ Failed to commit:    {failed} FBs (checkpoint commit_status=FAILED)")
     print(f"🗄️  Database:  {DB_PATH}")
@@ -980,6 +1226,9 @@ def run_stage6(export_only: bool = False):
             print(f"❌ Stage 6 FAILED: {failed}/{len(fbs)} FBs failed commit "
                   f"({failure_ratio:.1%} > max_failed_ratio={S6_MAX_FAILED_RATIO}). "
                   f"Failed inserts = permanent data loss — do NOT mark COMPLETE.")
+            if rolled_back:
+                print("   ⛔ The SQLite transaction was ROLLED BACK — the store is unchanged "
+                      "(BUG-708: no partial/half-migrated write).")
             sys.exit(1)
         if failed > 0:
             print(f"⚠️  Stage 6 CONDITIONAL_SUCCESS: {failed} FB(s) failed within "

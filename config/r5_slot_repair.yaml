@@ -13,15 +13,15 @@
 #
 # C12: config-first. This file is the single source of truth for the repaired
 # definitions. `scripts/definition_nli_verify.py` (R2) consumes it: when a slot has a
-# repaired definition here, it OVERRIDES the taxonomy_v5.yaml `definition` for NLI
+# repaired definition here, it OVERRIDES the taxonomy.yaml `definition` for NLI
 # hypothesis construction. (2026-09-20: the ratified D-285/D-283 definitions were FOLDED
-# into taxonomy_v5.yaml + content_types.yaml — the 5 core disciplines now semantically
+# into taxonomy.yaml + content_types.yaml — the 5 core disciplines now semantically
 # match this file, so `menu_hash` captures them. The dead `_R5_REPAIR_PATH` constant in
 # closed_menu.py was removed (BUG-307 RESOLVED).
 #
 # FULL r5 COLLAPSE (2026-09-20, D-289): (1) the 4 non-core discipline DEFINITIONS
 # (cultural studies / risk management / decision making / organizational theory) are
-# FOLDED into taxonomy_v5.yaml; (2) the 4 content_type overrides are DROPPED (arm C
+# FOLDED into taxonomy.yaml; (2) the 4 content_type overrides are DROPPED (arm C
 # D-284 builds the content_type hypothesis from the paraphrase content-claim in
 # content_types.yaml, so those definitions were dead); (3) cognitive science is
 # DE-NEGATED (BUG-313): removed the "NO design/persuasion/economic-application intent"

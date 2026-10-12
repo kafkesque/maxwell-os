@@ -7,7 +7,7 @@ Every write is C6 crash-safe (tempfile -> fsync -> os.replace). Idempotent. Surg
 must change the text exactly once, else abort before writing.
 
 Actions:
-  1. promote config/taxonomy_v9.yaml -> config/taxonomy_v5.yaml (LIVE source; renderer + validator
+  1. promote config/taxonomy_v9.yaml -> config/taxonomy.yaml (LIVE source; renderer + validator
      read this path hardcoded — the 'v5' filename is a historical artifact, content now v9).
   2. config/version.yaml taxonomy_version v8 -> v9.
   3. config/pipeline_config.yaml: drop per_label 'information retrieval' + 'visual semiotics'
@@ -27,7 +27,7 @@ import yaml
 
 ROOT = Path(__file__).resolve().parent.parent
 V9 = ROOT / "config" / "taxonomy_v9.yaml"
-LIVE = ROOT / "config" / "taxonomy_v5.yaml"
+LIVE = ROOT / "config" / "taxonomy.yaml"
 VERSION = ROOT / "config" / "version.yaml"
 PIPE_CFG = ROOT / "config" / "pipeline_config.yaml"
 HASHES_SCRIPT = ROOT / "scripts" / "menu_axis_hashes.py"

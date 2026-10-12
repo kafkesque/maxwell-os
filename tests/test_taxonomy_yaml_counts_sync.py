@@ -3,7 +3,7 @@
 
 Two independent, previously-UNLOCKED drift classes, found in a forensic audit:
 
-  Drift B (BUG-208): `taxonomy_v5.yaml` canonicals and `taxonomy_counts` canonical
+  Drift B (BUG-208): `taxonomy.yaml` canonicals and `taxonomy_counts` canonical
     status drift apart because seed_from_taxonomy_yaml() only INSERT-OR-IGNOREs
     and only runs on an empty table. Labels promoted in YAML after the first seed
     stay `emerging`/`raw` in the counts table, so D2399's check_for_replacements()
@@ -36,7 +36,7 @@ from pipeline.schemas import (
 from pipeline.taxonomy_manager import reconcile_canonical_status
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-TAX_PATH = PROJECT_ROOT / "config" / "taxonomy_v5.yaml"
+TAX_PATH = PROJECT_ROOT / "config" / "taxonomy.yaml"
 
 
 def _make_counts_db() -> sqlite3.Connection:

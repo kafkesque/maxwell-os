@@ -50,11 +50,11 @@ _EMBED_NORM_EPS = 1e-9  # C20: L2-normalization epsilon (named constant)
 _LOW_AGREEMENT_THRESHOLD = 0.3  # C20: neighbor-agreement below this = likely mislabeled
 _RANDOM_SEED = 42  # C20: deterministic sampling
 
-_TAXONOMY_PATH = _ROOT / "config" / "taxonomy_v5.yaml"  # C12: config-first canonical source
+_TAXONOMY_PATH = _ROOT / "config" / "taxonomy.yaml"  # C12: config-first canonical source
 
 
 def _load_canonicals() -> tuple[set[str], set[str]]:
-    """Load canonical discipline/domain sets from taxonomy_v5.yaml (D2544 fix).
+    """Load canonical discipline/domain sets from taxonomy.yaml (D2544 fix).
 
     The audit must only measure label agreement for FBs that actually HAVE a
     canonical label. 'emerging'/empty disciplines and empty domains are unlabeled

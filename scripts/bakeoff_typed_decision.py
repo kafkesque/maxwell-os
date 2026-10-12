@@ -241,7 +241,7 @@ def closed_menu(cfg: dict, include_catch_all: bool = False) -> dict[str, str]:
     if include_catch_all:
         cat = str((tax.get("meta") or {}).get("catch_all_discipline") or "").strip()
         if cat:
-            out.setdefault(cat, "declared catch-all discipline (config/taxonomy_v5.yaml meta)")
+            out.setdefault(cat, "declared catch-all discipline (config/taxonomy.yaml meta)")
     return out
 
 

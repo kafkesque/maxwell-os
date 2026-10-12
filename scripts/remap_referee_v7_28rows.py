@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """remap_referee_v7_28rows.py — D-2853 close-out: re-mint the A/B referee to menu v7.
 
+[COMPLETE 2026-10-10 (D-2916)] — one-shot done; v7 referee is minted + frozen. Do NOT
+re-run: it would re-mint under the SAME id (D-353: re-mint under a NEW id, never re-hash).
+
 WHY. D-2853 renamed the canonical DOMAIN ``research & methodology`` -> ``research practice``
 (discipline ``research methodology`` is UNCHANGED). The D-2767 A/B referee
 (``discipline_anchor_rederived_v6_20261006d.json``) was finalized against menu v6 and still
@@ -118,6 +121,13 @@ def crash_safe_write(path: Path, payload: dict) -> None:
 
 
 def main() -> int:
+    # COMPLETE (D-2916): one-shot already landed; re-running would re-mint under the SAME
+    # id (D-353 violation). Fail closed instead of silently re-hashing frozen provenance.
+    raise SystemExit(
+        "D-2853 close-out is COMPLETE — governance/discipline_anchor_rederived_v7_20261007.json "
+        "is already minted and frozen. Re-running would re-mint under the SAME id (D-353). "
+        "Refusing (C16)."
+    )
     manifest = json.loads(SRC_MANIFEST.read_text(encoding="utf-8"))
     rows = manifest["rows"]
     pins = load_pins()

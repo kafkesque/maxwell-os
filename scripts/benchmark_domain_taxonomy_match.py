@@ -34,7 +34,7 @@ sys.path.insert(0, str(ROOT))
 
 DB = ROOT / "knowledge pipeline" / "maxwell.db"
 GOLD = ROOT / "governance" / "gold_4axis.jsonl"
-TAX = ROOT / "config" / "taxonomy_v5.yaml"
+TAX = ROOT / "config" / "taxonomy.yaml"
 
 RERANKER_MODEL = "BAAI/bge-reranker-v2-m3"
 ZEROSHOT_MODEL = "MoritzLaurer/bge-m3-zeroshot-v2.0"

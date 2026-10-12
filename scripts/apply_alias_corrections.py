@@ -34,7 +34,7 @@ sys.path.insert(0, str(_ROOT))
 import yaml  # noqa: E402
 
 _ALIAS = _ROOT / "config" / "alias_map.yaml"
-_TAXONOMY = _ROOT / "config" / "taxonomy_v5.yaml"
+_TAXONOMY = _ROOT / "config" / "taxonomy.yaml"
 _PROPOSALS = _ROOT / "temp" / "alias_review_qwen38.jsonl"
 
 # DeepSeek verification result (Phase 2, cross-family R5). Module-level data.

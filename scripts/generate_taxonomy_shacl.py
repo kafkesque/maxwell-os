@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """scripts/generate_taxonomy_shacl.py — D2546: SHACL formalization of canonicals.
 
-Reads config/taxonomy_v5.yaml and emits config/taxonomy_shacl.ttl — SHACL shapes
+Reads config/taxonomy.yaml and emits config/taxonomy_shacl.ttl — SHACL shapes
 that formalize the taxonomy ontology:
   - 43 domain + 61 discipline canonicals as closed, disjoint classes
   - kind-safety (D2500): a label must not be canonical in BOTH axes
@@ -44,13 +44,13 @@ def _list(items: list[str]) -> str:
 
 
 def main() -> int:
-    tax = yaml.safe_load(open(_ROOT / "config" / "taxonomy_v5.yaml", encoding="utf-8"))
+    tax = yaml.safe_load(open(_ROOT / "config" / "taxonomy.yaml", encoding="utf-8"))
     domains = [d["canonical"] for d in tax["domains"]]
     disciplines = [d["canonical"] for d in tax["disciplines"]]
     version = tax.get("version", "v5.5")
 
     ttl = f"""# config/taxonomy_shacl.ttl — SHACL formalization of Maxwell OS taxonomy (D2546)
-# AUTO-GENERATED from config/taxonomy_v5.yaml — do NOT edit by hand.
+# AUTO-GENERATED from config/taxonomy.yaml — do NOT edit by hand.
 # Regenerate: python3 scripts/generate_taxonomy_shacl.py
 # Canonicals: {len(domains)} domains + {len(disciplines)} disciplines = {len(domains) + len(disciplines)} (taxonomy {version})
 

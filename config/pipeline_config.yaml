@@ -5,6 +5,32 @@ run:
   singleton_lock_path: ".pipeline_runner.lock"  # BUG-602: pid lock, relative to pipeline_root (C12)
   preflight_timeout_sec: 90            # BUG-606: must exceed watchdog restart cycle (kill 10s + sleep 3s + RESTART_WAIT 30s ≈ 43s)
   python_bin: /Users/barn/miniforge3/bin/python3  # BUG-607: canonical stage interpreter. Bare "python3" drifted between shells (login zsh→conda base, non-login→framework 3.12) so S2 lost datasketch. Pin the full-dep-chain env (C12).
+serving:
+  # D-2936 (2026-10-11): SERVING INDEX SCOPE — scope must be enforced by the INDEX, not
+  # only by a WHERE clause. The store holds every run ever committed (t11: 7855 rows,
+  # rechunk-v4-20260929: 6591, e2e: 122, bug198_reinject: 6). Serving is already pinned to
+  # the canonical run by D-2881 (canonical_run_clause), but vec_fbs / vec_fbs_ctx / fbs_fts
+  # index EVERY run, and sqlite-vec computes KNN *before* the run filter is applied.
+  # Measured cost (2026-10-11): of the vec_fbs top-100 for a canonical query, only 19-26
+  # candidates survive the run+PASS filter (53.9% of the index is the superseded t11 run).
+  index_scope: canonical_run            # canonical_run (production) | all_runs (diagnostic only)
+  # D-2939 (label vs pointer): an owner approves the query + the answer NAME; the
+  # fb_id is a content hash (D-2898) and is resolved per run by pipeline/golden.py.
+  # 'name_then_id' = prefer expected_names, keep expected ids as a legacy fallback.
+  golden_anchor_mode: name_then_id
+  # D-2937: runs superseded by run.default_id. They must not be served, counted in any
+  # census, or left in the vector/text indices. Removal is only permitted once
+  # scripts/purge_superseded_runs.py proves (a) zero inbound references from live rows,
+  # (b) an archive of every removed row (R-D410: archive, never silent delete),
+  # (c) a fresh C13 backup. Dry-run is the default; --apply is the only mutating mode.
+  superseded_runs:
+  - t11
+  - e2e
+  - bug198_reinject
+  # C16/BUG-710: a benchmark or census whose reference ids fall outside index_scope must
+  # FAIL LOUD. BUG-710 exists because 30/30 retrieval goldens pointed at the superseded t11
+  # run and the harness reported 0.000 recall as if it were a quality regression.
+  require_resolvable_goldens: true
 pipeline_manifest:
   schema_version: '3.0'
   taxonomy_version: v5.7
@@ -353,6 +379,13 @@ stage4:
   process_instance_output: process_instances.jsonl
   growth_edge_output: growth_edges.jsonl
   tool_instruction_output: tool_instructions.jsonl
+  # D-2938 (2026-10-11, BUG-712): S4 computed the D-2747/D-275b-corrected content_type and
+  # used it ONLY for the applicability axis, while persisting the RAW S2 label. The store's
+  # content_type therefore DISAGREED with the routing decision that placed the row - measured
+  # evidence: the growth_edges sidecar holds 187 records still stamped content_type=principle,
+  # and the quarantine sidecar holds 372 more. true = persist the RESOLVED role (store agrees
+  # with routing, D2323 invariant); false = legacy raw-label behaviour (rollback only).
+  persist_resolved_content_type: true
   quarantine_output: quarantined.jsonl
   max_principles_per_cluster: 25
   dedup_cosine_threshold: 0.92
@@ -406,7 +439,7 @@ stage4:
   golden_path: config/golden/stage4_golden.yaml
   golden_inject_enabled: true
   golden_max_examples: 7
-  discipline_anchor_path: governance/DOMAIN_RULER_FROZEN_20261008.json
+  discipline_anchor_path: governance/discipline_anchor_rederived_v9_20261011.json  # T1 RATIFIED (owner-approved 2026-10-11): v9 menu-stamped referee (202 rows = 194 owner_finalized + 8 noise_drop); was DOMAIN_RULER_FROZEN_20261008.json (un-stamped, BUG-650 fail-closed)
   discipline_conformance_kappa_floor: 0.8
   # D-2798 (BUG-622): discipline is ADVISORY-ONLY — this floor is a REPORTING reference,
   # NOT a hard gate. discipline_conformance_gate.py --gate is a NO-OP in advisory mode
@@ -416,10 +449,12 @@ stage4:
   # coarse 0.728, macro-3way 0.766. Gate at human parity; fine-62 is advisory, macro is advisory-only (D-2798).
   discipline_coarse_kappa_floor: 0.73   # re-targeted from 0.9 (D-2790) to the human coarse ceiling
   discipline_macro_groups_path: config/discipline_macro_groups.yaml
-  # D-2797 (BUG-622): owner ratified the 3-way macro scheme + human-parity gate (~0.73-0.77).
-  # D-2798 (BUG-622): Condition C measured kappa 0.6066 < 0.65 ship threshold AND < 0.73 human-parity
-  # floor (human 3-way ceiling 0.766) -> macro NOT shipped as a routing facet; discipline is ADVISORY-ONLY
-  # (fine-62 -> advisory multi-label tags, soft facet). Flag kept false until the S4 advisory re-wire.
+  # D-2929 RESOLVED (2026-10-11): the independent 3-way macro classifier (Condition C) is RETIRED.
+  # Macro is a DETERMINISTIC DERIVED advisory facet (pipeline/discipline_macro.to_macro of the fine
+  # discipline), NOT a predicted/gated axis — 'emerging' is an abstention+noise bucket (8 owner-adjudicated
+  # novel FBs + 8 noise_drop rows), never a positive class, so no classifier can reach this floor (D-2792/2793
+  # 'STOP classifier engineering'). discipline_macro_enabled is false PERMANENTLY; the floor below is a
+  # measurement-only reference on the retired instrument (scripts/discipline_macro_classify.py).
   discipline_macro_kappa_floor: 0.73
   discipline_macro_enabled: false
   discipline_model: gpt-oss-20b-MXFP4-Q8
@@ -440,7 +475,11 @@ stage4:
   # second coder of a DIFFERENT model family cross-checks (R5 generator != verifier).
   anchor_rederive_generator_model: gpt-oss-20b-MXFP4-Q8
   anchor_rederive_second_coder_model: gemma-4-E4B-it-MLX-4bit
-  anchor_rederive_anchor_version: v6
+  anchor_rederive_anchor_version: v9
+  # D-2913 (2026-10-10): authoritative re-derivation INPUT anchor (202-row anchor manifest). Split
+  # from discipline_anchor_path (which points at DOMAIN_RULER_FROZEN_20261008.json, a 194-row ruler/
+  # partition schema) to kill the schema overload. Owner-gated (GATE 1).
+  anchor_rederive_input_anchor: governance/discipline_anchor_rederived_v8_20261007.json
   swap_eval_baseline_model: gpt-oss-20b-MXFP4-Q8   # D-2767/D-2783 classifier-of-record (baseline)
   swap_eval_candidate_model: gemma-4-12B-it-qat-OptiQ-4bit   # D-2788 REJECTED (slower on BOTH axes) — kept for audit trail; classifier-of-record remains gpt-oss-20b-MXFP4-Q8
   swap_eval_kappa_bar: 0.7   # D-2782 classifier-kappa bar (Cohen, classifier-vs-gold), declared pre-eval
@@ -600,6 +639,29 @@ stage5:
     aggregation: or_entail_and_no_contra
     threshold: 0.5
     decision: D-2863
+    precision: 0.852
+    recall: 0.414
+  # D-B (BUG-705): paraphrase-aware grounding — RECALL path. ⛔ RETIRED (D-2932, owner approved
+  # 2026-10-11). bge-m3 STS cosine measures semantic relatedness, NOT paraphrase/entailment — it
+  # is the WRONG primitive to override the stronger DeBERTa entailment signal. Measured
+  # non-discriminative (true-vs-false Δ=0.048) and below the ship bar (R=0.065 at P>=0.85).
+  # The correct lever for faithful-reworded NEUTRAL recall is the NLI entailment calibration
+  # (D-2822 or-entail + AND-no-contra, threshold 0.5, D-2863) — already ratified, see
+  # stage5.nli_aggregation. paraphrase_path_enabled stays FALSE PERMANENTLY; do NOT re-enable.
+  paraphrase_path_enabled: false
+  paraphrase_similarity_threshold: 0.85
+  paraphrase_model: bge-m3
+  paraphrase_min_entail: 1
+  # BUG-705-threshold: WEAK-entail pre-filter for the paraphrase RECALL path. This must be
+  # BELOW nli_pass_threshold (0.5) or the path can never fire — the target rows are
+  # "max entail 0.13-0.46 < 0.5". 0.10 matches D-2920's documented "ent>=1" recoverable
+  # population. Config-first (C12); re-tune only via gold-set calibration, never by hand.
+  paraphrase_entail_threshold: 0.10
+  paraphrase_require_no_contra: true
+  paraphrase_max_chars: 1500
+  paraphrase_calibration:
+    decision: null
+    threshold: null
   banned_mechanism_prefixes:
   - because it enables
   - because it allows
@@ -634,6 +696,49 @@ stage5:
     - pipeline/io_guard.py
   single_writer_lock: true  # BUG-361: refuse a second S5 writer on one checkpoint
 stage6:
+  # D-2933 (owner-ratified 2026-10-11, "rule V"): VERIFICATION-SCOPED COMMIT.
+  # S4 owns the ontology (name/definition/domains/discipline/content_type/...); S5 owns
+  # provenance (status/verification_results/...). A commit that rewrites S4-owned columns
+  # from an S5 checkpoint REGRESSES ratified labels (BUG-709: 770/6591 rows differ, 466
+  # caught by D2620, ~304 silently) and can never be more correct than the store it
+  # overwrites. In this mode an existing fb_id receives ONLY the S5-owned columns below;
+  # a fb_id that is absent from the store still takes the full INSERT path (a genuinely
+  # new row has no ratified ontology to protect). `full_upsert` restores the legacy
+  # INSERT OR REPLACE and must only be used when the store is known to be behind the
+  # artifact. An unknown value FAILS CLOSED (C16).
+  commit_scope: verification_scoped
+  # D-2934 (2026-10-11): the taxonomy-skew guard is COLUMN-SCOPED, not row-scoped.
+  # The S5 checkpoint is stamped taxonomy_version v5.6 / menu_hash 99e1df82… (it was produced
+  # 2026-09-29) while the store was re-stamped to v9 by D-2899. A row-scoped guard would refuse
+  # every row forever, because the checkpoint artifact is permanently v5.6 — blocking the
+  # canonical run on a stale stamp rather than on a real risk. The real risk is narrower:
+  # writing a MENU-DERIVED value from a v5.6 menu onto a v9 row. No column in the S5-owned set
+  # is menu-derived, and that is PROVEN, not assumed:
+  #   * pipeline/stage5_verify.py derives status/s5_reason/verification_results/verifier_model/
+  #     verification_method/isor/epistemic_status/needs_human_review from (definition, evidence)
+  #     — its ONLY taxonomy reference is the fingerprint guard (line ~905), never the verdict;
+  #   * practicality is classified from config/practicality.yaml alone (pipeline/practicality.py);
+  #   * committed_at is the write clock.
+  # Empirically: definition drift checkpoint↔store = 0/6591 (fb_id is a content hash), so the
+  # verified input is byte-identical across the menu change.
+  # Guard behaviour: if ANY column being written appears in this list, the row is REFUSED
+  # (fail-closed). An empty list therefore means "the skew is immaterial and is recorded as a
+  # loud advisory". Never add a column here to silence a failure — add it to stop a real write.
+  taxonomy_dependent_columns: []
+  # Only columns PRESENT in the S5 checkpoint are written, so a field the checkpoint does
+  # not carry can never be default-injected over an existing store value. `borp_score` is
+  # deliberately absent: no S5 checkpoint carries it, so writing it would zero the column.
+  s5_owned_columns:
+  - status
+  - s5_reason
+  - verification_results
+  - verifier_model
+  - verification_method
+  - needs_human_review
+  - epistemic_status
+  - isor
+  - practicality
+  - committed_at
   commit_non_fb_types: true
   okf_export_enabled: true
   max_failed_ratio: 0.0
@@ -672,6 +777,17 @@ retrieval_eval:
 retrieval_benchmark:
   top_k: 10
   candidate_pool: 30
+  # D-2940: the LABEL-FREE slice. Mints no gold label (D-2898 governs LABELS, and
+  # there are none here) so it is not owner-gated; always runnable, unlike the
+  # semantic golden slice, which needs an owner-signed anchor. A FB name is a
+  # LEXICAL query, so FTS is flattered: this is the REGRESSION rail, not a quality claim.
+  self_retrieval:
+    sample: 30
+    order: fb_id          # deterministic sample (C12/C20: no unrecorded randomness)
+    legs: [fts, vector, vector+rerank, hybrid, hybrid+rerank]
+  reanchor:
+    candidates: 5
+    snippet_chars: 220
 rerank:
   enabled: true
   model: BAAI/bge-reranker-v2-m3

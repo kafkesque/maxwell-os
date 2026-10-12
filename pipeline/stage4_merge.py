@@ -261,6 +261,21 @@ def _current_menu_hash() -> str:
     return _closed_menu_hash()
 
 
+# D-2938 (BUG-712): persistence policy + observability. S4 ROUTES on _resolve_content_type
+# (bucket dispatch) but persisted the RAW S2 label, so the committed store disagreed with the
+# routing decision. Config-gated (C12) so the legacy behaviour stays reachable for rollback.
+# R5 review 2026-10-11 (gemma-4-E4B-it, temp 0.0): the CODE default is the fail-safe LEGACY
+# value, so a missing config key can never silently change behaviour; the shipped
+# config/pipeline_config.yaml sets `persist_resolved_content_type: true` EXPLICITLY (C12).
+_PERSIST_RESOLVED_CONTENT_TYPE: bool = bool(
+    _PIPELINE_CFG.get("stage4", {}).get("persist_resolved_content_type", False)
+)
+# D2590 observability pattern (counter, not a new column): how many S4 records had their
+# content_type CORRECTED by the deterministic D-2747 re-route. This figure was previously
+# computed and discarded - invisible (BUG-712 root cause).
+_REROUTE_COUNTER: dict = {"rerouted_nonprinciple": 0}
+
+
 def _resolve_content_type(fb: dict) -> str:
     """Resolve a principle's content_type.
 
@@ -2321,8 +2336,12 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
         # D-2757: applicability axis (consumer/teleology) — DETERMINISTIC, never
         # LLM-classified (D-343). Derived from the RESOLVED content_type so an
         # adjudicated record carries its applicability regardless of role.
+        # D-2938 (BUG-712): resolve ONCE and persist the SAME value routing uses.
+        _resolved_ct: str = _resolve_content_type(fb_data)
+        if _resolved_ct != (fb_data.get("content_type") or "").strip():
+            _REROUTE_COUNTER["rerouted_nonprinciple"] += 1
         _applicability_val, _applicability_source = derive_applicability(
-            fb_data, _resolve_content_type(fb_data)
+            fb_data, _resolved_ct
         )
 
         # Build FB record (bloat removed per D2130: no s3_original_domain, no classification_method)
@@ -2349,7 +2368,15 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
             "boundary": fb_data.get("boundary", "").strip(),
             "consequence": fb_data.get("consequence", "").strip(),
             # D2337: persist D2323 two-axis ontology (was dropped at S4→S6)
-            "content_type": (fb_data.get("content_type") or DEFAULT_CONTENT_TYPE).strip(),
+            # D-2938 (BUG-712): persist the RESOLVED role, never the raw S2 label. content_type
+            # is authoritative (D2128) and S4 already routes on the resolved value, so storing
+            # the raw label made the store contradict its own routing. content_type_source keeps
+            # the closed PROVENANCE_LITERAL tier (llm_extracted_from_source); the correction is
+            # OBSERVED via the _REROUTE_COUNTER run-summary line (D2590), not a new column.
+            "content_type": (
+                _resolved_ct if _PERSIST_RESOLVED_CONTENT_TYPE
+                else (fb_data.get("content_type") or DEFAULT_CONTENT_TYPE).strip()
+            ),
             "extraction_type": (fb_data.get("extraction_type") or "").strip(),
             "application": fb_data.get("application", "").strip(),
             "failure_mode": fb_data.get("failure_mode", "").strip(),
@@ -2643,6 +2670,11 @@ def run_stage4(cluster_ids: list[int | str] | None = None, only_fb_ids: set[str]
     print(f"\n{'='*60}")
     print(f"✅ FBs generated:            {len(fbs)}")
     print(f"🔧 Process templates:        {len(process_templates)} (→ {S4_PT_OUTPUT})")
+    if _REROUTE_COUNTER["rerouted_nonprinciple"]:
+        print(
+            "🏷  content_type corrected by D-2747 re-route: "
+            f"{_REROUTE_COUNTER['rerouted_nonprinciple']} record(s) (D-2938/BUG-712)"
+        )
     print(f"📖 Process instances:        {len(process_instances)} (→ {S4_PI_OUTPUT})")
     print(f"🌱 Growth edges:             {len(growth_edges)} (→ {S4_GE_OUTPUT})")
     print(f"🛠️  Tool instructions:        {len(tool_instructions)} (→ {S4_TI_OUTPUT})")

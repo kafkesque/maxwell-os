@@ -22,7 +22,7 @@ from datetime import datetime
 from pathlib import Path
 
 _ROOT = Path(__file__).resolve().parent.parent
-_TAX = _ROOT / "config" / "taxonomy_v5.yaml"
+_TAX = _ROOT / "config" / "taxonomy.yaml"
 
 REMOVE: list[tuple[str, str]] = [
     ("visual perception", "Color Psychology"),
@@ -112,7 +112,7 @@ def main() -> int:
         return 0
 
     ts = datetime.now().strftime("%Y%m%d_%H%M%S")
-    bak = _TAX.with_name(f"taxonomy_v5.yaml.bak_{ts}_pre_m1")
+    bak = _TAX.with_name(f"taxonomy.yaml.bak_{ts}_pre_m1")
     os.replace(_TAX, bak)
     fd, tmp = tempfile.mkstemp(dir=str(_TAX.parent), suffix=".tmp")
     try:

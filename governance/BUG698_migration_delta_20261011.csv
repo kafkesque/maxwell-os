@@ -1,0 +1,8 @@
+item_id,name,old_discipline,new_discipline,domains_kept_verbatim,reason
+R011,Agentic Decision-making Through Contextual Retrieval,information retrieval,information science,ai & agents,menu-rename information retrieval->information science
+R032,Heckel's Diff Algorithm for Version Tracking,computational theory,software engineering,data visualization|engineering practice,menu-removed computational theory -> OWNER-DECIDE (proposal: software engineering)
+R053,Self-referential Incompleteness,computational theory,emerging,code & computation|computational science & physics|systems & frameworks,menu-removed computational theory -> OWNER-DECIDE (proposal: emerging)
+R060,Aiga Transportation Symbol System Development,visual semiotics,semiotics,graphic design,menu-rename visual semiotics->semiotics
+R103,Temporal Consistency in Visual Narrative Analysis,visual semiotics,semiotics,illustration|media & entertainment|motion design,menu-rename visual semiotics->semiotics
+R113,Traveling Salesman Problem Computational Complexity,computational theory,operations research,computational science & physics|engineering practice,menu-removed computational theory -> OWNER-DECIDE (proposal: operations research)
+R134,Holistic Interpretation Problem in Index-aware Retrieval,information retrieval,information science,ai & agents|information architecture,menu-rename information retrieval->information science

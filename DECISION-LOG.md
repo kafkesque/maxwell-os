@@ -28,6 +28,7 @@ IMPLEMENTED: `config/anchor_family.yaml#store_bridge.canonical_run = rechunk-v4-
 5. **D2547 PLANNED** — per-label thresholds not yet populated.
 6. **D-2908 — RESOLVED (2026-10-10).** BUG-695 per_label recalibration complete: d2547_calibration.json covers all v9 labels; per_label re-populated 93 entries (53 disciplines + 40 domains); all 7 `0.0` labels are measured-0 (not missing-data false-zeros). Fixed false-zero guard + contract test 92→93. BUG-695 CLOSED. BUG-693 steps 1–2 done (mapfail/dombleed 0), step 3 (1,297 off-menu) owner-gated per D-2898.
 7. **D-2909 + D-2910 — RESOLVED (2026-10-10).** (a) BUG-566 remainder: `check_declaration_consumers.py#staged_set()` still whitespace-split the staged name list (D-2646 class); fixed to NUL-separated `-z` + 2 controls, selftest 13/13. (b) BUG-658 CLOSED: no-wedge reproduced end-to-end under the D-2854 wall-clock deadline (gemma 0.53s clean; gpt-oss cold-reload returned RuntimeError in 46–73s, no hang). Full d2767_ab_eval A/B re-run separately blocked by BUG-650 (stale v6-d referee).
+8. **D-2916 — RESOLVED (2026-10-10).** BUG-650 stale-default limb fixed: `d2767_ab_eval.py` DEFAULT_ANCHOR re-pointed v6d → v8 authority (DEFAULT_OUT → `d2767_ab_eval_v8_20261010.json`); `remap_referee_v7_28rows.py` marked COMPLETE (fail-closed self-guard, D-353); four v6 anchor variants + five v6-era `d2767_ab` outputs retired to `archive/` (C19, bytes preserved). v7 + `build_anchor_v8_*` HELD (D-340 frozen-pair). `d2767_ab_eval.py` stays LIVE (distinct gpt-oss gate; NOT superseded by `d2884b_decider_ab.py`).
 
 — everything below is dated change history / ACTIVE / DONE —
 
@@ -4143,3 +4144,230 @@ step 3 (offmenu-1309 → emerging whitelist, owner ruling), step 4 (D-2894 gate,
 the R5 gemma code-review leg was unavailable; the operation is deterministic SQL provenance-only and independently
 re-verified by the gate, which is the stronger correctness bound for a re-stamp. BUG-695 remains OPEN (recalibration
 --apply still pending the R5 review of the four-file canonical-run scoping).
+
+## D-2917 — Anchor recommendation C OWNER-ACCEPTED + final forensic audit (2026-10-10)
+
+OWNER-GATE RESOLVED: Anchor C accepted — re-bind the 208 human-adjudicated gold labels to the served v9
+population by source-derived identity (name only as fallback join key). REFINEMENT from final forensic audit:
+`source_principle_ids` are RUN-DERIVED (0 cross-generation overlap t11→v9), so they are NOT a valid stable key.
+Only `source_ids` (document-level; 640 doc overlap) + `source_text`/`citation` are source-invariant. The stable
+identity key for BOTH Anchor C and BUG-700 is hash(normalized source_ids + source_text excerpt) — NOT
+source_principle_ids, NOT fb_id (run-derived), NOT menu_hash (menu-version stamp, distinct=1 across 6591 rows).
+
+FINAL FORENSIC AUDIT — NEW FINDINGS (read-only, live DB):
+- F1 QUARANTINE 49%: v9 = 3360 PASS (s5_reason=entail) + 3231 QUARANTINE (neutral 3142 / contra 39 / no_evidence
+  29 / vacuous 19 / mech_fail 1 / evidence_contaminated 1). Serving defaults to status=PASS → effective KB is
+  3360, not 6591. The 47.7% "neutral" NLI rate has NEVER been audited (healthy fail-closed vs misalignment).
+- F2 source_principle_ids run-derived (0 overlap); source_ids 100% populated both gens (640 doc overlap) = the
+  valid stable key. Corrects the earlier "source_ids/source_principle_ids" framing.
+- F3 corpus-mission misalignment: v9 is general-knowledge (Black Swan, GEB, No Logo, Marketing Mgmt, Design
+  Literacy…). discipline_macro: Human & Design 3288 (50%) / emerging 1487 / Method & Business 1353 / Technical
+  463 (7%). No mission-relevance axis; practicality ≠ applicability-to-Maxwell-OS.
+- F4 procedural_skill 100% empty both gens (dead schema column; C19/C28 hygiene).
+- F5 menu_hash distinct=1 (menu-version stamp, not per-row identity) — confirms BUG-700.
+
+IMPLEMENTED (non-blocked): BUG-702 — added `--practicality` facet to retrieve.py (config-driven from
+config/practicality.yaml labels; threaded through _facet_conditions/_matches_facet + all search_* legs +
+keyword/hybrid dispatch; 11 verified replacements). Verified live: --hybrid "chunking" --practicality
+immediately-applicable vs context-dependent return disjoint, correctly-filtered sets.
+
+OPEN (next): BUG-700 stable-identity spec (design-only); BUG-703 discipline_raw backfill (190 rows); BUG-684
+Stage-2 domain-axis forensic audit; F1 quarantine-rate audit; corpus curation / mission-relevance axis (owner).
+
+---
+## D-2918 — CORRECTION to D-2917 F3 + root cause of "only 4 usable" (2026-10-10)
+D-2917 F3 ("corpus-mission misalignment: general-knowledge corpus, no mission-relevance axis") was WRONG.
+Live-DB evidence (2026-10-10):
+- 940 books on disk; 138 are DOMAIN-6 "AI + Computing" mission-relevant engineering books; all ingested.
+- ~404 v9 rows sourced from AI/agentic books (209 PASS + 195 QUARANTINE).
+- Real root cause = S4 taxonomy scatter + S5 quarantine, not corpus absence:
+  - S4: AI rows split 124 Human&Design / 97 Technical / 77 Method&Business / 46 emerging (24% Technical).
+  - S5: 195/404 AI rows QUARANTINE (143 neutral), lost by default status=PASS retrieval.
+  - Full PASS discipline skew: psychology 337 / cognitive science 252 / marketing 150 vs software-eng 71 / ML 28 / AI 27.
+- Implication: owner-gated "corpus curation / ingest more engineering books" decision is MISDIRECTED.
+  Correct owner-gated decision = fix S4 classification + S5 quarantine + add mission_relevance axis,
+  so already-ingested engineering knowledge surfaces.
+- New feature agreed: Stage R "surgical targeted knowledge extraction" (books + internet: video/blog/social/news).
+  Spec seed: research/SURGICAL_KNOWLEDGE_EXTRACTION_20261010.md (CRAG, GraphRAG/LightRAG, HippoRAG, HyDE,
+  Self-RAG, RAPTOR, ColBERT, STORM, gpt-researcher, whisper.cpp, sqlite-vec, bge-m3).
+
+---
+## D-2919 — Root cause of "only 4": S5 NLI-paraphrase + S4 62-way ceiling (2026-10-10)
+Cause A = S5 factual check uses DeBERTa NLI-entailment, which scores faithful paraphrases as "neutral"
+→ ~143 engineering rows wrongly quarantined (extraction is NOT hallucinating; mechanism_quality=1.0,
+definitions faithful to source_text). Fix = paraphrase-aware claim-grounding in S5.
+Cause B = S4 emits single 62-way discipline (human ceiling 0.581, D-2796) and derives macro from it;
+config already mandates "fine → advisory, macro → hard gate" but production never flipped. Fix = 3-way
+macro primary + faceted multi-label discipline. No full re-engineer; two targeted fixes (S5 verifier,
+S4 granularity flip). Ontological fix = faceted classification (SKOS/OWL/SHACL), drop single-inheritance.
+
+---
+## D-2920 — "rerun vs post-hoc" determination + D-A/D-B/D-C approval (2026-10-10)
+OWNER APPROVED: D-A (3-way macro primary + ranked multi-label discipline), D-B (S5 paraphrase-aware
+grounding), D-C (faceted classification; revise D316, drop single-inheritance).
+FORENSIC RE-DETERMINATION (code + live-DB, this session):
+- ANSWER: two surgical POST-HOC passes over the already-merged 6,591 rows. NO full S0→S6 re-run.
+  Extraction (S0–S2) is healthy (mechanism_quality=1.0, definitions faithful); the defects are in the
+  two DECISION layers only (S5 verdict + S4 discipline label).
+- "other 4 content types" DO NOT EXIST in v9: rechunk-v4-20260929 = principle (6,577) + tool_instruction (14).
+  Nothing to re-run there.
+- Menu is FRESH: v9 rows carry taxonomy_version=v9 + menu_hash be3235433e… == live composite (BUG-693 resolved).
+- S5 neutral breakdown (3,142): 2,258 ent≥1+cont=0 (paraphrase candidates), 508 cont>0 (genuine
+  contradiction, keep), 376 ent=0+cont=0 (no signal, keep). Fail-closed preserved: only ent≥1 AND cont=0
+  may flip, and only on a SECOND (similarity) signal.
+- CORRECTION vs D-2919: D-2822/D-2863 (or-entail @ threshold 0.5, precision 0.852) is a PRECISION fix and
+  is ALREADY coded+configured — but at threshold 0.5 it does NOT recover the paraphrase rows (their max
+  entail is 0.13–0.46 < 0.5). D-B (paraphrase-aware grounding) is SEPARATE, still-pending RECALL work:
+  a parallel STS/similarity path that passes a faithful reworded-true claim when NLI says "neutral" but
+  similarity is high. The two are complementary (D-2822 = precision on the entail path; D-B = recall via
+  the paraphrase path).
+DECISION: post-hoc two-pass fix (S5 re-verify with new paraphrase path + S4 macro re-classify). Not a full re-run.
+
+---
+## D-2921 — Forensic clarifications: anchors, keywords, retrieval surface, post-hoc vs pipeline (2026-10-11)
+Four clarifications resolved against live code + 218MB DB (this session):
+
+Q1 (are S4 anchors/golden "wrongly classified" raw+canonical, so the 6,591 principles too?):
+  NO — not a raw-vs-canonical mislabel. The S4 golden (config/golden/stage4_golden.yaml, 7 hand-curated
+  few-shot examples, D2451) uses VALID canonical fine disciplines (complex adaptive systems, color theory,
+  machine learning, creative process, information science, organizational theory) + multi-label domains.
+  The anchors are internally consistent but authored against D316 (single-inheritance FINE discipline),
+  which D-C now supersedes. Domains were ALWAYS multi-label (D150, 1-7); the single-inheritance defect is
+  DISCIPLINE-specific. discipline_raw/domains_raw are the LLM's pre-canonicalization output (D2066);
+  raw↔canonical divergence is benign; BUG-703 = 190 EMPTY discipline_raw (missing, not mislabeled).
+  → The 6,591 principles inherit fine discipline whose human inter-rater ceiling is 0.581 (unreachable):
+    labels are low-confidence/advisory, NOT random. The operative 3-way macro (ceiling 0.766) is derivable
+    deterministically (discipline_macro.py) or re-classifiable directly (Condition C).
+  → ACTION: re-author the 7 golden examples under D-C (add macro + ranked multi-label discipline), so
+    future S4 few-shot no longer teaches single-inheritance.
+
+Q2 (are keywords incorrect in content types?): NO content-type keywords exist — moved out per D2349.
+  content_type = functional ROLE (5 values), orthogonal to extraction_type (epistemic form). Keywords are
+  a PER-FB retrieval label (3-5 terms) generated in the S4 ELABORATION prompt (separate from the classify
+  prompt that sets discipline/domain), stored in fbs.keywords, FTS5-indexed (name, definition, keywords).
+  → Not part of the content-type ontology; NOT contaminated by the S4 discipline/domain defect.
+
+Q3 (retrieval for PT/TI/GE/PI without discipline/domain): live finding — they are NOT in the retrieval
+  surface. process_template/process_instance/growth_edge = ZERO DB rows (written to JSONL in S4, never
+  committed/indexed — D-2371). tool_instruction = 14 rows committed, carrying INCIDENTAL discipline_macro
+  (Technical 10 / Method & Business 3 / emerging 1) — semantically a tool has no discipline, harmless
+  because tool retrieval should key on content_type + tool_name + FTS/vector. retrieve.py keys on
+  discipline/domains/depth/status + FTS(name/def/keywords) + vector; content_type is NOT a first-class
+  filter yet. → This is the real "retrieval-surface" gap Stage R must close (commit + index the 4 types).
+
+Q4 (post-hoc only, or also pipeline for future?): BOTH — same code changes. Fix pipeline code
+  (stage5_verify D-B paraphrase path; S4 macro classifier; commit+index non-principle types) → future
+  batches inherit automatically; THEN run the fix as a post-hoc re-verify/re-classify/re-commit over the
+  6,591 merged rows. NO full S0→S6 rerun.
+
+REFINED rerun answer (strengthened): the "other 4 content types" have 0 rows in the canonical run, so
+"rerun S4-S5 on them" is moot — the work is commit+index (Stage R), not re-label. The principle rows get
+the two surgical post-hoc passes (S5 paraphrase re-verify + S4 macro re-classify).
+
+---
+## D-2922 — Retrieval contract for PT/TI as Layer-2 skill references (2026-10-11)
+Q: do we need retrieval for process_template/tool_instruction as skill references for the skill
+orchestration layer? ANSWER: YES, and it is a DIFFERENT retrieval contract than principles.
+
+Layer-2 model (content_types.yaml, already designed): FB(principle) → PT → PI → Recipe → MCP tool.
+  process_template = "Layer-2 product primitive (FB→PT→PI→Recipe)"; keyed by trigger + done_condition
+    + description + steps + fb_query_domain/fb_query_intent (which FBs ground it) — NOT discipline.
+  tool_instruction = 13-field MCP-compatible schema (tool_name, description, syntax, parameters, output,
+    example, annotations, caveats, version, source, alternatives) — keyed by tool_name + description
+    (intent) — NOT discipline. Promotion machinery already declared (status open→promoted, promoted_to_*).
+
+LIVE GAP (this session): the skill-reference retrieval surface is EMPTY / unkeyed:
+  - fbs_fts indexes ONLY (name, definition, keywords, jargon) — NOT content_type/tool_name/trigger/
+    done_condition/steps/syntax.
+  - vec_fbs embeds ONLY definition_embedding — not the PT/TI retrieval fields.
+  - retrieve.py has NO content_type facet (keyword=discipline/domain/depth/status + FTS + vector).
+  - PT/PI/GE = 0 local DB rows (D-2371); stage6b pushes them to Anytype by raw DOMAIN, not to local index.
+  - TI = 14 rows committed w/ incidental discipline_macro; retrieval fields un-indexed.
+  - Root: S2/S4 emit ~0 PT/TI/PI/GE (corpus collapses to principle) — so there is nothing to retrieve yet.
+
+DECISION (order): (1) fix decision layers (S5 paraphrase + S4 macro) for the 6,591 principles; (2) Stage R
+surgical extraction to EMIT PT/TI/PI/GE in volume; (3) wire retrieval surface: content_type first-class
+facet + per-type key (PT=trigger/done_condition intent-vector, TI=tool_name exact + description vector)
++ commit/index all 5 types; (4) THEN Layer-2 orchestration has real skill references. Retrieval wiring
+before rows is premature.
+
+---
+## D-2923 — Layer-2 retrieval contract completed: PT/PI/GE/TI (2026-10-11)
+Completes D-2922 (PT/TI only) to ALL FOUR non-principle content types. Full spec:
+research/LAYER2_RETRIEVAL_CONTRACT_20261011.md.
+
+Single invariant: principle = discipline/domain/depth/status keyed; PT/PI/GE/TI = intent+linkage keyed
+(trigger / parent_pt_id / tool_name+description / body+status), NEVER discipline/domain — grounded in
+content_types.yaml extension_fields (D2323 functional-ROLE axis).
+
+Per-type PRIMARY key:
+- PT: trigger (intent-vector) + done_condition + fb_query_domain/intent (FB grounding query)
+- PI: parent_pt_id (instance-of, navigational) + instance_text/domain_context + outcome (evidence)
+- GE: body (open-tension vector) + status (promotion filter open→promoted) + category/tags + parent_fb_ids
+- TI: tool_name (exact/prefix) + description (intent-vector) + syntax/parameters + alternatives (SEE-ALSO)
+
+Linkage graph (orchestration substrate): FB→PT (fb_query_*), PT→PI (parent_pt_id), FB→GE (parent_fb_ids),
+GE→promoted_to_*, TI→TI (alternatives). retrieve.py already declares graph-aware mode — needs per-type join keys.
+
+NEW GAP: GE `category`/`tags` imply a skill/capability ontology that does NOT exist — the 48-discipline
+taxonomy does NOT cover GE's open-tension/capability-growth space. Next decision (candidate D-2924): define
+the growth_edge category facet (closed vocabulary + provenance + calibration) BEFORE Stage R emits GE in
+volume. Do NOT force GE into discipline.
+
+Wiring order (now 4-type complete): decision layers → Stage R emit PT/PI/GE/TI in volume (0/0/0/14 today)
+→ wire content_type facet + per-type key + commit/index → Layer-2 orchestration.
+
+## D-2925 — BUG-705-threshold FIX: paraphrase RECALL path was a silent no-op (2026-10-11)
+Forensic audit found the D-B (BUG-705) paraphrase RECALL path counted `_n_entail` at
+`S5_NLI_PASS_THRESHOLD` (0.5), but the entire target population ("2,258 recoverable neutral", max
+entail 0.13–0.46) is BELOW 0.5 — so `_n_entail` was always 0 and the path could never flip a row.
+A silent no-op (C16 violation) that the R5 gemma review had approved without noticing.
+
+FIX (config-first, C12):
+- New key `stage5.paraphrase_entail_threshold: 0.10` — the WEAK-entail pre-filter (NOT the pass bar),
+  matching D-2920's documented "ent>=1" recoverable population (weak entail 0.13–0.46).
+- `pipeline/stage5_verify.py` counts `_n_entail = sum(entail >= PARAPHRASE_ENTAIL_THRESHOLD)`.
+- Added an ALWAYS-ON structural guard raising C16 if `paraphrase_entail_threshold >= nli_pass_threshold`
+  — prevents the no-op bug class from recurring (weak-entail pre-filter must sit strictly below pass bar).
+
+VERIFIED: imports clean, py_compile OK, guard inert (enabled=false), 0.10 < 0.50. This closes the
+blocking defect that made the pending gold-set calibration meaningless; calibration can now proceed.
+
+Note on DB staleness (no new work): the 6,591-row v9 slice was committed 2026-10-05 under majority/
+0.10 mode; config has since flipped to or_entail_and_no_contra @ 0.5 (D-2863). Re-derive the recoverable
+neutral set under or_entail BEFORE seeding the BUG-705 gold set (the "2,258" figure is majority-mode).
+
+## D-2924 — Growth-edge capability ontology (OWNER-APPROVED + implemented) (2026-10-11)
+Previously a candidate gap ("GE category/tags imply a skill/capability ontology that does NOT
+exist"). OWNER-APPROVED 2026-10-11. Implemented config-first (C12):
+- config/growth_edge_ontology.yaml — CLOSED category vocabulary (open_tension /
+  unverified_correlation / contested_claim / capability_gap + `emerging` abstention),
+  bootstrap capability tags, R14 provenance stamps, calibration contract (advisory until
+  a gold set is minted; kappa_floor 0.65; requires_gold_before_volume).
+- pipeline/growth_edge_ontology.py — C21 single home loader, fail-closed on off-vocabulary
+  category/tag (never free-gen). calibration_enforcing()/calibration_decision() gate Stage R.
+- tests/test_growth_edge_ontology.py — 4/4 pass.
+Ontological invariant preserved (D-2923): GE is keyed by body+status, NEVER discipline/domain;
+the category facet names the SKILL the edge points toward, not its knowledge-domain.
+
+
+## D-2926 — BUG-698 baseline-preserving migration (circular re-review loop broken) (2026-10-11)
+ROOT CAUSE: scripts/rederive_anchor_axes_v6.py --generate re-classifies from scratch using only FB
+definition/mechanism/boundary/consequence + menu, with NO memory of owner rulings, so every run
+reinvents labels and re-opens adjudication forever (the circle). The 20B generator also over-abstracts:
+it dumped 20 rows to `emerging`, collapsed 5 multi-domain rows to `research practice`, and promoted 7
+owner-declared abstentions back to concrete disciplines (contradicting owner_domain_rulings).
+DECISION: The v8 consolidated anchor (discipline_anchor_rederived_v8_20261007.json, owner-finalized)
+is the baseline of record. The v8->v9 menu delta is the ONLY justification for re-opening a label:
+disciplines removed = computational theory / information retrieval / visual semiotics; domains
+removed = NONE. Therefore the migration is exactly 7 discipline rows (4 deterministic D-2897 renames
++ 3 owner-decide), and ZERO domain rows. Every other generator delta (164 rows) reverts to v8 verbatim.
+D-2897 deterministic renames are applied REGARDLESS of the generator (which mis-renamed 3 of 4).
+Ontological invariant preserved (D-2896 raw-invariance): raw labels stay verbatim; only canonical
+discipline moves on the 7 menu-forced rows.
+MENU GAP: removing computational theory left no mathematics/logic/computer-science label; theoretical-
+computation rows must abstain or route to philosophy. Flagged for taxonomy follow-up.
+files:
+- config/owner_decisions_v9_keep_verbatim_20261011.json
+- governance/BUG698_migration_delta_20261011.csv
+- governance/BUG698_discarded_generator_delta_20261011.csv

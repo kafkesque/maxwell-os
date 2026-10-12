@@ -25,7 +25,7 @@ Why this wrapper exists (the naive re-run hazard):
     emitting a misleading zero.
 
 Preflight gates (all fail-closed; a failed gate blocks --apply):
-    G1  taxonomy_v5.yaml == taxonomy_v9.yaml (the four downstream scripts read the
+    G1  taxonomy.yaml == taxonomy_v9.yaml (the four downstream scripts read the
         misnamed "v5" file — if it ever diverges from v9 we must not silently
         calibrate against a stale taxonomy).
     G2  closed_menu_v9.json and taxonomy_v9.yaml agree up to the 'emerging'
@@ -59,7 +59,7 @@ from pipeline.pipeline_paths import CANONICAL_RUN, DB_PATH  # noqa: E402
 
 # ── C12: config-first paths (no hardcoded labels/thresholds) ─────────────────
 _TAXONOMY_V9 = _ROOT / "config" / "taxonomy_v9.yaml"
-_TAXONOMY_V5 = _ROOT / "config" / "taxonomy_v5.yaml"  # what the 4 scripts read
+_TAXONOMY_V5 = _ROOT / "config" / "taxonomy.yaml"  # what the 4 scripts read
 _CLOSED_MENU = _ROOT / "config" / "closed_menu_v9.json"
 _CALIBRATION = _ROOT / "governance" / "d2547_calibration.json"
 _CFG = _ROOT / "config" / "pipeline_config.yaml"

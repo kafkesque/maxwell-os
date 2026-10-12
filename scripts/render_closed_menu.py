@@ -55,7 +55,7 @@ def _render_report(menu: dict, h: str, summary: dict) -> str:
     lines: list[str] = [
         "# R1 — Closed menu frozen (D-279, 2026-09-20)",
         "",
-        "The canonical classification menu is rendered from `config/taxonomy_v5.yaml` +",
+        "The canonical classification menu is rendered from `config/taxonomy.yaml` +",
         "`config/content_types.yaml` by `pipeline/closed_menu.py`, with `none` as a FIRST-CLASS",
         "abstention value (D-275b/D-277). A label is only trustworthy if it is traceable to the",
         "exact menu it was classified against — that trace is the `menu_hash`.",
@@ -86,7 +86,7 @@ def _render_report(menu: dict, h: str, summary: dict) -> str:
         "",
         "## Regeneration",
         "",
-        "Any change to `config/taxonomy_v5.yaml` or `config/content_types.yaml` MUST be followed by:",
+        "Any change to `config/taxonomy.yaml` or `config/content_types.yaml` MUST be followed by:",
         "",
         "```",
         "python3 scripts/render_closed_menu.py",

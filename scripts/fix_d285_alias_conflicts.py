@@ -2,7 +2,7 @@
 """scripts/fix_d285_alias_conflicts.py — surgical D-285 alias + definition fix.
 
 Forensic audit (2026-09-20) found the D-285 discipline boundaries were NOT fully
-swept into taxonomy_v5.yaml. Two coupled problems:
+swept into taxonomy.yaml. Two coupled problems:
 
   1. RAW-ALIAS CROSS-LISTINGS — a raw alias must map to AT MOST ONE canonical
      (pipeline/schemas.py's synonym index is last-write-wins, so cross-listings
@@ -19,7 +19,7 @@ swept into taxonomy_v5.yaml. Two coupled problems:
        economics             -> economics          (remove from political economy)
        clinical psychology   -> psychology         (remove from health & medicine)
 
-  2. DEFINITION DRIFT — taxonomy_v5.yaml's 5-core discipline definitions are the
+  2. DEFINITION DRIFT — taxonomy.yaml's 5-core discipline definitions are the
      UN-strengthened base text; r5_slot_repair.yaml holds the ratified D-285
      strengthened text (extra discriminator sentences). Fold the strengthened
      text into the canonical definitions so the two sources agree.
@@ -38,7 +38,7 @@ from datetime import datetime
 from pathlib import Path
 
 _ROOT = Path(__file__).resolve().parent.parent
-_TAX = _ROOT / "config" / "taxonomy_v5.yaml"
+_TAX = _ROOT / "config" / "taxonomy.yaml"
 
 # (canonical, exact-raw-line) to REMOVE.
 REMOVE: list[tuple[str, str]] = [
@@ -212,7 +212,7 @@ def verify(lines: list[str]) -> int:
 
 
 def write(lines: list[str], ts: str) -> None:
-    bak = _TAX.with_name(f"taxonomy_v5.yaml.bak_{ts}_pre_d285_alias_fix")
+    bak = _TAX.with_name(f"taxonomy.yaml.bak_{ts}_pre_d285_alias_fix")
     os.replace(_TAX, bak)
     text = "".join(lines)
     fd, tmp = tempfile.mkstemp(dir=str(_TAX.parent), suffix=".tmp")

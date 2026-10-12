@@ -753,11 +753,11 @@ def suite_delegation() -> list[dict]:
 
 _DB_PATH = ROOT / "knowledge pipeline" / "maxwell.db"
 _GOLD_PATH = ROOT / "governance" / "gold_4axis.jsonl"
-_TAX_PATH = ROOT / "config" / "taxonomy_v5.yaml"
+_TAX_PATH = ROOT / "config" / "taxonomy.yaml"
 
 
 def _voting_taxonomy() -> tuple[list, list]:
-    """Return (disciplines, domains) canonical names from taxonomy_v5.yaml."""
+    """Return (disciplines, domains) canonical names from taxonomy.yaml."""
     import yaml  # local import: optional dependency for this suite only
     t = yaml.safe_load(_TAX_PATH.read_text(encoding="utf-8"))
     cand = lambda v: v["canonical"] if isinstance(v, dict) else v

@@ -289,6 +289,15 @@ S4_TEMPORAL_SIGNALS=_CFG.get("stage4", {}).get("temporal_signals", {})      # {t
 S4_DIFFICULTY_MAP=dict(_CFG.get("stage4", {}).get("difficulty_map", {}))    # D2410: {depth|domain_single|domain_multi: difficulty} (C12)
 S4_UNIVERSAL_SIGNALS=_CFG.get("stage4", {}).get("universal_signals", [])    # [name/mechanism substrings]
 S6_MAX_FAILED_RATIO=float(_CFG.get("stage6", {}).get("max_failed_ratio", 0.0))  # D2338: fail-closed commit
+# D-2933 (rule V): verification-scoped commit — write ONLY S5-owned provenance columns on an
+# existing fb_id, so a stale S5 checkpoint can never regress a ratified S4-owned ontology label
+# (BUG-709). C12: the scope and the column set live in config/pipeline_config.yaml:stage6.
+S6_COMMIT_SCOPE=str(_CFG.get("stage6", {}).get("commit_scope", "verification_scoped"))
+S6_S5_OWNED_COLUMNS=tuple(_CFG.get("stage6", {}).get("s5_owned_columns", []))
+# D-2934: columns whose value is DERIVED FROM the taxonomy menu. The taxonomy-skew guard
+# refuses a write only when a written column appears here; an empty list means the skew is
+# immaterial for this write and is recorded as a loud advisory instead (see stage6_commit).
+S6_TAXONOMY_DEPENDENT_COLUMNS=frozenset(_CFG.get("stage6", {}).get("taxonomy_dependent_columns", []))
 
 # ── Stage 5 settings (D2083: Type-aware BORP) ──────────────────────────
 S5_BORP_BYPASS_TYPES=list(_CFG["stage5"]["borp_bypass_types"])
@@ -381,7 +390,7 @@ TAXONOMY_FLOOD_THRESHOLD = float(_CFG.get("taxonomy", {}).get("flood_threshold_r
 TAXONOMY_REPLACEMENT_THRESHOLD = float(_CFG.get("taxonomy", {}).get("replacement_threshold_ratio", 1.1))
 TAXONOMY_EMERGING_FREQ = int(_CFG.get("taxonomy", {}).get("emerging_freq_threshold", 10))
 TAXONOMY_MAX_DOMAINS = int(_CFG.get("taxonomy", {}).get("max_domains", 35))      # D2378: canonical cap (was hardcoded 25 in taxonomy_manager.py)
-TAXONOMY_MAX_DISCIPLINES = int(_CFG.get("taxonomy", {}).get("max_disciplines", 75))  # D2378/D2504: canonical cap (was hardcoded 47; default 72→75 to match live taxonomy_v5.yaml)
+TAXONOMY_MAX_DISCIPLINES = int(_CFG.get("taxonomy", {}).get("max_disciplines", 75))  # D2378/D2504: canonical cap (was hardcoded 47; default 72→75 to match live taxonomy.yaml)
 D2399_PROMOTIONS_FROZEN = bool(_CFG.get("taxonomy", {}).get("d2399_promotions_frozen", False))          # D2519/D2399 policy A: manual freeze kill-switch
 D2399_ALLOW_BOTH_AXES_EMERGING = bool(_CFG.get("taxonomy", {}).get("d2399_allow_both_axes_emerging", False))  # D2519: never promote a both-axes-emerging label
 # D2556 (D2547): config-driven per-axis/per-label semantic-error thresholds (retire global 5%).

@@ -24,7 +24,7 @@ Deterministic + crash-safe (C6): every file edited is backed up first
 detects already-demoted labels and reports 0 changes.
 
 Edits:
-  1. config/taxonomy_v5.yaml   — remove 9 discipline entries; add 8 new domain
+  1. config/taxonomy.yaml   — remove 9 discipline entries; add 8 new domain
                                   entries (marketing merges into the existing
                                   'marketing & communications' domain = union of
                                   raw aliases); bump version v5.1 → v6.0.
@@ -48,7 +48,7 @@ from pathlib import Path
 import yaml
 
 ROOT = Path(__file__).resolve().parent.parent
-TAX_PATH = ROOT / "config" / "taxonomy_v5.yaml"
+TAX_PATH = ROOT / "config" / "taxonomy.yaml"
 ALIAS_PATH = ROOT / "config" / "alias_map.yaml"
 CFG_PATH = ROOT / "config" / "pipeline_config.yaml"
 
@@ -159,7 +159,7 @@ def migrate_taxonomy(tax: dict) -> tuple[dict, int]:
 
     tax["domains"] = domains
 
-    # 3. Bump version (MINOR only: v5.1 → v5.2 — the file stays taxonomy_v5.yaml;
+    # 3. Bump version (MINOR only: v5.1 → v5.2 — the file stays taxonomy.yaml;
     #    _get_taxonomy_path()/schemas.py/doc_guard.py hardcode that filename).
     old_version = tax.get("version", "v5.1")
     tax["version"] = "v5.2"
@@ -221,7 +221,7 @@ def main() -> int:
 
     total = 0
 
-    # 1. taxonomy_v5.yaml
+    # 1. taxonomy.yaml
     with open(TAX_PATH) as f:
         tax = yaml.safe_load(f)
     tax, n = migrate_taxonomy(tax)

@@ -27,7 +27,7 @@ from pathlib import Path
 import yaml
 
 ROOT = Path(__file__).resolve().parent.parent
-DEFAULT_PATH = ROOT / "config" / "taxonomy_v5.yaml"
+DEFAULT_PATH = ROOT / "config" / "taxonomy.yaml"
 AXES = ("disciplines", "domains")
 
 

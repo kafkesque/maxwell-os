@@ -13,7 +13,7 @@ imputed. This is the honest replacement for the corrupt ruler_measurement
 Axes:
   form  — extraction_type  (4 canonicals)         [FINAL — reviewer locked FORM]
   ct    — content_type     (7 = 5 roles + 2 dispositions)
-  disc  — discipline       (61 canonicals from taxonomy_v5.yaml)
+  disc  — discipline       (61 canonicals from taxonomy.yaml)
 
 Usage:
   python3 scripts/rescore_ruler_inverted.py [--axis form|ct|disc|all] [--out-dir ...]
@@ -38,7 +38,7 @@ CFG = REPO / "config" / "eval_integrity.yaml"
 AUTHORITY = REPO / "governance" / "anchor1_frozen_20260920.json"
 SHEET = REPO / "governance" / "RULER_BLIND_SHEET_20260917.csv"      # human workspace, NOT authority
 KEY = REPO / "governance" / "ruler_sheet_key_20260917.json"          # legacy stored-side key
-TAX = REPO / "config" / "taxonomy_v5.yaml"
+TAX = REPO / "config" / "taxonomy.yaml"
 OUT_JSON = REPO / "governance" / "ruler_inverted_20260920.json"
 OUT_MD = REPO / "governance" / "ruler_inverted_20260920.md"
 
@@ -584,7 +584,7 @@ def main() -> int:
         "key_inverted": True,
         "reference": "human blind label",
         "under_test": "stored free-generated label",
-        "taxonomy": "config/taxonomy_v5.yaml",
+        "taxonomy": "config/taxonomy.yaml",
         "truth_source": source_desc,
         "authority": "governance/anchor1_frozen_20260920.json (D-315 canonical ruler)",
         "authority_sha256": hashlib.sha256(paths["authority"].read_bytes()).hexdigest(),

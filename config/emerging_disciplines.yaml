@@ -1,6 +1,6 @@
 # Emerging Discipline Promotion Policy  (D2618-P1 follow-up, proposed)
 # User ruling 2026-09-14: a label stays 'emerging' until the raw discipline
-# reaches critical mass, then it is promoted into config/taxonomy_v5.yaml.
+# reaches critical mass, then it is promoted into config/taxonomy.yaml.
 # C12: the threshold lives here, never in code.
 schema_version: "3.0"
 pipeline_commit: "v3.0-D2618-p1"
@@ -17,7 +17,7 @@ emerging_disciplines:
     - "fbs rows whose raw discipline maps to this label"
     - "adjudicated 4-axis rows (gold/pending/silver)"
   promotion_requires:
-    - "taxonomy_v5.yaml entry added (protected file: edit via safe_edit + backup)"
+    - "taxonomy.yaml entry added (protected file: edit via safe_edit + backup)"
     - "decision row appended to DECISION-LOG.md + config/decisions.yaml"
     - "classifier head retrain check (label count change invalidates trained heads)"
     - "alias_map.yaml entry so raw strings canonicalise to the new label"

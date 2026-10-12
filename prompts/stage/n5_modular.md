@@ -24,7 +24,7 @@ context_labels:
   - agentic-os: "System self-management, LLM resilience, health monitoring"
 
 # ── SECTION: Domain Taxonomy ──
-# Populated from config/taxonomy_v5.yaml (25 domains)
+# Populated from config/taxonomy.yaml (25 domains)
 
 available_domains:
   - graphic design
@@ -54,7 +54,7 @@ available_domains:
   - research & methodology
 
 # ── SECTION: Discipline Taxonomy ──
-# Populated from config/taxonomy_v5.yaml (47 disciplines)
+# Populated from config/taxonomy.yaml (47 disciplines)
 
 available_disciplines:
   - visual perception

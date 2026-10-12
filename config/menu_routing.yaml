@@ -108,7 +108,7 @@ menu_sources:
   content_type: {path: config/closed_menu_v5.json, key: content_types}
   discipline: {path: config/closed_menu_v5.json, key: disciplines}
   extraction_type: {path: config/closed_menu_v5.json, key: extraction_types}
-  depth: {path: config/taxonomy_v5.yaml, key: depth}
+  depth: {path: config/taxonomy.yaml, key: depth}
   domains: {path: config/closed_menu_v5.json, key: domains}
 
 actions_vocabulary:

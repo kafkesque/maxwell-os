@@ -58,7 +58,7 @@ from pipeline.omlx_call import call_omlx_json  # noqa: E402
 from pipeline.pipeline_paths import PIPELINE_COMMIT, SCHEMA_VERSION  # noqa: E402
 
 # ── C12/C20: named constants ────────────────────────────────────────────────
-TAXONOMY = Path(os.environ.get("TAXONOMY_YAML", ROOT / "config" / "taxonomy_v5.yaml"))
+TAXONOMY = Path(os.environ.get("TAXONOMY_YAML", ROOT / "config" / "taxonomy.yaml"))
 VERIFIED_CORE = Path(os.environ.get("VERIFIED_CORE", ROOT / "governance" / "verified_core.jsonl"))
 DB = Path(os.environ.get("MAXWELL_DB", ROOT / "knowledge pipeline" / "maxwell.db"))
 OUT_CHECKPOINT = Path(os.environ.get(
@@ -78,7 +78,7 @@ DEFAULT_RELIABLE = ("deepseek-v4-pro", "Qwen3.8-27B-MLX-4bit")
 POLICY_VERSION = "v2"
 ABSTAIN = ""  # never fabricate a label
 
-# ── ontology (loaded once from taxonomy_v5.yaml) ────────────────────────────
+# ── ontology (loaded once from taxonomy.yaml) ────────────────────────────
 
 
 def _canonical_defs() -> Tuple[List[Tuple[str, str]], List[Tuple[str, str]]]:

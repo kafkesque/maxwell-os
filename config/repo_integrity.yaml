@@ -158,7 +158,7 @@ worktree:
       why: >-
         D-2897 v9 menu-edit build intermediate. scripts/build_taxonomy_v9.py writes config/taxonomy_v9.yaml
         from config/taxonomy_v8.yaml; scripts/apply_taxonomy_v9.py promotes it to the LIVE
-        config/taxonomy_v5.yaml (whose 'v5' name is a documented historical artifact, content now v9). The v9
+        config/taxonomy.yaml (whose 'v5' name is a documented historical artifact, content now v9). The v9
         intermediate is byte-identical to live and regenerable, so it is declared excluded (never indexed),
         never left silently absent.
 

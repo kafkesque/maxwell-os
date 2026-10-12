@@ -30,11 +30,11 @@ definition_anchored_menu_enabled is the OWNER's human gate (D-2839), not this sc
 Exit 0 on a completed measurement; exit 1 only on load/inference error.
 
 Modes:
-  --anchor PATH        override the referee (default: 20261006d manifest)
+  --anchor PATH        override the referee (default: v8 authority 20261007)
   --limit N            run only the first N rows (smoke)
   --baseline           ALSO run the flag-OFF cribs arm (reference only)
   --det-check N        determinism self-check prefix size (default 8)
-  --out PATH           R14-stamped JSON output (default governance/d2767_ab_20261006d.json)
+  --out PATH           R14-stamped JSON output (default governance/d2767_ab_eval_v8_20261010.json)
 """
 from __future__ import annotations
 
@@ -71,9 +71,11 @@ from discipline_conformance_gate import (  # noqa: E402
 # harness reports the coarse C+B kappa, NOT only the fine 62-way kappa (D-2767/D-2884 gate).
 from discipline_macro_classify import load_macro, to_macro  # noqa: E402
 
-# C12: default referee is the owner-signed-off re-derived manifest (D-2839 RATIFIED).
-DEFAULT_ANCHOR = REPO / "governance" / "discipline_anchor_rederived_v6_20261006d.json"
-DEFAULT_OUT = REPO / "governance" / "d2767_ab_20261006d.json"
+# C12: default referee is the current re-derived authority (v8, D-2866+/D-2879 RATIFIED).
+# BUG-650: was the stale v6d manifest; re-pointed to v8 (D-2916). The BUG-689
+# noise_drop/abstain handling already makes the 202-row v8 safe (effective N=194).
+DEFAULT_ANCHOR = REPO / "governance" / "discipline_anchor_rederived_v8_20261007.json"
+DEFAULT_OUT = REPO / "governance" / "d2767_ab_eval_v8_20261010.json"
 KAPPA_FLOOR = OPERATIVE_FLOOR  # 0.800 — reported reference (D-2839)
 EMERGING_MAX = 0.35  # fallback only; real value read from taxonomy config (C12)
 

@@ -12,7 +12,7 @@ Folder routing priority chain (v1-proven, now consolidated into one function):
 The folder name is the human-readable label that tells you what category
 the FBs fell into. When domain_raw != domain_canonical, the raw label
 accumulates; when enough FBs share the same raw label, it earns a
-canonical slot in taxonomy_v5.yaml.
+canonical slot in taxonomy.yaml.
 
 Also provides:
     count_raw_labels(fbs) → {raw_label: count} for taxonomy expansion decisions
@@ -79,7 +79,7 @@ def count_raw_labels(fbs: list[dict]) -> dict[str, int]:
 
     Returns {raw_label: count} sorted descending.
     Use this to determine when a raw label has accumulated enough
-    FBs to earn a canonical slot in taxonomy_v5.yaml.
+    FBs to earn a canonical slot in taxonomy.yaml.
 
     Only counts labels that differ from their canonical match
     (i.e., labels that the synonym matcher couldn't resolve).

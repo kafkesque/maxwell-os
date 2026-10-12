@@ -38,7 +38,7 @@ from benchmark_s2_qwen38_vs_coder import (  # noqa: E402
 
 DB = ROOT / "knowledge pipeline" / "maxwell.db"
 GOLD = ROOT / "governance" / "gold_4axis.jsonl"
-TAX = ROOT / "config" / "taxonomy_v5.yaml"
+TAX = ROOT / "config" / "taxonomy.yaml"
 
 MODELS = [
     "mlx-community/Ornith-1.5-9B-OptiQ-4bit",

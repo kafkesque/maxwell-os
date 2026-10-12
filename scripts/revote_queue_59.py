@@ -60,7 +60,7 @@ from pipeline.omlx_call import call_omlx_json  # noqa: E402
 from pipeline.pipeline_paths import PIPELINE_COMMIT, SCHEMA_VERSION  # noqa: E402
 
 # ── C12/C20: named constants (no hardcode, no magic numbers) ───────────────
-TAXONOMY = Path(os.environ.get("TAXONOMY_YAML", ROOT / "config" / "taxonomy_v5.yaml"))
+TAXONOMY = Path(os.environ.get("TAXONOMY_YAML", ROOT / "config" / "taxonomy.yaml"))
 QUEUE = Path(os.environ.get("EXPANSION_QUEUE", ROOT / "governance" / "expansion_queue_108.jsonl"))
 REVERIFY = Path(os.environ.get(
     "CT_REVERIFY", ROOT / "governance" / "content_type_reverify_108.json"))

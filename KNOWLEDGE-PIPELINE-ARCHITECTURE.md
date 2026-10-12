@@ -151,7 +151,7 @@ BOOKS/                          852 books across 8 domain folders
 
 - **25 canonical domains** (graphic_design through research_&_methodology) + "emerging"
 - **47 canonical disciplines** (visual_perception through philosophy) + "emerging"
-- **Source:** `config/taxonomy_v5.yaml` — canonical labels are **temporary placeholders**
+- **Source:** `config/taxonomy.yaml` — canonical labels are **temporary placeholders**
 - **Labels are NOT fixed** — they earn their place through accumulation
 
 ### 3.2 Classification Method: SALSA (Single-pass LLM)
@@ -177,7 +177,7 @@ LLM OUTPUT:  "Visual Communication" (non-canonical)
          → domains_canonical = ["emerging"]
          → domains_raw = ["Neuroscience"]  ← PRESERVED FOREVER
          → Accumulates. When enough FBs share "Neuroscience" raw,
-           it earns a canonical slot in taxonomy_v5.yaml.
+           it earns a canonical slot in taxonomy.yaml.
 ```
 
 ### 3.4 Folder Routing (P1.5-C)
@@ -620,7 +620,7 @@ trust_tier: "watch"
 
 | File | Lines | Wired To |
 |------|-------|----------|
-| `taxonomy_v5.yaml` | ~500 | `schemas.py` (Literal types, synonym index) |
+| `taxonomy.yaml` | ~500 | `schemas.py` (Literal types, synonym index) |
 | `synonym_map.yaml` | 743 | `schemas.py` (643-entry synonym lookup) |
 | `domain_disciplines.yaml` | 960 | NOT WIRED — available for future use |
 | `domain_anchors.yaml` | ~500 | NOT WIRED |

@@ -60,6 +60,7 @@ from pipeline.pipeline_paths import (  # noqa: E402
 from pipeline.schemas import (  # noqa: E402
     CANONICAL_DISCIPLINES,
     get_synonym_index,
+    normalize_label,
 )
 from pipeline.stage4_merge import map_to_canonical_with_fallback  # noqa: E402
 from pipeline.stage4_merged_call import (  # noqa: E402
@@ -120,7 +121,11 @@ def remap_discipline(result: dict, synonym_index: dict[str, str]) -> tuple[str, 
     raw_disc = result.get("discipline")
     if isinstance(raw_disc, list):
         raw_disc = raw_disc[0] if raw_disc else ""
-    raw_disc = str(raw_disc) if raw_disc else ""
+    # D-2896 / F8: surface-fold (NFKC + dash-fold U+2010..U+2015 + case-fold +
+    # strip) at the write boundary — mirror stage4_merge.py exactly. This path
+    # previously wrote raw discipline WITHOUT the fold, leaking non-ASCII-dash
+    # variants ("human–computer interaction" vs "human-computer interaction").
+    raw_disc = normalize_label(str(raw_disc)) if str(raw_disc).strip() else ""
 
     if not raw_disc.strip():
         return ("emerging", raw_disc, "emerging_unmapped")

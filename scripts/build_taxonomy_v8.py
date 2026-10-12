@@ -34,7 +34,7 @@ from pathlib import Path
 import yaml
 
 ROOT = Path(__file__).resolve().parent.parent
-SRC = ROOT / "config" / "taxonomy_v5.yaml"   # LIVE source (renderer + validator read it)
+SRC = ROOT / "config" / "taxonomy.yaml"   # LIVE source (renderer + validator read it)
 OUT = ROOT / "config" / "taxonomy_v8.yaml"
 MIG = ROOT / "governance" / "taxonomy_v8_migration.json"
 

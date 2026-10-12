@@ -53,7 +53,7 @@ from pipeline.pipeline_paths import (  # noqa: E402
 from pipeline.stage5_verify import NLIInferenceError, _nli_pair_scores  # noqa: E402
 
 _HYPOTHESIS_TEMPLATE = "This text is about {label}."  # C20: named NL template
-_TAXONOMY_PATH = _ROOT / "config" / "taxonomy_v5.yaml"  # C12: config-first source
+_TAXONOMY_PATH = _ROOT / "config" / "taxonomy.yaml"  # C12: config-first source
 _CHECKPOINT_INTERVAL = 100  # C20: flush checkpoint every N audited FBs
 _ERROR_MSG_MAX_LEN = 200  # C20: truncate NLI error strings in the report
 _MD_TOP_N = 30  # C20: how many contradict-label rows to surface in the .md
@@ -63,7 +63,7 @@ _MD_FILE = _ROOT / "governance" / "nli_label_audit.md"
 
 
 def _load_canonicals() -> tuple[set[str], set[str]]:
-    """Load canonical discipline/domain sets from taxonomy_v5.yaml (C12)."""
+    """Load canonical discipline/domain sets from taxonomy.yaml (C12)."""
     tax = yaml.safe_load(open(_TAXONOMY_PATH, encoding="utf-8"))
     discs = {d["canonical"] for d in tax.get("disciplines", [])}
     doms = {d["canonical"] for d in tax.get("domains", [])}

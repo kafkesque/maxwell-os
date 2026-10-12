@@ -7,9 +7,9 @@ cross-axis triage): business/management practice areas are subjects (domains), n
 academic fields (disciplines).
 
 Mechanics (C13 / C6):
-1. Back up DB + taxonomy_v5.yaml + S4/S5 checkpoints (timestamped, fsync'd).
+1. Back up DB + taxonomy.yaml + S4/S5 checkpoints (timestamped, fsync'd).
 2. ALIAS: append each raw label to the target DOMAIN canonical's `raw:` list in
-   taxonomy_v5.yaml (permanent, so future classification maps it onto the domain axis).
+   taxonomy.yaml (permanent, so future classification maps it onto the domain axis).
 3. KIND-SWAP each affected FB (discipline='emerging' + case-insensitive discipline_raw match):
      domains      += [target canonical]  (dedup; empty/['emerging'] → [target])
      domains_raw  += [raw label]         (dedup, preserved)
@@ -58,7 +58,7 @@ DOMAIN_SWAP: dict[str, str] = {
     "visual arts": "arts & culture",
 }
 
-TAXONOMY_PATH = _PROJECT_ROOT / "config" / "taxonomy_v5.yaml"
+TAXONOMY_PATH = _PROJECT_ROOT / "config" / "taxonomy.yaml"
 S4_CHECKPOINT = _PROJECT_ROOT / "knowledge pipeline" / "stage4_merge" / "t11" / "checkpoint_enriched.jsonl"
 S5_CHECKPOINT = _PROJECT_ROOT / "knowledge pipeline" / "stage5_verify" / "t11" / "checkpoint.jsonl"
 
@@ -127,7 +127,7 @@ def _edit_taxonomy_yaml(dry_run: bool) -> dict[str, list[str]]:
         if to_add:
             entry["raw"] = entry.get("raw", []) + to_add
     if dry_run:
-        print("  [dry-run] taxonomy_v5.yaml would add:")
+        print("  [dry-run] taxonomy.yaml would add:")
         for c, vs in added.items():
             if vs:
                 print(f"    {c}: {vs}")
@@ -144,7 +144,7 @@ def _edit_taxonomy_yaml(dry_run: bool) -> dict[str, list[str]]:
         if os.path.exists(tmp):
             os.unlink(tmp)
         raise
-    print("  ✅ taxonomy_v5.yaml updated (atomic)")
+    print("  ✅ taxonomy.yaml updated (atomic)")
     return added
 
 
@@ -246,7 +246,7 @@ def main() -> int:
     if not args.skip_integrity:
         _integrity_gate(db_path)
 
-    print("\n  ✏️  updating taxonomy_v5.yaml ...")
+    print("\n  ✏️  updating taxonomy.yaml ...")
     _edit_taxonomy_yaml(dry_run=False)
 
     print(f"\n  💾 kind-swapping {len(rows)} FBs ...")

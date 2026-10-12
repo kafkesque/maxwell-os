@@ -12,7 +12,7 @@ printed the top-16 of that raw counter. Three consequences:
      generator grew a SECOND, weaker matching path (the BUG-346 "two truth paths" class).
 
 This generator has exactly one resolver: `pipeline.schemas.match_to_canonical` (kind-aware,
-D2133) over `config/taxonomy_v5.yaml` canonical + `raw` aliases, plus the owner-approved
+D2133) over `config/taxonomy.yaml` canonical + `raw` aliases, plus the owner-approved
 `config/normalization_map.yaml` surface variants (D-307, domain axis only - BUG-325).
 A near-match is REPORTED, never silently resolved (D2422 spirit).
 
@@ -40,7 +40,7 @@ if str(ROOT) not in sys.path:  # single resolver lives in the package, not in th
     sys.path.insert(0, str(ROOT))
 SHEET = ROOT / "governance" / "ANCHOR2_BLIND_SHEET_20260920.csv"
 KEY = ROOT / "governance" / "ANCHOR2_KEY_20260920.json"
-TAXONOMY = ROOT / "config" / "taxonomy_v5.yaml"
+TAXONOMY = ROOT / "config" / "taxonomy.yaml"
 NORM_MAP = ROOT / "config" / "normalization_map.yaml"
 MENU = ROOT / "config" / "closed_menu_v5.json"
 OUT = ROOT / "governance" / "PART1_PART2_REISSUE_20260921.md"
@@ -150,7 +150,7 @@ def main() -> int:
         "|---|---|",
         "| governance/ANCHOR2_BLIND_SHEET_20260920.csv | `%s` |" % sha256_file(SHEET),
         "| governance/ANCHOR2_KEY_20260920.json | `%s` |" % sha256_file(KEY),
-        "| config/taxonomy_v5.yaml | `%s` |" % sha256_file(TAXONOMY),
+        "| config/taxonomy.yaml | `%s` |" % sha256_file(TAXONOMY),
         "| config/closed_menu_v5.json (bytes) | `%s` |" % sha256_file(MENU),
         "| config/closed_menu_v5.json (menu_hash) | `%s` |" % menu_hash(menu),
         "| config/normalization_map.yaml | `%s` |" % (sha256_file(NORM_MAP) if NORM_MAP.exists() else "n/a"),

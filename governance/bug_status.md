@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**177 open** / 311 closed of 488 ids.
+**178 open** / 311 closed of 489 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -184,3 +184,4 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-720 | (LOW - OPEN 2026-10-12): the S4 sidecar reconciliation tolerates a magic 7 instead of reconciling exactly | 1 |
 | BUG-721 | (HIGH - OPEN 2026-10-12): a DELEGATE returned a FABRICATED code-review verdict without reading the code (false assurance) | 1 |
 | BUG-723 | (MED - OPEN 2026-10-12): t11-unique corpus coverage debt after the superseded-run purge | 1 |
+| BUG-725 | (HIGH - OPEN 2026-10-12): the 1,049 non-principle rows carry NO label-provenance quartet, and the rail calls it a BROKEN STAMP (owner-gated  | 1 |

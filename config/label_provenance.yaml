@@ -30,7 +30,7 @@
 # R-D410 / D-277: nothing here is backfilled or imputed. A pre-boundary row stays pre_boundary for
 # ever; manufacturing a menu_hash retroactively would manufacture a provenance claim.
 schema_version: "3.0"
-last_updated: "2026-09-25"
+last_updated: "2026-10-12"
 decision: "D-2640"
 
 label_provenance:
@@ -64,8 +64,16 @@ label_provenance:
     # A DECLARED denominator (BUG-501/D-2638): a population that is only COMPUTED cannot disagree with
     # anything, so the measured count is declared and the rail compares. If it changes, that is drift
     # (or an explicit owner-authored update of this file), never a silent edit.
-    measured_rows: 7983
-    measured: "t11 7,855 | bug198_reinject 6 | e2e 122 (7,983 rows; menu_hash and all three *_source columns empty on every one)"
+    # RE-BASELINED 2026-10-12 (explicit and dated, never a silent edit — this file's own rule).
+    # The boundary is now EMPTY because the D-2937/BUG-713 purge (2026-10-12, owner-directed,
+    # archive-first, C13 backup) REMOVED the superseded generation runs from the store. Those rows now
+    # live ONLY in archive/superseded_runs/20261012T090055Z/superseded_rows.jsonl and
+    # "knowledge pipeline/backups/maxwell.db.pre_purge_20261012_110055" (R-D410: nothing deleted).
+    # NOTHING WAS RE-STAMPED AND NOTHING WAS IMPUTED: the boundary stays DECLARED (a future row carrying
+    # one of these pipeline_run_id values is still classified pre_boundary); it simply has no members in
+    # this store. This is a purge being recorded, NOT the boundary being dissolved.
+    measured_rows: 0
+    measured: "0 rows (2026-10-12, after the superseded-run purge). HISTORY (measured 2026-09-25, 7,995-row store): t11 7,855 | bug198_reinject 6 | e2e 122 = 7,983 rows; menu_hash and all three *_source columns empty on every one."
     rule: >-
       Inside the boundary a label is declared pre_boundary: its provenance is NOT imputed and NOT
       backfilled (D-277). Outside the boundary every row MUST carry the full quartet; a row that does

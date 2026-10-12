@@ -99,6 +99,11 @@ QUARANTINE` → 4/4 templates; default query (no facet, PASS) → principles wit
 
 **Unblocked machine work (do these in this order):**
 
+0. **BUG-725 — FIX IT FIRST (it is a RED boot gate).** The 1,049 non-principle rows carry no R1/D-279
+   label-provenance quartet, so `check_label_provenance.py` fails `just health` on them. Precisely measured
+   and fully diagnosed in the buglog; **both remedies are owner decisions** (do NOT silently exempt them,
+   and do NOT re-stamp — that would manufacture a provenance claim, D-277/R-D410). Author's recommendation:
+   remedy (b), a producer fix that stamps what S4 legitimately knows plus an explicit NOT_APPLICABLE token.
 1. **A2 / BUG-274 — related_fbs asymmetry — RE-MEASURE FIRST.** The last census (88,592/156,104 one-way =
    56.8%, + 7 self-refs) was taken on the **6,591-row** store; the denominator is now **7,640** and the 1,049
    new rows carry **no** `related_fbs` at all, so the ratio has moved by construction. Measure on the current

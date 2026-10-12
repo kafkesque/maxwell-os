@@ -10836,3 +10836,37 @@ with fine 62-way -> advisory (`discipline_macro.py` / D-2884 is already the sing
 v9-stamped referee, which is downstream of BUG-698.
 NOTE 2026-10-12: BUG-698's middle ground was RESOLVED on 2026-10-11, so this is now potentially UNBLOCKED —
 verify the referee stamp before starting.
+
+## BUG-725 (HIGH - OPEN 2026-10-12): the 1,049 non-principle rows carry NO label-provenance quartet, and the rail calls it a BROKEN STAMP (owner-gated ontology question)
+**MEASURED (2026-10-12, after the D2590 landing)** — `check_label_provenance.py` (BUG-497/D-2640) now fails on
+`just health`:
+| content_type | rows | menu_hash empty | content_type_source empty | discipline_source empty | extraction_type_source empty |
+|---|---|---|---|---|---|
+| principle | 6,577 | 0 | 0 | 0 | 0 |
+| process_template | 774 | 774 | 774 | 774 | 774 |
+| process_instance | 156 | 156 | 156 | 156 | 156 |
+| tool_instruction | 94 (new) + 14 (legacy) | 94 | 94 | 94 | 94 |
+| growth_edge | 25 | 25 | 25 | 25 | 25 |
+**DIAGNOSIS (not a broken stamp):** the R1/D-279 quartet is written by `stage4_merge.py` for every **CLASSIFIED**
+FB. S4 ROUTES a non-principle object to a sidecar and never runs the menu classify pass on it, so those rows
+have no menu, no discipline label and no tier sources — by construction, not by corruption. Their
+`content_type`/`extraction_type` (e.g. `normative_heuristic`) WERE assigned, but their `*_source` tiers were
+never stamped either.
+**WHY IT CANNOT BE FIXED BY RE-STAMPING:** manufacturing a menu_hash/discipline_source for a row no menu ever
+classified is exactly the provenance claim D-277 / R-D410 forbid ("nothing here is backfilled or imputed").
+Stamping only the two tiers that WERE used still leaves the quartet incomplete, so the rail would still say
+`missing`.
+**BOTH REMEDIES ARE OWNER DECISIONS** (the boundary file itself rules that changing this vocabulary is an owner
+act):
+  (a) declare a NEW state with a NARROW POSITIVE predicate — e.g. `label_not_applicable` = "content_type is a
+      non-principle role AND no menu classification was performed (all four cells empty)" — plus a state in
+      `config/label_provenance.yaml` and the classifier in `pipeline/label_traceability.py`. The predicate must
+      stay positive and narrow: a PRINCIPLE row with an empty quartet must keep failing as `missing`, or a real
+      broken stamp could hide behind the new state (the failure mode this rail exists for);
+  (b) make the S4 producer stamp what it legitimately knows on routed rows (`content_type_source`,
+      `extraction_type_source`) and declare the two cells that have no meaning for the tier (`menu_hash`,
+      `discipline_source`) as an explicit NOT_APPLICABLE token, then extend the rail's notion of a complete
+      quartet for that tier. Strictly more informative than (a), and it fixes the producer rather than the reader.
+**RECOMMENDATION:** (b) — it removes the ambiguity at the source and leaves the rail's teeth intact for every
+other row. Until it is ruled, `just health` is RED on this ONE rail and the raiL is RIGHT to be red: the tier is
+persisted (D2590) but its label provenance is genuinely undeclared.

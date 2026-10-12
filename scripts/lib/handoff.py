@@ -375,14 +375,21 @@ def decision_ids() -> set[str]:
 
 
 def superseded_bytes_at(digest: str, path: str, n: int) -> str:
-    """The commit that RE-DERIVES a superseded digest for this path, as 'git:<sha>'; '' when none does.
+    """Where a superseded digest re-derives, as 'git:<sha>' (EXACT) or 'git:<sha>#prefix' (retained); '' if none.
 
     WHY THIS EXISTS. A re-baseline that published only a digest would move the claim onto bytes nobody can
     recover: the journal would say "de3acd30 was replaced" while de3acd30 became unverifiable prose. So the act
     asks git - the store that OUTLIVES an in-place rewrite - whether the superseded bytes are still a revision
-    of this path (or a RETAINED PREFIX of one), and records WHERE they re-derive when they do (D-403: a claim
-    about bytes points at bytes; BUG-488: a superseded revision is still verifiable rather than quotable).
-    MEASURED for the decisions_registry receipt of 979,096 B: commit 98471a36 holds exactly those bytes.
+    of this path, and records WHERE they re-derive (D-403: a claim about bytes points at bytes; BUG-488: a
+    superseded revision is still verifiable rather than quotable).
+
+    EXACT BEATS PREFIX, AND THE TWO ARE DISTINGUISHED (MEASURED 2026-10-12 on this very receipt). config/
+    decisions.yaml at commit 98471a36 IS those 979,096 bytes (sha256 de3acd30…), while the NEWER b5ce8ae merely
+    RETAINS them as a prefix (1,067,237 B, same first 979,096). A newest-first search returns the weaker witness
+    first, so the whole history is scanned and the EXACT revision WINS; a prefix-only answer is marked '#prefix'
+    rather than left to read as an exact revision - a field that cannot say which claim it is making is the kind
+    of ambiguity this repo files bugs about (the first applied receipt named b5ce8ae, which is TRUE; the erratum
+    in governance/buglog.md names both).
     """
     if not digest or n <= 0:
         return ""
@@ -392,13 +399,16 @@ def superseded_bytes_at(digest: str, path: str, n: int) -> str:
         return ""
     if proc.returncode != 0:
         return ""
+    prefix_hit = ""
     for sha in proc.stdout.split():
         data = git_bytes(sha, path)
         if data is None or len(data) < n:
             continue
-        if sha256_bytes(data) == digest or sha256_bytes(data[:n]) == digest:
-            return "git:" + sha
-    return ""
+        if sha256_bytes(data) == digest:
+            return "git:" + sha  # EXACT: the strongest anchor, and the only one that is the revision itself
+        if not prefix_hit and sha256_bytes(data[:n]) == digest:
+            prefix_hit = "git:" + sha + "#prefix"
+    return prefix_hit
 
 
 def rebaseline_problems(rec: dict | None, cur: bytes, head: bytes | None, because: str, commits: list[str],

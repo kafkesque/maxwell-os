@@ -118,6 +118,24 @@ def test_the_act_previews_by_default_and_refuses_an_unknown_owner() -> None:
     assert "names no record" in (proc.stdout + proc.stderr), proc.stdout + proc.stderr
 
 
+def test_the_superseded_bytes_name_the_EXACT_revision_when_one_exists() -> None:
+    """MEASURED against this repo's own history: 98471a36 IS the superseded 979,096 B; b5ce8ae only RETAINS them.
+
+    A newest-first search finds the weaker witness first, so the act scans the whole history and lets the EXACT
+    revision win, marking a retained-prefix answer '#prefix'. Without this control the first applied receipt
+    named `b5ce8ae` (true, but a prefix) while the exact revision is `98471a36` - both facts true, and a field
+    that cannot say which one it is making is the ambiguity that makes a provenance rail useless.
+    """
+    old = [r for r in handoff.read_receipts()
+           if r.get("path") == "config/decisions.yaml" and int(r.get("bytes") or 0) == 979096]
+    assert old, "the superseded receipt must still be in the append-only journal"
+    where = handoff.superseded_bytes_at(str(old[-1]["sha256"]), "config/decisions.yaml", int(old[-1]["bytes"]))
+    assert where.startswith("git:98471a36"), where
+    assert not where.endswith("#prefix"), "a newer revision that merely RETAINS the bytes must not win"
+    assert handoff.superseded_bytes_at("0" * 64, "config/decisions.yaml", 979096) == "", \
+        "no store re-derives it: the field is EMPTY, never a guess"
+
+
 def test_the_cli_publishes_its_default_and_its_guards() -> None:
     """The default is a PREVIEW and the help says so: the only write is the receipt appended under --apply."""
     proc = subprocess.run([sys.executable, str(ROOT / "scripts" / "lib" / "handoff.py"), "--help"],

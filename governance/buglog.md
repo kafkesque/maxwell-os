@@ -11948,3 +11948,13 @@ The entry above says confidence_score is "declared in stage6.s5_owned_columns ag
 
 **NOT DONE, DELIBERATELY.** `--backfill` was NOT used (see MEASURED above), and no ceiling, census or floor was re-recorded to quiet the rail: it is HARD, so it was REPAIRED.
 
+## BUG-376 (HIGH — CLOSED 2026-10-12) — ERRATUM + PRECISION FIX to the entry above: the supersession field now names the EXACT revision; the FIRST applied receipt named one that merely RETAINS the bytes (both TRUE — the erratum names both)
+
+**MEASURED on the applied receipt.** `--rebaseline decisions_registry --because D-2971 --commit d149809 --commit 3db009e --apply` wrote `supersedes_bytes_at: git:b5ce8ae029874b1329c82cf1de1082c7cfbabc0d`, and the new receipt reads `1215693 B sha256 2d0fce3a60533c7f` — the SAME digest `config/decisions_summary.json` carries as `source_sha256`, so the receipt is over exactly the bytes the census describes (an independent cross-check, not a coincidence of timing). The `git:b5ce8ae` claim is TRUE: that revision's file is 1,067,237 B and its first 979,096 bytes hash to the superseded `de3acd30`. It is the WEAKER of two true witnesses, though — commit `98471a36` IS those 979,096 bytes exactly (its whole-file digest equals the receipted one). A newest-first search meets b5ce8ae first, so the act returned the RETAINING revision, and the field gave the reader no way to tell a prefix witness from the revision itself.
+
+**FIXED IN THE ACT, NOT IN THE RECEIPT.** `superseded_bytes_at` now scans the whole history and (1) lets an EXACT revision WIN over a newer one that merely retains the bytes, and (2) MARKS a retained-prefix answer `#prefix`, so the journal never leaves its reader to guess which claim it is making. `tests/test_handoff_rebaseline.py` pins both directions against this repo's own history (the exact revision beats a newer retaining one; no store at all → the field is EMPTY, never a guess) and is now 10 controls.
+
+**WHY THE APPLIED RECEIPT IS NOT RE-CUT.** The act REFUSES a receipt whose measured state is `unchanged` — and after the re-baseline the receipt sits ON the live bytes, so a second run is refused by construction. A "correction" mode would be precisely the door this act exists to keep shut (D-382/BUG-535). The applied field stays as written, it is verifiable, and the exact revision is named here: `98471a36`.
+
+**STATE AFTER.** `verify_handoffs --check` → `ok verify_handoffs: 6 declared path(s), 13 digest(s) and 3 revision(s) all agree with their bytes` (rc=0; the paths domain moved 5/6 → 6/6). Append-only state: the rejected receipt remains in the journal — a re-baseline SUPERSEDES, it never deletes.
+

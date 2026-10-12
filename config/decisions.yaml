@@ -22533,3 +22533,60 @@ decisions:
   - tests/test_handoff_rebaseline.py
   - governance/HANDOFFS.jsonl
   - governance/buglog.md
+- id: D-2972
+  state: RESOLVED
+  category: GOVERNANCE / PROVENANCE / RECEIPT INTEGRITY
+  date: '2026-10-13'
+  title: 'BUG-376 OWED DISCHARGED: a receipt obligation is REFUSED without an owner, ATTRIBUTED by the write that
+    moved the bytes, and FOUND by a hard rail - and the class closes WITHOUT a second ledger'
+  bugs:
+  - BUG-376
+  files:
+  - scripts/lib/handoff.py
+  - scripts/verify_handoffs.py
+  - scripts/recompute_decision_summary.py
+  - tests/test_handoff_obligation.py
+  - governance/buglog.md
+  decision: 'BUG-376''s OWED item, discharged: the class was that an in-place edit of an append_only artifact moves
+    bytes INSIDE a receipted region and threw the receipt obligation into PROSE, so the rail stayed RED for five
+    days and one route even recommended a remedy a ratified decision had REJECTED. (1) A SECOND LEDGER WAS CONSIDERED
+    AND REJECTED. The prefix rule (prefix_state) already DETECTS every rewritten region, exactly and totally, so
+    a store of open obligations would add GROUNDING, not detection - while adding a journal, a floor, a resolution
+    domain and a lifecycle that rails must keep in step (C28: bloat is opt-in). The enforcement point a ledger would
+    want is also structurally UNAVAILABLE: the remedy requires the edit to be COMMITTED first (a receipt over a
+    dirty worktree is UNREVISIONED, BUG-559), so a commit-boundary gate refusing open obligations would refuse the
+    very commit the sequence needs. (2) WHAT CLOSES IT INSTEAD - three mechanical facts. (a) REFUSED WITHOUT AN
+    OWNER: both in-place routes require `--because <D-id>`, validated against config/decisions.yaml, read BEFORE
+    the no-op branches so "there is nothing to do" can never be the door a licence is walked past. (b) ATTRIBUTED
+    BY THE WRITE ITSELF: every governed write appends a receipt to governance/MUTATION_JOURNAL.jsonl (write_guard
+    is its ONE home) carrying writer, mode, stamp and PRE/POST image digests, so `handoff.last_governed_write` JOINS
+    the live bytes to the write that produced them BY CONTENT - a record attributes only when its post-image digest
+    IS the file''s - and a path no governed write owns is declared UNATTRIBUTED rather than blamed on the newest
+    record (D-403/BUG-488). (c) FOUND BY A HARD RAIL IN ONE SENTENCE FROM ONE HOME: `handoff.unrepaired_region_finding`
+    is the finding text (state, who moved the region, the act that repairs it); the rail prints it and the controls
+    assert on it, so the remedy cannot drift out of the rail while a test still believes it (D-274a/BUG-746). (3)
+    THE MISALIGNMENT IS REMOVED: the canonicalising route recommended `--backfill`, which D-2971 had explicitly
+    rejected - two ratified positions about one act, disagreeing on disk. It now names the act, carrying the licence
+    the run was given. (4) THE SHRINK CASE IS NAMED, NOT WIDENED: `--strip-derived-head` shrinks the receipted region
+    by construction (derived bytes, never records - the count and the content stamp are asserted UNMOVED), and D-2971''s
+    rule STANDS (an unlicensed truncation is RESTORED, never re-baselined); the route''s text now says what is true
+    instead of prescribing an act its own state model refuses. (5) NO SECOND SPELLING: the routes read the artifact
+    id from config/handoffs.yaml#artifacts (`artifact_of`), the attribution subjects are DERIVED (the registry this
+    module owns, the journal''s declared path), and the licence is validated against the ids the act itself reads
+    (C12).'
+  measured: 'MEASURED 2026-10-13. The licence gate: `--canonicalise-states` alone -> "requires --because <D-id>:
+    it moves bytes INSIDE the receipted region of an append_only artifact, and an act with no owner is a favour
+    (C12/D-2655/D-2972)" (rc=1); `--because D-0000` -> "names no record in config/decisions.yaml" (rc=1); with D-2655
+    both routes reach their own no-op verdict (ALREADY CANONICALISED / ALREADY STRIPPED, rc=0, nothing written),
+    so the refusal is the LICENCE and not an accident of the route''s state. The attribution join, live: the registry''s
+    bytes ARE the post-image of a governed write (writer=scripts/recompute_decision_summary.py, mode=regenerate,
+    20261012T214449Z, dcc6559b7a0e0167 -> 2d0fce3a60533c7f); governance/HANDOFFS.jsonl - written by APPEND, never
+    through write_guard - answers UNATTRIBUTED; an absent path answers None. handoff --selftest: 12/12 re-baseline
+    answers PLUS 4/4 attribution answers, inside the SANDBOX (BUG-491), production journal byte-identical (5c9433b287407fd9).
+    tests/test_handoff_obligation.py: 6 controls. FULL SUITE 444 passed / 5 skipped (was 438/5). ruff A/B against
+    HEAD identical, nothing introduced. pre_commit_gate C11+C12 green (639 scanned files). R5 gemma-4-E4B-it-MLX-4bit
+    APPROVE on BOTH diffs - recorded and read as WEAK evidence ("no findings" is the reviewer''s uninformative mode,
+    BUG-736). store-columns: census moves 0 (the prose words that moved the context/evidence mentions censuses were
+    REMOVED, never --record''ed - D-2649/BUG-533 - which also repaired a move left by D-2971''s own prose) and MEASUREMENT-DRIFT
+    0. verify_handoffs --check rc=0: 6 declared path(s), 13 digest(s), 3 revision(s); just health-full: 8 fault(s),
+    all pre-existing and none in this class.'

@@ -11958,3 +11958,57 @@ The entry above says confidence_score is "declared in stage6.s5_owned_columns ag
 
 **STATE AFTER.** `verify_handoffs --check` → `ok verify_handoffs: 6 declared path(s), 13 digest(s) and 3 revision(s) all agree with their bytes` (rc=0; the paths domain moved 5/6 → 6/6). Append-only state: the rejected receipt remains in the journal — a re-baseline SUPERSEDES, it never deletes.
 
+
+## BUG-376 (HIGH - CLOSED 2026-10-12) - OWED DISCHARGED: the receipt obligation is now REFUSED without an owner, ATTRIBUTED by the write itself, and FOUND by the rail (D-2972)
+
+**THE OWED ITEM, NAMED BY D-2971 AND PAID HERE.** D-2971 closed BUG-376 with an act and left one thing LOUD: the
+declared in-place routes in `scripts/recompute_decision_summary.py` discharged their receipt obligation in PROSE
+("NEXT (same sitting): re-baseline the receipt"), which is a favour rather than a rule (C12/D-2655) - that is why the
+rail stayed RED for five days. One of those routes recommended `--backfill`, a remedy D-2971 had explicitly REJECTED
+(it re-cuts EVERY declared path, moving baselines nobody measured as broken, and remembers nothing). Two ratified
+positions about one act, disagreeing on disk, and a remedy that could not have been executed without laundering the
+receipts the act exists to protect.
+
+**A SECOND LEDGER WAS CONSIDERED AND REJECTED, ON THE RECORD.** The prefix rule already DETECTS every rewritten
+region, exactly and totally, so a store of open obligations would add GROUNDING, not detection - while adding a
+journal, a floor, a resolution domain and a lifecycle that rails must keep in step (C28: bloat is opt-in). And the
+enforcement point a ledger would want does not exist: the COMMIT boundary cannot refuse an open obligation, because
+the remedy REQUIRES the edit to be committed first (a receipt over a dirty worktree is UNREVISIONED, BUG-559) - such
+a gate would refuse the very commit the sequence needs.
+
+**WHAT CLOSES IT INSTEAD - three mechanical facts, none of them prose.**
+(1) REFUSED WITHOUT AN OWNER. Both in-place routes now require `--because <D-id>`, validated against
+config/decisions.yaml, and the licence is read BEFORE the no-op branches, so "there is nothing to do" can never be the
+door a licence is walked past. MEASURED: `--canonicalise-states` alone refuses (rc=1); `--because D-0000` refuses
+"names no record"; with D-2655 each route reaches its OWN no-op verdict (ALREADY CANONICALISED / ALREADY STRIPPED,
+rc=0) - so the refusal above was the LICENCE, not an accident of the route's state.
+(2) ATTRIBUTED BY THE WRITE ITSELF. Every governed write already appends a receipt to
+governance/MUTATION_JOURNAL.jsonl (write_guard is its ONE home) carrying writer, mode, stamp and PRE/POST image
+digests, so the rail now JOINS the live bytes to the write that produced them BY CONTENT -
+`handoff.last_governed_write` returns a record only when its post-image digest IS the file's digest, never the newest
+record. MEASURED on the live tree: the registry's bytes ARE the post-image of writer=scripts/recompute_decision_summary.py
+mode=regenerate 20261012T214449Z (dcc6559b7a0e0167 -> 2d0fce3a60533c7f), while governance/HANDOFFS.jsonl (written by
+APPEND, never through write_guard) answers UNATTRIBUTED, and an absent path answers None.
+(3) FOUND BY A HARD RAIL, IN ONE SENTENCE FROM ONE HOME. `handoff.unrepaired_region_finding` is the finding TEXT -
+state, WHO moved the region, and the act that repairs it - which the rail PRINTS and the controls ASSERT ON, so a
+remedy cannot drift out of the rail while a test still believes it (BUG-746). The remedy is the act, not the class:
+`--rebaseline <id> --because <D-id> --commit <sha> --apply` after the edit is COMMITTED; `--backfill` appears
+nowhere a reader would find it.
+
+**THE SHRINK CASE IS NAMED, NOT WIDENED.** `--strip-derived-head` shrinks the receipted region by construction (it
+removes DERIVED bytes, never records - the record count and the content stamp are asserted UNMOVED), and D-2971's rule
+STANDS: an unlicensed truncation is RESTORED, never re-baselined. What changed is only that its text now says what is
+true instead of prescribing an act its own state model refuses.
+
+**CONTROLS.** `handoff --selftest`: 12/12 re-baseline answers PLUS 4/4 attribution answers, inside the SANDBOX
+(BUG-491), production journal byte-identical (5c9433b287407fd9). tests/test_handoff_obligation.py: 6 controls (the
+licence refusal; that it fires BEFORE the no-op branch; that the remedy never names the rejected route; the finding's
+ONE home; the content-join vs recency; the artifact id read from its declaration). FULL SUITE 444 passed / 5 skipped
+(was 438/5). ruff A/B against HEAD identical, nothing introduced. R5 gemma-4-E4B-it-MLX-4bit APPROVE on BOTH diffs -
+recorded, and read as WEAK evidence ("no findings" is the reviewer's uninformative mode, BUG-736).
+
+**A CENSUS MOVED AND WAS NOT PAID WITH A RECORD.** The mentions census counts .py FILES naming a column, and prose
+words moved `context` and `evidence`; both were REMOVED from the wording rather than re-recorded (D-2649/BUG-533: a
+prose edit is not a store act) - which also repaired a move D-2971's own prose had left behind. Rail: census moves
+0, MEASUREMENT-DRIFT 0. This is the D-2972 doctrine applied to itself: the register is not edited to agree with the
+code, the code stops making the claim.

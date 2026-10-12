@@ -11,7 +11,8 @@ claim but NOT the verified image (BUG-376's actual loss).
 ONE FACT, ONE HOME (C12): mutability is READ from config/artifact_ownership.yaml when that config declares it.
 This module never re-declares it.
 
-CLI: --backfill (receipts + seals) | --seal-revisions (materialise declared SUPERSEDED revisions) | --selftest
+CLI: --backfill (receipts + seals) | --rebaseline (the D-2971 act) | --seal-revisions (materialise declared
+SUPERSEDED revisions) | --selftest (known-answer controls)
 Exit: 0 ok | 1 DRIFT | 2 owner-owed (BUG-457 tri-state convention).
 """
 from __future__ import annotations
@@ -26,7 +27,11 @@ import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
 import yaml
+
+from lib import write_guard  # noqa: E402 - the ONE home of governed-write receipts (C12)
 
 REPO = Path(__file__).resolve().parents[2]
 CONFIG = REPO / "config" / "handoffs.yaml"
@@ -516,6 +521,165 @@ def rebaseline(artifact: str, because: str, commits: list[str], apply: bool = Fa
     return 0
 
 
+# ----------------------------------------------------------------------------------------------------------
+# THE OBLIGATION'S ATTRIBUTION (D-2972): WHICH write moved a receipted region, joined BY CONTENT.
+#
+# WHY (the class D-2971 left OWED, LOUD). MEASURED 2026-10-12: the declared in-place routes threw their receipt
+# obligation into PROSE - `--strip-derived-head --apply` printed "NEXT (same sitting): re-baseline the receipt"
+# and `--canonicalise-states --apply` printed a three-part NEXT whose third part was the same re-baseline - and a
+# rule that lives in a `print` is a favour (C12/D-2655), so nobody paid it and the rail stayed RED for five days
+# (BUG-376).
+#
+# THE REMEDY IS NOT A SECOND LEDGER. The prefix rule (prefix_state) already DETECTS every rewritten region,
+# exactly and totally, so a store of open obligations would add GROUNDING, not detection - while adding a journal,
+# a floor, a resolution domain and a lifecycle that rails must keep in step (C28: bloat is opt-in). That grounding
+# already EXISTS: every governed write appends a receipt to governance/MUTATION_JOURNAL.jsonl (write_guard is its
+# ONE home), carrying the writer, the mode, the stamp and the PRE/POST image digests. So the rail JOINS the
+# rewrite to the write that caused it - BY CONTENT (the record's post-image must BE the current bytes), never by
+# recency: a record that merely happens to be newest attributes nothing, and the caller must SAY "unattributed"
+# rather than blame it (D-403/BUG-488). What closes the class is that the obligation is now (a) REFUSED without an
+# owner at the write, (b) ATTRIBUTED by the write itself, and (c) FOUND, with the act named, by a HARD rail.
+# ----------------------------------------------------------------------------------------------------------
+
+#: The only SYNTHETIC attribution subject: the branch it exercises is "no such bytes", so it must name
+#: nothing that exists. It lives under a declared home rather than at the repository root.
+ATTRIBUTION_ABSENT_SUBJECT: str = "governance/NO_SUCH_GOVERNED_ARTIFACT.jsonl"
+
+
+def governed_subject() -> str:
+    """The attribution control's POSITIVE subject: the registry whose receipt this module already owns (C12)."""
+    return DECISIONS_REGISTRY.relative_to(REPO).as_posix()
+
+
+def unrecorded_subject() -> str:
+    """The NEGATIVE subject: the receipt journal's DECLARED path, read from its home (config/handoffs.yaml#journal).
+
+    It is read from the DECLARATION rather than from journal_path(), which a control run SANDBOXES (BUG-491): the
+    subject of a known answer must not move because the ruler was isolated for the run.
+
+    MEASURED 2026-10-13: governance/MUTATION_JOURNAL.jsonl carries 212 record(s) for the registry and its newest
+    post-image IS the live file, while the receipt journal is written by APPEND (never through write_guard), so no
+    governed write owns its bytes. If a future rule ever routes it through write_guard, the control fails LOUDLY
+    and names itself - which is information, not noise.
+    """
+    declared = str(config().get("journal") or "")
+    if not declared:
+        raise SystemExit("FAIL-CLOSED (handoff): config/handoffs.yaml declares no `journal`, so the attribution "
+                         "control has no subject - a control that cannot name what it measures is a comment")
+    return Path(declared).as_posix()
+
+
+def mutation_journal() -> Path:
+    """The ONE home of governed-write receipts, READ from its owner (write_guard) rather than re-declared (C12)."""
+    return write_guard.JOURNAL
+
+
+def last_governed_write(path: str) -> dict | None:
+    """The most recent governed write whose POST-image IS the bytes now at `path`; None when none attributes them.
+
+    The join is by CONTENT for the same reason a receipt is: a journal record is a claim about bytes and `writer`
+    is only a name, so a record describes the CURRENT bytes only when its post-image digest IS theirs. A
+    path whose bytes match no record is UNATTRIBUTED - a hand edit, or a writer outside write_guard - and that
+    distinction is worth printing: it is precisely what the act's mandatory --commit names.
+    """
+    jp = mutation_journal()
+    full = REPO / path
+    if not jp.exists() or not full.exists():
+        return None
+    cur16 = sha256_file(full)[:16]
+    hits: list[dict] = []
+    for i, line in enumerate(jp.read_text(encoding="utf-8").splitlines(), 1):
+        if not line.strip():
+            continue
+        try:
+            rec = json.loads(line)
+        except json.JSONDecodeError as exc:
+            raise SystemExit("FAIL-CLOSED: " + jp.name + " line " + str(i) + " is not JSON: " + str(exc)) from exc
+        if not isinstance(rec, dict) or str(rec.get("post_sha16") or "") != cur16:
+            continue
+        declared = str(rec.get("path") or "")
+        if declared and declared != str(full) and not declared.endswith("/" + path):
+            continue
+        if declared:
+            hits.append(rec)
+    return hits[-1] if hits else None
+
+
+def attribution_line(path: str) -> str:
+    """ONE home for the sentence that attributes a moved region: a second home for it is the drift D-274a forbids."""
+    rec = last_governed_write(path)
+    if rec is None:
+        return ("NO governed write is recorded whose post-image is these bytes, so this rewrite is UNATTRIBUTED - "
+                "a hand edit, or a writer outside write_guard (every governed write leaves a receipt in "
+                + mutation_journal().name + ")")
+    return ("the bytes now on disk ARE the post-image of a GOVERNED write: writer=" + str(rec.get("writer"))
+            + " mode=" + str(rec.get("mode")) + " at " + str(rec.get("stamp")) + " ("
+            + str(rec.get("pre_sha16")) + " -> " + str(rec.get("post_sha16")) + ")")
+
+
+def unrepaired_region_finding(aid: str, path: str, state: str, why: str) -> str:
+    """The finding for an append_only path whose receipted bytes are no longer a prefix, WITH its remedy (D-2971).
+
+    ONE home for the text: the RAIL prints it and the CONTROLS assert on it, so the remedy cannot drift out of the
+    rail while a test still believes it (BUG-746's lesson - the review unit is the claim, not the file).
+    """
+    return (aid + ": " + path + " is declared append_only but its receipted bytes are not a prefix of the current "
+            "bytes (" + state + "): " + why + " (BUG-376 class). " + attribution_line(path)
+            + ". Remedy (D-2971) - COMMIT the declared in-place edit FIRST, then re-cut the receipt with the "
+              "rewrite NAMED: python3 scripts/lib/handoff.py --rebaseline " + aid + " --because <D-id>"
+              " --commit <sha> --apply")
+
+
+def rebaseline_next_steps(artifact: str, because: str) -> str:
+    """The obligation an in-place edit of a receipted region LEAVES, in ONE home: both routes print what they owe.
+
+    A rule that lives in a `print` is a favour (C12/D-2655), so this text is not the rule - the rule is that the
+    routes REFUSE to move a receipted region without an owner, the write ATTRIBUTES itself in the mutation journal,
+    and scripts/verify_handoffs.py FINDS the stale receipt and prints this. The wording is declared once here so
+    that "what is owed" cannot be said two different ways (D-274a).
+    """
+    return ("NEXT (the receipt obligation, D-2971/D-2972): (1) COMMIT this edit; (2) re-cut the receipt over the "
+            "COMMITTED bytes with the rewrite NAMED - python3 scripts/lib/handoff.py --rebaseline " + artifact
+            + " --because " + because + " --commit <sha> --apply; (3) python3 scripts/verify_handoffs.py --check."
+            " The two steps cannot be fused: a receipt taken over a dirty worktree is UNREVISIONED (BUG-559)")
+
+
+def artifact_of(path: str) -> str:
+    """The ONE declared artifact that owns `path`, from config/handoffs.yaml#artifacts (C12: never a typed name).
+
+    An ambiguous path is REFUSED rather than guessed: config/handoffs.yaml carries an identity map precisely
+    because one path can be declared by several artifacts, and the act re-cuts the receipt of ONE of them.
+    """
+    ids = [str(s.get("id")) for s in (config().get("artifacts") or [])
+           if any(str(p.get("path")) == str(path) for p in paths_of(s))]
+    if len(ids) != 1:
+        raise SystemExit("FAIL-CLOSED (handoff): " + str(path) + " is declared by " + str(len(ids))
+                         + " artifact(s) " + str(ids) + " in config/handoffs.yaml#artifacts - the obligation "
+                           "names ONE artifact, and guessing is how a receipt gets re-cut over the wrong claim")
+    return ids[0]
+
+
+def attribution_controls() -> list[tuple[str, bool]]:
+    """Known-answer controls for the attribution join (BUG-492): a probe never seen to answer is a comment."""
+    governed = governed_subject()
+    unrecorded = unrecorded_subject()
+    cur16 = sha256_file(REPO / governed)[:16]
+    rec = last_governed_write(governed)
+    got16 = str((rec or {}).get("post_sha16") or "")
+    return [
+        ("a governed write that IS the current bytes is attributed, and the join is by CONTENT (its recorded "
+         "post-image equals the live digest " + cur16 + ")", bool(rec) and got16 == cur16
+         and bool(str((rec or {}).get("writer") or ""))),
+        ("a path no governed write records answers None - the probe cannot fall back on RECENCY",
+         last_governed_write(unrecorded) is None),
+        ("an ABSENT path answers None: an attribution about bytes that do not exist is not an attribution",
+         last_governed_write(ATTRIBUTION_ABSENT_SUBJECT) is None),
+        ("an unattributed path yields the UNATTRIBUTED sentence and names no writer it cannot back",
+         attribution_line(unrecorded).startswith("NO governed write is recorded")
+         and "writer=" not in attribution_line(unrecorded)),
+    ]
+
+
 def backfill() -> int:
     """Take a receipt for every declared path, and seal every path declared seal: true.
 
@@ -551,7 +715,7 @@ def rebaseline_controls() -> list[tuple[str, bool]]:
     head = body  # "the bytes of this path at git HEAD" ARE the live bytes in a licensed act (D-2971)
 
     def fires(cur: bytes, h: bytes | None, because: str, commits: list[str], decisions: set[str]) -> bool:
-        """True when the act REFUSES to run (the only evidence the act has a gate)."""
+        """True when the act REFUSES to run: a gate nobody has watched refuse is a comment (BUG-492)."""
         return bool(rebaseline_problems(rec, cur, h, because, commits, decisions))
 
     def publishes_supersession() -> bool:
@@ -636,6 +800,9 @@ def selftest() -> int:
             # (`an extra that overwrites a measured field`) calls receipt() and must be refused before any
             # append, so if the guard ever stopped firing, the journal check below would SEE it grow.
             rebaseline_rows = rebaseline_controls()
+            # D-2972: the attribution rows READ the production mutation journal (write_guard's home); they write
+            # nothing, so the byte-identity check below still proves the control touched no ruler (BUG-491).
+            attribution_rows = attribution_controls()
         finally:
             SANDBOX = None
     post = sha256_file(prod) if prod.exists() else "absent"
@@ -657,11 +824,21 @@ def selftest() -> int:
         print("FAIL handoff selftest: " + str(len(failed)) + " of " + str(len(rebaseline_rows))
               + " re-baseline control(s) did not fire - the act that repairs BUG-376 is unvalidated (BUG-492)")
         return 1
+    bad_attr = [name for name, ok in attribution_rows if not ok]
+    for name in bad_attr:
+        print("FAIL handoff selftest (attribution): " + name + " - the probe did not answer as declared")
+    if bad_attr:
+        print("FAIL handoff selftest: " + str(len(bad_attr)) + " of " + str(len(attribution_rows))
+              + " attribution control(s) did not fire - the probe that names WHO moved a receipted region is "
+                "unvalidated (D-2972/BUG-492)")
+        return 1
     print("ok handoff selftest: a rewrite changes the digest (the meter detects drift); SANDBOXED in a temp dir "
           "(2 receipt(s) + 1 blob), production journal byte-identical (" + str(pre)[:16] + ") - BUG-491; and the "
           "re-baseline act fires on all " + str(len(rebaseline_rows)) + " known answers (a MEASURED rewrite with "
           "an owner and named commits is accepted; an append, an unchanged file, a truncation, an unowned or "
-          "uncommitted rewrite and a receiptless path are all refused)")
+          "uncommitted rewrite and a receiptless path are all refused); the attribution join answers on all "
+          + str(len(attribution_rows)) + " declared subject(s) (a governance write IS attributed by CONTENT, and a "
+          "path no governed write records is UNATTRIBUTED - never blamed on the newest record)")
     return 0
 
 

@@ -23,8 +23,11 @@ records list extends to end-of-file, so:
                                     file EXISTS, and a whole-payload clone of a record on disk is REFUSED.
     --selftest                      run the MINT gate's known-answer controls (BUG-492); a control that has never
                                     been seen to fire is a comment. Wired into just health.
-    --strip-derived-head [--apply]  the ONE-SHOT migration that removed the derived head and the summary block
-                                    by BYTE SPLICE, so the record bytes were never re-rendered.
+    --strip-derived-head --because <D-id> [--apply]
+                                    the ONE-SHOT migration that removed the derived head and the summary block
+                                    by BYTE SPLICE, so the record bytes were never re-rendered. D-2972: an
+                                    in-place route moves bytes INSIDE a receipted region, so it REFUSES without
+                                    the decision that orders the edit and prints the act that discharges it.
 
 BUG-402 design note: a timestamp alone is a DECLARATION, not a control - a human can edit it and no tool can
 verify it. The stamp is therefore CONTENT-derived: decisions_sha256_16 is the sha256 (16 hex chars) of the
@@ -61,6 +64,12 @@ sys.path.insert(0, str(ROOT / "scripts"))
 
 from lib.write_guard import OWNED_ANY, write_document  # noqa: E402 - D-401/I1 (C6: crash-safe registry write)
 from lib import yaml_guard  # noqa: E402 - D-2648: verify the bytes before writing them
+from lib import handoff  # noqa: E402 - D-2971/D-2972: the decision ids, the act and the obligation text
+
+#: The `--because <D-id>` licence an in-place route must name BEFORE it may move bytes inside a receipted region.
+LICENCE_FLAG: str = "--because"
+#: The route argument whose presence means "write" (preview is the default everywhere in this repo).
+APPLY_FLAG: str = "--apply"
 
 DECISIONS_YAML = ROOT / "config" / "decisions.yaml"
 #: The writer name declared in config/artifact_ownership.yaml - DERIVED, never typed twice.
@@ -358,16 +367,71 @@ def canonicalise_plan(text: str, targets: list[str]) -> tuple[str, list[str]]:
     return new_text, splice_problems(decisions, post, targets)
 
 
+def in_place_licence(argv: list[str], flag: str) -> tuple[str, bool]:
+    """Read and VALIDATE `FLAG --because <D-id> [--apply]` for an in-place route; return (because, apply).
+
+    WHY A LICENCE AT THE DOOR (D-2972, the class D-2971 left OWED). An in-place edit of an append_only artifact
+    moves bytes INSIDE a receipted region, so it leaves a receipt obligation behind - and MEASURED 2026-10-12 that
+    obligation was discharged in PROSE ("NEXT (same sitting): re-baseline the receipt"), which is a favour, not a
+    rule (C12/D-2655), so nobody paid it and the rail stayed RED for five days (BUG-376). The ordering is
+    structural: the edit must be COMMITTED before the receipt can be re-cut over it (a receipt over a dirty
+    worktree is UNREVISIONED, BUG-559), so no route can discharge the obligation itself. What a route CAN do is
+    refuse to be ANONYMOUS: it will not move a receipted region unless the decision that orders the edit is named,
+    and that name is what the printed act command carries. The refusal comes FIRST - before the no-op branches -
+    so "there is nothing to do" can never be the door a licence is walked past.
+    """
+    args = list(argv[1:])
+    if not args or args[0] != flag:
+        raise SystemExit("FAIL-CLOSED (" + WRITER + "): usage: " + flag + " " + LICENCE_FLAG + " <D-id> ["
+                         + APPLY_FLAG + "]")
+    because = ""
+    apply_now = False
+    tokens = args[1:]
+    i = 0
+    while i < len(tokens):
+        tok = tokens[i]
+        if tok == APPLY_FLAG and not apply_now:
+            apply_now = True
+        elif tok == LICENCE_FLAG and not because and i + 1 < len(tokens):
+            because = tokens[i + 1]
+            i += 1
+        else:
+            raise SystemExit("FAIL-CLOSED (" + WRITER + "): usage: " + flag + " " + LICENCE_FLAG + " <D-id> ["
+                             + APPLY_FLAG + "] - got " + repr(tok))
+        i += 1
+    if not because:
+        raise SystemExit("FAIL-CLOSED (" + WRITER + "): " + flag + " requires " + LICENCE_FLAG + " <D-id>: it "
+                         "moves bytes INSIDE the receipted region of an append_only artifact, and an act with no "
+                         "owner is a favour (C12/D-2655/D-2972)")
+    if because not in handoff.decision_ids():
+        raise SystemExit("FAIL-CLOSED (" + WRITER + "): " + LICENCE_FLAG + " " + because + " names no record in "
+                         + DECISIONS_YAML.relative_to(ROOT).as_posix() + " - the edit would be attributable to a "
+                           "decision that does not exist")
+    return because, apply_now
+
+
+def print_obligation(because: str) -> None:
+    """State the obligation a completed in-place edit leaves - from the receipt module's ONE home (D-2972).
+
+    It prints TWO facts and no prose of its own: WHO the mutation journal says moved these bytes (joined by
+    CONTENT, so an unrecorded write says UNATTRIBUTED instead of blaming the newest record), and the act the next
+    reader owes, carrying the licence this run was given.
+    """
+    artifact = handoff.artifact_of(DECISIONS_YAML.relative_to(ROOT).as_posix())
+    print("     " + handoff.attribution_line(DECISIONS_YAML.relative_to(ROOT).as_posix()))
+    print("     " + handoff.rebaseline_next_steps(artifact, because))
+
+
 def canonicalise_main(argv: list[str]) -> int:
-    """`--canonicalise-states [--apply]`: pay the spelling debt down by an in-place, PROVED splice (BUG-583).
+    """`--canonicalise-states --because <D-id> [--apply]`: pay the spelling debt down by an in-place splice (BUG-583).
 
     THE DECLARED SEQUENCE (three obligations, all LOUD): the splice; then the pin shrinks to empty in the SAME
     sitting, because a pin over a canonical cell is a STALE declaration the spelling reader FAILS on; then the
-    decisions_registry PREFIX receipt is re-baselined, because the splice moved bytes inside the receipted region
-    by construction - and a receipt that is merely forgotten is caught by verify_handoffs, never by silence.
+    decisions_registry receipt is RE-CUT, because the splice moved bytes inside the receipted region by
+    construction. D-2972 makes the first obligation refused (no `--because`, no edit), the second printed, and the
+    third found by a HARD rail whose finding names the act - never by silence, and never in the receipt's own home.
     """
-    if argv[1:] not in ([CANONICALISE_FLAG], [CANONICALISE_FLAG, "--apply"]):
-        raise SystemExit("FAIL-CLOSED (" + WRITER + "): usage: " + CANONICALISE_FLAG + " [--apply]")
+    because, apply_now = in_place_licence(argv, CANONICALISE_FLAG)
     route = legacy_spelling_route()
     if route is None or WRITER not in route:
         raise SystemExit("FAIL-CLOSED (" + WRITER + "): "
@@ -408,8 +472,8 @@ def canonicalise_main(argv: list[str]) -> int:
     print("POST " + str(len(new_text.encode("utf-8"))) + " B sha256 "
           + hashlib.sha256(new_text.encode("utf-8")).hexdigest() + " - stamp " + pre_stamp + " -> " + post_stamp
           + " (it MOVES: a state is part of the content stamp, unlike the strip's unmoved stamp)")
-    if "--apply" not in argv:
-        print("PREVIEW (nothing written): re-run with --apply")
+    if "--apply" not in argv and not apply_now:
+        print("PREVIEW (nothing written): re-run with " + APPLY_FLAG)
         return 0
     write_document(DECISIONS_YAML, new_text, writer=WRITER, owned_keys={OWNED_ANY}, backup=True, journal=True)
     disk = DECISIONS_YAML.read_text(encoding="utf-8")
@@ -417,10 +481,9 @@ def canonicalise_main(argv: list[str]) -> int:
     d_total, d_summary, d_digest = recompute(disk_data)
     write_census(census_document(disk_data, d_total, d_summary, d_digest, disk))
     print("ok " + str(d_total) + " record(s), stamp " + d_digest + ", census re-derived from the bytes ON DISK")
-    print("NEXT (SAME sitting, the readers are LOUD otherwise): (1) shrink "
-          + POLICY_YAML.relative_to(ROOT).as_posix() + "#state_vocabulary.legacy_non_canonical_ids to []; "
-          "(2) re-baseline the decisions_registry receipt (scripts/lib/handoff.py --backfill) and run "
-          "scripts/verify_handoffs.py; (3) " + WRITER + " --check")
+    print("OWED (SAME sitting, the readers are LOUD otherwise): (1) shrink "
+          + POLICY_YAML.relative_to(ROOT).as_posix() + "#state_vocabulary.legacy_non_canonical_ids to []")
+    print_obligation(because)
     return 0
 
 
@@ -1008,9 +1071,14 @@ def strip_main(argv: list[str]) -> int:
     IT REFUSES UNLESS THE REGISTRY IS ALREADY COHERENT (C16, fail closed): the derived fields must re-derive with
     zero drift AND the census on disk must already describe these exact bytes. Stripping a registry whose header is
     already wrong would delete the disagreement instead of reporting it. A second run refuses as ALREADY STRIPPED.
+
+    THE ROUTE SHRINKS THE RECEIPTED REGION BY CONSTRUCTION (D-2972), which the re-baseline act deliberately REFUSES
+    when it is UNLICENSED: a truncation loses every record after the cut, so it is RESTORED, never re-baselined
+    (D-2971). Here the cut removes DERIVED bytes under a decision, not records (the record count and the content
+    stamp are asserted UNMOVED below), so the obligation this route leaves is discharged by the act - and the
+    route says so in the ACT's words, from the receipt module's one home, carrying the licence it was given.
     """
-    if argv[1:] not in ([STRIP_FLAG], [STRIP_FLAG, "--apply"]):
-        raise SystemExit("FAIL-CLOSED (" + WRITER + "): usage: " + STRIP_FLAG + " [--apply]")
+    because, apply_now = in_place_licence(argv, STRIP_FLAG)
     text = DECISIONS_YAML.read_text(encoding="utf-8")
     data = yaml.safe_load(text) or {}
     if not [k for k in REGISTRY_DERIVED_KEYS if k in data]:
@@ -1043,8 +1111,8 @@ def strip_main(argv: list[str]) -> int:
     print("PRE  " + str(len(text)) + " B sha256 " + hashlib.sha256(text.encode("utf-8")).hexdigest())
     print("DROP " + str(len(stripped)) + " B of derived head: " + stripped.replace(chr(10), " | "))
     print("DROP " + str(len(text) - cut_at) + " B of summary block")
-    if "--apply" not in argv:
-        print("PREVIEW (nothing written): re-run with --apply")
+    if not apply_now:
+        print("PREVIEW (nothing written): re-run with " + APPLY_FLAG)
         return 0
     write_document(DECISIONS_YAML, new_text, writer=WRITER, owned_keys={OWNED_ANY}, backup=True, journal=True)
     disk = DECISIONS_YAML.read_text(encoding="utf-8")
@@ -1054,7 +1122,7 @@ def strip_main(argv: list[str]) -> int:
     print("POST " + str(len(disk)) + " B sha256 " + hashlib.sha256(disk.encode("utf-8")).hexdigest())
     print("     records " + str(d_total) + ", stamp " + d_digest + " (stamp UNMOVED: " + str(d_digest == digest)
           + ") - census re-derived from the bytes ON DISK")
-    print("NEXT (same sitting): re-baseline the receipt, then --check")
+    print_obligation(because)
     return 0
 
 

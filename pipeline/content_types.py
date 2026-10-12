@@ -73,6 +73,78 @@ CONTENT_TYPE_DISPOSITIONS: frozenset[str] = frozenset(
 )
 CONTENT_TYPES_ALL: frozenset[str] = CONTENT_TYPES | CONTENT_TYPE_DISPOSITIONS
 
+# ── D-2965 (BUG-712 / BUG-741 / BUG-726) — LEAF-LABEL ADMISSION ───────────
+# The ORDINARY producer write path (stage6_commit.insert_fb) may admit ONLY a declared ROLE into the
+# `content_type` column. Three shapes are refused, and each is a DIFFERENT defect that could reach
+# the store silently before this gate:
+#   (a) ABSENT/BLANK -> the D-2938 "computed then discarded" defect, and invisible to the store
+#       ruler ('' is not HOLLOW, BUG-726). An absent label AT S6 means the producer path was
+#       bypassed: S4 already routes a missing label to `quarantine` (_resolve_content_type, D2616).
+#   (b) DISPOSITION -> quarantine | noise_drop are AXIS-1 outcomes, not ROLES (BUG-741).
+#       validate_fb_content_type deliberately keeps the FULL 7-value vocabulary for the
+#       S2/pre-classification layer, so the narrowing belongs HERE, at the leaf (asserted by a control).
+#   (c) UNDECLARED -> already fail-closed at S6 (D2616); kept so that this function IS the one
+#       admission rule rather than one of two (D-2964 = the same rule for an owner warrant).
+def _validate_admission(raw: object) -> dict:
+    """Fail-closed load of `commit_gate` (D-2965): every key is REQUIRED and must be a bool.
+
+    A control that a missing key can silently disable is not a control; and a
+    `.get(key, default)` here would also add a shadowed-declared census key (BUG-731).
+
+    Args:
+        raw: The parsed `commit_gate` value, or None when the block is absent.
+
+    Returns:
+        The validated declaration.
+
+    Raises:
+        SystemExit: When the block is missing, not a mapping, incomplete, or mistyped.
+    """
+    if not isinstance(raw, dict):
+        raise SystemExit(
+            "FAIL-CLOSED: config/content_types.yaml#commit_gate must be a mapping "
+            f"(got {type(raw).__name__}) — D-2965"
+        )
+    out: dict = {}
+    for key in ("require_role", "refuse_dispositions"):
+        if key not in raw:
+            raise SystemExit(
+                f"FAIL-CLOSED: config/content_types.yaml#commit_gate is missing '{key}' — a control "
+                "whose declaration can go missing is not a control (D-2965)"
+            )
+        if not isinstance(raw[key], bool):
+            raise SystemExit(
+                f"FAIL-CLOSED: commit_gate.{key} must be a bool, got {raw[key]!r} (D-2965)"
+            )
+        out[key] = raw[key]
+    return out
+
+
+# LOUD read: no literal default, so an absent block is an IMPORT defect (BUG-731 census stays exact).
+LEAF_ADMISSION: dict = _validate_admission(_CT.get("commit_gate"))
+
+
+def leaf_label_fault(value: str | None) -> str | None:
+    """Return a NAMED fault when `value` may not be a leaf's `content_type`, else None.
+
+    The ONE admission rule for the content_type column (D-2965, C21). Named faults keep a
+    refusal auditable instead of merely loud: 'absent' | 'disposition:<value>' | 'undeclared:<value>'.
+
+    Args:
+        value: The candidate content_type about to be written (may be None).
+
+    Returns:
+        A named fault string, or None when the value is an admitted ROLE.
+    """
+    ct: str = (value or "").strip()
+    if ct == "":
+        return "absent" if LEAF_ADMISSION["require_role"] else None
+    if ct in CONTENT_TYPES:
+        return None
+    if ct in CONTENT_TYPE_DISPOSITIONS:
+        return f"disposition:{ct}" if LEAF_ADMISSION["refuse_dispositions"] else None
+    return f"undeclared:{ct}"
+
 # ── ROLE-SPECIFIC BODY (D2590 / D-2943) ───────────────────────────────────
 # `s2_body_fields` declares, per role, the fields S2 emits BEYOND the shared core body. `core_body`
 # is the set whose home is a first-class `fbs` column, so a role's `type_body` is s2_body_fields

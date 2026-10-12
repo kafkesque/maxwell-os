@@ -861,7 +861,7 @@
     {
       "id": "BUG-712",
       "title": "(CRITICAL \u2014 OPEN): content_type routing collapse \u2014 6 of 8 declared primitives produce ZERO output",
-      "events": 10
+      "events": 11
     },
     {
       "id": "BUG-719",
@@ -916,7 +916,7 @@
     {
       "id": "BUG-741",
       "title": "(MED - OPEN 2026-10-12) - the adjudication map's `proposed` field CONFLATES two vocabularies, so one owner adjudication is not expressible a",
-      "events": 2
+      "events": 3
     },
     {
       "id": "BUG-743",

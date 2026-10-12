@@ -62,6 +62,7 @@ from pipeline.pipeline_paths import (
     STAGE5_HUMAN_REVIEW,
     STAGE6_CHECKPOINT,
 )
+from pipeline.content_types import leaf_label_fault  # D-2965: the leaf-label ADMISSION rule (one home, C21)
 from pipeline.content_types import type_body_fields  # D-2943: the role->body-field ontology (C21)
 from pipeline.schema_accessor import (
     fb_accessibility,
@@ -693,6 +694,12 @@ def update_s5_provenance(conn: sqlite3.Connection, fb: dict) -> bool:
     return True
 
 
+# ── D-2965 (BUG-712/BUG-741/BUG-726): the leaf-label gate's run-scoped REFUSAL LEDGER ────────
+# A refusal must be NAMEABLE after the run — BUG-743's lesson (evidence not captured at the moment of
+# the act is not evidence). Run-scoped: one stage6 run per process.
+_LEAF_LABEL_REFUSALS: list[dict] = []
+
+
 def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
     """Insert or replace an FB into the database (D2130 schema).
 
@@ -700,12 +707,25 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
     run_stage6() only reaches it for a row absent from the store, or when
     `stage6.commit_scope: full_upsert` is explicitly configured.
     """
+    # D-2965 (BUG-712/BUG-741/BUG-726): the LEAF-LABEL admission gate fires FIRST, before any DB
+    # use, because the D2616 guard below is fail-closed on an INVALID value but fail-OPEN on the two
+    # SILENT shapes: an ABSENT label (tolerated here as '', a shape the store ruler cannot see —
+    # BUG-726) and a DISPOSITION (it validates against CONTENT_TYPES_ALL = 5 roles + 2 dispositions,
+    # BUG-741). Those two are exactly how a COMPUTED label can be discarded without a trace — the
+    # D-2938/BUG-712 defect class. Rule home: pipeline.content_types.leaf_label_fault (C21).
+    ct_fault = leaf_label_fault(fb.get("content_type"))
+    if ct_fault is not None:
+        print(f"   ❌ insert_fb: content_type REFUSED [{ct_fault}] on "
+              f"{fb.get('name', fb.get('fb_id', '?'))!r} — not written (fail-closed, D-2965)")
+        _LEAF_LABEL_REFUSALS.append({"fb_id": fb_id(fb), "fault": ct_fault})
+        return False
     # D2616 Phase 0: runtime ontology boundary (BUG-148 + C6 fail-closed).
     # A hallucinated content_type or depth is rejected here instead of being
-    # silently persisted. `None` = invalid; `""` = empty (tolerated only when
-    # the value is genuinely absent). The DB defaults (fb_depth→"domain",
-    # content_type→"") must NOT re-introduce a fabricated enum, so a *present*
-    # but invalid value fails closed before the INSERT.
+    # silently persisted. `None` = invalid; `""` = empty — for `content_type` that
+    # tolerance is now UNREACHABLE BY CONSTRUCTION (the D-2965 gate above refuses it);
+    # for `depth` it stands. The DB defaults (fb_depth→"domain", content_type→"")
+    # must NOT re-introduce a fabricated enum, so a *present* but invalid value fails
+    # closed before the INSERT.
     ct = fb.get("content_type")
     if ct is not None and ct != "" and validate_fb_content_type(ct) is None:
         print(f"   ❌ insert_fb: invalid content_type {ct!r} on {fb.get('name', fb.get('fb_id', '?'))!r} — REJECTED (fail-closed, D2616)")
@@ -1681,6 +1701,15 @@ def run_stage6(export_only: bool = False):
         print(f"📦 Parquet:   {parquet_path}")
     print(f"📋 Checkpoint: {STAGE6_CHECKPOINT}")
 
+    # ── D-2965: the leaf-label gate's refusals are named, never absorbed ─────
+    if _LEAF_LABEL_REFUSALS:
+        print(f"❌ Stage 6 leaf-label gate (D-2965): {len(_LEAF_LABEL_REFUSALS)} row(s) REFUSED")
+        print("   an absent/blank content_type or a DISPOSITION is not a ROLE — nothing was written.")
+        for _ref in _LEAF_LABEL_REFUSALS[:10]:
+            print(f"   · {_ref['fb_id']}  [{_ref['fault']}]")
+        if len(_LEAF_LABEL_REFUSALS) > 10:
+            print(f"   · … {len(_LEAF_LABEL_REFUSALS) - 10} more (full ledger: _LEAF_LABEL_REFUSALS)")
+
     # ── D2338: fail-closed commit ───────────────────────────────────────────
     # insert_fb() returns False on exception and run_stage6() previously printed
     # the failure but exited 0 — the runner then wrote a COMPLETE manifest despite
@@ -1701,11 +1730,114 @@ def run_stage6(export_only: bool = False):
             sys.exit(2)  # non-zero → runner does NOT auto-advance / mark COMPLETE
 
 
+def selftest() -> int:
+    """Known-answer controls for the D-2965 leaf-label admission gate (BOTH directions).
+
+    A rail that accepts everything is not a rail (BUG-739's lesson), so these controls must SEE the
+    gate refuse every silent shape AND admit every declared role, must SEE the verdict follow the
+    DECLARATION rather than a constant, and must SEE a missing declaration fail closed at load.
+
+    Returns:
+        0 when every control held, 1 when any control failed (fail-closed, never an approval).
+    """
+    from pipeline import content_types as _ct
+
+    failures: list[str] = []
+    checks: list[tuple[str, object, object]] = []
+
+    # (1) DIRECTION A — the refusal shapes.
+    for _label, _value in (("blank string", ""), ("whitespace only", "   "), ("None", None)):
+        checks.append((f"REFUSED as absent: {_label}", leaf_label_fault(_value), "absent"))
+    for _disp in sorted(_ct.CONTENT_TYPE_DISPOSITIONS):
+        checks.append(
+            (f"REFUSED as disposition: {_disp}", leaf_label_fault(_disp), f"disposition:{_disp}")
+        )
+    checks.append(
+        ("REFUSED as undeclared: 'fact' (the cemetery, dropped_content_types)",
+         leaf_label_fault("fact"), "undeclared:fact")
+    )
+
+    # (2) DIRECTION B — every declared ROLE is admitted (the store's own 5 values).
+    for _role in sorted(_ct.CONTENT_TYPES):
+        checks.append((f"ADMITTED role: {_role}", leaf_label_fault(_role), None))
+
+    # (3) THE SCOPE SPLIT IS ASSERTED, not assumed: the S2/pre-classification validator keeps the
+    # FULL vocabulary by design, so the leaf gate is the ONLY narrowing — if someone narrows the
+    # shared validator instead, this control fires and the reasoning must be re-decided.
+    checks.append(("scope split: validate_fb_content_type('quarantine') stays ACCEPTED (S2 layer)",
+                   validate_fb_content_type("quarantine"), "quarantine"))
+    checks.append(("scope split: the leaf gate refuses the SAME value",
+                   leaf_label_fault("quarantine"), "disposition:quarantine"))
+
+    for _name, _got, _want in checks:
+        if _got != _want:
+            failures.append(f"{_name}: got {_got!r}, want {_want!r}")
+
+    # (4) THE CONTROL BINDS CODE TO THE DECLARATION (D-2953's lesson): flipping the declared flags
+    # must FLIP the verdict. A gate hardcoded to True would pass (1)-(2) and fail exactly here.
+    _saved = _ct.LEAF_ADMISSION
+    try:
+        _ct.LEAF_ADMISSION = {"require_role": False, "refuse_dispositions": False}
+        if leaf_label_fault("") is not None:
+            failures.append("declaration not bound: require_role:false still refused a blank")
+        if leaf_label_fault("quarantine") is not None:
+            failures.append("declaration not bound: refuse_dispositions:false still refused a disposition")
+        if leaf_label_fault("fact") != "undeclared:fact":
+            failures.append("an UNDECLARED value must stay refused at ANY declaration (not switchable)")
+    finally:
+        _ct.LEAF_ADMISSION = _saved
+
+    # (5) DIRECTION C — a MISSING declaration FAILS CLOSED AT LOAD (the "silently disabled control"
+    # direction: the dangerous one, because it looks green).
+    for _bad, _why in ((None, "missing block"), ({}, "empty block"),
+                       ({"require_role": True}, "missing refuse_dispositions"),
+                       ({"require_role": True, "refuse_dispositions": "yes"}, "non-bool")):
+        try:
+            _ct._validate_admission(_bad)
+        except SystemExit:
+            pass
+        else:
+            failures.append(f"a {_why!r} commit_gate must FAIL CLOSED at load, not default")
+
+    # (6) THE ENFORCEMENT POINT: assert the gate is the FIRST thing insert_fb does. conn=None is
+    # deliberately unusable — a refusal must return False WITHOUT touching the connection, so if the
+    # gate ever moves below the DB use these raise instead of returning False.
+    for _label, _fb in (("blank", {"fb_id": "selftest", "name": "selftest", "content_type": ""}),
+                        ("disposition", {"fb_id": "selftest", "name": "selftest", "content_type": "quarantine"}),
+                        ("undeclared", {"fb_id": "selftest", "name": "selftest", "content_type": "fact"})):
+        _before = len(_LEAF_LABEL_REFUSALS)
+        try:
+            _verdict = insert_fb(None, _fb)  # type: ignore[arg-type]
+        except Exception as exc:  # noqa: BLE001 — the point is that NOTHING may be touched
+            failures.append(f"insert_fb({_label}) reached the DB before refusing: {type(exc).__name__}")
+            continue
+        if _verdict is not False:
+            failures.append(f"insert_fb({_label}) returned {_verdict!r}, want False")
+        if len(_LEAF_LABEL_REFUSALS) != _before + 1:
+            failures.append(f"insert_fb({_label}) did not record a NAMED refusal")
+
+    total = len(checks) + 4 + 3
+    print(f"stage6 leaf-label gate (D-2965) selftest: {total} control(s)")
+    if failures:
+        for _f in failures:
+            print(f"   ❌ {_f}")
+        print(f"   {len(failures)} FAILED — the gate is NOT trustworthy (fail-closed)")
+        return 1
+    print("   ✅ all controls held — refusal shapes REFUSED, roles ADMITTED, verdict bound to the "
+          "DECLARATION, missing declaration FAIL-CLOSED, refusals recorded before any DB use")
+    return 0
+
+
 def main():
     parser = argparse.ArgumentParser(description="Stage 6: Commit FBs → SQLite + Parquet")
     parser.add_argument("--export-only", action="store_true",
                         help="Only export Parquet snapshot (don't modify DB)")
+    parser.add_argument("--selftest", action="store_true",
+                        help="Run the D-2965 leaf-label gate's known-answer controls and exit")
     args = parser.parse_args()
+
+    if args.selftest:
+        sys.exit(selftest())
 
     run_stage6(export_only=args.export_only)
 

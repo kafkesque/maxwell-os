@@ -22206,3 +22206,65 @@ decisions:
   - governance/evidence/content_type_restamp_receipt.json
   - governance/buglog.md
   - config/store_columns.yaml
+- id: D-2965
+  state: RATIFIED
+  category: PIPELINE / ONTOLOGY / STORE WRITE
+  date: '2026-10-12'
+  title: 'the leaf-label admission gate (owner-ratified): the ORDINARY producer write path may admit only a DECLARED
+    ROLE into the content_type column — an ABSENT label and a DISPOSITION are both REFUSED before any DB use, and
+    the rule has ONE home (the ontology module) rather than a second copy at the writer'
+  decision: 'Owner-ratified 2026-10-12 together with the BUG-712 recommendation, and it is that bug''s DURABLE half:
+    the governed re-stamp closed 11 CELLS, this closes the CLASS. The class is D-2938''s producer defect seen from
+    the other side — S4 once computed the routed role and persisted the RAW S2 label, so the store contradicted
+    the decision it had been routed by. The producer half was fixed in D-2938 and only OBSERVED via a counter; nothing
+    stopped the SILENT half, because stage6.insert_fb validated against CONTENT_TYPES_ALL (5 roles + 2 dispositions)
+    and TOLERATED an empty label. Three consequences were therefore ARMED rather than firing: (a) a COMPUTED-THEN-DISCARDED
+    label could reach the store as '''', a shape the store ruler CANNOT see ('''' is not in HOLLOW — BUG-726); (b)
+    a DISPOSITION could be written into the content_type column (BUG-741: quarantine and noise_drop are outcomes,
+    not ROLES, and the store has no disposition column); (c) an UNDECLARED value was already refused (D2616). (1)
+    THE RULE IS NOT NEW — it is D-2964 applied at the path that writes 100% of rows: the owner-warrant gate already
+    refuses exactly these shapes, the ordinary producer path did not. (2) ONE HOME (C21/D-2646): the admission rule
+    is pipeline.content_types.leaf_label_fault, derived from the DECLARED vocabularies, and the writer IMPORTS it
+    rather than restating it. The narrowing must NOT move into validate_fb_content_type, which deliberately keeps
+    the FULL 7-value vocabulary because the S2/pre-classification layer legitimately routes to a disposition; a
+    control ASSERTS that scope split so a later edit cannot silently re-merge the two layers. (3) THE DECLARATION
+    FAILS CLOSED AND IS READ LOUDLY: config/content_types.yaml#commit_gate declares require_role and refuse_dispositions,
+    and a missing or mistyped key is an IMPORT defect (SystemExit), never a default — both because a control that
+    a missing key can silently disable is not a control, and because a .get(key, default) here would ADD a shadowed-declared
+    census key to a census already above its ceiling (BUG-731). (4) A REFUSAL IS NAMED, RUN-SCOPED AND LOUD: the
+    fault string (''absent'' | ''disposition:<v>'' | ''undeclared:<v>'') is recorded in a ledger and printed in
+    the run summary, so a refusal cannot be absorbed into a silent count. (5) THE CONSEQUENCE IS DECLARED, NOT DISCOVERED:
+    a refusal is a failed insert and pipeline_config.yaml sets stage6.max_failed_ratio to 0.0, so ONE refused row
+    HALTS the commit and ROLLS BACK — the intended fail-closed semantics, because a leaf with no ROLE is not knowledge
+    and an untyped row must never enter the governed store. (6) WHAT THIS IS NOT: not a re-stamp (no stored cell
+    was written), not a new vocabulary (the ontology''s own two vocabularies are NAMED, not extended), and not a
+    generalisation to other label columns — a SECOND bulk-label write is the stated trigger for that (C28).'
+  measured: 'MEASURED 2026-10-12 on the live artifact BEFORE the change: 7,640 rows, 0 blanks, 0 dispositions, census
+    principle 6,587 | process_template 774 | process_instance 157 | tool_instruction 97 | growth_edge 25 — so the
+    gate is NEUTRAL today (7,640 of 7,640 stored labels admitted) and closes a pathway that is ARMED, not a defect
+    that is firing. THE GAP IS DEMONSTRATED ON ONE VALUE: validate_fb_content_type(''quarantine'') returns ''quarantine''
+    (the S2 layer accepts the full 7-value axis) while leaf_label_fault(''quarantine'') returns ''disposition:quarantine''.
+    CONTROLS: pipeline/stage6_commit.py --selftest = 20 known-answer controls, BOTH directions — '''', ''   '' and
+    None refused as absent, every declared ROLE admitted, every disposition refused, ''fact'' refused as undeclared,
+    flipping the DECLARATION flips the verdict (a hardcoded gate cannot pass), a missing/empty/mistyped commit_gate
+    fails closed at load, and insert_fb(conn=None, ...) returns False WITHOUT touching the connection (proving the
+    gate is the FIRST act of the write path); wired into just health. NOTHING ELSE MOVED: ruff findings IDENTICAL
+    to HEAD''s bytes on both changed files (3 pre-existing, only a line-number shift), C11 import-subset and C12
+    hardcoded-path both GREEN (the BUG-739 fix''s payoff), 400 tests passed / 5 skipped (unchanged baseline), 6
+    generator pins 0 DRIFT, session plan rc=0, declaration consumers rc=0, the config-default census EXACTLY 241
+    shadowed-declared keys (UNCHANGED by the new LOUD read), config duplicate-keys green over 118 files. R5 (D-2962):
+    BOTH files APPROVE with the deterministic layers first (syntax PASS, lint pre-existing-proven, c11_c12 PASS)
+    and ONE cross-family reviewer (gemma-4-E4B-it-MLX-4bit, non-Qwen); its two concerns were generic and were NOT
+    applied. SELF-DISCLOSURE: the first write of the run-summary line embedded a REAL newline inside an f-string
+    (a template-literal escape); the SYNTAX layer failed the file CLOSED before any reviewer saw it and the fix
+    was re-verified — the D-2962 ordering working exactly as designed.'
+  bugs:
+  - BUG-712
+  - BUG-741
+  - BUG-726
+  files:
+  - config/content_types.yaml
+  - pipeline/content_types.py
+  - pipeline/stage6_commit.py
+  - justfile
+  - governance/buglog.md

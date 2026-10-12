@@ -486,6 +486,34 @@ reroute:
 #           S2 output type of `meta` is unreachable. Leftover from the old
 #           stage-3a classification taxonomy.
 # ─────────────────────────────────────────────────────────────────────────────
+# ─────────────────────────────────────────────────────────────────────────────
+# COMMIT GATE (D-2965, 2026-10-12) — LEAF-LABEL ADMISSION at the ordinary write path.
+#   WHY. D-2938 fixed the PRODUCER half of BUG-712 (S4 computed the routed role and then persisted
+#   the RAW S2 label, so the store contradicted the decision it had been routed by). Nothing
+#   stopped the SILENT half: stage6.insert_fb validated against CONTENT_TYPES_ALL (5 roles + 2
+#   dispositions) and TOLERATED an empty label. So (a) a COMPUTED-THEN-DISCARDED label could still
+#   reach the store as '' — a shape the store ruler CANNOT see ('' is not in HOLLOW, BUG-726) — and
+#   (b) a DISPOSITION could be written into the content_type column (BUG-741: a disposition is not a
+#   content_type, and the store has no disposition column). MEASURED 2026-10-12 on the live
+#   artifact: 7,640 rows · 0 blanks · 0 dispositions — this gate is NEUTRAL today and closes a
+#   pathway that is ARMED, not a defect that is firing.
+#   NOT A NEW RULE. scripts/restamp_content_type_adjudications.py (D-2964) already refuses exactly
+#   these shapes for an OWNER-WARRANT write. D-2965 applies the SAME rule at the path that writes
+#   100% of rows (D-2646: the rule's home is the ontology module).
+#   CONSEQUENCE (declared, not discovered). A refusal is a FAILED insert, and pipeline_config.yaml
+#   sets stage6.max_failed_ratio: 0.0 — so ONE refused row HALTS the commit and rolls back (BUG-708).
+#   That is the intended fail-closed semantics: a leaf with no ROLE is not knowledge, and an untyped
+#   row must never enter the governed store. An absent label at S6 means the S4 producer path was
+#   bypassed or regressed (S4 already routes a missing label to `quarantine`, D2616) — so S6
+#   REFUSES rather than manufactures.
+#   READS ARE LOUD (pipeline/content_types.py): a missing key is an IMPORT defect, never a default
+#   (D-2938/BUG-731 — a .get(key, default) moves the value out of config AND adds a shadowed-declared
+#   census key, and that census is already over its ceiling).
+commit_gate:
+  decision: D-2965
+  require_role: true          # an absent/blank content_type is REFUSED, never written as ''
+  refuse_dispositions: true   # quarantine | noise_drop are REFUSED as content_type values
+
 dropped_content_types:
   - fact
   - meta

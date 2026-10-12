@@ -21,7 +21,13 @@ from bug_status import BUGLOG, HEADER_RE  # noqa: E402  (single source of truth 
 HEADING_RE = re.compile(r"^#{1,6}\s+.*?BUG-\d+")
 # A heading that ANNOTATES a bug is not a status event and must not be forced into one (an over-strict guard
 # gets disabled, which is worse than no guard): CORRECTIONS/RECEIPTS/REFINEMENTS are append-only apparatus.
-ANNOTATION_RE = re.compile(r"^#{1,6}\s+(CORRECTION|RECEIPT|REFINEMENT|VERIFICATION|NOTE|APPENDIX|ERRATUM)\b")
+# STATUS (D-2946, 2026-10-12) BELONGS TO THE SAME CLASS, and leaving it out turned `just health` RED: a
+# "## STATUS <date> (...)" block is a SESSION SUMMARY that legitimately NAMES the several bugs it reports on
+# ("BUG-712 PRODUCER FIX APPLIED / BUG-715 NEW"), so by construction it can never be a single bug's status
+# event. MEASURED (pre-existing, proved against the pre-session commit): 7 such blocks, all 2026-10-11, failed
+# this guard while the bugs they name were fully parsed everywhere else. The bug's OWN "## BUG-<id>" heading
+# still carries its status and is still required - the two controls in --selftest hold BOTH directions.
+ANNOTATION_RE = re.compile(r"^#{1,6}\s+(CORRECTION|RECEIPT|REFINEMENT|VERIFICATION|NOTE|APPENDIX|ERRATUM|STATUS)\b")
 
 
 BLOCK_START_RE = re.compile(r"^(?:#{2,3}\s.*?BUG-\d+|\*\*BUG-\d+)")
@@ -43,6 +49,21 @@ def blocks(lines: list[str]) -> list[tuple[int, int, str]]:
         end = starts[n + 1] if n + 1 < len(starts) else len(lines)
         out.append((start, end, "".join(lines[start:end])))
     return out
+
+
+def unparsed_heading_problems(lines: list[str]) -> list[tuple[int, str]]:
+    """Headings that NAME a bug but that the status parser cannot see (BUG-428): the C15-invisible class.
+
+    A heading is accepted when it IS a status event (HEADER_RE, the register's own pattern) or when it
+    ANNOTATES rather than declares (ANNOTATION_RE: CORRECTION/RECEIPT/REFINEMENT/VERIFICATION/NOTE/APPENDIX/
+    ERRATUM/STATUS). Everything else is a fault, because a bug whose status no parser can read is absent from
+    the C15 count and from every handoff - the guard class that fails this way is worse than no guard.
+    """
+    unparsed: list[tuple[int, str]] = []
+    for n, line in enumerate(lines, start=1):
+        if HEADING_RE.match(line) and not HEADER_RE.match(line) and not ANNOTATION_RE.match(line):
+            unparsed.append((n, line.strip()[:110]))
+    return unparsed
 
 
 def duplicate_block_problems(lines: list[str]) -> list[str]:
@@ -97,6 +118,12 @@ def selftest() -> int:
          bool(table_rows_missing_heading(["| BUG-9001 | 2026-10-06 | body |\n"]))),
         ("a summary table row whose bug HAS a heading section is NOT a fault",
          not table_rows_missing_heading(["## BUG-9001 (OPEN, 2026-10-06) — x\n", "| BUG-9001 | 2026-10-06 | body |\n"])),
+        # D-2946 controls. Forward: a session STATUS summary that names bugs is apparatus, not a fault.
+        ("a '## STATUS <date> (...)' summary naming several bugs is NOT a fault (D-2946)",
+         not unparsed_heading_problems(["## STATUS 2026-10-11 20:08 (BUG-712 PRODUCER FIX APPLIED · BUG-715 NEW)\n"])),
+        # Backward: the DETECTION class must still fire, or the exemption would have swallowed it.
+        ("a heading that names a bug with NO annotation word is STILL a fault (the guard is not disarmed)",
+         bool(unparsed_heading_problems(["## Weekly notes about BUG-9001 and its children\n"]))),
     ]
     for name, ok in rows:
         print(("  ok  " if ok else "  !!  ") + name)
@@ -115,10 +142,7 @@ def main(argv: list[str] | None = None) -> int:
     argv = list(sys.argv[1:] if argv is None else argv)
     if "--selftest" in argv:
         return selftest()
-    unparsed: list[tuple[int, str]] = []
-    for n, line in enumerate(BUGLOG.read_text(encoding="utf-8").splitlines(), start=1):
-        if HEADING_RE.match(line) and not HEADER_RE.match(line) and not ANNOTATION_RE.match(line):
-            unparsed.append((n, line.strip()[:110]))
+    unparsed: list[tuple[int, str]] = unparsed_heading_problems(BUGLOG.read_text(encoding="utf-8").splitlines())
     if unparsed:
         print(f"FAIL buglog coverage: {len(unparsed)} heading(s) name a bug but are not parsed:")
         for n, line in unparsed:

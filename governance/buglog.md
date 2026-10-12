@@ -10791,3 +10791,22 @@ silently drops those rows. Root cause likely S4 merge (raw label blanked during 
 FIX: backfill `discipline_raw` from the S4 checkpoint for the 190 ids, or relax the raw facet to fall back to
 the canonical label when raw is empty. NOTE: BUG-703's mitigation (a COALESCE fallback) is already visible in
 `retrieve.py::_facet_conditions` — verify before closing.
+
+## BUG-724 (HIGH - RESOLVED 2026-10-12): `just health` was RED — the buglog-coverage guard had no annotation class for a session STATUS summary
+**MEASURED, AND PROVED PRE-EXISTING** (not a regression from the D2590 landing): `just health` failed on
+`scripts/check_buglog_coverage.py` with 7 unparsed headings — all `## STATUS <date> (...)` session summaries
+written on 2026-10-11, each of which legitimately NAMES the several bugs it reports on
+("BUG-712 PRODUCER FIX APPLIED · BUG-715 NEW", "BUG-706/707/708 FOUND+FIXED", ...). Re-running the SAME rail
+against the PRE-SESSION buglog (`git show 0e28cff:governance/buglog.md`) produced the IDENTICAL 7 faults, so the
+boot gate was already red when this session began and the D2590 work neither caused nor worsened it.
+**ROOT CAUSE:** the guard's annotation class listed CORRECTION/RECEIPT/REFINEMENT/VERIFICATION/NOTE/APPENDIX/
+ERRATUM but not STATUS, so a by-construction multi-bug summary heading was forced into the single-bug status
+class. This is the guard's own documented failure mode ("an over-strict guard gets disabled, which is worse than
+no guard").
+**FIXED (D-2946) by adding STATUS to that class, with the rule EXTRACTED into
+`unparsed_heading_problems()` so the selftest can drive it, and with TWO known-answer controls in BOTH
+directions:** a `## STATUS <date> (...)` summary naming several bugs is NOT a fault, AND a heading that names a
+bug with no annotation word is STILL a fault (so the exemption cannot silently disarm the BUG-428 guard).
+**VERIFIED:** selftest 6/6 controls fire; live run rc=0 ("every heading naming a bug id is parsed"); `just
+health` GREEN end to end. **Residual (not fixed here):** the annotation vocabulary is still hardcoded in the
+rail rather than declared in config (C12) — a cleanup, logged with this bug rather than smuggled into it.

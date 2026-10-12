@@ -16369,3 +16369,48 @@ decisions:
   - pipeline/stage6_commit.py
   - scripts/pre_s6_gate.py
   - temp/dryrun_d2590.py
+- id: D-2946
+  state: ACTIVE
+  category: GOVERNANCE / RULES
+  title: A session STATUS summary is an ANNOTATION heading, not a bug's status event — and the BUG-428 guard keeps
+    both directions
+  decision: 'BUG-724: `just health` was RED because `scripts/check_buglog_coverage.py` (BUG-428''s guard against
+    a bug
+
+    heading the status parser cannot see) had no annotation class for `## STATUS <date> (...)` session
+
+    summaries. Such a block NAMES the several bugs it reports on, by construction, so it can never be a single
+
+    bug''s status event. MEASURED PRE-EXISTING: the same 7 faults fire against the PRE-SESSION buglog
+
+    (`git show 0e28cff:governance/buglog.md`), so the boot gate was already red and the D2590 landing neither
+
+    caused nor worsened it.
+
+    RULING: STATUS belongs to the SAME annotation class the rail already declares for
+
+    CORRECTION / RECEIPT / REFINEMENT / VERIFICATION / NOTE / APPENDIX / ERRATUM. The rule was EXTRACTED into
+
+    `unparsed_heading_problems()` so the selftest can drive it (one rule, one home), and the guard keeps BOTH
+
+    directions — which is the part that matters: a `## STATUS` summary naming several bugs is NOT a fault, AND a
+
+    heading that names a bug with no annotation word IS STILL a fault. An exemption that cannot be told apart
+
+    from disarming the guard is not an exemption. A bug''s OWN `## BUG-<id>` heading remains its status event and
+
+    is still required.
+
+    VERIFIED: selftest 6/6 known-answer controls fire; the live run is rc=0 over 649 blocks; `just health` is
+
+    GREEN end to end.
+
+    RESIDUAL (deliberately NOT smuggled into this record): the annotation vocabulary is still hardcoded in the
+
+    rail rather than declared in config (C12) — a cleanup, not a behaviour change.
+
+    '
+  bugs:
+  - BUG-724
+  files:
+  - scripts/check_buglog_coverage.py

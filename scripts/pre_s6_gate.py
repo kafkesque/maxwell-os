@@ -10,6 +10,8 @@ Checks (deterministic, no LLM):
   3. fb_id UNIQUE  — no duplicate fb_id (duplicates would silently overwrite in S6).
   4. CONTAMINATION — severe EPUB→MD evidence records must be status=QUARANTINE (BUG-181#1).
   5. TALLY         — PASS / QUARANTINE report (sanity band for human review).
+  6. NON-FB TIER   — D2590: the sidecar rows S6 will ALSO commit must be collision-free, in-role,
+                     and carry their declared type_body (skipped when commit_non_fb_types=false).
 
 Exit 0 = safe to commit; non-zero = HOLD S6 (fix the cause, do not commit).
 """
@@ -128,6 +130,69 @@ def main() -> int:
     from collections import Counter
     c = Counter(r.get("status") for r in fbs)
     print(f"📊 tally: {dict(c)}")
+
+    # 6. D2590 non-principle ingest set — the rows S6 will ALSO commit (flag-gated).
+    # WHY HERE: pre_s6_gate exists so a truncated / duplicated / contaminated set never reaches S6's
+    # INSERT (D2505). The non-principle tier is a SECOND input to the SAME INSERT, so it must pass the
+    # same kind of gate: a collision with the checkpoint would be the BUG-195 silent overwrite, and an
+    # off-role row would persist a mislabelled object (C16).
+    try:
+        from pipeline.pipeline_paths import S6_COMMIT_NON_FB
+    except Exception as e:  # config failure is fatal, never ignored
+        problems.append(f"cannot read stage6.commit_non_fb_types from config (C12/C16): {e}")
+        S6_COMMIT_NON_FB = False
+
+    if S6_COMMIT_NON_FB:
+        try:
+            from pipeline.pipeline_paths import DB_PATH
+            from pipeline.stage6_commit import (
+                _run_id_for_commit,
+                _stored_fb_ids,
+                load_non_fb_sidecars,
+            )
+
+            run_id = _run_id_for_commit()
+            non_fb, non_fb_stored, receipt = load_non_fb_sidecars(run_id, _stored_fb_ids(DB_PATH))
+            collisions = sorted({r["fb_id"] for r in non_fb} & {r.get("fb_id") for r in fbs})
+            if collisions:
+                problems.append(
+                    f"{len(collisions)} non-principle fb_id(s) collide with the S5 checkpoint "
+                    f"(S6 INSERT OR REPLACE would overwrite): {collisions[:5]}"
+                )
+            bodyless = [r["fb_id"] for r in non_fb if not r.get("type_body")]
+            if bodyless:
+                problems.append(
+                    f"{len(bodyless)} non-principle row(s) carry no type_body — a role's declared body "
+                    f"would be committed empty: {bodyless[:5]}"
+                )
+            wrong_reason = sorted({str(r.get("s5_reason")) for r in non_fb} - {receipt["disposition_reason"]})
+            if wrong_reason:
+                problems.append(
+                    f"non-principle rows carry an undeclared s5_reason {wrong_reason} — the D-2942 "
+                    "disposition is the rule's output and nothing else may write it (D274h)"
+                )
+            if not non_fb:
+                problems.append(
+                    f"stage6.commit_non_fb_types=true but the {run_id} sidecars yielded 0 tier rows — "
+                    "a stale sidecar or a broken loader, never a no-op"
+                )
+            if not problems:
+                print(f"✅ non-principle tier ({run_id}): {receipt['tier_rows']} row(s) "
+                      f"{receipt['by_role']} — {receipt['new_rows']} new, "
+                      f"{receipt['already_stored_in_tier']} already stored (ALREADY_STORED); "
+                      f"type_body present, no checkpoint collision, "
+                      f"disposition={receipt['disposition_reason']}")
+                print(f"   excluded {receipt['excluded']['not_a_commit_role']} row(s) whose own "
+                      f"content_type is not a commit role "
+                      f"{receipt['excluded']['not_a_commit_role_by_content_type']}; "
+                      f"{receipt['quarantine_shelf_records']} on the D2616 hold shelf (never a source)")
+                if receipt.get("ge_category_vocabulary"):
+                    gv = receipt["ge_category_vocabulary"]
+                    print(f"   D-2924 advisory: {gv['off_vocabulary_rows']}/{gv['rows']} growth_edge "
+                          f"categor(ies) are OFF the closed vocabulary (enforcing={gv['enforcing']}) — the "
+                          "calibration gold set is still owner-owed, and nothing is rewritten here")
+        except Exception as e:
+            problems.append(f"non-principle ingest set could not be validated (D2590 fail-closed): {e}")
 
     if problems:
         print("\n❌ PRE-S6 GATE FAILED — HOLD S6:")

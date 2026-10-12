@@ -43,6 +43,13 @@ from pipeline.pipeline_paths import (
     CANONICAL_RUN,  # D-2881: canonical pipeline_run_id (D-2884a backfill scoping)
     PARQUET_DIR,
     S15_EMBED_DIM,
+    S4_DIR,  # D2590: S4 run dir — home of the non-principle sidecars S6 must ingest
+    S4_GE_OUTPUT,
+    S4_PI_OUTPUT,
+    S4_PT_OUTPUT,
+    S4_QUARANTINE_OUTPUT,  # D2616: the HOLD shelf — never a commit source
+    S4_TI_OUTPUT,
+    S6_COMMIT_NON_FB,  # D2590: the flag that was DEAD config until this build
     S6_MAX_FAILED_RATIO,  # D2338: fail-closed commit tolerance
     S6_COMMIT_SCOPE,  # D-2933 (rule V): verification-scoped commit
     S6_S5_OWNED_COLUMNS,  # D-2933: the S5-owned provenance column set (C12)
@@ -53,6 +60,7 @@ from pipeline.pipeline_paths import (
     STAGE5_HUMAN_REVIEW,
     STAGE6_CHECKPOINT,
 )
+from pipeline.content_types import type_body_fields  # D-2943: the role->body-field ontology (C21)
 from pipeline.schema_accessor import (
     fb_accessibility,
     fb_context,
@@ -69,7 +77,11 @@ from pipeline.schema_accessor import (
     fb_source_books,
     fb_source_ids,
 )
-from pipeline.serving_gate import pre_write_verdict  # D274a/D274h: the pre-write half of the gate
+from pipeline.serving_gate import (  # D274a/D274h: the pre-write half of the gate
+    content_types_without_factual_claim,  # D-2942: the roles with no NLI factual claim (C12)
+    derive_status,  # D-2942/D274h: the ONE status rule — S6 stamps its output, never a literal
+    pre_write_verdict,
+)
 from pipeline.discipline_macro import macro_for  # D-2884(a): C21 single home for fine->macro collapse
 from pipeline.stamp import get_pipeline_commit, stamp_record, write_stage_code_fingerprint
 from pipeline.sqlite_vec_loader import load_sqlite_vec  # D-2915: shared sqlite-vec loader (ctypes fallback)
@@ -160,6 +172,12 @@ CREATE TABLE IF NOT EXISTS fbs (
     verification_method TEXT,   -- G19/F-43: S5 verification method
     isor TEXT,                  -- G19/F-43: full ISOR scores (JSON) from S5
     practicality TEXT,          -- D2622: advisory applicability tier (immediately-applicable|context-dependent|abstract)
+    type_body TEXT,             -- D2590/D-2943: JSON object holding the ROLE-specific body the store has no
+                                -- column for (PT trigger/prerequisite/steps/done_condition; PI instance_text/actors/
+                                -- outcome_*/domain_context; TI tool_name/platform/description/syntax/parameters/
+                                -- output/example/caveats; GE body/category/actionable/status/priority). NULL for a
+                                -- role that declares no body beyond core_body (principle). Field list comes from
+                                -- config/content_types.yaml::s2_body_fields minus core_body — never re-declared here.
     -- Stamps (R14)
     schema_version TEXT,
     gen_model TEXT,
@@ -308,6 +326,9 @@ def init_db(db_path: Path) -> sqlite3.Connection:
     _migrate_add_column(conn, "fbs", "verification_method", "TEXT")
     _migrate_add_column(conn, "fbs", "isor", "TEXT")
     _migrate_add_column(conn, "fbs", "practicality", "TEXT")
+    # D2590/D-2943: the non-principle commit tier's role-specific body (ONE JSON column, not one
+    # column per role-field). Auto-heal for pre-existing DBs, exactly like every column above.
+    _migrate_add_column(conn, "fbs", "type_body", "TEXT")
     # D2395: drop dead legacy s3_original_domain (stage3 removed in D2130; the column was
     # never dropped from existing DBs). Drift → 61 DB cols vs 60 in CREATE TABLE/INSERT,
     # tripping integrity-check [8]. Dropping re-aligns; no active code reads the column.
@@ -731,6 +752,7 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
                 needs_human_review, verifier_model,
                 s5_reason, epistemic_status, verification_method, isor,
                 practicality,
+                type_body,
                 schema_version, gen_model, pipeline_commit,
                 taxonomy_version, pipeline_run_id,
                 created_at, committed_at,
@@ -759,6 +781,7 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
                 ?, ?, ?,
                 ?, ?,
                 ?, ?, ?, ?,
+                ?,
                 ?,
                 ?, ?, ?,
                 ?, ?,
@@ -846,6 +869,11 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
             _safe_str(fb.get("verification_method")),
             _safe_json(fb.get("isor")),
             _safe_str(fb.get("practicality")),
+            # D2590/D-2943: the role-specific body (JSON text, or a TRUE NULL for a role that declares
+            # none). Deliberately NOT `_safe_str(...)`: that maps None to "" and a store where "no body"
+            # and "empty body" are the same bytes cannot be audited. One type only (text) so SQLite and
+            # the Parquet snapshot agree and pyarrow cannot infer a struct column (BUG-388 class).
+            fb.get("type_body"),
             # stamps
             # D2169: Read schema version from config/version.yaml (single source of truth)
             _safe_str(fb.get("schema_version"), _get_pipeline_version()),
@@ -981,11 +1009,341 @@ def _assert_fb_id_unique(fbs: list[dict]) -> None:
         )
 
 
+# ══════════════════════════════════════════════════════════════════════════════════════════════════
+# D2590 / D-2942 / D-2943 — THE NON-PRINCIPLE (procedural + episodic) COMMIT TIER
+# ══════════════════════════════════════════════════════════════════════════════════════════════════
+# WHY THIS EXISTS (measured 2026-10-12, run rechunk-v4-20260929): S4 ROUTES non-principle objects into
+# sidecar JSONL files, and S6 ingested ONLY checkpoint.jsonl. So 1,049 extracted records (PT 774 /
+# PI 156 / TI 94 / GE 25) sat on disk — extracted, routed, written, NEVER committed, NEVER indexed,
+# NEVER retrievable — while the store reported a complete 6,591 rows. That silence is the defect
+# (C16/C23): the corpus read as "knowledge only, no procedures" when the procedures had been
+# extracted months earlier. The three rules below are the whole fix, and each is config- or
+# ontology-driven (C12), fail-loud (C16) and receipted (no silent drop).
+#
+#   RULE 1 — SELECT BY THE ROW'S OWN `content_type`, never by the file it happens to sit in.
+#            Measured: growth_edges.jsonl holds 187 `principle` rows and process_templates.jsonl
+#            holds 9; a whole-file ingest would commit mislabelled, unverified rows as non-FB objects.
+#   RULE 2 — THE QUARANTINE SHELF IS NEVER A SOURCE (D2616): quarantined.jsonl is a HOLD shelf.
+#   RULE 3 — IDEMPOTENT (C23): the WRITE is skipped for an fb_id the store already holds (the caller
+#            records ALREADY_STORED) and a repeated fb_id inside a sidecar keeps its first occurrence.
+#            Measured today: 0 internal duplicates, so rule 3 removes nothing NOW — it exists for the
+#            NEXT run, and the dry run proves a second pass inserts 0 rows.
+#   RULE 4 — THE TIER IS A PROPERTY OF THE RUN, NOT OF THE STORE'S HISTORY: a record already stored is
+#            STILL returned, because the S6 checkpoint and the Parquet snapshot must describe the run
+#            identically on every pass. MEASURED: omitting them made a re-run's checkpoint shrink
+#            13.8% and io_guard's SHRINK GUARD refused the write — the guard was right, and the fix
+#            belongs here, not in a force flag.
+#
+# The rows carry NO S5 pass, because S5 verifies TRUTH CLAIMS and these roles carry none. Their
+# disposition is therefore NOT invented here: `serving_gate.derive_status(None, content_type=...)`
+# answers (QUARANTINE, s5_not_applicable) — NOT-APPLICABLE, not undecidable and never PASS (a
+# promotion would manufacture trust, R5/D2298) — and the pre-write comparator in `insert_fb` still
+# refuses any pair that is not the rule's own output (D-2942). Consequence, stated plainly: D2590
+# makes this knowledge PERSISTENT and EXPLICITLY retrievable (include_quarantine=True + the
+# `content_type` facet), not default-served. Default-serving it is a VERIFICATION-DESIGN question
+# (how IS a tool instruction verified?) and remains owner-gated (BUG-714 contract, A1/A3).
+
+
+def _non_fb_sidecar_files() -> dict[str, str]:
+    """The role → sidecar filename map, read from config (C12) — code names no file literal."""
+    return {
+        "process_template": S4_PT_OUTPUT,
+        "process_instance": S4_PI_OUTPUT,
+        "growth_edge": S4_GE_OUTPUT,
+        "tool_instruction": S4_TI_OUTPUT,
+    }
+
+
+def _run_id_for_commit() -> str:
+    """The run S6 is committing, taken from the S5 checkpoint PATH (run-scoped, D-2938).
+
+    Deliberately NOT `CANONICAL_RUN`: the sidecars must belong to the same run as the checkpoint
+    whose rows are being committed, or S6 would fuse two generations into one store — the D-2937
+    defect this pipeline just paid to remove.
+    """
+    return STAGE5_CHECKPOINT.parent.name
+
+
+def _stored_fb_ids(db_path: Path) -> set[str]:
+    """The fb_ids already in the store (rule 3). READ-ONLY; an absent DB or table is simply empty."""
+    if not db_path.exists():
+        return set()
+    conn = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True)
+    try:
+        has_table = conn.execute(
+            "SELECT 1 FROM sqlite_master WHERE type='table' AND name='fbs'"
+        ).fetchone()
+        if not has_table:
+            return set()
+        return {str(r[0]) for r in conn.execute("SELECT fb_id FROM fbs")}
+    finally:
+        conn.close()
+
+
+def _legacy_type_body_null(db_path: Path, run_id: str) -> dict:
+    """Declare the rows this build does NOT back-fill (F5.4), so the gap is visible, not silent.
+
+    The 14 `tool_instruction` rows already in the store predate the `type_body` column. They are the
+    BUG-714 mislabels (code snippets, not tool instructions) and are slated for retype; back-filling
+    them here would entangle THIS change with that decision. Counted and reported instead.
+    """
+    if not db_path.exists():
+        return {"count": 0, "content_types": {}}
+    roles = sorted(content_types_without_factual_claim())
+    conn = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True)
+    try:
+        has_table = conn.execute(
+            "SELECT 1 FROM sqlite_master WHERE type='table' AND name='fbs'"
+        ).fetchone()
+        if not has_table:
+            return {"count": 0, "content_types": {}}
+        columns = {r[1] for r in conn.execute("PRAGMA table_info(fbs)")}
+        placeholders = ",".join("?" for _ in roles)
+        if "type_body" not in columns:
+            # Pre-migration store: the column does not exist yet, so EVERY row of these roles is
+            # un-backfilled. Reported as such instead of crashing or silently reporting zero.
+            rows = list(conn.execute(
+                f"SELECT content_type, COUNT(*) FROM fbs WHERE content_type IN ({placeholders}) GROUP BY 1",
+                roles,
+            ))
+            note = ("type_body column absent (pre-migration): every row of these roles is "
+                    "un-backfilled (BUG-714 retype owns them)")
+        else:
+            rows = list(conn.execute(
+                f"SELECT content_type, COUNT(*) FROM fbs "
+                f"WHERE content_type IN ({placeholders}) AND (type_body IS NULL OR type_body = '') "
+                f"GROUP BY 1",
+                roles,
+            ))
+            note = ("pre-dates the type_body column; BUG-714 retype owns them "
+                    "(governance/FORENSIC_AUDIT_D2590_20261012.md F5.4)")
+    finally:
+        conn.close()
+    return {"count": sum(r[1] for r in rows), "content_types": {r[0]: r[1] for r in rows}, "note": note}
+
+
+def build_type_body(fb: dict) -> str | None:
+    """The role-specific body as a JSON object string (D-2943); None when the role declares none.
+
+    The field list comes from the ONTOLOGY (`config/content_types.yaml::s2_body_fields` minus
+    `core_body`, via `pipeline.content_types.type_body_fields`) — it is never re-declared here (C12).
+    Only fields PRESENT on the record are kept: an absent key must not become a fabricated "" (that is
+    exactly how slop enters a store — a field nobody extracted reading as extracted).
+
+    FAIL-LOUD: a role being committed that declares no body fields is a config/ontology regression,
+    not an empty body (C16).
+    """
+    content_type = str(fb.get("content_type") or "")
+    fields = type_body_fields(content_type)
+    if not fields:
+        raise RuntimeError(
+            f"type_body: content_type {content_type!r} declares no s2_body_fields outside core_body — "
+            "refusing to commit a role whose body contract the ontology does not declare (C12/C16). "
+            "Fix config/content_types.yaml, do not invent a body here."
+        )
+    body = {f: fb[f] for f in fields if fb.get(f) not in (None, "")}
+    return json.dumps(body, ensure_ascii=False, sort_keys=True) if body else None
+
+
+def stamp_non_fb_disposition(fb: dict) -> None:
+    """Stamp the D-2942 disposition in place, as the output of the ONE rule (D274h).
+
+    `epistemic_status` is deliberately LEFT NULL: the D2284 label is co-derived from a verification
+    record that does not exist for this tier, and stamping its fallback ("speculative") on a tool's
+    syntax would be a MANUFACTURED label — the thing the co-derivation ontology forbids.
+    """
+    status, reason = derive_status(None, content_type=fb.get("content_type"))
+    fb["status"] = status
+    fb["s5_reason"] = reason
+    fb["verification_results"] = []
+
+
+def load_non_fb_sidecars(run_id: str, stored_ids: set[str]) -> tuple[list[dict], set[str], dict]:
+    """Load, filter, dispose and receipt the non-principle sidecar rows of a run (D2590).
+
+    Returns (rows, already_stored_ids, receipt). `rows` is the RUN's whole non-principle tier — every
+    sidecar record whose own content_type is a commit role — and `already_stored_ids` names the subset
+    the store already holds, so the caller writes only what is new while the S6 checkpoint and the
+    Parquet snapshot stay run-stable (rule 4).
+
+    Every other row is COUNTED in the receipt: the failure mode being repaired is a silent drop, so
+    no branch may be silent (C16).
+
+    The commit-role set is `serving_gate.content_types_without_factual_claim` — a RULE, not a list:
+    the rows S6 may commit without an S5 pass are exactly the roles S5 is not applicable to. The
+    declared sidecar files must cover that set exactly, and a divergence is a hard failure rather
+    than a silently narrower ingest (C12/C16).
+
+    S5-owned columns (D-2933) are STRIPPED from every top-level row before commit, so the governed
+    verification axis keeps its single writer. That stripping is also what resolves the growth_edge
+    `status` NAME COLLISION: the GE epistemic state (open|speculative|conceptual) survives inside
+    `type_body.status`, while the `status` COLUMN is written only by stamp_non_fb_disposition.
+    """
+    roles = sorted(content_types_without_factual_claim())
+    files = _non_fb_sidecar_files()
+    if sorted(files) != roles:
+        raise RuntimeError(
+            f"D2590: the declared sidecar files {sorted(files)} do not cover the roles with no factual "
+            f"claim {roles} — a divergence would silently narrow the ingest (C12/C16)"
+        )
+
+    receipt: dict = {
+        "run_id": run_id,
+        "roles": roles,
+        "source_files": [],
+        "tier_rows": 0,
+        "new_rows": 0,
+        "already_stored_in_tier": 0,
+        "by_role": {},
+        "by_role_new": {},
+        "disposition_reason": derive_status(None, content_type=roles[0])[1],
+        "excluded": {
+            "not_a_commit_role": 0,
+            "not_a_commit_role_by_content_type": {},
+            "duplicate_within_sidecars": 0,
+        },
+        "quarantine_shelf_records": 0,
+        "quarantine_shelf_is_never_a_source": S4_QUARANTINE_OUTPUT,
+        "s5_owned_columns_stripped": sorted(S6_S5_OWNED_COLUMNS),
+        "rule_4_run_not_history": (
+            "the returned tier is the RUN's: a record already in the store is still part of it, so the "
+            "S6 checkpoint and the Parquet snapshot describe the run and do NOT shrink on a re-run "
+            "(weakening the io_guard shrink guard would hide that signal). Stage 6 skips the WRITE for "
+            "those rows and records commit_status=ALREADY_STORED."
+        ),
+    }
+    rows: list[dict] = []
+    seen: set[str] = set()
+    stored_in_tier: set[str] = set()
+    for role in roles:
+        path = S4_DIR / run_id / files[role]
+        if not path.exists():
+            raise RuntimeError(
+                f"D2590: {path} does not exist — run {run_id!r} has no {role} sidecar. Refusing to "
+                "commit a partial non-principle tier (C16); re-run S4 for this run or disable "
+                "stage6.commit_non_fb_types."
+            )
+        receipt["source_files"].append(path.name)
+        with path.open(encoding="utf-8") as fh:
+            for lineno, line in enumerate(fh, 1):
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    rec = json.loads(line)
+                except json.JSONDecodeError as exc:
+                    raise RuntimeError(
+                        f"D2590: {path.name}:{lineno} is not standalone JSON ({exc}) — fix the sidecar "
+                        "before committing it (C16)."
+                    ) from exc
+                content_type = str(rec.get("content_type") or "")
+                if content_type not in roles:
+                    receipt["excluded"]["not_a_commit_role"] += 1
+                    breakdown = receipt["excluded"]["not_a_commit_role_by_content_type"]
+                    breakdown[content_type or "<none>"] = breakdown.get(content_type or "<none>", 0) + 1
+                    continue
+                rec_fb_id = str(rec.get("fb_id") or "")
+                if not rec_fb_id:
+                    raise RuntimeError(
+                        f"D2590: {path.name}:{lineno} carries no fb_id — an unidentifiable row cannot "
+                        "be receipted or de-duplicated (C16)."
+                    )
+                if rec_fb_id in seen:
+                    # RULE 3 — a repeated fb_id WITHIN the sidecars: the first occurrence wins and the
+                    # second is counted, so no duplicate can ever be committed twice (C23).
+                    receipt["excluded"]["duplicate_within_sidecars"] += 1
+                    continue
+                seen.add(rec_fb_id)
+                if rec_fb_id in stored_ids:
+                    stored_in_tier.add(rec_fb_id)
+                row = dict(rec)
+                for column in S6_S5_OWNED_COLUMNS:
+                    row.pop(column, None)
+                row["type_body"] = build_type_body(rec)  # from the ORIGINAL record (GE status survives)
+                row["pipeline_run_id"] = run_id
+                row["source_sidecar"] = f"{path.name}:{lineno}"
+                stamp_non_fb_disposition(row)
+                rows.append(row)
+                receipt["by_role"][content_type] = receipt["by_role"].get(content_type, 0) + 1
+                if rec_fb_id not in stored_ids:
+                    receipt["by_role_new"][content_type] = receipt["by_role_new"].get(content_type, 0) + 1
+    receipt["tier_rows"] = len(rows)
+    receipt["already_stored_in_tier"] = len(stored_in_tier)
+    receipt["new_rows"] = len(rows) - len(stored_in_tier)
+    shelf = S4_DIR / run_id / S4_QUARANTINE_OUTPUT
+    if shelf.exists():
+        with shelf.open(encoding="utf-8") as fh:
+            receipt["quarantine_shelf_records"] = sum(1 for line in fh if line.strip())
+
+    # ── Measured declarations (never asserted from prose): what this tier does NOT carry. ──
+    # A receipt that only lists successes is how a gap becomes invisible; these two counts are the
+    # known limits of the non-principle tier as committed, and both are computed from the rows.
+    from pipeline.schema_accessor import fb_discipline, fb_domains  # local: avoid import cycles
+
+    receipt["taxonomy_unlabelled"] = sum(
+        1 for r in rows if not fb_domains(r) and str(fb_discipline(r) or "") in ("", "emerging")
+    )
+    receipt["taxonomy_unlabelled_note"] = (
+        "rows with no domain and no resolved discipline: the S4 taxonomy facets were never produced "
+        "for the non-principle sidecars (deferred with the cross-ref producer, D2590(d)), so a "
+        "domain/discipline-faceted query cannot reach them; `depth` falls back to the store default. "
+        "Measured at commit time, not assumed."
+    )
+    ge_rows = [r for r in rows if r.get("content_type") == "growth_edge"]
+    if ge_rows:
+        from pipeline.growth_edge_ontology import calibration_enforcing, category_values
+
+        vocab = category_values()
+        cats = [json.loads(r["type_body"]).get("category") for r in ge_rows if r.get("type_body")]
+        off = sorted({str(c) for c in cats if c not in vocab})
+        receipt["ge_category_vocabulary"] = {
+            "enforcing": bool(calibration_enforcing()),
+            "rows": len(cats),
+            "off_vocabulary_rows": sum(1 for c in cats if c not in vocab),
+            "distinct_off_vocabulary_values": off,
+            "note": ("D-2924 remains ADVISORY (no calibration gold set minted): the closed vocabulary is "
+                     "NOT enforced on commit, and no category is rewritten here — normalising the values "
+                     "is an owner-gated ontology act (D-2898). This block is the evidence the D-2924 "
+                     "calibration needs."),
+        }
+    return rows, stored_in_tier, receipt
+
+
 def run_stage6(export_only: bool = False):
     """Run Stage 6: Commit FBs to SQLite + Parquet."""
     CHECKPOINT_DIR.mkdir(parents=True, exist_ok=True)
 
     fbs = load_stage5_fbs()
+
+    # ── D2590: the non-principle commit tier (flag-gated — S6_COMMIT_NON_FB was DEAD config) ──
+    # Loaded BEFORE the uniqueness assert so a collision between the checkpoint and a sidecar is
+    # caught by the same fail-loud guard rather than overwriting silently (BUG-195/D2505).
+    non_fb_receipt: dict | None = None
+    non_fb_already_stored: set[str] = set()
+    if S6_COMMIT_NON_FB:
+        commit_run = _run_id_for_commit()
+        non_fb_rows, non_fb_already_stored, non_fb_receipt = load_non_fb_sidecars(
+            commit_run, _stored_fb_ids(DB_PATH)
+        )
+        non_fb_receipt["legacy_type_body_null"] = _legacy_type_body_null(DB_PATH, commit_run)
+        # RULE 4: the WHOLE tier stays in `fbs` so the S6 checkpoint and the Parquet snapshot describe
+        # the RUN rather than the store's history; only the un-stored rows are written below.
+        fbs.extend(non_fb_rows)
+        print(f"➕ D2590 non-principle tier: {len(non_fb_rows)} row(s) from the S4 sidecars of "
+              f"{commit_run} — {non_fb_receipt['by_role']}")
+        print(f"   {non_fb_receipt['new_rows']} new to insert, "
+              f"{non_fb_receipt['already_stored_in_tier']} already in the store (skipped, ALREADY_STORED)")
+        print(f"   disposition: {non_fb_receipt['disposition_reason']} (D-2942: S5 verifies truth "
+              f"claims; these roles carry none — QUARANTINE, never PASS)")
+        print(f"   excluded: {non_fb_receipt['excluded']['not_a_commit_role']} not-a-commit-role "
+              f"{non_fb_receipt['excluded']['not_a_commit_role_by_content_type']} (the row's own "
+              f"content_type decides), {non_fb_receipt['excluded']['duplicate_within_sidecars']} "
+              f"duplicate; {non_fb_receipt['quarantine_shelf_records']} on the D2616 hold shelf "
+              f"(never a source)")
+    else:
+        print("⏭️  D2590 non-principle tier SKIPPED (stage6.commit_non_fb_types=false) — the S4 "
+              "sidecars stay uncommitted and unreachable; run scripts/audit_sidecar_commit.py "
+              "to see the gap")
 
     # BUG-195/D2505: fail-loud duplicate guard (runs before any INSERT).
     _assert_fb_id_unique(fbs)
@@ -1055,6 +1413,13 @@ def run_stage6(export_only: bool = False):
 
         for i, fb in enumerate(fbs, 1):
             name = fb_name(fb)[:40]
+            # D2590 RULE 3: a non-principle row the store ALREADY holds is part of the run's tier
+            # (rule 4: the artifacts stay run-stable) but must NOT be written again — re-running the
+            # S5-provenance update on it would be 1,049 pointless writes per pass. The row is
+            # recorded as ALREADY_STORED, never as INSERTED (D2325: no false commit claim).
+            if non_fb_receipt is not None and fb.get("fb_id") in non_fb_already_stored:
+                commit_status[fb["fb_id"]] = "ALREADY_STORED"
+                continue
             # D-2933 (rule V): VERIFICATION-SCOPED COMMIT. An fb_id that already exists in the
             # store receives ONLY the S5-owned provenance columns (update_s5_provenance); the
             # S4-owned ontology is never rewritten from a possibly-stale checkpoint (BUG-709).
@@ -1186,7 +1551,9 @@ def run_stage6(export_only: bool = False):
             "name": fb["name"],
             "status": fb.get("status"),
             "commit_status": per_fb_status,
-            "committed_to_sqlite": per_fb_status == "INSERTED",
+            # D2590: ALREADY_STORED is still IN the store — the flag answers "is this row in the
+            # DB", not "did this pass write it". Claiming otherwise would under-report the store.
+            "committed_to_sqlite": per_fb_status in ("INSERTED", "ALREADY_STORED"),
             "parquet_snapshot": str(parquet_path) if parquet_path else None,
         }, gen_model="python")
         rec["pipeline_commit"] = pipeline_commit
@@ -1197,6 +1564,17 @@ def run_stage6(export_only: bool = False):
         "\n".join(json.dumps(r, ensure_ascii=False) for r in commit_recs) + "\n",
     )
     write_stage_code_fingerprint(STAGE6_CHECKPOINT, "stage6")  # BUG-614: bind checkpoint to producing code
+
+    # ── D2590 receipt: the non-principle tier's audit trail (C16 — no silent drop, remembered).
+    # Written even when the commit ROLLED BACK, so a rolled-back ingest is as auditable as a landed one.
+    if non_fb_receipt is not None:
+        non_fb_receipt["rolled_back"] = rolled_back
+        non_fb_receipt["invoked_with"] = "--export-only" if export_only else "commit"
+        receipt_path = CHECKPOINT_DIR / "non_fb_commit_receipt.json"
+        receipt_rec = stamp_record(non_fb_receipt, gen_model="python")
+        receipt_rec["pipeline_commit"] = pipeline_commit
+        safe_write(receipt_path, json.dumps(receipt_rec, indent=2, ensure_ascii=False, sort_keys=True) + "\n")
+        print(f"🧾 D2590 receipt: {receipt_path}")
 
     # Summary
     print(f"\n{'='*60}")

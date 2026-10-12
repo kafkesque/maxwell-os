@@ -31,6 +31,27 @@ serving_gate:
   # MEASURED 2026-09-25: all 7,995 stored rows satisfy the predicate, so the guard refuses nothing
   # that exists today and fires only on a row written by something other than the one writer.
   pre_write_enforcement: "reject"
+
+  # ── D-2942 (D2590 build): THE THIRD DISPOSITION — a row whose content_type carries no factual
+  # claim. S5 verifies TRUTH CLAIMS. A process template, a process instance, a tool instruction and
+  # a growth edge are not truth claims, so an ABSENT verification record on one of them means
+  # NOT-APPLICABLE (QUARANTINE + `s5_not_applicable`), never UNDECIDABLE and never PASS.
+  # WHY A REASON AND NOT A NEW STATUS (measured blast radius, not preference): reusing QUARANTINE
+  # keeps `_status_predicate` and the retrieval quarantine contract BYTE-IDENTICAL, so no served
+  # query changes behaviour; the typed reason carries the split, which is the mechanism this file
+  # already declares exists for exactly this job (G9/D272d).
+  # WHY ROW-DETERMINISTIC: the rule reads the ROW's content_type against the list below, so the
+  # writer (stage6_commit) and the rail (scripts/check_serving_gate.py) derive the SAME value from
+  # the SAME bytes — a call-site flag would let the two disagree.
+  # NEVER PASS: promoting an unverified row would manufacture trust (R5 / D2298 fail-closed).
+  not_applicable_reason: "s5_not_applicable"
+  # The roles that carry no NLI factual claim (config/content_types.yaml is the ontology; this list
+  # is the GATE's view of it, and code never re-declares it — C12).
+  content_types_without_factual_claim:
+    - process_template
+    - process_instance
+    - tool_instruction
+    - growth_edge
   # The ONLY pass condition: the factual check passed (NLI ENTAIL-majority AND no
   # mechanism / evidence / classification failure), else QUARANTINE (fail-closed, D2093).
 
@@ -74,6 +95,10 @@ serving_gate:
       passed: false
       negative: false
       meaning: "dedup (D2627): duplicate of a canonical FB — excluded from serving regardless of verification"
+    s5_not_applicable:
+      passed: false
+      negative: false
+      meaning: "D-2942 (D2590): the row's content_type carries NO NLI factual claim (S5 verifies truth claims; a process template's steps or a tool's syntax are not truth claims), so an absent verification record means NOT-APPLICABLE — not undecidable, and NOT verified. QUARANTINE stays the status (the partition 'not served as verified' is unchanged); this reason splits it so the G9/D272d quarantine analysis stays readable and 1,049 procedural rows are never filed as 'claims that failed verification'."
 
   # Ordered detail-prefix rules: first match wins (specific before general).
   # These map stage5's persisted factual `detail` string back to the typed reason.
@@ -119,6 +144,9 @@ rail:
   col_reason: s5_reason
   col_verification: verification_results
   col_duplicate_of: duplicate_of
+  # D-2942 (D2590): the rail must read the SAME row input the writer reads, or the third
+  # disposition would be re-derived from a different object than the one that was stored.
+  col_content_type: content_type
   col_label: epistemic_status
   col_isor: isor
   # SHRINK-ONLY tolerances. MEASURED 2026-09-25 (first run of the rail): 7,995 rows, 0 status mismatch,

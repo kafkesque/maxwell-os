@@ -69,10 +69,28 @@ def negative_reasons(cfg: dict[str, Any] | None = None) -> set[str]:
     }
 
 
+def content_types_without_factual_claim(cfg: dict[str, Any] | None = None) -> frozenset[str]:
+    """D-2942 (D2590): the roles whose content is not an NLI factual claim — S5 is not applicable.
+
+    Read from `config/serving_gate.yaml` (C12); code never re-declares the list. A missing or empty
+    key is a HARD FAILURE rather than a silent empty set, because an empty set would quietly turn the
+    third disposition off and send every procedural row back to UNDECIDABLE (C16).
+    """
+    cfg = cfg or load_config()
+    values = cfg.get("content_types_without_factual_claim")
+    if not values:
+        raise KeyError(
+            "serving_gate.content_types_without_factual_claim is missing or empty: the D-2942 "
+            "disposition cannot be derived, and an empty list would silently disable it (C16)"
+        )
+    return frozenset(str(v) for v in values)
+
+
 def derive_status(
     verification_results: Any,
     cfg: dict[str, Any] | None = None,
     duplicate_of: str | None = None,
+    content_type: str | None = None,
 ) -> tuple[str, str]:
     """Derive `(status, s5_reason)` from the verification record (D274a).
 
@@ -83,12 +101,22 @@ def derive_status(
 
     Hard quarantine (D2627 / D-271d): a duplicate (`duplicate_of` set) is never
     served, even if verification passed — returned as `(QUARANTINE, "duplicate")`.
+
+    D-2942 (D2590) — the THIRD disposition, and the ORDER below IS the rule:
+      1. a dedup marker WINS over everything (a duplicate is never served, D2627);
+      2. a PRESENT record is evaluated on its own terms — a claim is a claim, whatever its role;
+      3. absent record + a role that carries no factual claim -> `(QUARANTINE,
+         not_applicable_reason)`: NOT-APPLICABLE, not undecidable;
+      4. absent record otherwise -> `(QUARANTINE, fallback_reason)`, unchanged.
+    Never PASS in cases 3/4: an unverified row must not be able to read as verified (R5/D2298).
     """
     cfg = cfg or load_config()
     if duplicate_of:
         return cfg["quarantine_status"], cfg["duplicate_reason"]
     factual = factual_check(verification_results)
     if factual is None:
+        if content_type in content_types_without_factual_claim(cfg):
+            return cfg["quarantine_status"], cfg["not_applicable_reason"]
         return cfg["quarantine_status"], cfg["fallback_reason"]
     passed = bool(factual.get("passed"))
     detail = str(factual.get("detail", ""))
@@ -243,18 +271,38 @@ def store_verdict(
     duplicate_of: object = None,
     cfg: dict[str, Any] | None = None,
     neg: set[str] | None = None,
+    content_type: object = None,
 ) -> tuple[str, str]:
     """Compare ONE row against the one D274a rule. Returns (verdict, detail); never guesses.
 
     Fail-closed (C16): a row with no factual check AND no dedup marker is UNDECIDABLE, not a pass --
     an un-evaluable row must not be able to read as verified. An absent status can never match,
     because derive_status always answers with a declared status.
+
+    D-2942 (D2590): for a role that carries NO factual claim, "no record" is DERIVABLE, not
+    undecidable - so the pair is compared EXACTLY (status AND reason) instead of returning
+    UNDECIDABLE. Without this the D2590 non-FB tier could never be written, and with a call-site
+    flag the rail and the writer could disagree: the rule reads the ROW's content_type.
     """
     cfg = cfg or load_config()
     neg = negative_reasons(cfg) if neg is None else neg
     if factual_check(verification_results) is None and not duplicate_of:
+        if content_type in content_types_without_factual_claim(cfg):
+            exp_status, exp_reason = derive_status(None, cfg, content_type=content_type)
+            if str(status or "") != exp_status:
+                return STATUS_MISMATCH, (
+                    f"stored {str(status)!r} but a role with no factual claim derives {exp_status!r}"
+                )
+            if str(reason or "") != exp_reason:
+                return REASON_MISMATCH, (
+                    f"stored reason {str(reason)!r} but a role with no factual claim derives "
+                    f"{exp_reason!r}"
+                )
+            return MATCH, ""
         return UNDECIDABLE, "no factual check in verification_results and no dedup marker"
-    exp_status, exp_reason = derive_status(verification_results, cfg, duplicate_of=duplicate_of)
+    exp_status, exp_reason = derive_status(
+        verification_results, cfg, duplicate_of=duplicate_of, content_type=content_type
+    )
     if str(status or "") != exp_status:
         return STATUS_MISMATCH, f"stored {str(status)!r} but the verification record derives {exp_status!r}"
     if exp_status == cfg["pass_status"]:
@@ -276,6 +324,12 @@ def pre_write_verdict(fb: dict[str, Any], cfg: dict[str, Any] | None = None) -> 
 
     Absent status is NOT repaired here: deriving a value on the commit path would make this stage a
     second writer of status, which is exactly the defect D274h names. The row is refused instead.
+
+    D-2942 (D2590): the refusal is unchanged for every row that CARRIES a factual claim. For a role
+    declared to carry NO factual claim, the disposition (QUARANTINE + `s5_not_applicable`) is the
+    output of `derive_status` — the ONE rule — and stage6 stamps THAT value rather than one it
+    invents. What D274h protects is "no second RULE", not "no second call site", and the comparator
+    below still refuses any pair that does not equal the rule's own output for the row's role.
     """
     cfg = cfg or load_config()
     policy = str(cfg.get("pre_write_enforcement", ""))
@@ -286,7 +340,7 @@ def pre_write_verdict(fb: dict[str, Any], cfg: dict[str, Any] | None = None) -> 
         )
     verdict, detail = store_verdict(
         fb.get("status"), fb.get("s5_reason"), fb.get("verification_results"),
-        fb.get("duplicate_of"), cfg,
+        fb.get("duplicate_of"), cfg, content_type=fb.get("content_type"),
     )
     if verdict == MATCH:
         return True, ""

@@ -112,6 +112,7 @@ def _facet_conditions(
     discipline_raw: str = None,
     domains_raw: str = None,
     practicality: str = None,
+    content_type: str = None,
     alias: str = "",
 ) -> tuple[list[str], list]:
     """D273a/G12: the facet predicate as a SHARED SQL clause, used by EVERY leg.
@@ -148,6 +149,12 @@ def _facet_conditions(
     if practicality:
         conds.append(f"{alias}practicality = ?")
         params.append(practicality)
+    if content_type:
+        # D-2944 (D2590): the ROLE facet. Load-bearing for the non-principle tier, which is
+        # QUARANTINE by design (D-2942): without it a caller cannot ask for "procedures only"
+        # and is forced to ask for "everything that did not pass verification".
+        conds.append(f"{alias}content_type = ?")
+        params.append(content_type)
     return conds, params
 
 
@@ -160,6 +167,7 @@ def _matches_facet(
     discipline_raw: str = None,
     domains_raw: str = None,
     practicality: str = None,
+    content_type: str = None,
 ) -> bool:
     """Post-filter assertion: a candidate matches the facet (mirrors _facet_conditions).
 
@@ -180,6 +188,8 @@ def _matches_facet(
         return False
     if practicality and (fb.get("practicality") or "") != practicality:
         return False
+    if content_type and (fb.get("content_type") or "") != content_type:
+        return False
     return True
 
 
@@ -197,6 +207,7 @@ def search_keyword(
     discipline_raw: str = None,
     domains_raw: str = None,
     practicality: str = None,
+    content_type: str = None,
 ) -> list[dict]:
     """Keyword-based SQL search. Gracefully handles missing optional columns.
 
@@ -227,7 +238,7 @@ def search_keyword(
     # D273a/G12: shared facet predicate (exact discipline / depth, substring domain).
     facet_conds, facet_params = _facet_conditions(
         domain=domain, discipline=discipline, macro=macro, depth=depth,
-        discipline_raw=discipline_raw, domains_raw=domains_raw, practicality=practicality,
+        discipline_raw=discipline_raw, domains_raw=domains_raw, practicality=practicality, content_type=content_type,
     )
     conditions.extend(facet_conds)
     params.extend(facet_params)
@@ -277,7 +288,8 @@ def search_fts(conn: sqlite3.Connection, query: str, limit: int = 20,
              depth: str = None,
              discipline_raw: str = None,
              domains_raw: str = None,
-             practicality: str = None) -> list[dict]:
+             practicality: str = None,
+             content_type: str = None) -> list[dict]:
     """Full-text search on name, definition, keywords. Column-aware.
 
     D273a/G12: accepts the same facet params as the other legs and asserts the
@@ -300,7 +312,7 @@ def search_fts(conn: sqlite3.Connection, query: str, limit: int = 20,
     run_f: str = "AND f.pipeline_run_id = ?" if has_run_id else ""
     facet_conds, facet_params = _facet_conditions(
         domain=domain, discipline=discipline, macro=macro, depth=depth,
-        discipline_raw=discipline_raw, domains_raw=domains_raw, practicality=practicality, alias="f.",
+        discipline_raw=discipline_raw, domains_raw=domains_raw, practicality=practicality, content_type=content_type, alias="f.",
     )
     facet_f: str = "".join(f"AND {c} " for c in facet_conds)
 
@@ -333,7 +345,7 @@ def search_fts(conn: sqlite3.Connection, query: str, limit: int = 20,
         like_class: str = "AND (classification_status IS NULL OR classification_status != 'FAILED')" if has_class_status else ""
         like_facet_conds, like_facet_params = _facet_conditions(
             domain=domain, discipline=discipline, macro=macro, depth=depth,
-            discipline_raw=discipline_raw, domains_raw=domains_raw, practicality=practicality,
+            discipline_raw=discipline_raw, domains_raw=domains_raw, practicality=practicality, content_type=content_type,
         )
         like_facet_f: str = "".join(f"AND {c} " for c in like_facet_conds)
         like_run_f: str = "AND pipeline_run_id = ?" if has_run_id else ""
@@ -368,6 +380,7 @@ def search_vector(
     discipline_raw: str = None,
     domains_raw: str = None,
     practicality: str = None,
+    content_type: str = None,
 ) -> list[dict]:
     """Vector similarity search using pre-computed sqlite-vec embeddings.
 
@@ -406,11 +419,11 @@ def search_vector(
         # D273a/G12: when a facet is present, oversample MORE — the KNN top-k is
         # computed BEFORE the facet/status filters, so a rare facet starves the
         # candidate pool otherwise (same reason the status filter oversamples).
-        has_facet = bool(domain or discipline or macro or depth or discipline_raw or domains_raw or practicality)
+        has_facet = bool(domain or discipline or macro or depth or discipline_raw or domains_raw or practicality or content_type)
         knn_k = max(limit * (15 if has_facet else 5), 200 if has_facet else 100)
         facet_conds, facet_params = _facet_conditions(
             domain=domain, discipline=discipline, macro=macro, depth=depth,
-            discipline_raw=discipline_raw, domains_raw=domains_raw, practicality=practicality, alias="f.",
+            discipline_raw=discipline_raw, domains_raw=domains_raw, practicality=practicality, content_type=content_type, alias="f.",
         )
         facet_f: str = "".join(f"AND {c} " for c in facet_conds)
         run_f: str = "AND f.pipeline_run_id = ?" if has_run_id else ""
@@ -469,6 +482,7 @@ def search_hybrid(
     discipline_raw: str = None,
     domains_raw: str = None,
     practicality: str = None,
+    content_type: str = None,
 ) -> list[dict]:
     """D2176: True hybrid retrieval with Reciprocal Rank Fusion (RRF).
 
@@ -493,12 +507,12 @@ def search_hybrid(
     fts_results: list[dict] = search_fts(
         conn, query, limit=POOL_SIZE, include_quarantine=include_quarantine,
         domain=domain, discipline=discipline, macro=macro, depth=depth,
-        discipline_raw=discipline_raw, domains_raw=domains_raw, practicality=practicality,
+        discipline_raw=discipline_raw, domains_raw=domains_raw, practicality=practicality, content_type=content_type,
     )
     vector_results: list[dict] = search_vector(
         conn, query, limit=POOL_SIZE, include_quarantine=include_quarantine,
         domain=domain, discipline=discipline, macro=macro, depth=depth,
-        discipline_raw=discipline_raw, domains_raw=domains_raw, practicality=practicality,
+        discipline_raw=discipline_raw, domains_raw=domains_raw, practicality=practicality, content_type=content_type,
     )
     # D2511 (BUG — RRF keyword-leg pollution): the "metadata/keyword" leg is only
     # meaningful when the caller actually filters by domain/discipline/depth.
@@ -508,11 +522,11 @@ def search_hybrid(
     # That diluted the real FTS+vector signal and made hybrid WORSE than vector.
     # D273a/G12: it is also now QUERY-AWARE (receives the query text).
     kw_results: list[dict] = []
-    if domain or discipline or macro or depth or discipline_raw or domains_raw or practicality:
+    if domain or discipline or macro or depth or discipline_raw or domains_raw or practicality or content_type:
         kw_results = search_keyword(
             conn, query=query, domain=domain, discipline=discipline, macro=macro, depth=depth, limit=POOL_SIZE,
             include_quarantine=include_quarantine,
-            discipline_raw=discipline_raw, domains_raw=domains_raw, practicality=practicality,
+            discipline_raw=discipline_raw, domains_raw=domains_raw, practicality=practicality, content_type=content_type,
         )
 
     # 2. Build RRF score map: fb_id → cumulative RRF score
@@ -543,11 +557,11 @@ def search_hybrid(
     # 3b. D273a/G12: ASSERT the facet on the FUSED pool (defense-in-depth). Even
     # though every leg now applies the predicate, a post-filter guarantees a
     # violator can never be promoted by RRF fusion or the rerank pool.
-    if domain or discipline or macro or depth or discipline_raw or domains_raw or practicality:
+    if domain or discipline or macro or depth or discipline_raw or domains_raw or practicality or content_type:
         ranked_ids = [
             fid for fid in ranked_ids
             if _matches_facet(fb_map[fid], domain=domain, discipline=discipline, macro=macro, depth=depth,
-                              discipline_raw=discipline_raw, domains_raw=domains_raw, practicality=practicality)
+                              discipline_raw=discipline_raw, domains_raw=domains_raw, practicality=practicality, content_type=content_type)
         ]
 
     # 4. Return top-N with RRF scores attached
@@ -585,6 +599,7 @@ def search(
     discipline_raw: str | None = None,
     domains_raw: str | None = None,
     practicality: str | None = None,
+    content_type: str | None = None,
     method: str | None = None,
 ) -> list[dict]:
     """D-2724: config-driven production retrieval entry point (C21 swappable).
@@ -610,7 +625,7 @@ def search(
         pool = search_vector(
             conn, query, limit=pool_size, include_quarantine=include_quarantine,
             domain=domain, discipline=discipline, macro=macro, depth=depth,
-            discipline_raw=discipline_raw, domains_raw=domains_raw, practicality=practicality,
+            discipline_raw=discipline_raw, domains_raw=domains_raw, practicality=practicality, content_type=content_type,
         )
         if should_rerank:
             try:
@@ -623,7 +638,7 @@ def search(
         return search_hybrid(
             conn, query, domain=domain, discipline=discipline, macro=macro, depth=depth,
             limit=limit, include_quarantine=include_quarantine, rerank=rerank,
-            discipline_raw=discipline_raw, domains_raw=domains_raw, practicality=practicality,
+            discipline_raw=discipline_raw, domains_raw=domains_raw, practicality=practicality, content_type=content_type,
         )
     raise ValueError(f"unknown retrieval method {m!r} (C16)")
 
@@ -858,6 +873,7 @@ def graph_aware_search(
     discipline: str | None = None,
     macro: str | None = None,
     depth: str | None = None,
+    content_type: str | None = None,
 ) -> list[dict]:
     """D2205 P1: Hybrid search + graph expansion pipeline.
 
@@ -893,6 +909,7 @@ def graph_aware_search(
         discipline=discipline,
         macro=macro,
         depth=depth,
+        content_type=content_type,  # D-2944: the seed leg must assert it too
     )
 
     if not seeds:
@@ -1012,6 +1029,7 @@ def agentic_search(
     discipline: str | None = None,
     macro: str | None = None,
     depth: str | None = None,
+    content_type: str | None = None,
     graph_aware: bool = True,
 ) -> EvidencePack:
     """D2205 P0: Agentic retrieval with structured critique and iteration budget.
@@ -1068,6 +1086,7 @@ def agentic_search(
                 discipline=discipline,
                 macro=macro,
                 depth=depth,
+                content_type=content_type,
             )
         else:
             results = search(
@@ -1077,6 +1096,7 @@ def agentic_search(
                 discipline=discipline,
                 macro=macro,
                 depth=depth,
+                content_type=content_type,
             )
 
         # Track FBs across iterations (dedup by fb_id)
@@ -1165,6 +1185,14 @@ def _macro_choices() -> list[str]:
     return sorted(buckets.keys())
 
 
+def _content_type_choices() -> list[str]:
+    """D-2944: the CLI's role choices, read from the content-type ontology (C12) - the
+    request-side list must never be a hand-typed copy of the store-side enum."""
+    from pipeline.content_types import CONTENT_TYPES
+
+    return sorted(CONTENT_TYPES)
+
+
 def _practicality_choices() -> list[str]:
     """BUG-702: S5 practical-applicability vocabulary, from C12 config (no hardcode)."""
     from pipeline.practicality import _load_config
@@ -1197,6 +1225,11 @@ def main():
     parser.add_argument("--domains-raw", help="D2537: filter by raw domain label (surgical facet)")
     parser.add_argument("--practicality", choices=_practicality_choices(),
                         help="BUG-702: filter by S5 practical-applicability (immediately-applicable/context-dependent)")
+    parser.add_argument("--content-type", choices=_content_type_choices(),
+                        help="D-2944: filter by content ROLE (principle/process_template/"
+                             "process_instance/tool_instruction/growth_edge). The non-principle "
+                             "roles are QUARANTINE by design (D-2942), so pair it with e.g. "
+                             "--status QUARANTINE to reach them.")
     parser.add_argument("--status", default="PASS", help="Filter by status (default: PASS)")
     parser.add_argument("--limit", "-n", type=int, default=10, help="Max results")
     parser.add_argument("--json", action="store_true", help="JSON output")
@@ -1251,6 +1284,7 @@ def main():
             discipline=args.discipline,
             macro=args.macro,
             depth=args.depth,
+            content_type=args.content_type,
             graph_aware=True,
         )
         results = evidence_pack.fbs
@@ -1269,8 +1303,9 @@ def main():
             discipline=args.discipline,
             macro=args.macro,
             depth=args.depth,
+            content_type=args.content_type,
         )
-    elif args.keyword or (args.domain or args.discipline or args.macro or args.depth or args.discipline_raw or args.domains_raw or args.practicality):
+    elif args.keyword or (args.domain or args.discipline or args.macro or args.depth or args.discipline_raw or args.domains_raw or args.practicality or args.content_type):
         results = search_keyword(
             conn,
             domain=args.domain,
@@ -1282,6 +1317,7 @@ def main():
             discipline_raw=args.discipline_raw,
             domains_raw=args.domains_raw,
             practicality=args.practicality,
+            content_type=args.content_type,
         )
     elif args.fts:
         results = search_fts(conn, args.fts, limit=args.limit, macro=args.macro)
@@ -1298,6 +1334,7 @@ def main():
             discipline_raw=args.discipline_raw,
             domains_raw=args.domains_raw,
             practicality=args.practicality,
+            content_type=args.content_type,
         )
     elif args.query:
         # Default: hybrid search

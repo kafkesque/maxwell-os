@@ -140,7 +140,7 @@ def evaluate_label(
 
 
 def read_rows(rail: dict[str, Any]) -> tuple[list[tuple[Any, ...]], list[str]]:
-    """Read (status, reason, verification, duplicate_of, label, isor) from the declared DB READ-ONLY.
+    """Read (status, reason, verification, duplicate_of, label, isor, content_type) READ-ONLY.
 
     Returns (rows, schema_notes). Raises SystemExit when a declared column does not exist - a declared
     column that is absent means this rail is checking a different table than the one it claims.
@@ -153,7 +153,8 @@ def read_rows(rail: dict[str, Any]) -> tuple[list[tuple[Any, ...]], list[str]]:
     conn = sqlite3.connect(f"file:{db}?mode=ro", uri=True)
     try:
         present = {r[1] for r in conn.execute(f"PRAGMA table_info({table})")}
-        keys = ("col_status", "col_reason", "col_verification", "col_duplicate_of", "col_label", "col_isor")
+        keys = ("col_status", "col_reason", "col_verification", "col_duplicate_of", "col_label",
+                "col_isor", "col_content_type")
         cols = [str(rail[k]) for k in keys]
         missing = [c for c in cols if c not in present]
         if missing:
@@ -175,15 +176,24 @@ def selftest(cfg: dict[str, Any], neg: set[str], lab_cfg: dict[str, Any]) -> int
     bad_nli = '[{"check_name": "factual", "passed": false, "detail": "CONTRA 3/3"}]'
     no_factual = '[{"check_name": "mechanism", "passed": true, "detail": "ok"}]'
     controls = [
-        ("a verified row stored as PASS is a MATCH", (PASS, "entail", good, None), MATCH),
-        ("PASS with factual.passed False is a STATUS_MISMATCH", (PASS, "entail", bad_nli, None), STATUS_MISMATCH),
-        ("PASS carrying the negative reason contra is a REASON_MISMATCH", (PASS, "contra", good, None), REASON_MISMATCH),
-        ("a verified row stored as QUARANTINE is a STATUS_MISMATCH", ("QUARANTINE", "neutral", good, None), STATUS_MISMATCH),
-        ("no factual check at all is UNDECIDABLE, never a pass", (PASS, "entail", no_factual, None), UNDECIDABLE),
+        ("a verified row stored as PASS is a MATCH", (PASS, "entail", good, None, None), MATCH),
+        ("PASS with factual.passed False is a STATUS_MISMATCH", (PASS, "entail", bad_nli, None, None), STATUS_MISMATCH),
+        ("PASS carrying the negative reason contra is a REASON_MISMATCH", (PASS, "contra", good, None, None), REASON_MISMATCH),
+        ("a verified row stored as QUARANTINE is a STATUS_MISMATCH", ("QUARANTINE", "neutral", good, None, None), STATUS_MISMATCH),
+        ("no factual check at all is UNDECIDABLE, never a pass", (PASS, "entail", no_factual, None, None), UNDECIDABLE),
+        # D-2942 (D2590) known-answer controls: a disposition nobody has watched fire is a comment.
+        ("a principle with NO record is still UNDECIDABLE (the scoping control)",
+         (PASS, "entail", no_factual, None, "principle"), UNDECIDABLE),
+        ("a role with no factual claim + no record derives not-applicable, NOT undecidable",
+         ("QUARANTINE", "s5_not_applicable", no_factual, None, "process_template"), MATCH),
+        ("the same role stored with the WRONG reason is a REASON_MISMATCH",
+         ("QUARANTINE", "unknown", no_factual, None, "tool_instruction"), REASON_MISMATCH),
+        ("a role with no factual claim can NEVER be stored as PASS",
+         (PASS, "entail", no_factual, None, "growth_edge"), STATUS_MISMATCH),
     ]
     failed = 0
     for name, row, want in controls:
-        got, detail = evaluate_row(row[0], row[1], row[2], row[3], cfg, neg)
+        got, detail = evaluate_row(row[0], row[1], row[2], row[3], cfg, neg, content_type=row[4])
         if got != want:
             failed += 1
             print(f"FAIL check-serving-gate --selftest: {name} -> {got} ({detail}); expected {want}")
@@ -232,8 +242,8 @@ def main() -> int:
     xtab: collections.Counter[tuple[str, str]] = collections.Counter()
     samples: dict[str, list[str]] = collections.defaultdict(list)
     label_samples: list[str] = []
-    for status, reason, vr, dup, label, isor in rows:
-        verdict, detail = evaluate_row(status, reason, vr, dup, cfg, neg)
+    for status, reason, vr, dup, label, isor, content_type in rows:
+        verdict, detail = evaluate_row(status, reason, vr, dup, cfg, neg, content_type=content_type)
         tally[verdict] += 1
         xtab[(str(label or ""), str(status or ""))] += 1
         if verdict != MATCH and len(samples[verdict]) < 3:

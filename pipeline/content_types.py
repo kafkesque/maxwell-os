@@ -66,6 +66,35 @@ CONTENT_TYPE_DISPOSITIONS: frozenset[str] = frozenset(
 )
 CONTENT_TYPES_ALL: frozenset[str] = CONTENT_TYPES | CONTENT_TYPE_DISPOSITIONS
 
+# ── ROLE-SPECIFIC BODY (D2590 / D-2943) ───────────────────────────────────
+# `s2_body_fields` declares, per role, the fields S2 emits BEYOND the shared core body. `core_body`
+# is the set whose home is a first-class `fbs` column, so a role's `type_body` is s2_body_fields
+# MINUS core_body: the column IS the home of a core field, and a JSON copy of it would be a SECOND
+# source of truth (drift + bloat, C12/C19). Measured against the rechunk-v4 sidecars (2026-10-12):
+#   process_template {trigger, prerequisite, steps, done_condition}          (failure_mode is core)
+#   process_instance {instance_text, actors, outcome_metric, outcome_qualitative, domain_context}
+#   tool_instruction {tool_name, platform, description, syntax, parameters, output, example, caveats}
+#   growth_edge      {body, category, actionable, status, priority}
+# NOTE growth_edge.status is the epistemic state of the TENSION (open|speculative|conceptual) and is
+# NOT the governed verification `status` column (S5-owned, D-2933): it survives namespaced inside
+# type_body, and the S6 commit path never writes an S5-owned column from a sidecar row.
+_S2_BODY_FIELDS: dict[str, tuple[str, ...]] = {
+    str(_k): tuple(str(_f) for _f in (_v or [])) for _k, _v in dict(_CT.get("s2_body_fields", {})).items()
+}
+CORE_BODY: frozenset[str] = frozenset(str(_f) for _f in (_CT.get("core_body") or []))
+
+
+def type_body_fields(content_type: str | None) -> tuple[str, ...]:
+    """The role-specific body fields for `content_type` (D-2943); () when the role has none.
+
+    Spec: a role's `type_body` holds exactly these fields, and only those PRESENT on the record. An
+    undeclared role returns () — the caller decides whether that is acceptable, and S6 refuses to
+    invent a body for a role the ontology does not declare (C12/C16).
+    """
+    if not content_type:
+        return ()
+    return tuple(_f for _f in _S2_BODY_FIELDS.get(str(content_type), ()) if _f not in CORE_BODY)
+
 # ── D2323 — vestigial content_type values, never used ─────────────────────
 DROPPED_CONTENT_TYPES: frozenset[str] = frozenset(
     _CT.get("dropped_content_types", [])

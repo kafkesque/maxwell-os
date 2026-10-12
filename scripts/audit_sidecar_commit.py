@@ -85,6 +85,42 @@ def _count_lines(path: Path) -> tuple[int, Counter]:
     return total, by_type
 
 
+def _declared_residuals(
+    sidecars: dict[str, tuple[int, Counter]], sidecar_keys: dict[str, str]
+) -> dict:
+    """Rows that are correctly NOT committed, NAMED (D2590 disclosure half).
+
+    After the D2590 build the ingestable set is committed, so the remaining uncommitted records must
+    be attributable one by one or the rail is silent about them:
+
+      * NOT A COMMIT ROLE — the row's OWN content_type is not a role the non-principle tier may
+        commit (measured 2026-10-12: 196 `principle`-typed rows sitting in the growth_edge/process
+        template sidecars). Excluded by the row's own content_type, and NOT a routing bug: these are
+        classification drift, the BUG-712/BUG-719 family, repaired by their own item.
+      * QUARANTINE SHELF — the D2616 hold shelf is never a commit source: a shelf is a decision to
+        WAIT, not a queue to drain.
+    """
+    commit_roles = {"process_template", "process_instance", "tool_instruction", "growth_edge"}
+    not_a_role: Counter = Counter()
+    for _name, (_total, by_type) in sidecars.items():
+        if _name == "quarantine":
+            continue
+        for content_type, n in by_type.items():
+            if content_type not in commit_roles and content_type != "<none>":
+                not_a_role[content_type] += n
+    shelf = sidecars.get("quarantine", (0, Counter()))[0]
+    return {
+        "not_a_commit_role_rows": sum(not_a_role.values()),
+        "not_a_commit_role_by_content_type": dict(not_a_role.most_common()),
+        "not_a_commit_role_reason": (
+            "the row's own content_type is not a non-principle role — classification drift "
+            "(BUG-712/BUG-719 family), repaired by its own item, never by routing"
+        ),
+        "quarantine_shelf_rows": shelf,
+        "quarantine_shelf_reason": "D2616 hold shelf: a decision to WAIT, never a commit source",
+    }
+
+
 def _db_counts(run: str) -> Counter:
     """Committed rows for a run, grouped by content_type."""
     conn = get_conn()
@@ -146,6 +182,10 @@ def main() -> int:
         "uncommitted_types": {
             k: v for k, v in s2_types.items() if k != "principle" and v > 0 and db_types.get(k, 0) == 0
         },
+        # D2590/D-2942: the records this rail can NEVER see committed, declared so that "not
+        # committed" is always attributable. Without this the rail is silent about exactly the
+        # rows a reader would otherwise assume were handled.
+        "declared_residuals": _declared_residuals(sidecars, sidecar_keys),
     }
 
     if args.json:
@@ -162,6 +202,10 @@ def main() -> int:
         print(f"  committed in SQLite     : {db_total}")
         print(f"  unexplained drop        : {unexplained}")
         print(f"  committed by type       : {dict(db_types.most_common())}")
+        res = report["declared_residuals"]
+        print(f"  declared residuals      : {res['not_a_commit_role_rows']} row(s) whose own content_type "
+              f"is not a commit role {res['not_a_commit_role_by_content_type']}; "
+              f"{res['quarantine_shelf_rows']} on the D2616 hold shelf")
         if report["uncommitted_types"]:
             print("\n  🚩 DECLARED TYPES EXTRACTED BUT NEVER COMMITTED (D2590 scoped-S6 build pending):")
             for k, v in report["uncommitted_types"].items():

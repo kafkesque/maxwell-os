@@ -31,6 +31,7 @@ Usage:
 """
 
 import ast
+import importlib.util
 import re
 import sqlite3
 import sys
@@ -183,6 +184,39 @@ STDLIB_MODULES = {
     "tomllib", "tomli", "zipfile", "tarfile", "gzip", "bz2", "lzma",
     "__future__",  # stdlib: used for annotations
 }
+# BUG-739 (CLOSED 2026-10-12): STDLIB_MODULES is a SUPPLEMENT, never the primary source. It used to be the ONLY
+# source, and a hand list is a claim about a platform this code is not running on: MEASURED on this host, 'difflib',
+# 'ctypes' and the C accelerator '_sqlite3' are stdlib, are importable, and ARE present in sys.stdlib_module_names
+# (300 names) - but were ABSENT here, so C11 reported them as undeclared and the rail was PERMANENTLY RED. A rail
+# that is red for reasons no commit caused is a rail committers learn to bypass (BUG-540), and that is measured
+# here, not assumed: the C11 line of the pre-commit hook was red on EVERY commit. The interpreter's own answer
+# cannot drift from the interpreter (D-2646: one home for one fact).
+
+
+def _stdlib_names() -> frozenset[str]:
+    """The INTERPRETER's answer to "what ships with Python", plus the declared supplement (BUG-739)."""
+    declared = frozenset(sys.stdlib_module_names) if hasattr(sys, "stdlib_module_names") else frozenset()
+    return declared | frozenset(getattr(sys, "builtin_module_names", ())) | frozenset(STDLIB_MODULES)
+
+
+def _resolves_to_stdlib(mod: str) -> bool:
+    """True if mod RESOLVES on this interpreter to something OUTSIDE site-packages (last resort, C16).
+
+    sys.stdlib_module_names is the interpreter's DECLARATION; this is the MEASUREMENT for what it does not cover
+    (a build hiding a private accelerator, or a Python older than 3.10 where the attribute is absent). It can only
+    ACCEPT a name whose resolved origin is outside site-packages/dist-packages, so it can never turn a missing
+    third-party dependency green; mod is always a TOP-LEVEL name (callers split on '.'), so no package __init__
+    is executed as a side effect of the check itself.
+    """
+    try:
+        spec = importlib.util.find_spec(mod)
+    except (ImportError, ValueError, AttributeError, TypeError):
+        return False
+    origin = str(getattr(spec, "origin", "") or "")
+    return bool(origin) and "site-packages" not in origin and "dist-packages" not in origin
+
+
+_STDLIB_NAMES = _stdlib_names()
 KNOWN_PACKAGES = {
     "pydantic", "yaml", "pyyaml", "pyarrow", "requests", "numpy",
     "sklearn", "scikit-learn", "faiss", "faiss-cpu", "sentence_transformers",
@@ -230,7 +264,8 @@ def check_import_dependencies() -> tuple[bool, str]:
 
 
 def _check_module(mod: str, filename: str, issues: list[str]) -> None:
-    if mod in STDLIB_MODULES or mod in LOCAL_MODULES or mod in KNOWN_PACKAGES:
+    """Classify ONE imported module name; the stdlib test is the INTERPRETER's, not a hand list (BUG-739)."""
+    if mod in _STDLIB_NAMES or mod in LOCAL_MODULES or mod in KNOWN_PACKAGES or _resolves_to_stdlib(mod):
         return
     issues.append(f"  {filename}: imports `{mod}` — not in stdlib, local, or known deps")
 
@@ -778,6 +813,37 @@ def check_canonical_promotion() -> tuple[bool, str]:
 # ═══════════════════════════════════════════════════════════════════════════
 # MAIN
 # ═══════════════════════════════════════════════════════════════════════════
+def selftest() -> int:
+    """Known-answer controls for this rail's own classifications (BUG-739/BUG-492).
+
+    The dangerous failure mode of a classifier rail is SILENTLY ACCEPTING EVERYTHING - it looks green and
+    protects nothing - so every control below asserts BOTH directions: an undeclared third-party name MUST
+    still be flagged, and the stdlib names this rail once misread MUST NOT be. A control nothing runs is a
+    comment (BUG-492), which is why this is wired into `just health`.
+    """
+    checks: list[tuple[str, bool]] = []
+
+    def flagged(mod: str) -> bool:
+        issues: list[str] = []
+        _check_module(mod, "selftest.py", issues)
+        return bool(issues)
+
+    checks.append(("an UNDECLARED third-party import is STILL flagged (the rail still fires)",
+                   flagged("totally_undeclared_pkg_xyz")))
+    checks.append(("difflib (the BUG-739 false positive) is NOT flagged", not flagged("difflib")))
+    checks.append(("the C accelerator _sqlite3 is NOT flagged", not flagged("_sqlite3")))
+    checks.append(("a DECLARED package is NOT flagged", not flagged("numpy")))
+    checks.append(("the stdlib set comes from the INTERPRETER, not a hand list",
+                   {"difflib", "ctypes", "_sqlite3"} <= set(_STDLIB_NAMES)))
+    checks.append(("a site-packages resolution is NOT read as stdlib",
+                   _resolves_to_stdlib("totally_undeclared_pkg_xyz") is False))
+    bad = [name for name, ok in checks if not ok]
+    for name, ok in checks:
+        print(("  ok   " if ok else "  FAIL ") + name)
+    print("selftest: " + str(len(checks) - len(bad)) + "/" + str(len(checks)) + " controls held")
+    return 1 if bad else 0
+
+
 CHECKS = [
     (1, "YAML parse", check_yaml_parse),
     (2, "Referenced files exist", check_referenced_files),
@@ -805,7 +871,10 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Maxwell OS Integrity Check (D2203)")
     parser.add_argument("--quick", action="store_true", help="Fast checks only")
     parser.add_argument("--check", type=int, help="Single check number")
+    parser.add_argument("--selftest", action="store_true", help="known-answer controls for this rail's classifications (BUG-492)")
     args = parser.parse_args()
+    if args.selftest:
+        return selftest()
 
     print(f"\n{BOLD}Maxwell OS — System Integrity Check (D2203){RESET}\n")
 

@@ -50,10 +50,14 @@ layers:
   - name: c11_c12
     why: >-
       C11 imports subset of requirements+stdlib+local and C12 no hardcoded absolute path;
-      scripts/pre_commit_gate.py is the ONE implementation. NON-FATAL ON PURPOSE: the rail is REPO-WIDE, so a
-      pre-existing red (BUG-739: it misreads difflib/ctypes/_sqlite3 as undeclared) would fail every per-file
-      review for a defect the reviewed file did not cause - and a loud rail nobody can satisfy is not a rail
-      (BUG-540). The status is printed and recorded in the receipt either way, so it can never be silently green.
+      scripts/pre_commit_gate.py is the ONE implementation. NON-FATAL BY DESIGN - now STRUCTURAL rather than
+      temporary: the layer is REPO-WIDE, so a per-file review must not be able to FAIL for a defect the reviewed
+      file did not cause (D-2962's own rule, and the fate this gate was written to avoid). The TEMPORARY reason is
+      RETIRED: BUG-739 (it misread difflib/ctypes/_sqlite3 as undeclared) is CLOSED 2026-10-12 - the stdlib set is
+      now the INTERPRETER's own answer (sys.stdlib_module_names) with a declared supplement and a
+      site-packages-aware measurement fallback - and this layer measured GREEN in that commit. It stays
+      non-optional, and its status is printed AND recorded in the receipt either way, so it can never be silently
+      green (BUG-540).
     applies: ["*"]
     argv: ["python3", "scripts/pre_commit_gate.py"]
     fatal: false

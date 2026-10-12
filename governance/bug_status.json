@@ -3,8 +3,8 @@
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
   "total_ids": 507,
-  "open_n": 184,
-  "closed_n": 323,
+  "open_n": 183,
+  "closed_n": 324,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -914,11 +914,6 @@
       "events": 2
     },
     {
-      "id": "BUG-739",
-      "title": "(LOW - OPEN 2026-10-12) - the C11 rail is PERMANENTLY RED: it calls 3 stdlib modules undeclared imports, so every control that trusts it mus",
-      "events": 1
-    },
-    {
       "id": "BUG-741",
       "title": "(MED - OPEN 2026-10-12) - the adjudication map's `proposed` field CONFLATES two vocabularies, so one owner adjudication is not expressible a",
       "events": 2
@@ -1251,6 +1246,7 @@
     "BUG-732",
     "BUG-733",
     "BUG-734",
+    "BUG-739",
     "BUG-740",
     "BUG-742"
   ]

@@ -22159,3 +22159,50 @@ decisions:
   - scripts/definition_nli_verify.py
   - config/recalibration_pins.yaml
   - governance/buglog.md
+- id: D-2964
+  state: RATIFIED
+  category: GOVERNANCE / ONTOLOGY / STORE WRITE
+  date: '2026-10-12'
+  title: 'the re-stamp rule (owner-ratified): below the declared bench floor only an OWNER WARRANT may move a store
+    label, a human-ruled label carries the DECLARED human_verbatim rather than a new vocabulary value, and every
+    refusal is NAMED in a generated receipt'
+  decision: 'Owner-ratified 2026-10-12 on the BUG-712 re-stamp, and generalised deliberately - it governs every
+    future bulk label write, not this one batch. (1) A PREDICTION MAY NOT MOVE A LABEL BELOW THE DECLARED BENCH
+    FLOOR. The calibrated router would move 14 rows; 12 carry an owner warrant and 2 (BUG-735) are the strict form
+    own survivors, 50 percent precise at n=2. Writing a coin-flip into the store is the exact defect the calibration
+    exists to prevent, so the write set is (the owner warrant map) JOIN (the live PRE-STATE) and a router-only move
+    can never enter it BY CONSTRUCTION rather than by a filter someone must remember to apply. This is D-2956 (a
+    survey is not a measurement) applied at the WRITE boundary. (2) THE AUTHORSHIP OF A HUMAN-RULED LABEL IS A DECLARED
+    VALUE, NOT A NEW ONE. content_type_source is stamped human_verbatim - a member of the CLOSED C29 vocabulary
+    (pipeline/schemas.py#PROVENANCE_LITERAL, a Pydantic Literal: an undeclared value is a ValidationError) and the
+    value the F-44 min_human_share floor counts. An owner_adjudication value was WITHDRAWN under this ratification:
+    a closed vocabulary must not grow to say what it already says (a human chose the label). Leaving llm_extracted_from_source
+    would have been TRUE of the old label and FALSE of the new - the BUG-725 class inverted. (3) EVERY REFUSAL IS
+    NAMED, NEVER FILTERED. STALE (the live label no longer equals the map pre-state - a warrant that outlived its
+    pre-state grants nothing), DISPOSITION (noise_drop/quarantine are dispositions, not content types - BUG-741),
+    UNKNOWN (a destination the vocabulary does not declare): each refused id is written to the generated receipt,
+    so no row disappears silently (C16). (4) THE GATE IS OWNER-GATED BY CONSTRUCTION: --apply refuses while the
+    authorship value is the sentinel, so the write cannot happen by inattention. (5) THE STORE RULER IS RE-RECORDED,
+    NOT SILENCED: a moved distinct is MEASUREMENT-DRIFT (fatal) until --record re-measures it (D-2642), and no debt-ceiling
+    raise was taken. (6) THE MEASUREMENT IS RE-DERIVED AT THE MOMENT OF THE ACT: of the warrant map 546 rows only
+    19 resolve to the live store (527 are rows this store no longer carries) - a map REPLAY would have reported
+    546 applied while moving 11 cells, which is why the receipt carries the four buckets separately.'
+  measured: 'APPLIED (owner-ratified): 11 cells + provenance, C13-backed, ONE BEGIN IMMEDIATE, every cell re-read.
+    principle 6,577 -> 6,587 | process_instance 156 -> 157 | tool_instruction 108 -> 97 | growth_edge 25 and process_template
+    774 unchanged. content_type_source llm_extracted_from_source 6,591 -> 6,581 | deterministic 1,049 -> 1,048 |
+    human_verbatim 0 -> 11. Idempotent re-run: apply 0 | already 18 | refused 1. Join: 546 map rows -> 19 resolve
+    | 7 already | 0 stale | 11 apply | 1 refused disposition | 0 unknown. Route: content_type_source.distinct 2
+    -> 3 recorded by --record; ceiling.debt 8 unchanged; the rail remaining RED names neither content_type nor content_type_source
+    (pre-existing BUG-737/733 population-shape faults). Independent cross-family check for the exact D-2962 dependency
+    rule: gemma-4-E4B-it-MLX-4bit ruled the 11 bodies with their own text as the only input.'
+  bugs:
+  - BUG-712
+  - BUG-735
+  - BUG-741
+  - BUG-742
+  files:
+  - config/content_type_restamp.yaml
+  - scripts/restamp_content_type_adjudications.py
+  - governance/evidence/content_type_restamp_receipt.json
+  - governance/buglog.md
+  - config/store_columns.yaml

@@ -44,12 +44,16 @@ label_column: content_type
 provenance_column: content_type_source
 pre_state_required: true   # a row whose live label no longer equals the map's `current` is STALE: refuse it
 
-# THE AUTHORSHIP OF AN OWNER-ADJUDICATED LABEL IS AN OWNER RULING (BUG-742), so --apply REFUSES while this is a
-# sentinel. Today the column's two live values are llm_extracted_from_source (6,591) and deterministic (1,049);
-# neither is TRUE for a label a human ruled. Writing the label and leaving the source alone would be a provenance
-# LIE (the BUG-725 class, inverted), and inventing a third value without declaring it is a writer without a
-# declaration (BUG-562). The owner names the value; this gate is owner-gated BY CONSTRUCTION, not by intention.
-provenance_value: OWNER_RULING_OWED
+# THE AUTHORSHIP OF AN OWNER-ADJUDICATED LABEL (BUG-742). The owner's ruling is in, and it needs NO new vocabulary:
+# the TIER-SOURCE value for a label a HUMAN ruled is `human_verbatim` - already a member of the CLOSED C29
+# vocabulary (pipeline/schemas.py#PROVENANCE_LITERAL: human_verbatim | llm_extracted_from_source | llm_hypothesis
+# | deterministic) and the value the F-44 `min_human_share` floor exists to count. MEASURED: the 11 rows carry
+# llm_extracted_from_source today - TRUE of the label they hold, FALSE of the one the owner ruled - so writing the
+# label and leaving the column alone would be a provenance LIE (the BUG-725 class, inverted), while minting a FIFTH
+# value (e.g. owner_adjudication) would grow a CLOSED vocabulary to say what it already says: a human chose this
+# label. The schema REJECTS an undeclared value (ValidationError), so this is not a preference - it is the only
+# value that is both TRUE and DECLARED. --apply refuses -- while this is the sentinel.
+provenance_value: human_verbatim
 
 # EVIDENCE - the receipt is generated, never hand-written, and names every REFUSED id (C16: no silent skip).
 # NB: the receipt lives under governance/evidence/ (an already-declared may_touch family) so the evidence a

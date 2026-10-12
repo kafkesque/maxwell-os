@@ -185,12 +185,12 @@ measured:
     content_type:
       distinct: 5
       hollow: 0
-      mentions: 121
+      mentions: 122
       nonblank: 7640
       nonnull: 7640
       rows: 7640
     content_type_source:
-      distinct: 2
+      distinct: 3
       hollow: 0
       mentions: 13
       nonblank: 7640
@@ -199,7 +199,7 @@ measured:
     context:
       distinct: 13
       hollow: 0
-      mentions: 73
+      mentions: 74
       nonblank: 6591
       nonnull: 7640
       rows: 7640
@@ -304,7 +304,7 @@ measured:
     evidence:
       distinct: 2
       hollow: 0
-      mentions: 113
+      mentions: 114
       nonblank: 7640
       nonnull: 7640
       rows: 7640
@@ -346,7 +346,7 @@ measured:
     fb_id:
       distinct: 7640
       hollow: 0
-      mentions: 187
+      mentions: 188
       nonblank: 7640
       nonnull: 7640
       rows: 7640
@@ -444,7 +444,7 @@ measured:
     name:
       distinct: 7637
       hollow: 0
-      mentions: 343
+      mentions: 345
       nonblank: 7640
       nonnull: 7640
       rows: 7640
@@ -507,7 +507,7 @@ measured:
     provenance:
       distinct: 1
       hollow: 0
-      mentions: 113
+      mentions: 114
       nonblank: 7640
       nonnull: 7640
       rows: 7640
@@ -528,7 +528,7 @@ measured:
     schema_version:
       distinct: 1
       hollow: 0
-      mentions: 107
+      mentions: 108
       nonblank: 7640
       nonnull: 7640
       rows: 7640
@@ -591,7 +591,7 @@ measured:
     status:
       distinct: 2
       hollow: 0
-      mentions: 125
+      mentions: 126
       nonblank: 7640
       nonnull: 7640
       rows: 7640

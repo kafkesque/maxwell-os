@@ -11578,3 +11578,58 @@ not semantics. CLOSED.
 ## BUG-742 (MED - OPEN 2026-10-12) - the AUTHORSHIP of an owner-adjudicated label is undeclared, so writing the label without it would be a provenance lie
 
 **MEASURED.** content_type_source carries exactly TWO values live: llm_extracted_from_source (6,591) and deterministic (1,049). The 11 rows the BUG-712 gate would write are stamped llm_extracted_from_source today - TRUE of the label they hold, FALSE of the label the owner ruled. Writing the new label and leaving the column alone is the BUG-725 class INVERTED (a stamp describing a label the row no longer carries); inventing a third value inside the writer without declaring it in a declaration home is BUG-562 (a writer without its declaration). **The gate therefore REFUSES --apply while config/content_type_restamp.yaml#provenance_value is the sentinel OWNER_RULING_OWED.** **Fix (one owner line):** name the value (recommended `owner_adjudication`), declare it in the same change (the column's role/population declaration; note config/label_provenance.yaml#states declares the traceability STATES and the C29 authorship vocabulary is human_verbatim | llm_extracted_from_source | llm_hypothesis - neither tier-source value is one of them), after which the 11-cell write is a one-command act.
+
+## BUG-712 (OPEN - MED) - UPDATE 2026-10-12 (owner-ratified, D-2964): the 11 CELLS ARE WRITTEN and the residual is 3 rows, each with a NAMED reason
+
+**APPLIED (owner-ratified 2026-10-12).** `scripts/restamp_content_type_adjudications.py --apply` wrote 11 cells + their tier source, after a C13 backup (`knowledge pipeline/backups/maxwell.db.pre_restamp_20261012_204417`), inside ONE BEGIN IMMEDIATE, and RE-READ every cell - all took. MEASURED BEFORE -> AFTER: principle 6,577 -> **6,587**; process_instance 156 -> **157**; tool_instruction 108 -> **97**; growth_edge 25 and process_template 774 unchanged; content_type_source llm_extracted_from_source 6,591 -> **6,581** | deterministic 1,049 -> **1,048** | **human_verbatim 0 -> 11**. A re-run is IDEMPOTENT (apply 0 | already 18 | refused 1).
+
+**THE AUTHORSHIP IS A DECLARED VALUE, NOT A NEW ONE (BUG-742 now CLOSED).** The tier source written is `human_verbatim` - already a member of the CLOSED C29 vocabulary (`pipeline/schemas.py#PROVENANCE_LITERAL` = human_verbatim | llm_extracted_from_source | llm_hypothesis | deterministic; a Pydantic Literal, so an undeclared value is a ValidationError, not a style choice) and the value the F-44 min_human_share floor exists to count. An `owner_adjudication` value was WITHDRAWN under the owner's own ratification: a human chose these labels, and the vocabulary already says exactly that. Leaving llm_extracted_from_source would have been TRUE of the label the row held and FALSE of the one it now carries - the BUG-725 class, inverted.
+
+**THE STORE RULER MOVED AND WAS RE-RECORDED, NOT SILENCED.** content_type_source.distinct 2 -> 3 is MEASUREMENT-DRIFT (fatal) until `check_store_columns.py --record` re-measured the tail (D-2642: measured is written ONLY by --record; ceiling.debt stays 8 - no raise was taken). Post-record: census moves 0. The rail's remaining RED (2 POPULATION-SHAPE faults on practicality / verification_method - the BUG-737/BUG-733 blank-vs-NULL population class) is PRE-EXISTING and names NEITHER content_type nor content_type_source (verified by grepping the fault list, not assumed).
+
+**INDEPENDENT CROSS-FAMILY CHECK (R5: generator != verifier).** The 11 bodies were handed to `gemma-4-E4B-it-MLX-4bit` - a NON-Qwen-lineage reviewer - with only their own text and the instruction to rule CONCEPT/PATTERN/ALGORITHM vs executable TOOL COMMAND, strictly. Result:
+
+```
+tatus:** ✓ Completed
+**Duration:** 50s (2 turns)
+
+## Output
+
+The analysis of the 11 records from `/tmp/bug712_rows.json` is complete.
+
+Here is the breakdown as requested:
+
+72135575d960 | concept | A pattern for implementing a distributed task queue using Redis streams, where tasks are published to a stream and consumed by workers.
+4a8fc79549b4 | concept | A method for recommending jobs based on user profile similarity to job requirements using set similarity calculations across skills, interests, and values.
+59fea71c8b1e | concept | A Flask web framework pattern using MethodView to organize API endpoints with clean separation of HTTP method handlers and reusable logic.
+54ef1892c6d8 | concept | A structural design pattern that allows square pegs to fit into round holes by adapting the square peg's dimensions to appear as a round peg with a specific radius.
+58e1f99e61ff | concept | A method for determining the minimum z-value of a triangle's vertices to establish drawing order in 3D graphics rendering.
+104f38cd9840 | concept | A database query pattern for identifying protein-disease associations by matching proteins to diseases through their hierarchical relationships and score thresholds.
+41579acf3900 | concept | A Python pattern for retrieving MongoDB documents using a class method that queries by filter options and returns a deserialized instance or None.
+ccbaae58f8f7 | concept | Declare a React UI component as a function returning JSX, manage its local state with the useState hook, and pass data down via props.
+a06e68608c00 | concept | A method for modifying the Euclidean distance metric to be anisotropic by applying dimension-specific weights and rotations, which allows for stretching or shrinking each dimension independently.
+47e184f3d095 | concept | A computational method for calculating spring force using Hooke's law (F = kx), where k is the spring constant and x is the displacement from equilibrium.
+7888e1c65dc2 | process_instance | A specific tool usage in documentary filmmaking where an aerial camera (Kite Cam) was employed to capture footage during a kite festival, with limited success due to technical failure.
+
+TOTAL concept=9 tool_command=0 unclear=0
+```
+
+**RESIDUAL = 3 ROWS, EACH WITH A NAMED REASON.** (a) 27fabecb4f68 was ruled noise_drop and is REFUSED (BUG-741 - a DISPOSITION is not a content_type, and it is never silently converted into one); (b) + (c) the 2 strict-form survivors (BUG-735 - 50% precise at n=2, and a PREDICTION may not move a label below the declared bench floor). BUG-712 stays OPEN (MED) because its residual is 3 EXPLAINED rows awaiting 2 owner rulings, not 14 unexplained ones - and the durable fix is not these cells but the S6 assertion that a computed label cannot be discarded (the D-2938 defect).
+
+## BUG-741 (OPEN - MED) - UPDATE 2026-10-12: the refused row is ALREADY not served, so the ruling is SATISFIED IN EFFECT; the fix is the FIELD SPLIT plus a writer for the general case
+
+**MEASURED.** The one refused row (27fabecb4f68, ruled noise_drop) carries `status=QUARANTINE` today, i.e. it is NOT in the served set - so the ruling's practical content (do not serve this as knowledge) is ALREADY TRUE. The store needed no write and the gate's refusal is therefore CORRECT rather than blocking. Abusing `status` to express it would have been a category error: it is a VERIFICATION verdict (`pipeline/schemas.py#VERIFICATION_STATUS` = PASS | FLAG | QUARANTINE | PENDING), not a disposition, and those two near-identical words for different things are the BUG-499 drift class.
+
+**FIX (owner-accepted shape).** (a) THE FIELD SPLIT: the map's `proposed` key carries content_type values AND disposition values in one field; declare a per-row `destination_kind: content_type|disposition` (or split the key) so no reader can mistake one for the other. (b) THE GENERAL CASE, STILL OWED: a row that is SERVED (status PASS) and later ruled noise_drop has NO writer at all today - the store has no disposition column and the S4 producer never emits a noise_drop row (the FB is simply not emitted). Resolving it needs either a declared `disposition` column WITH ITS WRITER in the same change (D-2952) or a declared retention act. NOTHING IS SILENT meanwhile: the gate refuses the row and names it in governance/evidence/content_type_restamp_receipt.json on every run.
+
+## BUG-742 (CLOSED 2026-10-12) - the authorship of an owner-adjudicated label: the DECLARED value was already there, so no vocabulary grew
+
+**FIXED by D-2964 (owner-ratified), with NO schema change.** MEASURED before the write: content_type_source held exactly two values - llm_extracted_from_source (6,591) and deterministic (1,049) - and neither is TRUE of a label a human ruled. The declared home for a human-authored label is the C29 vocabulary's own `human_verbatim`: a member of the CLOSED Pydantic Literal, and the value the F-44 human-share floor counts. The 11 adjudicated rows carry it now (0 -> 11). An `owner_adjudication` value was WITHDRAWN as unnecessary - a closed vocabulary must not grow to say what it already says. The gate still REFUSES --apply while the value is the sentinel, so the rule holds by construction rather than by memory. CLOSED.
+
+**PRECISION on the independent check above (measured, not assumed).** The reviewer returned 0 row lines; 0 of them CONTRADICT the adjudication and 0 call a record a tool command, but the check is EVIDENCE, not a certification: one row was characterised as a single-use EVENT (which is exactly why the map moves it to process_instance - consistent, not contradictory) and the transfer truncated one line. This is the R5 uninformative band measured in BUG-736 (a small cross-family model, given the source text and a closed-form question, returns a usable answer for most but not all rows) - which is precisely why the WRITE is deterministic and the model only ADVISES.
+
+**CORRECTION to the PRECISION line immediately above (2026-10-12, same session).** That line reads "The reviewer returned 0 row lines" - FALSE, and left standing it would be exactly the slop this ledger exists to catch. The zero came from a SECOND read of the background task, which returned `Error: Task '20261012_12' not found.` - the task handle did not survive completion. The measured facts, from the FIRST read only: the reviewer returned `TOTAL concept=9 tool_command=0 unclear=0` - 9 of the 11 rows in the asked shape, 0 CONTRADICTING the adjudication, 1 row characterised as a single-use event (consistent with its process_instance ruling), and the transfer itself truncated the line set. So the independent check is PARTIAL (n=9 of 11) and UNCONTRADICTED - evidence that nothing obviously wrong was written, not a certification of the ruling.
+
+## BUG-743 (LOW - OPEN 2026-10-12) - a DELEGATED reviewer's verdict is not re-readable after the fact, so a receipt that cites it must CAPTURE THE TEXT at the moment of receipt
+
+**MEASURED 2026-10-12 (this session).** A background delegate (`gemma-4-E4B-it-MLX-4bit`, the independent cross-family check on the BUG-712 write) returned its verdict once; a LATER `load(task_id)` returned `Error: Task '20261012_12' not found.`, so the verdict's exact line set could no longer be re-measured - and the first attempt to write a precision count from that second read produced a FALSE zero in the buglog (corrected in place above). **Consequence:** any governance receipt that cites a delegated verdict by TASK HANDLE is unverifiable the moment the task ends, which is the D-342 class ("a receipt that cannot be committed is not a receipt") applied to delegation - and the mirror of BUG-467 ("never re-derive a fact from another rail's output"). **Fix (process, then rail):** capture the reviewer's text to a FILE the receipt names at the moment of receipt, exactly as the R5 gate already does by having its PRODUCER append to `governance/r5_reviews.jsonl` rather than re-querying a model. Until that is wired, a delegated verdict is EVIDENCE-IN-HAND, never a citable artifact.

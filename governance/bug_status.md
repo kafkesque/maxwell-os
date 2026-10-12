@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**184 open** / 322 closed of 506 ids.
+**184 open** / 323 closed of 507 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -177,7 +177,7 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-706 | (MED - OPEN 2026-10-10): the macro re-classify gate needs a v9-stamped referee | 1 |
 | BUG-710 | (CRITICAL — OPEN): the D2511 retrieval gate is INERT — golden set anchored to the superseded run, and the documented fail-loud precondition  | 2 |
 | BUG-711 | (HIGH — OPEN): 173 canonical rows still carry a DISPLACED canonical domain label in the STORE | 1 |
-| BUG-712 | (CRITICAL — OPEN): content_type routing collapse — 6 of 8 declared primitives produce ZERO output | 9 |
+| BUG-712 | (CRITICAL — OPEN): content_type routing collapse — 6 of 8 declared primitives produce ZERO output | 10 |
 | BUG-719 | (MED - OPEN 2026-10-12): the non-principle sidecars are not content-type pure, and the "81 tool_instruction remaining" figure was an arithme | 1 |
 | BUG-720 | (LOW - OPEN 2026-10-12): the S4 sidecar reconciliation tolerates a magic 7 instead of reconciling exactly | 1 |
 | BUG-721 | (HIGH - OPEN 2026-10-12): a DELEGATE returned a FABRICATED code-review verdict without reading the code (false assurance) | 1 |
@@ -189,5 +189,5 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-737 | (MED - OPEN 2026-10-12) — the store's ABSENT SHAPE is `''` on 20 of 78 columns while the code declares `None` | 4 |
 | BUG-738 | (MED - OPEN 2026-10-12) - R5 code review had NO deterministic layer: 7 of 43 verdicts were not decisions, and the deep auditor was the gener | 2 |
 | BUG-739 | (LOW - OPEN 2026-10-12) - the C11 rail is PERMANENTLY RED: it calls 3 stdlib modules undeclared imports, so every control that trusts it mus | 1 |
-| BUG-741 | (MED - OPEN 2026-10-12) - the adjudication map's `proposed` field CONFLATES two vocabularies, so one owner adjudication is not expressible a | 1 |
-| BUG-742 | (MED - OPEN 2026-10-12) - the AUTHORSHIP of an owner-adjudicated label is undeclared, so writing the label without it would be a provenance  | 1 |
+| BUG-741 | (MED - OPEN 2026-10-12) - the adjudication map's `proposed` field CONFLATES two vocabularies, so one owner adjudication is not expressible a | 2 |
+| BUG-743 | (LOW - OPEN 2026-10-12) - a DELEGATED reviewer's verdict is not re-readable after the fact, so a receipt that cites it must CAPTURE THE TEXT | 1 |

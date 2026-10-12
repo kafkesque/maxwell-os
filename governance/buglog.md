@@ -10810,3 +10810,29 @@ bug with no annotation word is STILL a fault (so the exemption cannot silently d
 **VERIFIED:** selftest 6/6 controls fire; live run rc=0 ("every heading naming a bug id is parsed"); `just
 health` GREEN end to end. **Residual (not fixed here):** the annotation vocabulary is still hardcoded in the
 rail rather than declared in config (C12) — a cleanup, logged with this bug rather than smuggled into it.
+
+## BUG-704 (MED - OPEN 2026-10-10): S4 taxonomy scatter — engineering/agentic principles misclassified into Human&Design / Method&Business / emerging
+Status event added 2026-10-12: this bug was NAMED only inside the 2026-10-10 STATUS block, so no header carried
+it and `check_register_divergence` (BUG-481/BUG-571) correctly refused to let it stay uncarried — "a citation
+naming nothing is worse than no citation".
+CONTENT (unchanged): S4 scatters engineering/agentic principles across the three wrong macro buckets. The
+largest single loss term for engineering content is neutral NLI (143/195 AI rows).
+STILL OPEN: the re-classification pass has not been run on the served corpus.
+
+## BUG-705 (HIGH - OPEN 2026-10-10): the S5 recall path is still-pending code — and 2,258 neutral rows are recoverable
+Status event added 2026-10-12 (same uncarried-id gap as BUG-704).
+CONTENT (unchanged): D-2822/D-2863 (or-entail @ 0.5, precision 0.852) is coded+configured but is a PRECISION fix
+only — it cannot recover paraphrase rows (max entail 0.13-0.46 < 0.5). The RECALL fix (D-B paraphrase-aware
+grounding: a parallel STS/similarity path) is still-pending NEW code. Recoverable neutral rows = 2,258
+(ent>=1 + cont=0); keep 508 cont>0 + 376 no-signal.
+NOTE 2026-10-12: BUG-705-threshold (the defect that made the D-B path inert) was FIXED on 2026-10-11, and the
+"2,258 recoverable" baseline is a MAJORITY-MODE figure — the aggregation flip to
+`or_entail_and_no_contra` (BUG-651) changes it, so re-measure before quoting the number.
+
+## BUG-706 (MED - OPEN 2026-10-10): the macro re-classify gate needs a v9-stamped referee
+Status event added 2026-10-12 (same uncarried-id gap as BUG-704).
+CONTENT (unchanged): post-hoc re-classify macro directly (Condition C, `scripts/discipline_macro_classify.py`)
+with fine 62-way -> advisory (`discipline_macro.py` / D-2884 is already the single home). The GATE needs a
+v9-stamped referee, which is downstream of BUG-698.
+NOTE 2026-10-12: BUG-698's middle ground was RESOLVED on 2026-10-11, so this is now potentially UNBLOCKED —
+verify the referee stamp before starting.

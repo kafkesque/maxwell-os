@@ -2,8 +2,8 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 485,
-  "open_n": 174,
+  "total_ids": 488,
+  "open_n": 177,
   "closed_n": 311,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
@@ -836,6 +836,21 @@
     {
       "id": "BUG-703",
       "title": "(MED - OPEN 2026-10-10): 190/6,591 v9 rows have EMPTY `discipline_raw` while `discipline` is populated",
+      "events": 1
+    },
+    {
+      "id": "BUG-704",
+      "title": "(MED - OPEN 2026-10-10): S4 taxonomy scatter \u2014 engineering/agentic principles misclassified into Human&Design / Method&Business / emerging",
+      "events": 1
+    },
+    {
+      "id": "BUG-705",
+      "title": "(HIGH - OPEN 2026-10-10): the S5 recall path is still-pending code \u2014 and 2,258 neutral rows are recoverable",
+      "events": 1
+    },
+    {
+      "id": "BUG-706",
+      "title": "(MED - OPEN 2026-10-10): the macro re-classify gate needs a v9-stamped referee",
       "events": 1
     },
     {

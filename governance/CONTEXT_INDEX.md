@@ -165,6 +165,23 @@ content_type, NOT the yaml `content_types` key (BUG-277).
 7. **Freeze = tag, not approval.** An explicit `UNVERIFIED` beats a silent assumption.
 8. **No "spotless" without a number.** Agreement needs Krippendorff alpha + a per-axis n_min.
 
+## 6f. 2026-10-12 SESSION ARTIFACTS — the D2590 landing (and the two research inputs it rests on)
+
+| Artifact | Answers | Status |
+|---|---|---|
+| `research/PRIMITIVES_DEPLOYMENT_RESEARCH_20261012.md` | why the next move is a COMPLETION, not a pivot (the 5-primitive deployment picture) | advisory, read |
+| `research/COLLABORATION_CONTINUITY_CORTEX_20261012.md` | the queued meta-infrastructure design (`correlation_graph.jsonl` + a deterministic continuity compiler) | advisory, NOT built |
+| `governance/FORENSIC_AUDIT_D2590_20261012.md` | the pre-implementation forensic audit for D2590: F0 the tree was already stabilized, F1 the measured 1,619-record sidecar set, **F2 the hidden dependency that would have ROLLED THE STORE BACK**, F3 the type-body contract that already existed in the ontology, F4 blast radius, F5 declared residuals, F6 order | live |
+| `config/serving_gate.yaml` → `content_types_without_factual_claim`, `not_applicable_reason` | the D-2942 disposition: QUARANTINE + `s5_not_applicable` for a role with no NLI claim | AUTHORITATIVE |
+| `config/content_types.yaml` → `s2_body_fields`, `core_body` | the D-2943 `type_body` field lists (subtract `core_body`; nothing restates them) | AUTHORITATIVE |
+| `knowledge pipeline/checkpoints/non_fb_commit_receipt.json` | what the non-principle commit DID and what it EXCLUDED (196 mislabelled, 374 shelf, 14 legacy) | generated per run |
+| D-2942 / D-2943 / D-2944 / D-2945 (ACTIVE) | the disposition, the `type_body` contract, the `content_type` facet, and "an artifact describes the RUN, not the store's history" | in force |
+
+**Store truth after the landing (2026-10-12):** ONE run (`rechunk-v4-20260929`), **7,640 rows**
+(principle 6,577 / process_template 774 / process_instance 156 / tool_instruction 108 / growth_edge 25),
+PASS 4,503 (unchanged) / QUARANTINE 3,137. The non-principle tier is reachable ONLY with an explicit
+QUARANTINE scope plus a role facet — a deliberate consequence of D-2942, not an oversight.
+
 ## 9. DO-NOT-QUOTE list (claims that were already wrong once)
 
 | do not quote | quote instead |

@@ -16175,3 +16175,197 @@ decisions:
   files:
   - pipeline/golden.py
   - scripts/audit_sidecar_commit.py
+- id: D-2942
+  state: ACTIVE
+  category: DATA INTEGRITY / COMMIT
+  title: A role with no NLI factual claim derives QUARANTINE + `s5_not_applicable` when it has no verification record
+    — not UNDECIDABLE, and NEVER PASS
+  decision: 'Owner-approved D2590 (option C) builds the non-principle commit tier; this record fixes the disposition
+
+    of the rows it admits. MEASURED 2026-10-12 (dry run, then live): without it the build lands ZERO rows —
+
+    `insert_fb` refuses any row the serving gate cannot derive (`pre_write_enforcement: reject`) and a 100%
+
+    failure ratio ROLLS THE STORE BACK (BUG-708). The rule, and its ORDER, is now stated in ONE place
+
+    (`pipeline/serving_gate.py::derive_status`) — (1) a dedup marker wins over everything; (2) a PRESENT
+
+    record is evaluated on its own terms, whatever the role; (3) absent record + a role declared in
+
+    `serving_gate.content_types_without_factual_claim` -> `(QUARANTINE, s5_not_applicable)`;
+
+    (4) otherwise -> `(QUARANTINE, unknown)`, unchanged.
+
+    WHY: S5 verifies TRUTH CLAIMS (NLI over evidence). A process template''s steps or a tool''s syntax are not
+
+    truth claims, so an absent record means NOT-APPLICABLE — a derivable value — not undecidable. Filing 1,049
+
+    procedural rows as "claims that failed verification" would corrupt the G9/D272d quarantine analysis, which
+
+    is why the distinction rides the typed REASON rather than a new status value.
+
+    SCOPE (proved both ways): `tests/test_non_fb_commit.py` iterates EVERY declared content_type plus
+
+    "", "bogus_role", "PRINCIPLE" and None over every malformed input, asserting a declared role never derives
+
+    PASS and never derives `unknown`, and that NO other role can ever derive `s5_not_applicable` while its rule
+
+    output is still REFUSED by the pre-write gate.
+
+    BUG-719 CONTEXT: the 196 records whose OWN content_type is `principle` but which sit inside
+
+    the non-principle sidecars are excluded by this rule''s SELECTION (never by a re-route) and
+
+    declared in the receipt — the disposition is not a place to hide a mislabelled row.
+
+    BLAST RADIUS, MEASURED: status stays QUARANTINE, so `_status_predicate` and the retrieval quarantine
+
+    contract are byte-identical and no served query changes behaviour; `check_serving_gate.py` re-derives all
+
+    7,640 stored rows with 0 mismatch (row-deterministic: the rule reads the ROW''s content_type, so the writer
+
+    and the rail cannot disagree). NEVER PASS: promoting an unverified row would manufacture trust (R5/D2298
+
+    fail-closed). Serving this tier by default is a VERIFICATION-DESIGN question and stays owner-gated.
+
+    '
+  bugs:
+  - BUG-719
+  files:
+  - config/serving_gate.yaml
+  - pipeline/serving_gate.py
+  - pipeline/stage6_commit.py
+  - scripts/check_serving_gate.py
+- id: D-2943
+  state: ACTIVE
+  category: ARCH
+  title: '`type_body`: ONE JSON column holds the role-specific body, with its field list read from the content-type
+    ontology'
+  decision: 'A non-principle row carries fields the `fbs` schema has no column for (PT trigger/prerequisite/steps/
+
+    done_condition; PI instance_text/actors/outcome_*/domain_context; TI tool_name/platform/description/syntax/
+
+    parameters/output/example/caveats; GE body/category/actionable/status/priority). DECISION: persist them in
+
+    ONE nullable `type_body` TEXT column holding a JSON object, NOT one column per role-field (which would be
+
+    ~30 columns, ~95% NULL, and a new migration per role), and NOT a table per role.
+
+    THE FIELD LIST IS NOT DECLARED IN CODE: `pipeline/content_types.py::type_body_fields` reads
+
+    `config/content_types.yaml::s2_body_fields` and subtracts `core_body` — a core field''s home IS its column,
+
+    and a JSON copy of it would be a second source of truth (drift + bloat). MEASURED: the derived lists match
+
+    the D2590 spec field-for-field, i.e. the contract already existed in the ontology and was merely unread.
+
+    Only fields PRESENT on the record are stored: an absent key must not become a fabricated "" (that is how
+
+    slop enters a store — a field nobody extracted reading as extracted). A role that declares no body fields is
+
+    a hard failure, never an empty body (C12/C16).
+
+    NAMESPACE COLLISION, RESOLVED EXPLICITLY: `growth_edge.status` (open|speculative|conceptual — the state of
+
+    the tension) collides by NAME with the governed `status` column. The S5-owned column set is STRIPPED from
+
+    every sidecar row before commit and re-stamped by the gate alone, so the GE state survives namespaced inside
+
+    `type_body` (proved by test) while the `status` column keeps its single writer (D274h).
+
+    BUG-712 CONTEXT: with this column the non-principle primitives are finally PERSISTED, which
+
+    corrects that bug''s magnitude from ''ZERO output'' to a commit/retention collapse for PT/PI/GE/TI
+
+    (it stays OPEN: the producer still mislabels).
+
+    MEASURED after apply: 1,049 rows carry a parsed `type_body`; the only NULLs are the 6,577 principles (a role
+
+    that declares none) and the 14 pre-existing mislabelled tool_instructions (BUG-714, declared in the receipt).
+
+    '
+  bugs:
+  - BUG-712
+  files:
+  - pipeline/content_types.py
+  - pipeline/stage6_commit.py
+  - tests/test_non_fb_commit.py
+- id: D-2944
+  state: ACTIVE
+  category: RETRIEVAL
+  title: '`content_type` is a first-class retrieval facet asserted on EVERY leg — and it is what makes the non-principle
+    tier reachable at all'
+  decision: '`content_type` is now a facet on every candidate generator (`_facet_conditions` + the `_matches_facet`
+
+    post-filter + the `has_facet` guards + the keyword/FTS/vector/hybrid/search/graph-aware/agentic legs +
+
+    the CLI `--content-type`), because the standing D273a/G12 rule is that a facet which is not asserted on
+
+    every generator is not a filter. The CLI choice list is read from the ontology
+
+    (`pipeline.content_types.CONTENT_TYPES`), never hand-typed.
+
+    WHY IT IS LOAD-BEARING, not cosmetic: the non-principle tier is QUARANTINE by design (D-2942), so without
+
+    this facet a caller asking for a PROCEDURE is forced to ask for "everything that did not pass verification"
+
+    (2,088 verified-failure rows + 1,049 procedural rows). MEASURED after apply — a hybrid query with
+
+    `--content-type process_template --status QUARANTINE` returns 4/4 process_templates;
+
+    `--content-type principle --status QUARANTINE` returns 4/4 principles; `--content-type growth_edge` returns
+
+    4/4 growth_edges; and the DEFAULT serving query (no facet, status=PASS) returns principles with reason
+
+    BUG-712 CONTEXT: this facet is what lets the newly persisted non-principle primitives be REACHED,
+
+    which is the retrieval half of that bug (it stays OPEN on the producer side).
+
+    `entail` only — i.e. the served surface is unchanged.
+
+    '
+  bugs:
+  - BUG-712
+  files:
+  - pipeline/retrieve.py
+  - scripts/check_serving_gate.py
+- id: D-2945
+  state: ACTIVE
+  category: DATA INTEGRITY / COMMIT
+  title: A commit artifact describes the RUN, not the store's history — a re-run must not shrink it, and the io_guard
+    shrink guard is never force-bypassed
+  decision: 'MEASURED 2026-10-12: the first D2590 pass wrote 7,640 S6 commit records (4,420,790 bytes); the identical
+
+    second pass inserted 0 rows, so a loader that returned only the UN-STORED rows built its records from the
+
+    6,591 S5 rows and `io_guard.safe_write` REFUSED the write ("SHRINK GUARD: would shrink 4420790 -> 3810914
+
+    bytes (13.8%)"). The Parquet snapshot shrank for the same reason. Two artifacts therefore encoded the
+
+    store''s HISTORY rather than the RUN''s content.
+
+    RULING: the non-principle tier is a property of the RUN. `load_non_fb_sidecars` returns the WHOLE tier plus
+
+    the subset the store already holds; stage 6 writes only the new rows (commit_status `ALREADY_STORED` for the
+
+    rest, `committed_to_sqlite` true because the row IS in the store, D2325) and both artifacts are run-stable.
+
+    MEASURED after the fix: pass 2 inserts 0 rows, the store stays 7,640, the checkpoint holds 7,640 records
+
+    {UPDATED: 6,591, ALREADY_STORED: 1,049}.
+
+    BUG-722 CONTEXT: this rule is that bug''s fix, measured on a live two-pass run.
+
+    THE GUARD IS NEVER BYPASSED: `force_shrink=True` is not an option here — the shrink guard is the only
+
+    instrument that caught this defect, and a "re-run" that legitimately changes an artifact''s SIZE is a
+
+    design error to fix at the source (the same class as D-2941''s instrument rule).
+
+    '
+  bugs:
+  - BUG-722
+  files:
+  - pipeline/stage6_commit.py
+  - scripts/pre_s6_gate.py
+  - temp/dryrun_d2590.py

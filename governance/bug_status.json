@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 475,
-  "open_n": 168,
-  "closed_n": 307,
+  "total_ids": 484,
+  "open_n": 174,
+  "closed_n": 310,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -819,6 +819,26 @@
       "events": 1
     },
     {
+      "id": "BUG-700",
+      "title": "(HIGH - OPEN 2026-10-10): cross-generation entity identity gap (root cause of the dual-generation store)",
+      "events": 1
+    },
+    {
+      "id": "BUG-701",
+      "title": "(HIGH - OPEN 2026-10-10): the anchor-store bridge binds 193/208 rows to the NO-LONGER-SERVED generation",
+      "events": 1
+    },
+    {
+      "id": "BUG-702",
+      "title": "(MED - OPEN 2026-10-10): S5 `practicality` is STORED but was not a first-class retrieval facet",
+      "events": 1
+    },
+    {
+      "id": "BUG-703",
+      "title": "(MED - OPEN 2026-10-10): 190/6,591 v9 rows have EMPTY `discipline_raw` while `discipline` is populated",
+      "events": 1
+    },
+    {
       "id": "BUG-710",
       "title": "(CRITICAL \u2014 OPEN): the D2511 retrieval gate is INERT \u2014 golden set anchored to the superseded run, and the documented fail-loud precondition ",
       "events": 2
@@ -831,12 +851,7 @@
     {
       "id": "BUG-712",
       "title": "(CRITICAL \u2014 OPEN): content_type routing collapse \u2014 6 of 8 declared primitives produce ZERO output",
-      "events": 3
-    },
-    {
-      "id": "BUG-713",
-      "title": "(CRITICAL \u2014 OPEN): superseded runs are STILL in the store and STILL in the KNN index",
-      "events": 1
+      "events": 4
     },
     {
       "id": "BUG-714",
@@ -844,8 +859,23 @@
       "events": 1
     },
     {
-      "id": "BUG-715",
-      "title": "(MEDIUM - OPEN): 7 extracted S2 records reach neither the S4 checkpoint nor a sidecar",
+      "id": "BUG-719",
+      "title": "(MED - OPEN 2026-10-12): the non-principle sidecars are not content-type pure, and the \"81 tool_instruction remaining\" figure was an arithme",
+      "events": 1
+    },
+    {
+      "id": "BUG-720",
+      "title": "(LOW - OPEN 2026-10-12): the S4 sidecar reconciliation tolerates a magic 7 instead of reconciling exactly",
+      "events": 1
+    },
+    {
+      "id": "BUG-721",
+      "title": "(HIGH - OPEN 2026-10-12): a DELEGATE returned a FABRICATED code-review verdict without reading the code (false assurance)",
+      "events": 1
+    },
+    {
+      "id": "BUG-723",
+      "title": "(MED - OPEN 2026-10-12): t11-unique corpus coverage debt after the superseded-run purge",
       "events": 1
     }
   ],
@@ -1154,8 +1184,11 @@
     "BUG-707",
     "BUG-708",
     "BUG-709",
+    "BUG-713",
+    "BUG-715",
     "BUG-716",
     "BUG-717",
-    "BUG-718"
+    "BUG-718",
+    "BUG-722"
   ]
 }

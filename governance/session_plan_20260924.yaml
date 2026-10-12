@@ -22,6 +22,9 @@ may_touch:
 - config/closed_menu_v7.sha256
 - scripts/*.py
 - governance/buglog.md
+# BUG-563/BUG-548 (NAMED, never a glob): the prioritized task register is edited by the D2590
+# landing (T-P1.0 -> DONE) and had NO declared home, so the tree could never be clean.
+- governance/aggregated_remaining_tasks.md
 - governance/d2547_calibration.json
 - governance/knn_label_disagreement.json
 - governance/mislabel_triage.json

@@ -31,7 +31,18 @@
 - [x] T-P0.3 Wire `content_type_rules` + `min_steps` into `pipeline/content_types.py` loader + `scripts/audit_content_type_contract.py` (`_check_d2587_rules`: `len(steps)>=min_steps`, wired into audit_s2 + audit_s4). Closes BUG-225. ✅ D2589
 
 **P1 — silent-failure paths (data integrity):**
-- [ ] T-P1.0 **DECIDED (D2590): ENABLE `commit_non_fb_types`** — but it is a SCOPED S6 build, NOT a toggle (`S6_COMMIT_NON_FB` is dead config; fbs has a `content_type` column but S6 never ingests the 4 non-principle sidecars). Implementation: (a) ingest PT/PI/GE/TI sidecars, (b) store type-specific body (steps/trigger/done_condition/actors/parameters → new columns or type_body JSON), (c) wire `S6_COMMIT_NON_FB`, (d) defer cross-ref producer (`consulted_fbs`/`parent_pt_id`). Also: decide convergent-emits-non-principle design fork.
+- [x] T-P1.0 **DONE 2026-10-12 (D2590 → D-2942..D-2945, ACTIVE)** — the scoped S6 build LANDED: (a) the 4
+  sidecars are ingested (1,049 rows: PT 774 / PI 156 / TI 94 / GE 25; the handoff's "81 TI remaining" was
+  an arithmetic error — the 14 committed TI rows came from `checkpoint.jsonl`, not from a sidecar), (b)
+  `type_body` (ONE JSON column, field list read from `config/content_types.yaml::s2_body_fields` minus
+  `core_body`), (c) `S6_COMMIT_NON_FB` wired (it was DEAD config; read by no S6 code), (d) cross-ref
+  producer still DEFERRED by the decision. Disposition ruled by D-2942: QUARANTINE + `s5_not_applicable`
+  (row-deterministic, never PASS). `content_type` is now a first-class facet on every leg (D-2944).
+  MEASURED: store 6,591 → 7,640 rows in ONE run; `check_serving_gate` 7,640 MATCH / 0 mismatch;
+  `audit_sidecar_commit --strict` rc=0; `check_tests` 344/339/0-red; 2-pass sandbox dry run clean.
+  STILL OPEN: BUG-719 (196 sidecar rows whose own content_type is `principle`), BUG-714 (the 14 code-snippet
+  tool_instructions), and the convergent-emits-non-principle design fork.
+- [ ] ~~T-P1.0~~ **SUPERSEDED TEXT (kept for history): DECIDED (D2590): ENABLE `commit_non_fb_types`** — but it is a SCOPED S6 build, NOT a toggle (`S6_COMMIT_NON_FB` is dead config; fbs has a `content_type` column but S6 never ingests the 4 non-principle sidecars). Implementation: (a) ingest PT/PI/GE/TI sidecars, (b) store type-specific body (steps/trigger/done_condition/actors/parameters → new columns or type_body JSON), (c) wire `S6_COMMIT_NON_FB`, (d) defer cross-ref producer (`consulted_fbs`/`parent_pt_id`). Also: decide convergent-emits-non-principle design fork.
 - [x] T-P1.1 Flag+log empty-extraction_type default → **DONE D2590**: `_extraction_type_defaulted:true` + `_extraction_type_default_reason:empty_form` + counter in both summaries. Closes BUG-226. (Rename map → CONTENT_TYPE_CONFLATION_REPAIR_DEFAULT deferred, cosmetic.)
 - [~] T-P1.2 Deprecate `route` as ontology carrier → **PARTIAL D2590**: observability log added (missing content_type → stderr, C16). Full route-deprecation (missing→quarantine, not principle) remains. BUG-148 mitigated, not closed.
 - [x] T-P1.3 Extend cosine dedup to PT/PI/GE/TI → **DONE D2590**: `dedup_fbs_by_cosine` before exact-`fb_id` loop on all 4 non-principle write paths. Closes BUG-227.

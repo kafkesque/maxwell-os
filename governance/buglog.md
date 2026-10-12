@@ -10442,6 +10442,19 @@ only committed extraction for ~25% of the corpus. THEREFORE two-phase: Phase 1 =
 (reversible, no row loss) NOW; Phase 2 = archive+delete only after the 232 files are reprocessed. Tool:
 scripts/purge_superseded_runs.py (dry-run verified). OPEN 2026-10-11 21:40.
 
+**RESOLVED 2026-10-12 (owner-directed purge, R-D410 recoverable).** The owner ruled the store must hold
+ONLY the canonical run ("shouldnt include t11, should have 6500+ principle + nonprinciples"). Executed
+`scripts/purge_superseded_runs.py --apply --confirm t11,e2e,bug198_reinject` — a Phase-2 archive+delete,
+NOT the deferred path. The Phase-2 precondition (reprocess the 232 t11-unique corpus files first) was
+NOT met before apply; this is RECOVERABLE, not lossy: every purged row is archived to
+`archive/superseded_runs/20261012T090055Z/superseded_rows.jsonl` (sha256 1f5ba4b1…) and a full C13 backup
+exists at `knowledge pipeline/backups/maxwell.db.pre_purge_20261012_110055` (sha256 d6fd8800…), so the
+232-file coverage remains restorable. Verified: store 14,574→6,591 (principle PASS 4,498 / QUARANTINE
+2,079 / tool_instruction 14); residual=0; integrity ok; fts=6591==fbs=6591; vec_orphans=0; smoke test
+0 leaked runs (top hit "Systemic Feedback Dynamics"). The 232-file reprocess is now a RESTORE-path
+dependency, not a blocker: any re-derivation that needs t11-only extractions reads the archive. OPEN
+(recoverable-archive debt): 232 t11-unique corpus files must still be reprocessed under rechunk-v4.
+
 ## BUG-714 (HIGH — OPEN): content_type='tool_instruction' is populated with CODE SNIPPETS, not tool instructions
 All 14 tool_instruction rows in the served run are code/API excerpts lifted from books ("Chat Completions
 Request Pattern", "Flask Methodview Endpoint Pattern", "Redis Stream Task Queue Pattern", "Triangle Depth
@@ -10642,3 +10655,139 @@ Index health is NOT the cause (an exact-name query is retrievable almost always)
 **Blocking:** nothing (an A/B is a config flip + a re-run). **Needs:** the semantic golden
 slice (D-2939/D-2940) so the production leg can be validated on abstract queries, then an
 owner ruling on `retrieval.method`.
+
+
+---
+
+## BUG-719 (MED - OPEN 2026-10-12): the non-principle sidecars are not content-type pure, and the "81 tool_instruction remaining" figure was an arithmetic error
+**MEASURED 2026-10-12** (`scripts/audit_sidecar_commit.py`, run `rechunk-v4-20260929`): the four non-principle
+sidecars hold **196 records whose OWN `content_type` is `principle`** (187 inside `growth_edges.jsonl`, 9 inside
+`process_templates.jsonl`), and `quarantined.jsonl` holds **374** records on the D2616 hold shelf. A whole-file
+ingest would therefore have committed 196 mislabelled, unverified rows as non-FB objects.
+**SECOND FINDING (arithmetic):** both `SESSION-HANDOFF-20261012.md` and `FORENSIC_AUDIT_20261012.md` reported
+"TI 95 extracted, 14 committed -> 81 remaining". The 14 committed `tool_instruction` rows came from
+`checkpoint.jsonl` (the S5-verified leg), not from a sidecar, so subtracting across two disjoint populations
+understated the tier: the **sidecar TI population is 94** (34 + 1 + 59; the 95th sits on the quarantine shelf),
+and the true D2590 tier is **1,049** (PT 774 + PI 156 + TI 94 + GE 25). D2590's loader selects by the ROW's own
+`content_type`, so the 196 are excluded and *declared* (never silently dropped).
+**OPEN:** the 196 need a classification verdict (same class as BUG-712 / the 2026-10-11 mislabel triage). Fixing
+it by routing would be wrong: the row's own `content_type` is the authority.
+
+## BUG-720 (LOW - OPEN 2026-10-12): the S4 sidecar reconciliation tolerates a magic 7 instead of reconciling exactly
+`scripts/audit_sidecar_commit.py` attributes the residual drop (S2 8,217 -> S4 checkpoint 6,591 + sidecars 1,619 =
+8,210, residual 7) by a **tolerance flag**, not by a persisted receipt. Code inspection attributes the 7 to the
+D2120 cosine-dedup `valid_ids` gate (`stage4_merge.py`, clusters whose principle ids were all removed as
+near-duplicates are filtered before the checkpoint/sidecar split), which is a named rule and not a leak — but a
+tolerance is an assumption, not evidence, and the number 7 is nowhere recorded by the producer.
+**FIX:** `stage4_merge.py` emits a `deduped_cluster_ids` receipt; the rail then reconciles exactly and the
+tolerance goes to 0. Does not block anything.
+
+## BUG-721 (HIGH - OPEN 2026-10-12): a DELEGATE returned a FABRICATED code-review verdict without reading the code (false assurance)
+Two R5 code-review delegations (gemma-4-E4B-it-MLX-4bit, `maxwell_omlx`) were run before applying the D2590
+build. **Delegation 1** exhausted its turn budget and returned a "may I continue?" stub. **Delegation 2** stated
+in its own output that it could NOT read the files ("the `fs` object was not defined ... I cannot actually read
+the files"), then *simulated* the review anyway and returned a verdict (`REQUEST_CHANGES`, 1 HIGH) with two
+findings that name no real code path. **Delegation 3** (same model, payload INLINED so no filesystem was needed)
+produced correct code traces but **self-contradictory labels**: for two questions it walked through the correct
+behaviour and then labelled it FAIL, so its binary verdict is unusable.
+**WHY HIGH:** an unverified verdict is worse than no verdict. A fabricated APPROVE on a governed write path
+would have admitted a defect with a "reviewed" stamp attached, and this repo's R5 rule assumes the verifier
+actually reads its input. Nothing in the delegation result proves the reviewer saw the payload.
+**MITIGATION ADOPTED (2026-10-12):** (1) for code review, INLINE the payload in the instructions and require the
+model to quote the exact expression it judges, never just a verdict; (2) treat a verdict whose TRACE contradicts
+its LABEL as INVALID; (3) never accept a delegate verdict as the sole evidence — the D2590 apply was gated on
+DETERMINISTIC instruments instead: an exhaustive both-ways scoping test (every declared content_type x every
+malformed input), an AST check that the INSERT column/placeholder/value counts and ORDER agree, an end-to-end
+two-pass dry run in a sandboxed store copy, `check_serving_gate.py` (0 mismatch on 7,640 rows) and
+`audit_sidecar_commit.py --strict` (rc=0). **OPEN:** the harness cannot currently prove a delegate read what it
+claims to have read; a delegation should carry an evidence receipt (bytes read) before its verdict may gate a write.
+
+## BUG-722 (MED - RESOLVED 2026-10-12): a re-run of the non-principle commit SHRANK the S6 checkpoint (an artifact whose content depended on the store's history)
+**MEASURED:** the first D2590 dry run landed 1,049 rows and wrote 7,640 S6 commit records (4,420,790 bytes). The
+identical second pass inserted 0 rows and therefore built its commit records from the 6,591 S5 rows only ->
+`io_guard.safe_write` refused the write: "SHRINK GUARD: checkpoint.jsonl would shrink 4420790 -> 3810914 bytes
+(13.8%)". The Parquet snapshot shrank for the same reason. **The guard was right and the fix is architectural:**
+the non-principle tier is a property of the RUN, not of the store's history, so `load_non_fb_sidecars` now returns
+the whole tier plus the subset the store already holds, stage 6 writes only the new rows (commit_status=
+`ALREADY_STORED` for the rest) while the checkpoint and the Parquet snapshot stay run-stable (7,640 records on
+both passes). **Do NOT "fix" this class with `force_shrink=True`** — the shrink guard is the only thing that
+caught it.
+
+## BUG-713 (CRITICAL - RESOLVED 2026-10-12): superseded runs purged from the store AND the KNN index
+RESOLUTION EVENT (the earlier resolution was recorded as prose in the 2026-10-11 STATUS block and never as a
+status event, so the machine register still read this CRITICAL bug OPEN — drift repaired here).
+**EXECUTED 2026-10-12** (`scripts/purge_superseded_runs.py --apply --confirm t11,e2e,bug198_reinject`): the
+store went from 4 runs to 1; measured green afterwards — residual = 0, integrity ok, fts == fbs, no vec orphans,
+a smoke test leaked 0 runs. C13 backup: `knowledge pipeline/backups/maxwell.db.pre_purge_20261012_110055`.
+Archive of the removed rows: `archive/superseded_runs/20261012T090055Z/superseded_rows.jsonl` (sha256 1f5ba4b1..).
+**Store census after this session's D2590 landing: 7,640 rows, ONE run (`rechunk-v4-20260929`)** — see the D2590
+outcome note; the index is no longer 54% dead candidate slots.
+**RESIDUAL (its own bug, BUG-723):** t11 uniquely covered 232 of 939 corpus files, so those extractions now exist
+ONLY in the archive + the pre-purge backup and must be reprocessed under the canonical run.
+
+## BUG-715 (MEDIUM - RESOLVED 2026-10-12): the 7 unattributed S2 records are attributed, and the sidecar commit gap is closed
+RESOLUTION EVENT (the earlier resolution lived only in the predecessor audit's prose; the machine register still
+read it OPEN — drift repaired here).
+**ATTRIBUTED (deterministic, by code inspection):** the 7 are dropped by the D2120 cosine-dedup `valid_ids` gate
+in `stage4_merge.py` — clusters whose `principle_ids` were ALL removed as near-duplicates are filtered out BEFORE
+the checkpoint/sidecar split, so S5 never sees them. It is a NAMED rule, not a leak: `audit_sidecar_commit.py
+--tolerance 7` exits 0.
+**CLOSED AS A COMMIT GAP by D2590 (2026-10-12):** the 1,619 sidecar records that were "extracted, routed, written,
+never committed" are now committed (1,049 non-principle rows landed; 196 declared as mislabelled principles,
+BUG-719; 374 remain on the D2616 hold shelf by design). The rail's `--strict` mode now exits 0.
+**REMAINING HARDENING** is BUG-720 (persist `deduped_cluster_ids` so the tolerance goes to 0) — OPEN, not blocking.
+
+## BUG-712 (CRITICAL - OPEN, MAGNITUDE CORRECTED 2026-10-12): the primitive routing collapse is now measured POSITIVE for the non-principle tier
+The original claim — "6 of 8 declared primitives produce ZERO output" — was measured against the COMMITTED
+store. With D2590 landed the committed store now holds all five roles:
+`principle 6,577 / process_template 774 / process_instance 156 / tool_instruction 108 / growth_edge 25`
+(7,640 rows, one run). So the collapse was a COMMIT/RETENTION collapse for PT/PI/GE/TI, not (for those roles) an
+extraction collapse: the objects had been extracted and routed all along.
+**STILL OPEN, and the reason it stays OPEN:** the PRODUCER still mislabels — 187 `principle`-typed records sit in
+`growth_edges.jsonl` and 9 in `process_templates.jsonl` (BUG-719), and the 14 committed `tool_instruction` rows
+are code snippets (BUG-714). D2590 deliberately excluded the mislabelled rows rather than re-routing them, so the
+fix belongs in the S4/S2 producer (the root cause recorded on 2026-10-11: the corrected content_type is COMPUTED
+AND DISCARDED).
+
+## BUG-723 (MED - OPEN 2026-10-12): t11-unique corpus coverage debt after the superseded-run purge
+232 of 939 corpus files were covered ONLY by the purged `t11` run. Their extractions now live only in
+`archive/superseded_runs/20261012T090055Z/superseded_rows.jsonl` and the pre-purge backup, so the served corpus
+(one run, `rechunk-v4-20260929`) is missing the knowledge those 232 files carried.
+**WORK:** reprocess those files through the canonical run (S0..S6) so the served store covers them. Nothing is
+lost — the archive is byte-preserved (R-D410) — but nothing serves it either.
+**DO NOT** re-inject the archived rows: they carry the superseded v5.1 taxonomy and the pre-rechunk chunking.
+
+## BUG-700 (HIGH - OPEN 2026-10-10): cross-generation entity identity gap (root cause of the dual-generation store)
+Status event added 2026-10-12: this bug was named ONLY in the OPEN table, never as a `## BUG-` header, so the
+machine register did not carry it and check_governance_faces reported it as an unknown id. Content (unchanged
+from the table): `fb_id` is run-derived (hash of run-local name+content+taxonomy, NOT source-derived);
+`duplicate_of` has no writer; stage6 appends by fb_id with no stable key / ON CONFLICT / supersede step.
+Re-running the same corpus under a new taxonomy produced TWO un-reconciled generations with 0 fb_id overlap and
+only 444 name overlap. D-2881/BUG-691 masked it at the SERVING layer only.
+FIX (design, not built): stable content-derived identity = hash(normalized name + source_ids),
+taxonomy-independent; INSERT..ON CONFLICT(identity) DO UPDATE with `superseded_by`; a reconcile step that marks
+prior-generation rows on new-generation landing. NOTE 2026-10-12: the store is now genuinely SINGLE-run again
+(7,640 rows, rechunk-v4-20260929) because BUG-713's purge removed the other generation — the identity design is
+still owed, because the NEXT re-chunk will recreate it.
+
+## BUG-701 (HIGH - OPEN 2026-10-10): the anchor-store bridge binds 193/208 rows to the NO-LONGER-SERVED generation
+Status event added 2026-10-12 (same table-only gap as BUG-700). The bridge joins by exact folded name, so
+v9-reworded names bind to t11 rows that the serving layer no longer serves: only 12 resolve to the canonical run.
+CONSEQUENCE: ANCHOR_208 measures against a population the live store does not serve.
+FIX (owner-gated on the live population): re-derive the bridge by source identity after BUG-700's stable identity
+lands, or consciously re-run S4 on the anchor's source docs under the canonical run.
+
+## BUG-702 (MED - OPEN 2026-10-10): S5 `practicality` is STORED but was not a first-class retrieval facet
+Status event added 2026-10-12 (same table-only gap as BUG-700). `practicality` is 100% populated, but retrieve.py
+had no `--practicality` filter, so a downstream consumer could not ask for "only immediately-applicable
+principles". RESOLVED IN PART 2026-10-12: `--practicality` + the `practicality` facet DO exist in retrieve.py
+today (`_facet_conditions`, `_practicality_choices`), and D-2944 has just added the parallel `--content-type`
+facet by the same mechanism — so this row is STALE. Kept OPEN only until someone verifies the flag end-to-end on
+the served run and closes it with evidence (do not close on the strength of a grep).
+
+## BUG-703 (MED - OPEN 2026-10-10): 190/6,591 v9 rows have EMPTY `discipline_raw` while `discipline` is populated
+Status event added 2026-10-12 (same table-only gap as BUG-700). The D2537 `--discipline-raw` surgical facet
+silently drops those rows. Root cause likely S4 merge (raw label blanked during canonical projection).
+FIX: backfill `discipline_raw` from the S4 checkpoint for the 190 ids, or relax the raw facet to fall back to
+the canonical label when raw is empty. NOTE: BUG-703's mitigation (a COALESCE fallback) is already visible in
+`retrieve.py::_facet_conditions` — verify before closing.

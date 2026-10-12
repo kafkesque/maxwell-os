@@ -9,8 +9,25 @@
 
 ## 🔴 MUST — open (strategic-consequential order)
 
-> **CURRENT OPEN INDEX (machine-derived 2026-10-07 — the live face; dated history follows below).**
-> Register: 1035 decisions · 460 bugs (163 open / 297 closed; highest OPEN = BUG-695). Forensic audit GREEN: 0 fatal rails — store-change re-baseline cascade (BUG-659..668) FIXED at root cause. The 11 ambiguous anchor-bridge rows resolved to the ratified canonical run (D-2881); depth conformance 183→194. BUG-687 (CLOSED, D-2882): nli_calibration pin on a gitignored derived artifact RETIRED (owner approved). BUG-688 (CLOSED, D-2883): the D-2618 retired golden is recorded, never gated (owner approved). BUG-689 (CLOSED, D-2830): the D-2767 A/B harness crashed on the v8 referee's owner-absence rows — `noise_drop` excluded (out of scope), `abstained` → 'emerging'.
+> **CURRENT OPEN INDEX (machine-derived 2026-10-12 — the live face; dated history follows below).**
+> Register truth (do NOT restate counts elsewhere — BUG-588/D-2692): 1073 decisions · 484 bugs (174 open / 310 closed; highest OPEN = BUG-723).
+> **D2590 NON-PRINCIPLE TIER
+> LANDED** — decisions **D-2942..D-2945**; the store went **6,591 → 7,640 rows in ONE run** (principle 6,577 /
+> process_template 774 / process_instance 156 / tool_instruction 108 / growth_edge 25). The 1,619 S4 sidecar records
+> that had been "extracted, routed, written, NEVER committed" are now **committed (1,049) or DECLARED** (196
+> mislabelled `principle` rows → BUG-719; 374 on the D2616 hold shelf). Rails after apply: `check_serving_gate`
+> **7,640 MATCH / 0 mismatch / 0 undecidable**, `audit_sidecar_commit --strict` **rc=0** (tolerance 7 → BUG-720),
+> `check_tests` 344 collected / 339 passed / 0 red, `integrity_check` 10/10.
+> **Reconciled to CLOSED:** BUG-713 (superseded-run purge) and BUG-715 (the 7 unattributed records) — both had been
+> resolved in PROSE only, so the machine register still read two CRITICAL/MEDIUM bugs OPEN.
+> **NEW OPEN:** BUG-719 (196 rows whose own content_type is `principle` sit inside the non-principle sidecars; also
+> the handoff's "81 tool_instruction remaining" was an arithmetic error — the true tier is 1,049), BUG-720 (emit a
+> `deduped_cluster_ids` receipt so the audit tolerance goes to 0), BUG-721 (a DELEGATE returned a FABRICATED
+> code-review verdict — false assurance; mitigation adopted), BUG-723 (232 corpus files covered only by the purged
+> t11 run: knowledge preserved in the archive, served by nothing).
+>
+> **CURRENT OPEN INDEX (machine-derived 2026-10-07 — dated history).**
+> Dated history: the register then stood at 1035 decisions with 460 bugs (163 open, 297 closed, highest OPEN then BUG-695). Forensic audit GREEN: 0 fatal rails — store-change re-baseline cascade (BUG-659..668) FIXED at root cause. The 11 ambiguous anchor-bridge rows resolved to the ratified canonical run (D-2881); depth conformance 183→194. BUG-687 (CLOSED, D-2882): nli_calibration pin on a gitignored derived artifact RETIRED (owner approved). BUG-688 (CLOSED, D-2883): the D-2618 retired golden is recorded, never gated (owner approved). BUG-689 (CLOSED, D-2830): the D-2767 A/B harness crashed on the v8 referee's owner-absence rows — `noise_drop` excluded (out of scope), `abstained` → 'emerging'.
 >
 > **OWNER-RULED (D-2884, 2026-10-09) — D-2727 now gated on the (a)+(b) landing:**
 > 1. **D-2767 C+B gate = FAIL** (3-way coarse 0.5621 < 0.73 floor). Owner ruled **(a)** fine discipline → ADVISORY, 3-way macro + domains become the operative routing facet; **(b)** distinct-family decider A/B (autotrust/JEV-27B-VL or pplx-decider-v1.1-27b) in parallel. BUG-690 part 2 (macro drift v5→v8) FIXED; part 1 (coarse-kappa harness output) FIXED (commit 8895cbf: coarse_collapse/coarse_report + test_d2767_coarse_kappa.py 4/4) — the prerequisite instrumentation for (b) is in place. D-2884(a) macro operative routing is LANDED + R5 gemma-APPROVED (retrieve.py + maxwell_mcp_server.py, 2026-10-09).

@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**168 open** / 307 closed of 475 ids.
+**174 open** / 310 closed of 484 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -169,9 +169,15 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-680 | (OPEN, 2026-10-08) — the upstream anchor faces still encode discipline abstention as the out-of-menu token 'emerging' (BUG-676 residual) | 2 |
 | BUG-681 | (OPEN, 2026-10-08) — `just health-full` found 6 faults in one pass; 2 fixed deterministically, 4 remain (3 red contract tests + 3 rails) and | 2 |
 | BUG-698 | (OPEN, 2026-10-10) — v8→v9 discipline-anchor off-menu rows are 22 in THREE categories, not the "7 delta rows" assumed in GATE-2; abstained r | 1 |
+| BUG-700 | (HIGH - OPEN 2026-10-10): cross-generation entity identity gap (root cause of the dual-generation store) | 1 |
+| BUG-701 | (HIGH - OPEN 2026-10-10): the anchor-store bridge binds 193/208 rows to the NO-LONGER-SERVED generation | 1 |
+| BUG-702 | (MED - OPEN 2026-10-10): S5 `practicality` is STORED but was not a first-class retrieval facet | 1 |
+| BUG-703 | (MED - OPEN 2026-10-10): 190/6,591 v9 rows have EMPTY `discipline_raw` while `discipline` is populated | 1 |
 | BUG-710 | (CRITICAL — OPEN): the D2511 retrieval gate is INERT — golden set anchored to the superseded run, and the documented fail-loud precondition  | 2 |
 | BUG-711 | (HIGH — OPEN): 173 canonical rows still carry a DISPLACED canonical domain label in the STORE | 1 |
-| BUG-712 | (CRITICAL — OPEN): content_type routing collapse — 6 of 8 declared primitives produce ZERO output | 3 |
-| BUG-713 | (CRITICAL — OPEN): superseded runs are STILL in the store and STILL in the KNN index | 1 |
+| BUG-712 | (CRITICAL — OPEN): content_type routing collapse — 6 of 8 declared primitives produce ZERO output | 4 |
 | BUG-714 | (HIGH — OPEN): content_type='tool_instruction' is populated with CODE SNIPPETS, not tool instructions | 1 |
-| BUG-715 | (MEDIUM - OPEN): 7 extracted S2 records reach neither the S4 checkpoint nor a sidecar | 1 |
+| BUG-719 | (MED - OPEN 2026-10-12): the non-principle sidecars are not content-type pure, and the "81 tool_instruction remaining" figure was an arithme | 1 |
+| BUG-720 | (LOW - OPEN 2026-10-12): the S4 sidecar reconciliation tolerates a magic 7 instead of reconciling exactly | 1 |
+| BUG-721 | (HIGH - OPEN 2026-10-12): a DELEGATE returned a FABRICATED code-review verdict without reading the code (false assurance) | 1 |
+| BUG-723 | (MED - OPEN 2026-10-12): t11-unique corpus coverage debt after the superseded-run purge | 1 |

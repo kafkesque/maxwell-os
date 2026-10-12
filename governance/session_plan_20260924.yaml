@@ -144,11 +144,40 @@ may_touch:
 - governance/displaced_domain_repair_triage_20261011.csv
 - governance/owner_decisions_v9_template_20261010.json
 - governance/t9_paraphrase_gold_*
+# D-2860 FRONTIER CLEARANCE (2026-10-12): six governance RECEIPTS/RECORDS produced after their own session
+# widening entries, so they had no may_touch home and the tree could NEVER go clean. NAMED one by one
+# (BUG-548/BUG-563: never a glob) - each is an evidence receipt or a ruling record, not a standing class.
+- governance/DECISION_D271_IDENTITY_20260917.md
+- governance/VERIFIER_MODEL_SURVEY_20261012.md
+- governance/content_type_calibration_20261012.json
+- governance/dedup_gate_simulation_run_20261012.json
+- governance/dedup_gate_simulation_batch_20261012.json
+- governance/r5_review_gate.jsonl
 will_not_touch:
 - governance/F11_*
 - governance/ANCHOR_RULER_CONSOLIDATED_*.csv
 - governance/ANCHOR4_DEPTH_BLIND_SHEET_*.csv
 widening_log:
+- date: '2026-10-12'
+  actor: assistant
+  owner_ack: 'owner instruction 2026-10-12 ("commit D-2860" + "continue with the next critical step ... update and synch gov dependencies")'
+  addendum: 'D-2860 FRONTIER CLEARANCE - the 2-week-circle backlog. Six governance artifacts had NO may_touch home (each was written after its own session widening entry closed), so the anti-circle rail refused the boot on files that could never become committable: a receipt that cannot be committed is not a receipt (D-342 class).'
+  additions:
+  - pattern: governance/DECISION_D271_IDENTITY_20260917.md
+    why: 'D-271 identity ruling record - append-only evidence for the duplicate-identity work (dedup_identity.py).'
+  - pattern: governance/VERIFIER_MODEL_SURVEY_20261012.md
+    why: 'D-2961 - the verifier-model survey whose 26B-fielded claim was CORRECTED in place; the owner-ratified two-role ruling cites it.'
+  - pattern: governance/content_type_calibration_20261012.json
+    why: 'D-2953 - the content_type router calibration receipt (the strict-form 100 to 2 measurement that BUG-712 re-stamp is gated on).'
+  - pattern: governance/dedup_gate_simulation_run_20261012.json
+    why: 'D-2950 - the commit-dedup gate simulation receipt that the BUG-712 dedup correction cites.'
+  - pattern: governance/dedup_gate_simulation_batch_20261012.json
+    why: 'D-2950 - the batch arm of the same simulation receipt.'
+  - pattern: governance/r5_review_gate.jsonl
+    why: 'D-2962 - the R5 gate own append-only receipt journal.'
+  may_touch_untouched: false
+  will_not_touch_untouched: true
+  why: 'The widened set is EXACTLY the six paths rail 4 refused (measured: "touched 6 path(s) outside the plan"). No pipeline/** path, no pinned artifact, and no will_not_touch family is involved. The pins RED staged by the same backlog (scripts/definition_nli_verify.py, a docstring-only move) is cleared by a RE-MINT in the same backlog commit, never by a sha256 edit under the old id (BUG-535).'
 - date: '2026-10-10'
   actor: assistant
   owner_ack: 'standing owner mandate 2026-10-10 ("continue with next critical steps ... update and sync gov dependencies")'

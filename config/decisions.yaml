@@ -22425,3 +22425,51 @@ decisions:
   - config/r5_review_gate.yaml
   - governance/evidence/d2968_stage4_content_type_provenance.diff
   - governance/buglog.md
+
+- id: D-2970
+  state: RESOLVED
+  category: PIPELINE / PROVENANCE / WRITE SCOPE
+  date: '2026-10-12'
+  title: 'BUG-745: the S5 SCORE AXIS is written as an AXIS - the verification-scoped commit declared only its human-review
+    half, so 2,247 confidences stayed derived from the SUPERSEDED NLI aggregation'
+  decision: 'MEASURED 2026-10-12. stage6.s5_owned_columns (D-2933 rule V) carried needs_human_review but NOT
+    confidence_score, so the D-2822 re-verification (or-entail + AND-no-contra at 0.5) wrote the new record, status,
+    s5_reason, epistemic_status and review flag onto all 6,591 rows and left 2,247 confidences derived from the old
+    majority@0.1 rule. A/B against the pre-re-verification store: confidence byte-identical on 6,591/6,591 rows while
+    factual.passed flipped on exactly 2,247, each stale confidence matching the OTHER branch of its own record. THE
+    RULE: confidence_score and needs_human_review are ONE rule with TWO outputs (BUG-502), therefore (1) both are
+    declared in the write scope, (2) the axis is DECLARED in config stage6.s5_axis_columns and the stage6 preflight
+    REFUSES a scope carrying only part of a declared axis (serving_gate.validate_s5_axis_scope - the writer-half
+    rule beside pre_write_verdict, fail-closed C16), (3) a declared real coercer keeps a score a NUMBER or the
+    declared ABSENCE (None preserved, D-2942/D-2957), never a string, and (4) the DATA is repaired by
+    re-derivation from each row own record through the ONE home (scripts/repair_s5_score_axis.py: deterministic,
+    LLM-free, C13 backup, ONE transaction, post-state re-derived inside the transaction before COMMIT). The rail
+    (scripts/check_s5_score_axis.py) also ADOPTS the declared rule it lacked: a role with no factual claim has an
+    ABSENT-BY-DESIGN axis (D-2942), reported as NOT_APPLICABLE and never as undecidable, while a VALUE on such a
+    role remains fail-closed (D-2957). Forbidden moves, declined: re-recording a ceiling (a PARITY rail is repaired,
+    never re-baselined), writing a prediction to move a label (D-2953), and raising the R5 max_source_chars cap to
+    fit stage6_commit (the cap is anchored to a measurement; instead the guard moved to its rule home in
+    serving_gate, which put stage6_commit back under the cap at 99,153 chars).'
+  measured: 'BEFORE: check-s5-score-axis 4,344 MATCH / 2,247 SCORE_MISMATCH / 1,049 UNDECIDABLE; repair --check
+    stale 2,247, columns moved {confidence_score: 2247}, 0 human-review moves. AFTER: rail 6,591 MATCH / 0 / 0 plus
+    1,049 declared NOT_APPLICABLE; repair --apply wrote 2,247 rows with the post-state re-derivation clean and the
+    receipt at governance/evidence/s5_score_axis_repair_receipt.json (backup
+    backups/maxwell.db.bak_20261012T210829Z_pre_s5_score_axis_repair); check-serving-gate unchanged at 7,640 MATCH;
+    428 passed / 5 skipped (7 new controls); R5 APPROVE on the rail, the repair, serving_gate and stage6_commit;
+    check_store_columns census moves 0 after ONE named --record settling the confidence_score.distinct store ruler
+    (161 to 148) with debt unchanged at 8; check-config-defaults UNCHANGED at 486 sites / 241 keys (the axis
+    accessor was rewritten to read loudly, so the guard costs no shadowed-declared key - C12/C16).'
+  bugs:
+  - BUG-745
+  - BUG-502
+  - BUG-737
+  files:
+  - config/pipeline_config.yaml
+  - pipeline/pipeline_paths.py
+  - pipeline/serving_gate.py
+  - pipeline/stage6_commit.py
+  - scripts/check_s5_score_axis.py
+  - scripts/repair_s5_score_axis.py
+  - tests/test_s5_score_axis_write_scope.py
+  - governance/evidence/s5_score_axis_repair_receipt.json
+  - governance/buglog.md

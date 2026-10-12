@@ -52,6 +52,7 @@ from pipeline.pipeline_paths import (
     S6_COMMIT_NON_FB,  # D2590: the flag that was DEAD config until this build
     S6_MAX_FAILED_RATIO,  # D2338: fail-closed commit tolerance
     S6_COMMIT_SCOPE,  # D-2933 (rule V): verification-scoped commit
+    S6_S5_AXIS_COLUMNS,
     S6_S5_OWNED_COLUMNS,  # D-2933: the S5-owned provenance column set (C12)
     S6_TAXONOMY_DEPENDENT_COLUMNS,  # D-2934: column-scoped taxonomy-skew guard
     S6_VEC_REQUIRE,  # D-2717: fail-closed vec0 gate (C16)
@@ -84,6 +85,7 @@ from pipeline.serving_gate import (  # D274a/D274h: the pre-write half of the ga
     content_types_without_factual_claim,  # D-2942: the roles with no NLI factual claim (C12)
     derive_status,  # D-2942/D274h: the ONE status rule — S6 stamps its output, never a literal
     pre_write_verdict,
+    validate_s5_axis_scope,  # D-2970/BUG-745: refuse a write scope that splits a declared axis
 )
 from pipeline.dedup_gate import (  # D-2951: commit-time dedup gate (D-2949 prevention half)
     CommitDedupGate,
@@ -552,6 +554,8 @@ def _record_taxonomy_skew(checkpoint_taxonomy: str, store_taxonomy: str) -> None
 S5_COLUMN_COERCERS: dict[str, str] = {
     "status": "str", "s5_reason": "str", "verifier_model": "str", "verification_method": "str",
     "epistemic_status": "str", "practicality": "str", "committed_at": "str",
+    # D-2970: the OTHER half of the score axis - a NUMBER or the declared ABSENCE, never a string.
+    "confidence_score": "real",
     "verification_results": "json", "isor": "json", "needs_human_review": "bool",
 }
 
@@ -579,6 +583,9 @@ def _coerce_s5_value(column: str, value: object) -> object:
         return _safe_json(value if value is not None else [])
     if kind == "bool":
         return 1 if value else 0
+    if kind == "real":
+        # D-2970: a score is a NUMBER or the declared ABSENCE - never the string "0.9".
+        return None if value is None else float(value)
     return _safe_str(value)
 
 
@@ -1457,6 +1464,7 @@ def run_stage6(export_only: bool = False):
                 "stage6: commit_scope=verification_scoped but stage6.s5_owned_columns is empty — "
                 "a scoped commit would write nothing. Fix config/pipeline_config.yaml (C16)."
             )
+        validate_s5_axis_scope(S6_S5_OWNED_COLUMNS, S6_S5_AXIS_COLUMNS)
         if S6_TAXONOMY_DEPENDENT_COLUMNS & set(S6_S5_OWNED_COLUMNS):
             raise RuntimeError(
                 "stage6: a column is declared BOTH s5_owned AND taxonomy_dependent — the D-2934 "

@@ -313,6 +313,32 @@ def store_verdict(
     return MATCH, ""
 
 
+def validate_s5_axis_scope(owned: object, axes: dict[str, tuple[str, ...]]) -> None:
+    """D-2970 (BUG-745): refuse a write scope that carries only PART of a declared axis.
+
+    The WRITER half of the axis rule, next to pre_write_verdict: `confidence_score` and
+    `needs_human_review` are ONE rule with two outputs (BUG-502), so a scope that writes one half
+    leaves the other holding a value the row's own verification record does not derive (D274h).
+    Measured, not hypothetical: the D-2822 re-verification left 2,247 confidences derived from the
+    superseded aggregation because stage6's write scope carried the second half only (BUG-745).
+
+    Args:
+        owned: the declared S5-owned column names.
+        axes: {axis_name: columns} - config/pipeline_config.yaml#stage6.s5_axis_columns.
+
+    Raises:
+        RuntimeError: an axis is partially present in `owned` (fail-closed, C16).
+    """
+    names = {str(c) for c in owned}
+    for axis, columns in axes.items():
+        present = [c for c in columns if c in names]
+        if present and len(present) != len(columns):
+            raise RuntimeError(
+                f"stage6: stage6.s5_owned_columns carries only part of the declared axis {axis!r} "
+                f"({present} of {list(columns)}) - half an axis is a split truth (D-2970/BUG-745, C16)"
+            )
+
+
 def pre_write_verdict(fb: dict[str, Any], cfg: dict[str, Any] | None = None) -> tuple[bool, str]:
     """The WRITER HALF of D274a: may this row be persisted? Returns (ok, complaint).
 

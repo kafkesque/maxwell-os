@@ -294,6 +294,33 @@ S6_MAX_FAILED_RATIO=float(_CFG.get("stage6", {}).get("max_failed_ratio", 0.0))  
 # (BUG-709). C12: the scope and the column set live in config/pipeline_config.yaml:stage6.
 S6_COMMIT_SCOPE=str(_CFG.get("stage6", {}).get("commit_scope", "verification_scoped"))
 S6_S5_OWNED_COLUMNS=tuple(_CFG.get("stage6", {}).get("s5_owned_columns", []))
+# D-2970 (BUG-745): the DECLARED write axes (config stage6.s5_axis_columns). A group here must be
+# written WHOLE - stage6 refuses a scope carrying only part of one (C16), because half an axis is a
+# split truth: the store would hold a value its own verification record does not derive.
+def _s6_axis_columns() -> dict[str, tuple[str, ...]]:
+    """Read the DECLARED write axes from config/pipeline_config.yaml#stage6.s5_axis_columns.
+
+    D-2970/BUG-745 (C12/C16): read LOUDLY - no code default. A missing or empty declaration would
+    silently disable the guard that refuses a write scope splitting an axis, which is exactly the
+    defect this declaration exists to prevent (the rule BUG-504 applied to the S5 score-axis
+    constants: a config miss IS the bug, so it raises instead of defaulting).
+    """
+    try:
+        declared: object = _CFG["stage6"]["s5_axis_columns"]
+    except KeyError as exc:
+        raise KeyError(
+            "config/pipeline_config.yaml#stage6.s5_axis_columns is NOT declared - the stage6 preflight "
+            "could not then refuse a write scope that splits an axis (C12/C16, D-2970/BUG-745)"
+        ) from exc
+    if not isinstance(declared, dict) or not declared:
+        raise ValueError(
+            "config/pipeline_config.yaml#stage6.s5_axis_columns must declare at least one axis "
+            f"(got {declared!r}) - an empty declaration disables the split guard (C16)"
+        )
+    return {str(_k): tuple(str(_c) for _c in _v) for _k, _v in declared.items()}
+
+
+S6_S5_AXIS_COLUMNS: dict[str, tuple[str, ...]] = _s6_axis_columns()
 # D-2934: columns whose value is DERIVED FROM the taxonomy menu. The taxonomy-skew guard
 # refuses a write only when a written column appears here; an empty list means the skew is
 # immaterial for this write and is recorded as a loud advisory instead (see stage6_commit).

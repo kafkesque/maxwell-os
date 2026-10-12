@@ -728,17 +728,37 @@ stage6:
   # Only columns PRESENT in the S5 checkpoint are written, so a field the checkpoint does
   # not carry can never be default-injected over an existing store value. `borp_score` is
   # deliberately absent: no S5 checkpoint carries it, so writing it would zero the column.
+  # D-2970 (BUG-745): the SCORE AXIS is written as an AXIS or not at all. `confidence_score` and
+  # `needs_human_review` are ONE rule with TWO outputs (pipeline/serving_gate.py::derive_conf_and_review,
+  # BUG-502) - and this list carried only the SECOND half. MEASURED (A/B against the pre-re-verification
+  # store): the D-2822 re-verification (or-entail + AND-no-contra @ 0.5) rewrote the record + status +
+  # s5_reason + epistemic_status of all 6,591 rows, the confidence of NONE, so 2,247 rows kept a
+  # confidence computed by the SUPERSEDED majority@0.1 aggregation (the stored confidence is
+  # byte-identical on 6,591/6,591 rows across the re-verification, while `factual.passed` flipped on
+  # exactly those 2,247). scripts/check_s5_score_axis.py is the rail that measured it; the repair is
+  # scripts/repair_s5_score_axis.py (re-derive from the record through the ONE home).
+  # Drift-proofing: a column added here must not SPLIT a declared axis (stage6.s5_axis_columns) - the
+  # stage6 preflight refuses a partially-present axis (fail-closed, C16), so this cannot recur silently.
   s5_owned_columns:
   - status
   - s5_reason
   - verification_results
   - verifier_model
   - verification_method
+  - confidence_score
   - needs_human_review
   - epistemic_status
   - isor
   - practicality
   - committed_at
+  # D-2970 (BUG-745): DECLARED WRITE AXES. A group declared here is written WHOLE: the stage6
+  # preflight refuses a commit scope that carries only PART of a group, because half an axis is a
+  # split truth - the store would then hold a value its own record does not derive (D274h). The
+  # declaration lives HERE (C12) so the guard is a rule, not a comment a reader has to remember.
+  s5_axis_columns:
+    score_axis:  # serving_gate.derive_conf_and_review - confidence + human-review flag, ONE rule
+    - confidence_score
+    - needs_human_review
   # D-2951 (2026-10-12): COMMIT-TIME DEDUP GATE — the PREVENTION half of D-2949.
   # D-2949 #4 root-caused the 3 near-duplicate name groups to "stage1 SHA-256 EXACT-dedup +
   # no name-level uniqueness at commit": stage1 dedups SEGMENTS, so two extractions of the

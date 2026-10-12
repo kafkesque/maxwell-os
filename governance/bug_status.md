@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**183 open** / 327 closed of 510 ids.
+**182 open** / 328 closed of 510 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -189,4 +189,3 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-738 | (MED - OPEN 2026-10-12) - R5 code review had NO deterministic layer: 7 of 43 verdicts were not decisions, and the deep auditor was the gener | 2 |
 | BUG-741 | (MED - OPEN 2026-10-12) - the adjudication map's `proposed` field CONFLATES two vocabularies, so one owner adjudication is not expressible a | 4 |
 | BUG-743 | (LOW - OPEN 2026-10-12) - a DELEGATED reviewer's verdict is not re-readable after the fact, so a receipt that cites it must CAPTURE THE TEXT | 1 |
-| BUG-745 | (HIGH - OPEN 2026-10-12) - the S5 score-axis rail is RED again: 2,247 stored rows no longer reproduce from the ONE home, after the bug that  | 1 |

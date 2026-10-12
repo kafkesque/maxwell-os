@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0",
+  "gen_model": "deterministic",
+  "pipeline_commit": "e427767",
+  "created_at": "2026-10-12T21:08:30.814539+00:00",
+  "bug": "BUG-745",
+  "decision": "D-2970",
+  "db": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/maxwell.db",
+  "backup": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/backups/maxwell.db.bak_20261012T210829Z_pre_s5_score_axis_repair",
+  "deriver": "pipeline/serving_gate.py::derive_conf_and_review",
+  "enrichment_deriver": "pipeline/stage5_verify.py::_check_enrichment_quality",
+  "rows_written": 2247,
+  "columns_moved": {
+    "confidence_score": 2247
+  },
+  "post_state_verified": true,
+  "role_set_home": "pipeline/serving_gate.py::content_types_without_factual_claim"
+}

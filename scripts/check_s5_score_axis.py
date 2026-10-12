@@ -33,16 +33,55 @@ from pipeline.pipeline_paths import (  # noqa: E402
     S5_HUMAN_REVIEW_ISOR,
     S5_QUARANTINE_CONF_CAP,
 )
-from pipeline.serving_gate import derive_conf_and_review  # noqa: E402
+from pipeline.serving_gate import (  # noqa: E402
+    content_types_without_factual_claim,  # D-2942: the roles with no factual claim (ONE home)
+    derive_conf_and_review,
+)
 from pipeline.stage5_verify import _check_enrichment_quality  # noqa: E402
 
 MATCH = "MATCH"
 SCORE_MISMATCH = "SCORE_MISMATCH"
 REVIEW_MISMATCH = "REVIEW_MISMATCH"
+NOT_APPLICABLE = "NOT_APPLICABLE"  # D-2942/D-2970: a role with no factual claim - a DECLARED absence
 UNDECIDABLE = "UNDECIDABLE"
 PREFIX = "check-s5-score-axis"
 EXIT_OK = 0
 EXIT_DEFECT = 1
+
+
+def _no_factual_claim_verdict(row: dict) -> tuple[str, str]:
+    """D-2942/D-2970 (D2590, BUG-745): a role with NO factual claim has an ABSENT score axis.
+
+    The role set is a RULE - serving_gate.content_types_without_factual_claim (config), the SAME one
+    stage6/pre_write_verdict use - so the rail cannot hold a second truth about which rows have a
+    verification record at all. The declared shape of the axis for such a role is ABSENCE:
+    confidence_score IS NULL and needs_human_review is false. Anything else is not "undecidable",
+    it is an unmeasured claim (D-2957) and stays fail-closed. Any OTHER role with no record is
+    UNDECIDABLE, because for it an absent record is a missing measurement, not a declaration.
+
+    Args:
+        row: the stored row.
+
+    Returns:
+        (verdict, detail) - NOT_APPLICABLE only for the declared role AND the declared absent shape.
+    """
+    if str(row.get("content_type") or "") not in content_types_without_factual_claim():
+        return UNDECIDABLE, (
+            "no factual/mechanism_quality check in verification_results - an unevaluable row is never a pass (C16)"
+        )
+    stored_conf = row.get("confidence_score")
+    if stored_conf is not None:
+        return UNDECIDABLE, (
+            f"a role with no factual claim must carry an ABSENT score axis, but the row stores "
+            f"confidence_score={stored_conf!r} - an unmeasured claim (D-2957); "
+            f"scripts/repair_s5_score_axis.py --check reports whether this is repairable"
+        )
+    if row.get("needs_human_review"):
+        return UNDECIDABLE, (
+            "a role with no factual claim stores needs_human_review=true - the axis is declared ABSENT, "
+            "so a flag no rule derives is never a pass (C16)"
+        )
+    return NOT_APPLICABLE, ""
 
 
 def verdict_for(row: dict) -> tuple[str, str]:
@@ -54,7 +93,7 @@ def verdict_for(row: dict) -> tuple[str, str]:
     factual = next((x for x in results if x.get("check_name") == "factual"), None)
     mech = next((x.get("score") for x in results if x.get("check_name") == "mechanism_quality"), None)
     if factual is None or mech is None:
-        return UNDECIDABLE, "no factual/mechanism_quality check in verification_results - an unevaluable row is never a pass (C16)"
+        return _no_factual_claim_verdict(row)
     if row.get("confidence_score") is None:
         return UNDECIDABLE, "confidence_score is absent"
     _ok, enrich, _detail = _check_enrichment_quality(dict(row))
@@ -88,6 +127,20 @@ def _row(passed: bool, mech: float, isor: dict, stored_conf: float, stored_revie
     }
 
 
+def _no_claim_row(content_type: str, conf: object = None) -> dict:
+    """A sidecar-shaped row (no factual/mechanism check) with the score axis at a chosen state.
+
+    The role is read from the DECLARED set (serving_gate.content_types_without_factual_claim), so the
+    control cannot go stale by naming a role the config no longer declares as claim-free.
+    """
+    return {
+        "content_type": content_type,
+        "verification_results": json.dumps([]),
+        "confidence_score": conf,
+        "needs_human_review": False,
+    }
+
+
 def controls() -> list[tuple[str, dict, str]]:
     """Known-answer rows: the rail must reproduce the rail's own verdicts before judging the store."""
     strong = {"score": 0.917, "rating": S5_HUMAN_REVIEW_ISOR}
@@ -104,6 +157,9 @@ def controls() -> list[tuple[str, dict, str]]:
         ("a row with no mechanism_quality check is UNDECIDABLE, never a pass", {"verification_results": json.dumps([{"check_name": "factual", "passed": True}]), "confidence_score": 0.9, "needs_human_review": False}, UNDECIDABLE),
         ("the human-review flag is load-bearing on the DECLARED ISOR rating", _row(False, 1.0, strong, S5_QUARANTINE_CONF_CAP, False), REVIEW_MISMATCH),
         ("the same row with a NON-declared rating is not reviewed", _row(False, 1.0, weak, S5_QUARANTINE_CONF_CAP, False), MATCH),
+        ("a role with NO factual claim + the DECLARED absent axis is NOT_APPLICABLE, not undecidable", _no_claim_row(sorted(content_types_without_factual_claim())[0]), NOT_APPLICABLE),
+        ("the SAME role carrying a confidence value is UNDECIDABLE - an unmeasured claim (D-2957)", _no_claim_row(sorted(content_types_without_factual_claim())[0], conf=0.9), UNDECIDABLE),
+        ("a role WITH a factual claim and no record stays UNDECIDABLE - absence is not a declaration", _no_claim_row("principle"), UNDECIDABLE),
     ]
 
 
@@ -137,7 +193,7 @@ def main() -> int:
     for row in rows:
         verdict, detail = verdict_for(dict(row))
         tally[verdict] += 1
-        if verdict != MATCH:
+        if verdict not in (MATCH, NOT_APPLICABLE):
             samples.setdefault(verdict, []).append(f"{row['fb_id'][:12]}: {detail}")
             print(f"FAIL {PREFIX}: {verdict} - {row['fb_id'][:12]}: {detail}")
     if tally[SCORE_MISMATCH] or tally[REVIEW_MISMATCH] or tally[UNDECIDABLE]:
@@ -147,6 +203,12 @@ def main() -> int:
         f"ok {PREFIX}: {len(rows)} row(s) re-derived through pipeline/serving_gate.py::derive_conf_and_review"
         f" - {tally[MATCH]} MATCH, 0 score mismatch, 0 review mismatch, 0 undecidable"
     )
+    if tally[NOT_APPLICABLE]:
+        print(
+            f"   declared NOT APPLICABLE: {tally[NOT_APPLICABLE]} row(s) whose role carries no factual claim"
+            " (D-2942) carry the DECLARED ABSENT score axis (confidence NULL, needs_human_review false);"
+            " a value there would be an unmeasured claim and stays fail-closed (D-2957)"
+        )
     print(
         f"   declared weights: mechanism={S5_CONF_MECH_WEIGHT} enrichment={S5_CONF_ENRICH_WEIGHT} "
         f"isor={S5_CONF_ISOR_WEIGHT} cap={S5_QUARANTINE_CONF_CAP} human_review_isor={S5_HUMAN_REVIEW_ISOR!r}"

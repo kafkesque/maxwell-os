@@ -19,6 +19,7 @@ Usage: python3 scripts/diff_bug712_reroute.py [--limit N] [--csv path]
 from __future__ import annotations
 
 import argparse
+import csv
 import json
 import sqlite3
 import sys
@@ -35,6 +36,9 @@ from pipeline.pipeline_paths import DB_PATH  # noqa: E402
 _BODY_KEYS = ("definition", "mechanism", "boundary", "consequence", "elaboration")
 # TI-only body lives in type_body JSON (D-2943); contested is a growth_edge field there too.
 _TYPE_BODY_KEYS = ("tool_name", "syntax", "parameters", "contested")
+
+# Extra columns carried into the CSV so the owner can spot-check the WHY of each move.
+_SPOT_CHECK_COLS = ("discipline", "extraction_type", "status", "pipeline_run_id", "provenance")
 
 
 def _fb_from_row(row: sqlite3.Row) -> dict[str, Any]:
@@ -59,7 +63,7 @@ def _fb_from_row(row: sqlite3.Row) -> dict[str, Any]:
 
 
 def read_rows(conn: sqlite3.Connection, limit: int | None) -> list[sqlite3.Row]:
-    cols = ["fb_id", "name", "content_type", *_BODY_KEYS, "type_body"]
+    cols = ["fb_id", "name", "content_type", *_BODY_KEYS, "type_body", *_SPOT_CHECK_COLS]
     sql = f"SELECT {', '.join(cols)} FROM fbs"
     if limit:
         sql += f" LIMIT {limit}"
@@ -82,18 +86,32 @@ def main() -> int:
     finally:
         conn.close()
 
-    changes: list[tuple[str, str, str, str]] = []  # (fb_id, name, before, after)
+    # (fb_id, name, before, after, discipline, extraction_type, status, pipeline_run_id, provenance)
+    changes: list[tuple[str, str, str, str, str, str, str, str, str]] = []
     for row in rows:
         fb = _fb_from_row(row)
         before = (row["content_type"] or "").strip()
         after = reroute_content_type(fb)
         if after != before:
-            changes.append((row["fb_id"], row["name"] or "", before, after))
+            changes.append(
+                (
+                    row["fb_id"],
+                    row["name"] or "",
+                    before,
+                    after,
+                    row["discipline"] or "",
+                    row["extraction_type"] or "",
+                    row["status"] or "",
+                    row["pipeline_run_id"] or "",
+                    row["provenance"] or "",
+                )
+            )
 
     print(f"read {len(rows)} row(s); {len(changes)} would move under deterministic reroute")
     by_from: dict[str, int] = {}
     by_to: dict[str, int] = {}
-    for _fid, _name, before, after in changes:
+    for c in changes:
+        before, after = c[2], c[3]
         by_from[before] = by_from.get(before, 0) + 1
         by_to[after] = by_to.get(after, 0) + 1
     if by_from:
@@ -101,15 +119,14 @@ def main() -> int:
     if by_to:
         print("  by TO:  ", dict(sorted(by_to.items())))
 
-    for fid, name, before, after in changes[:20]:
+    for fid, name, before, after, *_ in changes[:20]:
         print(f"  {fid}  {name[:48]!r:50}  {before} -> {after}")
 
     if args.csv:
-        Path(args.csv).write_text(
-            "fb_id,name,before,after\n"
-            + "\n".join(f"{fid},{name!r},{b},{a}" for fid, name, b, a in changes) + "\n",
-            encoding="utf-8",
-        )
+        with open(args.csv, "w", newline="", encoding="utf-8") as fh:
+            w = csv.writer(fh)
+            w.writerow(["fb_id", "name", "before", "after", *_SPOT_CHECK_COLS])
+            w.writerows(changes)
         print(f"  wrote {args.csv}")
 
     if not changes:

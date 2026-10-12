@@ -764,6 +764,15 @@ coverage:
   flag_fraction: 0.3
 retrieval:
   method: vector  # D-2724: production candidate pool. 'vector' = pure vector + cross-encoder rerank (vector+rerank, D-2723 recommendation — RRF fusion is recall-negative); 'rrf' = RRF fusion of FTS+vector+keyword (legacy hybrid/hybrid+rerank).
+  # A2/BUG-274: related_fbs relationship types that are semantically SYMMETRIC
+  # (undirected). The store materialises related_fbs under a per-FB top-k
+  # neighbour cap (BUG-188), so a weak overlap edge may survive on only ONE side.
+  # graph_expand therefore follows INCOMING edges of these types too (reverse
+  # adjacency) to restore reachability symmetry WITHOUT mutating the store —
+  # backfilling the pruned direction would fabricate adjacency the cap
+  # intentionally dropped (D-277). All four are overlap/similarity signals and
+  # inherently undirected.
+  symmetric_relationship_types: [semantic_near, source_crossover, discipline_overlap, domain_overlap]
   fts_stopwords: [a, an, the, and, or, of, to, in, on, for, with, is, are, was, were, be, been, how, what, why, when, where, which, who, do, does, did, can, could, should, would, will, this, that, these, those, it, its, as, at, by, from, about, into, than, then, so, if, but, not, no, have, has, had, i, me, my, we, our, you, your, they, them, their]
 retrieval_eval:
   model: Phi-4-mini-instruct-8bit

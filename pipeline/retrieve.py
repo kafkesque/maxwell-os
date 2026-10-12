@@ -37,6 +37,7 @@ from pipeline.label_traceability import traceability_of  # noqa: E402  BUG-497/D
 from pipeline.pipeline_paths import RETRIEVE_CONFIDENCE_THRESHOLD  # D2231: C12 compliance
 from pipeline.pipeline_paths import RERANK_ENABLED  # D2521 (S2): production rerank adoption gate
 from pipeline.pipeline_paths import RETRIEVAL_METHOD  # D-2724: production retrieval default (C21 swappable)
+from pipeline.pipeline_paths import SYMMETRIC_RELATIONSHIP_TYPES  # A2/BUG-274: undirected related_fbs types (reverse adjacency)
 from pipeline.pipeline_paths import FTS_STOPWORDS  # D2561: C12 stopwords from config
 from pipeline.pipeline_paths import (  # D2537: fused quality ranking (opt-in)
     RANKING_QUALITY_SCORE_ENABLED,
@@ -719,6 +720,57 @@ def format_fb(fb: dict, index: int = None, compact: bool = False) -> str:
 # D2205 P1 — Graph Expansion Layer
 # ═══════════════════════════════════════════════════════════════════════
 
+def _reverse_adjacency(
+    conn: sqlite3.Connection,
+    symmetric_types: frozenset[str],
+    run_clause: str,
+    run_params: tuple,
+) -> dict[str, list[tuple[str, list[str]]]]:
+    """A2/BUG-274: incoming-edge index for symmetric related_fbs relationship types.
+
+    The store materialises related_fbs under a per-FB top-k neighbour cap
+    (BUG-188), so a weak overlap edge may survive on only ONE side — a one-way
+    link. Following ONLY forward edges makes reachability asymmetric. This
+    index lets the read-side traversal also follow INCOMING edges of the
+    symmetric types (semantic_near / source_crossover / discipline_overlap /
+    domain_overlap — all overlap/similarity signals, inherently undirected)
+    WITHOUT mutating the store (backfilling the pruned direction would
+    fabricate adjacency the cap intentionally dropped — D-277).
+
+    Args:
+        conn: Read-only SQLite connection.
+        symmetric_types: Related_fbs relationship types treated as undirected.
+        run_clause: Canonical-run SQL fragment (``"AND pipeline_run_id = ?"``
+            or empty when the table has no run column).
+        run_params: Parameters bound to ``run_clause``.
+
+    Returns:
+        ``{target_fb_id: [(source_fb_id, [symmetric relationship types]), ...]}``.
+    """
+    reverse: dict[str, list[tuple[str, list[str]]]] = {}
+    rows = conn.execute(
+        f"SELECT fb_id, related_fbs FROM fbs "
+        f"WHERE related_fbs IS NOT NULL AND related_fbs != '' {run_clause}",
+        run_params,
+    ).fetchall()
+    for row in rows:
+        src: str = row["fb_id"]
+        raw = row["related_fbs"]
+        try:
+            rels: list = json.loads(raw) if isinstance(raw, str) else raw
+        except (json.JSONDecodeError, TypeError):
+            continue
+        for rel in rels:
+            tgt: str | None = rel.get("fb_id") if isinstance(rel, dict) else rel
+            if not tgt:
+                continue
+            rtypes: list = rel.get("relationships", []) if isinstance(rel, dict) else []
+            sym: list[str] = [r for r in rtypes if r in symmetric_types]
+            if sym:
+                reverse.setdefault(tgt, []).append((src, sym))
+    return reverse
+
+
 def graph_expand(
     conn: sqlite3.Connection,
     fb_ids: list[str],
@@ -763,6 +815,14 @@ def graph_expand(
         for fid in fb_ids
     }
     current_hop: int = 0
+    # A2/BUG-274: symmetric related_fbs types are traversed undirected (reverse
+    # adjacency) to restore reachability symmetry dropped by the BUG-188 cap.
+    symmetric_types: frozenset[str] = frozenset(SYMMETRIC_RELATIONSHIP_TYPES)
+    reverse_adj: dict[str, list[tuple[str, list[str]]]] = (
+        _reverse_adjacency(conn, symmetric_types, run_clause, run_params)
+        if symmetric_types
+        else {}
+    )
 
     while frontier and current_hop < hops:
         level_size: int = len(frontier)
@@ -811,6 +871,26 @@ def graph_expand(
                         result[current_id]["related"].append(
                             dict(rrow) if rrow else {"fb_id": rel_id}
                         )
+
+            # ── Reverse adjacency (A2/BUG-274): follow INCOMING symmetric edges ──
+            # The store's per-FB neighbour cap (BUG-188) can drop one direction of
+            # an inherently-symmetric overlap edge, leaving a one-way link. Follow
+            # the stored reverse direction so reachability is symmetric WITHOUT
+            # backfilling the store (backfill would fabricate adjacency — D-277).
+            for src_id, _sym_types in reverse_adj.get(current_id, ()):
+                if src_id not in visited:
+                    visited.add(src_id)
+                    frontier.append(src_id)
+                    rrow = conn.execute(
+                        f"SELECT fb_id, name, definition, domains, borp_score "
+                        f"FROM fbs WHERE fb_id = ? {run_clause}",
+                        (src_id, *run_params),
+                    ).fetchone()
+                    if current_id not in result:
+                        result[current_id] = {"related": [], "contradicts": [], "prerequisites": []}
+                    result[current_id]["related"].append(
+                        dict(rrow) if rrow else {"fb_id": src_id}
+                    )
 
             # ── Expand contradicts_fbs (bidirectional warning) ─────────
             if include_contradictions and row["contradicts_fbs"]:

@@ -403,6 +403,7 @@ S4_GRAMMAR_DECODING_ENABLED = bool(_CFG.get("stage4", {}).get("grammar_decoding_
 RETRIEVE_CONFIDENCE_THRESHOLD = float(_CFG.get("retrieval_eval", {}).get("confidence_threshold", 0.85))
 RERANK_ENABLED = bool(_CFG.get("rerank", {}).get("enabled", False))   # D2521 (S2): production rerank adoption gate
 RETRIEVAL_METHOD = str(_CFG.get("retrieval", {}).get("method", "rrf"))  # D-2724: production retrieval default ('vector' | 'rrf')
+SYMMETRIC_RELATIONSHIP_TYPES = tuple(str(x) for x in (_CFG.get("retrieval", {}).get("symmetric_relationship_types", ["semantic_near", "source_crossover", "discipline_overlap", "domain_overlap"])))  # A2/BUG-274: undirected related_fbs types (reverse adjacency)
 FTS_STOPWORDS = frozenset(_CFG.get("retrieval", {}).get("fts_stopwords", []))  # C12: FTS stopwords from config (D2561)
 
 # D2537: opt-in fused quality ranking (replaces dead borp_score ordering)

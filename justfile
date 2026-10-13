@@ -142,6 +142,7 @@ health:
     python3 scripts/lib/fixture.py --selftest || exit 1                   # BUG-577: the shared fixture rules own known-answer controls (ONE home; a control nothing runs is a comment, BUG-492)
     python3 scripts/run_ladder.py --selftest || exit 1                    # D-2680/BUG-582: the ladder collector own known-answer controls (a control nothing runs is a comment, BUG-492)
     python3 scripts/check_declaration_consumers.py || exit 1              # D-2669: no declaration without its reader - BUG-562 landed the pair in one commit; this makes the JOIN a property, not an act
+    python3 scripts/run_ladder.py --receipt-check || [ $? -eq 2 ]         # D-2983/BUG-759: the last FULL scan is a MEASUREMENT with a COVERAGE and an AGE - 1 (a red RECORDED under exactly this coverage) is FATAL, 2 (UNKNOWN: never measured here, measured against a different ladder, or older than the declared budget) is OWNER-OWED, loud, never fatal. Declared in config/rail_registry.yaml#ladder_receipt. It stands LAST on purpose: a whole-set report placed early would hide every line it speaks for
 
 healthcheck: health
 

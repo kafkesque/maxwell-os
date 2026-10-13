@@ -34,7 +34,7 @@ fixture:
   keep: false
   timeout_seconds: 600
 coverage:
-  min_mutations: 32            # FLOOR (shrink guard): deleting an entry means editing the floor in a diff a human reads
+  min_mutations: 33            # FLOOR (shrink guard): deleting an entry means editing the floor in a diff a human reads (33 = 32 + the D-2983 receipt entry)
   # D-2679: the coverage set is DERIVED, never restated. Which rails gate a COMMIT is one fact and it already has
   # ONE home (config/rail_registry.yaml#commit_boundary), so restating it here would be a SECOND HOME - and two
   # lists of one fact drift, and only one of them can be right. scripts/check_rail_mutations.py joins the two and
@@ -508,6 +508,26 @@ mutations:
       twice. With the census neutered the TWICE case is no longer refused, so the control that NAMES the rule
       stops firing while the live control (every declared recipe is clean) stays green: the differential is real
       and the marker is the control's own name.
+
+  # D-2983 (BUG-759) - THE RECORDED VERDICT. A whole-set scan that is recorded and then read as evidence is the
+  # strongest claim in the ladder, so it must be falsifiable: this mutation makes a RECORDED RED read as GREEN
+  # and the control that names the rule has to go red (D-2676 iv). A receipt nobody can make fail is a receipt
+  # nobody can trust.
+  - id: a_recorded_ladder_red_is_load_bearing
+    subject: scripts/run_ladder.py
+    op: replace
+    find: '    if payload.get("faults"):'
+    replace: '    if False:  # MUTATION (D-2676): a recorded red reads as green'
+    runner: scripts/run_ladder.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: '  FAIL selftest/a_recorded_ladder_red_is_not_silently_green'
+    why: >-
+      D-2983/BUG-759: the collector RECORDS the whole-set verdict so a PREFIX report can no longer be read as a
+      verdict - MEASURED 2026-10-13, seven ladder lines stood red and nobody knew. With the recorded-red branch
+      inert, a scan that measured faults is reported as MEASURED GREEN: the exact blindness BUG-759 filed, one
+      level up.
 
   # BUG-570 (D-2692) - the BUGLOG BLOAT rail. A block occurring TWICE with identical bytes is a COPY, and
   # the comparison that REFUSED the real copy was `occurrence -> EOF`: length-dependent, so two identical

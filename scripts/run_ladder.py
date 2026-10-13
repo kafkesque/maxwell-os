@@ -30,18 +30,42 @@ that is the only line whose behaviour is not the ladder's own.
 TRI-STATE (BUG-457): 0 every line green | 1 FATAL (a hard gate red) | 2 owner-owed only (loud, NOT fatal).
 --selftest: known-answer controls over SYNTHETIC ladders, executing only lines this file writes itself - no
 filesystem fixture at all, so this rail adds no second home of the "a fixture resolves OUTSIDE the tree it
-audits" rule (BUG-577) and no writer to declare (config/rail_registry.yaml#writers).
+audits" rule (BUG-577); the RECEIPT it writes is declared, gitignored runtime state (see below).
+
+THE RECEIPT (D-2983, BUG-759). A prefix report is a verdict about the lines it RAN and says nothing about the
+lines it never reached. MEASURED 2026-10-13, that cost a whole-session blindness: the full ladder stood RED on
+SEVEN lines and nobody knew, because a session that mints a decision cannot get past the commit-frontier rail
+and a session that never runs the whole set never sees the rest. So the whole set is now a MEASUREMENT that
+outlives the run. --collect records {coverage fingerprint, line count, worst rc, every fault, cost, age, HEAD}
+to the path declared in config/rail_registry.yaml#ladder_receipt (C12: no path in code), and both readers of
+that record derive the whole-set entry point from the ladder's own bytes:
+  --banner         prints the recorded verdict FIRST, before any rail can abort the recipe (a declaration
+                   printed after the abort is read by nobody) and NEVER aborts on it itself;
+  --receipt-check  exits with the same tri-state: 0 the whole ladder was MEASURED GREEN under exactly this
+                   coverage | 1 a red is RECORDED under exactly this coverage (a measured fault may not go
+                   quiet, C16) | 2 UNKNOWN - never measured here, measured against a DIFFERENT ladder, or older
+                   than the declared budget (owner-owed and loud, never fatal: only a full scan clears it). It
+                   stands LAST in the recipe, because a whole-set report placed early would hide the very lines
+                   it speaks for.
+The record is held OUT of version control (gitignored, declared in the registry): it is THIS clone's
+observation, so committing it would dress a machine-local measurement as durable evidence.
 """
 from __future__ import annotations
 
 import argparse
 import contextlib
+import hashlib
 import io
+import json
+import os
 import pathlib
 import re
 import subprocess
 import sys
+import tempfile
 import time
+from datetime import UTC, datetime, timedelta
+from typing import Any
 
 import yaml
 
@@ -51,6 +75,7 @@ SELF = pathlib.Path(__file__).name
 RECIPE = re.compile(r"^([A-Za-z0-9_-]+):")
 EXIT_CLEAN, EXIT_FATAL, EXIT_OWED = 0, 1, 2
 Fault = tuple[str, int, float]
+RECEIPT_SCHEMA = "1"
 
 
 def declared() -> tuple[str, list[str]]:
@@ -73,19 +98,26 @@ def parse(text: str, recipe: str) -> list[str]:
     PURE on purpose: the known-answer controls drive it on synthetic ladders, so the rule that decides WHICH
     lines are collected is testable without running the live ladder (and without writing a fixture).
     """
-    out: list[str] = []
-    name = None
+    return [line for name, lines in recipes_of(text) for line in lines if name == recipe and SELF not in line]
+
+
+def recipes_of(text: str) -> list[tuple[str, list[str]]]:
+    """Every recipe of a ladder's TEXT with its declaring lines, in order - the ONE rule for reading a line.
+
+    PURE, and the single home of "which lines does a recipe own": `parse` (ONE recipe, self-calls DROPPED,
+    because a ladder that collects itself would recurse) and the whole-set entry point (EVERY recipe, self-calls
+    KEPT, because that invocation IS the subject) read the same bytes the same way instead of each carrying its
+    own copy of the rule (D-2642).
+    """
+    out: list[tuple[str, list[str]]] = []
     for raw in text.splitlines():
         m = RECIPE.match(raw)
         if m and not raw.startswith((" ", "\t")):
-            name = m.group(1)
+            out.append((m.group(1), []))
             continue
-        if name != recipe or not raw.strip() or raw.strip().startswith("#"):
+        if not out or not raw.strip() or raw.strip().startswith("#"):
             continue
-        line = raw.strip().lstrip("@")
-        if SELF in line:
-            continue  # a self-invocation (the banner): collecting it would recurse
-        out.append(line)
+        out[-1][1].append(raw.strip().lstrip("@"))
     return out
 
 
@@ -165,6 +197,224 @@ def run_lines(lines: list[str], quiet: bool = False) -> tuple[int, list[Fault]]:
     return worst, faults
 
 
+# --------------------------------------------------------------------- receipt (D-2983)
+def receipt_declaration() -> dict:
+    """The receipt's ONE declared home: path, recipe and age budget, read from config/rail_registry.yaml.
+
+    NO KEY IS DEFAULTED IN CODE (D-2644/C12): a home or a budget invented here would be a setting living in
+    THIS file instead of in the declaration, so a missing key is REFUSED, never filled in (C16).
+    """
+    doc = yaml.safe_load(CFG.read_text(encoding="utf-8")) or {}
+    block = doc.get("ladder_receipt")
+    if not isinstance(block, dict):
+        raise SystemExit("FAIL-CLOSED (C16): config/rail_registry.yaml declares no ladder_receipt block - a "
+                         "recorded verdict with no declared home is a file nobody accounts for (D-2983/D-405)")
+    missing = [key for key in ("path", "recipe", "max_age_hours") if block.get(key) in (None, "")]
+    if missing:
+        raise SystemExit("FAIL-CLOSED (C16): config/rail_registry.yaml#ladder_receipt declares no "
+                         + ", ".join(missing) + " - where the receipt lives, which recipe it is a verdict "
+                         "about and how long it stays evidence are DECLARED values, never code defaults "
+                         "(D-2644/D-2983)")
+    return block
+
+
+def receipt_path() -> pathlib.Path:
+    """Where THIS clone records its last full scan: the declared path, resolved against the repository."""
+    return REPO / str(receipt_declaration()["path"])
+
+
+def ladder_text() -> str:
+    """The declared ladder's BYTES - the ruler a whole-set verdict is a verdict about (D-404)."""
+    ladder, _recipes = declared()
+    path = REPO / ladder
+    if not path.is_file():
+        raise SystemExit("FAIL-CLOSED (C16): the declared ladder " + ladder + " does not exist on disk - a "
+                         "receipt about a ladder nobody can read is a claim about nothing (D-405/D-2680)")
+    return path.read_text(encoding="utf-8")
+
+
+def whole_set_entry(recipe: str, text: str) -> str:
+    """The ladder's OWN entry point that collects a recipe in ONE run - DERIVED from the bytes, never restated.
+
+    D-2680 gave the ladder a whole-set mode; nothing then required the ladder to HAVE an entry point that uses
+    it, so the name lived in one comment and one argument. Here it is derived: the recipe whose declaring line
+    invokes this script with --collect <recipe>. Returns "" when the ladder declares none - the remedy then says
+    so, because a remedy naming a recipe the ladder does not declare is prose (D-405), and a whole-set mode
+    nothing invokes is a control nothing runs (BUG-492).
+    """
+    pattern = re.compile(r"--collect\s+" + re.escape(recipe) + r"(?![-\w])")
+    return ", ".join(name for name, lines in recipes_of(text) if any(pattern.search(ln) for ln in lines))
+
+
+def remedy_for(recipe: str, text: str) -> str:
+    """The remedy a whole-set verdict owes: the DERIVED entry point, or the absence of one named as a fault."""
+    entry = whole_set_entry(recipe, text)
+    if entry:
+        return "run the whole set in ONE run: `just " + entry + "`"
+    return ("the ladder declares NO entry point that collects `" + recipe + "` in one run - that is itself a "
+            "fault (a whole-set mode nothing invokes is a control nothing runs, BUG-492)")
+
+
+def line_set_fingerprint(recipe: str, lines: list[str]) -> str:
+    """sha16 over a recipe and its ORDERED declaring lines - the COVERAGE a recorded verdict is about (D-2982).
+
+    The same defect the census paid for, one level down: a debt that ROTATES leaves a count untouched. A verdict
+    taken over one ladder and compared to another ladder is that defect in the instrument that measures
+    everything, and the fingerprint is derived from the lines the scan ITSELF runs, so there is no second census
+    of the ladder (D-2642).
+    """
+    return hashlib.sha256("\n".join([recipe] + list(lines)).encode("utf-8")).hexdigest()[:16]
+
+
+def age_hours(measured_at: Any, now: datetime) -> float | None:
+    """How old a recorded scan is, or None when its timestamp is absent or unusable (never a silent 0)."""
+    try:
+        measured = datetime.fromisoformat(str(measured_at))
+    except (TypeError, ValueError):
+        return None
+    if measured.tzinfo is None:
+        measured = measured.replace(tzinfo=UTC)
+    return (now - measured).total_seconds() / 3600.0
+
+
+def scan_payload(recipe: str, lines: list[str], worst: int, faults: list[Fault], elapsed: float, *,
+                 ladder: str, head: str, now: datetime) -> dict:
+    """What ONE full scan measured, as a record: the verdict, its coverage, its cost and its moment.
+
+    PURE, so a control can drive it without running a ladder. The record IS the measurement - a receipt that can
+    drift from the run it describes would be read as evidence, which is worse than no receipt at all.
+    """
+    return {
+        "schema_version": RECEIPT_SCHEMA,
+        "rail": SELF,
+        "ladder": ladder,
+        "recipe": recipe,
+        "line_count": len(lines),
+        "line_set_fingerprint": line_set_fingerprint(recipe, lines),
+        "worst_rc": worst,
+        "faults": [{"line": line, "rc": rc, "seconds": round(seconds, 1)} for line, rc, seconds in faults],
+        "elapsed_seconds": round(elapsed, 1),
+        "measured_at": now.isoformat(timespec="seconds"),
+        "head": head,
+    }
+
+
+def head_sha() -> str:
+    """git's own short answer for HEAD - enough to place a scan in history, never an input to a verdict."""
+    done = subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=str(REPO), capture_output=True, text=True)
+    return done.stdout.strip() if done.returncode == 0 else ""
+
+
+def record_scan(recipe: str, lines: list[str], worst: int, faults: list[Fault], elapsed: float) -> pathlib.Path:
+    """Record what this run measured. Crash-safe (C6), and written for a RED ladder too: a red is a measurement."""
+    ladder, _recipes = declared()
+    payload = scan_payload(recipe, lines, worst, faults, elapsed, ladder=ladder, head=head_sha(),
+                           now=datetime.now(UTC))
+    path = receipt_path()
+    try:
+        handle, tmp = tempfile.mkstemp(dir=str(path.parent), prefix="." + path.name + ".", suffix=".tmp")
+        with os.fdopen(handle, "w", encoding="utf-8") as fh:
+            fh.write(json.dumps(payload, indent=1, sort_keys=True) + "\n")
+            fh.flush()
+            os.fsync(fh.fileno())
+        os.replace(tmp, path)
+    except OSError as err:
+        raise SystemExit("FAIL-CLOSED (C16): the ladder's receipt could not be written to " + str(path) + " ("
+                         + str(err) + ") - a whole-set verdict nobody records is a verdict reasoned about from "
+                         "memory, which is how BUG-759 went unnoticed (D-2983)") from err
+    return path
+
+
+def recorded_scan() -> tuple[dict | None, str]:
+    """The recorded scan, or (None, why not). An unreadable record is a REPORTED condition, never an abort.
+
+    The banner reads this BEFORE any rail runs, so raising here would hide the whole ladder - the very defect
+    (BUG-759) this record exists to end. The fail-closed reading is the LAST line of the recipe instead.
+    """
+    path = receipt_path()
+    shown = str(path.relative_to(REPO)) if path.is_relative_to(REPO) else str(path)
+    if not path.is_file():
+        return None, "no full scan is recorded at " + shown
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as err:
+        return None, "the recorded receipt " + shown + " cannot be read (" + str(err) + ")"
+    if not isinstance(payload, dict):
+        return None, "the recorded receipt " + shown + " is not an object"
+    return payload, ""
+
+
+def receipt_verdict(payload: Any, fingerprint: str, line_count: int, *, recipe: str, now: datetime,
+                    max_age_hours: float, absent: str = "", remedy: str = "") -> tuple[int, str]:
+    """PURE: what a recorded full scan is evidence FOR, at THIS moment, about THIS ladder (D-2983/BUG-759).
+
+    Three answers, in the tri-state the ladder already speaks (BUG-457):
+      0 the whole ladder was MEASURED GREEN under exactly this coverage;
+      1 a red is RECORDED under exactly this coverage - a measured fault may not go quiet (C16);
+      2 UNKNOWN - never measured here, measured against a DIFFERENT ladder, or older than the declared budget.
+        Owner-owed and loud, never fatal: only a full scan can clear it, and "unknown" is not "clean".
+    """
+    tail = ("; " + remedy) if remedy else ""
+    if not isinstance(payload, dict):
+        return EXIT_OWED, ("the WHOLE-SET fault set of `just " + recipe + "` is UNKNOWN: "
+                           + (absent or "no full scan is recorded on this machine")
+                           + " - a prefix report is not a verdict (BUG-573)" + tail)
+    recorded = str(payload.get("line_set_fingerprint") or "")
+    if recorded != fingerprint:
+        return EXIT_OWED, ("the WHOLE-SET fault set of `just " + recipe + "` is UNKNOWN: the ladder CHANGED "
+                           "since the recorded scan (" + str(payload.get("line_count")) + " -> " + str(line_count)
+                           + " declaring line(s), " + (recorded or "<none>") + " -> " + fingerprint + ") - a "
+                           "verdict is a claim about the ladder at the MOMENT OF MEASUREMENT (D-2660)" + tail)
+    age = age_hours(payload.get("measured_at"), now)
+    if age is None:
+        return EXIT_OWED, ("the WHOLE-SET fault set of `just " + recipe + "` is UNKNOWN: the recorded scan "
+                           "carries no usable measured_at, and a record with no moment cannot be aged" + tail)
+    if age > max_age_hours:
+        return EXIT_OWED, ("the WHOLE-SET fault set of `just " + recipe + "` is UNKNOWN: the last full scan is "
+                           + f"{age:.1f}" + "h old, beyond the declared " + f"{max_age_hours:.0f}" + "h budget"
+                           + tail)
+    if payload.get("faults"):
+        recorded_faults = payload.get("faults") or []
+        named = "; ".join(str(one.get("line")) for one in recorded_faults if isinstance(one, dict))
+        return EXIT_FATAL, ("a red is RECORDED for `just " + recipe + "` under exactly this coverage: "
+                            + str(len(recorded_faults)) + " fault(s) measured " + f"{age:.1f}" + "h ago ("
+                            + named + ") - a measured fault may not go quiet (C16)" + tail)
+    return EXIT_CLEAN, ("the whole ladder `just " + recipe + "` was MEASURED GREEN under exactly this "
+                        + str(line_count) + " declaring line(s) " + f"{age:.1f}" + "h ago (fingerprint "
+                        + fingerprint + ", head " + str(payload.get("head") or "?") + ")")
+
+
+def receipt_lines(*, strict: bool) -> tuple[int, list[str]]:
+    """The recorded whole-set verdict, as (tri-state rc, the lines to print).
+
+    strict=False is the BANNER reading: it stands BEFORE every rail, so it may not abort - an unresolvable
+    record is REPORTED as UNKNOWN instead, because an abort there would hide the ladder it exists to declare
+    (that is BUG-759's mechanism). strict=True is the recipe's LAST line, where a broken DECLARATION is a defect
+    (1 FATAL) while an absent, changed or stale RECORD stays owner-owed (2): only a full scan can clear that.
+    """
+    try:
+        block = receipt_declaration()
+        recipe = str(block["recipe"])
+        lines = body(recipe)
+        text = ladder_text()
+        budget = block["max_age_hours"]
+        if isinstance(budget, bool) or not isinstance(budget, (int, float)):
+            raise SystemExit("FAIL-CLOSED (C16): config/rail_registry.yaml#ladder_receipt.max_age_hours is not a "
+                             "number (" + repr(budget) + ") - an age budget that cannot be read is not a budget "
+                             "(D-2983)")
+        max_age = float(budget)
+        payload, absent = recorded_scan()
+        remedy = remedy_for(recipe, text)
+    except SystemExit as err:
+        if strict:
+            raise
+        return EXIT_OWED, ["ladder receipt: UNKNOWN - " + str(err)]
+    rc, message = receipt_verdict(payload, line_set_fingerprint(recipe, lines), len(lines), recipe=recipe,
+                                  now=datetime.now(UTC), max_age_hours=max_age, absent=absent,
+                                  remedy=remedy)
+    return rc, ["ladder receipt: " + message]
+
+
 def banner(recipe: str, full: str) -> int:
     """Declare the ladder's own shape, in the ladder's own units, before any rail can abort the recipe."""
     lines = body(recipe)
@@ -173,6 +423,10 @@ def banner(recipe: str, full: str) -> int:
           + str(len(lines)) + " declaring line(s) stand in it (" + str(len(hard)) + " declared a HARD gate), so a "
           "red line HIDES every line after it (BUG-573).")
     print("ladder scan: for EVERY fault of this ladder in ONE run use `just " + full + "` (D-2680).")
+    # D-2983: the record is printed HERE, before any rail can abort - and it may never abort the recipe itself.
+    _recorded_rc, messages = receipt_lines(strict=False)
+    for message in messages:
+        print(message)
     return EXIT_CLEAN
 
 
@@ -184,6 +438,9 @@ def scan(recipe: str) -> int:
     t0 = time.monotonic()
     worst, faults = run_lines(lines)
     elapsed = time.monotonic() - t0
+    recorded = record_scan(recipe, lines, worst, faults, elapsed)
+    print("ladder receipt: RECORDED " + str(len(lines)) + " declaring line(s), worst rc=" + str(worst) + " -> "
+          + str(recorded.relative_to(REPO)) + " (coverage " + line_set_fingerprint(recipe, lines) + ")")
     if not faults:
         print("ok ladder scan: " + str(len(lines)) + " line(s) RUN, 0 fault(s), " + f"{elapsed:.1f}" + "s")
         return EXIT_CLEAN
@@ -287,6 +544,59 @@ def selftest() -> int:
           "the LIVE ladder is clean in every declared recipe - the control that would have caught BUG-584 at the "
           "boundary (MEASURED 2026-09-27 before this landing: recipe health carried 98 line(s) where 97 are "
           "DISTINCT)")
+    # ---- the RECEIPT (D-2983/BUG-759): one rule, five answers, every input synthetic (no live tree)
+    moment = datetime(2026, 10, 13, 12, 0, tzinfo=UTC)
+    coverage = line_set_fingerprint("probe", got)
+    fresh = {"line_count": len(got), "line_set_fingerprint": coverage, "worst_rc": EXIT_CLEAN, "faults": [],
+             "measured_at": (moment - timedelta(hours=1)).isoformat(timespec="seconds"), "head": "abc1234"}
+    rc, message = receipt_verdict(fresh, coverage, len(got), recipe="probe", now=moment, max_age_hours=72)
+    check("a_recorded_green_scan_is_green", rc == EXIT_CLEAN and "MEASURED GREEN" in message,
+          "D-2983: a whole-set verdict recorded over EXACTLY this coverage, inside its age budget, is the one "
+          "state in which 'the ladder is green' is a measurement rather than a hope")
+    red = dict(fresh, worst_rc=EXIT_FATAL, faults=[{"line": "sh -c 'exit 1'", "rc": 1, "seconds": 0.1}])
+    rc, message = receipt_verdict(red, coverage, len(got), recipe="probe", now=moment, max_age_hours=72)
+    check("a_recorded_ladder_red_is_not_silently_green", rc == EXIT_FATAL and "1 fault" in message,
+          "D-2983/BUG-759: a red the whole-set scan MEASURED may not go quiet - once a fault is recorded the "
+          "fast ladder is red until it is fixed AND re-measured (C16)")
+    rc, message = receipt_verdict(None, coverage, len(got), recipe="probe", now=moment, max_age_hours=72,
+                                  absent="no receipt at .ladder_receipt.json")
+    check("a_never_measured_ladder_is_UNKNOWN", rc == EXIT_OWED and "UNKNOWN" in message and "no receipt" in message,
+          "D-2983: 'never measured on this machine' is a REPORTED state (loud, owner-owed, rc=2) - BUG-759 was a "
+          "whole-set fault set that read as clean because nobody had asked")
+    rc, message = receipt_verdict(fresh, "0000000000000000", len(got), recipe="probe", now=moment, max_age_hours=72)
+    check("a_changed_ladder_invalidates_its_receipt", rc == EXIT_OWED and "UNKNOWN" in message
+          and "0000000000000000" in message,
+          "D-2983: a record measured over a DIFFERENT line set is evidence for a ladder that no longer exists "
+          "(D-2660) - a coverage that changed is not a coverage that was met")
+    old = dict(fresh, measured_at=(moment - timedelta(hours=80)).isoformat(timespec="seconds"))
+    rc, message = receipt_verdict(old, coverage, len(got), recipe="probe", now=moment, max_age_hours=72)
+    check("a_stale_record_is_UNKNOWN_by_age", rc == EXIT_OWED and "80.0h" in message,
+          "D-2983: the age budget is DECLARED (config/rail_registry.yaml#ladder_receipt), so a green record "
+          "cannot be relied on forever by silence")
+    same = line_set_fingerprint("probe", ["echo A"]) == line_set_fingerprint("probe", ["echo A"])
+    differs = line_set_fingerprint("probe", ["echo A"]) != line_set_fingerprint("probe", ["echo B"])
+    elsewhere = line_set_fingerprint("probe", ["echo A"]) != line_set_fingerprint("other", ["echo A"])
+    check("the_fingerprint_follows_the_line_set", same and differs and elsewhere,
+          "D-2983: the coverage is the recipe AND its ordered declaring lines - an added line, a reordering or "
+          "another recipe is a different coverage, and only a matching coverage makes a record comparable")
+    with_entry = ladder(["echo A"], neighbour=True) + "fuller:\n    python3 scripts/" + SELF + " --collect probe\n"
+    check("the_whole_set_entry_point_is_DERIVED_from_the_ladder", whole_set_entry("probe", with_entry) == "fuller",
+          "D-2983: the entry point a remedy names is READ from the ladder's own bytes, so renaming that recipe "
+          "cannot leave the remedy naming a recipe that is gone (D-405)")
+    near = ladder(["echo A"]) + "deeper:\n    python3 scripts/" + SELF + " --collect probe-deep\n"
+    check("a_longer_recipe_name_is_not_the_entry_for_a_shorter_one",
+          whole_set_entry("probe", near) == "" and "NO entry point" in remedy_for("probe", near),
+          "D-2983/BUG-492: '--collect probe-deep' is NOT an entry point for 'probe' - a prefix match would "
+          "produce a remedy the ladder does not declare, and a whole-set mode nothing invokes is a control "
+          "nothing runs")
+    payload = scan_payload("probe", got, EXIT_FATAL, [("sh -c 'exit 1'", 1, 0.25)], 1.5, ladder="justfile",
+                           head="abc1234", now=moment)
+    check("the_record_equals_the_measurement_it_took",
+          payload["line_count"] == len(got) and payload["line_set_fingerprint"] == coverage
+          and payload["worst_rc"] == EXIT_FATAL and len(payload["faults"]) == 1
+          and payload["faults"][0]["rc"] == 1 and str(payload["measured_at"]).startswith("2026-10-13"),
+          "D-2983: the record IS the measurement - a receipt that can drift from the run it describes would be "
+          "read as evidence, which is worse than no receipt at all")
     print("ladder controls: " + str(ok) + "/" + str(ok + fail) + " known-answer control(s) fire")
     return EXIT_FATAL if fail else EXIT_CLEAN
 
@@ -297,6 +607,8 @@ def main(argv: list[str]) -> int:
     ap.add_argument("--banner", metavar="RECIPE", help="declare the prefix property of this recipe")
     ap.add_argument("--full", metavar="RECIPE", help="the recipe that reports the whole fault set (named here)")
     ap.add_argument("--collect", metavar="RECIPE", help="run every line of this recipe, reporting every fault")
+    ap.add_argument("--receipt-check", action="store_true",
+                    help="report the RECORDED whole-set verdict as a tri-state exit code (D-2983/BUG-759)")
     ap.add_argument("--selftest", action="store_true")
     a = ap.parse_args(argv)
     if a.selftest:
@@ -305,7 +617,12 @@ def main(argv: list[str]) -> int:
         return banner(a.banner, a.full)
     if a.collect:
         return scan(a.collect)
-    ap.error("one of --banner, --collect or --selftest is required")
+    if a.receipt_check:
+        recorded_rc, messages = receipt_lines(strict=True)
+        for message in messages:
+            print(message)
+        return recorded_rc
+    ap.error("one of --banner, --collect, --receipt-check or --selftest is required")
     return EXIT_FATAL
 
 

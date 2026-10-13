@@ -18,6 +18,21 @@ authority: D-2665
 ladder: justfile
 recipes: [health, health-deep]     # the ladder(s) this registry governs; every other recipe is out of scope
 
+#: D-2983 (BUG-759): the ladder's verdict is a MEASUREMENT, not a moment. `just health` reports a PREFIX, and a
+#: prefix read as a verdict is how the full ladder stood RED on SEVEN lines while nobody knew - a session that
+#: mints a decision cannot get past the commit-frontier rail, and a session that never runs the whole set never
+#: sees the rest. So the collector now RECORDS what it measured - coverage fingerprint, line count, worst rc,
+#: every fault, cost, age, HEAD - and BOTH readers of that record, the banner FIRST in the recipe (before any
+#: rail can abort it) and the recipe's LAST line, derive the whole-set entry point from the ladder's own bytes.
+#: This path is gitignored runtime state, the same disposition as scripts/check_tests.py's
+#: temp/tests_rail_last_run.json: the record is THIS clone's observation, so committing it would dress a
+#: machine-local measurement as durable evidence, while its ABSENCE is itself a reported state (rc 2, UNKNOWN,
+#: loud), never a silent one.
+ladder_receipt:
+  path: temp/ladder_receipt.json
+  recipe: health                 # the recipe the record is a verdict ABOUT
+  max_age_hours: 72              # beyond this budget the record is UNKNOWN (owner-owed, loud): evidence ages out
+
 #: Rails the ladder does NOT invoke. Each MUST name the thing that exercises it, and that path MUST exist: a
 #: dormancy claim is a declaration, and a declaration whose subject is absent is an assertion (D-405/BUG-488).
 dormant:
@@ -77,6 +92,14 @@ writers:
   scripts/recompute_decision_summary.py:
     writes: ['config/decisions.yaml', 'config/decisions_summary.json']
     why: 'the MINT gate: it appends a record, so its own controls must be SEEN (D-2660/BUG-492)'
+  scripts/run_ladder.py:
+    writes: ["temp/ladder_receipt.json (gitignored runtime state: this clone's last full-scan verdict, D-2983)"]
+    why: >-
+      D-2983/BUG-759: the collector RECORDS what it measured, because a whole-set verdict that lives only in a
+      scrollback is a verdict reasoned about from memory - and that is exactly how seven red ladder lines went
+      unnoticed for longer than they had been measured. Class iii applies: its remedy is a claim about bytes it
+      replaces, so the ladder runs its --selftest (24 known answers, including the ten receipt answers) BEFORE
+      the check, and the record is written crash-safely (tempfile -> fsync -> os.replace, C6).
 
 #: Optional: the guard class a rail is DECLARED to have. Omit unless the declared class must be pinned: an
 #: entry that disagrees with the ladder is class (ii) and fails CLOSED. fatal = `|| exit 1`; tri_state =
@@ -91,6 +114,12 @@ guards:
   scripts/build_archive_index.py --selftest: fatal
   scripts/recompute_decision_summary.py --check: fatal
   scripts/validate_depth_domain_contract.py --gate-if-active: tri_state
+  #: D-2983 (BUG-759): the receipt's tri-state IS the line's point - 2 (UNKNOWN: never measured here, measured
+  #: against a DIFFERENT ladder, or older than the declared budget) is OWNER-OWED, loud and NOT fatal, because
+  #: only a full scan can clear it; 1 (a red RECORDED under exactly this coverage) must stay FATAL, because a
+  #: measured fault may not go quiet. Pinned here so the day someone writes `|| exit 1` - or drops the guard to
+  #: silence the line - the registry calls it class (ii) instead of letting an UNMEASURED ladder read as measured.
+  scripts/run_ladder.py --receipt-check: tri_state
 
 #: The COMMIT BOUNDARY (BUG-564). A dormancy claim says WHICH file exercises a rail; it cannot say the file still
 #: DOES. This hook lives OUTSIDE the synced tree (BUG-500) - it is not in git, so no diff, no review and no backup

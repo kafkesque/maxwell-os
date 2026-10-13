@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**185 open** / 336 closed of 521 ids.
+**184 open** / 338 closed of 522 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -190,5 +190,4 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-748 | (MED - OPEN 2026-10-13) - D-2928's definition re-scope left 177 canonical rows ON the moved boundary, and the audit D-2905's precedent requi | 5 |
 | BUG-749 | (HIGH - OPEN 2026-10-13) - 1,072 in-subject rows (16.3%) carry a discipline the live production mapper does NOT reproduce from their own raw | 4 |
 | BUG-750 | (LOW - OPEN 2026-10-13) - a GENERATED artifact can go stale behind its own generator and no rail sees it: the canonical-labels reference sti | 1 |
-| BUG-754 | (MED - OPEN, found 2026-10-13 while verifying D-2980) - the declared-defaults ceiling has been breached and check_config_defaults --check is | 1 |
 | BUG-757 | (MED - OPEN, found 2026-10-13 while auditing the user-facing faces) - 125 open bugs carry NO severity token, so the open register cannot be  | 1 |

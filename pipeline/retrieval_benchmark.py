@@ -43,7 +43,15 @@ import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from pipeline.pipeline_paths import CANONICAL_RUN, DB_PATH, HYDE_MAX_TOKENS, HYDE_MODEL
+from pipeline.pipeline_paths import (  # noqa: E402
+    CANONICAL_RUN,
+    DB_PATH,
+    HYDE_MAX_TOKENS,
+    HYDE_MODEL,
+    required,
+    required_mapping,
+    required_sequence,
+)
 from pipeline.retrieve import (  # noqa: E402  D-2980: search() = the SERVED path; the rest are A/B controls
     _rerank_pool_size,
     get_conn,
@@ -58,19 +66,24 @@ from pipeline.golden import resolve_golden_anchors, sample_self_retrieval  # noq
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 GOLDEN_PATH = PROJECT_ROOT / "config" / "golden" / "retrieval_queries.yaml"
 
-with open(PROJECT_ROOT / "config" / "pipeline_config.yaml") as _f:
+_CFG_PATH = PROJECT_ROOT / "config" / "pipeline_config.yaml"
+_CFG_HOME = str(_CFG_PATH.relative_to(_CFG_PATH.parent.parent))  # D-2982: derived, not a second copy
+with open(_CFG_PATH) as _f:
     _CFG = yaml.safe_load(_f) or {}
-_BENCH = _CFG.get("retrieval_benchmark", {})
-_SERVING: dict = _CFG.get("serving", {})
-DEFAULT_K: int = int(_BENCH.get("top_k", 10))
-DEFAULT_POOL: int = int(_BENCH.get("candidate_pool", 0))
+# D-2982 (C16/D-2644): both blocks are DECLARED. `candidate_pool: 0` means "derive the pool from
+# serving.pool", so an absent block silently changed the harness's own pool policy, and an absent
+# serving block silently emptied the anchors the harness exists to measure - both FAIL OPEN.
+_BENCH: dict = required_mapping(_CFG, "retrieval_benchmark", where=_CFG_HOME)
+_SERVING: dict = required_mapping(_CFG, "serving", where=_CFG_HOME)
+DEFAULT_K: int = int(required(_BENCH, "top_k", where=_CFG_HOME))
+DEFAULT_POOL: int = int(required(_BENCH, "candidate_pool", where=_CFG_HOME))
 # D-2980: the measured method set. "production" is the dispatcher (what serving returns);
 # the rest are A/B controls. Order = reference first.
 DEFAULT_METHODS: list[str] = ["production", "fts", "vector", "hybrid"]
 # D-2936: the scope a golden id must live in to be measurable at all.
-DEFAULT_SERVING_SCOPE: str = str(_SERVING.get("index_scope", "canonical_run"))
+DEFAULT_SERVING_SCOPE: str = str(required(_SERVING, "index_scope", where=_CFG_HOME))
 # C16/BUG-710: never report a recall number for a golden the harness cannot resolve.
-_REQUIRE_RESOLVABLE: bool = bool(_SERVING.get("require_resolvable_goldens", True))
+_REQUIRE_RESOLVABLE: bool = bool(required(_SERVING, "require_resolvable_goldens", where=_CFG_HOME))
 
 
 def _load_golden(path: Path) -> list[dict]:
@@ -274,9 +287,9 @@ def _run_self_retrieval(conn, args) -> int:
     so FTS flatters itself here and this number must never be quoted as retrieval
     quality for abstract questions. It is a REGRESSION rail for the semantic slice.
     """
-    sc: dict = _BENCH.get("self_retrieval", {}) or {}
-    n: int = args.self_retrieval or int(sc.get("sample", 30))
-    legs: list[str] = list(sc.get("legs", ["fts", "vector", "hybrid"]))
+    sc: dict = required_mapping(_BENCH, "self_retrieval", where=_CFG_HOME)
+    n: int = args.self_retrieval or int(required(sc, "sample", where=_CFG_HOME))
+    legs: list[str] = [str(x) for x in required_sequence(sc, "legs", where=_CFG_HOME)]
     rows = sample_self_retrieval(conn, n, order=str(sc.get("order", "fb_id")))
     if not rows:
         print("  ❌ self-retrieval sample is empty (C16)")

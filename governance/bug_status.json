@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 521,
-  "open_n": 185,
-  "closed_n": 336,
+  "total_ids": 522,
+  "open_n": 184,
+  "closed_n": 338,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -924,11 +924,6 @@
       "events": 1
     },
     {
-      "id": "BUG-754",
-      "title": "(MED - OPEN, found 2026-10-13 while verifying D-2980) - the declared-defaults ceiling has been breached and check_config_defaults --check is",
-      "events": 1
-    },
-    {
       "id": "BUG-757",
       "title": "(MED - OPEN, found 2026-10-13 while auditing the user-facing faces) - 125 open bugs carry NO severity token, so the open register cannot be ",
       "events": 1
@@ -1269,7 +1264,9 @@
     "BUG-751",
     "BUG-752",
     "BUG-753",
+    "BUG-754",
     "BUG-755",
-    "BUG-756"
+    "BUG-756",
+    "BUG-758"
   ]
 }

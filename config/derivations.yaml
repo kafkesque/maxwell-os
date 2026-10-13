@@ -191,10 +191,12 @@ derivations:
 config_reads:
   receivers: [_CFG, cfg, config, conf, settings, _CT]
   config_glob: 'config/*.yaml'
+  coverage_fingerprint: 62dbab7f98e862c4
   ceilings:
-    shadowed_declared: 229
+    shadowed_declared: 300
     undeclared: 3
     measured_by: scripts/check_config_defaults.py
+
 
 
 
@@ -210,6 +212,7 @@ config_reads:
     REMEASURED 2026-09-27 by scripts/check_config_defaults.py: shadowed_declared 211 -> 212, undeclared 2 -> 2. The RAIL owns the number (D-2642): the probe's value was a CLAIM, and a claim is not a measurement. From here the ceiling may only be LOWERED.
     REMEASURED 2026-10-03 by scripts/check_config_defaults.py: shadowed_declared 212 -> 221, undeclared 2 -> 2. The RAIL owns the number (D-2642): the probe's value was a CLAIM, and a claim is not a measurement. From here the ceiling may only be LOWERED.
     REMEASURED 2026-10-07 by scripts/check_config_defaults.py: shadowed_declared 221 -> 229, undeclared 2 -> 3. The RAIL owns the number (D-2642): the probe's value was a CLAIM, and a claim is not a measurement. From here the ceiling may only be LOWERED.
+    COVERAGE CHANGE 2026-10-13 by scripts/check_config_defaults.py, cited D-2982: rule 3, 6 receiver(s), aliases true, fingerprint 62dbab7f98e862c4. shadowed_declared 229 -> 300, undeclared 3 -> 3. This is a RE-MEASUREMENT under a wider instrument, not new debt (D-2982). From here the ceiling may only be LOWERED.
 
 enforcement:
   rail: scripts/check_derivation_homes.py

@@ -65,15 +65,25 @@ import yaml
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from pipeline.pipeline_paths import CANONICAL_RUN, DB_PATH  # noqa: E402
+from pipeline.pipeline_paths import (  # noqa: E402
+    CANONICAL_RUN,
+    DB_PATH,
+    required_mapping,
+    required_sequence,
+)
 from pipeline.sqlite_vec_loader import load_sqlite_vec  # noqa: E402
 
 CFG_PATH: Path = PROJECT_ROOT / "config" / "pipeline_config.yaml"
+_CFG_HOME = str(CFG_PATH.relative_to(CFG_PATH.parent.parent))  # D-2982: derived, not a second copy
 with open(CFG_PATH) as _f:
     _CFG: dict = yaml.safe_load(_f) or {}
-_SERVING: dict = _CFG.get("serving", {})
+# D-2982 (C16/D-2644): declared read - the old `_CFG.get("serving", {})` silently emptied the
+# purge list, so the tool reported "nothing superseded" for a config it had never read.
+_SERVING: dict = required_mapping(_CFG, "serving", where=_CFG_HOME)
 
-DEFAULT_RUNS: tuple[str, ...] = tuple(str(r) for r in _SERVING.get("superseded_runs", []) or [])
+DEFAULT_RUNS: tuple[str, ...] = tuple(
+    str(r) for r in required_sequence(_SERVING, "superseded_runs", where=_CFG_HOME)
+)
 ARCHIVE_ROOT: Path = PROJECT_ROOT / "archive" / "superseded_runs"
 BACKUP_DIR: Path = PROJECT_ROOT / "knowledge pipeline" / "backups"
 REFERENCE_COLUMNS: tuple[str, ...] = (

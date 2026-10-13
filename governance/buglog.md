@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1109 decisions (census stamp eb22af3d9e8a304e, 2026-10-13) · 521 bugs (185 open / 336 closed; highest OPEN = BUG-757) · 13 open tasks (MUST 5 / SHOULD 5 / WORTH 3; gate 1).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1110 decisions (census stamp bba2a4c7aac792a8, 2026-10-13) · 522 bugs (184 open / 338 closed; highest OPEN = BUG-757) · 13 open tasks (MUST 4 / SHOULD 6 / WORTH 3; gate 1).
 >
-> Decisions NEEDING ACTION: **67** of 1109 — open 32 · proposed 14 · draft 1 · deferred 14 · planned 6 | in effect (active) 565 | closed: resolved 309, superseded 16, archived 8, rejected 11
+> Decisions NEEDING ACTION: **67** of 1110 — open 32 · proposed 14 · draft 1 · deferred 14 · planned 6 | in effect (active) 565 | closed: resolved 310, superseded 16, archived 8, rejected 11
 >
-> Open BUGS by severity (heading population, first heading per id): CRITICAL 7 · HIGH 35 · MED 56 · LOW 30 · UNLABELLED 125 (BUG-757) of 185 open.
+> Open BUGS by severity (heading population, first heading per id): CRITICAL 7 · HIGH 35 · MED 56 · LOW 30 · UNLABELLED 125 (BUG-757) of 184 open.
 >
 > **MUST tasks (strategic-consequential order — source: config/task_register.yaml):**
 >
@@ -20,7 +20,6 @@
 > |---|---|---|---|---|
 > | R-1 | MUST | open | STANDING — the user-facing faces are DERIVED, never hand-appended at the top | scripts/gov_sync.py --check (byte-compares the block) |
 > | T-101 | MUST | open | HARDEN THE RETRIEVAL GOLDEN SET (the gate is saturated) | python3 pipeline/retrieval_benchmark.py -> production 1.000/0.919/0.100 (2026-10-13) |
-> | T-102 | MUST | open | BUG-754 — the declared-defaults ceiling is breached and the ladder is RED on that line | python3 scripts/check_config_defaults.py --check -> rc=1 (2026-10-13) |
 > | T-103 | MUST | gate | BUG-749 residual — 457 rows of label re-derivation debt, of which 163 are OWNER-RULED and store-write-owed | claim gap 6.9% (457 of 6,587) measured 2026-10-13 |
 > | T-104 | MUST | open | BUG-757 — 108 of 185 open bugs carry NO severity token, so the register cannot be ordered by criticality | governance/bug_status.json -> open_n 185 / UNLABELLED 108 (2026-10-13) |
 > | T-105 | SHOULD | open | REA tier A/B mining — DEVONthink 3 (related-document ranking) and Cursor (derived code index) | governance/NOT-YET-EVALUATED-RESEARCH.md (REA targets logged 2026-10-13) |
@@ -28,6 +27,7 @@
 > | T-107 | SHOULD | open | MCP payload decision — borp_score / feedback_score are still advertised to agents | maxwell_mcp_server.py output block (2026-10-13) |
 > | T-108 | SHOULD | open | BUG-712 / BUG-714 — the content_type residual and the harness-facing primitive | served run content_type census (2026-10-13) |
 > | T-112 | SHOULD | open | PERF - the SERVED path loads the cross-encoder per PROCESS, so short-lived callers pay a cold-start of minutes | suite rail runtime 100-200s -> >210s after the dispatcher became the CLI default (2026-10- |
+> | T-113 | SHOULD | open | PAY THE BASELINE the honest instrument REVEALED - the 71 keys behind block aliases, module by module, each wit | config/config_defaults_census.json after D-2982: 300 shadowed-declared keys / 568 sites (2 |
 > | T-109 | WORTH | open | spec/test sandbox — adopt the two mechanisms borrowed from impeccable / shadcn-ui-lint | specs/README.md (sandbox charter, prior art) |
 > | T-110 | WORTH | open | BUG-756 — the census restatement is hand-written | scripts/gov_sync.py --check rc=0 after --apply (2026-10-13) |
 >
@@ -4559,7 +4559,7 @@ FIX (all measured, `just health` green).
    `config/decisions.yaml` is declared in `config/artifact_ownership.yaml` (append_only, writer
    recompute_decision_summary.py).
 
-STATE AFTER. 766 -> 1109 decisions (D-400..D-406 registered; D-400..D-405 are the six gates the new guards
+STATE AFTER. 766 -> 1110 decisions (D-400..D-406 registered; D-400..D-405 are the six gates the new guards
 already cited, so their provenance stamps are no longer claims about nothing), stamp `aa69ae412a641374`,
 `recompute --check` clean, `tests/test_decision_summary_sync.py` 3 passed. Still OWNER-OWED and visible: 3
 citation values are not id-shaped and no rail can validate them - `config/eval_integrity.yaml:decision=<blank>`
@@ -9243,7 +9243,7 @@ DECISION-LOG "Register truth" line both sit INSIDE a `## 🔴` section, BELOW th
 (which stops at the first TIER_RE match) never scans them. This session the MTR live face drifted (167→160 open /
 265→272 closed, highest OPEN BUG-667→BUG-658, audit RED→GREEN) and was caught by MANUAL inspection, not by the rail.
 
-Gap 2 — format. Even if scanned, the live-face census is `521 bugs (185 open / 336 closed; ...)` — a 2-part parenthetical
+Gap 2 — format. Even if scanned, the live-face census is `522 bugs (184 open / 338 closed; ...)` — a 2-part parenthetical
 — and CENSUS_RE requires 3 parts (`N OPEN / N CLOSED / N TOTAL`), so it would not match. DECISION-LOG.md's "Register truth"
 line restates the same 2-part form and is stale for the same reason (it said 167/265 while the register said 160/272).
 
@@ -12371,7 +12371,7 @@ The face sync (BUG-588/D-2692) asserts the shape of the census restatement befor
 `\b\d+ decisions \(census stamp [0-9a-f]+, \d{4}-\d{2}-\d{2}\)` - and then substitutes `<n> decisions (census stamp
 <stamp>, <DATE>)` with the DATE argument VERBATIM. A caller passing the compact form (`20261013`, which is this
 session's own artifact-date convention) satisfied the ASSERTION but wrote a line the NEXT run could not match:
-DECISION-LOG.md read `1109 decisions (census stamp b62a605315150977, 20261013)` while the pattern demanded a DASHED
+DECISION-LOG.md read `1110 decisions (census stamp b62a605315150977, 20261013)` while the pattern demanded a DASHED
 ISO date. Nothing else noticed for a day, because the only consumer is the sync that had just written it.
 
 MEASURED AND HEALED: the sync now normalises `YYYYMMDD -> YYYY-MM-DD` on the write side and fails closed on anything
@@ -12552,7 +12552,7 @@ YYYY-MM-DD on the write side and fails closed on anything else"; no such writer 
 sentence currently describes bytes nobody can run (the BUG-542 class, in the RAIL layer rather than in a citation).
 
 CONSEQUENCE, measured: the two face lines (DECISION-LOG.md:14 and MASTER-TASK-REGISTER.md:13) restated
-"1109 decisions / 516 bugs" while the register said 1108 / 519, and check_governance_faces had been rc=1 since the
+"1110 decisions / 516 bugs" while the register said 1108 / 519, and check_governance_faces had been rc=1 since the
 D-2978/D-2979 mint - because no step re-cuts a line that has no writer. The numbers moved for a reason no reader
 could see: the FACE was stale, not the register.
 
@@ -12590,6 +12590,51 @@ THE DEFECT was a derived line whose only writer lived outside the tree, so its r
 faces AND re-cuts every census restatement line, and the health recipe runs BOTH its --selftest (8 known answers,
 including a STALE block that must be SEEN to differ from its re-derivation) and its check.
 MEASURED AFTER: scripts/gov_sync.py --check -> rc=0, 4 face(s) equal their re-derivation from the registers
-(1109 decisions / 520 bugs / 12 open tasks). The two face lines are now re-cut by the SAME run that writes the
+(1110 decisions / 520 bugs / 12 open tasks). The two face lines are now re-cut by the SAME run that writes the
 block, so they can no longer diverge from the census, and the previously hand-written numbers were replaced by
 the run rather than typed.
+
+## BUG-754 - UPDATE 2026-10-13: CLOSED by D-2982 - the twelve newest keys are PAID, and the ceiling can no longer be raised silently
+MEASURED AT HEAD (the debt was real, not a measurement artifact): the rail reported 241 shadowed-declared keys
+against a declared ceiling of 229 and the ladder was RED on that line. Bisected against 2b7958c (the commit that
+last raised the ceiling, on 2026-10-12): ZERO reclassifications and TWELVE new code sites - commit_scope,
+dedup_gate, growth_edge_output, process_instance_output, process_template_output, quarantine_output, require_both,
+s5_owned_columns, serving, symmetric_relationship_types, taxonomy_dependent_columns, tool_instruction_output -
+over 14 sites in 5 modules, introduced by the 2026-10-12 commits 0e28cffa / e11efc0b / 3db009e9. The last of
+those RAISED the ceiling to 229 in the same commit that incurred part of the debt it absorbed; nothing in the
+rail could say so, which is the second half of this defect (see BUG-758).
+WHY THESE DEFAULTS WERE NOT COSMETIC - three of them FAILED OPEN ON A GATE: `_CFG.get("serving", {})` silently
+emptied the golden-anchoring contract in three modules; `.get("dedup_gate", {})` with the leaf defaults
+`enabled=False` / `mode="report"` silently DISABLED the D-2951 commit gate; `.get("s5_owned_columns", [])`
+silently emptied the S5 write-ownership contract. A gate that reads as absent-when-missing is not a gate (C16).
+THE FIX: `pipeline/pipeline_paths.required / required_mapping / required_sequence` is the ONE loud-read idiom -
+it cannot express a default, because there is no parameter to pass it - adopted at the 14 sites across
+pipeline_paths, golden, retrieval_benchmark, dedup_identity, audit_sidecar_commit and purge_superseded_runs.
+PROVEN BEHAVIOUR-PRESERVING: every loud read returns exactly the value its code default returned
+(verification_scoped; True/report; the 4 relationship types; name_then_id; k=10 pool=0; canonical_run;
+t11/e2e/bug198_reinject), so this is a DEDUP of two homes, not a change of behaviour - the day the registry is
+edited, the code follows it instead of silently keeping the old rule.
+MEASURED AFTER: 229 shadowed-declared keys / 461 sites, the ladder line GREEN with NO ceiling raised (D-2644).
+
+## BUG-758 (HIGH - CLOSED 2026-10-13 by D-2982) - the census could not SEE a config block aliased to a local name, and could not tell a wider INSTRUMENT from bigger DEBT
+MEASURED BEFORE THE FIX (2026-10-13). The SITE rule matched a `.get(key, literal)` rooted at a declared receiver
+only, so `_SERVING = _CFG.get("serving", {})` followed by `_SERVING.get("golden_anchor_mode", ...)` escaped the
+census entirely: the block alias hid every leaf read behind it. A deliberately conservative re-implementation
+measured 99 alias-blind sites over 88 declared keys - a 27% undercount of the very number the rail exists to
+report, reachable by an ordinary refactor.
+THE SECOND HALF (why this is HIGH). config_reads.ceilings was compared as a COUNT, and the ledger shows it raised
+SEVEN times in eighteen days (179 - 209 - 210 - 211 - 212 - 221 - 229). A count cannot say whether the number
+moved because the CODE grew or because the INSTRUMENT changed, so every raise looked like debt and was absorbed as
+debt; and a debt that ROTATES (two keys paid, two new keys) leaves the count untouched and the rail GREEN.
+Nothing recorded the coverage a number was measured under, so no raise was attributable - which is how a
+shrink-only ceiling becomes a rubber stamp without anyone editing it dishonestly.
+THE FIX (D-2982): scope-aware alias resolution (a name resolves as an alias only when bound EXACTLY ONCE in its
+scope from a config-rooted expression - a reused local such as `s4 = load_jsonl(...)` is NOT an alias, because a
+detector that fires on an honest variable is noise); a COVERAGE FINGERPRINT over rule version + receivers +
+config glob + scan roots + alias rule, so a measurement is only ever compared to one taken the same way; a
+two-way attribution that RE-MEASURES BOTH populations and separates newly VISIBLE (coverage) from NEW (code)
+keys; and config/config_defaults_census.json as the receipt of the KEY SET, so a rotating debt cannot pass as a
+stable one. A ceiling can no longer be raised at all without `--rebaseline --because D-xxxx`, and the cited id
+must already exist in config/decisions.yaml.
+MEASURED AFTER: 568 sites / 300 shadowed-declared keys over 553 modules - the honest size of a surface that was
+being reported as 461 / 229. The 71 newly visible keys are REGISTERED (T-113) and payable in waves, not hidden.

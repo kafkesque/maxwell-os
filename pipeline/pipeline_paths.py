@@ -8,7 +8,9 @@ stage. It rewrites Stage 1/{run_id}/checkpoint.jsonl in place and writes only a 
 flag to S13/{run_id}/checkpoint.jsonl. Downstream S1.5 reads the MUTATED S1 checkpoint, not S13.
 """
 import os as _os
+from collections.abc import Mapping, Sequence
 from pathlib import Path
+from typing import Any
 
 import yaml
 
@@ -16,6 +18,76 @@ import yaml
 _CFG_PATH = Path(__file__).resolve().parent.parent / "config" / "pipeline_config.yaml"
 with open(_CFG_PATH) as _f:
     _CFG = yaml.safe_load(_f)
+# D-2982: the `where=` provenance of a loud read is DERIVED from the path constant - a hand-written
+# second copy of a path is one more value with two homes (C12/C20).
+_CFG_HOME = str(_CFG_PATH.relative_to(_CFG_PATH.parent.parent))
+
+
+class MissingDeclaredKey(KeyError):
+    """A DECLARED config value was absent or unusable at read time - a missing value is an ERROR (C16)."""
+
+
+def required(doc: Any, *path: str, where: str) -> Any:
+    """Return doc[path...] exactly, or fail closed naming the home (D-2982 / C16 / D-2644).
+
+    WHY THIS EXISTS. `receiver.get(key, <literal>)` moves a value's effective setting OUT of config and
+    INTO code: a config miss stops being an error and becomes a silent fallback (BUG-504's class - the
+    same class `_s6_axis_columns` below already refuses for stage6.s5_axis_columns, whose docstring states
+    the rule this function generalises). The gate-bearing instances are worse than untidy, because they
+    FAIL OPEN: an absent `serving` block silently emptied the golden-anchoring contract, an absent
+    `dedup_gate` block silently disabled a commit gate, an absent `s5_owned_columns` list silently
+    emptied a write-ownership contract, and an absent stage4 sidecar name silently made an audit read a
+    DIFFERENT file set than the pipeline writes.
+
+    This function cannot express a default - there is no `default` parameter to pass - so using it is the
+    cheap way to comply, and only a cheap rule holds (D-2642: the value has ONE home).
+
+    Args:
+        doc: the parsed config document, or a declared block of it.
+        path: the key path, one segment per positional argument.
+        where: the home of the declaration (derive it from the config path constant, never hand-copy it).
+
+    Raises:
+        MissingDeclaredKey: a segment is absent. The message names the segment, the home and the remedy.
+    """
+    node: Any = doc
+    for index, segment in enumerate(path):
+        if not isinstance(node, Mapping) or segment not in node:
+            walked = ".".join(path[: index + 1])
+            raise MissingDeclaredKey(
+                f"config-read: {where} declares no {walked} - a value read with a code default would move "
+                "the setting out of config and into code (D-2644/C12), so this read is fail-closed (C16). "
+                f"Declare {walked} in {where} and read it loudly (pipeline/pipeline_paths.required, D-2982)."
+            )
+        node = node[segment]
+    return node
+
+
+def required_mapping(doc: Any, *path: str, where: str) -> dict[str, Any]:
+    """`required`, asserting the value is a MAPPING - an absent block must never read as {} (C16)."""
+    value = required(doc, *path, where=where)
+    if not isinstance(value, Mapping):
+        raise MissingDeclaredKey(
+            f"config-read: {where}#{'.'.join(path)} is a {type(value).__name__}, not a block - a block read "
+            "that silently degrades to an empty mapping disables every rule underneath it (C16/D-2982)."
+        )
+    return dict(value)
+
+
+def required_sequence(doc: Any, *path: str, where: str) -> list[Any]:
+    """`required`, asserting the value is a SEQUENCE of items - a bare STRING is not one (C16).
+
+    A str is iterable, so accepting it here would silently split a declared value into characters: the
+    caller asks for a list of types and gets ['s','e','m',...]. That is the same fail-open shape in a
+    different costume, so it is refused with the key named.
+    """
+    value = required(doc, *path, where=where)
+    if isinstance(value, (str, bytes)) or not isinstance(value, Sequence):
+        raise MissingDeclaredKey(
+            f"config-read: {where}#{'.'.join(path)} is a {type(value).__name__}, not a list - a scalar here "
+            "would be iterated as its own characters (C16/D-2982). Declare a YAML list."
+        )
+    return list(value)
 def _env(k, d): return _os.environ.get(f"MAXWELL_{k.upper()}", str(d))
 
 PROJECT_ROOT = Path(_os.environ.get("MAXWELL_PIPELINE_ROOT", str(Path(__file__).resolve().parent.parent)))
@@ -292,8 +364,13 @@ S6_MAX_FAILED_RATIO=float(_CFG.get("stage6", {}).get("max_failed_ratio", 0.0))  
 # D-2933 (rule V): verification-scoped commit — write ONLY S5-owned provenance columns on an
 # existing fb_id, so a stale S5 checkpoint can never regress a ratified S4-owned ontology label
 # (BUG-709). C12: the scope and the column set live in config/pipeline_config.yaml:stage6.
-S6_COMMIT_SCOPE=str(_CFG.get("stage6", {}).get("commit_scope", "verification_scoped"))
-S6_S5_OWNED_COLUMNS=tuple(_CFG.get("stage6", {}).get("s5_owned_columns", []))
+# D-2982: read LOUDLY. The code defaults made the stage6 write scope and the write-ownership column set
+# values with TWO homes, so the registry could be edited while this module silently kept the old rule -
+# and an absent declaration read as "no S5-owned columns", i.e. a contract that empties itself (C16).
+S6_COMMIT_SCOPE=str(required(_CFG, "stage6", "commit_scope", where=_CFG_HOME))
+S6_S5_OWNED_COLUMNS=tuple(
+    str(_column) for _column in required_sequence(_CFG, "stage6", "s5_owned_columns", where=_CFG_HOME)
+)
 # D-2970 (BUG-745): the DECLARED write axes (config stage6.s5_axis_columns). A group here must be
 # written WHOLE - stage6 refuses a scope carrying only part of one (C16), because half an axis is a
 # split truth: the store would hold a value its own verification record does not derive.
@@ -324,13 +401,20 @@ S6_S5_AXIS_COLUMNS: dict[str, tuple[str, ...]] = _s6_axis_columns()
 # D-2934: columns whose value is DERIVED FROM the taxonomy menu. The taxonomy-skew guard
 # refuses a write only when a written column appears here; an empty list means the skew is
 # immaterial for this write and is recorded as a loud advisory instead (see stage6_commit).
-S6_TAXONOMY_DEPENDENT_COLUMNS=frozenset(_CFG.get("stage6", {}).get("taxonomy_dependent_columns", []))
+# D-2982 (C16/D-2644): declared read - an absent list silently meant "no taxonomy skew is material here",
+# which is precisely the guard D-2934 exists to apply (an empty declaration is a RULE, not a fallback).
+S6_TAXONOMY_DEPENDENT_COLUMNS=frozenset(
+    required_sequence(_CFG, "stage6", "taxonomy_dependent_columns", where=_CFG_HOME)
+)
 # D-2951 (D-2949 prevention half): the commit-time dedup gate. C12 — enabled + mode live in
 # config/pipeline_config.yaml:stage6.dedup_gate, never in code. An unknown mode FAILS CLOSED at
 # the call site (C16) rather than silently defaulting to a no-op gate.
-_S6_DEDUP_GATE=dict(_CFG.get("stage6", {}).get("dedup_gate", {}) or {})
-S6_DEDUP_GATE_ENABLED=bool(_S6_DEDUP_GATE.get("enabled", False))
-S6_DEDUP_GATE_MODE=str(_S6_DEDUP_GATE.get("mode", "report"))
+# D-2982 (C16/D-2644): declared reads. The old `{}` default meant an absent block silently DISABLED a
+# commit gate, and the old leaf defaults (`enabled=False`, `mode="report"`) meant an absent KEY disabled it
+# while the block still looked present - a gate that fails open is not a gate.
+_S6_DEDUP_GATE=required_mapping(_CFG, "stage6", "dedup_gate", where=_CFG_HOME)
+S6_DEDUP_GATE_ENABLED=bool(required(_S6_DEDUP_GATE, "enabled", where=_CFG_HOME))
+S6_DEDUP_GATE_MODE=str(required(_S6_DEDUP_GATE, "mode", where=_CFG_HOME))
 
 # ── Stage 5 settings (D2083: Type-aware BORP) ──────────────────────────
 S5_BORP_BYPASS_TYPES=list(_CFG["stage5"]["borp_bypass_types"])
@@ -440,19 +524,20 @@ RETRIEVAL_METHOD = str(_CFG.get("retrieval", {}).get("method", "rrf"))  # D-2724
 # Deliberately NOT a .get(key, <literal>) read: a code default moves the value out of config
 # and into code (D-2644/BUG-504 class), and this is exactly the tuning value C12 requires in
 # YAML. A missing block is an error at import, never a silent default (C16).
-try:
-    _POOL_CFG: dict = dict(_CFG["serving"]["pool"])
-except KeyError as _exc:  # C16/D-2980
-    raise KeyError(
-        f"config/pipeline_config.yaml is missing serving.pool.{_exc.args[0]} - the retrieval "
-        "candidate-pool policy has ONE home (D-2980) and must not be defaulted in code (C12/C16)"
-    ) from _exc
+# D-2982: the same act through the ONE loud-read idiom. The hand-rolled try/except here was the pattern
+# `required()` generalises; keeping both would leave two idioms for one rule, which is how a rule rots.
+_POOL_CFG: dict = required_mapping(_CFG, "serving", "pool", where=_CFG_HOME)
 RERANK_POOL_MULTIPLIER: int = int(_POOL_CFG["rerank_multiplier"])  # served/rerank pool = clamp(limit*mult, floor, cap)
 RERANK_POOL_FLOOR: int = int(_POOL_CFG["rerank_floor"])
 RERANK_POOL_CAP: int = int(_POOL_CFG["rerank_cap"])
 RRF_LEG_POOL_MULTIPLIER: int = int(_POOL_CFG["rrf_leg_multiplier"])  # D2176 leg pool = min(limit*mult, cap)
 RRF_LEG_POOL_CAP: int = int(_POOL_CFG["rrf_leg_cap"])
-SYMMETRIC_RELATIONSHIP_TYPES = tuple(str(x) for x in (_CFG.get("retrieval", {}).get("symmetric_relationship_types", ["semantic_near", "source_crossover", "discipline_overlap", "domain_overlap"])))  # A2/BUG-274: undirected related_fbs types (reverse adjacency)
+# A2/BUG-274: undirected related_fbs types (reverse adjacency). D-2982 (C16/D-2644): declared read - the
+# 4-element code default was a second copy of the config list, so the registry could be edited while the
+# reverse-adjacency rule silently kept the old vocabulary.
+SYMMETRIC_RELATIONSHIP_TYPES = tuple(
+    str(x) for x in required_sequence(_CFG, "retrieval", "symmetric_relationship_types", where=_CFG_HOME)
+)
 FTS_STOPWORDS = frozenset(_CFG.get("retrieval", {}).get("fts_stopwords", []))  # C12: FTS stopwords from config (D2561)
 
 # D2537: opt-in fused quality ranking (replaces dead borp_score ordering)

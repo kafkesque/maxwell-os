@@ -53,6 +53,15 @@ writers:
   scripts/build_archive_index.py:
     writes: ['archive/index.yaml']
     why: 'regenerates the archive census; its remedy was the subject of BUG-537 (a silent de-listing) and BUG-556 (a volatile input)'
+  scripts/check_config_defaults.py:
+    writes: ['config/derivations.yaml', 'config/config_defaults_census.json']
+    why: >-
+      D-2982: the census rail OWNS its own number, because a human transcribing a probe is not a measurement
+      (D-2642). It re-cuts config_reads.ceilings, writes the coverage fingerprint that makes a measurement
+      comparable only to one taken the same way, and records config/config_defaults_census.json - the measured
+      KEY SET that stops a rotating debt from passing as a stable one (BUG-758). Class iii applies: this rail
+      writes an invariant, so its own known-answer controls must be SEEN to fire in the ladder, which is why
+      justfile invokes --selftest BEFORE the check.
   scripts/gov_sync.py:
     writes: ['MASTER-TASK-REGISTER.md', 'DECISION-LOG.md', 'governance/buglog.md', 'agent/session_seed.yaml']
     why: >-

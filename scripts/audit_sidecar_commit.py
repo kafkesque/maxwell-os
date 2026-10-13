@@ -38,10 +38,13 @@ if str(ROOT) not in sys.path:
 
 import yaml  # noqa: E402
 
-from pipeline.pipeline_paths import CANONICAL_RUN  # noqa: E402
+from pipeline.pipeline_paths import CANONICAL_RUN, required  # noqa: E402
 from pipeline.retrieve import get_conn  # noqa: E402
 
 CFG_PATH = ROOT / "config" / "pipeline_config.yaml"
+# D-2982: the `where=` provenance of a loud read is DERIVED from the path constant - a second
+# hand-written copy of the path would be one more value with two homes (C12/C20).
+CFG_HOME = str(CFG_PATH.relative_to(CFG_PATH.parent.parent))
 
 
 def _cfg() -> dict:
@@ -149,12 +152,15 @@ def main() -> int:
     if not s4_dir.is_dir():
         raise SystemExit(f"stage4 dir for run {args.run!r} not found: {s4_dir} (C16)")
 
+    # D-2982 (C16/D-2644): the sidecar FILENAMES are declared in config/pipeline_config.yaml#stage4.
+    # Read LOUDLY: a code default here made an absent declaration silently audit a DIFFERENT file set
+    # than the pipeline writes - the rail would then pass on a run it never looked at.
     sidecar_keys = {
-        "process_template": cfg.get("stage4", {}).get("process_template_output", "process_templates.jsonl"),
-        "process_instance": cfg.get("stage4", {}).get("process_instance_output", "process_instances.jsonl"),
-        "growth_edge": cfg.get("stage4", {}).get("growth_edge_output", "growth_edges.jsonl"),
-        "tool_instruction": cfg.get("stage4", {}).get("tool_instruction_output", "tool_instructions.jsonl"),
-        "quarantine": cfg.get("stage4", {}).get("quarantine_output", "quarantined.jsonl"),
+        "process_template": str(required(cfg, "stage4", "process_template_output", where=CFG_HOME)),
+        "process_instance": str(required(cfg, "stage4", "process_instance_output", where=CFG_HOME)),
+        "growth_edge": str(required(cfg, "stage4", "growth_edge_output", where=CFG_HOME)),
+        "tool_instruction": str(required(cfg, "stage4", "tool_instruction_output", where=CFG_HOME)),
+        "quarantine": str(required(cfg, "stage4", "quarantine_output", where=CFG_HOME)),
     }
 
     s2_total, s2_types = _count_lines(s2_dir / "checkpoint.jsonl")

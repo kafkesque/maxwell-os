@@ -33,15 +33,22 @@ tasks:
   gate: 'owner-signed anchors for the new queries'
 - id: T-102
   priority: MUST
-  state: open
+  state: done
+  closed: '2026-10-13'
   title: 'BUG-754 — the declared-defaults ceiling is breached and the ladder is RED on that line'
   why: >-
     check_config_defaults --check rc=1 (241 shadowed-declared vs a shrink-only ceiling of 229);
     A/B-proven pre-existing and attributed to 7 config leaf names + code-side sites. Two legal
     routes: remove the code defaults (the rail s own remedy) or rule a ceiling raise that records
     the increase as a RECLASSIFICATION.
-  source: [BUG-754, D-2644]
-  evidence: 'python3 scripts/check_config_defaults.py --check -> rc=1 (2026-10-13)'
+    CLOSED BY D-2982 - ROUTE 1, taken on measurement rather than assumption: bisection against
+    2b7958c showed ZERO reclassifications and TWELVE new keys over 14 sites introduced on
+    2026-10-12, three of them FAIL-OPEN GATES (serving / dedup_gate / s5_owned_columns). The code
+    defaults were removed through the ONE loud-read idiom (pipeline/pipeline_paths.required), each
+    read PROVEN to return exactly what its default returned, so no behaviour changed and no ceiling
+    was raised (241 -> 229 keys). The 71 keys the honest instrument then revealed are T-113.
+  source: [BUG-754, D-2644, D-2982, BUG-758]
+  evidence: 'python3 scripts/check_config_defaults.py --check -> rc=0 (2026-10-13); receipt config/config_defaults_census.json'
   gate: none
 - id: T-103
   priority: MUST
@@ -181,4 +188,24 @@ tasks:
     caller cannot tell a cold start from a slow query.
   source: [D-2724, D-2980, BUG-710]
   evidence: 'suite rail runtime 100-200s -> >210s after the dispatcher became the CLI default (2026-10-13)'
+  gate: none
+- id: T-113
+  priority: SHOULD
+  state: open
+  title: >-
+    PAY THE BASELINE the honest instrument REVEALED - the 71 keys behind block aliases, module by module, each
+    with its own verification
+  why: >-
+    BUG-758/D-2982: the census could not see a config block aliased to a local name, so the published debt was
+    an undercount. With the alias rule in force the SAME tree measures 568 sites / 300 shadowed-declared keys
+    over 553 modules against 461 / 229 under the blind rule - 71 keys that were always there and were never
+    counted. They are now VISIBLE and recorded (config/config_defaults_census.json), which is the point: they
+    are not hidden, and they are not paid in one unauditable sweep. Each key is a value with two homes, and
+    each has its own blast radius - the D-2982 payment of 12 keys touched 5 modules and needed a
+    behaviour-preservation check per read (verification_scoped, True/report, the 4 relationship types,
+    name_then_id, k=10 pool=0, canonical_run, t11/e2e/bug198_reinject). So this is paid in WAVES by module,
+    largest first, with the loud-read idiom (pipeline/pipeline_paths.required) and a test per wave; the ceiling
+    LOWERS with each wave (D-2644) and the receipt re-records the set.
+  source: [D-2982, BUG-758, BUG-754, BUG-504]
+  evidence: 'config/config_defaults_census.json after D-2982: 300 shadowed-declared keys / 568 sites (229 / 461 under the pre-2982 rule)'
   gate: none

@@ -45,6 +45,15 @@ artifacts:
       governance/task_register.yaml + config/decisions_summary.json + governance/bug_status.json and
       re-cuts every census restatement line. Everything below the GOV-HISTORY-START marker is dated
       history (append-only, never a register).
+  config/config_defaults_census.json:
+    mutability: derived_regenerable
+    writer_of_record: scripts/check_config_defaults.py
+    unreconciled_reason: >-
+      D-2982: the receipt of the config-default census, re-derived by its rail. It carries the measured KEY SET
+      (not only a count) and the COVERAGE the measurement was taken under, so a debt that rotates cannot pass
+      as a stable one and a wider instrument cannot be misread as new debt (BUG-758). Read by the rail itself
+      and by tests/test_config_defaults_census_spec.py (INV-5); never hand-edited - the rail writes it on
+      --record and on --rebaseline, both of which are owner-owed acts.
   DECISION-LOG.md:
     mutability: derived_regenerable
     writer_of_record: scripts/gov_sync.py

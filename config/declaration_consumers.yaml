@@ -70,6 +70,14 @@ declarations:
     (ONE reader, wired into justfile:health). MEASURED 2026-09-27: the META-LANE FREEZE was asserted in fifteen prose
     homes and read by NOTHING, so it could not fail, declared no exit and counted nothing. A window whose only reader
     is withheld is that same defect with a filename on it, which is what this edge refuses.
+- declaration: config/config_defaults_census.json
+  consumers: [scripts/check_config_defaults.py, tests/test_config_defaults_census_spec.py]
+  decisions: [D-2982]
+  why: >-
+    the census receipt is read by its own rail (the debt SET is the baseline a later measurement is compared to)
+    and by the spec contract (INV-5 asserts the receipt equals the live measurement). Joining them here means a
+    staged receipt with a withheld reader is refused at the commit boundary (the BUG-562 shape) - and a receipt
+    nobody reads is exactly the state in which a ceiling becomes a rubber stamp.
 - declaration: config/serving_call_sites.yaml
   consumers: [tests/test_retrieval_serving_spec.py]
   decisions: [D-2980]

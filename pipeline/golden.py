@@ -40,16 +40,20 @@ import yaml
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from pipeline.pipeline_paths import CANONICAL_RUN  # noqa: E402
+from pipeline.pipeline_paths import CANONICAL_RUN, required, required_mapping  # noqa: E402
 
 _CFG_PATH = PROJECT_ROOT / "config" / "pipeline_config.yaml"
+_CFG_HOME = str(_CFG_PATH.relative_to(_CFG_PATH.parent.parent))  # D-2982: derived, never a second copy
 with open(_CFG_PATH) as _f:
     _CFG: dict = yaml.safe_load(_f) or {}
-_SERVING: dict = _CFG.get("serving", {})
+# D-2982 (C16/D-2644): the serving block is DECLARED. A missing block must be an ERROR - the old
+# `_CFG.get("serving", {})` read an EMPTY anchoring contract instead, so golden.py would silently
+# stop honouring every rule below it (fail-OPEN on a gate, the BUG-504 class).
+_SERVING: dict = required_mapping(_CFG, "serving", where=_CFG_HOME)
 # D-2939: `name_then_id` = prefer the owner-approved NAME, keep `expected` ids as a
 # legacy fallback. `id` = legacy behaviour (ids only, BUG-710 rail applies).
-ANCHOR_MODE: str = str(_SERVING.get("golden_anchor_mode", "name_then_id"))
-REQUIRE_RESOLVABLE: bool = bool(_SERVING.get("require_resolvable_goldens", True))
+ANCHOR_MODE: str = str(required(_SERVING, "golden_anchor_mode", where=_CFG_HOME))
+REQUIRE_RESOLVABLE: bool = bool(required(_SERVING, "require_resolvable_goldens", where=_CFG_HOME))
 GOLDEN_PATH: Path = PROJECT_ROOT / "config" / "golden" / "retrieval_queries.yaml"
 
 

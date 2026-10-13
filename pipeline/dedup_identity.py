@@ -116,7 +116,7 @@ def is_divergent(members: list[dict]) -> bool:
     cfg = _config()["divergence"]
     j_min = float(cfg["merge_jaccard_min"])
     s_min = float(cfg["merge_seq_min"])
-    require_both = bool(cfg.get("require_both", False))
+    require_both = bool(cfg["require_both"])  # D-2982: DECLARED in dedup_identity.yaml#divergence (C16/D-2644: no code default)
     if len(members) < 2:
         return False
     bodies = [body_text(m) for m in members]

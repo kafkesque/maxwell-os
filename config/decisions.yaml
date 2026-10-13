@@ -23169,3 +23169,74 @@ decisions:
   - agent/session_seed.yaml
   - specs/README.md
   - governance/NOT-YET-EVALUATED-RESEARCH.md
+- id: D-2982
+  date: '2026-10-13'
+  state: RESOLVED
+  category: GOVERNANCE / INSTRUMENT
+  title: The census is an INSTRUMENT with a stated coverage, and the debt is a SET - the alias escape hatch is closed,
+    the seven-day amnesty is ended, and three fail-open gates now read loudly
+  bugs:
+  - BUG-754
+  - BUG-758
+  decision: 'THE DEFECT (BUG-754, measured not felt). The ladder was RED on one line: scripts/check_config_defaults.py
+    reported 241 shadowed-declared keys against a declared ceiling of 229. Bisected against 2b7958c, the commit
+    that last raised the ceiling: ZERO reclassifications, TWELVE new code sites over 14 sites in 5 modules, all
+    introduced on 2026-10-12 (0e28cffa / e11efc0b / 3db009e9) - and 3db009e9 was the commit that RAISED the ceiling
+    to 229 in the same breath as incurring part of the debt it absorbed. A rail cannot report that.
+
+    WHY IT WAS NOT COSMETIC. Three of the twelve defaults FAILED OPEN ON A GATE: `_CFG.get("serving", {})` silently
+    emptied the golden-anchoring contract in three modules; `.get("dedup_gate", {})` with the leaf defaults `enabled=False`
+    / `mode="report"` silently DISABLED the D-2951 commit gate; `.get("s5_owned_ columns", [])` silently emptied
+    the S5 write-ownership contract. A gate that reads as absent-when-missing is not a gate (C16), and the class
+    is BUG-504''s - the class `_s6_axis_columns` in the very same module already refuses, with a docstring that
+    states the rule this decision generalises.
+
+    THE SECOND DEFECT (BUG-758), FOUND BY MEASURING THE MEASUREMENT. The SITE rule matched `.get(key, literal)`
+    rooted at a declared receiver only, so `_SERVING = _CFG.get("serving", {})` followed by `_SERVING.get("golden_
+    anchor_mode", ...)` escaped the census: the block alias hid every leaf read behind it (99 sites / 88 keys measured
+    under a deliberately conservative reconstruction - a 27% undercount of the number the rail exists to publish).
+    And the ceiling was compared as a COUNT, so the ledger''s SEVEN raises in eighteen days (179-209-210-211-212-221-229)
+    were each indistinguishable from real growth, while a debt that ROTATES (two keys paid, two new keys) would
+    leave the count untouched and the rail GREEN. Nothing recorded the coverage a number was measured under; therefore
+    no raise was ever attributable.
+
+    THE SHAPE. (1) ONE LOUD-READ IDIOM: `pipeline/pipeline_paths.required / required_mapping / required_sequence`
+    cannot express a default - there is no parameter to pass - so compliance is cheap, and the 14 sites adopt it.
+    (2) A COVERAGE FINGERPRINT (rule version + receivers + config glob + scan roots + alias rule) is declared in
+    config_reads: a measurement is only compared to one taken the same way, and a fingerprint change is reported
+    as "the INSTRUMENT changed, not the debt". (3) TWO-WAY ATTRIBUTION: the receipt carries the previous coverage,
+    so the rail RE-MEASURES BOTH populations and separates newly VISIBLE (coverage) from NEW (code, same coverage)
+    - the git archaeology this session had to improvise. (4) DEBT IS A SET: config/config_defaults_census.json records
+    the measured KEY SET, so rotation is visible. (5) THE AMNESTY IS OVER: a ceiling can no longer be raised at
+    all without `--rebaseline --because D-xxxx`, and the cited id must already exist in config/decisions.yaml (join
+    by content, D-2660 style). (6) SIX NEW KNOWN-ANSWER CONTROLS (14 total) cover the alias rule in BOTH directions
+    and the two ways a name must NOT become an alias.
+
+    MEASURED AFTER. Payments: 241 -> 229 shadowed-declared keys / 486 -> 461 sites, ladder line GREEN with NO ceiling
+    raised (D-2644), and every loud read PROVEN to return exactly the value its code default returned (verification_scoped;
+    True/report; the 4 relationship types; name_then_id; k=10 pool=0; canonical_run; t11/e2e/bug198_reinject) -
+    a dedup of two homes, not a change of behaviour. Under the HONEST instrument the same tree measures 568 sites
+    / 300 shadowed-declared keys over 553 modules: the true size of a surface that was being published as 461 /
+    229. The 71 newly visible keys are REGISTERED as T-113 and payable in waves, module by module, each with its
+    own tests - not hidden, and not paid in one unauditable sweep.
+
+    DELIBERATE NON-ACTIONS: no ceiling was raised (D-2644); the 229-key baseline was NOT swept in this change (it
+    is T-102/T-113 work, each key carrying its own blast radius); no test was edited or skipped; the buglog''s history
+    below the D-2981 boundary was not touched (records were APPENDED, which is also what keeps its append-only receipt
+    a prefix).'
+  files:
+  - scripts/check_config_defaults.py
+  - pipeline/pipeline_paths.py
+  - pipeline/golden.py
+  - pipeline/retrieval_benchmark.py
+  - pipeline/dedup_identity.py
+  - scripts/audit_sidecar_commit.py
+  - scripts/purge_superseded_runs.py
+  - config/derivations.yaml
+  - config/task_register.yaml
+  - config/rail_registry.yaml
+  - config/artifact_ownership.yaml
+  - config/declaration_consumers.yaml
+  - specs/config_defaults_census.spec.md
+  - tests/test_config_defaults_census_spec.py
+  - governance/buglog.md

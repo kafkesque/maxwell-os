@@ -174,6 +174,7 @@ may_touch:
 - governance/relabel_plan_20261014.md
 - governance/BORP_FEEDBACK_ASSESSMENT_20261013.md
 - governance/BORP_REVITALIZATION_RISK_20261013.md
+- governance/CORPUS_LIFECYCLE_20261013.md
 - governance/OWNER_DECISION_T107_20261013.md
 - governance/decisions_mint_D2989.yaml
 - governance/SESSION-HANDOFF-20261013-D2989.md
@@ -952,3 +953,19 @@ widening_log:
   may_touch_untouched: false
   will_not_touch_untouched: true
   why: 'No widening was needed: config/*.yaml (pipeline_config, task_register, served_fields, rail_registry), scripts/*.py (reanchor_retrieval_goldens), specs/** (retrieval_goldens.spec.md), tests/** (the paired contract), justfile, governance/golden_reanchor_* (the instructions and the reviewed sheet) and governance/golden_reanchor_candidates_20261011.reviewed.csv all sit inside existing grants. temp/golden_proposed_v5.yaml is the read-only PROJECTION of the review and lives in the gitignored temp/. The append-only journals (governance/r5_*.jsonl, governance/MUTATION_JOURNAL.jsonl) are written BY their rails, and the faces (DECISION-LOG.md, MASTER-TASK-REGISTER.md, governance/buglog.md, agent/session_seed.yaml) are re-cut by gov_sync.py, the ONE writer D-2981 declares.'
+- date: '2026-10-13'
+  actor: assistant
+  owner_ack: 'owner 2026-10-13 (before accepting the BORP recommendation): does BORP revitalization carry any risk, threat, cascade issue, leak, contamination, hidden error or failure issue (any history with it previously)? IF a single-source/singleton row LATER gains an additional source, how do BORP and the related scoring work POST-HOC - is that future-proof for new evidence? IF a richer text source arrives with a better description, is definition/mechanism/consequences/boundaries/elaboration/application/failure_mode OVERWRITTEN, and how does any change affect the axes (FORM, depth, domain, discipline)? Should we update NOTHING (sacrificing pragmatism), update EVERYTHING post (with real-world grounded solutions adapted after market research), or ELSE? The same question for ALL NON-PRINCIPLES. And considering the plan to plug the pipeline into internet sources (peer-reviewed articles, video transcripts, journals, articles, social threads, podcasts): how does that affect confidence score, BORP and provenance? Are there risks of content-type DRIFT, and what are the guardrails for 5-AXIS drift prevention - or should some stay open (e.g. a growth edge becoming a process template or a principle)? Plus: "I dont understand owner lane in batch - what is your STier senior RAG system engineer recommendation for T-101 / T-118 / T-117?" + the standing rule (most consequential leverage; verify never assume; infrastructure AND file for any manual task; senior RAG/ontological lens; forensic audit before committing; delegate to the right local LLMs; list the next critical step; gov dependencies synch and update).'
+  addendum: 'D-2992 - the corpus LIFECYCLE answer + the batch owner sheet. NO store write, NO payload/export change, NO axis label moved, NO golden applied: the act is documentation + register rows + two task rows + a SQLite-free census re-run. config/task_register.yaml sits inside config/*.yaml, so only this act''s four governance artifacts are NAMED below (governance/*.md is not a may_touch pattern).'
+  additions:
+  - pattern: governance/CORPUS_LIFECYCLE_20261013.md
+    why: 'D-2992 - the ANSWER: the three-time ontology (the READING / the WORK / the CORROBORATION) with each home named, the seven questions answered, the recommendation per question with the option REJECTED and why, the five axis-drift failure modes and the controls that already exist, and the external precedents verified before citing with the three corrections KEPT.'
+  - pattern: governance/OWNER_LANE_BATCH_20261013.md
+    why: 'D-2992 - the owner LANE explained in plain words, as asked: what owner lane MEANS, the four items (T-101 set|single, T-107 retire + promote corroboration and keep-and-repair, T-118 tier|withhold|leave, T-117 per CAUSE-GROUP and never one blanket word), each with the recommendation, the consequence of the other choices, and the file the word goes into.'
+  - pattern: governance/SESSION-HANDOFF-20261013-D2992.md
+    why: 'D-2992 - the act record: the findings each with its home, the forensic audit, the delegation, the six declared residuals and the next critical step.'
+  - pattern: governance/decisions_mint_D2992.yaml
+    why: 'D-2992 - the mint record (RESOLVED, bugs BUG-772/773/774): the four rulings (corroboration is a MEASURE; the head may change and the record never does; an axis is a judgment and a body is evidence; closed menu, open assignment), the mechanism, the verified citations, and WHAT THIS FIXES naming each bug as FILED and NONE as closed.'
+  may_touch_untouched: false
+  will_not_touch_untouched: true
+  why: 'No widening was needed for the CODE: config/task_register.yaml sits inside config/*.yaml, and the faces (DECISION-LOG.md, MASTER-TASK-REGISTER.md, governance/buglog.md, agent/session_seed.yaml) are re-cut by gov_sync.py, the ONE writer D-2981 declares; governance/bug_status.json is written by scripts/bug_status.py and was re-derived BEFORE the sync so no face cites a stale census. Three of this act''s four governance artifacts fall inside EXISTING grants (governance/OWNER_*, governance/SESSION-HANDOFF-*.md, governance/decisions_mint_*.yaml); only governance/CORPUS_LIFECYCLE_20261013.md needed a new NAMED grant (governance/*.md is not a pattern) - that one line is the whole widening of this entry.'

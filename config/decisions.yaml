@@ -23984,3 +23984,131 @@ decisions:
   - justfile
   - config/rail_registry.yaml
   - governance/SESSION-HANDOFF-20261013-D2990.md
+- id: D-2992
+  date: '2026-10-13'
+  state: RESOLVED
+  category: GOVERNANCE / STRUCTURE
+  title: A row has THREE times — the READING (extraction), the WORK (identity) and the CORROBORATION — and they
+    move independently. Corroboration is therefore a MEASURE re-derived from the row's own evidence set, never a
+    boolean frozen by one run's clustering; a body may be superseded but never destroyed; and an axis moves only
+    through its own instrument
+  bugs:
+  - BUG-772
+  - BUG-773
+  - BUG-774
+  decision: 'THE QUESTION (owner, 2026-10-13, before committing to the BORP recommendation): if a single-source
+    row later gains a second source, how do BORP and the related scores update — is that future-proof for new evidence?
+    If a RICHER text source arrives, are definition/mechanism/consequence/boundary/elaboration/application/failure_mode
+    OVERWRITTEN, and how does any change affect the axes (FORM, depth, domain, discipline)? Should nothing ever
+    be updated (sacrificing pragmatism), should everything be updated post-hoc, or else? The same for every NON-principle.
+    And if the pipeline is to ingest from the internet (peer-reviewed articles, journals, video transcripts, social
+    threads, podcasts), what does that do to confidence, BORP and provenance — and are there guardrails against
+    content-type and five-axis drift? THE ONTOLOGY (the finding; each home named). A row has THREE times and they
+    move independently: (1) the READING — a body is one model''s reading of one text at one commit, stamped gen_model/pipeline_commit/
+    schema_version, with `content_basis` (the pointer saying WHICH text the body was read from) a RESERVED NAME
+    WITH NO WRITER (config/dedup_identity.yaml → freshness_pointer); (2) the WORK — `fb_id = SHA-256(name + definition)`
+    (pipeline/schemas.py:175), DEFINITION-SENSITIVE, stated as the D-2949 root cause in pipeline/dedup_identity.py,
+    over a work identity `source_id = SHA-256(normalize_author|normalize_title)` whose edition collapse is deliberate
+    (D-2308/D-2952); (3) the CORROBORATION — `is_convergent` = "at least two distinct canonical sources IN ONE CLUSTER
+    OF ONE RUN" (pipeline/stage1_5_embed_cluster.py, D2176). The store HEAD is one run''s artifact and the commit
+    is `INSERT OR REPLACE INTO fbs` on a `fb_id` primary key (pipeline/stage6_commit.py:764). THE MECHANISM (what
+    actually happens today, measured by reading the write path, not inferred). (a) A later INDEPENDENT work asserting
+    the same claim cannot reach an existing row: the S1.5 cluster route sees only the RUN''s segment set, and the
+    dedup instrument built for the collision groups by `(normalize_name, source_id)` — THE SAME WORK — with `would`
+    in {link_duplicate, supersede_review, insert} and `mode: report`, so "a DIFFERENT work asserting the same claim"
+    is invisible to it by construction. A row''s tier can therefore never RISE, and the moment intake becomes incremental
+    (which the media plan makes unavoidable) corroboration collapses SILENTLY: a delta run corroborates nothing
+    and looks exactly like "nothing to corroborate" (BUG-772). (b) A body IS overwritten in place when the same
+    identity recurs — and if the definition moves by one character the identity moves with it and a SECOND row is
+    committed, so the corpus holds two rows for one claim while the declared rule `never_at_commit: true # D-2933
+    rule V: a commit may never rewrite an existing row''s body` (config/dedup_identity.yaml) is contradicted by
+    the live path, with no `content_basis` written to make either case visible (BUG-773). (c) Identity is BOOK-SHAPED
+    — `SHA-256(author|title)` with a FILENAME FALLBACK branch, over a converter that accepts only `{.epub,.pdf,.md}`
+    — while the evaluator''s rail asserts that fallback is never live (`config/eval_integrity.yaml` → source_identity.max_both_unknown_ratio:
+    0.0, enforced by scripts/verify_source_identity.py, whose docstring records the original defect: source_diversity
+    counted FILENAMES and 29.1% of convergence was the same book twice). A transcript, a podcast or a thread has
+    no author|title in that shape, so the media plan would put the closed defect class back into the live path (BUG-774).
+    THE FOUR RULINGS. R1 — CORROBORATION IS A MEASURE, NOT A BOOLEAN: independence must be a DERIVED value (config/derivations.yaml,
+    ONE DERIVED VALUE ONE HOME, D-2646 — the register already homes fbs.status, fbs.confidence_score, fbs.epistemic_status
+    each with a parity rail), computed as a function of the row''s OWN evidence (`source_segments` → n_voices by
+    embedding similarity, NLI-confirmed; `source_ids` → works × authors × domains), and computed only for rows whose
+    tier would MOVE. This serves post-hoc corroboration, delta ingestion and the collapse measurement with ONE mechanism
+    (T-120), and it promotes T-119 from a measurement to the engine''s prototype. Its FALSIFIER is part of the ruling:
+    if P(n_voices >= 2 | is_convergent = 1) is indistinguishable from 1, the count is NOT contaminated in this corpus
+    and the hardening is documentation. R2 — THE HEAD MAY CHANGE; THE RECORD NEVER DOES (C6). A richer source is
+    a NEW READING, not a correction of the old one: it becomes the head, stamped and dated; the superseded reading
+    is retained (an append-only revision sidecar: fb_id, revision_n, body fields, source_ids, gen_model, pipeline_commit,
+    run_id, effective_from/effective_to, basis), and `content_basis` finally gets a writer — recorded at EXTRACTION
+    first, because a fact nobody recorded cannot be audited later (D-2952''s own build order). The citation is untouched:
+    primary_source stays ORIGIN (D-2952). The two standard patterns this adapts were VERIFIED before they were cited
+    (D-2660): Kimball''s Slowly Changing Dimension Type 2 (begin/end-effective datetimes) and Fowler''s event sourcing
+    ("Capture all changes to an application state as a sequence of events"), with PROV-O as the ontology layer (prov:wasRevisionOf
+    is a SUBPROPERTY of prov:wasDerivedFrom — CORRECTED in this act: the Rec states exactly three subproperties,
+    wasQuotedFrom/wasRevisionOf/hadPrimarySource; wasGeneratedBy and invalidatedAtTime are separately-defined properties).
+    R3 — AN AXIS IS A JUDGMENT; A BODY IS EVIDENCE. A body revision may PROPOSE an axis change and may never APPLY
+    one; the axes (content_type, extraction_type/FORM, depth, discipline, domains) move only through their own instruments
+    — the body-evidence gates of D-2953/D-2955 for a ROLE move, the owner adjudication map, the append-only raw→canonical
+    calibrated path (D2066), the provenance-stamped `*_source` columns. The reason is measured, not philosophical:
+    D-2953 measured the "obvious" reroute at 88% router false positives and D-2955 established that a name is a
+    PRIOR, never evidence. Role-independent by construction: identity, revision and corroboration are WORK-layer,
+    so ONE engine serves all five roles (the D-2590 non-principle tier commits into the same store on the same identity
+    model); only the body schema (s2_body_fields) and the axis applicability are role-specific, and `growth_edge`
+    is deliberately keyed by body+status with NO discipline/domain (D-2923/D-2924) — so a growth_edge → principle
+    promotion is not a relabel: it must POPULATE axes the object never had, each by that axis''s own instrument.
+    R4 — CLOSED MENU, OPEN ASSIGNMENT; NEVER SILENT. The vocabulary is closed, versioned, pinned (config/ menu_axis_hashes
+    has TWO groups — answer_space vs definition_axes — so a value change moves the pin while a wording edit does
+    not, D-371/BUG-447) and append-only through the calibrated raw→canonical path with `emerging` as the DECLARED
+    absence (D2066/D-2830) and `dropped_content_types` as the cemetery for ad-hoc values. The OBJECT may move between
+    roles through an instrument that demands body evidence, stamps provenance and (where the label is a judgment
+    rather than a derivation) passes the owner gate. The alternative — freezing every axis — is rejected because
+    the system''s own learning would have nowhere to land: a growth_edge that resolves SHOULD be promotable. A sixth
+    failure mode was added to the four already controlled: a decision made against a GHOST premise (BUG-771), which
+    the same discipline fixes by stamping the premise by hash. WHAT THIS FIXES (the three bugs of the act, each
+    NAMED, and none of them closed here). This act fixes the DESIGN GAP, not the code: it answers the owner''s question
+    with the tree''s own mechanics, names each gap, gives each a home and a rail, and files the repairs. BUG-772
+    is FILED and NOT closed (corroboration is frozen by one run''s clustering; no absorption path for a later independent
+    source; the signal is indistinguishable from "nothing to corroborate" — remedy: T-120). BUG-773 is FILED and
+    NOT closed (the declared `never_at_commit` rule contradicts the live upsert; a re-read replaces a prior reading
+    and a definition move forks a twin row; `content_basis` has no writer — remedy: R2). BUG-774 is FILED and NOT
+    closed, PREVENTIVE (no non-book source has been ingested yet; the severity rises the moment the intake programme
+    starts — remedy: T-121). What is FIXED is the ambiguity: the question "should we update or not" is answered
+    by C6 rather than by preference, and the intake programme now has a declared prerequisite order instead of a
+    hope. THE OWNER''S WORDS (the only thing blocking the surface changes). T-101 `set | single`; T-107 `retire`
+    (borp_score) + `promote corroboration` and `keep-and-repair` (classification_status); T-118 `tier | withhold
+    | leave`; T-117 one word per CAUSE-GROUP (never a blanket word). The batch sheet is governance/OWNER_LANE_BATCH_20261013.md
+    and each word is read by a rail, never by prose.'
+  evidence: 'MEASURED 2026-10-13 by reading the write path and the identity model (read-only; no store write, no
+    payload or export change, no axis label moved, no golden applied): the commit is `INSERT OR REPLACE INTO fbs`
+    on a `fb_id TEXT PRIMARY KEY` seeded by SHA-256(name + definition) (pipeline/stage6_commit.py:764, pipeline/schemas.py:175)
+    and the corruption-free path is guarded by `_assert_fb_id_unique`; the dedup GROUPING key is `(normalize_name(name),
+    source_id)` with a body-divergence merge gate and the `would` vocabulary {link_duplicate, supersede_review,
+    insert} under `mode: report` (pipeline/dedup_identity.py, pipeline/dedup_gate.py:211, config/dedup_identity.yaml);
+    `is_convergent` is written by S1.5 as ">=2 distinct canonical sources" from the RUN''s segment set (pipeline/stage1_5_embed_cluster.py
+    header, D2176); `content_basis` is declared RESERVED with no writer and `never_at_commit: true` (config/dedup_identity.yaml
+    → edition_supersession); the converter accepts only {.epub, .pdf, .md} (pipeline/stage0_convert.py) and the
+    filename-fallback branch of compute_source_id is asserted never-live at ratio 0.0 (config/eval_integrity.yaml
+    → source_identity, scripts/verify_source_identity.py). EXTERNAL CLAIMS VERIFIED 2026-10-13 (one read-only delegate,
+    23 turns, 7 claims, 3 corrections kept): W3C PROV-O (Rec 30 April 2013, ns http://www.w3.org/ns/prov#) defines
+    wasRevisionOf as a subproperty of wasDerivedFrom; NISO RP-8-2008 JAV defines SEVEN article versions (AO, SMUR,
+    AM, P, VoR, CVoR, EVoR) — CORRECTED from four/five; Crossref relation types include isVersionOf/isPreprintOf/isTranslationOf/isCommentOn,
+    and `isRetractedBy` is NOT a Crossref relation type (retraction is Crossmark update metadata) — CORRECTED; OpenAlex
+    carries a controlled 25-value work `type`; Kimball names SCD Type 2; Fowler''s Event Sourcing (2005) is the
+    append-only-log pattern; Crossmark and COPE define the correction/retraction mechanisms. The owner-lane recommendations
+    and the before/after of each choice live in governance/OWNER_LANE_BATCH_20261013.md; the full answer, the five
+    axis-drift failure modes with their existing controls, and the roadmap re-order live in governance/CORPUS_LIFECYCLE_20261013.md.'
+  files:
+  - governance/CORPUS_LIFECYCLE_20261013.md
+  - governance/OWNER_LANE_BATCH_20261013.md
+  - governance/SESSION-HANDOFF-20261013-D2992.md
+  - governance/buglog.md
+  - config/task_register.yaml
+  - pipeline/dedup_identity.py
+  - config/dedup_identity.yaml
+  - pipeline/stage6_commit.py
+  - pipeline/stage1_5_embed_cluster.py
+  - pipeline/book_metadata.py
+  - config/derivations.yaml
+  - config/content_types.yaml
+  - config/eval_integrity.yaml
+  - config/references.yaml
+  - config/served_fields.yaml

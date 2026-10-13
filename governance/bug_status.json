@@ -2,8 +2,8 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 535,
-  "open_n": 188,
+  "total_ids": 538,
+  "open_n": 191,
   "closed_n": 347,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
@@ -946,6 +946,21 @@
     {
       "id": "BUG-771",
       "title": "(MED - OPEN 2026-10-13) - the review sheet compared every candidate against a golden state that no longer existed",
+      "events": 1
+    },
+    {
+      "id": "BUG-772",
+      "title": "(HIGH - OPEN 2026-10-13) - corroboration is frozen by ONE run's clustering, so a later independent source can never raise a row's tier",
+      "events": 1
+    },
+    {
+      "id": "BUG-773",
+      "title": "(HIGH - OPEN 2026-10-13) - the declared rule \"a commit may never rewrite an existing row's body\" is contradicted by the live upsert",
+      "events": 1
+    },
+    {
+      "id": "BUG-774",
+      "title": "(MED - OPEN 2026-10-13, PREVENTIVE) - the planned non-book intake has no identity, and the branch it would fall to is the one a closed defec",
       "events": 1
     }
   ],

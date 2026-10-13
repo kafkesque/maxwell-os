@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**188 open** / 347 closed of 535 ids.
+**191 open** / 347 closed of 538 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -195,3 +195,6 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-767 | (HIGH - OPEN 2026-10-13) - the RETIRED trust metric still leaves the machine, published to agents and written into two exports | 1 |
 | BUG-768 | (HIGH - OPEN 2026-10-13) - BORP is satisfied by a MINORITY of the served corpus: the deleted per-row check left the SINGLETON route unguarde | 1 |
 | BUG-771 | (MED - OPEN 2026-10-13) - the review sheet compared every candidate against a golden state that no longer existed | 1 |
+| BUG-772 | (HIGH - OPEN 2026-10-13) - corroboration is frozen by ONE run's clustering, so a later independent source can never raise a row's tier | 1 |
+| BUG-773 | (HIGH - OPEN 2026-10-13) - the declared rule "a commit may never rewrite an existing row's body" is contradicted by the live upsert | 1 |
+| BUG-774 | (MED - OPEN 2026-10-13, PREVENTIVE) - the planned non-book intake has no identity, and the branch it would fall to is the one a closed defec | 1 |

@@ -8,13 +8,13 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1119 decisions (census stamp abf585a58497b3c2, 2026-10-13) · 535 bugs (188 open / 347 closed; highest OPEN = BUG-771) · 16 open tasks (MUST 5 / SHOULD 8 / WORTH 3; OWNER-moved 4, pipeline-moved 12; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1120 decisions (census stamp 59a1e229f1af0967, 2026-10-13) · 538 bugs (191 open / 347 closed; highest OPEN = BUG-774) · 18 open tasks (MUST 6 / SHOULD 9 / WORTH 3; OWNER-moved 5, pipeline-moved 13; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **67** of 1119 — 🔴 open 32 · 🔵 proposed 14 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 565 · ⚖ ratified 133 | closed: ✅ resolved 319 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1119, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **67** of 1120 — 🔴 open 32 · 🔵 proposed 14 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 565 · ⚖ ratified 133 | closed: ✅ resolved 320 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1120, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 188 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 24 · 🟨 MED 40 · 🟩 LOW 19 · UNLABELLED 101 (BUG-757) of 188 open.
+> Open BUGS by severity (population = the census's 191 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 26 · 🟨 MED 41 · 🟩 LOW 19 · UNLABELLED 101 (BUG-757) of 191 open.
 >
-> **OWNER LANE (4) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
+> **OWNER LANE (5) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
@@ -22,13 +22,15 @@
 > | T-117 | 🔴 MUST | BUG-749 residual — the ESCALATE surface: the units NO owner ruling reaches | one owner word per unit on the reference sheet (CONFIRM / CORRECT + ho |
 > | T-118 | 🔴 MUST | the SINGLE-SOURCE trust tier — what the system may SAY about a row the Book of Record Principle does not cover | one word: tier | withhold | leave |
 > | T-107 | 🟠 SHOULD | MCP payload decision — borp_score / feedback_score are still advertised to agents | one owner word per advertised field in config/served_fields.yaml#decla |
+> | T-121 | 🟠 SHOULD | the SOURCE KIND axis + per-kind identity - the prerequisite the internet-intake plan does not have | one owner word for the source-kind VOCABULARY (an answer-space decisio |
 >
-> **PIPELINE LANE (12) — what the agent will do next, in strategic-consequential order (source: config/task_register.yaml):**
+> **PIPELINE LANE (13) — what the agent will do next, in strategic-consequential order (source: config/task_register.yaml):**
 >
 > | id | pri | state | task | evidence |
 > |---|---|---|---|---|
 > | T-104 | 🔴 MUST | 🔴 open | BUG-757 — OPEN bugs carry NO severity token, so the register cannot be ordered by criticality | bug_status.json joined to the buglog headings: UNLABELLED ceiling 101 (2026-10-13) |
 > | T-119 | 🔴 MUST | 🔴 open | the CORROBORATION COLLAPSE delta — how many "≥2 independent sources" rows are really ONE VOICE | MEASURED 2026-10-13 (governance/BORP_REVITALIZATION_RISK_20261013.md §4, over the canonica |
+> | T-120 | 🔴 MUST | 🔴 open | the ABSORPTION path - a later independent source must be able to RAISE an existing row's corroboration, and a  | MEASURED 2026-10-13 (read-only, by reading the write path and the identity model - no stor |
 > | T-105 | 🟠 SHOULD | 🔴 open | REA tier A/B mining — DEVONthink 3 (related-document ranking) and Cursor (derived code index) | governance/NOT-YET-EVALUATED-RESEARCH.md (REA targets logged 2026-10-13) |
 > | T-106 | 🟠 SHOULD | 🔴 open | ROADMAP — MODULARITY (C21 swappable infrastructure) and CROSS-OS COMPATIBILITY (C26) | protocols: pipeline/storage/base.py only; no cross-OS smoke exists (2026-10-13) |
 > | T-108 | 🟠 SHOULD | 🔴 open | BUG-712 / BUG-714 — the content_type residual and the harness-facing primitive | served run content_type census (2026-10-13) |
@@ -38,7 +40,6 @@
 > | T-116 | 🟠 SHOULD | 🔴 open | GOLDEN-SET GROWTH — the instrument that ADDS harder/abstract goldens (T-101 can only RE-anchor the set it has) | scripts/reanchor_retrieval_goldens.py --check reports the draft/live set out of phase and  |
 > | T-109 | 🟡 WORTH | 🔴 open | spec/test sandbox — adopt the two mechanisms borrowed from impeccable / shadcn-ui-lint | specs/README.md (sandbox charter, prior art) |
 > | T-110 | 🟡 WORTH | 🔴 open | BUG-756 — the census restatement is hand-written | scripts/gov_sync.py --check rc=0 after --apply (2026-10-13) |
-> | T-111 | 🟡 WORTH | 🔴 open | BUDGET — the reviewer can only review WHOLE files under 100,000 chars; stage4_merge.py and stage2_extract.py e | r5_review_gate.yaml max_source_chars vs the two module sizes (2026-10-12) |
 >
 > **STANDING RULES — in effect, never close (1):**
 >
@@ -73,6 +74,8 @@
 
 | Bug | Date | Issue |
 |---|---|---|
+| BUG-773 | 2026-10-13 | **The declared rule “a commit may never rewrite an existing row’s body” (D-2933 rule V, `config/dedup_identity.yaml` → `never_at_commit: true`) is CONTRADICTED by the live write path.** The commit is `INSERT OR REPLACE INTO fbs` on a `fb_id TEXT PRIMARY KEY` seeded by `SHA-256(name + definition)` (`pipeline/stage6_commit.py:764`, `pipeline/schemas.py:175`): a SAME-definition re-read rewrites all 77 columns — the prior reading is destroyed (C6) with no revision — and a one-character definition move FORKS a twin row that nothing reconciles. `content_basis` (the pointer saying which text the body was read from) is a RESERVED NAME WITH NO WRITER, so neither case is invisible-but-recorded; both are simply invisible. FIX: the append-only revision trail + the `content_basis` writer at extraction (D-2992 R2). |
+| BUG-772 | 2026-10-13 | **CORROBORATION is frozen by ONE RUN’s clustering, so a later independent source can NEVER raise an existing row’s tier.** `is_convergent` is written by S1.5 as “at least two distinct canonical sources IN ONE CLUSTER OF ONE RUN” (`pipeline/stage1_5_embed_cluster.py`, D2176) and nothing recomputes it; the dedup instrument groups by `(normalize_name, source_id)` — THE SAME WORK (`pipeline/dedup_identity.py`, D-2950) — so a DIFFERENT work asserting the same claim is invisible to it by construction. The only path that sees the case is a FULL re-run whose segment set holds both works. Consequence: (i) a tier can never RISE; (ii) the first DELTA run — which the media plan makes unavoidable — collapses corroboration SILENTLY and reports it indistinguishably from “nothing to corroborate” (absence by blindness). FIX: T-120 (independence as a DERIVED, re-computable measure). |
 | BUG-768 | 2026-10-13 | **The Book of Record Principle is satisfied by a MINORITY of the SERVED corpus, and the check that would have flagged it was DELETED on the argument that the guarantee had moved upstream — where only ONE of the two admission routes passes.** S5's `check_borp` was removed ("BORP guarantee now provided by S1.5"), but S1.5's >=2-source gate applies to the CLUSTER route only: singletons reach the store with ONE source work and nothing re-asserts the principle per row. MEASURED: 938 of 4,503 `status='PASS'` rows are convergent (20.8%); 5,198 of 6,591 verified rows carry one source. FIX: the per-row measurement on the wire (T-107, `isor`) + an OWNER POLICY word on what may be served as corroborated (T-118). |
 | BUG-767 | 2026-10-13 | **A RETIRED trust metric still LEAVES the machine.** `borp_score` is a constant `0.0` that NOTHING writes, yet it is published by the MCP payload (agent-facing) AND written into the OKF export and the Anytype push — three outward surfaces carrying a fabricated measurement, where an agent or a future reader reads `0.0` as "no corroboration" on rows that are in fact `strong`. It is also read as a VALUE by SQL and as ABSENT by Python inside ONE function (D-2957). FIX: retire it from every surface in ONE change-set and promote the real signal (`isor`, D2284/D2309) in its place (T-107). |
 | BUG-702 | 2026-10-10 | **S5 `practicality` metadata is STORED but NOT SERVED as a first-class retrieval facet. Verified 2026-10-10: `practicality` is 100% populated in v9 (6,591/6,591: `immediately-applicable`=5,092, `context-dependent`=1,499) and IS returned in retrieve.py JSON output (SELECT *), but retrieve.py has NO `--practicality` filter flag (grep of add_argument list confirms only keyword/fts/vector/hybrid/agentic/graph-aware/domain/discipline/macro/depth/discipline-raw/domains-raw/status/limit). Consequence: the "20-sec practical applicability" signal cannot drive retrieval routing or skill-orchestration gating — a downstream consumer cannot ask "give me only immediately-applicable principles for scaffolding". FIX: add `--practicality` (choices immediately-applicable/context-dependent) to retrieve.py CLI + `_practicality_clause()` alongside discipline_macro/raw facet clauses.** | |
@@ -92,6 +95,7 @@
 
 | Bug | Date | Issue |
 |---|---|---|
+| BUG-774 | 2026-10-13 | **The internet-intake plan has no IDENTITY: `source_id` is book-shaped and the fallback branch it would fall to is the one a closed defect class removed — PREVENTIVE, nothing ingested yet.** `source_id = SHA-256(normalize_author｜normalize_title)` with a FILENAME FALLBACK branch (`pipeline/book_metadata.py::compute_source_id`), over a converter that accepts only `{.epub, .pdf, .md}` (`pipeline/stage0_convert.py`); the evaluator’s rail asserts that fallback is NEVER live at ratio 0.0 (`config/eval_integrity.yaml` → `source_identity`, enforced by `scripts/verify_source_identity.py`, whose docstring records the original defect: `source_diversity` counted FILENAMES and 29.1% of convergence was the same book twice). A transcript, a podcast episode or a social thread has no author｜title in that shape, and a work re-published in another medium (preprint → version of record, book → the author’s podcast) would count as a SECOND source and certify a voice against itself. FIX: a source-kind axis + a per-kind identity resolver (the `config/references.yaml` OpenAlex-by-DOI precedent) + the re-publication collapse rule (D-2308 generalised) BEFORE any conversion (T-121). |
 | BUG-771 | 2026-10-13 | **The retrieval-golden REVIEW SHEET carried an `old_name` column that described a golden state NO LONGER LIVE, so a 150-cell owner review was conducted against a ghost comparison.** `old_name`/`old_fb_id`/`old_status` are filled by `scripts/reanchor_retrieval_goldens.py` at GENERATION time from the live golden; the sheet (`governance/golden_reanchor_candidates_20261011.csv`, generated 2026-10-11 20:44Z) was generated BEFORE the `20261011T221956Z` apply that re-anchored the same set — so the reviewed sheet compared every candidate against the PRE-apply expectation. MEASURED 2026-10-13 on the owner's reviewed copy: **30/30** `old_name` values are ABSENT from their own candidate list, while **30/30** LIVE expectations are PRESENT. Consequence: the instructions' cheapest and most valuable cell class — "if the query is already correct, anchor the row whose cand_name equals old_name" — was UNSATISFIABLE for every query, and the reviewer could not tell which candidate the system currently expects. FIX: the generator must stamp the golden state it compared against by HASH (sha256 of the golden file at generation) into the sheet, and `--check` must REFUSE a sheet whose stamped hash no longer matches the live file (a stale-premise rail) — the same discipline as D-2989's advertised-claim rail, one artifact over. |
 | BUG-766 | 2026-10-13 | **The store-columns register keeps the ladder RED on 6 POPULATION-SHAPE drifts and, until this act, on a stale measurement the licensed write moved.** MEASURED by scripts/check_store_columns.py --check (rc=1, the same rc recorded at commit 673a457 18:33 BEFORE the write): each of `source_text`, `difficulty_level`, `temporal_scope`, `epistemic_status`, `verification_method`, `practicality` declares `outside: absent` for population s5_verified while 1049 sidecar rows (s5_reason='s5_not_applicable') hold a NON-NULL blank where D-2957 requires NULL — so `count(col)` still claims rows the column does not carry. Separately, the D-2988 write moved `discipline_source.distinct` 1 -> 2 and the register still claimed 1 (a MEASUREMENT-DRIFT line, the honest cascade of a store write). FIX: reshape the six columns to TRUE NULL outside their population (the pipeline/normalize_absent_shape.py precedent, BUG-737), then --record; the census re-record at 18:40Z already absorbed the write's own moves. |
 | BUG-681 | 2026-10-08 | **`just health-full` = the ladder's WHOLE fault set. Round 2 measured 6; round 3 measures `FAIL ladder scan: 3 fault(s) in ONE pass` over 118 lines (503s), worst rc=1 (D-2680/BUG-573). FIXED so far: the unparsed buglog heading, the missing archive-index entry, and `check_undeclared_encoding`. THE 3 REMAINING: (a) `check_tests --check` = 3 red contract tests outside a declared-red=0 ceiling, incl. `test_s4_golden_conforms_to_ontology` (a golden set that does not conform to the ontology) - pre-existing, attributed away from the ANCHOR work by grep; (b) `check_encoding_homes --check` is now CLEAN (debt 0 of ceiling 0) — `scripts/remap_referee_v7_28rows.py` already reads the CSV via `artifact_encoding.open_artifact(CSV, ROOT)` (D-2644/D-2646 single decode home), so the `just health` prefix is UNBLOCKED; (c) `check_boundary_rehearsal` rc=1, newly diagnosed: `bootstrap.whole_tree_refused: refused (rc=1) but not for the declared reason 'FORBIDDEN session plan' (RAIL 4) - a refusal that does not name its cause cannot justify a bypass` - i.e. a whole-tree commit is still refused, but by a DIFFERENT rail than the declared one, so either the declared marker is stale or an earlier rail now refuses; do NOT hand-edit the declared reason (that hides the drift) - retain the fixture and print the ACTUAL refusal text. (b) RESOLVED 2026-10-09. Diagnose (a) and (c) now: the `just health` prefix is unblocked.** |
@@ -13168,3 +13172,81 @@ advertised-claim rail one artifact over; (iii) the reviewer is told in the sheet
 currently expects. Until then: regenerate the sheet immediately before a review sitting, never re-use one across an
 apply.
 
+## BUG-773 (HIGH - OPEN 2026-10-13) - the declared rule "a commit may never rewrite an existing row's body" is contradicted by the live upsert
+
+**THE DEFECT (a declared rule and a live path that disagree).** `config/dedup_identity.yaml` (`edition_supersession.execution`)
+declares `never_at_commit: true  # D-2933 rule V: a commit may never rewrite an existing row's body` and `never_delete: true`.
+The live commit path is `INSERT OR REPLACE INTO fbs` on a `fb_id TEXT PRIMARY KEY` (`pipeline/stage6_commit.py:764`, 77
+columns) whose identity is `SHA-256(name + definition)` (`pipeline/schemas.py:175`) — DEFINITION-SENSITIVE, stated as the
+D-2949 root cause in `pipeline/dedup_identity.py`. Two shapes, both wrong: (i) the definition is byte-identical → the SAME
+`fb_id` → every column is rewritten from the new checkpoint, so the PRIOR READING IS DESTROYED with no revision and no trace
+(C6 forbids exactly this); (ii) the definition moves by one character → a DIFFERENT `fb_id` → a SECOND row is committed, both
+survive, and nothing reconciles them (that second shape is BUG-772's case, one step further).
+
+**MEASURED 2026-10-13 (read-only, by reading the write path — nothing was written).** `content_basis` — the column that would
+say WHICH text the current body was read from — is declared a RESERVED NAME WITH NO WRITER
+(`config/dedup_identity.yaml` → `freshness_pointer`, with its own build order: "record it at EXTRACTION first; a supersession
+operation must never act on a fact nobody recorded"). So the corpus cannot answer "is this body's text the one I read last
+time?" for ANY row.
+
+**CONSEQUENCE.** A richer source (a newer edition, a cleaner scan, a better extractor, a re-chunk) silently BECOMES the row,
+and the previous statement of the claim is unrecoverable — while D-2952's queue for exactly this case
+(`supersede_review`, from the dedup gate's `would` vocabulary) cannot be executed safely because there is no basis to compare
+against. A knowledge base that cannot retain what it used to say cannot absorb a correction, which is the strongest reason
+option (a) "never update anything" was rejected (D-2992 §3).
+
+**FIX (owed, D-2992 R2).** (i) The HEAD may change; the RECORD never does: an append-only revision sidecar (`fb_id`,
+`revision_n`, the body fields, `source_ids`, `gen_model`, `pipeline_commit`, `run_id`, `effective_from`/`effective_to`,
+`basis`), with the superseded filename APPENDED to `source_ids` (never replacing one). (ii) `content_basis` gets its writer at
+EXTRACTION. (iii) The axes are NOT touched by a body revision (D-2992 R3). Precedents, verified before citing (2026-10-13):
+Kimball SCD Type 2, Fowler's event sourcing, and PROV-O (`prov:wasRevisionOf` is a subproperty of `prov:wasDerivedFrom`).
+
+## BUG-772 (HIGH - OPEN 2026-10-13) - corroboration is frozen by ONE run's clustering, so a later independent source can never raise a row's tier
+
+**THE DEFECT.** `is_convergent` is written by S1.5 as "at least two distinct canonical sources **in one cluster of one run**"
+(`pipeline/stage1_5_embed_cluster.py`, D2176) and PERSISTED with the row. Nothing recomputes it, and nothing joins a later
+work to an existing claim: the dedup instrument built for the same-concept-two-identities collision groups by
+`(normalize_name(name), source_id)` — THE SAME WORK — with a body-divergence merge gate and a `would` vocabulary of
+`link_duplicate | supersede_review | insert` under `mode: report` (`pipeline/dedup_identity.py`, `pipeline/dedup_gate.py:211`).
+A DIFFERENT work asserting the same claim is therefore invisible to it BY CONSTRUCTION (the grouping key differs), and the only
+path that sees the case is a FULL re-run whose segment set contains both works.
+
+**CONSEQUENCE (two, and the second is silent).** (i) A row's tier can NEVER RISE: a claim extracted from one work stays
+single-source for ever, however many later works assert it. (ii) The first DELTA run — and incremental intake is what the
+internet-media plan requires — corroborates NOTHING and reports it indistinguishably from "nothing to corroborate": absence by
+blindness, the BUG-487 class relocated onto the quality axis, where the number that would look wrong is the one nobody
+recomputes.
+
+**FIX (owed).** T-120: independence becomes a DERIVED value (ONE DERIVED VALUE, ONE HOME, D-2646 — `config/derivations.yaml`,
+which already homes `fbs.status` / `fbs.confidence_score` / `fbs.epistemic_status` each with a parity rail), computed from the
+row's OWN evidence (`source_segments` → `n_voices` by embedding similarity, NLI-confirmed; `source_ids` → works × authors ×
+domains) and only for rows whose tier would MOVE. That is T-119's plan promoted from a measurement to the engine, and its
+FALSIFIER travels with it: if P(n_voices >= 2 | is_convergent = 1) is indistinguishable from 1, the count is not contaminated
+in this corpus and the hardening is documentation only.
+
+## BUG-774 (MED - OPEN 2026-10-13, PREVENTIVE) - the planned non-book intake has no identity, and the branch it would fall to is the one a closed defect class removed
+
+**THE DEFECT.** Media intake (peer-reviewed articles, journals, video transcripts, social threads, podcasts) is on the
+roadmap, but identity is BOOK-SHAPED: `source_id = SHA-256(normalize_author｜normalize_title)` with a FILENAME FALLBACK branch
+(`pipeline/book_metadata.py::compute_source_id`), over a converter that accepts only `{.epub, .pdf, .md}`
+(`pipeline/stage0_convert.py`). The evaluator's rail asserts fail-closed that the fallback branch is NEVER live —
+`config/eval_integrity.yaml` → `source_identity.max_both_unknown_ratio: 0.0`, enforced by
+`scripts/verify_source_identity.py`, whose docstring records the ORIGINAL defect this closed: `source_diversity` counted
+FILENAMES, so "29.1% of convergence (757/2597 rows) was the same book twice", and 369 work-identities carried >1 filename.
+
+**WHY IT IS SEVERE LATER AND MEDIUM NOW.** Nothing non-book has been ingested, so no row is wrong TODAY. A transcript, a
+podcast episode, a journal article or a thread has no author｜title in that shape, so it lands on the fallback branch — and a
+work RE-PUBLISHED in another medium (preprint → version of record; the author's book → the author's podcast; a paper → its
+blog post) would count as a SECOND `source_id` and certify corroboration between a voice and itself. That is the R3
+contaminated-source failure of D-2990, at a scale the corpus has never seen, arriving through the identity layer rather than
+through the count.
+
+**FIX (owed, D-2992 R4 + T-121).** In this order: (i) a source-KIND axis with a per-kind identity resolver — the precedent is
+already in-repo (`config/references.yaml` resolves bibliographic metadata from OpenAlex BY DOI "rather than letting anyone
+type it (so a wrong year, venue or DOI cannot survive a rebuild)"), and OpenAlex's work `type` is a controlled 25-value
+vocabulary; (ii) the re-publication collapse rule (a work and its versions are ONE voice — the D-2308 edition collapse,
+generalised; the standard vocabulary is NISO RP-8-2008 JAV's seven versions and Crossref's `isVersionOf`/`isPreprintOf`/
+`isTranslationOf`/`isCommentOn` relations — note `isRetractedBy` is NOT a Crossref relation type; retraction is Crossmark
+update metadata); (iii) `content_basis` + `retrieved_at` + licence recorded at extraction; (iv) only then conversion. A
+retraction/update path is part of the same obligation — a corpus that cannot absorb a retraction cannot be trusted
+(Crossref Crossmark; COPE).

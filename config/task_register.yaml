@@ -395,3 +395,46 @@ tasks:
     population): of 938 rows the count certifies as corroborated, 148 carry ONE author, 170 ONE domain and 35 are
     rated weak by isor; §8 of that file is this plan, including the falsifier.'
   gate: 'none - read-only measurement; the SURFACE change it informs is T-107 + T-118'
+
+- id: T-120
+  priority: MUST
+  state: open
+  mover: pipeline
+  title: 'the ABSORPTION path - a later independent source must be able to RAISE an existing row''s corroboration, and a richer reading must REPLACE a body without destroying it'
+  why: >-
+    D-2992 separated the three times a row has (the READING, the WORK, the CORROBORATION) and showed they move
+    independently. Corroboration is currently a property of ONE RUN: `is_convergent` is written by S1.5 from the
+    run's own segment set, and the dedup instrument groups by SAME WORK, so a DIFFERENT work asserting the same
+    claim is invisible to it by construction - the only path that sees the case is a full re-run. Consequence:
+    a tier can never RISE, and the first DELTA run reports "nothing to corroborate" indistinguishably from
+    blindness. The fix is ONE mechanism serving three needs (post-hoc corroboration, delta ingestion, the
+    collapse measurement): make independence a DERIVED value recomputed from the row's OWN evidence -
+    `source_segments` -> n_voices by embedding similarity, NLI-confirmed; `source_ids` -> works x authors x
+    domains - homed in config/derivations.yaml (ONE DERIVED VALUE, ONE HOME, D-2646) with a parity rail and
+    computed only for rows whose tier would MOVE. This promotes T-119 from a measurement to the engine. Step 0
+    is READ-ONLY (locate the S1 segment store the S1.5 index already embeds); the tier WRITE is owner-gated
+    (a tier is a claim, D-2898). The FALSIFIER travels with it: if P(n_voices >= 2 | is_convergent = 1) is
+    indistinguishable from 1, the count is not contaminated and the hardening is documentation only.
+  source: [D-2992, D-2990, BUG-772, BUG-773]
+  evidence: "MEASURED 2026-10-13 (read-only, by reading the write path and the identity model - no store write): `is_convergent` is written by S1.5 from the run's segment set (pipeline/stage1_5_embed_cluster.py header, D2176); the dedup GROUPING key is `(normalize_name, source_id)` with `would` in {link_duplicate, supersede_review, insert} under mode: report (pipeline/dedup_identity.py, pipeline/dedup_gate.py:211, config/dedup_identity.yaml); the commit is `INSERT OR REPLACE` on `fb_id = SHA-256(name + definition)` (pipeline/stage6_commit.py:764, pipeline/schemas.py:175); `content_basis` is declared RESERVED with no writer. The three times, their homes and the falsifier are written up in governance/CORPUS_LIFECYCLE_20261013.md (D-2992)."
+  gate: 'READ-ONLY step 0 first (locate the S1 segment store); the derived-value registration needs its parity rail. The tier WRITE is a SEPARATE surface change - the one T-107 owes (D-2898); it is not licensed by this task'
+- id: T-121
+  priority: SHOULD
+  state: open
+  mover: owner
+  title: 'the SOURCE KIND axis + per-kind identity - the prerequisite the internet-intake plan does not have'
+  why: >-
+    The plan to ingest peer-reviewed articles, journals, video transcripts, social threads and podcasts is an
+    IDENTITY task before it is a conversion task (D-2992 section 5). Identity today is book-shaped
+    (`SHA-256(normalize_author|normalize_title)` with a FILENAME FALLBACK branch) over a converter that accepts
+    only .epub/.pdf/.md, and the evaluator's rail asserts fail-closed that the fallback branch is never live -
+    because the defect it closed was exactly this: source_diversity counting FILENAMES, which made a same-work
+    reproduction read as a second independent source. A work re-published in another medium would do the same
+    thing through the front door: certify a voice against itself. So the order is (i) a source-kind axis with a
+    per-kind identity resolver, (ii) the re-publication collapse rule, (iii) the extraction-time stamps
+    (content_basis, retrieved_at, licence), (iv) only then conversion. Two live precedents to build on, not
+    invent: config/references.yaml resolves bibliographic metadata from OpenAlex by DOI, and D-2308/D-2952
+    already collapse editions to ONE source_id.
+  source: [D-2992, BUG-774, D2176, D-2308]
+  evidence: "MEASURED 2026-10-13 (read-only): pipeline/stage0_convert.py accepts only {.epub, .pdf, .md}; compute_source_id falls back to `unknown|<filename>` when author/title are unresolved (pipeline/book_metadata.py); the fallback's liveness is pinned at ratio 0.0 by config/eval_integrity.yaml -> source_identity and enforced by scripts/verify_source_identity.py (whose docstring records the original defect: 29.1% of convergence was the same book twice). External vocabulary verified 2026-10-13: OpenAlex carries a controlled 25-value work `type`; NISO RP-8-2008 JAV defines seven article versions; Crossref relation types include isVersionOf/isPreprintOf/isTranslationOf/isCommentOn (isRetractedBy does NOT exist as a relation type - CORRECTED in D-2992)."
+  gate: 'one owner word for the source-kind VOCABULARY (an answer-space decision) + whether a work and its re-publication collapse to ONE voice (recommended YES - the D-2308 edition rule generalised); then the pipeline builds the resolver. NO non-book source may be ingested before this lands.'

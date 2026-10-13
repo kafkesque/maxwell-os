@@ -12232,3 +12232,21 @@ ladder step compares a generated artifact against its generator, so any regenera
 generator's declaration changes. The owed rail is a freshness control (regenerate-to-temp + compare, with a declared
 allow-list of artifacts that are intentionally frozen). Found because the owner asked for the canonical reference to be
 updated for the label review.
+
+## D-2976 - ERRATUM (2026-10-13, same day) - one figure in the minted record was TYPED, not MEASURED: the top-12 coverage is 48.1%, not 45.6%
+
+The D-2976 record states that "the top 12 units carry 45.6% of the rows". That figure was written from an ESTIMATE
+while the record was being composed; the artifact MEASURES it. Measured from `governance/canonical_relabel_review_
+20261013.csv` (the packet's own output, printed into the reference sheet and re-derived in the packet summary):
+
+* 192 units core 1,074 flagged rows (1,072 queue B + 2 attributable queue A);
+* the top 12 units carry **517 rows = 48.1%** (`U001..U012` = 107+94+71+60+29+28+23+23+23+22+20+17);
+* by cause: **170 units / 717 rows ALIAS-LAYER-RETIRED**, **16 units / 252 rows PROVENANCE-UNRESOLVED**, **4 units /
+  103 rows LATE-HOME**, **2 units / 2 rows DEFINITION-RE-SCOPE**.
+
+The record is APPEND-ONLY (the mint appends and its prefix receipt records the registry bytes), so the correction is
+APPENDED here rather than written over the minted text: the 45.6% claim is SUPERSEDED by this erratum, and the
+measured 48.1% is the figure of record. THE LESSON (process, not tooling): a measured statistic must be QUOTED from
+the artifact that measures it, never typed from memory into a record - the same discipline C12 applies to values in
+code, applied to claims in governance. The other D-2976 figures (1,074 rows / 192 units / 717 / 103 / 252 / 0) were
+re-derived from the artifacts and match this erratum.

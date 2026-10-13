@@ -177,13 +177,19 @@ flags:
   note: 'registered 2026-09-23 (D-339): rerank flag read by the retrieval benchmark; a flip must cite a decision (D-338).'
 - config: config/pipeline_config.yaml
   path: ranking.quality_score_enabled
-  required: false
+  required: true
   decisions:
   - D-339
-  consumers: []
-  exempt_reason: no consumer the audit can verify; it enforces nothing today (the C-1 pattern). Deferred to governance/FLAG_HYGIENE_TASKS_20260923.md
-    for a delete-or-wire call (C19/C12/D-338).
-  note: registered 2026-09-23 under D-339; required = value observed at registration (D-338).
+  - D-2979
+  consumers: [pipeline/pipeline_paths.py]
+  note: >-
+    registered 2026-09-23 under D-339; `required` = the value OBSERVED at registration (D-338), not a ruling.
+    STATE CHANGE 2026-10-13 (D-2979 + D-2980), and both halves of this entry were stale: the flag was ENABLED
+    on measured evidence (the fused quality ranking D-2537 needs it, and the served-path A/B moved MRR), and
+    D-2980 landed the ONE ranking home (_rank_sql in pipeline/retrieve.py) after retiring the dead borp_score
+    ordering - so the flag now HAS a consumer and `consumers: []` was the older half of the mismatch. The
+    audit's RED "D-339 requires False" was a September SNAPSHOT disagreeing with a later, measured decision,
+    never two live rulings (BUG-759 records the line; this entry records the resolution).
 - config: config/pipeline_config.yaml
   path: contextual_embed.enabled
   required: false

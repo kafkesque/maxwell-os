@@ -27,17 +27,21 @@ C6: every write is atomic (tempfile -> fsync -> os.replace) through the repo ONE
 """
 from __future__ import annotations
 
-import argparse
-import importlib
 import os
 import pathlib
 import re
 import sys
-import tempfile
 
 import yaml
 
 REPO = pathlib.Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(REPO / "scripts"))
+# D-2982/D-401: a STATIC import, deliberately. This module is a declared writer_of_record, and the ownership
+# audit could not SEE the lazy `importlib.import_module("lib.write_guard")` - so the invariant that exists to
+# prevent BUG-478 read as unenforced for this writer while it was in fact guarded. The old ImportError
+# fallback also wrote WITHOUT a receipt (tempfile + os.replace), i.e. the one path that most needed the guard
+# was the one path that bypassed it; failing to import the guard is now a loud import error (C16).
+from lib.write_guard import OWNED_ANY, write_document  # noqa: E402
 CFG_PATH = REPO / "config/gov_sync.yaml"
 IDX_S = "<!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->"
 IDX_E = "<!-- GOV-INDEX:END -->"
@@ -63,7 +67,9 @@ def cfg() -> dict:
 
 
 def _read(rel: str) -> str:
-    return (REPO / rel).read_text(encoding="utf-8", errors="replace")
+    # D-2982 (C16): STRICT - a face that cannot be decoded must fail loud, not be silently repaired into a
+    # byte-identical-looking text this writer would then rewrite from (BUG-521 class).
+    return (REPO / rel).read_text(encoding="utf-8")
 
 
 def derive(d: dict) -> dict:
@@ -249,26 +255,19 @@ def severity_gap(d: dict) -> list:
 
 
 def _write(path: pathlib.Path, text: str) -> str:
-    try:
-        wg = importlib.import_module("lib.write_guard")
-        # D-401/I1: EVERY governed write declares its writer and what it owns. OWNED_ANY is the
-        # declared marker for "this writer owns the whole artifact" (the faces are DERIVED in full).
-        wg.write_document(path, text, writer="scripts/gov_sync.py", owned_keys={getattr(wg, "OWNED_ANY", "*")})
-        return "write_guard"
-    except ImportError:
-        fd, tmp = tempfile.mkstemp(dir=str(path.parent))
-        with os.fdopen(fd, "w", encoding="utf-8") as fh:
-            fh.write(text); fh.flush(); os.fsync(fh.fileno())
-        os.replace(tmp, path)
-        print("  note: write_guard unavailable - atomic write without a receipt (scripts/lib on sys.path?)")
-        return "atomic"
+    # D-401/I1: EVERY governed write declares its writer and what it owns. OWNED_ANY is the declared marker
+    # for "this writer owns the whole artifact" (the faces are DERIVED in full). D-2982: the guard is imported
+    # STATICALLY at the top of this module, so the ownership audit can see it, and there is no unguarded
+    # fallback left to bypass it.
+    write_document(path, text, writer="scripts/gov_sync.py", owned_keys={OWNED_ANY})
+    return "write_guard"
 
 
 def check(d: dict, x: dict) -> int:
     faults = []
     for face in d["faces"]:
         p = REPO / face["path"]
-        text = p.read_text(encoding="utf-8", errors="replace")
+        text = p.read_text(encoding="utf-8")  # D-2982 (C16): STRICT - a laundered byte would be compared as a face
         if face.get("index_block"):
             if IDX_S not in text or IDX_E not in text:
                 faults.append(f"{face['path']}: no GOV-INDEX block (run --apply); a face with no derived block cannot be checked")
@@ -312,7 +311,7 @@ def apply(d: dict, x: dict) -> int:
     block = render_block(d, x)
     for face in d["faces"]:
         p = REPO / face["path"]
-        before = p.read_text(encoding="utf-8", errors="replace")
+        before = p.read_text(encoding="utf-8")  # D-2982 (C16): STRICT - the pre-image of a governed write
         text = before
         if face.get("index_block"):
             text, how = _replace_block(text, block)

@@ -11,11 +11,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1110 decisions (census stamp bba2a4c7aac792a8, 2026-10-13) · 522 bugs (184 open / 338 closed; highest OPEN = BUG-757) · 13 open tasks (MUST 4 / SHOULD 6 / WORTH 3; gate 1).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1110 decisions (census stamp bba2a4c7aac792a8, 2026-10-13) · 523 bugs (185 open / 338 closed; highest OPEN = BUG-759) · 14 open tasks (MUST 4 / SHOULD 7 / WORTH 3; gate 1).
 >
 > Decisions NEEDING ACTION: **67** of 1110 — open 32 · proposed 14 · draft 1 · deferred 14 · planned 6 | in effect (active) 565 | closed: resolved 310, superseded 16, archived 8, rejected 11
 >
-> Open BUGS by severity (heading population, first heading per id): CRITICAL 7 · HIGH 35 · MED 56 · LOW 30 · UNLABELLED 125 (BUG-757) of 184 open.
+> Open BUGS by severity (heading population, first heading per id): CRITICAL 7 · HIGH 36 · MED 56 · LOW 30 · UNLABELLED 125 (BUG-757) of 185 open.
 >
 > **MUST tasks (strategic-consequential order — source: config/task_register.yaml):**
 >
@@ -31,8 +31,8 @@
 > | T-108 | SHOULD | open | BUG-712 / BUG-714 — the content_type residual and the harness-facing primitive | served run content_type census (2026-10-13) |
 > | T-112 | SHOULD | open | PERF - the SERVED path loads the cross-encoder per PROCESS, so short-lived callers pay a cold-start of minutes | suite rail runtime 100-200s -> >210s after the dispatcher became the CLI default (2026-10- |
 > | T-113 | SHOULD | open | PAY THE BASELINE the honest instrument REVEALED - the 71 keys behind block aliases, module by module, each wit | config/config_defaults_census.json after D-2982: 300 shadowed-declared keys / 568 sites (2 |
+> | T-114 | SHOULD | open | DISCHARGE THE INHERITED LADDER FAULTS - four lines were RED before D-2982 and the prefix report hid them | just health-full 2026-10-13: 7 faults / 128 lines; each rc=1 at 42f8b76^ (worktree) |
 > | T-109 | WORTH | open | spec/test sandbox — adopt the two mechanisms borrowed from impeccable / shadcn-ui-lint | specs/README.md (sandbox charter, prior art) |
-> | T-110 | WORTH | open | BUG-756 — the census restatement is hand-written | scripts/gov_sync.py --check rc=0 after --apply (2026-10-13) |
 >
 > **Open decisions needing action (newest first; the states are DECLARED in config/gov_sync.yaml):**
 >
@@ -58,7 +58,7 @@
 
 
 > **CURRENT OPEN INDEX (machine-derived 2026-10-12 — the live face; dated history follows below).**
-> Register truth (do NOT restate counts elsewhere — BUG-588/D-2692): 1110 decisions · 522 bugs (184 open / 338 closed; highest OPEN = BUG-750).
+> Register truth (do NOT restate counts elsewhere — BUG-588/D-2692): 1110 decisions · 523 bugs (185 open / 338 closed; highest OPEN = BUG-750).
 > **D2590 NON-PRINCIPLE TIER
 > LANDED** — decisions **D-2942..D-2945**; the store went **6,591 → 7,640 rows in ONE run** (principle 6,577 /
 > process_template 774 / process_instance 156 / tool_instruction 108 / growth_edge 25). The 1,619 S4 sidecar records
@@ -89,7 +89,7 @@
 >
 > — everything below this index is dated history / SHOULD / WORTH / DONE —
 
-> **2026-10-05 BUG-638/BUG-639 + D-2822..D-2825 (registry 955): D-2825 cluster_28517 "Planck's Constant Derivation" RECOVERED (transient S4 `application` failure, NOT an S2 gap — S2 was complete/coherent; `--cluster 28517` retry cleaned it). D-2824 dedup-accept phantoms 3776/26074. D-2823 normalize bare `--cluster` ints. D-2822 PROPOSED (S5 gate A(d) OR-entail+AND-no-contra, T9). BUG-639 (S4 delta-merge shrink-guard false-positive → `force_shrink=bool(cluster_ids)`) + BUG-638 (METRICS.jsonl floor guard) both FIXED. S4 final 6,591 / preflight GREEN; S5 STALE (6,588) → re-run; S6 empty → run. Registry 1110 decisions / 522 bugs (184 open / 338 closed; highest OPEN = BUG-637).**
+> **2026-10-05 BUG-638/BUG-639 + D-2822..D-2825 (registry 955): D-2825 cluster_28517 "Planck's Constant Derivation" RECOVERED (transient S4 `application` failure, NOT an S2 gap — S2 was complete/coherent; `--cluster 28517` retry cleaned it). D-2824 dedup-accept phantoms 3776/26074. D-2823 normalize bare `--cluster` ints. D-2822 PROPOSED (S5 gate A(d) OR-entail+AND-no-contra, T9). BUG-639 (S4 delta-merge shrink-guard false-positive → `force_shrink=bool(cluster_ids)`) + BUG-638 (METRICS.jsonl floor guard) both FIXED. S4 final 6,591 / preflight GREEN; S5 STALE (6,588) → re-run; S6 empty → run. Registry 1110 decisions / 523 bugs (185 open / 338 closed; highest OPEN = BUG-637).**
 
 
 

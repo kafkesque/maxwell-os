@@ -303,7 +303,10 @@ def declared_keys(config_glob: str) -> set[str]:
     """Every key name anywhere in the declared config surface (the DECLARED half of the census)."""
     keys: set[str] = set()
     for path in sorted(ROOT.glob(config_glob)):
-        stack: list[Any] = [yaml.safe_load(path.read_text(encoding="utf-8", errors="replace"))]
+        # D-2982 (C16): STRICT decode. `errors="replace"` here would silently launder an undecodable byte of
+        # the DECLARED SURFACE and then measure a config that is not on disk - the census would report on text
+        # nobody wrote (BUG-521 class). A file this rail cannot decode is a finding, not a repaired read.
+        stack: list[Any] = [yaml.safe_load(path.read_text(encoding="utf-8"))]
         while stack:
             node = stack.pop()
             if isinstance(node, dict):
@@ -336,7 +339,10 @@ def scan(receivers: set[str], keys: set[str], roots: list[str], aliases: bool = 
             if "__pycache__" in path.parts:
                 continue
             files += 1
-            source = path.read_text(encoding="utf-8", errors="replace")
+            # D-2982 (C16): STRICT decode - the sources under scan_roots are this tree's own artifacts. A
+            # silently repaired byte would parse as different code than the file holds, and a census of code
+            # that is not on disk is worse than no census (BUG-521 class).
+            source = path.read_text(encoding="utf-8")
             try:
                 tree = ast.parse(source)
             except SyntaxError:
@@ -393,7 +399,9 @@ def write_receipt(measured: dict[str, int], shadowed: set[str], undeclared: set[
 
 def decision_ids() -> set[str]:
     """Every decision id in the live registry (a raise must cite one that exists - D-2982/D-2644)."""
-    return set(DECISION_ID_RE.findall(DECISIONS.read_text(encoding="utf-8", errors="replace")))
+    # D-2982 (C16): STRICT - this read decides whether a decision EXISTS, so a laundered byte could admit or
+    # refuse a raise on the strength of text that is not in the registry (BUG-521 class).
+    return set(DECISION_ID_RE.findall(DECISIONS.read_text(encoding="utf-8")))
 
 
 def flag_value(argv: list[str], flag: str) -> str:

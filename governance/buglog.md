@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1110 decisions (census stamp bba2a4c7aac792a8, 2026-10-13) · 522 bugs (184 open / 338 closed; highest OPEN = BUG-757) · 13 open tasks (MUST 4 / SHOULD 6 / WORTH 3; gate 1).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1110 decisions (census stamp bba2a4c7aac792a8, 2026-10-13) · 523 bugs (185 open / 338 closed; highest OPEN = BUG-759) · 14 open tasks (MUST 4 / SHOULD 7 / WORTH 3; gate 1).
 >
 > Decisions NEEDING ACTION: **67** of 1110 — open 32 · proposed 14 · draft 1 · deferred 14 · planned 6 | in effect (active) 565 | closed: resolved 310, superseded 16, archived 8, rejected 11
 >
-> Open BUGS by severity (heading population, first heading per id): CRITICAL 7 · HIGH 35 · MED 56 · LOW 30 · UNLABELLED 125 (BUG-757) of 184 open.
+> Open BUGS by severity (heading population, first heading per id): CRITICAL 7 · HIGH 36 · MED 56 · LOW 30 · UNLABELLED 125 (BUG-757) of 185 open.
 >
 > **MUST tasks (strategic-consequential order — source: config/task_register.yaml):**
 >
@@ -28,8 +28,8 @@
 > | T-108 | SHOULD | open | BUG-712 / BUG-714 — the content_type residual and the harness-facing primitive | served run content_type census (2026-10-13) |
 > | T-112 | SHOULD | open | PERF - the SERVED path loads the cross-encoder per PROCESS, so short-lived callers pay a cold-start of minutes | suite rail runtime 100-200s -> >210s after the dispatcher became the CLI default (2026-10- |
 > | T-113 | SHOULD | open | PAY THE BASELINE the honest instrument REVEALED - the 71 keys behind block aliases, module by module, each wit | config/config_defaults_census.json after D-2982: 300 shadowed-declared keys / 568 sites (2 |
+> | T-114 | SHOULD | open | DISCHARGE THE INHERITED LADDER FAULTS - four lines were RED before D-2982 and the prefix report hid them | just health-full 2026-10-13: 7 faults / 128 lines; each rc=1 at 42f8b76^ (worktree) |
 > | T-109 | WORTH | open | spec/test sandbox — adopt the two mechanisms borrowed from impeccable / shadcn-ui-lint | specs/README.md (sandbox charter, prior art) |
-> | T-110 | WORTH | open | BUG-756 — the census restatement is hand-written | scripts/gov_sync.py --check rc=0 after --apply (2026-10-13) |
 >
 > **Open decisions needing action (newest first; the states are DECLARED in config/gov_sync.yaml):**
 >
@@ -9243,7 +9243,7 @@ DECISION-LOG "Register truth" line both sit INSIDE a `## 🔴` section, BELOW th
 (which stops at the first TIER_RE match) never scans them. This session the MTR live face drifted (167→160 open /
 265→272 closed, highest OPEN BUG-667→BUG-658, audit RED→GREEN) and was caught by MANUAL inspection, not by the rail.
 
-Gap 2 — format. Even if scanned, the live-face census is `522 bugs (184 open / 338 closed; ...)` — a 2-part parenthetical
+Gap 2 — format. Even if scanned, the live-face census is `523 bugs (185 open / 338 closed; ...)` — a 2-part parenthetical
 — and CENSUS_RE requires 3 parts (`N OPEN / N CLOSED / N TOTAL`), so it would not match. DECISION-LOG.md's "Register truth"
 line restates the same 2-part form and is stale for the same reason (it said 167/265 while the register said 160/272).
 
@@ -12638,3 +12638,41 @@ stable one. A ceiling can no longer be raised at all without `--rebaseline --bec
 must already exist in config/decisions.yaml.
 MEASURED AFTER: 568 sites / 300 shadowed-declared keys over 553 modules - the honest size of a surface that was
 being reported as 461 / 229. The 71 newly visible keys are REGISTERED (T-113) and payable in waves, not hidden.
+
+## BUG-759 (HIGH - OPEN, found 2026-10-13 by running the FULL ladder for the first time in this session) - seven ladder lines were RED at HEAD and nobody knew, because the full ladder had never been run end to end
+MEASURED, WITH ATTRIBUTION (not inference). `just health-full` ran 128 declaring lines in 755.8s and reported
+SEVEN faults. Each was then run at the PARENT COMMIT (42f8b76^, in a git worktree) and every one returned rc=1
+there too - so none of the seven was introduced by D-2982, and the ladder had been red for longer than it had
+been measured. Why nobody knew is structural and worth naming: `just health` reports a PREFIX - it stops at the
+FIRST non-zero line (BUG-573) - and the D-2860 anti-circle rail refuses to run at all while governance state is
+uncommitted, so a session that MINTS a decision cannot see the rest of the ladder until it commits, and a session
+that does not then run `just health-full` never sees it either.
+THE SEVEN, AND WHAT D-2982 DID TO EACH:
+ 1. audit_flag_consumers (rc=1 -> rc=0) FIXED. RED: "ranking.quality_score_enabled = True but D-339 requires
+    False - STATE MISMATCH". The registry's `required` was a 2026-09-23 REGISTRATION SNAPSHOT (D-338), not a
+    ruling; D-2979 enabled the flag on measured evidence and D-2980 gave it a real consumer, so BOTH halves of
+    that entry were stale (the state AND `consumers: []`). Resolved as a documented state change citing
+    D-339 + D-2979. This was a genuine decision/artifact conflict - the kind only a full-ladder run surfaces.
+ 2. write_guard --audit (rc=1 -> rc=2, declared and tolerated) FIXED. "declared writer_of_record
+    scripts/gov_sync.py never imports the guard" was a FALSE NEGATIVE created by D-2981: the guard was imported
+    lazily via importlib INSIDE the write path, so the audit could not see it - and the ImportError fallback
+    wrote WITHOUT a receipt (tempfile + os.replace), i.e. the path that most needed the guard was the one path
+    that bypassed it. Now a static module-level import and the unguarded fallback is GONE (C16/C19).
+ 3. check_silent_repair (unknown 7 -> 1; parent baseline 4) IMPROVED, still rc=1 on ONE pre-existing unknown
+    that is in neither scripts/gov_sync.py nor the census rail. D-2982 removed SIX unknown repair sites by making
+    the reads STRICT: `errors="replace"` silently launders an undecodable byte of the DECLARED SURFACE and of the
+    sources under measurement, so the census would report on text nobody wrote (BUG-521 class). A file this rail
+    cannot decode is now a finding. The line is BELOW the baseline it inherited.
+ 4. undeclared_encoding (rc=1 before and after, IDENTICAL counts: files 159/156, sites 396/392, writes 75/74,
+    unresolvable 4/3) INHERITED, and D-2982 added ZERO to it - measured, not assumed.
+ 5. check_store_columns (rc=1 both) INHERITED: CODE-CENSUS-MOVED on taxonomy_match_method.mentions (18 -> 19)
+    and taxonomy_version.mentions (24 -> 25); the rail's own remedy is an owner-owed --record when the move is
+    intended (D-2649/BUG-533).
+ 6. build_anchor_store_bridge --check (rc=1 both) INHERITED: "the committed bridge no longer re-derives (a join,
+    a name or an input moved)" - owes a re-derive.
+ 7. build_archive_index --check (rc=1 both) INHERITED: "on disk but in NEITHER the index nor the declared
+    exclusions: superseded_runs" - the archive directory the D-2980 superseded-run purge produced was never
+    indexed and never declared excluded (the BUG-537 shape).
+WHY THIS IS HIGH AND NOT HOUSEKEEPING: a red ladder is the only thing standing between "measured" and "asserted",
+and seven red lines meant every line BELOW them was unobserved by the prefix report. The remaining four are
+registered as T-114 with their measured evidence: two are owner-owed re-records, two are index/re-derive acts.

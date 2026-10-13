@@ -3,7 +3,7 @@ session:
   pipeline_commit: 'v3.0-D2485'
   schema_version: '3.0'
   project_root: knowledge pipeline/
-  status: '2026-10-13 D-2981: the user-facing faces are DERIVED (scripts/gov_sync.py) and joined to the registers. Register: 1110 decisions (67 needing action) / 522 bugs (184 open) / 13 open tasks. NEXT: (1) HARDEN THE RETRIEVAL GOLDEN SET (the gate is saturated); (2) BUG-749 residual — 457 rows of label re-derivation debt, of which 163 are OWNER-RULED and ; (3) BUG-757 — 108 of 185 open bugs carry NO severity token, so the register cannot be ordered .'
+  status: '2026-10-13 D-2981: the user-facing faces are DERIVED (scripts/gov_sync.py) and joined to the registers. Register: 1110 decisions (67 needing action) / 523 bugs (185 open) / 14 open tasks. NEXT: (1) HARDEN THE RETRIEVAL GOLDEN SET (the gate is saturated); (2) BUG-749 residual — 457 rows of label re-derivation debt, of which 163 are OWNER-RULED and ; (3) BUG-757 — 108 of 185 open bugs carry NO severity token, so the register cannot be ordered .'
 models:
   generator:
     model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit

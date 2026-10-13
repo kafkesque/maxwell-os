@@ -209,3 +209,23 @@ tasks:
   source: [D-2982, BUG-758, BUG-754, BUG-504]
   evidence: 'config/config_defaults_census.json after D-2982: 300 shadowed-declared keys / 568 sites (229 / 461 under the pre-2982 rule)'
   gate: none
+- id: T-114
+  priority: SHOULD
+  state: open
+  title: >-
+    DISCHARGE THE INHERITED LADDER FAULTS - four lines were RED before D-2982 and the prefix report hid them
+  why: >-
+    BUG-759: `just health-full` found SEVEN red lines over 128 declaring lines; all seven were re-run at
+    42f8b76^ and all seven were already rc=1, so none was D-2982's (and D-2982 fixed two and improved a third).
+    The four that remain, with the act each owes: (1) check_undeclared_encoding is over its SHRINK-ONLY
+    ceilings (files 159/156, sites 396/392, writes 75/74, unresolvable 4/3); (2) check_store_columns reports
+    CODE-CENSUS-MOVED on taxonomy_match_method.mentions (18 -> 19) and taxonomy_version.mentions (24 -> 25),
+    whose remedy is an owner-owed --record when the move is intended (D-2649/BUG-533); (3)
+    build_anchor_store_bridge --check says the committed bridge no longer re-derives; (4) build_archive_index
+    --check says archive/superseded_runs is in neither the index nor the declared exclusions (BUG-537 shape).
+    Two are re-records and two are index/re-derive acts, so this is dischargeable without new policy - but each
+    SHRINK-ONLY ceiling must be LOWERED rather than raised (D-2644) and the census moves must be explained, not
+    absorbed.
+  source: [BUG-759, D-2644, D-2649, BUG-533, BUG-537]
+  evidence: 'just health-full 2026-10-13: 7 faults / 128 lines; each rc=1 at 42f8b76^ (worktree)'
+  gate: none

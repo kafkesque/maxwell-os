@@ -921,7 +921,7 @@
     {
       "id": "BUG-749",
       "title": "(HIGH - OPEN 2026-10-13) - 1,072 in-subject rows (16.3%) carry a discipline the live production mapper does NOT reproduce from their own raw",
-      "events": 3
+      "events": 4
     },
     {
       "id": "BUG-750",

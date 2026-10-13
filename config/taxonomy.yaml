@@ -711,6 +711,7 @@ disciplines:
   - Visual Perception
   - Visual Culture
   - visual design
+  - visual culture studies
   definition: The biological and psychological process of interpreting visual sensory information and color stimuli.
   exclude:
   - visual semiotics
@@ -749,6 +750,8 @@ disciplines:
   - Visual Communication Design
   - Multimodal Metaphor
   - Multimodal Discourse Analysis
+  - biological semiotics
+  - visual communication theory
   definition: The general study of signs, symbols, and their interpretation across biological and cognitive systems.
   exclude:
   - linguistics
@@ -768,6 +771,7 @@ disciplines:
   - history of type design
   - typeface design
   - Typographic Hierarchy
+  - type design
   definition: The art and technique of arranging typefaces, spacing, and layout for effective visual communication.
   exclude:
   - visual semiotics
@@ -781,6 +785,7 @@ disciplines:
   - Color Psychology
   - Color and design
   - Color Theory & Layout
+  - color science
   definition: The principles governing color mixing, harmony, contrast, and their psychological impact on design.
   exclude:
   - visual perception
@@ -838,6 +843,8 @@ disciplines:
   - creativity research
   - creative thinking
   - ideation
+  - creative studies
+  - innovation studies
   definition: The workflow, practices, and methodologies involved in generating and executing creative work.
   exclude:
   - design thinking
@@ -856,6 +863,15 @@ disciplines:
   - problem-solving
   - cognition
   - Cognitive Studies
+  - animal cognition
+  - comparative cognition
+  - creative cognition
+  - design cognition
+  - embodied cognition
+  - learning science
+  - learning sciences
+  - music psychology
+  - visual cognition
   definition: The interdisciplinary study of how the mind works — perception, memory, attention, reasoning, language, and learning. The default home for any claim about cognition, thinking, or a cognitive process.
   exclude:
   - psychology
@@ -873,6 +889,7 @@ disciplines:
   - Behavioral Analysis
   - Consumer Behavior
   - behavioural economics
+  - behavioral finance
   definition: The descriptive study of how psychological factors and cognitive biases cause systematic deviations from the rational or standard model in economic decision-making, market behavior and behavior-change interventions - where heuristics, framing, affect, social norms and peer influence change what people do (prices, incentives, markets, choice of behavior). It describes the bias; it does not exploit it to design persuasion.
   exclude:
   - economics
@@ -931,6 +948,14 @@ disciplines:
   - environmental psychology
   - Creative Psychology
   - organizational psychology
+  - cultural psychology
+  - existential psychology
+  - experimental psychology
+  - industrial and organizational psychology
+  - legal psychology
+  - moral psychology
+  - sports psychology
+  - transpersonal psychology
   definition: The empirical study of mind and behavior in individuals and groups — emotion, personality, development, social behavior, and mental health — beyond the computational modelling of cognition. Broader and more behavioral than cognitive science, which models mental processes as computation.
   exclude:
   - cognitive science
@@ -949,6 +974,8 @@ disciplines:
   - sociolinguistics
   - pragmatics
   - Rhetoric
+  - historical linguistics
+  - second language acquisition
   definition: The scientific study of language structure, meaning, use, and its relationship to cognition.
   exclude:
   - semiotics
@@ -967,6 +994,9 @@ disciplines:
   - strategy formulation
   - competitive strategy
   - organizational change management
+  - military strategy
+  - strategic studies
+  - military studies
   definition: The high-level planning and long-term goal setting involved in business and organizational management.
   exclude:
   - decision making
@@ -1004,6 +1034,7 @@ disciplines:
   - Control Systems
   - Communication Systems
   - cybernetics
+  - family systems theory
   definition: An approach to understanding complex systems by analyzing their interrelationships and holistic behavior.
   exclude:
   - systems engineering
@@ -1041,6 +1072,8 @@ disciplines:
   - Control Systems Engineering
   - systems architecture
   - requirements engineering
+  - performance engineering
+  - reliability engineering
   definition: The interdisciplinary field focused on designing, integrating, and managing complex system architectures.
   exclude:
   - systems thinking
@@ -1073,6 +1106,10 @@ disciplines:
   - qualitative research methodology
   - qualitative research methods
   - survey methodology
+  - experimental design
+  - historical methodology
+  - history of science and technology
+  - social science research methods
   definition: The systematic frameworks and techniques used to conduct valid and reliable academic research.
   exclude:
   - information science
@@ -1087,6 +1124,8 @@ disciplines:
   - Information Theory
   - Game Theory
   - management science
+  - optimization theory
+  - service management
   definition: The application of advanced analytical methods to decision-making and system optimization.
   exclude:
   - strategic thinking
@@ -1109,6 +1148,8 @@ disciplines:
   - pattern recognition
   - supervised learning
   - reinforcement learning
+  - data mining
+  - statistical learning
   definition: The field of artificial intelligence focused on algorithms that learn patterns from data.
   exclude:
   - artificial intelligence
@@ -1145,6 +1186,11 @@ disciplines:
   - systems programming
   - DevOps
   - frontend web development
+  - data engineering
+  - database systems
+  - distributed systems engineering
+  - programming languages
+  - web engineering
   definition: The systematic application of engineering principles to the design and development of software.
   exclude:
   - computer networking
@@ -1198,6 +1244,7 @@ disciplines:
   - Computer Graphics / Physics Simulation
   - computational evolution
   - computational systems
+  - atmospheric physics
   definition: The use of computer simulations to model and analyze physical systems and biological processes.
   exclude:
   - theoretical physics
@@ -1284,6 +1331,12 @@ disciplines:
   - artificial intelligence ethics
   - bioethics
   - formal logic
+  - history of philosophy
+  - medical ethics
+  - military ethics
+  - philosophy of logic
+  - political philosophy
+  - technology ethics
   definition: The study of fundamental questions concerning existence, knowledge, values, reason, and mind.
   exclude:
   - epistemology
@@ -1298,6 +1351,8 @@ disciplines:
   - AGI
   - general intelligence
   - AI safety
+  - ai ethics
+  - artificial intelligence safety
   definition: The broad field of creating systems capable of performing tasks that typically require human intelligence.
   exclude:
   - machine learning
@@ -1313,6 +1368,13 @@ disciplines:
   - Communication Studies
   - interpersonal communication
   - political communication
+  - communication design
+  - communication science
+  - cross-cultural communication
+  - health communication
+  - organizational communication
+  - science communication
+  - technical communication
   definition: The study of how information is transmitted, received, and interpreted across various channels.
   exclude:
   - media studies
@@ -1330,6 +1392,7 @@ disciplines:
   - interactive systems
   - interaction design
   - human-centered design
+  - human factors engineering
   definition: The design and evaluation of user interfaces and systems for effective human-computer interaction.
   exclude:
   - design psychology
@@ -1361,6 +1424,7 @@ disciplines:
   - information studies
   - library science
   - information retrieval
+  - information systems
   definition: The study of the collection, organization, and management of information and data systems.
   exclude:
   - data management
@@ -1378,6 +1442,13 @@ disciplines:
   - financial analysis
   - corporate finance
   - entrepreneurial finance
+  - business finance
+  - financial accounting
+  - financial engineering
+  - financial management
+  - financial mathematics
+  - personal finance
+  - accounting
   definition: The management of money, investments, and financial assets for individuals and organizations.
   exclude:
   - economics
@@ -1401,6 +1472,21 @@ disciplines:
   - business economics
   - econometrics
   - macroeconomics
+  - agricultural economics
+  - art economics
+  - consumer economics
+  - cultural economics
+  - energy economics
+  - entrepreneurial economics
+  - health economics
+  - industrial economics
+  - industrial organization economics
+  - marketing economics
+  - media economics
+  - organizational economics
+  - platform economics
+  - real estate economics
+  - transportation economics
   definition: The social science that studies the production, distribution, and consumption of goods and services.
   exclude:
   - finance
@@ -1418,6 +1504,13 @@ disciplines:
   - sociology of work
   - sociology of science
   - social movement theory
+  - architectural sociology
+  - historical sociology
+  - political sociology
+  - social media studies
+  - social movement studies
+  - social science methodology
+  - sociology of technology
   definition: The scientific study of society, social institutions, and the patterns of human interaction.
   exclude:
   - anthropology
@@ -1432,6 +1525,7 @@ disciplines:
   - Anthropology of Religion
   - Anthropological Linguistics
   - cultural anthropology
+  - cognitive anthropology
   definition: The study of human societies, cultures, and their development across time and space.
   exclude:
   - sociology
@@ -1444,6 +1538,11 @@ disciplines:
   - cultural studies
   - culture studies
   - cultural theory
+  - critical theory
+  - cultural geography
+  - science and technology policy
+  - science and technology studies
+  - technology studies
   definition: The critical analysis of cultural practices, texts, and power relations in contemporary society — how meaning is produced, circulated, and contested within a culture, with attention to ideology, discourse, and social power.
   exclude:
   - anthropology
@@ -1457,6 +1556,8 @@ disciplines:
   - Quantum Mechanics
   - particle physics
   - physics
+  - classical mechanics
+  - statistical physics
   definition: The branch of physics focused on mathematical models and abstract theories of natural phenomena.
   exclude:
   - computational physics
@@ -1487,6 +1588,10 @@ disciplines:
   - Publishing
   - Media Production
   - media theory
+  - digital publishing
+  - interactive media design
+  - media arts
+  - publishing studies
   definition: The academic analysis of media forms, technologies, and their social and cultural impacts.
   exclude:
   - communication theory
@@ -1501,6 +1606,7 @@ disciplines:
   - rendering
   - image synthesis
   - CGI
+  - visual effects technology
   definition: The technology and techniques for generating and manipulating visual images using computers.
   exclude:
   - computer vision
@@ -1517,6 +1623,10 @@ disciplines:
   - jurisprudence
   - legal theory
   - constitutional law
+  - business law
+  - contract law
+  - corporate law
+  - law and technology
   definition: The system of rules created by society or government to regulate behavior and resolve disputes.
   exclude:
   - political science
@@ -1554,6 +1664,7 @@ disciplines:
   - Conservation Biology
   - population genetics
   - biology
+  - systems biology
   definition: The study of the origin and diversification of life through genetic and natural selection processes.
   exclude:
   - genetics
@@ -1581,6 +1692,7 @@ disciplines:
   - cognitive neuroscience
   - neurobiology
   - psychoneuroimmunology
+  - clinical neuroscience
   definition: The scientific study of the nervous system, including the brain and neural circuits.
   exclude:
   - cognitive science
@@ -1594,6 +1706,7 @@ disciplines:
   - autonomous systems
   - mechatronics
   - robot control
+  - autonomous systems engineering
   definition: The engineering and science of designing, building, and operating autonomous or controlled machines.
   exclude:
   - artificial intelligence
@@ -1614,6 +1727,9 @@ disciplines:
   - Kinesiology
   - pharmacology
   - public health
+  - health services research
+  - healthcare design
+  - healthcare management
   definition: The practice and science of maintaining, restoring, and promoting human physical and mental well-being.
   exclude:
   - neuroscience
@@ -1630,6 +1746,7 @@ disciplines:
   - drama
   - musical composition
   - performance studies
+  - music theory
   definition: Artistic disciplines involving live performance, including music, theater, and dance.
   exclude:
   - literary theory
@@ -1645,6 +1762,7 @@ disciplines:
   - literary criticism
   - poetics
   - narratology
+  - literary studies
   definition: The critical frameworks and methods used to analyze and interpret literary texts.
   exclude:
   - cultural studies
@@ -1663,6 +1781,11 @@ disciplines:
   - design engineering
   - computer architecture
   - manufacturing engineering
+  - automotive engineering
+  - engineering design
+  - environmental engineering
+  - industrial engineering
+  - optical engineering
   definition: The application of scientific principles to design, build, and maintain structures and machines.
   exclude:
   - systems engineering
@@ -1674,6 +1797,11 @@ disciplines:
   raw:
   - design thinking
   - design studies
+  - architectural design
+  - design science
+  - service design
+  - urban design
+  - user experience research
   definition: A human-centered approach to innovation — an iterative process (empathise → define → ideate → prototype → test) that integrates user needs, technology feasibility, and business viability, whose output is a designed solution, not an explanation of the mind.
   exclude:
   - creative process

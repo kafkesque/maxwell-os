@@ -12324,3 +12324,29 @@ decisions (census stamp 2448089a63b81f97, 2026-10-13), 515 bugs (184 open / 330 
 CLASS (why a LOW is filed rather than swallowed): the guard fired LOUDLY and refused to write, which is exactly why
 the damage was cosmetic. But the defect is the shape the mission cares about - a DERIVED line whose writer can
 produce something its own reader rejects - and the fix belongs on the WRITE side, not in a widened reader alone.
+
+## BUG-749 (HIGH - OPEN, OWNER RULINGS APPLIED 2026-10-13) - the owner's four words landed, and the gap fell 894 -> 457 (6.9%)
+
+The owner's rulings (config/relabel_rulings.yaml, D-2977) were applied mechanically by
+scripts/apply_relabel_rulings.py --apply to a FIXED POINT (a CONFIRM can newly evidence a neighbour through a
+declared raw, so the applier is re-run until CONFIRM reaches 0):
+
+* ALIAS-LAYER-RETIRED -> CONFIRM (lexical_evidence_required stays true). 128 raw aliases declared (125 first pass
+  + 3 second-order: `accounting`->finance, `technology studies`->cultural studies, `military studies`->strategic
+  thinking, each newly evidenced by a raw the first pass declared). 437 rows made reproducible.
+* LATE-HOME -> CORRECT. `marketing science`/`marketing strategy`/`market research` -> `marketing`; `entrepreneurial
+  studies` -> `entrepreneurship studies`. 103 rows RECORDED AS OWED (owner-gated store write, D-2898) - NOT
+  performed here.
+* `computer science -> software engineering` -> ABSTAIN (declared absence `emerging`, D-2830). 60 rows RECORDED AS
+  OWED; the raw label is preserved for a future canonical home. Not CONFIRM (would declare a NARROWER forward
+  home), not CORRECT (no `computational theory`/plain `computer science` canonical exists in the 63-discipline
+  menu).
+
+MEASURED RECEIPT (deterministic, LLM-free): menu_hash `cc800a32...` is BYTE-IDENTICAL before and after, so no
+provenance was rewritten and no row was relabelled. The re-derivation gap fell 894 -> 457 of 6,587 (13.6% -> 6.9%).
+
+REMAINING (457 rows, still need eyes): 173 ALIAS-LAYER-RETIRED (44 units the lexical guard holds back - the
+unevidenced bridges), 181 PROVENANCE-UNRESOLVED (of which computer-science's 60 are ABSTAIN-ruled but not yet
+store-written; the rest are 14 units with no repo artefact declaring them), 103 LATE-HOME (owed, not yet
+store-written), 10 DEFINITION-RE-SCOPE (the D-2974 audit is still running - 269/354 arm-calls at last check - and
+this queue will grow).

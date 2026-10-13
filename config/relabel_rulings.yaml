@@ -30,7 +30,7 @@ class_rules:
   # PENDING (come back with the 44 unevidenced units listed)? With lexical_evidence_required: true, a
   # class CONFIRM still holds the 44 back for the owner — so this word buys the 126 without guessing.
   ALIAS-LAYER-RETIRED:
-    policy: PENDING
+    policy: CONFIRM
     lexical_evidence_required: true
 
   # 4 units / 103 rows: U002 `marketing science` (94), U057 `entrepreneurial studies` (4),
@@ -39,7 +39,8 @@ class_rules:
   # studies`). THE QUESTION: CORRECT (re-map the rows to the live home — the corpus aligns with today's
   # map) or LEAVE (the corpus is allowed to record what was true when the row was admitted)?
   LATE-HOME:
-    policy: PENDING
+    policy: CORRECT
+    owner_canonical: marketing
 
   # 16 units / 252 rows, and they are not 16 independent questions — they are FAMILIES with one origin:
   #   software engineering   U004 computer science (60), U035 distributed systems (6), U070 cloud
@@ -86,13 +87,22 @@ unit_rulings:
       here so it is a choice and not an accident.
   marketing science -> emerging:
     was: U002 (same packet)
-    action: LEAVE
+    action: CORRECT
+    owner_canonical: marketing
     note: >-
-      Owner 2026-10-13 ("approve"). READ AS LEAVE because the stored value is the ABSENCE `emerging`: to
-      approve the stored state is to keep the 94 rows as a correct-at-the-time record while the live map
-      stays authoritative forward. IF THE INTENT WAS "approve the live answer", it is ONE WORD to change:
-      set action: CORRECT and owner_canonical: marketing — that is a licensed store write, which the
-      applier records as owed rather than performing.
+      Owner 2026-10-13 ("2 = CORRECT for LATE-HOME"). Earlier read as LEAVE because the stored value is
+      the ABSENCE `emerging` (approving the stored state = keep the 94 rows as a correct-at-the-time
+      record). The owner has now clarified the intent is CORRECT: re-map the 94 rows to the live home
+      `marketing`. Recorded as OWED — a canonical relabel is a separate owner-gated store write
+      (D-2898), which this applier records but never performs.
+  entrepreneurial studies -> emerging:
+    was: U057 (packet 2026-10-13)
+    action: CORRECT
+    owner_canonical: entrepreneurship studies
+    note: >-
+      Owner 2026-10-13 ("2 = CORRECT for LATE-HOME"). The class CORRECT names `marketing` as the
+      majority home (3 of 4 units, 99 of 103 rows); this unit's live home is `entrepreneurship studies`,
+      so it is overridden by name. Recorded as OWED — never performed by the applier (D-2898).
   organizational psychology -> psychology:
     was: U003 (same packet)
     action: CONFIRM
@@ -104,15 +114,16 @@ unit_rulings:
       psychology` as a raw of `psychology`, so this declaration is the missing half of an existing one.
   computer science -> software engineering:
     was: U004 (same packet)
-    action: CONFIRM
+    action: ABSTAIN
     note: >-
-      Owner 2026-10-13 ("approve U004"). HELD, not applied: this one is re-affirmed before it propagates.
-      A CONFIRM here is not only "the 60 rows stand" — it declares `computer science` as a raw of
-      `software engineering` FORWARD, so every future CS-raw label lands in a NARROWER home than the
-      label. The three measured reasons to pause: (1) `computer science` is the broader field, not a
-      sub-field of `software engineering`; (2) the live mapper refuses it (both the definition-anchored
-      menu and the remap answer `emerging`); (3) the alias was introduced by the D2422 sweep that
-      explicitly states "semantic correctness NOT guaranteed by LLM". Options: re-affirm CONFIRM as
-      written; CORRECT with the home you judge right (e.g. `computational theory`, or a new canonical —
-      which needs its own decision); LEAVE (rows stand, no forward declaration); or ABSTAIN.
-    hold: 'awaiting re-affirmation: CONFIRM has a forward propagation effect (see note)'
+      Owner 2026-10-13 ("4 = whatever you recommend"). RELEASED from hold with the recommendation ABSTAIN
+      (declared absence `emerging`, D-2830) — recorded as OWED, never performed here. WHY NOT CONFIRM: it
+      would declare `computer science` as a raw of `software engineering` FORWARD, so every future CS-raw
+      label lands in a NARROWER home than the label; the three measured objections stand — (1) `computer
+      science` is the broader field, not a sub-field; (2) the live mapper refuses it (both the
+      definition-anchored menu and the remap answer `emerging`); (3) the alias came from the D2422 sweep
+      whose own text states "semantic correctness NOT guaranteed by LLM". WHY NOT CORRECT: no canonical in
+      the 63-discipline menu is a clean home (`computational theory` and a plain `computer science`
+      canonical do not exist; opening one needs its own decision). ABSTAIN removes the false `software
+      engineering` claim, aligns the stored value with the live mapper's own answer, and locks in no wrong
+      forward mapping; the raw label is preserved, so a future canonical home can be re-derived cleanly.

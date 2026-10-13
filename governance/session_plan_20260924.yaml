@@ -162,6 +162,8 @@ may_touch:
 - governance/CANONICAL_RELABEL_REVIEW_20261013.md
 - governance/canonical_relabel_review_20261013.csv
 - governance/canonical_relabel_review_segments_20261013.csv
+# D-2977 (2026-10-13): the ruling APPLIER's plan (the reviewable consequence of the owner's words).
+- governance/relabel_plan_20261013.md
 will_not_touch:
 - governance/F11_*
 - governance/ANCHOR_RULER_CONSOLIDATED_*.csv
@@ -869,3 +871,13 @@ widening_log:
   may_touch_untouched: false
   will_not_touch_untouched: true
   why: 'The builder itself needs no widening (scripts/*.py). The three artifacts are the owner-facing surface of the review and are date-stamped evidence; governance/canonical_labels_reference.md was already granted and was REGENERATED, not edited (its committed copy still declared config/taxonomy_v5.yaml as its source of truth - a stale declaration of the BUG-542 class, whose own header says "DO NOT hand-edit; regenerate").'
+- date: '2026-10-13'
+  actor: assistant
+  owner_ack: 'owner instruction 2026-10-13 ("approve U001..U004" + "if I dont have to one by one fill manually anything what exactly I have to do besides ruling" + "continue with the next critical step")'
+  addendum: 'D-2977 - the ruling APPLIER: config/relabel_rulings.yaml is the ONE home for the owner words (already granted by config/*.yaml) and scripts/apply_relabel_rulings.py by scripts/*.py, so ONE artifact needed a home - the PLAN it renders, which is the reviewable consequence of a ruling and the receipt that a class word reached exactly the units it names.'
+  additions:
+  - pattern: governance/relabel_plan_20261013.md
+    why: 'D-2977 - the rendered plan: which alias is declared in config/taxonomy.yaml, which units are held back, which rows move, and precisely which units no ruling reaches. Date-stamped so a reviewed copy survives a re-render (the surface SHRINKS as rulings land: 192 units / 1,074 rows at the first render, 197 / 903 after the two CONFIRMs).'
+  may_touch_untouched: false
+  will_not_touch_untouched: true
+  why: 'One NAMED artifact (BUG-548/BUG-563: never a glob). The applier writes exactly two things when --apply is given: the named declaration in config/taxonomy.yaml (a surgical two-line splice, asserted both ways) and this plan. config/taxonomy.yaml is granted, and no other config byte moved - MEASURED: menu_hash cc800a32... and the answer space c1f7895e... byte-identical before and after.'

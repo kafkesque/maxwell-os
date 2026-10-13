@@ -1,0 +1,70 @@
+- id: D-2981
+  date: '2026-10-13'
+  state: RESOLVED
+  category: GOVERNANCE / STRUCTURE
+  title: >-
+    The user-facing faces are DERIVED, JOINED and ORDERED - one writer, one check, and the boot-loaded
+    session seed stops propagating drift
+  bugs: [BUG-756, BUG-757]
+  decision: >-
+    THE DEFECT (measured, not felt). The agent-facing registers and the human-facing faces were joined in
+    exactly TWO places - the two census restatement lines - and nowhere else. Consequences, all measured on
+    2026-10-13: agent/session_seed.yaml, which is LOADED AT BOOT, sat seven days stale (pipeline_commit
+    v3.0-D2370 against the manifest v3.0-D2485; status dated 2026-10-06) and propagated that drift into every
+    session that read it; MASTER-TASK-REGISTER.md and DECISION-LOG.md headers said 2026-10-07 while the
+    registers had moved on; MTR carried 240 lines of prose where a register should be, with its live index
+    duplicated three times inside it (2026-10-12, 2026-10-07 and undated); and NO machine-readable task
+    register existed, so "how many tasks are open" had no answer at all.
+
+
+    THE SHAPE. config/task_register.yaml is the missing register (id, priority MUST/SHOULD/WORTH, state,
+    source, evidence, gate). config/gov_sync.yaml DECLARES the joins: which register feeds which face, the
+    sentinel-delimited index block, the history boundary, the derived scalar fields, the OPEN decision states,
+    the severity/task vocabularies and the two shrink-only severity ceilings. scripts/gov_sync.py is the ONE
+    writer: it renders the GOV-INDEX block in MASTER-TASK-REGISTER.md, DECISION-LOG.md and governance/buglog.md
+    from the registers, re-cuts EVERY census restatement line (BUG-588/D-2692), and derives session_seed
+    pipeline_commit (from the pipeline manifest) and status (from the MUST tasks). Its default mode is --check
+    and it BYTE-COMPARES the block in the file against its re-derivation, so a hand edit is DETECTABLE rather
+    than merely discouraged. It is declared in config/rail_registry.yaml as a WRITER and wired into the health
+    recipe with BOTH its --selftest and its check.
+
+
+    WHAT THE FACES NOW SAY (derived, therefore not stale): 1108 decisions (67 needing action: open 32,
+    proposed 14, draft 1, deferred 14, planned 6; in effect 565; closed 308 resolved / 16 superseded /
+    8 archived / 11 rejected) - 520 bugs (185 open / 335 closed, with the severity distribution printed from the
+    heading population) - 12 open tasks (MUST 5 / SHOULD 4 / WORTH 3, one OWNER-GATED). Every number in a face
+    is READ from config/decisions_summary.json, governance/bug_status.json and config/task_register.yaml.
+
+
+    THE APPEND CONVENTION, ENFORCED. Everything below the GOV-HISTORY-START sentinel is DATED HISTORY:
+    append-only, never a register, never re-counted. NOTHING WAS DELETED in this change - the old prose index
+    was declared history by placing the marker ABOVE it. A new OPEN task enters config/task_register.yaml;
+    a new bug enters the buglog with a (SEVERITY - STATE date) heading; a new decision enters by the mint.
+    Nothing else edits the top of a face.
+
+
+    THE STRUCTURAL CLEANUP. The top of each face is now a machine-owned block whose content is a VIEW (counts,
+    the MUST tasks, the open decisions, the most severe open bugs); the FULL sets stay in the registers. MTR and
+    DECISION-LOG keep their history intact below the declared boundary. BUG-756 is CLOSED (the census
+    restatement has a tracked writer). BUG-757 is FILED: 125 open headings carry no severity token (two
+    populations measured: 125 heading / 108 title), so the open register could not be ordered by criticality -
+    the rule is enforced for NEW headings and the historical backfill is owner-gated.
+
+
+    ASSESSED AND NOT ADOPTED (owner-asked): pbakaus/impeccable and shadcn-ui/lint are frontend/design-system
+    tools with no surface here. Two of their mechanisms are BORROWED as sandbox rules (specs/README.md): a
+    bounded set of deterministic detectors with the LLM strictly advisory, and diagnostics that name the derived
+    remedy. Recorded in governance/NOT-YET-EVALUATED-RESEARCH.md so the question is answered once.
+  files:
+  - config/gov_sync.yaml
+  - config/task_register.yaml
+  - scripts/gov_sync.py
+  - config/rail_registry.yaml
+  - config/artifact_ownership.yaml
+  - justfile
+  - MASTER-TASK-REGISTER.md
+  - DECISION-LOG.md
+  - governance/buglog.md
+  - agent/session_seed.yaml
+  - specs/README.md
+  - governance/NOT-YET-EVALUATED-RESEARCH.md

@@ -134,3 +134,14 @@ the repo directly — REA would return decompiled/minified approximations WORSE 
 Open-source targets are QUEUED (P4, after P0-P3): LlamaIndex content+config cache invalidation,
 Instructor typed response contract, Docling layout/table order-aware recovery, RAGChecker/Ragas/
 BGE-M3 retrieval-quality baseline.
+
+
+## FRONTEND/AGENT-DESIGN TOOLS ASSESSED 2026-10-13 (owner-asked) - REFERENCE ONLY, not adoptable
+
+| repo | what it is | verdict for Maxwell OS |
+|---|---|---|
+| pbakaus/impeccable | design guidance skill for AI coding agents: 1 skill, 24 commands, live browser iteration, **59 deterministic detector rules** for AI-generated frontend design | **NOT ADAPTABLE** (Maxwell OS has no UI surface). Two MECHANISMS borrowed into specs/README.md: a durable product-truth file read before any change, and a BOUNDED set of deterministic detectors with the LLM layer strictly advisory |
+| shadcn-ui/lint | agent-first linter for Tailwind design systems: you declare what is allowed, and a violation explains the problem and SUGGESTS a fix derived from your own components and theme | **NOT ADAPTABLE** (React/Svelte/Vue design systems). One MECHANISM borrowed: every failure must NAME ITS DERIVED REMEDY, not merely fail - now rule 5 of the spec/test sandbox |
+
+Both are recorded here so the question is answered ONCE instead of re-asked per session, and both are referenced
+from specs/README.md (the sandbox charter) where the borrowed mechanisms are stated as rules.

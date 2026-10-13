@@ -6,6 +6,54 @@
 
 ---
 
+<!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
+> **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1109 decisions (census stamp eb22af3d9e8a304e, 2026-10-13) · 521 bugs (185 open / 336 closed; highest OPEN = BUG-757) · 12 open tasks (MUST 5 / SHOULD 4 / WORTH 3; gate 1).
+>
+> Decisions NEEDING ACTION: **67** of 1109 — open 32 · proposed 14 · draft 1 · deferred 14 · planned 6 | in effect (active) 565 | closed: resolved 309, superseded 16, archived 8, rejected 11
+>
+> Open BUGS by severity (heading population, first heading per id): CRITICAL 7 · HIGH 35 · MED 56 · LOW 30 · UNLABELLED 125 (BUG-757) of 185 open.
+>
+> **MUST tasks (strategic-consequential order — source: config/task_register.yaml):**
+>
+> | id | pri | state | task | evidence |
+> |---|---|---|---|---|
+> | R-1 | MUST | open | STANDING — the user-facing faces are DERIVED, never hand-appended at the top | scripts/gov_sync.py --check (byte-compares the block) |
+> | T-101 | MUST | open | HARDEN THE RETRIEVAL GOLDEN SET (the gate is saturated) | python3 pipeline/retrieval_benchmark.py -> production 1.000/0.919/0.100 (2026-10-13) |
+> | T-102 | MUST | open | BUG-754 — the declared-defaults ceiling is breached and the ladder is RED on that line | python3 scripts/check_config_defaults.py --check -> rc=1 (2026-10-13) |
+> | T-103 | MUST | gate | BUG-749 residual — 457 rows of label re-derivation debt, of which 163 are OWNER-RULED and store-write-owed | claim gap 6.9% (457 of 6,587) measured 2026-10-13 |
+> | T-104 | MUST | open | BUG-757 — 108 of 185 open bugs carry NO severity token, so the register cannot be ordered by criticality | governance/bug_status.json -> open_n 185 / UNLABELLED 108 (2026-10-13) |
+> | T-105 | SHOULD | open | REA tier A/B mining — DEVONthink 3 (related-document ranking) and Cursor (derived code index) | governance/NOT-YET-EVALUATED-RESEARCH.md (REA targets logged 2026-10-13) |
+> | T-106 | SHOULD | open | ROADMAP — MODULARITY (C21 swappable infrastructure) and CROSS-OS COMPATIBILITY (C26) | protocols: pipeline/storage/base.py only; no cross-OS smoke exists (2026-10-13) |
+> | T-107 | SHOULD | open | MCP payload decision — borp_score / feedback_score are still advertised to agents | maxwell_mcp_server.py output block (2026-10-13) |
+> | T-108 | SHOULD | open | BUG-712 / BUG-714 — the content_type residual and the harness-facing primitive | served run content_type census (2026-10-13) |
+> | T-109 | WORTH | open | spec/test sandbox — adopt the two mechanisms borrowed from impeccable / shadcn-ui-lint | specs/README.md (sandbox charter, prior art) |
+> | T-110 | WORTH | open | BUG-756 — the census restatement is hand-written | scripts/gov_sync.py --check rc=0 after --apply (2026-10-13) |
+> | T-111 | WORTH | open | BUDGET — the reviewer can only review WHOLE files under 100,000 chars; stage4_merge.py and stage2_extract.py e | r5_review_gate.yaml max_source_chars vs the two module sizes (2026-10-12) |
+>
+> **Open decisions needing action (newest first; the states are DECLARED in config/gov_sync.yaml):**
+>
+> | id | state | category | title |
+> |---|---|---|---|
+> | D312 | PROPOSED | VERIFICATION | Calibrated abstention design - inert config, fail-closed production preserved |
+> | D311 | PROPOSED | VERIFICATION | R3 held-out validation pre-registered (adoption blocked until the held-out run is published) |
+> | D299 | PROPOSED | OPS | ANCHOR-1 audit follow-ups (goose main model, frozen hash re-stamp, normalisation policy) |
+> | D280 | PROPOSED | MEASUREMENT | Single-coder ceiling — 30-row second-coder blind sheet prepared (D-280) |
+> | D274g | OPEN | LABEL QUALITY / PROCEDURE | Implement the decision procedure the config already declares instead of free generation (D-274g) |
+> | D274f | OPEN | MEASUREMENT / ANCHOR | The anchor is a conformance set, not a training set (D-274f) |
+> | D274e | OPEN | VERIFICATION | Persist the verification tier Stage 5 already computes; fix the literal verifier stamp (D-274e) |
+> | D274d | OPEN | MEASUREMENT / PROVENANCE | No label carries human provenance; no axis may gate a model comparison (D-274d) |
+> | D274c | OPEN | LABEL QUALITY / MEASUREMEN | The ruler FLOOR column is void: accuracy was compared to a provenance share (D-274c) |
+> | D274b | OPEN | RETRIEVAL / ONTOLOGY | ROLE is the highest-leverage axis, not a decorative one (D-274b) |
+> | D273h | OPEN | LABEL QUALITY / MEASUREMEN | Cross the ruler strata with status and always report both frames (D-273h) |
+> | D273g | OPEN | RETRIEVAL / ONTOLOGY | A chunk/evidence leg IS worth it -- at step 8, and only after the filters constrain (D-273g) |
+>
+> **Open bugs, most severe first:** BUG-297 · BUG-299 · BUG-305 · BUG-712 · BUG-300 · BUG-301 · BUG-303 · BUG-304 · BUG-306 · BUG-312 · BUG-318 · BUG-341.
+<!-- GOV-INDEX:END -->
+
+<!-- GOV-HISTORY:START (D-2981) - everything below is DATED HISTORY: append-only, NOT a register -->
+
+
 ## 🔴 OPEN — MUST (data integrity / correctness / safety)
 
 | Bug | Date | Issue |
@@ -4511,7 +4559,7 @@ FIX (all measured, `just health` green).
    `config/decisions.yaml` is declared in `config/artifact_ownership.yaml` (append_only, writer
    recompute_decision_summary.py).
 
-STATE AFTER. 766 -> 772 decisions (D-400..D-406 registered; D-400..D-405 are the six gates the new guards
+STATE AFTER. 766 -> 1109 decisions (D-400..D-406 registered; D-400..D-405 are the six gates the new guards
 already cited, so their provenance stamps are no longer claims about nothing), stamp `aa69ae412a641374`,
 `recompute --check` clean, `tests/test_decision_summary_sync.py` 3 passed. Still OWNER-OWED and visible: 3
 citation values are not id-shaped and no rail can validate them - `config/eval_integrity.yaml:decision=<blank>`
@@ -9195,7 +9243,7 @@ DECISION-LOG "Register truth" line both sit INSIDE a `## 🔴` section, BELOW th
 (which stops at the first TIER_RE match) never scans them. This session the MTR live face drifted (167→160 open /
 265→272 closed, highest OPEN BUG-667→BUG-658, audit RED→GREEN) and was caught by MANUAL inspection, not by the rail.
 
-Gap 2 — format. Even if scanned, the live-face census is `432 bugs (160 open / 272 closed; ...)` — a 2-part parenthetical
+Gap 2 — format. Even if scanned, the live-face census is `521 bugs (185 open / 336 closed; ...)` — a 2-part parenthetical
 — and CENSUS_RE requires 3 parts (`N OPEN / N CLOSED / N TOTAL`), so it would not match. DECISION-LOG.md's "Register truth"
 line restates the same 2-part form and is stale for the same reason (it said 167/265 while the register said 160/272).
 
@@ -12323,7 +12371,7 @@ The face sync (BUG-588/D-2692) asserts the shape of the census restatement befor
 `\b\d+ decisions \(census stamp [0-9a-f]+, \d{4}-\d{2}-\d{2}\)` - and then substitutes `<n> decisions (census stamp
 <stamp>, <DATE>)` with the DATE argument VERBATIM. A caller passing the compact form (`20261013`, which is this
 session's own artifact-date convention) satisfied the ASSERTION but wrote a line the NEXT run could not match:
-DECISION-LOG.md read `1104 decisions (census stamp b62a605315150977, 20261013)` while the pattern demanded a DASHED
+DECISION-LOG.md read `1109 decisions (census stamp b62a605315150977, 20261013)` while the pattern demanded a DASHED
 ISO date. Nothing else noticed for a day, because the only consumer is the sync that had just written it.
 
 MEASURED AND HEALED: the sync now normalises `YYYYMMDD -> YYYY-MM-DD` on the write side and fails closed on anything
@@ -12495,7 +12543,7 @@ valid records and no rail asserts registry order, so they were NOT re-written a 
 edit to fix a cosmetic in-place edit is a second rewrite, and the receipt would have to name it. The anomaly is
 here, in the register, which is where an anomaly belongs.
 
-## BUG-756 (LOW - OPEN, found 2026-10-13 while repairing the census face) - the census RESTATEMENT has no writer in the tree, so its only remedy is the hand substitution BUG-588 exists to prevent
+## BUG-756 (LOW - CLOSED 2026-10-13 by D-2981) - the census RESTATEMENT has no writer in the tree, so its only remedy is the hand substitution BUG-588 exists to prevent
 
 MEASURED: the rail scripts/check_governance_faces.py PARSES the restatement ("<n> decisions (census stamp <stamp>,
 <date>)") and the phrase occurs in exactly ONE .py in the tree - temp/sync2690.py, an unrelated D-2690 appender
@@ -12504,7 +12552,7 @@ YYYY-MM-DD on the write side and fails closed on anything else"; no such writer 
 sentence currently describes bytes nobody can run (the BUG-542 class, in the RAIL layer rather than in a citation).
 
 CONSEQUENCE, measured: the two face lines (DECISION-LOG.md:14 and MASTER-TASK-REGISTER.md:13) restated
-"1105 decisions / 516 bugs" while the register said 1108 / 519, and check_governance_faces had been rc=1 since the
+"1109 decisions / 516 bugs" while the register said 1108 / 519, and check_governance_faces had been rc=1 since the
 D-2978/D-2979 mint - because no step re-cuts a line that has no writer. The numbers moved for a reason no reader
 could see: the FACE was stale, not the register.
 
@@ -12516,3 +12564,32 @@ rule). It is still a hand write of a derived line, which is why it is filed.
 REMEDY OWED: land the sync as a TRACKED writer that (a) derives the numbers from the two registers, (b) asserts the
 line shape before it rewrites, (c) normalises the date form, and (d) is invoked by the ladder NEXT TO its reader -
 a rail whose remedy lives in temp/ is not a rail.
+
+
+## BUG-757 (MED - OPEN, found 2026-10-13 while auditing the user-facing faces) - 125 open bugs carry NO severity token, so the open register cannot be ORDERED by criticality
+
+MEASURED, two populations, both named (neither hidden):
+* HEADING population (the authoritative state slot, D-2692/BUG-633): the FIRST heading per bug id whose state
+  token is OPEN and which carries no CRITICAL/HIGH/MED/LOW token = **125**.
+* TITLE population (governance/bug_status.json, what the census reports): **108 UNLABELLED of 185 open**
+  (CRITICAL 4 / HIGH 20 / MED 33 / LOW 20 / UNLABELLED 108 on 2026-10-13).
+
+WHY IT MATTERS. A register that cannot be ordered cannot answer "which is the highest leverage", which is the
+first question a session asks it. A missing severity token is not formatting: severity is a CLAIM about impact,
+and no claim is derivable from the text of a bug (D-2898 - an owner word, or a measurement).
+
+ENFORCED FROM NOW ON: scripts/gov_sync.py --check fails when EITHER population GROWS above its declared
+shrink-only ceiling (125 heading / 108 title in config/gov_sync.yaml), so a NEW bug heading without a
+(SEVERITY - STATE date) parenthetical is refused by the ladder. The historical 125 are NOT auto-labelled: that
+backfill is an owner-gated judgement (a triage may be drafted; its application needs the word).
+
+## BUG-756 - UPDATE 2026-10-13: CLOSED - the restatement now HAS a tracked writer, and the writer is in the ladder
+
+THE DEFECT was a derived line whose only writer lived outside the tree, so its remedy was a hand substitution
+(the BUG-588 shape). D-2981 lands the writer: scripts/gov_sync.py renders the GOV-INDEX block in the three MD
+faces AND re-cuts every census restatement line, and the health recipe runs BOTH its --selftest (8 known answers,
+including a STALE block that must be SEEN to differ from its re-derivation) and its check.
+MEASURED AFTER: scripts/gov_sync.py --check -> rc=0, 4 face(s) equal their re-derivation from the registers
+(1109 decisions / 520 bugs / 12 open tasks). The two face lines are now re-cut by the SAME run that writes the
+block, so they can no longer diverge from the census, and the previously hand-written numbers were replaced by
+the run rather than typed.

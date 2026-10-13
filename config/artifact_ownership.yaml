@@ -37,6 +37,36 @@ guard_coverage:
     exemption is retirable (not owner-gated) is named as the next I1 step inside its own reason.
 
 artifacts:
+  MASTER-TASK-REGISTER.md:
+    mutability: derived_regenerable
+    writer_of_record: scripts/gov_sync.py
+    unreconciled_reason: >-
+      D-2981: the face is DERIVED - scripts/gov_sync.py renders the GOV-INDEX block from
+      governance/task_register.yaml + config/decisions_summary.json + governance/bug_status.json and
+      re-cuts every census restatement line. Everything below the GOV-HISTORY-START marker is dated
+      history (append-only, never a register).
+  DECISION-LOG.md:
+    mutability: derived_regenerable
+    writer_of_record: scripts/gov_sync.py
+    unreconciled_reason: >-
+      D-2981: same shape as its sibling face - the derived GOV-INDEX block + the census restatement
+      lines are machine-owned; the records below the history marker are append-only history.
+  governance/buglog.md:
+    mutability: derived_regenerable
+    writer_of_record: scripts/gov_sync.py
+    unreconciled_reason: >-
+      D-2981: SPLIT OWNERSHIP, declared here so it is not a surprise - scripts/gov_sync.py owns ONLY
+      the derived index block at the top and the restatement line; the bug ENTRIES are written by the
+      session that finds the bug (append-only, heading convention enforced by scripts/check_bug_status.py
+      and the severity rule in scripts/gov_sync.py).
+  agent/session_seed.yaml:
+    mutability: derived_regenerable
+    writer_of_record: scripts/gov_sync.py
+    unreconciled_reason: >-
+      D-2981: only the DERIVED scalar fields are owned here (session.pipeline_commit from the pipeline
+      manifest, session.status rendered from the MUST tasks). The model/stage/service declarations in
+      the same file are hand-authored and out of this writer's scope - a writer that owns everything
+      would make a hand edit indistinguishable from a derived one.
   governance/bug_status.json:
     mutability: derived_regenerable
     writer_of_record: scripts/bug_status.py

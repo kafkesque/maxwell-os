@@ -9,8 +9,56 @@
 
 ## 🔴 MUST — open (strategic-consequential order)
 
+<!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
+> **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1109 decisions (census stamp eb22af3d9e8a304e, 2026-10-13) · 521 bugs (185 open / 336 closed; highest OPEN = BUG-757) · 12 open tasks (MUST 5 / SHOULD 4 / WORTH 3; gate 1).
+>
+> Decisions NEEDING ACTION: **67** of 1109 — open 32 · proposed 14 · draft 1 · deferred 14 · planned 6 | in effect (active) 565 | closed: resolved 309, superseded 16, archived 8, rejected 11
+>
+> Open BUGS by severity (heading population, first heading per id): CRITICAL 7 · HIGH 35 · MED 56 · LOW 30 · UNLABELLED 125 (BUG-757) of 185 open.
+>
+> **MUST tasks (strategic-consequential order — source: config/task_register.yaml):**
+>
+> | id | pri | state | task | evidence |
+> |---|---|---|---|---|
+> | R-1 | MUST | open | STANDING — the user-facing faces are DERIVED, never hand-appended at the top | scripts/gov_sync.py --check (byte-compares the block) |
+> | T-101 | MUST | open | HARDEN THE RETRIEVAL GOLDEN SET (the gate is saturated) | python3 pipeline/retrieval_benchmark.py -> production 1.000/0.919/0.100 (2026-10-13) |
+> | T-102 | MUST | open | BUG-754 — the declared-defaults ceiling is breached and the ladder is RED on that line | python3 scripts/check_config_defaults.py --check -> rc=1 (2026-10-13) |
+> | T-103 | MUST | gate | BUG-749 residual — 457 rows of label re-derivation debt, of which 163 are OWNER-RULED and store-write-owed | claim gap 6.9% (457 of 6,587) measured 2026-10-13 |
+> | T-104 | MUST | open | BUG-757 — 108 of 185 open bugs carry NO severity token, so the register cannot be ordered by criticality | governance/bug_status.json -> open_n 185 / UNLABELLED 108 (2026-10-13) |
+> | T-105 | SHOULD | open | REA tier A/B mining — DEVONthink 3 (related-document ranking) and Cursor (derived code index) | governance/NOT-YET-EVALUATED-RESEARCH.md (REA targets logged 2026-10-13) |
+> | T-106 | SHOULD | open | ROADMAP — MODULARITY (C21 swappable infrastructure) and CROSS-OS COMPATIBILITY (C26) | protocols: pipeline/storage/base.py only; no cross-OS smoke exists (2026-10-13) |
+> | T-107 | SHOULD | open | MCP payload decision — borp_score / feedback_score are still advertised to agents | maxwell_mcp_server.py output block (2026-10-13) |
+> | T-108 | SHOULD | open | BUG-712 / BUG-714 — the content_type residual and the harness-facing primitive | served run content_type census (2026-10-13) |
+> | T-109 | WORTH | open | spec/test sandbox — adopt the two mechanisms borrowed from impeccable / shadcn-ui-lint | specs/README.md (sandbox charter, prior art) |
+> | T-110 | WORTH | open | BUG-756 — the census restatement is hand-written | scripts/gov_sync.py --check rc=0 after --apply (2026-10-13) |
+> | T-111 | WORTH | open | BUDGET — the reviewer can only review WHOLE files under 100,000 chars; stage4_merge.py and stage2_extract.py e | r5_review_gate.yaml max_source_chars vs the two module sizes (2026-10-12) |
+>
+> **Open decisions needing action (newest first; the states are DECLARED in config/gov_sync.yaml):**
+>
+> | id | state | category | title |
+> |---|---|---|---|
+> | D312 | PROPOSED | VERIFICATION | Calibrated abstention design - inert config, fail-closed production preserved |
+> | D311 | PROPOSED | VERIFICATION | R3 held-out validation pre-registered (adoption blocked until the held-out run is published) |
+> | D299 | PROPOSED | OPS | ANCHOR-1 audit follow-ups (goose main model, frozen hash re-stamp, normalisation policy) |
+> | D280 | PROPOSED | MEASUREMENT | Single-coder ceiling — 30-row second-coder blind sheet prepared (D-280) |
+> | D274g | OPEN | LABEL QUALITY / PROCEDURE | Implement the decision procedure the config already declares instead of free generation (D-274g) |
+> | D274f | OPEN | MEASUREMENT / ANCHOR | The anchor is a conformance set, not a training set (D-274f) |
+> | D274e | OPEN | VERIFICATION | Persist the verification tier Stage 5 already computes; fix the literal verifier stamp (D-274e) |
+> | D274d | OPEN | MEASUREMENT / PROVENANCE | No label carries human provenance; no axis may gate a model comparison (D-274d) |
+> | D274c | OPEN | LABEL QUALITY / MEASUREMEN | The ruler FLOOR column is void: accuracy was compared to a provenance share (D-274c) |
+> | D274b | OPEN | RETRIEVAL / ONTOLOGY | ROLE is the highest-leverage axis, not a decorative one (D-274b) |
+> | D273h | OPEN | LABEL QUALITY / MEASUREMEN | Cross the ruler strata with status and always report both frames (D-273h) |
+> | D273g | OPEN | RETRIEVAL / ONTOLOGY | A chunk/evidence leg IS worth it -- at step 8, and only after the filters constrain (D-273g) |
+>
+> **Open bugs, most severe first:** BUG-297 · BUG-299 · BUG-305 · BUG-712 · BUG-300 · BUG-301 · BUG-303 · BUG-304 · BUG-306 · BUG-312 · BUG-318 · BUG-341.
+<!-- GOV-INDEX:END -->
+
+<!-- GOV-HISTORY:START (D-2981) - everything below is DATED HISTORY: append-only, NOT a register -->
+
+
 > **CURRENT OPEN INDEX (machine-derived 2026-10-12 — the live face; dated history follows below).**
-> Register truth (do NOT restate counts elsewhere — BUG-588/D-2692): 1108 decisions · 520 bugs (185 open / 335 closed; highest OPEN = BUG-750).
+> Register truth (do NOT restate counts elsewhere — BUG-588/D-2692): 1109 decisions · 521 bugs (185 open / 336 closed; highest OPEN = BUG-750).
 > **D2590 NON-PRINCIPLE TIER
 > LANDED** — decisions **D-2942..D-2945**; the store went **6,591 → 7,640 rows in ONE run** (principle 6,577 /
 > process_template 774 / process_instance 156 / tool_instruction 108 / growth_edge 25). The 1,619 S4 sidecar records
@@ -41,7 +89,7 @@
 >
 > — everything below this index is dated history / SHOULD / WORTH / DONE —
 
-> **2026-10-05 BUG-638/BUG-639 + D-2822..D-2825 (registry 955): D-2825 cluster_28517 "Planck's Constant Derivation" RECOVERED (transient S4 `application` failure, NOT an S2 gap — S2 was complete/coherent; `--cluster 28517` retry cleaned it). D-2824 dedup-accept phantoms 3776/26074. D-2823 normalize bare `--cluster` ints. D-2822 PROPOSED (S5 gate A(d) OR-entail+AND-no-contra, T9). BUG-639 (S4 delta-merge shrink-guard false-positive → `force_shrink=bool(cluster_ids)`) + BUG-638 (METRICS.jsonl floor guard) both FIXED. S4 final 6,591 / preflight GREEN; S5 STALE (6,588) → re-run; S6 empty → run. Registry 955 decisions / 377 bugs (139 open / 238 closed; highest OPEN = BUG-637).**
+> **2026-10-05 BUG-638/BUG-639 + D-2822..D-2825 (registry 955): D-2825 cluster_28517 "Planck's Constant Derivation" RECOVERED (transient S4 `application` failure, NOT an S2 gap — S2 was complete/coherent; `--cluster 28517` retry cleaned it). D-2824 dedup-accept phantoms 3776/26074. D-2823 normalize bare `--cluster` ints. D-2822 PROPOSED (S5 gate A(d) OR-entail+AND-no-contra, T9). BUG-639 (S4 delta-merge shrink-guard false-positive → `force_shrink=bool(cluster_ids)`) + BUG-638 (METRICS.jsonl floor guard) both FIXED. S4 final 6,591 / preflight GREEN; S5 STALE (6,588) → re-run; S6 empty → run. Registry 1109 decisions / 521 bugs (185 open / 336 closed; highest OPEN = BUG-637).**
 
 
 
@@ -2127,7 +2175,7 @@ NEXT (refreshed D-2772):
 
 ## D-2859 + v3 forensic audit (2026-10-07) — ANTI-CIRCLE COMMIT (backlog frozen; remaining work re-sequenced)
 
-- ROOT CAUSE of '2 weeks of circles': 34 decisions D-2826..D-2859 ratified in worktree but UNCOMMITTED (HEAD=D-2825=955, worktree=989) + 68 modified + 140 untracked. Every session re-read unstable state, re-derived the referee (4 variants), re-ran A/B, wrote another audit (7 on Oct 6 alone), never committed.
+- ROOT CAUSE of '2 weeks of circles': 1109 decisions D-2826..D-2859 ratified in worktree but UNCOMMITTED (HEAD=D-2825=955, worktree=989) + 68 modified + 140 untracked. Every session re-read unstable state, re-derived the referee (4 variants), re-ran A/B, wrote another audit (7 on Oct 6 alone), never committed.
 - COMMITTED this session: full backlog (v7 promote + D-2826..D-2859 + D-2854 wall-clock root fix + governance sync + decisions_summary re-derived 989; census --check GREEN).
 - A/B ANSWER: NEW A/B MANDATORY (old D-2767 flag-ON kappa 0.4313 FAIL, D-2852; invalidated by v7 +3 disciplines + domain rename + 'emerging' abstention + D-2857 split NOT implemented).
 - OWNER REFERENCE: REUSE governance/discipline_anchor_rederived_v6_20261006d.json (latest of 4) + deterministic 28-row domain remap; do NOT rebuild (D-2839 owner judgments + sampling variance).

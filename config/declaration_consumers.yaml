@@ -78,3 +78,10 @@ declarations:
     ROUTING rule (every production call site calls the dispatcher) and the INVENTORY rule
     (every leg call is declared, every declaration is live). Joining them here means a staged
     matrix with a withheld reader is refused at the commit boundary (the BUG-562 shape).
+- declaration: config/task_register.yaml
+  consumers: [scripts/gov_sync.py]
+  decisions: [D-2981]
+  why: >-
+    the machine-readable TASK register is read by scripts/gov_sync.py, which renders the MUST/SHOULD/WORTH view
+    into the user-facing faces and fails closed when a face stops equalling its re-derivation. Joining them here
+    means a staged register with a withheld reader is refused at the commit boundary (the BUG-562 shape).

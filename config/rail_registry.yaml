@@ -53,6 +53,15 @@ writers:
   scripts/build_archive_index.py:
     writes: ['archive/index.yaml']
     why: 'regenerates the archive census; its remedy was the subject of BUG-537 (a silent de-listing) and BUG-556 (a volatile input)'
+  scripts/gov_sync.py:
+    writes: ['MASTER-TASK-REGISTER.md', 'DECISION-LOG.md', 'governance/buglog.md', 'agent/session_seed.yaml']
+    why: >-
+      D-2981: the ONE writer for the USER-FACING faces. It renders the GOV-INDEX block in each face from
+      governance/task_register.yaml + config/decisions_summary.json + governance/bug_status.json, re-cuts every
+      census restatement line (BUG-588/D-2692 - this retires BUG-756, whose remedy had no tracked home), and
+      derives session_seed's pipeline_commit/status. Declared here because its remedy is a claim about bytes it
+      replaces: the ladder runs its --selftest (8 known answers, including a STALE block that must be SEEN to
+      differ) BEFORE its check, and the check BYTE-COMPARES the block against its re-derivation.
   scripts/check_tests.py:
     writes: ['temp/tests_rail_last_run.json']
     why: 'records the suite census a later run is compared against'

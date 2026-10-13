@@ -39,6 +39,8 @@ health:
     python3 pipeline/integrity_check.py --selftest || exit 1   # BUG-739: C11's OWN classifier, BOTH directions - an undeclared third-party import MUST still be flagged (a rail that accepts everything is not a rail) and the stdlib names it once misread MUST NOT be
     python3 scripts/check_bug_status.py || exit 1
     python3 scripts/check_governance_faces.py --selftest || exit 1   # SEVENTH rail - governance FACES must not contradict the register (BUG-588/D-2692); controls must fire (a control nothing runs is a comment, BUG-492)
+    python3 scripts/gov_sync.py --selftest || exit 1   # D-2981/BUG-492: the FACE writer own known-answer controls (a STALE block MUST be seen to differ from its re-derivation)
+    python3 scripts/gov_sync.py || exit 1   # D-2981: every user-facing face must EQUAL its re-derivation from the registers (derived index block + census restatement lines + session_seed derived fields)
     python3 scripts/check_governance_faces.py || exit 1   # D-NEW: bug-status table rows + header census in DECISION-LOG/MTR must agree with bug_status.json / decisions_summary.json
     python3 scripts/check_register_divergence.py --selftest || exit 1   # BUG-571/D-2683: BOTH divergence shapes must be SEEN to fire on synthetic logs (a control nothing runs is a comment, BUG-492)
     python3 scripts/check_register_divergence.py || exit 1

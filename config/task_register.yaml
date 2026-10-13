@@ -1,0 +1,167 @@
+# config/task_register.yaml — THE MACHINE-READABLE TASK REGISTER (D-2981).
+#
+# WHY THIS FILE EXISTS. Before it, "how many tasks are open?" had no answer: the tasks lived as
+# PROSE inside MASTER-TASK-REGISTER.md (2,202 lines of open items, session notes and dated
+# history mixed together), so the face could not be counted, ordered, or joined to anything.
+# The face is now DERIVED from this file by scripts/gov_sync.py (one writer), and
+# scripts/check_gov_sync.py fails closed when the face and this register disagree.
+#
+# CONVENTIONS (enforced by the rail, not by convention):
+#   * id          : T-<n> for real work; R-<n> for a RULE that must keep holding (a standing rule).
+#   * priority    : MUST | SHOULD | WORTH   (the MTR tier order; MUST is strategic-consequential)
+#   * state       : open | blocked | gate (an OWNER word is required) | done | superseded
+#   * source      : the register that EVIDENCES the task (a bug, a decision, a measurement file)
+#   * evidence    : a path or a measured figure — never an adjective
+#   * gate        : what would have to be true for it to leave 'gate' (owner word, or a rail)
+# APPEND-ONLY DISCIPLINE: a task is CLOSED by setting state: done + closed: <date>; it is never
+# deleted (a register that forgets cannot be diffed). New entries are APPENDED at the end.
+schema_version: '1'
+authority: D-2981
+updated: '2026-10-13'
+tasks:
+- id: T-101
+  priority: MUST
+  state: open
+  title: HARDEN THE RETRIEVAL GOLDEN SET (the gate is saturated)
+  why: >-
+    The D2511 benchmark now measures the SERVED path (D-2980) and reports recall@10 = 1.000 on 29
+    goldens: a saturated metric cannot gate an improvement, so the next retrieval change (and the
+    S1/S2/S3 adoption questions) has no instrument. Add harder/abstract and adversarial goldens
+    (owner-signed anchors, D-2898/D-2939) and move MRR (0.919 today).
+  source: [D-2980, BUG-710]
+  evidence: 'python3 pipeline/retrieval_benchmark.py -> production 1.000/0.919/0.100 (2026-10-13)'
+  gate: 'owner-signed anchors for the new queries'
+- id: T-102
+  priority: MUST
+  state: open
+  title: 'BUG-754 — the declared-defaults ceiling is breached and the ladder is RED on that line'
+  why: >-
+    check_config_defaults --check rc=1 (241 shadowed-declared vs a shrink-only ceiling of 229);
+    A/B-proven pre-existing and attributed to 7 config leaf names + code-side sites. Two legal
+    routes: remove the code defaults (the rail s own remedy) or rule a ceiling raise that records
+    the increase as a RECLASSIFICATION.
+  source: [BUG-754, D-2644]
+  evidence: 'python3 scripts/check_config_defaults.py --check -> rc=1 (2026-10-13)'
+  gate: none
+- id: T-103
+  priority: MUST
+  state: 'gate'
+  title: 'BUG-749 residual — 457 rows of label re-derivation debt, of which 163 are OWNER-RULED and store-write-owed'
+  why: >-
+    103 LATE-HOME (CORRECT ruled) and 60 computer-science rows (ABSTAIN ruled) are recorded as OWED
+    to a licensed store write (D-2898); 173 alias-layer-retired rows await evidence or owner eyes;
+    the D-2974 re-scope audit keeps feeding queue A. This is the largest remaining ontology-accuracy
+    item on the SERVED labels.
+  source: [BUG-749, D-2977, D-2898]
+  evidence: 'claim gap 6.9% (457 of 6,587) measured 2026-10-13'
+  gate: 'the owner word that licenses the store write'
+- id: T-104
+  priority: MUST
+  state: open
+  title: 'BUG-757 — 108 of 185 open bugs carry NO severity token, so the register cannot be ordered by criticality'
+  why: >-
+    Measured from governance/bug_status.json: open = 185 (CRITICAL 4, HIGH 20, MED 33, LOW 20,
+    UNLABELLED 108). A register that cannot be ordered cannot answer "which is the highest
+    leverage". Backfill is an owner-gated judgement (severity is a claim, not a derivation), so the
+    remedy is: (a) the rail now REQUIRES a severity on every NEW heading, and (b) the 108 are
+    declared as a SHRINK-ONLY ceiling until triaged.
+  source: [BUG-757]
+  evidence: 'governance/bug_status.json -> open_n 185 / UNLABELLED 108 (2026-10-13)'
+  gate: none
+- id: T-105
+  priority: SHOULD
+  state: open
+  title: 'REA tier A/B mining — DEVONthink 3 (related-document ranking) and Cursor (derived code index)'
+  why: >-
+    The closed-source tier the owner approved for REA study: DEVONthink 3 for the related-document
+    ranking that would replace the retired borp_score, Cursor for the derived codebase index shape.
+    Open-source targets are read DIRECTLY (never via REA): LlamaIndex content+config cache
+    invalidation, Instructor typed response contracts, Docling layout/table recovery,
+    RAGChecker / Ragas / BGE-M3 retrieval-quality baselines.
+  source: [D-2980, governance/NOT-YET-EVALUATED-RESEARCH.md]
+  evidence: 'governance/NOT-YET-EVALUATED-RESEARCH.md (REA targets logged 2026-10-13)'
+  gate: none
+- id: T-106
+  priority: SHOULD
+  state: open
+  title: 'ROADMAP — MODULARITY (C21 swappable infrastructure) and CROSS-OS COMPATIBILITY (C26)'
+  why: >-
+    Both were agreed as standing ambitions and neither has an audit. Modularity: every component
+    behind a protocol (pipeline/storage/base.py is the ONE example; retrieval, embeddings, NLI and
+    the commit writer still bind concrete modules), so a model/DB swap stays a config change.
+    Cross-OS: psutil + pathlib everywhere, no shell-outs to POSIX-only tools in the pipeline, and a
+    documented Windows/Linux degradation path (C24 hardware-adaptive already assumes psutil).
+    The audit owes: a protocol inventory, a POSIX-only call-site census, and a declared
+    cross-platform smoke (the suite currently runs on macOS only).
+  source: [C21, C24, C26, D-2981]
+  evidence: 'protocols: pipeline/storage/base.py only; no cross-OS smoke exists (2026-10-13)'
+  gate: none
+- id: T-107
+  priority: SHOULD
+  state: open
+  title: 'MCP payload decision — borp_score / feedback_score are still advertised to agents'
+  why: >-
+    borp_score is retired debt (constant 0.0) and the MCP query_knowledge payload still EXPOSES it,
+    so an agent is handed a dead signal next to real ones. Changing an MCP output schema is a
+    contract change: it needs one owner word plus a spec bump, not an edit.
+  source: [D-2980, specs/retrieval_serving.spec.md]
+  evidence: 'maxwell_mcp_server.py output block (2026-10-13)'
+  gate: 'owner word on the payload schema'
+- id: T-108
+  priority: SHOULD
+  state: open
+  title: 'BUG-712 / BUG-714 — the content_type residual and the harness-facing primitive'
+  why: >-
+    BUG-714: all 14 tool_instruction rows in the served run are CODE SNIPPETS, and
+    tool_instruction is the only primitive that can feed an agent harness - so the harness-facing
+    primitive is mis-scoped. BUG-712: the routing residuals are named (3 explained rows).
+  source: [BUG-712, BUG-714]
+  evidence: 'served run content_type census (2026-10-13)'
+  gate: none
+- id: T-109
+  priority: WORTH
+  state: open
+  title: 'spec/test sandbox — adopt the two mechanisms borrowed from impeccable / shadcn-ui-lint'
+  why: >-
+    Neither tool is adaptable (both are frontend/design-system linters and Maxwell OS has no UI
+    surface), but two of their mechanisms match the spec-first sandbox and are worth naming: a
+    bounded set of DETERMINISTIC detectors with zero LLM per governed surface, and diagnostics that
+    NAME THE REMEDY derived from the declaration. Recorded in specs/README.md as prior art.
+  source: [D-2978, D-2981]
+  evidence: 'specs/README.md (sandbox charter, prior art)'
+  gate: none
+- id: T-110
+  priority: WORTH
+  state: open
+  title: 'BUG-756 — the census restatement is hand-written'
+  why: >-
+    No tracked writer existed for the "Register truth" lines, so the two faces could only be re-cut
+    by hand. scripts/gov_sync.py now DERIVES them; BUG-756 closes when the writer has run once and
+    the rail holds.
+  source: [BUG-756, D-2981]
+  evidence: 'scripts/gov_sync.py --check rc=0 after --apply (2026-10-13)'
+  gate: none
+- id: T-111
+  priority: WORTH
+  state: open
+  title: 'BUDGET — the reviewer can only review WHOLE files under 100,000 chars; stage4_merge.py and stage2_extract.py exceed it'
+  why: >-
+    D-2969 declared the review unit for oversized modules to be the CHANGE. Two pipeline modules
+    currently exceed the cap, so their next substantive edit must be reviewed as a diff or the cap
+    must be re-measured (never raised without a measurement).
+  source: [BUG-738, D-2969]
+  evidence: 'r5_review_gate.yaml max_source_chars vs the two module sizes (2026-10-12)'
+  gate: none
+- id: R-1
+  priority: MUST
+  state: open
+  title: 'STANDING — the user-facing faces are DERIVED, never hand-appended at the top'
+  why: >-
+    MTR / DECISION-LOG / the buglog carry a machine-owned index block delimited by the GOV-INDEX
+    sentinels, rendered by scripts/gov_sync.py from the registers. Everything below the
+    GOV-HISTORY-START marker is DATED HISTORY: append-only, never a register, never re-counted.
+    A new OPEN task enters config/task_register.yaml; a new bug enters the buglog with a
+    (SEVERITY - STATE date) heading; a new decision enters by the mint. Nothing else edits the top.
+  source: [D-2981, BUG-588, D-2692]
+  evidence: 'scripts/gov_sync.py --check (byte-compares the block)'
+  gate: none

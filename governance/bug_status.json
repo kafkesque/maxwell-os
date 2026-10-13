@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 519,
+  "total_ids": 520,
   "open_n": 185,
-  "closed_n": 334,
+  "closed_n": 335,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -929,8 +929,8 @@
       "events": 1
     },
     {
-      "id": "BUG-755",
-      "title": "(MED - OPEN, found 2026-10-13 while verifying D-2980) - the suite rail is RED at HEAD: 4 failures that no declared red set covers",
+      "id": "BUG-756",
+      "title": "(LOW - OPEN, found 2026-10-13 while repairing the census face) - the census RESTATEMENT has no writer in the tree, so its only remedy is the",
       "events": 1
     }
   ],
@@ -1268,6 +1268,7 @@
     "BUG-747",
     "BUG-751",
     "BUG-752",
-    "BUG-753"
+    "BUG-753",
+    "BUG-755"
   ]
 }

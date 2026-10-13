@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**185 open** / 334 closed of 519 ids.
+**185 open** / 335 closed of 520 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -191,4 +191,4 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-749 | (HIGH - OPEN 2026-10-13) - 1,072 in-subject rows (16.3%) carry a discipline the live production mapper does NOT reproduce from their own raw | 4 |
 | BUG-750 | (LOW - OPEN 2026-10-13) - a GENERATED artifact can go stale behind its own generator and no rail sees it: the canonical-labels reference sti | 1 |
 | BUG-754 | (MED - OPEN, found 2026-10-13 while verifying D-2980) - the declared-defaults ceiling has been breached and check_config_defaults --check is | 1 |
-| BUG-755 | (MED - OPEN, found 2026-10-13 while verifying D-2980) - the suite rail is RED at HEAD: 4 failures that no declared red set covers | 1 |
+| BUG-756 | (LOW - OPEN, found 2026-10-13 while repairing the census face) - the census RESTATEMENT has no writer in the tree, so its only remedy is the | 1 |

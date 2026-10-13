@@ -12435,7 +12435,7 @@ is what the rail asks for; or (b) a decision that raises the ceiling WITH the na
 increase is a RECLASSIFICATION of the same debt rather than new debt. While it is open, every other green line must
 be read as "green after this one", because the ladder reports a PREFIX (D-2680/BUG-573).
 
-## BUG-755 (MED - OPEN, found 2026-10-13 while verifying D-2980) - the suite rail is RED at HEAD: 4 failures that no declared red set covers
+## BUG-755 (MED - CLOSED 2026-10-13; found while verifying D-2980) - the suite rail is RED at HEAD: 4 failures that no declared red set covers
 
 MEASURED: python3 scripts/check_tests.py --check -> rc=1: "457 collected, 448 passed, 4 failed, 0 error; declared
 red = 0" - and the rail's own rule makes an undeclared failure FATAL ("a NEW failure can never be absorbed by
@@ -12451,3 +12451,68 @@ minted decision records ABOVE the receipted region of config/decisions.yaml (see
 census therefore no longer describes the registry bytes, and the attribution join finds no governed write whose
 post-image is those bytes. Verifying D-2980 REQUIRES repairing the cause (the D-2971 act + the census re-cut); the
 4 tests are then expected to go GREEN, measured rather than asserted - the post-repair state is appended below.
+
+
+## BUG-755 - UPDATE 2026-10-13: CLOSED, and the fix was the CAUSE, not the symptom
+
+The 4 failures had ONE cause, and it was this session's own inheritance: commit 3998844 inserted D-2978/D-2979
+ABOVE the receipted region of config/decisions.yaml WITHOUT re-deriving the census. Two symptoms followed from that
+one cause - the census no longer described the registry bytes (3 tests) and the attribution join found no governed
+write whose post-image was those bytes (1 test).
+
+REPAIRED, in the order the guarantees demand: (1) the census was re-derived from the registry
+(scripts/recompute_decision_summary.py: 1105 declared -> 1107 actual, then 1108 after the D-2980 mint) and (2) the
+registry was written through the GOVERNED path (the mint appends via write_guard, so a MUTATION_JOURNAL receipt now
+has the live bytes as its post-image, which is exactly the join the fourth test asks for).
+
+MEASURED AFTER (not asserted): python3 -m pytest tests/test_decision_summary_sync.py tests/test_handoff_obligation.py
+-> 11 passed in 14.17s (was 4 failed / 7 passed). AND THE RAIL: python3 scripts/check_tests.py --check -> rc=0,
+"457 collected (floor 261), 452 passed, 0 declared red, 0 new, 5 skipped" (was 448 passed / 4 failed / rc=1).
+No ceiling was widened and no test was edited: the declared red set is still EMPTY, so the next failure is still
+FATAL. A pre-existing RED was cleared by repairing its cause.
+
+## BUG-376 - UPDATE 2026-10-13: the rewrite is NAMED and RE-BASELINED through the D-2971 act (this session's own defect, measured and repaired in one sitting)
+
+MEASURED FIRST (byte-exact bisect, one commit): at 3998844 the first 1,215,693 bytes of config/decisions.yaml hash
+to babaf679ff80738a while the receipt said 2d0fce3a60533c7f; the PREVIOUS commit 88bd9eb re-derives 2d0fce3a
+EXACTLY. So the rewrite happened at 3998844 and nowhere else, and the rail said so before anyone looked.
+
+ROOT CAUSE, named: the previous session MINTED two records (D-2978, D-2979) and inserted them at the HEAD of the
+decisions list (line 4) instead of APPENDING them - D-2655 HALF B: the registry is RECORDS ONLY and the only write
+that preserves a prefix receipt is an APPEND. The mint's own prefix assertion lives in the mint; the records were
+placed by hand, which is exactly the door that assertion exists to keep shut.
+
+REPAIRED with the act, not with prose: python3 scripts/lib/handoff.py --rebaseline decisions_registry
+--because D-2980 --commit 3998844 --commit bd2f71c --apply. The superseding receipt CARRIES the rewrite
+(origin=rebaseline, supersedes=2d0fce3a60533c7f, supersedes_bytes=1215693, because=D-2980,
+commits=[3998844, bd2f71c]) and the superseded claim stays RE-DERIVABLE from the store
+(git:659cecdcc573053104e449aac529e8b280d66662 holds exactly those bytes). MEASURED AFTER:
+python3 scripts/verify_handoffs.py --check -> rc=0, "6 declared path(s), 13 digest(s) and 3 revision(s) all agree
+with their bytes", and the receipted-path domain improved 5/6 -> 6/6.
+
+RECORDED, NOT HIDDEN: D-2978 and D-2979 still SIT at the head of the registry, out of recording order. They are
+valid records and no rail asserts registry order, so they were NOT re-written a second time - a cosmetic in-place
+edit to fix a cosmetic in-place edit is a second rewrite, and the receipt would have to name it. The anomaly is
+here, in the register, which is where an anomaly belongs.
+
+## BUG-756 (LOW - OPEN, found 2026-10-13 while repairing the census face) - the census RESTATEMENT has no writer in the tree, so its only remedy is the hand substitution BUG-588 exists to prevent
+
+MEASURED: the rail scripts/check_governance_faces.py PARSES the restatement ("<n> decisions (census stamp <stamp>,
+<date>)") and the phrase occurs in exactly ONE .py in the tree - temp/sync2690.py, an unrelated D-2690 appender
+that is a SESSION SCRATCH file, not the sync. BUG-752's entry states "the sync now normalises YYYYMMDD ->
+YYYY-MM-DD on the write side and fails closed on anything else"; no such writer exists in tracked code, so that
+sentence currently describes bytes nobody can run (the BUG-542 class, in the RAIL layer rather than in a citation).
+
+CONSEQUENCE, measured: the two face lines (DECISION-LOG.md:14 and MASTER-TASK-REGISTER.md:13) restated
+"1105 decisions / 516 bugs" while the register said 1108 / 519, and check_governance_faces had been rc=1 since the
+D-2978/D-2979 mint - because no step re-cuts a line that has no writer. The numbers moved for a reason no reader
+could see: the FACE was stale, not the register.
+
+WHAT THIS SESSION DID INSTEAD (declared, because it is the inferior route): substituted the DERIVED values into both
+lines - the numbers are COMPUTED from config/decisions_summary.json and governance/bug_status.json by a script and
+the line SHAPE is asserted by the same regex the rail uses, so nothing was typed from memory (the D-2976 erratum
+rule). It is still a hand write of a derived line, which is why it is filed.
+
+REMEDY OWED: land the sync as a TRACKED writer that (a) derives the numbers from the two registers, (b) asserts the
+line shape before it rewrites, (c) normalises the date form, and (d) is invoked by the ladder NEXT TO its reader -
+a rail whose remedy lives in temp/ is not a rail.

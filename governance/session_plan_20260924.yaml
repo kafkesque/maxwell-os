@@ -157,6 +157,11 @@ may_touch:
 # may_touch home, so the anti-circle rail refused the commit that carries it. NAMED, never a glob
 # (BUG-548/BUG-563): it is one journal, not a standing class.
 - governance/menu_rescope_cohort_audit.jsonl
+# D-2976 (2026-10-13): the OWNER review packet for the label cohorts (BUG-749/BUG-748). One builder,
+# three owner-facing artifacts. NAMED, never a glob (BUG-548/BUG-563: the record is not the rule).
+- governance/CANONICAL_RELABEL_REVIEW_20261013.md
+- governance/canonical_relabel_review_20261013.csv
+- governance/canonical_relabel_review_segments_20261013.csv
 will_not_touch:
 - governance/F11_*
 - governance/ANCHOR_RULER_CONSOLIDATED_*.csv
@@ -850,3 +855,17 @@ widening_log:
   may_touch_untouched: false
   will_not_touch_untouched: true
   why: 'The widened set is EXACTLY the one path the commit-boundary rail refused (measured: "touched 1 path(s) outside the plan: governance/menu_rescope_cohort_audit.jsonl"). The audit SCRIPT was already covered by the existing scripts/*.py entry, and nothing else was widened.'
+- date: '2026-10-13'
+  actor: assistant
+  owner_ack: 'owner instruction 2026-10-13 ("what do I exactly have to relabel where ... update a canonical reference.md and give a csv file with the segments")'
+  addendum: 'D-2976 - the OWNER review packet for the BUG-749 / BUG-748 label cohorts. One builder renders three artifacts: the reference sheet (the law, the closed action vocabulary, the closed menu) and two review CSVs (one row per DECISION, plus the row-level segments). Date-stamped so a returned, filled-in copy is preserved when the packet is regenerated. Three NAMED artifacts, never a glob (BUG-548/BUG-563).'
+  additions:
+  - pattern: governance/CANONICAL_RELABEL_REVIEW_20261013.md
+    why: 'D-2976 - the review reference sheet: the four-action vocabulary with its exact mechanical effect, the two queues and their authorities, and the closed discipline menu rendered from config/taxonomy.yaml (never typed, C12).'
+  - pattern: governance/canonical_relabel_review_20261013.csv
+    why: 'D-2976 - the owner''s decision surface: one row per REVIEW UNIT (the mapping decision, not the row), biggest leverage first, with blank owner_action/owner_canonical/owner_comment columns. This is the file the owner fills in.'
+  - pattern: governance/canonical_relabel_review_segments_20261013.csv
+    why: 'D-2976 - the row-level segments (fb_id, name, content_type and the five S4 core fields) keyed by review_id, so the evidence for one decision is one filter away.'
+  may_touch_untouched: false
+  will_not_touch_untouched: true
+  why: 'The builder itself needs no widening (scripts/*.py). The three artifacts are the owner-facing surface of the review and are date-stamped evidence; governance/canonical_labels_reference.md was already granted and was REGENERATED, not edited (its committed copy still declared config/taxonomy_v5.yaml as its source of truth - a stale declaration of the BUG-542 class, whose own header says "DO NOT hand-edit; regenerate").'

@@ -3,8 +3,8 @@
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
   "total_ids": 523,
-  "open_n": 185,
-  "closed_n": 338,
+  "open_n": 184,
+  "closed_n": 339,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -927,11 +927,6 @@
       "id": "BUG-757",
       "title": "(MED - OPEN, found 2026-10-13 while auditing the user-facing faces) - 125 open bugs carry NO severity token, so the open register cannot be ",
       "events": 1
-    },
-    {
-      "id": "BUG-759",
-      "title": "(HIGH - OPEN, found 2026-10-13 by running the FULL ladder for the first time in this session) - seven ladder lines were RED at HEAD and nobo",
-      "events": 1
     }
   ],
   "closed": [
@@ -1272,6 +1267,7 @@
     "BUG-754",
     "BUG-755",
     "BUG-756",
-    "BUG-758"
+    "BUG-758",
+    "BUG-759"
   ]
 }

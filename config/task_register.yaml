@@ -239,5 +239,9 @@ tasks:
     SHRINK-ONLY ceiling must be LOWERED rather than raised (D-2644) and the census moves must be explained, not
     absorbed.
   source: [BUG-759, D-2644, D-2649, BUG-533, BUG-537]
-  evidence: 'just health-full 2026-10-13: 7 faults / 128 lines; each rc=1 at 42f8b76^ (worktree)'
+  evidence: >-
+    just health-full 2026-10-13: 7 faults / 128 lines; each rc=1 at 42f8b76^ (worktree). RE-MEASURED at 673a457
+    (D-2983): 5 fault(s) under coverage 10f4df05acc8ecec in 754.0s, RECORDED to temp/ladder_receipt.json, so the
+    prefix can no longer hide them and the recorded red is what `just health` now reports. Each repair wave must
+    be followed by a re-measure: a stale or coverage-mismatched record is UNKNOWN (rc=2, loud), never silent.
   gate: none

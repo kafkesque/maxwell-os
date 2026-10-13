@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**185 open** / 338 closed of 523 ids.
+**184 open** / 339 closed of 523 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -191,4 +191,3 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-749 | (HIGH - OPEN 2026-10-13) - 1,072 in-subject rows (16.3%) carry a discipline the live production mapper does NOT reproduce from their own raw | 4 |
 | BUG-750 | (LOW - OPEN 2026-10-13) - a GENERATED artifact can go stale behind its own generator and no rail sees it: the canonical-labels reference sti | 1 |
 | BUG-757 | (MED - OPEN, found 2026-10-13 while auditing the user-facing faces) - 125 open bugs carry NO severity token, so the open register cannot be  | 1 |
-| BUG-759 | (HIGH - OPEN, found 2026-10-13 by running the FULL ladder for the first time in this session) - seven ladder lines were RED at HEAD and nobo | 1 |

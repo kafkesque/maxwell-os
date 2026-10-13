@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1110 decisions (census stamp bba2a4c7aac792a8, 2026-10-13) · 523 bugs (185 open / 338 closed; highest OPEN = BUG-759) · 14 open tasks (MUST 4 / SHOULD 7 / WORTH 3; gate 1).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1111 decisions (census stamp 5b6ff21b86ee09a7, 2026-10-13) · 523 bugs (184 open / 339 closed; highest OPEN = BUG-757) · 14 open tasks (MUST 4 / SHOULD 7 / WORTH 3; gate 1).
 >
-> Decisions NEEDING ACTION: **67** of 1110 — open 32 · proposed 14 · draft 1 · deferred 14 · planned 6 | in effect (active) 565 | closed: resolved 310, superseded 16, archived 8, rejected 11
+> Decisions NEEDING ACTION: **67** of 1111 — open 32 · proposed 14 · draft 1 · deferred 14 · planned 6 | in effect (active) 565 | closed: resolved 311, superseded 16, archived 8, rejected 11
 >
-> Open BUGS by severity (heading population, first heading per id): CRITICAL 7 · HIGH 36 · MED 56 · LOW 30 · UNLABELLED 125 (BUG-757) of 185 open.
+> Open BUGS by severity (heading population, first heading per id): CRITICAL 7 · HIGH 36 · MED 56 · LOW 30 · UNLABELLED 125 (BUG-757) of 184 open.
 >
 > **MUST tasks (strategic-consequential order — source: config/task_register.yaml):**
 >
@@ -28,7 +28,7 @@
 > | T-108 | SHOULD | open | BUG-712 / BUG-714 — the content_type residual and the harness-facing primitive | served run content_type census (2026-10-13) |
 > | T-112 | SHOULD | open | PERF - the SERVED path loads the cross-encoder per PROCESS, so short-lived callers pay a cold-start of minutes | suite rail runtime 100-200s -> >210s after the dispatcher became the CLI default (2026-10- |
 > | T-113 | SHOULD | open | PAY THE BASELINE the honest instrument REVEALED - the 71 keys behind block aliases, module by module, each wit | config/config_defaults_census.json after D-2982: 300 shadowed-declared keys / 568 sites (2 |
-> | T-114 | SHOULD | open | DISCHARGE THE INHERITED LADDER FAULTS - four lines were RED before D-2982 and the prefix report hid them | just health-full 2026-10-13: 7 faults / 128 lines; each rc=1 at 42f8b76^ (worktree) |
+> | T-114 | SHOULD | open | DISCHARGE THE INHERITED LADDER FAULTS - four lines were RED before D-2982 and the prefix report hid them | just health-full 2026-10-13: 7 faults / 128 lines; each rc=1 at 42f8b76^ (worktree). RE-ME |
 > | T-109 | WORTH | open | spec/test sandbox — adopt the two mechanisms borrowed from impeccable / shadcn-ui-lint | specs/README.md (sandbox charter, prior art) |
 >
 > **Open decisions needing action (newest first; the states are DECLARED in config/gov_sync.yaml):**
@@ -4559,7 +4559,7 @@ FIX (all measured, `just health` green).
    `config/decisions.yaml` is declared in `config/artifact_ownership.yaml` (append_only, writer
    recompute_decision_summary.py).
 
-STATE AFTER. 766 -> 1110 decisions (D-400..D-406 registered; D-400..D-405 are the six gates the new guards
+STATE AFTER. 766 -> 1111 decisions (D-400..D-406 registered; D-400..D-405 are the six gates the new guards
 already cited, so their provenance stamps are no longer claims about nothing), stamp `aa69ae412a641374`,
 `recompute --check` clean, `tests/test_decision_summary_sync.py` 3 passed. Still OWNER-OWED and visible: 3
 citation values are not id-shaped and no rail can validate them - `config/eval_integrity.yaml:decision=<blank>`
@@ -9243,7 +9243,7 @@ DECISION-LOG "Register truth" line both sit INSIDE a `## 🔴` section, BELOW th
 (which stops at the first TIER_RE match) never scans them. This session the MTR live face drifted (167→160 open /
 265→272 closed, highest OPEN BUG-667→BUG-658, audit RED→GREEN) and was caught by MANUAL inspection, not by the rail.
 
-Gap 2 — format. Even if scanned, the live-face census is `523 bugs (185 open / 338 closed; ...)` — a 2-part parenthetical
+Gap 2 — format. Even if scanned, the live-face census is `523 bugs (184 open / 339 closed; ...)` — a 2-part parenthetical
 — and CENSUS_RE requires 3 parts (`N OPEN / N CLOSED / N TOTAL`), so it would not match. DECISION-LOG.md's "Register truth"
 line restates the same 2-part form and is stale for the same reason (it said 167/265 while the register said 160/272).
 
@@ -12371,7 +12371,7 @@ The face sync (BUG-588/D-2692) asserts the shape of the census restatement befor
 `\b\d+ decisions \(census stamp [0-9a-f]+, \d{4}-\d{2}-\d{2}\)` - and then substitutes `<n> decisions (census stamp
 <stamp>, <DATE>)` with the DATE argument VERBATIM. A caller passing the compact form (`20261013`, which is this
 session's own artifact-date convention) satisfied the ASSERTION but wrote a line the NEXT run could not match:
-DECISION-LOG.md read `1110 decisions (census stamp b62a605315150977, 20261013)` while the pattern demanded a DASHED
+DECISION-LOG.md read `1111 decisions (census stamp b62a605315150977, 20261013)` while the pattern demanded a DASHED
 ISO date. Nothing else noticed for a day, because the only consumer is the sync that had just written it.
 
 MEASURED AND HEALED: the sync now normalises `YYYYMMDD -> YYYY-MM-DD` on the write side and fails closed on anything
@@ -12552,7 +12552,7 @@ YYYY-MM-DD on the write side and fails closed on anything else"; no such writer 
 sentence currently describes bytes nobody can run (the BUG-542 class, in the RAIL layer rather than in a citation).
 
 CONSEQUENCE, measured: the two face lines (DECISION-LOG.md:14 and MASTER-TASK-REGISTER.md:13) restated
-"1110 decisions / 516 bugs" while the register said 1108 / 519, and check_governance_faces had been rc=1 since the
+"1111 decisions / 516 bugs" while the register said 1108 / 519, and check_governance_faces had been rc=1 since the
 D-2978/D-2979 mint - because no step re-cuts a line that has no writer. The numbers moved for a reason no reader
 could see: the FACE was stale, not the register.
 
@@ -12590,7 +12590,7 @@ THE DEFECT was a derived line whose only writer lived outside the tree, so its r
 faces AND re-cuts every census restatement line, and the health recipe runs BOTH its --selftest (8 known answers,
 including a STALE block that must be SEEN to differ from its re-derivation) and its check.
 MEASURED AFTER: scripts/gov_sync.py --check -> rc=0, 4 face(s) equal their re-derivation from the registers
-(1110 decisions / 520 bugs / 12 open tasks). The two face lines are now re-cut by the SAME run that writes the
+(1111 decisions / 520 bugs / 12 open tasks). The two face lines are now re-cut by the SAME run that writes the
 block, so they can no longer diverge from the census, and the previously hand-written numbers were replaced by
 the run rather than typed.
 
@@ -12676,3 +12676,43 @@ THE SEVEN, AND WHAT D-2982 DID TO EACH:
 WHY THIS IS HIGH AND NOT HOUSEKEEPING: a red ladder is the only thing standing between "measured" and "asserted",
 and seven red lines meant every line BELOW them was unobserved by the prefix report. The remaining four are
 registered as T-114 with their measured evidence: two are owner-owed re-records, two are index/re-derive acts.
+
+## BUG-759 - UPDATE 2026-10-13 (D-2983): CLOSED - the BLINDNESS is fixed; the four inherited reds are T-114, and they can no longer hide
+MEASURED, not asserted: `just health-full` ran 128 declaring lines in 754.0s at 673a457 and reported FIVE
+faults, every one of them rc=1 at the parent commit too. The blindness was a MECHANISM, and the mechanism is what
+this closure retires: `just health` reports a PREFIX (BUG-573) and the D-2860 commit-frontier rail refuses to run
+at all while governance state is uncommitted - so a session that MINTS cannot see the rest of the ladder until it
+commits, and a session that never runs the whole set never sees it either. The whole-set answer therefore existed
+ONLY in the scrollback of whoever last ran it: a measurement with no record, indistinguishable from a green one.
+D-2983 turns it into a RECORD that outlives the run. `--collect` writes temp/ladder_receipt.json (declared in
+config/rail_registry.yaml#ladder_receipt; gitignored runtime state, the same disposition as
+scripts/check_tests.py's temp/tests_rail_last_run.json) carrying the coverage FINGERPRINT of the line set it
+measured, the line count, the worst rc, every fault with its own rc and cost, the elapsed time, the moment and
+HEAD. Two readers of that record cannot be quiet about it: the banner prints the recorded verdict FIRST in
+`just health`, before any rail can abort the recipe (and never aborts on it itself), and the recipe's LAST line
+(`--receipt-check`, guard class PINNED tri_state in config/rail_registry.yaml#guards) exits 1 when a red is
+RECORDED under exactly the coverage in force, and 2 - owner-owed, loud, NOT fatal (BUG-457) - when the whole set is
+UNKNOWN: never measured here, measured against a DIFFERENT ladder (the coverage changed), or older than the
+declared 72h budget. A verdict is now comparable only to a measurement taken the same way (D-2982's coverage rule,
+one level up), and 'unknown' can never again be read as 'clean'. ORDER IS PART OF THE RULE: a whole-set report
+placed early would hide every line it speaks for, which is why the enforced half stands LAST - and why the
+collector drops its own invocation from the census, so the whole-set scan can never be blocked by its own record.
+THE FIRST RECORD OF RECORD (measured_at 2026-10-13T16:33:36Z, head 673a457, coverage 10f4df05acc8ecec, 128
+declaring line(s), worst rc=1): build_anchor_store_bridge --check (1.7s), check_silent_repair (1.4s),
+check_undeclared_encoding (1.4s), check_store_columns (16.9s), build_archive_index --check (0.1s). Two of the
+original seven were repaired at D-2982 (audit_flag_consumers rc=1->0; write_guard --audit rc=1->2, declared and
+tolerated) and one was improved BELOW its inherited baseline (silent_repair unknown 7->1) - so the ladder is red on
+five, and that is now a measurement anybody can read, not a prefix somebody has to re-discover.
+RESIDUAL, ROUTED AND NOT HIDDEN: FOUR of the five are INHERITED and are tracked as T-114 (undeclared_encoding over
+its shrink-only ceilings; check_store_columns CODE-CENSUS-MOVED on taxonomy_match_method.mentions 18->19 and
+taxonomy_version.mentions 24->25, owner-owed --record; build_anchor_store_bridge --check, the committed bridge no
+longer re-derives; build_archive_index --check, archive/superseded_runs in neither the index nor the declared
+exclusions, the BUG-537 shape). After each repair wave the ladder must be RE-MEASURED so the record matches the
+repaired ladder - which the record itself now demands, because a stale or coverage-mismatched record is UNKNOWN and
+therefore loud.
+SEEN: run_ladder --selftest 24/24 (ten new receipt controls, incl. 'a recorded ladder red is not silently green');
+the paired contract tests/test_ladder_receipt_spec.py 10/10 (D-2978); check_rail_registry rc=0 (129 invocations,
+longest writer register yet: 9 declared writers, every remedy proven); check_rail_mutations 32 declared rules SEEN
+to red including a_recorded_ladder_red_is_load_bearing, 1 negative control green; R5 APPROVE on
+scripts/run_ladder.py (deterministic layers PASS + ONE advisory reviewer); `git status` UNCHANGED by a full scan -
+the record cannot dirty the tree it measures.

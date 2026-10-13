@@ -1,0 +1,68 @@
+- id: D-2983
+  date: '2026-10-13'
+  state: RESOLVED
+  category: GOVERNANCE / INSTRUMENT
+  title: >-
+    The ladder's verdict is a MEASUREMENT, not a moment - the whole set is RECORDED with its coverage and its
+    age, and two readers of that record make a prefix report impossible to read as a verdict
+  bugs: [BUG-759]
+  decision: >-
+    THE DEFECT (BUG-759, measured not felt). MEASURED 2026-10-13: `just health-full` ran 128 declaring lines in
+    755.8s and reported SEVEN faults, and every one of them was rc=1 at the parent commit too - so the ladder had
+    stood RED for longer than it had been measured, and nobody knew. The cause is a MECHANISM, not negligence:
+    `just health` reports a PREFIX (BUG-573, it stops at the first non-zero line) and the D-2860 commit-frontier
+    rail refuses to run at all while governance state is uncommitted - so a session that MINTS a decision cannot
+    see the rest of the ladder until it commits, and a session that never runs the whole set never sees it either.
+    The whole-set answer existed ONLY in the scrollback of whoever last ran it: a measurement with no record, which
+    is indistinguishable from a green one, and that is the same class D-2982 paid for one level down (a count that
+    cannot state its coverage).
+
+    THE SHAPE. The whole set becomes a RECORD that outlives the run, and it is held to the rules the register
+    already ratified instead of to a new promise. (i) ONE HOME (D-2642): scripts/run_ladder.py, the collector that
+    already owns the rules 'which lines does a recipe own' (recipes_of) and 'the whole set is run for every fault'
+    (run_lines) - the fingerprint is taken over the SAME lines the scan runs, so there is no second census.
+    (ii) DECLARED, NEVER DEFAULTED (C12/D-2644): the record's path, recipe and age budget live in
+    config/rail_registry.yaml#ladder_receipt; receipt_declaration() refuses a missing key rather than inventing
+    one, and no path, recipe name, budget or marker is written in code. (iii) A COVERAGE AND AN AGE (D-2982 one
+    level up): the record carries the sha16 fingerprint of the recipe plus its ORDERED declaring lines, the line
+    count, the worst rc, every fault with its own rc and cost, the elapsed time, the moment and HEAD, written
+    crash-safely (tempfile -> fsync -> os.replace, C6) - and it is written for a RED ladder too, because a red is
+    a measurement. (iv) TRI-STATE READERS THAT CANNOT BE QUIET (BUG-457): --banner prints the recorded verdict
+    FIRST in `just health`, before any rail can abort the recipe, and never aborts on it itself; --receipt-check
+    stands LAST in the recipe and exits 1 when a red is RECORDED under exactly the coverage in force, 2
+    (owner-owed, loud, NOT fatal) when the whole set is UNKNOWN - never measured here, measured against a
+    DIFFERENT ladder (the coverage changed: a verdict is a claim about the ladder at the moment of measurement,
+    D-2660), or older than the declared 72h budget. ORDER IS LOAD-BEARING: a whole-set report placed early would
+    hide every line it speaks for, and the collector drops its own invocation from the census (the existing
+    self-invocation rule) so the whole-set scan can never be blocked by its own record. (v) THE RECORD IS HELD OUT
+    OF VERSION CONTROL: it is gitignored runtime state, the same disposition as scripts/check_tests.py's
+    temp/tests_rail_last_run.json, because committing a clone-local observation would dress it as durable
+    evidence - while its ABSENCE is itself a reported state (rc 2, loud), never a silent one, so the BUG-500
+    hazard of out-of-tree state does not attach. (vi) THE REMEDY IS DERIVED (D-405): the whole-set entry point a
+    message names is read from the ladder's own bytes (the recipe whose line invokes the collector with
+    --collect <recipe>), and a ladder that declares none is REPORTED as a fault instead of being given an invented
+    name - a prefix match (`--collect health-deep` read as an entry for `health`) is refused by construction.
+
+    THE MEASUREMENT OF RECORD (the first run of the new path, at 673a457): measured_at 2026-10-13T16:33:36Z,
+    coverage 10f4df05acc8ecec, 128 declaring line(s), worst rc=1, 754.0s, FIVE faults - build_anchor_store_bridge
+    --check (1.7s), check_silent_repair (1.4s), check_undeclared_encoding (1.4s), check_store_columns (16.9s),
+    build_archive_index --check (0.1s). Two of the original seven were repaired at D-2982 and one improved below
+    its inherited baseline, so the ladder is red on five; the difference now is that the number is a RECORD with a
+    coverage and an age, readable by any session, instead of a prefix somebody has to re-discover.
+
+    HONEST LIMITS, STATED. (1) The enforced half of the rule is reached only when every earlier line is green -
+    which is the intended case (a session that might believe the ladder is green) and why the banner carries the
+    record for the cases where the prefix stops early. (2) The record is LOCAL: it says what THIS clone measured,
+    and a fresh clone reports UNKNOWN rather than inheriting a claim. (3) The age budget (72h) is a DECLARED
+    judgement, not a measurement - it is owner-tunable in one place, and it exists so that 'we measured it once'
+    cannot become a permanent licence. (4) A full scan still costs ~12.5 minutes, so the tri-state keeps UNKNOWN
+    owner-owed and loud rather than fatal; the fix is not to run it more often but to never lose what it found.
+  files:
+  - scripts/run_ladder.py
+  - config/rail_registry.yaml
+  - config/rail_mutations.yaml
+  - justfile
+  - specs/ladder_receipt.spec.md
+  - tests/test_ladder_receipt_spec.py
+  - config/task_register.yaml
+  - governance/buglog.md

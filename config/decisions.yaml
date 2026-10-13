@@ -22729,3 +22729,137 @@ decisions:
     and then an owner-gated canonicalisation or a declared "historical, accepted with cause" ruling (the F-02 precedent).
     A corpus-wide relabel is NOT taken here: it is an owner act, and its criterion must first exist as a rail (a
     control nothing runs is a comment, BUG-492).'
+- id: D-2976
+  state: RESOLVED
+  category: GOVERNANCE / ONTOLOGY / OWNER REVIEW SURFACE
+  date: '2026-10-13'
+  title: 'The label decision gets an OWNER-FACING SURFACE: the review unit is the MAPPING DECISION, not the row
+    — 1,074 flagged rows collapse to 192 units, and 717 of them are the orphans of a compensating control D-2814
+    retired (BUG-749 / BUG-748 / BUG-750)'
+  bugs:
+  - BUG-749
+  - BUG-748
+  - BUG-750
+  files:
+  - scripts/build_relabel_review_packet.py
+  - governance/CANONICAL_RELABEL_REVIEW_20261013.md
+  - governance/canonical_relabel_review_20261013.csv
+  - governance/canonical_relabel_review_segments_20261013.csv
+  - governance/canonical_labels_reference.md
+  - governance/session_plan_20260924.yaml
+  - governance/buglog.md
+  decision: 'WHY IT EXISTS. Two cohorts of canonical rows carry a discipline the LIVE production mapper does not
+    reproduce from
+
+    the row''s OWN raw label (R14: a decision belongs in the declaration, not in the row) — the menu-re-scope cohort
+
+    (D-2928 moved two DEFINITIONS and not the answer space; D-2974 measures that delta differentially) and the
+
+    re-derivation gap (BUG-749: 1,072 of 6,587 in-subject rows, 16.3%). Both end in an owner act (D-2898: no
+
+    LLM-applied canonical change), and asking a human to eyeball 1,074 rows one by one is how a ruling becomes a
+    rubber
+
+    stamp.
+
+    THE GOVERNING IDEA. The REVIEW UNIT IS THE MAPPING DECISION, NOT THE ROW. The rows collapse into the distinct
+
+    (raw label -> canonical home) decisions, ordered by how many rows each one governs, so the largest unit is settled
+
+    first and ONE verdict applies mechanically to every row it covers. MEASURED 2026-10-13: 1,074 flagged rows (1,072
+
+    queue B + 2 attributable queue A) collapse to 192 units; the top 12 units carry 45.6% of the rows.
+
+    THE CAUSE IS MEASURED, NOT INFERRED. 717 rows are ALIAS-LAYER-RETIRED: config/alias_map.yaml STILL declares
+    the
+
+    raw -> the stored canonical (e.g. design studies -> design thinking, alias_map.yaml:362), and
+
+    pipeline/schemas.py:973 records that D-2814 RETIRED that layer on 2026-10-09 — while the canonical run
+
+    rechunk-v4-20260929 was admitted TEN DAYS EARLIER, when the layer was live. The mapper is right-by-design today
+    and
+
+    these rows are its ORPHANS, not its errors. 103 rows are LATE-HOME (stored `emerging`: no home existed at
+
+    admission, the raw has a DECLARED home now). 252 rows are PROVENANCE-UNRESOLVED — no artefact this repo retains
+
+    declares the raw under the stored canonical, and the packet says exactly that instead of inventing a cause (the
+
+    F-02 family). 0 rows are DECLARATION-REPOINTED; the rung is kept and proven by control, because the shape is
+
+    reachable by construction.
+
+    THE DECISION SHAPE IS THEREFORE NOT A CORPUS RELABEL, and that is the point. For an ALIAS-LAYER-RETIRED unit,
+
+    CONFIRM declares the raw as an alias in config/taxonomy.yaml (the ONE synonym home) — and MEASURED (9/9
+
+    known-answer controls, including a live mutation of the taxonomy compared through closed_menu.menu_hash) a
+
+    raw-alias declaration moves NEITHER the composite NOR the answer space, because closed_menu._taxonomy_entries
+
+    renders value+definition+group ONLY: raws are not menu fields. The label becomes REPRODUCIBLE (R14) with zero
+
+    provenance disturbance and NO relabel. An I2 rew-rite of the frozen stamp is never required, which is what made
+
+    this shippable at all.
+
+    THE FORM IS CLOSED AND SELF-EXPLAINING. owner_action takes exactly one of CONFIRM | CORRECT | ABSTAIN | LEAVE,
+    each
+
+    with its exact mechanical effect rendered into the reference sheet; an unrecognised word, or CORRECT with an
+    empty
+
+    or non-canonical owner_canonical, FAILS CLOSED at application time (C16). owner_canonical is the only field
+    that
+
+    can name a label and nothing is applied until the packet is returned.
+
+    THE ARTIFACTS (three, all date-stamped so a returned and filled copy survives regeneration): the reference sheet
+
+    (the law, the action vocabulary, and the closed discipline menu rendered from config — never typed, C12); the
+    unit
+
+    CSV (the decision surface, blank owner columns); and the segment CSV (fb_id, name, content_type and the five
+    S4
+
+    core fields, keyed by review_id, so one decision''s evidence is one filter away). The builder is READ-ONLY against
+
+    the store, uses the PRODUCTION mapper rather than a restatement of it, and writes its three artifacts through
+
+    tempfile -> fsync -> os.replace (C6).
+
+    WHAT IS NOT DONE, AND WHY. No label, config or store byte is written by this decision. The ruling is the owner''s
+
+    (D-2898); the classifier of record is ADVISORY (kappa ~0.45 against the owner''s discipline anchor, D-2868/D-2770
+
+    class); and the packet''s one derived column (candidates_advisory: token overlap) is labelled advisory and never
+
+    applied. Queue A carries ONLY rows whose RECORDED-menu control reproduced the stored label, so an
+
+    instrument-unstable row cannot enter the ruling disguised as a re-scope effect.
+
+    SIDE EFFECTS, MEASURED AND LEFT OWED. (1) The new reader names 11 declared store columns, so the store-column
+
+    census moved 13 -> 17 owed CODE-CENSUS-MOVED columns (the snapshot is MEASURED 2026-09-26); it is left OWED
+    and was
+
+    NOT laundered with a blanket --record (D-2649/BUG-533). (2) governance/canonical_labels_reference.md was STALE
+    — it
+
+    declared config/taxonomy_v5.yaml, a file that does not exist, while its generator names config/taxonomy.yaml;
+    it is
+
+    regenerated from its own generator (never hand-edited, as its header demands) and the CLASS is filed as BUG-750.
+
+    (3) The session plan was widened with three NAMED entries (BUG-548/BUG-563: never a glob; the record is not
+    the
+
+    rule) and the plan was committed FIRST.
+
+    NEXT ACTS. The owner returns a filled packet and the verdicts are applied mechanically to their units; the
+
+    standing rail for queue B (measure the re-derivation gap with a declared shrink-only ceiling and fail closed
+    when
+
+    it GROWS) is still owed, and it is precisely what would have made this gap visible without a question.'

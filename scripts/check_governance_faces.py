@@ -130,9 +130,9 @@ def gov_sync_config() -> dict:
     literal here (C12)."""
     doc = yaml.safe_load(GOV_SYNC_CFG.read_text(encoding="utf-8")) or {}
     for key in ("face_owner_lane_label", "task_movers", "face_index_head_tokens", "face_hand_index_token",
-                "face_head_declaration_re"):
+                "face_head_declaration_re", "state_glyphs"):
         if key not in doc:
-            raise SystemExit(f"FAIL-CLOSED (C16): {GOV_SYNC_CFG.name} declares no {key!r} (D-2985/D-2986)")
+            raise SystemExit(f"FAIL-CLOSED (C16): {GOV_SYNC_CFG.name} declares no {key!r} (D-2985/D-2986/D-2987)")
     return doc
 
 
@@ -247,6 +247,109 @@ LIVE_CENSUS_RE = re.compile(
     r"\(\s*(\d+)\s+open\s*/\s*(\d+)\s+closed",
     re.IGNORECASE,
 )
+
+
+#: D-2987: the states the DERIVED block renders UNCONDITIONALLY - each is printed on EVERY run,
+#: whatever the register holds (the open-state keys, the four severities, and the five settled states on the
+#: decisions summary line). So the sign for each must be PRESENT in the block: a map that is declared and never
+#: rendered is a declaration with no reader (BUG-492).
+#: D-2987 (BUG-765): the four DECLARED decision-state buckets. Their union must EQUAL the states the census
+#: counts and they must be pairwise disjoint - that is the whole invariant, and it is what the defect violated.
+DECISION_BUCKET_KEYS = ("open_decision_states", "decision_in_effect_states", "decision_closed_states",
+                        "decision_void_states")
+
+
+def glyph_faults(d: dict, path: Path | None = None) -> list[str]:
+    """D-2987: every DECLARED state carries a sign, and the AUTHORITY renders it.
+
+    MEASURED 2026-10-13: the DERIVED block - the ONE authority (D-2981/D-2985) - printed every state as a bare
+    lowercase word, while the hand INDEXES below the marker, which D-2986 declares make NO live claim, led with
+    the tier icons. The colour sat on the region that claims NOTHING and was absent from the region that OWNS
+    the state, so an owner scanning by sign was reading the non-authoritative index. That is BUG-761's defect
+    one layer down: a surface that misleads about its own authority.
+
+    Two limbs, both joinable:
+      (1) COMPLETENESS - every token declared on any axis (the task states, the task priorities, the severity
+          tokens, the open decision states, and the states the census counts) must carry a sign. A NEW state
+          therefore cannot be added to any axis without giving it one, which is the whole point: a state the
+          owner cannot scan for is a state the face does not show.
+      (2) PRESENCE - the block must actually RENDER the sign beside the word, for every state it prints on
+          every run. A map nothing reads is a comment (BUG-492). The pair (sign + WORD) is checked, not the
+          sign alone, because two settled states deliberately share a sign.
+
+    PURE when `path` is None (completeness only), so the oracle is testable without touching a face. The
+    required tokens come from the DECLARED axes (config/gov_sync.yaml), never from whatever the census happens
+    to count: MEASURED 2026-10-13, the first version of this limb read the census's `summary` keys and so
+    demanded signs for `total` and `by_category` - a fault of the RULE, not of the map (the D-2986 lesson).
+    """
+    gl = d.get("state_glyphs")
+    if not isinstance(gl, dict) or not gl:
+        return [f"{GOV_SYNC_CFG.name} declares no state_glyphs - every declared state must carry a sign "
+                f"(D-2987)"]
+    required = (set(d["task_states"]) | set(d["task_priorities"]) | set(d["severity_tokens"])
+                | set().union(*(set(d.get(k) or []) for k in DECISION_BUCKET_KEYS)))
+    out = [f"{GOV_SYNC_CFG.name} declares the state {w!r} on an axis but state_glyphs gives it NO sign - a "
+           f"state the owner cannot scan for is a state the face does not show (D-2987)"
+           for w in sorted(w for w in required if w not in gl)]
+    if path is None:
+        return out
+    lines = path.read_text(encoding="utf-8").splitlines()
+    block = "\n".join(lines[:history_start(lines)])
+    summary = (json.loads(DECISIONS_SUMMARY.read_text(encoding="utf-8")).get("summary") or {})
+    # DECISIONS: every declared state the register ACTUALLY COUNTS must render its sign. A zero-valued state
+    # is suppressed by the renderer (C28 - the face is a VIEW), so the required set is the JOIN of the
+    # declared axis with the census, not a static list that would red spuriously the day a state hits 0.
+    present = {s for k in DECISION_BUCKET_KEYS for s in (d.get(k) or []) if int(summary.get(s) or 0)}
+    # BUGS: all four severities are rendered unconditionally, so all four are required unconditionally.
+    present |= set(d["severity_tokens"])
+    for word in sorted(present):
+        g = str(gl.get(word, ""))
+        if g and f"{g} {word}" not in block:
+            out.append(f"{path.name}: the DERIVED block does not render the sign {g!r} beside the state "
+                       f"{word!r} the register counts - a declared sign nothing renders is a comment (D-2987)")
+    return out
+
+
+def partition_faults(d: dict, census: dict | None = None) -> list[str]:
+    """D-2987 (BUG-765): the DECLARED decision-state buckets must PARTITION the states the register counts.
+
+    MEASURED 2026-10-13, by the first run of the sign limb: the DERIVED decisions line summed to 981 of 1114.
+    The 133 decisions it never accounted for were exactly those in state `ratified` - a state no file under
+    governance declared, printed or signed - so 12% of the register was invisible in the ONE authority, on a
+    line that printed its own total two words earlier. A state with no sign is a state the face does not show
+    (BUG-757's shape, on the decisions axis).
+
+    Two limbs: (1) the buckets are pairwise DISJOINT - a state in two buckets is counted twice by whoever reads
+    either; (2) their union EQUALS the census's state keys - a state the census counts that no bucket holds is
+    a state the authority does not account for. With a complete partition the rendered counts are exact BY
+    CONSTRUCTION, which is why the invariant is the PARTITION and not a separate sum comparison.
+    """
+    if census is None:
+        census = json.loads(DECISIONS_SUMMARY.read_text(encoding="utf-8"))
+    summary = census.get("summary") or {}
+    groups = {k: [str(s) for s in (d.get(k) or [])] for k in DECISION_BUCKET_KEYS}
+    out = [f"{GOV_SYNC_CFG.name} declares no {k} - the decision-state axis must be a DECLARED partition, not "
+           f"whatever the census happens to count (D-2987)"
+           for k in DECISION_BUCKET_KEYS if not groups[k]]
+    seen: dict[str, str] = {}
+    for k in DECISION_BUCKET_KEYS:
+        for s in groups[k]:
+            if s in seen:
+                out.append(f"the decision state {s!r} sits in BOTH {seen[s]!r} and {k!r} - a partition "
+                           f"requires exactly ONE bucket per state (D-2987)")
+            seen[s] = k
+    counted = {str(k) for k in summary if k not in ("total", "total_decisions", "by_category")}
+    missing = sorted(counted - set(seen))
+    extra = sorted(set(seen) - counted)
+    if missing:
+        n = sum(int(summary.get(k) or 0) for k in missing)
+        out.append(f"the census counts the state(s) {missing} ({n} decision(s)) but NO declared bucket holds "
+                   f"them - a state the authority does not account for is a state the face does not show "
+                   f"(D-2987/BUG-765)")
+    if extra:
+        out.append(f"the declared buckets hold {extra}, which the census does not count - either the state is "
+                   f"not real or the census is stale (D-2987)")
+    return out
 
 
 def status_word(w: str) -> str | None:
@@ -649,6 +752,35 @@ def _selftest_heading_claims(cfg_d: dict) -> list[tuple[str, bool]]:
     ]
 
 
+def _selftest_state_signs(cfg_d: dict) -> list[tuple[str, bool]]:
+    """D-2987, BOTH directions: the real map must be COMPLETE, a state with no sign must fire, and a face whose
+    derived block renders no sign must fire. A rule whose control has never been seen to fail is not a control
+    (BUG-492)."""
+    real = glyph_faults(cfg_d)
+    hole = {k: v for k, v in (cfg_d.get("state_glyphs") or {}).items() if k != "MED"}
+    broke = glyph_faults({**cfg_d, "state_glyphs": hole})
+    with tempfile.TemporaryDirectory() as td:
+        p = Path(td) / "FACE.md"
+        p.write_text("a face with no derived block at all\n", encoding="utf-8")
+        silent = glyph_faults(cfg_d, p)
+    # D-2987/BUG-765: the PARTITION, measured on the real census AND on the exact shape of the defect that
+    # was found - a state the census counts that no bucket holds (the 133 `ratified` decisions).
+    real_part = partition_faults(cfg_d)
+    orphan = partition_faults(cfg_d, {"summary": {"total": 100, "open": 60, "active": 30, "quiesced": 10}})
+    doubled = partition_faults({**cfg_d, "decision_void_states": ["stale", "revoked", "abandoned", "open"]})
+    return [
+        ("the REAL state_glyphs map covers every declared state (D-2987)", real == []),
+        ("a declared state with NO sign must fire (D-2987)", any("'MED'" in f for f in broke)),
+        ("a face whose DERIVED block renders no sign must fire (D-2987)",
+         any("does not render the sign" in f for f in silent)),
+        ("the REAL decision-state buckets PARTITION the census (D-2987/BUG-765)", real_part == []),
+        ("a state the census counts that NO bucket holds must fire (the BUG-765 shape)",
+         any("NO declared bucket holds" in f for f in orphan)),
+        ("a state sitting in TWO buckets must fire (D-2987)",
+         any("BOTH" in f for f in doubled)),
+    ]
+
+
 def _selftest_live_census_regex() -> bool:
     m = LIVE_CENSUS_RE.search(
         "Register: 993 decisions · 434 bugs (162 open / 272 closed; highest OPEN = BUG-670).")
@@ -718,6 +850,8 @@ def selftest() -> int:
         *_selftest_live_region(gov_sync_config()),
         # D-2986: the HEADINGS between the two regions - the surface that named a state with nothing joining it.
         *_selftest_heading_claims(gov_sync_config()),
+        # D-2987: every declared state CARRIES A SIGN, and the authority renders it.
+        *_selftest_state_signs(gov_sync_config()),
     ]
     for name, ok in rows:
         print(("  ok  " if ok else "  !!  ") + name)
@@ -740,7 +874,7 @@ def main(argv: list[str] | None = None) -> int:
     open_ids = known - closed
     sync_cfg = gov_sync_config()
     owner_moved = owner_moved_count()
-    problems: list[str] = []
+    problems: list[str] = list(partition_faults(sync_cfg))
     for face in FACES:
         if not face.exists():
             problems.append(f"{face.name}: missing face (cannot check what is not there)")
@@ -752,12 +886,14 @@ def main(argv: list[str] | None = None) -> int:
         problems.extend(history_faults(face, face_lines, states, closed, known))
         problems.extend(live_faults(face, face_lines, sync_cfg, owner_moved))
         problems.extend(heading_faults(face, face_lines, sync_cfg))
+        problems.extend(glyph_faults(sync_cfg, face))
     if BUGLOG_FACE.exists():
         problems.extend(check_buglog_tiers(BUGLOG_FACE, open_ids, known))
         blog_lines = BUGLOG_FACE.read_text(encoding="utf-8").splitlines()
         problems.extend(history_faults(BUGLOG_FACE, blog_lines, states, closed, known))
         problems.extend(live_faults(BUGLOG_FACE, blog_lines, sync_cfg, owner_moved))
         problems.extend(heading_faults(BUGLOG_FACE, blog_lines, sync_cfg))
+        problems.extend(glyph_faults(sync_cfg, BUGLOG_FACE))
     else:
         problems.append(f"{BUGLOG_FACE.name}: missing face (cannot check what is not there)")
     if problems:
@@ -766,7 +902,7 @@ def main(argv: list[str] | None = None) -> int:
             print("  " + p)
         return 1
     print("ok governance-faces: bug-status table rows, header/live census, the history claim surface, the "
-          "LIVE region and the INDEX headings agree with the register (" + str(len(FACES)) + " restatement "
+          "LIVE region, the INDEX headings and the STATE SIGNS agree with the register (" + str(len(FACES)) + " restatement "
           "face(s) + buglog tiers, " + str(len(known)) + " bug ids, " + str(owner_moved) + " owner-moved task(s))")
     return 0
 

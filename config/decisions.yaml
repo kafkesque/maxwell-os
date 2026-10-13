@@ -23572,3 +23572,106 @@ decisions:
   - governance/buglog.md
   - governance/CONTEXT_INDEX.md
   - agent/session_seed.yaml
+- id: D-2987
+  date: '2026-10-13'
+  state: RESOLVED
+  category: GOVERNANCE / INSTRUMENT
+  title: A STATE is a claim. Every DECLARED state carries a SIGN the authority renders, and the declared decision
+    buckets PARTITION the register - a state with no sign is a state the face does not show
+  bugs:
+  - BUG-765
+  decision: 'THE DEFECT (two residuals, one root). D-2984 policed the rows and prose BELOW the history marker; D-2985
+    the LIVE region ABOVE it; D-2986 the HEADINGS between them. The STATES those surfaces name were policed by nothing.
+    MEASURED 2026-10-13: (1) THE AUTHORITY WAS THE LEAST LEGIBLE SURFACE. The DERIVED block - the ONE authority
+    (D-2981/D-2985) - printed every state as a bare lowercase word, while the hand INDEXES below the marker, which
+    D-2986 declares make NO live claim, led with the tier icons. The colour sat on the region that claims NOTHING
+    and was absent from the region that OWNS the state, so an owner scanning by sign was reading the non-authoritative
+    index. That is BUG-761''s defect one layer down: a surface that misleads about its own authority. (2) THE AUTHORITY
+    DID NOT ACCOUNT FOR 12% OF THE REGISTER (BUG-765, filed BY the control that found it). The DERIVED decisions
+    line summed to 981 of 1114. The 133 decisions it never accounted for were exactly those in state `ratified`
+    - a state no file under governance declared, printed or signed, and which no document defines against `active`.
+    The line printed its own total two words earlier.
+
+    THE SHAPE (one sentence). A state is a claim: every DECLARED state carries a sign the authority renders, and
+    the declared state buckets partition the register. Three limbs, each landed rather than promised: (i) THE SIGN
+    HAS ONE HOME AND THE AUTHORITY RENDERS IT. `state_glyphs` in config/gov_sync.yaml is keyed by the DECLARED tokens
+    of every axis (task states, task priorities, severities, and the decision axis), and scripts/gov_sync.py renders
+    every state through ONE helper (`_cell`), so the word and the sign cannot disagree and the sign is never hand-typed
+    into a face. The sign is a RENDERING of the state the register owns, never a second home (D-2642). (ii) COMPLETENESS
+    IS THE CONTROL, NOT A CONVENTION. `check_governance_faces.glyph_faults` fails closed when a declared state has
+    no sign - so a NEW state cannot be added to any axis without giving it one. The required set comes from the
+    DECLARED axes, never from the census''s keys: MEASURED on the limb''s FIRST run, its first version read the
+    census''s `summary` and demanded signs for `total` and `by_category` - a fault of the RULE, not of the map (the
+    D-2986 lesson, and the reason this limb is SEEN to fire in both directions). (iii) THE DECISION-STATE AXIS IS
+    A DECLARED PARTITION. `open_decision_states` (what the owner must act on) plus `decision_in_effect_states` (active,
+    ratified) plus `decision_closed_states` (resolved, superseded, archived, rejected) plus `decision_void_states`
+    (declared, never used). The four lists must be pairwise DISJOINT and their union must EQUAL the states the census
+    counts (14 today). The renderer prints every non-empty bucket, so the counts are exact BY CONSTRUCTION - which
+    is why the invariant is the PARTITION and not a separate sum comparison: with a complete partition the sum is
+    a consequence, and a second check of it would be a second home for one fact (D-2642).
+
+    WHY (iii) IS THE FIX FOR (2) AND NOT A COSMETIC ADDITION. `ratified` was a state of the DECISION LIFECYCLE that
+    no declared artifact mentioned: not in `open_decision_states`, not in `state_tokens`, not in the convention
+    line at the head of DECISION-LOG.md, not in any spec, not in the glyph map. A reader asking "what is the difference
+    between `active` and `ratified`?" had no artifact to consult - the same class as BUG-761''s twelve undeclared
+    index headings and BUG-757''s 101 untokened bugs. The fix does NOT decide that question; it makes the state
+    VISIBLE, gives it its own sign, and gives its grouping one declared home where the owner can change it.
+
+    MEASUREMENT OF RECORD. Before: the decisions line 981 of 1114, 133 decisions in an undeclared state, zero signs
+    in the block, and the sign vocabulary living only as a naming accident. After: 67 (needs action) + 698 (in effect)
+    + 349 (closed) + 0 (void) = 1114; all 14 declared decision states carry a sign; all four severities carry a
+    sign; the owner lane, the pipeline lane, the standing rules, the bug list and the boot face all render signs;
+    `gov_sync.py --selftest` 19 -> 21 known answers; `check_governance_faces.py --selftest` 38 -> 44 controls; the
+    new `partition_faults` limb SEEN to red on the pre-D-2987 config ("the census counts [''abandoned'',''active'',''archived'',''ratified'',''rejected'',''resolved'',''revoked'',''stale'',''superseded'']
+    (1047 decision(s)) but NO declared bucket holds them") and green on the repair; two mutation locks added, floor
+    39 -> 41; `tests/test_governance_faces_spec.py` 15 -> 17 green; INV-15 and INV-16 added to the spec.
+
+    THE T-101 INSTRUCTION DEFECT (repaired in the same act, because it is the same defect one layer out). TWO consecutive
+    session handoffs (D-2985, D-2986) told the owner to fill the golden-review sheet with `keep`/`replace`/`drop`/`add`.
+    MEASURED: those four tokens are accepted NOWHERE. The applier (scripts/reanchor_retrieval_goldens.py) accepts
+    `anchor` / `rewrite-query` / `retire-query` / `ambiguous`, and the vocabulary existed ONLY as a Python tuple
+    inside the reader. That is the SAME class as this act: a claim surface that does not declare what its own marks
+    mean. Repaired at the root - the vocabulary moves to config/pipeline_config.yaml (ONE home, C12), the applier
+    reads it and fails closed without it, a new `--check` PRE-FLIGHT reports what `--apply` would refuse BEFORE
+    the owner''s work is spent, and governance/golden_reanchor_instructions.md states the four tokens in plain English,
+    a worked example, and the fact that the owner writes 30 cells and not 150. TWO FURTHER MEASURED DEFECTS in that
+    same infrastructure: D-2939''s "anchors are OWNER-SIGNED, no model may sign one" had NO CONTROL (the `owner_signature`
+    column was written by the generator and read by NOTHING in the repository - BUG-492), now enforced on the write;
+    and the candidate draft is OUT OF PHASE with the live set by one query that a previous apply RETIRED ON PURPOSE,
+    so `--check` now WARNS that anchoring that row would silently ADD it back.
+
+    RESIDUALS (declared, not decided). (1) Whether `ratified` is a genuinely distinct live state or a SYNONYM of
+    `active` is an ONTOLOGY question for the owner: a rendering act may not merge two domain states (D-2898 - no
+    agent mints a LABEL, and merging states is a claim about the domain). One line in config/gov_sync.yaml if the
+    owner rules they collapse. (2) The same partition question has NOT been asked of the bug axes: `state_tokens`
+    and `severity_tokens` are declared, but their BUCKETS are not. (3) The census declares three states with a value
+    of 0 (`stale`, `revoked`, `abandoned`) and names NO WRITER for them - a state no writer can produce is a declaration
+    without a producer (C19''s shape one layer up). (4) T-101''s ACTUAL goal - adding HARDER and adversarial goldens
+    - still has NO INSTRUMENT: the review sheet RE-ANCHORS the 30 existing queries and cannot add one. Recorded
+    as its own task rather than left as an implication of a file that cannot do it.'
+  evidence: 'BEFORE: `scripts/gov_sync.py --selftest` 19 known answers; `scripts/check_governance_faces.py --selftest`
+    38 controls; the DERIVED decisions line 981 of 1114 (133 `ratified` decisions unaccounted); zero signs rendered
+    in the derived block. AFTER: gov_sync 21/21; faces rail 44/44; `gov_sync.py --check` rc=0 on 4 faces; `check_governance_faces.py`
+    rc=0 ("...the INDEX headings and the STATE SIGNS agree with the register"); `python3 -m pytest tests/test_governance_faces_spec.py
+    -q` 17 passed; the decisions line 67 + 698 + 349 + 0 = 1114; `partition_faults` SEEN to red on the pre-D-2987
+    config and green on the repair; 2 mutation locks added (floor 39 -> 41); `scripts/reanchor_retrieval_goldens.py
+    --check` rc=1 on the unfilled sheet naming the vocabulary and the out-of-phase query, and the apply path refuses
+    an unsigned anchor.'
+  files:
+  - config/gov_sync.yaml
+  - config/pipeline_config.yaml
+  - config/rail_mutations.yaml
+  - config/task_register.yaml
+  - scripts/gov_sync.py
+  - scripts/check_governance_faces.py
+  - scripts/reanchor_retrieval_goldens.py
+  - specs/governance_faces.spec.md
+  - specs/README.md
+  - tests/test_governance_faces_spec.py
+  - governance/golden_reanchor_instructions.md
+  - governance/buglog.md
+  - governance/CONTEXT_INDEX.md
+  - governance/SESSION-HANDOFF-20261013-D2987.md
+  - DECISION-LOG.md
+  - MASTER-TASK-REGISTER.md
+  - agent/session_seed.yaml

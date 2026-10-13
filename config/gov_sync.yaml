@@ -52,6 +52,21 @@ faces:
     from: task_register
 # A decision in one of these states is UNRESOLVED: it appears in the faces as needing action.
 open_decision_states: [open, proposed, draft, deferred, planned]
+# D-2987 (BUG-765): the decision-state axis is a DECLARED PARTITION. Before these three lists the axis was
+# only "open (needing action)" vs "everything else the line happened to name", so the DERIVED decisions line
+# could - and did - account for only PART of the register. MEASURED 2026-10-13 by the first run of the sign
+# limb: that line summed to 981 of 1114. The 133 decisions it never accounted for were exactly those in state
+# `ratified` - a state no file under governance declared, printed or signed - so 12% of the register was
+# invisible in the ONE authority, on a line that printed its own total two words earlier. A state with no sign
+# is a state the face does not show (BUG-757's shape, on the decisions axis).
+# The four lists must PARTITION the census's state keys - disjoint, and their union EQUAL to it. That is the
+# control: scripts/check_governance_faces.py#partition_faults fails closed if the census counts a state no
+# bucket holds, so a NEW state cannot be introduced anywhere without being given a home and a sign. With a
+# complete partition the rendered counts are exact by construction, which is why the invariant is the
+# PARTITION and not a separate sum check.
+decision_in_effect_states: [active, ratified]
+decision_closed_states: [resolved, superseded, archived, rejected]
+decision_void_states: [stale, revoked, abandoned]
 # A bug heading must carry a STATE and a SEVERITY: "## BUG-nnn (SEVERITY - STATE ...)".
 severity_tokens: [CRITICAL, HIGH, MED, LOW]
 state_tokens: [OPEN, CLOSED, FIXED, RESOLVED, SUPERSEDED, FILED, HELD]
@@ -64,6 +79,49 @@ task_priorities: [MUST, SHOULD, WORTH]
 # actually describing. `state: gate` is RETIRED: gatehood is `mover: owner` plus the gate text.
 task_states: [open, rule, done, superseded]
 task_movers: [owner, pipeline]
+# D-2987: EVERY DECLARED STATE CARRIES A SIGN, and the sign has ONE home.
+# MEASURED 2026-10-13: the DERIVED block - the ONE authority (D-2981/D-2985) - printed every state as a bare
+# lowercase word, while the hand INDEXES below the marker, which D-2986 declares make NO live claim, led with
+# the tier icons. The colour therefore sat on the region that claims NOTHING and was absent from the region
+# that OWNS the state, so an owner scanning by sign was reading the non-authoritative index. That is BUG-761's
+# defect one layer down: a surface that misleads about its own authority. The sign is NOT a state of its own -
+# it is a RENDERING of the state the register owns, emitted by scripts/gov_sync.py, so the word and the sign
+# cannot disagree and the sign is never hand-typed into a face.
+# Keys are the DECLARED tokens VERBATIM, so completeness is a checkable property:
+# scripts/check_governance_faces.py#glyph_faults fails closed when a declared state has no sign, which means a
+# NEW state cannot be added to any axis without giving it one. `open` and `superseded` are keys SHARED by the
+# task and decision axes on purpose: the WORD is the key and the sign is the value, so one word keeps one sign.
+# C12/C20: the strings live HERE, never as a literal in the renderer.
+state_glyphs:
+  # task priority (task_priorities) - the icons the hand-index tier headings already lead with
+  MUST: '🔴'
+  SHOULD: '🟠'
+  WORTH: '🟡'
+  # task state (task_states)
+  open: '🔴'
+  rule: '📌'
+  done: '✅'
+  superseded: '⚪'
+  # decision state - the states config/decisions_summary.json counts
+  proposed: '🔵'
+  draft: '📝'
+  deferred: '⏳'
+  planned: '📅'
+  active: '🟢'
+  # D-2987/BUG-765: 'ratified' was undeclared everywhere and therefore INVISIBLE in the derived block.
+  ratified: '⚖'
+  resolved: '✅'
+  archived: '⚪'
+  rejected: '⛔'
+  # declared by the census, never used (0 today). They keep the axis complete so the partition is exact.
+  stale: '⚪'
+  revoked: '⚪'
+  abandoned: '⚪'
+  # bug severity (severity_tokens)
+  CRITICAL: '🟥'
+  HIGH: '🟧'
+  MED: '🟨'
+  LOW: '🟩'
 # The token that marks a gate as the OWNER's word (never hardcoded in a rule, C12/C20), and the label the
 # owner lane LEADS with - one home for the string, read by the writer that renders it and by the faces
 # rail that requires the lane to be present.

@@ -8,40 +8,41 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1114 decisions (census stamp 09e1c567a49c1ce7, 2026-10-13) · 528 bugs (184 open / 344 closed; highest OPEN = BUG-757) · 13 open tasks (MUST 3 / SHOULD 7 / WORTH 3; OWNER-moved 3, pipeline-moved 10; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1115 decisions (census stamp 4aef0e591ede2e2d, 2026-10-13) · 529 bugs (184 open / 345 closed; highest OPEN = BUG-757) · 14 open tasks (MUST 3 / SHOULD 8 / WORTH 3; OWNER-moved 3, pipeline-moved 11; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **67** of 1114 — open 32 · proposed 14 · draft 1 · deferred 14 · planned 6 | in effect (active) 565 | closed: resolved 314, superseded 16, archived 8, rejected 11
+> Decisions NEEDING ACTION: **67** of 1115 — 🔴 open 32 · 🔵 proposed 14 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 565 · ⚖ ratified 133 | closed: ✅ resolved 315 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1115, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 184 open ids; severity read from each id's FIRST heading at ANY hash depth): CRITICAL 4 · HIGH 22 · MED 38 · LOW 19 · UNLABELLED 101 (BUG-757) of 184 open.
+> Open BUGS by severity (population = the census's 184 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 22 · 🟨 MED 38 · 🟩 LOW 19 · UNLABELLED 101 (BUG-757) of 184 open.
 >
 > **OWNER LANE (3) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
-> | T-101 | MUST | HARDEN THE RETRIEVAL GOLDEN SET (the gate is saturated) | owner-signed anchors for the new queries |
-> | T-103 | MUST | BUG-749 residual — the label re-derivation debt the census names (OWNER-RULED rows are store-write-owed) | the owner word that licenses the store write |
-> | T-107 | SHOULD | MCP payload decision — borp_score / feedback_score are still advertised to agents | owner word on the payload schema |
+> | T-101 | 🔴 MUST | HARDEN THE RETRIEVAL GOLDEN SET (the gate is saturated) | owner-signed anchors for the new queries |
+> | T-103 | 🔴 MUST | BUG-749 residual — the label re-derivation debt the census names (OWNER-RULED rows are store-write-owed) | the owner word that licenses the store write |
+> | T-107 | 🟠 SHOULD | MCP payload decision — borp_score / feedback_score are still advertised to agents | owner word on the payload schema |
 >
-> **PIPELINE LANE (10) — what the agent will do next, in strategic-consequential order (source: config/task_register.yaml):**
+> **PIPELINE LANE (11) — what the agent will do next, in strategic-consequential order (source: config/task_register.yaml):**
 >
 > | id | pri | state | task | evidence |
 > |---|---|---|---|---|
-> | T-104 | MUST | open | BUG-757 — OPEN bugs carry NO severity token, so the register cannot be ordered by criticality | bug_status.json joined to the buglog headings: UNLABELLED ceiling 101 (2026-10-13) |
-> | T-105 | SHOULD | open | REA tier A/B mining — DEVONthink 3 (related-document ranking) and Cursor (derived code index) | governance/NOT-YET-EVALUATED-RESEARCH.md (REA targets logged 2026-10-13) |
-> | T-106 | SHOULD | open | ROADMAP — MODULARITY (C21 swappable infrastructure) and CROSS-OS COMPATIBILITY (C26) | protocols: pipeline/storage/base.py only; no cross-OS smoke exists (2026-10-13) |
-> | T-108 | SHOULD | open | BUG-712 / BUG-714 — the content_type residual and the harness-facing primitive | served run content_type census (2026-10-13) |
-> | T-112 | SHOULD | open | PERF - the SERVED path loads the cross-encoder per PROCESS, so short-lived callers pay a cold-start of minutes | suite rail runtime 100-200s -> >210s after the dispatcher became the CLI default (2026-10- |
-> | T-113 | SHOULD | open | PAY THE BASELINE the honest instrument REVEALED - the 71 keys behind block aliases, module by module, each wit | config/config_defaults_census.json after D-2982: 300 shadowed-declared keys / 568 sites (2 |
-> | T-114 | SHOULD | open | DISCHARGE THE INHERITED LADDER FAULTS - four lines were RED before D-2982 and the prefix report hid them | just health-full 2026-10-13: 7 faults / 128 lines; each rc=1 at 42f8b76^ (worktree). RE-ME |
-> | T-109 | WORTH | open | spec/test sandbox — adopt the two mechanisms borrowed from impeccable / shadcn-ui-lint | specs/README.md (sandbox charter, prior art) |
-> | T-110 | WORTH | open | BUG-756 — the census restatement is hand-written | scripts/gov_sync.py --check rc=0 after --apply (2026-10-13) |
-> | T-111 | WORTH | open | BUDGET — the reviewer can only review WHOLE files under 100,000 chars; stage4_merge.py and stage2_extract.py e | r5_review_gate.yaml max_source_chars vs the two module sizes (2026-10-12) |
+> | T-104 | 🔴 MUST | 🔴 open | BUG-757 — OPEN bugs carry NO severity token, so the register cannot be ordered by criticality | bug_status.json joined to the buglog headings: UNLABELLED ceiling 101 (2026-10-13) |
+> | T-105 | 🟠 SHOULD | 🔴 open | REA tier A/B mining — DEVONthink 3 (related-document ranking) and Cursor (derived code index) | governance/NOT-YET-EVALUATED-RESEARCH.md (REA targets logged 2026-10-13) |
+> | T-106 | 🟠 SHOULD | 🔴 open | ROADMAP — MODULARITY (C21 swappable infrastructure) and CROSS-OS COMPATIBILITY (C26) | protocols: pipeline/storage/base.py only; no cross-OS smoke exists (2026-10-13) |
+> | T-108 | 🟠 SHOULD | 🔴 open | BUG-712 / BUG-714 — the content_type residual and the harness-facing primitive | served run content_type census (2026-10-13) |
+> | T-112 | 🟠 SHOULD | 🔴 open | PERF - the SERVED path loads the cross-encoder per PROCESS, so short-lived callers pay a cold-start of minutes | suite rail runtime 100-200s -> >210s after the dispatcher became the CLI default (2026-10- |
+> | T-113 | 🟠 SHOULD | 🔴 open | PAY THE BASELINE the honest instrument REVEALED - the 71 keys behind block aliases, module by module, each wit | config/config_defaults_census.json after D-2982: 300 shadowed-declared keys / 568 sites (2 |
+> | T-114 | 🟠 SHOULD | 🔴 open | DISCHARGE THE INHERITED LADDER FAULTS - four lines were RED before D-2982 and the prefix report hid them | just health-full 2026-10-13: 7 faults / 128 lines; each rc=1 at 42f8b76^ (worktree). RE-ME |
+> | T-116 | 🟠 SHOULD | 🔴 open | GOLDEN-SET GROWTH — the instrument that ADDS harder/abstract goldens (T-101 can only RE-anchor the set it has) | scripts/reanchor_retrieval_goldens.py --check reports the draft/live set out of phase and  |
+> | T-109 | 🟡 WORTH | 🔴 open | spec/test sandbox — adopt the two mechanisms borrowed from impeccable / shadcn-ui-lint | specs/README.md (sandbox charter, prior art) |
+> | T-110 | 🟡 WORTH | 🔴 open | BUG-756 — the census restatement is hand-written | scripts/gov_sync.py --check rc=0 after --apply (2026-10-13) |
+> | T-111 | 🟡 WORTH | 🔴 open | BUDGET — the reviewer can only review WHOLE files under 100,000 chars; stage4_merge.py and stage2_extract.py e | r5_review_gate.yaml max_source_chars vs the two module sizes (2026-10-12) |
 >
 > **STANDING RULES — in effect, never close (1):**
 >
 > | id | rule |
 > |---|---|
-> | R-1 | STANDING — the user-facing faces are DERIVED, never hand-appended at the top |
+> | 📌 R-1 | STANDING — the user-facing faces are DERIVED, never hand-appended at the top |
 >
 > **Open decisions needing action (newest first; the states are DECLARED in config/gov_sync.yaml):**
 >
@@ -60,7 +61,7 @@
 > | D273h | OPEN | LABEL QUALITY / MEASUREMEN | Cross the ruler strata with status and always report both frames (D-273h) |
 > | D273g | OPEN | RETRIEVAL / ONTOLOGY | A chunk/evidence leg IS worth it -- at step 8, and only after the filters constrain (D-273g) |
 >
-> **Open bugs, most severe first:** BUG-297 · BUG-299 · BUG-305 · BUG-712 · BUG-300 · BUG-301 · BUG-303 · BUG-304 · BUG-306 · BUG-312 · BUG-318 · BUG-341.
+> **Open bugs, most severe first:** 🟥 BUG-297 · 🟥 BUG-299 · 🟥 BUG-305 · 🟥 BUG-712 · 🟧 BUG-300 · 🟧 BUG-301 · 🟧 BUG-303 · 🟧 BUG-304 · 🟧 BUG-306 · 🟧 BUG-312 · 🟧 BUG-318 · 🟧 BUG-341.
 <!-- GOV-INDEX:END -->
 
 <!-- GOV-HISTORY:START (D-2981/D-2986) - below this line a face makes NO LIVE CLAIM: the INDEX sections are declared HAND INDEXES (row-joined on every run of the rail, never the authority) and the rest is DATED HISTORY (append-only). The DERIVED block above is the ONE authority for the current state. -->
@@ -87,7 +88,6 @@
 
 | Bug | Date | Issue |
 |---|---|---|
-
 | BUG-681 | 2026-10-08 | **`just health-full` = the ladder's WHOLE fault set. Round 2 measured 6; round 3 measures `FAIL ladder scan: 3 fault(s) in ONE pass` over 118 lines (503s), worst rc=1 (D-2680/BUG-573). FIXED so far: the unparsed buglog heading, the missing archive-index entry, and `check_undeclared_encoding`. THE 3 REMAINING: (a) `check_tests --check` = 3 red contract tests outside a declared-red=0 ceiling, incl. `test_s4_golden_conforms_to_ontology` (a golden set that does not conform to the ontology) - pre-existing, attributed away from the ANCHOR work by grep; (b) `check_encoding_homes --check` is now CLEAN (debt 0 of ceiling 0) — `scripts/remap_referee_v7_28rows.py` already reads the CSV via `artifact_encoding.open_artifact(CSV, ROOT)` (D-2644/D-2646 single decode home), so the `just health` prefix is UNBLOCKED; (c) `check_boundary_rehearsal` rc=1, newly diagnosed: `bootstrap.whole_tree_refused: refused (rc=1) but not for the declared reason 'FORBIDDEN session plan' (RAIL 4) - a refusal that does not name its cause cannot justify a bypass` - i.e. a whole-tree commit is still refused, but by a DIFFERENT rail than the declared one, so either the declared marker is stale or an earlier rail now refuses; do NOT hand-edit the declared reason (that hides the drift) - retain the fixture and print the ACTUAL refusal text. (b) RESOLVED 2026-10-09. Diagnose (a) and (c) now: the `just health` prefix is unblocked.** |
 | BUG-242 | 2026-09-11 | **frontier69_v2 + extension80 audit outputs carry 2 data-quality defects.** (1) The `*_verdict` fields (depth/discipline/domains) are LLM SELF-REPORTS, not computed comparisons — they claim `override` even when the audit value equals silver (e.g. `S4-GOLD-MINED-00005` domains identical yet `domains_verdict=override`), so the cited "57.5% domain-override" and "80 flagged" figures are inflated. (2) Non-principle content_type rows (noise_drop/tool_instruction/process_template/process_instance/growth_edge) carry a spurious 4-way depth label, violating D2612 (depth only for principle). FIX (applied in `scripts/build_phase0_adjudication_form.py`): agreement recomputed deterministically (`differs` flag) + depth marked N/A for non-principle. REMAINS: recompute the override figures from the audit values (deterministic), and re-run the audit to null depth on non-principle if the raw artifacts are kept. |
 | BUG-228 | 2026-09-08 | **Dead/aspirational schema fields — 0 code references.** `parent_pt_id` (process_instance's tether to a template), `promoted_to_type`/`promoted_to_id`/`parent_fb_ids` (growth_edge promotion), MCP `annotations` (`readOnlyHint`/`destructiveHint`/`idempotentHint`), `consulted_fbs`/`template_source` — all declared in `content_types.yaml`, all 0 refs in `pipeline/`+`scripts/`. Consequence: `process_instance` is indistinguishable from an unlinked anecdote; `growth_edge` is a dead-end bucket with a staging-area description; MCP-promotion aspiration is unbacked. False affordances for future retrieval code. Fix = prune or ship; backfill `parent_pt_id` when a PT exists (§1.3.2 of the adjudication doc). |
@@ -111,6 +111,7 @@
 ---
 
 ## ✅ CLOSED / RESOLVED — bottom (recent) — HAND INDEX, not a register (the DERIVED block above is the ONE authority; rows joined on every run, D-2986)
+- **BUG-765** — **the ONE authority did not account for 12% of the register: 133 `ratified` decisions were invisible. FIXED (D-2987): the decision-state axis is a DECLARED PARTITION, `ratified` carries its own sign, every bucket is printed (67 + 698 + 349 + 0 = 1114, exact by construction), and `partition_faults` fails closed when the census counts a state no bucket holds — SEEN to red on the pre-D-2987 config (9 states / 1047 decisions unaccounted). Residual, DECLARED not decided: whether `ratified` is a distinct live state or a synonym of `active` is an OWNER ontology question.**
 - **BUG-761** — **the region declared \"NOT a register\" carried twelve INDEX headings that named a current state, two of them restating a count (477 vs 565 ACTIVE; 97 vs 348 closed). FIXED (D-2986): the sentinel declares both kinds of content, every index heading declares itself a HAND INDEX, both drifting counts are gone (one home), and the rule is a rail limb with 2 mutation locks + spec INV-14. Re-tiered here from the OPEN — SHOULD table on closure. ✅ (2026-10-13)**
 - **BUG-695** — **`per_label` semantic-error-rate census RESOLVED via RATIFY-2 D2547 recalibration against v9 (D-2908).** Recalibrated (nli_label_audit 12,552 pairs) → `d2547_calibration.json` now covers all v9 labels; re-populated `per_label` 93 entries (53 disciplines + 40 domains). All 7 `0.0` labels are measured-0 (nli_total 11–35, contradict=0), NOT missing-data false-zeros. Fixed `scripts/bug695_recalibrate.py` false-zero guard (was `v==0.0`, now missing-criterion) + contract test `EXPECTED_LABEL_COUNT` 92→93 + `design systems` (9 fbs) below-min-sample exception. ✅ (2026-10-10)
 - **BUG-693** — **menu-widening drift RESOLVED (steps 1–2 done; step 3 owner-gated per D-2898).** Live canonical-run truth: `discipline='emerging'` = 1487 (22.6%) = offmenu 1297 (has raw discipline) + 190 no-raw remnant; mapfail 0 (280 reclaimed → marketing/business administration/entrepreneurship studies), dombleed 0 (190 kind-swapped → domains). Formerly 'dead' disciplines now populated (marketing 259, business administration 20, entrepreneurship studies 1, robotics 8, ecology 12, creative writing 15, museum studies 13, color theory 14). Step 3 (1,297 off-menu labels) promotion review stays owner-gated per D-2898 (no LLM auto-promotion). ✅ (2026-10-10)
@@ -12908,3 +12909,52 @@ never compared to anything.
 **FIXED BY D-2985:** the re-cut has a SCOPE - the live region; the history region is returned BYTE-IDENTICAL
 (asserted by a known-answer control and mutation-locked), and the two false SNAPSHOT lines were repaired IN PLACE
 with the repair named (a version of the writer was re-cutting them; repaired 2026-10-13).
+## BUG-765 (MED - FIXED 2026-10-13 by D-2987) - the ONE authority did not account for 133 `ratified` decisions (12% of the register), and the state they sit in was declared NOWHERE
+
+**FOUND BY THE RAIL, NOT BY READING.** D-2987's second limb (PRESENCE: a declared sign nothing renders is a
+comment) was written to answer a different question - "does the authority actually RENDER the signs it declares?"
+Its first run reddened all three faces, as expected, and then the COMPLETENESS limb reddened on six census keys
+the new map did not cover. Five were not states at all (`total`, `by_category` - a fault of the RULE, the
+D-2986 lesson, repaired by making the required set come from the DECLARED axes instead of the census's keys).
+**The sixth was `ratified`, and it was not a fault of the rule.**
+
+**THE MEASUREMENT.** The census counts fourteen decision states. The DERIVED decisions line rendered:
+
+    NEEDING ACTION 67 (open 32 + proposed 14 + draft 1 + deferred 14 + planned 6)
+    in effect (active) 565
+    closed: resolved 314, superseded 16, archived 8, rejected 11
+
+    = **981 of 1114.** The 133 decisions it never accounted for are exactly those in state `ratified`
+      (D300, D315, D316, D-2884, D-2953, D-2959 ... - real, load-bearing decisions, not junk rows).
+
+**WHY IT IS A DEFECT, NOT A COSMETIC GAP.** (1) The line prints its OWN total two words earlier and does not
+sum to it - an authority whose arithmetic does not close is not an authority. (2) `ratified` is a state of the
+DECISION LIFECYCLE that no file under governance declared: not in `open_decision_states`, not in
+`state_tokens`, not in the convention line at the head of DECISION-LOG.md, not in any spec, not in the glyph
+map. A reader asking "what is the difference between `active` and `ratified`?" had no artifact to consult -
+the same class as BUG-761's twelve undeclared index headings and BUG-757's 101 untokened bugs: **a state with no
+sign is a state the face does not show.** (3) It is the THIRD time in four acts that the front-facing surfaces
+were found under-reporting: D-2986 policed twelve HEADINGS, D-2985 the LIVE region, and now the state AXIS.
+
+**FIXED 2026-10-13 by D-2987 — "every declared state carries a SIGN and is ACCOUNTED FOR":**
+1. the decision-state axis is a **DECLARED PARTITION** in config/gov_sync.yaml: `open_decision_states` (needs
+   action) + `decision_in_effect_states` + `decision_closed_states` + `decision_void_states`;
+2. the renderer prints **every** declared bucket, so the counts account for the whole register
+   (67 + 698 + 349 + 0 = 1114 - exact BY CONSTRUCTION, which is why the invariant is the PARTITION and not a
+   separate sum comparison);
+3. **NEW RAIL LIMB** `scripts/check_governance_faces.py#partition_faults`: the four buckets must be pairwise
+   DISJOINT and their union must EQUAL the states the census counts. **SEEN to red** on the pre-D-2987 config -
+   "the census counts ['abandoned','active','archived','ratified','rejected','resolved','revoked','stale',
+   'superseded'] (1047 decision(s)) but NO declared bucket holds them" - and green on the repair;
+4. `ratified` carries its own sign (⚖) and its own bucket membership, so it is VISIBLE and distinct.
+
+**RESIDUAL - AN OWNER ONTOLOGICAL QUESTION, DECLARED NOT DECIDED.** `ratified` is now *visible* and its
+grouping is *declared* (in effect, with its own sign) - but whether it is a genuinely distinct live state or a
+SYNONYM of `active` is an ontology question for the owner, not a rendering question. This act did NOT merge
+them: merging two states is a claim about the domain, and the honest minimum was to stop pretending 133
+decisions did not exist. If the owner rules they collapse, the change is ONE line in config/gov_sync.yaml.
+
+**NOT FIXED HERE:** the same partition question has NOT been asked of the BUG axes (state_tokens and
+severity_tokens are declared but their buckets are not), and the census still carries three states that are
+declared with a value of 0 (`stale`, `revoked`, `abandoned`) whose WRITERS are not named - a state that no
+writer can produce is a declaration without a producer (C19's shape one layer up).

@@ -121,3 +121,19 @@ at boot. TODAY it names three:
 - **T-103 (MUST)** — the owner word that licenses the store write for the label re-derivation debt.
 - **T-107 (SHOULD)** — the owner word on the MCP payload schema (whether `borp_score` / `feedback_score` stay
   advertised to agents).
+
+---
+
+## ERRATUM — appended 2026-10-13 (D-2987), never written over (R-D410)
+
+**The T-101 vocabulary in this handoff is WRONG.** It states the owner should fill the golden-review sheet with
+`decision ∈ {keep, replace, drop, add}`. **Those four tokens are accepted NOWHERE** — `grep` finds them in no
+reader. The applier (`scripts/reanchor_retrieval_goldens.py`) accepts exactly **`anchor` / `rewrite-query` /
+`retire-query` / `ambiguous`**, and it fails closed on anything else, so the owner would have filled the sheet and
+been refused at the end of the sitting.
+
+Repaired at the root (D-2987), not in the prose: the vocabulary now has ONE home
+(`config/pipeline_config.yaml` → `retrieval_benchmark.reanchor.decisions`), the applier fails closed without it,
+a new `--check` PRE-FLIGHT reports what `--apply` would refuse **before** the work is spent, and
+`governance/golden_reanchor_instructions.md` states the four tokens in plain English with a worked example.
+The owner writes ONE anchored row per query (**30 cells, not 150**) plus a signature on that row.

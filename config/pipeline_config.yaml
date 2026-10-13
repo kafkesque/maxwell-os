@@ -865,6 +865,24 @@ retrieval_benchmark:
   reanchor:
     candidates: 5
     snippet_chars: 220
+    # D-2987: the REVIEW VOCABULARY the applier accepts - ONE home (C12), read by
+    # scripts/reanchor_retrieval_goldens.py. MEASURED 2026-10-13: it existed ONLY as a Python tuple inside
+    # the reader, and TWO consecutive session handoffs (D-2985, D-2986) told the owner to write
+    # `keep/replace/drop/add` - tokens this applier accepts NOWHERE. A vocabulary that exists only inside
+    # its reader is a vocabulary the writer guesses at, and the guess costs real work: `--apply` fails
+    # closed on an unrecognised verdict (exit 2), so the owner would have filled 150 cells and been refused.
+    # The four tokens, in the owner's terms:
+    #   anchor        = THIS candidate NAME is the right answer for this query. Exactly ONE row per query.
+    #   rewrite-query = the query is worth keeping but is worded badly; drop it from the set now.
+    #   retire-query  = the query is no longer a question the system should answer; drop it on purpose.
+    #   ambiguous     = the owner judged it undecidable. It PARKS the query and therefore BLOCKS `--apply`
+    #                   rather than guessing - a guess is not a label (D-2898).
+    decisions: [anchor, rewrite-query, retire-query, ambiguous]
+    # D-2939 declares anchors are OWNER-SIGNED and that no model may sign one. MEASURED 2026-10-13: the CSV's
+    # `owner_signature` column was written by the generator and read by NOTHING in the repository - the
+    # declaration had no control behind it (BUG-492: a detector nobody has seen fail is not a detector).
+    # When true, `--apply` refuses to write an anchor whose chosen row carries no signature.
+    owner_signature_required: true
 rerank:
   enabled: true
   model: BAAI/bge-reranker-v2-m3

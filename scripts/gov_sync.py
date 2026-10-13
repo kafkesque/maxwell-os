@@ -77,7 +77,9 @@ EXIT_OK, EXIT_DRIFT, EXIT_FAIL = 0, 1, 2
 def cfg() -> dict:
     doc = yaml.safe_load(CFG_PATH.read_text(encoding="utf-8")) or {}
     for key in ("registers", "faces", "open_decision_states", "severity_tokens", "task_priorities",
-                "task_states", "task_movers", "owner_gate_token", "face_owner_lane_label"):
+                "task_states", "task_movers", "owner_gate_token", "face_owner_lane_label",
+                "state_glyphs", "decision_in_effect_states", "decision_closed_states",
+                "decision_void_states"):
         if key not in doc:
             raise SystemExit(f"FAIL-CLOSED (C16): {CFG_PATH.name} declares no {key!r} - the join has no home (D-2981)")
     return doc
@@ -219,6 +221,47 @@ def register_truth(d: dict, x: dict) -> str:
             f"pipeline-moved {len(x['pipeline_moved'])}; {len(x['rules'])} standing rule(s) never close)")
 
 
+def _glyph(d: dict, word: str) -> str:
+    """D-2987: the DECLARED sign for a state word, or '' when the map declares none.
+
+    The RENDERER does not fail closed here - the completeness control is the rail
+    (scripts/check_governance_faces.py#glyph_faults), so one missing key is reported as a fault against the
+    DECLARATION instead of crashing every face this writer owns.
+    """
+    return str((d.get("state_glyphs") or {}).get(str(word), ""))
+
+
+def _cell(d: dict, word: str, text) -> str:
+    """The sign AND the text ('🔴 open 32'), through ONE helper.
+
+    One helper, so every surface renders a state the same way, and so the sign can never be hand-typed into a
+    face: it is a RENDERING of the state the register owns, never a second home (D-2987, D-2642).
+    """
+    g = _glyph(d, word)
+    return f"{g} {text}".strip()
+
+
+def _sev_of(bug: dict) -> str:
+    """A bug's declared severity word, read from its OWN heading (the register's slot, D-2985)."""
+    m = SEV.search(str(bug.get("title", "")).upper())
+    return m.group(1) if m else ""
+
+
+def _dec_bucket(d: dict, label: str, states: list, x: dict) -> str:
+    """One DECLARED decision bucket, as the face renders it.
+
+    D-2987/C28: a state the register counts as ZERO is SUPPRESSED and an empty bucket prints nothing - the
+    face is a VIEW (face_list_limit's rule: the full set stays in the registers). The axis is not weakened by
+    this: it stays DECLARED in config/gov_sync.yaml and check_governance_faces.partition_faults still fails
+    closed if a counted state has no bucket. MEASURED before suppression: three always-zero void states were
+    printed into the block that a boot-loaded face carries into EVERY session.
+    """
+    live = [(s, x["states"].get(s, 0)) for s in states if x["states"].get(s, 0)]
+    if not live:
+        return ""
+    return f" | {label}: " + " · ".join(f"{_cell(d, s, s)} {n}" for s, n in live)
+
+
 def render_block(d: dict, x: dict, decs: list | None = None) -> str:
     lim = int(d.get("face_list_limit", 12))
     order = {p: i for i, p in enumerate(d["task_priorities"])}
@@ -226,13 +269,22 @@ def render_block(d: dict, x: dict, decs: list | None = None) -> str:
            "> **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**",
            f"> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): {register_truth(d, x)}.",
            ">",
+           # D-2987 (BUG-765): every DECLARED bucket is printed, so the line accounts for the WHOLE
+           # register instead of the part it used to name. The buckets PARTITION the axis
+           # (check_governance_faces.partition_faults), so the counts below are exact by construction -
+           # MEASURED before this: 981 of 1114, with 133 `ratified` decisions invisible.
            f"> Decisions NEEDING ACTION: **{x['need_action']}** of {x['decisions_total']} — " +
-           " · ".join(f"{s} {x['states'].get(s, 0)}" for s in x["open_states"]) +
-           f" | in effect (active) {x['states'].get('active', 0)} | closed: resolved {x['states'].get('resolved', 0)}, "
-           f"superseded {x['states'].get('superseded', 0)}, archived {x['states'].get('archived', 0)}, rejected {x['states'].get('rejected', 0)}",
+           (" · ".join(f"{_cell(d, s, s)} {x['states'].get(s, 0)}" for s in x["open_states"]
+                       if x['states'].get(s, 0)) or "none") +
+           "".join(_dec_bucket(d, lbl, d[bucket], x) for lbl, bucket in
+                   (("in effect", "decision_in_effect_states"),
+                    ("closed", "decision_closed_states"),
+                    ("void (never used)", "decision_void_states"))) +
+           f" — the DECLARED buckets sum to the whole register ({x['decisions_total']}, D-2987/BUG-765)",
            ">",
-           f"> Open BUGS by severity (population = the census's {x['bugs_open']} open ids; severity read from each id's FIRST heading at ANY hash depth): CRITICAL {x['sev'].get('CRITICAL', 0)} · HIGH {x['sev'].get('HIGH', 0)} · "
-           f"MED {x['sev'].get('MED', 0)} · LOW {x['sev'].get('LOW', 0)} · UNLABELLED {x['unlabelled']} (BUG-757) of {x['bugs_open']} open.",
+           f"> Open BUGS by severity (population = the census's {x['bugs_open']} open ids; severity read from each id's FIRST heading at ANY hash depth): {_cell(d, 'CRITICAL', 'CRITICAL')} {x['sev'].get('CRITICAL', 0)} · "
+           f"{_cell(d, 'HIGH', 'HIGH')} {x['sev'].get('HIGH', 0)} · {_cell(d, 'MED', 'MED')} {x['sev'].get('MED', 0)} · "
+           f"{_cell(d, 'LOW', 'LOW')} {x['sev'].get('LOW', 0)} · UNLABELLED {x['unlabelled']} (BUG-757) of {x['bugs_open']} open.",
            ">",
            # D-2985: the OWNER LANE leads. The four previous lines said "MUST tasks" and stopped there, so a
            # standing rule, two owner-gated items and one actionable task rendered as one list in priority
@@ -243,8 +295,8 @@ def render_block(d: dict, x: dict, decs: list | None = None) -> str:
            "> | id | pri | what YOU decide | the gate |",
            "> |---|---|---|---|"]
     for t in sorted(x["owner_moved"], key=lambda t: (order.get(t.get("priority"), 9), str(t.get("id")))):
-        out.append(f"> | {t.get('id')} | {t.get('priority')} | {str(t.get('title',''))[:110]} | "
-                   f"{str(t.get('gate',''))[:70]} |")
+        out.append(f"> | {t.get('id')} | {_cell(d, t.get('priority'), t.get('priority'))} | "
+                   f"{str(t.get('title',''))[:110]} | {str(t.get('gate',''))[:70]} |")
     out += [">",
             f"> **PIPELINE LANE ({len(x['pipeline_moved'])}) — what the agent will do next, in "
             f"strategic-consequential order (source: config/task_register.yaml):**",
@@ -253,7 +305,8 @@ def render_block(d: dict, x: dict, decs: list | None = None) -> str:
             "> |---|---|---|---|---|"]
     for t in sorted(x["pipeline_moved"], key=lambda t: (order.get(t.get("priority"), 9), str(t.get("id"))))[:lim]:
         ev = str(t.get("evidence", ""))[:90].replace("|", "/")
-        out.append(f"> | {t.get('id')} | {t.get('priority')} | {t.get('state')} | {str(t.get('title',''))[:110]} | {ev} |")
+        out.append(f"> | {t.get('id')} | {_cell(d, t.get('priority'), t.get('priority'))} | "
+                   f"{_cell(d, t.get('state'), t.get('state'))} | {str(t.get('title',''))[:110]} | {ev} |")
     if x["rules"]:
         out += [">",
                 f"> **STANDING RULES — in effect, never close ({len(x['rules'])}):**",
@@ -261,7 +314,7 @@ def render_block(d: dict, x: dict, decs: list | None = None) -> str:
                 "> | id | rule |",
                 "> |---|---|"]
         for t in x["rules"]:
-            out.append(f"> | {t.get('id')} | {str(t.get('title',''))[:120]} |")
+            out.append(f"> | {_cell(d, 'rule', t.get('id'))} | {str(t.get('title',''))[:120]} |")
     out += [">",
             "> **Open decisions needing action (newest first; the states are DECLARED in config/gov_sync.yaml):**",
             ">",
@@ -272,7 +325,7 @@ def render_block(d: dict, x: dict, decs: list | None = None) -> str:
         out.append(f"> | {e['id']} | {e['state']} | {str(e.get('category',''))[:26]} | {str(e.get('title',''))[:100]} |")
     out += [">",
             f"> **Open bugs, most severe first:** " +
-            " · ".join(f"{b['id']}" for b in _severe(x)[:lim]) + ".",
+            " · ".join(_cell(d, _sev_of(b), b["id"]) for b in _severe(x)[:lim]) + ".",
             IDX_E]
     return "\n".join(out)
 
@@ -303,9 +356,9 @@ def render_seed_status(d: dict, x: dict) -> str:
     two items only the owner can move; the actionable work never appeared. The boot line now says what the
     owner must decide and what the agent will do, in that order.
     """
-    own = "; ".join(f"{t.get('id')} {str(t.get('title'))[:70]}" for t in
+    own = "; ".join(f"{_cell(d, t.get('priority'), t.get('id'))} {str(t.get('title'))[:70]}" for t in
                     sorted(x["owner_moved"], key=lambda t: str(t.get("id")))[:3]) or "nothing"
-    nxt = "; ".join(f"{t.get('id')} {str(t.get('title'))[:70]}" for t in
+    nxt = "; ".join(f"{_cell(d, t.get('priority'), t.get('id'))} {str(t.get('title'))[:70]}" for t in
                     sorted(x["pipeline_moved"], key=lambda t: str(t.get("id")))[:3]) or "nothing"
     return (f"{x['date']} D-2981: the user-facing faces are DERIVED (scripts/gov_sync.py) and "
             f"joined to the registers. Register: {x['decisions_total']} decisions ({x['need_action']} needing action) / "
@@ -485,7 +538,10 @@ def selftest() -> int:
     d = {"registers": {}, "faces": [], "open_decision_states": ["open"], "severity_tokens": ["CRITICAL", "HIGH", "MED", "LOW"],
          "task_priorities": ["MUST", "SHOULD", "WORTH"], "face_list_limit": 12, "severity_grandfathered": 0,
          "task_states": ["open", "rule", "done", "superseded"], "task_movers": ["owner", "pipeline"],
-         "owner_gate_token": "owner", "face_owner_lane_label": "OWNER LANE"}
+         "owner_gate_token": "owner", "face_owner_lane_label": "OWNER LANE",
+         "decision_in_effect_states": ["active", "ratified"],
+         "decision_closed_states": ["resolved", "superseded", "archived", "rejected"],
+         "decision_void_states": ["stale", "revoked", "abandoned"]}
     x = {"decisions_total": 7, "states": {"open": 2, "active": 3, "resolved": 2}, "need_action": 2, "stamp": "deadbeefdeadbeef",
          "date": "2026-01-02", "bugs_total": 5, "bugs_open": 3, "bugs_closed": 2, "sev": {"CRITICAL": 1, "HIGH": 1, "MED": 0, "LOW": 0},
          "unlabelled": 1, "open_bugs": [{"id": "BUG-001", "title": "(LOW - OPEN) x"}, {"id": "BUG-003", "title": "(CRITICAL - OPEN) y"}],
@@ -503,6 +559,23 @@ def selftest() -> int:
     ok += 1
     blk = render_block(d, x, decs=[{"id": "D-1", "state": "open", "category": "X", "title": "t"}])
     assert IDX_S in blk and IDX_E in blk and "deadbeefdeadbeef" in blk, "block must carry the census stamp"
+    ok += 1
+    # D-2987: a DECLARED sign must be RENDERED beside its state, on every surface. The map is injected here
+    # (ASCII signs) so the known answer is readable and cannot be satisfied by a hard-coded emoji in the
+    # renderer - a literal there would pass only by accident of the real map.
+    d2 = {**d, "state_glyphs": {"open": "X", "active": "Y", "resolved": "Z", "superseded": "S",
+                                "archived": "A", "rejected": "R", "CRITICAL": "C", "HIGH": "H",
+                                "MED": "M", "LOW": "L", "rule": "P", "MUST": "!", "SHOULD": "?",
+                                "WORTH": "~", "proposed": "p", "draft": "d", "deferred": "f",
+                                "planned": "n", "done": "D"}}
+    blk2 = render_block(d2, x, decs=[{"id": "D-1", "state": "open", "category": "X", "title": "t"}])
+    assert "X open 2" in blk2 and "Y active 3" in blk2, "a DECLARED sign must render beside its state (D-2987)"
+    assert "in effect: Y active 3" in blk2, "every DECLARED bucket must be printed (D-2987/BUG-765)"
+    assert "! MUST" in blk2, "the OWNER LANE must carry the tier sign, not a bare word (D-2987)"
+    assert "P R-1" in blk2, "a STANDING RULE must carry its never-closes sign (D-2987)"
+    ok += 1
+    seed2 = render_seed_status(d2, x)
+    assert "! T-2" in seed2, "the BOOT face must carry the tier sign on every id it names (D-2987)"
     ok += 1
     face = "## 🔴 MUST — open (x)\n\n" + blk + "\n\ntail line\n"
     out, how = _replace_block(face, blk)

@@ -152,3 +152,23 @@ names the debt, the owner-ruled rows are store-write-owed.) Gate text: *the owne
 write.*
 **T-107 (SHOULD) — one decision: does the MCP payload keep advertising `borp_score` / `feedback_score` to
 agents?** (`borp_score` is a retired constant 0.0.) Gate text: *owner word on the payload schema.*
+**MEASURED by D-2987, so this is not an assumption:** over the 4,503 PASS rows of the served canonical run,
+`borp_score` carries ONE non-null value (0.0) and `feedback_score` is populated on **ZERO** rows, while
+`confidence_score` carries 147 distinct values (0.7522..1.0). Both advertised fields are DEAD; `feedback_score` is
+not "derived", it is EMPTY.
+
+---
+
+## ERRATUM — appended 2026-10-13 (D-2987), never written over (R-D410)
+
+**The T-101 vocabulary in this handoff is WRONG.** It states the owner should fill the golden-review sheet with
+`decision ∈ {keep, replace, drop, add}`. **Those four tokens are accepted NOWHERE** — `grep` finds them in no
+reader. The applier (`scripts/reanchor_retrieval_goldens.py`) accepts exactly **`anchor` / `rewrite-query` /
+`retire-query` / `ambiguous`**, and it fails closed on anything else, so the owner would have filled the sheet and
+been refused at the end of the sitting.
+
+Repaired at the root (D-2987), not in the prose: the vocabulary now has ONE home
+(`config/pipeline_config.yaml` → `retrieval_benchmark.reanchor.decisions`), the applier fails closed without it,
+a new `--check` PRE-FLIGHT reports what `--apply` would refuse **before** the work is spent, and
+`governance/golden_reanchor_instructions.md` states the four tokens in plain English with a worked example.
+The owner writes ONE anchored row per query (**30 cells, not 150**) plus a signature on that row.

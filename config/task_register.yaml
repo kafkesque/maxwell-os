@@ -293,3 +293,23 @@ tasks:
   - D-2642
   evidence: governance/buglog.md BUG-761 (FIXED 2026-10-13 by D-2986); config/rail_mutations.yaml floor 39 with the two new locks SEEN to red (2026-10-13)
   gate: none
+- id: T-116
+  priority: SHOULD
+  state: open
+  mover: pipeline
+  title: GOLDEN-SET GROWTH — the instrument that ADDS harder/abstract goldens (T-101 can only RE-anchor the set it has)
+  why: >-
+    MEASURED (D-2987): the review sheet re-anchors the queries the golden set ALREADY carries and cannot add one,
+    so the half of T-101 that asks for HARDER and ADVERSARIAL queries has no instrument at all - and it was
+    implied away by a handoff that told the owner an `add` verdict existed. Anchoring and GROWING are two acts
+    with two instruments, and the second is the one that attacks a saturated gate: re-anchoring an easy query
+    keeps the query, while adding a query the system FAILS is what moves recall@10 off its ceiling. The ADD path
+    must be first-class - a candidate query, a judged anchor NAME, an owner signature, and the same fail-closed
+    pre-flight - so growth is a DECLARED act rather than a side effect of a draft that is out of phase with the
+    live set.
+  source:
+  - D-2987
+  - D-2980
+  - BUG-710
+  evidence: scripts/reanchor_retrieval_goldens.py --check reports the draft/live set out of phase and names the retired query (2026-10-13)
+  gate: none

@@ -27,14 +27,16 @@ executable contract under tests/, and the MACHINE RUNNER (pytest) is the grader.
 | spec | contract | invariants | status |
 |---|---|---|---|
 | specs/retrieval_serving.spec.md | tests/test_retrieval_serving_spec.py | INV-1..INV-7: golden anchoring, run pinning, ranking signal, fail-loud gate, ONE dispatch point, the harness measures the SERVED path, ONE pool home | live; 8/8 green 2026-10-13 |
-| specs/governance_faces.spec.md | tests/test_governance_faces_spec.py | INV-1..INV-14: the claim surface of the faces - history region (label, census marker, decision rows, OPEN assertions, repair-naming, ordering, mutation lock), the LIVE region (one live label, citations resolve, the OWNER LANE leads, the re-cut's scope) AND the index HEADINGS between them (what a heading that names a state owes, and the count it may not carry) | live; 15/15 green 2026-10-13 |
+| specs/governance_faces.spec.md | tests/test_governance_faces_spec.py | INV-1..INV-16: the claim surface of the faces - history region (label, census marker, decision rows, OPEN assertions, repair-naming, ordering, mutation lock), the LIVE region (one live label, citations resolve, the OWNER LANE leads, the re-cut's scope), the index HEADINGS between them (what a heading that names a state owes, and the count it may not carry) AND the STATES themselves (every declared state carries a sign the authority renders, and the declared decision buckets partition the register) | live; 17/17 green 2026-10-13 |
 | specs/task_register.spec.md | tests/test_task_register_spec.py | INV-1..INV-6: a standing RULE is not a task, WHO must move it is declared, an owner gate is a MOVER, a count has ONE home, OPEN-ness is the census's (the severity line partitions it), the rule is mutation-locked | live; 7/7 green 2026-10-13 |
 | specs/config_defaults_census.spec.md | tests/test_config_defaults_census_spec.py | the undeclared-default census: the alias-aware key set, the receipt, the shrink-only ceiling | live 2026-10-13 |
 
 **MEASURED 2026-10-13 (D-2985): this inventory had drifted.** It listed ONE spec while `specs/` held four - an
 inventory that names one of four files is the BUG-588 shape in the sandbox's own front door. The rows above are
 the set that exists; a new spec adds its row here in the same change (rule 1, applied to this file).
-**D-2986 kept the row honest the same way:** the governance_faces row moved 13 invariants -> 14 in the same act
+**D-2987 kept the row honest the same way:** the governance_faces row moved 14 invariants -> 16 in the same act
+that added INV-15 (a declared state carries a sign the authority renders) and INV-16 (the decision-state buckets
+partition the register). **D-2986 kept the row honest the same way:** the governance_faces row moved 13 invariants -> 14 in the same act
 that added INV-14, and its status line moved with it - an inventory row is a claim too.
 
 ## Prior art assessed 2026-10-13 (NOT adopted as tools; two mechanisms borrowed)

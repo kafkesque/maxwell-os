@@ -2,7 +2,7 @@
 
 spec_version: 1
 governed: scripts/check_governance_faces.py (the rail: --selftest is its own oracle, the check is the ladder's line) · scripts/gov_sync.py (the faces' ONE writer, whose census re-cut is scoped by INV-13) · DECISION-LOG.md · MASTER-TASK-REGISTER.md · governance/buglog.md (the three faces' declared history regions AND their live regions) · config/decisions.yaml + governance/bug_status.json (the registers a claim is joined to) · config/task_register.yaml (the register that says WHO must move each task) · config/gov_sync.yaml (the declared labels and axes) · config/rail_mutations.yaml (the rules' mutation locks) · justfile#health (where the rails and their controls stand)
-authority: D-2985 (the LIVE region is a claim surface - this rule) · D-2986 (a HEADING is a claim - the region between the two) · D-2984 (the HISTORY region is a claim surface - its mirror) · D-2981/R-1 (the faces are DERIVED, never hand-appended) · D-2642 (one derived value, one home) · D-2660 (a citation is a claim about the tree at the MOMENT OF MINT) · D-405 (a declaration whose subject is absent is an assertion) · BUG-588/D-2692 (a count restated in prose is stale) · BUG-669 (the predecessor: the rail read tables and marker lines, never prose) · BUG-760 (measured: the faces told the owner a closed decision was still pending) · BUG-761 (measured: the region declared NOT a register carried twelve headings that claimed a current state, two of them restating a count) · BUG-762 (measured: the live region was unpoliced) · R-D410 (append-only history) · BUG-492 (a detector nobody has seen fail is not a detector) · C12/C16/C19
+authority: D-2987 (a STATE is a claim: every declared state carries a sign AND is accounted for - this rule) · D-2985 (the LIVE region is a claim surface) · D-2986 (a HEADING is a claim - the region between the two) · D-2984 (the HISTORY region is a claim surface - its mirror) · D-2981/R-1 (the faces are DERIVED, never hand-appended) · D-2642 (one derived value, one home) · D-2660 (a citation is a claim about the tree at the MOMENT OF MINT) · D-405 (a declaration whose subject is absent is an assertion) · BUG-588/D-2692 (a count restated in prose is stale) · BUG-669 (the predecessor: the rail read tables and marker lines, never prose) · BUG-760 (measured: the faces told the owner a closed decision was still pending) · BUG-761 (measured: the region declared NOT a register carried twelve headings that claimed a current state, two of them restating a count) · BUG-762 (measured: the live region was unpoliced) · R-D410 (append-only history) · BUG-492 (a detector nobody has seen fail is not a detector) · C12/C16/C19
 stamp: 2026-10-13 · deterministic authoring (no LLM gen)
 status: each invariant is live-verified by tests/test_governance_faces_spec.py
 
@@ -163,3 +163,41 @@ says it FIRST.**
   RECORD headings in buglog.md (`## BUG-331 — … (MED, OPEN)`), which are the register's own status slot and
   already joined by `scripts/bug_status.py`. The rule reads the LEADING token only: `heading, then rows`.
 - **Test:** `test_an_index_heading_declares_what_it_is_and_carries_no_count`.
+
+### INV-15 — Every DECLARED state carries a SIGN, and the authority renders it (D-2987)
+- **Correct:** `> | T-101 | 🔴 MUST | HARDEN THE RETRIEVAL GOLDEN SET | ... |` and
+  `> Decisions NEEDING ACTION: **67** of 1114 — 🔴 open 32 · 🔵 proposed 14 · 📝 draft 1 · ⏳ deferred 14 · 📅
+  planned 6 | in effect: 🟢 active 565 · ⚖ ratified 133 | closed: ✅ resolved 314 · ⚪ superseded 16 · ⚪ archived
+  8 · ⛔ rejected 11`. The sign is a RENDERING of the state the register owns, emitted by the renderer through
+  ONE helper, so the word and the sign cannot disagree and the sign is never hand-typed into a face.
+- **Wrong:** MEASURED 2026-10-13 — the DERIVED block (the ONE authority) printed every state as a bare lowercase
+  word, while the hand INDEXES below the marker, which INV-14 declares make NO live claim, led with the tier
+  icons. The colour sat on the region that claims NOTHING and was absent from the region that OWNS the state, so
+  an owner scanning by sign was reading the non-authoritative index: BUG-761's defect one layer down.
+- **The control is COMPLETENESS:** `state_glyphs` (config/gov_sync.yaml) is keyed by the DECLARED tokens of
+  every axis, and the limb fails closed when a declared state has no sign — so a NEW state cannot be added to any
+  axis without giving it one. The required set comes from the DECLARED axes, never from the census's keys:
+  MEASURED 2026-10-13, the first version read the census and demanded signs for `total` and `by_category` — a
+  fault of the RULE, not of the map (the D-2986 lesson, and why this limb is SEEN to fire in both directions).
+- **PRESENCE is a JOIN, not a static list:** every declared state the register ACTUALLY COUNTS must render its
+  sign beside its word. A zero-valued state is suppressed (C28 — the face is a VIEW), so a static list would red
+  spuriously the day a state hits 0.
+- **Test:** `test_every_declared_state_carries_a_sign`.
+
+### INV-16 — The decision-state axis is a DECLARED PARTITION, and the authority accounts for the whole register (D-2987, BUG-765)
+- **Correct:** `open_decision_states` + `decision_in_effect_states` + `decision_closed_states` +
+  `decision_void_states` are pairwise DISJOINT and their union EQUALS the states the census counts (14 today).
+  The renderer prints every non-empty bucket, so the counts are exact BY CONSTRUCTION.
+- **Wrong:** MEASURED 2026-10-13, by the FIRST run of INV-15's completeness limb — the decisions line summed to
+  **981 of 1114**. The 133 decisions it never accounted for were exactly those in state `ratified`, a state no
+  file under governance declared, printed or signed, and which no document defines against `active`: 12% of the
+  register invisible in the ONE authority, on a line that printed its own total two words earlier. A state with no
+  sign is a state the face does not show (BUG-757's shape, on the decisions axis). Filed as BUG-765 **by the control
+  that found it**.
+- **Why the invariant is the PARTITION and not a separate sum check:** with a complete partition the rendered
+  counts sum to the total by construction, so an independent sum comparison would be a second home for the same
+  fact (D-2642). The partition is the home; the sum is its consequence.
+- **Not decided here:** whether `ratified` is a distinct live state or a SYNONYM of `active` is an ONTOLOGY
+  question for the owner. This act makes it visible and gives it its own sign; it does not merge two domain states
+  (D-2898: no agent mints a LABEL — and merging states is a claim about the domain).
+- **Test:** `test_the_decision_state_buckets_partition_the_census`.

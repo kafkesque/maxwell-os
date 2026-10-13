@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import importlib.util
 import re
+import tempfile
 from pathlib import Path
 
 import yaml
@@ -46,7 +47,7 @@ def test_the_spec_is_paired_1to1_with_its_contract() -> None:
     text = SPEC.read_text(encoding="utf-8")
     invariants = re.findall(r"(?m)^### (INV-\d+)", text)
     named = re.findall(r"\*\*Test:\*\*\s*`([a-z0-9_]+)`", text)
-    assert len(invariants) == len(named) == 14, "one invariant, one named test (D-2978)"
+    assert len(invariants) == len(named) == 16, "one invariant, one named test (D-2978)"
     for name in named:
         assert name in globals(), f"the spec names {name}, which the contract does not define"
 
@@ -135,7 +136,8 @@ def test_the_rule_is_mutation_locked_and_its_controls_run() -> None:
     """INV-9 (D-2676 iv): the mutation exists, is expected RED, and its find-text is in the bytes TODAY."""
     doc = yaml.safe_load((PROJECT_ROOT / "config" / "rail_mutations.yaml").read_text(encoding="utf-8"))
     entries = [e for e in doc.get("mutations", []) if e.get("subject") == "scripts/check_governance_faces.py"]
-    assert len(entries) == 4, "both claim surfaces (history and LIVE) and both heading limbs must be locked"
+    assert len(entries) == 6, ("both claim surfaces (history and LIVE), both heading limbs and both state "
+                                  "limbs (the sign's completeness, the partition) must be locked")
     for entry in entries:
         assert entry.get("expect") == "red"
         assert str(entry.get("marker", "")).strip()
@@ -213,6 +215,56 @@ HEAD_CFG = {k: SYNC_CFG[k] for k in ("face_index_head_tokens", "face_hand_index_
 def heads(body: list[str]) -> list[str]:
     """The rail's heading rule, driven with a synthetic face body below a real marker."""
     return rail.heading_faults(Path("FACE.md"), [MARKER] + body, HEAD_CFG)
+
+
+def test_every_declared_state_carries_a_sign() -> None:
+    """INV-15: the SIGN map is keyed by the DECLARED axes and the AUTHORITY renders every sign it declares.
+
+    MEASURED 2026-10-13: the derived block printed bare words while the hand indexes below the marker - which
+    INV-14 declares make no live claim - led with the tier icons, so the colour sat on the region that claims
+    NOTHING. Two limbs, both driven here in both directions."""
+    # limb 1 (completeness, PURE): the real map must cover every declared axis, and a hole must fire
+    assert rail.glyph_faults(SYNC_CFG) == [], "the real state_glyphs must cover every declared state"
+    hole = {k: v for k, v in SYNC_CFG["state_glyphs"].items() if k != "MED"}
+    assert any("'MED'" in f for f in rail.glyph_faults({**SYNC_CFG, "state_glyphs": hole})), \
+        "a declared state with no sign must fire"
+    # ...and the required set is the DECLARED AXIS, never the census's keys. MEASURED 2026-10-13: the first
+    # version of this limb read the census's `summary` and so demanded signs for `total` and `by_category` -
+    # a fault of the RULE, not of the map (the D-2986 lesson). One signed state, everything else missing:
+    only_med = rail.glyph_faults({**SYNC_CFG, "state_glyphs": {"MED": "x"}})
+    assert any("'CRITICAL'" in f for f in only_med), "a declared severity with no sign must fire"
+    assert not any("'by_category'" in f or "'total'" in f for f in only_med), \
+        "the census's non-state keys are NOT part of the axis (this limb's own first defect)"
+    # limb 2 (presence): a face whose derived block renders no sign must fire, and the real faces must be clean
+    with tempfile.TemporaryDirectory() as td:
+        p = Path(td) / "FACE.md"
+        p.write_text("a face with no derived block at all\n", encoding="utf-8")
+        assert any("does not render the sign" in f for f in rail.glyph_faults(SYNC_CFG, p))
+    for face in FACES:
+        bad = rail.glyph_faults(SYNC_CFG, face)
+        assert not bad, f"{face.name}: {bad}"
+
+
+def test_the_decision_state_buckets_partition_the_census() -> None:
+    """INV-16 (BUG-765): the DECLARED buckets are disjoint and their union EQUALS the states the census counts.
+
+    The defect that created this invariant: the decisions line summed to 981 of 1114, missing exactly the 133
+    'ratified' decisions - a state no file under governance declared, printed or signed."""
+    assert rail.partition_faults(SYNC_CFG) == [], "the real buckets must partition the census"
+    # the exact shape of BUG-765: a state the census counts that NO bucket holds
+    orphan = rail.partition_faults(SYNC_CFG, {"summary": {"total": 100, "open": 60, "active": 30,
+                                                        "quiesced": 10}})
+    assert any("NO declared bucket holds" in f for f in orphan), "an unaccounted state must fire"
+    # a state in TWO buckets would be counted twice by whoever reads either
+    doubled = rail.partition_faults({**SYNC_CFG,
+                                     "decision_void_states": list(SYNC_CFG["decision_void_states"]) + ["open"]})
+    assert any("BOTH" in f for f in doubled), "a doubly-bucketed state must fire"
+    # and the buckets are DISJOINT on the real config
+    seen: set = set()
+    for k in rail.DECISION_BUCKET_KEYS:
+        group = set(SYNC_CFG[k])
+        assert not (seen & group), f"{k} overlaps another bucket"
+        seen |= group
 
 
 def test_an_index_heading_declares_what_it_is_and_carries_no_count() -> None:

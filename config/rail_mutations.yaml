@@ -35,7 +35,7 @@ fixture:
   timeout_seconds: 600
 
 coverage:
-  min_mutations: 39            # FLOOR (shrink guard): deleting an entry means editing the floor in a diff a human reads (39 = 37 + the two D-2986 entries: a heading that names a current state must declare what it is, and a count has one home)
+  min_mutations: 41            # FLOOR (shrink guard): deleting an entry means editing the floor in a diff a human reads (41 = 39 + the two D-2987 entries: a declared state carries a sign, and the declared buckets partition the axis)
   # D-2679: the coverage set is DERIVED, never restated. Which rails gate a COMMIT is one fact and it already has
   # ONE home (config/rail_registry.yaml#commit_boundary), so restating it here would be a SECOND HOME - and two
   # lists of one fact drift, and only one of them can be right. scripts/check_rail_mutations.py joins the two and
@@ -786,3 +786,36 @@ mutations:
     why: >-
       R-D410: append-only history, never rewritten - not even by the writer that owns the faces. The mutant
       makes the re-cut own the whole file, so the scope assertion is SEEN to be load-bearing.
+
+  # D-2987: TWO locks for the state rule. The first protects the SIGN's completeness limb (a declared state
+  # must carry a sign - the check that, on its first run, measured an undeclared 'ratified' state holding 133
+  # decisions). The second protects the PARTITION limb (a state the census counts must have a bucket - the check
+  # that FAILED on the pre-D-2987 config with 9 states / 1047 decisions unaccounted).
+  - id: the_state_sign_completeness_limb_is_load_bearing
+    subject: scripts/check_governance_faces.py
+    op: replace
+    find: '           for w in sorted(w for w in required if w not in gl)]'
+    replace: '           for w in []]  # MUTATION (D-2676): a declared state need not carry a sign'
+    runner: scripts/check_governance_faces.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: '  !!  a declared state with NO sign must fire (D-2987)'
+    why: >-
+      D-2987: a state with no sign is a state the face does not show. The mutant makes the completeness limb
+      silent, so the known answer that NAMES the rule is SEEN to be load-bearing rather than only a counter.
+
+  - id: the_state_partition_limb_is_load_bearing
+    subject: scripts/check_governance_faces.py
+    op: replace
+    find: '    missing = sorted(counted - set(seen))'
+    replace: '    missing = []  # MUTATION (D-2676): a state with no bucket is accounted for'
+    runner: scripts/check_governance_faces.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: '  !!  a state the census counts that NO bucket holds must fire (the BUG-765 shape)'
+    why: >-
+      D-2987/BUG-765: the decisions line summed to 981 of 1114 because 133 decisions sat in a state no bucket
+      held. The mutant pretends an unheld state is accounted for, so the control that NAMES the partition is
+      SEEN to be load-bearing.

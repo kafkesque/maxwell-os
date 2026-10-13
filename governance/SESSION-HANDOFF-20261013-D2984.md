@@ -90,7 +90,33 @@ created two writers of one rule (the D-2983 reasoning, unchanged). The ONE local
 reviewer via `scripts/r5_review_gate.py --file scripts/check_governance_faces.py`, and its verdict is read in-line
 below, not assumed.
 
-## 8. Next critical step (bug / task / decision — in order)
+## 8. ADDENDUM 2026-10-13 (owner: "to conform those are resolved check") — the verification pass
+
+An INDEPENDENT join (separate parser, straight to `config/decisions.yaml` / `governance/bug_status.json` /
+`config/task_register.yaml`; deliberately NOT the rail that D-2984 added, because generator ≠ verifier) reports:
+
+- **decision ROW claims disagreeing with the register in an UNDATED section: 0** (was 8 before D-2984).
+- the same inside a DATED section: **13** — declared history, each a claim about its own moment (including the two
+  rows the owner saw, now under the dated SNAPSHOT heading plus the appended CORRECTION).
+- **task claims: 0** disagreements (derived block AND hand claims).
+- **bug closure/opening claims: 0 undated**, 108 inside dated entries (history).
+- derived blocks: re-derived byte-identically (`gov_sync --check` rc=0).
+
+**The pass found a real blind spot in the rule this session landed, and it is now closed.** The row parser
+required a BARE id cell, so two SHAPES were invisible to the join: a bolded id
+(`| **D-274b** | **RESOLVED** | …`, DECISION-LOG.md:343) and an id with a label appended
+(`| D2546 SHACL+OWL | PLANNED | …`, :3260, a table whose own header reads `| ID | Registry state | True status |`).
+Both instances turned out to sit in DATED sections, so seeing them changed no verdict — but a claim surface the
+rule cannot SEE is not covered by the rule, and one undated row in either shape could have hidden a stale state
+exactly as the two D-2984 found. `DEC_ROW_RE` now strips leading emphasis and takes the id the cell LEADS with;
+three controls were added (bold id fires, label suffix fires, a row whose first cell is a BUG id is not a decision
+claim) — selftest **25/25**, contract 10/10, rail rc=0, spec INV-3 amended in place.
+
+**Correction to my own measurement, disclosed:** an intermediate ad-hoc counter reported "189 open" bugs because it
+read ids out of bug TITLES (a title may name another bug). The register is **185 open / 340 closed of 525**,
+confirmed with the rail's own exact-id method. No register change occurred.
+
+## 9. Next critical step (bug / task / decision — in order)
 
 1. **T-115** (SHOULD) — BUG-761: decide what a hand tier means inside the declared history region, and join the
    tier labels' counts. Cheap, contained, and it closes the last place a face can restate a drifted number.

@@ -78,7 +78,15 @@ HIGHEST_OPEN_RE = re.compile(r"highest\s+OPEN\b", re.IGNORECASE)
 #: A moment named IN WORDS rather than as a date. The field above must carry one on its OWN line - an entry
 #: stamp one line up is not enough for a DERIVED value, because the value is the thing that moved.
 MOMENT_TOKEN_RE = re.compile(r"\b(then|as\s+of|at\s+the\s+time|that\s+date)\b", re.IGNORECASE)
-DEC_ROW_RE = re.compile(r"^\|\s*(D-?[0-9]+[a-z]?)\s*\|")
+DEC_ROW_RE = re.compile(r"^\|\s*[*_`'\"]*\s*(D-?[0-9]+[a-z]?)\b")
+#: MEASURED 2026-10-13, AFTER the first version of this rule landed (the D-2984 verification pass): the row
+#: parser above originally required a BARE id cell, so two row SHAPES were invisible to the join - a bolded id
+#: (`| **D-274b** | **RESOLVED** | ... |`, DECISION-LOG.md:343) and an id with a label appended
+#: (`| D2546 SHACL+OWL | PLANNED | ... |`, :3260, a table whose own header reads "| ID | Registry state | True
+#: status |"). Both instances sat in DATED sections, so seeing them changed no verdict - but a claim surface
+#: the rule cannot SEE is not covered by the rule, and one undated row in either shape could have hidden a
+#: stale state exactly as the two D-2984 found. The claim a row makes is the id it LEADS with, after any
+#: emphasis is stripped; the state it claims is still the LAST bare state cell.
 BARE_STATE_RE = re.compile(r"^[*_`'\"]*([A-Za-z][A-Za-z /-]{1,18}?)[*_`'\"]*$")
 #: `BUG-539, still OPEN` / `BUG-695 remains OPEN` / `BUG-333 is OPEN`. The id and the claim must be ADJACENT:
 #: a line that merely mentions a closed bug beside a claim about another one is not a claim about it.
@@ -440,6 +448,13 @@ def _selftest_history_faults() -> list[tuple[str, bool]]:
          len(faults(["## 2026-10-03 - the flips", "| D2 | ACTIVE | something |"])) == 0),
         ("a decision row naming an id the register does not carry must fire",
          len(faults(["| D9 | ACTIVE | something |"])) == 1),
+        # BUG-760 verification pass: the row SHAPES the first version of this rule could not SEE.
+        ("a row whose id cell carries MARKDOWN EMPHASIS is still a claim",
+         len(faults(["| **D2** | **ACTIVE** | something |"])) == 1),
+        ("a row whose id cell carries a LABEL SUFFIX is still a claim",
+         len(faults(["| D2 practicality filter | ACTIVE | something |"])) == 1),
+        ("a row whose first cell is a BUG id is not a decision claim",
+         len(faults(["| BUG-625 | RESOLVED | the D2 follow-on |"])) == 0),
         ("asserting a CLOSED bug is OPEN must fire",
          len(faults(["BUG-539 still OPEN."])) == 1),
         ("the same assertion inside a DATED entry is history",

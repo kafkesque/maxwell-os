@@ -46,7 +46,11 @@ never a new file per change. History lives in git plus the D-number that changed
 ### INV-3 — A decision ROW is a claim about the register
 - **Correct:** `| D<id> | <state> | … |` agrees with config/decisions.yaml, or its SECTION declares its moment (the
   date on the nearest preceding heading, bounded by the marker so a live tier label above the region can never date
-  a claim inside it) and it is history.
+  a claim inside it) and it is history. The id cell may carry **markdown emphasis** or a **label suffix** — the
+  claim is the id the cell LEADS with (`| **D-274b** | **RESOLVED** | … |`, `| D2546 SHACL+OWL | PLANNED | … |`),
+  because a claim surface the rule cannot SEE is not covered by the rule. MEASURED 2026-10-13 in the verification
+  pass that followed this rule's own landing: the first version required a BARE id cell and was blind to both
+  shapes; seeing them changed no verdict (both instances sat in dated sections), but the blindness was real.
 - **Wrong:** a row claiming ACTIVE for a decision the register holds RESOLVED, or citing an id the register does not
   carry (D-405: a citation whose subject is absent is an assertion).
 - **Test:** `test_a_decision_row_joins_to_the_register`.

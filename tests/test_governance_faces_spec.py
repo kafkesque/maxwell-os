@@ -73,6 +73,10 @@ def test_a_decision_row_joins_to_the_register() -> None:
     assert faults(["| D2 | RESOLVED | something |"]) == []
     assert "does not carry" in first_fault(["| D9 | ACTIVE | something |"])
     assert faults(["## 2026-10-03 - the flips", "| D2 | ACTIVE | something |"]) == []
+    # the row SHAPES the first version of this rule could not see (BUG-760 verification pass)
+    assert "claims D2 is ACTIVE" in first_fault(["| **D2** | **ACTIVE** | something |"])
+    assert "claims D2 is ACTIVE" in first_fault(["| D2 practicality filter | ACTIVE | something |"])
+    assert faults(["| BUG-625 | RESOLVED | the D2 follow-on |"]) == []
     # a tier label ABOVE the marker can never date a claim inside the region
     assert rail.history_faults(Path("FACE.md"), ["## 2026-01-01 live tier", MARKER, "| D2 | ACTIVE | x |"],
                                STATES, CLOSED, KNOWN) != []

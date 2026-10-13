@@ -1,0 +1,65 @@
+# config/feedback.yaml - THE ONE HOME of the feedback loop's numeric policy (C12/D-2644).
+#
+# WHY. The feedback loop's thresholds and its neutral prior lived in CODE: pipeline/feedback.py carried
+# RETIREMENT_THRESHOLD = 0.3, RETIREMENT_MIN_FEEDBACKS = 5, BOOST_THRESHOLD = 0.8 and a literal `count >= 3`, and
+# pipeline/retrieve.py carried the neutral prior 0.5 in FOUR places inside ONE function (SQL x2, Python x2, two of
+# which disagree about what a stored 0.0 means). A policy value with no home cannot be reviewed, ratcheted or
+# reverted - and a policy value with TWO homes is the BUG-499/BUG-502 class.
+#
+# THE ONTOLOGY (D-2642/D-2989). Two layers, one home each:
+#   * the LEDGER `fb_feedback` is the TRUTH - an append-only event record, one row per (FB, agent, task) rating;
+#   * the CACHE `fbs.feedback_score` / `fbs.feedback_count` is a DENORMALIZATION of the ledger, declared
+#     `derived_regenerable` in config/derivations.yaml, and therefore owed a PARITY RAIL
+#     (scripts/check_feedback_parity.py recomputes it from the ledger through the SAME function the writer uses).
+# A cache you intend to fill is never dropped; it is declared and proved reproducible.
+schema_version: '1'
+authority: D-2989
+decisions: [D2130, D-2642, D-2989]
+assessment: governance/BORP_FEEDBACK_ASSESSMENT_20261013.md
+
+ledger:
+  table: fb_feedback
+  writer: pipeline/feedback.py::record_feedback
+  columns: [id, fb_id, agent_id, task_id, rating, was_correct, was_actionable, was_timely, notes, created_at]
+  rating:
+    kind: real
+    scale: [0.0, 1.0]        # enforced in the ledger DDL (CHECK(rating >= 0.0 AND rating <= 1.0))
+    clipped: true
+
+aggregate:
+  score_column: feedback_score
+  count_column: feedback_count
+  home: pipeline/feedback.py::declared_aggregate          # the FORMULA's ONE home (imported by the writer AND the rail)
+  writer: pipeline/feedback.py::_update_fb_aggregates     # the CACHE's ONE writer
+  formula: shrunk_mean      # mean | shrunk_mean  -- `shrunk_mean` with prior_weight 0 IS the plain mean
+  prior: 0.5                # the neutral belief about an FB nobody has rated
+  prior_weight: 0.0         # k: 0.0 == today's behaviour (byte-identical). Raise to 3.0 to activate shrinkage:
+                            #   effective = (n*mean + k*prior) / (n + k)  -- one 1.0 rating stops outranking twenty 0.9s
+  rounding: 3
+
+serving:
+  #: OWED (T-107): this value is a LITERAL in pipeline/retrieve.py:1070,1071 (SQL) and :1090,1091 (Python); the
+  #: change-set moves all four reads onto this key, so SQL and Python can no longer disagree about the same row.
+  neutral_prior: 0.5
+  rank_factor: 'quality * (1.0 + effective) * graph_boost'
+  max_skew: 1.0             # DECLARED ceiling of the feedback term: an FB rated 1.0 may at most DOUBLE the
+                            # quality factor (2.0x) while one rated 0.0 keeps it (1.0x) - an asymmetric skew that
+                            # used to be undeclared.
+
+thresholds:
+  retirement: {max_avg: 0.3, min_feedback: 5}   # reported by get_fb_feedback_stats (NOT enforced by a gate)
+  boost: {min_avg: 0.8, min_feedback: 3}
+
+absence:
+  shape: 'feedback_score IS NULL AND feedback_count = 0'   # D-2957: absent must be NULL, never a hollow blank
+  wire: >-
+    OWED (T-107): the payload must publish the absence EXPLICITLY - {score: null, count: 0, state: 'no_feedback',
+    prior, effective} - because a bare null cannot be told from a score of 0.0 (= maximally bad).
+
+residual:
+  needs_boost_unconsumed: >-
+    get_fb_feedback_stats computes needs_boost and NOTHING reads it (C19: a declaration nothing reads). Either the
+    boost is wired into the ranking policy (a retrieval-policy ruling) or the flag is retired. NAMED, not silent.
+  retain_on_row_delete: >-
+    the ledger holds a FOREIGN KEY to fbs(fb_id) but no ON DELETE action; a retired FB would orphan its ratings.
+    No FB has ever been deleted (D2625/D2630: mark, never delete), so this is declared, not repaired.

@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**185 open** / 345 closed of 530 ids.
+**187 open** / 346 closed of 533 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -192,3 +192,5 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-750 | (LOW - OPEN 2026-10-13) - a GENERATED artifact can go stale behind its own generator and no rail sees it: the canonical-labels reference sti | 1 |
 | BUG-757 | (MED - OPEN, found 2026-10-13 while auditing the user-facing faces) - 125 open bugs carry NO severity token, so the open register cannot be  | 1 |
 | BUG-766 | (MED - OPEN 2026-10-13) - the store-columns register holds TWO defects the ladder has been RED on: 6 columns declare `outside: absent` (NULL | 1 |
+| BUG-767 | (HIGH - OPEN 2026-10-13) - the RETIRED trust metric still leaves the machine, published to agents and written into two exports | 1 |
+| BUG-768 | (HIGH - OPEN 2026-10-13) - BORP is satisfied by a MINORITY of the served corpus: the deleted per-row check left the SINGLETON route unguarde | 1 |

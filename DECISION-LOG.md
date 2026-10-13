@@ -13,19 +13,20 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1116 decisions (census stamp 414471ebb87c5774, 2026-10-13) · 530 bugs (185 open / 345 closed; highest OPEN = BUG-766) · 14 open tasks (MUST 3 / SHOULD 8 / WORTH 3; OWNER-moved 3, pipeline-moved 11; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1117 decisions (census stamp 1950b61b7076a8da, 2026-10-13) · 533 bugs (187 open / 346 closed; highest OPEN = BUG-768) · 15 open tasks (MUST 4 / SHOULD 8 / WORTH 3; OWNER-moved 4, pipeline-moved 11; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **67** of 1116 — 🔴 open 32 · 🔵 proposed 14 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 565 · ⚖ ratified 133 | closed: ✅ resolved 316 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1116, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **67** of 1117 — 🔴 open 32 · 🔵 proposed 14 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 565 · ⚖ ratified 133 | closed: ✅ resolved 317 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1117, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 185 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 22 · 🟨 MED 39 · 🟩 LOW 19 · UNLABELLED 101 (BUG-757) of 185 open.
+> Open BUGS by severity (population = the census's 187 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 24 · 🟨 MED 39 · 🟩 LOW 19 · UNLABELLED 101 (BUG-757) of 187 open.
 >
-> **OWNER LANE (3) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
+> **OWNER LANE (4) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
 > | T-101 | 🔴 MUST | HARDEN THE RETRIEVAL GOLDEN SET (the gate is saturated) | owner-signed anchors for the new queries |
 > | T-117 | 🔴 MUST | BUG-749 residual — the ESCALATE surface: the units NO owner ruling reaches | one owner word per unit on the reference sheet (CONFIRM / CORRECT + ho |
-> | T-107 | 🟠 SHOULD | MCP payload decision — borp_score / feedback_score are still advertised to agents | owner word on the payload schema |
+> | T-118 | 🔴 MUST | the SINGLE-SOURCE trust tier — what the system may SAY about a row the Book of Record Principle does not cover | one word: tier | withhold | leave |
+> | T-107 | 🟠 SHOULD | MCP payload decision — borp_score / feedback_score are still advertised to agents | one owner word per advertised field in config/served_fields.yaml#decla |
 >
 > **PIPELINE LANE (11) — what the agent will do next, in strategic-consequential order (source: config/task_register.yaml):**
 >

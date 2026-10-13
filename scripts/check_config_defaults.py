@@ -514,6 +514,28 @@ def attribute_delta(shadowed: set[str], receipt: Mapping[str, Any], keys: set[st
             "paid": sorted(previous_keys - previous_shadowed)}
 
 
+def receipt_module_drift(receipt: Mapping[str, Any] | None, files: int) -> int:
+    """The receipt's recorded module COUNT when it no longer equals the measurement, else -1.
+
+    D-2989 (the D-2981 shape, one field over): the receipt carries a measured `counts.modules`, and
+    `tests/test_config_defaults_census_spec.py` asserts the receipt EQUALS a fresh measurement - but the only
+    re-record path was a CEILING change, so adding a module under the scan roots moved that count and left the
+    receipt unrefreshable BY THE RAIL. MEASURED 2026-10-13: two new `scripts/*.py` moved it 553 -> 556 while every
+    key, site and ceiling stayed put. A measured field the contract compares needs a re-record act.
+
+    Args:
+        receipt: the recorded receipt, or None.
+        files: the module count just measured.
+
+    Returns:
+        The stale recorded count (a re-record is owed), or -1 when there is nothing to record.
+    """
+    if not receipt:
+        return -1
+    recorded: int = int((receipt.get("counts") or {}).get("modules", -1))
+    return recorded if recorded != files else -1
+
+
 def controls() -> list[tuple[str, bool]]:
     """Known-answer controls (BUG-492: a detector nobody has seen fail is not a detector)."""
     rcv = {"_CFG", "cfg", "config", "conf", "settings"}
@@ -550,6 +572,10 @@ def controls() -> list[tuple[str, bool]]:
                 rcv, CONTROLS_KEYS) == ({"alpha"}, set(), 1)),
         ("a LOADER call is not a config alias: _load_yaml(PATH) roots at the loader, not the surface (D-2982)",
          census('_S = _load_yaml(PATH)\n_S.get("beta", 2)', rcv, CONTROLS_KEYS) == (set(), set(), 0)),
+        ("a receipt whose MODULE count moved is STALE and must be re-recordable by the rail (D-2989)",
+         receipt_module_drift({"counts": {"modules": 553}}, 556) == 553
+         and receipt_module_drift({"counts": {"modules": 556}}, 556) == -1
+         and receipt_module_drift(None, 556) == -1),
     ]
 
 
@@ -697,6 +723,20 @@ def main(argv: list[str]) -> int:
             print("  (first measurement by the RAIL: the probe's number was a claim, so the rail replaced it in "
                   "either direction - D-2642. Shrink-only applies from the next run on.)")
         return EXIT_OWED
+
+    # ── D-2989: a RECEIPT FIELD the paired contract compares needs its own re-record act ─────────────
+    stale_modules = receipt_module_drift(receipt, files)
+    if stale_modules != -1:
+        if not record:
+            print("owner-owed (loud, NOT fatal - BUG-457): the receipt's module count is STALE - " + line)
+            print("  ->  counts.modules: recorded " + str(stale_modules) + " -> measured " + str(files)
+                  + " (re-run with --record: a measured field the contract compares may not be hand-edited, "
+                  "D-2642)")
+            return EXIT_OWED
+        write_receipt(measured, shadowed, undeclared, sites, files, coverage, coverage_id)
+        print("ok " + PREFIX + " --record: the receipt re-recorded (counts.modules " + str(stale_modules)
+              + " -> " + str(files) + "; ceilings unchanged at " + str(before) + ") - " + line)
+        return EXIT_CLEAN
 
     if not receipt:
         print("owner-owed (loud, NOT fatal - BUG-457): no measured receipt yet - " + line)

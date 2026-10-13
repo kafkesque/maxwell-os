@@ -26,7 +26,11 @@ fixture:
   # MEASURED 2026-09-27: recompute_decision_summary.py --selftest checks its own bug citations against the
   # register, so it reads governance/bug_status.json; while the fixture did not carry it, EVERY baseline of that
   # runner was red and the gate reported the MUTATION as the fault. A declared input that EXISTS is the point.
-  include_files: [justfile, governance/bug_status.json]
+  include_files: [justfile, governance/bug_status.json, pipeline/feedback.py, pipeline/pipeline_paths.py]
+  # ^ D-2989: the feedback ABSENCE guard's subject is the FORMULA's one home (pipeline/feedback.py), and its runner
+  #   (scripts/check_feedback_parity.py --selftest) imports pipeline.feedback -> pipeline.pipeline_paths. Both are
+  #   named FILE-GRANULARLY rather than by adding the whole pipeline/ tree: the formula cannot be moved into a
+  #   fixture-friendly scripts/ copy without creating the second home the guard exists to forbid (BUG-502).
   include_globs: [governance/session_plan_*.yaml]   # MEASURED: check_session_plan.py --selftest reads the LIVE plan
   git: [init, add, commit]                               # a REAL repository: the rails read the ambient subject
   commit_message: rail-mutations fixture base
@@ -35,7 +39,7 @@ fixture:
   timeout_seconds: 600
 
 coverage:
-  min_mutations: 43            # FLOOR (shrink guard): deleting an entry means editing the floor in a diff a human reads (43 = 41 + the two D-2988 entries: the licensed store write's SCOPE guard and its TARGET-agreement guard)
+  min_mutations: 47            # FLOOR (shrink guard): deleting an entry means editing the floor in a diff a human reads (47 = 43 + the three D-2989 controls: the advertised-field rail's UNDECLARED guard and its owner-WORD guard, the feedback aggregate's ABSENCE guard, and the census receipt's MODULE-count re-record guard)
   # D-2679: the coverage set is DERIVED, never restated. Which rails gate a COMMIT is one fact and it already has
   # ONE home (config/rail_registry.yaml#commit_boundary), so restating it here would be a SECOND HOME - and two
   # lists of one fact drift, and only one of them can be right. scripts/check_rail_mutations.py joins the two and
@@ -854,3 +858,71 @@ mutations:
       ruling already reaches. With the agreement uncompared, a row whose mapper answer, owner target and recorded
       packet answer disagree is written with whichever value arrived first - the applier choosing between three
       authorities, which is exactly the act the owner reserves.
+
+  # D-2989: the ADVERTISED-FIELD rail. Its whole value is that a claim an agent reads is either TRUE or DECLARED,
+  # and the two guards below are the two ways that could be lost while every line of the report stayed green: the
+  # undeclared advert (nothing names the debt) and the owner word that would be accepted whatever it said. Each is
+  # reduced to a no-op, so the control that NAMES it is SEEN to be load-bearing rather than only counted.
+  - id: the_undeclared_advert_guard_is_load_bearing
+    subject: scripts/check_served_fields.py
+    op: replace
+    find: "        return DEFECT_UNDECLARED, (\n            f\"{field} is ADVERTISED by"
+    replace: "        return OK, (  # MUTATION (D-2676): an advert no declaration names passes silently\n            f\"{field} is ADVERTISED by"
+    runner: scripts/check_served_fields.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: '  !!  advertised_flagged_undeclared_is_a_defect'
+    why: >-
+      D-2989: with the guard inert, a field the payload publishes while a register that owns its truth calls it
+      defective is reported as OK - an agent reads a fabricated measurement and the rail says the surface is clean.
+      That is the BUG-511 family by construction, and the control asserts it is refused.
+
+  - id: the_owner_word_vocabulary_guard_is_load_bearing
+    subject: scripts/check_served_fields.py
+    op: replace
+    find: '    if word in vocabulary:'
+    replace: '    if True:  # MUTATION (D-2676): any word at all is accepted as an owner word'
+    runner: scripts/check_served_fields.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: '  !!  a_word_outside_the_vocabulary_is_refused'
+    why: >-
+      T-101/D-2989: the re-anchor sheet once accepted keep/replace/drop/add - tokens NO reader implemented - and the
+      owner was left guessing what to write. With this guard inert, a word outside the declared vocabulary is
+      accepted and the decision it was supposed to license is read as if it were ratified. The control names the
+      refusal, so the day the vocabulary stops being enforced the gate says so.
+
+  - id: the_feedback_absence_guard_is_load_bearing
+    subject: pipeline/feedback.py
+    op: replace
+    find: "    if n == 0:\n        return None"
+    replace: "    if n == 0:\n        return 0.0  # MUTATION (D-2676): an empty ledger reports 0.0 instead of ABSENT"
+    runner: scripts/check_feedback_parity.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: '  !!  an_empty_ledger_is_absent_not_zero'
+    why: >-
+      D-2957/D-2989: 'nobody has rated this FB' and 'rated 0.0' are different facts, and the aggregate is the only
+      place that decides which one the store holds. With the absence branch inert, every un-rated FB reads as
+      maximally bad - and because the serving path multiplies by (1.0 + score), a store migrated through this
+      mutant would rank the entire corpus as discredited. The control names the absence.
+
+  - id: the_receipt_module_count_rerecord_is_load_bearing
+    subject: scripts/check_config_defaults.py
+    op: replace
+    find: '    return recorded if recorded != files else -1'
+    replace: '    return -1  # MUTATION (D-2676): a measured receipt field is never re-recorded'
+    runner: scripts/check_config_defaults.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: '  !!  a receipt whose MODULE count moved is STALE and must be re-recordable by the rail (D-2989)'
+    why: >-
+      D-2989/D-2642: the receipt carries a MEASURED module count that the paired contract compares, and the only
+      re-record path used to be a CEILING change - so the measurement could go stale with no act able to refresh it
+      (the D-2981 shape: a measurement with no writer). With the guard inert the drift is invisible again, the
+      receipt silently disagrees with the tree, and the contract's failure would look like a test problem rather
+      than a stale measurement. The control names the staleness.

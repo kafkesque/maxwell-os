@@ -132,7 +132,7 @@ derivations:
   column: feedback_score
   kind: derived_regenerable
   home: pipeline/feedback.py::_update_fb_aggregates
-  parity_rail: null
+  parity_rail: scripts/check_feedback_parity.py   # D-2989: the ledger->cache parity rail this row lacked (D-2642)
   status: declared_but_empty
   note: >-
     MEASURED 2026-09-25: 0 of 7995 rows populated; the writer is never called by any run. A column declared but

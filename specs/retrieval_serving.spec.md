@@ -84,6 +84,11 @@ its test module; history lives in git plus the D-number that changed it.
 - The MCP payload still EXPOSES borp_score / feedback_score (retired/derived fields). Changing an
   MCP output schema is a contract change and needs its own decision; it is named here so it is a
   declared residual rather than a blindspot.
+  **D-2989 (2026-10-13): the residual now has a HOME and a RAIL.** The disposition of every advertised store field
+  is declared in `config/served_fields.yaml` (the owner word, the enforced vocabulary, the shrink-only ceiling) and
+  re-measured on every ladder run by `scripts/check_served_fields.py` (rc 2 = the owner word is owed, rc 1 = an
+  UNDECLARED advert or a stale declaration). The payload's promise is now: a published field is TRUE or DECLARED —
+  `specs/served_fields.spec.md` is the paired contract.
 
 ## Open items recorded by this spec (so they are not blindspots)
 1. The MCP query_knowledge payload advertises borp_score (retired constant) — awaiting an

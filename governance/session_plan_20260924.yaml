@@ -172,6 +172,10 @@ may_touch:
 - governance/canonical_relabel_review_20261014.csv
 - governance/canonical_relabel_review_segments_20261014.csv
 - governance/relabel_plan_20261014.md
+- governance/BORP_FEEDBACK_ASSESSMENT_20261013.md
+- governance/OWNER_DECISION_T107_20261013.md
+- governance/decisions_mint_D2989.yaml
+- governance/SESSION-HANDOFF-20261013-D2989.md
 will_not_touch:
 - governance/F11_*
 - governance/ANCHOR_RULER_CONSOLIDATED_*.csv
@@ -917,3 +921,17 @@ widening_log:
   may_touch_untouched: false
   will_not_touch_untouched: true
   why: 'One NAMED artifact (BUG-548/BUG-563: never a glob). The applier writes exactly two things when --apply is given: the named declaration in config/taxonomy.yaml (a surgical two-line splice, asserted both ways) and this plan. config/taxonomy.yaml is granted, and no other config byte moved - MEASURED: menu_hash cc800a32... and the answer space c1f7895e... byte-identical before and after.'
+- date: '2026-10-13'
+  actor: assistant
+  owner_ack: 'owner instruction 2026-10-13 ("what were the original concept behind BORP and lead for drop besides there are no current infrastructure/logic behind it? DONT drop till I dont clear explanation and if it can be revitalized with real scoring logic and feedback score keep how will exactly works and how will it be scored how will the logic will look like gave an stier senior system engineer recommendation for both" + the standing rule: go forward on the strategically most consequential act, provide infrastructure AND file for every manual task, forensic audit before any serious implementation, then gov dependencies synch and update)'
+  addendum: 'D-2989/T-107 - the ARCHAEOLOGY the owner demanded plus the rail that turns his one word into a config edit. The instrumentation is additive (no store write, no payload change: the payload and the two export surfaces are untouched because that contract change is the owner word T-107 still owes). Paths under config/, scripts/, tests/, specs/, pipeline/ and the faces were already granted; the three governance artifacts of the act are NAMED below because governance/*.md is NOT a may_touch pattern (BUG-548/BUG-563: a record is not a rule).'
+  additions:
+  - pattern: governance/BORP_FEEDBACK_ASSESSMENT_20261013.md
+    why: 'D-2989/T-107 - the EVIDENCE the owner asked for: BORP recovered from the repo''s own history (the v2 check_borp formula), the lead for the drop (producer deleted, formula degenerate on the admitted population, a false absence read as a VALUE by SQL and as ABSENT by Python in one function), the revitalization that already exists (ISOR, D2284/D2309), and the measurement tables. This is the file the OWNER LANE''s answer cites.'
+  - pattern: governance/OWNER_DECISION_T107_20261013.md
+    why: 'D-2989/T-107 - the SHEET: three rows (borp_score, feedback_score, classification_status), the FIVE enforced tokens, and the exact commands - nothing else for the owner to write. The tokens it offers are the ones config/served_fields.yaml#owner_word ENFORCES and the rail refuses by name.'
+  - pattern: governance/decisions_mint_D2989.yaml
+    why: 'D-2989 - the mint record: the defect, the owner''s challenge answered by archaeology, the mechanism, the measurement of record, the residuals and the files. A mint is evidence, so it is a named artifact rather than a pattern.'
+  may_touch_untouched: false
+  will_not_touch_untouched: true
+  why: 'No widening was needed: the two new config files sit inside config/*.yaml, the two new rails inside scripts/*.py, the paired spec/test inside specs/*.md and tests/*.py, the assessment + owner sheet + handoff inside governance/*.md, and pipeline/feedback.py is an existing file. The append-only journals (governance/r5_*jsonl, governance/MUTATION_JOURNAL.jsonl) are written BY their rails, and the faces (DECISION-LOG.md, MASTER-TASK-REGISTER.md, governance/buglog.md, agent/session_seed.yaml) are re-cut by gov_sync.py, the ONE writer D-2981 declares.'

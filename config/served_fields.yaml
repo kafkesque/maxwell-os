@@ -1,0 +1,142 @@
+# config/served_fields.yaml — THE ONE HOME of the fact "this field is advertised to an agent, and this is its disposition".
+#
+# WHY (the class, not the instances). A serving surface that publishes a store field is making a CLAIM about the
+# store. Nothing joined the claim to the registers that already own its truth, so an agent could be told a
+# fabricated measurement and every rail stayed green. MEASURED 2026-10-13: the MCP payload advertises 20 fields that
+# name `fbs` columns, and THREE of them are flagged as defective by a register that already owns the fact
+# (`config/derivations.yaml` — home + status, D-2646; `config/store_columns.yaml` — role + status, D-2960):
+#     borp_score           derivations dead_but_read            store_columns status debt   (constant 0.0, nothing writes it)
+#     feedback_score       derivations declared_but_empty       store_columns role reserved (NULL on every row; ledger exists)
+#     classification_status derivations orphan_magic_threshold  store_columns status debt   (constant 'CLEAN')
+# The rail (scripts/check_served_fields.py) re-measures that join on every ladder run. It does NOT re-census the
+# store: the two registers are the oracle, so this file cannot become a second truth about the same column (C12).
+#
+# THE RULE. A field the payload advertises that a register flags as defective MUST carry a DECLARATION here with the
+# owner word that closes it. Undeclared = DEFECT (the BUG-511 family: a value nothing writes, presented as a
+# measurement). Declared but no longer advertised = DEFECT (an assertion whose subject is gone — BUG-488/D-405). A
+# word outside the declared vocabulary, or a word with no anchor, = DEFECT, fail closed (T-101 lesson). A field
+# whose debt is SOURCE-owned (a content field the store-shape register already counts) is DECLARED once in
+# `acknowledged` and owes no owner word. Debt = the declared-and-still-advertised count. The ceiling is SHRINK-ONLY
+# (D-2644): the only act that may raise it is a DECISION. MEASURED at birth (2026-10-13): 3 owner-word rows
+# (borp_score, feedback_score, classification_status) + 2 source-owned rows (application, jargon), 0 undeclared.
+schema_version: '1'
+authority: D-2989
+decisions: [D-2537, D-2979, D-2980, D-2989]
+subjects: [T-107]
+assessment: governance/BORP_FEEDBACK_ASSESSMENT_20261013.md   # the EVIDENCE; this file is the RULE
+
+#: The surfaces whose advertised store fields are governed. A file, never a glob (C12): adding a surface is a
+#: visible edit. `kind: dict_keys` = the advertised fields are the string keys of the dicts in that file's AST, so
+#: the scan cannot be satisfied by a comment or a docstring.
+surfaces:
+  - file: maxwell_mcp_server.py
+    kind: dict_keys
+    why: >-
+      the MCP serving surface (C25 agent-agnostic): query_knowledge, get_fb and the trust-metrics block all publish
+      `fbs` columns to agents. D-2980 declared the payload exposure of borp_score/feedback_score as a deliberate,
+      owner-gated residual; this file is that decision's home.
+  - file: pipeline/stage6_okf_export.py
+    kind: string_mentions
+    why: >-
+      OWED (T-107): the OKF export emits `borp_score: 0.0` as a trust line, so the fabricated value LEAVES the
+      machine. Named here so the change-set cannot move the payload and leave the export publishing it (BUG-767).
+  - file: pipeline/stage6b_anytype_push.py
+    kind: dict_keys
+    why: >-
+      OWED (T-107): the Anytype push writes borp_score into the external knowledge store. Same change-set, same
+      reason as the OKF export (BUG-767).
+
+#: The store the claim is about. The population is DECLARED (stated, not implied) so the measured number is
+#: reproducible; it is read from pipeline.pipeline_paths, never restated as a literal (D-2881/D-2644).
+store:
+  path_from: pipeline.pipeline_paths::DB_PATH
+  table: fbs
+  population:
+    run_from: pipeline.pipeline_paths::CANONICAL_RUN
+    status: PASS
+  columns_from: 'PRAGMA table_info(fbs)'
+
+#: The registers that ALREADY own the truth about a column. This rail is a JOIN, not a census.
+registers:
+  derived: config/derivations.yaml
+  shape: config/store_columns.yaml
+flagged_status:
+  derived: [dead_but_read, declared_but_empty, orphan_magic_threshold]
+  shape: [debt]
+
+#: The declared disposition of every flagged field that is advertised. `word` is the OWNER WORD (T-107); `anchor` is
+#: the owner's signature (required as soon as the word leaves `pending` — T-101: an unsigned decision is not a rule).
+declared:
+  - field: borp_score
+    word: pending
+    anchor: ''
+    owed: T-107
+    recommendation: 'retire + promote corroboration'
+    why: >-
+      constant 0.0 on 7,640/7,640 rows and nothing writes it; the ratio it inherited is degenerate by construction
+      (min(distinct/2,1.0) with the pass bar at distinct>=2 is exactly 1.0 on every admitted row); still published to
+      agents and to two export surfaces as a trust metric, where it reads as "no corroboration" on rows that are
+      `strong`. FOUR reasons of record: producer deleted (S5 check_borp -> S1.5), degenerate formula, false absence
+      read two ways in ONE function (SQL COALESCE 0.0 vs Python `or 0.5`), no home and no parity rail.
+      The healthy signal already exists: `isor` (D2284/D2309, 6,591 rows) — see promotions.
+  - field: feedback_score
+    word: pending
+    anchor: ''
+    owed: T-107
+    recommendation: keep-and-declare
+    why: >-
+      NULL on 7,640/7,640 rows, but the LEDGER (fb_feedback) and the WRITER (pipeline/feedback.py::
+      _update_fb_aggregates) both exist and the serving path already ranks on it through a declared prior. The
+      defect is not the null, it is the AMBIGUITY: a bare null cannot be told from "score 0.0 = useless". Keep the
+      field and make its absence explicit ({score, count, state, prior, effective}).
+  - field: classification_status
+    word: pending
+    anchor: ''
+    owed: T-107
+    recommendation: keep-and-repair
+    why: >-
+      constant 'CLEAN' on 4,503/4,503 PASS rows while the store's own `status` column QUARANTINEs 2,972 rows and the
+      register that owns the column calls it a FALSE status (config/store_columns.yaml `status: debt`), with a
+      derived-value home that is an orphan carrying a magic threshold (config/derivations.yaml
+      `orphan_magic_threshold`). Two statuses on one row is the D-2987 defect on the wire: an agent reads 'CLEAN'
+      and cannot see the quarantine.
+
+#: A `promote <field>` word needs a target with a NAMED home. The rail asserts the home EXISTS (file + symbol), so a
+#: promotion can never name a home that is only a hope.
+promotions:
+  corroboration:
+    home: pipeline/schema_accessor.py::isor_score
+    inputs: ['fbs.source_ids (D2185, canonical works)', 'fbs.is_convergent', 'fbs.source_diversity']
+    shape: '{sources: int, convergent: bool, independence: weak|medium|strong, independence_score: 0.0-1.0, home: str}'
+    measured: 'fbs.isor is populated on 6,591 of 7,640 rows (weak 5,212 / medium 969 / strong 410) and on 4,503 of 4,503 PASS rows'
+
+#: A flagged advertised field whose debt is SOURCE-owned (a data-shape repair the store's own register already
+#: counts) owes no OWNER WORD: the payload publishes the FB's own text, not a judgment about it, and the repair is a
+#: writer fix, not a contract change. MEASURED 2026-10-13: the OKF export publishes `application` (blank on 1 of
+#: 7,640 rows) and `jargon` (blank on 2,091) — both CONTENT fields, both owned by the store-shape register's ceiling.
+#: Naming them here is what distinguishes "declared, owned elsewhere" from a field nobody has looked at: an
+#: UNDECLARED advert is a DEFECT. The rail checks both directions — an acknowledgement whose field is no longer
+#: advertised is an assertion (DEFECT_STALE).
+acknowledged:
+  - field: application
+    owned_by: 'config/store_columns.yaml#ceiling (role: value, status: debt)'
+    why: >-
+      published as the FB's own text by the OKF export while the store-shape register measures it blank on 1 of
+      7,640 rows. A partially-written CONTENT field is a writer repair, not a payload contract change.
+  - field: jargon
+    owned_by: 'config/store_columns.yaml#ceiling (role: value, status: debt)'
+    why: >-
+      published as the FB's own text by the OKF export and the Anytype push while the shape register measures it
+      blank on 2,091 of 7,640 rows (5,868 distinct). Same disposition as `application`: repair at source.
+
+#: THE OWNER WORD. This block declares the vocabulary and the state; the words themselves live on the `declared`
+#: rows above (ONE home per field — a second copy of the same word here would be a rival truth).
+owner_word:
+  decision: T-107
+  vocabulary: [retire, keep, keep-and-declare, keep-and-repair, 'promote <field>']
+  state: pending            # pending | granted
+  sheet: governance/OWNER_DECISION_T107_20261013.md
+
+coverage:
+  max_declared_debt: 3      # CEILING — SHRINK-ONLY. The only act that may RAISE it is a DECISION (D-2644).
+  min_declared_debt: 0      # FLOOR — the state this file exists to reach: every advertised field is true.

@@ -141,21 +141,25 @@ tasks:
   mover: owner
   title: 'MCP payload decision — borp_score / feedback_score are still advertised to agents'
   why: >-
-    MEASURED, and the two fields are NOT the same defect - which is why one of them must be KEPT. borp_score is
-    DEAD-but-READ: the column is not-null on every row with exactly ONE distinct value, and config/derivations.yaml
-    registers it home: null / parity_rail: null / status: dead_but_read - so an agent is handed a constant that
-    reads as "score zero", never as "no such signal". feedback_score is the OPPOSITE shape and must NOT be dropped:
-    it is populated on NO row, while the same registry names a WRITER for it (home:
-    pipeline/feedback.py::_update_fb_aggregates) with status declared_but_empty - it is UNPOPULATED, not retired,
-    and the serving path already ranks on it through a declared neutral prior. Dropping it would delete the
-    contract for a signal the feedback primitive is meant to populate and would make re-adding it a breaking
-    change for every agent.
-    RECOMMENDATION (the owner's one word): DROP borp_score from the payload; KEEP feedback_score and make its
-    ABSENCE explicit (null plus a declared state, and move the neutral prior out of the SQL into config, C12),
-    giving it the parity rail its registry row still lacks.
-  source: [D-2980, D-2537, specs/retrieval_serving.spec.md, config/derivations.yaml]
-  evidence: 'fbs census joined to config/derivations.yaml: borp_score one distinct value on every row (dead_but_read) vs feedback_score carrying no value on any row while its writer home exists (declared_but_empty) (2026-10-13)'
-  gate: 'owner word on the payload schema'
+    THE OWNER'S CHALLENGE WAS RIGHT AND THE FIRST RECOMMENDATION WAS WRONG — so it was re-MEASURED, not repeated.
+    (a) BORP's original concept is the BOOK OF RECORD PRINCIPLE ("at least two independent sources for
+    convergence"), implemented in the v2 module as `check_borp`, whose ratio `min(distinct / min_sources, 1.0)` has
+    its pass bar AT the minimum — i.e. it is a CONSTANT on every admitted row: a boolean wearing a ratio's name,
+    never a score. (b) The SCORE died because its producer was DELETED at S5 on the argument that the guarantee had
+    moved to S1.5, and because the ranking repair (D-2979/D-2980) repointed its last live reader — leaving a column
+    that nothing writes, that SQL reads as a VALUE and Python reads as ABSENT inside one function, and that three
+    outward surfaces still PUBLISH. (c) The PRINCIPLE is alive and UNDER-SERVED: the S1.5 gate only covers the
+    CLUSTER route, so the singleton route reached the store unguarded — the measurement is in BUG-768. (d) The REAL
+    scoring logic already EXISTS and is persisted: ISOR (D2284/D2309) over canonical source_ids (D2185) computes an
+    INDEPENDENCE measure (author independence x domain diversity x source count) with a strong/medium/weak rating,
+    and NO surface advertises it. RECOMMENDATION, corrected: RETIRE `borp_score` from every served surface and
+    PROMOTE `corroboration` (the ISOR block) in its place; KEEP `feedback_score` — it is a CACHE whose LEDGER and
+    writer exist, and its defect is that a bare null cannot be told from a score of 0.0, not that it is dead. The
+    owner word, the ENFORCED vocabulary and the dispositions live in config/served_fields.yaml; the evidence is
+    governance/BORP_FEEDBACK_ASSESSMENT_20261013.md; the sheet is governance/OWNER_DECISION_T107_20261013.md.
+  source: [BUG-767, BUG-768, D-2989, D-2537, D-2979, D-2980, D-2284, D-2309, D-2185, D-2957]
+  evidence: 'scripts/check_served_fields.py rc=2 (53 advertised store fields joined, 3 declared-absent advertised = borp_score/feedback_score/classification_status, 2 source-owned acknowledged = application/jargon, 0 undeclared) + the isor distribution and the status x is_convergent x source_ids table in governance/BORP_FEEDBACK_ASSESSMENT_20261013.md (2026-10-13)'
+  gate: 'one owner word per advertised field in config/served_fields.yaml#declared (retire | keep | keep-and-declare | keep-and-repair | promote <field>) plus the anchor'
 - id: T-108
   priority: SHOULD
   state: open
@@ -343,3 +347,19 @@ tasks:
   source: [BUG-749, D-2977, D-2988, D-2974]
   evidence: 'plan render ESCALATE 72 unit(s) / 311 row(s) and the reference sheet governance/canonical_relabel_review_20261014.md (2026-10-13)'
   gate: 'one owner word per unit on the reference sheet (CONFIRM / CORRECT + home / ABSTAIN / LEAVE)'
+- id: T-118
+  priority: MUST
+  state: open
+  mover: owner
+  title: 'the SINGLE-SOURCE trust tier — what the system may SAY about a row the Book of Record Principle does not cover'
+  why: >-
+    D-2989 measured the principle against the SERVED population and it is a MINORITY, because the corpus is admitted
+    through two routes and only the CLUSTER route passes the at-least-two-source gate the deleted S5 check used to
+    assert per row: the singleton route reaches the store with ONE source work and nothing re-asserts the principle.
+    That makes the question a POLICY ruling, not a schema edit — no agent may decide what the system is allowed to
+    SAY about its own evidence (D-2898). Three dispositions, one word: serve such a row but declare its tier on
+    every answer; withhold it from the default answer path; or accept single-source rows as first-class and say so
+    in the mission. The counts and the distribution live in the assessment and in the rail's own run, never here.
+  source: [BUG-768, D-2989, D-2120, D-2830]
+  evidence: 'governance/BORP_FEEDBACK_ASSESSMENT_20261013.md §2.3 (status x is_convergent x source_ids) and the fbs.isor rating distribution (2026-10-13)'
+  gate: 'one word: tier | withhold | leave'

@@ -8,19 +8,20 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1116 decisions (census stamp 414471ebb87c5774, 2026-10-13) · 530 bugs (185 open / 345 closed; highest OPEN = BUG-766) · 14 open tasks (MUST 3 / SHOULD 8 / WORTH 3; OWNER-moved 3, pipeline-moved 11; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1117 decisions (census stamp 1950b61b7076a8da, 2026-10-13) · 533 bugs (187 open / 346 closed; highest OPEN = BUG-768) · 15 open tasks (MUST 4 / SHOULD 8 / WORTH 3; OWNER-moved 4, pipeline-moved 11; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **67** of 1116 — 🔴 open 32 · 🔵 proposed 14 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 565 · ⚖ ratified 133 | closed: ✅ resolved 316 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1116, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **67** of 1117 — 🔴 open 32 · 🔵 proposed 14 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 565 · ⚖ ratified 133 | closed: ✅ resolved 317 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1117, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 185 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 22 · 🟨 MED 39 · 🟩 LOW 19 · UNLABELLED 101 (BUG-757) of 185 open.
+> Open BUGS by severity (population = the census's 187 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 24 · 🟨 MED 39 · 🟩 LOW 19 · UNLABELLED 101 (BUG-757) of 187 open.
 >
-> **OWNER LANE (3) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
+> **OWNER LANE (4) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
 > | T-101 | 🔴 MUST | HARDEN THE RETRIEVAL GOLDEN SET (the gate is saturated) | owner-signed anchors for the new queries |
 > | T-117 | 🔴 MUST | BUG-749 residual — the ESCALATE surface: the units NO owner ruling reaches | one owner word per unit on the reference sheet (CONFIRM / CORRECT + ho |
-> | T-107 | 🟠 SHOULD | MCP payload decision — borp_score / feedback_score are still advertised to agents | owner word on the payload schema |
+> | T-118 | 🔴 MUST | the SINGLE-SOURCE trust tier — what the system may SAY about a row the Book of Record Principle does not cover | one word: tier | withhold | leave |
+> | T-107 | 🟠 SHOULD | MCP payload decision — borp_score / feedback_score are still advertised to agents | one owner word per advertised field in config/served_fields.yaml#decla |
 >
 > **PIPELINE LANE (11) — what the agent will do next, in strategic-consequential order (source: config/task_register.yaml):**
 >
@@ -71,6 +72,8 @@
 
 | Bug | Date | Issue |
 |---|---|---|
+| BUG-768 | 2026-10-13 | **The Book of Record Principle is satisfied by a MINORITY of the SERVED corpus, and the check that would have flagged it was DELETED on the argument that the guarantee had moved upstream — where only ONE of the two admission routes passes.** S5's `check_borp` was removed ("BORP guarantee now provided by S1.5"), but S1.5's >=2-source gate applies to the CLUSTER route only: singletons reach the store with ONE source work and nothing re-asserts the principle per row. MEASURED: 938 of 4,503 `status='PASS'` rows are convergent (20.8%); 5,198 of 6,591 verified rows carry one source. FIX: the per-row measurement on the wire (T-107, `isor`) + an OWNER POLICY word on what may be served as corroborated (T-118). |
+| BUG-767 | 2026-10-13 | **A RETIRED trust metric still LEAVES the machine.** `borp_score` is a constant `0.0` that NOTHING writes, yet it is published by the MCP payload (agent-facing) AND written into the OKF export and the Anytype push — three outward surfaces carrying a fabricated measurement, where an agent or a future reader reads `0.0` as "no corroboration" on rows that are in fact `strong`. It is also read as a VALUE by SQL and as ABSENT by Python inside ONE function (D-2957). FIX: retire it from every surface in ONE change-set and promote the real signal (`isor`, D2284/D2309) in its place (T-107). |
 | BUG-702 | 2026-10-10 | **S5 `practicality` metadata is STORED but NOT SERVED as a first-class retrieval facet. Verified 2026-10-10: `practicality` is 100% populated in v9 (6,591/6,591: `immediately-applicable`=5,092, `context-dependent`=1,499) and IS returned in retrieve.py JSON output (SELECT *), but retrieve.py has NO `--practicality` filter flag (grep of add_argument list confirms only keyword/fts/vector/hybrid/agentic/graph-aware/domain/discipline/macro/depth/discipline-raw/domains-raw/status/limit). Consequence: the "20-sec practical applicability" signal cannot drive retrieval routing or skill-orchestration gating — a downstream consumer cannot ask "give me only immediately-applicable principles for scaffolding". FIX: add `--practicality` (choices immediately-applicable/context-dependent) to retrieve.py CLI + `_practicality_clause()` alongside discipline_macro/raw facet clauses.** | |
 | BUG-703 | 2026-10-10 | **190/6,591 v9 rows (2.9%) have EMPTY `discipline_raw` while canonical `discipline` is populated and `discipline_source`=`llm_extracted_from_source`. Verified: `SELECT discipline_source, COUNT(*), SUM(CASE WHEN discipline_raw IS NULL OR discipline_raw='' THEN 1 ELSE 0 END) FROM fbs WHERE taxonomy_version='v9' GROUP BY discipline_source` → all 6,591 rows are llm_extracted_from_source, 190 have empty discipline_raw. Consequence: the D2537 `--discipline-raw` surgical facet silently drops these 190 rows (invisible to raw-label routing), and raw-vs-canonical provenance is incomplete for them. Root cause likely S4 merge: raw label blanked during canonical projection while canonical landed. FIX: backfill discipline_raw from S4 checkpoint for the 190 ids, or relax the raw facet to fall back to canonical when raw is empty.** | |
 | BUG-700 | 2026-10-10 | **Cross-generation entity identity gap — ROOT CAUSE of the dual-generation store. `fb_id` is run-derived (hash of run-local name+content+taxonomy, NOT source-derived); `duplicate_of` has no writer (0 rows in every generation); stage6_commit appends by fb_id with no stable key / ON CONFLICT / supersede step. Re-running the SAME corpus (891 v5.1 vs 883 v9 source docs, 723 shared) under taxonomy v9 produced TWO un-reconciled generations in fbs (7,855 t11@v5.1 + 6,591 rechunk@v9), 0 fb_id overlap, only 444 name overlap (v9 reworded). stage1_chunk SHA-256 dedup is segment-level and stage1_5 cluster-before-extract is within-run, so re-chunking silently misses. D-2881/BUG-691 masked this at the SERVING layer (canonical_run filter) but the store is still physically dual-generation. FIX (design, not built): stable content-derived identity = hash(normalized name + source_ids), taxonomy-independent; stage6 INSERT..ON CONFLICT(identity) DO UPDATE with `superseded_by`; reconcile step marks prior-generation rows on new-generation landing.** | |
@@ -12426,7 +12429,6 @@ this queue will grow).
 
 
 ## BUG-766 (MED - OPEN 2026-10-13) - the store-columns register holds TWO defects the ladder has been RED on: 6 columns declare `outside: absent` (NULL) while 1049 sidecar rows carry a NON-NULL blank, and one measurement the licensed write moved stayed recorded as its old value
-
 FOUND WHILE LANDING D-2988 (the honest cascade of a store write, not a side effect: the write moved a measured
 number and the register that declares it still claimed the old one).
 
@@ -13022,3 +13024,92 @@ decisions did not exist. If the owner rules they collapse, the change is ONE lin
 severity_tokens are declared but their buckets are not), and the census still carries three states that are
 declared with a value of 0 (`stale`, `revoked`, `abandoned`) whose WRITERS are not named - a state that no
 writer can produce is a declaration without a producer (C19's shape one layer up).
+
+---
+
+## BUG-767 (HIGH - OPEN 2026-10-13) - the RETIRED trust metric still leaves the machine, published to agents and written into two exports
+
+FOUND WHILE ANSWERING THE OWNER'S T-107 CHALLENGE ("what were the original concept behind BORP and lead for drop
+besides there are no current infrastructure/logic behind it?") - the archaeology, the measurement and the
+recommendation are `governance/BORP_FEEDBACK_ASSESSMENT_20261013.md`.
+
+THE DEFECT, three layers deep. (1) `fbs.borp_score` is **non-null `0.0` on every row and NOTHING writes it**:
+`pipeline/stage6_commit.py:910` default-injects `fb.get("borp_score", 0.0)` for every row, so the column holds a
+value that no producer ever computed (the BUG-511 family: a value nothing writes, presented as a measurement).
+(2) Its producer was DELETED - `pipeline/stage5_verify.py:20` records *"DELETED (dead checks): BORP (S1.5
+guarantees >=2 sources)"* - and the formula it inherited was DEGENERATE ON THE ADMITTED POPULATION: the v2
+`check_borp` (git `c95f7ff:pipeline/stage5_verify.py:105-115`) computed `min(distinct / BORP_MIN_SOURCES, 1.0)`
+with the pass bar AT that minimum, so every admitted FB scores exactly 1.0. It was never a score - a boolean
+wearing a ratio's name. (3) The stored `0.0` is a FALSE ABSENCE with TWO READINGS inside ONE function:
+`pipeline/retrieve.py` reads it as a VALUE in SQL (`COALESCE(borp_score, 0.5)` -> 0.0, which is why any
+`ORDER BY borp_score` degenerates to rowid order - the F-40/BUG-710/INV-3 defect) and as ABSENT in Python
+(`fb.get("borp_score", 0.5) or 0.5` -> 0.5). MEASURED 2026-10-13 on the live store: `sqlite3 -> 0.0 | 0.5`,
+`python -> 0.5 | 0.5`.
+
+WHY IT STILL MATTERS (the outward harm). The value LEAVES the machine as a trust metric:
+`pipeline/stage6_okf_export.py:128-130` emits `borp_score: 0.0` as an OKF line,
+`pipeline/stage6b_anytype_push.py:336,466` pushes it into the external Anytype store, `pipeline/run_monitor.py:162`
+averages it into run metrics (`avg_borp_score`), and `maxwell_mcp_server.py:136,:195,:246` publishes it to agents
+in three payloads (`query_knowledge`, `get_fb`, the trust-metrics block). A reader therefore learns "no
+corroboration" about rows the same store measures as `strong` with up to 21 source works.
+
+FIX: retire `borp_score` from every served surface in ONE change-set (the payload, the OKF export, the Anytype
+push, the diagnostics), make the retired column SQL NULL so the absence is TRUE (D-2957), and PROMOTE the real
+signal `isor` (D2284/D2309) under the name `corroboration`. OWNER-GATED: T-107 carries the word; the rail
+`scripts/check_served_fields.py` (D-2989) reports the field as declared-absent-advertised at rc 2 until the
+change-set lands, and REFUSES a half-move (a declaration without the code edit, or a code edit without the
+declaration - BUG-548).
+
+## BUG-768 (HIGH - OPEN 2026-10-13) - BORP is satisfied by a MINORITY of the served corpus: the deleted per-row check left the SINGLETON route unguarded
+
+THE MEASUREMENT (store `knowledge pipeline/maxwell.db`, the only committed run `rechunk-v4-20260929`, 2026-10-13):
+
+```
+status        is_convergent    rows     of which >=2 canonical source works
+PASS               0           3,565            0
+PASS               1             938          938
+QUARANTINE         0           2,682            0
+QUARANTINE         1             455          455
+```
+
+`is_convergent = 1` is EXACTLY the set with `json_array_length(source_ids) >= 2` (1,393 rows - an identity, not a
+correlation). So the SERVED population (`status='PASS'`) satisfies the Book of Record Principle on 938 of 4,503
+rows = **20.8%**, and 5,198 of the 6,591 verified rows carry ONE source work. The secondary signal agrees: the
+persisted ISOR ratings are weak 5,212 / medium 969 / strong 410 (NULL 1,049 = the D-2590 sidecar tier).
+
+ROOT CAUSE. `check_borp` was deleted at S5 on the argument that "the guarantee moved to S1.5". It did - for the
+CLUSTER route only (`S15_MIN_SOURCE_DIVERSITY = 2`). The SINGLETON route (35,239 singletons at S1.5, by
+construction one source) never passes through that gate, and once the per-row check was gone nothing re-asserted
+the principle: the rows that could never satisfy it were the exact rows the deleted check existed to flag. This is
+the BUG-511/BUG-492 class one level up - a guard removed because "the property is structural now", where the
+structure covers only one of two admission routes.
+
+CONSEQUENCE. The pipeline's own stated key principle ("BORP: >=2 independent sources for convergence") is TRUE of
+the corpus it was built on and TRUE of only a fifth of what it SERVES, while the payload advertises a metric named
+after that principle whose value is a dead constant (BUG-767). Neither the pipeline nor the owner could see this:
+the metric that would have shown it was the one that died.
+
+FIX (two acts, one owner word). (1) T-107 puts the REAL measurement on the wire (`corroboration` from `isor`:
+sources / convergent / independence / independence_score), so the gap is visible to every consumer of the store.
+(2) T-118 asks the OWNER the policy question no agent may answer (D-2898): may a single-source row be served as if
+corroborated, must it carry a declared tier on every answer, or must it stay out of the default answer path? A
+repair that silently re-generated or re-gated those rows would change what the corpus SAYS, which is a ruling.
+
+## BUG-769 (MED - FIXED 2026-10-13 by D-2989) - a MEASURED receipt field the paired contract compares had no re-record act
+
+FOUND BY FIXING SOMETHING ELSE (the honest cascade of adding two modules under the census scan roots, not a side
+effect: the new files moved a number the receipt declares).
+
+THE DEFECT. `config/config_defaults_census.json` records `counts.modules`, and
+`tests/test_config_defaults_census_spec.py::test_the_receipt_equals_the_measurement` asserts that the receipt EQUALS
+a fresh measurement. But `scripts/check_config_defaults.py` rewrote the receipt only on a CEILING change
+(`if changed or paid:`), and a coverage change goes through `--rebaseline`. MEASURED 2026-10-13: adding two
+`scripts/*.py` moved the count 553 -> 556 while every key, site and ceiling stayed put - so the rail reported `ok`
+and the CONTRACT failed, with no act able to refresh the receipt: a hand edit is forbidden (D-2642) and a rebaseline
+is not a coverage change. That is the D-2981 shape one field over: **a measurement with no writer.**
+
+FIXED IN THE SAME ACT. `receipt_module_drift(receipt, files)` (a pure helper) + a `--record` path that re-records
+the receipt when the module count is stale (the ceilings are untouched, and the print names both numbers), one new
+known-answer control (the rail is now 15/15) and one mutation lock (`the_receipt_module_count_rerecord_is_load_bearing`,
+floor 46 -> 47, SEEN to red). MEASURED after the fix: `--record` re-recorded `counts.modules` 553 -> 556 with the
+ceilings unchanged at `{shadowed_declared: 300, undeclared: 3}`, and the paired contract is 10/10 green.

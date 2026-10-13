@@ -1,0 +1,88 @@
+# Mint record — D-2989 (T-107): an ADVERTISED field is a CLAIM
+- id: D-2989
+  date: '2026-10-13'
+  state: RESOLVED
+  category: GOVERNANCE / INSTRUMENT
+  title: >-
+    An advertised field is a CLAIM. Every store field a serving surface publishes is either TRUE or DECLARED with an
+    owned word - and the owner's T-107 challenge is answered by measurement, not by preference: BORP's principle is
+    ALIVE and UNDER-SERVED, its score is a degenerate fossil, and the real corroboration signal already exists
+  bugs: [BUG-767, BUG-768]
+  decision: >-
+    THE DEFECT. A serving surface that publishes a store column makes a claim about the store, and NOTHING joined
+    that claim to the registers that already own the column's truth (`config/derivations.yaml` — home + status,
+    D-2646; `config/store_columns.yaml` — role + status, D-2960). MEASURED: the MCP payload publishes 20 fields that
+    name `fbs` columns; joined across three surfaces the advertisement covers 53 store fields, of which THREE are
+    flagged by a register that owns the fact and still published to agents (`borp_score` dead_but_read + debt,
+    `feedback_score` declared_but_empty, `classification_status` orphan_magic_threshold + debt), and two more carry a
+    SOURCE-owned debt (`application`, `jargon`). Behind the dead metric sat the larger finding: the principle the
+    metric is named after is satisfied by 20.8% of the served corpus (BUG-768) — the deleted S5 `check_borp`
+    re-asserted it per row and the S1.5 gate it was replaced by covers only the CLUSTER route, so the SINGLETON
+    route holds one source work per row and nothing flags it.
+    THE OWNER'S CHALLENGE, ANSWERED BY ARCHAEOLOGY (not by repetition). "What was the original concept behind BORP,
+    and what is the lead for dropping it besides there being no infrastructure?" — BORP is the BOOK OF RECORD
+    PRINCIPLE, "at least two independent sources for convergence" (governance/master_evaluation_prompt.md); its v2
+    implementation (git `c95f7ff:pipeline/stage5_verify.py:105`) computed `min(distinct / BORP_MIN_SOURCES, 1.0)`
+    with the pass bar AT that minimum, i.e. a CONSTANT 1.0 on every admitted row — a boolean wearing a ratio's name,
+    never a score. The lead for the drop is therefore not "no logic": it is that the FORMULA was information-free on
+    the admitted population, the PRODUCER was deleted at S5, the last live READER was repointed by the ranking repair
+    (D-2979/D-2980), and the stored `0.0` is a FALSE ABSENCE that SQL reads as a value and Python reads as absence
+    inside ONE function — while three outward surfaces still publish it as a trust metric (BUG-767).
+    THE REVITALIZATION THE OWNER ASKED ABOUT ALREADY EXISTS. ISOR (D2284, canonicalized by D2309 over the D2185
+    source_ids) computes INDEPENDENCE, not count: author independence x domain diversity x source count, with a
+    strong/medium/weak rating, persisted on 6,591 rows and advertised by NOTHING. So the recommendation is: RETIRE
+    `borp_score` from every served surface and PROMOTE `corroboration` (the ISOR block) in its place; KEEP
+    `feedback_score`, because it is a CACHE whose LEDGER (`fb_feedback`) and writer exist and its defect is the
+    AMBIGUITY of a bare null (which an agent cannot tell from a score of 0.0), not its absence.
+    THE SHAPE (one sentence). ONE home declares the disposition of every advertised store field
+    (`config/served_fields.yaml`: the owner word, the enforced vocabulary, the source-owned acknowledgements and a
+    SHRINK-ONLY ceiling), ONE rail re-measures the join on every ladder run (`scripts/check_served_fields.py`), and
+    one paired spec writes the rule before the rail is believed.
+    THE MECHANISM (each landed, none promised). (i) The advertisement is read from the AST of each declared surface
+    (`dict_keys` / `string_mentions`) and INTERSECTED with `PRAGMA table_info(fbs)` — a key that names a store
+    column is a claim; a comment can never satisfy the scan. (ii) The flag is READ from the two registers, never
+    re-derived: this rail is a JOIN, and a second census of one fact is the defect those registers exist to prevent
+    (C12/D-2642). (iii) The owner word is ENFORCED — `retire | keep | keep-and-declare | keep-and-repair |
+    promote <field>` — and a non-pending word without an `anchor` is refused, because the T-101 lesson is that a
+    vocabulary with no reader leaves the owner guessing and a signature nothing reads is not a signature. (iv) A
+    declaration is joined to its subject in BOTH directions: an undeclared advert is a DEFECT (BUG-511), and a
+    declaration whose field no longer appears is a DEFECT (an assertion, BUG-488/D-405). (v) The feedback CACHE is
+    given the parity rail D-2642 was missing: the formula moves into ONE home
+    (`pipeline/feedback.py::declared_aggregate`, imported by the writer AND the rail), the thresholds move out of
+    the code into `config/feedback.yaml` read FAIL-CLOSED (BUG-504 class), the absence is declared as NULL + count 0
+    (D-2957), and `get_fb_feedback_stats` gains the tri-state a failed read owed (C16: an error could previously be
+    read as "this FB is fine"). (vi) THREE mutation locks (D-2676) and a paired spec/test (D-2978): INV-1..INV-9,
+    16/16 green.
+    MEASUREMENT OF RECORD (one instrument, before and after). The rail at birth: 53 advertised fields joined, 48
+    advertised-and-true, 2 source-owned acknowledged, 3 declared-absent advertised (ceiling 3, floor 0), 0
+    undeclared, 0 stale → rc 2 (the OWNER LANE's word, loud and not fatal — BUG-457). The parity rail: 6/6 controls,
+    the ledger's DECLARED absence reported as such. The mutation gate: 45 rules SEEN to red through their own
+    control including the three new locks, 1 negative control green, 23 declared subjects covered.
+    RESIDUALS (declared, not implied). The three owner words are PENDING (T-107); the serving neutral prior is still
+    a literal in four places inside one `retrieve.py` function (owed to the same change-set); `isor` is advertised by
+    no surface yet; the single-source TIER question is T-118 (an owner policy ruling, because it changes what the
+    corpus may SAY); and the BUG axis still has no severity partition (T-104/BUG-757).
+  evidence: >-
+    scripts/check_served_fields.py rc=2 with 53 fields joined / 3 declared-absent / 2 acknowledged / 0 undeclared /
+    0 stale, and 10/10 known-answer controls · scripts/check_feedback_parity.py 6/6 controls, live rc 0 with the
+    ledger's declared absence · governance/BORP_FEEDBACK_ASSESSMENT_20261013.md (the archaeology, the formulas, the
+    status x is_convergent x source_ids table and the isor distribution) · governance/buglog.md BUG-767 + BUG-768 ·
+    the mutation gate: 45 rules SEEN to red incl. the three D-2989 locks, 1 negative control green · the R5 gate
+    receipt (syntax/lint/C11-C12 + reviewer) · the paired contract tests/test_served_fields_spec.py 16/16 (2026-10-13)
+  files:
+    - config/served_fields.yaml
+    - config/feedback.yaml
+    - config/rail_mutations.yaml
+    - config/rail_registry.yaml
+    - config/task_register.yaml
+    - scripts/check_served_fields.py
+    - scripts/check_feedback_parity.py
+    - pipeline/feedback.py
+    - specs/served_fields.spec.md
+    - specs/retrieval_serving.spec.md
+    - specs/README.md
+    - tests/test_served_fields_spec.py
+    - justfile
+    - governance/BORP_FEEDBACK_ASSESSMENT_20261013.md
+    - governance/OWNER_DECISION_T107_20261013.md
+    - governance/SESSION-HANDOFF-20261013-D2989.md

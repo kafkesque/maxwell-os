@@ -2,7 +2,15 @@
 """
 feedback.py — Agent utilization feedback system (D2130 self-improvement loop).
 ================================================================================
-Authority: D2130, C8 (Generator≠Verifier), C16 (no silent errors)
+Authority: D2130, C8 (Generator≠Verifier), C16 (no silent errors), C12/D-2989 (the policy has ONE home)
+
+TWO LAYERS, ONE HOME EACH (D-2642/D-2989):
+  * the LEDGER `fb_feedback` is the TRUTH — an event record, one row per (FB, agent, task) rating;
+  * the CACHE `fbs.feedback_score` / `fbs.feedback_count` is a DENORMALIZATION of that ledger, declared
+    `derived_regenerable` in config/derivations.yaml and reproduced by scripts/check_feedback_parity.py.
+The loop's numeric policy (thresholds, the neutral prior, the aggregate formula, the rounding) lives in
+config/feedback.yaml and is read FAIL-CLOSED: a missing key raises, because a code default would move the value out
+of the config where no review can see it (C12/D-2644, the BUG-504 class).
 
 Records agent/human feedback on FB quality after utilization. Accumulated
 ratings feed back into:
@@ -20,27 +28,88 @@ Usage:
     stats = get_fb_feedback_stats("FB-123")
     if stats["needs_retirement"]:
         print(f"FB-123 should be retired: avg rating {stats['avg_rating']:.2f}")
+
+    # `stats["state"]` is the tri-state an agent must branch on (D-2989): 'measured' | 'no_feedback' | 'unmeasured'.
+    # A failed read is NEVER reported as a healthy FB (C16).
 """
 
 from __future__ import annotations
 
 import json
 import sqlite3
+from collections.abc import Sequence
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import Any
 
-if TYPE_CHECKING:
-    pass
+import yaml
 
 from pipeline.pipeline_paths import DB_PATH
 
 FEEDBACK_TABLE: str = "fb_feedback"
 
-# ── Thresholds (from config would be ideal per C12, but feedback is new) ──
-RETIREMENT_THRESHOLD: float = 0.3  # avg rating below this → flag for retirement
-RETIREMENT_MIN_FEEDBACKS: int = 5  # need at least N ratings before retirement consideration
-BOOST_THRESHOLD: float = 0.8  # avg rating above this → boost in retrieval ranking
+#: The ONE home of the loop's numeric policy (C12/D-2644). Read fail-closed on demand and memoized: a missing key is
+#: an ERROR, never a silent code default - the BUG-504 class, where a fallback moves the effective value out of
+#: config and into code, where no review can see it. The thresholds used to live HERE as literals.
+POLICY_PATH: Path = Path(__file__).resolve().parent.parent / "config" / "feedback.yaml"
+_POLICY_DOC: dict[str, Any] | None = None
+
+
+def policy_doc() -> dict[str, Any]:
+    """The declared feedback policy (config/feedback.yaml). Memoized; the FILE is the authority, not this module."""
+    global _POLICY_DOC
+    if _POLICY_DOC is None:
+        with open(POLICY_PATH, encoding="utf-8") as fh:
+            _POLICY_DOC = yaml.safe_load(fh) or {}
+    return _POLICY_DOC
+
+
+def declared(path: str) -> Any:
+    """Read one declared policy value by dotted path. Fail-closed: there is no default, ever (C12/D-2644).
+
+    Args:
+        path: a dotted path into config/feedback.yaml, e.g. 'thresholds.retirement.min_feedback'.
+
+    Returns:
+        The declared value.
+
+    Raises:
+        KeyError: the key is not declared - a policy value with no home is undeclared.
+    """
+    node: Any = policy_doc()
+    for part in path.split("."):
+        if not isinstance(node, dict) or part not in node:
+            raise KeyError(
+                f"config/feedback.yaml declares no {path!r} - a policy value with no home is undeclared (C12);"
+                " this read is fail-closed (C16) rather than falling back to a literal in code"
+            )
+        node = node[part]
+    return node
+
+
+def declared_aggregate(ratings: Sequence[float], policy: dict[str, Any] | None = None) -> float | None:
+    """THE aggregate formula - the ONE home that the writer AND the parity rail import (D-2642/D-2989).
+
+    effective = (n*mean + k*prior) / (n + k), rounded to the declared precision. With `prior_weight` 0 the formula
+    IS the plain mean, so the declared default reproduces the historical behaviour byte for byte while the shrink is
+    ONE config key away (C27: no future tax).
+
+    Args:
+        ratings: the ledger's ratings for one FB.
+        policy: an override document (the parity rail's known-answer controls drive it without touching the file).
+
+    Returns:
+        The rounded aggregate, or None when the ledger holds no event - ABSENCE, never 0.0 (D-2957).
+    """
+    pol: dict[str, Any] = policy if policy is not None else policy_doc()
+    agg: dict[str, Any] = pol["aggregate"]
+    n: int = len(ratings)
+    if n == 0:
+        return None
+    mean: float = sum(float(r) for r in ratings) / n
+    weight: float = float(agg["prior_weight"])
+    prior: float = float(agg["prior"])
+    return round((n * mean + weight * prior) / (n + weight), int(agg["rounding"]))
 
 
 def _ensure_feedback_table(conn: sqlite3.Connection) -> None:
@@ -127,22 +196,31 @@ def record_feedback(
 
 
 def _update_fb_aggregates(conn: sqlite3.Connection, fb_id: str) -> None:
-    """Recalculate and update aggregated feedback scores on the FB row."""
-    row = conn.execute(
-        f"""SELECT AVG(rating), COUNT(*)
-            FROM {FEEDBACK_TABLE}
-            WHERE fb_id = ?""",
-        (fb_id,),
-    ).fetchone()
+    """Recompute the CACHE (`fbs.feedback_score` / `feedback_count`) from the LEDGER through the declared formula.
 
-    if row and row[0] is not None:
-        conn.execute(
-            """UPDATE fbs SET
-                feedback_score = ?,
-                feedback_count = ?
-            WHERE fb_id = ?""",
-            (round(row[0], 3), row[1], fb_id),
-        )
+    The ledger is the home; this column is a denormalization, so the parity rail can always reproduce it
+    (scripts/check_feedback_parity.py). An EMPTY ledger writes nothing: the absence stays ABSENT (NULL), never 0.0,
+    because a stored 0.0 cannot be told from "rated maximally bad" (D-2957).
+
+    Args:
+        conn: an open connection inside the caller's transaction.
+        fb_id: the FB whose aggregate is refreshed.
+    """
+    ratings: list[float] = [
+        float(row[0])
+        for row in conn.execute(f"SELECT rating FROM {FEEDBACK_TABLE} WHERE fb_id = ?", (fb_id,))
+        if row[0] is not None
+    ]
+    score: float | None = declared_aggregate(ratings)
+    if score is None:
+        return
+    conn.execute(
+        """UPDATE fbs SET
+            feedback_score = ?,
+            feedback_count = ?
+        WHERE fb_id = ?""",
+        (score, len(ratings), fb_id),
+    )
 
 
 def get_fb_feedback_stats(fb_id: str, db_path: Path | None = None) -> dict:
@@ -176,6 +254,7 @@ def get_fb_feedback_stats(fb_id: str, db_path: Path | None = None) -> dict:
             return {
                 "avg_rating": None,
                 "count": 0,
+                "state": "no_feedback",   # D-2989: an absent score is DECLARED, never an implied 0.0
                 "needs_retirement": False,
                 "needs_boost": False,
                 "correctness_rate": None,
@@ -185,19 +264,26 @@ def get_fb_feedback_stats(fb_id: str, db_path: Path | None = None) -> dict:
 
         avg = row["avg_rating"]
         count = row["count"]
+        rounding: int = int(declared("aggregate.rounding"))
 
         return {
-            "avg_rating": round(avg, 3),
+            "avg_rating": round(avg, rounding),
             "count": count,
-            "needs_retirement": count >= RETIREMENT_MIN_FEEDBACKS and avg < RETIREMENT_THRESHOLD,
-            "needs_boost": count >= 3 and avg >= BOOST_THRESHOLD,
-            "correctness_rate": round(row["correctness_rate"], 3) if row["correctness_rate"] else None,
-            "actionability_rate": round(row["actionability_rate"], 3) if row["actionability_rate"] else None,
-            "timeliness_rate": round(row["timeliness_rate"], 3) if row["timeliness_rate"] else None,
+            "state": "measured",
+            "needs_retirement": count >= int(declared("thresholds.retirement.min_feedback"))
+            and avg < float(declared("thresholds.retirement.max_avg")),
+            "needs_boost": count >= int(declared("thresholds.boost.min_feedback"))
+            and avg >= float(declared("thresholds.boost.min_avg")),
+            "correctness_rate": round(row["correctness_rate"], rounding) if row["correctness_rate"] else None,
+            "actionability_rate": round(row["actionability_rate"], rounding) if row["actionability_rate"] else None,
+            "timeliness_rate": round(row["timeliness_rate"], rounding) if row["timeliness_rate"] else None,
         }
     except Exception as e:
         print(f"⚠️  Feedback stats query failed for {fb_id}: {e}")
-        return {"avg_rating": None, "count": 0, "needs_retirement": False, "needs_boost": False,
+        # C16/D-2989: a FAILED read is not a healthy verdict. Returning `needs_retirement: False` here would let an
+        # error read as "this FB is fine" for every downstream consumer (the error-leak class). The tri-state says
+        # what is true: the value was never measured.
+        return {"avg_rating": None, "count": 0, "state": "unmeasured", "needs_retirement": None, "needs_boost": None,
                 "correctness_rate": None, "actionability_rate": None, "timeliness_rate": None,
                 "error": str(e)}
 
@@ -217,7 +303,7 @@ def get_retirement_candidates(db_path: Path | None = None) -> list[dict]:
                 WHERE feedback_count >= ?
                   AND feedback_score < ?
                 ORDER BY feedback_score ASC""",
-            (RETIREMENT_MIN_FEEDBACKS, RETIREMENT_THRESHOLD),
+            (int(declared("thresholds.retirement.min_feedback")), float(declared("thresholds.retirement.max_avg"))),
         ).fetchall()
 
         conn.close()

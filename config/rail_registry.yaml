@@ -141,6 +141,17 @@ guards:
   scripts/check_governance_faces.py: fatal
   scripts/check_governance_faces.py --selftest: fatal
   scripts/gov_sync.py --selftest: fatal
+  #: D-2989: the advertised-field rail's EXIT CODE IS ITS VERDICT, so its class is pinned. 2 = the OWNER WORD is
+  #: owed (T-107: borp_score / feedback_score / classification_status are published by three surfaces while a
+  #: register that owns their truth calls them defective) - loud and NOT fatal, because an owner-gated contract
+  #: change may not abort the ladder (BUG-457); 1 = an UNDECLARED advert or a stale declaration, which is FATAL
+  #: because that is the class where an agent reads a fabricated measurement with nothing naming the debt.
+  scripts/check_served_fields.py: tri_state
+  scripts/check_served_fields.py --selftest: fatal
+  #: D-2989/D-2642: the ledger<->cache parity rail. FATAL: a stored aggregate that no longer equals what its ledger
+  #: recomputes is a WRONG VALUE, not a debt - nothing about it is the owner's to decide.
+  scripts/check_feedback_parity.py: fatal
+  scripts/check_feedback_parity.py --selftest: fatal
 
 #: The COMMIT BOUNDARY (BUG-564). A dormancy claim says WHICH file exercises a rail; it cannot say the file still
 #: DOES. This hook lives OUTSIDE the synced tree (BUG-500) - it is not in git, so no diff, no review and no backup

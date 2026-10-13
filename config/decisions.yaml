@@ -22590,3 +22590,63 @@ decisions:
     REMOVED, never --record''ed - D-2649/BUG-533 - which also repaired a move left by D-2971''s own prose) and MEASUREMENT-DRIFT
     0. verify_handoffs --check rc=0: 6 declared path(s), 13 digest(s), 3 revision(s); just health-full: 8 fault(s),
     all pre-existing and none in this class.'
+- id: D-2973
+  state: RESOLVED
+  category: GOVERNANCE / RAILS / MENU IDENTITY
+  date: '2026-10-13'
+  title: 'BUG-747: the menu-widening gate is REPAIRED to the ANSWER-SPACE identity and WIRED at last - a rail that
+    could not fire, whose verdict keyed on a composite a ratified decision had already declared HISTORICAL - and
+    the standing reconcile reds are cleared with the stale forward citation REMOVED, never re-pointed'
+  bugs:
+  - BUG-747
+  files:
+  - scripts/check_menu_reclass_gate.py
+  - justfile
+  - config/decisions_policy.yaml
+  - config/reconciliation.yaml
+  - governance/buglog.md
+  decision: 'FOUND (BUG-747) by the standing reconcile red on reach - "1 uninvoked check script(s) exceeds the declared
+    debt_max 0 - the list is SHRINK-ONLY (BUG-482)" - agreeing with check_rail_registry''s "(i) a rail NOTHING RUNS:
+    scripts/check_menu_reclass_gate.py ... declared dormant nowhere". MEASURED 2026-10-13, two defects, neither
+    visible from any green line. (i) IT COULD NOT FIRE: the gate (D-2894, BUG-693 step 4) appears in NO ladder recipe,
+    so from the day it was written it was a control that could not fire (BUG-492/D-355). (ii) ITS IDENTITY CONTRADICTED
+    A RATIFIED RULE: the verdict keyed on the COMPOSITE menu_hash, which the registry declares HISTORICAL (config/menu_axis_hashes.yaml#note;
+    D-285/D-321/D-371/D-NEW-1) - wording moves the composite, the ANSWER SPACE does not, and taxonomy_version advances
+    only when the answer space moves. MEASURED: live composite cc800a32... (closed_menu_v10, D-2928) vs the canonical
+    rows'' be3235433e... (v9), answer space v9 on BOTH sides. D-2928 (owner-approved, RATIFIED) recorded what follows
+    and REFUSED the remedy this rail demanded - rewriting the frozen provenance "would falsify history" (I2/D-2896)
+    - so wiring it as written would have carried a refused doctrine into the ladder''s verdict, and its own message
+    ("re-classification pass MANDATORY") IS that falsifying act. A SECOND MISREAD, same pass: the canonical run''s
+    1,049 sidecar rows carry the DECLARED absence stamp (menu_hash=NOT_APPLICABLE; D-2942/D-2970/BUG-737) because
+    NO MENU WAS EVER RUN for those roles, and the gate read the declaration as a STALE HASH demanding a re-classification
+    of rows no classifier ever touched. The declared no-claim set IS exactly that cohort (config/serving_gate.yaml#content_types_without_factual_claim:
+    process_template 774 + process_instance 157 + tool_instruction 93 + growth_edge 25 = 1,049), so the subject
+    split is DERIVED, not guessed. FIX: the rail is REPAIRED to the ratified identity and WIRED into justfile health
+    (--selftest || exit 1, then the tri-state check || [ $? -eq 2 ]). SUBJECT: a row whose role carries no factual
+    claim is OUTSIDE the gate''s subject, read through pipeline.serving_gate.content_types_without_factual_claim()
+    - the ONE home, which fails closed on a missing key (C16), because an empty set would silently re-subject 1,049
+    rows. RED: the recorded taxonomy_version differs from the live one, i.e. the ANSWER SPACE moved, so a re-classification
+    pass is MANDATORY - the only arm that may block the canonical run (the BUG-693 root cause, v5.6 -> v9). OWED:
+    version equal, composite different, i.e. WORDING moved (D-2928/D-371) - the labels are not invalidated, the
+    frozen composite is HISTORICAL and never rewritten, and the open act is the owner-gated AUDIT of the re-scope''s
+    affected cohort (D-2905 class); rc 2, LOUD, NOT fatal. The exit map lives in ONE place (EXIT_FOR), --report
+    stays informational, and the DB is opened read-only (BUG-660: a rail built to REPORT can never become a rail
+    that repairs what it reports). THE OTHER STANDING RECONCILE RED, cleared in the same act: the declared forward
+    citation config/recalibration_pins.yaml:decision=D-2663 was STALE - the r2_meter pin was re-minted to D-2963
+    (RESOLVED) and the composite moved again under D-2928 - so it is REMOVED from config/decisions_policy.yaml#pinned_forward_citations
+    with the measured reason, never re-pointed (BUG-542: a declaration that outlives its subject fails the rail,
+    and re-pointing would ratify a citation the file no longer carries); the shrink is stated in that file''s measured
+    prose and in config/reconciliation.yaml#entries.decision_citations_in_force. EVIDENCE: the gate''s --selftest
+    fires 13/13 known-answer controls (fresh GREEN; an ANSWER-SPACE move RED even when the composite MATCHES; a
+    wording-only move OWED and never MANDATORY; the declared-absence cohort OWED and never RED; unstamped OWED;
+    the tri-state exit map; the derived set cannot collapse to empty); the LIVE gate prints OWD for both canonical
+    cohorts and exits 2; check_rail_registry.py reports 0 faults (126 ladder invocations / 81 rails, was 124/80);
+    reconcile.py --check returns 0 - "70 citation site(s) all name a decision IN FORCE; 3 declared forward reference(s)
+    still owed" and "reach: 0 uninvoked of 126 reachable check script(s)"; pre_commit_gate C11+C12 green (639 scanned
+    files); ruff clean on the changed file. R5: gemma-4-E4B-it-MLX-4bit reviewed the DIFF (governance/r5_reviews.jsonl,
+    sha256_16 ba63c771) and returned APPROVE with no findings - recorded as WEAK evidence (BUG-736: "no findings"
+    is the reviewer''s uninformative mode), never as approval of the change. CENSUS HYGIENE (D-2649/BUG-533): the
+    repaired rail is a genuine new READER of the content_type column, so content_type.mentions moved 124 -> 125
+    - LOUD and OWED, deliberately NOT re-recorded (a blanket --record re-stamps unrelated stale rulers); two INCIDENTAL
+    moves the same docstring caused (consequence, definition) were repaired by REWORDING the prose - the register
+    is not edited to agree with the code, the code stops making the claim.'

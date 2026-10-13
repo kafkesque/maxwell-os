@@ -12012,3 +12012,56 @@ words moved `context` and `evidence`; both were REMOVED from the wording rather 
 prose edit is not a store act) - which also repaired a move D-2971's own prose had left behind. Rail: census moves
 0, MEASUREMENT-DRIFT 0. This is the D-2972 doctrine applied to itself: the register is not edited to agree with the
 code, the code stops making the claim.
+
+## BUG-747 (MED - CLOSED 2026-10-13) - the menu-widening gate was NEVER WIRED, and its identity was the COMPOSITE a ratified decision had already declared HISTORICAL (D-2973)
+
+FOUND by the standing reconcile red `reach: 1 uninvoked check script(s) exceeds the declared debt_max 0 - the list is
+SHRINK-ONLY (BUG-482)`, which agreed with `check_rail_registry.py`'s `(i) a rail NOTHING RUNS:
+scripts/check_menu_reclass_gate.py is invoked by no declared ladder recipe and is declared dormant nowhere`.
+
+**MEASURED 2026-10-13 - two defects, neither visible from any green line.**
+  (i)  **IT COULD NOT FIRE.** `scripts/check_menu_reclass_gate.py` (D-2894, BUG-693 step 4) appears in NO ladder
+       recipe: reach measured `1 uninvoked of 125 reachable check script(s)` against a declared debt_max of 0, so
+       from the day it was written it was a control that could not fire (BUG-492/D-355).
+  (ii) **ITS IDENTITY CONTRADICTED A RATIFIED RULE.** The verdict keyed on the COMPOSITE menu_hash, which the
+       registry declares HISTORICAL (config/menu_axis_hashes.yaml#note; D-285/D-321/D-371/D-NEW-1): wording moves
+       the composite, the ANSWER SPACE does not, and taxonomy_version advances only when the answer space moves.
+       MEASURED: live composite cc800a32... (closed_menu_v10, D-2928) vs the canonical rows' be3235433e... (v9), with
+       the answer space v9 on BOTH sides. D-2928 (owner-approved, RATIFIED) recorded what follows and REFUSED the
+       remedy this rail demanded: `rewriting [the frozen provenance] would falsify history` (I2/D-2896). Wired as
+       written, the rail would have carried a refused doctrine into the ladder's verdict - and its own message
+       (`re-classification pass MANDATORY`) IS that falsifying act.
+
+**A SECOND MISREAD, measured in the same pass.** The canonical run's 1,049 sidecar rows carry the DECLARED absence
+stamp (menu_hash=NOT_APPLICABLE; D-2942/D-2970/BUG-737) because NO MENU WAS EVER RUN for those roles, and the gate
+read that declaration as a STALE HASH demanding a re-classification of rows no classifier ever touched. The declared
+no-claim set is EXACTLY that cohort (config/serving_gate.yaml#content_types_without_factual_claim: process_template
+774 + process_instance 157 + tool_instruction 93 + growth_edge 25 = 1,049), so the subject split is DERIVED, not
+guessed.
+
+**FIX (D-2973): the rail is REPAIRED to the ratified identity and WIRED** (justfile `health`, selftest + tri-state).
+  * SUBJECT - a row whose role carries no factual claim is OUTSIDE the gate's subject, read through
+    `pipeline.serving_gate.content_types_without_factual_claim()` (the ONE home, which fails closed on a missing key).
+  * RED     - the recorded taxonomy_version differs from the live one: the ANSWER SPACE moved, so a re-classification
+    pass is MANDATORY. The ONLY arm that may block the canonical run.
+  * OWED    - version equal, composite different: WORDING moved (D-2928/D-371). The labels are not invalidated, the
+    frozen composite is HISTORICAL and never rewritten, and the open act is the owner-gated AUDIT of the re-scope's
+    affected cohort (D-2905 class). rc 2 - LOUD, NOT fatal.
+  * the exit map lives in ONE place (EXIT_FOR), --report stays informational, and the DB is opened read-only.
+
+**EVIDENCE.** `--selftest` 13/13 known-answer controls fire (fresh GREEN | an answer-space move RED even when the
+composite MATCHES | a wording-only move OWED and never MANDATORY | the declared-absence cohort OWED and never RED |
+unstamped OWED | the tri-state exit map | the derived set cannot collapse to empty). The LIVE gate prints `OWD` for
+both canonical cohorts and exits 2. `check_rail_registry.py` now reports 0 faults (126 ladder invocations / 81 rails,
+was 124/80), and reconcile reports `reach: 0 uninvoked of 126` and `70 citation site(s) all name a decision IN
+FORCE` - the two standing reconcile reds are CLEARED, not waived.
+
+**R5.** gemma-4-E4B-it-MLX-4bit reviewed the DIFF (governance/r5_reviews.jsonl, sha256_16 ba63c771) and returned
+APPROVE with no findings - recorded as WEAK evidence (BUG-736: "no findings" is the reviewer's uninformative mode),
+never as approval of the change.
+
+**CENSUS HYGIENE (D-2649/BUG-533).** The repaired rail is a genuine new READER of the content_type column, so
+content_type.mentions moved 124 -> 125: LOUD, OWED, and deliberately NOT re-recorded (a blanket `--record`
+re-stamps unrelated stale rulers, and a census move is recorded only when that is the intended act). Two INCIDENTAL
+moves the same docstring caused (consequence, definition) were repaired by REWORDING the prose - the register is not
+edited to agree with the code; the code stops making the claim.

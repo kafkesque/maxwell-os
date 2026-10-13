@@ -64,6 +64,8 @@ health:
     python3 scripts/check_serving_gate.py || [ $? -eq 2 ]        # D274a CI invariant over every stored row: 1 defect | 2 owner-owed label/status ontology (BUG-499), loud NOT fatal
     python3 scripts/check_label_provenance.py --selftest || exit 1   # the BUG-497 boundary classifier's known-answer controls
     python3 scripts/check_label_provenance.py || exit 1   # BUG-497/D-2640: a row OUTSIDE the declared boundary without the R1 stamp is a DEFECT - a broken stamp must not hide behind the boundary
+    python3 scripts/check_menu_reclass_gate.py --selftest || exit 1   # BUG-747/BUG-492: the menu-identity gate's arms must be SEEN to fire (a control nothing runs is a comment)
+    python3 scripts/check_menu_reclass_gate.py || [ $? -eq 2 ]        # D-2894/D-2928/BUG-693: a run's menu identity is the ANSWER SPACE (D-371); 2 = OWNER-OWED (a wording-only composite move owes the AUDIT, never a provenance rewrite)
     # ^ this comment was found DISPLACED onto the check_config_defaults line on 2026-09-26 (three comments on one
     #   line after a merge): a comment that documents another rail is a declaration with the wrong home (D-2649).
     python3 scripts/check_s5_score_axis.py --selftest || exit 1   # BUG-502: the score axis' known-answer controls

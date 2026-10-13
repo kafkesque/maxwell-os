@@ -120,12 +120,17 @@ graph:
   - config/evidence_floors.yaml:decided=D-403
   - config/handoffs.yaml:decided=D-403
   - config/instrument_controls.yaml:decided=D-400
-  - config/recalibration_pins.yaml:decision=D-2663
   pinned_forward_citations_measured: >-
     MEASURED 2026-09-27 (BUG-575): 4 of the 59 config citation sites name a decision that is not in force, and
     each is the AUTHORING AUTHORITY of a live config file. They are DECLARED forward references, not
     exemptions: the honest remedy is a visible, reasoned declaration a rail reads and can shrink - NOT the
     owner silently ratifying four decisions that no ruling has in fact made.
+    SHRUNK 2026-10-13 (D-2973, BUG-542): the fourth declaration (config/recalibration_pins.yaml:decision=D-2663)
+    no longer names any site - the r2_meter pin was re-minted to D-2963 (state RESOLVED) and the composite moved
+    again under D-2928 - so it is REMOVED, never re-pointed: a declaration that outlives its subject fails the
+    rail (BUG-542), and re-pointing would ratify a citation the file no longer carries. 3 declared forward
+    references remain, and MEASURED the same day: 0 of the 70 live config citation sites rest on a decision
+    that is not in force.
 
 # What counts as LIVE code. governance/** and archive/** are deliberately NOT scanned: those files are the
 # archaeology, and a rail that forbids writing down what was abandoned would delete the only evidence that it

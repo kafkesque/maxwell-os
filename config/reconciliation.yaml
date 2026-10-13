@@ -92,6 +92,9 @@ entries:
       a LIVE config file, so they are DECLARED forward references in the policy's ONE home (visible, reasoned,
       shrink-only) rather than silent exemptions. The same check fails closed on a state word the policy
       classifies neither in force nor not in force, so a new state cannot enter unread.
+      SHRUNK 2026-10-13 (D-2973): the D-2663 declaration is GONE - the site it protected was re-minted to D-2963
+      (D-2928), so the declared set is 3, and that day 0 of the 70 citation sites rested on a decision not in
+      force. A declaration whose subject has moved is REMOVED, never re-pointed (BUG-542).
 
   - id: decision_registry_wellformed
     declares: config/decisions.yaml#decisions

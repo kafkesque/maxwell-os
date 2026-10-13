@@ -165,3 +165,20 @@ tasks:
   source: [D-2981, BUG-588, D-2692]
   evidence: 'scripts/gov_sync.py --check (byte-compares the block)'
   gate: none
+- id: T-112
+  priority: SHOULD
+  state: open
+  title: >-
+    PERF - the SERVED path loads the cross-encoder per PROCESS, so short-lived callers pay a cold-start of
+    minutes while the long-lived MCP server pays it once
+  why: >-
+    D-2724 adopted vector+rerank as the default, and retrieval.dispatch returns the reranker on the default
+    query path. An MCP server is long-lived, so it amortises the model load; a CLI invocation, a smoke test or
+    a script that calls the dispatcher pays it EVERY time. Measured symptom, 2026-10-13: the suite rail's
+    runtime rose past the session window once the dispatcher became the CLI default (a pytest process was still
+    running at 210s where the same rail completed in ~100-200s earlier that day). The defect is not the model,
+    it is the ABSENCE of a declared warm path and of a measurement: no rail reports model-load seconds, so a
+    caller cannot tell a cold start from a slow query.
+  source: [D-2724, D-2980, BUG-710]
+  evidence: 'suite rail runtime 100-200s -> >210s after the dispatcher became the CLI default (2026-10-13)'
+  gate: none

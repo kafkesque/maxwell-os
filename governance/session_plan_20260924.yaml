@@ -173,6 +173,7 @@ may_touch:
 - governance/canonical_relabel_review_segments_20261014.csv
 - governance/relabel_plan_20261014.md
 - governance/BORP_FEEDBACK_ASSESSMENT_20261013.md
+- governance/BORP_REVITALIZATION_RISK_20261013.md
 - governance/OWNER_DECISION_T107_20261013.md
 - governance/decisions_mint_D2989.yaml
 - governance/SESSION-HANDOFF-20261013-D2989.md
@@ -935,3 +936,19 @@ widening_log:
   may_touch_untouched: false
   will_not_touch_untouched: true
   why: 'No widening was needed: the two new config files sit inside config/*.yaml, the two new rails inside scripts/*.py, the paired spec/test inside specs/*.md and tests/*.py, the assessment + owner sheet + handoff inside governance/*.md, and pipeline/feedback.py is an existing file. The append-only journals (governance/r5_*jsonl, governance/MUTATION_JOURNAL.jsonl) are written BY their rails, and the faces (DECISION-LOG.md, MASTER-TASK-REGISTER.md, governance/buglog.md, agent/session_seed.yaml) are re-cut by gov_sync.py, the ONE writer D-2981 declares.'
+- date: '2026-10-13'
+  actor: assistant
+  owner_ack: 'owner instruction 2026-10-13 ("does BORP revitalization carry any risk, threat, can cause any cascade issue, leak, contamination, hidden error, failure issue (do we have any history with it previously) ... revitalize but hardening (are there any existing similar proven grounded solution that can be adapted), or is it too risky or else" + "if your feedback score recommendation is reliable and futureproof (verifiable) I approve" + the T-101 reviewed sheet attached + the standing rule)'
+  addendum: 'D-2990 (BORP hardening) + D-2991 (an anchor is a SET) + the granted T-107 word for feedback_score. The instrumentation is additive: NO store write, NO payload change (the two export surfaces and the MCP payload stay untouched because that contract change is the borp_score word T-107 still owes), and NO behaviour change in the benchmark until the owner rules the anchor-set word. Paths under config/, scripts/, tests/, specs/, pipeline/ and the faces were already granted; the governance artifacts of the act are NAMED below because governance/*.md is NOT a may_touch pattern (BUG-548/BUG-563: a record is not a rule).'
+  additions:
+  - pattern: governance/BORP_REVITALIZATION_RISK_20261013.md
+    why: 'D-2990 - the RISK ANSWER the owner asked for: the three objects (principle/measure/surface), the R1..R8 risk register with in-repo history, the measurement that shows the count is coarser than the measure we hold, the hardening design (declare-not-gate, one measure, measure the independence AXIS), the VERIFIED external precedents to adapt, and T-119''s collapse-delta plan with its falsifier.'
+  - pattern: governance/decisions_mint_D2990.yaml
+    why: 'D-2990 - the mint record for the BORP ruling (state RESOLVED): the question, the three-object separation, the risk register, the measurement of record, the two prohibitions and the residuals.'
+  - pattern: governance/decisions_mint_D2991.yaml
+    why: 'D-2991 - the mint record for the anchor-set decision: the owner''s SET reading judged correct, the applier''s one-anchor limit retired to a DECLARED mode, the measured before/after that shows the instrument now separates the legs, and the self-referential-pool residual.'
+  - pattern: governance/SESSION-HANDOFF-20261013-D2990.md
+    why: 'D-2990/D-2991 - the act record: the leverage call, the two owner questions answered, the measurements, the forensic audit and the next critical step.'
+  may_touch_untouched: false
+  will_not_touch_untouched: true
+  why: 'No widening was needed: config/*.yaml (pipeline_config, task_register, served_fields, rail_registry), scripts/*.py (reanchor_retrieval_goldens), specs/** (retrieval_goldens.spec.md), tests/** (the paired contract), justfile, governance/golden_reanchor_* (the instructions and the reviewed sheet) and governance/golden_reanchor_candidates_20261011.reviewed.csv all sit inside existing grants. temp/golden_proposed_v5.yaml is the read-only PROJECTION of the review and lives in the gitignored temp/. The append-only journals (governance/r5_*.jsonl, governance/MUTATION_JOURNAL.jsonl) are written BY their rails, and the faces (DECISION-LOG.md, MASTER-TASK-REGISTER.md, governance/buglog.md, agent/session_seed.yaml) are re-cut by gov_sync.py, the ONE writer D-2981 declares.'

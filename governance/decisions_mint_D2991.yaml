@@ -1,0 +1,76 @@
+# Mint record — D-2991 (T-101): an anchor is a SET, and which one is DECLARED
+- id: D-2991
+  date: '2026-10-13'
+  state: RESOLVED
+  category: GOVERNANCE / INSTRUMENT
+  title: >-
+    A golden query's expected answer is a SET, and the multiplicity is a DECLARED mode — never a limit hardcoded in
+    the tool and never INFERRED from the sheet. The owner's 120 anchor marks were RIGHT; the applier's
+    "exactly ONE" was a rule the format and the harness never had
+  bugs: [BUG-770, BUG-771]
+  decision: >-
+    THE DEFECT (two layers). (1) The reviewed-sheet JUDGMENT existed TWICE: `_check_reviewed` and `_apply_reviewed`
+    each carried their own copy of the multi-anchor refusal, the owner-signature rule and the unreviewed-query rule,
+    so the pre-flight the owner runs BEFORE a 150-cell sitting could disagree with the writer it predicts (the
+    D-2642 class - one rule, two homes - applied to a CONTROL). (2) Both copies hardcoded "exactly ONE anchor per
+    query", while the ledger they feed has no such limit: `config/golden/retrieval_queries.yaml` stores
+    `expected_names` as a LIST, `pipeline/golden.py::resolve_golden_anchors` resolves EVERY entry, and
+    `pipeline/retrieval_benchmark.py::_recall_at_k` computes `hits / len(expected)` — MICRO over the set. So a
+    MARKED SET makes the ruler STRICTER, never looser, which is exactly T-101's purpose: a saturated metric cannot
+    gate an improvement.
+    THE MEASUREMENT (the owner's review read as a SET; read-only, 2026-10-13, the same 29 queries, k=10, pool=50).
+    Live set (29 queries x 1 anchor): production recall@k 1.000 / MRR 0.919 / P@k 0.100, fts 0.655, vector 0.862,
+    hybrid 0.931 — three legs that all look "fine". The review as a SET (29 x 120 anchors): production 1.000 /
+    MRR 0.954 / P@k 0.414, fts 0.408, vector 0.694, hybrid 0.712. The instrument now SEPARATES the legs, which is
+    what T-101 said was missing. What it does NOT do, stated so it is not mistaken for success: `production` stays
+    at 1.000 because the judged candidates were drawn from the production leg's OWN top-5 — a leg scored on its own
+    pool cannot lose. Desaturating `production` needs a POOLED candidate list and harder queries (T-116), not more
+    anchors. This residual is BUG-717's asymmetry one step further and is written into the spec.
+    WHAT THIS FIXES (the two bugs of the act, named). BUG-770 is CLOSED here: the reviewed-sheet judgment existed in
+    TWO copies (_check_reviewed and _apply_reviewed), so the pre-flight the owner runs BEFORE a sitting could
+    disagree with the writer it predicts — one rule with two homes, in a CONTROL this time. judge_review is now the
+    single home, and a paired contract asserts both callers use it. BUG-771 is the bug this act FILED and does NOT
+    close: the sheet's old_name/old_fb_id/old_status columns are filled from the live golden at GENERATION time and
+    nothing records WHICH golden state that was, so the owner's sheet compared every candidate against a state the
+    20261011T221956Z apply had already replaced (MEASURED: 30/30 old names absent from their own candidate list
+    while 30/30 live expectations were present) — the instructions' cheapest cell class ("anchor the row whose
+    cand_name equals old_name") was unsatisfiable for every query. Its remedy is owed: stamp the golden's sha256
+    into the sheet and REFUSE a sheet whose stamp no longer matches the live file (a stale-premise rail).
+    WHAT LANDED (each item its own home, none promised). (i) `judge_review(rows, queries, mode, signature_required,
+    live)` — ONE pure, store-free judgment, called by BOTH `--check` and `--apply` (INV-6). (ii)
+    `retrieval_benchmark.reanchor.anchor_mode: single | set`, DECLARED in config/pipeline_config.yaml and read
+    FAIL-CLOSED: an unknown mode refuses to start rather than guessing the semantics of a golden set. (iii) The
+    declaration of the `ambiguous` rule the code never enforced: an abstention EXCLUDES that candidate and is
+    COUNTED; a query with no anchor at all parks and blocks (the words in config and the words in the owner sheet
+    now say the same thing). (iv) A near-miss DIAGNOSTIC that names an out-of-vocabulary token and suggests the
+    fix while REFUSING to apply it (a token the reader guesses is a token the writer cannot trust). (v)
+    `--selftest` with 11 known-answer controls (pure, no store, no model) + a ladder pin, because a control that
+    needs the FAISS index never runs (BUG-492). (vi) `specs/retrieval_goldens.spec.md` (INV-1..INV-10) as the
+    paired contract for a write path that had NO spec, NO test and NO rail — and the store imports made LAZY so the
+    control really is hermetic.
+    THE OWNER'S WORD (the only thing blocking the write). `anchor_mode` ships as `single` (unchanged behaviour) and
+    under it the applier REFUSES the owner's sheet, naming the one-line edit that licenses the other reading. The
+    owner owes ONE word: `set` (their 120 marks are a coverage judgement — the table above) or `single` (then a rank
+    per query is owed, because no model may pick an anchor, D-2898). NOTHING was applied, and the owner's `anchor`
+    column was NOT edited: only the 19 `ambigouos` cells were normalised (a misspelling, one character each,
+    md5 cc68ae64... -> 7cf7f66f..., recorded in the owner sheet §6).
+  evidence: >-
+    judge_review over the owner's reviewed sheet with mode='set': 0 faults, 29 queries with an expected SET, 120
+    anchor names, 19 abstentions excluded, 1 query dropped on purpose (the one retired by the previous apply, NOT
+    silently re-added), 0 additions. With mode='single' (the declared, shipped mode): 29 faults, each naming the
+    config that licenses the other reading. Every one of the 116 DISTINCT anchored names resolves uniquely in
+    rechunk-v4-20260929 (0 unresolved, 0 ambiguous) — the refusals were semantic, not data. The benchmark table
+    above is the instrument's before/after. The paired contract tests/test_retrieval_goldens_spec.py is 21/21
+    green and `--selftest` is 11/11. BUG-771 records what was wrong with the SHEET (30/30 `old_name` values
+    described a superseded golden state); BUG-770 records the duplicated judgment.
+  files:
+    - scripts/reanchor_retrieval_goldens.py
+    - config/pipeline_config.yaml
+    - specs/retrieval_goldens.spec.md
+    - tests/test_retrieval_goldens_spec.py
+    - governance/golden_reanchor_instructions.md
+    - governance/golden_reanchor_candidates_20261011.reviewed.csv
+    - config/task_register.yaml
+    - justfile
+    - config/rail_registry.yaml
+    - governance/SESSION-HANDOFF-20261013-D2990.md

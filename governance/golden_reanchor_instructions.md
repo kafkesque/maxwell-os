@@ -131,3 +131,62 @@ task exists: *a saturated metric cannot gate an improvement.*
   without re-signing.
 * **`leg_score` is not a threshold.** If you find yourself ranking by the number, stop — the number is not
   calibrated and the file will not let you use it as a gate.
+
+---
+
+## 6. THE REVISION (2026-10-13, D-2991) — your review was REFUSED for a rule the ruler never had
+
+**What you wrote:** 120 `anchor` marks (3-5 candidate answers per query), 11 `rewrite-query`, and 19 cells reading
+`ambigouos`. **What the applier answered:** **48 faults** — 19 rows carried a token read by *nothing* (one missing
+`u`), and 29 queries marked **more than one** anchor where §2 above told you "exactly ONE".
+
+**Your reading was right; the instruction was wrong.** A query's expected answers are a **SET**:
+
+* `pipeline/retrieval_benchmark.py::_recall_at_k` divides by **`len(expected)`** — every expected name must be
+  retrieved, so a bigger expected set is a **STRICTER** ruler, never an easier one;
+* `config/golden/retrieval_queries.yaml` stores `expected_names` as a **list**, and `pipeline/golden.py` resolves
+  **every** entry.
+
+"Exactly one" was the applier's own rule, written in two copies. Neither the format nor the harness ever had it.
+
+**MEASURED (read-only, 2026-10-13, the same 29 queries):**
+
+| ruler | production | fts | vector | hybrid |
+|---|---|---|---|---|
+| today's live set (29 queries × **1** anchor) | 1.000 · MRR 0.919 · P@k 0.100 | 0.655 | 0.862 | 0.931 |
+| your review read as a SET (29 × **120** anchors) | 1.000 · MRR 0.954 · P@k 0.414 | **0.408** | **0.694** | **0.712** |
+
+Your marks turn three legs that all looked "fine" (0.655 / 0.862 / 0.931) into a ranking that **separates** them —
+the instrument T-101 said was missing. What it does **not** do: `production` stays at 1.000, because the candidates
+you judged were drawn from the production leg's own top-5, and a leg scored on its own pool cannot lose.
+Desaturating `production` needs a POOLED candidate list and harder queries (T-116), not more anchors.
+
+**THE ONE WORD THAT BLOCKS THE WRITE:**
+
+* **`set`** — your marks are a coverage judgement: every anchored candidate is a correct answer, and recall is
+  measured over the whole set. This is the reading that produces the table above. **Recommended.**
+* **`single`** — you meant exactly one correct answer per query and the other anchors were merely plausible. Then
+  the marked rows are not a set, and I need a **rank per query** (30 cells), because no model may pick your anchor
+  (D-2898).
+
+**What was NOT touched:** your `anchor` column, and the mode. `reanchor.anchor_mode` ships as `single` (unchanged
+behaviour); under it the applier REFUSES the sheet and names the one-line config edit that licenses the other
+reading. Fixed without your involvement: the 19 `ambigouos` cells (a misspelling — the checker now *suggests*
+`ambiguous` and still refuses to apply it; md5 cc68ae64… → 7cf7f66f…, 19 lines, one character each).
+
+After your word: `python3 scripts/reanchor_retrieval_goldens.py --check` (must be clean) → `--apply` (C13 backup,
+then the write, `version: 5`) → `python3 pipeline/retrieval_benchmark.py`.
+
+---
+
+## 7. WHAT WAS WRONG WITH THE SHEET YOU WERE GIVEN (recorded so it is not repeated)
+
+* **The `old_name` column described a golden set that no longer existed.** `old_name`/`old_fb_id` are looked up at
+  GENERATION time, and this sheet was generated BEFORE the `20261011T221956Z` apply — which then changed the
+  expectation of most queries. MEASURED: **30 of 30** `old_name` values are ABSENT from their own candidate list,
+  while **30 of 30** live expectations are PRESENT. §2 told you to anchor "the row whose `cand_name` equals
+  `old_name`": that row existed for **zero** queries. Filed as **BUG-771**.
+* **The `ambiguous` rule was declared and never enforced.** §0 above said `ambiguous` "PARKS the query and BLOCKS
+  the apply"; the code consulted it only when a query had **no** anchor. The rule §0 states is now SUPERSEDED by
+  the precise one: an abstention excludes **that candidate** and is counted; a query with **no** anchor at all
+  parks and blocks. `config/pipeline_config.yaml` carries the same words, and `--selftest` proves both arms.

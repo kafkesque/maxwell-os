@@ -875,14 +875,24 @@ retrieval_benchmark:
     #   anchor        = THIS candidate NAME is the right answer for this query. Exactly ONE row per query.
     #   rewrite-query = the query is worth keeping but is worded badly; drop it from the set now.
     #   retire-query  = the query is no longer a question the system should answer; drop it on purpose.
-    #   ambiguous     = the owner judged it undecidable. It PARKS the query and therefore BLOCKS `--apply`
-    #                   rather than guessing - a guess is not a label (D-2898).
+    #   ambiguous     = the owner judged THAT CANDIDATE undecidable (D-2991): it is EXCLUDED from the
+    #                   expected set and COUNTED. It PARKS the query - and blocks `--apply` - only when
+    #                   the query carries no anchor at all, rather than guessing a label (D-2898).
     decisions: [anchor, rewrite-query, retire-query, ambiguous]
     # D-2939 declares anchors are OWNER-SIGNED and that no model may sign one. MEASURED 2026-10-13: the CSV's
     # `owner_signature` column was written by the generator and read by NOTHING in the repository - the
     # declaration had no control behind it (BUG-492: a detector nobody has seen fail is not a detector).
     # When true, `--apply` refuses to write an anchor whose chosen row carries no signature.
     owner_signature_required: true
+    # D-2991: a query's expected answer is EITHER exactly one owner-signed anchor row (`single`) OR every row the
+    # owner marked, ordered by rank (`set` = the expected SET that recall@k is micro-averaged over). MEASURED
+    # 2026-10-13: the owner's 150-cell review marked 3-5 candidates per query, and the v2 applier - which hardcoded
+    # `single` in TWO places - refused that sheet for a limit the harness it feeds never had (`expected_names` is a
+    # list; `_recall_at_k` divides by len(expected)). DECLARED here and never INFERRED from the sheet: an inferred
+    # mode is a ruler whose meaning depends on the data it measured, and T-101 exists because that ruler saturated.
+    # NOTHING CHANGES until the owner's one word (governance/golden_reanchor_instructions.md §6): `set` is a
+    # one-line edit here, and the rail refuses a half-move.
+    anchor_mode: single
 rerank:
   enabled: true
   model: BAAI/bge-reranker-v2-m3

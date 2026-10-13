@@ -13,26 +13,27 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1117 decisions (census stamp 1950b61b7076a8da, 2026-10-13) · 533 bugs (187 open / 346 closed; highest OPEN = BUG-768) · 15 open tasks (MUST 4 / SHOULD 8 / WORTH 3; OWNER-moved 4, pipeline-moved 11; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1119 decisions (census stamp abf585a58497b3c2, 2026-10-13) · 535 bugs (188 open / 347 closed; highest OPEN = BUG-771) · 16 open tasks (MUST 5 / SHOULD 8 / WORTH 3; OWNER-moved 4, pipeline-moved 12; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **67** of 1117 — 🔴 open 32 · 🔵 proposed 14 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 565 · ⚖ ratified 133 | closed: ✅ resolved 317 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1117, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **67** of 1119 — 🔴 open 32 · 🔵 proposed 14 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 565 · ⚖ ratified 133 | closed: ✅ resolved 319 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1119, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 187 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 24 · 🟨 MED 39 · 🟩 LOW 19 · UNLABELLED 101 (BUG-757) of 187 open.
+> Open BUGS by severity (population = the census's 188 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 24 · 🟨 MED 40 · 🟩 LOW 19 · UNLABELLED 101 (BUG-757) of 188 open.
 >
 > **OWNER LANE (4) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
-> | T-101 | 🔴 MUST | HARDEN THE RETRIEVAL GOLDEN SET (the gate is saturated) | owner-signed anchors for the new queries |
+> | T-101 | 🔴 MUST | HARDEN THE RETRIEVAL GOLDEN SET (the gate is saturated) | one word: set | single (the anchor-set semantics) - then --check, --ap |
 > | T-117 | 🔴 MUST | BUG-749 residual — the ESCALATE surface: the units NO owner ruling reaches | one owner word per unit on the reference sheet (CONFIRM / CORRECT + ho |
 > | T-118 | 🔴 MUST | the SINGLE-SOURCE trust tier — what the system may SAY about a row the Book of Record Principle does not cover | one word: tier | withhold | leave |
 > | T-107 | 🟠 SHOULD | MCP payload decision — borp_score / feedback_score are still advertised to agents | one owner word per advertised field in config/served_fields.yaml#decla |
 >
-> **PIPELINE LANE (11) — what the agent will do next, in strategic-consequential order (source: config/task_register.yaml):**
+> **PIPELINE LANE (12) — what the agent will do next, in strategic-consequential order (source: config/task_register.yaml):**
 >
 > | id | pri | state | task | evidence |
 > |---|---|---|---|---|
 > | T-104 | 🔴 MUST | 🔴 open | BUG-757 — OPEN bugs carry NO severity token, so the register cannot be ordered by criticality | bug_status.json joined to the buglog headings: UNLABELLED ceiling 101 (2026-10-13) |
+> | T-119 | 🔴 MUST | 🔴 open | the CORROBORATION COLLAPSE delta — how many "≥2 independent sources" rows are really ONE VOICE | MEASURED 2026-10-13 (governance/BORP_REVITALIZATION_RISK_20261013.md §4, over the canonica |
 > | T-105 | 🟠 SHOULD | 🔴 open | REA tier A/B mining — DEVONthink 3 (related-document ranking) and Cursor (derived code index) | governance/NOT-YET-EVALUATED-RESEARCH.md (REA targets logged 2026-10-13) |
 > | T-106 | 🟠 SHOULD | 🔴 open | ROADMAP — MODULARITY (C21 swappable infrastructure) and CROSS-OS COMPATIBILITY (C26) | protocols: pipeline/storage/base.py only; no cross-OS smoke exists (2026-10-13) |
 > | T-108 | 🟠 SHOULD | 🔴 open | BUG-712 / BUG-714 — the content_type residual and the harness-facing primitive | served run content_type census (2026-10-13) |

@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 533,
-  "open_n": 187,
-  "closed_n": 346,
+  "total_ids": 535,
+  "open_n": 188,
+  "closed_n": 347,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -942,6 +942,11 @@
       "id": "BUG-768",
       "title": "(HIGH - OPEN 2026-10-13) - BORP is satisfied by a MINORITY of the served corpus: the deleted per-row check left the SINGLETON route unguarde",
       "events": 1
+    },
+    {
+      "id": "BUG-771",
+      "title": "(MED - OPEN 2026-10-13) - the review sheet compared every candidate against a golden state that no longer existed",
+      "events": 1
     }
   ],
   "closed": [
@@ -1290,6 +1295,7 @@
     "BUG-763",
     "BUG-764",
     "BUG-765",
-    "BUG-769"
+    "BUG-769",
+    "BUG-770"
   ]
 }

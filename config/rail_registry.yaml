@@ -152,6 +152,11 @@ guards:
   #: recomputes is a WRONG VALUE, not a debt - nothing about it is the owner's to decide.
   scripts/check_feedback_parity.py: fatal
   scripts/check_feedback_parity.py --selftest: fatal
+  #: D-2991: the golden re-anchor gate's judgment. FATAL: the ladder runs the CONTROLS, not the applier -- the
+  #: reviewed sheet + draft exist only at a review sitting, so a liveness pin on --check would be a rail that reds
+  #: on a laptop for the wrong reason. The judgment those controls prove is the SAME function both modes call
+  #: (judge_review), and the applier itself writes only with --apply plus a C13 backup.
+  scripts/reanchor_retrieval_goldens.py --selftest: fatal
 
 #: The COMMIT BOUNDARY (BUG-564). A dormancy claim says WHICH file exercises a rail; it cannot say the file still
 #: DOES. This hook lives OUTSIDE the synced tree (BUG-500) - it is not in git, so no diff, no review and no backup

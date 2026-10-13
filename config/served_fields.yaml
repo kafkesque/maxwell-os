@@ -80,9 +80,11 @@ declared:
       read two ways in ONE function (SQL COALESCE 0.0 vs Python `or 0.5`), no home and no parity rail.
       The healthy signal already exists: `isor` (D2284/D2309, 6,591 rows) — see promotions.
   - field: feedback_score
-    word: pending
-    anchor: ''
+    word: keep-and-declare
+    anchor: 'pipeline/feedback.py::_update_fb_aggregates (writer) + pipeline/feedback.py::declared_aggregate (the ONE formula home: shrunk_mean) + config/feedback.yaml (the numeric policy: prior 0.5, prior_weight 0.0) + scripts/check_feedback_parity.py (the ledger->cache parity rail D-2642 lacked) + specs/served_fields.spec.md INV-7/INV-8'
     owed: T-107
+    granted: 2026-10-13
+    granted_by: 'owner approval of the T-107 recommendation (keep-and-declare), conditional on it being verifiable'
     recommendation: keep-and-declare
     why: >-
       NULL on 7,640/7,640 rows, but the LEDGER (fb_feedback) and the WRITER (pipeline/feedback.py::
@@ -109,6 +111,7 @@ promotions:
     inputs: ['fbs.source_ids (D2185, canonical works)', 'fbs.is_convergent', 'fbs.source_diversity']
     shape: '{sources: int, convergent: bool, independence: weak|medium|strong, independence_score: 0.0-1.0, home: str}'
     measured: 'fbs.isor is populated on 6,591 of 7,640 rows (weak 5,212 / medium 969 / strong 410) and on 4,503 of 4,503 PASS rows'
+    measured_gap: 'MEASURED 2026-10-13 on the canonical PASS population: the count-based BORP is already COARSER than the measure we hold — of 938 rows it certifies as corroborated, 35 are rated WEAK by isor, 148 carry ONE author and 170 ONE domain (the same author''s second book counts as a second source). Evidence + hardening: governance/BORP_REVITALIZATION_RISK_20261013.md'
 
 #: A flagged advertised field whose debt is SOURCE-owned (a data-shape repair the store's own register already
 #: counts) owes no OWNER WORD: the payload publishes the FB's own text, not a judgment about it, and the repair is a

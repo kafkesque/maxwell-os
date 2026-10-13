@@ -8,26 +8,27 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1117 decisions (census stamp 1950b61b7076a8da, 2026-10-13) · 533 bugs (187 open / 346 closed; highest OPEN = BUG-768) · 15 open tasks (MUST 4 / SHOULD 8 / WORTH 3; OWNER-moved 4, pipeline-moved 11; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1119 decisions (census stamp abf585a58497b3c2, 2026-10-13) · 535 bugs (188 open / 347 closed; highest OPEN = BUG-771) · 16 open tasks (MUST 5 / SHOULD 8 / WORTH 3; OWNER-moved 4, pipeline-moved 12; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **67** of 1117 — 🔴 open 32 · 🔵 proposed 14 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 565 · ⚖ ratified 133 | closed: ✅ resolved 317 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1117, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **67** of 1119 — 🔴 open 32 · 🔵 proposed 14 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 565 · ⚖ ratified 133 | closed: ✅ resolved 319 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1119, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 187 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 24 · 🟨 MED 39 · 🟩 LOW 19 · UNLABELLED 101 (BUG-757) of 187 open.
+> Open BUGS by severity (population = the census's 188 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 24 · 🟨 MED 40 · 🟩 LOW 19 · UNLABELLED 101 (BUG-757) of 188 open.
 >
 > **OWNER LANE (4) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
-> | T-101 | 🔴 MUST | HARDEN THE RETRIEVAL GOLDEN SET (the gate is saturated) | owner-signed anchors for the new queries |
+> | T-101 | 🔴 MUST | HARDEN THE RETRIEVAL GOLDEN SET (the gate is saturated) | one word: set | single (the anchor-set semantics) - then --check, --ap |
 > | T-117 | 🔴 MUST | BUG-749 residual — the ESCALATE surface: the units NO owner ruling reaches | one owner word per unit on the reference sheet (CONFIRM / CORRECT + ho |
 > | T-118 | 🔴 MUST | the SINGLE-SOURCE trust tier — what the system may SAY about a row the Book of Record Principle does not cover | one word: tier | withhold | leave |
 > | T-107 | 🟠 SHOULD | MCP payload decision — borp_score / feedback_score are still advertised to agents | one owner word per advertised field in config/served_fields.yaml#decla |
 >
-> **PIPELINE LANE (11) — what the agent will do next, in strategic-consequential order (source: config/task_register.yaml):**
+> **PIPELINE LANE (12) — what the agent will do next, in strategic-consequential order (source: config/task_register.yaml):**
 >
 > | id | pri | state | task | evidence |
 > |---|---|---|---|---|
 > | T-104 | 🔴 MUST | 🔴 open | BUG-757 — OPEN bugs carry NO severity token, so the register cannot be ordered by criticality | bug_status.json joined to the buglog headings: UNLABELLED ceiling 101 (2026-10-13) |
+> | T-119 | 🔴 MUST | 🔴 open | the CORROBORATION COLLAPSE delta — how many "≥2 independent sources" rows are really ONE VOICE | MEASURED 2026-10-13 (governance/BORP_REVITALIZATION_RISK_20261013.md §4, over the canonica |
 > | T-105 | 🟠 SHOULD | 🔴 open | REA tier A/B mining — DEVONthink 3 (related-document ranking) and Cursor (derived code index) | governance/NOT-YET-EVALUATED-RESEARCH.md (REA targets logged 2026-10-13) |
 > | T-106 | 🟠 SHOULD | 🔴 open | ROADMAP — MODULARITY (C21 swappable infrastructure) and CROSS-OS COMPATIBILITY (C26) | protocols: pipeline/storage/base.py only; no cross-OS smoke exists (2026-10-13) |
 > | T-108 | 🟠 SHOULD | 🔴 open | BUG-712 / BUG-714 — the content_type residual and the harness-facing primitive | served run content_type census (2026-10-13) |
@@ -91,6 +92,7 @@
 
 | Bug | Date | Issue |
 |---|---|---|
+| BUG-771 | 2026-10-13 | **The retrieval-golden REVIEW SHEET carried an `old_name` column that described a golden state NO LONGER LIVE, so a 150-cell owner review was conducted against a ghost comparison.** `old_name`/`old_fb_id`/`old_status` are filled by `scripts/reanchor_retrieval_goldens.py` at GENERATION time from the live golden; the sheet (`governance/golden_reanchor_candidates_20261011.csv`, generated 2026-10-11 20:44Z) was generated BEFORE the `20261011T221956Z` apply that re-anchored the same set — so the reviewed sheet compared every candidate against the PRE-apply expectation. MEASURED 2026-10-13 on the owner's reviewed copy: **30/30** `old_name` values are ABSENT from their own candidate list, while **30/30** LIVE expectations are PRESENT. Consequence: the instructions' cheapest and most valuable cell class — "if the query is already correct, anchor the row whose cand_name equals old_name" — was UNSATISFIABLE for every query, and the reviewer could not tell which candidate the system currently expects. FIX: the generator must stamp the golden state it compared against by HASH (sha256 of the golden file at generation) into the sheet, and `--check` must REFUSE a sheet whose stamped hash no longer matches the live file (a stale-premise rail) — the same discipline as D-2989's advertised-claim rail, one artifact over. |
 | BUG-766 | 2026-10-13 | **The store-columns register keeps the ladder RED on 6 POPULATION-SHAPE drifts and, until this act, on a stale measurement the licensed write moved.** MEASURED by scripts/check_store_columns.py --check (rc=1, the same rc recorded at commit 673a457 18:33 BEFORE the write): each of `source_text`, `difficulty_level`, `temporal_scope`, `epistemic_status`, `verification_method`, `practicality` declares `outside: absent` for population s5_verified while 1049 sidecar rows (s5_reason='s5_not_applicable') hold a NON-NULL blank where D-2957 requires NULL — so `count(col)` still claims rows the column does not carry. Separately, the D-2988 write moved `discipline_source.distinct` 1 -> 2 and the register still claimed 1 (a MEASUREMENT-DRIFT line, the honest cascade of a store write). FIX: reshape the six columns to TRUE NULL outside their population (the pipeline/normalize_absent_shape.py precedent, BUG-737), then --record; the census re-record at 18:40Z already absorbed the write's own moves. |
 | BUG-681 | 2026-10-08 | **`just health-full` = the ladder's WHOLE fault set. Round 2 measured 6; round 3 measures `FAIL ladder scan: 3 fault(s) in ONE pass` over 118 lines (503s), worst rc=1 (D-2680/BUG-573). FIXED so far: the unparsed buglog heading, the missing archive-index entry, and `check_undeclared_encoding`. THE 3 REMAINING: (a) `check_tests --check` = 3 red contract tests outside a declared-red=0 ceiling, incl. `test_s4_golden_conforms_to_ontology` (a golden set that does not conform to the ontology) - pre-existing, attributed away from the ANCHOR work by grep; (b) `check_encoding_homes --check` is now CLEAN (debt 0 of ceiling 0) — `scripts/remap_referee_v7_28rows.py` already reads the CSV via `artifact_encoding.open_artifact(CSV, ROOT)` (D-2644/D-2646 single decode home), so the `just health` prefix is UNBLOCKED; (c) `check_boundary_rehearsal` rc=1, newly diagnosed: `bootstrap.whole_tree_refused: refused (rc=1) but not for the declared reason 'FORBIDDEN session plan' (RAIL 4) - a refusal that does not name its cause cannot justify a bypass` - i.e. a whole-tree commit is still refused, but by a DIFFERENT rail than the declared one, so either the declared marker is stale or an earlier rail now refuses; do NOT hand-edit the declared reason (that hides the drift) - retain the fixture and print the ACTUAL refusal text. (b) RESOLVED 2026-10-09. Diagnose (a) and (c) now: the `just health` prefix is unblocked.** |
 | BUG-242 | 2026-09-11 | **frontier69_v2 + extension80 audit outputs carry 2 data-quality defects.** (1) The `*_verdict` fields (depth/discipline/domains) are LLM SELF-REPORTS, not computed comparisons — they claim `override` even when the audit value equals silver (e.g. `S4-GOLD-MINED-00005` domains identical yet `domains_verdict=override`), so the cited "57.5% domain-override" and "80 flagged" figures are inflated. (2) Non-principle content_type rows (noise_drop/tool_instruction/process_template/process_instance/growth_edge) carry a spurious 4-way depth label, violating D2612 (depth only for principle). FIX (applied in `scripts/build_phase0_adjudication_form.py`): agreement recomputed deterministically (`differs` flag) + depth marked N/A for non-principle. REMAINS: recompute the override figures from the audit values (deterministic), and re-run the audit to null depth on non-principle if the raw artifacts are kept. |
@@ -13113,3 +13115,56 @@ the receipt when the module count is stale (the ceilings are untouched, and the 
 known-answer control (the rail is now 15/15) and one mutation lock (`the_receipt_module_count_rerecord_is_load_bearing`,
 floor 46 -> 47, SEEN to red). MEASURED after the fix: `--record` re-recorded `counts.modules` 553 -> 556 with the
 ceilings unchanged at `{shadowed_declared: 300, undeclared: 3}`, and the paired contract is 10/10 green.
+---
+
+## BUG-770 (MED - FIXED 2026-10-13 by D-2991) - the reviewed-sheet JUDGMENT existed TWICE, so the pre-flight could pass a sheet the writer refuses
+
+**CLASS.** One rule, two implementations. `scripts/reanchor_retrieval_goldens.py` carried the verdict logic in
+`_check_reviewed` AND `_apply_reviewed`: the "exactly ONE anchor" refusal, the owner-signature refusal, the
+unreviewed-query refusal and the drop/ADD reporting were each written out twice, in slightly different words
+(`rows marked 'anchor' — exactly one is required` vs `rows marked 'anchor' - exactly one is required`).
+
+**WHY IT MATTERS.** `--check` exists to tell the owner what the writer will do BEFORE a 150-cell sitting. A
+pre-flight that is a COPY drifts from the writer silently, and it drifts in the one direction that costs real work:
+it can report a sheet as appliable that the writer then refuses (or, worse, the reverse — a refusal nobody can see
+until the end). This is the D-2642 class (one derived value, two homes) applied to a CONTROL.
+
+**MEASURED.** The owner's sheet was refused with 48 faults by BOTH paths, but the two paths agreed only because
+both had been edited in the same act; the vocabulary literal, the multiplicity rule and the signature rule were
+each hardcoded in both. The fourth defect was invisible: **neither path could express the SET semantics the harness
+already had** (`_recall_at_k` is micro over `expected`; `expected_names` is a list) - the limit was the tool's,
+not the format's.
+
+**FIXED IN THE SAME ACT.** `judge_review(rows, queries, mode, signature_required, live)` is now the ONE pure,
+store-free judgment; `--check` and `--apply` both call it and neither restates a rule (asserted by
+`tests/test_retrieval_goldens_spec.py::test_inv6_check_and_apply_call_the_one_judgment`); the mode, the vocabulary,
+the signature requirement and the multiplicity rule all live in `config/pipeline_config.yaml` and are read
+FAIL-CLOSED; 11 known-answer controls (`--selftest`) prove the guards can FAIL, and `specs/retrieval_goldens.spec.md`
+(INV-1..INV-10) is the paired contract for a surface that had NONE.
+
+---
+
+## BUG-771 (MED - OPEN 2026-10-13) - the review sheet compared every candidate against a golden state that no longer existed
+
+**THE DEFECT.** `scripts/reanchor_retrieval_goldens.py` fills `old_name`/`old_fb_id`/`old_status` from the LIVE
+golden at GENERATION time and nothing records WHICH golden state that was. The sheet the owner reviewed
+(`governance/golden_reanchor_candidates_20261011.csv`, generated 2026-10-11 20:44Z) was generated BEFORE the
+`20261011T221956Z` apply that re-anchored the same 30 queries - so every "old" cell described the PRE-apply set.
+
+**MEASURED 2026-10-13 (on the owner's reviewed copy).** `30/30` `old_name` values are ABSENT from their own
+candidate list; `30/30` LIVE expectations are PRESENT. The instructions' cheapest, highest-value cell class -
+*"if the query is already correct, still write it: anchor the row whose `cand_name` equals `old_name`"* - was
+therefore unsatisfiable for EVERY query. The reviewer had no way to see what the system currently expects, which is
+precisely the comparison the column exists to make.
+
+**CONSEQUENCE (bounded, but real).** A 30-query owner sitting was run against a ghost. It did not produce a WRONG
+anchor (the owner judged the live candidates on their merits), but it removed the cheapest correct answer
+("what is already right") from the sheet and made the review slower and harder for no reason.
+
+**FIX (owed).** (i) The generator stamps the golden state it compared against by HASH (`sha256` of
+`config/golden/retrieval_queries.yaml` at generation) into the sheet header; (ii) the pre-flight REFUSES a sheet
+whose stamped hash no longer matches the live file - a STALE-PREMISE rail, the same discipline as D-2989's
+advertised-claim rail one artifact over; (iii) the reviewer is told in the sheet which candidate the system
+currently expects. Until then: regenerate the sheet immediately before a review sitting, never re-use one across an
+apply.
+

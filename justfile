@@ -97,6 +97,7 @@ health:
     python3 scripts/check_served_fields.py || [ $? -eq 2 ]          # D-2989: an advertised field is a CLAIM - live, declared-absent with an owed word, or refused; 2 = the OWNER WORD is owed (T-107), ceiling SHRINK-ONLY
     python3 scripts/check_feedback_parity.py --selftest || exit 1  # D-2989/D-2642: the ledger->cache parity controls must be SEEN to fire
     python3 scripts/check_feedback_parity.py || exit 1             # D-2989: the feedback cache must equal what its ledger recomputes through the declared formula (ONE home)
+    python3 scripts/reanchor_retrieval_goldens.py --selftest || exit 1  # D-2991: the reviewed-sheet judgment's known-answer controls. `--check`/`--apply` need a REVIEWED SHEET and a draft that only exist at a review sitting, so the ladder pins the CONTROLS; the judgment they prove is the same one both modes call (INV-6)
     python3 scripts/check_store_columns.py --selftest || exit 1    # BUG-492: the column-lifecycle detector must be SEEN to fire
     python3 scripts/check_store_columns.py --check || [ $? -eq 2 ]  # BUG-524/COLUMNS: a label that cannot vary, a blank a count(col) cannot see; 2 = declared debt
     python3 scripts/check_domain_cardinality.py || [ $? -eq 2 ]   # D-2838/BUG-631: reader-limb re-measures the committed store for over-cap FBs; 1 = over-cap (historical re-derivation owed), 2 = parse-defect

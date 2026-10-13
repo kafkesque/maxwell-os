@@ -38,9 +38,21 @@ tasks:
     goldens: a saturated metric cannot gate an improvement, so the next retrieval change (and the
     S1/S2/S3 adoption questions) has no instrument. Add harder/abstract and adversarial goldens
     (owner-signed anchors, D-2898/D-2939) and move MRR (0.919 today).
-  source: [D-2980, BUG-710]
-  evidence: 'python3 pipeline/retrieval_benchmark.py -> production 1.000/0.919/0.100 (2026-10-13)'
-  gate: 'owner-signed anchors for the new queries'
+    D-2991 (2026-10-13): the owner FILLED the re-anchor sheet - 120 anchor marks (3-5 candidate
+    answers per query), 11 rewrite-query, 19 cells misspelled `ambigouos` - and the applier REFUSED
+    all 48 semantics, because "exactly ONE anchor per query" was the APPLIER's rule, hardcoded in two
+    copies, while the format stores `expected_names` as a LIST and the harness divides by
+    `len(expected)`. MEASURED read-only with the review read as a SET: production 1.000/0.954/0.414
+    vs fts 0.655->0.408, vector 0.862->0.694, hybrid 0.931->0.712 - three legs that all looked "fine"
+    now separate, which IS the missing instrument. production itself stays 1.000 because the
+    candidates were drawn from its OWN top-5 (self-referential pool) - so desaturating PRODUCTION is
+    T-116 (harder queries) plus a POOLED candidate list, not more anchors. The mode is DECLARED
+    (`reanchor.anchor_mode: single` ships; the applier refuses the sheet and names the one line).
+  source: [D-2980, D-2991, BUG-710, BUG-771]
+  evidence: 'live set 29x1: production 1.000/0.919/P@k 0.100, fts 0.655, vector 0.862, hybrid 0.931 |
+    the review as a SET (29x120 anchors, temp/golden_proposed_v5.yaml): production 1.000/0.954/0.414,
+    fts 0.408, vector 0.694, hybrid 0.712 (python3 pipeline/retrieval_benchmark.py, 2026-10-13)'
+  gate: 'one word: set | single (the anchor-set semantics) - then --check, --apply, benchmark'
 - id: T-102
   priority: MUST
   state: done
@@ -363,3 +375,23 @@ tasks:
   source: [BUG-768, D-2989, D-2120, D-2830]
   evidence: 'governance/BORP_FEEDBACK_ASSESSMENT_20261013.md §2.3 (status x is_convergent x source_ids) and the fbs.isor rating distribution (2026-10-13)'
   gate: 'one word: tier | withhold | leave'
+- id: T-119
+  priority: MUST
+  state: open
+  mover: pipeline
+  title: 'the CORROBORATION COLLAPSE delta — how many "≥2 independent sources" rows are really ONE VOICE'
+  why: >-
+    D-2990 measured that the count-based BORP is already COARSER than the measure we hold: of the served rows the
+    count certifies as corroborated, a measurable share carries ONE author or ONE domain and some are rated weak by
+    isor (the worked example in the assessment is two works by the SAME author counting as two sources). The
+    PRINCIPLE is fine; the COUNT is not - so before any surface advertises `corroboration` as a guarantee the
+    system must be able to say how deep the collapse goes. n_voices = |clusters of the row's source_segments by
+    embedding similarity| (step 0: locate the S1 segment store that the S1.5 index already embeds;
+    `source_segments` is populated on every row). The FALSIFIER matters as much as the number: if the collapsed
+    voice count is indistinguishable from the convergent count, the count is NOT contaminated in this corpus and the
+    hardening is documentation only - a measurement that cannot say "no finding" is not a measurement.
+  source: [D-2990, D2284, D2309, BUG-768]
+  evidence: 'MEASURED 2026-10-13 (governance/BORP_REVITALIZATION_RISK_20261013.md §4, over the canonical PASS
+    population): of 938 rows the count certifies as corroborated, 148 carry ONE author, 170 ONE domain and 35 are
+    rated weak by isor; §8 of that file is this plan, including the falsifier.'
+  gate: 'none - read-only measurement; the SURFACE change it informs is T-107 + T-118'

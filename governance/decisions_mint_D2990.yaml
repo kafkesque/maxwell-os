@@ -1,0 +1,103 @@
+# Mint record — D-2990 (T-107/T-118/T-119): BORP is a PRINCIPLE, not a score
+- id: D-2990
+  date: '2026-10-13'
+  state: RESOLVED
+  category: GOVERNANCE / STRUCTURE
+  title: >-
+    BORP is a PRINCIPLE with THREE objects — the RULE keeps, the MEASURE is the one we already hold (`isor`), the
+    dead SURFACE retires. Revitalization is LOW risk only if it is DECLARED on the wire (never gated on the corpus)
+    and its independence axis is MEASURED (the collapse delta) before anything is advertised
+  bugs: [BUG-767, BUG-768]
+  decision: >-
+    THE QUESTION (owner, verbatim): "does BORP revitalization carry any risk, threat, can cause any cascade issue,
+    leak, contamination, hidden error, failure issue (do we have any history with it previously) ... revitalize but
+    hardening (are there any existing similar proven grounded solution that can be adapted), or is it too risky or
+    else." THE ANSWER: REVITALIZE THE PRINCIPLE WITH HARDENING — do NOT restore the score and do NOT re-assert a
+    per-row gate. The danger was never in the principle; it is in the two naive implementations this repository
+    already paid for.
+    THE ONTOLOGICAL FIX (three objects that one word has been used for). (1) BORP-THE-PRINCIPLE — the rule
+    "convergence requires >=2 INDEPENDENT records", a statement about EVIDENCE QUALITY: ALIVE and load-bearing
+    (`is_convergent`), satisfied by 938 of 4,503 served PASS rows (20.8%) — KEEP, and serve its truth. (2)
+    BORP-THE-MEASURE — how independence is COMPUTED: was `min(distinct / BORP_MIN_SOURCES, 1.0)` with the pass bar
+    AT the minimum, i.e. a CONSTANT on every admitted row; TODAY it is `isor` (author independence x domain
+    diversity x count, D2284/D2309 over the D2185 canonical source_ids), populated on 4,503/4,503 PASS rows — KEEP,
+    and do not mint a second one (D-2646). (3) BORP-THE-SURFACE — the value an agent or an export reads:
+    `fbs.borp_score`, constant 0.0, producer DELETED at S5, home null, published by three surfaces — RETIRE
+    (T-107). The drop the owner asked about was correct for (3) and over-broad for (2); (1) was never in question.
+    THE RISK REGISTER (R1..R8, each with in-repo history — the full table is
+    governance/BORP_REVITALIZATION_RISK_20261013.md §2). R1 TAUTOLOGY: a ratio whose pass bar sits at its
+    denominator floor cannot vary (git c95f7ff:pipeline/stage5_verify.py:105-115). R2 GATE REGRESSION: a per-row
+    >=2-source gate is a corpus EDIT, not a check — Audit1 P1.4 measured "BORP >=2 sources drops single-source
+    insights", and 3,565 of 4,503 served rows (79.2%) are single-source today. R3 CORRELATED-SOURCE
+    CONTAMINATION — the real one: counting distinct TITLES is spoofable (an author's second book, a reprint, a book
+    that quotes another), so the count CERTIFIES the echo/slop pattern it was minted to prevent. R4 FALSE
+    ABSENCE / WIRE LEAK: one column read as a VALUE by SQL (COALESCE 0.0) and as ABSENT by Python (`or 0.5`) inside
+    ONE function, published as 0.0 by three surfaces (BUG-767, D-2957). R5 THRESHOLD RE-LITIGATION: an unresolved
+    "BORP_MIN_SOURCES 2 vs 3" question and the never-landed D2053-C "author-weighted BORP" variant — patching the
+    count keeps the count's blindness. R6 RANKING COUPLING: the retired constant was ORDER BY-ed in TWO places
+    (F-40/BUG-710), so any new signal wired into ranking is a silent recalibration. R7 AGENT-TRUST: a scalar "BORP
+    score" on the wire is a CLAIM (D-2989) and, if it is a count dressed as a ratio, runtime noise an agent
+    repeats. R8 REPROCESS ROT: anything keyed by a count of titles rots when the corpus is re-processed (BUG-710:
+    0/30 golden ids AND 0/30 names survived rechunk-v4).
+    THE MEASUREMENT THAT SETTLES IT (canonical run, PASS, N=4,503; read-only 2026-10-13). `isor.rating` = weak
+    3,576 / medium 670 / strong 257. Rows the COUNT certifies as corroborated (`is_convergent=1`) = 938; of those,
+    35 are rated WEAK by `isor`, 148 carry ONE AUTHOR (15.8%) and 170 ONE DOMAIN (18.1%). Worked example
+    (a real row): "Chroma Subsampling in Jpeg Compression" — two source works, BOTH by Rosa Menkman, one author,
+    `isor` weak 0.5. The count says CORROBORATED; the independence measure says ONE VOICE. Only one of them is
+    right, and we already own the one that is right — which is why "revitalize BORP" cannot mean "restore the
+    count": that would be a DOWNGRADE from the measure in hand.
+    THE HARDENING (three moves, two prohibitions). (1) Revitalize the principle AT THE SURFACE, not at the gate:
+    every served row carries its corroboration tier, and no answer may call a row corroborated unless its tier says
+    so (T-118 is the owner's policy word for the 79.2% the principle does not cover). (2) ONE measure, ONE home:
+    `pipeline/schema_accessor.py::isor_score`, published as a GRADED tuple (independence + sources + convergent),
+    never a floating scalar oracle. (3) HARDEN the independence AXIS with lineage: independence must mean "no
+    shared ancestor", not "different title" (T-119 measures the collapse delta with the S1.5 embeddings already on
+    disk, and its FALSIFIER is part of the plan: if P(n_voices>=2) ~= P(is_convergent) nothing is contaminated and
+    the hardening is documentation only). PROHIBITION A: no per-row hard gate on the corpus (a gate needs an owner
+    policy and buys exclusion, not truth — declare a tier instead). PROHIBITION B: no scalar "BORP score" on the
+    wire (it invites R4, R6 and R7 at once).
+    THE PRECEDENTS, ADAPTED NOT INVENTED (each VERIFIED before it was cited, 2026-10-13 — a citation is a claim at
+    the moment of mint, D-2660). (a) Source DEPENDENCE in truth discovery: X. L. Dong, L. Berti-Équille, D.
+    Srivastava, "Integrating conflicting data: the role of source dependence", PVLDB 2(1):550-561, 2009, and "Truth
+    discovery and copying detection in a dynamic world", PVLDB 2(1):562-573, 2009 — the independence assumption is
+    violated in practice because sources COPY each other, so dependence must be MODELLED rather than assumed; we
+    adapt the RULE (a shared ancestor collapses two sources into one voice), not an algorithm. (b) Copy /
+    near-duplicate detection (shingling/MinHash; embedding-similarity clustering for "same story" grouping) — the
+    deterministic way to collapse two works into one voice, on embeddings we already compute; ADAPTED MEASURE-FIRST
+    (its threshold is reported as a DISTRIBUTION, never used as an uncalibrated gate — the T-101 lesson). (c) W3C
+    PROV-O ("PROV-O: The PROV Ontology", W3C Recommendation 30 April 2013; `prov:wasDerivedFrom`,
+    `prov:hadPrimarySource`) — the standard vocabulary to DECLARE ancestry instead of inferring it; adopted as the
+    field vocabulary for the eventual derivation edge. (d) Pooled qrels in IR evaluation (Sparck Jones & van
+    Rijsbergen 1975; Voorhees, "The Philosophy of Information Retrieval Evaluation", CLEF 2001/LNCS 2406:355-370;
+    Buckley & Voorhees, "Retrieval evaluation with incomplete information", SIGIR 2004) — the SAME defect class on
+    the EVALUATION axis: `qrels` are the POOLED-judged set (the best available estimate of the recall denominator,
+    unjudged = conventionally non-relevant), NOT an exhaustive ground truth. VERIFIED CORRECTION KEPT: pooling
+    exists to approximate that denominator; "one relevant document saturates a metric" is OUR measured finding
+    (29 goldens, recall@10 = 1.000, T-101), not the literature's rationale for pooling — the two are kept apart
+    on purpose rather than merged into one flattering citation.
+    RESIDUALS (declared, not hidden). (i) The S1.5 >=2-source gate covers the CLUSTER route only, so the singleton
+    route reaches the store unguarded (BUG-768) — the tier declaration (T-118) is what makes it honest.
+    (ii) `borp_score` remains advertised until the T-107 change-set lands in ONE move (BUG-767;
+    scripts/check_served_fields.py reports rc 2, the owner lane, loud and not fatal). (iii) The S1.5 threshold (2)
+    is a declared floor, not a measurement — T-119's step 2 distribution is what would replace it. (iv) The
+    independence axis has no measured collapse number YET: T-119 is the instrument.
+  evidence: >-
+    MEASURED 2026-10-13 (canonical run rechunk-v4-20260929, status='PASS', N=4,503, read-only):
+    json_extract(isor,'$.rating') -> weak 3,576 / medium 670 / strong 257; is_convergent=1 -> 938 (20.8%);
+    of those, isor weak -> 35, n_authors=1 -> 148, n_domains=1 -> 170; 5,198 of 6,591 verified rows are
+    single-source. ISOR's own `detail` string on the worked row: "ISOR weak: 1 authors, 1 domains, 2 sources ->
+    composite 0.5". HISTORY: git c95f7ff:pipeline/stage5_verify.py:105-115 (the degenerate formula),
+    pipeline/stage5_verify.py:20 and :554 (the deletion), config/decisions.yaml (the 2-vs-3 discrepancy and the
+    D2053-C variant), D2284/D2309 (ISOR landed), D-2979/D-2980 (the last reader repointed), BUG-767 + BUG-768 +
+    BUG-710. The three-object separation, the R1..R8 table with each risk's history, the hardening design and
+    T-119's plan (with its falsifier) are governance/BORP_REVITALIZATION_RISK_20261013.md. The owner lane:
+    config/served_fields.yaml (`feedback_score` = keep-and-declare, GRANTED 2026-10-13) and
+    governance/OWNER_DECISION_T107_20261013.md (the two words still owed).
+  files:
+    - governance/BORP_REVITALIZATION_RISK_20261013.md
+    - config/served_fields.yaml
+    - config/task_register.yaml
+    - governance/BORP_FEEDBACK_ASSESSMENT_20261013.md
+    - governance/OWNER_DECISION_T107_20261013.md
+    - scripts/check_served_fields.py
+    - governance/SESSION-HANDOFF-20261013-D2990.md

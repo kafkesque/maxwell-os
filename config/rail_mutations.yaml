@@ -35,7 +35,7 @@ fixture:
   timeout_seconds: 600
 
 coverage:
-  min_mutations: 41            # FLOOR (shrink guard): deleting an entry means editing the floor in a diff a human reads (41 = 39 + the two D-2987 entries: a declared state carries a sign, and the declared buckets partition the axis)
+  min_mutations: 43            # FLOOR (shrink guard): deleting an entry means editing the floor in a diff a human reads (43 = 41 + the two D-2988 entries: the licensed store write's SCOPE guard and its TARGET-agreement guard)
   # D-2679: the coverage set is DERIVED, never restated. Which rails gate a COMMIT is one fact and it already has
   # ONE home (config/rail_registry.yaml#commit_boundary), so restating it here would be a SECOND HOME - and two
   # lists of one fact drift, and only one of them can be right. scripts/check_rail_mutations.py joins the two and
@@ -819,3 +819,38 @@ mutations:
       D-2987/BUG-765: the decisions line summed to 981 of 1114 because 133 decisions sat in a state no bucket
       held. The mutant pretends an unheld state is accounted for, so the control that NAMES the partition is
       SEEN to be load-bearing.
+
+  # D-2988/T-103: the LICENSED store write for owner-ruled labels. Two guards carry the whole authority of the
+  # write - the scope (a write may only execute a ruling that EXISTS) and the target (the write copies the
+  # production mapper's own answer, never an invented one). Each is reduced to a no-op here, so the control that
+  # NAMES it is SEEN to be load-bearing rather than only counted.
+  - id: the_store_write_scope_guard_is_load_bearing
+    subject: scripts/apply_relabel_store_write.py
+    op: replace
+    find: "        if action not in RULED_ACTIONS:\n            faults.append(f\"scope/not-ruled:"
+    replace: "        if False:  # MUTATION (D-2676): a licensed unit no ruling reaches is written anyway\n            faults.append(f\"scope/not-ruled:"
+    runner: scripts/apply_relabel_store_write.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: '  !!  scope_refuses_an_unruled_licensed_unit'
+    why: >-
+      D-2898: no agent mints a LABEL. With the guard inert, a unit the owner has NOT ruled (ESCALATE) is carried
+      into the write, so the control that names that refusal is SEEN to be the thing standing between a licensed
+      repair and a script-minted label.
+
+  - id: the_store_write_target_agreement_is_load_bearing
+    subject: scripts/apply_relabel_store_write.py
+    op: replace
+    find: '            if _norm(mapped) != _norm(target) or _norm(live) != _norm(target):'
+    replace: '            if False:  # MUTATION (D-2676): the mapper answer need not agree with the owner target'
+    runner: scripts/apply_relabel_store_write.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: '  !!  mapper_disagreement_is_refused'
+    why: >-
+      T-103/D-2988: the write's authority is that it copies the PRODUCTION MAPPER's own answer for a row an owner
+      ruling already reaches. With the agreement uncompared, a row whose mapper answer, owner target and recorded
+      packet answer disagree is written with whichever value arrived first - the applier choosing between three
+      authorities, which is exactly the act the owner reserves.

@@ -8,18 +8,18 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1115 decisions (census stamp 4aef0e591ede2e2d, 2026-10-13) · 529 bugs (184 open / 345 closed; highest OPEN = BUG-757) · 14 open tasks (MUST 3 / SHOULD 8 / WORTH 3; OWNER-moved 3, pipeline-moved 11; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1116 decisions (census stamp 414471ebb87c5774, 2026-10-13) · 530 bugs (185 open / 345 closed; highest OPEN = BUG-766) · 14 open tasks (MUST 3 / SHOULD 8 / WORTH 3; OWNER-moved 3, pipeline-moved 11; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **67** of 1115 — 🔴 open 32 · 🔵 proposed 14 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 565 · ⚖ ratified 133 | closed: ✅ resolved 315 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1115, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **67** of 1116 — 🔴 open 32 · 🔵 proposed 14 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 565 · ⚖ ratified 133 | closed: ✅ resolved 316 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1116, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 184 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 22 · 🟨 MED 38 · 🟩 LOW 19 · UNLABELLED 101 (BUG-757) of 184 open.
+> Open BUGS by severity (population = the census's 185 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 22 · 🟨 MED 39 · 🟩 LOW 19 · UNLABELLED 101 (BUG-757) of 185 open.
 >
 > **OWNER LANE (3) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
 > | T-101 | 🔴 MUST | HARDEN THE RETRIEVAL GOLDEN SET (the gate is saturated) | owner-signed anchors for the new queries |
-> | T-103 | 🔴 MUST | BUG-749 residual — the label re-derivation debt the census names (OWNER-RULED rows are store-write-owed) | the owner word that licenses the store write |
+> | T-117 | 🔴 MUST | BUG-749 residual — the ESCALATE surface: the units NO owner ruling reaches | one owner word per unit on the reference sheet (CONFIRM / CORRECT + ho |
 > | T-107 | 🟠 SHOULD | MCP payload decision — borp_score / feedback_score are still advertised to agents | owner word on the payload schema |
 >
 > **PIPELINE LANE (11) — what the agent will do next, in strategic-consequential order (source: config/task_register.yaml):**
@@ -88,6 +88,7 @@
 
 | Bug | Date | Issue |
 |---|---|---|
+| BUG-766 | 2026-10-13 | **The store-columns register keeps the ladder RED on 6 POPULATION-SHAPE drifts and, until this act, on a stale measurement the licensed write moved.** MEASURED by scripts/check_store_columns.py --check (rc=1, the same rc recorded at commit 673a457 18:33 BEFORE the write): each of `source_text`, `difficulty_level`, `temporal_scope`, `epistemic_status`, `verification_method`, `practicality` declares `outside: absent` for population s5_verified while 1049 sidecar rows (s5_reason='s5_not_applicable') hold a NON-NULL blank where D-2957 requires NULL — so `count(col)` still claims rows the column does not carry. Separately, the D-2988 write moved `discipline_source.distinct` 1 -> 2 and the register still claimed 1 (a MEASUREMENT-DRIFT line, the honest cascade of a store write). FIX: reshape the six columns to TRUE NULL outside their population (the pipeline/normalize_absent_shape.py precedent, BUG-737), then --record; the census re-record at 18:40Z already absorbed the write's own moves. |
 | BUG-681 | 2026-10-08 | **`just health-full` = the ladder's WHOLE fault set. Round 2 measured 6; round 3 measures `FAIL ladder scan: 3 fault(s) in ONE pass` over 118 lines (503s), worst rc=1 (D-2680/BUG-573). FIXED so far: the unparsed buglog heading, the missing archive-index entry, and `check_undeclared_encoding`. THE 3 REMAINING: (a) `check_tests --check` = 3 red contract tests outside a declared-red=0 ceiling, incl. `test_s4_golden_conforms_to_ontology` (a golden set that does not conform to the ontology) - pre-existing, attributed away from the ANCHOR work by grep; (b) `check_encoding_homes --check` is now CLEAN (debt 0 of ceiling 0) — `scripts/remap_referee_v7_28rows.py` already reads the CSV via `artifact_encoding.open_artifact(CSV, ROOT)` (D-2644/D-2646 single decode home), so the `just health` prefix is UNBLOCKED; (c) `check_boundary_rehearsal` rc=1, newly diagnosed: `bootstrap.whole_tree_refused: refused (rc=1) but not for the declared reason 'FORBIDDEN session plan' (RAIL 4) - a refusal that does not name its cause cannot justify a bypass` - i.e. a whole-tree commit is still refused, but by a DIFFERENT rail than the declared one, so either the declared marker is stale or an earlier rail now refuses; do NOT hand-edit the declared reason (that hides the drift) - retain the fixture and print the ACTUAL refusal text. (b) RESOLVED 2026-10-09. Diagnose (a) and (c) now: the `just health` prefix is unblocked.** |
 | BUG-242 | 2026-09-11 | **frontier69_v2 + extension80 audit outputs carry 2 data-quality defects.** (1) The `*_verdict` fields (depth/discipline/domains) are LLM SELF-REPORTS, not computed comparisons — they claim `override` even when the audit value equals silver (e.g. `S4-GOLD-MINED-00005` domains identical yet `domains_verdict=override`), so the cited "57.5% domain-override" and "80 flagged" figures are inflated. (2) Non-principle content_type rows (noise_drop/tool_instruction/process_template/process_instance/growth_edge) carry a spurious 4-way depth label, violating D2612 (depth only for principle). FIX (applied in `scripts/build_phase0_adjudication_form.py`): agreement recomputed deterministically (`differs` flag) + depth marked N/A for non-principle. REMAINS: recompute the override figures from the audit values (deterministic), and re-run the audit to null depth on non-principle if the raw artifacts are kept. |
 | BUG-228 | 2026-09-08 | **Dead/aspirational schema fields — 0 code references.** `parent_pt_id` (process_instance's tether to a template), `promoted_to_type`/`promoted_to_id`/`parent_fb_ids` (growth_edge promotion), MCP `annotations` (`readOnlyHint`/`destructiveHint`/`idempotentHint`), `consulted_fbs`/`template_source` — all declared in `content_types.yaml`, all 0 refs in `pipeline/`+`scripts/`. Consequence: `process_instance` is indistinguishable from an unlinked anecdote; `growth_edge` is a dead-end bucket with a staging-area description; MCP-promotion aspiration is unbacked. False affordances for future retrieval code. Fix = prune or ship; backfill `parent_pt_id` when a PT exists (§1.3.2 of the adjudication doc). |
@@ -12423,6 +12424,69 @@ store-written; the rest are 14 units with no repo artefact declaring them), 103 
 store-written), 10 DEFINITION-RE-SCOPE (the D-2974 audit is still running - 269/354 arm-calls at last check - and
 this queue will grow).
 
+
+## BUG-766 (MED - OPEN 2026-10-13) - the store-columns register holds TWO defects the ladder has been RED on: 6 columns declare `outside: absent` (NULL) while 1049 sidecar rows carry a NON-NULL blank, and one measurement the licensed write moved stayed recorded as its old value
+
+FOUND WHILE LANDING D-2988 (the honest cascade of a store write, not a side effect: the write moved a measured
+number and the register that declares it still claimed the old one).
+
+DEFECT 1 — POPULATION-SHAPE (the larger half, and NOT caused by this act). `scripts/check_store_columns.py --check`
+is rc=1 with six lines of this shape: *"source_text declares `outside: absent` for population 's5_verified' and is
+blank there, but 1049 row(s) hold a NON-NULL blank (hollow 0) — absent must be NULL (D-2957), or count(source_text)
+keeps claiming those rows while the column is empty"* — the same for `difficulty_level`, `temporal_scope`,
+`epistemic_status`, `verification_method`, `practicality`. The two-tier store (D-2943/D-2958) means these
+columns are structurally absent on the 1,049 sidecar rows; `count` still counts them. MEASURED AS PRE-EXISTING: the
+ladder receipt of commit 673a457 at 18:33 (BEFORE this act's write) already records this rail at rc=1.
+
+DEFECT 2 — MEASUREMENT-DRIFT (this act's cascade, now recorded). `discipline_source.distinct` was recorded as 1
+and measured 2 after the licensed write stamped 163 rows `deterministic` — a declaration still claiming the old
+number is exactly the state `--record` exists for, and the re-record at 2026-10-13T18:40:50Z absorbed it together
+with the code-mention moves the new applier caused (`taxonomy_match_method.mentions` 18 -> 20 and siblings).
+
+FIX OWED: reshape the six columns to a TRUE NULL outside their population (the pipeline/normalize_absent_shape.py
+precedent, BUG-737 column 2 of 14), then `--record`. Until then this rail's rc is 1 and the ladder line is RED for
+a MEASURED reason rather than a silenced one.
+
+## BUG-749 (HIGH - OPEN, THE LICENSED STORE WRITE LANDED 2026-10-13 by D-2988) - every OWNER-RULED unit is now written, the gap fell 457 -> 294 (6.9% -> 4.5%), and the twenty ad-hoc `UPDATE fbs SET discipline` sites have ONE licensed replacement
+
+The owner licensed the write (T-103) and D-2988 built the instrument that EXECUTES a ruling without minting one:
+`scripts/apply_relabel_store_write.py`, whose authority is that it copies the PRODUCTION MAPPER's own answer into
+the store for rows an owner ruling already reaches — never an invented label.
+
+WHAT IT WROTE (5 owner-ruled units, 163 rows, keyed by fb_id — never by a predicate over the raw label):
+`marketing science -> marketing` (94), `entrepreneurial studies -> entrepreneurship studies` (4),
+`marketing strategy -> marketing` (4), `market research -> marketing` (1), `computer science -> emerging` (60).
+Four columns and only four: `discipline`, `discipline_macro` (macro_for, the ONE collapse home D-2884a),
+`discipline_source` (the C29 tier the licence declares), `taxonomy_match_method` (the S4 rule: the declared
+absence -> `emerging_real`, else `synonym`). `discipline_raw` is untouched — the raw IS the provenance.
+
+WHY IT COULD NOT GO WRONG SILENTLY. Every row must be TRIPLY agreed — mapper(raw) == the owner's ruling == the
+packet's recorded `live_mapper_says` — and the scope may not widen: an unlicensed ruled unit, a licensed unruled
+unit, a stale surface (the store moved under the review) or a row over the licence's SHRINK-ONLY cap is a REFUSAL
+with the guard NAMED (C16). Both load-bearing guards are mutation-locked (D-2676) and SEEN to red.
+
+MEASURED RECEIPT (config/label_store_write_receipt.json, D-2660): changed=163 verified=163 planned=163; the store's
+`menu_hash` SET byte-identical before and after; every input hashed; backup
+`maxwell.db.bak_20261013_203654_pre_relabel_store_write` (219,467,776 bytes) taken after a PRAGMA integrity gate.
+STORE DELTAS: `marketing` 259 -> 358, `entrepreneurship studies` 1 -> 5, `software engineering` 167 -> 107,
+`emerging` +60, `discipline_source='deterministic'` on exactly the 163 written rows, and `taxonomy_counts`
+recounted through its own home (pipeline.taxonomy_manager).
+
+THE TWO SURFACES THE INSTRUMENTS PUBLISH, BEFORE -> AFTER (the same instruments, one difference):
+* the plan applier: CORRECT 4 / ABSTAIN 1 -> **CORRECT 0 / ABSTAIN 0** (the ruled-but-owed half is DISCHARGED);
+  ESCALATE 65 units / 304 rows -> 72 units / 311 rows (that surface is owned by T-117, and queue A grew because
+  the D-2974 re-scope audit keeps feeding it — the bug says so in its own text).
+* the reference sheet's SUBJECT LINE (queue B, the re-derivation gap): **457 rows (6.9%) -> 294 rows (4.5%) of
+  6,587** — exactly the 163 written (457 - 163 = 294), and queue B's decision units fell 60 -> 55.
+
+A PROSE DEFECT CLOSED IN THE SAME ACT. The previous section's REMAINING list summed to 467 while the gap it names is
+**457**: the 10 `DEFINITION-RE-SCOPE` rows are QUEUE A (the D-2928 re-scope differential of D-2974), not part of the
+re-derivation gap. The reference sheet's header names the two subjects separately; the bug's prose mixed them. The
+number of record is now the instrument's own, quoted above.
+
+REMAINING: 294 rows the pipeline still owes an answer for, of which the OWNER's half is T-117 (the units no ruling
+reaches) and the rest is the running re-scope audit. The raw labels are all preserved, so any future canonical home
+can be re-derived cleanly.
 
 ## BUG-710 (CRITICAL - CLOSED 2026-10-13 by D-2979 + D-2980) - all three defects fixed AND the gate now MEASURES the served path
 

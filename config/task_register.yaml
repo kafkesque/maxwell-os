@@ -63,18 +63,21 @@ tasks:
   gate: none
 - id: T-103
   priority: MUST
-  state: open
-  mover: owner
-  title: 'BUG-749 residual — the label re-derivation debt the census names (OWNER-RULED rows are store-write-owed)'
+  state: done
+  closed: '2026-10-13'
+  mover: pipeline
+  title: 'BUG-749 residual — the OWNER-RULED half is STORE-WRITTEN (the half no ruling reaches is now T-117)'
   why: >-
-    The LATE-HOME rows (CORRECT ruled) and the computer-science rows (ABSTAIN ruled) are recorded as OWED
-    to a licensed store write (D-2898); the alias-layer-retired rows await evidence or owner eyes; the
-    D-2974 re-scope audit keeps feeding queue A. The sizes of each queue live in the census and the bug,
-    not here (a count restated in prose is stale the moment it is written, BUG-588/D-2692). This is the
-    largest remaining ontology-accuracy item on the SERVED labels.
-  source: [BUG-749, D-2977, D-2898]
-  evidence: 'claim gap 6.9% (457 of 6,587) measured 2026-10-13'
-  gate: 'the owner word that licenses the store write'
+    CLOSED BY D-2988 - the owner licensed the write and the instrument that EXECUTES a ruling (never mints one)
+    landed it: scripts/apply_relabel_store_write.py wrote the 5 owner-ruled units (4 CORRECT, 1 ABSTAIN) to the
+    store, keyed by fb_id, with the target TRIPLY agreed (the production mapper's answer == the owner's ruling ==
+    the packet's recorded answer), a timestamped backup, one transaction and a receipt that records BYTES rather
+    than a claim: MEASURED changed=163 verified=163, the store's menu set unmoved, and the plan render now shows
+    CORRECT 0 / ABSTAIN 0. The residual - the units NO ruling reaches - is a DIFFERENT act with a different gate
+    (the owner's word, not the owner's licence) and is filed as T-117 rather than implied away here.
+  source: [BUG-749, D-2977, D-2898, D-2988]
+  evidence: 'config/label_store_write_receipt.json (changed=163 verified=163 menu_unmoved=True); owner-ruled units remaining owed = 0 (2026-10-13)'
+  gate: none
 - id: T-104
   priority: MUST
   state: open
@@ -138,11 +141,20 @@ tasks:
   mover: owner
   title: 'MCP payload decision — borp_score / feedback_score are still advertised to agents'
   why: >-
-    borp_score is retired debt (constant 0.0) and the MCP query_knowledge payload still EXPOSES it,
-    so an agent is handed a dead signal next to real ones. Changing an MCP output schema is a
-    contract change: it needs one owner word plus a spec bump, not an edit.
-  source: [D-2980, specs/retrieval_serving.spec.md]
-  evidence: 'maxwell_mcp_server.py output block (2026-10-13)'
+    MEASURED, and the two fields are NOT the same defect - which is why one of them must be KEPT. borp_score is
+    DEAD-but-READ: the column is not-null on every row with exactly ONE distinct value, and config/derivations.yaml
+    registers it home: null / parity_rail: null / status: dead_but_read - so an agent is handed a constant that
+    reads as "score zero", never as "no such signal". feedback_score is the OPPOSITE shape and must NOT be dropped:
+    it is populated on NO row, while the same registry names a WRITER for it (home:
+    pipeline/feedback.py::_update_fb_aggregates) with status declared_but_empty - it is UNPOPULATED, not retired,
+    and the serving path already ranks on it through a declared neutral prior. Dropping it would delete the
+    contract for a signal the feedback primitive is meant to populate and would make re-adding it a breaking
+    change for every agent.
+    RECOMMENDATION (the owner's one word): DROP borp_score from the payload; KEEP feedback_score and make its
+    ABSENCE explicit (null plus a declared state, and move the neutral prior out of the SQL into config, C12),
+    giving it the parity rail its registry row still lacks.
+  source: [D-2980, D-2537, specs/retrieval_serving.spec.md, config/derivations.yaml]
+  evidence: 'fbs census joined to config/derivations.yaml: borp_score one distinct value on every row (dead_but_read) vs feedback_score carrying no value on any row while its writer home exists (declared_but_empty) (2026-10-13)'
   gate: 'owner word on the payload schema'
 - id: T-108
   priority: SHOULD
@@ -313,3 +325,21 @@ tasks:
   - BUG-710
   evidence: scripts/reanchor_retrieval_goldens.py --check reports the draft/live set out of phase and names the retired query (2026-10-13)
   gate: none
+- id: T-117
+  priority: MUST
+  state: open
+  mover: owner
+  title: 'BUG-749 residual — the ESCALATE surface: the units NO owner ruling reaches'
+  why: >-
+    D-2988 discharged every unit that ALREADY carried a ruling (T-103); this is the other half, and it is a
+    DIFFERENT act with a different gate: for these units the owner's WORD is owed, not a licence to write, because
+    writing one would mint a label by script (D-2898). Two causes feed it and they are not the same question. The
+    lexical-guard units are ALIAS-LAYER-RETIRED mappings whose raw shares no content token with its canonical - the
+    alias layer bridged unrelated vocabularies, so a CONFIRM would declare a link nobody can evidence and an
+    ABSTAIN removes a stored claim the corpus still holds. The PROVENANCE-UNRESOLVED units have NO artefact this
+    repo retains declaring the raw under the stored canonical, so a CONFIRM would CREATE a declaration out of an
+    unrecoverable mapping. The sizes and the ordered unit list live in the packet and the plan render, never here
+    (BUG-588/D-2692). Owner-ruled truth for each unit is one word per row of the sheet.
+  source: [BUG-749, D-2977, D-2988, D-2974]
+  evidence: 'plan render ESCALATE 72 unit(s) / 311 row(s) and the reference sheet governance/canonical_relabel_review_20261014.md (2026-10-13)'
+  gate: 'one owner word per unit on the reference sheet (CONFIRM / CORRECT + home / ABSTAIN / LEAVE)'

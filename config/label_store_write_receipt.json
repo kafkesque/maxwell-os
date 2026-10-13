@@ -1,0 +1,1978 @@
+{
+  "decision": "D-2988",
+  "granted": "2026-10-13",
+  "owner_word": "\"T-103 approve your recommendation\" \u2014 licensed SCOPED to the rows that ALREADY carry an owner ruling: the CORRECT units of the LATE-HOME cause and the ABSTAIN unit of the PROVENANCE-UNRESOLVED cause. The units that still ESCALATE (no ruling reaches them) are NOT licensed: for those the owner's own word is owed first, and writing them would mint a LABEL by script.",
+  "written_utc": "2026-10-13T18:36:58.128110+00:00",
+  "store": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/maxwell.db",
+  "store_bytes": 219467776,
+  "inputs": {
+    "rulings": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/config/relabel_rulings.yaml",
+    "rulings_sha256": "2271d15c2388ccca5b11fc2ad7336b3543666dc3dcf51f635ba348b7630190ce",
+    "packet": "canonical_relabel_review_20261013.csv",
+    "packet_sha256": "9cfbaf7820218b3b5d2a060a05b0ca564c03e5e3ce9867c3e65022de8b412db5",
+    "segments": "canonical_relabel_review_segments_20261013.csv",
+    "segments_sha256": "5502fc79684a23842033d8cbde4db907a8389de09d19b4f44099354257a198a3",
+    "taxonomy_sha256": "f5c7b55120bc13a0ab868c968e59f6818055780894b333ab463367838b4fd5d2"
+  },
+  "plan": {
+    "rows": 163,
+    "units": {
+      "computer science -> software engineering": 60,
+      "entrepreneurial studies -> emerging": 4,
+      "market research -> emerging": 1,
+      "marketing science -> emerging": 94,
+      "marketing strategy -> emerging": 4
+    },
+    "moves": [
+      "emerging -> entrepreneurship studies",
+      "emerging -> marketing",
+      "software engineering -> emerging"
+    ]
+  },
+  "measurement": {
+    "changed": 163,
+    "verified": 163,
+    "planned": 163,
+    "menu_hash_before": [
+      "NOT_APPLICABLE",
+      "be3235433e7659144a315ec8ad565f86ba0cc6e603eebdc87a9cbd2bec9b651c"
+    ],
+    "menu_hash_after": [
+      "NOT_APPLICABLE",
+      "be3235433e7659144a315ec8ad565f86ba0cc6e603eebdc87a9cbd2bec9b651c"
+    ],
+    "menu_unmoved": true,
+    "counts_recount": {
+      "domain": 4118,
+      "discipline": 584,
+      "flood_warning": false
+    },
+    "column_census_after": {
+      "discipline": [
+        [
+          "emerging",
+          2493
+        ],
+        [
+          "psychology",
+          618
+        ],
+        [
+          "cognitive science",
+          411
+        ],
+        [
+          "marketing",
+          358
+        ],
+        [
+          "strategic thinking",
+          236
+        ],
+        [
+          "cultural design",
+          191
+        ],
+        [
+          "philosophy",
+          174
+        ],
+        [
+          "economics",
+          166
+        ],
+        [
+          "human-computer interaction",
+          166
+        ],
+        [
+          "design thinking",
+          160
+        ],
+        [
+          "research methodology",
+          160
+        ],
+        [
+          "organizational theory",
+          157
+        ],
+        [
+          "linguistics",
+          150
+        ],
+        [
+          "information science",
+          131
+        ],
+        [
+          "communication theory",
+          127
+        ],
+        [
+          "political economy",
+          126
+        ],
+        [
+          "anthropology",
+          121
+        ],
+        [
+          "software engineering",
+          107
+        ],
+        [
+          "semiotics",
+          105
+        ],
+        [
+          "sociology",
+          94
+        ],
+        [
+          "operations research",
+          86
+        ],
+        [
+          "media studies",
+          85
+        ],
+        [
+          "machine learning",
+          78
+        ],
+        [
+          "literary theory",
+          71
+        ],
+        [
+          "engineering",
+          70
+        ],
+        [
+          "behavioral economics",
+          69
+        ],
+        [
+          "creative process",
+          69
+        ],
+        [
+          "health & medicine",
+          54
+        ],
+        [
+          "cultural studies",
+          53
+        ],
+        [
+          "law",
+          53
+        ],
+        [
+          "decision making",
+          52
+        ],
+        [
+          "neuroscience",
+          49
+        ],
+        [
+          "finance",
+          48
+        ],
+        [
+          "systems engineering",
+          48
+        ],
+        [
+          "artificial intelligence",
+          47
+        ],
+        [
+          "aesthetics",
+          41
+        ],
+        [
+          "motion & time",
+          36
+        ],
+        [
+          "systems thinking",
+          36
+        ],
+        [
+          "typography",
+          35
+        ],
+        [
+          "computer graphics",
+          32
+        ],
+        [
+          "computational geometry",
+          29
+        ],
+        [
+          "complex adaptive systems",
+          26
+        ],
+        [
+          "performing arts",
+          26
+        ],
+        [
+          "business administration",
+          20
+        ],
+        [
+          "theoretical physics",
+          19
+        ],
+        [
+          "evolutionary biology",
+          17
+        ],
+        [
+          "information security",
+          16
+        ],
+        [
+          "creative writing",
+          15
+        ],
+        [
+          "color theory",
+          14
+        ],
+        [
+          "museum studies",
+          13
+        ],
+        [
+          "ecology",
+          12
+        ],
+        [
+          "computational physics & simulation",
+          11
+        ],
+        [
+          "risk management",
+          11
+        ],
+        [
+          "visual perception",
+          11
+        ],
+        [
+          "robotics",
+          8
+        ],
+        [
+          "social network analysis",
+          7
+        ],
+        [
+          "game design",
+          6
+        ],
+        [
+          "interdisciplinary studies",
+          6
+        ],
+        [
+          "entrepreneurship studies",
+          5
+        ],
+        [
+          "design psychology",
+          3
+        ],
+        [
+          "privacy & surveillance",
+          2
+        ]
+      ],
+      "discipline_macro": [
+        [
+          "Human & Design",
+          3288
+        ],
+        [
+          "emerging",
+          2493
+        ],
+        [
+          "Method & Business",
+          1456
+        ],
+        [
+          "Technical",
+          403
+        ]
+      ],
+      "discipline_source": [
+        [
+          "llm_extracted_from_source",
+          7477
+        ],
+        [
+          "deterministic",
+          163
+        ]
+      ],
+      "taxonomy_match_method": [
+        [
+          "synonym",
+          3313
+        ],
+        [
+          "emerging_real",
+          1736
+        ],
+        [
+          "exact",
+          1542
+        ],
+        [
+          "",
+          1049
+        ]
+      ]
+    }
+  },
+  "rows": [
+    {
+      "fb_id": "012800470bf43710b33f17ebe300c293bc0b2446958f1309addc4ff34780caa9",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "016b08de60bd864d31bb164fedb9674eeac7452178b775369bb0c1053bc18c53",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "017168f44a9a1ff39b564dd8e80ea75dfa4a22a294c0bd8f352b922dcd43d2ef",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "01cbb1dfe5f260c48d786697327e45b99923478fbf0149e9ebf809794934133b",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "098d432caa576d431d603e8b4279e07f931686fdeb74d9a314c54642f19ccc73",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "0c749d44d51859eb1085d8b2f238a251325a0556db54fbc236e10a12abd174db",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "0d75823469ca5af66b16b1cea2fc0ee714b3b3d254d644fb6fcb692ede2fb2e6",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "0e82fea747d831e1e4693dd86835b644c93f616e6ef4487c567896e479ede24d",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "10635a6bc8337b53cb84bcbac4d711a49f86b7d10cdba8a7eb59301e4e1eb038",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "191a83e5535a548c34b1707bb45541861defe4e8feb658b057d77ab0274841e7",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "1b443f28dfae71fc12a2ea1641f9431b7bcb826fad8e339df14ffdd642bdd00d",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "1cce2b2f8fc0f80e56a757a611bd4347100c775be253f410784b882ff0b1cb1c",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "1e6238c25135f780b3b578c8c2a5d35596a01ac93061fc86496ecfca69d40ad7",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "1fdc1473c8530488480a0cef06d2e16a6d6e8e5fe2c73f4f3eb9d3c6126a4dba",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "216ca20db793c948c667f085ed1bdbeb5fea74c2ce4bdcfcea1a980ca00c6395",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "2ee0a85207bbb75d2aa5d0628af1f84bc70b23a0b5ae8dbc2f4f78d077c9130c",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "2fd8af080b8a1b0776bd6ef08b488b3d58758ad7babb6728d7d5c5499d1996f1",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "312beaf62db4cacea33329786847a95a26528e558137f1c9baa0fcbde2d79092",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "33d120ca026c4a9f0a410f376d60a1e34908834eae43bdd4aec27b584766959c",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "3b629fc7187ad888b7abbe3f75ed23fa80c755502c1d8dab06eb2977bf72a27d",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "3fe06c4a890de52462ac8ccde35eca5a9c65fa15db683deebb89e5234b39e533",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "454af81ff5162e8f06269987aa55076e9cbfbaf8c0855ea65a3bae9af250d8b6",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "475eaa55d54692adeb84b1d4aa41d14eeafc327205a18a54c8bee16676f7e84b",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "485f3e6782db394849deab499648c18e6dffa4f44fa8be2275b1e057e3e1b013",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "492620733ff4658361538da8b77ccab334654c8b5b9cbea24bc06d731e45d8cc",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "4a651f1e58e84bcf39cce5437a49364f90544f0291e9c56c4113ab7b902049cb",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "4acbc0e83131dd564c70378c7ae3904f46cac6803a35d08f837bc4a8843ea2bf",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "4c2904e0fab34a40f37cb1129aa5122c568b003c2cbc9c94140ae85c9cfd7f22",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "4c73d344d0e51e79aa5e9749bb210c70413cfacd59d3aa971d0010a2093b28b7",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "4e917fe8bb4057beb336f9b6b789170a79b2687628c2be90d39f4d6a05975837",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "51820a768188822b361bea118055785197b165b1b3b9abed9ea13e180cd03b25",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "57f20aa691bf7f0ac8773cc3932d3a10967bd0a5fe8a3b4faf9ee6d0a3389947",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "629affb29bcf194966924d4c1f22c588bd80026b9b2ce2f9eb86f02df0e1ebd9",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "6acd25c04a6ae4b8376f13ba8eef5e2ea9050e84574ba93e384aabe9a8de7bed",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "6d91c2f827081cb36e404bd13d97bd129a13eddd760af8122e56c662f99a8681",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "6ed0952d0ff03cfae06acf027f987ff752512afa9e0f21647803dd30591d053c",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "7444d5aba5eb1fecf23e40d7d1f747d7f8c2e04b602fcd76e1b402fd8f289883",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "7845ac2eaf24a9e484267edb1c78dd2c3c3b04262f428e117b2534bd68b3af6e",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "78fa7b5d7be5e16a10f3890554f0dc430f37c3607e6d0dfbf0a7da344c58c456",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "7c937a611537c8951ef6f3524a4b27edc2acf64983569d304727c97354f8fbb3",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "81ebd78d8435e7fe6c63ebb5773f272b212c20e00196fbd11534fc3b66ccabec",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "825056ac012eab7e077629302fdadff2ff1fe277865c9f73e4eaf4d16511c0b3",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "83d16df31c4aff78558095d6dc5399947e7310f62d06cb7b84efeaead25facb8",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "848cb6bee0a7fea510c8f9b715432b57c3f4fa74d8762abd07e06867c66c10bd",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "86fdf090ba328325783cf4e6583a11ef2181d7f2f470bc82caf57fd5a58fc5c8",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "8752b1eddd4d6b0623dc2ff483b282757d295c90c7d7db262b65c1b86c95cb49",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "87ad9716e96d21c712cbf5dad69d5c473ee3f5de0ad4ff0e92188a27b6c4dd6e",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "8828bef8fc33607d9dea02e5a9b4bffa8b8a976b8281f4e914713b9c57187b44",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "90bfc1bcf01f9b150c03355289cec118e394b9d49d8fcb3e54da758c36293bb6",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "946c2536cd7e3403564d63b82c6dff13d95d833c241bf1ddb599a6bdf319fbd7",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "97205013bf97171fddebf5e952f86de8926314dd1e6eb6162c8d9c89aff1fe37",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "98eeb4579af5605ce96cdaf36b66e7730fa914a9c9b13aa5d0f516dfd7f21afc",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "9ec1daaaff8f8a9eb328ff2247964a9b2465c33e6d813bea0a6bb9aff1b72e17",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "9fa203bd6597c13bb98f01379ba08dc68e47a5244b54827cee1d2a079e082ff4",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "a0862d6cba75fdf19e8eb541a24701c0017441994aa033b44d53149cd09c56d5",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "a2bd0d35a5c5457e1a19507ca6469b5671e487597c8124b3ced5445d6f8cda9d",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "a56ae88b2b177619f5c8a090c50faef01357030805dfe1435cac048a69fd900e",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "a56cb8e4aaf3f90986fe5387b0f1a81b467127eb1d5d6cbffa03bc966777f89d",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "a78f00a3ee9538ff736dce5f2cf2ca3d48a1340fe7f72691498b6e40fa547395",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "af0510d6f506922b3c4036113d89a6b6388a1a20e622d5511169ad375765fd17",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "af2f56c108499ef03fa1aa46ede341b1b5565b2c042914b902125ca6b9390819",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "b60e50072c4fb73dd5be7e2595aa364aa3c69a5f5c964f250526b8f79c268268",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "b701ba085e7eba33b61b7335713e4ab3bd0f3b02a1d006b887a6394881cad8b1",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "b7379de0904c7371a9aa43f1153725e678e8584cd2b92b9cbd4b23d82c35a99a",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "b8237699d0b8d34a424f988b94268f9e97ced375b46d5063fe86c741409111e2",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "b9f38390b3090ab0bfed6b1b5c7325c9334a6a4ea69b25b2806f76dcbd0aad9b",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "ba3582b97b342be6795228460582bfa8786ea164d2adea55fa8aee0e1084bfc8",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "bfb7d7923f0dd27cd27e675db43fc0bc81ad48d1e1b0bc336a15714a3091f8c6",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "c105f5f21646261d43ddb6a63a57b48d9465764d899667c32fa15458d10b526b",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "ca8818e5497be75bd7e537f7cf48c07d1b4fd0f0b9adb29afb47ab2be7913343",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "d21e20a0b9cc9cebc87df21fb0ea912dbe7648884cc22b2e691c3b9e44ee8ce6",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "d57614b9b7f8662c970ca96e047e974c4fbdaf3994d74f5af4b552dd05ce8721",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "d5ab40775fb7d6952f239b8aa659cb569afa6a759174b224c7e50ac16df0f26b",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "d9cdfb83f251d39b70c181aecd29be6cb1c5c5fbf72a876ff14aed8943ab6be7",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "d9ffe9e44ff9103e0e96cb5bfb3187f2ad47b07f6ffb1be213515738308e71fb",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "dac3ae7148cdea108187186d9d816b08f971ee3b934e3d03a30aefc271048f4f",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "dc9365062c4a4e42a5e4c1c4d4407e653ea4dc333bbd17555895e66dbf46a256",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "df0f37b2b64e8dabf011b6eedc5800ad354fa2bc1f43b07acdf7c8fc896c9c63",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "e7d6e98e1bbd80327848cb3a4452f5c8582f89d1d85f79ace8b9cafad7d96ec8",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "ea865a104e3289099c9ed8433280b347f2801309c4558bc12576d96711bba0b8",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "ebe3e59fa44261c8eb0683d22f2bf196de4a082f5a508385e67880fac6f793ac",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "ec65329f49c069f12ab3aed9764778f665f1d6b66e9106bb672619e11f2f2e79",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "ee2efd3f6482b03a902891b7cb978ed97bcd81d5ef3114085bbf13c3a54d5daf",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "ee5a642c968aac1467d3a0cc3c7adbcae9be2b38007ad1f660e64bd4faa7b523",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "f1b999c519634f379cd0c2a0e6b4d4bd3412bc3b0745b7b5c8d5f3bd6bcfc7f4",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "f464c07c23409b3e5079d45830ff41217ace82ff99cf132154be567fe680a588",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "f67205696d7975870a5d4799b3a9562e994c5b6e61df6c7e05248a82deb88376",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "f6c61f035a021e3788b2161d463d2811970705aea71763228d6f254303629398",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "f6f4da64ebcfd91ede6963ec0c693cb3a508317e7a167500f3db48f9edfc9344",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "f8a6a11a0c20c98d8d0a53888f611958e2d4374f892c03ee6bbcef71f5fe305b",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "fa820e7861bb55d128b659f91fd459b31873bc5bed238a6c7486b3c4b26952b5",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "fab3b9273d45f3d02dce94677673877db907f359524b54857dae1b3b52dbdad8",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "fb8fdbac8db4cc8d29e7cb2d9a5100ada023fca0521bcaabe25d2fb2bcd1fb5e",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "fc5588208b6040bb014d2d9f23095e0a01920964ac4382424702ff994db4f5f4",
+      "unit_key": "marketing science -> emerging",
+      "raw": "marketing science",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "2f6b47fd9fdeaaf84cd9962d13a501df1218609017297e809f98213782a938e3",
+      "unit_key": "entrepreneurial studies -> emerging",
+      "raw": "entrepreneurial studies",
+      "from": "emerging",
+      "to": "entrepreneurship studies",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "52ea50399f264cbd7866a62fcddc0cd1d2f3cb68a44fd835c48013c743e5b677",
+      "unit_key": "entrepreneurial studies -> emerging",
+      "raw": "entrepreneurial studies",
+      "from": "emerging",
+      "to": "entrepreneurship studies",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "887fdcb353b1136ff4fa06ae3e44679a059941c8b789b40bc84e1eda58d63734",
+      "unit_key": "entrepreneurial studies -> emerging",
+      "raw": "entrepreneurial studies",
+      "from": "emerging",
+      "to": "entrepreneurship studies",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "c35a5a8dad0bcd9f6eb769026eac963bb1d1fa488a2b1f4983f46e1df439e8a4",
+      "unit_key": "entrepreneurial studies -> emerging",
+      "raw": "entrepreneurial studies",
+      "from": "emerging",
+      "to": "entrepreneurship studies",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "5e054d77ac34ef3bce416d170f01150e5ceae4d446d91d73c33b3c2fa12400a2",
+      "unit_key": "marketing strategy -> emerging",
+      "raw": "marketing strategy",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "853636ad30b0ccbbc0df9bc948b1f306da5895b1f1172cd5812603a8abba0701",
+      "unit_key": "marketing strategy -> emerging",
+      "raw": "marketing strategy",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "c94e1eb203c4715170a35b692222313608eb065d278317f1c2d866795d1e8c07",
+      "unit_key": "marketing strategy -> emerging",
+      "raw": "marketing strategy",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "cc0d348478e164451f941579dc4d364dd2b8214f452045f98faacdf78a9e3891",
+      "unit_key": "marketing strategy -> emerging",
+      "raw": "marketing strategy",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "aeb442ba7f12486db7cf41d9e823f1dd86f53273a3b51d291e4b414d3f706293",
+      "unit_key": "market research -> emerging",
+      "raw": "market research",
+      "from": "emerging",
+      "to": "marketing",
+      "macro": "Method & Business",
+      "source": "deterministic",
+      "method": "synonym"
+    },
+    {
+      "fb_id": "08f6d9df6b4cf0371d29edc7dae544490c30457be0e147e281dc800a2e229876",
+      "unit_key": "computer science -> software engineering",
+      "raw": "computer science",
+      "from": "software engineering",
+      "to": "emerging",
+      "macro": "emerging",
+      "source": "deterministic",
+      "method": "emerging_real"
+    },
+    {
+      "fb_id": "0b33538c7bdda0a2f1e0f4c729c8d5faf127deccd91a9c69d09b359c75f6852c",
+      "unit_key": "computer science -> software engineering",
+      "raw": "computer science",
+      "from": "software engineering",
+      "to": "emerging",
+      "macro": "emerging",
+      "source": "deterministic",
+      "method": "emerging_real"
+    },
+    {
+      "fb_id": "0dae34fe6a4468975fabbb014c1116856c357b0bb59210cc9f8197cd28cfcdcd",
+      "unit_key": "computer science -> software engineering",
+      "raw": "computer science",
+      "from": "software engineering",
+      "to": "emerging",
+      "macro": "emerging",
+      "source": "deterministic",
+      "method": "emerging_real"
+    },
+    {
+      "fb_id": "0ead298eebacb84f015a6691af78d00c6de3d99bf11d3b97ed175b2838836843",
+      "unit_key": "computer science -> software engineering",
+      "raw": "computer science",
+      "from": "software engineering",
+      "to": "emerging",
+      "macro": "emerging",
+      "source": "deterministic",
+      "method": "emerging_real"
+    },
+    {
+      "fb_id": "1809c3c6e13d6296eabbbbd9777060d3506163047e6b51ac82d7b61f58a6ee60",
+      "unit_key": "computer science -> software engineering",
+      "raw": "computer science",
+      "from": "software engineering",
+      "to": "emerging",
+      "macro": "emerging",
+      "source": "deterministic",
+      "method": "emerging_real"
+    },
+    {
+      "fb_id": "1f68435f1debc33aa3877f8ae71f83715f499dc1f2210ca02f1887c21ae47b84",
+      "unit_key": "computer science -> software engineering",
+      "raw": "computer science",
+      "from": "software engineering",
+      "to": "emerging",
+      "macro": "emerging",
+      "source": "deterministic",
+      "method": "emerging_real"
+    },
+    {
+      "fb_id": "1f71d9647b9c512070f938f10d6fb0e39b74a8769f0f6160a0451192327eb513",
+      "unit_key": "computer science -> software engineering",
+      "raw": "computer science",
+      "from": "software engineering",
+      "to": "emerging",
+      "macro": "emerging",
+      "source": "deterministic",
+      "method": "emerging_real"
+    },
+    {
+      "fb_id": "20f959895668969b7ec69b2f078fe23dac7d29558f2ecc19549aa55b11685765",
+      "unit_key": "computer science -> software engineering",
+      "raw": "computer science",
+      "from": "software engineering",
+      "to": "emerging",
+      "macro": "emerging",
+      "source": "deterministic",
+      "method": "emerging_real"
+    },
+    {
+      "fb_id": "25b655b4fe5d1293f997989c4885292a306cb68c2fab75ad3c41f2748f160e0b",
+      "unit_key": "computer science -> software engineering",
+      "raw": "computer science",
+      "from": "software engineering",
+      "to": "emerging",
+      "macro": "emerging",
+      "source": "deterministic",
+      "method": "emerging_real"
+    },
+    {
+      "fb_id": "28afdd86fe27829c2515a62400acff107d20d51d1742f803b61ac9886bbffb8c",
+      "unit_key": "computer science -> software engineering",
+      "raw": "computer science",
+      "from": "software engineering",
+      "to": "emerging",
+      "macro": "emerging",
+      "source": "deterministic",
+      "method": "emerging_real"
+    },
+    {
+      "fb_id": "29860699eaaf922f306901232d1633de7323dbbcccf25606e5da4752a66d4c2c",
+      "unit_key": "computer science -> software engineering",
+      "raw": "computer science",
+      "from": "software engineering",
+      "to": "emerging",
+      "macro": "emerging",
+      "source": "deterministic",
+      "method": "emerging_real"
+    },
+    {
+      "fb_id": "2c5d0b3330f22d67204da90b76029a3fc8bf31aab5191e7061926567af08a7fc",
+      "unit_key": "computer science -> software engineering",
+      "raw": "computer science",
+      "from": "software engineering",
+      "to": "emerging",
+      "macro": "emerging",
+      "source": "deterministic",
+      "method": "emerging_real"
+    },
+    {
+      "fb_id": "31b73333fcb7a795826e16e351aa4aac72cebba478cff78f5894bdd9e90ce028",
+      "unit_key": "computer science -> software engineering",
+      "raw": "computer science",
+      "from": "software engineering",
+      "to": "emerging",
+      "macro": "emerging",
+      "source": "deterministic",
+      "method": "emerging_real"
+    },
+    {
+      "fb_id": "35bdd0aedcd634a8d1e0c7dadda2bb88f4ab89709463f35ba5d237aa0bf76d41",
+      "unit_key": "computer science -> software engineering",
+      "raw": "computer science",
+      "from": "software engineering",
+      "to": "emerging",
+      "macro": "emerging",
+      "source": "deterministic",
+      "method": "emerging_real"
+    },
+    {
+      "fb_id": "36d458935cbbc32248718cf3796d78271188828c5b9f44580a71950659990b07",
+      "unit_key": "computer science -> software engineering",
+      "raw": "computer science",
+      "from": "software engineering",
+      "to": "emerging",
+      "macro": "emerging",
+      "source": "deterministic",
+      "method": "emerging_real"
+    },
+    {
+      "fb_id": "37d4dfe16077fb80a95a57edd589b724ab5829a96d8de0ff3c00084aadd26680",
+      "unit_key": "computer science -> software engineering",
+      "raw": "computer science",
+      "from": "software engineering",
+      "to": "emerging",
+      "macro": "emerging",
+      "source": "deterministic",
+      "method": "emerging_real"
+    },
+    {
+      "fb_id": "3e323541e99dc6227744b8a2cb7f89aea05c25f0c197cc81fda197a527a46ea2",
+      "unit_key": "computer science -> software engineering",
+      "raw": "computer science",
+      "from": "software engineering",
+      "to": "emerging",
+      "macro": "emerging",
+      "source": "deterministic",
+      "method": "emerging_real"
+    },
+    {
+      "fb_id": "3eb1d8a29434b2d62329e33031e2d06a7cb9560d34b9aa096489bd53db7473ce",
+      "unit_key": "computer science -> software engineering",
+      "raw": "computer science",
+      "from": "software engineering",
+      "to": "emerging",
+      "macro": "emerging",
+      "source": "deterministic",
+      "method": "emerging_real"
+    },
+    {
+      "fb_id": "4605b0975291e520354a75789100a0c35c523b94c2d19881fd95c19700f601b0",
+      "unit_key": "computer science -> software engineering",
+      "raw": "computer science",
+      "from": "software engineering",
+      "to": "emerging",
+      "macro": "emerging",
+      "source": "deterministic",
+      "method": "emerging_real"
+    },
+    {
+      "fb_id": "48c297c6591dec97dea379062a95986b2cdcb193dfe3c7a114ba8df5a1a67087",
+      "unit_key": "computer science -> software engineering",
+      "raw": "computer science",
+      "from": "software engineering",
+      "to": "emerging",
+      "macro": "emerging",
+      "source": "deterministic",
+      "method": "emerging_real"
+    },
+    {
+      "fb_id": "4c6da2601c51d7ad9d04109b1118e299d70918976f854a1ed8ccea7421d28a76",
+      "unit_key": "computer science -> software engineering",
+      "raw": "computer science",
+      "from": "software engineering",
+      "to": "emerging",
+      "macro": "emerging",
+      "source": "deterministic",
+      "method": "emerging_real"
+    },
+    {
+      "fb_id": "57f18685bba32eb3abfe04d5d3d932f76c4fb1f18b3e4e358a51c8f173e6ec2d",
+      "unit_key": "computer science -> software engineering",
+      "raw": "computer science",
+      "from": "software engineering",
+      "to": "emerging",
+      "macro": "emerging",
+      "source": "deterministic",
+      "method": "emerging_real"
+    },
+    {
+      "fb_id": "57f78dd7fa958a61f2a794a48e3d7da54e746d6a5643774d5f85f8134ce5df20",
+      "unit_key": "computer science -> software engineering",
+      "raw": "computer science",
+      "from": "software engineering",
+      "to": "emerging",
+      "macro": "emerging",
+      "source": "deterministic",
+      "method": "emerging_real"
+    },
+    {
+      "fb_id": "5d2d8052771f6e9946b1f88dca62efa1af4570cf447c610255f28d88c2f895bb",
+      "unit_key": "computer science -> software engineering",
+      "raw": "computer science",
+      "from": "software engineering",
+      "to": "emerging",
+      "macro": "emerging",
+      "source": "deterministic",
+      "method": "emerging_real"
+    },
+    {
+      "fb_id": "6cb3b466541c4de2218f33abc14f0a41d91ad7b9ebadc5f1eaea242c0bf02254",
+      "unit_key": "computer science -> software engineering",
+      "raw": "computer science",
+      "from": "software engineering",
+      "to": "emerging",
+      "macro": "emerging",
+      "source": "deterministic",
+      "method": "emerging_real"
+    },
+    {
+      "fb_id": "712328f7eac5ecea05ab751066ff540bb70dd33100ef2b7ee93c361c7f0a9a19",
+      "unit_key": "computer science -> software engineering",
+      "raw": "computer science",
+      "from": "software engineering",
+      "to": "emerging",
+      "macro": "emerging",
+      "source": "deterministic",
+      "method": "emerging_real"
+    },
+    {
+      "fb_id": "7c091948b6904acfe6f16a11a486adc8cd12b0caadc79babf37d25cf2b342712",
+      "unit_key": "computer science -> software engineering",
+      "raw": "computer science",
+      "from": "software engineering",
+      "to": "emerging",
+      "macro": "emerging",
+      "source": "deterministic",
+      "method": "emerging_real"
+    },
+    {
+      "fb_id": "7dbcaf6b7bca8bdcbc0ce40bba1369a6d5034adced0e61516d0a15c43cda2857",
+      "unit_key": "computer science -> software engineering",
+      "raw": "computer science",
+      "from": "software engineering",
+      "to": "emerging",
+      "macro": "emerging",
+      "source": "deterministic",
+      "method": "emerging_real"
+    },
+    {
+      "fb_id": "8039b6b5505aa36098e7ba8a806a440e0e59fcf6312372923319154ae2490cd2",
+      "unit_key": "computer science -> software engineering",
+      "raw": "computer science",
+      "from": "software engineering",
+      "to": "emerging",
+      "macro": "emerging",
+      "source": "deterministic",
+      "method": "emerging_real"
+    },
+    {
+      "fb_id": "81962379ebc74b8665ccc085af0cf532387d15ec34d92b6e8a698023158e1f6f",
+      "unit_key": "computer science -> software engineering",
+      "raw": "computer science",
+      "from": "software engineering",
+      "to": "emerging",
+      "macro": "emerging",
+      "source": "deterministic",
+      "method": "emerging_real"
+    },
+    {
+      "fb_id": "8ac29e3f98b8cf1e0001ebdb9abdf44f69c85653600d563b4f0b1efb22cf6510",
+      "unit_key": "computer science -> software engineering",
+      "raw": "computer science",
+      "from": "software engineering",
+      "to": "emerging",
+      "macro": "emerging",
+      "source": "deterministic",
+      "method": "emerging_real"
+    },
+    {
+      "fb_id": "95757066725582f8fea53551246ef01e80bc123b1cd37cae1f0bdeb6daec4fcf",
+      "unit_key": "computer science -> software engineering",
+      "raw": "computer science",
+      "from": "software engineering",
+      "to": "emerging",
+      "macro": "emerging",
+      "source": "deterministic",
+      "method": "emerging_real"
+    },
+    {
+      "fb_id": "9f40b5bccadcf3461810b5c237b801140bd6b896b4741c7ca11acdd7843cd160",
+      "unit_key": "computer science -> software engineering",
+      "raw": "computer science",
+      "from": "software engineering",
+      "to": "emerging",
+      "macro": "emerging",
+      "source": "deterministic",
+      "method": "emerging_real"
+    },
+    {
+      "fb_id": "a0c2d691c267505e0800785eb1066f8811c1b641ead746825911b6bfef1840b4",
+      "unit_key": "computer science -> software engineering",
+      "raw": "computer science",
+      "from": "software engineering",
+      "to": "emerging",
+      "macro": "emerging",
+      "source": "deterministic",
+      "method": "emerging_real"
+    },
+    {
+      "fb_id": "a1c98d88e01564a1e2511429eefc834788d02a1c8bea9df78178db1225dad674",
+      "unit_key": "computer science -> software engineering",
+      "raw": "computer science",
+      "from": "software engineering",
+      "to": "emerging",
+      "macro": "emerging",
+      "source": "deterministic",
+      "method": "emerging_real"
+    },
+    {
+      "fb_id": "a34b362eea6a0b98ef832b41a6d9b31695b230b0fdc9bba4ba2e783980ecd86d",
+      "unit_key": "computer science -> software engineering",
+      "raw": "computer science",
+      "from": "software engineering",
+      "to": "emerging",
+      "macro": "emerging",
+      "source": "deterministic",
+      "method": "emerging_real"
+    },
+    {
+      "fb_id": "a41c1fc0776096b9a5c54b3b86946fbb2a6845e5faf95718cf6ca0d41ec2ca7b",
+      "unit_key": "computer science -> software engineering",
+      "raw": "computer science",
+      "from": "software engineering",
+      "to": "emerging",
+      "macro": "emerging",
+      "source": "deterministic",
+      "method": "emerging_real"
+    },
+    {
+      "fb_id": "a8a04d755e507000ae87b28120ede6a5eedd1d45c68d90e598240689f9ed8074",
+      "unit_key": "computer science -> software engineering",
+      "raw": "computer science",
+      "from": "software engineering",
+      "to": "emerging",
+      "macro": "emerging",
+      "source": "deterministic",
+      "method": "emerging_real"
+    },
+    {
+      "fb_id": "af5fb3ec7fc354065363d4c571512de1ccd6699f11d3c5a37e183df88518629a",
+      "unit_key": "computer science -> software engineering",
+      "raw": "computer science",
+      "from": "software engineering",
+      "to": "emerging",
+      "macro": "emerging",
+      "source": "deterministic",
+      "method": "emerging_real"
+    },
+    {
+      "fb_id": "af6f24164bd5ab9e1cebc23fc815d18a87173e3b957db23a9b2393efa661cbcd",
+      "unit_key": "computer science -> software engineering",
+      "raw": "computer science",
+      "from": "software engineering",
+      "to": "emerging",
+      "macro": "emerging",
+      "source": "deterministic",
+      "method": "emerging_real"
+    },
+    {
+      "fb_id": "af71021fec640692466cde4c6c661fca476edf3d516eecb7b08a69d416b25e31",
+      "unit_key": "computer science -> software engineering",
+      "raw": "computer science",
+      "from": "software engineering",
+      "to": "emerging",
+      "macro": "emerging",
+      "source": "deterministic",
+      "method": "emerging_real"
+    },
+    {
+      "fb_id": "b078e35172cf53c8cf8dec072ca5d129ebc032197239cdf7d5f8f26db19e7719",
+      "unit_key": "computer science -> software engineering",
+      "raw": "computer science",
+      "from": "software engineering",
+      "to": "emerging",
+      "macro": "emerging",
+      "source": "deterministic",
+      "method": "emerging_real"
+    },
+    {
+      "fb_id": "b23245276c3ac45e90b5c8297ee270eb2a50e99bd4a2a682f0834036195cc3b6",
+      "unit_key": "computer science -> software engineering",
+      "raw": "computer science",
+      "from": "software engineering",
+      "to": "emerging",
+      "macro": "emerging",
+      "source": "deterministic",
+      "method": "emerging_real"
+    },
+    {
+      "fb_id": "b796fefd9f13170a3f258cd74a31a2be1bf531a5d3b732693529088f0d6e4148",
+      "unit_key": "computer science -> software engineering",
+      "raw": "computer science",
+      "from": "software engineering",
+      "to": "emerging",
+      "macro": "emerging",
+      "source": "deterministic",
+      "method": "emerging_real"
+    },
+    {
+      "fb_id": "c51d3316afed0cc68de7e5a5b1ee6aeada70da66e1b7482090d74e33e65d57e7",
+      "unit_key": "computer science -> software engineering",
+      "raw": "computer science",
+      "from": "software engineering",
+      "to": "emerging",
+      "macro": "emerging",
+      "source": "deterministic",
+      "method": "emerging_real"
+    },
+    {
+      "fb_id": "c747c4156a867f2b73b550150d465ea12908b4723d5893e6a368483d13d2c3e0",
+      "unit_key": "computer science -> software engineering",
+      "raw": "computer science",
+      "from": "software engineering",
+      "to": "emerging",
+      "macro": "emerging",
+      "source": "deterministic",
+      "method": "emerging_real"
+    },
+    {
+      "fb_id": "c8b3c0bb7ab176c2109e9352351328f388e071912da755808932b234c6f32044",
+      "unit_key": "computer science -> software engineering",
+      "raw": "computer science",
+      "from": "software engineering",
+      "to": "emerging",
+      "macro": "emerging",
+      "source": "deterministic",
+      "method": "emerging_real"
+    },
+    {
+      "fb_id": "c946df5dbd2706cd845c2b5ee36c07ccb23680698e4354b9c92ecb81e483f1fe",
+      "unit_key": "computer science -> software engineering",
+      "raw": "computer science",
+      "from": "software engineering",
+      "to": "emerging",
+      "macro": "emerging",
+      "source": "deterministic",
+      "method": "emerging_real"
+    },
+    {
+      "fb_id": "d7cd999a897e257aeee6b7d922d1c043add0fffe903f81647babaf796afa90d9",
+      "unit_key": "computer science -> software engineering",
+      "raw": "computer science",
+      "from": "software engineering",
+      "to": "emerging",
+      "macro": "emerging",
+      "source": "deterministic",
+      "method": "emerging_real"
+    },
+    {
+      "fb_id": "dad489b02fd57bafd04cfa71746499d584c2b6fccfa9c32a7511c7d341eb6bfb",
+      "unit_key": "computer science -> software engineering",
+      "raw": "computer science",
+      "from": "software engineering",
+      "to": "emerging",
+      "macro": "emerging",
+      "source": "deterministic",
+      "method": "emerging_real"
+    },
+    {
+      "fb_id": "df32370fb9bfaac7a9db1ffda1c514752a56a2497eb0d55d9852326d2ae50fd0",
+      "unit_key": "computer science -> software engineering",
+      "raw": "computer science",
+      "from": "software engineering",
+      "to": "emerging",
+      "macro": "emerging",
+      "source": "deterministic",
+      "method": "emerging_real"
+    },
+    {
+      "fb_id": "e38243ab389ef1cc8221f549715760e77116ba1a0667ffcd7567dae1afa5a5d7",
+      "unit_key": "computer science -> software engineering",
+      "raw": "computer science",
+      "from": "software engineering",
+      "to": "emerging",
+      "macro": "emerging",
+      "source": "deterministic",
+      "method": "emerging_real"
+    },
+    {
+      "fb_id": "e68ff272686397681c4926bf0677809e387c8a556899fb477753e4f35f0e5be1",
+      "unit_key": "computer science -> software engineering",
+      "raw": "computer science",
+      "from": "software engineering",
+      "to": "emerging",
+      "macro": "emerging",
+      "source": "deterministic",
+      "method": "emerging_real"
+    },
+    {
+      "fb_id": "ec4278f8a82b90e862c44af2c8a2ff78a434b9947df4b9cecabeb435b2bb2f33",
+      "unit_key": "computer science -> software engineering",
+      "raw": "computer science",
+      "from": "software engineering",
+      "to": "emerging",
+      "macro": "emerging",
+      "source": "deterministic",
+      "method": "emerging_real"
+    },
+    {
+      "fb_id": "ecd69d895cac2cc12a45121fed95e88b0554666d753e7a6a0f6367ef83705bff",
+      "unit_key": "computer science -> software engineering",
+      "raw": "computer science",
+      "from": "software engineering",
+      "to": "emerging",
+      "macro": "emerging",
+      "source": "deterministic",
+      "method": "emerging_real"
+    },
+    {
+      "fb_id": "f05d84ba0f40eeac51db2648d06f02dbffd02822d9a6b00e20c23353370714ed",
+      "unit_key": "computer science -> software engineering",
+      "raw": "computer science",
+      "from": "software engineering",
+      "to": "emerging",
+      "macro": "emerging",
+      "source": "deterministic",
+      "method": "emerging_real"
+    },
+    {
+      "fb_id": "f1c5cd34314010e98a80174d3e5f1b14cd67dec0fbe90d112bb17fa1c9382758",
+      "unit_key": "computer science -> software engineering",
+      "raw": "computer science",
+      "from": "software engineering",
+      "to": "emerging",
+      "macro": "emerging",
+      "source": "deterministic",
+      "method": "emerging_real"
+    },
+    {
+      "fb_id": "f2f2d8a10fb8901ccbe00438273aefc7ea7f3ce0de6c25481d276bf364e35f6c",
+      "unit_key": "computer science -> software engineering",
+      "raw": "computer science",
+      "from": "software engineering",
+      "to": "emerging",
+      "macro": "emerging",
+      "source": "deterministic",
+      "method": "emerging_real"
+    },
+    {
+      "fb_id": "f5859bd45bd8d91ad8b9a1f292045b6895b148869ac8f09e558aaa232b65032a",
+      "unit_key": "computer science -> software engineering",
+      "raw": "computer science",
+      "from": "software engineering",
+      "to": "emerging",
+      "macro": "emerging",
+      "source": "deterministic",
+      "method": "emerging_real"
+    },
+    {
+      "fb_id": "fd1912c0b72fca89b5536ce240b99f62fd5eba40bdd262dbd9e9bae2585f0991",
+      "unit_key": "computer science -> software engineering",
+      "raw": "computer science",
+      "from": "software engineering",
+      "to": "emerging",
+      "macro": "emerging",
+      "source": "deterministic",
+      "method": "emerging_real"
+    }
+  ],
+  "fault": false
+}

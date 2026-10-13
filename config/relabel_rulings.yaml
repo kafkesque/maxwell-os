@@ -89,20 +89,32 @@ unit_rulings:
     was: U002 (same packet)
     action: CORRECT
     owner_canonical: marketing
+    applied: '2026-10-13'
+    write_receipt: config/label_store_write_receipt.json
     note: >-
       Owner 2026-10-13 ("2 = CORRECT for LATE-HOME"). Earlier read as LEAVE because the stored value is
       the ABSENCE `emerging` (approving the stored state = keep the 94 rows as a correct-at-the-time
       record). The owner has now clarified the intent is CORRECT: re-map the 94 rows to the live home
       `marketing`. Recorded as OWED — a canonical relabel is a separate owner-gated store write
       (D-2898), which this applier records but never performs.
+      STORE-WRITTEN 2026-10-13: the owner licensed the write (T-103, D-2988) and
+      scripts/apply_relabel_store_write.py landed 94 rows here as part of the 163-row licensed set —
+      MEASURED changed=163 verified=163, the store's menu set unmoved. Receipt:
+      config/label_store_write_receipt.json. The write ran from the round-1 surface
+      (canonical_relabel_review_20261013.csv); this entry no longer reaches a unit, which is why it is
+      marked `applied` (a ruling with no receipt that reaches nothing is a silence, C16).
   entrepreneurial studies -> emerging:
     was: U057 (packet 2026-10-13)
     action: CORRECT
     owner_canonical: entrepreneurship studies
+    applied: '2026-10-13'
+    write_receipt: config/label_store_write_receipt.json
     note: >-
       Owner 2026-10-13 ("2 = CORRECT for LATE-HOME"). The class CORRECT names `marketing` as the
       majority home (3 of 4 units, 99 of 103 rows); this unit's live home is `entrepreneurship studies`,
       so it is overridden by name. Recorded as OWED — never performed by the applier (D-2898).
+      STORE-WRITTEN 2026-10-13 (T-103, D-2988): 4 rows to `entrepreneurship studies` as part of the
+      163-row licensed set; receipt config/label_store_write_receipt.json.
   organizational psychology -> psychology:
     was: U003 (same packet)
     action: CONFIRM
@@ -115,6 +127,8 @@ unit_rulings:
   computer science -> software engineering:
     was: U004 (same packet)
     action: ABSTAIN
+    applied: '2026-10-13'
+    write_receipt: config/label_store_write_receipt.json
     note: >-
       Owner 2026-10-13 ("4 = whatever you recommend"). RELEASED from hold with the recommendation ABSTAIN
       (declared absence `emerging`, D-2830) — recorded as OWED, never performed here. WHY NOT CONFIRM: it
@@ -127,3 +141,39 @@ unit_rulings:
       canonical do not exist; opening one needs its own decision). ABSTAIN removes the false `software
       engineering` claim, aligns the stored value with the live mapper's own answer, and locks in no wrong
       forward mapping; the raw label is preserved, so a future canonical home can be re-derived cleanly.
+      STORE-WRITTEN 2026-10-13 (T-103, D-2988): 60 rows to the declared absence `emerging` (method
+      emerging_real), as part of the 163-row licensed set; receipt config/label_store_write_receipt.json.
+
+# ─────────────────────────────────────────────────────────────────────────────────────────────────
+# STORE-WRITE LICENSE (T-103 / D-2988) — the ONE home of the OWNER WORD that licenses a STORE WRITE.
+#
+# WHY A SEPARATE WORD IS NEEDED AT ALL. A class ruling says WHICH WAY a mapping must go; it does not license
+# the WRITE, because a canonical relabel is a store mutation and D-2898 forbids an agent minting a LABEL. This
+# block is the owner's word that closes that gap, and it is SCOPED: only rows an OWNER RULING already reaches
+# may be written. Every unit this file leaves at ESCALATE is NOT licensed, and the applier FAILS CLOSED if one
+# appears in scope (C16).
+#
+# WHAT THE LICENSED WRITE IS, ONTOLOGICALLY: not a re-classification. It copies the PRODUCTION MAPPER's own
+# answer (the ONE home: `_map_discipline`, scripts/audit_menu_rescope_cohort.py — the same function the
+# packet's `live_mapper_says` column came from) into the store for those rows, so the stored canonical becomes
+# REPRODUCIBLE from the row's own raw label (R14). Every row's new value is therefore TRIPLY agreed: the
+# mapper's answer == the owner's ruling == the packet's recorded mapper answer. `discipline_raw` is never
+# touched, `menu_hash` is never moved, and the scope is keyed by fb_id — NEVER by a predicate.
+store_write_license:
+  decision: D-2988
+  granted: '2026-10-13'
+  owner_word: >-
+    "T-103 approve your recommendation" — licensed SCOPED to the rows that ALREADY carry an owner ruling: the
+    CORRECT units of the LATE-HOME cause and the ABSTAIN unit of the PROVENANCE-UNRESOLVED cause. The units
+    that still ESCALATE (no ruling reaches them) are NOT licensed: for those the owner's own word is owed
+    first, and writing them would mint a LABEL by script.
+  units:                        # the LICENSED SCOPE, keyed by unit_key (BUG-751: never by the positional ordinal)
+    - marketing science -> emerging
+    - entrepreneurial studies -> emerging
+    - marketing strategy -> emerging
+    - market research -> emerging
+    - computer science -> software engineering
+  row_cap: 163                  # SHRINK-ONLY ceiling (D-2644): above this the write refuses and a NEW owner word is owed
+  provenance_tier: deterministic  # C29 tier: the label came from a DECLARED RULE, never from an LLM (D-343)
+  requires_target_equals_live_mapper: true
+  receipt: config/label_store_write_receipt.json

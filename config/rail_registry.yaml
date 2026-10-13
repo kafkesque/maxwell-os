@@ -59,6 +59,15 @@ writers:
       D-2675: the rehearsal materializes TRACKED HEAD bytes into a REAL repository under the system temp dir and runs
       real commits there. Declared as a WRITER so a rail that writes is never a rail nothing accounts for, and so the
       ladder's own audit of declared writers keeps its --selftest wired (config/rail_registry.yaml#writers).
+  scripts/apply_relabel_store_write.py:
+    writes: ['knowledge pipeline/maxwell.db#fbs (discipline, discipline_macro, discipline_source, taxonomy_match_method — for the LICENSED fb_ids only)', 'config/label_store_write_receipt.json']
+    why: >-
+      T-103/D-2988: the ONLY writer that EXECUTES an owner ruling on a stored label. Declared as a writer because
+      its remedy is a claim about bytes it replaces - 163 canonical labels plus the store's own counts - so the
+      ladder must run its --selftest (11 known answers: six refusals each NAMED by its guard, five acceptance and
+      agreement controls) before its remedy can be believed. It refuses to write without the owner word in
+      config/relabel_rulings.yaml#store_write_license, and it is mutation-locked twice (D-2676): the SCOPE guard
+      and the TARGET-agreement guard.
   scripts/check_rail_mutations.py:
     writes: ['<system temp>/rail_mutations_*/ (a REAL fixture repository: NEVER inside the synced tree, BUG-537)']
     why: >-

@@ -1,0 +1,65 @@
+# Mint record — D-2988 (T-103): the LICENSED store write for OWNER-RULED labels
+- id: D-2988
+  date: '2026-10-13'
+  state: RESOLVED
+  category: GOVERNANCE / INSTRUMENT
+  title: >-
+    A ruling is not a licence. The store write that EXECUTES an owner-ruled label exists as ONE instrument - scoped
+    by fb_id, capped shrink-only, triply agreed with the production mapper, and measured in a receipt
+  bugs: [BUG-749]
+  decision: >-
+    THE DEFECT. The plan applier rendered five units as OWED to a store write and could never perform one (D-2898
+    forbids an agent minting a LABEL), while the repo carried twenty-odd ad-hoc `UPDATE fbs SET discipline` sites:
+    the step between "the owner ruled" and "the store agrees" had no instrument, no scope, no ceiling, no backup and
+    no receipt. An owner word that licenses a write existed only as prose in a handoff.
+    THE SHAPE (one sentence). A ruling says WHICH WAY a mapping goes; a LICENCE says WHICH ROWS may be written, and
+    the two are different acts - so the licence lives in its own declared block, the write refuses without it, and
+    the writer's authority is that it copies the PRODUCTION MAPPER's own answer into the store for rows an owner
+    ruling already reaches (the stored canonical becomes reproducible from the row's own raw label, R14).
+    THE MECHANISM (each landed, none promised). (i) config/relabel_rulings.yaml#store_write_license - the ONE home of
+    the owner word: decision, granted, the LICENSED unit_keys, a SHRINK-ONLY row cap (D-2644), the C29 tier and the
+    receipt path. (ii) scripts/apply_relabel_store_write.py - every row must be TRIPLY agreed (mapper(raw) == owner
+    target == the packet's recorded live_mapper_says); scope is by fb_id, never by a predicate; four columns only,
+    `discipline_raw` never touched; six NAMED refusals (scope/not-licensed, scope/not-ruled, target/disagreement,
+    surface/stale, cap/exceeded, tier/undeclared). (iii) --apply = timestamped size-verified backup + PRAGMA
+    integrity gate + ONE transaction + the `taxonomy_counts` recount through its own home + a receipt that records
+    each input's sha256, changed/verified/planned and the store's menu SET before and after. (iv) TWO mutation locks
+    (D-2676) and a paired spec/test (D-2978): INV-1..INV-8, 9/9 green.
+    MEASUREMENT OF RECORD (same instruments, one difference). The plan applier: CORRECT 4 / ABSTAIN 1 -> CORRECT 0 /
+    ABSTAIN 0. The reference sheet's subject line (queue B, the re-derivation gap): 457 rows (6.9%) -> 294 rows
+    (4.5%) of 6,587 - exactly the 163 written; queue B decision units 60 -> 55. The write: changed=163 verified=163
+    planned=163, the store's menu_hash SET byte-identical before and after, backup 219,467,776 bytes, and the store
+    deltas `marketing` 259->358, `entrepreneurship studies` 1->5, `software engineering` 167->107, `emerging` +60,
+    `discipline_source='deterministic'` on exactly the 163 rows.
+    A PROSE DEFECT CLOSED IN THE SAME ACT: BUG-749's REMAINING list summed to 467 while the gap it names is 457,
+    because the 10 DEFINITION-RE-SCOPE rows are QUEUE A (the D-2974 re-scope differential). The sheet's header names
+    the two subjects separately; the prose mixed them.
+    THE T-107 CORRECTION (the owner challenged the first recommendation, and the challenge was right). borp_score is
+    `dead_but_read` (one distinct value, home null, parity rail null) and should be DROPPED from the MCP payload;
+    feedback_score is `declared_but_empty` (populated on no row, WITH a registered writer home) and must be KEPT -
+    it is unpopulated, not retired - with its absence made explicit and the neutral prior moved out of SQL into
+    config.
+    RESIDUALS (declared, not fixed). (1) The ESCALATE surface - 72 units / 311 rows no ruling reaches - is the
+    owner's remaining word and is filed as T-117, not implied away. (2) BUG-766: the store-columns register's six
+    POPULATION-SHAPE drifts keep that rail rc=1 (MEASURED pre-existing: rc=1 already at commit 673a457). (3)
+    `fbs.discipline` itself is NOT registered in config/derivations.yaml, so the value this act moved has no home
+    and no parity rail while twenty-plus call sites write it - the natural follow-up.
+  evidence: >-
+    config/label_store_write_receipt.json (changed=163 verified=163 planned=163, menu_unmoved=true, every input
+    hashed) · the plan render CORRECT 0 / ABSTAIN 0 / ESCALATE 72 units / 311 rows · the reference sheet subject line
+    294 rows (4.5%) of 6,587 · governance/buglog.md BUG-749 (this act's section) and BUG-766 · the R5 gate receipt
+    (syntax/lint/C11-C12 PASS + reviewer APPROVE) · check_rail_mutations: 42 declared rules SEEN to red including the
+    two new locks, 1 negative control green (2026-10-13)
+  files:
+    - config/relabel_rulings.yaml
+    - config/label_store_write_receipt.json
+    - config/rail_mutations.yaml
+    - config/rail_registry.yaml
+    - config/store_columns.yaml
+    - config/task_register.yaml
+    - scripts/apply_relabel_store_write.py
+    - specs/label_store_write.spec.md
+    - specs/README.md
+    - tests/test_label_store_write_spec.py
+    - justfile
+    - governance/SESSION-HANDOFF-20261013-D2988.md

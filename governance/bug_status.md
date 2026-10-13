@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**184 open** / 345 closed of 529 ids.
+**185 open** / 345 closed of 530 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -188,6 +188,7 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-741 | (MED - OPEN 2026-10-12) - the adjudication map's `proposed` field CONFLATES two vocabularies, so one owner adjudication is not expressible a | 4 |
 | BUG-743 | (LOW - OPEN 2026-10-12) - a DELEGATED reviewer's verdict is not re-readable after the fact, so a receipt that cites it must CAPTURE THE TEXT | 1 |
 | BUG-748 | (MED - OPEN 2026-10-13) - D-2928's definition re-scope left 177 canonical rows ON the moved boundary, and the audit D-2905's precedent requi | 5 |
-| BUG-749 | (HIGH - OPEN 2026-10-13) - 1,072 in-subject rows (16.3%) carry a discipline the live production mapper does NOT reproduce from their own raw | 4 |
+| BUG-749 | (HIGH - OPEN 2026-10-13) - 1,072 in-subject rows (16.3%) carry a discipline the live production mapper does NOT reproduce from their own raw | 5 |
 | BUG-750 | (LOW - OPEN 2026-10-13) - a GENERATED artifact can go stale behind its own generator and no rail sees it: the canonical-labels reference sti | 1 |
 | BUG-757 | (MED - OPEN, found 2026-10-13 while auditing the user-facing faces) - 125 open bugs carry NO severity token, so the open register cannot be  | 1 |
+| BUG-766 | (MED - OPEN 2026-10-13) - the store-columns register holds TWO defects the ladder has been RED on: 6 columns declare `outside: absent` (NULL | 1 |

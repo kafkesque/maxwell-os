@@ -165,6 +165,13 @@ may_touch:
 - governance/canonical_relabel_review_segments_20261013.csv
 # D-2977 (2026-10-13): the ruling APPLIER's plan (the reviewable consequence of the owner's words).
 - governance/relabel_plan_20261013.md
+# D-2988 (2026-10-13): T-103, the LICENSED store write. A written surface SHRINKS, so the write makes a NEW round
+# of the same three artifacts necessary - and a shrunk surface must be re-rendered by its own instrument, never
+# hand-edited. NAMED, never a glob (BUG-548/BUG-563: the record is not the rule).
+- governance/CANONICAL_RELABEL_REVIEW_20261014.md
+- governance/canonical_relabel_review_20261014.csv
+- governance/canonical_relabel_review_segments_20261014.csv
+- governance/relabel_plan_20261014.md
 will_not_touch:
 - governance/F11_*
 - governance/ANCHOR_RULER_CONSOLIDATED_*.csv
@@ -872,6 +879,34 @@ widening_log:
   may_touch_untouched: false
   will_not_touch_untouched: true
   why: 'The builder itself needs no widening (scripts/*.py). The three artifacts are the owner-facing surface of the review and are date-stamped evidence; governance/canonical_labels_reference.md was already granted and was REGENERATED, not edited (its committed copy still declared config/taxonomy_v5.yaml as its source of truth - a stale declaration of the BUG-542 class, whose own header says "DO NOT hand-edit; regenerate").'
+- date: '2026-10-13'
+  actor: assistant
+  owner_ack: 'owner instruction 2026-10-13 ("T-103 approve your recommendation" + "go forward based on the stratigically most consequnetial highest leverage task,bug,decsions as a rule" + the T-107 challenge "why do you want to drop both feedback score wont.be utilized soon as the primitive or the non-principles get used?")'
+  addendum: 'D-2988/T-103 - the LICENSED store write. ONE new writer plus its paired spec/test and two mutation locks. Every changed HOME was already granted (config/*.yaml, scripts/*.py, tests/*.py, specs/*.md, governance/*.md, justfile); the NAMED artifacts below are the write''s receipt, its decision record, its handoff, and the round-2 review surface the write makes necessary (a shrunk surface must be re-rendered, never hand-edited).'
+  additions:
+  - pattern: scripts/apply_relabel_store_write.py
+    why: 'D-2988 - the ONE instrument that EXECUTES an owner ruling on a stored label: scoped by fb_id, capped shrink-only, triply agreed with the production mapper, six NAMED refusals, backup + integrity gate + one transaction + receipt.'
+  - pattern: config/label_store_write_receipt.json
+    why: 'D-2988/D-2660 - the MEASUREMENT of the write (every input''s sha256, changed/verified/planned, the store''s menu_hash SET before and after, each row''s from->to). A receipt is evidence, so it is a named artifact rather than a pattern.'
+  - pattern: specs/label_store_write.spec.md
+    why: 'D-2988/D-2978 - the paired spec: INV-1..INV-8, one named test each, writing the rule BEFORE the writer is believed.'
+  - pattern: tests/test_label_store_write_spec.py
+    why: 'D-2988/D-2978 - the paired contract: the guards driven as known answers, and the LIVE receipt joined back to the store (the write is measured, not claimed).'
+  - pattern: governance/decisions_mint_D2988.yaml
+    why: 'D-2988/D-2660 - the mint record: the defect, the shape, the mechanism, the measurement of record and the residuals.'
+  - pattern: governance/SESSION-HANDOFF-20261013-D2988.md
+    why: 'D-2988 - the act record: the leverage call, the T-107 correction the owner''s challenge forced, the before/after table, the forensic audit and the next critical step.'
+  - pattern: governance/relabel_plan_20261014.md
+    why: 'D-2988 - the round-2 plan render, proof the ruled-but-owed half is DISCHARGED (CORRECT 0 / ABSTAIN 0 / ESCALATE 72).'
+  - pattern: governance/CANONICAL_RELABEL_REVIEW_20261014.md
+    why: 'D-2988/BUG-749 - the round-2 reference sheet: the re-derivation gap re-measured by its own instrument after the write.'
+  - pattern: governance/canonical_relabel_review_20261014.csv
+    why: 'D-2988 - the round-2 unit surface (72 units), the surface T-117''s owner words are written on.'
+  - pattern: governance/canonical_relabel_review_segments_20261014.csv
+    why: 'D-2988 - the round-2 row-level surface (311 rows), so one owner decision is one filter away.'
+  may_touch_untouched: false
+  will_not_touch_untouched: true
+  why: 'The writer and its evidence are NAMED; nothing else is widened. The append-only journals touched by the act (governance/r5_reviews.jsonl, governance/r5_review_gate.jsonl, governance/MUTATION_JOURNAL.jsonl) are written BY their rails, and the faces (DECISION-LOG.md, MASTER-TASK-REGISTER.md, governance/buglog.md, agent/session_seed.yaml) are re-cut by gov_sync.py, the ONE writer D-2981 declares.'
 - date: '2026-10-13'
   actor: assistant
   owner_ack: 'owner instruction 2026-10-13 ("approve U001..U004" + "if I dont have to one by one fill manually anything what exactly I have to do besides ruling" + "continue with the next critical step")'

@@ -2,8 +2,8 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 529,
-  "open_n": 184,
+  "total_ids": 530,
+  "open_n": 185,
   "closed_n": 345,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
@@ -916,7 +916,7 @@
     {
       "id": "BUG-749",
       "title": "(HIGH - OPEN 2026-10-13) - 1,072 in-subject rows (16.3%) carry a discipline the live production mapper does NOT reproduce from their own raw",
-      "events": 4
+      "events": 5
     },
     {
       "id": "BUG-750",
@@ -926,6 +926,11 @@
     {
       "id": "BUG-757",
       "title": "(MED - OPEN, found 2026-10-13 while auditing the user-facing faces) - 125 open bugs carry NO severity token, so the open register cannot be ",
+      "events": 1
+    },
+    {
+      "id": "BUG-766",
+      "title": "(MED - OPEN 2026-10-13) - the store-columns register holds TWO defects the ladder has been RED on: 6 columns declare `outside: absent` (NULL",
       "events": 1
     }
   ],

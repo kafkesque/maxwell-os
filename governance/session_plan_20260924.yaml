@@ -153,6 +153,10 @@ may_touch:
 - governance/dedup_gate_simulation_run_20261012.json
 - governance/dedup_gate_simulation_batch_20261012.json
 - governance/r5_review_gate.jsonl
+# D-2974/BUG-748 (2026-10-13): the menu-re-scope cohort audit's OWN append-only evidence journal had no
+# may_touch home, so the anti-circle rail refused the commit that carries it. NAMED, never a glob
+# (BUG-548/BUG-563): it is one journal, not a standing class.
+- governance/menu_rescope_cohort_audit.jsonl
 will_not_touch:
 - governance/F11_*
 - governance/ANCHOR_RULER_CONSOLIDATED_*.csv
@@ -836,3 +840,13 @@ widening_log:
   may_touch_untouched: false
   will_not_touch_untouched: true
   why: 'FORENSIC_AUDIT_20261012 step 1 (stabilize tree): the in-flight D-2933..D-2941 implementation left 16 legitimate artifacts with no may_touch home (BUG-563). Granted NAMED / family (BUG-548 no-glob): root architecture doc, config/golden S4S5 prompt, prompts/stage prompt, tools suite, BUG698 delta CSVs, D-2939/D-2940 proposal, LABEL_ONTOLOGY_PROOF, RETRIEVAL_TRUTH_AND_UTILIZATION, binary rulings confirmation, displaced-domain triage, owner_decisions_v9 template, t9 paraphrase gold. .goose/ session state gitignored (not repo content). 2 byte-identical hygiene snapshots deleted. pipeline/** otherwise untouched; no pinned artifact staged.'
+- date: '2026-10-13'
+  actor: assistant
+  owner_ack: 'owner instruction 2026-10-13 ("fix bug 748" + "continue with the next critical step ... update and synch gov dependencies")'
+  addendum: 'D-2974 - the menu-re-scope cohort audit''s own append-only checkpoint had no may_touch home, so the commit-boundary rail refused the commit that carries it (a receipt that cannot be committed is not a receipt, D-342 class). One NAMED artifact (BUG-548/BUG-563: never a glob).'
+  additions:
+  - pattern: governance/menu_rescope_cohort_audit.jsonl
+    why: 'D-2974/BUG-748 - the audit''s resumable append-only evidence journal: one record per (row, arm) carrying the R14 stamp, the stored label, the predicted label and the arm verdict, so the measurement can be re-read and the remainder resumed.'
+  may_touch_untouched: false
+  will_not_touch_untouched: true
+  why: 'The widened set is EXACTLY the one path the commit-boundary rail refused (measured: "touched 1 path(s) outside the plan: governance/menu_rescope_cohort_audit.jsonl"). The audit SCRIPT was already covered by the existing scripts/*.py entry, and nothing else was widened.'

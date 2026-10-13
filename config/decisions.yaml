@@ -22650,3 +22650,82 @@ decisions:
     - LOUD and OWED, deliberately NOT re-recorded (a blanket --record re-stamps unrelated stale rulers); two INCIDENTAL
     moves the same docstring caused (consequence, definition) were repaired by REWORDING the prose - the register
     is not edited to agree with the code, the code stops making the claim.'
+- id: D-2974
+  state: RESOLVED
+  category: GOVERNANCE / ONTOLOGY / MENU RE-SCOPE AUDIT
+  date: '2026-10-13'
+  title: 'BUG-748''s audit RUNS: a differential, config-derived cohort audit where the RECORDED-menu arm is the
+    control - the re-scope is measured to move 2 of 20 business-administration rows, attributable to the definitions,
+    and the relabel stays owner-gated'
+  bugs:
+  - BUG-748
+  files:
+  - scripts/audit_menu_rescope_cohort.py
+  - pipeline/closed_menu.py
+  - governance/menu_rescope_cohort_audit.jsonl
+  - governance/buglog.md
+  - governance/r5_reviews.jsonl
+  decision: 'WHY IT EXISTS. D-2928 minted closed_menu_v10 having moved two DEFINITIONS and not the answer space,
+    and deliberately did not rewrite the frozen provenance (I2/D-2896). A stamp cannot say whether the 177 canonical
+    rows on that boundary still hold their label, and the S4 classifier is DEFINITION-ANCHORED (D-2814: the model
+    sees every canonical label WITH its definition and answers verbatim), so a definition edit IS an input change.
+    The audit D-2905''s precedent requires therefore had to be a MEASUREMENT, not a reading. THE INSTRUMENT (read-only,
+    resumable). scripts/audit_menu_rescope_cohort.py derives the cohort instead of being told it: the stale in-subject
+    composites are resolved BY CONTENT against the frozen revisions (a unique composite match or it fails closed),
+    and the moved definitions are the per-discipline definition fields that differ. MEASURED: exactly business administration
+    + organizational theory, with the answer space unmoved on both sides (64/64 disciplines, 42/42 domains) - D-371/D-NEW-1
+    re-measured from bytes rather than cited. THE TWO ARMS ARE THE MEASUREMENT (one arm measures nothing). Both
+    run through the PRODUCTION path (merged_cribs_classify + the production remap; stage4.batch_enabled is FALSE,
+    so the serial path IS the path these rows were admitted under): LIVE = the live v10 menu, RECORDED = the v9
+    menu block of the revision the rows carry. The block comes from the ONE home - pipeline/closed_menu.definition_anchored_block()
+    now takes an optional menu, which is a no-op for every production caller and exists precisely so a frozen revision
+    can be rendered without a rival renderer (C12/D-274a). Every arm record is stamped (schema_version / gen_model
+    / pipeline_commit) and appended to governance/menu_rescope_cohort_audit.jsonl (C6/R14), so the run is RESUMABLE.
+    MEASURED 2026-10-13 (22 rows, both arms, 0 failed calls): business administration LIVE 18/20 reproduce and RECORDED
+    20/20 - two movements, attributable to the menu because the control reproduces every stored label - business
+    administration -> marketing (raw ''marketing'') and -> design thinking (raw ''design thinking''); organizational
+    theory LIVE 2/2 and RECORDED 2/2; both-differ (noise) 0/22. The moved rows leave the PAIR entirely: the v9 business-administration
+    wording ("how organizations are structured, coordinated and governed") was holding generic management/innovation
+    content that the v10 wording ("steering an organization toward objectives under resource constraints") no longer
+    accepts - the F12 ambiguity class, measured. WHAT IS NOT DONE, AND WHY. The relabel of the delta set is OWNER-GATED
+    and stays so: the classifier of record measures kappa ~0.45 against the human-owner anchor (D-2868/D-2770 class),
+    so its fresh label is ADVISORY and never rewrites a canonical row (D-2898: no LLM-applied canonical change).
+    The owner ruling is owed on the COMPLETE delta set - either a licensed re-classification (the D-2905/D-2907
+    pattern) or a recorded declaration that the sharpened definition applies FORWARD ONLY. 155 of the 157 organizational-theory
+    rows are not yet swept; the remainder is quantified, loud, and one command away, at a MEASURED latency of ~45-75
+    s per row. CONTROLS + REVIEW: 10/10 known-answer controls fire (the revision family is derived; the live composite
+    resolves to exactly one revision by content; an unknown hash resolves to none; a moved definition is reported
+    as moved while a value in one menu only is reported as an ANSWER-SPACE move; the block swap refuses a half-swapped
+    prompt; a failed call is recorded as failed). ruff clean; the two pre-existing rails that scan for silent repair
+    and undeclared encodings are unchanged. R5: gemma-4-E4B-it-MLX-4bit APPROVE on the change (governance/r5_reviews.jsonl,
+    sha256_16 1506896244efe684) - recorded as WEAK evidence (BUG-736).'
+- id: D-2975
+  state: RESOLVED
+  category: PIPELINE / PROVENANCE / LABEL RE-DERIVATION
+  date: '2026-10-13'
+  title: 'BUG-749: 1,072 in-subject rows carry a discipline the live production mapper does not reproduce from their
+    own raw label - 969 on a synonym the index no longer resolves, 103 admitted ''emerging'' whose raw now maps
+    - and the mapping state was never recorded per row'
+  bugs:
+  - BUG-749
+  files:
+  - governance/buglog.md
+  decision: 'MEASURED 2026-10-13 (read-only, deterministic, LLM-free), found while auditing the re-scope cohort
+    (D-2974): four organizational-theory rows carry discipline_raw=''higher education administration'', which the
+    LIVE production mapper sends to ''emerging'' while their stored canonical is ''organizational theory''. Extended
+    to the whole canonical run''s 6,587 in-subject rows, against the production chain exactly as pipeline/stage4_merge.py
+    calls it (map_to_canonical_with_fallback(raw, "discipline", get_synonym_index(), CANONICAL_DISCIPLINES)): exact
+    rows 1,541 re-derive and 0 do not; synonym-matched rows 2,299 re-derive and 969 do not; emerging_real rows 1,675
+    re-derive and 103 do not - i.e. 1,072 of 6,587 (16.3%) carry a canonical label their own raw label no longer
+    produces. TWO CAUSES, both a mapping-state change with no per-row record: synonyms the live index no longer
+    resolves (stored design thinking, raw design studies -> ''emerging'' today) and raw labels that now MAP (stored
+    emerging, raw ''marketing science'' -> ''marketing''; that raw label entered the taxonomy in 2cb713a). WHY IT
+    IS A DEFECT: the derivation is not auditable after the fact (R14; the F-02 family), and D-277 already declares
+    the obligation - labels stamped with an old menu_hash must be re-derived - while D-2905''s "v9-clean" certification
+    used the WEAKER membership test (every stored discipline is a member of the live menu) and never re-derivation,
+    so the gap sat inside a green claim. NOT the re-scope: both arms of the BUG-748 audit use this same mapper and
+    the moved definitions account for none of it. NEXT ACTS: a standing rail that measures the gap and fails closed
+    when it GROWS (a declared, shrink-only ceiling; today no ladder step can see it), the per-row cause decomposition,
+    and then an owner-gated canonicalisation or a declared "historical, accepted with cause" ruling (the F-02 precedent).
+    A corpus-wide relabel is NOT taken here: it is an owner act, and its criterion must first exist as a rail (a
+    control nothing runs is a comment, BUG-492).'

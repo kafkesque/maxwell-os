@@ -12091,3 +12091,93 @@ cohort against the v10 definitions: which rows would move, which would not, and 
 re-classification of the affected rows (a WRITE, with its own licence and re-measurement) or a recorded finding that
 no row moves. NOT a provenance rewrite: a frozen composite stamp records what the rows WERE adjudicated against and
 is never falsified (D-2928/I2/D-2896).
+## BUG-748 (MED - NARROWED 2026-10-13) - the re-scope cohort audit has now RUN: the instrument exists, its control VALIDATES, and the business-administration half is fully swept (D-2974)
+
+**WHAT WAS OWED.** Filed 2026-10-13 (D-2973): D-2928's definition re-scope left 177 canonical rows ON the moved
+boundary, and the D-2905-class audit had never run - invisible because the rail built for exactly that question
+(scripts/check_menu_reclass_gate.py) was invoked by nothing until the same session.
+
+**WHAT RAN (D-2974).** `scripts/audit_menu_rescope_cohort.py` - read-only, differential, config-derived:
+  * the COHORT is DERIVED, never typed: the stale in-subject composites are resolved BY CONTENT against the
+    frozen revisions (a unique composite match or fail closed), and the moved definitions are the per-discipline
+    `definition` fields that differ. MEASURED: exactly business administration + organizational theory, with the
+    ANSWER SPACE UNMOVED on both sides (64/64 disciplines, 42/42 domains) - D-371/D-NEW-1 re-measured from bytes;
+  * TWO ARMS through the PRODUCTION path (merged_cribs_classify + the production remap; `stage4.batch_enabled`
+    is FALSE, so the serial path IS the path these rows were admitted under): LIVE = the live v10 menu,
+    RECORDED = the v9 block of the revision the rows carry, rendered from the ONE home
+    (pipeline/closed_menu.definition_anchored_block now takes an optional menu - a no-op for every caller);
+  * controls: 10/10 known-answer controls fire, 0 failed calls, and the checkpoint is append-only, stamped
+    (schema_version / gen_model / pipeline_commit) and RESUMABLE.
+
+**MEASURED 2026-10-13 (22 rows, BOTH arms, 0 failures).**
+  business administration   LIVE 18/20 reproduce | RECORDED 20/20   -> 2 movements ATTRIBUTABLE to the menu
+      business administration -> marketing        (raw 'marketing')       fb 3bd897791f45
+      business administration -> design thinking  (raw 'design thinking') fb 9d6aa605c70c
+  organizational theory     LIVE 2/2 reproduce | RECORDED 2/2
+  both-differ (instrument noise, NOT attributable): 0/22
+**THE CONTROL IS THE RESULT.** The recorded (v9) arm reproduces EVERY stored label, so the movements are the
+DEFINITIONS' doing and not model drift - and the moved rows leave the PAIR entirely (marketing, design thinking):
+the v9 business-administration definition ("how organizations are structured, coordinated and governed") was
+holding generic management/innovation content that the v10 wording ("steering an organization toward objectives
+under resource constraints") no longer accepts. That is the F12 ambiguity class D-2928 was written to settle,
+now measured rather than asserted.
+
+**THE REMEDY STAYS OWNER-GATED (D-2898).** The classifier of record measures kappa ~0.45 against the human-owner
+anchor (D-2868/D-2770 class), so its fresh label is ADVISORY and never rewrites a canonical row. What is owed is an
+owner ruling on the measured delta SET once the sweep is complete: either a licensed re-classification (the
+D-2905/D-2907 pattern: audit -> owner-signed change -> re-measurement) or a recorded declaration that the
+sharpened definition applies FORWARD ONLY.
+
+**WHAT REMAINS (loud, not silent).** 155 of 157 organizational-theory rows are not yet swept. The instrument is
+resumable in one command, its cost is MEASURED (~45-75 s per serial S4 classification on this box), and the
+checkpoint names every row audited - so the remainder is a quantified, resumable act rather than an omission.
+
+**A SECOND FINDING from the same pass is filed separately (BUG-749):** 1,072 in-subject rows carry a canonical
+discipline the live production mapper does not reproduce from their own raw label.
+## BUG-749 (HIGH - OPEN 2026-10-13) - 1,072 in-subject rows (16.3%) carry a discipline the live production mapper does NOT reproduce from their own raw label: 969 sit on a synonym the index no longer resolves, 103 were 'emerging' whose raw now maps (D-2975)
+
+**FOUND** while auditing the re-scope cohort (BUG-748): four organizational-theory rows carry
+discipline_raw='higher education administration', which the LIVE production mapper sends to 'emerging', while
+their stored canonical is 'organizational theory'.
+
+**MEASURED 2026-10-13** (read-only, deterministic, LLM-free) over the canonical run's 6,587 in-subject rows,
+against the PRODUCTION chain exactly as pipeline/stage4_merge.py calls it
+(map_to_canonical_with_fallback(raw, "discipline", get_synonym_index(), CANONICAL_DISCIPLINES)):
+  exact-match rows      1,541  -> 1,541 re-derive, 0 DO NOT
+  synonym-matched rows  3,268  -> 2,299 re-derive, 969 DO NOT
+  emerging_real rows    1,778  -> 1,675 re-derive, 103 DO NOT
+  => **1,072 of 6,587 (16.3%) carry a canonical label their own raw label no longer produces.**
+
+TWO MEASURED CAUSES, both a mapping-state change with NO per-row record: 969 rows were admitted by a SYNONYM the
+live index no longer resolves (stored=design thinking, raw=design studies -> 'emerging' today); 103 rows were
+admitted 'emerging_real' and their raw label now MAPS (stored=emerging, raw='marketing science' -> 'marketing'
+today - that raw label entered the taxonomy in 2cb713a).
+
+**WHY IT IS A DEFECT, NOT A CURIOSITY.** The mapping state is not recorded per row, so the label's derivation is
+not auditable after the fact (R14; the F-02 family - a machine label must carry WHO / WHAT / HOW-MUCH). D-277
+already declares the obligation (labels stamped with an old menu_hash must be re-derived), and D-2905's
+"v9-clean" certification used the WEAKER membership test (every stored discipline is a member of the live menu),
+never re-derivation - so this gap sat inside a green claim.
+
+**IT IS NOT THE RE-SCOPE.** Both arms of the BUG-748 audit use this same mapper, and the moved definitions account
+for none of these rows.
+
+**THE NEXT ACTS (in order).** (1) A standing rail that MEASURES this gap and fails closed when it GROWS (a
+declared, shrink-only ceiling): today it is invisible to every ladder step. (2) The cause decomposition finished
+per row (the cross-tab above is the first cut). (3) An owner-gated canonicalisation, or a declared "historical,
+accepted with cause" ruling - the F-02 precedent applied to the discipline axis. NOT fixed here: a corpus-wide
+relabel is an owner act, and its criterion must FIRST exist as a rail (a control nothing runs is a comment, BUG-492).
+## BUG-748 - ERRATUM (2026-10-13, same day) - the audit is a LIVE instrument: the frozen sample is 25 rows, and the control caught 2 instrument-unstable rows
+
+The audit's checkpoint is append-only and resumable, so the figures in D-2974 are the SNAPSHOT at the moment of
+minting (22 rows). The run was then FROZEN for the commit at 51 records / **25 rows with BOTH arms** - 20 of the 20
+business-administration rows and 5 of the 157 organizational-theory rows - with **0 failed calls**:
+  * **attributable movements** (the live v10 arm differs AND the recorded v9 arm reproduces the stored label): **2** -
+    business administration -> marketing (raw 'marketing') and business administration -> design thinking
+    (raw 'design thinking'), both in the business-administration group;
+  * **instrument-unstable rows** (BOTH arms differ from the stored label): **2** - which is exactly what the control
+    arm exists to keep out of the attributable count, and it did;
+  * so the live arm reproduces the stored label on 21/25 and the recorded (v9) arm on 23/25.
+Nothing else in D-2974 or the entry above changes. The remainder - **152 organizational-theory rows** - is unchanged
+and still one resumable command away (`python3 scripts/audit_menu_rescope_cohort.py`), at the measured ~45-75 s per
+row. This erratum is APPENDED into the record it corrects, never written over it.

@@ -148,7 +148,7 @@ def render_closed_menu() -> dict:
     }
 
 
-def definition_anchored_block() -> str:
+def definition_anchored_block(menu: dict | None = None) -> str:
     """Render the definition-anchored closed menu (label + definition + abstention).
 
     D-2814 (2026-10-05): the free-generation prompt told the model to INVENT precise
@@ -160,11 +160,16 @@ def definition_anchored_block() -> str:
     Fail-closed (C16): an enabled-but-empty menu raises rather than silently degrading
     back to free generation.
 
+    D-2974/BUG-748: an optional menu makes a FROZEN revision renderable from this ONE home, which is
+    what a re-scope differential needs (the same production injection path, only the menu differs). The
+    default is the LIVE menu, so no production caller changes behaviour by one byte.
+
     Returns:
         A stable block (deterministic given config) for injection into the S4
-        classification system prompt. Uses the LIVE abstention token (menu["abstention"]).
+        classification system prompt. Uses the menu's abstention token.
     """
-    menu = render_closed_menu()
+    if menu is None:
+        menu = render_closed_menu()
     abstention = menu["abstention"]
     disciplines = [e for e in menu["disciplines"] if e["value"] != abstention]
     domains = [e for e in menu["domains"] if e["value"] != abstention]

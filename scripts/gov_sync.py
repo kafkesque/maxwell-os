@@ -52,7 +52,20 @@ CENSUS_BUG = re.compile(r"\b\d+ bugs \(\d+ open / \d+ closed;")
 # MASTER-TASK-REGISTER.md used before D-2981). It must be owned too, or a history line keeps a stale
 # count that the faces rail still reads.
 CENSUS_DEC_BARE = re.compile(r"\b\d+ decisions(?= [^a-z])")
-BUG_HEAD = re.compile(r"(?m)^## BUG-(\d{3,4})\b([^\n]*)")
+# D-2985/BUG-757: ANY hash depth. The old reader required EXACTLY two hashes, so a bug written as
+# `### BUG-426 (HIGH, OPEN ...)` was invisible to the census - the SAME visibility defect the buglog
+# records for BUG-426/BUG-427 ("HEADER_RE was ^##\s+(BUG-\d+) - EXACTLY two hashes ... so the rail never
+# saw them"). The lesson was recorded and never propagated to this reader; MEASURED 2026-10-13: 18 open
+# ids were invisible to the severity census for exactly this reason.
+BUG_HEAD = re.compile(r"(?m)^#{1,6}\s*BUG-(\d{3,4})\b([^\n]*)")
+# D-2985: a count that a REGISTER owns has ONE home. A task title is what the face PRINTS, so a measured
+# count stored there is stale the moment it is written (BUG-588/D-2692) and the face then contradicts the
+# census line three lines above it - MEASURED: T-104's title said "108 of 185 open bugs" while the block's
+# own census said 125 and the joined truth was 101. Three answers, one question, one screen.
+_CNT = r"(?<![-\w])\d[\d,]*"
+COUNT_NOUN_RE = re.compile(rf"{_CNT}(?:\s+\w+)?(?:\s+\w+)?\s+(?:bugs?|tasks?|decisions?|rows?)\b", re.IGNORECASE)
+CENSUS_SCALAR_RE = re.compile(rf"\b(?:open|closed)\s*[=:]\s*{_CNT}\b|\b{_CNT}\s+(?:open|closed)\b", re.IGNORECASE)
+DATE_RE = re.compile(r"\b20\d\d-\d\d-\d\d\b")
 SEV = re.compile(r"\b(CRITICAL|HIGH|MED|LOW)\b")
 STATE = re.compile(r"\b(OPEN|CLOSED|FIXED|RESOLVED|SUPERSEDED|FILED|HELD)\b")
 EXIT_OK, EXIT_DRIFT, EXIT_FAIL = 0, 1, 2
@@ -60,10 +73,68 @@ EXIT_OK, EXIT_DRIFT, EXIT_FAIL = 0, 1, 2
 
 def cfg() -> dict:
     doc = yaml.safe_load(CFG_PATH.read_text(encoding="utf-8")) or {}
-    for key in ("registers", "faces", "open_decision_states", "severity_tokens", "task_priorities"):
+    for key in ("registers", "faces", "open_decision_states", "severity_tokens", "task_priorities",
+                "task_states", "task_movers", "owner_gate_token", "face_owner_lane_label"):
         if key not in doc:
             raise SystemExit(f"FAIL-CLOSED (C16): {CFG_PATH.name} declares no {key!r} - the join has no home (D-2981)")
     return doc
+
+
+def task_faults(tasks: list, d: dict) -> list[str]:
+    """D-2985: the task register must obey its OWN declared schema (PURE - no I/O, so the oracle is testable).
+
+    Four limbs, each with the failure it prevents:
+      (1) a standing RULE is not a task: an `R-` id must be `state: rule` and is never counted as open work
+          (MEASURED: R-1 sat at rank #1 of the MUST list in every face, because a rule never closes);
+      (2) WHO must act is DECLARED, not inferred: `mover` is REQUIRED and must be one of the declared movers
+          (a face that cannot say who must move a task cannot answer the owner's only question);
+      (3) an owner GATE is a mover, and the gate text must name the owner's word - and a pipeline-moved task
+          may not carry a gate that names the owner (the two fields would disagree);
+      (4) a count a register owns has ONE home: a measured count in `title`/`why` is a restatement that goes
+          stale (BUG-588/D-2692), and a count in `evidence` must carry its date (D-2660: a citation is a
+          claim about the tree at the MOMENT OF MINT).
+    """
+    states, movers = set(d["task_states"]), set(d["task_movers"])
+    token = str(d["owner_gate_token"]).lower()
+    out: list[str] = []
+    seen: set[str] = set()
+    for t in tasks or []:
+        tid = str(t.get("id", "")).strip()
+        if not tid:
+            out.append("a task entry carries no id - a task with no id cannot be closed, diffed or cited")
+            continue
+        if tid in seen:
+            out.append(f"{tid} is declared twice in the same register - one task, one home (D-2642)")
+        seen.add(tid)
+        st, mv = str(t.get("state", "")), str(t.get("mover", ""))
+        gate = str(t.get("gate", "none")).strip().lower()
+        if st not in states:
+            out.append(f"{tid}: state {st!r} is not one of {sorted(states)} - a task's state is DECLARED "
+                       f"(gatehood is mover: owner, not a state of its own)")
+        if mv not in movers:
+            out.append(f"{tid}: mover {mv!r} is not one of {sorted(movers)} - WHO must act is REQUIRED on "
+                       f"every entry (D-2985): without it the face cannot separate what only the OWNER can "
+                       f"move from what the pipeline will move")
+        if tid.startswith("R-") and st != "rule":
+            out.append(f"{tid}: an `R-` id is a STANDING RULE, not a task - state must be 'rule', because a "
+                       f"rule that never closes must never be counted as open work")
+        if mv == "owner" and gate in ("", "none"):
+            out.append(f"{tid}: mover: owner but gate is 'none' - name the owner's word that unblocks it "
+                       f"(a task cannot be gated on a person who is never told what to decide)")
+        if mv != "owner" and token and token in gate:
+            out.append(f"{tid}: the gate names the {token!r} but mover says {mv!r} - the two fields disagree; "
+                       f"a task the pipeline cannot advance is mover: owner")
+        for field in ("title", "why"):
+            m = COUNT_NOUN_RE.search(str(t.get(field, ""))) or CENSUS_SCALAR_RE.search(str(t.get(field, "")))
+            if m:
+                out.append(f"{tid}.{field} restates a measured count ({m.group(0)!r}) - a count a register "
+                           f"owns has ONE home (BUG-588/D-2692): state it in `evidence` with its date, or "
+                           f"leave it to the census the faces derive from the block")
+        ev = str(t.get("evidence", ""))
+        if re.search(r"\d", ev) and not DATE_RE.search(ev):
+            out.append(f"{tid}.evidence carries a measurement with no date - a citation is a claim at the "
+                       f"MOMENT OF MINT (D-2660): add the date it was measured")
+    return out
 
 
 def _read(rel: str) -> str:
@@ -89,11 +160,22 @@ def derive(d: dict) -> dict:
             states[k] = v
     open_states = d["open_decision_states"]
     need_action = sum(states.get(s, 0) for s in open_states)
-    tl = [t for t in (tasks.get("tasks") or []) if str(t.get("state")) not in ("done", "superseded")]
-    pri = {p: sum(1 for t in tl if t.get("priority") == p) for p in d["task_priorities"]}
-    gate = sum(1 for t in tl if t.get("state") == "gate")
+    all_tasks = tasks.get("tasks") or []
+    faults = task_faults(all_tasks, d)
+    if faults:  # C16: a register that breaks its own declared schema is not readable-as-true
+        for f in faults:
+            print("  !! " + f)
+        raise SystemExit(EXIT_FAIL)
+    # D-2985: a RULE is never open work; a task's MOVER decides which lane of the face it belongs to.
+    live = [t for t in all_tasks if str(t.get("state")) not in ("done", "superseded", "rule")]
+    rules = [t for t in all_tasks if str(t.get("state")) == "rule"]
+    pri = {p: sum(1 for t in live if t.get("priority") == p) for p in d["task_priorities"]}
+    owner_moved = [t for t in live if t.get("mover") == "owner"]
+    pipeline_moved = [t for t in live if t.get("mover") != "owner"]
     open_bugs = bugs.get("open") or []
-    sev, unlab, headed_ids = severity_census(d)
+    open_ids = [str(b.get("id")) for b in open_bugs]
+    # ONE population for OPEN-ness (the census) and one for severity (the id's first heading at ANY depth).
+    sev, unlab = severity_census(d, set(open_ids))
     stamp8 = str(dec.get("decisions_sha256_16", ""))[:16]
     sys.path.insert(0, str(REPO / "scripts"))
     try:
@@ -109,24 +191,34 @@ def derive(d: dict) -> dict:
         "decisions_total": dec.get("total_decisions", 0), "states": states, "need_action": need_action,
         "stamp": stamp8, "date": today,
         "bugs_total": bugs.get("total_ids", 0), "bugs_open": bugs.get("open_n", 0), "bugs_closed": bugs.get("closed_n", 0),
-        "sev": sev, "unlabelled": len(unlab), "open_bugs": open_bugs, "headed_ids": headed_ids,
-        "tasks": tl, "pri": pri, "gate": gate, "tasks_total": len(tl),
+        "sev": sev, "unlabelled": len(unlab), "open_bugs": open_bugs, "headed_ids": len(open_ids),
+        "tasks": live, "rules": rules, "all_tasks": all_tasks, "pri": pri,
+        "owner_moved": owner_moved, "pipeline_moved": pipeline_moved,
+        "tasks_total": len(live),
         "version": str(version_value or "unknown"),
         "open_states": open_states,
     }
 
 
 def register_truth(d: dict, x: dict) -> str:
-    """The ONE restatement line - shaped for the faces rail's own regex (BUG-588/D-2692)."""
+    """The ONE restatement line - shaped for the faces rail's own regex (BUG-588/D-2692).
+
+    D-2985: the task half of the line now names WHO must move the work. A bare "15 open tasks" was true of
+    three different situations at once - a standing rule that never closes, work only the OWNER can advance,
+    and work the pipeline will advance - which is what made the top of every face unreadable: the owner saw
+    obligations he had already given the agent, and the agent saw a gate it could never pass.
+    """
     return (f"{x['decisions_total']} decisions (census stamp {x['stamp']}, {x['date']}) · "
             f"{x['bugs_total']} bugs ({x['bugs_open']} open / {x['bugs_closed']} closed; "
             f"highest OPEN = {str(x['open_bugs'][-1]['id']) if x['open_bugs'] else 'none'}) · "
             f"{x['tasks_total']} open tasks (MUST {x['pri'].get('MUST', 0)} / SHOULD {x['pri'].get('SHOULD', 0)} / "
-            f"WORTH {x['pri'].get('WORTH', 0)}; gate {x['gate']})")
+            f"WORTH {x['pri'].get('WORTH', 0)}; OWNER-moved {len(x['owner_moved'])}, "
+            f"pipeline-moved {len(x['pipeline_moved'])}; {len(x['rules'])} standing rule(s) never close)")
 
 
 def render_block(d: dict, x: dict, decs: list | None = None) -> str:
     lim = int(d.get("face_list_limit", 12))
+    order = {p: i for i, p in enumerate(d["task_priorities"])}
     out = [IDX_S,
            "> **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**",
            f"> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): {register_truth(d, x)}.",
@@ -136,17 +228,37 @@ def render_block(d: dict, x: dict, decs: list | None = None) -> str:
            f" | in effect (active) {x['states'].get('active', 0)} | closed: resolved {x['states'].get('resolved', 0)}, "
            f"superseded {x['states'].get('superseded', 0)}, archived {x['states'].get('archived', 0)}, rejected {x['states'].get('rejected', 0)}",
            ">",
-           f"> Open BUGS by severity (heading population, first heading per id): CRITICAL {x['sev'].get('CRITICAL', 0)} · HIGH {x['sev'].get('HIGH', 0)} · "
+           f"> Open BUGS by severity (population = the census's {x['bugs_open']} open ids; severity read from each id's FIRST heading at ANY hash depth): CRITICAL {x['sev'].get('CRITICAL', 0)} · HIGH {x['sev'].get('HIGH', 0)} · "
            f"MED {x['sev'].get('MED', 0)} · LOW {x['sev'].get('LOW', 0)} · UNLABELLED {x['unlabelled']} (BUG-757) of {x['bugs_open']} open.",
            ">",
-           "> **MUST tasks (strategic-consequential order — source: config/task_register.yaml):**",
+           # D-2985: the OWNER LANE leads. The four previous lines said "MUST tasks" and stopped there, so a
+           # standing rule, two owner-gated items and one actionable task rendered as one list in priority
+           # order - and the owner, reading his own register, saw three things he had already handed over.
+           f"> **{d['face_owner_lane_label']} ({len(x['owner_moved'])}) — what ONLY YOU can move; the pipeline cannot "
+           f"advance these, each needs YOUR word:**",
            ">",
-           "> | id | pri | state | task | evidence |",
-           "> |---|---|---|---|---|"]
-    order = {p: i for i, p in enumerate(d["task_priorities"])}
-    for t in sorted(x["tasks"], key=lambda t: (order.get(t.get("priority"), 9), str(t.get("id"))))[:lim]:
+           "> | id | pri | what YOU decide | the gate |",
+           "> |---|---|---|---|"]
+    for t in sorted(x["owner_moved"], key=lambda t: (order.get(t.get("priority"), 9), str(t.get("id")))):
+        out.append(f"> | {t.get('id')} | {t.get('priority')} | {str(t.get('title',''))[:110]} | "
+                   f"{str(t.get('gate',''))[:70]} |")
+    out += [">",
+            f"> **PIPELINE LANE ({len(x['pipeline_moved'])}) — what the agent will do next, in "
+            f"strategic-consequential order (source: config/task_register.yaml):**",
+            ">",
+            "> | id | pri | state | task | evidence |",
+            "> |---|---|---|---|---|"]
+    for t in sorted(x["pipeline_moved"], key=lambda t: (order.get(t.get("priority"), 9), str(t.get("id"))))[:lim]:
         ev = str(t.get("evidence", ""))[:90].replace("|", "/")
         out.append(f"> | {t.get('id')} | {t.get('priority')} | {t.get('state')} | {str(t.get('title',''))[:110]} | {ev} |")
+    if x["rules"]:
+        out += [">",
+                f"> **STANDING RULES — in effect, never close ({len(x['rules'])}):**",
+                ">",
+                "> | id | rule |",
+                "> |---|---|"]
+        for t in x["rules"]:
+            out.append(f"> | {t.get('id')} | {str(t.get('title',''))[:120]} |")
     out += [">",
             "> **Open decisions needing action (newest first; the states are DECLARED in config/gov_sync.yaml):**",
             ">",
@@ -181,12 +293,22 @@ def _severe(x: dict) -> list:
 
 
 def render_seed_status(d: dict, x: dict) -> str:
-    top = [t for t in x["tasks"] if t.get("priority") == "MUST"][:3]
-    nxt = "; ".join(f"({i+1}) {str(t.get('title'))[:90]}" for i, t in enumerate(top))
+    """D-2985: the BOOT face leads with the OWNER's obligations.
+
+    session_seed.yaml is loaded at boot, so it is the one derived face that reaches EVERY session. It used
+    to render the top three MUST tasks - which was, in fact, a standing rule the pipeline keeps itself, plus
+    two items only the owner can move; the actionable work never appeared. The boot line now says what the
+    owner must decide and what the agent will do, in that order.
+    """
+    own = "; ".join(f"{t.get('id')} {str(t.get('title'))[:70]}" for t in
+                    sorted(x["owner_moved"], key=lambda t: str(t.get("id")))[:3]) or "nothing"
+    nxt = "; ".join(f"{t.get('id')} {str(t.get('title'))[:70]}" for t in
+                    sorted(x["pipeline_moved"], key=lambda t: str(t.get("id")))[:3]) or "nothing"
     return (f"{x['date']} D-2981: the user-facing faces are DERIVED (scripts/gov_sync.py) and "
             f"joined to the registers. Register: {x['decisions_total']} decisions ({x['need_action']} needing action) / "
-            f"{x['bugs_total']} bugs ({x['bugs_open']} open) / {x['tasks_total']} open tasks. "
-            f"NEXT: {nxt}.")
+            f"{x['bugs_total']} bugs ({x['bugs_open']} open) / {x['tasks_total']} open tasks "
+            f"({len(x['owner_moved'])} OWNER-moved, {len(x['pipeline_moved'])} pipeline). "
+            f"YOURS: {own}. AGENT NEXT: {nxt}.")
 
 
 def _extract_block(text: str) -> str | None:
@@ -208,50 +330,56 @@ def _replace_block(text: str, block: str) -> tuple:
 
 
 def _recut_census(text: str, truth: str, d: dict, x: dict) -> tuple:
-    """Own EVERY restatement line in the face (BUG-588/D-2692; closes BUG-756)."""
+    """Own EVERY restatement line in the face's LIVE region (BUG-588/D-2692; closes BUG-756).
+
+    D-2985 (SCOPE): the region BELOW the history marker is NOT re-cut. It is declared "DATED HISTORY:
+    append-only, NOT a register" (D-2981), and MEASURED 2026-10-13 this writer was rewriting counts inside
+    those snapshots to TODAY'S value while the line still said "as measured then" - i.e. this writer was
+    making historical claims FALSE, the one thing the history declaration forbids (R-D410). A historical
+    count is scoped by the moment the line names; the derived block owns the current one.
+    """
+    head, sep, tail = text.partition(HIS)
     dec_sub = f"{x['decisions_total']} decisions (census stamp {x['stamp']}, {x['date']})"
-    n0 = len(CENSUS_DEC_BARE.findall(text))
+    n0 = len(CENSUS_DEC_BARE.findall(head))
     bug_sub = f"{x['bugs_total']} bugs ({x['bugs_open']} open / {x['bugs_closed']} closed;"
-    n1 = len(CENSUS_DEC.findall(text))
-    n2 = len(CENSUS_BUG.findall(text))
-    text = CENSUS_DEC.sub(dec_sub, text)
-    text = CENSUS_DEC_BARE.sub(f"{x['decisions_total']} decisions", text)
-    text = CENSUS_BUG.sub(bug_sub, text)
-    return text, n0 + n1 + n2
+    n1 = len(CENSUS_DEC.findall(head))
+    n2 = len(CENSUS_BUG.findall(head))
+    head = CENSUS_DEC.sub(dec_sub, head)
+    head = CENSUS_DEC_BARE.sub(f"{x['decisions_total']} decisions", head)
+    head = CENSUS_BUG.sub(bug_sub, head)
+    return head + sep + tail, n0 + n1 + n2
 
 
-def severity_census(d: dict) -> tuple:
-    """ONE population for both the severity distribution and the gap (BUG-757).
+def severity_census(d: dict, open_ids: set[str]) -> tuple:
+    """ONE population for both the severity distribution and the gap (BUG-757, re-measured by D-2985).
 
-    POPULATION, stated so the number is reproducible: the FIRST heading for each bug id (a later
-    heading is an UPDATE of the same bug), whose state token is OPEN (a CLOSED heading needs no
-    severity - it is not in the open set), carrying a CRITICAL/HIGH/MED/LOW token or not. The
-    register-truth line keeps the CENSUS (governance/bug_status.json) open count separately: two
-    populations, both named, neither hidden.
+    POPULATION, stated so the number is reproducible: the ids the CENSUS calls OPEN (governance/bug_status.json
+    - the ONE home for OPEN-ness, D-2642), each carrying the severity token of its FIRST heading at ANY hash
+    depth (a later heading is an UPDATE of the same bug). Both halves were wrong before and in opposite
+    directions, which is why the line could not be checked: the old reader re-derived OPEN-ness from a heading
+    token (so 88 bugs the register calls CLOSED were counted as open) and required EXACTLY two hashes (so 18
+    open bugs written with three were invisible - the BUG-426/427 class). MEASURED 2026-10-13: 255 counted
+    open-ish vs 185 open, and the parts summed to 255 for a population of 185.
     """
     log = _read(d["registers"]["bugs"]["log"])
-    seen, sev, unlab = set(), {s: 0 for s in d["severity_tokens"]}, []
+    first: dict[str, str] = {}
     for m in BUG_HEAD.finditer(log):
-        bid, head = "BUG-" + m.group(1), m.group(2).upper()
-        if bid in seen:
-            continue
-        seen.add(bid)
-        if "UPDATE" in head:
-            continue
-        st = STATE.search(head)
-        if st and st.group(1) != "OPEN":
-            continue
-        s2 = SEV.search(head)
+        first.setdefault("BUG-" + m.group(1), m.group(2).upper())
+    sev = {s: 0 for s in d["severity_tokens"]}
+    unlab = []
+    for bid in sorted(open_ids):
+        head = first.get(bid)
+        s2 = SEV.search(head) if head is not None else None
         if s2 and s2.group(1) in sev:
             sev[s2.group(1)] += 1
         else:
-            unlab.append(bid)
-    return sev, unlab, len(seen)
+            unlab.append(bid)  # no heading, or a heading with no severity token: the gap, one bucket
+    return sev, unlab
 
 
-def severity_gap(d: dict) -> list:
-    """Open bug headings with NO severity token (BUG-757) - the SHRINK-ONLY ceiling's population."""
-    return severity_census(d)[1]
+def severity_gap(d: dict, open_ids: set[str]) -> list:
+    """Open ids with NO severity token (BUG-757) - the SHRINK-ONLY ceiling's population."""
+    return severity_census(d, open_ids)[1]
 
 
 def _write(path: pathlib.Path, text: str) -> str:
@@ -285,11 +413,11 @@ def check(d: dict, x: dict) -> int:
                 want = x["version"] if f["from"] == "manifest" else render_seed_status(d, x)
                 if val != want:
                     faults.append(f"{face['path']}: {f['key']} is STALE (derived value differs)")
-    bad = severity_gap(d)
+    bad = severity_gap(d, {str(b.get("id")) for b in (x["open_bugs"] or [])})
     ceil = int(d.get("severity_grandfathered", 0))
     if len(bad) > ceil:
-        faults.append(f"buglog: {len(bad)} open-ish heading(s) carry no severity token, over the shrink-only ceiling {ceil} "
-                      f"(BUG-757). New: {bad[ceil:][:6]}")
+        faults.append(f"buglog: {len(bad)} of the register's OPEN ids carry no severity token, over the "
+                      f"shrink-only ceiling {ceil} (BUG-757). New: {bad[ceil:][:6]}")
     for f in faults:
         print("  !! " + f)
     if faults:
@@ -352,12 +480,20 @@ def _insert_block(text: str, rel: str, block: str) -> str:
 def selftest() -> int:
     """Known-answer controls: a STALE block must be SEEN to fail (BUG-492)."""
     d = {"registers": {}, "faces": [], "open_decision_states": ["open"], "severity_tokens": ["CRITICAL", "HIGH", "MED", "LOW"],
-         "task_priorities": ["MUST", "SHOULD", "WORTH"], "face_list_limit": 12, "severity_grandfathered": 0}
+         "task_priorities": ["MUST", "SHOULD", "WORTH"], "face_list_limit": 12, "severity_grandfathered": 0,
+         "task_states": ["open", "rule", "done", "superseded"], "task_movers": ["owner", "pipeline"],
+         "owner_gate_token": "owner", "face_owner_lane_label": "OWNER LANE"}
     x = {"decisions_total": 7, "states": {"open": 2, "active": 3, "resolved": 2}, "need_action": 2, "stamp": "deadbeefdeadbeef",
          "date": "2026-01-02", "bugs_total": 5, "bugs_open": 3, "bugs_closed": 2, "sev": {"CRITICAL": 1, "HIGH": 1, "MED": 0, "LOW": 0},
          "unlabelled": 1, "open_bugs": [{"id": "BUG-001", "title": "(LOW - OPEN) x"}, {"id": "BUG-003", "title": "(CRITICAL - OPEN) y"}],
-         "tasks": [{"id": "T-1", "priority": "MUST", "state": "open", "title": "t", "evidence": "e"}], "pri": {"MUST": 1, "SHOULD": 0, "WORTH": 0},
-         "gate": 0, "tasks_total": 1, "version": "v9.9", "open_states": ["open"]}
+         "tasks": [{"id": "T-1", "priority": "MUST", "state": "open", "mover": "pipeline", "title": "t", "evidence": "e"}],
+         "rules": [{"id": "R-1", "priority": "MUST", "state": "rule", "mover": "pipeline", "title": "the faces are derived"}],
+         "all_tasks": [], "pri": {"MUST": 1, "SHOULD": 0, "WORTH": 0},
+         "owner_moved": [{"id": "T-2", "priority": "MUST", "state": "open", "mover": "owner", "title": "sign",
+                          "gate": "the owner word", "evidence": "e (2026-01-02)"}],
+         "pipeline_moved": [{"id": "T-1", "priority": "MUST", "state": "open", "mover": "pipeline", "title": "t",
+                             "evidence": "e (2026-01-02)"}],
+         "tasks_total": 2, "version": "v9.9", "open_states": ["open"]}
     ok = 0
     truth = register_truth(d, x)
     assert re.search(r"\b5 bugs \(3 open / 2 closed;", truth), "register_truth must satisfy the faces rail regex"
@@ -375,6 +511,9 @@ def selftest() -> int:
     recut, n = _recut_census("x 99 decisions (census stamp 0000000000000000, 1999-01-01) · 42 bugs (1 open / 41 closed; y", truth, d, x)
     assert n >= 2 and "deadbeefdeadbeef" in recut and "5 bugs (3 open / 2 closed;" in recut, "census re-cut must own both shapes"
     ok += 1
+    # D-2985: the re-cut has a SCOPE - history is never rewritten, not even by the writer that owns the faces.
+    scoped, n3 = _recut_census("live 99 decisions (census stamp 27, 1999-01-01)\n" + HIS +
+                               "\nSNAPSHOT: 99 decisions (census stamp 27, 1999-01-01)", truth, d, x)
     bare, n2 = _recut_census("Register truth: 99 decisions · 42 bugs (1 open / 41 closed; y", truth, d, x)
     assert n2 >= 2 and "7 decisions ·" in bare, "the STAMP-LESS restatement must be owned too (the MTR pre-D-2981 shape)"
     ok += 1
@@ -383,7 +522,42 @@ def selftest() -> int:
     assert _extract_block(face) == blk, "extract must return the block BYTES (the check compares these, not a rewrite)"
     assert _extract_block(face.replace("deadbeefdeadbeef", "0000000000000000")) != blk, "a modified block must compare UNEQUAL"
     ok += 2
-    print(f"ok gov-sync --selftest: {ok}/9 known answers (a stale block is DETECTED, not trusted)")
+    # D-2985: the task register's OWN schema, as NAMED known answers in BOTH directions - a rule whose control
+    # has never been seen to fail is not a control (BUG-492), and a mutation must RED the control that NAMES
+    # the rule rather than only move a counter (D-2676 iv).
+    base = {"priority": "MUST", "evidence": "e (2026-01-02)", "gate": "none"}
+    rows = [
+        ("a conforming task register makes no fault",
+         task_faults([{**base, "id": "T-1", "state": "open", "mover": "pipeline", "title": "t"},
+                      {**base, "id": "T-2", "state": "open", "mover": "owner", "title": "sign", "gate": "the owner word"},
+                      {**base, "id": "R-1", "state": "rule", "mover": "pipeline", "title": "r"}], d) == []),
+        ("a standing RULE registered as an open task must fire",
+         any("STANDING RULE" in f for f in task_faults([{**base, "id": "R-1", "state": "open", "mover": "pipeline", "title": "r"}], d))),
+        ("an entry that does not say WHO must move it must fire",
+         any("WHO must act" in f for f in task_faults([{**base, "id": "T-1", "state": "open", "title": "t"}], d))),
+        ("mover: owner with gate 'none' must fire",
+         any("mover: owner but gate is 'none'" in f for f in task_faults([{**base, "id": "T-1", "state": "open", "mover": "owner", "title": "t"}], d))),
+        ("a pipeline-moved task whose gate names the owner must fire",
+         any("the two fields disagree" in f for f in task_faults([{**base, "id": "T-1", "state": "open", "mover": "pipeline", "title": "t", "gate": "the owner word"}], d))),
+        ("a title that restates a measured count must fire",
+         any("ONE home" in f for f in task_faults([{**base, "id": "T-1", "state": "open", "mover": "pipeline", "title": "108 of 185 open bugs"}], d))),
+        ("an evidence line carrying a count with no date must fire",
+         any("MOMENT OF MINT" in f for f in task_faults([{**base, "id": "T-1", "state": "open", "mover": "pipeline", "title": "t", "evidence": "185 open"}], d))),
+        ("the derived block LEADS with the OWNER LANE (before the pipeline lane)",
+         render_block(d, x, decs=[]).index("OWNER LANE") < render_block(d, x, decs=[]).index("PIPELINE LANE")),
+        ("a standing RULE is NOT counted as open work", "standing rule(s) never close" in register_truth(d, x)),
+        ("the census re-cut owns the LIVE region and leaves the history region BYTE-IDENTICAL",
+         n3 >= 1 and "7 decisions (census stamp deadbeefdeadbeef, 2026-01-02)" in scoped
+         and "SNAPSHOT: 99 decisions (census stamp 27, 1999-01-01)" in scoped),
+    ]
+    for name, okk in rows:
+        print(("  ok  " if okk else "  !!  ") + name)
+    ok += len(rows)
+    failed = [name for name, okk in rows if not okk]
+    if failed:
+        print("FAIL gov-sync --selftest: " + str(len(failed)) + " known answer(s) did not fire")
+        return EXIT_DRIFT
+    print(f"ok gov-sync --selftest: {ok} known answers (a stale block is DETECTED, not trusted)")
     return EXIT_OK
 
 

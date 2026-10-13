@@ -1,0 +1,95 @@
+- id: D-2985
+  date: '2026-10-13'
+  state: RESOLVED
+  category: GOVERNANCE / INSTRUMENT
+  title: >-
+    A claim in the LIVE region joins a register TOO - and where the register says only the OWNER can move it,
+    the face says so, and says it FIRST. The mirror of D-2984, plus the axes the task register never had
+  bugs: [BUG-762, BUG-763, BUG-764]
+  decision: >-
+    THE DEFECT (three bugs, one act; measured the day after D-2984 closed the mirror hole, and it is the shape
+    of the owner's own complaint restated: "the done, fixed, resolved task/bugs/decisions are still on top so my
+    instruction hasn't delivered"). D-2984 policed everything BELOW the `GOV-HISTORY:START` marker. The region
+    ABOVE it - the one the owner opens the file on - had NO join, and it was wrong three ways at once.
+    (1) BUG-762: `DECISION-LOG.md:12` read `## 🔴 CURRENT OPEN / PENDING INDEX (machine-derived 2026-10-03 -
+    the live face; history below)` - a HAND heading, ten days stale, calling itself machine-derived and THE live
+    face, two lines above the derived block that claimed the same title. The D-2984 label limb could not see it
+    (it required the label to LEAD the line WITHOUT a heading marker, so the ONE line the owner opens the file
+    on was invisible to the rule that exists to police it). `config/task_register.yaml` cited
+    `scripts/check_gov_sync.py` in its own header - a file that has never existed (D-405: a citation whose
+    subject is absent is an assertion; the BUG-761 class one level down). And NO face said WHO must move the
+    work: `R-1` (a standing RULE that never closes), `T-101` and `T-103` (both gated on an owner word) and
+    `T-104` (the only actionable MUST) were ALL registered `state: open`, so every face led with four rows
+    sorted by priority alone - three the owner could not act on and the agent could not move, the actionable one
+    last - and the census said `gate 1` while THREE entries named an owner gate.
+    (2) BUG-763: the register-truth line read `CRITICAL 7 · HIGH 36 · MED 57 · LOW 30 · UNLABELLED 125 ... of
+    185 open` - parts summing to 255 for a population of 185. The reader re-derived OPEN-ness from a heading's
+    state token instead of reading the census (88 bugs the register calls CLOSED were counted as open), and
+    `BUG_HEAD` required EXACTLY two hashes, so a bug written `### BUG-426` was INVISIBLE (18 open ids missing
+    from the denominator). The buglog already records that class ("HEADER_RE was `^##\s+(BUG-\d+)` - EXACTLY
+    two hashes ... so the rail never saw them") - the lesson was written down and never propagated to the
+    reader. One question had THREE answers: 125 (heading), 108 (census titles, quoted in T-104's title), 101
+    (the truth against the census's open set).
+    (3) BUG-764: `scripts/gov_sync.py` re-cut every census-shaped line in the WHOLE file, so the two SNAPSHOT
+    lines below the marker had been re-cut to TODAY's counts while still reading "as measured then" - the
+    writer that exists to stop stale counts was making HISTORICAL claims FALSE (R-D410), and that is a direct
+    CONFLICT between D-2981 (every restatement is derived) and the faces' own declaration that everything below
+    the marker is dating-only history.
+
+    THE SHAPE (one sentence, four limbs). A claim in the LIVE region joins a register too - and where the
+    register says only the OWNER can move it, the face says so, and says it FIRST. (i) The live-claim LABEL has
+    ONE home: a hand line may not claim to BE the live index; the label may carry a heading marker, quote
+    markers, emphasis and an icon, and it must still LEAD the line (a rule that fires on a discussion of a
+    pointer is not a rule about pointers). (ii) A file a live claim NAMES must EXIST - the D-405 class,
+    generalised from decision ids to paths, which is what a header citation is. (iii) The task register
+    declares WHO must act: `mover: owner | pipeline` is REQUIRED on every entry, an `R-` id is `state: rule`
+    (in effect, NEVER closes) and is never counted as open work, and `state: gate` is RETIRED - gatehood is
+    `mover: owner` plus the gate text naming the owner's word, and a pipeline-moved entry whose gate names the
+    owner FAILS CLOSED (C16: the two fields would disagree). The face then LEADS with the OWNER LANE (the label
+    is declared once, in config/gov_sync.yaml) and the boot face renders `YOURS:` before `AGENT NEXT:`.
+    (iv) A count a register owns has ONE home: a measured count in a task `title`/`why` is REFUSED, a count in
+    `evidence` must carry its date (D-2660), the severity population IS the census's open ids (D-2642 - one home
+    for OPEN-ness) with the severity read from the id's FIRST heading at ANY hash depth, and the census re-cut
+    is SCOPED to the live region (R-D410: history is never rewritten, not even by the writer that owns the
+    faces).
+
+    MEASUREMENT OF RECORD. Baseline: the LIVE limbs reported 4 faults (the hand heading + the missing owner
+    lane in three faces) and the register reader FAILED CLOSED on the new schema (1 fault: T-113's undated
+    evidence). Repairs: 1 heading line, the register's 16 entries given a `mover`, 2 titles and 3 prose counts
+    moved to the field that owns them, 2 SNAPSHOT lines repaired in place with the repair named, 1 dangling
+    citation corrected. After: `check_governance_faces` rc=0 (31/31 controls, was 25), `gov_sync --check`
+    rc=0 (19 named known answers, was 13), the faces carry `OWNER LANE (3)` / `PIPELINE LANE (11)` / `STANDING
+    RULES (1)` and `14 open tasks ... OWNER-moved 3, pipeline-moved 11; 1 standing rule(s) never close`, and the
+    severity line now PARTITIONS the open count exactly: CRITICAL 4 · HIGH 22 · MED 39 · LOW 19 · UNLABELLED
+    101 = 185. The ceiling LOWERED 125 -> 101 (D-2644: a ceiling may only be lowered) and the retired second
+    number (`severity_grandfathered_titles: 108`) is gone - one question, one home. Three mutations land
+    (config/rail_mutations.yaml, floor 34 -> 37): the LIVE label limb, the mover axis, and the re-cut scope,
+    each with the control it must RED.
+
+    HONEST LIMITS. (1) The `why` field is policed only for the CENSUS-SHAPED restatement form
+    (`open = N`, `N bugs|tasks|decisions|rows`); a count phrased some other way in prose can still go stale -
+    the printed surface (title/evidence) is fully covered, the register's long-form prose is not. (2) `T-103`
+    keeps "the label re-derivation debt" as its title: the numbers moved to the bug and evidence, but the
+    entry's gate is still an owner word, so the OWNER LANE will keep naming it until the owner rules - that is
+    the point of the lane, not a defect. (3) The hand TIER sections below the marker (BUG-761/T-115) are
+    untouched: moving the marker would silence the D-2984 joins that keep those rows honest, and the tier
+    labels' counts are still a separate join owed by T-115. (4) The register's header comments are not
+    automatically policed for path citations - THIS instance was repaired, and the live-region rule covers the
+    faces; a general register-citation join is not landed. (5) The spec files were authored in the SAME act as
+    the code (D-2978 prefers spec-first); the invariant set was designed before the implementation, but the
+    files were written after it - a weaker ordering than the rule prescribes, recorded rather than claimed.
+  files:
+  - scripts/gov_sync.py
+  - scripts/check_governance_faces.py
+  - config/gov_sync.yaml
+  - config/task_register.yaml
+  - config/rail_mutations.yaml
+  - config/rail_registry.yaml
+  - specs/governance_faces.spec.md
+  - specs/task_register.spec.md
+  - tests/test_governance_faces_spec.py
+  - tests/test_task_register_spec.py
+  - DECISION-LOG.md
+  - MASTER-TASK-REGISTER.md
+  - governance/buglog.md
+  - agent/session_seed.yaml

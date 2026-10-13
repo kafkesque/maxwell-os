@@ -33,8 +33,9 @@ fixture:
   commit_identity: {email: mutation-gate@localhost, name: mutation-gate}
   keep: false
   timeout_seconds: 600
+
 coverage:
-  min_mutations: 34            # FLOOR (shrink guard): deleting an entry means editing the floor in a diff a human reads (34 = 33 + the D-2984 claim-surface entry)
+  min_mutations: 37            # FLOOR (shrink guard): deleting an entry means editing the floor in a diff a human reads (37 = 34 + the three D-2985 entries: the LIVE label limb, the mover axis, the re-cut scope)
   # D-2679: the coverage set is DERIVED, never restated. Which rails gate a COMMIT is one fact and it already has
   # ONE home (config/rail_registry.yaml#commit_boundary), so restating it here would be a SECOND HOME - and two
   # lists of one fact drift, and only one of them can be right. scripts/check_rail_mutations.py joins the two and
@@ -686,3 +687,61 @@ mutations:
       The faces told the owner that two RESOLVED decisions were still pending (BUG-760) while this rail reported
       agreement: surfaces (1)-(4) read tables and marker lines, and no DEC_ROW_RE existed. This entry pins the
       join: if the comparison ever stops comparing, the control that names the rule goes RED.
+
+  # D-2985/BUG-762: the LIVE region (above the history marker) - the surface the OWNER actually opens. The
+  # rule that guards it is the mirror of the one above, so it gets its own pin: if the LIVE label limb stops
+  # firing, the control that NAMES it goes red and nothing else moves (D-2676 iv). MEASURED before the fix:
+  # DECISION-LOG.md:12 read `## 🔴 CURRENT OPEN / PENDING INDEX (machine-derived 2026-10-03 the live face)`
+  # - a hand heading, ten days stale, claiming to BE the index - and every rail was green.
+  - id: the_live_region_label_limb_is_load_bearing
+    subject: scripts/check_governance_faces.py
+    op: replace
+    find: "        n = i + 1\n        if LIVE_LABEL_RE.search(line):"
+    replace: "        n = i + 1\n        if False:  # MUTATION (D-2676): the LIVE label limb stops firing"
+    runner: scripts/check_governance_faces.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: '  !!  a HAND HEADING that claims to be the live index must fire'
+    why: >-
+      BUG-762: the region ABOVE the marker was never policed, and the one line the owner opens the file on
+      claimed to be the index. The mutant silences that limb alone; the history-region limb keeps its own
+      control, so the red isolates the LIVE join rather than the rail (D-2676 iv).
+
+  # D-2985/BUG-762: the task register's MOVER axis. MEASURED before the fix: a standing RULE, two
+  # OWNER-gated tasks and one actionable task were all registered `open`, so every face led with rows the
+  # owner could not act on and the agent could not advance. The mutant drops the WHO-must-act requirement,
+  # which moves exactly the control that names it (the register's own known answers), so the red isolates
+  # the rule rather than the reader.
+  - id: the_mover_axis_is_load_bearing
+    subject: scripts/gov_sync.py
+    op: replace
+    find: '        if mv not in movers:'
+    replace: '        if False:  # MUTATION (D-2676): an entry need not say WHO must move it'
+    runner: scripts/gov_sync.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: '  !!  an entry that does not say WHO must move it must fire'
+    why: >-
+      BUG-762: "MUST ... open" covered a rule that never closes, work only the OWNER can move, and work the
+      pipeline will move. The mutant removes the requirement, so the control that names the rule is SEEN to
+      fail rather than the number quietly moving.
+
+  # D-2985/BUG-763: the census re-cut has a SCOPE (R-D410). MEASURED before the fix: this writer was
+  # re-cutting the counts inside the faces' SNAPSHOT lines to TODAY's value while the line still read "as
+  # measured then" - the writer that exists to stop stale counts was making historical claims FALSE. The
+  # mutant re-cuts the whole file (history included), which reds exactly the scope control.
+  - id: the_census_recut_scope_is_load_bearing
+    subject: scripts/gov_sync.py
+    op: replace
+    find: '    head, sep, tail = text.partition(HIS)'
+    replace: '    head, sep, tail = text, "", ""  # MUTATION (D-2676): history is re-cut too'
+    runner: scripts/gov_sync.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: '  !!  the census re-cut owns the LIVE region and leaves the history region BYTE-IDENTICAL'
+    why: >-
+      R-D410: append-only history, never rewritten - not even by the writer that owns the faces. The mutant
+      makes the re-cut own the whole file, so the scope assertion is SEEN to be load-bearing.

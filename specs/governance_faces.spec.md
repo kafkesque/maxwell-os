@@ -1,8 +1,8 @@
 # SPEC — Governance Faces, the CLAIM SURFACE of the register (P0)
 
 spec_version: 1
-governed: scripts/check_governance_faces.py (the rail: --selftest is its own oracle, the check is the ladder's line) · DECISION-LOG.md · MASTER-TASK-REGISTER.md · governance/buglog.md (the three faces' declared history regions) · config/decisions.yaml (the register a claim is joined to) · config/rail_mutations.yaml (the rule's mutation lock) · justfile#health (where the rail and its controls stand)
-authority: D-2984 (this rule) · D-2981/R-1 (the faces are DERIVED, never hand-appended) · D-2642 (one derived value, one home) · D-2660 (a citation is a claim about the tree at the MOMENT OF MINT) · D-405 (a declaration whose subject is absent is an assertion) · BUG-588/D-2692 (a count restated in prose is stale) · BUG-669 (the predecessor: the rail read tables and marker lines, never prose) · BUG-760 (measured: the faces told the owner a closed decision was still pending) · BUG-492 (a detector nobody has seen fail is not a detector) · C16
+governed: scripts/check_governance_faces.py (the rail: --selftest is its own oracle, the check is the ladder's line) · scripts/gov_sync.py (the faces' ONE writer, whose census re-cut is scoped by INV-13) · DECISION-LOG.md · MASTER-TASK-REGISTER.md · governance/buglog.md (the three faces' declared history regions AND their live regions) · config/decisions.yaml + governance/bug_status.json (the registers a claim is joined to) · config/task_register.yaml (the register that says WHO must move each task) · config/gov_sync.yaml (the declared labels and axes) · config/rail_mutations.yaml (the rules' mutation locks) · justfile#health (where the rails and their controls stand)
+authority: D-2985 (the LIVE region is a claim surface - this rule) · D-2984 (the HISTORY region is a claim surface - its mirror) · D-2981/R-1 (the faces are DERIVED, never hand-appended) · D-2642 (one derived value, one home) · D-2660 (a citation is a claim about the tree at the MOMENT OF MINT) · D-405 (a declaration whose subject is absent is an assertion) · BUG-588/D-2692 (a count restated in prose is stale) · BUG-669 (the predecessor: the rail read tables and marker lines, never prose) · BUG-760 (measured: the faces told the owner a closed decision was still pending) · BUG-761 (measured: a dangling citation in a declared-history region) · BUG-762 (measured: the live region was unpoliced) · R-D410 (append-only history) · BUG-492 (a detector nobody has seen fail is not a detector) · C12/C16/C19
 stamp: 2026-10-13 · deterministic authoring (no LLM gen)
 status: each invariant is live-verified by tests/test_governance_faces_spec.py
 
@@ -24,6 +24,20 @@ because nothing can tell the difference later.
 
 Lifecycle (owner-approved, D-2978): this file is OVERWRITTEN IN PLACE when the contract changes — never appended,
 never a new file per change. History lives in git plus the D-number that changed it.
+
+## The mirror (D-2985)
+
+D-2984 policed everything BELOW the history marker. MEASURED 2026-10-13: the region ABOVE it — the one the
+owner actually opens — was unpoliced, and it was wrong three ways at once. `DECISION-LOG.md:12` still read
+`## 🔴 CURRENT OPEN / PENDING INDEX (machine-derived 2026-10-03 — the live face; history below)`: a HAND
+heading, ten days stale, calling itself machine-derived and the live face, two lines above the block that
+claimed the same title. A file a live claim NAMED had no checker (`config/task_register.yaml` cited
+`scripts/check_gov_sync.py`, which does not exist — the D-405 class, the same class as BUG-761's dangling
+`D2537`). And no face said WHO must move the work, so every face led with a standing rule and two owner-gated
+tasks rendered as `MUST … open`: the owner saw three rows he had already handed over, the agent saw a gate it
+could never pass, and the actionable work never appeared. The rule's mirror sentence: **a claim in the LIVE
+region joins a register too — and where the register says only the OWNER can move it, the face says so, and
+says it FIRST.**
 
 ## Invariants
 
@@ -96,3 +110,41 @@ never a new file per change. History lives in git plus the D-number that changed
 - **Wrong:** a rule whose oracle is never run, or a mutation whose declared `find` text no longer matches the bytes
   (a declaration that drifted from reality is FATAL, never a quiet pass).
 - **Test:** `test_the_rule_is_mutation_locked_and_its_controls_run`.
+
+### INV-10 — The LIVE region is a claim surface: a hand line may not claim to BE the live index
+- **Correct:** the phrase that points at the current state names ONE place — the derived block. A hand heading
+  above it is a tier heading or a snapshot (`## 🔴 OPEN / PENDING — tier heading (the DERIVED block below owns
+  the current state)`). The label may carry a heading marker, quote markers, emphasis and an icon, and it must
+  still LEAD the line.
+- **Wrong:** `## 🔴 CURRENT OPEN / PENDING INDEX (machine-derived 2026-10-03 — the live face; history below)` —
+  a hand line that says it IS the index, dated ten days earlier. MEASURED 2026-10-13: the FIRST version of this
+  limb (D-2984) could not see it, because it required the label to lead the line WITHOUT a heading marker, so the
+  one line the owner opens the file on was invisible to the rule that exists to police it.
+- **Test:** `test_a_hand_line_may_not_claim_to_be_the_live_index`.
+
+### INV-11 — A file a live claim NAMES must exist
+- **Correct:** a path cited in the live region resolves (`config/gov_sync.yaml`, `scripts/gov_sync.py`).
+- **Wrong:** `config/task_register.yaml` cited `scripts/check_gov_sync.py` — a rail that has never existed, in
+  the header of the register of record. A citation whose subject is absent is an ASSERTION (D-405), and it was
+  the same class as BUG-761's dangling `D2537`: the declaration read as a guarantee while guaranteeing nothing.
+- **Test:** `test_a_citation_in_the_live_region_resolves`.
+
+### INV-12 — The face LEADS with the OWNER lane when the register declares owner-moved work
+- **Correct:** the block's first task section is `**OWNER LANE (n) — what ONLY YOU can move**` (the label is
+  declared once, in config/gov_sync.yaml), and the pipeline lane follows it. The boot face (`session_seed.yaml`)
+  renders `YOURS:` before `AGENT NEXT:`.
+- **Wrong:** any order that puts work the owner cannot do, or the agent cannot move, above the statement of what
+  the owner must decide. MEASURED 2026-10-13: the four rows at the top of every face were a standing rule, two
+  owner-gated tasks and one actionable task, sorted by priority alone — which is what "the resolved items are
+  still on top" was describing, session after session.
+- **Test:** `test_the_face_leads_with_the_owner_lane_when_the_register_has_one`.
+
+### INV-13 — The census re-cut has a SCOPE: the live region. History is never rewritten.
+- **Correct:** scripts/gov_sync.py re-cuts every census-shaped restatement line ABOVE the history marker and
+  leaves everything below it BYTE-IDENTICAL (R-D410). A historical count is scoped by the moment its line names.
+- **Wrong:** re-cutting the whole file, which this writer was doing: MEASURED 2026-10-13, the two SNAPSHOT lines
+  had been re-cut to TODAY's counts while still reading "as measured then" — the writer that exists to stop
+  stale counts was making historical claims FALSE. That is a CONFLICT between D-2981 (every restatement is
+  derived) and the faces' own declaration that everything below the marker is dating-only history; D-2985
+  resolves it in favour of the declaration.
+- **Test:** `test_the_census_recut_never_rewrites_history`.

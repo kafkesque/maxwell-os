@@ -27,6 +27,13 @@ executable contract under tests/, and the MACHINE RUNNER (pytest) is the grader.
 | spec | contract | invariants | status |
 |---|---|---|---|
 | specs/retrieval_serving.spec.md | tests/test_retrieval_serving_spec.py | INV-1..INV-7: golden anchoring, run pinning, ranking signal, fail-loud gate, ONE dispatch point, the harness measures the SERVED path, ONE pool home | live; 8/8 green 2026-10-13 |
+| specs/governance_faces.spec.md | tests/test_governance_faces_spec.py | INV-1..INV-13: the claim surface of the faces - history region (label, census marker, decision rows, OPEN assertions, repair-naming, ordering, mutation lock) AND the LIVE region (one live label, citations resolve, the OWNER LANE leads, the re-cut's scope) | live; 14/14 green 2026-10-13 |
+| specs/task_register.spec.md | tests/test_task_register_spec.py | INV-1..INV-6: a standing RULE is not a task, WHO must move it is declared, an owner gate is a MOVER, a count has ONE home, OPEN-ness is the census's (the severity line partitions it), the rule is mutation-locked | live; 7/7 green 2026-10-13 |
+| specs/config_defaults_census.spec.md | tests/test_config_defaults_census_spec.py | the undeclared-default census: the alias-aware key set, the receipt, the shrink-only ceiling | live 2026-10-13 |
+
+**MEASURED 2026-10-13 (D-2985): this inventory had drifted.** It listed ONE spec while `specs/` held four - an
+inventory that names one of four files is the BUG-588 shape in the sandbox's own front door. The rows above are
+the set that exists; a new spec adds its row here in the same change (rule 1, applied to this file).
 
 ## Prior art assessed 2026-10-13 (NOT adopted as tools; two mechanisms borrowed)
 

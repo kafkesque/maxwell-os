@@ -11,28 +11,41 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1112 decisions (census stamp e090da935be729b6, 2026-10-13) · 525 bugs (185 open / 340 closed; highest OPEN = BUG-761) · 15 open tasks (MUST 4 / SHOULD 8 / WORTH 3; gate 1).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1113 decisions (census stamp a2bcb9e7201140fb, 2026-10-13) · 528 bugs (185 open / 343 closed; highest OPEN = BUG-761) · 14 open tasks (MUST 3 / SHOULD 8 / WORTH 3; OWNER-moved 3, pipeline-moved 11; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **67** of 1112 — open 32 · proposed 14 · draft 1 · deferred 14 · planned 6 | in effect (active) 565 | closed: resolved 312, superseded 16, archived 8, rejected 11
+> Decisions NEEDING ACTION: **67** of 1113 — open 32 · proposed 14 · draft 1 · deferred 14 · planned 6 | in effect (active) 565 | closed: resolved 313, superseded 16, archived 8, rejected 11
 >
-> Open BUGS by severity (heading population, first heading per id): CRITICAL 7 · HIGH 36 · MED 57 · LOW 30 · UNLABELLED 125 (BUG-757) of 185 open.
+> Open BUGS by severity (population = the census's 185 open ids; severity read from each id's FIRST heading at ANY hash depth): CRITICAL 4 · HIGH 22 · MED 39 · LOW 19 · UNLABELLED 101 (BUG-757) of 185 open.
 >
-> **MUST tasks (strategic-consequential order — source: config/task_register.yaml):**
+> **OWNER LANE (3) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
+>
+> | id | pri | what YOU decide | the gate |
+> |---|---|---|---|
+> | T-101 | MUST | HARDEN THE RETRIEVAL GOLDEN SET (the gate is saturated) | owner-signed anchors for the new queries |
+> | T-103 | MUST | BUG-749 residual — the label re-derivation debt the census names (OWNER-RULED rows are store-write-owed) | the owner word that licenses the store write |
+> | T-107 | SHOULD | MCP payload decision — borp_score / feedback_score are still advertised to agents | owner word on the payload schema |
+>
+> **PIPELINE LANE (11) — what the agent will do next, in strategic-consequential order (source: config/task_register.yaml):**
 >
 > | id | pri | state | task | evidence |
 > |---|---|---|---|---|
-> | R-1 | MUST | open | STANDING — the user-facing faces are DERIVED, never hand-appended at the top | scripts/gov_sync.py --check (byte-compares the block) |
-> | T-101 | MUST | open | HARDEN THE RETRIEVAL GOLDEN SET (the gate is saturated) | python3 pipeline/retrieval_benchmark.py -> production 1.000/0.919/0.100 (2026-10-13) |
-> | T-103 | MUST | gate | BUG-749 residual — 457 rows of label re-derivation debt, of which 163 are OWNER-RULED and store-write-owed | claim gap 6.9% (457 of 6,587) measured 2026-10-13 |
-> | T-104 | MUST | open | BUG-757 — 108 of 185 open bugs carry NO severity token, so the register cannot be ordered by criticality | governance/bug_status.json -> open_n 185 / UNLABELLED 108 (2026-10-13) |
+> | T-104 | MUST | open | BUG-757 — OPEN bugs carry NO severity token, so the register cannot be ordered by criticality | bug_status.json joined to the buglog headings: UNLABELLED ceiling 101 (2026-10-13) |
 > | T-105 | SHOULD | open | REA tier A/B mining — DEVONthink 3 (related-document ranking) and Cursor (derived code index) | governance/NOT-YET-EVALUATED-RESEARCH.md (REA targets logged 2026-10-13) |
 > | T-106 | SHOULD | open | ROADMAP — MODULARITY (C21 swappable infrastructure) and CROSS-OS COMPATIBILITY (C26) | protocols: pipeline/storage/base.py only; no cross-OS smoke exists (2026-10-13) |
-> | T-107 | SHOULD | open | MCP payload decision — borp_score / feedback_score are still advertised to agents | maxwell_mcp_server.py output block (2026-10-13) |
 > | T-108 | SHOULD | open | BUG-712 / BUG-714 — the content_type residual and the harness-facing primitive | served run content_type census (2026-10-13) |
 > | T-112 | SHOULD | open | PERF - the SERVED path loads the cross-encoder per PROCESS, so short-lived callers pay a cold-start of minutes | suite rail runtime 100-200s -> >210s after the dispatcher became the CLI default (2026-10- |
 > | T-113 | SHOULD | open | PAY THE BASELINE the honest instrument REVEALED - the 71 keys behind block aliases, module by module, each wit | config/config_defaults_census.json after D-2982: 300 shadowed-declared keys / 568 sites (2 |
 > | T-114 | SHOULD | open | DISCHARGE THE INHERITED LADDER FAULTS - four lines were RED before D-2982 and the prefix report hid them | just health-full 2026-10-13: 7 faults / 128 lines; each rc=1 at 42f8b76^ (worktree). RE-ME |
 > | T-115 | SHOULD | open | BUG-761 — decide what a HAND TIER means inside the region the faces declare to be history | governance/buglog.md BUG-761; DECISION-LOG.md "## 🟢 ACTIVE — in effect (477)" vs 565 ACTIV |
+> | T-109 | WORTH | open | spec/test sandbox — adopt the two mechanisms borrowed from impeccable / shadcn-ui-lint | specs/README.md (sandbox charter, prior art) |
+> | T-110 | WORTH | open | BUG-756 — the census restatement is hand-written | scripts/gov_sync.py --check rc=0 after --apply (2026-10-13) |
+> | T-111 | WORTH | open | BUDGET — the reviewer can only review WHOLE files under 100,000 chars; stage4_merge.py and stage2_extract.py e | r5_review_gate.yaml max_source_chars vs the two module sizes (2026-10-12) |
+>
+> **STANDING RULES — in effect, never close (1):**
+>
+> | id | rule |
+> |---|---|
+> | R-1 | STANDING — the user-facing faces are DERIVED, never hand-appended at the top |
 >
 > **Open decisions needing action (newest first; the states are DECLARED in config/gov_sync.yaml):**
 >
@@ -58,7 +71,7 @@
 
 
 > **SNAPSHOT 2026-10-12 (dated history — the DERIVED index at the top of this file owns the current state; D-2984).**
-> Snapshot of the census as measured then: 1112 decisions · 523 bugs (184 open / 339 closed). Which bug is highest-OPEN, and the current numbers, belong to the derived block (one home, D-2642/D-2984).
+> Snapshot of the census as measured then: the counts it carried are SUPERSEDED by the DERIVED index above (one home, D-2642/D-2984/D-2985 — a version of this writer was re-cutting them to TODAY's value while the line said 'as measured then', repaired in place 2026-10-13). Which bug is highest-OPEN, and the current numbers, belong to the derived block.
 > **D2590 NON-PRINCIPLE TIER
 > LANDED** — decisions **D-2942..D-2945**; the store went **6,591 → 7,640 rows in ONE run** (principle 6,577 /
 > process_template 774 / process_instance 156 / tool_instruction 108 / growth_edge 25). The 1,619 S4 sidecar records

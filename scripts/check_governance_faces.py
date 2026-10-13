@@ -67,9 +67,18 @@ HEADING_RE = re.compile(r"^#{1,6}\s")
 #: line: MEASURED 2026-10-13, the phrase also occurs in prose that DISCUSSES the face (buglog.md:9241, the
 #: BUG-669 entry), and a rule that fires on a discussion of a pointer is not a rule about pointers.
 LIVE_LABEL_RE = re.compile(
-    r"^\s*(?:>\s*)*(?:[*_]{0,2})?\s*(?:CURRENT\s+OPEN\s*(?:/\s*PENDING)?\s*INDEX|the\s+live\s+face)\b",
+    r"^\s*(?:#{1,6}\s*)?(?:>\s*)*(?:[*_`]{0,2}\s*)*(?:[^\w\s]{1,3}\s*)*"
+    r"(?:CURRENT\s+OPEN\s*(?:/\s*PENDING)?\s*INDEX|the\s+live\s+face)\b",
     re.IGNORECASE,
 )
+#: MEASURED 2026-10-13 (D-2985), the day AFTER this rule first landed: the pattern above was blind to a label
+#: behind a heading marker. DECISION-LOG.md:12 read `## 🔴 CURRENT OPEN / PENDING INDEX (machine-derived
+#: 2026-10-03 — the live face; history below)` - a HAND heading, dated ten days earlier, calling itself
+#: machine-derived and the live face, sitting two lines above the block that claimed the same title. The
+#: first version of this limb required the label to LEAD the line and so could not see the ONE instance the
+#: owner opens the file on. The label may now carry a heading marker, quote markers, emphasis and an icon -
+#: and it must still LEAD the line, which is what keeps the prose that DISCUSSES a pointer (buglog.md's
+#: BUG-669 entry) from firing.
 #: The highest-open bug is a DERIVED value: ONE home (the derived block), D-2642. A hand line may state it only
 #: as a claim about a moment (D-2660) - which is how "highest OPEN then BUG-695" stays true while the
 #: register moves on. MEASURED 2026-10-13: MASTER-TASK-REGISTER.md:61 said "highest OPEN = BUG-750" with no
@@ -78,8 +87,7 @@ HIGHEST_OPEN_RE = re.compile(r"highest\s+OPEN\b", re.IGNORECASE)
 #: A moment named IN WORDS rather than as a date. The field above must carry one on its OWN line - an entry
 #: stamp one line up is not enough for a DERIVED value, because the value is the thing that moved.
 MOMENT_TOKEN_RE = re.compile(r"\b(then|as\s+of|at\s+the\s+time|that\s+date)\b", re.IGNORECASE)
-DEC_ROW_RE = re.compile(r"^\|\s*[*_`'\"]*\s*(D-?[0-9]+[a-z]?)\b")
-#: MEASURED 2026-10-13, AFTER the first version of this rule landed (the D-2984 verification pass): the row
+DEC_ROW_RE = re.compile(r"^\|\s*[*_`'\"]*\s*(D-?[0-9]+[a-z]?)\b")#: MEASURED 2026-10-13, AFTER the first version of this rule landed (the D-2984 verification pass): the row
 #: parser above originally required a BARE id cell, so two row SHAPES were invisible to the join - a bolded id
 #: (`| **D-274b** | **RESOLVED** | ... |`, DECISION-LOG.md:343) and an id with a label appended
 #: (`| D2546 SHACL+OWL | PLANNED | ... |`, :3260, a table whose own header reads "| ID | Registry state | True
@@ -95,6 +103,65 @@ OPEN_ASSERT_RE = re.compile(
     r"|\bBUG-(\d+)[^.\n]{0,24}?\bis\s+(?:still\s+)?OPEN\b",
     re.IGNORECASE,
 )
+
+# ------------------------------------------------ D-2985: the LIVE region is a claim surface too
+# D-2984 policed everything BELOW the history marker. MEASURED 2026-10-13: the region ABOVE it - the one the
+# owner actually opens - was unpoliced, and it was wrong in three ways at once. DECISION-LOG.md:12 read
+# `## 🔴 CURRENT OPEN / PENDING INDEX (machine-derived 2026-10-03 - the live face; history below)`: a HAND
+# heading, ten days stale, claiming to BE the live index while the derived block below claimed the same title.
+# A file a live claim names had no checker (config/task_register.yaml cited scripts/check_gov_sync.py, which
+# does not exist - the D-405 class, the same class as BUG-761's dangling D2537). And no face declared WHO must
+# move the work, so the top of every face led with a standing rule and two owner-gated tasks rendered as
+# "MUST ... open". Three claims, three joins, one sentence: the LIVE region is a claim surface too.
+GOV_SYNC_CFG = REPO / "config" / "gov_sync.yaml"
+LIVE_PATH_RE = re.compile(
+    r"\b((?:scripts|pipeline|config|governance|specs|tests|agent|lib)/[A-Za-z0-9_./-]+\.(?:py|yaml|yml|md|json))\b")
+
+
+def gov_sync_config() -> dict:
+    """The owner-lane label and the task axes - ONE home (config/gov_sync.yaml), never a literal here (C12)."""
+    doc = yaml.safe_load(GOV_SYNC_CFG.read_text(encoding="utf-8")) or {}
+    for key in ("face_owner_lane_label", "task_movers"):
+        if key not in doc:
+            raise SystemExit(f"FAIL-CLOSED (C16): {GOV_SYNC_CFG.name} declares no {key!r} (D-2985)")
+    return doc
+
+
+def owner_moved_count() -> int:
+    """How many live tasks the register says only the OWNER can move (config/task_register.yaml)."""
+    reg = yaml.safe_load((REPO / "config" / "task_register.yaml").read_text(encoding="utf-8")) or {}
+    return sum(1 for t in (reg.get("tasks") or [])
+               if str(t.get("state")) not in ("done", "superseded", "rule") and t.get("mover") == "owner")
+
+
+def live_faults(path: Path, lines: list[str], cfg_d: dict, owner_moved: int) -> list[str]:
+    """D-2985: the LIVE region (above the history marker) is a claim surface. Three limbs, each with its repair:
+    (1) a hand line may not claim to BE the live index - the label has one home;
+    (2) a file a live claim NAMES must exist (D-405: a citation whose subject is absent is an assertion);
+    (3) when the register declares owner-moved work, the face LEADS with the owner lane.
+    """
+    end = history_start(lines)
+    label = str(cfg_d["face_owner_lane_label"])
+    lane = re.compile(rf"^>\s*(?:[*_`]*\s*)*\*\*{re.escape(label)}\b")
+    problems: list[str] = []
+    if owner_moved and not any(lane.search(ln) for ln in lines[:end]):
+        problems.append(f"{path.name}: config/task_register.yaml declares {owner_moved} OWNER-moved task(s) and "
+                        f"this face carries no '{label}' row: a face that does not say what only the OWNER can "
+                        f"move cannot be acted on by anyone (D-2985) - relabel the lane, or run "
+                        f"scripts/gov_sync.py --apply")
+    for i, line in enumerate(lines[:end]):
+        n = i + 1
+        if LIVE_LABEL_RE.search(line):
+            problems.append(f"{path.name}:{n} claims to BE the live index. The label has ONE home - the derived "
+                            f"block above the history marker (D-2642): relabel this line a tier heading, or "
+                            f"date-scope it so it reads as a snapshot")
+        for m in LIVE_PATH_RE.finditer(line):
+            rel = m.group(1)
+            if not (REPO / rel).exists():
+                problems.append(f"{path.name}:{n} cites {rel}, which does not exist - a citation whose subject is "
+                                f"absent is an assertion (D-405): cite the file that runs, or drop the citation")
+    return problems
+
 
 # BUG status words must resolve consistently with scripts/bug_status.py (the register's own parser).
 CLOSE_WORDS = ("RESOLVED", "CLOSED", "FIXED", "INVALID", "RETRACTED")
@@ -473,6 +540,28 @@ def _selftest_history_faults() -> list[tuple[str, bool]]:
     ]
 
 
+def _selftest_live_region(cfg_d: dict) -> list[tuple[str, bool]]:
+    """D-2985: the LIVE region's three limbs, in BOTH directions (BUG-492)."""
+    def faults(body: list[str], owner: int = 0) -> list[str]:
+        return live_faults(Path("FACE.md"), body, cfg_d, owner)
+
+    lane = "> **OWNER LANE (1) — what ONLY YOU can move:**"
+    return [
+        ("a HAND HEADING that claims to be the live index must fire (the shape the first rule was blind to)",
+         len(faults(["## 🔴 CURRENT OPEN / PENDING INDEX (machine-derived 2026-10-03 — the live face)."])) == 1),
+        ("the same words in a line that DISCUSSES the faces must not fire",
+         len(faults(["Gap 1 — the MTR 'CURRENT OPEN INDEX' (the machine-derived live face) sits in a section."])) == 0),
+        ("a live claim may not name a file that does not exist",
+         len(faults(["see scripts/no_such_rail.py for the join"])) == 1),
+        ("a live claim naming a file that EXISTS makes no problem",
+         len(faults(["see config/gov_sync.yaml for the join"])) == 0),
+        ("owner-moved work with no owner lane in the face must fire",
+         len(faults(["the face says nothing about who moves what"], owner=2)) == 1),
+        ("the same face carrying the owner lane makes no problem",
+         len(faults([lane], owner=2)) == 0),
+    ]
+
+
 def _selftest_live_census_regex() -> bool:
     m = LIVE_CENSUS_RE.search(
         "Register: 993 decisions · 434 bugs (162 open / 272 closed; highest OPEN = BUG-670).")
@@ -538,6 +627,8 @@ def selftest() -> int:
          _selftest_buglog_tiers()),
         # D-2984: the claim-surface controls (both directions) - unpacked so each is a NAMED known answer.
         *_selftest_history_faults(),
+        # D-2985: the LIVE region (above the marker) - the surface the owner actually opens.
+        *_selftest_live_region(gov_sync_config()),
     ]
     for name, ok in rows:
         print(("  ok  " if ok else "  !!  ") + name)
@@ -558,6 +649,8 @@ def main(argv: list[str] | None = None) -> int:
     closed = bug_closed_set(bug)
     known = bug_known_ids(bug)
     open_ids = known - closed
+    sync_cfg = gov_sync_config()
+    owner_moved = owner_moved_count()
     problems: list[str] = []
     for face in FACES:
         if not face.exists():
@@ -568,10 +661,12 @@ def main(argv: list[str] | None = None) -> int:
         problems.extend(check_header_census(face, bug, dec))
         problems.extend(check_live_census(face, bug, dec))
         problems.extend(history_faults(face, face_lines, states, closed, known))
+        problems.extend(live_faults(face, face_lines, sync_cfg, owner_moved))
     if BUGLOG_FACE.exists():
         problems.extend(check_buglog_tiers(BUGLOG_FACE, open_ids, known))
-        problems.extend(history_faults(BUGLOG_FACE, BUGLOG_FACE.read_text(encoding="utf-8").splitlines(),
-                                       states, closed, known))
+        blog_lines = BUGLOG_FACE.read_text(encoding="utf-8").splitlines()
+        problems.extend(history_faults(BUGLOG_FACE, blog_lines, states, closed, known))
+        problems.extend(live_faults(BUGLOG_FACE, blog_lines, sync_cfg, owner_moved))
     else:
         problems.append(f"{BUGLOG_FACE.name}: missing face (cannot check what is not there)")
     if problems:
@@ -579,8 +674,9 @@ def main(argv: list[str] | None = None) -> int:
         for p in problems:
             print("  " + p)
         return 1
-    print("ok governance-faces: bug-status table rows and header/live census agree with the register "
-          "(" + str(len(FACES)) + " restatement face(s) + buglog tiers, " + str(len(known)) + " bug ids)")
+    print("ok governance-faces: bug-status table rows, header/live census, the history claim surface and the "
+          "LIVE region agree with the register (" + str(len(FACES)) + " restatement face(s) + buglog tiers, "
+          + str(len(known)) + " bug ids, " + str(owner_moved) + " owner-moved task(s))")
     return 0
 
 

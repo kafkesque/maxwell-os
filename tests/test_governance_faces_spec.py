@@ -46,7 +46,7 @@ def test_the_spec_is_paired_1to1_with_its_contract() -> None:
     text = SPEC.read_text(encoding="utf-8")
     invariants = re.findall(r"(?m)^### (INV-\d+)", text)
     named = re.findall(r"\*\*Test:\*\*\s*`([a-z0-9_]+)`", text)
-    assert len(invariants) == len(named) == 9, "one invariant, one named test (D-2978)"
+    assert len(invariants) == len(named) == 13, "one invariant, one named test (D-2978)"
     for name in named:
         assert name in globals(), f"the spec names {name}, which the contract does not define"
 
@@ -135,10 +135,71 @@ def test_the_rule_is_mutation_locked_and_its_controls_run() -> None:
     """INV-9 (D-2676 iv): the mutation exists, is expected RED, and its find-text is in the bytes TODAY."""
     doc = yaml.safe_load((PROJECT_ROOT / "config" / "rail_mutations.yaml").read_text(encoding="utf-8"))
     entries = [e for e in doc.get("mutations", []) if e.get("subject") == "scripts/check_governance_faces.py"]
-    assert len(entries) == 1, "the claim surface must be mutation-locked exactly once"
-    entry = entries[0]
-    assert entry.get("expect") == "red"
-    assert str(entry.get("marker", "")).strip()
-    source = RAIL.read_text(encoding="utf-8")
-    assert source.count(str(entry["find"])) == 1, "the declared find-text must match the bytes exactly once"
-    assert str(entry["marker"]) not in source, "the marker must not be present at baseline"
+    assert len(entries) == 2, "both claim surfaces (history and LIVE) must be mutation-locked, once each"
+    for entry in entries:
+        assert entry.get("expect") == "red"
+        assert str(entry.get("marker", "")).strip()
+        source = RAIL.read_text(encoding="utf-8")
+        assert source.count(str(entry["find"])) == 1, f"{entry['id']}: the find-text must match the bytes exactly once"
+        assert str(entry["marker"]) not in source, f"{entry['id']}: the marker must be absent at baseline"
+
+
+# ------------------------------------------------------------------ D-2985: the LIVE region
+SYNC_CFG = yaml.safe_load((PROJECT_ROOT / "config" / "gov_sync.yaml").read_text(encoding="utf-8"))
+LANE_CFG = {"face_owner_lane_label": SYNC_CFG["face_owner_lane_label"], "task_movers": SYNC_CFG["task_movers"]}
+
+
+def live(body: list[str], owner: int = 0) -> list[str]:
+    """The rail's LIVE-region join, driven with a synthetic face body (no write, no scan of the tree)."""
+    return rail.live_faults(Path("FACE.md"), body, LANE_CFG, owner)
+
+
+def test_a_hand_line_may_not_claim_to_be_the_live_index() -> None:
+    """INV-10: the label has ONE home - and the shape the first rule was blind to is the one that counted."""
+    assert len(live(["## 🔴 CURRENT OPEN / PENDING INDEX (machine-derived 2026-10-03 — the live face)."])) == 1
+    assert live(["## 🔴 OPEN / PENDING — tier heading (the DERIVED block below owns the current state)."]) == []
+    assert live(["> Gap 1 - the MTR 'CURRENT OPEN INDEX' (the machine-derived live face) sits in a section."]) == []
+    # the real faces: the claim must be absent, above the marker, TODAY
+    for face in FACES:
+        lines = face.read_text(encoding="utf-8").splitlines()
+        assert not [f for f in rail.live_faults(face, lines, LANE_CFG, 0) if "claims to BE" in f], \
+            f"{face.name}: still claims to be the live index"
+
+
+def test_a_citation_in_the_live_region_resolves() -> None:
+    """INV-11 (D-405): a live claim naming a file that does not exist is an assertion, not a citation."""
+    assert len(live(["see scripts/no_such_rail_at_all.py for the join"])) == 1
+    assert live(["see config/gov_sync.yaml for the join"]) == []
+    for face in FACES:
+        lines = face.read_text(encoding="utf-8").splitlines()
+        bad = [f for f in rail.live_faults(face, lines, LANE_CFG, 0) if "does not exist" in f]
+        assert not bad, f"{face.name}: cites a file that does not exist: {bad}"
+
+
+def test_the_face_leads_with_the_owner_lane_when_the_register_has_one() -> None:
+    """INV-12: where the register says only the OWNER can move work, the face says so, and says it FIRST."""
+    assert len(live(["the face says nothing about who moves what"], owner=2)) == 1
+    lane = f"> **{LANE_CFG['face_owner_lane_label']} (1) — what ONLY YOU can move:**"
+    assert live([lane], owner=2) == []
+    reg = yaml.safe_load((PROJECT_ROOT / "config" / "task_register.yaml").read_text(encoding="utf-8"))
+    owner_moved = [t for t in reg["tasks"]
+                   if str(t.get("state")) not in ("done", "superseded", "rule") and t.get("mover") == "owner"]
+    assert owner_moved, "the register must declare at least one owner-moved task for this invariant to mean anything"
+    for face in FACES:
+        text = face.read_text(encoding="utf-8")[: face.read_text(encoding="utf-8").index("GOV-HISTORY:START")]
+        lane_at, pipe_at = text.find("**OWNER LANE"), text.find("**PIPELINE LANE")
+        assert -1 < lane_at < pipe_at, f"{face.name}: the OWNER lane does not LEAD the pipeline lane"
+
+
+def test_the_census_recut_never_rewrites_history() -> None:
+    """INV-13 (R-D410): the writer owns the LIVE region; below the marker it must not touch a single byte."""
+    gs = importlib.util.spec_from_file_location("gov_sync", PROJECT_ROOT / "scripts" / "gov_sync.py")
+    mod = importlib.util.module_from_spec(gs)
+    assert gs and gs.loader
+    gs.loader.exec_module(mod)
+    x = {"decisions_total": 7, "stamp": "deadbeefdeadbeef", "date": "2026-01-02",
+         "bugs_total": 5, "bugs_open": 3, "bugs_closed": 2}
+    tail = "SNAPSHOT: 99 decisions (census stamp 27, 1999-01-01) · 42 bugs (1 open / 41 closed;"
+    out, n = mod._recut_census("live 99 decisions (census stamp 27, 1999-01-01)\n" + mod.HIS + "\n" + tail, "", {}, x)
+    assert n >= 1 and out.endswith(tail), "the history region must survive the re-cut BYTE-IDENTICAL (R-D410)"
+    assert "7 decisions (census stamp deadbeefdeadbeef, 2026-01-02)" in out, "the live region must be re-cut"

@@ -51,13 +51,25 @@ open_decision_states: [open, proposed, draft, deferred, planned]
 severity_tokens: [CRITICAL, HIGH, MED, LOW]
 state_tokens: [OPEN, CLOSED, FIXED, RESOLVED, SUPERSEDED, FILED, HELD]
 task_priorities: [MUST, SHOULD, WORTH]
-# BUG-757 (SHRINK-ONLY): open bug headings that predate the severity rule. A new heading without a
-# severity token is a FAULT; the historical set may only shrink as bugs are triaged.
-# MEASURED 2026-10-13 by THIS writer (heading population: the first heading per bug id, state
-# OPEN, no CRITICAL/HIGH/MED/LOW token) = 125. governance/bug_status.json separately reports 108
-# UNLABELLED open TITLES (its own, title-based population). Two populations, both named, neither
-# hidden: the rail prints both and fails when EITHER grows.
-severity_grandfathered: 125
-severity_grandfathered_titles: 108
+# D-2985: the two axes EVERY task must declare. `state` says whether it is live; `mover` says WHO must
+# act for it to advance. Before this there was one axis and one word for three different things - a
+# standing RULE (never closes), an OWNER-gated item (the pipeline cannot move it) and real work - all
+# registered as "open". So the face the owner reads led with rows he could not act on and the agent
+# could not advance, session after session, which is what "the resolved items are still on top" was
+# actually describing. `state: gate` is RETIRED: gatehood is `mover: owner` plus the gate text.
+task_states: [open, rule, done, superseded]
+task_movers: [owner, pipeline]
+# The token that marks a gate as the OWNER's word (never hardcoded in a rule, C12/C20), and the label the
+# owner lane LEADS with - one home for the string, read by the writer that renders it and by the faces
+# rail that requires the lane to be present.
+owner_gate_token: owner
+face_owner_lane_label: 'OWNER LANE'
+# BUG-757 ceiling, RE-MEASURED 2026-10-13 (D-2985). The population is now the CENSUS's open ids (ONE home
+# for OPEN-ness, D-2642) and a severity is read from the id's FIRST heading at ANY hash depth (the
+# BUG-426/427 class: three-hash headings were invisible to a `^## ` reader). Under that join the gap is
+# 101. The retired 125 counted 88 bugs the register calls CLOSED and was blind to 18 open ids; the
+# retired severity_grandfathered_titles (108) was a SECOND number for the same question and is gone -
+# one question, one home. LOWERED 125 -> 101 (D-2644: a ceiling may only be LOWERED).
+severity_grandfathered: 101
 # How many rows the faces print per list (the FULL set stays in the registers; the face is a view).
 face_list_limit: 12

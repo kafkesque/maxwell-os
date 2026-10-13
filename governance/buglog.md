@@ -8,28 +8,41 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1112 decisions (census stamp e090da935be729b6, 2026-10-13) · 525 bugs (185 open / 340 closed; highest OPEN = BUG-761) · 15 open tasks (MUST 4 / SHOULD 8 / WORTH 3; gate 1).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1113 decisions (census stamp a2bcb9e7201140fb, 2026-10-13) · 528 bugs (185 open / 343 closed; highest OPEN = BUG-761) · 14 open tasks (MUST 3 / SHOULD 8 / WORTH 3; OWNER-moved 3, pipeline-moved 11; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **67** of 1112 — open 32 · proposed 14 · draft 1 · deferred 14 · planned 6 | in effect (active) 565 | closed: resolved 312, superseded 16, archived 8, rejected 11
+> Decisions NEEDING ACTION: **67** of 1113 — open 32 · proposed 14 · draft 1 · deferred 14 · planned 6 | in effect (active) 565 | closed: resolved 313, superseded 16, archived 8, rejected 11
 >
-> Open BUGS by severity (heading population, first heading per id): CRITICAL 7 · HIGH 36 · MED 57 · LOW 30 · UNLABELLED 125 (BUG-757) of 185 open.
+> Open BUGS by severity (population = the census's 185 open ids; severity read from each id's FIRST heading at ANY hash depth): CRITICAL 4 · HIGH 22 · MED 39 · LOW 19 · UNLABELLED 101 (BUG-757) of 185 open.
 >
-> **MUST tasks (strategic-consequential order — source: config/task_register.yaml):**
+> **OWNER LANE (3) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
+>
+> | id | pri | what YOU decide | the gate |
+> |---|---|---|---|
+> | T-101 | MUST | HARDEN THE RETRIEVAL GOLDEN SET (the gate is saturated) | owner-signed anchors for the new queries |
+> | T-103 | MUST | BUG-749 residual — the label re-derivation debt the census names (OWNER-RULED rows are store-write-owed) | the owner word that licenses the store write |
+> | T-107 | SHOULD | MCP payload decision — borp_score / feedback_score are still advertised to agents | owner word on the payload schema |
+>
+> **PIPELINE LANE (11) — what the agent will do next, in strategic-consequential order (source: config/task_register.yaml):**
 >
 > | id | pri | state | task | evidence |
 > |---|---|---|---|---|
-> | R-1 | MUST | open | STANDING — the user-facing faces are DERIVED, never hand-appended at the top | scripts/gov_sync.py --check (byte-compares the block) |
-> | T-101 | MUST | open | HARDEN THE RETRIEVAL GOLDEN SET (the gate is saturated) | python3 pipeline/retrieval_benchmark.py -> production 1.000/0.919/0.100 (2026-10-13) |
-> | T-103 | MUST | gate | BUG-749 residual — 457 rows of label re-derivation debt, of which 163 are OWNER-RULED and store-write-owed | claim gap 6.9% (457 of 6,587) measured 2026-10-13 |
-> | T-104 | MUST | open | BUG-757 — 108 of 185 open bugs carry NO severity token, so the register cannot be ordered by criticality | governance/bug_status.json -> open_n 185 / UNLABELLED 108 (2026-10-13) |
+> | T-104 | MUST | open | BUG-757 — OPEN bugs carry NO severity token, so the register cannot be ordered by criticality | bug_status.json joined to the buglog headings: UNLABELLED ceiling 101 (2026-10-13) |
 > | T-105 | SHOULD | open | REA tier A/B mining — DEVONthink 3 (related-document ranking) and Cursor (derived code index) | governance/NOT-YET-EVALUATED-RESEARCH.md (REA targets logged 2026-10-13) |
 > | T-106 | SHOULD | open | ROADMAP — MODULARITY (C21 swappable infrastructure) and CROSS-OS COMPATIBILITY (C26) | protocols: pipeline/storage/base.py only; no cross-OS smoke exists (2026-10-13) |
-> | T-107 | SHOULD | open | MCP payload decision — borp_score / feedback_score are still advertised to agents | maxwell_mcp_server.py output block (2026-10-13) |
 > | T-108 | SHOULD | open | BUG-712 / BUG-714 — the content_type residual and the harness-facing primitive | served run content_type census (2026-10-13) |
 > | T-112 | SHOULD | open | PERF - the SERVED path loads the cross-encoder per PROCESS, so short-lived callers pay a cold-start of minutes | suite rail runtime 100-200s -> >210s after the dispatcher became the CLI default (2026-10- |
 > | T-113 | SHOULD | open | PAY THE BASELINE the honest instrument REVEALED - the 71 keys behind block aliases, module by module, each wit | config/config_defaults_census.json after D-2982: 300 shadowed-declared keys / 568 sites (2 |
 > | T-114 | SHOULD | open | DISCHARGE THE INHERITED LADDER FAULTS - four lines were RED before D-2982 and the prefix report hid them | just health-full 2026-10-13: 7 faults / 128 lines; each rc=1 at 42f8b76^ (worktree). RE-ME |
 > | T-115 | SHOULD | open | BUG-761 — decide what a HAND TIER means inside the region the faces declare to be history | governance/buglog.md BUG-761; DECISION-LOG.md "## 🟢 ACTIVE — in effect (477)" vs 565 ACTIV |
+> | T-109 | WORTH | open | spec/test sandbox — adopt the two mechanisms borrowed from impeccable / shadcn-ui-lint | specs/README.md (sandbox charter, prior art) |
+> | T-110 | WORTH | open | BUG-756 — the census restatement is hand-written | scripts/gov_sync.py --check rc=0 after --apply (2026-10-13) |
+> | T-111 | WORTH | open | BUDGET — the reviewer can only review WHOLE files under 100,000 chars; stage4_merge.py and stage2_extract.py e | r5_review_gate.yaml max_source_chars vs the two module sizes (2026-10-12) |
+>
+> **STANDING RULES — in effect, never close (1):**
+>
+> | id | rule |
+> |---|---|
+> | R-1 | STANDING — the user-facing faces are DERIVED, never hand-appended at the top |
 >
 > **Open decisions needing action (newest first; the states are DECLARED in config/gov_sync.yaml):**
 >
@@ -12790,3 +12803,62 @@ honest — the fix has to come with a join for the tier labels, not before it. D
 **REMEDY:** decide, per face, whether a hand tier inside history is (a) relabelled a dated snapshot and removed
 from the claim surface, or (b) promoted into the derived block; then join the tier labels' counts. Routed to
 **T-115**.
+
+## BUG-762 (HIGH - FIXED 2026-10-13 by D-2985) - the LIVE region was never policed: the part the OWNER actually opens
+
+**MEASURED 2026-10-13, one day after D-2984 closed the mirror hole.** D-2984 policed everything BELOW the
+`GOV-HISTORY:START` marker. The region ABOVE it - the one the owner opens the file on - had no join at all, and
+it was wrong three ways at once:
+1. `DECISION-LOG.md:12` read `## 🔴 CURRENT OPEN / PENDING INDEX (machine-derived 2026-10-03 — the live face;
+   history below)`: a HAND heading, ten days stale, calling itself machine-derived and THE live face, two lines
+   above the derived block that claimed the same title. The D-2984 label limb could not see it: the regex
+   required the label to LEAD the line WITHOUT a heading marker.
+2. `config/task_register.yaml` (the register of record) cited `scripts/check_gov_sync.py` in its own header. That
+   file has never existed. A citation whose subject is absent is an assertion (D-405) - the same class as
+   BUG-761's dangling `D2537`, one level down.
+3. No face said WHO must move the work. `R-1` (a STANDING RULE that never closes), `T-101` and `T-103` (both
+   gated on an owner word) and `T-104` (the only actionable MUST) were all registered `state: open`, so every
+   face led with four rows sorted by priority alone: three the owner could not act on and the agent could not
+   move, and the actionable one last. The census even said `gate 1` while THREE entries named an owner gate.
+   THIS IS THE OWNER'S COMPLAINT, MEASURED: "the done, fixed, resolved task/bugs/decisions are still on top so
+   my instruction hasn't delivered."
+
+**WHY NOTHING CAUGHT IT.** The rail's five surfaces read tables, marker lines and the history region; nothing
+read the live region's prose, its citations, or the register's own axes. A face nobody derives drifts (D-2981);
+a face whose LIVE region is nobody's claim surface lies (this bug).
+**FIXED BY D-2985:** the LIVE region is a claim surface - a hand line may not claim to BE the live index, a
+citation in it must resolve, and the face LEADS with the declared OWNER LANE; the register now declares a
+`mover` on every entry, an `R-` id is `state: rule` and is never counted as open work, and `state: gate` is
+retired (gatehood is `mover: owner` + the gate text).
+
+## BUG-763 (MED - FIXED 2026-10-13 by D-2985) - one question had THREE answers: the severity line did not join the census
+
+**MEASURED 2026-10-13.** The register-truth line the owner reads first said
+`CRITICAL 7 · HIGH 36 · MED 57 · LOW 30 · UNLABELLED 125 ... of 185 open` - parts summing to **255** for a
+population of **185**. Two independent defects, in opposite directions:
+1. the reader re-derived OPEN-ness from a heading's state token instead of reading the census, so **88 bugs the
+   register calls CLOSED were counted as open** (D-2642: one derived value, one home - the census owns OPEN-ness);
+2. `BUG_HEAD` required EXACTLY two hashes (`^## BUG-`), so a bug written `### BUG-426` was **invisible** -
+   **18 open ids** were missing from the denominator. The buglog itself already records this class for
+   BUG-426/BUG-427 ("HEADER_RE was `^##\s+(BUG-\d+)` - EXACTLY two hashes ... so the rail never saw them"): the
+   lesson was written down and never propagated to this reader.
+**THREE ANSWERS, ONE QUESTION:** 125 (heading population), 108 (the census's own title population, quoted in
+T-104's title), 101 (the truth against the census's open set). The face printed the wrong one twice and the
+task title printed the third - while T-104's whole remedy depends on which population is meant.
+**FIXED BY D-2985:** the population IS the census's open ids and the severity is read from the id's FIRST
+heading at ANY depth; the parts now partition the open count exactly (CRITICAL 4 · HIGH 22 · MED 39 · LOW 19 ·
+UNLABELLED 101 = 185); the ceiling LOWERED 125 -> 101 (D-2644); the retired second number
+(`severity_grandfathered_titles: 108`) is gone - one question, one home.
+
+## BUG-764 (HIGH - FIXED 2026-10-13 by D-2985) - the faces' WRITER was rewriting the declared-history region
+
+**MEASURED 2026-10-13.** `scripts/gov_sync.py` re-cut every census-shaped restatement line in a face - the WHOLE
+file, not the live region. So the two SNAPSHOT lines below the marker (MTR and DECISION-LOG) had been re-cut to
+TODAY's counts while still reading "as measured then": the writer that exists to keep counts from going stale was
+making HISTORICAL CLAIMS FALSE. That is an R-D410 violation (append-only history, never rewritten) and a direct
+CONFLICT between D-2981 ("every restatement is derived") and the faces' own declaration that everything below the
+marker is dating-only history. Nothing could see it: the derived block is byte-compared, the history region was
+never compared to anything.
+**FIXED BY D-2985:** the re-cut has a SCOPE - the live region; the history region is returned BYTE-IDENTICAL
+(asserted by a known-answer control and mutation-locked), and the two false SNAPSHOT lines were repaired IN PLACE
+with the repair named (a version of the writer was re-cutting them; repaired 2026-10-13).

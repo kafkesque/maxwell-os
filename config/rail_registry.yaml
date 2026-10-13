@@ -124,8 +124,14 @@ guards:
   #: like style: a face that tells the owner a RESOLVED decision is still pending is not a wording problem, it
   #: is the register lying through the one artifact the owner actually reads. Both its controls and the check
   #: stand as `|| exit 1` for that reason.
+  #: D-2985 (BUG-762/763/764): the rail now also polices the LIVE region - the part of the face the OWNER
+  #: actually opens - and the failure it catches is the one the owner reported out loud twice. A face that
+  #: claims to BE the current index, cites a file that does not exist, or omits WHO must move the work is
+  #: FATAL for the same reason D-2984's pin is: the artifact that carries the register to the owner would be
+  #: lying, and this is the only surface that reads it.
   scripts/check_governance_faces.py: fatal
   scripts/check_governance_faces.py --selftest: fatal
+  scripts/gov_sync.py --selftest: fatal
 
 #: The COMMIT BOUNDARY (BUG-564). A dormancy claim says WHICH file exercises a rail; it cannot say the file still
 #: DOES. This hook lives OUTSIDE the synced tree (BUG-500) - it is not in git, so no diff, no review and no backup

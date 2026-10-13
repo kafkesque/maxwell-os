@@ -100,3 +100,76 @@ Highest-priority others from the register (185 open): BUG-749 (HIGH, re-derivati
 re-scope sweep + the rail that holds its ceiling) · BUG-712 (content_type routing debt, residuals named) ·
 BUG-714 (tool_instruction rows are code snippets — blocks the harness-facing primitive) · BUG-711 (173 displaced
 canonical domains). CLOSED today or earlier: BUG-710, BUG-713, BUG-745, BUG-752, BUG-755.
+
+
+---
+
+# ADDENDUM 2026-10-13 (later) — D-2981: the user-facing faces are DERIVED, JOINED and ORDERED
+
+Commits: 0d653d7 (gov D-2981). Register after the change: 1109 decisions / 521 bugs (185 open) / 12 open tasks.
+
+## THE COUNTS (the answer to "exactly how many", derived, therefore not stale)
+
+| axis | total | open / needing action | ordering home |
+|---|---|---|---|
+| decisions | 1109 | 67 NEED ACTION (open 32, proposed 14, draft 1, deferred 14, planned 6); in effect 565; closed 308 resolved / 16 superseded / 8 archived / 11 rejected | config/decisions_summary.json |
+| bugs | 521 | 185 OPEN (335 closed); severity distribution printed from the heading population; 125 open headings carry NO severity token (BUG-757) | governance/bug_status.json |
+| tasks | 12 open | MUST 5 - SHOULD 4 - WORTH 3, of which 1 is OWNER-GATED | config/task_register.yaml (NEW: the missing register) |
+
+The MUST list, in strategic-consequential order (now live in every face):
+T-101 harden the retrieval golden set (recall@10 is saturated) - T-102 BUG-754 (the ladder is RED on
+check_config_defaults) - T-103 BUG-749 residual (163 owner-ruled rows, store-write-owed) - T-104 BUG-757
+(the severity gap) - R-1 the standing rule that the faces are derived and never hand-appended at the top.
+
+## WHAT WAS MEASURED AS WRONG WITH THE FACES (before this change)
+
+1. agent/session_seed.yaml is LOADED AT BOOT and was SEVEN DAYS STALE: pipeline_commit v3.0-D2370 against the
+   manifest v3.0-D2485, status dated 2026-10-06. Drift in a boot file propagates into every session that reads
+   it - the highest-leverage defect found in this audit.
+2. MASTER-TASK-REGISTER.md and DECISION-LOG.md headers said 2026-10-07; MTR's live index appeared THREE times
+   inside the same file (2026-10-12 / 2026-10-07 / undated) and 240 lines of prose sat where a register should be.
+3. No machine-readable task register existed: "how many tasks are open" had NO answer.
+4. The census restatement had no tracked writer (BUG-756); its only sync was a session scratch file in temp/.
+
+## THE FIX (one writer, one check, both in the ladder)
+
+* config/task_register.yaml — the missing register: id, priority (MUST/SHOULD/WORTH), state (open/blocked/gate/
+  done/superseded), source, evidence, gate. It carries the modularity (C21) + cross-OS (C26) roadmap items as
+  T-106 and the REA/open-source queue as T-105.
+* config/gov_sync.yaml — the DECLARED joins: register to face, the sentinel-delimited index block, the history
+  boundary, the derived scalar fields, the OPEN decision states, the severity/task vocabularies, and the two
+  shrink-only severity ceilings (125 heading / 108 title, BUG-757).
+* scripts/gov_sync.py — the ONE writer. Renders GOV-INDEX into the three MD faces from the registers, re-cuts
+  EVERY census restatement line (both the stamped and the pre-D-2981 stamp-less shape — that is what retires
+  BUG-756), and derives session_seed pipeline_commit and status. Its default mode is --check and it
+  BYTE-COMPARES the block in the file against its re-derivation, so a hand edit is DETECTABLE. 9 known-answer
+  controls (--selftest), including a STALE block that MUST be seen to differ.
+* justfile + config/rail_registry.yaml + config/artifact_ownership.yaml — the writer is declared (the four faces
+  are derived_regenerable), and the ladder runs --selftest then the check.
+* The append convention, ENFORCED: everything below the GOV-HISTORY-START sentinel is DATED HISTORY (append-only,
+  never a register, never re-counted). NOTHING WAS DELETED — the old prose index was declared history by placing
+  the marker above it. New work enters at its register, never at the top of a face.
+
+## MEASURED RAIL STATE AFTER D-2981
+
+GREEN: scripts/gov_sync.py --check rc=0 (4 faces equal their re-derivation; --selftest 9/9) - check_governance_faces
+(1109 / 521) - check_bug_status - check_buglog_coverage (740 blocks) - check_rail_registry (every rail invoked or
+declared dormant; every declared writer's remedy proven by the ladder) - check_declaration_consumers (8 homes,
+10 edges) - recompute_decision_summary --check. R5 cross-family review of ALL FIVE D-2980 files: APPROVE (the
+review owed last turn was discharged: OMLX WAS listening on :11435 - the earlier "server down" reading came from
+probing the wrong port; the deterministic layers report C11/C12 PASS and a PRE-EXISTING lint I001).
+RED (pre-existing, filed): BUG-754 - check_config_defaults --check rc=1 (241 measured against a shrink-only
+ceiling of 229).
+OWED/UNVERIFIED: the FULL suite rail did not complete inside this session window (two of this session's own
+background runs contended for the machine). The focused subset that covers this change -
+test_decision_summary_sync, test_handoff_obligation, test_retrieval_serving_spec - passes 19/19. First act of the
+next session: run python3 scripts/check_tests.py --check (last full-suite GREEN measured today: 457 collected /
+452 passed / 0 declared red).
+
+## NEW / CLOSED REGISTER ITEMS
+
+BUG-756 CLOSED (the restatement has a tracked writer, in the ladder) - BUG-757 FILED (125 open headings without a
+severity token; a NEW heading without one is now REFUSED) - D-2981 MINTED (1109 decisions). Prior art assessed for
+the owner: pbakaus/impeccable and shadcn-ui/lint are frontend/design-system tools and are NOT adoptable here (no UI
+surface); two mechanisms are borrowed into specs/README.md (a bounded set of deterministic detectors with the LLM
+strictly advisory; diagnostics that name the DERIVED remedy) and logged in NOT-YET-EVALUATED-RESEARCH.md.

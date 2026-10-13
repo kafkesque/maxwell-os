@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 523,
-  "open_n": 184,
-  "closed_n": 339,
+  "total_ids": 525,
+  "open_n": 185,
+  "closed_n": 340,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -927,6 +927,11 @@
       "id": "BUG-757",
       "title": "(MED - OPEN, found 2026-10-13 while auditing the user-facing faces) - 125 open bugs carry NO severity token, so the open register cannot be ",
       "events": 1
+    },
+    {
+      "id": "BUG-761",
+      "title": "(MED - OPEN 2026-10-13) \u2014 the region declared \"NOT a register\" still carries hand TIERS and citations that nothing joins",
+      "events": 1
     }
   ],
   "closed": [
@@ -1268,6 +1273,7 @@
     "BUG-755",
     "BUG-756",
     "BUG-758",
-    "BUG-759"
+    "BUG-759",
+    "BUG-760"
   ]
 }

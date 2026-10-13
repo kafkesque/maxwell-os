@@ -1,0 +1,84 @@
+- id: D-2984
+  date: '2026-10-13'
+  state: RESOLVED
+  category: GOVERNANCE / INSTRUMENT
+  title: >-
+    A claim in a face is JOINED to the register or it DECLARES THE MOMENT it speaks about - the faces' declared
+    history region stops being an unpoliceable surface, and a decision row stops being unjoined
+  bugs: [BUG-760, BUG-761]
+  decision: >-
+    THE DEFECT (BUG-760, measured after the owner said it out loud: "seems like the done, fixed, resolved task
+    bugs, decisions are still on top so my instruction haven't delivered"). The faces DECLARE, with a
+    `<!-- GOV-HISTORY:START -->` marker, that everything below is "DATED HISTORY: append-only, NOT a register" -
+    and nothing enforced it, so the region made LIVE claims beside the derived block. MEASURED 2026-10-13:
+    DECISION-LOG.md:195 read `| D2622 | ACTIVE |` and :196 read `| D2621 | PROPOSED |`, both under a heading
+    reading "OPEN / PENDING - highest priority first", while config/decisions.yaml holds both as RESOLVED; :247
+    cited `D2537`, an id the register does not carry (the record is D-2979); MASTER-TASK-REGISTER.md:60 and :77
+    were headed "CURRENT OPEN INDEX (... the live face ...)" - a SECOND live face beside the derived one - and
+    :61 restated the census with a derived field (which bug is highest-OPEN) as a bare value, BUG-750, while the
+    register's own answer was BUG-757. Eight lines across the three faces; the DERIVED block was right every
+    time and the hand prose beside it was wrong every time. WHY NOTHING CAUGHT IT: the rail had four surfaces -
+    bug-status table rows, the header census, the live-census marker, the buglog tiers - and every one of them
+    read TABLES or MARKER LINES. It had no decision-row join at all (`DEC_ROW_RE` did not exist), and the region
+    declared "NOT a register" was never treated as a claim surface. This is BUG-759 one level up: the artifact
+    the OWNER reads said something false and the instrument watching it was GREEN. Its predecessor BUG-669 fixed
+    WHERE the live census marker sits and made the rail check it; it never asked whether a live marker belongs
+    in a region declared not to be a register.
+
+    THE SHAPE (one sentence, four limbs). A claim is either JOINED to the register, or it DECLARES THE MOMENT it
+    speaks about (D-2660). There is no third state - an unmoored present-tense claim is the defect whether or not
+    it happens to be true today, because nothing can tell the difference later. (i) A live-claim LABEL has ONE
+    home - the derived block above the marker - with NO date exemption, because "this is the live face" is not a
+    claim about a moment, it is a claim about WHERE THE CURRENT STATE IS (D-2642). The label must LEAD the line:
+    measured, the phrase also appears in prose that DISCUSSES the faces (buglog.md's own BUG-669 entry), and a
+    rule that fires on a discussion of a pointer is not a rule about pointers. (ii) A LIVE census marker may not
+    stand in a region declared "NOT a register" - the marker IS the live one by definition, so no date can rescue
+    it; its repair is to name its moment and stop being the marker. (iii) A decision ROW is a claim about the
+    register: joined to config/decisions.yaml, or its SECTION declares its moment (the date on the nearest
+    preceding heading, BOUNDED BY THE MARKER so a live tier label above the region can never date a claim inside
+    it). This is the twin of the ratified bug-row rule (BUG-669) that was simply never written. A 4-column
+    TRANSITION row (`| D2546 | PLANNED | RESOLVED | the ship |`) is read by the state it ENDED in - the LAST
+    cell naming a register state and nothing else - so one parser reads both forms and a long prose cell that
+    merely discusses "resolved" makes no claim. (iv) A present-tense "BUG-N is OPEN" assertion is joined, unless
+    its ENTRY declares its moment (the nearest preceding line carrying a date), and the id must be ADJACENT to
+    the claim: a line naming a closed bug beside a claim about another one is not a claim about it. Plus the
+    derived highest-OPEN field, which must state its moment ON ITS OWN LINE - an entry stamp one line up is not
+    enough, because the VALUE is the thing that moved. Every fault NAMES ITS REPAIR (D-405) and history is never
+    rewritten (R-D410, append-only).
+
+    THE MEASUREMENT OF RECORD. Baseline: 8 faults (5 DECISION-LOG, 3 MTR, 0 buglog). After the repairs: rc=0.
+    buglog.md required ZERO edits - all nine of its present-tense "still OPEN" claims sit under entries that
+    already carry a date, so the rule reports zero faults there and the append-only file stays append-only; that
+    measurement is why the scope rule was chosen over a rewrite. The repairs were 8 lines in the two hand-edited
+    faces: two snapshots relabelled (they were calling themselves the live face), one census marker demoted to a
+    dated snapshot, one section heading given the moment it was written (2026-10-03, taken from git blame of its
+    own rows) plus an appended CORRECTION naming the two decisions the register has since moved to RESOLVED, one
+    row re-cited to the id that carries it (D-2979), and three derived fields given the word "then". The rule
+    also caught its own author: the first draft of the BUG-760 entry quoted the defect without a moment and the
+    rail went red on it, which is the detector working.
+
+    HONEST LIMITS. (1) History is exempt by design, so a stale claim inside a dated entry is NOT a fault - the
+    rule polices contradictions and unmoored claims, not every stale sentence; the reading is that a dated claim
+    was true when written, and the register's current answer lives in the derived block. (2) The scope rule
+    (section heading for rows, entry for prose) is a CONVENTION about how these files are organized; it is
+    declared in specs/governance_faces.spec.md, and a face that reorganized its history would need the rule
+    updated, not silently reinterpreted. (3) The rail cannot judge whether a dated claim was true at its moment -
+    that is unmeasured and stays unmeasured. (4) The hand tier sections still sit INSIDE the declared history
+    region (the marker was inserted after the derived block, which is inside the first tier), so a tier label can
+    restate a drifted count - `## ACTIVE - in effect (477)` against 565 in the register - and a dangling citation
+    survived as long as nothing joined it; both are filed as BUG-761 and routed to T-115 rather than fixed here,
+    because moving the marker would silence the joins that keep those rows honest. (5) config/decisions.yaml
+    carries two spellings of the same id form (691 bare `D2622`, 420 dashed `D-2983`) with zero collisions under
+    the normalisation this rail uses; canonicalising the spelling is D-2693's licence to take, not this
+    decision's.
+  files:
+  - scripts/check_governance_faces.py
+  - specs/governance_faces.spec.md
+  - tests/test_governance_faces_spec.py
+  - config/rail_mutations.yaml
+  - config/rail_registry.yaml
+  - justfile
+  - DECISION-LOG.md
+  - MASTER-TASK-REGISTER.md
+  - governance/buglog.md
+  - config/task_register.yaml

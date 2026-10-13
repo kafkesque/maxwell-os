@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1111 decisions (census stamp 5b6ff21b86ee09a7, 2026-10-13) · 523 bugs (184 open / 339 closed; highest OPEN = BUG-757) · 14 open tasks (MUST 4 / SHOULD 7 / WORTH 3; gate 1).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1112 decisions (census stamp e090da935be729b6, 2026-10-13) · 525 bugs (185 open / 340 closed; highest OPEN = BUG-761) · 15 open tasks (MUST 4 / SHOULD 8 / WORTH 3; gate 1).
 >
-> Decisions NEEDING ACTION: **67** of 1111 — open 32 · proposed 14 · draft 1 · deferred 14 · planned 6 | in effect (active) 565 | closed: resolved 311, superseded 16, archived 8, rejected 11
+> Decisions NEEDING ACTION: **67** of 1112 — open 32 · proposed 14 · draft 1 · deferred 14 · planned 6 | in effect (active) 565 | closed: resolved 312, superseded 16, archived 8, rejected 11
 >
-> Open BUGS by severity (heading population, first heading per id): CRITICAL 7 · HIGH 36 · MED 56 · LOW 30 · UNLABELLED 125 (BUG-757) of 184 open.
+> Open BUGS by severity (heading population, first heading per id): CRITICAL 7 · HIGH 36 · MED 57 · LOW 30 · UNLABELLED 125 (BUG-757) of 185 open.
 >
 > **MUST tasks (strategic-consequential order — source: config/task_register.yaml):**
 >
@@ -29,7 +29,7 @@
 > | T-112 | SHOULD | open | PERF - the SERVED path loads the cross-encoder per PROCESS, so short-lived callers pay a cold-start of minutes | suite rail runtime 100-200s -> >210s after the dispatcher became the CLI default (2026-10- |
 > | T-113 | SHOULD | open | PAY THE BASELINE the honest instrument REVEALED - the 71 keys behind block aliases, module by module, each wit | config/config_defaults_census.json after D-2982: 300 shadowed-declared keys / 568 sites (2 |
 > | T-114 | SHOULD | open | DISCHARGE THE INHERITED LADDER FAULTS - four lines were RED before D-2982 and the prefix report hid them | just health-full 2026-10-13: 7 faults / 128 lines; each rc=1 at 42f8b76^ (worktree). RE-ME |
-> | T-109 | WORTH | open | spec/test sandbox — adopt the two mechanisms borrowed from impeccable / shadcn-ui-lint | specs/README.md (sandbox charter, prior art) |
+> | T-115 | SHOULD | open | BUG-761 — decide what a HAND TIER means inside the region the faces declare to be history | governance/buglog.md BUG-761; DECISION-LOG.md "## 🟢 ACTIVE — in effect (477)" vs 565 ACTIV |
 >
 > **Open decisions needing action (newest first; the states are DECLARED in config/gov_sync.yaml):**
 >
@@ -75,6 +75,7 @@
 
 | Bug | Date | Issue |
 |---|---|---|
+| BUG-761 | 2026-10-13 | **The region a face declares "NOT a register" still carries hand TIERS and a drifted tier count: the `GOV-HISTORY:START` marker sits after the derived block, which is inside the FIRST tier, so SHOULD/WORTH/DONE (MTR) and the OPEN/CLOSED tiers (buglog) all fall BELOW it — and `## 🟢 ACTIVE — in effect (477)` states 477 while the register holds 565 ACTIVE, a count the header-census surface cannot see. Plus a dangling citation: the register's D-2979 title cites "D-2537" and a face row cited `D2537`; no such record exists (D-405). Routed to T-115 (found by D-2984/BUG-760).** |
 
 | BUG-681 | 2026-10-08 | **`just health-full` = the ladder's WHOLE fault set. Round 2 measured 6; round 3 measures `FAIL ladder scan: 3 fault(s) in ONE pass` over 118 lines (503s), worst rc=1 (D-2680/BUG-573). FIXED so far: the unparsed buglog heading, the missing archive-index entry, and `check_undeclared_encoding`. THE 3 REMAINING: (a) `check_tests --check` = 3 red contract tests outside a declared-red=0 ceiling, incl. `test_s4_golden_conforms_to_ontology` (a golden set that does not conform to the ontology) - pre-existing, attributed away from the ANCHOR work by grep; (b) `check_encoding_homes --check` is now CLEAN (debt 0 of ceiling 0) — `scripts/remap_referee_v7_28rows.py` already reads the CSV via `artifact_encoding.open_artifact(CSV, ROOT)` (D-2644/D-2646 single decode home), so the `just health` prefix is UNBLOCKED; (c) `check_boundary_rehearsal` rc=1, newly diagnosed: `bootstrap.whole_tree_refused: refused (rc=1) but not for the declared reason 'FORBIDDEN session plan' (RAIL 4) - a refusal that does not name its cause cannot justify a bypass` - i.e. a whole-tree commit is still refused, but by a DIFFERENT rail than the declared one, so either the declared marker is stale or an earlier rail now refuses; do NOT hand-edit the declared reason (that hides the drift) - retain the fixture and print the ACTUAL refusal text. (b) RESOLVED 2026-10-09. Diagnose (a) and (c) now: the `just health` prefix is unblocked.** |
 | BUG-242 | 2026-09-11 | **frontier69_v2 + extension80 audit outputs carry 2 data-quality defects.** (1) The `*_verdict` fields (depth/discipline/domains) are LLM SELF-REPORTS, not computed comparisons — they claim `override` even when the audit value equals silver (e.g. `S4-GOLD-MINED-00005` domains identical yet `domains_verdict=override`), so the cited "57.5% domain-override" and "80 flagged" figures are inflated. (2) Non-principle content_type rows (noise_drop/tool_instruction/process_template/process_instance/growth_edge) carry a spurious 4-way depth label, violating D2612 (depth only for principle). FIX (applied in `scripts/build_phase0_adjudication_form.py`): agreement recomputed deterministically (`differs` flag) + depth marked N/A for non-principle. REMAINS: recompute the override figures from the audit values (deterministic), and re-run the audit to null depth on non-principle if the raw artifacts are kept. |
@@ -4559,7 +4560,7 @@ FIX (all measured, `just health` green).
    `config/decisions.yaml` is declared in `config/artifact_ownership.yaml` (append_only, writer
    recompute_decision_summary.py).
 
-STATE AFTER. 766 -> 1111 decisions (D-400..D-406 registered; D-400..D-405 are the six gates the new guards
+STATE AFTER. 766 -> 1112 decisions (D-400..D-406 registered; D-400..D-405 are the six gates the new guards
 already cited, so their provenance stamps are no longer claims about nothing), stamp `aa69ae412a641374`,
 `recompute --check` clean, `tests/test_decision_summary_sync.py` 3 passed. Still OWNER-OWED and visible: 3
 citation values are not id-shaped and no rail can validate them - `config/eval_integrity.yaml:decision=<blank>`
@@ -9241,9 +9242,9 @@ the surface the rail exists to protect — the LIVE census face.
 Gap 1 — position. The MTR "CURRENT OPEN INDEX" (MASTER-TASK-REGISTER.md, the machine-derived live face) and the
 DECISION-LOG "Register truth" line both sit INSIDE a `## 🔴` section, BELOW the first tiered header, so header_block()
 (which stops at the first TIER_RE match) never scans them. This session the MTR live face drifted (167→160 open /
-265→272 closed, highest OPEN BUG-667→BUG-658, audit RED→GREEN) and was caught by MANUAL inspection, not by the rail.
+265→272 closed, highest OPEN then BUG-667→BUG-658, audit RED→GREEN) and was caught by MANUAL inspection, not by the rail.
 
-Gap 2 — format. Even if scanned, the live-face census is `523 bugs (184 open / 339 closed; ...)` — a 2-part parenthetical
+Gap 2 — format. Even if scanned, the live-face census is `525 bugs (185 open / 340 closed; ...)` — a 2-part parenthetical
 — and CENSUS_RE requires 3 parts (`N OPEN / N CLOSED / N TOTAL`), so it would not match. DECISION-LOG.md's "Register truth"
 line restates the same 2-part form and is stale for the same reason (it said 167/265 while the register said 160/272).
 
@@ -12371,7 +12372,7 @@ The face sync (BUG-588/D-2692) asserts the shape of the census restatement befor
 `\b\d+ decisions \(census stamp [0-9a-f]+, \d{4}-\d{2}-\d{2}\)` - and then substitutes `<n> decisions (census stamp
 <stamp>, <DATE>)` with the DATE argument VERBATIM. A caller passing the compact form (`20261013`, which is this
 session's own artifact-date convention) satisfied the ASSERTION but wrote a line the NEXT run could not match:
-DECISION-LOG.md read `1111 decisions (census stamp b62a605315150977, 20261013)` while the pattern demanded a DASHED
+DECISION-LOG.md read `1112 decisions (census stamp b62a605315150977, 20261013)` while the pattern demanded a DASHED
 ISO date. Nothing else noticed for a day, because the only consumer is the sync that had just written it.
 
 MEASURED AND HEALED: the sync now normalises `YYYYMMDD -> YYYY-MM-DD` on the write side and fails closed on anything
@@ -12552,7 +12553,7 @@ YYYY-MM-DD on the write side and fails closed on anything else"; no such writer 
 sentence currently describes bytes nobody can run (the BUG-542 class, in the RAIL layer rather than in a citation).
 
 CONSEQUENCE, measured: the two face lines (DECISION-LOG.md:14 and MASTER-TASK-REGISTER.md:13) restated
-"1111 decisions / 516 bugs" while the register said 1108 / 519, and check_governance_faces had been rc=1 since the
+"1112 decisions / 516 bugs" while the register said 1108 / 519, and check_governance_faces had been rc=1 since the
 D-2978/D-2979 mint - because no step re-cuts a line that has no writer. The numbers moved for a reason no reader
 could see: the FACE was stale, not the register.
 
@@ -12590,7 +12591,7 @@ THE DEFECT was a derived line whose only writer lived outside the tree, so its r
 faces AND re-cuts every census restatement line, and the health recipe runs BOTH its --selftest (8 known answers,
 including a STALE block that must be SEEN to differ from its re-derivation) and its check.
 MEASURED AFTER: scripts/gov_sync.py --check -> rc=0, 4 face(s) equal their re-derivation from the registers
-(1111 decisions / 520 bugs / 12 open tasks). The two face lines are now re-cut by the SAME run that writes the
+(1112 decisions / 520 bugs / 12 open tasks). The two face lines are now re-cut by the SAME run that writes the
 block, so they can no longer diverge from the census, and the previously hand-written numbers were replaced by
 the run rather than typed.
 
@@ -12716,3 +12717,76 @@ longest writer register yet: 9 declared writers, every remedy proven); check_rai
 to red including a_recorded_ladder_red_is_load_bearing, 1 negative control green; R5 APPROVE on
 scripts/run_ladder.py (deterministic layers PASS + ONE advisory reviewer); `git status` UNCHANGED by a full scan -
 the record cannot dirty the tree it measures.
+
+---
+
+## BUG-760 (HIGH - FIXED 2026-10-13 by D-2984) — the register lied through the FACES: DECISION-LOG listed two RESOLVED decisions as pending, and the rail that owns the faces had no decision-row join at all
+
+**Discovered:** 2026-10-13, by the owner reading DECISION-LOG.md ("seems like the done, fixed, resolved task bugs,
+decisions are still on top") and then MEASURED.
+
+**The measurement.** `DECISION-LOG.md:195` read `| D2622 | ACTIVE |`, `:196` read `| D2621 | PROPOSED |`, both
+under the heading `## 🔴 OPEN / PENDING — highest priority first` — while `config/decisions.yaml` holds both as
+RESOLVED. `:247` cited `D2537`, an id the register does not carry (the record that carries that decision is
+D-2979). In MASTER-TASK-REGISTER.md, `:60` and `:77` were headed `CURRENT OPEN INDEX (... the live face ...)` — a
+SECOND live face beside the derived one — and `:61` restated the census with a derived field (which bug is
+highest-OPEN) stated as a bare value, BUG-750, with no moment at all, while the register's own answer was BUG-757. Measured across the three faces: 8 such lines (5 in DECISION-LOG, 3 in MTR, 0
+in buglog). The DERIVED block was right in every case; the hand prose beside it was wrong in every case.
+
+**Why nothing caught it — the rail read tables, never prose.** `scripts/check_governance_faces.py` had four
+surfaces: bug-status table rows, the header-block census, the live-census marker, and the buglog tiers. It had NO
+`DEC_ROW_RE` at all, so a decision row was unjoined; and the region a face declares "DATED HISTORY: append-only,
+NOT a register" was never policed as a claim surface. This is the BUG-759 shape one level up: the artifact the
+owner READS said a thing that was false, and the instrument watching it was green. Its predecessor BUG-669 fixed
+WHERE the live census marker sits, and made the rail CHECK it — it did not ask whether a live marker belongs in a
+region declared not to be a register.
+
+**FIXED by D-2984 (the claim surface).** A claim is either JOINED to the register, or it DECLARES THE MOMENT it
+speaks about (D-2660). Four limbs, each with a named repair: (1) a live-claim label may not lead a line below the
+marker — no exemption, because a pointer is not a claim about a moment; (2) a live census marker may not stand in
+a region declared NOT a register; (3) a decision ROW is joined to config/decisions.yaml unless its SECTION
+declares its moment — this is the twin of the ratified bug-row rule (BUG-669) that was simply never written; (4) a
+present-tense "BUG-N is OPEN" assertion is joined unless its ENTRY declares its moment. Plus the derived
+A derived field — which bug is highest-OPEN — must state its moment on its own line (one home, D-2642).
+
+**SEEN.** `check_governance_faces --selftest` 22/22 known answers in both directions (11 new, including a
+4-column transition row, a discussion of the label that must NOT fire, and an append-only claim that must stay
+quiet); the rail rc=1 on the 8 measured faults and rc=0 after the repairs; the paired contract
+`tests/test_governance_faces_spec.py` 10/10 (D-2978, spec `specs/governance_faces.spec.md`); the mutation
+`a_decision_row_that_contradicts_the_register_is_load_bearing` SEEN to red the control that names the rule
+(floor 33 → 34); a declared guard (`fatal`) in config/rail_registry.yaml.
+
+**The repairs were 8 lines, and NO history was rewritten.** buglog.md needed ZERO edits: all nine of its
+present-tense "still OPEN" claims sit under entries that already carry a date, so the rule reports zero faults
+there — the append-only file stays append-only. In MTR/DECISION-LOG the repairs were the 8 claims that
+contradicted the register: two snapshots relabelled (they were calling themselves the live face), one census
+marker demoted to a dated snapshot, one section heading given the moment it was written (2026-10-03, from git
+blame of its own rows) plus an appended CORRECTION naming the two decisions the register has since moved to
+RESOLVED, one row re-cited to the id that carries it (D-2979), and three derived fields given the word "then"
+(`highest OPEN then BUG-622`, `then BUG-667`).
+
+**RESIDUAL:** BUG-761 — the hand tier sections still live INSIDE the region the faces declare to be history.
+
+## BUG-761 (MED - OPEN 2026-10-13) — the region declared "NOT a register" still carries hand TIERS and citations that nothing joins
+
+**Discovered:** 2026-10-13 by the D-2984 measurement (BUG-760), as the residue the new rule deliberately did not
+touch.
+
+**Measured, three residuals.**
+1. **The hand tier sections are inside the declared history region.** `## 🟠 SHOULD — open`, `## 🟡 WORTH — open`,
+   `## ✅ DONE` in MASTER-TASK-REGISTER.md, and `## 🔴 OPEN — MUST` / `## 🟠 OPEN — SHOULD` / `## 🟡 OPEN — WORTH` /
+   `## ✅ CLOSED / RESOLVED` in governance/buglog.md, all sit BELOW the `GOV-HISTORY:START` marker — so the marker's
+   own declaration ("everything below is DATED HISTORY: append-only, NOT a register") is FALSE about them. The
+   marker was inserted after the derived block, which is inside the FIRST tier, so the remaining tiers fell below it.
+2. **A tier LABEL restates a count that has drifted.** DECISION-LOG.md `## 🟢 ACTIVE — in effect (477)` states 477
+   while the register holds 565 ACTIVE. A count restated in prose is stale the moment it is written (BUG-588) — and
+   the rail's header-census surface only covers the block above the FIRST tier, so a tier label's count is unjoined.
+3. **A dangling decision citation.** The register's own D-2979 title cites "D-2537", and a face row cited `D2537`;
+   no record with that id exists (D-405: a declaration whose subject is absent is an assertion).
+
+**Why it is not fixed here.** Fixing (1) means moving the marker (or the tiers) in three PROTECTED files that
+`gov_sync.py` writes, and moving the marker would also silence the D-2984 joins that currently keep those hand rows
+honest — the fix has to come with a join for the tier labels, not before it. Deliberately left as its own act.
+**REMEDY:** decide, per face, whether a hand tier inside history is (a) relabelled a dated snapshot and removed
+from the claim surface, or (b) promoted into the derived block; then join the tier labels' counts. Routed to
+**T-115**.

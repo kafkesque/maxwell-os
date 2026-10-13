@@ -194,10 +194,16 @@ membership:
   # Pinned BY IDENTITY, never by a count: a ceiling would let a NEW orphan hide inside it. The list may only
   # SHRINK - an id here that becomes a record, or that the log stops naming, is a STALE declaration and fails
   # the rail (D-405). MEASURED 2026-09-27, each classified: D-271 / D-272 / D-275 are DATED SECTION HEADINGS
-  # for groups of lettered records (D271a-d, D272a-e, D273a-g) that ARE in the registry; D2537 is a table row in
-  # the historical tier whose record does not exist under that spelling; D637 is a dated owner ruling recorded in
-  # governance/, not a minted record.
-  legacy_orphan_ids: [D-271, D-272, D-275, D2537, D637]
+  # for groups of lettered records (D271a-d, D272a-e, D273a-g) that ARE in the registry; D637 is a dated owner
+  # ruling recorded in governance/, not a minted record.
+  # RETIRED 2026-10-13 (D-2984, BUG-760/761): D2537 was pinned here as "a table row in the historical tier whose
+  # record does not exist under that spelling". D-2984 joined decision ROWS to the register and found that row
+  # (`| D2537 | Ranking fix + raw-label facet (opt-in). |`, in the tier "ACTIVE - in effect") citing an id no
+  # record carries - a citation whose subject is absent is an assertion (D-405) - and re-cited it to D-2979, the
+  # record that holds the decision. The log therefore stops naming D2537, which is exactly the shrink this pin's
+  # own note prescribes. The id is still cited ONCE, in the register's own D-2979 title ("Enable D-2537 fused
+  # quality ranking"), and that residual dangling citation is filed as BUG-761 rather than carried as a pin.
+  legacy_orphan_ids: [D-271, D-272, D-275, D637]
   why: >-
     An id NAMED in the human log with no TOP-LEVEL record in the registry is the signature of BUG-587: the record
     was ABSORBED into the previous record's files: list, its bytes are in the file, the file parses, and the

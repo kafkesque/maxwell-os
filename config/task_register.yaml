@@ -245,3 +245,21 @@ tasks:
     prefix can no longer hide them and the recorded red is what `just health` now reports. Each repair wave must
     be followed by a re-measure: a stale or coverage-mismatched record is UNKNOWN (rc=2, loud), never silent.
   gate: none
+- id: T-115
+  priority: SHOULD
+  state: open
+  title: 'BUG-761 — decide what a HAND TIER means inside the region the faces declare to be history'
+  why: >-
+    The GOV-HISTORY marker was inserted after the derived block, which sits inside the FIRST tier, so every other
+    tier fell BELOW it: 'SHOULD/WORTH/DONE' in MASTER-TASK-REGISTER.md and 'OPEN — MUST/SHOULD/WORTH' plus
+    'CLOSED / RESOLVED' in governance/buglog.md are all inside a region a face declares to be "DATED HISTORY:
+    append-only, NOT a register". Two consequences, both measured: a tier LABEL can restate a count that has
+    drifted (DECISION-LOG.md 'ACTIVE — in effect (477)' against 565 ACTIVE in the register; the header-census
+    surface only covers the block above the FIRST tier), and a citation inside such a tier can dangle unnoticed
+    (D2537 has no record; the record is D-2979). D-2984 joins the ROWS but deliberately left the tier LABELS and
+    the marker's extent alone, because moving the marker would silence the joins that now keep those rows honest.
+    Per face, decide whether a hand tier inside history is (a) relabelled a dated snapshot and removed from the
+    claim surface, or (b) promoted into the derived block; then join the tier labels' counts to the register.
+  source: [BUG-761, D-2984, D-2642]
+  evidence: 'governance/buglog.md BUG-761; DECISION-LOG.md "## 🟢 ACTIVE — in effect (477)" vs 565 ACTIVE in config/decisions.yaml (2026-10-13)'
+  gate: none

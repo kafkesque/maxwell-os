@@ -7,10 +7,11 @@ S2 (cross-encoder rerank), and S3 (HyDE): a candidate retrieval change is only
 adoptable if it IMPROVES recall@k / MRR / precision@k on the golden query set
 WITHOUT regressing the others.
 
-Measures, for each golden query, three retrieval legs:
+Measures, for each golden query, the SERVED path and its A/B controls:
+  * PRODUCTION   (the dispatcher, D-2724/D-2980 - what serving actually returns) [reference]
   * FTS only     (lexical baseline — good at vocabulary overlap)
   * VECTOR only  (semantic — the leg D2509 repaired)
-  * HYBRID (RRF) (production default)
+  * HYBRID (RRF) (the superseded fusion path, kept as a control)
 
 And, when enabled, the re-rank pass over the hybrid candidate pool:
   * HYBRID + RERANK  (S2 — cross-encoder bge-reranker-v2-m3, config-gated)
@@ -43,7 +44,14 @@ import yaml
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from pipeline.pipeline_paths import CANONICAL_RUN, DB_PATH, HYDE_MAX_TOKENS, HYDE_MODEL
-from pipeline.retrieve import get_conn, search_fts, search_vector, search_hybrid
+from pipeline.retrieve import (  # noqa: E402  D-2980: search() = the SERVED path; the rest are A/B controls
+    _rerank_pool_size,
+    get_conn,
+    search,
+    search_fts,
+    search_hybrid,
+    search_vector,
+)
 # D-2939: owner-approved NAMES -> current fb_ids (the pointer is mechanical).
 from pipeline.golden import resolve_golden_anchors, sample_self_retrieval  # noqa: E402
 
@@ -55,7 +63,10 @@ with open(PROJECT_ROOT / "config" / "pipeline_config.yaml") as _f:
 _BENCH = _CFG.get("retrieval_benchmark", {})
 _SERVING: dict = _CFG.get("serving", {})
 DEFAULT_K: int = int(_BENCH.get("top_k", 10))
-DEFAULT_POOL: int = int(_BENCH.get("candidate_pool", 30))
+DEFAULT_POOL: int = int(_BENCH.get("candidate_pool", 0))
+# D-2980: the measured method set. "production" is the dispatcher (what serving returns);
+# the rest are A/B controls. Order = reference first.
+DEFAULT_METHODS: list[str] = ["production", "fts", "vector", "hybrid"]
 # D-2936: the scope a golden id must live in to be measurable at all.
 DEFAULT_SERVING_SCOPE: str = str(_SERVING.get("index_scope", "canonical_run"))
 # C16/BUG-710: never report a recall number for a golden the harness cannot resolve.
@@ -198,7 +209,12 @@ def _generate_hypothetical(query: str) -> str:
 
 def _run_method(conn, name: str, query: str, expected: list[str],
                 k: int, pool: int, rerank: bool) -> dict:
-    if name == "fts":
+    if name == "production":
+        # D-2980: EXACTLY what serving does - the dispatcher with its config-selected method,
+        # its own pool policy (_rerank_pool_size) and its rerank gate. Every other leg is an
+        # A/B control; this is the REFERENCE row (BUG-710: the harness could not bench it).
+        got = _ids(search(conn, query, limit=k))
+    elif name == "fts":
         got = _ids(search_fts(conn, query, limit=pool))
     elif name == "vector":
         got = _ids(search_vector(conn, query, limit=pool))
@@ -269,7 +285,7 @@ def _run_self_retrieval(conn, args) -> int:
     agg: dict[str, dict[str, float]] = {lg: {"recall": 0.0, "mrr": 0.0} for lg in legs}
     for r in rows:
         for lg in legs:
-            res = _run_method(conn, lg, r["name"], [r["fb_id"]], args.top_k, args.pool, True)
+            res = _run_method(conn, lg, r["name"], [r["fb_id"]], args.top_k, pool, True)
             agg[lg]["recall"] += res["recall"]
             agg[lg]["mrr"] += res["mrr"]
     m: int = len(rows)
@@ -302,7 +318,9 @@ def main() -> int:
     parser.add_argument("--db", type=Path, default=DB_PATH)
     parser.add_argument("--golden", type=Path, default=GOLDEN_PATH)
     parser.add_argument("-k", "--top-k", type=int, default=DEFAULT_K)
-    parser.add_argument("--pool", type=int, default=DEFAULT_POOL, help="candidate pool per leg")
+    parser.add_argument("--pool", type=int, default=DEFAULT_POOL,
+                        help="candidate pool per leg; 0 (default) = DERIVE from serving.pool, "
+                             "which is the SERVED path's own policy (D-2980)")
     parser.add_argument("--rerank", action="store_true", help="A/B cross-encoder rerank (S2)")
     parser.add_argument("--contextual", action="store_true", help="A/B contextual embedding (S1)")
     parser.add_argument("--hyde", action="store_true", help="A/B HyDE hypothetical-document embedding (S3)")
@@ -317,6 +335,10 @@ def main() -> int:
                              "Mints no gold label, so it needs no owner gate; it is a REGRESSION rail, "
                              "not a substitute for the semantic golden slice (a name query is lexical).")
     args = parser.parse_args()
+
+    # D-2980: the A/B legs must be built at the SERVED pool width, not a literal, or they
+    # measure a different function than the one production calls.
+    pool: int = args.pool if args.pool else _rerank_pool_size(args.top_k)
 
     queries = _load_golden(args.golden)
     if not queries:
@@ -361,7 +383,7 @@ def main() -> int:
         if _REQUIRE_RESOLVABLE and not args.allow_unresolvable:
             return 2
 
-    methods = ["fts", "vector", "hybrid"]
+    methods = list(DEFAULT_METHODS)
     if args.contextual:
         methods.append("hybrid-ctx")
     if args.rerank:
@@ -379,7 +401,7 @@ def main() -> int:
         expected: list[str] = q.get("expected", [])
         row = {"query": query, "type": q.get("query_type", "?"), "methods": {}}
         for m in methods:
-            res = _run_method(conn, m, query, expected, args.top_k, args.pool, args.rerank)
+            res = _run_method(conn, m, query, expected, args.top_k, pool, args.rerank)
             row["methods"][m] = res
             for metric in ("recall", "mrr", "precision"):
                 agg[m][metric] += res[metric]
@@ -394,7 +416,7 @@ def main() -> int:
         print(json.dumps({"aggregate": agg, "per_query": per_query}, indent=2))
         return 0
 
-    print("\n═══ D2511 RETRIEVAL BENCHMARK (golden queries, k=%d) ═══" % args.top_k)
+    print("\n═══ D2511 RETRIEVAL BENCHMARK (golden queries, k=%d, pool=%d) ═══" % (args.top_k, pool))
     header = f"{'method':<16} {'recall@k':>10} {'MRR':>8} {'P@k':>8}"
     print(header)
     print("-" * len(header))

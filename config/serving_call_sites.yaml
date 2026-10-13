@@ -1,0 +1,83 @@
+# config/serving_call_sites.yaml - the ONE home of the SERVING CALL-SITE MATRIX (D-2980).
+#
+# WHY (the class, not the instance). D-2724 adopted vector+rerank as the production retrieval
+# default and named exactly THREE call sites repointed off search_hybrid(). TWO production
+# surfaces were missed - the MCP query_knowledge non-graph branch (maxwell_mcp_server.py) and
+# the retrieve.py CLI default query path - and NOTHING could see that, because the fact
+# "this module serves" had no home. A call site could drift back onto a leg for a year with
+# every rail green. This file is that home; tests/test_retrieval_serving_spec.py is its
+# reader (INV-5).
+#
+# THE TWO RULES the reader enforces, in BOTH directions:
+#   (1) ROUTING   - every declared production call site must call the dispatcher. A serving
+#                   surface that never calls it has bypassed the adopted method (D-2724).
+#   (2) INVENTORY - every call to a retrieval LEG from any file in scope_globs must be
+#                   DECLARED in leg_callers with a reason, and every declaration must match a
+#                   LIVE call. An undeclared leg call is a silent bypass; a declaration that
+#                   outlives its subject is the BUG-488/BUG-542 class. An A/B control is
+#                   legitimate - it only has to SAY SO.
+# Scope is a file GLOB, never a directory walk, so an added subpackage is a visible edit
+# rather than an implicit grant (C12).
+schema_version: '1'
+authority: D-2980
+decisions: [D-2724, D-2980]
+dispatcher: search
+leg_functions: [search_keyword, search_fts, search_vector, search_hybrid]
+scope_globs: ['pipeline/*.py', 'scripts/*.py', '*.py']
+out_of_scope:
+  tests/**: 'contracts and fixtures - the suite asserts this property, it is not a serving surface'
+  tools/**: 'scratch model-eval helpers, no serving surface'
+  temp/**: 'scratch'
+  archive/**: 'retired artifacts'
+  benchmarks/**: 'measurement harnesses, not serving surfaces'
+production_call_sites:
+- file: maxwell_mcp_server.py
+  function: _tool_query_knowledge
+  why: >-
+    the MCP serving surface (C25 agent-agnostic). Its non-graph branch called search_hybrid()
+    directly until D-2980: an agent saw the superseded RRF path while config declared
+    retrieval.method=vector. Repointed by D-2980.
+- file: pipeline/retrieve.py
+  function: graph_aware_search
+  why: 'graph-expanded serving path - seeds from the dispatcher (repointed by D-2724)'
+- file: pipeline/retrieve.py
+  function: agentic_search
+  why: 'iterative agentic serving path - seed + broaden both dispatch (repointed by D-2724)'
+- file: pipeline/retrieve.py
+  function: main
+  why: >-
+    the human CLI. Its DEFAULT query path (-q/--query) called search_hybrid() directly until
+    D-2980; --fts/--vector/--hybrid remain explicit leg switches, declared below.
+leg_callers:
+- file: pipeline/retrieve.py
+  function: search
+  legs: [search_hybrid, search_vector]
+  why: 'the dispatcher: method=vector -> search_vector, method=rrf -> search_hybrid (the D-2724 revert path)'
+- file: pipeline/retrieve.py
+  function: search_hybrid
+  legs: [search_fts, search_keyword, search_vector]
+  why: 'the RRF implementation calls its own three legs (the keyword leg only when a facet is present)'
+- file: pipeline/retrieve.py
+  function: search_vector
+  legs: [search_fts]
+  why: >-
+    declared FALLBACK: C24 graceful degradation when vec_fbs/embeddings are unavailable. The
+    leg is the LAST resort here, never the default - and it is named so it cannot hide.
+- file: pipeline/retrieve.py
+  function: main
+  legs: [search_keyword, search_fts, search_vector, search_hybrid]
+  why: 'CLI explicit leg switches (--fts/--vector/--hybrid) + the no-query "recent rows" listing, which has no query text to dispatch'
+- file: pipeline/retrieval_benchmark.py
+  function: _run_method
+  legs: [search_fts, search_vector, search_hybrid]
+  why: >-
+    A/B CONTROL: the raw leg rows (rerank=False). They must stay OFF the dispatcher or the
+    control they provide disappears; the SERVED path is measured by the production leg (INV-6).
+- file: scripts/measure_constraint_violation.py
+  function: main
+  legs: [search_hybrid]
+  why: 'D-2601 constraint-violation measurement (rerank=False) - a measurement, not a serving surface'
+- file: scripts/purge_superseded_runs.py
+  function: verify
+  legs: [search_hybrid]
+  why: 'post-purge leak smoke (rerank=False) - a measurement, not a serving surface'

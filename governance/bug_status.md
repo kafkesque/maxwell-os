@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**184 open** / 332 closed of 516 ids.
+**185 open** / 334 closed of 519 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -174,7 +174,6 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-704 | (MED - OPEN 2026-10-10): S4 taxonomy scatter — engineering/agentic principles misclassified into Human&Design / Method&Business / emerging | 1 |
 | BUG-705 | (HIGH - OPEN 2026-10-10): the S5 recall path is still-pending code — and 2,258 neutral rows are recoverable | 1 |
 | BUG-706 | (MED - OPEN 2026-10-10): the macro re-classify gate needs a v9-stamped referee | 1 |
-| BUG-710 | (CRITICAL — OPEN): the D2511 retrieval gate is INERT — golden set anchored to the superseded run, and the documented fail-loud precondition  | 2 |
 | BUG-711 | (HIGH — OPEN): 173 canonical rows still carry a DISPLACED canonical domain label in the STORE | 1 |
 | BUG-712 | (CRITICAL — OPEN): content_type routing collapse — 6 of 8 declared primitives produce ZERO output | 12 |
 | BUG-719 | (MED - OPEN 2026-10-12): the non-principle sidecars are not content-type pure, and the "81 tool_instruction remaining" figure was an arithme | 1 |
@@ -191,3 +190,5 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-748 | (MED - OPEN 2026-10-13) - D-2928's definition re-scope left 177 canonical rows ON the moved boundary, and the audit D-2905's precedent requi | 5 |
 | BUG-749 | (HIGH - OPEN 2026-10-13) - 1,072 in-subject rows (16.3%) carry a discipline the live production mapper does NOT reproduce from their own raw | 4 |
 | BUG-750 | (LOW - OPEN 2026-10-13) - a GENERATED artifact can go stale behind its own generator and no rail sees it: the canonical-labels reference sti | 1 |
+| BUG-754 | (MED - OPEN, found 2026-10-13 while verifying D-2980) - the declared-defaults ceiling has been breached and check_config_defaults --check is | 1 |
+| BUG-755 | (MED - OPEN, found 2026-10-13 while verifying D-2980) - the suite rail is RED at HEAD: 4 failures that no declared red set covers | 1 |

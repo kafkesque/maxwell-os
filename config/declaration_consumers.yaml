@@ -70,3 +70,11 @@ declarations:
     (ONE reader, wired into justfile:health). MEASURED 2026-09-27: the META-LANE FREEZE was asserted in fifteen prose
     homes and read by NOTHING, so it could not fail, declared no exit and counted nothing. A window whose only reader
     is withheld is that same defect with a filename on it, which is what this edge refuses.
+- declaration: config/serving_call_sites.yaml
+  consumers: [tests/test_retrieval_serving_spec.py]
+  decisions: [D-2980]
+  why: >-
+    the serving call-site matrix is read by the spec contract (INV-5): the contract asserts the
+    ROUTING rule (every production call site calls the dispatcher) and the INVENTORY rule
+    (every leg call is declared, every declaration is live). Joining them here means a staged
+    matrix with a withheld reader is refused at the commit boundary (the BUG-562 shape).

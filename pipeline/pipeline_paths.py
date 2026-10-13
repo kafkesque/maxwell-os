@@ -436,6 +436,22 @@ S4_GRAMMAR_DECODING_ENABLED = bool(_CFG.get("stage4", {}).get("grammar_decoding_
 RETRIEVE_CONFIDENCE_THRESHOLD = float(_CFG.get("retrieval_eval", {}).get("confidence_threshold", 0.85))
 RERANK_ENABLED = bool(_CFG.get("rerank", {}).get("enabled", False))   # D2521 (S2): production rerank adoption gate
 RETRIEVAL_METHOD = str(_CFG.get("retrieval", {}).get("method", "rrf"))  # D-2724: production retrieval default ('vector' | 'rrf')
+# D-2980: the retrieval CANDIDATE-POOL policy reads its ONE home and FAILS CLOSED.
+# Deliberately NOT a .get(key, <literal>) read: a code default moves the value out of config
+# and into code (D-2644/BUG-504 class), and this is exactly the tuning value C12 requires in
+# YAML. A missing block is an error at import, never a silent default (C16).
+try:
+    _POOL_CFG: dict = dict(_CFG["serving"]["pool"])
+except KeyError as _exc:  # C16/D-2980
+    raise KeyError(
+        f"config/pipeline_config.yaml is missing serving.pool.{_exc.args[0]} - the retrieval "
+        "candidate-pool policy has ONE home (D-2980) and must not be defaulted in code (C12/C16)"
+    ) from _exc
+RERANK_POOL_MULTIPLIER: int = int(_POOL_CFG["rerank_multiplier"])  # served/rerank pool = clamp(limit*mult, floor, cap)
+RERANK_POOL_FLOOR: int = int(_POOL_CFG["rerank_floor"])
+RERANK_POOL_CAP: int = int(_POOL_CFG["rerank_cap"])
+RRF_LEG_POOL_MULTIPLIER: int = int(_POOL_CFG["rrf_leg_multiplier"])  # D2176 leg pool = min(limit*mult, cap)
+RRF_LEG_POOL_CAP: int = int(_POOL_CFG["rrf_leg_cap"])
 SYMMETRIC_RELATIONSHIP_TYPES = tuple(str(x) for x in (_CFG.get("retrieval", {}).get("symmetric_relationship_types", ["semantic_near", "source_crossover", "discipline_overlap", "domain_overlap"])))  # A2/BUG-274: undirected related_fbs types (reverse adjacency)
 FTS_STOPWORDS = frozenset(_CFG.get("retrieval", {}).get("fts_stopwords", []))  # C12: FTS stopwords from config (D2561)
 

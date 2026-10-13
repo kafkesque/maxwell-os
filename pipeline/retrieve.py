@@ -37,6 +37,13 @@ from pipeline.label_traceability import traceability_of  # noqa: E402  BUG-497/D
 from pipeline.pipeline_paths import RETRIEVE_CONFIDENCE_THRESHOLD  # D2231: C12 compliance
 from pipeline.pipeline_paths import RERANK_ENABLED  # D2521 (S2): production rerank adoption gate
 from pipeline.pipeline_paths import RETRIEVAL_METHOD  # D-2724: production retrieval default (C21 swappable)
+from pipeline.pipeline_paths import (  # D-2980: the ONE home of the candidate-pool policy (C12/C20)
+    RERANK_POOL_CAP,
+    RERANK_POOL_FLOOR,
+    RERANK_POOL_MULTIPLIER,
+    RRF_LEG_POOL_CAP,
+    RRF_LEG_POOL_MULTIPLIER,
+)
 from pipeline.pipeline_paths import SYMMETRIC_RELATIONSHIP_TYPES  # A2/BUG-274: undirected related_fbs types (reverse adjacency)
 from pipeline.pipeline_paths import FTS_STOPWORDS  # D2561: C12 stopwords from config
 from pipeline.pipeline_paths import (  # D2537: fused quality ranking (opt-in)
@@ -103,6 +110,27 @@ def _rank_sql() -> str:
         f"+ CASE WHEN source_diversity IS NOT NULL AND source_diversity >= 2 "
         f"THEN {RANKING_DIVERSITY_BOOST} ELSE 0.0 END DESC"
     )
+
+
+def _rerank_pool_size(limit: int) -> int:
+    """D-2980: the served/rerank candidate-pool size. ONE home (config serving.pool).
+
+    Both the served path (search()) and the retrieval benchmark's A/B legs read THIS
+    function, so an A/B leg is CONSTRUCTED to equal the served path instead of nearly
+    matching it (the harness used a literal 30 while production used 50-100, which is why
+    it could not bench production - BUG-710 residual).
+    """
+    return min(max(limit * RERANK_POOL_MULTIPLIER, RERANK_POOL_FLOOR), RERANK_POOL_CAP)
+
+
+def _rrf_leg_pool_size(limit: int) -> int:
+    """D-2980: the per-leg candidate pool of the RRF path (config serving.pool).
+
+    Shape PRESERVED from D2176 (min(limit * mult, cap), no floor) so the raw-RRF control leg
+    keeps measuring the same function it always measured; the literal it used to be is gone,
+    so the value is tunable in ONE place (C12/C20).
+    """
+    return min(limit * RRF_LEG_POOL_MULTIPLIER, RRF_LEG_POOL_CAP)
 
 
 def _facet_conditions(
@@ -500,7 +528,7 @@ def search_hybrid(
     benchmark's raw-RRF "hybrid" baseline stays a clean A/B control).
     """
     RRF_K: int = 60  # RRF constant — higher = smoother rank blending
-    POOL_SIZE: int = min(limit * 5, 100)  # Candidate pool per method
+    POOL_SIZE: int = _rrf_leg_pool_size(limit)  # D-2980: per-leg pool policy (config-first)
 
     # 1. Collect ranked candidates from all three methods (D2330: quarantine opt-in).
     # D273a/G12: the facet predicate is passed to EVERY leg — FTS and vector now
@@ -578,7 +606,7 @@ def search_hybrid(
     if should_rerank and ranked_ids:
         try:
             from pipeline.rerank import rerank_candidates
-            pool_size = min(max(limit * 5, 20), 100)
+            pool_size = _rerank_pool_size(limit)  # D-2980: the served pool policy
             pool = [dict(fb_map[fid]) for fid in ranked_ids[:pool_size]]
             results = rerank_candidates(query, pool, top_k=limit)
         except Exception as e:  # C24: degrade gracefully but loudly (no silent error)
@@ -622,7 +650,7 @@ def search(
     m: str = method if method is not None else RETRIEVAL_METHOD
     if m == "vector":
         should_rerank = RERANK_ENABLED if rerank is None else rerank
-        pool_size: int = min(max(limit * 5, 20), 100)
+        pool_size: int = _rerank_pool_size(limit)  # D-2980: the served pool policy
         pool = search_vector(
             conn, query, limit=pool_size, include_quarantine=include_quarantine,
             domain=domain, discipline=discipline, macro=macro, depth=depth,
@@ -1417,8 +1445,12 @@ def main():
             content_type=args.content_type,
         )
     elif args.query:
-        # Default: hybrid search
-        results = search_hybrid(conn, args.query, limit=args.limit, macro=args.macro)
+        # D-2980: the DEFAULT query path routes through the DISPATCHER (D-2724 adoption). It
+        # called search_hybrid() directly until D-2980, so the human surface served the
+        # superseded RRF path while config declared retrieval.method=vector. The explicit leg
+        # switches (--fts/--vector/--hybrid) stay, and they are now DECLARED in
+        # config/serving_call_sites.yaml (INV-5) instead of being invisible.
+        results = search(conn, args.query, limit=args.limit, macro=args.macro)
     else:
         # No query: show recent
         results = search_keyword(conn, status=args.status, limit=args.limit, macro=args.macro)

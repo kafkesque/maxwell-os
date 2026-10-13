@@ -30,6 +30,22 @@ serving:
   # C16/BUG-710: a benchmark or census whose reference ids fall outside index_scope must
   # FAIL LOUD. BUG-710 exists because 30/30 retrieval goldens pointed at the superseded t11
   # run and the harness reported 0.000 recall as if it were a quality regression.
+  # D-2980: the ONE home of the retrieval CANDIDATE-POOL policy (C12/C20). Before this
+  # block the policy was two inline literals in pipeline/retrieve.py
+  # (min(max(limit*5,20),100) for the rerank/production pool, min(limit*5,100) for the RRF
+  # leg pool), so the benchmark's A/B legs could not be CONSTRUCTED to equal the served
+  # path and the served path could not be benched at all (BUG-710 residual).
+  #   rerank pool  = clamp(limit * rerank_multiplier, rerank_floor, rerank_cap)
+  #   rrf leg pool = min(limit * rrf_leg_multiplier, rrf_leg_cap)   (D2176 shape, preserved)
+  pool:
+    rerank_multiplier: 5
+    rerank_floor: 20
+    rerank_cap: 100
+    rrf_leg_multiplier: 5
+    rrf_leg_cap: 100
+  # C16/BUG-710: a benchmark or census whose reference ids fall outside index_scope must
+  # FAIL LOUD. BUG-710 exists because 30/30 retrieval goldens pointed at the superseded t11
+  # run and the harness reported 0.000 recall as if it were a quality regression.
   require_resolvable_goldens: true
 pipeline_manifest:
   schema_version: '3.0'
@@ -834,7 +850,10 @@ retrieval_eval:
   fb_name_max_chars: 200
 retrieval_benchmark:
   top_k: 10
-  candidate_pool: 30
+  # D-2980: 0 = DERIVE the per-leg pool from serving.pool (the policy the SERVED path uses);
+  # a non-zero value is an explicit A/B override. The harness used a literal 30 while
+  # production used 50-100, so no leg was ever the served path.
+  candidate_pool: 0
   # D-2940: the LABEL-FREE slice. Mints no gold label (D-2898 governs LABELS, and
   # there are none here) so it is not owner-gated; always runnable, unlike the
   # semantic golden slice, which needs an owner-signed anchor. A FB name is a
@@ -842,7 +861,7 @@ retrieval_benchmark:
   self_retrieval:
     sample: 30
     order: fb_id          # deterministic sample (C12/C20: no unrecorded randomness)
-    legs: [fts, vector, vector+rerank, hybrid, hybrid+rerank]
+    legs: [production, fts, vector, vector+rerank, hybrid, hybrid+rerank]   # D-2980: production = the SERVED path (the dispatcher) is the REFERENCE leg
   reanchor:
     candidates: 5
     snippet_chars: 220

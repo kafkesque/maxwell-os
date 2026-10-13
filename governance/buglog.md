@@ -12360,3 +12360,94 @@ unevidenced bridges), 181 PROVENANCE-UNRESOLVED (of which computer-science's 60 
 store-written; the rest are 14 units with no repo artefact declaring them), 103 LATE-HOME (owed, not yet
 store-written), 10 DEFINITION-RE-SCOPE (the D-2974 audit is still running - 269/354 arm-calls at last check - and
 this queue will grow).
+
+
+## BUG-710 (CRITICAL - CLOSED 2026-10-13 by D-2979 + D-2980) - all three defects fixed AND the gate now MEASURES the served path
+
+THREE DEFECTS, named, each with its own evidence.
+
+(1) THE STALE ANCHORS (fixed earlier today, D-2939): config/golden/retrieval_queries.yaml is version 4, 29/29
+queries pinned to rechunk-v4-20260929, every query carrying an expected_names anchor. The "0.000 recall on 30/30"
+reading measured the GOLDEN SET, never retrieval.
+
+(2) THE DEAD RANKING SIGNAL (D-2979, then D-2980): ranking.quality_score_enabled flipped true so the served path
+orders by the D-2537 fused score instead of the retired borp_score constant (D-2979); MEASURED at the DATA level,
+not the code level - COUNT(DISTINCT confidence_score) > 1 over the served PASS rows. The first version of the test
+asserted on borp_score and was itself wrong: the spec-first contract caught the assistant's own bad assumption
+instead of the assistant editing the test to fit. D-2980 then found the SECOND copy of the same dead clause in
+pipeline/query.py - un-gated, inside a hand-written SQL string - and repointed it to the ONE ranking home, fixing
+an OR/AND precedence bug on the same line that let its name-LIKE branch ignore the canonical-run pin (D-2881).
+
+(3) THE GATE THAT COULD NOT SEE THE PRODUCT (D-2980): the harness's rerank legs ran at a literal pool of 30 while
+production ran 50-100, so no leg WAS the served path. The pool policy now has one config home and one code home,
+the harness gains a "production" leg that IS the dispatcher, and the A/B legs are built at the served width.
+
+MEASURED, live, 29 goldens, k=10, pool=50 (production = the dispatcher = vector + cross-encoder rerank):
+    production   1.000 recall@10   0.919 MRR   0.100 P@k
+    hybrid       0.931             0.601       0.093
+    vector       0.862             0.417       0.086
+    fts          0.655             0.351       0.066
+
+NAMED LIMIT (registered, not hidden): recall@10 is SATURATED at 1.000 on this golden set. A saturated metric cannot
+gate an improvement, so the next retrieval change must be judged on MRR (0.919 today) and the golden set itself is
+the thing to harden - a plateau is a limit of the INSTRUMENT, not a licence to stop measuring.
+
+## BUG-753 (MED - CLOSED 2026-10-13 by D-2980) - D-2724's adoption named THREE call sites; TWO production surfaces were never repointed, and nothing could see it
+
+MEASURED: maxwell_mcp_server.py::_tool_query_knowledge (the graph_aware=false branch - an agent's request for a
+plain search) and pipeline/retrieve.py::main (the CLI default query path, whose own comment still read "Default:
+hybrid search") both called search_hybrid() directly. D-2724 repointed THREE call sites and audited itself as
+"3 call sites repointed, search_hybrid callers unchanged" - an audit that COULD NOT FAIL, because the fact "this
+module SERVES" had no home: an inventory of consumers is a DECLARATION, and no artifact held it.
+
+IMPACT, stated precisely: the surfaces diverged in RANKING BEHAVIOUR, not in scope. Both paths are run-pinned and
+both rerank (RERANK_ENABLED is on), so no stale row leaked; but the agent-facing default served the RRF path
+(D-2723: recall-negative, 0.867 vs 0.900) while config declared retrieval.method=vector. A declared default that two
+production surfaces do not use is a declaration with no reader - the BUG-562 shape, one layer up.
+
+FIX: both repoint to the dispatcher; config/serving_call_sites.yaml declares 4 production call sites + 7 leg callers
+(each with a reason, scope as a file GLOB); tests/test_retrieval_serving_spec.py asserts BOTH directions by AST
+(routing + inventory, and no declaration may outlive its subject); the matrix is joined to its reader in
+config/declaration_consumers.yaml. INSTANCE CLOSED, CLASS CLOSED: a NEW bypass anywhere in scope now fails the suite.
+
+## BUG-754 (MED - OPEN, found 2026-10-13 while verifying D-2980) - the declared-defaults ceiling has been breached and check_config_defaults --check is RED at HEAD
+
+MEASURED: python3 scripts/check_config_defaults.py --check -> rc=1: "measured 486 config-default SITE(s) over 552
+module(s): 241 distinct SHADOWED-DECLARED key(s), 3 distinct UNDECLARED key(s)" against a declared ceiling of 229
+with direction shrink_only. The health recipe runs this rail as "--check || [ 0 -eq 2 ]" style tolerance (rc=2
+owner-owed is tolerated; rc=1 is NOT), so the ladder is RED on this line and has been.
+
+A/B, WITH AND WITHOUT THIS SESSION'S CHANGE (HEAD config vs the same tree carrying the D-2980 config): BYTE-IDENTICAL
+measurement in both directions (486 / 552 / 241 / 3). NOT caused by D-2980 - and NOT absorbed by it either: no
+ceiling was raised (D-2644: raising a ceiling is a decision, never an edit).
+
+ATTRIBUTION, measured rather than guessed. The last commit that recorded the 229 ceiling is 2b7958c (2026-10-07,
+BUG-659). Comparing the declared key surface at that commit with today's: SEVEN leaf names were ADDED to config/
+after it that code reads with a literal default, so every one of those reads silently moved class UNDECLARED ->
+SHADOWED-DECLARED - commit_scope, dedup_gate, require_both, s5_owned_columns, serving,
+symmetric_relationship_types, taxonomy_dependent_columns. The remainder of the +12 is code-side: sites added since
+that commit that read already-declared leaf names. This is the rail's stated mechanism working as designed (it
+counts DISTINCT LEAF NAMES), and its real lesson: DECLARING a generic leaf name in a new config file reclassifies
+reads repo-wide, so the census can move without a single new code default.
+
+REMEDY OWED (two legal routes, neither taken here): (a) remove the code defaults - declare the reads loudly, which
+is what the rail asks for; or (b) a decision that raises the ceiling WITH the named keys, recording that the
+increase is a RECLASSIFICATION of the same debt rather than new debt. While it is open, every other green line must
+be read as "green after this one", because the ladder reports a PREFIX (D-2680/BUG-573).
+
+## BUG-755 (MED - OPEN, found 2026-10-13 while verifying D-2980) - the suite rail is RED at HEAD: 4 failures that no declared red set covers
+
+MEASURED: python3 scripts/check_tests.py --check -> rc=1: "457 collected, 448 passed, 4 failed, 0 error; declared
+red = 0" - and the rail's own rule makes an undeclared failure FATAL ("a NEW failure can never be absorbed by
+editing the ceiling"). The 4 are tests/test_decision_summary_sync.py::{test_census_artifact_describes_the_registry_bytes,
+test_census_counts_match_recomputed_counts, test_census_total_matches_decision_count} and
+tests/test_handoff_obligation.py::test_the_attribution_is_joined_by_CONTENT_and_never_by_recency.
+
+A/B: the same 4 fail at HEAD with this session's change STASHED (git stash -u, measured rerun, stash popped). NOT
+caused by D-2980.
+
+DIAGNOSIS, one cause and four symptoms - and it is this session's OWN inheritance: commit 3998844 inserted two
+minted decision records ABOVE the receipted region of config/decisions.yaml (see the BUG-376 update below). The
+census therefore no longer describes the registry bytes, and the attribution join finds no governed write whose
+post-image is those bytes. Verifying D-2980 REQUIRES repairing the cause (the D-2971 act + the census re-cut); the
+4 tests are then expected to go GREEN, measured rather than asserted - the post-repair state is appended below.

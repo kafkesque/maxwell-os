@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 516,
-  "open_n": 184,
-  "closed_n": 332,
+  "total_ids": 519,
+  "open_n": 185,
+  "closed_n": 334,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -844,11 +844,6 @@
       "events": 1
     },
     {
-      "id": "BUG-710",
-      "title": "(CRITICAL \u2014 OPEN): the D2511 retrieval gate is INERT \u2014 golden set anchored to the superseded run, and the documented fail-loud precondition ",
-      "events": 2
-    },
-    {
       "id": "BUG-711",
       "title": "(HIGH \u2014 OPEN): 173 canonical rows still carry a DISPLACED canonical domain label in the STORE",
       "events": 1
@@ -926,6 +921,16 @@
     {
       "id": "BUG-750",
       "title": "(LOW - OPEN 2026-10-13) - a GENERATED artifact can go stale behind its own generator and no rail sees it: the canonical-labels reference sti",
+      "events": 1
+    },
+    {
+      "id": "BUG-754",
+      "title": "(MED - OPEN, found 2026-10-13 while verifying D-2980) - the declared-defaults ceiling has been breached and check_config_defaults --check is",
+      "events": 1
+    },
+    {
+      "id": "BUG-755",
+      "title": "(MED - OPEN, found 2026-10-13 while verifying D-2980) - the suite rail is RED at HEAD: 4 failures that no declared red set covers",
       "events": 1
     }
   ],
@@ -1236,6 +1241,7 @@
     "BUG-707",
     "BUG-708",
     "BUG-709",
+    "BUG-710",
     "BUG-713",
     "BUG-714",
     "BUG-715",
@@ -1261,6 +1267,7 @@
     "BUG-746",
     "BUG-747",
     "BUG-751",
-    "BUG-752"
+    "BUG-752",
+    "BUG-753"
   ]
 }

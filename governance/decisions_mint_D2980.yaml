@@ -1,0 +1,66 @@
+- id: D-2980
+  date: '2026-10-13'
+  state: RESOLVED
+  category: RETRIEVAL / GOVERNANCE
+  title: >-
+    ONE production retrieval entry point, DECLARED and MEASURED - the two missed D-2724 call
+    sites repoint, the call-site matrix gets a home, and the benchmark benches the SERVED path
+  bugs: [BUG-710, BUG-753]
+  decision: >-
+    THREE DEFECTS, ONE CAUSE: the fact "this module SERVES" had no home, so D-2724's adoption of
+    vector+rerank could not be audited - and neither could D-2724's own audit claim.
+
+
+    (1) THE MISSED CALL SITES (BUG-753). D-2724 named THREE call sites repointed off
+    search_hybrid(); TWO production surfaces were missed and stayed on the superseded RRF path
+    for two weeks with every rail green - maxwell_mcp_server.py::_tool_query_knowledge (the
+    NON-GRAPH branch, i.e. what an agent gets when it asks for a plain search) and
+    pipeline/retrieve.py::main (the CLI default query path, whose own comment still read
+    "Default: hybrid search"). Both now dispatch through search() (D-2724's own entry point);
+    the explicit leg switches stay (--fts / --vector / --hybrid).
+
+
+    (2) THE MATRIX (C12 one home). config/serving_call_sites.yaml DECLARES 4 production call
+    sites and 7 leg callers, each with a reason; scope is a file GLOB, so an added subpackage is
+    a visible edit rather than an implicit grant. tests/test_retrieval_serving_spec.py (INV-5)
+    asserts BOTH directions by AST: every production call site must call the dispatcher, every
+    leg call must be declared, and every declaration must match a LIVE call (a declaration that
+    outlives its subject is the BUG-488/BUG-542 class). The matrix is joined to its reader in
+    config/declaration_consumers.yaml, so a staged matrix with a withheld reader is refused at
+    the commit boundary (the BUG-562 shape).
+
+
+    (3) THE MEASUREMENT (BUG-710 residual). The harness could not bench the served path: its
+    rerank legs ran at a literal pool of 30 while production ran 50-100, so "the benchmark" and
+    "the product" were DIFFERENT FUNCTIONS. The pool policy now has ONE config home
+    (serving.pool, read fail-closed with no code default - the D-2644/BUG-504 class) and ONE
+    code home (_rerank_pool_size / _rrf_leg_pool_size), used by the dispatcher AND the harness;
+    the harness gains a "production" leg that IS the dispatcher, and its A/B legs are
+    constructed at the served width. MEASURED (29 owner-anchored goldens, k=10, pool=50):
+    production 1.000 recall / 0.919 MRR / 0.100 P@k; hybrid 0.931/0.601; vector 0.862/0.417;
+    fts 0.655/0.351. NAMED LIMIT: recall@10 is SATURATED at 1.000 on this golden set, so the
+    discriminating metric for the NEXT retrieval change is MRR, and the golden set itself is the
+    thing to harden - a saturated metric cannot gate an improvement.
+
+
+    ALSO FIXED (BUG-710 residual 2): pipeline/query.py carried a SECOND, un-gated copy of the
+    dead "ORDER BY borp_score DESC" clause plus an OR/AND PRECEDENCE bug that let its name-LIKE
+    branch ignore the canonical-run pin (D-2881). It now reads the ONE ranking home (_rank_sql)
+    and the OR is parenthesised.
+
+
+    NOT DONE, DELIBERATELY: the MCP query_knowledge payload still EXPOSES borp_score and
+    feedback_score (retired/derived fields). Changing an MCP output schema is a contract change
+    and needs its own owner-gated decision; it is named in specs/retrieval_serving.spec.md so it
+    is a declared residual rather than a blindspot.
+  files:
+  - config/serving_call_sites.yaml
+  - config/pipeline_config.yaml
+  - config/declaration_consumers.yaml
+  - pipeline/retrieve.py
+  - pipeline/retrieval_benchmark.py
+  - pipeline/pipeline_paths.py
+  - pipeline/query.py
+  - maxwell_mcp_server.py
+  - tests/test_retrieval_serving_spec.py
+  - specs/retrieval_serving.spec.md

@@ -22,6 +22,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from pipeline.pipeline_paths import DB_PATH, CANONICAL_RUN  # D-2881: serving canonical-run pin
+from pipeline.retrieve import _rank_sql  # D-2980: the ranking home (no second ORDER BY home, C12/D-2537)
 from pipeline.label_traceability import traceability_of  # BUG-497/D-2640
 
 
@@ -209,8 +210,13 @@ def interactive(conn: sqlite3.Connection):
                 except sqlite3.OperationalError:
                     like = f"%{arg}%"
                     rows = conn.execute(
-                        "SELECT * FROM fbs WHERE name LIKE ? OR definition LIKE ? "
-                        "AND pipeline_run_id = ? ORDER BY borp_score DESC LIMIT 10",
+                        # D-2980: (a) the OR/AND PRECEDENCE bug is fixed - the unparenthesised
+                        # OR let the name LIKE branch ignore the canonical-run pin (D-2881);
+                        # (b) the dead ORDER BY borp_score DESC is replaced by the ONE ranking
+                        # home (D-2537/D-2979): borp_score is a retired constant (0.0), so that
+                        # clause collapsed to rowid order.
+                        "SELECT * FROM fbs WHERE (name LIKE ? OR definition LIKE ?) "
+                        "AND pipeline_run_id = ? ORDER BY " + _rank_sql() + " LIMIT 10",
                         (like, like, CANONICAL_RUN),
                     ).fetchall()
                 print(f"\n  Found {len(rows)} results for '{arg}':\n")

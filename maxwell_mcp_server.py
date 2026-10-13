@@ -46,7 +46,7 @@ from pipeline.pipeline_paths import (
     MCP_DELEGATE_MAX_FILES,
     MCP_DELEGATE_MAX_SYSTEM_CHARS,
 )
-from pipeline.retrieve import search_hybrid, graph_aware_search, agentic_search, EvidencePack
+from pipeline.retrieve import search, graph_aware_search, agentic_search, EvidencePack  # D-2980: the non-graph branch DISPATCHES (was search_hybrid - the un-repointed 4th call site of D-2724)
 from pipeline.feedback import get_fb_feedback_stats
 from pipeline.omlx_delegate import delegate_omlx  # BUG-063: file-grounded local delegation (C25)
 
@@ -115,7 +115,9 @@ async def _tool_query_knowledge(args: dict) -> list[TextContent]:
             )
             agentic_meta = {}
         else:
-            results = search_hybrid(
+            # D-2980: the DISPATCHER, not the superseded RRF leg (D-2723/D-2724: vector+rerank
+            # 0.900 recall vs hybrid-RRF 0.867). Declared in config/serving_call_sites.yaml.
+            results = search(
                 conn, query, limit=limit, domain=domain, depth=depth, macro=macro,
             )
             agentic_meta = {}

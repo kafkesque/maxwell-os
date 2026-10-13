@@ -930,6 +930,7 @@ disciplines:
   - industrial-organizational psychology
   - environmental psychology
   - Creative Psychology
+  - organizational psychology
   definition: The empirical study of mind and behavior in individuals and groups — emotion, personality, development, social behavior, and mental health — beyond the computational modelling of cognition. Broader and more behavioral than cognitive science, which models mental processes as computation.
   exclude:
   - cognitive science
@@ -1672,6 +1673,7 @@ disciplines:
   group: Design Cognition
   raw:
   - design thinking
+  - design studies
   definition: A human-centered approach to innovation — an iterative process (empathise → define → ideate → prototype → test) that integrates user needs, technology feasibility, and business viability, whose output is a designed solution, not an explanation of the mind.
   exclude:
   - creative process

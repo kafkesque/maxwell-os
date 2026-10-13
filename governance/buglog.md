@@ -12250,3 +12250,77 @@ measured 48.1% is the figure of record. THE LESSON (process, not tooling): a mea
 the artifact that measures it, never typed from memory into a record - the same discipline C12 applies to values in
 code, applied to claims in governance. The other D-2976 figures (1,074 rows / 192 units / 717 / 103 / 252 / 0) were
 re-derived from the artifacts and match this erratum.
+
+## BUG-749 (HIGH - OPEN, FIRST CONFIRMS APPLIED 2026-10-13) - two owner CONFIRMs landed as DECLARATIONS, and the gap fell 1,072 -> 894 rows with a BYTE-IDENTICAL menu
+
+The owner ruled the first four units on 2026-10-13 (`approve U001..U004`). Two were CONFIRM and are APPLIED; the
+applier declares the raw as an alias in config/taxonomy.yaml - the ONE synonym home - and nothing else:
+
+* `design studies` -> `design thinking` (107 rows) and `organizational psychology` -> `psychology` (71 rows);
+* MEASURED RECEIPT, taken before and after the write: **menu_hash `cc800a32…` and the answer space `c1f7895e…` are
+  BYTE-IDENTICAL**, so no composite moved, no provenance was rewritten (I2/D-2896) and **no row was relabelled**;
+  the live taxonomy diff is exactly +2 lines and the splice is asserted both ways (one heading, one raw block);
+* MEASURED SHRINK: the re-derivation gap fell **1,072 -> 894 rows (16.3% -> 13.6%)**, because the live mapper now
+  reproduces those labels from their own raw labels (verified: the kind-constrained discipline index resolves both);
+* the 'organizational psychology' CONFIRM has CONSISTENCY EVIDENCE, not just an approval: the taxonomy ALREADY
+  declared `industrial-organizational psychology` as a raw of `psychology`, so this was the missing half of an
+  existing declaration. The 'design studies' CONFIRM creates a DECLARED CROSS-AXIS HOMONYM (`design studies` is
+  also a raw of the DOMAIN `design strategy`), which is a sanctioned shape but is NAMED, not accidental.
+
+Of the other two: `marketing science -> emerging` (94 rows) is recorded as **LEAVE** (the stored value is the ABSENCE
+`emerging`, so approving it keeps the rows as a correct-at-the-time record - one word changes it to CORRECT);
+`computer science -> software engineering` (60 rows) is **HELD** — a CONFIRM there is not only "the rows stand", it
+declares a NARROWER home than the label FORWARD, and it is the D2422 alias sweep's own product ("semantic
+correctness NOT guaranteed by LLM"). It waits for one word of re-affirmation rather than propagating.
+The gap remains invisible to every ladder step; the standing rail is still the next act, and it now has a shrink
+target to hold (894, shrink-only).
+
+## BUG-751 (MED - CLOSED 2026-10-13) - a POSITIONAL review id is not an identity: the ruling home was keyed on U-numbers, so the first rebuild silently re-pointed the owner's rulings to other units
+
+The D-2976 packet numbers its units U001.. in leverage order and the owner's rulings were keyed on those ORDINALS.
+The ordinals are RECOMPUTED on every build, and the surface SHRINKS as rulings land: after the two CONFIRMs applied,
+the packet's U001 was `marketing science -> emerging` (it had been `design studies -> design thinking`) and U002 was
+`computer science -> software engineering` (it had been `marketing science -> emerging`). A re-run of the applier
+would have applied **CONFIRM to marketing science and LEAVE to computer science** — both silently wrong, and with no
+error anywhere, because every key still resolved to *a* unit.
+
+**MEASURED**: the two declarations already written were correct (the applier ran before the rebuild), so nothing was
+misapplied — the drift was caught by re-running the applier in DRY-RUN after the rebuild and reading its plan. That
+is the whole value of a plan-by-default writer: the wrong write never had to happen to be seen.
+
+**FIX**: the packet now carries `unit_key` (the decision's own content: `raw -> stored`, or `row:<fb_id>` for a
+per-row re-scope decision); the ruling home is keyed on it and records the ordinal it was ruled under as `was:`; and
+the applier FAILS CLOSED on (i) an ordinal key and (ii) a key that reaches no unit without an `applied:` receipt —
+because a ruling that applies to nothing is a SILENCE, not a no-op. An APPLIED ruling whose cohort has left the
+surface is printed as a record. 3 known-answer controls fire.
+
+**CLASS (why this is filed rather than fixed quietly)**: it is the D-2649 census lesson in a new layer — a derived,
+recomputed label LOOKS like a stable key and is not. Any artifact that invites a human to reference a row by its
+POSITION carries this defect by construction, and the next such artifact will be built unless the shape is named.
+
+## BUG-748 (MED - OPEN, SWEEP ADVANCING 2026-10-13) - the re-scope sweep is at ~190 records and still advancing; the control continues to hold rows back
+
+The D-2974 audit was resumed and is still running (measured rate ~34 s per arm-call), now past 190 journal records.
+It re-derives the same cohort and the same moved definitions on every pass, and the CONTROL arm keeps doing its job:
+rows that move under BOTH the live and the recorded menu (measured example: organizational theory -> design
+psychology) are instrument-unstable and are excluded from the attributable set by construction. Every attributable
+row it proves is surfaced into the packet's queue A (2 rows at the first render, 9 at the latest) and is stopped
+there: no label is moved by the audit, by the packet, by the applier or by this entry (D-2898).
+
+## BUG-752 (LOW - CLOSED 2026-10-13) - a derived census line could violate the very pattern its own sync asserts: the faces carried a COMPACT date for a day with every rail green
+
+The face sync (BUG-588/D-2692) asserts the shape of the census restatement before it rewrites it -
+`\b\d+ decisions \(census stamp [0-9a-f]+, \d{4}-\d{2}-\d{2}\)` - and then substitutes `<n> decisions (census stamp
+<stamp>, <DATE>)` with the DATE argument VERBATIM. A caller passing the compact form (`20261013`, which is this
+session's own artifact-date convention) satisfied the ASSERTION but wrote a line the NEXT run could not match:
+DECISION-LOG.md read `1104 decisions (census stamp b62a605315150977, 20261013)` while the pattern demanded a DASHED
+ISO date. Nothing else noticed for a day, because the only consumer is the sync that had just written it.
+
+MEASURED AND HEALED: the sync now normalises `YYYYMMDD -> YYYY-MM-DD` on the write side and fails closed on anything
+else, and its SEARCH pattern accepts `\d{4}-?\d{2}-?\d{2}` so the historical compact form is healed rather than
+hand-edited (the line is DERIVED - typing it would be the BUG-588 defect it exists to prevent). Reconciled: 1105
+decisions (census stamp 2448089a63b81f97, 2026-10-13), 515 bugs (184 open / 330 closed).
+
+CLASS (why a LOW is filed rather than swallowed): the guard fired LOUDLY and refused to write, which is exactly why
+the damage was cosmetic. But the defect is the shape the mission cares about - a DERIVED line whose writer can
+produce something its own reader rejects - and the fix belongs on the WRITE side, not in a widened reader alone.

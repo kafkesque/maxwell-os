@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 514,
+  "total_ids": 516,
   "open_n": 184,
-  "closed_n": 330,
+  "closed_n": 332,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -916,12 +916,12 @@
     {
       "id": "BUG-748",
       "title": "(MED - OPEN 2026-10-13) - D-2928's definition re-scope left 177 canonical rows ON the moved boundary, and the audit D-2905's precedent requi",
-      "events": 4
+      "events": 5
     },
     {
       "id": "BUG-749",
       "title": "(HIGH - OPEN 2026-10-13) - 1,072 in-subject rows (16.3%) carry a discipline the live production mapper does NOT reproduce from their own raw",
-      "events": 2
+      "events": 3
     },
     {
       "id": "BUG-750",
@@ -1259,6 +1259,8 @@
     "BUG-744",
     "BUG-745",
     "BUG-746",
-    "BUG-747"
+    "BUG-747",
+    "BUG-751",
+    "BUG-752"
   ]
 }

@@ -22863,3 +22863,158 @@ decisions:
     when
 
     it GROWS) is still owed, and it is precisely what would have made this gap visible without a question.'
+- id: D-2977
+  state: RESOLVED
+  category: GOVERNANCE / ONTOLOGY / RULING MECHANISM
+  date: '2026-10-13'
+  title: 'The review stops being 192 questions: a CLASS ruling + a content-keyed ruling home + a plan-first applier
+    — the first two owner CONFIRMs apply as BYTE-IDENTICAL declarations and the re-derivation gap falls 1,072 ->
+    894 rows (BUG-749 / BUG-751 / BUG-748)'
+  bugs:
+  - BUG-749
+  - BUG-751
+  - BUG-748
+  files:
+  - scripts/apply_relabel_rulings.py
+  - config/relabel_rulings.yaml
+  - scripts/build_relabel_review_packet.py
+  - config/taxonomy.yaml
+  - governance/relabel_plan_20261013.md
+  - governance/CANONICAL_RELABEL_REVIEW_20261013.md
+  - governance/canonical_relabel_review_20261013.csv
+  - governance/canonical_relabel_review_segments_20261013.csv
+  - governance/session_plan_20260924.yaml
+  - governance/buglog.md
+  decision: 'WHY. D-2976 gave the owner a surface (192 units), but 192 words is still the wrong SHAPE: the units
+    are not
+
+    independent. They fall into CAUSE CLASSES with the same decision in each, so the review is a handful of class
+
+    rulings plus a named exception list. MEASURED: the ALIAS-LAYER-RETIRED class alone is 170 units / 717 rows,
+    of
+
+    which 126 units / 534 rows are LEXICALLY EVIDENCED (the raw label shares a content token with the canonical''s
+
+    name, its declared raws, or its definition) and 44 units / 183 rows are not — instances of the alias layer
+
+    bridging unrelated vocabularies (religious studies -> anthropology, narrative theory -> literary theory,
+
+    accounting -> finance, optics -> theoretical physics). A class word on the evidenced 126 is worth more than
+    126
+
+    individual words, and the 44 are exactly what should come back to a human.
+
+    THE MECHANISM. config/relabel_rulings.yaml is the ONE home for the owner''s words; scripts/apply_relabel_rulings.py
+
+    computes every unit''s effective verdict and renders a PLAN. VERDICT PRECEDENCE, deterministic and fail-closed:
+
+    unit_rulings[unit_key] > class_rules[cause].policy > ESCALATE. A class CONFIRM carries
+
+    lexical_evidence_required: true, so a blanket class word still HOLDS the unevidenced units back rather than
+
+    sweeping them in. A PENDING policy escalates its whole class by design. An unrecognised action or policy, or
+    a
+
+    CORRECT with no canonical home, FAILS CLOSED (C16). The plan is written by default and nothing else is: --apply
+    is
+
+    a separate word.
+
+    THE FIRST RULINGS (owner 2026-10-13, "approve U001..U004"). CONFIRM applied for design studies -> design thinking
+
+    (107 rows) and organizational psychology -> psychology (71 rows); LEAVE recorded for marketing science -> emerging
+
+    (94 rows, the stored value is the ABSENCE emerging, so approving it keeps a correct-at-the-time record — one
+    word
+
+    changes it to CORRECT); CONFIRM HELD for computer science -> software engineering (60 rows). APPLIED = declare
+    the
+
+    raw as an alias in config/taxonomy.yaml, the ONE synonym home. MEASURED RECEIPT, before and after the write:
+
+    menu_hash cc800a32… and the answer space c1f7895e… are BYTE-IDENTICAL, so no composite moved, no provenance
+    was
+
+    rewritten (I2/D-2896) and NO ROW was relabelled; the live taxonomy diff is exactly +2 lines, spliced at the
+
+    blocking anchor with both sides asserted (a YAML round-trip would have rewritten 2,300 hand-formatted lines).
+
+    MEASURED SHRINK: the re-derivation gap fell 1,072 -> 894 rows (16.3% -> 13.6%), and the kind-constrained
+
+    discipline index now resolves both raws from their own labels. The organizational-psychology CONFIRM is backed
+    by
+
+    CONSISTENCY EVIDENCE rather than an approval alone: the taxonomy ALREADY declared industrial-organizational
+
+    psychology as a raw of psychology, so the new declaration is the missing half of an existing one. The
+
+    design-studies CONFIRM makes the raw a DECLARED CROSS-AXIS HOMONYM (it is also a raw of the DOMAIN design
+
+    strategy): a sanctioned shape, kind-constrained on both axes, but NAMED in the record and in the ruling home
+    so
+
+    it is a choice and not an accident.
+
+    THE HOLD (why an owner word can wait). computer science -> software engineering is the one approval this decision
+
+    does NOT propagate. A CONFIRM there is not only "the 60 rows stand": it declares a NARROWER home than the label
+
+    FORWARD, so every future CS-raw label lands in software engineering. Three measured reasons to pause: computer
+
+    science is the broader field, not a sub-field of software engineering; the live mapper refuses it on BOTH the
+
+    definition-anchored menu and the remap; and the alias is the D2422 sweep''s own product, which states that
+
+    "semantic correctness NOT guaranteed by LLM". The ruling is RECORDED and HELD — the last ruling but the first
+    that
+
+    propagates — and one word (re-affirm / CORRECT / LEAVE / ABSTAIN) releases it. The applier implements this as
+
+    hold:, which escalates the unit while printing the owner''s word: an approval that has to be put back to the
+    owner
+
+    before it reaches future rows is a legitimate state, and it must be visible, not silent.
+
+    BUG-751 (found by measurement, within the hour). The packet''s review_id (U001, U002, …) is a POSITIONAL ORDINAL,
+
+    recomputed on every build, and the ruling home was first keyed on it. The surface SHRINKS as rulings land, so
+
+    after the two CONFIRMs applied the packet''s U001 was marketing science -> emerging (it had been design studies
+    ->
+
+    design thinking) and U002 was computer science -> software engineering (it had been marketing science ->
+
+    emerging): a re-run would have applied CONFIRM to marketing science and LEAVE to computer science, both silently
+
+    wrong, with every key still resolving to *a* unit and no error anywhere. Nothing was misapplied — the two
+
+    declarations were written before the rebuild and the drift was caught by re-reading a DRY-RUN plan, which is
+
+    exactly why the writer plans by default. FIX: the packet now carries unit_key (the decision''s own content,
+
+    `raw -> stored`, or `row:<fb_id>` for a per-row re-scope decision); the ruling home is keyed on it and records
+
+    the ordinal it was ruled under as was:; and the applier FAILS CLOSED on an ordinal key and on a key that reaches
+
+    no unit without an applied: receipt, because a ruling that applies to nothing is a SILENCE, not a no-op. An
+
+    APPLIED ruling whose cohort has left the surface is printed as a record. CLASS: a derived, recomputed label
+    LOOKS
+
+    like a stable key and is not — the D-2649 census lesson in a new layer, and any artifact that invites a human
+    to
+
+    reference a row by its POSITION carries this defect by construction.
+
+    WHAT IS NOT DONE, AND WHY. No canonical relabel is performed BY THIS DECISION, and none can be: CORRECT and
+
+    ABSTAIN are recorded in the plan as OWED to a separate licensed store write with its own backup and decision
+
+    (D-2898), and the classifier of record stays ADVISORY (kappa ~0.45 against the owner''s anchor). The three class
+
+    policies remain PENDING, so 196 units / 809 rows escalate BY DESIGN — the plan says so instead of inventing
+    a
+
+    default. The standing rail for queue B (measure the gap against a declared shrink-only ceiling and fail closed
+
+    when it GROWS) is still owed; it now has a measured target to hold (894).'

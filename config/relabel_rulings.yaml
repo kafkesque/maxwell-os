@@ -1,0 +1,118 @@
+schema_version: '1.0'
+# ─────────────────────────────────────────────────────────────────────────────────────────────────
+# RELABEL RULINGS — the ONE home for the OWNER's decisions on the discipline-label cohorts.
+# D-2977. Written by the OWNER; read by scripts/apply_relabel_rulings.py. Ruling the CLASSES here is
+# what replaces filling 192 units by hand: a class word applies to every unit of that cause, except the
+# ones the lexical guard escalates, and `unit_rulings` overrides the class for a named unit.
+#
+# The vocabulary is the one the packet published (governance/CANONICAL_RELABEL_REVIEW_20261013.md):
+#   CONFIRM   the stored canonical IS the right home; declare the raw as an alias in config/taxonomy.yaml
+#             (MEASURED: no menu_hash move, no answer-space move, no relabel, no provenance rewrite)
+#   CORRECT   the stored canonical is wrong; name the home in owner_canonical (a separate, licensed,
+#             owner-gated store write — recorded as owed in the plan, never performed by the applier)
+#   ABSTAIN   no canonical home fits; the label becomes the declared absence `emerging` (D-2830)
+#   LEAVE     the mapping stands as a historical artefact; nothing is written (I2/D-2896)
+#   ESCALATE  the default when NO ruling reaches a unit — it is listed for the owner, never guessed
+#   PENDING   a class the owner has not ruled yet: its whole class ESCALATES (fail-closed, C16)
+# ─────────────────────────────────────────────────────────────────────────────────────────────────
+date: '2026-10-13'
+decision: D-2977
+packet: governance/canonical_relabel_review_20261013.csv
+
+class_rules:
+  # 170 units / 717 rows. MEASURED split: 126 units / 534 rows are LEXICALLY EVIDENCED (the raw label
+  # shares a content token with the canonical's name, its declared raws, or its definition) and 44 units
+  # / 183 rows are NOT (instances of the alias layer bridging unrelated vocabularies: `religious studies`
+  # -> `anthropology`, `narrative theory` -> `literary theory`, `accounting` -> `finance`,
+  # `optics` -> `theoretical physics`, `molecular biology` -> `health & medicine`, ...).
+  # THE QUESTION: CONFIRM (the map is restored — the rows become reproducible and future raw labels
+  # resolve deterministically), LEAVE (the rows stand as history and the retired map is not restored), or
+  # PENDING (come back with the 44 unevidenced units listed)? With lexical_evidence_required: true, a
+  # class CONFIRM still holds the 44 back for the owner — so this word buys the 126 without guessing.
+  ALIAS-LAYER-RETIRED:
+    policy: PENDING
+    lexical_evidence_required: true
+
+  # 4 units / 103 rows: U002 `marketing science` (94), U057 `entrepreneurial studies` (4),
+  # U062 `marketing strategy` (4), U163 `market research` (1). Each stores `emerging` because no home
+  # existed when it was admitted; the LIVE revision declares the home (`marketing`, `entrepreneurship
+  # studies`). THE QUESTION: CORRECT (re-map the rows to the live home — the corpus aligns with today's
+  # map) or LEAVE (the corpus is allowed to record what was true when the row was admitted)?
+  LATE-HOME:
+    policy: PENDING
+
+  # 16 units / 252 rows, and they are not 16 independent questions — they are FAMILIES with one origin:
+  #   software engineering   U004 computer science (60), U035 distributed systems (6), U070 cloud
+  #                          computing (3), U085 web development (3), U182 software architecture (1)
+  #   political economy      U006 public policy (28), U020 public administration (9), U041 social
+  #                          entrepreneurship (6), U077 nonprofit management (3), U140 community
+  #                          development (1)
+  #   research methodology   U033 psychometrics (7), U135 biostatistics (1)
+  #   information science    U007 information visualization (23)
+  #   creative process       U005 innovation management (29) [the live map now says entrepreneurship studies]
+  #   cognitive science      U173 problem solving (1)
+  # No artefact this repo retains declares these raws under the stored canonical, so a CONFIRM here would
+  # CREATE a new declaration out of an unrecoverable mapping. The default is ESCALATE — the owner's eyes.
+  PROVENANCE-UNRESOLVED:
+    policy: ESCALATE
+
+  # 2 units / 2 rows (U191, U192): rows whose LIVE arm now answers a different canonical while the
+  # RECORDED-menu control reproduced the stored label — the attributable delta of the D-2928 re-scope
+  # (D-2974). Each row is its own question and each needs the segment read.
+  DEFINITION-RE-SCOPE:
+    policy: ESCALATE
+
+# KEYED BY unit_key, NEVER BY THE ORDINAL (BUG-751, measured 2026-10-13): review_id (U001, U002, ...)
+# is POSITIONAL and is recomputed on every packet build, so a ruling keyed on it silently re-points to a
+# different unit the moment the surface is rebuilt - which it did, within the hour: after the two CONFIRMs
+# landed, the packet's U001 became 'marketing science -> emerging'. The applier now FAILS CLOSED on an
+# ordinal key and on a key that reaches no unit without an applied receipt. `was:` records the ordinal the
+# owner actually saw when ruling, so the two can never drift apart silently.
+unit_rulings:
+  # Owner ruling 2026-10-13 ("approve U001..U004").
+  design studies -> design thinking:
+    was: U001 (packet 2026-10-13, before the first ruling round)
+    action: CONFIRM
+    applied: '2026-10-13'
+    note: >-
+      Owner 2026-10-13. `design studies` -> `design thinking`, 107 rows. APPLIED 2026-10-13 with the
+      measured receipt: the live menu_hash (cc800a32...) and the answer space (c1f7895e...) are
+      BYTE-IDENTICAL before and after, so no provenance was rewritten and no row was relabelled; the
+      re-derivation gap fell 1,072 -> 894 rows on the 178 rows this and the U003 declaration cover.
+      NOTE RECORDED AT APPLY TIME:
+      `design studies` is ALSO a declared raw of the DOMAIN `design strategy` (config/taxonomy.yaml,
+      dom-037), so this makes it a DECLARED CROSS-AXIS HOMONYM — a sanctioned shape (D-2814's same-axis
+      fallthrough / D2422's kind-aware index), safe because both indexes are kind-constrained, but named
+      here so it is a choice and not an accident.
+  marketing science -> emerging:
+    was: U002 (same packet)
+    action: LEAVE
+    note: >-
+      Owner 2026-10-13 ("approve"). READ AS LEAVE because the stored value is the ABSENCE `emerging`: to
+      approve the stored state is to keep the 94 rows as a correct-at-the-time record while the live map
+      stays authoritative forward. IF THE INTENT WAS "approve the live answer", it is ONE WORD to change:
+      set action: CORRECT and owner_canonical: marketing — that is a licensed store write, which the
+      applier records as owed rather than performing.
+  organizational psychology -> psychology:
+    was: U003 (same packet)
+    action: CONFIRM
+    applied: '2026-10-13'
+    note: >-
+      Owner 2026-10-13. `organizational psychology` -> `psychology`, 71 rows. APPLIED 2026-10-13 (same
+      byte-identical menu_hash/answer-space receipt as above). CONSISTENCY EVIDENCE
+      (measured, not inferred): config/taxonomy.yaml ALREADY declares `industrial-organizational
+      psychology` as a raw of `psychology`, so this declaration is the missing half of an existing one.
+  computer science -> software engineering:
+    was: U004 (same packet)
+    action: CONFIRM
+    note: >-
+      Owner 2026-10-13 ("approve U004"). HELD, not applied: this one is re-affirmed before it propagates.
+      A CONFIRM here is not only "the 60 rows stand" — it declares `computer science` as a raw of
+      `software engineering` FORWARD, so every future CS-raw label lands in a NARROWER home than the
+      label. The three measured reasons to pause: (1) `computer science` is the broader field, not a
+      sub-field of `software engineering`; (2) the live mapper refuses it (both the definition-anchored
+      menu and the remap answer `emerging`); (3) the alias was introduced by the D2422 sweep that
+      explicitly states "semantic correctness NOT guaranteed by LLM". Options: re-affirm CONFIRM as
+      written; CORRECT with the home you judge right (e.g. `computational theory`, or a new canonical —
+      which needs its own decision); LEAVE (rows stand, no forward declaration); or ABSTAIN.
+    hold: 'awaiting re-affirmation: CONFIRM has a forward propagation effect (see note)'

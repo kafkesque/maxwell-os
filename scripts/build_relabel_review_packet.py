@@ -101,12 +101,12 @@ CANDIDATES = 3
 _GENERIC = frozenset({"studies", "science", "theory", "research", "practice", "general", "applied"})
 
 UNIT_COLUMNS = (
-    "review_id", "queue", "n_rows", "raw_label", "stored_canonical", "live_mapper_says", "cause",
-    "evidence", "candidates_advisory", "owner_action", "owner_canonical", "owner_comment",
+    "review_id", "unit_key", "queue", "n_rows", "raw_label", "stored_canonical", "live_mapper_says",
+    "cause", "evidence", "candidates_advisory", "owner_action", "owner_canonical", "owner_comment",
     "sample_fb_id", "sample_name",
 )
-SEGMENT_COLUMNS = ("review_id", "fb_id", "name", "content_type", "stored_canonical", "raw_label",
-                   "live_mapper_says", *FB_FIELDS)
+SEGMENT_COLUMNS = ("review_id", "unit_key", "fb_id", "name", "content_type", "stored_canonical",
+                   "raw_label", "live_mapper_says", *FB_FIELDS)
 
 
 def _yaml(path: Path) -> dict:
@@ -339,12 +339,17 @@ def build(date: str) -> int:
 
     units.sort(key=lambda u: (u["queue"] != QUEUE_REDERIVE, -u["n_rows"], u["raw_label"]))
     for i, u in enumerate(units, 1):
+        # review_id is a PRINTED ORDINAL: it is recomputed every build, so it is NOT an identity and a
+        # ruling must never be keyed on it. unit_key IS the identity - the decision's own content
+        # (raw -> stored for a mapping decision; the fb_id for a per-row re-scope decision).
         u["review_id"] = f"U{i:03d}"
+        u["unit_key"] = (f"{_norm(u['raw_label'])} -> {_norm(u['stored_canonical'])}"
+                         if u["queue"] == QUEUE_REDERIVE else f"row:{u['sample_fb_id']}")
 
     segs: list[dict] = []
     for u in units:
         for rec in u["rows"]:
-            segs.append({"review_id": u["review_id"], "fb_id": rec["fb_id"],
+            segs.append({"review_id": u["review_id"], "unit_key": u["unit_key"], "fb_id": rec["fb_id"],
                          "name": _clamp(rec.get("name")), "content_type": rec.get("content_type", ""),
                          "stored_canonical": u["stored_canonical"], "raw_label": u["raw_label"],
                          "live_mapper_says": u["live_mapper_says"],

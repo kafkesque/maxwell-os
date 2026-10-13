@@ -856,8 +856,9 @@ ranking:
   # D2537: opt-in fused quality ranking. borp_score is ~all 0.0 (verified 3310/3310
   # PASS rows), so the legacy `ORDER BY borp_score` collapses to rowid order. When
   # enabled, rank by S5 NLI confidence_score + epistemic boosts (convergent /
-  # source-diverse). OFF by default so legacy behaviour stays the benchmark baseline.
-  quality_score_enabled: false
+  # source-diverse). ENABLED 2026-10-13: the borp_score fallback is a constant (dead)
+  # on the served run, so OFF would collapse ranking to rowid order (P0 ranking fix).
+  quality_score_enabled: true
   confidence_weight: 1.0
   convergent_boost: 0.10
   diversity_boost: 0.05

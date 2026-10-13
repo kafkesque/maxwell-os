@@ -41,6 +41,7 @@ may_touch:
 - governance/session_plan_*.yaml
 - governance/menu_v9_edit_spec_20261009.md
 - tests/**
+- specs/**
 - archive/index.yaml
 - governance/evidence/**
 - governance/CONTEXT_INDEX.md

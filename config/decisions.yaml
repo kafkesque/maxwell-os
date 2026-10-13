@@ -1,6 +1,32 @@
 version: '1.0'
 ratified: '2026-07-26'
 decisions:
+- id: D-2978
+  state: RESOLVED
+  category: GOVERNANCE / TEST DISCIPLINE
+  title: Spec-first engineering + automated test suite adopted (SPEC.md overwrite-in-place + pytest executable contract)
+  decision: 'Definition-of-correct BEFORE implementation. One SPEC.md per governed surface,
+    OVERWRITTEN in place (never appended, never a new file per change); history lives in git
+    plus a D-number. Each invariant maps 1:1 to a pytest executable contract; the machine runner
+    (temp=0) is the grader and local LLMs only DRAFT contracts (R5 generator not equal verifier).
+    Toolchain: pytest and pytest-xdist (present), hypothesis plus approvaltests plus mutmut (to add).
+    First surface: specs/retrieval_serving.spec.md plus tests/test_retrieval_serving_spec.py (4 invariants, 4 green).'
+  bugs: [BUG-710]
+  files: [specs/retrieval_serving.spec.md, tests/test_retrieval_serving_spec.py]
+  created: '2026-10-13'
+- id: D-2979
+  state: RESOLVED
+  category: RETRIEVAL / RANKING
+  title: Enable D-2537 fused quality ranking (retire dead borp_score ORDER BY on the serving path)
+  decision: 'ranking.quality_score_enabled flipped false to true. Verified: confidence_score 100
+    percent populated (4503/4503, 147 distinct, avg 0.9); is_convergent=1 and source_diversity>=2
+    each on 938 rows. _rank_sql() now emits the 4-factor clause (confidence + convergent boost +
+    diversity boost). The borp_score COLUMN remains retired debt (constant 0.0, nothing writes it);
+    only the ORDER BY changed. Related blindspot: pipeline/query.py:213 has its own dead ORDER BY
+    borp_score DESC (CLI, not serving), logged under BUG-710, not yet fixed.'
+  bugs: [BUG-710]
+  files: [config/pipeline_config.yaml, pipeline/retrieve.py, tests/test_retrieval_serving_spec.py]
+  created: '2026-10-13'
 - id: D-2813
   state: RESOLVED
   category: GOVERNANCE / ANCHOR INTEGRITY

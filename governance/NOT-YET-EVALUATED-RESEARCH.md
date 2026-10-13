@@ -115,3 +115,22 @@ gated by D-300/Phase B -> WATCH. laya-mlx = labeler head, zero scaffolding surfa
 Notion = hosted workspace -> REJECT. Apple FM = see `config/apple_fm.yaml` (enabled:false, arms:[]) -> GATED
 ON MEASUREMENT, verdict in the buglog's BUG-538 discussion; it is an ARM for schema-shaped chores, never a
 generator (C2/C4) and never a verifier (S5 stays DeBERTa, D2298).
+
+---
+
+## 🧩 REA Reverse-Engineering Targets (closed-source only — open source is read directly)
+
+Decision (2026-10-13): REA is for CLOSED artifacts where source is unavailable. For open-source
+targets (LlamaIndex, Instructor, Docling, RAGChecker/Ragas/BGE-M3, Argilla, RAGFlow, DSPy) read
+the repo directly — REA would return decompiled/minified approximations WORSE than the source.
+
+| Tier | Target | REA entry | Feature to mine -> Maxwell |
+|------|--------|-----------|----------------------------|
+| MUST | DEVONthink 3 (native macOS) | native + Apple bundle anatomy | related-document ranking ("See Also"/"Classify") -> replaces dead borp_score |
+| MUST | Cursor (Electron) | analyze-javascript/electron | semantic code-search + derived codebase index (+12.5% acc) -> scout-lane derived index |
+| SHOULD | Notion (Electron client) | analyze-javascript | retrieval/index surface (partial; server core inaccessible) |
+| NOT WORTH | Glean / Perplexity / Elicit / Consensus | web JS bundle only | server-side engine inaccessible -> use blogs/whitepapers |
+
+Open-source targets are QUEUED (P4, after P0-P3): LlamaIndex content+config cache invalidation,
+Instructor typed response contract, Docling layout/table order-aware recovery, RAGChecker/Ragas/
+BGE-M3 retrieval-quality baseline.

@@ -13,9 +13,14 @@
 #   * index_block — a machine-owned block delimited by the GOV-INDEX sentinels. scripts/gov_sync.py
 #     renders it from the registers; scripts/gov_sync.py --check BYTE-COMPARES it. Hand edits are
 #     therefore detectable, not merely discouraged.
-#   * history_boundary — the GOV-HISTORY-START sentinel: everything below is DATED HISTORY
-#     (append-only, never a register, never re-counted). The rail fails if a *new* OPEN item is
-#     added below it.
+#   * history_boundary — the GOV-HISTORY-START sentinel: below it a face makes NO LIVE CLAIM. MEASURED
+#     2026-10-13 (BUG-761): the original wording ("everything below is DATED HISTORY, append-only, never a
+#     register, and the rail fails if a new OPEN item is added") was FALSE about what actually sits there - the
+#     owner's own INDEX sections, which are maintained (a bug was appended below the marker the day the marker
+#     was written) but are NOT a register. So the region has TWO declared kinds of content and the sentinel now
+#     says so: declared HAND INDEXES (row-joined on every `just health`, non-authoritative - see the heading
+#     rule below) and DATED HISTORY (append-only, never re-counted). A hand index heading must SAY which it is;
+#     the rail (scripts/check_governance_faces.py#heading_faults) fails closed on one that does not.
 #   * derived_fields — scalar fields a face must carry but must not author (session_seed).
 schema_version: '1'
 authority: D-2981
@@ -64,6 +69,29 @@ task_movers: [owner, pipeline]
 # rail that requires the lane to be present.
 owner_gate_token: owner
 face_owner_lane_label: 'OWNER LANE'
+# D-2986 (BUG-761): a HEADING is a claim too. The region below the marker is populated by INDEX sections (a
+# tier heading followed by a table of rows), and one of those headings can claim a CURRENT state - and restate
+# a count - with nothing joining it. MEASURED 2026-10-13, the day after the LIVE region was policed: TWELVE
+# index headings sat inside a region every face declares "NOT a register" while claiming exactly that, and two
+# restated a count that had drifted - DECISION-LOG `## 🟢 ACTIVE — in effect (477)` against 565 ACTIVE in the
+# register, and `## ⚪ DONE / CLOSED — bottom (97)` against 348 closed (resolved 313 + superseded 16 + archived
+# 8 + rejected 11). A count has ONE home (BUG-588/D-2642) - the derived block above - and the index the owner
+# navigates by must say what it IS: a hand index, joined on every run of the rail, and NOT the authority.
+# The shape that discriminates is the LEADING token: `## 🔴 OPEN — MUST` and `## 🟢 ACTIVE` are INDEX headings
+# (heading, then rows), while `## BUG-331 (MED, OPEN)` is a RECORD heading - the register's own status slot,
+# scripts/bug_status.py's surface. MEASURED the same day: a word-ANYWHERE form of this rule fires on 399 record
+# headings in buglog.md, so the rule reads the leading token ONLY. `face_hand_index_token` is the string every
+# such heading must carry (one home for the string, C12: never a literal in the rail).
+face_index_head_tokens: [MUST, SHOULD, WORTH, OPEN, CLOSED, ACTIVE, DONE, PENDING, RESOLVED, PROPOSED, SUPERSEDED, ARCHIVED, REJECTED, DEFERRED]
+face_hand_index_token: 'HAND INDEX'
+# The DECLARATION an index heading owes, as a regex (C12: never a literal in the rail). TWO shapes are already
+# true of a heading below the marker and both name the authority, so both are accepted: the repair this act
+# writes ("HAND INDEX, not a register (the DERIVED block above is the ONE authority ...)") and the D-2984
+# snapshot form the faces already carry ("SNAPSHOT 2026-10-03 - dated history; the DERIVED index at the top owns
+# the current state"). MEASURED 2026-10-13, the first run of the limb: DECISION-LOG.md:205
+# `### Pending from registry (SNAPSHOT 2026-10-03 - dated history; the DERIVED index at the top owns the current
+# state, D-2984)` was the ONLY fault, and it was a fault of the RULE, not of the face - it already declares.
+face_head_declaration_re: '(?:HAND\s+INDEX|DERIVED\s+(?:block|index))'
 # BUG-757 ceiling, RE-MEASURED 2026-10-13 (D-2985). The population is now the CENSUS's open ids (ONE home
 # for OPEN-ness, D-2642) and a severity is read from the id's FIRST heading at ANY hash depth (the
 # BUG-426/427 class: three-hash headings were invisible to a `^## ` reader). Under that join the gap is

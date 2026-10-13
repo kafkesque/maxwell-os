@@ -27,6 +27,13 @@ Scope discipline (why it will not false-positive on append-only history): FIVE s
       RESOLVED). Its scope rule is the whole reason it cannot false-positive on history: a claim's moment is
       its section heading (table rows) or its date-stamped entry (prose), both of which the append-only files
       already carry - so the rule reports ZERO faults in buglog.md and NO history byte was rewritten.
+  (6) the LIVE region ABOVE the marker (D-2985, BUG-762): the label that points at the current state, a file a
+      live claim names, and the OWNER LANE the register's own task axes require the face to LEAD with.
+  (7) the HEADINGS between the two regions (D-2986, BUG-761): a heading that LEADS with a tier/state token is an
+      INDEX heading, and below the marker it must declare WHAT IT IS - a HAND INDEX, row-joined and never the
+      authority - and may not carry a count (a count has ONE home, BUG-588/D-2642). MEASURED 2026-10-13: twelve
+      such headings sat inside the region every face declares "NOT a register" while claiming a current state,
+      two of them restating a count that had drifted (477 against 565 ACTIVE; 97 against 348 closed).
 
 Exit: 0 all faces agree with the registers | 1 a face contradicts a register (fail closed).
 """
@@ -119,11 +126,13 @@ LIVE_PATH_RE = re.compile(
 
 
 def gov_sync_config() -> dict:
-    """The owner-lane label and the task axes - ONE home (config/gov_sync.yaml), never a literal here (C12)."""
+    """The owner-lane label, the task axes and the heading rule - ONE home (config/gov_sync.yaml), never a
+    literal here (C12)."""
     doc = yaml.safe_load(GOV_SYNC_CFG.read_text(encoding="utf-8")) or {}
-    for key in ("face_owner_lane_label", "task_movers"):
+    for key in ("face_owner_lane_label", "task_movers", "face_index_head_tokens", "face_hand_index_token",
+                "face_head_declaration_re"):
         if key not in doc:
-            raise SystemExit(f"FAIL-CLOSED (C16): {GOV_SYNC_CFG.name} declares no {key!r} (D-2985)")
+            raise SystemExit(f"FAIL-CLOSED (C16): {GOV_SYNC_CFG.name} declares no {key!r} (D-2985/D-2986)")
     return doc
 
 
@@ -160,6 +169,57 @@ def live_faults(path: Path, lines: list[str], cfg_d: dict, owner_moved: int) -> 
             if not (REPO / rel).exists():
                 problems.append(f"{path.name}:{n} cites {rel}, which does not exist - a citation whose subject is "
                                 f"absent is an assertion (D-405): cite the file that runs, or drop the citation")
+    return problems
+
+
+# ------------------------------------------------ D-2986: a HEADING is a claim
+# D-2984 policed the ROWS and the prose of the declared history region; D-2985 policed the LIVE region above
+# the marker. MEASURED 2026-10-13 (BUG-761 - the residual both acts deliberately left, because a fix had to
+# come with a join for the tier LABELS or not at all): the HEADINGS between the two regions were policed by
+# nothing. Twelve of them sat below the marker claiming a CURRENT state inside a region the face declares
+# "NOT a register", and two restated a count that had drifted:
+#   DECISION-LOG.md:241  `## 🟢 ACTIVE — in effect (477)`   vs 565 ACTIVE in config/decisions.yaml
+#   DECISION-LOG.md:295  `## ⚪ DONE / CLOSED — bottom (97)` vs 348 closed (resolved 313 + superseded 16 +
+#                                                            archived 8 + rejected 11)
+# A count restated in prose is stale the moment it is written (BUG-588); a count has ONE home, the derived
+# block (D-2642). The shape that discriminates an INDEX heading from a RECORD heading is the LEADING token:
+# `## 🔴 OPEN — MUST` and `## 🟢 ACTIVE` are heading-then-rows indexes, while `## BUG-331 (MED, OPEN)` leads with
+# the ID and is the register's own status slot (scripts/bug_status.py's surface). MEASURED the same day: a
+# word-ANYWHERE form of this rule fires on 399 record headings in buglog.md, so the rule reads the leading token
+# ONLY. What the heading owes when it leads with one: it must SAY what it is - a HAND INDEX, non-authoritative -
+# because the owner navigates by these sections and a heading that models the register without being joined to
+# it is the thing this file exists to refuse.
+HEAD_COUNT_RE = re.compile(r"\(\s*\d[\d,]*\s*\)")
+
+
+def heading_faults(path: Path, lines: list[str], cfg_d: dict) -> list[str]:
+    """D-2986: the HEADINGS below the marker. An INDEX heading (one that LEADS with a declared tier/state token
+    after any icon/emphasis) must (1) carry the declared HAND INDEX token - it is not the authority for the
+    current state, and it says so - and (2) carry no count, because a count has ONE home (BUG-588/D-2642).
+    Two limbs, each with its repair; nothing is deleted, because the rows below such a heading are already
+    joined (D-2984's decision-row join, scripts/bug_status.py's record headings, check_buglog_tiers)."""
+    start = history_start(lines)
+    tokens = [str(t) for t in cfg_d["face_index_head_tokens"]]
+    token = str(cfg_d["face_hand_index_token"])
+    declare = re.compile(str(cfg_d["face_head_declaration_re"]), re.IGNORECASE)
+    head = re.compile(r"^\s*#{1,6}\s*(?:[^\w\s]{1,3}\s*)*(?:[*_`]{0,2}\s*)*"
+                      r"(?:" + "|".join(re.escape(t) for t in tokens) + r")\b", re.IGNORECASE)
+    problems: list[str] = []
+    for i in range(start, len(lines)):
+        line = lines[i]
+        if not head.match(line):
+            continue
+        n = i + 1
+        if not declare.search(line):
+            problems.append(
+                f"{path.name}:{n} is an INDEX heading naming a current state inside the region this face "
+                f"declares makes no live claim: declare it a {token} - non-authoritative, row-joined, with the "
+                f"DERIVED block above as the ONE authority for the current state (D-2986)")
+        m = HEAD_COUNT_RE.search(line)
+        if m:
+            problems.append(
+                f"{path.name}:{n} restates the count {m.group(0)} in a heading - a count has ONE home, the "
+                f"derived block above (BUG-588/D-2642): drop it from the label (D-2986)")
     return problems
 
 
@@ -562,6 +622,33 @@ def _selftest_live_region(cfg_d: dict) -> list[tuple[str, bool]]:
     ]
 
 
+def _selftest_heading_claims(cfg_d: dict) -> list[tuple[str, bool]]:
+    """D-2986: the INDEX heading's two requirements, in BOTH directions (BUG-492)."""
+    marker = "<!-- GOV-HISTORY:START (D-2981/D-2986) -->"
+    ok = "## 🔴 OPEN — MUST (data integrity) — HAND INDEX (not a register; the DERIVED block above owns it)"
+
+    def faults(body: list[str]) -> list[str]:
+        return heading_faults(Path("FACE.md"), [marker] + body, cfg_d)
+
+    return [
+        ("an INDEX heading that names a current state and declares nothing must fire",
+         len(faults(["## 🔴 OPEN — MUST (data integrity / correctness / safety)"])) == 1),
+        ("the same heading declaring itself a HAND INDEX makes no problem",
+         len(faults([ok])) == 0),
+        ("an INDEX heading restating a COUNT must fire (a count has one home)",
+         len(faults(["## 🟢 ACTIVE — in effect (477) — HAND INDEX"])) == 1),
+        ("the count-free form of that heading makes no problem",
+         len(faults(["## 🟢 ACTIVE — in effect — HAND INDEX"])) == 0),
+        ("the D-2984 SNAPSHOT form already declares the authority, so it stays quiet",
+         len(faults(["### Pending from registry (SNAPSHOT 2026-10-03 — dated history; the DERIVED index at the "
+                     "top owns the current state, D-2984)"])) == 0),
+        ("a per-bug RECORD heading is the register's own status slot, not an index heading",
+         len(faults(["## BUG-331 — Serving-gate write to the production DB (MED, OPEN)"])) == 0),
+        ("a tier heading ABOVE the marker is the live tier heading, not a history claim",
+         len(heading_faults(Path("FACE.md"), ["## 🔴 OPEN — MUST", marker], cfg_d)) == 0),
+    ]
+
+
 def _selftest_live_census_regex() -> bool:
     m = LIVE_CENSUS_RE.search(
         "Register: 993 decisions · 434 bugs (162 open / 272 closed; highest OPEN = BUG-670).")
@@ -629,6 +716,8 @@ def selftest() -> int:
         *_selftest_history_faults(),
         # D-2985: the LIVE region (above the marker) - the surface the owner actually opens.
         *_selftest_live_region(gov_sync_config()),
+        # D-2986: the HEADINGS between the two regions - the surface that named a state with nothing joining it.
+        *_selftest_heading_claims(gov_sync_config()),
     ]
     for name, ok in rows:
         print(("  ok  " if ok else "  !!  ") + name)
@@ -662,11 +751,13 @@ def main(argv: list[str] | None = None) -> int:
         problems.extend(check_live_census(face, bug, dec))
         problems.extend(history_faults(face, face_lines, states, closed, known))
         problems.extend(live_faults(face, face_lines, sync_cfg, owner_moved))
+        problems.extend(heading_faults(face, face_lines, sync_cfg))
     if BUGLOG_FACE.exists():
         problems.extend(check_buglog_tiers(BUGLOG_FACE, open_ids, known))
         blog_lines = BUGLOG_FACE.read_text(encoding="utf-8").splitlines()
         problems.extend(history_faults(BUGLOG_FACE, blog_lines, states, closed, known))
         problems.extend(live_faults(BUGLOG_FACE, blog_lines, sync_cfg, owner_moved))
+        problems.extend(heading_faults(BUGLOG_FACE, blog_lines, sync_cfg))
     else:
         problems.append(f"{BUGLOG_FACE.name}: missing face (cannot check what is not there)")
     if problems:
@@ -674,9 +765,9 @@ def main(argv: list[str] | None = None) -> int:
         for p in problems:
             print("  " + p)
         return 1
-    print("ok governance-faces: bug-status table rows, header/live census, the history claim surface and the "
-          "LIVE region agree with the register (" + str(len(FACES)) + " restatement face(s) + buglog tiers, "
-          + str(len(known)) + " bug ids, " + str(owner_moved) + " owner-moved task(s))")
+    print("ok governance-faces: bug-status table rows, header/live census, the history claim surface, the "
+          "LIVE region and the INDEX headings agree with the register (" + str(len(FACES)) + " restatement "
+          "face(s) + buglog tiers, " + str(len(known)) + " bug ids, " + str(owner_moved) + " owner-moved task(s))")
     return 0
 
 

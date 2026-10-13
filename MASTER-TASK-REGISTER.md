@@ -11,11 +11,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1113 decisions (census stamp a2bcb9e7201140fb, 2026-10-13) · 528 bugs (185 open / 343 closed; highest OPEN = BUG-761) · 14 open tasks (MUST 3 / SHOULD 8 / WORTH 3; OWNER-moved 3, pipeline-moved 11; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1114 decisions (census stamp 09e1c567a49c1ce7, 2026-10-13) · 528 bugs (184 open / 344 closed; highest OPEN = BUG-757) · 13 open tasks (MUST 3 / SHOULD 7 / WORTH 3; OWNER-moved 3, pipeline-moved 10; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **67** of 1113 — open 32 · proposed 14 · draft 1 · deferred 14 · planned 6 | in effect (active) 565 | closed: resolved 313, superseded 16, archived 8, rejected 11
+> Decisions NEEDING ACTION: **67** of 1114 — open 32 · proposed 14 · draft 1 · deferred 14 · planned 6 | in effect (active) 565 | closed: resolved 314, superseded 16, archived 8, rejected 11
 >
-> Open BUGS by severity (population = the census's 185 open ids; severity read from each id's FIRST heading at ANY hash depth): CRITICAL 4 · HIGH 22 · MED 39 · LOW 19 · UNLABELLED 101 (BUG-757) of 185 open.
+> Open BUGS by severity (population = the census's 184 open ids; severity read from each id's FIRST heading at ANY hash depth): CRITICAL 4 · HIGH 22 · MED 38 · LOW 19 · UNLABELLED 101 (BUG-757) of 184 open.
 >
 > **OWNER LANE (3) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -25,7 +25,7 @@
 > | T-103 | MUST | BUG-749 residual — the label re-derivation debt the census names (OWNER-RULED rows are store-write-owed) | the owner word that licenses the store write |
 > | T-107 | SHOULD | MCP payload decision — borp_score / feedback_score are still advertised to agents | owner word on the payload schema |
 >
-> **PIPELINE LANE (11) — what the agent will do next, in strategic-consequential order (source: config/task_register.yaml):**
+> **PIPELINE LANE (10) — what the agent will do next, in strategic-consequential order (source: config/task_register.yaml):**
 >
 > | id | pri | state | task | evidence |
 > |---|---|---|---|---|
@@ -36,7 +36,6 @@
 > | T-112 | SHOULD | open | PERF - the SERVED path loads the cross-encoder per PROCESS, so short-lived callers pay a cold-start of minutes | suite rail runtime 100-200s -> >210s after the dispatcher became the CLI default (2026-10- |
 > | T-113 | SHOULD | open | PAY THE BASELINE the honest instrument REVEALED - the 71 keys behind block aliases, module by module, each wit | config/config_defaults_census.json after D-2982: 300 shadowed-declared keys / 568 sites (2 |
 > | T-114 | SHOULD | open | DISCHARGE THE INHERITED LADDER FAULTS - four lines were RED before D-2982 and the prefix report hid them | just health-full 2026-10-13: 7 faults / 128 lines; each rc=1 at 42f8b76^ (worktree). RE-ME |
-> | T-115 | SHOULD | open | BUG-761 — decide what a HAND TIER means inside the region the faces declare to be history | governance/buglog.md BUG-761; DECISION-LOG.md "## 🟢 ACTIVE — in effect (477)" vs 565 ACTIV |
 > | T-109 | WORTH | open | spec/test sandbox — adopt the two mechanisms borrowed from impeccable / shadcn-ui-lint | specs/README.md (sandbox charter, prior art) |
 > | T-110 | WORTH | open | BUG-756 — the census restatement is hand-written | scripts/gov_sync.py --check rc=0 after --apply (2026-10-13) |
 > | T-111 | WORTH | open | BUDGET — the reviewer can only review WHOLE files under 100,000 chars; stage4_merge.py and stage2_extract.py e | r5_review_gate.yaml max_source_chars vs the two module sizes (2026-10-12) |
@@ -67,7 +66,7 @@
 > **Open bugs, most severe first:** BUG-297 · BUG-299 · BUG-305 · BUG-712 · BUG-300 · BUG-301 · BUG-303 · BUG-304 · BUG-306 · BUG-312 · BUG-318 · BUG-341.
 <!-- GOV-INDEX:END -->
 
-<!-- GOV-HISTORY:START (D-2981) - everything below is DATED HISTORY: append-only, NOT a register -->
+<!-- GOV-HISTORY:START (D-2981/D-2986) - below this line a face makes NO LIVE CLAIM: the INDEX sections are declared HAND INDEXES (row-joined on every run of the rail, never the authority) and the rest is DATED HISTORY (append-only). The DERIVED block above is the ONE authority for the current state. -->
 
 
 > **SNAPSHOT 2026-10-12 (dated history — the DERIVED index at the top of this file owns the current state; D-2984).**
@@ -309,7 +308,7 @@
 
 ---
 
-## 🟠 SHOULD — open
+## 🟠 SHOULD — open — HAND INDEX, not a register (the DERIVED block above is the ONE authority; rows joined on every run, D-2986)
 
 0. **ANCHOR-EVAL COVERAGE (logged 2026-09-14, D2634 follow-up).** Grow the verified anchor (`gold_4axis`) to **≥10–20 verified examples per discipline** so macro-F1 measurement stops bouncing. Currently **35/57 disciplines have ≤3 eval rows** — with 1–3 examples a class's F1 is 0/33/67/100% (coin-flip), so the macro-F1 average is unstable *even if the classifier doesn't change*. This is an **EVAL-TRUST task (trustworthy grade), NOT an accuracy task** — growing the anchor doesn't make the classifier smarter, it makes the score meaningful. Sources to seed it: the 190 incomplete rows (`scripts/audit_human_verification.py` → `governance/remaining_verification_audit.csv`: 135 depth+disc+dom, 33 disc+dom, 14 depth, 8 other) + 106 stale-label rows (complete but `verification_status` still "pending-human"), the 59 queue re-vote (D2631, now partially applied), and targeted-ingestion output (D2607-D). Target ≈ 10–20 ex/discipline × 61 ≈ **600–1,200 verified principle rows** (today: 234 rows / 57 disciplines).
 
@@ -337,7 +336,7 @@
 
 21. **D2440** — S5 verifier calibration experiment (AlignScore 355M + MiniCheck EMNLP-2024 vs DeBERTa-v3-large via `pipeline/calibrate.py` + `nli_calibrate.py`). BLOCKED: `evals/nli_golden.jsonl` not committed → threshold non-reproducible. Adopt only if F1 materially > 0.484 AND fail-closed (D2093) preserved.
 
-## 🟡 WORTH — open (later / after measurement)
+## 🟡 WORTH — open (later / after measurement) — HAND INDEX, not a register (the DERIVED block above is the ONE authority; rows joined on every run, D-2986)
 
 22. **T-S1** — S1 contextual embeddings adopt-vs-gate decision.
 23. **T-S3** — S3 HyDE A/B run.
@@ -358,7 +357,7 @@
 
 ---
 
-## ✅ DONE — bottom (recent, resolved this/prior sessions)
+## ✅ DONE — bottom (recent, resolved this/prior sessions) — HAND INDEX, not a register (the DERIVED block above is the ONE authority; rows joined on every run, D-2986)
 
 - **0a/0b/0c — SERVING GATE + RETRIEVAL FACET + WRITE-GUARD SPLIT (2026-09-19, later session)** — (0a) `scripts/apply_serving_gate.py` is the single writer for `status` (derived from `verification_results[factual].passed` + typed `s5_reason` in new `fbs.s5_reason` column; label-derived status writes removed from the 4 label scripts; CI invariant in `pipeline/serving_gate.py` + 15 tests). Applied PASS 4,745 → 3,299 (de-served 1,941 + 11 duplicates; restored 506); 0 invariant violations; duplicates hard-quarantined (`duplicate_of` → QUARANTINE/`duplicate`). (0b) facet predicate in every retrieval leg + asserted on the fused pool (`_facet_conditions`/`_matches_facet` in `pipeline/retrieve.py`); constraint-violation rate **0.5911 → 0.0000**. (0c) write guard split into row guard (`validate_discipline_domain`) + vocabulary lint (`lint_discipline_domain_vocabulary`); `research methodology` now writes clean. Closed BUG-276/285/286/299/300/302; gates G12/G17/G18. ✅
 - **BUG-276 — DB backup restored (2026-09-19)** — `pipeline/backup_guardian.sh` repointed at the SQLite DB (consistent `.backup` + integrity-check), was rsync-ing non-existent markdown dirs. ✅

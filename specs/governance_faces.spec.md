@@ -2,7 +2,7 @@
 
 spec_version: 1
 governed: scripts/check_governance_faces.py (the rail: --selftest is its own oracle, the check is the ladder's line) · scripts/gov_sync.py (the faces' ONE writer, whose census re-cut is scoped by INV-13) · DECISION-LOG.md · MASTER-TASK-REGISTER.md · governance/buglog.md (the three faces' declared history regions AND their live regions) · config/decisions.yaml + governance/bug_status.json (the registers a claim is joined to) · config/task_register.yaml (the register that says WHO must move each task) · config/gov_sync.yaml (the declared labels and axes) · config/rail_mutations.yaml (the rules' mutation locks) · justfile#health (where the rails and their controls stand)
-authority: D-2985 (the LIVE region is a claim surface - this rule) · D-2984 (the HISTORY region is a claim surface - its mirror) · D-2981/R-1 (the faces are DERIVED, never hand-appended) · D-2642 (one derived value, one home) · D-2660 (a citation is a claim about the tree at the MOMENT OF MINT) · D-405 (a declaration whose subject is absent is an assertion) · BUG-588/D-2692 (a count restated in prose is stale) · BUG-669 (the predecessor: the rail read tables and marker lines, never prose) · BUG-760 (measured: the faces told the owner a closed decision was still pending) · BUG-761 (measured: a dangling citation in a declared-history region) · BUG-762 (measured: the live region was unpoliced) · R-D410 (append-only history) · BUG-492 (a detector nobody has seen fail is not a detector) · C12/C16/C19
+authority: D-2985 (the LIVE region is a claim surface - this rule) · D-2986 (a HEADING is a claim - the region between the two) · D-2984 (the HISTORY region is a claim surface - its mirror) · D-2981/R-1 (the faces are DERIVED, never hand-appended) · D-2642 (one derived value, one home) · D-2660 (a citation is a claim about the tree at the MOMENT OF MINT) · D-405 (a declaration whose subject is absent is an assertion) · BUG-588/D-2692 (a count restated in prose is stale) · BUG-669 (the predecessor: the rail read tables and marker lines, never prose) · BUG-760 (measured: the faces told the owner a closed decision was still pending) · BUG-761 (measured: the region declared NOT a register carried twelve headings that claimed a current state, two of them restating a count) · BUG-762 (measured: the live region was unpoliced) · R-D410 (append-only history) · BUG-492 (a detector nobody has seen fail is not a detector) · C12/C16/C19
 stamp: 2026-10-13 · deterministic authoring (no LLM gen)
 status: each invariant is live-verified by tests/test_governance_faces_spec.py
 
@@ -148,3 +148,18 @@ says it FIRST.**
   derived) and the faces' own declaration that everything below the marker is dating-only history; D-2985
   resolves it in favour of the declaration.
 - **Test:** `test_the_census_recut_never_rewrites_history`.
+
+### INV-14 — A heading that names a current state says WHAT it is, and carries no count (D-2986)
+- **Correct:** `## 🔴 OPEN — MUST (data integrity / correctness / safety) — HAND INDEX, not a register (the
+  DERIVED block above is the ONE authority; rows joined on every run, D-2986)`. The heading names the state; the
+  rows under it are joined (a buglog tier row by `check_buglog_tiers`, a decision ROW by INV-7, a bug's own
+  RECORD heading by `scripts/bug_status.py`); and the number that belongs to the register is printed by the
+  derived block, which is re-derived on every run.
+- **Wrong:** `## 🟢 ACTIVE — in effect (477)` — MEASURED 2026-10-13 against 565 ACTIVE in the register — and
+  `## ⚪ DONE / CLOSED — bottom (97)` against 348 closed (resolved 313 + superseded 16 + archived 8 + rejected
+  11). Twelve such headings sat in the three faces, inside the very region each face declares "NOT a register":
+  a heading is a claim, and a count has ONE home (BUG-588/D-2642).
+- **Not the rule:** a word-ANYWHERE form was REFUSED by measurement on the day it was written — it fires on 399
+  RECORD headings in buglog.md (`## BUG-331 — … (MED, OPEN)`), which are the register's own status slot and
+  already joined by `scripts/bug_status.py`. The rule reads the LEADING token only: `heading, then rows`.
+- **Test:** `test_an_index_heading_declares_what_it_is_and_carries_no_count`.

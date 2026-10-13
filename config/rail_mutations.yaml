@@ -35,7 +35,7 @@ fixture:
   timeout_seconds: 600
 
 coverage:
-  min_mutations: 37            # FLOOR (shrink guard): deleting an entry means editing the floor in a diff a human reads (37 = 34 + the three D-2985 entries: the LIVE label limb, the mover axis, the re-cut scope)
+  min_mutations: 39            # FLOOR (shrink guard): deleting an entry means editing the floor in a diff a human reads (39 = 37 + the two D-2986 entries: a heading that names a current state must declare what it is, and a count has one home)
   # D-2679: the coverage set is DERIVED, never restated. Which rails gate a COMMIT is one fact and it already has
   # ONE home (config/rail_registry.yaml#commit_boundary), so restating it here would be a SECOND HOME - and two
   # lists of one fact drift, and only one of them can be right. scripts/check_rail_mutations.py joins the two and
@@ -727,6 +727,47 @@ mutations:
       BUG-762: "MUST ... open" covered a rule that never closes, work only the OWNER can move, and work the
       pipeline will move. The mutant removes the requirement, so the control that names the rule is SEEN to
       fail rather than the number quietly moving.
+
+  # D-2986/BUG-761: a HEADING is a claim, and a count has ONE home. MEASURED 2026-10-13: twelve index
+  # headings sat inside the region every face declares "NOT a register" while claiming a current state, and two
+  # of them restated a count that had drifted (477 against 565 ACTIVE; 97 against 348 closed) with nothing
+  # joining them. The mutant silences the DECLARATION limb alone - the count limb keeps its own control - so the
+  # red isolates the rule rather than the reader (D-2676 iv).
+  - id: the_index_heading_declaration_limb_is_load_bearing
+    subject: scripts/check_governance_faces.py
+    op: replace
+    find: '        if not declare.search(line):'
+    replace: '        if False:  # MUTATION (D-2676): an index heading need not say what it is'
+    runner: scripts/check_governance_faces.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: '  !!  an INDEX heading that names a current state and declares nothing must fire'
+    why: >-
+      BUG-761/D-2986: a heading that LEADS with a tier or state token is an INDEX heading, and below the marker
+      it must declare that it is a HAND INDEX - non-authoritative, the derived block above being the ONE
+      authority - or it models the register without being joined to it. The mutant removes the requirement, so
+      the control that names the rule is SEEN to fail rather than the twelve headings quietly staying as they
+      were.
+
+  # D-2986/BUG-761: the COUNT limb - one question, one home (BUG-588/D-2642). MEASURED before the fix:
+  # DECISION-LOG.md:241 read `## 🟢 ACTIVE — in effect (477)` while config/decisions_summary.json held 565, and
+  # :295 read `## ⚪ DONE / CLOSED — bottom (97)` against 348 closed. The mutant silences the count check, so
+  # the control that names it is SEEN to be the thing that keeps a label from restating a register's number.
+  - id: the_index_heading_count_limb_is_load_bearing
+    subject: scripts/check_governance_faces.py
+    op: replace
+    find: '        m = HEAD_COUNT_RE.search(line)'
+    replace: '        m = None  # MUTATION (D-2676): a heading may restate a count'
+    runner: scripts/check_governance_faces.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: '  !!  an INDEX heading restating a COUNT must fire (a count has one home)'
+    why: >-
+      BUG-588/D-2642: a count restated in prose is stale the moment it is written, and a count a register owns
+      has ONE home - the derived block, which is re-derived from the registers on every run. Two labels had been
+      carrying their own number for ten days. The mutant makes the label's number unchecked again.
 
   # D-2985/BUG-763: the census re-cut has a SCOPE (R-D410). MEASURED before the fix: this writer was
   # re-cutting the counts inside the faces' SNAPSHOT lines to TODAY's value while the line still read "as

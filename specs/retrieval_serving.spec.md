@@ -2,7 +2,7 @@
 
 spec_version: 2
 governed: pipeline/retrieve.py · pipeline/retrieval_benchmark.py (the gate) · config/serving_call_sites.yaml (the call-site matrix)
-authority: D-2881 (canonical-run pin) · D-2939 (name anchoring) · D-2537/D-2979 (quality ranking) · D-2724 (vector+rerank adopted) · D-2978 (spec-first) · D-2980 (one dispatcher, measured) · BUG-710
+authority: D-2881 (canonical-run pin) · D-2939 (name anchoring) · D-2979 (quality ranking; the record's own title spells it "D-2537", an id no record carries) · D-2724 (vector+rerank adopted) · D-2978 (spec-first) · D-2980 (one dispatcher, measured) · BUG-710
 stamp: 2026-10-13 · deterministic authoring (no LLM gen)
 status: owner-ratified spec-first direction; each invariant is live-verified by tests/test_retrieval_serving_spec.py
 
@@ -35,8 +35,8 @@ its test module; history lives in git plus the D-number that changed it.
 - **Failure it prevents:** stale FBs competing at rank 1-2; dead KNN candidate slots.
 - **Status:** ✅ SATISFIED.
 
-### INV-3 — Ranking signal must not degenerate to a constant (D-2537 / D-2979)
-- **Correct:** the ORDER BY is the D-2537 fused quality score
+### INV-3 — Ranking signal must not degenerate to a constant (D-2979; the record's title spells it "D-2537")
+- **Correct:** the ORDER BY is the D-2979 fused quality score
   (COALESCE(confidence_score, 0.5) * weight + convergent boost + diversity boost), gated by
   ranking.quality_score_enabled: true, and it has ONE home (_rank_sql()).
 - **Why the fallback is wrong:** with the flag false, _rank_sql() returns "borp_score DESC" and

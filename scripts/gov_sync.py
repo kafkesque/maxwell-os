@@ -45,7 +45,10 @@ from lib.write_guard import OWNED_ANY, write_document  # noqa: E402
 CFG_PATH = REPO / "config/gov_sync.yaml"
 IDX_S = "<!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->"
 IDX_E = "<!-- GOV-INDEX:END -->"
-HIS = "<!-- GOV-HISTORY:START (D-2981) - everything below is DATED HISTORY: append-only, NOT a register -->"
+HIS = ("<!-- GOV-HISTORY:START (D-2981/D-2986) - below this line a face makes NO LIVE CLAIM: the INDEX "
+       "sections are declared HAND INDEXES (row-joined on every run of the rail, never the authority) and the "
+       "rest is DATED HISTORY (append-only). The DERIVED block above is the ONE authority for the current "
+       "state. -->")
 CENSUS_DEC = re.compile(r"\b\d+ decisions \(census stamp [0-9a-f]+, \d{4}-\d{2}-\d{2}\)")
 CENSUS_BUG = re.compile(r"\b\d+ bugs \(\d+ open / \d+ closed;")
 # The STAMP-LESS form (a face that restates the decision count without the census stamp - the shape

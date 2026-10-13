@@ -201,8 +201,15 @@ membership:
   # (`| D2537 | Ranking fix + raw-label facet (opt-in). |`, in the tier "ACTIVE - in effect") citing an id no
   # record carries - a citation whose subject is absent is an assertion (D-405) - and re-cited it to D-2979, the
   # record that holds the decision. The log therefore stops naming D2537, which is exactly the shrink this pin's
-  # own note prescribes. The id is still cited ONCE, in the register's own D-2979 title ("Enable D-2537 fused
-  # quality ranking"), and that residual dangling citation is filed as BUG-761 rather than carried as a pin.
+  # own note prescribes. CORRECTED 2026-10-13 (D-2986): the note claimed the id "is still cited ONCE" - it was
+  # cited in FOUR places, so the note was itself a stale restatement (BUG-588) and is replaced by the measured
+  # truth. What survives, and why each is not repaired here: (a) the register's OWN D-2979 title, which cites
+  # "D-2537" and CANNOT be rewritten - config/decisions.yaml is the append-only registry, so a mint title is a
+  # claim at the moment of mint (D-2660); (b) `specs/retrieval_serving.spec.md`, which now names D-2979 and
+  # records the legacy spelling instead of citing the absent id; (c) EIGHT code comments (pipeline/retrieve.py x5,
+  # pipeline/query.py x2, pipeline/pipeline_paths.py x1) that name the flag by the spelling the record's title
+  # uses - not face claims, and not edited inside a governance act under a pipeline write boundary. An ALIAS key
+  # was considered and REJECTED: no reader would consume it, and a declaration nothing reads is bloat (C19).
   legacy_orphan_ids: [D-271, D-272, D-275, D637]
   why: >-
     An id NAMED in the human log with no TOP-LEVEL record in the registry is the signature of BUG-587: the record

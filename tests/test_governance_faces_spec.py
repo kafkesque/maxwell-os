@@ -46,7 +46,7 @@ def test_the_spec_is_paired_1to1_with_its_contract() -> None:
     text = SPEC.read_text(encoding="utf-8")
     invariants = re.findall(r"(?m)^### (INV-\d+)", text)
     named = re.findall(r"\*\*Test:\*\*\s*`([a-z0-9_]+)`", text)
-    assert len(invariants) == len(named) == 13, "one invariant, one named test (D-2978)"
+    assert len(invariants) == len(named) == 14, "one invariant, one named test (D-2978)"
     for name in named:
         assert name in globals(), f"the spec names {name}, which the contract does not define"
 
@@ -135,7 +135,7 @@ def test_the_rule_is_mutation_locked_and_its_controls_run() -> None:
     """INV-9 (D-2676 iv): the mutation exists, is expected RED, and its find-text is in the bytes TODAY."""
     doc = yaml.safe_load((PROJECT_ROOT / "config" / "rail_mutations.yaml").read_text(encoding="utf-8"))
     entries = [e for e in doc.get("mutations", []) if e.get("subject") == "scripts/check_governance_faces.py"]
-    assert len(entries) == 2, "both claim surfaces (history and LIVE) must be mutation-locked, once each"
+    assert len(entries) == 4, "both claim surfaces (history and LIVE) and both heading limbs must be locked"
     for entry in entries:
         assert entry.get("expect") == "red"
         assert str(entry.get("marker", "")).strip()
@@ -203,3 +203,36 @@ def test_the_census_recut_never_rewrites_history() -> None:
     out, n = mod._recut_census("live 99 decisions (census stamp 27, 1999-01-01)\n" + mod.HIS + "\n" + tail, "", {}, x)
     assert n >= 1 and out.endswith(tail), "the history region must survive the re-cut BYTE-IDENTICAL (R-D410)"
     assert "7 decisions (census stamp deadbeefdeadbeef, 2026-01-02)" in out, "the live region must be re-cut"
+
+
+# ------------------------------------------------------------------ D-2986: the HEADINGS between the two regions
+HEAD_CFG = {k: SYNC_CFG[k] for k in ("face_index_head_tokens", "face_hand_index_token",
+                                     "face_head_declaration_re")}
+
+
+def heads(body: list[str]) -> list[str]:
+    """The rail's heading rule, driven with a synthetic face body below a real marker."""
+    return rail.heading_faults(Path("FACE.md"), [MARKER] + body, HEAD_CFG)
+
+
+def test_an_index_heading_declares_what_it_is_and_carries_no_count() -> None:
+    """INV-14: a heading that LEADS with a tier/state token is an INDEX heading; below the marker it must say
+    what it is and may not restate a count. MEASURED 2026-10-13: twelve such headings, two of them carrying a
+    number the register had moved on from."""
+    # the shape that fired: an index heading naming a state, declaring nothing
+    assert len(heads(["## 🟢 ACTIVE — in effect (477)"])) == 2, "both limbs must fire on the measured shape"
+    # limb 1: the declaration. Both true shapes are accepted (the D-2984 snapshot form already names the authority)
+    assert heads(["## 🟢 ACTIVE — in effect — HAND INDEX, not a register (the DERIVED block above owns it)"]) == []
+    assert heads(["### Pending from registry (SNAPSHOT 2026-10-03 — the DERIVED index at the top owns it)"]) == []
+    # limb 2: the count. A count-free label is fine; the same label with a number is not (BUG-588/D-2642)
+    assert len(heads(["## 🟢 ACTIVE — in effect (477) — HAND INDEX, not a register"])) == 1
+    # NOT the rule: a RECORD heading is the register's own status slot (bug_status.py), not an index heading
+    assert heads(["## BUG-331 — Serving-gate write to the production DB (MED, OPEN)"]) == []
+    assert heads(["### BUG-254 - RESOLVED"]) == []
+    # and the live tier heading above the marker is not a history claim
+    assert rail.heading_faults(Path("FACE.md"), ["## 🔴 OPEN — MUST", MARKER], HEAD_CFG) == []
+    # the real faces: TODAY every index heading in the three faces declares itself, and none carries a count
+    for face in FACES:
+        lines = face.read_text(encoding="utf-8").splitlines()
+        bad = rail.heading_faults(face, lines, HEAD_CFG)
+        assert not bad, f"{face.name}: {bad}"

@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1113 decisions (census stamp a2bcb9e7201140fb, 2026-10-13) · 528 bugs (185 open / 343 closed; highest OPEN = BUG-761) · 14 open tasks (MUST 3 / SHOULD 8 / WORTH 3; OWNER-moved 3, pipeline-moved 11; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1114 decisions (census stamp 09e1c567a49c1ce7, 2026-10-13) · 528 bugs (184 open / 344 closed; highest OPEN = BUG-757) · 13 open tasks (MUST 3 / SHOULD 7 / WORTH 3; OWNER-moved 3, pipeline-moved 10; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **67** of 1113 — open 32 · proposed 14 · draft 1 · deferred 14 · planned 6 | in effect (active) 565 | closed: resolved 313, superseded 16, archived 8, rejected 11
+> Decisions NEEDING ACTION: **67** of 1114 — open 32 · proposed 14 · draft 1 · deferred 14 · planned 6 | in effect (active) 565 | closed: resolved 314, superseded 16, archived 8, rejected 11
 >
-> Open BUGS by severity (population = the census's 185 open ids; severity read from each id's FIRST heading at ANY hash depth): CRITICAL 4 · HIGH 22 · MED 39 · LOW 19 · UNLABELLED 101 (BUG-757) of 185 open.
+> Open BUGS by severity (population = the census's 184 open ids; severity read from each id's FIRST heading at ANY hash depth): CRITICAL 4 · HIGH 22 · MED 38 · LOW 19 · UNLABELLED 101 (BUG-757) of 184 open.
 >
 > **OWNER LANE (3) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -22,7 +22,7 @@
 > | T-103 | MUST | BUG-749 residual — the label re-derivation debt the census names (OWNER-RULED rows are store-write-owed) | the owner word that licenses the store write |
 > | T-107 | SHOULD | MCP payload decision — borp_score / feedback_score are still advertised to agents | owner word on the payload schema |
 >
-> **PIPELINE LANE (11) — what the agent will do next, in strategic-consequential order (source: config/task_register.yaml):**
+> **PIPELINE LANE (10) — what the agent will do next, in strategic-consequential order (source: config/task_register.yaml):**
 >
 > | id | pri | state | task | evidence |
 > |---|---|---|---|---|
@@ -33,7 +33,6 @@
 > | T-112 | SHOULD | open | PERF - the SERVED path loads the cross-encoder per PROCESS, so short-lived callers pay a cold-start of minutes | suite rail runtime 100-200s -> >210s after the dispatcher became the CLI default (2026-10- |
 > | T-113 | SHOULD | open | PAY THE BASELINE the honest instrument REVEALED - the 71 keys behind block aliases, module by module, each wit | config/config_defaults_census.json after D-2982: 300 shadowed-declared keys / 568 sites (2 |
 > | T-114 | SHOULD | open | DISCHARGE THE INHERITED LADDER FAULTS - four lines were RED before D-2982 and the prefix report hid them | just health-full 2026-10-13: 7 faults / 128 lines; each rc=1 at 42f8b76^ (worktree). RE-ME |
-> | T-115 | SHOULD | open | BUG-761 — decide what a HAND TIER means inside the region the faces declare to be history | governance/buglog.md BUG-761; DECISION-LOG.md "## 🟢 ACTIVE — in effect (477)" vs 565 ACTIV |
 > | T-109 | WORTH | open | spec/test sandbox — adopt the two mechanisms borrowed from impeccable / shadcn-ui-lint | specs/README.md (sandbox charter, prior art) |
 > | T-110 | WORTH | open | BUG-756 — the census restatement is hand-written | scripts/gov_sync.py --check rc=0 after --apply (2026-10-13) |
 > | T-111 | WORTH | open | BUDGET — the reviewer can only review WHOLE files under 100,000 chars; stage4_merge.py and stage2_extract.py e | r5_review_gate.yaml max_source_chars vs the two module sizes (2026-10-12) |
@@ -64,10 +63,10 @@
 > **Open bugs, most severe first:** BUG-297 · BUG-299 · BUG-305 · BUG-712 · BUG-300 · BUG-301 · BUG-303 · BUG-304 · BUG-306 · BUG-312 · BUG-318 · BUG-341.
 <!-- GOV-INDEX:END -->
 
-<!-- GOV-HISTORY:START (D-2981) - everything below is DATED HISTORY: append-only, NOT a register -->
+<!-- GOV-HISTORY:START (D-2981/D-2986) - below this line a face makes NO LIVE CLAIM: the INDEX sections are declared HAND INDEXES (row-joined on every run of the rail, never the authority) and the rest is DATED HISTORY (append-only). The DERIVED block above is the ONE authority for the current state. -->
 
 
-## 🔴 OPEN — MUST (data integrity / correctness / safety)
+## 🔴 OPEN — MUST (data integrity / correctness / safety) — HAND INDEX, not a register (the DERIVED block above is the ONE authority; rows joined on every run, D-2986)
 
 | Bug | Date | Issue |
 |---|---|---|
@@ -84,11 +83,10 @@
 | BUG-638 | 2026-10-05 | **`governance/METRICS.jsonl` append-only journal TRUNCATED 817→70 lines (747 samples lost) between 2026-09-27 and 2026-10-03 — undocumented; no rotation logic exists (`emit_metric` opens `"a"` append).** The metric `claim_shape_gate_f1` (still declared in `config/resolution_domains.yaml` + `config/claim_shape_instrument.yaml`) was absent from the truncated journal. Violates C6 (crash-safe writes), C13 (backup after batch writes), R-D410 (never delete pipeline output). **RESTORED 2026-10-05:** HEAD 817 + 70 new 2026-10-03 lines re-joined → 887 lines / 6 metric names, crash-safe write. **OPEN — root cause UNCONFIRMED:** no truncate/rotate/unlink of METRICS found in scripts/; add a shrink-only floor guard so a future truncation is caught (BUG-487 class, fail-closed on a journal that shrinks). **FIXED 2026-10-05:** `emit_metric` now reads a record-count floor (`governance/METRICS.jsonl.floor`, crash-safe tempfile→fsync→os.replace), fails-closed if the journal shrank below it, fsyncs the append, and re-writes the floor. R5 gemma APPROVE; shrink-guard test PASS (truncation detected). | |
 | BUG-267 | 2026-09-17 | **The `min_human_share` floor metric is a substring classifier, and "human" provenance is semantically ambiguous — so the floors are measured against an UNKNOWN denominator.** `scripts/audit_eval_integrity.py::_tier()` returns HUMAN when the source string contains `human` OR `locked`, and checks that BEFORE `frontier`. Therefore `p5:human-frontier69` (48 cells across the anchor, incl. 7 content_type + 16 domains) is counted as a HUMAN label although its own name says *frontier*. Separately, the operator confirms that some labels recorded as `p5:human-*` were produced by *reviewing a frontier model's suggestion* (kimi / deepseek / claude), not by independent blind human adjudication — i.e. the source string cannot distinguish **human-decided** from **human-ratified-a-model-output**. CONSEQUENCE: the published human shares (content_type 0.116, discipline 0.347, depth 0.526, domains 0.920) are UPPER BOUNDS, and the anchoring bias of see-then-confirm makes the true figure plausibly lower still. Blast radius: the floor gate `AXB.axis_human_share` and the priority decision that rests on it. FIX: (a) make `_tier()` an exact-match allow-list read from config (no substring tests); (b) split provenance into `human-blind` vs `human-ratified-model` and count only the former as HUMAN; (c) re-measure the floors; (d) all FUTURE human adjudication must be **blind** — the model's proposed label is hidden until the human verdict is recorded. See F-16. | |
 
-## 🟠 OPEN — SHOULD
+## 🟠 OPEN — SHOULD — HAND INDEX, not a register (the DERIVED block above is the ONE authority; rows joined on every run, D-2986)
 
 | Bug | Date | Issue |
 |---|---|---|
-| BUG-761 | 2026-10-13 | **The region a face declares "NOT a register" still carries hand TIERS and a drifted tier count: the `GOV-HISTORY:START` marker sits after the derived block, which is inside the FIRST tier, so SHOULD/WORTH/DONE (MTR) and the OPEN/CLOSED tiers (buglog) all fall BELOW it — and `## 🟢 ACTIVE — in effect (477)` states 477 while the register holds 565 ACTIVE, a count the header-census surface cannot see. Plus a dangling citation: the register's D-2979 title cites "D-2537" and a face row cited `D2537`; no such record exists (D-405). Routed to T-115 (found by D-2984/BUG-760).** |
 
 | BUG-681 | 2026-10-08 | **`just health-full` = the ladder's WHOLE fault set. Round 2 measured 6; round 3 measures `FAIL ladder scan: 3 fault(s) in ONE pass` over 118 lines (503s), worst rc=1 (D-2680/BUG-573). FIXED so far: the unparsed buglog heading, the missing archive-index entry, and `check_undeclared_encoding`. THE 3 REMAINING: (a) `check_tests --check` = 3 red contract tests outside a declared-red=0 ceiling, incl. `test_s4_golden_conforms_to_ontology` (a golden set that does not conform to the ontology) - pre-existing, attributed away from the ANCHOR work by grep; (b) `check_encoding_homes --check` is now CLEAN (debt 0 of ceiling 0) — `scripts/remap_referee_v7_28rows.py` already reads the CSV via `artifact_encoding.open_artifact(CSV, ROOT)` (D-2644/D-2646 single decode home), so the `just health` prefix is UNBLOCKED; (c) `check_boundary_rehearsal` rc=1, newly diagnosed: `bootstrap.whole_tree_refused: refused (rc=1) but not for the declared reason 'FORBIDDEN session plan' (RAIL 4) - a refusal that does not name its cause cannot justify a bypass` - i.e. a whole-tree commit is still refused, but by a DIFFERENT rail than the declared one, so either the declared marker is stale or an earlier rail now refuses; do NOT hand-edit the declared reason (that hides the drift) - retain the fixture and print the ACTUAL refusal text. (b) RESOLVED 2026-10-09. Diagnose (a) and (c) now: the `just health` prefix is unblocked.** |
 | BUG-242 | 2026-09-11 | **frontier69_v2 + extension80 audit outputs carry 2 data-quality defects.** (1) The `*_verdict` fields (depth/discipline/domains) are LLM SELF-REPORTS, not computed comparisons — they claim `override` even when the audit value equals silver (e.g. `S4-GOLD-MINED-00005` domains identical yet `domains_verdict=override`), so the cited "57.5% domain-override" and "80 flagged" figures are inflated. (2) Non-principle content_type rows (noise_drop/tool_instruction/process_template/process_instance/growth_edge) carry a spurious 4-way depth label, violating D2612 (depth only for principle). FIX (applied in `scripts/build_phase0_adjudication_form.py`): agreement recomputed deterministically (`differs` flag) + depth marked N/A for non-principle. REMAINS: recompute the override figures from the audit values (deterministic), and re-run the audit to null depth on non-principle if the raw artifacts are kept. |
@@ -100,7 +98,7 @@
 | BUG-159 | 2026-08-21 | prompt-injection contamination (cluster_11649, 0.007%) |
 | BUG-160 | 2026-08-21 | evidence-passage topical relevance not verified (1/30 drift sample cites carbon passage for maternal-health FB) |
 
-## 🟡 OPEN — WORTH
+## 🟡 OPEN — WORTH — HAND INDEX, not a register (the DERIVED block above is the ONE authority; rows joined on every run, D-2986)
 
 | Bug | Date | Issue |
 |---|---|---|
@@ -112,7 +110,8 @@
 
 ---
 
-## ✅ CLOSED / RESOLVED — bottom (recent)
+## ✅ CLOSED / RESOLVED — bottom (recent) — HAND INDEX, not a register (the DERIVED block above is the ONE authority; rows joined on every run, D-2986)
+- **BUG-761** — **the region declared \"NOT a register\" carried twelve INDEX headings that named a current state, two of them restating a count (477 vs 565 ACTIVE; 97 vs 348 closed). FIXED (D-2986): the sentinel declares both kinds of content, every index heading declares itself a HAND INDEX, both drifting counts are gone (one home), and the rule is a rail limb with 2 mutation locks + spec INV-14. Re-tiered here from the OPEN — SHOULD table on closure. ✅ (2026-10-13)**
 - **BUG-695** — **`per_label` semantic-error-rate census RESOLVED via RATIFY-2 D2547 recalibration against v9 (D-2908).** Recalibrated (nli_label_audit 12,552 pairs) → `d2547_calibration.json` now covers all v9 labels; re-populated `per_label` 93 entries (53 disciplines + 40 domains). All 7 `0.0` labels are measured-0 (nli_total 11–35, contradict=0), NOT missing-data false-zeros. Fixed `scripts/bug695_recalibrate.py` false-zero guard (was `v==0.0`, now missing-criterion) + contract test `EXPECTED_LABEL_COUNT` 92→93 + `design systems` (9 fbs) below-min-sample exception. ✅ (2026-10-10)
 - **BUG-693** — **menu-widening drift RESOLVED (steps 1–2 done; step 3 owner-gated per D-2898).** Live canonical-run truth: `discipline='emerging'` = 1487 (22.6%) = offmenu 1297 (has raw discipline) + 190 no-raw remnant; mapfail 0 (280 reclaimed → marketing/business administration/entrepreneurship studies), dombleed 0 (190 kind-swapped → domains). Formerly 'dead' disciplines now populated (marketing 259, business administration 20, entrepreneurship studies 1, robotics 8, ecology 12, creative writing 15, museum studies 13, color theory 14). Step 3 (1,297 off-menu labels) promotion review stays owner-gated per D-2898 (no LLM auto-promotion). ✅ (2026-10-10)
 - **BUG-692** — **D-2884(b) C+B emerging clause was a trivially-satisfied blindspot FIXED (D-2886 D1 symmetric gate + D3(b) owner ruling).** The gate's emerging arm measured only a rate CEILING (how often the decider abstains), never WHETHER it abstained on the RIGHT rows — so an always-answer decider (pplx 0.0052 rate, clef-4bit 0.0309 rate) passed vacuously at ZERO emerging recall (0/7 gold both). D-2886 D1 landed the symmetric gate: rate ceiling 0.35 AND `taxonomy.emerging_discipline_recall_floor` 0.5 (catch >=4/7 gold-emerging). D3(b) owner ruling closed the certification question: no distinct-family decider clears coarse_kappa 0.73 + recall 0.5, so gpt-oss-20b stays routing authority (D2249), pplx is advisory best-arm, clef-flash is the emerging-abstention signal. ✅ (2026-10-09)
@@ -8017,7 +8016,7 @@ THEREFORE the freeze window reads nothing_still_held = 2 still parked (BUG-559 a
 
 ---
 
-## 🔴 OPEN — MUST (appended 2026-09-29; to be sorted into MUST tier)
+## 🔴 OPEN — MUST (appended 2026-09-29; to be sorted into MUST tier) — HAND INDEX, not a register (the DERIVED block above is the ONE authority; rows joined on every run, D-2986)
 
 | Bug | Date | Issue |
 |---|---|---|
@@ -12780,7 +12779,7 @@ RESOLVED, one row re-cited to the id that carries it (D-2979), and three derived
 
 **RESIDUAL:** BUG-761 — the hand tier sections still live INSIDE the region the faces declare to be history.
 
-## BUG-761 (MED - OPEN 2026-10-13) — the region declared "NOT a register" still carries hand TIERS and citations that nothing joins
+## BUG-761 (MED - FIXED 2026-10-13 by D-2986) — the region declared "NOT a register" still carries hand TIERS and citations that nothing joins
 
 **Discovered:** 2026-10-13 by the D-2984 measurement (BUG-760), as the residue the new rule deliberately did not
 touch.
@@ -12803,6 +12802,53 @@ honest — the fix has to come with a join for the tier labels, not before it. D
 **REMEDY:** decide, per face, whether a hand tier inside history is (a) relabelled a dated snapshot and removed
 from the claim surface, or (b) promoted into the derived block; then join the tier labels' counts. Routed to
 **T-115**.
+
+
+**FIXED 2026-10-13 by D-2986 — "a HEADING is a claim: below the marker it says WHAT it is, and a count has ONE
+home."** The residual was the region BETWEEN the two claim surfaces D-2984 and D-2985 policed, and it was
+measured on the day the second one landed.
+
+1. **The marker's own declaration was FALSE about what it covered.** `GOV-HISTORY:START` said "everything below
+   is DATED HISTORY: append-only, NOT a register" - and below it sat the owner's own INDEX sections, maintained
+   by hand (this very bug was appended to one of them the day the marker was written) and row-joined by the
+   rail. The sentinel now declares BOTH kinds of content: **declared HAND INDEXES (row-joined on every run,
+   never the authority)** and DATED HISTORY (append-only). One home for the string: `scripts/gov_sync.py#HIS`,
+   hand-edited into the three faces in the same act.
+2. **Twelve INDEX headings named a CURRENT state inside a region the face says makes no live claim.** Measured
+   2026-10-13: DECISION-LOG `## 🔴 OPEN / PENDING — highest priority first` and `## 🟢 ACTIVE`(x2);
+   MASTER-TASK-REGISTER `## 🟠 SHOULD — open`, `## 🟡 WORTH — open`, `## ✅ DONE — bottom`;
+   governance/buglog `## 🔴 OPEN — MUST`, `## 🟠 OPEN — SHOULD`, `## 🟡 OPEN — WORTH`,
+   `## ✅ CLOSED / RESOLVED — bottom`, and the dated 2026-09-29 MUST inbox. Each now declares itself a
+   `HAND INDEX` - non-authoritative, the DERIVED block above being the ONE authority, rows joined on every run.
+3. **TWO of them restated a count that had drifted, and one of those was named in this bug** - and the second
+   was found by looking:
+   `## 🟢 ACTIVE — in effect (477)` vs **565** ACTIVE in config/decisions.yaml, and
+   `## ⚪ DONE / CLOSED — bottom (97)` vs **348** closed (resolved 313 + superseded 16 + archived 8 + rejected
+   11). A count has ONE home (BUG-588/D-2642): both labels are count-free now, and the derived block prints the
+   number on every run.
+4. **The rule is mechanical and mutation-locked.** `scripts/check_governance_faces.py#heading_faults`, two limbs
+   (declare / no count), 6 known-answer controls in both directions, 2 mutation entries SEEN to red (floor
+   37 -> 39), spec INV-14 + its paired test. The shape the rule reads is the **LEADING** token; a
+   word-ANYWHERE form was REFUSED by measurement on the day it was written - it fires on **399 RECORD
+   headings** in this file (`## BUG-331 — ... (MED, OPEN)`), which are the register's own status slot and
+   already joined by `scripts/bug_status.py`. And the FIRST run of the limb fired on
+   `DECISION-LOG.md:205 ### Pending from registry (SNAPSHOT 2026-10-03 — ... the DERIVED index at the top owns
+   the current state, D-2984)` - a fault of the RULE, not of the face (D-2984's snapshot form already
+   declares). Both true shapes are accepted, and that control is now a named known answer.
+
+**RESIDUALS, named, not silently carried.** The third measured residual - the dangling `D2537` - was repaired
+for the FACES by D-2984 (the row was re-cited to D-2979, the record that carries the decision). What survives is
+(a) the register's own D-2979 TITLE, which cites `D-2537` and CANNOT be rewritten: config/decisions.yaml is the
+append-only registry, so a mint title is a claim at the moment of mint (D-2660) - and config/decisions_policy.yaml
+records it, corrected to say where the spelling survives (its note claimed "cited ONCE", which was itself stale:
+the spec and 8 code comments cite it too); (b) `specs/retrieval_serving.spec.md` now names D-2979 and records the
+legacy spelling rather than citing the absent id; (c) code COMMENTS (`pipeline/retrieve.py`, `pipeline/query.py`,
+`pipeline/pipeline_paths.py`) keep the legacy spelling - they are not face claims, they name the flag the record
+names, and they are recorded here rather than edited under a store/pipeline lock in a governance act. An ALIAS
+key was considered and REJECTED: nothing would read it, and a declaration no reader consumes is bloat (C19).
+**HONEST LIMIT:** this rule covers an index heading; a `###` section deep inside the dated tail that names a state
+without a date (e.g. `### USearch/HNSW recall benchmark (RATIFY-2 gate #1) — STILL PENDING`) is not an index
+heading and is not covered. It is dated history and it is not re-checked.
 
 ## BUG-762 (HIGH - FIXED 2026-10-13 by D-2985) - the LIVE region was never policed: the part the OWNER actually opens
 

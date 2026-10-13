@@ -274,20 +274,22 @@ tasks:
   gate: none
 - id: T-115
   priority: SHOULD
-  state: open
+  state: done
   mover: pipeline
-  title: 'BUG-761 — decide what a HAND TIER means inside the region the faces declare to be history'
+  closed: '2026-10-13'
+  title: BUG-761 — what a HAND TIER means inside the region the faces declare to be history
   why: >-
-    The GOV-HISTORY marker was inserted after the derived block, which sits inside the FIRST tier, so every other
-    tier fell BELOW it: 'SHOULD/WORTH/DONE' in MASTER-TASK-REGISTER.md and 'OPEN — MUST/SHOULD/WORTH' plus
-    'CLOSED / RESOLVED' in governance/buglog.md are all inside a region a face declares to be "DATED HISTORY:
-    append-only, NOT a register". Two consequences, both measured: a tier LABEL can restate a count that has
-    drifted (DECISION-LOG.md 'ACTIVE — in effect (477)' against 565 ACTIVE in the register; the header-census
-    surface only covers the block above the FIRST tier), and a citation inside such a tier can dangle unnoticed
-    (D2537 has no record; the record is D-2979). D-2984 joins the ROWS but deliberately left the tier LABELS and
-    the marker's extent alone, because moving the marker would silence the joins that now keep those rows honest.
-    Per face, decide whether a hand tier inside history is (a) relabelled a dated snapshot and removed from the
-    claim surface, or (b) promoted into the derived block; then join the tier labels' counts to the register.
-  source: [BUG-761, D-2984, D-2642]
-  evidence: 'governance/buglog.md BUG-761; DECISION-LOG.md "## 🟢 ACTIVE — in effect (477)" vs 565 ACTIVE in config/decisions.yaml (2026-10-13)'
+    DECIDED (D-2986): a tier section below the marker is a DECLARED, non-authoritative HAND INDEX - not dated
+    history, and not the register. The thing that was false was the sentinel's own declaration about what it
+    covered, so the sentinel now declares BOTH kinds of content (hand indexes: row-joined on every run, never
+    the authority; dated history: append-only), every index heading under it says which it is, and the two
+    labels that restated a drifted number are count-free - a count has ONE home (BUG-588/D-2642). PROMOTION
+    into the derived block was REJECTED: a bug's narrative has its home in the bug's own section, so a derived
+    table of it would be a SECOND home for prose, while the rows are already joined one by one (D-2984).
+  source:
+  - BUG-761
+  - D-2986
+  - D-2984
+  - D-2642
+  evidence: governance/buglog.md BUG-761 (FIXED 2026-10-13 by D-2986); config/rail_mutations.yaml floor 39 with the two new locks SEEN to red (2026-10-13)
   gate: none

@@ -23478,3 +23478,97 @@ decisions:
   - MASTER-TASK-REGISTER.md
   - governance/buglog.md
   - agent/session_seed.yaml
+- id: D-2986
+  date: '2026-10-13'
+  state: RESOLVED
+  category: GOVERNANCE / INSTRUMENT
+  title: A HEADING is a claim. Below the marker a heading that names a current state says WHAT it is and carries
+    no count - the region BETWEEN the two claim surfaces D-2984 and D-2985 policed
+  bugs:
+  - BUG-761
+  decision: 'THE DEFECT (BUG-761, the residual D-2984 recorded on purpose and routed to T-115). D-2984 policed the
+    ROWS and the prose BELOW the history marker; D-2985 policed the LIVE region ABOVE it. Between them, the HEADINGS
+    were policed by nothing - and the marker''s own declaration was therefore FALSE about what it covered: "everything
+    below is DATED HISTORY: append-only, NOT a register" was written over the owner''s own INDEX sections, which
+    are maintained by hand (BUG-761 itself was appended to one of them the day the marker existed) and are not a
+    register. MEASURED 2026-10-13, three residuals in one region: (1) TWELVE index headings named a CURRENT state
+    inside a region the face says makes no live claim - DECISION-LOG `## 🔴 OPEN / PENDING — highest priority first`,
+    `## 🟢 ACTIVE — in effect`, `## ⚪ DONE / CLOSED — bottom`, `## 🟢 ACTIVE`; MASTER-TASK-REGISTER `## 🟠 SHOULD —
+    open`, `## 🟡 WORTH — open`, `## ✅ DONE — bottom`; buglog `## 🔴 OPEN — MUST`, `## 🟠 OPEN — SHOULD`, `## 🟡 OPEN
+    — WORTH`, `## ✅ CLOSED / RESOLVED — bottom` and its dated 2026-09-29 MUST inbox. (2) TWO of them restated a
+    count that had drifted, with nothing joining either: `(477)` against 565 ACTIVE in config/decisions.yaml, and
+    `(97)` against 348 closed (resolved 313 + superseded 16 + archived 8 + rejected 11). A count restated in prose
+    is stale the moment it is written (BUG-588); a count a register owns has ONE home (D-2642) - the derived block,
+    which is re-derived on every run. (3) A citation inside such a tier could dangle unnoticed: the register''s
+    own D-2979 title cites "D-2537", an id no record carries (D-405), and config/decisions_policy.yaml''s note claimed
+    that spelling survived "ONCE" while it survived in four places - a stale restatement inside the note that documents
+    the class.
+
+    THE SHAPE (one sentence). A heading is a claim: below the marker it must say WHAT it is and may not carry a
+    count. Consequences, each landed rather than promised: (i) THE SENTINEL TELLS THE TRUTH ABOUT ITS OWN REGION.
+    `GOV-HISTORY:START` now declares BOTH kinds of content it covers: the INDEX sections are DECLARED HAND INDEXES
+    (row-joined on every run of the rail, never the authority) and the rest is DATED HISTORY (append-only). One
+    home for the string (`scripts/gov_sync.py#HIS`), hand-edited into the three faces in the same act - so the declaration
+    and the thing it declares cannot drift apart. The config comment that repeated the old wording is corrected
+    too: a declaration that overstates what it covers is the defect this act exists to remove. (ii) AN INDEX HEADING
+    DECLARES ITSELF. The shape that discriminates is the LEADING token: `## 🔴 OPEN — MUST` and `## 🟢 ACTIVE` are
+    heading-then-rows INDEX sections, while `## BUG-331 — ... (MED, OPEN)` is a RECORD heading - the register''s
+    own status slot, scripts/bug_status.py''s surface. A word-ANYWHERE form of the rule was REFUSED BY MEASUREMENT
+    on the day it was written: it fires on 399 RECORD headings in buglog.md. Each of the twelve now reads `— HAND
+    INDEX, not a register (the DERIVED block above is the ONE authority; rows joined on every run, D-2986)`. Neither
+    limb is merely documentation: every row under such a heading is already joined (the buglog tier by check_buglog_tiers,
+    a decision ROW by D-2984''s join, a bug''s own heading by bug_status.py), so the heading''s claim is backed
+    by a check that runs. (iii) NO COUNT IN A LABEL. Both numbers are gone from the labels; the derived block prints
+    them. The replacement is not a promise: `heading_faults` fires on any parenthesised count in such a heading.
+    (iv) THE DANGLING CITATION IS REPAIRED WHERE IT CAN BE. The face rows were already re-cited by D-2984; the live
+    spec (specs/retrieval_serving.spec.md) now names D-2979 and records the legacy spelling instead of citing the
+    absent id; and the policy note is CORRECTED to say where the spelling survives and why each survivor is not
+    rewritten (the register''s own mint title is append-only - a claim at the moment of mint, D-2660 - and eight
+    code comments name the flag, not a face claim). An ALIAS key was considered and REJECTED: nothing would read
+    it, and a declaration no reader consumes is bloat (C19).
+
+    WHY NOT (b), promotion into the derived block. BUG-761 offered a per-face choice: (a) relabel a dated snapshot
+    and remove it from the claim surface, or (b) promote it into the derived block. Promotion is REJECTED for the
+    buglog tiers on ONE home grounds: a bug''s narrative has its home in the bug''s own section, so a derived table
+    of that prose would be a SECOND home for it (D-2642), while OPEN-ness is already the census''s. The (a) form
+    was also not taken literally: a snapshot claims a moment it cannot prove, and these sections are row-JOINED
+    to the current register rather than frozen at a past one - so they are declared for what they actually are,
+    a hand index behind the derived block and behind every join that keeps it honest.
+
+    MEASUREMENT OF RECORD. Baseline: 12 index headings fired the new limb and 2 carried a drifted count; the marker''s
+    declaration was false; the policy note was stale. After: the three faces carry the amended sentinel and twelve
+    declared index headings; `check_governance_faces` rc=0 with 38/38 controls (was 31, six new in both directions);
+    two mutation entries SEEN to red (floor 37 -> 39); the paired contract is 22/22 green (governance_faces 15,
+    task_register 7) with spec INV-14; BUG-761 CLOSED (184 open / 344 closed of 528) and T-115 `state: done` so
+    the register drops to 13 open tasks. The FIRST run of the new limb reported exactly one fault on the real faces
+    and it was a fault of the RULE, not of the face (`DECISION-LOG.md:205 ### Pending from registry (SNAPSHOT 2026-10-03
+    — ... the DERIVED index at the top owns the current state, D-2984)` already declares, in D-2984''s own form)
+    - so the declaration is now a declared PATTERN accepting both true shapes, and that instance is a named known
+    answer rather than a silent exemption.
+
+    HONEST LIMITS. (1) The rule covers an INDEX heading; a `###` section deep inside the dated tail that names a
+    state with no date (e.g. `### USearch/HNSW recall benchmark (RATIFY-2 gate #1) — STILL PENDING`) is not an index
+    heading, is dated history, and is not re-checked - stated because a rule read as covering everything covers
+    nothing. (2) The hand index is a SELECTION, not a partition: it lists what the author chose to list, and only
+    the derived block and the registers carry the whole population. (3) The eight code comments that spell the ranking
+    decision "D2537" are recorded, not edited: they are not face claims, and they sit under a pipeline write boundary
+    that a governance act should not cross for a comment. (4) The register''s long-form prose is still policed only
+    for census-shaped restatements (D-2985''s limit, unchanged). (5) The spec was written in the same act as the
+    code - D-2978 prefers spec-first; the invariants were designed before the implementation but the file was written
+    after it, recorded rather than claimed.'
+  files:
+  - scripts/gov_sync.py
+  - scripts/check_governance_faces.py
+  - config/gov_sync.yaml
+  - config/rail_mutations.yaml
+  - config/task_register.yaml
+  - config/decisions_policy.yaml
+  - specs/governance_faces.spec.md
+  - specs/retrieval_serving.spec.md
+  - specs/README.md
+  - tests/test_governance_faces_spec.py
+  - DECISION-LOG.md
+  - MASTER-TASK-REGISTER.md
+  - governance/buglog.md
+  - governance/CONTEXT_INDEX.md
+  - agent/session_seed.yaml

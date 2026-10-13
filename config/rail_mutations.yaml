@@ -34,7 +34,7 @@ fixture:
   keep: false
   timeout_seconds: 600
 coverage:
-  min_mutations: 33            # FLOOR (shrink guard): deleting an entry means editing the floor in a diff a human reads (33 = 32 + the D-2983 receipt entry)
+  min_mutations: 34            # FLOOR (shrink guard): deleting an entry means editing the floor in a diff a human reads (34 = 33 + the D-2984 claim-surface entry)
   # D-2679: the coverage set is DERIVED, never restated. Which rails gate a COMMIT is one fact and it already has
   # ONE home (config/rail_registry.yaml#commit_boundary), so restating it here would be a SECOND HOME - and two
   # lists of one fact drift, and only one of them can be right. scripts/check_rail_mutations.py joins the two and
@@ -666,3 +666,23 @@ mutations:
       this rail through --selftest; before that bound this entry measured rc=124 at 600.0s (a
       DID-NOT-RED) instead of the single red line above.
 
+  # D-2984/BUG-760: the claim surface of the faces. MEASURED 2026-10-13 before the fix: DECISION-LOG.md listed
+  # \`| D2622 | ACTIVE |\` and \`| D2621 | PROPOSED |\` under a heading reading "OPEN / PENDING - highest priority
+  # first" while config/decisions.yaml said RESOLVED for both, and the rail was GREEN - it had no decision-row
+  # join at all. The mutant makes a disagreeing row read as agreement, which moves exactly ONE control in the
+  # rail's own 22-answer selftest (its decision-row control) and leaves every other limb intact, so the red
+  # isolates the JOIN rather than the rail (D-2676 iv).
+  - id: a_decision_row_that_contradicts_the_register_is_load_bearing
+    subject: scripts/check_governance_faces.py
+    op: replace
+    find: '            elif claim is not None and claim != states[key]:'
+    replace: '            elif claim is not None and False:  # MUTATION (D-2676): a decision row that disagrees reads as agreement'
+    runner: scripts/check_governance_faces.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: '  !!  a decision row that disagrees with the register must fire'
+    why: >-
+      The faces told the owner that two RESOLVED decisions were still pending (BUG-760) while this rail reported
+      agreement: surfaces (1)-(4) read tables and marker lines, and no DEC_ROW_RE existed. This entry pins the
+      join: if the comparison ever stops comparing, the control that names the rule goes RED.

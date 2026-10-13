@@ -11,11 +11,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1111 decisions (census stamp 5b6ff21b86ee09a7, 2026-10-13) · 523 bugs (184 open / 339 closed; highest OPEN = BUG-757) · 14 open tasks (MUST 4 / SHOULD 7 / WORTH 3; gate 1).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1112 decisions (census stamp e090da935be729b6, 2026-10-13) · 525 bugs (185 open / 340 closed; highest OPEN = BUG-761) · 15 open tasks (MUST 4 / SHOULD 8 / WORTH 3; gate 1).
 >
-> Decisions NEEDING ACTION: **67** of 1111 — open 32 · proposed 14 · draft 1 · deferred 14 · planned 6 | in effect (active) 565 | closed: resolved 311, superseded 16, archived 8, rejected 11
+> Decisions NEEDING ACTION: **67** of 1112 — open 32 · proposed 14 · draft 1 · deferred 14 · planned 6 | in effect (active) 565 | closed: resolved 312, superseded 16, archived 8, rejected 11
 >
-> Open BUGS by severity (heading population, first heading per id): CRITICAL 7 · HIGH 36 · MED 56 · LOW 30 · UNLABELLED 125 (BUG-757) of 184 open.
+> Open BUGS by severity (heading population, first heading per id): CRITICAL 7 · HIGH 36 · MED 57 · LOW 30 · UNLABELLED 125 (BUG-757) of 185 open.
 >
 > **MUST tasks (strategic-consequential order — source: config/task_register.yaml):**
 >
@@ -32,7 +32,7 @@
 > | T-112 | SHOULD | open | PERF - the SERVED path loads the cross-encoder per PROCESS, so short-lived callers pay a cold-start of minutes | suite rail runtime 100-200s -> >210s after the dispatcher became the CLI default (2026-10- |
 > | T-113 | SHOULD | open | PAY THE BASELINE the honest instrument REVEALED - the 71 keys behind block aliases, module by module, each wit | config/config_defaults_census.json after D-2982: 300 shadowed-declared keys / 568 sites (2 |
 > | T-114 | SHOULD | open | DISCHARGE THE INHERITED LADDER FAULTS - four lines were RED before D-2982 and the prefix report hid them | just health-full 2026-10-13: 7 faults / 128 lines; each rc=1 at 42f8b76^ (worktree). RE-ME |
-> | T-109 | WORTH | open | spec/test sandbox — adopt the two mechanisms borrowed from impeccable / shadcn-ui-lint | specs/README.md (sandbox charter, prior art) |
+> | T-115 | SHOULD | open | BUG-761 — decide what a HAND TIER means inside the region the faces declare to be history | governance/buglog.md BUG-761; DECISION-LOG.md "## 🟢 ACTIVE — in effect (477)" vs 565 ACTIV |
 >
 > **Open decisions needing action (newest first; the states are DECLARED in config/gov_sync.yaml):**
 >
@@ -57,8 +57,8 @@
 <!-- GOV-HISTORY:START (D-2981) - everything below is DATED HISTORY: append-only, NOT a register -->
 
 
-> **CURRENT OPEN INDEX (machine-derived 2026-10-12 — the live face; dated history follows below).**
-> Register truth (do NOT restate counts elsewhere — BUG-588/D-2692): 1111 decisions · 523 bugs (184 open / 339 closed; highest OPEN = BUG-750).
+> **SNAPSHOT 2026-10-12 (dated history — the DERIVED index at the top of this file owns the current state; D-2984).**
+> Snapshot of the census as measured then: 1112 decisions · 523 bugs (184 open / 339 closed). Which bug is highest-OPEN, and the current numbers, belong to the derived block (one home, D-2642/D-2984).
 > **D2590 NON-PRINCIPLE TIER
 > LANDED** — decisions **D-2942..D-2945**; the store went **6,591 → 7,640 rows in ONE run** (principle 6,577 /
 > process_template 774 / process_instance 156 / tool_instruction 108 / growth_edge 25). The 1,619 S4 sidecar records
@@ -74,7 +74,7 @@
 > code-review verdict — false assurance; mitigation adopted), BUG-723 (232 corpus files covered only by the purged
 > t11 run: knowledge preserved in the archive, served by nothing).
 >
-> **CURRENT OPEN INDEX (machine-derived 2026-10-07 — dated history).**
+> **SNAPSHOT 2026-10-07 (dated history — superseded by the derived index at the top; D-2984).**
 > Dated history: the register then stood at 1035 decisions with 460 bugs (163 open, 297 closed, highest OPEN then BUG-695). Forensic audit GREEN: 0 fatal rails — store-change re-baseline cascade (BUG-659..668) FIXED at root cause. The 11 ambiguous anchor-bridge rows resolved to the ratified canonical run (D-2881); depth conformance 183→194. BUG-687 (CLOSED, D-2882): nli_calibration pin on a gitignored derived artifact RETIRED (owner approved). BUG-688 (CLOSED, D-2883): the D-2618 retired golden is recorded, never gated (owner approved). BUG-689 (CLOSED, D-2830): the D-2767 A/B harness crashed on the v8 referee's owner-absence rows — `noise_drop` excluded (out of scope), `abstained` → 'emerging'.
 >
 > **OWNER-RULED (D-2884, 2026-10-09) — D-2727 now gated on the (a)+(b) landing:**
@@ -89,7 +89,7 @@
 >
 > — everything below this index is dated history / SHOULD / WORTH / DONE —
 
-> **2026-10-05 BUG-638/BUG-639 + D-2822..D-2825 (registry 955): D-2825 cluster_28517 "Planck's Constant Derivation" RECOVERED (transient S4 `application` failure, NOT an S2 gap — S2 was complete/coherent; `--cluster 28517` retry cleaned it). D-2824 dedup-accept phantoms 3776/26074. D-2823 normalize bare `--cluster` ints. D-2822 PROPOSED (S5 gate A(d) OR-entail+AND-no-contra, T9). BUG-639 (S4 delta-merge shrink-guard false-positive → `force_shrink=bool(cluster_ids)`) + BUG-638 (METRICS.jsonl floor guard) both FIXED. S4 final 6,591 / preflight GREEN; S5 STALE (6,588) → re-run; S6 empty → run. Registry 1111 decisions / 523 bugs (184 open / 339 closed; highest OPEN = BUG-637).**
+> **2026-10-05 BUG-638/BUG-639 + D-2822..D-2825 (registry 955): D-2825 cluster_28517 "Planck's Constant Derivation" RECOVERED (transient S4 `application` failure, NOT an S2 gap — S2 was complete/coherent; `--cluster 28517` retry cleaned it). D-2824 dedup-accept phantoms 3776/26074. D-2823 normalize bare `--cluster` ints. D-2822 PROPOSED (S5 gate A(d) OR-entail+AND-no-contra, T9). BUG-639 (S4 delta-merge shrink-guard false-positive → `force_shrink=bool(cluster_ids)`) + BUG-638 (METRICS.jsonl floor guard) both FIXED. S4 final 6,591 / preflight GREEN; S5 STALE (6,588) → re-run; S6 empty → run. Registry 1112 decisions / 525 bugs (185 open / 340 closed; highest OPEN = BUG-637).**
 
 
 
@@ -105,7 +105,7 @@
 > edit-gated to REVIEW-gated (R5 generator≠verifier + D-naming + stage_code_fingerprint). **S4 rerun is BLOCKED
 > until the owner resolves this with one ack.** Stale D-2703 item closed: evidence_passages schema bug = BUG-596
 > (CLOSED D-2721), NOT re-filed. Registry unchanged: decisions 930 / buglog 363 (143 open / 220 closed) /
-> highest OPEN BUG-622 (highest overall 624, both 623/624 RESOLVED).
+> highest OPEN then BUG-622 (highest overall then 624, both 623/624 RESOLVED).
 > **NEW — 2026-10-02 (D-2783): S4 classifier shortlist REVISED after archive/chat-recall research — Mistral-Small-3.1-24B was ALREADY tested+rejected (v1.0 D492: no chat template, 0% schema validity); Bonsai 2 = Prism Ternary (1-bit Qwen3.8) R5-excluded; Ornith-1.5-35B-A3B already local+OMLX-served → first no-download FIT-eval candidate. Shortlist = [Ornith local, Gemma-3-12b-it fallback]; gate unchanged (faster AND kappa≥0.7 AND ≥ gpt-oss-20b).**
 > **NEW — 2026-10-02 (D-2784): Ornith-1.5-35B-A3B FIT eval NEGATIVE — fails prod schema on BOTH axes (depth CoT overflow via missing reasoning_off; discipline SparseClassificationError 'application 4<10'). Same class as Mistral D492. Shortlist = [Gemma-3-12b-it fallback]; gate unchanged. scripts/fit_eval_model_swap.py added (config-first swap_eval_* keys).**
 > **NEW — 2026-10-02 (D-2781/D-2782): BUG-622 hierarchical N=30 NEGATIVE (kappa 0.514 vs 0.452 flat, << 0.7) → hierarchical-via-prompt REJECTED, pivot to D-2767 model swap; kappa-floor policy: keep agreement_floor.yaml (Krippendorff α 0.8) untouched, adopt SEPARATE classifier-kappa bar 0.7 DECLARED before swap.**
@@ -2175,7 +2175,7 @@ NEXT (refreshed D-2772):
 
 ## D-2859 + v3 forensic audit (2026-10-07) — ANTI-CIRCLE COMMIT (backlog frozen; remaining work re-sequenced)
 
-- ROOT CAUSE of '2 weeks of circles': 1111 decisions D-2826..D-2859 ratified in worktree but UNCOMMITTED (HEAD=D-2825=955, worktree=989) + 68 modified + 140 untracked. Every session re-read unstable state, re-derived the referee (4 variants), re-ran A/B, wrote another audit (7 on Oct 6 alone), never committed.
+- ROOT CAUSE of '2 weeks of circles': 1112 decisions D-2826..D-2859 ratified in worktree but UNCOMMITTED (HEAD=D-2825=955, worktree=989) + 68 modified + 140 untracked. Every session re-read unstable state, re-derived the referee (4 variants), re-ran A/B, wrote another audit (7 on Oct 6 alone), never committed.
 - COMMITTED this session: full backlog (v7 promote + D-2826..D-2859 + D-2854 wall-clock root fix + governance sync + decisions_summary re-derived 989; census --check GREEN).
 - A/B ANSWER: NEW A/B MANDATORY (old D-2767 flag-ON kappa 0.4313 FAIL, D-2852; invalidated by v7 +3 disciplines + domain rename + 'emerging' abstention + D-2857 split NOT implemented).
 - OWNER REFERENCE: REUSE governance/discipline_anchor_rederived_v6_20261006d.json (latest of 4) + deterministic 28-row domain remap; do NOT rebuild (D-2839 owner judgments + sampling variance).
@@ -2208,7 +2208,7 @@ NEXT (refreshed D-2772):
   decisions receipt re-cut).
 - D-2853 fan-out COMPLETE (live config maps): alias_map(16), synonym_map(1), domain_disciplines(1 key),
   anchor_workbook_fixes(1), eval_integrity known_collisions entry removed. Remaining: 28-row referee remap = OWNER-GATED.
-- Bug register 432 = 166 open / 266 closed. Decisions 991. Highest OPEN = BUG-667.
+- Bug register 432 = 166 open / 266 closed. Decisions 991. Highest OPEN then BUG-667.
 - STILL OWNER-GATED (do NOT cross unilaterally): BUG-659 (shrink-only ceiling re-baseline), BUG-660 (health read-only),
   BUG-665 (encoding repoint to artifact_encoding.py), BUG-666 (write-boundary teeth), BUG-667 (t11 authority re-mint
   via D-2862), BUG-631 (52 over-cap FB re-derive via D-2838 writer-limb).

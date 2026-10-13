@@ -120,6 +120,12 @@ guards:
   #: measured fault may not go quiet. Pinned here so the day someone writes `|| exit 1` - or drops the guard to
   #: silence the line - the registry calls it class (ii) instead of letting an UNMEASURED ladder read as measured.
   scripts/run_ladder.py --receipt-check: tri_state
+  #: D-2984 (BUG-760): the faces' CLAIM SURFACE is FATAL, and pinned here because the failure it catches looks
+  #: like style: a face that tells the owner a RESOLVED decision is still pending is not a wording problem, it
+  #: is the register lying through the one artifact the owner actually reads. Both its controls and the check
+  #: stand as `|| exit 1` for that reason.
+  scripts/check_governance_faces.py: fatal
+  scripts/check_governance_faces.py --selftest: fatal
 
 #: The COMMIT BOUNDARY (BUG-564). A dormancy claim says WHICH file exercises a rail; it cannot say the file still
 #: DOES. This hook lives OUTSIDE the synced tree (BUG-500) - it is not in git, so no diff, no review and no backup

@@ -41,7 +41,7 @@ health:
     python3 scripts/check_governance_faces.py --selftest || exit 1   # SEVENTH rail - governance FACES must not contradict the register (BUG-588/D-2692); controls must fire (a control nothing runs is a comment, BUG-492)
     python3 scripts/gov_sync.py --selftest || exit 1   # D-2981/BUG-492: the FACE writer own known-answer controls (a STALE block MUST be seen to differ from its re-derivation)
     python3 scripts/gov_sync.py || exit 1   # D-2981: every user-facing face must EQUAL its re-derivation from the registers (derived index block + census restatement lines + session_seed derived fields)
-    python3 scripts/check_governance_faces.py || exit 1   # D-NEW: bug-status table rows + header census in DECISION-LOG/MTR must agree with bug_status.json / decisions_summary.json
+    python3 scripts/check_governance_faces.py || exit 1   # D-2984/BUG-760: the CLAIM SURFACE of each face's declared history region - a live-claim label, a live census marker, a decision ROW and a present-tense "BUG-N is OPEN" assertion are joined to the register, or they declare the moment they speak about. Before this, DECISION-LOG listed `| D2622 | ACTIVE |` under "OPEN / PENDING" while the register said RESOLVED, and the rail was green (it had no decision-row join at all)
     python3 scripts/check_register_divergence.py --selftest || exit 1   # BUG-571/D-2683: BOTH divergence shapes must be SEEN to fire on synthetic logs (a control nothing runs is a comment, BUG-492)
     python3 scripts/check_register_divergence.py || exit 1
     python3 scripts/check_freeze_window.py --selftest || exit 1   # D-2688: the freeze WINDOW's declared EXIT must be SEEN to fire (a control nothing runs is a comment, BUG-492)

@@ -2,8 +2,8 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 511,
-  "open_n": 181,
+  "total_ids": 512,
+  "open_n": 182,
   "closed_n": 330,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
@@ -911,6 +911,11 @@
     {
       "id": "BUG-743",
       "title": "(LOW - OPEN 2026-10-12) - a DELEGATED reviewer's verdict is not re-readable after the fact, so a receipt that cites it must CAPTURE THE TEXT",
+      "events": 1
+    },
+    {
+      "id": "BUG-748",
+      "title": "(MED - OPEN 2026-10-13) - D-2928's definition re-scope left 177 canonical rows ON the moved boundary, and the audit D-2905's precedent requi",
       "events": 1
     }
   ],

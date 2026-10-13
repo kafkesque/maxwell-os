@@ -12065,3 +12065,29 @@ content_type.mentions moved 124 -> 125: LOUD, OWED, and deliberately NOT re-reco
 re-stamps unrelated stale rulers, and a census move is recorded only when that is the intended act). Two INCIDENTAL
 moves the same docstring caused (consequence, definition) were repaired by REWORDING the prose - the register is not
 edited to agree with the code; the code stops making the claim.
+## BUG-748 (MED - OPEN 2026-10-13) - D-2928's definition re-scope left 177 canonical rows ON the moved boundary, and the audit D-2905's precedent requires has never run (the rail that would have said so was not wired until D-2973)
+
+FOUND by the D-2973 repair, in the same read-only pass. The canonical run rechunk-v4-20260929 carries the v9
+COMPOSITE stamp (be3235433e...) while the live menu is v10 (cc800a32...), with the answer space v9 on BOTH sides -
+which is why D-2928 (owner-approved, RATIFIED) could mint v10 "provenance-safe" and refuse to rewrite the frozen
+stamps (I2/D-2896). What it did NOT do is audit the rows whose BOUNDARY it moved: T7 re-scoped two discipline
+definitions - organizational theory (disc-012: descriptive/explanatory, "how organizations work, never how to steer
+one") vs business administration (disc-062: prescriptive/normative, "steering toward objectives under resource
+constraints") - and D-2928's own rationale names the rows at risk: the re-scope exists to settle "F12's gemma
+second-coder confusion pairs (risk management/organizational theory -> business administration)".
+
+**MEASURED 2026-10-13** (read-only, canonical run, content_type='principle'): organizational theory 157 rows +
+business administration 20 rows = **177 rows sit ON the moved boundary**, and risk management names 11 more rows in
+the same confusion class. All 6,587 in-subject rows carry discipline_source=llm_extracted_from_source, so none of
+these labels is human-derived: they were produced by the S4 closed-menu classifier against the **v9** definitions and
+have never been re-read against v10's.
+
+**WHY IT WAS INVISIBLE.** scripts/check_menu_reclass_gate.py (D-2894) was built for exactly this question and was
+invoked by NOTHING until D-2973 (BUG-747). With its identity repaired to the ANSWER SPACE it now states this
+correctly as OWNER-OWED (rc 2, loud, not fatal) on every health run, and names this audit as the open act.
+
+**THE ACT (owner-gated - D-2898: no LLM auto-promotion; D-2905 is the precedent).** A MEASURED audit of the 177-row
+cohort against the v10 definitions: which rows would move, which would not, and the evidence for each - then either a
+re-classification of the affected rows (a WRITE, with its own licence and re-measurement) or a recorded finding that
+no row moves. NOT a provenance rewrite: a frozen composite stamp records what the rows WERE adjudicated against and
+is never falsified (D-2928/I2/D-2896).

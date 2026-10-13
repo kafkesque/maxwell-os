@@ -100,6 +100,18 @@ tasks:
     documented Windows/Linux degradation path (C24 hardware-adaptive already assumes psutil).
     The audit owes: a protocol inventory, a POSIX-only call-site census, and a declared
     cross-platform smoke (the suite currently runs on macOS only).
+    MEASURED 2026-10-13 (the two parallel read-only audits that fed this item were NOT recoverable as evidence -
+    a task result that cannot be read is not a measurement, so the census was re-measured deterministically
+    in-tree by the main session; that lesson is itself recorded here). CROSS-OS (C26): 131 subprocess call sites,
+    of which 2 pass shell=True; 17 POSIX-only process/signal calls (os.fork/setsid, signal., resource., pty.,
+    fcntl., termios., pwd., grp.); 7 privileged calls (os.getuid/geteuid/getgid/kill/chmod); 4 hardcoded /tmp or
+    /var literals; and ZERO platform guards - no sys.platform, no platform.system, no os.name anywhere under
+    pipeline/, scripts/, tools/. The POSIX assumption is therefore real, unguarded and UNDECLARED: on Windows
+    those 24 sites fail with no diagnostic that names a platform contract. MODULARITY (C21): 65
+    Protocol/ABC/abstractmethod tokens against a large DIRECT vendor surface - token counts = deberta 184,
+    torch 184, faiss 87, transformers 41, sqlite_vec 26, hdbscan 7 (tokens include comments and docstrings, so
+    they BOUND the coupling rather than count it). The deliverable is two inventories plus a named degradation
+    contract, not a refactor.
   source: [C21, C24, C26, D-2981]
   evidence: 'protocols: pipeline/storage/base.py only; no cross-OS smoke exists (2026-10-13)'
   gate: none

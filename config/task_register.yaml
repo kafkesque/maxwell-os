@@ -542,3 +542,71 @@ tasks:
     the write is bounded by the QUARANTINE/sidecar tier and refuses a PASS row; the reshape and the declaration
     land in ONE act, and the rail's own re-record of the measured block follows the write (D-2642), with the
     ceiling SHRINK-ONLY
+- id: T-126
+  priority: SHOULD
+  state: open
+  mover: pipeline
+  title: >-
+    typed-decision pilot — a local System-1 decision head (Laya/decider, MLX) as the S4 classifier backend,
+    measured against the frozen ARM-2 benchmark
+  why: >-
+    The intake's single most consequential finding (INTAKE_ASSESSMENT_20261014 §1): a typed decision head is not
+    a generator - it returns a probability distribution over a CLOSED set in one forward pass, so it has no
+    sampling step (R7 temp=0.0 becomes structurally unnecessary), no parsing (C16 fail-closed parsers), and no
+    off-menu output (closed-menu D-371). It fixes a MEASURED defect: D2635 ARM-2 shows gpt-oss-20b 2/6
+    schema-valid on the S4 classifier role. The probe is already proven locally: .venv_laya (laya_mlx 0.1.0)
+    loads Maxwell's own 62-slot closed_menu_v5.json as `criteria` without error (temp/s13_laya_probe.py,
+    run 2026-10-14). The head may MEASURE and DECLARE, never GATE and never MINT (D-2898 no_llm_canonical_promotion;
+    R1-R3 of the intake risk register). The precondition for this being MORE than a swap is A5/T-129 (ECE rail).
+  source: [INTAKE_ASSESSMENT_20261014, D2635, D-2898, D-371, R7, C16]
+  evidence: >-
+    governance/INTAKE_ASSESSMENT_20261014.md §1 (the typed-decision finding) + §1.1 (role-by-role mapping) +
+    temp/s13_laya_probe.py (the criteria-load probe, green 2026-10-14) + .venv_laya (laya_mlx 0.1.0 installed)
+    + the frozen ARM-2 harness (the D2635 2/6 measurement)
+  gate: >-
+    mover = pipeline. The head is a BACKEND of the same declared rule (like stage1_5 backends), never a rival
+    rule (D-2646); vendor numbers are re-measured here (D-2635/R2), never adopted; the pilot's verdict is a
+    before/after against the frozen ARM-2 benchmark with a majority baseline and human ceiling (T-127/A2)
+- id: T-127
+  priority: SHOULD
+  state: open
+  mover: pipeline
+  title: >-
+    publish a majority-class baseline and a human ceiling with every decision rail's accuracy, starting with the
+    saturated T-101 ruler
+  why: >-
+    BoolQ (ACL N19-1300) names the protocol: an accuracy number with no baseline and no ceiling is not a
+    measurement (its authors publish 80.4% model vs 90% human vs 62% majority). T-101's ruler is saturated at
+    recall@10 = 1.000 with no baseline and no ceiling, so it cannot tell a real improvement from a constant.
+    This is the CHEAPEST MUST in the intake (§2): no model, a computed baseline + a recorded ceiling per rail.
+  source: [INTAKE_ASSESSMENT_20261014, N19-1300, T-101]
+  evidence: >-
+    governance/INTAKE_ASSESSMENT_20261014.md §2 (Knowledge-base retrieval, the BoolQ row) + the T-101 ruler
+    (recall@10 = 1.000, saturated; measured 2026-10-14)
+  gate: >-
+    mover = pipeline. The baseline is COMPUTED (majority class) and the ceiling is RECORDED (human), never
+    estimated by a model; the pair is published beside the accuracy, never instead of it
+- id: T-128
+  priority: SHOULD
+  state: open
+  mover: pipeline
+  title: >-
+    declare ONE state machine — the row lifecycle — in config/row_lifecycle.yaml with a rail
+    scripts/check_row_lifecycle.py
+  why: >-
+    The intake §6 distinction: a decision head answers "what IS this?" (a TYPE over a closed set) while a state
+    machine answers "what may happen NEXT?" (transitions and absence) - and a non-principle is, by construction,
+    a claim about what is NOT established, i.e. an ordering/absence property, not a type. The row lifecycle
+    (chunked -> clustered -> extracted -> merged -> verified -> committed -> retrieved) already exists implicitly
+    in D-2992/D2625 prose in ~6 places. Declaring it gives T-122 (classification_status CLEAN on the QUARANTINE
+    rows) and T-120 (a later independent source must be able to RAISE an existing row's corroboration) a home,
+    and makes BUG-766's "which tier is this row in" a declared question. Cost: no model. The ontology/taxonomy is
+    NOT a machine (a category error that would mutate the taxonomy).
+  source: [INTAKE_ASSESSMENT_20261014, D-2992, D2625, T-122, T-120, BUG-766]
+  evidence: >-
+    governance/INTAKE_ASSESSMENT_20261014.md §6 (state machines for the knowledge base) + the lifecycle prose in
+    D-2992/D2625 + T-122's CLEAN-on-QUARANTINE defect (1,049 rows, measured 2026-10-14)
+  gate: >-
+    mover = pipeline. The rail asserts every stored status/classification_status value is a DECLARED state and
+    every state is reachable; a transition must name its `who` and its required `evidence`; the taxonomy itself
+    is NOT declared as a machine (progression must not mutate)

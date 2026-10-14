@@ -46,6 +46,26 @@ class ProbeError(SystemExit):
     """Fail-closed: an unreadable declaration is a fault, never a silent pass (C16)."""
 
 
+def declared_value(cfg: dict[str, Any], *path: str) -> Any:
+    """Fail-closed navigation of a key the DECLARATION owns: absent is a fault, never a code default.
+
+    A code fallback for a declared value is a second home for it (C12c), and the rail that counts those
+    (`scripts/check_config_defaults.py`) is shrink-only - a rule may not pay for itself with new debt.
+    """
+    node: Any = cfg
+    for key in path:
+        if not isinstance(node, dict) or key not in node:
+            raise ProbeError("FAIL-CLOSED (agent-context): the declaration carries no "
+                             + ".".join(path) + " - and a declared value has ONE home (C12)")
+        node = node[key]
+    return node
+
+
+def exit_code(cfg: dict[str, Any], name: str) -> int:
+    """The declared exit code for a verdict. A code the declaration does not carry is a fault (C12)."""
+    return int(declared_value(cfg, "exit_codes", name))
+
+
 def repo_root() -> Path:
     """The repository root, derived from this file's own location (never an absolute literal)."""
     return Path(__file__).resolve().parents[1]
@@ -66,7 +86,8 @@ def load_config(path: str | None = None) -> dict[str, Any]:
 
 def home_path(cfg: dict[str, Any], key: str) -> Path:
     """Resolve a declared home to a path. The '#<field>' hint is stripped; '~' is expanded."""
-    raw = str(cfg.get("homes", {}).get(key, "")).strip()
+    homes = declared_value(cfg, "homes")
+    raw = str(homes.get(key) or "").strip()
     if not raw:
         raise ProbeError(f"FAIL-CLOSED (agent-context): the declaration names no home for {key!r} (C12)")
     return Path(os.path.expanduser(raw.split("#", 1)[0]))
@@ -116,7 +137,7 @@ def provider_auth(provider: dict[str, Any]) -> tuple[str, str | None]:
 
 def served_windows(cfg: dict[str, Any], base_url: str, auth: str | None, timeout: int = 10) -> dict[str, Any]:
     """Layer 1: what the SERVER says it can attend to. Returns {'windows': {...}, 'error': str|None}."""
-    template = str(cfg.get("homes", {}).get("served_window_endpoint", "")).strip()
+    template = str(declared_value(cfg, "homes", "served_window_endpoint")).strip()
     if not template or not base_url:
         return {"windows": {}, "error": "no served-window endpoint is declared (C12)"}
     url = template.split("#", 1)[0].format(base_url=base_url.rstrip("/"))
@@ -228,7 +249,7 @@ def prefill_bill(window: int, tps: float | None, classes: dict[str, Any], cfg: d
     large window and a small throughput satisfies the floor and fails the bill - and the class's
     WORKING SET is what gets divided, never the window: a window is not a budget.
     """
-    policy = str((cfg.get("prefill_budget") or {}).get("unknown_tps", "refuse_route"))
+    policy = str(declared_value(cfg, "prefill_budget", "unknown_tps"))
     evaluated: list[dict[str, Any]] = []
     for name, spec in classes.items():
         if not isinstance(spec, dict):
@@ -310,17 +331,16 @@ def prefix_audit(cfg: dict[str, Any]) -> dict[str, Any]:
     can amortise it. And a prefix is only worth amortising if it is LONG: the classified rows are the
     precondition, so a label counted as a prefix would overstate what packing can buy.
     """
-    stages = cfg.get("pipeline_stages") or {}
-    declared = int(stages.get("system_prefixes_verified_byte_stable", 0))
-    floor = int(stages.get("min_prompt_chars", 1))
+    declared_stable = int(declared_value(cfg, "pipeline_stages", "system_prefixes_verified_byte_stable"))
+    floor = int(declared_value(cfg, "pipeline_stages", "min_prompt_chars"))
     totals: dict[str, list[dict[str, Any]]] = {"stable": [], "volatile": [], "ignored": []}
     for path in sorted((repo_root() / "pipeline").glob("*.py")):
         rows = prefix_rows_from_source(path.read_text(), path.name, floor)
         for key, items in rows.items():
             totals[key].extend(items)
-    return {"declared_stable": declared, "stable": len(totals["stable"]), "rows": totals["stable"],
+    return {"declared_stable": declared_stable, "stable": len(totals["stable"]), "rows": totals["stable"],
             "volatile": totals["volatile"], "ignored": totals["ignored"],
-            "prompt_floor_chars": floor, "ok": len(totals["stable"]) >= declared}
+            "prompt_floor_chars": floor, "ok": len(totals["stable"]) >= declared_stable}
 
 
 def ab_probe(cfg: dict[str, Any], model: str, prompt_tokens: int, timeout: int = 900) -> dict[str, Any]:
@@ -331,14 +351,15 @@ def ab_probe(cfg: dict[str, Any], model: str, prompt_tokens: int, timeout: int =
     rather than of a page of memory that happened to be warm.
     """
     ab = (cfg.get("prefill_budget") or {}).get("ab_probe") or {}
-    filler, per_unit = str(ab.get("filler", "")), float(ab.get("chars_per_token_measured", 0) or 0)
+    filler = str(declared_value(cfg, "prefill_budget", "ab_probe", "filler"))
+    per_unit = float(declared_value(cfg, "prefill_budget", "ab_probe", "chars_per_token_measured"))
     if not filler or per_unit <= 0:
         raise ProbeError("FAIL-CLOSED (agent-context): the A/B names no declared filler or its measured "
                          "chars-per-token rate - a probe may not invent either (C12)")
     prefix = (filler * (int(prompt_tokens * per_unit) // len(filler) + 1))[: int(prompt_tokens * per_unit)]
     provider = read_json(home_path(cfg, "declaration"))
     base_url, auth = provider_auth(provider)
-    template = str(cfg.get("homes", {}).get("chat_endpoint", "")).split("#", 1)[0]
+    template = str(declared_value(cfg, "homes", "chat_endpoint")).split("#", 1)[0]
     if not template or not base_url:
         raise ProbeError("FAIL-CLOSED (agent-context): the declaration names no chat endpoint (C12)")
     url = template.format(base_url=base_url.rstrip("/"))
@@ -356,11 +377,11 @@ def ab_probe(cfg: dict[str, Any], model: str, prompt_tokens: int, timeout: int =
                 "prefill_tps": usage.get("prompt_tokens_per_second")}
 
     first, second = once(model, "Reply OK (a)"), once(model, "Reply OK (b)")
-    control = once(str(ab.get("control_model", "")), "Reply OK (c)")
+    control = once(str(declared_value(cfg, "prefill_budget", "ab_probe", "control_model")), "Reply OK (c)")
     speedup = None
     if first.get("seconds") and second.get("seconds"):
         speedup = round(float(first["seconds"]) / float(second["seconds"]), 2)
-    proof = (cfg.get("cache_accounting") or {}).get("proof") or {}
+    proof = declared_value(cfg, "cache_accounting", "proof")
     bar = proof.get("min_speedup")
     sent = {"chars": len(prefix), "tokens_estimated_from_the_declared_rate": prompt_tokens}
     return {"model": model, "sent": sent, "call1": first, "call2": second, "control_call": control,
@@ -381,13 +402,13 @@ def _post_json(url: str, payload: dict[str, Any], auth: str | None, timeout: int
 
 def ledger_summary(db: Path, cfg: dict[str, Any]) -> dict[str, Any]:
     """Layer 4: the measured cache evidence, with ABSENT != ZERO (D-2957) held as a rule, not a habit."""
-    accounting = cfg.get("cache_accounting") or {}
-    ledger = cfg.get("homes", {}).get("cache_ledger", "")
+    ledger = declared_value(cfg, "homes", "cache_ledger")
     table = str(ledger).split("#", 1)[1] if "#" in str(ledger) else ""
     if not db.is_file() or not table:
         return {"available": False, "reason": f"declared ledger unreadable or unnamed: {db}", "per_model": []}
-    field, input_field = str(accounting.get("field", "")), str(accounting.get("input_field", ""))
-    min_calls = int(accounting.get("min_calls_for_a_ratio", 0))
+    field = str(declared_value(cfg, "cache_accounting", "field"))
+    input_field = str(declared_value(cfg, "cache_accounting", "input_field"))
+    min_calls = int(declared_value(cfg, "cache_accounting", "min_calls_for_a_ratio"))
     query = (
         f'SELECT model, COUNT(*), SUM("{input_field}"), SUM("{field}"), COUNT("{field}") '  # noqa: S608 - names declared
         f'FROM "{table}" GROUP BY model ORDER BY 3 DESC'
@@ -416,7 +437,7 @@ def ledger_summary(db: Path, cfg: dict[str, Any]) -> dict[str, Any]:
 
 def prefix_hazards(cfg: dict[str, Any], harness: dict[str, Any]) -> list[dict[str, str]]:
     """The prefix-stability hazards this machine can settle from its own live declaration."""
-    stability = cfg.get("prefix_stability") or {}
+    stability = declared_value(cfg, "prefix_stability")
     injections = [str(name) for name in (stability.get("injection_envs") or [])]
     if not injections:
         raise ProbeError("FAIL-CLOSED (agent-context): prefix_stability names no injection_envs - the "
@@ -440,7 +461,7 @@ def build_report(cfg: dict[str, Any]) -> dict[str, Any]:
     declared = declared_windows(provider)
     verdicts = parity(served["windows"], declared, cfg)
     inputs = resolve_trigger_inputs(cfg, harness)
-    classes = cfg.get("classes") or {}
+    classes = declared_value(cfg, "classes")
     prefill_rows = measured_prefill(cfg)
     routes = {}
     for model, window in sorted(served["windows"].items()):
@@ -456,7 +477,7 @@ def build_report(cfg: dict[str, Any]) -> dict[str, Any]:
             "best_class": bill["best"],
         }
     ledger = ledger_summary(home_path(cfg, "cache_ledger"), cfg)
-    proof = (cfg.get("cache_accounting") or {}).get("proof") or {}
+    proof = declared_value(cfg, "cache_accounting", "proof")
     return {
         "served": served["windows"],
         "served_error": served["error"],
@@ -517,9 +538,9 @@ def render(report: dict[str, Any], cfg: dict[str, Any]) -> int:
         print(f"\nFAIL agent-context: {len(faults)} declared fault(s)")
         for fault in faults:
             print(f"   - {fault}")
-        return int(cfg.get("exit_codes", {}).get("fault", 2))
+        return exit_code(cfg, "fault")
     print("\nok agent-context: the four layers agree, and nothing measured was written")
-    return int(cfg.get("exit_codes", {}).get("ok", 0))
+    return exit_code(cfg, "ok")
 
 
 #: ── END OF THE REPORT PATH ──────────────────────────────────────────────────────────────────────
@@ -612,7 +633,7 @@ def selftest(cfg: dict[str, Any]) -> int:
         connection.close()
         tmp.unlink(missing_ok=True)
     report_path = report_path_source()
-    scan = cfg.get("self_scan") or {}
+    scan = declared_value(cfg, "self_scan")
     forbidden = tuple(str(lit) for lit in (scan.get("forbidden_everywhere") or []))
     baselines = tuple(str(num) for num in (scan.get("baseline_numbers") or []))
     if not forbidden or not baselines:
@@ -620,7 +641,7 @@ def selftest(cfg: dict[str, Any]) -> int:
                          "declared forbidden set proves nothing (C12)")
     control(CONTROL_LABELS[9], not [lit for lit in forbidden if lit in report_path])
     control(CONTROL_LABELS[10], not [num for num in baselines if num in report_path_source()]
-            and REPORT_PATH_MARKER == str(scan.get("marker", "")))
+            and REPORT_PATH_MARKER == str(scan.get("marker")))
     refused = False
     try:
         prefix_hazards({"prefix_stability": {}}, {})
@@ -629,13 +650,13 @@ def selftest(cfg: dict[str, Any]) -> int:
     control(CONTROL_LABELS[11], refused)
 
     # ── LAYER 5: the prefill bill, asserted against the DECLARATION's own measured throughputs ──
-    live_classes = cfg.get("classes") or {}
+    live_classes = declared_value(cfg, "classes")
     throughputs = [float(row["prefill_tps"]) for row in measured_prefill(cfg).values()
                    if isinstance(row.get("prefill_tps"), (int, float))]
     if not throughputs:
         raise ProbeError("FAIL-CLOSED (agent-context): no measured throughput is declared - the prefill "
                          "bill cannot be controlled, and a control that cannot run is not a control")
-    floor = int((live_classes.get("agent_loop") or {}).get("min_window", 0))
+    floor = int(declared_value(cfg, "classes", "agent_loop")["min_window"])
     fast = prefill_bill(floor, max(throughputs), live_classes, cfg)
     slow = prefill_bill(floor, min(throughputs), live_classes, cfg)
     control(CONTROL_LABELS[12], "agent_loop" in fast["routable"] and "agent_loop" not in slow["routable"])
@@ -666,8 +687,7 @@ def selftest(cfg: dict[str, Any]) -> int:
 
     held = passed == total
     print(f"{'ok ' if held else 'FAIL'} agent-context-probe --selftest: {passed}/{total} known-answer control(s) green")
-    codes = cfg.get("exit_codes", {})
-    return int(codes.get("ok", 0)) if held else int(codes.get("error", 1))
+    return exit_code(cfg, "ok") if held else exit_code(cfg, "error")
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -682,7 +702,6 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--config", default=None, help="override the declaration path (testing only)")
     args = parser.parse_args(argv)
     cfg = load_config(args.config)
-    codes = cfg.get("exit_codes", {})
     if args.selftest:
         return selftest(cfg)
     if args.prefix_audit:
@@ -695,12 +714,11 @@ def main(argv: Sequence[str] | None = None) -> int:
             print(f"   not a prompt ({row['state']})  {row['file']}:{row['name']}")
         print(f"{'ok ' if audit['ok'] else 'FAIL'} prefix-audit: {audit['stable']} byte-stable system "
               f"prefix(es), {len(audit['volatile'])} built per call (declared minimum {audit['declared_stable']})")
-        return int(codes.get("ok", 0) if audit["ok"] else codes.get("fault", 2))
+        return exit_code(cfg, "ok") if audit["ok"] else exit_code(cfg, "fault")
     if args.prefill_ab:
-        classes = cfg.get("classes") or {}
-        slots = ((cfg.get("routing") or {}).get("measured_routable_20261014") or {}).get("agent_loop") or [""]
+        slots = (declared_value(cfg, "routing").get("measured_routable_20261014") or {}).get("agent_loop") or [""]
         model = args.model or str(slots[0])
-        tokens = args.tokens or int((classes.get("agent_loop") or {}).get("working_set", 0))
+        tokens = args.tokens or int(declared_value(cfg, "classes", "agent_loop")["working_set"])
         if not model or not tokens:
             raise ProbeError("FAIL-CLOSED (agent-context): the A/B needs a model and a prefix size, and "
                              "neither is invented here (C12)")
@@ -709,15 +727,15 @@ def main(argv: Sequence[str] | None = None) -> int:
         proven = result["verdict"] == "proven"
         print(f"{'ok ' if proven else 'FAIL'} prefill-ab: {result['speedup']}x against a declared bar of "
               f"{result['bar']}x -> {result['verdict']}")
-        return int(codes.get("ok", 0) if proven else codes.get("fault", 2))
+        return exit_code(cfg, "ok") if proven else exit_code(cfg, "fault")
     try:
         report = build_report(cfg)
     except ProbeError as exc:
         print(f"FAIL agent-context: {exc}", file=sys.stderr)
-        return int(codes.get("fault", 2))
+        return exit_code(cfg, "fault")
     if args.json:
         print(json.dumps(report, indent=2, sort_keys=True))
-        return int(codes.get("ok", 0))
+        return exit_code(cfg, "ok")
     return render(report, cfg)
 
 

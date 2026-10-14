@@ -1,0 +1,63 @@
+schema_version: '1'
+authority: D-2997
+kind: ingest_identity_gate
+# ─────────────────────────────────────────────────────────────────────────────────────────────
+# ONE HOME of the INGEST-SIDE identity gate's policy (BUG-781). It CROSS-REFERENCES, never restates:
+#   * the two detectors + the owner-ledger vocabulary : config/eval_integrity.yaml#duplicate_gate (D-2736/37/38)
+#   * the collapse bar and its measured census       : config/corroboration_collapse.yaml#lexical_limb (D-2996)
+#   * the corpus root / checkpoint root              : pipeline/pipeline_paths.py (BOOKS_DIR, CHECKPOINT_DIR)
+#   * the source-noise markers and the sanitizer     : pipeline/book_metadata.py (D2449) + config/filtering.yaml
+#   * the identity function itself                   : pipeline/book_metadata.py::compute_source_id (D2176/D2308)
+# WHY THIS FILE EXISTS. The identity machinery was never missing — its ENFORCEMENT POINT was. MEASURED
+# 2026-10-14: governance/duplicate_adjudication.json holds 59 adjudicable pairs with `adjudicated: 0` from
+# 2026-09-30, because nothing in the INGEST path read it (the gate is declared POST-RUN only). BUG-780 measured
+# the consequence: 530 of 1,393 corroborated rows are ONE TEXT under TWO NAMES (84 pairs), 369 served.
+# This gate ADDS the missing enforcement point and NOTHING ELSE: it never re-detects (detection has one home),
+# never merges, never deletes (R-D410), and never labels (D-2898 — a work-identity label is an owner word).
+
+door:
+  # The door is DELTA-SCOPED (the cascade rule): only files ABSENT from the metadata cache are candidates, so
+  # an already-ingested file can never be re-classified here and no row, checkpoint or source_id can move
+  # because of this gate. A deferred candidate is skipped IN PLACE (never deleted), loudly named, and recorded.
+  new_file_definition: absent_from_metadata_cache
+  action: defer_new            # defer_new | report | abort
+  # A first run has no metadata cache yet (S0.5 WRITES it), and pre-S0 no corroboration claim is minted, so a
+  # missing cache degrades LOUDLY (receipted as `identity_available: false`) instead of aborting. The same
+  # absence at `--gate` (post-S0.5) is FATAL: there the door is the last screen before the claim is minted.
+  on_missing_cache: degrade_loud       # degrade_loud | abort
+  points: [pre_s0, pre_s1_5]   # ONE function, two declared call points; the identity screen is stronger after S0.5 (author|title exists)
+  override_env: MAXWELL_INGEST_GATE   # value `warn` = publish the deferrals and proceed (logged AND counted, never silent)
+  deferral_dir: temp/ingest_deferrals # gitignored runtime state: THIS batch's deferral receipt (D-2983 disposition)
+  # The SAME rc means two things, by DECLARATION (never by accident): in `just health` rc 2 is OWNER-OWED and
+  # NOT fatal (BUG-457); at the ingest door rc 2 REFUSES, because a run that proceeded would mint the very
+  # claim (corroboration by two VOICES) that the unresolved identity makes false.
+  ingest_reading: rc2_refuses
+
+identity:
+  # Deterministic name defects — MACHINE-decidable, so they are never an owner question; they are reported with
+  # the sanitized name the file should carry. MEASURED 2026-10-14 on the 962-record cache: 571 names carry an
+  # ingest-site marker, 34 carry a repeated internal space, 3 carry leading/trailing whitespace. Fixing an
+  # already-ingested name is a WRITE, so the corpus count is OWNER-OWED debt (rc 2), never a fatal line.
+  name_defect_patterns:
+    leading_or_trailing_whitespace: '^\s|\s$'
+    repeated_internal_whitespace: '\S\s{2,}\S'
+  ingest_site_marker_pattern: '(?i)(z-libr|libgen|liber3|anna''s archive|annas-archive|1lib)'
+
+ledger:
+  file: governance/duplicate_adjudication.json     # D-2738 — the ONE owner ledger (59 pairs, PENDING)
+  verdicts_open: [PENDING]
+  verdicts_closed: [MERGE, KEEP_SEPARATE]
+  # ONE act, two sheets: T-129's sheet and the ledger carry the SAME ruling in two vocabularies. Declared here
+  # so the gate can never report one owner act as two different debts (nor two debts as one).
+  collapse_sheet: governance/work_identity_collapse_review_20261014.csv
+  collapse_words:
+    CONFIRM-ONE-WORK: MERGE
+    DISTINCT: KEEP_SEPARATE
+    LEAVE: PENDING
+
+content:
+  # P2 (post-S0, pre-S1.5): the D-2737 detector's report is the authority for content-level same-work pairs.
+  report: governance/same_work_content_candidates.json
+  title_report: governance/title_rename_candidates.json
+  # A report OLDER than the newest corpus file certifies a corpus that no longer exists: measured, not assumed.
+  staleness: fatal

@@ -666,3 +666,34 @@ tasks:
   gate: 'one owner word per pair on governance/work_identity_collapse_review_20261014.csv (CONFIRM-ONE-WORK /
     DISTINCT / LEAVE) - the 37 identical-text pairs are deterministic and need confirmation only; the 47
     containment-only pairs are the ones that need the ruling'
+
+- id: T-130
+  priority: MUST
+  state: open
+  mover: owner
+  title: THE INGEST DOOR — the identity guarantee becomes an ENFORCEMENT POINT (delta-scoped), so a duplicate work cannot be ingested while its identity is unresolved
+  why: >-
+    BUG-781: the identity machinery was never missing — detect_title_renames (D-2736) + detect_same_work_content
+    (D-2737) feed ONE owner ledger (D-2738) and verify_duplicate_gate --gate is the declared fail-closed reader —
+    but `--gate` is declared POST-RUN only, so NOTHING IN THE INGEST PATH read the ledger: 59 adjudicable pairs,
+    `adjudicated: 0`, from 2026-09-30. BUG-780 measured the cost (530 count-corroborated rows are ONE TEXT under
+    TWO NAMES, 369 served). The remedy is NOT a new detector (detection has ONE home, C12/D-2646) and NOT a new
+    score (D-2646): it is the missing ENFORCEMENT POINT. It must be DELTA-SCOPED — only files absent from the
+    metadata cache are candidates — because a gate that re-classified an already-ingested file would move rows,
+    counts and checkpoints the corpus already certifies: a cascade, which is why this task's first act was an audit
+    (0 candidates over the live 940-file corpus) rather than a rewrite.
+  source: [BUG-781, BUG-780, D-2997, D-2738, D-2736, D-2737, T-129, D-2646, D-2898]
+  evidence: >-
+    MEASURED 2026-10-14 (all counts below are from that date). pipeline/ingest_gate.py (census, delta rule,
+    per-candidate decision, deferral receipt);
+    scripts/check_ingest_identity_gate.py (selftest 8/8; live --check rc 2 owner-owed = 59 ledger pairs + 84
+    collapse rows + 37 corpus name defects; live --gate rc 2 REFUSES; --preflight 0 candidates over 940 cached
+    files, i.e. inert on the existing corpus BY CONSTRUCTION); config/ingest_identity_gate.yaml (the ONE policy
+    home); wired into pipeline/stage0_convert.py (unbypassable) + justfile#health (tri_state) + justfile#triad
+    (fatal). Audit + both plans: governance/INGEST_IDENTITY_GATE_20261014.md.
+  gate: >-
+    mover = owner for the RELEASE (59 ledger pairs + 84 collapse rows on
+    governance/work_identity_collapse_review_20261014.csv — ONE act read in two vocabularies, mapping declared in
+    config/ingest_identity_gate.yaml#ledger.collapse_words); mover = pipeline for the door, which is landed.
+    `--gate` REFUSES until those words land, and that refusal IS the guarantee — declared
+    (door.ingest_reading: rc2_refuses), never accidental.

@@ -28,6 +28,7 @@ from pathlib import Path
 # ── Paths ──────────────────────────────────────────────────────────────────
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from pipeline import ingest_gate  # D-2997/BUG-781: the INGEST DOOR (delta-scoped; never re-classifies an ingested file)
 from pipeline.io_guard import load_jsonl, safe_write  # D2332 fail-closed read + D2487 atomic write
 from pipeline.pipeline_paths import (
     BOOKS_DIR,
@@ -36,7 +37,7 @@ from pipeline.pipeline_paths import (
     SMOKE_BOOK_LIMIT,
     STAGE0_CHECKPOINT,
 )
-from pipeline.stamp import check_stage_code_fingerprint, get_pipeline_commit, stamp_record, write_stage_code_fingerprint
+from pipeline.stamp import check_stage_code_fingerprint, get_pipeline_commit, get_pipeline_run_id, stamp_record, write_stage_code_fingerprint
 from pipeline.text_cleaner import check_conversion_quality
 
 # ── Constants ──────────────────────────────────────────────────────────────
@@ -165,6 +166,59 @@ def load_existing_checkpoint() -> dict[str, dict]:
     return existing
 
 
+def apply_ingest_door(books: list[Path], books_dir: Path) -> list[Path]:
+    """The INGEST DOOR: drop the DELTA candidates an unresolved identity defers. Nothing ingested is touched.
+
+    WHY (D-2997/BUG-781, measured 2026-10-14). The identity machinery was never missing — its enforcement
+    point was: the D-2736/37/38 chain produced ONE owner ledger holding 59 adjudicable pairs with
+    `adjudicated: 0` from 2026-09-30, and NOTHING IN THE INGEST PATH READ IT (the gate is declared POST-RUN
+    only). BUG-780 then measured what a fortnight of that costs: 530 of the 1,393 rows the store certifies as
+    corroborated are ONE TEXT under TWO NAMES (84 pairs), 369 of them served. This call is that missing point.
+
+    DELTA-SCOPED (the cascade rule, pipeline/ingest_gate.py): a file the metadata cache already knows is never
+    a candidate, so no existing row, checkpoint, source_id or count can move because of this call. A deferred
+    candidate is skipped IN PLACE — never deleted (R-D410) — named loudly, and receipted under the declared
+    runtime path. A missing cache degrades LOUDLY when the policy says so (a first run has none: S0.5 writes
+    it) and never silently (C16).
+
+    Args:
+        books: The candidate files found on disk.
+        books_dir: Corpus root, for the report and the receipt.
+
+    Returns:
+        The books that may be converted: the input minus the deferred candidates (subject to `door.action`).
+    """
+    if not books:
+        return books
+    policy = ingest_gate.load_policy()
+    degrade = str(policy["door"].get("on_missing_cache", "abort")) == "degrade_loud"
+    try:
+        report = ingest_gate.preflight(books_dir=books_dir, run_id=get_pipeline_run_id() or "",
+                                       allow_missing_cache=degrade)
+    except ingest_gate.GateInputError as exc:
+        print(f"❌ INGEST DOOR: {exc}")
+        print("   refusing to convert: an identity decision taken BLIND is the defect this door exists for (C16)")
+        sys.exit(1)
+    deferred = {str(Path(item["path"]).resolve()) for item in report["deferrals"]}
+    for item in report["deferrals"]:
+        print(f"   ⛔ DEFERRED [{item['defer_reason']}] {item['name']} — collides with {item['matched']} "
+              f"(canonical name: {item['canonical_name']})")
+    if not report["identity_available"]:
+        print("   ⚠️  INGEST DOOR degraded LOUDLY: no metadata cache yet, so identity is FILENAME-ONLY at this "
+              "point (receipted as identity_available=false; the door re-runs stronger after S0.5)")
+    if not deferred:
+        return books
+    action = "report" if report["override"] else str(report["action"])
+    print(f"   ingest door: {len(deferred)} candidate(s) deferred | action={action} | receipt={report['receipt']}")
+    if action == "abort":
+        print("   action=abort: refusing to convert while identity is unresolved (D-2997)")
+        sys.exit(1)
+    if action == "report":
+        print("   action=report: converting anyway — the deferrals are NAMED above and receipted, never silent")
+        return books
+    return [book for book in books if str(book.resolve()) not in deferred]
+
+
 def run_stage0(
     books_dir: Path = None, force: bool = False, single_book: str = None, limit: int = None
 ):
@@ -216,6 +270,10 @@ def run_stage0(
     if not books:
         print("📭 No EPUB or PDF files found in books/")
         return
+
+    # ── The INGEST DOOR (D-2997/BUG-781) ────────────────────────────────
+    # Delta-scoped: only files the metadata cache does NOT know can be deferred; a deferred file stays on disk.
+    books = apply_ingest_door(books, books_dir)
 
     print(f"📚 Stage 0: Convert — {len(books)} books found")
     if limit:

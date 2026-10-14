@@ -131,6 +131,15 @@ guards:
   #: the ladder silently turn "the window is due to CLOSE" into a broken build.
   scripts/check_freeze_window.py: tri_state
   scripts/check_freeze_window.py --selftest: fatal
+  #: D-2997/BUG-781: the INGEST DOOR. The health line is tri_state: 2 = OWNER-OWED (a ledger pair or a T-129
+  #: collapse row with no owner word; a corpus name defect whose fix is a write) — loud, NOT fatal (BUG-457).
+  #: The SAME rc REFUSES at the ingest step: the door's reading is declared in config#door.ingest_reading, so a
+  #: rail pinning the health line to `|| exit 1` would turn an owner's owed word into a broken build, and one
+  #: pinning the ingest line to tri_state would let a run mint a corroboration claim its evidence contradicts.
+  #: It is a READER of four declared homes (the D-2738 ledger, T-129's sheet, the two detector reports, and
+  #: book_metadata's identity + sanitizer) and writes ONLY a deferral receipt under declared runtime state.
+  scripts/check_ingest_identity_gate.py: tri_state
+  scripts/check_ingest_identity_gate.py --selftest: fatal
   scripts/build_archive_index.py --check: fatal
   scripts/build_archive_index.py --selftest: fatal
   scripts/recompute_decision_summary.py --check: fatal

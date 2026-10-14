@@ -38,6 +38,10 @@ may_touch:
 # D-2993 (NAMED, never a glob): the T-120 step-0 measurement record - the corroboration falsifier that FIRED, the
 # one bit in three columns (BUG-775), and the two forensic negatives cleared at the row level.
 - governance/T120_S1_RECON_20261014.md
+# D-2997/BUG-781 (NAMED, never a glob): the ingest door added a library module and edited the ingest stage.
+- pipeline/ingest_gate.py
+- pipeline/stage0_convert.py
+- governance/INGEST_IDENTITY_GATE_20261014.md
 - governance/existence_negatives.yaml
 - governance/HANDOFFS.jsonl
 - governance/r5_reviews.jsonl

@@ -24,6 +24,8 @@ health:
     python3 scripts/gate_duplicate_candidates.py --selftest || exit 1   # D-2738: owner-gate ledger generator controls (a control nothing runs is a comment, BUG-492)
     python3 scripts/verify_duplicate_gate.py --selftest || exit 1   # D-2738: fail-closed dedup-gate rail controls (BUG-492)
     python3 scripts/verify_duplicate_gate.py || exit 1   # D-2738: owner-gate ledger structural check — never auto-merge; --gate is POST-RUN apply only
+    python3 scripts/check_ingest_identity_gate.py --selftest || exit 1   # D-2997/BUG-781: the INGEST DOOR's known-answer controls (the delta rule, a byte twin under a new name, an undeclared ledger verdict, a blind door) — a control nothing runs is a comment (BUG-492)
+    python3 scripts/check_ingest_identity_gate.py || [ $? -eq 2 ]   # D-2997/BUG-781: the identity the INGEST PATH never read — the D-2738 ledger held 59 adjudicable pairs, `adjudicated: 0`, from 2026-09-30 while BUG-780 measured the cost (530 rows certified by ONE voice under TWO names, 369 served). 2 = OWNER-OWED (a pair with no owner word; a corpus name defect whose fix is a write), loud NOT fatal (BUG-457). The SAME rc REFUSES at the ingest step — a DECLARED difference (config/ingest_identity_gate.yaml#door.ingest_reading), which is why the two readings are two declared lines and not one
     python3 scripts/consolidate_anchor4_context.py --check || exit 1
     python3 scripts/check_depth_menu.py || exit 1
     python3 scripts/menu_axis_hashes.py --check || exit 1   # the answer-space pin must not be STALE (D-371/BUG-453)
@@ -210,6 +212,7 @@ triad:
     python3 pipeline/stage0_5_extract_metadata.py
     python3 pipeline/stage1_chunk.py
     python3 pipeline/stage1_3_prefilter.py
+    python3 scripts/check_ingest_identity_gate.py --gate || exit 1   # D-2997/BUG-781: the door's INGEST reading — rc 2 here REFUSES (identity unresolved: a run would mint the corroboration claim its own evidence contradicts), rc 1 = a BLIND door (C16). Release = the owner words (T-129/T-131)
     python3 pipeline/stage1_5_embed_cluster.py
     python3 pipeline/stage2_extract.py
     python3 pipeline/stage4_merge.py

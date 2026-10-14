@@ -24439,3 +24439,69 @@ decisions:
   - governance/WORK_IDENTITY_COLLAPSE_20261014.md
   - governance/work_identity_collapse_review_20261014.csv
   - governance/buglog.md
+- id: D-2997
+  date: '2026-10-14'
+  state: RESOLVED
+  category: GOVERNANCE / INGEST IDENTITY
+  title: 'The identity machinery was never missing — its ENFORCEMENT POINT was: the owner ledger held 59 adjudicable
+    pairs with adjudicated: 0 from 2026-09-30 while the ingest path read NOTHING, so the door is now DELTA-SCOPED,
+    unbypassable and fail-closed, and the SAME rc is declared to mean two things at its two readings'
+  bugs:
+  - BUG-781
+  - BUG-780
+  decision: '(1) THE DEFECT IS AN ABSENCE OF A READER, NOT A MISSING DETECTOR. MEASURED 2026-10-14: detect_title_renames
+    (D-2736) and detect_same_work_content (D-2737) feed ONE owner ledger (D-2738) whose reader verify_duplicate_gate.py
+    --gate is declared POST-RUN only; the ledger held 59 adjudicable pairs with `adjudicated: 0` for fourteen days
+    while BUG-780 measured what an unguarded door costs (530 count-corroborated rows are ONE TEXT under TWO NAMES,
+    369 served). Adding a third detector would have added a fourth blindspot.
+
+    (2) THE DOOR IS DELTA-SCOPED (THE CASCADE RULE). Only files ABSENT from the metadata cache are candidates, so
+    no ingested file, row, checkpoint, source_id or count can move because of the gate; a deferred candidate is
+    skipped IN PLACE, never deleted (R-D410), named loudly and receipted under declared runtime state. MEASURED:
+    0 candidates over the live 940-file corpus — the door is INERT on what already exists and can act only on a
+    future batch.
+
+    (3) ONE rc, TWO DECLARED READINGS. In `just health` rc 2 is OWNER-OWED and NOT fatal (BUG-457); at the ingest
+    step the SAME rc REFUSES, because a run that proceeded would mint the very claim (corroboration by two VOICES)
+    that the unresolved identity makes false. The difference is declared (door.ingest_reading: rc2_refuses) and
+    pinned in the rail registry, because a number that means two things by accident is the class (ii) defect the
+    registry exists to catch.
+
+    (4) NOTHING IS RE-DETECTED, MERGED, LABELLED OR DELETED. The gate reads four declared homes (the D-2738 ledger,
+    T-129''s collapse sheet, the two detector reports, and book_metadata''s identity + sanitizer D2176/D2449) and
+    writes only its own deferral receipt. Work identity remains an OWNER WORD (D-2898); `min_source_diversity` is
+    untouched (risk R2); no duplicate-adjusted scalar is minted (D-2646).
+
+    (5) THE DOOR SHIPPED WITH CONTROLS, AND THEY CAUGHT TWO REAL DEFECTS BEFORE THE COMMIT. (a) The filename-fallback
+    branch of compute_source_id returns a BARE digest — there is no `unknown|` prefix — so a gate that trusted the
+    id''s SHAPE admitted a new file as its own duplicate; honesty is now decided by the SOURCE (a cache record with
+    author AND title), never by an id''s shape (the BUG-511 class). (b) The detector report carries no `pair_id`
+    while the ledger does, so a coverage check across two id NAMESPACES reported all 29 content candidates as an
+    uncovered (stale) ledger — a FALSE FATAL; coverage now joins on the unordered {a_id,b_id} pair key, the only
+    key both surfaces carry. Both are recorded in BUG-781 and both are why the gate''s selftest is a prerequisite,
+    not a formality.
+
+    (6) THE TWO PLANS THE OWNER ASKED FOR. POST-HOC (bounded, owner-gated): collapse the 84 measured pairs + the
+    59 ledger pairs as a DECLARED identity map, re-derive only the affected rows'' source_ids/source_diversity/
+    is_convergent at their DECLARED home (config/derivations.yaml), write the `duplicate_of` marker that currently
+    has no writer, re-derive the T-118 tier, and let check_corroboration_bit re-prove the whole 7,640 population
+    while check_corroboration_collapse --voice reproduces the 530 census. Expected: is_convergent 1,393 -> 863,
+    advertised corroborated 257 -> <=123, ZERO rows deleted. FUTURE BATCHES (L0-L4): the door (L0) -> the content
+    screen before S1.5 (L1) -> diversity that counts VOICES via the declared map (L2) -> the ladder line that stops
+    the debt going quiet (L3) -> a per-batch receipt naming deferrals and outstanding owner words (L4).'
+  evidence: 'pipeline/ingest_gate.py; scripts/check_ingest_identity_gate.py (selftest 8/8, live --check rc 2, --gate
+    rc 2 REFUSES, --preflight 0 candidates / 940 files); config/ingest_identity_gate.yaml; config/rail_registry.yaml
+    (tri_state guard pinned); justfile#health + #triad lines; pipeline/stage0_convert.py::apply_ingest_door (verified
+    end-to-end on a synthetic corpus in temp/: 2 candidates deferred, 1 admitted, receipt written); governance/INGEST_IDENTITY_GATE_20261014.md
+    (design, forensic audit, both plans); BUG-781. Independence: the door''s controls ran against a synthetic corpus
+    (no store home is touched), and the review delegate check is recorded separately (R5: generator != verifier).'
+  files:
+  - pipeline/ingest_gate.py
+  - scripts/check_ingest_identity_gate.py
+  - config/ingest_identity_gate.yaml
+  - pipeline/stage0_convert.py
+  - config/rail_registry.yaml
+  - config/task_register.yaml
+  - justfile
+  - governance/INGEST_IDENTITY_GATE_20261014.md
+  - governance/buglog.md

@@ -8,13 +8,13 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1124 decisions (census stamp 6751313b4b68da8a, 2026-10-14) · 544 bugs (195 open / 349 closed; highest OPEN = BUG-780) · 24 open tasks (MUST 8 / SHOULD 13 / WORTH 3; OWNER-moved 5, pipeline-moved 19; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1125 decisions (census stamp 9b03953ab8ee85ad, 2026-10-14) · 545 bugs (196 open / 349 closed; highest OPEN = BUG-781) · 25 open tasks (MUST 9 / SHOULD 13 / WORTH 3; OWNER-moved 6, pipeline-moved 19; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **67** of 1124 — 🔴 open 32 · 🔵 proposed 14 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 565 · ⚖ ratified 133 | closed: ✅ resolved 324 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1124, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **67** of 1125 — 🔴 open 32 · 🔵 proposed 14 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 565 · ⚖ ratified 133 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1125, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 195 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 30 · 🟨 MED 41 · 🟩 LOW 19 · UNLABELLED 101 (BUG-757) of 195 open.
+> Open BUGS by severity (population = the census's 196 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 31 · 🟨 MED 41 · 🟩 LOW 19 · UNLABELLED 101 (BUG-757) of 196 open.
 >
-> **OWNER LANE (5) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
+> **OWNER LANE (6) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
@@ -22,6 +22,7 @@
 > | T-117 | 🔴 MUST | BUG-749 residual — the ESCALATE surface: the units NO owner ruling reaches | one owner word per unit on the reference sheet (CONFIRM / CORRECT + ho |
 > | T-124 | 🔴 MUST | the RED ladder (BUG-777 + BUG-778): the anchor-bridge ambiguity policy is owed first, then the masked 68-rail  | the ambiguity policy is a RULING (D-2898): a name resolving to N rows  |
 > | T-129 | 🔴 MUST | WORK IDENTITY COLLAPSE — collapse the duplicate works at the IDENTITY layer, so a row stops advertising a corr | one owner word per pair on governance/work_identity_collapse_review_20 |
+> | T-130 | 🔴 MUST | THE INGEST DOOR — the identity guarantee becomes an ENFORCEMENT POINT (delta-scoped), so a duplicate work cann | mover = owner for the RELEASE (59 ledger pairs + 84 collapse rows on g |
 > | T-121 | 🟠 SHOULD | the SOURCE KIND axis + per-kind identity - the prerequisite the internet-intake plan does not have | one owner word for the source-kind VOCABULARY (an answer-space decisio |
 >
 > **PIPELINE LANE (19) — what the agent will do next, in strategic-consequential order (source: config/task_register.yaml):**
@@ -74,6 +75,7 @@
 
 | Bug | Date | Issue |
 |---|---|---|
+| BUG-781 | 2026-10-14 | **THE IDENTITY MACHINERY EXISTED; ITS ENFORCEMENT POINT DID NOT — so "a duplicate work may not enter the corpus" was a DECLARATION with nothing reading it, and the door stayed shut only on paper.** MEASURED 2026-10-14: `governance/duplicate_adjudication.json` (D-2738, the ONE owner ledger built from `detect_title_renames.py` D-2736 + `detect_same_work_content.py` D-2737) holds **59 adjudicable pairs with `adjudicated: 0`**, unmoved since **2026-09-30**; its declared fail-closed reader `verify_duplicate_gate.py --gate` is declared **POST-RUN apply only**, and NO line of the ingest path (`pipeline/stage0_convert.py`, `justfile#triad`, `justfile#stage0`) read the ledger at all. BUG-780 then measured what a fortnight of an unguarded door costs: 530 of the 1,393 count-corroborated rows are ONE TEXT under TWO NAMES, 369 served. The class is the repo's own (i) "a rail NOTHING RUNS" (D-2665) — except the thing nothing ran was the INGEST GUARANTEE itself. FIX: T-130 — the ingest door (`pipeline/ingest_gate.py` + `scripts/check_ingest_identity_gate.py`), DELTA-SCOPED so only files absent from the metadata cache are candidates and no ingested file can move, wired into `stage0` (unbypassable) and into the ladder as a tri-state line whose rc 2 REFUSES at the door by DECLARATION. |
 | BUG-780 | 2026-10-14 | **WORK IDENTITY COLLAPSE — 84 work-pairs are ONE TEXT under TWO NAMES, so 530 "corroborated" rows (369 of them SERVED) are certified by a SINGLE VOICE, and `isor` rates 205 of them strong/medium.** Measured read-only 2026-10-14 over the 1,393 `is_convergent = 1` rows: 84 collapsing pairs at containment ≥0.80 (37 IDENTICAL normalised text, i.e. no threshold at all) forming 72 duplicate-work groups; the dominant shape is one book ingested twice — once by TITLE, once by FILENAME (`Hustle Harder, Hustle Smarter (Curtis 50 Cent…)` vs `Hustle Harder, Hustle Smarter.md`). `isor` is a METADATA measure, so a duplicate under a second name looks independent and rates STRONG — a content-level fact cannot be screened by a metadata-level measure, which is why `tier_policy` currently publishes "convergent: true, independence: strong" about one voice. Not a count defect (raising `min_source_diversity` is risk R2) and not a scoring gap (a duplicate-adjusted scalar would be a fourth home, D-2646): an IDENTITY defect one level below D-2309. FIX: T-129 (collapse the duplicates, then let `check_corroboration_bit` re-prove the population); write-up `governance/WORK_IDENTITY_COLLAPSE_20261014.md`; sheet `governance/work_identity_collapse_review_20261014.csv`. |
 | BUG-773 | 2026-10-13 | **The declared rule “a commit may never rewrite an existing row’s body” (D-2933 rule V, `config/dedup_identity.yaml` → `never_at_commit: true`) is CONTRADICTED by the live write path.** The commit is `INSERT OR REPLACE INTO fbs` on a `fb_id TEXT PRIMARY KEY` seeded by `SHA-256(name + definition)` (`pipeline/stage6_commit.py:764`, `pipeline/schemas.py:175`): a SAME-definition re-read rewrites all 77 columns — the prior reading is destroyed (C6) with no revision — and a one-character definition move FORKS a twin row that nothing reconciles. `content_basis` (the pointer saying which text the body was read from) is a RESERVED NAME WITH NO WRITER, so neither case is invisible-but-recorded; both are simply invisible. FIX: the append-only revision trail + the `content_basis` writer at extraction (D-2992 R2). |
 | BUG-772 | 2026-10-13 | **CORROBORATION is frozen by ONE RUN’s clustering, so a later independent source can NEVER raise an existing row’s tier.** `is_convergent` is written by S1.5 as “at least two distinct canonical sources IN ONE CLUSTER OF ONE RUN” (`pipeline/stage1_5_embed_cluster.py`, D2176) and nothing recomputes it; the dedup instrument groups by `(normalize_name, source_id)` — THE SAME WORK (`pipeline/dedup_identity.py`, D-2950) — so a DIFFERENT work asserting the same claim is invisible to it by construction. The only path that sees the case is a FULL re-run whose segment set holds both works. Consequence: (i) a tier can never RISE; (ii) the first DELTA run — which the media plan makes unavoidable — collapses corroboration SILENTLY and reports it indistinguishably from “nothing to corroborate” (absence by blindness). FIX: T-120 (independence as a DERIVED, re-computable measure). |
@@ -13488,6 +13490,43 @@ f-string is neither. NAMED, not fixed: it is the natural home of the `check_conf
 Evidence: this entry; `pipeline/retrieve.py::_rank_sql` (the one line) + `:1103`/`:1123` (the declared reads);
 `config/feedback.yaml` (the ONE home, and its own header stating the rule);
 `specs/retrieval_serving.spec.md` INV-3.
+
+## BUG-781 (HIGH - OPEN 2026-10-14) - THE IDENTITY MACHINERY HAD NO ENFORCEMENT POINT: the owner ledger sat 59 pairs PENDING for a fortnight while the INGEST path read nothing
+
+- **Where.** The ABSENCE of a reader, not the presence of a defect: `pipeline/stage0_convert.py`, `justfile#triad`,
+  `justfile#stage0` — none of them read `governance/duplicate_adjudication.json`. The machinery around it is healthy
+  and green in the ladder (`detect_title_renames.py` 45 candidates, `detect_same_work_content.py` 29 candidates,
+  `gate_duplicate_candidates.py` 59 ledger pairs, `verify_duplicate_gate.py --selftest` passing).
+- **The measurement.** MEASURED 2026-10-14: `candidate_count: 59`, `adjudicated: 0`, verdicts `Counter({'PENDING': 59})`,
+  ledger last written 2026-09-30 19:52 — fourteen days in which the corpus kept growing and BUG-780's 84 pairs kept
+  certifying 530 rows as corroborated by ONE voice under TWO names (369 of them SERVED).
+- **Why it is the BUG-780 shape, one level UP.** BUG-780 is the CORPUS consequence; this is the PIPELINE cause. An
+  unresolved identity was not refused at the door, so it was ingested, rowed, and decided by nobody.
+- **Why nothing caught it (four reasons, all reusable).** (a) `--gate` is declared POST-RUN; a reader that only runs
+  after the batch cannot refuse the batch. (b) The ledger's own `_preserve_verdicts` carries verdicts forward, so a
+  never-adjudicated ledger re-renders byte-identically on every run and LOOKS maintained. (c) `verify_duplicate_gate.py`
+  was run by the ladder in its STRUCTURAL mode, whose docstring is explicit that "PENDING is a valid state (owner
+  gating is a human step)" — TRUE about the structure and SILENT about the door: green rail, open door. (d) No line
+  carried a corpus-denominator, so "the corpus grew" had no measurement that could disagree with it.
+- **The fix (T-130).** The missing enforcement point and nothing else: `pipeline/ingest_gate.py` (the door) +
+  `scripts/check_ingest_identity_gate.py` (its rail, 8/8 controls) + `config/ingest_identity_gate.yaml` (the ONE
+  policy home). It re-detects NOTHING (detection has one home, C12/D-2646), merges NOTHING (D-2898: a work-identity
+  label is an owner word) and deletes NOTHING (R-D410). It is DELTA-SCOPED — only files absent from the metadata
+  cache are candidates — so no ingested file, row, checkpoint or count can move because of it (the cascade rule;
+  measured: 0 candidates over the live 940-file corpus). A deferred candidate is skipped IN PLACE, named loudly and
+  receipted under declared runtime state. Wired into `stage0` (so no recipe can bypass it) and into the ladder as a
+  TRI-STATE line whose rc 2 REFUSES at the ingest step BY DECLARATION (`door.ingest_reading: rc2_refuses`).
+- **The two blindspots found while building it (recorded, because both were caught by CONTROLS and not by reading).**
+  (1) `compute_source_id`'s filename-fallback branch returns a BARE digest — there is NO `unknown|` prefix to test
+  for — so a door that trusted the id's SHAPE admitted a brand-new file as its own duplicate; identity honesty is now
+  decided by the SOURCE (a cache record carrying author AND title), never by an id's shape (the BUG-511 class).
+  (2) The detector report carries NO `pair_id` while the ledger does, so a coverage check compared two id NAMESPACES
+  and reported all 29 content candidates as an uncovered/STALE ledger — a false FATAL. Coverage is now joined on the
+  unordered `{a_id,b_id}` pair key, the one key both surfaces carry. A door ships with controls, not with confidence.
+- **Status.** OPEN. The DOOR is landed and inert on the existing corpus; what remains is the owner's words on the 59
+  ledger pairs + the 84 collapse rows (T-129/T-130), and until they land `--gate` REFUSES BY DESIGN. Evidence:
+  `governance/INGEST_IDENTITY_GATE_20261014.md`; `pipeline/ingest_gate.py`; `scripts/check_ingest_identity_gate.py`;
+  `config/ingest_identity_gate.yaml`; `config/rail_registry.yaml`.
 
 ## BUG-780 (HIGH - OPEN 2026-10-14) - WORK IDENTITY COLLAPSE: 84 work-pairs are ONE TEXT under TWO NAMES, so 530 "corroborated" rows (369 of them SERVED) are certified by a SINGLE VOICE while `isor` rates 205 of them strong/medium
 

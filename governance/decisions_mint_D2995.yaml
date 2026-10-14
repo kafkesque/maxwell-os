@@ -1,0 +1,109 @@
+# Mint record — D-2995: the retired scalar leaves the MACHINE (the producer as well as the readers), and the retirement becomes a rail
+- id: D-2995
+  date: '2026-10-14'
+  state: RESOLVED
+  category: GOVERNANCE / CONTRACT
+  title: >-
+    BUG-776 closed: every INTERNAL reader of the retired BORP scalar is removed and the S6 INSERT default that
+    FABRICATED the constant goes with them, so the column is writerless and NULL-shaped from the next commit; the
+    fused ranking has NO degraded arm (it refuses loudly rather than ordering by a dead column); and a retirement
+    is enforced by a rail that joins BOTH directions, so a retired name cannot be re-read and an allowance cannot
+    outlive its reason
+  bugs: [BUG-776]
+  decision: >-
+    THE DISPOSITION. D-2994 retired the scalar from the WIRE (the three serving surfaces an agent reads) and named
+    the machine half as owed, because it MOVES RETRIEVAL BEHAVIOUR and therefore needed its own change-set with its
+    own measurement (BUG-776). This act closes that: the readers are gone, the PRODUCER is gone, and the rule that
+    kept them alive is now enforced by a rail instead of a promise.
+    R1 — THE FALLBACK ARM IS DELETED, NOT MERELY UNREACHABLE. `pipeline/retrieve.py::_quality_field` returned
+    `"borp_score"` whenever `ranking.quality_score_enabled` was false, and `_rank_sql()` returned
+    `"borp_score DESC"` - i.e. the degraded path ranked on a column that is constant 0.0 on every canonical row
+    (rowid order dressed as a quality ranking). Both now call ONE guard that RAISES when the fused ranking is off:
+    there is no declared degraded ordering, and a config state with no declared ordering is a refusal, never a
+    guess (C16). The MEASURE itself (`confidence_score`) moved to its own declared home,
+    `config/pipeline_config.yaml#ranking.quality_field`, read fail-closed by
+    `pipeline/pipeline_paths.py::RANKING_QUALITY_FIELD` (no code default - D-2982/D-2644, the BUG-504 class).
+    R2 — THE PRODUCER. The register claimed "nothing writes it" and the derivations register claimed "NO writer
+    exists anywhere in the tree". Both were FALSE, and the audit found why the reader defect stayed hidden:
+    `pipeline/stage6_commit.py`'s INSERT default `fb.get("borp_score", 0.0)` wrote the constant on EVERY row of the
+    last commit. A fabricated 0.0 published as a trust score is worse than an unwritten column, so the default is
+    removed (column name, placeholder and value leave together - a mismatched arity is refused by the store, which
+    is how the change proved itself: 28/28 commit-path tests green after the fix, 9 red before it), and the two
+    checkpoint-sync DB-only field lists drop the name so the BUG-376 round-trip cannot carry the value back. The
+    DDL keeps the SLOT, labelled RETIRED: a retirement is not a DROP, and the artifact is not rewritten to forget.
+    R3 — WHAT THE CHANGE DID NOT DO TO THE SERVED PATH, MEASURED. Because two of the readers sit on the retrieval
+    path, the act carried its own receipt: `pipeline/retrieval_benchmark.py --json` over the 29 golden queries,
+    SERVED path, before and after - aggregate production recall 1.0 / mrr 0.9195 / precision 0.1 BOTH times, and
+    the per-query ranked-identity is EXACT (29/29 `top_hits` sequences equal, fingerprint 00deeb030657f314 pre ==
+    post). The fail-closed arm was exercised directly: with the gate forced false, both functions raise. The graph
+    neighbour SELECTs dropped the false scalar and ADDED NOTHING: a new served field is a payload-contract change
+    and would belong to its own act, not to a retirement.
+    R4 — THE OTHER READERS, ONE DISPOSITION EACH. `pipeline/query.py` prints the graded corroboration tuple
+    (D-2994's replacement) instead of a fabricated 0.0; `pipeline/run_monitor.py`'s `avg_borp_score` is DELETED (a
+    monitor metric that could only read 0.0 is a control that can never fire); the retrieval evaluator's
+    `BORP: ?` slot is DELETED from the judge prompt (it was information-free by construction - the constant 0.0
+    failed its own truthiness test, so it always rendered `?`); `pipeline/schemas.py::VerifiedFB.borp_score`
+    (default 1.0) is DELETED, because a pydantic default of 1.0 on a retired measure FABRICATES a trust score for
+    any model constructed without it; `pipeline/run_diagnostic.py`'s display list drops the field;
+    `stage6b_anytype_push.py::ALL_FIELDS` was RE-MEASURED (not assumed) and is already clear.
+    R5 — THE FIXTURES ARE THE PROOF. `tests/test_graph_expand_reverse.py` and
+    `tests/test_retrieval_quarantine_contract.py` build fake stores; the retired column is REMOVED from those DDLs
+    and the tests still pass - which is the machine proof that nothing in the retrieval path needs it.
+    `config/pipeline_config.yaml#test.full_run.defaults.borp_score` and the three `tests/full_run*.py` uses of it
+    are deleted for the same reason: a test harness that fabricates 1.0 is a fabricated value with a green receipt.
+    R6 — A RETIREMENT HAS A RAIL, AND THE RAIL HAS ONE RULE. `config/retired_names.yaml` is the ONE home of
+    retired names (word, decision, reason, and every file that may still NAME it with a why), and
+    `scripts/check_retired_names.py` joins it in BOTH directions: an undeclared reader is a DEFECT and an allowance
+    that outlives its reason is a DEFECT (the INV-12 both-directions rule applied to a name). It does NOT restate
+    what a reference is: that rule has ONE implementation, shared with the anti-resurrection rail
+    (`check_revoked_references.py::python_refs` - an inline string and an identifier are references; a comment and a
+    docstring are archaeology), because a second copy would be the BUG-499/BUG-502 class applied to the rule
+    itself (D-2642). 9/9 known-answer controls fire; wired FATAL into `just health` and `config/rail_registry.yaml`.
+    R7 — WHAT IS NOT IN THIS ACT, NAMED. (a) The store WRITE: nothing in the store was touched, so the NULL shape
+    arrives with the next S6 commit and the `config/store_columns.yaml` role/status row moves then through the
+    rail's own `--record` (D-2642: a measured field is never hand-edited) - recorded as T-123 so it is a named owed
+    action instead of a surprise. (b) The `borp_min_sources` THRESHOLD is a DIFFERENT name (the S1.5 `>= 2 works`
+    corroboration rule, alive and enforced) and is untouched: the rail targets `borp_score`, the retired value.
+    (c) The external Anytype column remains D-2994's declared residual.
+  evidence: >-
+    MEASURED 2026-10-14, ZERO store writes. (1) THE RECEIPT: pipeline/retrieval_benchmark.py --json
+    (SERVED path, 29 golden queries) pre == post on aggregate AND per-query ranked identity, fingerprint
+    00deeb030657f314. (2) THE FAIL-CLOSED ARM: with ranking.quality_score_enabled forced false, _quality_field()
+    and _rank_sql() both raise (control run). (3) THE RAIL: scripts/check_retired_names.py --selftest 9/9 controls
+    fire; live rc 0 with the naming set EXACTLY equal to the declared allowances (5 files: the DDL, the tombstoned
+    D2205 migration, the served-surface rail, and the two tests that assert the absence) - both directions.
+    (4) THE SUITE: 546 passed / 5 skipped (was 10 failed before the INSERT arity was corrected - the same audit
+    caught it), tests/test_config_defaults_census_spec.py 10 passed after the declared --record (counts.modules
+    556 -> 559; the key set and its coverage hash UNCHANGED, so no config-default behaviour moved).
+    (5) THE REGISTERS: check_derivation_homes (12 rows, 11 homed, 1 non-homed - ceiling 1, shrink-only),
+    check_rail_registry (no unowned rail), check_config_defaults --check rc 0, check_repo_integrity --worktree
+    (every dirty path granted), justfile parses.
+  files:
+    - pipeline/retrieve.py
+    - pipeline/pipeline_paths.py
+    - pipeline/query.py
+    - pipeline/run_monitor.py
+    - pipeline/retrieval_evaluator.py
+    - pipeline/run_diagnostic.py
+    - pipeline/schemas.py
+    - pipeline/stage6_commit.py
+    - pipeline/migrate_D2205_epistemic.py
+    - scripts/sync_checkpoint_from_db.py
+    - scripts/sync_s5_checkpoint_from_db.py
+    - scripts/check_retired_names.py
+    - config/retired_names.yaml
+    - config/pipeline_config.yaml
+    - config/served_fields.yaml
+    - config/derivations.yaml
+    - config/store_columns.yaml
+    - config/rail_registry.yaml
+    - config/task_register.yaml
+    - config/config_defaults_census.json
+    - justfile
+    - specs/retrieval_serving.spec.md
+    - tests/test_graph_expand_reverse.py
+    - tests/test_retrieval_quarantine_contract.py
+    - tests/test_hybrid_rrf_keyword_leg_d2511.py
+    - tests/full_run.py
+    - tests/full_run_streaming.py
+    - governance/buglog.md

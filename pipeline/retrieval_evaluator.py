@@ -250,13 +250,12 @@ def _build_critique_prompt(query: str, fbs: list[dict]) -> str:
         name: str = str(fb.get("name", ""))[:EVAL_FB_NAME_MAX_CHARS]
         domains: str = str(fb.get("domains", ""))
         definition: str = str(fb.get("definition", ""))[:EVAL_FB_DEFINITION_MAX_CHARS]
-        borp: str = f"{fb.get('borp_score', '?'):.2f}" if fb.get("borp_score") else "?"
         feedback: str = f"{fb.get('feedback_score', '?'):.2f}" if fb.get("feedback_score") is not None else "?"
 
         fb_summaries.append(
             f"{fb_id}: {name}\n"
             f"  Domain: {domains}\n"
-            f"  BORP: {borp} | Feedback: {feedback}\n"
+            f"  Feedback: {feedback}\n"
             f"  Definition: {definition}"
         )
 

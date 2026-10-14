@@ -173,7 +173,8 @@ CREATE TABLE IF NOT EXISTS fbs (
     classification_error TEXT,     -- D2351: failure reason when status != CLEAN
     -- Verification (from Stage 5)
     verification_results TEXT,     -- JSON array
-    borp_score REAL,
+    borp_score REAL,   -- RETIRED (D-2994/T-107): the artifact keeps the SLOT, but NOTHING writes
+                       -- and nothing reads it (D-2995/BUG-776). A retirement is not a DROP: the
     status TEXT NOT NULL,
     needs_human_review INTEGER,
     verifier_model TEXT,
@@ -640,7 +641,8 @@ def update_s5_provenance(conn: sqlite3.Connection, fb: dict) -> bool:
     Invariants enforced here (all fail-closed — the row is simply not written):
       * unknown commit scope is rejected before any write (C16, no silent fail-open);
       * only columns PRESENT in the checkpoint are written, so a field the checkpoint does
-        not carry can never be default-injected over a live value (e.g. borp_score);
+        not carry can never be default-injected over a live value (a scalar the store already
+        holds must never be overwritten by a code default - D-2995/BUG-776);
       * the stored `definition` must equal the checkpoint's, so a scoped write can never sit
         on top of diverged S4 content (fb_id is a content hash → they must match);
       * D274a/D274h (pre_write_verdict) still gates the write — it validates exactly the S5
@@ -782,7 +784,7 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
                 source_diversity, primary_source, source_principle_ids, source_segments,
                 evidence_passages, evidence_passages_shown,
                 classification_errors, classification_status, classification_error,
-                verification_results, borp_score, status,
+                verification_results, status,
                 needs_human_review, verifier_model,
                 s5_reason, epistemic_status, verification_method, isor,
                 practicality,
@@ -812,7 +814,7 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
                 ?, ?, ?, ?,
                 ?, ?,
                 ?, ?, ?,
-                ?, ?, ?,
+                ?, ?,
                 ?, ?,
                 ?, ?, ?, ?,
                 ?,
@@ -907,7 +909,6 @@ def insert_fb(conn: sqlite3.Connection, fb: dict) -> bool:
             _safe_str(fb.get("classification_error")),
             # verification
             _safe_json(fb.get("verification_results", [])),
-            fb.get("borp_score", 0.0),
             _safe_str(fb.get("status"), "PENDING"),
             1 if fb.get("needs_human_review") else 0,
             # D-2957/BUG-737: absent must be NULL, never a blank. pipeline/schemas.py declares

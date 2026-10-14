@@ -16,7 +16,7 @@ def _conn() -> sqlite3.Connection:
     conn.execute(
         "CREATE TABLE fbs ("
         "fb_id TEXT PRIMARY KEY, name TEXT, definition TEXT, domains TEXT, "
-        "borp_score REAL, related_fbs TEXT, contradicts_fbs TEXT, "
+        "related_fbs TEXT, contradicts_fbs TEXT, "
         "prerequisite_fbs TEXT, pipeline_run_id TEXT)"
     )
     return conn
@@ -24,8 +24,8 @@ def _conn() -> sqlite3.Connection:
 
 def _insert(conn, fid: str, related: list) -> None:
     conn.execute(
-        "INSERT INTO fbs VALUES (?,?,?,?,?,?,?,?,?)",
-        (fid, fid, f"def {fid}", "d", 0.0,
+        "INSERT INTO fbs VALUES (?,?,?,?,?,?,?,?)",
+        (fid, fid, f"def {fid}", "d",
          json.dumps(related), "[]", "[]", retrieve.CANONICAL_RUN),
     )
 

@@ -11,11 +11,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1122 decisions (census stamp a774a886be86b042, 2026-10-14) · 540 bugs (193 open / 347 closed; highest OPEN = BUG-776) · 17 open tasks (MUST 6 / SHOULD 8 / WORTH 3; OWNER-moved 3, pipeline-moved 14; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1123 decisions (census stamp 80c0ee779942890e, 2026-10-14) · 540 bugs (192 open / 348 closed; highest OPEN = BUG-775) · 18 open tasks (MUST 6 / SHOULD 9 / WORTH 3; OWNER-moved 3, pipeline-moved 15; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **67** of 1122 — 🔴 open 32 · 🔵 proposed 14 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 565 · ⚖ ratified 133 | closed: ✅ resolved 322 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1122, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **67** of 1123 — 🔴 open 32 · 🔵 proposed 14 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 565 · ⚖ ratified 133 | closed: ✅ resolved 323 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1123, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 193 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 27 · 🟨 MED 42 · 🟩 LOW 19 · UNLABELLED 101 (BUG-757) of 193 open.
+> Open BUGS by severity (population = the census's 192 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 26 · 🟨 MED 42 · 🟩 LOW 19 · UNLABELLED 101 (BUG-757) of 192 open.
 >
 > **OWNER LANE (3) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -25,7 +25,7 @@
 > | T-117 | 🔴 MUST | BUG-749 residual — the ESCALATE surface: the units NO owner ruling reaches | one owner word per unit on the reference sheet (CONFIRM / CORRECT + ho |
 > | T-121 | 🟠 SHOULD | the SOURCE KIND axis + per-kind identity - the prerequisite the internet-intake plan does not have | one owner word for the source-kind VOCABULARY (an answer-space decisio |
 >
-> **PIPELINE LANE (14) — what the agent will do next, in strategic-consequential order (source: config/task_register.yaml):**
+> **PIPELINE LANE (15) — what the agent will do next, in strategic-consequential order (source: config/task_register.yaml):**
 >
 > | id | pri | state | task | evidence |
 > |---|---|---|---|---|
@@ -40,7 +40,7 @@
 > | T-113 | 🟠 SHOULD | 🔴 open | PAY THE BASELINE the honest instrument REVEALED - the 71 keys behind block aliases, module by module, each wit | config/config_defaults_census.json after D-2982: 300 shadowed-declared keys / 568 sites (2 |
 > | T-114 | 🟠 SHOULD | 🔴 open | DISCHARGE THE INHERITED LADDER FAULTS - four lines were RED before D-2982 and the prefix report hid them | just health-full 2026-10-13: 7 faults / 128 lines; each rc=1 at 42f8b76^ (worktree). RE-ME |
 > | T-116 | 🟠 SHOULD | 🔴 open | GOLDEN-SET GROWTH — the instrument that ADDS harder/abstract goldens (T-101 can only RE-anchor the set it has) | scripts/reanchor_retrieval_goldens.py --check reports the draft/live set out of phase and  |
-> | T-109 | 🟡 WORTH | 🔴 open | spec/test sandbox — adopt the two mechanisms borrowed from impeccable / shadcn-ui-lint | specs/README.md (sandbox charter, prior art) |
+> | T-123 | 🟠 SHOULD | 🔴 open | the RETIRED borp_score row in config/store_columns.yaml: its role/status move when the next S6 commit makes th | config/store_columns.yaml (the borp_score why, 2026-10-14) + config/derivations.yaml#fbs.b |
 >
 > **STANDING RULES — in effect, never close (1):**
 >

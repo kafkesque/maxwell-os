@@ -53,7 +53,9 @@ STALE_BASE = S5_DIR / "checkpoint.jsonl.stale_20260902_154337"
 EXPECTED = S5_DIR / "checkpoint.jsonl.expected_count.json"
 
 # DB-only columns (written at S6, absent from the S5 checkpoint).
-_DB_ONLY_FIELDS = {"borp_score", "committed_at", "contradicts_fbs", "last_retrieved_at"}
+# D-2995 (BUG-776): `borp_score` LEFT this set with its writer - the S6 INSERT no longer names the
+# column (the retired scalar is never written again), so the checkpoint has no such value to carry.
+_DB_ONLY_FIELDS = {"committed_at", "contradicts_fbs", "last_retrieved_at"}
 
 # JSON-encoded DB text columns → parsed back to list/dict for the S5 checkpoint.
 _JSON_LIST_FIELDS = {

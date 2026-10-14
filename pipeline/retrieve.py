@@ -45,6 +45,7 @@ from pipeline.pipeline_paths import (  # D-2980: the ONE home of the candidate-p
     RANKING_CONFIDENCE_WEIGHT,
     RANKING_CONVERGENT_BOOST,
     RANKING_DIVERSITY_BOOST,
+    RANKING_QUALITY_FIELD,  # D-2995 (BUG-776): the measure's ONE home (fail-closed read)
     RANKING_QUALITY_SCORE_ENABLED,
     RERANK_ENABLED,  # D2521 (S2): production rerank adoption gate
     RERANK_POOL_CAP,
@@ -104,20 +105,37 @@ def _status_predicate(include_quarantine: bool) -> str:
     return "status = 'PASS'"
 
 
-def _quality_field() -> str:
-    """D2537: the verified-populated quality signal vs the dead borp_score.
+def _require_fused_ranking() -> None:
+    """D-2995 (BUG-776): the fused ranking is the ONLY declared ordering — fail CLOSED when it is off.
 
-    borp_score is ~all 0.0 (verified 3,310/3,310 PASS rows), so any `ORDER BY
-    borp_score` degenerates to rowid order. When RANKING_QUALITY_SCORE_ENABLED,
-    use S5 NLI confidence_score (avg 0.917, fully populated) instead.
+    There is no degraded arm to fall back to. The arm this replaced ordered by a scalar that is
+    constant 0.0 on every canonical row (D-2994/T-107), i.e. it served ROWID order while presenting
+    itself as a quality ranking: a reader branching on a value nothing writes (the BUG-511 class).
+    A config state with no declared ordering is a refusal, never a guess (C16).
     """
-    return "confidence_score" if RANKING_QUALITY_SCORE_ENABLED else "borp_score"
+    if not RANKING_QUALITY_SCORE_ENABLED:
+        raise RuntimeError(
+            "config/pipeline_config.yaml#ranking.quality_score_enabled is false and NO degraded "
+            "ordering is declared: the fused quality ranking is the ONE home of the served ORDER BY "
+            "(D2537/D-2979). The previous off-arm ordered by a retired constant and was removed "
+            "2026-10-14 (D-2994/BUG-776) — it must not be reintroduced as a silent fallback (C16)."
+        )
+
+
+def _quality_field() -> str:
+    """D2537/D-2995: the MEASURE the served ordering reads.
+
+    ONE home: config `ranking.quality_field`, read fail-closed by pipeline/pipeline_paths.py
+    (RANKING_QUALITY_FIELD — no code default, D-2982/D-2644). The verified arm is the S5 NLI
+    confidence_score; a retired column is not an admissible value here (BUG-776).
+    """
+    _require_fused_ranking()
+    return RANKING_QUALITY_FIELD
 
 
 def _rank_sql() -> str:
-    """D2537: fused quality-score ORDER BY clause (config-gated)."""
-    if not RANKING_QUALITY_SCORE_ENABLED:
-        return "borp_score DESC"
+    """D2537/D-2995: fused quality-score ORDER BY clause (config-gated, fail-closed)."""
+    _require_fused_ranking()
     return (
         f"COALESCE(confidence_score, 0.5) * {RANKING_CONFIDENCE_WEIGHT} "
         f"+ CASE WHEN is_convergent = 1 THEN {RANKING_CONVERGENT_BOOST} ELSE 0.0 END "
@@ -559,8 +577,9 @@ def search_hybrid(
     )
     # D2511 (BUG — RRF keyword-leg pollution): the "metadata/keyword" leg is only
     # meaningful when the caller actually filters by domain/discipline/depth.
-    # With NO filter, search_keyword() returned `ORDER BY borp_score DESC` — and
-    # with borp_score ~all 0.0 that collapses to ROWID order, i.e. a CONSTANT list
+    # With NO filter, search_keyword() returned the legacy `ORDER BY <a constant quality
+    # column> DESC` (D2511/BUG-710; the retired scalar is named in the decision record, not
+    # here) — a constant column collapses to ROWID order, i.e. a CONSTANT list
     # (e.g. "High Contrast Visual Design") injected into every query's RRF fusion.
     # That diluted the real FTS+vector signal and made hybrid WORSE than vector.
     # D273a/G12: it is also now QUERY-AWARE (receives the query text).
@@ -904,7 +923,7 @@ def graph_expand(
                         frontier.append(rel_id)
                         # Fetch FB details for the related entry
                         rrow = conn.execute(
-                            f"SELECT fb_id, name, definition, domains, borp_score "
+                            f"SELECT fb_id, name, definition, domains "  # D-2995 (BUG-776): the false quality scalar LEFT this payload; a NEW served field would be its own contract change
                             f"FROM fbs WHERE fb_id = ? {run_clause}",
                             (rel_id, *run_params),
                         ).fetchone()
@@ -924,7 +943,7 @@ def graph_expand(
                     visited.add(src_id)
                     frontier.append(src_id)
                     rrow = conn.execute(
-                        f"SELECT fb_id, name, definition, domains, borp_score "
+                        f"SELECT fb_id, name, definition, domains "  # D-2995 (BUG-776): the false quality scalar LEFT this payload; a NEW served field would be its own contract change
                         f"FROM fbs WHERE fb_id = ? {run_clause}",
                         (src_id, *run_params),
                     ).fetchone()
@@ -1003,7 +1022,7 @@ def graph_aware_search(
       1. search_hybrid → top-N seed FBs (RRF fusion of FTS + vector + keyword)
       2. graph_expand → 1-2 hop graph traversal over related/contradicts/prerequisite edges
       3. Deduplicate by fb_id
-      4. Rerank by: borp_score × (1.0 + feedback_score) × graph_closeness
+      4. Rerank by: <ranking.quality_field> × (1.0 + feedback_score) × graph_closeness
          (seed FBs weighted higher than 2-hop neighbors)
       5. Return top-k with _graph metadata attached
 
@@ -1081,13 +1100,13 @@ def graph_aware_search(
         gas_params.append(CANONICAL_RUN)
     rows = conn.execute(
         f"""SELECT *,
-            COALESCE({_quality_field()}, {NEUTRAL_PRIOR}) AS _borp,
+            COALESCE({_quality_field()}, {NEUTRAL_PRIOR}) AS _quality,
             COALESCE(feedback_score, {NEUTRAL_PRIOR}) AS _feedback
             FROM fbs
             WHERE fb_id IN ({placeholders})
             {class_filter_gas}
             {run_filter_gas}
-            ORDER BY _borp DESC, _feedback DESC""",
+            ORDER BY _quality DESC, _feedback DESC""",
         gas_params,
     ).fetchall()
 
@@ -1101,10 +1120,10 @@ def graph_aware_search(
         fb["_is_seed"] = is_seed
 
         # Graph-aware score: boost seed FBs, penalize distant ones
-        borp: float = float(fb.get(_quality_field(), NEUTRAL_PRIOR) or NEUTRAL_PRIOR)
+        quality: float = float(fb.get(_quality_field(), NEUTRAL_PRIOR) or NEUTRAL_PRIOR)
         feedback: float = float(fb.get("feedback_score", NEUTRAL_PRIOR) or NEUTRAL_PRIOR)
         graph_boost: float = 1.2 if is_seed else 0.9  # D2205: seed bias
-        fb["_graph_score"] = borp * (1.0 + feedback) * graph_boost
+        fb["_graph_score"] = quality * (1.0 + feedback) * graph_boost
 
     # Re-sort by graph-aware score
     results.sort(key=lambda fb: fb.get("_graph_score", 0.0), reverse=True)

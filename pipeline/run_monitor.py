@@ -159,8 +159,9 @@ def analyze_stage_output(stage_name: str, run_id: str) -> dict:
                 metrics["verification_statuses"] = statuses
                 pass_rate = statuses.get("PASS", 0) / len(items) if items else 0
                 metrics["pass_rate"] = round(pass_rate, 3)
-                borp_scores = [fb.get("borp_score", 0) for fb in items]
-                metrics["avg_borp_score"] = round(sum(borp_scores) / len(borp_scores), 3) if borp_scores else 0
+                # D-2995 (BUG-776): the retired scalar's average was DELETED here. It could only
+                # ever read 0.0 (the column is constant on every canonical row, D-2994), i.e. it
+                # was a monitor metric that could never move - a control nothing can make fire.
 
         except Exception as e:
             metrics["analysis_error"] = str(e)[:200]

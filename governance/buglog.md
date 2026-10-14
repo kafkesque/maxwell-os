@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1122 decisions (census stamp a774a886be86b042, 2026-10-14) · 540 bugs (193 open / 347 closed; highest OPEN = BUG-776) · 17 open tasks (MUST 6 / SHOULD 8 / WORTH 3; OWNER-moved 3, pipeline-moved 14; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1123 decisions (census stamp 80c0ee779942890e, 2026-10-14) · 540 bugs (192 open / 348 closed; highest OPEN = BUG-775) · 18 open tasks (MUST 6 / SHOULD 9 / WORTH 3; OWNER-moved 3, pipeline-moved 15; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **67** of 1122 — 🔴 open 32 · 🔵 proposed 14 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 565 · ⚖ ratified 133 | closed: ✅ resolved 322 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1122, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **67** of 1123 — 🔴 open 32 · 🔵 proposed 14 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 565 · ⚖ ratified 133 | closed: ✅ resolved 323 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1123, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 193 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 27 · 🟨 MED 42 · 🟩 LOW 19 · UNLABELLED 101 (BUG-757) of 193 open.
+> Open BUGS by severity (population = the census's 192 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 26 · 🟨 MED 42 · 🟩 LOW 19 · UNLABELLED 101 (BUG-757) of 192 open.
 >
 > **OWNER LANE (3) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -22,7 +22,7 @@
 > | T-117 | 🔴 MUST | BUG-749 residual — the ESCALATE surface: the units NO owner ruling reaches | one owner word per unit on the reference sheet (CONFIRM / CORRECT + ho |
 > | T-121 | 🟠 SHOULD | the SOURCE KIND axis + per-kind identity - the prerequisite the internet-intake plan does not have | one owner word for the source-kind VOCABULARY (an answer-space decisio |
 >
-> **PIPELINE LANE (14) — what the agent will do next, in strategic-consequential order (source: config/task_register.yaml):**
+> **PIPELINE LANE (15) — what the agent will do next, in strategic-consequential order (source: config/task_register.yaml):**
 >
 > | id | pri | state | task | evidence |
 > |---|---|---|---|---|
@@ -37,7 +37,7 @@
 > | T-113 | 🟠 SHOULD | 🔴 open | PAY THE BASELINE the honest instrument REVEALED - the 71 keys behind block aliases, module by module, each wit | config/config_defaults_census.json after D-2982: 300 shadowed-declared keys / 568 sites (2 |
 > | T-114 | 🟠 SHOULD | 🔴 open | DISCHARGE THE INHERITED LADDER FAULTS - four lines were RED before D-2982 and the prefix report hid them | just health-full 2026-10-13: 7 faults / 128 lines; each rc=1 at 42f8b76^ (worktree). RE-ME |
 > | T-116 | 🟠 SHOULD | 🔴 open | GOLDEN-SET GROWTH — the instrument that ADDS harder/abstract goldens (T-101 can only RE-anchor the set it has) | scripts/reanchor_retrieval_goldens.py --check reports the draft/live set out of phase and  |
-> | T-109 | 🟡 WORTH | 🔴 open | spec/test sandbox — adopt the two mechanisms borrowed from impeccable / shadcn-ui-lint | specs/README.md (sandbox charter, prior art) |
+> | T-123 | 🟠 SHOULD | 🔴 open | the RETIRED borp_score row in config/store_columns.yaml: its role/status move when the next S6 commit makes th | config/store_columns.yaml (the borp_score why, 2026-10-14) + config/derivations.yaml#fbs.b |
 >
 > **STANDING RULES — in effect, never close (1):**
 >
@@ -13269,7 +13269,7 @@ retraction/update path is part of the same obligation — a corpus that cannot a
   surface move so the wire cannot publish a tier that disagrees with the store.
 - **Status.** OPEN. Evidence: `governance/T120_S1_RECON_20261014.md` §2; `config/served_fields.yaml#tier_policy`.
 
-## BUG-776 (HIGH - OPEN 2026-10-14) - the RETIRED scalar is gone from the wire but still READ inside the machine
+## BUG-776 (CLOSED 2026-10-14) - the RETIRED scalar is gone from the wire but still READ inside the machine
 - **Where.** The T-107 change-set (D-2994) removed `borp_score` from all three serving surfaces, and the rail proves
   it from the payload's own AST keys (INV-12). The INTERNAL readers were deliberately NOT touched, because they move
   retrieval behaviour and therefore need their own change-set with its own measurement.
@@ -13288,5 +13288,52 @@ retraction/update path is part of the same obligation — a corpus that cannot a
   the graded tuple (or delete the metric), and delete the dead `ALL_FIELDS` list. It must land with a
   retrieval-measurement receipt (golden set) because it changes served ordering; a silent edit inside a contract
   change was refused on purpose.
-- **Status.** OPEN. Evidence: this entry; `config/served_fields.yaml#retired[borp_score].readers_owed`;
-  `config/derivations.yaml` (the `fbs.borp_score` row, `dead_but_read`).
+- **Status.** CLOSED 2026-10-14 by D-2995 (the reader change-set, one commit, with its receipt).
+
+**WHAT LANDED (D-2995).** Every reader named above is gone and the PRODUCER is gone with them:
+| site | disposition |
+| --- | --- |
+| `pipeline/retrieve.py::_quality_field` | the retired-column fallback is DELETED; the measure is now `config/pipeline_config.yaml#ranking.quality_field`, read fail-closed by `pipeline_paths.py::RANKING_QUALITY_FIELD` |
+| `pipeline/retrieve.py::_rank_sql` | the off-arm no longer returns a dead `ORDER BY`; with `quality_score_enabled: false` BOTH functions raise (`RuntimeError`), because there is no declared degraded ordering — a dead ordering may not return as a silent fallback (C16) |
+| `pipeline/retrieve.py:893,913` (graph SELECTs) | the false scalar is out of the neighbour payload; NO new field was added (that would be its own payload-contract act) |
+| `pipeline/query.py:287` | the operator line now prints the graded `corroboration_tuple` (D-2994's replacement), not a fabricated 0.0 |
+| `pipeline/run_monitor.py:162-163` | `avg_borp_score` DELETED — a monitor metric that could only read 0.0 is a control that can never fire |
+| `pipeline/retrieval_evaluator.py:253` | the `BORP: ?` slot DELETED from the judge prompt. It was information-free by construction (the constant 0.0 failed its own truthiness test, so it always rendered `?`) |
+| `pipeline/schemas.py` | `VerifiedFB.borp_score` (default 1.0) DELETED — a pydantic default of 1.0 on a retired measure FABRICATED a trust score for any model built without it |
+| `pipeline/stage6_commit.py` | the INSERT default `fb.get("borp_score", 0.0)` that PRODUCED the constant is REMOVED (the column, the `?` and the value all leave together — measured: 28/28 commit-path tests green); the DDL keeps the SLOT, labelled RETIRED |
+| `scripts/sync_checkpoint_from_db.py`, `sync_s5_checkpoint_from_db.py` | removed from the DB-only field sets, so the checkpoint round-trip (BUG-376) cannot CARRY the fabricated value back |
+| `pipeline/stage6b_anytype_push.py::ALL_FIELDS` | already cleared by D-2994 — re-measured clean, not assumed |
+| `config/pipeline_config.yaml#test.full_run.defaults` + `tests/full_run*.py` | the test harness's fabricated `borp_score: 1` DELETED |
+| `tests/test_graph_expand_reverse.py`, `test_retrieval_quarantine_contract.py` | the column is REMOVED from the fake-store DDL: the fixture no longer carries it and the tests still pass, which is the machine proof that nothing reads it |
+
+**THE RECEIPT (the bug's own gate: it moves retrieval behaviour).** `pipeline/retrieval_benchmark.py --json`
+was run before and after the change over the 29 golden queries, SERVED path (`search()`, D-2980):
+aggregate production `recall 1.0 / mrr 0.9195 / precision 0.1` BOTH times, and the per-query
+**ranked-identity is exact** — 29/29 production `top_hits` sequences byte-equal,
+fingerprint `00deeb030657f314` pre == post. The ordering does not move; the bug's risk was measured, not
+assumed. The fail-closed arm was exercised directly: with `quality_score_enabled` forced false, both
+`_quality_field()` and `_rank_sql()` RAISE (control run 2026-10-14).
+
+**THE PRODUCER (a claim of the register's own that the audit found FALSE).** `config/store_columns.yaml`
+said "nothing writes it" and `config/derivations.yaml` said "NO writer exists anywhere in the tree". Both
+were wrong: `stage6_commit.py`'s INSERT default wrote the 0.0 on every row of the last commit — which is
+how a constant nobody produced became a published trust score. That default is now removed, so the column
+is **writerless and NULL-shaped from the next S6 commit**. The role/status row in `config/store_columns.yaml`
+moves to `reserved` at that commit through its own `--record` (D-2642: a measured field is never
+hand-edited) — recorded as T-123 so the re-record is not a blindspot; the row's `why` now states the
+disposition instead of a false claim and a stale count.
+
+**THE RAIL (so it cannot come back).** `scripts/check_retired_names.py` + `config/retired_names.yaml`
+(D-2995) assert the join in BOTH directions: a file that NAMES a retired name without a declared allowance
+is a DEFECT, and an allowance that outlives its reason (a file that no longer names it) is a DEFECT — 9/9
+known-answer controls fire (an inline string and a bare identifier ARE references; a comment and a
+docstring are archaeology; an unparsable file is reported, never clean). The reference rule has ONE
+implementation, shared with `scripts/check_revoked_references.py::python_refs` (D-2642) — a second copy
+would be the BUG-499/BUG-502 class applied to the rule itself. Wired FATAL into `just health` and
+`config/rail_registry.yaml`.
+
+**WHAT IS *NOT* IN THIS ACT.** (1) the Word DROP: the store SLOT survives by design (a retirement is not a
+rewrite of the artifact). (2) A store WRITE: nothing in the store was touched — the shape moves at the next
+commit, which is the pipeline's own act. (3) A new served field on the graph-neighbour payload. (4) The
+external Anytype column (D-2994's declared residual). (5) The `borp_min_sources` THRESHOLD is a different
+name (the S1.5 `>= 2 works` rule, alive and enforced) and is untouched: the rail targets `borp_score`.

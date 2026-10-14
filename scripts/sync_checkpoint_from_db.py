@@ -61,7 +61,7 @@ _JSON_DICT_FIELDS = {"primary_source"}
 # S5 verification fields that must NOT leak into the S4 checkpoint record.
 _DB_ONLY_FIELDS = {
     "contradicts_fbs", "last_retrieved_at", "confidence_score",
-    "verification_results", "borp_score", "status", "needs_human_review",
+    "verification_results", "status", "needs_human_review",
     "verifier_model", "committed_at",
 }
 

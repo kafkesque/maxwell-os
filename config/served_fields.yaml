@@ -118,13 +118,15 @@ retired:
       it is enforced upstream at S1.5 (`>= 2 canonical works`) and its graded measure now replaces the scalar on the
       wire. Retiring the scalar costs an agent nothing it was ever told truthfully.
     consumers_clear: [maxwell_mcp_server.py, pipeline/stage6_okf_export.py, pipeline/stage6b_anytype_push.py]
-    readers_owed: >-
-      pipeline/retrieve.py::_quality_field (the fallback names the dead column when the fused-ranking flag is off),
-      pipeline/retrieve.py:893,913 (SELECT lists), pipeline/query.py:287 (a printed field), pipeline/run_monitor.py
-      (avg_borp_score can only ever be 0.0), pipeline/retrieval_evaluator.py:253 (a formatted '?'), and
-      pipeline/stage6b_anytype_push.py::ALL_FIELDS (a list nothing reads). FILED as BUG-776: these move retrieval
-      behaviour and therefore need their own change-set with its own measurement, not a silent edit inside a
-      contract change.
+    #: D-2995 (BUG-776, closed 2026-10-14): the INTERNAL readers are cleared in the same act that removed the
+    #: PRODUCER. The fallback arm that named the dead column is gone (the fused ranking fails CLOSED when it is
+    #: off - a dead ORDER BY may not return as a silent fallback); the two graph SELECTs, the CLI print, the
+    #: monitor metric, the evaluator line and the pydantic default are replaced or deleted; the S6 INSERT default
+    #: that FABRICATED the 0.0 is removed, so the column is writerless and NULL-shaped from the next commit.
+    readers_clear: [pipeline/retrieve.py, pipeline/query.py, pipeline/run_monitor.py, pipeline/retrieval_evaluator.py, pipeline/schemas.py, pipeline/stage6_commit.py, scripts/sync_checkpoint_from_db.py, scripts/sync_s5_checkpoint_from_db.py]
+    readers_owed: 'none - cleared by D-2995'
+    readers_rail: scripts/check_retired_names.py   # the both-directions join: no undeclared reader AND no stale allowance
+    receipt: governance/T120_S1_RECON_20261014.md (the retirement's measurement of record) + D-2995's ranked-identity receipt
 
 #: A `promote <field>` word needs a target with a NAMED home. The rail asserts the home EXISTS (file + symbol), so a
 #: promotion can never name a home that is only a hope.

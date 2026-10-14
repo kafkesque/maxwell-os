@@ -3,7 +3,7 @@
 FULL PIPELINE RUN v3 — Complete FB records with ALL properties. C12 compliant.
 
 Adds missing: author, book_title, citation, source_paragraph_ids, grounding_evidence,
-confidence, borp_score, related_fbs, embodiment_tag, taxonomy_version.
+confidence, related_fbs, embodiment_tag, taxonomy_version.
 Fixes: jargon in body only (not YAML), citation with Author (Book Title) format.
 
 D2121: All configurable values extracted to config/pipeline_config.yaml → test.full_run.
@@ -282,7 +282,6 @@ for i, p in enumerate(principles):
     source_para_ids = f"{Path(source_book_fn).stem[:20]}_p1"
 
     # ── Default values from config ──
-    borp_score = DEFAULTS["borp_score"]
     confidence = DEFAULTS["confidence"]
 
     # ── BUILD COMPLETE FB ──
@@ -317,7 +316,6 @@ for i, p in enumerate(principles):
         "grounding_evidence": DEFAULTS["grounding_evidence"],
         # Verification
         "confidence": confidence,
-        "borp_score": borp_score,
         "classification_errors": None,
         # v1 Anytype properties
         "context": context_val,

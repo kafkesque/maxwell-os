@@ -26,20 +26,20 @@ def _make_db() -> sqlite3.Connection:
         CREATE TABLE fbs (
             fb_id TEXT, name TEXT, definition TEXT, keywords TEXT,
             status TEXT, domains TEXT, discipline TEXT, depth TEXT,
-            borp_score REAL, is_summary INTEGER, classification_status TEXT,
+            is_summary INTEGER, classification_status TEXT,
             source_clusters TEXT, source_books TEXT,
             verification_results TEXT, classification_errors TEXT
         )
     """)
     conn.execute("""
-        INSERT INTO fbs (fb_id, name, definition, keywords, status, domains, discipline, depth, borp_score)
+        INSERT INTO fbs (fb_id, name, definition, keywords, status, domains, discipline, depth)
         VALUES ('pass_1', 'Habit Loop', 'A cue-routine-reward cycle that drives repeated behavior',
-                'habit', 'PASS', 'psychology', 'behavior', 'domain', 0.9)
+                'habit', 'PASS', 'psychology', 'behavior', 'domain')
     """)
     conn.execute("""
-        INSERT INTO fbs (fb_id, name, definition, keywords, status, domains, discipline, depth, borp_score)
+        INSERT INTO fbs (fb_id, name, definition, keywords, status, domains, discipline, depth)
         VALUES ('quar_1', 'Habit Quarantine', 'An unverified habit claim pending human review',
-                'habit', 'QUARANTINE', 'psychology', 'behavior', 'domain', 0.5)
+                'habit', 'QUARANTINE', 'psychology', 'behavior', 'domain')
     """)
     return conn
 

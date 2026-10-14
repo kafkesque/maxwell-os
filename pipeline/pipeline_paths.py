@@ -540,8 +540,14 @@ SYMMETRIC_RELATIONSHIP_TYPES = tuple(
 )
 FTS_STOPWORDS = frozenset(_CFG.get("retrieval", {}).get("fts_stopwords", []))  # C12: FTS stopwords from config (D2561)
 
-# D2537: opt-in fused quality ranking (replaces dead borp_score ordering)
+# D2537/D-2995 (BUG-776): fused quality ranking. The MEASURE the ordering uses has ONE home in config
+# (`ranking.quality_field`), read FAIL-CLOSED - a code default here would move the value's effective
+# setting out of config and turn a config miss into a silent fallback (D-2982/D-2644, the BUG-504 class).
+# The retired `borp_score` scalar is NOT a candidate for either field or fallback (constant 0.0 on
+# 7,640/7,640 rows, D-2994): with the fused ranking OFF there is NO declared ordering, and the code
+# refuses loudly instead of ranking on a column nothing writes (C16/BUG-511).
 RANKING_QUALITY_SCORE_ENABLED = bool(_CFG.get("ranking", {}).get("quality_score_enabled", False))
+RANKING_QUALITY_FIELD = str(required(_CFG, "ranking", "quality_field", where=_CFG_HOME))
 RANKING_CONFIDENCE_WEIGHT = float(_CFG.get("ranking", {}).get("confidence_weight", 1.0))
 RANKING_CONVERGENT_BOOST = float(_CFG.get("ranking", {}).get("convergent_boost", 0.10))
 RANKING_DIVERSITY_BOOST = float(_CFG.get("ranking", {}).get("diversity_boost", 0.05))

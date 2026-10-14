@@ -4,7 +4,8 @@
 BUG (found live during D2511 stress-testing): search_hybrid() always fused the
 `search_keyword()` leg into the RRF score map, even when the caller passed NO
 domain/discipline/depth filter. With no filter, search_keyword() returns
-`ORDER BY borp_score DESC` — and with borp_score ≈ all 0.0 that collapses to
+`ORDER BY <the constant quality column>` (retired 2026-10-14, D-2994 — named in the decision
+record, not here) — and with that column constant ≈ 0.0 it collapses to
 ROWID order, i.e. a CONSTANT list. The same ~100 FBs (e.g. "High Contrast
 Visual Design") then received a fixed RRF bonus in EVERY query, diluting the
 real FTS+vector signal and making hybrid WORSE than vector-only.

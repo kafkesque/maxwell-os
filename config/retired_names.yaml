@@ -1,0 +1,56 @@
+# config/retired_names.yaml — the ONE home of RETIRED NAMES (D-2995, closes BUG-776).
+#
+# A RETIREMENT is stronger than a debt. A debt says "this value is wrong, and the owner owes a word"; a
+# retirement says "no live code path may READ this name, and it must not return as a silent fallback".
+# The store's SLOT may survive (a retirement is not a DROP — the artifact is not rewritten to forget),
+# so the rail cannot be "the string is absent from the repo". It is: every file that names the name is
+# DECLARED here WITH a reason, and scripts/check_retired_names.py enforces the join in BOTH directions —
+# an undeclared reader is a DEFECT, and an allowance that outlives its reason is a DEFECT.
+#
+# WHAT COUNTS AS A REFERENCE has ONE implementation, shared with the anti-resurrection rail
+# (scripts/check_revoked_references.py::python_refs): an inline string, an identifier, an attribute or a
+# keyword name IS a reference; a comment and a docstring are archaeology and are not.
+#
+# SCOPE. Code roots only. config/*.yaml and governance/*.md DECLARE the retirement (they must be able to
+# name it), so they are not scanned; a name that a config value READS is a different defect class
+# (config/store_columns.yaml role records + scripts/check_store_columns.py).
+
+scan_roots: [pipeline, scripts, tests]
+scan_files: [maxwell_mcp_server.py]
+
+retired:
+  borp_score:
+    word: retire
+    decision: D-2994
+    closed_by: D-2995
+    bug: BUG-776
+    reason: >-
+      A scalar published as a trust score that was constant 0.0 on every canonical row: produced by no
+      stage (the S6 INSERT default fabricated the 0.0), constant on 7,640/7,640 rows, and advertised by
+      three serving surfaces. D-2994/T-107 retired it from the WIRE and promoted the graded corroboration
+      tuple in its place; D-2995 retired it from the MACHINE (the rank fallback, the two graph SELECTs,
+      the monitor metric, the evaluator line, the pydantic default) and removed the S6 default that
+      produced the value, so the column is now writerless and NULL-shaped from the next commit.
+    may_name:
+      - path: pipeline/stage6_commit.py
+        why: >-
+          the store DDL. A retirement is not a DROP: the artifact keeps the SLOT and the DDL is the one
+          place that must still describe it, labelled RETIRED and written by nothing.
+      - path: pipeline/migrate_D2205_epistemic.py
+        why: >-
+          the TOMBSTONED D2205 migration (BUG-503/D-2643), unreachable without the owner's explicit
+          opt-in flag, whose SQL is the tombstone's own evidence. Its backfill source is retired: if the
+          owner ever re-opens D2205, that arm reads NULL and the backfill must be re-declared rather than
+          fabricating 0.5 where no measurement exists.
+      - path: scripts/check_served_fields.py
+        why: >-
+          the SERVED-SURFACE rail: it owns the retirement on the wire (config/served_fields.yaml#retired),
+          so it must be able to name what it retired and assert its absence from the payload.
+      - path: tests/test_retrieval_serving_spec.py
+        why: >-
+          INV-3's machine proof: it asserts the retired name is ABSENT from the served rank clause. A
+          test that asserts an absence must name the thing it asserts is absent.
+      - path: tests/test_served_fields_spec.py
+        why: >-
+          D-2994's machine proof: it asserts no serving payload advertises the retired scalar, which is
+          the measurement that let the wire half of the retirement be called landed.

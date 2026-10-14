@@ -900,12 +900,13 @@ rerank:
   max_length: 512
   batch_size: 8
 ranking:
-  # D2537: opt-in fused quality ranking. borp_score is ~all 0.0 (verified 3310/3310
-  # PASS rows), so the legacy `ORDER BY borp_score` collapses to rowid order. When
-  # enabled, rank by S5 NLI confidence_score + epistemic boosts (convergent /
-  # source-diverse). ENABLED 2026-10-13: the borp_score fallback is a constant (dead)
-  # on the served run, so OFF would collapse ranking to rowid order (P0 ranking fix).
+  # D2537/D-2995: fused quality ranking. `quality_field` is the MEASURE the ordering reads - ONE
+  # home (C12), read fail-closed by pipeline/pipeline_paths.py (no code default: D-2982/D-2644).
+  # ENABLED 2026-10-13 (D-2979): the superseded `ORDER BY` fallback collapsed to rowid order on the
+  # served run (a constant signal), so OFF now has NO declared ordering - pipeline/retrieve.py
+  # refuses loudly instead of ranking on a retired column (BUG-776, closed 2026-10-14).
   quality_score_enabled: true
+  quality_field: confidence_score
   confidence_weight: 1.0
   convergent_boost: 0.10
   diversity_boost: 0.05
@@ -1143,7 +1144,6 @@ test:
       domain: intermediate
     defaults:
       confidence: 0.7
-      borp_score: 1
       grounding_evidence: source_text
       accessibility: self-evident
       intimacy_boundary: public

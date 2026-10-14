@@ -14,7 +14,7 @@ Adds 8 columns to fbs table:
   Epistemic state (1): epistemic_state
 
 Backfills existing data:
-  - evidence_support ← borp_score
+  - evidence_support ← borp_score   [RETIRED SOURCE 2026-10-14, D-2994/D-2995: the run below REFUSES]
   - epistemic_state ← derived from status + feedback_count
   - execution_trials ← feedback_count
   - execution_successes ← feedback_count × feedback_score

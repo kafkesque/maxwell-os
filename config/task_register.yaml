@@ -456,3 +456,18 @@ tasks:
   source: [D-2994, D-2987, D-2960, BUG-504]
   evidence: 'config/served_fields.yaml#declared[classification_status] (word keep-and-repair, granted 2026-10-14) + config/store_columns.yaml classification_status status=debt + config/derivations.yaml fbs.classification_status orphan_magic_threshold + the measured distribution (CLEAN 7,640/7,640, status QUARANTINE 3,137) in governance/T120_S1_RECON_20261014.md (2026-10-14)'
   gate: 'none - the word is GRANTED (D-2994) and the mover is the pipeline: the act needs a C13 backup and a byte receipt, not a further ruling'
+- id: T-123
+  priority: SHOULD
+  state: open
+  mover: pipeline
+  title: 'the RETIRED borp_score row in config/store_columns.yaml: its role/status move when the next S6 commit makes the column NULL-shaped'
+  why: >-
+    D-2995 removed the S6 INSERT default that FABRICATED the constant, so the column is writerless: the stored
+    values are the last commit's default and the next S6 commit leaves the column NULL-shaped. At that moment the
+    row's declaration (role value, status debt) stops describing the store. The move to reserved is taken by the
+    rail's own re-record remedy, never by hand (D-2642: a measured field may not be hand-edited), and the row's
+    why already states the disposition - this task exists so the re-record is a NAMED owed action rather than a
+    future surprise. No further ruling is required: the retirement is decided (D-2994 wire, D-2995 machine).
+  source: [D-2995, D-2994, BUG-776]
+  evidence: 'config/store_columns.yaml (the borp_score why, 2026-10-14) + config/derivations.yaml#fbs.borp_score (status declared_but_empty) + scripts/check_store_columns.py --record (the declared remedy) + governance/SESSION-HANDOFF-20261014-D2995.md (the receipt and the declaration)'
+  gate: 'none - the mover is the pipeline: the act is scripts/check_store_columns.py --record after the next S6 commit, and the census that moves must move DOWNWARD only (D-2642 shrink-only)'

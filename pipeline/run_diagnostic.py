@@ -718,7 +718,7 @@ def generate_report(summary: dict, s5_fbs: list[dict]) -> str:
 
         # Verification details
         for vk in ["nli_label", "nli_score", "verifier_model",
-                    "verification_method", "borp_score", "epistemic_status"]:
+                    "verification_method", "epistemic_status"]:
             vv = fb.get(vk)
             if vv is not None:
                 lines.append(f"- **{vk}:** {vv}")

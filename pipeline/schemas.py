@@ -514,12 +514,6 @@ class VerifiedFB(FB):
     verification_results: list[VerificationResult] = Field(
         default_factory=list, description="All verification check results"
     )
-    borp_score: float = Field(
-        description="BORP score: distinct_sources / min_required",
-        ge=0.0,
-        le=1.0,
-        default=1.0,
-    )
     status: VERIFICATION_STATUS = Field(  # type: ignore[valid-type]
         default="PENDING",
         description="PASS | FLAG | QUARANTINE | PENDING",

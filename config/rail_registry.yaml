@@ -158,6 +158,12 @@ guards:
   #: migrates), so it carries no `writers:` entry.
   scripts/check_corroboration_bit.py: fatal
   scripts/check_corroboration_bit.py --selftest: fatal
+  #: D-2995/BUG-776: the RETIRED-NAME rail. FATAL, because a live code path reading a retired name is a WRONG
+  #: READING (it branches on a value nothing writes - the BUG-511 class), not a debt the owner owes a word for;
+  #: and its second direction (an allowance that outlives its reason) is a stale declaration, the same class
+  #: check_served_fields.py calls a DEFECT. It reads config/retired_names.yaml only - no store, no writer.
+  scripts/check_retired_names.py: fatal
+  scripts/check_retired_names.py --selftest: fatal
   #: D-2991: the golden re-anchor gate's judgment. FATAL: the ladder runs the CONTROLS, not the applier -- the
   #: reviewed sheet + draft exist only at a review sitting, so a liveness pin on --check would be a rail that reds
   #: on a laptop for the wrong reason. The judgment those controls prove is the SAME function both modes call

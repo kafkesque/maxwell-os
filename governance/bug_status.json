@@ -3,8 +3,8 @@
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
   "total_ids": 540,
-  "open_n": 193,
-  "closed_n": 347,
+  "open_n": 192,
+  "closed_n": 348,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -967,11 +967,6 @@
       "id": "BUG-775",
       "title": "(MED - OPEN 2026-10-14) - ONE BIT IN THREE COLUMNS: the corroboration the store advertises is a derivation nothing declares",
       "events": 1
-    },
-    {
-      "id": "BUG-776",
-      "title": "(HIGH - OPEN 2026-10-14) - the RETIRED scalar is gone from the wire but still READ inside the machine",
-      "events": 1
     }
   ],
   "closed": [
@@ -1321,6 +1316,7 @@
     "BUG-764",
     "BUG-765",
     "BUG-769",
-    "BUG-770"
+    "BUG-770",
+    "BUG-776"
   ]
 }

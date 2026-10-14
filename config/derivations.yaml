@@ -121,12 +121,15 @@ derivations:
   kind: derived_regenerable
   home: null
   parity_rail: null
-  status: dead_but_read
+  status: declared_but_empty
   note: >-
-    MEASURED 2026-09-25: 7995/7995 non-null with distinct values [0.0] - a constant except that NO writer exists
-    anywhere in the tree. It is still ORDER BY-ed as an arbitrary top-10 in pipeline/query.py and averaged in
-    pipeline/run_monitor.py where avg_borp_score can only ever be 0.0. D2537 already calls it the dead borp_score
-    ordering. home null is ON PURPOSE: a null home is the machine-readable statement that no code decides this.
+    RETIRED 2026-10-14 (D-2994 the wire / D-2995 the machine; closes BUG-776). MEASURED 2026-10-14: constant 0.0 on
+    7,640/7,640 canonical rows, FABRICATED by the S6 INSERT default - the register's earlier claim that "NO writer
+    exists anywhere in the tree" was itself wrong, which is why the reader-side defect hid for so long. The insert
+    default is REMOVED and every reader is gone, so the column is writerless and NULL-shaped from the next commit
+    (role/status in config/store_columns.yaml move by their own --record, not by hand). home null is ON PURPOSE: a
+    null home is the machine-readable statement that no code decides this, and now NO code reads it either -
+    scripts/check_retired_names.py asserts that join in both directions.
 - name: fbs.feedback_score
   table: fbs
   column: feedback_score

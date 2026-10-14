@@ -39,12 +39,17 @@ its test module; history lives in git plus the D-number that changed it.
 - **Correct:** the ORDER BY is the D-2979 fused quality score
   (COALESCE(confidence_score, 0.5) * weight + convergent boost + diversity boost), gated by
   ranking.quality_score_enabled: true, and it has ONE home (_rank_sql()).
-- **Why the fallback is wrong:** with the flag false, _rank_sql() returns "borp_score DESC" and
-  borp_score is retired debt (constant 0.0, nothing writes it), so the ORDER BY collapses to rowid
-  order and low-confidence rows compete at rank 1-2.
+- **There IS no fallback (D-2995, closes BUG-776):** with the flag false, _rank_sql() and
+  _quality_field() BOTH refuse (RuntimeError) instead of returning `"borp_score DESC"`. The legacy arm
+  ordered by a scalar that is constant 0.0 on every canonical row, i.e. it served rowid order while
+  presenting itself as a quality ranking — a reader branching on a value nothing writes (the BUG-511
+  class). "No ordering is declared" is now a refusal, never a guess (C16).
 - **Status:** ✅ SATISFIED (D-2979 flipped the gate 2026-10-13; the signal is verified non-constant
   at the DATA level, not merely at the code level). The CLI fallback in pipeline/query.py carried a
-  SECOND dead copy of this clause and was repointed to the ONE home by D-2980.
+  SECOND dead copy of this clause and was repointed to the ONE home by D-2980. **D-2995: the arm is
+  GONE, not merely unreachable** — `ranking.quality_field` is the measure's ONE home (fail-closed read),
+  and the retirement is enforced by `scripts/check_retired_names.py`; the change carried a ranked-identity
+  receipt over the 29 goldens (pre == post, fingerprint 00deeb030657f314).
 
 ### INV-4 — The benchmark gate fails loud, never a false 0.000 (C16)
 - **Correct:** retrieval_benchmark aborts exit 2 on any unresolvable golden (run/status/scope),
@@ -91,8 +96,11 @@ its test module; history lives in git plus the D-number that changed it.
   `specs/served_fields.spec.md` is the paired contract.
 
 ## Open items recorded by this spec (so they are not blindspots)
-1. The MCP query_knowledge payload advertises borp_score (retired constant) — awaiting an
-   owner-gated payload decision.
+1. ~~The MCP query_knowledge payload advertises borp_score (retired constant)~~ — **CLOSED 2026-10-14**:
+   D-2994 retired it from all three serving surfaces (owner word `retire`, T-107) and D-2995 removed every
+   internal reader plus the INSERT default that fabricated the 0.0. The disposition of every advertised
+   store field lives in `config/served_fields.yaml`; the retired name is now governed by
+   `config/retired_names.yaml` + `scripts/check_retired_names.py`.
 2. config serving.superseded_runs still lists the purged runs: it is the purge/restore-path
    declaration read by scripts/purge_superseded_runs.py, and it is now inert for serving (nothing
    un-purged exists). Retiring it requires the archive-restore path to be re-declared.

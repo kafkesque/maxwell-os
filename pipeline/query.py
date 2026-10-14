@@ -23,6 +23,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from pipeline.pipeline_paths import DB_PATH, CANONICAL_RUN  # D-2881: serving canonical-run pin
 from pipeline.retrieve import _rank_sql  # D-2980: the ranking home (no second ORDER BY home, C12/D-2537)
+from pipeline.corroboration import corroboration_tuple  # D-2994/D-2995 (BUG-776): the graded tuple, not the retired scalar
 from pipeline.label_traceability import traceability_of  # BUG-497/D-2640
 
 
@@ -212,9 +213,9 @@ def interactive(conn: sqlite3.Connection):
                     rows = conn.execute(
                         # D-2980: (a) the OR/AND PRECEDENCE bug is fixed - the unparenthesised
                         # OR let the name LIKE branch ignore the canonical-run pin (D-2881);
-                        # (b) the dead ORDER BY borp_score DESC is replaced by the ONE ranking
-                        # home (D-2537/D-2979): borp_score is a retired constant (0.0), so that
-                        # clause collapsed to rowid order.
+                        # (b) the legacy ORDER BY <constant quality column> DESC is replaced by
+                        # the ONE ranking home (D-2537/D-2979): the retired scalar (D-2994) was
+                        # constant on every canonical row, so that clause collapsed to rowid order.
                         "SELECT * FROM fbs WHERE (name LIKE ? OR definition LIKE ?) "
                         "AND pipeline_run_id = ? ORDER BY " + _rank_sql() + " LIMIT 10",
                         (like, like, CANONICAL_RUN),
@@ -284,7 +285,11 @@ def _print_fb_full(fb: dict):
     print(f"  Depth:       {fb.get('depth', 'N/A')}")
     print(f"  Evidence:    {fb.get('evidence', 'N/A')}")
     print(f"  Status:      {fb.get('status', 'N/A')}")
-    print(f"  BORP Score:  {fb.get('borp_score', 'N/A')}")
+    _corr: dict = corroboration_tuple(dict(fb))  # D-2994: the retired scalar's graded replacement
+    print(
+        f"  Corroboration: {_corr['sources']} source(s) | convergent={_corr['convergent']} "
+        f"| independence={_corr['independence']} ({_corr['independence_score']})"
+    )
 
     domains = fb.get("domains", [])
     if isinstance(domains, str):

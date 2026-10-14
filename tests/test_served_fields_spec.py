@@ -223,3 +223,23 @@ def test_the_thresholds_have_one_home_and_no_code_default() -> None:
         from pipeline import feedback as fb
 
         fb.declared("thresholds.retirement.not_a_key")
+
+# ── INV-10 — a granted owner word is JOINED to the thing it names, never restated ─────────────────────────────────
+
+def test_the_tier_word_is_joined_to_the_measure_it_names() -> None:
+    """INV-10 (T-118): the tier vocabulary must be the MEASURE's own, and the word must be SIGNED."""
+    policy = DECL.get("tier_policy")
+    assert isinstance(policy, dict), "T-118 is granted: the declaration must carry the tier policy"
+    assert policy["word"] == "tier" and policy["word"] in sf.TIER_WORDS
+    assert str(policy.get("granted") or "").strip(), "an unsigned word is not a rule (T-101)"
+    assert str(policy.get("granted_by") or "").strip()
+    rel, _, symbol = str(policy["vocabulary_home"]).partition("::")
+    tokens = sf.symbol_literals(rel, symbol)
+    assert set(policy["vocabulary"]) <= tokens, "a tier token living only in config is a RIVAL definition (C12)"
+    joined = sf.tier_faults(policy, tokens, sf.home_exists(policy["vocabulary_home"]), sf.home_exists(policy["accessor"]))
+    assert joined == [], joined
+    rival = {**policy, "vocabulary": [*policy["vocabulary"], "gold"]}
+    assert sf.tier_faults(rival, tokens, True, True), "a tier defined in config must be REFUSED, not tolerated"
+    rc, out = _live()
+    assert sf.DEFECT_TIER not in out, out
+    assert rc != 1, out

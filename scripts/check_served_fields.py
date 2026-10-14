@@ -59,10 +59,23 @@ DEFECT_ANCHOR = "DEFECT_UNSIGNED_WORD"
 DEFECT_HOME = "DEFECT_MISSING_HOME"
 DEFECT_CEILING = "DEFECT_CEILING_EXCEEDED"
 DEFECT_SURFACE = "DEFECT_MISSING_SURFACE"
+DEFECT_TIER = "DEFECT_TIER_POLICY_UNJOINED"
 EXIT_OK, EXIT_DEFECT, EXIT_OWNER_OWED = 0, 1, 2
 PROMOTE_PREFIX = "promote "
 PENDING = "pending"
-DEFECTS = (DEFECT_UNDECLARED, DEFECT_STALE, DEFECT_WORD, DEFECT_ANCHOR, DEFECT_HOME, DEFECT_CEILING, DEFECT_SURFACE)
+#: T-118: the three dispositions the owner was offered. `tier` is the granted word; the other two are declared so a
+#: near-miss token (`withold`, `keep`) is refused BY NAME rather than accepted as an unknown string (the T-101 rule).
+TIER_WORDS: tuple[str, ...] = ("tier", "withhold", "leave")
+DEFECTS = (
+    DEFECT_UNDECLARED,
+    DEFECT_STALE,
+    DEFECT_WORD,
+    DEFECT_ANCHOR,
+    DEFECT_HOME,
+    DEFECT_CEILING,
+    DEFECT_SURFACE,
+    DEFECT_TIER,
+)
 
 
 def load_declaration() -> dict[str, Any]:
@@ -150,6 +163,88 @@ def home_exists(home: str) -> bool:
         return False
     src: str = path.read_text()
     return f"def {symbol}" in src or f"class {symbol}" in src or f"{symbol}:" in src
+
+
+def symbol_literals(rel: str, symbol: str) -> set[str]:
+    """The string CONSTANTS inside one declared FUNCTION - the vocabulary a policy may borrow must exist in its home.
+
+    Why the FUNCTION and not the file: a token that appears only in a docstring or a comment is a mention, and a
+    mention is not the rule (D-2662). Reading the function's own body is what makes "the tier vocabulary lives in
+    the measure" a machine fact rather than a claim (C12/D-2642).
+
+    Args:
+        rel: repo-relative path of the home file.
+        symbol: the function whose body declares the vocabulary.
+
+    Returns:
+        The set of string constants inside that function, empty when the file or the symbol does not resolve.
+    """
+    path: Path = REPO / rel
+    if not path.exists():
+        return set()
+    try:
+        tree = ast.parse(path.read_text())
+    except SyntaxError:
+        return set()
+    for node in ast.walk(tree):
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and node.name == symbol:
+            inner: set[str] = set()
+            for sub in ast.walk(node):
+                if isinstance(sub, ast.Constant) and isinstance(sub.value, str):
+                    inner.add(sub.value)
+            return inner
+    return set()
+
+
+def tier_faults(
+    policy: dict[str, Any] | None,
+    measure_tokens: set[str],
+    home_ok: bool,
+    accessor_ok: bool,
+) -> list[str]:
+    """PURE guard for the T-118 tier policy (the known-answer control surface for the granted owner word).
+
+    Four things are checked, and each one is a way the owner's word could be silently UNJOINED: a policy that names a
+    word the owner never granted; a grant with no signature (T-101: an unsigned decision is not a rule); a tier
+    vocabulary that is a RIVAL DEFINITION rather than the measure's own (C12); and a rule with no statement of what
+    it does with a single-source row.
+
+    Args:
+        policy: the declared `tier_policy` block, or None when it is missing.
+        measure_tokens: the string constants inside the measure's own home function.
+        home_ok: whether `vocabulary_home` resolves (file + symbol).
+        accessor_ok: whether `accessor` resolves (file + symbol).
+
+    Returns:
+        One message per fault; empty when the word is joined.
+    """
+    if policy is None:
+        return [
+            "no `tier_policy` block: T-118 is GRANTED, so a declaration that omits it leaves the single-source policy"
+            " undeclared while 6,247 of 7,640 rows carry one source work"
+        ]
+    faults: list[str] = []
+    word: str = str(policy.get("word", "")).strip()
+    if word not in TIER_WORDS:
+        faults.append(f"tier word {word!r} is outside the declared dispositions {list(TIER_WORDS)}")
+    if not str(policy.get("granted") or "").strip() or not str(policy.get("granted_by") or "").strip():
+        faults.append("the tier word carries no grant (date + granted_by): an unsigned word is not a rule (T-101)")
+    if not home_ok:
+        faults.append(f"vocabulary_home {policy.get('vocabulary_home')!r} does not resolve (file + symbol)")
+    if not accessor_ok:
+        faults.append(f"accessor {policy.get('accessor')!r} does not resolve (file + symbol)")
+    vocabulary: list[str] = [str(v) for v in (policy.get("vocabulary") or [])]
+    if not vocabulary:
+        faults.append("the tier vocabulary is empty: a tier that names no tier cannot be published")
+    missing: list[str] = sorted(set(vocabulary) - measure_tokens)
+    if missing:
+        faults.append(
+            f"tier token(s) {missing} appear NOWHERE in the measure's own home function - a tier defined in config is"
+            " a RIVAL definition of the value it claims to read (C12/D-2642)"
+        )
+    if not str(policy.get("rule") or "").strip():
+        faults.append("the tier policy states no rule about a single-source row")
+    return faults
 
 
 def word_declared(word: str, vocabulary: set[str]) -> bool:
@@ -260,20 +355,54 @@ def controls() -> list[tuple[str, dict[str, Any], str]]:
     ]
 
 
+def tier_controls() -> list[tuple[str, dict[str, Any] | None, set[str], bool, bool, bool]]:
+    """The T-118 known-answer controls: one per way a granted owner word can be UNJOINED (D-2990's guard list)."""
+    healthy: dict[str, Any] = {
+        "word": "tier",
+        "vocabulary": ["weak", "medium", "strong"],
+        "vocabulary_home": "pipeline/schema_accessor.py::isor_score",
+        "accessor": "pipeline/schema_accessor.py::isor_rating",
+        "granted": "2026-10-14",
+        "granted_by": "owner",
+        "rule": "every row publishes the tier it measured",
+    }
+    tokens: set[str] = {"weak", "medium", "strong", "No source books"}
+    return [
+        ("a_granted_tier_word_is_joined", healthy, tokens, True, True, False),
+        ("a_tier_word_the_owner_never_granted_is_refused",
+         {**healthy, "word": "withold"}, tokens, True, True, True),
+        ("an_unsigned_tier_word_is_refused",
+         {**healthy, "granted": ""}, tokens, True, True, True),
+        ("a_tier_defined_in_config_is_a_rival_definition",
+         {**healthy, "vocabulary": ["weak", "medium", "strong", "gold"]}, tokens, True, True, True),
+        ("a_tier_home_that_does_not_resolve_is_refused", healthy, tokens, False, True, True),
+        ("an_accessor_that_does_not_resolve_is_refused", healthy, tokens, True, False, True),
+        ("a_missing_tier_policy_is_a_fault_and_not_a_silence", None, tokens, False, False, True),
+    ]
+
+
 def run_selftest() -> int:
     """Drive every known-answer control through the SAME classifier the verdict comes from."""
-    vocabulary: set[str] = set(load_declaration()["owner_word"]["vocabulary"])
+    declaration: dict[str, Any] = load_declaration()
+    vocabulary: set[str] = set(declaration["owner_word"]["vocabulary"])
     bad: list[str] = []
+    total: int = 0
     for label, state, expected in controls():
+        total += 1
         got, detail = verdict_for(state, vocabulary)
         if got != expected:
             bad.append(f"{label}: expected {expected}, got {got} ({detail})")
+    for label, policy, tokens, home_ok, accessor_ok, expected_fault in tier_controls():
+        total += 1
+        got_faults: list[str] = tier_faults(policy, tokens, home_ok, accessor_ok)
+        if bool(got_faults) != expected_fault:
+            bad.append(f"{label}: expected fault={expected_fault}, got {got_faults}")
     if bad:
         for line in bad:
             print(f"  !!  {line}")
-        print(f"FAIL {PREFIX} selftest: {len(bad)} of {len(controls())} known-answer control(s) failed")
+        print(f"FAIL {PREFIX} selftest: {len(bad)} of {total} known-answer control(s) failed")
         return EXIT_DEFECT
-    print(f"ok {PREFIX} --selftest: {len(controls())}/{len(controls())} known-answer control(s) fire")
+    print(f"ok {PREFIX} --selftest: {total}/{total} known-answer control(s) fire")
     return EXIT_OK
 
 
@@ -303,6 +432,21 @@ def main() -> int:
     promo_homes: dict[str, bool] = {
         name: home_exists(str(spec["home"])) for name, spec in (declaration.get("promotions") or {}).items()
     }
+    #: T-118 - the granted tier word joins the MEASURE's own home: the vocabulary must be the one that function
+    #: declares, so a tier that exists only in config is refused (C12/D-2642; the BUG-499/BUG-502 class).
+    tier_policy: dict[str, Any] | None = declaration.get("tier_policy")
+    tier_home: str = str((tier_policy or {}).get("vocabulary_home", ""))
+    tier_accessor: str = str((tier_policy or {}).get("accessor", ""))
+    measure_tokens: set[str] = set()
+    if "::" in tier_home:
+        home_file, _, home_symbol = tier_home.partition("::")
+        measure_tokens = symbol_literals(home_file, home_symbol)
+    tier_problems: list[str] = tier_faults(
+        tier_policy, measure_tokens, home_exists(tier_home), home_exists(tier_accessor)
+    )
+    for problem in tier_problems:
+        print(f"FAIL {PREFIX}: {DEFECT_TIER} - {problem}")
+    faults += tier_problems
 
     con = sqlite3.connect(f"file:{DB_PATH}?mode=ro", uri=True)
     tally: dict[str, int] = {}

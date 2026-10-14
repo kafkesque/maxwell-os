@@ -2,8 +2,8 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 538,
-  "open_n": 191,
+  "total_ids": 539,
+  "open_n": 192,
   "closed_n": 347,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
@@ -961,6 +961,11 @@
     {
       "id": "BUG-774",
       "title": "(MED - OPEN 2026-10-13, PREVENTIVE) - the planned non-book intake has no identity, and the branch it would fall to is the one a closed defec",
+      "events": 1
+    },
+    {
+      "id": "BUG-775",
+      "title": "(MED - OPEN 2026-10-14) - ONE BIT IN THREE COLUMNS: the corroboration the store advertises is a derivation nothing declares",
       "events": 1
     }
   ],

@@ -140,6 +140,48 @@ owner_word:
   state: pending            # pending | granted
   sheet: governance/OWNER_DECISION_T107_20261013.md
 
+#: THE SINGLE-SOURCE TIER (T-118, owner word GRANTED 2026-10-14 = `tier`). WHAT THE SYSTEM MAY SAY ABOUT A ROW THE
+#: PRINCIPLE DOES NOT COVER. The gate was a POLICY question, not a schema edit (D-2989/BUG-768): the corpus is
+#: admitted through TWO routes and only the CLUSTER route passes the at-least-two-source gate the deleted S5 check
+#: used to assert per row, so the SINGLETON route reaches the store with ONE source work and nothing re-asserts the
+#: principle. MEASURED 2026-10-14 on the canonical run (rechunk-v4-20260929, 7,640 rows): 6,247 rows carry exactly
+#: ONE source work (3,565 of them served PASS). Three dispositions were offered - tier | withhold | leave - and the
+#: owner's word is TIER, which is the only one that publishes a MEASUREMENT where the other two publish a JUDGEMENT:
+#: `withhold` deletes evidence the corpus paid for, and `leave` publishes a row as if the principle were satisfied.
+#:
+#: THE MEASURE IS NOT RESTATED HERE (C12/D-2642). The tier vocabulary and the decision rule live in the measure's
+#: OWN home - `pipeline/schema_accessor.py::isor_score` (D2284: author independence x domain diversity x source
+#: count; D2309 canonical works) - and the rail asserts THIS block's vocabulary against the string constants of that
+#: function, so a second definition of a tier in config is refused as the BUG-499/BUG-502 class, not tolerated.
+tier_policy:
+  decision: T-118
+  word: tier
+  vocabulary: [weak, medium, strong]
+  vocabulary_home: pipeline/schema_accessor.py::isor_score
+  accessor: pipeline/schema_accessor.py::isor_rating
+  rule: >-
+    no served row is WITHHELD and no served row is SILENTLY TRUSTED: every row publishes the tier that was MEASURED
+    about it, so a single-source row publishes `weak` because that is what it measured - never an absence, never a
+    default, never silence. The tier is a MEASURE of the row's own evidence, so it re-derives when the evidence
+    grows (D-2992) and is never frozen by one run's clustering (BUG-772).
+  granted: 2026-10-14
+  granted_by: 'owner approval of the T-118 recommendation (tier) - one word: tier'
+  owed_change_set: >-
+    OWED (the T-107 change-set, same act): the surfaces (maxwell_mcp_server.py, pipeline/stage6_okf_export.py,
+    pipeline/stage6b_anytype_push.py) publish the graded corroboration tuple
+    {sources, convergent, independence, independence_score, home} and STOP publishing `borp_score: 0.0` (BUG-767).
+    This block is the POLICY; the surface change is the act that consumes it - a policy with no consumer is prose.
+  measured:
+    - >-
+      MEASURED 2026-10-14 (read-only, canonical run, 7,640 rows): `is_convergent` = 1 on 1,393 rows and
+      `source_diversity` = 1 on exactly the other 6,247 - the two columns are the SAME BIT, and
+      P(source_works>=2 | is_convergent=1) = 1.0000 with P(...| is_convergent=0) = 0.0000
+      (governance/T120_S1_RECON_20261014.md)
+    - 'isor tiers: weak 5,212 / medium 969 / strong 410 over 6,591 populated rows; NULL 1,049 = the D-2590 non-FB sidecar tier (quarantined)'
+    - >-
+      so the tier is not a re-write of the corpus: 6,247 rows publish `weak` - a TRUE statement about evidence -
+      where today they publish NOTHING and 1,393 of their neighbours publish a false 0.0 (BUG-767)
+
 coverage:
   max_declared_debt: 3      # CEILING — SHRINK-ONLY. The only act that may RAISE it is a DECISION (D-2644).
   min_declared_debt: 0      # FLOOR — the state this file exists to reach: every advertised field is true.

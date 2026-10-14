@@ -8,19 +8,18 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1120 decisions (census stamp 59a1e229f1af0967, 2026-10-13) · 538 bugs (191 open / 347 closed; highest OPEN = BUG-774) · 18 open tasks (MUST 6 / SHOULD 9 / WORTH 3; OWNER-moved 5, pipeline-moved 13; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1121 decisions (census stamp 9c72ded0156dbb0d, 2026-10-14) · 539 bugs (192 open / 347 closed; highest OPEN = BUG-775) · 17 open tasks (MUST 5 / SHOULD 9 / WORTH 3; OWNER-moved 4, pipeline-moved 13; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **67** of 1120 — 🔴 open 32 · 🔵 proposed 14 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 565 · ⚖ ratified 133 | closed: ✅ resolved 320 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1120, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **67** of 1121 — 🔴 open 32 · 🔵 proposed 14 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 565 · ⚖ ratified 133 | closed: ✅ resolved 321 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1121, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 191 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 26 · 🟨 MED 41 · 🟩 LOW 19 · UNLABELLED 101 (BUG-757) of 191 open.
+> Open BUGS by severity (population = the census's 192 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 26 · 🟨 MED 42 · 🟩 LOW 19 · UNLABELLED 101 (BUG-757) of 192 open.
 >
-> **OWNER LANE (5) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
+> **OWNER LANE (4) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
 > | T-101 | 🔴 MUST | HARDEN THE RETRIEVAL GOLDEN SET (the gate is saturated) | one word: set | single (the anchor-set semantics) - then --check, --ap |
 > | T-117 | 🔴 MUST | BUG-749 residual — the ESCALATE surface: the units NO owner ruling reaches | one owner word per unit on the reference sheet (CONFIRM / CORRECT + ho |
-> | T-118 | 🔴 MUST | the SINGLE-SOURCE trust tier — what the system may SAY about a row the Book of Record Principle does not cover | one word: tier | withhold | leave |
 > | T-107 | 🟠 SHOULD | MCP payload decision — borp_score / feedback_score are still advertised to agents | one owner word per advertised field in config/served_fields.yaml#decla |
 > | T-121 | 🟠 SHOULD | the SOURCE KIND axis + per-kind identity - the prerequisite the internet-intake plan does not have | one owner word for the source-kind VOCABULARY (an answer-space decisio |
 >
@@ -13250,3 +13249,23 @@ generalised; the standard vocabulary is NISO RP-8-2008 JAV's seven versions and 
 update metadata); (iii) `content_basis` + `retrieved_at` + licence recorded at extraction; (iv) only then conversion. A
 retraction/update path is part of the same obligation — a corpus that cannot absorb a retraction cannot be trusted
 (Crossref Crossmark; COPE).
+
+## BUG-775 (MED - OPEN 2026-10-14) - ONE BIT IN THREE COLUMNS: the corroboration the store advertises is a derivation nothing declares
+- **Where.** `fbs.is_convergent`, `fbs.source_diversity` and `fbs.source_ids` (the D2185 canonical works), joined by
+  NOTHING. `config/derivations.yaml` declares a home and a parity rail for every other derived column it knows; these
+  three rows do not exist, so "which column owns the fact?" cannot be answered from the repo (D-2646).
+- **Measured 2026-10-14** (read-only, CANONICAL_RUN `rechunk-v4-20260929`, 7,640 rows): `is_convergent = 1` ⟺
+  `source_diversity >= 2` ⟺ `|source_ids| >= 2` on **7,640/7,640 rows, 0 exceptions, 0 NULL source_ids**. Three
+  governed columns, one bit. The corroboration count is therefore a PURE PROJECTION of the source set: exact, and
+  information-free beyond it — the falsifier D-2992 attached to its own ruling (P(n_voices>=2 | is_convergent=1))
+  measured **1.0000** against a counterfactual **0.0000** and FIRED (`governance/T120_S1_RECON_20261014.md`).
+- **Why it matters beyond tidiness.** A reader may branch on any of the three columns and no rail reports the
+  divergence; a delta run can write one and not the others; and the whole "derived corroboration" plan (T-120) was
+  scoped as if the count carried information the row did not already state. The information is on the INDEPENDENCE
+  axis (`isor`, D2284/D2309: weak 5,212 / medium 969 / strong 410), where 35 of the 938 served count-corroborated
+  rows are WEAK, 148 carry ONE author and 170 ONE domain.
+- **Fix (declared, not yet landed).** ONE derivation row (`kind: derived_regenerable`, home
+  `pipeline/stage1_5_embed_cluster.py` for the bit's writer + `pipeline/schema_accessor.py::isor_score` for the
+  independence) with a PARITY RAIL that re-derives the bit from `source_ids`, in the same change-set as the T-107/T-118
+  surface move so the wire cannot publish a tier that disagrees with the store.
+- **Status.** OPEN. Evidence: `governance/T120_S1_RECON_20261014.md` §2; `config/served_fields.yaml#tier_policy`.

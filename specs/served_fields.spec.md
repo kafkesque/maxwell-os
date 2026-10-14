@@ -85,11 +85,21 @@ to prevent (C12/D-2642).
 - **Wrong:** returning `needs_retirement: False` from an `except` clause (the error-leak class).
 - **Status:** ✅ SATISFIED — `test_a_failed_read_reports_unmeasured`.
 
+### INV-10 — A granted owner word is JOINED to the thing it names, never restated
+- **Correct:** the T-118 word `tier` is granted in `config/served_fields.yaml#tier_policy`, and its vocabulary is
+  asserted against the string CONSTANTS of the measure's OWN home function
+  (`pipeline/schema_accessor.py::isor_score`); a tier token that exists only in config is refused as a rival
+  definition of the value it claims to read (C12/D-2642), and an unsigned word is refused (T-101).
+- **Wrong:** a tier vocabulary declared in config but absent from the measure; a grant with no date and no author;
+  a declaration that omits the block entirely while the policy gate it answers is GRANTED — silence is the fault.
+- **Status:** ✅ SATISFIED — `test_the_tier_word_is_joined_to_the_measure_it_names`.
+
 ## Non-goals (out of scope for this spec)
 - The COLUMN-shape census of the store — `config/store_columns.yaml` / `scripts/check_store_columns.py` own it
   (BUG-766 tracks its six population-shape drifts).
 - The retrieval ranking policy — `specs/retrieval_serving.spec.md` owns it (INV-3 there; `_rank_sql()` is its home).
-- WHICH single-source rows may be served — a policy ruling (T-118), not a schema question.
+- The tier MEASURE itself (author independence × domain diversity × source count) — `pipeline/schema_accessor.py` and
+  `config/derivations.yaml` own it (D2284/D2309). This spec owns only the POLICY that consumes it (INV-10, T-118).
 
 ## Open items recorded by this spec (so they are not blindspots)
 1. The owner words for `borp_score`, `feedback_score` and `classification_status` are PENDING (T-107) — the rail
@@ -98,3 +108,7 @@ to prevent (C12/D-2642).
    all four reads onto `config/feedback.yaml#serving.neutral_prior` (declared here, owed to T-107).
 3. `isor` — the real corroboration signal (D2284/D2309/D2185, 6,591 populated rows) — is advertised by NO surface
    today; the `corroboration` promotion is the recommendation, not yet a fact.
+4. **T-118 is GRANTED (2026-10-14)**: the single-source disposition is `tier`, declared in
+   `config/served_fields.yaml#tier_policy` and machine-joined by INV-10. The CHANGE-SET it owes is still open: the
+   three surfaces keep publishing `borp_score: 0.0` and publish no tier (BUG-767), so the policy is declared with no
+   consumer until that act lands — recorded here rather than implied.

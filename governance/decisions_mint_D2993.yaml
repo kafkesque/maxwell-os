@@ -1,0 +1,70 @@
+# Mint record — D-2993: the corroboration FALSIFIER fired — publish the independence, do not re-count the voices
+- id: D-2993
+  date: '2026-10-14'
+  state: RESOLVED
+  category: GOVERNANCE / EVIDENCE
+  title: >-
+    The corroboration COUNT is exact on this corpus, so the measure carries no information the row does not already
+    carry — the falsifier D-2992 attached to its own ruling FIRED — and the single-source disposition the owner
+    granted (T-118 = `tier`) is a MACHINE-JOINED policy, not prose: a granted owner word must name the measure's own
+    home and may not define a rival vocabulary in config
+  bugs: [BUG-767, BUG-768, BUG-775]
+  decision: >-
+    THE MEASUREMENT (T-120 step 0, READ-ONLY, no store write). On the DECLARED population (CANONICAL_RUN =
+    rechunk-v4-20260929, 7,640 rows): P(n_voices >= 2 | is_convergent = 1) = 1,393/1,393 = 1.0000 and
+    P(n_voices >= 2 | is_convergent = 0) = 0/6,247 = 0.0000, with 0 rows whose source_ids are NULL or empty. The
+    falsifier D-2992 wrote into its own ruling — "if P(n_voices >= 2 | is_convergent = 1) is indistinguishable from
+    1, the count is NOT contaminated in this corpus and the hardening is documentation" — THEREFORE FIRED. The
+    count dimension of corroboration is a bit-for-bit function of ">=2 canonical works": exact, uncontaminated, and
+    INFORMATION-FREE beyond the source set it is computed from.
+    R1 — THE COUNT ENGINE IS NOT THE ENGINE THIS STORE NEEDS. Re-clustering source_segments by embedding similarity
+    and NLI-confirming a second voice inside the row's own evidence would re-derive a number the row already
+    states. T-120 narrows: (a) the ONE BIT (is_convergent == source_diversity >= 2 == |source_ids| >= 2, true on
+    7,640/7,640 rows) is declared as a DERIVATION with a parity rail rather than left as three columns nobody
+    joined (BUG-775); (b) the absorption ruling of D-2992 stands unchanged — a later independent source RAISES a
+    row in place, and that act is what makes the measure live rather than run-frozen (BUG-772). T-119 therefore
+    stays a cheap READ-ONLY delta, not a pipeline.
+    R2 — THE INFORMATION IS THE INDEPENDENCE AXIS, AND IT IS ALREADY COMPUTED. `isor` (D2284/D2309: author
+    independence x domain diversity x canonical source count) is populated on 6,591 rows — weak 5,212 / medium 969 /
+    strong 410 — and of the 938 SERVED rows the count certifies, 35 are WEAK by isor, 148 carry ONE author and 170
+    ONE domain. A count that is exact and an independence that DISAGREES with it is the whole finding: what the row
+    owes the reader is the independence of its voices, not their number. The healthy signal exists and is advertised
+    by NOTHING (BUG-768's other half, BUG-767's harm).
+    R3 — THE OWNER'S WORD IS JOINED, NOT QUOTED (T-118, GRANTED 2026-10-14 = `tier`). The disposition for the 6,247
+    rows carrying ONE source work (3,565 of them served) is declared in config/served_fields.yaml#tier_policy —
+    word, the three offered dispositions (tier | withhold | leave), the grant date and author, the rule, and the
+    OWED change-set — and scripts/check_served_fields.py ASSERTS the declared tier vocabulary against the string
+    constants of the measure's own function (pipeline/schema_accessor.py::isor_score). A tier vocabulary that exists
+    only in config is REFUSED as a rival definition of the value it claims to read (C12/D-2642); an unsigned word is
+    refused (T-101); a MISSING policy is a fault rather than a silence. 7 known-answer controls, 17/17 in total.
+    R4 — WHY `tier` AND NOT `withhold` OR `leave` (the reason that survives an audit). `withhold` deletes evidence
+    the corpus paid for; `leave` publishes a row as if the principle were satisfied. `tier` is the only disposition
+    that publishes a MEASUREMENT about the row's own evidence, which is what the store actually holds — and it is
+    the disposition that survives the falsifier above: with the count exact and the independence measured, the
+    honest statement about a one-voice row is `weak`, not silence and not a fabricated 0.0.
+    R5 — WHAT IS STILL OWED (stated, not implied). The surfaces keep publishing `borp_score: 0.0` (a false claim on
+    7,640/7,640 rows) and publish no tier: the tier policy is DECLARED WITH NO CONSUMER until the T-107 change-set
+    lands, and the spec records that as an open item rather than implying the policy is in effect (BUG-767).
+    BUG-775 files the one bit: three governed columns carrying it, no declared derivation, no parity rail.
+  evidence: >-
+    governance/T120_S1_RECON_20261014.md — the full read-only measurement: the falsifier (1.0000 vs 0.0000), the
+    collinearity table (7,640 rows), the dead scalar 0.0 on 7,640/7,640 rows while 1,393 rows are corroborated and
+    938 served, the LAZY ledger (fb_feedback does not exist because CREATE TABLE IF NOT EXISTS has never run, so
+    the cache NULL/0 is the DECLARED absence shape D-2957, and the loop is in a CORRECT state today), the dedup
+    answer measured from the store (0 duplicate fb_id, 0 duplicate_of markers, 3 name-collision groups / 6 rows ALL
+    in QUARANTINE, 2 of the 3 the same-source class), and the two forensic NEGATIVES cleared on the row level
+    (status: 0 rows changed, the +1,049 is the D-2590 sidecar tier; classification_status: 'CLEAN' on 7,640 rows in
+    the PRE-image too, so the relabel store write did not flatten the axis). Rails: scripts/check_served_fields.py
+    --selftest 17/17 fire; the live rail rc=2 with 0 defects (the owner word for borp_score/classification_status is
+    still PENDING, T-107); tests/test_served_fields_spec.py INV-10 green.
+  files:
+    - governance/T120_S1_RECON_20261014.md
+    - config/served_fields.yaml
+    - scripts/check_served_fields.py
+    - specs/served_fields.spec.md
+    - tests/test_served_fields_spec.py
+    - config/derivations.yaml
+    - config/task_register.yaml
+    - governance/OWNER_LANE_BATCH_20261013.md
+    - config/pipeline_config.yaml
+    - governance/buglog.md

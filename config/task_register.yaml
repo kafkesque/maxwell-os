@@ -361,7 +361,8 @@ tasks:
   gate: 'one owner word per unit on the reference sheet (CONFIRM / CORRECT + home / ABSTAIN / LEAVE)'
 - id: T-118
   priority: MUST
-  state: open
+  state: done
+  closed: '2026-10-14'
   mover: owner
   title: 'the SINGLE-SOURCE trust tier — what the system may SAY about a row the Book of Record Principle does not cover'
   why: >-
@@ -373,8 +374,8 @@ tasks:
     every answer; withhold it from the default answer path; or accept single-source rows as first-class and say so
     in the mission. The counts and the distribution live in the assessment and in the rail's own run, never here.
   source: [BUG-768, D-2989, D-2120, D-2830]
-  evidence: 'governance/BORP_FEEDBACK_ASSESSMENT_20261013.md §2.3 (status x is_convergent x source_ids) and the fbs.isor rating distribution (2026-10-13)'
-  gate: 'one word: tier | withhold | leave'
+  evidence: 'governance/BORP_FEEDBACK_ASSESSMENT_20261013.md §2.3 (status x is_convergent x source_ids) and the fbs.isor rating distribution (2026-10-13); GRANTED + LANDED 2026-10-14 (D-2993): governance/T120_S1_RECON_20261014.md §1 and §5 - 6,247 of 7,640 rows carry ONE source work and 3,565 of them are served, while the 3 name-collision groups are ALL in QUARANTINE'
+  gate: 'none - the owner word `tier` was GRANTED 2026-10-14 (config/served_fields.yaml#tier_policy, joined by specs/served_fields.spec.md INV-10); the SURFACE change-set it owes (stop publishing borp_score 0.0, publish the tier) is tracked as T-107'
 - id: T-119
   priority: MUST
   state: open
@@ -417,7 +418,7 @@ tasks:
     indistinguishable from 1, the count is not contaminated and the hardening is documentation only.
   source: [D-2992, D-2990, BUG-772, BUG-773]
   evidence: "MEASURED 2026-10-13 (read-only, by reading the write path and the identity model - no store write): `is_convergent` is written by S1.5 from the run's segment set (pipeline/stage1_5_embed_cluster.py header, D2176); the dedup GROUPING key is `(normalize_name, source_id)` with `would` in {link_duplicate, supersede_review, insert} under mode: report (pipeline/dedup_identity.py, pipeline/dedup_gate.py:211, config/dedup_identity.yaml); the commit is `INSERT OR REPLACE` on `fb_id = SHA-256(name + definition)` (pipeline/stage6_commit.py:764, pipeline/schemas.py:175); `content_basis` is declared RESERVED with no writer. The three times, their homes and the falsifier are written up in governance/CORPUS_LIFECYCLE_20261013.md (D-2992)."
-  gate: 'READ-ONLY step 0 first (locate the S1 segment store); the derived-value registration needs its parity rail. The tier WRITE is a SEPARATE surface change - the one T-107 owes (D-2898); it is not licensed by this task'
+  gate: 'DONE 2026-10-14 (read-only step 0, D-2993): the falsifier FIRED - P(n_voices>=2 | is_convergent=1) = 1393/1393 = 1.0000 against 0/6247 = 0.0000, so the count engine is NOT needed and the independently-computed half narrows to the DECLARED derivation for the one bit (BUG-775, needs its parity rail). The tier WRITE remains a SEPARATE surface change - the one T-107 owes (D-2898); it is not licensed by this task'
 - id: T-121
   priority: SHOULD
   state: open

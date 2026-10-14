@@ -890,9 +890,9 @@ retrieval_benchmark:
     # `single` in TWO places - refused that sheet for a limit the harness it feeds never had (`expected_names` is a
     # list; `_recall_at_k` divides by len(expected)). DECLARED here and never INFERRED from the sheet: an inferred
     # mode is a ruler whose meaning depends on the data it measured, and T-101 exists because that ruler saturated.
-    # NOTHING CHANGES until the owner's one word (governance/golden_reanchor_instructions.md §6): `set` is a
-    # one-line edit here, and the rail refuses a half-move.
-    anchor_mode: single
+    # 2026-10-14: owner word GRANTED = `set` (T-101). The reviewed sheet's 120 anchors now apply as the expected
+    # SET recall@k is micro-averaged over. `--apply` remains gated by owner_signature_required and C13 backup.
+    anchor_mode: set
 rerank:
   enabled: true
   model: BAAI/bge-reranker-v2-m3

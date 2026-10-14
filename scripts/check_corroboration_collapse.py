@@ -386,7 +386,7 @@ def voice_limb(rule: dict[str, Any], limit: int = 0) -> dict[str, Any]:
 
     cells: dict[str, dict[str, dict[str, Any]]] = collections.defaultdict(dict)
     matched = 0
-    with store.open(encoding="utf-8", errors="replace") as fh:
+    with store.open(encoding="utf-8") as fh:
         for line in fh:
             if '"segment_id"' not in line:
                 continue

@@ -37,8 +37,13 @@ its test module; history lives in git plus the D-number that changed it.
 
 ### INV-3 — Ranking signal must not degenerate to a constant (D-2979; the record's title spells it "D-2537")
 - **Correct:** the ORDER BY is the D-2979 fused quality score
-  (COALESCE(confidence_score, 0.5) * weight + convergent boost + diversity boost), gated by
+  (COALESCE(confidence_score, `<config/feedback.yaml#serving.neutral_prior>`) * weight + convergent boost +
+  diversity boost), gated by
   ranking.quality_score_enabled: true, and it has ONE home (_rank_sql()).
+  The neutral prior is NOT a literal in the SQL: it is read from its declared home (D-2989), so the ORDER BY and
+  the served SELECT cannot disagree about what an absent quality means — until 2026-10-14 this line carried a
+  literal `0.5` while the same file's SELECT used NEUTRAL_PRIOR, i.e. TWO homes for ONE policy value on the
+  SERVED path (the BUG-499/BUG-502 class). The repair is provably inert: the literal equalled the declared value.
 - **There IS no fallback (D-2995, closes BUG-776):** with the flag false, _rank_sql() and
   _quality_field() BOTH refuse (RuntimeError) instead of returning `"borp_score DESC"`. The legacy arm
   ordered by a scalar that is constant 0.0 on every canonical row, i.e. it served rowid order while

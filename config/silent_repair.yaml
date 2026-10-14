@@ -18,7 +18,12 @@ scan_roots: [scripts, pipeline, tools]          # tools/ was OUTSIDE the first c
 # REPAIRED, not declared - the first reads through the decode home, the second named ONE rule for its input
 # (its silent repair could never fire: the module already opened the same file strictly).
 ceiling:
-  debt: 17
+  debt: 14          # LOWERED 17 -> 14 on 2026-10-14 in the same act as the code (D-2642: SHRINK-ONLY). MEASURED
+                    # after the change: 25 sites found, 25 declared, 0 undeclared, 0 stale, 14 of them `debt`-kind.
+                    # The DRIFT that reddened this rail (`scripts/verify_anchor_family_registry.py:66`) is now
+                    # DELEGATED to scripts/lib/artifact_encoding.py, and three entries whose debt had already been
+                    # PAID in code (check_config_defaults.py [114,140] - strict decode since D-2982 - and
+                    # verify_anchor_family_registry.py [61] - the CSV path) are deleted instead of STALE forever.
   direction: shrink_only
 
 allowed:
@@ -65,10 +70,9 @@ debt:
     lines: [43]
     mode: replace
     why: reads run jsonl; a repaired byte becomes U+FFFD INSIDE a parsed row. Repoint to scripts/lib/artifact_encoding.py.
-  - path: scripts/check_config_defaults.py
-    lines: [114, 140]
-    mode: replace
-    why: reads config + source text into the undeclared-default census; a silent repair could hide a producer's text.
+  # REMOVED 2026-10-14 (the debt was PAID in code and never shrunk here): scripts/check_config_defaults.py carried
+  # `errors="replace"` at lines 114/140 until D-2982 replaced it with a STRICT decode (the comment at :306 is the
+  # only trace left). A register that keeps a paid entry reports STALE forever and hides the next real one.
   - path: scripts/check_derivation_homes.py
     # BUG-542/D-2658 applied to its OWN register (2026-09-26T, D-2661): this entry was `lines: [78]`, a
     # COORDINATE, and the coordinate held only until the rail grew - the D-2661 coordinate join inserted lines
@@ -86,10 +90,9 @@ debt:
     lines: [81]
     mode: replace
     why: reads the coders' label files (a Kimi return arrived as .md) - the artifact class where Mac Roman is real here.
-  - path: scripts/verify_anchor_family_registry.py
-    lines: [61]
-    mode: replace
-    why: reads the cohort/anchor jsonl artifacts; delegates the CSV path already, this one still repairs.
+  # REMOVED 2026-10-14 (the debt was PAID in code and never shrunk here): the CSV path of
+  # scripts/verify_anchor_family_registry.py was already delegated to scripts/lib/artifact_encoding.py, and the
+  # JSONL path (read_jsonl) is delegated in the SAME act - so the entry has nothing left to declare.
   - path: pipeline/batch_convert_epubs.py
     lines: [160]
     mode: replace

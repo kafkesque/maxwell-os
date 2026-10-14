@@ -161,6 +161,11 @@ may_touch:
 # may_touch home, so the anti-circle rail refused the commit that carries it. NAMED, never a glob
 # (BUG-548/BUG-563): it is one journal, not a standing class.
 - governance/menu_rescope_cohort_audit.jsonl
+# 2026-10-14 (this session): the ladder-triage act's two OWNED artifacts. The assessment is a requested REVIEW (the
+# owner asked for an examination of eight external sources), not a ruling; the handoff is the act's own record.
+# NAMED, never a glob (BUG-548/BUG-563): each is one record, not a standing class.
+- governance/INTAKE_ASSESSMENT_20261014.md
+- governance/SESSION-HANDOFF-20261014-LADDER.md
 # D-2976 (2026-10-13): the OWNER review packet for the label cohorts (BUG-749/BUG-748). One builder,
 # three owner-facing artifacts. NAMED, never a glob (BUG-548/BUG-563: the record is not the rule).
 - governance/CANONICAL_RELABEL_REVIEW_20261013.md

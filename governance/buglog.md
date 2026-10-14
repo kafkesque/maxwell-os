@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1123 decisions (census stamp 80c0ee779942890e, 2026-10-14) · 542 bugs (194 open / 348 closed; highest OPEN = BUG-778) · 19 open tasks (MUST 7 / SHOULD 9 / WORTH 3; OWNER-moved 4, pipeline-moved 15; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1123 decisions (census stamp 80c0ee779942890e, 2026-10-14) · 543 bugs (194 open / 349 closed; highest OPEN = BUG-778) · 20 open tasks (MUST 7 / SHOULD 10 / WORTH 3; OWNER-moved 4, pipeline-moved 16; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **67** of 1123 — 🔴 open 32 · 🔵 proposed 14 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 565 · ⚖ ratified 133 | closed: ✅ resolved 323 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1123, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 194 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 28 · 🟨 MED 42 · 🟩 LOW 19 · UNLABELLED 101 (BUG-757) of 194 open.
+> Open BUGS by severity (population = the census's 194 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 29 · 🟨 MED 41 · 🟩 LOW 19 · UNLABELLED 101 (BUG-757) of 194 open.
 >
 > **OWNER LANE (4) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -23,7 +23,7 @@
 > | T-124 | 🔴 MUST | the RED ladder (BUG-777 + BUG-778): the anchor-bridge ambiguity policy is owed first, then the masked 68-rail  | the ambiguity policy is a RULING (D-2898): a name resolving to N rows  |
 > | T-121 | 🟠 SHOULD | the SOURCE KIND axis + per-kind identity - the prerequisite the internet-intake plan does not have | one owner word for the source-kind VOCABULARY (an answer-space decisio |
 >
-> **PIPELINE LANE (15) — what the agent will do next, in strategic-consequential order (source: config/task_register.yaml):**
+> **PIPELINE LANE (16) — what the agent will do next, in strategic-consequential order (source: config/task_register.yaml):**
 >
 > | id | pri | state | task | evidence |
 > |---|---|---|---|---|
@@ -36,7 +36,7 @@
 > | T-108 | 🟠 SHOULD | 🔴 open | BUG-712 / BUG-714 — the content_type residual and the harness-facing primitive | served run content_type census (2026-10-13) |
 > | T-112 | 🟠 SHOULD | 🔴 open | PERF - the SERVED path loads the cross-encoder per PROCESS, so short-lived callers pay a cold-start of minutes | suite rail runtime 100-200s -> >210s after the dispatcher became the CLI default (2026-10- |
 > | T-113 | 🟠 SHOULD | 🔴 open | PAY THE BASELINE the honest instrument REVEALED - the 71 keys behind block aliases, module by module, each wit | config/config_defaults_census.json after D-2982: 300 shadowed-declared keys / 568 sites (2 |
-> | T-114 | 🟠 SHOULD | 🔴 open | DISCHARGE THE INHERITED LADDER FAULTS - four lines were RED before D-2982 and the prefix report hid them | just health-full 2026-10-13: 7 faults / 128 lines; each rc=1 at 42f8b76^ (worktree). RE-ME |
+> | T-114 | 🟠 SHOULD | 🔴 open | DISCHARGE THE INHERITED LADDER FAULTS - ONE owes real work now (the undeclared-encoding campaign) and ONE was  | just health-full 2026-10-13: 7 faults / 128 lines; each rc=1 at 42f8b76^ (worktree). RE-ME |
 > | T-116 | 🟠 SHOULD | 🔴 open | GOLDEN-SET GROWTH — the instrument that ADDS harder/abstract goldens (T-101 can only RE-anchor the set it has) | scripts/reanchor_retrieval_goldens.py --check reports the draft/live set out of phase and  |
 > | T-123 | 🟠 SHOULD | 🔴 open | the RETIRED borp_score row in config/store_columns.yaml: its role/status move when the next S6 commit makes th | config/store_columns.yaml (the borp_score why, 2026-10-14) + config/derivations.yaml#fbs.b |
 >
@@ -12433,7 +12433,7 @@ store-written), 10 DEFINITION-RE-SCOPE (the D-2974 audit is still running - 269/
 this queue will grow).
 
 
-## BUG-766 (MED - OPEN 2026-10-13) - the store-columns register holds TWO defects the ladder has been RED on: 6 columns declare `outside: absent` (NULL) while 1049 sidecar rows carry a NON-NULL blank, and one measurement the licensed write moved stayed recorded as its old value
+## BUG-766 (HIGH - OPEN 2026-10-13) - the store-columns register holds TWO defects the ladder has been RED on: TWELVE columns declare `outside: absent` (NULL) while 1049 sidecar rows carry a NON-NULL blank (and four more are blind), and one measurement the licensed write moved stayed recorded as its old value
 FOUND WHILE LANDING D-2988 (the honest cascade of a store write, not a side effect: the write moved a measured
 number and the register that declares it still claimed the old one).
 
@@ -12450,9 +12450,37 @@ and measured 2 after the licensed write stamped 163 rows `deterministic` — a d
 number is exactly the state `--record` exists for, and the re-record at 2026-10-13T18:40:50Z absorbed it together
 with the code-mention moves the new applier caused (`taxonomy_match_method.mentions` 18 -> 20 and siblings).
 
-FIX OWED: reshape the six columns to a TRUE NULL outside their population (the pipeline/normalize_absent_shape.py
+FIX OWED: reshape the columns to a TRUE NULL outside their population (the pipeline/normalize_absent_shape.py
 precedent, BUG-737 column 2 of 14), then `--record`. Until then this rail's rc is 1 and the ladder line is RED for
 a MEASURED reason rather than a silenced one.
+
+**MEASURED UPDATE 2026-10-14 (T-124 limb b — the causal verdict for this rail in BUG-778 was WRONG, and the blast
+radius is DOUBLE what this entry recorded).** Three corrections, all re-measured read-only against
+`knowledge pipeline/maxwell.db` (7,640 rows: 6,591 `verification_results <> '[]'`, 1,049 `= '[]'`):
+
+1. NOT SIX COLUMNS — TWELVE. `scripts/check_store_columns.py --check` now emits **12** POPULATION-SHAPE lines
+   (every one of them FATAL, i.e. this is the SOLE cause of the rail's rc=1): `taxonomy_match_method`, `keywords`,
+   `discipline_raw`, `context`, `accessibility`, `intimacy_boundary`, `source_text`, `difficulty_level`,
+   `temporal_scope`, `epistemic_status`, `verification_method`, `practicality` — each "1049 row(s) hold a NON-NULL
+   blank". The six this entry named were the six that DECLARED it at the time; the drift did not grow, THE
+   DECLARATIONS DID (six more columns were given `outside: absent` since), which is the honest direction and the
+   reason the count moved.
+2. THE RAIL CAN SEE ONLY WHAT IS DECLARED — and 4 more columns carry the same hollow blank with NO `outside:`
+   key at all, so no line can ever fire for them: `application` (1049), `jargon` (1049 on the sidecar tier, and
+   2,170 further hollows on the S5 tier), `procedural_skill` (1049 of 7,640 — the register itself records "BLANK
+   on 7995/7995"), `classification_error` (1049 + a hollow on all 6,591 S5 rows). **A register that must DECLARE a
+   population before the rail can see a shape defect has a blind spot shaped exactly like an undeclared column** —
+   so the fix is two-part: reshape the store AND declare the shape, or the rail cannot hold the fix.
+3. THE POPULATION IS NOW NAMEABLE, WHICH MAKES THE REPAIR SAFE. All 1,049 rows are `status='QUARANTINE'` with
+   `verification_results='[]'` and `classification_status='CLEAN'` — i.e. the same rows T-122 owns. The reshape is
+   therefore bounded by a predicate the register already declares, not by a new one, and it touches no PASS row.
+
+**WHY IT MATTERS MORE THAN IT LOOKS.** `count(col)` counts a hollow as content, so every S4 coverage statistic
+computed over this store — including the CRIBS fields' own nonblank counts in `config/store_columns.yaml`
+(`jargon` 5,904 of 7,995; `application` 7,994) — is inflated by a tier whose fields were never written. A
+sparsity/coverage number read off `count()` is not a measurement of enrichment; it is a measurement of the
+writer's blank convention. (This is also the measurement that must exist BEFORE any CRIBS quality rail can mean
+anything — a detector that counts sparse CRIBS over a store where absent is sometimes `''` counts the convention.)
 
 ## BUG-749 (HIGH - OPEN, THE LICENSED STORE WRITE LANDED 2026-10-13 by D-2988) - every OWNER-RULED unit is now written, the gap fell 457 -> 294 (6.9% -> 4.5%), and the twenty ad-hoc `UPDATE fbs SET discipline` sites have ONE licensed replacement
 
@@ -13382,7 +13410,7 @@ therefore run individually with their ladder semantics preserved (bash -c, exact
 | --- | --- | --- | --- |
 | `check_silent_repair.py --check` | 1 | "DRIFT scripts/verify_anchor_family_registry.py:66 repairs silently (replace) with no entry" + 3 STALE declarations + debt 14 of ceiling 17 | PRE-EXISTING: the named file is untouched by D-2995 |
 | `check_undeclared_encoding.py --check` | 1 | "files 161 of ceiling 156 | sites 405 of ceiling 392 | writes 75 of ceiling 74 | unresolvable 4 of ceiling 3" | PRE-EXISTING ceiling overruns (>=4 files over) + 1 file from D-2995's new rail - the remedy is a re-record, which for a SHRINK-ONLY ceiling is its own act |
-| `check_store_columns.py --check` | 1 | "OWED CODE-CENSUS-MOVED" on name/pipeline_run_id/source_diversity/source_ids/status `.mentions` (the census counts .py files naming the column, so it moves on ANY code change) | PRE-EXISTING class (D-2649/BUG-533); D-2995's code changes move it one file in either direction - the declared remedy is `--record` |
+| `check_store_columns.py --check` | 1 | "OWED CODE-CENSUS-MOVED" on name/pipeline_run_id/source_diversity/source_ids/status `.mentions` (the census counts .py files naming the column, so it moves on ANY code change) | **CORRECTED 2026-10-14 — THIS ROW'S CAUSAL VERDICT WAS WRONG.** The census moves are OWED and non-fatal by the rail's own classification. The rc=1 cause is **12 FATAL POPULATION-SHAPE drifts** (1,049 sidecar rows carry a NON-NULL blank where the register declares `absent`) = **BUG-766 defect 1**, which `--record` cannot fix because it is a STORE-SHAPE defect. Following this table would have burned a session on a remedy that cannot work; the corrected measurement and the doubled blast radius are recorded in BUG-766's own MEASURED UPDATE block |
 | `build_archive_index.py --check` | 1 | "on disk but in NEITHER the index nor the declared exclusions: `superseded_runs`" | PRE-EXISTING: untouched by D-2995 |
 | `check_rail_mutations.py` | 1 | "the oracle's BASELINE is not green (rc=1): the runner is already red before any mutation" | PRE-EXISTING interaction defect: the ORACLE (`check_served_fields.py`) is a TRI-STATE rail whose declared rc is **2** (owner-owed debt 2 == ceiling 2, T-107); the mutation harness reads any non-zero as "not green", so a load-bearing claim about the `borp`/owner-word guards cannot be proven while a declared debt exists |
 
@@ -13392,9 +13420,70 @@ instrument that reports health had a blind spot no face counted. Four of the fiv
 re-records (declared remedies, their own acts); one (check_rail_mutations) is a HARNESS defect that will keep
 mis-reporting as long as `check_served_fields` carries a declared debt, i.e. until T-122 and the Anytype arm land.
 
-**STATUS.** OPEN. Next: (1) fix the ladder's masking (a face or the ladder itself must say HOW MANY rails were not
-reached - a prefix is only honest if its LENGTH is printed); (2) triage the four pre-existing census/archive drifts as
-one declared re-record act with its own receipt; (3) fix the mutation harness to honour the tri-state convention it
-already declares. Evidence: this entry; `justfile` (the bridge line and the 68 below it);
-`governance/SESSION-HANDOFF-20261014-D2995.md`.
+**STATUS.** OPEN. **DISCHARGE 2026-10-14 (T-124 limb b, first pass — measured, not asserted):** 2 of the 5 reds
+are now GREEN and the third's DIAGNOSIS was corrected, leaving 2 that are real work and 1 that is owner-gated.
+
+| rail | before | after | what moved |
+| --- | --- | --- | --- |
+| `build_archive_index.py --check` | 1 | **0** | the declared remedy: the writer re-derived the index (`superseded_runs` is now INDEXED, 44 entries). Nothing was excluded or hand-added |
+| `check_silent_repair.py --check` (the ladder LINE) | 1 (DRIFT) | **0** (rail rc 2 = declared debt only) | the DRIFT was a real C16 defect: `verify_anchor_family_registry.py::read_jsonl` read with `errors="replace"` (a silent byte-launder) and is now DELEGATED to the ONE decode home `scripts/lib/artifact_encoding.py`; three entries whose debt was already PAID in code (check_config_defaults.py [114,140] — strict decode since D-2982 — and verify_anchor_family_registry.py [61]) were deleted instead of reported STALE forever; the SHRINK-ONLY ceiling is lowered 17 -> 14, which is now the MEASUREMENT (25 sites found, 25 declared, 0 undeclared, 0 stale) |
+| `check_store_columns.py --check` | 1 | 1 | **verdict corrected:** the cause is BUG-766 defect 1 (12 fatal POPULATION-SHAPE drifts), NOT the census moves this entry blamed; `--record` cannot fix it. Measurement recorded in BUG-766 |
+| `check_undeclared_encoding.py --check` | 1 | 1 | real work: the SHRINK-ONLY ceiling is overrun and can ONLY be met by declaring encodings in code — MEASURED 2026-10-14: files 161/156, sites 405/392, writes 75/74, unresolvable 4/3. Note the DEBT IS GROWING (T-114 recorded 159/156 and 396/392 on 2026-10-11) |
+| `check_rail_mutations.py` | 1 | open | HARNESS defect, unchanged: it reads a declared tri-state baseline (rc 2, owner-owed) as "not green" |
+
+**AND THE PREFIX ITSELF — the instrument was UNKNOWN, not merely red.** `python3 scripts/run_ladder.py
+--receipt-check` returns **rc 2 / "the WHOLE-SET fault set of `just health` is UNKNOWN: the ladder CHANGED since
+the recorded scan (128 -> 138 declaring line(s))"** — the last full scan (`temp/ladder_receipt.json`, 754s) covers a
+ladder that no longer exists, so `--banner` declares UNKNOWN at the top of every `just health` and the run
+continues into a prefix. **The masking mechanism is therefore not a missing feature: it is an uncollected
+receipt.** D-2983's whole-set measurement exists and is honest; it has simply never been re-collected since the
+ladder grew. That is the cheapest high-leverage repair in this bug: run the set in ONE run, and every subsequent
+`just health` opens with the measured fault count instead of a prefix.
+
+Next: (1) fix the ladder's masking by RECOLLECTING the whole set (below); (2) triage the two remaining real faults
+(undeclared-encoding = a code campaign; store-columns = BUG-766's reshape, which is a STORE WRITE and needs its own
+receipt + C13 backup); (3) fix the mutation harness to honour the tri-state convention it already declares.
+Evidence: this entry; `justfile` (the bridge line and the 68 below it); `config/silent_repair.yaml`;
+`scripts/run_ladder.py --receipt-check` (rc 2, 128 -> 138); `governance/SESSION-HANDOFF-20261014-D2995.md`.
+
+## BUG-779 (MED - FIXED 2026-10-14 by the same act) - the SERVED ranking carried TWO homes for ONE policy value: the ORDER BY inlined a literal where the same file used the declared constant
+
+**FOUND** while completing D-2995's own cascade check (the audit was looking for a retired value that left; it found a
+DECLARED value that had never fully arrived). `pipeline/retrieve.py::_rank_sql()` - the ONE home of the served
+`ORDER BY` (D2537/D-2980) - built its fusion clause as
+`COALESCE(confidence_score, 0.5) * {RANKING_CONFIDENCE_WEIGHT}`, **inlining the neutral prior as a literal**, while the
+SAME FILE's served SELECT (`:1103`) and its Python re-sort (`:1123`) read the declared
+`NEUTRAL_PRIOR = config/feedback.yaml#serving.neutral_prior`. That is precisely the shape
+`config/feedback.yaml`'s own header names as the reason the file exists: *"a policy value with TWO homes is the
+BUG-499/BUG-502 class"* - and it sat on the ORDER path, where changing the config would have moved the SELECT and left
+the ORDER BY behind, silently re-ranking every answer with a prior the register no longer declares.
+
+**WHY IT SURVIVED.** The two values are numerically equal today (0.5), so no measurement could see it; and the
+`borp_score` retirement workstream had every reason to look at what LEFT this function and none to look at what it
+still INLINED. It is the mirror of BUG-776: that bug was a value nothing writes being read as a measurement; this one
+is a value that HAS a home being written a second time inside the same function.
+
+**THE FIX.** One line: `0.5` -> `{NEUTRAL_PRIOR}`; `specs/retrieval_serving.spec.md` INV-3 now names the declared home
+instead of quoting the number.
+
+**THE RECEIPT (inertness, proven by construction rather than by benchmark).** The rendered SQL is **byte-identical**
+before and after the change: `NEUTRAL_PRIOR` is read from `config/feedback.yaml#serving.neutral_prior` and equals
+`0.5`, so the substitution cannot alter a byte of the statement the store executes - verified by rebuilding the
+pre-fix string from the post-fix one and comparing (`old == sql` -> True, 2026-10-14). A ranked-identity benchmark run
+was attempted as a second receipt and was **abandoned on a 300s cap** (the ladder's whole-set collection was running
+concurrently); it is NOT needed here, because a byte-identical statement cannot produce a different order, and
+claiming otherwise would be a receipt for a risk this change does not carry. **The lesson is recorded as the receipt's
+own limit:** a benchmark is the right instrument when the change can move behaviour, and the wrong instrument when the
+change is a substitution of equal value - spending 15 minutes to "prove" inertness by measurement is the mirror of
+asserting it.
+
+**WHAT IS *NOT* IN THIS ACT.** (a) The `or NEUTRAL_PRIOR` idiom at `:1123`/`:1124` still conflates a stored `0.0`
+with absence (0.0 becomes 0.5) - that is the D-2957/R4 half and it belongs to T-107's declared `keep-and-declare`
+limb, not here. (b) A rail that would CATCH this class (a numeric literal on a path whose value has a declared home)
+does not exist; the census rails count code defaults READ through `cfg.get(...)`, and an inlined literal inside an
+f-string is neither. NAMED, not fixed: it is the natural home of the `check_config_defaults` family's third limb.
+
+Evidence: this entry; `pipeline/retrieve.py::_rank_sql` (the one line) + `:1103`/`:1123` (the declared reads);
+`config/feedback.yaml` (the ONE home, and its own header stating the rule);
+`specs/retrieval_serving.spec.md` INV-3.
 

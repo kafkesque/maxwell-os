@@ -281,11 +281,12 @@ tasks:
   state: open
   mover: pipeline
   title: >-
-    DISCHARGE THE INHERITED LADDER FAULTS - four lines were RED before D-2982 and the prefix report hid them
+    DISCHARGE THE INHERITED LADDER FAULTS - ONE owes real work now (the undeclared-encoding campaign) and ONE
+    was mis-diagnosed
   why: >-
     BUG-759: `just health-full` found SEVEN red lines over 128 declaring lines; all seven were re-run at
     42f8b76^ and all seven were already rc=1, so none was D-2982's (and D-2982 fixed two and improved a third).
-    The four that remain, with the act each owes: (1) check_undeclared_encoding is over its SHRINK-ONLY
+    The four that remained, with the act each owes: (1) check_undeclared_encoding is over its SHRINK-ONLY
     ceilings (files 159/156, sites 396/392, writes 75/74, unresolvable 4/3); (2) check_store_columns reports
     CODE-CENSUS-MOVED on taxonomy_match_method.mentions (18 -> 19) and taxonomy_version.mentions (24 -> 25),
     whose remedy is an owner-owed --record when the move is intended (D-2649/BUG-533); (3)
@@ -294,7 +295,17 @@ tasks:
     Two are re-records and two are index/re-derive acts, so this is dischargeable without new policy - but each
     SHRINK-ONLY ceiling must be LOWERED rather than raised (D-2644) and the census moves must be explained, not
     absorbed.
-  source: [BUG-759, D-2644, D-2649, BUG-533, BUG-537]
+    PARTLY DISCHARGED 2026-10-14 (T-124 limb b, first pass): (4) is CLOSED - the writer re-derived the archive
+    index through its own declared remedy, and `superseded_runs` is now INDEXED rather than excluded by hand;
+    (2) was MIS-DIAGNOSED here and in BUG-778 - the census moves are OWED and non-fatal, and the rail's rc=1
+    cause is the FATAL population-shape drift that BUG-766 already owns (so `--record` cannot discharge it; the
+    repair is a store reshape and is now T-125); a NEW line not in this list - check_silent_repair's DRIFT - is
+    CLOSED (the silent byte-launder in verify_anchor_family_registry.py::read_jsonl is delegated to the ONE
+    decode home, three already-paid entries are deleted instead of reported STALE, and the SHRINK-ONLY ceiling
+    is lowered to its measurement). What is left in THIS task is (1) alone: the ceiling can only be met by
+    DECLARING encodings in code, and the debt is GROWING (it was 159/396 on 2026-10-11, 161/405 on 2026-10-14),
+    so the campaign needs a per-file pass, not a re-record.
+  source: [BUG-759, D-2644, D-2649, BUG-533, BUG-537, BUG-766, BUG-778]
   evidence: >-
     just health-full 2026-10-13: 7 faults / 128 lines; each rc=1 at 42f8b76^ (worktree). RE-MEASURED at 673a457
     (D-2983): 5 fault(s) under coverage 10f4df05acc8ecec in 754.0s, RECORDED to temp/ladder_receipt.json, so the
@@ -488,6 +499,46 @@ tasks:
     store-columns .mentions, archive index) go through their declared --record remedies in ONE act. Limb (c) is a
     HARNESS defect: check_rail_mutations reads its oracle's declared tri-state rc 2 (owner-owed) as "not green", so
     its load-bearing claim about the owner-word guards cannot be proven while any declared debt exists.
-  source: [BUG-777, BUG-778, D-2658, D-2959, D-2861, D-2898]
+    LIMB (b) PARTLY DISCHARGED 2026-10-14, AND THE PREFIX'S REAL MECHANISM IS NOW NAMED: `run_ladder.py
+    --receipt-check` returns rc 2 (UNKNOWN) because the RECORDED whole-set scan covers a ladder that has since
+    grown, so the banner declares UNKNOWN and the recipe still walks into a prefix - the masking is not a missing
+    feature but an UNCOLLECTED receipt (D-2983's instrument exists and is honest). In the same pass: the archive
+    index went GREEN through its own remedy, the silent-repair DRIFT went GREEN (delegated to the decode home,
+    ceiling lowered to its measurement) - and the store-columns row in BUG-778's table was WRONG, which is why
+    limb (b) now points at BUG-766/T-125 for the store reshape instead of a re-record. Limbs (a) and (c) are
+    untouched: (a) is the owner's ruling and (c) is a harness fix.
+  source: [BUG-777, BUG-778, BUG-766, D-2658, D-2959, D-2861, D-2898]
   evidence: 'governance/buglog.md BUG-777 + BUG-778 (2026-10-14; both entries carry the verbatim measurements: 13 vs 208 entries, 7,640 vs 14,574 store rows, and the 5 rails with rc + cause) + governance/SESSION-HANDOFF-20261014-D2995.md (the triage table) + justfile (the bridge line and the 68 below it)'
   gate: 'the ambiguity policy is a RULING (D-2898): a name resolving to N rows must either stay declared-unresolved or be resolved by a DECLARED rule; only then may the pipeline re-derive, re-baseline and re-record'
+- id: T-125
+  priority: SHOULD
+  state: open
+  mover: pipeline
+  title: >-
+    BUG-766 — the SIDECAR tier's absent fields are a hollow blank, not NULL: reshape the store column shape and
+    DECLARE the shapes the rail cannot see
+  why: >-
+    The rail's rc=1 cause is a POPULATION-SHAPE drift over the rows the verification never reached (BUG-766
+    defect 1, measured and re-measured 2026-10-14): the register declares the columns ABSENT outside the
+    verified population while the store holds a NON-NULL blank there, so count(col) keeps claiming rows whose
+    field was never written - every coverage statistic computed over this store, including the CRIBS fields' own
+    nonblank counts, is inflated by that tier. Two things are owed and they are ONE act: (i) the store reshape
+    to a TRUE NULL outside the population, using the PRECEDENT THAT ALREADY EXISTS (D-2630 mark-never-delete +
+    the pipeline/normalize_absent_shape.py normalizer, BUG-737 column 2 of 14) - a STORE WRITE, so it carries
+    its own receipt, a C13 backup and a byte comparison, and it may not touch a PASS row; (ii) the DECLARATION
+    of the shapes the rail cannot see: a column that carries a hollow blank with NO `outside:` key is invisible
+    to the rail by construction, so the register's own blind spot is part of the fix, not a follow-up. The
+    remedy is NOT `--record`: a re-record absorbs the census moves and would leave the row shape unchanged
+    (which is how the wrong remedy got written into BUG-778's table).
+  source: [BUG-766, BUG-737, D-2630, D-2943, D-2957, D-2958, D-2642]
+  evidence: >-
+    governance/buglog.md BUG-766 (the MEASURED UPDATE 2026-10-14 block: the rail's 12 fatal lines, the 4 blind
+    columns, and all 1,049 rows being status=QUARANTINE with verification_results='[]') +
+    scripts/check_store_columns.py --check (rc=1; the POPULATION-SHAPE lines are the fatal class; the census
+    moves are OWED/non-fatal) + config/store_columns.yaml (the declared `outside:` keys) +
+    pipeline/normalize_absent_shape.py (the existing normalizer) + knowledge pipeline/maxwell.db#fbs
+  gate: >-
+    mover = pipeline. The predicate is the register's own declaration (population + outside), never a new one;
+    the write is bounded by the QUARANTINE/sidecar tier and refuses a PASS row; the reshape and the declaration
+    land in ONE act, and the rail's own re-record of the measured block follows the write (D-2642), with the
+    ceiling SHRINK-ONLY

@@ -137,7 +137,7 @@ def _rank_sql() -> str:
     """D2537/D-2995: fused quality-score ORDER BY clause (config-gated, fail-closed)."""
     _require_fused_ranking()
     return (
-        f"COALESCE(confidence_score, 0.5) * {RANKING_CONFIDENCE_WEIGHT} "
+        f"COALESCE(confidence_score, {NEUTRAL_PRIOR}) * {RANKING_CONFIDENCE_WEIGHT} "
         f"+ CASE WHEN is_convergent = 1 THEN {RANKING_CONVERGENT_BOOST} ELSE 0.0 END "
         f"+ CASE WHEN source_diversity IS NOT NULL AND source_diversity >= 2 "
         f"THEN {RANKING_DIVERSITY_BOOST} ELSE 0.0 END DESC"

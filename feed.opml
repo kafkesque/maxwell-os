@@ -48,6 +48,14 @@
                description="General developer tooling"/>
       <outline type="rss" text="Prompt Engineering" xmlUrl="https://github.com/topics/prompt-engineering" 
                description="Prompt engineering frameworks and tools"/>
+      <!-- 2026-10-14 (owner request). E2E / AGENTIC TESTING - the harness axis. Read for the VERIFICATION side of
+           this repo (rails, goldens, mutation tests), not for web QA: "an agent drives a system toward a goal, then
+           an assertion decides whether it got there" IS the shape of a rail that must be SEEN to fire (BUG-492),
+           and of a golden set that must be re-anchored rather than remembered (T-101). -->
+      <outline type="rss" text="E2E Testing" xmlUrl="https://github.com/topics/e2e-testing" 
+               description="End-to-end and agentic test runners, natural-language assertions"/>
+      <outline type="rss" text="End-to-End Testing" xmlUrl="https://github.com/topics/end-to-end-testing" 
+               description="E2E testing across web/mobile; framework and harness patterns"/>
       <!-- E8: MLX + Apple Silicon ecosystem feeds (2026-07-27) -->
       <outline type="rss" text="MLX" xmlUrl="https://github.com/topics/mlx"
                description="Apple MLX framework ecosystem: inference engines, servers, tools, models"/>

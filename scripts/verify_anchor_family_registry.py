@@ -61,9 +61,15 @@ def read_csv_rows(path: Path) -> list[dict[str, str]]:
 
 
 def read_jsonl(path: Path) -> list[dict[str, Any]]:
-    """Read a JSONL file, skipping blank lines."""
+    """Read a JSONL file, skipping blank lines.
+
+    DELEGATED to the ONE decode home (D-2646/C16). Until 2026-10-14 this read `errors="replace"`, which silently
+    launders an undecodable byte into U+FFFD and then parses it as if it were the artifact's own text - the
+    BUG-511 class, and the last unlisted silent repair in this file (config/silent_repair.yaml, C16). The home
+    fails CLOSED on bytes that are neither valid UTF-8 nor declared.
+    """
     out: list[dict[str, Any]] = []
-    with path.open(encoding="utf-8", errors="replace") as fh:
+    with artifact_encoding.open_artifact(path, REPO) as fh:
         for line in fh:
             if line.strip():
                 out.append(json.loads(line))

@@ -3,7 +3,7 @@ session:
   pipeline_commit: 'v3.0-D2485'
   schema_version: '3.0'
   project_root: knowledge pipeline/
-  status: '2026-10-14 D-2981: the user-facing faces are DERIVED (scripts/gov_sync.py) and joined to the registers. Register: 1123 decisions (67 needing action) / 542 bugs (194 open) / 19 open tasks (4 OWNER-moved, 15 pipeline). YOURS: 🔴 T-101 HARDEN THE RETRIEVAL GOLDEN SET (the gate is saturated); 🔴 T-117 BUG-749 residual — the ESCALATE surface: the units NO owner ruling rea; 🟠 T-121 the SOURCE KIND axis + per-kind identity - the prerequisite the intern. AGENT NEXT: 🔴 T-104 BUG-757 — OPEN bugs carry NO severity token, so the register cannot be; 🟠 T-105 REA tier A/B mining — DEVONthink 3 (related-document ranking) and Curs; 🟠 T-106 ROADMAP — MODULARITY (C21 swappable infrastructure) and CROSS-OS COMPA.'
+  status: '2026-10-14 D-2981: the user-facing faces are DERIVED (scripts/gov_sync.py) and joined to the registers. Register: 1123 decisions (67 needing action) / 543 bugs (194 open) / 20 open tasks (4 OWNER-moved, 16 pipeline). YOURS: 🔴 T-101 HARDEN THE RETRIEVAL GOLDEN SET (the gate is saturated); 🔴 T-117 BUG-749 residual — the ESCALATE surface: the units NO owner ruling rea; 🟠 T-121 the SOURCE KIND axis + per-kind identity - the prerequisite the intern. AGENT NEXT: 🔴 T-104 BUG-757 — OPEN bugs carry NO severity token, so the register cannot be; 🟠 T-105 REA tier A/B mining — DEVONthink 3 (related-document ranking) and Curs; 🟠 T-106 ROADMAP — MODULARITY (C21 swappable infrastructure) and CROSS-OS COMPA.'
 models:
   generator:
     model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit

@@ -24505,3 +24505,64 @@ decisions:
   - justfile
   - governance/INGEST_IDENTITY_GATE_20261014.md
   - governance/buglog.md
+- id: D-2998
+  date: '2026-10-14'
+  state: RATIFIED
+  category: CORROBORATION / SOURCE KIND
+  title: >-
+    A re-publication is ONE VOICE, and the source-kind axis takes an ADOPTED vocabulary, never an invented one
+  bugs: []
+  decision: >-
+    (1) ONE VOICE. A work and every re-publication of it - edition, printing, reprint, translation, repository
+    copy, preprint - are ONE VOICE when corroboration is measured. This generalises D-2308's edition rule from
+    IDENTITY to CORROBORATION: the same bytes certified under two names were already the same identity, and the
+    measured cost is in this corpus (530 corroborated rows under two names, BUG-780; 84 collapsing pairs, T-129).
+    (2) AN ADOPTED VOCABULARY. The source-kind axis is DECLARED in config/content_types.yaml#source_kind and its
+    values are TAKEN from an existing controlled set (OpenAlex work.type), not invented: a bespoke list would be
+    a fourth naming system beside the taxonomy, the content types and the extraction types (C12), and an invented
+    axis cannot be compared with anything outside this repository.
+    (3) THE AXIS IS A PRECONDITION, NOT A CONSEQUENCE. `book` is the only value the pipeline emits (measured
+    2026-10-14) and no non-book source may be ingested before the one-voice rule is exercised on its first batch.
+    Nothing is migrated, no row is relabelled, and no model is involved: the ruling is a vocabulary and a rule.
+  evidence: >-
+    MEASURED 2026-10-14 (T-121 lane, config/owner_marks.yaml#other_owner_lanes): the question was asked with no
+    home to answer it in, and the reviewer-facing consequence is concrete - a preprint + its article + its
+    repository copy would have counted THREE voices for one claim, which is the same inflation the collapse
+    repair (T-129) exists to remove from the identity axis. The vocabulary is adopted from
+    https://docs.openalex.org/api-entities/works/work-object#type (10 values, plain strings, C2). The axis is
+    declared with `emitted_by_pipeline: [book]` and a gate that names what a non-book ingest must first carry.
+    The BORP principle this restates (independent-voice corroboration, not a count) is recorded at
+    governance/buglog.md#BORP; the SCALAR BORP score remains refused (D-2646: one fact, one home).
+  files:
+  - config/content_types.yaml
+  - config/owner_marks.yaml
+- id: D-2999
+  date: '2026-10-14'
+  state: RATIFIED
+  category: RETRIEVAL / IDENTITY RESOLUTION
+  title: >-
+    A name that resolves to N rows stays declared-unresolved: the anchor-bridge ambiguity ruling
+  bugs: [BUG-777, BUG-778]
+  decision: >-
+    (1) DEFAULT = DECLARED-UNRESOLVED. A name that no declared rule decides is recorded as declared_unresolved,
+    COUNTED and reported - never dropped, never silently narrowed to "the first row", never guessed by a model.
+    (2) RESOLUTION ONLY BY A DECLARED, ORDERED, DETERMINISTIC RULE, which prints the rung that decided it:
+    exact_id, then served_run_name_and_author, then single_corpus_row. The order is the whole decision - it makes
+    the outcome reproducible and auditable, and it makes a later change to the order a visible act rather than a
+    different answer from the same input.
+    (3) WHAT THE RULE DOES NOT RESOLVE STAYS declared_unresolved: the count IS the debt (fail-closed), so the
+    gate cannot be satisfied by resolving more aggressively - only by resolving more EVIDENCE.
+    The ruling is declared in config/anchor_family.yaml#store_bridge.resolution and consumed by
+    scripts/build_anchor_store_bridge.py. It converts a MASKED ambiguity into a MEASURED one.
+  evidence: >-
+    MEASURED (BUG-777): the anchor<->corpus bridge no longer re-derives - the content join collapsed 208 entries
+    to 13 and most anchor rows read AMBIGUOUS; the RED ladder line then masked 5 of the 68 rails below it
+    (BUG-778), which is why ambiguity was expensive as well as invisible. The owner's own signed sheet already
+    declares this position at the other end of the same surface: 19 of 150 cells in
+    governance/golden_reanchor_candidates_20261011.reviewed.csv are `ambiguous` ABSTENTIONS that are EXCLUDED
+    from the expected sets and COUNTED (D-2991). No model resolves a name here (D-2898: a resolution is a label);
+    the rungs are joins and keys the store already holds.
+  files:
+  - config/anchor_family.yaml
+  - config/owner_marks.yaml
+  - scripts/build_anchor_store_bridge.py

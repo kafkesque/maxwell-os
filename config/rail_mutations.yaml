@@ -26,7 +26,7 @@ fixture:
   # MEASURED 2026-09-27: recompute_decision_summary.py --selftest checks its own bug citations against the
   # register, so it reads governance/bug_status.json; while the fixture did not carry it, EVERY baseline of that
   # runner was red and the gate reported the MUTATION as the fault. A declared input that EXISTS is the point.
-  include_files: [justfile, governance/bug_status.json, pipeline/feedback.py, pipeline/pipeline_paths.py, scripts/reanchor_retrieval_goldens.py, config/pipeline_config.yaml, maxwell_mcp_server.py, pipeline/corroboration.py, pipeline/stage6_okf_export.py, pipeline/stage6b_anytype_push.py, pipeline/ingest_gate.py, pipeline/book_metadata.py, pipeline/io_guard.py, pipeline/stamp.py]
+  include_files: [scripts/ingest_relabel_rulings.py, scripts/reanchor_retrieval_goldens.py, justfile, governance/bug_status.json, pipeline/feedback.py, pipeline/pipeline_paths.py, scripts/reanchor_retrieval_goldens.py, config/pipeline_config.yaml, maxwell_mcp_server.py, pipeline/corroboration.py, pipeline/stage6_okf_export.py, pipeline/stage6b_anytype_push.py, pipeline/ingest_gate.py, pipeline/book_metadata.py, pipeline/io_guard.py, pipeline/stamp.py]
   # ^ MEASURED 2026-10-14 (BUG-786 sweep): the new word-PROVENANCE guard's subject is pipeline/ingest_gate.py and
   #   its runner (scripts/check_ingest_identity_gate.py --selftest) imports it, so the fixture must carry the module
   #   AND the modules IT imports (book_metadata = the identity home, io_guard, stamp) plus its own config/ (carried by
@@ -938,6 +938,82 @@ mutations:
       (the D-2981 shape: a measurement with no writer). With the guard inert the drift is invisible again, the
       receipt silently disagrees with the tree, and the contract's failure would look like a test problem rather
       than a stale measurement. The control names the staleness.
+
+  #: BUG-782 — the shrink guard. `--render`/`--apply` rebuild the DERIVED column from the tiers; with the tiers
+  #: unsigned that write would have blanked the owner's 84 hand-typed words (the only record of them).
+  - id: the_write_may_blank_a_hand_typed_owner_word
+    subject: scripts/owner_marks.py
+    op: replace
+    find: '    if typed:'
+    replace: '    if False:  # MUTATION (BUG-782): a write may blank a hand-typed cell again'
+    runner: scripts/owner_marks.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: '   FAIL a_write_never_blanks_a_hand_typed_cell'
+    why: >-
+      BUG-782 (MEASURED 2026-10-14): the owner's 84 words were typed by hand into `owner_ruling` while --apply had
+      never run, and `--render`/`--apply` rebuild that column FROM THE TIERS - so with the tiers still unsigned,
+      running --apply would have written "" over all 84 cells and destroyed the only machine-readable record of
+      the owner's decision. A derived column is refreshed, never ERASED. The control builds exactly that
+      situation (a non-empty derived cell whose rebuilt value is empty) and the guard must refuse it by name.
+
+  #: BUG-785 — the T-117 reader. The owner filled `owner_action` on 72/72 rows and nothing read it; the
+  #: ingest is the missing bridge, and its two refusals are load-bearing: a word outside the declared
+  #: vocabulary, and a home no canonical declares (writing either MINTS the owner's word, D-2898).
+  - id: the_relabel_ingest_takes_an_unknown_word_on_trust
+    subject: scripts/ingest_relabel_rulings.py
+    op: replace
+    find: '        if action not in actions:'
+    replace: '        if False:  # MUTATION (BUG-785): a word outside the declared vocabulary is ingested anyway'
+    runner: scripts/ingest_relabel_rulings.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: '  FAIL a_word_outside_the_declared_vocabulary_is_refused'
+    why: >-
+      BUG-785 (MEASURED 2026-10-14): the owner's 72 words sat in a column nothing read, and the bridge that now
+      reads them decides 311 rows. A word outside the DECLARED vocabulary is a word the owner never said - an
+      ingest that admits it writes a ruling into config/relabel_rulings.yaml on the strength of a typo, which is
+      how a machine mints a label (D-2898). The control pins it: 'APPROVE' is refused, and the refusal names the
+      row and the vocabulary.
+
+  - id: the_relabel_ingest_writes_a_home_no_canonical_declares
+    subject: scripts/ingest_relabel_rulings.py
+    op: replace
+    find: '                if lowered not in homes:'
+    replace: '                if False:  # MUTATION (BUG-785): a home the taxonomy does not declare is written'
+    runner: scripts/ingest_relabel_rulings.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: '  FAIL a_home_that_no_canonical_declares_is_refused_never_minted'
+    why: >-
+      BUG-785 (MEASURED 2026-10-14): 16 of the owner's CORRECT cells name a home, and each one must already exist
+      as a canonical of config/taxonomy.yaml (a discipline or a domain). If the guard is inert, a CORRECT to a
+      home the taxonomy does not declare creates the home by writing it - the applier then declares an alias under
+      a canonical that is not in the menu, and the corpus acquires a label nothing can re-derive (C12/R14). Two
+      of the 16 homes also carried trailing whitespace, which the guard normalises rather than silently
+      mismatching.
+
+  #: BUG-787 — the WRITER was wired to the generator's output while the READER used the declared sheet.
+  - id: the_reanchor_writer_reads_the_generators_sheet_again
+    subject: scripts/reanchor_retrieval_goldens.py
+    op: replace
+    find: '    return ns.reviewed_csv, ns.reviewed_draft'
+    replace: "    return ns.csv, ns.yaml_out  # MUTATION (BUG-787): the writer is wired back to the GENERATOR's sheet"
+    runner: scripts/reanchor_retrieval_goldens.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: '  !!  the_writer_reads_the_declared_reviewed_inputs_never_the_generators_output'
+    why: >-
+      BUG-787 (MEASURED 2026-10-14 by running the approved apply): --check read the DECLARED reviewed sheet
+      (rc 0, 29/29 verdicts) while --apply was wired to args.csv/args.yaml_out, the GENERATOR's empty outputs, and
+      refused all 29 queries - a COMPLETED 150-cell signed act that could never be applied. A reader wired to the
+      wrong file reports a false debt; a WRITER wired to the wrong file is a permanently unrealisable step. This
+      mutation returns the wiring to the generator's output and must red the control that asserts both modes
+      resolve the DECLARED inputs through one helper.
 
   - id: the_word_provenance_guard_is_load_bearing
     subject: pipeline/ingest_gate.py

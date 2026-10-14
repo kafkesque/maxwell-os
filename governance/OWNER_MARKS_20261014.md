@@ -7,15 +7,22 @@ written by no script in this repo) in a column NAMED `owner_ruling` — and its 
 where the measuring rail and the census both say **37** (BUG-782). A lane whose only machine-readable "ruling" was
 minted by nobody is a lane an agent can read as RELEASED. The intake now exists; this page is the act.
 
-**Your whole act, in two commands and eight cells.** Since this page was written, the intake grew a SIGNER, so the
-five signatures are no longer a file edit you have to get exactly right — they are one command whose whole job is to
-refuse anything that is not your word:
+**Your whole act is now ONE command — and the ledger half is already DONE by your hand.** MEASURED 2026-10-14
+22:2x: `governance/duplicate_adjudication_review.csv` carries `owner_verdict` on **59 of 59** pairs (51 `MERGE` / 8
+`KEEP_SEPARATE`), so the ledger's debt is CLOSED and **tiers L-A/L-B no longer need a signature at all** — a per-row
+word always beats a blanket rule in the derivation (`override > tier_signature > none`), and signing the rule on top
+of your 59 rows would generalise a word you gave pair by pair. What remains is the collapse sheet's 84 rows, and your
+own typed cells are row-for-row exactly what tiers A+B+C expand to (37 + 31 + 16 = 84) — measured, on a copy:
 
 ```
-python3 scripts/owner_marks.py --sign A B C L-A L-B     # THE OWNER'S WORD: 5 tiers, one act, dated today
-python3 scripts/owner_marks.py --check                  # rc 2 while words are still owed, rc 0 when the act is whole
+python3 scripts/owner_marks.py --sign A B C             # THE OWNER'S WORD: 3 tiers, one act, dated today
+python3 scripts/owner_marks.py --check                  # then rc 0 — 'every row of both homes carries a word'
 python3 scripts/owner_marks.py --apply                  # expand the signed predicates; writes the 84 cells + provenance
 ```
+
+A dry run on a COPY of the policy (nothing written) measured the outcome of those three ids: sheet **0 owed**, 0
+conflicts, 0 binding faults, words `CONFIRM-ONE-WORK` 68 / `DISTINCT` 16, every row carrying provenance
+`signature:A@…` (37) / `signature:B@…` (31) / `signature:C@…` (16).
 
 The signer refuses an unknown tier id, refuses a tier whose `word` is `null` (there is nothing to sign), refuses to
 overwrite an existing signature silently, and re-reads the date it just wrote before it returns — a signature that did
@@ -45,7 +52,7 @@ The ONE home of the words, the tiers and the derivation is **`config/owner_marks
 
 ### The five signatures (each is one word on one line)
 
-`python3 scripts/owner_marks.py --sign A B C L-A L-B` stamps `signed: <date>` on these five tier lines in
+`python3 scripts/owner_marks.py --sign A B C` stamps `signed: <date>` on these three tier lines in
 `config/owner_marks.yaml` (by hand is equivalent; the command exists so the act is one keystroke and its refusals are
 SEEN). Each signature covers the rows its predicate names — nothing has to be typed twice:
 
@@ -54,22 +61,39 @@ SEEN). Each signature covers the rows its predicate names — nothing has to be 
 | **A** | `evidence_class == identical_normalised_text` | 37 | `CONFIRM-ONE-WORK` | the measurement itself: identical normalised text under two names IS one voice, no threshold involved (re-measured today: 37, not the 42 the old sheet claimed) |
 | **B** | containment ≥ the declared bar **and** the screen agreed `yes` | 31 | `CONFIRM-ONE-WORK` | containment at/above 0.80 with both sides clearing the boilerplate screen. Containment CAN certify a collapse; what it cannot certify is that the shared text is the WORK rather than boilerplate — that judgement is what your signature supplies |
 | **C** | containment ≥ the bar **and** the screen said `no` | 16 | `DISTINCT` | the false-positive class: 7 singleton pairs + the 3 series-volume groups (v1 groups 3, 5, 6). Eyeball three of them before signing; they are the `Poor Charlie's Almanack` vs `Seeking Wisdom`, `Great Mental Models Vol 1` vs `Vol 2/4`, `HBR Guide to Making Better Decisions` vs `…Unlocking Creativity` shape |
-| **L-A** | ledger `hint in (subtitle_or_edition, title_rename, author_leak, noise_suffix)` | 48 | `MERGE` | the ledger's own declared hint classes: an edition/subtitle is the same work (D-2308), an author leaking into the title is a normalisation artefact, a piracy suffix is noise the sanitizer already strips |
-| **L-B** | ledger `hint == series_volume` | 3 | `KEEP_SEPARATE` | the boundary of D-2308 stated as a word: an EDITION of one work collapses, a VOLUME of a series does not |
+| ~~L-A~~ | (no signature needed — your 59 per-row words decide) ledger `hint in (subtitle_or_edition, title_rename, author_leak, noise_suffix)` | 48 | `MERGE` | the ledger's own declared hint classes: an edition/subtitle is the same work (D-2308), an author leaking into the title is a normalisation artefact, a piracy suffix is noise the sanitizer already strips |
+| ~~L-B~~ | (no signature needed) ledger `hint == series_volume` | 3 | `KEEP_SEPARATE` | the boundary of D-2308 stated as a word: an EDITION of one work collapses, a VOLUME of a series does not |
 
-### The eight cells that need YOUR word (no evidence speaks for them)
+### The eight cells — ✅ YOUR WORD HAS LANDED (recorded 2026-10-14, 22:2x)
 
-`hint == review` — 8 ledger pairs. **Tier L-C carries no word on purpose**: a tier with no evidence behind it may
-not carry a blanked word (that is how a machine mints a label, D-2898). For each of the 8, write in
-`governance/duplicate_adjudication_review.csv#owner_verdict`:
+`hint == review` — the 8 ledger pairs where no declared evidence speaks. **You ruled all 8 by hand**; the column is
+`governance/duplicate_adjudication_review.csv#owner_verdict` and the table below is your word, kept beside my
+recommendation so the two are never confused. Tier L-C carries no word on purpose (a tier with no evidence behind it
+must not carry a blanked word: that is how a machine mints a label, D-2898).
 
-- `MERGE` → they are one work · `KEEP_SEPARATE` → they are two · `PENDING` → **the word is withheld, deliberately**
-  (the pair stays open and the ingest door keeps refusing — that IS the guarantee, not a failure).
+| pair_id | the two names | my recommendation | YOUR WORD | |
+|---|---|---|---|---|
+| `a4ebdd393e24def2` | Sean Adams — *The Designer's Dictionary of **Color*** vs *… of **Type*** | `KEEP_SEPARATE` (high) | **`MERGE`** | ⚠️ see below |
+| `68f90898423cce1d` | Neumeier — *The Brand **Flip*** vs *The Brand **Gap*** | `KEEP_SEPARATE` (high) | `KEEP_SEPARATE` | ✔ |
+| `35c6778225c7ad32` | Miller — *Metaphorically Selling* vs *The Tall Lady With the Iceberg* | `KEEP_SEPARATE` (high) | `KEEP_SEPARATE` | ✔ |
+| `f621222bfafc3f28` | Kotler — *Marketing 7.0* vs Kotler/Keller/Chernev/Sheth — *Marketing Management* | `KEEP_SEPARATE` (high) | `KEEP_SEPARATE` | ✔ |
+| `e93136effd604167` | Pressfield — *The War of Art …* (two subtitle variants) | `MERGE` (high) | `MERGE` | ✔ |
+| `03898151f8617e9f` | Neumeier — *The Brand Gap* vs *…, Revised Edition* | `MERGE` (high) | `MERGE` | ✔ |
+| `833b7b704cd98478` | *Anonymous — The Essential Guide…* vs *Alison Branagan — the essential guide…* | `MERGE` (high) | `MERGE` | ✔ |
+| `542f9b581dfccf15` | van Leeuwen & Djonov — *…semiotics of **kinetic** typography* vs *Towards a semiotics of typography* | `KEEP_SEPARATE` (medium) | `KEEP_SEPARATE` | ✔ |
 
-### My recommendation for each of the eight (name-level evidence, your word)
-
-These are the only rows where NO declared evidence speaks, so I give a recommendation and its reason — never a guess
-applied by script. Confidence is stated per row; the first four are flatly different books.
+> **TWO ROWS WHERE YOUR WORD OVERRIDES A DECLARED RULE OR MY ADVICE — recorded, not "fixed" (a resolved
+> contradiction is a minted label, D-2898):**
+> **(1) `ad02046ad2461eff`** — *The anatomy of type A graphic guide to 100 typefaces* (Coles + Spiekermann) vs *The
+> Anatomy of Type* (Coles): the declared L-A rule says `MERGE`, and you wrote **`KEEP_SEPARATE` with the note "two
+> different books"**. Your word stands and it is the safer error (splitting two identical rows costs nothing;
+> merging two works inflates corroboration).
+> **(2) `a4ebdd393e24def2`** — one row where I recommend you look again before the pipeline acts on it: the only
+> detector that fired is the TITLE (`max_similarity 0.775`, no content overlap), the two titles name *different
+> subject matter* (Color vs Type — two real books by the same author in one series), you wrote no note explaining the
+> merge, and the same file's other "different books" call carries the note "two different books". If that MERGE was a
+> slip, say the word and it is one cell: `KEEP_SEPARATE`. Nothing else in the 59 depends on it — but it is the one
+> row where a wrong word creates a claim the evidence contradicts, which is precisely what this whole task removes.
 
 | pair_id | the two names | why | recommend | conf. |
 |---|---|---|---|---|
@@ -89,7 +113,8 @@ reading, and it keeps the door shut on exactly that pair.
 
 ### "If I just approve, I approve"
 
-**Yes — approving tiers A, B, C, L-A and L-B IS the act, and it is the recommended one.** Each of those rows
+**Yes — approving tiers A, B and C IS the act, and it is the recommended one** (L-A/L-B need no signature: your
+59 ledger words are already in). Each of those rows
 carries either the measurement itself (A) or a clearly-labelled, per-row-inspectable screen (B/C) or the ledger's
 own declared hint classes (L-A/L-B); nothing is deleted, nothing merges in the store: your word releases the
 *repair* (T-129's pipeline half) and opens the *door* (T-130).
@@ -119,11 +144,11 @@ relabel + re-derivation, never a delete.
 ### The commands
 
 ```
-python3 scripts/owner_marks.py --sign A B C L-A L-B   # THE OWNER'S WORD (the only writer of `signed:`)
+python3 scripts/owner_marks.py --sign A B C   # THE OWNER'S WORD (the only writer of `signed:`; L-A/L-B need none)
 python3 scripts/owner_marks.py --check      # what you still owe (rc 2 = owed, loud, NOT fatal)
 python3 scripts/owner_marks.py --apply      # expand the signatures you signed + write the receipt, atomically
 python3 scripts/owner_marks.py --render     # only if the measurement changed: re-measure + re-render both sheets
-python3 scripts/owner_marks.py --selftest   # 12 known-answer controls (no store, no model)
+python3 scripts/owner_marks.py --selftest   # 13 known-answer controls (no store, no model)
 ```
 
 `--apply` writes the derived word into the sheet's `owner_ruling` column **with its provenance** (`ruling_source`:
@@ -138,10 +163,10 @@ collapse_word_column_from`), never by sniffing a column name: a name-sniff on th
 
 | task | your act | where |
 |---|---|---|
-| **T-124** (MUST) | the anchor-bridge **ambiguity policy**: a name resolving to N rows must either stay declared-unresolved or be resolved by a DECLARED rule. A RULING, not a sheet — it unmasks the 68 masked rails and BUG-777/778. **My recommendation (see the session answer): (1) the DEFAULT is DECLARED-UNRESOLVED — a name that resolves to N rows never silently picks one; (2) a resolution is allowed ONLY where a DECLARED, ordered, deterministic rule selects exactly one row (exact id → served-run name+author → single-corpus-row), and the rule prints its tie-break; (3) anything the rule cannot resolve stays `declared_unresolved` and is COUNTED, never dropped — a fail-closed count, not a guess. That keeps the reference set honest and lets the ladder run past its first red line | your word → the bridge policy home, then a decision mint (`D-2898` is the precedent) |
-| **T-117** (MUST) | ✅ **you have DONE it** — measured 2026-10-14: `owner_action` 72/72 (38 CONFIRM / 17 CORRECT / 14 LEAVE / 3 ABSTAIN), `owner_canonical` 33, `owner_comment` 2, all 311 rows. What is owed is the READER (BUG-785): nothing reads `owner_action`. ONE row still needs your word — **U022** (`higher education administration` → stored `organizational theory`): you ruled `CORRECT` with NO home. My recommendation: `business administration` (the advisory candidate, and the same home you chose for the sibling "administration" labels U010/U032); `ABSTAIN` if no home fits | `governance/canonical_relabel_review_20261014.csv` → then `config/relabel_rulings.yaml` |
-| **T-101** (MUST) | ✅ **COMPLETE — nothing is owed, and nothing was ever missing** (BUG-784, measured 2026-10-14): your signed sheet reads `--check` **rc 0** — "29 of 29 queries carry a verdict, 120 anchor names, 19 abstentions, every chosen anchor owner-signed". The 30-fault reading was the applier defaulting to the GENERATOR's empty sheet; the paths are now DECLARED and the reader prints the sheet it read. REMAINING = pipeline: `--apply`, then the benchmark (and T-116: this ruler is saturated by construction) | `governance/golden_reanchor_candidates_20261011.reviewed.csv` + `governance/golden_reanchor_proposed_v5.yaml` (declared in `config/pipeline_config.yaml`) |
-| **T-121** (SHOULD) | the **SOURCE KIND vocabulary** (an answer-space word) + whether a work and its re-publication are ONE voice. **My recommendation: YES — a re-publication is ONE VOICE** (D-2308's edition rule generalised: the corpus counts SOURCES, not printings; a preprint + its journal version + its repository copy is one voice, and counting three would inflate corroboration exactly as the 84 collapsing pairs did). On the vocabulary: do NOT invent one — declare the axis and ADOPT the controlled vocabulary that already exists for it (OpenAlex's work `type` set is the cleanest published starting point), keeping `book` as the value the current pipeline emits; the pipeline then builds the resolver. No non-book source is ingested before this lands | your word → one home for the axis (a `source_kind` block beside `content_types.yaml`, joined by the taxonomy rail) |
+| **T-124** (MUST) | the anchor-bridge **ambiguity policy**: a name resolving to N rows must either stay declared-unresolved or be resolved by a DECLARED rule. A RULING, not a sheet — it unmasks the 68 masked rails and BUG-777/778. **My recommendation (see the session answer): (1) the DEFAULT is DECLARED-UNRESOLVED — a name that resolves to N rows never silently picks one; (2) a resolution is allowed ONLY where a DECLARED, ordered, deterministic rule selects exactly one row (exact id → served-run name+author → single-corpus-row), and the rule prints its tie-break; (3) anything the rule cannot resolve stays `declared_unresolved` and is COUNTED, never dropped — a fail-closed count, not a guess. That keeps the reference set honest and lets the ladder run past its first red line. ✅ **RULED 2026-10-14 — `D-2999`**, landed in `config/anchor_family.yaml#store_bridge.resolution`; the mover is now the pipeline (the resolution rung in `scripts/build_anchor_store_bridge.py`) |
+| **T-117** (MUST) | ✅ **DONE AND CLOSED (2026-10-14)** — your 72 words plus the missing reader. **Your U022 word is recorded: `ABSTAIN`** (it read `CORRECT` with no home, and an incomplete word is not a word). MEASURED after the ingest: `scripts/ingest_relabel_rulings.py --apply` wrote **72** rulings keyed by `unit_key`, the 17 `owner_canonical` cells on non-CORRECT rows were reported ADVERSARIALLY as INERT (never written), the 3 owner notes were carried, and the applier now plans **0 ESCALATE over all 311 rows** (CONFIRM 38 / CORRECT 16 / ABSTAIN 4 / LEAVE 14) — the reader that did not exist is BUG-785, FIXED | `governance/canonical_relabel_review_20261014.csv` → `config/relabel_rulings.yaml` (ingest = `scripts/ingest_relabel_rulings.py`) |
+| **T-101** (MUST) | ✅ **COMPLETE — nothing is owed, and nothing was ever missing** (BUG-784, measured 2026-10-14): your signed sheet reads `--check` **rc 0** — "29 of 29 queries carry a verdict, 120 anchor names, 19 abstentions, every chosen anchor owner-signed". The 30-fault reading was the applier defaulting to the GENERATOR's empty sheet; the paths are now DECLARED and the reader prints the sheet it read. **DONE 2026-10-14 (BUG-787 fixed): `--apply` LANDED** — `config/golden/retrieval_queries.yaml` v5, 29 queries × 120 owner-signed anchor names (the writer had been wired to the GENERATOR's sheet, so it refused all 29: the judgment was never wrong, the call site was). REMAINING = pipeline: the benchmark (and T-116: this ruler is saturated by construction) | `governance/golden_reanchor_candidates_20261011.reviewed.csv` + `governance/golden_reanchor_proposed_v5.yaml` (declared in `config/pipeline_config.yaml`) |
+| **T-121** (SHOULD) | the **SOURCE KIND vocabulary** (an answer-space word) + whether a work and its re-publication are ONE voice. **My recommendation: YES — a re-publication is ONE VOICE** (D-2308's edition rule generalised: the corpus counts SOURCES, not printings; a preprint + its journal version + its repository copy is one voice, and counting three would inflate corroboration exactly as the 84 collapsing pairs did). On the vocabulary: do NOT invent one — declare the axis and ADOPT the controlled vocabulary that already exists for it (OpenAlex's work `type` set is the cleanest published starting point), keeping `book` as the value the current pipeline emits; the pipeline then builds the resolver. No non-book source is ingested before this lands. ✅ **RULED 2026-10-14 — `D-2998`**, landed in `config/content_types.yaml#source_kind` (10 adopted values, `emitted_by_pipeline: [book]`, and the gate a non-book ingest must first carry) |
 
 ---
 

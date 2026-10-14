@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**197 open** / 353 closed of 550 ids.
+**196 open** / 355 closed of 551 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -203,4 +203,3 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-778 | (HIGH - OPEN 2026-10-14) - a RED ladder line MASKS every rail below it: 5 of the 68 rails after BUG-777 measured red, each with its own caus | 1 |
 | BUG-780 | (HIGH - OPEN 2026-10-14) - WORK IDENTITY COLLAPSE: 84 work-pairs are ONE TEXT under TWO NAMES, so 530 "corroborated" rows (369 of them SERVE | 1 |
 | BUG-781 | (HIGH - OPEN 2026-10-14) - THE IDENTITY MACHINERY HAD NO ENFORCEMENT POINT: the owner ledger sat 59 pairs PENDING for a fortnight while the  | 1 |
-| BUG-785 | (MED - OPEN 2026-10-14) - the T-117 packet has no reader: the owner's 72 words sit in a column nothing reads, while the word's declared home | 1 |

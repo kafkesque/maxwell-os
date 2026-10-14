@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 550,
-  "open_n": 197,
-  "closed_n": 353,
+  "total_ids": 551,
+  "open_n": 196,
+  "closed_n": 355,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -987,11 +987,6 @@
       "id": "BUG-781",
       "title": "(HIGH - OPEN 2026-10-14) - THE IDENTITY MACHINERY HAD NO ENFORCEMENT POINT: the owner ledger sat 59 pairs PENDING for a fortnight while the ",
       "events": 1
-    },
-    {
-      "id": "BUG-785",
-      "title": "(MED - OPEN 2026-10-14) - the T-117 packet has no reader: the owner's 72 words sit in a column nothing reads, while the word's declared home",
-      "events": 1
     }
   ],
   "closed": [
@@ -1347,6 +1342,8 @@
     "BUG-782",
     "BUG-783",
     "BUG-784",
-    "BUG-786"
+    "BUG-785",
+    "BUG-786",
+    "BUG-787"
   ]
 }

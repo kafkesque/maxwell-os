@@ -1,210 +1,396 @@
 # Golden retrieval query set — re-anchored by scripts/reanchor_retrieval_goldens.py --apply
-# 20261011T221956Z  served run: rechunk-v4-20260929
-# D-2939: anchors are NAMES (owner-approved); IDs are resolved per run by pipeline/golden.py
-# and are recorded here as the verified snapshot. Retired/rewritten this pass: 1
-version: 4
+# 20261014T203059Z  served run: rechunk-v4-20260929  anchor_mode: set
+# D-2939: anchors are NAMES (owner-signed); IDs are resolved per run by pipeline/golden.py and are
+# recorded here as the verified snapshot.
+# D-2991: a query's expected answer is the SET of rows the owner marked (version 5). recall@k is MICRO
+# over `expected` (pipeline/retrieval_benchmark.py::_recall_at_k), so a larger set is a STRICTER ruler,
+# never an easier one — that is the ONLY reason a set is allowed (T-101).
+# 29 quer(ies) x 120 anchor name(s) · owner abstentions EXCLUDED: 19 · dropped on purpose: 0
+version: 5
 queries:
 - query: how do organizations recover from a major crisis
   expected_names:
   - Institutional Response to Crisis
+  - Resilience in Adversity
+  - Institutional Vision As Survival Mechanism
+  - Global Pandemic Response Framework
   expected:
   - 334e75a2f5d1d57ef40ecf864890b8a26aed71371a21a07a1ce043c73d9b6b44
+  - d7b3deddf12d9b76e1af31fe98402f09b00123bd5cd349438a658525044cce7a
+  - 0c725b6702456359b4b053b7d27572b2323e6eeb4b92cba2227465ff98983936
+  - d5f80c6f01270a2cd1045dc06ba99c902efed556bbf54d9f67f3bab9a63c29c0
   query_type: synonym
   verified_run: rechunk-v4-20260929
 - query: what makes teams psychologically safe
   expected_names:
   - Robert's Approachability Leadership Principle
+  - Mark Andrews' Dailies Meeting Leadership Style
+  - Design Thinking Implementation Support Groups
+  - Safety of Belonging with Others
   expected:
   - 790c8ced9e9d018d3a9c9b7b57ceb26704c4d96212673d38730d901fbf4d48e1
+  - 638d75b5b6f3f761f1da3dda00c38a554603339aeb464ea05944399f5cc292b3
+  - 3e68051d4f553a219086d64dc5dadfff2e17dab1c55c6b9a0e3059cf0618b3d4
+  - 2ee98b436af8f4c919ec37ee7df3b4152958500dde786d6da574b5a6aafbb4cf
   query_type: synonym
   verified_run: rechunk-v4-20260929
 - query: why do feedback loops stabilize a system
   expected_names:
   - Systemic Feedback Dynamics
+  - Adaptive Policy Design with Meta-feedback
+  - Consistency of Feedback Principle
   expected:
   - 334c49ae6b7a2dadbc52e9e36f48006f77050062528d6a727127b211473262d5
+  - 7475d0ed8d29c62ec77dc02b1490ffef99b46198216837bed6d0c794d172ecef
+  - 3fd2cea27f1f0cb58df7debc3c8f7d8a6129b2f54b50b4699b73fa8b3ff05e96
   query_type: vocabulary-overlap
   verified_run: rechunk-v4-20260929
 - query: how to build resilient distributed systems
   expected_names:
   - Golden Goose System Creation
+  - Diversity-driven Evolutionary Systems
+  - Infinite Stream Data Collection Loop
+  - Failure Mode Focus
   expected:
   - 124724124bc5d11951ab22085fe28c4d351aa4dd2f8475c4511d0b0e0c740cd8
+  - c8e4c08192a2faa632a289a8e5c6fbdafb678fc4b21e05e5f39f16d1e4976a14
+  - 327e52d8a4f2e607c0cb7654055be3441d91a80ef5a9397bf6459cb9c9c61e29
+  - e242daa9866dd7df5012642d8d479c1fcc20c196de33a6e5229c80dc54da082c
   query_type: synonym
   verified_run: rechunk-v4-20260929
 - query: how does the decoy effect influence choice
   expected_names:
   - Preferential Option Selection
+  - Cognitive Bias in Decision Making
+  - Emotional Decision-making Under Uncertainty
+  - Marketing Psychology of Product Choice
+  - Temporal Decay Scoring Algorithm
   expected:
   - 1e76f09b3933ba9d8a5e4aa00e2ac49202f6a8f02a8a735953652805d2682d0b
+  - ce1c081845043512e9b9057a8d8fa63c4f3baf68b5217fe8d9f80de0f64e6016
+  - b2e06813354735b246cd33fe6d12450e3a8adb9ad08d7c5db88e1dc9f0d27d48
+  - e4b2bcf75e0502ac7607b930d0befcf5711fc89300784645c4f0b21a8cdca01e
+  - 53a221ed8a2ce2f871ce5c776d6db2b2da1f28e90854f02da8af8397c337a230
   query_type: abstract
   verified_run: rechunk-v4-20260929
 - query: why is time treated like money
   expected_names:
   - Time Arbitrage System
+  - Yapese Coin Value System
+  - Daily Focus Hour Method
+  - Humility in Sales Decision-making
   expected:
   - 276c65432e9faaf9221f9fb43d40470e755007b299db4669113432e1f8305217
+  - 61315c70ce714baba0c7e5decba939b58c12478e7fe0886ff6cd652668c420b8
+  - 9096bd04d7daca84f1cd803f156de83b6992823b9321120eb8610bc0c5de8361
+  - c81c7e7ac734014ba24983307191b4d89257270afd3df96f06f0618f8171c749
   query_type: abstract
   verified_run: rechunk-v4-20260929
 - query: why is a task that matches your skill level more engaging
   expected_names:
+  - Educational Exploration Vs. Early Specialization Trade-off
   - Active Engagement in Ai-assisted Learning
+  - Selective Attention and Autopilot Behavior
   expected:
+  - 8330460b28468a6f6b299531b8098e2313e91e3fdfc07db1321050f601b2d655
   - a2f1b07476c054e5d99c3f4bcc2f6fe2e71a80839b608ab3409bdf300e1d8809
+  - 5b18692c1f9a1bffbd2fa6b04bf1c03226d1cab34ff254e740876c5c2ab670c7
   query_type: synonym
   verified_run: rechunk-v4-20260929
 - query: why does the same color mean different things in different cultures
   expected_names:
   - Color Perception and Cultural Context
+  - Whiteness As Symbolic Ambivalence
+  - Color Symbolism in Religious Art
+  - Green As Duality Metaphor in Paradise
   expected:
   - 7293175317be70cc305f51a54b8915ed35f03110510b6537e4e79f1c4cb9a2b6
+  - 3f4e29a0878ce284ee4265b6edd31f5483a995a15d67cd7661cafbb380f3a97a
+  - 97661bd25e8555852b0c4c30a72e15517659c8f056fa5de6418be9953b059b58
+  - 82c74e50c0091403ca24ef8754adacc47dfc756fb0f628678def4d5326853353
   query_type: abstract
   verified_run: rechunk-v4-20260929
 - query: how do signs and symbols get their meaning from context
   expected_names:
   - Signifier-signified Relationship in Language
+  - Las Vegas Strip As Symbolic Architecture
+  - Semiotic Integration and Cognitive Continuity
+  - Media Semiotics and Representation
+  - Symbolic Versatility and Meaning Manipulation
   expected:
   - efbc5010395c77acb29beda75e4bb8704ca95ae8d525449d617ee4e9633b5415
+  - 64374fd69105090c420427bc7de32c65f432600507448f3ae1b7b8587438944a
+  - e53126fb5502b43fbd50162566e5a91a986e9d440b18d93cacdae1ceb2d5f423
+  - 93c83bebfa68a97a1abac4e151f91de5b5761618252b653fb5e60ab316e9a23c
+  - 10eff42c899c74a8a8fe7d035f68887bbb611f7a7fa487fa6af880f504113a41
   query_type: synonym
   verified_run: rechunk-v4-20260929
 - query: why does too much information make it hard to understand a design
   expected_names:
   - Information Vs Understanding in Decision Making
+  - Information Overload Decision Paralysis
+  - Information Overload and Signal-to-noise Ratio in Decision Making
+  - Feature Clutter
+  - Analysis Paralysis in Decision Making
   expected:
   - 9da66af3c99b1268bf48e124434193ddce7fa79caa6643464b559b4368f9783f
+  - 7f08af06b212a17cf1369a895e61756a458319fd5783737d6d47cf1304a6e5ab
+  - 9b04e237f7fa44e2350fc84d350ce1ec4bb2477de074ad14d0f73f2c78f88d32
+  - 56e63f52d61872017fd70ec29d96e968ed368dccf05e43cbbba6fe2449700dbe
+  - 653879f070fa1758f7ae2e9222263d031f3b1098edc627dc82031fd1bffcfd46
   query_type: abstract
   verified_run: rechunk-v4-20260929
 - query: how does brainstorming produce more ideas
   expected_names:
   - Expenditure Reduction Creative Challenge
+  - Reverse Mentoring for Innovation
+  - Subconscious Idea Access Through Free Association
+  - Idea Generation Through Unconscious Processing
+  - Playlist Method for Creative Problem-solving
   expected:
   - b60729a5680ead8c7b5cb212d705bc0af62be0a2b9693a840fb4f9c024274fd9
+  - 62b70eebe5e3b4be823dfa971e89852f6f690a6589d0ae750427280a76bd5bc8
+  - a5366270146a855b1a9495aa84cb5220653a88787779bfc0a3aee1d3c36a5621
+  - ef4610ca1d43b341f1ce902bcdc17d393861b0c98b450f472da7cd7d1a44dacb
+  - 52b9a816b908739b36bf119257c3454cdcd18f1ad15d03647104f0515ded5ef3
   query_type: synonym
   verified_run: rechunk-v4-20260929
 - query: why should you accept that problems are too complex to fully solve
   expected_names:
   - Challenge Atomization Principle
+  - Problem Reduction Method
+  - Judgment Call Process in Complex Decision-making
+  - Multi-perspective Problem Solving Approach
   expected:
   - 4b91d2b472486bd54b372d75680800eba806e5892c6b4552984987f47eaedf1b
+  - 5667e8769c16f96e5f389c0bc7d84aa30bfec946521635e6c95aea7011977f82
+  - 36b77717189f38f16e053d6413fb53147b8dcdc5f9509c1fa62b1eaea900bd99
+  - 84a52bfcf7c5cbb95a6124f9c231d8ce70294b7bb6f2c6296714eb014739889d
   query_type: abstract
   verified_run: rechunk-v4-20260929
 - query: how do decision makers gather information before choosing
   expected_names:
   - Strategic Information Collection
+  - Risk-value Tradeoff in High-stakes Decision Making
+  - Information Cascades in Restaurant Selection
+  - Data-intuition Decision Framework
   expected:
   - 94032f5ddbce3b1fea11b1ecaa3d84c0103146f307bb431070ac88c32b55cdc8
+  - bb8515cd497960a9997b05bd6f2f3fa3fafda7c812fdb520547e86ef82fe2c93
+  - 6774fb68ffae76196e94c8a2d098102984a926b58089a8f0008f10a17d906a2a
+  - 6019b47b995f5805d25716396ad7a3bcb0b8a121767237187e81ffcc3b4c1dc1
   query_type: synonym
   verified_run: rechunk-v4-20260929
 - query: how do machine learning systems get better over time automatically
   expected_names:
   - Reinforcement Learning From Experience
+  - Adaptive Model Management
+  - Conventional Reflex Automation
   expected:
   - 9769ffc7acb192e0071a9136408ce495a6a7956e1499f40251529e50d30563eb
+  - 34768b380dea034897bb4fa5eb5448bc980b7d1ee19beb2838032449662919a0
+  - f339dfee84afc14277b76b9c6a4ab02c15276fd4f1371955ac9b50573bf8c798
   query_type: synonym
   verified_run: rechunk-v4-20260929
 - query: why do myths and symbols carry shared meaning across a society
   expected_names:
   - Symbolic Representation Through Visual and Linguistic Systems
+  - Symbolic Representation in Human Culture
+  - Communal Body Metaphor
+  - Mythic Archetype Representation
+  - Mythic Cosmogonic Narratives
   expected:
   - 7b6d031c3e35a403864354decf73a766316c8c5eb7cfcebee5459a36c718a197
+  - 6237a5541ee824892bed86bfcac21b6c45415fa3da7f3a2b7d58e55cffca7d90
+  - f3a370d5d4e967f0002ba4d85fb219d24de86e80fefe96bec6642e86423c3e5a
+  - 74f54eff06bfd0c47c9484a15b269b99a07e206378b981999133fab8b117bea9
+  - 8ee34674bd6b8aec6f43932dc6e3ab7161c46f3d252a9a42a5ed14eb8e1bf111
   query_type: abstract
   verified_run: rechunk-v4-20260929
 - query: why does creating knowledge require collaboration across contributors
   expected_names:
   - Collaborative Learning and Knowledge Creation
+  - Collective Memory Enhancement
+  - Active Information Exchange
+  - Brainswarming Graph Growth Mechanism
+  - Distributed Idea Consolidation
   expected:
   - a13bab86d391537d29164dfcc174da2f6bd673bd1e0d0ce73c9055c115b83d05
+  - c59346d51e792b124e5201bc754687370c7c7f129e3acfa3a2575937a6149994
+  - a9722169ddca1c7dc2c34a677b490bf4f7dfe029aa467beada5763944310ecb3
+  - 6ef364b4005937b2d938df65ccde323fb48487f60dc0bf568b90e88ab1988516
+  - 3d04b2183f87e26913754dca35c7a5bfdd30eb294c1100ce69d7849d0587e1cf
   query_type: synonym
   verified_run: rechunk-v4-20260929
 - query: how does the style of a typeface convey meaning
   expected_names:
   - Dynamic Typographic Expression
+  - Typeface Weight and Historical Classification
+  - Typography As Personal Branding Tool
+  - Classical Serif Typeface Influence on Modern Design
+  - Typography As Cultural and Brand Identity Marker
   expected:
   - eb60ca8cd5112b29068e04d7a8aac3d8bc421b33c732dcf1237c9b8cd2c33e8d
+  - 0fd89a2ccb7b5448f712694500ab19d3f0a3414067a49ceb399f501a359bd44a
+  - 64cba0957ca77a48d1df13fc29cc3be2ecec5ec5c05d9615e56d39f88c06c3da
+  - 22ff86de6518f4a22f2773f8a7283c99a7db2f8ce13266f68f5863419e225465
+  - 73ca28a434ef14347458af8b8ad2d88df1dc56b1d874b44f804ea249373956a7
   query_type: synonym
   verified_run: rechunk-v4-20260929
 - query: how does combining doing, thinking, and refining produce creative change
   expected_names:
   - Morphological Box Method
+  - Design Thinking Refinement Process
+  - Editorial Collaboration and Iterative Refinement
+  - Iterative Refinement and Feedback Loops
+  - Creative Disruption Through Unexpected Departures
   expected:
   - 9a242beda541a6d3e834b927c103459aacb37b10fc7d48768be4f87067b5a2dd
+  - 09e90eb4fe36c7adde707e32b58d4c05b20a9e43a714efe5adddca0ab96a25c3
+  - 6269430dac05fae7fdef213914e39f1730c0cfc42e33dae81b363a94fa1413f3
+  - 3860ffff45cf233e6e462b18e4a9e5e02abbca9779d42977d106a443e8da09c2
+  - 9f28c6a65a89ea6b28a9c89c5ce0dac43cbb3cb8e4cb4fbef5d28788e785044f
   query_type: abstract
   verified_run: rechunk-v4-20260929
 - query: why does ai not need full human intelligence to be useful
   expected_names:
   - Shift Left Ai Automation
+  - Human Cognitive Limits in Strategic Rule Application
+  - Human Creativity As Ai Boundary
+  - Intuition Misalignment with Modern Complexity
   expected:
   - ce34cc7efce7d1c9be7ae11e65a133a0a3d927f69d4f269176ae2422eac67e35
+  - c0b7a1693a45225907256d07e2fff5a8d6086ec5aa9d53d8f22167f4479a5465
+  - fb10168c658050b76131103ba92cb96e6fbc160f0c5056ff2fb311c9fbd030d1
+  - b02fca8d7723be59ca2f194ba65e7133070a17a9896f14a76e113170e8ef584a
   query_type: abstract
   verified_run: rechunk-v4-20260929
 - query: why must charts accurately represent the underlying data
   expected_names:
   - Essential Form Visualization Principle
+  - Real-world Transfer Principle
+  - William Playfair's Visualization Principle
   expected:
   - 0ac4cd9a80475a429ace9332a1d96146a5f8501291a594ff5e8839fbd6c151ff
+  - 2f38efc653b174dbd3341b478a2e83d1b674f09fc9ab74e3912a4210852e15a5
+  - e8e99709a11bb254294b16b064948b8c83db4610e027733b38bf125615f4f8e7
   query_type: synonym
   verified_run: rechunk-v4-20260929
 - query: why does focused practice with feedback improve a skill
   expected_names:
   - Virtuous Cycle of Skill Development
+  - Virtuous Cycle of Learning Through Doing
+  - Iron Sharpens Iron Principle
+  - Strategic Focus Through One Thing
   expected:
   - 01a444c5eed39b08dd4c43bf351f62001a7d37f77e44f7dc9bbc58e6ed329d4c
+  - ee5ce08c90c7d44cbfad36086358b2f11a02c06dddefbf08df00fbc4d67a16ba
+  - 49c671755d630f9aa98a9630329c85b17bedec5fa35c76f0ff7b572b73bf5df5
+  - 90232f23409c957908aa473b06290dd869a3350854c418aa52825c03da0b32e5
   query_type: synonym
   verified_run: rechunk-v4-20260929
 - query: how does retrieval augmented generation keep answers coherent
   expected_names:
   - Retrieval-augmented Generation Process
+  - Multimodal Context Integration
+  - Llm Response Parsing Boundary Recognition
+  - Temporal Decay Scoring Algorithm
   expected:
   - 9c881a1bab7ea7f0a40a6f7e77209d27fef44b8aa7e6aa24d2bd69b76a0c66cf
+  - 78f2b11049bcf922fbbb17502982e3ec9001514d532eeb2b4677d1dfc1451acd
+  - 8f7919129e59a53c41e18f6b896c0094c4f80db2d771814140f7add57c0b993f
+  - 53a221ed8a2ce2f871ce5c776d6db2b2da1f28e90854f02da8af8397c337a230
   query_type: synonym
   verified_run: rechunk-v4-20260929
 - query: how to make ai systems dependable before adding features
   expected_names:
   - Create First, Compute Later Strategy
+  - Modular Ai Agent Architecture
+  - Explainable Ai Decision Transparency
+  - Iterative Ai Prototyping and Refinement
   expected:
   - ab908a54c432b6f5906ff48de748c3ddf0e08da5cabc3bc8eea2d81fb53c32f5
+  - 8cba28323841d3f7b20aab70db79f18d51b9fd8a4128239e48f36829db0e7732
+  - f0bd37b0248017c0726afc1080184201b69ca53c95e10432dbd009fc7c94be5a
+  - 9e477bb5b751cf34516c17b5841c534d306bd24daa873576dc0f63dce0b56f0e
   query_type: synonym
   verified_run: rechunk-v4-20260929
 - query: how do controlled experiments establish cause and effect
   expected_names:
+  - Randomized Controlled Trial Principle
   - Correlation-based Causal Hypothesis Formation
+  - Regression to the Mean As Baseline Comparison
+  - Partial Correlation Calculation Method
   expected:
+  - c0ced3bc942a2c1cd3bc187aba77a08236ed2bdda665b85868a6dda301aa7a9f
   - 70e9b802df629b7a7ec33b65bc182457cbcbf62ff17d1e89fa86a71932dd020a
+  - e1471093cd6c48fcf8002c89bfc2e3e625c065fd6f15f1443bed98aed035a183
+  - b452478ec2859a83a9574076bdbc50b490dda1101a4ed132b984123e3e7be73d
   query_type: synonym
   verified_run: rechunk-v4-20260929
 - query: how do ai systems amplify existing biases
   expected_names:
   - Beware of Bias in Ai Recommendations
+  - Ai Chatbot Interaction Risk
+  - Machine Drift
   expected:
   - 50356efd05b249304b3f749f682bb81b51bec65125fca7e7c3347b0d4636274c
+  - 5679ec9b6aaa98f16fcf9b0650010bf35f6fe701b7acc54dd1a97088fe55b339
+  - 606a9c47c7321edec8ca8e01d3cb2eeeba4615bb0a463eeb95bc24543615f991
   query_type: synonym
   verified_run: rechunk-v4-20260929
 - query: how do signs get their meaning from the relationship between sign, object,
     and interpreter
   expected_names:
   - Signifier-signified Relationship in Language
+  - Direct Sign-object Linkage in Visual Design
+  - Synesthonic Sign Theory
+  - Media Semiotics and Representation
   expected:
   - efbc5010395c77acb29beda75e4bb8704ca95ae8d525449d617ee4e9633b5415
+  - 56db07d1cd74eb55d303d49ba8d0d3834fb3c2f971ce109a570220ea65ab27ee
+  - 13d8a45ebd17a9d80e12b20947b85d04593970c3f3524a8924e52c67e7e35080
+  - 93c83bebfa68a97a1abac4e151f91de5b5761618252b653fb5e60ab316e9a23c
   query_type: synonym
   verified_run: rechunk-v4-20260929
 - query: why does the first piece of information anchor our judgment
   expected_names:
   - Fear of Missing Out Anchoring Effect
+  - Information Overload Decision Paralysis
+  - Social Proof Manipulation (2)
   expected:
   - fb47db46a18b5ee616e72be95acf1600e59a3bbbce2191ef5e719cee6144239b
+  - 7f08af06b212a17cf1369a895e61756a458319fd5783737d6d47cf1304a6e5ab
+  - 6b2b764224a3a1a0a166aa4352d52d9523da6a34b5a3f274cf4ee4392e283dc7
   query_type: synonym
   verified_run: rechunk-v4-20260929
 - query: how do small consistent investments compound over time
   expected_names:
   - Compound Effect
+  - The Compound Effect in Fitness Transformation
+  - Long-term Thinking Vs. Short-term Gains
+  - Meal Plan Development Return on Investment
+  - Stock Market Resilience Over Time
   expected:
   - a7808b2f0a47eb89c57040f9ad1f7ec3bea942eddb082efa6fbb1c1d22939760
+  - fca847084c3921bc672bd84153f84859a3edce8246e6375ecbc4b7f87d4f86cd
+  - ecc9796ec613156c6660806ecda424118d2ebfbb515d41732e1fc6e0d5d56e77
+  - 352f908374da95200f249097623ec4ab7c65fd193c4328a6de56eaad343ce5bf
+  - 2068d550715d195807068fad50efcba6c44cb294df3ee5b5ed28c61462ef7217
   query_type: synonym
   verified_run: rechunk-v4-20260929
 - query: how does visual tone and contrast shape a design
   expected_names:
   - Dynamic Juxtaposition in Layout Design
+  - Contrast-driven Design Character
+  - Polar Interaction for Conceptual Clarity
+  - Visual Contrast and Perceptual Balance
+  - "Jean-beno\xEEt L\xE9vy's Typography Integration Method"
   expected:
   - 603a2de8b87986af40e42b21e7d360e6b50ed8b77866322f18812ebd23a79c03
+  - 5c81c25ba46ca3cfb122b0f4365cad3511a95f5a4979ed94e9234587b1d99e08
+  - 795ea06b14c170280d8f4346a1a4da4008d4bacf0ee7435f76b36f8500b37757
+  - 98d0a3277fb53ee48d1ca6cbe6664998f7a4502a3f8314ac56826c5b38ee7201
+  - 9a6da1b93e100637238bbed54bec40551a00559853b07223192850ec1b9f4f41
   query_type: synonym
   verified_run: rechunk-v4-20260929

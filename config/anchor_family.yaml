@@ -182,6 +182,18 @@ store_bridge:
   # canonical run resolves it. Never a positional pick.
   canonical_run: rechunk-v4-20260929
   declared_unresolved: []
+
+  #: THE ANCHOR-BRIDGE AMBIGUITY RULING (T-124, D-2999, owner-approved 2026-10-14). A NAME resolving to N rows is
+  #: the NORMAL case in this corpus, not a defect: the bridge's job is to say WHICH rows, or to declare that no
+  #: rule decided. MEASURED before the ruling (BUG-777): the content join collapsed 208 entries to 13 and most
+  #: anchor rows read AMBIGUOUS; the RED line then masked 5 of the 68 rails below it (BUG-778).
+  resolution:
+    decision: D-2999
+    default: declared_unresolved
+    order: [exact_id, served_run_name_and_author, single_corpus_row]
+    print_tie_break: true
+    fail_closed: declared_unresolved_stays_counted
+    consumer: scripts/build_anchor_store_bridge.py
   golden:
     # D-2618 retired the 1,027-example gpt-oss silver pool to TRAIN-ONLY (archive/golden_retired_D2618/;
     # 93.3% unverified per D-2616). A retired golden is NOT an eval target, so its unjoined rows are EXPECTED:

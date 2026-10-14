@@ -198,20 +198,20 @@ other_owner_lanes:
   - task: T-124
     act: the anchor-bridge ambiguity RULING (a name resolving to N rows must stay declared-unresolved or be resolved by a DECLARED rule)
     kind: ruling
-    home: governance/buglog.md#BUG-777
-    applier: none_it_is_a_policy_word
+    home: config/anchor_family.yaml#store_bridge.resolution   # D-2999, owner-approved 2026-10-14
+    applier: scripts/build_anchor_store_bridge.py   # the resolution rung (D-2999)
   - task: T-121
     act: the SOURCE KIND vocabulary (an answer-space decision) + whether a work and its re-publication are ONE voice
     kind: vocabulary
-    home: config/content_types.yaml
-    applier: none_until_the_word_lands
+    home: config/content_types.yaml#source_kind   # D-2998, owner-approved 2026-10-14
+    applier: none_the_axis_is_a_declaration_until_a_non_book_source_is_ingested
   - task: T-117
     act: one word per unit (CONFIRM / CORRECT + home / ABSTAIN / LEAVE) on the ESCALATE reference sheet
     kind: sheet
-    home: governance/canonical_relabel_review_20261014.md
-    applier: declared_by_that_tasks_own_plan
+    home: governance/canonical_relabel_review_20261014.csv   # the packet the owner marked (BUG-785); its reader is scripts/ingest_relabel_rulings.py
+    applier: scripts/ingest_relabel_rulings.py
   - task: T-101
     act: "the owner's marks reaching the sheet the re-anchor applier reads (anchor_mode: set is already granted and declared)"
     kind: sheet
-    home: temp/golden_proposed_v5.yaml
+    home: governance/golden_reanchor_proposed_v5.yaml   # BUG-784: moved out of the gitignored, 7-day-purging temp/; the SHEET is declared in config/pipeline_config.yaml#retrieval_benchmark.reanchor.reviewed_sheet
     applier: scripts/reanchor_retrieval_goldens.py

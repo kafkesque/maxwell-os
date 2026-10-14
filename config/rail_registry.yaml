@@ -148,6 +148,12 @@ guards:
   #: and then only derived words + a receipt (an agent may EXPAND a signed predicate; it may never mint a label).
   scripts/owner_marks.py --check: tri_state
   scripts/owner_marks.py --selftest: fatal
+  #: BUG-785 — THE T-117 READER. The owner's 72 words had no reader (the applier reads config/relabel_rulings.yaml
+  #: instead), so a COMPLETED act read as owed. It validates the packet against the DECLARED vocabulary, refuses a
+  #: CORRECT with no home and a home no canonical declares (both would MINT a word, D-2898), keys the write by
+  #: unit_key (never the ordinal, BUG-751), reports an owner_canonical on a non-CORRECT row as ADVISORY and never
+  #: writes it, and never writes `applied:` (that is the licensed store write's receipt).
+  scripts/ingest_relabel_rulings.py --selftest: fatal
   scripts/build_archive_index.py --check: fatal
   scripts/build_archive_index.py --selftest: fatal
   scripts/recompute_decision_summary.py --check: fatal

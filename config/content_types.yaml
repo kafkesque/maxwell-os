@@ -573,3 +573,41 @@ nli_paraphrase:
   noise_drop: "This is a bare factual summary with no rule or method to apply."
   quarantine: "This has some value but does not clearly fit any single category."
 
+# ─────────────────────────────────────────────────────────────────────────────────────────────────────
+# source_kind — THE SOURCE-KIND AXIS (T-121, D-2998, owner-approved 2026-10-14).
+#
+# THE QUESTION THE OWNER ANSWERED. When a claim's corroboration is measured, is a work and its
+# RE-PUBLICATION one voice or two?  ANSWER: ONE VOICE. A preprint, its journal article, its repository
+# copy and its 2nd edition are ONE work under D-2308's edition rule — extended here from IDENTITY to
+# CORROBORATION. Counting them separately inflates a voice count with no second voice behind it, which
+# is the measured failure this corpus already carries: 530 corroborated rows were ONE text under TWO
+# names (BUG-780), certified twice because identity and corroboration read the same pair twice.
+#
+# THE VOCABULARY IS ADOPTED, NEVER INVENTED. A bespoke source-kind list would be a FOURTH naming system
+# beside the taxonomy, the content types and the extraction types (C12: a second copy of a fact is a
+# second truth). The axis therefore takes an existing controlled set — OpenAlex's work `type` — so a
+# future ingest, a future paper and a future reader share one vocabulary. Values are plain strings: no
+# vendor, no enum owned by someone else (C2).
+source_kind:
+  decision: D-2998
+  axis: source_kind
+  vocabulary_source: 'https://docs.openalex.org/api-entities/works/work-object#type'
+  values: [book, book-chapter, dissertation, report, article, review, preprint, dataset, paratext, other]
+  #: WHAT THE PIPELINE EMITS TODAY: one value. `book` is the kind every admitted source has, measured
+  #: 2026-10-14. A second value may be emitted only WITH the one-voice rule below exercised on its first
+  #: batch: the axis is the PRECONDITION of a non-book ingest, never its consequence.
+  emitted_by_pipeline: [book]
+  one_voice_rule:
+    statement: >-
+      a work and every RE-PUBLICATION of it — edition, printing, reprint, translation, repository copy,
+      preprint — are ONE VOICE
+    applies_to: [source_diversity, is_convergent, corroboration_bit]
+    basis: [D-2308, D-2998]
+    why: >-
+      Corroboration is a claim asserted by INDEPENDENT VOICES — the principle BORP named (governance/
+      buglog.md#BORP) — and two rows of one work are one voice however the second row was published. The
+      voice count is therefore taken AFTER the identity collapse (the D-2738 ledger + T-129's repair),
+      never from a raw row count, because a count is spoofable and a declared identity is not.
+  non_book_ingest_gate:
+    requires: 'this axis emitted for the new value + the one_voice_rule exercised on its first batch'
+    status: 'no non-book source is ingested, measured 2026-10-14'

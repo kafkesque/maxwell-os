@@ -350,6 +350,7 @@ def _apply_reviewed(
             f"  ❌ apply needs both the reviewed CSV and the draft ({csv_path.name}, {draft_path.name})"
         )
         return 2
+    print(f"  reading reviewed sheet {csv_path}\n  reading reviewed draft {draft_path}")
     with open(csv_path, newline="", encoding="utf-8") as fh:
         rows = list(csv.DictReader(fh))
     draft = yaml.safe_load(draft_path.read_text(encoding="utf-8")) or {}
@@ -600,6 +601,11 @@ def controls() -> list[tuple[str, bool]]:
             "the_vocabulary_and_the_anchor_mode_have_ONE_home_in_config",
             len(DECISIONS) >= 2 and ANCHOR_MODE in ANCHOR_MODES,
         ),
+        (
+            "the_writer_reads_the_declared_reviewed_inputs_never_the_generators_output",
+            reviewed_inputs(_parser().parse_args(["--apply"])) == (REVIEWED_CSV, REVIEWED_DRAFT)
+            and (REVIEWED_CSV, REVIEWED_DRAFT) != (CSV_OUT, YAML_OUT),
+        ),
     ]
 
 
@@ -621,7 +627,7 @@ def _selftest() -> int:
     return 1 if bad else 0
 
 
-def main() -> int:
+def _parser() -> argparse.ArgumentParser:
     ap = argparse.ArgumentParser(
         description="Re-anchor stale retrieval goldens to the served run (BUG-710)"
     )
@@ -667,12 +673,28 @@ def main() -> int:
         help="D-2991: run the known-answer controls for the reviewed-sheet judgment (no store, no "
         "CSV, no model) - the ladder pins this, so a dead guard is SEEN (BUG-492)",
     )
-    args = ap.parse_args()
+    return ap
+
+
+def reviewed_inputs(ns: argparse.Namespace) -> tuple[Path, Path]:
+    """The ONE wiring point for the REVIEWED inputs, shared by --check and --apply (BUG-787).
+
+    BUG-784 fixed the READER (--check) to read the declared reviewed sheet; the WRITER (--apply) was left wired
+    to `args.csv`/`args.yaml_out`, which are the GENERATOR's outputs. MEASURED 2026-10-14: --check read 150
+    marked rows while --apply refused all 29 queries ("NO row marked 'anchor'"), so T-101 could never be
+    applied. The judgment was never wrong; the CALL SITE was. One helper, one place, and a control below that
+    reds if it is ever wired back to the generator's output.
+    """
+    return ns.reviewed_csv, ns.reviewed_draft
+
+
+def main() -> int:
+    args = _parser().parse_args()
 
     if args.selftest:
         return _selftest()
     if args.check:
-        return _check_reviewed(args.reviewed_csv, args.reviewed_draft)
+        return _check_reviewed(*reviewed_inputs(args))
 
     # D-2991: the store imports happen HERE, after the two store-free modes have returned, so --selftest and
     # --check stay hermetic (a rail that needs the FAISS index is a rail that gets skipped).
@@ -698,7 +720,8 @@ def main() -> int:
         # D-2941 / R5: apply reads the already-REVIEWED CSV + draft. Regenerating
         # candidates here would overwrite the CSV and blank the human's `decision`
         # column, so the gate could never pass. Early-return instead.
-        return _apply_reviewed(args.csv, args.yaml_out, args.golden, conn)
+        # BUG-787: the WRITER reads the DECLARED reviewed inputs, never the generator's output.
+        return _apply_reviewed(*reviewed_inputs(args), args.golden, conn)
 
     rows: list[dict] = []
     no_candidate: list[str] = []

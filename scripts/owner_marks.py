@@ -31,6 +31,8 @@ WHAT EACH MODE DOES
   --selftest known-answer controls over the pure parts: no store, no network, no LLM (BUG-492).
 
 WHAT IT REFUSES TO DO (stated, because an unstated scope reads as coverage)
+  - It never blanks a hand-typed cell: a write that would empty a non-empty `derived_column` entry REFUSES
+    (BUG-782: the owner's word must not be destroyed by the tool built to record it).
   - It never chooses a word. `signed:` in the policy is the only owner act the file accepts; a proposal is not a
     word and the derivation ignores it (D-2898).
   - It never guesses a tier: without the pair object it REFUSES to render, because the object is what makes the
@@ -768,12 +770,53 @@ def sign_tiers(
 
 # ── modes ────────────────────────────────────────────────────────────────────
 
+def hand_typed_cells(policy: dict[str, Any], cfg: dict[str, Any], rows: Sequence[dict[str, Any]]) -> list[str]:
+    """Cells whose word is on DISK but which this write would BLANK, with no recorded expansion behind them.
+
+    MEASURED 2026-10-14: the owner's 84 words were typed by hand into `owner_ruling` (the DERIVED column) while
+    `--apply` had never run. `--render`/`--apply` rebuild that column from the tiers, so with the tiers still
+    UNSIGNED every one of those 84 cells would have been written as "" - the write would have DESTROYED the only
+    machine-readable record of the owner's word, and the next reader would see a sheet that never carried one.
+    A derived column is machine-written, so refreshing it is legitimate; blanking a NON-EMPTY cell is not, and
+    the difference is exactly what a shrink guard is for (C6, the docguard shape). It refuses instead, and says
+    which two acts would make the write safe (sign the tier, or move the word to the owner's column).
+    """
+    path = resolve(policy, str(cfg["path"]))
+    if not path.exists():
+        return []
+    derived_col, src_col = str(cfg["derived_column"]), str(cfg["provenance_column"])
+    with path.open(newline="", encoding="utf-8") as fh:
+        on_disk = {work_key(str(r.get("work_a", "")), str(r.get("work_b", ""))): r for r in csv.DictReader(fh)}
+    blanks: list[str] = []
+    for row in rows:
+        old = on_disk.get(work_key(str(row.get("work_a", "")), str(row.get("work_b", "")))) or {}
+        old_word = str(old.get(derived_col) or "").strip()
+        if old_word and not str(row.get(derived_col) or "").strip():
+            src = str(old.get(src_col) or "").strip() or "BLANK"
+            blanks.append(f"{str(row.get('work_a', ''))[:40]} / {str(row.get('work_b', ''))[:40]}: "
+                          f"{old_word!r} (provenance {src})")
+    return blanks
+
+
+def refuse_to_blank(policy: dict[str, Any], cfg: dict[str, Any], rows: Sequence[dict[str, Any]]) -> None:
+    """Fail closed (C16) rather than blank a word a human put in a derived column (the BUG-782 shape)."""
+    typed = hand_typed_cells(policy, cfg, rows)
+    if typed:
+        raise OwnerMarksError(
+            f"refusing to write: {len(typed)} non-empty cell(s) in {cfg['derived_column']} would be BLANKED, and "
+            f"they carry no recorded expansion (e.g. {typed[0]}). Two acts make this write safe: sign the tier "
+            f"that expands them (`--sign ...`), or move the words to {cfg['word_column']} (the OWNER's column). "
+            f"A derived column is refreshed, never ERASED (BUG-782: the owner's word must not be destroyed by the "
+            f"tool that was supposed to record it)")
+
+
 def render(policy: dict[str, Any]) -> int:
     """Render the sheet and the ledger projection from their instruments, carrying every word already given."""
     cfg = home(policy, "collapse_sheet")
     sheet_path = resolve(policy, str(cfg["path"]))
     build_pair_object(policy)   # measure FIRST: the sheet is rendered from the instrument, never from a column
     rows = build_sheet_rows(policy)
+    refuse_to_blank(policy, cfg, rows)   # render
     saved = backup(sheet_path, "owner_marks_render")
     write_csv(sheet_path, [str(c) for c in cfg["columns"]], rows)
     lcfg = home(policy, "ledger")
@@ -829,6 +872,7 @@ def apply_words(policy: dict[str, Any]) -> int:
         d = by_key[work_key(row["work_a"], row["work_b"])]
         row["owner_ruling"], row["ruling_source"] = d["word"], d["source"]
         written += 1 if d["word"] and d["source"] != "none" else 0
+    refuse_to_blank(policy, cfg, rows)   # apply
     saved = backup(sheet_path, "owner_marks_apply")
     write_csv(sheet_path, [str(c) for c in cfg["columns"]], rows)
     lcfg = home(policy, "ledger")
@@ -884,6 +928,7 @@ CONTROL_LABELS: tuple[str, ...] = (
     "a_signature_is_written_on_the_named_tier_and_nowhere_else",
     "an_unknown_tier_id_is_refused_never_guessed",
     "a_tier_that_names_no_word_is_never_signed",
+    "a_write_never_blanks_a_hand_typed_cell",
 )
 
 
@@ -1038,6 +1083,34 @@ def selftest() -> int:
         control(CONTROL_LABELS[11], noword_refused)
     finally:
         shutil.rmtree(tmp3, ignore_errors=True)
+
+    tmp4 = Path(tempfile.mkdtemp(prefix="owner_marks_shrink_"))
+    try:
+        cfg4 = dict(home(policy, "collapse_sheet"))
+        cfg4["path"] = str(tmp4 / "sheet.csv")
+        cols = [str(c) for c in cfg4["columns"]]
+        typed_row = dict.fromkeys(cols, "")
+        typed_row.update({"work_a": "A", "work_b": "B", "evidence_class": "identical_normalised_text",
+                          "owner_ruling": "CONFIRM-ONE-WORK", "ruling_source": "none"})
+        write_csv(Path(cfg4["path"]), cols, [typed_row])
+        blanked = [dict(typed_row, owner_ruling="", ruling_source="none")]        # what an unsigned write builds
+        kept = [dict(typed_row, owner_ruling="CONFIRM-ONE-WORK", ruling_source="signature:A@2026-10-14")]
+        # the CONTROL exercises the GUARD (refuse_to_blank), not the helper: a control that calls the pure part
+        # would stay green while the write path was rewired (the BUG-787 shape - the call site IS the guard here).
+        refused = False
+        try:
+            refuse_to_blank(policy, cfg4, blanked)
+        except OwnerMarksError:
+            refused = True
+        accepted = True
+        try:
+            refuse_to_blank(policy, cfg4, kept)
+        except OwnerMarksError:
+            accepted = False
+        control(CONTROL_LABELS[12],
+                refused and accepted and len(hand_typed_cells(policy, cfg4, blanked)) == 1)
+    finally:
+        shutil.rmtree(tmp4, ignore_errors=True)
 
     for label in CONTROL_LABELS:
         print(f"   {'PASS' if label not in failures else 'FAIL'} {label}")

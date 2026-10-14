@@ -17,7 +17,16 @@ schema_version: '1.0'
 # ─────────────────────────────────────────────────────────────────────────────────────────────────
 date: '2026-10-13'
 decision: D-2977
-packet: governance/canonical_relabel_review_20261013.csv
+packet: governance/canonical_relabel_review_20261014.csv
+
+#: THE OWNER'S WORD SET, DECLARED (BUG-785). The packet is the marked surface; this is the vocabulary the
+#: ingest validates it against, and the ingest's selftest proves this block is a SUBSET of the applier's own
+#: ACTIONS (scripts/apply_relabel_rulings.py) so the two homes can never drift apart silently (C12).
+vocabulary:
+  actions: [CONFIRM, CORRECT, ABSTAIN, LEAVE]
+  home_required: [CORRECT]          # CORRECT with no home is an incomplete word: the ingest REFUSES it
+  withheld: [PENDING]               # a class the owner has not ruled yet: ESCALATE, fail-closed
+  applier_actions_home: scripts/apply_relabel_rulings.py#ACTIONS
 
 class_rules:
   # 170 units / 717 rows. MEASURED split: 126 units / 534 rows are LEXICALLY EVIDENCED (the raw label
@@ -70,39 +79,65 @@ class_rules:
 # ordinal key and on a key that reaches no unit without an applied receipt. `was:` records the ordinal the
 # owner actually saw when ruling, so the two can never drift apart silently.
 unit_rulings:
-  # Owner ruling 2026-10-13 ("approve U001..U004").
+  # WRITTEN BY scripts/ingest_relabel_rulings.py from /Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/governance/canonical_relabel_review_20261014.csv (ingested 2026-10-14).
+  # Keyed by unit_key, NEVER by the packet's ordinal (BUG-751): `was:` carries the ordinal as history.
+  # `applied:` is NOT written here: it is the receipt of the licensed store write, and a receipt
+  # minted by an ingestion is a claim-shaped field with a false reading (BUG-785/BUG-782).
+  affective computing -> human-computer interaction:
+    was: U038
+    action: CONFIRM
+  animation studies -> computer graphics:
+    was: U009
+    action: CORRECT
+    owner_canonical: motion & time
+  architectural theory -> cultural design:
+    was: U012
+    action: CONFIRM
+  biostatistics -> research methodology:
+    was: U039
+    action: CONFIRM
+    owner_comment: thisis woke  low quality principle
+  career counseling -> psychology:
+    was: U006
+    action: CONFIRM
+  chronobiology -> neuroscience:
+    was: U040
+    action: CONFIRM
+  clinical epidemiology -> health & medicine:
+    was: U041
+    action: CONFIRM
+  cloud computing -> software engineering:
+    was: U024
+    action: CONFIRM
+  community development -> political economy:
+    was: U042
+    action: CONFIRM
+  community-based participatory research -> research methodology:
+    was: U043
+    action: CONFIRM
+  computer science -> software engineering:
+    was: U004 (same packet)
+    action: ABSTAIN
+    applied: '2026-10-13'
+    write_receipt: config/label_store_write_receipt.json
+    note: >-
+      Owner 2026-10-13 ("4 = whatever you recommend"). RELEASED from hold with the recommendation ABSTAIN (declared absence `emerging`, D-2830) — recorded as OWED, never performed here. WHY NOT CONFIRM: it would declare `computer science` as a raw of `software engineering` FORWARD, so every future CS-raw label lands in a NARROWER home than the label; the three measured objections stand — (1) `computer science` is the broader field, not a sub-field; (2) the live mapper refuses it (both the definition-anchored menu and the remap answer `emerging`); (3) the alias came from the D2422 sweep whose own text states "semantic correctness NOT guaranteed by LLM". WHY NOT CORRECT: no canonical in the 63-discipline menu is a clean home (`computational theory` and a plain `computer science` canonical do not exist; opening one needs its own decision). ABSTAIN removes the false `software engineering` claim, aligns the stored value with the live mapper's own answer, and locks in no wrong forward mapping; the raw label is preserved, so a future canonical home can be re-derived cleanly. STORE-WRITTEN 2026-10-13 (T-103, D-2988): 60 rows to the declared absence `emerging` (method emerging_real), as part of the 163-row licensed set; receipt config/label_store_write_receipt.json.
+  customer experience management -> design psychology:
+    was: U044
+    action: CONFIRM
   design studies -> design thinking:
     was: U001 (packet 2026-10-13, before the first ruling round)
     action: CONFIRM
     applied: '2026-10-13'
     note: >-
-      Owner 2026-10-13. `design studies` -> `design thinking`, 107 rows. APPLIED 2026-10-13 with the
-      measured receipt: the live menu_hash (cc800a32...) and the answer space (c1f7895e...) are
-      BYTE-IDENTICAL before and after, so no provenance was rewritten and no row was relabelled; the
-      re-derivation gap fell 1,072 -> 894 rows on the 178 rows this and the U003 declaration cover.
-      NOTE RECORDED AT APPLY TIME:
-      `design studies` is ALSO a declared raw of the DOMAIN `design strategy` (config/taxonomy.yaml,
-      dom-037), so this makes it a DECLARED CROSS-AXIS HOMONYM — a sanctioned shape (D-2814's same-axis
-      fallthrough / D2422's kind-aware index), safe because both indexes are kind-constrained, but named
-      here so it is a choice and not an accident.
-  marketing science -> emerging:
-    was: U002 (same packet)
+      Owner 2026-10-13. `design studies` -> `design thinking`, 107 rows. APPLIED 2026-10-13 with the measured receipt: the live menu_hash (cc800a32...) and the answer space (c1f7895e...) are BYTE-IDENTICAL before and after, so no provenance was rewritten and no row was relabelled; the re-derivation gap fell 1,072 -> 894 rows on the 178 rows this and the U003 declaration cover. NOTE RECORDED AT APPLY TIME: `design studies` is ALSO a declared raw of the DOMAIN `design strategy` (config/taxonomy.yaml, dom-037), so this makes it a DECLARED CROSS-AXIS HOMONYM — a sanctioned shape (D-2814's same-axis fallthrough / D2422's kind-aware index), safe because both indexes are kind-constrained, but named here so it is a choice and not an accident.
+  distributed systems -> software engineering:
+    was: U013
     action: CORRECT
-    owner_canonical: marketing
-    applied: '2026-10-13'
-    write_receipt: config/label_store_write_receipt.json
-    note: >-
-      Owner 2026-10-13 ("2 = CORRECT for LATE-HOME"). Earlier read as LEAVE because the stored value is
-      the ABSENCE `emerging` (approving the stored state = keep the 94 rows as a correct-at-the-time
-      record). The owner has now clarified the intent is CORRECT: re-map the 94 rows to the live home
-      `marketing`. Recorded as OWED — a canonical relabel is a separate owner-gated store write
-      (D-2898), which this applier records but never performs.
-      STORE-WRITTEN 2026-10-13: the owner licensed the write (T-103, D-2988) and
-      scripts/apply_relabel_store_write.py landed 94 rows here as part of the 163-row licensed set —
-      MEASURED changed=163 verified=163, the store's menu set unmoved. Receipt:
-      config/label_store_write_receipt.json. The write ran from the round-1 surface
-      (canonical_relabel_review_20261013.csv); this entry no longer reaches a unit, which is why it is
-      marked `applied` (a ruling with no receipt that reaches nothing is a silence, C16).
+    owner_canonical: privacy & surveillance
+  educational measurement -> research methodology:
+    was: U025
+    action: CONFIRM
   entrepreneurial studies -> emerging:
     was: U057 (packet 2026-10-13)
     action: CORRECT
@@ -110,55 +145,214 @@ unit_rulings:
     applied: '2026-10-13'
     write_receipt: config/label_store_write_receipt.json
     note: >-
-      Owner 2026-10-13 ("2 = CORRECT for LATE-HOME"). The class CORRECT names `marketing` as the
-      majority home (3 of 4 units, 99 of 103 rows); this unit's live home is `entrepreneurship studies`,
-      so it is overridden by name. Recorded as OWED — never performed by the applier (D-2898).
-      STORE-WRITTEN 2026-10-13 (T-103, D-2988): 4 rows to `entrepreneurship studies` as part of the
-      163-row licensed set; receipt config/label_store_write_receipt.json.
+      Owner 2026-10-13 ("2 = CORRECT for LATE-HOME"). The class CORRECT names `marketing` as the majority home (3 of 4 units, 99 of 103 rows); this unit's live home is `entrepreneurship studies`, so it is overridden by name. Recorded as OWED — never performed by the applier (D-2898). STORE-WRITTEN 2026-10-13 (T-103, D-2988): 4 rows to `entrepreneurship studies` as part of the 163-row licensed set; receipt config/label_store_write_receipt.json.
+  exercise physiology -> health & medicine:
+    was: U018
+    action: CONFIRM
+  film theory -> media studies:
+    was: U031
+    action: CONFIRM
+  financial regulation -> law:
+    was: U021
+    action: CORRECT
+    owner_canonical: finance
+  health informatics -> information science:
+    was: U010
+    action: CORRECT
+    owner_canonical: business administration
+  higher education administration -> organizational theory:
+    was: U022
+    action: ABSTAIN
+    owner_comment: re-taken ABSTAIN 2026-10-14 (CORRECT named no home)
+  implementation science -> research methodology:
+    was: U045
+    action: CORRECT
+    owner_canonical: organizational theory
+  industrial relations -> sociology:
+    was: U032
+    action: CORRECT
+    owner_canonical: business administration
+  information visualization -> information science:
+    was: U003
+    action: CORRECT
+    owner_canonical: creative writing
+  innovation management -> creative process:
+    was: U001
+    action: CORRECT
+    owner_canonical: business administration
+  journalism studies -> media studies:
+    was: U046
+    action: CONFIRM
+  knowledge representation and reasoning -> artificial intelligence:
+    was: U033
+    action: CONFIRM
+  marketing science -> emerging:
+    was: U002 (same packet)
+    action: CORRECT
+    owner_canonical: marketing
+    applied: '2026-10-13'
+    write_receipt: config/label_store_write_receipt.json
+    note: >-
+      Owner 2026-10-13 ("2 = CORRECT for LATE-HOME"). Earlier read as LEAVE because the stored value is the ABSENCE `emerging` (approving the stored state = keep the 94 rows as a correct-at-the-time record). The owner has now clarified the intent is CORRECT: re-map the 94 rows to the live home `marketing`. Recorded as OWED — a canonical relabel is a separate owner-gated store write (D-2898), which this applier records but never performs. STORE-WRITTEN 2026-10-13: the owner licensed the write (T-103, D-2988) and scripts/apply_relabel_store_write.py landed 94 rows here as part of the 163-row licensed set — MEASURED changed=163 verified=163, the store's menu set unmoved. Receipt: config/label_store_write_receipt.json. The write ran from the round-1 surface (canonical_relabel_review_20261013.csv); this entry no longer reaches a unit, which is why it is marked `applied` (a ruling with no receipt that reaches nothing is a silence, C16).
+  medical humanities -> health & medicine:
+    was: U047
+    action: ABSTAIN
+  medical informatics -> health & medicine:
+    was: U034
+    action: CORRECT
+    owner_canonical: operations research
+  molecular biology -> health & medicine:
+    was: U048
+    action: ABSTAIN
+  mythology -> cultural studies:
+    was: U014
+    action: CONFIRM
+  narrative theory -> literary theory:
+    was: U004
+    action: CONFIRM
+  nonprofit management -> political economy:
+    was: U026
+    action: CONFIRM
+  numerical analysis -> computational physics & simulation:
+    was: U027
+    action: CONFIRM
+  nutrition science -> health & medicine:
+    was: U015
+    action: CONFIRM
+  optics -> theoretical physics:
+    was: U049
+    action: CONFIRM
   organizational psychology -> psychology:
     was: U003 (same packet)
     action: CONFIRM
     applied: '2026-10-13'
     note: >-
-      Owner 2026-10-13. `organizational psychology` -> `psychology`, 71 rows. APPLIED 2026-10-13 (same
-      byte-identical menu_hash/answer-space receipt as above). CONSISTENCY EVIDENCE
-      (measured, not inferred): config/taxonomy.yaml ALREADY declares `industrial-organizational
-      psychology` as a raw of `psychology`, so this declaration is the missing half of an existing one.
-  computer science -> software engineering:
-    was: U004 (same packet)
+      Owner 2026-10-13. `organizational psychology` -> `psychology`, 71 rows. APPLIED 2026-10-13 (same byte-identical menu_hash/answer-space receipt as above). CONSISTENCY EVIDENCE (measured, not inferred): config/taxonomy.yaml ALREADY declares `industrial-organizational psychology` as a raw of `psychology`, so this declaration is the missing half of an existing one.
+  phonology -> linguistics:
+    was: U035
+    action: CONFIRM
+  problem solving -> cognitive science:
+    was: U050
+    action: CORRECT
+    owner_canonical: decision making
+  problem solving theory -> decision making:
+    was: U051
+    action: CONFIRM
+  psycholinguistics -> linguistics:
+    was: U036
+    action: CONFIRM
+  psychometrics -> research methodology:
+    was: U011
+    action: CONFIRM
+  psychophysiology -> neuroscience:
+    was: U052
+    action: CONFIRM
+  public administration -> political economy:
+    was: U007
+    action: CONFIRM
+  public policy -> political economy:
+    was: U002
+    action: CONFIRM
+  religious studies -> anthropology:
+    was: U005
+    action: CONFIRM
+  rhetorical studies -> communication theory:
+    was: U028
+    action: CONFIRM
+  rhetorical theory -> communication theory:
+    was: U053
+    action: CORRECT
+    owner_canonical: literary theory
+  row:0f808ed97f0df455f77adcb3d78bcc020e911106d2874f4ac947248576ec2225:
+    was: U059
+    action: LEAVE
+  row:1dcb9f1d7b15f12041428e909a309ecaa65f8ba50295aec42067445b5d786be6:
+    was: U060
+    action: LEAVE
+  row:1f9d2696b37072d165fe786d8e83dfbc6bd4cdf30023c19846fbad4e0adf7503:
+    was: U061
+    action: LEAVE
+  row:2dbf74fca79b7302df0537696958c9c6b155c3d9352bdb4d993a7ae337aca7a6:
+    was: U062
+    action: LEAVE
+  row:3bd897791f45a5796840971068a33144c4d4721498759b461836af071ef99892:
+    was: U056
+    action: CORRECT
+    owner_canonical: strategic thinking
+  row:3d25109da166538e711ab327f1619265871c082b3f4d152b01825114ee4d13b2:
+    was: U063
+    action: LEAVE
+  row:4ff20c35c6edd8a137d3c05d843d07a936295e3545ac93842e8b096b557c3476:
+    was: U064
+    action: LEAVE
+  row:7196e92b224bc5710254570558807e2939df002c78af825ecbee6d0522256097:
+    was: U065
+    action: LEAVE
+  row:960bd1bd87207aeccd3c61424b365d4a81fb8ae89419ff990cab6822e896d26f:
+    was: U066
+    action: LEAVE
+  row:9d6aa605c70cac702f12a47f738dacf2e63225ad9700f9a3486fbb40658ce646:
+    was: U057
+    action: CORRECT
+    owner_canonical: decision making
+  row:c1a46f7a5bae2ba23574cf731d1538a46b8a10e20c707a0a6db6a442d9bbb86c:
+    was: U058
     action: ABSTAIN
-    applied: '2026-10-13'
-    write_receipt: config/label_store_write_receipt.json
-    note: >-
-      Owner 2026-10-13 ("4 = whatever you recommend"). RELEASED from hold with the recommendation ABSTAIN
-      (declared absence `emerging`, D-2830) — recorded as OWED, never performed here. WHY NOT CONFIRM: it
-      would declare `computer science` as a raw of `software engineering` FORWARD, so every future CS-raw
-      label lands in a NARROWER home than the label; the three measured objections stand — (1) `computer
-      science` is the broader field, not a sub-field; (2) the live mapper refuses it (both the
-      definition-anchored menu and the remap answer `emerging`); (3) the alias came from the D2422 sweep
-      whose own text states "semantic correctness NOT guaranteed by LLM". WHY NOT CORRECT: no canonical in
-      the 63-discipline menu is a clean home (`computational theory` and a plain `computer science`
-      canonical do not exist; opening one needs its own decision). ABSTAIN removes the false `software
-      engineering` claim, aligns the stored value with the live mapper's own answer, and locks in no wrong
-      forward mapping; the raw label is preserved, so a future canonical home can be re-derived cleanly.
-      STORE-WRITTEN 2026-10-13 (T-103, D-2988): 60 rows to the declared absence `emerging` (method
-      emerging_real), as part of the 163-row licensed set; receipt config/label_store_write_receipt.json.
-
-# ─────────────────────────────────────────────────────────────────────────────────────────────────
-# STORE-WRITE LICENSE (T-103 / D-2988) — the ONE home of the OWNER WORD that licenses a STORE WRITE.
-#
-# WHY A SEPARATE WORD IS NEEDED AT ALL. A class ruling says WHICH WAY a mapping must go; it does not license
-# the WRITE, because a canonical relabel is a store mutation and D-2898 forbids an agent minting a LABEL. This
-# block is the owner's word that closes that gap, and it is SCOPED: only rows an OWNER RULING already reaches
-# may be written. Every unit this file leaves at ESCALATE is NOT licensed, and the applier FAILS CLOSED if one
-# appears in scope (C16).
-#
-# WHAT THE LICENSED WRITE IS, ONTOLOGICALLY: not a re-classification. It copies the PRODUCTION MAPPER's own
-# answer (the ONE home: `_map_discipline`, scripts/audit_menu_rescope_cohort.py — the same function the
-# packet's `live_mapper_says` column came from) into the store for those rows, so the stored canonical becomes
-# REPRODUCIBLE from the row's own raw label (R14). Every row's new value is therefore TRIPLY agreed: the
-# mapper's answer == the owner's ruling == the packet's recorded mapper answer. `discipline_raw` is never
-# touched, `menu_hash` is never moved, and the scope is keyed by fb_id — NEVER by a predicate.
+  row:d22d5313ff89b7f47c9daad0eea8be29227e527259712d97cbb96a738b614847:
+    was: U067
+    action: LEAVE
+  row:d5024f08d859d11a10f6d84805bb8b00e0ffc97d3e2148d7130292112d3ab528:
+    was: U068
+    action: LEAVE
+  row:e42033a1a09216dea09bc55070d8f7b007320f8d933c1f09957b44d9c3c9dc04:
+    was: U069
+    action: LEAVE
+  row:ea8aa125fa0d0df62ebcfd1ef820cafa1be3f1eac0db636b6b16e91de9067bf1:
+    was: U070
+    action: LEAVE
+  row:eb4a73655de67455ba0919966e77a8d40d093967172ba221ad9e02b40f3e8151:
+    was: U071
+    action: LEAVE
+  row:f8d167628442655e18110f11ace2d0854c12f4aaf3cfc467291b56b7a025a2f1:
+    was: U072
+    action: LEAVE
+  social entrepreneurship -> political economy:
+    was: U016
+    action: CONFIRM
+  software architecture -> software engineering:
+    was: U054
+    action: CORRECT
+    owner_canonical: machine learning
+  sports science -> health & medicine:
+    was: U008
+    action: CORRECT
+    owner_canonical: communication theory
+  statistical theory -> operations research:
+    was: U029
+    action: CONFIRM
+  theology -> philosophy:
+    was: U019
+    action: CONFIRM
+  time series analysis -> operations research:
+    was: U037
+    action: CONFIRM
+  translation studies -> linguistics:
+    was: U023
+    action: CORRECT
+    owner_canonical: literary theory
+  urban studies -> interdisciplinary studies:
+    was: U017
+    action: CONFIRM
+    owner_comment: could be also marketing
+  visual analytics -> information science:
+    was: U020
+    action: CONFIRM
+  web accessibility -> human-computer interaction:
+    was: U055
+    action: CONFIRM
+  web development -> software engineering:
+    was: U030
+    action: CONFIRM
 store_write_license:
   decision: D-2988
   granted: '2026-10-13'

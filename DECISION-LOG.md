@@ -13,40 +13,36 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1125 decisions (census stamp 9b03953ab8ee85ad, 2026-10-14) · 550 bugs (197 open / 353 closed; highest OPEN = BUG-785) · 26 open tasks (MUST 9 / SHOULD 14 / WORTH 3; OWNER-moved 7, pipeline-moved 19; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1127 decisions (census stamp 43b48a9893479d4a, 2026-10-14) · 551 bugs (196 open / 355 closed; highest OPEN = BUG-781) · 25 open tasks (MUST 8 / SHOULD 14 / WORTH 3; OWNER-moved 3, pipeline-moved 22; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **67** of 1125 — 🔴 open 32 · 🔵 proposed 14 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 565 · ⚖ ratified 133 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1125, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **67** of 1127 — 🔴 open 32 · 🔵 proposed 14 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 565 · ⚖ ratified 135 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1127, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 197 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 31 · 🟨 MED 42 · 🟩 LOW 19 · UNLABELLED 101 (BUG-757) of 197 open.
+> Open BUGS by severity (population = the census's 196 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 31 · 🟨 MED 41 · 🟩 LOW 19 · UNLABELLED 101 (BUG-757) of 196 open.
 >
-> **OWNER LANE (7) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
+> **OWNER LANE (3) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
-> | T-101 | 🔴 MUST | HARDEN THE RETRIEVAL GOLDEN SET (the gate is saturated) | THE OWNER'S WORD AND MARKS ARE BOTH IN PLACE, MEASURED 2026-10-14 (D-2 |
-> | T-117 | 🔴 MUST | BUG-749 residual — the ESCALATE surface: the units NO owner ruling reaches | one owner word per unit on the reference sheet (CONFIRM / CORRECT + ho |
-> | T-124 | 🔴 MUST | the RED ladder (BUG-777 + BUG-778): the anchor-bridge ambiguity policy is owed first, then the masked 68-rail  | the ambiguity policy is a RULING (D-2898): a name resolving to N rows  |
-> | T-129 | 🔴 MUST | WORK IDENTITY COLLAPSE — collapse the duplicate works at the IDENTITY layer, so a row stops advertising a corr | one owner word per pair on governance/work_identity_collapse_review_20 |
-> | T-130 | 🔴 MUST | THE INGEST DOOR — the identity guarantee becomes an ENFORCEMENT POINT (delta-scoped), so a duplicate work cann | mover = owner for the RELEASE (59 ledger pairs + 84 collapse rows on g |
-> | T-121 | 🟠 SHOULD | the SOURCE KIND axis + per-kind identity - the prerequisite the internet-intake plan does not have | one owner word for the source-kind VOCABULARY (an answer-space decisio |
+> | T-129 | 🔴 MUST | WORK IDENTITY COLLAPSE — collapse the duplicate works at the IDENTITY layer, so a row stops advertising a corr | ONE COMMAND REMAINS - and the ledger half is CLOSED by the owner's han |
+> | T-130 | 🔴 MUST | THE INGEST DOOR — the identity guarantee becomes an ENFORCEMENT POINT (delta-scoped), so a duplicate work cann | SAME ONE ACT as T-129 (one act, two vocabularies; mapping declared in  |
 > | T-131 | 🟠 SHOULD | THE MODEL-SWAP BENCH — no role is re-pointed to a newer model family without a declared, preflighted slot | mover = owner for the SLOT (which role, which model, what it may evict |
 >
-> **PIPELINE LANE (19) — what the agent will do next, in strategic-consequential order (source: config/task_register.yaml):**
+> **PIPELINE LANE (22) — what the agent will do next, in strategic-consequential order (source: config/task_register.yaml):**
 >
 > | id | pri | state | task | evidence |
 > |---|---|---|---|---|
+> | T-101 | 🔴 MUST | 🔴 open | HARDEN THE RETRIEVAL GOLDEN SET (the gate is saturated) | MEASURED 2026-10-14 (BUG-784): the owner-signed review (governance/golden_reanchor_candida |
 > | T-104 | 🔴 MUST | 🔴 open | BUG-757 — OPEN bugs carry NO severity token, so the register cannot be ordered by criticality | bug_status.json joined to the buglog headings: UNLABELLED ceiling 101 (2026-10-13) |
 > | T-119 | 🔴 MUST | 🔴 open | the CORROBORATION COLLAPSE delta — how many "≥2 independent sources" rows are really ONE VOICE | BASELINE §4 MEASURED 2026-10-13 (governance/BORP_REVITALIZATION_RISK_20261013.md): of 938  |
 > | T-120 | 🔴 MUST | 🔴 open | the ABSORPTION path - a later independent source must be able to RAISE an existing row's corroboration, and a  | MEASURED 2026-10-13 (read-only, by reading the write path and the identity model - no stor |
 > | T-122 | 🔴 MUST | 🔴 open | the classification_status REPAIR (owner word keep-and-repair) - a store column that says CLEAN on a QUARANTINE | config/served_fields.yaml#declared[classification_status] (word keep-and-repair, granted 2 |
+> | T-124 | 🔴 MUST | 🔴 open | the RED ladder (BUG-777 + BUG-778): the anchor-bridge ambiguity policy is owed first, then the masked 68-rail  | governance/buglog.md BUG-777 + BUG-778 (2026-10-14; both entries carry the verbatim measur |
 > | T-105 | 🟠 SHOULD | 🔴 open | REA tier A/B mining — DEVONthink 3 (related-document ranking) and Cursor (derived code index) | governance/NOT-YET-EVALUATED-RESEARCH.md (REA targets logged 2026-10-13) |
 > | T-106 | 🟠 SHOULD | 🔴 open | ROADMAP — MODULARITY (C21 swappable infrastructure) and CROSS-OS COMPATIBILITY (C26) | protocols: pipeline/storage/base.py only; no cross-OS smoke exists (2026-10-13) |
 > | T-108 | 🟠 SHOULD | 🔴 open | BUG-712 / BUG-714 — the content_type residual and the harness-facing primitive | served run content_type census (2026-10-13) |
 > | T-112 | 🟠 SHOULD | 🔴 open | PERF - the SERVED path loads the cross-encoder per PROCESS, so short-lived callers pay a cold-start of minutes | suite rail runtime 100-200s -> >210s after the dispatcher became the CLI default (2026-10- |
 > | T-113 | 🟠 SHOULD | 🔴 open | PAY THE BASELINE the honest instrument REVEALED - the 71 keys behind block aliases, module by module, each wit | config/config_defaults_census.json after D-2982: 300 shadowed-declared keys / 568 sites (2 |
 > | T-114 | 🟠 SHOULD | 🔴 open | DISCHARGE THE INHERITED LADDER FAULTS - ONE owes real work now (the undeclared-encoding campaign) and ONE was  | just health-full 2026-10-13: 7 faults / 128 lines; each rc=1 at 42f8b76^ (worktree). RE-ME |
-> | T-116 | 🟠 SHOULD | 🔴 open | GOLDEN-SET GROWTH — the instrument that ADDS harder/abstract goldens (T-101 can only RE-anchor the set it has) | scripts/reanchor_retrieval_goldens.py --check reports the draft/live set out of phase and  |
-> | T-123 | 🟠 SHOULD | 🔴 open | the RETIRED borp_score row in config/store_columns.yaml: its role/status move when the next S6 commit makes th | config/store_columns.yaml (the borp_score why, 2026-10-14) + config/derivations.yaml#fbs.b |
 >
 > **STANDING RULES — in effect, never close (1):**
 >
@@ -4774,3 +4770,41 @@ owed), BUG-739 (the C11 rail misreads stdlib: difflib / ctypes / _sqlite3).
 SUPERSEDES (pointer only; no protected file is rewritten): the "VERIFIER MODEL RULING (2026-10-12 - RECOMMENDATION, awaiting
 owner ratification)" clause above (now D-2961/D-2962), and D2556's "Qwen3.8-27B = deep auditor" clause, which the FAMILY rule
 retires in its reviewer role.
+
+## D-2998 RATIFIED (2026-10-14) - A re-publication is ONE VOICE, and the source-kind axis takes an ADOPTED vocabulary
+
+MEASURED 2026-10-14 (T-121 lane). The question was asked with no home to answer it in: when corroboration is measured, is a
+work and its RE-PUBLICATION one voice or two? ANSWER: ONE VOICE. A preprint, its journal article, its repository copy and its
+2nd edition are ONE work under D-2308's edition rule - generalised here from IDENTITY to CORROBORATION. On this corpus the
+inflation is already visible twice over: 530 corroborated rows were ONE text under TWO names (BUG-780) and 84 collapsing
+pairs (T-129) certify the same work twice, which is precisely the failure a raw row count cannot see. Counting a preprint plus
+its article plus its repository copy as three voices would rebuild that failure on a new axis.
+
+The VOCABULARY is ADOPTED, never invented. A bespoke source-kind list would be a FOURTH naming system beside the taxonomy,
+the content types and the extraction types (C12: a second copy of a fact is a second truth), and it could not be compared with
+anything outside this repository. The axis therefore takes an existing controlled set - OpenAlex's work `type` (10 values, plain
+strings, no vendor lock-in: C2) - declared in config/content_types.yaml#source_kind.
+
+The axis is a PRECONDITION, not a consequence: `book` is the only value the pipeline emits (measured), and no non-book source
+may be ingested before the one-voice rule is exercised on its first batch. Nothing is migrated, no row is relabelled, and no
+model is involved. The principle restated here is BORP's (corroboration by INDEPENDENT VOICES, not by count - see
+governance/buglog.md#BORP); its SCALAR form stays refused, because a second home for one fact is a second truth (D-2646).
+
+## D-2999 RATIFIED (2026-10-14) - A name that resolves to N rows stays declared-unresolved: the anchor-bridge ambiguity ruling
+
+MEASURED (BUG-777): the anchor<->corpus bridge no longer re-derives - the content join collapsed 208 entries to 13 and most
+anchor rows read AMBIGUOUS; the consequent RED ladder line masked 5 of the 68 rails below it (BUG-778), so the ambiguity was
+expensive as well as invisible. The owner's ruling has three parts, and the third is the one that keeps the other two honest:
+
+(1) DEFAULT = DECLARED-UNRESOLVED. A name no declared rule decides is recorded as declared_unresolved, COUNTED and reported.
+Never dropped, never narrowed to "the first row", never guessed by a model (D-2898: a resolution is a label).
+(2) RESOLUTION ONLY BY A DECLARED, ORDERED, DETERMINISTIC RULE that PRINTS the rung that decided it: exact_id, then
+served_run_name_and_author, then single_corpus_row. The order IS the decision: it makes the outcome reproducible, and it makes
+any later change to the order a visible act rather than a different answer from the same input.
+(3) WHAT THE RULE DOES NOT RESOLVE STAYS declared_unresolved - the count is the debt (fail-closed), so the gate cannot be
+satisfied by resolving more aggressively, only by resolving more EVIDENCE.
+
+The ruling is declared in config/anchor_family.yaml#store_bridge.resolution and consumed by
+scripts/build_anchor_store_bridge.py. It converts a MASKED ambiguity into a MEASURED one, and it matches the position the
+owner's own signed sheet already takes at the other end of the same surface: 19 of 150 cells are `ambiguous` ABSTENTIONS,
+excluded from the expected sets and COUNTED (D-2991).

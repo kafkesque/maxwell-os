@@ -31,7 +31,7 @@ tasks:
 - id: T-101
   priority: MUST
   state: open
-  mover: owner
+  mover: pipeline
   title: HARDEN THE RETRIEVAL GOLDEN SET (the gate is saturated)
   why: >-
     The D2511 benchmark now measures the SERVED path (D-2980) and reports recall@10 = 1.000 on 29
@@ -59,12 +59,16 @@ tasks:
     live set 29x1: production 1.000/0.919/P@k 0.100, fts 0.655, vector 0.862, hybrid 0.931 |
     the review as a SET (29x120 anchors, governance/golden_reanchor_proposed_v5.yaml): production 1.000/0.954/0.414,
     fts 0.408, vector 0.694, hybrid 0.712 (python3 pipeline/retrieval_benchmark.py, 2026-10-13)'
-  gate: 'THE OWNER''S WORD AND MARKS ARE BOTH IN PLACE, MEASURED 2026-10-14 (D-2991 + BUG-784): the mode is
-    DECLARED (reanchor.anchor_mode: set), the reviewed sheet and its draft are read by DECLARATION
-    (config/pipeline_config.yaml#retrieval_benchmark.reanchor.reviewed_sheet / .reviewed_draft), and the pre-flight
-    is GREEN - rc 0, 29 of 29 queries carry a verdict, 120 anchor names, 19 abstentions, every chosen anchor
-    owner-signed. What remains is the pipeline: --apply (config/golden/retrieval_queries.yaml), then
-    pipeline/retrieval_benchmark.py - and T-116, because this ruler is saturated by construction.'
+  gate: >-
+    THE SIGNATURE HALF IS COMPLETE AND THE WRITER HAS NOW RUN (2026-10-14). Declared: reanchor.anchor_mode: set,
+    reviewed_sheet + reviewed_draft in config/pipeline_config.yaml. BUG-784 fixed the READER; BUG-787 fixed the
+    WRITER, which was wired to the GENERATOR's sheet (args.csv/args.yaml_out) while --check read the declared one -
+    so --apply refused all 29 queries over a COMPLETED signed act. Both modes now resolve their inputs through ONE
+    helper (reviewed_inputs) and the two files are printed. MEASURED: --check rc 0 (29/29 verdicts, 120 anchor
+    names, 19 abstentions, every chosen anchor carrying a signature); --apply rc 0 ->
+    config/golden/retrieval_queries.yaml v5 (29 queries x 120 signed anchor names, C13 backup taken). Remaining:
+    pipeline/retrieval_benchmark.py (the semantic baseline) and T-116 (this ruler is saturated by construction).
+
 - id: T-102
   priority: MUST
   state: done
@@ -367,7 +371,7 @@ tasks:
   gate: none
 - id: T-117
   priority: MUST
-  state: open
+  state: done
   mover: owner
   title: 'BUG-749 residual — the ESCALATE surface: the units NO owner ruling reaches'
   why: >-
@@ -382,14 +386,18 @@ tasks:
     (BUG-588/D-2692). Owner-ruled truth for each unit is one word per row of the sheet.
   source: [BUG-749, D-2977, D-2988, D-2974]
   evidence: 'plan render ESCALATE 72 unit(s) / 311 row(s) and the reference sheet governance/canonical_relabel_review_20261014.md (2026-10-13)'
-  gate: 'one owner word per unit on the reference sheet (CONFIRM / CORRECT + home / ABSTAIN / LEAVE). THE OWNER HAS
-    FILLED IT, MEASURED 2026-10-14: owner_action 72/72 (38 CONFIRM / 17 CORRECT / 14 LEAVE / 3 ABSTAIN),
-    owner_canonical 33, owner_comment 2, covering all 311 rows. What is owed is THE READER (BUG-785): no module
-    reads owner_action (the applier reads config/relabel_rulings.yaml instead), and the returned packet carries two
-    things a script must NOT guess - U022 is CORRECT with an EMPTY owner_canonical, and 17 rows carry an
-    owner_canonical on a non-CORRECT action. Mover: pipeline, to land scripts/ingest_relabel_rulings.py (validate by
-    unit_key, NEVER by the row ordinal - BUG-751 - then write config/relabel_rulings.yaml#unit_rulings with the
-    ordinal recorded as `was:`)'
+  gate: >-
+    DONE (2026-10-14). The owner's word: owner_action 72/72 (38 CONFIRM / 16 CORRECT + U022 re-taken ABSTAIN / 4
+    ABSTAIN / 14 LEAVE) over all 311 rows. The missing READER (BUG-785) is landed: scripts/ingest_relabel_rulings.py
+    validates the packet against the DECLARED vocabulary, refuses a CORRECT with no home and a home no taxonomy
+    canonical declares, keys unit_rulings by unit_key (never the ordinal, BUG-751), reports an owner_canonical on a
+    non-CORRECT row as INERT (17 cells, advisory, never written), and never writes applied: (that is the licensed
+    store write's receipt). MEASURED after --apply: 72 rulings written, 5 carried, and
+    scripts/apply_relabel_rulings.py now plans 0 ESCALATE over 311 rows. Remaining movers are other tasks: the
+    CONFIRM-alias declarations are the applier's own gated apply, and the CORRECT store write is T-103's licensed
+    write.
+
+  closed: '2026-10-14'
 - id: T-118
   priority: MUST
   state: done
@@ -476,7 +484,7 @@ tasks:
 - id: T-121
   priority: SHOULD
   state: open
-  mover: owner
+  mover: pipeline
   title: 'the SOURCE KIND axis + per-kind identity - the prerequisite the internet-intake plan does not have'
   why: >-
     The plan to ingest peer-reviewed articles, journals, video transcripts, social threads and podcasts is an
@@ -492,7 +500,14 @@ tasks:
     already collapse editions to ONE source_id.
   source: [D-2992, BUG-774, D2176, D-2308]
   evidence: "MEASURED 2026-10-13 (read-only): pipeline/stage0_convert.py accepts only {.epub, .pdf, .md}; compute_source_id falls back to `unknown|<filename>` when author/title are unresolved (pipeline/book_metadata.py); the fallback's liveness is pinned at ratio 0.0 by config/eval_integrity.yaml -> source_identity and enforced by scripts/verify_source_identity.py (whose docstring records the original defect: 29.1% of convergence was the same book twice). External vocabulary verified 2026-10-13: OpenAlex carries a controlled 25-value work `type`; NISO RP-8-2008 JAV defines seven article versions; Crossref relation types include isVersionOf/isPreprintOf/isTranslationOf/isCommentOn (isRetractedBy does NOT exist as a relation type - CORRECTED in D-2992)."
-  gate: 'one owner word for the source-kind VOCABULARY (an answer-space decision) + whether a work and its re-publication collapse to ONE voice (recommended YES - the D-2308 edition rule generalised); then the pipeline builds the resolver. NO non-book source may be ingested before this lands.'
+  gate: >-
+    THE WORD HAS LANDED, 2026-10-14 (D-2998): a re-publication is ONE VOICE (D-2308's edition rule generalised from
+    identity to CORROBORATION), and the source-kind axis takes an ADOPTED vocabulary, never an invented one -
+    declared in config/content_types.yaml#source_kind (10 values from OpenAlex work.type, emitted_by_pipeline:
+    [book]). The axis is a PRECONDITION: no non-book source may be ingested before the one-voice rule is exercised
+    on its first batch, so the remaining mover is the pipeline and it triggers on the first non-book source, not on
+    a date.
+
 - id: T-122
   priority: MUST
   state: open
@@ -527,7 +542,7 @@ tasks:
 - id: T-124
   priority: MUST
   state: open
-  mover: owner
+  mover: pipeline
   title: 'the RED ladder (BUG-777 + BUG-778): the anchor-bridge ambiguity policy is owed first, then the masked 68-rail triage and re-records'
   why: >-
     A ladder that stops at its first red line makes every "nothing cascades" claim a claim about a PREFIX - and the
@@ -551,7 +566,15 @@ tasks:
     untouched: (a) is the owner's ruling and (c) is a harness fix.
   source: [BUG-777, BUG-778, BUG-766, D-2658, D-2959, D-2861, D-2898]
   evidence: 'governance/buglog.md BUG-777 + BUG-778 (2026-10-14; both entries carry the verbatim measurements: 13 vs 208 entries, 7,640 vs 14,574 store rows, and the 5 rails with rc + cause) + governance/SESSION-HANDOFF-20261014-D2995.md (the triage table) + justfile (the bridge line and the 68 below it)'
-  gate: 'the ambiguity policy is a RULING (D-2898): a name resolving to N rows must either stay declared-unresolved or be resolved by a DECLARED rule; only then may the pipeline re-derive, re-baseline and re-record'
+  gate: >-
+    THE RULING HAS LANDED, 2026-10-14 (D-2999), declared in config/anchor_family.yaml#store_bridge.resolution: (1)
+    DEFAULT = declared_unresolved, counted and reported, never dropped and never guessed; (2) resolution ONLY by a
+    DECLARED, ORDERED, DETERMINISTIC rule that prints the rung that decided it (exact_id ->
+    served_run_name_and_author -> single_corpus_row); (3) what the rule does not resolve stays declared_unresolved -
+    the COUNT is the debt (fail-closed). The mover is now the pipeline: implement the resolution rung in
+    scripts/build_anchor_store_bridge.py, which unmasks BUG-777 and the 5 rails BUG-778 found hiding behind its RED
+    line, then re-baseline the ladder.
+
 - id: T-125
   priority: SHOULD
   state: open
@@ -674,15 +697,15 @@ tasks:
     corroborated rows as corroborated, of which 369 are SERVED and 134 are among the store''s 257 rows
     advertised epistemic_status=corroborated; isor rates 205 of the 530 strong/medium. Sheet:
     governance/work_identity_collapse_review_20261014.csv (84 pair rows, 72 groups, owner_ruling blank)'
-  gate: 'one owner word per pair on governance/work_identity_collapse_review_20261014.csv (CONFIRM-ONE-WORK /
-    DISTINCT / LEAVE) - the 37 identical-text pairs are deterministic and need confirmation only; the 47
-    containment-only pairs are the ones that need the ruling. THE INTAKE THAT TURNS 84 ROWS INTO FIVE SIGNATURES
-    (BUG-782, 2026-10-14): config/owner_marks.yaml#tiers (the owner signs a RULE over a DECLARED predicate;
-    exceptions go in the sheet''s owner_override column) + scripts/owner_marks.py --sign <TIER>... | --check |
-    --apply (rc 2 = owed) + governance/OWNER_MARKS_20261014.md (the act page). THE OWNER''S ACT IS ONE COMMAND:
-    `python3 scripts/owner_marks.py --sign A B C L-A L-B` - the signer refuses an unknown tier id, refuses a tier
-    whose word is null, refuses a silent re-sign and reads the date back before it returns; then --check; then
-    --apply. The 84 sheet cells are DERIVED from those five signatures, so nothing has to be typed twice.'
+  gate: >-
+    ONE COMMAND REMAINS - and the ledger half is CLOSED by the owner's hand. MEASURED 2026-10-14:
+    governance/duplicate_adjudication_review.csv carries owner_verdict on 59/59 pairs (51 MERGE / 8 KEEP_SEPARATE),
+    so tiers L-A/L-B need NO signature (a per-row word beats a blanket rule: override > tier_signature > none) and
+    the T-130 ledger debt is 0. What remains is the collapse sheet's 84 rows: `python3 scripts/owner_marks.py --sign
+    A B C`, then --check (rc 0) and --apply. A dry run on a COPY measured the outcome of those three ids: sheet 0
+    owed, 0 conflicts, 0 binding faults, 68 CONFIRM-ONE-WORK / 16 DISTINCT, every row carrying provenance
+    signature:A|B|C@<date> (37/31/16). The agent never mints this word (D-2676/D-2898: signed: is the only owner act
+    in the file).
 
 - id: T-130
   priority: MUST
@@ -709,16 +732,14 @@ tasks:
     home); wired into pipeline/stage0_convert.py (unbypassable) + justfile#health (tri_state) + justfile#triad
     (fatal). Audit + both plans: governance/INGEST_IDENTITY_GATE_20261014.md.
   gate: >-
-    mover = owner for the RELEASE (59 ledger pairs + 84 collapse rows on
-    governance/work_identity_collapse_review_20261014.csv — ONE act read in two vocabularies, mapping declared in
-    config/ingest_identity_gate.yaml#ledger.collapse_words); mover = pipeline for the door, which is landed.
-    `--gate` REFUSES until those words land, and that refusal IS the guarantee — declared
-    (door.ingest_reading: rc2_refuses), never accidental. The release now has an INTAKE (BUG-782):
-    config/owner_marks.yaml#tiers + scripts/owner_marks.py --sign/--check/--apply, act page
-    governance/OWNER_MARKS_20261014.md. The RELEASE of the 84 collapse rows is the five signatures; the ledger''s 51
-    hinted pairs are the same act (tiers L-A/L-B); and the 8 `hint == review` pairs take a per-row word or a
-    DELIBERATE Pending - a withheld word counts as a word and keeps the door shut on those pairs by the owner''s own
-    word (D-2997#door.ingest_reading).'
+    SAME ONE ACT as T-129 (one act, two vocabularies; mapping declared in
+    config/ingest_identity_gate.yaml#ledger.collapse_words). The LEDGER half is CLOSED by the owner's hand (59/59
+    verdicts, measured 2026-10-14) and needs no signature; the COLLAPSE half waits on `python3
+    scripts/owner_marks.py --sign A B C`. --gate REFUSES until then, and that refusal IS the guarantee
+    (door.ingest_reading: rc2_refuses). NOTE (measured this session): --apply must NOT run before the signature -
+    the derived column is rebuilt from the tiers, so an unsigned --apply would BLANK the owner's 84 hand-typed
+    cells; the shrink guard now refuses that write by name (a control reds it and a mutation proves the control
+    fires).
 
 - id: T-131
   priority: SHOULD

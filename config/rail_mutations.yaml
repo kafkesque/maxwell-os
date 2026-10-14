@@ -1053,6 +1053,24 @@ mutations:
       inferred mode is (a ruler whose meaning depends on the data it measured). The control names the refusal, so
       the day the multiplicity stops being enforced the gate says so.
 
+  - id: a_rendered_value_may_be_spliced_with_an_unescaped_apostrophe
+    subject: scripts/gov_sync.py
+    op: replace
+    find: '    return "''" + value.replace("''", "''''") + "''"'
+    replace: '    return "''" + value + "''"  # MUTATION (D-2679): an apostrophe closes the scalar early again'
+    runner: scripts/gov_sync.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: '  !!  a rendered value with an apostrophe is quoted so the BOOT face stays parseable (BUG-791)'
+    why: >-
+      BUG-791 (MEASURED 2026-10-14): the face writer spliced a rendered value straight into a single-quoted
+      YAML scalar. T-132's title contains "model's", the apostrophe CLOSED the scalar at column 473, and
+      agent/session_seed.yaml - the BOOT-LOADED face - became unparseable, taking FOUR ladder rails with it
+      (YAML parse, referenced files exist, vector dimensions, version stamps) while every writer reported
+      success. One apostrophe in one task title is all it takes, and THIS DECLARATION then hit the same
+      class twice: hand-typing a quote-heavy Python line into a YAML scalar is how it happens, which is why
+      the find string above is read FROM THE SOURCE and quoted by the rule rather than typed.
   - id: a_control_fixture_may_carry_the_live_act_into_the_signer
     subject: scripts/owner_marks.py
     op: replace

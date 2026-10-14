@@ -8,7 +8,7 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1128 decisions (census stamp 734b3a63d6101a40, 2026-10-14) · 554 bugs (198 open / 356 closed; highest OPEN = BUG-790) · 26 open tasks (MUST 8 / SHOULD 15 / WORTH 3; OWNER-moved 3, pipeline-moved 23; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1128 decisions (census stamp 734b3a63d6101a40, 2026-10-14) · 555 bugs (198 open / 357 closed; highest OPEN = BUG-790) · 26 open tasks (MUST 8 / SHOULD 15 / WORTH 3; OWNER-moved 3, pipeline-moved 23; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **68** of 1128 — 🔴 open 32 · 🔵 proposed 15 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 565 · ⚖ ratified 135 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1128, D-2987/BUG-765)
 >
@@ -123,6 +123,7 @@
 ---
 
 ## ✅ CLOSED / RESOLVED — bottom (recent) — HAND INDEX, not a register (the DERIVED block above is the ONE authority; rows joined on every run, D-2986)
+- **BUG-791** — **ONE APOSTROPHE IN ONE TASK TITLE MADE THE BOOT-LOADED FACE UNPARSEABLE, and every writer still reported success.** The face writer spliced a rendered value straight into a single-quoted YAML scalar; `model's` closed the scalar at column 473 and `agent/session_seed.yaml` stopped loading, taking FOUR ladder rails with it. FIX: quote by the YAML rule (`_yaml_quote`), refuse a face that cannot be READ BACK, and a control + mutation that name it. 21/21 known answers.
 - **BUG-788** — **THE SIGNER'S CONTROLS COPIED THE LIVE DECLARATION, so the day the collapse act COMPLETED a known-answer control went red — and a red baseline makes every mutation in the file unprovable.** The signer is the subject of those controls; how far the act has got is not. FIX: a PURE pre-image (`unsigned_fixture`), a 14th control that proves the fixture's independence, and a mutation that reds through it. 14/14 controls, gate 57/57.
 - **BUG-783** — ****THE MUTATION GATE'S FIXTURE WAS UNDER-DECLARED, so TWO guards could not be made to red and the gate blamed the MUTATION for a fixture gap.** MEASURED 2026-10-14: `scripts/check_rail_mutations.py` reported `the_undeclared_advert_guard_is_load_bearing` and `the_owner_word_vocabulary_guard_is_load_bearing` (both on `scripts/check_served_fields.py`) as "the oracle's BASELINE is not green (rc=1)". Inside the fixture the runner failed **1 of 24** controls with two exact reasons: `promotions.corroboration.builder 'pipeline/corroboration.py::corroboration_tuple' does not resolve (file + symbol)` and `consumers names 'maxwell_mcp_server.py', which does not exist` — the declaration NAMES its builder and its consumers, and the fixture is FILE-GRANULAR (`config/rail_mutations.yaml#fixture.include_files`) so neither came with it. The direct run in the live tree is green (24/24, rc 0). Class: the BUG-589 shape one declaration over (a runner reads a declared input the fixture does not carry ⇒ EVERY baseline is red ⇒ the gate's finding is a false attribution), and the reason it matters is that the two guards are exactly the kind (iv) teeth the standing rule requires (D-2676): un-provable means un-held. FIX: `include_files` now carries `maxwell_mcp_server.py`, `pipeline/corroboration.py`, `pipeline/stage6_okf_export.py`, `pipeline/stage6b_anytype_push.py`, with the measurement recorded next to the list. VERIFIED: `check_served_fields.py --selftest` 24/24 in the fixture and `check_rail_mutations.py` **47/47 declared rules seen to red**, 1 negative control green, 0 baseline faults.**
 - **BUG-782** — ****THE OWNER LANE HAD NO INTAKE: the review sheet carried a machine screen (68 yes / 16 no, written by NO script in this repo) in a column NAMED `owner_ruling`, and its deterministic tier said 42 where the rail and the census both measure 37 — and nothing read either, so nothing could notice.** MEASURED 2026-10-14: the v1 sheet's `identical_text` column disagreed with its own source artifact (`temp/voice_collapse_pairs_20261014.csv#certain` = 37 yes / 47 no) and with `config/corroboration_collapse.yaml#lexical_limb.measured.pairs_identical_text` = 37; its per-pair `rows_affected` column summed to 745 against a census of 530 because a row can sit in MORE THAN ONE pair (117 rows do) and in more than one GROUP, so the per-pair/per-group columns are NOT additive and nothing declared that; the pair OBJECT itself had no home (a one-off under `temp/` produced it, and `temp/` auto-purges at 7 days) so the review sheet could not be re-derived; and the sum of its 84 rows' prescreen was read by no rail (the ingest door's own `collapse_debt` sniffed the FIRST column whose NAME contains "ruling" — on a rendered sheet that is `proposed_ruling`, i.e. a machine PROPOSAL would have been counted as an owner's word). FIX: `config/owner_marks.yaml` (ONE contract: vocabulary, homes, tiers, derivation, coverage, conflict rule) + `scripts/owner_marks.py` (`--render` measures and renders both sheets and carries every word and note already given, failing closed rather than dropping one; `--check` derives the effective word, validates the vocabulary, tests the transitivity conflict rule and binds the sheet to the census BY DIGEST; `--apply` expands only SIGNED tiers and records `ruling_source` per row; 9/9 known-answer controls) + the pair OBJECT gains a home (`governance/corroboration_collapse_pairs.json`, written by the intake which IMPORTS the rail's own limb, D-2646) + `ingest_gate.collapse_debt` reads the DECLARED column. Owner act: `governance/OWNER_MARKS_20261014.md` (5 signed tiers + 8 per-row words). CLOSED 2026-10-14: the intake, the signer and the ladder reading all exist and read both homes; the owner''s remaining WORD is tracked by T-129/T-130, not by this bug. ✅ (2026-10-14)
@@ -13827,3 +13828,30 @@ rotation, no environment indirection and no file protection, and it is copied by
 sweeps the user profile. **Fix (declared, not yet applied):** move the value to `HF_TOKEN` in the environment (or
 the keychain), REVOKE and reissue the exposed value, and add a rail that refuses a secret-shaped literal in an
 app config. The value is never restated in a governance file (a bug record is not a credential store).
+
+## BUG-791 (HIGH — FIXED 2026-10-14) — one apostrophe in one task title made the BOOT-LOADED face unparseable, and every writer reported success
+
+**MEASURED 2026-10-14, minutes after the mint that caused it.** `just health` reported FOUR rails failing at
+once — YAML parse, referenced files exist, vector dimensions, version stamps — all with the same unhandled
+error: `while parsing a block mapping in agent/session_seed.yaml, line 6, column 3 ... expected <block end>,
+but found '<scalar>' ... line 6, column 473`.
+
+**The defect.** `scripts/gov_sync.py` splices the derived boot status into the face with
+`f"{key}: '{val}'"` — a single-quoted YAML scalar built by INTERPOLATION, with no escaping. T-132's title
+contains `model's`; the apostrophe CLOSED the scalar at column 473 and the rest of the line became stray
+scalar content. Every writer printed `wrote agent/session_seed.yaml` and `--check` reported the four faces
+equal — because the check BYTE-COMPARES the block it renders, and the break was in a DERIVED SCALAR beside it.
+
+**Why it is HIGH and not cosmetic.** `agent/session_seed.yaml` is the ONE face loaded at BOOT. A boot face that
+does not parse is a session that starts blind, and the break rode in on data (a task title) rather than on code:
+any future title with an apostrophe in a possessive would have done the same.
+
+**The fix.** (1) `_yaml_quote`: the YAML rule itself (single-quote, DOUBLE any inner quote), refusing a
+multi-line value outright. (2) A READ-BACK GUARD in `apply()`: a YAML face is parsed before it is written, and a
+write that would leave it unloadable is REFUSED — this is the guard that would have stopped the break before it
+reached the ladder. (3) A known answer naming the rule, and a mutation proving the quoting is load-bearing.
+**After:** 21/21 known answers; the face parses; the four rails are green.
+
+**Lesson (the reusable half).** A writer's OWN check is not a read-back: this writer verified the block it
+rendered and never the DOCUMENT it wrote. The ingest learned this as "read back what you spliced"; the faces had
+no such rule until a possessive apostrophe taught it.

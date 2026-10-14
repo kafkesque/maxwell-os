@@ -484,11 +484,47 @@ def check(d: dict, x: dict) -> int:
     return EXIT_OK
 
 
-def _field(text: str, dotted: str) -> str:
+def _yaml_quote(value: str) -> str:
+    """One-line YAML scalar, SINGLE-quoted with inner quotes DOUBLED (the YAML rule).
+
+    BUG-791 (MEASURED 2026-10-14): this splice used to interpolate the rendered value straight into a
+    single-quoted scalar, so a title carrying an apostrophe ("the model's served window") CLOSED the scalar
+    early and left agent/session_seed.yaml - the BOOT-LOADED face - unparseable, taking four ladder rails with
+    it (YAML parse, referenced files, vector dimensions, version stamps). A value that reaches a face is quoted
+    BY RULE, never by hope: the rule is YAML's own (double the inner quote), so the file stays in the style the
+    faces are written in, and a value that is not one line is REFUSED rather than silently folded.
+    """
+    if "\n" in value or "\r" in value:
+        raise SystemExit("FAIL-CLOSED (gov-sync): a rendered face value must be ONE line (BUG-791)")
+    return "'" + value.replace("'", "''") + "'"
+
+
+def _scalar_round_trips(value: str) -> bool:
+    """True when a value can be spliced into a face and READ BACK unchanged (BUG-791).
+
+    The control must REPORT, never crash: a rule that fails by raising a traceback prints no verdict line, so a
+    mutation of it cannot be SEEN through the control that names it (D-2676 iv - a crash is not a control).
+    """
+    try:
+        return bool(yaml.safe_load("status: " + _yaml_quote(value))["status"] == value)
+    except (yaml.YAMLError, KeyError, TypeError):
+        return False
+
+
+def _field(text: str, dotted: str) -> str | None:
     """Read a scalar from an indented YAML face (session_seed), never a guess: None when absent."""
     key = dotted.split(".")[-1]
     m = re.search(rf"(?m)^[ \t]*{re.escape(key)}:[ \t]*(.+)$", text)
-    return m.group(1).strip().strip("'") if m else None
+    if not m:
+        return None
+    # BUG-791 (the reader half): a scalar is read BY THE YAML RULE, never by stripping quotes. With the writer
+    # now doubling an inner apostrophe ('the model''s window'), strip() would hand back the ESCAPED text and the
+    # face would read STALE forever - a false staleness, which is the worst kind: it is loud and wrong.
+    try:
+        value = yaml.safe_load(m.group(1))
+    except yaml.YAMLError:
+        return None
+    return None if value is None else str(value)
 
 
 def apply(d: dict, x: dict) -> int:
@@ -508,7 +544,15 @@ def apply(d: dict, x: dict) -> int:
             for f in face["derived_fields"]:
                 val = x["version"] if f["from"] == "manifest" else render_seed_status(d, x)
                 key = f["key"].split(".")[-1]
-                text = re.sub(rf"(?m)^([ \t]*){re.escape(key)}:.*$", lambda m: f"{m.group(1)}{key}: '{val}'", text, count=1)
+                # BUG-791: the value is QUOTED BY RULE (an apostrophe in a title used to close the scalar early).
+                text = re.sub(rf"(?m)^([ \t]*){re.escape(key)}:.*$",
+                              lambda m: f"{m.group(1)}{key}: {_yaml_quote(str(val))}", text, count=1)
+        if text != before and str(face.get("path", "")).endswith((".yaml", ".yml")):
+            try:                                    # a writer that cannot read back its own output must not write it
+                yaml.safe_load(text)
+            except yaml.YAMLError as exc:
+                raise SystemExit(f"FAIL-CLOSED: {face['path']} would not parse after this write ({exc}) - "
+                                 f"refusing to leave a BOOT-LOADED face unloadable (BUG-791)")
         if text != before:
             route = _write(p, text)
             print(f"  wrote {face['path']} ({route}; census lines re-cut: {n})")
@@ -601,6 +645,15 @@ def selftest() -> int:
     # D-2985: the task register's OWN schema, as NAMED known answers in BOTH directions - a rule whose control
     # has never been seen to fail is not a control (BUG-492), and a mutation must RED the control that NAMES
     # the rule rather than only move a counter (D-2676 iv).
+    # BUG-791: a rendered value reaches the boot face through a SINGLE-QUOTED scalar.
+    # NOTE: render_seed_status reads x['owner_moved'] - injecting the quirk into the wrong argument is how a
+    # control stays green while mutated (the BUG-787 shape), and the mutation gate caught exactly that here.
+    quirky = render_seed_status(d2, {**x, "owner_moved": [{"id": "T-1", "priority": "MUST", "state": "open",
+                                                           "mover": "owner",
+                                                           "title": "the model's served window",
+                                                           "gate": "the owner word",
+                                                           "evidence": "e (2026-01-02)"}],
+                                    "pipeline_moved": []})
     base = {"priority": "MUST", "evidence": "e (2026-01-02)", "gate": "none"}
     rows = [
         ("a conforming task register makes no fault",
@@ -621,6 +674,8 @@ def selftest() -> int:
          any("MOMENT OF MINT" in f for f in task_faults([{**base, "id": "T-1", "state": "open", "mover": "pipeline", "title": "t", "evidence": "185 open"}], d))),
         ("the derived block LEADS with the OWNER LANE (before the pipeline lane)",
          render_block(d, x, decs=[]).index("OWNER LANE") < render_block(d, x, decs=[]).index("PIPELINE LANE")),
+        ("a rendered value with an apostrophe is quoted so the BOOT face stays parseable (BUG-791)",
+         _scalar_round_trips(quirky)),
         ("a standing RULE is NOT counted as open work", "standing rule(s) never close" in register_truth(d, x)),
         ("the census re-cut owns the LIVE region and leaves the history region BYTE-IDENTICAL",
          n3 >= 1 and "7 decisions (census stamp deadbeefdeadbeef, 2026-01-02)" in scoped

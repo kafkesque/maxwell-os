@@ -23,6 +23,11 @@ WHAT EACH MODE DOES
              fatal: BUG-457) | 1 error. This is the ONE reading the ladder needs.
   --apply    expand the signed tiers over their DECLARED predicates and write the result with its provenance into
              `derived_column` / the ledger's `verdict`. Backs up, writes atomically (C6), deletes nothing (R-D410).
+  --sign     THE OWNER'S ACT: stamp `signed: <date>` on the NAMED tiers. It is the ONLY writer of that field.
+             It never chooses a tier (the ids are the owner's word), it refuses an unknown id and a tier whose word
+             is null (there is nothing to sign), it refuses to overwrite an existing signature silently, and it
+             re-parses the file and reads back the date it just wrote before it returns - a signature that did not
+             land is not an act (D-2676).
   --selftest known-answer controls over the pure parts: no store, no network, no LLM (BUG-492).
 
 WHAT IT REFUSES TO DO (stated, because an unstated scope reads as coverage)
@@ -36,6 +41,7 @@ WHAT IT REFUSES TO DO (stated, because an unstated scope reads as coverage)
     records the WORD, and the identity repair stays T-129's separately-gated pipeline act.
 
 USAGE
+  python3 scripts/owner_marks.py --sign A B C L-A L-B   # THE OWNER'S WORD (the only writer of `signed:`)
   python3 scripts/owner_marks.py --render            # sheet + ledger projection
   python3 scripts/owner_marks.py --check             # rc 0 released | 2 owed | 1 error
   python3 scripts/owner_marks.py --apply             # expand signatures, write derived words + receipt
@@ -49,11 +55,13 @@ import hashlib
 import io
 import json
 import os
+import re
 import shutil
 import sqlite3
 import sys
 import tempfile
 from collections.abc import Sequence
+from contextlib import redirect_stdout
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -654,6 +662,110 @@ def ledger_state(policy: dict[str, Any]) -> dict[str, Any]:
             "withheld": [d for d in derived if d["word"] == withheld], "derived": derived}
 
 
+# ── the owner's act ──────────────────────────────────────────────────────────
+
+TIER_ID_LINE: re.Pattern[str] = re.compile(r"^(\s*)-\s*id:\s*(\S+)\s*$")
+SIGNED_LINE: re.Pattern[str] = re.compile(r"^(\s*)signed:\s*(\S.*)$")
+DATE_LINE: re.Pattern[str] = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+
+
+def tier_line_spans(lines: Sequence[str]) -> dict[str, tuple[int, int]]:
+    """Map every tier id in the `tiers:` list to the [start, end) line span of its block.
+
+    Scoped to the `tiers:` section ON PURPOSE: a `- id:` line elsewhere in the file is not a tier, and a signer that
+    edits the first match it finds stamps the wrong rule (the BUG-751 ordinal class, one file over).
+    """
+    spans: dict[str, tuple[int, int]] = {}
+    inside = False
+    current: str | None = None
+    for i, line in enumerate(lines):
+        if not inside:
+            if TIER_ID_LINE.match(line) is None and line.startswith("tiers:"):
+                inside = True
+            continue
+        if line.strip() and not line[0].isspace():
+            break
+        match = TIER_ID_LINE.match(line)
+        if match:
+            if current is not None:
+                spans[current] = (spans[current][0], i)
+            current = match.group(2)
+            spans[current] = (i, len(lines))
+    return spans
+
+
+def sign_tiers(
+    policy: dict[str, Any], ids: Sequence[str], date: str, path: Path | None = None, *, take_backup: bool = True
+) -> int:
+    """THE OWNER'S WORD: stamp `signed: <date>` on the named tiers. The only writer of that field (D-2676)."""
+    target = path or (ROOT / CONFIG_REL)
+    if not DATE_LINE.match(date):
+        raise OwnerMarksError(f"--date {date!r} is not YYYY-MM-DD: an act with no date is not auditable")
+    known = {str(t["id"]): t for t in policy.get("tiers", [])}
+    if not ids:
+        raise OwnerMarksError(
+            "--sign names NO tier: the ids ARE the owner's word, and a signature the tool chose for him is a "
+            "minted rule (D-2898)")
+    if len(set(ids)) != len(ids):
+        raise OwnerMarksError(f"--sign names a tier twice ({list(ids)}): refusing an ambiguous act")
+    for tid in ids:
+        if tid not in known:
+            raise OwnerMarksError(
+                f"unknown tier id {tid!r}: {CONFIG_REL} declares {sorted(known)} - a signature over a rule that "
+                f"does not exist MINTS one (D-2898)")
+        if known[tid].get("word") is None:
+            raise OwnerMarksError(
+                f"tier {tid} names NO word (word: null): there is nothing to sign - those rows take a per-row word "
+                f"or stay WITHHELD, and a signature would invent the word the contract refused to generalise")
+
+    text = target.read_text(encoding="utf-8")
+    lines = text.splitlines(keepends=True)
+    spans = tier_line_spans(lines)
+    stamps: list[str] = []
+    for tid in ids:
+        if tid not in spans:
+            raise OwnerMarksError(
+                f"tier {tid!r} is in the parsed policy but not in {target.name}: refusing to write a signature the "
+                f"file cannot carry")
+        start, end = spans[tid]
+        hits = [i for i in range(start, end) if SIGNED_LINE.match(lines[i])]
+        if len(hits) != 1:
+            raise OwnerMarksError(
+                f"tier {tid}: expected exactly ONE `signed:` line inside its block, found {len(hits)} - refusing to "
+                f"guess which line is the act")
+        i = hits[0]
+        previous = str(SIGNED_LINE.match(lines[i]).group(2)).strip()
+        if previous not in ("null", "~"):
+            raise OwnerMarksError(
+                f"tier {tid} already carries a signature ({previous}): a re-sign is a deliberate act, never a silent "
+                f"overwrite - remove it by hand if the word is being re-taken (D-2676)")
+        indent = SIGNED_LINE.match(lines[i]).group(1)
+        lines[i] = f"{indent}signed: '{date}'\n"
+        stamps.append(tid)
+
+    body = "".join(lines)
+    reloaded = yaml.safe_load(body) or {}
+    landed = {str(t["id"]): str(t.get("signed") or "") for t in reloaded.get("tiers", [])}
+    before = {str(t["id"]): str(t.get("signed") or "") for t in policy.get("tiers", [])}
+    for tid in ids:
+        if landed.get(tid) != date:
+            raise OwnerMarksError(
+                f"tier {tid}: the signature did not land (read back {landed.get(tid)!r}) - refusing to write")
+    for tid, value in landed.items():
+        if tid not in ids and value != before.get(tid, ""):
+            raise OwnerMarksError(
+                f"the edit moved a signature it was not asked to touch ({tid}: {before.get(tid, '')!r} -> "
+                f"{value!r}) - refusing to write")
+    saved = backup(target, "owner_marks_sign") if take_backup else ""
+    atomic_write_text(target, body)
+    print(f"ok owner-marks --sign: {len(stamps)} tier(s) signed {date} ({', '.join(stamps)}) - THE OWNER'S WORD, "
+          f"the only writer of `signed:`")
+    if saved:
+        print(f"   backup: {saved}")
+    print("   next: python3 scripts/owner_marks.py --check   (rc 2 while words are still owed)")
+    return int(policy["coverage"]["rc_released"])
+
+
 # ── modes ────────────────────────────────────────────────────────────────────
 
 def render(policy: dict[str, Any]) -> int:
@@ -769,6 +881,9 @@ CONTROL_LABELS: tuple[str, ...] = (
     "an_owners_word_is_never_dropped_by_a_re_render",
     "the_matcher_raises_on_a_predicate_it_does_not_understand",
     "a_stale_pair_object_is_refused_never_rendered",
+    "a_signature_is_written_on_the_named_tier_and_nowhere_else",
+    "an_unknown_tier_id_is_refused_never_guessed",
+    "a_tier_that_names_no_word_is_never_signed",
 )
 
 
@@ -889,6 +1004,41 @@ def selftest() -> int:
     finally:
         shutil.rmtree(tmp2, ignore_errors=True)
 
+    tmp3 = Path(tempfile.mkdtemp(prefix="owner_marks_sign_"))
+    try:
+        sign_target = tmp3 / "owner_marks.yaml"
+        sign_target.write_bytes((ROOT / CONFIG_REL).read_bytes())
+        signed_ok = True
+        try:
+            with redirect_stdout(io.StringIO()):   # a control is not an act: keep the mode's own report quiet
+                sign_tiers(policy, ["A"], "2026-10-14", path=sign_target, take_backup=False)
+        except OwnerMarksError:
+            signed_ok = False
+        after = yaml.safe_load(sign_target.read_text(encoding="utf-8")) or {}
+        got = {str(t["id"]): str(t.get("signed") or "") for t in after.get("tiers", [])}
+        control(CONTROL_LABELS[9],
+                signed_ok and got.get("A") == "2026-10-14" and not any(v for k, v in got.items() if k != "A"))
+        unknown_refused = False
+        try:
+            with redirect_stdout(io.StringIO()):
+                sign_tiers(policy, ["Z-NOT-A-TIER"], "2026-10-14", path=sign_target, take_backup=False)
+        except OwnerMarksError:
+            unknown_refused = True
+        still_one = yaml.safe_load(sign_target.read_text(encoding="utf-8")) or {}
+        control(CONTROL_LABELS[10],
+                unknown_refused
+                and {str(t["id"]): str(t.get("signed") or "") for t in still_one.get("tiers", [])}.get("A")
+                == "2026-10-14")
+        noword_refused = False
+        try:
+            with redirect_stdout(io.StringIO()):
+                sign_tiers(policy, ["L-C"], "2026-10-14", path=sign_target, take_backup=False)
+        except OwnerMarksError:
+            noword_refused = True
+        control(CONTROL_LABELS[11], noword_refused)
+    finally:
+        shutil.rmtree(tmp3, ignore_errors=True)
+
     for label in CONTROL_LABELS:
         print(f"   {'PASS' if label not in failures else 'FAIL'} {label}")
     if failures:
@@ -906,21 +1056,30 @@ def _build_parser() -> argparse.ArgumentParser:
     p.add_argument("--check", action="store_true", help="validate both homes; rc 2 = words still owed")
     p.add_argument("--apply", action="store_true", help="expand signed tiers and write the derived words")
     p.add_argument("--selftest", action="store_true", help="known-answer controls, no store")
+    p.add_argument(
+        "--sign", nargs="+", metavar="TIER",
+        help="THE OWNER'S ACT: stamp `signed: <date>` on the named tier(s) - the only writer of that field")
+    p.add_argument(
+        "--date", default=datetime.now().date().isoformat(),
+        help="the date the owner's word lands (YYYY-MM-DD; default = today, local)")
     return p
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     """Dispatch one mode. Fail closed: an unreadable input is an error, never a clean reading (C16)."""
     args = _build_parser().parse_args(argv)
-    modes = [m for m in (args.render, args.check, args.apply, args.selftest) if m]
+    modes = [m for m in (args.render, args.check, args.apply, args.selftest, bool(args.sign)) if m]
     if len(modes) != 1:
-        print("FAIL-CLOSED (owner-marks): pass exactly ONE of --render | --check | --apply | --selftest",
-              file=sys.stderr)
-        return int(load_policy()["coverage"]["rc_error"]) if args.check or args.render or args.apply else 1
+        print("FAIL-CLOSED (owner-marks): pass exactly ONE of --sign <TIER>... | --render | --check | --apply | "
+              "--selftest", file=sys.stderr)
+        return int(load_policy()["coverage"]["rc_error"]) if any(
+            (args.check, args.render, args.apply, args.sign)) else 1
     try:
         if args.selftest:
             return selftest()
         policy = load_policy()
+        if args.sign:
+            return sign_tiers(policy, [str(t) for t in args.sign], str(args.date))
         if args.render:
             return render(policy)
         if args.apply:

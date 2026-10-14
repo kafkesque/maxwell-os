@@ -893,6 +893,21 @@ retrieval_benchmark:
     # 2026-10-14: owner word GRANTED = `set` (T-101). The reviewed sheet's 120 anchors now apply as the expected
     # SET recall@k is micro-averaged over. `--apply` remains gated by owner_signature_required and C13 backup.
     anchor_mode: set
+    # BUG-784 (2026-10-14): WHERE THE REVIEWED SHEET LIVES. MEASURED: `--check`/`--apply` defaulted to
+    # `governance/golden_reanchor_candidates_20261011.csv` + `governance/golden_reanchor_proposed_20261011.yaml`,
+    # which are the GENERATOR's outputs (both carry EMPTY `decision`/`owner_signature` columns). The pre-flight read
+    # the UNREVIEWED sheet, reported "0 / 30 queries carry an anchor" and T-101 was recorded as OWED - while the
+    # SIGNED sheet (150 rows, 120 anchors, 19 abstentions, 150 owner signatures, dated 2026-10-13) sat one filename
+    # away, unread by anything. A reader that names its input by a GENERATOR's default path cannot see the artifact a
+    # human filled. Declared HERE (ONE home, C12); the reader PRINTS the sheet it read plus its marked/signed counts,
+    # so a wrong path can no longer be misread as the owner's omission.
+    reviewed_sheet: governance/golden_reanchor_candidates_20261011.reviewed.csv
+    # The DRAFT is the judgment's denominator (its query list, in order). It was a PROJECTION living in the
+    # gitignored, auto-purging `temp/` (temp/golden_proposed_v5.yaml): the artifact `--apply` depends on would have
+    # vanished within 7 days, which is the same class of home as the pair object BUG-782 found under temp/. Moved to
+    # a durable home 2026-10-14; its header records how it was built (judge_review(mode='set') over the reviewed
+    # sheet) so it stays reproducible rather than becoming a new single copy of record.
+    reviewed_draft: governance/golden_reanchor_proposed_v5.yaml
 rerank:
   enabled: true
   model: BAAI/bge-reranker-v2-m3

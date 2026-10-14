@@ -48,19 +48,23 @@ tasks:
     candidates were drawn from its OWN top-5 (self-referential pool) - so desaturating PRODUCTION is
     T-116 (harder queries) plus a POOLED candidate list, not more anchors. The mode is DECLARED and the word
     the gate asked for IS IN PLACE (`reanchor.anchor_mode: set`, config/pipeline_config.yaml, read by the applier
-    as ANCHOR_MODE - D-2991); what the applier still REFUSES is the SHEET, not the mode: MEASURED 2026-10-14,
-    `--check` reads rows 150 / queries 30 and finds 0 of 30 queries carrying an anchor row and 0 rewrite/retire
-    verdicts (30 faults), while the 3-5-candidate review the owner filled lives in temp/golden_proposed_v5.yaml.
+    as ANCHOR_MODE - D-2991); and the OWNER'S MARKS ARE IN PLACE TOO - MEASURED 2026-10-14 (BUG-784): the fault that
+    made this task look owed came from `--check` defaulting to the GENERATOR's empty sheet, while the SIGNED sheet
+    reads rc 0 through the DECLARED paths (every query carries a verdict; the counts live in `evidence`). The
+    remaining acts are the pipeline's: --apply, then the benchmark.
   source: [D-2980, D-2991, BUG-710, BUG-771]
-  evidence: 'live set 29x1: production 1.000/0.919/P@k 0.100, fts 0.655, vector 0.862, hybrid 0.931 |
-    the review as a SET (29x120 anchors, temp/golden_proposed_v5.yaml): production 1.000/0.954/0.414,
+  evidence: 'MEASURED 2026-10-14 (BUG-784): the owner-signed review (governance/golden_reanchor_candidates_20261011.reviewed.csv,
+    150 rows = 120 anchor + 19 ambiguous + 11 rewrite-query, 150 owner signatures, signed 2026-10-13) reads --check
+    rc 0 through the DECLARED paths - 29/29 queries carry a verdict, 120 anchor names, 19 abstentions. |
+    live set 29x1: production 1.000/0.919/P@k 0.100, fts 0.655, vector 0.862, hybrid 0.931 |
+    the review as a SET (29x120 anchors, governance/golden_reanchor_proposed_v5.yaml): production 1.000/0.954/0.414,
     fts 0.408, vector 0.694, hybrid 0.712 (python3 pipeline/retrieval_benchmark.py, 2026-10-13)'
-  gate: 'PARTIAL - the WORD IS GRANTED and DECLARED: reanchor.anchor_mode: set ships in config/pipeline_config.yaml
-    (D-2991) and the applier implements both modes. What is owed now is the owner''s MARKS reaching the sheet the
-    applier reads: measured 2026-10-14, `--check` sees 0 of 30 queries with an anchor row (30 faults, --apply would
-    REFUSE), while the filled 3-5-candidate review sits in temp/golden_proposed_v5.yaml - so T-101 advances by
-    landing those marks in the applier''s sheet format (or by an explicit rewrite-query / retire-query verdict per
-    query), then --check, --apply, benchmark'
+  gate: 'THE OWNER''S WORD AND MARKS ARE BOTH IN PLACE, MEASURED 2026-10-14 (D-2991 + BUG-784): the mode is
+    DECLARED (reanchor.anchor_mode: set), the reviewed sheet and its draft are read by DECLARATION
+    (config/pipeline_config.yaml#retrieval_benchmark.reanchor.reviewed_sheet / .reviewed_draft), and the pre-flight
+    is GREEN - rc 0, 29 of 29 queries carry a verdict, 120 anchor names, 19 abstentions, every chosen anchor
+    owner-signed. What remains is the pipeline: --apply (config/golden/retrieval_queries.yaml), then
+    pipeline/retrieval_benchmark.py - and T-116, because this ruler is saturated by construction.'
 - id: T-102
   priority: MUST
   state: done
@@ -378,7 +382,14 @@ tasks:
     (BUG-588/D-2692). Owner-ruled truth for each unit is one word per row of the sheet.
   source: [BUG-749, D-2977, D-2988, D-2974]
   evidence: 'plan render ESCALATE 72 unit(s) / 311 row(s) and the reference sheet governance/canonical_relabel_review_20261014.md (2026-10-13)'
-  gate: 'one owner word per unit on the reference sheet (CONFIRM / CORRECT + home / ABSTAIN / LEAVE)'
+  gate: 'one owner word per unit on the reference sheet (CONFIRM / CORRECT + home / ABSTAIN / LEAVE). THE OWNER HAS
+    FILLED IT, MEASURED 2026-10-14: owner_action 72/72 (38 CONFIRM / 17 CORRECT / 14 LEAVE / 3 ABSTAIN),
+    owner_canonical 33, owner_comment 2, covering all 311 rows. What is owed is THE READER (BUG-785): no module
+    reads owner_action (the applier reads config/relabel_rulings.yaml instead), and the returned packet carries two
+    things a script must NOT guess - U022 is CORRECT with an EMPTY owner_canonical, and 17 rows carry an
+    owner_canonical on a non-CORRECT action. Mover: pipeline, to land scripts/ingest_relabel_rulings.py (validate by
+    unit_key, NEVER by the row ordinal - BUG-751 - then write config/relabel_rulings.yaml#unit_rulings with the
+    ordinal recorded as `was:`)'
 - id: T-118
   priority: MUST
   state: done
@@ -667,8 +678,11 @@ tasks:
     DISTINCT / LEAVE) - the 37 identical-text pairs are deterministic and need confirmation only; the 47
     containment-only pairs are the ones that need the ruling. THE INTAKE THAT TURNS 84 ROWS INTO FIVE SIGNATURES
     (BUG-782, 2026-10-14): config/owner_marks.yaml#tiers (the owner signs a RULE over a DECLARED predicate;
-    exceptions go in the sheet''s owner_override column) + scripts/owner_marks.py --check/--apply (rc 2 = owed) +
-    governance/OWNER_MARKS_20261014.md (the act page)'
+    exceptions go in the sheet''s owner_override column) + scripts/owner_marks.py --sign <TIER>... | --check |
+    --apply (rc 2 = owed) + governance/OWNER_MARKS_20261014.md (the act page). THE OWNER''S ACT IS ONE COMMAND:
+    `python3 scripts/owner_marks.py --sign A B C L-A L-B` - the signer refuses an unknown tier id, refuses a tier
+    whose word is null, refuses a silent re-sign and reads the date back before it returns; then --check; then
+    --apply. The 84 sheet cells are DERIVED from those five signatures, so nothing has to be typed twice.'
 
 - id: T-130
   priority: MUST
@@ -700,8 +714,11 @@ tasks:
     config/ingest_identity_gate.yaml#ledger.collapse_words); mover = pipeline for the door, which is landed.
     `--gate` REFUSES until those words land, and that refusal IS the guarantee — declared
     (door.ingest_reading: rc2_refuses), never accidental. The release now has an INTAKE (BUG-782):
-    config/owner_marks.yaml#tiers + scripts/owner_marks.py --check/--apply, act page
-    governance/OWNER_MARKS_20261014.md
+    config/owner_marks.yaml#tiers + scripts/owner_marks.py --sign/--check/--apply, act page
+    governance/OWNER_MARKS_20261014.md. The RELEASE of the 84 collapse rows is the five signatures; the ledger''s 51
+    hinted pairs are the same act (tiers L-A/L-B); and the 8 `hint == review` pairs take a per-row word or a
+    DELIBERATE Pending - a withheld word counts as a word and keeps the door shut on those pairs by the owner''s own
+    word (D-2997#door.ingest_reading).'
 
 - id: T-131
   priority: SHOULD

@@ -329,18 +329,12 @@ def uncovered_candidates(candidate_keys: list[str], ledger_keys: set[str]) -> li
     return [key for key in candidate_keys if key not in ledger_keys]
 
 
-def declared_sheet_column(pol: dict[str, Any]) -> str:
-    """The review sheet's ruling COLUMN, resolved from its DECLARED home (C12). Never sniffed by name.
-
-    BUG-782, MEASURED: this reader used to take the FIRST column whose name contains "ruling". On the rendered
-    sheet that column is `proposed_ruling` — a PROPOSAL — so a name-sniff would count machine proposals as owner
-    words and release the lane. The column is declared once, with the owner-word contract, and read from there.
-    """
-    pointer = str(pol["ledger"].get("collapse_word_column_from", "")).strip()
+def declared_pointer(pol: dict[str, Any], key: str) -> str:
+    """Resolve a '<file>#<dotted.path>' pointer DECLARED in this policy (C12). Never sniffed by name (BUG-782)."""
+    pointer = str(pol["ledger"].get(key, "")).strip()
     if "#" not in pointer:
         raise GateInputError(
-            f"{CONFIG_REL}#ledger.collapse_word_column_from must be a '<file>#<dotted.path>' pointer, "
-            f"got {pointer!r}")
+            f"{CONFIG_REL}#ledger.{key} must be a '<file>#<dotted.path>' pointer, got {pointer!r}")
     rel, dotted = pointer.split("#", 1)
     node: Any = yaml.safe_load((PROJECT_ROOT / rel).read_text(encoding="utf-8"))
     for step in dotted.split("."):
@@ -349,8 +343,18 @@ def declared_sheet_column(pol: dict[str, Any]) -> str:
         node = node[step]
     value = str(node).strip()
     if not value:
-        raise GateInputError(f"{pointer} resolves to an empty column name")
+        raise GateInputError(f"{pointer} resolves to an empty value")
     return value
+
+
+def declared_sheet_column(pol: dict[str, Any]) -> str:
+    """The review sheet's ruling COLUMN, resolved from its DECLARED home (C12). Never sniffed by name.
+
+    BUG-782, MEASURED: this reader used to take the FIRST column whose name contains "ruling". On the rendered
+    sheet that column is `proposed_ruling` — a PROPOSAL — so a name-sniff would count machine proposals as owner
+    words and release the lane. The column is declared once, with the owner-word contract, and read from there.
+    """
+    return declared_pointer(pol, "collapse_word_column_from")
 
 
 def collapse_debt(policy: dict[str, Any] | None = None) -> dict[str, Any]:
@@ -358,7 +362,8 @@ def collapse_debt(policy: dict[str, Any] | None = None) -> dict[str, Any]:
     pol = policy or load_policy()
     path = policy_path(pol, "ledger", "collapse_sheet")
     words = {str(k).upper(): str(v).upper() for k, v in pol["ledger"]["collapse_words"].items()}
-    empty = {"file": str(path.name), "rows": 0, "ruled": 0, "outstanding": 0, "missing": True, "ruled_rows": 0}
+    empty = {"file": str(path.name), "rows": 0, "ruled": 0, "outstanding": 0, "missing": True, "ruled_rows": 0,
+             "unprovenanced": 0}
     if not path.exists():
         return empty
     with path.open(encoding="utf-8", newline="") as handle:
@@ -370,13 +375,33 @@ def collapse_debt(policy: dict[str, Any] | None = None) -> dict[str, Any]:
         raise GateInputError(
             f"collapse sheet has no DECLARED ruling column {column!r}: {path} (looked up by declaration, "
             f"never sniffed by name — BUG-782)")
+    # BUG-786, MEASURED 2026-10-14: THE WORD MUST BE PROVENANCED. `--apply` is the only writer of the derived
+    # column and it ALWAYS records where the word came from ('row' for a per-row override, 'signature:<tier>@<date>'
+    # for a signature expansion). MEASURED: the sheet on disk carried a word in ALL 84 rows with
+    # `ruling_source = none` — typed by hand into the DERIVED column — and this reader counted them as RULED
+    # (84 ruled / 0 owed). A reader that cannot tell a hand-typed cell from a signature releases the lane without an
+    # owner act, which is the BUG-782 defect one column over. So 'none' (or a blank) is OWED, and the reading NAMES
+    # the provenance column it required.
+    source_column = declared_pointer(pol, "collapse_word_source_column")
+    if source_column not in rows[0]:
+        raise GateInputError(
+            f"collapse sheet has no DECLARED provenance column {source_column!r}: {path} (BUG-786: a word without "
+            f"provenance is not an owner act)")
+    none_token = str(pol["ledger"].get("collapse_word_source_none", "")).strip().lower()
     ruled = 0
+    unprovenanced = 0
     for row in rows:
         word = str(row.get(column) or "").strip().upper()
-        if word and words.get(word, "PENDING") != "PENDING":
-            ruled += 1
+        if not word or words.get(word, "PENDING") == "PENDING":
+            continue
+        source = str(row.get(source_column) or "").strip().lower()
+        if source in ("", none_token):
+            unprovenanced += 1
+            continue
+        ruled += 1
     return {"file": path.name, "rows": len(rows), "ruled": ruled, "outstanding": len(rows) - ruled,
-            "missing": False, "ruled_rows": ruled}
+            "missing": False, "ruled_rows": ruled, "unprovenanced": unprovenanced,
+            "provenance_column": source_column, "provenance_none": none_token}
 
 
 def content_debt(policy: dict[str, Any] | None = None, corpus: list[Path] | None = None) -> dict[str, Any]:
@@ -431,6 +456,12 @@ def standing(policy: dict[str, Any] | None = None, books_dir: str | Path | None 
         owner.append(f"ledger pairs with no owner word: {ledger['open']} of {ledger['pairs']}")
     if collapse["outstanding"]:
         owner.append(f"T-129 collapse rows with no owner word: {collapse['outstanding']} of {collapse['rows']}")
+    if collapse.get("unprovenanced"):
+        owner.append(
+            f"T-129 collapse rows whose word carries NO PROVENANCE ({collapse['provenance_column']} is blank or "
+            f"'{collapse['provenance_none']}'): {collapse['unprovenanced']} of {collapse['rows']} - a value in the "
+            f"DERIVED column is not an owner act (BUG-786: `--apply` is the only writer that records where a word "
+            f"came from, so a provenance-less word is OWED until it is expanded from a signature)")
     if sum(defects.values()) or markers:
         owner.append(f"corpus name defects (fix is a write): {defects} markers={markers}")
     if delta["deferrals"]:

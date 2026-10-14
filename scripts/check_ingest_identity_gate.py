@@ -46,6 +46,7 @@ CONTROL_LABELS = (
     "a_missing_content_report_is_fatal_not_clean",
     "a_content_candidate_absent_from_the_ledger_is_fatal",
     "a_ruled_collapse_row_is_not_counted_as_owed",
+    "a_word_with_no_provenance_is_owed_not_ruled",
 )
 
 
@@ -197,11 +198,29 @@ def _selftest() -> int:
             mark(CONTROL_LABELS[6], "a covered candidate was wrongly reported (pair key is not order-free)")
 
         # C8: an owner word ENDS the debt for that row; a blank row stays owed.
-        collapse_path.write_text("group,work_a,work_b,owner_ruling\n"
-                                 "1,a,b,CONFIRM-ONE-WORK\n2,c,d,\n", encoding="utf-8")
+        collapse_path.write_text("group,work_a,work_b,owner_ruling,ruling_source\n"
+                                 "1,a,b,CONFIRM-ONE-WORK,signature:A@2026-10-14\n2,c,d,,\n", encoding="utf-8")
         collapse = gate.collapse_debt(policy)
         if (collapse["ruled"], collapse["outstanding"]) != (1, 1):
             mark(CONTROL_LABELS[7], f"collapse debt was {collapse['ruled']}/{collapse['outstanding']}, expected 1/1")
+
+        # C9 (BUG-786, MEASURED 2026-10-14): a WORD IN THE DERIVED COLUMN IS NOT AN OWNER ACT. The live sheet carried
+        # a word in all 84 rows with `ruling_source = none` (typed by hand into the column `--apply` writes) and this
+        # reader counted them as ruled. Without provenance the row stays OWED - and the reading must say so.
+        collapse_path.write_text("group,work_a,work_b,owner_ruling,ruling_source\n"
+                                 "1,a,b,CONFIRM-ONE-WORK,none\n2,c,d,CONFIRM-ONE-WORK,\n", encoding="utf-8")
+        unprovenanced = gate.collapse_debt(policy)
+        if (unprovenanced["ruled"], unprovenanced["unprovenanced"], unprovenanced["outstanding"]) != (0, 2, 2):
+            mark(CONTROL_LABELS[8],
+                 f"provenance-less words were {unprovenanced['ruled']} ruled / "
+                 f"{unprovenanced['unprovenanced']} unprovenanced, expected 0 ruled / 2 unprovenanced")
+        # ... and the SAME rows WITH provenance ARE ruled, so the control cannot pass by refusing every word.
+        collapse_path.write_text("group,work_a,work_b,owner_ruling,ruling_source\n"
+                                 "1,a,b,CONFIRM-ONE-WORK,none\n2,c,d,CONFIRM-ONE-WORK,row\n", encoding="utf-8")
+        mixed = gate.collapse_debt(policy)
+        if (mixed["ruled"], mixed["outstanding"]) != (1, 1):
+            mark(CONTROL_LABELS[8],
+                 f"a provenance-carrying word was not ruled ({mixed['ruled']}/{mixed['outstanding']}, expected 1/1)")
 
     failed = {label for label, _ in failures}
     for label in CONTROL_LABELS:

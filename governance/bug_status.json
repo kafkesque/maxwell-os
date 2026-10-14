@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 547,
+  "total_ids": 550,
   "open_n": 197,
-  "closed_n": 350,
+  "closed_n": 353,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -989,8 +989,8 @@
       "events": 1
     },
     {
-      "id": "BUG-782",
-      "title": "(MED - OPEN 2026-10-14) - THE OWNER LANE HAD NO INTAKE: a machine screen sat in a column NAMED `owner_ruling`, the deterministic tier was of",
+      "id": "BUG-785",
+      "title": "(MED - OPEN 2026-10-14) - the T-117 packet has no reader: the owner's 72 words sit in a column nothing reads, while the word's declared home",
       "events": 1
     }
   ],
@@ -1344,6 +1344,9 @@
     "BUG-770",
     "BUG-776",
     "BUG-779",
-    "BUG-783"
+    "BUG-782",
+    "BUG-783",
+    "BUG-784",
+    "BUG-786"
   ]
 }

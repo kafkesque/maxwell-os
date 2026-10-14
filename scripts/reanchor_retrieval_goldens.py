@@ -77,6 +77,32 @@ DEFAULT_TOP: int = int(REANCHOR_CFG.get("candidates", 5))
 SNIPPET_CHARS: int = int(REANCHOR_CFG.get("snippet_chars", 220))
 CSV_OUT: Path = PROJECT_ROOT / "governance" / "golden_reanchor_candidates_20261011.csv"
 YAML_OUT: Path = PROJECT_ROOT / "governance" / "golden_reanchor_proposed_20261011.yaml"
+
+
+def _declared_reviewed_path(key: str) -> Path:
+    """The REVIEWED sheet and its draft come from their ONE home in config - never from this file's defaults.
+
+    BUG-784 (MEASURED 2026-10-14): `--check`/`--apply` defaulted to CSV_OUT/YAML_OUT, which are the GENERATOR's
+    outputs (both carry EMPTY `decision`/`owner_signature` columns). The pre-flight therefore read the UNREVIEWED
+    sheet, reported "0 / 30 queries carry an anchor" and the owner lane (T-101) was recorded as OWED - while the
+    SIGNED sheet (150 rows, 120 anchors, 19 abstentions, 150 signatures, dated 2026-10-13) sat one filename away and
+    nothing read it. A reader that names its input by a generator's default path cannot see the artifact a human
+    filled. Fail closed when the declaration is missing (C16): a guessed path is how this happened.
+    """
+    value = str(REANCHOR_CFG.get(key, "")).strip()
+    if not value:
+        raise SystemExit(
+            f"FAIL-CLOSED (C16): config/pipeline_config.yaml declares no retrieval_benchmark.reanchor.{key} - the "
+            f"reviewed sheet has ONE home and this reader will not guess it (BUG-784)"
+        )
+    return PROJECT_ROOT / value
+
+
+#: The input `--check`/`--apply` read. The generator KEEPS writing CSV_OUT/YAML_OUT (an apply must never overwrite
+#: the sheet a human filled: the comment at the apply gates below says exactly that), so the two surfaces are
+#: separate by construction rather than by remembering to pass a flag.
+REVIEWED_CSV: Path = _declared_reviewed_path("reviewed_sheet")
+REVIEWED_DRAFT: Path = _declared_reviewed_path("reviewed_draft")
 # D-2987: the vocabulary has ONE home (config/pipeline_config.yaml -> retrieval_benchmark.reanchor).
 # MEASURED 2026-10-13: it existed ONLY as this literal, and TWO consecutive session handoffs (D-2985, D-2986)
 # told the owner to write `keep/replace/drop/add` - tokens this applier accepts NOWHERE. A vocabulary that
@@ -434,6 +460,16 @@ def _check_reviewed(csv_path: Path, draft_path: Path) -> int:
     if not rows:
         print("  ❌ the reviewed CSV has no rows (C16)")
         return 1
+    # BUG-784: NAME THE INPUT. A pre-flight that reports faults without naming the file it read made a completed
+    # owner act (150 signed cells) read as an omission, because the default pointed at the pre-review sheet.
+    marked = sum(1 for r in rows if str(r.get("decision") or "").strip())
+    signed = sum(1 for r in rows if str(r.get("owner_signature") or "").strip())
+    print(f"  reading sheet {csv_path}\n  reading draft {draft_path}")
+    print(f"  rows {len(rows)} · marked decision(s) {marked} · owner_signature(s) {signed}")
+    if not marked:
+        print(f"  ⚠️  NOT ONE ROW of {csv_path.name} carries a decision: this is the GENERATOR's empty sheet, not the "
+              f"REVIEWED one (BUG-784). Before reading the faults below as the owner's omission, check --reviewed-csv "
+              f"against config/pipeline_config.yaml#retrieval_benchmark.reanchor.reviewed_sheet.")
     if not draft_path.exists():
         print(
             f"  ❌ no candidate draft at {draft_path} - run the generator first to rebuild the sheet (C16)"
@@ -594,6 +630,14 @@ def main() -> int:
     ap.add_argument("--csv", type=Path, default=CSV_OUT)
     ap.add_argument("--yaml-out", type=Path, default=YAML_OUT)
     ap.add_argument(
+        "--reviewed-csv", type=Path, default=REVIEWED_CSV,
+        help="the REVIEWED sheet (declared: retrieval_benchmark.reanchor.reviewed_sheet) - the ONLY sheet "
+        "--check/--apply read (BUG-784)")
+    ap.add_argument(
+        "--reviewed-draft", type=Path, default=REVIEWED_DRAFT,
+        help="the draft the reviewed sheet was built against (declared: "
+        "retrieval_benchmark.reanchor.reviewed_draft) - its query list is the judgment's denominator")
+    ap.add_argument(
         "--method",
         default=RETRIEVAL_METHOD,
         choices=["vector", "rrf"],
@@ -628,7 +672,7 @@ def main() -> int:
     if args.selftest:
         return _selftest()
     if args.check:
-        return _check_reviewed(args.csv, args.yaml_out)
+        return _check_reviewed(args.reviewed_csv, args.reviewed_draft)
 
     # D-2991: the store imports happen HERE, after the two store-free modes have returned, so --selftest and
     # --check stay hermetic (a rail that needs the FAISS index is a rail that gets skipped).

@@ -58,6 +58,14 @@ ledger:
   #: sniff a column by NAME: the v1 sheet carried a machine screen in a column named `owner_ruling`, and on the
   #: rendered sheet a name-sniff lands on `proposed_ruling` — i.e. it would count a PROPOSAL as an owner's word.
   collapse_word_column_from: config/owner_marks.yaml#homes.collapse_sheet.derived_column
+  #: BUG-786 (MEASURED 2026-10-14): the DERIVED column is not enough. The sheet on disk carried a word in all 84
+  #: rows while `ruling_source` said `none` for every one of them - the cells were typed by hand into the column
+  #: `--apply` writes - and this reader counted them as RULED (84 ruled / 0 owed). A reader that cannot tell a
+  #: hand-typed cell from a signature releases the lane without an owner act. So the PROVENANCE column is declared
+  #: too, and a word whose provenance is blank or the `none` token below is OWED: `--apply` always records 'row'
+  #: (a per-row override) or 'signature:<tier>@<date>' (a signature expansion).
+  collapse_word_source_column: config/owner_marks.yaml#homes.collapse_sheet.provenance_column
+  collapse_word_source_none: none
 
 content:
   # P2 (post-S0, pre-S1.5): the D-2737 detector's report is the authority for content-level same-work pairs.

@@ -26,7 +26,12 @@ fixture:
   # MEASURED 2026-09-27: recompute_decision_summary.py --selftest checks its own bug citations against the
   # register, so it reads governance/bug_status.json; while the fixture did not carry it, EVERY baseline of that
   # runner was red and the gate reported the MUTATION as the fault. A declared input that EXISTS is the point.
-  include_files: [justfile, governance/bug_status.json, pipeline/feedback.py, pipeline/pipeline_paths.py, scripts/reanchor_retrieval_goldens.py, config/pipeline_config.yaml, maxwell_mcp_server.py, pipeline/corroboration.py, pipeline/stage6_okf_export.py, pipeline/stage6b_anytype_push.py]
+  include_files: [justfile, governance/bug_status.json, pipeline/feedback.py, pipeline/pipeline_paths.py, scripts/reanchor_retrieval_goldens.py, config/pipeline_config.yaml, maxwell_mcp_server.py, pipeline/corroboration.py, pipeline/stage6_okf_export.py, pipeline/stage6b_anytype_push.py, pipeline/ingest_gate.py, pipeline/book_metadata.py, pipeline/io_guard.py, pipeline/stamp.py]
+  # ^ MEASURED 2026-10-14 (BUG-786 sweep): the new word-PROVENANCE guard's subject is pipeline/ingest_gate.py and
+  #   its runner (scripts/check_ingest_identity_gate.py --selftest) imports it, so the fixture must carry the module
+  #   AND the modules IT imports (book_metadata = the identity home, io_guard, stamp) plus its own config/ (carried by
+  #   include_dirs). Without them the runner died with ModuleNotFoundError: No module named 'pipeline.book_metadata'
+  #   and THREE baselines were reported red - the gate blaming mutations for a fixture gap, the BUG-589 shape again.
   # ^ MEASURED 2026-10-14 (BUG-782 sweep): the served-fields runner reads the SERVED-FIELD DECLARATION
   #   (config/served_fields.yaml, carried by include_dirs config/) and that declaration NAMES its builder and its
   #   consumers, so the fixture must carry them too: without them BOTH of that runner's mutations were reported
@@ -933,6 +938,24 @@ mutations:
       (the D-2981 shape: a measurement with no writer). With the guard inert the drift is invisible again, the
       receipt silently disagrees with the tree, and the contract's failure would look like a test problem rather
       than a stale measurement. The control names the staleness.
+
+  - id: the_word_provenance_guard_is_load_bearing
+    subject: pipeline/ingest_gate.py
+    op: replace
+    find: 'if source in ("", none_token):'
+    replace: 'if False:  # MUTATION (D-2676): a word with NO provenance counts as an owner act again'
+    runner: scripts/check_ingest_identity_gate.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: '  FAIL a_word_with_no_provenance_is_owed_not_ruled'
+    why: >-
+      BUG-786 (MEASURED 2026-10-14): the door counted a word as RULED in all 84 collapse rows while the sheet's
+      `ruling_source` said `none` for every one of them - the cells had been typed by hand into the DERIVED column,
+      the one `--apply` writes - so the collapse lane could read as RELEASED without an owner act. That is the
+      BUG-782 defect one column over, and the guard is the only thing that keeps the two apart. With it inert, a
+      provenance-less word ends the debt again and the reading that says so stops firing. The control NAMES the
+      reading, so the day a typed cell can masquerade as a signature again the gate says it.
 
   - id: the_anchor_set_multiplicity_guard_is_load_bearing
     subject: scripts/reanchor_retrieval_goldens.py

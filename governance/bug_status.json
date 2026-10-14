@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 551,
-  "open_n": 196,
-  "closed_n": 355,
+  "total_ids": 554,
+  "open_n": 198,
+  "closed_n": 356,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -987,6 +987,16 @@
       "id": "BUG-781",
       "title": "(HIGH - OPEN 2026-10-14) - THE IDENTITY MACHINERY HAD NO ENFORCEMENT POINT: the owner ledger sat 59 pairs PENDING for a fortnight while the ",
       "events": 1
+    },
+    {
+      "id": "BUG-789",
+      "title": "(MED \u2014 OPEN) \u2014 the local model server's app config carries a Hugging Face token in plaintext",
+      "events": 1
+    },
+    {
+      "id": "BUG-790",
+      "title": "(LOW \u2014 OPEN) \u2014 the ingest door's refusal names the WRONG TASK",
+      "events": 1
     }
   ],
   "closed": [
@@ -1344,6 +1354,7 @@
     "BUG-784",
     "BUG-785",
     "BUG-786",
-    "BUG-787"
+    "BUG-787",
+    "BUG-788"
   ]
 }

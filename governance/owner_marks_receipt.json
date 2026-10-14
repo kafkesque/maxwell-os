@@ -1,33 +1,33 @@
 {
   "schema_version": "1",
   "kind": "owner_marks_apply_receipt",
-  "generated_at": "2026-10-14T17:08:19Z",
+  "generated_at": "2026-10-14T20:45:21Z",
   "sheet": {
     "path": "governance/work_identity_collapse_review_20261014.csv",
     "rows": 84,
-    "words_written": 0,
-    "backup": "backups/work_identity_collapse_review_20261014.csv.PRE_owner_marks_apply_20261014T170819Z"
+    "words_written": 84,
+    "backup": "backups/work_identity_collapse_review_20261014.csv.PRE_owner_marks_apply_20261014T204521Z"
   },
   "ledger": {
     "path": "governance/duplicate_adjudication.json",
     "pairs": 59,
-    "verdicts_written": 0,
-    "adjudicated": 0,
-    "pending": 59,
-    "backup": "backups/duplicate_adjudication.json.PRE_owner_marks_apply_20261014T170819Z"
+    "verdicts_written": 59,
+    "adjudicated": 59,
+    "pending": 0,
+    "backup": "backups/duplicate_adjudication.json.PRE_owner_marks_apply_20261014T204521Z"
   },
   "tiers": [
     {
       "id": "A",
-      "signed": null
+      "signed": "2026-10-14"
     },
     {
       "id": "B",
-      "signed": null
+      "signed": "2026-10-14"
     },
     {
       "id": "C",
-      "signed": null
+      "signed": "2026-10-14"
     },
     {
       "id": "L-A",

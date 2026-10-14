@@ -209,6 +209,16 @@ guards:
 #: DOES. This hook lives OUTSIDE the synced tree (BUG-500) - it is not in git, so no diff, no review and no backup
 #: would show a line someone deleted, and the strictest gate in the system (RAIL 0/3/4/5) would silently disarm.
 #: Its REQUIRED TEXT is therefore a declaration, verified against the bytes on disk, fail closed (C16).
+  #: T-132/D-3000 — THE AGENT CONTEXT PROBE. The four layers between a local model's SERVED window and the
+  #: words an agent session can afford (served window -> harness declaration -> compaction trigger -> the
+  #: ledger's own cache evidence) had no single home and no rail: every link is SILENT when it is wrong, which
+  #: is how a local agent session came to compact at 80% of a 32768-token window on a machine that already
+  #: serves 262144 to two other models. The --selftest line is fatal (twelve known answers, two of which read
+  #: the file's own bytes to prove the report path names no path, host or baseline number, C12). The LIVE line
+  #: is tri_state: 2 = OWNER-OWED drift (a declared model the server cannot serve, or a served window nothing
+  #: declares) — loud, NOT fatal (BUG-457), because the remedy is a declaration, not a broken build.
+  scripts/agent_context_probe.py --selftest: fatal
+  scripts/agent_context_probe.py: tri_state
 commit_boundary:
   path: git-path:hooks/pre-commit
   why: 'a commit is the one act that makes a conflicted tree permanent (RAIL 0); four rails run ONLY there, so a deleted line is a rail that nothing runs - class (i) at the commit boundary. TWO SMALLER ACTS DISARM IT JUST AS SILENTLY, and neither was the subject of any rail (D-2687). (1) THE ROUTE: this declaration used to name a PATH SHAPE (gitdir: + hooks/). git does not promise to run that file - core.hooksPath decides, and the --git-dir of a linked worktree is not where hooks live. MEASURED 2026-09-27 in a real repository: with core.hooksPath set, `git rev-parse --git-path hooks/pre-commit` answered hooks/pre-commit while --git-dir answered .git, the file at gitdir:hooks/pre-commit DID NOT EXIST, and a DIFFERENT file received the commit and refused it. The route is therefore declared as git-path:<rel>: GIT ITSELF, never a path shape. (2) THE MODE: MEASURED the same day, a mode-644 hook is IGNORED - git LANDS the commit (rc=0), runs none of the four rails, and prints only a `hint:` git documents how to suppress. A byte-perfect verification of a file that may not be executed is class (i) with a green verdict, so the declared subject is the RESOLVED path, its bytes, AND its mode'

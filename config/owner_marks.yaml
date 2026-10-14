@@ -113,7 +113,7 @@ tiers:
       Identical normalised text under two names IS one voice, with no threshold involved (lexical_limb.certain_class
       in config/corroboration_collapse.yaml). The rail certifies it; the owner's signature says the identity layer
       may act on it.
-    signed: null
+    signed: '2026-10-14'
   - id: B
     home: collapse_sheet
     predicate: 'evidence_class == "containment_at_or_above_bar" and prescreen_verdict == "yes"'
@@ -124,7 +124,7 @@ tiers:
       agreeing it is one work. Containment alone can NEVER certify independence (paraphrase/translation are
       invisible) but it CAN certify a collapse; what it cannot do is certify the CONTAINMENT is the work rather
       than shared boilerplate, which is exactly the judgement the owner's signature supplies.
-    signed: null
+    signed: '2026-10-14'
   - id: C
     home: collapse_sheet
     predicate: 'evidence_class == "containment_at_or_above_bar" and prescreen_verdict == "no"'
@@ -135,7 +135,7 @@ tiers:
       series-volume groups). Measured 2026-10-14: 16 rows, being the 3 multi-pair groups (5, 3, 6 in the v1
       numbering) plus 7 singleton pairs. No group mixes this class with the confirmed class, so signing it cannot
       contradict a signed CONFIRM.
-    signed: null
+    signed: '2026-10-14'
   - id: L-A
     home: ledger
     predicate: 'hint in ("subtitle_or_edition", "title_rename", "author_leak", "noise_suffix")'

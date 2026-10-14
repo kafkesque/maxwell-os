@@ -678,7 +678,7 @@ tasks:
 - id: T-129
   priority: MUST
   state: open
-  mover: owner
+  mover: pipeline
   title: WORK IDENTITY COLLAPSE — collapse the duplicate works at the IDENTITY layer, so a row stops advertising a corroboration it does not have
   why: >-
     BUG-780/T-119: the count certifies as corroborated a set of rows whose "sources" are ONE TEXT under TWO
@@ -698,15 +698,14 @@ tasks:
     advertised epistemic_status=corroborated; isor rates 205 of the 530 strong/medium. Sheet:
     governance/work_identity_collapse_review_20261014.csv (84 pair rows, 72 groups, owner_ruling blank)'
   gate: >-
-    ONE COMMAND REMAINS - and the ledger half is CLOSED by the owner's hand. MEASURED 2026-10-14:
-    governance/duplicate_adjudication_review.csv carries owner_verdict on 59/59 pairs (51 MERGE / 8 KEEP_SEPARATE),
-    so tiers L-A/L-B need NO signature (a per-row word beats a blanket rule: override > tier_signature > none) and
-    the T-130 ledger debt is 0. What remains is the collapse sheet's 84 rows: `python3 scripts/owner_marks.py --sign
-    A B C`, then --check (rc 0) and --apply. A dry run on a COPY measured the outcome of those three ids: sheet 0
-    owed, 0 conflicts, 0 binding faults, 68 CONFIRM-ONE-WORK / 16 DISTINCT, every row carrying provenance
-    signature:A|B|C@<date> (37/31/16). The agent never mints this word (D-2676/D-2898: signed: is the only owner act
-    in the file).
-
+    THE SIGNATURE HALF IS COMPLETE AND APPLIED (2026-10-14). MEASURED: tiers A, B and C carry `signed:
+    2026-10-14`; `--check` reads rc 0 (sheet 0/84 owed, ledger 0/59, withheld 0+0); `--apply` wrote the 84
+    derived rulings (68 CONFIRM-ONE-WORK / 16 DISTINCT, provenance signature:A|B|C) and folded the 59 per-row
+    ledger verdicts into governance/duplicate_adjudication.json. The word is no longer the blocker, so the mover
+    is the PIPELINE. What REMAINS is the declared identity-map repair, measured at the next run: is_convergent
+    1,393 -> 863, advertised corroborated 257 -> <=123, rows DELETED 0 (duplicate_of + QUARANTINE, never a
+    delete - R-D410), with check_corroboration_bit re-proving 7,640. The repair lands THROUGH the ingest door
+    (T-130), so the two tasks are one pipeline step read twice.
 - id: T-130
   priority: MUST
   state: open
@@ -732,15 +731,15 @@ tasks:
     home); wired into pipeline/stage0_convert.py (unbypassable) + justfile#health (tri_state) + justfile#triad
     (fatal). Audit + both plans: governance/INGEST_IDENTITY_GATE_20261014.md.
   gate: >-
-    SAME ONE ACT as T-129 (one act, two vocabularies; mapping declared in
-    config/ingest_identity_gate.yaml#ledger.collapse_words). The LEDGER half is CLOSED by the owner's hand (59/59
-    verdicts, measured 2026-10-14) and needs no signature; the COLLAPSE half waits on `python3
-    scripts/owner_marks.py --sign A B C`. --gate REFUSES until then, and that refusal IS the guarantee
-    (door.ingest_reading: rc2_refuses). NOTE (measured this session): --apply must NOT run before the signature -
-    the derived column is rebuilt from the tiers, so an unsigned --apply would BLANK the owner's 84 hand-typed
-    cells; the shrink guard now refuses that write by name (a control reds it and a mutation proves the control
-    fires).
-
+    THE DOOR NOW READS A DECLARED WORD, AND ITS rc 2 NAMES THE ONE DEBT THAT REMAINS (2026-10-14). MEASURED by
+    `scripts/check_ingest_identity_gate.py --gate`: ledger 59 pairs / 59 closed / 0 open; collapse sheet 84 rows
+    ruled 84, owed 0; content report 29 candidates, stale False; delta candidates 0 (so nothing is blocked by
+    the refusal today). The WHOLE remaining refusal is the corpus-name debt the door itself declares
+    OWNER-OWED, whose remedy is a WRITE: {'leading_or_trailing_whitespace': 3,
+    'repeated_internal_whitespace': 34} across 459 ingest-site markers. YOUR WORD decides whether the corpus
+    names are NORMALISED by a declared, deterministic renamer (plan -> apply -> receipt, every path
+    byte-identical otherwise) or ACCEPTED as they stand with the debt declared. The mover stays `owner`
+    because the door's own reading says so: the pipeline cannot advance this one.
 - id: T-131
   priority: SHOULD
   state: open
@@ -775,3 +774,38 @@ tasks:
     the model_eval suites, retrieval_benchmark.py, r5_review_gate agreement) and MUST run at temp=0.0 with every
     cell PREFLIGHTED (a cell that fails preflight is NA, never 0 — BUG-257/BUG-263). No role is re-pointed before
     that run, and the evidence for the swap is the run, never a community-notes ranking.
+
+- id: T-132
+  priority: SHOULD
+  state: open
+  mover: owner
+  title: THE HARNESS CONTEXT CONTRACT — the four layers between a local model's served window and the words
+    an agent session can afford, measured and declared instead of inherited
+  why: >-
+    MEASURED 2026-10-14 (read-only, on this machine). The harness's compaction trigger is
+    min(GOOSE_AUTO_COMPACT_THRESHOLD x window, GOOSE_AUTO_COMPACT_TOKEN_LIMIT) and NEITHER variable is set, so
+    the defaults govern: 0.8 x 32768 capped at 225000 = 26214 tokens for every local model the harness may run
+    as an agent, while two models ALREADY SERVED here (gpt-oss-20b-MXFP4-Q8 at 131072, Qwen3.8-27B-MLX-4bit at
+    262144) qualify for the 131072+ class. The 225000 cap is a CLOUD PRICE-TIER artifact (goose docs: headroom
+    below the long-context price tier) and is meaningless on hardware we own (C1/C22). Every compaction REWRITES
+    the prompt, so the next turn pays a full COLD re-prefill of the rewritten history - which is the measured
+    reason a local agent loop feels slow (prefill, not decode; a same-session A/B cited 6.1 s cached vs 268 s
+    uncached). The harness's own usage_ledger already measures prefix reuse: 28,646 calls, 96% of cloud input
+    tokens are cache reads, gemma-4-E4B locally reports 37.4% - and no local AGENT-LOOP call carries cache
+    evidence at all. Two of the four layers are also DRIFTED: six models are declared-and-not-served or
+    served-and-not-declared (measured by the new probe; BUG-790's sweep). A reader wired to the wrong window is
+    silent in both directions, which is why parity must be DECLARED, not coincidental.
+  source: 'D-3000 (PROPOSED); config/agent_context.yaml (the contract); scripts/agent_context_probe.py (the reading)'
+  evidence: >-
+    MEASURED 2026-10-14 (read-only). config/agent_context.yaml#measured_20261014 - served windows
+    (32768 / 131072 / 262144), declared == served
+    for the five the harness names, the derived trigger 26214, the ledger census, the six drifts, and the
+    session store (906,100,736 bytes / 380 sessions / 163,147 messages). Twelve known-answer controls green;
+    four mutations red through their own controls.
+  gate: >-
+    YOUR WORD decides the two things an agent must never choose, and then the PIPELINE lands them. (1) THE
+    ROUTING: may an agent LOOP run on a model that serves 32768 (the probe puts Phi-4-mini, gemma-4-E4B and
+    Qwen3-Coder-30B there) while gpt-oss-20b and Qwen3.8-27B are already served at 131072/262144? (2) THE
+    TRIGGER: GOOSE_CONTEXT_LIMIT and the compaction pair are UNSET today, so declaring them is one line of
+    environment - but it changes WHEN every session rewrites its own history, which is why it is an act and not
+    a setting. Declaring the contract costs nothing and changes no behaviour; adopting it is your word.

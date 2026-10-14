@@ -24566,3 +24566,65 @@ decisions:
   - config/anchor_family.yaml
   - config/owner_marks.yaml
   - scripts/build_anchor_store_bridge.py
+
+- id: D-3000
+  date: '2026-10-14'
+  state: PROPOSED
+  category: AGENT HARNESS / CONTEXT & PREFIX CACHE
+  title: 'The harness context contract: window parity is an invariant, the compaction trigger is derived from
+    the SERVED window, and a cache reading is never a fabricated zero'
+  bugs:
+  - BUG-788
+  - BUG-789
+  decision: >-
+    (1) PARITY IS AN INVARIANT, NOT A COINCIDENCE. What the model SERVER serves and what the HARNESS is TOLD it
+    serves must be equal, and the two directions fail DIFFERENTLY and are named separately: a served window
+    BELOW the declaration is a TRUNCATION RISK (the harness builds a prompt the server cannot attend to and the
+    server answers anyway), while a declaration BELOW the served window is a WASTED WINDOW (the harness compacts
+    early and throws usable context away). A model with either side missing is UNVERIFIABLE and is not a routable
+    slot. MEASURED 2026-10-14: both sides agreed for the five models the harness names - which is exactly why it
+    must be declared, because parity between two hand-edited files in two directories is a coincidence, and a
+    reader wired to the wrong window is silent in both directions.
+    (2) THE TRIGGER IS DERIVED FROM THE SERVED WINDOW, AND A CLOUD PRICE TIER MAY NOT GOVERN A LOCAL RUN. The
+    trigger is min(threshold x window, cap); the cap's default (225000) exists to stay under a cloud long-context
+    price tier and is meaningless on hardware we own (C1/C22). With the defaults and a 32768-token window the
+    trigger resolves to 26214, so every local agent session compacts at ~80% of a small window while the machine
+    already serves 131072 and 262144 to two other models. Routing is by WINDOW CLASS (agent_loop >= 131072,
+    agent_probe >= 32768, pipeline_batch >= 32768), declared rather than inferred.
+    (3) A CACHE READING IS EVIDENCE ONLY WITH A PROOF, AND ABSENT IS NOT ZERO (D-2957). A ratio is computed only
+    over the rows that CARRY the field; rows that do not are counted and reported as UNKNOWN, never folded in as
+    zeros, because a fabricated 0 here is BUG-767's defect class wearing a measurement's name. The only
+    certification of prefix REUSE is a two-call A/B on one cold process (identical prefix; ttft_warm/ttft_cold at
+    or above the declared bar), and that A/B has never been run on this machine.
+    (4) PREFIX STABILITY IS THE PREFILL LEVER. The prompt PREFIX is byte-stable across turns and only the TAIL
+    may change; the three ways this harness breaks that are declared as hazards (a compaction rewrites the
+    prefix, a per-turn injection placed at the HEAD is a cache miss every turn, and dynamic content such as a
+    timestamp inside the system prompt or the project hints). Compaction is therefore a CACHE BOMB: the local
+    agent loop's cost is PREFILL, not decode, which is why the trigger (2) and the routing (1) are the same
+    decision seen twice.
+    The contract lives in config/agent_context.yaml; scripts/agent_context_probe.py re-measures all four layers
+    read-only and names every fault. PROPOSED because (1) and (4) are declarations that change nothing, while
+    the routing choice and the two environment values change behaviour and are the owner's act.
+  evidence: >-
+    MEASURED read-only 2026-10-14. SERVED (oMLX /v1/models, cross-checked against
+    ~/.omlx/model_settings.json#max_context_window): Phi-4-mini-instruct-8bit / gemma-4-E4B-it-MLX-4bit /
+    Qwen3-Coder-30B-A3B-Instruct-MLX-4bit 32768, gpt-oss-20b-MXFP4-Q8 131072, Qwen3.8-27B-MLX-4bit 262144.
+    DECLARED (goose custom_providers/maxwell_omlx.json#models[].context_limit): identical for those five, and
+    THREE declared models are NOT SERVED while THREE served models are NOT DECLARED - six drifts, reported as
+    UNVERIFIABLE by the probe and never as green. TRIGGER: neither GOOSE_AUTO_COMPACT_THRESHOLD nor
+    GOOSE_AUTO_COMPACT_TOKEN_LIMIT appears in the process environment or in ~/.config/goose/config.yaml, so the
+    defaults apply and the local trigger is 26214. LEDGER (goose sessions.db#usage_ledger, 28646 calls):
+    2,856,939,380 input tokens of which 2,742,286,067 are cache reads (96%); per model, deepseek-v4-pro 96.4%,
+    deepseek-flash 96.1%, gemma-4-E4B-it-MLX-4bit 37.4% over 289 calls - so the local server DOES report cached
+    tokens, and the field is trustworthy - while Qwen3-Coder-30B-A3B-Instruct-MLX-4bit carries 0% over 10
+    single-shot calls (below the declared minimum, reported INCONCLUSIVE, never as a measured zero). 676
+    compactions in the ledger. Session store 906,100,736 bytes / 380 sessions / 163,147 messages. BUG-788 was
+    found by this sweep and FIXED: the signer's known-answer controls copied the LIVE declaration, so the day the
+    collapse act COMPLETED a control went red and every mutation in the file became unprovable.
+  files:
+  - config/agent_context.yaml
+  - scripts/agent_context_probe.py
+  - config/rail_registry.yaml
+  - config/rail_mutations.yaml
+  - justfile
+  - config/task_register.yaml

@@ -1,0 +1,154 @@
+# config/agent_context.yaml
+# ─────────────────────────────────────────────────────────────────────────────
+# THE AGENT HARNESS'S CONTEXT CONTRACT. ONE home (C12/C12c) for the four layers that sit between a
+# local model's SERVED window and the words an agent session can actually afford. Authority: D-3000
+# (PROPOSED — the policy below is measured and declared, but the two knobs that change behaviour wait
+# on the owner's word; nothing here rewrites a live setting).
+#
+# WHY THIS EXISTS — MEASURED 2026-10-14, read-only, on this machine:
+#   * oMLX serves Phi-4-mini / gemma-4-E4B / Qwen3-Coder-30B at `max_context_window: 32768`,
+#     gpt-oss-20b-MXFP4-Q8 at 131072, Qwen3.8-27B-MLX-4bit at 262144
+#     (`~/.omlx/model_settings.json`; confirmed by the OpenAI-compatible `/v1/models.max_model_len`).
+#   * goose DECLARES the same numbers (`custom_providers/maxwell_omlx.json#models[].context_limit`),
+#     so there is NO belief mismatch today. That is exactly why the parity must be DECLARED: today it
+#     is a coincidence of two hand-edited files in two different directories, and a reader that reads
+#     the wrong window is silent in both directions (truncated request, or a window thrown away).
+#   * goose's compaction trigger defaults to `min(GOOSE_AUTO_COMPACT_THRESHOLD x window,
+#     GOOSE_AUTO_COMPACT_TOKEN_LIMIT)` = `min(0.8 x 32768, 225000)` = 26214 tokens. EVERY local agent
+#     session therefore compacts at ~26k, and each compaction REWRITES the whole prompt — a
+#     prefix-cache bomb, which is the measured cause of "local AI feels slow" (the first token costs
+#     a full re-prefill of the summary; the video's own A/B measured 6.1 s cached vs 268 s uncached).
+#     The 225000 cap is a CLOUD PRICE-TIER artifact ("headroom below OpenAI's long-context price
+#     tier", goose docs) and is meaningless on hardware we own (C1/C22 — hybrid sovereignty).
+#   * the harness's own ledger already measures prefix reuse: `usage_ledger.cache_read_tokens`.
+#     Measured across 28646 calls: cloud deepseek-* models report ~96% of input tokens as cache reads,
+#     while NO local agent-loop call carries any cache evidence at all. ABSENT IS NOT ZERO (D-2957):
+#     a 0 here means UNPROVEN, and the only certification is a two-call A/B (below).
+#
+# THE FOUR LAYERS. A mismatch between any two is a fault, and today every mismatch is silent:
+#   1 served_window        what the SERVER can attend to          (~/.omlx/model_settings.json)
+#   2 declaration          what the HARNESS is TOLD               (goose custom provider)
+#   3 trigger              when the harness COMPACTS              (GOOSE_* env, defaults from goose)
+#   4 cache_ledger         the MEASURED prefix reuse              (goose sessions.db usage_ledger)
+#
+# THE PROBE. `scripts/agent_context_probe.py` re-measures all four and reports the parity, the derived
+# trigger and the cache evidence. It reads EVERY path, threshold and vocabulary from THIS file: it
+# names no path, no host and no magic number of its own (C12), and it WRITES NOTHING (read-only).
+schema_version: '1'
+authority: D-3000
+authority_state: PROPOSED
+updated: '2026-10-14'
+state: measured_awaiting_owner_word
+
+#: The homes. A path that lives in code rather than here is the defect C12 names.
+homes:
+  served_window: '~/.omlx/model_settings.json#models.<model>.max_context_window'
+  served_window_endpoint: '{base_url}/models#max_model_len'      # base_url comes from the declaration
+  declaration: '~/.config/goose/custom_providers/maxwell_omlx.json'
+  harness_config: '~/.config/goose/config.yaml'                  # top-level GOOSE_* keys = the env defaults
+  cache_ledger: '~/.local/share/goose/sessions/sessions.db#usage_ledger'
+  env_defaults_doc: 'https://goose-docs.ai/docs/guides/environment-variables.md#session-management'
+
+#: LAYER 1 <-> LAYER 2. The invariant: what the harness is TOLD equals what the server SERVES.
+parity_rule:
+  statement: 'served_window == declared_context_limit for every model the harness may run'
+  on_served_below_declared: truncation_risk     # the harness builds a prompt the server cannot attend to
+  on_declared_below_served: wasted_window       # the harness compacts early and throws away usable context
+  on_missing_either_side: unverifiable          # a model with no served window is not a routable slot
+  fault_rc: 2                                   # the probe's rc when the rule is broken
+
+#: LAYER 3. The trigger is derived, never guessed. `cloud_cap` is declared so that the day a local run
+#: is capped by a cloud price tier, the config says so instead of the default silently binding.
+trigger:
+  formula: 'min(threshold * window, cap)'
+  threshold_env: GOOSE_AUTO_COMPACT_THRESHOLD
+  threshold_default: 0.8
+  cap_env: GOOSE_AUTO_COMPACT_TOKEN_LIMIT
+  cap_default: 225000
+  cap_origin: 'cloud price tier (OpenAI long-context), meaningless locally (C1/C22)'
+  window_override_env: GOOSE_CONTEXT_LIMIT      # main model context limit; default model-specific or 128000
+  ollama_input_limit_env: GOOSE_INPUT_LIMIT      # maps to num_ctx for ollama requests
+  tool_cutoff_env: GOOSE_TOOL_CALL_CUTOFF        # full-detail tool calls kept before older output is summarized
+  strategy_env: GOOSE_CONTEXT_STRATEGY
+  #: declared headroom: compaction must fire BEFORE the window is full (the request that triggers
+  #: compaction is itself large), and late enough that one session compacts once, not five times.
+  min_headroom_tokens: 2048
+  max_compactions_per_session: 1
+
+#: LAYER 4. Cache accounting. A ratio is computed ONLY over rows that CARRY the field; the rows that do
+#: not are counted and REPORTED as unknown. A fabricated 0 is BUG-767's defect class, not a measurement.
+cache_accounting:
+  field: cache_read_tokens
+  input_field: input_tokens
+  absent_is_not_zero: true
+  decision: D-2957
+  min_calls_for_a_ratio: 20        # below this the ratio is reported as inconclusive, never as a number
+  proof:
+    method: 'two-call A/B on ONE cold-start process: identical prefix, measure ttft_cold then ttft_warm'
+    min_speedup: 5.0               # below this, prefix reuse is UNPROVEN and the ledger field is UNTRUSTED
+    measured_reference: '6.1 s warm vs 268 s cold = 44x (the referenced walkthrough, same session, same model)'
+    status: 'not_yet_run_on_this_machine — nothing in this repo has certified a local prefix cache HIT'
+
+#: PREFIX STABILITY. The invariant that makes prefill cheap, and the three ways this harness breaks it.
+prefix_stability:
+  invariant: 'the prompt PREFIX is byte-stable across turns; only the TAIL may change'
+  stable: [system_prompt, tool_definitions, extension_set, project_hints]
+  volatile_allowed_at_tail: [user_turn, tool_result, per_turn_injection]
+  hazards:
+    - id: compaction_rewrites_the_prefix
+      why: 'a compaction replaces the whole history, so the next call re-prefills the summary cold'
+    - id: per_turn_injection_at_the_head
+      why: >-
+        the `tom` extension injects context "into every turn" (GOOSE_MOIM_MESSAGE_TEXT /
+        GOOSE_MOIM_MESSAGE_FILE). Injected at the HEAD it changes the prefix every turn and NO turn can
+        ever hit the cache; injected at the TAIL it is free. MEASURED: neither variable is set today.
+    - id: dynamic_head_content
+      why: >-
+        timestamps, git status or a rotating file list inside the system prompt / project hints make
+        the prefix unique per turn. A per-turn block belongs in the TAIL (a turn-context block is
+        exactly this shape and must never be prepended).
+  injection_envs: [GOOSE_MOIM_MESSAGE_TEXT, GOOSE_MOIM_MESSAGE_FILE]   # the per-turn injection homes
+  verification: 'the probe prints the hazards it can measure from the live config and names the rest as UNVERIFIED'
+
+#: TOOL RESULTS are where an agent's context actually goes. Two knobs, one on each side of the wire.
+tool_results:
+  harness: {env: GOOSE_TOOL_CALL_CUTOFF, default: 'computed from window and threshold'}
+  server: {home: '~/.omlx/model_settings.json#models.<model>.max_tool_result_tokens', measured_default: 4096}
+  rule: 'older tool output is summarized, the recent calls stay in full detail'
+
+#: THE WINDOW CLASSES. Routing is declared: a class names the minimum served window an agent LOOP may
+#: run on, so a 32k model is never asked to hold a multi-file session.
+classes:
+  agent_loop:
+    min_window: 131072
+    why: 'a session with tool output, project hints and a compaction budget needs a real window'
+  agent_probe:
+    min_window: 32768
+    why: 'single-question delegation: summarize WITH source, review diff, one classification'
+  pipeline_batch:
+    min_window: 32768
+    why: 'bounded prompt, one answer, no history (the pipeline never re-sends a prefix it grew)'
+routing:
+  rule: 'select the MOST capable class the served window satisfies (the largest min_window it meets); first-declared wins a tie'
+  measured_agent_loop_capable: [gpt-oss-20b-MXFP4-Q8, Qwen3.8-27B-MLX-4bit]   # 131072 / 262144
+  measured_agent_probe_only: [Phi-4-mini-instruct-8bit, gemma-4-E4B-it-MLX-4bit,
+                              Qwen3-Coder-30B-A3B-Instruct-MLX-4bit, Qwen3.5-9B-4bit]
+
+#: THE BASELINE this contract was written against. Drift is visible by re-running the probe; a baseline
+#: nobody re-measures is a claim, so the probe prints its own numbers beside these.
+measured_20261014:
+  served: {Phi-4-mini-instruct-8bit: 32768, gemma-4-E4B-it-MLX-4bit: 32768,
+           Qwen3-Coder-30B-A3B-Instruct-MLX-4bit: 32768, gpt-oss-20b-MXFP4-Q8: 131072,
+           Qwen3.8-27B-MLX-4bit: 262144}
+  declared_equal: true
+  derived_trigger_local_32k: 26214
+  ledger: {calls: 28646, input_tokens: 2856939380, cache_read_tokens: 2742286067,
+           compactions: 676, local_agent_loop_cache_evidence: none}
+  session_store_bytes: 906100736
+  sessions: 380
+  messages: 163147
+
+exit_codes:
+  ok: 0
+  fault: 2          # parity broken, a declared home unreadable, or a model with no served window
+  error: 1          # the probe itself failed, or a known-answer control failed (the RAIL is red)

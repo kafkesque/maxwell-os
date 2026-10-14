@@ -8,21 +8,21 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1127 decisions (census stamp 43b48a9893479d4a, 2026-10-14) · 551 bugs (196 open / 355 closed; highest OPEN = BUG-781) · 25 open tasks (MUST 8 / SHOULD 14 / WORTH 3; OWNER-moved 3, pipeline-moved 22; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1128 decisions (census stamp 734b3a63d6101a40, 2026-10-14) · 554 bugs (198 open / 356 closed; highest OPEN = BUG-790) · 26 open tasks (MUST 8 / SHOULD 15 / WORTH 3; OWNER-moved 3, pipeline-moved 23; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **67** of 1127 — 🔴 open 32 · 🔵 proposed 14 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 565 · ⚖ ratified 135 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1127, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **68** of 1128 — 🔴 open 32 · 🔵 proposed 15 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 565 · ⚖ ratified 135 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1128, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 196 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 31 · 🟨 MED 41 · 🟩 LOW 19 · UNLABELLED 101 (BUG-757) of 196 open.
+> Open BUGS by severity (population = the census's 198 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 31 · 🟨 MED 42 · 🟩 LOW 20 · UNLABELLED 101 (BUG-757) of 198 open.
 >
 > **OWNER LANE (3) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
-> | T-129 | 🔴 MUST | WORK IDENTITY COLLAPSE — collapse the duplicate works at the IDENTITY layer, so a row stops advertising a corr | ONE COMMAND REMAINS - and the ledger half is CLOSED by the owner's han |
-> | T-130 | 🔴 MUST | THE INGEST DOOR — the identity guarantee becomes an ENFORCEMENT POINT (delta-scoped), so a duplicate work cann | SAME ONE ACT as T-129 (one act, two vocabularies; mapping declared in  |
+> | T-130 | 🔴 MUST | THE INGEST DOOR — the identity guarantee becomes an ENFORCEMENT POINT (delta-scoped), so a duplicate work cann | THE DOOR NOW READS A DECLARED WORD, AND ITS rc 2 NAMES THE ONE DEBT TH |
 > | T-131 | 🟠 SHOULD | THE MODEL-SWAP BENCH — no role is re-pointed to a newer model family without a declared, preflighted slot | mover = owner for the SLOT (which role, which model, what it may evict |
+> | T-132 | 🟠 SHOULD | THE HARNESS CONTEXT CONTRACT — the four layers between a local model's served window and the words an agent se | YOUR WORD decides the two things an agent must never choose, and then  |
 >
-> **PIPELINE LANE (22) — what the agent will do next, in strategic-consequential order (source: config/task_register.yaml):**
+> **PIPELINE LANE (23) — what the agent will do next, in strategic-consequential order (source: config/task_register.yaml):**
 >
 > | id | pri | state | task | evidence |
 > |---|---|---|---|---|
@@ -32,12 +32,12 @@
 > | T-120 | 🔴 MUST | 🔴 open | the ABSORPTION path - a later independent source must be able to RAISE an existing row's corroboration, and a  | MEASURED 2026-10-13 (read-only, by reading the write path and the identity model - no stor |
 > | T-122 | 🔴 MUST | 🔴 open | the classification_status REPAIR (owner word keep-and-repair) - a store column that says CLEAN on a QUARANTINE | config/served_fields.yaml#declared[classification_status] (word keep-and-repair, granted 2 |
 > | T-124 | 🔴 MUST | 🔴 open | the RED ladder (BUG-777 + BUG-778): the anchor-bridge ambiguity policy is owed first, then the masked 68-rail  | governance/buglog.md BUG-777 + BUG-778 (2026-10-14; both entries carry the verbatim measur |
+> | T-129 | 🔴 MUST | 🔴 open | WORK IDENTITY COLLAPSE — collapse the duplicate works at the IDENTITY layer, so a row stops advertising a corr | MEASURED 2026-10-14 read-only (governance/WORK_IDENTITY_COLLAPSE_20261014.md): 84 collapsi |
 > | T-105 | 🟠 SHOULD | 🔴 open | REA tier A/B mining — DEVONthink 3 (related-document ranking) and Cursor (derived code index) | governance/NOT-YET-EVALUATED-RESEARCH.md (REA targets logged 2026-10-13) |
 > | T-106 | 🟠 SHOULD | 🔴 open | ROADMAP — MODULARITY (C21 swappable infrastructure) and CROSS-OS COMPATIBILITY (C26) | protocols: pipeline/storage/base.py only; no cross-OS smoke exists (2026-10-13) |
 > | T-108 | 🟠 SHOULD | 🔴 open | BUG-712 / BUG-714 — the content_type residual and the harness-facing primitive | served run content_type census (2026-10-13) |
 > | T-112 | 🟠 SHOULD | 🔴 open | PERF - the SERVED path loads the cross-encoder per PROCESS, so short-lived callers pay a cold-start of minutes | suite rail runtime 100-200s -> >210s after the dispatcher became the CLI default (2026-10- |
 > | T-113 | 🟠 SHOULD | 🔴 open | PAY THE BASELINE the honest instrument REVEALED - the 71 keys behind block aliases, module by module, each wit | config/config_defaults_census.json after D-2982: 300 shadowed-declared keys / 568 sites (2 |
-> | T-114 | 🟠 SHOULD | 🔴 open | DISCHARGE THE INHERITED LADDER FAULTS - ONE owes real work now (the undeclared-encoding campaign) and ONE was  | just health-full 2026-10-13: 7 faults / 128 lines; each rc=1 at 42f8b76^ (worktree). RE-ME |
 >
 > **STANDING RULES — in effect, never close (1):**
 >
@@ -95,6 +95,7 @@
 
 | Bug | Date | Issue |
 |---|---|---|
+| BUG-789 | 2026-10-14 | **THE LOCAL MODEL SERVER'S APP CONFIG CARRIES A HUGGING FACE TOKEN IN PLAINTEXT (mode 644, world-readable, 215 bytes).** MEASURED 2026-10-14 while mapping the agent harness: the oMLX app config holds an `hf_token` field verbatim. C3 declares all data and compute sovereign and local, and a credential in a plaintext config is neither: it is a live secret with no rotation, no env indirection and no file protection. FIX (declared): move it to the environment (`HF_TOKEN`) or the keychain, revoke and reissue the exposed value, and add a rail that refuses a secret-shaped literal in an app config. The value is deliberately NOT restated here. |
 | BUG-774 | 2026-10-13 | **The internet-intake plan has no IDENTITY: `source_id` is book-shaped and the fallback branch it would fall to is the one a closed defect class removed — PREVENTIVE, nothing ingested yet.** `source_id = SHA-256(normalize_author｜normalize_title)` with a FILENAME FALLBACK branch (`pipeline/book_metadata.py::compute_source_id`), over a converter that accepts only `{.epub, .pdf, .md}` (`pipeline/stage0_convert.py`); the evaluator’s rail asserts that fallback is NEVER live at ratio 0.0 (`config/eval_integrity.yaml` → `source_identity`, enforced by `scripts/verify_source_identity.py`, whose docstring records the original defect: `source_diversity` counted FILENAMES and 29.1% of convergence was the same book twice). A transcript, a podcast episode or a social thread has no author｜title in that shape, and a work re-published in another medium (preprint → version of record, book → the author’s podcast) would count as a SECOND source and certify a voice against itself. FIX: a source-kind axis + a per-kind identity resolver (the `config/references.yaml` OpenAlex-by-DOI precedent) + the re-publication collapse rule (D-2308 generalised) BEFORE any conversion (T-121). |
 | BUG-771 | 2026-10-13 | **The retrieval-golden REVIEW SHEET carried an `old_name` column that described a golden state NO LONGER LIVE, so a 150-cell owner review was conducted against a ghost comparison.** `old_name`/`old_fb_id`/`old_status` are filled by `scripts/reanchor_retrieval_goldens.py` at GENERATION time from the live golden; the sheet (`governance/golden_reanchor_candidates_20261011.csv`, generated 2026-10-11 20:44Z) was generated BEFORE the `20261011T221956Z` apply that re-anchored the same set — so the reviewed sheet compared every candidate against the PRE-apply expectation. MEASURED 2026-10-13 on the owner's reviewed copy: **30/30** `old_name` values are ABSENT from their own candidate list, while **30/30** LIVE expectations are PRESENT. Consequence: the instructions' cheapest and most valuable cell class — "if the query is already correct, anchor the row whose cand_name equals old_name" — was UNSATISFIABLE for every query, and the reviewer could not tell which candidate the system currently expects. FIX: the generator must stamp the golden state it compared against by HASH (sha256 of the golden file at generation) into the sheet, and `--check` must REFUSE a sheet whose stamped hash no longer matches the live file (a stale-premise rail) — the same discipline as D-2989's advertised-claim rail, one artifact over. |
 | BUG-766 | 2026-10-13 | **The store-columns register keeps the ladder RED on 6 POPULATION-SHAPE drifts and, until this act, on a stale measurement the licensed write moved.** MEASURED by scripts/check_store_columns.py --check (rc=1, the same rc recorded at commit 673a457 18:33 BEFORE the write): each of `source_text`, `difficulty_level`, `temporal_scope`, `epistemic_status`, `verification_method`, `practicality` declares `outside: absent` for population s5_verified while 1049 sidecar rows (s5_reason='s5_not_applicable') hold a NON-NULL blank where D-2957 requires NULL — so `count(col)` still claims rows the column does not carry. Separately, the D-2988 write moved `discipline_source.distinct` 1 -> 2 and the register still claimed 1 (a MEASUREMENT-DRIFT line, the honest cascade of a store write). FIX: reshape the six columns to TRUE NULL outside their population (the pipeline/normalize_absent_shape.py precedent, BUG-737), then --record; the census re-record at 18:40Z already absorbed the write's own moves. |
@@ -112,6 +113,7 @@
 
 | Bug | Date | Issue |
 |---|---|---|
+| BUG-790 | 2026-10-14 | **THE INGEST DOOR'S REFUSAL NAMES THE WRONG TASK.** `scripts/check_ingest_identity_gate.py:123` prints `evidence contradicts (task T-129/T-131)` while the door's task is T-130 and T-131 is THE MODEL-SWAP BENCH — so a reader who follows the pointer lands on a task about re-pointing model slots, not on the door. MEASURED 2026-10-14 (`--gate` rc 2 on this machine). A hardcoded task pointer is the C12 defect class inside a refusal message: it is the one thing a REFUSAL must get right, because it is the instruction the reader acts on. FIX: name the task from a declared home (the register), or correct it to T-130. |
 | BUG-223 | 2026-09-05 | `'[]'` literal-array hygiene: 54 `emerging` FBs store `discipline_raw = '[]'` (JSON-empty-array string) instead of `''`/NULL. Queries testing `discipline_raw != ''` will wrongly count these as "has raw". Correct empty-test = `(discipline_raw IS NULL OR TRIM(discipline_raw)='' OR discipline_raw='[]')`. Minor (all 54 are legitimately `emerging`); normalize `'[]'`→`''` or add a shared empty-check helper in `pipeline/schemas.py`. D2569. |
 | BUG-169 | 2026-08-24 | TI `parameters` empty on 31/143 single-source + 100/307 singleton TI — ontology nuance (technique-type vs API TI); verify at rerun |
 | BUG-099 | 2026-08-13 | Model registry drift: gpt-oss/Phi misnamed "verifier" (rename deferred) |
@@ -121,6 +123,7 @@
 ---
 
 ## ✅ CLOSED / RESOLVED — bottom (recent) — HAND INDEX, not a register (the DERIVED block above is the ONE authority; rows joined on every run, D-2986)
+- **BUG-788** — **THE SIGNER'S CONTROLS COPIED THE LIVE DECLARATION, so the day the collapse act COMPLETED a known-answer control went red — and a red baseline makes every mutation in the file unprovable.** The signer is the subject of those controls; how far the act has got is not. FIX: a PURE pre-image (`unsigned_fixture`), a 14th control that proves the fixture's independence, and a mutation that reds through it. 14/14 controls, gate 57/57.
 - **BUG-783** — ****THE MUTATION GATE'S FIXTURE WAS UNDER-DECLARED, so TWO guards could not be made to red and the gate blamed the MUTATION for a fixture gap.** MEASURED 2026-10-14: `scripts/check_rail_mutations.py` reported `the_undeclared_advert_guard_is_load_bearing` and `the_owner_word_vocabulary_guard_is_load_bearing` (both on `scripts/check_served_fields.py`) as "the oracle's BASELINE is not green (rc=1)". Inside the fixture the runner failed **1 of 24** controls with two exact reasons: `promotions.corroboration.builder 'pipeline/corroboration.py::corroboration_tuple' does not resolve (file + symbol)` and `consumers names 'maxwell_mcp_server.py', which does not exist` — the declaration NAMES its builder and its consumers, and the fixture is FILE-GRANULAR (`config/rail_mutations.yaml#fixture.include_files`) so neither came with it. The direct run in the live tree is green (24/24, rc 0). Class: the BUG-589 shape one declaration over (a runner reads a declared input the fixture does not carry ⇒ EVERY baseline is red ⇒ the gate's finding is a false attribution), and the reason it matters is that the two guards are exactly the kind (iv) teeth the standing rule requires (D-2676): un-provable means un-held. FIX: `include_files` now carries `maxwell_mcp_server.py`, `pipeline/corroboration.py`, `pipeline/stage6_okf_export.py`, `pipeline/stage6b_anytype_push.py`, with the measurement recorded next to the list. VERIFIED: `check_served_fields.py --selftest` 24/24 in the fixture and `check_rail_mutations.py` **47/47 declared rules seen to red**, 1 negative control green, 0 baseline faults.**
 - **BUG-782** — ****THE OWNER LANE HAD NO INTAKE: the review sheet carried a machine screen (68 yes / 16 no, written by NO script in this repo) in a column NAMED `owner_ruling`, and its deterministic tier said 42 where the rail and the census both measure 37 — and nothing read either, so nothing could notice.** MEASURED 2026-10-14: the v1 sheet's `identical_text` column disagreed with its own source artifact (`temp/voice_collapse_pairs_20261014.csv#certain` = 37 yes / 47 no) and with `config/corroboration_collapse.yaml#lexical_limb.measured.pairs_identical_text` = 37; its per-pair `rows_affected` column summed to 745 against a census of 530 because a row can sit in MORE THAN ONE pair (117 rows do) and in more than one GROUP, so the per-pair/per-group columns are NOT additive and nothing declared that; the pair OBJECT itself had no home (a one-off under `temp/` produced it, and `temp/` auto-purges at 7 days) so the review sheet could not be re-derived; and the sum of its 84 rows' prescreen was read by no rail (the ingest door's own `collapse_debt` sniffed the FIRST column whose NAME contains "ruling" — on a rendered sheet that is `proposed_ruling`, i.e. a machine PROPOSAL would have been counted as an owner's word). FIX: `config/owner_marks.yaml` (ONE contract: vocabulary, homes, tiers, derivation, coverage, conflict rule) + `scripts/owner_marks.py` (`--render` measures and renders both sheets and carries every word and note already given, failing closed rather than dropping one; `--check` derives the effective word, validates the vocabulary, tests the transitivity conflict rule and binds the sheet to the census BY DIGEST; `--apply` expands only SIGNED tiers and records `ruling_source` per row; 9/9 known-answer controls) + the pair OBJECT gains a home (`governance/corroboration_collapse_pairs.json`, written by the intake which IMPORTS the rail's own limb, D-2646) + `ingest_gate.collapse_debt` reads the DECLARED column. Owner act: `governance/OWNER_MARKS_20261014.md` (5 signed tiers + 8 per-row words). CLOSED 2026-10-14: the intake, the signer and the ladder reading all exist and read both homes; the owner''s remaining WORD is tracked by T-129/T-130, not by this bug. ✅ (2026-10-14)
 - **BUG-786** — **THE INGEST DOOR COUNTED A WORD WITH NO PROVENANCE AS AN OWNER ACT: all 84 collapse rows read as RULED while `ruling_source` said `none` for every one of them, so the lane could RELEASE without a signature.** MEASURED 2026-10-14 by running the door: `check_ingest_identity_gate.py --check` printed `collapse sheet ... | ruled 84 | owed 0` over a sheet whose 84 words were typed by hand into the DERIVED column (`owner_ruling`) — the column `scripts/owner_marks.py --apply` writes, and whose `ruling_source` column therefore said `none` on every row. The reader took the word and asked nothing about where it came from, which is the BUG-782 defect ONE COLUMN OVER: a value in a claim-shaped column, minted by nobody, releasing a lane. It was masked only because the LEDGER half of the same gate was still owed (59 pairs) — the door's rc 2 hid a hole in its other limb. FIX: the provenance column is DECLARED (`config/ingest_identity_gate.yaml#ledger.collapse_word_source_column` -> `config/owner_marks.yaml#homes.collapse_sheet.provenance_column`) with the `none` token declared beside it; `collapse_debt` now counts a word with a blank/\`none\` provenance as OWED (and names the column it required), the reading reports it in words, the selftest gained `a_word_with_no_provenance_is_owed_not_ruled` (9/9, and the SAME rows WITH provenance are still ruled, so the control cannot pass by refusing every word), and a mutation (`the_word_provenance_guard_is_load_bearing`) reds that control through its own marker (48/48). After: `ruled 0 | owed 84` with the provenance reason spelled out. ✅ (2026-10-14)
@@ -13778,3 +13781,49 @@ TWO HAZARDS FOUND WHILE LANDING IT, both closed with controls and mutations:
     only machine-readable record of the owner's word): the derived column is rebuilt from the tiers and the tiers were
     unsigned. The write now REFUSES, by name, and points at the two acts that make it safe (sign the tier, or move
     the words to the owner's column).
+
+## BUG-788 (MED — FIXED 2026-10-14) — the signer's controls copied the LIVE declaration, so a COMPLETED owner act turned a control red and masked every mutation in the file
+
+**MEASURED 2026-10-14, the day the collapse act completed.** `scripts/owner_marks.py --selftest` reported
+`FAIL a_signature_is_written_on_the_named_tier_and_nowhere_else` (13/13 green before the act), and
+`scripts/check_rail_mutations.py` reported `mutation the_write_may_blank_a_hand_typed_owner_word: the oracle's
+BASELINE is not green (rc=1) — so its red after one proves nothing`. One red control therefore disarmed the WHOLE
+mutation gate for that file: 57 declared rules, none of them provable.
+
+**The defect.** The control copied `config/owner_marks.yaml` from disk and then asserted the copy was otherwise
+UNSIGNED. Two state dependencies followed from that: (a) with tiers A/B/C signed, `sign_tiers` correctly REFUSES
+the re-sign (D-2676) so nothing was written; (b) the assertion `not any(v for k, v in got.items() if k != "A")`
+is false over a signed file. The control had been passing only while the act it guards was still OWED, i.e. the
+OWNER was the mutator of the rail's input — the BUG-556 shape ("a rail whose input the ladder itself mutates"),
+one layer up.
+
+**The fix.** `unsigned_fixture(text)`: a PURE helper that returns the same declaration with every signature
+removed; the controls now write that pre-image and hand the signer a policy reset to match. The control also
+asserts the RE-SIGN REFUSAL explicitly, which it never did. A 14th control
+(`a_control_fixture_is_unsigned_whatever_the_live_declaration_says`) makes the independence itself a known
+answer, so a mutation (`a_control_fixture_may_carry_the_live_act_into_the_signer`) can be SEEN to red through it
+— a state-dependent control could never be proven that way.
+
+**After.** owner-marks 14/14; mutation gate 57/57 declared rules seen to red; the ladder's owner-marks line reads
+rc 0. **Lesson (the reusable half):** a control whose input is the live artifact DEAD in the state where the
+thing it guards has SUCCEEDED. Declare the pre-image, not the world.
+
+
+## BUG-790 (LOW — OPEN) — the ingest door's refusal names the WRONG TASK
+
+**MEASURED 2026-10-14** (`scripts/check_ingest_identity_gate.py --gate`, rc 2 on this machine): the refusal
+prints `evidence contradicts (task T-129/T-131)`. The door's task is **T-130**; **T-131 is THE MODEL-SWAP BENCH** —
+so a reader who follows the pointer lands on a task about re-pointing model slots instead of on the door. A
+hardcoded task pointer is the C12 defect class inside a REFUSAL, and a refusal is the one message a reader acts
+on. **Fix:** name the task from a declared home (the register) rather than a literal in the message, or correct
+the literal to T-130. Nothing else reads this string.
+
+## BUG-789 (MED — OPEN) — the local model server's app config carries a Hugging Face token in plaintext
+
+**MEASURED 2026-10-14** while mapping the agent harness, read-only: `~/Library/Application Support/oMLX/config.json`
+holds `hf_token` verbatim, the file is mode 644 (world-readable) and 215 bytes. **Why it matters:** C3 declares
+all data and compute sovereign and local; a plaintext credential in an app config is a live secret with no
+rotation, no environment indirection and no file protection, and it is copied by every backup and sync that
+sweeps the user profile. **Fix (declared, not yet applied):** move the value to `HF_TOKEN` in the environment (or
+the keychain), REVOKE and reissue the exposed value, and add a rail that refuses a secret-shaped literal in an
+app config. The value is never restated in a governance file (a bug record is not a credential store).

@@ -200,11 +200,47 @@ may_touch:
 - governance/SESSION-HANDOFF-20261013-D2989.md
 - governance/WORK_IDENTITY_COLLAPSE_20261014.md
 - governance/work_identity_collapse_review_20261014.csv
+# 2026-10-14 (T-132/D-3000, the harness-context act): the measured answer to the owner's PREFILL/CACHE
+# future task. NAMED, never a glob (BUG-548/BUG-563): it is one measurement write-up, not a standing class.
+- governance/AGENT_CONTEXT_PREFILL_20261014.md
 will_not_touch:
 - governance/F11_*
 - governance/ANCHOR_RULER_CONSOLIDATED_*.csv
 - governance/ANCHOR4_DEPTH_BLIND_SHEET_*.csv
 widening_log:
+- date: '2026-10-14'
+  actor: assistant
+  owner_ack: 'standing owner mandate (verbatim): go forward on the most consequential leverage; for any manual
+    task give the senior recommendation (verify, never assume) AND the infrastructure and the file; senior
+    RAG/ontological lens; forensic audit before any serious implementation; delegate to the right local LLMs and
+    check none drifted; list the next critical step; gov dependencies synch and update. Plus the FUTURE TASK
+    named in this turn: "How can we optimize agent harness context window for local llm so they dont run out
+    fast - OPTIMIZE PREFILL FOR LOCAL LLMS CONTEXT WINDOW AND FIX CACHE."'
+  addendum: 'T-132 + D-3000 (PROPOSED): the agent harness context contract. NO harness setting was rewritten, NO
+    model re-pointed, NO store write, NO corpus write and NO label moved - the act is one new declaration
+    (config/agent_context.yaml), one read-only probe (scripts/agent_context_probe.py with 12 known-answer
+    controls), its rails (rail_registry guards + 4 mutations + the ladder lines), the register/census/face
+    re-cuts, and the BUG-788 fix in scripts/owner_marks.py (a pure pre-image for the signer''s controls, plus a
+    14th control and a 5th mutation). config/*.yaml, scripts/*.py, justfile, governance/buglog.md and the four
+    derived faces all sit inside EXISTING grants; the ONE new artifact needing a home is the measurement
+    write-up below.'
+  additions:
+  - pattern: governance/AGENT_CONTEXT_PREFILL_20261014.md
+    why: 'D-3000/T-132 - the measured answer to the owner''s future task: the four layers (served window ->
+      harness declaration -> compaction trigger -> the ledger''s cache evidence), the fix ladder with the home
+      of every knob, and the list of what is NOT proven. A measurement whose write-up cannot be committed is a
+      measurement nobody can re-run.'
+  may_touch_untouched: false
+  will_not_touch_untouched: true
+  why: 'No further widening was needed. The contract is config/*.yaml; the probe and the BUG-788 fix are
+    scripts/*.py; the ladder line is justfile; the register rows are config/task_register.yaml; the mint is
+    config/decisions.yaml; the bug records are governance/buglog.md; the census files are written by
+    scripts/bug_status.py and scripts/recompute_decision_summary.py and were re-derived BEFORE the sync so no
+    face cites a stale census; and the four faces (DECISION-LOG.md, MASTER-TASK-REGISTER.md,
+    governance/buglog.md, agent/session_seed.yaml) are re-cut by gov_sync.py, the ONE writer D-2981 declares.
+    The scratch that produced the mint (temp/mint_agent_context_20261014.py) and the video transcript live in
+    the gitignored temp/. Only governance/AGENT_CONTEXT_PREFILL_20261014.md needed a NAMED grant, because
+    governance/*.md is deliberately not a pattern.'
 - date: '2026-10-12'
   actor: assistant
   owner_ack: 'owner instruction 2026-10-12 ("commit D-2860" + "continue with the next critical step ... update and synch gov dependencies")'

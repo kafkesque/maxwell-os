@@ -9,8 +9,8 @@
   ],
   "apply_threshold": 0.5,
   "candidate_count": 59,
-  "adjudicated": 0,
-  "pending": 59,
+  "adjudicated": 59,
+  "pending": 0,
   "hint_counts": {
     "subtitle_or_edition": 32,
     "title_rename": 1,
@@ -32,8 +32,9 @@
       "max_similarity": 1.0,
       "pair_id": "25587e01b7d60821",
       "hint": "subtitle_or_edition",
-      "verdict": "PENDING",
-      "owner_note": ""
+      "verdict": "MERGE",
+      "owner_note": "",
+      "ruling_source": "row"
     },
     {
       "a_id": "6ec1d7b227afc802",
@@ -47,8 +48,9 @@
       "max_similarity": 0.9994,
       "pair_id": "4720e54652284157",
       "hint": "subtitle_or_edition",
-      "verdict": "PENDING",
-      "owner_note": ""
+      "verdict": "MERGE",
+      "owner_note": "",
+      "ruling_source": "row"
     },
     {
       "a_id": "d406c9b5d5f07a0d",
@@ -61,8 +63,9 @@
       "max_similarity": 0.9986,
       "pair_id": "0b54967c8706ae57",
       "hint": "title_rename",
-      "verdict": "PENDING",
-      "owner_note": ""
+      "verdict": "MERGE",
+      "owner_note": "",
+      "ruling_source": "row"
     },
     {
       "a_id": "8d569bb0a35a14de",
@@ -75,8 +78,9 @@
       "max_similarity": 0.9954,
       "pair_id": "d7968892630f7e0e",
       "hint": "subtitle_or_edition",
-      "verdict": "PENDING",
-      "owner_note": ""
+      "verdict": "MERGE",
+      "owner_note": "",
+      "ruling_source": "row"
     },
     {
       "a_id": "c7c8ac54d033a233",
@@ -89,8 +93,9 @@
       "max_similarity": 0.9615,
       "pair_id": "c497100a8e872240",
       "hint": "subtitle_or_edition",
-      "verdict": "PENDING",
-      "owner_note": ""
+      "verdict": "MERGE",
+      "owner_note": "",
+      "ruling_source": "row"
     },
     {
       "a_id": "c70098af41f6a043",
@@ -103,8 +108,9 @@
       "max_similarity": 0.9474,
       "pair_id": "7740dd75140955f3",
       "hint": "series_volume",
-      "verdict": "PENDING",
-      "owner_note": ""
+      "verdict": "KEEP_SEPARATE",
+      "owner_note": "",
+      "ruling_source": "row"
     },
     {
       "a_id": "c70098af41f6a043",
@@ -117,8 +123,9 @@
       "max_similarity": 0.9474,
       "pair_id": "90479755f0a6c7f3",
       "hint": "series_volume",
-      "verdict": "PENDING",
-      "owner_note": ""
+      "verdict": "KEEP_SEPARATE",
+      "owner_note": "",
+      "ruling_source": "row"
     },
     {
       "a_id": "3e53876ae0c135d6",
@@ -131,8 +138,9 @@
       "max_similarity": 0.9474,
       "pair_id": "231792fa4dced248",
       "hint": "series_volume",
-      "verdict": "PENDING",
-      "owner_note": ""
+      "verdict": "KEEP_SEPARATE",
+      "owner_note": "",
+      "ruling_source": "row"
     },
     {
       "a_id": "9937c0ce3b89dec8",
@@ -145,8 +153,9 @@
       "max_similarity": 0.9385,
       "pair_id": "f80cfc264a1c4821",
       "hint": "author_leak",
-      "verdict": "PENDING",
-      "owner_note": ""
+      "verdict": "MERGE",
+      "owner_note": "",
+      "ruling_source": "row"
     },
     {
       "a_id": "77b05e5db2b15e28",
@@ -159,8 +168,9 @@
       "max_similarity": 0.9348,
       "pair_id": "202303b08e020022",
       "hint": "subtitle_or_edition",
-      "verdict": "PENDING",
-      "owner_note": ""
+      "verdict": "MERGE",
+      "owner_note": "",
+      "ruling_source": "row"
     },
     {
       "a_id": "9dd12fcc42dfb7f3",
@@ -173,8 +183,9 @@
       "max_similarity": 0.9296,
       "pair_id": "bb977a8430de81ac",
       "hint": "subtitle_or_edition",
-      "verdict": "PENDING",
-      "owner_note": ""
+      "verdict": "MERGE",
+      "owner_note": "",
+      "ruling_source": "row"
     },
     {
       "a_id": "f572dfec14c42a6c",
@@ -187,8 +198,9 @@
       "max_similarity": 0.9231,
       "pair_id": "68c2beba5dc18b50",
       "hint": "author_leak",
-      "verdict": "PENDING",
-      "owner_note": ""
+      "verdict": "MERGE",
+      "owner_note": "",
+      "ruling_source": "row"
     },
     {
       "a_id": "396295ca7e029a37",
@@ -201,8 +213,9 @@
       "max_similarity": 0.9074,
       "pair_id": "72dd7797b71323ea",
       "hint": "author_leak",
-      "verdict": "PENDING",
-      "owner_note": ""
+      "verdict": "MERGE",
+      "owner_note": "",
+      "ruling_source": "row"
     },
     {
       "a_id": "e7c89f9eca43ad96",
@@ -216,8 +229,9 @@
       "max_similarity": 0.907,
       "pair_id": "0d6edc31b15785e3",
       "hint": "author_leak",
-      "verdict": "PENDING",
-      "owner_note": ""
+      "verdict": "MERGE",
+      "owner_note": "",
+      "ruling_source": "row"
     },
     {
       "a_id": "17ac019eeffeb320",
@@ -230,8 +244,9 @@
       "max_similarity": 0.8929,
       "pair_id": "216d2a5d0651b465",
       "hint": "subtitle_or_edition",
-      "verdict": "PENDING",
-      "owner_note": ""
+      "verdict": "MERGE",
+      "owner_note": "",
+      "ruling_source": "row"
     },
     {
       "a_id": "09a825fd5e0076f0",
@@ -245,8 +260,9 @@
       "max_similarity": 0.8912,
       "pair_id": "71c1bf25cb5645d8",
       "hint": "subtitle_or_edition",
-      "verdict": "PENDING",
-      "owner_note": ""
+      "verdict": "MERGE",
+      "owner_note": "",
+      "ruling_source": "row"
     },
     {
       "a_id": "8c779e40a844d9ed",
@@ -259,8 +275,9 @@
       "max_similarity": 0.8723,
       "pair_id": "b9d0257ae1b48b54",
       "hint": "subtitle_or_edition",
-      "verdict": "PENDING",
-      "owner_note": ""
+      "verdict": "MERGE",
+      "owner_note": "",
+      "ruling_source": "row"
     },
     {
       "a_id": "d17be236beda3451",
@@ -273,8 +290,9 @@
       "max_similarity": 0.8676,
       "pair_id": "df0056c9f49f1a2d",
       "hint": "subtitle_or_edition",
-      "verdict": "PENDING",
-      "owner_note": ""
+      "verdict": "MERGE",
+      "owner_note": "",
+      "ruling_source": "row"
     },
     {
       "a_id": "90ca5a74b674a9c0",
@@ -288,8 +306,9 @@
       "max_similarity": 0.8333,
       "pair_id": "32acc75b8c4b1db8",
       "hint": "noise_suffix",
-      "verdict": "PENDING",
-      "owner_note": ""
+      "verdict": "MERGE",
+      "owner_note": "",
+      "ruling_source": "row"
     },
     {
       "a_id": "bc31fd7c7f6f920d",
@@ -302,8 +321,9 @@
       "max_similarity": 0.8182,
       "pair_id": "b28b47e8705a3ff5",
       "hint": "subtitle_or_edition",
-      "verdict": "PENDING",
-      "owner_note": ""
+      "verdict": "MERGE",
+      "owner_note": "",
+      "ruling_source": "row"
     },
     {
       "a_id": "aa81a4e244b4ba87",
@@ -316,8 +336,9 @@
       "max_similarity": 0.8077,
       "pair_id": "ebf0392983587eff",
       "hint": "author_leak",
-      "verdict": "PENDING",
-      "owner_note": ""
+      "verdict": "MERGE",
+      "owner_note": "",
+      "ruling_source": "row"
     },
     {
       "a_id": "ec3a3dc1ce55b4a6",
@@ -331,8 +352,9 @@
       "max_similarity": 0.8056,
       "pair_id": "ce3c60065fbc793a",
       "hint": "subtitle_or_edition",
-      "verdict": "PENDING",
-      "owner_note": ""
+      "verdict": "MERGE",
+      "owner_note": "",
+      "ruling_source": "row"
     },
     {
       "a_id": "987bdd0e7bcb67d9",
@@ -346,8 +368,9 @@
       "max_similarity": 0.7989,
       "pair_id": "c573c93515128cb2",
       "hint": "subtitle_or_edition",
-      "verdict": "PENDING",
-      "owner_note": ""
+      "verdict": "MERGE",
+      "owner_note": "",
+      "ruling_source": "row"
     },
     {
       "a_id": "85e5f7261d361da1",
@@ -361,8 +384,9 @@
       "max_similarity": 0.7922,
       "pair_id": "340dc555532a3ee2",
       "hint": "subtitle_or_edition",
-      "verdict": "PENDING",
-      "owner_note": ""
+      "verdict": "MERGE",
+      "owner_note": "",
+      "ruling_source": "row"
     },
     {
       "a_id": "26d9bd396aa6df4a",
@@ -375,8 +399,9 @@
       "max_similarity": 0.7857,
       "pair_id": "6fbdd40393fd0ce4",
       "hint": "subtitle_or_edition",
-      "verdict": "PENDING",
-      "owner_note": ""
+      "verdict": "MERGE",
+      "owner_note": "",
+      "ruling_source": "row"
     },
     {
       "a_id": "bc3df1c395735588",
@@ -389,8 +414,9 @@
       "max_similarity": 0.7826,
       "pair_id": "dcc9f3111c74f6e8",
       "hint": "subtitle_or_edition",
-      "verdict": "PENDING",
-      "owner_note": ""
+      "verdict": "MERGE",
+      "owner_note": "",
+      "ruling_source": "row"
     },
     {
       "a_id": "4f69f198711dacf7",
@@ -403,8 +429,9 @@
       "max_similarity": 0.7786,
       "pair_id": "062d48863913f3ea",
       "hint": "author_leak",
-      "verdict": "PENDING",
-      "owner_note": ""
+      "verdict": "MERGE",
+      "owner_note": "",
+      "ruling_source": "row"
     },
     {
       "a_id": "fc9cb21c0c4779fc",
@@ -417,8 +444,9 @@
       "max_similarity": 0.775,
       "pair_id": "a4ebdd393e24def2",
       "hint": "review",
-      "verdict": "PENDING",
-      "owner_note": ""
+      "verdict": "MERGE",
+      "owner_note": "",
+      "ruling_source": "row"
     },
     {
       "a_id": "88a6204e56252eb2",
@@ -431,8 +459,9 @@
       "max_similarity": 0.7727,
       "pair_id": "9cb5e7b0b5f20775",
       "hint": "subtitle_or_edition",
-      "verdict": "PENDING",
-      "owner_note": ""
+      "verdict": "MERGE",
+      "owner_note": "",
+      "ruling_source": "row"
     },
     {
       "a_id": "a690232baa303dc2",
@@ -446,8 +475,9 @@
       "max_similarity": 0.7727,
       "pair_id": "58ae3115dbabbc12",
       "hint": "subtitle_or_edition",
-      "verdict": "PENDING",
-      "owner_note": ""
+      "verdict": "MERGE",
+      "owner_note": "",
+      "ruling_source": "row"
     },
     {
       "a_id": "6ec1d7b227afc802",
@@ -460,8 +490,9 @@
       "max_similarity": 0.7705,
       "pair_id": "8096d55fc1650a10",
       "hint": "subtitle_or_edition",
-      "verdict": "PENDING",
-      "owner_note": ""
+      "verdict": "MERGE",
+      "owner_note": "",
+      "ruling_source": "row"
     },
     {
       "a_id": "ee3a49a7db0c1820",
@@ -474,8 +505,9 @@
       "max_similarity": 0.7595,
       "pair_id": "37412149acdd0773",
       "hint": "subtitle_or_edition",
-      "verdict": "PENDING",
-      "owner_note": ""
+      "verdict": "MERGE",
+      "owner_note": "",
+      "ruling_source": "row"
     },
     {
       "a_id": "71633d2a02d9446c",
@@ -489,8 +521,9 @@
       "max_similarity": 0.7455,
       "pair_id": "3559d322597614f1",
       "hint": "author_leak",
-      "verdict": "PENDING",
-      "owner_note": ""
+      "verdict": "MERGE",
+      "owner_note": "",
+      "ruling_source": "row"
     },
     {
       "a_id": "bc3df1c395735588",
@@ -503,8 +536,9 @@
       "max_similarity": 0.7308,
       "pair_id": "68f90898423cce1d",
       "hint": "review",
-      "verdict": "PENDING",
-      "owner_note": ""
+      "verdict": "KEEP_SEPARATE",
+      "owner_note": "",
+      "ruling_source": "row"
     },
     {
       "a_id": "9f0dfc50f7667f7c",
@@ -518,8 +552,9 @@
       "max_similarity": 0.7306,
       "pair_id": "dc33d0ac9bcaf58d",
       "hint": "subtitle_or_edition",
-      "verdict": "PENDING",
-      "owner_note": ""
+      "verdict": "MERGE",
+      "owner_note": "",
+      "ruling_source": "row"
     },
     {
       "a_id": "7a2260a3bf22ce94",
@@ -532,8 +567,9 @@
       "max_similarity": 0.726,
       "pair_id": "35c6778225c7ad32",
       "hint": "review",
-      "verdict": "PENDING",
-      "owner_note": ""
+      "verdict": "KEEP_SEPARATE",
+      "owner_note": "",
+      "ruling_source": "row"
     },
     {
       "a_id": "fe45048f38027a23",
@@ -546,8 +582,9 @@
       "max_similarity": 0.7143,
       "pair_id": "bd935944789d2319",
       "hint": "subtitle_or_edition",
-      "verdict": "PENDING",
-      "owner_note": ""
+      "verdict": "MERGE",
+      "owner_note": "",
+      "ruling_source": "row"
     },
     {
       "a_id": "3f9db214c55f5f1d",
@@ -560,8 +597,9 @@
       "max_similarity": 0.7045,
       "pair_id": "e1f622e03aa85cf1",
       "hint": "subtitle_or_edition",
-      "verdict": "PENDING",
-      "owner_note": ""
+      "verdict": "MERGE",
+      "owner_note": "",
+      "ruling_source": "row"
     },
     {
       "a_id": "5616e5a77b28d51a",
@@ -574,8 +612,9 @@
       "max_similarity": 0.6818,
       "pair_id": "8e70c1f2717f0ced",
       "hint": "subtitle_or_edition",
-      "verdict": "PENDING",
-      "owner_note": ""
+      "verdict": "MERGE",
+      "owner_note": "",
+      "ruling_source": "row"
     },
     {
       "a_id": "71611635480f8595",
@@ -589,8 +628,9 @@
       "max_similarity": 0.6792,
       "pair_id": "54ff0f4c18782ef7",
       "hint": "subtitle_or_edition",
-      "verdict": "PENDING",
-      "owner_note": ""
+      "verdict": "MERGE",
+      "owner_note": "",
+      "ruling_source": "row"
     },
     {
       "a_id": "15da781a87b25405",
@@ -604,8 +644,9 @@
       "max_similarity": 0.6765,
       "pair_id": "454bbe3c2349c0d6",
       "hint": "noise_suffix",
-      "verdict": "PENDING",
-      "owner_note": ""
+      "verdict": "MERGE",
+      "owner_note": "",
+      "ruling_source": "row"
     },
     {
       "a_id": "0f4ebf6c2f9ca322",
@@ -618,8 +659,9 @@
       "max_similarity": 0.6757,
       "pair_id": "e93136effd604167",
       "hint": "review",
-      "verdict": "PENDING",
-      "owner_note": ""
+      "verdict": "MERGE",
+      "owner_note": "",
+      "ruling_source": "row"
     },
     {
       "a_id": "65349eb7a2874b3e",
@@ -632,8 +674,9 @@
       "max_similarity": 0.6667,
       "pair_id": "cc7b1023833eb060",
       "hint": "author_leak",
-      "verdict": "PENDING",
-      "owner_note": ""
+      "verdict": "MERGE",
+      "owner_note": "",
+      "ruling_source": "row"
     },
     {
       "a_id": "ac839d447627ab79",
@@ -646,8 +689,9 @@
       "max_similarity": 0.6667,
       "pair_id": "947bcb11ab9a112a",
       "hint": "noise_suffix",
-      "verdict": "PENDING",
-      "owner_note": ""
+      "verdict": "MERGE",
+      "owner_note": "",
+      "ruling_source": "row"
     },
     {
       "a_id": "e38e14fd1487a10d",
@@ -660,8 +704,9 @@
       "max_similarity": 0.6667,
       "pair_id": "93acbf3e9de1318e",
       "hint": "subtitle_or_edition",
-      "verdict": "PENDING",
-      "owner_note": ""
+      "verdict": "MERGE",
+      "owner_note": "",
+      "ruling_source": "row"
     },
     {
       "a_id": "cc6280f2cd05b823",
@@ -674,8 +719,9 @@
       "max_similarity": 0.6607,
       "pair_id": "542f9b581dfccf15",
       "hint": "review",
-      "verdict": "PENDING",
-      "owner_note": ""
+      "verdict": "KEEP_SEPARATE",
+      "owner_note": "",
+      "ruling_source": "row"
     },
     {
       "a_id": "acae6d83e5f38e9e",
@@ -688,8 +734,9 @@
       "max_similarity": 0.6566,
       "pair_id": "2a2bfcbe6c052c45",
       "hint": "noise_suffix",
-      "verdict": "PENDING",
-      "owner_note": ""
+      "verdict": "MERGE",
+      "owner_note": "",
+      "ruling_source": "row"
     },
     {
       "a_id": "8e0a6ee7e4597cdc",
@@ -702,8 +749,9 @@
       "max_similarity": 0.6491,
       "pair_id": "395ecab12c76e0a0",
       "hint": "subtitle_or_edition",
-      "verdict": "PENDING",
-      "owner_note": ""
+      "verdict": "MERGE",
+      "owner_note": "",
+      "ruling_source": "row"
     },
     {
       "a_id": "c7c8ac54d033a233",
@@ -716,8 +764,9 @@
       "max_similarity": 0.641,
       "pair_id": "7ac001822b1fe508",
       "hint": "noise_suffix",
-      "verdict": "PENDING",
-      "owner_note": ""
+      "verdict": "MERGE",
+      "owner_note": "",
+      "ruling_source": "row"
     },
     {
       "a_id": "58a0e7dc52f47999",
@@ -730,8 +779,9 @@
       "max_similarity": 0.6331,
       "pair_id": "7fd11d3a30e84b28",
       "hint": "author_leak",
-      "verdict": "PENDING",
-      "owner_note": ""
+      "verdict": "MERGE",
+      "owner_note": "",
+      "ruling_source": "row"
     },
     {
       "a_id": "69d6ee2d73f2525b",
@@ -744,8 +794,9 @@
       "max_similarity": 0.6318,
       "pair_id": "f0516dcee96848e9",
       "hint": "subtitle_or_edition",
-      "verdict": "PENDING",
-      "owner_note": ""
+      "verdict": "MERGE",
+      "owner_note": "",
+      "ruling_source": "row"
     },
     {
       "a_id": "5f50fc481e0aaadb",
@@ -759,8 +810,9 @@
       "max_similarity": 0.6313,
       "pair_id": "03898151f8617e9f",
       "hint": "review",
-      "verdict": "PENDING",
-      "owner_note": ""
+      "verdict": "MERGE",
+      "owner_note": "",
+      "ruling_source": "row"
     },
     {
       "a_id": "265a59860aab522d",
@@ -774,8 +826,9 @@
       "max_similarity": 0.625,
       "pair_id": "3903456c33fc0063",
       "hint": "subtitle_or_edition",
-      "verdict": "PENDING",
-      "owner_note": ""
+      "verdict": "MERGE",
+      "owner_note": "",
+      "ruling_source": "row"
     },
     {
       "a_id": "dd0b4ab4338a47af",
@@ -788,8 +841,9 @@
       "max_similarity": 0.6129,
       "pair_id": "f621222bfafc3f28",
       "hint": "review",
-      "verdict": "PENDING",
-      "owner_note": ""
+      "verdict": "KEEP_SEPARATE",
+      "owner_note": "",
+      "ruling_source": "row"
     },
     {
       "a_id": "502bf84fc594cd01",
@@ -802,8 +856,9 @@
       "max_similarity": 0.6109,
       "pair_id": "11c08a51d51ecc94",
       "hint": "author_leak",
-      "verdict": "PENDING",
-      "owner_note": ""
+      "verdict": "MERGE",
+      "owner_note": "",
+      "ruling_source": "row"
     },
     {
       "a_id": "f88bc17efa5062c8",
@@ -816,8 +871,9 @@
       "max_similarity": 0.5841,
       "pair_id": "833b7b704cd98478",
       "hint": "review",
-      "verdict": "PENDING",
-      "owner_note": ""
+      "verdict": "MERGE",
+      "owner_note": "",
+      "ruling_source": "row"
     },
     {
       "a_id": "fb14eceea1857e00",
@@ -830,8 +886,9 @@
       "max_similarity": 0.5714,
       "pair_id": "ad02046ad2461eff",
       "hint": "subtitle_or_edition",
-      "verdict": "PENDING",
-      "owner_note": ""
+      "verdict": "KEEP_SEPARATE",
+      "owner_note": "",
+      "ruling_source": "row"
     },
     {
       "a_id": "f566bc18cd0c4478",
@@ -844,8 +901,9 @@
       "max_similarity": 0.52,
       "pair_id": "ba9c8d7a5827ff67",
       "hint": "subtitle_or_edition",
-      "verdict": "PENDING",
-      "owner_note": ""
+      "verdict": "MERGE",
+      "owner_note": "",
+      "ruling_source": "row"
     },
     {
       "a_id": "ec757000bb6be330",
@@ -858,8 +916,11 @@
       "max_similarity": 0.5114,
       "pair_id": "a72c11523c0f32db",
       "hint": "subtitle_or_edition",
-      "verdict": "PENDING",
-      "owner_note": ""
+      "verdict": "MERGE",
+      "owner_note": "",
+      "ruling_source": "row"
     }
-  ]
+  ],
+  "adjudicated_at": "2026-10-14T20:45:21Z",
+  "adjudicated_from": "config/owner_marks.yaml#tiers (owner signatures) + governance/duplicate_adjudication_review.csv#owner_verdict"
 }

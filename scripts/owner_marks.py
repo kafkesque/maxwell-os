@@ -52,6 +52,7 @@ USAGE
 from __future__ import annotations
 
 import argparse
+import copy
 import csv
 import hashlib
 import io
@@ -668,6 +669,28 @@ def ledger_state(policy: dict[str, Any]) -> dict[str, Any]:
 
 TIER_ID_LINE: re.Pattern[str] = re.compile(r"^(\s*)-\s*id:\s*(\S+)\s*$")
 SIGNED_LINE: re.Pattern[str] = re.compile(r"^(\s*)signed:\s*(\S.*)$")
+
+
+def unsigned_fixture(text: str) -> str:
+    """The control's OWN pre-image: the same declaration with every signature REMOVED (BUG-788).
+
+    WHY THIS EXISTS. The signer's controls copied the LIVE declaration and then asserted the copy was
+    otherwise unsigned. That made a known-answer control a function of how far the OWNER had got: on
+    2026-10-14 the act COMPLETED, `sign_tiers` correctly REFUSED the re-sign (D-2676), the control went red -
+    and because a red baseline masks every mutation in the file ("the oracle's BASELINE is not green"),
+    `scripts/check_rail_mutations.py` could no longer see any of its own teeth. The same shape as BUG-556
+    (a rail whose INPUT is mutated by the ladder), one layer up: here the OWNER is the mutator.
+    The SIGNER is the subject of these controls; the state of the owner's act is NOT. PURE, so that the
+    fixture's independence is itself provable by a control that can be seen to red.
+    """
+    out: list[str] = []
+    for line in text.splitlines(keepends=True):
+        hit = SIGNED_LINE.match(line)
+        if hit and hit.group(2).strip() not in ("null", "~"):
+            out.append(f"{hit.group(1)}signed: null\n")
+        else:
+            out.append(line)
+    return "".join(out)
 DATE_LINE: re.Pattern[str] = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
 
@@ -929,6 +952,7 @@ CONTROL_LABELS: tuple[str, ...] = (
     "an_unknown_tier_id_is_refused_never_guessed",
     "a_tier_that_names_no_word_is_never_signed",
     "a_write_never_blanks_a_hand_typed_cell",
+    "a_control_fixture_is_unsigned_whatever_the_live_declaration_says",
 )
 
 
@@ -1052,21 +1076,35 @@ def selftest() -> int:
     tmp3 = Path(tempfile.mkdtemp(prefix="owner_marks_sign_"))
     try:
         sign_target = tmp3 / "owner_marks.yaml"
-        sign_target.write_bytes((ROOT / CONFIG_REL).read_bytes())
+        # BUG-788: THE FIXTURE IS THE CONTROL'S OWN PRE-IMAGE, NEVER A COPY OF THE LIVE ACT. Signed tiers in
+        # the live declaration made this control a function of the owner's progress: the completed act made
+        # sign_tiers refuse (correctly) and turned the control - and with it the whole mutation gate - red.
+        sign_target.write_text(unsigned_fixture((ROOT / CONFIG_REL).read_text(encoding="utf-8")), encoding="utf-8")
+        fixture_policy = copy.deepcopy(policy)
+        for tier in fixture_policy.get("tiers", []):
+            tier["signed"] = None          # the policy the signer is handed must agree with the fixture it writes
         signed_ok = True
         try:
             with redirect_stdout(io.StringIO()):   # a control is not an act: keep the mode's own report quiet
-                sign_tiers(policy, ["A"], "2026-10-14", path=sign_target, take_backup=False)
+                sign_tiers(fixture_policy, ["A"], "2026-10-14", path=sign_target, take_backup=False)
         except OwnerMarksError:
             signed_ok = False
         after = yaml.safe_load(sign_target.read_text(encoding="utf-8")) or {}
         got = {str(t["id"]): str(t.get("signed") or "") for t in after.get("tiers", [])}
+        # a RE-SIGN is refused (D-2676): the same tier signed twice is a deliberate act, never a silent overwrite
+        resign_refused = False
+        try:
+            with redirect_stdout(io.StringIO()):
+                sign_tiers(fixture_policy, ["A"], "2026-10-15", path=sign_target, take_backup=False)
+        except OwnerMarksError:
+            resign_refused = True
         control(CONTROL_LABELS[9],
-                signed_ok and got.get("A") == "2026-10-14" and not any(v for k, v in got.items() if k != "A"))
+                signed_ok and resign_refused and got.get("A") == "2026-10-14"
+                and not any(v for k, v in got.items() if k != "A"))
         unknown_refused = False
         try:
             with redirect_stdout(io.StringIO()):
-                sign_tiers(policy, ["Z-NOT-A-TIER"], "2026-10-14", path=sign_target, take_backup=False)
+                sign_tiers(fixture_policy, ["Z-NOT-A-TIER"], "2026-10-14", path=sign_target, take_backup=False)
         except OwnerMarksError:
             unknown_refused = True
         still_one = yaml.safe_load(sign_target.read_text(encoding="utf-8")) or {}
@@ -1077,7 +1115,7 @@ def selftest() -> int:
         noword_refused = False
         try:
             with redirect_stdout(io.StringIO()):
-                sign_tiers(policy, ["L-C"], "2026-10-14", path=sign_target, take_backup=False)
+                sign_tiers(fixture_policy, ["L-C"], "2026-10-14", path=sign_target, take_backup=False)
         except OwnerMarksError:
             noword_refused = True
         control(CONTROL_LABELS[11], noword_refused)
@@ -1111,6 +1149,12 @@ def selftest() -> int:
                 refused and accepted and len(hand_typed_cells(policy, cfg4, blanked)) == 1)
     finally:
         shutil.rmtree(tmp4, ignore_errors=True)
+
+    # BUG-788: the fixture's INDEPENDENCE is itself a known answer, and it is PURE - so it can be seen to
+    # red at a mutation, which is exactly what the state-dependent version of this control could never be.
+    marked = "  - id: A\n    word: X\n    signed: '2026-10-14'\n  - id: B\n    word: Y\n    signed: null\n"
+    expected = "  - id: A\n    word: X\n    signed: null\n  - id: B\n    word: Y\n    signed: null\n"
+    control(CONTROL_LABELS[13], unsigned_fixture(marked) == expected)
 
     for label in CONTROL_LABELS:
         print(f"   {'PASS' if label not in failures else 'FAIL'} {label}")

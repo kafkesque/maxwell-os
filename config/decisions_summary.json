@@ -1,13 +1,13 @@
 {
   "schema_version": "1.0",
   "source_path": "config/decisions.yaml",
-  "source_sha256": "bec335764bf75f4514cd051292fcf644aac741b6af0c6d59858323137d21a906",
+  "source_sha256": "ed47950ec8a932f05edce63d681fee2748bdfdca22f6e4498310145ccb1ff78b",
   "written_by": "scripts/recompute_decision_summary.py",
-  "decisions_sha256_16": "43b48a9893479d4a",
-  "total_decisions": 1127,
+  "decisions_sha256_16": "734b3a63d6101a40",
+  "total_decisions": 1128,
   "summary": {
-    "total": 1127,
-    "proposed": 14,
+    "total": 1128,
+    "proposed": 15,
     "draft": 1,
     "active": 565,
     "stale": 0,
@@ -22,6 +22,7 @@
     "revoked": 0,
     "abandoned": 0,
     "by_category": {
+      "AGENT HARNESS / CONTEXT & PREFIX CACHE": 1,
       "AGENT HARNESS / DETERMINISM": 1,
       "ANCHOR / BRIDGE": 1,
       "ANCHOR / GOLDEN / ROUTING": 4,

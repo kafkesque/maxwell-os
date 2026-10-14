@@ -26,7 +26,10 @@ fixture:
   # MEASURED 2026-09-27: recompute_decision_summary.py --selftest checks its own bug citations against the
   # register, so it reads governance/bug_status.json; while the fixture did not carry it, EVERY baseline of that
   # runner was red and the gate reported the MUTATION as the fault. A declared input that EXISTS is the point.
-  include_files: [scripts/ingest_relabel_rulings.py, scripts/reanchor_retrieval_goldens.py, justfile, governance/bug_status.json, pipeline/feedback.py, pipeline/pipeline_paths.py, scripts/reanchor_retrieval_goldens.py, config/pipeline_config.yaml, maxwell_mcp_server.py, pipeline/corroboration.py, pipeline/stage6_okf_export.py, pipeline/stage6b_anytype_push.py, pipeline/ingest_gate.py, pipeline/book_metadata.py, pipeline/io_guard.py, pipeline/stamp.py]
+  include_files: [scripts/ingest_relabel_rulings.py, scripts/reanchor_retrieval_goldens.py, justfile, governance/bug_status.json, pipeline/feedback.py, pipeline/pipeline_paths.py, scripts/reanchor_retrieval_goldens.py, config/pipeline_config.yaml, maxwell_mcp_server.py, pipeline/corroboration.py, pipeline/stage6_okf_export.py, pipeline/stage6b_anytype_push.py, pipeline/ingest_gate.py, pipeline/book_metadata.py, pipeline/io_guard.py, pipeline/stamp.py, scripts/agent_context_probe.py]
+  # ^ MEASURED 2026-10-14 (T-132/D-3000): the probe is its OWN subject and its own runner, and it reads
+  #   config/agent_context.yaml (carried by include_dirs config/) - so without this line every one of its
+  #   four mutations would report "the oracle's BASELINE is not green", blaming a MUTATION for a fixture gap.
   # ^ MEASURED 2026-10-14 (BUG-786 sweep): the new word-PROVENANCE guard's subject is pipeline/ingest_gate.py and
   #   its runner (scripts/check_ingest_identity_gate.py --selftest) imports it, so the fixture must carry the module
   #   AND the modules IT imports (book_metadata = the identity home, io_guard, stamp) plus its own config/ (carried by
@@ -1049,3 +1052,96 @@ mutations:
       config says single - i.e. the RULER's meaning changes with no decision, which is exactly the failure an
       inferred mode is (a ruler whose meaning depends on the data it measured). The control names the refusal, so
       the day the multiplicity stops being enforced the gate says so.
+
+  - id: a_control_fixture_may_carry_the_live_act_into_the_signer
+    subject: scripts/owner_marks.py
+    op: replace
+    find: '        if hit and hit.group(2).strip() not in ("null", "~"):'
+    replace: '        if False:  # MUTATION (D-2679): the fixture keeps whatever the live act says'
+    runner: scripts/owner_marks.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: '   FAIL a_control_fixture_is_unsigned_whatever_the_live_declaration_says'
+    why: >-
+      BUG-788 (MEASURED 2026-10-14, the day the collapse act COMPLETED): the signer's controls copied the LIVE
+      declaration and asserted the copy was otherwise unsigned, so a completed owner act - which makes sign_tiers
+      correctly REFUSE a re-sign (D-2676) - turned a known-answer control red, and a red baseline masks EVERY
+      mutation in the file ("the oracle's BASELINE is not green"). That is BUG-556's shape with the OWNER as the
+      mutator: the rail's input was the ladder's own state. The fix is a PURE pre-image (unsigned_fixture) and
+      this mutation proves it: with the reset inert the fixture carries the live act's signatures, so a control
+      that asserts "A signed, nothing else" reds. The subject is the SIGNER, never how far the owner has got.
+
+
+  - id: the_trigger_may_ignore_the_cloud_cap
+    subject: scripts/agent_context_probe.py
+    op: replace
+    find: '    return int(min(threshold * window, cap))'
+    replace: '    return int(threshold * window)  # MUTATION (D-2679): the cap stops binding'
+    runner: scripts/agent_context_probe.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: '   FAIL a_cap_below_the_percentage_binds'
+    why: >-
+      D-3000: the trigger is the EARLIER of the percentage and the cap, and the cap's default is a CLOUD price
+      tier (225000, "headroom below OpenAI's long-context tier"). On the local 32k models the percentage binds
+      and the cap is invisible, so the two are indistinguishable there - which is exactly why the cap needs its
+      own control: a run whose window is large enough for the cap to bind is a run where a cloud artifact decides
+      when a LOCAL session compacts (C1/C22). With the min() gone the cap silently stops governing and the
+      declared 200000 case returns 209715. The control names the case, so the day the cap stops binding the rail
+      says so instead of the setting drifting.
+
+  - id: a_served_window_below_the_declaration_may_read_as_parity
+    subject: scripts/agent_context_probe.py
+    op: replace
+    find: '        elif s < d:'
+    replace: '        elif False:  # MUTATION (D-2679): a served window below the declaration reads as its opposite'
+    runner: scripts/agent_context_probe.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: '   FAIL a_served_window_below_the_declaration_is_a_truncation_risk'
+    why: >-
+      D-3000: the TWO directions of a window mismatch fail differently and only one of them is loud. A served
+      window BELOW the declaration is a TRUNCATION RISK - the harness builds a prompt the server cannot attend
+      to, and the server answers anyway. With this branch inert the model falls through to the opposite verdict,
+      so the dangerous direction is reported as the merely wasteful one (a window thrown away). The control names
+      the dangerous direction, and that asymmetry is the reason it cannot share a control with its twin.
+
+  - id: an_absent_cache_field_may_read_as_a_measured_zero
+    subject: scripts/agent_context_probe.py
+    op: replace
+    find: '            verdict = "unknown_not_zero" if carried == 0 else "inconclusive"'
+    replace: '            verdict = "measured" if carried == 0 else "inconclusive"  # MUTATION (D-2679)'
+    runner: scripts/agent_context_probe.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: '   FAIL a_zero_cache_read_with_no_ratio_is_unknown_never_zero'
+    why: >-
+      D-2957: ABSENT IS NOT ZERO, and this is the exact column where the confusion is expensive. A cache-read
+      ratio is evidence of prefix REUSE; a field that carries no value is evidence of nothing, and a fabricated 0
+      is BUG-767's defect class wearing a measurement's name (a boolean dressed as a ratio). The guard counts the
+      rows that CARRY the field and refuses a ratio below the declared minimum, so an unproven cache is reported
+      as unproven. With the guard inert, silence reads as "the cache is broken" and a real measurement is
+      replaced by a claim.
+
+  - id: the_self_scan_may_read_the_control_data
+    subject: scripts/agent_context_probe.py
+    op: replace
+    find: '    return Path(__file__).read_text().split(REPORT_PATH_MARKER, 1)[0]'
+    replace: '    return Path(__file__).read_text().split(REPORT_PATH_MARKER, 1)[-1]  # MUTATION (D-2679): the scan reads control data'
+    runner: scripts/agent_context_probe.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: '   FAIL the_report_path_names_no_baseline_number_the_declaration_owns'
+    why: >-
+      C12: the C12 self-scan only means something if it reads the part of the file that can REACH A READER. The
+      split is the whole guard: above the marker is the report path (which may name no path, host or baseline
+      number), below it is control data (a known answer is ALLOWED to name the baseline - that is what makes it
+      a known answer). Invert the split and the scan reads the control data, so it fails for a reason that has
+      nothing to do with the report path - a control that reds for the wrong reason is a control nobody can
+      trust when it stays green.
+

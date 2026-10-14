@@ -13,21 +13,21 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1127 decisions (census stamp 43b48a9893479d4a, 2026-10-14) · 551 bugs (196 open / 355 closed; highest OPEN = BUG-781) · 25 open tasks (MUST 8 / SHOULD 14 / WORTH 3; OWNER-moved 3, pipeline-moved 22; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1128 decisions (census stamp 734b3a63d6101a40, 2026-10-14) · 554 bugs (198 open / 356 closed; highest OPEN = BUG-790) · 26 open tasks (MUST 8 / SHOULD 15 / WORTH 3; OWNER-moved 3, pipeline-moved 23; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **67** of 1127 — 🔴 open 32 · 🔵 proposed 14 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 565 · ⚖ ratified 135 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1127, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **68** of 1128 — 🔴 open 32 · 🔵 proposed 15 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 565 · ⚖ ratified 135 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1128, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 196 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 31 · 🟨 MED 41 · 🟩 LOW 19 · UNLABELLED 101 (BUG-757) of 196 open.
+> Open BUGS by severity (population = the census's 198 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 31 · 🟨 MED 42 · 🟩 LOW 20 · UNLABELLED 101 (BUG-757) of 198 open.
 >
 > **OWNER LANE (3) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
-> | T-129 | 🔴 MUST | WORK IDENTITY COLLAPSE — collapse the duplicate works at the IDENTITY layer, so a row stops advertising a corr | ONE COMMAND REMAINS - and the ledger half is CLOSED by the owner's han |
-> | T-130 | 🔴 MUST | THE INGEST DOOR — the identity guarantee becomes an ENFORCEMENT POINT (delta-scoped), so a duplicate work cann | SAME ONE ACT as T-129 (one act, two vocabularies; mapping declared in  |
+> | T-130 | 🔴 MUST | THE INGEST DOOR — the identity guarantee becomes an ENFORCEMENT POINT (delta-scoped), so a duplicate work cann | THE DOOR NOW READS A DECLARED WORD, AND ITS rc 2 NAMES THE ONE DEBT TH |
 > | T-131 | 🟠 SHOULD | THE MODEL-SWAP BENCH — no role is re-pointed to a newer model family without a declared, preflighted slot | mover = owner for the SLOT (which role, which model, what it may evict |
+> | T-132 | 🟠 SHOULD | THE HARNESS CONTEXT CONTRACT — the four layers between a local model's served window and the words an agent se | YOUR WORD decides the two things an agent must never choose, and then  |
 >
-> **PIPELINE LANE (22) — what the agent will do next, in strategic-consequential order (source: config/task_register.yaml):**
+> **PIPELINE LANE (23) — what the agent will do next, in strategic-consequential order (source: config/task_register.yaml):**
 >
 > | id | pri | state | task | evidence |
 > |---|---|---|---|---|
@@ -37,12 +37,12 @@
 > | T-120 | 🔴 MUST | 🔴 open | the ABSORPTION path - a later independent source must be able to RAISE an existing row's corroboration, and a  | MEASURED 2026-10-13 (read-only, by reading the write path and the identity model - no stor |
 > | T-122 | 🔴 MUST | 🔴 open | the classification_status REPAIR (owner word keep-and-repair) - a store column that says CLEAN on a QUARANTINE | config/served_fields.yaml#declared[classification_status] (word keep-and-repair, granted 2 |
 > | T-124 | 🔴 MUST | 🔴 open | the RED ladder (BUG-777 + BUG-778): the anchor-bridge ambiguity policy is owed first, then the masked 68-rail  | governance/buglog.md BUG-777 + BUG-778 (2026-10-14; both entries carry the verbatim measur |
+> | T-129 | 🔴 MUST | 🔴 open | WORK IDENTITY COLLAPSE — collapse the duplicate works at the IDENTITY layer, so a row stops advertising a corr | MEASURED 2026-10-14 read-only (governance/WORK_IDENTITY_COLLAPSE_20261014.md): 84 collapsi |
 > | T-105 | 🟠 SHOULD | 🔴 open | REA tier A/B mining — DEVONthink 3 (related-document ranking) and Cursor (derived code index) | governance/NOT-YET-EVALUATED-RESEARCH.md (REA targets logged 2026-10-13) |
 > | T-106 | 🟠 SHOULD | 🔴 open | ROADMAP — MODULARITY (C21 swappable infrastructure) and CROSS-OS COMPATIBILITY (C26) | protocols: pipeline/storage/base.py only; no cross-OS smoke exists (2026-10-13) |
 > | T-108 | 🟠 SHOULD | 🔴 open | BUG-712 / BUG-714 — the content_type residual and the harness-facing primitive | served run content_type census (2026-10-13) |
 > | T-112 | 🟠 SHOULD | 🔴 open | PERF - the SERVED path loads the cross-encoder per PROCESS, so short-lived callers pay a cold-start of minutes | suite rail runtime 100-200s -> >210s after the dispatcher became the CLI default (2026-10- |
 > | T-113 | 🟠 SHOULD | 🔴 open | PAY THE BASELINE the honest instrument REVEALED - the 71 keys behind block aliases, module by module, each wit | config/config_defaults_census.json after D-2982: 300 shadowed-declared keys / 568 sites (2 |
-> | T-114 | 🟠 SHOULD | 🔴 open | DISCHARGE THE INHERITED LADDER FAULTS - ONE owes real work now (the undeclared-encoding campaign) and ONE was  | just health-full 2026-10-13: 7 faults / 128 lines; each rc=1 at 42f8b76^ (worktree). RE-ME |
 >
 > **STANDING RULES — in effect, never close (1):**
 >
@@ -4808,3 +4808,29 @@ The ruling is declared in config/anchor_family.yaml#store_bridge.resolution and 
 scripts/build_anchor_store_bridge.py. It converts a MASKED ambiguity into a MEASURED one, and it matches the position the
 owner's own signed sheet already takes at the other end of the same surface: 19 of 150 cells are `ambiguous` ABSTENTIONS,
 excluded from the expected sets and COUNTED (D-2991).
+
+## D-3000 PROPOSED (2026-10-14) - The harness context contract: window parity is an invariant, the compaction trigger is derived from the SERVED window, and a cache reading is never a fabricated zero
+
+**State:** PROPOSED (the declarations change nothing; the routing choice and the two environment values are the
+owner's act). **Authority:** `config/agent_context.yaml`. **Reading:** `scripts/agent_context_probe.py`
+(12 known-answer controls, 4 mutations, rc 2 on drift, read-only).
+
+**Why.** MEASURED 2026-10-14: the local agent loop compacts at 26,214 tokens (0.8 x 32768) while this machine
+already SERVES 131,072 and 262,144 to two other models, and every compaction rewrites the prompt so the next
+turn pays a full cold re-prefill - which is why a local agent loop feels slow (prefill, not decode). The harness's
+own ledger proves the harness measures prefix reuse (96% of cloud input tokens are cache reads, 37.4% locally on
+the reviewer model) and nothing measured an agent loop's window at all.
+
+**The four layers.** served_window (server) -> declaration (harness) -> trigger (compaction) -> cache_ledger
+(the harness's own measurement). A mismatch between any two is a fault, and today every mismatch is silent: a
+served window below the declaration is a TRUNCATION RISK, the reverse is a WASTED WINDOW, and a missing side is
+UNVERIFIABLE. Six such drifts are measured right now.
+
+**The rules.** (1) parity is an invariant with two separately-named failure directions; (2) the trigger is
+derived from the SERVED window, and a CLOUD price-tier cap may not govern a local run (C1/C22); (3) a cache
+reading is evidence only over rows that CARRY the field, and the only certification of reuse is a two-call A/B
+(D-2957: absent is not zero); (4) the prompt prefix is byte-stable and only the tail may change - a compaction is
+a cache bomb, a per-turn injection at the head is a miss every turn. Routing is by declared WINDOW CLASS.
+
+**Not this decision.** No harness setting is rewritten here, no model is re-pointed (that is T-131's bench), and
+no cache ratio is published as a measurement until the A/B is run.

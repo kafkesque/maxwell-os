@@ -10,21 +10,30 @@
 # SAME work, count as two. T-119 asks how deep that collapse goes, and is explicitly required to be
 # able to answer "NO FINDING" - a measurement that cannot say "no finding" is not a measurement.
 #
-# TWO LIMBS, ONE OF WHICH IS BLOCKED (the step-0 finding, 2026-10-14):
-#   limb_identity  - author/domain collapse. COMPUTABLE NOW, read-only, from the committed store:
+# THREE LIMBS. The 2026-10-14 correction matters more than the numbers it produced: the limb that was
+# reported BLOCKED probed for persisted EMBEDDINGS, while the artifact it actually needs is the
+# segment TEXT - which the S1 chunk store persists (730 MB). The limb was never blocked; it was
+# looking in the wrong place. The lesson is recorded in the rule rather than in a commit message:
+#   limb_identity  - author/domain collapse. COMPUTABLE, read-only, from the committed store:
 #                    `source_books` -> isor_score() (D2284/D2309). ONE HOME: the rail IMPORTS
 #                    pipeline.schema_accessor.isor_score, it does NOT reimplement it (D-2646).
-#   limb_semantic  - `n_voices` = |clusters of the row's source_segments by embedding similarity|.
-#                    BLOCKED: the S1.5 index does NOT persist its embeddings (no .index, no .npy,
-#                    no embeddings_cache survives in stage1_5_embed_cluster/<run>/). The rail PROBES
-#                    for them and reports `blocked` - it must NEVER silently report 0 voices, because
-#                    a fabricated 0 is the exact defect (BUG-767) this whole line of work retired.
-#                    Unblocking is a DECISION (persist the index, or accept a re-embed pass), not an edit.
-schema_version: '1'
+#   limb_voice     - `n_voices` by a LEXICAL screen over the row's OWN segment texts: identical
+#                    normalised text, or bottom-k shingle containment at/above the declared bar.
+#                    COMPUTABLE (--voice), $0, local CPU, no model. It can CERTIFY a collapse and can
+#                    NEVER certify independence (paraphrase/translation are invisible to it), so its
+#                    result is a LOWER BOUND.
+#   limb_semantic  - the EMBEDDING/NLI refinement that would cover the paraphrase class. Declared as
+#                    the RESIDUAL: the S1.5 index persists no embeddings (no .index, no .npy, no
+#                    embeddings_cache survives), so the rail PROBES and reports `blocked` - never 0,
+#                    because ABSENT IS NOT ZERO (D-2957) and a fabricated 0 is precisely BUG-767.
+#                    Unblocking (persist the index / accept a re-embed pass) is a DECISION, not an
+#                    edit - and since limb_voice answered the question at $0 it is now OPTIONAL.
+schema_version: '2'
 authority: T-119
-decisions: [D-2990, D2284, D2309, D-2993, D-2994]
-subjects: [T-119, T-120]
+decisions: [D-2990, D2284, D2309, D-2993, D-2994, D-2996]
+subjects: [T-119, T-120, T-129]
 assessment: governance/BORP_REVITALIZATION_RISK_20261013.md   # §4 numbers, §8 the plan + falsifier
+finding: governance/WORK_IDENTITY_COLLAPSE_20261014.md          # limb_voice measured 2026-10-14 (BUG-780)
 
 #: The population the claim is about. DECLARED (stated, not implied) so the measured number always
 #: carries its denominator (BUG-588/D-2692: a count has ONE home - this file).
@@ -37,6 +46,10 @@ population:
     collapse. Measured 2026-10-14: 1,393 of 7,640 committed rows.
   source_books_field: source_books          # the isor input; read through the schema accessor
   domains_field: domains
+  status_field: status                      # the served/not-served axis, for the cross-tab
+  served_value: PASS
+  epistemic_field: epistemic_status         # the ADVERTISED corroboration claim, for the cross-tab
+  advertised_value: corroborated
 
 #: The FALSIFIER travels with the number. If the collapsed share is indistinguishable from zero, the
 #: count is NOT contaminated in THIS corpus, the hardening is documentation only, and the rail says
@@ -55,14 +68,57 @@ falsifier:
     population is genuinely multi-voice and the collapse is not a live defect in this corpus.
     FINDING (rc=0) when either control falls below its bar; the rail then reports the collapsed share.
 
-#: What the semantic limb needs in order to exist. Probed, never assumed: a missing artifact is
-#: reported as `blocked`, which is a DIFFERENT state from `0 voices` (D-2957: absent is not zero).
+#: limb_voice - the LEXICAL screen. Every constant is declared here (C12): the normalisation, the
+#: shingle size, the sketch width, the boilerplate screen and the collapse bar. `unblock_is: none`
+#: is deliberate: the measurement needs no owner word, no model and no new artifact.
+lexical_limb:
+  enabled_by: "--voice"                       # it streams ~730 MB, so it is OPT-IN rather than default
+  corpus: stage1_chunk_store                  # THE artifact the blocked probe did not check
+  segment_store_from: stage1.checkpoint       # one home: config stage_files.checkpoint under S1_DIR/CANONICAL_RUN
+  normalize: alphanumeric_lowercase_single_space
+  shingle_words: 5
+  sketch_width: 48
+  min_words_per_side: 120                     # boilerplate screen: a short side is not a shared voice
+  collapse_at_or_above: 0.80
+  certain_class: identical_normalised_text    # no threshold involved at all
+  unblock_is: none
+  #: MEASURED 2026-10-14 (read-only, ZERO store writes, ~1 min local CPU, no model). Declared here
+  #: because this file is the census's ONE home for these counts.
+  measured:
+    date: '2026-10-14'
+    rows_tested: 1393
+    pairs_at_bar: 84
+    pairs_identical_text: 37
+    groups: 72
+    largest_group: 3
+    rows_collapsed: 530
+    collapsed_share: 0.3805
+    rows_collapsed_at_090: 351
+    rows_collapsed_at_095: 284
+    served_rows_collapsed: 369
+    served_rows_total: 938
+    advertised_corroborated_collapsed: 134
+    advertised_corroborated_total: 257
+    isor_strong_or_medium_among_collapsed: 205
+    review_sheet: governance/work_identity_collapse_review_20261014.csv
+  scope: >-
+    LEXICAL ONLY. It can CERTIFY a collapse (identical or near-identical text is one voice) and can
+    NEVER certify independence: paraphrase, translation and heavy editing are invisible, so every
+    number above is a LOWER BOUND and not a clearance.
+  residual: >-
+    The paraphrase/translation class stays with limb_semantic (embeddings + NLI). It is declared, not
+    blocking: the question this task asked was answered lexically at $0.
+
+#: limb_semantic - the residual probe. Probed, never assumed: a missing artifact is reported as
+#: `blocked`, which is a DIFFERENT state from `0 voices` (D-2957: absent is not zero).
 semantic_limb:
   probe_globs: ["**/*.index", "**/*.npy", "**/embeddings_cache/*"]
   probe_roots: ["knowledge pipeline/stage1_5_embed_cluster"]
   similarity_threshold_from: stage1_5.faiss_threshold   # D288: reuse the DECLARED cosine bar, invent none
   min_voices_to_clear: 2
   unblock_is: decision    # persisting the index (or a re-embed pass) is owner-gated, not an edit
+  superseded_role: >-
+    No longer the limb that answers T-119. It is the declared residual for the paraphrase class only.
 
 #: Rail behaviour. `census_one_home` keeps this file the single home of the measured counts.
 rail:

@@ -8,19 +8,20 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1123 decisions (census stamp 80c0ee779942890e, 2026-10-14) · 543 bugs (194 open / 349 closed; highest OPEN = BUG-778) · 23 open tasks (MUST 7 / SHOULD 13 / WORTH 3; OWNER-moved 4, pipeline-moved 19; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1124 decisions (census stamp 6751313b4b68da8a, 2026-10-14) · 544 bugs (195 open / 349 closed; highest OPEN = BUG-780) · 24 open tasks (MUST 8 / SHOULD 13 / WORTH 3; OWNER-moved 5, pipeline-moved 19; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **67** of 1123 — 🔴 open 32 · 🔵 proposed 14 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 565 · ⚖ ratified 133 | closed: ✅ resolved 323 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1123, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **67** of 1124 — 🔴 open 32 · 🔵 proposed 14 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 565 · ⚖ ratified 133 | closed: ✅ resolved 324 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1124, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 194 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 29 · 🟨 MED 41 · 🟩 LOW 19 · UNLABELLED 101 (BUG-757) of 194 open.
+> Open BUGS by severity (population = the census's 195 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 30 · 🟨 MED 41 · 🟩 LOW 19 · UNLABELLED 101 (BUG-757) of 195 open.
 >
-> **OWNER LANE (4) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
+> **OWNER LANE (5) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
 > | T-101 | 🔴 MUST | HARDEN THE RETRIEVAL GOLDEN SET (the gate is saturated) | one word: set | single (the anchor-set semantics) - then --check, --ap |
 > | T-117 | 🔴 MUST | BUG-749 residual — the ESCALATE surface: the units NO owner ruling reaches | one owner word per unit on the reference sheet (CONFIRM / CORRECT + ho |
 > | T-124 | 🔴 MUST | the RED ladder (BUG-777 + BUG-778): the anchor-bridge ambiguity policy is owed first, then the masked 68-rail  | the ambiguity policy is a RULING (D-2898): a name resolving to N rows  |
+> | T-129 | 🔴 MUST | WORK IDENTITY COLLAPSE — collapse the duplicate works at the IDENTITY layer, so a row stops advertising a corr | one owner word per pair on governance/work_identity_collapse_review_20 |
 > | T-121 | 🟠 SHOULD | the SOURCE KIND axis + per-kind identity - the prerequisite the internet-intake plan does not have | one owner word for the source-kind VOCABULARY (an answer-space decisio |
 >
 > **PIPELINE LANE (19) — what the agent will do next, in strategic-consequential order (source: config/task_register.yaml):**
@@ -73,6 +74,7 @@
 
 | Bug | Date | Issue |
 |---|---|---|
+| BUG-780 | 2026-10-14 | **WORK IDENTITY COLLAPSE — 84 work-pairs are ONE TEXT under TWO NAMES, so 530 "corroborated" rows (369 of them SERVED) are certified by a SINGLE VOICE, and `isor` rates 205 of them strong/medium.** Measured read-only 2026-10-14 over the 1,393 `is_convergent = 1` rows: 84 collapsing pairs at containment ≥0.80 (37 IDENTICAL normalised text, i.e. no threshold at all) forming 72 duplicate-work groups; the dominant shape is one book ingested twice — once by TITLE, once by FILENAME (`Hustle Harder, Hustle Smarter (Curtis 50 Cent…)` vs `Hustle Harder, Hustle Smarter.md`). `isor` is a METADATA measure, so a duplicate under a second name looks independent and rates STRONG — a content-level fact cannot be screened by a metadata-level measure, which is why `tier_policy` currently publishes "convergent: true, independence: strong" about one voice. Not a count defect (raising `min_source_diversity` is risk R2) and not a scoring gap (a duplicate-adjusted scalar would be a fourth home, D-2646): an IDENTITY defect one level below D-2309. FIX: T-129 (collapse the duplicates, then let `check_corroboration_bit` re-prove the population); write-up `governance/WORK_IDENTITY_COLLAPSE_20261014.md`; sheet `governance/work_identity_collapse_review_20261014.csv`. |
 | BUG-773 | 2026-10-13 | **The declared rule “a commit may never rewrite an existing row’s body” (D-2933 rule V, `config/dedup_identity.yaml` → `never_at_commit: true`) is CONTRADICTED by the live write path.** The commit is `INSERT OR REPLACE INTO fbs` on a `fb_id TEXT PRIMARY KEY` seeded by `SHA-256(name + definition)` (`pipeline/stage6_commit.py:764`, `pipeline/schemas.py:175`): a SAME-definition re-read rewrites all 77 columns — the prior reading is destroyed (C6) with no revision — and a one-character definition move FORKS a twin row that nothing reconciles. `content_basis` (the pointer saying which text the body was read from) is a RESERVED NAME WITH NO WRITER, so neither case is invisible-but-recorded; both are simply invisible. FIX: the append-only revision trail + the `content_basis` writer at extraction (D-2992 R2). |
 | BUG-772 | 2026-10-13 | **CORROBORATION is frozen by ONE RUN’s clustering, so a later independent source can NEVER raise an existing row’s tier.** `is_convergent` is written by S1.5 as “at least two distinct canonical sources IN ONE CLUSTER OF ONE RUN” (`pipeline/stage1_5_embed_cluster.py`, D2176) and nothing recomputes it; the dedup instrument groups by `(normalize_name, source_id)` — THE SAME WORK (`pipeline/dedup_identity.py`, D-2950) — so a DIFFERENT work asserting the same claim is invisible to it by construction. The only path that sees the case is a FULL re-run whose segment set holds both works. Consequence: (i) a tier can never RISE; (ii) the first DELTA run — which the media plan makes unavoidable — collapses corroboration SILENTLY and reports it indistinguishably from “nothing to corroborate” (absence by blindness). FIX: T-120 (independence as a DERIVED, re-computable measure). |
 | BUG-768 | 2026-10-13 | **The Book of Record Principle is satisfied by a MINORITY of the SERVED corpus, and the check that would have flagged it was DELETED on the argument that the guarantee had moved upstream — where only ONE of the two admission routes passes.** S5's `check_borp` was removed ("BORP guarantee now provided by S1.5"), but S1.5's >=2-source gate applies to the CLUSTER route only: singletons reach the store with ONE source work and nothing re-asserts the principle per row. MEASURED: 938 of 4,503 `status='PASS'` rows are convergent (20.8%); 5,198 of 6,591 verified rows carry one source. FIX: the per-row measurement on the wire (T-107, `isor`) + an OWNER POLICY word on what may be served as corroborated (T-118). |
@@ -13486,4 +13488,45 @@ f-string is neither. NAMED, not fixed: it is the natural home of the `check_conf
 Evidence: this entry; `pipeline/retrieve.py::_rank_sql` (the one line) + `:1103`/`:1123` (the declared reads);
 `config/feedback.yaml` (the ONE home, and its own header stating the rule);
 `specs/retrieval_serving.spec.md` INV-3.
+
+## BUG-780 (HIGH - OPEN 2026-10-14) - WORK IDENTITY COLLAPSE: 84 work-pairs are ONE TEXT under TWO NAMES, so 530 "corroborated" rows (369 of them SERVED) are certified by a SINGLE VOICE while `isor` rates 205 of them strong/medium
+
+- **Where.** `fbs.source_ids` / `source_books` / `is_convergent`, one level below the D-2309 identity fix. Measured
+  read-only 2026-10-14 over the 1,393 `is_convergent = 1` rows of the canonical run (`rechunk-v4-20260929`, 7,640
+  rows): **84 work-pairs collapse at containment ≥ 0.80, 37 of them IDENTICAL normalised text, forming 72
+  duplicate-work groups** (largest 3). Those pairs certify **530 rows**, of which **369 are SERVED
+  (`status='PASS'`)** and **134 of the store's 257 `epistemic_status='corroborated'` rows** are in the set.
+  Threshold-free class: **184 rows** are identical text, no similarity judgement involved.
+- **Measured (rail + rule, both read-only).** `scripts/check_corroboration_collapse.py --voice` against
+  `config/corroboration_collapse.yaml#lexical_limb`; the method and the worked pairs are in
+  `governance/WORK_IDENTITY_COLLAPSE_20261014.md`. ZERO store writes; ~1 minute of local CPU; no model.
+- **Why it matters.** The store's corroboration claim is FALSE on these rows, and the false half is the half an
+  agent reads: `config/served_fields.yaml#tier_policy` (T-118, granted 2026-10-14) publishes
+  `{sources, convergent, independence, independence_score}` — on 134 collapsed rows that reads "convergent: true,
+  independence: **strong**" about **one voice**. `isor` (author × domain × count) is a METADATA measure, so a book
+  ingested twice under two names rates **strong**; a content-level fact cannot be screened by a metadata-level
+  measure. Distribution among the 530: PASS/source-supported/medium 220 · PASS/corroborated/**strong** 134 ·
+  QUARANTINE/medium 88 · QUARANTINE/**strong** 71 · weak 17.
+- **Why the existing fixes do not cover it (nothing regressed, nothing is contradicted).** D-2309 removed FILENAMES
+  from identity — these two names resolve to two *different* canonical works, so it was necessary and not
+  sufficient. `dedup_identity` groups by `(normalize_name, source_id)` — the SAME WORK — so a second ingest under
+  another name is invisible to it **by construction** (the BUG-772 shape), and `duplicate_of` still has no writer.
+  `check_corroboration_bit` stays GREEN: `is_convergent == |source_ids| >= 2` on 7,640/7,640 — the count is exactly
+  re-derivable AND carries no information about whether the named sources are distinct VOICES. Both facts hold.
+- **The blindspot that hid it (recorded, because it is the reusable lesson).** T-119's semantic limb probed for
+  persisted EMBEDDINGS (`*.index`, `*.npy`, `embeddings_cache/*`), found none, and reported BLOCKED (correctly —
+  absent is not zero, D-2957). The limb needs the segment TEXT, not the vectors, and the S1 chunk store persists it
+  (730 MB, `stage1_chunk/rechunk-v4-20260929/checkpoint.jsonl`); all 148,831 referenced segment ids matched. The
+  limb was never blocked — it was looking in the wrong place.
+- **Fix (declared, owner-gated on the WRITE, D-2898).** Collapse the 84 pairs at the identity layer: 37 are
+  DETERMINISTIC (identical text), 47 need one owner word each. Then re-derive `source_ids`/`source_diversity`/
+  `is_convergent` for the affected rows and let `check_corroboration_bit` re-prove the whole population against its
+  own evidence. Sheet: `governance/work_identity_collapse_review_20261014.csv`; task T-129. Raising
+  `stage1_5.min_source_diversity` is explicitly REFUSED (risk R2, gate regression, would suppress real
+  corroboration with the fake) and no duplicate-adjusted SCALAR may be minted (C12/C20, D-2646).
+- **Scope, stated.** LEXICAL screen: it can CERTIFY a collapse and can never certify independence — paraphrase,
+  translation and heavy editing are invisible to it, so 38.05% is a LOWER BOUND and the embedding+NLI limb stays
+  declared as the residual (no longer a blocker).
+- **Status.** OPEN. Evidence: `governance/WORK_IDENTITY_COLLAPSE_20261014.md`;
+  `config/corroboration_collapse.yaml#lexical_limb`; `governance/work_identity_collapse_review_20261014.csv`.
 

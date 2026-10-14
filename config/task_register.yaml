@@ -410,11 +410,19 @@ tasks:
     1,393-row is_convergent=1 population: 204 carry ONE author, 265 ONE domain, 44 rated weak; p_multi_author
     0.8536 and p_multi_domain 0.8098 against the declared 0.95 bar, so the FALSIFIER DID NOT FIRE. The rail
     IMPORTS pipeline.schema_accessor.isor_score instead of reimplementing it (D-2646: one derived value, one
-    home); its thresholds, population and probe targets live in config/corroboration_collapse.yaml (C12)'
-  gate: 'PARTIAL - limb_identity (author/domain collapse) is MEASURED; limb_semantic (n_voices = |clusters of
-    source_segments by embedding similarity|) is BLOCKED, and config/corroboration_collapse.yaml is the ONE home
-    of that finding. The rail reports BLOCKED, never 0 (D-2957) - a fabricated zero is the BUG-767 defect class.
-    Unblocking is a DECISION (persist the S1.5 index, or accept a re-embed pass), not an edit'
+    home); its thresholds, population and probe targets live in config/corroboration_collapse.yaml (C12).
+    LIMB_VOICE MEASURED 2026-10-14 (the SAME rail, --voice, selftest 8/8, read-only, ZERO store writes, ~1 min
+    local CPU, no model): 84 collapsing work-pairs (37 IDENTICAL normalised text) in 72 duplicate-work groups
+    make 530 of the 1,393 count-corroborated rows ONE VOICE (38.05%; 351 rows at bar 0.90, 217 at 0.99); 369 of
+    them are SERVED and 134 of the store''s 257 advertised-corroborated rows are in the set; isor rates 205 of
+    the 530 strong/medium, so the metadata axis does not screen it. Write-up:
+    governance/WORK_IDENTITY_COLLAPSE_20261014.md; sheet: governance/work_identity_collapse_review_20261014.csv'
+  gate: 'MEASURED 2026-10-14 - the limb that was reported BLOCKED probed the WRONG ARTIFACT (persisted
+    EMBEDDINGS; the limb needs the segment TEXT, which the S1 chunk store persists at 730 MB on the canonical
+    run). limb_voice is now COMPUTABLE read-only at $0 by scripts/check_corroboration_collapse.py --voice and
+    its census lives in config/corroboration_collapse.yaml#lexical_limb.measured. What REMAINS is the RESIDUAL
+    class only: paraphrase/translation, which needs the embedding+NLI limb (reported blocked, never 0, D-2957)
+    and is now OPTIONAL rather than blocking. The repair it produced is T-129 (BUG-780)'
 
 - id: T-120
   priority: MUST
@@ -437,7 +445,15 @@ tasks:
     indistinguishable from 1, the count is not contaminated and the hardening is documentation only.
   source: [D-2992, D-2990, BUG-772, BUG-773]
   evidence: "MEASURED 2026-10-13 (read-only, by reading the write path and the identity model - no store write): `is_convergent` is written by S1.5 from the run's segment set (pipeline/stage1_5_embed_cluster.py header, D2176); the dedup GROUPING key is `(normalize_name, source_id)` with `would` in {link_duplicate, supersede_review, insert} under mode: report (pipeline/dedup_identity.py, pipeline/dedup_gate.py:211, config/dedup_identity.yaml); the commit is `INSERT OR REPLACE` on `fb_id = SHA-256(name + definition)` (pipeline/stage6_commit.py:764, pipeline/schemas.py:175); `content_basis` is declared RESERVED with no writer. The three times, their homes and the falsifier are written up in governance/CORPUS_LIFECYCLE_20261013.md (D-2992)."
-  gate: 'DONE 2026-10-14 (read-only step 0, D-2993): the falsifier FIRED - P(n_voices>=2 | is_convergent=1) = 1393/1393 = 1.0000 against 0/6247 = 0.0000, so the count engine is NOT needed and the independently-computed half narrows to the DECLARED derivation for the one bit (BUG-775, needs its parity rail). The tier WRITE remains a SEPARATE surface change - the one T-107 owes (D-2898); it is not licensed by this task'
+  gate: 'STEP 0 DONE and its REMEDY LANDED 2026-10-14: the falsifier fired (P(works>=2 | is_convergent=1) =
+    1393/1393 vs 0/6247), so the count engine it scoped is NOT needed - and the "narrows to the DECLARED
+    derivation for the one bit" half is now LANDED, not owed: config/derivations.yaml declares fbs.is_convergent
+    and fbs.source_diversity (home pipeline/stage1_5_embed_cluster.py::build_clusters) with the parity rail
+    scripts/check_corroboration_bit.py, wired FATAL in the ladder and GREEN on 7,640/7,640 rows (measured
+    2026-10-14). What REMAINS is the title''s second half - "a richer reading must REPLACE a body without
+    destroying it" - which is BUG-773: the append-only revision trail + the content_basis writer, an
+    EXTRACTION-layer act, not a corroboration one. The tier WRITE stays a separate surface change (T-107/T-118,
+    D-2898) and is not licensed by this task'
 - id: T-121
   priority: SHOULD
   state: open
@@ -617,3 +633,28 @@ tasks:
     mover = pipeline. The rail asserts every stored status/classification_status value is a DECLARED state and
     every state is reachable; a transition must name its `who` and its required `evidence`; the taxonomy itself
     is NOT declared as a machine (progression must not mutate)
+- id: T-129
+  priority: MUST
+  state: open
+  mover: owner
+  title: WORK IDENTITY COLLAPSE — collapse the duplicate works at the IDENTITY layer, so a row stops advertising a corroboration it does not have
+  why: >-
+    BUG-780/T-119: the count certifies as corroborated a set of rows whose "sources" are ONE TEXT under TWO
+    NAMES. The remedy is NOT in the count - raising stage1_5.min_source_diversity is risk R2 (gate regression: it
+    would suppress real corroboration along with the fake) - and NOT a new score, because a duplicate-adjusted
+    scalar would be a fourth home for one fact (C12/C20, D-2646). The defect sits one level below D-2309:
+    identity is resolved from NAMES, and these two names are genuinely different strings resolving to different
+    canonical works, so dedup_identity - which groups by the SAME WORK - is blind to them by construction (the
+    BUG-772 shape). The act is an IDENTITY COLLAPSE over a bounded, reviewable set, then a re-derivation that the
+    existing parity rail CHECKS rather than asserts. Work identity is an ontology ruling, so the WRITE is
+    owner-gated (D-2898); the evidence is already produced and costs nothing to reproduce. Feeds back into the
+    tier contract T-118 just landed, which currently publishes `independence` from a METADATA measure.
+  source: [BUG-780, D-2992, D-2309, BUG-772, T-119, T-118]
+  evidence: 'MEASURED 2026-10-14 read-only (governance/WORK_IDENTITY_COLLAPSE_20261014.md): 84 collapsing
+    work-pairs (37 identical normalised text) forming 72 duplicate-work groups certify 530 of the 1,393
+    corroborated rows as corroborated, of which 369 are SERVED and 134 are among the store''s 257 rows
+    advertised epistemic_status=corroborated; isor rates 205 of the 530 strong/medium. Sheet:
+    governance/work_identity_collapse_review_20261014.csv (84 pair rows, 72 groups, owner_ruling blank)'
+  gate: 'one owner word per pair on governance/work_identity_collapse_review_20261014.csv (CONFIRM-ONE-WORK /
+    DISTINCT / LEAVE) - the 37 identical-text pairs are deterministic and need confirmation only; the 47
+    containment-only pairs are the ones that need the ruling'

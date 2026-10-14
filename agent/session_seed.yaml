@@ -3,7 +3,7 @@ session:
   pipeline_commit: 'v3.0-D2485'
   schema_version: '3.0'
   project_root: knowledge pipeline/
-  status: '2026-10-14 D-2981: the user-facing faces are DERIVED (scripts/gov_sync.py) and joined to the registers. Register: 1123 decisions (67 needing action) / 543 bugs (194 open) / 23 open tasks (4 OWNER-moved, 19 pipeline). YOURS: 🔴 T-101 HARDEN THE RETRIEVAL GOLDEN SET (the gate is saturated); 🔴 T-117 BUG-749 residual — the ESCALATE surface: the units NO owner ruling rea; 🟠 T-121 the SOURCE KIND axis + per-kind identity - the prerequisite the intern. AGENT NEXT: 🔴 T-104 BUG-757 — OPEN bugs carry NO severity token, so the register cannot be; 🟠 T-105 REA tier A/B mining — DEVONthink 3 (related-document ranking) and Curs; 🟠 T-106 ROADMAP — MODULARITY (C21 swappable infrastructure) and CROSS-OS COMPA.'
+  status: '2026-10-14 D-2981: the user-facing faces are DERIVED (scripts/gov_sync.py) and joined to the registers. Register: 1124 decisions (67 needing action) / 544 bugs (195 open) / 24 open tasks (5 OWNER-moved, 19 pipeline). YOURS: 🔴 T-101 HARDEN THE RETRIEVAL GOLDEN SET (the gate is saturated); 🔴 T-117 BUG-749 residual — the ESCALATE surface: the units NO owner ruling rea; 🟠 T-121 the SOURCE KIND axis + per-kind identity - the prerequisite the intern. AGENT NEXT: 🔴 T-104 BUG-757 — OPEN bugs carry NO severity token, so the register cannot be; 🟠 T-105 REA tier A/B mining — DEVONthink 3 (related-document ranking) and Curs; 🟠 T-106 ROADMAP — MODULARITY (C21 swappable infrastructure) and CROSS-OS COMPA.'
 models:
   generator:
     model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
@@ -328,7 +328,7 @@ session_status_2026_10_06:
   summary: 'v7 PROMOTED (2026-10-06 apply). Domain rename research & methodology -> research practice
     (D-2853) DONE in menu+golden+anchors+DB (875+1 rows relabelled); discipline "research methodology" UNCHANGED.
     3 new disciplines (business administration / entrepreneurship studies / marketing). FORENSIC AUDIT 2026-10-07 v3
-    found the CIRCLES root cause: 1123 decisions D-2826..D-2859 UNCOMMITTED (git HEAD=D-2825, worktree=D-2859) + ~70
+    found the CIRCLES root cause: 1124 decisions D-2826..D-2859 UNCOMMITTED (git HEAD=D-2825, worktree=D-2859) + ~70
     modified + ~15 untracked files. NEW drift beyond v2: (1) taxonomy_shacl.ttl enum still lists research &
     methodology (unenforced, future tax); (2) closed_menu_v7 = 65 disc/44 dom vs live taxonomy_v5 = 64/43
     (off-by-one on BOTH axes, unreconciled); (3) 4 referee variants discipline_anchor_rederived_v6_20261006[.b.c.d].json

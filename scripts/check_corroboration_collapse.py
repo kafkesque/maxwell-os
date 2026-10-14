@@ -10,17 +10,25 @@ is still a COUNT of SOURCES, and a source is not a VOICE: two works by the same 
 of one work, both count as two. T-119 asks how deep that collapse goes - and is required to be able to
 answer "NO FINDING", because a measurement that cannot say "no finding" is not a measurement.
 
-THE TWO LIMBS (the step-0 finding of 2026-10-14 is that the second is BLOCKED):
-  limb_identity  COMPUTABLE NOW. `source_books` -> isor_score() (D2284/D2309). The rail IMPORTS the
+THE THREE LIMBS (2026-10-14: the limb reported BLOCKED probed the WRONG ARTIFACT):
+  limb_identity  COMPUTABLE. `source_books` -> isor_score() (D2284/D2309). The rail IMPORTS the
                  existing home (`pipeline.schema_accessor.isor_score`); it does not reimplement it,
                  because one derived value has ONE home (D-2646). Reimplementing it here would create
                  a second truth about the same column - the exact defect class this work retires.
-  limb_semantic  BLOCKED. `n_voices` = |clusters of the row's `source_segments` by embedding
-                 similarity|. The S1.5 index does NOT persist its embeddings: there is no `.index`,
-                 no `.npy` and no surviving `embeddings_cache` under `stage1_5_embed_cluster/<run>/`.
-                 The rail PROBES for them and reports `blocked`. It must NEVER report `0 voices` -
-                 ABSENT IS NOT ZERO (D-2957), and a fabricated 0 is precisely BUG-767.
-                 Unblocking (persist the index, or accept a re-embed pass) is a DECISION, not an edit.
+  limb_voice     COMPUTABLE (`--voice`). `n_voices` by a LEXICAL screen over the row's OWN segment
+                 texts: identical normalised text, or bottom-k shingle containment at/above the bar.
+                 $0, local CPU, no model, READ-ONLY. The limb that was BLOCKED probed for persisted
+                 EMBEDDINGS; the artifact it needs is the segment TEXT, which the S1 chunk store
+                 persists (stage1_chunk/<run>/checkpoint.jsonl, measured 730 MB on the canonical run).
+                 All 148,831 referenced segment ids matched. It was never blocked - it was looking in
+                 the wrong place, and that lesson is the reusable half of the finding (BUG-780).
+                 It can CERTIFY a collapse and can NEVER certify independence, so its share is a
+                 LOWER BOUND.
+  limb_semantic  BLOCKED BY DESIGN (the RESIDUAL, not the answer). The embedding/NLI refinement for
+                 the paraphrase+translation class limb_voice cannot see: the S1.5 index persists no
+                 embeddings, so the rail PROBES and reports `blocked`. It must NEVER report `0 voices`
+                 - ABSENT IS NOT ZERO (D-2957), and a fabricated 0 is precisely BUG-767. Now OPTIONAL:
+                 the declared question was answered lexically at $0.
 
 EXIT CODES (declared in the rule file, not here):
   0  finding measured   - the count-certified population carries a measurable collapse
@@ -36,9 +44,13 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import collections
+import hashlib
 import json
+import re
 import sqlite3
 import sys
+import zlib
 from pathlib import Path
 from typing import Any, Sequence
 
@@ -222,6 +234,189 @@ def probe_semantic_limb(rule: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+# ── limb_voice: the LEXICAL screen (pure core + one read-only streaming wrapper) ──
+
+_WORD = re.compile(r"[a-z0-9]+")
+
+
+def normalized_words(text: str) -> list[str]:
+    """Lower-case alphanumerics, single-spaced: the shape two copies of ONE VOICE share."""
+    return _WORD.findall(str(text).lower())
+
+
+def bottom_k_sketch(words: list[str], shingle: int, width: int) -> set[int]:
+    """The bottom-`width` smallest 32-bit shingle hashes: a bottom-k MinHash sketch.
+
+    Bottom-k (not k independent permutations) because it is one pass per shingle and its containment
+    estimate is unbiased for OUR question - "is this text already inside that text?" - which is a
+    containment question, not a symmetric similarity one.
+    """
+    if len(words) < shingle:
+        return set()
+    out: set[int] = set()
+    for i in range(len(words) - shingle + 1):
+        h = zlib.crc32(" ".join(words[i:i + shingle]).encode("utf-8"))
+        if len(out) < width:
+            out.add(h)
+        elif h < max(out):
+            out.discard(max(out))
+            out.add(h)
+    return out
+
+
+def containment(left: set[int], right: set[int]) -> float:
+    """Share of the SMALLER sketch present in the larger. PURE. Never raises on an empty sketch."""
+    if not left or not right:
+        return 0.0
+    small, large = (left, right) if len(left) <= len(right) else (right, left)
+    return len(small & large) / len(small)
+
+
+def voice_stats(cells: dict[str, dict[str, dict[str, Any]]], bar: float, min_words: int,
+                meta: dict[str, dict[str, str]] | None = None, served: str = "",
+                advertised: str = "") -> dict[str, Any]:
+    """Count ONE-VOICE collapse from per-(row, work) evidence cells. PURE - no store, no model.
+
+    `cells` is `{fb_id: {work: {"sk": set, "dg": set, "words": int}}}`: the row's OWN evidence, which
+    is the doctrine T-120 established (independence is re-derived from the evidence the row holds,
+    never from the run that happened to cluster it). A pair is COLLAPSED when the two sides are
+    identical after normalisation (the `certain_class` - no threshold involved) or when containment
+    is at/above `bar` with BOTH sides clearing the boilerplate screen.
+    """
+    hits: set[tuple[str, str]] = set()
+    certain: set[tuple[str, str]] = set()
+    row_best: dict[str, float] = {}
+    pair_rows: dict[tuple[str, str], set[str]] = collections.defaultdict(set)
+    for fb, works in cells.items():
+        names = sorted(works)
+        if len(names) < 2:
+            continue
+        best = 0.0
+        for i in range(len(names)):
+            for j in range(i + 1, len(names)):
+                a, b = works[names[i]], works[names[j]]
+                if int(a.get("words", 0)) < min_words or int(b.get("words", 0)) < min_words:
+                    continue
+                if set(a.get("dg", ())) & set(b.get("dg", ())):
+                    c, exact = 1.0, True
+                else:
+                    c, exact = containment(set(a.get("sk", ())), set(b.get("sk", ()))), False
+                if c >= bar:
+                    hits.add((names[i], names[j]))
+                    pair_rows[(names[i], names[j])].add(fb)
+                    if exact:
+                        certain.add((names[i], names[j]))
+                best = max(best, c)
+        row_best[fb] = best
+
+    parent: dict[str, str] = {}
+
+    def find(x: str) -> str:
+        parent.setdefault(x, x)
+        while parent[x] != x:
+            parent[x] = parent[parent[x]]
+            x = parent[x]
+        return x
+
+    for a, b in hits:
+        parent[find(a)] = find(b)
+    groups = {find(n) for n in list(parent)}
+
+    collapsed = {fb for fb, c in row_best.items() if c >= bar}
+    stats: dict[str, Any] = {
+        "rows_tested": len(row_best),
+        "pairs_at_bar": len(hits),
+        "pairs_identical_text": len(certain),
+        "groups": len(groups),
+        "rows_collapsed": len(collapsed),
+        "collapsed_share": (len(collapsed) / len(row_best)) if row_best else 0.0,
+        "bar": bar,
+    }
+    if meta:
+        stats["served_rows_collapsed"] = sum(1 for fb in collapsed if meta.get(fb, {}).get("status") == served)
+        stats["advertised_rows_collapsed"] = sum(
+            1 for fb in collapsed if meta.get(fb, {}).get("epistemic_status") == advertised)
+        stats["population_served"] = sum(1 for m in meta.values() if m.get("status") == served)
+        stats["population_advertised"] = sum(
+            1 for m in meta.values() if m.get("epistemic_status") == advertised)
+    return stats
+
+
+def voice_limb(rule: dict[str, Any], limit: int = 0) -> dict[str, Any]:
+    """Measure `voice_stats` against the declared corpus. READ-ONLY; streams the S1 chunk store.
+
+    The store path is RESOLVED from the pipeline's own declaration (`stage1.checkpoint` under
+    `S1_DIR/<CANONICAL_RUN>`), never typed twice: a second copy of a path is a second truth (C12).
+    Every threshold comes from the rule file; nothing here is a literal.
+    """
+    limb = rule.get("lexical_limb", {})
+    shingle = int(limb.get("shingle_words", 0))
+    width = int(limb.get("sketch_width", 0))
+    min_words = int(limb.get("min_words_per_side", 0))
+    bar = float(limb.get("collapse_at_or_above", 1.0))
+    if not (shingle and width and bar):
+        raise ValueError("config/corroboration_collapse.yaml: lexical_limb is not fully declared (C12)")
+
+    if str(PROJECT_ROOT) not in sys.path:
+        sys.path.insert(0, str(PROJECT_ROOT))
+    from pipeline.pipeline_paths import CANONICAL_RUN, S1_DIR, STAGE1_CHECKPOINT  # ONE HOME
+
+    store = Path(str(STAGE1_CHECKPOINT))
+    if not store.exists():
+        store = S1_DIR / str(CANONICAL_RUN) / "checkpoint.jsonl"
+    if not store.exists():
+        return {"state": "blocked", "why": f"the S1 chunk store does not exist at {store}",
+                "artifacts_found": 0, "rows_tested": None}
+
+    rule_pop = rule.get("population", {})
+    db = resolve_db(rule, None)
+    con = sqlite3.connect(f"file:{db}?mode=ro", uri=True)
+    pop = con.execute(
+        f"SELECT fb_id, {rule_pop['status_field']}, {rule_pop['epistemic_field']}, source_segments "
+        f"FROM {rule_pop['table']} WHERE {population_predicate(rule)}").fetchall()
+    if limit:
+        pop = pop[:limit]
+
+    wanted: dict[str, list[str]] = collections.defaultdict(list)
+    meta: dict[str, dict[str, str]] = {}
+    for fb, status, epi, segs in pop:
+        meta[str(fb)] = {"status": str(status or ""), "epistemic_status": str(epi or "")}
+        for sid in _coerce_list_fields({"segs": segs}).get("segs", ()):
+            wanted[str(sid)].append(str(fb))
+
+    cells: dict[str, dict[str, dict[str, Any]]] = collections.defaultdict(dict)
+    matched = 0
+    with store.open(encoding="utf-8", errors="replace") as fh:
+        for line in fh:
+            if '"segment_id"' not in line:
+                continue
+            try:
+                obj = json.loads(line)
+            except Exception:
+                continue
+            owners = wanted.get(str(obj.get("segment_id")))
+            if not owners:
+                continue
+            matched += 1
+            words = normalized_words(obj.get("text") or "")
+            work = str(obj.get("source_book") or "?")
+            digest = hashlib.blake2b(" ".join(words).encode("utf-8"), digest_size=8).hexdigest()
+            sketch = bottom_k_sketch(words, shingle, width)
+            for fb in owners:
+                cell = cells[fb].setdefault(work, {"sk": set(), "dg": set(), "words": 0})
+                cell["sk"] |= sketch
+                cell["dg"].add(digest)
+                cell["words"] += len(words)
+
+    stats = voice_stats(dict(cells), bar, min_words, meta=meta,
+                        served=str(rule_pop.get("served_value", "")),
+                        advertised=str(rule_pop.get("advertised_value", "")))
+    stats["state"] = "measured"
+    stats["segments_matched"] = matched
+    stats["store"] = str(store.relative_to(PROJECT_ROOT)) if str(store).startswith(str(PROJECT_ROOT)) else str(store)
+    return stats
+
+
 # ── selftest ─────────────────────────────────────────────────────────────────
 
 CONTROL_LABELS: tuple[str, ...] = (
@@ -230,6 +425,9 @@ CONTROL_LABELS: tuple[str, ...] = (
     "absent_artifacts_are_blocked_never_zero",
     "the_population_predicate_is_declared_not_defaulted",
     "the_census_is_arithmetic_on_its_own_denominator",
+    "the_lexical_limb_certifies_a_collapse",
+    "the_boilerplate_screen_ignores_a_short_side",
+    "the_voice_census_is_arithmetic_on_its_own_denominator",
 )
 
 
@@ -268,6 +466,30 @@ def selftest() -> int:
                    mixed["population"] == 2 and mixed["one_author"] == 1 and mixed["one_domain"] == 1
                    and abs(mixed["p_multi_author"] - 0.5) < 1e-9))
 
+    # limb_voice, PURE. (a) identical normalised text under two names is a COLLAPSE with no threshold
+    # involved - the certain class; (b) a short side is boilerplate, not a shared voice, so the screen
+    # must be able to say NOT collapsed; (c) the census divides by its OWN denominator.
+    same = {"A": {"words": 400, "dg": {"x"}, "sk": {1, 2, 3}},
+            "B": {"words": 400, "dg": {"x"}, "sk": {1, 2, 3}}}
+    v1 = voice_stats({"fb1": same}, bar=0.80, min_words=120)
+    checks.append((CONTROL_LABELS[5],
+                   v1["rows_tested"] == 1 and v1["rows_collapsed"] == 1
+                   and v1["pairs_identical_text"] == 1 and v1["groups"] == 1))
+
+    short = {"A": {"words": 400, "dg": {"x"}, "sk": {1, 2, 3}},
+             "B": {"words": 5, "dg": {"x"}, "sk": {1, 2, 3}}}
+    v2 = voice_stats({"fb1": short}, bar=0.80, min_words=120)
+    checks.append((CONTROL_LABELS[6], v2["rows_collapsed"] == 0 and v2["pairs_at_bar"] == 0))
+
+    near = {"A": {"words": 400, "dg": {"a"}, "sk": set(range(1000, 1100))},
+            "B": {"words": 400, "dg": {"b"}, "sk": set(range(1000, 1090)) | set(range(2000, 2010))}}
+    twin = {"C": {"words": 400, "dg": {"y"}, "sk": {7, 8, 9}},
+            "D": {"words": 400, "dg": {"y"}, "sk": {7, 8, 9}}}
+    v3 = voice_stats({"fb1": near, "fb2": twin}, bar=0.80, min_words=120)
+    checks.append((CONTROL_LABELS[7],
+                   v3["rows_tested"] == 2 and v3["rows_collapsed"] == 2 and v3["groups"] == 2
+                   and v3["pairs_identical_text"] == 1 and abs(v3["collapsed_share"] - 1.0) < 1e-9))
+
     ok = sum(1 for _, passed in checks if passed)
     for label, passed in checks:
         print(f"   {'ok ' if passed else 'RED'} {label}")
@@ -283,6 +505,9 @@ def _build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(description="T-119 corroboration collapse (read-only measurement)")
     p.add_argument("--selftest", action="store_true", help="exercise the pure parts, no store needed")
     p.add_argument("--json", action="store_true", help="emit the census as JSON")
+    p.add_argument("--voice", action="store_true",
+                   help="also measure limb_voice: streams the S1 chunk store (~730 MB, ~1 min, $0, read-only)")
+    p.add_argument("--limit", type=int, default=0, help="rows to test (0 = all); shortens a --voice run")
     p.add_argument("--db", default=None, help="override the store path (default: config)")
     p.add_argument("--quiet", action="store_true", help="suppress the human summary")
     return p
@@ -310,6 +535,9 @@ def main(argv: Sequence[str] | None = None) -> int:
         stats = collapse_stats(isor_rows)
         rc, below = falsifier_verdict(stats, rule.get("falsifier", {}))
         semantic = probe_semantic_limb(rule)
+        voice = (voice_limb(rule, args.limit) if args.voice else
+                 {"state": "not_run",
+                  "why": "limb_voice is OPT-IN (--voice): it streams the S1 chunk store (~730 MB, ~1 min, $0)"})
     except Exception as exc:  # C16: log AND raise the exit - never a silent zero
         print(f"!! corroboration-collapse: {type(exc).__name__}: {exc}", file=sys.stderr)
         return EXIT_ERROR
@@ -318,6 +546,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         "population": predicate,
         "db": str(db),
         "limb_identity": stats,
+        "limb_voice": voice,
         "limb_semantic": semantic,
         "falsifier": {"verdict": "no_finding" if rc == EXIT_NO_FINDING else "finding", "below": below},
     }
@@ -330,6 +559,16 @@ def main(argv: Sequence[str] | None = None) -> int:
               f"weak={s['rated_weak']}")
         print(f"                  p_multi_author={s['p_multi_author']:.4f} "
               f"p_multi_domain={s['p_multi_domain']:.4f}")
+        if voice.get("state") == "measured":
+            print(f"limb_voice      : one voice on {voice['rows_collapsed']}/{voice['rows_tested']} rows "
+                  f"({voice['collapsed_share']:.4f}) - {voice['pairs_at_bar']} pair(s), "
+                  f"{voice['pairs_identical_text']} identical text, {voice['groups']} duplicate-work group(s)")
+            if "served_rows_collapsed" in voice:
+                print(f"                  served {voice['served_rows_collapsed']}/{voice['population_served']} "
+                      f"| advertised-corroborated {voice['advertised_rows_collapsed']}"
+                      f"/{voice['population_advertised']}  (LOWER BOUND: lexical only)")
+        else:
+            print(f"limb_voice      : {voice['state']} - {voice['why']}")
         print(f"limb_semantic   : {semantic['state']} - {semantic['why']}")
         if rc == EXIT_NO_FINDING:
             print("falsifier       : NO FINDING - the count is not contaminated in this corpus")
@@ -339,7 +578,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     if rc == EXIT_NO_FINDING:
         print("ok corroboration-collapse: NO FINDING (falsifier fired) - rc=2, documentation-only hardening")
     else:
-        print(f"ok corroboration-collapse: measured rc=0 (semantic limb {semantic['state']})")
+        print(f"ok corroboration-collapse: measured rc=0 (limb_voice {voice['state']}, "
+              f"limb_semantic {semantic['state']})")
     return rc
 
 

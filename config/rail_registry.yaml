@@ -49,6 +49,11 @@ dormant:
       build, so wiring it into `just health` would turn a number into a verdict. Its rule file names it
       (`rail.script`) and carries the population, the falsifier bars and the probe targets, so the invocation is
       DECLARED rather than left to inspiration. Declared dormant 2026-10-14; the ladder is unchanged.
+      RE-MEASURED 2026-10-14 (D-2996/BUG-780): limb_voice became COMPUTABLE ($0, read-only, opt-in `--voice`)
+      where the earlier step-0 report called it BLOCKED - the probe had asked for persisted EMBEDDINGS while the
+      limb needs the segment TEXT, which the S1 chunk store persists. Selftest 8/8; live rc=0. The ladder is
+      still unchanged, and the reason to keep it dormant is stronger now, not weaker: its number is an OWNER
+      RULING'S input (T-129), not a build verdict.
 
 #: Rails that WRITE or REGENERATE an artifact. Each must be run with --selftest BY THE LADDER, because such a
 #: rail's remedy is a claim about bytes it replaces, and an unproven remedy is where BUG-537/BUG-556 came from.

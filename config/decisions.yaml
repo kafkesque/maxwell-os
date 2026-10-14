@@ -24353,3 +24353,89 @@ decisions:
   - tests/full_run.py
   - tests/full_run_streaming.py
   - governance/buglog.md
+- id: D-2996
+  date: '2026-10-14'
+  state: RESOLVED
+  category: MEASUREMENT / IDENTITY
+  title: 'The T-119 collapse is MEASURED and it is an IDENTITY defect: 84 work-pairs are ONE TEXT under TWO NAMES,
+    so 530 count-corroborated rows (369 SERVED, 134 of them advertised as corroborated) are ONE VOICE - and the
+    metadata independence axis (`isor`) rates 205 of them strong/medium because a duplicate ingested under a second
+    name looks independent to a measure that reads names'
+  bugs:
+  - BUG-780
+  - BUG-772
+  - BUG-773
+  decision: 'THE QUESTION (T-119, carried through D-2990/D-2992/D-2993): how deep does the collapse go - how many
+    rows the COUNT certifies as corroborated are really ONE VOICE - and can say NO FINDING? THE ANSWER: 38.05% are
+    one voice, in a BOUNDED set, and the defect is WORK IDENTITY, not the count.
+
+    (1) THE BLINDSPOT, recorded because it is the reusable half. T-120''s step-0 falsifier fired correctly: `is_convergent`
+    == `|source_ids| >= 2` on 7,640/7,640 rows, so the count is exactly re-derivable. The conclusion drawn from
+    it - "the corroboration count is a pure projection of the source set, information-free beyond it, so the expensive
+    half would re-derive a number the row already states" - was HALF a non-sequitur: the count is exact about HOW
+    MANY SOURCES ARE NAMED and silent about WHETHER THOSE SOURCES ARE DIFFERENT STATEMENTS OF IT. The limb that
+    would have asked the second question reported BLOCKED because it probed for persisted EMBEDDINGS (`*.index`,
+    `*.npy`, `embeddings_cache/*`) while the artifact it needs is the segment TEXT - which the S1 chunk store persists
+    (`stage1_chunk/<run>/checkpoint.jsonl`, MEASURED 730 MB on the canonical run, all 148,831 referenced segment
+    ids matched). The limb was never blocked; it was looking in the wrong place. `blocked` was still the honest
+    STATE (absent is not zero, D-2957) - the error was the artifact set, and that is now a declared rail parameter
+    rather than an inference.
+
+    (2) THE MEASUREMENT (read-only, ZERO store writes, ~1 minute of local CPU, no model, reproducible at $0 by `scripts/check_corroboration_collapse.py
+    --voice`; the census lives in `config/corroboration_collapse.yaml#lexical_limb.measured`, ONE home). Over the
+    1,393 `is_convergent = 1` rows: 84 work-pairs collapse at containment >= 0.80, 37 of them IDENTICAL normalised
+    text (no threshold involved, 184 rows), forming 72 duplicate-work groups (largest 3). Those pairs certify 530
+    rows (38.05%; 351 at bar 0.90, 284 at 0.95, 217 at 0.99 - a smooth curve, not a threshold artifact), of which
+    369 are SERVED (`status=''PASS''`) and 134 are among the store''s 257 `epistemic_status=''corroborated''` rows.
+    The dominant shape is one book ingested twice - once by TITLE, once by FILENAME ("Hustle Harder, Hustle Smarter
+    (Curtis 50 Cent..)" vs "Hustle Harder, Hustle Smarter.md"); the sharpest is one body of text under two DIFFERENT
+    titles ("Metaphorically Selling.." == "The Tall Lady With the Iceberg..", containment 1.00).
+
+    (3) THE FINDING THAT MATTERS MOST: THE INDEPENDENCE AXIS CANNOT SCREEN IT. Among the 530 collapsed rows, `isor`
+    rates 205 strong or medium - including 134 SERVED rows advertised as `corroborated` at STRONG. This is structural,
+    not incidental: `isor` reads METADATA (authors, domains, counts), so a second ingest under a second name yields
+    different metadata and scores as independence. A content-level fact cannot be screened by a metadata-level measure.
+    `config/served_fields.yaml#tier_policy` (T-118, granted 2026-10-14) therefore publishes "convergent: true, independence:
+    strong" about ONE VOICE on those rows: D-2989''s rule - an advertised field is a CLAIM - applies one level down,
+    and the `independence` input is not sufficient for the claim it is used to make.
+
+    (4) WHY NOTHING REGRESSED AND NOTHING IS CONTRADICTED. D-2309 ("canonical works, never filenames") removed FILENAMES
+    from identity - necessary and not sufficient, because here the two names resolve to two DIFFERENT canonical
+    works. `dedup_identity` groups by `(normalize_name, source_id)` - the SAME WORK - so a second ingest under another
+    name is invisible to it BY CONSTRUCTION (the BUG-772 shape) and `duplicate_of` still has no writer. `check_corroboration_bit`
+    stays GREEN and stays TRUE: both facts hold at once - the count is exactly re-derivable AND carries no information
+    about distinct voices.
+
+    (5) THE DISPOSITION. REVITALIZE the principle (it was never the problem); DO NOT touch the count threshold (raising
+    `min_source_diversity` is risk R2 - it suppresses real corroboration along with the fake); DO NOT mint a duplicate-adjusted
+    SCALAR (a fourth home for one fact, C12/C20/D-2646). COLLAPSE THE DUPLICATES AT THE IDENTITY LAYER over the
+    bounded reviewer set - 37 pairs deterministic (identical text), 47 needing one owner word each - then RE-DERIVE
+    `source_ids`/`source_diversity`/`is_convergent` for the affected rows and let `check_corroboration_bit` re-prove
+    the whole population against its own evidence. T-129 carries the act; the WRITE is owner-gated (D-2898: work
+    identity is an ontology ruling). The tier contract question - whether `independence` takes the voice axis as
+    a second declared input, or its scope is stated as metadata-only - is the owner''s, and is owed BEFORE an agent
+    reads the field as a corroboration guarantee.
+
+    (6) SCOPE, STATED BECAUSE AN UNSTATED SCOPE READS AS COVERAGE. The screen is LEXICAL: it can CERTIFY a collapse
+    and can NEVER certify independence - paraphrase, translation and heavy editing are invisible to it, so 38.05%
+    is a LOWER BOUND, not a clearance. The embedding+NLI limb stays DECLARED as the residual for that class (reported
+    `blocked`, never 0) and is now OPTIONAL rather than blocking, because the declared question was answered at
+    $0 without it.'
+  evidence: 'MEASURED 2026-10-14, read-only, ZERO store writes. Rail: `scripts/check_corroboration_collapse.py --voice`
+    (selftest 8/8, live rc=0; the three new pure controls: the lexical limb certifies a collapse, the boilerplate
+    screen ignores a short side, the voice census is arithmetic on its own denominator). Rule + census: `config/corroboration_collapse.yaml#lexical_limb`
+    (schema_version 2; limb_voice computable, limb_semantic declared residual). Write-up: `governance/WORK_IDENTITY_COLLAPSE_20261014.md`
+    (§2 method, §3 the numbers and the worked pairs, §5 the consequence for the tier). Sheet: `governance/work_identity_collapse_review_20261014.csv`
+    (84 pair rows, 72 groups, owner_ruling blank). Rail at close: `check_corroboration_bit` 7,640/7,640 exact; `check_derivation_homes
+    --check` rc=0 (12 derivations, 11 homed, 1 declared-null ceiling). The independent method check: the probe that
+    produced the numbers first (temp/, threshold sweep + min-words screen + isor cross-tab) was re-implemented INSIDE
+    the rail and reproduces the same census exactly, which is what makes this file the census''s one home rather
+    than a transcript of a session.'
+  files:
+  - scripts/check_corroboration_collapse.py
+  - config/corroboration_collapse.yaml
+  - config/rail_registry.yaml
+  - config/task_register.yaml
+  - governance/WORK_IDENTITY_COLLAPSE_20261014.md
+  - governance/work_identity_collapse_review_20261014.csv
+  - governance/buglog.md

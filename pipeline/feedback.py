@@ -112,6 +112,47 @@ def declared_aggregate(ratings: Sequence[float], policy: dict[str, Any] | None =
     return round((n * mean + weight * prior) / (n + weight), int(agg["rounding"]))
 
 
+#: THE WIRE SHAPE of the feedback loop (D-2989/D-2993), assembled in `feedback_wire` and published by the three
+#: serving surfaces. `keys` is asserted against that function by scripts/check_served_fields.py, so the contract has
+#: ONE home and the three surfaces cannot drift apart (the BUG-499/BUG-502 class applied to a payload).
+WIRE_KEYS: tuple[str, ...] = ("score", "count", "state", "prior", "effective")
+
+
+def feedback_wire(fb: dict[str, Any]) -> dict[str, Any]:
+    """The feedback signal as an agent must read it: an EXPLICIT absence, never a bare null (D-2957).
+
+    WHY. The stored cache is NULL until the first rating, and a bare `null` on the wire cannot be told from a score
+    of 0.0 - which is the most damning value the scale has. So the absence is PUBLISHED as an absence, with the prior
+    the ranking actually used.
+
+    Args:
+        fb: a row carrying `feedback_score` / `feedback_count`.
+
+    Returns:
+        `{score, count, state, prior, effective}` where `state` is `measured` or the declared `no_feedback`,
+        `prior` is config/feedback.yaml#serving.neutral_prior (read, never a literal) and `effective` is the value
+        the ranking used - the stored score, or the prior when the ledger holds no event.
+    """
+    prior: float = float(declared("serving.neutral_prior"))
+    count: int = int(fb.get("feedback_count") or 0)
+    score: Any = fb.get("feedback_score")
+    if score is None or count == 0:
+        return {
+            "score": None,
+            "count": count,
+            "state": str(declared("wire.state_absent")),
+            "prior": prior,
+            "effective": prior,
+        }
+    return {
+        "score": float(score),
+        "count": count,
+        "state": str(declared("wire.state_measured")),
+        "prior": prior,
+        "effective": float(score),
+    }
+
+
 def _ensure_feedback_table(conn: sqlite3.Connection) -> None:
     """Create feedback table if not exists."""
     conn.execute(f"""

@@ -152,6 +152,12 @@ guards:
   #: recomputes is a WRONG VALUE, not a debt - nothing about it is the owner's to decide.
   scripts/check_feedback_parity.py: fatal
   scripts/check_feedback_parity.py --selftest: fatal
+  #: D-2993/BUG-775: the corroboration parity rail. FATAL, for the same reason as the feedback arm: a stored
+  #: `is_convergent`/`source_diversity` that no longer equals what the row's own `source_ids` re-derive is a WRONG
+  #: VALUE about the row's evidence, not a policy debt. Read-only (it re-derives; it never clusters, writes or
+  #: migrates), so it carries no `writers:` entry.
+  scripts/check_corroboration_bit.py: fatal
+  scripts/check_corroboration_bit.py --selftest: fatal
   #: D-2991: the golden re-anchor gate's judgment. FATAL: the ladder runs the CONTROLS, not the applier -- the
   #: reviewed sheet + draft exist only at a review sitting, so a liveness pin on --check would be a rail that reds
   #: on a laptop for the wrong reason. The judgment those controls prove is the SAME function both modes call

@@ -137,6 +137,39 @@ derivations:
   note: >-
     MEASURED 2026-09-25: 0 of 7995 rows populated; the writer is never called by any run. A column declared but
     never populated is a lie the schema tells. T2 wires a call site or declares the field unpopulated.
+- name: fbs.is_convergent
+  table: fbs
+  column: is_convergent
+  kind: derived_regenerable
+  home: pipeline/stage1_5_embed_cluster.py::build_clusters
+  parity_rail: scripts/check_corroboration_bit.py   # D-2993/BUG-775: the bit re-derives from the row's OWN source_ids
+  status: homed
+  note: >-
+    BUG-775, DECLARED 2026-10-14. The Book-of-Record bit was decided by ONE RUN's clustering and registered
+    NOWHERE: no row, no home, no rail. MEASURED (canonical run, 7,640 rows): is_convergent ==
+    (|source_ids| >= S15_MIN_SOURCE_DIVERSITY) on 7,640/7,640 rows, and P(works>=2 | is_convergent=1) = 1,393/1,393
+    = 1.0000 against a counterfactual of 0/6,247 = 0.0000 - so the stored bit is EXACTLY re-derivable from the
+    row's own evidence set, which is what makes it a DERIVATION rather than a run's memory (the falsifier D-2992
+    attached to its own ruling fired: governance/T120_S1_RECON_20261014.md). The other S1.5 paths that compute the
+    same two values (stage1_5_domain_cluster.py, stage1_5_fastembed.py) are declared BACKENDS of the same rule,
+    not rival rules: each counts distinct canonical works and compares them to the ONE config threshold
+    (stage1_5.min_source_diversity). RESIDUAL, recorded and not fixed here: that threshold has a SECOND config
+    name left over from the retired S5 gate (pipeline.borp_min_sources -> pipeline_paths.BORP_MIN_SOURCES, whose
+    only live reader is the e2e pass-rate estimator) - the one-value-two-names shape this registry exists to
+    surface.
+- name: fbs.source_diversity
+  table: fbs
+  column: source_diversity
+  kind: derived_regenerable
+  home: pipeline/stage1_5_embed_cluster.py::build_clusters
+  parity_rail: scripts/check_corroboration_bit.py
+  status: homed
+  note: >-
+    BUG-775, DECLARED 2026-10-14 - the COUNT half of the same bit and the bit's own input: the rail asserts
+    source_diversity == |source_ids| on every row of the canonical run (MEASURED 2026-10-14: 7,640/7,640 exact, 0
+    mismatches), because two columns that claim one quantity must not drift apart. The SET this count is taken over
+    has its own home upstream: pipeline/book_metadata.py::resolve_source_ids (D-2309: canonical works, never
+    filenames - the closed defect class where 29.1% of convergence was the same book counted twice).
 - name: decisions.summary
   table: config/decisions_summary.json
   column: summary

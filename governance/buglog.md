@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1121 decisions (census stamp 9c72ded0156dbb0d, 2026-10-14) · 539 bugs (192 open / 347 closed; highest OPEN = BUG-775) · 17 open tasks (MUST 5 / SHOULD 9 / WORTH 3; OWNER-moved 4, pipeline-moved 13; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1122 decisions (census stamp a774a886be86b042, 2026-10-14) · 540 bugs (193 open / 347 closed; highest OPEN = BUG-776) · 17 open tasks (MUST 5 / SHOULD 9 / WORTH 3; OWNER-moved 4, pipeline-moved 13; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **67** of 1121 — 🔴 open 32 · 🔵 proposed 14 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 565 · ⚖ ratified 133 | closed: ✅ resolved 321 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1121, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **67** of 1122 — 🔴 open 32 · 🔵 proposed 14 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 565 · ⚖ ratified 133 | closed: ✅ resolved 322 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1122, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 192 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 26 · 🟨 MED 42 · 🟩 LOW 19 · UNLABELLED 101 (BUG-757) of 192 open.
+> Open BUGS by severity (population = the census's 193 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 27 · 🟨 MED 42 · 🟩 LOW 19 · UNLABELLED 101 (BUG-757) of 193 open.
 >
 > **OWNER LANE (4) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -13269,3 +13269,25 @@ retraction/update path is part of the same obligation — a corpus that cannot a
   independence) with a PARITY RAIL that re-derives the bit from `source_ids`, in the same change-set as the T-107/T-118
   surface move so the wire cannot publish a tier that disagrees with the store.
 - **Status.** OPEN. Evidence: `governance/T120_S1_RECON_20261014.md` §2; `config/served_fields.yaml#tier_policy`.
+
+## BUG-776 (HIGH - OPEN 2026-10-14) - the RETIRED scalar is gone from the wire but still READ inside the machine
+- **Where.** The T-107 change-set (D-2994) removed `borp_score` from all three serving surfaces, and the rail proves
+  it from the payload's own AST keys (INV-12). The INTERNAL readers were deliberately NOT touched, because they move
+  retrieval behaviour and therefore need their own change-set with its own measurement.
+- **Measured 2026-10-14 (read-only).** `pipeline/retrieve.py::_quality_field` returns `"borp_score"` whenever
+  `RANKING_QUALITY_SCORE_ENABLED` is OFF, i.e. the degraded path ranks on a constant; `pipeline/retrieve.py:893,913`
+  SELECT it into the graph-aware path; `pipeline/query.py:287` prints `BORP Score: 0.0` to the operator;
+  `pipeline/run_monitor.py:162-163` reports `avg_borp_score`, which is 0.0 by construction (`borp_score` is 0.0 on
+  7,640/7,640 rows) - a monitor metric that can never move; `pipeline/retrieval_evaluator.py:253` formats the dead
+  value into an evaluation line; and `pipeline/stage6b_anytype_push.py::ALL_FIELDS` is a list NOTHING reads (a dead
+  declaration, C19) that still names the column.
+- **Why it matters.** The BUG-511 class: a reader can branch on a value nothing writes, and a MONITOR that reports a
+  constant is a control that cannot fire - exactly the shape the register exists to find. A wire-only retirement
+  leaves the machine's own view of corroboration still false wherever the degraded path is taken.
+- **Fix (declared, owed as ONE change-set).** Point `_quality_field()`'s fallback at the live measure (or make the
+  fused ranking unconditional), replace the two SELECT lists, replace the printed line and the monitor metric with
+  the graded tuple (or delete the metric), and delete the dead `ALL_FIELDS` list. It must land with a
+  retrieval-measurement receipt (golden set) because it changes served ordering; a silent edit inside a contract
+  change was refused on purpose.
+- **Status.** OPEN. Evidence: this entry; `config/served_fields.yaml#retired[borp_score].readers_owed`;
+  `config/derivations.yaml` (the `fbs.borp_score` row, `dead_but_read`).

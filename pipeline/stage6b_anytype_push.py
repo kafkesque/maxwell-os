@@ -57,6 +57,7 @@ from pipeline.pipeline_paths import (
     get_run_id,
 )
 from pipeline.intimacy_lattice import derive_context, resolve_intimacy, route_space  # W6/D2375: fresh space routing at push
+from pipeline.corroboration import corroboration_tuple  # D-2993/T-107: the graded measure's ONE home (BUG-767)
 from pipeline.stamp import get_pipeline_commit, stamp_record
 
 # ── Constants ──────────────────────────────────────────────────────────────
@@ -83,7 +84,7 @@ ALL_FIELDS: list[str] = [
     "source_books", "source_clusters", "source_paragraph_ids",
     "source_authors", "primary_source",
     "source_principle_ids", "source_text", "grounding_evidence",
-    "confidence", "borp_score", "classification_errors",
+    "confidence", "corroboration", "classification_errors",
     "context", "accessibility", "intimacy_boundary", "provenance",
     "difficulty_level", "temporal_scope", "prerequisite_fbs",
     "procedural_skill", "related_fbs", "embodiment_tag",
@@ -333,7 +334,7 @@ def _format_fb_markdown(fb: dict) -> str:
         "temporal_scope": fb.get("temporal_scope", ""),
         "accessibility": fb.get("accessibility", ""),
         "confidence": fb.get("confidence", ""),
-        "borp_score": fb.get("borp_score", ""),
+        "corroboration": corroboration_tuple(dict(fb)),
         "keywords": fb.get("keywords", ""),  # D2349: metadata.discovery, not body
         "schema_version": fb.get("schema_version", ""),
         "taxonomy_version": fb.get("taxonomy_version", ""),
@@ -463,7 +464,7 @@ def _format_fb_payload(fb: dict) -> dict:
         "jargon": fb.get("jargon"),
         # ── Verification ──
         "confidence": fb.get("confidence"),
-        "borp_score": fb.get("borp_score"),
+        "corroboration": corroboration_tuple(dict(fb)),
         "classification_errors": fb.get("classification_errors"),
         # ── v1 Anytype properties ──
         "context": ctx,

@@ -54,7 +54,11 @@ def test_the_scan_reads_the_ast_and_joins_the_store() -> None:
     """INV-1: the payload's own keys are found, and only the ones that name a store column count."""
     columns = sf.columns_of_store()
     found = sf.advertised_fields("maxwell_mcp_server.py", "dict_keys", columns)
-    assert {"borp_score", "feedback_score", "confidence_score"} <= found, sorted(found)
+    assert "confidence_score" in found, sorted(found)
+    #: D-2993/T-107: the retired scalar and the bare feedback column LEFT this payload. The machine proof of a
+    #: retirement is that the AST scan - which reads the payload's OWN keys - no longer finds them (INV-12).
+    assert "borp_score" not in found, "the retired borp_score scalar is still advertised by the MCP payload"
+    assert "feedback_score" not in found, sorted(found)
     assert "rank" not in found, "a payload key that names no store column is STRUCTURE, not a claim"
 
 
@@ -242,4 +246,45 @@ def test_the_tier_word_is_joined_to_the_measure_it_names() -> None:
     assert sf.tier_faults(rival, tokens, True, True), "a tier defined in config must be REFUSED, not tolerated"
     rc, out = _live()
     assert sf.DEFECT_TIER not in out, out
+    assert rc != 1, out
+
+# ── INV-11 — a WIRE SHAPE has ONE home: the builder, joined to the declaration ──────────────────────────────────
+
+def test_the_wire_shapes_equal_the_builders_that_emit_them() -> None:
+    """INV-11 (D-2993/D-2994): the declared keys must BE the builder's keys, for both contracts."""
+    feedback_policy = yaml.safe_load(FEEDBACK_POLICY.read_text())
+    tuple_keys = sf.module_tuple("pipeline/corroboration.py", "TUPLE_KEYS")
+    wire_keys = sf.module_tuple("pipeline/feedback.py", "WIRE_KEYS")
+    assert tuple_keys == DECL["promotions"]["corroboration"]["keys"], "a shape restated in config is the BUG-499 class"
+    assert wire_keys == feedback_policy["wire"]["keys"]
+    assert sf.shape_faults(DECL, feedback_policy, tuple_keys, wire_keys) == []
+    assert sf.shape_faults(DECL, feedback_policy, tuple_keys, [*wire_keys, "drifted"]), "a drift must be SEEN to fire"
+
+
+def test_the_corroboration_builder_publishes_a_measure_and_never_a_default() -> None:
+    """INV-11: an unrated row publishes `independence: null` - not `weak`, not 0.0 (D-2957)."""
+    from pipeline.corroboration import corroboration_tuple
+
+    unrated = corroboration_tuple({"source_ids": '["a"]', "is_convergent": 0})
+    assert unrated["independence"] is None and unrated["independence_score"] is None
+    assert unrated["sources"] == 1 and unrated["convergent"] is False
+    rated = corroboration_tuple(
+        {"source_ids": '["a", "b"]', "is_convergent": 1, "isor": '{"score": 0.667, "rating": "medium"}'}
+    )
+    assert (rated["sources"], rated["convergent"], rated["independence"]) == (2, True, "medium")
+    assert list(rated.keys()) == list(sf.module_tuple("pipeline/corroboration.py", "TUPLE_KEYS"))
+
+
+# ── INV-12 — a COMPLETED owner word is joined in BOTH directions ────────────────────────────────────────────────
+
+def test_the_retired_field_left_every_declared_surface() -> None:
+    """INV-12 (D-2994): the retirement LANDED, and the payload's own keys prove it."""
+    found = sf.advertised_fields("maxwell_mcp_server.py", "dict_keys", sf.columns_of_store())
+    assert "borp_score" not in found, found
+    retired = {str(r["field"]): r for r in DECL["retired"]}
+    assert retired["borp_score"]["word"] == "retire" and str(retired["borp_score"]["anchor"]).strip()
+    assert sf.retired_faults(DECL["retired"], found) == []
+    assert sf.retired_faults(DECL["retired"], found | {"borp_score"}), "a retirement that did not land must fire"
+    rc, out = _live()
+    assert sf.DEFECT_UNJOINED not in out and sf.DEFECT_TIER not in out, out
     assert rc != 1, out

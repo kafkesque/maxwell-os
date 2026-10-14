@@ -36,6 +36,10 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from pipeline.corroboration import (
+    corroboration_tuple,  # D-2993/T-107: the graded measure's ONE home (BUG-767)
+)
+from pipeline.feedback import feedback_wire  # D-2989/D-2957: the explicit absence shape
 from pipeline.io_guard import safe_write
 from pipeline.pipeline_paths import (
     S6_DIR,
@@ -125,9 +129,11 @@ def _format_frontmatter(fb: dict) -> str:
             total_v = len(vrf)
             lines.append(f"verification: {passed}/{total_v} checks passed")
 
-    borp = fb.get("borp_score")
-    if borp is not None:
-        lines.append(f"borp_score: {borp}")
+    # D-2993/T-107 (BUG-767): the retired borp_score scalar is REPLACED by the graded corroboration tuple, and the
+    # feedback signal carries its absence EXPLICITLY (D-2957). `sort_keys=True` keeps the exported bytes
+    # deterministic for one row (R7/temp=0 spirit): the export may not depend on dict insertion order.
+    lines.append(f"corroboration: {json.dumps(corroboration_tuple(dict(fb)), sort_keys=True)}")
+    lines.append(f"feedback: {json.dumps(feedback_wire(dict(fb)), sort_keys=True)}")
 
     lines.append("---")
     return "\n".join(lines)

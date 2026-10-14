@@ -94,6 +94,25 @@ to prevent (C12/D-2642).
   a declaration that omits the block entirely while the policy gate it answers is GRANTED — silence is the fault.
 - **Status:** ✅ SATISFIED — `test_the_tier_word_is_joined_to_the_measure_it_names`.
 
+### INV-11 — A WIRE SHAPE has ONE home: the builder, joined to the declaration
+- **Correct:** the corroboration tuple and the feedback signal are each assembled in exactly ONE function
+  (`pipeline/corroboration.py::corroboration_tuple`, `pipeline/feedback.py::feedback_wire`), and the key list
+  declared in config (`promotions.corroboration.keys`, `wire.keys`) is asserted against those functions' own
+  constants by the rail. Three surfaces publishing one contract therefore cannot drift apart (D-2993/D-2994).
+- **Wrong:** a shape restated in config and diverging from the builder (the BUG-499/BUG-502 class applied to a
+  payload); a builder that does not resolve; a declared consumer that does not exist.
+- **Status:** ✅ SATISFIED — `test_the_wire_shapes_equal_the_builders_that_emit_them`,
+  `test_the_corroboration_builder_publishes_a_measure_and_never_a_default`.
+
+### INV-12 — A COMPLETED owner word is joined in BOTH directions
+- **Correct:** a retiring word that landed is recorded in `retired` with its word and anchor, and the field is
+  advertised by NO declared surface — refused if it is (the retirement did not land), refused if the word or its
+  anchor is missing (T-101). An agent can no longer read a fabricated value on a row that was never wrong.
+- **Wrong:** `borp_score: 0.0` still leaving the machine on a payload that says it was retired; a retirement that
+  exists only as prose in a handoff.
+- **Status:** ✅ SATISFIED — `test_the_retired_field_left_every_declared_surface` (the AST scan of the payload's own
+  keys no longer finds the retired column).
+
 ## Non-goals (out of scope for this spec)
 - The COLUMN-shape census of the store — `config/store_columns.yaml` / `scripts/check_store_columns.py` own it
   (BUG-766 tracks its six population-shape drifts).

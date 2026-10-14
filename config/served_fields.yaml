@@ -67,18 +67,6 @@ flagged_status:
 #: The declared disposition of every flagged field that is advertised. `word` is the OWNER WORD (T-107); `anchor` is
 #: the owner's signature (required as soon as the word leaves `pending` — T-101: an unsigned decision is not a rule).
 declared:
-  - field: borp_score
-    word: pending
-    anchor: ''
-    owed: T-107
-    recommendation: 'retire + promote corroboration'
-    why: >-
-      constant 0.0 on 7,640/7,640 rows and nothing writes it; the ratio it inherited is degenerate by construction
-      (min(distinct/2,1.0) with the pass bar at distinct>=2 is exactly 1.0 on every admitted row); still published to
-      agents and to two export surfaces as a trust metric, where it reads as "no corroboration" on rows that are
-      `strong`. FOUR reasons of record: producer deleted (S5 check_borp -> S1.5), degenerate formula, false absence
-      read two ways in ONE function (SQL COALESCE 0.0 vs Python `or 0.5`), no home and no parity rail.
-      The healthy signal already exists: `isor` (D2284/D2309, 6,591 rows) — see promotions.
   - field: feedback_score
     word: keep-and-declare
     anchor: 'pipeline/feedback.py::_update_fb_aggregates (writer) + pipeline/feedback.py::declared_aggregate (the ONE formula home: shrunk_mean) + config/feedback.yaml (the numeric policy: prior 0.5, prior_weight 0.0) + scripts/check_feedback_parity.py (the ledger->cache parity rail D-2642 lacked) + specs/served_fields.spec.md INV-7/INV-8'
@@ -91,27 +79,72 @@ declared:
       _update_fb_aggregates) both exist and the serving path already ranks on it through a declared prior. The
       defect is not the null, it is the AMBIGUITY: a bare null cannot be told from "score 0.0 = useless". Keep the
       field and make its absence explicit ({score, count, state, prior, effective}).
+      LANDED 2026-10-14 (D-2994): pipeline/feedback.py::feedback_wire assembles exactly that tuple and all three
+      surfaces publish it; `state` is the token that resolves the ambiguity (measured | no_feedback). The four
+      neutral-prior literals also left pipeline/retrieve.py for config/feedback.yaml#serving.neutral_prior.
   - field: classification_status
-    word: pending
-    anchor: ''
+    word: keep-and-repair
+    anchor: 'owner 2026-10-14 (unblocking the T-107 change-set; the word is keep-and-repair for classification_status)'
     owed: T-107
+    granted: 2026-10-14
+    granted_by: 'owner instruction 2026-10-14 - the T-107 change-set was explicitly unblocked'
     recommendation: keep-and-repair
     why: >-
-      constant 'CLEAN' on 4,503/4,503 PASS rows while the store's own `status` column QUARANTINEs 2,972 rows and the
-      register that owns the column calls it a FALSE status (config/store_columns.yaml `status: debt`), with a
-      derived-value home that is an orphan carrying a magic threshold (config/derivations.yaml
+      constant 'CLEAN' on 7,640/7,640 rows (PRE and POST the 2026-10-13 relabel store write: verified at the row
+      level, so the write did not flatten this axis) while the store's own `status` column holds 3,137 QUARANTINE
+      rows and the register that owns the column calls it a FALSE status (config/store_columns.yaml `status: debt`),
+      with a derived-value home that is an orphan carrying a magic threshold (config/derivations.yaml
       `orphan_magic_threshold`). Two statuses on one row is the D-2987 defect on the wire: an agent reads 'CLEAN'
-      and cannot see the quarantine.
+      and cannot see the quarantine. THE REPAIR (next act, not this one): the writer is
+      scripts/reinject_bug198_singletons.py::_classify_s4 with its threshold as an undeclared literal - move it into
+      config, re-prove the stored values, and publish the row-level status the payload already carries.
+
+#: THE RETIRED WORDS (D-2993/D-2994). ONE home for the completed disposition of a field that LEFT the wire: a live
+#: claim lives in `declared`; a finished one lives here, and the rail checks it in BOTH directions - a retired field
+#: that some declared surface still advertises is a DEFECT (the retirement did not land), and a retirement with no
+#: word or no anchor is a DEFECT (an unsigned act is not an act, T-101). `readers` names the places that still NAME
+#: the column internally: those are the BUG-511 family (a reader branching on a value nothing writes) and they are
+#: OWED as their own change-set rather than smuggled into a wire change (they move retrieval behaviour).
+retired:
+  - field: borp_score
+    word: retire
+    anchor: 'owner 2026-10-14 (unblocking the T-107 change-set; the word is retire for borp_score)'
+    granted: 2026-10-14
+    decision: D-2994
+    evidence: governance/T120_S1_RECON_20261014.md
+    why: >-
+      constant 0.0 on 7,640/7,640 canonical rows while 1,393 of those rows ARE corroborated and 938 are SERVED: the
+      field was a false trust claim on 100% of the corpus, published by three surfaces. The PRINCIPLE is untouched -
+      it is enforced upstream at S1.5 (`>= 2 canonical works`) and its graded measure now replaces the scalar on the
+      wire. Retiring the scalar costs an agent nothing it was ever told truthfully.
+    consumers_clear: [maxwell_mcp_server.py, pipeline/stage6_okf_export.py, pipeline/stage6b_anytype_push.py]
+    readers_owed: >-
+      pipeline/retrieve.py::_quality_field (the fallback names the dead column when the fused-ranking flag is off),
+      pipeline/retrieve.py:893,913 (SELECT lists), pipeline/query.py:287 (a printed field), pipeline/run_monitor.py
+      (avg_borp_score can only ever be 0.0), pipeline/retrieval_evaluator.py:253 (a formatted '?'), and
+      pipeline/stage6b_anytype_push.py::ALL_FIELDS (a list nothing reads). FILED as BUG-776: these move retrieval
+      behaviour and therefore need their own change-set with its own measurement, not a silent edit inside a
+      contract change.
 
 #: A `promote <field>` word needs a target with a NAMED home. The rail asserts the home EXISTS (file + symbol), so a
 #: promotion can never name a home that is only a hope.
 promotions:
   corroboration:
     home: pipeline/schema_accessor.py::isor_score
-    inputs: ['fbs.source_ids (D2185, canonical works)', 'fbs.is_convergent', 'fbs.source_diversity']
+    inputs: ['fbs.source_ids (D2185, canonical works)', 'fbs.is_convergent', 'fbs.source_diversity', 'fbs.isor']
     shape: '{sources: int, convergent: bool, independence: weak|medium|strong, independence_score: 0.0-1.0, home: str}'
+    #: D-2993/T-107: the SHAPE has ONE home too. `keys` is asserted against pipeline/corroboration.py::TUPLE_KEYS by
+    #: the rail, and the tuple itself is assembled ONLY there - the surface list is the set of publishers, each of
+    #: which imports that builder. A fix written three times would be the BUG-499/BUG-502 class applied to a contract.
+    keys: [sources, convergent, independence, independence_score, home]
+    builder: pipeline/corroboration.py::corroboration_tuple
+    consumers: [maxwell_mcp_server.py, pipeline/stage6_okf_export.py, pipeline/stage6b_anytype_push.py]
     measured: 'fbs.isor is populated on 6,591 of 7,640 rows (weak 5,212 / medium 969 / strong 410) and on 4,503 of 4,503 PASS rows'
     measured_gap: 'MEASURED 2026-10-13 on the canonical PASS population: the count-based BORP is already COARSER than the measure we hold — of 938 rows it certifies as corroborated, 35 are rated WEAK by isor, 148 carry ONE author and 170 ONE domain (the same author''s second book counts as a second source). Evidence + hardening: governance/BORP_REVITALIZATION_RISK_20261013.md'
+    landed: >-
+      MEASURED 2026-10-14 (D-2994): PUBLISHED by all three consumers; the retired scalar is gone from every one of
+      them, and the absence rules hold - a row with no `isor` publishes `independence: null` (never a fabricated
+      `weak`/0.0, D-2957).
 
 #: A flagged advertised field whose debt is SOURCE-owned (a data-shape repair the store's own register already
 #: counts) owes no OWNER WORD: the payload publishes the FB's own text, not a judgment about it, and the repair is a
@@ -137,7 +170,9 @@ acknowledged:
 owner_word:
   decision: T-107
   vocabulary: [retire, keep, keep-and-declare, keep-and-repair, 'promote <field>']
-  state: pending            # pending | granted
+  state: granted            # granted 2026-10-14: `retire` for borp_score, `keep-and-declare` for feedback_score,
+                            # `keep-and-repair` for classification_status (see `declared` and `retired`)
+  granted: 2026-10-14
   sheet: governance/OWNER_DECISION_T107_20261013.md
 
 #: THE SINGLE-SOURCE TIER (T-118, owner word GRANTED 2026-10-14 = `tier`). WHAT THE SYSTEM MAY SAY ABOUT A ROW THE
@@ -183,5 +218,10 @@ tier_policy:
       where today they publish NOTHING and 1,393 of their neighbours publish a false 0.0 (BUG-767)
 
 coverage:
-  max_declared_debt: 3      # CEILING — SHRINK-ONLY. The only act that may RAISE it is a DECISION (D-2644).
+  max_declared_debt: 2      # CEILING — SHRINK-ONLY. Was 3; LOWERED to 2 on 2026-10-14 by the T-107 change-set,
+                            # which retired borp_score off all three surfaces (its declaration moved to `retired`).
+                            # The remaining two are still ADVERTISED and still owe their change-set:
+                            # feedback_score (keep-and-declare; the wire shape landed, the fields stay) and
+                            # classification_status (keep-and-repair; the store-side repair is the next act).
+                            # The only act that may RAISE this is a DECISION (D-2644).
   min_declared_debt: 0      # FLOOR — the state this file exists to reach: every advertised field is true.

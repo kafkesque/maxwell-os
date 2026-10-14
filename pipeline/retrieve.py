@@ -33,29 +33,43 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from pipeline.label_traceability import traceability_of  # noqa: E402  BUG-497/D-2640: declared label provenance
-from pipeline.pipeline_paths import RETRIEVE_CONFIDENCE_THRESHOLD  # D2231: C12 compliance
-from pipeline.pipeline_paths import RERANK_ENABLED  # D2521 (S2): production rerank adoption gate
-from pipeline.pipeline_paths import RETRIEVAL_METHOD  # D-2724: production retrieval default (C21 swappable)
-from pipeline.pipeline_paths import (  # D-2980: the ONE home of the candidate-pool policy (C12/C20)
-    RERANK_POOL_CAP,
-    RERANK_POOL_FLOOR,
-    RERANK_POOL_MULTIPLIER,
-    RRF_LEG_POOL_CAP,
-    RRF_LEG_POOL_MULTIPLIER,
+from pipeline.feedback import (
+    declared as _feedback_declared,  # D-2989: the numeric policy's ONE home (C12)
 )
-from pipeline.pipeline_paths import SYMMETRIC_RELATIONSHIP_TYPES  # A2/BUG-274: undirected related_fbs types (reverse adjacency)
-from pipeline.pipeline_paths import FTS_STOPWORDS  # D2561: C12 stopwords from config
-from pipeline.pipeline_paths import (  # D2537: fused quality ranking (opt-in)
-    RANKING_QUALITY_SCORE_ENABLED,
+from pipeline.feedback import mark_fb_retrieved  # D2188 (P1-2): usage tracking on retrieval
+from pipeline.label_traceability import (
+    traceability_of,  # noqa: E402  BUG-497/D-2640: declared label provenance
+)
+from pipeline.pipeline_paths import (  # D-2980: the ONE home of the candidate-pool policy (C12/C20)  # D2537: fused quality ranking (opt-in)
+    FTS_STOPWORDS,  # D2561: C12 stopwords from config
     RANKING_CONFIDENCE_WEIGHT,
     RANKING_CONVERGENT_BOOST,
     RANKING_DIVERSITY_BOOST,
+    RANKING_QUALITY_SCORE_ENABLED,
+    RERANK_ENABLED,  # D2521 (S2): production rerank adoption gate
+    RERANK_POOL_CAP,
+    RERANK_POOL_FLOOR,
+    RERANK_POOL_MULTIPLIER,
+    RETRIEVAL_METHOD,  # D-2724: production retrieval default (C21 swappable)
+    RETRIEVE_CONFIDENCE_THRESHOLD,  # D2231: C12 compliance
+    RRF_LEG_POOL_CAP,
+    RRF_LEG_POOL_MULTIPLIER,
+    SYMMETRIC_RELATIONSHIP_TYPES,  # A2/BUG-274: undirected related_fbs types (reverse adjacency)
 )
 
-from pipeline.feedback import mark_fb_retrieved  # D2188 (P1-2): usage tracking on retrieval
-from pipeline.pipeline_paths import DB_PATH, CANONICAL_RUN, canonical_run_clause  # D-2881: serving canonical-run pin
-from pipeline.sqlite_vec_loader import load_sqlite_vec  # D-2915: shared sqlite-vec loader (ctypes fallback)
+#: D-2989/T-107: the serving NEUTRAL PRIOR, READ from its declared home instead of restated as a literal in the four
+#: reads below (config/feedback.yaml#serving.neutral_prior). A policy value with no home cannot be reviewed or
+#: ratcheted, and the SQL and Python copies of it could disagree about what a stored 0.0 means (the BUG-499/BUG-502
+#: class inside ONE function). Fail-closed at import: a missing declaration is an error, never a code default.
+NEUTRAL_PRIOR: float = float(_feedback_declared("serving.neutral_prior"))
+from pipeline.pipeline_paths import (  # D-2881: serving canonical-run pin
+    CANONICAL_RUN,
+    DB_PATH,
+    canonical_run_clause,
+)
+from pipeline.sqlite_vec_loader import (
+    load_sqlite_vec,  # D-2915: shared sqlite-vec loader (ctypes fallback)
+)
 
 
 def get_conn() -> sqlite3.Connection:
@@ -1067,8 +1081,8 @@ def graph_aware_search(
         gas_params.append(CANONICAL_RUN)
     rows = conn.execute(
         f"""SELECT *,
-            COALESCE({_quality_field()}, 0.5) AS _borp,
-            COALESCE(feedback_score, 0.5) AS _feedback
+            COALESCE({_quality_field()}, {NEUTRAL_PRIOR}) AS _borp,
+            COALESCE(feedback_score, {NEUTRAL_PRIOR}) AS _feedback
             FROM fbs
             WHERE fb_id IN ({placeholders})
             {class_filter_gas}
@@ -1087,8 +1101,8 @@ def graph_aware_search(
         fb["_is_seed"] = is_seed
 
         # Graph-aware score: boost seed FBs, penalize distant ones
-        borp: float = float(fb.get(_quality_field(), 0.5) or 0.5)
-        feedback: float = float(fb.get("feedback_score", 0.5) or 0.5)
+        borp: float = float(fb.get(_quality_field(), NEUTRAL_PRIOR) or NEUTRAL_PRIOR)
+        feedback: float = float(fb.get("feedback_score", NEUTRAL_PRIOR) or NEUTRAL_PRIOR)
         graph_boost: float = 1.2 if is_seed else 0.9  # D2205: seed bias
         fb["_graph_score"] = borp * (1.0 + feedback) * graph_boost
 

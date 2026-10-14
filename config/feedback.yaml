@@ -50,6 +50,15 @@ thresholds:
   retirement: {max_avg: 0.3, min_feedback: 5}   # reported by get_fb_feedback_stats (NOT enforced by a gate)
   boost: {min_avg: 0.8, min_feedback: 3}
 
+#: THE WIRE SHAPE (D-2989/D-2993). ONE home: pipeline/feedback.py::feedback_wire assembles it and the serving
+#: surfaces publish it; scripts/check_served_fields.py asserts this key list against that function's own WIRE_KEYS,
+#: so the contract cannot drift between the payload and the two exports. `state` is the token that resolves the
+#: ambiguity a bare null creates: the scale's WORST value is 0.0, so an absent score must SAY it is absent.
+wire:
+  keys: [score, count, state, prior, effective]
+  state_measured: measured
+  state_absent: no_feedback
+
 absence:
   shape: 'feedback_score IS NULL AND feedback_count = 0'   # D-2957: absent must be NULL, never a hollow blank
   wire: >-

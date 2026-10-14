@@ -47,7 +47,8 @@ from pipeline.pipeline_paths import (
     MCP_DELEGATE_MAX_SYSTEM_CHARS,
 )
 from pipeline.retrieve import search, graph_aware_search, agentic_search, EvidencePack  # D-2980: the non-graph branch DISPATCHES (was search_hybrid - the un-repointed 4th call site of D-2724)
-from pipeline.feedback import get_fb_feedback_stats
+from pipeline.feedback import get_fb_feedback_stats, feedback_wire
+from pipeline.corroboration import corroboration_tuple  # D-2993/T-107: the graded measure's ONE home (BUG-767)
 from pipeline.omlx_delegate import delegate_omlx  # BUG-063: file-grounded local delegation (C25)
 
 # MCP SDK
@@ -133,8 +134,11 @@ async def _tool_query_knowledge(args: dict) -> list[TextContent]:
                 "depth": fb.get("depth", ""),
                 "discipline": fb.get("discipline", ""),
                 "discipline_macro": fb.get("discipline_macro") or "emerging",
-                "borp_score": fb.get("borp_score"),
-                "feedback_score": fb.get("feedback_score"),
+                # D-2993/T-107: a fabricated 0.0 that every register called defective is GONE from the payload; the
+                # GRADED measure (sources x convergent x independence, one home pipeline/corroboration.py) takes its
+                # place, and the feedback signal publishes its absence EXPLICITLY rather than as a bare null.
+                "corroboration": corroboration_tuple(fb),
+                "feedback": feedback_wire(fb),
                 "confidence_score": fb.get("confidence_score"),
             }
             if graph_aware and "_graph" in fb:
@@ -192,10 +196,11 @@ async def _tool_get_fb_detail(args: dict) -> list[TextContent]:
             "depth": fb.get("depth"),
             "status": fb.get("status"),
             "classification_status": fb.get("classification_status"),
-            "borp_score": fb.get("borp_score"),
+            # D-2993/T-107: the RETIRED scalar is gone from the wire; the GRADED measure takes its place (one home:
+            # pipeline/corroboration.py). An agent can no longer read a fabricated 0.0 on a corroborated row.
+            "corroboration": corroboration_tuple(fb),
             "confidence_score": fb.get("confidence_score"),
-            "feedback_score": fb.get("feedback_score"),
-            "feedback_count": fb.get("feedback_count"),
+            "feedback": feedback_wire(fb),
             "usage_count": fb.get("usage_count"),
             "source_books": fb.get("source_books", []),
             "keywords": fb.get("keywords", []),
@@ -233,7 +238,7 @@ async def _tool_get_fb_reliability(args: dict) -> list[TextContent]:
     try:
         stats: dict = get_fb_feedback_stats(fb_id, DB_PATH)
         row = conn.execute(
-            """SELECT fb_id, name, borp_score, confidence_score,
+            """SELECT fb_id, name, confidence_score,
                feedback_score, feedback_count, usage_count,
                last_retrieved_at, status, classification_status, discipline_macro
                FROM fbs WHERE fb_id = ? AND pipeline_run_id = ?""",
@@ -249,10 +254,12 @@ async def _tool_get_fb_reliability(args: dict) -> list[TextContent]:
             "name": fb.get("name"),
             "discipline_macro": fb.get("discipline_macro") or "emerging",
             "trust_metrics": {
-                "borp_score": fb.get("borp_score"),
+                # D-2993/T-107: the graded corroboration tuple replaces the retired borp_score scalar, and the
+                # feedback signal is published with its absence made EXPLICIT (D-2957) - a bare null could not be
+                # told from a score of 0.0, the most damning value the scale has.
+                "corroboration": corroboration_tuple(fb),
                 "confidence_score": fb.get("confidence_score"),
-                "feedback_score": fb.get("feedback_score"),
-                "feedback_count": fb.get("feedback_count") or 0,
+                "feedback": feedback_wire(fb),
                 "usage_count": fb.get("usage_count") or 0,
                 # D-2957: absent is NULL, so `or ""` keeps this reader's emitted shape stable across the change.
                 "last_retrieved_at": str(fb.get("last_retrieved_at") or ""),

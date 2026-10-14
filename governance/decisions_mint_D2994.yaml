@@ -1,0 +1,80 @@
+# Mint record — D-2994: the retired scalar leaves the wire, the MEASURE takes its place, and a contract published by three surfaces has ONE home
+- id: D-2994
+  date: '2026-10-14'
+  state: RESOLVED
+  category: GOVERNANCE / CONTRACT
+  title: >-
+    The BORP scalar is RETIRED from every serving surface and the graded corroboration tuple replaces it (owner word
+    `retire`, unblocking the T-107 change-set); the feedback signal publishes its ABSENCE explicitly; a contract
+    published by three surfaces is assembled in ONE builder that the declaration is ASSERTED against; and a
+    completed owner word is joined in BOTH directions, so a retirement that did not land is a defect rather than a
+    claim in a handoff
+  bugs: [BUG-767, BUG-776]
+  decision: >-
+    THE GRANT. The owner unblocked the T-107 change-set on 2026-10-14 ("Also unblock (1)"), which is the word this
+    act required: `retire` for borp_score, `keep-and-declare` for feedback_score (granted 2026-10-13, landed here),
+    `keep-and-repair` for classification_status (granted here; its store-side repair is the NEXT act and is named).
+    D-2989 measured the harm, D-2990 separated the principle from the scalar, D-2993 proved the count is a
+    derivation, and this act removes the false claim from the machine.
+    R1 — THE SCALAR IS GONE FROM EVERY SURFACE, AND THE MEASURE TAKES ITS PLACE. MEASURED before this act:
+    `borp_score` = 0.0 on 7,640/7,640 canonical rows while 1,393 of those rows ARE corroborated and 938 are SERVED
+    - a false trust claim on 100% of the corpus, published by the MCP payload AND written into two exports
+    (BUG-767). The three surfaces now publish the GRADED tuple {sources, convergent, independence,
+    independence_score, home} instead, and the retirement is machine-proven: the rail's AST scan reads the
+    payload's OWN keys and no longer finds the column (INV-12). WHAT IS PUBLISHED IS A MEASURE, NOT A POLITICIAN'S
+    SCORE: `sources` is the row's canonical work count (re-derivable, D-2993), `independence` is the persisted
+    measure (D2284/D2309), and a row that was NEVER rated publishes `independence: null` - not `weak` and not 0.0,
+    because an absence read as the worst value is the same defect in the opposite direction (D-2957).
+    R2 — ONE CONTRACT, ONE BUILDER (the BUG-499/BUG-502 class applied to a payload). The tuple is assembled ONLY in
+    pipeline/corroboration.py::corroboration_tuple; the three surfaces import it, and the key list declared in
+    config/served_fields.yaml#promotions.corroboration.keys is ASSERTED against that module's own TUPLE_KEYS by the
+    rail - so a surface cannot drift from the contract without the rail firing (INV-11). The consumer list is
+    declared and each path must EXIST (C16), so a promotion can never name a surface that is gone.
+    R3 — THE FEEDBACK ABSENCE IS EXPLICIT (D-2957). The stored cache is NULL until the first rating, and a bare
+    `null` on the wire cannot be told from a score of 0.0 - the most damning value the scale has. The surfaces now
+    publish {score, count, state, prior, effective} with `state` ∈ {measured, no_feedback}, and the SHAPE has the
+    same one-home treatment (config/feedback.yaml#wire.keys asserted against pipeline/feedback.py::WIRE_KEYS).
+    MEASURED at the time of the act: the ledger table does not yet exist (CREATE TABLE IF NOT EXISTS has never run -
+    no rating was ever recorded) and every stored score is NULL, so the published state today is `no_feedback` for
+    every row: TRUE, and now legible.
+    R4 — THE NEUTRAL PRIOR HAS A HOME. The serving prior lived as FOUR literals inside ONE function in
+    pipeline/retrieve.py (SQL x2 and Python x2, two of which disagreed about what a stored 0.0 means). All four now
+    READ config/feedback.yaml#serving.neutral_prior through the declared accessor, fail-closed. The value is 0.5, so
+    the served ordering is UNCHANGED byte for byte: this is a home change, not a behaviour change.
+    R5 — A COMPLETED WORD IS JOINED IN BOTH DIRECTIONS (INV-12, `retired`). A retiring word with no anchor is a
+    defect (an unsigned act is not an act, T-101), and a field declared RETIRED that any declared surface still
+    advertises is a defect (the retirement did not land). The dead scalar cannot creep back as a claim.
+    R6 — WHAT IS DELIBERATELY NOT IN THIS ACT, NAMED SO IT CANNOT BE READ AS DONE. (a) The INTERNAL readers of the
+    dead column are NOT touched: pipeline/retrieve.py::_quality_field falls back to it when the fused-ranking flag
+    is off, two SELECT lists name it, query.py prints it, run_monitor averages it (a constant 0.0), the retrieval
+    evaluator formats it, and stage6b's ALL_FIELDS is a list nothing reads. Those are the BUG-511 family (a reader
+    branching on a value nothing writes) and they MOVE RETRIEVAL BEHAVIOUR, so they need their own change-set with
+    its own measurement rather than a silent edit inside a contract change - FILED as BUG-776. (b) The
+    classification_status REPAIR is a store-side writer fix (its threshold is an undeclared literal in
+    scripts/reinject_bug198_singletons.py::_classify_s4); the word is recorded and the repair is the next act. (c)
+    The Anytype push still publishes the bare `feedback_score` column to the EXTERNAL store; that feed's own shape
+    change is named here rather than half-migrated.
+  evidence: >-
+    MEASURED 2026-10-14, no store write: scripts/check_served_fields.py --selftest = 24/24 known-answer controls
+    fire; the live rail rc=2 with 0 undeclared, 0 stale and debt 2 == ceiling 2 (LOWERED from 3 by this act, D-2644
+    shrink-only), where the two remaining declarations are the still-advertised fields with their owed change-sets;
+    tests/test_served_fields_spec.py = 20 passed; the tuple is verified on real rows (a rated row publishes
+    median/weak with its score, an unrated row publishes null/null) and pipeline/retrieve.py::NEUTRAL_PRIOR reads
+    0.5 from its declared home; every touched module imports clean (pipeline.retrieve, pipeline.stage6_okf_export,
+    pipeline.stage6b_anytype_push, maxwell_mcp_server). The retirement's machine proof is the AST scan of the
+    payload's own keys (INV-12), not a claim in this record.
+  files:
+    - pipeline/corroboration.py
+    - config/served_fields.yaml
+    - config/feedback.yaml
+    - pipeline/feedback.py
+    - pipeline/retrieve.py
+    - maxwell_mcp_server.py
+    - pipeline/stage6_okf_export.py
+    - pipeline/stage6b_anytype_push.py
+    - scripts/check_served_fields.py
+    - specs/served_fields.spec.md
+    - tests/test_served_fields_spec.py
+    - config/task_register.yaml
+    - governance/T120_S1_RECON_20261014.md
+    - governance/buglog.md

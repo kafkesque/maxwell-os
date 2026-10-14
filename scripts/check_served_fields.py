@@ -60,6 +60,7 @@ DEFECT_HOME = "DEFECT_MISSING_HOME"
 DEFECT_CEILING = "DEFECT_CEILING_EXCEEDED"
 DEFECT_SURFACE = "DEFECT_MISSING_SURFACE"
 DEFECT_TIER = "DEFECT_TIER_POLICY_UNJOINED"
+DEFECT_UNJOINED = "DEFECT_DECLARATION_UNJOINED"
 EXIT_OK, EXIT_DEFECT, EXIT_OWNER_OWED = 0, 1, 2
 PROMOTE_PREFIX = "promote "
 PENDING = "pending"
@@ -247,6 +248,103 @@ def tier_faults(
     return faults
 
 
+def module_tuple(rel: str, name: str) -> list[str]:
+    """The string elements of a module-level tuple/list constant - the SHAPE a contract declares in CODE.
+
+    Args:
+        rel: repo-relative path of the module.
+        name: the constant's name.
+
+    Returns:
+        Its string elements, or [] when the module or the constant does not resolve (the caller fails closed).
+    """
+    path: Path = REPO / rel
+    if not path.exists():
+        return []
+    try:
+        tree = ast.parse(path.read_text())
+    except SyntaxError:
+        return []
+    for node in tree.body:
+        target: ast.expr | None = None
+        value: ast.expr | None = None
+        if isinstance(node, ast.Assign) and len(node.targets) == 1:
+            target, value = node.targets[0], node.value
+        elif isinstance(node, ast.AnnAssign):
+            target, value = node.target, node.value
+        if isinstance(target, ast.Name) and target.id == name and isinstance(value, (ast.Tuple, ast.List)):
+            return [str(e.value) for e in value.elts if isinstance(e, ast.Constant) and isinstance(e.value, str)]
+    return []
+
+
+def retired_faults(rows: list[dict[str, Any]], advertised: set[str]) -> list[str]:
+    """PURE guard for the COMPLETED owner words (D-2993/D-2994): a retirement that did not LAND is a defect.
+
+    Args:
+        rows: the declaration's `retired` rows.
+        advertised: the fields the declared surfaces still advertise.
+
+    Returns:
+        One message per fault; empty when every completed word is signed and has actually left the wire.
+    """
+    faults: list[str] = []
+    for row in rows:
+        field: str = str(row.get("field") or "").strip()
+        if not field:
+            faults.append("a `retired` row names no field")
+            continue
+        if not str(row.get("word") or "").strip():
+            faults.append(f"{field}: retired with no word - a completed act must name its disposition")
+        if not str(row.get("anchor") or "").strip():
+            faults.append(f"{field}: the retiring word carries no anchor - an unsigned act is not an act (T-101)")
+        if field in advertised:
+            faults.append(
+                f"{field}: declared RETIRED while {sorted(advertised)} still advertise it - the retirement did not"
+                " land, so the field is still a live claim about the store"
+            )
+    return faults
+
+
+def shape_faults(
+    declaration: dict[str, Any],
+    feedback_policy: dict[str, Any],
+    tuple_keys: list[str],
+    wire_keys: list[str],
+) -> list[str]:
+    """PURE guard for the WIRE SHAPES (D-2993/D-2994): the declared contract must EQUAL the builder that emits it.
+
+    Args:
+        declaration: config/served_fields.yaml.
+        feedback_policy: config/feedback.yaml.
+        tuple_keys: the keys the corroboration builder emits (read from its own module).
+        wire_keys: the keys the feedback builder emits (read from its own module).
+
+    Returns:
+        One message per fault; empty when both contracts have one home, one builder and a resolvable consumer set.
+    """
+    faults: list[str] = []
+    promo: dict[str, Any] = (declaration.get("promotions") or {}).get("corroboration") or {}
+    declared_keys: list[str] = [str(k) for k in (promo.get("keys") or [])]
+    if declared_keys != list(tuple_keys):
+        faults.append(
+            f"promotions.corroboration.keys {declared_keys} != the builder's own keys {list(tuple_keys)}"
+            " (pipeline/corroboration.py::TUPLE_KEYS) - a contract restated in config is the BUG-499 class"
+        )
+    builder: str = str(promo.get("builder") or "")
+    if not builder or not home_exists(builder):
+        faults.append(f"promotions.corroboration.builder {builder!r} does not resolve (file + symbol)")
+    for consumer in promo.get("consumers") or []:
+        if not (REPO / str(consumer)).exists():
+            faults.append(f"promotions.corroboration.consumers names {consumer!r}, which does not exist")
+    wire_declared: list[str] = [str(k) for k in ((feedback_policy.get("wire") or {}).get("keys") or [])]
+    if wire_declared != list(wire_keys):
+        faults.append(
+            f"config/feedback.yaml#wire.keys {wire_declared} != pipeline/feedback.py::WIRE_KEYS {list(wire_keys)}"
+            " - the feedback contract must have ONE home"
+        )
+    return faults
+
+
 def word_declared(word: str, vocabulary: set[str]) -> bool:
     """Whether an owner word is INSIDE the declared vocabulary (a `promote <field>` word matches its pattern).
 
@@ -381,6 +479,44 @@ def tier_controls() -> list[tuple[str, dict[str, Any] | None, set[str], bool, bo
     ]
 
 
+def retired_controls() -> list[tuple[str, list[dict[str, Any]], set[str], bool]]:
+    """The completed-word controls: one per way a retirement can be a LIE rather than an act (D-2994)."""
+    signed: dict[str, Any] = {
+        "field": "borp_score",
+        "word": "retire",
+        "anchor": "owner 2026-10-14",
+        "granted": "2026-10-14",
+    }
+    return [
+        ("a_signed_retirement_that_left_the_wire_is_joined", [signed], set(), False),
+        ("a_retirement_still_advertised_is_a_defect", [signed], {"borp_score"}, True),
+        ("an_unsigned_retirement_is_a_defect", [{**signed, "anchor": ""}], set(), True),
+        ("a_retirement_with_no_word_is_a_defect", [{**signed, "word": ""}], set(), True),
+    ]
+
+
+def shape_controls() -> list[tuple[str, dict[str, Any], dict[str, Any], list[str], list[str], bool]]:
+    """The wire-shape controls: a contract restated in config cannot be told from the builder (C12/D-2642)."""
+    keys: list[str] = ["sources", "convergent", "independence", "independence_score", "home"]
+    wire: list[str] = ["score", "count", "state", "prior", "effective"]
+    healthy: dict[str, Any] = {
+        "promotions": {
+            "corroboration": {
+                "keys": keys,
+                "builder": "pipeline/corroboration.py::corroboration_tuple",
+                "consumers": ["maxwell_mcp_server.py"],
+            }
+        }
+    }
+    policy: dict[str, Any] = {"wire": {"keys": wire}}
+    return [
+        ("a_declared_shape_equal_to_its_builder_is_joined", healthy, policy, keys, wire, False),
+        ("a_shape_differing_from_the_builder_is_a_defect", healthy, policy, keys, [*wire, "extra"], True),
+        ("a_shape_with_no_builder_is_a_defect",
+         {"promotions": {"corroboration": {"keys": keys, "builder": "", "consumers": []}}}, policy, keys, wire, True),
+    ]
+
+
 def run_selftest() -> int:
     """Drive every known-answer control through the SAME classifier the verdict comes from."""
     declaration: dict[str, Any] = load_declaration()
@@ -397,6 +533,16 @@ def run_selftest() -> int:
         got_faults: list[str] = tier_faults(policy, tokens, home_ok, accessor_ok)
         if bool(got_faults) != expected_fault:
             bad.append(f"{label}: expected fault={expected_fault}, got {got_faults}")
+    for label, rows, advertised, expected_fault in retired_controls():
+        total += 1
+        found: list[str] = retired_faults(rows, advertised)
+        if bool(found) != expected_fault:
+            bad.append(f"{label}: expected fault={expected_fault}, got {found}")
+    for label, decl, pol, tkeys, wkeys, expected_fault in shape_controls():
+        total += 1
+        shaped: list[str] = shape_faults(decl, pol, tkeys, wkeys)
+        if bool(shaped) != expected_fault:
+            bad.append(f"{label}: expected fault={expected_fault}, got {shaped}")
     if bad:
         for line in bad:
             print(f"  !!  {line}")
@@ -447,6 +593,19 @@ def main() -> int:
     for problem in tier_problems:
         print(f"FAIL {PREFIX}: {DEFECT_TIER} - {problem}")
     faults += tier_problems
+    #: D-2993/D-2994 - the COMPLETED words and the two WIRE SHAPES are joined to reality the same way the tier word
+    #: is: a retirement that did not leave the wire, and a contract restated in config, are both DEFECTS.
+    retired_problems: list[str] = retired_faults(list(declaration.get("retired") or []), set(surfaces))
+    feedback_policy: dict[str, Any] = yaml.safe_load((REPO / "config" / "feedback.yaml").read_text()) or {}
+    shape_problems: list[str] = shape_faults(
+        declaration,
+        feedback_policy,
+        module_tuple("pipeline/corroboration.py", "TUPLE_KEYS"),
+        module_tuple("pipeline/feedback.py", "WIRE_KEYS"),
+    )
+    for problem in retired_problems + shape_problems:
+        print(f"FAIL {PREFIX}: {DEFECT_UNJOINED} - {problem}")
+    faults += retired_problems + shape_problems
 
     con = sqlite3.connect(f"file:{DB_PATH}?mode=ro", uri=True)
     tally: dict[str, int] = {}

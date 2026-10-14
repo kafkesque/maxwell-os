@@ -11,28 +11,28 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1122 decisions (census stamp a774a886be86b042, 2026-10-14) · 540 bugs (193 open / 347 closed; highest OPEN = BUG-776) · 17 open tasks (MUST 5 / SHOULD 9 / WORTH 3; OWNER-moved 4, pipeline-moved 13; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1122 decisions (census stamp a774a886be86b042, 2026-10-14) · 540 bugs (193 open / 347 closed; highest OPEN = BUG-776) · 17 open tasks (MUST 6 / SHOULD 8 / WORTH 3; OWNER-moved 3, pipeline-moved 14; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **67** of 1122 — 🔴 open 32 · 🔵 proposed 14 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 565 · ⚖ ratified 133 | closed: ✅ resolved 322 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1122, D-2987/BUG-765)
 >
 > Open BUGS by severity (population = the census's 193 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 27 · 🟨 MED 42 · 🟩 LOW 19 · UNLABELLED 101 (BUG-757) of 193 open.
 >
-> **OWNER LANE (4) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
+> **OWNER LANE (3) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
 > | T-101 | 🔴 MUST | HARDEN THE RETRIEVAL GOLDEN SET (the gate is saturated) | one word: set | single (the anchor-set semantics) - then --check, --ap |
 > | T-117 | 🔴 MUST | BUG-749 residual — the ESCALATE surface: the units NO owner ruling reaches | one owner word per unit on the reference sheet (CONFIRM / CORRECT + ho |
-> | T-107 | 🟠 SHOULD | MCP payload decision — borp_score / feedback_score are still advertised to agents | one owner word per advertised field in config/served_fields.yaml#decla |
 > | T-121 | 🟠 SHOULD | the SOURCE KIND axis + per-kind identity - the prerequisite the internet-intake plan does not have | one owner word for the source-kind VOCABULARY (an answer-space decisio |
 >
-> **PIPELINE LANE (13) — what the agent will do next, in strategic-consequential order (source: config/task_register.yaml):**
+> **PIPELINE LANE (14) — what the agent will do next, in strategic-consequential order (source: config/task_register.yaml):**
 >
 > | id | pri | state | task | evidence |
 > |---|---|---|---|---|
 > | T-104 | 🔴 MUST | 🔴 open | BUG-757 — OPEN bugs carry NO severity token, so the register cannot be ordered by criticality | bug_status.json joined to the buglog headings: UNLABELLED ceiling 101 (2026-10-13) |
 > | T-119 | 🔴 MUST | 🔴 open | the CORROBORATION COLLAPSE delta — how many "≥2 independent sources" rows are really ONE VOICE | MEASURED 2026-10-13 (governance/BORP_REVITALIZATION_RISK_20261013.md §4, over the canonica |
 > | T-120 | 🔴 MUST | 🔴 open | the ABSORPTION path - a later independent source must be able to RAISE an existing row's corroboration, and a  | MEASURED 2026-10-13 (read-only, by reading the write path and the identity model - no stor |
+> | T-122 | 🔴 MUST | 🔴 open | the classification_status REPAIR (owner word keep-and-repair) - a store column that says CLEAN on a QUARANTINE | config/served_fields.yaml#declared[classification_status] (word keep-and-repair, granted 2 |
 > | T-105 | 🟠 SHOULD | 🔴 open | REA tier A/B mining — DEVONthink 3 (related-document ranking) and Cursor (derived code index) | governance/NOT-YET-EVALUATED-RESEARCH.md (REA targets logged 2026-10-13) |
 > | T-106 | 🟠 SHOULD | 🔴 open | ROADMAP — MODULARITY (C21 swappable infrastructure) and CROSS-OS COMPATIBILITY (C26) | protocols: pipeline/storage/base.py only; no cross-OS smoke exists (2026-10-13) |
 > | T-108 | 🟠 SHOULD | 🔴 open | BUG-712 / BUG-714 — the content_type residual and the harness-facing primitive | served run content_type census (2026-10-13) |
@@ -41,7 +41,6 @@
 > | T-114 | 🟠 SHOULD | 🔴 open | DISCHARGE THE INHERITED LADDER FAULTS - four lines were RED before D-2982 and the prefix report hid them | just health-full 2026-10-13: 7 faults / 128 lines; each rc=1 at 42f8b76^ (worktree). RE-ME |
 > | T-116 | 🟠 SHOULD | 🔴 open | GOLDEN-SET GROWTH — the instrument that ADDS harder/abstract goldens (T-101 can only RE-anchor the set it has) | scripts/reanchor_retrieval_goldens.py --check reports the draft/live set out of phase and  |
 > | T-109 | 🟡 WORTH | 🔴 open | spec/test sandbox — adopt the two mechanisms borrowed from impeccable / shadcn-ui-lint | specs/README.md (sandbox charter, prior art) |
-> | T-110 | 🟡 WORTH | 🔴 open | BUG-756 — the census restatement is hand-written | scripts/gov_sync.py --check rc=0 after --apply (2026-10-13) |
 >
 > **STANDING RULES — in effect, never close (1):**
 >

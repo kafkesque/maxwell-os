@@ -8,18 +8,19 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1123 decisions (census stamp 80c0ee779942890e, 2026-10-14) · 540 bugs (192 open / 348 closed; highest OPEN = BUG-775) · 18 open tasks (MUST 6 / SHOULD 9 / WORTH 3; OWNER-moved 3, pipeline-moved 15; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1123 decisions (census stamp 80c0ee779942890e, 2026-10-14) · 542 bugs (194 open / 348 closed; highest OPEN = BUG-778) · 19 open tasks (MUST 7 / SHOULD 9 / WORTH 3; OWNER-moved 4, pipeline-moved 15; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **67** of 1123 — 🔴 open 32 · 🔵 proposed 14 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 565 · ⚖ ratified 133 | closed: ✅ resolved 323 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1123, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 192 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 26 · 🟨 MED 42 · 🟩 LOW 19 · UNLABELLED 101 (BUG-757) of 192 open.
+> Open BUGS by severity (population = the census's 194 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 28 · 🟨 MED 42 · 🟩 LOW 19 · UNLABELLED 101 (BUG-757) of 194 open.
 >
-> **OWNER LANE (3) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
+> **OWNER LANE (4) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
 > | T-101 | 🔴 MUST | HARDEN THE RETRIEVAL GOLDEN SET (the gate is saturated) | one word: set | single (the anchor-set semantics) - then --check, --ap |
 > | T-117 | 🔴 MUST | BUG-749 residual — the ESCALATE surface: the units NO owner ruling reaches | one owner word per unit on the reference sheet (CONFIRM / CORRECT + ho |
+> | T-124 | 🔴 MUST | the RED ladder (BUG-777 + BUG-778): the anchor-bridge ambiguity policy is owed first, then the masked 68-rail  | the ambiguity policy is a RULING (D-2898): a name resolving to N rows  |
 > | T-121 | 🟠 SHOULD | the SOURCE KIND axis + per-kind identity - the prerequisite the internet-intake plan does not have | one owner word for the source-kind VOCABULARY (an answer-space decisio |
 >
 > **PIPELINE LANE (15) — what the agent will do next, in strategic-consequential order (source: config/task_register.yaml):**
@@ -13337,3 +13338,63 @@ rewrite of the artifact). (2) A store WRITE: nothing in the store was touched �
 commit, which is the pipeline's own act. (3) A new served field on the graph-neighbour payload. (4) The
 external Anytype column (D-2994's declared residual). (5) The `borp_min_sources` THRESHOLD is a different
 name (the S1.5 `>= 2 works` rule, alive and enforced) and is untouched: the rail targets `borp_score`.
+
+
+## BUG-777 (HIGH - OPEN 2026-10-14) - the anchor<->corpus bridge no longer re-derives: the content join collapsed 208 entries to 13 and most anchor rows are now AMBIGUOUS
+
+**DISCOVERED** by running the full ladder after D-2995 (the first act in this session to reach the rail). NOT caused
+by D-2995: the rail's own inputs are the ANCHOR ruler sheet (untouched), `config/anchor_family.yaml` (untouched) and
+the LIVE store (zero writes by this act - the newest `last_retrieved_at` in the store is 2026-10-13T14:41Z, i.e.
+before this session). The committed artifact is from **2026-10-08**; the store's population moved on 2026-10-12/13.
+
+**MEASURED 2026-10-14 (read-only, re-derived in-process, volatile fields stripped exactly as the rail strips them).**
+`inputs.store.rows`: **7,640** re-derived vs **14,574** committed. `entries`: **13** vs **208** - 196 vanished and
+**0 of the 196 vanished fb_ids still exist in the store**, so the loss is the join's, not a stale id set. The
+remaining 195 ruler rows resolve to **MULTIPLE candidate fb_ids** (`cause: ambiguous` with 2-3 candidates each, e.g.
+S4-GOLD-MINED-00396 "Institutional Response to Crisis" -> 2 candidates). 1,258 field differences in total.
+
+**WHY IT MATTERS.** The bridge is the one artifact that says WHICH corpus row an anchor-family row IS, keyed by
+CONTENT (D-2658). With 195 of 208 rows ambiguous, the anchor's authority cannot be propagated to the corpus by this
+join at all - and it is the rail the ladder reads to prove the join still holds. A JOIN that resolves to a SET is not
+a join: it is the D-2959 identity question (which of two rows with the same name is the work?) reappearing at the
+anchor layer.
+
+**THE LADDER CONSEQUENCE (see BUG-778).** `just health` STOPS here (rc 1 is not the tolerated owner-owed 2), so
+every rail below this line has been UNREACHABLE - measured this session: 5 of the 68 remaining rails are red.
+
+**STATUS.** OPEN. The remedy is NOT a blind re-baseline: writing a bridge whose entries collapsed to 13 would delete
+195 declarations. The order is (i) decide the ambiguity policy (a name that resolves to N rows is either declared
+unresolved or resolved by a rule, and that rule is the D-2959 content-identity rule generalised - an owner-gated
+ruling if it picks a winner), (ii) re-derive with the new ruler sheet/candidates, (iii) re-baseline as its own
+declared act (D-2861 precedent). Evidence: this entry; `governance/ANCHOR_208_BRIDGE_RULER_20261002.csv`;
+`governance/ANCHOR_STORE_BRIDGE_20260926.json` (built 2026-10-08, commit 57906e0);
+`governance/SESSION-HANDOFF-20261014-D2995.md`.
+
+## BUG-778 (HIGH - OPEN 2026-10-14) - a RED ladder line MASKS every rail below it: 5 of the 68 rails after BUG-777 measured red, each with its own cause
+
+**DISCOVERED** while completing the cascade check for D-2995. The ladder's prefix behaviour is DECLARED (BUG-573/
+BUG-582: it stops at the first non-zero line and reports a prefix), but the CONSEQUENCE had no owner: a rail that has
+been red for days silently un-verifies everything under it, and no face says so. The 68 rails below the bridge were
+therefore run individually with their ladder semantics preserved (bash -c, exactly as the justfile line reads).
+
+**MEASURED 2026-10-14 (68 rails, 5 non-zero; the ladder's own tolerance rc=2 was honoured for every line).**
+| rail | rc | cause (verbatim) | causal verdict |
+| --- | --- | --- | --- |
+| `check_silent_repair.py --check` | 1 | "DRIFT scripts/verify_anchor_family_registry.py:66 repairs silently (replace) with no entry" + 3 STALE declarations + debt 14 of ceiling 17 | PRE-EXISTING: the named file is untouched by D-2995 |
+| `check_undeclared_encoding.py --check` | 1 | "files 161 of ceiling 156 | sites 405 of ceiling 392 | writes 75 of ceiling 74 | unresolvable 4 of ceiling 3" | PRE-EXISTING ceiling overruns (>=4 files over) + 1 file from D-2995's new rail - the remedy is a re-record, which for a SHRINK-ONLY ceiling is its own act |
+| `check_store_columns.py --check` | 1 | "OWED CODE-CENSUS-MOVED" on name/pipeline_run_id/source_diversity/source_ids/status `.mentions` (the census counts .py files naming the column, so it moves on ANY code change) | PRE-EXISTING class (D-2649/BUG-533); D-2995's code changes move it one file in either direction - the declared remedy is `--record` |
+| `build_archive_index.py --check` | 1 | "on disk but in NEITHER the index nor the declared exclusions: `superseded_runs`" | PRE-EXISTING: untouched by D-2995 |
+| `check_rail_mutations.py` | 1 | "the oracle's BASELINE is not green (rc=1): the runner is already red before any mutation" | PRE-EXISTING interaction defect: the ORACLE (`check_served_fields.py`) is a TRI-STATE rail whose declared rc is **2** (owner-owed debt 2 == ceiling 2, T-107); the mutation harness reads any non-zero as "not green", so a load-bearing claim about the `borp`/owner-word guards cannot be proven while a declared debt exists |
+
+**WHY IT MATTERS.** Every "the rails are green" claim made from a ladder run since 2026-10-12 was a claim about a
+PREFIX. This is the same shape as BUG-730 (a silent config key killed a tier with every test green) one level up: the
+instrument that reports health had a blind spot no face counted. Four of the five causes are code-census/archive
+re-records (declared remedies, their own acts); one (check_rail_mutations) is a HARNESS defect that will keep
+mis-reporting as long as `check_served_fields` carries a declared debt, i.e. until T-122 and the Anytype arm land.
+
+**STATUS.** OPEN. Next: (1) fix the ladder's masking (a face or the ladder itself must say HOW MANY rails were not
+reached - a prefix is only honest if its LENGTH is printed); (2) triage the four pre-existing census/archive drifts as
+one declared re-record act with its own receipt; (3) fix the mutation harness to honour the tri-state convention it
+already declares. Evidence: this entry; `justfile` (the bridge line and the 68 below it);
+`governance/SESSION-HANDOFF-20261014-D2995.md`.
+

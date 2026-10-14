@@ -2,8 +2,8 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 540,
-  "open_n": 192,
+  "total_ids": 542,
+  "open_n": 194,
   "closed_n": 348,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
@@ -966,6 +966,16 @@
     {
       "id": "BUG-775",
       "title": "(MED - OPEN 2026-10-14) - ONE BIT IN THREE COLUMNS: the corroboration the store advertises is a derivation nothing declares",
+      "events": 1
+    },
+    {
+      "id": "BUG-777",
+      "title": "(HIGH - OPEN 2026-10-14) - the anchor<->corpus bridge no longer re-derives: the content join collapsed 208 entries to 13 and most anchor row",
+      "events": 1
+    },
+    {
+      "id": "BUG-778",
+      "title": "(HIGH - OPEN 2026-10-14) - a RED ladder line MASKS every rail below it: 5 of the 68 rails after BUG-777 measured red, each with its own caus",
       "events": 1
     }
   ],

@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**192 open** / 348 closed of 540 ids.
+**194 open** / 348 closed of 542 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -199,3 +199,5 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-773 | (HIGH - OPEN 2026-10-13) - the declared rule "a commit may never rewrite an existing row's body" is contradicted by the live upsert | 1 |
 | BUG-774 | (MED - OPEN 2026-10-13, PREVENTIVE) - the planned non-book intake has no identity, and the branch it would fall to is the one a closed defec | 1 |
 | BUG-775 | (MED - OPEN 2026-10-14) - ONE BIT IN THREE COLUMNS: the corroboration the store advertises is a derivation nothing declares | 1 |
+| BUG-777 | (HIGH - OPEN 2026-10-14) - the anchor<->corpus bridge no longer re-derives: the content join collapsed 208 entries to 13 and most anchor row | 1 |
+| BUG-778 | (HIGH - OPEN 2026-10-14) - a RED ladder line MASKS every rail below it: 5 of the 68 rails after BUG-777 measured red, each with its own caus | 1 |

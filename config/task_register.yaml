@@ -471,3 +471,23 @@ tasks:
   source: [D-2995, D-2994, BUG-776]
   evidence: 'config/store_columns.yaml (the borp_score why, 2026-10-14) + config/derivations.yaml#fbs.borp_score (status declared_but_empty) + scripts/check_store_columns.py --record (the declared remedy) + governance/SESSION-HANDOFF-20261014-D2995.md (the receipt and the declaration)'
   gate: 'none - the mover is the pipeline: the act is scripts/check_store_columns.py --record after the next S6 commit, and the census that moves must move DOWNWARD only (D-2642 shrink-only)'
+- id: T-124
+  priority: MUST
+  state: open
+  mover: owner
+  title: 'the RED ladder (BUG-777 + BUG-778): the anchor-bridge ambiguity policy is owed first, then the masked 68-rail triage and re-records'
+  why: >-
+    A ladder that stops at its first red line makes every "nothing cascades" claim a claim about a PREFIX - and the
+    masking is now MEASURED (BUG-778: the rails below the stop were run individually and their causes recorded).
+    Limb (a) needs a ruling: the anchor<->corpus content join no longer resolves the ruler to unique corpus rows, so
+    it returns a SET where an IDENTITY is required (BUG-777; the counts and the candidates are in that entry, not
+    here). When a ruler row's name resolves to N corpus rows, is the row DECLARED unresolved or RESOLVED by a rule -
+    and if a rule picks a winner, which rule (D-2658 content join / D-2959 identity)? Limb (b) is deterministic and
+    follows the ruling: the pipeline re-derives and re-baselines the bridge as its own receipted act (D-2861
+    precedent), and the four code-census / archive drifts named in BUG-778 (silent-repair, undeclared-encoding,
+    store-columns .mentions, archive index) go through their declared --record remedies in ONE act. Limb (c) is a
+    HARNESS defect: check_rail_mutations reads its oracle's declared tri-state rc 2 (owner-owed) as "not green", so
+    its load-bearing claim about the owner-word guards cannot be proven while any declared debt exists.
+  source: [BUG-777, BUG-778, D-2658, D-2959, D-2861, D-2898]
+  evidence: 'governance/buglog.md BUG-777 + BUG-778 (2026-10-14; both entries carry the verbatim measurements: 13 vs 208 entries, 7,640 vs 14,574 store rows, and the 5 rails with rc + cause) + governance/SESSION-HANDOFF-20261014-D2995.md (the triage table) + justfile (the bridge line and the 68 below it)'
+  gate: 'the ambiguity policy is a RULING (D-2898): a name resolving to N rows must either stay declared-unresolved or be resolved by a DECLARED rule; only then may the pipeline re-derive, re-baseline and re-record'

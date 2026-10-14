@@ -11,18 +11,19 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1123 decisions (census stamp 80c0ee779942890e, 2026-10-14) · 540 bugs (192 open / 348 closed; highest OPEN = BUG-775) · 18 open tasks (MUST 6 / SHOULD 9 / WORTH 3; OWNER-moved 3, pipeline-moved 15; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1123 decisions (census stamp 80c0ee779942890e, 2026-10-14) · 542 bugs (194 open / 348 closed; highest OPEN = BUG-778) · 19 open tasks (MUST 7 / SHOULD 9 / WORTH 3; OWNER-moved 4, pipeline-moved 15; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **67** of 1123 — 🔴 open 32 · 🔵 proposed 14 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 565 · ⚖ ratified 133 | closed: ✅ resolved 323 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1123, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 192 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 26 · 🟨 MED 42 · 🟩 LOW 19 · UNLABELLED 101 (BUG-757) of 192 open.
+> Open BUGS by severity (population = the census's 194 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 28 · 🟨 MED 42 · 🟩 LOW 19 · UNLABELLED 101 (BUG-757) of 194 open.
 >
-> **OWNER LANE (3) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
+> **OWNER LANE (4) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
 > | T-101 | 🔴 MUST | HARDEN THE RETRIEVAL GOLDEN SET (the gate is saturated) | one word: set | single (the anchor-set semantics) - then --check, --ap |
 > | T-117 | 🔴 MUST | BUG-749 residual — the ESCALATE surface: the units NO owner ruling reaches | one owner word per unit on the reference sheet (CONFIRM / CORRECT + ho |
+> | T-124 | 🔴 MUST | the RED ladder (BUG-777 + BUG-778): the anchor-bridge ambiguity policy is owed first, then the masked 68-rail  | the ambiguity policy is a RULING (D-2898): a name resolving to N rows  |
 > | T-121 | 🟠 SHOULD | the SOURCE KIND axis + per-kind identity - the prerequisite the internet-intake plan does not have | one owner word for the source-kind VOCABULARY (an answer-space decisio |
 >
 > **PIPELINE LANE (15) — what the agent will do next, in strategic-consequential order (source: config/task_register.yaml):**

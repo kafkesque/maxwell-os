@@ -115,3 +115,42 @@ implementation (`python_refs`, already R5-reviewed and control-backed in D-2645)
 plus 9 controls that were run, not asserted. The generator/verifier separation that matters here is the RAIL vs the
 CLAIM (the receipt is a benchmark run, not a model's opinion). Delegation budget was spent instead on the two
 falsifiable claims — the served-path identity and the fail-closed arm — because a model's review cannot check either.
+
+## POST-COMMIT LADDER TRIAGE — the act is green; the LADDER is not, and that is the finding (BUG-777 + BUG-778)
+
+`just health` after the commit stopped at **`build_anchor_store_bridge.py --check` (rc 1, and the ladder only
+tolerates rc 2 there)**. Verified NOT caused by D-2995: the rail's inputs are the ruler sheet (untouched),
+`config/anchor_family.yaml` (untouched) and the LIVE store (zero writes — the newest `last_retrieved_at` is
+**2026-10-13T14:41Z**, before this session). The committed bridge is from **2026-10-08**; the store's population
+moved on 10-12/13. Re-derived in-process with the rail's own volatile-field stripping: `inputs.store.rows` **7,640
+vs 14,574**; `entries` **13 vs 208** (196 vanished, and **0 of the 196 ids are still in the store** — the loss is
+the JOIN's); the surviving ruler rows resolve to **MULTIPLE candidates** ("cause: ambiguous", 2-3 each). So the
+content join now returns a SET where an identity is required. **Filed BUG-777; do NOT blind-rebaseline** (writing a
+13-entry bridge would delete 195 declarations). Remedy order: rule the ambiguity policy → re-derive → re-baseline as
+its own act (D-2861 precedent).
+
+**Because the ladder stops at the first red line, everything below it was UNREACHABLE — the 68 remaining rails were
+run individually with the ladder's own semantics.** Result: **5 red**, and only one of them is even partly this
+act's (a re-recordable code census), the rest pre-existing for days: `check_silent_repair` (a DRIFT in
+`verify_anchor_family_registry.py:66`), `check_undeclared_encoding` (ceiling overruns: files 161>156, sites
+405>392, writes 75>74, unresolvable 4>3), `check_store_columns` (OWED CODE-CENSUS-MOVED: `.mentions` counts
+`.py` files, so it moves on ANY code change — D-2649/BUG-533), `build_archive_index` (`superseded_runs` on disk
+but neither indexed nor excluded), and `check_rail_mutations` — a HARNESS defect: it reads its oracle's DECLARED
+tri-state rc 2 (owner-serviced debt, T-107) as "not green", so its load-bearing claim about the owner-word guards
+cannot be proven while any declared debt exists. **Filed BUG-778**; T-124 opened (ruling first, then one receipted
+re-record act). **The consequence for the record: every "the rails are green" claim made from a ladder run since
+2026-10-12 was a claim about a PREFIX.** That, not the scalar, is the highest-leverage defect found today — an
+instrument with a blind spot no face counts is the same shape as BUG-730 one level up.
+
+**Revised next critical steps (the ladder outranks the scalar work, because it is what verifies it).**
+1. **T-124 / BUG-777 + BUG-778** — rule the anchor-bridge ambiguity, then re-derive/re-baseline, then the four
+   census/archive re-records in ONE act, and fix the mutation harness's tri-state blindness. Until the ladder runs to
+   its end, no act can claim "nothing cascades".
+2. **T-122** — the classification_status REPAIR (the last limb of T-107; BUG-767 stays open until it lands).
+3. **T-123** — the store-columns re-record for the now-writerless column, after the next S6 commit.
+4. **T-117 → T-121 → T-104/BUG-757 → BUG-771**, as before.
+5. **The CRIBS detector rail** (`scripts/check_cribs_grounding.py`): NLI-entail `application`/`failure_mode`
+   against the FB body + evidence passages, refuse template-shaped elaborations, count sparse CRIBS per run — the
+   deterministic, temp-0 answer to the question the humanizer was proposed for. The existing guard in
+   `pipeline/stage4_merge.py` is *informational, not blocking*; promoting it is the real fix.
+

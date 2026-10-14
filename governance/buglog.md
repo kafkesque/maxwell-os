@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1128 decisions (census stamp 309f8cf9a7f9a898, 2026-10-15) · 559 bugs (201 open / 358 closed; highest OPEN = BUG-795) · 26 open tasks (MUST 8 / SHOULD 15 / WORTH 3; OWNER-moved 3, pipeline-moved 23; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1128 decisions (census stamp 309f8cf9a7f9a898, 2026-10-15) · 560 bugs (202 open / 358 closed; highest OPEN = BUG-796) · 26 open tasks (MUST 8 / SHOULD 15 / WORTH 3; OWNER-moved 3, pipeline-moved 23; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **68** of 1128 — 🔴 open 32 · 🔵 proposed 15 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 565 · ⚖ ratified 135 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1128, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 201 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 31 · 🟨 MED 44 · 🟩 LOW 21 · UNLABELLED 101 (BUG-757) of 201 open.
+> Open BUGS by severity (population = the census's 202 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 31 · 🟨 MED 45 · 🟩 LOW 21 · UNLABELLED 101 (BUG-757) of 202 open.
 >
 > **OWNER LANE (3) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -95,6 +95,7 @@
 
 | Bug | Date | Issue |
 |---|---|---|
+| BUG-796 | 2026-10-14 | **A DECISION WRITTEN OUTSIDE THE RECEIPTING WRITER LEAVES THE ATTRIBUTION CONTROL RED, and it is red on a commit that predates this session.** MEASURED 2026-10-14: `python3 scripts/lib/handoff.py --selftest` fails 1 of 4 attribution controls - `a governed write that IS the current bytes is attributed, and the join is by CONTENT` - because the MUTATION-journal's newest record for `config/decisions.yaml` (post-image `e93a3121639d77a3`, written by `scripts/recompute_decision_summary.py` at 20261014T152011Z) is not the live digest. PROVEN PRE-EXISTING, not a cascade from this session: the SAME control reds in a clean worktree at 7ccb4cd, where the live digest was `ed47950ec8a932f0`. The gap is the one every guarded write shares: `config/decisions.yaml` is written by the mint path and by the doc guard, and NEITHER records a post-image into the journal the control reads. `--rebaseline` correctly REFUSES to move it ("nothing was rewritten"), so the honest state is RED and owner-owed. FIX: the registry's writers record the post-image they produce (the mint already has the bytes), or the control accepts a verified ancestor and says so; never a hand re-record (D-2642). |
 | BUG-792 | 2026-10-14 | **THE LOCAL SERVER REUSES NO PREFIX, SO EVERY AGENT TURN PRE-PAYS ITS WHOLE PROMPT.** MEASURED 2026-10-14 (read-only, 12 identical-prefix calls + the probe's own `--prefill-ab`): `prompt_tokens_details.cached_tokens = 0` on every call, speedup 1.01x then 1.04x against the declared 5x bar. The one non-zero reading (a 4096-token block boundary straight after a model load) names the mechanism - a 4096-token BLOCK cache, switched OFF by the D2460 thrash guard, which is a RAIL that refuses inference when it is on. FIX: re-test ONE variable at a time under a declared protocol with a decode-rate oracle (the D2460 baseline is a decode collapse); until then the declared state is `disproven` and every prefill optimisation must be CACHE-FREE (fewer requests, shorter prompts, a model whose throughput can pay the bill). |
 | BUG-793 | 2026-10-14 | **Qwen3.8-27B PREFILLS AT 39 tok/s - FOUR TIMES WORSE THAN ITS PARAMETER RATIO PREDICTS.** MEASURED 2026-10-14: 32,026-token prefill = 715.7 s (11.9 minutes), decode 1.7 tok/s, model load 26.5 s, against gpt-oss-20b's 210 tok/s at a 50,082-token prompt on the same machine and the same settings tier. The parameter ratio alone predicts ~155 tok/s. CONSEQUENCE: the 27B cannot host an agent loop at any declared budget (672 s per 26,214-token turn), and its declared 262,144-token window would cost ~1.9 hours of prefill for one turn. FIX: diagnose before using it - memory guard tier, KV memory pressure, `specprefill_enabled: False` on this model while other models have it on. |
 | BUG-789 | 2026-10-14 | **THE LOCAL MODEL SERVER'S APP CONFIG CARRIES A HUGGING FACE TOKEN IN PLAINTEXT (mode 644, world-readable, 215 bytes).** MEASURED 2026-10-14 while mapping the agent harness: the oMLX app config holds an `hf_token` field verbatim. C3 declares all data and compute sovereign and local, and a credential in a plaintext config is neither: it is a live secret with no rotation, no env indirection and no file protection. FIX (declared): move it to the environment (`HF_TOKEN`) or the keychain, revoke and reissue the exposed value, and add a rail that refuses a secret-shaped literal in an app config. The value is deliberately NOT restated here. |
@@ -13926,3 +13927,36 @@ to no model is exactly the shape D-2957 forbids from being folded into someone e
 claims the row is wrong - only that it is UNATTRIBUTED, and that an unattributed row of that size must be named
 wherever a total is published (the probe already prints it as `inconclusive`, never as a zero, which is how it
 was found).
+
+## BUG-796 (MED — OPEN 2026-10-14) — a decision written outside the receipting writer leaves the attribution control red
+
+**MEASURED 2026-10-14**, and measured TWICE: once in the live tree, then once in a clean worktree at
+`7ccb4cd` to establish whether this session caused it (it did not).
+
+`python3 scripts/lib/handoff.py --selftest` reports 3 of 4 attribution controls firing and
+`1 of 4 attribution control(s) did not fire`:
+`a governed write that IS the current bytes is attributed, and the join is by CONTENT`. The control is
+narrow and correct: it asks for a MUTATION-journal record whose `post_sha16` IS the digest of
+`config/decisions.yaml` now, with a named writer. The newest such record carries
+`post_sha16 = e93a3121639d77a3` (`writer: scripts/recompute_decision_summary.py`,
+`stamp: 20261014T152011Z`), while the live file is `45fd6ee364bd868b` — and in the PRE-session worktree
+the same control reds with the live digest `ed47950ec8a932f0`. So the pairing has been broken since
+before this session, by the same class of act each time: **the registry is written by a path that does not
+record the bytes it produced.**
+
+**Why it is not cosmetic.** The handoff journal is the machinery that answers "WHO moved this governed
+region", and D-2972 makes that question an act rather than a narrative. A registry whose receipts lag its
+bytes means the attribution sentence for the ONE artifact every decision lands in is either stale or
+silent — the BUG-780/BUG-781 family (a guarantee with no enforcement point) one artifact over.
+
+**What was NOT done.** No hand re-record: `--rebaseline` was run and REFUSED, in its own words —
+"the receipted bytes are still an APPENDED of the live file, so nothing was rewritten and there is nothing
+to re-baseline ... a baseline moved where nobody measured a break is a quiet re-record (D-2642)". That
+refusal is correct and it is why the red stands. The module's declared maintenance act was run instead
+(`--backfill`, which took receipts for the 6 declared paths, labelled `origin=backfill` — "these receipts
+claim what the bytes ARE now"), which is honest hygiene and NOT a fix for this control.
+
+**FIX (declared, not applied).** Have the registry's writers record the post-image they produce — the mint
+already holds the bytes it just wrote, so this is one call at the write site — or let the control accept a
+VERIFIED ancestor and say which one, instead of demanding an exact post-image that the append-only mutual
+writes can never leave behind.

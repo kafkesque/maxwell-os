@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**201 open** / 358 closed of 559 ids.
+**202 open** / 358 closed of 560 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -208,3 +208,4 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-792 | (MED — OPEN 2026-10-14) — the local server reuses no prefix, so every agent turn pre-pays its whole prompt | 1 |
 | BUG-793 | (MED — OPEN 2026-10-14) — Qwen3.8-27B prefills at 39 tok/s, four times worse than its parameter ratio predicts | 1 |
 | BUG-795 | (LOW — OPEN 2026-10-14) — one ledger row carries a NULL model and 156,098,139 input tokens | 1 |
+| BUG-796 | (MED — OPEN 2026-10-14) — a decision written outside the receipting writer leaves the attribution control red | 1 |

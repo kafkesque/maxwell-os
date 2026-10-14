@@ -2,8 +2,8 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 559,
-  "open_n": 201,
+  "total_ids": 560,
+  "open_n": 202,
   "closed_n": 358,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
@@ -1011,6 +1011,11 @@
     {
       "id": "BUG-795",
       "title": "(LOW \u2014 OPEN 2026-10-14) \u2014 one ledger row carries a NULL model and 156,098,139 input tokens",
+      "events": 1
+    },
+    {
+      "id": "BUG-796",
+      "title": "(MED \u2014 OPEN 2026-10-14) \u2014 a decision written outside the receipting writer leaves the attribution control red",
       "events": 1
     }
   ],

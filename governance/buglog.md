@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1128 decisions (census stamp 734b3a63d6101a40, 2026-10-14) · 555 bugs (198 open / 357 closed; highest OPEN = BUG-790) · 26 open tasks (MUST 8 / SHOULD 15 / WORTH 3; OWNER-moved 3, pipeline-moved 23; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1128 decisions (census stamp 309f8cf9a7f9a898, 2026-10-15) · 559 bugs (201 open / 358 closed; highest OPEN = BUG-795) · 26 open tasks (MUST 8 / SHOULD 15 / WORTH 3; OWNER-moved 3, pipeline-moved 23; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **68** of 1128 — 🔴 open 32 · 🔵 proposed 15 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 565 · ⚖ ratified 135 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1128, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 198 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 31 · 🟨 MED 42 · 🟩 LOW 20 · UNLABELLED 101 (BUG-757) of 198 open.
+> Open BUGS by severity (population = the census's 201 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 31 · 🟨 MED 44 · 🟩 LOW 21 · UNLABELLED 101 (BUG-757) of 201 open.
 >
 > **OWNER LANE (3) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -20,7 +20,7 @@
 > |---|---|---|---|
 > | T-130 | 🔴 MUST | THE INGEST DOOR — the identity guarantee becomes an ENFORCEMENT POINT (delta-scoped), so a duplicate work cann | THE DOOR NOW READS A DECLARED WORD, AND ITS rc 2 NAMES THE ONE DEBT TH |
 > | T-131 | 🟠 SHOULD | THE MODEL-SWAP BENCH — no role is re-pointed to a newer model family without a declared, preflighted slot | mover = owner for the SLOT (which role, which model, what it may evict |
-> | T-132 | 🟠 SHOULD | THE HARNESS CONTEXT CONTRACT — the four layers between a local model's served window and the words an agent se | YOUR WORD decides the two things an agent must never choose, and then  |
+> | T-132 | 🟠 SHOULD | THE HARNESS CONTEXT CONTRACT — the four layers between a local model's served window and the words an agent se | THE MEASUREMENT ANSWERED THE FIRST QUESTION AND NARROWED THE SECOND, A |
 >
 > **PIPELINE LANE (23) — what the agent will do next, in strategic-consequential order (source: config/task_register.yaml):**
 >
@@ -95,6 +95,8 @@
 
 | Bug | Date | Issue |
 |---|---|---|
+| BUG-792 | 2026-10-14 | **THE LOCAL SERVER REUSES NO PREFIX, SO EVERY AGENT TURN PRE-PAYS ITS WHOLE PROMPT.** MEASURED 2026-10-14 (read-only, 12 identical-prefix calls + the probe's own `--prefill-ab`): `prompt_tokens_details.cached_tokens = 0` on every call, speedup 1.01x then 1.04x against the declared 5x bar. The one non-zero reading (a 4096-token block boundary straight after a model load) names the mechanism - a 4096-token BLOCK cache, switched OFF by the D2460 thrash guard, which is a RAIL that refuses inference when it is on. FIX: re-test ONE variable at a time under a declared protocol with a decode-rate oracle (the D2460 baseline is a decode collapse); until then the declared state is `disproven` and every prefill optimisation must be CACHE-FREE (fewer requests, shorter prompts, a model whose throughput can pay the bill). |
+| BUG-793 | 2026-10-14 | **Qwen3.8-27B PREFILLS AT 39 tok/s - FOUR TIMES WORSE THAN ITS PARAMETER RATIO PREDICTS.** MEASURED 2026-10-14: 32,026-token prefill = 715.7 s (11.9 minutes), decode 1.7 tok/s, model load 26.5 s, against gpt-oss-20b's 210 tok/s at a 50,082-token prompt on the same machine and the same settings tier. The parameter ratio alone predicts ~155 tok/s. CONSEQUENCE: the 27B cannot host an agent loop at any declared budget (672 s per 26,214-token turn), and its declared 262,144-token window would cost ~1.9 hours of prefill for one turn. FIX: diagnose before using it - memory guard tier, KV memory pressure, `specprefill_enabled: False` on this model while other models have it on. |
 | BUG-789 | 2026-10-14 | **THE LOCAL MODEL SERVER'S APP CONFIG CARRIES A HUGGING FACE TOKEN IN PLAINTEXT (mode 644, world-readable, 215 bytes).** MEASURED 2026-10-14 while mapping the agent harness: the oMLX app config holds an `hf_token` field verbatim. C3 declares all data and compute sovereign and local, and a credential in a plaintext config is neither: it is a live secret with no rotation, no env indirection and no file protection. FIX (declared): move it to the environment (`HF_TOKEN`) or the keychain, revoke and reissue the exposed value, and add a rail that refuses a secret-shaped literal in an app config. The value is deliberately NOT restated here. |
 | BUG-774 | 2026-10-13 | **The internet-intake plan has no IDENTITY: `source_id` is book-shaped and the fallback branch it would fall to is the one a closed defect class removed — PREVENTIVE, nothing ingested yet.** `source_id = SHA-256(normalize_author｜normalize_title)` with a FILENAME FALLBACK branch (`pipeline/book_metadata.py::compute_source_id`), over a converter that accepts only `{.epub, .pdf, .md}` (`pipeline/stage0_convert.py`); the evaluator’s rail asserts that fallback is NEVER live at ratio 0.0 (`config/eval_integrity.yaml` → `source_identity`, enforced by `scripts/verify_source_identity.py`, whose docstring records the original defect: `source_diversity` counted FILENAMES and 29.1% of convergence was the same book twice). A transcript, a podcast episode or a social thread has no author｜title in that shape, and a work re-published in another medium (preprint → version of record, book → the author’s podcast) would count as a SECOND source and certify a voice against itself. FIX: a source-kind axis + a per-kind identity resolver (the `config/references.yaml` OpenAlex-by-DOI precedent) + the re-publication collapse rule (D-2308 generalised) BEFORE any conversion (T-121). |
 | BUG-771 | 2026-10-13 | **The retrieval-golden REVIEW SHEET carried an `old_name` column that described a golden state NO LONGER LIVE, so a 150-cell owner review was conducted against a ghost comparison.** `old_name`/`old_fb_id`/`old_status` are filled by `scripts/reanchor_retrieval_goldens.py` at GENERATION time from the live golden; the sheet (`governance/golden_reanchor_candidates_20261011.csv`, generated 2026-10-11 20:44Z) was generated BEFORE the `20261011T221956Z` apply that re-anchored the same set — so the reviewed sheet compared every candidate against the PRE-apply expectation. MEASURED 2026-10-13 on the owner's reviewed copy: **30/30** `old_name` values are ABSENT from their own candidate list, while **30/30** LIVE expectations are PRESENT. Consequence: the instructions' cheapest and most valuable cell class — "if the query is already correct, anchor the row whose cand_name equals old_name" — was UNSATISFIABLE for every query, and the reviewer could not tell which candidate the system currently expects. FIX: the generator must stamp the golden state it compared against by HASH (sha256 of the golden file at generation) into the sheet, and `--check` must REFUSE a sheet whose stamped hash no longer matches the live file (a stale-premise rail) — the same discipline as D-2989's advertised-claim rail, one artifact over. |
@@ -113,6 +115,7 @@
 
 | Bug | Date | Issue |
 |---|---|---|
+| BUG-795 | 2026-10-14 | **ONE LEDGER ROW CARRIES A NULL MODEL AND 156,098,139 INPUT TOKENS.** MEASURED 2026-10-14: `usage_ledger` id 33 (session `20260826_1`) holds `model = NULL`, input 156,098,139, cache_read 141,896,704, `is_compaction = 0` - the single largest row in the table, belonging to no model, and 5.5% of the ledger's 2.86 B input tokens. Any census that groups by model drops or mis-attributes it, and D-2957's rule forbids folding an unattributed row of that size into someone else's denominator. The probe prints it as `inconclusive`, never as a zero - which is how it was found. FIX: report the unattributed residue wherever a total is published, and attribute the row if a session id can name its model. |
 | BUG-790 | 2026-10-14 | **THE INGEST DOOR'S REFUSAL NAMES THE WRONG TASK.** `scripts/check_ingest_identity_gate.py:123` prints `evidence contradicts (task T-129/T-131)` while the door's task is T-130 and T-131 is THE MODEL-SWAP BENCH — so a reader who follows the pointer lands on a task about re-pointing model slots, not on the door. MEASURED 2026-10-14 (`--gate` rc 2 on this machine). A hardcoded task pointer is the C12 defect class inside a refusal message: it is the one thing a REFUSAL must get right, because it is the instruction the reader acts on. FIX: name the task from a declared home (the register), or correct it to T-130. |
 | BUG-223 | 2026-09-05 | `'[]'` literal-array hygiene: 54 `emerging` FBs store `discipline_raw = '[]'` (JSON-empty-array string) instead of `''`/NULL. Queries testing `discipline_raw != ''` will wrongly count these as "has raw". Correct empty-test = `(discipline_raw IS NULL OR TRIM(discipline_raw)='' OR discipline_raw='[]')`. Minor (all 54 are legitimately `emerging`); normalize `'[]'`→`''` or add a shared empty-check helper in `pipeline/schemas.py`. D2569. |
 | BUG-169 | 2026-08-24 | TI `parameters` empty on 31/143 single-source + 100/307 singleton TI — ontology nuance (technique-type vs API TI); verify at rerun |
@@ -123,7 +126,7 @@
 ---
 
 ## ✅ CLOSED / RESOLVED — bottom (recent) — HAND INDEX, not a register (the DERIVED block above is the ONE authority; rows joined on every run, D-2986)
-- **BUG-791** — **ONE APOSTROPHE IN ONE TASK TITLE MADE THE BOOT-LOADED FACE UNPARSEABLE, and every writer still reported success.** The face writer spliced a rendered value straight into a single-quoted YAML scalar; `model's` closed the scalar at column 473 and `agent/session_seed.yaml` stopped loading, taking FOUR ladder rails with it. FIX: quote by the YAML rule (`_yaml_quote`), refuse a face that cannot be READ BACK, and a control + mutation that name it. 21/21 known answers.
+- **BUG-794** — **AN ESTIMATE OF A PROMPT SIZE PUBLISHED A TRUNCATION THAT DID NOT EXIST, and it had already reached a rail's evidence and the contract's baseline before it was caught the same day.** The sweep reported `sent ~35,200 tokens, the server echoed 32,026` and called it a truncation. The server echoed the truth: the prompt WAS 32,026 tokens, and the "sent" figure came from a chars-per-token rule of **4.0** while that filler measures **4.5** (45 characters = exactly 10 tokens). Refuted by sending a genuinely larger prompt: **50,082 tokens accepted whole** by a model declared at 131,072 - so the reachable window was real all along. FIX (structural, not a correction): `measured_prompt_tokens()` refuses a row marked `estimated`, the contract declares `chars_per_token_measured: 4.5` beside the filler, control 16 `an_estimated_prompt_size_is_refused_as_a_measurement` reds if the refusal is removed, and its own mutation proves it. ✅ (2026-10-14) — **ONE APOSTROPHE IN ONE TASK TITLE MADE THE BOOT-LOADED FACE UNPARSEABLE, and every writer still reported success.** The face writer spliced a rendered value straight into a single-quoted YAML scalar; `model's` closed the scalar at column 473 and `agent/session_seed.yaml` stopped loading, taking FOUR ladder rails with it. FIX: quote by the YAML rule (`_yaml_quote`), refuse a face that cannot be READ BACK, and a control + mutation that name it. 21/21 known answers.
 - **BUG-788** — **THE SIGNER'S CONTROLS COPIED THE LIVE DECLARATION, so the day the collapse act COMPLETED a known-answer control went red — and a red baseline makes every mutation in the file unprovable.** The signer is the subject of those controls; how far the act has got is not. FIX: a PURE pre-image (`unsigned_fixture`), a 14th control that proves the fixture's independence, and a mutation that reds through it. 14/14 controls, gate 57/57.
 - **BUG-783** — ****THE MUTATION GATE'S FIXTURE WAS UNDER-DECLARED, so TWO guards could not be made to red and the gate blamed the MUTATION for a fixture gap.** MEASURED 2026-10-14: `scripts/check_rail_mutations.py` reported `the_undeclared_advert_guard_is_load_bearing` and `the_owner_word_vocabulary_guard_is_load_bearing` (both on `scripts/check_served_fields.py`) as "the oracle's BASELINE is not green (rc=1)". Inside the fixture the runner failed **1 of 24** controls with two exact reasons: `promotions.corroboration.builder 'pipeline/corroboration.py::corroboration_tuple' does not resolve (file + symbol)` and `consumers names 'maxwell_mcp_server.py', which does not exist` — the declaration NAMES its builder and its consumers, and the fixture is FILE-GRANULAR (`config/rail_mutations.yaml#fixture.include_files`) so neither came with it. The direct run in the live tree is green (24/24, rc 0). Class: the BUG-589 shape one declaration over (a runner reads a declared input the fixture does not carry ⇒ EVERY baseline is red ⇒ the gate's finding is a false attribution), and the reason it matters is that the two guards are exactly the kind (iv) teeth the standing rule requires (D-2676): un-provable means un-held. FIX: `include_files` now carries `maxwell_mcp_server.py`, `pipeline/corroboration.py`, `pipeline/stage6_okf_export.py`, `pipeline/stage6b_anytype_push.py`, with the measurement recorded next to the list. VERIFIED: `check_served_fields.py --selftest` 24/24 in the fixture and `check_rail_mutations.py` **47/47 declared rules seen to red**, 1 negative control green, 0 baseline faults.**
 - **BUG-782** — ****THE OWNER LANE HAD NO INTAKE: the review sheet carried a machine screen (68 yes / 16 no, written by NO script in this repo) in a column NAMED `owner_ruling`, and its deterministic tier said 42 where the rail and the census both measure 37 — and nothing read either, so nothing could notice.** MEASURED 2026-10-14: the v1 sheet's `identical_text` column disagreed with its own source artifact (`temp/voice_collapse_pairs_20261014.csv#certain` = 37 yes / 47 no) and with `config/corroboration_collapse.yaml#lexical_limb.measured.pairs_identical_text` = 37; its per-pair `rows_affected` column summed to 745 against a census of 530 because a row can sit in MORE THAN ONE pair (117 rows do) and in more than one GROUP, so the per-pair/per-group columns are NOT additive and nothing declared that; the pair OBJECT itself had no home (a one-off under `temp/` produced it, and `temp/` auto-purges at 7 days) so the review sheet could not be re-derived; and the sum of its 84 rows' prescreen was read by no rail (the ingest door's own `collapse_debt` sniffed the FIRST column whose NAME contains "ruling" — on a rendered sheet that is `proposed_ruling`, i.e. a machine PROPOSAL would have been counted as an owner's word). FIX: `config/owner_marks.yaml` (ONE contract: vocabulary, homes, tiers, derivation, coverage, conflict rule) + `scripts/owner_marks.py` (`--render` measures and renders both sheets and carries every word and note already given, failing closed rather than dropping one; `--check` derives the effective word, validates the vocabulary, tests the transitivity conflict rule and binds the sheet to the census BY DIGEST; `--apply` expands only SIGNED tiers and records `ruling_source` per row; 9/9 known-answer controls) + the pair OBJECT gains a home (`governance/corroboration_collapse_pairs.json`, written by the intake which IMPORTS the rail's own limb, D-2646) + `ingest_gate.collapse_debt` reads the DECLARED column. Owner act: `governance/OWNER_MARKS_20261014.md` (5 signed tiers + 8 per-row words). CLOSED 2026-10-14: the intake, the signer and the ladder reading all exist and read both homes; the owner''s remaining WORD is tracked by T-129/T-130, not by this bug. ✅ (2026-10-14)
@@ -13855,3 +13858,71 @@ reached the ladder. (3) A known answer naming the rule, and a mutation proving t
 **Lesson (the reusable half).** A writer's OWN check is not a read-back: this writer verified the block it
 rendered and never the DOCUMENT it wrote. The ingest learned this as "read back what you spliced"; the faces had
 no such rule until a possessive apostrophe taught it.
+
+## BUG-792 (MED — OPEN 2026-10-14) — the local server reuses no prefix, so every agent turn pre-pays its whole prompt
+
+**MEASURED 2026-10-14**, read-only, on this machine. Twelve calls with **byte-identical prefixes** (4,466 / 4,468 /
+5,358 tokens) against a resident model, in three arms: a large fixed SYSTEM block, a large fixed USER block, and
+the CONTROL whose SYSTEM block carries a per-call nonce. **Every single call reported
+`prompt_tokens_details.cached_tokens = 0`**, and each paid the full prefill again (~9.8 s for ~4.5 k tokens at
+~455 tok/s). Two-call speedup: **1.01x**, then **1.04x** through the probe's own `--prefill-ab` against the
+contract's declared bar of **5x**. The server's own load figures name the mechanism: the one non-zero reading in
+the entire sweep was a **4096-token block boundary (cached_tokens = 4096) directly after a model load**, i.e. a
+4096-token BLOCK cache - the cache that `~/.omlx/settings.json` declares **off** (`cache.enabled = false`), which
+it must, because `assert_omlx_no_cache()` is a fail-closed rail that ABORTS inference when that cache (or its
+`gdn_ssd_split` / `hot_cache_only` companions) is enabled (D2460: `store_cache_main_dispatch` 817 ms -> 3.08 s,
+decode collapsing ~50 -> ~4-7 tok/s).
+
+**Why it matters.** Prefill, not decode, is the cost of an agent loop, and with no reuse the cost of a turn is the
+WHOLE prompt. It also re-reads the harness's own ledger: the 37.4% cache ratio that `gemma-4-E4B` shows over 289
+calls is NOT reproducible as cross-request prefix reuse today, so that number is historical, not a live capability.
+
+**What this bug does NOT claim.** It does not claim the cache cannot work, and it does not recommend flipping the
+flag. D2460 measured a regression, and a regression that has a known shape is re-tested ONE VARIABLE AT A TIME
+under a declared protocol with a DECODE-RATE ORACLE - never re-enabled on a hunch. Until that re-test lands, the
+declared state (contract: `cache_accounting.proof.status`) is **DISPROVEN**, and every optimisation must be
+cache-free: fewer requests per unit of work, shorter prompts, and a model whose measured throughput can pay the bill.
+
+## BUG-793 (MED — OPEN 2026-10-14) — Qwen3.8-27B prefills at 39 tok/s, four times worse than its parameter ratio predicts
+
+**MEASURED 2026-10-14** (read-only, one call, the server's own counters): a 32,026-token prompt returned
+`prompt_tokens_per_second = 39.02`, `time_to_first_token = 715.7 s`, `generation_tokens_per_second = 1.68`,
+`model_load_duration = 26.5 s`. On the same machine, same settings tier, `gpt-oss-20b-MXFP4-Q8` prefills at
+**210 tok/s** at a 50,082-token prompt and at 240-274 tok/s at 30 k and 3.6 k. A 27B against a 20B predicts roughly
+155 tok/s; the measurement is **four times slower**.
+
+**Why it matters.** It is the difference between a candidate and a trap. The model carries the machine's largest
+declared window (262,144) and is therefore the obvious "long-session" answer - while in fact one turn at the
+harness's own compaction trigger (26,214 tokens) would cost **672 seconds**, and a turn at its declared window
+**~1.9 hours**. It also inflates a page of routing arithmetic in the contract, so it must be diagnosed rather than
+inherited: candidates are the `memory_guard_tier: aggressive` path, KV memory pressure at a large prompt, and
+`specprefill_enabled: False` on this model where comparable models have it on.
+
+## BUG-794 (LOW — FIXED 2026-10-14, same session) — an ESTIMATE of a prompt size published a truncation that did not exist
+
+**MEASURED, then RETRACTED, 2026-10-14.** The first version of this sweep's evidence reported that a prompt was
+TRUNCATED: "sent ~35,200 tokens, the server echoed 32,026". The server echoed the truth; the *sent* number was
+computed with a chars-per-token rule of **4.0** while the filler ("the quick brown fox jumps over the lazy dog. ",
+45 characters) is exactly **10 tokens** in that tokenizer - i.e. **4.5 characters per token**. The prompt was
+32,026 tokens and was never truncated. Refuted by sending a genuinely larger one: **50,082 prompt tokens accepted
+whole** by a model declared at 131,072.
+
+**Why it is filed rather than quietly corrected.** A retraction nobody records is an error the next reader
+inherits, and this one had already been written into a rail's evidence and a contract's baseline. The fix is
+structural: `measured_prompt_tokens()` refuses a row marked `estimated`, the contract declares the MEASURED
+`chars_per_token_measured: 4.5` beside the filler, and a known-answer control fails if the refusal is removed
+(`an_estimated_prompt_size_is_refused_as_a_measurement`, with its own mutation).
+
+## BUG-795 (LOW — OPEN 2026-10-14) — one ledger row carries a NULL model and 156,098,139 input tokens
+
+**MEASURED 2026-10-14** while re-reading the cache ledger for this contract: `usage_ledger` row id 33
+(session `20260826_1`, timestamp 1787913235) carries `model = NULL`, `input_tokens = 156,098,139`,
+`output_tokens = 1,249,089`, `cache_read_tokens = 141,896,704`, `is_compaction = 0` - it is the single largest
+row in the table and it belongs to no model. Any census that groups by model silently drops it (5.5% of the
+ledger's 2.86 B input tokens and the largest single cache-read figure in the file).
+
+**Why it matters.** A per-model ratio is the evidence this contract publishes, and a row this large that belongs
+to no model is exactly the shape D-2957 forbids from being folded into someone else's denominator. Nothing here
+claims the row is wrong - only that it is UNATTRIBUTED, and that an unattributed row of that size must be named
+wherever a total is published (the probe already prints it as `inconclusive`, never as a zero, which is how it
+was found).

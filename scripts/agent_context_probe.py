@@ -17,8 +17,12 @@ its own, and two of its known-answer controls prove exactly that by reading its 
 
 READ-ONLY: this rail measures, it never writes a setting. Fixing a fault it reports is a config act.
 
-Usage:  python3 scripts/agent_context_probe.py [--json] [--selftest]
+Usage:  python3 scripts/agent_context_probe.py [--json] [--selftest] [--prefix-audit] [--prefill-ab]
 Exit:   rc 0 = every layer coherent | rc 2 = a declared fault | rc 1 = the probe itself failed
+
+READ-ONLY, with ONE declared exception: `--prefill-ab` SENDS three prompts (the two-call A/B that
+certifies prefix reuse, plus its control). It is opt-in and OFF the ladder, because a rail that needs
+the network must never be the thing that decides whether a build is green. Every other mode only reads.
 """
 
 from __future__ import annotations
@@ -28,6 +32,7 @@ import json
 import os
 import sqlite3
 import sys
+import time
 import urllib.error
 import urllib.request
 from collections.abc import Sequence
@@ -187,6 +192,193 @@ def window_class(window: int, classes: dict[str, Any]) -> str | None:
     return best[1] if best else None
 
 
+def measured_prompt_tokens(record: dict[str, Any]) -> int:
+    """A prompt size is MEASURED or it is REFUSED. BUG-794: an estimate published a claim that was false."""
+    if record.get("estimated"):
+        raise ProbeError("FAIL-CLOSED (agent-context): a prompt size derived from a chars-per-token rule is "
+                         "not a measurement - read the server's own counter instead (BUG-794)")
+    value = record.get("prompt_tokens")
+    if not isinstance(value, (int, float)) or value <= 0:
+        raise ProbeError("FAIL-CLOSED (agent-context): a reading with no measured prompt size is refused")
+    return int(value)
+
+
+def prefill_seconds(prompt_tokens: int, tps: float | None) -> float | None:
+    """Layer 5: the seconds a turn spends BEFORE its first decoded token (None when throughput is unmeasured)."""
+    if not isinstance(tps, (int, float)) or tps <= 0:
+        return None
+    return round(float(prompt_tokens) / float(tps), 1)
+
+
+def measured_prefill(cfg: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    """Layer 5's measured rows: one per model, each proved by the token count the SERVER echoed."""
+    rows: dict[str, dict[str, Any]] = {}
+    for model, row in ((cfg.get("measured_20261014") or {}).get("prefill") or {}).items():
+        if not isinstance(row, dict):
+            continue                     # an explicitly unmeasured model is a HOLE, not an error
+        rows[str(model)] = {"prompt_tokens": measured_prompt_tokens(row),
+                            "prefill_tps": row.get("prefill_tps"), "decode_tps": row.get("decode_tps")}
+    return rows
+
+
+def prefill_bill(window: int, tps: float | None, classes: dict[str, Any], cfg: dict[str, Any]) -> dict[str, Any]:
+    """Layer 5, the TWO-SIDED predicate: a class is satisfied by the WINDOW and by the PREFILL BILL.
+
+    The window is the FLOOR a class declares; the bill is what a turn actually costs. A model with a
+    large window and a small throughput satisfies the floor and fails the bill - and the class's
+    WORKING SET is what gets divided, never the window: a window is not a budget.
+    """
+    policy = str((cfg.get("prefill_budget") or {}).get("unknown_tps", "refuse_route"))
+    evaluated: list[dict[str, Any]] = []
+    for name, spec in classes.items():
+        if not isinstance(spec, dict):
+            continue
+        floor, working, allowed = spec.get("min_window"), spec.get("working_set"), spec.get("prefill_budget_s")
+        if not isinstance(floor, (int, float)) or window < floor:
+            continue
+        seconds = prefill_seconds(int(working), tps) if isinstance(working, (int, float)) else None
+        if seconds is None:
+            verdict = policy
+        elif isinstance(allowed, (int, float)) and seconds <= float(allowed):
+            verdict = "routable"
+        else:
+            verdict = "prefill_bill"
+        evaluated.append({"class": str(name), "min_window": floor, "working_set": working,
+                          "seconds": seconds, "budget_s": allowed, "verdict": verdict})
+    routable = [row for row in evaluated if row["verdict"] == "routable"]
+    best = max(routable, key=lambda row: row["min_window"], default=None)
+    return {"window": window, "prefill_tps": tps, "unknown_tps_policy": policy, "evaluated": evaluated,
+            "routable": [row["class"] for row in routable], "best": best["class"] if best else None}
+
+
+def cache_verdict(proof: dict[str, Any]) -> str:
+    """The proof's NUMBERS decide the verdict; the prose in `status` is a label, never the evidence.
+
+    A measured speedup below the declared bar is DISPROVEN - never "unknown", because the run HAPPENED.
+    An unrun proof is `not_yet_run`, and a declaration that carries neither is a fault, not a pass.
+    """
+    measured = proof.get("measured_20261014") or {}
+    speedup, bar = measured.get("speedup_measured"), proof.get("min_speedup")
+    if isinstance(speedup, (int, float)) and isinstance(bar, (int, float)):
+        return "proven" if float(speedup) >= float(bar) else "disproven"
+    if str(proof.get("status", "")).strip().lower().startswith("not_yet_run"):
+        return "not_yet_run"
+    return "undeclared"
+
+
+def prefix_rows_from_source(source: str, label: str, floor: int) -> dict[str, list[dict[str, Any]]]:
+    """Classify every module-level *SYSTEM* constant in ONE file's source (pure: source in, rows out).
+
+    Four things a grep cannot tell apart: a byte-stable PROMPT, a prompt BUILT per call (an f-string or
+    a concatenation - unique every call, amortisable by nothing), a name that merely mentions a system
+    (a role string, a token budget), and a constant too short to be a prompt at all.
+    """
+    import ast
+
+    out: dict[str, list[dict[str, Any]]] = {"stable": [], "volatile": [], "ignored": []}
+    try:
+        tree = ast.parse(source)
+    except SyntaxError:
+        return out
+    for node in tree.body:
+        if not isinstance(node, ast.Assign):
+            continue
+        names = [t.id for t in node.targets if isinstance(t, ast.Name) and "SYSTEM" in t.id]
+        if not names:
+            continue
+        name = names[0]
+        literal = isinstance(node.value, ast.Constant) and isinstance(node.value.value, str)
+        row: dict[str, Any] = {"file": label, "name": name,
+                               "chars": len(node.value.value) if literal else None}
+        if not literal:
+            row["state"] = ("built_per_call" if isinstance(node.value, (ast.JoinedStr, ast.BinOp, ast.Call))
+                            else "not_a_prompt")
+            out["volatile" if row["state"] == "built_per_call" else "ignored"].append(row)
+        elif len(node.value.value) < floor:
+            row["state"] = "below_the_declared_prompt_floor"
+            out["ignored"].append(row)
+        else:
+            row["state"] = "byte_stable"
+            out["stable"].append(row)
+    return out
+
+
+def prefix_audit(cfg: dict[str, Any]) -> dict[str, Any]:
+    """The pipeline's amortisation PRECONDITION, over the pipeline's own source.
+
+    A prefix that interpolates a date, a run id or a path is unique per call, so NO amount of batching
+    can amortise it. And a prefix is only worth amortising if it is LONG: the classified rows are the
+    precondition, so a label counted as a prefix would overstate what packing can buy.
+    """
+    stages = cfg.get("pipeline_stages") or {}
+    declared = int(stages.get("system_prefixes_verified_byte_stable", 0))
+    floor = int(stages.get("min_prompt_chars", 1))
+    totals: dict[str, list[dict[str, Any]]] = {"stable": [], "volatile": [], "ignored": []}
+    for path in sorted((repo_root() / "pipeline").glob("*.py")):
+        rows = prefix_rows_from_source(path.read_text(), path.name, floor)
+        for key, items in rows.items():
+            totals[key].extend(items)
+    return {"declared_stable": declared, "stable": len(totals["stable"]), "rows": totals["stable"],
+            "volatile": totals["volatile"], "ignored": totals["ignored"],
+            "prompt_floor_chars": floor, "ok": len(totals["stable"]) >= declared}
+
+
+def ab_probe(cfg: dict[str, Any], model: str, prompt_tokens: int, timeout: int = 900) -> dict[str, Any]:
+    """The ONLY certification of prefix REUSE: one identical prefix, two calls, the server's own count.
+
+    Sends, so it is opt-in and declared OFF the ladder. The third call is the CONTROL: the same prefix
+    on a DIFFERENT model must NOT be reused, which is what makes the first two a measurement of a cache
+    rather than of a page of memory that happened to be warm.
+    """
+    ab = (cfg.get("prefill_budget") or {}).get("ab_probe") or {}
+    filler, per_unit = str(ab.get("filler", "")), float(ab.get("chars_per_token_measured", 0) or 0)
+    if not filler or per_unit <= 0:
+        raise ProbeError("FAIL-CLOSED (agent-context): the A/B names no declared filler or its measured "
+                         "chars-per-token rate - a probe may not invent either (C12)")
+    prefix = (filler * (int(prompt_tokens * per_unit) // len(filler) + 1))[: int(prompt_tokens * per_unit)]
+    provider = read_json(home_path(cfg, "declaration"))
+    base_url, auth = provider_auth(provider)
+    template = str(cfg.get("homes", {}).get("chat_endpoint", "")).split("#", 1)[0]
+    if not template or not base_url:
+        raise ProbeError("FAIL-CLOSED (agent-context): the declaration names no chat endpoint (C12)")
+    url = template.format(base_url=base_url.rstrip("/"))
+
+    def once(target: str, tail: str) -> dict[str, Any]:
+        payload = {"model": target, "max_tokens": 1, "temperature": 0.0, "stream": False,
+                   "messages": [{"role": "system", "content": "You are a terse assistant."},
+                                {"role": "user", "content": prefix + "\n" + tail}]}
+        started = time.time()
+        body = _post_json(url, payload, auth, timeout)
+        usage = body.get("usage") or {}
+        return {"model": target, "seconds": round(time.time() - started, 1),
+                "prompt_tokens": usage.get("prompt_tokens"),
+                "cached_tokens": (usage.get("prompt_tokens_details") or {}).get("cached_tokens"),
+                "prefill_tps": usage.get("prompt_tokens_per_second")}
+
+    first, second = once(model, "Reply OK (a)"), once(model, "Reply OK (b)")
+    control = once(str(ab.get("control_model", "")), "Reply OK (c)")
+    speedup = None
+    if first.get("seconds") and second.get("seconds"):
+        speedup = round(float(first["seconds"]) / float(second["seconds"]), 2)
+    proof = (cfg.get("cache_accounting") or {}).get("proof") or {}
+    bar = proof.get("min_speedup")
+    sent = {"chars": len(prefix), "tokens_estimated_from_the_declared_rate": prompt_tokens}
+    return {"model": model, "sent": sent, "call1": first, "call2": second, "control_call": control,
+            "control_model": ab.get("control_model"), "speedup": speedup, "bar": bar,
+            "verdict": ("proven" if isinstance(speedup, float) and isinstance(bar, (int, float))
+                        and speedup >= float(bar) else "disproven")}
+
+
+def _post_json(url: str, payload: dict[str, Any], auth: str | None, timeout: int) -> dict[str, Any]:
+    """The one POST this probe ever makes; reached only by the declared, off-ladder A/B mode."""
+    headers = {"Content-Type": "application/json"}
+    if auth:
+        headers["Authorization"] = auth
+    request = urllib.request.Request(url, data=json.dumps(payload).encode(), headers=headers)
+    with urllib.request.urlopen(request, timeout=timeout) as response:  # noqa: S310 - declared local home
+        return json.loads(response.read().decode())
+
+
 def ledger_summary(db: Path, cfg: dict[str, Any]) -> dict[str, Any]:
     """Layer 4: the measured cache evidence, with ABSENT != ZERO (D-2957) held as a rule, not a habit."""
     accounting = cfg.get("cache_accounting") or {}
@@ -249,14 +441,22 @@ def build_report(cfg: dict[str, Any]) -> dict[str, Any]:
     verdicts = parity(served["windows"], declared, cfg)
     inputs = resolve_trigger_inputs(cfg, harness)
     classes = cfg.get("classes") or {}
+    prefill_rows = measured_prefill(cfg)
     routes = {}
     for model, window in sorted(served["windows"].items()):
+        tps = (prefill_rows.get(model) or {}).get("prefill_tps")
+        bill = prefill_bill(window, tps, classes, cfg)
         routes[model] = {
             "window": window,
             "class": window_class(window, classes),
             "trigger": effective_trigger(window, inputs["threshold"]["value"], inputs["cap"]["value"]),
+            "prefill_tps": tps,
+            "evaluated": bill["evaluated"],
+            "routable_classes": bill["routable"],
+            "best_class": bill["best"],
         }
     ledger = ledger_summary(home_path(cfg, "cache_ledger"), cfg)
+    proof = (cfg.get("cache_accounting") or {}).get("proof") or {}
     return {
         "served": served["windows"],
         "served_error": served["error"],
@@ -265,6 +465,9 @@ def build_report(cfg: dict[str, Any]) -> dict[str, Any]:
         "trigger_inputs": inputs,
         "routes": routes,
         "ledger": ledger,
+        "cache_verdict": cache_verdict(proof),
+        "cache_proof_bar": proof.get("min_speedup"),
+        "cache_proof_status": proof.get("status"),
         "prefix_hazards": prefix_hazards(cfg, harness),
     }
 
@@ -281,6 +484,9 @@ def render(report: dict[str, Any], cfg: dict[str, Any]) -> int:
     for model, verdict in report["parity"].items():
         if verdict != "ok":
             faults.append(f"{model}: {verdict}")
+    if report["cache_verdict"] == "undeclared":
+        faults.append("the cache proof carries NO measured verdict and no not-yet-run status: a rail that "
+                      "cannot say whether reuse was measured cannot say whether the local loop is affordable")
     print("== LAYER 3 - the derived compaction trigger ==")
     for label, spec in report["trigger_inputs"].items():
         print(f"   {label:10} {spec['value']!r:>10}  from {spec['source']} ({spec['env']})")
@@ -293,6 +499,18 @@ def render(report: dict[str, Any], cfg: dict[str, Any]) -> int:
         ratio = "n/a" if row["cache_read_ratio"] is None else f"{row['cache_read_ratio']:.1%}"
         print(f"   {row['verdict']:16} calls={row['calls']:>6} input={row['input_tokens']:>12} "
               f"carrying={row['rows_carrying_the_field']:>5} ratio={ratio:>7}  {row['model']}")
+    print(f"== LAYER 4b - the cache proof reads: {report['cache_verdict']} "
+          f"(declared bar {report['cache_proof_bar']}x, declared status {report['cache_proof_status']!r}) ==")
+    print("== LAYER 5 - the prefill bill (a window is not a budget) ==")
+    for model, spec in sorted(report["routes"].items()):
+        if spec["prefill_tps"] is None:
+            print(f"   UNMEASURED throughput -> NO route, fail-closed: {model}")
+            continue
+        print(f"   {float(spec['prefill_tps']):>7.1f} tok/s  best={str(spec['best_class']):13} "
+              f"routable={spec['routable_classes']}  {model}")
+        for row in spec["evaluated"]:
+            print(f"        {row['class']:16} working_set={row['working_set']:>7} seconds={row['seconds']} "
+                  f"budget_s={row['budget_s']} -> {row['verdict']}")
     for hazard in report["prefix_hazards"]:
         print(f"== PREFIX - {hazard['hazard']}: {hazard['state']} - {hazard['detail']}")
     if faults:
@@ -310,8 +528,17 @@ def render(report: dict[str, Any], cfg: dict[str, Any]) -> int:
 #: the declaration owns - that is what makes it known - and the control proves the split holds.
 REPORT_PATH_MARKER = "#: ── END OF THE REPORT PATH"
 
-FORBIDDEN_EVERYWHERE = ("/Users/", "sessions.db", "model_settings.json", "custom_providers", "localhost", "11435")
-BASELINE_NUMBERS = ("225000", "32768", "262144", "26214", "131072")
+#: The prefix auditor's own fixture: one module with all FOUR shapes the classifier must separate, so
+#: the control cannot pass by classifying everything the same way.
+PREFIX_FIXTURE_SOURCE = (
+    'SYSTEM_PROMPT = "{pad}"\n'
+    'SYSTEM = "system"\n'
+    'SYSTEM_LIVE = f"built per call {pad}"\n'
+    'MAX_SYSTEM_CHARS = 400\n'
+)
+#: The forbidden set and the baseline numbers are DECLARED (config/agent_context.yaml#self_scan, C12):
+#: a fixture nobody declares is a magic value with a good excuse, and this self-scan is the rail that
+#: proves the report path names neither a path, a host nor a number the declaration owns.
 CONTROL_LABELS = (
     "the_trigger_is_the_earlier_of_the_percentage_and_the_cap",
     "a_cap_below_the_percentage_binds",
@@ -325,6 +552,11 @@ CONTROL_LABELS = (
     "the_probe_names_no_path_or_host_of_its_own",
     "the_report_path_names_no_baseline_number_the_declaration_owns",
     "an_undeclared_injection_env_list_is_refused",
+    "a_model_that_cannot_pay_the_prefill_bill_is_not_routable_to_the_class",
+    "the_working_set_is_divided_not_the_window",
+    "a_measured_cache_failure_is_disproven_and_never_unknown",
+    "an_estimated_prompt_size_is_refused_as_a_measurement",
+    "the_prompt_floor_separates_a_prefix_from_a_label",
 )
 
 
@@ -380,14 +612,57 @@ def selftest(cfg: dict[str, Any]) -> int:
         connection.close()
         tmp.unlink(missing_ok=True)
     report_path = report_path_source()
-    control(CONTROL_LABELS[9], not [lit for lit in FORBIDDEN_EVERYWHERE if lit in report_path])
-    control(CONTROL_LABELS[10], not [num for num in BASELINE_NUMBERS if num in report_path_source()])
+    scan = cfg.get("self_scan") or {}
+    forbidden = tuple(str(lit) for lit in (scan.get("forbidden_everywhere") or []))
+    baselines = tuple(str(num) for num in (scan.get("baseline_numbers") or []))
+    if not forbidden or not baselines:
+        raise ProbeError("FAIL-CLOSED (agent-context): self_scan declares no fixtures - a self-scan with no "
+                         "declared forbidden set proves nothing (C12)")
+    control(CONTROL_LABELS[9], not [lit for lit in forbidden if lit in report_path])
+    control(CONTROL_LABELS[10], not [num for num in baselines if num in report_path_source()]
+            and REPORT_PATH_MARKER == str(scan.get("marker", "")))
     refused = False
     try:
         prefix_hazards({"prefix_stability": {}}, {})
     except ProbeError:
         refused = True
     control(CONTROL_LABELS[11], refused)
+
+    # ── LAYER 5: the prefill bill, asserted against the DECLARATION's own measured throughputs ──
+    live_classes = cfg.get("classes") or {}
+    throughputs = [float(row["prefill_tps"]) for row in measured_prefill(cfg).values()
+                   if isinstance(row.get("prefill_tps"), (int, float))]
+    if not throughputs:
+        raise ProbeError("FAIL-CLOSED (agent-context): no measured throughput is declared - the prefill "
+                         "bill cannot be controlled, and a control that cannot run is not a control")
+    floor = int((live_classes.get("agent_loop") or {}).get("min_window", 0))
+    fast = prefill_bill(floor, max(throughputs), live_classes, cfg)
+    slow = prefill_bill(floor, min(throughputs), live_classes, cfg)
+    control(CONTROL_LABELS[12], "agent_loop" in fast["routable"] and "agent_loop" not in slow["routable"])
+    # the bill divides the WORKING SET: with the window divided instead, this model is refused
+    toy = {"c": {"min_window": 1, "working_set": 10, "prefill_budget_s": 100}}
+    toy_bill = prefill_bill(1000000, 1.0, toy, cfg)
+    control(CONTROL_LABELS[13], toy_bill["routable"] == ["c"]
+            and toy_bill["evaluated"][0]["working_set"] == 10)
+    # the verdict comes from the NUMBERS: a status string alone may not manufacture one
+    control(CONTROL_LABELS[14],
+            cache_verdict({"min_speedup": 5, "measured_20261014": {"speedup_measured": 1.01}}) == "disproven"
+            and cache_verdict({"min_speedup": 5, "measured_20261014": {"speedup_measured": 44}}) == "proven"
+            and cache_verdict({"status": "not_yet_run_on_this_machine"}) == "not_yet_run")
+    estimated_refused = False
+    try:
+        measured_prompt_tokens({"prompt_tokens": 50000, "estimated": True})
+    except ProbeError:
+        estimated_refused = True
+    control(CONTROL_LABELS[15], estimated_refused
+            and measured_prompt_tokens({"prompt_tokens": 50000}) == 50000)
+    audit = prefix_audit(cfg)
+    fixture_rows = prefix_rows_from_source(PREFIX_FIXTURE_SOURCE.replace("{pad}", "x" * 300), "fixture.py", 200)
+    control(CONTROL_LABELS[16],
+            all(row["chars"] >= audit["prompt_floor_chars"] for row in audit["rows"])
+            and [row["name"] for row in fixture_rows["stable"]] == ["SYSTEM_PROMPT"]
+            and [row["name"] for row in fixture_rows["volatile"]] == ["SYSTEM_LIVE"]
+            and sorted(row["name"] for row in fixture_rows["ignored"]) == ["MAX_SYSTEM_CHARS", "SYSTEM"])
 
     held = passed == total
     print(f"{'ok ' if held else 'FAIL'} agent-context-probe --selftest: {passed}/{total} known-answer control(s) green")
@@ -396,23 +671,53 @@ def selftest(cfg: dict[str, Any]) -> int:
 
 
 def main(argv: Sequence[str] | None = None) -> int:
-    """CLI: report the four layers, or prove the controls."""
+    """CLI: report the layers, audit the pipeline's prefixes, run the A/B, or prove the controls."""
     parser = argparse.ArgumentParser(description="Read-only probe of the agent harness's context contract (T-132)")
     parser.add_argument("--json", action="store_true", help="emit the report as JSON")
     parser.add_argument("--selftest", action="store_true", help="run the known-answer controls")
+    parser.add_argument("--prefix-audit", action="store_true", help="audit the pipeline's system prefixes (offline)")
+    parser.add_argument("--prefill-ab", action="store_true", help="SEND the two-call prefix-reuse A/B (off the ladder)")
+    parser.add_argument("--model", default="", help="the model the A/B runs on (default: the declared loop slot)")
+    parser.add_argument("--tokens", type=int, default=0, help="A/B prefix size (default: the declared working set)")
     parser.add_argument("--config", default=None, help="override the declaration path (testing only)")
     args = parser.parse_args(argv)
     cfg = load_config(args.config)
+    codes = cfg.get("exit_codes", {})
     if args.selftest:
         return selftest(cfg)
+    if args.prefix_audit:
+        audit = prefix_audit(cfg)
+        for row in audit["rows"]:
+            print(f"   stable  {row['chars']:>6} chars  {row['file']}:{row['name']}")
+        for row in audit["volatile"]:
+            print(f"   VOLATILE (built per call, not amortisable)  {row['file']}:{row['name']}")
+        for row in audit["ignored"]:
+            print(f"   not a prompt ({row['state']})  {row['file']}:{row['name']}")
+        print(f"{'ok ' if audit['ok'] else 'FAIL'} prefix-audit: {audit['stable']} byte-stable system "
+              f"prefix(es), {len(audit['volatile'])} built per call (declared minimum {audit['declared_stable']})")
+        return int(codes.get("ok", 0) if audit["ok"] else codes.get("fault", 2))
+    if args.prefill_ab:
+        classes = cfg.get("classes") or {}
+        slots = ((cfg.get("routing") or {}).get("measured_routable_20261014") or {}).get("agent_loop") or [""]
+        model = args.model or str(slots[0])
+        tokens = args.tokens or int((classes.get("agent_loop") or {}).get("working_set", 0))
+        if not model or not tokens:
+            raise ProbeError("FAIL-CLOSED (agent-context): the A/B needs a model and a prefix size, and "
+                             "neither is invented here (C12)")
+        result = ab_probe(cfg, model, tokens)
+        print(json.dumps(result, indent=2, sort_keys=True))
+        proven = result["verdict"] == "proven"
+        print(f"{'ok ' if proven else 'FAIL'} prefill-ab: {result['speedup']}x against a declared bar of "
+              f"{result['bar']}x -> {result['verdict']}")
+        return int(codes.get("ok", 0) if proven else codes.get("fault", 2))
     try:
         report = build_report(cfg)
     except ProbeError as exc:
         print(f"FAIL agent-context: {exc}", file=sys.stderr)
-        return int(cfg.get("exit_codes", {}).get("fault", 2))
+        return int(codes.get("fault", 2))
     if args.json:
         print(json.dumps(report, indent=2, sort_keys=True))
-        return int(cfg.get("exit_codes", {}).get("ok", 0))
+        return int(codes.get("ok", 0))
     return render(report, cfg)
 
 

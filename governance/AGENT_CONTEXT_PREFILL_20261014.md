@@ -78,3 +78,62 @@ python3 scripts/agent_context_probe.py --selftest # 12 known answers, 2 of which
 rc 0 = the four layers agree; rc 2 = a declared fault (a drift, or a window nothing declares). The live reading
 is wired into `just health` as a **tri_state** line — loud, never fatal (BUG-457) — because the remedy for a
 drift is a declaration, not a broken build. The controls are `fatal`.
+
+---
+
+## 8. AMENDMENT (measured 2026-10-14, the same day) — the cache was RUN, the window was RE-TESTED, and LAYER 5 was added
+
+**The two claims in sections 1-6 that the amendment replaces, stated plainly so nothing above is read as current:**
+
+1. **"Every compaction rewrites the prompt, so the next turn pays a full cold re-prefill" is TRUE but no longer the
+   point.** The point is that there is **no prefix cache at all**: twelve calls with byte-identical prefixes (and the
+   probe's own `--prefill-ab`) all reported `cached_tokens = 0`, at a speedup of **1.01x / 1.04x** against a declared
+   **5x** bar. Every turn pre-pays its whole prompt, so a compaction is not a special case - it is the ordinary case
+   with a bigger bill (BUG-792). The declared state is `disproven`, and the single non-zero reading (a 4096-token
+   block boundary after a model load) names the mechanism: a 4096-token BLOCK cache, switched OFF by the D2460
+   thrash guard, which is a fail-closed rail rather than a setting.
+2. **Layer 3's ranking sentence in section 5 is WITHDRAWN.** The sweep said a 131,072-token window is reachable and
+   therefore better. It is reachable - **50,082 prompt tokens were accepted whole by the 20B** - and it is
+   **unaffordable**: at the measured throughputs a 131,072-token turn costs ~10 minutes on the 20B and ~56 minutes on
+   the 27B. The earlier "truncation at 32,026 tokens" is **RETRACTED**: the prompt WAS 32,026 tokens, and the "sent"
+   figure came from a chars-per-token ESTIMATE (4.0) where the measured rate is 4.5 (BUG-794).
+
+**LAYER 5 — THE PREFILL BILL** (the contract's new, fifth layer, and the column every routing table was missing):
+
+| model | prefill tok/s | decode tok/s | 26,214-token turn | 32,768-token turn | verdict at a 60 s budget |
+|---|---|---|---|---|---|
+| gemma-4-E4B-it-MLX-4bit | 455 | 27 | **57.6 s** | 72.0 s | **agent_loop** (the only one) |
+| Phi-4-mini-instruct-8bit | 394 | 40 | 66.5 s | 83.2 s | probe only — misses by 6 s |
+| gpt-oss-20b-MXFP4-Q8 | 210 | 33 | 124.8 s | 156.0 s | probe only |
+| Qwen3.8-27B-MLX-4bit | 39 | 1.7 | 672.2 s | 840.2 s | not a loop at any budget |
+| Qwen3-Coder-30B / others | unmeasured | — | — | — | **refused a route (fail-closed)** |
+
+**THE AMENDED F-LADDER (replaces the F1-F6 ordering in section 4, which was built on the window-first premise):**
+
+- **F1 — DECLARE THE TRIGGER FROM THE BILL, not from the window** (owner's word; T-132). While the cache is
+  disproven, `threshold <= per_turn_budget_s x measured_prefill_tps / window`. The 0.8 default is right for the
+  4B **by coincidence** and wrong for every other model — on the 20B's window it resolves to **104,857 tokens, 8.3
+  minutes of prefill per turn**.
+- **F2 — ROUTE THE LOOP TO THE MODEL THAT CAN PAY THE BILL** (the 4B class), and keep the large-window models for
+  `agent_probe` work where a 2-13 minute single answer is acceptable and a loop is not.
+- **F3 — AMORTISE THE PIPELINE BY PACKING, NOT BY PROMPT LAYOUT.** With no cache, the lever is requests per unit of
+  work. The precondition is verified and now railed: **10 byte-stable system prefixes** (`--prefix-audit`, AST-based,
+  because a grep counts role strings and budget constants as prompts).
+- **F4 — KEEP THE PREFIX STABLE ANYWAY** (a necessary condition, measured insufficient): no per-turn injection at
+  the head, no timestamps or ids in the system block, same model for a run of calls.
+- **F5 — PREFER A DECLARED HANDOFF OVER AN IN-PLACE COMPACTION.** A compaction rewrites the prefix (a full cold
+  re-prefill of the summary) *and* is lossy; a handoff read at the head of a fresh session is a shorter, byte-stable
+  prefix — cheaper and auditable (C3). The harness's compaction stays as the fallback.
+- **F6 — RE-TEST THE BLOCK CACHE ONE VARIABLE AT A TIME** behind a decode-rate oracle (D2460's regression has a known
+  shape: ~50 -> ~4-7 tok/s). Not a flag to flip; an experiment to declare. Owner-owed.
+- **F7 — DRIFT CORRECTION** (unchanged): reconcile the declared/served model mismatches — three served models nobody
+  declares, three declared models not served.
+
+**The reading, amended:**
+
+```bash
+python3 scripts/agent_context_probe.py                 # 5 layers + parity + the prefill bill per model, rc 2 on drift
+python3 scripts/agent_context_probe.py --selftest      # 17 known answers, 2 of which read the file's own bytes (C12)
+python3 scripts/agent_context_probe.py --prefix-audit  # the pipeline's amortisation precondition (offline)
+python3 scripts/agent_context_probe.py --prefill-ab     # SENDS 3 calls: the only certification of REUSE (off the ladder)
+```

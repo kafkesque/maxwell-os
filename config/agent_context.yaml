@@ -1,40 +1,57 @@
 # config/agent_context.yaml
 # ─────────────────────────────────────────────────────────────────────────────
-# THE AGENT HARNESS'S CONTEXT CONTRACT. ONE home (C12/C12c) for the four layers that sit between a
-# local model's SERVED window and the words an agent session can actually afford. Authority: D-3000
-# (PROPOSED — the policy below is measured and declared, but the two knobs that change behaviour wait
-# on the owner's word; nothing here rewrites a live setting).
+# THE AGENT HARNESS'S CONTEXT CONTRACT. ONE home (C12/C12c) for the layers that sit between a local
+# model's SERVED window and the words an agent session can actually afford. Authority: D-3000
+# (PROPOSED — measured and declared; the knobs that change behaviour wait on the owner's word, and
+# nothing here rewrites a live setting).
+#
+# AMENDED 2026-10-14, same day, BEFORE ratification, and the amendment is the point:
+#   * the first draft ranked models by WINDOW (agent_loop >= 131072) and read a prefill from a
+#     chars/token rule. Both were wrong, and both were caught by measuring rather than by reasoning:
+#       - a "truncation at 32,026 tokens" was an ARTEFACT: the filler unit is exactly 10 tokens per
+#         45 characters (0.222 tok/char), not 4 chars/token (0.25). The prompt was 32,026 tokens and
+#         was NOT truncated. An ESTIMATE is not a MEASUREMENT (BUG-794).
+#       - the local server reuses NO prefix: 12 calls with byte-identical 4.5k-5.3k prefixes returned
+#         `cached_tokens = 0` every time (speedup 1.01x against a declared bar of 5x). The cache is
+#         OFF, so every turn pays its WHOLE prompt again, and the binding constraint is PREFILL
+#         THROUGHPUT, not the window. A 131072-token turn on the 27B costs ~56 minutes of prefill.
+#   * the corrected ranking is therefore two-sided (window AND prefill bill), and it DEMOTES the
+#     big-window models for loop work while keeping them for single-shot probes.
 #
 # WHY THIS EXISTS — MEASURED 2026-10-14, read-only, on this machine:
 #   * oMLX serves Phi-4-mini / gemma-4-E4B / Qwen3-Coder-30B at `max_context_window: 32768`,
 #     gpt-oss-20b-MXFP4-Q8 at 131072, Qwen3.8-27B-MLX-4bit at 262144
 #     (`~/.omlx/model_settings.json`; confirmed by the OpenAI-compatible `/v1/models.max_model_len`).
+#   * those windows are REACHABLE, and that was verified rather than assumed: a 50,082-token prompt
+#     on gpt-oss-20b (declared 131072) came back as `prompt_tokens = 50,082`. The global
+#     `sampling.max_context_window` does NOT cap input, so a declared window above it is real.
 #   * goose DECLARES the same numbers (`custom_providers/maxwell_omlx.json#models[].context_limit`),
 #     so there is NO belief mismatch today. That is exactly why the parity must be DECLARED: today it
 #     is a coincidence of two hand-edited files in two different directories, and a reader that reads
 #     the wrong window is silent in both directions (truncated request, or a window thrown away).
 #   * goose's compaction trigger defaults to `min(GOOSE_AUTO_COMPACT_THRESHOLD x window,
-#     GOOSE_AUTO_COMPACT_TOKEN_LIMIT)` = `min(0.8 x 32768, 225000)` = 26214 tokens. EVERY local agent
-#     session therefore compacts at ~26k, and each compaction REWRITES the whole prompt — a
-#     prefix-cache bomb, which is the measured cause of "local AI feels slow" (the first token costs
-#     a full re-prefill of the summary; the video's own A/B measured 6.1 s cached vs 268 s uncached).
-#     The 225000 cap is a CLOUD PRICE-TIER artifact ("headroom below OpenAI's long-context price
-#     tier", goose docs) and is meaningless on hardware we own (C1/C22 — hybrid sovereignty).
-#   * the harness's own ledger already measures prefix reuse: `usage_ledger.cache_read_tokens`.
-#     Measured across 28646 calls: cloud deepseek-* models report ~96% of input tokens as cache reads,
-#     while NO local agent-loop call carries any cache evidence at all. ABSENT IS NOT ZERO (D-2957):
-#     a 0 here means UNPROVEN, and the only certification is a two-call A/B (below).
+#     GOOSE_AUTO_COMPACT_TOKEN_LIMIT)` = `min(0.8 x 32768, 225000)` = 26214 tokens on the local
+#     models. The 225000 cap is a CLOUD PRICE-TIER artifact and is meaningless on hardware we own
+#     (C1/C22) — but on a 262144-declared model it would let a LOCAL session grow to a two-hour prefill.
+#   * the harness's own ledger measures prefix reuse (`usage_ledger.cache_read_tokens`); the SERVER
+#     reports its own counter (`usage.prompt_tokens_details.cached_tokens`). MEASURED across 28646
+#     calls: cloud deepseek-* models report ~96% of input tokens as cache reads, and the local
+#     agent-loop calls report nothing. ABSENT IS NOT ZERO (D-2957) — and now it is not UNKNOWN either:
+#     the two-call A/B below was RUN on this machine and it FAILED.
 #
-# THE FOUR LAYERS. A mismatch between any two is a fault, and today every mismatch is silent:
+# THE LAYERS. A mismatch between any two is a fault, and every mismatch is silent:
 #   1 served_window        what the SERVER can attend to          (~/.omlx/model_settings.json)
 #   2 declaration          what the HARNESS is TOLD               (goose custom provider)
 #   3 trigger              when the harness COMPACTS              (GOOSE_* env, defaults from goose)
-#   4 cache_ledger         the MEASURED prefix reuse              (goose sessions.db usage_ledger)
+#   4 cache_ledger         the MEASURED prefix reuse              (goose sessions.db + the server's own counter)
+#   5 prefill_budget       what a turn COSTS in seconds           (this file, measured per model)
 #
-# THE PROBE. `scripts/agent_context_probe.py` re-measures all four and reports the parity, the derived
-# trigger and the cache evidence. It reads EVERY path, threshold and vocabulary from THIS file: it
-# names no path, no host and no magic number of its own (C12), and it WRITES NOTHING (read-only).
-schema_version: '1'
+# THE PROBE. `scripts/agent_context_probe.py` re-measures the layers and reports the parity, the
+# derived trigger, the cache verdict and the prefill bill. It reads EVERY path, threshold and
+# vocabulary from THIS file: it names no path, no host and no magic number of its own (C12), and it
+# WRITES NOTHING. `--prefill-ab` is the ONLY mode that SENDS a prompt, and it is opt-in and OFF the
+# ladder (a rail that needs the network must never be the thing that decides whether a build is green).
+schema_version: '2'
 authority: D-3000
 authority_state: PROPOSED
 updated: '2026-10-14'
@@ -44,6 +61,8 @@ state: measured_awaiting_owner_word
 homes:
   served_window: '~/.omlx/model_settings.json#models.<model>.max_context_window'
   served_window_endpoint: '{base_url}/models#max_model_len'      # base_url comes from the declaration
+  chat_endpoint: '{base_url}/chat/completions'                   # the ONE place a probe may SEND a prompt
+  server_settings: '~/.omlx/settings.json'                       # the server's launch-time source of truth
   declaration: '~/.config/goose/custom_providers/maxwell_omlx.json'
   harness_config: '~/.config/goose/config.yaml'                  # top-level GOOSE_* keys = the env defaults
   cache_ledger: '~/.local/share/goose/sessions/sessions.db#usage_ledger'
@@ -56,6 +75,10 @@ parity_rule:
   on_declared_below_served: wasted_window       # the harness compacts early and throws away usable context
   on_missing_either_side: unverifiable          # a model with no served window is not a routable slot
   fault_rc: 2                                   # the probe's rc when the rule is broken
+  #: A window is REACHABLE or it is not, and reachability is measured, never inferred from the
+  #: global sampling setting: MEASURED 2026-10-14, a 50082-token prompt on a 131072-declared model
+  #: was accepted whole, so the server's global context setting does not cap an input.
+  reachability_evidence: 'prompt_tokens echoed by the server for a prompt LARGER than the setting'
 
 #: LAYER 3. The trigger is derived, never guessed. `cloud_cap` is declared so that the day a local run
 #: is capped by a cloud price tier, the config says so instead of the default silently binding.
@@ -70,24 +93,63 @@ trigger:
   ollama_input_limit_env: GOOSE_INPUT_LIMIT      # maps to num_ctx for ollama requests
   tool_cutoff_env: GOOSE_TOOL_CALL_CUTOFF        # full-detail tool calls kept before older output is summarized
   strategy_env: GOOSE_CONTEXT_STRATEGY
-  #: declared headroom: compaction must fire BEFORE the window is full (the request that triggers
-  #: compaction is itself large), and late enough that one session compacts once, not five times.
+  #: DECLARED HEADROOM. Compaction must fire BEFORE the window is full (the request that triggers
+  #: compaction is itself large) and late enough that one session compacts once, not five times.
   min_headroom_tokens: 2048
   max_compactions_per_session: 1
+  #: THE TRIGGER IS CONDITIONAL ON THE CACHE, and this is the whole of T-132's second knob.
+  #: With a PROVEN cache, growth is nearly free and the threshold may sit at the window's edge.
+  #: With the cache DISPROVEN (the measured state below), the threshold must instead satisfy the
+  #: LATENCY budget, because every turn re-prefills the whole prompt:
+  #:     threshold <= per_turn_budget_s * measured_prefill_tps / window
+  #: MEASURED 2026-10-14, the default 0.8 is right for the FASTEST local model BY COINCIDENCE
+  #: (0.8 x 32768 = 26214, and 26214 / 455 = 58 s <= 60 s) and wrong for every other: the same 0.8 on
+  #: a 210 tok/s model buys a 125-second turn, and on a 39 tok/s model a 672-second one.
+  cache_conditional:
+    cache_proven: 'threshold 0.8 x window, capped by the window itself; growth is nearly free'
+    cache_disproven: 'threshold = min(0.8 x window, per_turn_budget_s x measured_prefill_tps)'
+    measured_state: cache_disproven
+  #: A compaction is the MOST EXPENSIVE single act the harness performs on a local model: it rewrites
+  #: the prefix, so the next turn pays a full COLD re-prefill of the summary AND the summary is lossy.
+  #: A DECLARED HANDOFF read at the head of a FRESH session is a SHORTER, byte-stable prefix: cheaper,
+  #: auditable, and local (C3). Prefer it, and keep the harness's compaction as the fallback.
+  prefer: declared_handoff_over_in_place_compaction
+  handoff_home: 'governance/session_plan_*.yaml + the session-resume skill'
 
 #: LAYER 4. Cache accounting. A ratio is computed ONLY over rows that CARRY the field; the rows that do
 #: not are counted and REPORTED as unknown. A fabricated 0 is BUG-767's defect class, not a measurement.
 cache_accounting:
-  field: cache_read_tokens
+  field: cache_read_tokens                                   # the HARNESS's ledger (goose sessions.db)
+  served_field: 'usage.prompt_tokens_details.cached_tokens'  # the SERVER's own counter (the vocabulary
+                                                             #   of the thing that actually reuses a prefix)
   input_field: input_tokens
   absent_is_not_zero: true
   decision: D-2957
   min_calls_for_a_ratio: 20        # below this the ratio is reported as inconclusive, never as a number
   proof:
-    method: 'two-call A/B on ONE cold-start process: identical prefix, measure ttft_cold then ttft_warm'
-    min_speedup: 5.0               # below this, prefix reuse is UNPROVEN and the ledger field is UNTRUSTED
+    method: 'two-call A/B on ONE resident model with a BYTE-IDENTICAL prefix (the server echoes the reused count)'
+    min_speedup: 5.0               # below this, prefix reuse is UNPROVEN and every ledger field is UNTRUSTED
     measured_reference: '6.1 s warm vs 268 s cold = 44x (the referenced walkthrough, same session, same model)'
-    status: 'not_yet_run_on_this_machine — nothing in this repo has certified a local prefix cache HIT'
+    status: DISPROVEN_MEASURED_20261014
+    measured_20261014:
+      identical_prefix_calls: 12
+      arms: ['large fixed SYSTEM block', 'large fixed USER block', 'large SYSTEM block with a per-call nonce at its head']
+      prefix_tokens: [4466, 4468, 5358]
+      cached_tokens_every_call: 0
+      speedup_measured: 1.01
+      prefill_repayed_per_call: 'the full prefix, every call (~9.8 s for ~4.5 k tokens on the fastest local model)'
+      the_one_nonzero: >-
+        a single cached_tokens=4096 appeared immediately after a model LOAD - i.e. the reuse mechanism is a
+        4096-token BLOCK cache, and 4096 is its block boundary. That is the cache this machine has switched OFF.
+      cause_candidate: 'the server settings declare the paged block cache disabled (the D2460 thrash guard is a RAIL that refuses inference when it is on)'
+      cause_state: UNVERIFIED            # a candidate, not a finding: the flag is refused by declaration, and flipping it re-opens a measured regression
+      re_test_rung: >-
+        ONE variable at a time under a declared protocol with a decode-rate oracle (the D2460 baseline is a
+        decode collapse; a re-test that cannot red on the collapse is not a re-test), never a hunch-driven flip
+      conclusion: >-
+        prefix reuse is DISPROVEN on this machine today, so the honest model of a local turn is
+        "every turn pre-pays its whole prompt". Every prefill optimisation must therefore be CACHE-FREE:
+        fewer requests per unit of work, shorter prompts, and a model whose throughput can pay the bill.
 
 #: PREFIX STABILITY. The invariant that makes prefill cheap, and the three ways this harness breaks it.
 prefix_stability:
@@ -107,6 +169,11 @@ prefix_stability:
         timestamps, git status or a rotating file list inside the system prompt / project hints make
         the prefix unique per turn. A per-turn block belongs in the TAIL (a turn-context block is
         exactly this shape and must never be prepended).
+    - id: no_cache_behind_a_stable_prefix
+      why: >-
+        a byte-stable prefix is NECESSARY and NOT SUFFICIENT: MEASURED, twelve calls with an identical
+        prefix reused nothing. A stability claim without an A/B is a claim about the prompt, not about
+        the machine, and this hazard exists so the report cannot present the first as the second.
   injection_envs: [GOOSE_MOIM_MESSAGE_TEXT, GOOSE_MOIM_MESSAGE_FILE]   # the per-turn injection homes
   verification: 'the probe prints the hazards it can measure from the live config and names the rest as UNVERIFIED'
 
@@ -116,23 +183,84 @@ tool_results:
   server: {home: '~/.omlx/model_settings.json#models.<model>.max_tool_result_tokens', measured_default: 4096}
   rule: 'older tool output is summarized, the recent calls stay in full detail'
 
-#: THE WINDOW CLASSES. Routing is declared: a class names the minimum served window an agent LOOP may
-#: run on, so a 32k model is never asked to hold a multi-file session.
+#: LAYER 5. THE PREFILL BILL. A window is not a budget. An agent turn pays
+#: `working_set / prefill_tps` seconds BEFORE a single token is decoded, and with the cache disproven
+#: it pays it again on the next turn. A model is routable to a class only if it satisfies BOTH sides.
+prefill_budget:
+  predicate: 'window >= class.min_window AND prefill_seconds(class.working_set) <= class.prefill_budget_s'
+  prefill_seconds: 'prompt_tokens / measured_prefill_tps'
+  working_set: 'the class names the prompt size it must be able to pay for (not the window it may grow to)'
+  measured_tps_field: 'usage.prompt_tokens_per_second   (the server''s own counter, read back from a real call)'
+  unknown_tps: refuse_route        # an unmeasured model is not routable: fail-closed, never optimistic
+  rule_estimate_is_not_a_measurement: >-
+    a prefill cost, a prompt size or a reuse ratio is read from the SERVER'S OWN COUNTERS. A
+    chars-per-token rule is a guess wearing a number's clothes, and on 2026-10-14 such a guess produced a
+    "truncation" that did not exist (BUG-794). A claim whose input was estimated is refused, not reported.
+  ab_probe:
+    mode: '--prefill-ab'
+    sends: 'THREE calls: one to warm nothing, one on the same prefix (the A/B), one on the same prefix on a DIFFERENT model (the control)'
+    ladder: false               # declared OFF the ladder: a rail that needs the network must not gate a build
+    why: 'the only certification of REUSE is two calls on one cold process with one identical prefix'
+    filler: 'the quick brown fox jumps over the lazy dog. '
+    filler_tokens_measured: 10          # MEASURED: the unit above is EXACTLY ten tokens
+    chars_per_token_measured: 4.5       # 45 chars / 10 tokens. The first draft assumed 4.0, published a
+                                        # truncation that did not exist, and was retracted the same day (BUG-794)
+    control_model: Phi-4-mini-instruct-8bit   # the same prefix on a DIFFERENT model must not be reused
+
+#: THE WINDOW CLASSES. Routing is declared and TWO-SIDED: a class names the minimum served window an
+#: agent LOOP may run on AND the prompt size it must be able to pay for inside the latency budget.
 classes:
   agent_loop:
-    min_window: 131072
-    why: 'a session with tool output, project hints and a compaction budget needs a real window'
+    min_window: 32768
+    working_set: 26214
+    prefill_budget_s: 60
+    why: >-
+      LOWERED FROM 131072 on the same day it was written, before ratification, because the first number
+      selected on window ARITHMETIC and the measurement says the binding constraint is the prefill BILL:
+      at the measured throughputs a 131072-token turn costs ~56 minutes on the 27B and ~10 minutes on the
+      20B, so no local model can hold a loop at that size. A loop is a SMALL working set paid REPEATEDLY.
   agent_probe:
     min_window: 32768
-    why: 'single-question delegation: summarize WITH source, review diff, one classification'
+    working_set: 32768
+    prefill_budget_s: 600
+    why: 'single-question delegation: summarize WITH source, review a diff, one classification, one long read'
   pipeline_batch:
     min_window: 32768
+    working_set: 32768
+    prefill_budget_s: 3600
     why: 'bounded prompt, one answer, no history (the pipeline never re-sends a prefix it grew)'
 routing:
-  rule: 'select the MOST capable class the served window satisfies (the largest min_window it meets); first-declared wins a tie'
-  measured_agent_loop_capable: [gpt-oss-20b-MXFP4-Q8, Qwen3.8-27B-MLX-4bit]   # 131072 / 262144
+  rule: 'select the MOST capable class the model satisfies on BOTH sides (window and prefill bill); first-declared wins a tie'
+  floor_note: >-
+    window_class() is the FLOOR a class declares, never the decision: a model with a large window and a
+    small throughput satisfies the floor and fails the bill. The decision is routable_classes().
+  #: MEASURED 2026-10-14 against the declared 60-second per-turn budget: ONE model qualifies for a loop.
+  measured_routable_20261014:
+    agent_loop: [gemma-4-E4B-it-MLX-4bit]                      # 26214 / 455 = 58 s
+    agent_probe: [gemma-4-E4B-it-MLX-4bit, Phi-4-mini-instruct-8bit, gpt-oss-20b-MXFP4-Q8]
+    pipeline_batch: [gemma-4-E4B-it-MLX-4bit, Phi-4-mini-instruct-8bit, gpt-oss-20b-MXFP4-Q8,
+                     Qwen3.8-27B-MLX-4bit]
+  refused_for_a_loop_20261014:
+    Phi-4-mini-instruct-8bit: '26214 / 394 = 66 s — SIX SECONDS over the budget, and the budget is the owner''s knob'
+    gpt-oss-20b-MXFP4-Q8: '26214 / 210 = 125 s — a usable PROBE, an unusable loop'
+    Qwen3.8-27B-MLX-4bit: '26214 / 39 = 672 s — eleven minutes per turn; no budget makes this a loop'
+  measured_agent_loop_capable: [gpt-oss-20b-MXFP4-Q8, Qwen3.8-27B-MLX-4bit]   # by WINDOW only (superseded as a decision by the bill)
   measured_agent_probe_only: [Phi-4-mini-instruct-8bit, gemma-4-E4B-it-MLX-4bit,
                               Qwen3-Coder-30B-A3B-Instruct-MLX-4bit, Qwen3.5-9B-4bit]
+
+#: THE PIPELINE'S OWN PREFILL BILL. A knowledge-pipeline stage is a CACHE-FREE amortisation problem:
+#: it sends a byte-stable system prefix with every call, and (measured) nothing reuses it, so the
+#: prefix is prefilled once PER CALL. The lever is therefore the number of requests per unit of work,
+#: never the prompt's layout (the layouts are already stable - verified 9/9 module constants, and no
+#: prompt builder interpolates a date, a run id or a path into a prefix).
+pipeline_stages:
+  prefix_layout: 'invariant instructions and schema FIRST, the variable payload LAST (already the case)'
+  amortisation_lever: 'requests per unit of work: packing N items into one request prefills the shared prefix ONCE'
+  same_model_run: 'a cache key is per model; interleaving models on one prefix evicts whatever cache exists'
+  system_prefixes_verified_byte_stable: 10   # MEASURED by the audit below (an earlier grep found 9: a regex
+                                             # cannot tell a prompt from a role string or a budget constant)
+  min_prompt_chars: 200                      # below this a "SYSTEM" constant is a label, not a prefix
+  verify_command: 'python3 scripts/agent_context_probe.py --prefix-audit'
 
 #: THE BASELINE this contract was written against. Drift is visible by re-running the probe; a baseline
 #: nobody re-measures is a claim, so the probe prints its own numbers beside these.
@@ -141,14 +269,37 @@ measured_20261014:
            Qwen3-Coder-30B-A3B-Instruct-MLX-4bit: 32768, gpt-oss-20b-MXFP4-Q8: 131072,
            Qwen3.8-27B-MLX-4bit: 262144}
   declared_equal: true
+  reachability: {gpt-oss-20b-MXFP4-Q8: '50082 prompt tokens accepted (declared 131072)',
+                 Qwen3.8-27B-MLX-4bit: '32026 prompt tokens accepted (declared 262144)'}
   derived_trigger_local_32k: 26214
+  prefill:                       # MEASURED from the server's own counters, one real call per row
+    gemma-4-E4B-it-MLX-4bit: {prompt_tokens: 4468, prefill_tps: 455, decode_tps: 27}
+    Phi-4-mini-instruct-8bit: {prompt_tokens: 4466, prefill_tps: 394, decode_tps: 40}
+    gpt-oss-20b-MXFP4-Q8: {prompt_tokens: 50082, prefill_tps: 210, decode_tps: 33}
+    Qwen3.8-27B-MLX-4bit: {prompt_tokens: 32026, prefill_tps: 39, decode_tps: 1.7}
+    Qwen3-Coder-30B-A3B-Instruct-MLX-4bit: null      # UNMEASURED -> refused a route (fail-closed)
+  prefill_reading: 'prompt_tokens is the number the SERVER echoed; a row without it is refused rather than estimated'
   ledger: {calls: 28646, input_tokens: 2856939380, cache_read_tokens: 2742286067,
            compactions: 676, local_agent_loop_cache_evidence: none}
+  retracted: >-
+    an earlier reading of this same probe reported a TRUNCATION at 32,026 of 35,200 "sent" tokens. The
+    prompt was 32,026 tokens and was never truncated; the "sent" figure was produced by a chars-per-token
+    ESTIMATE (0.25) where the measured rate is 0.222 (BUG-794). The claim is retracted here so that the
+    next reader inherits the correction and not the error.
   session_store_bytes: 906100736
   sessions: 380
   messages: 163147
 
+#: THE SELF-SCAN's fixtures. The probe proves by reading its OWN BYTES that the report path names no
+#: path, no host and no baseline number - and these lists belong here rather than in the script (C12),
+#: because a fixture nobody declares is a magic value with a good excuse.
+self_scan:
+  forbidden_everywhere: ['/Users/', 'sessions.db', 'model_settings.json', 'custom_providers', 'localhost', '11435']
+  baseline_numbers: ['225000', '32768', '262144', '26214', '131072']
+  marker: '#: ── END OF THE REPORT PATH'
+
 exit_codes:
   ok: 0
-  fault: 2          # parity broken, a declared home unreadable, or a model with no served window
+  fault: 2          # parity broken, a declared home unreadable, a model with no served window,
+                    # or a cache verdict that contradicts the declared proof status
   error: 1          # the probe itself failed, or a known-answer control failed (the RAIL is red)

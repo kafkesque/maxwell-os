@@ -1163,3 +1163,91 @@ mutations:
       nothing to do with the report path - a control that reds for the wrong reason is a control nobody can
       trust when it stays green.
 
+  - id: a_model_that_cannot_pay_the_prefill_bill_may_be_routed_anyway
+    subject: scripts/agent_context_probe.py
+    op: replace
+    find: '        elif isinstance(allowed, (int, float)) and seconds <= float(allowed):'
+    replace: '        elif True:  # MUTATION (D-2679): the prefill bill stops binding and every floor is a route'
+    runner: scripts/agent_context_probe.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: '   FAIL a_model_that_cannot_pay_the_prefill_bill_is_not_routable_to_the_class'
+    why: >-
+      D-3000 AMENDED 2026-10-14 (same day, before ratification): the first draft routed by WINDOW, and the
+      measurement says the binding constraint is the PREFILL BILL - a turn pays prompt/throughput seconds before
+      it decodes a token, and with the local prefix cache DISPROVEN it pays them again on the next turn. With the
+      bill inert, a model that serves a large window but moves 39 tokens/second is routed the same work as one
+      that moves 455, which is exactly the mistake the amendment corrects. The control asserts the DISCRIMINATION
+      (the fastest declared model reaches the class and the slowest does not), so it cannot be satisfied by a rule
+      that routes everything or nothing.
+
+  - id: the_prefill_bill_may_be_computed_from_the_window_instead_of_the_working_set
+    subject: scripts/agent_context_probe.py
+    op: replace
+    find: '        seconds = prefill_seconds(int(working), tps) if isinstance(working, (int, float)) else None'
+    replace: '        seconds = prefill_seconds(window, tps) if isinstance(working, (int, float)) else None  # MUTATION (D-2679): a window read as a budget'
+    runner: scripts/agent_context_probe.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: '   FAIL the_working_set_is_divided_not_the_window'
+    why: >-
+      A WINDOW IS NOT A BUDGET, and this is the one line where the two are confused. Multiplying the window by the
+      throughput bills a model for context it was never asked to carry: every model becomes unroutable the moment
+      its window is large, which is the opposite failure of the mutation above and just as wrong. The control
+      gives a class a ten-token working set and a million-token window, so the two are separated by construction -
+      a control that cannot tell them apart would pass this mutation.
+
+  - id: a_measured_cache_failure_may_read_as_proven
+    subject: scripts/agent_context_probe.py
+    op: replace
+    find: '        return "proven" if float(speedup) >= float(bar) else "disproven"'
+    replace: '        return "proven"  # MUTATION (D-2679): the numbers stop deciding the verdict'
+    runner: scripts/agent_context_probe.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: '   FAIL a_measured_cache_failure_is_disproven_and_never_unknown'
+    why: >-
+      D-2957's sharper edge. The A/B WAS RUN on this machine on 2026-10-14 (twelve calls, byte-identical prefixes,
+      every call reporting no reused tokens, speedup 1.01x against a declared bar of 5x), so the honest verdict is
+      DISPROVEN - a fact about the machine - and the dishonest ones are "unknown" (a run that happened, reported
+      as if it had not) and "proven" (the binding here). The control passes a proof with NO status string at all,
+      so the verdict must come from the speedup and the bar; a verdict read from my own prose would pass this
+      mutation and prove nothing.
+
+  - id: an_estimated_prompt_size_may_be_accepted_as_a_measurement
+    subject: scripts/agent_context_probe.py
+    op: replace
+    find: '    if record.get("estimated"):'
+    replace: '    if False:  # MUTATION (D-2679): an estimate passes as a measurement (this is BUG-794)'
+    runner: scripts/agent_context_probe.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: '   FAIL an_estimated_prompt_size_is_refused_as_a_measurement'
+    why: >-
+      BUG-794, filed against this rail on the day it was written: a prompt size computed from a chars-per-token
+      rule (four characters per token) instead of read from the server's own counter reported a TRUNCATION that
+      did not exist - the real rate on that filler is 4.5 characters per token, and the prompt fit. An estimate is
+      not a measurement, and a rail built on one publishes a fault that the machine never committed. With the
+      guard inert, an estimated row is accepted and the whole prefill layer inherits the guess.
+
+  - id: the_prompt_floor_may_admit_a_label_as_a_byte_stable_prefix
+    subject: scripts/agent_context_probe.py
+    op: replace
+    find: '        elif len(node.value.value) < floor:'
+    replace: '        elif False:  # MUTATION (D-2679): the prompt floor stops separating a prefix from a label'
+    runner: scripts/agent_context_probe.py
+    runner_args: [--selftest]
+    expect: red
+    mutated_rc: 1
+    marker: '   FAIL the_prompt_floor_separates_a_prefix_from_a_label'
+    why: >-
+      The pipeline audit has to tell a PREFIX from a LABEL, and a grep cannot: a 70-character constant named
+      SYSTEM (a role string) counted as a byte-stable system prompt until the floor separated them. The declared
+      count is the amortisation precondition of the whole pipeline stage - if labels inflate it, the audit reports
+      more amortisable prefix than exists, which is the BUG-589 shape (an under-declared fixture turning a rail's
+      baseline green). With the floor inert, a label enters the stable set and the control reds.
+

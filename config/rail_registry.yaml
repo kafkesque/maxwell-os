@@ -218,6 +218,7 @@ guards:
   #: is tri_state: 2 = OWNER-OWED drift (a declared model the server cannot serve, or a served window nothing
   #: declares) — loud, NOT fatal (BUG-457), because the remedy is a declaration, not a broken build.
   scripts/agent_context_probe.py --selftest: fatal
+  scripts/agent_context_probe.py --prefix-audit: fatal
   scripts/agent_context_probe.py: tri_state
 commit_boundary:
   path: git-path:hooks/pre-commit

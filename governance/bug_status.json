@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 555,
-  "open_n": 198,
-  "closed_n": 357,
+  "total_ids": 559,
+  "open_n": 201,
+  "closed_n": 358,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -997,6 +997,21 @@
       "id": "BUG-790",
       "title": "(LOW \u2014 OPEN) \u2014 the ingest door's refusal names the WRONG TASK",
       "events": 1
+    },
+    {
+      "id": "BUG-792",
+      "title": "(MED \u2014 OPEN 2026-10-14) \u2014 the local server reuses no prefix, so every agent turn pre-pays its whole prompt",
+      "events": 1
+    },
+    {
+      "id": "BUG-793",
+      "title": "(MED \u2014 OPEN 2026-10-14) \u2014 Qwen3.8-27B prefills at 39 tok/s, four times worse than its parameter ratio predicts",
+      "events": 1
+    },
+    {
+      "id": "BUG-795",
+      "title": "(LOW \u2014 OPEN 2026-10-14) \u2014 one ledger row carries a NULL model and 156,098,139 input tokens",
+      "events": 1
     }
   ],
   "closed": [
@@ -1356,6 +1371,7 @@
     "BUG-786",
     "BUG-787",
     "BUG-788",
-    "BUG-791"
+    "BUG-791",
+    "BUG-794"
   ]
 }

@@ -792,20 +792,41 @@ tasks:
     reason a local agent loop feels slow (prefill, not decode; a same-session A/B cited 6.1 s cached vs 268 s
     uncached). The harness's own usage_ledger already measures prefix reuse: 28,646 calls, 96% of cloud input
     tokens are cache reads, gemma-4-E4B locally reports 37.4% - and no local AGENT-LOOP call carries cache
-    evidence at all. Two of the four layers are also DRIFTED: six models are declared-and-not-served or
+    evidence at all - SUPERSEDED 2026-10-14 by the A/B, which found that the local server reuses NO prefix at
+    all (BUG-792): the ledger's local ratio is historical, not a live capability, and the binding constraint is the
+    PREFILL BILL, added to the contract as a fifth layer the same day. Two of the four layers are also DRIFTED:
+    six models are declared-and-not-served or
     served-and-not-declared (measured by the new probe; BUG-790's sweep). A reader wired to the wrong window is
     silent in both directions, which is why parity must be DECLARED, not coincidental.
   source: 'D-3000 (PROPOSED); config/agent_context.yaml (the contract); scripts/agent_context_probe.py (the reading)'
   evidence: >-
+    AMENDED 2026-10-14, before ratification. The contract (schema 2) now declares a FIFTH LAYER - the prefill bill:
+    window_and_throughput, MEASURED from the server's own counters (gemma-4-E4B 455 tok/s at 4468 prompt tokens,
+    Phi-4-mini 394 at 4466, gpt-oss-20b 210 at 50082, Qwen3.8-27B 39 at 32026) - and the cache proof now carries a
+    MEASURED verdict instead of a hope: twelve byte-identical-prefix calls, every one reporting
+    prompt_tokens_details.cached_tokens = 0, speedup 1.01x then 1.04x through the probe's own --prefill-ab against
+    the declared 5x bar -> status DISPROVEN (BUG-792). Reachability re-tested rather than inferred: 50082 prompt
+    tokens accepted whole by a model declared at 131072, and the earlier "truncation at 32026" RETRACTED as an
+    artefact of a chars-per-token ESTIMATE (BUG-794). The probe is now 17 known-answer controls, 9 mutations in the
+    gate, and three modes: the report, --prefix-audit (10 byte-stable pipeline prefixes, a rail) and --prefill-ab
+    (sends three calls; declared OFF the ladder, because a rail that needs the network must not gate a build).
     MEASURED 2026-10-14 (read-only). config/agent_context.yaml#measured_20261014 - served windows
     (32768 / 131072 / 262144), declared == served
     for the five the harness names, the derived trigger 26214, the ledger census, the six drifts, and the
     session store (906,100,736 bytes / 380 sessions / 163,147 messages). Twelve known-answer controls green;
     four mutations red through their own controls.
   gate: >-
-    YOUR WORD decides the two things an agent must never choose, and then the PIPELINE lands them. (1) THE
-    ROUTING: may an agent LOOP run on a model that serves 32768 (the probe puts Phi-4-mini, gemma-4-E4B and
-    Qwen3-Coder-30B there) while gpt-oss-20b and Qwen3.8-27B are already served at 131072/262144? (2) THE
-    TRIGGER: GOOSE_CONTEXT_LIMIT and the compaction pair are UNSET today, so declaring them is one line of
-    environment - but it changes WHEN every session rewrites its own history, which is why it is an act and not
-    a setting. Declaring the contract costs nothing and changes no behaviour; adopting it is your word.
+    THE MEASUREMENT ANSWERED THE FIRST QUESTION AND NARROWED THE SECOND, AND IT LEFT ONE WORD THAT IS YOURS.
+    (1) THE ROUTING - ANSWERED, and the answer is the opposite of the one the first draft assumed: YES, an agent
+    LOOP may run on a model that serves 32768, and it MUST, because the large-window models cannot PAY for a turn.
+    MEASURED 2026-10-14 from the server's own counters: gemma-4-E4B 455 tok/s, Phi-4-mini 394, gpt-oss-20b 210,
+    Qwen3.8-27B 39. At the declared 60-second per-turn budget only the 4B can carry the loop class's 26214-token
+    working set (57.6 s); Phi-4-mini misses by six seconds (66.5 s), gpt-oss-20b costs 124.8 s, and Qwen3.8-27B
+    costs 672.2 s (BUG-793). THE WORD THAT REMAINS IS THE BUDGET ITSELF: at 60 s a local loop is a 4B, at 180 s the
+    20B becomes usable, and no budget makes the 27B one. (2) THE TRIGGER - NARROWED, NOT ANSWERED:
+    GOOSE_CONTEXT_LIMIT and the compaction pair are still UNSET, and with the cache DISPROVEN (BUG-792: twelve
+    identical-prefix calls, every one reporting no reused tokens, 1.04x against a declared 5x bar) the threshold
+    must satisfy the prefill bill instead of the window alone - threshold <= per_turn_budget_s x
+    measured_prefill_tps / window. The 0.8 default is right for the fastest local model BY COINCIDENCE and wrong on
+    the 20B's window, where it resolves to 104857 tokens, i.e. 8.3 minutes of prefill per turn. Declaring the
+    contract costs nothing and changes no behaviour; adopting it is your word.

@@ -13,11 +13,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1128 decisions (census stamp 734b3a63d6101a40, 2026-10-14) · 555 bugs (198 open / 357 closed; highest OPEN = BUG-790) · 26 open tasks (MUST 8 / SHOULD 15 / WORTH 3; OWNER-moved 3, pipeline-moved 23; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1128 decisions (census stamp 309f8cf9a7f9a898, 2026-10-15) · 559 bugs (201 open / 358 closed; highest OPEN = BUG-795) · 26 open tasks (MUST 8 / SHOULD 15 / WORTH 3; OWNER-moved 3, pipeline-moved 23; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **68** of 1128 — 🔴 open 32 · 🔵 proposed 15 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 565 · ⚖ ratified 135 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1128, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 198 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 31 · 🟨 MED 42 · 🟩 LOW 20 · UNLABELLED 101 (BUG-757) of 198 open.
+> Open BUGS by severity (population = the census's 201 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 31 · 🟨 MED 44 · 🟩 LOW 21 · UNLABELLED 101 (BUG-757) of 201 open.
 >
 > **OWNER LANE (3) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -25,7 +25,7 @@
 > |---|---|---|---|
 > | T-130 | 🔴 MUST | THE INGEST DOOR — the identity guarantee becomes an ENFORCEMENT POINT (delta-scoped), so a duplicate work cann | THE DOOR NOW READS A DECLARED WORD, AND ITS rc 2 NAMES THE ONE DEBT TH |
 > | T-131 | 🟠 SHOULD | THE MODEL-SWAP BENCH — no role is re-pointed to a newer model family without a declared, preflighted slot | mover = owner for the SLOT (which role, which model, what it may evict |
-> | T-132 | 🟠 SHOULD | THE HARNESS CONTEXT CONTRACT — the four layers between a local model's served window and the words an agent se | YOUR WORD decides the two things an agent must never choose, and then  |
+> | T-132 | 🟠 SHOULD | THE HARNESS CONTEXT CONTRACT — the four layers between a local model's served window and the words an agent se | THE MEASUREMENT ANSWERED THE FIRST QUESTION AND NARROWED THE SECOND, A |
 >
 > **PIPELINE LANE (23) — what the agent will do next, in strategic-consequential order (source: config/task_register.yaml):**
 >
@@ -4834,3 +4834,56 @@ a cache bomb, a per-turn injection at the head is a miss every turn. Routing is 
 
 **Not this decision.** No harness setting is rewritten here, no model is re-pointed (that is T-131's bench), and
 no cache ratio is published as a measurement until the A/B is run.
+
+## D-3000 AMENDMENT (2026-10-14, the same day, BEFORE ratification) - LAYER 5: the prefill bill, and the two claims the first draft got wrong
+
+**State:** still PROPOSED. **Authority:** `config/agent_context.yaml` (schema_version 2). **Reading:**
+`scripts/agent_context_probe.py` (17 known-answer controls, 9 mutations, three modes, rc 2 on drift).
+
+**What the amendment corrects - and the correction is the point, because both errors were produced by reasoning
+and caught by measuring:**
+
+1. **A FALSE TRUNCATION, RETRACTED.** The first draft reported that a prompt came back truncated at 32,026
+   tokens and blamed the server's global context setting. It did not: the prompt WAS 32,026 tokens. The "sent"
+   figure had been computed from a chars-per-token rule (four characters per token) while that filler's measured
+   rate is 4.5, and the estimate was never checked against the server's own counter. Refuted the same day by
+   sending a genuinely larger prompt: **50,082 prompt tokens were accepted whole** by a model declared at
+   131,072, so the reachable window is real and the truncation was an artefact of arithmetic (BUG-794). The
+   lesson is now a rule and a control: an ESTIMATE is not a MEASUREMENT, and a rail may not build a claim on one.
+
+2. **THE CACHE, MEASURED INSTEAD OF ASSUMED.** The first draft could only say that reuse was unproven. It was
+   then run: **twelve calls, byte-identical prefixes (4.5 k - 5.3 k tokens), a resident model, three arms
+   (fixed system block, fixed user block, and the control whose system block carries a per-call nonce) - every
+   call reported `cached_tokens = 0`**, and the two-call speedup came out at **1.01x, then 1.04x** through the
+   probe's own `--prefill-ab`, against a declared bar of 5x. The single non-zero reading in the whole sweep was
+   a **4096-token block boundary directly after a model load**, which names the mechanism: a 4096-token BLOCK
+   cache, and it is switched OFF by declaration (the D2460 thrash guard is a RAIL that refuses inference when it
+   is on). **Prefix reuse is therefore DISPROVEN on this machine today** (BUG-792). The honest model of a local
+   turn is that it re-pays its WHOLE prompt, every turn.
+
+3. **LAYER 5 - THE PREFILL BILL.** A window is not a budget. An agent turn pays `working_set / throughput`
+   seconds BEFORE it decodes a token, and with the cache disproven it pays again on the next turn. Measured
+   throughputs, read from the server's own counters: **gemma-4-E4B 455 tok/s, Phi-4-mini 394, gpt-oss-20b 210,
+   Qwen3.8-27B 39.** At the declared 60-second per-turn budget the loop class (working set 26,214) is satisfied
+   by **ONE model**: the 4B pays 57.6 s, Phi-4-mini misses by six seconds (66.5 s), gpt-oss-20b costs 125 s, and
+   Qwen3.8-27B costs **672 s - eleven minutes per turn**. The first draft's routing rule (**agent_loop >= 131,072**,
+   on the reasoning that a session needs room) is therefore WITHDRAWN as a decision: it selected on window
+   arithmetic and ignored the bill, and it would have routed a loop to a model that cannot pay a turn at that
+   size (~56 minutes on the 27B). The class rule is now two-sided: the window is the FLOOR, the bill is the
+   DECISION.
+
+4. **THE TRIGGER, MADE CONDITIONAL ON THE CACHE.** `min(threshold x window, cap)` stands, but the threshold must
+   satisfy the latency budget while the cache is disproven: `threshold <= budget_s x measured_prefill_tps / window`.
+   The default 0.8 is right for the fastest local model **by coincidence** (26,214 / 455 = 58 s <= 60 s) and wrong
+   everywhere else: the same 0.8 on the 20B's window resolves to **104,857 tokens - 8.3 minutes of prefill per
+   turn** - which is precisely the "a cloud artifact governs a local run" failure this decision exists to name.
+
+5. **THE PIPELINE'S OWN AMORTISATION.** The knowledge pipeline's LLM stages are the textbook prefix-cache case and
+   get nothing from it: **10 stage system prompts are byte-stable module constants**, verified by AST rather than
+   by grep (`--prefix-audit`, now a rail, because a regex cannot tell a prompt from a role string). With no cache
+   behind them, that same prefix is prefilled **once per call**. A cache that does not exist cannot be called, so
+   the lever is the NUMBER OF REQUESTS per unit of work (packing), never the prompt's layout - and the audit is the
+   precondition that keeps packing worth doing.
+
+**Not this decision.** Nothing in the harness is rewritten: not one environment variable, not one provider slot.
+The declaration is amended; the owner's word on the two knobs is still the act T-132 waits for.

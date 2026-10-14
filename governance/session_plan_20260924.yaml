@@ -45,6 +45,13 @@ may_touch:
 - governance/existence_negatives.yaml
 - governance/HANDOFFS.jsonl
 - governance/r5_reviews.jsonl
+# BUG-782 (NAMED, never a glob): the owner-word intake - the sheet is now RENDERED from the measurement, the pair
+# OBJECT that the sheet is derived from gains a home, and the ledger gains a declared PROJECTION the owner can mark.
+- config/owner_marks.yaml
+- scripts/owner_marks.py
+- governance/OWNER_MARKS_20261014.md
+- governance/corroboration_collapse_pairs.json
+- governance/duplicate_adjudication_review.csv
 - governance/session_plan_*.yaml
 - governance/menu_v9_edit_spec_20261009.md
 - tests/**

@@ -140,6 +140,14 @@ guards:
   #: book_metadata's identity + sanitizer) and writes ONLY a deferral receipt under declared runtime state.
   scripts/check_ingest_identity_gate.py: tri_state
   scripts/check_ingest_identity_gate.py --selftest: fatal
+  #: BUG-782 — THE OWNER-WORD INTAKE. It renders the T-129 review sheet from the measurement that owns it (never
+  #: from a column), validates the owner's vocabulary, derives the effective word (override > signed tier > none),
+  #: tests the transitivity conflict rule and binds the sheet to the census by digest. `--check` is the owner lane's
+  #: ONE reading: rc 2 = words still owed (loud, NOT fatal, BUG-457); rc 1 = the words contradict each other, or the
+  #: sheet is out of phase with its own measurement (the 42-vs-37 class). It writes NOTHING unless --apply is asked,
+  #: and then only derived words + a receipt (an agent may EXPAND a signed predicate; it may never mint a label).
+  scripts/owner_marks.py --check: tri_state
+  scripts/owner_marks.py --selftest: fatal
   scripts/build_archive_index.py --check: fatal
   scripts/build_archive_index.py --selftest: fatal
   scripts/recompute_decision_summary.py --check: fatal

@@ -26,7 +26,14 @@ fixture:
   # MEASURED 2026-09-27: recompute_decision_summary.py --selftest checks its own bug citations against the
   # register, so it reads governance/bug_status.json; while the fixture did not carry it, EVERY baseline of that
   # runner was red and the gate reported the MUTATION as the fault. A declared input that EXISTS is the point.
-  include_files: [justfile, governance/bug_status.json, pipeline/feedback.py, pipeline/pipeline_paths.py, scripts/reanchor_retrieval_goldens.py, config/pipeline_config.yaml]
+  include_files: [justfile, governance/bug_status.json, pipeline/feedback.py, pipeline/pipeline_paths.py, scripts/reanchor_retrieval_goldens.py, config/pipeline_config.yaml, maxwell_mcp_server.py, pipeline/corroboration.py, pipeline/stage6_okf_export.py, pipeline/stage6b_anytype_push.py]
+  # ^ MEASURED 2026-10-14 (BUG-782 sweep): the served-fields runner reads the SERVED-FIELD DECLARATION
+  #   (config/served_fields.yaml, carried by include_dirs config/) and that declaration NAMES its builder and its
+  #   consumers, so the fixture must carry them too: without them BOTH of that runner's mutations were reported
+  #   "the oracle's BASELINE is not green (rc=1)" — the gate blamed the MUTATION for a fixture gap, which is the
+  #   BUG-589 shape one declaration over. Before: check_served_fields.py --selftest in the fixture failed 1 of 24
+  #   controls ("promotions.corroboration.builder ... does not resolve", "consumers names
+  #   'maxwell_mcp_server.py', which does not exist"); after: 24/24 and both mutations prove their guard.
   # ^ D-2989: the feedback ABSENCE guard's subject is the FORMULA's one home (pipeline/feedback.py), and its runner
   #   (scripts/check_feedback_parity.py --selftest) imports pipeline.feedback -> pipeline.pipeline_paths. Both are
   #   named FILE-GRANULARLY rather than by adding the whole pipeline/ tree: the formula cannot be moved into a

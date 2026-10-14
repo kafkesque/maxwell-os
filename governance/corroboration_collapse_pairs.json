@@ -1,0 +1,1440 @@
+{
+ "schema_version": "1",
+ "kind": "corroboration_collapse_pair_object",
+ "generated_at": "2026-10-14T16:46:52Z",
+ "rule_file": "config/corroboration_collapse.yaml",
+ "rule_digest": "b67aae3878d14f0fa5721bbbbd170db4cbbf1e833e25a5cd37544a3f1c8f6976",
+ "parameters": {
+  "collapse_at_or_above": 0.8,
+  "min_words_per_side": 120,
+  "shingle_words": 5,
+  "sketch_width": 48
+ },
+ "counts": {
+  "rows_tested": 1393,
+  "pairs_at_bar": 84,
+  "pairs_identical_text": 37,
+  "groups": 72,
+  "rows_collapsed": 530,
+  "segments_matched": 148831
+ },
+ "pairs": [
+  {
+   "a": "365 habits of successful graphic designers  insider secrets from top designers on working smart and staying creative (Laurel Saville) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "b": "[Laurel_Saville,_Joshua_Berger,_Steve_Gordon_Jr.,_(z-lib.org).md",
+   "identical": false,
+   "similarity": 1.0,
+   "rows": [
+    "241be4a236bddd2e9f910707d84a95eedb5d8e7f30ded0de47ada6271e2c325a",
+    "30cb897616371c2ab7770b049dd28115f694a6fc55f72cc57014b7545d72c26d",
+    "3cdea094528a886c8770629c2647e6291d27f6163d3c4852565cadff8f6f0746",
+    "414c7885917deaad9ab6d32057f3fb44c81960bb7d2d977826efa710a4ed60f5",
+    "5e5b99d5a6961c3ec21e018c6b7cf22cbb6ad42744586c93ac32849c2d832c8f",
+    "75d02cdd425ae542f99fb3c9131a054652adaf5d9e6ae3c9d5ab1ff051227479",
+    "7732820121d8a2d55ee87e7abaef30d9221b59e7d63c46e811e643623963daca",
+    "7b03a05720bb165b5fb881bd792daa20354e598fa3b1aa1606fb9f0eb4dbfef1",
+    "972c84ec3e422128eddd1db500bd0a39563310e83f3eff8f02dbde28eab35dc0",
+    "9b4eedb6eff7c93434f120c0d1c4a5c135986d50d8398cce7f208f70dfa86446",
+    "ab7efee7e1f0b0f2e950438b4ee05302e50a1a2d8db55f2e2523053cdae10fc2",
+    "c114778b51acf95ae2a1e9a2caab662e1a7dbf9e9ad3cf4f84f025412ff8453f",
+    "d012e9820943980abea7c499a97928929349f0fb94e2f1041e0e3466e1c47617",
+    "e42033a1a09216dea09bc55070d8f7b007320f8d933c1f09957b44d9c3c9dc04",
+    "e5f785084a07da3b1593fd2462d5f4e3340f2f0c7b7f162a60ca52b96b8df281",
+    "e7d0eaf3e61f70545ddf3943e6d0f372c67eccc65eba9e9ae2cd50f3a87c7630"
+   ]
+  },
+  {
+   "a": "AI Value Creators (Rob Thomas, Paul Zikopoulos, Kate Soule) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "b": "AI Value Creators Beyond the Generative AI User Mindset (Rob Thomas, Paul Zikopoulos, Kate Soule) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "identical": true,
+   "similarity": 1.0,
+   "rows": [
+    "08e6a8ce48c1f77069db2e335b352448af8ae56925c77078863f7c80e9a10b88",
+    "1815a843fd412387d231b509960d8272e35d1704b8824f23bf7289bf7d4ae727",
+    "1bc63aab08481e73d6fa84fa7d85e1373e69f4f793f8b49b35ac9f119d1dab62",
+    "310734924aca8bd18add1df79a4df7ccfd56b60a7ad91988fadeb15cda4ed7a3",
+    "390b9dd0b231272cb5bd52780a2660af9253037771b9c8a4a081bd871272c3d5",
+    "3e323541e99dc6227744b8a2cb7f89aea05c25f0c197cc81fda197a527a46ea2",
+    "44a4e528cb06a36aed19ed57c2a5f2d5954f563e4f16f2b908da03277e8a613c",
+    "5db5442e1fb86ce82e9b0c4c7712cd9688884c60e168c5403c4627bb35ffeddf",
+    "645401305f1ac2bbafd135b1c0074e99ae22d8784aa1a1546dbc74301af3ca83",
+    "66d717ae6f09d1a3729c2bceafde5c539910ffdd7d1652f074af942384290b62",
+    "7aadad80486d30889b38ef740a5b573c62aafddb4ac40755c1dcc594753cb61f",
+    "88673d2a34ae9560dbd183878a2de0c72a950840cef9ee49a2bb565b62117fb2",
+    "9df1e8b336fd9135276b34533908d0b636c384d1e01fce5a3cd358931b4b80af",
+    "a1da2d723d01dd7efa5d16c256aaa983df0cb8d99ec5ec17aead2a4ac90f970f",
+    "b0cc1602e6801d89c4404a1749592bcd956e40cd393ab234eaa551ba2e554c6d",
+    "bb40fc4d682df5cf8313d520185ae04a19e40bf25f406ba69b0c6eb830e2fbb7",
+    "be5e312a42038d54c9ebb071ee7f299e148ec3d6fb8b1f3f2e98d08acbc4127a",
+    "ce34cc7efce7d1c9be7ae11e65a133a0a3d927f69d4f269176ae2422eac67e35",
+    "ec9cf38e4cfd15fbc30ba69418e30add865106848fa8985a00fa88eca5ab1672",
+    "f0bd37b0248017c0726afc1080184201b69ca53c95e10432dbd009fc7c94be5a",
+    "f172f0cdf1d1a6da85a8388859fcce12973f5380da677b0caad798aa6629f352",
+    "f1cd25b937b0a2feec10b68414542a3f7a0a97f1f522d0c6e0dd09c0f9201589",
+    "fbd0162fa03ee82c5e09d36f898bc1b4cc4243e4297ff1c49363fde0f771d5fa"
+   ]
+  },
+  {
+   "a": "About Face The Essentials of Interaction Design 4th Edition (Alan Cooper, Robert Reimann, David Cronin etc.) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "b": "About Face. The Essentials of Interaction Design Alan Cooper,Robert Reimann,David Cronin, et al.John Wiley & Sons, Inc. Wiley Adult NonfictionComputer TechnologyLanguage(s) 13.08.2014 liber3.md",
+   "identical": true,
+   "similarity": 1.0,
+   "rows": [
+    "0cc7826079cbc8284537ac03823f72212bf6ed1af95724696262ef752c131a0d",
+    "1a5b1918ba1ac5dc93cf2ca2ebceadc4bee6aad37fb075232fc6d6a86d68bbfe",
+    "1e7151ece3e8db31f63ab92983be369b576199177a0a39b597ec069b025b47da",
+    "2b0b7e897a86f7e37ebc19e53ca675d5ff7c562f81ca111127122df296e974ef",
+    "316c7f01535841e3ad34c18f1976195dac5b24a315a83abd1f8c1d795e6889c0",
+    "35584d70b7b2105d22c6924b6963977e02b1a4690593d4d94069ca2a81f887ea",
+    "39e300746d554d2ae08fb8efda46fa21ad4c9ccf6d1e10f1855b87361fc377f7",
+    "46736ee5191cd23e72f5b9b12309f541d14628a9ac59f5ebba1ece5322658614",
+    "4b4b10887b3dd6c85af94e2514f63e0668ed7bff7a93784b45c092da572c420e",
+    "4fca5668e4703d657fcd4bc9bbdaa2fcae78ccad3c627b2029d0a1073b295475",
+    "5164e8d84329c9a692dc4ea3145e48008dbdff9c76b1b9a332573fa4d9cb21c7",
+    "679280f5068ffb39e49a91c4c6c007f5586c9a44735c8d083cb9d1fa3f159ec9",
+    "6eb87ff873bc60bccf265b2272a28d8ad6bccc5d75866214a06a824798bba565",
+    "7293175317be70cc305f51a54b8915ed35f03110510b6537e4e79f1c4cb9a2b6",
+    "7723a120d3b638ae5f298b40158c0d278f4170605d5fb8e98c8b1de1595d7ca8",
+    "781018cab78be1857fbf0c507b84477d029aea4b25a7cbdff382cac28af5bc66",
+    "8f3e36f2b41d0591f47b48c54d8ec9b7cb6aca7c9fdb41bd05387ae443733a70",
+    "9751a9e8598ad1d2d7d0dd8052da899cc2cbb17115dae284c21b5444a4dc6fc4",
+    "976e9474cbe59a1ac8308358c1a35b0a366cd4f13fbd1af6c051f67f54ee982d",
+    "9b983c40fb33fde426ebaace435977cd8d2ec6ac71e4ca7af0b6cc9b782f0be6",
+    "9becf8f560eb5112a3549cd8ab3dbf8bc33b7d19232848a3485b063dc385cfa0",
+    "a6221cfa833e65b390b5fb7deb2f5600149be03028b141b6c6c71e29f08541ce",
+    "a7b94524d6e0e706fc70b4fbd5360fb52ac171dad7a1ede4200d3f5d888c246f",
+    "a7efbad11d829e9ee55be037bd2ec3505bc9941554a34005fa1c53a2424feb2b",
+    "d2dcba4ec2a780ade33b08c34b4fce06de150d22d17a1b2ec9e8f5c147cf1057",
+    "d5eeb4d2b04117da3275e8bf421fd54e1982bb1411bedf883fd2e093419cbdf6",
+    "deb507ab1f74d338306e6945d2c952d0ab617c4512466d1582ce3d28b19f1a6a",
+    "e30aee375cc2fbace99ba32dde712e64cc49b4594360e203606ab9755838ef1c",
+    "f57baf339abfeaaf2aa0d4049f669a33823fe0f8dac2204518f4c2d5ce42b681",
+    "fba860c98885c35944e25fabd9303a2b840e0d004f33521b0bd392b49f017917"
+   ]
+  },
+  {
+   "a": "Alan Male- Illustration.md",
+   "b": "Illustration A Theoretical and Contextual Perspective Alan Male liber3.md",
+   "identical": false,
+   "similarity": 0.8125,
+   "rows": [
+    "18535a0111ef86b74e43a441f7e9a3efa785005f3df667620fd277355d6d73e0"
+   ]
+  },
+  {
+   "a": "Atomic Design (Brad Frost) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "b": "Atomic Design by Brad Frost.md",
+   "identical": true,
+   "similarity": 1.0,
+   "rows": [
+    "39e300746d554d2ae08fb8efda46fa21ad4c9ccf6d1e10f1855b87361fc377f7",
+    "46736ee5191cd23e72f5b9b12309f541d14628a9ac59f5ebba1ece5322658614",
+    "6076191e6cf58e69c34869e4c55ffe5ded9958101dadc1e8dadfd01f46b597da",
+    "6eb87ff873bc60bccf265b2272a28d8ad6bccc5d75866214a06a824798bba565",
+    "7f43b2844b7d2c900badeac414f2ca4d64e53a431c66a0200686af24cb8336f3",
+    "7fbdb082ce0ad3e84dbc5347d0f58124ab3079efbd50c4832df8477ad887b952",
+    "9b983c40fb33fde426ebaace435977cd8d2ec6ac71e4ca7af0b6cc9b782f0be6",
+    "e321bb7f89e36136106b87a916bc0334bce5a9433721198d6c4ada27b041f649"
+   ]
+  },
+  {
+   "a": "Autonomous Minds How Agentic AI Predicts and Learns to Enable Productivity and Empowerment (Francisco Javier Campos Zabala) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "b": "[Colin Barrow_ Paul Barrow_ Robert Brown] The Busi.md",
+   "identical": false,
+   "similarity": 1.0,
+   "rows": [
+    "4562fb7be6cc126637a005d5d4ba80a441a5c0dcea5babdc9aa6b45077bf23b1"
+   ]
+  },
+  {
+   "a": "Avoiding Data Pitfalls_ How to Steer Clear of Common Blunders When Working with Data and Presenting Analysis and Visualizations_Ben Jones_liber3.md",
+   "b": "Avoiding data pitfalls how to steer clear of common.md",
+   "identical": true,
+   "similarity": 1.0,
+   "rows": [
+    "22b574b03e089786497a43e9f0d67dd5de0add391606895b67ed3a0f01cd0a11",
+    "2d7b8a7b9a9698627808ca797fcbe94c5838175f6e826910d78ac88197cfd59d",
+    "8372e03e65bcff2facd8d96f25bc7346daa7eb03b39838fec5d04524cbb1e60d",
+    "9becf8f560eb5112a3549cd8ab3dbf8bc33b7d19232848a3485b063dc385cfa0"
+   ]
+  },
+  {
+   "a": "Basics Graphic Design 02 Design Research Investigation for successful creative solutions (Neil Leonard, Gavin Ambrose) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "b": "Basics Graphic Design 03 Idea Generation (Neil Leonard, Gavin Ambrose) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "identical": false,
+   "similarity": 0.8232931726907631,
+   "rows": [
+    "c6728aabee02c32d839fd65d4f5ee3df96b325357bf27f43628cd1151ff694e8"
+   ]
+  },
+  {
+   "a": "Basics Graphic Design 02 Design Research Investigation for successful creative solutions (Neil Leonard, Gavin Ambrose) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "b": "[Paul-Harris,-Gavin-Ambrose]-Basics-Design_-Layout(z-lib.org).md",
+   "identical": false,
+   "similarity": 0.8904761904761904,
+   "rows": [
+    "c6728aabee02c32d839fd65d4f5ee3df96b325357bf27f43628cd1151ff694e8"
+   ]
+  },
+  {
+   "a": "Basics Graphic Design 03 Idea Generation (Neil Leonard, Gavin Ambrose) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "b": "[Paul-Harris,-Gavin-Ambrose]-Basics-Design_-Layout(z-lib.org).md",
+   "identical": false,
+   "similarity": 0.8333333333333334,
+   "rows": [
+    "c6728aabee02c32d839fd65d4f5ee3df96b325357bf27f43628cd1151ff694e8"
+   ]
+  },
+  {
+   "a": "Beyond Vibe Coding (for True Epub) (Addy Osmani) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "b": "Beyond Vibe Coding_ From Coder to AI-Era Developer -- Addy Osmani -- ISBN_ 979-8-341-63475-6_, 2025 -- O'Reilly Media, Inc_ -- f0473318f8e70e15c253b9c07075d409 -- Anna’s Archive.md",
+   "identical": false,
+   "similarity": 0.9166666666666666,
+   "rows": [
+    "6a1f59ab44151e1819b9f573c7e32f5618860cfedbd7d40e1e9d2c79847b7efc",
+    "a89bad0778096c27f0340f1c2cdfb8e7b173488d0219d5b7197c0dd360a8211d",
+    "b1b322f0a68fa6ab7ee5fe2f7eaa3251a27be9e169c967a612df876d95bdf5b1"
+   ]
+  },
+  {
+   "a": "Bierut, Michael_ Rand, Paul Thoughts on design.md",
+   "b": "Thoughts on Design - Paul Rand.md",
+   "identical": false,
+   "similarity": 0.8876404494382022,
+   "rows": [
+    "39792bc76cafd3ef3e00999c9954d5e20f1b170b239d7dccae21dd6047d5a4e2",
+    "86f4d6052141a44ee33478c0f90e391777cce531f734d3f690693e434458435e"
+   ]
+  },
+  {
+   "a": "Blue Ocean Strategy and Beyond Disruption Collection (2 -- Kim, W_ Chan, Mauborgne, Renée A_ -- 2024_2023 -- Harvard Business Review Press -- isbn13 9781647829674 -- dd8b809f7dbec9acf0bb1fa0b0d2cc2c -- Anna’s Archive.md",
+   "b": "Blue Ocean Strategy, Expanded Edition_ How to Create -- W_ Chan Kim & Renée A_ Mauborgne -- 2014 -- Harvard Business Review Press -- da62c52f1a3189b8e8f2680d91e34ccc -- Anna’s Archive.md",
+   "identical": false,
+   "similarity": 0.8794326241134752,
+   "rows": [
+    "1096548d50dc4321d625735f7d0c247099bfd88290dfce52864a84358f569488",
+    "129efe515dcc29caa6d2a118fea8be2708f31d37aa0bd080dc87f8cc38bcd7a2",
+    "51116dd9618c03324d3a76fdffab2df8d2019beb3b358580f521fa5bb8814a49",
+    "86ccb768e3291b908f7f5b395b9a9497358cb3bc2f02ba2f2eaeb6fc21568031",
+    "a5e2a820d94824343fdb615a8a7ed5d3bb662610ba8c36f086adb3c7928ec09a",
+    "bcb5932db408f5f993e0c35a6c457837d8bec8a7d8dedfc09c683419923ba01c"
+   ]
+  },
+  {
+   "a": "Building AI Agent Platforms (for Isabel Garcia) (Ben OMahony and Fabian Nonnenmacher) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "b": "Building AI Agent Platforms (for Isabel Garcia) -- Ben O'Mahony and Fabian Nonnenmacher -- 2026 -- O'Reilly Media, Inc_ -- 0cd870ebd42c3c37eb0a817985df2e9e -- Anna’s Archive.md",
+   "identical": true,
+   "similarity": 1.0,
+   "rows": [
+    "1eda49fce96c6fac931dee2fe0bee70d115c24186481bc715904f879289b6848"
+   ]
+  },
+  {
+   "a": "Building Applications with AI Agents (Fifth Early Release) (Michael Albada) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "b": "Building Applications with AI Agents_ Designing and Implementing Multiagent Systems{Albada, Michael}(2025 October 21, O&_039_Reilly Media){111959655} libgen.li.md",
+   "identical": true,
+   "similarity": 1.0,
+   "rows": [
+    "4be7747ea825ee9364957684b7e0347fa94bd0953e2818d75ccdfec6aa9c1ac9",
+    "b1b322f0a68fa6ab7ee5fe2f7eaa3251a27be9e169c967a612df876d95bdf5b1",
+    "bb40fc4d682df5cf8313d520185ae04a19e40bf25f406ba69b0c6eb830e2fbb7"
+   ]
+  },
+  {
+   "a": "Building Design Systems Unify User Experiences Through a.md",
+   "b": "Building Design Systems Unify User Experiences through a Shared Design Language by Sarrah Vesselov, Taurie Davis (z-lib.org).md",
+   "identical": false,
+   "similarity": 0.9583333333333334,
+   "rows": [
+    "0cc7826079cbc8284537ac03823f72212bf6ed1af95724696262ef752c131a0d",
+    "0f48d24f2dcc9391091cf3ef311364c95ceb90449611926abcd43eaf48e8d7d3",
+    "b1b322f0a68fa6ab7ee5fe2f7eaa3251a27be9e169c967a612df876d95bdf5b1",
+    "da79b9ea634127075873c728c5b241230d1d5089fb4b94c4c8078b8ef7969dfd"
+   ]
+  },
+  {
+   "a": "Building Generative AI Services with FastAPI A Practical Approach to Developing Context-Rich Generative AI Applications (Alireza Parandeh) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "b": "Building Generative AI Services with FastAPI_ A Practical -- Alireza Parandeh -- 2025 -- O'Reilly Media, Incorporated -- isbn13 9781098160302 -- 9413c4d01c18f4676013692a1e941015 -- Anna’s Archive.md",
+   "identical": true,
+   "similarity": 1.0,
+   "rows": [
+    "1737574028185c3a580ea48d6333a5e80b989edd53db501d05dea4062f628e9f",
+    "1eda49fce96c6fac931dee2fe0bee70d115c24186481bc715904f879289b6848",
+    "387047c9b56bbfd71fd4bab714a9c54e605bb22c660e5a85382553d896217fbd",
+    "3bb932dda7e170e436b8c9643b0d4623c40d69e6d0336c62f92b3be331e2afcc",
+    "4605b0975291e520354a75789100a0c35c523b94c2d19881fd95c19700f601b0",
+    "598ccf4eac943d052d9b366526829ca150228703815c5b73c01a328daefb318c",
+    "9c881a1bab7ea7f0a40a6f7e77209d27fef44b8aa7e6aa24d2bd69b76a0c66cf",
+    "9df1e8b336fd9135276b34533908d0b636c384d1e01fce5a3cd358931b4b80af",
+    "d644569526b8c9a2d3b4223f51ea1ed4f7086e8c62a51eeed2d92959493c17da",
+    "f13dcf0c8ccef1f4973de90e33e2edf3f9e20014013643b0ea0a65903d12681b",
+    "fb712f0fc9ac7a8d0d44a5ae67b05accabd9d99f554264ae343925baf4815a0c"
+   ]
+  },
+  {
+   "a": "Building a StoryBrand 2 0 Clarify Your Message So Customers.md",
+   "b": "Real Artists Don_t Starve Timeless Strategies for Thriving.md",
+   "identical": false,
+   "similarity": 0.9791666666666666,
+   "rows": [
+    "4562fb7be6cc126637a005d5d4ba80a441a5c0dcea5babdc9aa6b45077bf23b1"
+   ]
+  },
+  {
+   "a": "Complex Adaptive Systems An Introduction to Computational Models of Social Life (John H. Miller, Scott E. Page) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "b": "Complex Adaptive Systems_ An Introduction to Computational -- Miller, John H__ Page, Scott E_ -- Princeton studies in complexity, Course Book, 2009 -- 9780691127026 -- 021dd4817ab9bc9630b737c64add4441 -- Anna’s Archive.md",
+   "identical": false,
+   "similarity": 0.9166666666666666,
+   "rows": [
+    "5164e8d84329c9a692dc4ea3145e48008dbdff9c76b1b9a332573fa4d9cb21c7",
+    "a8d1c57c6519740392449429ec0b6eda94b2c57b6f96387cb732c0c4f5168c91"
+   ]
+  },
+  {
+   "a": "Continuous Discovery Habits Discover Products that Create Customer Value and Business Value (Teresa Torres) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "b": "Continuous_Discovery_Habits_Discover_Products_that_Create_Teresa.md",
+   "identical": false,
+   "similarity": 0.9375,
+   "rows": [
+    "060d6466705c1167c5cd4a9adf213db70bb973c2b59ed9b34edcb1cef63bd16b",
+    "2a9e3cefeb5b7920c5f1d3a3a622e6268631d96a9b60ccef8ed1c2387857ab88",
+    "5164e8d84329c9a692dc4ea3145e48008dbdff9c76b1b9a332573fa4d9cb21c7",
+    "6d97af278e08dcc6bdfbb09c94717dcae13a4712c3617b873e4443d58e13ebd4",
+    "7f43b2844b7d2c900badeac414f2ca4d64e53a431c66a0200686af24cb8336f3",
+    "8741f9c29d0b80562057de28c0b36ef4d6573645a6ffa99f576bbb010f3f0052",
+    "9d6aa605c70cac702f12a47f738dacf2e63225ad9700f9a3486fbb40658ce646",
+    "c95e7cc94f7ac80d1cf3e5a962528cb5cc85d7353432e079cab3ce5600372494",
+    "cfa291c30cc53fa143a07fc96a6bf7fc057a1a8bc6b838cc5852206c112ad194",
+    "d1c7beb40c4e2c7665aaf8cd69b94ec466fdbb43c6afc94baa3d1bcc3a0955d2",
+    "d5669fead8c2ac978156ed8dc6a0f041971741a3c63a789697af79b9157b6c68",
+    "d8fd2bb91c75afb578fcc048c0ec574bcb20b69120239f3750ed7b39ffad5dfb"
+   ]
+  },
+  {
+   "a": "Continuous Discovery Habits Discover Products that Create Customer Value and Business Value (Teresa Torres) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "b": "Teresa Torres - Continuous Discovery Habits_ Discover Products that Create Customer Value and Business Value (2021, Product Talk LLC) - libgen.li.md",
+   "identical": true,
+   "similarity": 1.0,
+   "rows": [
+    "060d6466705c1167c5cd4a9adf213db70bb973c2b59ed9b34edcb1cef63bd16b",
+    "170cad4db7d87869f7ae25f79d001478d76076c743ea3b1c70b789b5489d52e7",
+    "6d97af278e08dcc6bdfbb09c94717dcae13a4712c3617b873e4443d58e13ebd4",
+    "78fa7b5d7be5e16a10f3890554f0dc430f37c3607e6d0dfbf0a7da344c58c456",
+    "a76bed6e2354e2f5f7ed7e9402ace284aa2e66d0947b0560e1a7a492aaf08da5",
+    "c95e7cc94f7ac80d1cf3e5a962528cb5cc85d7353432e079cab3ce5600372494",
+    "dc7a5e7092e37dc7f36fbd9a29a31e67d6f5c054290f7eeceac0630c63ddbe6a"
+   ]
+  },
+  {
+   "a": "Continuous_Discovery_Habits_Discover_Products_that_Create_Teresa.md",
+   "b": "Teresa Torres - Continuous Discovery Habits_ Discover Products that Create Customer Value and Business Value (2021, Product Talk LLC) - libgen.li.md",
+   "identical": false,
+   "similarity": 0.9444444444444444,
+   "rows": [
+    "060d6466705c1167c5cd4a9adf213db70bb973c2b59ed9b34edcb1cef63bd16b",
+    "78fa7b5d7be5e16a10f3890554f0dc430f37c3607e6d0dfbf0a7da344c58c456",
+    "c95e7cc94f7ac80d1cf3e5a962528cb5cc85d7353432e079cab3ce5600372494"
+   ]
+  },
+  {
+   "a": "Creativity, Inc. Overcoming the Unseen Forces That Stand in the Way of True Inspiration by Ed Catmull, Amy Wallace.md",
+   "b": "Creativity, Inc. Overcoming the Unseen Forces That Stand in the Way of True Inspiration by Ed Catmull, Amy Wallace_clean.md",
+   "identical": true,
+   "similarity": 1.0,
+   "rows": [
+    "5164e8d84329c9a692dc4ea3145e48008dbdff9c76b1b9a332573fa4d9cb21c7",
+    "533764890644d9a83740c8d85120c7693d31bda145b9c1d8c4a51232685f2b8b",
+    "6123d22c43983d2767b9eb849acba6997473a839606681461451b9c442e5ae47",
+    "92a9804cdd205c100c02cd5a888863d2c878c741164aef72ce6df8b31bfd9364",
+    "b0cc1602e6801d89c4404a1749592bcd956e40cd393ab234eaa551ba2e554c6d",
+    "c810044bff8198309e7fcee9b9968fd3624bee579ac995fcb60b1a05108c6cf7",
+    "cf410a66dfa224d4b086df88f10ed72170958eaa166ba2403c0752d363559dc1"
+   ]
+  },
+  {
+   "a": "Data Points Visualization That Means Something by Nathan Yau (z-lib.org).md",
+   "b": "Data points _ visualization that means something -- Nathan Yau -- Informatica (E-libro), Indianapolis, IN, 2013 -- Wiley Publishing, Inc_ -- 9781118462225 -- 015a890852878d79372dbad77fdf33c9 -- Anna’s Archive.md",
+   "identical": true,
+   "similarity": 1.0,
+   "rows": [
+    "2d7b8a7b9a9698627808ca797fcbe94c5838175f6e826910d78ac88197cfd59d",
+    "67902247c2c926850c56cb11bd5d1f1ed8158ebebc150daef0062fb61d06991c",
+    "6fc1bdf019dc2b02e14ad4e65da41329b2970cf3ff39b307b3fce142b5205227",
+    "73bd46ac186cd071a3383924a47c4b611e6808b625756dae1da0e12cdf910bd6",
+    "8372e03e65bcff2facd8d96f25bc7346daa7eb03b39838fec5d04524cbb1e60d",
+    "e2faa98a53b53fbdaf446d9f1a3ef95d1a50eb0e85735163ff57eed6dda4a794"
+   ]
+  },
+  {
+   "a": "Design School Type A Practical Guide for Students and Designers by Richard Poulin.md",
+   "b": "Making and Breaking the Grid A Graphic Design Layout Workshop Timothy Samara liber3.md",
+   "identical": false,
+   "similarity": 0.9583333333333334,
+   "rows": [
+    "4562fb7be6cc126637a005d5d4ba80a441a5c0dcea5babdc9aa6b45077bf23b1"
+   ]
+  },
+  {
+   "a": "Design School Type A Practical Guide for Students and Designers by Richard Poulin.md",
+   "b": "[Richard Poulin] Design School Layout A Practica.md",
+   "identical": false,
+   "similarity": 0.9375,
+   "rows": [
+    "4562fb7be6cc126637a005d5d4ba80a441a5c0dcea5babdc9aa6b45077bf23b1"
+   ]
+  },
+  {
+   "a": "Design Systems (Smashing eBooks) Alla Kholmatova, Smashing Magazine (editor) liber3.md",
+   "b": "Design Systems - A practical guide to creating design languages for digital products Alla Kholmatova liber3.md",
+   "identical": true,
+   "similarity": 1.0,
+   "rows": [
+    "39e300746d554d2ae08fb8efda46fa21ad4c9ccf6d1e10f1855b87361fc377f7",
+    "3c99c94443384b542a0dd9bb5acb1c98258b6208b12987ceca548f0437495681",
+    "4ffc5d4bc042aabb94f3df9f89f0a4b2941ecd35b3440070b50141cf0d19f098",
+    "500cb7b8aecd5af3ab3722c2a7f57f660111deb933d2f505f8fd5af1332fee11",
+    "5164e8d84329c9a692dc4ea3145e48008dbdff9c76b1b9a332573fa4d9cb21c7",
+    "9b983c40fb33fde426ebaace435977cd8d2ec6ac71e4ca7af0b6cc9b782f0be6"
+   ]
+  },
+  {
+   "a": "Designing Interface Animation - Meaningful Motion for User Experience by Val Head (z-lib.org).md",
+   "b": "Designing Interface Animation_ Meaningful Motion for User -- Val Head -- Lightning Source Inc_ (Tier 1), Brooklyn, New York, 2016 -- Rosenfeld Media, -- 9781457190872 -- 1b56b52b896276051865a908c799f4ee -- Anna’s Archive.md",
+   "identical": false,
+   "similarity": 1.0,
+   "rows": [
+    "316c7f01535841e3ad34c18f1976195dac5b24a315a83abd1f8c1d795e6889c0",
+    "3b877d882f9141b3d2d1ebe71d70fcc19c22d0fb37c011b5d8bb325da9bab074",
+    "5164e8d84329c9a692dc4ea3145e48008dbdff9c76b1b9a332573fa4d9cb21c7",
+    "663841fb115de4c47fe0b63ef59c1e7c188bb0c5449dcc803e533205cb232c09"
+   ]
+  },
+  {
+   "a": "Designing for Growth A Design Thinking Toolkit for Managers (Columbia Business School Publishing) (Jeanne Liedtka, Tim Ogilvie) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "b": "Designing for growth a Design Thinking Toolkit for Managers Ogilvie, Tim_Liedtka, Jeanne liber3.md",
+   "identical": true,
+   "similarity": 1.0,
+   "rows": [
+    "08b64a0430ba90a443ec19758d862098ec6b1f16755c6d0ca612a4f6d1f3a20d",
+    "0b7f5a03b1164ff5a97e2a7e65f41433cd297543fd682b42be7acc5c2e5c0608",
+    "0cc96ff9ef5f8a30fa2e729837f9808b36644d131ecc6f65f67ad5b898af933d",
+    "1319a3fb59dfbbc502c22794518d0a7747c19e1f30e476dcd2356a97fbdb447c",
+    "153c6a390d4dae9c1ef732e0fe7e40eebd88973138718797e5592a26b89c2dbf",
+    "196e6dfee5c8ea85bf70b430c013a76d13c1fa1aed5b7eecece30057912957e6",
+    "1acabe11a8a1d24a190edc2b67c2bf6a554543f57e77f623058fe135f06f441f",
+    "1e7151ece3e8db31f63ab92983be369b576199177a0a39b597ec069b025b47da",
+    "21d951053d85a0d662679d2034ebb665ff5d643927ff02e5a8171906e4cec2f1",
+    "27fd8dd1c68cb74d9e976a263f013e47b0014ccd963996dad2825cfce28dd4fd",
+    "30fedf4b7fdced6ee194b650ba5433b4296589186a34f5163eb8c48642ca0108",
+    "3b877d882f9141b3d2d1ebe71d70fcc19c22d0fb37c011b5d8bb325da9bab074",
+    "3c99c94443384b542a0dd9bb5acb1c98258b6208b12987ceca548f0437495681",
+    "3e68051d4f553a219086d64dc5dadfff2e17dab1c55c6b9a0e3059cf0618b3d4",
+    "43e4245c549288bfb9b660abd518ee6ecb258c2ba9a49386cdd76864d0a698d2",
+    "4d4dc17602bd8889653c55445e42d8ec9449a969e4fcebcf65b9069e4b27a03e",
+    "5164e8d84329c9a692dc4ea3145e48008dbdff9c76b1b9a332573fa4d9cb21c7",
+    "649dcebfbe6fd6c73c4a3d6d2d62ecdb010a1a2558cebe5b327d8f1846d41822",
+    "74a671a07c538f3efe3d74e2280891d60588e796b7b93f2ecad6db109b040c57",
+    "795ea06b14c170280d8f4346a1a4da4008d4bacf0ee7435f76b36f8500b37757",
+    "7f43b2844b7d2c900badeac414f2ca4d64e53a431c66a0200686af24cb8336f3",
+    "8b8d383216325ec60fd44956d944aa744e1ea02ca70180e8d5dc60095c04f901",
+    "931f5304a574e0d48599fd5414f4f902887a37a6f1ed56c26f4294f29864076b",
+    "9b159c3d7a5fb9d3724f4542e41fe1817b80a0349519f7b92746f7ffac29318f",
+    "a76bed6e2354e2f5f7ed7e9402ace284aa2e66d0947b0560e1a7a492aaf08da5",
+    "a7acd87cfcdd3cc139e162162ea2cf5bc0285a0d6ec6c383e49b88bdeafa73c8",
+    "a9722169ddca1c7dc2c34a677b490bf4f7dfe029aa467beada5763944310ecb3",
+    "ae7b6f69d14b99cbb37708e916e25e8eb536610cbb0949c55e314efba88dd855",
+    "b522b23e5a4f43549696171febab9204b561ab35e12d75d6662cf9eccaa366fa",
+    "b5c71a5f138de1d7fc5fb138d6b89af1bd20bcc66197393ea1a8696e1f1f7a2c",
+    "bde5cff89fc34a64d75e57ccb03f1f95a0a813f6081d20aec11e278907c1fb9a",
+    "c37fe4e98d025a1802acc4f15fac3656bf9499a50768181e6309ccf4ae30d448",
+    "c6b19f3b539137a530f6702e101db925ca266900ab47fe8044f30347cc4803ca",
+    "c782bcdc0898e7bd30075ad30254fb1681ae025d9461358de32be08a3b2d568b",
+    "c95e7cc94f7ac80d1cf3e5a962528cb5cc85d7353432e079cab3ce5600372494",
+    "d5669fead8c2ac978156ed8dc6a0f041971741a3c63a789697af79b9157b6c68",
+    "dc7a5e7092e37dc7f36fbd9a29a31e67d6f5c054290f7eeceac0630c63ddbe6a",
+    "ec38bca295f482d718ae91469b53aab2329b0f4e100ff87466d3b3d28679bf25",
+    "ef2ba82a46eca88070ac1d6a832db55e2daa718361b1a092aeca5c33d68738c2",
+    "f447b426bbb1dc309ab33172524aec597378dc66346f22fc906e4148e96d1d73",
+    "f57baf339abfeaaf2aa0d4049f669a33823fe0f8dac2204518f4c2d5ce42b681"
+   ]
+  },
+  {
+   "a": "Doglapan By Ashneer Grover English Edition @magcourse.md",
+   "b": "Doglapan The Hard Truth about Life and Start-Ups.md",
+   "identical": false,
+   "similarity": 0.9166666666666666,
+   "rows": [
+    "751abe80d939adb9bce33acbce431bba843ef8aeb1e3db43bb986ad70264097a"
+   ]
+  },
+  {
+   "a": "Graphic design the new basics Lupton, Ellen_Phillips, Jennifer Cole liber3-1.md",
+   "b": "[Ellen_Lupton,_Jennifer_Cole_Phillips]_Graphic_Des(z-lib.org).md",
+   "identical": false,
+   "similarity": 0.8541666666666666,
+   "rows": [
+    "b9f38390b3090ab0bfed6b1b5c7325c9334a6a4ea69b25b2806f76dcbd0aad9b"
+   ]
+  },
+  {
+   "a": "HBR Guide to Making Better Decisions Harvard Business Review liber3.md",
+   "b": "HBR Guide to Unlocking Creativity Harvard Business Review liber3.md",
+   "identical": false,
+   "similarity": 0.9166666666666666,
+   "rows": [
+    "ea7d52a6c7edf7120d69e96bf90677f1f326278707ea55ca78ae993a8d32e346"
+   ]
+  },
+  {
+   "a": "Hands-On Generative AI with Transformers and Diffusion -- Pedro Cuenca, Apolinário Passos, Omar Sanseviero & Jonathan -- 6, 2024 -- O'Reilly Media, -- 4a3dd41c0fe610c053b13d3817350636 -- Anna’s Archive.md",
+   "b": "Hands-On Generative AI with Transformers and Diffusion Models (Omar Sanseviero, Pedro Cuenca etc.) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "identical": true,
+   "similarity": 1.0,
+   "rows": [
+    "78f2b11049bcf922fbbb17502982e3ec9001514d532eeb2b4677d1dfc1451acd",
+    "9df1e8b336fd9135276b34533908d0b636c384d1e01fce5a3cd358931b4b80af",
+    "a56650c3707113ee52047bc956e7a23b316c135c02d355e2c1e35a935fb55062",
+    "c5dccd5ec39d757095ee75d946c39d799e197a2dd39f827840f69a7c8e723ddd",
+    "d3442444f9985a23ee38a3e0517fcaca65d731c2c67bb9d0bc1d805ab7897cd4",
+    "e97ca9f4a0ec3c2ac8d8de52172a8e973303503366694ad43698b5f217268fa2"
+   ]
+  },
+  {
+   "a": "Hello, My Name Is Awesome How to Create Brand Names That.md",
+   "b": "The B Corp Handbook How You Can Use Business as a Force for Good by Ryan Honeyman Tiffany Jana (z-lib.org).md",
+   "identical": false,
+   "similarity": 0.9047619047619048,
+   "rows": [
+    "97a57d87343f086559d398c41980a5641e15c6674e5d49fdb4357b84aa7ea705"
+   ]
+  },
+  {
+   "a": "How to Be a Graphic Designer Without Losing Your Soul (New Expanded Edition) (Adrian Shaughnessy) @.md",
+   "b": "How to Be a Graphic Designer without Losing Your Soul (New -- Adrian Shaughnessy; -- Lightning Source Inc_ (Tier 1), New York, 2010 -- Lightning -- 9781568989839 -- 7148a33670f572cac55f19e1e7c71e2d -- Anna’s Archive.md",
+   "identical": true,
+   "similarity": 1.0,
+   "rows": [
+    "08b64a0430ba90a443ec19758d862098ec6b1f16755c6d0ca612a4f6d1f3a20d",
+    "11413db78a3d5c6f24bd0de4621d84ad6efe7395089613b289165a5289c5ae49",
+    "1e76f09b3933ba9d8a5e4aa00e2ac49202f6a8f02a8a735953652805d2682d0b",
+    "3860ffff45cf233e6e462b18e4a9e5e02abbca9779d42977d106a443e8da09c2",
+    "3c99c94443384b542a0dd9bb5acb1c98258b6208b12987ceca548f0437495681",
+    "46736ee5191cd23e72f5b9b12309f541d14628a9ac59f5ebba1ece5322658614",
+    "751abe80d939adb9bce33acbce431bba843ef8aeb1e3db43bb986ad70264097a",
+    "751ff7005e4d4a501d1af5c0f292b57dc22521bf6a3deadfec099f6327896988",
+    "75d02cdd425ae542f99fb3c9131a054652adaf5d9e6ae3c9d5ab1ff051227479",
+    "7f43b2844b7d2c900badeac414f2ca4d64e53a431c66a0200686af24cb8336f3",
+    "9b4eedb6eff7c93434f120c0d1c4a5c135986d50d8398cce7f208f70dfa86446",
+    "9b983c40fb33fde426ebaace435977cd8d2ec6ac71e4ca7af0b6cc9b782f0be6",
+    "c141a8c347683bf3f1899e8225d0b0d284074ef4be02426c138e83ea671f808c",
+    "c91fe98da15998389e25d4669551fc55f482bdc5eeac26ecc7c29c1096ae3738",
+    "cc3c0763028e614434f208635751ba53b14b73f4fc55dec5e57fc9faa6633fe2",
+    "d5eeb4d2b04117da3275e8bf421fd54e1982bb1411bedf883fd2e093419cbdf6"
+   ]
+  },
+  {
+   "a": "How to Read a Person Like a Book - Gerard I. Nierenberg.md",
+   "b": "How to read a person like a book.md",
+   "identical": true,
+   "similarity": 1.0,
+   "rows": [
+    "3ad9cd6338b0c92e119a9af348886d001358d926de387da1a3a0e1fbf1f23fe4",
+    "412e9e128a9054284e7cf79914f7ccc03fc7794df3028fa2fdeed4b3d02e3b66",
+    "69011326eefe66a3eeae721382eda852a180b18a586153b47190e79c3d4fb139",
+    "757108a3ef3890660075d37e6b31def1a831dc9737f400ab112baa74f1dfeede",
+    "8fde7efb46806e2ad263bb601122b3fc2271f1fcb774532973333ebc4d807acd",
+    "cedd9294c445d5a70147d6e6f01eaf1dacc707b57e54456287bf31fbae4b1021",
+    "d047c7221865b7f7ce313dceade23c38b2a3a71aa26d3d5fd1f72a93421fb3a7",
+    "e649302e16b18f8e3d06e04cd8a494094f6b70f98d2863a93b6ffb983394981b"
+   ]
+  },
+  {
+   "a": "Hustle Harder, Hustle Smarter (Curtis 50 Cent Jackson) (Z-Library).md",
+   "b": "Hustle Harder, Hustle Smarter.md",
+   "identical": true,
+   "similarity": 1.0,
+   "rows": [
+    "010afcb6b4b9c4436a688805d6f51c8e5247e00d7808f62ebdbbbdefe6946812",
+    "014abd6c1f48ae730c7ed0e7f344cd562f4596a73a8171fe9fcce1b7708ef2b2",
+    "022a9c11b8b5ba790b8b8798cd700b491dc3b1086eea169eda90e29ea42a18f8",
+    "0791d24990274f0a5ca37d70b971768775b149eea4cd27708c0ad7d14b6a4af6",
+    "08dfffea505e71a060e990d721c0bec7b707664a85a063ba1efdcd280a991f14",
+    "0e657f959a0a0b17cf29f89f518abfe920f1e9748482b336d2e37c6def81d4e1",
+    "0ecc136bef75a5556551a0c794c8c95d9426050acf7deb6fe909e8b699cba9fd",
+    "1351a9df28ac8de7c3809220ffdce2056fef8d95c5314fbd26cb956379f1e10b",
+    "3209e35e20764465e8ac3a289d33e9cf170677550c5f0459d59e1c9ff8825cd4",
+    "3d63beb6e34b220af9cd0edc2809252b0a45af30d1a981fb30335b8445772e62",
+    "3f6391f41ab250513c2f0f30bc5c92a73b2d1fba6a03d5f01cb0e5b74b997fbe",
+    "47758818265faaf435a2e742aeb650359e77f4426c5a1555ed8ed8e044a25aeb",
+    "49158e69f3dc5d4a275b296da9891a4dac42d1ad94dea2533b8d7b88217fa37f",
+    "498a347ff7a3066e11b661de43e15e7e169088e2029ab85c5d0742b9698c2965",
+    "4a41972694ab3c9c43a866083496f3a0090bf18a3bc3da1787c03fb11a9a6034",
+    "4ed1877ca4b626457eaf7a368b9ac501374147a32a0c8843ad14a554be07aaeb",
+    "54a598765d4c067d0b7cffccc9481c9c741e09f81b83fda0ede3c24909e0d041",
+    "5562d3dbfb27ce3a99627b76cca70ec130a662ed90be92510de0918dfd4f2ca0",
+    "590f22d1492b947575ceda683675461ba2f992ba5eca17b7ab10502b42e7286f",
+    "60ec16739d776167c60646da3bcfd43225b686c740c357bd17aadba955dc51e8",
+    "65c3a5241591eb270e111b1f8fcb1d0c6083c812c2a96a36607c0f293527921e",
+    "735e3fbb7d4e81a139056b9c6a59e19c1cc7538c032c8a001ee55a41d1eaf97c",
+    "7382f325b07dbaeb9a5cd6fb2a53ef72b6a335da8d31e4b6db0f246a10359d45",
+    "74b8bf02a1c1a36060b811d17365ba0d2f653721cee5bca79646a0ce9b7adacb",
+    "75bf6bd30b25240960b70efa7ab0674c979e3dd67030d2b1bc9d63fd1b7bf612",
+    "75c079f782586da1c2ef50655f4013d2d9f1f7dd1be0642f53472406a32ccf50",
+    "7f1b693c892c87bed33aebf03b5c825e2ff863369c1d959951098a517bb7ae1b",
+    "7f51685c162f04304fe272375883f5f3b8b35af379c7b5aca49077790c1755e4",
+    "81b4c7fb31164e79e16ca4aadddf04e47fe92a54c4d27ba4933a58a91bd970aa",
+    "86ccb768e3291b908f7f5b395b9a9497358cb3bc2f02ba2f2eaeb6fc21568031",
+    "8894973c81ae6326cec20b85ac799855d29100939aa5d7dcb357b3b17786412b",
+    "8d0db1ddb5ccac0359bbec1d4a1177a71f3895e756975fe41b9579fc118a4011",
+    "99424c5a965b2d7a9fca9ac8fe9600c699e82840f2cd382dfb1ed6a04ede14a8",
+    "9cf298762419b52ed13c3c4769021f123d85573003d47b8e76b47f17215bc751",
+    "9e64cbda0157f40d8d96e7471d35422c2a7dee79ba8f0da0c447f89950d6fb62",
+    "9ed7d3d14a14dcc0184c274b73af0e74825985ef665407bb4a2a27b46a113373",
+    "a169a62ed449e584cfd0a8f58d0a4cab505e38bbe8962ffd81c45d795b938c52",
+    "ac2acbf1118ed83114e491388d0949ce11655c18b5124c0853733f1a5206a867",
+    "b7c4f222492a2e7c335e261e63a2c549960787463f7095322af39783466c82dc",
+    "b9c35405ae55e23e965460eee0e98eb9eeb2c8641ce00e5b0e27a88de73e7831",
+    "bd2873bdcbcfae8fd66661db062c58e5f3546dc1f9e97f67bee12fc314c4b3d9",
+    "be11830080c0b173e460d27866c82a459fde4aafc16eaff3e55b2a546d389019",
+    "c6ab1a5fc862ef4295c63bad4227116463ba02077cbfdd75fb5ddbc81a5d5f23",
+    "d2790d0f565b0e5ba62873304113e79bb4240890259ed6c3583df6c76ea06ef1",
+    "d3c69bfacf7c1ffee0802a23e2c2eedacd2186453f72d706765cd524cb9bfbb8",
+    "dbb546109e4250bc69ba15096e4472a577bbc49ac42848905e1697c5ceda1085",
+    "dd55abfb42915c497290c7c97b1f1432ffb9e1dd20845247d1820bae5283bfc5",
+    "e1ff229ad811c08425ed1067119cd949433df30eb4c9fc88da1450c71553802e",
+    "e64758392f00499b3435648962517d6cd20933371b4edb0ef004a60b63aec1eb",
+    "f64790514d2a1a9e4213c197f303f564bd60eae35e8a638f63c2e51a51344d13"
+   ]
+  },
+  {
+   "a": "Influence - The Psychology of Persuasion (Collins Business Essentials) by Robert B. Cialdini (z-lib.org).md",
+   "b": "Robert B. Cialdini, PhD - Influence, New and Expanded_ The Psychology of Persuasion (2021, HarperCollins) - libgen.li.md",
+   "identical": false,
+   "similarity": 0.8125,
+   "rows": [
+    "4b1460e302eecfbe0e58a5a6d052e06a1640062c451628adede0b3f2fb731808",
+    "9c6bbe1a6a548d395e42941051fd93ae0c3a4fb081a24c386464ca67f2542265"
+   ]
+  },
+  {
+   "a": "Information Architecture For the Web and Beyond (Louis Rosenfeld, Peter Morville etc.) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "b": "Information Architecture For the Web and Beyond Louis Rosenfeld, Peter Morville, Jorge Arango liber3.md",
+   "identical": true,
+   "similarity": 1.0,
+   "rows": [
+    "0b7f5a03b1164ff5a97e2a7e65f41433cd297543fd682b42be7acc5c2e5c0608",
+    "1e7151ece3e8db31f63ab92983be369b576199177a0a39b597ec069b025b47da",
+    "2b0b7e897a86f7e37ebc19e53ca675d5ff7c562f81ca111127122df296e974ef",
+    "2c73cdc5dae2ad408225ccfb5313f14e77ba419a2f616603318e86be456a69b2",
+    "39e300746d554d2ae08fb8efda46fa21ad4c9ccf6d1e10f1855b87361fc377f7",
+    "3b877d882f9141b3d2d1ebe71d70fcc19c22d0fb37c011b5d8bb325da9bab074",
+    "422111cc3eea85a377c15850bb0bb6118299862947e41355c5785f615f10b040",
+    "46736ee5191cd23e72f5b9b12309f541d14628a9ac59f5ebba1ece5322658614",
+    "4cda587629c64f340dbbf1c77a811e360def42f2ba75693c8c10102c16d06a92",
+    "4ffc5d4bc042aabb94f3df9f89f0a4b2941ecd35b3440070b50141cf0d19f098",
+    "50e70bc122da394c8bc8952427ee60272644da3f7fb58e46c4e5b5899b9ad9fc",
+    "5152f022d8ea2576d418fb0f496be4c9539ff40b8bcd46dc578751d28ee1d1ad",
+    "5164e8d84329c9a692dc4ea3145e48008dbdff9c76b1b9a332573fa4d9cb21c7",
+    "66b590c93935ac459edb6fea83f3ae22790dc24db9d54620e43558a066eb465b",
+    "679280f5068ffb39e49a91c4c6c007f5586c9a44735c8d083cb9d1fa3f159ec9",
+    "6a5f1b8a079accb2ac8a4a1f697810a57cbde3c887c6c5f65b9686f889d791f2",
+    "6d97af278e08dcc6bdfbb09c94717dcae13a4712c3617b873e4443d58e13ebd4",
+    "75d02cdd425ae542f99fb3c9131a054652adaf5d9e6ae3c9d5ab1ff051227479",
+    "781018cab78be1857fbf0c507b84477d029aea4b25a7cbdff382cac28af5bc66",
+    "7f43b2844b7d2c900badeac414f2ca4d64e53a431c66a0200686af24cb8336f3",
+    "7fbdb082ce0ad3e84dbc5347d0f58124ab3079efbd50c4832df8477ad887b952",
+    "81483b86fe740df29a799131b674b1e561c2385025e997c02c8ec892b0e31dc0",
+    "87f20a0409cf98ab1cd0c9d2779cbcfa16ad3735f86ff59a1c41ac2628dc59ab",
+    "91d10e66a429f0a757c7628323c6421681b4a21f9e7b799b2c5cabbf765cf362",
+    "9cb8ec334232dcb1ac4c71e22471877810977b1b4b27dbee61e48d84db409a07",
+    "c0b80fc29e162029cf162082ff115c02c0bf1a7f6b358b341a90c74ce4126a24",
+    "c4fb2a30698a9d4df93b36cb62c74f0dfacacc28cf971ed520cd27b0c4ea6859",
+    "c53f5e243567a504d6e846554bd613927a480db0d57c6f40fa642ea4fd845441",
+    "d5eeb4d2b04117da3275e8bf421fd54e1982bb1411bedf883fd2e093419cbdf6",
+    "d8fd2bb91c75afb578fcc048c0ec574bcb20b69120239f3750ed7b39ffad5dfb",
+    "d90cb85654f6c9e6e62768f7eb23a6a5662b26fe2a7b9586ae4deee8c10f2884",
+    "da2b990bcf66f871d0437e032107cdc688cdf52b7cab4cffdb3c3a7f8e9e06ac",
+    "da79b9ea634127075873c728c5b241230d1d5089fb4b94c4c8078b8ef7969dfd",
+    "deb507ab1f74d338306e6945d2c952d0ab617c4512466d1582ce3d28b19f1a6a",
+    "e48521bf5f27355175c29b487f2178811267abad56c2cd9036c6b0d7fe2f546a",
+    "ea2695617e889d141673a87b56cdf571d9411cedfa822c9618130bd01b56db90",
+    "eda0520ed7802367e09a1d9eb4942d4603e7c7da49cc272639badaaa627a363c",
+    "f3aeb486d53819ffc92327f16bb3d3f99ffe59d50d962069b86b668d965b62d0",
+    "f43aa24f8f639851c180a59a041c943431b728ad939c7f6427002ff43df84dea",
+    "f4b38db94156ead7e2e15cb758935a986aa7de5013025c1ec0241fd18789745f",
+    "f57baf339abfeaaf2aa0d4049f669a33823fe0f8dac2204518f4c2d5ce42b681",
+    "fba860c98885c35944e25fabd9303a2b840e0d004f33521b0bd392b49f017917"
+   ]
+  },
+  {
+   "a": "LLM Engineer_s Handbook_ Master the Art of Engineering Large -- Paul Iusztin & Maxime Labonne & Alex Vesa -- 2024 -- Packt Publishing -- 9781836200062 -- eec4e0451d5ed347034dee70af6044e8 -- Anna’s Archive.md",
+   "b": "LLM Engineer’s Handbook (Paul Iusztin ,Maxime Labonne) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "identical": true,
+   "similarity": 1.0,
+   "rows": [
+    "21fd1e71531b055753f2c04124e9cb84714232045cc2ca51016bd6dfa843a8cb",
+    "7335f0a33c9dbedd8f09aae8b3725fc419834695383b035f1261e8c64bc8d078",
+    "c626637685c1c07d953e5290f2bb10c5001a5a287510ce038e936a5c8077f39b"
+   ]
+  },
+  {
+   "a": "Layout Essentials Revised and Updated 100 Design Principles for Using Grids Beth Tondreau liber3.md",
+   "b": "Typography Essentials - Ina Saltz.md",
+   "identical": false,
+   "similarity": 0.8125,
+   "rows": [
+    "4562fb7be6cc126637a005d5d4ba80a441a5c0dcea5babdc9aa6b45077bf23b1"
+   ]
+  },
+  {
+   "a": "Logo Design Love A Guide to Creating Iconic Brand.md",
+   "b": "Logo design love a guide to creating iconic brand identities by Airey, David (z-lib.org).md",
+   "identical": true,
+   "similarity": 1.0,
+   "rows": [
+    "0e899bf2ae056fdf1818e8a2123e9b0479c3ec34e0e24200e1938af222cb75d6",
+    "11413db78a3d5c6f24bd0de4621d84ad6efe7395089613b289165a5289c5ae49",
+    "11d96fd24c11f5a3492c5cc73052213343465b8a689408063988d279d451866e",
+    "231cfcf2b22faa49a9568880abcfed39e6aa818cd3a0ddce35e2e30102720c63",
+    "2b985598dca263be6c14f383b7a80c3eb3c6b45cc70c5082eee65adc4768daf6",
+    "454af81ff5162e8f06269987aa55076e9cbfbaf8c0855ea65a3bae9af250d8b6",
+    "54c26797d535602755f78a6ea3de04d2e3d61695e23902d7b78f21c9d4037dfe",
+    "75d02cdd425ae542f99fb3c9131a054652adaf5d9e6ae3c9d5ab1ff051227479",
+    "795ea06b14c170280d8f4346a1a4da4008d4bacf0ee7435f76b36f8500b37757",
+    "7ba886219cc8de8864033ff1e16a407c94a8170da32789296c8b9b271774eb26",
+    "7f43b2844b7d2c900badeac414f2ca4d64e53a431c66a0200686af24cb8336f3",
+    "c91fe98da15998389e25d4669551fc55f482bdc5eeac26ecc7c29c1096ae3738",
+    "d36d84a2d8d5c25c170800c9994d9a229ca8bb481a11634576fc19b78f3f9a26"
+   ]
+  },
+  {
+   "a": "MAKE Bootstrappers Handbook. Learn to build profitable startups the indie way (Pieter Levels) @.md",
+   "b": "Make_Bootstrappers_Handbook_-_Pieter_Levels.md",
+   "identical": true,
+   "similarity": 1.0,
+   "rows": [
+    "1351a9df28ac8de7c3809220ffdce2056fef8d95c5314fbd26cb956379f1e10b",
+    "18696a896710fb2d46ec3adfd1f2ead2bc73e6acd5a95f0e75a0268a2b136bc8",
+    "2d9780ddcb49590783d230729bc637b42031ef4defb81da41c3b6380d6d93d15",
+    "2e169316c197f565bf7fe7ea5147377bb4bfd7f38656df7bd61f9d1b2b567d02",
+    "32800edcd34e9fb3909d64cbcc83f9b064e1b11fbab69a530933b85a2763f44b",
+    "3bb932dda7e170e436b8c9643b0d4623c40d69e6d0336c62f92b3be331e2afcc",
+    "4c9a1469248c25a4d02e7132c3370047b861b88e99733d890efefbf3fcfa3e09",
+    "533764890644d9a83740c8d85120c7693d31bda145b9c1d8c4a51232685f2b8b",
+    "7335f0a33c9dbedd8f09aae8b3725fc419834695383b035f1261e8c64bc8d078",
+    "7723a120d3b638ae5f298b40158c0d278f4170605d5fb8e98c8b1de1595d7ca8",
+    "918ff14e6711e08478873390fd1cb5333947e0a85a1e9f0d1ce38747308812ae",
+    "91a612bf8b3a242cf655282350906fa5ed60cdd7f1e401eed6d9817cd9004283",
+    "983223fd26de451bcd34c4c9fdbb7161fd4cac174776ae88e33240a72f80709b",
+    "c810044bff8198309e7fcee9b9968fd3624bee579ac995fcb60b1a05108c6cf7",
+    "c95e7cc94f7ac80d1cf3e5a962528cb5cc85d7353432e079cab3ce5600372494",
+    "da79b9ea634127075873c728c5b241230d1d5089fb4b94c4c8078b8ef7969dfd",
+    "e56c9a7988bd4532d74ea981de011cf9c1f0dca1006fc774c37bebd1cbcebba6"
+   ]
+  },
+  {
+   "a": "Making and Breaking the Grid A Graphic Design Layout Workshop Timothy Samara liber3.md",
+   "b": "[Richard Poulin] Design School Layout A Practica.md",
+   "identical": false,
+   "similarity": 0.9375,
+   "rows": [
+    "4562fb7be6cc126637a005d5d4ba80a441a5c0dcea5babdc9aa6b45077bf23b1"
+   ]
+  },
+  {
+   "a": "Maps of Meaning (Peterson, Jordan [Peterson, Jordan]) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "b": "The Structure of Scientific Revolutions (Thomas Kuhn) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "identical": false,
+   "similarity": 0.9791666666666666,
+   "rows": [
+    "8372e03e65bcff2facd8d96f25bc7346daa7eb03b39838fec5d04524cbb1e60d"
+   ]
+  },
+  {
+   "a": "Mastering openFrameworks - Yanc, Chris_compressed.md",
+   "b": "Mastering openFrameworks Creative Coding Demystified (Denis Perevalov) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "identical": true,
+   "similarity": 1.0,
+   "rows": [
+    "316c7f01535841e3ad34c18f1976195dac5b24a315a83abd1f8c1d795e6889c0",
+    "71030ffc179d495076fea70ea19036b2bb6edfce863fef1d8f47c4dd709d4ca8",
+    "d6ed0df6fa67d16b8de888cf9a3551ab53e11c7c9884d44658499ea331986982",
+    "e445447aeab5753146b819ef2cfbb3882ad2bae833b1687976c9da1bd27f5fb3",
+    "fee082a75796e42e728157c75efa2d0f386d1595bcf515645ebf76ff64d0e81d"
+   ]
+  },
+  {
+   "a": "Metaphorically Selling How to Use the Magic of Metaphors to Sell, Persuade,  Explain Anything to Anyone (Anne Miller) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "b": "The Tall Lady With the Iceberg The Power of Metaphor to Sell, Persuade  Explain Anything to Anyone (Anne Miller) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "identical": true,
+   "similarity": 1.0,
+   "rows": [
+    "03e9f2b038da1c9d47161a3cd37652d3503d42219e8024eeaa446b665cc82104",
+    "10cc7c13760515ec4a093718f001b391149364da73500143cac584e2943e3ec4",
+    "15f983d9e1b59580080fb99ee926e195dc640f5df73832fec0beda9b5feadc80",
+    "18329cde9129542a22957f851ead854c9f20ebfc79ae5205077e8b24615369d8",
+    "2084ab450bf70cc2a4ce84432775c0b3f5bd9b1f5450c4f807c2baef0f54982b",
+    "38f7f09f84df4199ca0062810694f614c13af0e2096457832b807e6e56e99f26",
+    "3d1f81a6e0f99256269697b8c58bcbf5db7bc4b2b9cecd2e9d493f60abbe436c",
+    "3da99bd44418bfd8938a69ee1686147ee9ee4f3f7eb28f4589b0171044586c32",
+    "50d673540c7e3accbf345ea280027e49bdf546bd44a2ace28ad9825810286808",
+    "512d9e8d33aea834d5d23422d8d7e691dac1d23f5c07a6bdd77eca4451809576",
+    "54d41138177bd7184d1690d549ea29573d265a6dfe442e51bed96ca7727ccb1a",
+    "57bd8b70c5b21a2566bc2311d4707361c75f676d13a40b8a64fec33f35211369",
+    "67faf2d7ea9b85c479ff0355640b2d6ada1c7159948c8376bb29297db5939062",
+    "747bab452acd727b9a30d070f733a3ea41e86419f99bb89148830e3127e57c03",
+    "7586c59b2480d3576a1593dbf50e1b8f0a8c009baf074393c03910a01009c6e5",
+    "7bbef640e0b9294420128ec3b810b8f94307175c5008444f758d818c03af68be",
+    "7f08af06b212a17cf1369a895e61756a458319fd5783737d6d47cf1304a6e5ab",
+    "86e67b20cb2ca040701be650242867149d30f6f194bf2271300fb51a2c87018f",
+    "8987e2d678e7e8200c883308e78fd35d31199fd762364355c521096c9474dd87",
+    "8b28e68986aa990e87f463fe94f6a8e756bbe2bbf1cbe57db0bc8ecf009bd7fd",
+    "913be8d9799c5c4a1a7f902536ed2c33e5e0352b56fec9fb6045e7113c8cfed1",
+    "9371977cee39093833e8dba0e4960d2664d0c5f49b6757799631db1a79331d73",
+    "9dc696876f7aa6ec896a5ded2eb0728f012fc42494e4c31331290f4ca771ad9a",
+    "9efd7d9dec0554639b6d822efba779835a0a0ea045f30fd8e726881d4afd2c42",
+    "a0862d6cba75fdf19e8eb541a24701c0017441994aa033b44d53149cd09c56d5",
+    "a34a2a01d69bb164490571bc1616f99a0b45b9654e1ae9474ee182eae04c2a48",
+    "a351e566a59b20ed40b3d50507e95112cb1936bc4a4c2a504b4f9b852fda45a9",
+    "aa022f3cd7fb656ed9db2a03ebfba55b0324fe7a6546542f1cf2795a9e5bc54d",
+    "af8ebac63bb12429d2cffdcb1deada0f32c8aeb26075710c371826a4723f9729",
+    "bb9c004689c2e8826d69aca9ad1895e639731ae5fe785e2d405e05e2eda92289",
+    "c548f3eee45cb3b9168669cd9ad064c72ba7f5c76db54e1f9c58d45db0657955",
+    "c61edfd979a2b69eed73425df7d8d4edaf7afffda841550db45e79f4a729c89a",
+    "d778d26a392f0277a9c6b70ae030cc5958f9a7091888869b795b32cef1b5e52e",
+    "d897dbb47ec93cdc3db592bac609e662f35ee2949ee47ccb7a343db948773ae2",
+    "e6d8d16188005f58001b164fce5c82c3665e675ea65d9d512939220f8abba1ab",
+    "ebe5b155cc2c3154a58bb05f66980026f4f70a9addfa5c6abcdc28a7e5417dbf",
+    "ff02c60d13e9eeb8274dae7fce7a33484954ecb25f8947473cb9f2662ef021d3"
+   ]
+  },
+  {
+   "a": "Poor Charlie’s Almanack The Essential Wit and Wisdom of Charles T. Munge (Charles T. Munger) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "b": "Seeking Wisdom_ From Darwin to Munger, 3rd Edition -- Bevelin, Peter -- Third edition, 2018_2007 -- PCA Publications L_L_C__ PCA Publications -- 9781578644285 -- fc29e83e825ec3045c15f31e225e2324 -- Anna’s Archive.md",
+   "identical": false,
+   "similarity": 0.8958333333333334,
+   "rows": [
+    "2746da0a6e145f5c5089f9458aa4e8009cd47f5fe9058e578b3b3fa6227ff40c",
+    "568fa1d0f151e8ad409833b9e4984e8786c53b7ea94c41d4dbb7dfddd86c64ea",
+    "bba8dcc5b3840894bdb67f99c0dca44123f47110aa4a35480bf7ab56543a95fe"
+   ]
+  },
+  {
+   "a": "Pricing Creativity A Guide to Profit Beyond the Billable Hour (Blair Enns) (Z-Library).md",
+   "b": "Pricing Creativity A Guide to Profit Beyond the Billable Hour (Blair Enns) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "identical": true,
+   "similarity": 1.0,
+   "rows": [
+    "0c6afc1fb7fbacd3f37200f53e4f688a033fb9a5b04cff96fb3a119881ec7e15",
+    "15f983d9e1b59580080fb99ee926e195dc640f5df73832fec0beda9b5feadc80",
+    "22b574b03e089786497a43e9f0d67dd5de0add391606895b67ed3a0f01cd0a11",
+    "4102fafdf9b61b4de7071784be4eaaa2485a0aa9e5c121d926d6d0c5dab8a2e0",
+    "4c9a1469248c25a4d02e7132c3370047b861b88e99733d890efefbf3fcfa3e09",
+    "52484669e072153c304f93bd46b49a12f51b6dad4c0e9afd1040f7b015996e74",
+    "5b1338098db462421ec988c5ad1b6c99025541184ef26b23a52605b9cedd0a85",
+    "8741f9c29d0b80562057de28c0b36ef4d6573645a6ffa99f576bbb010f3f0052",
+    "88673d2a34ae9560dbd183878a2de0c72a950840cef9ee49a2bb565b62117fb2",
+    "91a612bf8b3a242cf655282350906fa5ed60cdd7f1e401eed6d9817cd9004283",
+    "983223fd26de451bcd34c4c9fdbb7161fd4cac174776ae88e33240a72f80709b",
+    "a6221cfa833e65b390b5fb7deb2f5600149be03028b141b6c6c71e29f08541ce",
+    "b3ec81a899fe63bd55643677eeccc284ead40698cd448c88fda46cc884e08b71",
+    "ba8054ed6a3899be0dee722b7f5496ff75c2976f9437f3fefd2c28ce19b305cb",
+    "c810044bff8198309e7fcee9b9968fd3624bee579ac995fcb60b1a05108c6cf7",
+    "ce1c081845043512e9b9057a8d8fa63c4f3baf68b5217fe8d9f80de0f64e6016",
+    "d36d84a2d8d5c25c170800c9994d9a229ca8bb481a11634576fc19b78f3f9a26",
+    "e7d0eaf3e61f70545ddf3943e6d0f372c67eccc65eba9e9ae2cd50f3a87c7630"
+   ]
+  },
+  {
+   "a": "Pricing Creativity A Guide to Profit Beyond the Billable Hour (Blair Enns) (Z-Library).md",
+   "b": "Pricing Creativity A Guide to Profit Beyond the Billable Hour by Blair Enns.md",
+   "identical": true,
+   "similarity": 1.0,
+   "rows": [
+    "15f983d9e1b59580080fb99ee926e195dc640f5df73832fec0beda9b5feadc80",
+    "22b574b03e089786497a43e9f0d67dd5de0add391606895b67ed3a0f01cd0a11",
+    "4c9a1469248c25a4d02e7132c3370047b861b88e99733d890efefbf3fcfa3e09",
+    "52484669e072153c304f93bd46b49a12f51b6dad4c0e9afd1040f7b015996e74",
+    "983223fd26de451bcd34c4c9fdbb7161fd4cac174776ae88e33240a72f80709b",
+    "ce1c081845043512e9b9057a8d8fa63c4f3baf68b5217fe8d9f80de0f64e6016",
+    "d36d84a2d8d5c25c170800c9994d9a229ca8bb481a11634576fc19b78f3f9a26"
+   ]
+  },
+  {
+   "a": "Pricing Creativity A Guide to Profit Beyond the Billable Hour (Blair Enns) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "b": "Pricing Creativity A Guide to Profit Beyond the Billable Hour by Blair Enns.md",
+   "identical": true,
+   "similarity": 1.0,
+   "rows": [
+    "15f983d9e1b59580080fb99ee926e195dc640f5df73832fec0beda9b5feadc80",
+    "22b574b03e089786497a43e9f0d67dd5de0add391606895b67ed3a0f01cd0a11",
+    "4c9a1469248c25a4d02e7132c3370047b861b88e99733d890efefbf3fcfa3e09",
+    "52484669e072153c304f93bd46b49a12f51b6dad4c0e9afd1040f7b015996e74",
+    "983223fd26de451bcd34c4c9fdbb7161fd4cac174776ae88e33240a72f80709b",
+    "ce1c081845043512e9b9057a8d8fa63c4f3baf68b5217fe8d9f80de0f64e6016",
+    "d36d84a2d8d5c25c170800c9994d9a229ca8bb481a11634576fc19b78f3f9a26"
+   ]
+  },
+  {
+   "a": "Pricing Design (Dan Mall) (Z-Library).md",
+   "b": "Pricing Design by Mall Dan (z-lib.org).md",
+   "identical": false,
+   "similarity": 0.875,
+   "rows": [
+    "022a9c11b8b5ba790b8b8798cd700b491dc3b1086eea169eda90e29ea42a18f8",
+    "aa1d82e2d288e54c10e014b4304ae39fc31dd3a58fee2da861c16454ba5756ab"
+   ]
+  },
+  {
+   "a": "Principles of Logo Design (George Bokhua) (Z-Library).md",
+   "b": "Principles of Logo Design A Practical Guide to Creating.md",
+   "identical": false,
+   "similarity": 0.9583333333333334,
+   "rows": [
+    "30edb87a3aab699c63aaf683b87d0df67908d1e769a5a04ce06a9ff057aeeed3",
+    "35f7208ed5079619333e9caba57f8f97a0bb0e6db2942da8f4134efb3c36d3bf",
+    "5936b4b51b6813e2a54dc70aacee13e6e3ad45b460db32f8bac996dfc8431bb4",
+    "7f8cea3a48b28beaef09bdc682aec35933159c0f10057313aeb8eb25d3ea7e63",
+    "f57baf339abfeaaf2aa0d4049f669a33823fe0f8dac2204518f4c2d5ce42b681"
+   ]
+  },
+  {
+   "a": "Prompt Engineering for Generative AI Future-Proof Inputs for Reliable AI Outputs (James Phoenix, Mike Taylor) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "b": "Prompt Engineering for Generative AI_ Future-Proof Inputs -- James Phoenix and Michael Taylor -- O_Reilly Media, [S_l_], 2024 -- O_Reilly Media, -- 9781098153403 -- 566d1a173782a422ad1df1b1241919e3 -- Anna’s Archive.md",
+   "identical": true,
+   "similarity": 1.0,
+   "rows": [
+    "08e6a8ce48c1f77069db2e335b352448af8ae56925c77078863f7c80e9a10b88",
+    "1a11d633e4faa81e3009a6b20fada29a390a4d8dae4199aa8970705c41d13c31",
+    "1bc63aab08481e73d6fa84fa7d85e1373e69f4f793f8b49b35ac9f119d1dab62",
+    "255b07de679a19fbb9264d08ba6c93fed7da7aff87a95e2334c52c65c065966c",
+    "44a4e528cb06a36aed19ed57c2a5f2d5954f563e4f16f2b908da03277e8a613c",
+    "5492eb56da628eb1f8c8ef5f4de6a3ba7415f433d82bef5bfb6edc3ad8c1a528",
+    "5d2736c9e8499b775014a7ab21107cb57663b8b2fe9adb77fd22db6869e185e2",
+    "5d2d8052771f6e9946b1f88dca62efa1af4570cf447c610255f28d88c2f895bb",
+    "620e333c8b8e57821c2bd7ac833d482b5f0cb35715e03de9640370e4a9a2ebee",
+    "78f2b11049bcf922fbbb17502982e3ec9001514d532eeb2b4677d1dfc1451acd",
+    "7aadad80486d30889b38ef740a5b573c62aafddb4ac40755c1dcc594753cb61f",
+    "85cb9446af38e24e207114e2ac84ba88c3976e5bb1d10cd5cf0acb55f2594be7",
+    "9c881a1bab7ea7f0a40a6f7e77209d27fef44b8aa7e6aa24d2bd69b76a0c66cf",
+    "9e477bb5b751cf34516c17b5841c534d306bd24daa873576dc0f63dce0b56f0e",
+    "a661a500db8dfbc4300d398a9dbb864ff354cf9ead2981ae7738f2159e6721c3",
+    "a7d5c214a844e1bbaf84ea194ca61e9962c3e90934d69903823cd2e09f1f1566",
+    "b1b322f0a68fa6ab7ee5fe2f7eaa3251a27be9e169c967a612df876d95bdf5b1",
+    "c0971b0af2917e59799de86bf5d62b7ba8d8e3e4964971ff2463c91e203d4497",
+    "c4fd56d6cfb47bde909bcad1e9b101b3d6f1e655e25bfbb77e50f08436c8768b",
+    "c626637685c1c07d953e5290f2bb10c5001a5a287510ce038e936a5c8077f39b",
+    "eda0520ed7802367e09a1d9eb4942d4603e7c7da49cc272639badaaa627a363c",
+    "f0a42b865a5ea7196210a54870f6bceff03adc51cdc870611441155de66ed9f8",
+    "f5658e4968790dd898fcf686d3372c50eca960ef99d9da0424dc1e52b6c2a082"
+   ]
+  },
+  {
+   "a": "Prompt Engineering for LLMs (John Berryman , Albert Ziegler) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "b": "Prompt Engineering for LLMs The Art and Science of Building Large Language Model-Based Applications (John Berryman, Albert Ziegler) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "identical": false,
+   "similarity": 0.8125,
+   "rows": [
+    "c0971b0af2917e59799de86bf5d62b7ba8d8e3e4964971ff2463c91e203d4497"
+   ]
+  },
+  {
+   "a": "Prompt Engineering for LLMs (John Berryman , Albert Ziegler) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "b": "Prompt Engineering for LLMs_ The Art and Science of Building -- John Berryman & Albert Ziegler -- 2024 -- O_Reilly Media, Incorporated -- 9781098156152 -- 5f2cb8d5f26e202cdd7b308091def046 -- Anna’s Archive.md",
+   "identical": true,
+   "similarity": 1.0,
+   "rows": [
+    "0778647f8272dd83f41d3d50bbd461b72de7ad579f91399dbeaad96af890f635",
+    "08e6a8ce48c1f77069db2e335b352448af8ae56925c77078863f7c80e9a10b88",
+    "1a11d633e4faa81e3009a6b20fada29a390a4d8dae4199aa8970705c41d13c31",
+    "1eda49fce96c6fac931dee2fe0bee70d115c24186481bc715904f879289b6848",
+    "21fd1e71531b055753f2c04124e9cb84714232045cc2ca51016bd6dfa843a8cb",
+    "255b07de679a19fbb9264d08ba6c93fed7da7aff87a95e2334c52c65c065966c",
+    "399a59abba340bbe1fe5109c0b7c36ec0a785d63524faac479237c78be6ffa41",
+    "44a4e528cb06a36aed19ed57c2a5f2d5954f563e4f16f2b908da03277e8a613c",
+    "5d2736c9e8499b775014a7ab21107cb57663b8b2fe9adb77fd22db6869e185e2",
+    "5d2d8052771f6e9946b1f88dca62efa1af4570cf447c610255f28d88c2f895bb",
+    "7aadad80486d30889b38ef740a5b573c62aafddb4ac40755c1dcc594753cb61f",
+    "9769ffc7acb192e0071a9136408ce495a6a7956e1499f40251529e50d30563eb",
+    "9c881a1bab7ea7f0a40a6f7e77209d27fef44b8aa7e6aa24d2bd69b76a0c66cf",
+    "9e477bb5b751cf34516c17b5841c534d306bd24daa873576dc0f63dce0b56f0e",
+    "a661a500db8dfbc4300d398a9dbb864ff354cf9ead2981ae7738f2159e6721c3",
+    "b1b322f0a68fa6ab7ee5fe2f7eaa3251a27be9e169c967a612df876d95bdf5b1",
+    "c0971b0af2917e59799de86bf5d62b7ba8d8e3e4964971ff2463c91e203d4497",
+    "c626637685c1c07d953e5290f2bb10c5001a5a287510ce038e936a5c8077f39b",
+    "d644569526b8c9a2d3b4223f51ea1ed4f7086e8c62a51eeed2d92959493c17da",
+    "eda0520ed7802367e09a1d9eb4942d4603e7c7da49cc272639badaaa627a363c",
+    "f0a42b865a5ea7196210a54870f6bceff03adc51cdc870611441155de66ed9f8",
+    "f5658e4968790dd898fcf686d3372c50eca960ef99d9da0424dc1e52b6c2a082"
+   ]
+  },
+  {
+   "a": "Prompt Engineering for LLMs The Art and Science of Building Large Language Model-Based Applications (John Berryman, Albert Ziegler) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "b": "Prompt Engineering for LLMs_ The Art and Science of Building -- John Berryman & Albert Ziegler -- 2024 -- O_Reilly Media, Incorporated -- 9781098156152 -- 5f2cb8d5f26e202cdd7b308091def046 -- Anna’s Archive.md",
+   "identical": false,
+   "similarity": 0.8125,
+   "rows": [
+    "c0971b0af2917e59799de86bf5d62b7ba8d8e3e4964971ff2463c91e203d4497"
+   ]
+  },
+  {
+   "a": "SYSTEMANTICS. THE SYSTEMS BIBLE_John Gall [Gall, John]_liber3.md",
+   "b": "The Systems Bible_ The Beginner__s Guide to Systems Large and Small_John Gall_liber3.md",
+   "identical": true,
+   "similarity": 1.0,
+   "rows": [
+    "000a09c79e87b65ff88128e9ed1efe9a04d266ab7d520d1ad0d3d8db8f2aa359",
+    "0683661ad9e40b9335b89e71b5331a75119269aaf588d0e4fa2202419cc30dfb",
+    "15e8b6246841677239c40a933e9c172c42a9a41f9b1e898b84b48a9eb2a45a2e",
+    "20deb92b1a40ac513aafec3fd5702af8623f80be7b2a2f6d5a4454929a022dbd",
+    "20f99a2cc7df6702b49099b0c33830d8347d5af9b43def58909f87bec8b7bada",
+    "334c49ae6b7a2dadbc52e9e36f48006f77050062528d6a727127b211473262d5",
+    "33b66789c8179e580cd7e90662779ce32858fb60c5a6f88922404aecb484ffa0",
+    "364e9f2245f35a1c89d389600df80f5fb69bfc849ae37de66776233531beb5bf",
+    "4b7d9033e7a145af9f8a48153c33a26e9a8bb77bea7dae44ba58c97f7d58188e",
+    "5e094575108f8db2e7c6efd63897bb0c8bfa567ccb2b48c69d5e585db67e447e",
+    "625939982534efbc1ebd5fa9d3b40736a933cb0ffca5f4df6bcbafeddcaabb9b",
+    "637cb14791d050680deece82693d3a1f513d3ad0ea530812b658636d0ebbf613",
+    "65594b5bc767c10c654a8bfdf5c204ee0414c0c37677b6ad8a4f77ad466a0710",
+    "65d547bf9a9203a809b57115d53846fc913416e6a2e2661572210fbda7dcba7c",
+    "69bcdf0b8febad2af92d86b2f7d7bd0cf963c5969bab71a3e4de48d0a863992b",
+    "69ff0bce69e7382c5b32126fc4e756ce6e3e735a6316a1a31b467eb642300a86",
+    "6abb9c1538ca861ea7430e7ff6c6061879ad874be7634817fa4f1e77b2e12b47",
+    "72749b5a2d5e9a745d90d78d956af4e3e404209e24304a0334a2e7d5a8f7fb9e",
+    "7ffe9b3bf59dbd5b5d189618efc14905a04314bcc78c3a4feb2e5c276d965501",
+    "839ee41a99667f85fdd257ed1dbc2b0227113098896dd300c8e7c9fda7037e92",
+    "855c4bbf9c6d8932e33cb9029974d56f4e0f65ccb401f12a6972d54909eb467e",
+    "91ef1346351125099db1a6bbfa2db1da25094cd2f8cf4898c3272dfcc0ac92fd",
+    "97693ad3a198310de86f18bc9078eebd8088b9cbfbd1a7f26504e9fb7ced4d48",
+    "98f25a79cd27e81353f7cdf97dd3e32727397fdb8482606e0404f03069fe6d21",
+    "9b0346208183a9814a3b72ed047e8c296b04803c727fd921dfa77c26f9546ea2",
+    "9d6cdb4e97af5bdfd6049f0c6e546de6a622621ee634c6579193b2861f6fb154",
+    "9dfbcfe0d1d9b33cbb88211566388bdaa609a603632613b364b2beb01882d009",
+    "adb08393403ef04dedacc4b1edb1b18651aacf30a6a1f9045111e6d3fc410145",
+    "b24561ffba8f9a338241f6d4d728f333b5a08cd9fb77c7f328ee32110b032ee8",
+    "b654802b820d466819a33a269035334da5d37b1a17e1331cb71d44164572db27",
+    "bb0eabea6ba992db24f17667cc4322e333713fb67a05cec06725f6e85e1c5f94",
+    "bbf72f9d2e830bbf0e4d73295df33b4128b1afd67f6f9181f6c4953f27441c8b",
+    "bdefc3bd0313c6ef920479efb112ece126c5ea3f004b6d00aebec59d09f09366",
+    "c6f304ae57b3e34330cae40c1d5a692c6be2eae52ea2fa7f1e0f73ef14719710",
+    "cd14e7906954c0997f436216cca69bb3ac3ed6225dc199898ef8250313cd068d",
+    "d95202177e87870f7f6011a87bd1a7f7b84261b6334eb90eae19b2d808ca752f",
+    "e242daa9866dd7df5012642d8d479c1fcc20c196de33a6e5229c80dc54da082c",
+    "e2620b7892597efd805c1463723898d358a990c8043b54ff78582b5ab2c96cd6",
+    "e6a8bdcca2d73ca508b192366c78418dcc16ae384aab43312e2555cbef5aeded",
+    "ee37fec0ca15860f10bb178918c0792d29a7aa8179fb83ea2a04c27edb73e42b"
+   ]
+  },
+  {
+   "a": "Semiotics The Basics Daniel Chandler liber3.md",
+   "b": "[Paul_Cobley]_The_Routledge_companion_to_semiotics(z-lib.org).md",
+   "identical": true,
+   "similarity": 1.0,
+   "rows": [
+    "017baf7584d45afc2a8d95b106d2e4f64dd3a7b83c38f699d1c92d1cc4657293",
+    "285faea51095bd59d925c2daa65c6620e04ca2a101b5c0192a6883c0ea1b9fff",
+    "31ddadcad315444333204f5c59a9cbce51cbd53218bb0d173a0b0c7a68ccc69b",
+    "3a6a3c714104abc5ebca16c8d08edd731dcab414ca9768357d2200a9851d76ea",
+    "4d75a0d8a5dbc0f98e0082ada912cbfb0a0f8eee68b3f9ea6024406d2e263d57",
+    "5bd45b2d936687ef3155eff321fa251f2bcbf26962d85bd43d9916b47240cd8f",
+    "6f41bb349a014d4b77dc26547f13b5754ed367014081c066fcebdf6605388766",
+    "74f54eff06bfd0c47c9484a15b269b99a07e206378b981999133fab8b117bea9",
+    "756c006c8ed31bec9cf3f14288db5ae8b5c36cef3752196cba1dc74952f7a4b6",
+    "8c122be1ec41478067c811659e37b83f0011517f90b3bd411205cf8fa0ea3086",
+    "b2ba331523ed879821c925067e32c5664fc0d704393110662283589115c61d22",
+    "c5e7668af479aeb35a3fbc17bf7fd8251f6ad1b884adecd4f9f86a566ad44032",
+    "ce1c081845043512e9b9057a8d8fa63c4f3baf68b5217fe8d9f80de0f64e6016",
+    "e772e254ea8db48b41d74144a0680d421654898c5b44464f8f0da38f65acf511",
+    "efbc5010395c77acb29beda75e4bb8704ca95ae8d525449d617ee4e9633b5415"
+   ]
+  },
+  {
+   "a": "Silent Weapons for Quiet Wars (Anonymous) (Z-Library).md",
+   "b": "Silent Weapons for Quiet Wars - An Introduction Programming Manual ( etc.) (Z-Library).md",
+   "identical": false,
+   "similarity": 1.0,
+   "rows": [
+    "3a77f0808f09fee2a7f40d4406a34439b9612ef1762f12966855560b220ff593",
+    "60ec1b502e2caa510bd954b41ed7a4927467f9008414305f336477127fcb065b",
+    "b0fb06a5e95697e6e922b5697add43dab317057394f8e8c06a9805452fe74d14",
+    "eae95d414691c30571caf0f3127cdfed67fb536f5b1e395ebd7c03dc98dff7c2"
+   ]
+  },
+  {
+   "a": "Speculative Everything Design, Fiction, and Social Dreaming (Anthony Dunne) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "b": "Speculative Everything Design, Fiction, and Social Dreaming Anthony Dunne, Fiona Raby liber3.md",
+   "identical": false,
+   "similarity": 0.8541666666666666,
+   "rows": [
+    "5164e8d84329c9a692dc4ea3145e48008dbdff9c76b1b9a332573fa4d9cb21c7",
+    "5ea600ec629e7d92289136d5ac9302d4ffccfa39d602ad076bebacbd5dd1c4c5"
+   ]
+  },
+  {
+   "a": "The Black Swan (Nassim Nicholas Taleb) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "b": "The Black SwanThe Impact of the Highly Improbable (Nassim Nicholas Taleb) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "identical": false,
+   "similarity": 0.9583333333333334,
+   "rows": [
+    "170cad4db7d87869f7ae25f79d001478d76076c743ea3b1c70b789b5489d52e7",
+    "22b574b03e089786497a43e9f0d67dd5de0add391606895b67ed3a0f01cd0a11",
+    "29723ce4233759e8b88f515352be0058ca6ad0ac27cf8ee4b8b5aa3afa97e4de",
+    "5164e8d84329c9a692dc4ea3145e48008dbdff9c76b1b9a332573fa4d9cb21c7",
+    "56ac61faa2300a1a4d775ccc85265360fc1ecddc676e8d005572bc706ab9892c",
+    "7bce0b3d1d6fd411d87d8f3519501f441e95a6309cee3e5dc2bb373a834d6326",
+    "93c83bebfa68a97a1abac4e151f91de5b5761618252b653fb5e60ab316e9a23c",
+    "99e1cc2c9421192c0c4855d2ed2ebd28a18c1e2bb673f8fff0137705ccf9ee67",
+    "a7acd87cfcdd3cc139e162162ea2cf5bc0285a0d6ec6c383e49b88bdeafa73c8",
+    "a8d1c57c6519740392449429ec0b6eda94b2c57b6f96387cb732c0c4f5168c91",
+    "b64a61289575bb089526eec35c53efba6f6a350d4fe947b93f2de0e443b13b58",
+    "c2970f358609e6f48d1ca0427e29d8e71b8bd683b4cf4b2f8d0e27e0b3c61c7f",
+    "d5669fead8c2ac978156ed8dc6a0f041971741a3c63a789697af79b9157b6c68"
+   ]
+  },
+  {
+   "a": "The Brand Gap - How to Bridge the Distance Between Business Strategy and Design (Marty Neumeier) @.md",
+   "b": "The Brand Gap, Revised Edition -- Marty Neumeier -- 2005 -- Pearson Education (US) -- 80264045cb7a79faa7ea63e629cacc3c -- Anna’s Archive.md",
+   "identical": false,
+   "similarity": 0.9791666666666666,
+   "rows": [
+    "0b4eb6d611c0a72558a473e9b88819530899c0141e473ce99ebf0a93fb19275d",
+    "5164e8d84329c9a692dc4ea3145e48008dbdff9c76b1b9a332573fa4d9cb21c7",
+    "69092fc85d1c8c5036292f7709dfa159d55f5feff46700b6553f276d3692c7d9",
+    "78fa7b5d7be5e16a10f3890554f0dc430f37c3607e6d0dfbf0a7da344c58c456",
+    "8b48f86951ee8206242a2daf6f8f8707b1fa4df99e2c2ecedde355b14d36ec34",
+    "a9a30161f161327eedc21101280b5b93343124faf686231071bfb43ff8317643",
+    "d07d09f0ffcd98d4ccbaca49f4efc09b98099599a0591f444f7994142f5a843c"
+   ]
+  },
+  {
+   "a": "The Compound Effect (Darren Hardy) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "b": "The Compound Effect by Darren Hardy.md",
+   "identical": false,
+   "similarity": 0.9583333333333334,
+   "rows": [
+    "08153492531aaed963e85d30f9edcab8daf9a4fec143acfd050dd5725900903b",
+    "1a2f675a2ab13a9d6b4af8af398387d1a74145c1d0a13700488c20e28cc8e1cb",
+    "b47d1b97b1ee9750aa7e26c374b6b4fce4fcf68888663d82788001d1599285fd",
+    "d1c7beb40c4e2c7665aaf8cd69b94ec466fdbb43c6afc94baa3d1bcc3a0955d2"
+   ]
+  },
+  {
+   "a": "The Data Storytelling Workbook Anna Feigenbaum, Aria Alamalhodaei liber3.md",
+   "b": "The Data Storytelling Workbook by Anna Feigenbaum Aria Alamalhodaei (z-lib.org).md",
+   "identical": false,
+   "similarity": 0.9583333333333334,
+   "rows": [
+    "2a8f852e658dae1f5f841fb2376253356fa0977883504adf58a9288d04ef1efd",
+    "38ff4e3eb7e147aeac01380937b09c9546f195e58a4594902645f2a2d05af3e0",
+    "4e428b2bf1a346debc94f5de0cdbb4ba8de251006252b0f08de0d39223901006",
+    "75d02cdd425ae542f99fb3c9131a054652adaf5d9e6ae3c9d5ab1ff051227479",
+    "b7fce8beb8d8f675c0c6dbf1f15e1eed4ff0c710f69f4fa37e4589b9e0d30778",
+    "d4c61e6b8b76520df867eee3b6fd64975fead79a5e02169e4bddcc6b516ed6d1",
+    "e4da9913870f4dd780e07c4fa61c6764ca93406bc56259f351327c77f352a903",
+    "e82cb4862ef0f180482255912ab4c5e241aa40eb9a647a1daec7d510b2bd79f8",
+    "f7e8a83f8273165a2540d765d4986ed753b17255a8d9191edec00ed00f3c2dd0"
+   ]
+  },
+  {
+   "a": "The Elements of Typographic Style_Robert Bringhurst_liber3.md",
+   "b": "_Bringhurst, Robert - The Elements of Typographic Style.md",
+   "identical": true,
+   "similarity": 1.0,
+   "rows": [
+    "0fd89a2ccb7b5448f712694500ab19d3f0a3414067a49ceb399f501a359bd44a",
+    "aada0d626dca6f3d9fce88098175c1b89946a9d43dbcb2c09269f1b58bebc3e8"
+   ]
+  },
+  {
+   "a": "The Elements of User Experienc_Garrett_liber3.md",
+   "b": "The elements of user experience  user-centered design for the Web and beyond (Garrett, Jesse James) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "identical": false,
+   "similarity": 0.9186046511627907,
+   "rows": [
+    "39e300746d554d2ae08fb8efda46fa21ad4c9ccf6d1e10f1855b87361fc377f7",
+    "f339dfee84afc14277b76b9c6a4ab02c15276fd4f1371955ac9b50573bf8c798"
+   ]
+  },
+  {
+   "a": "The Essential Guide to Business for Artists and Designers.md",
+   "b": "The essential guide to business for artists designers by Alison Branagan (z-lib.org).md",
+   "identical": false,
+   "similarity": 0.9126984126984127,
+   "rows": [
+    "18696a896710fb2d46ec3adfd1f2ead2bc73e6acd5a95f0e75a0268a2b136bc8",
+    "27271a51057ed0ac4bd106a018d3f78704e342b6a0e61eed29360c2c645b1954",
+    "2a6f60ac2fd5e44c6a40ae57b903adf0fffdb055f67fb2ec818c36e8376720e8",
+    "a89bad0778096c27f0340f1c2cdfb8e7b173488d0219d5b7197c0dd360a8211d"
+   ]
+  },
+  {
+   "a": "The Essential Guide to Doing Your Research Project Zina O’Leary liber3.md",
+   "b": "[O_Leary]-The-Essential-Guide-to-Doing-Your-Resear(z-lib.org).md",
+   "identical": true,
+   "similarity": 1.0,
+   "rows": [
+    "0ec07c55e32c2848bb43e7bae19af0705b603290ed93d4a476cf3576fac33f2c",
+    "11b16694a032af085713d39c4d564369caf7f0142da286f92d1539702680a842",
+    "17fe5f1ee55465fe0cdd83cc14148d9fad1a0cb395662f81b9002ce6dbf71d58",
+    "196e6dfee5c8ea85bf70b430c013a76d13c1fa1aed5b7eecece30057912957e6",
+    "1e7151ece3e8db31f63ab92983be369b576199177a0a39b597ec069b025b47da",
+    "36ddce7de2d2906fd9ada43e57169df8c4d1c404824efc7e0ea05a0971a908f2",
+    "3860ffff45cf233e6e462b18e4a9e5e02abbca9779d42977d106a443e8da09c2",
+    "3e672e6d5cd8066e120af27311c9493f6a2ff982be6cf441c6565bc6795c3e54",
+    "50f91edcbc96d2148951b63af331eeab431df1f440358ce00ace2a72cf6d6db6",
+    "52484669e072153c304f93bd46b49a12f51b6dad4c0e9afd1040f7b015996e74",
+    "56ec10a0eaf2306a68a924b1301e555a0461cf56e93a2a44cf293aeba4da2a64",
+    "59dc62dd51da77a1311da97eefc7259ce9323672a6feea71eb7cd3d45f9109c1",
+    "5a081dc475207cdda1ad2f3453cb959834a485dd54ec7822b88ec41ae13da430",
+    "6afee5d569da1890fd0af9f286001476f2445ac80bfccf9d88df10f58a68e280",
+    "6d258d419b86470998ce37f4db50586cae5df500ab26a94900521f52638f97a5",
+    "6d97af278e08dcc6bdfbb09c94717dcae13a4712c3617b873e4443d58e13ebd4",
+    "78fa7b5d7be5e16a10f3890554f0dc430f37c3607e6d0dfbf0a7da344c58c456",
+    "7b896794ebe6036a650b302f3aec354e9f59f87c099deb55e100f5a579496fc9",
+    "7e87d07efeea3612017ba3ce3ed18c1bd9399ad696f17c36da4944b55c0c7f29",
+    "84db8c31c1a82ab478ee2079e1143ab0d6f040d432ee0c4ce345bc44fd76e374",
+    "877430701e5f7bee5b81b781b4d530eed2cc5df8380cba4a8419010e6ea877b5",
+    "a4b823118c4ee5d92ff0d7b68f7012b77854fcc0935994fbd30dee652b24082f",
+    "ad100a2920fad14032ff82708577a23e31064d562c8e2ce38f316c0448e0dae9",
+    "c5a260dbd1af2b2242433bafc72542d4f1922c3f971f4171880ef69031aa798d",
+    "c6728aabee02c32d839fd65d4f5ee3df96b325357bf27f43628cd1151ff694e8",
+    "c810044bff8198309e7fcee9b9968fd3624bee579ac995fcb60b1a05108c6cf7",
+    "cfba25f888945081d79afe1a991d8fb94121d88150bc6f62ac8b52c11baa9d7f",
+    "d4c61e6b8b76520df867eee3b6fd64975fead79a5e02169e4bddcc6b516ed6d1",
+    "d8fd2bb91c75afb578fcc048c0ec574bcb20b69120239f3750ed7b39ffad5dfb",
+    "e30aee375cc2fbace99ba32dde712e64cc49b4594360e203606ab9755838ef1c",
+    "e82cb4862ef0f180482255912ab4c5e241aa40eb9a647a1daec7d510b2bd79f8",
+    "ea7d52a6c7edf7120d69e96bf90677f1f326278707ea55ca78ae993a8d32e346",
+    "f150060f43c4e0e71e5305b59fb283ece436de63c3704d9831341b8b4ff2e36d"
+   ]
+  },
+  {
+   "a": "The Freelance Manifesto A Field Guide for the Modern Motion Designer by Joey Korenman.md",
+   "b": "The_Freelance_Manifesto_A_Field_Guide_for_the_Modern_Motion_Designer.md",
+   "identical": true,
+   "similarity": 1.0,
+   "rows": [
+    "11413db78a3d5c6f24bd0de4621d84ad6efe7395089613b289165a5289c5ae49",
+    "1da591d0cedf3f40249e8fb0ed54c17a94aedba013a387411227e23ac5230249",
+    "29ffde4f2b797ca471f620c36a7d219c186607fa90ca3fffcd0737cb1ae04191",
+    "2a6f60ac2fd5e44c6a40ae57b903adf0fffdb055f67fb2ec818c36e8376720e8",
+    "386cedaa5944409ec3b60a8c9e0bced06ad3113f0ed8d511b5909534ae004e83",
+    "4a606f849882177218bed292ab4d91f601a8eebafb94c6a277aa0d176809f27e",
+    "5b1338098db462421ec988c5ad1b6c99025541184ef26b23a52605b9cedd0a85",
+    "5f5a50c6a248076712abadf23612ec870a43d9146f9dca5b9d7960e26c259614",
+    "747eec32be66b78cff5a871a1a8d647281dc8f9e1e1d36406c16fb6c7c844ad8",
+    "7f43b2844b7d2c900badeac414f2ca4d64e53a431c66a0200686af24cb8336f3",
+    "a9722169ddca1c7dc2c34a677b490bf4f7dfe029aa467beada5763944310ecb3",
+    "aa022f3cd7fb656ed9db2a03ebfba55b0324fe7a6546542f1cf2795a9e5bc54d",
+    "b552efbe7c7baef0b9d7ccaf22f37aaddc51f25bdecf5638f2d50ffcb68b754b",
+    "be6b9af94c4bf45d648e0339a3b407f440b391a30f72179885fb0c2575f786b4",
+    "c91fe98da15998389e25d4669551fc55f482bdc5eeac26ecc7c29c1096ae3738",
+    "d36d84a2d8d5c25c170800c9994d9a229ca8bb481a11634576fc19b78f3f9a26",
+    "e2905b2737c4e44b9c610ffcdf3aa8b80d80cd5805bccf1b797907423c0c1180",
+    "ea7d52a6c7edf7120d69e96bf90677f1f326278707ea55ca78ae993a8d32e346",
+    "efa5dc7a52a8867f5e45e58c0086c0f3bcc93bb8c6bf94868a5436846bd7f2c8"
+   ]
+  },
+  {
+   "a": "The Great Mental Models, Volume 1 General Thinking Concepts (Shane Parrish  Rhiannon Beaubien) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "b": "The Great Mental Models, Volume 2 Physics, Chemistry and Biology (Shane Parrish, Rhiannon Beaubien) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "identical": false,
+   "similarity": 0.8125,
+   "rows": [
+    "8c2ed6208c22141348bd14edb6a52bbee8dfcdc7bc13cc7f320cc623a2ea7848"
+   ]
+  },
+  {
+   "a": "The Great Mental Models, Volume 1 General Thinking Concepts (Shane Parrish  Rhiannon Beaubien) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "b": "The Great Mental Models, Volume 4 Economics and Art (Shane Parrish, Rhiannon Beaubien) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "identical": false,
+   "similarity": 0.8125,
+   "rows": [
+    "8c2ed6208c22141348bd14edb6a52bbee8dfcdc7bc13cc7f320cc623a2ea7848"
+   ]
+  },
+  {
+   "a": "The Great Mental Models, Volume 2 Physics, Chemistry and Biology (Shane Parrish, Rhiannon Beaubien) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "b": "The Great Mental Models, Volume 4 Economics and Art (Shane Parrish, Rhiannon Beaubien) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "identical": false,
+   "similarity": 0.875,
+   "rows": [
+    "8c2ed6208c22141348bd14edb6a52bbee8dfcdc7bc13cc7f320cc623a2ea7848"
+   ]
+  },
+  {
+   "a": "The Harvard Business Review Entrepreneur_s Handbook.md",
+   "b": "[Harvard_Business_Review]_The_Harvard_Business_Rev(z-lib.org).md",
+   "identical": false,
+   "similarity": 0.875,
+   "rows": [
+    "b47d1b97b1ee9750aa7e26c374b6b4fce4fcf68888663d82788001d1599285fd",
+    "dc775be8b870df67bfc7a24788f4709e9e3839bea6a7c71a6c56f3e7b5e1cafa"
+   ]
+  },
+  {
+   "a": "The Nature of Code Simulating Natural Systems with JavaScript (Daniel Shiffman) (Z-Library).md",
+   "b": "The Nature of Code Simulating Natural Systems with.md",
+   "identical": true,
+   "similarity": 1.0,
+   "rows": [
+    "0dae34fe6a4468975fabbb014c1116856c357b0bb59210cc9f8197cd28cfcdcd",
+    "5164e8d84329c9a692dc4ea3145e48008dbdff9c76b1b9a332573fa4d9cb21c7",
+    "918ff14e6711e08478873390fd1cb5333947e0a85a1e9f0d1ce38747308812ae",
+    "c5dccd5ec39d757095ee75d946c39d799e197a2dd39f827840f69a7c8e723ddd"
+   ]
+  },
+  {
+   "a": "The Psychology of Totalitarianism Mattias Desmet liber3.md",
+   "b": "The_Psychology_of_Totalitarianism_-_Mattias_Desmet.md",
+   "identical": true,
+   "similarity": 1.0,
+   "rows": [
+    "056894733710fba17c25453e974d3cbc420fb0c264a9bb28438d86a6636d9cbc",
+    "3ad9cd6338b0c92e119a9af348886d001358d926de387da1a3a0e1fbf1f23fe4",
+    "5164e8d84329c9a692dc4ea3145e48008dbdff9c76b1b9a332573fa4d9cb21c7",
+    "6e8b92a2fd7ddaac6c392c57d3412c1f66184e65e02fe4a5a41b0bdfbbf90b71",
+    "97a12c0639333fa170a3ed52dcdcd7c206812ca5b85d2d8ee783e96a6ff07e99",
+    "99e1cc2c9421192c0c4855d2ed2ebd28a18c1e2bb673f8fff0137705ccf9ee67",
+    "9c4e420f72d6fcd13fb3d3ad5850daf8fde0f233e5b291d7a5b3ab01fd50e59a",
+    "abece43394a525a39bae820a565d303973bf3eebc23f5a8186b76c51ac0d04cd",
+    "c558c8e223f6fb548f1db59bb5a04297fab58f5bfda829b099c609890e06dc1d",
+    "dd1d685d10ab00bc1e019ff0fc6dda4c399031c27b8333f14eb5c09242e71ee0",
+    "ecd366d2eceb9a61dd2fdc619d6bdbb9f5bc6a030fbbe65019f7c6198ac0eda9",
+    "ff7d075662be5f29ff85489b7cce6fcf9f53f1945af6ffa7e2e91b255d9692d6"
+   ]
+  },
+  {
+   "a": "The Startup Playbook Founder-to-Founder Advice from Two Startup Veterans (Rajat Bhargava Will Herman)@.md",
+   "b": "The Startup Playbook Founder-to-Founder Advice from Two Startup Veterans (Techstars) by Rajat Bhargava, Will Herman (z-lib.org).md",
+   "identical": false,
+   "similarity": 1.0,
+   "rows": [
+    "32800edcd34e9fb3909d64cbcc83f9b064e1b11fbab69a530933b85a2763f44b",
+    "a89bad0778096c27f0340f1c2cdfb8e7b173488d0219d5b7197c0dd360a8211d",
+    "a9d3fa79997815df19381f3294be922c21ec54f2388f15d1acbfaa8562e4105e",
+    "b47d1b97b1ee9750aa7e26c374b6b4fce4fcf68888663d82788001d1599285fd",
+    "c141a8c347683bf3f1899e8225d0b0d284074ef4be02426c138e83ea671f808c",
+    "cfa4dacfa687df1ba215aca51a37fb810a2ed4feb7320aba312d44218910ef47",
+    "efa5dc7a52a8867f5e45e58c0086c0f3bcc93bb8c6bf94868a5436846bd7f2c8"
+   ]
+  },
+  {
+   "a": "The anatomy of type A graphic guide to 100 typefaces Stephen Coles, Erik Spiekermann liber3.md",
+   "b": "The_Anatomy_of_Type_-_Stephen_Coles.md",
+   "identical": true,
+   "similarity": 1.0,
+   "rows": [
+    "119a0cf291dd2efdb9c46f973d0e52942674c97b5fa91b690efcec3853068ca3"
+   ]
+  },
+  {
+   "a": "Things We Could Design For More Than Human-Centered Worlds.md",
+   "b": "Things We Could Design For More Than Human-Centered Worlds_clean.md",
+   "identical": true,
+   "similarity": 1.0,
+   "rows": [
+    "23a29ae036b297771d48d383a022dbe6f1c6e387fd0b1978e0c289f4cddc0cd1",
+    "2b61eab2f38eb01900ac9ed3be7b2a86fcdaacb691fb849fc97fb85411956712",
+    "3c99c94443384b542a0dd9bb5acb1c98258b6208b12987ceca548f0437495681",
+    "422111cc3eea85a377c15850bb0bb6118299862947e41355c5785f615f10b040",
+    "727f64a32f6559b1fa13538c51a729a2163fdd16d0bc189ad88145f45d008dad",
+    "730929f12f15f63c0cd8e1e0cee6000ec86bc373b0ba52a02eabffed0369c26f",
+    "88ab5d90365da4e11641890502da541dd8c174c39d247ba2b0ead7f6d858c378",
+    "a7d8e36c517368bbbb47299fcd10ba4cdee0f1349868ea1d179ef432380389b8",
+    "a9eea6b950d88f9d4907ea2631e24a58afa4704c740ee2db63a16b5adace9654",
+    "b8f5da5464a5577d75cda24b98b90cfa7aa6b5914d13342fc0c0603d9c96319c",
+    "b93d8b4f96860816015f7e4bb36450d46b53ade011a9ae377bc088d7fdc98df8",
+    "c4dfeba168c6840c43b19ab9f2b3d014036c5bb157f69905c1b14a2c254ec377",
+    "e36f746ecd41177392d052d2e80fdac9a1f0cbaaa57956c668236137eac6836a",
+    "fb18592cc211fb70499f7f15078be14164e64f6c4ecc6da23f4da914f17fa529"
+   ]
+  },
+  {
+   "a": "Thinking in Systems A Primer Donella H. Meadows liber3.md",
+   "b": "Thinking in Systems_Donella Meadows_liber3.md",
+   "identical": true,
+   "similarity": 1.0,
+   "rows": [
+    "0321a095343b10e5efd16d7d518f5b43380280c8d0d70760d6b7c41c231f6d59",
+    "085dd098ef025f61ee4066281f60a2382819ba6e236fed0ee02cc64f36e8e996",
+    "0aefea3ade3ae636a19fd279cd689c8a75008eb6ae89a38f383745b5afcfa0a3",
+    "0bc1ffe486186ad44d392e008e396871f2134f6e0022ac92d2c9093a7b396a65",
+    "0c6afc1fb7fbacd3f37200f53e4f688a033fb9a5b04cff96fb3a119881ec7e15",
+    "155c6a0defd0475fd7b551b63a2d687711a370769d71c4fcd972b3685f4bba03",
+    "1e22b1ac072f33496ca56cc7d53f348c37962dface2a62faa2dc6f908fd4cf55",
+    "334c49ae6b7a2dadbc52e9e36f48006f77050062528d6a727127b211473262d5",
+    "48ea08b904d394caae06a57a9a2bb42a43262ccfd8cd2bb1d8bbadace219849e",
+    "5164e8d84329c9a692dc4ea3145e48008dbdff9c76b1b9a332573fa4d9cb21c7",
+    "533764890644d9a83740c8d85120c7693d31bda145b9c1d8c4a51232685f2b8b",
+    "6ac8b8d90e32f2b1a65bb64f7ca423bf6d9d76d10276b39b2250030a77507c75",
+    "7475d0ed8d29c62ec77dc02b1490ffef99b46198216837bed6d0c794d172ecef",
+    "9b9ad5f0cae460ae2dd13919e6744bbbf9ae5f139b3efbd2b008c2cc3cabe502",
+    "a7acd87cfcdd3cc139e162162ea2cf5bc0285a0d6ec6c383e49b88bdeafa73c8",
+    "b8882357d487bac64309c399201d0fd29c64d3816b0d4ec63fb65b9cb5275fe4",
+    "d76d4fb66077ef24884ca0f1e0d4529c5c86c4bb3493a426e4e762c13b9260af",
+    "eb4ad8d03bdd2ff7fbbc9882ec43965cd02e5fef9320b5b89ff506ab0fdfec3d",
+    "f9b8f6404fd35573ddb93939e1cf416e117b5c2bb1d45afee751bdd5528e34d3"
+   ]
+  },
+  {
+   "a": "Thinking with Type A Critical Guide for Designers, Writers, Editors, Students (Second and Revised Edition) (Ellen Lupton) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "b": "[Ellen_Lupton]_Thinking_with_Type__A_Critical_Guid(z-lib.org).md",
+   "identical": false,
+   "similarity": 0.875,
+   "rows": [
+    "0f48d24f2dcc9391091cf3ef311364c95ceb90449611926abcd43eaf48e8d7d3",
+    "5164e8d84329c9a692dc4ea3145e48008dbdff9c76b1b9a332573fa4d9cb21c7"
+   ]
+  },
+  {
+   "a": "This Is Marketing You Can_t Be Seen Until You Learn to See.md",
+   "b": "This Is Marketing You Cant Be Seen Until You Learn to See by Seth Godin (z-lib.org).md",
+   "identical": false,
+   "similarity": 0.9791666666666666,
+   "rows": [
+    "0789b99332d3c3befcde14aadb38a69624c29c48c5062998228f70666f4264b7",
+    "0e899bf2ae056fdf1818e8a2123e9b0479c3ec34e0e24200e1938af222cb75d6",
+    "18696a896710fb2d46ec3adfd1f2ead2bc73e6acd5a95f0e75a0268a2b136bc8",
+    "1fa3f21111bf611ffca4df1caa9e99fd59cb5c882bea34f3c8ef35d8f0ec161e",
+    "22bbdb502d9a62e1efeea239d3cfcd67e092d06c41623d6ab70002486cbabd47",
+    "312beaf62db4cacea33329786847a95a26528e558137f1c9baa0fcbde2d79092",
+    "3a5ffea01e5dd5f2fd96eaa437d244b1c0a5032c90d294a9afa5b5b26e630acb",
+    "590394c0c2b50c3f105705552955a45272530dbb743e055d872e5bb843e5d387",
+    "60854bffd192934e5d5a036f7b04bd2ea2566e3d7018f47013a07bde50448b48",
+    "8741f9c29d0b80562057de28c0b36ef4d6573645a6ffa99f576bbb010f3f0052",
+    "946c2536cd7e3403564d63b82c6dff13d95d833c241bf1ddb599a6bdf319fbd7",
+    "a9722169ddca1c7dc2c34a677b490bf4f7dfe029aa467beada5763944310ecb3",
+    "ab0be39eb8c196815504841b1aa33542817c91c1728e068b40866122ee227736",
+    "c94e1eb203c4715170a35b692222313608eb065d278317f1c2d866795d1e8c07",
+    "d416f08a90e1338c5348d127aaa75c4af9d0b830984e663bfc846ecfd1d4b09b",
+    "dc12498c3105b8c34bcfe273a73b64df6b0c6139f2617c7cfee0d8c0760abe41",
+    "dc9365062c4a4e42a5e4c1c4d4407e653ea4dc333bbd17555895e66dbf46a256",
+    "f447b426bbb1dc309ab33172524aec597378dc66346f22fc906e4148e96d1d73",
+    "f76eac4340b56c01095c8c4ec081b5b27fa06daf8f523903b2ddaf53015b0f89"
+   ]
+  },
+  {
+   "a": "Type Rules The Designer _s Guide to Professional Typography, 4th Edition Strizver, Ilene liber3.md",
+   "b": "[Ilene_Strizver]_Type_Rules__The_Designer_s_Guide_(z-lib.org).md",
+   "identical": false,
+   "similarity": 0.9583333333333334,
+   "rows": [
+    "31dd2d43c58e8f2cf393dbb8aee0612f00d8fee4341dc27bbf37b7948f1befa9",
+    "3c09e05d68172d8ce7fb8cae64b8531c75a8b7b035f1836ff43fe007447b06ae",
+    "5164e8d84329c9a692dc4ea3145e48008dbdff9c76b1b9a332573fa4d9cb21c7",
+    "a3a86356068c6e3289188f8b09efcf717f1eee7893b0eeb1664a59f8dd9eccb8",
+    "b6d68f10fbff5fc2fce648b00463fede302bd2b5facc9f207c0bb933425bd0f9"
+   ]
+  },
+  {
+   "a": "[Gerard_Deledalle]_Charles_S._Peirce_s_Philosoph(z-lib.org).md",
+   "b": "[James Hoopes] Peirce on Signs Writings on Semiot.md",
+   "identical": false,
+   "similarity": 0.8125,
+   "rows": [
+    "d93002ecc043b3a9e9cd277e1360fd68fa546e445daec3e56b238036423b108a"
+   ]
+  }
+ ]
+}

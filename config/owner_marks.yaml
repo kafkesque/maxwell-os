@@ -1,0 +1,217 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# config/owner_marks.yaml — THE OWNER'S WORD: the intake contract for the human gate.
+#
+# WHY THIS FILE EXISTS (BUG-782). Six open MUST tasks are blocked on the same thing and it is NOT code:
+# the OWNER'S WORD. Each owed act lived only in prose (a `gate:` line in config/task_register.yaml), so the
+# words had no home, no vocabulary, no validator and no coverage reading — and the one sheet that DID exist
+# carried a DERIVED machine screen (68 yes / 16 no, written by no script in this repo) in a column NAMED
+# `owner_ruling`. A lane whose only machine-readable "ruling" was minted by nobody could have been read as
+# RELEASED by an agent that never spoke to the owner. This file is the ONE home of:
+#   1. the VOCABULARIES — a word is a word only if it is in the declared set (an unknown word is FATAL),
+#   2. the HOMES       — which artifact carries the word, and which column the OWNER writes vs which is DERIVED,
+#   3. the TIERS       — a blanket word over a DECLARED predicate, so the owner signs a RULE and not 84 rows,
+#   4. the PROPOSALS   — which evidence proposes which word, and whether that evidence is DECLARED or not,
+#   5. the DERIVATION  — effective word = override > tier signature > none, and the COVERAGE reading (what is owed).
+#
+# WHAT THIS FILE IS NOT. It restates no count, no threshold and no measurement: every number it points at lives
+# in its own home (lexical_limb.measured in config/corroboration_collapse.yaml; the D-2738 ledger; the census).
+# C12/D-2646: a second copy of a fact is a second truth.
+#
+# THE ASYMMETRY THAT KEEPS IT HONEST (D-2898). An agent may RENDER a sheet, VALIDATE a vocabulary, and EXPAND a
+# signature over a DECLARED predicate. An agent may NEVER mint the word: `signed:` below is the ONLY field whose
+# value is an owner act, and the expansion of a signature is recorded per row (`ruling_source`) so a machine
+# expansion can never be mistaken for a ruling.
+version: 1
+authority: [T-129, T-130, BUG-780, BUG-781, BUG-782, D-2898, D-2997, D-2738, D-2646]
+mover: owner
+agent_may_mint_a_label: false
+
+#: The declared word sets. `collapse` and `ledger` ask ONE ontology question in two vocabularies (is this ONE
+#: work or TWO?), which is why T-130 can call the release ONE act read twice. The collapse->ledger MAPPING is
+#: declared once, in the ingest door's own policy, and is referenced here rather than restated (C12).
+vocabularies:
+  collapse:
+    words: [CONFIRM-ONE-WORK, DISTINCT, LEAVE]
+    withheld_word: LEAVE            # LEAVE = the word is WITHHELD: the row stays PENDING and the door keeps refusing
+    reading: config/ingest_identity_gate.yaml#ledger.collapse_words
+  ledger:
+    words: [MERGE, KEEP_SEPARATE, PENDING]
+    withheld_word: PENDING
+
+#: THE HOMES. `word_column` is the ONLY place a human writes. `derived_column` is written by --apply from the
+#: derivation below and is NEVER hand-edited (BUG-782: a derived value under a claim-shaped name is how a lane
+#: gets released by a machine). The binding is the reconciliation: the sheet's per-group distinct counts must
+#: equal the census the measurement publishes, or the sheet is STALE and --check is fatal.
+homes:
+  collapse_sheet:
+    path: governance/work_identity_collapse_review_20261014.csv
+    vocabulary: collapse
+    word_column: owner_override
+    derived_column: owner_ruling
+    provenance_column: ruling_source
+    note_column: owner_note
+    columns:
+      - group                # deterministic: components are numbered largest-first, ties broken by work name
+      - group_v1             # carried from the v1 sheet so every hand reference to the old numbering still resolves
+      - work_a
+      - work_b
+      - evidence_class       # identical_normalised_text | containment_at_or_above_bar  (the rail's own labels)
+      - similarity
+      - rows_affected
+      - served_rows
+      - advertised_corroborated_rows
+      - group_rows_distinct           # per GROUP, NOT additive across groups: a row's works can fall in two groups
+      - group_rows_served              # (measured 2026-10-14: Σ = 717 over a corpus-wide distinct of 530, because
+      - group_rows_advertised          #  117 rows sit in more than one collapsing pair)
+      - pair_object_digest             # sha256 of the measurement the row was rendered from: a re-measure makes the
+                                       #  sheet STALE until it is re-rendered (this is what stops BUG-782's 42 vs 37)
+      - prescreen_verdict    # carried verbatim from the v1 sheet: UNDECLARED provenance, a PROPOSAL input only
+      - proposed_ruling
+      - proposal_basis
+      - owner_override
+      - owner_ruling
+      - ruling_source
+      - owner_note
+    binding:
+      digest_column: pair_object_digest
+      object_arithmetic: [pairs_at_bar, pairs_identical_text, groups, rows_collapsed]
+      sheet_pairs_field: pairs_at_bar
+      sheet_groups_field: groups
+  ledger:
+    path: governance/duplicate_adjudication.json
+    vocabulary: ledger
+    word_field: verdict
+    note_field: owner_note
+    projection: governance/duplicate_adjudication_review.csv   # a DECLARED PROJECTION: the ledger stays the one home
+    projection_word_column: owner_verdict
+    projection_note_column: owner_note
+    projection_columns: [pair_id, a_id, b_id, a, b, detectors, max_similarity, hint, proposed_verdict,
+                         proposal_basis, owner_verdict, owner_note]
+
+#: WHERE THE EVIDENCE COMES FROM. The pair OBJECT had no home in the repo: the numbers were published by the rail
+#: (lexical_limb.measured) but the pairs themselves were produced by a one-off under temp/, which is why the v1
+#: sheet could drift to 42 "identical" rows while the rail and the census both measured 37 (BUG-782). The rail
+#: now WRITES the object it computes; this renderer READS it and refuses to render without it.
+sources:
+  pair_object: config/corroboration_collapse.yaml#lexical_limb.pair_object_file
+  pair_object_parameters_home: config/corroboration_collapse.yaml
+  prescreen_v1_file: governance/work_identity_collapse_review_20261014.csv
+  prescreen_v1_column: owner_ruling       # in the v1 header this name holds the machine screen, NOT an owner word
+  prescreen_v1_note_column: ""            # the v1 sheet's 10th (unnamed) column carries the two carried notes
+
+#: THE TIERS. A signature is a RULE the owner signs, not a row the owner types: `signed:` holds the date the
+#: owner's word landed (null = NOT signed = the rows below this predicate stay OWED). `evidence:` states what
+#: makes the predicate defensible: `declared` = a threshold-free identity published by the measuring rail;
+#: `undeclared_screen_v1` = a screen whose provenance is unknown, preserved as a PROPOSAL and never as a ruling.
+tiers:
+  - id: A
+    home: collapse_sheet
+    predicate: 'evidence_class == "identical_normalised_text"'
+    word: CONFIRM-ONE-WORK
+    evidence: declared
+    why: >-
+      Identical normalised text under two names IS one voice, with no threshold involved (lexical_limb.certain_class
+      in config/corroboration_collapse.yaml). The rail certifies it; the owner's signature says the identity layer
+      may act on it.
+    signed: null
+  - id: B
+    home: collapse_sheet
+    predicate: 'evidence_class == "containment_at_or_above_bar" and prescreen_verdict == "yes"'
+    word: CONFIRM-ONE-WORK
+    evidence: undeclared_screen_v1
+    why: >-
+      Containment at/above the declared bar with BOTH sides clearing the boilerplate screen, and the v1 screen
+      agreeing it is one work. Containment alone can NEVER certify independence (paraphrase/translation are
+      invisible) but it CAN certify a collapse; what it cannot do is certify the CONTAINMENT is the work rather
+      than shared boilerplate, which is exactly the judgement the owner's signature supplies.
+    signed: null
+  - id: C
+    home: collapse_sheet
+    predicate: 'evidence_class == "containment_at_or_above_bar" and prescreen_verdict == "no"'
+    word: DISTINCT
+    evidence: undeclared_screen_v1
+    why: >-
+      The false-positive class the v1 screen isolated: works that share publisher/back-matter text (and the three
+      series-volume groups). Measured 2026-10-14: 16 rows, being the 3 multi-pair groups (5, 3, 6 in the v1
+      numbering) plus 7 singleton pairs. No group mixes this class with the confirmed class, so signing it cannot
+      contradict a signed CONFIRM.
+    signed: null
+  - id: L-A
+    home: ledger
+    predicate: 'hint in ("subtitle_or_edition", "title_rename", "author_leak", "noise_suffix")'
+    word: MERGE
+    evidence: declared
+    why: >-
+      The ledger's own hint classes for the SAME work carrying a different name: a subtitle/edition is the same
+      work (D-2308), a title rename is the same work, an author leaking into the title is a normalisation artefact,
+      and a piracy-site suffix is noise the sanitizer already strips (D2176/D2308).
+    signed: null
+  - id: L-B
+    home: ledger
+    predicate: 'hint == "series_volume"'
+    word: KEEP_SEPARATE
+    evidence: declared
+    why: >-
+      A series VOLUME is a DIFFERENT work. This is the boundary of the D-2308 edition rule stated as a word: an
+      EDITION of one work collapses, a VOLUME of a series does not. (Config/owner_marks never invents the rule;
+      the boundary is the one D-2308 already drew.)
+    signed: null
+  - id: L-C
+    home: ledger
+    predicate: 'hint == "review"'
+    word: null
+    evidence: none
+    why: >-
+      No declared evidence speaks for these pairs, so this tier CANNOT carry a blanked word: they take a per-row
+      word or they stay PENDING. A tier with `word: null` is how the contract refuses to generalise a judgement
+      it does not have evidence for.
+    signed: null
+
+#: THE DERIVATION (one rule, one place). An effective word is, in order: the owner's per-row word, else the word of
+#: the FIRST signed tier whose predicate the row satisfies, else none. `--apply` writes the result into
+#: `derived_column` and records WHICH source produced it, so a reviewer can always separate a signature from a row.
+derivation:
+  order: [owner_override, tier_signature, none]
+  none_word: null
+
+#: COVERAGE. The lane is RELEASED when every row of every home resolves to a word and no conflict is open.
+#: rc 2 = owed (loud, NOT fatal: BUG-457) — the same rc that REFUSES at the ingest door, by declaration.
+coverage:
+  rc_released: 0
+  rc_owed: 2
+  rc_error: 1
+  released_when: every row resolves to a word and no conflict is open
+
+#: THE CONFLICT RULE. A group cannot be one work AND two works. The collapse relation is a relation, not a bag of
+#: independent pairs, so CONSISTENCY is checkable: build components over the CONFIRM edges; if a DISTINCT edge has
+#: both ends in ONE component, the words contradict and --check is FATAL. It is never resolved by preferring one
+#: word (a resolved contradiction is a minted label; D-2898).
+conflict_rule:
+  homes: [collapse_sheet]
+  confirm_words: [CONFIRM-ONE-WORK]
+  distinct_words: [DISTINCT]
+  rule: 'no DISTINCT edge may join two works that a CONFIRM path already joins'
+
+#: OTHER OWNER LANES — DECLARED HERE SO THE ACT IS ONE PAGE, NOT APPLIED HERE (Zero Future Tax: each has its own
+#: home and its own applier; this script refuses every home it does not declare in `homes` above).
+other_owner_lanes:
+  - task: T-124
+    act: the anchor-bridge ambiguity RULING (a name resolving to N rows must stay declared-unresolved or be resolved by a DECLARED rule)
+    kind: ruling
+    home: governance/buglog.md#BUG-777
+    applier: none_it_is_a_policy_word
+  - task: T-121
+    act: the SOURCE KIND vocabulary (an answer-space decision) + whether a work and its re-publication are ONE voice
+    kind: vocabulary
+    home: config/content_types.yaml
+    applier: none_until_the_word_lands
+  - task: T-117
+    act: one word per unit (CONFIRM / CORRECT + home / ABSTAIN / LEAVE) on the ESCALATE reference sheet
+    kind: sheet
+    home: governance/canonical_relabel_review_20261014.md
+    applier: declared_by_that_tasks_own_plan
+  - task: T-101
+    act: "the owner's marks reaching the sheet the re-anchor applier reads (anchor_mode: set is already granted and declared)"
+    kind: sheet
+    home: temp/golden_proposed_v5.yaml
+    applier: scripts/reanchor_retrieval_goldens.py

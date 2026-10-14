@@ -665,7 +665,10 @@ tasks:
     governance/work_identity_collapse_review_20261014.csv (84 pair rows, 72 groups, owner_ruling blank)'
   gate: 'one owner word per pair on governance/work_identity_collapse_review_20261014.csv (CONFIRM-ONE-WORK /
     DISTINCT / LEAVE) - the 37 identical-text pairs are deterministic and need confirmation only; the 47
-    containment-only pairs are the ones that need the ruling'
+    containment-only pairs are the ones that need the ruling. THE INTAKE THAT TURNS 84 ROWS INTO FIVE SIGNATURES
+    (BUG-782, 2026-10-14): config/owner_marks.yaml#tiers (the owner signs a RULE over a DECLARED predicate;
+    exceptions go in the sheet''s owner_override column) + scripts/owner_marks.py --check/--apply (rc 2 = owed) +
+    governance/OWNER_MARKS_20261014.md (the act page)'
 
 - id: T-130
   priority: MUST
@@ -696,4 +699,41 @@ tasks:
     governance/work_identity_collapse_review_20261014.csv — ONE act read in two vocabularies, mapping declared in
     config/ingest_identity_gate.yaml#ledger.collapse_words); mover = pipeline for the door, which is landed.
     `--gate` REFUSES until those words land, and that refusal IS the guarantee — declared
-    (door.ingest_reading: rc2_refuses), never accidental.
+    (door.ingest_reading: rc2_refuses), never accidental. The release now has an INTAKE (BUG-782):
+    config/owner_marks.yaml#tiers + scripts/owner_marks.py --check/--apply, act page
+    governance/OWNER_MARKS_20261014.md
+
+- id: T-131
+  priority: SHOULD
+  state: open
+  mover: owner
+  title: THE MODEL-SWAP BENCH — no role is re-pointed to a newer model family without a declared, preflighted slot
+  why: >-
+    The Strata docs recommend the Qwen3.8-Flash-Next family and its Coder variant, and the standing question is
+    whether the MLX family is better than the assigned Qwen3-Coder-30B-A3B-Instruct-MLX-4bit. MEASURED 2026-10-14
+    (HF API, read-only): the family is 180B (MoE, "A5B"), so EVERY published MLX quant of it is 111.5 GB
+    (mlx-community 4bit) and even the most aggressive published reduction is 70.8 GB (REAP320 3-bit) — against this
+    machine's 64 GB of unified memory, the OMLX memory-guard ceiling and the 24 GB delegate budget (D2496): the
+    family CANNOT LOAD here at any published quant, and the Strata "Coder" is a GGUF/llama.cpp build (IQ1_M, 91% of
+    the authors' SWE-bench Verified) aimed at a 32 GB Windows PC, not an MLX artifact at all. The MLX candidates
+    that DO fit and are worth a declared slot: Qwen3.8-27B-MLX-4bit (16.1 GB, ALREADY served and already declared
+    in config/bench_preflight.yaml#expected_models) and Qwen3-Coder-Next-MLX-4bit (44.9 GB, fits the guard but not
+    the delegate budget, and loading it evicts a resident — BUG-255). One more fact argues for a bench rather than
+    a swap: DELEGATE-002 is a DECODE-COLLAPSE measured on the 30B-A3B MoE under growing agent context, i.e. a
+    property of the assigned model's shape, and the family that would replace it is also MoE.
+  source: [D2549, D2199, D2496, BUG-255, BUG-263, T-130]
+  evidence: >-
+    MEASURED 2026-10-14 (read-only). OMLX /v1/models serves: Phi-4-mini-instruct-8bit,
+    Qwen3-Coder-30B-A3B-Instruct-MLX-4bit, Qwen3.8-27B-MLX-4bit, gemma-4-E4B-it-MLX-4bit, gpt-oss-20b-MXFP4-Q8,
+    Ornith-1.5-35B-A3B-REAP-19B, Ornith-1.5-9B-MLX-8bit, gemma-4-12B-it-qat-OptiQ-4bit. HF params/bytes:
+    Qwen3.8-Flash-Next 179,999,981,459 params (360.0 GB bf16; mlx-community 4bit 111.5 GB; mlx 4bit-mtp 113.3 GB;
+    Litwein REAP320-oQ3e 70.8 GB; Jundot oQ2.5e 83.8 GB); Qwen3.8-27B 27,356,728,560 (mlx-4bit 16.1 GB, mlx-8bit
+    29.5 GB); Qwen3-Coder-Next 79,674,391,296 (MLX 4bit 44.9 GB). The local HF cache already holds
+    Pluto-AI-Labs/Qwen3.8-27B-MLX and StargazerLabs/Qwen3.8-23B-Mini-Me-4bit. NO MLX port of the Strata Coder
+    exists (ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF is GGUF only).
+  gate: >-
+    mover = owner for the SLOT (which role, which model, what it may evict, and the memory ceiling it must respect);
+    mover = pipeline for the bench itself, which already has a declared harness (config/bench_preflight.yaml +
+    the model_eval suites, retrieval_benchmark.py, r5_review_gate agreement) and MUST run at temp=0.0 with every
+    cell PREFLIGHTED (a cell that fails preflight is NA, never 0 — BUG-257/BUG-263). No role is re-pointed before
+    that run, and the evidence for the swap is the run, never a community-notes ranking.

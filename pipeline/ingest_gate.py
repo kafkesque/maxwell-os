@@ -329,6 +329,30 @@ def uncovered_candidates(candidate_keys: list[str], ledger_keys: set[str]) -> li
     return [key for key in candidate_keys if key not in ledger_keys]
 
 
+def declared_sheet_column(pol: dict[str, Any]) -> str:
+    """The review sheet's ruling COLUMN, resolved from its DECLARED home (C12). Never sniffed by name.
+
+    BUG-782, MEASURED: this reader used to take the FIRST column whose name contains "ruling". On the rendered
+    sheet that column is `proposed_ruling` — a PROPOSAL — so a name-sniff would count machine proposals as owner
+    words and release the lane. The column is declared once, with the owner-word contract, and read from there.
+    """
+    pointer = str(pol["ledger"].get("collapse_word_column_from", "")).strip()
+    if "#" not in pointer:
+        raise GateInputError(
+            f"{CONFIG_REL}#ledger.collapse_word_column_from must be a '<file>#<dotted.path>' pointer, "
+            f"got {pointer!r}")
+    rel, dotted = pointer.split("#", 1)
+    node: Any = yaml.safe_load((PROJECT_ROOT / rel).read_text(encoding="utf-8"))
+    for step in dotted.split("."):
+        if not isinstance(node, dict) or step not in node:
+            raise GateInputError(f"{pointer} does not resolve: missing {step!r}")
+        node = node[step]
+    value = str(node).strip()
+    if not value:
+        raise GateInputError(f"{pointer} resolves to an empty column name")
+    return value
+
+
 def collapse_debt(policy: dict[str, Any] | None = None) -> dict[str, Any]:
     """T-129's sheet read in the LEDGER's vocabulary: ONE owner act, two sheets (mapping declared in policy)."""
     pol = policy or load_policy()
@@ -341,9 +365,11 @@ def collapse_debt(policy: dict[str, Any] | None = None) -> dict[str, Any]:
         rows = list(csv.DictReader(handle))
     if not rows:
         return {**empty, "missing": False}
-    column = next((c for c in rows[0] if "ruling" in str(c).lower()), "")
-    if not column:
-        raise GateInputError(f"collapse sheet has no ruling column: {path}")
+    column = declared_sheet_column(pol)
+    if column not in rows[0]:
+        raise GateInputError(
+            f"collapse sheet has no DECLARED ruling column {column!r}: {path} (looked up by declaration, "
+            f"never sniffed by name — BUG-782)")
     ruled = 0
     for row in rows:
         word = str(row.get(column) or "").strip().upper()

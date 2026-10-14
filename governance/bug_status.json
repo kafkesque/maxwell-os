@@ -2,8 +2,8 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 545,
-  "open_n": 196,
+  "total_ids": 546,
+  "open_n": 197,
   "closed_n": 349,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
@@ -986,6 +986,11 @@
     {
       "id": "BUG-781",
       "title": "(HIGH - OPEN 2026-10-14) - THE IDENTITY MACHINERY HAD NO ENFORCEMENT POINT: the owner ledger sat 59 pairs PENDING for a fortnight while the ",
+      "events": 1
+    },
+    {
+      "id": "BUG-782",
+      "title": "(MED - OPEN 2026-10-14) - THE OWNER LANE HAD NO INTAKE: a machine screen sat in a column NAMED `owner_ruling`, the deterministic tier was of",
       "events": 1
     }
   ],

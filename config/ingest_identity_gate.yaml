@@ -54,6 +54,10 @@ ledger:
     CONFIRM-ONE-WORK: MERGE
     DISTINCT: KEEP_SEPARATE
     LEAVE: PENDING
+  #: BUG-782: the sheet's ruling COLUMN is resolved from its DECLARED home (ONE home, C12). A reader must never
+  #: sniff a column by NAME: the v1 sheet carried a machine screen in a column named `owner_ruling`, and on the
+  #: rendered sheet a name-sniff lands on `proposed_ruling` — i.e. it would count a PROPOSAL as an owner's word.
+  collapse_word_column_from: config/owner_marks.yaml#homes.collapse_sheet.derived_column
 
 content:
   # P2 (post-S0, pre-S1.5): the D-2737 detector's report is the authority for content-level same-work pairs.

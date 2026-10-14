@@ -82,6 +82,11 @@ lexical_limb:
   collapse_at_or_above: 0.80
   certain_class: identical_normalised_text    # no threshold involved at all
   unblock_is: none
+  #: THE PAIR OBJECT — the pairs themselves, not their counts. The counts have ONE home (`measured`, below); the
+  #: pairs had NONE, so the review sheet was hand-built from a one-off under temp/ and drifted to 42 identical
+  #: rows against the 37 measured here (BUG-782). It is written by the owner-word intake (scripts/owner_marks.py
+  #: --render), which IMPORTS this limb's own measurement (D-2646: imported, never reimplemented).
+  pair_object_file: governance/corroboration_collapse_pairs.json
   #: MEASURED 2026-10-14 (read-only, ZERO store writes, ~1 min local CPU, no model). Declared here
   #: because this file is the census's ONE home for these counts.
   measured:

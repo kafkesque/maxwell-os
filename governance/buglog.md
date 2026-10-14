@@ -8,13 +8,13 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1125 decisions (census stamp 9b03953ab8ee85ad, 2026-10-14) · 545 bugs (196 open / 349 closed; highest OPEN = BUG-781) · 25 open tasks (MUST 9 / SHOULD 13 / WORTH 3; OWNER-moved 6, pipeline-moved 19; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1125 decisions (census stamp 9b03953ab8ee85ad, 2026-10-14) · 546 bugs (197 open / 349 closed; highest OPEN = BUG-782) · 26 open tasks (MUST 9 / SHOULD 14 / WORTH 3; OWNER-moved 7, pipeline-moved 19; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **67** of 1125 — 🔴 open 32 · 🔵 proposed 14 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 565 · ⚖ ratified 133 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1125, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 196 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 31 · 🟨 MED 41 · 🟩 LOW 19 · UNLABELLED 101 (BUG-757) of 196 open.
+> Open BUGS by severity (population = the census's 197 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 31 · 🟨 MED 42 · 🟩 LOW 19 · UNLABELLED 101 (BUG-757) of 197 open.
 >
-> **OWNER LANE (6) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
+> **OWNER LANE (7) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
@@ -24,6 +24,7 @@
 > | T-129 | 🔴 MUST | WORK IDENTITY COLLAPSE — collapse the duplicate works at the IDENTITY layer, so a row stops advertising a corr | one owner word per pair on governance/work_identity_collapse_review_20 |
 > | T-130 | 🔴 MUST | THE INGEST DOOR — the identity guarantee becomes an ENFORCEMENT POINT (delta-scoped), so a duplicate work cann | mover = owner for the RELEASE (59 ledger pairs + 84 collapse rows on g |
 > | T-121 | 🟠 SHOULD | the SOURCE KIND axis + per-kind identity - the prerequisite the internet-intake plan does not have | one owner word for the source-kind VOCABULARY (an answer-space decisio |
+> | T-131 | 🟠 SHOULD | THE MODEL-SWAP BENCH — no role is re-pointed to a newer model family without a declared, preflighted slot | mover = owner for the SLOT (which role, which model, what it may evict |
 >
 > **PIPELINE LANE (19) — what the agent will do next, in strategic-consequential order (source: config/task_register.yaml):**
 >
@@ -75,6 +76,7 @@
 
 | Bug | Date | Issue |
 |---|---|---|
+| BUG-782 | 2026-10-14 | **THE OWNER LANE HAD NO INTAKE: the review sheet carried a machine screen (68 yes / 16 no, written by NO script in this repo) in a column NAMED `owner_ruling`, and its deterministic tier said 42 where the rail and the census both measure 37 — and nothing read either, so nothing could notice.** MEASURED 2026-10-14: the v1 sheet's `identical_text` column disagreed with its own source artifact (`temp/voice_collapse_pairs_20261014.csv#certain` = 37 yes / 47 no) and with `config/corroboration_collapse.yaml#lexical_limb.measured.pairs_identical_text` = 37; its per-pair `rows_affected` column summed to 745 against a census of 530 because a row can sit in MORE THAN ONE pair (117 rows do) and in more than one GROUP, so the per-pair/per-group columns are NOT additive and nothing declared that; the pair OBJECT itself had no home (a one-off under `temp/` produced it, and `temp/` auto-purges at 7 days) so the review sheet could not be re-derived; and the sum of its 84 rows' prescreen was read by no rail (the ingest door's own `collapse_debt` sniffed the FIRST column whose NAME contains "ruling" — on a rendered sheet that is `proposed_ruling`, i.e. a machine PROPOSAL would have been counted as an owner's word). FIX: `config/owner_marks.yaml` (ONE contract: vocabulary, homes, tiers, derivation, coverage, conflict rule) + `scripts/owner_marks.py` (`--render` measures and renders both sheets and carries every word and note already given, failing closed rather than dropping one; `--check` derives the effective word, validates the vocabulary, tests the transitivity conflict rule and binds the sheet to the census BY DIGEST; `--apply` expands only SIGNED tiers and records `ruling_source` per row; 9/9 known-answer controls) + the pair OBJECT gains a home (`governance/corroboration_collapse_pairs.json`, written by the intake which IMPORTS the rail's own limb, D-2646) + `ingest_gate.collapse_debt` reads the DECLARED column. Owner act: `governance/OWNER_MARKS_20261014.md` (5 signed tiers + 8 per-row words). |
 | BUG-781 | 2026-10-14 | **THE IDENTITY MACHINERY EXISTED; ITS ENFORCEMENT POINT DID NOT — so "a duplicate work may not enter the corpus" was a DECLARATION with nothing reading it, and the door stayed shut only on paper.** MEASURED 2026-10-14: `governance/duplicate_adjudication.json` (D-2738, the ONE owner ledger built from `detect_title_renames.py` D-2736 + `detect_same_work_content.py` D-2737) holds **59 adjudicable pairs with `adjudicated: 0`**, unmoved since **2026-09-30**; its declared fail-closed reader `verify_duplicate_gate.py --gate` is declared **POST-RUN apply only**, and NO line of the ingest path (`pipeline/stage0_convert.py`, `justfile#triad`, `justfile#stage0`) read the ledger at all. BUG-780 then measured what a fortnight of an unguarded door costs: 530 of the 1,393 count-corroborated rows are ONE TEXT under TWO NAMES, 369 served. The class is the repo's own (i) "a rail NOTHING RUNS" (D-2665) — except the thing nothing ran was the INGEST GUARANTEE itself. FIX: T-130 — the ingest door (`pipeline/ingest_gate.py` + `scripts/check_ingest_identity_gate.py`), DELTA-SCOPED so only files absent from the metadata cache are candidates and no ingested file can move, wired into `stage0` (unbypassable) and into the ladder as a tri-state line whose rc 2 REFUSES at the door by DECLARATION. |
 | BUG-780 | 2026-10-14 | **WORK IDENTITY COLLAPSE — 84 work-pairs are ONE TEXT under TWO NAMES, so 530 "corroborated" rows (369 of them SERVED) are certified by a SINGLE VOICE, and `isor` rates 205 of them strong/medium.** Measured read-only 2026-10-14 over the 1,393 `is_convergent = 1` rows: 84 collapsing pairs at containment ≥0.80 (37 IDENTICAL normalised text, i.e. no threshold at all) forming 72 duplicate-work groups; the dominant shape is one book ingested twice — once by TITLE, once by FILENAME (`Hustle Harder, Hustle Smarter (Curtis 50 Cent…)` vs `Hustle Harder, Hustle Smarter.md`). `isor` is a METADATA measure, so a duplicate under a second name looks independent and rates STRONG — a content-level fact cannot be screened by a metadata-level measure, which is why `tier_policy` currently publishes "convergent: true, independence: strong" about one voice. Not a count defect (raising `min_source_diversity` is risk R2) and not a scoring gap (a duplicate-adjusted scalar would be a fourth home, D-2646): an IDENTITY defect one level below D-2309. FIX: T-129 (collapse the duplicates, then let `check_corroboration_bit` re-prove the population); write-up `governance/WORK_IDENTITY_COLLAPSE_20261014.md`; sheet `governance/work_identity_collapse_review_20261014.csv`. |
 | BUG-773 | 2026-10-13 | **The declared rule “a commit may never rewrite an existing row’s body” (D-2933 rule V, `config/dedup_identity.yaml` → `never_at_commit: true`) is CONTRADICTED by the live write path.** The commit is `INSERT OR REPLACE INTO fbs` on a `fb_id TEXT PRIMARY KEY` seeded by `SHA-256(name + definition)` (`pipeline/stage6_commit.py:764`, `pipeline/schemas.py:175`): a SAME-definition re-read rewrites all 77 columns — the prior reading is destroyed (C6) with no revision — and a one-character definition move FORKS a twin row that nothing reconciles. `content_basis` (the pointer saying which text the body was read from) is a RESERVED NAME WITH NO WRITER, so neither case is invisible-but-recorded; both are simply invisible. FIX: the append-only revision trail + the `content_basis` writer at extraction (D-2992 R2). |
@@ -13490,6 +13492,43 @@ f-string is neither. NAMED, not fixed: it is the natural home of the `check_conf
 Evidence: this entry; `pipeline/retrieve.py::_rank_sql` (the one line) + `:1103`/`:1123` (the declared reads);
 `config/feedback.yaml` (the ONE home, and its own header stating the rule);
 `specs/retrieval_serving.spec.md` INV-3.
+
+## BUG-782 (MED - OPEN 2026-10-14) - THE OWNER LANE HAD NO INTAKE: a machine screen sat in a column NAMED `owner_ruling`, the deterministic tier was off by five, and no reader existed for either
+
+- **Where.** `governance/work_identity_collapse_review_20261014.csv` (the T-129 review sheet) and the absence of a
+  consumer for it: no module under `scripts/` or `pipeline/` read the sheet; the only reader was
+  `pipeline/ingest_gate.py#collapse_debt`, and it located the ruling column by NAME.
+- **The measurement (2026-10-14, read-only).** (a) The sheet's `identical_text` = **42 yes / 42 no** while its own
+  source artifact `temp/voice_collapse_pairs_20261014.csv#certain` = **37 yes / 47 no** and
+  `config/corroboration_collapse.yaml#lexical_limb.measured.pairs_identical_text` = **37**. Re-measured today
+  through the intake (`--render`, 67 s, imports the rail's limb): **37 identical / 47 containment / 84 pairs /
+  72 groups** — the rail and the census were right and the sheet was wrong. (b) The sheet's `owner_ruling` column
+  held **68 yes / 16 no**, written by no script in this repo, in a claim-shaped name a reader would take for an
+  owner's word. (c) Per-pair `rows_affected` summed to **745** against a census of **530** because 117 rows sit in
+  more than one pair and rows span groups: the columns are NOT additive and nothing declared it. (d) Σ per-group
+  distinct = **717** over a corpus-wide distinct of **530** — the same fact, one level up.
+- **Why nothing caught it.** The pair OBJECT had no home: the counts were published (`lexical_limb.measured`) but
+  the pairs came from a one-off under `temp/` (auto-purge 7 days), so the sheet was **hand-built** and could not be
+  re-derived; the sheet's only reader sniffed a column by name and would have landed on `proposed_ruling` — a
+  PROPOSAL — had one existed; and the sheet's own columns were declared nowhere. Same class as BUG-781 (a claim
+  with no reader) and the same class as the census cascade (a measured field compared by nothing).
+- **The fix.** `config/owner_marks.yaml` (ONE contract: vocabularies, homes, tiers, proposals, derivation,
+  coverage, conflict rule) + `scripts/owner_marks.py`:
+  `--render` measures the store through the rail's own limb (IMPORTED, D-2646), writes the pair object
+  (`governance/corroboration_collapse_pairs.json`, carrying the rule's sha256 so a changed rule makes the object
+  STALE), renders the sheet with per-row proposals and provenance, carries every owner word/note already given and
+  FAILS CLOSED rather than drop one; `--check` derives the effective word (override > signed tier > none),
+  validates the vocabulary, tests the transitivity conflict rule, and binds the sheet to the census by digest;
+  `--apply` expands ONLY signed tiers and writes `ruling_source` per row; `--selftest` = **9/9** known-answer
+  controls (unknown word, unsigned tier, withheld word, transitivity conflict, stale sheet, dropped word,
+  unparseable predicate, stale pair object, signature expansion). `ingest_gate.collapse_debt` now reads the column
+  by DECLARATION (`config/ingest_identity_gate.yaml#ledger.collapse_word_column_from` →
+  `config/owner_marks.yaml#homes.collapse_sheet.derived_column`).
+- **What it does NOT do.** It never chooses a word (a proposal is not a word and the derivation never reads one,
+  D-2898), never applies a collapse in the store (the identity repair stays T-129's pipeline act) and never writes
+  a home it does not declare (the four other owner lanes are pointers, `other_owner_lanes`).
+- **Owner act.** `governance/OWNER_MARKS_20261014.md`: 5 signed tiers (A/B/C/L-A/L-B) + 8 per-row words
+  (`hint == review`).
 
 ## BUG-781 (HIGH - OPEN 2026-10-14) - THE IDENTITY MACHINERY HAD NO ENFORCEMENT POINT: the owner ledger sat 59 pairs PENDING for a fortnight while the INGEST path read nothing
 

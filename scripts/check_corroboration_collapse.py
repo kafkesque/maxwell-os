@@ -274,7 +274,7 @@ def containment(left: set[int], right: set[int]) -> float:
 
 def voice_stats(cells: dict[str, dict[str, dict[str, Any]]], bar: float, min_words: int,
                 meta: dict[str, dict[str, str]] | None = None, served: str = "",
-                advertised: str = "") -> dict[str, Any]:
+                advertised: str = "", pair_sink: list[dict[str, Any]] | None = None) -> dict[str, Any]:
     """Count ONE-VOICE collapse from per-(row, work) evidence cells. PURE - no store, no model.
 
     `cells` is `{fb_id: {work: {"sk": set, "dg": set, "words": int}}}`: the row's OWN evidence, which
@@ -287,6 +287,7 @@ def voice_stats(cells: dict[str, dict[str, dict[str, Any]]], bar: float, min_wor
     certain: set[tuple[str, str]] = set()
     row_best: dict[str, float] = {}
     pair_rows: dict[tuple[str, str], set[str]] = collections.defaultdict(set)
+    pair_sim: dict[tuple[str, str], float] = {}
     for fb, works in cells.items():
         names = sorted(works)
         if len(names) < 2:
@@ -302,10 +303,12 @@ def voice_stats(cells: dict[str, dict[str, dict[str, Any]]], bar: float, min_wor
                 else:
                     c, exact = containment(set(a.get("sk", ())), set(b.get("sk", ()))), False
                 if c >= bar:
-                    hits.add((names[i], names[j]))
-                    pair_rows[(names[i], names[j])].add(fb)
+                    hit_key = (names[i], names[j])
+                    hits.add(hit_key)
+                    pair_rows[hit_key].add(fb)
+                    pair_sim[hit_key] = max(pair_sim.get(hit_key, 0.0), c)
                     if exact:
-                        certain.add((names[i], names[j]))
+                        certain.add(hit_key)
                 best = max(best, c)
         row_best[fb] = best
 
@@ -339,10 +342,16 @@ def voice_stats(cells: dict[str, dict[str, dict[str, Any]]], bar: float, min_wor
         stats["population_served"] = sum(1 for m in meta.values() if m.get("status") == served)
         stats["population_advertised"] = sum(
             1 for m in meta.values() if m.get("epistemic_status") == advertised)
+    if pair_sink is not None:
+        pair_sink.extend(
+            {"a": a, "b": b, "identical": (a, b) in certain, "similarity": pair_sim.get((a, b), 1.0),
+             "rows": sorted(pair_rows[(a, b)])}
+            for a, b in sorted(hits))
     return stats
 
 
-def voice_limb(rule: dict[str, Any], limit: int = 0) -> dict[str, Any]:
+def voice_limb(rule: dict[str, Any], limit: int = 0,
+               pair_sink: list[dict[str, Any]] | None = None) -> dict[str, Any]:
     """Measure `voice_stats` against the declared corpus. READ-ONLY; streams the S1 chunk store.
 
     The store path is RESOLVED from the pipeline's own declaration (`stage1.checkpoint` under
@@ -410,7 +419,7 @@ def voice_limb(rule: dict[str, Any], limit: int = 0) -> dict[str, Any]:
 
     stats = voice_stats(dict(cells), bar, min_words, meta=meta,
                         served=str(rule_pop.get("served_value", "")),
-                        advertised=str(rule_pop.get("advertised_value", "")))
+                        advertised=str(rule_pop.get("advertised_value", "")), pair_sink=pair_sink)
     stats["state"] = "measured"
     stats["segments_matched"] = matched
     stats["store"] = str(store.relative_to(PROJECT_ROOT)) if str(store).startswith(str(PROJECT_ROOT)) else str(store)

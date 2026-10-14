@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 546,
+  "total_ids": 547,
   "open_n": 197,
-  "closed_n": 349,
+  "closed_n": 350,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -1343,6 +1343,7 @@
     "BUG-769",
     "BUG-770",
     "BUG-776",
-    "BUG-779"
+    "BUG-779",
+    "BUG-783"
   ]
 }

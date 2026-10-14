@@ -734,8 +734,12 @@ def apply_words(policy: dict[str, Any]) -> int:
     withheld = str(vocabulary(policy, "ledger")["withheld_word"])
     ledger["adjudicated"] = sum(1 for p in pairs if str(p.get("verdict")) != withheld)
     ledger["pending"] = len(pairs) - int(ledger["adjudicated"])
-    ledger["adjudicated_at"] = datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
-    ledger["adjudicated_from"] = f"{CONFIG_REL}#tiers (owner signatures) + {lcfg['projection']}#{lcfg['projection_word_column']}"
+    if changed:
+        # Never a stamp for an act that did not happen: an `adjudicated_at` written while nothing was adjudicated is
+        # a claim-shaped field with a false reading (the BUG-782 class the intake exists to retire).
+        ledger["adjudicated_at"] = datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
+        ledger["adjudicated_from"] = (f"{CONFIG_REL}#tiers (owner signatures) + "
+                                      f"{lcfg['projection']}#{lcfg['projection_word_column']}")
     ledger_path = resolve(policy, str(lcfg["path"]))
     saved_ledger = backup(ledger_path, "owner_marks_apply")
     atomic_write_text(ledger_path, json.dumps(ledger, indent=2, ensure_ascii=False) + "\n")

@@ -13,7 +13,7 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1125 decisions (census stamp 9b03953ab8ee85ad, 2026-10-14) · 546 bugs (197 open / 349 closed; highest OPEN = BUG-782) · 26 open tasks (MUST 9 / SHOULD 14 / WORTH 3; OWNER-moved 7, pipeline-moved 19; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1125 decisions (census stamp 9b03953ab8ee85ad, 2026-10-14) · 547 bugs (197 open / 350 closed; highest OPEN = BUG-782) · 26 open tasks (MUST 9 / SHOULD 14 / WORTH 3; OWNER-moved 7, pipeline-moved 19; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **67** of 1125 — 🔴 open 32 · 🔵 proposed 14 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 565 · ⚖ ratified 133 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1125, D-2987/BUG-765)
 >

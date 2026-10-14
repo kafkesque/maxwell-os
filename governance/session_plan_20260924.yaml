@@ -52,6 +52,7 @@ may_touch:
 - governance/OWNER_MARKS_20261014.md
 - governance/corroboration_collapse_pairs.json
 - governance/duplicate_adjudication_review.csv
+- governance/owner_marks_receipt.json
 - governance/session_plan_*.yaml
 - governance/menu_v9_edit_spec_20261009.md
 - tests/**

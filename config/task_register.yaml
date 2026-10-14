@@ -149,9 +149,10 @@ tasks:
   gate: none
 - id: T-107
   priority: SHOULD
-  state: open
+  state: done
+  closed: '2026-10-14'
   mover: owner
-  title: 'MCP payload decision — borp_score / feedback_score are still advertised to agents'
+  title: 'MCP payload decision - the owner words are GRANTED and EXECUTED: the retired scalar left the wire and the graded measure took its place'
   why: >-
     THE OWNER'S CHALLENGE WAS RIGHT AND THE FIRST RECOMMENDATION WAS WRONG — so it was re-MEASURED, not repeated.
     (a) BORP's original concept is the BOOK OF RECORD PRINCIPLE ("at least two independent sources for
@@ -170,8 +171,8 @@ tasks:
     owner word, the ENFORCED vocabulary and the dispositions live in config/served_fields.yaml; the evidence is
     governance/BORP_FEEDBACK_ASSESSMENT_20261013.md; the sheet is governance/OWNER_DECISION_T107_20261013.md.
   source: [BUG-767, BUG-768, D-2989, D-2537, D-2979, D-2980, D-2284, D-2309, D-2185, D-2957]
-  evidence: 'scripts/check_served_fields.py rc=2 (53 advertised store fields joined, 3 declared-absent advertised = borp_score/feedback_score/classification_status, 2 source-owned acknowledged = application/jargon, 0 undeclared) + the isor distribution and the status x is_convergent x source_ids table in governance/BORP_FEEDBACK_ASSESSMENT_20261013.md (2026-10-13)'
-  gate: 'one owner word per advertised field in config/served_fields.yaml#declared (retire | keep | keep-and-declare | keep-and-repair | promote <field>) plus the anchor'
+  evidence: 'scripts/check_served_fields.py --selftest 24/24 and live rc=2 with 0 undeclared, 0 stale, debt 2 == ceiling 2 (lowered 3->2) + tests/test_served_fields_spec.py 20 passed (2026-10-14, D-2993/D-2994); the retirement is proven from the payload AST keys (INV-12)'
+  gate: 'none - the words were GRANTED 2026-10-14 (retire borp_score, keep-and-declare feedback_score, keep-and-repair classification_status) and the WIRE half landed in D-2994. TWO acts remain and they are NOT this task: the internal readers of the dead column (BUG-776) and the classification_status store-side repair (T-122)'
 - id: T-108
   priority: SHOULD
   state: open
@@ -439,3 +440,19 @@ tasks:
   source: [D-2992, BUG-774, D2176, D-2308]
   evidence: "MEASURED 2026-10-13 (read-only): pipeline/stage0_convert.py accepts only {.epub, .pdf, .md}; compute_source_id falls back to `unknown|<filename>` when author/title are unresolved (pipeline/book_metadata.py); the fallback's liveness is pinned at ratio 0.0 by config/eval_integrity.yaml -> source_identity and enforced by scripts/verify_source_identity.py (whose docstring records the original defect: 29.1% of convergence was the same book twice). External vocabulary verified 2026-10-13: OpenAlex carries a controlled 25-value work `type`; NISO RP-8-2008 JAV defines seven article versions; Crossref relation types include isVersionOf/isPreprintOf/isTranslationOf/isCommentOn (isRetractedBy does NOT exist as a relation type - CORRECTED in D-2992)."
   gate: 'one owner word for the source-kind VOCABULARY (an answer-space decision) + whether a work and its re-publication collapse to ONE voice (recommended YES - the D-2308 edition rule generalised); then the pipeline builds the resolver. NO non-book source may be ingested before this lands.'
+- id: T-122
+  priority: MUST
+  state: open
+  mover: pipeline
+  title: 'the classification_status REPAIR (owner word keep-and-repair) - a store column that says CLEAN on a QUARANTINEd row'
+  why: >-
+    The owner word for classification_status is keep-and-repair (granted 2026-10-14, D-2994), and the REPAIR is a
+    store-side writer fix, not a payload change: the column is constant 'CLEAN' on all 7,640 canonical rows while the
+    store's own `status` column holds 3,137 QUARANTINE rows, so an agent reads CLEAN and cannot see the quarantine
+    (the D-2987 defect on the wire). The writer is scripts/reinject_bug198_singletons.py::_classify_s4 and its
+    decision threshold is an UNDECLARED LITERAL (config/derivations.yaml calls the row orphan_magic_threshold), so
+    the fix has two halves that must land together: move the threshold into config, then re-prove the stored values
+    and write the TRUE status - with a C13 backup and a byte receipt, because it is a store write.
+  source: [D-2994, D-2987, D-2960, BUG-504]
+  evidence: 'config/served_fields.yaml#declared[classification_status] (word keep-and-repair, granted 2026-10-14) + config/store_columns.yaml classification_status status=debt + config/derivations.yaml fbs.classification_status orphan_magic_threshold + the measured distribution (CLEAN 7,640/7,640, status QUARANTINE 3,137) in governance/T120_S1_RECON_20261014.md (2026-10-14)'
+  gate: 'none - the owner word is GRANTED; the act needs a C13 backup and a receipt, not a further ruling'

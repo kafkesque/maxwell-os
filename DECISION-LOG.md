@@ -33,7 +33,7 @@
 > | id | pri | state | task | evidence |
 > |---|---|---|---|---|
 > | T-104 | 🔴 MUST | 🔴 open | BUG-757 — OPEN bugs carry NO severity token, so the register cannot be ordered by criticality | bug_status.json joined to the buglog headings: UNLABELLED ceiling 101 (2026-10-13) |
-> | T-119 | 🔴 MUST | 🔴 open | the CORROBORATION COLLAPSE delta — how many "≥2 independent sources" rows are really ONE VOICE | MEASURED 2026-10-13 (governance/BORP_REVITALIZATION_RISK_20261013.md §4, over the canonica |
+> | T-119 | 🔴 MUST | 🔴 open | the CORROBORATION COLLAPSE delta — how many "≥2 independent sources" rows are really ONE VOICE | BASELINE §4 MEASURED 2026-10-13 (governance/BORP_REVITALIZATION_RISK_20261013.md): of 938  |
 > | T-120 | 🔴 MUST | 🔴 open | the ABSORPTION path - a later independent source must be able to RAISE an existing row's corroboration, and a  | MEASURED 2026-10-13 (read-only, by reading the write path and the identity model - no stor |
 > | T-122 | 🔴 MUST | 🔴 open | the classification_status REPAIR (owner word keep-and-repair) - a store column that says CLEAN on a QUARANTINE | config/served_fields.yaml#declared[classification_status] (word keep-and-repair, granted 2 |
 > | T-105 | 🟠 SHOULD | 🔴 open | REA tier A/B mining — DEVONthink 3 (related-document ranking) and Cursor (derived code index) | governance/NOT-YET-EVALUATED-RESEARCH.md (REA targets logged 2026-10-13) |

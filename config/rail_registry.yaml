@@ -42,6 +42,13 @@ dormant:
   scripts/check_suite_coverage.py:
     exercised_by: ['governance/p0_p1_criteria.yaml']
     reason: 'a CRITERION of drift_monitor.py, declared as an args/cmd line in governance/p0_p1_criteria.yaml (measured 2026-09-26)'
+  scripts/check_corroboration_collapse.py:
+    exercised_by: ['config/corroboration_collapse.yaml']
+    reason: >-
+      T-119's read-only collapse measurement. It is DORMANT because a measurement is not a gate: it cannot fail a
+      build, so wiring it into `just health` would turn a number into a verdict. Its rule file names it
+      (`rail.script`) and carries the population, the falsifier bars and the probe targets, so the invocation is
+      DECLARED rather than left to inspiration. Declared dormant 2026-10-14; the ladder is unchanged.
 
 #: Rails that WRITE or REGENERATE an artifact. Each must be run with --selftest BY THE LADDER, because such a
 #: rail's remedy is a claim about bytes it replaces, and an unproven remedy is where BUG-537/BUG-556 came from.

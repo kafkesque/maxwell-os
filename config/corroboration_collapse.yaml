@@ -1,0 +1,75 @@
+# config/corroboration_collapse.yaml
+# ─────────────────────────────────────────────────────────────────────────────
+# THE RULE for the T-119 CORROBORATION COLLAPSE measurement. This file is the RULE; the rail
+# (scripts/check_corroboration_collapse.py) re-measures it on demand. NO value in the rail is
+# hardcoded (C12/C12c): every threshold, population and probe target below is DECLARED here.
+#
+# WHAT IS BEING MEASURED. T-107/T-118 established that the count-based Book of Record Principle is
+# COARSER than the measure the system already holds: `is_convergent` (and with it ">=2 sources")
+# counts SOURCES, but a source is not a VOICE. Two works by the SAME author, or two excerpts of the
+# SAME work, count as two. T-119 asks how deep that collapse goes, and is explicitly required to be
+# able to answer "NO FINDING" - a measurement that cannot say "no finding" is not a measurement.
+#
+# TWO LIMBS, ONE OF WHICH IS BLOCKED (the step-0 finding, 2026-10-14):
+#   limb_identity  - author/domain collapse. COMPUTABLE NOW, read-only, from the committed store:
+#                    `source_books` -> isor_score() (D2284/D2309). ONE HOME: the rail IMPORTS
+#                    pipeline.schema_accessor.isor_score, it does NOT reimplement it (D-2646).
+#   limb_semantic  - `n_voices` = |clusters of the row's source_segments by embedding similarity|.
+#                    BLOCKED: the S1.5 index does NOT persist its embeddings (no .index, no .npy,
+#                    no embeddings_cache survives in stage1_5_embed_cluster/<run>/). The rail PROBES
+#                    for them and reports `blocked` - it must NEVER silently report 0 voices, because
+#                    a fabricated 0 is the exact defect (BUG-767) this whole line of work retired.
+#                    Unblocking is a DECISION (persist the index, or accept a re-embed pass), not an edit.
+schema_version: '1'
+authority: T-119
+decisions: [D-2990, D2284, D2309, D-2993, D-2994]
+subjects: [T-119, T-120]
+assessment: governance/BORP_REVITALIZATION_RISK_20261013.md   # §4 numbers, §8 the plan + falsifier
+
+#: The population the claim is about. DECLARED (stated, not implied) so the measured number always
+#: carries its denominator (BUG-588/D-2692: a count has ONE home - this file).
+population:
+  table: fbs
+  predicate: "is_convergent = 1"
+  why: >-
+    The rows the COUNT certifies as corroborated. This is the only population on which the question
+    "is the count coarser than the measure" is well-posed: a row the count already rejects cannot
+    collapse. Measured 2026-10-14: 1,393 of 7,640 committed rows.
+  source_books_field: source_books          # the isor input; read through the schema accessor
+  domains_field: domains
+
+#: The FALSIFIER travels with the number. If the collapsed share is indistinguishable from zero, the
+#: count is NOT contaminated in THIS corpus, the hardening is documentation only, and the rail says
+#: so out loud rather than manufacturing a finding (T-119.gate: "a measurement that cannot say
+#: 'no finding' is not a measurement").
+falsifier:
+  controls:
+    - name: p_multi_author
+      statistic: "rows with >= 2 distinct authors / population"
+      no_finding_if_gte: 0.95
+    - name: p_multi_domain
+      statistic: "rows with >= 2 distinct domains / population"
+      no_finding_if_gte: 0.95
+  verdict: >-
+    NO FINDING (rc=2) when BOTH controls are at or above their bar - i.e. the count-certified
+    population is genuinely multi-voice and the collapse is not a live defect in this corpus.
+    FINDING (rc=0) when either control falls below its bar; the rail then reports the collapsed share.
+
+#: What the semantic limb needs in order to exist. Probed, never assumed: a missing artifact is
+#: reported as `blocked`, which is a DIFFERENT state from `0 voices` (D-2957: absent is not zero).
+semantic_limb:
+  probe_globs: ["**/*.index", "**/*.npy", "**/embeddings_cache/*"]
+  probe_roots: ["knowledge pipeline/stage1_5_embed_cluster"]
+  similarity_threshold_from: stage1_5.faiss_threshold   # D288: reuse the DECLARED cosine bar, invent none
+  min_voices_to_clear: 2
+  unblock_is: decision    # persisting the index (or a re-embed pass) is owner-gated, not an edit
+
+#: Rail behaviour. `census_one_home` keeps this file the single home of the measured counts.
+rail:
+  script: scripts/check_corroboration_collapse.py
+  write_mode: read_only
+  census_one_home: true
+  exit_codes:
+    '0': finding_measured
+    '1': error
+    '2': no_finding_falsifier_fired

@@ -404,10 +404,17 @@ tasks:
     voice count is indistinguishable from the convergent count, the count is NOT contaminated in this corpus and the
     hardening is documentation only - a measurement that cannot say "no finding" is not a measurement.
   source: [D-2990, D2284, D2309, BUG-768]
-  evidence: 'MEASURED 2026-10-13 (governance/BORP_REVITALIZATION_RISK_20261013.md §4, over the canonical PASS
-    population): of 938 rows the count certifies as corroborated, 148 carry ONE author, 170 ONE domain and 35 are
-    rated weak by isor; §8 of that file is this plan, including the falsifier.'
-  gate: 'none - read-only measurement; the SURFACE change it informs is T-107 + T-118'
+  evidence: 'BASELINE §4 MEASURED 2026-10-13 (governance/BORP_REVITALIZATION_RISK_20261013.md): of 938 rows the
+    count certifies as corroborated, 148 carry ONE author, 170 ONE domain and 35 are rated weak by isor. STEP 0
+    MEASURED 2026-10-14 by scripts/check_corroboration_collapse.py (--selftest 5/5 ok, live rc=0) over the full
+    1,393-row is_convergent=1 population: 204 carry ONE author, 265 ONE domain, 44 rated weak; p_multi_author
+    0.8536 and p_multi_domain 0.8098 against the declared 0.95 bar, so the FALSIFIER DID NOT FIRE. The rail
+    IMPORTS pipeline.schema_accessor.isor_score instead of reimplementing it (D-2646: one derived value, one
+    home); its thresholds, population and probe targets live in config/corroboration_collapse.yaml (C12)'
+  gate: 'PARTIAL - limb_identity (author/domain collapse) is MEASURED; limb_semantic (n_voices = |clusters of
+    source_segments by embedding similarity|) is BLOCKED, and config/corroboration_collapse.yaml is the ONE home
+    of that finding. The rail reports BLOCKED, never 0 (D-2957) - a fabricated zero is the BUG-767 defect class.
+    Unblocking is a DECISION (persist the S1.5 index, or accept a re-embed pass), not an edit'
 
 - id: T-120
   priority: MUST

@@ -1213,7 +1213,8 @@ tasks:
     download as the release condition.'
 - id: T-154
   priority: MUST
-  state: open
+  state: done
+  closed: 2026-10-15
   mover: pipeline
   title: 'BOUND THE HARNESS THE WAY ITS CLASS DECLARES: transcript-aware liveness, a stall
     threshold above the longest measured turn, and a per-class token ceiling'
@@ -1335,3 +1336,53 @@ tasks:
     count reported); and the exit code follows the STATE so an EMPTY terminal is non-zero. Proof: the exact
     command shape that produced this bug now refuses, and a control pins both readings.'
 
+
+- id: T-161
+  priority: SHOULD
+  state: open
+  mover: owner
+  title: 'BIND THE HARNESS CLASS CEILING IN THE ENGINE''S OWN HOME: the derived bound is declared and checked, and the binding is the owner''s act on a LIVE server'
+  source: 'BUG-828 (part 3); D-3027; config/agent_context.yaml#turn_budget.bindings'
+  evidence: 'MEASURED 2026-10-15: `python3 pipeline/research_run.py --check` derives a 3,266-token ceiling for the
+    agent_loop class (the owner''s 90 s per-turn knob x the MEASURED 36.3 tok/s decode of its only routable
+    model) and reports OWNER-OWED (rc 2) - because `~/.omlx/model_settings.json#models` is EMPTY, so the harness
+    class, which sends NO max_tokens (83 of 83 gemma calls in the engine log carried request_max_tokens=None),
+    still inherits the global 32768 = ~20 minutes of decode at 27.4 tok/s against a 90 s knob.'
+  gate: 'owner: the per-model fallback for the harness class''s model is bound to the derived ceiling in the
+    engine''s own settings home, and `python3 pipeline/research_run.py --check` returns 0 instead of 2. Proof:
+    the engine''s own log line for a harness turn carries max_tokens equal to the derived ceiling rather than
+    32768, and the declaration of a bound is a READING rather than a comment. NOTE the cross-class risk the
+    bind must respect: a per-MODEL fallback also applies to any other caller that sends no ceiling, which is
+    why the derived value (3,266) is generous for a single turn and the pipeline continues to pass its own.'
+
+- id: T-162
+  priority: MUST
+  state: open
+  mover: owner
+  title: 'THE HARNESS CLASS MUST BE ABLE TO FINISH A TURN: the engine''s chunk-shaped keepalive must not be read as an answer (the prerequisite the T-137 A/B was missing)'
+  source: 'BUG-835; T-137; config/ab_harness_t137.yaml#preconditions'
+  evidence: 'MEASURED 2026-10-15 (temp/runs/harness_20261015c/fan_h1): a healthy four-turn pi loop - the engine
+    answered every turn, the transcript grew to 114,750 B - ended with an EMPTY answer and exit 0. pi''s own last
+    transcript record reads `content: [], output: 0, stopReason: stop, responseModel: "keepalive"`, and the
+    engine''s log agrees: `0 tokens in 16.62s (0.0 tok/s) ... finish_reason=stop`. `~/.omlx/settings.json#server.
+    sse_keepalive_mode` is `chunk`, whose frame is shaped exactly like a completion chunk; the engine''s own
+    source names the hazard and offers `comment` (a true no-op) and `off`.'
+  gate: 'owner: the keepalive mode is set to the engine''s no-op frame (`comment`) or `off` in the live server''s
+    own home. Proof: the T-154 proof task re-run through `pipeline/subagent_fanout.py run --tasks
+    temp/t154_harness_proof.yaml` returns a NON-EMPTY answer and its receipt reads DONE - and only then may the
+    T-137 arms run, because BOTH arms drive this same harness class.'
+
+- id: T-163
+  priority: MUST
+  state: open
+  mover: pipeline
+  title: 'AN ANSWER''S SHAPE IS CHECKED, NOT ONLY ITS LENGTH: a delegated review must carry a FINDING citing the artifact it was given, or it is not an answer'
+  source: 'BUG-836; D-3022; BUG-827; T-156'
+  evidence: 'MEASURED 2026-10-15: gemma-4-E4B answered a 22 KB diff review with a 2,294-char sequential
+    citation list and `oneshot_ask.py` accepted it, because the only gate on an answer is min_answer_chars=80
+    (BUG-836). The same session, the same route: gpt-oss-20b returned EMPTY content at both 700 and 2500
+    max_tokens (everything in reasoning_content), which the path correctly refused as "no content".'
+  gate: 'pipeline: a review-shaped task declares what its answer must CONTAIN (>=1 finding, each citing a
+    location that exists in the artifact under review), the grader reads that shape rather than a byte floor,
+    and a degenerate-but-long answer reads as NOT AN ANSWER. Proof: the measured gemma output above is
+    regraded as not-an-answer, and a real finding passes.'

@@ -25176,3 +25176,44 @@ decisions:
     peer-reviewed literature (arXiv 2609.17542, register bias in complexity-based routing) shows a self-rated fork
     drifts by construction. A fork whose bar or checker cannot be named is REFUSED, not tested (D-3025''s loop rule
     applied to forks).'
+- id: D-3027
+  state: ACTIVE
+  category: METHOD / BUDGET POLICY
+  title: 'THE BUDGET IS DERIVED, THE CLASS MAY BE PROPOSED: a model may name the task class it is in, never the
+    budget it spends'
+  bugs:
+  - BUG-828
+  - BUG-827
+  files:
+  - config/agent_context.yaml
+  - config/engine.yaml
+  - config/delegation_economy.yaml
+  decision: 'THREE DECISIONS ARE CONFLATED BY THE PHRASE "WHO DECIDES THE EFFORT", AND THEY GET THREE DIFFERENT
+    AUTHORITIES. (1) THE CLASS - what kind of work is this - is the ONLY one a MODEL may touch, and only as an ADVISORY
+    proposer returning a label from a DECLARED vocabulary, required to ABSTAIN outside it, with nothing auto-applied
+    (the D-2898 pattern: a proposal about classification is never the classification); the deterministic resolver
+    assigns. (2) THE BUDGET - max_tokens per turn, the wall, the stall threshold, the decode/prefill bill - is DERIVED,
+    never chosen: class ceiling (config/agent_context.yaml#classes) x measured rate (measured_decode_20261015.decode_tps,
+    the size-declared prefill column), so it is idempotent, replayable and CHECKABLE. A budget a model can raise
+    is not a bound, and BUG-828 is exactly that failure measured: pi sends max_tokens=None, the class inherits the
+    model''s global 32768, and the result is a turn that can outlive the wall while the stall threshold (45 s) sits
+    BELOW the longest measured turn (45.58 s) - so the flag fired by construction. NOTHING IN THAT SHAPE LETS A
+    GUARD GO RED, because an undeclared number has no declared number to disagree with. (3) ESCALATION - spending
+    more - is triggered by MEASURED EVIDENCE (a refuted citation, D-3022/BUG-827; an empty or degenerate answer;
+    a verifier disagreement; a spent retry; a class wall exceeded), in ONE declared tier, always logged, never by
+    the model''s own confidence. GROUNDS, measured rather than argued: (a) decode is NOT the binding axis (every
+    served model answers 320 tokens in 2-13 s) while prefill is, so a self-rated difficulty optimises the axis that
+    does not bind - MEASURED 2026-10-14 a 26214-token loop turn costs 58 s on the only routable loop model and 672
+    s on the 27B; (b) the peer-reviewed position this rests on is that compute-optimal test-time budgets are set
+    by SAMPLING CONSISTENCY (arXiv 2408.03314) - a measurement, not a self-report - while complexity-based routers
+    inherit REGISTER BIAS from the phrasing of the input (arXiv 2609.17542) and routing decisions are only trustworthy
+    when AUDITABLE as declared labels with a checker (arXiv 2602.21231 ACAR); (c) a self-rating is a model grading
+    its own input, which is R5''s violation in a new place. A MODEL MAY DECIDE A BUDGET ONLY WHERE THE DECISION
+    IS ITS OWN DECODE POLICY, and even there the lever is the ENGINE''S (MEASURED and already recorded in the registry:
+    oMLX drops a top-level reasoning_effort/enable_thinking as a silent no-op; the working lever is chat_template_kwargs),
+    NOT a lever a caller may re-raise. ADVISORY ELIGIBILITY (laya-mlx, jevmlx, gpt-oss-20b and every future judge):
+    a model becomes an eligible PROPOSER only when it is a ROUTABLE SLOT (agent_context.yaml#prefill_budget.unknown_tps:
+    refuse_route - laya-mlx is benchmark-only today, Phase B held, config/bakeoff_laya.yaml enabled: false, zero
+    production imports) AND it clears a declared AGREEMENT FLOOR against a labelled reference set with abstention
+    outside it; and any change to the derived route it proposes is an A/B with a named bar and a deterministic checker
+    (D-3026), never a preference.'

@@ -253,6 +253,21 @@ classes:
     min_window: 32768
     working_set: 26214
     prefill_budget_s: 60
+    # ── T-154 (BUG-828): the CLASS's own turn bound. The BUDGET is the owner's
+    # (ratified.knobs.per_turn_budget_s); what a class adds is how long its SILENCE may last, how many
+    # turns it may take, and where its transcript goes. Every number here is CHECKED against a
+    # measurement by pipeline/subagent_fanout.py doctor - a bound nobody can check is BUG-828.
+    workstream_class: true             # a class a workstream may run AS (the runner resolves it)
+    max_turns: 3                       # MEASURED: the 2026-10-15 guard review took 3 model turns (20/18/521 tokens)
+    stall_s: 120                       # DERIVED FLOOR: > longest_turn_measured_s x stall_margin (45.58 x 2 = 91.2)
+    timeout_guard: agent_timeout_s     # the declared wall this class's workstream is bounded by (engine.yaml)
+    transcript_in_ws: true             # a harness streams a transcript WHILE it works; count it, inside the ws
+    env:                               # what the class's child MUST have bound. ONE home: the runner
+      PI_CODING_AGENT_DIR: '{ws}/agent'   # (pipeline/research_run.py) and the deploy line both read THIS.
+    evidence:                          # (pi honours it - `pi --help`: "Config directory (default: ~/.pi/agent)")
+      longest_turn_measured_s: 45.58   # MEASURED 2026-10-15 harness_20261015a: 521 tokens @ 27.4 tok/s, prompt 12438
+      longest_turn_measured_on: 'harness_20261015a, gemma-4-E4B-it-MLX-4bit'
+      source: '~/.omlx/logs/server.log - the "Chat completion" line of each turn'
     why: >-
       LOWERED FROM 131072 on the same day it was written, before ratification, because the first number
       selected on window ARITHMETIC and the measurement says the binding constraint is the prefill BILL:
@@ -262,12 +277,75 @@ classes:
     min_window: 32768
     working_set: 32768
     prefill_budget_s: 600
+    workstream_class: true             # T-154: the class a one-shot delegation runs as
+    max_turns: 1
+    stall_s: 45
+    transcript_in_ws: false            # a one-shot writes one answer at the end; the report+log are its progress
+    timeout_guard: default_timeout_s
+    env: {}
+    evidence:
+      longest_turn_measured_s: 17.0    # MEASURED 2026-10-15: oneshots answered in 0.4-17 s
+      longest_turn_measured_on: 'fanout oneshot runs, 2026-10-15'
+      source: 'temp/runs/*/state.json elapsed_s, one-shot delegations'
     why: 'single-question delegation: summarize WITH source, review a diff, one classification, one long read'
   pipeline_batch:
     min_window: 32768
     working_set: 32768
     prefill_budget_s: 3600
+    workstream_class: false            # NOT a workstream class: the pipeline calls the model itself (D-3016),
+    max_turns: 1                       # so the runner never resolves it and no stall threshold is claimed here
+    stall_s: 45
+    transcript_in_ws: false
+    timeout_guard: default_timeout_s
+    env: {}
     why: 'bounded prompt, one answer, no history (the pipeline never re-sends a prefix it grew)'
+
+#: ── THE WORKSTREAM CONTRACT (T-154). What a runner may claim, and what it must refuse. ONE home: both
+#: halves of the delegation machinery read THIS - pipeline/research_run.py (the runner) and
+#: pipeline/subagent_fanout.py (the front door). An undeclared mode or an unclaimed class is FATAL: the
+#: runner never INFERS a class from the command bytes, because inference is how a harness came to be
+#: measured against a script's threshold (BUG-828).
+workstreams:
+  default_class: agent_probe                  # an ad-hoc workstream with no declared class is a one-shot
+  mode_class:
+    oneshot: agent_probe                      # one deterministic call, temp 0.0, no tools
+    agent: agent_loop                         # goose run -t: HAS tools, streams, and costs minutes
+    harness: agent_loop                       # an engine-launched coding harness (pi/claude): the streaming class
+  harness_cmd_markers: ['omlx launch ']       # a command carrying one of these MUST run as a transcript-bound class
+  env_placeholders: ['{ws}', '{run}']         # the only substitutions a class env may use; both resolve INSIDE the ws
+
+#: ── T-154 / BUG-828: THE PER-TURN CEILING IS DERIVED, NEVER PICKED (D-3027) ────────────────────────
+#: WHAT WAS MEASURED, and why this block exists: pi sends `max_tokens=None` (83 of 83 gemma calls in the
+#: engine log carried `request_max_tokens=None`), so the class inherits the model's global 32768 - about
+#: 20 minutes of decode at 27.4 tok/s against the owner's 90 s per-turn knob. The bound that actually bit
+#: was the WORKSTREAM WALL, which is why a wall nobody derived is a wall nobody can defend. Everything
+#: below is a named SOURCE plus a FORMULA: no number here is chosen, and the checker recomputes each one.
+turn_budget:
+  budget_home: 'ratified.knobs.per_turn_budget_s'      # the owner's knob - the ONE home for the budget
+  formula: 'max_tokens_per_turn(model) = floor(per_turn_budget_s * decode_tps(model))'
+  decode_source: 'measured_decode_20261015.decode_tps'  # measured, size-declared where it matters
+  stall_rule: 'stall_s(class) > longest_turn_measured_s(class) * stall_margin'
+  stall_margin: 2.0
+  wall_rule: 'guards[timeout_guard] >= max_turns * per_turn_budget_s'
+  #: The wall uses the OWNER'S per-turn budget and the class's declared turn count, and NOTHING ELSE. A
+  #: prefill term was drafted here and RETRACTED the moment it was computed: a class's `working_set` is the
+  #: prompt size it must be able to PAY FOR (a routing gate the prefill bill already owns), not the prompt
+  #: it actually sends, so adding `working_set/prefill_tps` to the wall inflated a 15 s one-shot class into
+  #: a 690 s wall and contradicted a guard that is measurably right. An estimate dressed as a derivation
+  #: is BUG-794's defect, so the derivation keeps only terms that are declared facts.
+  ceiling_declared_source: '@config/engine.yaml#fanout.default_max_tokens'   # what a ONE-SHOT caller passes itself
+  bindings:                          # A DERIVED CEILING IS NOT A BOUND CEILING (T-132: declared is not bound)
+    oneshot: 'the caller passes it: pipeline/oneshot_ask.py --max-tokens (fanout.guards.default_max_tokens)'
+    harness: '~/.omlx/model_settings.json#models.<model>.max_tokens - the server''s OWN per-model fallback,
+              which is what a caller that sends none receives (server.py: request > per-model > global)'
+  bind_state_20261015: 'UNBOUND for the harness class: model_settings.json#models is EMPTY, so the pi class
+                        still inherits sampling.max_tokens=32768. Binding it is an OWNER act on the live
+                        server''s home, not a silent edit - see the checker''s tri-state report.'
+  why_derived: >-
+    A budget a model can raise is not a budget, and a budget a model RATES is a measurement this repo does
+    not have: decode is not the binding axis (every served model answers 320 tokens in 2-13 s) while prefill
+    is, and a self-rated difficulty optimises the axis that does not bind (D-3027).
+
 routing:
   rule: 'select the MOST capable class the model satisfies on BOTH sides (window and prefill bill); first-declared wins a tie'
   floor_note: >-

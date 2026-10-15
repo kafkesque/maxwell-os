@@ -50,6 +50,24 @@ checker: deterministic                   # harness_contract.py --check + fsm.py;
 receipt: "~/.local/share/goose/sessions/sessions.db#usage_ledger"
 min_sealed_runs: 3
 
+# ── PRECONDITIONS (added 2026-10-15, after the T-154 proof run). An A/B that is run in an environment which
+# cannot produce the artifact under measurement measures THE ENVIRONMENT, not the arm - and this session
+# measured exactly that: a healthy harness loop returned an empty answer (BUG-835). Both arms below drive the
+# same harness class, so neither may run until both preconditions read MET.
+preconditions:
+  P1_harness_can_finish_a_turn:
+    what: 'a harness workstream completes with a NON-EMPTY answer (BUG-835: the engine''s chunk-shaped SSE
+      keepalive is read as the model''s final response, so the loop ends empty and exits 0)'
+    check: 'python3 pipeline/subagent_fanout.py run --tasks temp/t154_harness_proof.yaml --run t137_preflight
+      -> 98_receipt.json reads DONE for the task, not EMPTY'
+    state: 'UNMET 2026-10-15 - measured empty (responseModel: keepalive); remedy is the owner''s (T-162)'
+  P2_bounds_are_bound:
+    what: 'every class bound recomputes without a contradiction AND the harness class ceiling is BOUND where it
+      bites, not merely declared (T-161)'
+    check: 'python3 pipeline/research_run.py --check -> rc 0'
+    state: 'UNMET 2026-10-15 - rc 2 (OWNER-OWED: ~/.omlx/model_settings.json#models is empty, so the class still
+      inherits the global 32768 = ~20 min against the owner''s 90 s per-turn knob)'
+
 terminal_condition:
   pass: every metric meets bar across >= min_sealed_runs sealed runs
   fail: any metric below bar -> treatment rejected; active_provider stays custom_deepseek

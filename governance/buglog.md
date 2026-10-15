@@ -8,17 +8,18 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1154 decisions (census stamp 8a5fa95a0c0135f4, 2026-10-15) · 597 bugs (224 open / 373 closed; highest OPEN = BUG-834) · 49 open tasks (MUST 16 / SHOULD 28 / WORTH 4; OWNER-moved 12, pipeline-moved 37; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1155 decisions (census stamp a1902fe25cf184d2, 2026-10-15) · 599 bugs (225 open / 374 closed; highest OPEN = BUG-836) · 51 open tasks (MUST 17 / SHOULD 29 / WORTH 4; OWNER-moved 14, pipeline-moved 37; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **80** of 1154 — 🔴 open 32 · 🔵 proposed 27 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 569 · ⚖ ratified 145 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1154, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **80** of 1155 — 🔴 open 32 · 🔵 proposed 27 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 570 · ⚖ ratified 145 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1155, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 224 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 34 · 🟨 MED 61 · 🟩 LOW 24 · UNLABELLED 101 (BUG-757) of 224 open.
+> Open BUGS by severity (population = the census's 225 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 35 · 🟨 MED 61 · 🟩 LOW 24 · UNLABELLED 101 (BUG-757) of 225 open.
 >
-> **OWNER LANE (12) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
+> **OWNER LANE (14) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
 > | T-130 | 🔴 MUST | THE INGEST DOOR — the identity guarantee becomes an ENFORCEMENT POINT (delta-scoped), so a duplicate work cann | THE DOOR NOW READS A DECLARED WORD, AND ITS rc 2 NAMES THE ONE DEBT TH |
+> | T-162 | 🔴 MUST | THE HARNESS CLASS MUST BE ABLE TO FINISH A TURN: the engine's chunk-shaped keepalive must not be read as an an | owner: the keepalive mode is set to the engine's no-op frame (`comment |
 > | T-131 | 🟠 SHOULD | THE MODEL-SWAP BENCH — no role is re-pointed to a newer model family without a declared, preflighted slot | mover = owner for the SLOT (which role, which model, what it may evict |
 > | T-132 | 🟠 SHOULD | THE HARNESS CONTEXT CONTRACT — the four layers between a local model's served window and the words an agent se | THE MEASUREMENT ANSWERED THE FIRST QUESTION AND NARROWED THE SECOND, A |
 > | T-133 | 🟠 SHOULD | THE INTAKE FRONT-END - an interest-based daily queue of PROPOSALS, owner-gated, that never writes the store | the DAILY REPORT is the owner gate; nothing enters the pipeline withou |
@@ -29,6 +30,7 @@
 > | T-140 | 🟠 SHOULD | ADOPT THE FAN-OUT EXECUTOR for everyday scaffolding and debugging, capped and cross-verified | the owner names the first real fan-out task: the executor needs a task |
 > | T-142 | 🟠 SHOULD | BYTE-OWNER AUDIT of the DECLARED bucket: 59.7 GB whose only claim to be on disk is a mention | pipeline: re-run the census with a RESOLUTION test (does a served entr |
 > | T-145 | 🟠 SHOULD | EDGE0 IS DEFERRED WITH A NAMED TRIGGER, not fetched: the class is already served and the role is blocked on me | OWNER: say 'fetch Edge0' to override, or leave it deferred until T-137 |
+> | T-161 | 🟠 SHOULD | BIND THE HARNESS CLASS CEILING IN THE ENGINE'S OWN HOME: the derived bound is declared and checked, and the bi | owner: the per-model fallback for the harness class's model is bound t |
 > | T-138 | COULD | HARNESS ADOPTION ON DEMAND - one command per tool, and none of them load-bearing | install a harness only when a specific job needs it (C28). The engine  |
 >
 > **PIPELINE LANE (37) — what the agent will do next, in strategic-consequential order (source: config/task_register.yaml):**
@@ -14577,7 +14579,7 @@ including `a_fabricated_citation_is_refuted` and `a_prose_reference_is_never_rea
 not be a smarter model, it must be a reader (D-3022).
 
 
-## BUG-828 (MED - OPEN 2026-10-15) - the deployed harness is not bounded by the declared budgets: the liveness signal cannot see it, and one turn outlasts the stall threshold
+## BUG-828 (MED - CLOSED 2026-10-15) - the deployed harness is not bounded by the declared budgets: the liveness signal cannot see it, and one turn outlasts the stall threshold
 
 Three measured parts, all from the same T-144 run.
 
@@ -14599,6 +14601,38 @@ Three measured parts, all from the same T-144 run.
 (`PI_CODING_AGENT_DIR=$WS_DIR/agent`, a knob the engine's own pi integration already honours), progress becomes a
 recursive count of the workstream directory, and the per-turn token ceiling is declared per class instead of being
 inherited from a global number that was never about the class.
+
+**CLOSED 2026-10-15 (T-154).** All three parts are fixed, each with a control that can fail:
+
+1. **The liveness signal now sees the harness, and this was PROVEN LIVE, not argued.** The workstream class
+   declares its env (`config/agent_context.yaml#classes.agent_loop.env: PI_CODING_AGENT_DIR: '{ws}/agent'`, applied
+   by `pipeline/research_run.py::class_env`) and progress is a RECURSIVE walk of the workstream dir minus the
+   runner's own `state.json`/`.tmp_*` (a counter that counted its own writes would pin idle at 0 and make the stall
+   flag UNREACHABLE - the opposite silent failure, and there is a control for that too). Measured on
+   `temp/runs/harness_20261015c/fan_h1`, sampled every 8 s while pi worked:
+   `idle=9.5/17.7/7.2/15.4/0.9/9.1 s, stalled=False`, with `progress_newest` naming
+   `agent/sessions/--Users-...--/2026-10-15T19-50-31-290Z_*.jsonl` as the transcript grew 113,306 -> 114,750 B
+   **inside the workstream**. The 45 s threshold that fired on a healthy loop is gone: the class declares 120 s
+   (longest measured turn 45.58 s x declared margin 2.0) and the class - not the caller - owns it.
+2. **The threshold is now a DERIVED floor with a checker.** `pipeline/subagent_fanout.py doctor` and
+   `python3 pipeline/research_run.py --check` (wired into `just preflight`) recompute every class bound from
+   declared sources: stall floor from the class's longest MEASURED turn x `turn_budget.stall_margin`, the wall from
+   the owner's `per_turn_budget_s` x the class's declared `max_turns` against the guard the class names, and the
+   ceiling from `per_turn_budget_s` x the MEASURED decode rate. Known-answer controls prove each assertion CAN
+   fail, including the exact 45 s threshold this bug measured.
+3. **The ceiling is declared per class, and where it cannot be declared it is DERIVED - with the residual named.**
+   A one-shot passes its own `--max-tokens` and is checked against the derived ceiling (512 <= 3150). A harness
+   sends NO `max_tokens` (83 of 83 gemma calls in the engine log carried `request_max_tokens=None`), so its ceiling
+   is what the SERVER falls back to: the derived ceiling is **3,266 tokens** (90 s x 36.3 tok/s) and the checker
+   reads `~/.omlx/model_settings.json` for it. That file's `models` map is EMPTY, so the checker reports
+   **OWNER-OWED (rc 2)** - loud, never a pass - because binding it edits the LIVE SERVER's own home. That is the
+   remaining act, and it is the owner's: T-161.
+
+**A DERIVATION WAS DRAFTED AND RETRACTED IN THIS SAME SESSION, and the retraction is part of the record.** The
+first wall formula added the class's `working_set / prefill_tps` term. Computed, it turned a 15-second one-shot
+class into a 690 s wall and contradicted a guard that is measurably right - because `working_set` is the prompt a
+class must be able to PAY FOR (a routing gate the prefill bill already owns), not the prompt it sends. An estimate
+dressed as a derivation is BUG-794's defect, so the shipped derivation keeps only terms that are declared facts.
 
 
 ## BUG-829 (MED - OPEN 2026-10-15) - the review surface's own agent panel defaults to a CLOUD provider
@@ -14788,3 +14822,79 @@ before either is trusted for governed work.
 EVIDENCE: this session's delegate call (prompt: "read config/delegation_economy.yaml and pipeline/
 delegation_economy.py, report three findings as file:line - exact text") and the load() error above.
 
+
+
+## BUG-835 (HIGH - OPEN 2026-10-15) - the engine's chunk-shaped SSE keepalive is read as the model's FINAL answer, so a harness turn ends empty while the loop is healthy
+
+MEASURED 2026-10-15 21:51:29, live, in the T-154 harness proof
+(`temp/runs/harness_20261015c/fan_h1`): pi ran a healthy four-turn tool loop (read -> grep -> assistant), the
+engine answered every turn, and then the loop ENDED with an EMPTY answer. The final record in pi's own
+transcript (`agent/sessions/--Users-...--/2026-10-15T19-50-31-290Z_*.jsonl`, last of 9) is:
+
+    {"role": "assistant", "content": [], "output": 0, "stopReason": "stop",
+     "provider": "omlx", "model": "gemma-4-E4B-it-MLX-4bit", "responseModel": "keepalive"}
+
+and the engine's own log agrees it completed with nothing:
+
+    Chat completion: model=gemma-4-E4B-it-MLX-4bit, 0 tokens in 16.62s (0.0 tok/s), prompt: 8417,
+    finish_reason=stop, max_tokens=32768, request_max_tokens=None, stream_model_ttft=unavailable
+
+ROOT (read from the engine's own source, not inferred): `~/.omlx/settings.json#server.sse_keepalive_mode` is
+`"chunk"`, and `omlx/server.py::_resolve_keepalive` returns `_KEEPALIVE_CHAT_CHUNK` for that mode - a
+wire-level frame shaped EXACTLY like a real completion chunk
+(`{"id":"chatcmpl-keepalive","model":"keepalive",...}`), emitted during a long prefill. `responseModel:
+"keepalive"` in pi's transcript is the frame's own `model` field arriving as the turn's final response. The
+engine documents the hazard in the same function: "Some clients (e.g. OpenClaw / WorkBuddy) cannot parse" it, and
+the alternative `comment` mode returns `_KEEPALIVE_COMMENT`, which is a true no-op for any compliant client.
+**pi is such a client.** The other two modes it declares are `comment` and `off`.
+
+WHY THIS IS HIGH: the harness class is the deployment T-137 measures and the flip to `active_provider:
+maxwell_omlx` depends on. An agent loop that loses its last turn cannot be trusted as the primary provider, and
+the failure is silent in the worst way - the process exits 0, the transcript looks busy and healthy, and only the
+EMPTY terminal (BUG-833's discipline, working as designed) says anything is wrong. It also inflates the measured
+loop cost: the run spent ~60 s and three model calls to produce nothing.
+
+DO NOT CONFUSE THIS WITH THE LIVENESS FIX (BUG-828): BUG-828 was the runner being blind to a working loop, and it
+is fixed. Here the loop was SEEN perfectly and still produced nothing - a different layer, a different remedy.
+
+REMEDY (owner act on the LIVE server's home, then a re-run): set
+`~/.omlx/settings.json#server.sse_keepalive_mode` to `comment` (the engine's own no-op frame) or `off`, and re-run
+the T-154 proof - which then also becomes the T-137 preflight. Declared as a PRECONDITION of the T-137 A/B gate
+(`config/ab_harness_t137.yaml#preconditions`): both arms drive the same harness class, so an A/B run in this
+environment measures the keepalive, not the model.
+
+EVIDENCE: the transcript record and the engine log line above; `omlx/server.py:2494-2545` (`_resolve_keepalive`,
+`_chat_keepalive_chunk`); `~/.omlx/settings.json#server.sse_keepalive_mode = "chunk"`;
+`30_harness.err` shows the loop ran to completion with the wrapper's node/hermit banner on stderr.
+
+
+## BUG-836 (MED - OPEN 2026-10-15) - the R5 cross-family review route produced NO usable review from either local verifier, and one of the two failures was graded as an ANSWER
+
+MEASURED 2026-10-15, reviewing this session's own T-154 diff (R5: the generator may not verify itself, so a
+different family was asked):
+
+1. **gemma-4-E4B-it-MLX-4bit returned a DEGENERATE answer that was accepted.** Given a 22 KB diff and a
+   four-defect checklist, it answered 2,294 characters containing nothing but a sequential `file:line` list
+   (`pipeline/research_run.py:16`, `:17`, ... `:9`) - no finding, no claim, no defect. `oneshot_ask.py` wrote it
+   as a normal answer (`ok: ... answered 2294 chars in 40.55s`) because the only gate on an answer is
+   `min_answer_chars = 80`. A citation list is not a review; a length floor cannot tell the two apart.
+2. **gpt-oss-20b-MXFP4-Q8 returned NO content at all, twice.** Both `max_tokens=700` and `max_tokens=2500`
+   produced `message.content` EMPTY with the whole response in `message.reasoning_content`; `oneshot_ask.py`
+   correctly refused it ("returned no content"). The 700-token attempt is the informative one: the reasoning
+   stream consumed the entire budget, so a ceiling that does not cover reasoning buys an empty answer - which is
+   D-3027's point measured rather than argued, and it means the strongest local reasoning model is NOT today a
+   usable verifier through this path.
+
+CONSEQUENCE FOR T-156 (the capability registry): a route is only legal if the instrument has a MEASURED usable
+output on the class of work, and "a 4B model reviewed a 22 KB diff" is now a measurement that says NO. Two
+instruments failing in two different shapes (degenerate-but-accepted, empty-and-refused) is exactly the pair a
+registry must encode - and it must name the checker that can tell an answer from a non-answer, because today
+nothing does.
+
+REMEDY (T-163): an answer's SHAPE is checked, not only its length - a delegated REVIEW must carry at least one
+finding citing a location in the artifact it was given, and a citation-only listing must read as NOT AN ANSWER
+(the fan-out receipt already knows this shape: `an_answer_with_no_citation_checks_nothing_not_passing`).
+Then re-route: a review whose prompt exceeds a measured size is refused by the registry rather than sent to a 4B.
+
+EVIDENCE: `temp/t154_r5_review.md` (the 2,294-char degenerate answer), `temp/t154_r5_review2.md` (the "no
+content" stub) and the two prompts `temp/t154_review_prompt.md` (22 KB) / `temp/t154_review2_prompt.md` (8.9 KB).

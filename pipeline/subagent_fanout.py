@@ -47,6 +47,11 @@ import sys
 import time
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT))
+# ONE class resolver (C21): the workstream contract lives in pipeline/research_run.py, which reads it from
+# config/agent_context.yaml. A second reader here would be a second home for the same vocabulary (C12).
+from pipeline.research_run import class_for_mode, resolve_class  # noqa: E402
+
 RUNS = ROOT / "temp" / "runs"
 RUNNER = ROOT / "pipeline" / "research_run.py"
 ASKER = ROOT / "pipeline" / "oneshot_ask.py"
@@ -245,10 +250,51 @@ def _write_json(path: pathlib.Path, obj: dict) -> None:
     os.replace(tmp, path)
 
 
+def _job_row(ws_class: str) -> dict:
+    """The declared deployment for a workstream class - its one home is engine.yaml#harnesses.jobs (D-3017).
+
+    A class whose row names no harness is not deployable AS a harness, and a row with no declared args is
+    refused rather than assembled here: the command the owner runs and the command a workstream runs must
+    be the same declared bytes, or the measurement describes a deployment nobody uses (C12).
+    """
+    rows = (conf().get("harnesses") or {}).get("jobs") or {}
+    row = rows.get(ws_class)
+    if not isinstance(row, dict) or not row.get("harness"):
+        raise SystemExit(f"FATAL: config/engine.yaml#harnesses.jobs declares no harness for class "
+                         f"'{ws_class}' - a harness workstream in a class that has none is a deployment "
+                         f"nobody decided (D-3017)")
+    if not row.get("args"):
+        raise SystemExit(f"FATAL: the harness row for '{ws_class}' declares no args - refusing to assemble a "
+                         f"deployment command that no declaration owns (C12)")
+    return row
+
+
 def _cmd_for(task: dict, wsd: str, g: dict, model: str) -> str:
     """The exact bytes a workstream runs: the task, then the GRADER that decides its terminal word."""
+    mode = str(task.get("mode", "oneshot"))
     lines = [f'echo "STEP 1: {model} starts" >> "$WS_REPORT"']
-    if str(task.get("mode", "oneshot")) == "agent":
+    if mode == "harness":
+        # T-154: a harness workstream is launched through the ENGINE's own wiring (`omlx launch <tool>`),
+        # with the class's transcript binding set by the runner from the class's declared env. Its answer
+        # is its stdout; the launcher's banner lines are stripped by the DECLARED regex, and both byte
+        # counts are reported so a reader can see whether stripping removed anything at all.
+        row = _job_row(class_for_mode(mode))
+        launch = str((conf().get("engine") or {}).get("launch_cli") or "")
+        if not launch:
+            raise SystemExit("FATAL: config/engine.yaml declares no engine.launch_cli - refusing to invent "
+                             "a deployment command (C12)")
+        args = " ".join(str(a) for a in row["args"])
+        lines.append(f'"{launch}" launch {row["harness"]} --model {model} -- {args} '
+                     f'"$(cat "$WS_DIR/00_prompt.txt")" > "$WS_DIR/20_answer_raw.md" 2> "$WS_DIR/30_harness.err"')
+        noise = str(row.get("stdout_noise_regex") or "")
+        if noise:
+            lines.append(f"grep -vE {_shq(noise)} \"$WS_DIR/20_answer_raw.md\" > \"$WS_DIR/20_answer.md\" || true")
+            lines.append('[ -s "$WS_DIR/20_answer.md" ] || cp "$WS_DIR/20_answer_raw.md" "$WS_DIR/20_answer.md"')
+            lines.append('{ echo "HARNESS_STDOUT: raw=$(wc -c < "$WS_DIR/20_answer_raw.md")B '
+                         'answer=$(wc -c < "$WS_DIR/20_answer.md")B"; } >> "$WS_REPORT"')
+        else:
+            lines.append('cp "$WS_DIR/20_answer_raw.md" "$WS_DIR/20_answer.md"')
+    elif mode == "agent":
         lines.append('GOOSE=$(command -v goose || echo /Applications/Goose.app/Contents/Resources/bin/goose)')
         lines.append('"$GOOSE" run -t "$(cat "$WS_DIR/00_prompt.txt")" > "$WS_DIR/20_answer.md" 2>&1')
     else:
@@ -260,6 +306,11 @@ def _cmd_for(task: dict, wsd: str, g: dict, model: str) -> str:
     lines.append(f'python3 pipeline/subagent_fanout.py _grade --answer "$WS_DIR/20_answer.md" --rc "$RC" '
                  f'--min-chars {int(g["min_answer_chars"])} --report "$WS_REPORT"')
     return "\n".join(lines) + "\n"
+
+
+def _shq(text: str) -> str:
+    """Single-quote a value for the shell: the command carries a DECLARED regex, never a literal."""
+    return "'" + str(text).replace("'", "'\\''") + "'"
 
 
 def _prompt_for(task: dict, cap: int) -> str:
@@ -307,6 +358,7 @@ def plan(tasks_file: pathlib.Path, run_id: str) -> int:
         wsd.mkdir(parents=True, exist_ok=True)
         (wsd / "00_prompt.txt").write_text(_prompt_for(t, cap))
         _write_json(wsd / "task.json", {"id": wid, "model": t["model"], "mode": str(t.get("mode", "oneshot")),
+                                        "class": class_for_mode(str(t.get("mode", "oneshot"))),
                                         "max_tokens": t.get("max_tokens"), "attempt": 1,
                                         "timeout_s": t.get("timeout_s"),
                                         "retry_of": None, "question": str(t.get("question", ""))})
@@ -316,14 +368,13 @@ def plan(tasks_file: pathlib.Path, run_id: str) -> int:
 
 
 def _timeout_for(task: dict, g: dict) -> int:
-    """The declared budget for THIS task's mode - a oneshot never inherits an agent's minutes.
+    """The declared budget for THIS task's CLASS - read from the guard the class names, never a mode guess.
 
-    The owner's rule (2026-10-15): if a task can be answered faster than the old blanket 1800 s, it
-    must be BUDGETED faster, because a generous timeout is a stall nobody notices. Measured oneshots
-    answer in 0.4-17 s, so the oneshot budget is 120 s - and a task that overruns it is reaped and
-    reported instead of being waited on.
+    T-154: the mapping mode -> class -> guard is DECLARED in config/agent_context.yaml (workstreams.mode_class
+    and classes.<class>.timeout_guard). A oneshot therefore cannot inherit an agent's minutes by falling
+    through a ternary, and a new mode cannot silently take the default: an undeclared mode is FATAL.
 
-    A task may declare its own `timeout_s`, which is how a KNOWN-fast task is kept honest: expecting
+    A task may still declare its own `timeout_s`, which is how a KNOWN-fast task is kept honest: expecting
     a 6 s answer and killing at 120 s is 114 s of silence nobody reads.
     """
     own = task.get("timeout_s")
@@ -332,14 +383,20 @@ def _timeout_for(task: dict, g: dict) -> int:
             raise SystemExit(f"FATAL: task {task.get('id')!r} declares timeout_s={own!r} - a budget of zero "
                              f"kills the task it was meant to bound")
         return int(own)
-    return int(g["agent_timeout_s"]) if str(task.get("mode", "oneshot")) == "agent" else int(g["default_timeout_s"])
+    spec = resolve_class(class_for_mode(str(task.get("mode", "oneshot"))))
+    return int(g[str(spec["timeout_guard"])])
 
 
 def _start_one(run_id: str, wid: str, g: dict, task: dict, note: str = "") -> None:
-    """Launch one planned workstream with the DECLARED budget, stall threshold and kill policy."""
+    """Launch one planned workstream as its declared CLASS, with that class's budget and stall floor.
+
+    The stall threshold is no longer passed from here: the runner resolves it from the class the task
+    declares, so a harness cannot be measured against a one-shot's 45 s threshold (BUG-828).
+    """
     wsd = RUNS / run_id / f"fan_{wid}"
+    mode = str(task.get("mode", "oneshot"))
     cmd = [sys.executable, str(RUNNER), "start", "--run", run_id, "--ws", f"fan_{wid}",
-           "--timeout", str(_timeout_for(task, g)), "--stall", str(int(g["stall_s"])),
+           "--timeout", str(_timeout_for(task, g)), "--class", class_for_mode(mode),
            "--cmd-file", str(wsd / "cmd.sh"), "--note", note]
     if g.get("kill_on_stall"):
         cmd.append("--kill-on-stall")
@@ -668,6 +725,17 @@ def doctor(tasks_file: pathlib.Path | None = None) -> int:
     add("the run root is writable", RUNS.exists() and RUNS.is_dir(), str(RUNS))
     add("both instruments are present", RUNNER.exists() and ASKER.exists())
 
+    # T-154: the CLASS bounds, recomputed from their declared sources by the one instrument that owns them.
+    # rc 2 (a bound declared but not bound) is the SAME tri-state the harness contract uses: loud, and NOT a
+    # false FAIL - the engine's per-model fallback is the live server's home, so binding it is the owner's act.
+    cls = subprocess.run([sys.executable, str(RUNNER), "--check"], capture_output=True, text=True, cwd=str(ROOT))
+    tail = [ln for ln in cls.stdout.strip().splitlines() if "CONTRADICTION" in ln or "OWNER-OWED" in ln]
+    add("every class bound recomputes without a contradiction (T-154/BUG-828)", cls.returncode != 1,
+        " | ".join(tail[:2]) or f"rc={cls.returncode}")
+    if cls.returncode == 2:
+        add("the harness class ceiling is DECLARED and NOT BOUND in the engine's own home (owner act)", None,
+            " | ".join(tail[:1]) or "OWNER-OWED")
+
     stuck = []
     for r in _rows_present():
         if r["state"] == "RUNNING" and not r.get("process_alive"):
@@ -743,14 +811,35 @@ def selftest() -> int:
     checks.append(("no_generated_command_asserts_its_own_terminal_word",
                    "TERMINAL: DONE" not in cmd and "_grade" in cmd))
     checks.append(("every_generated_command_grades_the_answer_it_got", "--min-chars " in cmd))
-    checks.append(("the_stall_threshold_is_strictly_inside_the_timeout",
-                   int(g["stall_s"]) < int(g["default_timeout_s"])))
+    checks.append(("the_whole_run_is_bounded_by_a_deadline_the_parent_obeys",
+                   int(g["deadline_s"]) > 0))
     checks.append(("a_oneshot_is_budgeted_FAR_MORE_TIGHTLY_than_an_agent_loop",
                    _timeout_for({"mode": "oneshot"}, g) < _timeout_for({"mode": "agent"}, g)))
     checks.append(("the_oneshot_budget_is_not_a_blanket_1800s",
                    _timeout_for({"mode": "oneshot"}, g) <= 300))
-    checks.append(("the_whole_run_is_bounded_by_a_deadline_the_parent_obeys",
-                   int(g["deadline_s"]) > 0))
+    # T-154: the harness class is measured against ITS OWN threshold, its deployment is the ENGINE's, and
+    # its transcript binding is the RUNNER's - never a literal path baked into a command.
+    spec = resolve_class(class_for_mode("harness"))
+    longest = float((spec.get("evidence") or {}).get("longest_turn_measured_s") or 0)
+    checks.append(("a_harness_is_measured_against_a_threshold_above_its_longest_measured_turn_T154",
+                   longest > 0 and float(spec["stall_s"]) > longest))
+    checks.append(("the_harness_class_is_not_measured_against_a_one_shot_threshold_T154",
+                   int(spec["stall_s"]) > int(g["stall_s"])))
+    hcmd = _cmd_for({"id": "h", "mode": "harness"}, "/tmp", g, "M")
+    row = _job_row(class_for_mode("harness"))
+    launch = str((conf().get("engine") or {}).get("launch_cli") or "")
+    checks.append(("a_harness_command_is_launched_through_the_ENGINE_own_wiring_T154",
+                   launch in hcmd and f"launch {row['harness']}" in hcmd))
+    checks.append(("a_harness_command_bakes_in_no_transcript_path_T154",
+                   "PI_CODING_AGENT_DIR" not in hcmd and str(RUNS) not in hcmd))
+    checks.append(("a_harness_command_is_graded_like_every_other_answer", "_grade" in hcmd and "TERMINAL:" not in hcmd))
+    checks.append(("the_harness_and_the_agent_share_a_class_but_a_oneshot_does_not_T154",
+                   class_for_mode("harness") == class_for_mode("agent") != class_for_mode("oneshot")))
+    try:
+        class_for_mode("SELFTEST-NO-SUCH-MODE")
+        checks.append(("an_undeclared_mode_is_FATAL_in_the_front_door_too_T154", False))
+    except SystemExit:
+        checks.append(("an_undeclared_mode_is_FATAL_in_the_front_door_too_T154", True))
     checks.append(("the_retry_count_is_bounded", int(g["max_attempts"]) >= 1))
     checks.append(("a_retried_task_cannot_be_retried_again_by_construction",
                    r'if re.search(r"_r\d+$", t.name)' in pathlib.Path(__file__).read_text()))

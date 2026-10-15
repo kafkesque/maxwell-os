@@ -16,6 +16,10 @@ WHY THIS EXISTS
 
 CONTRACT (declared here, restated nowhere - C12)
     runs root      : temp/runs/<run_id>/<ws>/
+    class          : every workstream runs AS one (config/agent_context.yaml#classes via workstreams.mode_class);
+                     the class - not the caller - decides the stall floor, the wall and the env, and a
+                     command carrying a harness launch marker is REFUSED under a class that does not keep
+                     its transcript in the workstream (T-154/BUG-828)
     report         : 10_report.md   (append-only, written by the workstream)
     command        : cmd.sh         (written by start; the exact bytes that ran)
     run log        : run.log        (stdout+stderr of the workstream)
@@ -23,14 +27,17 @@ CONTRACT (declared here, restated nowhere - C12)
     brief          : 00_brief.md    (the run-level mandate; start materialises it into the prompt when needed)
     state          : state.json     (PENDING/RUNNING/DONE/FAILED/TIMEOUT/STALLED/STOPPED/EMPTY + pid, t0, t1, rc)
     heartbeat line : "STEP <n>: ..."   (workstream progress, readable while it runs)
+    liveness       : RECURSIVE over the workstream dir minus the runner's own state.json/.tmp_* - so a
+                     harness streaming its transcript under <ws>/agent/** is BUSY, not dead (T-154/BUG-828)
     terminal line  : "TERMINAL: <state> - <one line>"  (workstream declares its own end)
 
 USAGE
     python3 pipeline/research_run.py new      --run ID --brief FILE
-    python3 pipeline/research_run.py start    --run ID --ws NAME --cmd "..." [--timeout s]
+    python3 pipeline/research_run.py start    --run ID --ws NAME --cmd "..." [--timeout s] [--class CLASS]
     python3 pipeline/research_run.py status   [--run ID]
     python3 pipeline/research_run.py collect  --run ID [--timeout s]
     python3 pipeline/research_run.py stop     --run ID --ws NAME
+    python3 pipeline/research_run.py --check  # recompute every class bound from its declared sources
     python3 pipeline/research_run.py --selftest
 
 EXIT: 0 every workstream DONE; 2 something is still RUNNING (owner-owed);
@@ -86,8 +93,94 @@ def _guards() -> dict:
 _GUARDS = _guards()
 DEFAULT_TIMEOUT_S = int(_GUARDS["default_timeout_s"])
 DEFAULT_STALL_S = int(_GUARDS["stall_s"])
-ANSWER = "20_answer.md"
-PROGRESS_FILES = (REPORT, LOG, ANSWER)
+AGENT_CONTEXT = ROOT / "config" / "agent_context.yaml"
+TEMP_PREFIX = ".tmp_"          # write_json's own tempfiles: a progress counter must never count its own writes
+
+
+def _agent_context() -> dict:
+    """The class-bound contract, read from its one home (config/agent_context.yaml). FAIL-CLOSED (C12)."""
+    import yaml
+    if not AGENT_CONTEXT.exists():
+        raise SystemExit(f"FATAL: {AGENT_CONTEXT} is absent - it is the one home for the class bounds (C12)")
+    doc = yaml.safe_load(AGENT_CONTEXT.read_text()) or {}
+    if not doc.get("classes") or not doc.get("workstreams"):
+        raise SystemExit("FATAL: config/agent_context.yaml declares no classes/workstreams block - a "
+                         "workstream without a declared class is the BUG-828 defect (fail-closed, C16)")
+    return doc
+
+
+_CONTEXT = _agent_context()
+CLASSES: dict = _CONTEXT["classes"]
+WORKSTREAMS: dict = _CONTEXT["workstreams"]
+DEFAULT_CLASS = str(WORKSTREAMS["default_class"])
+CLASS_REQUIRED = ("stall_s", "timeout_guard", "max_turns", "transcript_in_ws", "env")
+
+
+def resolve_class(name: str) -> dict:
+    """A workstream class and its declared bound. An unknown or non-workstream class is FATAL.
+
+    T-154/BUG-828: the CLASS is what makes a budget checkable. A workstream that runs as a class the
+    contract does not declare has no longest measured turn, no stall floor and no ceiling - which is
+    exactly how a healthy pi loop came to read `stalled=True` under a threshold written for scripts.
+    """
+    spec = CLASSES.get(name)
+    if not spec:
+        raise SystemExit(f"FATAL: '{name}' is not a declared class (config/agent_context.yaml#classes "
+                         f"declares {sorted(CLASSES)}) - refusing to invent a bound (C12)")
+    if not spec.get("workstream_class"):
+        raise SystemExit(f"FATAL: '{name}' is not a WORKSTREAM class (workstream_class: false) - the pipeline "
+                         f"calls the model itself, so no runner may claim it (D-3016)")
+    missing = [k for k in CLASS_REQUIRED if k not in spec]
+    if missing:
+        raise SystemExit(f"FATAL: class '{name}' is missing {missing} - a bound nobody declared cannot be checked")
+    if spec["timeout_guard"] not in _GUARDS:
+        raise SystemExit(f"FATAL: class '{name}' names timeout_guard '{spec['timeout_guard']}', which "
+                         f"config/engine.yaml#fanout.guards does not declare")
+    return spec
+
+
+def class_for_mode(mode: str) -> str:
+    """The class a mode runs as, read from the one declared map - never inferred from the command bytes."""
+    mapping = WORKSTREAMS.get("mode_class") or {}
+    if mode not in mapping:
+        raise SystemExit(f"FATAL: mode '{mode}' has no declared class (config/agent_context.yaml"
+                         f"#workstreams.mode_class declares {sorted(mapping)})")
+    return str(mapping[mode])
+
+
+def class_env(spec: dict, wsd: pathlib.Path) -> dict:
+    """The env the class REQUIRES bound for its child, with {ws}/{run} expanded and dirs created.
+
+    T-154/BUG-828 part 1: a harness streams its transcript into its OWN config directory, which by default
+    is outside the workstream where no liveness signal has ever looked. The class declares the binding;
+    this is the ONE place it is applied, and the deploy path reads the same line of the same file.
+    """
+    out: dict[str, str] = {}
+    for key, raw in (spec.get("env") or {}).items():
+        value = str(raw).replace("{ws}", str(wsd)).replace("{run}", str(wsd.parent))
+        if not value.startswith(str(wsd)):
+            raise SystemExit(f"FATAL: class env {key}={value} does not resolve INSIDE the workstream {wsd} - "
+                             f"a transcript outside the workstream is the BUG-828 defect")
+        out[str(key)] = value
+        pathlib.Path(value).mkdir(parents=True, exist_ok=True)
+    return out
+
+
+def _refusal(wsd: pathlib.Path, run_id: str, ws: str, reason: str, timeout_s: int, stall_s: int,
+             kill_on_stall: bool, note: str) -> dict:
+    """FAIL CLOSED: nothing is invoked, no command is written, and the state says why (BUG-833/T-154).
+
+    One shape for every refusal, so a reader cannot tell a mandate-less workstream from a harness asked to
+    run as a class that cannot see it - both are EMPTY, both are non-zero, both name their reason.
+    """
+    append_line(wsd / REPORT, f"{TERMINAL} EMPTY - {reason}")
+    rec = {"run": run_id, "ws": ws, "state": "EMPTY", "pid": None, "rc": None,
+           "t0": time.time(), "t1": time.time(), "timeout_s": timeout_s, "stall_s": stall_s,
+           "kill_on_stall": kill_on_stall, "note": note, "refused": reason}
+    write_json(wsd / STATE, rec)
+    return rec
+
+
 TERMINAL_WORDS = ("DONE", "FAILED", "TIMEOUT", "STOPPED", "STALLED", "EMPTY")
 POLL_S = 2.0
 OK, FATAL, OWNER_OWED = 0, 1, 2
@@ -230,71 +323,102 @@ def materialise_prompt(wsd: pathlib.Path) -> tuple[int, str]:
     return 0, "no prompt and no run brief - refused (BUG-833)"
 
 
-def start(run_id: str, ws: str, cmd: str, timeout_s: int, note: str = "",
-          stall_s: int = DEFAULT_STALL_S, kill_on_stall: bool = False) -> dict:
-    """Launch one workstream DETACHED. Returns its state record.
+def start(run_id: str, ws: str, cmd: str, timeout_s: int | None = None, note: str = "",
+          stall_s: int | None = None, kill_on_stall: bool = False, ws_class: str = "") -> dict:
+    """Launch one workstream DETACHED, as a DECLARED CLASS. Returns its state record.
 
     Detachment is the whole point: start_new_session=True gives the child its own session,
     so nothing that happens to this harness (a new user message, a cancelled turn, a
     compaction) can cancel it.
 
-    The child receives WS_REPORT / WS_DIR / RUN_DIR in its environment, so a workstream
-    writes to its own report without ever guessing a path (and without a shell-quoted
-    argument that bash will mangle).
+    The child receives WS_REPORT / WS_DIR / RUN_DIR plus the class's own declared env, so a workstream
+    writes to its own report (and a harness streams its transcript INSIDE its own dir) without ever
+    guessing a path. The class - not the caller's mood - decides the stall floor, the wall and the env:
+    T-154 measured a healthy pi loop reading `stalled=True` because the class was never declared, and
+    BUG-828's third part is the same defect on the ceiling (the class inherited a global 32768).
 
-    A workstream whose prompt is absent AND whose run has no brief is REFUSED here (an EMPTY
-    state record, no command, no process) - a mandate-less run must not exit 0 (BUG-833).
+    TWO REFUSALS, both fail-closed (EMPTY, no command, no process, non-zero): a workstream with no
+    mandate (BUG-833), and a command carrying a harness launch marker under a class that does not keep
+    its transcript in the workstream (T-154 - an unbound transcript is a liveness signal nobody can see).
     """
+    spec = resolve_class(ws_class or DEFAULT_CLASS)
+    resolved_stall = int(stall_s if stall_s is not None else spec["stall_s"])
+    resolved_timeout = int(timeout_s if timeout_s is not None else _GUARDS[spec["timeout_guard"]])
     wsd = ws_dir(run_id, ws)
     wsd.mkdir(parents=True, exist_ok=True)
+    markers = [str(m) for m in (WORKSTREAMS.get("harness_cmd_markers") or [])]
+    hit = [m for m in markers if m in cmd]
     prompt_bytes, prompt_note = materialise_prompt(wsd)
     (wsd / REPORT).touch()
-    append_line(wsd / REPORT, f"# workstream {ws} (run {run_id}) note: {note or 'none'}")
+    append_line(wsd / REPORT, f"# workstream {ws} (run {run_id}) class: {ws_class or DEFAULT_CLASS} "
+                             f"note: {note or 'none'}")
     append_line(wsd / REPORT, f"# prompt: {prompt_bytes}B - {prompt_note}")
     if prompt_bytes == 0:
-        # FAIL CLOSED: nothing is invoked and no command is written - a workstream with no
-        # mandate must not run and then report rc 0 (BUG-833).
-        append_line(wsd / REPORT, f"{TERMINAL} EMPTY - {prompt_note}")
-        rec = {"run": run_id, "ws": ws, "state": "EMPTY", "pid": None, "rc": None,
-               "t0": time.time(), "t1": time.time(), "timeout_s": timeout_s, "stall_s": stall_s,
-               "kill_on_stall": kill_on_stall, "note": note, "refused": prompt_note}
-        write_json(wsd / STATE, rec)
-        return rec
+        return _refusal(wsd, run_id, ws, prompt_note, resolved_timeout, resolved_stall,
+                        kill_on_stall, note)
+    if hit and not spec.get("transcript_in_ws"):
+        # FAIL CLOSED: a harness's transcript is the only thing that moves WHILE it works, so a harness
+        # run that does not bind it inside the workstream is a run no liveness signal can see (BUG-828).
+        return _refusal(wsd, run_id, ws,
+                        f"command carries the harness marker {hit} but class '{ws_class or DEFAULT_CLASS}' "
+                        f"declares transcript_in_ws: false - run it as a harness class (T-154)",
+                        resolved_timeout, resolved_stall, kill_on_stall, note)
     (wsd / CMD).write_text(cmd.rstrip("\n") + "\n")
+    bound = class_env(spec, wsd)
+    append_line(wsd / REPORT, "# class env: " + (", ".join(f"{k}={v}" for k, v in sorted(bound.items()))
+                                                 or "none declared"))
     env = dict(os.environ)
     env.update(WS_REPORT=str(wsd / REPORT), WS_DIR=str(wsd), RUN_DIR=str(wsd.parent))
+    env.update(bound)
     log = open(wsd / LOG, "ab")
     proc = subprocess.Popen(
         ["bash", str(wsd / CMD)], cwd=str(ROOT), env=env, stdout=log, stderr=subprocess.STDOUT,
         start_new_session=True,
     )
     rec = {"run": run_id, "ws": ws, "state": "RUNNING", "pid": proc.pid, "rc": None,
-           "t0": time.time(), "t1": None, "timeout_s": timeout_s, "stall_s": stall_s,
+           "t0": time.time(), "t1": None, "timeout_s": resolved_timeout, "stall_s": resolved_stall,
+           "ws_class": ws_class or DEFAULT_CLASS, "class_env": bound,
            "kill_on_stall": kill_on_stall, "note": note}
     write_json(wsd / STATE, rec)
     return rec
 
 
-def progress_bytes(wsd: pathlib.Path) -> int:
-    """Total bytes of every file a live workstream grows WHILE it works.
+def progress_snapshot(wsd: pathlib.Path) -> tuple[int, int, float | None, str | None]:
+    """(bytes, files, newest mtime, newest name) over the WHOLE workstream dir, minus the runner's own state.
 
-    The report alone is a weak liveness signal: in oneshot mode the answer is
-    redirected into it only at the end, so a healthy run looks dead for its whole
-    life. Log + answer file are counted for the same reason.
+    RECURSIVE ON PURPOSE (T-154/BUG-828 part 1). A harness streams its transcript under `<ws>/agent/**`
+    while it works and writes its answer only at the end, so a counter that watches three fixed files
+    read a healthy pi loop as dead for its whole life. Two exclusions matter as much as the walk:
+      * `state.json` is REWRITTEN on every refresh - counting it would pin idle_s at 0.0 and make the
+        stall flag UNREACHABLE, a silent failure in the opposite direction (the selftest asserts it);
+      * `write_json`'s own `.tmp_*` files are the runner's writes, not the child's progress.
     """
-    return sum(p.stat().st_size for p in (wsd / f for f in PROGRESS_FILES) if p.exists())
+    total = files = 0
+    newest: float | None = None
+    newest_name: str | None = None
+    for path in wsd.rglob("*"):
+        if path.name == STATE or path.name.startswith(TEMP_PREFIX) or not path.is_file():
+            continue
+        try:
+            st = path.stat()
+        except OSError:
+            continue                     # a file that vanished mid-walk is not a reading
+        files += 1
+        total += st.st_size
+        if newest is None or st.st_mtime > newest:
+            newest, newest_name = st.st_mtime, str(path.relative_to(wsd))
+    return total, files, newest, newest_name
 
 
 def idle_s(wsd: pathlib.Path, now: float | None = None) -> float:
-    """Seconds since ANY progress file was last touched - the liveness signal.
+    """Seconds since the NEWEST counted file changed - the liveness signal (BUG-809/T-154).
 
-    This is the number that was missing when a delegation "ran for so long without
-    any result": without it, a hung child and a working child read identically
-    until the timeout fires (BUG-809).
+    The newest file, never the sum: a sum hides a stall behind a big report written once at boot, and
+    the report that once answered this question was measured at 66.6 s idle while pi was mid-loop.
     """
     now = time.time() if now is None else now
-    mt = [p.stat().st_mtime for p in (wsd / f for f in PROGRESS_FILES) if p.exists()]
-    return round(now - max(mt), 1) if mt else 0.0
+    _, _, newest, _ = progress_snapshot(wsd)
+    return round(now - newest, 1) if newest else 0.0
 
 
 def refresh(run_id: str, ws: str) -> dict:
@@ -308,9 +432,16 @@ def refresh(run_id: str, ws: str) -> dict:
     rec["heartbeat"] = last_heartbeat(wsd / REPORT)
     rec["elapsed_s"] = round((rec.get("t1") or time.time()) - rec["t0"], 1)
     rec["process_alive"] = pid_alive(rec.get("pid"))
-    rec["progress_bytes"] = progress_bytes(wsd)
+    total, files, _newest, newest_name = progress_snapshot(wsd)
+    rec["progress_bytes"] = total
+    rec["progress_files"] = files
+    rec["progress_newest"] = newest_name
     rec["idle_s"] = idle_s(wsd)
-    rec["stall_s"] = int(rec.get("stall_s") or DEFAULT_STALL_S)
+    # The class decides the stall floor when the record does not carry one; an ad-hoc record with no
+    # class reads as the declared default class rather than as "unknown" (T-154: one vocabulary).
+    rec["ws_class"] = rec.get("ws_class") or DEFAULT_CLASS
+    _cls = CLASSES.get(rec["ws_class"]) or {}
+    rec["stall_s"] = int(rec.get("stall_s") or _cls.get("stall_s") or DEFAULT_STALL_S)
     if rec["state"] == "RUNNING":
         if rec["terminal"]:
             word = rec["terminal"].split(":", 1)[1].strip().split(" ", 1)[0].upper()
@@ -353,6 +484,152 @@ def status(run_id: str | None) -> list[dict]:
         for wsd in sorted([p for p in root.glob("*") if p.is_dir()]):
             rows.append(refresh(root.name, wsd.name))
     return rows
+
+
+#: ── THE CLASS BOUND, RECOMPUTED (T-154/BUG-828). Three measured facts, three computed assertions. ──
+def _dotted(node: object, dotted: str) -> object:
+    """Walk a dotted pointer to its value. A missing step raises - a bound is never guessed (C16)."""
+    for part in str(dotted).split("."):
+        node = node[part]  # type: ignore[index]
+    return node
+
+
+def _pointer(value: str) -> object:
+    """Resolve a pointer: 'a.b.c' in this file, or '@path#a.b.c' in another declared home.
+
+    The same convention pipeline/harness_env.py uses for the harness contract, so a class env and a
+    budget source are read the same way. An unresolvable pointer is FATAL, never a literal (C12/C16).
+    """
+    import yaml
+    text = str(value)
+    if text.startswith("@"):
+        ref, _, dotted = text[1:].partition("#")
+        path = pathlib.Path(ref)
+        if not path.is_absolute():
+            path = ROOT / ref
+        if not path.exists():
+            raise SystemExit(f"FATAL: the pointer {value} names {path}, which does not exist")
+        doc = yaml.safe_load(path.read_text()) or {}
+    else:
+        dotted = text
+        doc = _CONTEXT
+    return _dotted(doc, dotted)
+
+
+def class_defects(ctx: dict) -> list[tuple[str, str, str]]:
+    """Recompute every class bound and return (class, verdict, detail): ok / owner_owed / CONTRADICTION.
+
+    PURE over the context it is handed, so the selftest can feed it a doctored contract and check that
+    each defect is CAUGHT (D-400: an instrument that decides is measured on known answers, never on a
+    hunch). The three assertions are BUG-828's three measured parts, turned into arithmetic:
+      (1) SILENCE - stall_s must exceed the class's longest MEASURED turn by the declared margin. The
+          failure it prevents is a healthy 45.58 s turn reading `stalled=True` under a 45 s threshold.
+      (2) THE WALL - guards[timeout_guard] must be at least max_turns x per_turn_budget_s. The failure it
+          prevents is a wall that is decorative or a ceiling nobody can pay: the bound that actually bit
+          was the workstream wall, so the wall is derived from the owner's per-turn knob and the class's
+          own declared turn count - and NOTHING else (a prefill term was retracted: a class's working_set
+          is the prompt it must be able to PAY FOR, not the prompt it sends).
+      (3) THE CEILING - max_tokens_per_turn is DERIVED (per_turn_budget_s x decode_tps) and must be
+          BOUND where the class cannot declare it: a harness sends no max_tokens, so the server's own
+          per-model fallback IS its ceiling. An engine bound ABOVE the derived ceiling contradicts it;
+          an engine bound that is absent is OWNER-OWED (T-132: declared is not bound) - never a pass.
+    """
+    tb = ctx.get("turn_budget") or {}
+    budget_home = str(tb.get("budget_home") or "")
+    if not budget_home:
+        raise SystemExit("FATAL: config/agent_context.yaml#turn_budget declares no budget_home - the per-turn "
+                         "budget has ONE home and a checker that invents it is the defect (C12)")
+    budget = float(_dotted(ctx, budget_home))
+    margin = float(tb.get("stall_margin", 0))
+    decode = _dotted(ctx, str(tb.get("decode_source")))
+    routable = ((ctx.get("routing") or {}).get("measured_routable_20261014") or {})
+    out: list[tuple[str, str, str]] = []
+    for name, spec in (ctx.get("classes") or {}).items():
+        if not spec.get("workstream_class"):
+            out.append((name, "ok", "not a workstream class - the runner never claims it"))
+            continue
+        longest = float((spec.get("evidence") or {}).get("longest_turn_measured_s") or 0.0)
+        floor = round(longest * margin, 2)
+        if longest <= 0:
+            out.append((name, "CONTRADICTION", "declares no longest_turn_measured_s - a stall threshold "
+                                               "with no measured turn to sit above is BUG-828 itself"))
+        elif float(spec.get("stall_s", 0)) <= floor:
+            out.append((name, "CONTRADICTION",
+                        f"stall_s={spec.get('stall_s')}s is not above the measured-turn floor {floor}s "
+                        f"(longest {longest}s x margin {margin})"))
+        models = routable.get(name) or []
+        if not models:
+            out.append((name, "CONTRADICTION", "no measured routable model - a class nobody can run is not bound"))
+            continue
+        slowest = min(float((decode.get(m) or {}).get("decode_tps", 0) or 0) for m in models)
+        if slowest <= 0:
+            out.append((name, "CONTRADICTION", f"no measured decode rate for {models} - an unmeasured model "
+                                               f"is not routable (refuse, never optimistically assume)"))
+            continue
+        ceiling_tokens = int(budget * slowest)
+        wall = round(float(spec.get("max_turns", 0)) * budget, 1)
+        guard = float(_GUARDS[spec["timeout_guard"]])
+        detail = (f"wall {wall}s (max_turns {spec.get('max_turns')} x {budget:.0f}s) <= "
+                  f"{spec['timeout_guard']}={guard:.0f}s; derived ceiling {ceiling_tokens} tokens "
+                  f"({budget:.0f}s x {slowest} tok/s on the slowest routable of {len(models)})")
+        if wall > guard:
+            out.append((name, "CONTRADICTION",
+                        f"the derived wall {wall}s exceeds {spec['timeout_guard']}={guard:.0f}s - the wall "
+                        f"would reap the class before its own declared budget is spent"))
+            continue
+        if spec.get("transcript_in_ws"):
+            out.append((name, _binding_verdict(tb, models, ceiling_tokens), detail))
+            continue
+        declared = int(_pointer(str(tb.get("ceiling_declared_source") or "")))
+        if declared > ceiling_tokens:
+            out.append((name, "CONTRADICTION",
+                        f"a caller declares max_tokens={declared}, ABOVE the derived ceiling "
+                        f"{ceiling_tokens} tokens: the class would spend what the budget never bought"))
+            continue
+        out.append((name, "ok", detail + f"; the caller passes its own max_tokens ({declared})"))
+    return out
+
+
+def _binding_verdict(tb: dict, models: list[str], ceiling_tokens: int) -> str:
+    """Is the class's derived ceiling actually BOUND where it can bite? (T-132: declared is not bound.)"""
+    pointer = str((tb.get("bindings") or {}).get("harness") or "")
+    ref = pointer.split("#")[0].strip()
+    if not ref:
+        return "CONTRADICTION"
+    path = pathlib.Path(ref).expanduser()
+    if not path.exists():
+        return "owner_owed"
+    import json
+    try:
+        doc = json.loads(path.read_text())
+    except Exception:
+        return "CONTRADICTION"
+    for model in models:
+        bound = ((doc.get("models") or {}).get(model) or {}).get("max_tokens")
+        if bound is None:
+            continue
+        if int(bound) > ceiling_tokens:
+            return "CONTRADICTION"
+        return "ok"
+    return "owner_owed"
+
+
+def class_check() -> int:
+    """Print every class bound, recomputed. 0 green / 2 OWNER-OWED (a bound declared but not bound) / 1 a
+    contradiction. OWNER-OWED is loud and not fatal, the same tri-state the harness contract uses: the
+    engine's per-model fallback is the LIVE SERVER's home, so binding it is the owner's act, not a rail."""
+    worst = OK
+    for name, verdict, detail in class_defects(_CONTEXT):
+        print(f"  [{verdict:<13}] {name:<15} {detail}")
+        if verdict == "CONTRADICTION":
+            worst = FATAL
+        elif verdict == "owner_owed" and worst == OK:
+            worst = OWNER_OWED
+    if worst == OWNER_OWED:
+        print("OWNER-OWED: the harness class ceiling is DECLARED and NOT BOUND - a caller that sends no")
+        print("            max_tokens still inherits the server's global 32768. Binding it edits the live")
+        print("            server's own home (~/.omlx/model_settings.json), which is the owner's act.")
+    return worst
 
 
 def exit_code_for(rows: list[dict]) -> int:
@@ -536,6 +813,125 @@ def selftest() -> int:
     add("a_refused_workstream_writes_no_command", not (RUNS / rr / "nobrief" / CMD).exists(),
         "cmd.sh was materialised for a refused workstream")
 
+    # T-154 (BUG-828): the CLASS is what makes a bound checkable, and the liveness signal must see a
+    # harness that streams its transcript INSIDE its workstream.
+    start(rnd, "harness", 'for i in 1 2 3 4 5 6; do mkdir -p "$WS_DIR/agent/sessions"; '
+                          'echo "{\\"turn\\":$i}" >> "$WS_DIR/agent/sessions/s.jsonl"; sleep 1; done; '
+                          'echo "TERMINAL: DONE - transcript-bound harness" >> "$WS_REPORT"; sleep 30',
+          timeout_s=300, note="a harness streams a transcript and writes its answer only at the end",
+          ws_class="agent_loop")
+    time.sleep(3.5)
+    hrec = read_json(ws_dir(rnd, "harness") / STATE)
+    add("the_class_env_is_bound_INSIDE_the_workstream_T154",
+        str(hrec.get("class_env", {}).get("PI_CODING_AGENT_DIR", "")).startswith(str(ws_dir(rnd, "harness"))),
+        f"class_env={hrec.get('class_env')}")
+    add("the_class_env_directory_exists", (ws_dir(rnd, "harness") / "agent").is_dir(),
+        "PI_CODING_AGENT_DIR was declared but not created")
+    h = refresh(rnd, "harness")
+    add("a_harness_that_streams_a_NESTED_transcript_is_seen_as_progress_T154",
+        not h.get("stalled") and "agent/sessions" in (h.get("progress_newest") or ""),
+        f"idle={h.get('idle_s')} newest={h.get('progress_newest')} files={h.get('progress_files')}")
+    # The counter must not count the runner's OWN writes: refresh() rewrites state.json every poll, so a
+    # counter that included it would pin idle_s at 0 and make the stall flag unreachable (BUG-828 reversed).
+    idle_a = refresh(rnd, "harness")["idle_s"]
+    time.sleep(2.2)
+    idle_b = refresh(rnd, "harness")["idle_s"]
+    add("a_refresh_may_not_reset_its_own_idle_signal_T154", idle_b > idle_a, f"{idle_a} -> {idle_b}")
+    stop(rnd, "harness")
+
+    # A harness launch marker under a class that does not bind its transcript must be REFUSED, and the
+    # SAME bytes under the harness class must not be (the control the refusal needs to mean anything).
+    marker = str((WORKSTREAMS.get("harness_cmd_markers") or ["?"])[0])
+    rq = "selftest_harness_refusal"
+    if (RUNS / rq).exists():
+        shutil.rmtree(RUNS / rq)
+    (RUNS / rq).mkdir(parents=True, exist_ok=True)
+    (RUNS / rq / BRIEF).write_text("selftest control brief - the harness-class refusal controls (T-154)\n")
+    marked = f'echo "{marker}pi --help" >/dev/null; sleep 30'
+    bad_class = start(rq, "unbound", marked, timeout_s=10, note="a harness marker under a one-shot class")
+    add("a_harness_marker_under_a_one_shot_class_is_REFUSED_T154",
+        bad_class.get("state") == "EMPTY" and bad_class.get("pid") is None,
+        f"state={bad_class.get('state')} pid={bad_class.get('pid')}")
+    add("a_refused_harness_writes_no_command", not (RUNS / rq / "unbound" / CMD).exists())
+    ok_class = start(rq, "bound", marked, timeout_s=30, note="the same bytes under the harness class",
+                     ws_class="agent_loop")
+    add("the_same_command_under_the_harness_class_is_NOT_refused",
+        ok_class.get("state") == "RUNNING", f"state={ok_class.get('state')}")
+    stop(rq, "bound")
+
+    # A class must resolve from the declared map, an unknown mode must be FATAL, and a class the pipeline
+    # owns may not be claimed by a runner (D-3016).
+    add("a_mode_resolves_to_its_declared_class_T154", class_for_mode("harness") == "agent_loop",
+        f"harness -> {class_for_mode('harness')}")
+    try:
+        class_for_mode("SELFTEST-NO-SUCH-MODE")
+        add("an_undeclared_mode_is_FATAL_T154", False, "accepted a mode no config declares")
+    except SystemExit:
+        add("an_undeclared_mode_is_FATAL_T154", True)
+    try:
+        resolve_class("pipeline_batch")
+        add("a_class_the_pipeline_owns_is_not_a_workstream_class_T154", False, "accepted pipeline_batch")
+    except SystemExit:
+        add("a_class_the_pipeline_owns_is_not_a_workstream_class_T154", True)
+
+    # T-154: the DERIVED bounds, measured on known answers (D-400 - an instrument that decides is checked
+    # on fabricated contracts, never on a hunch). Each defect below was measured in production first.
+    import copy
+
+    def doctored(**changes) -> list[tuple[str, str, str]]:
+        ctx = copy.deepcopy(_CONTEXT)
+        for path, value in changes.items():
+            node = ctx
+            parts = path.split(".")
+            for part in parts[:-1]:
+                node = node[part]
+            node[parts[-1]] = value
+        return class_defects(ctx)
+
+    real = class_defects(_CONTEXT)
+    add("the_shipped_class_contract_has_no_contradiction_T154",
+        not [v for _, v, _ in real if v == "CONTRADICTION"], str([(n, d) for n, v, d in real if v == "CONTRADICTION"]))
+    add("the_harness_class_ceiling_reads_OWNER_OWED_while_the_engine_home_is_empty_T154",
+        any(v == "owner_owed" for n, v, _ in real if n == "agent_loop"),
+        "the harness class ceiling no longer reports unbound - re-measure before trusting it")
+    add("a_stall_threshold_below_the_measured_turn_is_CAUGHT_T154",
+        any(v == "CONTRADICTION" for n, v, _ in doctored(**{"classes.agent_loop.stall_s": 45}) if n == "agent_loop"),
+        "45 s - the exact threshold BUG-828 measured - was accepted")
+    add("a_wall_smaller_than_the_class_own_budget_is_CAUGHT_T154",
+        any(v == "CONTRADICTION" for _, v, _ in doctored(**{"classes.agent_loop.max_turns": 99})),
+        "99 turns x 90 s was accepted against a 600 s wall")
+    add("a_class_with_no_measured_turn_is_CAUGHT_T154",
+        any(v == "CONTRADICTION" for _, v, _ in doctored(**{"classes.agent_loop.evidence.longest_turn_measured_s": 0})),
+        "a stall threshold with no measured turn was accepted")
+    # What a ONE-SHOT caller passes (engine.yaml#fanout.excerpt_bytes = 24000) is far above the derived
+    # ceiling, so re-pointing the declared-ceiling source at it must be CAUGHT - the control proves the
+    # ceiling assertion can fail, not only pass.
+    add("a_declared_ceiling_above_the_derived_ceiling_is_CAUGHT_T154",
+        any(v == "CONTRADICTION" for n, v, _ in class_defects(
+            {**_CONTEXT, "turn_budget": {**(_CONTEXT["turn_budget"]),
+                                         "ceiling_declared_source": "@config/engine.yaml#fanout.excerpt_bytes"}})
+            if n == "agent_probe"),
+        "a caller declaring 24000 max_tokens against a 3150-token ceiling was accepted")
+    # ... and the same assertion for the class that sends NO ceiling: what the ENGINE falls back to IS the
+    # ceiling, so a bound above it contradicts the budget and an absent bound is OWNER-OWED (never a pass).
+    model = (_CONTEXT["routing"]["measured_routable_20261014"]["agent_loop"] or [""])[0]
+    bound_file = ws_dir(rnd, "early") / "engine_bound_control.json"
+    bound_file.write_text(json.dumps({"models": {model: {"max_tokens": 10 ** 9}}}))
+    unbound_file = ws_dir(rnd, "early") / "engine_unbound_control.json"
+    unbound_file.write_text(json.dumps({"models": {}}))
+
+    def with_binding(path: pathlib.Path) -> list[tuple[str, str, str]]:
+        return class_defects({**_CONTEXT, "turn_budget": {
+            **(_CONTEXT["turn_budget"]),
+            "bindings": {**(_CONTEXT["turn_budget"]["bindings"]), "harness": f"{path}#models.<model>.max_tokens"}}})
+
+    add("an_engine_bound_ABOVE_the_derived_ceiling_is_CAUGHT_T154",
+        any(v == "CONTRADICTION" for n, v, _ in with_binding(bound_file) if n == "agent_loop"),
+        "the engine fallback was allowed to exceed the class ceiling")
+    add("an_absent_engine_bound_reads_OWNER_OWED_never_OK_T154",
+        all(v != "ok" for n, v, _ in with_binding(unbound_file) if n == "agent_loop"),
+        "an unbound ceiling was reported as a pass")
+
     src = pathlib.Path(__file__).read_text()
     # assembled at run time: the control may not contain the literals it forbids
     forbidden = [t for t in ("114" + "35", "sk-" + "maxwell", "bge" + "-m3", "deberta" + "-v3",
@@ -555,14 +951,19 @@ def main(argv: list[str]) -> int:
     """CLI entry point."""
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--selftest", action="store_true")
+    ap.add_argument("--check", action="store_true",
+                    help="recompute every class bound (T-154/BUG-828): 0 green, 2 OWNER-OWED, 1 contradiction")
     sub = ap.add_subparsers(dest="verb")
     p_new = sub.add_parser("new"); p_new.add_argument("--run", required=True)
     p_new.add_argument("--brief"); p_new.add_argument("--brief-text")
     p_start = sub.add_parser("start"); p_start.add_argument("--run", required=True)
     p_start.add_argument("--ws", required=True)
     p_start.add_argument("--cmd", default=""); p_start.add_argument("--cmd-file", default="")
-    p_start.add_argument("--timeout", type=int, default=DEFAULT_TIMEOUT_S); p_start.add_argument("--note", default="")
-    p_start.add_argument("--stall", type=int, default=DEFAULT_STALL_S)
+    p_start.add_argument("--timeout", type=int, default=None); p_start.add_argument("--note", default="")
+    p_start.add_argument("--stall", type=int, default=None)
+    p_start.add_argument("--class", dest="ws_class", default="",
+                         help="a workstream class (config/agent_context.yaml#classes); default from "
+                              "config/agent_context.yaml#workstreams.default_class")
     p_start.add_argument("--kill-on-stall", action="store_true")
     p_st = sub.add_parser("status"); p_st.add_argument("--run"); p_st.add_argument("--json", action="store_true")
     p_w = sub.add_parser("watch"); p_w.add_argument("--run")
@@ -574,6 +975,8 @@ def main(argv: list[str]) -> int:
 
     if args.selftest:
         return selftest()
+    if args.check:
+        return class_check()
     if args.verb == "new":
         root = new_run(args.run, pathlib.Path(args.brief) if args.brief else None, args.brief_text)
         print(f"run {args.run} created at {root}")
@@ -584,11 +987,12 @@ def main(argv: list[str]) -> int:
             print("FATAL: start needs --cmd or --cmd-file")
             return FATAL
         rec = start(args.run, args.ws, cmd, args.timeout, args.note,
-                    stall_s=args.stall, kill_on_stall=bool(args.kill_on_stall))
+                    stall_s=args.stall, kill_on_stall=bool(args.kill_on_stall), ws_class=args.ws_class)
         if rec["state"] == "EMPTY":
             print(f"REFUSED {args.ws}: {rec['refused']}")
             return FATAL
-        print(f"started {args.ws} pid={rec['pid']} timeout={args.timeout}s stall={args.stall}s (detached)")
+        print(f"started {args.ws} pid={rec['pid']} class={rec.get('ws_class')} "
+              f"timeout={rec['timeout_s']}s stall={rec['stall_s']}s (detached)")
         return OK
     if args.verb == "status":
         if args.json:

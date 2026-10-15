@@ -206,6 +206,7 @@ preflight:
     @python3 scripts/recompute_decision_summary.py --check || { echo "  ❌ Decision summary drift — run scripts/recompute_decision_summary.py"; exit 1; }
     @python3 scripts/check_config_duplicate_keys.py || { echo "  ❌ A config key is being silently lost to a duplicate scope (BUG-822) — an instrument that is never called is not a guard (T-149)"; exit 1; }
     @python3 pipeline/subagent_fanout.py doctor || { echo "  ❌ The delegation guards cannot decide — a delegation would start unsound (BUG-809/BUG-826, D-3020)"; exit 1; }
+    @python3 pipeline/research_run.py --check || [ $? -eq 2 ]   # T-154/BUG-828: every class bound is RECOMPUTED from its declared sources (the owner's per-turn knob, the measured decode rate, the class's longest measured turn). 2 = OWNER-OWED: the harness class ceiling is declared and NOT bound in the engine's own home, which is the owner's act and is therefore loud, not fatal
     @echo "  🔍 Dependency check..."
     @pip3 check 2>&1 || echo "    ⚠️  Dependency conflicts found (non-blocking — see above)"
     @echo "    📦 Outdated packages:"

@@ -124,7 +124,12 @@ ratified:
   by: owner
   basis: 'the per-turn budget is the owner''s knob; the trigger is derived from it and from the served window'
   knobs:
-    per_turn_budget_s: 60      # agent_loop class. MEASURED consequences: at 60 s the loop is the 4B;
+    per_turn_budget_s: 90      # agent_loop class. RAISED 60 -> 90 on 2026-10-15 with T-132 approved. The only
+                               # agent_loop-capable model measured 54.7 s against the 60 s budget - a 5.3 s margin - while the
+                               # pool was crowded and adaptive_prefill_throttle was evicting a resident model mid-request
+                               # (BUG-803). The budget was failed by RESIDENCY, not by the model. Return to 60 when a
+                               # pre-turn eviction policy exists AND the bill is re-measured on an uncrowded pool.
+                               # MEASURED consequences at 60 s, routing UNCHANGED: the loop is the 4B;
                                # at 180 s gpt-oss-20b becomes usable (26214/210 = 125 s); no budget
                                # makes Qwen3.8-27B one (26214/39 = 672 s)
     trigger:
@@ -135,6 +140,13 @@ ratified:
       max_compactions_per_session: 1
       min_headroom_tokens: 2048
       strategy: declared_handoff_first    # declared_handoff_over_in_place_compaction (above)
+  binding:                       # T-132/D-3003: a declaration that is not in the environment is a comment.
+                                 # The executor is a SIBLING of the knobs it binds and is named by them, so the
+                                 # declaration cannot drift from the thing that executes it.
+    script: pipeline/harness_env.py
+    state: 'BOUND-BY-SCRIPT - the values under knobs are read from this file at run time and never restated (C12)'
+    owner_command: 'eval "$(python3 pipeline/harness_env.py --print)"'
+    ladder: 'python3 pipeline/harness_env.py --check -> 0 every name bound, 2 OWNER-OWED, 1 fatal on CONFLICT'
   revisit_when: 'the block cache is PROVEN (F6/BUG-792): with a proven cache growth is nearly free and the
                  threshold may rise toward the window; until then every rise buys prefill seconds per turn'
 
@@ -402,6 +414,7 @@ candidates_20261015b:
   why_a_successor: >-
     MEASURED/READ 2026-10-15 (governance/MARKET_RESEARCH_20261015.md, the delegation-axis census). The earlier block
     is NOT deleted or reformatted: it stays the record of what was known then (C12/D-2642).
+  CORRECTED_20261015b: 'THE PREMISE OF THE BLOCK BELOW WAS FALSE, MEASURED 2026-10-15. Four of its five entries are not parked - their HuggingFace hub repos are ABSENT, so the _unloaded symlinks are BROKEN and the BYTES ARE GONE. gemma-4-26B-A4B-it-OptiQ-4bit and Qwen3.6-35B-A3B-4bit each need a FRESH DOWNLOAD (~14-16 GB each), which is exactly why both returned NA in the T-131 bench RUN: the model could not load because it does not exist (BUG-808). Only Phi-4-mini-instruct-8bit still resolves, and it is served from models_stashed. Treat the block below as a historical claim, not as availability.'
   already_on_disk_needs_no_download:
     gemma-4-26B-A4B-it-OptiQ-4bit: {where: '~/.omlx/_unloaded/', note: 'the previous session recommended this download; MEASURED 2026-10-15 it is ALREADY here, parked - the open item was the SLOT, not the download'}
     Qwen3.6-35B-A3B-4bit: {where: '~/.omlx/_unloaded/', shape: A3B}

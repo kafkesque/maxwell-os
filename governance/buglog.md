@@ -8,13 +8,13 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1128 decisions (census stamp 309f8cf9a7f9a898, 2026-10-15) · 569 bugs (209 open / 360 closed; highest OPEN = BUG-806) · 28 open tasks (MUST 8 / SHOULD 17 / WORTH 3; OWNER-moved 5, pipeline-moved 23; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1128 decisions (census stamp 309f8cf9a7f9a898, 2026-10-15) · 573 bugs (213 open / 360 closed; highest OPEN = BUG-810) · 30 open tasks (MUST 8 / SHOULD 19 / WORTH 3; OWNER-moved 7, pipeline-moved 23; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **68** of 1128 — 🔴 open 32 · 🔵 proposed 15 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 565 · ⚖ ratified 135 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1128, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 209 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 31 · 🟨 MED 49 · 🟩 LOW 24 · UNLABELLED 101 (BUG-757) of 209 open.
+> Open BUGS by severity (population = the census's 213 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 32 · 🟨 MED 52 · 🟩 LOW 24 · UNLABELLED 101 (BUG-757) of 213 open.
 >
-> **OWNER LANE (5) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
+> **OWNER LANE (7) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
@@ -23,6 +23,8 @@
 > | T-132 | 🟠 SHOULD | THE HARNESS CONTEXT CONTRACT — the four layers between a local model's served window and the words an agent se | THE MEASUREMENT ANSWERED THE FIRST QUESTION AND NARROWED THE SECOND, A |
 > | T-133 | 🟠 SHOULD | THE INTAKE FRONT-END - an interest-based daily queue of PROPOSALS, owner-gated, that never writes the store | the DAILY REPORT is the owner gate; nothing enters the pipeline withou |
 > | T-134 | 🟠 SHOULD | THE ENGINE'S SURVIVAL AND ITS VERSION - a boot agent (BUG-802), the residency lever (BUG-803), and the oMLX ve | the owner runs the installer (dry run first). The residency policy and |
+> | T-135 | 🟠 SHOULD | BIND the harness context contract - adopt the executor so the ratified knobs are in the environment, not in a  | the OWNER adopts the binding in the shell that starts the harness; the |
+> | T-136 | 🟠 SHOULD | THE STORE CENSUS AND THE RECLAIM PROPOSAL - decide what leaves the disk, and stop treating a parked symlink as | the OWNER decides what leaves the disk; the census only proposes and p |
 >
 > **PIPELINE LANE (23) — what the agent will do next, in strategic-consequential order (source: config/task_register.yaml):**
 >
@@ -14135,3 +14137,91 @@ gemma-4-26B-A4B-it-OptiQ-4bit is not among them - it sits in ~/.omlx/_unloaded/ 
 returned an ERROR OBJECT, and "the server did not echo prompt_tokens" is my instrument's label for it, not the
 server's own explanation. The lesson generalises: an NA verdict must quote the RAW response body, or a refusal of
 mine is indistinguishable from a refusal of the engine's.
+
+## BUG-807 (MED - OPEN 2026-10-15) - a single-instant store census reported 85 GB as reclaimable mass, and the first draft then narrated a cause it never observed
+
+**MEASURED.** A `du` of the engine's own store read **85 GB** of content-addressed `.safetensors`
+(16 shard directories, ~300 files each, dated Oct 6-10). Twenty minutes later the same store read
+**0 B** with a different structure (`vision_features`, `_gdn_sidecars`). Disk free moved 134 Gi ->
+217 Gi. The first draft of `pipeline/model_store_census.py` wrote the causal claim **"the engine
+released it"** into its own docstring. That was **FALSE**: the owner cleaned the cache by hand
+(owner, 2026-10-15 14:54). The instrument invented a cause.
+
+**WHY IT MATTERS.** This is the third instance of one class in one day: BUG-803 (a prefill reading
+without its pool residency), BUG-805 (a decode figure without its context length), BUG-807 (a byte
+count without the time it was taken at). In each case the READING looked authoritative and the
+MISSING COVARIATE decided the conclusion.
+
+**REMEDY (applied).** `measure_twice()` measures every store twice in one run and flags `transient`
+when it moves by more than 5%; a transient store may never be offered as an owner decision; and the
+census now states only what it observed. **No cause is narrated.**
+
+## BUG-808 (HIGH - OPEN 2026-10-15) - five of six engine-parked entries are BROKEN symlinks, so a model that does not exist reads as "on disk"
+
+**MEASURED.** `~/.omlx/_unloaded/` holds six entries; `test -e` is false for **five** of them, and
+the HuggingFace hub repos they point at are **ABSENT**:
+
+| entry | target repo | state |
+|---|---|---|
+| `DeepSeek-R1-0528-Qwen3-8B-MLX-4bit` | `lmstudio-community/DeepSeek-R1-0528-Qwen3-8B-MLX-4bit` | ABSENT |
+| `Qwen3.6-35B-A3B-4bit` | `mlx-community/Qwen3.6-35B-A3B-4bit` | ABSENT |
+| `Qwopus-GLM-18B` | `KyleHessling1/Qwopus-GLM-18B-Healed-MLX-4bit` | ABSENT |
+| `gemma-4-26B-A4B-it-OptiQ-4bit` | `mlx-community/gemma-4-26B-A4B-it-OptiQ-4bit` | ABSENT |
+| `gemma-4-E2B-it-MLX-4bit` | `lmstudio-community/gemma-4-E2B-it-MLX-4bit` | ABSENT |
+| `Phi-4-mini-instruct-8bit` | `mlx-community/Phi-4-mini-instruct-8bit` | present (and served from `models_stashed`) |
+
+**WHY IT MATTERS.** `du -sh` reported **0 B** for every one of these entries, which BUG-804 already
+explained as "a symlink into the hub". The 0 B did not mean *parked*; for five of them it meant
+**gone**. An instruction landed yesterday read "move `gemma-4-26B-A4B-it-OptiQ-4bit` out of
+`_unloaded/` - it requires NO download". **It requires a fresh download of ~14-16 GB.** The addendum
+to BUG-806 said the model "sits in `_unloaded/`": the *symlink* sits there, the model does not.
+
+**ALSO EXPLAINS THE BENCH.** Both NA rows of the T-131 RUN (`gemma-4-26B-A4B-it-OptiQ-4bit`,
+`Qwen3.6-35B-A3B-4bit`) were NA because **the model could not load** - it is not on disk. The earlier
+hypothesis ("the server returned an error object") was an inference about the *server*; the cause was
+the *store*. Two rows that looked like a server defect were a store fact.
+
+**REMEDY (applied).** `broken_entries()` tests each engine entry with `Path.exists()` and reports
+`BROKEN entries` in the census, in the JSON receipt and on stdout. The general rule is D-3004.
+
+## BUG-809 (MED - OPEN 2026-10-15) - delegated research was not durable: six of seven delegate runs were cancelled mid-flight and their findings were lost
+
+**MEASURED.** Seven research delegates were launched; **six were cancelled** ("cancelled before it
+finished and will not run again") and one reported `failed: max turns reached` after delivering its
+report. The cancels arrived attached to the owner's next message: **a new user message interrupts the
+turn and the harness cancels every in-flight child of that session.** The six cancelled runs had done
+real work (web fetches, API reads); because their deliverable was their **return value**, that work
+evaporated. **No file was written and no task was implemented for two consecutive attempts.**
+
+**WHY IT MATTERS.** The standing rule says to delegate to save tokens and to parallelise. That advice
+is only safe if a delegate's output survives interruption. It did not.
+
+**REMEDY (rule, applied from now on).** (1) A research delegate's FIRST action is to create its
+report file and **append** findings as it goes, so a cancel leaves a partial receipt instead of
+nothing. (2) Its chat answer is a <= 15-line summary naming the file. (3) A delegate is never the only
+copy of a fact that matters: the load-bearing numbers are re-measured by the parent before landing.
+(4) Work that must be implemented is never sequenced *behind* a delegate.
+
+## BUG-810 (MED - OPEN 2026-10-15) - a YAML insert that re-parents a mapping passes every parse check and is caught only by the consumer
+
+**MEASURED, in this session's own landing.** A `binding:` block was inserted immediately after the
+parent key `knobs:` in `config/agent_context.yaml`, at the SAME indent as `knobs`. In YAML a blank or
+comment line does not dedent, so the two children that followed at the child indent
+(`per_turn_budget_s`, `trigger`) were **re-parented under `binding`** and `knobs` became **null**.
+
+`yaml.safe_load` returned successfully - the document was perfectly valid YAML. The landing script's
+guard therefore reported `yaml ok`, and the corruption was found only because a later reader asked
+for `ratified.knobs.trigger` and got `TypeError: 'NoneType' object is not subscriptable`. Any consumer
+of that home would have crashed: `pipeline/harness_env.py`, `pipeline/harness_contract.py`, the bench
+preflight's budget source, and the S/O binding table.
+
+**WHY IT MATTERS.** Every insert into a YAML home in this repo is validated by *parsing*. Parsing
+proves syntax, never **shape**. A re-parented mapping is syntactically flawless and semantically
+catastrophic, and it fails at the READER, at a later time, in a different process.
+
+**REMEDY (rule, applied).** (1) An insert that adds a sibling mapping goes **after the parent's last
+child**, never between a parent key and its children. (2) After any structural insert into a YAML
+home, the landing runs that home's **CONSUMER** controls in the same act - for this home
+`python3 pipeline/harness_env.py --selftest` and `python3 pipeline/harness_contract.py --check` -
+because only a consumer can see a re-parenting. (3) A shape assertion (the expected key path must
+resolve) is stronger than an equality check on bytes and is what the landing must assert.

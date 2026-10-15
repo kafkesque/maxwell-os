@@ -143,3 +143,31 @@ the noise filter is a **two-sided control**. A filter that drops 5% of alpha to 
 *decision the owner must be shown*, so the curator publishes its own precision/recall on a frozen golden
 set, and **an item it drops is still COUNTED and REVERSIBLE** — a dropped item that can never be seen is
 an invisible failure (the BUG-787 shape, in the intake).
+
+## CORRECTIONS AND ADDITIONS (MEASURED 2026-10-15, later the same day)
+
+**SUPERSEDES the candidate table's download figures and the two rows named below. Read this before the tables above.**
+
+| item | claim that was wrong | MEASURED now | verdict change |
+|---|---|---|---|
+| `empero-ai/Qwen3.8-35B-A3B-Distill` | a 997,686-download A3B worth a slot | **7,813 downloads**, 76 likes, **71.93 GB repo**, no official MLX quant | **REFUSE** — the size is beyond the guard at any usable quant, and the popularity figure was not reproducible |
+| `prism-ml/Ternary-Bonsai-2-27B-mlx-2bit` | the best decode-per-byte download, needs a quality gate | the card states the pack *"declares `model_type: prism_hadamard_qwen35` and requires the loader bundled in `runtime/`"* and *"Ordinary MLX loaders skip the activation transform and the inverse embedding lookup"*, i.e. it needs the `PrismML-Eng/mlx` **fork** | **REFUSE** — oMLX runs stock `mlx-lm`; 8.6 GB that cannot load is worth 0 GB |
+| `ornith-ai/Ornith-1.5-35B-A3B-MLX-4bit` | a 19.51 GB A3B candidate | no license is declared on the repo (`cardData.license` is null) | **WATCH** — an undeclared license is no grant (C2/C4), so it cannot be promoted without one |
+| `google/embeddinggemma-2` | window 262,144, then window 8K | `config.json` exposes no `max_position_embeddings`; the two figures conflict and neither is verified | **UNVERIFIED** — and unchanged in substance: any embedder swap invalidates every stored vector |
+| `LiquidAI/LFM2.5-24B-A2B` | watch 30 days, released 2026-10-12 | 352 likes, license `other` (non-OSI), repo modified 2026-10-13 | **WATCH** — hold the 30 days; a non-OSI license is a declared question before a slot |
+
+**NEW candidates this sweep did not carry (evidence is the HF API, and quality is UNVERIFIED for both):**
+
+- `Edge0/Edge0-35B-A3B-preview` — 19,738 MB of weights, 57,485 downloads, **3,582 likes** in three weeks, apache-2.0, `model_type: qwen3_5_moe`. The strongest community signal of any candidate found, and it is an A3B. Its format/loader compatibility with oMLX is **UNVERIFIED** — check before downloading.
+- `openbmb/MiniCPM5-2B-MLX` — 1,426 MB, **554,313 downloads**, apache-2.0, `llama` architecture, hidden 2048, 42 layers, **context 131,072**, already in MLX format. The cheapest candidate on the list by an order of magnitude; the plausible use is a probe/classifier slot, not a generator.
+
+### THE ONE STORE MEASUREMENT THAT REPLACES THE EARLIER DELETION LIST
+
+`pipeline/model_store_census.py --json-out governance/model_store_census_20261015.json` (MEASURED 2026-10-15, two readings per store, symlinks resolved):
+
+- **LIVE 7 repos / 74,261.2 MB** served — including `Phi-4-mini-instruct-8bit` (served from `models_stashed`) and `lmstudio-community/Qwen3.8-27B-MLX-4bit`, which is a **real 15 GB directory** in the serving path, not a symlink.
+- **DECLARED 26 repos / 59,755.8 MB** — named by a live config, pipeline or script file. Not deletable.
+- **ORPHAN 19 repos / 18,056.8 MB** — the only defensible deletion proposal: `facebook/bart-large-mnli` 6,932 MB, `mlx-community/Qwen2.5-7B-Instruct-4bit` 4,296 MB, `ynie/roberta-large-snli_mnli_fever_anli_R1_R2_R3-nli` 4,274 MB, `roberta-large-mnli` 1,428 MB, `cross-encoder/nli-deberta-v3-small` 579 MB, plus six sub-100 MB legacy encoders.
+- **BROKEN engine entries** — five of six `_unloaded` names point at hub repos that are **ABSENT** (`DeepSeek-R1-0528`, `Qwen3.6-35B-A3B-4bit`, `Qwopus-GLM-18B`, `gemma-4-26B-A4B-it-OptiQ-4bit`, `gemma-4-E2B-it-MLX-4bit`). An entry that reads as "on disk" is not on disk (BUG-808).
+- A **4.0 GB stale hub copy** of `Qwen3.8-27B` exists beside the 15 GB directory the engine actually serves.
+- The engine's own store (`~/.omlx/cache`) read **0 B with no movement** in this run, because **the OWNER cleaned ~83 GB** of it (disk free 134 Gi -> 217 Gi). An earlier draft of the census reported that 85 GB as reclaimable mass and wrote a *cause* into the record which was false (BUG-807).

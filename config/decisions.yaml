@@ -24677,3 +24677,18 @@ decisions:
     changes) against a local install at 0.7.0 with cache.enabled=false. Star counts and release tags could NOT be
     re-read for 48 repos (GitHub core API rate limit, unauthenticated): those columns are ABSENT, not negative.'
   files: '[config/agent_context.yaml, config/bench_preflight.yaml, pipeline/com.maxwell.omlx-engine.plist, pipeline/install_omlx_engine_agent.sh, pipeline/engine_boot_report.py]'
+
+- id: D-3003
+  date: '2026-10-15'
+  state: PROPOSED
+  by: assistant
+  category: HARNESS / CONTEXT CONTRACT
+  bugs: '[BUG-797]'
+  decision: '(1) A CONTRACT IS BOUND, NOT DECLARED. A ratified knob that is not present in the environment is a COMMENT, so the declaration must be executable: ONE script reads the values from their one home and execs the child with them, restating none of them (C12). (2) THE READING IS TRI-STATE: BOUND, UNBOUND (owner-owed, because an absent variable means the harness silently uses its own default) and CONFLICT (fatal - an environment that contradicts the declaration is drift and hiding it is worse than failing, C16). (3) A CONFLICTING VALUE IS NEVER SILENTLY OVERRIDDEN. (4) The binding names ITSELF in the declaration it reads, so the declaration cannot drift from its executor.'
+- id: D-3004
+  date: '2026-10-15'
+  state: PROPOSED
+  by: assistant
+  category: STORE / INTEGRITY
+  bugs: '[BUG-804, BUG-807, BUG-808]'
+  decision: '(1) A STORE IS MEASURED TWICE and flagged TRANSIENT when it moves, so a single instant may never be reported as reclaimable mass (an 85 GB reading was cleaned by the owner within the hour, BUG-807). (2) AN ENGINE ENTRY WHOSE TARGET IS ABSENT IS REPORTED BROKEN, never as a model that is on disk: a parked symlink is a NAME, not a model (BUG-808). (3) A DELETION CANDIDATE MAY COME ONLY FROM THE ORPHAN CLASS - a store that no serving, parked or stashed entry resolves to AND that no live file under config, pipeline or scripts names - and it is executed only through pipeline/safe_delete.py (R-D410). (4) A CENSUS NARRATES NOTHING IT DID NOT OBSERVE: no cause may be written into a record that the instrument did not measure.'

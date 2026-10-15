@@ -153,6 +153,9 @@ guards:
   # an env that CONTRADICTS the declaration reads CONFLICT, and the module restates no declared value (C12) - proved
   # by reading its own bytes. A control nothing runs is a comment (BUG-492).
   pipeline/harness_contract.py --check: tri_state
+  pipeline/harness_env.py --selftest: fatal
+  pipeline/harness_env.py --check: tri_state
+  pipeline/model_store_census.py: tri_state
   # T-132: the contract's ONE reading - 0 the RUNNING env is bound | 2 OWNER-OWED (declared but not exported, so the
   # harness silently uses its own cloud price-tier defaults) | 1 FATAL (an env contradicts the declaration: a drift,
   # not a default). 2 is loud and NOT fatal, by the BUG-457 convention.

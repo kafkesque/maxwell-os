@@ -1,0 +1,13 @@
+{
+ "applied": true,
+ "files": {
+  "config/agent_context.yaml": "candidates_20261015b premise CORRECTED (the bytes are absent, not parked)",
+  "config/decisions.yaml": "appended 1693 bytes",
+  "config/rail_registry.yaml": "three rail lines added (binding + census)",
+  "config/task_register.yaml": "ANCHOR ABSENT - T-134 evidence corrected (the A4B/a-b rows are not free to preflight)",
+  "governance/MARKET_RESEARCH_20261015.md": "appended 3984 bytes",
+  "governance/buglog.md": "appended 4673 bytes",
+  "governance/session_plan_20260924.yaml": "appended 965 bytes",
+  "justfile": "three ladder lines added"
+ }
+}

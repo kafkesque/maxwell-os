@@ -901,3 +901,20 @@ tasks:
     pipeline/engine_boot_report.py is the ladder reading (MEASURED 2026-10-15: engine UP, template in repo, job not loaded, so rc 2 owner-owed).'
   gate: the owner runs the installer (dry run first). The residency policy and the upstream version check are owed before ANY
     candidate engine (Magnitude / TensorFold) is admitted to a prefill slot (D-3002).
+
+- id: T-135
+  priority: SHOULD
+  state: open
+  mover: owner
+  title: "BIND the harness context contract - adopt the executor so the ratified knobs are in the environment, not in a comment"
+  source: D-3003; T-132; pipeline/harness_env.py; pipeline/harness_contract.py; config/agent_context.yaml#ratified.binding
+  gate: 'the OWNER adopts the binding in the shell that starts the harness; the ladder is already tri-state, so the act is one command'
+  evidence: 'MEASURED 2026-10-15 - pipeline/harness_env.py --selftest 7/7 and --exec proved the CHILD process receives all three GOOSE_* names, while --check still reads all three UNBOUND (rc 2) because the harness is started outside that exec'
+- id: T-136
+  priority: SHOULD
+  state: open
+  mover: owner
+  title: "THE STORE CENSUS AND THE RECLAIM PROPOSAL - decide what leaves the disk, and stop treating a parked symlink as a model"
+  source: BUG-804; BUG-807; BUG-808; D-3004; pipeline/model_store_census.py; governance/model_store_census_20261015.json
+  gate: 'the OWNER decides what leaves the disk; the census only proposes and pipeline/safe_delete.py is the only deleter (R-D410)'
+  evidence: 'MEASURED 2026-10-15 - ORPHAN 19 repos / 18056.8 MB; LIVE 7 / 74261.2 MB; DECLARED 26 / 59755.8 MB; five of six _unloaded entries are BROKEN because their hub repos are ABSENT; a 4.0 GB stale hub copy of Qwen3.8-27B sits beside the 15 GB directory the engine actually serves'

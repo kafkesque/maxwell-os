@@ -2,8 +2,8 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 569,
-  "open_n": 209,
+  "total_ids": 573,
+  "open_n": 213,
   "closed_n": 360,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
@@ -1051,6 +1051,26 @@
     {
       "id": "BUG-806",
       "title": "(LOW - OPEN 2026-10-15) - my bench wrote its receipt only on the SUCCESS path, so the two REFUSALS were not persisted",
+      "events": 1
+    },
+    {
+      "id": "BUG-807",
+      "title": "(MED - OPEN 2026-10-15) - a single-instant store census reported 85 GB as reclaimable mass, and the first draft then narrated a cause it nev",
+      "events": 1
+    },
+    {
+      "id": "BUG-808",
+      "title": "(HIGH - OPEN 2026-10-15) - five of six engine-parked entries are BROKEN symlinks, so a model that does not exist reads as \"on disk\"",
+      "events": 1
+    },
+    {
+      "id": "BUG-809",
+      "title": "(MED - OPEN 2026-10-15) - delegated research was not durable: six of seven delegate runs were cancelled mid-flight and their findings were l",
+      "events": 1
+    },
+    {
+      "id": "BUG-810",
+      "title": "(MED - OPEN 2026-10-15) - a YAML insert that re-parents a mapping passes every parse check and is caught only by the consumer",
       "events": 1
     }
   ],

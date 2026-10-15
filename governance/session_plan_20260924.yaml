@@ -71,6 +71,12 @@ may_touch:
 - pipeline/install_omlx_engine_agent.sh
 - pipeline/engine_boot_report.py
 - governance/land_receipt_20261015b.json
+- governance/ENGINE_VERDICT_20261015.md
+- governance/INTAKE_MECHANICS_20261015.md
+- governance/model_store_census_20261015.json
+- pipeline/harness_env.py
+- pipeline/model_store_census.py
+- governance/land_receipt_20261015c.json
 - governance/frontier_pack_*
 - governance/anchor4_domain_*
 - governance/ANCHOR4_DOMAIN_*
@@ -1092,3 +1098,11 @@ widening_log:
     surfaces only, never a glob (BUG-548/BUG-563).
   owner_ack: 'the owner asked for the research and the update; NO engine was installed, NO model was downloaded
     or deleted, NO launchd job was loaded, NO routing row was re-pointed and NO source was scraped.'
+
+
+# widening_log
+- date: 2026-10-15
+  actor: assistant
+  reason: 'the owner asked for four clarifications (engine swap vs borrow; which models to download or delete; the intake mechanism; T-132). Answering them required evidence, so the engine table came from oMLX upstream (tiered KV cache, fused kernels, one-click bench, one-click harness setup), the model facts from the HF API, the intake facts from the Miniflux/FreshRSS/Inoreader/Telegram/Podcast-2.0 docs, and the store facts from pipeline/model_store_census.py. Two corrections were landed where the false claim stood (the candidates_20261015b premise; T-134 evidence) and three defects were filed (BUG-807/808/809). New NAMED surfaces only, never a glob.'
+  may_touch_untouched: false
+  owner_ack: 'NO engine was installed, NO model was downloaded, NO model was deleted, NO launchd job was loaded, NO routing row was re-pointed. The owner cleaned ~83 GB of the engine cache by hand, which this file records as the OWNER cause it was.'

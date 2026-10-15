@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1161 decisions (census stamp 118ef597a2298fa9, 2026-10-16) · 603 bugs (223 open / 380 closed; highest OPEN = BUG-836) · 46 open tasks (MUST 13 / SHOULD 28 / WORTH 4; OWNER-moved 11, pipeline-moved 35; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1161 decisions (census stamp 118ef597a2298fa9, 2026-10-16) · 604 bugs (224 open / 380 closed; highest OPEN = BUG-840) · 46 open tasks (MUST 13 / SHOULD 28 / WORTH 4; OWNER-moved 11, pipeline-moved 35; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **80** of 1161 — 🔴 open 32 · 🔵 proposed 27 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 576 · ⚖ ratified 145 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1161, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 223 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 34 · 🟨 MED 60 · 🟩 LOW 24 · UNLABELLED 101 (BUG-757) of 223 open.
+> Open BUGS by severity (population = the census's 224 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 34 · 🟨 MED 61 · 🟩 LOW 24 · UNLABELLED 101 (BUG-757) of 224 open.
 >
 > **OWNER LANE (11) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -15258,3 +15258,41 @@ repairs. Measured after - `check_governance_faces.py --selftest` 46/46 and the l
 **THE CLASS, KEPT.** A reader that infers "this is a claim about THIS repository" from a path-shaped substring will
 meet a home-relative path eventually; the durable fix is T-157's - CENSUS the harness homes a decision names, so an
 out-of-repo home is a DECLARED join instead of an inference from prose.
+
+## BUG-840 (MED - OPEN 2026-10-16) - the DECLARED class is a MENTION INDEX, so a GOVERNANCE WRITE reclassified 267.9 MB with no byte moving
+
+**MEASURED 2026-10-16, twice, in the same session.** `classify()` decides DECLARED by asking whether a repo's stem
+or its last path segment appears ANYWHERE in the joined text of config/, pipeline/ and scripts/. At 01:01 the census
+read **ORPHAN 6 repo(s) / 267.9 MB**, whose only member with bytes was a 267.8 MB encoder. Minutes later, after this
+session's own landing wrote that repo's stem into T-136's evidence in `config/task_register.yaml`, the SAME census
+read **ORPHAN 5 repo(s) / 0.0 MB, DECLARED 21 / 56700.7 MB**. Nothing left the disk. Verified rather than asserted -
+the only new occurrence of the stem under the reference roots is the added evidence line, and the pre-existing
+mentions in config/decisions.yaml name a DIFFERENT, superseded stem.
+
+**WHY IT MATTERS, IN BOTH DIRECTIONS.** Write a repo's name into the register and it LEAVES the candidate class;
+delete or rename the mention and it ENTERS it. The first direction is fail-safe for a deletion, and it is how a
+record protects a dependency by accident. The second is the hazard, and T-130 is the standing example - a
+corpus-name RENAME touching roughly eighty references per stem. So the class an owner is shown as "declared" is not
+a resolution, and any count taken from it is invalidated by the next prose edit: the D-2941 corollary firing on the
+instrument's own INPUTS.
+
+**THIS IS NOT THE DOMAIN DEFECT (BUG-838) AGAIN.** BUG-838 was WHAT may be counted, and it is fixed - the partition
+now has a declared domain, so the hub's own machinery can never be a member. BUG-840 is HOW membership of DECLARED
+is decided, and it is still a substring test. D-3018 already ruled the remedy for a SWEEP ("the byte-owner test is
+RESOLUTION, not MENTION"); that ruling now has to reach the CLASSIFIER that feeds the sweep, because a sweep can
+only be as honest as the classes it is handed.
+
+**NOT FIXED HERE, AND SAID SO.** The resolution test is T-142's gate, which already asks for exactly it - "re-run
+the census with a RESOLUTION test (does a served entry, config value or script resolve into these bytes?) and report
+per repo: resolution, bytes, re-acquirability". Leaving the class as a text index while T-142 lands is a DECLARED
+limit rather than a silent one: this entry is the declaration.
+
+## BUG-840 - EFFECT (MEASURED, and the record CORRECTED rather than edited)
+
+This landing's own prose quotes "ORPHAN 6 repo(s) / 267.9 MB". That was a true reading at 01:01 and it does NOT
+reproduce at HEAD: the correct current reading is **ORPHAN 5 repo(s) / 0.0 MB, DECLARED 21 / 56700.7 MB, owner-owed
+0** - a smaller candidate set than the fix was built on, and smaller for the wrong reason. The prose is deliberately
+NOT edited to restore the earlier number: editing a record so a bucket flips back is the same disease wearing the
+opposite coat, and it would leave no trace. The reading, its cause and this correction are in the log instead. The
+floor verdict is unaffected either way - every candidate was and remains at or below 256 MiB, so T-136's owner lane
+was empty before this reclassification and is empty after it.

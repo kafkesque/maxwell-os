@@ -330,6 +330,16 @@ may_touch:
 - governance/eval_models.txt
 - governance/DELETION_RECEIPT_20261015.json
 - governance/PARALLEL_EXECUTION_DOCTRINE_20261015.md
+# NAMED grants added 2026-10-15 by temp/land_20261015g.py (D-3018 sweep + D-3017 harness
+# routing + the Zed verdict): each one earned by the decision named in that doc.
+- governance/NLI_ANCESTOR_VERDICT_20261015.md
+- governance/DELETION_RECEIPT_20261015b.json
+- governance/model_store_census_20261015b.json
+- temp/land_20261015g.py
+- temp/land_20261015h.py
+- temp/fanout_20261015h.yaml
+- temp/mint_20261015h.yaml
+- temp/mint_20261015g.yaml
 will_not_touch:
 - governance/F11_*
 - governance/ANCHOR_RULER_CONSOLIDATED_*.csv

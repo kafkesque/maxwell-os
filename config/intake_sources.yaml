@@ -31,27 +31,27 @@ mechanics:
   api:        {how: "a first-party API with a key", auth: api_key}
 
 sources:
-  - class: video          {mechanic: account, auth: oauth, fetch: "YouTube Data API v3 subscriptions.list?mine=true", item_id: videoId, text_path: description, transcript: native}
-  - class: video          {mechanic: rss, auth: none, fetch: "https://www.youtube.com/feeds/videos.xml?channel_id=ID", item_id: yt:videoId, text_path: description, transcript: native}
-  - class: video          {mechanic: rss, auth: none, fetch: "https://www.youtube.com/feeds/videos.xml?playlist_id=ID", item_id: yt:videoId, text_path: description, transcript: native}
-  - class: microblog      {mechanic: api, auth: api_key, fetch: "X.com API v2 (paid tier) OR an RSSHub route", item_id: tweet id, text_path: page, transcript: none, status: UNVERIFIED}
-  - class: channel        {mechanic: bot_api, auth: bot_token, fetch: "Telegram Bot API updates", item_id: chat_id:message_id, text_path: message text, transcript: none, limit: "a bot cannot read the owner's subscriptions - this is a deliberate collector, not a follow-list"}
-  - class: channel        {mechanic: user_api, auth: user_session, fetch: "TDLib/MTProto dialog list, or an offline export", item_id: chat_id:message_id, text_path: message text, transcript: none}
-  - class: newsletter     {mechanic: rss, auth: none, fetch: "Substack/Medium /feed or /feed.xml per publication", item_id: guid, text_path: content:encoded, transcript: none}
-  - class: newsletter     {mechanic: api, auth: api_key, fetch: "Inoreader reader/api/0/subscription/list (OPML round-trips)", item_id: item id, text_path: content, transcript: none}
-  - class: newsletter     {mechanic: api, auth: api_key, fetch: "FreshRSS reader/api/0/subscription/list + stream/contents", item_id: item id, text_path: content, transcript: none}
-  - class: mail           {mechanic: api, auth: api_key, fetch: "IMAP to a dedicated folder (the newsletter vault)", item_id: Message-ID, text_path: text/html part, transcript: none}
-  - class: article        {mechanic: rss, auth: none, fetch: "any publisher feed", item_id: guid|link, text_path: content, transcript: none}
-  - class: article        {mechanic: page, auth: none, fetch: "changedetection.io watch on a feedless page", item_id: url + content hash, text_path: page, transcript: none}
-  - class: audio          {mechanic: rss, auth: none, fetch: "podcast feed; Podcast 2.0 podcast:transcript when the publisher provides it", item_id: guid, text_path: transcript, transcript: "native|asr"}
-  - class: research       {mechanic: api, auth: none, fetch: "arXiv API / Crossref / PubMed", item_id: DOI|arXiv id, text_path: abstract, transcript: none}
-  - class: discussion     {mechanic: rss, auth: none, fetch: "Reddit .rss or a subreddit feed", item_id: t3 id, text_path: selftext, transcript: none}
-  - class: discussion     {mechanic: api, auth: none, fetch: "Hacker News API / Algolia search", item_id: objectID, text_path: text|url, transcript: none}
-  - class: code           {mechanic: api, auth: none, fetch: "GitHub releases/commits/README via API or .atom", item_id: sha|release id, text_path: body, transcript: none}
-  - class: social         {mechanic: api, auth: api_key, fetch: "Bluesky AT Protocol / Mastodon client API", item_id: uri, text_path: record.text, transcript: none}
-  - class: chat           {mechanic: bot_api, auth: bot_token, fetch: "Discord bot in the servers the bot joined", item_id: channel+message id, text_path: content, transcript: none}
-  - class: saved          {mechanic: page, auth: none, fetch: "browser bookmarks export; Kindle/Zotero exports", item_id: url|doi, text_path: page, transcript: none}
-  - class: report         {mechanic: page, auth: none, fetch: "company/think-tank report PDFs (markitdown)", item_id: url, text_path: extracted text, transcript: none}
+  - {class: video, mechanic: account, auth: oauth, fetch: "YouTube Data API v3 subscriptions.list?mine=true", item_id: videoId, text_path: description, transcript: native}
+  - {class: video, mechanic: rss, auth: none, fetch: "https://www.youtube.com/feeds/videos.xml?channel_id=ID", item_id: yt:videoId, text_path: description, transcript: native}
+  - {class: video, mechanic: rss, auth: none, fetch: "https://www.youtube.com/feeds/videos.xml?playlist_id=ID", item_id: yt:videoId, text_path: description, transcript: native}
+  - {class: microblog, mechanic: api, auth: api_key, fetch: "X.com API v2 (paid tier) OR an RSSHub route", item_id: tweet id, text_path: page, transcript: none, status: UNVERIFIED}
+  - {class: channel, mechanic: bot_api, auth: bot_token, fetch: "Telegram Bot API updates", item_id: chat_id:message_id, text_path: message text, transcript: none, limit: "a bot cannot read the owner's subscriptions - this is a deliberate collector, not a follow-list"}
+  - {class: channel, mechanic: user_api, auth: user_session, fetch: "TDLib/MTProto dialog list, or an offline export", item_id: chat_id:message_id, text_path: message text, transcript: none}
+  - {class: newsletter, mechanic: rss, auth: none, fetch: "Substack/Medium /feed or /feed.xml per publication", item_id: guid, text_path: content:encoded, transcript: none}
+  - {class: newsletter, mechanic: api, auth: api_key, fetch: "Inoreader reader/api/0/subscription/list (OPML round-trips)", item_id: item id, text_path: content, transcript: none}
+  - {class: newsletter, mechanic: api, auth: api_key, fetch: "FreshRSS reader/api/0/subscription/list + stream/contents", item_id: item id, text_path: content, transcript: none}
+  - {class: mail, mechanic: api, auth: api_key, fetch: "IMAP to a dedicated folder (the newsletter vault)", item_id: Message-ID, text_path: text/html part, transcript: none}
+  - {class: article, mechanic: rss, auth: none, fetch: "any publisher feed", item_id: guid|link, text_path: content, transcript: none}
+  - {class: article, mechanic: page, auth: none, fetch: "changedetection.io watch on a feedless page", item_id: url + content hash, text_path: page, transcript: none}
+  - {class: audio, mechanic: rss, auth: none, fetch: "podcast feed; Podcast 2.0 podcast:transcript when the publisher provides it", item_id: guid, text_path: transcript, transcript: "native|asr"}
+  - {class: research, mechanic: api, auth: none, fetch: "arXiv API / Crossref / PubMed", item_id: DOI|arXiv id, text_path: abstract, transcript: none}
+  - {class: discussion, mechanic: rss, auth: none, fetch: "Reddit .rss or a subreddit feed", item_id: t3 id, text_path: selftext, transcript: none}
+  - {class: discussion, mechanic: api, auth: none, fetch: "Hacker News API / Algolia search", item_id: objectID, text_path: text|url, transcript: none}
+  - {class: code, mechanic: api, auth: none, fetch: "GitHub releases/commits/README via API or .atom", item_id: sha|release id, text_path: body, transcript: none}
+  - {class: social, mechanic: api, auth: api_key, fetch: "Bluesky AT Protocol / Mastodon client API", item_id: uri, text_path: record.text, transcript: none}
+  - {class: chat, mechanic: bot_api, auth: bot_token, fetch: "Discord bot in the servers the bot joined", item_id: channel+message id, text_path: content, transcript: none}
+  - {class: saved, mechanic: page, auth: none, fetch: "browser bookmarks export; Kindle/Zotero exports", item_id: url|doi, text_path: page, transcript: none}
+  - {class: report, mechanic: page, auth: none, fetch: "company/think-tank report PDFs (markitdown)", item_id: url, text_path: extracted text, transcript: none}
 
 # ADDING A SOURCE - the whole procedure:
 #   1. pick the mechanic (if none fits, the mechanic list is the thing to extend, not the curator);

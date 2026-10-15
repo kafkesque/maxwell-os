@@ -45,9 +45,31 @@ harnesses:
     copilot:   {display: "Copilot CLI",      installed: false}
     dsh:       {display: "DeepSeek Harness", installed: false}
 
+# JOB -> HARNESS (D-3017). A harness is deployed for a NAMED JOB CLASS, never for a mood, and the
+# class names are the ones config/agent_context.yaml#classes already declares. The measured cost of
+# an invocation decides: goose one-shot 0.4 s, pi 28.2 s, claude 104.7 s (2026-10-15). A class with
+# harness: null says the harness LOSES for that class - the pipeline or goose already wins it.
+  jobs:
+    agent_loop:       # a loop with a human watching it
+      harness: pi
+      fallback: claude
+      why: 'the only class a harness wins: 28.2 s/invocation (pi) against a loop the owner is in'
+    agent_probe:      # single-question delegation
+      harness: null
+      why: 'pipeline/oneshot_ask.py answers in 0.4 s; a harness is 70x-260x that for the same answer'
+    pipeline_batch:   # unattended
+      harness: null
+      why: 'the pipeline calls the model directly and a harness holds no governed pen (D-3016)'
+
+
 # Fetching is pipeline/hf_fetch_model.py: resumable, verified, receipted.
 hf:
   download_workers: 4        # keeps the engine's own decode traffic viable while bytes land
+  lock_dir: /Users/barn/.cache/huggingface/hub/.maxwell_locks   # T-141/D-3015: ONE fetch per repo
+  lock_suffix: .lock
+  # BUG-814: two .incomplete blobs for ONE target hash are two attempts at one blob and no tool
+  # can assemble them. pipeline/hf_fetch_model.py refuses while they exist and needs the flag.
+  duplicate_fragments: refuse
 
 # Fan-out: many small sub-tasks, one serial pool (D-3005). The cap is declared here because the resource
 # it protects is the ENGINE's, not the orchestrator's. An instrument that finds this block missing must
@@ -57,6 +79,23 @@ fanout:
   default_max_tokens: 512
   excerpt_bytes: 24000
   verify_with_another_family: true     # R5: the verifier may never be the generator
+  guards:                              # D-3020 (BUG-809): a delegation that cannot finish must SAY SO
+    default_timeout_s: 120             # measured oneshot: 0.4-17 s, so 120 s is 7x the slowest ever seen
+    agent_timeout_s: 600               # `goose run -t` holds tools; the only mode that earns minutes
+    deadline_s: 900                    # the whole run, retries included: the parent never blocks past it
+    stall_s: 45                        # silence this long is REPORTED (a slow model is not a failure)
+    kill_on_stall: false               # ...so silence alone never kills; declare it per task if wanted
+    max_attempts: 2
+    retry_on: [EMPTY, FAILED, TIMEOUT, STALLED]
+    fallback_model: gemma-4-E4B-it-MLX-4bit   # a retry may never repeat the model that failed (R5)
+    min_answer_chars: 80
+
+# The STORE's deletion rule (D-3018). Below this floor the DECISION costs more attention than the
+# bytes, and the floor is 2x the largest model a live code DEFAULT resolves into
+# (BAAI/bge-small-en-v1.5, 128 MiB), so no mention-based sweep may reach one.
+model_store:
+  deletion_floor_bytes: 268435456    # 256 MiB
+
 
 # Download decisions are made by pipeline/model_loadability_probe.py, never by download counts.
 candidates:

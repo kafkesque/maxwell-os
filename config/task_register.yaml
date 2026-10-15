@@ -1019,3 +1019,139 @@ tasks:
   gate: 'pipeline: add a resource_class per fan-out task (ENGINE_POOL capped at engine.fanout.max_parallel, CPU_IO capped
     at cores, WRITE strictly serial) and make the planner REFUSE a task whose class is not declared. Proof: a six-task
     plan where the three ENGINE_POOL tasks serialize and the CPU_IO tasks run wide.'
+- id: T-144
+  priority: SHOULD
+  state: open
+  mover: owner
+  title: 'ROUTE THE FIRST HARNESS JOB: name the class, deploy pi or claude through
+    config/engine.yaml#harnesses.jobs, and receipt which harness ran'
+  source: D-3017; config/engine.yaml#harnesses.jobs; pipeline/harness_env.py --job
+  evidence: 'MEASURED 2026-10-15: claude and pi are installed and headless; a goose
+    one-shot costs 0.4 s while pi costs 28.2 s and claude 104.7 s per invocation,
+    and config/agent_context.yaml#routing routes only gemma-4-E4B-it-MLX-4bit for
+    agent_loop at the declared 60 s budget. The reader exists; the first NAMED job
+    does not.'
+  gate: 'OWNER: name the job class and the file set (the routing, the reader and the
+    two installed harnesses are in place; D-3017). Then: eval "$(python3 pipeline/harness_env.py
+    --print)", python3 pipeline/harness_env.py --job <class>, omlx launch pi.'
+- id: T-145
+  priority: SHOULD
+  state: open
+  mover: owner
+  title: 'EDGE0 IS DEFERRED WITH A NAMED TRIGGER, not fetched: the class is already
+    served and the role is blocked on measurement, not bytes'
+  source: D-3018; governance/NLI_ANCESTOR_VERDICT_20261015.md; Edge0/Edge0-35B-A3B-preview
+    (HF API)
+  evidence: 'MEASURED 2026-10-15 from the HF API: apache-2.0, 3,582 likes, 57,485
+    downloads, tags mlx+safetensors+qwen3_5_moe, base_model Qwen/Qwen3.6-35B-A3B,
+    4-bit affine group_size 64 with 8-bit gates - the model_type the engine ALREADY
+    serves as Ornith-1.5-35B-A3B-OptiQ-4bit-REAP-19B. Its config.json nests the model
+    under language_model.*, so loadability of that key SHAPE is unverified. Pool ceiling
+    52.7 GB, 8 declared models.'
+  gate: 'OWNER: say ''fetch Edge0'' to override, or leave it deferred until T-137
+    pins the agent_loop model / BUG-805 re-measures decode at class context size.
+    The download lock (T-141) is now in place, so a single fetch is safe.'
+- id: T-146
+  priority: COULD
+  state: open
+  mover: owner
+  title: 'ZED AS THE REVIEW SURFACE: put the CLI on PATH and open the evidence at
+    the exact line after a batch'
+  source: D-3019; governance/NLI_ANCESTOR_VERDICT_20261015.md#Zed; /Applications/Zed.app
+  evidence: 'MEASURED 2026-10-15: Zed 1.9.0 is installed and its CLI --help lists
+    path opening, --wait, --add, --new, --existing, --foreground and NO headless task
+    mode; the CLI is not on PATH (no ~/.local/bin/zed). The repo carries AGENTS.md
+    (7,396 B) as the agent-instruction home. Zed''s own application store measured
+    14 GB (governance/buglog.md:3323).'
+  gate: 'pipeline: ln -s /Applications/Zed.app/Contents/MacOS/cli ~/.local/bin/zed
+    (owner action, no supply chain), then zed <path>:<line>. Recorded as a REVIEW
+    surface only - Zed has no headless mode, so nothing is delegated to it (D-3019).
+    Owed evidence: whether Zed reads AGENTS.md, and whether its agent panel can host
+    pi or claude.'
+- id: T-147
+  priority: MUST
+  state: open
+  mover: pipeline
+  title: 'WIRE THE STORE CENSUS TO EVERY DELETION BATCH: it is a generated face, and
+    it lies the moment bytes move without a re-measure'
+  source: D-3018; pipeline/model_store_census.py; governance/model_store_census_20261015.json
+  evidence: 'MEASURED 2026-10-15: the census IS generated (pipeline/model_store_census.py:
+    dir_bytes, measure_twice, classify) yet it is run BY HAND, so the 18.90 GiB deleted
+    today left a dated face describing bytes that are gone - the BUG-819 class, one
+    day after BUG-819 was filed.'
+  gate: 'pipeline: make the deletion procedure run pipeline/model_store_census.py
+    after the bytes are gone, and fail the batch if the census did not move. Same
+    class as BUG-819 (a face that says measured and is stale).'
+- id: T-148
+  priority: SHOULD
+  state: open
+  mover: pipeline
+  title: 'ONE WRITER FOR THE CENSUS: the mint lives in temp/ while the census declares
+    the writer in scripts/, so agreement depends on run ORDER'
+  source: 'BUG-821b; config/derivations.yaml (decisions_summary home: scripts/recompute_decision_summary.py::recompute);
+    temp/mut_recompute.py'
+  evidence: 'MEASURED 2026-10-15 while minting D-3017..D-3019 through the mint path:
+    the mint rewrote config/decisions_summary.json with written_by=temp/mut_recompute.py
+    while config/derivations.yaml declares scripts/recompute_decision_summary.py,
+    and --check then reported one drift - the other tool. Running the declared writer
+    LAST cleared it, so the census agrees only because this session happened to end
+    in that order. Each tool reports exactly one drift (the other) and neither is
+    wrong, which is why the drift is invisible from inside either one.'
+  gate: 'pipeline: make the declared writer the ONLY writer - move the mint into scripts/
+    (or have the temp/ tool delegate its census write to the declared writer) so --check
+    cannot be a false witness depending on which ran last. Do NOT simply re-declare
+    written_by: the declaration in config/derivations.yaml is the one the rails read.'
+- id: T-149
+  priority: MUST
+  state: open
+  mover: pipeline
+  title: 'CALL THE TWO GUARDS THAT ALREADY EXIST, IN PREFLIGHT: the duplicate-key
+    checker and the delegation doctor'
+  source: BUG-822 (16 duplicate scopes in config/engine.yaml that every parse check
+    passed) + the delegation guards (D-3020)
+  evidence: 'python3 scripts/check_config_duplicate_keys.py  # exists since BUG-730,
+    found the live defect in one second and was not in just preflight; python3 pipeline/subagent_fanout.py
+    doctor  # 8/8 on 2026-10-15'
+  gate: 'pipeline: add both commands to `just preflight`; the gate is that preflight
+    FAILS when a config loses a key to a duplicate or the delegation guards cannot
+    decide (an instrument that is never called is not a guard)'
+- id: T-150
+  priority: MUST
+  state: open
+  mover: pipeline
+  title: 'THE DURABLE PATH IS THE DELEGATION PATH (D-3020): anything whose failure
+    is not free goes through pipeline/subagent_fanout.py run'
+  source: BUG-809 (six of seven delegates cancelled, then two more on 2026-10-15)
+    + BUG-824
+  evidence: 'temp/runs/fanout_20261015i/98_receipt.json - 3/3 DONE with one task deliberately
+    given a 1 s budget: reaped at 2.2 s, retried on a different model, both attempts
+    in the receipt'
+  gate: 'pipeline: an in-process harness subagent is allowed only for a task whose
+    loss costs nothing; every load-bearing delegation leaves temp/runs/<id>/98_receipt.json
+    and a doctor run precedes it'
+- id: T-151
+  priority: MUST
+  state: open
+  mover: pipeline
+  title: 'THE CENSUS FACE MUST BE THE INSTRUMENT''S OUTPUT: governance/model_store_census_20261015.json
+    did not move across a 14.83 GiB deletion'
+  source: BUG-819 (a hand-cut face that drifted) + BUG-825 (the batch exited 0 while
+    the face stood still)
+  evidence: git show HEAD:governance/model_store_census_20261015.json is byte-identical
+    to the working copy (hub_bytes 0.15 GiB, buckets DECLARED 26 / LIVE 7 / ORPHAN
+    19) although the census printed a hub total of 124837.5 MB after the sweep
+  gate: 'pipeline: pipeline/model_store_census.py writes the face it prints, and the
+    sweep''s own movement check (temp/land_20261015g.py#phase_b) turns green because
+    the artifact moves, not because the check was relaxed'
+- id: T-152
+  priority: SHOULD
+  state: open
+  mover: pipeline
+  title: 'A DECLARATION WITH NO READER CANNOT FAIL LOUDLY: wire config/intake_sources.yaml
+    into the intake front-end or mark it proposal-only'
+  source: BUG-823 (the file did not parse and nothing read it, so nothing could complain)
+  evidence: grep -rn intake_sources over pipeline/, scripts/, tools/ and justfile
+    returns no consumer; the file now parses after the flow-mapping repair
+  gate: 'pipeline: either a reader exists that loads it at boot (and the parse is
+    then gated), or the file carries an explicit proposal-only marker so a future
+    reader does not mistake it for a contract'

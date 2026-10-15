@@ -24820,7 +24820,7 @@ decisions:
     repointed to the classifier-of-record. (5) Each deletion carries the task that would notice it went wrong:
     T-141 for downloads, T-142 for the declared-by-mention bucket.
 - id: D-3014
-  state: PROPOSED
+  state: RATIFIED
   date: '2026-10-15'
   category: STORE / HYGIENE
   title: 'A MODEL KEPT ONLY TO LOSE A RECORDED COMPARISON IS DELETABLE; A DATASET IS NOT A MODEL AND IS NEVER SWEPT WITH MODEL BYTES'
@@ -24853,7 +24853,7 @@ decisions:
     (4) Verification is a SEQUENCE, never a parallel peer: the verifier runs after the generator and from a
     different family (R5).
 - id: D-3016
-  state: PROPOSED
+  state: RATIFIED
   date: '2026-10-15'
   category: AGENT / HARNESS POLICY
   title: 'A HARNESS IS AN ENGINE-WIRED CLIENT, INSTALLED ON DEMAND: omlx wires, it does not download; the owner is the installer, and a cloud harness is excluded by C3'
@@ -24869,3 +24869,169 @@ decisions:
     lists live DeepSeek API models) and is therefore NOT the local deepseek harness: using it breaks C3/C22 and it is
     excluded from pipeline work. (4) A harness writes PROPOSALS into temp/ and holds no governed pen; one interactive
     harness at a time on the pool; its output is a claim, never a verification (L4 constraints, D-3011).
+- id: D-3017
+  state: RATIFIED
+  date: '2026-10-15'
+  category: AGENT / HARNESS DEPLOYMENT
+  bugs:
+  - BUG-815
+  files:
+  - config/engine.yaml
+  - pipeline/harness_env.py
+  - config/agent_context.yaml
+  - governance/NLI_ANCESTOR_VERDICT_20261015.md
+  measured: 'BUG-815 is the failure this closes: a headless agent run was not bound to the local engine and went
+    elsewhere. Measured 2026-10-15, per invocation: goose one-shot 0.4 s, pi 28.2 s, claude 104.7 s - which is why
+    agent_loop earns a harness and the other two classes do not.'
+  title: 'A HARNESS IS DEPLOYED FOR A NAMED JOB CLASS, NEVER FOR A MOOD: pi and claude code are the two defaults,
+    goose deploys them, and a class that names no harness is saying the harness LOSES there'
+  decision: '(1) The owner''s standing word (2026-10-15): in future workflows, when a workflow is more effective
+    than goose, delegate that work to a harness and deploy pi or claude code. This amends D-3016 (which established
+    that omlx WIRES a harness and never installs one) by naming WHEN the deployment is earned. (2) The trigger is
+    a NAMED JOB CLASS, not a mood: the classes are the ones config/agent_context.yaml#classes already declares (agent_loop,
+    agent_probe, pipeline_batch), and the decision is written in config/engine.yaml #harnesses.jobs so it is read,
+    not remembered. Measured 2026-10-15: a goose one-shot costs 0.4 s, pi 28.2 s and claude 104.7 s per invocation.
+    Therefore agent_loop (a loop with a human inside it) earns a harness and agent_probe and pipeline_batch DO NOT:
+    70x-260x the cost for the same answer is not a speed-up, it is a regression with a nicer interface. (3) The
+    deploy path is two commands and a file, not a memory: eval "$(python3 pipeline/harness_env.py --print)" binds
+    the contract, pipeline/harness_env.py --job CLASS prints the harness this class earns plus the engine''s own
+    launch command read from config/engine.yaml #engine.launch_cli (C12), and the reader FAILS on an unknown class
+    rather than guessing (D-3015: a job that cannot decide says so and stops). (4) An install is the OWNER''s supply-chain
+    act and happens only for a named job (T-138); a harness writes PROPOSALS into temp/ and holds no governed pen
+    (D-3016). (5) A harness answer is a claim, never a verification: the verifier runs after it, from a different
+    family (R5).'
+- id: D-3018
+  state: RATIFIED
+  date: '2026-10-15'
+  category: STORE / DELETION
+  bugs:
+  - BUG-807
+  - BUG-814
+  files:
+  - governance/NLI_ANCESTOR_VERDICT_20261015.md
+  - pipeline/model_store_census.py
+  - config/engine.yaml
+  - pipeline/hf_fetch_model.py
+  - governance/DEBERTA_VERIFICATION_TEST_2026-08-09.md
+  measured: 'BUG-807 and BUG-814 are the failures this closes: a single-instant census reported 85 GB as reclaimable
+    mass, and one hub repo carried 4.0 GB of fragments no tool could assemble. Measured 2026-10-15: 8 hub repos
+    deleted, 18.90 GiB, 0 live references found by the resolution test, 6 live models protected (two of them reachable
+    only through a code DEFAULT).'
+  title: 'A SWEEP IS BY RESOLUTION, NOT BY MENTION, AND IT HAS A FLOOR: the census buckets are a text index, so
+    a live code DEFAULT is invisible to them'
+  decision: '(1) Owner word 2026-10-15: delete the Tier B NLI/embedder ancestors if they have no current or potential
+    future use better than the current model. Eight repos were deleted (18.90 GiB measured): bart-large-mnli, roberta-large-snli,
+    bge-m3-zeroshot-v2.0, roberta-large-mnli, ModernBERT-base-nli, bge-reranker-base, nli-deberta-v3-small, DeBERTa-v3-base.
+    Each is an ancestor of a decision ALREADY made and its measured verdict survives in governance/DEBERTA_VERIFICATION_TEST_2026-08-09.md
+    and in config/decisions.yaml - the receipt is the value, not the weights (D-3014). (2) THE RULE, earned by the
+    near-miss: a deletion proposes itself from a MENTION, and a mention test answers "is this string written down",
+    never "does anything resolve into these bytes". pipeline/model_store_census.py#declared_text() joins every text
+    file and classify() asks stem in refs, which is over-inclusive (it lists cross-encoder/ms-marco-MiniLM-L-6-v2
+    as an ORPHAN although pipeline/stage2_relabel_extraction_type.py:21 names ms-marco-MiniLM) and under-inclusive
+    (it cannot see BAAI/bge-small-en-v1.5, resolved by a DEFAULT in pipeline/stage1_5_fastembed.py, or answerdotai/ModernBERT-base,
+    resolved by BASE_MODEL_NAME in pipeline/student_classifier.py). A sweep that trusted the bucket would have deleted
+    the S1.5 alternative embedding backend and the student backbone, and nothing would have announced it until the
+    next pipeline run. So a deletion runs its OWN resolution test - every .py/.yaml/.json/.sh under pipeline, scripts,
+    config, agent searched for the repo''s stem - and REFUSES on any hit outside an audited mention list (comments,
+    a test script''s own inputs, the register). The sweep publishes the LIVE set it protected (governance/NLI_ANCESTOR_VERDICT_20261015.md)
+    so the next one starts from evidence instead of re-deriving it. (3) THE FLOOR: below config/engine.yaml#model_store
+    .deletion_floor_bytes (256 MiB) the DECISION costs more than the bytes, and the floor is set at 2x the largest
+    live-by-code-default encoder so no sweep may reach one. Four losers survive by the floor (distilbert-mnli 255
+    MiB, ms-marco-MiniLM 88 MiB, all-MiniLM-L6-v2 87 MiB, all-MiniLM-L6-v2-onnx 87 MiB): they survive the FLOOR,
+    not a claim of usefulness - and that distinction is the record. (4) A deletion states its COST: scripts/test_matryoshka_nli.py
+    cannot run offline until its two input models are fetched again. (5) Datasets are never swept with model bytes
+    (D-3014), and model weights are deleted directly with a receipt, never through pipeline/safe_delete.py, which
+    would copy them into a Dropbox-synced repo (D-3013, BUG-818c).'
+- id: D-3019
+  state: RATIFIED
+  date: '2026-10-15'
+  category: AGENT / TOOLING
+  bugs:
+  - BUG-721
+  files:
+  - governance/NLI_ANCESTOR_VERDICT_20261015.md
+  - config/engine.yaml
+  - AGENTS.md
+  measured: 'BUG-721 is the class this closes: a verdict with no reading behind it. Measured 2026-10-15: Zed 1.9.0
+    is installed and its CLI opens paths (--help read in full) and offers no headless task mode, so a task assigned
+    to Zed would be an assertion with no execution path.'
+  title: 'ZED IS A REVIEW SURFACE, NOT A DELEGATE TARGET: its CLI opens paths and has no headless mode, so no task
+    can be delegated into it'
+  decision: '(1) Measured 2026-10-15: Zed 1.9.0 is installed at /Applications/Zed.app and its CLI (Contents/MacOS/cli)
+    OPENS paths - zed path:line:column, --wait, --add, --new, --existing, --foreground - and offers no headless
+    task mode and no server. Zed therefore has no execution path for an assigned task and is EXCLUDED from the delegate
+    registry and from config/engine.yaml#harnesses.jobs: it is not an engine-wired client (D-3016), it holds no
+    model binding, and "delegate to Zed" would be a task with no runner. (2) What it IS worth, and the only reason
+    to install its CLI on PATH: the human REVIEW surface. After a batch, the evidence is opened where the owner
+    will do the interactive long-context edit (zed governance/NLI_ANCESTOR_VERDICT_20261015.md:1), which keeps the
+    review loop at the exact line rather than at a filename. (3) The install is one symlink and no supply chain:
+    ln -s /Applications/Zed.app/Contents/MacOS/cli ~/.local/bin/zed. (4) UNVERIFIED and recorded as owed, not asserted:
+    whether Zed reads this repo''s existing AGENTS.md as its rules home, and whether its agent panel can host one
+    of the two installed harnesses (D-3017) under the OWNER''s hand. Zed''s own store measured 14 GB (governance/buglog.md:3323)
+    - irrelevant to the model store, not free.'
+- id: D-3020
+  state: RATIFIED
+  category: DELEGATION / DURABILITY
+  title: 'A DELEGATION IS DURABLE BY CONSTRUCTION: it runs detached under a declared budget, its terminal word is
+    DERIVED from the answer it got, its silence is measured, it gets ONE retry by a DIFFERENT model, and every task
+    leaves a receipt'
+  bugs:
+  - BUG-809
+  - BUG-824
+  files:
+  - pipeline/subagent_fanout.py
+  - pipeline/research_run.py
+  - config/engine.yaml
+  - governance/PARALLEL_EXECUTION_DOCTRINE_20261015.md
+  decision: 'BUG-809 was filed twice: once as a rule ("write the report first, summarise in chat") and once again
+    as a failure, because a rule a human must remember is not a fix. BUG-824 then showed that the executor built
+    to enforce that rule told four lies of its own, the worst of them a FALSE SUCCESS. The rule is therefore moved
+    into the machinery, and it has five parts, each one a measured defect turned into a guard. (1) DETACHED, NEVER
+    A CHILD: a task runs in its own session and process group through pipeline/research_run.py, so no user message,
+    cancelled turn or compaction can reach it - the deliverable is a FILE, not a return value. (2) A DERIVED TERMINAL
+    WORD: the word DONE is computed by a grader that reads the answer file and the exit code; a failed oneshot can
+    no longer be recorded as success (BUG-824''s first lie, the BUG-817 class living inside the health instrument).
+    (3) BOUNDED BUDGETS, TIGHT BY DEFAULT: the owner''s rule is that a task which can be answered faster than the
+    old blanket 1800 s must BE budgeted faster, because a generous timeout is a stall nobody notices. Measured oneshots
+    answer in 0.4-17 s, so fanout.guards declares 120 s for a oneshot, 600 s for an agent loop, and a 900 s deadline
+    for the whole run including retries - and a task may declare a tighter budget of its own. A reaper (research_run
+    watch) enforces those budgets without anybody polling, which is the defect that produced "it seems stuck". (4)
+    SILENCE IS MEASURED, NOT ASSUMED: idle_s against a declared stall_s is published for every live task; only a
+    task that declares kill_on_stall is stopped on suspicion, because a slow model is not a failure, but an unreported
+    silence is. (5) ONE RETRY, BY A DIFFERENT MODEL: a task that ends EMPTY/FAILED/TIMEOUT/STALLED is re-asked once
+    on the declared fallback, and the retry REFUSES to use the model that just failed - a second attempt by the
+    same model duplicates the blindspot rather than testing it (R5 applied to delegation); a retry also drops the
+    per-task budget that proved insufficient. Every run writes temp/runs/<id>/98_receipt.json naming each task''s
+    state, its attempts and the model of each attempt, and its exit code is honest: 0 only when every task is DONE,
+    2 when work is still running at the deadline, 1 when a task failed. Preflight is `doctor`, which refuses to
+    start an unsound run (missing guards, an unserved model, a retry target that is the failing model, or a workstream
+    reading RUNNING with a dead process - a stuck ledger).
+
+    '
+- id: D-3021
+  state: RATIFIED
+  category: STORE / MEASUREMENT
+  title: 'A RECLAIM FIGURE IS THE DISK''S, NOT THE SUM OF MY FILE SIZES: a deletion is measured once per PHYSICAL
+    BLOCK, the receipt keeps the claim it corrects, and a batch FAILS if its census face did not move'
+  bugs:
+  - BUG-825
+  - BUG-807
+  files:
+  - governance/DELETION_RECEIPT_20261015b.json
+  - temp/land_20261015g.py
+  - config/engine.yaml
+  decision: 'BUG-825 measured two dishonesty defects in one receipt, both of them found by checking, not by reasoning.
+    FIRST, the space freed was computed by summing st_size over a recursive walk, which counts a hub blob and the
+    snapshot hardlink pointing at it as two files: the artifact claimed 30.66 GB while du -sk showed 14.83 GiB,
+    an overstatement of 2.07x, and the calibration on repos that still exist gives a factor of exactly 2.000. A
+    reclaim figure is a claim about the DISK, so it is now measured the way the disk measures: once per physical
+    block, keyed by (st_dev, st_ino), with du -sk before and after as the witness. SECOND, the batch read the census''s
+    exit code 2 (orphan proposals exist - a measurement) as a failure, printed a warning, and exited 0 while the
+    census face stayed byte-identical to HEAD across a 14.83 GiB deletion. A batch that deletes bytes without moving
+    the face that describes them may not report success, so the sweep now records the census total BEFORE it deletes
+    and RAISES unless the face moved afterwards (T-147). The original claim is kept inside the corrected receipt:
+    an artifact that hides what it used to say is worse than the one that was wrong, because the next reader cannot
+    tell whether the correction is complete. The same rule retires the BUG-807 class (a single-instant census reading
+    quoted as reclaimable space).
+
+    '

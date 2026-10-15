@@ -11,15 +11,24 @@ declared names from their one home (config/agent_context.yaml#ratified.knobs.tri
 for the CHILD process only, and execs. It never restates a declared value (C12): every value it
 exports is read at run time.
 
+D-3017 adds the other half of the same question: WHICH harness is earned by WHICH job. A harness
+costs 28.2 s (pi) or 104.7 s (claude) per invocation against 0.4 s for a goose one-shot, so the
+deployment is a decision with a home - config/engine.yaml#harnesses.jobs - and --job reads it and
+prints the two commands. An unknown class is FATAL: a job that cannot decide must say so and stop
+(D-3015).
+
 Usage:
   python3 pipeline/harness_env.py --print                  # the export lines, for a shell profile
   python3 pipeline/harness_env.py --check                  # BOUND / UNBOUND / CONFLICT in this shell
   python3 pipeline/harness_env.py --exec -- <cmd> [args]   # exec cmd with the contract bound
+  python3 pipeline/harness_env.py --jobs                   # every job class and the harness it earns
+  python3 pipeline/harness_env.py --job <class>            # that class, and the exact deploy commands
   python3 pipeline/harness_env.py --selftest               # controls; exit 1 on any failure
 
 Exit codes (BUG-457 tri-state): 0 = ok / every name bound; 2 = OWNER-OWED, names unbound so the
 harness may ignore the contract; 1 = fatal, because an environment value CONTRADICTS the
-declaration - that is drift and hiding it would be worse than failing.
+declaration - or because the job class asked for does not exist. That is drift, and hiding it
+would be worse than failing.
 """
 from __future__ import annotations
 
@@ -31,16 +40,108 @@ import sys
 import yaml
 
 CONFIG = pathlib.Path("config/agent_context.yaml")
+ENGINE = pathlib.Path("config/engine.yaml")
 TRIGGER = "trigger"
+CLASSES = "classes"
+JOBS = "jobs"
 ENV_SHAPED = re.compile(r"^[A-Z][A-Z0-9_]*$")
 RC_OK, RC_FATAL, RC_OWNER_OWED = 0, 1, 2
 
 
+def _home(path: pathlib.Path) -> dict:
+    """Load one declared home, FAILING on absence rather than proceeding on emptiness (C12/C16)."""
+    if not path.exists():
+        raise SystemExit(f"FATAL: {path} is absent - it is the one home for what this reads (C12)")
+    return yaml.safe_load(path.read_text()) or {}
+
+
 def declared() -> dict[str, str]:
     """The declared trigger names and their values, read from their one home, in declaration order."""
-    doc = yaml.safe_load(CONFIG.read_text())
+    doc = _home(CONFIG)
     trigger = doc["ratified"]["knobs"][TRIGGER]
     return {str(key): resolve(str(val)) for key, val in trigger.items() if ENV_SHAPED.match(str(key))}
+
+
+def declared_classes() -> list[str]:
+    """Every job class the harness contract declares, in declaration order."""
+    return list((_home(CONFIG).get(CLASSES) or {}).keys())
+
+
+def job_rows() -> dict[str, dict]:
+    """class -> the harness decision, read from config/engine.yaml#harnesses.jobs."""
+    return (_home(ENGINE).get("harnesses") or {}).get(JOBS) or {}
+
+
+def resolve_job(job: str) -> tuple[dict | None, list[str]]:
+    """Resolve one job class to its row. Returns (row, problems) - problems are never swallowed."""
+    classes = declared_classes()
+    rows = job_rows()
+    problems: list[str] = []
+    if not rows:
+        return None, ["config/engine.yaml declares no harnesses.jobs block - no class can decide"]
+    if job not in classes:
+        return None, [f"'{job}' is not a declared class (config/agent_context.yaml#classes declares "
+                      f"{classes}) - a job that cannot decide says so and stops (D-3015)"]
+    if job not in rows:
+        problems.append(f"'{job}' is declared as a class but has NO row in config/engine.yaml"
+                        f"#harnesses.jobs - an undeclared decision is the drift this reader exists to catch")
+        return None, problems
+    row = rows[job]
+    harness = row.get("harness")
+    if harness:
+        tools = (_home(ENGINE).get("harnesses") or {}).get("tools") or {}
+        if harness not in tools:
+            problems.append(f"{job}: names harness '{harness}', which engine.yaml#harnesses.tools does not list")
+        elif not tools[harness].get("installed"):
+            problems.append(f"{job}: '{harness}' is NOT installed on this machine - an install is the owner's "
+                            f"supply-chain act, done only for a named job (T-138)")
+    return row, problems
+
+
+def render(job: str) -> int:
+    """Print the harness this class earns and the exact commands, or FAIL on an unknown class."""
+    row, problems = resolve_job(job)
+    for problem in problems:
+        print(f"FATAL: {problem}")
+    if row is None or problems:
+        return RC_FATAL
+    harness = row.get("harness")
+    if not harness:
+        print(f"NO HARNESS for '{job}': {row.get('why', '(no reason declared)')}")
+        return RC_OK
+    launch = (_home(ENGINE).get("engine") or {}).get("launch_cli")
+    if not launch:
+        print("FATAL: config/engine.yaml declares no engine.launch_cli - refusing to invent a command (C12)")
+        return RC_FATAL
+    fallback = row.get("fallback")
+    print(f"HARNESS {job} -> {harness}" + (f" (fallback {fallback})" if fallback else ""))
+    print(f"  why: {row.get('why', '(no reason declared)')}")
+    print("  the two commands:")
+    print('    eval "$(python3 pipeline/harness_env.py --print)"')
+    print(f"    {launch} launch {harness}")
+    return RC_OK
+
+
+def report_jobs() -> int:
+    """Every class and its decision. A class with no row is FATAL - a gap, not a default."""
+    rows = job_rows()
+    classes = declared_classes()
+    worst = RC_OK
+    for job in classes:
+        row, problems = resolve_job(job)
+        if problems:
+            worst = RC_FATAL
+            for problem in problems:
+                print(f"FATAL: {problem}")
+            continue
+        harness = row.get("harness") if row else None
+        print("%-16s %s" % (job, harness or "none - " + str((row or {}).get("why", ""))[:70]))
+    for job in rows:
+        if job not in classes:
+            worst = RC_FATAL
+            print(f"FATAL: config/engine.yaml#harnesses.jobs routes '{job}', which is not a declared class "
+                  f"- a stale row, and a row for a class nobody declares can never be earned")
+    return worst
 
 
 def resolve(value: str) -> str:
@@ -150,6 +251,19 @@ def selftest() -> int:
     except SystemExit:
         checks.append(("an_unresolvable_pointer_is_FATAL", True))
 
+    # D-3017 controls: the job map must be complete, must not invent a class, and must FAIL closed.
+    classes, rows = declared_classes(), job_rows()
+    checks.append(("the_contract_declares_at_least_one_job_class", len(classes) >= 1))
+    checks.append(("every_declared_class_has_a_harness_decision_D3017", all(c in rows for c in classes)))
+    checks.append(("no_harness_row_names_an_undeclared_class", all(r in classes for r in rows)))
+    checks.append(("a_row_that_cannot_be_earned_is_FATAL",
+                   resolve_job("SELFTEST-NO-SUCH-CLASS")[0] is None))
+    checks.append(("a_row_naming_an_uninstalled_harness_is_CAUGHT",
+                   all(p for c in classes for p in resolve_job(c)[1] if "NOT installed" in p)
+                   or all(not (rows.get(c) or {}).get("harness") for c in classes)
+                   or all(((_home(ENGINE).get("harnesses") or {}).get("tools") or {})
+                          .get((rows.get(c) or {}).get("harness"), {}).get("installed") for c in classes)))
+
     for name, ok in checks:
         print("%-4s %s" % ("ok" if ok else "FAIL", name))
     print("selftest: %d/%d" % (sum(1 for _, ok in checks if ok), len(checks)))
@@ -157,13 +271,21 @@ def selftest() -> int:
 
 
 def main(argv: list[str]) -> int:
-    """Dispatch the four readings; an unknown flag is fatal rather than silently ignored (C16)."""
+    """Dispatch the readings; an unknown flag is fatal rather than silently ignored (C16)."""
     if "--selftest" in argv:
         return selftest()
     if "--print" in argv:
         return print_lines(declared())
     if "--check" in argv:
         return check()
+    if "--jobs" in argv:
+        return report_jobs()
+    if "--job" in argv:
+        rest = [a for a in argv[argv.index("--job") + 1:] if not a.startswith("--")]
+        if not rest:
+            print("FATAL: --job needs a class name (see --jobs)")
+            return RC_FATAL
+        return render(rest[0])
     if "--exec" in argv:
         rest = argv[argv.index("--exec") + 1:]
         if rest and rest[0] == "--":

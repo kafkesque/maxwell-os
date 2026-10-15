@@ -1,31 +1,40 @@
 #!/usr/bin/env python3
-"""Fan independent sub-tasks out to local models - the parallel-delegation executor.
+"""Fan independent sub-tasks out to local models - the DURABLE delegation executor (BUG-809).
 
-THE PROBLEM IT SOLVES
-    "Delegate in parallel to the most reliable local model" fails in two ways today: an in-session
-    subagent is cancelled by the next user message (BUG-809), and the ENGINE POOL is serial
-    (8 served / 46.88 GB / 55 GB guard, BUG-803), so more concurrency past a small cap makes the
-    whole machine slower and less repeatable. This executor therefore: partitions by ARTEFACT (each
-    task reads its own files and writes its OWN answer file), runs every task as a DETACHED
-    workstream through pipeline/research_run.py, and caps concurrency at engine.fanout.max_parallel.
+WHY THE OLD VERSION WAS NOT ENOUGH
+    It already ran tasks DETACHED (pipeline/research_run.py), but it had three ways to lie,
+    and all three were measured in this repo on 2026-10-15:
+      (1) A FALSE SUCCESS. Every task's command ended with `TERMINAL: DONE - oneshot rc=$?`, so a
+          oneshot that exited 1 (engine refused, no content) was recorded as DONE. That is BUG-817's
+          class - a failed answer read as a success - living inside the instrument that reports
+          delegation health. The terminal word is now DERIVED from the answer (_grade), never asserted.
+      (2) NO REAPER. `timeout_s` was only consulted when somebody happened to call status(). A run
+          nobody polled therefore stayed RUNNING forever: "it runs so long without any result, it
+          seems stuck". `run` now watches its own run to a declared deadline (research_run watch).
+      (3) NO LIVENESS. A hung child and a working child looked identical. Stalled is now measured
+          (idle_s against a declared stall_s) and published; only a task declared kill_on_stall is
+          killed on suspicion, but silence is never a secret.
+    On top of that: an empty/stub answer is retried ONCE on a DIFFERENT declared model (a second
+    attempt by the model that just failed adds no information), and every run writes a RECEIPT.
 
-WHAT A TASK IS (one question, one artefact, one file)
-    tasks:
+THE ONE ENTRY POINT (guarded, bounded, honest)
+    python3 pipeline/subagent_fanout.py doctor --tasks T.yaml     # preflight: refuse to start unsound
+    python3 pipeline/subagent_fanout.py run    --tasks T.yaml --run ID [--deadline S]
+    ... plan | start | status | retry | verify | _grade            # manual / forensic use
+
+WHAT A TASK IS (one question, one artefact, one file)  -  temp/runs/<run>/fan_<id>/
       - id: t1                       # a slug; the workstream name is fan_<id>
         model: gemma-4-E4B-it-MLX-4bit
         question: "Which function decides a workstream's state, and on which line?"
         files: [pipeline/research_run.py]
-        mode: oneshot                # oneshot = one deterministic curl (temp 0.0, no tools)
+        mode: oneshot                # oneshot = one deterministic call (temp 0.0, no tools)
                                      # agent   = goose run -t, which HAS tools (slower, less predictable)
         max_tokens: 400
-    Synthesis is NOT automatic: after every task is TERMINAL, --verify runs ONE extra cross-family
-    pass (R5) over the collected answers, so the generator is never its own checker.
+        timeout_s: 60                # OPTIONAL: this task's own budget (tighter than the mode default;
+                                     # a retry never inherits one that just proved insufficient)
 
-USAGE
-    python3 pipeline/subagent_fanout.py plan   --tasks TASKS.yaml --run ID
-    python3 pipeline/subagent_fanout.py start  --run ID
-    python3 pipeline/subagent_fanout.py status --run ID
-    python3 pipeline/subagent_fanout.py verify --run ID --model M --out SYNTH.md
+EXIT: 0 every task DONE | 1 a task FAILED/EMPTY after its attempts, or the config is unsound
+      | 2 tasks still RUNNING when the deadline was spent (owner-owed, never silently waited on)
 """
 from __future__ import annotations
 
@@ -40,11 +49,15 @@ import time
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 RUNS = ROOT / "temp" / "runs"
 RUNNER = ROOT / "pipeline" / "research_run.py"
+ASKER = ROOT / "pipeline" / "oneshot_ask.py"
 OK, FATAL, PENDING = 0, 1, 2
+STUB_PREFIX = "(no content returned"
+GUARDS_REQUIRED = ("default_timeout_s", "agent_timeout_s", "deadline_s", "stall_s", "kill_on_stall",
+                   "max_attempts", "retry_on", "fallback_model", "min_answer_chars")
 
 
 def conf() -> dict:
-    """The declared fan-out facts, or a FATAL.
+    """The declared engine facts, or a FATAL.
 
     A missing home is NOT a reason to fall back to a number this module likes: on 2026-10-15 this
     executor ran with its own hardcoded defaults because the declared block had never landed, and a
@@ -57,9 +70,135 @@ def conf() -> dict:
     return doc
 
 
+def guards() -> dict:
+    """The declared delegation guards, or a FATAL naming every missing key.
+
+    These are the numbers that decide whether a delegation can be trusted: its budget, its stall
+    threshold, whether silence is fatal, how many attempts it gets, on which model it retries, and
+    the smallest answer that counts as an answer. Inventing any one of them at runtime is the
+    BUG-817 defect, so a missing key stops the run instead of being filled in (C12/C16).
+    """
+    g = conf().get("fanout", {}).get("guards")
+    if not isinstance(g, dict):
+        raise SystemExit("FATAL: config/engine.yaml declares no fanout.guards block - a delegation "
+                         "without guards is the BUG-809 defect (C12)")
+    missing = [k for k in GUARDS_REQUIRED if k not in g]
+    if missing:
+        raise SystemExit(f"FATAL: config/engine.yaml#fanout.guards is incomplete, missing {missing} - "
+                         f"refusing to invent a delegation guard (C12)")
+    if int(g["min_answer_chars"]) <= 0:
+        raise SystemExit("FATAL: fanout.guards.min_answer_chars must be > 0 - a zero floor accepts an "
+                         "empty answer as an answer")
+    if int(g["stall_s"]) >= int(g["default_timeout_s"]):
+        raise SystemExit("FATAL: fanout.guards.stall_s must be BELOW default_timeout_s, or a silent child "
+                         "is reported for the first time at the moment it is killed - the guard would be dead")
+    return g
+
+
+def answer_verdict(path: pathlib.Path, min_chars: int) -> tuple[bool, str]:
+    """Did a usable answer actually arrive? One rule, one home (C12/C16).
+
+    The failure this exists for: an engine that returns HTTP 200 with no content, or the stub
+    oneshot_ask.py writes when it got nothing, must never be read as a deliverable.
+    """
+    if not path.exists():
+        return False, "no answer file"
+    text = path.read_text(errors="replace").strip()
+    if not text:
+        return False, "the answer is empty"
+    if text.startswith(STUB_PREFIX):
+        return False, "the model returned no content"
+    if len(text) < min_chars:
+        return False, f"the answer is {len(text)} chars, below the declared floor of {min_chars}"
+    return True, f"ok, {len(text)} chars"
+
+
+def grade(answer: pathlib.Path, rc: int, min_chars: int, report: pathlib.Path) -> int:
+    """Write the workstream's OWN terminal line from the evidence, never from an expectation.
+
+    This runs INSIDE the workstream (it is the last line of cmd.sh), so it is the only writer of the
+    terminal word. A non-zero rc with a real answer is still a partial result worth keeping, and it is
+    reported as FAILED with the answer on disk - the point is that the WORD may not be guessed.
+    """
+    ok, why = answer_verdict(answer, min_chars)
+    if ok and rc == 0:
+        word = "DONE"
+    elif "no content" in why or "empty" in why or "no answer file" in why:
+        word = "EMPTY"
+    else:
+        word = "FAILED"
+    line = f"TERMINAL: {word} - rc={rc}, {why}"
+    with open(report, "a") as fh:
+        fh.write(line + "\n")
+        fh.flush()
+    return 0 if word == "DONE" else 1
+
+
+def _rows(run_id: str) -> list[dict]:
+    """Every workstream's reconciled state, read from the runner that owns that state (one home)."""
+    proc = subprocess.run([sys.executable, str(RUNNER), "status", "--run", run_id, "--json"],
+                          capture_output=True, text=True, cwd=str(ROOT))
+    try:
+        return json.loads(proc.stdout or "[]")
+    except Exception:
+        print(f"FATAL: could not read the run state: {proc.stdout[:200]}{proc.stderr[:200]}")
+        return []
+
+
+def _watch(run_id: str, budget_s: int) -> int:
+    """Enforce the declared budgets for this run. Returns the runner's honest exit code."""
+    return subprocess.run([sys.executable, str(RUNNER), "watch", "--run", run_id,
+                           "--budget", str(int(budget_s))], cwd=str(ROOT)).returncode
+
+
+def _write_json(path: pathlib.Path, obj: dict) -> None:
+    """Crash-safe JSON write: tempfile -> fsync -> os.replace (C6)."""
+    import os
+    import tempfile
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fd, tmp = tempfile.mkstemp(dir=str(path.parent), prefix=".tmp_")
+    with os.fdopen(fd, "w") as fh:
+        json.dump(obj, fh, indent=1, sort_keys=True)
+        fh.flush()
+        os.fsync(fh.fileno())
+    os.replace(tmp, path)
+
+
+def _cmd_for(task: dict, wsd: str, g: dict, model: str) -> str:
+    """The exact bytes a workstream runs: the task, then the GRADER that decides its terminal word."""
+    lines = [f'echo "STEP 1: {model} starts" >> "$WS_REPORT"']
+    if str(task.get("mode", "oneshot")) == "agent":
+        lines.append('GOOSE=$(command -v goose || echo /Applications/Goose.app/Contents/Resources/bin/goose)')
+        lines.append('"$GOOSE" run -t "$(cat "$WS_DIR/00_prompt.txt")" > "$WS_DIR/20_answer.md" 2>&1')
+    else:
+        mt = int(task.get("max_tokens", conf().get("fanout", {}).get("default_max_tokens", 512)))
+        lines.append(f'python3 pipeline/oneshot_ask.py --model {model} --prompt-file "$WS_DIR/00_prompt.txt" '
+                     f'--max-tokens {mt} --out "$WS_DIR/20_answer.md" --json-out "$WS_DIR/21_meta.json" '
+                     f'>> "$WS_REPORT" 2>&1')
+    lines.append("RC=$?")
+    lines.append(f'python3 pipeline/subagent_fanout.py _grade --answer "$WS_DIR/20_answer.md" --rc "$RC" '
+                 f'--min-chars {int(g["min_answer_chars"])} --report "$WS_REPORT"')
+    return "\n".join(lines) + "\n"
+
+
+def _prompt_for(task: dict, cap: int) -> str:
+    """The question plus its evidence, with an explicit permission to say NO EVIDENCE."""
+    parts = [str(task.get("question", "")).strip()]
+    for f in task.get("files", []):
+        p = ROOT / f
+        if not p.exists():
+            parts.append(f"\n### {f}\n(file absent - say so, do not guess)")
+            continue
+        parts.append(f"\n### {f}\n{p.read_text(errors='replace')[:cap]}")
+    parts.append("\nAnswer in <=12 lines. Cite file:line where it helps. If the files do not "
+                 "contain the answer, say NO EVIDENCE rather than guessing.")
+    return "\n".join(parts)
+
+
 def plan(tasks_file: pathlib.Path, run_id: str) -> int:
-    """Validate a task file and write one command file per task (artefact-partitioned)."""
+    """Validate a task file and freeze one command + one prompt per task (artefact-partitioned)."""
     import yaml
+    g = guards()
     doc = yaml.safe_load(tasks_file.read_text()) or {}
     tasks = doc.get("tasks") or []
     if not tasks:
@@ -67,7 +206,7 @@ def plan(tasks_file: pathlib.Path, run_id: str) -> int:
         return FATAL
     cap = int(conf().get("fanout", {}).get("excerpt_bytes", 24000))
     subprocess.run([sys.executable, str(RUNNER), "new", "--run", run_id,
-                    "--brief-text", tasks_file.read_text()], check=True)
+                    "--brief-text", tasks_file.read_text()], check=True, cwd=str(ROOT))
     for t in tasks:
         wid = str(t["id"])
         # THE PREMISE GATE. A fan-out verifies ANSWERS; nothing in it verifies the PREMISE of a task.
@@ -85,65 +224,247 @@ def plan(tasks_file: pathlib.Path, run_id: str) -> int:
             print(f"premise ok: task {wid} expect={expect!r} found in {hit}")
         wsd = RUNS / run_id / f"fan_{wid}"
         wsd.mkdir(parents=True, exist_ok=True)
-        prompt = [str(t.get("question", "")).strip()]
-        for f in t.get("files", []):
-            p = ROOT / f
-            if not p.exists():
-                prompt.append(f"\n### {f}\n(file absent - say so, do not guess)")
-                continue
-            text = p.read_text(errors="replace")[:cap]
-            prompt.append(f"\n### {f}\n{text}")
-        prompt.append("\nAnswer in <=12 lines. Cite file:line where it helps. If the files do not "
-                      "contain the answer, say NO EVIDENCE rather than guessing.")
-        (wsd / "00_prompt.txt").write_text("\n".join(prompt))
-        if str(t.get("mode", "oneshot")) == "agent":
-            cmd = (f'GOOSE=$(command -v goose || echo /Applications/Goose.app/Contents/Resources/bin/goose)\n'
-                   f'"$GOOSE" run -t "$(cat "$WS_DIR/00_prompt.txt")" > "$WS_DIR/20_answer.md" 2>&1\n'
-                   f'echo "TERMINAL: DONE - agent task rc=$?" >> "$WS_REPORT"\n')
-        else:
-            mt = int(t.get("max_tokens", conf().get("fanout", {}).get("default_max_tokens", 512)))
-            cmd = (f'python3 pipeline/oneshot_ask.py --model {t["model"]} --prompt-file "$WS_DIR/00_prompt.txt" '
-                   f'--max-tokens {mt} --out "$WS_DIR/20_answer.md" --json-out "$WS_DIR/21_meta.json" '
-                   f'>> "$WS_REPORT" 2>&1\n'
-                   f'echo "TERMINAL: DONE - oneshot rc=$?" >> "$WS_REPORT"\n')
-        (wsd / "cmd.sh").write_text(cmd)
+        (wsd / "00_prompt.txt").write_text(_prompt_for(t, cap))
+        _write_json(wsd / "task.json", {"id": wid, "model": t["model"], "mode": str(t.get("mode", "oneshot")),
+                                        "max_tokens": t.get("max_tokens"), "attempt": 1,
+                                        "timeout_s": t.get("timeout_s"),
+                                        "retry_of": None, "question": str(t.get("question", ""))})
+        (wsd / "cmd.sh").write_text(_cmd_for(t, str(wsd), g, str(t["model"])))
     print(f"planned {len(tasks)} task(s) for run {run_id}")
     return OK
 
 
-def start(run_id: str) -> int:
-    """Start tasks with the DECLARED concurrency cap; the rest wait their turn."""
+def _timeout_for(task: dict, g: dict) -> int:
+    """The declared budget for THIS task's mode - a oneshot never inherits an agent's minutes.
+
+    The owner's rule (2026-10-15): if a task can be answered faster than the old blanket 1800 s, it
+    must be BUDGETED faster, because a generous timeout is a stall nobody notices. Measured oneshots
+    answer in 0.4-17 s, so the oneshot budget is 120 s - and a task that overruns it is reaped and
+    reported instead of being waited on.
+
+    A task may declare its own `timeout_s`, which is how a KNOWN-fast task is kept honest: expecting
+    a 6 s answer and killing at 120 s is 114 s of silence nobody reads.
+    """
+    own = task.get("timeout_s")
+    if own not in (None, ""):
+        if int(own) <= 0:
+            raise SystemExit(f"FATAL: task {task.get('id')!r} declares timeout_s={own!r} - a budget of zero "
+                             f"kills the task it was meant to bound")
+        return int(own)
+    return int(g["agent_timeout_s"]) if str(task.get("mode", "oneshot")) == "agent" else int(g["default_timeout_s"])
+
+
+def _start_one(run_id: str, wid: str, g: dict, task: dict, note: str = "") -> None:
+    """Launch one planned workstream with the DECLARED budget, stall threshold and kill policy."""
+    wsd = RUNS / run_id / f"fan_{wid}"
+    cmd = [sys.executable, str(RUNNER), "start", "--run", run_id, "--ws", f"fan_{wid}",
+           "--timeout", str(_timeout_for(task, g)), "--stall", str(int(g["stall_s"])),
+           "--cmd-file", str(wsd / "cmd.sh"), "--note", note]
+    if g.get("kill_on_stall"):
+        cmd.append("--kill-on-stall")
+    subprocess.run(cmd, check=True, cwd=str(ROOT))
+
+
+def _running(run_id: str) -> int:
+    """How many workstreams of this run are RUNNING right now (the pool cap is theirs)."""
+    return sum(1 for r in _rows(run_id) if r["state"] == "RUNNING")
+
+
+def start(run_id: str, watch: bool = True) -> int:
+    """Start tasks under the DECLARED cap, then hand the run to the reaper.
+
+    The reaper is what makes the declared budgets real for a run nobody is polling: a run that is
+    started and walked away from is the exact shape of the 2026-10-15 stall (BUG-809).
+    """
+    g = guards()
     cap = int(conf().get("fanout", {}).get("max_parallel", 3))
-    tasks = sorted([p for p in (RUNS / run_id).glob("fan_*") if p.is_dir()])
+    _rows(run_id)                       # reconcile before deciding what to launch
     started, waiting = 0, []
-    for t in tasks:
+    for t in sorted([p for p in (RUNS / run_id).glob("fan_*") if p.is_dir()]):
         state = {}
         sp = t / "state.json"
         if sp.exists():
-            state = json.loads(sp.read_text())
-        if state.get("state") in ("RUNNING", "DONE", "FAILED", "TIMEOUT"):
+            try:
+                state = json.loads(sp.read_text())
+            except Exception as exc:  # reported, never swallowed (C16)
+                print(f"FATAL: unreadable state for {t.name}: {type(exc).__name__}: {exc}")
+                return FATAL
+        if state.get("state") in ("RUNNING", "DONE", "FAILED", "TIMEOUT", "EMPTY", "STALLED"):
             continue
-        if started >= cap:
+        if _running(run_id) >= cap:
+            # The cap counts workstreams that are ALREADY RUNNING, and only those. Adding `started`
+            # on top double-books every launch in this loop and silently strands the last task in
+            # PENDING - measured live: 3 tasks, cap 3, started 2 (BUG-825).
             waiting.append(t.name)
             continue
-        subprocess.run([sys.executable, str(RUNNER), "start", "--run", run_id, "--ws", t.name,
-                        "--timeout", "900", "--cmd-file", str(t / "cmd.sh")], check=True)
+        meta = t / "task.json"
+        task = json.loads(meta.read_text()) if meta.exists() else {"mode": "oneshot"}
+        _start_one(run_id, t.name.removeprefix("fan_"), g, task)
         started += 1
+    print(f"started {started} (cap {cap})")
     if waiting:
-        print(f"started {started}; {len(waiting)} waiting on the declared cap of {cap}: {waiting}")
-        print("re-run 'start' after the running ones are terminal (the cap protects the pool)")
-    else:
-        print(f"started {started} (cap {cap})")
+        print(f"waiting on the declared cap of {cap}: {waiting} - retry/run will pick them up")
+    if watch:
+        budget = int(g["agent_timeout_s"]) + int(g["deadline_s"])
+        subprocess.Popen([sys.executable, str(RUNNER), "watch", "--run", run_id, "--budget", str(budget)],
+                         cwd=str(ROOT), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                         start_new_session=True)
+        print(f"reaper attached (budget {budget}s): timeouts and stalls are enforced without polling")
     return OK
+
+
+RETRYABLE = ("FAILED", "EMPTY", "TIMEOUT", "STALLED")
+
+
+def retry(run_id: str) -> int:
+    """One bounded retry pass: a failed task is re-asked ONCE on a DIFFERENT declared model.
+
+    Two rules make this a guard rather than a loop. (1) The retry model may not be the model that
+    just failed - a second identical attempt duplicates the blindspot that produced the failure
+    (R5's reasoning applied to delegation). (2) The attempt count is declared, so this can never
+    become an unbounded restart loop that burns the pool.
+    """
+    g = guards()
+    retry_on = set(g["retry_on"])
+    fallback = str(g["fallback_model"])
+    cap = int(conf().get("fanout", {}).get("max_parallel", 3))
+    launched = 0
+    for t in sorted([p for p in (RUNS / run_id).glob("fan_*") if p.is_dir()]):
+        if re.search(r"_r\d+$", t.name):
+            continue                                  # already a retry: attempts are declared
+        meta = t / "task.json"
+        if not meta.exists():
+            continue
+        try:
+            task = json.loads(meta.read_text())
+        except Exception as exc:
+            print(f"FATAL: unreadable task.json for {t.name}: {type(exc).__name__}: {exc}")
+            return 0
+        rows = {r["ws"]: r for r in _rows(run_id)}
+        state = rows.get(t.name, {}).get("state")
+        if state not in retry_on:
+            continue
+        if int(task.get("attempt", 1)) >= int(g["max_attempts"]):
+            print(f"retry: {task['id']} is {state} and has spent its {g['max_attempts']} attempt(s) - not retried")
+            continue
+        if fallback == task["model"]:
+            print(f"FATAL: the retry model for {task['id']} ({fallback}) IS the model that failed - "
+                  f"a second attempt by the same model adds no information (declare another fallback)")
+            return 0
+        if _running(run_id) >= cap:
+            print(f"retry: {task['id']} waits - the pool cap of {cap} is in use")
+            break
+        wid = f"{task['id']}_r2"
+        wsd = RUNS / run_id / f"fan_{wid}"
+        wsd.mkdir(parents=True, exist_ok=True)
+        (wsd / "00_prompt.txt").write_text((t / "00_prompt.txt").read_text())
+        retried = dict(task, model=fallback, attempt=int(task.get("attempt", 1)) + 1, retry_of=t.name)
+        # A retry does NOT inherit the per-task budget that just proved insufficient: re-asking the
+        # same question with the same impossible clock is a way to spend the pool twice and call it
+        # resilience. The attempt gets its mode's declared budget instead, and the relaxation is recorded.
+        relaxed = retried.pop("timeout_s", None)
+        retried["timeout_relaxed_from"] = relaxed
+        _write_json(wsd / "task.json", retried)
+        (wsd / "cmd.sh").write_text(_cmd_for(retried, str(wsd), g, fallback))
+        _start_one(run_id, wid, g, retried, note=f"retry of {t.name} after {state}")
+        print(f"retry: {task['id']} ({state}) re-asked on {fallback} as fan_{wid}")
+        launched += 1
+    return launched
+
+
+def task_state(attempts: list[dict]) -> str:
+    """A TASK's state, rolled up from its attempts: any usable answer makes it DONE.
+
+    Reporting per-WORKSTREAM instead of per-TASK reads as failure when the run actually succeeded:
+    the live proof printed "2/4 usable" for a run that answered all three questions, because the
+    retried task's first attempt (TIMEOUT) and second attempt (DONE) were counted as two tasks.
+    A receipt that under-reports success is as unusable as one that over-reports it.
+    """
+    if not attempts:
+        return "PENDING"
+    for a in attempts:
+        if a["answer_usable"]:
+            return "DONE"
+    return attempts[-1]["state"]
+
+
+def receipt(run_id: str) -> int:
+    """Write the run's receipt and return an honest exit code (never a green light on a failure)."""
+    rows = _rows(run_id)
+    if not rows:
+        print("FATAL: no workstreams in this run")
+        return FATAL
+    floor = int(guards()["min_answer_chars"])
+    by_id: dict[str, dict] = {}
+    for r in sorted(rows, key=lambda x: x["ws"]):
+        wsd = RUNS / run_id / r["ws"]
+        meta = {}
+        if (wsd / "task.json").exists():
+            try:
+                meta = json.loads((wsd / "task.json").read_text())
+            except Exception as exc:  # reported, never swallowed (C16)
+                print(f"warn: unreadable task.json for {r['ws']}: {type(exc).__name__}: {exc}")
+        ok, why = answer_verdict(wsd / "20_answer.md", floor)
+        tid = str(meta.get("id") or r["ws"])
+        entry = by_id.setdefault(tid, {"id": tid, "state": "PENDING", "attempts": []})
+        entry["attempts"].append({"ws": r["ws"], "state": r["state"], "model": meta.get("model"),
+                                  "attempt": meta.get("attempt", 1), "elapsed_s": r["elapsed_s"],
+                                  "idle_s": r.get("idle_s"), "terminal": r.get("terminal"),
+                                  "answer_usable": ok, "answer_note": why})
+    for entry in by_id.values():
+        entry["state"] = task_state(entry["attempts"])
+    tasks = [by_id[k] for k in sorted(by_id)]
+    counts: dict[str, int] = {}
+    for t in tasks:
+        counts[t["state"]] = counts.get(t["state"], 0) + 1
+    rec = {"run": run_id, "written_at": time.strftime("%Y-%m-%dT%H:%M:%S"), "tasks": tasks,
+           "counts": counts, "done": counts.get("DONE", 0), "total": len(tasks)}
+    _write_json(RUNS / run_id / "98_receipt.json", rec)
+    print(f"\nreceipt: temp/runs/{run_id}/98_receipt.json")
+    for t in tasks:
+        trail = " -> ".join(f"{a['state']}({a['model']})" for a in t["attempts"])
+        print(f"  {t['id']:<20} {t['state']:<8} {len(t['attempts'])} attempt(s): {trail}")
+    print(f"  {rec['done']}/{rec['total']} task(s) DONE")
+    if counts.get("RUNNING") or counts.get("PENDING"):
+        return PENDING
+    if rec["done"] < rec["total"]:
+        return FATAL
+    return OK
+
+
+def run_task_file(tasks_file: pathlib.Path, run_id: str, deadline_s: int | None) -> int:
+    """The guarded front door: plan -> start -> reap -> retry ONCE -> receipt. Bounded, always."""
+    g = guards()
+    deadline = int(deadline_s or g["deadline_s"])
+    rc = plan(tasks_file, run_id)
+    if rc != OK:
+        return rc
+    rc = start(run_id)
+    if rc != OK:
+        return rc
+    t0 = time.time()
+    _watch(run_id, deadline)
+    left = max(30, deadline - int(time.time() - t0))
+    # A task that waited on the pool cap has not had its turn yet: it is PENDING, not failed, and
+    # leaving it behind is the silent gap the cap fix exists for. Sweep, then reap again.
+    start(run_id, watch=False)
+    retry(run_id)
+    _watch(run_id, left)
+    return receipt(run_id)
 
 
 def verify(run_id: str, model: str, out: pathlib.Path) -> int:
     """Cross-family check of the collected answers (R5): the generator never checks itself."""
+    g = guards()
     answers = []
     for t in sorted((RUNS / run_id).glob("fan_*")):
         a = t / "20_answer.md"
-        if a.exists():
+        ok, why = answer_verdict(a, int(g["min_answer_chars"]))
+        if ok:
             answers.append(f"## {t.name}\n{a.read_text(errors='replace')[:4000]}")
+        elif a.exists():
+            answers.append(f"## {t.name}\n[UNUSABLE ANSWER - {why}; the verifier must not treat this as "
+                           f"a claim to check]")
     if not answers:
         print("FATAL: no answers to verify")
         return FATAL
@@ -153,29 +474,220 @@ def verify(run_id: str, model: str, out: pathlib.Path) -> int:
               "(task | verdict | one-line reason).\n\n" + "\n\n".join(answers))
     tmp = RUNS / run_id / "99_verify_prompt.txt"
     tmp.write_text(prompt)
-    rc = subprocess.run([sys.executable, str(ROOT / "pipeline" / "oneshot_ask.py"), "--model", model,
-                         "--prompt-file", str(tmp), "--max-tokens", "1200", "--out", str(out)],
-                        cwd=str(ROOT)).returncode
+    rc = subprocess.run([sys.executable, str(ASKER), "--model", model, "--prompt-file", str(tmp),
+                         "--max-tokens", "1200", "--out", str(out)], cwd=str(ROOT)).returncode
     print("verify: " + ("ok" if rc == 0 else "FAILED") + f" -> {out}")
     return rc
+
+
+def _served() -> set[str]:
+    """The ids the engine is actually serving right now (never a list copied by hand - BUG-819)."""
+    sys.path.insert(0, str(ROOT))
+    try:
+        import json as _json
+        import urllib.request
+
+        from pipeline.pipeline_paths import OMLX_API_KEY, OMLX_URL
+        req = urllib.request.Request(f"{OMLX_URL}/v1/models",
+                                     headers={"Authorization": f"Bearer {OMLX_API_KEY}"})
+        with urllib.request.urlopen(req, timeout=10) as fh:
+            return {m["id"] for m in _json.loads(fh.read().decode()).get("data", [])}
+    except Exception as exc:
+        print(f"  [FAIL] the engine could not be asked what it serves: {type(exc).__name__}: {exc}")
+        return set()
+
+
+def doctor(tasks_file: pathlib.Path | None = None) -> int:
+    """Preflight: refuse to start a delegation that cannot be sound. Print every check, fail on any.
+
+    This is the guard against the whole BLINDSPOT/GAP class the owner asked for - an unguarded run
+    (missing config), an unserved model (a 404 discovered halfway), a stuck ledger (a RUNNING entry
+    whose process is dead, which reads forever as "still working"), and a retry target that is the
+    model that failed. An instrument that cannot decide says so and stops (D-3015).
+    """
+    bad = 0
+    checks: list[tuple[str, bool, str]] = []
+
+    def add(name: str, ok: bool, why: str = "") -> None:
+        checks.append((name, ok, why))
+
+    try:
+        g = guards()
+        add("fanout.guards is declared and complete (C12)", True,
+            f"timeout={g['default_timeout_s']}s stall={g['stall_s']}s attempts={g['max_attempts']}")
+    except SystemExit as exc:
+        add("fanout.guards is declared and complete (C12)", False, str(exc).split("\n")[0])
+        g = {}
+
+    served = _served()
+    add("the engine answers /v1/models", bool(served), f"{len(served)} served id(s)")
+    models: list[str] = []
+    if tasks_file:
+        import yaml
+        models = [str(t["model"]) for t in (yaml.safe_load(tasks_file.read_text()) or {}).get("tasks", [])]
+    elif (RUNS).exists():
+        for run in sorted(p for p in RUNS.glob("*") if p.is_dir()):
+            for tj in run.glob("fan_*/task.json"):
+                try:
+                    models.append(str(json.loads(tj.read_text())["model"]))
+                except Exception:
+                    pass
+    unserved = sorted({m for m in models if served and m not in served})
+    add("every task model is served by the engine", not unserved,
+        f"not served: {unserved}" if unserved else f"{len(set(models))} distinct model(s) checked")
+    if g:
+        add("the retry model is not a task model (R5: a retry may not repeat the failing model)",
+            str(g["fallback_model"]) not in set(models),
+            f"fallback={g['fallback_model']}")
+        add("the retry model itself is served", bool(served) and str(g["fallback_model"]) in served,
+            str(g["fallback_model"]))
+    add("the run root is writable", RUNS.exists() and RUNS.is_dir(), str(RUNS))
+    add("both instruments are present", RUNNER.exists() and ASKER.exists())
+
+    stuck = []
+    for r in _rows_present():
+        if r["state"] == "RUNNING" and not r.get("process_alive"):
+            stuck.append(f"{r['run']}/{r['ws']}")
+    add("no workstream reads RUNNING with a dead process (a stuck ledger, BUG-809)", not stuck,
+        f"stuck: {stuck[:5]}" if stuck else "ledger reconcilable")
+
+    for name, ok, why in checks:
+        print(f"  [{'ok' if ok else 'FAIL'}] {name}{'  ' + why if why else ''}")
+        bad += 0 if ok else 1
+    print(f"doctor: {len(checks) - bad}/{len(checks)}")
+    return FATAL if bad else OK
+
+
+def _rows_present() -> list[dict]:
+    """Every workstream of every run, reconciled (the ledger's own view)."""
+    if not RUNS.exists():
+        return []
+    proc = subprocess.run([sys.executable, str(RUNNER), "status", "--json"],
+                          capture_output=True, text=True, cwd=str(ROOT))
+    try:
+        return json.loads(proc.stdout or "[]")
+    except Exception:
+        return []
+
+
+def selftest() -> int:
+    """The controls that would have caught the three lies, plus the config guard itself."""
+    g = guards()
+    checks: list[tuple[str, bool]] = []
+    tmp = RUNS / "selftest_fanout"
+    tmp.mkdir(parents=True, exist_ok=True)
+
+    stub = tmp / "stub.md"
+    stub.write_text(STUB_PREFIX + ")\n")
+    ok, why = answer_verdict(stub, 10)
+    checks.append(("the_no_content_stub_is_NOT_an_answer", not ok))
+    empty = tmp / "empty.md"
+    empty.write_text("   \n")
+    checks.append(("a_whitespace_answer_is_NOT_an_answer", not answer_verdict(empty, 10)[0]))
+    short = tmp / "short.md"
+    short.write_text("yes")
+    checks.append(("an_answer_below_the_declared_floor_is_NOT_an_answer",
+                   not answer_verdict(short, int(g["min_answer_chars"]))[0]
+                   or int(g["min_answer_chars"]) <= 3))
+    real = tmp / "real.md"
+    real.write_text("x" * (int(g["min_answer_chars"]) + 5))
+    checks.append(("a_real_answer_is_an_answer", answer_verdict(real, int(g["min_answer_chars"]))[0]))
+    checks.append(("a_missing_answer_file_is_NOT_an_answer",
+                   not answer_verdict(tmp / "nope.md", 10)[0]))
+
+    # THE BUG-817 CLASS: the terminal word must be DERIVED, never asserted. A non-zero rc with a stub
+    # answer must read EMPTY; a non-zero rc with a real answer must read FAILED, not DONE.
+    rep = tmp / "10_report.md"
+    rep.unlink(missing_ok=True)
+    grade(stub, 1, int(g["min_answer_chars"]), rep)
+    checks.append(("a_failed_oneshot_with_a_stub_reads_EMPTY_not_DONE",
+                   rep.read_text().startswith("TERMINAL: EMPTY")))
+    rep.unlink(missing_ok=True)
+    grade(real, 1, int(g["min_answer_chars"]), rep)
+    checks.append(("a_failed_oneshot_with_an_answer_reads_FAILED_not_DONE",
+                   rep.read_text().startswith("TERMINAL: FAILED")))
+    rep.unlink(missing_ok=True)
+    grade(real, 0, int(g["min_answer_chars"]), rep)
+    checks.append(("a_successful_oneshot_with_an_answer_reads_DONE",
+                   rep.read_text().startswith("TERMINAL: DONE")))
+
+    # NO COMMAND MAY CARRY A BAKED-IN VERDICT (the exact defect: `TERMINAL: DONE - rc=$?`).
+    cmd = _cmd_for({"id": "x", "mode": "oneshot", "max_tokens": 8}, "/tmp", g, "M")
+    checks.append(("no_generated_command_asserts_its_own_terminal_word",
+                   "TERMINAL: DONE" not in cmd and "_grade" in cmd))
+    checks.append(("every_generated_command_grades_the_answer_it_got", "--min-chars " in cmd))
+    checks.append(("the_stall_threshold_is_strictly_inside_the_timeout",
+                   int(g["stall_s"]) < int(g["default_timeout_s"])))
+    checks.append(("a_oneshot_is_budgeted_FAR_MORE_TIGHTLY_than_an_agent_loop",
+                   _timeout_for({"mode": "oneshot"}, g) < _timeout_for({"mode": "agent"}, g)))
+    checks.append(("the_oneshot_budget_is_not_a_blanket_1800s",
+                   _timeout_for({"mode": "oneshot"}, g) <= 300))
+    checks.append(("the_whole_run_is_bounded_by_a_deadline_the_parent_obeys",
+                   int(g["deadline_s"]) > 0))
+    checks.append(("the_retry_count_is_bounded", int(g["max_attempts"]) >= 1))
+    checks.append(("a_retried_task_cannot_be_retried_again_by_construction",
+                   r'if re.search(r"_r\d+$", t.name)' in pathlib.Path(__file__).read_text()))
+    # The receipt must roll attempts up to the TASK, or a successful retry is reported as a failure.
+    checks.append(("a_task_that_succeeded_on_its_retry_reads_DONE_not_TIMEOUT",
+                   task_state([{"state": "TIMEOUT", "answer_usable": False},
+                               {"state": "DONE", "answer_usable": True}]) == "DONE"))
+    checks.append(("a_task_whose_attempts_all_failed_reads_its_last_attempt",
+                   task_state([{"state": "EMPTY", "answer_usable": False},
+                               {"state": "FAILED", "answer_usable": False}]) == "FAILED"))
+    checks.append(("a_task_with_no_attempt_yet_reads_PENDING", task_state([]) == "PENDING"))
+    # The cap may not double-book a launch: counting `started` on top of the ledger stranded a task.
+    # The literal is assembled at run time because a control may not CONTAIN what it forbids.
+    cap_leak = "started" + " + _running"
+    checks.append(("the_pool_cap_counts_each_running_workstream_exactly_once",
+                   cap_leak not in pathlib.Path(__file__).read_text()))
+
+    bad = 0
+    for name, ok_ in checks:
+        print(f"  [{'ok' if ok_ else 'FAIL'}] {name}")
+        bad += 0 if ok_ else 1
+    print(f"selftest: {len(checks) - bad}/{len(checks)}")
+    return FATAL if bad else OK
 
 
 def main(argv: list[str]) -> int:
     """CLI entry point."""
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    ap.add_argument("--selftest", action="store_true")
     sub = ap.add_subparsers(dest="verb")
+    d = sub.add_parser("doctor"); d.add_argument("--tasks")
+    r = sub.add_parser("run"); r.add_argument("--tasks", required=True); r.add_argument("--run", required=True)
+    r.add_argument("--deadline", type=int)
     p = sub.add_parser("plan"); p.add_argument("--tasks", required=True); p.add_argument("--run", required=True)
-    for verb in ("start", "status"):
+    s = sub.add_parser("start"); s.add_argument("--run", required=True); s.add_argument("--no-watch", action="store_true")
+    for verb in ("status", "retry"):
         q = sub.add_parser(verb); q.add_argument("--run", required=True)
     v = sub.add_parser("verify"); v.add_argument("--run", required=True)
     v.add_argument("--model", required=True); v.add_argument("--out", required=True)
+    gr = sub.add_parser("_grade"); gr.add_argument("--answer", required=True); gr.add_argument("--rc", required=True)
+    gr.add_argument("--min-chars", required=True); gr.add_argument("--report", required=True)
     args = ap.parse_args(argv)
+
+    if args.selftest:
+        return selftest()
+    if args.verb == "_grade":
+        return grade(pathlib.Path(args.answer), int(args.rc), int(args.min_chars), pathlib.Path(args.report))
+    if args.verb == "doctor":
+        return doctor(pathlib.Path(args.tasks) if args.tasks else None)
+    if args.verb == "run":
+        return run_task_file(pathlib.Path(args.tasks), args.run, args.deadline)
     if args.verb == "plan":
         return plan(pathlib.Path(args.tasks), args.run)
     if args.verb == "start":
-        return start(args.run)
+        return start(args.run, watch=not args.no_watch)
     if args.verb == "status":
-        return subprocess.run([sys.executable, str(RUNNER), "status", "--run", args.run], cwd=str(ROOT)).returncode
+        rows = _rows(args.run)
+        for r in rows:
+            print(f"{r['ws']:<20} {r['state']:<8}{' STALLED' if r.get('stalled') else '        '}"
+                  f" {r['elapsed_s']:>7.1f}s idle={r.get('idle_s', 0):>6.1f}s"
+                  f" progress={r.get('progress_bytes', 0):>7}B")
+        return OK
+    if args.verb == "retry":
+        return OK if retry(args.run) >= 0 else FATAL
     if args.verb == "verify":
         return verify(args.run, args.model, pathlib.Path(args.out))
     ap.print_help()

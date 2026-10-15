@@ -79,3 +79,18 @@ candidate, so retiring it removes one R5 option (gemma-4-E4B, Qwen3.8-27B and Or
 | `bart-large-mnli` 6.5 GB, `roberta-large-snli` 4.0 GB, `roberta-large-mnli` 1.3 GB, `nli-deberta-v3-small` 552 MB, `distilbert-mnli` 255 MB, `ms-marco-MiniLM` 88 MB, `all-MiniLM-L6-v2` 87 MB, `Qdrant onnx` 87 MB | 12.9 GB | KEEP-UNTIL-A-BATCH: each exists only to LOSE a comparison that is already recorded (DEBERTA_VERIFICATION_TEST_2026-08-09.md) and no config resolves into any of them. Deletable on the owner word, as one batch, kind-classified (D-3014). |
 | `MMLU-Pro` 4.0 MB, `MATH-500` 448 KB, `openai_humaneval` 96 KB | 4.5 MB | KEEP: DATASETS are the eval instrument. Deleting 4.5 MB to break re-benching is a net loss (D-3014). |
 | five 12-24 KB Qwen3.8 metadata stubs; `pplx-decider-v1.1-27b-4bit` 14 GB; `clef-4bit` 8.2 GB; `clef-flash-4bit` 5.8 GB; the hub's second copy of `Phi-4-mini-instruct-8bit` 5.4 GB | ~33.5 GB | AUDIT (T-142): classify by RESOLUTION, not by mention. `BAAI--bge-m3` 4.3 GB is explicitly out of scope until the sentence-transformers path is checked against Ollama. |
+
+## EXECUTED 2026-10-15 (ancestors)
+
+The Tier B proposal above was executed for its ancestor class, by the owner's word of 2026-10-15 and under
+D-3018's resolution test. **8 hub repos / 18.90 GiB.** Receipt: `governance/DELETION_RECEIPT_20261015b.json`.
+Evidence and the KEEP list: `governance/NLI_ANCESTOR_VERDICT_20261015.md`.
+
+Two corrections to this document's own reasoning, in passing:
+
+1. Its ORPHAN ranking reads `facebook/bart-large-mnli` at 6,932 MB while the measured directory is
+   6,769,864 KiB = 6.93 GB: the census counts megabytes, `du -sk` counts KiB, and a sweep must use the
+   same instrument on both sides of the comparison.
+2. "The only defensible deletion proposal" was too strong: the bucket is a TEXT INDEX, so it is silent
+   about a model that live code resolves into by DEFAULT. The resolution test in
+   `pipeline/hf_fetch_model.py`'s sibling guard is now what authorises a sweep (D-3018).

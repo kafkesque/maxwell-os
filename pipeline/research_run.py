@@ -58,6 +58,10 @@ TERMINAL = "TERMINAL:"
 HEARTBEAT = "STEP "
 SLUG = re.compile(r"^[a-z0-9][a-z0-9_-]{0,40}$")
 DEFAULT_TIMEOUT_S = 1800
+DEFAULT_STALL_S = 600
+ANSWER = "20_answer.md"
+PROGRESS_FILES = (REPORT, LOG, ANSWER)
+TERMINAL_WORDS = ("DONE", "FAILED", "TIMEOUT", "STOPPED", "STALLED", "EMPTY")
 POLL_S = 2.0
 OK, FATAL, OWNER_OWED = 0, 1, 2
 
@@ -175,7 +179,8 @@ def new_run(run_id: str, brief_path: pathlib.Path | None, brief_text: str | None
     return root
 
 
-def start(run_id: str, ws: str, cmd: str, timeout_s: int, note: str = "") -> dict:
+def start(run_id: str, ws: str, cmd: str, timeout_s: int, note: str = "",
+          stall_s: int = DEFAULT_STALL_S, kill_on_stall: bool = False) -> dict:
     """Launch one workstream DETACHED. Returns its state record.
 
     Detachment is the whole point: start_new_session=True gives the child its own session,
@@ -199,9 +204,32 @@ def start(run_id: str, ws: str, cmd: str, timeout_s: int, note: str = "") -> dic
         start_new_session=True,
     )
     rec = {"run": run_id, "ws": ws, "state": "RUNNING", "pid": proc.pid, "rc": None,
-           "t0": time.time(), "t1": None, "timeout_s": timeout_s, "note": note}
+           "t0": time.time(), "t1": None, "timeout_s": timeout_s, "stall_s": stall_s,
+           "kill_on_stall": kill_on_stall, "note": note}
     write_json(wsd / STATE, rec)
     return rec
+
+
+def progress_bytes(wsd: pathlib.Path) -> int:
+    """Total bytes of every file a live workstream grows WHILE it works.
+
+    The report alone is a weak liveness signal: in oneshot mode the answer is
+    redirected into it only at the end, so a healthy run looks dead for its whole
+    life. Log + answer file are counted for the same reason.
+    """
+    return sum(p.stat().st_size for p in (wsd / f for f in PROGRESS_FILES) if p.exists())
+
+
+def idle_s(wsd: pathlib.Path, now: float | None = None) -> float:
+    """Seconds since ANY progress file was last touched - the liveness signal.
+
+    This is the number that was missing when a delegation "ran for so long without
+    any result": without it, a hung child and a working child read identically
+    until the timeout fires (BUG-809).
+    """
+    now = time.time() if now is None else now
+    mt = [p.stat().st_mtime for p in (wsd / f for f in PROGRESS_FILES) if p.exists()]
+    return round(now - max(mt), 1) if mt else 0.0
 
 
 def refresh(run_id: str, ws: str) -> dict:
@@ -215,18 +243,34 @@ def refresh(run_id: str, ws: str) -> dict:
     rec["heartbeat"] = last_heartbeat(wsd / REPORT)
     rec["elapsed_s"] = round((rec.get("t1") or time.time()) - rec["t0"], 1)
     rec["process_alive"] = pid_alive(rec.get("pid"))
+    rec["progress_bytes"] = progress_bytes(wsd)
+    rec["idle_s"] = idle_s(wsd)
+    rec["stall_s"] = int(rec.get("stall_s") or DEFAULT_STALL_S)
     if rec["state"] == "RUNNING":
         if rec["terminal"]:
             word = rec["terminal"].split(":", 1)[1].strip().split(" ", 1)[0].upper()
-            rec["state"] = word if word in ("DONE", "FAILED", "TIMEOUT", "STOPPED") else "FAILED"
+            rec["state"] = word if word in TERMINAL_WORDS else "FAILED"
             rec["t1"] = rec["t1"] or time.time()
         elif not rec["process_alive"]:
             rec["state"] = "FAILED"
+            rec["t1"] = rec["t1"] or time.time()
             append_line(wsd / REPORT, f"{TERMINAL} FAILED - the process died without declaring an end (rc unknown)")
         elif rec["elapsed_s"] > rec["timeout_s"]:
             rec["state"] = "TIMEOUT"
+            rec["t1"] = rec["t1"] or time.time()
             append_line(wsd / REPORT, f"{TERMINAL} TIMEOUT - exceeded the declared {rec['timeout_s']} s budget")
             signal_group(rec["pid"])
+        elif rec["idle_s"] > rec["stall_s"] and rec.get("kill_on_stall"):
+            # Only a workstream whose owner declared kill_on_stall is stopped on
+            # suspicion. What is NEVER optional is the REPORT: stalled is a fact
+            # about the child, not a verdict, so it is published either way.
+            rec["state"] = "STALLED"
+            rec["t1"] = rec["t1"] or time.time()
+            append_line(wsd / REPORT,
+                        f"{TERMINAL} STALLED - no progress for {rec['idle_s']}s (declared stall {rec['stall_s']}s)")
+            signal_group(rec["pid"])
+        else:
+            rec["stalled"] = rec["idle_s"] > rec["stall_s"]
         write_json(wsd / STATE, rec)
     return rec
 
@@ -270,6 +314,44 @@ def collect(run_id: str, timeout_s: int, wait_all: bool = True) -> int:
         return FATAL
     if any(r["state"] == "RUNNING" for r in rows):
         return OWNER_OWED
+    return OK
+
+
+def watch(run_id: str | None, budget_s: int, poll_s: float = POLL_S) -> int:
+    """Reap every declared budget without a human polling - the BUG-809 guard.
+
+    A budget that is only enforced when somebody happens to call status() is not a
+    budget: it is a hope. This loop is the thing that makes `timeout_s` and
+    `stall_s` REAL for a detached run, and it exits on its own budget so the
+    watcher itself can never become the stuck process.
+
+    It reports STALLED loudly and keeps the child alive unless kill_on_stall was
+    declared for it: a slow model is not a failure, but an unreported silence is.
+    """
+    deadline = time.time() + budget_s
+    seen: dict[str, str] = {}
+    while True:
+        rows = status(run_id)
+        for r in rows:
+            key = f"{r['run']}/{r['ws']}"
+            tag = f"{r['state']}{'!' if r.get('stalled') else ''}"
+            if seen.get(key) != tag:
+                seen[key] = tag
+                print(f"  {r['run']}/{r['ws']:<16} {r['state']:<8}"
+                      f"{' STALLED' if r.get('stalled') else '':<9}"
+                      f" {r['elapsed_s']:>7.1f}s idle={r.get('idle_s', 0):>6.1f}s"
+                      f" progress={r.get('progress_bytes', 0):>7}B"
+                      f"{'  ' + r['terminal'][:52] if r.get('terminal') else ''}")
+        if not any(r["state"] == "RUNNING" for r in rows):
+            break
+        if time.time() > deadline:
+            live = [f"{r['run']}/{r['ws']}" for r in rows if r["state"] == "RUNNING"]
+            print(f"watch: budget {budget_s}s spent, still RUNNING: {live} - NOT waiting further")
+            return OWNER_OWED
+        time.sleep(poll_s)
+    rows = status(run_id)
+    if any(r["state"] == "FAILED" for r in rows):
+        return FATAL
     return OK
 
 
@@ -338,6 +420,34 @@ def selftest() -> int:
     add("a_workstream_past_its_budget_reads_TIMEOUT_and_is_signalled", over["state"] == "TIMEOUT", f"state={over['state']}")
     time.sleep(1.0)
     add("a_timeout_actually_signals_the_child", not pid_alive(over.get("pid")), "the child survived its own timeout")
+    # A terminal record must STOP COUNTING: an elapsed that keeps growing after the end is a lie about
+    # how long the work took, and it was measured live (55.1 s on a task that died at 2.2 s).
+    time.sleep(1.5)
+    add("a_TIMEOUT_record_stops_growing_its_elapsed_time", refresh(rnd, "over")["elapsed_s"] == over["elapsed_s"],
+        f"{over['elapsed_s']} -> {refresh(rnd, 'over')['elapsed_s']}")
+
+    # The liveness controls: a SILENT child must be distinguishable from a working one.
+    start(rnd, "quiet", "sleep 60", timeout_s=300, stall_s=2, note="works silently and never reports")
+    start(rnd, "loud", 'for i in 1 2 3 4 5 6 7 8; do echo "STEP $i: working" >> "$WS_REPORT"; sleep 1; done; '
+                       'echo "TERMINAL: DONE - eight steps" >> "$WS_REPORT"; sleep 60',
+          timeout_s=300, stall_s=4, note="reports progress, so it is never called stalled")
+    time.sleep(3.5)
+    quiet = refresh(rnd, "quiet")
+    loud = refresh(rnd, "loud")
+    add("a_silent_child_is_reported_STALLED_without_being_killed", bool(quiet.get("stalled")), f"idle={quiet.get('idle_s')}")
+    add("a_silent_child_that_was_not_declared_kill_on_stall_is_still_alive", pid_alive(quiet.get("pid")))
+    add("a_child_that_reports_progress_is_NOT_stalled", not loud.get("stalled"), f"idle={loud.get('idle_s')}")
+    add("a_stalled_child_still_reads_RUNNING_while_it_is_alive", quiet["state"] == "RUNNING", f"state={quiet['state']}")
+    start(rnd, "quiet2", "sleep 60", timeout_s=300, stall_s=2, kill_on_stall=True,
+          note="silent AND declared kill_on_stall")
+    time.sleep(3.5)
+    q2 = refresh(rnd, "quiet2")
+    add("a_child_stalled_AND_declared_kill_on_stall_reads_STALLED_never_DONE",
+        q2["state"] == "STALLED", f"state={q2['state']}")
+    time.sleep(0.5)
+    add("a_kill_on_stall_child_is_actually_signalled", not pid_alive(q2.get("pid")))
+    for name in ("quiet", "loud", "quiet2"):
+        stop(rnd, name)
 
     src = pathlib.Path(__file__).read_text()
     # assembled at run time: the control may not contain the literals it forbids
@@ -365,7 +475,11 @@ def main(argv: list[str]) -> int:
     p_start.add_argument("--ws", required=True)
     p_start.add_argument("--cmd", default=""); p_start.add_argument("--cmd-file", default="")
     p_start.add_argument("--timeout", type=int, default=DEFAULT_TIMEOUT_S); p_start.add_argument("--note", default="")
-    p_st = sub.add_parser("status"); p_st.add_argument("--run")
+    p_start.add_argument("--stall", type=int, default=DEFAULT_STALL_S)
+    p_start.add_argument("--kill-on-stall", action="store_true")
+    p_st = sub.add_parser("status"); p_st.add_argument("--run"); p_st.add_argument("--json", action="store_true")
+    p_w = sub.add_parser("watch"); p_w.add_argument("--run")
+    p_w.add_argument("--budget", type=int, default=DEFAULT_TIMEOUT_S)
     p_c = sub.add_parser("collect"); p_c.add_argument("--run", required=True)
     p_c.add_argument("--timeout", type=int, default=DEFAULT_TIMEOUT_S)
     p_stop = sub.add_parser("stop"); p_stop.add_argument("--run", required=True); p_stop.add_argument("--ws", required=True)
@@ -382,13 +496,19 @@ def main(argv: list[str]) -> int:
         if not cmd.strip():
             print("FATAL: start needs --cmd or --cmd-file")
             return FATAL
-        rec = start(args.run, args.ws, cmd, args.timeout, args.note)
-        print(f"started {args.ws} pid={rec['pid']} timeout={args.timeout}s (detached)")
+        rec = start(args.run, args.ws, cmd, args.timeout, args.note,
+                    stall_s=args.stall, kill_on_stall=bool(args.kill_on_stall))
+        print(f"started {args.ws} pid={rec['pid']} timeout={args.timeout}s stall={args.stall}s (detached)")
         return OK
     if args.verb == "status":
+        if args.json:
+            print(json.dumps(status(args.run), indent=1))
+            return OK
         for r in status(args.run):
             print(f"{r['run']:<18} {r['ws']:<14} {r['state']:<8} {r['elapsed_s']:>7.1f}s report={r.get('report_bytes',0)}B alive={r.get('process_alive')}")
         return OK
+    if args.verb == "watch":
+        return watch(args.run, args.budget)
     if args.verb == "collect":
         return collect(args.run, args.timeout)
     if args.verb == "stop":

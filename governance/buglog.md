@@ -14425,3 +14425,99 @@ line per record, so every later index pointed one line off (the loop had to run 
 an instrument mutating the list it is iterating indexes into.
 (d) AFTER THE FIX: 1144 decisions, stamp `81ac953af5bd0eda`, source_sha256 `414ccaa436aeecdf`, and both gates pass
 (`records-only` and `describes those exact bytes`).
+
+## BUG-809 (MED - FIXED 2026-10-15) - delegated research was not durable; the fix is now INFRASTRUCTURE, not a rule
+
+**RE-MEASURED, and it failed again first.** On 2026-10-15 the owner's own delegate calls failed twice in one
+session (one subagent returned an empty response, one was cancelled) while "running for so long without any
+result". The 2026-10-15 remedy in this register was a RULE applied by hand (write the report first, summarise in
+chat, re-measure the load-bearing numbers, never sequence implementation behind a delegate). A rule that a human
+must remember is not a fix: the same two failures happened again.
+
+**THE FIX (three layers, all landed).** (1) DURABILITY: a task runs as a DETACHED workstream
+(pipeline/research_run.py, own session, own process group) so no harness event can cancel it, and it writes its
+answer to a file - the deliverable is never a return value. (2) GUARDS: pipeline/subagent_fanout.py#run plans,
+launches under the declared pool cap, watches to a declared deadline, reaps a task past its budget, and writes a
+receipt naming every task's state. (3) HONESTY: the terminal word is DERIVED from the answer the task actually
+got (see BUG-824 - the old command asserted `TERMINAL: DONE` unconditionally).
+
+**EVIDENCE.** `python3 pipeline/subagent_fanout.py --selftest` -> 20/20; `doctor` -> 8/8;
+`run --tasks temp/fanout_20261015h.yaml --run fanout_20261015i` -> 3/3 DONE, rc=0, one task deliberately given
+a 1 s budget: it was reaped at 2.2 s, retried on a DIFFERENT model, and the receipt shows both attempts
+(temp/runs/fanout_20261015i/98_receipt.json). `pipeline/research_run.py --selftest` -> 18/18.
+
+
+## BUG-822 (MED - FIXED 2026-10-15) - a land script wrote three config blocks TWICE, and every parse check passed
+
+**MEASURED.** Landing the 2026-10-15 ancestors decision inserted `harnesses.jobs`, `hf.lock_dir`/`lock_suffix`/
+`duplicate_fragments` and the whole `model_store` block into config/engine.yaml, and the anchor-based insert ran
+twice. Result: **16 duplicate scopes** (`model_store` at lines 106 and 112, `harnesses.jobs` at 52 and 68,
+`hf.lock_dir` at 83 and 88, and 13 more). PyYAML does not refuse a duplicate key - it keeps the LAST one - so the
+file parsed, every rail stayed green, and the second copy silently shadowed the first.
+
+**HOW IT WAS CAUGHT.** Not by a rail: by a hand-written duplicate-key detector, after the fact. The detector that
+already existed (`scripts/check_config_duplicate_keys.py`, BUG-730) found it in one second when run by hand.
+
+**REMEDY.** The three duplicate blocks are deleted (verified: the checker reports 0 of 135 files);
+`fanout.guards` was landed as a single insert. The systemic half is T-149: an instrument that is never CALLED is
+not a guard, so this checker goes into `just preflight`.
+
+
+## BUG-823 (MED - FIXED 2026-10-15) - a governed config file did not parse, and nothing read it
+
+**MEASURED.** `config/intake_sources.yaml` failed to load: `mapping values are not allowed here` at line 34.
+Twelve rows were written as `- class: video   {mechanic: ...}` - a flow mapping cannot follow a plain scalar.
+No file under pipeline/, scripts/ or tools/ reads `intake_sources`, so the defect could not surface as an error
+anywhere: the intake declaration was unreadable AND unread, which is the worst of both.
+
+**REMEDY.** The rows are repaired into flow mappings (`- {class: video, mechanic: ...}`) and the file parses.
+T-152 records the governance half: a declaration with no reader cannot fail loudly, so it must either get its
+reader or be marked proposal-only.
+
+
+## BUG-824 (HIGH - FIXED 2026-10-15) - the fan-out executor told four lies, and the first one was a false success
+
+**ALL FOUR MEASURED on 2026-10-15, three of them by the executor's own acceptance run.**
+1. **A FALSE SUCCESS (the BUG-817 class, inside the instrument that reports delegation health).** Every planned
+   command ended with `echo "TERMINAL: DONE - oneshot rc=$?"`, so a oneshot that exited 1 - engine refused, no
+   content - was recorded as **DONE**. The `$?` was captured and then ignored. The terminal word is now computed
+   by a grader that reads the answer file and the rc (`_grade`), so EMPTY, FAILED and DONE are earned.
+2. **NO REAPER.** `timeout_s` was consulted only when somebody happened to call `status()`. A run nobody polled
+   stayed RUNNING forever - the owner's exact words, "it runs so long without any result, it seems stuck". There
+   is now a `watch` loop, and `run` attaches one, so a budget is enforced without a human polling.
+3. **NO LIVENESS.** A hung child and a working child read identically. `idle_s` is now measured against a
+   declared `stall_s` and published; only a task declared `kill_on_stall` is killed on suspicion, but silence is
+   never a secret.
+4. **THE CAP DOUBLE-BOOKED A LAUNCH, STRANDING A TASK.** `started + _running(run_id) >= cap` counted the same
+   launch twice, so the third of three tasks was never started: measured live as `started 2 (cap 3)` with one
+   task left PENDING and the receipt reporting `2/4 usable` for a run that had answered every question. The
+   receipt now rolls attempts up to the TASK.
+
+**A FIFTH, found in the same run:** a TIMEOUT/STALLED record never stamped `t1`, so its `elapsed_s` kept growing
+after it had died - `55.1 s` reported for a task that stopped at 2.2 s. Every terminal transition now stamps it.
+
+**EVIDENCE.** `--selftest` 20/20 including the controls that would have caught all five; `research_run.py
+--selftest` 18/18 including `a_TIMEOUT_record_stops_growing_its_elapsed_time`. The live proof run is cited under
+BUG-809.
+
+
+## BUG-825 (HIGH - FIXED 2026-10-15) - a deletion receipt overstated the reclaimed space 2.07x, and the batch exited 0 while its census face never moved
+
+**MEASURED, in the sweep that ran minutes after the delegation fix.** Two defects in one receipt.
+1. **THE RECLAIM FIGURE WAS MINE, NOT THE DISK'S.** Each repo's bytes were summed with
+   `sum(p.stat().st_size for p in rglob)` - which counts a hub **blob** and the **snapshot hardlink** that points
+   at it as two files. The receipt claimed **30.66 GB freed**; `du -sk` on the same directory showed
+   **14.83 GiB** (153.50 -> 138.67 GiB). Calibration on the repos that still exist: the overstatement factor is
+   **exactly 2.000** on every one of them. This is the BUG-807 class - a reclaim figure nobody can act on - and
+   it was caught only by measuring the disk on both sides.
+2. **A FAILED WITNESS WAS READ AS A WARNING.** The census exits **2 when orphan proposals exist** (a
+   measurement, not a failure). The batch read `rc != 0` as "the census did not re-run", printed a warning, and
+   **exited 0** - while `governance/model_store_census_20261015.json` did not move AT ALL (byte-identical to
+   HEAD, `hub_bytes` 0.15 GiB, buckets unchanged) despite 14.83 GiB having been deleted. That is exactly the
+   BUG-819 class the warning itself names: a face describing bytes that are gone.
+
+**REMEDY.** The receipt carries a `measurement` block with the disk's own before/after, the original claim kept
+visible, and the defect proved by live calibration (temp/land_20261015g.py --phase c). Phase b now measures each
+repo ONCE PER PHYSICAL BLOCK (`physical_bytes`), records the census total BEFORE the sweep, treats rc=2 as a
+measurement, and **raises** if the census did not move - a batch that deletes without moving its face may not
+exit 0 (T-147). The stale face itself is T-151.

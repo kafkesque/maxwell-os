@@ -55,3 +55,23 @@ Maxwell OS wants an always-on curator, a gated pipeline and a self-auditing gove
 JOB QUEUE, not more sub-agents: every job declares its resource class, its artefact, its budget and its
 receipt; the scheduler admits a job only if its class has a free permit. The pool is the mutex of record,
 and the governed homes stay single-writer for as long as they are registers.
+
+
+## HARNESS DEPLOYMENT — where a harness beats goose, and where it is a regression (D-3017)
+
+A harness is not a faster goose. Measured per invocation 2026-10-15: goose one-shot **0.4 s**,
+`pi` **28.2 s**, `claude` **104.7 s**. That single row decides the whole policy:
+
+| job class (`config/agent_context.yaml#classes`) | harness | why |
+|---|---|---|
+| `agent_loop` | **pi** (fallback `claude`) | a loop with a human inside it: the only class where a harness's context management and multi-file edits pay for 28 s |
+| `agent_probe` | **none** | one question, one answer: `pipeline/oneshot_ask.py` answers in 0.4 s |
+| `pipeline_batch` | **none** | unattended; a harness holds no governed pen (D-3016) |
+
+The decision lives in `config/engine.yaml#harnesses.jobs` and is READ
+(`python3 pipeline/harness_env.py --job CLASS`), not remembered. `harness: null` is a decision, not an
+omission: it says the harness LOSES for that class. A class the file does not know is FATAL, because a
+job that cannot decide must say so and stop (D-3015).
+
+Two rules that bind a fan-out to its resource class (D-3015) still hold inside a harness: ONE harness
+on the pool at a time, and a harness's output is a PROPOSAL in `temp/`, never a verification (R5, D-3011).

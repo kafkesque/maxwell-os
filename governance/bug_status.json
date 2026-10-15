@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 584,
-  "open_n": 221,
-  "closed_n": 363,
+  "total_ids": 588,
+  "open_n": 220,
+  "closed_n": 368,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -1059,11 +1059,6 @@
       "events": 1
     },
     {
-      "id": "BUG-809",
-      "title": "(MED - OPEN 2026-10-15) - delegated research was not durable: six of seven delegate runs were cancelled mid-flight and their findings were l",
-      "events": 1
-    },
-    {
       "id": "BUG-810",
       "title": "(MED - OPEN 2026-10-15) - a YAML insert that re-parents a mapping passes every parse check and is caught only by the consumer",
       "events": 1
@@ -1476,7 +1471,12 @@
     "BUG-798",
     "BUG-801",
     "BUG-808",
+    "BUG-809",
     "BUG-814",
-    "BUG-816"
+    "BUG-816",
+    "BUG-822",
+    "BUG-823",
+    "BUG-824",
+    "BUG-825"
   ]
 }

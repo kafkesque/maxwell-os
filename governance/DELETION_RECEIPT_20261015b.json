@@ -1,0 +1,151 @@
+{
+ "deleted_at": "2026-10-15T17:28:18",
+ "authority": "owner word 2026-10-15, verbatim: 'delete the tier B NLI/embedder anchestors if they dont have any current or potential future use that can be better than current model' (D-3014, RATIFIED)",
+ "method": "direct rmtree of hub repos, NOT pipeline/safe_delete.py: model weights are not pipeline output and safe_delete would copy them into a Dropbox-synced repo (D-3013, BUG-818c)",
+ "kind": "model weights (encoders). NO dataset was in scope (D-3014: a dataset is never swept with model bytes)",
+ "guard": "pipeline/hf_fetch_model.py: for each repo, every .py/.yaml/.json/.sh under pipeline, scripts, config, agent was searched for the repo stem; a hit outside the audited mention set REFUSES the sweep (D-3018: resolution, never mention)",
+ "deleted": [
+  {
+   "repo": "models--facebook--bart-large-mnli",
+   "path": "/Users/barn/.cache/huggingface/hub/models--facebook--bart-large-mnli",
+   "bytes_deleted": 13864619914,
+   "measured_kib_at_audit": 6769864,
+   "verdict": "resolved-by-nothing"
+  },
+  {
+   "repo": "models--ynie--roberta-large-snli_mnli_fever_anli_R1_R2_R3-nli",
+   "path": "/Users/barn/.cache/huggingface/hub/models--ynie--roberta-large-snli_mnli_fever_anli_R1_R2_R3-nli",
+   "bytes_deleted": 8548678870,
+   "measured_kib_at_audit": 4174196,
+   "verdict": "resolved-by-nothing"
+  },
+  {
+   "repo": "models--roberta-large-mnli",
+   "path": "/Users/barn/.cache/huggingface/hub/models--roberta-large-mnli",
+   "bytes_deleted": 2856819706,
+   "measured_kib_at_audit": 1394952,
+   "verdict": "resolved-by-nothing"
+  },
+  {
+   "repo": "models--tasksource--ModernBERT-base-nli",
+   "path": "/Users/barn/.cache/huggingface/hub/models--tasksource--ModernBERT-base-nli",
+   "bytes_deleted": 1204131806,
+   "measured_kib_at_audit": 1172400,
+   "verdict": "resolved-by-nothing"
+  },
+  {
+   "repo": "models--BAAI--bge-reranker-base",
+   "path": "/Users/barn/.cache/huggingface/hub/models--BAAI--bge-reranker-base",
+   "bytes_deleted": 2268749678,
+   "measured_kib_at_audit": 1107808,
+   "verdict": "resolved-by-nothing"
+  },
+  {
+   "repo": "models--cross-encoder--nli-deberta-v3-small",
+   "path": "/Users/barn/.cache/huggingface/hub/models--cross-encoder--nli-deberta-v3-small",
+   "bytes_deleted": 1157459610,
+   "measured_kib_at_audit": 565188,
+   "verdict": "resolved-by-nothing"
+  },
+  {
+   "repo": "models--MoritzLaurer--DeBERTa-v3-base-mnli-fever-anli",
+   "path": "/Users/barn/.cache/huggingface/hub/models--MoritzLaurer--DeBERTa-v3-base-mnli-fever-anli",
+   "bytes_deleted": 760003222,
+   "measured_kib_at_audit": 371120,
+   "verdict": "resolved-by-nothing"
+  }
+ ],
+ "bytes_deleted": 30660462806,
+ "kept_because_live": {
+  "models--MoritzLaurer--DeBERTa-v3-large-mnli-fever-anli-ling-wanli": {
+   "bytes": 4039240,
+   "resolved_by": "config/pipeline_config.yaml#stage5.nli_model + models.nli_large (D2298 sole verifier)"
+  },
+  "models--BAAI--bge-m3": {
+   "bytes": 4457460,
+   "resolved_by": "config/pipeline_config.yaml#stage1_5.embed_model_hf"
+  },
+  "models--BAAI--bge-reranker-v2-m3": {
+   "bytes": 2239512,
+   "resolved_by": "config/pipeline_config.yaml#rerank.model + pipeline/rerank.py"
+  },
+  "models--answerdotai--ModernBERT-base": {
+   "bytes": 586728,
+   "resolved_by": "pipeline/student_classifier.py#BASE_MODEL_NAME (D2607)"
+  },
+  "models--BAAI--bge-small-en-v1.5": {
+   "bytes": 131392,
+   "resolved_by": "pipeline/stage1_5_fastembed.py#EMBED_MODEL (a code DEFAULT)"
+  },
+  "models--minishlab--potion-base-32M": {
+   "bytes": 128160,
+   "resolved_by": "pipeline/providers/test_mlx_provider.py (a code DEFAULT)"
+  },
+  "models--MoritzLaurer--bge-m3-zeroshot-v2.0": {
+   "bytes": 3349172,
+   "resolved_by": "scripts/benchmark_domain_taxonomy_match.py#ZEROSHOT_MODEL (D2613 comparison PENDING)"
+  }
+ },
+ "kept_below_floor": {
+  "rule": "config/engine.yaml#model_store.deletion_floor_bytes",
+  "repos": [
+   "models--typeform--distilbert-base-uncased-mnli",
+   "models--cross-encoder--ms-marco-MiniLM-L-6-v2",
+   "models--sentence-transformers--all-MiniLM-L6-v2",
+   "models--Qdrant--all-MiniLM-L6-v2-onnx"
+  ],
+  "why": "each lost a recorded comparison, so each is deletable by the verdict rule; they survive the FLOOR, not a claim of usefulness - below the floor the decision costs more than the bytes, and the floor is 2x the largest live-by-code-default encoder so no sweep may reach one"
+ },
+ "evidence": "governance/NLI_ANCESTOR_VERDICT_20261015.md",
+ "measurement": {
+  "corrected_at": "2026-10-15T17:29:52",
+  "defect": "every `bytes_deleted` below is a SUM OF FILE SIZES, which counts a hub blob and the snapshot hardlink that points at it as two files. The sweep therefore reported 30.66 GB freed while the disk returned 14.83 GiB (an overstatement of about 2x). Corrected for future runs in build_physical_bytes() - phase b now measures each repo ONCE PER PHYSICAL BLOCK before deleting it.",
+  "physical_reclaimed_gib": 14.83,
+  "hub_gib_before": 153.5,
+  "hub_gib_after": 138.67,
+  "witness": "du -sk ~/.cache/huggingface/hub, the same command on both sides of the deletion",
+  "original_claim_bytes": 30660462806,
+  "calibration_on_repos_that_still_EXIST": {
+   "models--MoritzLaurer--DeBERTa-v3-large-mnli-fever-anli-ling-wanli": {
+    "physical_bytes": 4136148159,
+    "bytes_as_summed_over_links": 8272294011,
+    "overstatement_factor": 2.0
+   },
+   "models--BAAI--bge-m3": {
+    "physical_bytes": 4564396159,
+    "bytes_as_summed_over_links": 9128792238,
+    "overstatement_factor": 2.0
+   },
+   "models--BAAI--bge-reranker-v2-m3": {
+    "physical_bytes": 2293242148,
+    "bytes_as_summed_over_links": 4586484256,
+    "overstatement_factor": 2.0
+   },
+   "models--answerdotai--ModernBERT-base": {
+    "physical_bytes": 600790736,
+    "bytes_as_summed_over_links": 1201581432,
+    "overstatement_factor": 2.0
+   },
+   "models--BAAI--bge-small-en-v1.5": {
+    "physical_bytes": 134505980,
+    "bytes_as_summed_over_links": 269011920,
+    "overstatement_factor": 2.0
+   },
+   "models--minishlab--potion-base-32M": {
+    "physical_bytes": 131204625,
+    "bytes_as_summed_over_links": 262407756,
+    "overstatement_factor": 2.0
+   },
+   "models--MoritzLaurer--bge-m3-zeroshot-v2.0": {
+    "physical_bytes": 3429517920,
+    "bytes_as_summed_over_links": 6881189783,
+    "overstatement_factor": 2.006
+   }
+  }
+ },
+ "census_face": {
+  "finding": "the governed census artifact did NOT move: governance/model_store_census_20261015.json is byte-identical to HEAD (hub_bytes 0.15 GiB, buckets unchanged) although the census WAS run on both sides of the deletion and printed a hub total of 124837.5 MB. The artifact is therefore not the instrument's output - it is a hand-cut face (BUG-819), and this batch would have exited 0 while a face described bytes that are gone (T-147).",
+  "census_stdout_hub_total_mb_after": 124837.5,
+  "tracks": "T-147 (wire the census to every deletion batch, and fail the batch if it did not move)"
+ }
+}

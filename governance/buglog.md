@@ -14285,3 +14285,14 @@ FIX (measured working): `GOOSE_PROVIDER` and `GOOSE_MODEL` are now part of the h
 MODEL resolved by POINTER to config/model_assignments.yaml#harness_roles.AGENT_LOOP_SHORT.model so no
 model name is restated (C12). Proof: with the binding applied, the same run moved the local engine's
 counter 52 -> 54. harness_env --selftest is now 9/9, including `an_unresolvable_pointer_is_FATAL`.
+
+## BUG-816 (MED - OPEN 2026-10-15) - the first fan-out proved the mechanism and exposed the model: a 2B reader returned a FALSE NEGATIVE
+Two detached sub-agent tasks (pipeline/subagent_fanout.py, MiniCPM5-2B-MLX) both reached TERMINAL in ~24s and
+wrote their own answer files - durability and artefact-partitioning worked on the first try. One of the two
+answers was WRONG: asked whether config/engine.yaml declares fanout.max_parallel, the model said there is no
+mention, while a grep finds it in the very file it was handed. A 2B model reads fast and unreliably, and a wrong
+sub-answer is invisible in a fan-out unless something else checks it.
+FIX IN PLACE: (a) the model is declared PER TASK (D-3011 - a slot names an axis, and LIGHTWEIGHT_PROBE is not a
+reading-comprehension worker); (b) the cross-family verify pass is REQUIRED, not offered (R5); (c) a task budget
+must be sized for the answer, not for the hope (task 1 was cut off at 220 tokens).
+CLASS: BUG-811's cousin - a new instrument's first output is evidence about the instrument, not about the world.

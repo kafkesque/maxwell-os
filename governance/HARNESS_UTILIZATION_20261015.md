@@ -74,3 +74,17 @@ is pinned and the cache is proven (T-137).
    C1/C3 do not allow. Fixed the same way as the context contract: the provider and the model are BOUND
    by pipeline/harness_env.py, and the model is resolved by POINTER from the single home that owns it,
    so no model name is restated (C12).
+
+## 7. THE FAN-OUT EXECUTOR, MEASURED ON ITS FIRST REAL RUN (2026-10-15)
+Two independent questions over two files, one fast model (MiniCPM5-2B-MLX), run as detached workstreams:
+both reached TERMINAL in **23.9s and 24.0s**, each writing its own answer file, started under the declared cap
+(engine.fanout.max_parallel = 3) - the MECHANISM works.
+
+The ANSWERS did not: task 1 found the right function (refresh) and the right expression but was cut off by its
+220-token budget, and task 2 claimed that config/engine.yaml contains no fanout.max_parallel - which is FALSE:
+a grep finds it in the file the model was handed. A 2B model is a fast READER, not a reliable one, and its
+failure is silent unless a second model checks it. That is why:
+  * the model is declared PER TASK in the task file (D-3011: a slot names an axis), and
+  * the cross-family verify pass is MANDATORY, not optional (R5) - it is what turns a fast wrong answer into a
+    caught one (the verdict is in temp/runs/fanout_20261015/99_verify.md).
+Filed as BUG-816.

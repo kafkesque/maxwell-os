@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**218 open** / 360 closed of 578 ids.
+**219 open** / 360 closed of 579 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -225,3 +225,4 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-813 | (MED - OPEN 2026-10-15) - the cache was enabled before its baseline was taken | 1 |
 | BUG-814 | (MED - OPEN 2026-10-15) - a hub snapshot can be DECLARED by name while nothing resolves into it | 1 |
 | BUG-815 | (HIGH - OPEN 2026-10-15) - `goose run` was not bound to the local engine, so a headless agent run went elsewhere | 1 |
+| BUG-816 | (MED - OPEN 2026-10-15) - the first fan-out proved the mechanism and exposed the model: a 2B reader returned a FALSE NEGATIVE | 1 |

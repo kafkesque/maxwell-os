@@ -11,6 +11,8 @@ next_state:
 - the anchor's MISSING domain axis produced as machine evidence by the reliable pair (DeepSeek + Qwen3.8) on the blind row
   text, silver consensus + needs_review, owner adjudicates; no domains_final is ever written by a script
 may_touch:
+- governance/HARNESS_UTILIZATION_20261015.md
+- governance/buglog.md
 - DECISION-LOG.md
 - MASTER-TASK-REGISTER.md
 - agent/session_seed.yaml

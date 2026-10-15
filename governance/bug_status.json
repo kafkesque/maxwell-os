@@ -2,8 +2,8 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 578,
-  "open_n": 218,
+  "total_ids": 579,
+  "open_n": 219,
   "closed_n": 360,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
@@ -1096,6 +1096,11 @@
     {
       "id": "BUG-815",
       "title": "(HIGH - OPEN 2026-10-15) - `goose run` was not bound to the local engine, so a headless agent run went elsewhere",
+      "events": 1
+    },
+    {
+      "id": "BUG-816",
+      "title": "(MED - OPEN 2026-10-15) - the first fan-out proved the mechanism and exposed the model: a 2B reader returned a FALSE NEGATIVE",
       "events": 1
     }
   ],

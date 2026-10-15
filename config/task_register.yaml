@@ -1339,7 +1339,8 @@ tasks:
 
 - id: T-161
   priority: SHOULD
-  state: open
+  state: done
+  closed: 2026-10-15
   mover: owner
   title: 'BIND THE HARNESS CLASS CEILING IN THE ENGINE''S OWN HOME: the derived bound is declared and checked, and the binding is the owner''s act on a LIVE server'
   source: 'BUG-828 (part 3); D-3027; config/agent_context.yaml#turn_budget.bindings'
@@ -1357,7 +1358,8 @@ tasks:
 
 - id: T-162
   priority: MUST
-  state: open
+  state: done
+  closed: 2026-10-15
   mover: owner
   title: 'THE HARNESS CLASS MUST BE ABLE TO FINISH A TURN: the engine''s chunk-shaped keepalive must not be read as an answer (the prerequisite the T-137 A/B was missing)'
   source: 'BUG-835; T-137; config/ab_harness_t137.yaml#preconditions'

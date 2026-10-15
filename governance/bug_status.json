@@ -3,8 +3,8 @@
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
   "total_ids": 599,
-  "open_n": 225,
-  "closed_n": 374,
+  "open_n": 224,
+  "closed_n": 375,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -1124,11 +1124,6 @@
       "events": 1
     },
     {
-      "id": "BUG-835",
-      "title": "(HIGH - OPEN 2026-10-15) - the engine's chunk-shaped SSE keepalive is read as the model's FINAL answer, so a harness turn ends empty while t",
-      "events": 1
-    },
-    {
       "id": "BUG-836",
       "title": "(MED - OPEN 2026-10-15) - the R5 cross-family review route produced NO usable review from either local verifier, and one of the two failures",
       "events": 1
@@ -1508,6 +1503,7 @@
     "BUG-828",
     "BUG-830",
     "BUG-831",
-    "BUG-833"
+    "BUG-833",
+    "BUG-835"
   ]
 }

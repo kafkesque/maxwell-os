@@ -14128,3 +14128,10 @@ missing, both readings are unavailable and any conclusion drawn now would be a g
 
 FIX (declared, not applied): write the receipt on EVERY path, refusals included, with the raw call records (both
 calls' dt, pt, ct, cached_tokens and err).
+
+**BUG-806 ADDENDUM (MEASURED 2026-10-15, same session).** The A4B reading's likely cause was FOUND after the fact and
+cannot be proved from the receipt (which is the bug): /v1/models lists 8 served models and
+gemma-4-26B-A4B-it-OptiQ-4bit is not among them - it sits in ~/.omlx/_unloaded/ - so the request almost certainly
+returned an ERROR OBJECT, and "the server did not echo prompt_tokens" is my instrument's label for it, not the
+server's own explanation. The lesson generalises: an NA verdict must quote the RAW response body, or a refusal of
+mine is indistinguishable from a refusal of the engine's.

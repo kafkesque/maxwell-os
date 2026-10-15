@@ -1050,7 +1050,7 @@
     },
     {
       "id": "BUG-806",
-      "title": "(LOW \u2014 OPEN 2026-10-15) \u2014 my bench wrote its receipt only on the SUCCESS path, so the two REFUSALS were not persisted",
+      "title": "(LOW - OPEN 2026-10-15) - my bench wrote its receipt only on the SUCCESS path, so the two REFUSALS were not persisted",
       "events": 1
     }
   ],

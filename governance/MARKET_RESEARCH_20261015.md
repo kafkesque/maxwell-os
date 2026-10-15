@@ -77,7 +77,15 @@ A4B), `Qwen3.8-27B-MLX-4bit` (15 GB, worst loop bill by 6.6x — keep only if it
 and the parked `_unloaded/` set (`DeepSeek-R1-0528-Qwen3-8B`, `Qwopus-GLM-18B`, `gemma-4-E2B` — the last
 is redundant against the E4B). **Nothing is deleted this session** (an unverified inventory may not drive a delete).
 
-**Already on disk and therefore FREE to preflight:** `gemma-4-26B-A4B-it-OptiQ-4bit` and
+**CORRECTION, MEASURED 2026-10-15 (same session, after the claim was first written):** both models sit in
+the engine's parked directory (~/.omlx/_unloaded/) and are **NOT in the engine's served list** - /v1/models
+returned 8 entries and neither of them is among them. "Already on disk" is therefore true about the BYTES
+and false about the SERVICE: making either one preflightable is ONE declared act (move the directory back),
+not zero acts. The bench run attempted the A4B by name and got no usable reading for exactly this reason -
+filed as BUG-806, whose point is that the RAW error was not persisted, so the cause is INFERRED from the
+served list and never proven from the receipt.
+
+**Already on disk (bytes), NOT yet served:** `gemma-4-26B-A4B-it-OptiQ-4bit` and
 `Qwen3.6-35B-A3B-4bit` sit in `~/.omlx/_unloaded/`. The "worth downloading" recommendation from the
 previous session is **already downloaded** — the open item was never the download, it was the SLOT.
 

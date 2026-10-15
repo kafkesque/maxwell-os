@@ -33,6 +33,8 @@ health:
     python3 pipeline/harness_contract.py --check || [ $? -eq 2 ]   # T-132: the contract's ONE reading of the RUNNING env. 2 = OWNER-OWED (unbound: the harness will use its own cloud price-tier defaults) - loud, NOT fatal (BUG-457); 1 = an env value CONTRADICTS the declaration, which is a drift and IS fatal
     python3 pipeline/harness_env.py --selftest || exit 1   # T-132/D-3003: the declared contract must have a working EXECUTOR, not only a reader - a declaration that never reaches the environment is a comment
     python3 pipeline/harness_env.py --check || [ $? -eq 2 ]   # T-132: 2 = OWNER-OWED (the harness was started outside the executor); 1 = an env value CONTRADICTS the declaration and that is fatal
+    python3 pipeline/delegation_economy.py --selftest || exit 1   # D-3023: the economy instrument's known-answer controls (local-only ledger, a cloud row over the ceiling, an absent ledger read as UNMEASURED and never as zero, a local model whose NAME carries a cloud marker still reading LOCAL, an unrecognised model joining neither tier, a row with no cost counted as UNKNOWN, a ratio below the declared floor reading INCONCLUSIVE, a ledger missing a declared column FATAL, and the module naming no ceiling of its own - proved by reading its own bytes, C12) - a control nothing runs is a comment (BUG-492)
+    python3 pipeline/delegation_economy.py --check || [ $? -eq 2 ]   # D-3023/BUG-832: a cloud token is an ESCALATION, so the lifetime ceilings are SHRINK-ONLY. 1 = a ceiling is EXCEEDED (the only fatal reading: route the work to T0/T1, or the OWNER raises the ceiling with a reason); 2 = UNMEASURED, loud, NOT fatal (BUG-457)
     python3 pipeline/model_store_census.py || [ $? -eq 2 ]   # BUG-804/808: 2 = bytes only an owner disposes of, or an engine entry whose target is ABSENT; the census PROPOSES and never deletes (R-D410)
     python3 pipeline/engine_boot_report.py || [ $? -eq 2 ]   # BUG-802: the $0 engine's survival - the ladder REPORTS the engine's own state (and whether a boot agent exists) instead of discovering it as a per-request failure hours later. 2 = OWNER-OWED (engine down, or nothing starts it after a reboot)
     python3 scripts/ingest_relabel_rulings.py --selftest || exit 1   # BUG-785: the T-117 READER's known-answer controls (a word outside the DECLARED vocabulary, a CORRECT with no home, a home no taxonomy canonical declares, an inert owner_canonical on a non-CORRECT row, the write keyed by unit_key and never by the ordinal, an applied receipt surviving a re-ingest, and the declared vocabulary staying a SUBSET of the applier's ACTIONS) — a control nothing runs is a comment (BUG-492)   # BUG-782: the OWNER-WORD INTAKE's known-answer controls (an unknown word, an unsigned tier, a withheld word, a transitivity conflict, a stale sheet, a dropped owner word, an unparseable predicate, a stale pair object) — a control nothing runs is a comment (BUG-492)
@@ -182,6 +184,13 @@ health-full:
 # ── One-panel inference stack monitor (D2456): versions + drift + single-source ──
 stacks:
     @python3 scripts/monitor_stacks.py
+
+# ── The delegation economy (D-3023): what leaves the machine, what stays, and the ceiling ──
+economy:
+    @python3 pipeline/delegation_economy.py
+
+economy-json:
+    @python3 pipeline/delegation_economy.py --json
 
 preflight:
     @echo "=== Maxwell OS Preflight ==="

@@ -1,0 +1,93 @@
+# config/delegation_economy.yaml
+# ─────────────────────────────────────────────────────────────────────────────
+# THE DELEGATION ECONOMY — what leaves the machine, what stays, and the ceiling that makes a
+# cloud token an ESCALATION rather than a default. ONE home (C12/C12c). Authority: D-3023.
+#
+# WHY THIS EXISTS. MEASURED 2026-10-15 BY pipeline/delegation_economy.py from the harness's OWN
+# ledger (~/.local/share/goose/sessions/sessions.db#usage_ledger; 33,231 rows; 2026-08-28 ->
+# 2026-10-15). The instrument's reading is the baseline, and these are its numbers:
+#   * CLOUD  32,851 calls, 3,981,322,921 input tokens, 57,008,294 output, $105.42 (estimated)
+#   * LOCAL     379 calls,     3,667,410 input tokens,    144,968 output, $0.00
+#   * UNCLASSIFIED 1 call, 156,098,139 input, $7.35 (cost_source=carried_forward) - a ledger row with
+#     NO model name. It is REPORTED here and joined to neither tier: a fabricated bucket is BUG-767's
+#     defect class. 1,384 further rows carry no cost at all and are counted as UNKNOWN, not as zero.
+#   * the local fleet carried 0.09% of the input tokens while it sat idle.
+# A cloud token is therefore TWO facts, in this order: (1) a SOVEREIGNTY escalation (C1/C3 — all
+# generation on local hardware, all data local), and only then (2) a money line of ~$2.35/day.
+# The money is NOT the reason to route locally; capability and independence are. This file exists
+# so the first fact is MEASURED instead of assumed, and so the second cannot grow unobserved.
+#
+# THE RULE. A capability routes to the CHEAPEST tier that can do it: T0 deterministic script,
+# T1 local engine, T2 cloud. A T2 call is an ESCALATION: it carries a reason from the vocabulary
+# below, and the lifetime ceilings are SHRINK-ONLY — raising one is an owner word with a reason,
+# never an edit. (D-3023; the same shape as the T-104 shrink-only ceiling, and the same principle
+# as D-2941: a gate carries intent, a script applies it.)
+schema_version: '1'
+authority: D-3023
+updated: '2026-10-15'
+state: measured
+
+#: The ledger and the local model registry are READ from the homes that already own them — never
+#: restated here (C12). Both are pointers resolved by pipeline/harness_env.py::resolve (ONE
+#: resolver, C21). The ledger pointer carries its own table name after '#'.
+homes:
+  ledger: '@config/agent_context.yaml#homes.cache_ledger'
+  local_model_set: '@config/agent_context.yaml#homes.served_window'
+
+#: The columns this instrument reads, by ROLE. A missing column is FATAL, never a zero (C16).
+ledger_fields:
+  model: model
+  input: input_tokens
+  output: output_tokens
+  cache_read: cache_read_tokens
+  cost: cost
+  cost_source: cost_source
+
+#: A row is LOCAL iff its model is in the engine's OWN registry (the join IS the measurement —
+#: no list of local models is written down here). A row that names a declared cloud FAMILY is
+#: CLOUD. Anything else is UNCLASSIFIED and is REPORTED: an unclassified row is never quietly
+#: added to either tier, because a fabricated bucket is BUG-767's defect class (D-2957).
+cloud_model_families:
+  - deepseek
+  - kimi
+  - moonshot
+  - gemini
+  - gpt-
+  - claude-
+  - glm-
+  - qwen-cloud
+
+#: SHRINK-ONLY, measured immediately before this file was written. Raising a ceiling is an OWNER
+#: act (a word with a reason) — the whole point is that it cannot be raised by an edit an agent
+#: makes while routing around the question.
+ceiling:
+  measured_20261015:               # the instrument's own reading, not an ad-hoc query
+    cloud_cost_usd: 105.42
+    cloud_input_tokens: 3981322921
+    cloud_calls: 32851
+    local_input_tokens: 3667410
+    local_calls: 379
+    unclassified_cost_usd: 7.35    # one ledger row with no model name (reported, never bucketed)
+  #: The margin is ~10 days of the measured burn (~$2.35/day). A ceiling is not a budget to spend up
+  #: to; it is the point at which the QUESTION is asked. Raising one is an owner word with a reason.
+  cloud_cost_usd: 130.00
+  cloud_input_tokens: 4600000000
+  cloud_calls: 37000
+
+#: The vocabulary an escalation reason is drawn FROM. The instrument never infers a reason; the
+#: CALLER records one. The route registry (T-156) holds the ROUTES, this holds the WORDS, and
+#: neither is allowed to become the other.
+escalation:
+  reasons:
+    - owner_visible_architecture   # the reasoning is read by the owner and its quality is the deliverable
+    - no_local_route_measured      # no served model passes the class's own measurement
+    - local_route_refuted          # a local attempt was measured and FAILED (the measurement is the receipt)
+    - owner_deadline
+  note: >-
+    a reason is a CLAIM about a decision, and an unverifiable claim is not evidence: the durable
+    version of this is T-156's route registry, where the route is declared and the resolver is
+    deterministic.
+
+ratio:
+  min_calls: '@config/agent_context.yaml#cache_accounting.min_calls_for_a_ratio'
+  local_share_advisory_only: true   # reported; it is not a gate until a route registry exists

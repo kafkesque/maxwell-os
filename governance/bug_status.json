@@ -2,8 +2,8 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 594,
-  "open_n": 222,
+  "total_ids": 595,
+  "open_n": 223,
   "closed_n": 372,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
@@ -1116,6 +1116,11 @@
     {
       "id": "BUG-829",
       "title": "(MED - OPEN 2026-10-15) - the review surface's own agent panel defaults to a CLOUD provider",
+      "events": 1
+    },
+    {
+      "id": "BUG-832",
+      "title": "(MED - OPEN 2026-10-15) \u2014 the session brain is the provider a CLOSED bug banned, and nothing in the repo can see it change",
       "events": 1
     }
   ],

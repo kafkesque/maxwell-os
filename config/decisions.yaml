@@ -25072,3 +25072,84 @@ decisions:
     This also retires the recipe that BUG-721 was previously answered with. That bug was closed by RULES (delegate
     less, delegate differently) and it came back; the durable answer is an INSTRUMENT, because a rule is remembered
     while an instrument runs. The same shape as D-3020: durability over discipline.'
+- id: D-3023
+  state: ACTIVE
+  category: DELEGATION / ECONOMY
+  title: 'A CLOUD TOKEN IS AN ESCALATION: the delegation economy has one home, one reader and SHRINK-ONLY ceilings,
+    and money is the second fact - sovereignty is the first'
+  bugs:
+  - BUG-832
+  - BUG-794
+  files:
+  - config/delegation_economy.yaml
+  - pipeline/delegation_economy.py
+  - justfile
+  - pipeline/config_audit.py
+  - config/declaration_consumers.yaml
+  decision: 'MEASURED 2026-10-15, and nothing had measured it before: the harness''s own ledger holds 32,851 cloud
+    calls carrying 3,981,322,921 input tokens and $105.42 (estimated), against 379 local calls carrying 3,667,410
+    input tokens and $0.00. The local fleet carried 0.09% of the load while it sat idle, and one ledger row (156,098,139
+    input tokens, no model name) joined no tier at all. THE RULE: the economy has ONE home and ONE reader. config/delegation_economy.yaml
+    declares the ceilings, the tier vocabulary and the homes it reads; pipeline/delegation_economy.py is the only
+    reader, it WRITES NOTHING, and it is the source of the baseline - an ad-hoc query is not a measurement (BUG-794''s
+    lesson applied to cost). A capability routes to the CHEAPEST tier that can do it: T0 a deterministic script,
+    T1 the local engine, T2 a cloud API. A T2 call is an ESCALATION, and the lifetime ceilings are SHRINK-ONLY:
+    raising one is an owner word with a reason, never an edit made while routing around the question. TWO BOUNDARIES
+    are part of the rule, because a lying instrument is worse than none: a row whose model is in neither the engine''s
+    registry nor a declared cloud family is UNCLASSIFIED and is REPORTED, never bucketed; and a row with no cost
+    is UNKNOWN, never a measured zero (D-2957). THE MONEY IS THE SECOND FACT: the first is that C1/C3 says generation
+    happens on hardware we own ($2.35/day is not the reason to route locally - capability and independence are).
+    What this decision does NOT do is force a route: it makes the question unavoidable and measurable, and a measured
+    local route or the owner''s word is what moves it.'
+- id: D-3024
+  state: ACTIVE
+  category: DELEGATION / ROUTING
+  title: 'THE ROUTE GRAPH IS DECLARED, DETERMINISTIC AND CALLED: a capability registry with a check and a receipt,
+    and the LLM PROPOSES but never assigns'
+  bugs:
+  - BUG-482
+  - BUG-827
+  files:
+  - config/declaration_consumers.yaml
+  - config/flag_consumer_registry.yaml
+  - config/harness_policy.yaml
+  - justfile
+  decision: 'MEASURED 2026-10-15: of 516 python files, 35 are named by no justfile recipe, no config and no governance
+    document; of 112 pipeline modules, 3 expose a machine-readable check verb; of 404 scripts, 0 do. Who runs what
+    lives in prose and in a justfile, so a task cannot be resolved to the capability that owns it and a capability
+    whose check does not exist cannot be refused. THE RULE: a registry declares for every capability its KIND (script
+    | recipe | skill | harness_job), its ENTRYPOINT, its CHECK, its COST TIER and its RECEIPT; a deterministic resolver
+    assigns; the resolver COMPOSES the joins that already exist (config/declaration_consumers.yaml, config/flag_consumer_registry.yaml,
+    config/harness_policy.yaml) rather than restating them; and a capability with no check, no entrypoint or no
+    receipt is REFUSED rather than trusted - an instrument that is never called is not a guard (T-149/BUG-482).
+    AN LLM MAY PROPOSE A ROUTE INTO temp/ AND MAY NEVER ASSIGN ONE. That is D-2898''s no-LLM-canonical-promotion
+    and D-2941''s a-gate-carries-intent-a-script-applies-it, applied to tools - and it is not caution for its own
+    sake: the one model this repository has measured on a citation task invented 8 of 8 citations (BUG-827), so
+    an assignment layer that cannot be audited would add a drift surface whose failure mode is SILENT. Recipes and
+    skills in a harness (goose, pi) are THIN WRAPPERS over the repo''s entrypoints, because ~/.config/goose is not
+    versioned, not reviewed and not governed: a capability defined only there drifts by construction.'
+- id: D-3025
+  state: ACTIVE
+  category: DELEGATION / LOOPS
+  title: 'A LOOP NAMES ITS TERMINAL CONDITION AND ITS CHECKER BEFORE IT RUNS: the loop is admissible where the checker
+    is a READER, and refused where the checker is the generator'
+  bugs:
+  - BUG-721
+  - BUG-827
+  files:
+  - pipeline/subagent_fanout.py
+  - pipeline/research_run.py
+  - pipeline/fsm.py
+  decision: 'A LOOP MUST NAME ITS TERMINAL CONDITION AND ITS CHECKER BEFORE IT RUNS. Three things are declared before
+    the first iteration: the TERMINAL CONDITION (what ends it), the CHECKER (a deterministic reading of the artifact
+    - never the generating model''s opinion of its own work), and the BUDGET (D-3020: a delegation that cannot finish
+    must say so). A loop whose checker is its own generator is a runaway with a receipt; a loop that cannot name
+    a terminal condition cannot run unattended; a loop that neither writes nor is read is an expensive no-op. This
+    decides what may be loop-engineered, and it is grounded in what the repository has MEASURED rather than in a
+    preference for caution. ADMISSIBLE, because the checker is mechanical: the citation read-back (D-3022/T-155),
+    the ladder rails, the doctor''s tri-state verdicts, retrieval-then-verify, and prompt optimization against a
+    fixed metric (DSPy/MIPROv2/GEPA, whose metric is the artifact of a D-400 instrument). REFUSED by the same rule:
+    multi-agent debate and self-grading loops - they multiply tokens without a reader, which is BUG-721''s failure
+    mode with a larger bill. The admissible middle is the chain-of-verification shape: DECOMPOSE the claim, then
+    verify each part against the file (D-3022) or the rail, with the verification performed by a READER rather than
+    by a second opinion.'

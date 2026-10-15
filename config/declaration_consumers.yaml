@@ -86,6 +86,14 @@ declarations:
     ROUTING rule (every production call site calls the dispatcher) and the INVENTORY rule
     (every leg call is declared, every declaration is live). Joining them here means a staged
     matrix with a withheld reader is refused at the commit boundary (the BUG-562 shape).
+- declaration: config/delegation_economy.yaml
+  consumers: [pipeline/delegation_economy.py]
+  decisions: [D-3023, BUG-832]
+  why: >-
+    the economy's ceilings, its tier vocabulary and the homes it reads are declared in ONE config home and read
+    by exactly ONE module (pipeline/delegation_economy.py). Joining them here means a staged ceiling with a
+    withheld reader is refused at the commit boundary (the BUG-562 shape) - and a ceiling nobody reads is a
+    rubber stamp, which is the state T-104 already measured once on a different ceiling.
 - declaration: config/task_register.yaml
   consumers: [scripts/gov_sync.py]
   decisions: [D-2981]

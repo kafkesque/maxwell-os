@@ -1245,3 +1245,76 @@ tasks:
     against the file AS IT IS NOW, so a refutation can mean the file MOVED rather than that the answer
     lied; a retry policy must therefore re-check the citation against the file at the answer own
     timestamp where one exists, and must never spend a retry on line drift alone.'
+
+- id: T-156
+  priority: MUST
+  state: open
+  mover: pipeline
+  title: 'THE ROUTE GRAPH IS DECLARED AND DETERMINISTIC: a capability registry plus a resolver, and the LLM PROPOSES but never assigns'
+  source: D-3024; BUG-482; D-2898; D-2941; T-149; harness_policy.yaml
+  evidence: 'MEASURED 2026-10-15 (read-only census): 516 python files across pipeline/ and scripts/,
+    35 of them named by NO justfile recipe, NO config and NO governance document (an instrument with
+    no caller is not a capability - the T-149/BUG-482 class); 112 pipeline modules of which 3 expose a
+    machine-readable check verb and 404 scripts of which 0 do; 89 mutator-shaped scripts (apply_*,
+    repair_*, fix_*, backfill_*) against 85 guard-shaped ones. "Who runs what" therefore lives in
+    prose (CLAUDE.md delegate_rules, ADVISORY) and in a justfile, and nothing can resolve a task to
+    the capability that owns it, nor refuse a capability whose entrypoint or check does not exist.'
+  gate: 'pipeline: a declared registry (kind: script | recipe | skill | harness_job) carries for every
+    capability its entrypoint, its CHECK, its cost tier and its receipt; the resolver is deterministic
+    and COMPOSES config/declaration_consumers.yaml and config/flag_consumer_registry.yaml instead of
+    restating them; --check FAILS on a capability with no entrypoint, no check or no receipt, and on a
+    declared route whose entrypoint is absent; an LLM may write a PROPOSAL into temp/ and never an
+    assignment (D-2898/D-2941). Proof: every open task and every open bug resolves to a declared route
+    (or is explicitly unrouted WITH a reason) and the resolver is byte-stable across runs.'
+- id: T-157
+  priority: MUST
+  state: open
+  mover: pipeline
+  title: 'CENSUS THE HARNESS HOMES A DECISION NAMES, so a reversal of a ruled remedy is a READING and not a discovery'
+  source: BUG-832; D-295; BUG-243; config/agent_context.yaml#homes
+  evidence: 'MEASURED 2026-10-15: ~/.config/goose/config.yaml:311 reads active_provider:
+    custom_deepseek while BUG-243 (CLOSED) rests on the rationale "active_provider=maxwell_omlx ...
+    No active config references custom_deepseek" and DECISION-LOG D-295 records the same remedy. The
+    reversal is invisible because the repo measures config/*.yaml to the KEY and does not read the
+    harness homes that config/agent_context.yaml#homes itself declares.'
+  gate: 'pipeline: the harness homes a decision names (the session provider and model, the harness
+    job map, the Zed settings that BUG-829 concerns) are read by an instrument that reports
+    BOUND / CONFLICT / WAITING-ON-A-HUMAN-WORD, and a hand edit to one of them shows up as a reading. Proof: a change
+    is caught by a rail rather than by a session noticing it, and the ladder line for it is
+    loud-not-fatal (BUG-457) unless a decision names the value.'
+- id: T-158
+  priority: SHOULD
+  state: open
+  mover: pipeline
+  title: 'THE CONTEXT DIET: a mechanically generated state digest replaces the 3.96 MB manual boot read'
+  source: D-3023; config/delegation_economy.yaml; config/agent_context.yaml#trigger.prefer
+  evidence: 'MEASURED 2026-10-15: the declared knowledge sources total 3.96 MB (governance/buglog.md
+    1.50 MB, config/decisions.yaml 1.42 MB, DECISION-LOG.md 577 KB, MASTER-TASK-REGISTER.md 299 KB,
+    governance/CONTEXT_INDEX.md 165 KB) = ~990 k tokens at 4 chars/token if read whole, while the
+    harness ledger shows a cloud session paying ~92 k input tokens PER CALL (32,851 cloud calls,
+    3,981,322,921 input tokens, $105.42 measured). config/agent_context.yaml#trigger already prefers a
+    short byte-stable DECLARED handoff over in-place compaction; nothing generates one for BOOT.'
+  gate: 'pipeline: a script re-derives a compact state digest (faces, ceilings, open MUSTs, human
+    gates) that a fresh session boots from, names the generator and the timestamp it summarises, and
+    FAILS when it is stale relative to the registers it summarises. Proof: a session reaches working
+    state from the digest alone, and the digest is never hand-written.'
+- id: T-159
+  priority: WORTH
+  state: open
+  mover: pipeline
+  title: 'THE INTAKE DELTA: the prior art that this session identified lands in the intake register, MARKED where it already exists'
+  source: governance/NOT-YET-EVALUATED-RESEARCH.md; D-3024; D-3025
+  evidence: 'MEASURED 2026-10-15: the register already holds R-02 (structured JSON output / response_format) and R-13
+    (token-efficient prompt patterns), which are two of the eight opportunities this analysis
+    surfaced - so a naive append would DUPLICATE a live opportunity and inflate the intake. The
+    delta to record: citation precision/recall as a metric vocabulary (ALCE / AttrScore / AIS) for
+    D-3022; bounded-critique loops with a CHECKER rather than self-judgement (Reflexion / Self-Refine
+    / CRITIC) for T-155/D-3025; constrained decoding (Outlines / XGrammar, and the engine own
+    guided_grammar_enabled flag) against the json_fixer.py repair path; prefix/KV cache (RadixAttention
+    / Prompt Cache) against the measured cached_tokens=0 (F6/BUG-792); DSPy/MIPROv2/GEPA against the
+    unrun pipeline/dspy_trainer.py; adaptive retrieval (Self-RAG / Adaptive-RAG) against the context
+    budget; and the governance framing (NIST AI 600-1, 2024) for the escalation receipt.'
+  gate: 'pipeline: the entries land in governance/NOT-YET-EVALUATED-RESEARCH.md in ITS format, with
+    the already-present items MARKED as extending an existing row rather than duplicated. Proof: the
+    register grows by the delta only, and two rows are visibly annotated instead of repeated.'
+

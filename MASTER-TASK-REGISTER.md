@@ -11,11 +11,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1150 decisions (census stamp 609b84db6cabaeba, 2026-10-15) · 594 bugs (222 open / 372 closed; highest OPEN = BUG-829) · 45 open tasks (MUST 14 / SHOULD 27 / WORTH 3; OWNER-moved 12, pipeline-moved 33; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1153 decisions (census stamp dfdafbd1d5943ed1, 2026-10-15) · 595 bugs (223 open / 372 closed; highest OPEN = BUG-832) · 49 open tasks (MUST 16 / SHOULD 28 / WORTH 4; OWNER-moved 12, pipeline-moved 37; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **80** of 1150 — 🔴 open 32 · 🔵 proposed 27 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 565 · ⚖ ratified 145 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1150, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **80** of 1153 — 🔴 open 32 · 🔵 proposed 27 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 568 · ⚖ ratified 145 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1153, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 222 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 34 · 🟨 MED 59 · 🟩 LOW 24 · UNLABELLED 101 (BUG-757) of 222 open.
+> Open BUGS by severity (population = the census's 223 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 34 · 🟨 MED 60 · 🟩 LOW 24 · UNLABELLED 101 (BUG-757) of 223 open.
 >
 > **OWNER LANE (12) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -34,7 +34,7 @@
 > | T-145 | 🟠 SHOULD | EDGE0 IS DEFERRED WITH A NAMED TRIGGER, not fetched: the class is already served and the role is blocked on me | OWNER: say 'fetch Edge0' to override, or leave it deferred until T-137 |
 > | T-138 | COULD | HARNESS ADOPTION ON DEMAND - one command per tool, and none of them load-bearing | install a harness only when a specific job needs it (C28). The engine  |
 >
-> **PIPELINE LANE (33) — what the agent will do next, in strategic-consequential order (source: config/task_register.yaml):**
+> **PIPELINE LANE (37) — what the agent will do next, in strategic-consequential order (source: config/task_register.yaml):**
 >
 > | id | pri | state | task | evidence |
 > |---|---|---|---|---|

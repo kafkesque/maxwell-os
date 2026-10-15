@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1150 decisions (census stamp 609b84db6cabaeba, 2026-10-15) · 594 bugs (222 open / 372 closed; highest OPEN = BUG-829) · 45 open tasks (MUST 14 / SHOULD 27 / WORTH 3; OWNER-moved 12, pipeline-moved 33; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1153 decisions (census stamp dfdafbd1d5943ed1, 2026-10-15) · 595 bugs (223 open / 372 closed; highest OPEN = BUG-832) · 49 open tasks (MUST 16 / SHOULD 28 / WORTH 4; OWNER-moved 12, pipeline-moved 37; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **80** of 1150 — 🔴 open 32 · 🔵 proposed 27 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 565 · ⚖ ratified 145 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1150, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **80** of 1153 — 🔴 open 32 · 🔵 proposed 27 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 568 · ⚖ ratified 145 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1153, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 222 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 34 · 🟨 MED 59 · 🟩 LOW 24 · UNLABELLED 101 (BUG-757) of 222 open.
+> Open BUGS by severity (population = the census's 223 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 34 · 🟨 MED 60 · 🟩 LOW 24 · UNLABELLED 101 (BUG-757) of 223 open.
 >
 > **OWNER LANE (12) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -31,7 +31,7 @@
 > | T-145 | 🟠 SHOULD | EDGE0 IS DEFERRED WITH A NAMED TRIGGER, not fetched: the class is already served and the role is blocked on me | OWNER: say 'fetch Edge0' to override, or leave it deferred until T-137 |
 > | T-138 | COULD | HARNESS ADOPTION ON DEMAND - one command per tool, and none of them load-bearing | install a harness only when a specific job needs it (C28). The engine  |
 >
-> **PIPELINE LANE (33) — what the agent will do next, in strategic-consequential order (source: config/task_register.yaml):**
+> **PIPELINE LANE (37) — what the agent will do next, in strategic-consequential order (source: config/task_register.yaml):**
 >
 > | id | pri | state | task | evidence |
 > |---|---|---|---|---|
@@ -14685,3 +14685,45 @@ re-check of an old answer is archaeology and must be read as such.
 
 **D-3022 is unchanged in rule and extended in shape:** the rule is "a citation is read back"; BUG-831 is the
 measurement that "both shapes" was one shape too few, and that the reader has to be told where the quote lives.
+
+## BUG-832 (MED - OPEN 2026-10-15) — the session brain is the provider a CLOSED bug banned, and nothing in the repo can see it change
+
+MEASURED 2026-10-15, read-only:
+- ~/.config/goose/config.yaml:311 reads `active_provider: custom_deepseek`, and providers.custom_deepseek
+  (lines 273-276) is enabled with model: deepseek-v4-pro.
+- BUG-243 (CLOSED 2026-10-09) closed on the rationale "active_provider=maxwell_omlx; delegate-safe guard +
+  delegate_rules ban (DELEGATE-001). No active config references custom_deepseek." That rationale is FALSE
+  today: the active provider IS custom_deepseek.
+- DECISION-LOG.md D-295 (RESOLVED) records the same remedy — "the bug is active_provider: custom_deepseek.
+  Switch to maxwell_omlx".
+- The economy of the current arrangement, measured by the new instrument:
+  python3 pipeline/delegation_economy.py -> cloud 32,851 calls / 3,981,322,921 input tokens / $105.42
+  (estimated) against local 379 calls / 3,667,410 input tokens / $0.00, i.e. the local fleet carried
+  0.09% of the load.
+
+ROOT — two defects stacked, and neither of them is the owner's taste in models:
+(a) ONTOLOGICAL: the rule's SUBJECT is mistyped. DELEGATE-001 is a defect of the DELEGATE PASSTHROUGH PATH
+    (a reasoning model returns finish_reason=stop with an empty final content under json_object), not of a
+    provider NAME. The ban names the provider, so it is at once too broad (an interactive session on the
+    same provider is not that bug) and too narrow (no path is guarded but the delegate path — tools/
+    delegate_safe.py validates a DELEGATE's provider, so the SESSION's own provider is unchecked). A rule
+    whose subject is a name rather than a MECHANISM cannot be enforced anywhere.
+(b) STRUCTURAL: a home-directory setting that a decision NAMES has no reader in the repo, so a reversal of
+    a ruled remedy is invisible — no census, no rail, no face. The repo measures config/*.yaml to the key;
+    it does not measure the harness homes that config/agent_context.yaml#homes itself declares.
+
+REMEDY (owner-gated: the setting is the owner's and the choice of brain is theirs).
+1. CENSUS the harness homes a decision names, so a change is a READING and not a discovery (T-157).
+2. DECIDE the brain explicitly (C22: local-first, API opt-in EXPLICIT): either execute D-295 literally, or
+   AMEND D-295 — the session brain is a measured, ceilinged opt-in. The measurement makes the second the
+   honest option today: no served model passes agent_loop long-context reasoning
+   (config/harness_policy.yaml#capability_axes.long_context_reasoning_16k: gemma-4-E4B 0.0, Qwen3-Coder 0.0;
+   only Qwen3.8-27B at 1.0, and at 39 tok/s prefill a 26214-token turn costs 672 s). The local route is
+   therefore REFUTED BY MEASUREMENT for this class, which is exactly the declared escalation reason
+   'local_route_refuted' in config/delegation_economy.yaml.
+3. RESTATE the ban with its real subject (the delegate passthrough path), not a provider name.
+
+EVIDENCE: ~/.config/goose/config.yaml:311 and :273-276 | governance/buglog.md BUG-243 close rationale |
+DECISION-LOG.md D-295 | python3 pipeline/delegation_economy.py --check (rc 0, within ceiling) |
+config/harness_policy.yaml#capability_axes.long_context_reasoning_16k.
+

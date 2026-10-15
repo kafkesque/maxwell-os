@@ -108,6 +108,12 @@ CONFIG_TO_CODE: dict[str, tuple[str, str, str]] = {
 # These are inside try/except blocks as graceful degradation when config is unavailable.
 # They mirror the config defaults in pipeline_paths.py — NOT drift risks.
 ACKNOWLEDGED_HARDCODED: set[str] = {
+    # delegation_economy.py — the rc VOCABULARY (0 ok / 1 breach / 2 unmeasured), which is the repo's
+    # own convention (BUG-457: loud, not fatal) and not a policy value. Config-ising an exit code
+    # would make the meaning of a run's result configurable, which is the opposite of C12's intent.
+    "RC_OK",
+    "RC_BREACH",
+    "RC_UNMEASURED",
     "BORP_MIN_SOURCES",      # e2e_test.py — except fallback (mirrors config default=2)
     "S4_DEPTH_MAX_TOKENS",   # stage4_merged_call.py — except fallback (mirrors stage4.depth_max_tokens=1024)
     "E2E_MIN_PASS_RATE",     # e2e_test.py — except fallback (mirrors config default=0.80)

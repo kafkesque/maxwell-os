@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**222 open** / 372 closed of 594 ids.
+**223 open** / 372 closed of 595 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -229,3 +229,4 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-821 | (MED - OPEN 2026-10-15) - the census could not count 16 records because the mint path was bypassed, so four faces quoted a stale total for t | 1 |
 | BUG-828 | (MED - OPEN 2026-10-15) - the deployed harness is not bounded by the declared budgets: the liveness signal cannot see it, and one turn outla | 1 |
 | BUG-829 | (MED - OPEN 2026-10-15) - the review surface's own agent panel defaults to a CLOUD provider | 1 |
+| BUG-832 | (MED - OPEN 2026-10-15) — the session brain is the provider a CLOSED bug banned, and nothing in the repo can see it change | 1 |

@@ -1,0 +1,100 @@
+schema_version: 2
+authority: D-3001; the DOOR it must pass -> config/ingest_identity_gate.yaml; the contract -> config/agent_context.yaml
+updated: '2026-10-15'
+intent: >-
+  Turn the owner's scattered following (YouTube channels, X, Telegram, Substack/Medium, news and journals,
+  podcasts) into ONE interest-based DAILY QUEUE of curated PROPOSALS. Each proposal carries its evidence,
+  its provenance and its estimated extract; the owner admits a few into the knowledge pipeline (-> primitive)
+  or drops the rest (-> non-principle) in minutes. The intake NEVER writes the store and never bypasses the
+  door (D-2997): its terminal state is OWNER-GATED.
+one_home_note: >-
+  This file is the ONE home of the intake policy. Do not restate its values in a doc or a script (C12/D-2646);
+  cite this path. The pipeline's own stage config is untouched by it.
+
+domains:
+  # The owner's declared interest set. The curator ranks and RADIOS against these; a domain is a FUNNEL,
+  # never a label written on a row (labels stay with the pipeline's own ontology, D-2898).
+  - web3
+  - privacy
+  - geopolitics
+  - macro_economics
+  - ai_ml
+  - design
+  - business_indiehacker
+  - productivity_health_lifehack
+  - creative_coding_music_dj_vj
+  - maxwell_os_engineering
+
+source_classes:
+  # ONE ROUTE per class. A bespoke scraper per SITE is the failure mode this table exists to prevent.
+  rss_opml: {route: 'feed.opml / FreshRSS-compatible OPML import', note: 'seed list: fuxiaoai/tidings-rss (REFERENCE, never truth)'}
+  youtube_channel: {route: 'RSSHub or the channel feed; transcript > ASR'}
+  x_account: {route: 'RSSHub (no API key path)'}
+  telegram_channel: {route: 'RSSHub or the channel export'}
+  substack_medium: {route: 'native /feed'}
+  news_journal: {route: 'native RSS; changedetection.io only where a feed is absent'}
+  podcast: {route: 'RSS enclosure -> transcript, ASR fallback'}
+  repo_release: {route: 'GitHub releases/atom for the tools in feed.opml'}
+
+item_classes: [video, podcast_episode, article, newsletter_post, journal_paper, thread, repo_release, model_card]
+
+noise_taxonomy:
+  # DECLARED classes. Every row must carry the EVIDENCE that put it there; a class assigned by vibes is a defect.
+  scam: {evidence: 'urgency/guarantee/payment pattern AND a claim the cited source cannot support (NLI)'}
+  psyops: {evidence: 'claimed provenance contradicts the cited source (NLI entailment below the declared floor)'}
+  clickbait: {evidence: 'the promised payload is absent from the body (title-vs-body entailment below floor)'}
+  engagement_bait: {evidence: 'no proposition extractable from the item at all'}
+  duplicate: {rule: 'exact_id -> served_run_name_and_author -> single_corpus_row (the D-2999 rung, reused)'}
+  off_interest: {rule: 'no declared domain reaches the relevance floor'}
+  low_alpha: {rule: 'nothing extractable: no claim, no method, no number, no decision, no artefact'}
+  unreadable: {rule: 'paywall/DRM/absent transcript AND no lawful route -> counted, never dropped silently'}
+
+screens:
+  # ORDER MATTERS: screen before any model is asked to treat untrusted text as content.
+  untrusted_input_first: true
+  injection_screen: 'a prompt-injection classifier on every item BEFORE it reaches a model (protectai/deberta-v3-base-prompt-injection class; ADOPT the idea)'
+  claim_check: 'the pipeline NLI pair (config/agent_context.yaml) - the curator NEVER scores itself'
+  independence: 'the curator model and the checker model are DIFFERENT families (R5)'
+  never_instructions: 'no text from the intake may be executed as a command, a path or a tool argument'
+
+daily_report:
+  gate: owner
+  cadence: daily
+  sections: per_domain
+  fields_per_item: [title, source, link, domain, item_class, noise_class_or_null, why_keep, extracted_alpha, estimated_units, transcript_available, cost_estimate]
+  max_items_per_section: 12
+  admit_action: 'owner approves a row -> the item is staged for the pipeline (S0) and passes the ingest door'
+  drop_action: 'owner drops a row -> COUNTED in the recall ledger, never deleted from the record'
+  receipts: 'every report is written and stamped; a dropped item stays re-viewable (a filter you cannot audit is an invisible failure)'
+
+extraction:
+  transcript_first: true
+  asr_fallback: 'WhisperKit / faster-whisper, local only'
+  text_to_md: 'crawl4ai or markitdown -> stage0_convert'
+  paywall: 'counted as unreadable; never circumvented'
+  store: 'nothing enters knowledge pipeline/ until the owner admits it and the door passes it'
+
+budgets:
+  class: pipeline_batch
+  why: 'bounded prompt, one answer, no history (the pipeline never re-sends a prefix it grew)'
+  per_item_ceiling: 'declared in config/agent_context.yaml#classes - cite it, do not restate it'
+  batch_packing: 'pack N items into one request; the shared prefix prefills once'
+
+rails:
+  precision_recall: 'the curator publishes its own precision/recall on a FROZEN golden set; a filter change without a re-measured pair is refused'
+  false_negative_is_the_expensive_error: 'an alpha item dropped is worse than a slop item shown: the drop rate is REPORTED, not optimised away silently'
+  dropped_items_counted: true
+  no_auto_admit: true
+  golden_set_path: governance/curator_golden_20261015.json
+  reading: 'TBD - the reading script is not written yet; until then the floor is DECLARED and the ladder is BLIND (say so, never imply measurement)'
+
+refusals:
+  - 'an intake item may never be written into the store except through the ingest door'
+  - 'no curator output may be used as a governance claim'
+  - 'no scraper may run against a source whose terms forbid it; the route is RSS/API or nothing'
+  - 'an item with no provenance (no link, no author, no timestamp) is UNREADABLE, never admitted'
+
+provenance:
+  stamps: [schema_version, gen_model, pipeline_commit]
+  receipt_dir: governance/
+exit_codes: {0: ok, 1: fatal, 2: owner_owed}

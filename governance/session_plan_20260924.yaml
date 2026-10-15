@@ -63,6 +63,14 @@ may_touch:
 - governance/depth_menu*.md
 - governance/ANCHOR4_DEPTH_RUBRIC_*.md
 - justfile
+- governance/MARKET_RESEARCH_20261015.md
+- governance/CURATOR_INTAKE_20261015.md
+- config/curator_intake.yaml
+- pipeline/harness_contract.py
+- pipeline/com.maxwell.omlx-engine.plist
+- pipeline/install_omlx_engine_agent.sh
+- pipeline/engine_boot_report.py
+- governance/land_receipt_20261015b.json
 - governance/frontier_pack_*
 - governance/anchor4_domain_*
 - governance/ANCHOR4_DOMAIN_*
@@ -1074,3 +1082,13 @@ widening_log:
   may_touch_untouched: false
   will_not_touch_untouched: true
   why: 'One widening, one NAMED grant. Everything else this act touched sits inside existing grants: config/agent_context.yaml, config/bench_preflight.yaml, config/ingest_identity_gate.yaml, config/task_register.yaml, config/rail_registry.yaml, config/decisions.yaml (config/*.yaml), scripts/normalise_corpus_names.py (scripts/*.py), justfile, governance/buglog.md, and the four derived faces. The engine start (a read-only measurement against the local server) and the oracle-free census wrote NO repo state outside temp/. The append-only journals (governance/MUTATION_JOURNAL.jsonl, governance/session_plan_20260924.yaml) are written BY their rails and by append; governance/bug_status.json/md were re-derived BEFORE the sync so no face cites a stale census (566 bugs).'
+- date: '2026-10-15'
+  actor: assistant
+  reason: >-
+    2026-10-15b: the delegation-axis market census (engines incl. magnitudedev/magnitude, models, harnesses and
+    the intake reference stack) plus the T-131 bench RUN at class size, and the two declarations the run forced:
+    BUG-803 (a prefill reading must carry the POOL RESIDENCY it was taken at) and BUG-805 (decode is a function of
+    CONTEXT LENGTH - a correction to the 2026-10-15 decode axis, which was measured on tiny prompts). New NAMED
+    surfaces only, never a glob (BUG-548/BUG-563).
+  owner_ack: 'the owner asked for the research and the update; NO engine was installed, NO model was downloaded
+    or deleted, NO launchd job was loaded, NO routing row was re-pointed and NO source was scraped.'

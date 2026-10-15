@@ -1,0 +1,17 @@
+{
+ "applied": true,
+ "files": {
+  "governance/buglog.md": {
+   "headings_before": 696,
+   "headings_after": 698,
+   "amendment": true
+  },
+  "config/task_register.yaml": "ROLLED BACK: mapping values are not allowed here\n  in \"<unicode string>\", line 878, column 110:\n     ... at is missing is the FRONT of it:\n                                         ^",
+  "config/decisions.yaml": "appended block at indent 0",
+  "config/rail_registry.yaml": "harness-contract rail lines inserted=True",
+  "justfile": "harness-contract + engine-boot ladder lines inserted=True",
+  "config/bench_preflight.yaml": "required_fields extended=True guards=True",
+  "config/agent_context.yaml": "candidates_20261015b appended",
+  "governance/session_plan_20260924.yaml": "may_touch=True widening_log=True"
+ }
+}

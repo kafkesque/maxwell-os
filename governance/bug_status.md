@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**206 open** / 360 closed of 566 ids.
+**209 open** / 360 closed of 569 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -213,3 +213,6 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-799 | (LOW — OPEN 2026-10-15) — two cache records duplicate ONE work under two raw names, and the door looks names up by BYTES | 1 |
 | BUG-800 | (LOW — OPEN 2026-10-15) — the approved corpus-name rename is a CASCADE until it rides a re-ingest | 1 |
 | BUG-802 | (MED — OPEN 2026-10-15) — the $0 local engine does not survive a reboot, and nothing starts it | 1 |
+| BUG-803 | (MED — OPEN 2026-10-15) — a prefill reading without the POOL STATE it was taken at is not comparable either | 1 |
+| BUG-805 | (MED — OPEN 2026-10-15) — decode is a function of CONTEXT LENGTH: the decode axis was measured on tiny prompts | 1 |
+| BUG-806 | (LOW — OPEN 2026-10-15) — my bench wrote its receipt only on the SUCCESS path, so the two REFUSALS were not persisted | 1 |

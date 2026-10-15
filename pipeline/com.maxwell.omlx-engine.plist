@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- BUG-802 remedy: the $0 local engine must survive a reboot.
+     TEMPLATE: @HOME@ is substituted by pipeline/install_omlx_engine_agent.sh at install time
+     (C12: no absolute path is hardcoded in the repo; C26: the same template fits any account).
+     KeepAlive is {SuccessfulExit: false}: restart ONLY on FAILURE. That is deliberate - "omlx start"
+     may legitimately daemonise and exit 0, and a bare KeepAlive=true would then restart it forever. -->
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>com.maxwell.omlx-engine</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>@HOME@/.omlx/bin/omlx</string>
+    <string>start</string>
+  </array>
+  <key>RunAtLoad</key><true/>
+  <key>KeepAlive</key>
+  <dict><key>SuccessfulExit</key><false/></dict>
+  <key>ThrottleInterval</key><integer>30</integer>
+  <key>ProcessType</key><string>Background</string>
+  <key>StandardOutPath</key><string>@HOME@/.omlx/logs/boot_agent.out.log</string>
+  <key>StandardErrorPath</key><string>@HOME@/.omlx/logs/boot_agent.err.log</string>
+</dict>
+</plist>

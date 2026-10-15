@@ -11,19 +11,21 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1128 decisions (census stamp 309f8cf9a7f9a898, 2026-10-15) · 566 bugs (206 open / 360 closed; highest OPEN = BUG-802) · 26 open tasks (MUST 8 / SHOULD 15 / WORTH 3; OWNER-moved 3, pipeline-moved 23; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1128 decisions (census stamp 309f8cf9a7f9a898, 2026-10-15) · 569 bugs (209 open / 360 closed; highest OPEN = BUG-806) · 28 open tasks (MUST 8 / SHOULD 17 / WORTH 3; OWNER-moved 5, pipeline-moved 23; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **68** of 1128 — 🔴 open 32 · 🔵 proposed 15 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 565 · ⚖ ratified 135 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1128, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 206 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 31 · 🟨 MED 47 · 🟩 LOW 23 · UNLABELLED 101 (BUG-757) of 206 open.
+> Open BUGS by severity (population = the census's 209 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 31 · 🟨 MED 49 · 🟩 LOW 24 · UNLABELLED 101 (BUG-757) of 209 open.
 >
-> **OWNER LANE (3) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
+> **OWNER LANE (5) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
 > | T-130 | 🔴 MUST | THE INGEST DOOR — the identity guarantee becomes an ENFORCEMENT POINT (delta-scoped), so a duplicate work cann | THE DOOR NOW READS A DECLARED WORD, AND ITS rc 2 NAMES THE ONE DEBT TH |
 > | T-131 | 🟠 SHOULD | THE MODEL-SWAP BENCH — no role is re-pointed to a newer model family without a declared, preflighted slot | mover = owner for the SLOT (which role, which model, what it may evict |
 > | T-132 | 🟠 SHOULD | THE HARNESS CONTEXT CONTRACT — the four layers between a local model's served window and the words an agent se | THE MEASUREMENT ANSWERED THE FIRST QUESTION AND NARROWED THE SECOND, A |
+> | T-133 | 🟠 SHOULD | THE INTAKE FRONT-END - an interest-based daily queue of PROPOSALS, owner-gated, that never writes the store | the DAILY REPORT is the owner gate; nothing enters the pipeline withou |
+> | T-134 | 🟠 SHOULD | THE ENGINE'S SURVIVAL AND ITS VERSION - a boot agent (BUG-802), the residency lever (BUG-803), and the oMLX ve | the owner runs the installer (dry run first). The residency policy and |
 >
 > **PIPELINE LANE (23) — what the agent will do next, in strategic-consequential order (source: config/task_register.yaml):**
 >

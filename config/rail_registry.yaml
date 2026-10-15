@@ -147,6 +147,15 @@ guards:
   # prompt-size floor is reported INCOMPARABLE, never compared (BUG-801).
   scripts/normalise_corpus_names.py --selftest: fatal
   scripts/normalise_corpus_names.py --census: tri_state
+  pipeline/harness_contract.py --selftest: fatal
+  # T-132/D-3000: the harness CONTEXT CONTRACT's known-answer controls - a declared trigger key must bind to an
+  # env-shaped name, an env holding the declared value reads BOUND, an ABSENT env reads UNBOUND and never 0 (D-795),
+  # an env that CONTRADICTS the declaration reads CONFLICT, and the module restates no declared value (C12) - proved
+  # by reading its own bytes. A control nothing runs is a comment (BUG-492).
+  pipeline/harness_contract.py --check: tri_state
+  # T-132: the contract's ONE reading - 0 the RUNNING env is bound | 2 OWNER-OWED (declared but not exported, so the
+  # harness silently uses its own cloud price-tier defaults) | 1 FATAL (an env contradicts the declaration: a drift,
+  # not a default). 2 is loud and NOT fatal, by the BUG-457 convention.
   #: BUG-782 — THE OWNER-WORD INTAKE. It renders the T-129 review sheet from the measurement that owns it (never
   #: from a column), validates the owner's vocabulary, derives the effective word (override > signed tier > none),
   #: tests the transitivity conflict rule and binds the sheet to the census by digest. `--check` is the owner lane's

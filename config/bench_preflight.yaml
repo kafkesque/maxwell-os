@@ -84,12 +84,14 @@ exit_codes:
 # the class's bill is NA FOR THAT CLASS, and never 0: an unaffordable prompt is not a wrong answer
 # (BUG-257/BUG-263: the harness scored its own artifacts as model failures).
 prefill_bill:
-  required_fields: [model, class, prompt_tokens, prompt_size_measured_at, prefill_tps, per_turn_s, budget_s, verdict]
+  required_fields: [model, class, prompt_tokens, prompt_size_measured_at, prefill_tps, per_turn_s, budget_s, verdict, pool_residency, decode_context_size]
   classes_source: config/agent_context.yaml#classes          # the working set each class must pay for
   budget_source: config/agent_context.yaml#ratified.knobs.per_turn_budget_s
   on_missing_reading: NA            # a slot with no size-declared prefill reading is NA for the class
   on_budget_exceeded: NA            # never 0 - the bill is a CAPACITY fact, not a quality fact
   never_zero: true
+  pool_residency: 'BUG-803 (MEASURED 2026-10-15): the same model answered a 12-token prompt with a 15.49 s TTFT while a 30,900-token prompt prefilled at 479 tok/s in the SAME MINUTE, because the ADAPTIVE PREFILL THROTTLE was evicting a resident model. A bill taken against a crowded pool is PESSIMISTIC, so the reading must carry what was resident. Steady state MEASURED today: 8 models / 46.88 GB against a 55 GB guard ceiling.'
+  decode_context_size: 'BUG-805 (MEASURED 2026-10-15): decode is a function of CONTEXT LENGTH, not a model constant - the same 4B decoded 9.88 tok/s at 30,900 tokens of context against 36.3 tok/s on a ~36-token prompt. A decode figure without its context size is as incomparable as a prefill figure without its prompt size.'
   size_scale_guard:
     # A reading taken on a prompt below this floor is INCOMPARABLE to a class working set and is reported
     # as such rather than compared. MEASURED 2026-10-15: 36 tokens -> 331 tok/s vs 4,468 tokens -> 455 on

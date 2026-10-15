@@ -8,19 +8,21 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1128 decisions (census stamp 309f8cf9a7f9a898, 2026-10-15) · 566 bugs (206 open / 360 closed; highest OPEN = BUG-802) · 26 open tasks (MUST 8 / SHOULD 15 / WORTH 3; OWNER-moved 3, pipeline-moved 23; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1128 decisions (census stamp 309f8cf9a7f9a898, 2026-10-15) · 569 bugs (209 open / 360 closed; highest OPEN = BUG-806) · 28 open tasks (MUST 8 / SHOULD 17 / WORTH 3; OWNER-moved 5, pipeline-moved 23; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **68** of 1128 — 🔴 open 32 · 🔵 proposed 15 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 565 · ⚖ ratified 135 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1128, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 206 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 31 · 🟨 MED 47 · 🟩 LOW 23 · UNLABELLED 101 (BUG-757) of 206 open.
+> Open BUGS by severity (population = the census's 209 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 31 · 🟨 MED 49 · 🟩 LOW 24 · UNLABELLED 101 (BUG-757) of 209 open.
 >
-> **OWNER LANE (3) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
+> **OWNER LANE (5) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
 > | T-130 | 🔴 MUST | THE INGEST DOOR — the identity guarantee becomes an ENFORCEMENT POINT (delta-scoped), so a duplicate work cann | THE DOOR NOW READS A DECLARED WORD, AND ITS rc 2 NAMES THE ONE DEBT TH |
 > | T-131 | 🟠 SHOULD | THE MODEL-SWAP BENCH — no role is re-pointed to a newer model family without a declared, preflighted slot | mover = owner for the SLOT (which role, which model, what it may evict |
 > | T-132 | 🟠 SHOULD | THE HARNESS CONTEXT CONTRACT — the four layers between a local model's served window and the words an agent se | THE MEASUREMENT ANSWERED THE FIRST QUESTION AND NARROWED THE SECOND, A |
+> | T-133 | 🟠 SHOULD | THE INTAKE FRONT-END - an interest-based daily queue of PROPOSALS, owner-gated, that never writes the store | the DAILY REPORT is the owner gate; nothing enters the pipeline withou |
+> | T-134 | 🟠 SHOULD | THE ENGINE'S SURVIVAL AND ITS VERSION - a boot agent (BUG-802), the residency lever (BUG-803), and the oMLX ve | the owner runs the installer (dry run first). The residency policy and |
 >
 > **PIPELINE LANE (23) — what the agent will do next, in strategic-consequential order (source: config/task_register.yaml):**
 >
@@ -13988,6 +13990,19 @@ declared invocation (absolute path or a PATH declaration), not a new dependency.
 **FIX (declared, not applied):** resolve `llmfit` by absolute path or declare the PATH in the recipe, and
 make an UNAVAILABLE tool a red or a NA — never a silent pass.
 
+**AMENDED 2026-10-15 (MEASURED — the recorded premise was false).** This entry states that `llmfit` "is NOT on
+the PATH the recipe runs with". That is no longer true, re-measured three ways today: the login shell resolves
+`/opt/homebrew/bin/llmfit`; `sh -c 'command -v llmfit'` resolves the same; and the recipe's own shell runs it
+(`llmfit 0.9.38`) — a Homebrew install since the entry was written. **The defect that REMAINS is worse than the
+one recorded, and it is not a PATH problem:** the cell is `@llmfit 2>&1 | head -5 || echo unavailable`, and the
+PIPE hands the recipe `head`'s exit status, which is 0 always — a control that cannot fail **by construction**,
+whatever llmfit prints. Two further measured facts belong here: (1) llmfit's DB LAGS the market — today it had
+NO record for `embeddinggemma-2` or `Qwen3.8-35B-A3B-Distill`, and its `fit --sort tps` ranks random test models
+first, so "not found" is DB-lag and never absence; (2) its `recommend` top row is a 2025 reasoning model
+(DeepSeek-R1-0528-Qwen3-8B) — a recommendation list is not a measurement. So the fix is not "resolve the path"
+(done); it is a cell that ASSERTS (`--version` against a declared expectation) and declares its DB horizon.
+
+
 ## BUG-798 (MED — FIXED 2026-10-15, same session) — my own rename census scanned NAMES and read a FALSE GREEN
 
 MEASURED 2026-10-15, written in the same act that built the instrument (T-130's renamer). The first census
@@ -14061,3 +14076,55 @@ every delegate lane, the S4 classifier and the pipeline's generator.
 **FIX (declared, not applied):** a KeepAlive launchd job for the managed server (or a declared
 `omlx_watchdog.py --daemon` supervisor), plus a rail that reports the engine DOWN as a red rather than as a
 per-request failure discovered later.
+## BUG-803 (MED — OPEN 2026-10-15) — a prefill reading without the POOL STATE it was taken at is not comparable either
+
+MEASURED 2026-10-15, in the SAME MINUTE, same model, same machine. A 12-token prompt was answered with
+`time_to_first_token: 15.49 s` while a 30,900-token prompt prefilled at 479 tok/s. The server's own log says
+why: `Reserved prefill capacity for 30900 tokens`, then `needs prefill headroom before throttling
+(reason=adaptive_prefill_throttle, current=46.19GB, target=51.78GB)`, then `Evicting idle model
+'gemma-4-12B-it-qat-OptiQ-4bit' for prefill headroom`. Eight models were resident (46.88 GB against a 55 GB
+guard ceiling), because oMLX pins everyday models in memory.
+
+Same shape as BUG-801, one variable over. BUG-801 fixed "a prefill reading must carry the prompt SIZE it was
+taken at"; this one fixes the second missing covariate: a prefill (or TTFT) reading must also carry the POOL
+RESIDENCY, because the adaptive prefill throttle and the prefill-LRU eviction make the same prompt cost very
+different time depending on what else is loaded. Remedy declared in the cell:
+`config/bench_preflight.yaml#prefill_bill.required_fields` now carries `pool_residency`.
+
+Consequence (operational, cheap, not a model change): a bill taken against a crowded pool is PESSIMISTIC, so
+evicting idle models before a class turn is a legitimate lever on the prefill bill — and it is now a declared
+input rather than an unrecorded variable.
+
+## BUG-805 (MED — OPEN 2026-10-15) — decode is a function of CONTEXT LENGTH: the decode axis was measured on tiny prompts
+
+MEASURED 2026-10-15 by the T-131 bench RUN (two-point slope on ONE 30,900-token prompt):
+`gemma-4-E4B-it-MLX-4bit` decodes **9.88 tok/s at 30,900 tokens of context** against **36.3 tok/s** measured
+the previous day on a ~36-token prompt (config/agent_context.yaml#measured_decode_20261015) — a 3.7x collapse
+on the same model, from context alone.
+
+**This CORRECTS the previous session's headline, and the correction is the point.** "Decode is not the binding
+constraint" stays true AT CLASS SIZE (65 s of prefill against ~8 s of decode for a 96-token answer), but the
+sentence implied decode was a model CONSTANT. It is not: decode reads the KV cache per step, so it degrades
+with context. Every decode number in that table is scoped to SMALL PROMPTS, and any LATENCY budget at class
+size must be re-measured at that size.
+
+Remedy (declared, same cell): `decode_context_size` is now a required field of the prefill bill. A decode
+figure without its context length is as incomparable as a prefill figure without its prompt size.
+
+## BUG-806 (LOW - OPEN 2026-10-15) - my bench wrote its receipt only on the SUCCESS path, so the two REFUSALS were not persisted
+
+MEASURED 2026-10-15, my own instrument (the same class as BUG-798, which was also mine).
+temp/prefill_bench_20261015.py writes temp/prefill_bench_20261015.json once per MODEL - but only on the SUCCESS
+path. Every early continue (a failed warm-up, a failed measured call, a C2/C3 disagreement, a missing
+prompt_tokens) returns BEFORE the write. The run's two most informative rows therefore exist only in the human
+log: gpt-oss-20b-MXFP4-Q8 REFUSED (the two calls disagree) and gemma-4-26B-A4B-it-OptiQ-4bit NA (the server did
+not echo prompt_tokens). A refusal is a FINDING; an instrument that persists only its successes is the BUG-798
+shape one layer down - the reading that matters is the one that goes missing.
+
+It also leaves a real question UNANSWERED and unauditable for the A4B: whether the engine omits
+usage.prompt_tokens for that model (an engine/instrument gap that would make the prefill bill uncomputable for a
+model that may be perfectly routable), or whether the call itself failed (eviction/context). With the receipt
+missing, both readings are unavailable and any conclusion drawn now would be a guess - so none is drawn.
+
+FIX (declared, not applied): write the receipt on EVERY path, refusals included, with the raw call records (both
+calls' dt, pt, ct, cached_tokens and err).

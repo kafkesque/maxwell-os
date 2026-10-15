@@ -395,3 +395,29 @@ exit_codes:
   fault: 2          # parity broken, a declared home unreadable, a model with no served window,
                     # or a cache verdict that contradicts the declared proof status
   error: 1          # the probe itself failed, or a known-answer control failed (the RAIL is red)
+
+
+candidates_20261015b:
+  supersedes: candidates_20261015#worth_a_declared_slot_unmeasured
+  why_a_successor: >-
+    MEASURED/READ 2026-10-15 (governance/MARKET_RESEARCH_20261015.md, the delegation-axis census). The earlier block
+    is NOT deleted or reformatted: it stays the record of what was known then (C12/D-2642).
+  already_on_disk_needs_no_download:
+    gemma-4-26B-A4B-it-OptiQ-4bit: {where: '~/.omlx/_unloaded/', note: 'the previous session recommended this download; MEASURED 2026-10-15 it is ALREADY here, parked - the open item was the SLOT, not the download'}
+    Qwen3.6-35B-A3B-4bit: {where: '~/.omlx/_unloaded/', shape: A3B}
+    DeepSeek-R1-0528-Qwen3-8B-MLX-4bit: {where: '~/.omlx/_unloaded/', note: "llmfit's own top recommendation today; a 2025 reasoning model, so a community ranking is being compared against a measurement"}
+  new_candidates_unmeasured:
+    prism-ml/Ternary-Bonsai-2-27B-mlx-2bit: {gb: 8.6, window: 262144, hf_downloads: 83733, likes: 454, why: '2-bit ternary 27B in 8.6 GB - roughly HALF the bytes read per step of a 4-bit 27B, so the best decode-per-byte shape on offer, and it needs a QUALITY gate before any role'}
+    empero-ai/Qwen3.8-35B-A3B-Distill: {hf_downloads: 997686, likes: 211, why: 'the A3B shape carrying Qwen3.8 lineage: the most promising second coding voice; llmfit does not know it and no MLX-4bit repo was confirmed'}
+    ornith-ai/Ornith-1.5-35B-A3B-MLX-4bit: {gb: 19.51, window: 262144, hf_downloads: 164329, why: 'the same A3B shape as the SKU already parked here'}
+    LiquidAI/LFM2.5-24B-A2B: {repo_gb: 47.94, window: 131072, released: '2026-10-12', why: 'newest A2B shape, 3 days old, 6.3k downloads: WATCH 30 days'}
+    ConwayResearch/Underdog-Saluki-27B-1.0: {gb: 9.46, hf_downloads: 344177, why: 'the same low-bit 27B effect as Ternary-Bonsai: WATCH'}
+    google/embeddinggemma-2: {gb: 1.49, window: 262144, hf_downloads: 144280, likes: 2318, why: 'NOT a model swap: an EMBEDDER swap invalidates every stored vector (FAISS + sqlite-vec + every S1.5 cluster). It is a declared migration with a re-embed receipt, or it is nothing'}
+  refused_for_this_machine:
+    zai-org/GLM-5.3-Flash: {repo_gb: 328.34, why: 'image-text-to-text and beyond the guard at any usable quant'}
+    autotrust/JEV-35B: {gb: 71.9, pipeline: text-classification, why: 'a 35B classifier would consume the whole guard against a 12.1 GB S4 classifier that works'}
+  delete_candidates_pending_a_blob_aware_census:
+    # BUG-804: five of eight served models READ 0 B in ~/.omlx/models - the real bytes live in the HF cache (165 GB).
+    - gemma-4-12B-it-qat-OptiQ-4bit
+    - Qwen3.8-27B-MLX-4bit
+    - 'unloaded: gemma-4-E2B-it-MLX-4bit (redundant against the E4B), Qwopus-GLM-18B'

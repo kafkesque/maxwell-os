@@ -24634,3 +24634,46 @@ decisions:
   - config/rail_mutations.yaml
   - justfile
   - config/task_register.yaml
+- id: D-3001
+  date: '2026-10-15'
+  state: PROPOSED
+  category: INTAKE / CURATION
+  title: 'The intake front-end is a PROPOSAL surface: the curator distils, the OWNER admits, the noise filter is two-sided and measured, and no harness is load-bearing'
+  bugs: '[BUG-787]'
+  decision: '(1) THE CURATOR STOPS AT THE OWNER: its terminal state is a daily queue of proposals with provenance,
+    and it never writes the store nor bypasses the ingest door (D-2997). (2) THE NOISE FILTER IS TWO-SIDED AND
+    MEASURED: admitted slop is visible, dropped alpha is invisible, so the curator publishes its own precision and
+    recall on a frozen golden set, COUNTS every drop, and keeps every dropped item re-viewable. (3) UNTRUSTED TEXT
+    IS SCREENED BEFORE IT IS READ AS CONTENT. (4) THE CURATOR IS NOT THE CHECKER: the claim check is the pipeline NLI
+    pair and the curator model is a DIFFERENT family (R5). (5) NO HARNESS IS LOAD-BEARING: oMLX, Codex, Claude Code,
+    OpenClaw, Hermes, Pi and the DeepSeek Harness may DRIVE the intake through MCP/CLI, but the intake is config-driven
+    scripts with receipts (C25), because a harness-driven curator cannot be audited by a rail or run by a scheduler.'
+  evidence: 'READ-ONLY census 2026-10-15 (governance/MARKET_RESEARCH_20261015.md#d): RSSHub, yt-dlp +
+    youtube-transcript-api, crawl4ai/markitdown, changedetection.io and the protectai screen are the ADOPT set;
+    openclaw-newsroom proves the shape but is harness-coupled and is therefore REFERENCE only (C25); hosted extraction
+    services are refused (C1/C3). NO source has been fetched: this declares the architecture, the policy home
+    (config/curator_intake.yaml) and the gate, and names the measurement that would falsify it (the first week of
+    receipts: items/day, admit rate, drop rate).'
+  files: '[config/curator_intake.yaml, governance/CURATOR_INTAKE_20261015.md, governance/MARKET_RESEARCH_20261015.md, config/task_register.yaml]'
+- id: D-3002
+  date: '2026-10-15'
+  state: PROPOSED
+  category: INFERENCE ENGINE / PORTABILITY
+  title: 'The engine stays swappable and oMLX stays the baseline: a candidate enters through a preflight in ONE slot, never by migration - and boot survival is engine-independent'
+  bugs: '[BUG-802, BUG-803, BUG-792]'
+  decision: '(1) oMLX is the BASELINE and the only engine the pipeline may assume, and it stays swappable behind C21;
+    the transport is already OpenAI-compatible, so a swap is a base-URL change and not a rewrite. (2) A candidate
+    engine (Magnitude: Apache-2.0, kernels autotuned for the local chip, OpenAI AND Anthropic endpoints, a boot
+    service; TensorFold: Zig/Metal, no Python) is admitted ONLY by the T-131 preflight, into the agent_probe slot
+    first, and only after three UNVERIFIED questions are answered by measurement: can it serve OUR exact model set,
+    does it expose cache/prefill controls comparable to settings.json, and is the tuned artefact reproducible OFFLINE
+    (C2/C4/C22). (3) BOOT SURVIVAL IS ENGINE-INDEPENDENT: BUG-802 is fixed by a declared launchd agent for the CURRENT
+    engine, which stays correct under every candidate. (4) F6/BUG-792 is a CONFIGURATION question first: upstream oMLX
+    documents the tiered KV cache this install disables, so the cache is re-tested before any engine swap is credited.'
+  evidence: 'READ 2026-10-15: magnitude README + docs.magnitude.dev (a "2x faster than Ollama" CLAIM, autotuned
+    kernels, Apple Silicon, port 10100, one-click connections to Pi/OpenCode/Hermes/OpenClaw/Codex/Claude Code, a boot
+    service, inference-only scope, and NO embeddings and NO NLI role); ashhart/TensorFold README (Zig, Metal kernels,
+    OpenAI + Anthropic Messages, homebrew); jundot/omlx README (Apache-2.0, tiered KV cache persisted across context
+    changes) against a local install at 0.7.0 with cache.enabled=false. Star counts and release tags could NOT be
+    re-read for 48 repos (GitHub core API rate limit, unauthenticated): those columns are ABSENT, not negative.'
+  files: '[config/agent_context.yaml, config/bench_preflight.yaml, pipeline/com.maxwell.omlx-engine.plist, pipeline/install_omlx_engine_agent.sh, pipeline/engine_boot_report.py]'

@@ -869,3 +869,35 @@ tasks:
     binding constraint - every model answers 320 tokens in 2-13 s and the small-ACTIVE MoE decodes faster than a dense
     model half its size. The bill is PREFILL, so NO routing row changed on the strength of this run and the
     unmeasured candidates stay REFUSED a route until a size-declared prefill reading exists (fail-closed).
+- id: T-133
+  priority: SHOULD
+  state: open
+  mover: owner
+  title: "THE INTAKE FRONT-END - an interest-based daily queue of PROPOSALS, owner-gated, that never writes the store"
+  why: the owner's following is scattered across platforms and media, and nothing today turns it into a reviewed
+    daily decision. The pipeline can already convert TEXT into primitives; what is missing is the FRONT of it -
+    collection, noise screening, and distillation into proposals.
+  source: D-3001; config/curator_intake.yaml; governance/CURATOR_INTAKE_20261015.md; governance/MARKET_RESEARCH_20261015.md
+  evidence: 'READ-ONLY market census 2026-10-15: the reference stack exists and is mature (RSSHub as the one-route-per-platform
+    layer, yt-dlp + youtube-transcript-api with ASR only as fallback, crawl4ai/markitdown feeding the existing S0 converter,
+    changedetection.io for feedless sources, a prompt-injection screen from the protectai class). NO item has been fetched and
+    NO source has been scraped: the policy and the design are declared, the machines are not built.'
+  gate: 'the DAILY REPORT is the owner gate; nothing enters the pipeline without an approval, and every DROPPED item stays
+    COUNTED and re-viewable (a filter whose drops are invisible is the BUG-787 shape, in the intake). The screen precision and
+    recall on a frozen golden set are declared BEFORE any noise class is trusted.'
+- id: T-134
+  priority: SHOULD
+  state: open
+  mover: owner
+  title: "THE ENGINE'S SURVIVAL AND ITS VERSION - a boot agent (BUG-802), the residency lever (BUG-803), and the oMLX version gap measured before any engine is swapped"
+  why: 'the $0 local engine (C1) is the single dependency of every delegate lane, the S4 classifier and the pipeline generator,
+    and BUG-802 measured that nothing starts it after a reboot. Separately, the installed oMLX is 0.7.0 while its upstream
+    (jundot/omlx, Apache-2.0) advertises the tiered KV cache that F6/BUG-792 is chasing: the version gap is a PREFILL BILL
+    question, not housekeeping.'
+  source: BUG-802; BUG-803; D-3002; config/bench_preflight.yaml#prefill_bill; pipeline/install_omlx_engine_agent.sh
+  evidence: 'DELIVERED, UNAPPLIED ON PURPOSE. pipeline/com.maxwell.omlx-engine.plist is a TEMPLATE (no absolute path in the repo,
+    C12/C26; KeepAlive={SuccessfulExit:false} so a daemonising start cannot restart-loop) and pipeline/install_omlx_engine_agent.sh
+    installs it FAIL-CLOSED: it waits for the engine health endpoint and ROLLS BACK the job if the engine does not answer.
+    pipeline/engine_boot_report.py is the ladder reading (MEASURED 2026-10-15: engine UP, template in repo, job not loaded, so rc 2 owner-owed).'
+  gate: the owner runs the installer (dry run first). The residency policy and the upstream version check are owed before ANY
+    candidate engine (Magnitude / TensorFold) is admitted to a prefill slot (D-3002).

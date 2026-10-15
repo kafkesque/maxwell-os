@@ -85,7 +85,10 @@ def main(argv: list[str]) -> int:
         print(f"FATAL: huggingface_hub is unavailable ({type(exc).__name__}: {exc})")
         return FATAL
 
-    workers = int(conf.get("hf", {}).get("download_workers", 4))
+    if not conf.get("hf") or "download_workers" not in conf["hf"]:
+        print("FATAL: config/engine.yaml declares no hf.download_workers - refusing to invent one (C12)")
+        return FATAL
+    workers = int(conf["hf"]["download_workers"])
     step(f"fetching {args.repo} with {workers} workers into the hub cache")
     t0 = time.time()
     try:

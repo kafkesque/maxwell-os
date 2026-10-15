@@ -14286,7 +14286,14 @@ MODEL resolved by POINTER to config/model_assignments.yaml#harness_roles.AGENT_L
 model name is restated (C12). Proof: with the binding applied, the same run moved the local engine's
 counter 52 -> 54. harness_env --selftest is now 9/9, including `an_unresolvable_pointer_is_FATAL`.
 
-## BUG-816 (MED - OPEN 2026-10-15) - the first fan-out proved the mechanism and exposed the model: a 2B reader returned a FALSE NEGATIVE
+## BUG-816 (MED - RETRACTED 2026-10-15, the same day) - the 2B reader did NOT return a false negative; the question's PREMISE was false
+**RETRACTION.** The sub-agent said config/engine.yaml contains no fanout.max_parallel. That was TRUE: the block had
+never landed. A grep in this repository finds no such key at the time of the run, and the same task re-run after the
+block was actually written was answered CORRECTLY in 8.1s (max_parallel: 3, with the reason quoted). The failure was
+mine: an edit whose answer began 'No match found for the specified text' was read as a success, so two declared blocks
+(hf, fanout) were absent while three instruments silently used their own hardcoded defaults. The real bug is BUG-817.
+KEEP THE LESSON: a sub-agent that says NO EVIDENCE is reporting on the PREMISE, not about itself.
+
 Two detached sub-agent tasks (pipeline/subagent_fanout.py, MiniCPM5-2B-MLX) both reached TERMINAL in ~24s and
 wrote their own answer files - durability and artefact-partitioning worked on the first try. One of the two
 answers was WRONG: asked whether config/engine.yaml declares fanout.max_parallel, the model said there is no

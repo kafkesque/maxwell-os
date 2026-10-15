@@ -75,16 +75,19 @@ is pinned and the cache is proven (T-137).
    by pipeline/harness_env.py, and the model is resolved by POINTER from the single home that owns it,
    so no model name is restated (C12).
 
-## 7. THE FAN-OUT EXECUTOR, MEASURED ON ITS FIRST REAL RUN (2026-10-15)
-Two independent questions over two files, one fast model (MiniCPM5-2B-MLX), run as detached workstreams:
-both reached TERMINAL in **23.9s and 24.0s**, each writing its own answer file, started under the declared cap
-(engine.fanout.max_parallel = 3) - the MECHANISM works.
+## 7. THE FAN-OUT EXECUTOR, MEASURED - AND A CORRECTION (2026-10-15, the same day)
+First run: two independent questions over two files, one fast model (MiniCPM5-2B-MLX), detached workstreams.
+Both reached TERMINAL in **23.9s and 24.0s**, each writing its own answer file, under the declared cap - the
+MECHANISM works.
 
-The ANSWERS did not: task 1 found the right function (refresh) and the right expression but was cut off by its
-220-token budget, and task 2 claimed that config/engine.yaml contains no fanout.max_parallel - which is FALSE:
-a grep finds it in the file the model was handed. A 2B model is a fast READER, not a reliable one, and its
-failure is silent unless a second model checks it. That is why:
-  * the model is declared PER TASK in the task file (D-3011: a slot names an axis), and
-  * the cross-family verify pass is MANDATORY, not optional (R5) - it is what turns a fast wrong answer into a
-    caught one (the verdict is in temp/runs/fanout_20261015/99_verify.md).
-Filed as BUG-816.
+One answer looked wrong: task 2 reported that config/engine.yaml contains no fanout.max_parallel. **It was
+right.** The block had never landed - an edit that answered "No match found" had been read as a success - while
+pipeline/subagent_fanout.py, oneshot_ask.py and hf_fetch_model.py all silently fell back to their own hardcoded
+defaults (BUG-817). After the block was actually written, the SAME task on the SAME model produced the correct
+answer (max_parallel: 3, with the reason quoted) in **8.1s**.
+
+The lesson is the design change: a fan-out verifies ANSWERS; nothing in it verified the PREMISE of a question.
+pipeline/subagent_fanout.py now refuses a task whose declared `expect: REGEX` is absent from its own files,
+before any model is called - measured working: "premise ok: task fanout_cfg expect='max_parallel' found in
+['config/engine.yaml']". And every instrument now FAILS when its config home is missing rather than inventing a
+value (C12/C16). Two bugs, one of them a retraction: BUG-816 (retracted) and BUG-817 (the real one).

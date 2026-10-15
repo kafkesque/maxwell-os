@@ -45,6 +45,19 @@ harnesses:
     copilot:   {display: "Copilot CLI",      installed: false}
     dsh:       {display: "DeepSeek Harness", installed: false}
 
+# Fetching is pipeline/hf_fetch_model.py: resumable, verified, receipted.
+hf:
+  download_workers: 4        # keeps the engine's own decode traffic viable while bytes land
+
+# Fan-out: many small sub-tasks, one serial pool (D-3005). The cap is declared here because the resource
+# it protects is the ENGINE's, not the orchestrator's. An instrument that finds this block missing must
+# FAIL, not invent a default (C12/C16 - this is exactly what went wrong on 2026-10-15, BUG-817).
+fanout:
+  max_parallel: 3
+  default_max_tokens: 512
+  excerpt_bytes: 24000
+  verify_with_another_family: true     # R5: the verifier may never be the generator
+
 # Download decisions are made by pipeline/model_loadability_probe.py, never by download counts.
 candidates:
   probe:

@@ -24787,3 +24787,15 @@ decisions:
     and bypassPermissions is never used on this repository. (4) A HARNESS IS BOUND, NOT ASSUMED: the provider AND
     model are bound by pipeline/harness_env.py, because a declared provider is not a bound one (BUG-815: goose run
     answered without the local engine''s counter moving). (5) LAYER-BY-LAYER VERDICT: config/harness_policy.yaml.'
+- id: D-3012
+  date: '2026-10-15'
+  status: proposed
+  category: DELEGATION / PREMISE
+  bugs: '[BUG-816, BUG-817]'
+  decision: '(1) A DELEGATED QUESTION MUST CARRY ITS PREMISE. A fan-out task declares expect: REGEX and the
+    planner refuses the task unless one of its own files contains that regex - so a question about something
+    that does not exist can never be asked, and a correct "NO EVIDENCE" can never be mistaken for a model
+    failure (BUG-816 retracted). (2) NO INSTRUMENT INVENTS A DEFAULT FOR A DECLARED VALUE: a missing home is
+    FATAL, because a fallback is indistinguishable from a declaration (C12/C16, BUG-817). (3) AFTER ANY
+    STRUCTURAL EDIT, GREP FOR THE KEY THAT WAS JUST WRITTEN before anything is built on it; "no match found"
+    is a FAILURE REPORT, not a note (BUG-810's remedy, restated as practice after it was violated).'

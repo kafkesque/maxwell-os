@@ -32,6 +32,7 @@ from __future__ import annotations
 import argparse
 import json
 import pathlib
+import re
 import subprocess
 import sys
 import time
@@ -43,9 +44,17 @@ OK, FATAL, PENDING = 0, 1, 2
 
 
 def conf() -> dict:
-    """Engine + fan-out facts from their one home (C12)."""
+    """The declared fan-out facts, or a FATAL.
+
+    A missing home is NOT a reason to fall back to a number this module likes: on 2026-10-15 this
+    executor ran with its own hardcoded defaults because the declared block had never landed, and a
+    sub-agent was blamed for correctly reporting that the setting did not exist (BUG-817).
+    """
     import yaml
-    return yaml.safe_load((ROOT / "config" / "engine.yaml").read_text())
+    doc = yaml.safe_load((ROOT / "config" / "engine.yaml").read_text())
+    if not doc.get("fanout"):
+        raise SystemExit("FATAL: config/engine.yaml declares no fanout block - refusing to invent a cap (C12)")
+    return doc
 
 
 def plan(tasks_file: pathlib.Path, run_id: str) -> int:
@@ -61,6 +70,19 @@ def plan(tasks_file: pathlib.Path, run_id: str) -> int:
                     "--brief-text", tasks_file.read_text()], check=True)
     for t in tasks:
         wid = str(t["id"])
+        # THE PREMISE GATE. A fan-out verifies ANSWERS; nothing in it verifies the PREMISE of a task.
+        # On 2026-10-15 a task asked about a setting that did not exist, the sub-agent correctly said so,
+        # and the answer was read as a model failure (BUG-816/BUG-817). If a task declares expect=REGEX,
+        # one of its files must contain it or the task is refused before any model is called.
+        expect = t.get("expect")
+        if expect:
+            hit = [f for f in t.get("files", [])
+                   if (ROOT / f).exists() and re.search(str(expect), (ROOT / f).read_text(errors="replace"))]
+            if not hit:
+                print(f"FATAL: task {wid} declares expect={expect!r} and no listed file contains it - "
+                      f"the PREMISE is wrong, so no model should be asked")
+                return FATAL
+            print(f"premise ok: task {wid} expect={expect!r} found in {hit}")
         wsd = RUNS / run_id / f"fan_{wid}"
         wsd.mkdir(parents=True, exist_ok=True)
         prompt = [str(t.get("question", "")).strip()]

@@ -76,8 +76,11 @@ def main(argv: list[str]) -> int:
     ap.add_argument("--out", required=True)
     ap.add_argument("--json-out")
     args = ap.parse_args(argv)
-    fanout = conf().get("fanout", {})
-    max_tokens = args.max_tokens or int(fanout.get("default_max_tokens", 512))
+    fanout = conf().get("fanout")
+    if not fanout or "default_max_tokens" not in fanout:
+        print("FATAL: config/engine.yaml declares no fanout.default_max_tokens - refusing to invent one (C12)")
+        return FATAL
+    max_tokens = args.max_tokens or int(fanout["default_max_tokens"])
     prompt = args.prompt if args.prompt else pathlib.Path(args.prompt_file).read_text()
     t0 = time.time()
     content, meta = ask(args.model, prompt, max_tokens, args.timeout)

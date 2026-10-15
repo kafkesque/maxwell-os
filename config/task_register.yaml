@@ -327,6 +327,17 @@ tasks:
     (D-2983): 5 fault(s) under coverage 10f4df05acc8ecec in 754.0s, RECORDED to temp/ladder_receipt.json, so the
     prefix can no longer hide them and the recorded red is what `just health` now reports. Each repair wave must
     be followed by a re-measure: a stale or coverage-mismatched record is UNKNOWN (rc=2, loud), never silent.
+    RE-MEASURED 2026-10-15 (the T-164/T-156 landing: a whole-set scan, 159 collecting lines in 778.2s, worst rc=1, NINE
+    faults). The set is NOT the set this entry was written against, which is why it is recorded here rather than
+    assumed: two of the ten faults RECORDED at c258dd1 are CLEAN (scripts/lib/handoff.py --selftest and
+    scripts/recompute_decision_summary.py --check), ONE is new to the list - scripts/check_register_divergence.py
+    reports a single UNDECLARED uncarried id, i.e. the log's provenance prose names an id no header carries (BUG-571's
+    shape) - and the other eight are unchanged (build_anchor_store_bridge, check_config_defaults, verify_handoffs,
+    check_silent_repair, check_undeclared_encoding, check_store_columns, reconcile, and check_tests). THE NEW ONE IS NOT
+    AN EDIT HERE: the declared set is pinned by identity and SHRINK-ONLY at its ceiling (config/register_divergence.yaml,
+    39 of 39), so the id must either be PROMOTED to a header event (its state has to be known, and the prose does not
+    state it) or the ceiling must be raised by a DECLARED DECISION. Neither is an agent's act, so it is recorded as debt
+    instead of absorbed. The landing itself added NO fault to this list, and that is the comparison the audit was for.
   gate: none
 - id: T-115
   priority: SHOULD
@@ -1249,7 +1260,8 @@ tasks:
 
 - id: T-156
   priority: MUST
-  state: open
+  state: done
+  closed: 2026-10-15
   mover: pipeline
   title: 'THE ROUTE GRAPH IS DECLARED AND DETERMINISTIC: a capability registry plus a resolver, and the LLM PROPOSES but never assigns'
   source: D-3024; BUG-482; D-2898; D-2941; T-149; harness_policy.yaml
@@ -1266,7 +1278,19 @@ tasks:
     restating them; --check FAILS on a capability with no entrypoint, no check or no receipt, and on a
     declared route whose entrypoint is absent; an LLM may write a PROPOSAL into temp/ and never an
     assignment (D-2898/D-2941). Proof: every open task and every open bug resolves to a declared route
-    (or is explicitly unrouted WITH a reason) and the resolver is byte-stable across runs.'
+    (or is explicitly unrouted WITH a reason) and the resolver is byte-stable across runs.
+    LANDED 2026-10-15 (D-3031): config/capability_registry.yaml (15 capabilities + 8 operator lanes + the disposition
+    vocabulary) and scripts/resolve_route.py (14 known-answer controls), both run BY THE LADDER with their guard classes
+    pinned in config/rail_registry.yaml#guards, and the consumer edge declared in config/declaration_consumers.yaml. The
+    proof is MEASURED rather than asserted, and it states its own limits: every open item either ROUTES or carries a
+    DECLARED reason (49 open tasks: 14 routed, 35 dispositioned or reported; 225 open bugs: 223 carry the bug-class
+    reason, because a bug is a FINDING and not a work item), a MOVER nobody dispositioned is a FAULT, an item declared
+    unrouted that is no longer open is a STALE declaration and a fault, and the routing debt is a SHRINK-ONLY ceiling
+    whose number is the instrument''s own reading. Byte-stability is measured (the report is rendered twice and digests
+    must agree; digest agreements recorded across separate processes). The first readings are recorded in
+    governance/buglog.md under T-156, and they opened T-165 (32 files named by no declared home). R5: a DIFFERENT model
+    family reviewed the module through the system''s own executor (run t156r5b, shape: review, DONE) and one of its
+    findings landed as a real refinement (the two debt facts behind an unrouted item are now reported TOGETHER).'
 - id: T-157
   priority: MUST
   state: open
@@ -1398,7 +1422,8 @@ tasks:
 
 - id: T-164
   priority: SHOULD
-  state: open
+  state: done
+  closed: 2026-10-15
   mover: pipeline
   title: 'THE RAIL REGISTRY''S OWN SCHEMA IS CHECKED: an unknown top-level key must FAIL CLOSED, and the declarations that live outside the mapping must be given a home the reader reads'
   source: BUG-837; D-2665; BUG-826; config/rail_registry.yaml
@@ -1415,4 +1440,39 @@ tasks:
     with a known-answer control in --selftest that PROVES the limb fires. (b) cannot land alone: it is RED until
     (a) is decided, and (a) is a choice between widening recipes: to the recipes that run rails and removing the
     declarations. Proof: a synthetic registry with a stray key returns a fault, the live registry returns none,
-    and the guard census equals the declarations the file actually carries.'
+    and the guard census equals the declarations the file actually carries.
+    LANDED 2026-10-15 (D-3030). (b) is in: schema.keys and schema.required are declared IN the file and read by the
+    rail (the hardcoded tuple is gone, C12), an unknown top-level key is class (iv), a key SHAPED like a command line is
+    refused AS such, and schema must list itself. (a) is decided and closed: the eight are deleted with their fact
+    RE-HOMED - config/capability_registry.yaml#lanes, where a reader checks that the recipe exists, that the command is
+    in THAT recipe''s body, and that the command runs in NO governed recipe. WIDENING recipes: was REFUSED on
+    measurement, not on taste: scripts/run_ladder.py COLLECTS cfg["recipes"], so widening it would make `just
+    health-full` run the engine guard and the retirement script. A THIRD defect fell out of the same audit: the parser
+    admitted only python3/python lines, so a FATAL `bash` rail could not be declared at all - the reader would answer a
+    true declaration with a FALSE fault; it now takes every declaring line except a bare echo, and justfile:136 is pinned
+    fatal so the widening is load-bearing. MEASURED: 10 top-level keys, 0 strays; 36 declared guards read (was 35 of 43);
+    160 invocations parsed (was 158) with the invoked set unchanged at 99; --selftest 19/19 with 5 new controls, RUN BY
+    THE LADDER (just health).'
+- id: T-165
+  priority: SHOULD
+  state: open
+  mover: pipeline
+  title: 'AN INSTRUMENT WITH NO CALLER IS NOT A CAPABILITY: the 32 python files that no justfile recipe, no config file and no governance document names must each get a caller or be RETIRED'
+  source: T-156; D-3031; D-3024; BUG-482; scripts/resolve_route.py --census
+  evidence: 'MEASURED 2026-10-15 by `python3 scripts/resolve_route.py --census` (fingerprint 6943898c4e273509 over
+    the declared corpus, so the number is re-derivable and not remembered): of 538 python files across pipeline/ +
+    scripts/ + the repo root, 32 are named by NO declared home - pipeline/hybrid_gate_ab.py, pipeline/ladder_ab.py,
+    pipeline/omlx_parallel.py, pipeline/providers/test_mlx_integration.py, pipeline/providers/test_mlx_unit.py,
+    pipeline/research/ws_harness_survey.py, pipeline/stage2_backfill_elaboration.py, scripts/_fix_buglog_format_657.py,
+    scripts/_session10_sync.py, scripts/apply_bug150_aliases.py, scripts/apply_bug150_axis_decisions.py,
+    scripts/apply_bug150_domain_swap.py and 20 more (the reader prints the whole list). This is BUG-482''s class at the
+    scale of the tree: a file with no caller in any declared home is reachable only by memory, and a one-shot repair
+    script that nobody calls is either HISTORY (archive/, C19: no dead code) or a CAPABILITY whose caller is missing.
+    The join is COARSE BY DECLARATION - a BASENAME mention counts - so 32 is a LOWER bound, and the census states that.'
+  gate: 'pipeline: a declared disposition for EVERY one of the 32, in the home that owns it: (a) RETIRED - moved to
+    archive/ (through pipeline/safe_delete.py where the act is destructive) with the reason the census can then check;
+    (b) CALLED - a justfile recipe, a consumer edge in config/declaration_consumers.yaml, or a lane in
+    config/capability_registry.yaml, whichever the instrument actually is; (c) or DECLARED DORMANT with the thing that
+    exercises it, the D-2665 shape (the exerciser path must EXIST, C16). Proof: --census reports 0 unnamed files, or the
+    residue is a declared list with a reason per file, and the ladder runs the census so the number cannot drift back up
+    unobserved.'

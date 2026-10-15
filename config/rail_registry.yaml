@@ -15,6 +15,21 @@
 # This registry does NOT decide policy: it reports which invariant has no owner.
 schema_version: '1'
 authority: D-2665
+
+#: THE REGISTRY'S OWN SCHEMA (T-164/BUG-837). A registry whose own shape is unchecked is a registry that can LOSE a
+#: declaration SILENTLY. MEASURED 2026-10-15: eight guard declarations appended at COLUMN 0 after `commit_boundary:`
+#: were ordinary TOP-LEVEL keys, invisible to `cfg["guards"]`, and the rail still printed "no declared guard disagrees
+#: with the ladder" - a true sentence about 35 of the 43 declarations the file carried.
+#: `keys` is therefore the CLOSED set of sections this file may declare: scripts/check_rail_registry.py reports any
+#: top-level key it does not list (and refuses a key shaped like a COMMAND LINE, which is not a section at all).
+#: `required` is the set that must be PRESENT - the fail-closed load, and the reason the rail's own closing sentence
+#: ("every rail is invoked or declared dormant... every declared writer's remedy is proven... no declared guard
+#: disagrees...") can never be vacuously true about a section the file simply omitted.
+#: `schema` LISTS ITSELF: a closure that does not cover its own description is the same defect one level up, and
+#: self-membership is what makes the NEXT stray key a fault instead of a shrug.
+schema:
+  keys: [schema, schema_version, authority, ladder, recipes, ladder_receipt, dormant, writers, guards, commit_boundary]
+  required: [ladder, recipes, dormant, writers, guards, commit_boundary]
 ladder: justfile
 recipes: [health, health-deep]     # the ladder(s) this registry governs; every other recipe is out of scope
 
@@ -240,9 +255,21 @@ guards:
   scripts/agent_context_probe.py --prefix-audit: fatal
   scripts/agent_context_probe.py: tri_state
   # T-163: the SHAPE controls must be SEEN, and they are the only reader that can refuse a listing of TRUE
-  # locations (BUG-836). Declared INSIDE this mapping on purpose: the eight declarations below this point sit at
-  # column 0 after commit_boundary: and are therefore TOP-LEVEL keys the rail never reads (BUG-837).
+  # locations (BUG-836).
   pipeline/subagent_fanout.py --selftest: fatal
+  #: T-164/BUG-837 (same family, the OTHER direction). `ladder_invocations` parsed ONLY lines beginning
+  #: `python3`/`python`, so a FATAL rail written as `bash ...` could not be declared AT ALL: the declaration would
+  #: have been answered with "(ii) ... an invocation the ladder does not contain", a FALSE fault, and the class it
+  #: pins would have looked unpinnable rather than unpinned. The parser now takes every DECLARING line except a bare
+  #: echo, and this line - BUG-526's hook check, guarded `|| exit 1` by the ladder - is pinned so the widening is
+  #: LOAD-BEARING rather than a claim about a capability nobody used.
+  scripts/install_git_hooks.sh --check: fatal
+  #: T-156/D-3024: the ROUTE GRAPH. Both lines are fatal and neither is owner-owed: the graph's READING is a
+  #: measurement (the debt is reported against a shrink-only ceiling, so inherited debt is loud but not a broken
+  #: build), while a capability that cannot resolve its entrypoint, a lane the operator cannot run, an undeclared
+  #: mover and a debt that GREW are all defects in the tree, not words the owner owes.
+  scripts/resolve_route.py --selftest: fatal
+  scripts/resolve_route.py --check: fatal
 commit_boundary:
   path: git-path:hooks/pre-commit
   why: 'a commit is the one act that makes a conflicted tree permanent (RAIL 0); four rails run ONLY there, so a deleted line is a rail that nothing runs - class (i) at the commit boundary. TWO SMALLER ACTS DISARM IT JUST AS SILENTLY, and neither was the subject of any rail (D-2687). (1) THE ROUTE: this declaration used to name a PATH SHAPE (gitdir: + hooks/). git does not promise to run that file - core.hooksPath decides, and the --git-dir of a linked worktree is not where hooks live. MEASURED 2026-09-27 in a real repository: with core.hooksPath set, `git rev-parse --git-path hooks/pre-commit` answered hooks/pre-commit while --git-dir answered .git, the file at gitdir:hooks/pre-commit DID NOT EXIST, and a DIFFERENT file received the commit and refused it. The route is therefore declared as git-path:<rel>: GIT ITSELF, never a path shape. (2) THE MODE: MEASURED the same day, a mode-644 hook is IGNORED - git LANDS the commit (rc=0), runs none of the four rails, and prints only a `hint:` git documents how to suppress. A byte-perfect verification of a file that may not be executed is class (i) with a green verdict, so the declared subject is the RESOLVED path, its bytes, AND its mode'
@@ -251,13 +278,19 @@ commit_boundary:
   - 'python3 scripts/verify_recalibration_pins.py --staged'
   - 'python3 scripts/check_declaration_consumers.py --staged'
   - 'python3 scripts/check_session_plan.py --staged'
-# --- 2026-10-15 (durable research + engine lifecycle) ---
-pipeline/research_run.py --selftest: fatal
-pipeline/research_run.py status: tri_state
-pipeline/model_loadability_probe.py: tri_state
-pipeline/hf_fetch_model.py --verify-only: tri_state
-pipeline/omlx_engine_guard.sh: tri_state
-# --- 2026-10-15 (fan-out + retirement) ---
-pipeline/oneshot_ask.py: tri_state
-pipeline/subagent_fanout.py status: tri_state
-pipeline/omlx_retire_model.sh --model: tri_state
+# --- 2026-10-15: THE EIGHT STRAYS (T-164/BUG-837) - deleted, and here is WHY they are not moved. ---
+# An earlier landing (6688938) appended EIGHT guard declarations at COLUMN 0 after the `commit_boundary:` mapping.
+# They parsed as top-level keys, so the rail never compared one of them with the ladder. Two of them were also
+# claims this ladder CANNOT support, which is what "unread" costs: `pipeline/hf_fetch_model.py --verify-only` is
+# carried by NO justfile recipe at all, and `pipeline/subagent_fanout.py status` is written `|| true` (the exit code
+# is DISCARDED, so no class can be pinned). They are DELETED rather than moved INSIDE `guards:` because a guard class
+# is a claim a CHAINED ladder consumes: `recipes:` is [health, health-deep], every operator recipe they named is out
+# of scope BY DECLARATION, and WIDENING `recipes:` is not an option - scripts/run_ladder.py COLLECTS cfg["recipes"],
+# so widening it would make `just health-full` RUN the engine guard and the retirement script.
+# The fact those eight lines exist to record - WHICH operator lane carries WHICH command, and whether that command is
+# still there - is declared where a reader CHECKS it: config/capability_registry.yaml#lanes, resolved by
+# scripts/resolve_route.py (T-156/D-3024), which fails on a declared lane whose recipe or command is ABSENT. A
+# disposition is not a comment about knowledge nobody reads; it is a MOVE to the home that reads it.
+# The eight: research_run.py --selftest | research_run.py status | model_loadability_probe.py |
+# hf_fetch_model.py --verify-only | omlx_engine_guard.sh | oneshot_ask.py | subagent_fanout.py status |
+# omlx_retire_model.sh --model.

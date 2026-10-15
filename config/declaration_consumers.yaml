@@ -101,3 +101,12 @@ declarations:
     the machine-readable TASK register is read by scripts/gov_sync.py, which renders the MUST/SHOULD/WORTH view
     into the user-facing faces and fails closed when a face stops equalling its re-derivation. Joining them here
     means a staged register with a withheld reader is refused at the commit boundary (the BUG-562 shape).
+- declaration: config/capability_registry.yaml
+  consumers: [scripts/resolve_route.py]
+  decisions: [D-3024, T-156]
+  why: >-
+    the route graph is read by exactly ONE module (scripts/resolve_route.py::CFG) - it resolves every `just <recipe>`
+    route against the ladder's bytes, follows every composed receipt pointer, and composes the joins this registry
+    deliberately does not restate (declaration consumers, flag consumers, rail guards, handoff receipts, the
+    delegation economy's tier vocabulary). A withheld reader would leave the graph UNREAD, not broken, which is the
+    BUG-837 class one level up.

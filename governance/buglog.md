@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1157 decisions (census stamp 2d26e29a259f46fd, 2026-10-15) · 600 bugs (225 open / 375 closed; highest OPEN = BUG-837) · 49 open tasks (MUST 15 / SHOULD 29 / WORTH 4; OWNER-moved 12, pipeline-moved 37; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1159 decisions (census stamp 8e0dff622b5b4657, 2026-10-15) · 600 bugs (224 open / 376 closed; highest OPEN = BUG-836) · 48 open tasks (MUST 14 / SHOULD 29 / WORTH 4; OWNER-moved 12, pipeline-moved 36; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **80** of 1157 — 🔴 open 32 · 🔵 proposed 27 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 572 · ⚖ ratified 145 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1157, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **80** of 1159 — 🔴 open 32 · 🔵 proposed 27 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 574 · ⚖ ratified 145 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1159, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 225 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 34 · 🟨 MED 62 · 🟩 LOW 24 · UNLABELLED 101 (BUG-757) of 225 open.
+> Open BUGS by severity (population = the census's 224 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 34 · 🟨 MED 61 · 🟩 LOW 24 · UNLABELLED 101 (BUG-757) of 224 open.
 >
 > **OWNER LANE (12) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -31,7 +31,7 @@
 > | T-145 | 🟠 SHOULD | EDGE0 IS DEFERRED WITH A NAMED TRIGGER, not fetched: the class is already served and the role is blocked on me | OWNER: say 'fetch Edge0' to override, or leave it deferred until T-137 |
 > | T-138 | COULD | HARNESS ADOPTION ON DEMAND - one command per tool, and none of them load-bearing | install a harness only when a specific job needs it (C28). The engine  |
 >
-> **PIPELINE LANE (37) — what the agent will do next, in strategic-consequential order (source: config/task_register.yaml):**
+> **PIPELINE LANE (36) — what the agent will do next, in strategic-consequential order (source: config/task_register.yaml):**
 >
 > | id | pri | state | task | evidence |
 > |---|---|---|---|---|
@@ -15032,3 +15032,70 @@ not as a courtesy.
    IS the model that failed` and then `return 0` - a verdict the code never carried (the run's honest exit is
    decided by the receipt). It now reads `retry refused: ...`, same behaviour, no false FATAL. MEASURED in
    `t163_r5b`, where a task whose model IS the declared fallback hits this line by construction.
+
+## BUG-837 (MED - FIXED 2026-10-15) - eight guard declarations in the rail registry were TOP-LEVEL keys, so the rail that reports "no declared guard disagrees with the ladder" never read them
+
+**REMEDY (T-164/D-3030, landed 2026-10-15).** Three acts, each measured, none of them a comment:
+
+1. **THE REGISTRY'S OWN SCHEMA IS CLOSED.** config/rail_registry.yaml now declares `schema: {keys: [...], required: [...]}`,
+   and scripts/check_rail_registry.py reports class (iv) for any top-level key `schema.keys` does not list - and refuses a
+   key shaped like a COMMAND LINE outright, which is this bug's shape exactly: eight command lines were read as sections.
+   `schema` must list ITSELF (a closure that exempts its own description is not a closure), and `required` is now READ
+   from the file (the hardcoded tuple is gone, C12) and includes `dormant`, `writers` and `guards`, because the rail's own
+   closing sentence asserts something about each: an omitted section made that sentence VACUOUSLY true.
+   MEASURED: 10 top-level keys, 0 strays; the rail now reads 36 declared guards (it covered 35 of the 43 declarations).
+2. **THE EIGHT ARE DISPOSITIONED, NOT DELETED.** Two of them were also claims the ladder cannot support:
+   `pipeline/hf_fetch_model.py --verify-only` is carried by NO justfile recipe, and `pipeline/subagent_fanout.py status`
+   is written `|| true`, so its exit code is DISCARDED and no class can be pinned. They could not move inside `guards:`
+   because a guard class is a claim a CHAINED ladder consumes, `recipes:` is [health, health-deep], and WIDENING it is not
+   an option - scripts/run_ladder.py COLLECTS cfg["recipes"], so widening would make `just health-full` RUN the engine
+   guard and the retirement script. Their fact - which operator lane carries which command, and whether that command is
+   still there - is declared in config/capability_registry.yaml#lanes, whose reader checks all three limbs: the recipe
+   exists, the command is in THAT recipe's body, and the command is in NO governed recipe.
+   MEASURED, and this is the argument for a CHECKED declaration over a remembered one: the reader caught a real defect in
+   the FIRST draft of that declaration - a lane was declared against a recipe named `task`, and the ladder carries `ask`
+   (a numbered listing had been misread).
+3. **THE PARSER'S SUBJECT WAS TOO NARROW.** `ladder_invocations` admitted only `python3`/`python` lines, so a FATAL rail
+   written `bash ...` could not be declared AT ALL: the reader would answer a TRUE declaration with a FALSE fault ("an
+   invocation the ladder does not contain"), which reads as "this class cannot be pinned" rather than "this class is
+   unpinned". It now takes every DECLARING line except a bare echo, and justfile:136
+   (`bash scripts/install_git_hooks.sh --check || exit 1`) is pinned fatal so the widening is LOAD-BEARING.
+   MEASURED: 160 invocations parsed (was 158), the `invoked` set unchanged (99), and the census lists
+   `scripts/install_git_hooks.sh --check` for the first time.
+
+**CONTROLS.** `python3 scripts/check_rail_registry.py --selftest` is now 19 known answers (5 new: an unknown top-level
+section; the command-line-as-a-key shape; a closure that omits itself; a bash lane that IS nameable; a bash lane whose
+declared guard disagrees), and the LADDER runs it (`just health`), because a control nothing runs is a comment (BUG-492).
+
+## T-156 (MUST - landed 2026-10-15) - the ROUTE GRAPH: a capability registry, a deterministic resolver, and the readings it took on its first run
+
+Not a bug: the landing of D-3024, recorded here because the first reading of a new instrument is evidence about the TREE,
+and because a number quoted after its instrument has been forgotten is not a reading (D-2642).
+
+**BUILT.** config/capability_registry.yaml declares 15 capabilities (KIND, ENTRYPOINT, CHECK, RECEIPT, COST TIER and the
+paths each one OWNS), 8 operator lanes (the declarations re-homed from the remedy above), and the disposition vocabulary
+that makes an unrouted item explicit. scripts/resolve_route.py is its ONE deterministic reader: `--check` refuses a
+capability that cannot resolve its entrypoint, check, receipt or owned path; a lane whose recipe or command is gone; a lane
+command that a GOVERNED recipe also runs; an open item whose MOVER nobody dispositioned; a STALE unrouted declaration; an
+undeclared reason; and routing debt that GREW past a declared SHRINK-ONLY ceiling. It renders its report TWICE and refuses
+a non-byte-stable one, and it never writes: a proposal is validated under temp/ and applied by nobody (D-2898/D-2941).
+14 known-answer controls; wired into `just health` with its guard class pinned in config/rail_registry.yaml#guards.
+
+**FIRST READINGS (2026-10-15, `--check`, report digest 3389a65e6b464911).**
+  * 49 open tasks: 14 ROUTE to a declared capability; 31 name an artifact that EXISTS and NO capability owns (a missing
+    route); 4 name no repo artifact at all (prose cannot be routed by a join).
+  * 225 open bugs: 223 name no repo artifact - a bug is a FINDING, not a work item, and the register that moves work is
+    config/task_register.yaml - 1 names an unowned artifact, 1 names a path that does not exist in the repo.
+  * 4 items name a path that does not exist in the repo. The reader reports that FACT and does NOT claim which kind it is:
+    a stale citation (BUG-488's class), a PROPOSAL to create the artifact (a task's own gate may declare it), or a home
+    OUTSIDE the repo (the session's harness config lives in the user's home). Naming it "stale citation" would have been
+    the over-claim this project pays for repeatedly; the category is `absent_path`, and the prose says why.
+  * `--census`: 538 python files, of which 32 are named by NO declared home (justfile + config + governance), and 74
+    declare a check verb. Fingerprint 6943898c4e273509. The join is COARSE BY DECLARATION (a BASENAME mention counts), so
+    32 is a LOWER bound. The 32 are now T-165: an instrument with no caller is not a capability (BUG-482's class).
+
+**R5 (D-3020: the generator may not verify itself).** The new module was reviewed through the system's own executor - gemma-4-E4B, a different family - as a task declaring `shape: review` over the artifact: run t156r5b, 26.3s, `TERMINAL: DONE
+- rc=0, ok, 828 chars, 2 finding(s) for the declared review shape` (which is also the first real use of the shape gate that
+landed in the same session). Its findings were: two misreadings of the code (an empty entrypoint IS already a fault from the
+field loop; a lane check that verifies the command is PRESENT is exactly what it claims to verify) and ONE real refinement,
+now landed: the two facts behind an unrouted item are reported TOGETHER, because a single category hid the other one.

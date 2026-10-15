@@ -1,0 +1,257 @@
+# config/capability_registry.yaml — THE ROUTE GRAPH (D-3024 / T-156). The ONE home of the fact "<this entry
+# point> is a CAPABILITY: here is how it is invoked, how it is CHECKED, what it LEAVES BEHIND, and what it COSTS."
+#
+# WHY (the class, not the instance). MEASURED 2026-10-15 by `python3 scripts/resolve_route.py --census` (the
+# instrument is named with the number, D-2642 — a number quoted after its instrument was invalidated is not a
+# reading, and the READING is quoted with its corpus FINGERPRINT because this file and the resolver are themselves
+# part of the corpus they measure): 538 python files across pipeline/ + scripts/ + the repo root, of which 32 are
+# named by NO justfile recipe, NO config file and NO governance document; 74 of the 538 DECLARE a check verb
+# (--selftest/--check). Fingerprint 6943898c4e273509 over 509 declared-home file(s), 11,168,252 bytes. "Who runs what" therefore lived in prose (a CLAUDE.md
+# delegate_rules block, ADVISORY) and in a justfile, so a TASK could not be RESOLVED to the capability that owns
+# it, and a capability whose entrypoint or check does not exist could not be REFUSED. This file is the declared
+# graph; scripts/resolve_route.py is its ONE deterministic reader.
+#
+# THE RULE (D-3024). A capability declares its KIND, ENTRYPOINT, CHECK, RECEIPT and COST TIER. `--check` FAILS on
+# a capability missing any of them, on an entrypoint / check / owned path that is ABSENT, on a lane whose recipe or
+# command is gone, on an open item whose MOVER has no declared disposition, and on routing debt that GREW past its
+# declared ceiling. An LLM may write a PROPOSAL into temp/ and never an assignment (D-2898/D-2941): this file is a
+# GOVERNED home and `resolve_route.py --propose <file>` validates a proposal instead of applying it.
+#
+# WHAT THIS FILE DELIBERATELY DOES NOT DO. It does not restate the joins that already exist: the
+# declaration -> consumer edges are read from config/declaration_consumers.yaml, the flag -> consumer edges from
+# config/flag_consumer_registry.yaml, the rail set and its receipts from config/rail_registry.yaml, the stage
+# receipts from config/handoffs.yaml, and the cost-tier VOCABULARY from config/delegation_economy.yaml (a second
+# copy of a fact IS the drift, C12). It is not a census of every file either: the 32 unnamed files are a REPORTED
+# debt (see routing_debt), never something a route declaration papers over.
+#
+# WHAT IT IS FOR. Two questions, both deterministic: (1) "which capability owns this open item?" —
+# `--route T-156`; (2) "is the graph well-formed and is its debt shrinking?" — `--check`.
+schema_version: '1'
+authority: D-3024
+updated: '2026-10-15'
+
+# ─── THE VOCABULARIES (a value that is not declared here is refused, never inferred) ───
+#: The KIND of route. A kind is a CLAIM about how a capability is entered and what it leaves behind.
+kinds:
+  script: 'a file invoked as a command; its receipt is a file (or a census) it writes'
+  recipe: 'a justfile recipe: the route to a stage, a rail chain or an operator lane'
+  harness_job: 'a detached job run through the harness; its receipt is a workspace under temp/runs/'
+  skill: >-
+    an agent-session capability addressed by name. NO skill is declared below: a skill carries no receipt of its
+    own yet, and a kind with zero members is declared rather than implied - the day one carries a receipt, the
+    entry appears here and the check accepts it without an edit to code
+
+#: COST TIERS ARE NOT DECLARED HERE. The vocabulary lives in config/delegation_economy.yaml (T0 deterministic
+#: script / T1 local engine / T2 cloud), which owns it; the reader REFUSES a tier token that does not appear in
+#: that file, so a re-badged economy is a fault and not a silent re-labelling.
+cost_tier_home: config/delegation_economy.yaml
+
+# ─── THE CAPABILITIES ───
+#: Every field is checked: `entrypoint` and `check` must RESOLVE (a file path must exist; `just <recipe>` must be
+#: a recipe in the ladder file), `owns` names the paths this capability is responsible for (an item that names one
+#: of them ROUTES here), `receipt` names what is left behind — a path, or `<file>#<key>` when an existing
+#: declaration already owns that fact (the pointer is followed, so a composed receipt is verified, not asserted).
+capabilities:
+  # ── the ladder and the registers ──
+  - id: ladder
+    kind: recipe
+    entrypoint: just health-full
+    check: python3 scripts/run_ladder.py --receipt-check
+    receipt: temp/ladder_receipt.json
+    cost_tier: T0
+    owns: [justfile]
+    note: 'the whole declared rail set in one run (D-2983); the rail set ITSELF is not restated here - it is config/rail_registry.yaml#guards'
+  - id: rail_registry
+    kind: script
+    entrypoint: python3 scripts/check_rail_registry.py
+    check: python3 scripts/check_rail_registry.py --selftest
+    receipt: config/rail_registry.yaml
+    cost_tier: T0
+    owns: [config/rail_registry.yaml]
+  - id: governance_faces
+    kind: script
+    entrypoint: python3 scripts/gov_sync.py --apply
+    check: python3 scripts/check_governance_faces.py
+    receipt: DECISION-LOG.md
+    cost_tier: T0
+    owns: [config/gov_sync.yaml, DECISION-LOG.md, MASTER-TASK-REGISTER.md, governance/buglog.md]
+    note: 'the four USER-FACING faces are one capability: they are re-cut from one register and one reader (D-2981)'
+  - id: decision_mint
+    kind: script
+    entrypoint: python3 scripts/recompute_decision_summary.py --mint
+    check: python3 scripts/recompute_decision_summary.py --check
+    receipt: config/decisions_summary.json
+    cost_tier: T0
+    owns: [config/decisions.yaml, config/decisions_summary.json, config/decisions_policy.yaml]
+  - id: bug_census
+    kind: script
+    entrypoint: python3 scripts/bug_status.py
+    check: python3 scripts/check_bug_status.py
+    receipt: governance/bug_status.json
+    cost_tier: T0
+    owns: [governance/bug_status.json]
+  - id: store_write
+    kind: script
+    entrypoint: python3 scripts/apply_relabel_store_write.py
+    check: python3 scripts/apply_relabel_store_write.py --selftest
+    receipt: config/label_store_write_receipt.json
+    cost_tier: T0
+    owns: [config/relabel_rulings.yaml, knowledge pipeline/maxwell.db]
+
+  # ── the delegation fleet (D-3020/D-3028) ──
+  - id: fanout
+    kind: harness_job
+    entrypoint: python3 pipeline/subagent_fanout.py start
+    check: python3 pipeline/subagent_fanout.py --selftest
+    receipt: temp/runs/
+    cost_tier: T1
+    owns: [pipeline/subagent_fanout.py, config/engine.yaml]
+    note: 'the delegation EXECUTOR; a run is a job whose receipt is its workspace'
+  - id: research_run
+    kind: harness_job
+    entrypoint: python3 pipeline/research_run.py run
+    check: python3 pipeline/research_run.py --selftest
+    receipt: temp/runs/
+    cost_tier: T1
+    owns: [pipeline/research_run.py]
+  - id: model_fetch
+    kind: script
+    entrypoint: python3 pipeline/hf_fetch_model.py --repo
+    check: python3 pipeline/hf_fetch_model.py --verify-only
+    receipt: config/engine.yaml#model_store
+    cost_tier: T0
+    owns: [pipeline/hf_fetch_model.py]
+
+  # ── the pipeline (S0 -> S6): one capability per PHASE, and the phase's receipt is the handoff journal ──
+  - id: pipeline_ingest
+    kind: recipe
+    entrypoint: just stage1
+    check: python3 scripts/verify_handoffs.py
+    receipt: config/handoffs.yaml#journal
+    cost_tier: T0
+    owns: [pipeline/stage0_convert.py, pipeline/stage0_5_extract_metadata.py, pipeline/stage1_chunk.py, config/handoffs.yaml]
+  - id: pipeline_cluster
+    kind: recipe
+    entrypoint: just stage1_5
+    check: python3 scripts/verify_handoffs.py
+    receipt: config/handoffs.yaml#journal
+    cost_tier: T0
+    owns: [pipeline/stage1_3_prefilter.py, pipeline/stage1_5_embed_cluster.py]
+  - id: pipeline_extract
+    kind: recipe
+    entrypoint: just stage2
+    check: python3 scripts/verify_handoffs.py
+    receipt: config/handoffs.yaml#journal
+    cost_tier: T1
+    owns: [pipeline/stage2_extract.py]
+  - id: pipeline_merge
+    kind: recipe
+    entrypoint: just stage4
+    check: python3 scripts/verify_handoffs.py
+    receipt: config/handoffs.yaml#journal
+    cost_tier: T1
+    owns: [pipeline/stage4_merge.py]
+  - id: pipeline_verify
+    kind: recipe
+    entrypoint: just stage5
+    check: python3 scripts/verify_handoffs.py
+    receipt: config/handoffs.yaml#journal
+    cost_tier: T1
+    owns: [pipeline/stage5_verify.py]
+  - id: pipeline_commit
+    kind: recipe
+    entrypoint: just stage6
+    check: python3 scripts/verify_handoffs.py
+    receipt: config/handoffs.yaml#journal
+    cost_tier: T0
+    owns: [pipeline/stage6_commit.py]
+
+# ─── THE OPERATOR LANES (T-164/BUG-837's disposition) ───
+#: An operator lane is an entry point a HUMAN runs and that produces a READING or a STATE CHANGE, not a receipt —
+#: which is why it is a LANE and not a capability: declaring it a capability would force a receipt field to be
+#: filled with something invented. Each lane names its RECIPE, the exact COMMAND the recipe must still carry, and
+#: what the operator gets. The reader checks all three: the recipe exists in the ladder file, the command is in
+#: THAT recipe's body, and the command appears in NO governed recipe (if it did, it would be a ladder rail and its
+#: guard class would belong in config/rail_registry.yaml#guards).
+#
+# These eight are the declarations that were appended at COLUMN 0 of config/rail_registry.yaml (BUG-837) and read
+# by nothing. They are not deleted knowledge: they are re-homed here, where a reader checks them.
+lanes:
+  - recipe: research-selftest
+    cmd: pipeline/research_run.py --selftest
+    produces: reading
+    capability: research_run
+    why: 'the durable-research executor''s own known-answer controls, run by hand when a run is suspected'
+  - recipe: research-status
+    cmd: pipeline/research_run.py status
+    produces: reading
+    capability: research_run
+    why: 'what the detached runs are doing RIGHT NOW - a run outlives the session that started it (D-3020)'
+  - recipe: model-loadability
+    cmd: pipeline/model_loadability_probe.py
+    produces: reading
+    capability: model_fetch
+    why: 'whether the engine can actually serve a candidate; 2 = the engine refused it (owner-owed, loud)'
+  - recipe: engine-guard
+    cmd: pipeline/omlx_engine_guard.sh
+    produces: state
+    why: 'starts the engine only when it is not already answering (D-3007) - the one lane that CHANGES state'
+  - recipe: cache-dry
+    cmd: pipeline/omlx_cache_enable.sh
+    produces: reading
+    why: 'the cache A/B instrument''s dry run; applying it is --confirm and rolling back is the measurement (D-3008)'
+  - recipe: fanout
+    cmd: pipeline/subagent_fanout.py status
+    produces: reading
+    capability: fanout
+    why: 'an agent-facing reminder of the executor''s verbs plus the status of one run (the exit code is discarded: || true)'
+  - recipe: ask
+    cmd: pipeline/oneshot_ask.py
+    produces: receipt
+    capability: fanout
+    why: 'one question to one local model, receipted at temp/ask.md - the smallest unit of the fleet (the recipe is named ask: - MEASURED 2026-10-15, a first draft of this registry named it task:, which is a misreading of a numbered listing and an example of why a lane command is CHECKED against the recipe rather than remembered)'
+  - recipe: retire-dry
+    cmd: pipeline/omlx_retire_model.sh
+    produces: state
+    why: 'parks a model; the BYTES need pipeline/safe_delete.py (R-D410), so the lane never deletes'
+
+# ─── THE ITEM CENSUS (does open WORK route to a declared capability?) ───
+#: A disposition is what an item gets when it does NOT route. It is keyed by MOVER for tasks (the register's own
+#: vocabulary) and by class for bugs, and every reason must be DECLARED below: an item is never silently unrouted.
+dispositions:
+  tasks:
+    pipeline: route_graph_incomplete
+    owner: owner_gate
+  bugs:
+    default: bug_is_a_finding
+
+reasons:
+  route_graph_incomplete: >-
+    the item names no artifact owned by a declared capability. MEASURED, not assumed: the reader reports which of
+    the item's artifacts exist but are owned by NO declared capability (artifact_has_no_route) separately from the
+    items whose text names no repo artifact at all (no_artifact_named), because only the first kind is a missing
+    ROUTE while the second is prose that cannot be routed by a join.
+  owner_gate: >-
+    an owner-moved item is an OWNER'S word to give (D-2941: a gate carries INTENT or POLICY), so it is not routable
+    to a capability until the word exists - routing it would be an agent minting the intent.
+  bug_is_a_finding: >-
+    a bug is a FINDING, not a work item: the register that moves work is config/task_register.yaml. A bug therefore
+    routes only when its title NAMES a declared capability's artifact; otherwise it stays unrouted until a task or a
+    decision names the capability that fixes it. Declaring it routable would fabricate work.
+
+#: PER-ITEM OVERRIDES. Empty today, and declared because the mechanism must be visible before it is needed:
+#: an item whose mover-level reason is not the true one carries its own reason here, and the reader refuses a reason
+#: that is not in the vocabulary above and refuses an entry for an item that is no longer open (a stale reason is the
+#: same defect as a stale declaration, D-405).
+unrouted: {}
+
+#: SHRINK-ONLY (the D-3023 ceiling shape). These are the instrument's own readings, not targets: the reader FAILS
+#: when the measured debt EXCEEDS the declared number, so inherited debt cannot grow unnoticed, and it reports a
+#: SHRINK as good news. Clearing an item is a route declaration or an item edit - never a raised ceiling.
+routing_debt:
+  measured: '2026-10-15'
+  unrouted_open_tasks: 35
+  unrouted_open_bugs: 225
+  note: >-
+    the readings below are RE-MEASURED every run and printed per item; the ceiling exists so that a NEW unrouted
+    item is a fault instead of a shrug, and so the worklist of the route graph is a number someone can shrink

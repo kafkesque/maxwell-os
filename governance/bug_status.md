@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**225 open** / 375 closed of 600 ids.
+**224 open** / 376 closed of 600 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -231,4 +231,3 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-832 | (MED - OPEN 2026-10-15) — the session brain is the provider a CLOSED bug banned, and nothing in the repo can see it change | 1 |
 | BUG-834 | (MED - OPEN 2026-10-15) — a delegate's handle did not resolve, so the deliverable of an in-process delegation was unretrievable in the same  | 1 |
 | BUG-836 | (MED - OPEN 2026-10-15) - the R5 cross-family review route produced NO usable review from either local verifier, and one of the two failures | 1 |
-| BUG-837 | (MED - OPEN 2026-10-15) - eight guard declarations in the rail registry are TOP-LEVEL keys, so the rail that reports "no declared guard disa | 1 |

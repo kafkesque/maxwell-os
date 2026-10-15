@@ -25330,3 +25330,112 @@ decisions:
     keys, invisible to the rail that reports "no declared guard disagrees with the ladder" - a coverage claim over
     35 of 43 declarations. That is BUG-826''s class one layer down and the same structural defect BUG-832 filed
     against the session provider: a home a decision names, with no reader in the repo.'
+- id: D-3030
+  state: ACTIVE
+  category: RAIL INTEGRITY / META
+  title: 'THE REGISTRY''S OWN SCHEMA IS CLOSED: a top-level key the registry does not declare is a fault and a COMMAND
+    LINE is not a section, because a declaration the reader never reads is how eight guards lived at column 0'
+  bugs:
+  - BUG-837
+  files:
+  - scripts/check_rail_registry.py
+  - config/rail_registry.yaml
+  - config/capability_registry.yaml
+  - scripts/resolve_route.py
+  - justfile
+  decision: 'MEASURED 2026-10-15 (BUG-837): config/rail_registry.yaml carried EIGHT guard declarations appended
+    at column 0 after the indented commit_boundary block. They parsed as TOP-LEVEL keys, so cfg["guards"] never
+    contained them - and the rail still printed "no declared guard disagrees with the ladder", a TRUE sentence about
+    35 of the 43 declarations the file carried. Two of the eight were also claims the ladder cannot support: pipeline/hf_fetch_model.py
+    --verify-only is carried by no justfile recipe, and pipeline/subagent_fanout.py status is written || true, so
+    its exit code is DISCARDED and no class can be pinned. In other words the damage was not "eight entries were
+    noisy"; it was that a declaration could be WRITTEN and never READ, which is the same defect class as BUG-482
+    one layer down.
+
+    THE RULE THIS MINTS. A REGISTRY''S OWN SCHEMA IS PART OF ITS CLAIM. The file declares schema.keys - the CLOSED
+    set of sections it may carry - and schema.required, the set that must be PRESENT; scripts/check_rail_registry.py
+    reads BOTH from the file (the hardcoded tuple is gone, C12) and reports an unknown top-level key as class (iv),
+    and refuses a key shaped like a COMMAND LINE outright, because a command line IS the BUG-837 shape. schema must
+    LIST ITSELF: a closure that exempts its own description is not a closure. dormant, writers and guards are now
+    REQUIRED, because the rail''s closing sentence asserts something about each and an omitted section made that
+    sentence vacuously true - an emptiness that is explicit is checkable, an emptiness by omission is not.
+
+    TWO ADJACENT FACTS THIS REMEDY HAD TO SETTLE, both by measurement rather than preference. (1) THE EIGHT ARE
+    DISPOSITIONED, NOT DELETED, and they could NOT move inside guards:: a guard class is a claim a CHAINED ladder
+    consumes, recipes: is [health, health-deep], and WIDENING recipes: is not available - scripts/run_ladder.py
+    COLLECTS cfg["recipes"], so widening it would make `just health-full` RUN the engine guard and the retirement
+    script. Their fact is re-homed where a reader CHECKS it: config/capability_registry.yaml#lanes verifies that
+    the recipe exists, that the command is in THAT recipe''s body, and that the command runs in NO governed recipe.
+    The reader caught a defect in the first draft of that very declaration (a recipe I had named `task` is really
+    `ask` - a numbered listing misread), which is the difference between a checked declaration and a remembered
+    one. (2) THE PARSER''S SUBJECT WAS TOO NARROW: ladder_invocations admitted only python3/python lines, so a FATAL
+    rail written `bash ...` could not be declared at all - the reader answered a TRUE declaration with a FALSE fault,
+    which reads as "this class cannot be pinned" rather than "this class is unpinned". It now takes every DECLARING
+    line except a bare echo, and justfile:136 is pinned fatal so the widening is load-bearing.
+
+    MEASURED AFTER: 10 top-level keys, 0 strays; 36 declared guards read (was 35 of 43); 160 invocations parsed
+    (was 158) with the invoked set unchanged at 99; --selftest 19/19 known answers (5 new controls, one of which
+    is the BUG-837 shape itself), RUN BY THE LADDER (just health), because a control nothing runs is a comment (BUG-492).
+    This does NOT make the registry a census of the ladder: guards: stays OPTIONAL per rail by the file''s own doctrine
+    (D-2665) - what changed is that an omission is now VISIBLE as a choice, never a silent loss.'
+- id: D-3031
+  state: ACTIVE
+  category: GOVERNANCE / ROUTING
+  title: 'THE ROUTE GRAPH IS DECLARED AND DETERMINISTIC: a capability declares its entrypoint, its check, its receipt
+    and its cost tier, the resolver composes the joins that already exist and REFUSES an absent route, and an LLM
+    proposes but never assigns'
+  bugs:
+  - BUG-482
+  files:
+  - config/capability_registry.yaml
+  - scripts/resolve_route.py
+  - config/rail_registry.yaml
+  - justfile
+  - config/declaration_consumers.yaml
+  decision: 'MEASURED 2026-10-15 by the new instrument itself (python3 scripts/resolve_route.py --census, fingerprint
+    6943898c4e273509, the corpus declared in the report): 538 python files across pipeline/ + scripts/ + the repo
+    root, of which 32 are named by NO justfile recipe, NO config file and NO governance document, and 74 declare
+    a check verb. "Who runs what" therefore lived in prose (a CLAUDE.md delegate_rules block, ADVISORY) and in a
+    justfile, so a task could not be RESOLVED to the capability that owns it and a capability whose entrypoint or
+    check does not exist could not be REFUSED. That is BUG-482''s class ("a declaration with no caller") applied
+    to the system''s own instruments, and T-149''s already.
+
+    THE RULE THIS MINTS. config/capability_registry.yaml is the ONE home of the route graph, and scripts/resolve_route.py
+    is its ONE deterministic reader (T-156/D-3024). A capability declares (a) KIND - from a declared vocabulary
+    (script | recipe | harness_job | skill, the last with zero members DECLARED rather than implied); (b) ENTRYPOINT,
+    which must RESOLVE - a file that exists, or a `just <recipe>` the ladder still declares; (c) CHECK, which must
+    resolve for the same reason: a capability whose check does not exist cannot be refused; (d) RECEIPT - a path,
+    or `<file>#<key>` followed into the declaration that already owns that fact, so a composed receipt is VERIFIED
+    rather than asserted; (e) COST TIER, read from the vocabulary config/delegation_economy.yaml OWNS (a re-badged
+    economy is a fault, not a relabelling); and (f) the paths it OWNS, each of which must exist, because owning
+    an absent path is an assertion (D-405).
+
+    WHAT MAKES IT NOT A CENSUS. The graph does not restate the joins that already exist and it does not declare
+    a route for every file: the declaration->consumer edges come from config/declaration_consumers.yaml, the flag->consumer
+    edges from config/flag_consumer_registry.yaml, the rail set and its receipt discipline from config/rail_registry.yaml,
+    the stage receipts from config/handoffs.yaml. The 32 unnamed files are a REPORTED debt.
+
+    THE ITEM CENSUS, and why it is honest about what it cannot decide. Every open task and bug is joined to the
+    graph by the artifacts its own text names. FIRST READINGS (digest 3389a65e6b464911): of 49 open tasks, 14 ROUTE,
+    31 name an artifact that exists and no capability owns, 4 name no repo artifact; of 225 open bugs, 223 name
+    no repo artifact at all - a bug is a FINDING, not a work item, and declaring it routable would fabricate work.
+    Four items name a path that does not exist in the repo, and the reader reports that FACT WITHOUT claiming which
+    kind it is: a stale citation (BUG-488''s class), a PROPOSAL to create the artifact (a task''s own gate may declare
+    it), or a home OUTSIDE the repo (the session''s harness config lives in the user''s home). The category is therefore
+    `absent_path`, not `stale_citation` - naming it the worst thing it could be would be the over-claim this project
+    pays for repeatedly.
+
+    THE TEETH. An item that does not route must carry a DECLARED reason, and a MOVER with no declared disposition
+    is a FAULT (an item is never silently unrouted). An item declared unrouted that is no longer open is a STALE
+    declaration and a fault. A lane whose recipe or command is gone, or whose command a GOVERNED recipe also runs,
+    is a fault. The routing DEBT is a SHRINK-ONLY ceiling (the D-3023 shape): inherited debt cannot grow unnoticed,
+    and the ceiling is the instrument''s own reading, never a target. The report is rendered TWICE and must be byte-stable
+    (digest agreement across two processes measured: 109617de99add207 -> b21119bb58b33604 -> 3389a65e6b464911 as
+    the report was refined; a clock in a report is a report that cannot be compared with itself). 14 known-answer
+    controls over SYNTHETIC graphs, run BY THE LADDER, because a control nothing runs is a comment (BUG-492).
+
+    THE BOUNDARY. No LLM may ASSIGN a route: the resolver reads ONE governed home and writes NOTHING, and a proposal
+    is validated under temp/ and applied by nobody (D-2898/D-2941). R5 applies as everywhere else: the module was
+    reviewed by a DIFFERENT model family through the system''s own executor (run t156r5b, shape: review, DONE with
+    2 findings), and one of its three findings landed as a real refinement - the two facts behind an unrouted item
+    are now reported TOGETHER, since a single category hid the other one.'

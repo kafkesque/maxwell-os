@@ -24694,7 +24694,7 @@ decisions:
   decision: '(1) A STORE IS MEASURED TWICE and flagged TRANSIENT when it moves, so a single instant may never be reported as reclaimable mass (an 85 GB reading was cleaned by the owner within the hour, BUG-807). (2) AN ENGINE ENTRY WHOSE TARGET IS ABSENT IS REPORTED BROKEN, never as a model that is on disk: a parked symlink is a NAME, not a model (BUG-808). (3) A DELETION CANDIDATE MAY COME ONLY FROM THE ORPHAN CLASS - a store that no serving, parked or stashed entry resolves to AND that no live file under config, pipeline or scripts names - and it is executed only through pipeline/safe_delete.py (R-D410). (4) A CENSUS NARRATES NOTHING IT DID NOT OBSERVE: no cause may be written into a record that the instrument did not measure.'
 - id: D-3005
   date: '2026-10-15'
-  status: proposed
+  state: PROPOSED
   category: RESEARCH / INFRASTRUCTURE
   bugs: '[BUG-809, BUG-811]'
   supersedes: 'the practice of running open-ended research as in-session subagents'
@@ -24707,7 +24707,7 @@ decisions:
     workstreams are partitioned by ARTEFACT, never by harness instance - the model pool is the serial resource.'
 - id: D-3006
   date: '2026-10-15'
-  status: proposed
+  state: PROPOSED
   category: MODEL / SELECTION
   bugs: '[BUG-811]'
   supersedes: 'download counts and leaderboards as the selection instrument'
@@ -24720,7 +24720,7 @@ decisions:
     pool they get back (pipeline/research/ws_model_adopt.py).'
 - id: D-3007
   date: '2026-10-15'
-  status: proposed
+  state: PROPOSED
   category: ENGINE / LIFECYCLE
   bugs: '[BUG-802, BUG-812]'
   decision: '(1) A BOOT AGENT MUST BE IDEMPOTENT: a job that starts the engine without first asking whether the
@@ -24732,7 +24732,7 @@ decisions:
     -lint is the gate, and it is what found it (BUG-812).'
 - id: D-3008
   date: '2026-10-15'
-  status: proposed
+  state: PROPOSED
   category: MEASUREMENT DISCIPLINE
   bugs: '[BUG-813]'
   decision: '(1) NO CASCADE CHANGE WITHOUT A BEFORE-MEASUREMENT of the same instrument: the cache was enabled with
@@ -24743,7 +24743,7 @@ decisions:
     while the second call was 7x faster.'
 - id: D-3009
   date: '2026-10-15'
-  status: proposed
+  state: PROPOSED
   category: MODEL / PORTFOLIO
   bugs: '[BUG-811, BUG-814]'
   supersedes: 'downloading a candidate because it looks good in isolation'
@@ -24758,7 +24758,7 @@ decisions:
     than parking a symlink whose target stays absent (BUG-808).'
 - id: D-3010
   date: '2026-10-15'
-  status: proposed
+  state: PROPOSED
   category: STORE / HYGIENE
   bugs: '[BUG-808, BUG-814]'
   supersedes: 'tidiness as a deletion reason'
@@ -24772,7 +24772,7 @@ decisions:
     (4) Every deletion goes through pipeline/safe_delete.py with the owner''s word (R-D410).'
 - id: D-3011
   date: '2026-10-15'
-  status: proposed
+  state: PROPOSED
   category: AGENT / HARNESS POLICY
   bugs: '[BUG-809, BUG-815]'
   supersedes: 'choosing a harness or a model by reputation'
@@ -24789,7 +24789,7 @@ decisions:
     answered without the local engine''s counter moving). (5) LAYER-BY-LAYER VERDICT: config/harness_policy.yaml.'
 - id: D-3012
   date: '2026-10-15'
-  status: proposed
+  state: PROPOSED
   category: DELEGATION / PREMISE
   bugs: '[BUG-816, BUG-817]'
   decision: '(1) A DELEGATED QUESTION MUST CARRY ITS PREMISE. A fan-out task declares expect: REGEX and the
@@ -24801,8 +24801,9 @@ decisions:
     is a FAILURE REPORT, not a note (BUG-810''s remedy, restated as practice after it was violated).'
 
 - id: D-3013
+  state: RATIFIED
   date: '2026-10-15'
-  class: STORE / DELETION
+  category: STORE / DELETION
   title: 'AN OWNER-ORDERED DELETION KEEPS A RECEIPT: retire the NAME first, delete the BYTES second, and never leave the two steps able to produce a name that points at nothing'
   decision: >-
     (1) The owner ordered the deletion of gemma-4-12B-it-qat-OptiQ-4bit (8.4 GB, served) and
@@ -24819,8 +24820,9 @@ decisions:
     repointed to the classifier-of-record. (5) Each deletion carries the task that would notice it went wrong:
     T-141 for downloads, T-142 for the declared-by-mention bucket.
 - id: D-3014
+  state: PROPOSED
   date: '2026-10-15'
-  class: STORE / HYGIENE
+  category: STORE / HYGIENE
   title: 'A MODEL KEPT ONLY TO LOSE A RECORDED COMPARISON IS DELETABLE; A DATASET IS NOT A MODEL AND IS NEVER SWEPT WITH MODEL BYTES'
   decision: >-
     (1) The Tier B set (facebook/bart-large-mnli 6.5 GB, ynie/roberta-large-snli 4.0 GB, roberta-large-mnli 1.3 GB,
@@ -24834,8 +24836,9 @@ decisions:
     ability to re-bench is strictly worse than 4.5 MB kept. (3) A deletion batch is therefore classified by
     KIND first (model weights / dataset / receipt / config) and only then by size.
 - id: D-3015
+  state: PROPOSED
   date: '2026-10-15'
-  class: EXECUTION / PARALLELISM
+  category: EXECUTION / PARALLELISM
   title: 'PARALLELISM IS A RESOURCE-CLASS DECISION: the engine pool is a mutex, the governed homes are a single writer, and a download is serialized per repo'
   decision: >-
     (1) A fan-out unit is an ARTEFACT (D-3005), and every unit declares a RESOURCE CLASS. ENGINE_POOL jobs
@@ -24850,8 +24853,9 @@ decisions:
     (4) Verification is a SEQUENCE, never a parallel peer: the verifier runs after the generator and from a
     different family (R5).
 - id: D-3016
+  state: PROPOSED
   date: '2026-10-15'
-  class: AGENT / HARNESS POLICY
+  category: AGENT / HARNESS POLICY
   title: 'A HARNESS IS AN ENGINE-WIRED CLIENT, INSTALLED ON DEMAND: omlx wires, it does not download; the owner is the installer, and a cloud harness is excluded by C3'
   decision: >-
     (1) `omlx launch TOOL` sets the env for a harness that IS ALREADY on PATH; it does not install one. Measured

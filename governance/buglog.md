@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1128 decisions (census stamp 309f8cf9a7f9a898, 2026-10-15) · 583 bugs (220 open / 363 closed; highest OPEN = BUG-820) · 36 open tasks (MUST 10 / SHOULD 22 / WORTH 3; OWNER-moved 11, pipeline-moved 25; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1144 decisions (census stamp 81ac953af5bd0eda, 2026-10-15) · 584 bugs (221 open / 363 closed; highest OPEN = BUG-821) · 36 open tasks (MUST 10 / SHOULD 22 / WORTH 3; OWNER-moved 11, pipeline-moved 25; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **68** of 1128 — 🔴 open 32 · 🔵 proposed 15 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 565 · ⚖ ratified 135 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1128, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **82** of 1144 — 🔴 open 32 · 🔵 proposed 29 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 565 · ⚖ ratified 137 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1144, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 220 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 34 · 🟨 MED 57 · 🟩 LOW 24 · UNLABELLED 101 (BUG-757) of 220 open.
+> Open BUGS by severity (population = the census's 221 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 34 · 🟨 MED 58 · 🟩 LOW 24 · UNLABELLED 101 (BUG-757) of 221 open.
 >
 > **OWNER LANE (11) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -14402,3 +14402,26 @@ insertion that preserves every comment.
 RULE: a governed YAML file whose comments carry provenance is edited by INSERTION, never by load-dump. A dumper is
 safe for a file whose meaning is entirely in its keys; it is destructive for a file whose meaning is partly in its
 comments (the same distinction BUG-810 made for shell-quoted arguments).
+
+## BUG-821 (MED - OPEN 2026-10-15) - the census could not count 16 records because the mint path was bypassed, so four faces quoted a stale total for two sessions
+
+MEASURED then FIXED. `config/decisions_summary.json` declared **1128 decisions** while `config/decisions.yaml` held
+**1144**. The recompute tool refused to repair it, and its refusal names the reason: `FAIL-CLOSED (BUG-483):
+decision D-3005 carries no canonical state: key (legacy keys present: [status]) - it would be silently counted as
+ACTIVE.` Twelve records minted by appending text in a land script carried no canonical keys at all - eight had
+`status:` instead of `state:`, four had `class:` instead of `category:` - so the census stopped advancing and
+DECISION-LOG.md, MASTER-TASK-REGISTER.md, buglog.md and agent/session_seed.yaml all quoted 1128 for two sessions.
+
+(a) THE MINT PATH IS THE ONE HOME. A decision is added by `--mint`, which validates the record, joins its own
+fields to reality (the cited bugs, the cited files, D-2660) and REWRITES THE CENSUS IN THE SAME INVOCATION.
+Appending text to the register is a path that can mint a record nothing can count.
+(b) The normalisation exposed a second defect: `scripts/recompute_decision_summary.py` declares
+`written_by: temp/mut_recompute.py` and the tool in `temp/` declares `written_by: scripts/recompute_decision_summary.py`.
+Each therefore reports exactly one drift - the other - and `--check` becomes a false witness depending on which ran
+last. ONE artifact, ONE writer: the declared writer should be the one in `scripts/`, and the tool in `temp/` should
+either move there or be deleted.
+(c) The first repair attempt fixed ONE record of the twelve: it collected block indices once and then INSERTED a
+line per record, so every later index pointed one line off (the loop had to run in reverse). BUG-811 cousin -
+an instrument mutating the list it is iterating indexes into.
+(d) AFTER THE FIX: 1144 decisions, stamp `81ac953af5bd0eda`, source_sha256 `414ccaa436aeecdf`, and both gates pass
+(`records-only` and `describes those exact bytes`).

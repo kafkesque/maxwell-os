@@ -2,8 +2,8 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 583,
-  "open_n": 220,
+  "total_ids": 584,
+  "open_n": 221,
   "closed_n": 363,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
@@ -1106,6 +1106,11 @@
     {
       "id": "BUG-820",
       "title": "(MED - OPEN 2026-10-15) - a guard artifact rewritten by a generic YAML dumper loses the comments that ARE the guard",
+      "events": 1
+    },
+    {
+      "id": "BUG-821",
+      "title": "(MED - OPEN 2026-10-15) - the census could not count 16 records because the mint path was bypassed, so four faces quoted a stale total for t",
       "events": 1
     }
   ],

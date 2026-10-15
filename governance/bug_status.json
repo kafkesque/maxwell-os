@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 579,
+  "total_ids": 580,
   "open_n": 219,
-  "closed_n": 360,
+  "closed_n": 361,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -1099,8 +1099,8 @@
       "events": 1
     },
     {
-      "id": "BUG-816",
-      "title": "(MED - OPEN 2026-10-15) - the first fan-out proved the mechanism and exposed the model: a 2B reader returned a FALSE NEGATIVE",
+      "id": "BUG-817",
+      "title": "addendum (2026-10-15, minutes later) - the broken home was COMMITTED",
       "events": 1
     }
   ],
@@ -1464,6 +1464,7 @@
     "BUG-791",
     "BUG-794",
     "BUG-798",
-    "BUG-801"
+    "BUG-801",
+    "BUG-816"
   ]
 }

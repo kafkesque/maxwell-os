@@ -24798,4 +24798,4 @@ decisions:
     failure (BUG-816 retracted). (2) NO INSTRUMENT INVENTS A DEFAULT FOR A DECLARED VALUE: a missing home is
     FATAL, because a fallback is indistinguishable from a declaration (C12/C16, BUG-817). (3) AFTER ANY
     STRUCTURAL EDIT, GREP FOR THE KEY THAT WAS JUST WRITTEN before anything is built on it; "no match found"
-    is a FAILURE REPORT, not a note (BUG-810's remedy, restated as practice after it was violated).'
+    is a FAILURE REPORT, not a note (BUG-810''s remedy, restated as practice after it was violated).'

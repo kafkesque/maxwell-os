@@ -14303,3 +14303,14 @@ FIX IN PLACE: (a) the model is declared PER TASK (D-3011 - a slot names an axis,
 reading-comprehension worker); (b) the cross-family verify pass is REQUIRED, not offered (R5); (c) a task budget
 must be sized for the answer, not for the hope (task 1 was cut off at 220 tokens).
 CLASS: BUG-811's cousin - a new instrument's first output is evidence about the instrument, not about the world.
+
+### BUG-817 addendum (2026-10-15, minutes later) - the broken home was COMMITTED
+The D-3012 block was appended by an inline heredoc that had no rollback: YAML refused it (an apostrophe inside
+a single-quoted scalar - the third occurrence of that exact class today), the traceback killed the script, and
+the bash around it carried on to `git add -A` and `git commit`, so config/decisions.yaml - a PROTECTED home
+and the source of truth for 1,130+ decisions - sat broken in a commit. Fixed in the next commit; gov_sync then
+re-cut the faces.
+TWO RULES THIS ADDS, and they are the same rule twice:
+  (1) A STRUCTURAL EDIT GOES THROUGH THE LAND-SCRIPT PATTERN (temp/land_*.py): guard() a backup, append, then
+      yaml_ok() which ROLLS BACK on a parse failure. Every earlier landing today did this; this one did not.
+  (2) A SHELL THAT RUNS AFTER A FAILED STEP MUST NOT COMMIT. The land script's exit code is the gate.

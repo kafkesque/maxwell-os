@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1128 decisions (census stamp 309f8cf9a7f9a898, 2026-10-15) · 580 bugs (219 open / 361 closed; highest OPEN = BUG-817) · 36 open tasks (MUST 10 / SHOULD 22 / WORTH 3; OWNER-moved 11, pipeline-moved 25; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1128 decisions (census stamp 309f8cf9a7f9a898, 2026-10-15) · 583 bugs (220 open / 363 closed; highest OPEN = BUG-820) · 36 open tasks (MUST 10 / SHOULD 22 / WORTH 3; OWNER-moved 11, pipeline-moved 25; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **68** of 1128 — 🔴 open 32 · 🔵 proposed 15 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 565 · ⚖ ratified 135 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1128, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 219 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 34 · 🟨 MED 55 · 🟩 LOW 24 · UNLABELLED 102 (BUG-757) of 219 open.
+> Open BUGS by severity (population = the census's 220 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 34 · 🟨 MED 57 · 🟩 LOW 24 · UNLABELLED 101 (BUG-757) of 220 open.
 >
 > **OWNER LANE (11) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -14306,6 +14306,16 @@ reading-comprehension worker); (b) the cross-family verify pass is REQUIRED, not
 must be sized for the answer, not for the hope (task 1 was cut off at 220 tokens).
 CLASS: BUG-811's cousin - a new instrument's first output is evidence about the instrument, not about the world.
 
+## BUG-817 (HIGH - OPEN 2026-10-15) - a failed edit was read as a success, so two declared config blocks never existed while three instruments invented their own defaults
+
+FILED IN PLACE (the retraction above and this bug share one chronology; the body of the finding is the
+BUG-816 block). An edit to `config/engine.yaml` answered `No match found for the specified text` and was READ
+AS A SUCCESS. The `hf:` block and the whole `fanout:` block were therefore ABSENT from the file, while
+pipeline/hf_fetch_model.py, pipeline/subagent_fanout.py and pipeline/oneshot_ask.py each fell back to their own
+hardcoded default - a C12 violation in which a value with no home is invented by its consumer. The instrument
+that caught it was a PREMISE GATE, not a smarter model: a task that declares `expect: REGEX` is now refused
+unless one of its own files contains that regex, before any model is called (D-3012).
+
 ### BUG-817 addendum (2026-10-15, minutes later) - the broken home was COMMITTED
 The D-3012 block was appended by an inline heredoc that had no rollback: YAML refused it (an apostrophe inside
 a single-quoted scalar - the third occurrence of that exact class today), the traceback killed the script, and
@@ -14372,7 +14382,7 @@ with rm -rf") - the trap is that its own default contradicts it.
 FIX RULE (now part of D-3013): model weights are deleted directly, with a receipt naming path, measured
 bytes, reason and decision id; the engine entry is removed FIRST so no name can outlive its target.
 
-## BUG-819 (WORTH - OPEN 2026-10-15) - a face that says "generated from the live oMLX registry" was hand-copied and had drifted
+## BUG-819 (MED - OPEN 2026-10-15) - a face that says "generated from the live oMLX registry" was hand-copied and had drifted
 
 `governance/eval_models.txt` opens with `# generated from live oMLX registry` and is cited by
 `config/r5_review_gate.yaml` as the evidence for what is live. Measured: it lists seven models including

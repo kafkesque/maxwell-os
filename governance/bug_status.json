@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 580,
-  "open_n": 219,
-  "closed_n": 361,
+  "total_ids": 583,
+  "open_n": 220,
+  "closed_n": 363,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -1059,11 +1059,6 @@
       "events": 1
     },
     {
-      "id": "BUG-808",
-      "title": "(HIGH - OPEN 2026-10-15) - five of six engine-parked entries are BROKEN symlinks, so a model that does not exist reads as \"on disk\"",
-      "events": 1
-    },
-    {
       "id": "BUG-809",
       "title": "(MED - OPEN 2026-10-15) - delegated research was not durable: six of seven delegate runs were cancelled mid-flight and their findings were l",
       "events": 1
@@ -1089,18 +1084,28 @@
       "events": 1
     },
     {
-      "id": "BUG-814",
-      "title": "(MED - OPEN 2026-10-15) - a hub snapshot can be DECLARED by name while nothing resolves into it",
-      "events": 1
-    },
-    {
       "id": "BUG-815",
       "title": "(HIGH - OPEN 2026-10-15) - `goose run` was not bound to the local engine, so a headless agent run went elsewhere",
       "events": 1
     },
     {
       "id": "BUG-817",
-      "title": "addendum (2026-10-15, minutes later) - the broken home was COMMITTED",
+      "title": "(HIGH - OPEN 2026-10-15) - a failed edit was read as a success, so two declared config blocks never existed while three instruments invented",
+      "events": 2
+    },
+    {
+      "id": "BUG-818",
+      "title": "(MED - OPEN 2026-10-15) - the retire tool's dry run promises a park and its code performs a delete; and safe_delete would copy model weights",
+      "events": 1
+    },
+    {
+      "id": "BUG-819",
+      "title": "(MED - OPEN 2026-10-15) - a face that says \"generated from the live oMLX registry\" was hand-copied and had drifted",
+      "events": 1
+    },
+    {
+      "id": "BUG-820",
+      "title": "(MED - OPEN 2026-10-15) - a guard artifact rewritten by a generic YAML dumper loses the comments that ARE the guard",
       "events": 1
     }
   ],
@@ -1465,6 +1470,8 @@
     "BUG-794",
     "BUG-798",
     "BUG-801",
+    "BUG-808",
+    "BUG-814",
     "BUG-816"
   ]
 }

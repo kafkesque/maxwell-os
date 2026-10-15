@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1128 decisions (census stamp 309f8cf9a7f9a898, 2026-10-15) · 576 bugs (216 open / 360 closed; highest OPEN = BUG-813) · 32 open tasks (MUST 8 / SHOULD 20 / WORTH 3; OWNER-moved 9, pipeline-moved 23; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1128 decisions (census stamp 309f8cf9a7f9a898, 2026-10-15) · 578 bugs (218 open / 360 closed; highest OPEN = BUG-815) · 32 open tasks (MUST 8 / SHOULD 20 / WORTH 3; OWNER-moved 9, pipeline-moved 23; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **68** of 1128 — 🔴 open 32 · 🔵 proposed 15 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 565 · ⚖ ratified 135 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1128, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 216 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 33 · 🟨 MED 54 · 🟩 LOW 24 · UNLABELLED 101 (BUG-757) of 216 open.
+> Open BUGS by severity (population = the census's 218 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 34 · 🟨 MED 55 · 🟩 LOW 24 · UNLABELLED 101 (BUG-757) of 218 open.
 >
 > **OWNER LANE (9) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -14262,3 +14262,26 @@ printed nothing at all - a script whose function was defined and never called, w
 lesson). The engine's own counter disagrees with the wall clock: total_cached_tokens still reads 0.
 FIX: T-137. The rollback switch (`pipeline/omlx_cache_enable.sh --rollback`) IS the A/B instrument:
 measure the pair with the cache off, apply, measure the pair again, and only then claim a cause.
+
+## BUG-814 (MED - OPEN 2026-10-15) - a hub snapshot can be DECLARED by name while nothing resolves into it
+The store census classifies a hub repo as DECLARED when its NAME appears in live config/pipeline/script
+text. `~/.cache/huggingface/hub/models--lmstudio-community--Qwen3.8-27B-MLX-4bit` measures 4.0 GB while
+the model the engine actually serves is a REAL 15.7 GB directory at `~/.omlx/models/Qwen3.8-27B-MLX-4bit`
+(not a symlink into the hub). So the hub copy is a leftover partial of the same repo, it is classified
+DECLARED because the name is mentioned, and nothing resolves into it. A truncated snapshot that a name
+resolves TO is a hazard - it is BUG-808's cousin, one step earlier in the sequence. The byte-owner test
+must be RESOLUTION, not mention: what matters is whether a live object resolves into the bytes.
+Also observed: `_unloaded` carries SEVEN broken symlinks, one of them new since the last census
+(`gemma-4-12B-it-4bit`) - the parked directory keeps accreting names that are not models.
+
+## BUG-815 (HIGH - OPEN 2026-10-15) - `goose run` was not bound to the local engine, so a headless agent run went elsewhere
+Measured: `goose run -t 'Reply with exactly: PONG'` answered PONG in ~28s while the local engine's
+`total_requests` stood still at 52. `~/.config/goose/config.yaml` DECLARES `maxwell_omlx` (model
+Qwen3-Coder-30B) - and also enables `custom_deepseek` and `nvidia`. A declared provider is not a BOUND
+one, and no GOOSE_PROVIDER/GOOSE_MODEL was in the environment. This is C1/C3 in the one place they are
+easiest to lose: an unattended run that nobody watches.
+FIX (measured working): `GOOSE_PROVIDER` and `GOOSE_MODEL` are now part of the harness context contract
+(config/agent_context.yaml#ratified.knobs.trigger) and are bound by pipeline/harness_env.py, with the
+MODEL resolved by POINTER to config/model_assignments.yaml#harness_roles.AGENT_LOOP_SHORT.model so no
+model name is restated (C12). Proof: with the binding applied, the same run moved the local engine's
+counter 52 -> 54. harness_env --selftest is now 9/9, including `an_unresolvable_pointer_is_FATAL`.

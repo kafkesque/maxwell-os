@@ -29,6 +29,11 @@ engine:
 # "omlx launch list" 2026-10-15. installed=true means the CLI exists on this machine.
 harnesses:
   measured_at: "2026-10-15"
+  # Which goose provider id IS this engine. goose's own config enables several providers
+  # (maxwell_omlx, custom_deepseek, nvidia, ollama) and a DECLARED provider is not a BOUND one:
+  # measured 2026-10-15, goose run -t answered without the local engine's request counter moving.
+  goose_provider_id: maxwell_omlx
+  launch_by: "omlx launch TOOL - the engine's own wiring module sets the env (C12: never hand-write it)"
   tools:
     claude:    {display: "Claude Code",      installed: true}
     codex:     {display: "Codex",            installed: false}

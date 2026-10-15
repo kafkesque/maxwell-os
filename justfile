@@ -541,3 +541,13 @@ engine-guard:
 
 cache-dry:
     bash pipeline/omlx_cache_enable.sh   # apply with --confirm; --rollback is the A/B instrument (D-3008)
+# --- 2026-10-15: fan-out delegation and model retirement (T-139/T-140) ---
+fanout:
+    @echo "fanout: plan --tasks TASKS.yaml --run ID | start --run ID | status --run ID | verify --run ID --model M --out S.md"
+    python3 pipeline/subagent_fanout.py status --run $(RUN) || true
+
+ask:
+    python3 pipeline/oneshot_ask.py --model $(MODEL) --prompt "$(Q)" --out temp/ask.md
+
+retire-dry:
+    bash pipeline/omlx_retire_model.sh --model $(MODEL)   # --confirm parks it; the bytes need safe_delete (R-D410)

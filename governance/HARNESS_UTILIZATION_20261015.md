@@ -49,3 +49,28 @@ is pinned and the cache is proven (T-137).
    endpoint reports the flag per model.
 2. The tiered cache proven by an A/B (T-137), so prefill stops being the wall.
 3. Only then does the number of harnesses stop mattering to latency.
+
+## 6. MEASURED, NOT ASSUMED: three headless probes (2026-10-15, run as detached workstreams)
+| probe | command | result | wall clock | did the traffic land on the LOCAL engine? |
+|---|---|---|---|---|
+| Claude Code | omlx launch claude --model MiniCPM5-2B-MLX -p  (piped prompt) | PONG, rc=0 | **104.7s** | YES - the engine's chat counter rose 153 -> 154 |
+| Pi | omlx launch pi --model MiniCPM5-2B-MLX | rc=0 | **28.2s** | YES - counter rose 153 -> 154 |
+| goose (headless) | goose run -t 'Reply with exactly: PONG' | PONG, rc=0 | ~28s | **NO - total_requests stayed at 52** |
+
+### What those three numbers decide
+1. **A harness CAN be driven unattended against the local engine, and the engine's own wiring is what
+   makes it local.** omlx launch sets ANTHROPIC_BASE_URL / ANTHROPIC_AUTH_TOKEN and disables the
+   non-essential traffic (CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC, the autoupdater, telemetry).
+   Probes 1 and 2 prove it on this machine.
+2. **The overhead is ~104s for Claude Code and ~28s for Pi, per invocation, before any work happens.**
+   For unattended work that is ~250x the cost of a direct one-shot call (pipeline/oneshot_ask.py: 0.4s
+   on the same prompt, measured earlier today). A harness is therefore worth its place where a HUMAN is
+   watching - interactive editing, exploration, debugging a hypothesis - and is waste where a script can
+   ask one question and write one file.
+3. **goose run did NOT use the local engine.** This is the T-132 / D-3003 lesson wearing a new coat: a
+   provider that is *declared* in ~/.config/goose/config.yaml (maxwell_omlx, model Qwen3-Coder-30B) is
+   not *bound* in the process environment, and two other providers are also enabled: true. The run
+   answered PONG while the local engine's request counter did not move - it went somewhere else, which
+   C1/C3 do not allow. Fixed the same way as the context contract: the provider and the model are BOUND
+   by pipeline/harness_env.py, and the model is resolved by POINTER from the single home that owns it,
+   so no model name is restated (C12).

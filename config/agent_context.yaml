@@ -137,6 +137,11 @@ ratified:
       GOOSE_AUTO_COMPACT_THRESHOLD: 0.8       # right BY COINCIDENCE at 455 tok/s (58 s <= 60 s) and for
                                               # the right reason only while the cache is DISPROVEN
       GOOSE_AUTO_COMPACT_TOKEN_LIMIT: 32768   # the 225000 default is a cloud price-tier artifact (C1/C22)
+      # 2026-10-15 (T-132 addendum): a harness's IDENTITY is part of its context contract. Measured:
+      # goose run -t answered while the local engine's counter stood still - a declared provider is not
+      # a bound one. These two names are what make a headless run provably local (C1/C3).
+      GOOSE_PROVIDER: "@config/engine.yaml#harnesses.goose_provider_id"
+      GOOSE_MODEL: "@config/model_assignments.yaml#harness_roles.AGENT_LOOP_SHORT.model"
       max_compactions_per_session: 1
       min_headroom_tokens: 2048
       strategy: declared_handoff_first    # declared_handoff_over_in_place_compaction (above)

@@ -947,3 +947,30 @@ tasks:
     46.88 GB resident against a 55 GB guard. An interactive agent loop is honest work only on a model whose decode
     holds over a long context - this repo measured gemma-4-E4B ROUTABLE for agent_loop and the 30B coder REFUSED
     (DELEGATE-002).'
+- id: T-139
+  priority: SHOULD
+  state: open
+  mover: owner
+  title: "RETIRE a served model so a better one can be adopted - the pool, not the disk, is the scarce resource"
+  source: governance/DELETE_PROPOSAL_20261015.md; D-3009; D-3010; pipeline/omlx_retire_model.sh
+  evidence: 'gemma-4-12B-it-qat-OptiQ-4bit is served (8.4 GB) with the worst MEASURED non-27B decode (13.4 tok/s,
+    agent_context.yaml), and its only live declarations are a REJECTED swap (pipeline_config.yaml#swap_eval_candidate_model
+    - D-2788 "slower on BOTH axes") and an R5 candidate list (config/r5_review_gate.yaml). The eval report lists it
+    under PRUNED. Its functions are covered by gemma-4-E4B (routing/stability) and Qwen3.8-27B (quality).'
+  gate: 'THE OWNER''S WORD, because it changes what the engine serves: retiring it removes one R5 reviewer
+    candidate (gemma-4-E4B, Qwen3.8-27B and Ornith-9B remain). Infrastructure is ready and dry-run verified:
+    pipeline/omlx_retire_model.sh --model gemma-4-12B-it-qat-OptiQ-4bit (parks the entry; the bytes need a
+    separate safe_delete call, R-D410). Only after this does Edge0/Edge0-35B-A3B-preview (19.69 GB) have a slot.'
+- id: T-140
+  priority: SHOULD
+  state: open
+  mover: owner
+  title: "ADOPT THE FAN-OUT EXECUTOR for everyday scaffolding and debugging, capped and cross-verified"
+  source: D-3005; D-3011; pipeline/subagent_fanout.py; pipeline/oneshot_ask.py; config/engine.yaml#fanout
+  evidence: 'MEASURED 2026-10-15 - an in-session subagent is cancelled by the next user message (BUG-809) and the
+    engine pool is serial (8 served / 46.88 GB / 55 GB guard, BUG-803), so parallel delegation is capped at
+    engine.fanout.max_parallel=3, runs DETACHED through research_run, partitions by ARTEFACT, and is verified by a
+    DIFFERENT family (R5). One-shot sub-agents cost 0.4s; a harness costs ~104s (Claude Code) or ~28s (Pi) per
+    invocation, measured today.'
+  gate: 'the owner names the first real fan-out task: the executor needs a task file (id, model, question, files)
+    plus the word that its answers are to be applied.'

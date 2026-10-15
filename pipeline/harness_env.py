@@ -40,7 +40,30 @@ def declared() -> dict[str, str]:
     """The declared trigger names and their values, read from their one home, in declaration order."""
     doc = yaml.safe_load(CONFIG.read_text())
     trigger = doc["ratified"]["knobs"][TRIGGER]
-    return {str(key): str(val) for key, val in trigger.items() if ENV_SHAPED.match(str(key))}
+    return {str(key): resolve(str(val)) for key, val in trigger.items() if ENV_SHAPED.match(str(key))}
+
+
+def resolve(value: str) -> str:
+    """Resolve a "@path#dotted.key" pointer to the value in its one home.
+
+    Why pointers: the contract now binds WHICH provider and WHICH model a harness runs on, and a
+    model name written into this file would be a second copy of a fact that config/engine.yaml and
+    config/model_assignments.yaml already own (C12). An unresolvable pointer is FATAL - it must never
+    degrade into a literal string, or a harness would silently run on a model nobody declared (C16).
+    """
+    if not value.startswith("@"):
+        return value
+    ref, _, dotted = value[1:].partition("#")
+    path = pathlib.Path(ref)
+    if not path.is_absolute():
+        path = CONFIG.resolve().parent.parent / path
+    try:
+        node: object = yaml.safe_load(path.read_text())
+        for part in dotted.split("."):
+            node = node[int(part)] if isinstance(node, list) else node[part]  # type: ignore[index]
+    except Exception as exc:
+        raise SystemExit(f"FATAL: the pointer {value} does not resolve ({type(exc).__name__}: {exc})")
+    return str(node)
 
 
 def state(bindings: dict[str, str]) -> list[tuple[str, str, str]]:
@@ -116,6 +139,17 @@ def selftest() -> int:
                    not [val for val in bindings.values() if val and val in own]))
     checks.append(("the_contract_is_read_from_its_declared_home",
                    CONFIG.as_posix() in own and TRIGGER in own))
+    try:
+        resolved = resolve("@config/engine.yaml#harnesses.goose_provider_id")
+        checks.append(("a_pointer_resolves_the_value_from_its_one_home", bool(resolved)))
+    except SystemExit:
+        checks.append(("a_pointer_resolves_the_value_from_its_one_home", False))
+    try:
+        resolve("@config/engine.yaml#no.such.chain")
+        checks.append(("an_unresolvable_pointer_is_FATAL", False))
+    except SystemExit:
+        checks.append(("an_unresolvable_pointer_is_FATAL", True))
+
     for name, ok in checks:
         print("%-4s %s" % ("ok" if ok else "FAIL", name))
     print("selftest: %d/%d" % (sum(1 for _, ok in checks if ok), len(checks)))

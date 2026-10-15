@@ -24741,3 +24741,49 @@ decisions:
     command can be measured properly in minutes, and the absence of such a command is a reason not to apply it.
     (3) A COUNTER THAT DISAGREES WITH THE WALL CLOCK IS REPORTED, NOT EXPLAINED AWAY: total_cached_tokens read 0
     while the second call was 7x faster.'
+- id: D-3009
+  date: '2026-10-15'
+  status: proposed
+  category: MODEL / PORTFOLIO
+  bugs: '[BUG-811, BUG-814]'
+  supersedes: 'downloading a candidate because it looks good in isolation'
+  decision: '(1) A DOWNLOAD IS PAIRED WITH A RETIREMENT when the pool is full: the scarce resource is the engine
+    pool (a 55 GB guard with adaptive eviction), not disk. A candidate that would need a resident slot does not get
+    one until a served model whose function is covered is retired. (2) THE STANDING ROSTER, measured: ADOPT
+    MiniCPM5-2B-MLX (done); HOLD Edge0-35B-A3B-preview pending a retirement; REFUSE Ternary-Bonsai (needs a
+    private runtime), embeddinggemma-2 (the engine runtime has no module for it, and an embedder swap cascades),
+    Qwen3.8-35B-A3B-Distill (72 GB for 7,813 downloads), Underdog-Saluki (no model_type: not an MLX repack);
+    DEFER LFM2.5-24B-A2B (non-OSI licence) and Ornith-1.5-35B-A3B (no licence declared = no grant).
+    (3) RETIREMENT MUST NOT LEAVE A NAME THAT LIES: pipeline/omlx_retire_model.sh removes the engine entry rather
+    than parking a symlink whose target stays absent (BUG-808).'
+- id: D-3010
+  date: '2026-10-15'
+  status: proposed
+  category: STORE / HYGIENE
+  bugs: '[BUG-808, BUG-814]'
+  supersedes: 'tidiness as a deletion reason'
+  decision: '(1) DELETE WHAT CAN MISLEAD; KEEP WHAT CAN ONLY WASTE. Hazard class = a byte that can be loaded by
+    accident and be wrong (a truncated snapshot whose name resolves, a broken parked symlink); waste class = a
+    superseded but valid instrument. (2) FREE SPACE IS NOT A REASON: 217 GB free means the 18.06 GB ORPHAN set is
+    rent, and re-downloading to re-run one old comparison costs more than the bytes save. Trigger to revisit: free
+    space below 25 percent of the volume, or a new candidate whose bytes must come from somewhere.
+    (3) THE BYTE-OWNER TEST IS RESOLUTION, NOT MENTION: a repo is a dependency only if a live object resolves into
+    it (BUG-814 - a 4.0 GB truncated hub snapshot sat classified DECLARED because its NAME appears in config text).
+    (4) Every deletion goes through pipeline/safe_delete.py with the owner''s word (R-D410).'
+- id: D-3011
+  date: '2026-10-15'
+  status: proposed
+  category: AGENT / HARNESS POLICY
+  bugs: '[BUG-809, BUG-815]'
+  supersedes: 'choosing a harness or a model by reputation'
+  decision: '(1) A MODEL SLOT NAMES AN AXIS, NOT A REPUTATION: config/model_assignments.yaml#harness_roles maps
+    each agent-facing slot to the axis it must win (the best tool-caller is NOT the best long-context model and the
+    most stable model is the weakest coder - measured, governance/model_eval_report.md). (2) A HARNESS IS WORTH ITS
+    PLACE ONLY WHERE A HUMAN IS IN THE LOOP: measured overhead is ~104s (Claude Code) and ~28s (Pi) per invocation
+    against 0.4s for a one-shot call, so unattended work goes to scripts/detached workstreams and interactive work
+    goes to a harness wired by the ENGINE (omlx launch TOOL - the engine''s module sets the env; hand-written env is
+    a C12 violation). (3) A HARNESS HOLDS NO GOVERNED PEN: it proposes into temp/; governance/, config/,
+    DECISION-LOG.md, MASTER-TASK-REGISTER.md and buglog.md are written by the agent and the owner through the rails,
+    and bypassPermissions is never used on this repository. (4) A HARNESS IS BOUND, NOT ASSUMED: the provider AND
+    model are bound by pipeline/harness_env.py, because a declared provider is not a bound one (BUG-815: goose run
+    answered without the local engine''s counter moving). (5) LAYER-BY-LAYER VERDICT: config/harness_policy.yaml.'

@@ -1,0 +1,88 @@
+schema_version: "1.0"
+# WHERE A CODING HARNESS IS WORTH ITS PLACE IN MAXWELL OS - a layered verdict.
+#
+# A harness is a CLIENT of the engine (C21/C25): Claude Code, Codex, Pi, OpenClaw, Hermes, Copilot,
+# OpenCode, DeepSeek Harness all speak to 127.0.0.1:11435. Its value is ERGONOMICS x MODEL
+# CAPABILITY, and the second term is the binding one. This file is therefore downstream of the
+# inventory (config/engine.yaml#harnesses) and the capability measurements
+# (governance/model_eval_report.md, temperature 0.0, identical prompts).
+#
+# The rule that produces every verdict below: a harness must be introduced where a HUMAN is in the
+# loop and the work is exploratory. Where the work is deterministic, unattended, or governed, a
+# harness adds a conversation where a script belongs (C27: no future tax).
+
+# ── 1. THE MEASURED CAPABILITY AXES (this is what actually limits a coding harness) ──
+capability_axes:
+  tool_calling:                  # the axis every agentic harness lives on
+    best: {model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit, score: 0.7}
+    never: {model: gpt-oss-20b-MXFP4-Q8, score: 0.0, why: "a 0.0 tool-caller must never drive a tool loop"}
+  long_context_reasoning_16k:    # the axis a harness creates by design (it stuffs the window)
+    best: {model: Qwen3.8-27B-MLX-4bit, score: 1.0}
+    fails: [{model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit, score: 0.0},
+            {model: gemma-4-E4B-it-MLX-4bit, score: 0.0}]
+    consequence: "a harness pointed at the coder for long-context work is pointed at the model's measured worst axis"
+  code_generation_humaneval:
+    order: [{model: Qwen3.8-27B-MLX-4bit, score: 0.96},
+            {model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit, score: 0.8},
+            {model: Ornith-1.5-9B-MLX-8bit, score: 0.8},
+            {model: Ornith-1.5-35B-A3B-REAP-19B, score: 0.56},
+            {model: gemma-4-E4B-it-MLX-4bit, score: 0.16}]
+  stability_self_agreement:
+    best: {model: gemma-4-E4B-it-MLX-4bit, score: 0.7}
+    note: "the best STABILITY is not the best QUALITY - the two axes disagree, so an agent loop that needs repeatability and one that needs correctness take different models"
+  latency_agent_loop:            # T-131 (temp/prefill_bench_20261015.json)
+    routable: [gemma-4-E4B-it-MLX-4bit]
+    refused: [Qwen3-Coder-30B-A3B-Instruct-MLX-4bit, gpt-oss-20b-MXFP4-Q8]
+    means: "only one served model currently fits an interactive per-turn budget; the rest are batch models"
+  pool: "8 served, 46.88 GB resident, 55 GB guard, adaptive eviction observed mid-request (BUG-803). ONE pool: harnesses queue on it, they do not add to it."
+
+# ── 2. THE LAYERED VERDICT ──
+layers:
+  L0_engine:
+    is_for: "oMLX owns the model; a harness here is a test client"
+    harness_verdict: NEVER_LOAD_BEARING
+    file: config/engine.yaml
+  L1_pipeline_S0_S6:
+    is_for: "deterministic stages S0 convert -> S6 commit, each pinned to a model by script"
+    harness_verdict: NOT_APPLICABLE
+    why: "the pipeline must be reproducible and $0; a conversational client in a stage is a future tax (C27) and a drift surface (R7 temp 0.0)"
+    file: config/pipeline_config.yaml
+  L2_governance_rails:
+    is_for: "decision/task/bug registers, gov_sync, the pre-commit rails, the human gate"
+    harness_verdict: NOT_APPLICABLE
+    why: "a harness may PROPOSE into temp/, never write a governed home: buglog/DECISION-LOG/config are protected (see L4 write rules)"
+  L3_research_intake_curator:
+    is_for: "fetch, screen, curate the owner's streams"
+    harness_verdict: NOT_APPLICABLE
+    why: "deterministic fetchers + evidence-requiring checks (config/curator_intake.yaml, config/intake_sources.yaml); a browse-by-conversation curator is unreproducible and unauditable"
+    file: config/intake_sources.yaml
+  L4_dev_tooling:
+    is_for: "debugging, everyday coding, scaffolding, refactors, test design - the human explores"
+    harness_verdict: WORTH_IT_WITH_CONSTRAINTS
+    recommended: [claude, pi]
+    model_routing:
+      interactive_edit_loop_short_context: gemma-4-E4B-it-MLX-4bit    # the only agent_loop-routable model
+      read_and_change_code_correctly: Qwen3.8-27B-MLX-4bit           # humaneval 0.96, lc_reason 1.0, reviewing 1.0
+      tool_heavy_short_tasks: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit  # toolcalling 0.7 - the best, and one-shot only
+      repeatable_classification: gpt-oss-20b-MXFP4-Q8                # never for tools
+    constraints:
+      - "launch through the engine (omlx launch TOOL) so the wiring is the engine's, not a hand-written env (C12)"
+      - "a harness writes PROPOSALS into temp/; the agent applies them through the rails. No harness holds write access to governance/, config/, DECISION-LOG.md, MASTER-TASK-REGISTER.md, buglog.md"
+      - "never --permission-mode bypassPermissions on this repository: the rails exist because a fast writer can outrun a slow reader"
+      - "one harness at a time on the pool unless the work is cheap: the pool is serial (BUG-803)"
+      - "a harness's output is a claim, never a verification: R5 (generator != verifier) is not suspended for a nice UI"
+  L5_human_gate:
+    is_for: "the OWNER's approve/drop/final word"
+    harness_verdict: FORBIDDEN
+    why: "a proposal a harness makes about itself is not a gate (C15/owner-gate discipline: no_llm_canonical_promotion, D-2898)"
+  L6_unattended_ops:
+    is_for: "research runs, long fetches, batch measurement, repair scripts"
+    harness_verdict: SCRIPTS_AND_DETACHED_WORKSTREAMS
+    why: "durability comes from detachment + a TERMINAL marker, not from an agent session (D-3005, pipeline/research_run.py); goose run -t is the fallback when JUDGEMENT is needed, and it runs on the local provider (maxwell_omlx)"
+
+# ── 3. WHAT WOULD CHANGE THE VERDICT ──
+change_conditions:
+  - "a PINNED pool (engine is_pinned: 'Never evict if True') so an interactive session's model cannot be evicted mid-turn (T-137)"
+  - "the tiered cache proven by an A/B, so prefill stops being the wall (T-137)"
+  - "a long-context measurement of MiniCPM5-2B-MLX at its class context size (BUG-805 discipline: never generalise a 17-token spot reading)"
+  - "if a served model ever exceeds 0.9 on BOTH tool_calling and long_context_reasoning_16k, harness count stops being a risk"

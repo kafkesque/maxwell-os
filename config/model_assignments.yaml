@@ -247,3 +247,49 @@ cloud_roles:
 - cloud_fallback
 _source: Merged from model_assignments.yaml + models.yaml + model_registry.yaml
 _merged_at: 2026-07-08 20:31 UTC
+
+# ── 2026-10-15 (T-138): HARNESS-FACING AND AGENT-FACING SLOTS ──
+# Appended, never edited: the roles above are consumed by scripts and renumbering would drift.
+# BASIS: governance/model_eval_report.md (quality axes, temperature 0.0, identical prompts) +
+# temp/prefill_bench_20261015.json (latency axes, T-131) + the 2026-10-15 adoption of MiniCPM5-2B-MLX.
+# For pipeline models, config/pipeline_config.yaml still takes precedence.
+# RULE: a slot names a MODEL FOR AN AXIS, because the axes DISAGREE (config/harness_policy.yaml
+# capability_axes): the best long-context model is not the best tool-caller, and the most stable
+# model is the weakest coder.
+harness_roles:
+  AGENT_LOOP_SHORT:
+    model: gemma-4-E4B-it-MLX-4bit
+    basis: "T-131: the only served model ROUTABLE for agent_loop (54.7s against a 60s budget)"
+    also_best_at: "stability 0.7 - the highest measured, which is what an interactive loop needs"
+    never_for: "code generation (humaneval 0.16) and long context (lc_reason 0.0)"
+  AGENT_EDIT_LONG_CONTEXT:
+    model: Qwen3.8-27B-MLX-4bit
+    basis: "lc_reason 1.0, niah 1.0, reviewing 1.0, humaneval 0.96, ifeval 1.0 - the strongest axis set in the portfolio"
+    watch: "BUG-793: its prefill was the anomaly; measure prefill at the class context size before long interactive loops (BUG-805)"
+  AGENT_TOOL_SHORT_ONESHOT:
+    model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
+    basis: "toolcalling 0.7 (portfolio best), mbpp 0.68, humaneval 0.8"
+    never_for: "multi-turn agent loops (DELEGATE-002 decode collapse) and long context (lc_reason 0.0)"
+  LIGHTWEIGHT_PROBE:
+    model: MiniCPM5-2B-MLX
+    basis: "adopted 2026-10-15: 110.1 tok/s decode, 66.7 tok/s prefill, TTFT 0.25s, load 1.26s at a 17-token prompt"
+    unmeasured: "long-context prefill - BUG-805 forbids generalising a 17-token spot reading"
+  CLASSIFIER_S4:
+    model: gpt-oss-20b-MXFP4-Q8
+    basis: "D2249 routing"
+    never_for: "tool calling - 0.0 measured, so it must never drive a tool loop"
+  PROBE_S2:
+    model: Phi-4-mini-instruct-8bit
+    basis: "D2319"
+    never_for: "open-ended research (BUG-053)"
+  STABILITY_FIRST:
+    model: gemma-4-E4B-it-MLX-4bit
+    basis: "stability 0.7, self-agreement 10/10"
+  VERIFIER_CROSS_FAMILY:
+    rule: "the verifier may never be the generator (R5): pick a DIFFERENT family from the generator"
+    candidates: [gemma-4-E4B-it-MLX-4bit, Qwen3.8-27B-MLX-4bit, Ornith-1.5-9B-MLX-8bit]
+    basis: "every served model measured 10/10 self-agreement, so cross-family choice is safe on stability"
+  BATCH_ONLY_DO_NOT_INTERACTIVE:
+    models: [Ornith-1.5-35B-A3B-REAP-19B, Ornith-1.5-9B-MLX-8bit]
+    basis: "Ornith-35B: stability 0.2, lc_reason 0.5, toolcalling 0.6 - a long interactive session on a
+      0.2-stability model produces work nobody can reproduce"

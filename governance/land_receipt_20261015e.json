@@ -1,0 +1,22 @@
+[
+ {
+  "file": "config/task_register.yaml",
+  "op": "append",
+  "bytes": 2108
+ },
+ {
+  "file": "config/decisions.yaml",
+  "op": "append",
+  "bytes": 3599
+ },
+ {
+  "file": "config/rail_registry.yaml",
+  "op": "append",
+  "bytes": 174
+ },
+ {
+  "file": "justfile",
+  "op": "append",
+  "bytes": 501
+ }
+]

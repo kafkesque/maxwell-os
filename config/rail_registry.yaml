@@ -253,3 +253,7 @@ pipeline/research_run.py status: tri_state
 pipeline/model_loadability_probe.py: tri_state
 pipeline/hf_fetch_model.py --verify-only: tri_state
 pipeline/omlx_engine_guard.sh: tri_state
+# --- 2026-10-15 (fan-out + retirement) ---
+pipeline/oneshot_ask.py: tri_state
+pipeline/subagent_fanout.py status: tri_state
+pipeline/omlx_retire_model.sh --model: tri_state

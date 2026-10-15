@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1153 decisions (census stamp dfdafbd1d5943ed1, 2026-10-15) · 595 bugs (223 open / 372 closed; highest OPEN = BUG-832) · 49 open tasks (MUST 16 / SHOULD 28 / WORTH 4; OWNER-moved 12, pipeline-moved 37; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1153 decisions (census stamp dfdafbd1d5943ed1, 2026-10-15) · 597 bugs (225 open / 372 closed; highest OPEN = BUG-834) · 50 open tasks (MUST 17 / SHOULD 28 / WORTH 4; OWNER-moved 12, pipeline-moved 38; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **80** of 1153 — 🔴 open 32 · 🔵 proposed 27 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 568 · ⚖ ratified 145 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1153, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 223 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 34 · 🟨 MED 60 · 🟩 LOW 24 · UNLABELLED 101 (BUG-757) of 223 open.
+> Open BUGS by severity (population = the census's 225 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 34 · 🟨 MED 62 · 🟩 LOW 24 · UNLABELLED 101 (BUG-757) of 225 open.
 >
 > **OWNER LANE (12) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -31,7 +31,7 @@
 > | T-145 | 🟠 SHOULD | EDGE0 IS DEFERRED WITH A NAMED TRIGGER, not fetched: the class is already served and the role is blocked on me | OWNER: say 'fetch Edge0' to override, or leave it deferred until T-137 |
 > | T-138 | COULD | HARNESS ADOPTION ON DEMAND - one command per tool, and none of them load-bearing | install a harness only when a specific job needs it (C28). The engine  |
 >
-> **PIPELINE LANE (37) — what the agent will do next, in strategic-consequential order (source: config/task_register.yaml):**
+> **PIPELINE LANE (38) — what the agent will do next, in strategic-consequential order (source: config/task_register.yaml):**
 >
 > | id | pri | state | task | evidence |
 > |---|---|---|---|---|
@@ -14726,4 +14726,61 @@ REMEDY (owner-gated: the setting is the owner's and the choice of brain is their
 EVIDENCE: ~/.config/goose/config.yaml:311 and :273-276 | governance/buglog.md BUG-243 close rationale |
 DECISION-LOG.md D-295 | python3 pipeline/delegation_economy.py --check (rc 0, within ceiling) |
 config/harness_policy.yaml#capability_axes.long_context_reasoning_16k.
+
+
+## BUG-833 (MED - OPEN 2026-10-15) — a workstream started with an ABSENT prompt ran to completion, called NO model at all, and exited 0
+
+MEASURED 2026-10-15, live (temp/runs/r5_economy_20261015/ws_r5_economy):
+- python3 pipeline/research_run.py new --run r5_economy_20261015 --brief temp/_r5_economy_prompt.txt wrote the
+  RUN-level 00_brief.md (904 B) and NO workstream prompt.
+- ... start --ws ws_r5_economy --cmd-file temp/_r5_economy_cmd.sh created the ws dir (00_prompt.txt ABSENT)
+  and ran the command ANYWAY.
+- The shipped cmd idiom reads the prompt as -p "$(cat "$WS_DIR/00_prompt.txt")"; a missing file expands to an
+  EMPTY STRING, so pi was launched with an empty -p ("Executing 'node' command with arguments: ... -p",
+  30_pi.err line 25).
+- pi exited 0, wrote 0 bytes, and THE ENGINE WAS NEVER CALLED: ENGINE_WITNESS chat_completions 232 -> 232
+  (the two prior jobs moved the counter 223 -> 226 and 226 -> 232). 16.5 s of a 300 s budget produced nothing.
+- The grader called it "TERMINAL: EMPTY - rc=0, the answer is empty" - an honest VERDICT, but rc=0 is a lie: a
+  run that did nothing returns the exit code of a run that answered. A chain that keys on rc cannot see this.
+
+ROOT: the two halves disagree about who owns the prompt. pipeline/subagent_fanout.py writes 00_prompt.txt for
+the FAN-OUT path (line 308) and copies it on the retry path (line 449); the DURABLE RUNNER writes only the
+run-level 00_brief.md. A caller following the documented shape (new --brief, then start --cmd-file) therefore
+starts a workstream with an empty prompt, and NOTHING refuses it: start validates neither the prompt's
+existence nor its size, and "$(cat missing)" is silent by design - the shell defect BUG-817 already named.
+
+REMEDY (all three; the third is what makes the first two durable):
+1. research_run start REFUSES before it invokes anything when the ws prompt file is absent or 0 bytes
+   (fail closed, C16) - the shape the engine contract's own readers already use.
+2. new --brief MATERIALISES the brief into the workstream (or start copies 00_brief.md -> ws/00_prompt.txt
+   and reports the byte count).
+3. an EMPTY terminal must not carry rc 0: the state vocabulary already separates EMPTY from DONE, so the rc
+   must follow the STATE, not the child process.
+
+EVIDENCE: temp/runs/r5_economy_20261015/ws_r5_economy/10_report.md (ENGINE_WITNESS + TERMINAL), 30_pi.err,
+state.json | pipeline/subagent_fanout.py:308 and :449 | the two prior jobs' engine counters (223 -> 226,
+226 -> 232).
+
+
+## BUG-834 (MED - OPEN 2026-10-15) — a delegate's handle did not resolve, so the deliverable of an in-process delegation was unretrievable in the same turn
+
+MEASURED 2026-10-15, in-session: the delegate surface (Summon.delegate, extensions: [developer], max_turns 6)
+returned the string "Delegated to foreground subagent 20261015_13" and nothing else - no answer, no artifact path.
+load(source: "20261015_13") returned "Error: Task '20261015_13' not found.". The prompt asked for three
+file:line citations that a deterministic reader could have checked (D-3022), so the delegation was built to be
+verifiable; it produced nothing verifiable.
+
+ROOT (bounded claim, not a diagnosis): the handle returned to the CALLER does not name an object the caller can
+load. Whether the answer arrives later in the parent transcript is UNTESTED - the honest statement is that the
+caller cannot retrieve it at the moment it needs it, and that is enough to make the in-process delegate
+unsuitable for any work whose loss costs something.
+
+REMEDY: the durable path already exists and is the rule (T-150/D-3020: anything whose failure is not free goes
+through pipeline/subagent_fanout.py run, which writes a workstream with a receipt). Do not route a deliverable
+through the in-process delegate until the handle resolves to a loadable artifact. The SAME turn then measured
+the durable path failing differently (BUG-833: an empty prompt ran to completion), so both paths owe a control
+before either is trusted for governed work.
+
+EVIDENCE: this session's delegate call (prompt: "read config/delegation_economy.yaml and pipeline/
+delegation_economy.py, report three findings as file:line - exact text") and the load() error above.
 

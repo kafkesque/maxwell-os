@@ -1318,3 +1318,19 @@ tasks:
     the already-present items MARKED as extending an existing row rather than duplicated. Proof: the
     register grows by the delta only, and two rows are visibly annotated instead of repeated.'
 
+
+- id: T-160
+  priority: MUST
+  state: open
+  mover: pipeline
+  title: 'REFUSE A WORKSTREAM WITH NO PROMPT: the runner must fail closed before it invokes anything, and an EMPTY terminal must not carry rc 0'
+  source: BUG-833; BUG-817; BUG-828; D-3020
+  evidence: 'MEASURED 2026-10-15 (temp/runs/r5_economy_20261015/ws_r5_economy): new --brief wrote the run-level
+    00_brief.md and no ws prompt, start ran the command anyway, pi was launched with an EMPTY -p, exited 0, wrote
+    0 bytes, and the engine was never called (ENGINE_WITNESS chat_completions 232 -> 232 against 223 -> 226 and
+    226 -> 232 for the two prior jobs). The terminal read EMPTY with rc=0, so a chain keying on rc cannot see it.'
+  gate: 'pipeline: research_run start refuses (before invoking anything) when the workstream prompt file is
+    absent or 0 bytes; the brief reaches the workstream by construction (materialised or copied, with its byte
+    count reported); and the exit code follows the STATE so an EMPTY terminal is non-zero. Proof: the exact
+    command shape that produced this bug now refuses, and a control pins both readings.'
+

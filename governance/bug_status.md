@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**223 open** / 372 closed of 595 ids.
+**225 open** / 372 closed of 597 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -230,3 +230,5 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-828 | (MED - OPEN 2026-10-15) - the deployed harness is not bounded by the declared budgets: the liveness signal cannot see it, and one turn outla | 1 |
 | BUG-829 | (MED - OPEN 2026-10-15) - the review surface's own agent panel defaults to a CLOUD provider | 1 |
 | BUG-832 | (MED - OPEN 2026-10-15) — the session brain is the provider a CLOSED bug banned, and nothing in the repo can see it change | 1 |
+| BUG-833 | (MED - OPEN 2026-10-15) — a workstream started with an ABSENT prompt ran to completion, called NO model at all, and exited 0 | 1 |
+| BUG-834 | (MED - OPEN 2026-10-15) — a delegate's handle did not resolve, so the deliverable of an in-process delegation was unretrievable in the same  | 1 |

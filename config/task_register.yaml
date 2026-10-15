@@ -1321,7 +1321,8 @@ tasks:
 
 - id: T-160
   priority: MUST
-  state: open
+  state: done
+  closed: 2026-10-15
   mover: pipeline
   title: 'REFUSE A WORKSTREAM WITH NO PROMPT: the runner must fail closed before it invokes anything, and an EMPTY terminal must not carry rc 0'
   source: BUG-833; BUG-817; BUG-828; D-3020

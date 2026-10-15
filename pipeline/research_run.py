@@ -19,7 +19,9 @@ CONTRACT (declared here, restated nowhere - C12)
     report         : 10_report.md   (append-only, written by the workstream)
     command        : cmd.sh         (written by start; the exact bytes that ran)
     run log        : run.log        (stdout+stderr of the workstream)
-    state          : state.json     (PENDING/RUNNING/DONE/FAILED/TIMEOUT + pid, t0, t1, rc)
+    prompt         : 00_prompt.txt  (the workstream's mandate; start REFUSES when absent/empty and no brief exists)
+    brief          : 00_brief.md    (the run-level mandate; start materialises it into the prompt when needed)
+    state          : state.json     (PENDING/RUNNING/DONE/FAILED/TIMEOUT/STALLED/STOPPED/EMPTY + pid, t0, t1, rc)
     heartbeat line : "STEP <n>: ..."   (workstream progress, readable while it runs)
     terminal line  : "TERMINAL: <state> - <one line>"  (workstream declares its own end)
 
@@ -31,8 +33,9 @@ USAGE
     python3 pipeline/research_run.py stop     --run ID --ws NAME
     python3 pipeline/research_run.py --selftest
 
-EXIT: 0 everything terminal and none failed; 2 something is still RUNNING (owner-owed);
-      1 a workstream FAILED or a marker is malformed (fatal - C16: never silent).
+EXIT: 0 every workstream DONE; 2 something is still RUNNING (owner-owed);
+      1 anything else terminal (FAILED/TIMEOUT/STALLED/STOPPED/EMPTY) or a malformed marker -
+        the exit code follows the STATE, never the child's rc (C16: never silent).
 """
 from __future__ import annotations
 
@@ -54,6 +57,8 @@ REPORT = "10_report.md"
 STATE = "state.json"
 CMD = "cmd.sh"
 LOG = "run.log"
+PROMPT = "00_prompt.txt"   # the workstream's mandate copy; the one name BOTH halves agree on (BUG-833)
+BRIEF = "00_brief.md"      # the run-level mandate; start materialises it into PROMPT when PROMPT is absent
 TERMINAL = "TERMINAL:"
 HEARTBEAT = "STEP "
 SLUG = re.compile(r"^[a-z0-9][a-z0-9_-]{0,40}$")
@@ -197,8 +202,32 @@ def new_run(run_id: str, brief_path: pathlib.Path | None, brief_text: str | None
     root = RUNS / run_id
     root.mkdir(parents=True, exist_ok=True)
     body = brief_path.read_text() if brief_path else (brief_text or "")
-    (root / "00_brief.md").write_text(body.rstrip("\n") + "\n")
+    (root / BRIEF).write_text(body.rstrip("\n") + "\n")
     return root
+
+
+def _meaningful(path: pathlib.Path) -> bool:
+    """True when a file exists and carries more than whitespace (an empty prompt is a no-op call)."""
+    return path.exists() and bool(path.read_text(errors="replace").strip())
+
+
+def materialise_prompt(wsd: pathlib.Path) -> tuple[int, str]:
+    """Guarantee the workstream's prompt is non-empty, or say why it cannot run.
+
+    A workstream's command reads $WS_DIR/00_prompt.txt; a missing file silently expands to an
+    empty string (BUG-817), so a run that never asked a model still exits 0 (BUG-833). This is
+    the single gate that makes that impossible: a prompt the caller wrote wins; otherwise the
+    run-level brief (the one mandate new --brief freezes) is copied into the prompt; otherwise
+    the workstream is refused. Returns (prompt_bytes, note); 0 bytes means refuse.
+    """
+    prompt = wsd / PROMPT
+    if _meaningful(prompt):
+        return prompt.stat().st_size, "prompt present"
+    brief = wsd.parent / BRIEF
+    if _meaningful(brief):
+        prompt.write_text(brief.read_text())
+        return prompt.stat().st_size, f"materialised from run brief ({brief.stat().st_size}B)"
+    return 0, "no prompt and no run brief - refused (BUG-833)"
 
 
 def start(run_id: str, ws: str, cmd: str, timeout_s: int, note: str = "",
@@ -212,12 +241,26 @@ def start(run_id: str, ws: str, cmd: str, timeout_s: int, note: str = "",
     The child receives WS_REPORT / WS_DIR / RUN_DIR in its environment, so a workstream
     writes to its own report without ever guessing a path (and without a shell-quoted
     argument that bash will mangle).
+
+    A workstream whose prompt is absent AND whose run has no brief is REFUSED here (an EMPTY
+    state record, no command, no process) - a mandate-less run must not exit 0 (BUG-833).
     """
     wsd = ws_dir(run_id, ws)
     wsd.mkdir(parents=True, exist_ok=True)
-    (wsd / CMD).write_text(cmd.rstrip("\n") + "\n")
+    prompt_bytes, prompt_note = materialise_prompt(wsd)
     (wsd / REPORT).touch()
     append_line(wsd / REPORT, f"# workstream {ws} (run {run_id}) note: {note or 'none'}")
+    append_line(wsd / REPORT, f"# prompt: {prompt_bytes}B - {prompt_note}")
+    if prompt_bytes == 0:
+        # FAIL CLOSED: nothing is invoked and no command is written - a workstream with no
+        # mandate must not run and then report rc 0 (BUG-833).
+        append_line(wsd / REPORT, f"{TERMINAL} EMPTY - {prompt_note}")
+        rec = {"run": run_id, "ws": ws, "state": "EMPTY", "pid": None, "rc": None,
+               "t0": time.time(), "t1": time.time(), "timeout_s": timeout_s, "stall_s": stall_s,
+               "kill_on_stall": kill_on_stall, "note": note, "refused": prompt_note}
+        write_json(wsd / STATE, rec)
+        return rec
+    (wsd / CMD).write_text(cmd.rstrip("\n") + "\n")
     env = dict(os.environ)
     env.update(WS_REPORT=str(wsd / REPORT), WS_DIR=str(wsd), RUN_DIR=str(wsd.parent))
     log = open(wsd / LOG, "ab")
@@ -312,6 +355,20 @@ def status(run_id: str | None) -> list[dict]:
     return rows
 
 
+def exit_code_for(rows: list[dict]) -> int:
+    """The runner's honest exit code: a run is a SUCCESS only when every workstream is DONE.
+
+    An EMPTY answer is the exact failure BUG-833 measured - a workstream that called no model at
+    all and exited 0 - so EMPTY (and TIMEOUT, STALLED, STOPPED, FAILED, PENDING) is non-zero.
+    The exit code follows the STATE, never the child process's rc (which can be 0 for nothing).
+    """
+    if any(r["state"] == "RUNNING" for r in rows):
+        return OWNER_OWED
+    if all(r["state"] == "DONE" for r in rows):
+        return OK
+    return FATAL
+
+
 def collect(run_id: str, timeout_s: int, wait_all: bool = True) -> int:
     """Wait until every workstream is TERMINAL - and not one second past the last marker."""
     deadline = time.time() + timeout_s
@@ -331,12 +388,7 @@ def collect(run_id: str, timeout_s: int, wait_all: bool = True) -> int:
             print(f"collect: still RUNNING after {timeout_s}s: {[r['ws'] for r in live]} - NOT waiting further")
             break
         time.sleep(POLL_S)
-    rows = status(run_id)
-    if any(r["state"] == "FAILED" for r in rows):
-        return FATAL
-    if any(r["state"] == "RUNNING" for r in rows):
-        return OWNER_OWED
-    return OK
+    return exit_code_for(status(run_id))
 
 
 def watch(run_id: str | None, budget_s: int, poll_s: float = POLL_S) -> int:
@@ -371,10 +423,7 @@ def watch(run_id: str | None, budget_s: int, poll_s: float = POLL_S) -> int:
             print(f"watch: budget {budget_s}s spent, still RUNNING: {live} - NOT waiting further")
             return OWNER_OWED
         time.sleep(poll_s)
-    rows = status(run_id)
-    if any(r["state"] == "FAILED" for r in rows):
-        return FATAL
-    return OK
+    return exit_code_for(status(run_id))
 
 
 def stop(run_id: str, ws: str) -> int:
@@ -414,6 +463,11 @@ def selftest() -> int:
     quick = ws_dir(rnd, "early")
     slow = ws_dir(rnd, "late")
     add("the_selftest_starts_from_an_empty_run", not any(quick.glob("*")) and not any(slow.glob("*")))
+
+    # The runner's own liveness controls still need a non-empty mandate: start's prompt gate must
+    # hold for EVERY workstream (T-160), so give the harness run a brief to materialise.
+    (RUNS / rnd).mkdir(parents=True, exist_ok=True)
+    (RUNS / rnd / BRIEF).write_text("selftest control brief - the runner's own liveness/harness controls\n")
 
     start(rnd, "early", 'echo boot >> "$WS_REPORT"; echo "TERMINAL: DONE - finished before the process ended" >> "$WS_REPORT"; sleep 90',
           timeout_s=120, note="declares its end, then keeps existing")
@@ -471,6 +525,17 @@ def selftest() -> int:
     for name in ("quiet", "loud", "quiet2"):
         stop(rnd, name)
 
+    # T-160: a workstream with NO prompt and NO brief must be REFUSED, not launched (BUG-833).
+    rr = "selftest_refusal"
+    if (RUNS / rr).exists():
+        shutil.rmtree(RUNS / rr)
+    refused = start(rr, "nobrief", 'echo "SHOULD NOT RUN" >> "$WS_REPORT"', timeout_s=10)
+    add("a_workstream_with_no_prompt_and_no_brief_is_refused_before_anything_runs",
+        refused.get("state") == "EMPTY" and refused.get("pid") is None,
+        f"state={refused.get('state')} pid={refused.get('pid')}")
+    add("a_refused_workstream_writes_no_command", not (RUNS / rr / "nobrief" / CMD).exists(),
+        "cmd.sh was materialised for a refused workstream")
+
     src = pathlib.Path(__file__).read_text()
     # assembled at run time: the control may not contain the literals it forbids
     forbidden = [t for t in ("114" + "35", "sk-" + "maxwell", "bge" + "-m3", "deberta" + "-v3",
@@ -520,6 +585,9 @@ def main(argv: list[str]) -> int:
             return FATAL
         rec = start(args.run, args.ws, cmd, args.timeout, args.note,
                     stall_s=args.stall, kill_on_stall=bool(args.kill_on_stall))
+        if rec["state"] == "EMPTY":
+            print(f"REFUSED {args.ws}: {rec['refused']}")
+            return FATAL
         print(f"started {args.ws} pid={rec['pid']} timeout={args.timeout}s stall={args.stall}s (detached)")
         return OK
     if args.verb == "status":

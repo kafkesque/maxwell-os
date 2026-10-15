@@ -3,8 +3,8 @@
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
   "total_ids": 597,
-  "open_n": 225,
-  "closed_n": 372,
+  "open_n": 224,
+  "closed_n": 373,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -1124,11 +1124,6 @@
       "events": 1
     },
     {
-      "id": "BUG-833",
-      "title": "(MED - OPEN 2026-10-15) \u2014 a workstream started with an ABSENT prompt ran to completion, called NO model at all, and exited 0",
-      "events": 1
-    },
-    {
       "id": "BUG-834",
       "title": "(MED - OPEN 2026-10-15) \u2014 a delegate's handle did not resolve, so the deliverable of an in-process delegation was unretrievable in the same ",
       "events": 1
@@ -1506,6 +1501,7 @@
     "BUG-826",
     "BUG-827",
     "BUG-830",
-    "BUG-831"
+    "BUG-831",
+    "BUG-833"
   ]
 }

@@ -2,8 +2,8 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 599,
-  "open_n": 224,
+  "total_ids": 600,
+  "open_n": 225,
   "closed_n": 375,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
@@ -1126,6 +1126,11 @@
     {
       "id": "BUG-836",
       "title": "(MED - OPEN 2026-10-15) - the R5 cross-family review route produced NO usable review from either local verifier, and one of the two failures",
+      "events": 1
+    },
+    {
+      "id": "BUG-837",
+      "title": "(MED - OPEN 2026-10-15) - eight guard declarations in the rail registry are TOP-LEVEL keys, so the rail that reports \"no declared guard disa",
       "events": 1
     }
   ],

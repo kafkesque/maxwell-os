@@ -98,6 +98,55 @@ fanout:
     retry_on: [EMPTY, FAILED, TIMEOUT, STALLED]
     fallback_model: gemma-4-E4B-it-MLX-4bit   # a retry may never repeat the model that failed (R5)
     min_answer_chars: 80
+  # T-163 (BUG-836): WHAT AN ANSWER MUST *CONTAIN*, per declared SHAPE - a different question from how long it is.
+  # MEASURED 2026-10-15: gemma-4-E4B answered a 22 KB review request with 2,294 chars of `file:line` lines and
+  # NOTHING else, and the citation reader CERTIFIED it - 82 citations checked, 0 refuted, because every location
+  # it names really exists. A true listing of locations is still not a review: nothing in the chain asked whether
+  # the answer made a CLAIM. A task chooses a shape in its own task file (`shape: review`); the numbers live HERE
+  # and never in code (C12); the requirement is DISCLOSED to the model in the prompt, because a gate the answer
+  # was never told about is a trap and not a guard; and a task that declares a shape nobody declared is FATAL at
+  # plan time, before any model is called. SHAPE IS NOT TRUTH: this decides whether an answer EXISTS, and the
+  # verifier (R5/D-3022) decides whether it is right.
+  answer_shapes:
+    review:
+      min_findings: 1                    # a review that carries no finding is a listing
+      min_finding_chars: 40              # the reasoning a finding must carry BESIDE its citation
+      artifact_required: true            # the finding must cite a location IN the artefact under review
+      defect_markers: [bug, defect, wrong, incorrect, broken, break, breaks, fail, fails, failing, failure,
+                       missing, absent, unguarded, unbounded, unchecked, unsafe, unsound, silently, silent,
+                       risk, leak, leaks, race, cascade, mismatch, contradicts, contradiction, drift, drifts,
+                       hardcoded, unreachable, unused, dead, collision, overwrite, overwrites, loses, lost,
+                       swallows, ignored, never, cannot, but, however, should, must, owes, owed, trap, hole,
+                       gap, blind, stale, bypass, bypasses, skips, skipped, duplicate, shadowed, ambiguous,
+                       mislabelled, mislabeled, redundant, no-op]
+  # T-163: the FROZEN known-answer controls the SHAPE reader is proved against. The path is DECLARED because a
+  # control whose subject is a literal in code is a second home (C12) - and because this control is a
+  # MEASUREMENT, not a fixture: it is the bytes one local model actually returned on 2026-10-15, kept so that the
+  # claim "a citation list reads as NOT AN ANSWER" stays falsifiable.
+  answer_shape_controls:
+    - name: the_measured_gemma_citation_list_is_NOT_a_review_T163
+      path: governance/evidence/BUG836_gemma_citation_list.md
+      shape: review
+      artifact: [pipeline/research_run.py]
+      expect: not_an_answer
+      measured: >-
+        2026-10-15 21:55, gemma-4-E4B-it-MLX-4bit, answering the 22 KB T-154 diff review (prompt:
+        temp/t154_review_prompt.md). VERBATIM bytes with no header added - a control with a preamble is no
+        longer the bytes it measures, which is why the provenance lives here and not in the file. It is the
+        case the two existing readers CANNOT refuse: `citations` on it returns 82 checked / 0 refuted, and the
+        80-char floor passes it (BUG-836/T-163).
+    - name: the_measured_gemma_prose_review_IS_a_review_T163
+      path: governance/evidence/BUG836_gemma_prose_review.md
+      shape: review
+      artifact: [pipeline/subagent_fanout.py]
+      expect: an_answer
+      measured: >-
+        2026-10-15 22:5x, gemma-4-E4B-it-MLX-4bit, answering this module's own R5 review request through the
+        fan-out front door (run t163_r5b). It is the FALSE NEGATIVE the first run of this gate found, kept as a
+        control because it is the answer that taught the grammar the LINE RANGE: it names its finding as
+        "**338-342**" and "(lines 349-351)", so a reader that knows only `path.py:111` refuses a located,
+        predicated finding as if no location had been given. Two-sided proof on REAL model bytes: the listing
+        above must stay refused and this must stay accepted.
 
 # The STORE's deletion rule (D-3018). Below this floor the DECISION costs more attention than the
 # bytes, and the floor is 2x the largest model a live code DEFAULT resolves into

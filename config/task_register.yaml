@@ -1376,15 +1376,43 @@ tasks:
 
 - id: T-163
   priority: MUST
-  state: open
+  state: done
+  closed: '2026-10-15'
   mover: pipeline
   title: 'AN ANSWER''S SHAPE IS CHECKED, NOT ONLY ITS LENGTH: a delegated review must carry a FINDING citing the artifact it was given, or it is not an answer'
   source: 'BUG-836; D-3022; BUG-827; T-156'
   evidence: 'MEASURED 2026-10-15: gemma-4-E4B answered a 22 KB diff review with a 2,294-char sequential
     citation list and `oneshot_ask.py` accepted it, because the only gate on an answer is min_answer_chars=80
     (BUG-836). The same session, the same route: gpt-oss-20b returned EMPTY content at both 700 and 2500
-    max_tokens (everything in reasoning_content), which the path correctly refused as "no content".'
-  gate: 'pipeline: a review-shaped task declares what its answer must CONTAIN (>=1 finding, each citing a
-    location that exists in the artifact under review), the grader reads that shape rather than a byte floor,
-    and a degenerate-but-long answer reads as NOT AN ANSWER. Proof: the measured gemma output above is
-    regraded as not-an-answer, and a real finding passes.'
+    max_tokens (everything in reasoning_content), which the path correctly refused as "no content".
+    LANDED 2026-10-15 (D-3029): the shape is read. On the measured bytes, `citations` refuses NOTHING (82
+    citations checked, 0 refuted - every location exists) while `shape --shape review --artifact
+    pipeline/research_run.py` returns rc=1: "the answer carries 0 finding(s) stating a defect about
+    pipeline/research_run.py - a review must carry 1 - across 82 citation(s) into the artefact and 82 in total;
+    every citation RESOLVED, so this is a LISTING of true locations and not a review". The bytes are a DECLARED
+    frozen control (governance/evidence/BUG836_gemma_citation_list.md); the fan-out selftest is now RUN BY THE
+    LADDER (just health, pinned fatal in config/rail_registry.yaml) at 58/58 with 15 T-163 controls; one
+    refactor is provably behaviour-preserving (citation_sites/resolve_location extracted from citation_defects,
+    which still returns 82 checked / 0 refuted on the same answer).'
+  gate: none
+
+- id: T-164
+  priority: SHOULD
+  state: open
+  mover: pipeline
+  title: 'THE RAIL REGISTRY''S OWN SCHEMA IS CHECKED: an unknown top-level key must FAIL CLOSED, and the declarations that live outside the mapping must be given a home the reader reads'
+  source: BUG-837; D-2665; BUG-826; config/rail_registry.yaml
+  evidence: 'MEASURED 2026-10-15 (BUG-837): yaml.safe_load of config/rail_registry.yaml returns EIGHT top-level
+    keys that are literally guard declarations ("pipeline/research_run.py --selftest", "pipeline/research_run.py
+    status", "pipeline/oneshot_ask.py", "pipeline/model_loadability_probe.py", "pipeline/hf_fetch_model.py
+    --verify-only", "pipeline/omlx_engine_guard.sh", "pipeline/subagent_fanout.py status", "pipeline/
+    omlx_retire_model.sh --model"), because they were appended at COLUMN 0 after the indented commit_boundary
+    block. check_rail_registry.py#audit iterates cfg["guards"] only, so the rail printed "no declared guard
+    disagrees with the ladder" while those eight classes were never compared with the ladder - four of them
+    tri_state classes on live instruments. The verdict covered 35 of the 43 declarations the file carries.'
+  gate: 'pipeline: (a) every declaration gets a home the reader READS - moved inside guards:, or explicitly
+    dispositioned - and (b) check_rail_registry.py FAILS CLOSED on an unknown top-level key in its own registry,
+    with a known-answer control in --selftest that PROVES the limb fires. (b) cannot land alone: it is RED until
+    (a) is decided, and (a) is a choice between widening recipes: to the recipes that run rails and removing the
+    declarations. Proof: a synthetic registry with a stray key returns a fault, the live registry returns none,
+    and the guard census equals the declarations the file actually carries.'

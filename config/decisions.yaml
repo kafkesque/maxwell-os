@@ -25257,3 +25257,76 @@ decisions:
     BUG-836) and T-156 (deterministic capability resolver).
 
     '
+- id: D-3029
+  state: ACTIVE
+  category: DELEGATION / VERIFICATION
+  title: 'A CITATION THAT RESOLVES IS NOT YET A CLAIM: an answer''s SHAPE is read and not only its length, so a
+    review must CARRY a finding - and a listing of TRUE locations is NOT AN ANSWER'
+  bugs:
+  - BUG-836
+  - BUG-837
+  files:
+  - pipeline/subagent_fanout.py
+  - config/engine.yaml
+  - config/rail_registry.yaml
+  - justfile
+  - governance/evidence/BUG836_gemma_citation_list.md
+  decision: 'MEASURED 2026-10-15 (BUG-836), and the measurement is the reason this record exists: gemma-4-E4B answered
+    a 22 KB review request with 2,294 chars of `file:line` lines and NOTHING ELSE. Read back against the tree, every
+    one of its 82 citations RESOLVED - `python3 pipeline/subagent_fanout.py citations` returns "82 checked, 0 refuted",
+    rc 0 - so the reader D-3022 built CERTIFIES it, and the 80-char floor lets it through. So an answer is not a
+    deliverable because its citations are TRUE, and not because it is LONG. Six guards stood on the FORM of that
+    answer and not one asked whether it contained a CLAIM. Its companion failure is the opposite shape: gpt-oss-20b
+    spent 700 and then 2500 tokens inside reasoning_content and returned nothing at all (BUG-836 limb 2).
+
+
+    THE RULE THIS MINTS. D-3022 reads a LOCATION back; this reads the PREDICATION a review exists to make. A task
+    declares a SHAPE (`shape: review` in its task file); the requirement lives in config/engine.yaml#fanout.answer_shapes
+    and is never assembled in code (C12); it is DISCLOSED to the model in the prompt by the same declaration that
+    grades it; and the artefact coordinates are FROZEN into task.json, so the grader, the retry, the receipt and
+    the verifier all judge by the shape the task was ASKED for rather than by what a later reader assumes. A FINDING
+    has three limbs, each with the failure it prevents - (1) LOCATION: the citation resolves, or the finding is
+    about nothing; (2) ARTEFACT: it points at the artefact the answer was GIVEN, so "I reviewed this" is bounded
+    by what was actually put in front of the model; (3) PREDICATION: at least 40 chars of reasoning beside the citation
+    AND a defect from a DECLARED vocabulary, because prose alone is a description (an account of what a function
+    DOES is not a finding) and a marker alone is a heading. A task that declares a shape nobody declared is FATAL
+    at plan, before any model is called: the number that decides a verdict must have a home, which is the BUG-817
+    defect one layer up.
+
+
+    THREE BOUNDARIES ARE PART OF THE RULE, because an over-strict guard is a disabled guard (D-3022) and because
+    a gate that drifts into a quality judgement becomes the thing it replaced. FIRST, SHAPE IS NOT TRUTH: this decides
+    whether an answer EXISTS; whether the finding is CORRECT stays the verifier''s job (R5/D-3022), and a quality
+    judgement dressed as a vocabulary match would be a form check wearing a truth check''s name. SECOND, it errs
+    TOWARD the artefact and never against an honest answer: a basename counts as its full path, a finding may be
+    stated on the line after its citation, and a citation to a neighbouring file is ignored rather than punished.
+    THIRD, it is DISCLOSED, because this repository has already paid for a gate nobody was told about (BUG-816,
+    a task about a setting that did not exist).
+
+
+    WHAT IT DELIVERS, AND WHAT IT DOES NOT. It delivers the checker BUG-836''s remedy asked for and that the capability
+    registry (T-156/D-3024) had to be able to NAME: a route is legal only with a measured usable output, and there
+    is now a deterministic reader that tells an answer from a non-answer WITHOUT a model. It does NOT open the reviewer
+    slot: D-3028 stands - local models are the outsourcing fleet, promoted only by measured clearance - and "a 4B
+    model reviewed a 22 KB diff" remains a measurement that says no. gemma''s degenerate answer is now REFUSED where
+    it was ACCEPTED, and gpt-oss-20b''s empty one remains a class/budget finding the registry must encode. A shape
+    failure reads FAILED and never EMPTY, because content ARRIVED and was not the answer (EMPTY means nothing came
+    back), and that distinction is itself the measurement T-156 inherits.
+
+
+    PROVEN RATHER THAN ASSERTED. The measured bytes are a DECLARED frozen control (governance/evidence/BUG836_gemma_citation_list.md,
+    verbatim, provenance in config/engine.yaml#fanout.answer_shape_controls) so the claim stays falsifiable instead
+    of remembered; those same bytes regrade rc=1 with "every citation RESOLVED, so this is a LISTING of true locations
+    and not a review"; a real finding about the same artefact PASSES; a finding that cites only a file outside the
+    artefact, a description of what a line does, and a finding whose location does not exist are each refused; the
+    same answer passes ungated and FAILS once a shape is declared; and the fan-out''s selftest (58/58, 15 of them
+    this rule''s) is now RUN BY THE LADDER, pinned fatal in config/rail_registry.yaml, because a control nothing
+    runs is a comment (BUG-492). The one refactor that shares the citation grammar is behaviour-preserving BY MEASUREMENT:
+    citation_defects still returns 82 checked / 0 refuted on the very answer that motivated it.
+
+
+    WHAT LANDING IT COST, RECORDED BECAUSE IT IS A FINDING IN ITS OWN RIGHT (BUG-837, T-164): the registry''s own
+    schema is not checked, so EIGHT guard declarations had been sitting at column 0 after commit_boundary: as top-level
+    keys, invisible to the rail that reports "no declared guard disagrees with the ladder" - a coverage claim over
+    35 of 43 declarations. That is BUG-826''s class one layer down and the same structural defect BUG-832 filed
+    against the session provider: a home a decision names, with no reader in the repo.'

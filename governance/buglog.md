@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1156 decisions (census stamp 06ebb9ea4bec1273, 2026-10-15) · 599 bugs (224 open / 375 closed; highest OPEN = BUG-836) · 49 open tasks (MUST 16 / SHOULD 28 / WORTH 4; OWNER-moved 12, pipeline-moved 37; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1157 decisions (census stamp 2d26e29a259f46fd, 2026-10-15) · 600 bugs (225 open / 375 closed; highest OPEN = BUG-837) · 49 open tasks (MUST 15 / SHOULD 29 / WORTH 4; OWNER-moved 12, pipeline-moved 37; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **80** of 1156 — 🔴 open 32 · 🔵 proposed 27 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 571 · ⚖ ratified 145 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1156, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **80** of 1157 — 🔴 open 32 · 🔵 proposed 27 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 572 · ⚖ ratified 145 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1157, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 224 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 34 · 🟨 MED 61 · 🟩 LOW 24 · UNLABELLED 101 (BUG-757) of 224 open.
+> Open BUGS by severity (population = the census's 225 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 34 · 🟨 MED 62 · 🟩 LOW 24 · UNLABELLED 101 (BUG-757) of 225 open.
 >
 > **OWNER LANE (12) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -14902,3 +14902,133 @@ Then re-route: a review whose prompt exceeds a measured size is refused by the r
 
 EVIDENCE: `temp/t154_r5_review.md` (the 2,294-char degenerate answer), `temp/t154_r5_review2.md` (the "no
 content" stub) and the two prompts `temp/t154_review_prompt.md` (22 KB) / `temp/t154_review2_prompt.md` (8.9 KB).
+
+**REMEDY LIMB 1 LANDED (T-163, same day, 2026-10-15) - THE SHAPE IS NOW READ.** `answer_verdict()` takes the
+task's declared `shape` and the artefact it was given; `shape_defects()` counts FINDINGS - a citation INTO the
+artefact under review that RESOLVES (through `resolve_location()`, the ONE reader extracted from the quote refuter
+of D-3022, so the two cannot drift) AND carries at least 40 characters of reasoning beside it that states a defect
+from a DECLARED vocabulary (`config/engine.yaml#fanout.answer_shapes.review`, 65 markers). The requirement is
+DISCLOSED to the model (`shape_instruction()`, appended to the prompt by the same declaration that grades it), the
+artefact coordinates are FROZEN into task.json so the grader, the retry, the receipt and the verifier all judge by
+the shape the task was ASKED for, and a task that declares a shape nobody declared is FATAL at plan, before any
+model is called.
+
+**MEASURED ON THE EXACT BYTES OF LIMB 1, and the pair IS the point:**
+`python3 pipeline/subagent_fanout.py citations --answer temp/t154_r5_review.md` -> **82 citations checked, 0
+refuted, rc=0** - D-3022 CANNOT refuse this answer, because every location it names exists. Then
+`python3 pipeline/subagent_fanout.py shape --answer temp/t154_r5_review.md --shape review --artifact
+pipeline/research_run.py` -> **rc=1: "the answer carries 0 finding(s) stating a defect about
+pipeline/research_run.py - a review must carry 1 - across 82 citation(s) into the artefact and 82 in total; every
+citation RESOLVED, so this is a LISTING of true locations and not a review"**. The limiting case is now decided:
+the answer was never FALSE, it was EMPTY OF ANY CLAIM, and a length floor cannot tell a review from a table of
+contents.
+
+The bytes are a DECLARED FROZEN CONTROL (`governance/evidence/BUG836_gemma_citation_list.md`, verbatim, 2,294 B,
+provenance in `config/engine.yaml#fanout.answer_shape_controls`) so the claim stays falsifiable rather than
+remembered; the fan-out's selftest is RUN BY THE LADDER (`just health`, pinned `fatal` in
+`config/rail_registry.yaml`) at 58/58 with 15 T-163 controls; and the refactor is proved behaviour-preserving
+(`citation_sites`/`resolve_location` extracted from `citation_defects`, which still returns 82 checked / 0 refuted
+on the same answer, and PASSES the same six controls it did before).
+
+**LIMB 2 IS NOT THIS INSTRUMENT'S AND THIS BUG STAYS OPEN ON IT.** No local model has a MEASURED usable output on
+a 22 KB review: gemma-4-E4B produces the degenerate listing - now REFUSED instead of accepted, which IS the fix -
+and gpt-oss-20b spends 700/2500 tokens inside `reasoning_content` and returns nothing. That is a ROUTE question
+(D-3024), and a route is legal only with a measured usable output on the class of work. It belongs to the
+capability registry (T-156), whose gate was missing exactly the checker this landing names. So: the "one of the two
+failures was graded as an ANSWER" defect is CLOSED BY MEASUREMENT, and "no usable local reviewer exists" remains
+OPEN and visible in the owner lane, which is the fact that keeps the verifier slot closed (D-3028).
+
+**LANDING RECEIPT:** `python3 pipeline/subagent_fanout.py --selftest` 58/58; `doctor` 9/9 decided (2 undecided,
+nothing to decide) including the two new T-163 checks; `just health` runs the selftest (BUG-492: a control nothing
+runs is a comment). One adjacent gap the gate exposed was also closed rather than left silent: the artefact a
+shaped task reviews is TRUNCATED at `fanout.excerpt_bytes`, and the prompt now SAYS SO to the model and the owner
+(a finding below the cut is impossible in a way nobody could see - the BUG-816 class), while refusing a review
+whose prompt exceeds a measured size stays the registry's job (T-156).
+
+## BUG-837 (MED - OPEN 2026-10-15) - eight guard declarations in the rail registry are TOP-LEVEL keys, so the rail that reports "no declared guard disagrees with the ladder" never read them
+
+**MEASURED 2026-10-15**, while landing T-163 (a new ladder line for `pipeline/subagent_fanout.py --selftest`, whose
+declaration was appended after the existing 2026-10-15 fan-out declarations). `yaml.safe_load` of
+`config/rail_registry.yaml` returns EIGHTEEN top-level keys where the file visibly declares NINE:
+
+    schema_version, authority, ladder, recipes, ladder_receipt, dormant, writers, guards, commit_boundary
+    + 'pipeline/research_run.py --selftest',          'pipeline/research_run.py status',
+      'pipeline/model_loadability_probe.py',          'pipeline/hf_fetch_model.py --verify-only',
+      'pipeline/omlx_engine_guard.sh',                'pipeline/oneshot_ask.py',
+      'pipeline/subagent_fanout.py status',           'pipeline/omlx_retire_model.sh --model'
+
+**ROOT.** `commit_boundary:` opens a block at line 242 whose keys are 2-space indented, and the 2026-10-15
+declarations that follow it were appended at COLUMN 0. In YAML a mapping at column 0 after an indented block is
+not a member of that block: it is a SIBLING of `commit_boundary` - and of `guards`. So those declarations sit in
+the registry as keys no reader reads, which is the D-2649 shape exactly: a declaration with the wrong home.
+
+**CONSEQUENCE.** `scripts/check_rail_registry.py#audit` iterates `cfg['guards']` ONLY, so its verdict - printed on
+every `just health` - is a claim about 35 of the 43 declared guard classes. MEASURED: it printed "no declared guard
+disagrees with the ladder" while EIGHT declarations (19%) were never compared with the ladder at all, four of them
+`tri_state` classes on live instruments (`research_run.py status`, `oneshot_ask.py`,
+`model_loadability_probe.py`, `subagent_fanout.py status`). This is BUG-826's class one layer down - an instrument
+reporting a coverage it does not have - and it is the SAME structural defect BUG-832 filed against the session
+provider: a home a decision names, with no reader in the repo. A misindented declaration is INERT, and inert is
+indistinguishable from green.
+
+**REMEDY (two limbs, and the second cannot land alone):**
+ (a) THE HOME. The eight declarations name invocations that live in recipes this registry does not govern
+     (`recipes: [health, health-deep]`, while `pipeline/research_run.py --selftest` is a line of
+     `just research-selftest`). They therefore cannot be honoured as declared: either WIDEN `recipes:` to the
+     recipes that run rails (research-selftest, model-loadability, engine-guard, cache-dry, status ...) or REMOVE
+     the declarations and let those recipes own their own guards. Both are governance acts, so this is ONE
+     decision and it is OWED.
+ (b) THE LIMB THAT PREVENTS RECURRENCE. `check_rail_registry.py` must FAIL CLOSED on an unknown top-level key in
+     its own registry (a registry whose schema is unchecked is a registry where a typo is a silent disarm, C16),
+     proved by a known-answer control in its `--selftest`. Adding (b) alone would make `just health` RED, which is
+     why it is registered WITH (a) as T-164 rather than half-landed here.
+
+**EVIDENCE:** `python3 -c "import yaml; d=yaml.safe_load(open('config/rail_registry.yaml')); print(len(d['guards']),
+[k for k in d if '/' in k])"` -> `35` and the eight keys above. The T-163 line was moved INSIDE the mapping and
+that entry IS pinned (`just health` runs it, the class matches, rc=0); the stray set is the eight pre-existing
+declarations, untouched by this landing.
+
+**R5 REVIEW OF THIS LANDING, BY A DIFFERENT FAMILY, THROUGH THE NEW PATH - AND THE FALSE NEGATIVE IT FOUND
+(2026-10-15).** The generator may not verify itself (R5), so this module's own shape reader was reviewed by
+`gemma-4-E4B-it-MLX-4bit` through the fan-out's front door, with a task that declared `shape: review` over
+`pipeline/subagent_fanout.py` (task file `temp/t163_r5_review.yaml`). It was run as a MEASUREMENT of the whole new
+path - plan, shape validation, prompt disclosure, the `--shape/--artifact` command, the grader, the receipt - and
+not as a courtesy.
+
+1. **THE GATE REFUSED A REAL FINDING (run `t163_r5b`, rc measured without a pipe).** The model answered 1,615 chars
+   of genuine PROSE that stated a defect and named its location as a RANGE: "the most critical line ... is
+   **338-342**" and "(lines 349-351)". The reader returned `0 finding(s) ... across 0 citation(s) into the artefact
+   and 0 in total`, `citations` returned "none to check", and the workstream's terminal word was
+   `TERMINAL: FAILED - rc=0, not a review: ...`. A grammar that reads only `path.py:111` had refused a located,
+   predicated finding as if no location had been given - a FALSE NEGATIVE, which is the costly direction (D-3022:
+   an over-strict guard is a disabled guard), and it was found by delegating the review rather than by reasoning
+   about the code.
+   **FIXED, and the fix is bounded by measurement.** `citation_sites()` learned the LINE RANGE (`lines N-M`, and a
+   BOLDED `**N-M**`), attributed to the file the answer was TOLD it is about - a parameter the SHAPE reader passes
+   and the quote refuter never does, so `citation_defects` is untouched: on the BUG-836 bytes it still returns
+   **82 checked / 0 refuted**. A bare reference is attributed ONLY when exactly ONE artefact is declared (with two,
+   `338-342` is ambiguous and is not counted); a range is read by its FIRST line, which must EXIST; and a bare line
+   with no prose beside it is still not a finding. The answer is frozen as a second declared control
+   (`governance/evidence/BUG836_gemma_prose_review.md`, `expect: an_answer`), so the gate's proof is now TWO-SIDED
+   ON REAL MODEL BYTES: the listing must stay refused, this must stay accepted.
+
+2. **THE WHOLE PATH, END TO END, AFTER THE FIX (run `t163_r5c`, exit 0).**
+   `TERMINAL: DONE - rc=0, ok, 981 chars, 1 finding(s) for the declared review shape`; the receipt carries
+   `shape: review`, `shape_findings: 1`, `answer_usable: true`, and the run reports `1/1 task(s) DONE`. The receipt,
+   the task.json coordinates and the grader's own verdict agree, which is what "the shape is read" has to mean in
+   practice and not only in a unit control.
+
+3. **THE RESIDUAL THE REVIEWER POINTED AT IS REAL, AND IT IS DECLARED RATHER THAN PATCHED.** Both replies (1,615
+   and 981 chars) argue that a listing could pass because `min_findings: 1` is satisfied by ONE good line inside an
+   otherwise-degenerate answer. Its FACTS are wrong - it reads the docstring, and the measured listing IS refused -
+   but the shape of the worry is right. Disposition, deliberately: **the shape gate is a FLOOR, not a quality
+   bar.** `min_findings` is a DECLARED per-task number that any task may raise, and it is DISCLOSED to the model
+   (`shape_instruction`), so a review that needs three findings declares three; adding a proportion limb now would
+   be speculative machinery with exactly the false-negative risk just measured. Quality is the VERIFIER's job
+   (R5/D-3022), and that is the boundary D-3029 draws. The knob is named here so the next session finds it instead
+   of re-deriving it.
+
+4. **ONE WORD CORRECTED IN THE INSTRUMENT'S OWN VOICE (error leak).** `retry()` printed `FATAL: the retry model ...
+   IS the model that failed` and then `return 0` - a verdict the code never carried (the run's honest exit is
+   decided by the receipt). It now reads `retry refused: ...`, same behaviour, no false FATAL. MEASURED in
+   `t163_r5b`, where a task whose model IS the declared fallback hits this line by construction.

@@ -25493,3 +25493,50 @@ decisions:
     reading, and a severity that no author wrote is OMITTED rather than invented. A brief that withholds its subject
     is not a decision an owner can make, and the register may not depend on an owner noticing (D-2941: a gate carries
     intent or policy - promotion was neither).'
+- id: D-3033
+  state: ACTIVE
+  date: '2026-10-16'
+  by: assistant
+  category: STORE / INTEGRITY
+  bugs:
+  - BUG-838
+  - BUG-807
+  files:
+  - config/engine.yaml
+  - pipeline/model_store_census.py
+  - config/rail_registry.yaml
+  - justfile
+  - pipeline/config_audit.py
+  title: 'A PARTITION MUST DECLARE ITS DOMAIN: what may be COUNTED is declared before anything is counted, so a
+    class that permits a deletion can admit only its own members'
+  decision: 'MEASURED 2026-10-16 (BUG-838). The store census published a partition of ~/.cache/huggingface/hub''s
+    DIRECTORY ENTRIES while naming its members "repos", so the store''s own machinery (.locks, version.txt) entered
+    ORPHAN - the only class a deletion may ever be proposed from (D-3004(3)) - the hub''s blob root "blobs" read
+    DECLARED because the census''s OWN SOURCE spells the word, and the seven eval datasets were protected by nothing
+    but an incidental citation although D-3014(2) says a dataset is never swept with model bytes: the recorded 2026-10-15
+    face still offers datasets--TIGER-Lab--MMLU-Pro, datasets--HuggingFaceH4--MATH-500 and datasets--openai--openai_humaneval
+    as ORPHAN deletion candidates. The defect sat UPSTREAM OF EVERY COUNT - a partition with no declared domain
+    has whatever membership the directory happens to have - so a safety property phrased over "the ORPHAN class"
+    could not hold, and no count taken from it was wrong in a way a count could reveal. (1) A PARTITION DECLARES
+    ITS DOMAIN (C12/D-402). config/engine.yaml#model_store.census_domain is the ONE home of what a census may count:
+    member_prefixes (the model repos - the only candidate class), non_member_repo_prefixes (a repo, NEVER a candidate:
+    D-3014(2); spaces-- is declared with zero members rather than implied, the D-3031 practice) and store_metadata
+    (not a repo at all). An absent or empty rule is FATAL, because a domain with no declared member is green by
+    vacancy (BUG-487). (2) KIND PRECEDES MENTION. An entry''s kind is decided by the DECLARED rule before any name
+    is looked for, so no string a config file happens to contain - least of all the reader''s own vocabulary - can
+    promote an entry into a bucket. This is D-3018''s rule (a sweep is by resolution, not by mention) applied to
+    CLASSIFICATION, which is upstream of the sweep it governs. (3) AN UNDECLARED KIND IS A FAULT, NOT A DEFAULT.
+    An entry matching no declared kind - or more than one, which is an ambiguity rather than a coin flip - reads
+    rc 1, so a new kind of hub entry must be DECLARED and is never silently inherited by the candidate class: the
+    inverse of the green-by-vacancy disease (BUG-487/D-2644). (4) THE FLOOR IS READ WHERE THE OFFER IS MADE. D-3018''s
+    floor decides owner-hood, but its only reader was a sweep script in temp/, so the rule deciding what an owner
+    is SHOWN had no governed consumer; the census now reads it and offers only a candidate ABOVE it. The live reading
+    is therefore rc 0 with six candidates REPORTED and none offered - the floor is applied PER REPO, as the shipped
+    procedure applies it. (5) A REMEDY IS NOT DONE UNTIL A CONTROL CAN REFUSE IT. The instrument that authorizes
+    the only destructive act in this system had NO known-answer controls; it now has 13, declared fatal in config/rail_registry.yaml
+    and run by the ladder - among them that a dataset and the store machinery can never reach ORPHAN, that an undeclared
+    kind is a fault, and that measure_twice reads a moving store as TRANSIENT and a still one as not, which closes
+    BUG-807 (remedied 2026-10-15, counted OPEN for a day because its remedy had no control, BUG-492). MEASURED AFTER
+    (2026-10-16): hub total 124837.5 MB - unchanged, because that is the quantity the deletion movement check reads
+    (T-147/T-151) - of which model repos 123351.8 MB over 33 repo(s); LIVE 7 / PARKED 0 / DECLARED 20 (was 29) /
+    ORPHAN 6 (was 8); undeclared entries none; owner-owed 0 repo(s).'

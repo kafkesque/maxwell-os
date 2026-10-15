@@ -150,10 +150,24 @@ fanout:
 
 # The STORE's deletion rule (D-3018). Below this floor the DECISION costs more attention than the
 # bytes, and the floor is 2x the largest model a live code DEFAULT resolves into
-# (BAAI/bge-small-en-v1.5, 128 MiB), so no mention-based sweep may reach one.
+# (BAAI/bge-small-en-v1.5, 128 MiB), so no mention-based sweep may reach one. It is applied PER REPO.
 model_store:
   deletion_floor_bytes: 268435456    # 256 MiB
   census_move_ratio: 0.05            # a re-measure counts as MOVED only above this RELATIVE change; below it the two readings are the same measurement (D-3021/T-151)
+
+  # WHAT THE PARTITION IS A PARTITION OF (D-3033/BUG-838, C12/D-402). The census publishes a partition of
+  # THE MODEL REPOS THIS HUB HOLDS, never of every directory entry, because ORPHAN is the only class a
+  # deletion may be proposed from (D-3004(3)) - so a class that admits a non-member is a safety hole, not
+  # untidiness. Measured before this block existed: .locks and version.txt (the hub's own machinery) were
+  # counted as repos and fell into ORPHAN, blobs read DECLARED because the word appears in the reader's own
+  # source, and the eval datasets were protected by nothing but an incidental citation although D-3014(2)
+  # says a dataset is never swept with model bytes. An entry matching NO declared kind is a FAULT: a new
+  # kind must be DECLARED here, never silently inherited by the candidate class (the inverse of green by
+  # vacancy, BUG-487). This block states WHAT MAY BE COUNTED, which is upstream of any count.
+  census_domain:
+    member_prefixes: [models--]                    # THE MEMBERS: the model repos, the only candidate class
+    non_member_repo_prefixes: [datasets--, spaces--]   # a REPO, NEVER A CANDIDATE (D-3014(2)); spaces-- has zero members today and is DECLARED rather than implied (D-3031)
+    store_metadata: [.locks, version.txt, CACHEDIR.TAG, blobs]   # NOT A REPO AT ALL: the store's own machinery
 
 
 # Download decisions are made by pipeline/model_loadability_probe.py, never by download counts.

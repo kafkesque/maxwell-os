@@ -1,54 +1,63 @@
 {
- "broken_entries": [
-  "DeepSeek-R1-0528-Qwen3-8B-MLX-4bit",
-  "Qwen3.6-35B-A3B-4bit",
-  "Qwopus-GLM-18B",
-  "gemma-4-26B-A4B-it-OptiQ-4bit",
-  "gemma-4-E2B-it-MLX-4bit",
-  "Qwen3.6-35B-A3B-UD-MLX-4bit",
-  "gemma-4-12B-it-4bit"
+ "below_floor_not_offered": [
+  "models--typeform--distilbert-base-uncased-mnli",
+  "models--pooyakn73--Qwen3.8-9B-Distill-MTPLX-Q6G64",
+  "models--xy10086--Qwen3.8-9B-Distill-Uncensored-Heretic-MTPLX-Q6G64",
+  "models--lmstudio-community--Qwen3.8-27B-MLX-6bit",
+  "models--mlx-community--Qwen3.8-27B-4bit",
+  "models--keXjos--Qwen3.8-9B-mlx-4Bit"
  ],
+ "broken_entries": [],
  "buckets": {
   "DECLARED": {
-   "bytes": 59755.8,
-   "n": 26
+   "bytes": 56432.8,
+   "n": 20
   },
   "LIVE": {
-   "bytes": 74261.2,
+   "bytes": 66651.0,
    "n": 7
   },
   "ORPHAN": {
-   "bytes": 18056.8,
-   "n": 19
+   "bytes": 267.9,
+   "n": 6
   },
   "PARKED": {
    "bytes": 0.0,
    "n": 0
   }
  },
+ "census_domain": {
+  "member_prefixes": [
+   "models--"
+  ],
+  "non_member_repo_prefixes": [
+   "datasets--",
+   "spaces--"
+  ],
+  "store_metadata": [
+   ".locks",
+   "version.txt",
+   "CACHEDIR.TAG",
+   "blobs"
+  ]
+ },
+ "deletion_floor_bytes": 268435456,
  "engine_entries": {
   "parked": {
-   "DeepSeek-R1-0528-Qwen3-8B-MLX-4bit": "/Users/barn/.cache/huggingface/hub/models--lmstudio-community--DeepSeek-R1-0528-Qwen3-8B-MLX-4bit/snapshots/1b6065ad0cd7256f662c9ef6fd0ed2dfd06e286f",
-   "Phi-4-mini-instruct-8bit": "/Users/barn/.cache/huggingface/hub/models--mlx-community--Phi-4-mini-instruct-8bit/snapshots/93b273a5497a4fcdcfb7ac00143565506b4f72e4",
-   "Qwen3.6-35B-A3B-4bit": "/Users/barn/.cache/huggingface/hub/models--mlx-community--Qwen3.6-35B-A3B-4bit/snapshots/main",
-   "Qwopus-GLM-18B": "/Users/barn/.cache/huggingface/hub/models--KyleHessling1--Qwopus-GLM-18B-Healed-MLX-4bit/snapshots/a51a8492f2fdafef31ecea8d8d5beb3f91bd271c",
-   "gemma-4-26B-A4B-it-OptiQ-4bit": "/Users/barn/.cache/huggingface/hub/models--mlx-community--gemma-4-26B-A4B-it-OptiQ-4bit/snapshots/main",
-   "gemma-4-E2B-it-MLX-4bit": "/Users/barn/.cache/huggingface/hub/models--lmstudio-community--gemma-4-E2B-it-MLX-4bit/snapshots/main"
+   "Phi-4-mini-instruct-8bit": "/Users/barn/.cache/huggingface/hub/models--mlx-community--Phi-4-mini-instruct-8bit/snapshots/93b273a5497a4fcdcfb7ac00143565506b4f72e4"
   },
   "serving": {
+   "MiniCPM5-2B-MLX": "/Users/barn/.cache/huggingface/hub/models--openbmb--MiniCPM5-2B-MLX/snapshots/8a9ad7539ac86281d0ac2b017ba04a5de53fe9a3",
    "Ornith-1.5-35B-A3B-REAP-19B": "/Users/barn/.cache/huggingface/hub/models--mlx-community--Ornith-1.5-35B-A3B-OptiQ-4bit-REAP-19B/snapshots/d2930458b7e8ff4799d5e17ea1ef23818746361e",
    "Ornith-1.5-9B-MLX-8bit": "/Users/barn/.cache/huggingface/hub/models--ornith-ai--Ornith-1.5-9B-MLX-8bit/snapshots/b4b70543d60c81e7c418a001b74cd4352212bd44",
    "Phi-4-mini-instruct-8bit": "/Users/barn/.omlx/models_stashed/Phi-4-mini-instruct-8bit",
    "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit": "/Users/barn/.cache/huggingface/hub/models--lmstudio-community--Qwen3-Coder-30B-A3B-Instruct-MLX-4bit/snapshots/main",
    "Qwen3.8-27B-MLX-4bit": "/Users/barn/.omlx/models/Qwen3.8-27B-MLX-4bit",
-   "gemma-4-12B-it-qat-OptiQ-4bit": "/Users/barn/.cache/huggingface/hub/models--mlx-community--gemma-4-12B-it-qat-OptiQ-4bit/snapshots/625223a54b2ecae941d727df319b91dbcc4ba603",
    "gemma-4-E4B-it-MLX-4bit": "/Users/barn/.cache/huggingface/hub/models--lmstudio-community--gemma-4-E4B-it-MLX-4bit/snapshots/main",
    "gpt-oss-20b-MXFP4-Q8": "/Users/barn/.cache/huggingface/hub/models--mlx-community--gpt-oss-20b-MXFP4-Q8/snapshots/773a7da77e569019bb0fd17a554b263738d669a3"
   },
   "stashed": {
-   "Phi-4-mini-instruct-8bit": "/Users/barn/.omlx/models_stashed/Phi-4-mini-instruct-8bit",
-   "Qwen3.6-35B-A3B-UD-MLX-4bit": "/Users/barn/.cache/huggingface/hub/models--unsloth--Qwen3.6-35B-A3B-UD-MLX-4bit/snapshots/6700c3e5bdeb050a379c8d2a4133f43f3647f20f",
-   "gemma-4-12B-it-4bit": "/Users/barn/.cache/huggingface/hub/models--mlx-community--gemma-4-12B-it-4bit/snapshots/73bcf09092aa277861d5a191b989b666f7f32e8f"
+   "Phi-4-mini-instruct-8bit": "/Users/barn/.omlx/models_stashed/Phi-4-mini-instruct-8bit"
   }
  },
  "engine_store": {
@@ -56,23 +65,11 @@
   "note": "not on the serving path; measured twice because a single reading reported 85 GB that the owner then cleaned (BUG-807)",
   "transient": false
  },
- "hub_bytes": 152073.8,
+ "hub_bytes": 124837.5,
  "hub_repos": {
-  ".locks": 0.0,
-  "CACHEDIR.TAG": 0.0,
-  "blobs": 1118.7,
-  "datasets--HuggingFaceH4--MATH-500": 0.4,
-  "datasets--TIGER-Lab--MMLU-Pro": 4.2,
-  "datasets--google--IFEval": 0.2,
-  "datasets--google-research-datasets--mbpp": 0.1,
-  "datasets--hotpotqa--hotpot_qa": 359.2,
-  "datasets--openai--gsm8k": 2.7,
-  "datasets--openai--openai_humaneval": 0.1,
   "models--BAAI--bge-m3": 4564.4,
-  "models--BAAI--bge-reranker-base": 1134.4,
   "models--BAAI--bge-reranker-v2-m3": 2293.2,
   "models--BAAI--bge-small-en-v1.5": 134.5,
-  "models--MoritzLaurer--DeBERTa-v3-base-mnli-fever-anli": 380.0,
   "models--MoritzLaurer--DeBERTa-v3-large-mnli-fever-anli-ling-wanli": 4136.1,
   "models--MoritzLaurer--bge-m3-zeroshot-v2.0": 3429.5,
   "models--Pluto-AI-Labs--Qwen3.8-27B-MLX": 0.0,
@@ -81,8 +78,6 @@
   "models--answerdotai--ModernBERT-base": 600.8,
   "models--convaiinnovations--laya": 1526.4,
   "models--cross-encoder--ms-marco-MiniLM-L-6-v2": 91.8,
-  "models--cross-encoder--nli-deberta-v3-small": 578.7,
-  "models--facebook--bart-large-mnli": 6932.3,
   "models--google--flan-t5-base": 3.2,
   "models--keXjos--Qwen3.8-9B-mlx-4Bit": 0.0,
   "models--lmstudio-community--Qwen3-Coder-30B-A3B-Instruct-MLX-4bit": 17190.8,
@@ -92,55 +87,56 @@
   "models--minishlab--potion-base-32M": 131.2,
   "models--mlx-community--Ornith-1.5-35B-A3B-OptiQ-4bit-REAP-19B": 13757.0,
   "models--mlx-community--Phi-4-mini-instruct-8bit": 5774.6,
-  "models--mlx-community--Qwen2.5-7B-Instruct-4bit": 4295.9,
   "models--mlx-community--Qwen2.5-Coder-7B-Instruct-4bit": 4295.9,
   "models--mlx-community--Qwen3-Embedding-0.6B-4bit-DWQ": 351.2,
   "models--mlx-community--Qwen3.8-27B-4bit": 0.0,
   "models--mlx-community--clef-4bit": 8845.4,
   "models--mlx-community--clef-flash-4bit": 6214.0,
-  "models--mlx-community--gemma-4-12B-it-qat-OptiQ-4bit": 9036.4,
   "models--mlx-community--gpt-oss-20b-MXFP4-Q8": 12104.2,
   "models--mlx-community--pplx-decider-v1.1-27b-4bit": 15362.3,
+  "models--openbmb--MiniCPM5-2B-MLX": 1426.2,
   "models--ornith-ai--Ornith-1.5-9B-MLX-8bit": 9536.3,
   "models--pooyakn73--Qwen3.8-9B-Distill-MTPLX-Q6G64": 0.0,
-  "models--roberta-large-mnli": 1428.4,
   "models--sentence-transformers--all-MiniLM-L6-v2": 91.6,
-  "models--tasksource--ModernBERT-base-nli": 602.1,
   "models--typeform--distilbert-base-uncased-mnli": 267.8,
-  "models--xy10086--Qwen3.8-9B-Distill-Uncensored-Heretic-MTPLX-Q6G64": 0.0,
-  "models--ynie--roberta-large-snli_mnli_fever_anli_R1_R2_R3-nli": 4274.3,
-  "version.txt": 0.0
+  "models--xy10086--Qwen3.8-9B-Distill-Uncensored-Heretic-MTPLX-Q6G64": 0.0
  },
  "live": [
   "models--lmstudio-community--Qwen3-Coder-30B-A3B-Instruct-MLX-4bit",
   "models--lmstudio-community--gemma-4-E4B-it-MLX-4bit",
   "models--mlx-community--Ornith-1.5-35B-A3B-OptiQ-4bit-REAP-19B",
   "models--mlx-community--Phi-4-mini-instruct-8bit",
-  "models--mlx-community--gemma-4-12B-it-qat-OptiQ-4bit",
   "models--mlx-community--gpt-oss-20b-MXFP4-Q8",
+  "models--openbmb--MiniCPM5-2B-MLX",
   "models--ornith-ai--Ornith-1.5-9B-MLX-8bit"
  ],
- "measured_at": "2026-10-15",
+ "measured_at": "2026-10-16T01:01:58",
+ "model_repo_bytes": 123351.8,
+ "not_a_candidate_non_model_repo": {
+  "datasets--HuggingFaceH4--MATH-500": 0.4,
+  "datasets--TIGER-Lab--MMLU-Pro": 4.2,
+  "datasets--google--IFEval": 0.2,
+  "datasets--google-research-datasets--mbpp": 0.1,
+  "datasets--hotpotqa--hotpot_qa": 359.2,
+  "datasets--openai--gsm8k": 2.7,
+  "datasets--openai--openai_humaneval": 0.1
+ },
+ "not_a_candidate_store_metadata": {
+  ".locks": 0.0,
+  "CACHEDIR.TAG": 0.0,
+  "blobs": 1118.7,
+  "version.txt": 0.0
+ },
  "orphans": [
-  "models--facebook--bart-large-mnli",
-  "models--mlx-community--Qwen2.5-7B-Instruct-4bit",
-  "models--ynie--roberta-large-snli_mnli_fever_anli_R1_R2_R3-nli",
-  "models--roberta-large-mnli",
-  "models--cross-encoder--nli-deberta-v3-small",
   "models--typeform--distilbert-base-uncased-mnli",
-  "models--cross-encoder--ms-marco-MiniLM-L-6-v2",
-  "models--sentence-transformers--all-MiniLM-L6-v2",
-  "models--Qdrant--all-MiniLM-L6-v2-onnx",
-  "datasets--TIGER-Lab--MMLU-Pro",
-  "datasets--HuggingFaceH4--MATH-500",
-  "datasets--openai--openai_humaneval",
   "models--pooyakn73--Qwen3.8-9B-Distill-MTPLX-Q6G64",
   "models--xy10086--Qwen3.8-9B-Distill-Uncensored-Heretic-MTPLX-Q6G64",
   "models--lmstudio-community--Qwen3.8-27B-MLX-6bit",
   "models--mlx-community--Qwen3.8-27B-4bit",
-  "models--keXjos--Qwen3.8-9B-mlx-4Bit",
-  ".locks",
-  "version.txt"
+  "models--keXjos--Qwen3.8-9B-mlx-4Bit"
  ],
- "parked": []
+ "owner_owed_above_floor": [],
+ "parked": [],
+ "schema_version": "1",
+ "undeclared_entries": []
 }

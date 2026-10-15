@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**224 open** / 377 closed of 601 ids.
+**223 open** / 379 closed of 602 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -216,7 +216,6 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-803 | (MED — OPEN 2026-10-15) — a prefill reading without the POOL STATE it was taken at is not comparable either | 1 |
 | BUG-805 | (MED — OPEN 2026-10-15) — decode is a function of CONTEXT LENGTH: the decode axis was measured on tiny prompts | 1 |
 | BUG-806 | (LOW - OPEN 2026-10-15) - my bench wrote its receipt only on the SUCCESS path, so the two REFUSALS were not persisted | 1 |
-| BUG-807 | (MED - OPEN 2026-10-15) - a single-instant store census reported 85 GB as reclaimable mass, and the first draft then narrated a cause it nev | 1 |
 | BUG-810 | (MED - OPEN 2026-10-15) - a YAML insert that re-parents a mapping passes every parse check and is caught only by the consumer | 1 |
 | BUG-811 | (HIGH - OPEN 2026-10-15) - a new instrument told three lies before its own selftest was written | 1 |
 | BUG-812 | (MED - OPEN 2026-10-15) - a comment inserted into a plist silently broke the XML, and launchd reported only "Input/output error" | 1 |

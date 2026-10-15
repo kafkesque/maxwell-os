@@ -121,8 +121,14 @@ OPEN_ASSERT_RE = re.compile(
 # move the work, so the top of every face led with a standing rule and two owner-gated tasks rendered as
 # "MUST ... open". Three claims, three joins, one sentence: the LIVE region is a claim surface too.
 GOV_SYNC_CFG = REPO / "config" / "gov_sync.yaml"
+#: BUG-839 - A CITATION IS NOT A PATH SEGMENT. \b matched INSIDE a home-relative path, so the citation
+#: "~/.config/goose/config.yaml:311" yielded the repo-relative path "config/goose/config.yaml" and this rail
+#: reported a D-405 fault against a claim the face never made - the subject is a HARNESS HOME that exists, and
+#: the segment after the dot is not a statement about this repository (T-157). The prefix must therefore START a
+#: token: it may not be preceded by a path character, so ".config/..." is not a citation while "config/..." at a
+#: line start, after a space, after "(" or after a quote still is.
 LIVE_PATH_RE = re.compile(
-    r"\b((?:scripts|pipeline|config|governance|specs|tests|agent|lib)/[A-Za-z0-9_./-]+\.(?:py|yaml|yml|md|json))\b")
+    r"(?<![\w./~-])((?:scripts|pipeline|config|governance|specs|tests|agent|lib)/[A-Za-z0-9_./-]+\.(?:py|yaml|yml|md|json))\b")
 
 
 def gov_sync_config() -> dict:
@@ -718,6 +724,12 @@ def _selftest_live_region(cfg_d: dict) -> list[tuple[str, bool]]:
          len(faults(["see scripts/no_such_rail.py for the join"])) == 1),
         ("a live claim naming a file that EXISTS makes no problem",
          len(faults(["see config/gov_sync.yaml for the join"])) == 0),
+        # BUG-839: a HOME-RELATIVE path is not a repo citation. The first version matched the segment after the
+        # dot and faulted a harness home that exists (T-157's row in the live region).
+        ("a home-relative citation makes no problem, because it claims nothing about this repo",
+         len(faults(["MEASURED 2026-10-15: ~/.config/goose/config.yaml:311 reads active_provider: custom_deepseek"])) == 0),
+        ("a genuinely dangling repo citation still fires BESIDE the same home path (the fix must not blind the rule)",
+         len(faults(["~/.config/goose/config.yaml:311 and scripts/no_such_rail.py"])) == 1),
         ("owner-moved work with no owner lane in the face must fire",
          len(faults(["the face says nothing about who moves what"], owner=2)) == 1),
         ("the same face carrying the owner lane makes no problem",

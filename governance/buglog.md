@@ -8,13 +8,13 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1160 decisions (census stamp d6fccf85406a2721, 2026-10-16) · 601 bugs (224 open / 377 closed; highest OPEN = BUG-836) · 48 open tasks (MUST 14 / SHOULD 29 / WORTH 4; OWNER-moved 12, pipeline-moved 36; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1161 decisions (census stamp 118ef597a2298fa9, 2026-10-16) · 602 bugs (223 open / 379 closed; highest OPEN = BUG-836) · 46 open tasks (MUST 13 / SHOULD 28 / WORTH 4; OWNER-moved 11, pipeline-moved 35; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **80** of 1160 — 🔴 open 32 · 🔵 proposed 27 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 575 · ⚖ ratified 145 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1160, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **80** of 1161 — 🔴 open 32 · 🔵 proposed 27 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 576 · ⚖ ratified 145 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1161, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 224 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 34 · 🟨 MED 61 · 🟩 LOW 24 · UNLABELLED 101 (BUG-757) of 224 open.
+> Open BUGS by severity (population = the census's 223 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 34 · 🟨 MED 60 · 🟩 LOW 24 · UNLABELLED 101 (BUG-757) of 223 open.
 >
-> **OWNER LANE (12) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
+> **OWNER LANE (11) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
@@ -24,14 +24,13 @@
 > | T-133 | 🟠 SHOULD | THE INTAKE FRONT-END - an interest-based daily queue of PROPOSALS, owner-gated, that never writes the store | the DAILY REPORT is the owner gate; nothing enters the pipeline withou |
 > | T-134 | 🟠 SHOULD | THE ENGINE'S SURVIVAL AND ITS VERSION - a boot agent (BUG-802), the residency lever (BUG-803), and the oMLX ve | the owner runs the installer (dry run first). The residency policy and |
 > | T-135 | 🟠 SHOULD | BIND the harness context contract - adopt the executor so the ratified knobs are in the environment, not in a  | the OWNER adopts the binding in the shell that starts the harness; the |
-> | T-136 | 🟠 SHOULD | THE STORE CENSUS AND THE RECLAIM PROPOSAL - decide what leaves the disk, and stop treating a parked symlink as | the OWNER decides what leaves the disk; the census only proposes and p |
 > | T-137 | 🟠 SHOULD | PIN the agent_loop model and prove the tiered cache with an A/B | THE OWNER DECIDES WHEN THE ENGINE MAY BE FLAPPED: the A/B needs one ro |
 > | T-140 | 🟠 SHOULD | ADOPT THE FAN-OUT EXECUTOR for everyday scaffolding and debugging, capped and cross-verified | the owner names the first real fan-out task: the executor needs a task |
 > | T-142 | 🟠 SHOULD | BYTE-OWNER AUDIT of the DECLARED bucket: 59.7 GB whose only claim to be on disk is a mention | pipeline: re-run the census with a RESOLUTION test (does a served entr |
 > | T-145 | 🟠 SHOULD | EDGE0 IS DEFERRED WITH A NAMED TRIGGER, not fetched: the class is already served and the role is blocked on me | OWNER: say 'fetch Edge0' to override, or leave it deferred until T-137 |
 > | T-138 | COULD | HARNESS ADOPTION ON DEMAND - one command per tool, and none of them load-bearing | install a harness only when a specific job needs it (C28). The engine  |
 >
-> **PIPELINE LANE (36) — what the agent will do next, in strategic-consequential order (source: config/task_register.yaml):**
+> **PIPELINE LANE (35) — what the agent will do next, in strategic-consequential order (source: config/task_register.yaml):**
 >
 > | id | pri | state | task | evidence |
 > |---|---|---|---|---|
@@ -46,7 +45,7 @@
 > | T-143 | 🔴 MUST | 🔴 open | RESOURCE-CLASS THE FAN-OUT: the engine pool is a mutex, the governed homes are a single writer | MEASURED 2026-10-15: the engine declares model_count 9 / loaded 3 / final_ceiling 56.6 GB, |
 > | T-147 | 🔴 MUST | 🔴 open | WIRE THE STORE CENSUS TO EVERY DELETION BATCH: it is a generated face, and it lies the moment bytes move witho | MEASURED 2026-10-15: the census IS generated (pipeline/model_store_census.py: dir_bytes, m |
 > | T-150 | 🔴 MUST | 🔴 open | THE DURABLE PATH IS THE DELEGATION PATH (D-3020): anything whose failure is not free goes through pipeline/sub | temp/runs/fanout_20261015i/98_receipt.json - 3/3 DONE with one task deliberately given a 1 |
-> | T-151 | 🔴 MUST | 🔴 open | THE CENSUS FACE MUST BE THE INSTRUMENT'S OUTPUT: governance/model_store_census_20261015.json did not move acro | git show HEAD:governance/model_store_census_20261015.json is byte-identical to the working |
+> | T-157 | 🔴 MUST | 🔴 open | CENSUS THE HARNESS HOMES A DECISION NAMES, so a reversal of a ruled remedy is a READING and not a discovery | MEASURED 2026-10-15: ~/.config/goose/config.yaml:311 reads active_provider: custom_deepsee |
 >
 > **STANDING RULES — in effect, never close (1):**
 >
@@ -15170,3 +15169,92 @@ indentation, so a claim nested in a sub-block, or a value folded past its own li
 That is a fail-OPEN path inside the rule that decides what may be declared, which is the one direction this system
 refuses. The reader now takes the field at the indentation IT has, accepting any continuation indented past it, with
 two new known-answer controls (16/16): a NESTED field is read, a FOLDED value is read.
+
+## BUG-838 (HIGH - OPEN 2026-10-16) - the store census partitioned the hub DIRECTORY and called the result a set of models, so the store's own machinery entered the only class a deletion may come from
+
+**MEASURED 2026-10-16** by reading the instrument against the store it measures. `pipeline/model_store_census.py`
+measured EVERY entry of `~/.cache/huggingface/hub` and called the result "repos", so the partition's DOMAIN was a
+directory listing rather than the model repos it holds. Three limbs, one class.
+
+**(1) UNSOUND.** `.locks` (the hub's lock directory) and `version.txt` (its cache-format version) were counted as
+"repo(s)" and fell into ORPHAN, because no engine entry resolves to them and no file under config/, pipeline/ or
+scripts/ spells their names. ORPHAN is the only class a deletion may ever be proposed from (D-3004(3)) and
+pipeline/safe_delete.py is the only deleter (R-D410), so a class that admits a non-member is not untidiness - it is
+a deletion candidate that is not a model. The census's own line read "ORPHAN 8 repo(s)" where 6 were repos.
+
+**(2) SELF-REFERENCE.** `blobs` - the hub's own blob-store root, 1118.7 MB - read DECLARED, because classify() asks
+whether the repo's STEM appears in the text under config/, pipeline/ and scripts/, and THIS FILE spells "blobs" at
+its own line 113. The instrument's vocabulary was acting as a declaration.
+
+**(3) PROTECTION BY ACCIDENT.** The seven eval datasets were DECLARED - not protected - because config text happens
+to mention their names. D-3014(2) states the rule ("a dataset is not a model and is never swept with model bytes")
+and the DELETION_RECEIPT_20261015 names them "the eval instrument", but NOTHING ENFORCED IT: the recorded face
+still lists datasets--TIGER-Lab--MMLU-Pro, datasets--HuggingFaceH4--MATH-500 and datasets--openai--openai_humaneval
+as ORPHAN deletion candidates. Remove one citation and the eval instrument joins the candidate class.
+`datasets--hotpotqa--hotpot_qa` alone is 359.2 MB - larger than the entire ORPHAN set (267.9 MB).
+
+**CLASS.** The instrument's vocabulary outran its observations: BUG-804 (measured symlinks, called it bytes),
+BUG-808 (a name that reads as on-disk, resolving to nothing), BUG-814 (a snapshot the census calls DECLARED on a
+mention). What is new here is that the defect sat UPSTREAM OF EVERY COUNT - the partition had no declared domain, so
+its membership was whatever the directory happened to hold, and the safety property D-3004(3) asserts could not
+hold because the class it names had no membership rule.
+
+## BUG-838 (CLOSED 2026-10-16) - the partition's DOMAIN is DECLARED and read, and the eval instrument is protected by a rule instead of by a citation
+
+**REMEDY (T-136/D-3033).** `config/engine.yaml#model_store.census_domain` now DECLARES what the partition is a
+partition OF (C12/D-402): `member_prefixes: [models--]` is the ONLY candidate class; `non_member_repo_prefixes:
+[datasets--, spaces--]` are repos that are NEVER candidates (D-3014(2); `spaces--` is declared with zero members
+rather than implied, the D-3031 practice); `store_metadata: [.locks, version.txt, CACHEDIR.TAG, blobs]` are not
+repos at all. KIND precedes mention, so no name a config file happens to spell can promote an entry into a bucket.
+An entry matching NO declared kind - or MORE THAN ONE, which is an ambiguity rather than a coin flip - is a FAULT
+(rc 1): a new kind of hub entry must be DECLARED and is never silently inherited by the candidate class, the
+inverse of the green-by-vacancy disease (BUG-487).
+
+**MEASURED AFTER (2026-10-16).** hub total 124837.5 MB - unchanged, because that is the quantity the deletion
+movement check reads (T-147/T-151) - of which model repos 123351.8 MB over 33 repo(s); LIVE 7 / PARKED 0 /
+DECLARED 20 (was 29) / ORPHAN 6 (was 8); undeclared entries: none. The seven datasets (367.4 MB) and the four
+pieces of store machinery (1134.5 MB, blobs alone 1118.7 MB) are REPORTED on their own lines and marked
+not-a-candidate, so they stay visible without ever being offered. The instrument now carries 13 known-answer
+controls, where before it had NONE, among them that a dataset and the store machinery can never reach ORPHAN, that
+an undeclared kind is a fault, and that the hub's own blob root is still not a model although this file spells the
+word.
+
+## BUG-807 (CLOSED 2026-10-16) - the twice-measured store and the no-cause rule had no control; both are now controls
+
+**WHY IT WAS STILL COUNTED OPEN.** Its remedy shipped on 2026-10-15 (`measure_twice()`, the `transient` flag, and
+"a census narrates nothing it did not observe") and its own body says "REMEDY (applied)" while its header read OPEN
+for a day - the BUG-481 shape (a closure recorded in prose and counted as work). Under it sat a second defect: a
+remedy with NO CONTROL is a comment (BUG-492), so "the store moved between two readings" was a claim no test could
+refuse, and the measurement could regress unobserved.
+
+**CLOSURE.** `pipeline/model_store_census.py --selftest` is now a declared FATAL rail
+(config/rail_registry.yaml) with 13 known-answer controls, and one of them reads a MOVING store as TRANSIENT and a
+still one as NOT - the exact property BUG-807 is about, now refusable rather than asserted. The measurement side was
+already sound: the engine store reads 0.0 MB with transient=False. Wired into the ladder at justfile:38.
+
+## BUG-839 (MED - FIXED 2026-10-16) - a citation reader matched a path SEGMENT, so a harness home that exists was reported as a missing repo file
+
+**MEASURED 2026-10-16, exposed by a face that had been RE-CUT rather than by a search.** Each face's LIVE region
+carries the open-MUST task table, and T-157's row cites the goose harness home -
+`~/.config/goose/config.yaml:311 reads active_provider: custom_deepseek`. `LIVE_PATH_RE` matched with `\b`, so
+it returned `config/goose/config.yaml` - the segment that follows the dot - and `live_faults()` then demanded that
+`REPO/config/goose/config.yaml` exist. It does not, so three faces were reported as "cites config/goose/config.yaml,
+which does not exist - a citation whose subject is absent is an assertion (D-405)". The subject was NOT absent:
+`~/.config/goose/config.yaml` exists (7,849 B, and its line 311 reads `active_provider: custom_deepseek`, which is
+T-157's own evidence). The rail was reporting a claim the face never made - the false-fault direction of BUG-454
+("a rail that cannot express a state is not a rail for that state").
+
+**WHY IT SURFACED NOW - the fault was not new, its VISIBILITY was.** The T-157 row entered the derived block only
+when `gov_sync --apply` re-cut the faces, so this rail had never read that row. A face nobody re-cuts is a checker
+with nothing to check: the stale face had been HIDING a red rail, which is the BUG-819/T-151 family ("a face that
+says measured and is stale") sitting on top of a false fault.
+
+**REMEDY.** A citation must START a token - `(?<![\w./~-])` replaces `\b`, so `.config/...` is not a citation
+while a line-initial, space-preceded, `(`-preceded or quote-preceded `config/...` still is. Two known-answer
+controls land in the rail's own selftest, in BOTH directions: a home-relative citation makes no problem, AND a
+genuinely dangling repo citation still FIRES beside the same home path, so the fix cannot blind the rule it
+repairs. Measured after - `check_governance_faces.py --selftest` 46/46 and the live check rc 0.
+
+**THE CLASS, KEPT.** A reader that infers "this is a claim about THIS repository" from a path-shaped substring will
+meet a home-relative path eventually; the durable fix is T-157's - CENSUS the harness homes a decision names, so an
+out-of-repo home is a DECLARED join instead of an inference from prose.

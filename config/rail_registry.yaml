@@ -170,6 +170,18 @@ guards:
   pipeline/harness_contract.py --check: tri_state
   pipeline/harness_env.py --selftest: fatal
   pipeline/harness_env.py --check: tri_state
+  # D-3033/BUG-838 (T-136): the store census's known-answer controls. Its partition's DOMAIN is DECLARED
+  # (config/engine.yaml#model_store.census_domain) and READ, so a dataset repo and the store's own machinery
+  # (.locks, version.txt, blobs) can never reach ORPHAN - the only class a deletion may ever be proposed from
+  # (D-3004(3)); an entry matching NO declared kind is a FAULT rather than a silent candidate; the deletion
+  # floor is READ and a candidate at or below it is reported but NOT offered (D-3018); and measure_twice is
+  # proved to flag a moving store and not a still one (BUG-807, whose remedy had no control) - a control
+  # nothing runs is a comment (BUG-492).
+  pipeline/model_store_census.py --selftest: fatal
+  # D-3033: the live reading - 0 NOTHING OWED (every candidate is at or below the declared floor, so no
+  # decision is owed) | 1 FAULT (a hub entry of no declared kind, or a declared value the config lacks) |
+  # 2 bytes only an owner disposes of (a candidate ABOVE the floor). Before D-3033 the rc was 2 for ANY
+  # orphan, which asked the owner to decide about the hub's own lock directory.
   pipeline/model_store_census.py: tri_state
   # T-132: the contract's ONE reading - 0 the RUNNING env is bound | 2 OWNER-OWED (declared but not exported, so the
   # harness silently uses its own cloud price-tier defaults) | 1 FATAL (an env contradicts the declaration: a drift,

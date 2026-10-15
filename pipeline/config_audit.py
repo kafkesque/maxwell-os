@@ -43,6 +43,10 @@ CONFIG_TO_CODE: dict[str, tuple[str, str, str]] = {
     "engine.yaml#fanout.guards.default_timeout_s": ("pipeline.research_run", "DEFAULT_TIMEOUT_S", "int"),
     "engine.yaml#fanout.guards.stall_s":           ("pipeline.research_run", "DEFAULT_STALL_S", "int"),
     "engine.yaml#model_store.census_move_ratio":   ("pipeline.model_store_census", "MOVE", "float"),
+    # D-3033/BUG-838: the FLOOR now has a reader inside the instrument that OFFERS a candidate, so it can no
+    # longer drift behind a second copy in the offerer. Until 2026-10-16 the only reader was a sweep script
+    # in temp/, which meant the rule that decides what the owner is shown had no governed consumer.
+    "engine.yaml#model_store.deletion_floor_bytes": ("pipeline.model_store_census", "FLOOR", "int"),
     # ── Stage 1.5 (embedding) ──
     "stage1_5.embed_model_hf":     ("pipeline.pipeline_paths", "S15_EMBED_MODEL_HF", "str"),
     "stage1_5.embed_dim":          ("pipeline.pipeline_paths", "S15_EMBED_DIM", "int"),

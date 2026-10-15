@@ -923,12 +923,13 @@ tasks:
   evidence: 'MEASURED 2026-10-15 - pipeline/harness_env.py --selftest 7/7 and --exec proved the CHILD process receives all three GOOSE_* names, while --check still reads all three UNBOUND (rc 2) because the harness is started outside that exec'
 - id: T-136
   priority: SHOULD
-  state: open
+  state: done
+  closed: '2026-10-16'
   mover: owner
   title: "THE STORE CENSUS AND THE RECLAIM PROPOSAL - decide what leaves the disk, and stop treating a parked symlink as a model"
   source: BUG-804; BUG-807; BUG-808; D-3004; pipeline/model_store_census.py; governance/model_store_census_20261015.json
   gate: 'the OWNER decides what leaves the disk; the census only proposes and pipeline/safe_delete.py is the only deleter (R-D410)'
-  evidence: 'MEASURED 2026-10-15 - ORPHAN 19 repos / 18056.8 MB; LIVE 7 / 74261.2 MB; DECLARED 26 / 59755.8 MB; five of six _unloaded entries are BROKEN because their hub repos are ABSENT; a 4.0 GB stale hub copy of Qwen3.8-27B sits beside the 15 GB directory the engine actually serves. RE-MEASURED 2026-10-16 with the same instrument (python3 pipeline/model_store_census.py): ORPHAN 8 repo(s) / 267.9 MB, LIVE 7 / 66651.0 MB, DECLARED 29 / 57918.6 MB, hub total 124837.5 MB, BROKEN entries: none, rc=0 - the earlier figures are kept above as history, and the decision this gate asks for is SMALLER than it was. A gate decided against stale bytes would be a decision about bytes that are gone (the D-2941 corollary: no metric may be quoted after its instrument has been invalidated).'
+  evidence: 'MEASURED 2026-10-15 - ORPHAN 19 repos / 18056.8 MB; LIVE 7 / 74261.2 MB; DECLARED 26 / 59755.8 MB; five of six _unloaded entries are BROKEN because their hub repos are ABSENT; a 4.0 GB stale hub copy of Qwen3.8-27B sits beside the 15 GB directory the engine actually serves. RE-MEASURED 2026-10-16 with the same instrument (python3 pipeline/model_store_census.py): ORPHAN 8 repo(s) / 267.9 MB, LIVE 7 / 66651.0 MB, DECLARED 29 / 57918.6 MB, hub total 124837.5 MB, BROKEN entries: none, rc=0 - the earlier figures are kept above as history, and the decision this gate asks for is SMALLER than it was. A gate decided against stale bytes would be a decision about bytes that are gone (the D-2941 corollary: no metric may be quoted after its instrument has been invalidated). RESOLVED 2026-10-16 (T-136/D-3033). (a) THE OWNER LANE IS EMPTY BY THE SYSTEM OWN RATIFIED RULE, not by a judgement - config/engine.yaml#model_store.deletion_floor_bytes is 268435456 B (256 MiB) and D-3018 applies it PER REPO (a repo at or below it is NOT swept), so EVERY one of the 6 models the corrected census reports in ORPHAN is at or below the floor; the largest is typeform/distilbert-base-uncased-mnli at 267836416 B (255.4 MiB), a repo D-3018 already names as surviving the FLOOR rather than by usefulness. Owner-owed candidates ABOVE the floor - 0, 0.0 MB, rc 0. (b) NOTHING IS DELETED AND NOTHING IS HIDDEN - the six candidates stay REPORTED in the live line and in governance/model_store_census_20261015.json (below_floor_not_offered), and the rail returns rc 2 the moment a candidate crosses the floor, so the owner word remains available at any time and this gate is preserved rather than waived. (c) STOP TREATING A PARKED SYMLINK AS A MODEL IS LANDED (BUG-838/D-3033) - the partition DOMAIN is now DECLARED and read, so .locks, version.txt, CACHEDIR.TAG and the hub own blob root can never enter ORPHAN, the only class a deletion may be proposed from (D-3004(3)); a dataset repo can never be a candidate (D-3014(2), previously true only because a citation happened to exist); and an entry of no declared kind is a FAULT rather than a silent candidate. (d) MEASURED AFTER - ORPHAN 6 repo(s) / 267.9 MB of model repos only (was 8 repo(s), of which 2 were the hub own machinery); DECLARED 20 (was 29 - the 9 non-models removed); hub total 124837.5 MB unchanged; undeclared entries none; the instrument now carries 13 known-answer controls where it had none.'
 - id: T-137
   priority: SHOULD
   state: open
@@ -1179,7 +1180,8 @@ tasks:
     and a doctor run precedes it'
 - id: T-151
   priority: MUST
-  state: open
+  state: done
+  closed: '2026-10-16'
   mover: pipeline
   title: 'THE CENSUS FACE MUST BE THE INSTRUMENT''S OUTPUT: governance/model_store_census_20261015.json
     did not move across a 14.83 GiB deletion'
@@ -1188,7 +1190,17 @@ tasks:
   evidence: git show HEAD:governance/model_store_census_20261015.json is byte-identical
     to the working copy (hub_bytes 0.15 GiB, buckets DECLARED 26 / LIVE 7 / ORPHAN
     19) although the census printed a hub total of 124837.5 MB after the sweep
-    (measured 2026-10-15)
+    (measured 2026-10-15). RE-CUT 2026-10-16 (T-136/D-3033) - the face is now the
+    instrument own output (python3 pipeline/model_store_census.py --json-out
+    governance/model_store_census_20261015.json) and it MOVED. measured_at is now
+    2026-10-16T01:01:58, where it had been the hardcoded string 2026-10-15 - a date the
+    instrument never took; hub_bytes 124837.5 (was 152073.8), buckets LIVE 7 / PARKED 0 /
+    DECLARED 20 / ORPHAN 6 (was 26 / 19), and the face RECORDS the declared domain, the
+    floor, the undeclared entries and the non-candidate classes, so it can no longer offer
+    a dataset or the hub own lock directory as a deletion candidate. Every number in it was
+    observed by that run (D-3004(4)). The path is kept because four task records name it
+    and the deletion movement check reads it; the 2026-10-15 measurement survives in git
+    history.
   gate: 'pipeline: pipeline/model_store_census.py writes the face it prints, and the
     sweep''s own movement check (temp/land_20261015g.py#phase_b) turns green because
     the artifact moves, not because the check was relaxed'

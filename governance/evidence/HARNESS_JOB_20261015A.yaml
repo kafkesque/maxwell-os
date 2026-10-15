@@ -1,0 +1,30 @@
+# T-144 - THE FIRST NAMED HARNESS JOB (D-3017). Declared, not typed at a prompt.
+# class/harness/model are READ from their homes and restated here only as the act's inputs (C12).
+schema_version: "1.0"
+job: harness_20261015a
+task: T-144
+declared_at: "2026-10-15"
+class: agent_loop                      # config/agent_context.yaml#classes
+harness: pi                            # config/engine.yaml#harnesses.jobs.agent_loop
+fallback: claude
+model: gemma-4-E4B-it-MLX-4bit         # config/model_assignments.yaml#harness_roles.AGENT_LOOP_SHORT
+basis: >-
+  T-131 measured gemma-4-E4B-it-MLX-4bit as the ONLY served model routable for agent_loop
+  (26214-token working set at 54.7 s against the owner's 90 s per-turn budget).
+tool_profile: read-only                # pi --tools read,grep,find,ls : a 4B model holds no governed pen
+tool_profile_note: >-
+  The first job is deliberately WRITE-LESS. A harness that can edit must earn that right on a
+  job whose diff an owner reads; this one produces a FINDING, and a finding needs no pen.
+workstream: ws_guard_review
+question: >-
+  Read pipeline/subagent_fanout.py and pipeline/research_run.py in this repository. Find every place
+  where a TERMINAL state (DONE/FAILED/TIMEOUT/STALLED/EMPTY) or a RECEIPT count can be recorded
+  WITHOUT a proof derived from the evidence - i.e. where a word or a number is ASSERTED rather than
+  computed from the answer file and the exit code. For each: file:line and one line saying why it is
+  an assertion. Answer in <=12 lines. If you find none, say NO FINDINGS.
+files_read_by_the_harness: [pipeline/subagent_fanout.py, pipeline/research_run.py]
+budget_s: 300                          # 5x the measured 9.7 s smoke turn (2026-10-15), not a blanket 1800
+stall_s: 45                            # config/engine.yaml#fanout.guards.stall_s (declared, not chosen here)
+witness: >-
+  the engine's own log line "Chat completion: model=..." (BUG-815 class): a harness whose tokens do
+  NOT appear there is a harness talking to something else, whatever its answer file says.

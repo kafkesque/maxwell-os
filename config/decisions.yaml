@@ -25035,3 +25035,40 @@ decisions:
     quoted as reclaimable space).
 
     '
+- id: D-3022
+  state: RATIFIED
+  category: DELEGATION / VERIFICATION
+  title: 'A CITATION IS READ BACK, NOT JUDGED: an answer whose file:line quoting does not check out is not a deliverable,
+    and the reader of a citation is not a smarter model but a READER'
+  bugs:
+  - BUG-827
+  - BUG-721
+  files:
+  - pipeline/subagent_fanout.py
+  - governance/evidence/HARNESS_JOB_20261015A.yaml
+  - justfile
+  decision: 'MEASURED 2026-10-15, on the first harness job this repository ever routed (run harness_20261015a):
+    asked to find assertions in two files, the deployed agent_loop model returned eight file:line citations and
+    every one pointed at unrelated code - it quoted `word = "DONE"` at pipeline/subagent_fanout.py:111, which reads
+    `if len(text) < min_chars:`, and cited pipeline/research_run.py:149 for `rc == 0`, which reads `if not pid_alive(pid):`.
+    The answer was 1737 chars, exited 0 and cleared every gate the chain had: not a stub, above the length floor,
+    sane rc, bounded wall. Six guards and not one of them READ THE FILE the answer made a claim about, because every
+    one of them judged the answer FORM.
+
+    The rule this mints: A CLAIM ABOUT A FILE IS DECIDABLE, so it must be DECIDED, and the deciding does not require
+    intelligence - it requires reading. citation_defects() checks every citation against the file itself in both
+    shapes models actually write (an inline path.py:111 and a path.py heading with Line 111: bullets) and refutes
+    a quoted fragment that is not on the cited line, a line past the end of the file, and a file that does not exist.
+    A refuted citation makes the deliverable a non-deliverable: the receipt carries citations_checked/citations_refuted
+    per attempt and the run exits 1 (T-155 gives that state one retry on a different family).
+
+    Two boundaries are part of the rule, because an over-strict guard is a disabled guard. FIRST, only a QUOTE is
+    checked: a fragment carrying punctuation or an underscore is a quote, a prose reference (like `the grader`)
+    is not, so a loose answer is never failed for being LOOSE - only for being FALSE. SECOND, the check is mechanical
+    and its verification is therefore not a matter of trust: on the real fabricated answer it returns 8 citations
+    checked and 13 refuted claims in one second, and six controls in --selftest (32/32) pin both the refutation
+    and the non-refutation.
+
+    This also retires the recipe that BUG-721 was previously answered with. That bug was closed by RULES (delegate
+    less, delegate differently) and it came back; the durable answer is an INSTRUMENT, because a rule is remembered
+    while an instrument runs. The same shape as D-3020: durability over discipline.'

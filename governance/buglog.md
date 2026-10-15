@@ -8,13 +8,13 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1149 decisions (census stamp b01d666d6a2760ea, 2026-10-15) · 588 bugs (220 open / 368 closed; highest OPEN = BUG-821) · 45 open tasks (MUST 14 / SHOULD 26 / WORTH 3; OWNER-moved 14, pipeline-moved 31; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1150 decisions (census stamp 609b84db6cabaeba, 2026-10-15) · 594 bugs (222 open / 372 closed; highest OPEN = BUG-829) · 45 open tasks (MUST 14 / SHOULD 27 / WORTH 3; OWNER-moved 12, pipeline-moved 33; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **80** of 1149 — 🔴 open 32 · 🔵 proposed 27 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 565 · ⚖ ratified 144 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1149, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **80** of 1150 — 🔴 open 32 · 🔵 proposed 27 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 565 · ⚖ ratified 145 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1150, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 220 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 34 · 🟨 MED 57 · 🟩 LOW 24 · UNLABELLED 101 (BUG-757) of 220 open.
+> Open BUGS by severity (population = the census's 222 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 34 · 🟨 MED 59 · 🟩 LOW 24 · UNLABELLED 101 (BUG-757) of 222 open.
 >
-> **OWNER LANE (14) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
+> **OWNER LANE (12) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
@@ -28,12 +28,10 @@
 > | T-137 | 🟠 SHOULD | PIN the agent_loop model and prove the tiered cache with an A/B | THE OWNER DECIDES WHEN THE ENGINE MAY BE FLAPPED: the A/B needs one ro |
 > | T-140 | 🟠 SHOULD | ADOPT THE FAN-OUT EXECUTOR for everyday scaffolding and debugging, capped and cross-verified | the owner names the first real fan-out task: the executor needs a task |
 > | T-142 | 🟠 SHOULD | BYTE-OWNER AUDIT of the DECLARED bucket: 59.7 GB whose only claim to be on disk is a mention | pipeline: re-run the census with a RESOLUTION test (does a served entr |
-> | T-144 | 🟠 SHOULD | ROUTE THE FIRST HARNESS JOB: name the class, deploy pi or claude through config/engine.yaml#harnesses.jobs, an | OWNER: name the job class and the file set (the routing, the reader an |
 > | T-145 | 🟠 SHOULD | EDGE0 IS DEFERRED WITH A NAMED TRIGGER, not fetched: the class is already served and the role is blocked on me | OWNER: say 'fetch Edge0' to override, or leave it deferred until T-137 |
 > | T-138 | COULD | HARNESS ADOPTION ON DEMAND - one command per tool, and none of them load-bearing | install a harness only when a specific job needs it (C28). The engine  |
-> | T-146 | COULD | ZED AS THE REVIEW SURFACE: put the CLI on PATH and open the evidence at the exact line after a batch | pipeline: ln -s /Applications/Zed.app/Contents/MacOS/cli ~/.local/bin/ |
 >
-> **PIPELINE LANE (31) — what the agent will do next, in strategic-consequential order (source: config/task_register.yaml):**
+> **PIPELINE LANE (33) — what the agent will do next, in strategic-consequential order (source: config/task_register.yaml):**
 >
 > | id | pri | state | task | evidence |
 > |---|---|---|---|---|
@@ -47,8 +45,8 @@
 > | T-141 | 🔴 MUST | 🔴 open | SERIALIZE MODEL DOWNLOADS: two overlapping attempts at one repo leave .incomplete fragments that no tool can a | MEASURED 2026-10-15: models--lmstudio-community--Qwen3.8-27B-MLX-4bit held 4.0 GB as SIX . |
 > | T-143 | 🔴 MUST | 🔴 open | RESOURCE-CLASS THE FAN-OUT: the engine pool is a mutex, the governed homes are a single writer | MEASURED 2026-10-15: the engine declares model_count 9 / loaded 3 / final_ceiling 56.6 GB, |
 > | T-147 | 🔴 MUST | 🔴 open | WIRE THE STORE CENSUS TO EVERY DELETION BATCH: it is a generated face, and it lies the moment bytes move witho | MEASURED 2026-10-15: the census IS generated (pipeline/model_store_census.py: dir_bytes, m |
-> | T-149 | 🔴 MUST | 🔴 open | CALL THE TWO GUARDS THAT ALREADY EXIST, IN PREFLIGHT: the duplicate-key checker and the delegation doctor | python3 scripts/check_config_duplicate_keys.py  # exists since BUG-730, found the live def |
 > | T-150 | 🔴 MUST | 🔴 open | THE DURABLE PATH IS THE DELEGATION PATH (D-3020): anything whose failure is not free goes through pipeline/sub | temp/runs/fanout_20261015i/98_receipt.json - 3/3 DONE with one task deliberately given a 1 |
+> | T-151 | 🔴 MUST | 🔴 open | THE CENSUS FACE MUST BE THE INSTRUMENT'S OUTPUT: governance/model_store_census_20261015.json did not move acro | git show HEAD:governance/model_store_census_20261015.json is byte-identical to the working |
 >
 > **STANDING RULES — in effect, never close (1):**
 >
@@ -14524,3 +14522,166 @@ visible, and the defect proved by live calibration (temp/land_20261015g.py --pha
 repo ONCE PER PHYSICAL BLOCK (`physical_bytes`), records the census total BEFORE the sweep, treats rc=2 as a
 measurement, and **raises** if the census did not move - a batch that deletes without moving its face may not
 exit 0 (T-147). The stale face itself is T-151.
+
+## BUG-826 (HIGH - FIXED 2026-10-15) - the delegation doctor failed against the LEDGER OF EVERY RUN EVER, and the check beside it passed having checked nothing
+
+**MEASURED, minutes before T-149 was to wire this doctor into `just preflight`.** `python3
+pipeline/subagent_fanout.py doctor` returned `doctor: 7/8` with
+`[FAIL] the retry model is not a task model (R5: a retry may not repeat the failing model) fallback=gemma-4-E4B-it-MLX-4bit`
+and, next to it, `[ok] every task model is served by the engine  2 distinct model(s) checked`. Those two models
+were read from `temp/runs/*/fan_*/task.json` - **the ledger of delegations that already finished**. R5's retry
+question ("is the retry target the model that failed?") is a property of a **PLAN**; asked of history it answers a
+question nobody asked, and it answers it WRONG in the direction that matters: a fallback model that was some task's
+model yesterday fails a doctor run for a plan that does not exist yet. The check beside it reported `ok` having
+checked nothing about the plan in hand.
+
+**WHY IT IS HIGH.** T-149 exists to CALL this guard from preflight. Wiring a guard that is red on history makes
+preflight permanently red - and a permanently red guard is a guard an operator learns to ignore. The instrument
+had to be honest BEFORE it was obeyed.
+
+**REMEDY (tri-state verdicts).** A check that had nothing to decide now prints `[undecided]` and is counted as
+neither a pass nor a failure - D-3015 ("an instrument that cannot decide says so and stops") applied to the
+per-check verdict, not only to the whole tool. Models are read from the PLAN (`--tasks`) or not at all; history is
+never a plan. `doctor: 6/6 decided, 2 undecided (nothing to decide)`, rc 0. **The FAIL path is proven live, not
+assumed:** a synthetic plan naming `gemma-4-E4B-it-MLX-4bit` as a task model returns rc 1 with the R5 line FAIL.
+`--selftest` 26/26, with five new controls including `a_doctor_with_no_plan_reads_UNDECIDED_not_FAIL` and
+`a_plan_whose_task_model_IS_the_retry_model_reads_FAIL`.
+
+
+## BUG-827 (HIGH - FIXED 2026-10-15) - nothing in the guard chain reads the file an answer cites, so a fabricated review was graded DONE (BUG-721, reproduced live)
+
+**MEASURED on the FIRST harness job (T-144, run `harness_20261015a`).** Asked to find every place where a terminal
+state can be recorded without a derived proof, the declared agent_loop model (`gemma-4-E4B-it-MLX-4bit`, driving
+`pi` through `omlx launch pi`) returned **eight `file:line` citations and every one of them pointed at unrelated
+code**. It "quoted" `word = "DONE"` at `pipeline/subagent_fanout.py:111`, which reads `if len(text) < min_chars:`;
+it cited `pipeline/research_run.py:149` for `rc == 0`, which reads `if not pid_alive(pid):`. The answer was
+**1,737 chars, exited 0**, cleared the 80-char floor and was recorded `TERMINAL: DONE - rc=0, ok, 1737 chars`.
+
+**ROOT.** Every guard in the chain judged the answer's **FORM** - not a stub, long enough, sane rc, bounded wall.
+Not one of them read the file the answer made a claim about. `answer_verdict()` cannot see a fabrication: a
+fabrication is long, exits 0 and does not carry the stub prefix. This is BUG-721 (a delegate returned a fabricated
+verdict without reading the code) measured again, five sessions later, with the same result.
+
+**REMEDY: the R5 duty made MECHANICAL.** `citation_defects()` (`pipeline/subagent_fanout.py`), exposed as
+`python3 pipeline/subagent_fanout.py citations --answer F`, reads **both shapes models actually write** -
+`path.py:111` inline and a `path.py` heading followed by `Line 111:` bullets - and refutes (a) a quoted fragment
+that is not on the cited line, (b) a line past the end of the file, (c) a file that does not exist. A prose
+reference (no punctuation, like `the grader`) is never read as a quote, so a loose answer is not failed for being
+**loose** - only for being **false**. The receipt now carries `citations_checked` / `citations_refuted` per attempt
+and returns exit 1 when any deliverable's citation is refuted.
+
+**EVIDENCE.** On the real answer (the one graded DONE): **8 citations checked, 13 refuted claims**, rc 1 -
+`temp/runs/harness_20261015a/ws_guard_review/40_citation_check.txt`. `--selftest` 32/32 with six controls
+including `a_fabricated_citation_is_refuted` and `a_prose_reference_is_never_read_as_a_quote`.
+**The lesson generalises:** a claim about a file is not judged, it is READ BACK - the verifier of a citation need
+not be a smarter model, it must be a reader (D-3022).
+
+
+## BUG-828 (MED - OPEN 2026-10-15) - the deployed harness is not bounded by the declared budgets: the liveness signal cannot see it, and one turn outlasts the stall threshold
+
+Three measured parts, all from the same T-144 run.
+
+1. **THE LIVENESS SIGNAL DOES NOT SEE THE HARNESS.** `research_run` counts progress as
+   `10_report.md|20_answer.md|run.log`. A harness writes its transcript to `~/.pi/agent/sessions/**/*.jsonl`
+   continuously and its answer only at the END. Measured live at 17:46: `state=RUNNING idle_s=66.6 stalled=True`
+   **while pi was mid-loop and healthy** (the next engine line 12 s later was `finish_reason=stop`). A stall flag
+   that fires on a working run is the BUG-824 family again: the instrument asserting something it has not measured.
+2. **ONE TURN IS LONGER THAN THE DECLARED STALL THRESHOLD.** The final turn measured **45.58 s** (521 tokens at
+   27.4 tok/s, prompt 12,438) against `config/engine.yaml#fanout.guards.stall_s=45`. The threshold is BELOW the
+   longest single measured turn of the deployed class, so the flag trips by construction rather than by defect.
+3. **THE TURN'S TOKEN CEILING IS THE ENGINE'S GLOBAL CAP, NOT THE CLASS BUDGET.** pi sends no `max_tokens`
+   (`request_max_tokens=None` in the engine log) and the per-model entry caps at **32,768** - inherited from
+   `~/.omlx/settings.json#sampling.max_tokens` - which at 27.4 tok/s is **~20 minutes** against the owner's
+   declared **90 s** per-turn knob. The bound that actually bites is the workstream wall (300 s declared for this
+   job, reaped by `research_run watch`), which is why that wall is load-bearing rather than decorative.
+
+**REMEDY (T-154):** a harness workstream declares its transcript INSIDE the workstream
+(`PI_CODING_AGENT_DIR=$WS_DIR/agent`, a knob the engine's own pi integration already honours), progress becomes a
+recursive count of the workstream directory, and the per-turn token ceiling is declared per class instead of being
+inherited from a global number that was never about the class.
+
+
+## BUG-829 (MED - OPEN 2026-10-15) - the review surface's own agent panel defaults to a CLOUD provider
+
+**MEASURED while executing T-146.** `~/.config/zed/settings.json` declares
+`agent.default_model = deepseek/deepseek-v4-pro` (provider `deepseek`, effort high, thinking on) - and the SAME
+file already declares `agent_servers: {pi-acp: {type: registry}, deepagents: {type: registry}}`. So the surface
+being adopted as the REVIEW surface carries a native agent that leaves the machine by default, while its
+ACP-hosted agents can be wired to the sovereign engine (pi's config already points at
+`http://127.0.0.1:11435/v1` with the local token).
+
+**WHY IT IS FILED AND NOT LEFT AS A NOTE.** No rail in this repository can see this file - it lives outside the
+repo - so an implicit cloud default in a surface used to review governed work is exactly the C3/C22 drift the
+constitution names, and it is invisible to `just preflight`. **Options, in order:** (i) bind
+`agent.default_model` to the local engine (provider `omlx`), so the panel is sovereign like the harness is; or
+(ii) record the cloud default as an explicit owner OPT-IN, because C22 permits API use that is *explicit*, not API
+use that is *ambient*.
+
+## BUG-830 (MED - FIXED 2026-10-15) - preflight had been RED since the delegation session, because the delegation code kept a SECOND copy of two declared values
+
+**MEASURED 2026-10-15, by running `just preflight` after wiring T-149's two guards into it.** The recipe failed
+**before** either new guard, at `pipeline/config_audit.py --check-unchecked --strict`:
+`UNCHECKED - 5 hardcoded values not in audit registry: model_store_census.py:39 MOVE = 0.05,
+oneshot_ask.py:25 TEMPERATURE = 0.0, research_run.py:60 DEFAULT_TIMEOUT_S = 1800, research_run.py:61
+DEFAULT_STALL_S = 600, research_run.py:65 POLL_S = 2.0`. Two of those five are the sharpest kind of defect C12
+names: `config/engine.yaml#fanout.guards` **already declared** `default_timeout_s` and `stall_s`, so the module
+held a **second home for values that had one** - and it held the WRONG one (1800 s and 600 s against the declared
+120 s and 45 s). A workstream that inherits 1800 s while the executor budgets 120 s is exactly the silence
+BUG-809 exists to prevent, and it was written by the fix for BUG-809.
+
+**WHY IT WENT UNNOTICED, and this is the point.** The fix was verified with `--selftest` (18/18), doctor runs and
+live runs - every instrument EXCEPT the one recipe that gates everything. Preflight was red for a day and no one
+asked it, which is the same lesson T-149 was filed for one day earlier: **an instrument nobody calls is not a
+guard**. T-149's wiring is what made this visible: the guard rails went in ABOVE the failure and immediately
+reported it.
+
+**REMEDY.** (1) `pipeline/research_run.py` now READS `DEFAULT_TIMEOUT_S` / `DEFAULT_STALL_S` from
+`config/engine.yaml#fanout.guards` at import, failing closed if the home or the block is absent - so the executor
+and the runner can no longer disagree about a budget. (2) `pipeline/model_store_census.py` reads its movement
+tolerance from the new declared `model_store.census_move_ratio` (0.05) instead of carrying a literal - the ratio
+decides whether a re-measure counts as movement, which is a POLICY value, not an implementation detail.
+(3) `POLL_S` (a 2 s watch cadence) and `TEMPERATURE` (R7 mandates 0.0 on every generation script - a
+constitutional constant, and making it configurable would make R7 violable) are REGISTERED as acknowledged
+literals with the reason stated, in `pipeline/config_audit.py#ACKNOWLEDGED_HARDCODED`.
+
+**AND THE AUDIT ITSELF WAS TOO WEAK TO CHECK THE FIX.** Its registry resolves dotted paths against
+`config/pipeline_config.yaml` only, so an engine.yaml value could not be registered at all - which is WHY the
+authors left literals instead of linking them. Registering them made the audit report `CODE-ONLY` instead of
+clean. The resolver now accepts `FILE#dotted.path` (`engine.yaml#fanout.guards.stall_s`), so the audit VERIFIES
+that the code equals the declared value across files rather than merely knowing the name. Audit rc 0.
+
+## BUG-831 (HIGH - FIXED 2026-10-15) - the citation checker certified a LINE without reading its labelled quote, and a real fabrication walked through the gap in the same hour it was written
+
+**MEASURED, on the R5 review of the checker itself (run `harness_20261015b`, 2026-10-15).** A different family was
+asked for one concrete way each of two new guards could produce a wrong verdict. Its answer cited two lines. One of
+them read:
+
+```
+*   **File:line:** `pipeline/config_audit.py` (line 110)
+*   **Exact Code:** `if not path.exists(): raise SystemExit(...)` (This line is *not* the issue, ...)
+```
+
+`pipeline/config_audit.py:110` actually reads `ACKNOWLEDGED_HARDCODED: set[str] = {`. The "Exact Code" was
+invented - and the checker reported **`2 citation(s) checked, 0 refuted claim(s)`** on that answer, because its
+quote window was the SAME line as the citation and the quote sat on the next one. The guard certified the line
+number it could read and never read the sentence it was shown.
+
+**A SECOND DEFECT, found by writing the control for the first:** the `path.py (line N)` shape resolved against the
+file named in the nearest preceding HEADING, so a heading over file A followed by a citation to file B was checked
+against **file A** - a false refutation, which is the failure mode that disables a guard (D-3022's own boundary).
+
+**REMEDY.** (1) A quote on the NEXT line is now tied to the citation when that line LABELS itself as code
+(`**Exact Code:**`, `Code:`, `Quoted:`, `Reads:`, `Says:`) and carries no citation of its own - the label is
+required so that a merely nearby fragment is never guessed at, and an unlabelled next line is still not read.
+(2) A line that names its own file on the same line is now checked against THAT file, with the heading as a
+fallback only. `--selftest` 37/37, six of the controls being this bug's.
+
+**EVIDENCE, both directions.** The fabricated `config_audit.py:110` quote is now REFUTED BY NAME; the honest
+citation beside it (`subagent_fanout.py:171`, `if quote and quote not in actual:`) is **no longer refuted** by the
+new lookahead, and is only reported now because the file MOVED (the fix added lines above it) - so the limit is
+declared rather than hidden: **the check is against the file AS IT IS NOW**, and a refutation of an answer written
+before an edit means the file moved. A receipt is written minutes after its answer, where the two coincide; a
+re-check of an old answer is archaeology and must be read as such.
+
+**D-3022 is unchanged in rule and extended in shape:** the rule is "a citation is read back"; BUG-831 is the
+measurement that "both shapes" was one shape too few, and that the reader has to be told where the quote lives.

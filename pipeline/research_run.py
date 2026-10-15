@@ -57,8 +57,30 @@ LOG = "run.log"
 TERMINAL = "TERMINAL:"
 HEARTBEAT = "STEP "
 SLUG = re.compile(r"^[a-z0-9][a-z0-9_-]{0,40}$")
-DEFAULT_TIMEOUT_S = 1800
-DEFAULT_STALL_S = 600
+
+
+def _guards() -> dict:
+    """The DECLARED delegation guards, read from their one home. A missing home STOPS the import.
+
+    These two values were literals here (1800 s and 600 s) until 2026-10-15, when `just preflight`
+    turned red on them: config/engine.yaml#fanout.guards ALREADY declares default_timeout_s and
+    stall_s, so the literals were a SECOND home for values that had one (C12) - and a workstream that
+    quietly inherited 1800 s while the executor budgeted 120 s is the exact silence BUG-809 is about.
+    """
+    import yaml
+    home = ROOT / "config" / "engine.yaml"
+    if not home.exists():
+        raise SystemExit(f"FATAL: {home} is absent - it is the one home for the delegation budgets (C12)")
+    guards = ((yaml.safe_load(home.read_text()) or {}).get("fanout") or {}).get("guards")
+    if not isinstance(guards, dict):
+        raise SystemExit("FATAL: config/engine.yaml declares no fanout.guards block - a workstream "
+                         "without a declared budget is the BUG-809 defect (D-3020)")
+    return guards
+
+
+_GUARDS = _guards()
+DEFAULT_TIMEOUT_S = int(_GUARDS["default_timeout_s"])
+DEFAULT_STALL_S = int(_GUARDS["stall_s"])
 ANSWER = "20_answer.md"
 PROGRESS_FILES = (REPORT, LOG, ANSWER)
 TERMINAL_WORDS = ("DONE", "FAILED", "TIMEOUT", "STOPPED", "STALLED", "EMPTY")

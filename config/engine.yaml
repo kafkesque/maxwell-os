@@ -95,6 +95,7 @@ fanout:
 # (BAAI/bge-small-en-v1.5, 128 MiB), so no mention-based sweep may reach one.
 model_store:
   deletion_floor_bytes: 268435456    # 256 MiB
+  census_move_ratio: 0.05            # a re-measure counts as MOVED only above this RELATIVE change; below it the two readings are the same measurement (D-3021/T-151)
 
 
 # Download decisions are made by pipeline/model_loadability_probe.py, never by download counts.

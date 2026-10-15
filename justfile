@@ -195,6 +195,8 @@ preflight:
     @python3 -c "from pipeline.schemas import CANONICAL_DOMAINS, CANONICAL_DISCIPLINES; print(f'✅ Taxonomy: {len(CANONICAL_DOMAINS)} domains, {len(CANONICAL_DISCIPLINES)} disciplines')"
     @python3 -c "from pipeline.omlx_call import check_omlx_health; ok = check_omlx_health(); print('✅ OMLX UP' if ok else '❌ OMLX DOWN')"
     @python3 scripts/recompute_decision_summary.py --check || { echo "  ❌ Decision summary drift — run scripts/recompute_decision_summary.py"; exit 1; }
+    @python3 scripts/check_config_duplicate_keys.py || { echo "  ❌ A config key is being silently lost to a duplicate scope (BUG-822) — an instrument that is never called is not a guard (T-149)"; exit 1; }
+    @python3 pipeline/subagent_fanout.py doctor || { echo "  ❌ The delegation guards cannot decide — a delegation would start unsound (BUG-809/BUG-826, D-3020)"; exit 1; }
     @echo "  🔍 Dependency check..."
     @pip3 check 2>&1 || echo "    ⚠️  Dependency conflicts found (non-blocking — see above)"
     @echo "    📦 Outdated packages:"

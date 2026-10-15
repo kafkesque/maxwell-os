@@ -1021,7 +1021,8 @@ tasks:
     plan where the three ENGINE_POOL tasks serialize and the CPU_IO tasks run wide.'
 - id: T-144
   priority: SHOULD
-  state: open
+  state: done
+  closed: '2026-10-15'
   mover: owner
   title: 'ROUTE THE FIRST HARNESS JOB: name the class, deploy pi or claude through
     config/engine.yaml#harnesses.jobs, and receipt which harness ran'
@@ -1029,8 +1030,17 @@ tasks:
   evidence: 'MEASURED 2026-10-15: claude and pi are installed and headless; a goose
     one-shot costs 0.4 s while pi costs 28.2 s and claude 104.7 s per invocation,
     and config/agent_context.yaml#routing routes only gemma-4-E4B-it-MLX-4bit for
-    agent_loop at the declared 60 s budget. The reader exists; the first NAMED job
-    does not.'
+    agent_loop at the declared 60 s budget. THE FIRST JOB RAN (run harness_20261015a, brief
+    governance/evidence/HARNESS_JOB_20261015A.yaml, 2026-10-15, the class named and the job
+    executed under the owner standing instruction to act rather than hold): class agent_loop,
+    harness pi via `omlx launch pi`, model gemma-4-E4B-it-MLX-4bit, READ-ONLY tools
+    (read,grep,find,ls), 300 s declared wall, 75 s actual, three engine turns (prompt 4162 ->
+    8295 -> 12438, finish_reason stopped), and the ENGINE LOG as binding witness
+    (chat_completions 223 -> 226, all three model=gemma-4-E4B-it-MLX-4bit) - the BUG-815 class
+    closed for this surface, because a harness whose tokens do not appear in the engine log is
+    talking to something else. THE DELIVERABLE WAS REFUTED: all 8 of its file:line citations
+    pointed at unrelated code (BUG-827), which is the measured answer to whether this class is
+    served by this model (T-137).'
   gate: 'OWNER: name the job class and the file set (the routing, the reader and the
     two installed harnesses are in place; D-3017). Then: eval "$(python3 pipeline/harness_env.py
     --print)", python3 pipeline/harness_env.py --job <class>, omlx launch pi.'
@@ -1047,13 +1057,21 @@ tasks:
     4-bit affine group_size 64 with 8-bit gates - the model_type the engine ALREADY
     serves as Ornith-1.5-35B-A3B-OptiQ-4bit-REAP-19B. Its config.json nests the model
     under language_model.*, so loadability of that key SHAPE is unverified. Pool ceiling
-    52.7 GB, 8 declared models.'
+    52.7 GB, 8 declared models. RE-MEASURED 2026-10-15, and the deferral is now DECIDABLE
+    WITHOUT THE DOWNLOAD: Edge0 belongs to the model_type this machine ALREADY serves
+    (Ornith-1.5-35B-A3B-OptiQ-4bit-REAP-19B), and the binding question - does the class fit the
+    owner 90 s per-turn knob at the 26214-token working set - can be answered on the resident model
+    for zero bytes (T-153). NEW EVIDENCE AGAINST FETCHING NOW: the first harness job showed the
+    CURRENT agent_loop model cannot be trusted for evidence-cited work (8 of 8 citations refuted,
+    BUG-827), so the class does need a better model - but WHICH one is a measurement, not a
+    purchase. Recommendation: DEFER, with T-153 as the release test.'
   gate: 'OWNER: say ''fetch Edge0'' to override, or leave it deferred until T-137
     pins the agent_loop model / BUG-805 re-measures decode at class context size.
     The download lock (T-141) is now in place, so a single fetch is safe.'
 - id: T-146
   priority: COULD
-  state: open
+  state: done
+  closed: '2026-10-15'
   mover: owner
   title: 'ZED AS THE REVIEW SURFACE: put the CLI on PATH and open the evidence at
     the exact line after a batch'
@@ -1062,7 +1080,20 @@ tasks:
     path opening, --wait, --add, --new, --existing, --foreground and NO headless task
     mode; the CLI is not on PATH (no ~/.local/bin/zed). The repo carries AGENTS.md
     (7,396 B) as the agent-instruction home. Zed''s own application store measured
-    14 GB (governance/buglog.md:3323).'
+    14 GB (governance/buglog.md:3323). DONE 2026-10-15: the CLI is on PATH
+    (~/.local/bin/zed -> /Applications/Zed.app/Contents/MacOS/cli; `zed --version` = Zed 1.9.0)
+    and both owed questions are answered from the INSTALLED ARTIFACT, not from documentation.
+    (1) ZED READS AGENTS.md: the binary carries the rules-file list `.rules .cursorrules
+    .windsurfrules .clinerules .github/copilot-instructions.md AGENTS.md CLAUDE.md GEMINI.md`
+    plus `### Personal AGENTS.md` and `Failed to load user AGENTS.md from`. (2) ZED CAN HOST AN
+    EXTERNAL AGENT: it implements ACP (agent_servers schema key, acp_tools, AcpThread,
+    AgentServerStore, `ACP registry`, `Failed to receive ACP connection handle`) and the owner
+    own ~/.config/zed/settings.json ALREADY declares `agent_servers: {pi-acp: type registry}`.
+    RESIDUAL, declared not implied: whether `pi-acp` resolves in Zed remote registry is NOT
+    locally verifiable (no bundled registry entry; a string search over
+    /Applications/Zed.app/Contents/Resources finds none), so the panel must be opened ONCE to
+    confirm it. FINDING that changes the surface status: Zed own agent.default_model is a CLOUD
+    provider (deepseek-v4-pro), so only its ACP-hosted agents are sovereign (BUG-829).'
   gate: 'pipeline: ln -s /Applications/Zed.app/Contents/MacOS/cli ~/.local/bin/zed
     (owner action, no supply chain), then zed <path>:<line>. Recorded as a REVIEW
     surface only - Zed has no headless mode, so nothing is delegated to it (D-3019).
@@ -1103,7 +1134,8 @@ tasks:
     written_by: the declaration in config/derivations.yaml is the one the rails read.'
 - id: T-149
   priority: MUST
-  state: open
+  state: done
+  closed: '2026-10-15'
   mover: pipeline
   title: 'CALL THE TWO GUARDS THAT ALREADY EXIST, IN PREFLIGHT: the duplicate-key
     checker and the delegation doctor'
@@ -1111,7 +1143,12 @@ tasks:
     passed) + the delegation guards (D-3020)
   evidence: 'python3 scripts/check_config_duplicate_keys.py  # exists since BUG-730,
     found the live defect in one second and was not in just preflight; python3 pipeline/subagent_fanout.py
-    doctor  # 8/8 on 2026-10-15'
+    doctor  # 8/8 on 2026-10-15. DONE 2026-10-15: both commands are in `just preflight`
+    (justfile, immediately after the decision-summary check) and both FAIL the run
+    (`|| { echo ...; exit 1; }`). The duplicate-key checker is green 135/135; the doctor is green
+    6/6 decided, 2 undecided. WIRING THE SECOND GUARD FOUND A DEFECT IN IT: `doctor` read the
+    LEDGER OF EVERY RUN EVER as if it were the plan and returned rc 1 against history (BUG-826),
+    which is why the doctor was repaired to tri-state verdicts BEFORE it was obeyed.'
   gate: 'pipeline: add both commands to `just preflight`; the gate is that preflight
     FAILS when a config loses a key to a duplicate or the delegation guards cannot
     decide (an instrument that is never called is not a guard)'
@@ -1156,3 +1193,55 @@ tasks:
   gate: 'pipeline: either a reader exists that loads it at boot (and the parse is
     then gated), or the file carries an explicit proposal-only marker so a future
     reader does not mistake it for a contract'
+
+- id: T-153
+  priority: SHOULD
+  state: open
+  mover: pipeline
+  title: 'MEASURE THE CLASS REPRESENTATIVE BEFORE BUYING Edge0: the served 35B-A3B MoE can
+    decide T-145 with zero bytes downloaded'
+  source: T-145; D-3017; BUG-805 (prefill must be measured at the class context size)
+  evidence: 'MEASURED 2026-10-15: Edge0 is a 4-bit affine Qwen3.5/3.6-family MoE whose
+    model_type the engine ALREADY serves as Ornith-1.5-35B-A3B-OptiQ-4bit-REAP-19B, and the
+    binding constraint on the agent_loop class is the PREFILL BILL at the 26214-token working
+    set, not the architecture. So the download cannot answer a question the resident model
+    cannot: measure Ornith-1.5-35B-A3B-REAP-19B prefill and decode at 26214 tokens. If it fits
+    the owner 90 s per-turn knob, agent_loop should move to it (a far stronger model, 0 GB
+    fetched); if it does not, Edge0 does not either, because it is the same class.'
+  gate: 'pipeline: run the class-context measurement (prefill + decode at 26214 tokens) against
+    the resident Ornith-1.5-35B-A3B-REAP-19B and record the verdict on T-145. This REPLACES the
+    download as the release condition.'
+- id: T-154
+  priority: MUST
+  state: open
+  mover: pipeline
+  title: 'BOUND THE HARNESS THE WAY ITS CLASS DECLARES: transcript-aware liveness, a stall
+    threshold above the longest measured turn, and a per-class token ceiling'
+  source: BUG-828; D-3017; config/engine.yaml#fanout.guards
+  evidence: 'MEASURED 2026-10-15 on harness_20261015a: (1) a healthy harness read
+    `idle_s=66.6 stalled=True` because progress counts only 10_report/20_answer/run.log while pi
+    streams its transcript to ~/.pi/agent/sessions; (2) one turn took 45.58 s against the declared
+    stall_s=45, so the flag fires by construction; (3) the turn ceiling is the ENGINE global
+    sampling.max_tokens=32768 (~20 min at the measured 27.4 tok/s) against the owner 90 s per-turn
+    knob, and pi sends max_tokens=None, so the workstream wall is the only bound that bites.'
+  gate: 'pipeline: a harness workstream sets PI_CODING_AGENT_DIR inside its own workstream dir (the
+    knob the engine integration honours), research_run counts progress recursively over the
+    workstream dir, the stall threshold is declared above the longest measured turn of the class,
+    and the per-turn token ceiling is declared per class. Proof: a live harness run that is BUSY
+    (not merely alive) while it works and is never reported stalled.'
+- id: T-155
+  priority: SHOULD
+  state: open
+  mover: pipeline
+  title: 'A REFUTED CITATION EARNS ONE RETRY ON A DIFFERENT FAMILY, not just a red receipt'
+  source: BUG-827; D-3022; D-3020 (max_attempts + R5)
+  evidence: 'MEASURED 2026-10-15: `citations --answer` refutes a fabricated answer in one second
+    (8 citations, 13 refuted claims) but the run still ends there - the receipt is honest and the
+    delegation is spent. `fanout.guards.retry_on` lists EMPTY/FAILED/TIMEOUT/STALLED and a refuted
+    citation is none of those, so the guard chain detects the failure and does nothing with it.'
+  gate: 'pipeline: retry_on gains CITATION_REFUTED, the retry must use another family (R5, already
+    enforced), and the receipt records both attempts. Proof: a task whose first answer is fabricated
+    is re-asked once and the second answer is citation-checked. BOUNDARY (from BUG-831): the check is
+    against the file AS IT IS NOW, so a refutation can mean the file MOVED rather than that the answer
+    lied; a retry policy must therefore re-check the citation against the file at the answer own
+    timestamp where one exists, and must never spend a retry on line drift alone.'

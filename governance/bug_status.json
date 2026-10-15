@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 588,
-  "open_n": 220,
-  "closed_n": 368,
+  "total_ids": 594,
+  "open_n": 222,
+  "closed_n": 372,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -1107,6 +1107,16 @@
       "id": "BUG-821",
       "title": "(MED - OPEN 2026-10-15) - the census could not count 16 records because the mint path was bypassed, so four faces quoted a stale total for t",
       "events": 1
+    },
+    {
+      "id": "BUG-828",
+      "title": "(MED - OPEN 2026-10-15) - the deployed harness is not bounded by the declared budgets: the liveness signal cannot see it, and one turn outla",
+      "events": 1
+    },
+    {
+      "id": "BUG-829",
+      "title": "(MED - OPEN 2026-10-15) - the review surface's own agent panel defaults to a CLOUD provider",
+      "events": 1
     }
   ],
   "closed": [
@@ -1477,6 +1487,10 @@
     "BUG-822",
     "BUG-823",
     "BUG-824",
-    "BUG-825"
+    "BUG-825",
+    "BUG-826",
+    "BUG-827",
+    "BUG-830",
+    "BUG-831"
   ]
 }

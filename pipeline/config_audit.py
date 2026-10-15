@@ -37,6 +37,12 @@ CONFIG_TO_CODE: dict[str, tuple[str, str, str]] = {
     "stage2.max_cluster_samples":              ("pipeline.stage2_extract", "MAX_CLUSTER_SAMPLES", "int"),
     "stage2.max_probe_samples":                ("pipeline.stage2_extract", "S2_MAX_PROBE_SAMPLES", "int"),
     "stage2.split_probe_kmeans_random_state":  ("pipeline.stage2_extract", "SPLIT_KMEANS_RANDOM_STATE", "int"),
+    # ── Delegation guards (D-3020 / BUG-809, BUG-830) ──
+    # research_run kept a SECOND copy of two values the guards already declare; preflight turned red
+    # on them on 2026-10-15, which is how a second home is supposed to be found.
+    "engine.yaml#fanout.guards.default_timeout_s": ("pipeline.research_run", "DEFAULT_TIMEOUT_S", "int"),
+    "engine.yaml#fanout.guards.stall_s":           ("pipeline.research_run", "DEFAULT_STALL_S", "int"),
+    "engine.yaml#model_store.census_move_ratio":   ("pipeline.model_store_census", "MOVE", "float"),
     # ── Stage 1.5 (embedding) ──
     "stage1_5.embed_model_hf":     ("pipeline.pipeline_paths", "S15_EMBED_MODEL_HF", "str"),
     "stage1_5.embed_dim":          ("pipeline.pipeline_paths", "S15_EMBED_DIM", "int"),
@@ -112,6 +118,10 @@ ACKNOWLEDGED_HARDCODED: set[str] = {
     "E2E_SINGLE_SOURCE_MIN_PASS_RATE",  # e2e_test.py — except fallback (mirrors e2e.corpus_aware_pass_rate.single_source_min_pass_rate=0.20)
     "INTERVAL",              # n2_watchdog.py — 300s polling loop (P3: migrate to config.stage2.watchdog_interval)
     "TRADITIONAL_EXTRACT_SECONDS",  # hybrid_gate_ab.py — documented benchmark estimate, not a runtime threshold
+    "POLL_S",                # research_run.py — the watch loop's CADENCE (2 s), not a policy value: the
+                             # budget it serves is declared (fanout.guards), the interval is implementation
+    "TEMPERATURE",           # oneshot_ask.py — R7 mandates temp=0.0 on every generation script; a
+                             # CONSTITUTIONAL constant, so making it configurable would make R7 violable
 }
 
 
@@ -123,8 +133,34 @@ def load_config() -> dict:
         return yaml.safe_load(f)
 
 
+_OTHER_HOMES: dict[str, dict] = {}
+
+
+def other_home(name: str) -> dict:
+    """Load a DECLARED config home by file name, so a registry entry can name where a value LIVES.
+
+    engine.yaml facts are not in pipeline_config.yaml, and copying them there to satisfy this audit
+    would create the second home the audit exists to prevent (C12). A key path may therefore be
+    written `engine.yaml#fanout.guards.stall_s`.
+    """
+    if name not in _OTHER_HOMES:
+        path = Path(__file__).resolve().parent.parent / "config" / name
+        if not path.exists():
+            raise SystemExit(f"FATAL: the audit registry names config home {name!r}, which does not exist "
+                             f"at {path} - a registry entry that cannot be checked is worse than none")
+        import yaml
+        _OTHER_HOMES[name] = yaml.safe_load(path.read_text()) or {}
+    return _OTHER_HOMES[name]
+
+
 def get_config_value(cfg: dict, key_path: str):
-    """Get nested config value by dotted path. Returns None if missing."""
+    """Get nested config value by dotted path. Returns None if missing.
+
+    A `FILE#dotted.path` path is resolved against that file (see other_home).
+    """
+    if "#" in key_path:
+        home, _, rest = key_path.partition("#")
+        return get_config_value(other_home(home), rest)
     parts = key_path.split(".")
     val = cfg
     for p in parts:

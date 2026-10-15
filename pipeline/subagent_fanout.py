@@ -113,6 +113,87 @@ def answer_verdict(path: pathlib.Path, min_chars: int) -> tuple[bool, str]:
     return True, f"ok, {len(text)} chars"
 
 
+CITATION = re.compile(r"(?<![\w/])([A-Za-z0-9_][A-Za-z0-9_./-]*\.(?:py|ya?ml|json|md|sh|toml|txt)):(\d{1,6})")
+PATHISH = re.compile(r"(?<![\w/])([A-Za-z0-9_][A-Za-z0-9_./-]*\.(?:py|ya?ml|json|md|sh|toml|txt))")
+LINE_ONLY = re.compile(r"\bLines?\s+(\d{1,6})\b", re.I)
+BACKTICK = re.compile(r"`([^`\n]+)`")
+CODEY = re.compile(r"[^A-Za-z0-9\s]|_")     # a fragment with punctuation or an underscore is a QUOTE
+# A LABEL is how a model announces that the next line is the code it means: "**Exact Code:** `frag`".
+# Requiring a label is what keeps the lookahead below from turning ordinary prose into a failed citation.
+QUOTE_LABEL = re.compile(r"^\s*[>*-]*\s*(?:\*\*)?\s*(?:exact\s+code|code|quoted?|reads|says|exact)\b", re.I)
+
+
+def citation_defects(text: str) -> tuple[int, list[str]]:
+    """Check every file:line an answer cites, against the file itself. Returns (checked, defects).
+
+    WHY THIS EXISTS (BUG-721, re-measured live on the FIRST harness job, 2026-10-15): asked to find
+    assertions in two files, the deployed agent_loop model returned EIGHT file:line citations and
+    every one pointed at unrelated code - it "quoted" `word = "DONE"` at a line that reads
+    `if len(text) < min_chars:`. The answer was 1,737 chars, exited 0, cleared the length floor and
+    was graded DONE. Nothing in the guard chain could see it, because not one of them READ THE FILE.
+
+    A citation is a claim about a file, and a claim about a file is decidable in one second. This is
+    the R5 duty made mechanical: the verifier of a citation need not be a smarter model, it must be a
+    reader. THREE SHAPES are read, because all three are what models actually write: `path.py:111` inline,
+    a `path.py (line 111)` pair, and a `path.py` heading followed by `Line 111:` bullets. A quote on the
+    NEXT line is read only when that line LABELS itself as the code (`**Exact Code:**`) and carries no
+    citation of its own. Everything is checked against the file AS IT IS NOW, so a refutation of an answer
+    written BEFORE an edit means the file MOVED - the guard is meant for a receipt minutes after the answer,
+    not for archaeology. A prose reference (no punctuation, like `the grader`) is never treated as a quote,
+    so a loose answer is not failed for being loose.
+    """
+    checked, defects, context = 0, [], None
+    answer_lines = text.splitlines()
+    for i, raw in enumerate(answer_lines):
+        targets = [(m.group(1), int(m.group(2)), m.start(), m.end()) for m in CITATION.finditer(raw)]
+        if not targets:
+            line_only = LINE_ONLY.search(raw)
+            named = PATHISH.findall(raw)
+            # A line that NAMES its own file beats one inherited from a heading, or a heading over file A
+            # would check a citation to file B against file A (a false refutation).
+            if line_only and len(set(named)) == 1:
+                targets = [(named[0], int(line_only.group(1)), line_only.start(), line_only.end())]
+            elif line_only and context:
+                targets = [(context, int(line_only.group(1)), line_only.start(), line_only.end())]
+            elif len(set(named)) == 1 and not line_only:
+                context = named[0]         # a heading names the file the following Line N: refer to
+                continue
+            else:
+                continue
+        for index, (path, line_no, _, end) in enumerate(targets):
+            window_end = targets[index + 1][2] if index + 1 < len(targets) else len(raw)
+            frags = [f for f in BACKTICK.findall(raw[end:window_end]) if CODEY.search(f)]
+            if not frags and i + 1 < len(answer_lines):
+                # THE LABELLED ADJACENT QUOTE, and it is not a hypothetical: measured 2026-10-15, an R5
+                # reviewer wrote `**File:line:** pipeline/config_audit.py (line 110)` followed by
+                # `**Exact Code:** if not path.exists(): raise SystemExit(...)` - and line 110 actually
+                # reads `ACKNOWLEDGED_HARDCODED: set[str] = {`. Without this lookahead the checker
+                # certified the line, never read the quote, and reported `0 refuted` on a fabrication
+                # (BUG-831). The label is required so that a merely NEARBY fragment is not guessed at;
+                # and a line that carries its own citation is never borrowed.
+                nxt = answer_lines[i + 1]
+                if QUOTE_LABEL.match(nxt) and not CITATION.search(nxt) and not LINE_ONLY.search(nxt):
+                    frags = [f for f in BACKTICK.findall(nxt) if CODEY.search(f)]
+            checked += 1
+            target = ROOT / path
+            if not target.exists():
+                alt = pathlib.Path(path)
+                if not alt.exists():
+                    defects.append(f"cites {path}:{line_no} and no such file exists")
+                    continue
+                target = alt
+            lines = target.read_text(errors="replace").splitlines()
+            if line_no > len(lines):
+                defects.append(f"{path}:{line_no} is past the end of the file ({len(lines)} lines)")
+                continue
+            actual = " ".join(lines[line_no - 1].split())
+            for frag in frags:
+                quote = " ".join(frag.split())
+                if quote and quote not in actual:
+                    defects.append(f"{path}:{line_no} is quoted as `{quote}` but that line reads: {actual[:120] or '(blank)'}")
+    return checked, defects
+
+
 def grade(answer: pathlib.Path, rc: int, min_chars: int, report: pathlib.Path) -> int:
     """Write the workstream's OWN terminal line from the evidence, never from an expectation.
 
@@ -413,12 +494,18 @@ def receipt(run_id: str) -> int:
             except Exception as exc:  # reported, never swallowed (C16)
                 print(f"warn: unreadable task.json for {r['ws']}: {type(exc).__name__}: {exc}")
         ok, why = answer_verdict(wsd / "20_answer.md", floor)
+        # A DELIVERABLE WHOSE CITATIONS ARE REFUTED IS NOT A DELIVERABLE (BUG-721). The verdict above
+        # cannot see it: a fabricated answer is long, exits 0 and reads DONE.
+        cited, cdefs = ((0, []) if not (wsd / "20_answer.md").exists()
+                        else citation_defects((wsd / "20_answer.md").read_text(errors="replace")))
         tid = str(meta.get("id") or r["ws"])
         entry = by_id.setdefault(tid, {"id": tid, "state": "PENDING", "attempts": []})
         entry["attempts"].append({"ws": r["ws"], "state": r["state"], "model": meta.get("model"),
                                   "attempt": meta.get("attempt", 1), "elapsed_s": r["elapsed_s"],
                                   "idle_s": r.get("idle_s"), "terminal": r.get("terminal"),
-                                  "answer_usable": ok, "answer_note": why})
+                                  "answer_usable": ok, "answer_note": why,
+                                  "citations_checked": cited, "citations_refuted": len(cdefs),
+                                  "citation_defects": cdefs[:5]})
     for entry in by_id.values():
         entry["state"] = task_state(entry["attempts"])
     tasks = [by_id[k] for k in sorted(by_id)]
@@ -433,8 +520,16 @@ def receipt(run_id: str) -> int:
         trail = " -> ".join(f"{a['state']}({a['model']})" for a in t["attempts"])
         print(f"  {t['id']:<20} {t['state']:<8} {len(t['attempts'])} attempt(s): {trail}")
     print(f"  {rec['done']}/{rec['total']} task(s) DONE")
+    refuted = [(t["id"], a) for t in tasks for a in t["attempts"] if a.get("citations_refuted")]
+    for tid, a in refuted:
+        print(f"  REFUTED CITATION  {tid}/{a['ws']}: {a['citations_refuted']} refuted claim(s) across "
+              f"{a['citations_checked']} citation(s) - the answer is not a deliverable")
+        for d in a.get("citation_defects", [])[:2]:
+            print(f"      {d}")
     if counts.get("RUNNING") or counts.get("PENDING"):
         return PENDING
+    if refuted:
+        return FATAL
     if rec["done"] < rec["total"]:
         return FATAL
     return OK
@@ -505,6 +600,29 @@ def _served() -> set[str]:
         return set()
 
 
+def _plan_models(tasks_file: pathlib.Path | None) -> list[str]:
+    """The models a PLAN will use. No plan -> the empty list: history is not a plan (see doctor)."""
+    if not tasks_file:
+        return []
+    import yaml
+    return [str(t["model"]) for t in (yaml.safe_load(tasks_file.read_text()) or {}).get("tasks", [])]
+
+
+def _served_check(models: list[str], served: set[str]) -> tuple[bool | None, str]:
+    """Is every model the plan names actually served? UNDECIDED (None) when there is no plan."""
+    if not models:
+        return None, "no plan given - pass --tasks to decide this"
+    unserved = sorted({m for m in models if served and m not in served})
+    return (not unserved), (f"not served: {unserved}" if unserved else f"{len(set(models))} distinct model(s) checked")
+
+
+def _retry_check(fallback: str, models: list[str]) -> tuple[bool | None, str]:
+    """R5: is the retry target DIFFERENT from the model(s) the plan will use? None = no plan to ask about."""
+    if not models:
+        return None, f"no plan given - fallback is {fallback}, nothing to compare it against"
+    return (fallback not in set(models)), f"fallback={fallback}"
+
+
 def doctor(tasks_file: pathlib.Path | None = None) -> int:
     """Preflight: refuse to start a delegation that cannot be sound. Print every check, fail on any.
 
@@ -514,9 +632,13 @@ def doctor(tasks_file: pathlib.Path | None = None) -> int:
     model that failed. An instrument that cannot decide says so and stops (D-3015).
     """
     bad = 0
-    checks: list[tuple[str, bool, str]] = []
+    # ok is TRI-STATE: True / False / None. None means UNDECIDED - the check had nothing to decide,
+    # which is a verdict and must be printed as one. A check that cannot decide must never print as
+    # a pass (measured 2026-10-15: doctor read 7/8 against the LEDGER OF EVERY RUN EVER, so the R5
+    # retry check failed against a historical plan while the check that "passed" had checked nothing).
+    checks: list[tuple[str, bool | None, str]] = []
 
-    def add(name: str, ok: bool, why: str = "") -> None:
+    def add(name: str, ok: bool | None, why: str = "") -> None:
         checks.append((name, ok, why))
 
     try:
@@ -529,24 +651,18 @@ def doctor(tasks_file: pathlib.Path | None = None) -> int:
 
     served = _served()
     add("the engine answers /v1/models", bool(served), f"{len(served)} served id(s)")
-    models: list[str] = []
-    if tasks_file:
-        import yaml
-        models = [str(t["model"]) for t in (yaml.safe_load(tasks_file.read_text()) or {}).get("tasks", [])]
-    elif (RUNS).exists():
-        for run in sorted(p for p in RUNS.glob("*") if p.is_dir()):
-            for tj in run.glob("fan_*/task.json"):
-                try:
-                    models.append(str(json.loads(tj.read_text())["model"]))
-                except Exception:
-                    pass
-    unserved = sorted({m for m in models if served and m not in served})
-    add("every task model is served by the engine", not unserved,
-        f"not served: {unserved}" if unserved else f"{len(set(models))} distinct model(s) checked")
+    # THE PLAN, OR NOTHING. R5's retry question ("is the retry model the model that failed?") is a
+    # property of a PLAN. Reading it off every run directory instead asks the question of delegations
+    # that already finished, so a fallback model that was some task's model YESTERDAY fails a doctor
+    # run for a plan that does not exist yet - a false FAIL, which teaches an operator to ignore the
+    # guard. With no plan in hand the honest verdict is UNDECIDED, and a check that decided nothing
+    # must never print as a pass either.
+    models = _plan_models(tasks_file)
+    add("every task model is served by the engine", *_served_check(models, served))
     if g:
+        fallback = str(g["fallback_model"])
         add("the retry model is not a task model (R5: a retry may not repeat the failing model)",
-            str(g["fallback_model"]) not in set(models),
-            f"fallback={g['fallback_model']}")
+            *_retry_check(fallback, models))
         add("the retry model itself is served", bool(served) and str(g["fallback_model"]) in served,
             str(g["fallback_model"]))
     add("the run root is writable", RUNS.exists() and RUNS.is_dir(), str(RUNS))
@@ -560,9 +676,12 @@ def doctor(tasks_file: pathlib.Path | None = None) -> int:
         f"stuck: {stuck[:5]}" if stuck else "ledger reconcilable")
 
     for name, ok, why in checks:
-        print(f"  [{'ok' if ok else 'FAIL'}] {name}{'  ' + why if why else ''}")
-        bad += 0 if ok else 1
-    print(f"doctor: {len(checks) - bad}/{len(checks)}")
+        verdict = "undecided" if ok is None else ("ok" if ok else "FAIL")
+        print(f"  [{verdict}] {name}{'  ' + why if why else ''}")
+        bad += 0 if ok is not False else 1
+    und = sum(1 for _, ok, _ in checks if ok is None)
+    decided_n = len(checks) - und
+    print(f"doctor: {decided_n - bad}/{decided_n} decided" + (f", {und} undecided (nothing to decide)" if und else ""))
     return FATAL if bad else OK
 
 
@@ -653,6 +772,49 @@ def selftest() -> int:
     checks.append(("the_pool_cap_counts_each_running_workstream_exactly_once",
                    cap_leak not in pathlib.Path(__file__).read_text()))
 
+    # A CHECK THAT DECIDED NOTHING MUST NOT READ AS A PASS (BUG-826). doctor was reading the LEDGER OF
+    # EVERY RUN EVER as if it were the plan, so the R5 check failed against a historical plan while the
+    # check beside it "passed" having checked nothing.
+    checks.append(("a_doctor_with_no_plan_reads_UNDECIDED_not_FAIL", _retry_check("m", [])[0] is None))
+    checks.append(("a_plan_whose_task_model_IS_the_retry_model_reads_FAIL", _retry_check("m", ["m"])[0] is False))
+    checks.append(("a_plan_whose_task_model_differs_from_the_retry_model_reads_ok", _retry_check("m", ["n"])[0] is True))
+    checks.append(("a_served_check_with_no_plan_reads_UNDECIDED", _served_check([], {"a"})[0] is None))
+    checks.append(("a_served_check_still_fails_on_an_unserved_plan_model", _served_check(["ghost"], {"a"})[0] is False))
+
+    # BUG-721, MADE MECHANICAL: a citation is a claim about a file, so it is checkable without a model.
+    bad_ans = 'pipeline/subagent_fanout.py:1 `word = "DONE"` asserts the terminal word'
+    checks.append(("a_fabricated_citation_is_refuted", len(citation_defects(bad_ans)[1]) == 1))
+    src = (ROOT / "pipeline/subagent_fanout.py").read_text().splitlines()
+    n = next(i for i, line in enumerate(src, 1) if "def grade(" in line)
+    good_ans = f"see pipeline/subagent_fanout.py:{n} `def grade(` for the only writer of the word"
+    checks.append(("a_true_citation_passes", citation_defects(good_ans)[1] == []))
+    checks.append(("a_citation_past_the_end_of_the_file_is_refuted",
+                   len(citation_defects("pipeline/subagent_fanout.py:999999 `x = 1`")[1]) == 1))
+    checks.append(("a_citation_to_a_file_that_does_not_exist_is_refuted",
+                   len(citation_defects("pipeline/no_such_module_xyz.py:3 `x = 1`")[1]) == 1))
+    checks.append(("an_answer_with_no_citation_checks_nothing_not_passing",
+                   citation_defects("the code looks fine to me")[0] == 0))
+    checks.append(("a_prose_reference_is_never_read_as_a_quote",
+                   citation_defects(f"see pipeline/subagent_fanout.py:{n} for the grader")[1] == []))
+    # BUG-831: the quote that sits on a LABELLED NEXT LINE must be tied to the citation, or a fabricated
+    # "Exact Code:" walks through - which it did, in the R5 review of this very function.
+    checks.append(("a_fabricated_quote_on_a_labelled_next_line_is_refuted",
+                   len(citation_defects(f"File:line: pipeline/subagent_fanout.py (line {n})\n"
+                                        'Exact Code: `word = "DONE"`')[1]) == 1))
+    checks.append(("an_honest_quote_on_a_labelled_next_line_is_not_refuted",
+                   citation_defects(f"File:line: pipeline/subagent_fanout.py (line {n})\n"
+                                    "Exact Code: `def grade(`")[1] == []))
+    checks.append(("a_fragment_on_an_UNLABELLED_next_line_is_not_guessed_at",
+                   citation_defects(f"see pipeline/subagent_fanout.py:{n}\n"
+                                    "and `something_else_entirely` elsewhere")[1] == []))
+    checks.append(("a_next_line_with_its_own_citation_is_never_borrowed",
+                   citation_defects(f"see pipeline/subagent_fanout.py:{n}\n"
+                                    "Exact Code: `def grade(` (pipeline/research_run.py:1)")[1] == []))
+    checks.append(("a_line_naming_its_own_file_is_checked_against_THAT_file",
+                   len(citation_defects("### 1. `pipeline/research_run.py`\n"
+                                        "File:line: `pipeline/subagent_fanout.py` (line 1)\n"
+                                        'Exact Code: `word = "DONE"`')[1]) == 1))
+
     bad = 0
     for name, ok_ in checks:
         print(f"  [{'ok' if ok_ else 'FAIL'}] {name}")
@@ -677,12 +839,26 @@ def main(argv: list[str]) -> int:
     v.add_argument("--model", required=True); v.add_argument("--out", required=True)
     gr = sub.add_parser("_grade"); gr.add_argument("--answer", required=True); gr.add_argument("--rc", required=True)
     gr.add_argument("--min-chars", required=True); gr.add_argument("--report", required=True)
+    ci = sub.add_parser("citations"); ci.add_argument("--answer", required=True)
     args = ap.parse_args(argv)
 
     if args.selftest:
         return selftest()
     if args.verb == "_grade":
         return grade(pathlib.Path(args.answer), int(args.rc), int(args.min_chars), pathlib.Path(args.report))
+    if args.verb == "citations":
+        a = pathlib.Path(args.answer)
+        if not a.exists():
+            print(f"FATAL: no answer file at {a}")
+            return FATAL
+        checked, defects = citation_defects(a.read_text(errors="replace"))
+        for d in defects:
+            print(f"  REFUTED  {d}")
+        if not checked:
+            print("citations: none to check - this answer makes no checkable claim about a file")
+            return PENDING
+        print(f"citations: {checked} citation(s) checked, {len(defects)} refuted claim(s)")
+        return FATAL if defects else OK
     if args.verb == "doctor":
         return doctor(pathlib.Path(args.tasks) if args.tasks else None)
     if args.verb == "run":

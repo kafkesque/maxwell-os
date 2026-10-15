@@ -36,7 +36,28 @@ HUB = HOME / ".cache" / "huggingface" / "hub"
 REF_ROOTS = ("config", "pipeline", "scripts")
 REF_SUFFIXES = (".yaml", ".yml", ".py", ".json", ".toml", ".sh", ".md")
 SKIP = (".bak", "archive/", "__pycache__")
-MOVE = 0.05
+
+
+def _census_move_ratio() -> float:
+    """The declared tolerance for 'the census moved', read from its one home (C12).
+
+    This ratio decides whether a RE-MEASURE counts as movement: below it, two readings are the same
+    measurement and reporting movement would be noise. It was a literal here until 2026-10-15, when
+    `just preflight` turned red on it while config/engine.yaml#model_store already had a home for
+    store facts - the second copy of a declared value (BUG-830).
+    """
+    import yaml
+    home = pathlib.Path(__file__).resolve().parent.parent / "config" / "engine.yaml"
+    if not home.exists():
+        raise SystemExit(f"FATAL: {home} is absent - it is the one home for the census tolerance (C12)")
+    row = (yaml.safe_load(home.read_text()) or {}).get("model_store") or {}
+    if "census_move_ratio" not in row:
+        raise SystemExit("FATAL: config/engine.yaml#model_store declares no census_move_ratio - "
+                         "refusing to invent a tolerance (C12)")
+    return float(row["census_move_ratio"])
+
+
+MOVE = _census_move_ratio()
 
 
 def dir_bytes(path: pathlib.Path) -> int:

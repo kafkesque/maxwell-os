@@ -339,6 +339,7 @@ may_touch:
 - temp/land_20261015h.py
 - temp/fanout_20261015h.yaml
 - temp/mint_20261015h.yaml
+- governance/SESSION-HANDOFF-20261015-D3021.md
 - temp/mint_20261015g.yaml
 will_not_touch:
 - governance/F11_*

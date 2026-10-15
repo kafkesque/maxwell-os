@@ -60,13 +60,12 @@ preconditions:
       keepalive is read as the model''s final response, so the loop ends empty and exits 0)'
     check: 'python3 pipeline/subagent_fanout.py run --tasks temp/t154_harness_proof.yaml --run t137_preflight
       -> 98_receipt.json reads DONE for the task, not EMPTY'
-    state: 'UNMET 2026-10-15 - measured empty (responseModel: keepalive); remedy is the owner''s (T-162)'
+    state: 'MET 2026-10-15 - t137_preflight 98_receipt.json reads DONE (1009 chars, 46.6s); T-162 keepalive fix live'
   P2_bounds_are_bound:
     what: 'every class bound recomputes without a contradiction AND the harness class ceiling is BOUND where it
       bites, not merely declared (T-161)'
     check: 'python3 pipeline/research_run.py --check -> rc 0'
-    state: 'UNMET 2026-10-15 - rc 2 (OWNER-OWED: ~/.omlx/model_settings.json#models is empty, so the class still
-      inherits the global 32768 = ~20 min against the owner''s 90 s per-turn knob)'
+    state: 'MET 2026-10-15 - research_run --check rc 0; gemma-4-E4B max_tokens=3266 bound (T-161)'
 
 terminal_condition:
   pass: every metric meets bar across >= min_sealed_runs sealed runs
@@ -75,3 +74,9 @@ terminal_condition:
 gate:
   on_pass: run pipeline/apply_provider_flip.py --apply-flip
   on_fail: record bug, re-baseline the declared bar (never loosen a bar silently)
+  blocked_by: 'BUG-832 (OPEN): the local session-brain route is REFUTED BY MEASUREMENT - gemma-4-E4B and
+    Qwen3-Coder both score 0.0 on long_context_reasoning_16k (config/harness_policy.yaml), so flipping
+    active_provider -> maxwell_omlx/gemma-4-E4B is a measured DOWNGRADE, not an upgrade. The flip stays
+    blocked until T-157 censuses the harness homes AND the owner DECIDES the brain explicitly (BUG-832
+    remedy #2). Note also the A/B itself has no runner and its cache bar (5.0) is already DISPROVEN
+    (measured 1.01), so on_pass cannot fire on the declared metrics.'

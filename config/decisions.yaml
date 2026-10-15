@@ -25217,3 +25217,43 @@ decisions:
     production imports) AND it clears a declared AGREEMENT FLOOR against a labelled reference set with abstention
     outside it; and any change to the derived route it proposes is an A/B with a named bar and a deterministic checker
     (D-3026), never a preference.'
+- id: D-3028
+  state: ACTIVE
+  category: STRATEGY / PROVIDER POSTURE
+  title: DeepSeek stays the main brain; local models are the outsourcing fleet promoted to a slot only by measured
+    clearance - the session-brain provider flip is SUPERSEDED
+  bugs:
+  - BUG-832
+  - BUG-836
+  files:
+  - config/harness_policy.yaml
+  - pipeline/apply_provider_flip.py
+  - config/ab_harness_t137.yaml
+  created: '2026-10-15'
+  decision: 'The owner''s directive (2026-10-15) resolves the D-295 vs BUG-832 conflict. The session brain REMAINS
+
+    DeepSeek (active_provider custom_deepseek, deepseek-v4-pro); the local maxwell_omlx fleet is used to
+
+    OUTSOURCE as many subtasks as possible - each subtask routed to a local model only where that model
+
+    MEASURES at or above the task''s declared bar (config/harness_policy.yaml capability_axes), never where
+
+    it scores 0.0 on the task''s defining axis. D-295''s RESOLVED remedy (flip active_provider to
+
+    maxwell_omlx) is superseded by this record.
+
+    MEASURED BASIS (BUG-832): gemma-4-E4B and Qwen3-Coder both score 0.0 on long_context_reasoning_16k -
+
+    the exact axis a session brain creates - so pipeline/apply_provider_flip.py --apply-flip would be a
+
+    measured DOWNGRADE, not an upgrade. Only Qwen3.8-27B clears 1.0 at ~672s per 26k-token turn,
+
+    disqualifying it as a brain today. Therefore: (1) no local model reaches the brain slot until T-156 /
+
+    T-157 MEASURE one clearing long_context_reasoning_16k; (2) the flip''s on_pass target is DECOMMISSIONED
+
+    for the session brain; (3) the local-outsourcing growth path is gated by T-163 (answer SHAPE check -
+
+    BUG-836) and T-156 (deterministic capability resolver).
+
+    '

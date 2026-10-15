@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1128 decisions (census stamp 309f8cf9a7f9a898, 2026-10-15) · 560 bugs (202 open / 358 closed; highest OPEN = BUG-796) · 26 open tasks (MUST 8 / SHOULD 15 / WORTH 3; OWNER-moved 3, pipeline-moved 23; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1128 decisions (census stamp 309f8cf9a7f9a898, 2026-10-15) · 566 bugs (206 open / 360 closed; highest OPEN = BUG-802) · 26 open tasks (MUST 8 / SHOULD 15 / WORTH 3; OWNER-moved 3, pipeline-moved 23; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **68** of 1128 — 🔴 open 32 · 🔵 proposed 15 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 565 · ⚖ ratified 135 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1128, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 202 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 31 · 🟨 MED 45 · 🟩 LOW 21 · UNLABELLED 101 (BUG-757) of 202 open.
+> Open BUGS by severity (population = the census's 206 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 31 · 🟨 MED 47 · 🟩 LOW 23 · UNLABELLED 101 (BUG-757) of 206 open.
 >
 > **OWNER LANE (3) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -13899,6 +13899,15 @@ harness's own compaction trigger (26,214 tokens) would cost **672 seconds**, and
 inherited: candidates are the `memory_guard_tier: aggressive` path, KV memory pressure at a large prompt, and
 `specprefill_enabled: False` on this model where comparable models have it on.
 
+**AMENDED 2026-10-15 (re-measured, same engine, two-point slope).** The DECODE figure in this entry (1.7
+tok/s) was a cold/pressured state, not the model: re-measured 2026-10-15 it decodes **7.5 tok/s**, a 4.4x
+correction. It remains the WORST of the eight models served here by 6.6x (the A3B MoE decodes 49.5, the 4B
+dense 36.3, the 12B 13.4). Its PREFILL figure (39 tok/s, 2026-10-14) is not contradicted by this run and
+stands as the reason it cannot hold a loop: 26214 / 39 = 672 s per turn, and its declared 262144 window is
+~1.9 hours of prefill. The entry's remedy is unchanged and still un-diagnosed: `specprefill_enabled: False`
+on this model in `~/.omlx/model_settings.json` while comparable models have it on, plus
+`memory_guard_tier: aggressive`.
+
 ## BUG-794 (LOW — FIXED 2026-10-14, same session) — an ESTIMATE of a prompt size published a truncation that did not exist
 
 **MEASURED, then RETRACTED, 2026-10-14.** The first version of this sweep's evidence reported that a prompt was
@@ -13960,3 +13969,95 @@ claim what the bytes ARE now"), which is honest hygiene and NOT a fix for this c
 already holds the bytes it just wrote, so this is one call at the write site — or let the control accept a
 VERIFIED ancestor and say which one, instead of demanding an exact post-image that the append-only mutual
 writes can never leave behind.
+
+## BUG-797 (MED — OPEN 2026-10-15) — the `llmfit` preflight cell is a control that CANNOT FAIL
+
+MEASURED 2026-10-15. `just preflight` (and therefore `just health`) declares a hardware-model-fit cell:
+`@llmfit 2>&1 | head -5 || echo "    ⚠️  llmfit unavailable"`. `llmfit` is NOT on the PATH the recipe runs
+with, so the line prints `llmfit unavailable` and the recipe stays GREEN — the R-03 control added to
+`just preflight` (governance/NOT-YET-EVALUATED-RESEARCH.md) has been a no-op since the day it landed.
+
+The tool is installed, twice, under two homes: a cargo binary at `~/.cargo/bin/llmfit` (reports
+`llmfit 0.9.38`) and a pip package reporting `1.1.6`, while the research docs cite "llmfit 1.1.6"
+(governance/MARKET-RESEARCH-QWEN3.8-HARNESS-2026-08-14.md). Two version homes and one unavailable command:
+a control whose failure mode is indistinguishable from its success mode (BUG-787's shape, one cell over).
+
+**Run for real 2026-10-15** (`~/.cargo/bin/llmfit --json system`): Apple M1 Max, 64 GB unified,
+400 GB/s memory bandwidth, 10 cores, Metal. `--json recommend` and `--json fit` DO work, so the fix is a
+declared invocation (absolute path or a PATH declaration), not a new dependency.
+**FIX (declared, not applied):** resolve `llmfit` by absolute path or declare the PATH in the recipe, and
+make an UNAVAILABLE tool a red or a NA — never a silent pass.
+
+## BUG-798 (MED — FIXED 2026-10-15, same session) — my own rename census scanned NAMES and read a FALSE GREEN
+
+MEASURED 2026-10-15, written in the same act that built the instrument (T-130's renamer). The first census
+of the approved corpus-name write reported `apply_ready: True` for all 37 rows: it counted SIBLING FILES,
+STAGE-OUTPUT FILENAMES and STORE ROWS, and every one of them read 0. A targeted grep then found the stems
+3,171 times INSIDE 13 derived artifacts that no filename scan could see —
+`checkpoints/stage4_merge|stage5_verify/diagnostic_*/checkpoint.jsonl`, `stage0_convert/*/checkpoint.jsonl`
+(`source_file`/`source_path`/`output_path`), `parquet/fbs_export_20260902_final.jsonl` (2,419 alone) — so
+an `--apply` would have left ~2,952 dangling references behind it: a cascade, signed off by an instrument
+that reported clean (the BUG-787 shape: a control reading the wrong surface stays green).
+
+**FIXED in the same act:** the census now scans the CONTENT of the declared artifact dirs
+(`name_normalisation.surfaces.artifact_dir_attrs: [CHECKPOINT_DIR, PARQUET_DIR]`,
+`artifact_suffixes: ['.jsonl','.json']`), and a 10th known-answer control asserts the boundary both ways
+(a content reference IS counted; a filename match with no content reference is NOT). The plan now reads
+`apply_ready: False` with all 37 rows refused and the artifact named per row.
+
+## BUG-799 (LOW — OPEN 2026-10-15) — two cache records duplicate ONE work under two raw names, and the door looks names up by BYTES
+
+MEASURED 2026-10-15 on the 962-record metadata cache: exactly 2 canonical keys hold more than one distinct
+raw `source_book` — `Identity Designed The Definitive Guide to Visual Branding by David Airey` and
+`Pricing Creativity A Guide to Profit Beyond the Billable Hour`, each appearing twice with a whitespace
+difference. Both pairs carry the SAME author and title, so both compute the SAME `source_id`
+(`bdb3a25d5707fafc`, `a4d8aacdbca22099`): the collapse is IDENTITY-PRESERVING and merges no distinct work
+(910 distinct source_ids survive; 962 -> 960 records).
+
+The defect is in the READER, not the corpus: `ingest_gate.corpus_census.record_for()` resolves a record by
+`by_name.get(path.name.strip())` and `by_path` — exact bytes, minus the ends — while the door's own
+comparison key `_key()` already collapses whitespace. So the door declares 37 corpus names DEFECTIVE and
+then depends on their exact bytes to find their identity. The durable fix is one canonical fallback in that
+lookup, and it needs a control of its own before it lands (BUG-492). Deliberately NOT applied this session.
+
+## BUG-800 (LOW — OPEN 2026-10-15) — the approved corpus-name rename is a CASCADE until it rides a re-ingest
+
+MEASURED 2026-10-15: the 37 defective corpus stems are referenced 2,952 times INSIDE 13 derived artifacts
+(the parquet export, the stage0/2/4/5 checkpoints and their `input_fbs`) — RUN RECEIPTS that record what a
+past run was given. The T-130 write approved 2026-10-15 renames the 37 files and rewrites the metadata
+cache (which it CAN do) but cannot rewrite a receipt without re-recording history (D-2642), so the plan
+REFUSES: `apply_ready: False`, 37/37 rows refused, each naming its artifact. The plan is written and
+waiting: `governance/normalise_corpus_names_plan_20261015.json`. The act becomes non-cascading when the
+artifacts are regenerated anyway, i.e. BUNDLED WITH A RE-INGEST — not against a live corpus.
+
+## BUG-801 (LOW — FIXED 2026-10-15, same session) — a prefill reading was published without the prompt SIZE it was taken at
+
+MEASURED 2026-10-15. The new decode probe derives prefill from the same two-call slope, and on a ~36-token
+prompt it read 331 tok/s for `gemma-4-E4B-it-MLX-4bit` — against the 2026-10-14 reading of 455 tok/s taken
+on 4,468 tokens. The two numbers are not comparable: a tiny prompt is dominated by fixed kernel and
+scheduling overhead (the same run's first 4-token call read 0.3 tok/s on a model that then read 13.2). A
+prefill figure is a function of prompt size, so a reading without its size is INCOMPARABLE, not merely
+imprecise — and the routing bill is a prefill bill.
+
+**FIXED in the same act:** the size dependency is DECLARED in
+`config/bench_preflight.yaml#prefill_bill.size_scale_guard` (`min_prompt_tokens_for_a_comparable_reading:
+2000`, `on_below_floor: report_incomparable`) and in `config/agent_context.yaml#measured_decode_20261015`.
+No routing row was changed on the strength of this run: the candidates remain REFUSED a route until a
+size-declared prefill reading exists (fail-closed).
+
+## BUG-802 (MED — OPEN 2026-10-15) — the $0 local engine does not survive a reboot, and nothing starts it
+
+MEASURED 2026-10-15. At session start `curl http://localhost:11435/health` returned `000` and
+`/v1/models` returned `000`: the engine was DOWN. Its own log shows a CLEAN shutdown at `2026-10-15
+02:11:21` ("Engine pool shutdown complete", every model unloaded, caches cleared) — so this was not a crash,
+it was a restart in which nothing brought the server back. `~/.omlx/bin/omlx start` brought it up in ~25 s
+and the decode probe then ran 4 models through it.
+
+The agent's $0 marginal cost (C1), its sovereignty (C3) and "resilient by design" (C23) all rest on this
+process. The launchd facts: `~/Library/LaunchAgents/com.maxwell.omlx-api-key.plist` only SETS AN ENV VAR;
+`com.maxwellos.watchdog.plist.DISABLED` and `com.maxwell.memoryguardian.plist.DISABLED` are both DISABLED.
+So after any reboot the whole local-capability layer is absent until a human types a command — including
+every delegate lane, the S4 classifier and the pipeline's generator.
+**FIX (declared, not applied):** a KeepAlive launchd job for the managed server (or a declared
+`omlx_watchdog.py --daemon` supervisor), plus a rail that reports the engine DOWN as a red rather than as a
+per-request failure discovered later.

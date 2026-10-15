@@ -73,3 +73,47 @@ content:
   title_report: governance/title_rename_candidates.json
   # A report OLDER than the newest corpus file certifies a corpus that no longer exists: measured, not assumed.
   staleness: fatal
+
+name_normalisation:
+  # T-130, OWNER-APPROVED 2026-10-15 ("Approve your T-130 Write recommendation"). The door's rc 2 named ONE
+  # debt whose remedy is a WRITE: 37 of 940 corpus stems carry a name defect. MEASURED 2026-10-15.
+  #
+  # THE REMEDY CLASS MUST EQUAL THE DEFECT CLASS. The defect is whitespace, so the write is WHITESPACE-ONLY.
+  # It deliberately does NOT run the file stem through `sanitize_source_book()` even though that function is
+  # one line away: the sanitizer ALSO strips piracy markers, and applying it would rename 571 names instead of
+  # 37 (571/962 cache names carry an ingest-site marker). That is a DIFFERENT debt with a different blast
+  # radius; widening this act's scope to cover it is how a bounded repair becomes a corpus-wide rewrite.
+  scope: whitespace_only
+  transform: whitespace_collapse_then_strip
+  transform_pattern: '\s{2,}'
+  invariant:
+    # The door compares names through ingest_gate._key() = sanitize_source_book(name).strip().lower(), which
+    # ALREADY collapses whitespace and strips. So these defects are STORAGE-non-canonicality, not ambiguity:
+    # the rename must leave the door's comparison key IDENTICAL, and a row that would move it is refused.
+    key_preserved: 'gate._key(stem_before) == gate._key(stem_after), computed with the door''s own function'
+    bytes_unchanged: 'sha256 before == after per row; a delta rolls the rename back mid-act'
+    suffix_unchanged: true
+    parent_unchanged: true
+    collision: refuse
+  # THE CASCADE IS MEASURED, NOT ASSUMED. A filename is referenced by things other than itself. The act can
+  # rewrite the metadata cache (it is the gate's own store of `source_book`); it CANNOT rewrite a stage-output
+  # filename or a store row, so a reference there makes the plan NOT apply-ready and the reason is printed.
+  # An absent surface reads as null with a reason and is never reported as zero (D-795).
+  surfaces:
+    stage_dir_attrs: [S0_DIR, S1_DIR, S13_DIR, S15_DIR, S2_DIR, S4_DIR, S5_DIR, S6_DIR]
+    # MEASURED 2026-10-15 (and the reason this key exists): a FILENAME-ONLY census read 0 references for
+    # every one of the 37 rows while the same stems sat 3,171 times INSIDE 13 derived artifacts - the
+    # parquet export (2,419), the stage0/stage2/stage4/stage5 checkpoints and their input_fbs. An instrument
+    # that scans names and not content reports a false green (the BUG-787 shape). These are RUN RECEIPTS:
+    # this act cannot rewrite them, so a hit here refuses the apply rather than dangling.
+    artifact_dir_attrs: [CHECKPOINT_DIR, PARQUET_DIR]
+    artifact_suffixes: ['.jsonl', '.json']
+    store_db_attrs: [DB_PATH]
+    store_columns:
+      - [fbs, source_books]
+      - [fbs, source_text]
+  plan: governance/normalise_corpus_names_plan_20261015.json
+  receipt: governance/normalise_corpus_names_receipt_20261015.json
+  reading: scripts/normalise_corpus_names.py
+  #: The door's own count of this debt (identity.name_defect_patterns above) is the DEFECT source of truth;
+  #: this act never re-declares the patterns (C12) and never invents a second census home.

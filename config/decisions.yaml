@@ -24569,7 +24569,7 @@ decisions:
 
 - id: D-3000
   date: '2026-10-14'
-  state: PROPOSED
+  state: RATIFIED
   category: AGENT HARNESS / CONTEXT & PREFIX CACHE
   title: 'The harness context contract: window parity is an invariant, the compaction trigger is derived from
     the SERVED window, a cache reading is never a fabricated zero, and a turn''s prefill BILL decides the route'
@@ -24580,6 +24580,8 @@ decisions:
   - BUG-793
   - BUG-794
   - BUG-795
+  - BUG-801
+  - BUG-802
   decision: >-
     (1) PARITY IS AN INVARIANT, NOT A COINCIDENCE. What the model SERVER serves and what the HARNESS is TOLD it
     serves must be equal, and the two directions fail DIFFERENTLY and are named separately: a served window

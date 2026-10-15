@@ -116,6 +116,28 @@ trigger:
   prefer: declared_handoff_over_in_place_compaction
   handoff_home: 'governance/session_plan_*.yaml + the session-resume skill'
 
+#: ── RATIFIED 2026-10-15 (owner: "Approve your ... T-132 recommendation") ──────────────────────────
+#: THE TWO KNOBS AN AGENT MUST NEVER CHOOSE FOR ITSELF are now DECLARED rather than inherited. Both values
+#: are the measurement's, not a preference's, and both are reversible by one word.
+ratified:
+  date: '2026-10-15'
+  by: owner
+  basis: 'the per-turn budget is the owner''s knob; the trigger is derived from it and from the served window'
+  knobs:
+    per_turn_budget_s: 60      # agent_loop class. MEASURED consequences: at 60 s the loop is the 4B;
+                               # at 180 s gpt-oss-20b becomes usable (26214/210 = 125 s); no budget
+                               # makes Qwen3.8-27B one (26214/39 = 672 s)
+    trigger:
+      GOOSE_CONTEXT_LIMIT: 32768              # declare the SERVED window; never inherit 128000
+      GOOSE_AUTO_COMPACT_THRESHOLD: 0.8       # right BY COINCIDENCE at 455 tok/s (58 s <= 60 s) and for
+                                              # the right reason only while the cache is DISPROVEN
+      GOOSE_AUTO_COMPACT_TOKEN_LIMIT: 32768   # the 225000 default is a cloud price-tier artifact (C1/C22)
+      max_compactions_per_session: 1
+      min_headroom_tokens: 2048
+      strategy: declared_handoff_first    # declared_handoff_over_in_place_compaction (above)
+  revisit_when: 'the block cache is PROVEN (F6/BUG-792): with a proven cache growth is nearly free and the
+                 threshold may rise toward the window; until then every rise buys prefill seconds per turn'
+
 #: LAYER 4. Cache accounting. A ratio is computed ONLY over rows that CARRY the field; the rows that do
 #: not are counted and REPORTED as unknown. A fabricated 0 is BUG-767's defect class, not a measurement.
 cache_accounting:
@@ -244,6 +266,76 @@ routing:
     Phi-4-mini-instruct-8bit: '26214 / 394 = 66 s — SIX SECONDS over the budget, and the budget is the owner''s knob'
     gpt-oss-20b-MXFP4-Q8: '26214 / 210 = 125 s — a usable PROBE, an unusable loop'
     Qwen3.8-27B-MLX-4bit: '26214 / 39 = 672 s — eleven minutes per turn; no budget makes this a loop'
+
+#: ── MEASURED 2026-10-15: THE DECODE AXIS, and the refinement it forced ────────────────────────────
+#: METHOD: two calls, ONE prompt, two max_tokens (64/320) -> decode_tps = (c2-c1)/(t2-t1). No streamed
+#: TTFT is trusted (it measured 0.044 vs 0.025 s in the 2026-10-14 probe). The 2026-10-14 prefill
+#: column is kept BESIDE the new decode column and the two are not mixed: a slope does not need a
+#: first-token time, and it is why decode could be measured at all on a 36-token prompt.
+#:
+#: THE REFINEMENT: prefill_tps is a FUNCTION OF PROMPT SIZE. This run's prompts were ~36 tokens while
+#: the 2026-10-14 readings used ~4,468, so a prefill figure taken here is dominated by fixed kernel
+#: and scheduling overhead and is NOT comparable to the baseline. A prefill reading that does not
+#: declare the prompt size it was taken at is therefore INCOMPARABLE, not merely imprecise. The routing
+#: tables below keep the size-declared baseline as the bill's source of truth; this axis adds the cost
+#: of the ANSWER (320 tokens of decode = 2.0 s on the 49.5 tok/s model, 13.3 s on the 7.5 tok/s one).
+measured_decode_20261015:
+  method: 'two-point slope on one prompt (64 and 320 max_tokens), non-streaming'
+  engine: 'the local server, started 2026-10-15 11:33 after a clean shutdown at 02:11 (not a crash)'
+  controls: '10/10 known answers on the instrument; Phi-4-mini FAILED the implied-prefill control and its
+             reading is REFUSED rather than published (the 2026-10-14 reading of 40 tok/s stands)'
+  decode_tps:
+    gemma-4-E4B-it-MLX-4bit: {decode_tps: 36.3, previous: 27, ratio: 1.34, agreement: REPRODUCED}
+    Phi-4-mini-instruct-8bit: {decode_tps: 35.0, previous: 40, ratio: 0.88, agreement: REPRODUCED,
+                              verdict: 'REFUSED — the implied prefill was negative, so the two calls disagree'}
+    gpt-oss-20b-MXFP4-Q8: {decode_tps: 41.7, previous: 33, ratio: 1.26, agreement: REPRODUCED}
+    Qwen3-Coder-30B-A3B-Instruct-MLX-4bit: {decode_tps: 49.5, previous: null, agreement: 'NEW (first reading)'}
+    gemma-4-12B-it-qat-OptiQ-4bit: {decode_tps: 13.4, previous: null, agreement: 'NEW (first reading)'}
+    Qwen3.8-27B-MLX-4bit: {decode_tps: 7.5, previous: 1.7, ratio: 4.41, agreement: DRIFTED,
+                           note: 'BUG-793: 4.4x BETTER than the 2026-10-14 reading — the earlier figure was
+                                  a cold/pressured state, not the model. Still the worst of the eight by 6.6x.'}
+  the_conclusion_this_axis_settles: >-
+    DECODE IS NOT THE BINDING CONSTRAINT. Every served model decodes the answer in 2-13 s at 320 tokens,
+    and the small ACTIVE-parameter MoE (30B-A3B) decodes FASTER than the 4B dense (49.5 vs 36.3) because it
+    reads only its active experts. The bill is PREFILL, which is why routing is decided on the prefill bill
+    and why a bigger model with a small ACTIVE count is the shape worth buying (llmfit's MoE-aware estimates
+    agree: A3B 56-59 tok/s, A4B 42, dense E4B 27.5).
+  routability_after_this_run: >-
+    UNCHANGED for the new candidates, and deliberately so: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit and
+    gemma-4-12B-it-qat-OptiQ-4bit were measured on ~36-token prompts, which cannot decide a 26214-token
+    bill. They stay REFUSED a route (fail-closed) until a size-declared prefill reading exists - and that
+    reading is precisely T-131's preflight cell.
+
+#: ── THE DELEGATION CANDIDATE SET, MEASURED 2026-10-15 (HF API + llmfit, read-only) ────────────────
+#: WHAT THIS IS: the pool the bench (T-131) draws from, with each row's weight bytes MEASURED from the
+#: repo's own file listing and llmfit's MoE-AWARE decode estimate beside it. WHAT IT IS NOT: a route. A
+#: row here is ELIGIBLE FOR THE BENCH and refused a route until a size-declared prefill reading exists.
+#: RULE OF SHAPE: the machine pays for BYTES READ PER STEP, not for parameters held. A MoE with a small
+#: ACTIVE count (A3B/A4B) prefills like its active size and decodes faster than a dense model of half its
+#: size - MEASURED: 30B-A3B decodes 49.5 tok/s against the 4B dense's 36.3, at 6.8 GB and 17.2 GB.
+candidates_20261015:
+  already_served:
+    gemma-4-E4B-it-MLX-4bit: {weight_gb: 6.8, class: 'agent_loop (the only one that ever passed a 60 s bill)'}
+    gpt-oss-20b-MXFP4-Q8: {weight_gb: 12.1, window: 131072, decode_measured: 41.7}
+    Qwen3-Coder-30B-A3B-Instruct-MLX-4bit: {weight_gb: 17.2, window: 262144, decode_measured: 49.5,
+                                            shape: A3B, note: 'the strongest PREFILL-per-quality shape available here'}
+    Qwen3.8-27B-MLX-4bit: {weight_gb: 16.1, window: 262144, decode_measured: 7.5, shape: dense,
+                           note: 'the worst decode of the eight, by 6.6x; dense 27B pays full bytes/step'}
+    gemma-4-12B-it-qat-OptiQ-4bit: {weight_gb: 8.4, decode_measured: 13.4, shape: dense}
+  worth_a_declared_slot_unmeasured:
+    'Qwen3.5-35B-A3B': {weight_gb: 20.4, shape: A3B, llmfit_est_decode_tps: 56.0,
+                        why: 'A3B at 35B total: prefills like a 3B and answers like a 35B - the textbook pipeline_batch slot'}
+    'gemma-4-26B-A4B-it-QAT': {weight_gb: 15.6, shape: A4B, llmfit_est_decode_tps: 42.1,
+                               why: 'QAT, so 4-bit is quality-preserving; the strongest all-round delegate in the set'}
+    'Devstral-Small-2-24B-Instruct-2512': {weight_gb: 15.1, shape: dense, why: 'built for agentic coding (SWE-bench lineage)'}
+    'Seed-OSS-36B-Instruct': {weight_gb: 20.3, window: 524288, shape: dense, why: 'long-context specialist; dense, so prefill-bound'}
+    'GLM-4.7-Flash': {weight_gb: 16.9, window: 202752, why: 'long window; shape unconfirmed'}
+    'Qwen3.5-9B': {weight_gb: 6.0, note: 'already DECLARED by the harness and not served; no tps reading exists'}
+  cannot_load_here:
+    'Qwen3.8-Flash-Next (180B MoE)': {published_4bit_gb: 111.5, verdict: 'refused: 64 GB unified, 55 GB guard ceiling, 24 GB delegate budget (D2496)'}
+    'Qwen3-Coder-Next (79.7B)': {mlx_4bit_gb: 44.8, verdict: 'loadable but hostile: it would hold the whole guard and leave no room for the verifier'}
+    'Ornith-1.5-35B-A3B-MLX (fp16)': {gb: 69.3, verdict: 'refused: unquantised; the REAP-19B 4-bit variant is the servable one'}
+  decided_by: 'a declared preflight per slot (T-131); a community ranking is not evidence'
   measured_agent_loop_capable: [gpt-oss-20b-MXFP4-Q8, Qwen3.8-27B-MLX-4bit]   # by WINDOW only (superseded as a decision by the bill)
   measured_agent_probe_only: [Phi-4-mini-instruct-8bit, gemma-4-E4B-it-MLX-4bit,
                               Qwen3-Coder-30B-A3B-Instruct-MLX-4bit, Qwen3.5-9B-4bit]

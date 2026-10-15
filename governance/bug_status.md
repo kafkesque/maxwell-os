@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**202 open** / 358 closed of 560 ids.
+**206 open** / 360 closed of 566 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -209,3 +209,7 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-793 | (MED — OPEN 2026-10-14) — Qwen3.8-27B prefills at 39 tok/s, four times worse than its parameter ratio predicts | 1 |
 | BUG-795 | (LOW — OPEN 2026-10-14) — one ledger row carries a NULL model and 156,098,139 input tokens | 1 |
 | BUG-796 | (MED — OPEN 2026-10-14) — a decision written outside the receipting writer leaves the attribution control red | 1 |
+| BUG-797 | (MED — OPEN 2026-10-15) — the `llmfit` preflight cell is a control that CANNOT FAIL | 1 |
+| BUG-799 | (LOW — OPEN 2026-10-15) — two cache records duplicate ONE work under two raw names, and the door looks names up by BYTES | 1 |
+| BUG-800 | (LOW — OPEN 2026-10-15) — the approved corpus-name rename is a CASCADE until it rides a re-ingest | 1 |
+| BUG-802 | (MED — OPEN 2026-10-15) — the $0 local engine does not survive a reboot, and nothing starts it | 1 |

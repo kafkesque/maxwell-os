@@ -75,3 +75,24 @@ exit_codes:
   ok: 0
   cell_invalid: 1
   env_unsafe: 2
+
+# ── THE PREFILL-BILL CELL (T-131, owner-approved 2026-10-15) ─────────────────────────────────────────
+# WHY THIS CELL EXISTS. The preflight above proves a cell can RETURN A GRADABLE ANSWER. It does not prove
+# the cell can PAY FOR ITS PROMPT. MEASURED 2026-10-15: prefill throughput is a FUNCTION OF PROMPT SIZE -
+# a ~36-token prompt measured 331 tok/s on the model whose 4,468-token reading was 455 - so a slot's
+# prefill figure is comparable only when it DECLARES the size it was taken at. A model that cannot pay
+# the class's bill is NA FOR THAT CLASS, and never 0: an unaffordable prompt is not a wrong answer
+# (BUG-257/BUG-263: the harness scored its own artifacts as model failures).
+prefill_bill:
+  required_fields: [model, class, prompt_tokens, prompt_size_measured_at, prefill_tps, per_turn_s, budget_s, verdict]
+  classes_source: config/agent_context.yaml#classes          # the working set each class must pay for
+  budget_source: config/agent_context.yaml#ratified.knobs.per_turn_budget_s
+  on_missing_reading: NA            # a slot with no size-declared prefill reading is NA for the class
+  on_budget_exceeded: NA            # never 0 - the bill is a CAPACITY fact, not a quality fact
+  never_zero: true
+  size_scale_guard:
+    # A reading taken on a prompt below this floor is INCOMPARABLE to a class working set and is reported
+    # as such rather than compared. MEASURED 2026-10-15: 36 tokens -> 331 tok/s vs 4,468 tokens -> 455 on
+    # the SAME model, because fixed kernel/scheduling overhead dominates a tiny prompt.
+    min_prompt_tokens_for_a_comparable_reading: 2000
+    on_below_floor: report_incomparable

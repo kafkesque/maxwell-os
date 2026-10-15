@@ -740,6 +740,23 @@ tasks:
     names are NORMALISED by a declared, deterministic renamer (plan -> apply -> receipt, every path
     byte-identical otherwise) or ACCEPTED as they stand with the debt declared. The mover stays `owner`
     because the door's own reading says so: the pipeline cannot advance this one.
+  owner_word_20261015: >-
+    OWNER WORD 2026-10-15: the WRITE is APPROVED ("Approve your T-130 Write recommendation"). The write
+    was then REFUSED BY MEASUREMENT in the same session, and the refusal is the finding: the 37 defective stems
+    are referenced 2,952 times INSIDE 13 derived artifacts (the parquet export 2,419 alone; the stage0/2/4/5
+    checkpoints and their input_fbs) which this act CANNOT rewrite without re-recording run history (D-2642).
+    MEASURED 2026-10-15 (BUG-798): the first census read a FALSE GREEN on this exact point because it scanned
+    NAMES and not CONTENT - a control reading the wrong surface stays green (BUG-787's shape) - and it was caught
+    before any file moved. MEASURED 2026-10-15 (BUG-799): the 37 names are NOT an identity hazard - the door's own
+    `_key()` already collapses whitespace, and the 2 canonical collisions in the cache are duplicate records of ONE
+    work (identical source_id bdb3a25d5707fafc / a4d8aacdbca22099; 910 distinct ids survive 962 records).
+    SO THE ACT SPLITS AND THE DURABLE FIX IS IN THE READER: `ingest_gate.corpus_census.record_for()` resolves a
+    record by EXACT BYTES (`by_name.get(path.name.strip())`) while the door's comparison key is canonical. Declare
+    the canonical fallback WITH its control (BUG-492); let the 37-name rename ride the next RE-INGEST, when the
+    receipts are regenerated anyway. DELIVERED THIS SESSION: the plan-first renamer
+    (`scripts/normalise_corpus_names.py`; 10/10 controls; --selftest/--census/--plan/--apply), its one policy home
+    (`config/ingest_identity_gate.yaml#name_normalisation`) and the refused plan
+    (`governance/normalise_corpus_names_plan_20261015.json`: 37 rows, apply_ready False, each row naming its artifact).
 - id: T-131
   priority: SHOULD
   state: open
@@ -775,6 +792,18 @@ tasks:
     cell PREFLIGHTED (a cell that fails preflight is NA, never 0 — BUG-257/BUG-263). No role is re-pointed before
     that run, and the evidence for the swap is the run, never a community-notes ranking.
 
+  owner_word_20261015: >-
+    OWNER WORD 2026-10-15: APPROVED. The cell is DECLARED and no behaviour changed
+    (`config/bench_preflight.yaml#prefill_bill`): required_fields, `on_missing_reading: NA`,
+    `on_budget_exceeded: NA`, `never_zero: true`, plus a size guard MEASURED 2026-10-15 to be missing - prefill
+    throughput is a FUNCTION OF PROMPT SIZE (BUG-801: 331 tok/s on a 36-token prompt against 455 on 4,468 for the
+    SAME model), so `min_prompt_tokens_for_a_comparable_reading: 2000` and a reading below it is reported
+    INCOMPARABLE, never compared. The bench RUN remains the mover: each slot preflighted at temp=0.0, a cell that
+    cannot PAY the class bill is NA and never 0 (BUG-257/BUG-263), and no role is re-pointed before it. ELIGIBLE SET
+    MEASURED 2026-10-15 (HF API + llmfit, read-only; config/agent_context.yaml#candidates_20261015): the A3B/A4B
+    shapes are the ones worth a slot (Qwen3.5-35B-A3B 20.4 GB, gemma-4-26B-A4B-QAT 15.6 GB), because this machine
+    pays BYTES READ PER STEP, not parameters held - MEASURED: the 30B-A3B decodes 49.5 tok/s, FASTER than the 4B
+    dense's 36.3, while holding 17.2 GB of weights against 6.8 GB.
 - id: T-132
   priority: SHOULD
   state: open
@@ -830,3 +859,13 @@ tasks:
     measured_prefill_tps / window. The 0.8 default is right for the fastest local model BY COINCIDENCE and wrong on
     the 20B's window, where it resolves to 104857 tokens, i.e. 8.3 minutes of prefill per turn. Declaring the
     contract costs nothing and changes no behaviour; adopting it is your word.
+  owner_word_20261015: >-
+    OWNER WORD 2026-10-15: APPROVED - both knobs are now DECLARED rather than inherited
+    (`config/agent_context.yaml#ratified`, 2026-10-15, by owner): per_turn_budget_s 60 (the agent_loop knob: at 60 s
+    the loop is the 4B; at 180 s gpt-oss-20b becomes usable; no budget makes the 27B one), GOOSE_CONTEXT_LIMIT 32768,
+    GOOSE_AUTO_COMPACT_THRESHOLD 0.8, GOOSE_AUTO_COMPACT_TOKEN_LIMIT 32768 (the 225000 default is a cloud
+    price-tier artifact, C1/C22), max_compactions_per_session 1, min_headroom_tokens 2048, strategy
+    declared_handoff_first. THE DECODE AXIS WAS MEASURED 2026-10-15 (the half this task left open): decode is NOT the
+    binding constraint - every model answers 320 tokens in 2-13 s and the small-ACTIVE MoE decodes faster than a dense
+    model half its size. The bill is PREFILL, so NO routing row changed on the strength of this run and the
+    unmeasured candidates stay REFUSED a route until a size-declared prefill reading exists (fail-closed).

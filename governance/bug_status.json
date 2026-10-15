@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 560,
-  "open_n": 202,
-  "closed_n": 358,
+  "total_ids": 566,
+  "open_n": 206,
+  "closed_n": 360,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -1017,6 +1017,26 @@
       "id": "BUG-796",
       "title": "(MED \u2014 OPEN 2026-10-14) \u2014 a decision written outside the receipting writer leaves the attribution control red",
       "events": 1
+    },
+    {
+      "id": "BUG-797",
+      "title": "(MED \u2014 OPEN 2026-10-15) \u2014 the `llmfit` preflight cell is a control that CANNOT FAIL",
+      "events": 1
+    },
+    {
+      "id": "BUG-799",
+      "title": "(LOW \u2014 OPEN 2026-10-15) \u2014 two cache records duplicate ONE work under two raw names, and the door looks names up by BYTES",
+      "events": 1
+    },
+    {
+      "id": "BUG-800",
+      "title": "(LOW \u2014 OPEN 2026-10-15) \u2014 the approved corpus-name rename is a CASCADE until it rides a re-ingest",
+      "events": 1
+    },
+    {
+      "id": "BUG-802",
+      "title": "(MED \u2014 OPEN 2026-10-15) \u2014 the $0 local engine does not survive a reboot, and nothing starts it",
+      "events": 1
     }
   ],
   "closed": [
@@ -1377,6 +1397,8 @@
     "BUG-787",
     "BUG-788",
     "BUG-791",
-    "BUG-794"
+    "BUG-794",
+    "BUG-798",
+    "BUG-801"
   ]
 }

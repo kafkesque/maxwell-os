@@ -140,6 +140,13 @@ guards:
   #: book_metadata's identity + sanitizer) and writes ONLY a deferral receipt under declared runtime state.
   scripts/check_ingest_identity_gate.py: tri_state
   scripts/check_ingest_identity_gate.py --selftest: fatal
+  # T-130 (owner-approved 2026-10-15): the corpus-name debt's remedy. The SELFTEST is fatal (its controls
+  # prove the transform preserves the door's own comparison key, that a byte delta rolls a rename back, and
+  # that an untouched cache record is never reformatted - D-2642); the CENSUS is tri_state because its rc 2
+  # is the OWNER-OWED debt it exists to measure, loud and not fatal (BUG-457). A reading below the declared
+  # prompt-size floor is reported INCOMPARABLE, never compared (BUG-801).
+  scripts/normalise_corpus_names.py --selftest: fatal
+  scripts/normalise_corpus_names.py --census: tri_state
   #: BUG-782 — THE OWNER-WORD INTAKE. It renders the T-129 review sheet from the measurement that owns it (never
   #: from a column), validates the owner's vocabulary, derives the effective word (override > signed tier > none),
   #: tests the transitivity conflict rule and binds the sheet to the census by digest. `--check` is the owner lane's

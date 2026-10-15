@@ -1,0 +1,1947 @@
+{
+ "act": "T-130 corpus-name normalisation",
+ "generated": "2026-10-15",
+ "scope": "whitespace_only",
+ "transform": "whitespace_collapse_then_strip",
+ "transform_pattern": "\\s{2,}",
+ "invariant": {
+  "key_preserved": "gate._key(stem_before) == gate._key(stem_after), computed with the door's own function",
+  "bytes_unchanged": "sha256 before == after per row; a delta rolls the rename back mid-act",
+  "suffix_unchanged": true,
+  "parent_unchanged": true,
+  "collision": "refuse"
+ },
+ "rows": [
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 0 Systems + Decision/execution+operations/Lao Tzu  Tao te ching  a book about the way and the power of the way (Lao-tzu, Ursula K. Le Guin) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "parent": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 0 Systems + Decision/execution+operations",
+   "suffix": ".md",
+   "labels": [
+    "repeated_internal_whitespace"
+   ],
+   "stem_before": "Lao Tzu  Tao te ching  a book about the way and the power of the way (Lao-tzu, Ursula K. Le Guin) (z-library.sk, 1lib.sk, z-lib.sk)",
+   "stem_after": "Lao Tzu Tao te ching a book about the way and the power of the way (Lao-tzu, Ursula K. Le Guin) (z-library.sk, 1lib.sk, z-lib.sk)",
+   "key_before": "lao tzu tao te ching a book about the way and the power of the way (lao-tzu, ursula k. le guin",
+   "key_after": "lao tzu tao te ching a book about the way and the power of the way (lao-tzu, ursula k. le guin",
+   "key_preserved": true,
+   "collision": false,
+   "bytes_sha256": "ec96fd843c392a071c37ace58050a65142cf7b5489234d737305beab9f563a16"
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 0 Systems + Decision/mental+models+epistemology/Art  fear  observations on the perils (and rewards) of artmaking (Bayles, David Orland, Ted) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "parent": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 0 Systems + Decision/mental+models+epistemology",
+   "suffix": ".md",
+   "labels": [
+    "repeated_internal_whitespace"
+   ],
+   "stem_before": "Art  fear  observations on the perils (and rewards) of artmaking (Bayles, David Orland, Ted) (z-library.sk, 1lib.sk, z-lib.sk)",
+   "stem_after": "Art fear observations on the perils (and rewards) of artmaking (Bayles, David Orland, Ted) (z-library.sk, 1lib.sk, z-lib.sk)",
+   "key_before": "art fear observations on the perils (and rewards) of artmaking (bayles, david orland, ted",
+   "key_after": "art fear observations on the perils (and rewards) of artmaking (bayles, david orland, ted",
+   "key_preserved": true,
+   "collision": false,
+   "bytes_sha256": "00d46feebbd061775368eb0b01770b253e7ea224a2d945d8f4096c94b52339c1"
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 0 Systems + Decision/mental+models+epistemology/The Great Mental Models, Volume 1 General Thinking Concepts (Shane Parrish  Rhiannon Beaubien) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "parent": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 0 Systems + Decision/mental+models+epistemology",
+   "suffix": ".md",
+   "labels": [
+    "repeated_internal_whitespace"
+   ],
+   "stem_before": "The Great Mental Models, Volume 1 General Thinking Concepts (Shane Parrish  Rhiannon Beaubien) (z-library.sk, 1lib.sk, z-lib.sk)",
+   "stem_after": "The Great Mental Models, Volume 1 General Thinking Concepts (Shane Parrish Rhiannon Beaubien) (z-library.sk, 1lib.sk, z-lib.sk)",
+   "key_before": "the great mental models, volume 1 general thinking concepts (shane parrish rhiannon beaubien",
+   "key_after": "the great mental models, volume 1 general thinking concepts (shane parrish rhiannon beaubien",
+   "key_preserved": true,
+   "collision": false,
+   "bytes_sha256": "b8b2b72798b09c5cf1cecd3acaecb6571b4e61c7c430a5434796836988bb7306"
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 0 Systems + Decision/mental+models+epistemology/Working Backwards (Colin Bryar  Bill Carr) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "parent": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 0 Systems + Decision/mental+models+epistemology",
+   "suffix": ".md",
+   "labels": [
+    "repeated_internal_whitespace"
+   ],
+   "stem_before": "Working Backwards (Colin Bryar  Bill Carr) (z-library.sk, 1lib.sk, z-lib.sk)",
+   "stem_after": "Working Backwards (Colin Bryar Bill Carr) (z-library.sk, 1lib.sk, z-lib.sk)",
+   "key_before": "working backwards (colin bryar bill carr",
+   "key_after": "working backwards (colin bryar bill carr",
+   "key_preserved": true,
+   "collision": false,
+   "bytes_sha256": "2618002b3253a99fa705ceaec18118dc72f148eab192c17511791bd27b240218"
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/communication+design/ Finding the Tipping Point- Visual Metaphor and Conceptual Complexity in Advertising.md",
+   "parent": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/communication+design",
+   "suffix": ".md",
+   "labels": [
+    "leading_or_trailing_whitespace"
+   ],
+   "stem_before": " Finding the Tipping Point- Visual Metaphor and Conceptual Complexity in Advertising",
+   "stem_after": "Finding the Tipping Point- Visual Metaphor and Conceptual Complexity in Advertising",
+   "key_before": "finding the tipping point- visual metaphor and conceptual complexity in advertising",
+   "key_after": "finding the tipping point- visual metaphor and conceptual complexity in advertising",
+   "key_preserved": true,
+   "collision": false,
+   "bytes_sha256": "3aa8de971c6f968f7d19d1d77c8c87804f493802f42255c37a0122dabff2ca45"
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/communication+design/Advertising  new techniques for visual seduction (Stoklossa, Uwe, Rempen, Thomas) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "parent": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/communication+design",
+   "suffix": ".md",
+   "labels": [
+    "repeated_internal_whitespace"
+   ],
+   "stem_before": "Advertising  new techniques for visual seduction (Stoklossa, Uwe, Rempen, Thomas) (z-library.sk, 1lib.sk, z-lib.sk)",
+   "stem_after": "Advertising new techniques for visual seduction (Stoklossa, Uwe, Rempen, Thomas) (z-library.sk, 1lib.sk, z-lib.sk)",
+   "key_before": "advertising new techniques for visual seduction (stoklossa, uwe, rempen, thomas",
+   "key_after": "advertising new techniques for visual seduction (stoklossa, uwe, rempen, thomas",
+   "key_preserved": true,
+   "collision": false,
+   "bytes_sha256": "1559ac87b5f073b3100bb9b632f3cef1d938dc34d777d0c52284c2807afffc48"
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/communication+design/Meme wars  the creative destruction of neoclassical economics (Lasn etc.) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "parent": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/communication+design",
+   "suffix": ".md",
+   "labels": [
+    "repeated_internal_whitespace"
+   ],
+   "stem_before": "Meme wars  the creative destruction of neoclassical economics (Lasn etc.) (z-library.sk, 1lib.sk, z-lib.sk)",
+   "stem_after": "Meme wars the creative destruction of neoclassical economics (Lasn etc.) (z-library.sk, 1lib.sk, z-lib.sk)",
+   "key_before": "meme wars the creative destruction of neoclassical economics (lasn etc.",
+   "key_after": "meme wars the creative destruction of neoclassical economics (lasn etc.",
+   "key_preserved": true,
+   "collision": false,
+   "bytes_sha256": "4464a0d0575b274f86c2c0f0f498702e98b70a24c21101f1d9f44a7dcb48daf5"
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/communication+design/Metaphorically Selling How to Use the Magic of Metaphors to Sell, Persuade,  Explain Anything to Anyone (Anne Miller) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "parent": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/communication+design",
+   "suffix": ".md",
+   "labels": [
+    "repeated_internal_whitespace"
+   ],
+   "stem_before": "Metaphorically Selling How to Use the Magic of Metaphors to Sell, Persuade,  Explain Anything to Anyone (Anne Miller) (z-library.sk, 1lib.sk, z-lib.sk)",
+   "stem_after": "Metaphorically Selling How to Use the Magic of Metaphors to Sell, Persuade, Explain Anything to Anyone (Anne Miller) (z-library.sk, 1lib.sk, z-lib.sk)",
+   "key_before": "metaphorically selling how to use the magic of metaphors to sell, persuade, explain anything to anyone (anne miller",
+   "key_after": "metaphorically selling how to use the magic of metaphors to sell, persuade, explain anything to anyone (anne miller",
+   "key_preserved": true,
+   "collision": false,
+   "bytes_sha256": "4460c20136396e39ef2c5805b49272db806715b00b290a65173b7302972ca99f"
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/communication+design/The Tall Lady With the Iceberg The Power of Metaphor to Sell, Persuade  Explain Anything to Anyone (Anne Miller) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "parent": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/communication+design",
+   "suffix": ".md",
+   "labels": [
+    "repeated_internal_whitespace"
+   ],
+   "stem_before": "The Tall Lady With the Iceberg The Power of Metaphor to Sell, Persuade  Explain Anything to Anyone (Anne Miller) (z-library.sk, 1lib.sk, z-lib.sk)",
+   "stem_after": "The Tall Lady With the Iceberg The Power of Metaphor to Sell, Persuade Explain Anything to Anyone (Anne Miller) (z-library.sk, 1lib.sk, z-lib.sk)",
+   "key_before": "the tall lady with the iceberg the power of metaphor to sell, persuade explain anything to anyone (anne miller",
+   "key_after": "the tall lady with the iceberg the power of metaphor to sell, persuade explain anything to anyone (anne miller",
+   "key_preserved": true,
+   "collision": false,
+   "bytes_sha256": "764dc95384e51f9d59b0a5f10354deac25ea645da77fd6a826cfd7bcf4e1acbe"
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/communication+design/The impact of perceived complexity, deviation and comprehension on the appreciation of visual metaphor in advertising .md",
+   "parent": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/communication+design",
+   "suffix": ".md",
+   "labels": [
+    "leading_or_trailing_whitespace"
+   ],
+   "stem_before": "The impact of perceived complexity, deviation and comprehension on the appreciation of visual metaphor in advertising ",
+   "stem_after": "The impact of perceived complexity, deviation and comprehension on the appreciation of visual metaphor in advertising",
+   "key_before": "the impact of perceived complexity, deviation and comprehension on the appreciation of visual metaphor in advertising",
+   "key_after": "the impact of perceived complexity, deviation and comprehension on the appreciation of visual metaphor in advertising",
+   "key_preserved": true,
+   "collision": false,
+   "bytes_sha256": "6ba8919a41709a9748715679c8b6716cdc07380c56989691a0b94b0771750935"
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/data+information+design/Introduction to Data Visualization  Storytelling A Guide For The Data Scientist ( etc.) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "parent": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/data+information+design",
+   "suffix": ".md",
+   "labels": [
+    "repeated_internal_whitespace"
+   ],
+   "stem_before": "Introduction to Data Visualization  Storytelling A Guide For The Data Scientist ( etc.) (z-library.sk, 1lib.sk, z-lib.sk)",
+   "stem_after": "Introduction to Data Visualization Storytelling A Guide For The Data Scientist ( etc.) (z-library.sk, 1lib.sk, z-lib.sk)",
+   "key_before": "introduction to data visualization storytelling a guide for the data scientist ( etc.",
+   "key_after": "introduction to data visualization storytelling a guide for the data scientist ( etc.",
+   "key_preserved": true,
+   "collision": false,
+   "bytes_sha256": "7f848cbb5fc6012595fa6c7bd16d9c3b4678a172d6c3cad6f87684fd537a2661"
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/data+information+design/Making Sense of Data III_ A Practical Guide to Designing Interactive Data Visualizations    _Glenn J. Myatt, Wayne P. Johnson_liber3.md",
+   "parent": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/data+information+design",
+   "suffix": ".md",
+   "labels": [
+    "repeated_internal_whitespace"
+   ],
+   "stem_before": "Making Sense of Data III_ A Practical Guide to Designing Interactive Data Visualizations    _Glenn J. Myatt, Wayne P. Johnson_liber3",
+   "stem_after": "Making Sense of Data III_ A Practical Guide to Designing Interactive Data Visualizations _Glenn J. Myatt, Wayne P. Johnson_liber3",
+   "key_before": "making sense of data iii_ a practical guide to designing interactive data visualizations _glenn j. myatt, wayne p. johnson_liber3",
+   "key_after": "making sense of data iii_ a practical guide to designing interactive data visualizations _glenn j. myatt, wayne p. johnson_liber3",
+   "key_preserved": true,
+   "collision": false,
+   "bytes_sha256": "3466aadd9291098fea7c20bc98c940a0009cfb599ac9e17dab3272392c9bed33"
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/data+information+design/Visualization Analysis  Design (Tamara Munzner) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "parent": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/data+information+design",
+   "suffix": ".md",
+   "labels": [
+    "repeated_internal_whitespace"
+   ],
+   "stem_before": "Visualization Analysis  Design (Tamara Munzner) (z-library.sk, 1lib.sk, z-lib.sk)",
+   "stem_after": "Visualization Analysis Design (Tamara Munzner) (z-library.sk, 1lib.sk, z-lib.sk)",
+   "key_before": "visualization analysis design (tamara munzner",
+   "key_after": "visualization analysis design (tamara munzner",
+   "key_preserved": true,
+   "collision": false,
+   "bytes_sha256": "62e47b855fff7fb44ca41e569b866a4562005b15481abb320027c5e4c172c645"
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/interaction+digital/Design for Motion  Fundamentals and Techniques of Motion Design (Austin Shaw) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "parent": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/interaction+digital",
+   "suffix": ".md",
+   "labels": [
+    "repeated_internal_whitespace"
+   ],
+   "stem_before": "Design for Motion  Fundamentals and Techniques of Motion Design (Austin Shaw) (z-library.sk, 1lib.sk, z-lib.sk)",
+   "stem_after": "Design for Motion Fundamentals and Techniques of Motion Design (Austin Shaw) (z-library.sk, 1lib.sk, z-lib.sk)",
+   "key_before": "design for motion fundamentals and techniques of motion design (austin shaw",
+   "key_after": "design for motion fundamentals and techniques of motion design (austin shaw",
+   "key_preserved": true,
+   "collision": false,
+   "bytes_sha256": "311d242a805a04b431c5b0ce09fd5bd2c367100f4ddfa0580fdd0f0b932987f5"
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/interaction+digital/How to Create Your Own Gig Posters, Band T-Shirts, Album Covers,  Stickers Screenprinting, Photocopy Art, Mixed-Media… (Ruthann Godollei) (Z-Library).md",
+   "parent": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/interaction+digital",
+   "suffix": ".md",
+   "labels": [
+    "repeated_internal_whitespace"
+   ],
+   "stem_before": "How to Create Your Own Gig Posters, Band T-Shirts, Album Covers,  Stickers Screenprinting, Photocopy Art, Mixed-Media… (Ruthann Godollei) (Z-Library)",
+   "stem_after": "How to Create Your Own Gig Posters, Band T-Shirts, Album Covers, Stickers Screenprinting, Photocopy Art, Mixed-Media… (Ruthann Godollei) (Z-Library)",
+   "key_before": "how to create your own gig posters, band t-shirts, album covers, stickers screenprinting, photocopy art, mixed-media… (ruthann godollei",
+   "key_after": "how to create your own gig posters, band t-shirts, album covers, stickers screenprinting, photocopy art, mixed-media… (ruthann godollei",
+   "key_preserved": true,
+   "collision": false,
+   "bytes_sha256": "beaf693aefd3f3a9fcb1045ed2ddda8e31d9b67f5873d8b89c56efa9babfca45"
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/interaction+digital/Laws of UX Using Psychology to Design Better Products  Services (Jon Yablonski) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "parent": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/interaction+digital",
+   "suffix": ".md",
+   "labels": [
+    "repeated_internal_whitespace"
+   ],
+   "stem_before": "Laws of UX Using Psychology to Design Better Products  Services (Jon Yablonski) (z-library.sk, 1lib.sk, z-lib.sk)",
+   "stem_after": "Laws of UX Using Psychology to Design Better Products Services (Jon Yablonski) (z-library.sk, 1lib.sk, z-lib.sk)",
+   "key_before": "laws of ux using psychology to design better products services (jon yablonski",
+   "key_after": "laws of ux using psychology to design better products services (jon yablonski",
+   "key_preserved": true,
+   "collision": false,
+   "bytes_sha256": "64110465dc0e05b01e95669f8279e96694b4a362febed489b38bda19f89203f9"
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/interaction+digital/Practical UI  Quick and practical UI design guidelines to design intuitive, accessible, and beautiful interfaces - 2nd Edition (Adham Dannaway) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "parent": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/interaction+digital",
+   "suffix": ".md",
+   "labels": [
+    "repeated_internal_whitespace"
+   ],
+   "stem_before": "Practical UI  Quick and practical UI design guidelines to design intuitive, accessible, and beautiful interfaces - 2nd Edition (Adham Dannaway) (z-library.sk, 1lib.sk, z-lib.sk)",
+   "stem_after": "Practical UI Quick and practical UI design guidelines to design intuitive, accessible, and beautiful interfaces - 2nd Edition (Adham Dannaway) (z-library.sk, 1lib.sk, z-lib.sk)",
+   "key_before": "practical ui quick and practical ui design guidelines to design intuitive, accessible, and beautiful interfaces - 2nd edition (adham dannaway",
+   "key_after": "practical ui quick and practical ui design guidelines to design intuitive, accessible, and beautiful interfaces - 2nd edition (adham dannaway",
+   "key_preserved": true,
+   "collision": false,
+   "bytes_sha256": "d413a275b06dc951309427ff505217d1ce829079e1e047e8566160f7df35e40a"
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/interaction+digital/The elements of user experience  user-centered design for the Web and beyond (Garrett, Jesse James) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "parent": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/interaction+digital",
+   "suffix": ".md",
+   "labels": [
+    "repeated_internal_whitespace"
+   ],
+   "stem_before": "The elements of user experience  user-centered design for the Web and beyond (Garrett, Jesse James) (z-library.sk, 1lib.sk, z-lib.sk)",
+   "stem_after": "The elements of user experience user-centered design for the Web and beyond (Garrett, Jesse James) (z-library.sk, 1lib.sk, z-lib.sk)",
+   "key_before": "the elements of user experience user-centered design for the web and beyond (garrett, jesse james",
+   "key_after": "the elements of user experience user-centered design for the web and beyond (garrett, jesse james",
+   "key_preserved": true,
+   "collision": false,
+   "bytes_sha256": "02d7736cd2c7f812e5c20a0f1d3b308d3d052582caefc33b4499e6d86713ac57"
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/practice+process/Grounded theory and grounded theorizing  pragmatism in research practice by Bryant, Antony (z-lib.org).md",
+   "parent": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/practice+process",
+   "suffix": ".md",
+   "labels": [
+    "repeated_internal_whitespace"
+   ],
+   "stem_before": "Grounded theory and grounded theorizing  pragmatism in research practice by Bryant, Antony (z-lib.org)",
+   "stem_after": "Grounded theory and grounded theorizing pragmatism in research practice by Bryant, Antony (z-lib.org)",
+   "key_before": "grounded theory and grounded theorizing pragmatism in research practice by bryant, antony",
+   "key_after": "grounded theory and grounded theorizing pragmatism in research practice by bryant, antony",
+   "key_preserved": true,
+   "collision": false,
+   "bytes_sha256": "9c59cdc51bd9c987b8e13132bcae1cb3b629a3a085f72295b377c330bca63620"
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/practice+process/Qualitative Inquiry and Research Design Choosing Among Five Approaches by John W. Creswell  Cheryl N. Poth (z-lib.org).md",
+   "parent": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/practice+process",
+   "suffix": ".md",
+   "labels": [
+    "repeated_internal_whitespace"
+   ],
+   "stem_before": "Qualitative Inquiry and Research Design Choosing Among Five Approaches by John W. Creswell  Cheryl N. Poth (z-lib.org)",
+   "stem_after": "Qualitative Inquiry and Research Design Choosing Among Five Approaches by John W. Creswell Cheryl N. Poth (z-lib.org)",
+   "key_before": "qualitative inquiry and research design choosing among five approaches by john w. creswell cheryl n. poth",
+   "key_after": "qualitative inquiry and research design choosing among five approaches by john w. creswell cheryl n. poth",
+   "key_preserved": true,
+   "collision": false,
+   "bytes_sha256": "680a314d4f1889f2d72387b4b069a163d9920fec609d347480b4aa99a269e245"
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/practice+process/Workflow  a practical guide to the creative process by Meir, Doron (z-lib.org).md",
+   "parent": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/practice+process",
+   "suffix": ".md",
+   "labels": [
+    "repeated_internal_whitespace"
+   ],
+   "stem_before": "Workflow  a practical guide to the creative process by Meir, Doron (z-lib.org)",
+   "stem_after": "Workflow a practical guide to the creative process by Meir, Doron (z-lib.org)",
+   "key_before": "workflow a practical guide to the creative process by meir, doron",
+   "key_after": "workflow a practical guide to the creative process by meir, doron",
+   "key_preserved": true,
+   "collision": false,
+   "bytes_sha256": "7777f130f8304c0a979e39cf6edabacd04a4576acccbbe326aa9341358bf4c2b"
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/visual+fundamentals/Emotional Expression and Effective Communication on Kinetic  Typography (1)_clean.md",
+   "parent": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/visual+fundamentals",
+   "suffix": ".md",
+   "labels": [
+    "repeated_internal_whitespace"
+   ],
+   "stem_before": "Emotional Expression and Effective Communication on Kinetic  Typography (1)_clean",
+   "stem_after": "Emotional Expression and Effective Communication on Kinetic Typography (1)_clean",
+   "key_before": "emotional expression and effective communication on kinetic typography (1)_clean",
+   "key_after": "emotional expression and effective communication on kinetic typography (1)_clean",
+   "key_preserved": true,
+   "collision": false,
+   "bytes_sha256": "90232a2a0bfd97cee2e55e6aec9ed8756ae40080fb96ba4b94e910dd01c953a4"
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/visual+fundamentals/Giving Type Meaning  Context and Craft in Typography (Mia Cinelli) (Z-Library).md",
+   "parent": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/visual+fundamentals",
+   "suffix": ".md",
+   "labels": [
+    "repeated_internal_whitespace"
+   ],
+   "stem_before": "Giving Type Meaning  Context and Craft in Typography (Mia Cinelli) (Z-Library)",
+   "stem_after": "Giving Type Meaning Context and Craft in Typography (Mia Cinelli) (Z-Library)",
+   "key_before": "giving type meaning context and craft in typography (mia cinelli",
+   "key_after": "giving type meaning context and craft in typography (mia cinelli",
+   "key_preserved": true,
+   "collision": false,
+   "bytes_sha256": "6a623128bb1186f93c75566528a43f404e5f04ce646e65d40d023aa43da9bce6"
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/visual+fundamentals/Graphic style  from Victorian to digital (Heller, Steven, Chwast, Seymour) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "parent": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/visual+fundamentals",
+   "suffix": ".md",
+   "labels": [
+    "repeated_internal_whitespace"
+   ],
+   "stem_before": "Graphic style  from Victorian to digital (Heller, Steven, Chwast, Seymour) (z-library.sk, 1lib.sk, z-lib.sk)",
+   "stem_after": "Graphic style from Victorian to digital (Heller, Steven, Chwast, Seymour) (z-library.sk, 1lib.sk, z-lib.sk)",
+   "key_before": "graphic style from victorian to digital (heller, steven, chwast, seymour",
+   "key_after": "graphic style from victorian to digital (heller, steven, chwast, seymour",
+   "key_preserved": true,
+   "collision": false,
+   "bytes_sha256": "961268816a6786399354da8000717f1ed227d7724c976d1781fdf7ac741f326c"
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/visual+fundamentals/Layout for Graphic Designers An Introduction (Gavin Ambrose  Paul Harris) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "parent": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/visual+fundamentals",
+   "suffix": ".md",
+   "labels": [
+    "repeated_internal_whitespace"
+   ],
+   "stem_before": "Layout for Graphic Designers An Introduction (Gavin Ambrose  Paul Harris) (z-library.sk, 1lib.sk, z-lib.sk)",
+   "stem_after": "Layout for Graphic Designers An Introduction (Gavin Ambrose Paul Harris) (z-library.sk, 1lib.sk, z-lib.sk)",
+   "key_before": "layout for graphic designers an introduction (gavin ambrose paul harris",
+   "key_after": "layout for graphic designers an introduction (gavin ambrose paul harris",
+   "key_preserved": true,
+   "collision": false,
+   "bytes_sha256": "82209a555481728723f0e9be2a50a64295f3b5fd7b49f2516932cf9d89f57b48"
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Generative Art _ A Practical Guide Using Processing -- Matt  Pearson -- Pap_Psc, 2011 -- Manning Publications Co_ LLC -- 9781638352433 -- 6feaa18e048c4a229030d32609e63f3f -- Anna’s Archive.md",
+   "parent": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 3 Art + Computational Media/generative+art+creative+coding",
+   "suffix": ".md",
+   "labels": [
+    "repeated_internal_whitespace"
+   ],
+   "stem_before": "Generative Art _ A Practical Guide Using Processing -- Matt  Pearson -- Pap_Psc, 2011 -- Manning Publications Co_ LLC -- 9781638352433 -- 6feaa18e048c4a229030d32609e63f3f -- Anna’s Archive",
+   "stem_after": "Generative Art _ A Practical Guide Using Processing -- Matt Pearson -- Pap_Psc, 2011 -- Manning Publications Co_ LLC -- 9781638352433 -- 6feaa18e048c4a229030d32609e63f3f -- Anna’s Archive",
+   "key_before": "generative art _ a practical guide using processing -- matt pearson -- pap_psc, 2011 -- manning publications co_ llc -- 9781638352433",
+   "key_after": "generative art _ a practical guide using processing -- matt pearson -- pap_psc, 2011 -- manning publications co_ llc -- 9781638352433",
+   "key_preserved": true,
+   "collision": false,
+   "bytes_sha256": "ac11d5767c960de2366574d9d65952665cf8fd3d39acdf1a39a46955e6976df5"
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Graphics Shaders Theory and Practice, edition 2 (Mike Bailey  Steve Cunningham) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "parent": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 3 Art + Computational Media/generative+art+creative+coding",
+   "suffix": ".md",
+   "labels": [
+    "repeated_internal_whitespace"
+   ],
+   "stem_before": "Graphics Shaders Theory and Practice, edition 2 (Mike Bailey  Steve Cunningham) (z-library.sk, 1lib.sk, z-lib.sk)",
+   "stem_after": "Graphics Shaders Theory and Practice, edition 2 (Mike Bailey Steve Cunningham) (z-library.sk, 1lib.sk, z-lib.sk)",
+   "key_before": "graphics shaders theory and practice, edition 2 (mike bailey steve cunningham",
+   "key_after": "graphics shaders theory and practice, edition 2 (mike bailey steve cunningham",
+   "key_preserved": true,
+   "collision": false,
+   "bytes_sha256": "15e342d7831c79869523e2b3560c2d8cbe2a8236d87ecc7775c30e71a57ae2cc"
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 3 Art + Computational Media/live+visuals+vjing/Live Visuals History, Theory, Practice (Routledge Advances in Theatre  Performance Studies) (Steve Gibson, Stefan Arisona etc.) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "parent": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 3 Art + Computational Media/live+visuals+vjing",
+   "suffix": ".md",
+   "labels": [
+    "repeated_internal_whitespace"
+   ],
+   "stem_before": "Live Visuals History, Theory, Practice (Routledge Advances in Theatre  Performance Studies) (Steve Gibson, Stefan Arisona etc.) (z-library.sk, 1lib.sk, z-lib.sk)",
+   "stem_after": "Live Visuals History, Theory, Practice (Routledge Advances in Theatre Performance Studies) (Steve Gibson, Stefan Arisona etc.) (z-library.sk, 1lib.sk, z-lib.sk)",
+   "key_before": "live visuals history, theory, practice (routledge advances in theatre performance studies) (steve gibson, stefan arisona etc.",
+   "key_after": "live visuals history, theory, practice (routledge advances in theatre performance studies) (steve gibson, stefan arisona etc.",
+   "key_preserved": true,
+   "collision": false,
+   "bytes_sha256": "497b26c472d7a9398a293a303d065657d47212f2fb804e857934aceb2690ec91"
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/marketing+growth/Demand-Side Sales 101 Stop Selling and Help Your Customers Make Progress (Bob Moesta  Greg Engle) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "parent": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/marketing+growth",
+   "suffix": ".md",
+   "labels": [
+    "repeated_internal_whitespace"
+   ],
+   "stem_before": "Demand-Side Sales 101 Stop Selling and Help Your Customers Make Progress (Bob Moesta  Greg Engle) (z-library.sk, 1lib.sk, z-lib.sk)",
+   "stem_after": "Demand-Side Sales 101 Stop Selling and Help Your Customers Make Progress (Bob Moesta Greg Engle) (z-library.sk, 1lib.sk, z-lib.sk)",
+   "key_before": "demand-side sales 101 stop selling and help your customers make progress (bob moesta greg engle",
+   "key_after": "demand-side sales 101 stop selling and help your customers make progress (bob moesta greg engle",
+   "key_preserved": true,
+   "collision": false,
+   "bytes_sha256": "750dd13bf6e3439fb7efb2cbe2f82933e38e0953a19eac7377d33d26e867fb06"
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/practice+economics/365 habits of successful graphic designers  insider secrets from top designers on working smart and staying creative (Laurel Saville) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "parent": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/practice+economics",
+   "suffix": ".md",
+   "labels": [
+    "repeated_internal_whitespace"
+   ],
+   "stem_before": "365 habits of successful graphic designers  insider secrets from top designers on working smart and staying creative (Laurel Saville) (z-library.sk, 1lib.sk, z-lib.sk)",
+   "stem_after": "365 habits of successful graphic designers insider secrets from top designers on working smart and staying creative (Laurel Saville) (z-library.sk, 1lib.sk, z-lib.sk)",
+   "key_before": "365 habits of successful graphic designers insider secrets from top designers on working smart and staying creative (laurel saville",
+   "key_after": "365 habits of successful graphic designers insider secrets from top designers on working smart and staying creative (laurel saville",
+   "key_preserved": true,
+   "collision": false,
+   "bytes_sha256": "522d9642fde5ca0c4fdcd2bc64a629631f85a167d265cb2e9542e95fd1a4cf2d"
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/practice+economics/Running Lean, 3rd Edition  Iterate from Plan A to a Plan That Works (Ash Maurya) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "parent": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/practice+economics",
+   "suffix": ".md",
+   "labels": [
+    "repeated_internal_whitespace"
+   ],
+   "stem_before": "Running Lean, 3rd Edition  Iterate from Plan A to a Plan That Works (Ash Maurya) (z-library.sk, 1lib.sk, z-lib.sk)",
+   "stem_after": "Running Lean, 3rd Edition Iterate from Plan A to a Plan That Works (Ash Maurya) (z-library.sk, 1lib.sk, z-lib.sk)",
+   "key_before": "running lean, 3rd edition iterate from plan a to a plan that works (ash maurya",
+   "key_after": "running lean, 3rd edition iterate from plan a to a plan that works (ash maurya",
+   "key_preserved": true,
+   "collision": false,
+   "bytes_sha256": "d38a517da7d1147bca1d49accd3cbef5b77a64ea338a4e4f2d2900111564262f"
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/practice+economics/Testing Business Ideas A Field Guide for Rapid Experimentation (Alex Osterwalder  David J. Bland) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "parent": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/practice+economics",
+   "suffix": ".md",
+   "labels": [
+    "repeated_internal_whitespace"
+   ],
+   "stem_before": "Testing Business Ideas A Field Guide for Rapid Experimentation (Alex Osterwalder  David J. Bland) (z-library.sk, 1lib.sk, z-lib.sk)",
+   "stem_after": "Testing Business Ideas A Field Guide for Rapid Experimentation (Alex Osterwalder David J. Bland) (z-library.sk, 1lib.sk, z-lib.sk)",
+   "key_before": "testing business ideas a field guide for rapid experimentation (alex osterwalder david j. bland",
+   "key_after": "testing business ideas a field guide for rapid experimentation (alex osterwalder david j. bland",
+   "key_preserved": true,
+   "collision": false,
+   "bytes_sha256": "e6502d6fcdd786a90398d16c944694d133f1b285279f85068975488799921c08"
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/strategy+brand/Business Acumen for Sales Success (Kevin Cope  Ben Cook) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "parent": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/strategy+brand",
+   "suffix": ".md",
+   "labels": [
+    "repeated_internal_whitespace"
+   ],
+   "stem_before": "Business Acumen for Sales Success (Kevin Cope  Ben Cook) (z-library.sk, 1lib.sk, z-lib.sk)",
+   "stem_after": "Business Acumen for Sales Success (Kevin Cope Ben Cook) (z-library.sk, 1lib.sk, z-lib.sk)",
+   "key_before": "business acumen for sales success (kevin cope ben cook",
+   "key_after": "business acumen for sales success (kevin cope ben cook",
+   "key_preserved": true,
+   "collision": false,
+   "bytes_sha256": "02f46741f250433cc506186f9fdcada3231585469d6808fb9b65777c4790a81f"
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 6 AI + Computing/ai+engineering+agents/The Art of Prompt Engineering for Multimodel AI  Harmonizing Text, Images, and Audio with GPT-4, CLIP, and AudioLM (Yash Jain) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "parent": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 6 AI + Computing/ai+engineering+agents",
+   "suffix": ".md",
+   "labels": [
+    "repeated_internal_whitespace"
+   ],
+   "stem_before": "The Art of Prompt Engineering for Multimodel AI  Harmonizing Text, Images, and Audio with GPT-4, CLIP, and AudioLM (Yash Jain) (z-library.sk, 1lib.sk, z-lib.sk)",
+   "stem_after": "The Art of Prompt Engineering for Multimodel AI Harmonizing Text, Images, and Audio with GPT-4, CLIP, and AudioLM (Yash Jain) (z-library.sk, 1lib.sk, z-lib.sk)",
+   "key_before": "the art of prompt engineering for multimodel ai harmonizing text, images, and audio with gpt-4, clip, and audiolm (yash jain",
+   "key_after": "the art of prompt engineering for multimodel ai harmonizing text, images, and audio with gpt-4, clip, and audiolm (yash jain",
+   "key_preserved": true,
+   "collision": false,
+   "bytes_sha256": "f7babaa7c8cd118e3f9de131b1f2688c7ce82db51242bfe88244b967f576e41b"
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 6 AI + Computing/ai+society+business/AI Marketing How AI is Transforming Marketing and Business Growth (Hamed Taherdoost  Mitra Madanchian) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "parent": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 6 AI + Computing/ai+society+business",
+   "suffix": ".md",
+   "labels": [
+    "repeated_internal_whitespace"
+   ],
+   "stem_before": "AI Marketing How AI is Transforming Marketing and Business Growth (Hamed Taherdoost  Mitra Madanchian) (z-library.sk, 1lib.sk, z-lib.sk)",
+   "stem_after": "AI Marketing How AI is Transforming Marketing and Business Growth (Hamed Taherdoost Mitra Madanchian) (z-library.sk, 1lib.sk, z-lib.sk)",
+   "key_before": "ai marketing how ai is transforming marketing and business growth (hamed taherdoost mitra madanchian",
+   "key_after": "ai marketing how ai is transforming marketing and business growth (hamed taherdoost mitra madanchian",
+   "key_preserved": true,
+   "collision": false,
+   "bytes_sha256": "a083f657f0009004f3287b25dcd66862764968cbb2ab95ee0bd96313847e7078"
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 6 AI + Computing/llm+applications/Building Knowledge Graphs (Jesus Barrasa  Maya Natarajan  Jim Webber) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "parent": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 6 AI + Computing/llm+applications",
+   "suffix": ".md",
+   "labels": [
+    "repeated_internal_whitespace"
+   ],
+   "stem_before": "Building Knowledge Graphs (Jesus Barrasa  Maya Natarajan  Jim Webber) (z-library.sk, 1lib.sk, z-lib.sk)",
+   "stem_after": "Building Knowledge Graphs (Jesus Barrasa Maya Natarajan Jim Webber) (z-library.sk, 1lib.sk, z-lib.sk)",
+   "key_before": "building knowledge graphs (jesus barrasa maya natarajan jim webber",
+   "key_after": "building knowledge graphs (jesus barrasa maya natarajan jim webber",
+   "key_preserved": true,
+   "collision": false,
+   "bytes_sha256": "a703b58a222aca0d8ea37f198744cf6f366a02b5a4c3276e431ded27459f58a2"
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 6 AI + Computing/programming/Learn Python The Hard Way, 3rd Edition .md",
+   "parent": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 6 AI + Computing/programming",
+   "suffix": ".md",
+   "labels": [
+    "leading_or_trailing_whitespace"
+   ],
+   "stem_before": "Learn Python The Hard Way, 3rd Edition ",
+   "stem_after": "Learn Python The Hard Way, 3rd Edition",
+   "key_before": "learn python the hard way, 3rd edition",
+   "key_after": "learn python the hard way, 3rd edition",
+   "key_preserved": true,
+   "collision": false,
+   "bytes_sha256": "6510c71d7def565a9831d6c48be906a5ba3a236cca25e7d758718a0fb87c2955"
+  }
+ ],
+ "row_count": 37,
+ "references": [
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 0 Systems + Decision/execution+operations/Lao Tzu  Tao te ching  a book about the way and the power of the way (Lao-tzu, Ursula K. Le Guin) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "sibling_corpus_files": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "stage_outputs": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "derived_artifacts": {
+    "count": 5,
+    "rewritable": false,
+    "examples": [
+     "checkpoints/book_metadata.jsonl:2",
+     "parquet/fbs_export_20260902_final.jsonl:3"
+    ]
+   },
+   "metadata_cache": {
+    "count": 1,
+    "rewritable": true
+   },
+   "store": {
+    "count": 0,
+    "rewritable": false,
+    "per_source": {
+     "DB_PATH": {
+      "fbs.source_books": 0,
+      "fbs.source_text": 0
+     }
+    }
+   }
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 0 Systems + Decision/mental+models+epistemology/Art  fear  observations on the perils (and rewards) of artmaking (Bayles, David Orland, Ted) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "sibling_corpus_files": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "stage_outputs": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "derived_artifacts": {
+    "count": 18,
+    "rewritable": false,
+    "examples": [
+     "checkpoints/book_metadata.jsonl:2",
+     "parquet/fbs_export_20260902_final.jsonl:16"
+    ]
+   },
+   "metadata_cache": {
+    "count": 1,
+    "rewritable": true
+   },
+   "store": {
+    "count": 0,
+    "rewritable": false,
+    "per_source": {
+     "DB_PATH": {
+      "fbs.source_books": 0,
+      "fbs.source_text": 0
+     }
+    }
+   }
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 0 Systems + Decision/mental+models+epistemology/The Great Mental Models, Volume 1 General Thinking Concepts (Shane Parrish  Rhiannon Beaubien) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "sibling_corpus_files": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "stage_outputs": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "derived_artifacts": {
+    "count": 235,
+    "rewritable": false,
+    "examples": [
+     "checkpoints/book_metadata.jsonl:2",
+     "checkpoints/checkpoint.jsonl:17",
+     "checkpoints/checkpoint.jsonl:17",
+     "checkpoints/input_fbs.jsonl:36",
+     "checkpoints/checkpoint.jsonl:12"
+    ]
+   },
+   "metadata_cache": {
+    "count": 1,
+    "rewritable": true
+   },
+   "store": {
+    "count": 0,
+    "rewritable": false,
+    "per_source": {
+     "DB_PATH": {
+      "fbs.source_books": 0,
+      "fbs.source_text": 0
+     }
+    }
+   }
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 0 Systems + Decision/mental+models+epistemology/Working Backwards (Colin Bryar  Bill Carr) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "sibling_corpus_files": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "stage_outputs": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "derived_artifacts": {
+    "count": 82,
+    "rewritable": false,
+    "examples": [
+     "checkpoints/book_metadata.jsonl:2",
+     "checkpoints/checkpoint.jsonl:3",
+     "checkpoints/checkpoint.jsonl:3",
+     "checkpoints/input_fbs.jsonl:6",
+     "checkpoints/checkpoint.jsonl:2"
+    ]
+   },
+   "metadata_cache": {
+    "count": 1,
+    "rewritable": true
+   },
+   "store": {
+    "count": 0,
+    "rewritable": false,
+    "per_source": {
+     "DB_PATH": {
+      "fbs.source_books": 0,
+      "fbs.source_text": 0
+     }
+    }
+   }
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/communication+design/ Finding the Tipping Point- Visual Metaphor and Conceptual Complexity in Advertising.md",
+   "sibling_corpus_files": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "stage_outputs": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "derived_artifacts": {
+    "count": 17,
+    "rewritable": false,
+    "examples": [
+     "checkpoints/book_metadata.jsonl:2",
+     "parquet/fbs_export_20260902_final.jsonl:15"
+    ]
+   },
+   "metadata_cache": {
+    "count": 1,
+    "rewritable": true
+   },
+   "store": {
+    "count": 0,
+    "rewritable": false,
+    "per_source": {
+     "DB_PATH": {
+      "fbs.source_books": 0,
+      "fbs.source_text": 0
+     }
+    }
+   }
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/communication+design/Advertising  new techniques for visual seduction (Stoklossa, Uwe, Rempen, Thomas) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "sibling_corpus_files": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "stage_outputs": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "derived_artifacts": {
+    "count": 60,
+    "rewritable": false,
+    "examples": [
+     "checkpoints/book_metadata.jsonl:2",
+     "parquet/fbs_export_20260902_final.jsonl:58"
+    ]
+   },
+   "metadata_cache": {
+    "count": 1,
+    "rewritable": true
+   },
+   "store": {
+    "count": 0,
+    "rewritable": false,
+    "per_source": {
+     "DB_PATH": {
+      "fbs.source_books": 0,
+      "fbs.source_text": 0
+     }
+    }
+   }
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/communication+design/Meme wars  the creative destruction of neoclassical economics (Lasn etc.) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "sibling_corpus_files": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "stage_outputs": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "derived_artifacts": {
+    "count": 67,
+    "rewritable": false,
+    "examples": [
+     "checkpoints/book_metadata.jsonl:2",
+     "checkpoints/checkpoint.jsonl:3",
+     "checkpoints/checkpoint.jsonl:3",
+     "checkpoints/input_fbs.jsonl:6",
+     "checkpoints/checkpoint.jsonl:6"
+    ]
+   },
+   "metadata_cache": {
+    "count": 1,
+    "rewritable": true
+   },
+   "store": {
+    "count": 0,
+    "rewritable": false,
+    "per_source": {
+     "DB_PATH": {
+      "fbs.source_books": 0,
+      "fbs.source_text": 0
+     }
+    }
+   }
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/communication+design/Metaphorically Selling How to Use the Magic of Metaphors to Sell, Persuade,  Explain Anything to Anyone (Anne Miller) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "sibling_corpus_files": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "stage_outputs": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "derived_artifacts": {
+    "count": 162,
+    "rewritable": false,
+    "examples": [
+     "checkpoints/book_metadata.jsonl:2",
+     "parquet/fbs_export_20260902_final.jsonl:160"
+    ]
+   },
+   "metadata_cache": {
+    "count": 1,
+    "rewritable": true
+   },
+   "store": {
+    "count": 0,
+    "rewritable": false,
+    "per_source": {
+     "DB_PATH": {
+      "fbs.source_books": 0,
+      "fbs.source_text": 0
+     }
+    }
+   }
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/communication+design/The Tall Lady With the Iceberg The Power of Metaphor to Sell, Persuade  Explain Anything to Anyone (Anne Miller) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "sibling_corpus_files": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "stage_outputs": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "derived_artifacts": {
+    "count": 100,
+    "rewritable": false,
+    "examples": [
+     "checkpoints/book_metadata.jsonl:2",
+     "parquet/fbs_export_20260902_final.jsonl:98"
+    ]
+   },
+   "metadata_cache": {
+    "count": 1,
+    "rewritable": true
+   },
+   "store": {
+    "count": 0,
+    "rewritable": false,
+    "per_source": {
+     "DB_PATH": {
+      "fbs.source_books": 0,
+      "fbs.source_text": 0
+     }
+    }
+   }
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/communication+design/The impact of perceived complexity, deviation and comprehension on the appreciation of visual metaphor in advertising .md",
+   "sibling_corpus_files": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "stage_outputs": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "derived_artifacts": {
+    "count": 41,
+    "rewritable": false,
+    "examples": [
+     "checkpoints/book_metadata.jsonl:3",
+     "parquet/fbs_export_20260902_final.jsonl:38"
+    ]
+   },
+   "metadata_cache": {
+    "count": 1,
+    "rewritable": true
+   },
+   "store": {
+    "count": 0,
+    "rewritable": false,
+    "per_source": {
+     "DB_PATH": {
+      "fbs.source_books": 0,
+      "fbs.source_text": 0
+     }
+    }
+   }
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/data+information+design/Introduction to Data Visualization  Storytelling A Guide For The Data Scientist ( etc.) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "sibling_corpus_files": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "stage_outputs": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "derived_artifacts": {
+    "count": 58,
+    "rewritable": false,
+    "examples": [
+     "checkpoints/book_metadata.jsonl:2",
+     "checkpoints/checkpoint.jsonl:2",
+     "checkpoints/checkpoint.jsonl:2",
+     "checkpoints/input_fbs.jsonl:4",
+     "checkpoints/checkpoint.jsonl:4"
+    ]
+   },
+   "metadata_cache": {
+    "count": 1,
+    "rewritable": true
+   },
+   "store": {
+    "count": 0,
+    "rewritable": false,
+    "per_source": {
+     "DB_PATH": {
+      "fbs.source_books": 0,
+      "fbs.source_text": 0
+     }
+    }
+   }
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/data+information+design/Making Sense of Data III_ A Practical Guide to Designing Interactive Data Visualizations    _Glenn J. Myatt, Wayne P. Johnson_liber3.md",
+   "sibling_corpus_files": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "stage_outputs": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "derived_artifacts": {
+    "count": 155,
+    "rewritable": false,
+    "examples": [
+     "checkpoints/book_metadata.jsonl:2",
+     "checkpoints/checkpoint.jsonl:1",
+     "checkpoints/checkpoint.jsonl:1",
+     "checkpoints/input_fbs.jsonl:2",
+     "checkpoints/checkpoint.jsonl:2"
+    ]
+   },
+   "metadata_cache": {
+    "count": 1,
+    "rewritable": true
+   },
+   "store": {
+    "count": 0,
+    "rewritable": false,
+    "per_source": {
+     "DB_PATH": {
+      "fbs.source_books": 0,
+      "fbs.source_text": 0
+     }
+    }
+   }
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/data+information+design/Visualization Analysis  Design (Tamara Munzner) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "sibling_corpus_files": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "stage_outputs": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "derived_artifacts": {
+    "count": 119,
+    "rewritable": false,
+    "examples": [
+     "checkpoints/book_metadata.jsonl:2",
+     "checkpoints/checkpoint.jsonl:1",
+     "checkpoints/checkpoint.jsonl:1",
+     "checkpoints/input_fbs.jsonl:2",
+     "checkpoints/checkpoint.jsonl:2"
+    ]
+   },
+   "metadata_cache": {
+    "count": 1,
+    "rewritable": true
+   },
+   "store": {
+    "count": 0,
+    "rewritable": false,
+    "per_source": {
+     "DB_PATH": {
+      "fbs.source_books": 0,
+      "fbs.source_text": 0
+     }
+    }
+   }
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/interaction+digital/Design for Motion  Fundamentals and Techniques of Motion Design (Austin Shaw) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "sibling_corpus_files": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "stage_outputs": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "derived_artifacts": {
+    "count": 96,
+    "rewritable": false,
+    "examples": [
+     "checkpoints/book_metadata.jsonl:2",
+     "parquet/fbs_export_20260902_final.jsonl:94"
+    ]
+   },
+   "metadata_cache": {
+    "count": 1,
+    "rewritable": true
+   },
+   "store": {
+    "count": 0,
+    "rewritable": false,
+    "per_source": {
+     "DB_PATH": {
+      "fbs.source_books": 0,
+      "fbs.source_text": 0
+     }
+    }
+   }
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/interaction+digital/How to Create Your Own Gig Posters, Band T-Shirts, Album Covers,  Stickers Screenprinting, Photocopy Art, Mixed-Media… (Ruthann Godollei) (Z-Library).md",
+   "sibling_corpus_files": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "stage_outputs": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "derived_artifacts": {
+    "count": 24,
+    "rewritable": false,
+    "examples": [
+     "checkpoints/book_metadata.jsonl:2",
+     "parquet/fbs_export_20260902_final.jsonl:22"
+    ]
+   },
+   "metadata_cache": {
+    "count": 1,
+    "rewritable": true
+   },
+   "store": {
+    "count": 0,
+    "rewritable": false,
+    "per_source": {
+     "DB_PATH": {
+      "fbs.source_books": 0,
+      "fbs.source_text": 0
+     }
+    }
+   }
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/interaction+digital/Laws of UX Using Psychology to Design Better Products  Services (Jon Yablonski) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "sibling_corpus_files": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "stage_outputs": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "derived_artifacts": {
+    "count": 78,
+    "rewritable": false,
+    "examples": [
+     "checkpoints/book_metadata.jsonl:2",
+     "checkpoints/checkpoint.jsonl:2",
+     "checkpoints/checkpoint.jsonl:2",
+     "checkpoints/input_fbs.jsonl:4",
+     "checkpoints/checkpoint.jsonl:4"
+    ]
+   },
+   "metadata_cache": {
+    "count": 1,
+    "rewritable": true
+   },
+   "store": {
+    "count": 0,
+    "rewritable": false,
+    "per_source": {
+     "DB_PATH": {
+      "fbs.source_books": 0,
+      "fbs.source_text": 0
+     }
+    }
+   }
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/interaction+digital/Practical UI  Quick and practical UI design guidelines to design intuitive, accessible, and beautiful interfaces - 2nd Edition (Adham Dannaway) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "sibling_corpus_files": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "stage_outputs": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "derived_artifacts": {
+    "count": 48,
+    "rewritable": false,
+    "examples": [
+     "checkpoints/book_metadata.jsonl:2",
+     "parquet/fbs_export_20260902_final.jsonl:46"
+    ]
+   },
+   "metadata_cache": {
+    "count": 1,
+    "rewritable": true
+   },
+   "store": {
+    "count": 0,
+    "rewritable": false,
+    "per_source": {
+     "DB_PATH": {
+      "fbs.source_books": 0,
+      "fbs.source_text": 0
+     }
+    }
+   }
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/interaction+digital/The elements of user experience  user-centered design for the Web and beyond (Garrett, Jesse James) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "sibling_corpus_files": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "stage_outputs": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "derived_artifacts": {
+    "count": 103,
+    "rewritable": false,
+    "examples": [
+     "checkpoints/book_metadata.jsonl:2",
+     "parquet/fbs_export_20260902_final.jsonl:101"
+    ]
+   },
+   "metadata_cache": {
+    "count": 1,
+    "rewritable": true
+   },
+   "store": {
+    "count": 0,
+    "rewritable": false,
+    "per_source": {
+     "DB_PATH": {
+      "fbs.source_books": 0,
+      "fbs.source_text": 0
+     }
+    }
+   }
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/practice+process/Grounded theory and grounded theorizing  pragmatism in research practice by Bryant, Antony (z-lib.org).md",
+   "sibling_corpus_files": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "stage_outputs": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "derived_artifacts": {
+    "count": 132,
+    "rewritable": false,
+    "examples": [
+     "checkpoints/book_metadata.jsonl:2",
+     "checkpoints/checkpoint.jsonl:4",
+     "checkpoints/checkpoint.jsonl:4",
+     "checkpoints/input_fbs.jsonl:8",
+     "checkpoints/checkpoint.jsonl:4"
+    ]
+   },
+   "metadata_cache": {
+    "count": 1,
+    "rewritable": true
+   },
+   "store": {
+    "count": 0,
+    "rewritable": false,
+    "per_source": {
+     "DB_PATH": {
+      "fbs.source_books": 0,
+      "fbs.source_text": 0
+     }
+    }
+   }
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/practice+process/Qualitative Inquiry and Research Design Choosing Among Five Approaches by John W. Creswell  Cheryl N. Poth (z-lib.org).md",
+   "sibling_corpus_files": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "stage_outputs": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "derived_artifacts": {
+    "count": 82,
+    "rewritable": false,
+    "examples": [
+     "checkpoints/book_metadata.jsonl:2",
+     "parquet/fbs_export_20260902_final.jsonl:80"
+    ]
+   },
+   "metadata_cache": {
+    "count": 1,
+    "rewritable": true
+   },
+   "store": {
+    "count": 0,
+    "rewritable": false,
+    "per_source": {
+     "DB_PATH": {
+      "fbs.source_books": 0,
+      "fbs.source_text": 0
+     }
+    }
+   }
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/practice+process/Workflow  a practical guide to the creative process by Meir, Doron (z-lib.org).md",
+   "sibling_corpus_files": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "stage_outputs": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "derived_artifacts": {
+    "count": 37,
+    "rewritable": false,
+    "examples": [
+     "checkpoints/book_metadata.jsonl:2",
+     "parquet/fbs_export_20260902_final.jsonl:35"
+    ]
+   },
+   "metadata_cache": {
+    "count": 1,
+    "rewritable": true
+   },
+   "store": {
+    "count": 0,
+    "rewritable": false,
+    "per_source": {
+     "DB_PATH": {
+      "fbs.source_books": 0,
+      "fbs.source_text": 0
+     }
+    }
+   }
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/visual+fundamentals/Emotional Expression and Effective Communication on Kinetic  Typography (1)_clean.md",
+   "sibling_corpus_files": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "stage_outputs": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "derived_artifacts": {
+    "count": 18,
+    "rewritable": false,
+    "examples": [
+     "checkpoints/book_metadata.jsonl:2",
+     "parquet/fbs_export_20260902_final.jsonl:16"
+    ]
+   },
+   "metadata_cache": {
+    "count": 1,
+    "rewritable": true
+   },
+   "store": {
+    "count": 0,
+    "rewritable": false,
+    "per_source": {
+     "DB_PATH": {
+      "fbs.source_books": 0,
+      "fbs.source_text": 0
+     }
+    }
+   }
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/visual+fundamentals/Giving Type Meaning  Context and Craft in Typography (Mia Cinelli) (Z-Library).md",
+   "sibling_corpus_files": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "stage_outputs": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "derived_artifacts": {
+    "count": 116,
+    "rewritable": false,
+    "examples": [
+     "checkpoints/book_metadata.jsonl:2",
+     "parquet/fbs_export_20260902_final.jsonl:114"
+    ]
+   },
+   "metadata_cache": {
+    "count": 1,
+    "rewritable": true
+   },
+   "store": {
+    "count": 0,
+    "rewritable": false,
+    "per_source": {
+     "DB_PATH": {
+      "fbs.source_books": 0,
+      "fbs.source_text": 0
+     }
+    }
+   }
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/visual+fundamentals/Graphic style  from Victorian to digital (Heller, Steven, Chwast, Seymour) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "sibling_corpus_files": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "stage_outputs": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "derived_artifacts": {
+    "count": 58,
+    "rewritable": false,
+    "examples": [
+     "checkpoints/book_metadata.jsonl:2",
+     "parquet/fbs_export_20260902_final.jsonl:56"
+    ]
+   },
+   "metadata_cache": {
+    "count": 1,
+    "rewritable": true
+   },
+   "store": {
+    "count": 0,
+    "rewritable": false,
+    "per_source": {
+     "DB_PATH": {
+      "fbs.source_books": 0,
+      "fbs.source_text": 0
+     }
+    }
+   }
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/visual+fundamentals/Layout for Graphic Designers An Introduction (Gavin Ambrose  Paul Harris) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "sibling_corpus_files": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "stage_outputs": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "derived_artifacts": {
+    "count": 64,
+    "rewritable": false,
+    "examples": [
+     "checkpoints/book_metadata.jsonl:2",
+     "parquet/fbs_export_20260902_final.jsonl:62"
+    ]
+   },
+   "metadata_cache": {
+    "count": 1,
+    "rewritable": true
+   },
+   "store": {
+    "count": 0,
+    "rewritable": false,
+    "per_source": {
+     "DB_PATH": {
+      "fbs.source_books": 0,
+      "fbs.source_text": 0
+     }
+    }
+   }
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Generative Art _ A Practical Guide Using Processing -- Matt  Pearson -- Pap_Psc, 2011 -- Manning Publications Co_ LLC -- 9781638352433 -- 6feaa18e048c4a229030d32609e63f3f -- Anna’s Archive.md",
+   "sibling_corpus_files": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "stage_outputs": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "derived_artifacts": {
+    "count": 120,
+    "rewritable": false,
+    "examples": [
+     "checkpoints/book_metadata.jsonl:2",
+     "checkpoints/checkpoint.jsonl:4",
+     "checkpoints/checkpoint.jsonl:4",
+     "checkpoints/input_fbs.jsonl:8",
+     "checkpoints/checkpoint.jsonl:4"
+    ]
+   },
+   "metadata_cache": {
+    "count": 1,
+    "rewritable": true
+   },
+   "store": {
+    "count": 0,
+    "rewritable": false,
+    "per_source": {
+     "DB_PATH": {
+      "fbs.source_books": 0,
+      "fbs.source_text": 0
+     }
+    }
+   }
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Graphics Shaders Theory and Practice, edition 2 (Mike Bailey  Steve Cunningham) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "sibling_corpus_files": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "stage_outputs": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "derived_artifacts": {
+    "count": 50,
+    "rewritable": false,
+    "examples": [
+     "checkpoints/book_metadata.jsonl:2",
+     "parquet/fbs_export_20260902_final.jsonl:48"
+    ]
+   },
+   "metadata_cache": {
+    "count": 1,
+    "rewritable": true
+   },
+   "store": {
+    "count": 0,
+    "rewritable": false,
+    "per_source": {
+     "DB_PATH": {
+      "fbs.source_books": 0,
+      "fbs.source_text": 0
+     }
+    }
+   }
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 3 Art + Computational Media/live+visuals+vjing/Live Visuals History, Theory, Practice (Routledge Advances in Theatre  Performance Studies) (Steve Gibson, Stefan Arisona etc.) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "sibling_corpus_files": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "stage_outputs": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "derived_artifacts": {
+    "count": 22,
+    "rewritable": false,
+    "examples": [
+     "checkpoints/book_metadata.jsonl:2",
+     "parquet/fbs_export_20260902_final.jsonl:20"
+    ]
+   },
+   "metadata_cache": {
+    "count": 1,
+    "rewritable": true
+   },
+   "store": {
+    "count": 0,
+    "rewritable": false,
+    "per_source": {
+     "DB_PATH": {
+      "fbs.source_books": 0,
+      "fbs.source_text": 0
+     }
+    }
+   }
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/marketing+growth/Demand-Side Sales 101 Stop Selling and Help Your Customers Make Progress (Bob Moesta  Greg Engle) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "sibling_corpus_files": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "stage_outputs": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "derived_artifacts": {
+    "count": 67,
+    "rewritable": false,
+    "examples": [
+     "checkpoints/book_metadata.jsonl:2",
+     "checkpoints/stage0_convert.jsonl:3",
+     "parquet/fbs_export_20260902_final.jsonl:62"
+    ]
+   },
+   "metadata_cache": {
+    "count": 1,
+    "rewritable": true
+   },
+   "store": {
+    "count": 0,
+    "rewritable": false,
+    "per_source": {
+     "DB_PATH": {
+      "fbs.source_books": 0,
+      "fbs.source_text": 0
+     }
+    }
+   }
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/practice+economics/365 habits of successful graphic designers  insider secrets from top designers on working smart and staying creative (Laurel Saville) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "sibling_corpus_files": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "stage_outputs": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "derived_artifacts": {
+    "count": 129,
+    "rewritable": false,
+    "examples": [
+     "checkpoints/book_metadata.jsonl:2",
+     "parquet/fbs_export_20260902_final.jsonl:127"
+    ]
+   },
+   "metadata_cache": {
+    "count": 1,
+    "rewritable": true
+   },
+   "store": {
+    "count": 0,
+    "rewritable": false,
+    "per_source": {
+     "DB_PATH": {
+      "fbs.source_books": 0,
+      "fbs.source_text": 0
+     }
+    }
+   }
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/practice+economics/Running Lean, 3rd Edition  Iterate from Plan A to a Plan That Works (Ash Maurya) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "sibling_corpus_files": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "stage_outputs": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "derived_artifacts": {
+    "count": 254,
+    "rewritable": false,
+    "examples": [
+     "checkpoints/book_metadata.jsonl:2",
+     "checkpoints/checkpoint.jsonl:8",
+     "checkpoints/checkpoint.jsonl:8",
+     "checkpoints/input_fbs.jsonl:16",
+     "checkpoints/checkpoint.jsonl:10"
+    ]
+   },
+   "metadata_cache": {
+    "count": 1,
+    "rewritable": true
+   },
+   "store": {
+    "count": 0,
+    "rewritable": false,
+    "per_source": {
+     "DB_PATH": {
+      "fbs.source_books": 0,
+      "fbs.source_text": 0
+     }
+    }
+   }
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/practice+economics/Testing Business Ideas A Field Guide for Rapid Experimentation (Alex Osterwalder  David J. Bland) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "sibling_corpus_files": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "stage_outputs": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "derived_artifacts": {
+    "count": 131,
+    "rewritable": false,
+    "examples": [
+     "checkpoints/book_metadata.jsonl:2",
+     "checkpoints/stage0_convert.jsonl:3",
+     "checkpoints/checkpoint.jsonl:3",
+     "checkpoints/checkpoint.jsonl:3",
+     "checkpoints/input_fbs.jsonl:6"
+    ]
+   },
+   "metadata_cache": {
+    "count": 1,
+    "rewritable": true
+   },
+   "store": {
+    "count": 0,
+    "rewritable": false,
+    "per_source": {
+     "DB_PATH": {
+      "fbs.source_books": 0,
+      "fbs.source_text": 0
+     }
+    }
+   }
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/strategy+brand/Business Acumen for Sales Success (Kevin Cope  Ben Cook) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "sibling_corpus_files": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "stage_outputs": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "derived_artifacts": {
+    "count": 66,
+    "rewritable": false,
+    "examples": [
+     "checkpoints/book_metadata.jsonl:2",
+     "checkpoints/stage0_convert.jsonl:3",
+     "checkpoints/checkpoint.jsonl:1",
+     "checkpoints/checkpoint.jsonl:1",
+     "checkpoints/input_fbs.jsonl:2"
+    ]
+   },
+   "metadata_cache": {
+    "count": 1,
+    "rewritable": true
+   },
+   "store": {
+    "count": 0,
+    "rewritable": false,
+    "per_source": {
+     "DB_PATH": {
+      "fbs.source_books": 0,
+      "fbs.source_text": 0
+     }
+    }
+   }
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 6 AI + Computing/ai+engineering+agents/The Art of Prompt Engineering for Multimodel AI  Harmonizing Text, Images, and Audio with GPT-4, CLIP, and AudioLM (Yash Jain) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "sibling_corpus_files": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "stage_outputs": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "derived_artifacts": {
+    "count": 29,
+    "rewritable": false,
+    "examples": [
+     "checkpoints/book_metadata.jsonl:2",
+     "parquet/fbs_export_20260902_final.jsonl:27"
+    ]
+   },
+   "metadata_cache": {
+    "count": 1,
+    "rewritable": true
+   },
+   "store": {
+    "count": 0,
+    "rewritable": false,
+    "per_source": {
+     "DB_PATH": {
+      "fbs.source_books": 0,
+      "fbs.source_text": 0
+     }
+    }
+   }
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 6 AI + Computing/ai+society+business/AI Marketing How AI is Transforming Marketing and Business Growth (Hamed Taherdoost  Mitra Madanchian) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "sibling_corpus_files": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "stage_outputs": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "derived_artifacts": {
+    "count": 48,
+    "rewritable": false,
+    "examples": [
+     "checkpoints/book_metadata.jsonl:2",
+     "checkpoints/stage0_convert.jsonl:3",
+     "parquet/fbs_export_20260902_final.jsonl:43"
+    ]
+   },
+   "metadata_cache": {
+    "count": 1,
+    "rewritable": true
+   },
+   "store": {
+    "count": 0,
+    "rewritable": false,
+    "per_source": {
+     "DB_PATH": {
+      "fbs.source_books": 0,
+      "fbs.source_text": 0
+     }
+    }
+   }
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 6 AI + Computing/llm+applications/Building Knowledge Graphs (Jesus Barrasa  Maya Natarajan  Jim Webber) (z-library.sk, 1lib.sk, z-lib.sk).md",
+   "sibling_corpus_files": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "stage_outputs": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "derived_artifacts": {
+    "count": 23,
+    "rewritable": false,
+    "examples": [
+     "checkpoints/book_metadata.jsonl:2",
+     "parquet/fbs_export_20260902_final.jsonl:21"
+    ]
+   },
+   "metadata_cache": {
+    "count": 1,
+    "rewritable": true
+   },
+   "store": {
+    "count": 0,
+    "rewritable": false,
+    "per_source": {
+     "DB_PATH": {
+      "fbs.source_books": 0,
+      "fbs.source_text": 0
+     }
+    }
+   }
+  },
+  {
+   "path": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 6 AI + Computing/programming/Learn Python The Hard Way, 3rd Edition .md",
+   "sibling_corpus_files": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "stage_outputs": {
+    "count": 0,
+    "rewritable": false,
+    "examples": []
+   },
+   "derived_artifacts": {
+    "count": 38,
+    "rewritable": false,
+    "examples": [
+     "checkpoints/book_metadata.jsonl:2",
+     "parquet/fbs_export_20260902_final.jsonl:36"
+    ]
+   },
+   "metadata_cache": {
+    "count": 1,
+    "rewritable": true
+   },
+   "store": {
+    "count": 0,
+    "rewritable": false,
+    "per_source": {
+     "DB_PATH": {
+      "fbs.source_books": 0,
+      "fbs.source_text": 0
+     }
+    }
+   }
+  }
+ ],
+ "apply_ready": false,
+ "refusal_reasons": [
+  "Lao Tzu  Tao te ching  a book about the way and the power of has 5 reference(s) in derived_artifacts, which this act CANNOT rewrite - refused (a rename that leaves a dangling reference is a cascade)",
+  "Art  fear  observations on the perils (and rewards) of artma has 18 reference(s) in derived_artifacts, which this act CANNOT rewrite - refused (a rename that leaves a dangling reference is a cascade)",
+  "The Great Mental Models, Volume 1 General Thinking Concepts  has 235 reference(s) in derived_artifacts, which this act CANNOT rewrite - refused (a rename that leaves a dangling reference is a cascade)",
+  "Working Backwards (Colin Bryar  Bill Carr) (z-library.sk, 1l has 82 reference(s) in derived_artifacts, which this act CANNOT rewrite - refused (a rename that leaves a dangling reference is a cascade)",
+  " Finding the Tipping Point- Visual Metaphor and Conceptual C has 17 reference(s) in derived_artifacts, which this act CANNOT rewrite - refused (a rename that leaves a dangling reference is a cascade)",
+  "Advertising  new techniques for visual seduction (Stoklossa, has 60 reference(s) in derived_artifacts, which this act CANNOT rewrite - refused (a rename that leaves a dangling reference is a cascade)",
+  "Meme wars  the creative destruction of neoclassical economic has 67 reference(s) in derived_artifacts, which this act CANNOT rewrite - refused (a rename that leaves a dangling reference is a cascade)",
+  "Metaphorically Selling How to Use the Magic of Metaphors to  has 162 reference(s) in derived_artifacts, which this act CANNOT rewrite - refused (a rename that leaves a dangling reference is a cascade)",
+  "The Tall Lady With the Iceberg The Power of Metaphor to Sell has 100 reference(s) in derived_artifacts, which this act CANNOT rewrite - refused (a rename that leaves a dangling reference is a cascade)",
+  "The impact of perceived complexity, deviation and comprehens has 41 reference(s) in derived_artifacts, which this act CANNOT rewrite - refused (a rename that leaves a dangling reference is a cascade)",
+  "Introduction to Data Visualization  Storytelling A Guide For has 58 reference(s) in derived_artifacts, which this act CANNOT rewrite - refused (a rename that leaves a dangling reference is a cascade)",
+  "Making Sense of Data III_ A Practical Guide to Designing Int has 155 reference(s) in derived_artifacts, which this act CANNOT rewrite - refused (a rename that leaves a dangling reference is a cascade)",
+  "Visualization Analysis  Design (Tamara Munzner) (z-library.s has 119 reference(s) in derived_artifacts, which this act CANNOT rewrite - refused (a rename that leaves a dangling reference is a cascade)",
+  "Design for Motion  Fundamentals and Techniques of Motion Des has 96 reference(s) in derived_artifacts, which this act CANNOT rewrite - refused (a rename that leaves a dangling reference is a cascade)",
+  "How to Create Your Own Gig Posters, Band T-Shirts, Album Cov has 24 reference(s) in derived_artifacts, which this act CANNOT rewrite - refused (a rename that leaves a dangling reference is a cascade)",
+  "Laws of UX Using Psychology to Design Better Products  Servi has 78 reference(s) in derived_artifacts, which this act CANNOT rewrite - refused (a rename that leaves a dangling reference is a cascade)",
+  "Practical UI  Quick and practical UI design guidelines to de has 48 reference(s) in derived_artifacts, which this act CANNOT rewrite - refused (a rename that leaves a dangling reference is a cascade)",
+  "The elements of user experience  user-centered design for th has 103 reference(s) in derived_artifacts, which this act CANNOT rewrite - refused (a rename that leaves a dangling reference is a cascade)",
+  "Grounded theory and grounded theorizing  pragmatism in resea has 132 reference(s) in derived_artifacts, which this act CANNOT rewrite - refused (a rename that leaves a dangling reference is a cascade)",
+  "Qualitative Inquiry and Research Design Choosing Among Five  has 82 reference(s) in derived_artifacts, which this act CANNOT rewrite - refused (a rename that leaves a dangling reference is a cascade)",
+  "Workflow  a practical guide to the creative process by Meir, has 37 reference(s) in derived_artifacts, which this act CANNOT rewrite - refused (a rename that leaves a dangling reference is a cascade)",
+  "Emotional Expression and Effective Communication on Kinetic  has 18 reference(s) in derived_artifacts, which this act CANNOT rewrite - refused (a rename that leaves a dangling reference is a cascade)",
+  "Giving Type Meaning  Context and Craft in Typography (Mia Ci has 116 reference(s) in derived_artifacts, which this act CANNOT rewrite - refused (a rename that leaves a dangling reference is a cascade)",
+  "Graphic style  from Victorian to digital (Heller, Steven, Ch has 58 reference(s) in derived_artifacts, which this act CANNOT rewrite - refused (a rename that leaves a dangling reference is a cascade)",
+  "Layout for Graphic Designers An Introduction (Gavin Ambrose  has 64 reference(s) in derived_artifacts, which this act CANNOT rewrite - refused (a rename that leaves a dangling reference is a cascade)",
+  "Generative Art _ A Practical Guide Using Processing -- Matt  has 120 reference(s) in derived_artifacts, which this act CANNOT rewrite - refused (a rename that leaves a dangling reference is a cascade)",
+  "Graphics Shaders Theory and Practice, edition 2 (Mike Bailey has 50 reference(s) in derived_artifacts, which this act CANNOT rewrite - refused (a rename that leaves a dangling reference is a cascade)",
+  "Live Visuals History, Theory, Practice (Routledge Advances i has 22 reference(s) in derived_artifacts, which this act CANNOT rewrite - refused (a rename that leaves a dangling reference is a cascade)",
+  "Demand-Side Sales 101 Stop Selling and Help Your Customers M has 67 reference(s) in derived_artifacts, which this act CANNOT rewrite - refused (a rename that leaves a dangling reference is a cascade)",
+  "365 habits of successful graphic designers  insider secrets  has 129 reference(s) in derived_artifacts, which this act CANNOT rewrite - refused (a rename that leaves a dangling reference is a cascade)",
+  "Running Lean, 3rd Edition  Iterate from Plan A to a Plan Tha has 254 reference(s) in derived_artifacts, which this act CANNOT rewrite - refused (a rename that leaves a dangling reference is a cascade)",
+  "Testing Business Ideas A Field Guide for Rapid Experimentati has 131 reference(s) in derived_artifacts, which this act CANNOT rewrite - refused (a rename that leaves a dangling reference is a cascade)",
+  "Business Acumen for Sales Success (Kevin Cope  Ben Cook) (z- has 66 reference(s) in derived_artifacts, which this act CANNOT rewrite - refused (a rename that leaves a dangling reference is a cascade)",
+  "The Art of Prompt Engineering for Multimodel AI  Harmonizing has 29 reference(s) in derived_artifacts, which this act CANNOT rewrite - refused (a rename that leaves a dangling reference is a cascade)",
+  "AI Marketing How AI is Transforming Marketing and Business G has 48 reference(s) in derived_artifacts, which this act CANNOT rewrite - refused (a rename that leaves a dangling reference is a cascade)",
+  "Building Knowledge Graphs (Jesus Barrasa  Maya Natarajan  Ji has 23 reference(s) in derived_artifacts, which this act CANNOT rewrite - refused (a rename that leaves a dangling reference is a cascade)",
+  "Learn Python The Hard Way, 3rd Edition .md has 38 reference(s) in derived_artifacts, which this act CANNOT rewrite - refused (a rename that leaves a dangling reference is a cascade)"
+ ]
+}

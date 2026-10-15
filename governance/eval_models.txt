@@ -1,6 +1,7 @@
-# generated from live oMLX registry
+# generated from /v1/models/status by this script (BUG-819: it was hand-copied and had drifted)
+MiniCPM5-2B-MLX
 Ornith-1.5-35B-A3B-REAP-19B
-Ornith-1.5-9B-OptiQ-4bit
+Ornith-1.5-9B-MLX-8bit
 Phi-4-mini-instruct-8bit
 Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
 Qwen3.8-27B-MLX-4bit

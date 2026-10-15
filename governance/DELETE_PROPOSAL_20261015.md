@@ -50,3 +50,32 @@ Command (owner act): `pipeline/omlx_retire_model.sh --model gemma-4-12B-it-qat-O
 then, only if the bytes are to go: `python3 pipeline/safe_delete.py <hub repo> --reason "T-139 retirement"`
 Open question the owner must settle: `config/r5_review_gate.yaml` lists it as a cross-family reviewer
 candidate, so retiring it removes one R5 option (gemma-4-E4B, Qwen3.8-27B and Ornith-9B remain).
+
+---
+
+## EXECUTED 2026-10-15 (D-3013) - what actually happened to the roster above
+
+### Deleted (owner order, 2026-10-15)
+
+| item | bytes | why it was safe |
+|---|---|---|
+| `models--mlx-community--gemma-4-12B-it-qat-OptiQ-4bit` (hub) | 8.4 GB | T-139 retirement: the entry was removed FIRST, then the bytes; worst measured non-27B decode (13.4 tok/s), only live declarations were a REJECTED swap (D-2788) and one R5 slot. Re-acquirable (public repo). |
+| `models--mlx-community--Qwen2.5-7B-Instruct-4bit` (hub) | 4.0 GB | zero live references anywhere outside governance prose (re-verified by grep 2026-10-15) |
+| 5 broken symlinks in `~/.omlx/_unloaded` + 2 in `~/.omlx/models_stashed` | 0 B | names that resolved to nothing (BUG-808); removing a symlink loses no bytes |
+
+### Corrected in passing
+
+* `config/engine.yaml#candidates.served_now`, `config/r5_review_gate.yaml#candidates` and
+  `config/pipeline_config.yaml#swap_eval_candidate_model` named the retired model. The third is READ by
+  `scripts/fit_eval_model_swap.py`, so leaving it would have been a hidden failure at the next re-fit.
+* `~/.omlx/models/Qwen3.8-27B-MLX-4bit` is COMPLETE (real 15 GB directory, 3/3 shards). The 4.0 GB hub
+  repo of the same name is not a partial copy of it: it is six `.incomplete` fragments, metadata-only
+  snapshot, nothing resumable, identical quantization (BUG-814).
+
+### NOT deleted, and why (the owner asked about the NLI/embedder set)
+
+| set | bytes | verdict |
+|---|---|---|
+| `bart-large-mnli` 6.5 GB, `roberta-large-snli` 4.0 GB, `roberta-large-mnli` 1.3 GB, `nli-deberta-v3-small` 552 MB, `distilbert-mnli` 255 MB, `ms-marco-MiniLM` 88 MB, `all-MiniLM-L6-v2` 87 MB, `Qdrant onnx` 87 MB | 12.9 GB | KEEP-UNTIL-A-BATCH: each exists only to LOSE a comparison that is already recorded (DEBERTA_VERIFICATION_TEST_2026-08-09.md) and no config resolves into any of them. Deletable on the owner word, as one batch, kind-classified (D-3014). |
+| `MMLU-Pro` 4.0 MB, `MATH-500` 448 KB, `openai_humaneval` 96 KB | 4.5 MB | KEEP: DATASETS are the eval instrument. Deleting 4.5 MB to break re-benching is a net loss (D-3014). |
+| five 12-24 KB Qwen3.8 metadata stubs; `pplx-decider-v1.1-27b-4bit` 14 GB; `clef-4bit` 8.2 GB; `clef-flash-4bit` 5.8 GB; the hub's second copy of `Phi-4-mini-instruct-8bit` 5.4 GB | ~33.5 GB | AUDIT (T-142): classify by RESOLUTION, not by mention. `BAAI--bge-m3` 4.3 GB is explicitly out of scope until the sentence-transformers path is checked against Ollama. |

@@ -949,18 +949,19 @@ tasks:
     (DELEGATE-002).'
 - id: T-139
   priority: SHOULD
-  state: open
+  state: done
   mover: owner
   title: "RETIRE a served model so a better one can be adopted - the pool, not the disk, is the scarce resource"
-  source: governance/DELETE_PROPOSAL_20261015.md; D-3009; D-3010; pipeline/omlx_retire_model.sh
-  evidence: 'gemma-4-12B-it-qat-OptiQ-4bit is served (8.4 GB) with the worst MEASURED non-27B decode (13.4 tok/s,
-    agent_context.yaml), and its only live declarations are a REJECTED swap (pipeline_config.yaml#swap_eval_candidate_model
-    - D-2788 "slower on BOTH axes") and an R5 candidate list (config/r5_review_gate.yaml). The eval report lists it
-    under PRUNED. Its functions are covered by gemma-4-E4B (routing/stability) and Qwen3.8-27B (quality).'
-  gate: 'THE OWNER''S WORD, because it changes what the engine serves: retiring it removes one R5 reviewer
-    candidate (gemma-4-E4B, Qwen3.8-27B and Ornith-9B remain). Infrastructure is ready and dry-run verified:
-    pipeline/omlx_retire_model.sh --model gemma-4-12B-it-qat-OptiQ-4bit (parks the entry; the bytes need a
-    separate safe_delete call, R-D410). Only after this does Edge0/Edge0-35B-A3B-preview (19.69 GB) have a slot.'
+  source: governance/DELETE_PROPOSAL_20261015.md; D-3009; D-3010; D-3013; pipeline/omlx_retire_model.sh
+  evidence: 'gemma-4-12B-it-qat-OptiQ-4bit was served (8.4 GB) with the worst MEASURED non-27B decode (13.4 tok/s,
+    MEASURED 2026-10-15, config/agent_context.yaml), and its only live declarations were a REJECTED swap
+    (pipeline_config.yaml#swap_eval_candidate_model - D-2788 "slower on BOTH axes") and an R5 candidate list
+    (config/r5_review_gate.yaml). The eval report lists it under PRUNED, and its functions are covered by
+    gemma-4-E4B (routing/stability) and Qwen3.8-27B (quality).'
+  gate: 'EXECUTED 2026-10-15 by the owner (D-3013): unloaded, the engine entry removed and the 8.4 GB of hub
+    bytes deleted - receipt governance/DELETION_RECEIPT_20261015.json. The R5 loss is accepted and recorded in
+    config/r5_review_gate.yaml; gemma-4-E4B, Qwen3.8-27B and Ornith-9B remain as reviewers. The freed pool
+    slot belongs to Edge0/Edge0-35B-A3B-preview (19.69 GB), which stays HOLD until its own download decision.'
 - id: T-140
   priority: SHOULD
   state: open
@@ -974,3 +975,47 @@ tasks:
     invocation, measured today.'
   gate: 'the owner names the first real fan-out task: the executor needs a task file (id, model, question, files)
     plus the word that its answers are to be applied.'
+- id: T-141
+  priority: MUST
+  state: open
+  mover: pipeline
+  title: "SERIALIZE MODEL DOWNLOADS: two overlapping attempts at one repo leave .incomplete fragments that no tool can assemble"
+  source: BUG-818; pipeline/hf_fetch_model.py; D-3015
+  evidence: 'MEASURED 2026-10-15: models--lmstudio-community--Qwen3.8-27B-MLX-4bit held 4.0 GB as SIX .incomplete
+    blobs, three target hashes each present twice with different random suffixes (471a9a...55035491 + 471a9a...f6248dc7;
+    0e1038989...fc41e56b + ff5c14eb; e7474b8f...c30174f6 + ce03d157) - the fingerprint of two concurrent or aborted
+    attempts. huggingface_hub will not resume a foreign fragment, so the bytes can never be assembled; meanwhile the
+    SAME repo content is complete in the serving path with an identical quantization block. hf_fetch_model.py takes
+    no lock, so nothing prevents a second fetch of the same repo while the first is running.'
+  gate: 'pipeline: take an exclusive lock per repo before fetching, refuse to start when the repo holds .incomplete
+    fragments (a partial download is not a cache hit), and report resume-vs-restart explicitly. Proof must be a
+    two-process attempt where the second refuses.'
+- id: T-142
+  priority: SHOULD
+  state: open
+  mover: owner
+  title: "BYTE-OWNER AUDIT of the DECLARED bucket: 59.7 GB whose only claim to be on disk is a mention"
+  source: BUG-814; D-3010; governance/model_store_census_20261015.json; governance/DELETION_RECEIPT_20261015.json
+  evidence: 'MEASURED 2026-10-15: three findings the census could not see because it classifies by NAME. (1) the hub
+    holds 5.4 GB as a SECOND copy of Phi-4-mini-instruct-8bit while the model the engine serves is a real directory in
+    models_stashed. (2) five 12-24 KB metadata stubs named for 27B/9B Qwen3.8 repos (lmstudio-community 6bit,
+    mlx-community 4bit, keXjos 9B, pooyakn73 and xy10086 9B distills) - a name that resolves to no weight at all.
+    (3) DECLARED also contains pplx-decider-v1.1-27b-4bit 14 GB, clef-4bit 8.2 GB and clef-flash-4bit 5.8 GB, none
+    of them served. BAAI--bge-m3 4.3 GB is NOT in scope until the sentence-transformers path is checked against the
+    Ollama path (deleting the live embedder would be a self-inflicted outage).'
+  gate: 'pipeline: re-run the census with a RESOLUTION test (does a served entry, config value or script resolve into
+    these bytes?) and report per repo: resolution, bytes, re-acquirability. Deletion follows D-3010 and needs the
+    owner word per batch.'
+- id: T-143
+  priority: MUST
+  state: open
+  mover: pipeline
+  title: "RESOURCE-CLASS THE FAN-OUT: the engine pool is a mutex, the governed homes are a single writer"
+  source: D-3015; governance/PARALLEL_EXECUTION_DOCTRINE_20261015.md; pipeline/subagent_fanout.py
+  evidence: 'MEASURED 2026-10-15: the engine declares model_count 9 / loaded 3 / final_ceiling 56.6 GB, so a fan-out of
+    three is safe and a fan-out of nine schedules an eviction (BUG-803). The pool has ONE resident set: any job that
+    loads a fourth model changes the latency of every other job. The governance homes take APPEND-ONLY land scripts
+    (BUG-817): two writers on one register is data loss, not parallelism.'
+  gate: 'pipeline: add a resource_class per fan-out task (ENGINE_POOL capped at engine.fanout.max_parallel, CPU_IO capped
+    at cores, WRITE strictly serial) and make the planner REFUSE a task whose class is not declared. Proof: a six-task
+    plan where the three ENGINE_POOL tasks serialize and the CPU_IO tasks run wide.'

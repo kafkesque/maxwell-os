@@ -1,0 +1,33 @@
+{
+  "deleted_at": "2026-10-15T16:2x",
+  "authority": "owner order 2026-10-15 (D-3013); T-139 executed",
+  "items": [
+    {
+      "path": "~/.cache/huggingface/hub/models--mlx-community--gemma-4-12B-it-qat-OptiQ-4bit",
+      "bytes_measured_before": 8400000000,
+      "note": "served model retired first (engine entry removed), then bytes deleted"
+    },
+    {
+      "path": "~/.cache/huggingface/hub/models--mlx-community--Qwen2.5-7B-Instruct-4bit",
+      "bytes_measured_before": 4000000000,
+      "note": "orphan, zero live references (grep re-verified 2026-10-15)"
+    },
+    {
+      "path": "~/.omlx/_unloaded/{DeepSeek-R1-0528-Qwen3-8B-MLX-4bit,Qwen3.6-35B-A3B-4bit,Qwopus-GLM-18B,gemma-4-26B-A4B-it-OptiQ-4bit,gemma-4-E2B-it-MLX-4bit}",
+      "bytes_measured_before": 0,
+      "note": "5 broken symlinks (BUG-808); 0 bytes lost"
+    },
+    {
+      "path": "~/.omlx/models_stashed/{Qwen3.6-35B-A3B-UD-MLX-4bit,gemma-4-12B-it-4bit}",
+      "bytes_measured_before": 0,
+      "note": "2 broken symlinks (BUG-808); 0 bytes lost"
+    }
+  ],
+  "method": "direct rm -rf for model weights (pipeline/safe_delete.py copies into backup/deletions/, which is inside a Dropbox-synced repo — BUG-818c); symlinks removed only when test -e was false",
+  "kept_in_scope_now": {
+    "tier_B_nli_embedder": "12.9 GB — each exists only to lose a comparison already recorded in governance/DEBERTA_VERIFICATION_TEST_2026-08-09.md; no config resolves into them (D-3014)",
+    "datasets": "MMLU-Pro 4.0 MB + MATH-500 448 KB + humaneval 96 KB = 4.5 MB — the eval instrument, never swept with model bytes (D-3014)",
+    "audit_T142": "~33.5 GB the census calls DECLARED on a mention: pplx-decider 14 GB, clef-4bit 8.2 GB, clef-flash-4bit 5.8 GB, hub's 2nd copy of Phi-4-mini 5.4 GB, five 12-24 KB Qwen3.8 metadata stubs"
+  },
+  "verification": "engine registry reloaded; no dangling name under ~/.omlx/{models,_unloaded,models_stashed}"
+}

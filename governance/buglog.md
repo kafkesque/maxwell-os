@@ -14314,3 +14314,79 @@ TWO RULES THIS ADDS, and they are the same rule twice:
   (1) A STRUCTURAL EDIT GOES THROUGH THE LAND-SCRIPT PATTERN (temp/land_*.py): guard() a backup, append, then
       yaml_ok() which ROLLS BACK on a parse failure. Every earlier landing today did this; this one did not.
   (2) A SHELL THAT RUNS AFTER A FAILED STEP MUST NOT COMMIT. The land script's exit code is the gate.
+
+## BUG-808 (CLOSED 2026-10-15) - names that read as "on disk" and resolve to nothing
+
+RE-MEASURED and CLOSED. The censuss seven-entry broken set lives in TWO directories, not one, and one of
+the six parked entries was never broken at all:
+
+| where | name | state |
+|---|---|---|
+| `~/.omlx/_unloaded` | DeepSeek-R1-0528-Qwen3-8B-MLX-4bit, Qwen3.6-35B-A3B-4bit, Qwopus-GLM-18B, gemma-4-26B-A4B-it-OptiQ-4bit, gemma-4-E2B-it-MLX-4bit | 5 x BROKEN (target absent) - REMOVED, 0 bytes lost |
+| `~/.omlx/models_stashed` | Qwen3.6-35B-A3B-UD-MLX-4bit, gemma-4-12B-it-4bit | 2 x BROKEN (target absent) - REMOVED, 0 bytes lost |
+| `~/.omlx/_unloaded` | Phi-4-mini-instruct-8bit | RESOLVES into the hub (5.4 GB) - and that is the FINDING below |
+
+(a) The census said "seven broken `_unloaded` symlinks". The measurement says FIVE there and TWO elsewhere:
+an instrument that reports a count without reporting WHERE cannot be re-derived by the next agent (D-2981).
+(b) Removing a symlink whose target is absent destroys zero bytes and is the whole remedy; leaving it is what
+made two bench rows read NA.
+(c) The RESOLVING parked entry exposed the real hazard: `Phi-4-mini-instruct-8bit` has TWO copies on this
+machine - the hub's (reachable only through that parked symlink) and the real directory in `models_stashed`
+that the engine actually serves. A duplicate is not a lying name, it is a 5.4 GB question nobody asked.
+Filed as T-142 (byte-owner audit of the DECLARED bucket).
+
+## BUG-814 (CLOSED 2026-10-15) - 4.0 GB of hub bytes that can never become a model, named as a model that already is one
+
+MEASURED, and the answer to "can we not just resume it?" is NO, twice over.
+
+(a) `models--lmstudio-community--Qwen3.8-27B-MLX-4bit` = 4.0 GB and ALL of it is `.incomplete` fragments:
+319 MB + 0.24 MB + 1459 MB + 1657 MB + 293 MB + 513 MB. Three target hashes appear TWICE with different
+random suffixes (`471a9a...55035491.incomplete` AND `471a9a...f6248dc7.incomplete`; `0e1038989...fc41e56b`
+AND `ff5c14eb`; `e7474b8f...c30174f6` AND `ce03d157`) - the fingerprint of two overlapping or aborted
+attempts. huggingface_hub does not resume a foreign fragment: there is nothing here to resume FROM.
+(b) The snapshot directory holds METADATA ONLY (config.json, tokenizer.json, index.json, README, processor
+configs) and NOT ONE shard symlink: the index names three shards; the snapshot names none.
+(c) The model is NOT missing. The served `~/.omlx/models/Qwen3.8-27B-MLX-4bit` is a REAL 15 GB directory,
+3 complete shards (5.34 + 5.35 + 5.36 GB), and its quantization block is IDENTICAL to the hub fragments
+(`qwen3_5`, 4-bit, affine, group_size 64). Resuming would rebuild something that already exists, next to it.
+(d) It was classified DECLARED only because its name appears in two governance documents. RESOLUTION, not
+mention, is the byte-owner test (D-3010) - the same test that keeps the three 12-24 KB metadata stubs and
+the `pplx-decider`/`clef` trio in T-142 rather than in a delete list.
+
+## BUG-818 (MED - OPEN 2026-10-15) - the retire tool's dry run promises a park and its code performs a delete; and safe_delete would copy model weights into a Dropbox-synced repo
+
+Three self-inflicted traps found while executing the owners deletion order (D-3013).
+
+(a) `pipeline/omlx_retire_model.sh` dry run prints "would move the ENTRY (not the bytes) to
+`models_stashed/NAME`" while the apply branch does `rm "$ENTRY"` for a symlink and only MOVES a real
+directory. Two behaviours, one sentence: an operator who reads the dry run believes the entry is
+recoverable from the stash and it is not.
+(b) A park followed by a byte deletion produces a parked symlink pointing at nothing - recreating BUG-808
+inside the tool that exists to prevent it.
+(c) `pipeline/safe_delete.py` copies its target to `backup/deletions/` before deleting. For model weights that
+copies 8.4 GB INTO THE REPOSITORY, which is a Dropbox-synced folder: the bytes would leave the machine
+(C3) and the gain would be nil. The tool already prints the right instruction for weights ("delete directly
+with rm -rf") - the trap is that its own default contradicts it.
+FIX RULE (now part of D-3013): model weights are deleted directly, with a receipt naming path, measured
+bytes, reason and decision id; the engine entry is removed FIRST so no name can outlive its target.
+
+## BUG-819 (WORTH - OPEN 2026-10-15) - a face that says "generated from the live oMLX registry" was hand-copied and had drifted
+
+`governance/eval_models.txt` opens with `# generated from live oMLX registry` and is cited by
+`config/r5_review_gate.yaml` as the evidence for what is live. Measured: it lists seven models including
+`Ornith-1.5-9B-OptiQ-4bit` (the engine now serves `Ornith-1.5-9B-MLX-8bit`) and it does not list
+`MiniCPM5-2B-MLX` (adopted 2026-10-15). Nothing writes it. A count or a list with no generator is a claim,
+not a face: regenerate it from `/v1/models/status` or delete the "generated" line.
+
+## BUG-820 (MED - OPEN 2026-10-15) - a guard artifact rewritten by a generic YAML dumper loses the comments that ARE the guard
+
+`governance/session_plan_20260924.yaml` is read by `scripts/check_session_plan.py`, and its `may_touch` list carries
+per-entry NAMED comments (which decision or bug earned each grant) so that a later agent can tell an earned grant from a
+blanket one. Granting five new paths with `yaml.safe_load` + `yaml.safe_dump` rewrote the file: 618 insertions /
+666 deletions, 34 comment lines gone, folded scalars re-flowed, and 78 duplicate entries silently collapsed - the data
+survived and the PROVENANCE did not. MEASURED, then REVERTED (`git checkout HEAD --`) and redone as a TEXTUAL
+insertion that preserves every comment.
+
+RULE: a governed YAML file whose comments carry provenance is edited by INSERTION, never by load-dump. A dumper is
+safe for a file whose meaning is entirely in its keys; it is destructive for a file whose meaning is partly in its
+comments (the same distinction BUG-810 made for shell-quoted arguments).

@@ -24799,3 +24799,69 @@ decisions:
     FATAL, because a fallback is indistinguishable from a declaration (C12/C16, BUG-817). (3) AFTER ANY
     STRUCTURAL EDIT, GREP FOR THE KEY THAT WAS JUST WRITTEN before anything is built on it; "no match found"
     is a FAILURE REPORT, not a note (BUG-810''s remedy, restated as practice after it was violated).'
+
+- id: D-3013
+  date: '2026-10-15'
+  class: STORE / DELETION
+  title: 'AN OWNER-ORDERED DELETION KEEPS A RECEIPT: retire the NAME first, delete the BYTES second, and never leave the two steps able to produce a name that points at nothing'
+  decision: >-
+    (1) The owner ordered the deletion of gemma-4-12B-it-qat-OptiQ-4bit (8.4 GB, served) and
+    Qwen2.5-7B-Instruct-4bit (4.0 GB, orphan) on 2026-10-15. Both are public MLX repos: re-acquirable,
+    never load-bearing. (2) THE ORDER IS RETIRE THEN DELETE. Deleting bytes under a live engine entry
+    creates exactly the BUG-808 failure mode the retire tool exists to prevent; parking a symlink and
+    then deleting its target creates it too. (3) MODEL WEIGHTS ARE NOT PIPELINE OUTPUT: pipeline/safe_delete.py
+    copies its target into backup/deletions/ before deleting, which for model bytes would drag 8.4 GB into a
+    Dropbox-synced repository - the tool says so itself and points at rm -rf for weights. The deletion is
+    therefore direct, and the RECORD is the safeguard: path, measured bytes, reason, owner word and decision id
+    in governance/DELETION_RECEIPT_20261015.json. (4) A RECEIPT THAT NAMES A DELETED MODEL IS NOT DRIFT
+    (measurements in config/agent_context.yaml stay); a LIVE KEY that names one is drift and must be repointed -
+    config/pipeline_config.yaml#swap_eval_candidate_model is read by scripts/fit_eval_model_swap.py and was
+    repointed to the classifier-of-record. (5) Each deletion carries the task that would notice it went wrong:
+    T-141 for downloads, T-142 for the declared-by-mention bucket.
+- id: D-3014
+  date: '2026-10-15'
+  class: STORE / HYGIENE
+  title: 'A MODEL KEPT ONLY TO LOSE A RECORDED COMPARISON IS DELETABLE; A DATASET IS NOT A MODEL AND IS NEVER SWEPT WITH MODEL BYTES'
+  decision: >-
+    (1) The Tier B set (facebook/bart-large-mnli 6.5 GB, ynie/roberta-large-snli 4.0 GB, roberta-large-mnli 1.3 GB,
+    cross-encoder/nli-deberta-v3-small 552 MB, typeform/distilbert-mnli 255 MB, cross-encoder/ms-marco-MiniLM 88 MB,
+    sentence-transformers/all-MiniLM-L6-v2 87 MB, Qdrant/all-MiniLM-L6-v2-onnx 87 MB = 12.9 GB) exists to be a
+    baseline that LOST. governance/DEBERTA_VERIFICATION_TEST_2026-08-09.md holds the measured verdict
+    (nli-deberta-v3-small runner-up at 4.8s, roberta-large-mnli baseline FAILS), and no live config or script
+    resolves into any of them. The RECEIPT is the value, not the weights - the models may go, the receipt may not.
+    (2) The three dataset orphans (TIGER-Lab/MMLU-Pro 4.0 MB, HuggingFaceH4/MATH-500 448 KB,
+    openai/openai_humaneval 96 KB) are THE EVAL INSTRUMENT, not models: 4.5 MB total. A delete that breaks the
+    ability to re-bench is strictly worse than 4.5 MB kept. (3) A deletion batch is therefore classified by
+    KIND first (model weights / dataset / receipt / config) and only then by size.
+- id: D-3015
+  date: '2026-10-15'
+  class: EXECUTION / PARALLELISM
+  title: 'PARALLELISM IS A RESOURCE-CLASS DECISION: the engine pool is a mutex, the governed homes are a single writer, and a download is serialized per repo'
+  decision: >-
+    (1) A fan-out unit is an ARTEFACT (D-3005), and every unit declares a RESOURCE CLASS. ENGINE_POOL jobs
+    (anything that calls a model) are capped at engine.fanout.max_parallel=3 because the pool is one resident set:
+    a fourth concurrent model changes the latency and the memory of every other job (BUG-803, measured). CPU_IO jobs
+    (grep, census, hashing, verification of files) run wide up to the core count. WRITE jobs (governance/, config/,
+    registers) are STRICTLY SERIAL through a land script - two writers on one register is data loss, not parallelism.
+    (2) DOWNLOADS ARE SERIALIZED PER REPO. The evidence is measured: 4.0 GB of .incomplete fragments holding three
+    target hashes twice over is the fingerprint of overlapping attempts, and no tool can assemble them (T-141).
+    (3) A job that cannot decide must say so and stop: a workstream that reports NO EVIDENCE is reporting on its
+    PREMISE (BUG-816), so the planner gates the premise before any model is called (D-3012).
+    (4) Verification is a SEQUENCE, never a parallel peer: the verifier runs after the generator and from a
+    different family (R5).
+- id: D-3016
+  date: '2026-10-15'
+  class: AGENT / HARNESS POLICY
+  title: 'A HARNESS IS AN ENGINE-WIRED CLIENT, INSTALLED ON DEMAND: omlx wires, it does not download; the owner is the installer, and a cloud harness is excluded by C3'
+  decision: >-
+    (1) `omlx launch TOOL` sets the env for a harness that IS ALREADY on PATH; it does not install one. Measured
+    install hints: claude npm install -g @anthropic-ai/claude-code (installed), pi npm install -g
+    @mariozechner/pi-coding-agent (installed), codex npm install -g @openai/codex, openclaw npm install -g openclaw,
+    copilot npm install -g @github/copilot, opencode curl -fsSL https://opencode.ai/install | bash, hermes the
+    NousResearch install.sh, dsh a DESKTOP APP (no CLI) that cannot be driven by a script at all. (2) L4 default is
+    TWO harnesses, claude and pi, because both are installed and both have a headless mode; the other five are
+    installed only when a specific job demands it (T-138) and each install is a supply-chain action on this machine.
+    (3) The DeepSeek CLI already present at /opt/homebrew/bin/deepseek is a CLOUD client (its own `models` command
+    lists live DeepSeek API models) and is therefore NOT the local deepseek harness: using it breaks C3/C22 and it is
+    excluded from pipeline work. (4) A harness writes PROPOSALS into temp/ and holds no governed pen; one interactive
+    harness at a time on the pool; its output is a claim, never a verification (L4 constraints, D-3011).

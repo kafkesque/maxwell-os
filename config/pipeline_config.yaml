@@ -497,7 +497,10 @@ stage4:
   # partition schema) to kill the schema overload. Owner-gated (GATE 1).
   anchor_rederive_input_anchor: governance/discipline_anchor_rederived_v8_20261007.json
   swap_eval_baseline_model: gpt-oss-20b-MXFP4-Q8   # D-2767/D-2783 classifier-of-record (baseline)
-  swap_eval_candidate_model: gemma-4-12B-it-qat-OptiQ-4bit   # D-2788 REJECTED (slower on BOTH axes) — kept for audit trail; classifier-of-record remains gpt-oss-20b-MXFP4-Q8
+  # D-2788 REJECTED the gemma-4-12B swap (slower on BOTH axes) and T-139 RETIRED the model on 2026-10-15.
+  # This key must not name it: scripts/fit_eval_model_swap.py READS it and would bench a model whose
+  # bytes no longer exist. A re-fit needs a NEW candidate, named only after it is fetched and measured.
+  swap_eval_candidate_model: gpt-oss-20b-MXFP4-Q8   # == the baseline; classifier-of-record stands
   swap_eval_kappa_bar: 0.7   # D-2782 classifier-kappa bar (Cohen, classifier-vs-gold), declared pre-eval
   # D-2773 (2026-10-02): closed 62-discipline menu injection (BUG-622 fix, MEASURE-gated).
   # OFF by default — when false the prompt is byte-identical to the pre-fix baseline.

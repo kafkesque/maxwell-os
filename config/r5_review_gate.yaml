@@ -88,7 +88,10 @@ tiers:
       below AND a BUG-265-class preflight: the 26B-A4B OptiQ sibling is DISABLED as BROKEN
       (config/model_assignments.yaml:145 - "5/5 calls fail"), and lmstudio-community/gemma-4-26B-A4B-it-QAT-MLX-4bit
       is a DIFFERENT artifact that is NOT fetched and NOT registered here.
-    candidates: [gpt-oss-20b-MXFP4-Q8, gemma-4-26B-A4B-it-QAT-MLX-4bit, gemma-4-12B-it-qat-OptiQ-4bit]
+    # RETIRED 2026-10-15 (T-139/D-3013): gemma-4-12B-it-qat-OptiQ-4bit was a reviewer candidate whose
+    # bytes are gone - a candidate that cannot resolve is a name that lies (BUG-808 class). The
+    # 26B-A4B OptiQ sibling stays DISABLED as BROKEN (config/model_assignments.yaml:145).
+    candidates: [gpt-oss-20b-MXFP4-Q8]
     not_candidates: [Qwen3.8-27B-MLX-4bit]
     not_candidates_why: >-
       Qwen3.8-27B shares the Qwen lineage with the generator (Qwen3-Coder-30B-A3B-Instruct-MLX-4bit), so it is

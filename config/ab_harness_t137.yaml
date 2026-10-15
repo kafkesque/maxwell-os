@@ -1,0 +1,59 @@
+# config/ab_harness_t137.yaml
+# T-137 A/B gate: pin agent_loop model + prove tiered cache — the LINCHPIN before flipping active_provider.
+# Authority: D-3025 (a loop names its terminal condition + checker before it runs),
+#            D-400  (every instrument that DECIDES is measured on a sealed control first),
+#            owner standing rule 2026-10-15 (a fork without a verified winner is A/B'd before commit).
+# State: DECLARED. measured values below come from 2026-10-14/15 instrumentation; bars marked
+#        "declared" are proposed thresholds, NOT yet measured baselines (verify before adopting).
+
+decision: T-137
+question: >
+  Is gemma-4-E4B-it-MLX-4bit + tiered-cache a strictly better agent_loop engine than
+  Qwen3-Coder-30B-A3B-Instruct-MLX-4bit + current cache, on latency, decode stability,
+  and cache amplification?
+
+control:
+  model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
+  cache: as-is
+  cache_amplification_measured: 1.01   # vs declared 5.0x -> DISPROVEN
+  known_failure: DELEGATE-002 multi-turn decode collapse (~50-token stubs)
+
+treatment:
+  model: gemma-4-E4B-it-MLX-4bit
+  cache: tiered ON                       # via pipeline/omlx_cache_enable.sh --confirm (BUG-807 SSD dir)
+  latency_measured_s: 0.48               # only measured-routable agent_loop local model
+
+metrics:
+  cache_amplification:
+    bar: 5.0
+    direction: gte
+    measured: 1.01
+    status: measured
+  agent_loop_latency_p90_s:
+    bar: 1.0
+    direction: lte
+    measured: 0.48
+    status: measured
+  decode_stability_min_tokens:
+    # catches the DELEGATE-002 collapse (~50-token stubs) over >= 8 sequential turns
+    bar: 150
+    direction: gte
+    measured: null
+    status: declared
+  self_agreement:
+    bar: 0.667                          # agreement_floor (D-400, config/instrument_controls.yaml)
+    direction: gte
+    measured: 0.7
+    status: measured
+
+checker: deterministic                   # harness_contract.py --check + fsm.py; NO LLM judge (R5)
+receipt: "~/.local/share/goose/sessions/sessions.db#usage_ledger"
+min_sealed_runs: 3
+
+terminal_condition:
+  pass: every metric meets bar across >= min_sealed_runs sealed runs
+  fail: any metric below bar -> treatment rejected; active_provider stays custom_deepseek
+
+gate:
+  on_pass: run pipeline/apply_provider_flip.py --apply-flip
+  on_fail: record bug, re-baseline the declared bar (never loosen a bar silently)

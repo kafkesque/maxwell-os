@@ -25153,3 +25153,26 @@ decisions:
     mode with a larger bill. The admissible middle is the chain-of-verification shape: DECOMPOSE the claim, then
     verify each part against the file (D-3022) or the rail, with the verification performed by a READER rather than
     by a second opinion.'
+- id: D-3026
+  state: ACTIVE
+  category: METHOD / DECISION DISCIPLINE
+  title: 'A FORK WITHOUT A VERIFIED WINNER IS A MEASUREMENT, NOT A PREFERENCE: a sealed A/B with a declared bar
+    and a deterministic checker before committing'
+  bugs:
+  - BUG-813
+  - BUG-827
+  files:
+  - config/ab_harness_t137.yaml
+  - config/instrument_controls.yaml
+  decision: 'WHEN TWO OPTIONS FOR THE SAME CAPABILITY STAND IN FRONT OF THE OWNER AND NO SENIOR ENGINEER CAN GIVE
+    A 100%-VERIFIED FUTURE-PROOF RECOMMENDATION, THE RESOLUTION IS A SEALED A/B, NOT A PREFERENCE. Declare the BAR
+    (the threshold each arm must clear) and the CHECKER (a deterministic reader of the artifact - never a second
+    LLM opinion, R5) BEFORE the first run; run each arm on a sealed control (D-400: an instrument that DECIDES is
+    measured on a control, never on a hunch); and the arm that clears the bar across the declared minimum of sealed
+    runs is adopted - the loser is recorded and archived, never silently kept. This is D-400 generalised from decision-instruments
+    to every consequential fork, and it is grounded in what the repository measured rather than in caution: BUG-813
+    recorded a cache A/B whose pre-change baseline was never taken, so its 7x speed-up was unprovable; BUG-827 recorded
+    a model inventing 8 of 8 citations, so the checker must be a READER, not the model''s self-assessment; and the
+    peer-reviewed literature (arXiv 2609.17542, register bias in complexity-based routing) shows a self-rated fork
+    drifts by construction. A fork whose bar or checker cannot be named is REFUSED, not tested (D-3025''s loop rule
+    applied to forks).'

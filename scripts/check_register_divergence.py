@@ -150,16 +150,18 @@ def claimed_ids(homes: list[dict], texts: dict) -> dict[str, list[str]]:
     for home in homes:
         path = str(home.get("path") or "")
         field = str(home.get("field") or "")
-        pat = re.compile("^\\s{2}" + re.escape(field) + ":\\s*(.*)$")
+        pat = re.compile("^(\\s+)" + re.escape(field) + ":\\s*(.*)$")
         for rid, lines in _records(texts.get(path, "")):
             value = ""
             for i, line in enumerate(lines):
                 m = pat.match(line)
                 if not m:
                     continue
-                value = m.group(1)
+                depth = len(m.group(1))
+                value = m.group(2)
                 for cont in lines[i + 1:]:
-                    if cont.startswith("    ") and cont.strip():
+                    pad = len(cont) - len(cont.lstrip())
+                    if cont.strip() and pad > depth:
                         value += " " + cont.strip()
                     else:
                         break
@@ -276,6 +278,14 @@ def selftest() -> int:
     check("a_claim_is_read_from_its_OWN_field", claimed_ids(homes, texts),
           {"BUG-804": ["D-1#bugs", "T-1#source"], "BUG-807": ["D-1#bugs"]},
           "a mention in another field is a NAME, not a claim - the distinction the shape rests on")
+    nested = {"p.yaml": "- id: D-9\n  nested:\n    bugs: [BUG-777]\n"}
+    check("a_claim_home_reads_a_NESTED_field", claimed_ids([{"path": "p.yaml", "field": "bugs"}], nested),
+          {"BUG-777": ["D-9#bugs"]},
+          "an indentation assumption that hides a claim is a FAIL-OPEN path in a rule about what may be declared")
+    folded = {"q.yaml": "- id: T-9\n  source: BUG-777;\n    BUG-778\n"}
+    check("a_claim_home_reads_a_FOLDED_value", claimed_ids([{"path": "q.yaml", "field": "source"}], folded),
+          {"BUG-777": ["T-9#source"], "BUG-778": ["T-9#source"]},
+          "a value continued past its own line is still that field value")
     twelve = faults({}, set(), 0, {}, set(), 0, claim_homes_n=0)
     check("a_rule_with_no_claim_home_is_a_fault", count(twelve, "no claim home is declared"), 1,
           "green by vacancy is the BUG-487 disease, so an undeclared subject set is RED (D-2644)")

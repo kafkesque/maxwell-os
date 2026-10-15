@@ -928,7 +928,7 @@ tasks:
   title: "THE STORE CENSUS AND THE RECLAIM PROPOSAL - decide what leaves the disk, and stop treating a parked symlink as a model"
   source: BUG-804; BUG-807; BUG-808; D-3004; pipeline/model_store_census.py; governance/model_store_census_20261015.json
   gate: 'the OWNER decides what leaves the disk; the census only proposes and pipeline/safe_delete.py is the only deleter (R-D410)'
-  evidence: 'MEASURED 2026-10-15 - ORPHAN 19 repos / 18056.8 MB; LIVE 7 / 74261.2 MB; DECLARED 26 / 59755.8 MB; five of six _unloaded entries are BROKEN because their hub repos are ABSENT; a 4.0 GB stale hub copy of Qwen3.8-27B sits beside the 15 GB directory the engine actually serves'
+  evidence: 'MEASURED 2026-10-15 - ORPHAN 19 repos / 18056.8 MB; LIVE 7 / 74261.2 MB; DECLARED 26 / 59755.8 MB; five of six _unloaded entries are BROKEN because their hub repos are ABSENT; a 4.0 GB stale hub copy of Qwen3.8-27B sits beside the 15 GB directory the engine actually serves. RE-MEASURED 2026-10-16 with the same instrument (python3 pipeline/model_store_census.py): ORPHAN 8 repo(s) / 267.9 MB, LIVE 7 / 66651.0 MB, DECLARED 29 / 57918.6 MB, hub total 124837.5 MB, BROKEN entries: none, rc=0 - the earlier figures are kept above as history, and the decision this gate asks for is SMALLER than it was. A gate decided against stale bytes would be a decision about bytes that are gone (the D-2941 corollary: no metric may be quoted after its instrument has been invalidated).'
 - id: T-137
   priority: SHOULD
   state: open

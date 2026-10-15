@@ -15154,3 +15154,19 @@ the id - which is the point: the register may not depend on an owner noticing.
   * scripts/bug_status.py -> OPEN 224 / CLOSED 377 of 601. The OPEN count is UNCHANGED on purpose: this event carries
     the INSTRUMENT defect (a census that measured symlinks), while T-136's owner gate for what LEAVES THE DISK stays
     open. scripts/check_bug_status.py re-derives the register identically.
+
+## REGISTER PROMOTION 20261016 - R5, AND THE HARDENING IT PROMPTED
+
+R5 (D-3020: the generator may not verify itself). The new shape was reviewed through the system's own executor by a
+DIFFERENT model family - gemma-4-E4B-it-MLX-4bit, as a task declaring shape: review over
+scripts/check_register_divergence.py (run t166r5, 23.9s, TERMINAL: DONE - rc=0, ok, 1053 chars, 3 finding(s) for the
+declared review shape). Its observations: one MISREADING (the reader's empty-record guard already closes the case it
+names - _records appends nothing when a file opens on an id with an empty buffer) and two style notes about a
+defensive default. NO DEFECT LANDED FROM THE REVIEW.
+
+THE HARDENING IT PROMPTED, and it is a real one: the review's prompt asked for the parsing assumption that could
+silently MISS a claim, and the answer was in the code - a claim home's field was read at EXACTLY two spaces of
+indentation, so a claim nested in a sub-block, or a value folded past its own line, would have been missed SILENTLY.
+That is a fail-OPEN path inside the rule that decides what may be declared, which is the one direction this system
+refuses. The reader now takes the field at the indentation IT has, accepting any continuation indented past it, with
+two new known-answer controls (16/16): a NESTED field is read, a FOLDED value is read.

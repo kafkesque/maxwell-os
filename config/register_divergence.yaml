@@ -77,3 +77,22 @@ declared_uncarried:
   - BUG-429   # first named at governance/buglog.md:8678
                          # SHRINK-ONLY: an id that gets a HEADER event (or whose name is removed) must be
                          # deleted from this list in a diff a human reads, or this rail FAILS as STALE.
+
+# ----------------------------------------------------------------------------------------------------------
+# D-3032 (T-166, 2026-10-16) - WHAT MAY BE DECLARED HERE, AND WHAT MAY NOT.
+#
+# MEASURED 2026-10-16 (temp/_uncarried_home_join.py, re-derivable over the registers): every one of the 39 ids
+# above is NAMED ONLY - no decision record's bugs: field and no task record's source: field claims any of them.
+# They are the log's ARCHAEOLOGY: names a human can read that no machine home owns, which D-2645 refuses to
+# BACKFILL because a promoted header would carry a status no author ever wrote. That is what this list may declare.
+#
+# An id a decision or a task CLAIMS as one of its own bugs is a DIFFERENT class and may NOT be declared here: the
+# register would then be unable to answer a question a live record asks (D-2660, a citation naming nothing), and the
+# debt would GROW. Measured once: BUG-804 was claimed by D-3004 (bugs:) and T-136 (source:) while uncarried, so it
+# was PROMOTED instead - see governance/buglog.md, REGISTER PROMOTION 20261016, and D-3032.
+claim_homes:            # WHERE a bug may be CLAIMED as this system's own. The rail reads this list and
+  - path: config/decisions.yaml        # hardcodes no path (C12); an empty or absent list is a FAULT there,
+    field: bugs                        # because a rule with no subject set is green by vacancy (BUG-487).
+  - path: config/task_register.yaml
+    field: source
+

@@ -1476,3 +1476,33 @@ tasks:
     exercises it, the D-2665 shape (the exerciser path must EXIST, C16). Proof: --census reports 0 unnamed files, or the
     residue is a declared list with a reason per file, and the ladder runs the census so the number cannot drift back up
     unobserved.'
+- id: T-166
+  priority: SHOULD
+  state: done
+  closed: 2026-10-16
+  mover: pipeline
+  title: 'A NAME MAY BE DECLARED, A CLAIM MAY NOT: the divergence ceiling''s membership is defined and READ, and the id the register could not answer for is CARRIED'
+  source: BUG-571; BUG-804; D-3032; config/register_divergence.yaml; scripts/check_register_divergence.py; temp/OWNER_WORD_register_divergence_20261015.md
+  evidence: 'MEASURED 2026-10-16. (a) THE JOIN THAT DECIDES THE REMEDY: of the 39 ids in declared_uncarried, every
+    one is NAMED ONLY - no decision record''s bugs: field and no task record''s source: field claims it - while BUG-804
+    is the ONE id in the set CLAIMED by a decision (D-3004 bugs:) and by a task (T-136 source:). The ceiling therefore
+    holds the log''s archaeology, and BUG-804 was NOT archaeology: declaring it would have left a citation naming
+    nothing (D-2660) inside a list whose whole membership is unclaimed. (b) THE PROMOTION: BUG-804 is CARRIED under an
+    evidence ledger in which every fact already had a home - title from pipeline/model_store_census.py:3-6, state from
+    a live measurement (LIVE 7 repo(s) 66651.0 MB, BROKEN entries: none, rc=0, where the earlier census read 0 B for
+    five of eight served models), severity DELIBERATELY ABSENT because no author named one. (c) THE RULE IS READ, not
+    written: config/register_divergence.yaml#claim_homes declares WHERE a bug may be claimed (C12), the rail refuses
+    the intersection, an absent or empty claim_homes is RED (BUG-487), a declared home that does not exist is RED
+    (D-405), and 4 new known-answer controls run in --selftest. (d) MEASURED AFTER: rail rc=0 with 63 claimed id(s)
+    read from 2 declared claim home(s), 601 id(s) carried, register 224 open / 377 closed of 601 and the OPEN count
+    unchanged. (e) THE BRIEF THAT ASKED FOR THE WRONG WORD: temp/OWNER_WORD_register_divergence_20261015.md is now
+    SUPERSEDED - it requested a decision it did not need and withheld the id on a premise that is measurably false (the
+    rail reads governance/buglog.md ONLY, so a name in temp/ creates no second divergence); the file carries the
+    resolution and nothing in it remains open.'
+  gate: 'pipeline: a claim the register cannot answer for must be PROMOTED to a header event, never declared away, and
+    the rule must be a CONTROL (BUG-492) rather than a convention. LANDED 2026-10-16 (D-3032): the third shape is read
+    over declared claim homes, an absent or empty subject set is RED (BUG-487), a claim home that does not exist is RED
+    (D-405), and 4 new known-answer controls run in --selftest. NOT IN SCOPE HERE: the remaining 39 stay declared by
+    D-2645 (a promoted header would carry a status no author wrote), and T-136''s reclaim gate - what LEAVES THE DISK -
+    stays open, which is why this task is pipeline-moved rather than gated on a word.'
+

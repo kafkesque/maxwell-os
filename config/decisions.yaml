@@ -25439,3 +25439,57 @@ decisions:
     reviewed by a DIFFERENT model family through the system''s own executor (run t156r5b, shape: review, DONE with
     2 findings), and one of its three findings landed as a real refinement - the two facts behind an unrouted item
     are now reported TOGETHER, since a single category hid the other one.'
+- id: D-3032
+  state: ACTIVE
+  category: GOVERNANCE / REGISTER
+  title: 'A NAME MAY BE DECLARED, A CLAIM MAY NOT: the divergence ceiling holds the archaeology of the log, an id
+    a decision or a task OWNS must be CARRIED, and the rail reads DECLARED claim homes and refuses the intersection'
+  bugs:
+  - BUG-571
+  - BUG-804
+  files:
+  - config/register_divergence.yaml
+  - scripts/check_register_divergence.py
+  - governance/buglog.md
+  decision: 'MEASURED 2026-10-16 (the join is re-derivable from the registers; it was first run as temp/_uncarried_home_join.py,
+    and the rail now prints its own reading of the same join on every run): the divergence rail was RED with exactly
+    ONE fault - BUG-804, an id the log NAMES at governance/buglog.md:14178 and no header carries (BUG-571''s shape).
+    The two lawful acts the rail names are NOT equivalent, and a measurement is what decides between them: of the
+    39 ids in declared_uncarried, EVERY one is NAMED ONLY - no decision record''s bugs: field and no task record''s
+    source: field claims it, so the list declares the log''s ARCHAEOLOGY, which D-2645 refuses to backfill because
+    a promoted header would carry a status no author ever wrote. BUG-804 is the ONE id in the whole set that IS
+    CLAIMED - by D-3004 (bugs: [BUG-804, BUG-807, BUG-808]) and by T-136 (source: BUG-804; BUG-807; BUG-808; D-3004).
+
+    THE RULE THIS MINTS. (1) THE CEILING''S MEMBERSHIP IS DEFINED BY CLAIM-HOOD, and that is measurable: a name
+    may be DECLARED (archaeology, pinned by identity, SHRINK-ONLY, D-2645); a CLAIM may not be declared, because
+    an id a decision or a task asserts as one of its own bugs is a LIVE question the register must be able to answer
+    - declaring it away would leave a citation naming nothing (D-2660) while the debt GREW, the one direction a
+    shrink-only list may not move. (2) WHERE a bug may be claimed is DECLARED, never hardcoded: config/register_divergence.yaml#claim_homes
+    names the register and the FIELD whose semantic is ownership (a decision''s bugs:, a task''s source:), so a
+    register joins by declaration (C12), and a mention in any other field is a NAME, not a claim. (3) A RULE WITH
+    NO SUBJECT SET IS A FAULT, NOT A SILENCE: an absent or empty claim_homes is RED, because green by vacancy is
+    the BUG-487 disease. (4) A declared claim home that does not EXIST is RED - a declaration whose subject is gone
+    is an assertion, not a control (D-405).
+
+    THE INSTANCE, CARRIED RATHER THAN DECLARED AWAY. BUG-804 was PROMOTED to a header event (governance/buglog.md,
+    REGISTER PROMOTION 20261016) under an evidence ledger in which every fact already had a home: the TITLE from
+    the remedy instrument''s own docstring (pipeline/model_store_census.py:3-6), the STATE from a LIVE measurement
+    (python3 pipeline/model_store_census.py -> LIVE 7 repo(s) 66651.0 MB, BROKEN entries: none, rc=0, where the
+    earlier census read 0 B for five of eight served models), and the SEVERITY DELIBERATELY ABSENT because no author
+    ever named one and the register''s own promotion precedent writes a closure header without it. A later REOPEN
+    event reverses it, which is what makes the act auditable rather than asserted.
+
+    THE TEETH. scripts/check_register_divergence.py gains the third shape, DECLARED BUT CLAIMED, over the DECLARED
+    claim homes, with four new known-answer controls (14 in all, one of them the NEGATIVE control - a declared id
+    that is NAMED ONLY stays silent - and one the subject-set control). MEASURED after: rc=0, 601 id(s) carried
+    (was 600), 63 claimed id(s) read from 2 declared claim home(s) with NONE of them declared, and the register''s
+    OPEN count UNCHANGED at 224 of 601 - the promotion carries the INSTRUMENT defect and leaves T-136''s owner gate
+    (what LEAVES THE DISK) open, which the header states so a reader cannot mistake one for the other.
+
+    WHY NO OWNER WORD WAS NEEDED, AND WHAT THE EARLIER BRIEF GOT WRONG. temp/OWNER_WORD_register_divergence_20261015.md
+    withheld the id to avoid minting a second divergence. MEASURED: the rail reads governance/buglog.md ONLY (a
+    token walk over BUGLOG lines), so a name written in temp/ is not a name in the register - the brief was un-actionable
+    for no reason, and it also overstated the gap: the STATE was in the author''s own words plus a live instrument
+    reading, and a severity that no author wrote is OMITTED rather than invented. A brief that withholds its subject
+    is not a decision an owner can make, and the register may not depend on an owner noticing (D-2941: a gate carries
+    intent or policy - promotion was neither).'

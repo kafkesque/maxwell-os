@@ -8,9 +8,9 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1159 decisions (census stamp 8e0dff622b5b4657, 2026-10-15) · 600 bugs (224 open / 376 closed; highest OPEN = BUG-836) · 48 open tasks (MUST 14 / SHOULD 29 / WORTH 4; OWNER-moved 12, pipeline-moved 36; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1160 decisions (census stamp d6fccf85406a2721, 2026-10-16) · 601 bugs (224 open / 377 closed; highest OPEN = BUG-836) · 48 open tasks (MUST 14 / SHOULD 29 / WORTH 4; OWNER-moved 12, pipeline-moved 36; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **80** of 1159 — 🔴 open 32 · 🔵 proposed 27 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 574 · ⚖ ratified 145 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1159, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **80** of 1160 — 🔴 open 32 · 🔵 proposed 27 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 575 · ⚖ ratified 145 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1160, D-2987/BUG-765)
 >
 > Open BUGS by severity (population = the census's 224 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 34 · 🟨 MED 61 · 🟩 LOW 24 · UNLABELLED 101 (BUG-757) of 224 open.
 >
@@ -15099,3 +15099,58 @@ a non-byte-stable one, and it never writes: a proposal is validated under temp/ 
 landed in the same session). Its findings were: two misreadings of the code (an empty entrypoint IS already a fault from the
 field loop; a lane check that verifies the command is PRESENT is exactly what it claims to verify) and ONE real refinement,
 now landed: the two facts behind an unrouted item are reported TOGETHER, because a single category hid the other one.
+
+## REGISTER PROMOTION 20261016 - one id the register could not answer for: it was CLAIMED, so it is CARRIED
+
+WHY. scripts/check_register_divergence.py was RED with exactly ONE fault: an id the log NAMES that no header carries
+(BUG-571's shape) - BUG-804, first named at governance/buglog.md:14178 inside BUG-808's provenance sentence (which
+BUG-804 already explained as a symlink into the hub).
+
+THE MEASUREMENT THAT DECIDES THE REMEDY (MEASURED 2026-10-16; the join is temp/_uncarried_home_join.py, re-derivable).
+The declared_uncarried list holds 39 ids and EVERY one of them is NAMED ONLY: no decision's bugs: field and no task's
+source: field claims it. BUG-804 is the ONE id in the set that IS claimed - by D-3004 (bugs: [BUG-804, BUG-807,
+BUG-808]) and by T-136 (source: BUG-804; BUG-807; BUG-808; D-3004). So the two lawful acts were NOT equivalent:
+  * DECLARING it (raising declared_max_uncarried 39 -> 40) would file a CLAIMED bug into a list whose entire
+    membership is UNCLAIMED archaeology, and the register would stay permanently unable to answer a question its own
+    decision record asks: a citation naming nothing (D-2660). Debt would GROW, the one direction a SHRINK-ONLY list
+    may not move (BUG-571).
+  * PROMOTING it makes the register able to answer, and EMPTIES a debt instead of declaring it.
+
+WHY NO AUTHOR'S WORD WAS NEEDED, AND WHY THE EARLIER OWNER BRIEF WAS WRONG TO WITHHOLD THE ID. The state below is
+not inferred: it is the remedy instrument's own docstring, the decision record, and a live measurement. The brief
+also held that naming the id would create a SECOND divergence - MEASURED, it would not: this rail reads
+governance/buglog.md ONLY (TOKEN_RE over BUGLOG lines), so a name written in temp/ is not a name in the register.
+A brief that withholds its own subject is not a decision an owner can make.
+
+EVIDENCE LEDGER (every fact of this event, and where it already lived)
+  * TITLE <- pipeline/model_store_census.py:3-6, in its own words: a census that walks the engine's serving directory
+             measures SYMLINKS and reports 0 B for a model that is present.
+  * STATE: FIXED <- the remedy IS that census (it resolves every entry to its target, and treats a real directory in
+             the serving path as live), the defect is gone by MEASUREMENT (2026-10-16: python3
+             pipeline/model_store_census.py -> LIVE 7 repo(s) 66651.0 MB, BROKEN entries: none, rc=0, where the
+             earlier census read 0 B for five of eight served models), and the instrument is RUN BY THE LADDER
+             (justfile:38) with its tolerance in ONE home (config/engine.yaml#model_store.census_move_ratio, BUG-830).
+  * SEVERITY: DELIBERATELY ABSENT. No author ever named one, and the register's own promotion precedent writes a
+             closure header without it (BUG-808's CLOSED event carries none). Inventing a severity here is the drift
+             this promotion exists to prevent; the owner may restate one in a single word.
+  * NOT SETTLED BY THIS EVENT: what LEAVES THE DISK. That is T-136's owner gate, still open, and the census only
+             PROPOSES (R-D410). This event carries the INSTRUMENT defect, not the disposition.
+
+### BUG-804 (FIXED 2026-10-15) - a store census measured SYMLINKS, so five of eight served models read 0 B and an owner-facing byte number was false
+
+RULE THIS MINTED (D-3032, T-166). config/register_divergence.yaml#claim_homes now declares WHERE a bug may be CLAIMED
+as this system's own, and the rail FAILS CLOSED when an id in declared_uncarried is claimed by one of those homes: a
+NAME may be declared, a CLAIM may not. The rule would have fired the moment D-3004 was minted, before any prose named
+the id - which is the point: the register may not depend on an owner noticing.
+
+## REGISTER PROMOTION 20261016 - EFFECT (MEASURED, after the promotion)
+
+  * scripts/check_register_divergence.py: rc=0 - 0 declared divergence(s); 39 named-but-uncarried id(s) declared, all
+    still uncarried; ceilings 0/39 (shrink-only); 601 id(s) carried (was 600); 63 claimed id(s) read from 2 declared
+    claim home(s), NONE of them declared. The figure now lives in the rail's own reading on every run; the scratch join
+    that decided the remedy is temp/_uncarried_home_join.py, and it is the rail that carries the number from here.
+  * --selftest 14/14 (was 10): four new controls, including the NEGATIVE control (a declared id that is NAMED ONLY stays
+    silent) and the subject-set control (no declared claim home is RED, not a quiet pass).
+  * scripts/bug_status.py -> OPEN 224 / CLOSED 377 of 601. The OPEN count is UNCHANGED on purpose: this event carries
+    the INSTRUMENT defect (a census that measured symlinks), while T-136's owner gate for what LEAVES THE DISK stays
+    open. scripts/check_bug_status.py re-derives the register identically.

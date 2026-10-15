@@ -1125,7 +1125,7 @@ tasks:
     + BUG-824
   evidence: 'temp/runs/fanout_20261015i/98_receipt.json - 3/3 DONE with one task deliberately
     given a 1 s budget: reaped at 2.2 s, retried on a different model, both attempts
-    in the receipt'
+    in the receipt (measured 2026-10-15)'
   gate: 'pipeline: an in-process harness subagent is allowed only for a task whose
     loss costs nothing; every load-bearing delegation leaves temp/runs/<id>/98_receipt.json
     and a doctor run precedes it'
@@ -1140,6 +1140,7 @@ tasks:
   evidence: git show HEAD:governance/model_store_census_20261015.json is byte-identical
     to the working copy (hub_bytes 0.15 GiB, buckets DECLARED 26 / LIVE 7 / ORPHAN
     19) although the census printed a hub total of 124837.5 MB after the sweep
+    (measured 2026-10-15)
   gate: 'pipeline: pipeline/model_store_census.py writes the face it prints, and the
     sweep''s own movement check (temp/land_20261015g.py#phase_b) turns green because
     the artifact moves, not because the check was relaxed'

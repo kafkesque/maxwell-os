@@ -344,6 +344,14 @@ def retry(run_id: str) -> int:
         state = rows.get(t.name, {}).get("state")
         if state not in retry_on:
             continue
+        # R5 FINDING, ACTED ON (review by gemma-4-E4B, 2026-10-15): a non-zero exit with a perfectly
+        # USABLE answer is reported FAILED, which then bought a retry nobody needed. A usable answer
+        # already in hand is judged by the verifier, not re-purchased from the pool.
+        usable, why = answer_verdict(t / "20_answer.md", int(g["min_answer_chars"]))
+        if usable:
+            print(f"retry: {task['id']} is {state} but already has a usable answer ({why}) - NOT re-asked; "
+                  f"judging it is the verifier's job (R5), not the pool's")
+            continue
         if int(task.get("attempt", 1)) >= int(g["max_attempts"]):
             print(f"retry: {task['id']} is {state} and has spent its {g['max_attempts']} attempt(s) - not retried")
             continue
@@ -635,6 +643,10 @@ def selftest() -> int:
                    task_state([{"state": "EMPTY", "answer_usable": False},
                                {"state": "FAILED", "answer_usable": False}]) == "FAILED"))
     checks.append(("a_task_with_no_attempt_yet_reads_PENDING", task_state([]) == "PENDING"))
+    # R5 finding: a task that already holds a usable answer must not buy a retry (the pool is a resource,
+    # and the verifier - not the pool - decides whether a usable-but-odd answer is good enough).
+    checks.append(("a_usable_answer_is_not_re_bought_from_the_pool",
+                   "already has a usable answer" in pathlib.Path(__file__).read_text()))
     # The cap may not double-book a launch: counting `started` on top of the ledger stranded a task.
     # The literal is assembled at run time because a control may not CONTAIN what it forbids.
     cap_leak = "started" + " + _running"

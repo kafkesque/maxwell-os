@@ -8,13 +8,13 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1144 decisions (census stamp 81ac953af5bd0eda, 2026-10-15) · 584 bugs (221 open / 363 closed; highest OPEN = BUG-821) · 36 open tasks (MUST 10 / SHOULD 22 / WORTH 3; OWNER-moved 11, pipeline-moved 25; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1149 decisions (census stamp b01d666d6a2760ea, 2026-10-15) · 588 bugs (220 open / 368 closed; highest OPEN = BUG-821) · 45 open tasks (MUST 14 / SHOULD 26 / WORTH 3; OWNER-moved 14, pipeline-moved 31; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **82** of 1144 — 🔴 open 32 · 🔵 proposed 29 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 565 · ⚖ ratified 137 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1144, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **80** of 1149 — 🔴 open 32 · 🔵 proposed 27 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 565 · ⚖ ratified 144 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1149, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 221 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 34 · 🟨 MED 58 · 🟩 LOW 24 · UNLABELLED 101 (BUG-757) of 221 open.
+> Open BUGS by severity (population = the census's 220 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 34 · 🟨 MED 57 · 🟩 LOW 24 · UNLABELLED 101 (BUG-757) of 220 open.
 >
-> **OWNER LANE (11) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
+> **OWNER LANE (14) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
@@ -28,9 +28,12 @@
 > | T-137 | 🟠 SHOULD | PIN the agent_loop model and prove the tiered cache with an A/B | THE OWNER DECIDES WHEN THE ENGINE MAY BE FLAPPED: the A/B needs one ro |
 > | T-140 | 🟠 SHOULD | ADOPT THE FAN-OUT EXECUTOR for everyday scaffolding and debugging, capped and cross-verified | the owner names the first real fan-out task: the executor needs a task |
 > | T-142 | 🟠 SHOULD | BYTE-OWNER AUDIT of the DECLARED bucket: 59.7 GB whose only claim to be on disk is a mention | pipeline: re-run the census with a RESOLUTION test (does a served entr |
+> | T-144 | 🟠 SHOULD | ROUTE THE FIRST HARNESS JOB: name the class, deploy pi or claude through config/engine.yaml#harnesses.jobs, an | OWNER: name the job class and the file set (the routing, the reader an |
+> | T-145 | 🟠 SHOULD | EDGE0 IS DEFERRED WITH A NAMED TRIGGER, not fetched: the class is already served and the role is blocked on me | OWNER: say 'fetch Edge0' to override, or leave it deferred until T-137 |
 > | T-138 | COULD | HARNESS ADOPTION ON DEMAND - one command per tool, and none of them load-bearing | install a harness only when a specific job needs it (C28). The engine  |
+> | T-146 | COULD | ZED AS THE REVIEW SURFACE: put the CLI on PATH and open the evidence at the exact line after a batch | pipeline: ln -s /Applications/Zed.app/Contents/MacOS/cli ~/.local/bin/ |
 >
-> **PIPELINE LANE (25) — what the agent will do next, in strategic-consequential order (source: config/task_register.yaml):**
+> **PIPELINE LANE (31) — what the agent will do next, in strategic-consequential order (source: config/task_register.yaml):**
 >
 > | id | pri | state | task | evidence |
 > |---|---|---|---|---|
@@ -43,9 +46,9 @@
 > | T-129 | 🔴 MUST | 🔴 open | WORK IDENTITY COLLAPSE — collapse the duplicate works at the IDENTITY layer, so a row stops advertising a corr | MEASURED 2026-10-14 read-only (governance/WORK_IDENTITY_COLLAPSE_20261014.md): 84 collapsi |
 > | T-141 | 🔴 MUST | 🔴 open | SERIALIZE MODEL DOWNLOADS: two overlapping attempts at one repo leave .incomplete fragments that no tool can a | MEASURED 2026-10-15: models--lmstudio-community--Qwen3.8-27B-MLX-4bit held 4.0 GB as SIX . |
 > | T-143 | 🔴 MUST | 🔴 open | RESOURCE-CLASS THE FAN-OUT: the engine pool is a mutex, the governed homes are a single writer | MEASURED 2026-10-15: the engine declares model_count 9 / loaded 3 / final_ceiling 56.6 GB, |
-> | T-105 | 🟠 SHOULD | 🔴 open | REA tier A/B mining — DEVONthink 3 (related-document ranking) and Cursor (derived code index) | governance/NOT-YET-EVALUATED-RESEARCH.md (REA targets logged 2026-10-13) |
-> | T-106 | 🟠 SHOULD | 🔴 open | ROADMAP — MODULARITY (C21 swappable infrastructure) and CROSS-OS COMPATIBILITY (C26) | protocols: pipeline/storage/base.py only; no cross-OS smoke exists (2026-10-13) |
-> | T-108 | 🟠 SHOULD | 🔴 open | BUG-712 / BUG-714 — the content_type residual and the harness-facing primitive | served run content_type census (2026-10-13) |
+> | T-147 | 🔴 MUST | 🔴 open | WIRE THE STORE CENSUS TO EVERY DELETION BATCH: it is a generated face, and it lies the moment bytes move witho | MEASURED 2026-10-15: the census IS generated (pipeline/model_store_census.py: dir_bytes, m |
+> | T-149 | 🔴 MUST | 🔴 open | CALL THE TWO GUARDS THAT ALREADY EXIST, IN PREFLIGHT: the duplicate-key checker and the delegation doctor | python3 scripts/check_config_duplicate_keys.py  # exists since BUG-730, found the live def |
+> | T-150 | 🔴 MUST | 🔴 open | THE DURABLE PATH IS THE DELEGATION PATH (D-3020): anything whose failure is not free goes through pipeline/sub | temp/runs/fanout_20261015i/98_receipt.json - 3/3 DONE with one task deliberately given a 1 |
 >
 > **STANDING RULES — in effect, never close (1):**
 >

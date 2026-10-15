@@ -57,6 +57,34 @@ receipt; the scheduler admits a job only if its class has a free permit. The poo
 and the governed homes stay single-writer for as long as they are registers.
 
 
+## DELEGATION IS PROVEN, NOT ASSERTED (D-3020, 2026-10-15)
+
+The doctrine above describes WHO runs work. This section records what happened when the durable path was
+finally RUN, because a doctrine that is never exercised is a hypothesis.
+
+**The acceptance run.** `python3 pipeline/subagent_fanout.py run --tasks temp/fanout_20261015h.yaml --run
+fanout_20261015i` -> **3/3 tasks DONE, rc=0, 65 s**. One task was deliberately given a 1 s budget: the reaper
+marked it TIMEOUT at 2.2 s (nobody polled for that), a retry was launched on gemma-4-E4B (a DIFFERENT model
+than the one that failed) and its receipt carries both attempts. Temp/runs/fanout_20261015i/98_receipt.json.
+
+**Budgets are tight by default (the owner's rule).** A task that can be answered faster than the old blanket
+1800 s must BE budgeted faster: `fanout.guards` declares 120 s for a oneshot (measured answers land in 0.4-17 s),
+600 s for an agent loop, a 900 s deadline for the whole run including retries, a 45 s stall threshold, and a
+per-task `timeout_s` for a task whose speed is known. A retry never inherits a per-task budget that just proved
+insufficient.
+
+**The R5 review, run THROUGH the durable path.** Two review tasks were handed to gemma-4-E4B (a different model
+family from the author) as detached workstreams and the parent kept working; the receipt is
+temp/runs/fanout_20261015j/98_receipt.json (2/2 DONE). This is the discipline the doctrine demands - a harness
+or subagent output is a PROPOSAL in temp/, never a verification (D-3011) - and it earned its keep: the reviewer
+found that a task whose process exited non-zero while holding a perfectly usable answer was still buying a
+retry. ACTED ON: `retry()` now refuses to re-ask a task that already has a usable answer, because judging a
+usable-but-odd answer is the verifier's job, not the pool's.
+
+**What this does NOT claim.** The in-process harness subagent still exists and is still cancellable by the next
+user message: that is the harness's contract, not a defect this repo can patch. What changed is that no
+load-bearing delegation depends on it any more - it is allowed only for work whose loss costs nothing (T-150).
+
 ## HARNESS DEPLOYMENT — where a harness beats goose, and where it is a regression (D-3017)
 
 A harness is not a faster goose. Measured per invocation 2026-10-15: goose one-shot **0.4 s**,

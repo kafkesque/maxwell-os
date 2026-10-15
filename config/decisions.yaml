@@ -24692,3 +24692,52 @@ decisions:
   category: STORE / INTEGRITY
   bugs: '[BUG-804, BUG-807, BUG-808]'
   decision: '(1) A STORE IS MEASURED TWICE and flagged TRANSIENT when it moves, so a single instant may never be reported as reclaimable mass (an 85 GB reading was cleaned by the owner within the hour, BUG-807). (2) AN ENGINE ENTRY WHOSE TARGET IS ABSENT IS REPORTED BROKEN, never as a model that is on disk: a parked symlink is a NAME, not a model (BUG-808). (3) A DELETION CANDIDATE MAY COME ONLY FROM THE ORPHAN CLASS - a store that no serving, parked or stashed entry resolves to AND that no live file under config, pipeline or scripts names - and it is executed only through pipeline/safe_delete.py (R-D410). (4) A CENSUS NARRATES NOTHING IT DID NOT OBSERVE: no cause may be written into a record that the instrument did not measure.'
+- id: D-3005
+  date: '2026-10-15'
+  status: proposed
+  category: RESEARCH / INFRASTRUCTURE
+  bugs: '[BUG-809, BUG-811]'
+  supersedes: 'the practice of running open-ended research as in-session subagents'
+  decision: '(1) RESEARCH RUNS DETACHED: a workstream is a process in its own session, so no harness event - a new
+    user message, a cancelled turn, a compaction - can cancel it, and a cancelled run loses nothing because the
+    report is written to disk first (pipeline/research_run.py). (2) A WORKSTREAM DECLARES ITS OWN END with a
+    TERMINAL line; the runner stops waiting on that line and NOT on process exit, so a finished deliverable is
+    never waited on again. (3) STATE IS READ, NOT INFERRED: a dead process without a marker is FAILED, an exceeded
+    budget is TIMEOUT and the group is signalled (SIGTERM then SIGKILL). (4) ONE VARIABLE PER WORKSTREAM: parallel
+    workstreams are partitioned by ARTEFACT, never by harness instance - the model pool is the serial resource.'
+- id: D-3006
+  date: '2026-10-15'
+  status: proposed
+  category: MODEL / SELECTION
+  bugs: '[BUG-811]'
+  supersedes: 'download counts and leaderboards as the selection instrument'
+  decision: '(1) A DOWNLOAD DECISION IS MADE BY THE ENGINE WE ACTUALLY RUN, not by community downloads: the
+    architecture must exist in the engine runtime mlx_lm build (measured via the app bundle interpreter) and the
+    checkpoint must be MLX safetensors. A model that cannot load is worth 0 GB. (2) A HUB THAT CANNOT BE READ IS
+    NOT A VERDICT: an unreadable repo is FETCH_FAILED and fatal, never converted into "no weights" (which is what
+    the first probe did, eight times). (3) A LICENCE THAT IS NOT DECLARED IS NOT A GRANT. (4) ADOPTION IS NOT
+    DOWNLOAD: fetch, verify, reload the registry, LOAD once, measure, unload - the pool the owner was using is the
+    pool they get back (pipeline/research/ws_model_adopt.py).'
+- id: D-3007
+  date: '2026-10-15'
+  status: proposed
+  category: ENGINE / LIFECYCLE
+  bugs: '[BUG-802, BUG-812]'
+  decision: '(1) A BOOT AGENT MUST BE IDEMPOTENT: a job that starts the engine without first asking whether the
+    engine is up is D2455/D2456 (a duplicate managed server) wearing a LaunchAgent as a disguise. The job runs
+    pipeline/omlx_engine_guard.sh, which exits 0 when /health answers and only brings the app up when nothing does.
+    Verified: the job is loaded and the process count is unchanged (no duplicate). (2) A GUARDED-install is
+    fail-closed: it removes the job if the engine never answers. (3) A PLIST IS A PARSER SURFACE: a comment inserted
+    into one breaks the XML silently and launchd reports only "Bootstrap failed: 5: Input/output error" - plutil
+    -lint is the gate, and it is what found it (BUG-812).'
+- id: D-3008
+  date: '2026-10-15'
+  status: proposed
+  category: MEASUREMENT DISCIPLINE
+  bugs: '[BUG-813]'
+  decision: '(1) NO CASCADE CHANGE WITHOUT A BEFORE-MEASUREMENT of the same instrument: the cache was enabled with
+    a post-change pair (10.07s -> 1.44s on an identical prompt) and no pre-change baseline, so the speed-up is real
+    but its CAUSE is not established. (2) THE ROLLBACK SWITCH IS THE A/B INSTRUMENT: a change whose rollback is one
+    command can be measured properly in minutes, and the absence of such a command is a reason not to apply it.
+    (3) A COUNTER THAT DISAGREES WITH THE WALL CLOCK IS REPORTED, NOT EXPLAINED AWAY: total_cached_tokens read 0
+    while the second call was 7x faster.'

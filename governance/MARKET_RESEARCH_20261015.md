@@ -171,3 +171,23 @@ an invisible failure (the BUG-787 shape, in the intake).
 - **BROKEN engine entries** — five of six `_unloaded` names point at hub repos that are **ABSENT** (`DeepSeek-R1-0528`, `Qwen3.6-35B-A3B-4bit`, `Qwopus-GLM-18B`, `gemma-4-26B-A4B-it-OptiQ-4bit`, `gemma-4-E2B-it-MLX-4bit`). An entry that reads as "on disk" is not on disk (BUG-808).
 - A **4.0 GB stale hub copy** of `Qwen3.8-27B` exists beside the 15 GB directory the engine actually serves.
 - The engine's own store (`~/.omlx/cache`) read **0 B with no movement** in this run, because **the OWNER cleaned ~83 GB** of it (disk free 134 Gi -> 217 Gi). An earlier draft of the census reported that 85 GB as reclaimable mass and wrote a *cause* into the record which was false (BUG-807).
+### FINAL: THE ENGINE'S OWN RUNTIME, ASKED DIRECTLY (measured 2026-10-15)
+The oracle is the engine's bundled runtime: mlx_lm 0.31.4.dev132+g94cdcae13 / mlx 0.32.2 / 134 architectures,
+read through /Applications/oMLX.app/Contents/Resources/Python/cpython-3.11/bin/python3. A candidate whose
+model_type is absent from that registry cannot load HERE, whatever its download count says.
+
+| repo | GB | model_type | dl | likes | licence | verdict (engine, not hearsay) |
+|---|---|---|---|---|---|---|
+| openbmb/MiniCPM5-2B-MLX | 1.42 | llama | 554313 | 55 | apache-2.0 | LOADABLE - and ADOPTED (fetched, discovered, loaded, measured, released) |
+| Edge0/Edge0-35B-A3B-preview | 19.69 | qwen3_5_moe | 57485 | 3582 | apache-2.0 | LOADABLE - the only candidate that could replace a resident 30B class model |
+| LiquidAI/LFM2.5-24B-A2B | 47.94 | lfm2_moe | 6286 | 353 | other (non-OSI) | LOADABLE but 48 GB under a non-OSI licence -> WATCH, do not buy |
+| ornith-ai/Ornith-1.5-35B-A3B-MLX-4bit | 19.51 | qwen3_5_moe | 164329 | 39 | NONE DECLARED | no licence = no grant; its family is already resident as REAP-19B -> DEFER |
+| empero-ai/Qwen3.8-35B-A3B-Distill | 71.90 | qwen3_5_moe | 7813 | 76 | apache-2.0 | 72 GB for 7.8k downloads -> REFUSE |
+| prism-ml/Ternary-Bonsai-2-27B-mlx-2bit | 8.60 | prism_hadamard_qwen35 | 83733 | 454 | apache-2.0 | NEEDS_FORK_RUNTIME: no prism module in the engine's mlx_lm -> REFUSE |
+| google/embeddinggemma-2 | 1.49 | embedding_gemma2 | 144280 | 2337 | apache-2.0 | ARCH_UNSUPPORTED by the engine runtime -> REFUSE (and an embedder swap is a cascade anyway) |
+| ConwayResearch/Underdog-Saluki-27B-1.0 | 9.46 | (none declared) | 344177 | 477 | apache-2.0 | UNDETERMINED: config declares no model_type; not an MLX repack -> REFUSE |
+
+HAVE WE ALREADY TESTED THEM? Measured by pipeline/research/ws_prior_tests.py: NONE of the eight was ever
+benched. Every previous appearance was prose ("LOOKED UP ONLY - never benched"). The models this repo has
+actually measured are the ones already served: gemma-4-E4B, Qwen3-Coder-30B-A3B, gpt-oss-20b, Qwen3.8-27B,
+Phi-4-mini, the two Ornith entries and gemma-4-12B.

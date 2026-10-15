@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**213 open** / 360 closed of 573 ids.
+**216 open** / 360 closed of 576 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -220,3 +220,6 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-808 | (HIGH - OPEN 2026-10-15) - five of six engine-parked entries are BROKEN symlinks, so a model that does not exist reads as "on disk" | 1 |
 | BUG-809 | (MED - OPEN 2026-10-15) - delegated research was not durable: six of seven delegate runs were cancelled mid-flight and their findings were l | 1 |
 | BUG-810 | (MED - OPEN 2026-10-15) - a YAML insert that re-parents a mapping passes every parse check and is caught only by the consumer | 1 |
+| BUG-811 | (HIGH - OPEN 2026-10-15) - a new instrument told three lies before its own selftest was written | 1 |
+| BUG-812 | (MED - OPEN 2026-10-15) - a comment inserted into a plist silently broke the XML, and launchd reported only "Input/output error" | 1 |
+| BUG-813 | (MED - OPEN 2026-10-15) - the cache was enabled before its baseline was taken | 1 |

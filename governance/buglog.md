@@ -8,13 +8,13 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1128 decisions (census stamp 309f8cf9a7f9a898, 2026-10-15) · 573 bugs (213 open / 360 closed; highest OPEN = BUG-810) · 30 open tasks (MUST 8 / SHOULD 19 / WORTH 3; OWNER-moved 7, pipeline-moved 23; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1128 decisions (census stamp 309f8cf9a7f9a898, 2026-10-15) · 576 bugs (216 open / 360 closed; highest OPEN = BUG-813) · 32 open tasks (MUST 8 / SHOULD 20 / WORTH 3; OWNER-moved 9, pipeline-moved 23; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **68** of 1128 — 🔴 open 32 · 🔵 proposed 15 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 565 · ⚖ ratified 135 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1128, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 213 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 32 · 🟨 MED 52 · 🟩 LOW 24 · UNLABELLED 101 (BUG-757) of 213 open.
+> Open BUGS by severity (population = the census's 216 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 33 · 🟨 MED 54 · 🟩 LOW 24 · UNLABELLED 101 (BUG-757) of 216 open.
 >
-> **OWNER LANE (7) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
+> **OWNER LANE (9) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
@@ -25,6 +25,8 @@
 > | T-134 | 🟠 SHOULD | THE ENGINE'S SURVIVAL AND ITS VERSION - a boot agent (BUG-802), the residency lever (BUG-803), and the oMLX ve | the owner runs the installer (dry run first). The residency policy and |
 > | T-135 | 🟠 SHOULD | BIND the harness context contract - adopt the executor so the ratified knobs are in the environment, not in a  | the OWNER adopts the binding in the shell that starts the harness; the |
 > | T-136 | 🟠 SHOULD | THE STORE CENSUS AND THE RECLAIM PROPOSAL - decide what leaves the disk, and stop treating a parked symlink as | the OWNER decides what leaves the disk; the census only proposes and p |
+> | T-137 | 🟠 SHOULD | PIN the agent_loop model and prove the tiered cache with an A/B | THE OWNER DECIDES WHEN THE ENGINE MAY BE FLAPPED: the A/B needs one ro |
+> | T-138 | COULD | HARNESS ADOPTION ON DEMAND - one command per tool, and none of them load-bearing | install a harness only when a specific job needs it (C28). The engine  |
 >
 > **PIPELINE LANE (23) — what the agent will do next, in strategic-consequential order (source: config/task_register.yaml):**
 >
@@ -14225,3 +14227,38 @@ home, the landing runs that home's **CONSUMER** controls in the same act - for t
 `python3 pipeline/harness_env.py --selftest` and `python3 pipeline/harness_contract.py --check` -
 because only a consumer can see a re-parenting. (3) A shape assertion (the expected key path must
 resolve) is stronger than an equality check on bytes and is what the landing must assert.
+
+## BUG-811 (HIGH - OPEN 2026-10-15) - a new instrument told three lies before its own selftest was written
+The durable research runner (pipeline/research_run.py) and the loadability probe
+(pipeline/model_loadability_probe.py) were both written and run in the same hour. Between them they
+produced six wrong answers, every one of them caught by a CONTROL rather than by reading the output:
+| # | lie | how it was caught | fix |
+|---|---|---|---|
+| 1 | a dead detached child read as ALIVE forever, so no workstream was ever noticed to be over | selftest: the FAILED path never fired | a ZOMBIE answers kill(pid,0); pid_alive now asks ps for the process state and rejects Z |
+| 2 | a TIMEOUT was recorded as FAILED | selftest: state=FAILED with a TERMINAL: TIMEOUT line | the state word is READ from the marker, not inferred from the substring "DONE" |
+| 3 | a previous run's marker was read as this run's end | selftest: state came from a stale report | the selftest starts from an empty run, and that is itself a control |
+| 4 | a workstream's relative path wrote into the REPOSITORY ROOT | selftest: the report stayed 78 bytes | the runner injects WS_REPORT / WS_DIR / RUN_DIR |
+| 5 | eight repos were reported EMPTY_REPO ("no weight files at all") | the verdicts were identical for every repo INCLUDING three known to hold weights | the fetch layer swallowed every exception into {}; it is now curl with the HTTP STATUS KEPT, and an unreadable hub is FETCH_FAILED (fatal), never a model verdict |
+| 6 | the prior-test census called "dl=57485 near the model name" a MEASUREMENT and stamped ALREADY TESTED on five candidates that were only ever looked up | the answer contradicted every other artefact | the READING pattern now requires a UNIT-bearing rate/duration or a bench key; a download count is neither |
+GATE: `python3 pipeline/research_run.py --selftest` -> 11/11. The class of error worth remembering: a
+new instrument's FIRST output is not evidence about the world, it is evidence about the instrument.
+
+## BUG-812 (MED - OPEN 2026-10-15) - a comment inserted into a plist silently broke the XML, and launchd reported only "Input/output error"
+The BUG-802 remedy was made idempotent by replacing the job's ProgramArguments with the new guard
+(pipeline/omlx_engine_guard.sh) and by rewriting the template's header comment. The comment edit left
+the ORIGINAL continuation lines after the new closing "-->" , so the file carried stray text before
+<plist>. `launchctl bootstrap gui/501 <plist>` answered "Bootstrap failed: 5: Input/output error -
+Try re-running the command as root for richer errors", which names neither the file nor the line.
+`plutil -lint` found it immediately: "Unexpected character T at line 6".
+FIX: the plist was rewritten whole; the install path is unchanged. GATE: lint a rendered plist BEFORE
+bootstrapping it (a parser surface is not a place to edit comments).
+
+## BUG-813 (MED - OPEN 2026-10-15) - the cache was enabled before its baseline was taken
+Approved act 3 changed cache.enabled false -> true and gave the SSD tier a distinct directory. The
+evidence produced afterwards is a PAIR on an identical 209-token prompt on gemma-4-E4B: 10.07s cold,
+1.44s on the identical second call. That shows a warm-prefix speed-up is now happening; it does NOT
+show that the change caused it, because no pre-change pair was measured (the first attempt at one
+printed nothing at all - a script whose function was defined and never called, which is its own small
+lesson). The engine's own counter disagrees with the wall clock: total_cached_tokens still reads 0.
+FIX: T-137. The rollback switch (`pipeline/omlx_cache_enable.sh --rollback`) IS the A/B instrument:
+measure the pair with the cache off, apply, measure the pair again, and only then claim a cause.

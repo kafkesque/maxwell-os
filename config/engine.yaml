@@ -1,0 +1,62 @@
+schema_version: "1.0"
+# THE ENGINE'S OWN FACTS, in one home (C12). Nothing that reads this file may restate a value.
+# Measured 2026-10-15 from the live install; a change here invalidates the cached architecture
+# oracle in pipeline/model_loadability_probe.py (oracle_ttl_days governs that).
+engine:
+  name: omlx
+  bundle: /Applications/oMLX.app/Contents   # the installed app's Contents; Resources/omlx is the engine source
+  oracle_python: Resources/Python/cpython-3.11/bin/python3      # relative to bundle
+  oracle_site: Resources/Python/framework-mlx-base/lib/python3.11/site-packages
+  oracle_ttl_days: 7
+  host: 127.0.0.1
+  port: 11435
+  auth_token_home: pipeline.pipeline_paths.OMLX_API_KEY   # POINTER ONLY - the value lives in one place
+  model_dir: /Users/barn/.omlx/models
+  parked_dir: /Users/barn/.omlx/_unloaded
+  settings: /Users/barn/.omlx/settings.json
+  launch_cli: /Users/barn/.omlx/bin/omlx
+  install: app                              # gui app with auto_start_on_launch true (measured)
+  status_endpoint: /v1/models/status        # residency, pinned flag, engine_type, config_model_type
+  observed:
+    measured_at: "2026-10-15"
+    served: 8
+    loaded: 4
+    final_ceiling_bytes: 52708965240
+    current_model_memory_bytes: 42164115844
+    resident_note: 'adaptive eviction is what failed the agent_loop budget (BUG-803), not the model'
+
+# Harnesses the engine can WIRE to itself in one command (omlx launch TOOL). Measured by
+# "omlx launch list" 2026-10-15. installed=true means the CLI exists on this machine.
+harnesses:
+  measured_at: "2026-10-15"
+  tools:
+    claude:    {display: "Claude Code",      installed: true}
+    codex:     {display: "Codex",            installed: false}
+    codex_app: {display: "Codex App",        installed: false}
+    opencode:  {display: "OpenCode",         installed: false}
+    openclaw:  {display: "OpenClaw",         installed: false}
+    hermes:    {display: "Hermes Agent",     installed: false}
+    pi:        {display: "Pi",               installed: true}
+    copilot:   {display: "Copilot CLI",      installed: false}
+    dsh:       {display: "DeepSeek Harness", installed: false}
+
+# Download decisions are made by pipeline/model_loadability_probe.py, never by download counts.
+candidates:
+  probe:
+    - openbmb/MiniCPM5-2B-MLX
+    - Edge0/Edge0-35B-A3B-preview
+    - LiquidAI/LFM2.5-24B-A2B
+    - prism-ml/Ternary-Bonsai-2-27B-mlx-2bit
+    - google/embeddinggemma-2
+    - ornith-ai/Ornith-1.5-35B-A3B-MLX-4bit
+    - ConwayResearch/Underdog-Saluki-27B-1.0
+    - empero-ai/Qwen3.8-35B-A3B-Distill
+  served_now:
+    - Phi-4-mini-instruct-8bit
+    - Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
+    - Qwen3.8-27B-MLX-4bit
+    - gemma-4-E4B-it-MLX-4bit
+    - gpt-oss-20b-MXFP4-Q8
+    - Ornith-1.5-35B-A3B-REAP-19B
+    - Ornith-1.5-9B-MLX-8bit
+    - gemma-4-12B-it-qat-OptiQ-4bit

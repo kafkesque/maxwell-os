@@ -13,13 +13,13 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1128 decisions (census stamp 309f8cf9a7f9a898, 2026-10-15) · 573 bugs (213 open / 360 closed; highest OPEN = BUG-810) · 30 open tasks (MUST 8 / SHOULD 19 / WORTH 3; OWNER-moved 7, pipeline-moved 23; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1128 decisions (census stamp 309f8cf9a7f9a898, 2026-10-15) · 576 bugs (216 open / 360 closed; highest OPEN = BUG-813) · 32 open tasks (MUST 8 / SHOULD 20 / WORTH 3; OWNER-moved 9, pipeline-moved 23; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **68** of 1128 — 🔴 open 32 · 🔵 proposed 15 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 565 · ⚖ ratified 135 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1128, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 213 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 32 · 🟨 MED 52 · 🟩 LOW 24 · UNLABELLED 101 (BUG-757) of 213 open.
+> Open BUGS by severity (population = the census's 216 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 33 · 🟨 MED 54 · 🟩 LOW 24 · UNLABELLED 101 (BUG-757) of 216 open.
 >
-> **OWNER LANE (7) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
+> **OWNER LANE (9) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
@@ -30,6 +30,8 @@
 > | T-134 | 🟠 SHOULD | THE ENGINE'S SURVIVAL AND ITS VERSION - a boot agent (BUG-802), the residency lever (BUG-803), and the oMLX ve | the owner runs the installer (dry run first). The residency policy and |
 > | T-135 | 🟠 SHOULD | BIND the harness context contract - adopt the executor so the ratified knobs are in the environment, not in a  | the OWNER adopts the binding in the shell that starts the harness; the |
 > | T-136 | 🟠 SHOULD | THE STORE CENSUS AND THE RECLAIM PROPOSAL - decide what leaves the disk, and stop treating a parked symlink as | the OWNER decides what leaves the disk; the census only proposes and p |
+> | T-137 | 🟠 SHOULD | PIN the agent_loop model and prove the tiered cache with an A/B | THE OWNER DECIDES WHEN THE ENGINE MAY BE FLAPPED: the A/B needs one ro |
+> | T-138 | COULD | HARNESS ADOPTION ON DEMAND - one command per tool, and none of them load-bearing | install a harness only when a specific job needs it (C28). The engine  |
 >
 > **PIPELINE LANE (23) — what the agent will do next, in strategic-consequential order (source: config/task_register.yaml):**
 >

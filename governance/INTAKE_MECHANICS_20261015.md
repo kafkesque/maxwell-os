@@ -99,3 +99,13 @@ Not one "alpha score" — **four independent checks, each of which must name the
 2. **Golden set** — `governance/curator_golden_20261015.json` is referenced but **not yet created**; until it exists the recall floor is declared and the ladder is blind.
 3. **X.com viability** — unverified; assume it may be unavailable and design it as optional.
 4. **Volume honesty** — the number of items/day from these sources is unmeasured; the 12-item report cap is a declared budget, not a measured one.
+
+## 7. EXPANDABILITY (answer to the follow-up question)
+YES. A source is DATA, not code: `config/intake_sources.yaml` declares each source by class,
+mechanic, auth, fetch, item_id, text_path and transcript. Six mechanics cover the space (rss,
+account, store, bot_api, user_api, page, api); adding a source is adding a row plus one OPML import
+or one API call. Nothing in the curator, the dedupe ladder, the noise checks or the report knows
+what YouTube is - so a new source cannot destabilise the ones that work. The class column doubles
+as the report's section breakdown. A source is admitted only if it can name a stable item_id and a
+text_path: a stream that cannot be deduped or read is rejected rather than quietly contributing
+nothing.

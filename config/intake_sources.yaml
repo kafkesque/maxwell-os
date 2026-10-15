@@ -1,0 +1,66 @@
+schema_version: "1.0"
+# THE INTAKE'S EXPANSION CONTRACT (answer to "will it be expandable with other sources?").
+#
+# YES - and the reason is that a source is DATA here, not code. Every source resolves to one of six
+# FETCH MECHANICS; adding a source is adding a row to this file (or one OPML export). Nothing in
+# the curator, the dedupe ladder, the noise checks or the report knows what YouTube is.
+#
+# A source may enter the pipeline only when it declares all seven fields below. That declaration is
+# the admission control: a source that cannot name a stable item id cannot be deduped, and a source
+# that cannot name its text cannot be curated.
+#
+#   class            what kind of stream this is (a taxonomy label for the report's sections)
+#   mechanic         which of the six fetchers it uses (below)
+#   auth             what the owner must grant ONCE (none | token | oauth | api_key | user_session)
+#   fetch            the concrete endpoint or file it reads
+#   item_id          the stable identity of one item (the dedupe key, D-2999 ladder)
+#   text_path        where the body text comes from (feed content | page | transcript | api field)
+#   transcript       how to get readable text when the item is audio/video (native | asr | none)
+#
+# Measured 2026-10-15: mechanics and endpoints below were verified against vendor docs this session
+# (see governance/INTAKE_MECHANICS_20261015.md section 1); X.com account-level access and the
+# YouTube quota page are marked UNVERIFIED where they were not reachable.
+
+mechanics:
+  rss:        {how: "a feed URL", supports_opml: true, auth: none}
+  account:    {how: "the provider's API, pulling the account's OWN subscription list", auth: "oauth|token"}
+  store:      {how: "a self-hosted reader that is itself the store (categories/tags + full API)", auth: "api_key"}
+  bot_api:    {how: "a bot token - it can only read chats the bot is a MEMBER of", auth: bot_token}
+  user_api:   {how: "a user session (MTProto/TDLib) or an offline export", auth: user_session}
+  page:       {how: "a feedless page, watched for a change", auth: none}
+  api:        {how: "a first-party API with a key", auth: api_key}
+
+sources:
+  - class: video          {mechanic: account, auth: oauth, fetch: "YouTube Data API v3 subscriptions.list?mine=true", item_id: videoId, text_path: description, transcript: native}
+  - class: video          {mechanic: rss, auth: none, fetch: "https://www.youtube.com/feeds/videos.xml?channel_id=ID", item_id: yt:videoId, text_path: description, transcript: native}
+  - class: video          {mechanic: rss, auth: none, fetch: "https://www.youtube.com/feeds/videos.xml?playlist_id=ID", item_id: yt:videoId, text_path: description, transcript: native}
+  - class: microblog      {mechanic: api, auth: api_key, fetch: "X.com API v2 (paid tier) OR an RSSHub route", item_id: tweet id, text_path: page, transcript: none, status: UNVERIFIED}
+  - class: channel        {mechanic: bot_api, auth: bot_token, fetch: "Telegram Bot API updates", item_id: chat_id:message_id, text_path: message text, transcript: none, limit: "a bot cannot read the owner's subscriptions - this is a deliberate collector, not a follow-list"}
+  - class: channel        {mechanic: user_api, auth: user_session, fetch: "TDLib/MTProto dialog list, or an offline export", item_id: chat_id:message_id, text_path: message text, transcript: none}
+  - class: newsletter     {mechanic: rss, auth: none, fetch: "Substack/Medium /feed or /feed.xml per publication", item_id: guid, text_path: content:encoded, transcript: none}
+  - class: newsletter     {mechanic: api, auth: api_key, fetch: "Inoreader reader/api/0/subscription/list (OPML round-trips)", item_id: item id, text_path: content, transcript: none}
+  - class: newsletter     {mechanic: api, auth: api_key, fetch: "FreshRSS reader/api/0/subscription/list + stream/contents", item_id: item id, text_path: content, transcript: none}
+  - class: mail           {mechanic: api, auth: api_key, fetch: "IMAP to a dedicated folder (the newsletter vault)", item_id: Message-ID, text_path: text/html part, transcript: none}
+  - class: article        {mechanic: rss, auth: none, fetch: "any publisher feed", item_id: guid|link, text_path: content, transcript: none}
+  - class: article        {mechanic: page, auth: none, fetch: "changedetection.io watch on a feedless page", item_id: url + content hash, text_path: page, transcript: none}
+  - class: audio          {mechanic: rss, auth: none, fetch: "podcast feed; Podcast 2.0 podcast:transcript when the publisher provides it", item_id: guid, text_path: transcript, transcript: "native|asr"}
+  - class: research       {mechanic: api, auth: none, fetch: "arXiv API / Crossref / PubMed", item_id: DOI|arXiv id, text_path: abstract, transcript: none}
+  - class: discussion     {mechanic: rss, auth: none, fetch: "Reddit .rss or a subreddit feed", item_id: t3 id, text_path: selftext, transcript: none}
+  - class: discussion     {mechanic: api, auth: none, fetch: "Hacker News API / Algolia search", item_id: objectID, text_path: text|url, transcript: none}
+  - class: code           {mechanic: api, auth: none, fetch: "GitHub releases/commits/README via API or .atom", item_id: sha|release id, text_path: body, transcript: none}
+  - class: social         {mechanic: api, auth: api_key, fetch: "Bluesky AT Protocol / Mastodon client API", item_id: uri, text_path: record.text, transcript: none}
+  - class: chat           {mechanic: bot_api, auth: bot_token, fetch: "Discord bot in the servers the bot joined", item_id: channel+message id, text_path: content, transcript: none}
+  - class: saved          {mechanic: page, auth: none, fetch: "browser bookmarks export; Kindle/Zotero exports", item_id: url|doi, text_path: page, transcript: none}
+  - class: report         {mechanic: page, auth: none, fetch: "company/think-tank report PDFs (markitdown)", item_id: url, text_path: extracted text, transcript: none}
+
+# ADDING A SOURCE - the whole procedure:
+#   1. pick the mechanic (if none fits, the mechanic list is the thing to extend, not the curator);
+#   2. add the row above with all seven fields;
+#   3. import its subscriptions ONCE (OPML for anything feed-shaped; one API call for an account);
+#   4. run the resolver control: the source must return >=1 item with a stable item_id, or it is
+#      rejected rather than silently contributing nothing.
+# A source class is a REPORT SECTION for free: the daily report groups by the class column.
+
+open_questions:
+  - "daily volume is UNMEASURED: the item budget in the report cannot be sized until one week of real fetch counts exists"
+  - "the golden set (governance/curator_golden_20261015.json) is NOT created yet, so the recall floor is declared and the ladder is blind (T-133)"

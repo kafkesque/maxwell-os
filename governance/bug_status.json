@@ -2,8 +2,8 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 573,
-  "open_n": 213,
+  "total_ids": 576,
+  "open_n": 216,
   "closed_n": 360,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
@@ -1071,6 +1071,21 @@
     {
       "id": "BUG-810",
       "title": "(MED - OPEN 2026-10-15) - a YAML insert that re-parents a mapping passes every parse check and is caught only by the consumer",
+      "events": 1
+    },
+    {
+      "id": "BUG-811",
+      "title": "(HIGH - OPEN 2026-10-15) - a new instrument told three lies before its own selftest was written",
+      "events": 1
+    },
+    {
+      "id": "BUG-812",
+      "title": "(MED - OPEN 2026-10-15) - a comment inserted into a plist silently broke the XML, and launchd reported only \"Input/output error\"",
+      "events": 1
+    },
+    {
+      "id": "BUG-813",
+      "title": "(MED - OPEN 2026-10-15) - the cache was enabled before its baseline was taken",
       "events": 1
     }
   ],

@@ -247,3 +247,9 @@ commit_boundary:
   - 'python3 scripts/verify_recalibration_pins.py --staged'
   - 'python3 scripts/check_declaration_consumers.py --staged'
   - 'python3 scripts/check_session_plan.py --staged'
+# --- 2026-10-15 (durable research + engine lifecycle) ---
+pipeline/research_run.py --selftest: fatal
+pipeline/research_run.py status: tri_state
+pipeline/model_loadability_probe.py: tri_state
+pipeline/hf_fetch_model.py --verify-only: tri_state
+pipeline/omlx_engine_guard.sh: tri_state

@@ -1,0 +1,64 @@
+[
+ {
+  "file": "governance/buglog.md",
+  "op": "append",
+  "bytes": 3783,
+  "note": "BUG-811/812/813"
+ },
+ {
+  "file": "config/task_register.yaml",
+  "op": "append",
+  "bytes": 2099,
+  "note": "T-137 cache A/B + pinning, T-138 harness adoption"
+ },
+ {
+  "file": "config/decisions.yaml",
+  "op": "append",
+  "bytes": 3481,
+  "note": "D-3005..D-3008"
+ },
+ {
+  "file": "config/rail_registry.yaml",
+  "op": "append",
+  "bytes": 285,
+  "note": "rail lines for the new instruments"
+ },
+ {
+  "file": "justfile",
+  "op": "append",
+  "bytes": 624,
+  "note": "justfile recipes"
+ },
+ {
+  "file": "governance/MARKET_RESEARCH_20261015.md",
+  "op": "append",
+  "bytes": 2128,
+  "note": "the engine-verified recommendation table + the prior-test answer"
+ },
+ {
+  "file": "governance/session_plan_20260924.yaml",
+  "op": "grant",
+  "paths": [
+   "config/decisions.yaml",
+   "config/engine.yaml",
+   "config/intake_sources.yaml",
+   "config/rail_registry.yaml",
+   "config/task_register.yaml",
+   "governance/HARNESS_UTILIZATION_20261015.md",
+   "governance/INTAKE_MECHANICS_20261015.md",
+   "governance/MARKET_RESEARCH_20261015.md",
+   "governance/RESEARCH_RUNNER_20261015.md",
+   "governance/buglog.md",
+   "justfile",
+   "pipeline/com.maxwell.omlx-engine.plist",
+   "pipeline/hf_fetch_model.py",
+   "pipeline/install_omlx_engine_agent.sh",
+   "pipeline/model_loadability_probe.py",
+   "pipeline/omlx_cache_enable.sh",
+   "pipeline/omlx_engine_guard.sh",
+   "pipeline/research/",
+   "pipeline/research_run.py",
+   "scripts/bind_harness_env.sh"
+  ]
+ }
+]

@@ -526,3 +526,18 @@ instruments:
 criteria:
     @echo "=== criteria board: governance/p0_p1_criteria.yaml (drift_monitor) ==="
     python3 scripts/drift_monitor.py
+# --- 2026-10-15: durable research runs and engine lifecycle (T-137/T-138) ---
+research-selftest:
+    python3 pipeline/research_run.py --selftest
+
+research-status:
+    python3 pipeline/research_run.py status
+
+model-loadability:
+    python3 pipeline/model_loadability_probe.py || [ $? -eq 2 ]   # 2 = the engine refused a candidate; 1 = no oracle or an unreadable hub (fatal)
+
+engine-guard:
+    bash pipeline/omlx_engine_guard.sh   # 0 = the engine answers; it starts nothing when it already does (D-3007)
+
+cache-dry:
+    bash pipeline/omlx_cache_enable.sh   # apply with --confirm; --rollback is the A/B instrument (D-3008)

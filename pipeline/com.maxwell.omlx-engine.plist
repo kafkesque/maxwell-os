@@ -1,16 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- BUG-802 remedy: the $0 local engine must survive a reboot.
-     TEMPLATE: @HOME@ is substituted by pipeline/install_omlx_engine_agent.sh at install time
-     (C12: no absolute path is hardcoded in the repo; C26: the same template fits any account).
-     KeepAlive is {SuccessfulExit: false}: restart ONLY on FAILURE. That is deliberate - "omlx start"
-     may legitimately daemonise and exit 0, and a bare KeepAlive=true would then restart it forever. -->
+<!-- BUG-802 remedy: the local engine must survive a reboot, and must NOT be started twice.
+     D2455/D2456 record that a blind start spawns a DUPLICATE managed server, so the job runs
+     pipeline/omlx_engine_guard.sh instead: the guard exits 0 when the engine already answers
+     /health and only brings the app up when nothing does.
+     TEMPLATE: @HOME@ and @REPO@ are substituted by pipeline/install_omlx_engine_agent.sh at
+     install time (C12: the repo stores no absolute path; C26: the same template fits any account).
+     KeepAlive is {SuccessfulExit: false}: restart ONLY on FAILURE. A guard that finds the engine
+     healthy exits 0, and a clean exit must not be retried. -->
 <plist version="1.0">
 <dict>
   <key>Label</key><string>com.maxwell.omlx-engine</string>
   <key>ProgramArguments</key>
   <array>
-    <string>@HOME@/.omlx/bin/omlx</string>
-    <string>start</string>
+    <string>@REPO@/pipeline/omlx_engine_guard.sh</string>
   </array>
   <key>RunAtLoad</key><true/>
   <key>KeepAlive</key>

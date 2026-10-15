@@ -918,3 +918,32 @@ tasks:
   source: BUG-804; BUG-807; BUG-808; D-3004; pipeline/model_store_census.py; governance/model_store_census_20261015.json
   gate: 'the OWNER decides what leaves the disk; the census only proposes and pipeline/safe_delete.py is the only deleter (R-D410)'
   evidence: 'MEASURED 2026-10-15 - ORPHAN 19 repos / 18056.8 MB; LIVE 7 / 74261.2 MB; DECLARED 26 / 59755.8 MB; five of six _unloaded entries are BROKEN because their hub repos are ABSENT; a 4.0 GB stale hub copy of Qwen3.8-27B sits beside the 15 GB directory the engine actually serves'
+- id: T-137
+  priority: SHOULD
+  state: open
+  mover: owner
+  title: "PIN the agent_loop model and prove the tiered cache with an A/B"
+  source: F6; BUG-792; BUG-803; pipeline/omlx_cache_enable.sh; config/engine.yaml
+  evidence: 'MEASURED 2026-10-15 - cache.enabled was false with ssd_cache_dir null; it is now true with a DISTINCT
+    SSD tier (~/.omlx/ssd_cache, never ~/.omlx/cache, which the owner cleared by hand under BUG-807). Post-change,
+    the SAME 209-token prompt twice on gemma-4-E4B measured 10.07s then 1.44s. The engine counter total_cached_tokens
+    still reads 0, so WHICH layer produced the 7x is not established - and the pre-change baseline for the identical
+    pair was NOT taken before the change was applied (BUG-813).'
+  gate: 'THE OWNER DECIDES WHEN THE ENGINE MAY BE FLAPPED: the A/B needs one rollback-apply cycle, so it needs a moment
+    when no long run depends on the pool. Run it as: baseline with pipeline/omlx_cache_enable.sh --rollback, then apply, then the same pair.
+    Then PIN the agent_loop model ("Never evict if True" - engine_pool.is_pinned) so adaptive eviction cannot evict it
+    mid-request, and re-measure the per-turn budget on an uncrowded pool. Only then may per_turn_budget_s return to 60.'
+- id: T-138
+  priority: COULD
+  state: open
+  mover: owner
+  title: "HARNESS ADOPTION ON DEMAND - one command per tool, and none of them load-bearing"
+  source: governance/HARNESS_UTILIZATION_20261015.md; config/engine.yaml#harnesses; D-3007
+  evidence: 'MEASURED 2026-10-15 - the engine can wire nine clients and ships a wiring module for each
+    (Resources/omlx/integrations/*.py; claude.py sets ANTHROPIC_BASE_URL, ANTHROPIC_AUTH_TOKEN,
+    ANTHROPIC_DEFAULT_{OPUS,SONNET,HAIKU}_MODEL). Installed: claude (--print) and pi (--print/--prompt).
+    Not installed: codex, codex_app, opencode, openclaw, hermes, copilot, dsh.'
+  gate: 'install a harness only when a specific job needs it (C28). The engine pool is the serial resource: 8 served,
+    46.88 GB resident against a 55 GB guard. An interactive agent loop is honest work only on a model whose decode
+    holds over a long context - this repo measured gemma-4-E4B ROUTABLE for agent_loop and the 30B coder REFUSED
+    (DELEGATE-002).'

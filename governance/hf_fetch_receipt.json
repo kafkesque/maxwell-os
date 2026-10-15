@@ -1,0 +1,10 @@
+[
+ {
+  "repo": "openbmb/MiniCPM5-2B-MLX",
+  "link": "/Users/barn/.omlx/models/MiniCPM5-2B-MLX",
+  "snapshot": "/Users/barn/.cache/huggingface/hub/models--openbmb--MiniCPM5-2B-MLX/snapshots/8a9ad7539ac86281d0ac2b017ba04a5de53fe9a3",
+  "verified": true,
+  "detail": "1 shard(s), 1.42 GB",
+  "at": "2026-10-15T15:34:27"
+ }
+]

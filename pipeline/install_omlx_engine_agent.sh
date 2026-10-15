@@ -18,7 +18,7 @@ if [ "$#" -gt 0 ] && [ "$1" = "--confirm" ]; then CONFIRMED=1; fi
 
 if [ "$CONFIRMED" -ne 1 ]; then
   echo "DRY RUN (nothing changed). This will:"
-  echo "  1. render $TPL -> $DEST   (substituting HOME; the repo stores no absolute path)"
+  echo "  1. render $TPL -> $DEST   (substituting HOME and REPO; the repo stores no absolute path)"
   echo "  2. launchctl bootstrap gui/$(id -u) $DEST"
   echo "  3. poll $URL for up to $WAIT_S s; on failure: launchctl bootout + exit 1"
   echo "Re-run with --confirm to install."
@@ -30,7 +30,7 @@ if launchctl print "gui/$(id -u)/$LABEL" >/dev/null 2>&1; then
   launchctl bootout "gui/$(id -u)/$LABEL" || true
 fi
 mkdir -p "$HOME/Library/LaunchAgents" "$HOME/.omlx/logs"
-sed "s|@HOME@|$HOME|g" "$TPL" > "$DEST"
+sed -e "s|@HOME@|$HOME|g" -e "s|@REPO@|$REPO|g" "$TPL" > "$DEST"
 launchctl bootstrap "gui/$(id -u)" "$DEST" || { echo "FAIL: bootstrap refused"; exit 1; }
 
 deadline=$(( $(date +%s) + WAIT_S ))

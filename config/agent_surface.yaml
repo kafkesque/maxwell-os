@@ -1,0 +1,51 @@
+# config/agent_surface.yaml - THE ADAPTER SURFACE (D-3037). The ONE home of the fact "this is where the
+# AGENT HARNESS is bound, and everything else must survive swapping it".
+#
+# WHY (measured 2026-10-16, this repository): the CORE is already harness-agnostic - the model servers own the
+# models (oMLX 127.0.0.1:11435), the pipeline is deterministic Python, the governance is files and rails, and MCP
+# is the declared agent interface (C21/C25). What is NOT agnostic is the BINDING: skills live in agent/skills/ AND
+# in ~/.config/goose/skills/, the delegate routing is prose in AGENTS.md#delegate_rules, the context contract is
+# config/agent_context.yaml, and harness verdicts are config/harness_policy.yaml. A swap then becomes an
+# archaeology exercise across N homes - the failure mode this file exists to end. The chosen shape is MODULAR CORE
+# + ONE ADAPTER SURFACE: not a monolith (C21 forbids it) and not N scattered couplings (each one a future tax).
+#
+# THE RULE A READER CAN ENFORCE: a PORTABLE artifact (a skill, a task, a decision) may not name a harness or a
+# provider; a harness- or provider-specific artifact may live ONLY under adapter.roots. scripts/check_agent_surface.py
+# is the reader (T-169); this block is what it reads, so a new binding is a DECLARED edit rather than a silent file.
+schema_version: '1'
+decided: D-3037
+
+core:
+  # What must keep working with ANY harness (or none): the engine, the pipeline, the rails, the registers.
+  survives_a_swap: [pipeline/, scripts/, config/, governance/, justfile, CONSTITUTION.md]
+  interface: MCP + the OpenAI-compatible endpoint at 127.0.0.1:11435 (C25) - a harness is a CLIENT, never an owner
+
+adapter:
+  # The ONE surface. A harness-specific file, path, provider binding or env var belongs here or nowhere.
+  roots:
+    - agent/adapters/            # in-repo: provider bindings, env wiring, invocation, per-harness rendering
+    - agent/skills/              # PORTABLE skills (no harness name, no provider name inside a SKILL.md)
+  external_roots:
+    # Declared, never mirrored: these live outside the repository and are what a swap RE-POINTS.
+    - ~/.config/goose/config.yaml
+    - ~/.config/goose/custom_providers/maxwell_omlx.json
+    - ~/.config/goose/skills/
+  agent_md_sections: [delegate_rules, models]   # the AGENTS.md sections that are ADAPTER-owned text
+  provider_bindings:
+    goose: {provider: maxwell_omlx, base_url: http://127.0.0.1:11435, binding_home: agent/adapters/goose/}
+
+rules:
+  portable_artifacts: [agent/skills/**/SKILL.md, config/task_register.yaml, config/decisions.yaml, governance/**]
+  # A portable artifact that names a harness or a provider is a review failure: the binding belongs in the
+  # adapter, beside the artifact, so the artifact itself is the same file under any harness.
+  forbidden_in_portable: [goose, claude, codex, opencode, copilot, hermes, dsh, anthropic, openai]
+  swap_checklist:
+    - re-point the harness at 127.0.0.1:11435 (never at a model path)
+    - re-install agent/skills/ into the new harness's skill home (the files themselves do not change)
+    - re-render AGENTS.md#delegate_rules and #models from agent/adapters/<harness>/
+    - re-run the rails: just health, scripts/resolve_route.py --check, scripts/check_governance_faces.py
+logging:
+  # BUG-844/T-168: a delegated run declares itself BEFORE it starts; an untraced act is not an act.
+  journal: governance/delegate_journal.jsonl
+  budget_required: true
+  verified_artifacts_required: true

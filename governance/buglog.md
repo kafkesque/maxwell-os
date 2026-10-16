@@ -8,29 +8,20 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1162 decisions (census stamp 7818ed237e3d288d, 2026-10-16) · 606 bugs (223 open / 383 closed; highest OPEN = BUG-836) · 46 open tasks (MUST 13 / SHOULD 28 / WORTH 4; OWNER-moved 11, pipeline-moved 35; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1166 decisions (census stamp 4597f723d828f647, 2026-10-16) · 610 bugs (226 open / 384 closed; highest OPEN = BUG-846) · 48 open tasks (MUST 14 / SHOULD 29 / WORTH 4; OWNER-moved 2, pipeline-moved 46; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **80** of 1162 — 🔴 open 32 · 🔵 proposed 27 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 577 · ⚖ ratified 145 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1162, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **79** of 1166 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 581 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1166, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 223 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 34 · 🟨 MED 60 · 🟩 LOW 24 · UNLABELLED 101 (BUG-757) of 223 open.
+> Open BUGS by severity (population = the census's 226 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 34 · 🟨 MED 62 · 🟩 LOW 25 · UNLABELLED 101 (BUG-757) of 226 open.
 >
-> **OWNER LANE (11) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
+> **OWNER LANE (2) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
 > | T-130 | 🔴 MUST | THE INGEST DOOR — the identity guarantee becomes an ENFORCEMENT POINT (delta-scoped), so a duplicate work cann | THE DOOR NOW READS A DECLARED WORD, AND ITS rc 2 NAMES THE ONE DEBT TH |
-> | T-131 | 🟠 SHOULD | THE MODEL-SWAP BENCH — no role is re-pointed to a newer model family without a declared, preflighted slot | mover = owner for the SLOT (which role, which model, what it may evict |
-> | T-132 | 🟠 SHOULD | THE HARNESS CONTEXT CONTRACT — the four layers between a local model's served window and the words an agent se | THE MEASUREMENT ANSWERED THE FIRST QUESTION AND NARROWED THE SECOND, A |
-> | T-133 | 🟠 SHOULD | THE INTAKE FRONT-END - an interest-based daily queue of PROPOSALS, owner-gated, that never writes the store | the DAILY REPORT is the owner gate; nothing enters the pipeline withou |
-> | T-134 | 🟠 SHOULD | THE ENGINE'S SURVIVAL AND ITS VERSION - a boot agent (BUG-802), the residency lever (BUG-803), and the oMLX ve | the owner runs the installer (dry run first). The residency policy and |
-> | T-135 | 🟠 SHOULD | BIND the harness context contract - adopt the executor so the ratified knobs are in the environment, not in a  | the OWNER adopts the binding in the shell that starts the harness; the |
-> | T-137 | 🟠 SHOULD | PIN the agent_loop model and prove the tiered cache with an A/B | THE OWNER DECIDES WHEN THE ENGINE MAY BE FLAPPED: the A/B needs one ro |
-> | T-140 | 🟠 SHOULD | ADOPT THE FAN-OUT EXECUTOR for everyday scaffolding and debugging, capped and cross-verified | the owner names the first real fan-out task: the executor needs a task |
-> | T-145 | 🟠 SHOULD | EDGE0 IS DEFERRED WITH A NAMED TRIGGER, not fetched: the class is already served and the role is blocked on me | OWNER: say 'fetch Edge0' to override, or leave it deferred until T-137 |
-> | T-167 | 🟠 SHOULD | A SECOND PHI-4 FETCH SITS IN THE HUB WHOSE WEIGHTS ARE ALREADY THE BYTES THE ENGINE SERVES: drop the stale par | the OWNER decides whether the cached copy and its stale parked entry g |
 > | T-138 | COULD | HARNESS ADOPTION ON DEMAND - one command per tool, and none of them load-bearing | install a harness only when a specific job needs it (C28). The engine  |
 >
-> **PIPELINE LANE (35) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
+> **PIPELINE LANE (46) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
 >
 > | id | pri | state | task | evidence |
 > |---|---|---|---|---|
@@ -47,7 +38,7 @@
 > | T-150 | 🔴 MUST | 🔴 open | THE DURABLE PATH IS THE DELEGATION PATH (D-3020): anything whose failure is not free goes through pipeline/sub | temp/runs/fanout_20261015i/98_receipt.json - 3/3 DONE with one task deliberately given a 1 |
 > | T-157 | 🔴 MUST | 🔴 open | CENSUS THE HARNESS HOMES A DECISION NAMES, so a reversal of a ruled remedy is a READING and not a discovery | MEASURED 2026-10-15: ~/.config/goose/config.yaml:311 reads active_provider: custom_deepsee |
 >
-> _the face is a VIEW: 12 of 35 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
+> _the face is a VIEW: 12 of 46 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
 >
 > **STANDING RULES — in effect, never close (1):**
 >
@@ -72,7 +63,7 @@
 > | D273h | OPEN | LABEL QUALITY / MEASUREMEN | Cross the ruler strata with status and always report both frames (D-273h) |
 > | D273g | OPEN | RETRIEVAL / ONTOLOGY | A chunk/evidence leg IS worth it -- at step 8, and only after the filters constrain (D-273g) |
 >
-> _the face is a VIEW: 12 of 80 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
+> _the face is a VIEW: 12 of 79 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
 >
 > **Open bugs, most severe first:** 🟥 BUG-297 · 🟥 BUG-299 · 🟥 BUG-305 · 🟥 BUG-712 · 🟧 BUG-300 · 🟧 BUG-301 · 🟧 BUG-303 · 🟧 BUG-304 · 🟧 BUG-306 · 🟧 BUG-312 · 🟧 BUG-318 · 🟧 BUG-341.
 <!-- GOV-INDEX:END -->
@@ -15332,3 +15323,45 @@ MEASURED 2026-10-16: pipeline/hf_fetch_model.py was -rw-r--r-- and carries #!/us
 REMEDY, two limbs, both enforced. (1) THE FORM DECIDES THE REQUIREMENT: scripts/resolve_route.py#_bare_form_faults refuses a declared command written as a BARE path whose file is not executable, and does NOT require the bit for the declared python3 <path> form (requiring it there would have made all 562 a fault). Its FIRST live run found FOUR declarations that could not be run as written: lane model-loadability (pipeline/model_loadability_probe.py), lane research-selftest and lane research-status (pipeline/research_run.py), and the capability route model_fetch (pipeline/hf_fetch_model.py) - the owner had hit the fourth. All four are 755 now, and config/capability_registry.yaml#model_fetch.entrypoint is declared in the BARE form he typed, matching all eight operator lanes. (2) git preserves the bit, so the declared command is runnable as written and the next atomic rewrite that strips it turns scripts/resolve_route.py --check RED instead of waiting for the owner to discover it.
 
 CONTROL: bare_path_not_executable (BOTH sites, a capability and a lane) and interpreter_form_needs_no_exec_bit (the other direction - the rail is proved NOT to require a bit the repo does not set 562 times). resolve-route controls 16 -> 17, and --check is green on a route graph that was RED the moment the rule landed.
+
+## BUG-843 (MED - FIXED 2026-10-16) - the instrument PROSE contradicted the DIGEST it printed: a same-name copy read as unique because two file LISTS could never be equal
+
+**Status:** FIXED (T-167/D-3035). The owner read his own store and asked whether the Phi-4 pair is a duplicate; the census said no, and the census was wrong.
+
+MEASURED 2026-10-16, read-only, by this session: `~/.omlx/models_stashed/Phi-4-mini-instruct-8bit/model.safetensors` hashes to `84bcf5553d78094fd6fbe8d7b547a94c6b21996c4066a7a1e89ee4d347a50a24` at 4,076,012,072 B, and the CACHE copy's `model.safetensors` symlink resolves to `blobs/84bcf555...a24` - the same digest at the same size, so the two weight files are ONE set of bytes. The only names that differ are `.gitattributes` and `README.md` (present in the repacked directory, absent from the snapshot; 4,097,978,555 - 4,097,975,786 = 2,769 B, exactly those two files). Yet `pipeline/model_store_census.py` printed "they are NOT the same bytes", "the parked hub copy is therefore the only pristine copy of that fetch", and `same_weights: false` - one line away from the digest that disproves it.
+
+ROOT CAUSE, two limbs. (1) Redundancy was asked of FILE INVENTORY EQUALITY (`held_inv == served_inv`, a frozenset of (name, size)), and a hub SNAPSHOT can never equal a REPACKED DIRECTORY: it is a subset by construction, so equality was unreachable and the copy could never be offered - the conservative direction, but reported as a FACT about the bytes rather than as the limit of the comparison. (2) The figure that made the sentence look measured - "27 files, 9872601143 B" - was a DOUBLE COUNT: `file_inventory` walks with `os.walk(followlinks=True)`, so a snapshot's symlinks resolve into the very blobs the same walk already counted, and 9,872,601,143 B is the repository (5,774,623,426 B of blobs) ADDED to the served directory (4,097,978,555 B) it holds a copy of. A walk that follows symlinks measured a content-addressed store twice - the very class this census exists to catch (BUG-804 failure 1) inside the census itself.
+
+REMEDY: `config/engine.yaml#model_store.redundancy` DECLARES what a weight file IS (`weight_suffixes`), the proof (`digest: sha256`), the partial marker (`.incomplete`) and the bound (`max_weight_files: 64`), and it is read at import (FATAL when absent, empty, or a digest this reader does not implement). `weight_proof()` re-hashes EVERY weight file of the served twin from the bytes on disk and calls a copy redundant only when each matches by name, size and digest; the files that differ are NAMED beside it and a PARTIAL download is named too - MEASURED: 1,676,647,640 B of the same model sat in that repository under a `.incomplete` name, so the cache held a complete copy AND a half-download of the same file. The face now reads "REDUNDANT BY CONTENT - the weights are the same bytes ... these bytes may leave, and the name still resolves from the served copy", and the census offers 5,774.6 MB for the first time (rc 2, owner-owed).
+
+CONTROL (BUG-492): 12 new known-answer controls over synthetic directories - the digest path is EXERCISED, not mocked. They hold both directions (the same content under different listings IS redundant; the same NAME and SIZE with different content is NOT, and the digest mismatch is named), a missing weight file, a served twin with no weight file at all, the declared bound, the `.incomplete` naming, an undeclared digest algorithm refusing BY NAME, and the fail-closed reads of an absent / empty / unimplemented redundancy rule. `model-store-census: 36/36 known-answer control(s) fire` (was 24).
+
+## BUG-844 (MED - OPEN 2026-10-16) - pipeline/subagent_fanout.py can show a FAN-OUT while no delegated run leaves a trace: an async delegate has no declared budget and no start or end record, so a stalled, a finished and a cancelled subagent are ONE state to every later reader
+
+**Status:** OPEN (remedy T-168). MEASURED 2026-10-16, this session.
+
+SYMPTOM (the owner's words): "how the fuck do I know if they progressing or not and timed out?" Three delegates were launched for independent read-only work. The harness then reported "cancelled before it finished" for all three. ONE had already written its artifact (`temp/draft_diagnose_skill_20261016.md`, 6,573 B) and was still in its closing turns; the other two had written nothing. NOTHING ON DISK DISTINGUISHED THOSE THREE STATES - there is no start record, no artifact claim, no budget, no timeout and no end record anywhere in this repository, so the only witness was the session transcript, which no later reader can join.
+
+ROOT CAUSE: the delegation ECONOMY is measured (`config/delegation_economy.yaml`, cost tiers, the D2549 routing map) while the delegation ACT is not. `pipeline/omlx_delegate.py` and `scripts/delegation_economy.py` count what a call COSTS; nothing records that a call was MADE, what it was allowed to write, how long it had, whether the file it claimed to write exists, or whether the harness killed it. The peek surface reports activity (turn count, idle time, recent tool calls) but it is SESSION-SCOPED: it dies with the session and it is invisible to `just health`, to a handoff and to the next agent.
+
+PROPOSED FIX (T-168): a declared delegate journal - a START row (task id, purpose, model, the exact files it MAY write, its wall budget) written BEFORE the call, an END row (outcome, artifacts VERIFIED ON DISK, wall time) written after - plus a `--status` reader that lists OPEN rows past their budget, wired as a rail, so a silent stall becomes a RED line instead of a shrug. Files it may write must be declared because two delegates on one file is a conflict nobody sees (C21/C23).
+
+## BUG-845 (MED - OPEN 2026-10-16) - the CORE is harness-agnostic while the BINDING is scattered across five homes and config/decisions.yaml names none of them, so a harness swap is archaeology
+
+**Status:** OPEN (remedy T-169). MEASURED 2026-10-16, read-only.
+
+SYMPTOM: nothing in this repository says where the agent harness is bound. The core is genuinely agnostic - oMLX owns the models at 127.0.0.1:11435, the pipeline is deterministic Python, the registers are files, the rails read files, and MCP is the declared agent interface (C21/C25) - but the BINDING an agent needs sits in at least five places: `agent/skills/maxwell-os-SKILL.md`, `~/.config/goose/skills/maxwell-efficiency-goose.md`, `~/.config/goose/config.yaml` + `custom_providers/maxwell_omlx.json`, `AGENTS.md#delegate_rules` + `#models` (prose), and `config/agent_context.yaml` / `config/harness_policy.yaml`.
+
+ROOT CAUSE: C21/C25 are enforced for INFRASTRUCTURE (every component behind a protocol) and for the AGENT INTERFACE (MCP, no agent-specific coupling in the engine), but nothing declared where the CLIENT of that interface is configured. So each harness addition appends another coupling that no file enumerates, and a swap cannot be checked - only attempted.
+
+REMEDY (T-169): `config/agent_surface.yaml` DECLARES the core, the ONE adapter root, the external roots a swap re-points, the AGENTS.md sections that are adapter-owned text, and the rule that a PORTABLE artifact (a SKILL.md, a task, a decision) may not name a harness or a provider. The reader is `scripts/check_agent_surface.py` (a rail, still to be written - which is why this bug is OPEN and not FIXED): a forbidden name in a portable artifact, or a harness-specific path outside the declared roots, is a fault.
+
+## BUG-846 (LOW - OPEN 2026-10-16) - governance/buglog.md is a REGISTER while the intake assessment is only a DOCUMENT: a rejected research finding has no register, so it can be re-proposed by the next reader as if it were new
+
+**Status:** OPEN (remedy: D-3038 and the registry it declares). MEASURED 2026-10-16.
+
+SYMPTOM: the 2026-10-14 intake (`governance/INTAKE_ASSESSMENT_20261014.md`) screened two external repositories and produced verdicts - MUST for tester-army's "the assertion decides, the agent only drives", SHOULD for a portable model-agnostic skill shape, WORTH for diagnosing-bugs / code-review / tdd as named procedures, for `.out-of-scope/` as a first-class negative, and for calibration (ECE) as a rail. SIXTEEN days later none of those verdicts had a home in `config/decisions.yaml` or `config/task_register.yaml`: the assessment is a DOCUMENT, and a document is not a register. The same failure direction already broke the other way once - a rejected idea re-proposed as new, which is what `.out-of-scope/` exists to prevent upstream.
+
+ROOT CAUSE: verdicts are recorded where they were FORMED (a report) rather than where they are USED (the registers), so a future reader must find and trust the report. No artifact enumerated the accepted negatives.
+
+REMEDY: D-3038 registers the intake as a REGISTER - each revelation gets a verdict in a decision, the accepted NEGATIVE (M3: no repo-wide shebang-equals-exec-bit invariant; the FORM rule stays, BUG-842) is recorded as a first-class decision rather than a silence, and the two adoptions that need building become T-169/T-170.

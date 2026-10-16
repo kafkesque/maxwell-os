@@ -35,6 +35,16 @@
 - Quality-Tiered — lightweight default, bloat is opt-in (C28)
 </iron_rules>
 
+<!-- WORKING RULES — how a SERIOUS ACT is done. Each one is a decision, and each one was measured first. -->
+<working_rules>
+- A DECLARATION MUST RESOLVE (D-3034). A value that merely MENTIONS a thing declares nothing; only a RESOLUTION confers ownership - an entry whose realpath lands inside it, a value that IS the reference, a path that EXISTS. Before accepting any bucket, class or count, ask what RESOLVED it; a register whose values are SENTENCES declares no bytes.
+- COMMAND FORM DECIDES WHAT IT REQUIRES (BUG-842/T-146). A declared command written as a BARE path must be executable; the 'python3 <path>' form needs no bit. Never mass-chmod 562 files to make a promise true - declare the form you actually run and let scripts/resolve_route.py --check refuse the rest.
+- AN OPEN OWNER-LANE ROW IS A PROPOSAL, NOT AN APPROVAL. mover: owner + state: open = "registered, awaiting YOUR word" (D-3035 sitting). An approval flips mover to pipeline IN THE REGISTER (the face is DERIVED from it, so editing the face changes nothing); a deferral is RECORDED as deferred, never left to look like a pending question.
+- A THEORY NEEDS A RED LOOP FIRST (D-3036). No hypothesis may be formed before ONE named command exists, already run once, that goes RED on this bug and GREEN when it is fixed. Phases are GATES; every guess stays labelled a hypothesis until a receipt speaks. For an intermittent bug the target is a debuggable REPRODUCTION RATE, not a clean repro.
+- AN ACT THAT LEAVES NO TRACE DID NOT HAPPEN (D-3036/BUG-844). A delegated or detached run declares its budget, its purpose and the exact files it MAY write BEFORE it starts; an artifact it claimed but did not leave is a NAMED fault. Peek is session-scoped evidence, not a record.
+- WHAT WE REJECT WE REGISTER (D-3038). A rejected idea is recorded WITH ITS REASON so it cannot be re-proposed; an accepted negative ("we deliberately do NOT do X, and here is why") is a first-class decision, not a silence.
+</working_rules>
+
 <!-- BOOT SEQUENCE -->
 <boot>
 1. Read CONSTITUTION.md

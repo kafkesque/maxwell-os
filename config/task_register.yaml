@@ -721,6 +721,15 @@ tasks:
   priority: MUST
   state: open
   mover: owner
+  owner_word_20261016: >-
+    OWNER WORD 2026-10-16: the owner approved the T-130 recommendation. The PIPELINE act is
+    landed (the door reads the identity ledger before ingest), and the ONE thing still waiting
+    is the choice this gate already names: NORMALISE the 37 corpus-name markers with the
+    declared deterministic renamer (plan -> apply -> receipt, every path byte-identical
+    otherwise), or ACCEPT them with the debt declared. The mover therefore stays owner for
+    THAT word - approving a recommendation is not the same act as choosing between its two
+    options, and a task whose own gate says the pipeline cannot advance it must not be moved
+    into the pipeline lane (gov_sync#task_faults, MEASURED 2026-10-16).
   title: THE INGEST DOOR — the identity guarantee becomes an ENFORCEMENT POINT (delta-scoped), so a duplicate work cannot be ingested while its identity is unresolved
   why: >-
     BUG-781: the identity machinery was never missing — detect_title_renames (D-2736) + detect_same_work_content
@@ -771,7 +780,8 @@ tasks:
 - id: T-131
   priority: SHOULD
   state: open
-  mover: owner
+  mover: pipeline
+  owner_approved: '2026-10-16 (owner word, the D-3035 sitting)'
   title: THE MODEL-SWAP BENCH — no role is re-pointed to a newer model family without a declared, preflighted slot
   why: >-
     The Strata docs recommend the Qwen3.8-Flash-Next family and its Coder variant, and the standing question is
@@ -796,12 +806,7 @@ tasks:
     29.5 GB); Qwen3-Coder-Next 79,674,391,296 (MLX 4bit 44.9 GB). The local HF cache already holds
     Pluto-AI-Labs/Qwen3.8-27B-MLX and StargazerLabs/Qwen3.8-23B-Mini-Me-4bit. NO MLX port of the Strata Coder
     exists (ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-Coder-GGUF is GGUF only).
-  gate: >-
-    mover = owner for the SLOT (which role, which model, what it may evict, and the memory ceiling it must respect);
-    mover = pipeline for the bench itself, which already has a declared harness (config/bench_preflight.yaml +
-    the model_eval suites, retrieval_benchmark.py, r5_review_gate agreement) and MUST run at temp=0.0 with every
-    cell PREFLIGHTED (a cell that fails preflight is NA, never 0 — BUG-257/BUG-263). No role is re-pointed before
-    that run, and the evidence for the swap is the run, never a community-notes ranking.
+  gate: 'pipeline: RUN the bench this task already declares (config/bench_preflight.yaml + the model_eval suites, retrieval_benchmark.py, r5_review_gate agreement) at temp=0.0 with every cell PREFLIGHTED (a cell that fails preflight is NA, never 0 - BUG-257/BUG-263); no role is re-pointed before that run and the evidence for a swap is the run, never a community note. THE SLOT (which role, which model, what it may evict, and the memory ceiling it must respect) is the ONE WORD this task hands over, and the pipeline owes the bench first.'
 
   owner_word_20261015: >-
     OWNER WORD 2026-10-15: APPROVED. The cell is DECLARED and no behaviour changed
@@ -818,7 +823,8 @@ tasks:
 - id: T-132
   priority: SHOULD
   state: open
-  mover: owner
+  mover: pipeline
+  owner_approved: '2026-10-16 (owner word, the D-3035 sitting)'
   title: THE HARNESS CONTEXT CONTRACT — the four layers between a local model's served window and the words
     an agent session can afford, measured and declared instead of inherited
   why: >-
@@ -883,7 +889,8 @@ tasks:
 - id: T-133
   priority: SHOULD
   state: open
-  mover: owner
+  mover: pipeline
+  owner_approved: '2026-10-16 (owner word, the D-3035 sitting)'
   title: "THE INTAKE FRONT-END - an interest-based daily queue of PROPOSALS, owner-gated, that never writes the store"
   why: the owner's following is scattered across platforms and media, and nothing today turns it into a reviewed
     daily decision. The pipeline can already convert TEXT into primitives; what is missing is the FRONT of it -
@@ -893,13 +900,12 @@ tasks:
     layer, yt-dlp + youtube-transcript-api with ASR only as fallback, crawl4ai/markitdown feeding the existing S0 converter,
     changedetection.io for feedless sources, a prompt-injection screen from the protectai class). NO item has been fetched and
     NO source has been scraped: the policy and the design are declared, the machines are not built.'
-  gate: 'the DAILY REPORT is the owner gate; nothing enters the pipeline without an approval, and every DROPPED item stays
-    COUNTED and re-viewable (a filter whose drops are invisible is the BUG-787 shape, in the intake). The screen precision and
-    recall on a frozen golden set are declared BEFORE any noise class is trusted.'
+  gate: 'pipeline: build the DAILY REPORT and the deterministic screen (fetchers plus evidence-requiring checks, config/curator_intake.yaml + config/intake_sources.yaml), DECLARE screen precision and recall on a frozen golden set BEFORE any noise class is trusted, and keep every DROPPED item COUNTED and re-viewable (a filter whose drops are invisible is the BUG-787 shape, in the intake). The daily report is the gate a human reads: ONE WORD per item, and nothing enters the pipeline without it.'
 - id: T-134
   priority: SHOULD
   state: open
-  mover: owner
+  mover: pipeline
+  owner_approved: '2026-10-16 (owner word, the D-3035 sitting)'
   title: "THE ENGINE'S SURVIVAL AND ITS VERSION - a boot agent (BUG-802), the residency lever (BUG-803), and the oMLX version gap measured before any engine is swapped"
   why: 'the $0 local engine (C1) is the single dependency of every delegate lane, the S4 classifier and the pipeline generator,
     and BUG-802 measured that nothing starts it after a reboot. Separately, the installed oMLX is 0.7.0 while its upstream
@@ -910,16 +916,16 @@ tasks:
     C12/C26; KeepAlive={SuccessfulExit:false} so a daemonising start cannot restart-loop) and pipeline/install_omlx_engine_agent.sh
     installs it FAIL-CLOSED: it waits for the engine health endpoint and ROLLS BACK the job if the engine does not answer.
     pipeline/engine_boot_report.py is the ladder reading (MEASURED 2026-10-15: engine UP, template in repo, job not loaded, so rc 2 owner-owed).'
-  gate: the owner runs the installer (dry run first). The residency policy and the upstream version check are owed before ANY
-    candidate engine (Magnitude / TensorFold) is admitted to a prefill slot (D-3002).
+  gate: 'pipeline: prepare and REHEARSE the install (dry run first) and measure the residency policy and the upstream version check BEFORE any candidate engine (Magnitude / TensorFold) is admitted to a prefill slot (D-3002); BUG-802 (nothing starts the engine after a reboot) and BUG-803 (adaptive eviction mid-request) are the findings this closes. The install itself is ONE COMMAND run at the keyboard; the pipeline must have left the dry run receipt before that command is asked for.'
 
 - id: T-135
   priority: SHOULD
   state: open
-  mover: owner
+  mover: pipeline
+  owner_approved: '2026-10-16 (owner word, the D-3035 sitting)'
   title: "BIND the harness context contract - adopt the executor so the ratified knobs are in the environment, not in a comment"
   source: D-3003; T-132; pipeline/harness_env.py; pipeline/harness_contract.py; config/agent_context.yaml#ratified.binding
-  gate: 'the OWNER adopts the binding in the shell that starts the harness; the ladder is already tri-state, so the act is one command'
+  gate: 'pipeline: run pipeline/harness_env.py --check (0 bound / 2 declared-but-not-exported / 1 a contradiction) and hand over the ONE command that binds the ratified knobs in the shell that starts the harness; the ladder already reports the reading, so the act is one line.'
   evidence: 'MEASURED 2026-10-15 - pipeline/harness_env.py --selftest 7/7 and --exec proved the CHILD process receives all three GOOSE_* names, while --check still reads all three UNBOUND (rc 2) because the harness is started outside that exec'
 - id: T-136
   priority: SHOULD
@@ -933,7 +939,8 @@ tasks:
 - id: T-137
   priority: SHOULD
   state: open
-  mover: owner
+  mover: pipeline
+  owner_approved: '2026-10-16 (owner word, the D-3035 sitting)'
   title: "PIN the agent_loop model and prove the tiered cache with an A/B"
   source: F6; BUG-792; BUG-803; pipeline/omlx_cache_enable.sh; config/engine.yaml
   evidence: 'MEASURED 2026-10-15 - cache.enabled was false with ssd_cache_dir null; it is now true with a DISTINCT
@@ -941,13 +948,11 @@ tasks:
     the SAME 209-token prompt twice on gemma-4-E4B measured 10.07s then 1.44s. The engine counter total_cached_tokens
     still reads 0, so WHICH layer produced the 7x is not established - and the pre-change baseline for the identical
     pair was NOT taken before the change was applied (BUG-813).'
-  gate: 'THE OWNER DECIDES WHEN THE ENGINE MAY BE FLAPPED: the A/B needs one rollback-apply cycle, so it needs a moment
-    when no long run depends on the pool. Run it as: baseline with pipeline/omlx_cache_enable.sh --rollback, then apply, then the same pair.
-    Then PIN the agent_loop model ("Never evict if True" - engine_pool.is_pinned) so adaptive eviction cannot evict it
-    mid-request, and re-measure the per-turn budget on an uncrowded pool. Only then may per_turn_budget_s return to 60.'
+  gate: 'pipeline: run the A/B (baseline with pipeline/omlx_cache_enable.sh --rollback, then apply, then the same pair), then PIN the agent_loop model (Never evict if True - engine_pool.is_pinned) so adaptive eviction cannot evict it mid-request, then re-measure the per-turn budget on an uncrowded pool; per_turn_budget_s returns to 60 only after that reading. THE TIMING IS THE ONE WORD: the flap needs a moment when no long run depends on the pool, and which moment that is is the human call the pipeline must ask for before it flips anything.'
 - id: T-138
   priority: COULD
   state: open
+  owner_word: 'DEFERRED 2026-10-16 (COULD: install a harness only when a specific job needs it, C28) - not approved and not dropped'
   mover: owner
   title: "HARNESS ADOPTION ON DEMAND - one command per tool, and none of them load-bearing"
   source: governance/HARNESS_UTILIZATION_20261015.md; config/engine.yaml#harnesses; D-3007
@@ -977,7 +982,8 @@ tasks:
 - id: T-140
   priority: SHOULD
   state: open
-  mover: owner
+  mover: pipeline
+  owner_approved: '2026-10-16 (owner word, the D-3035 sitting)'
   title: "ADOPT THE FAN-OUT EXECUTOR for everyday scaffolding and debugging, capped and cross-verified"
   source: D-3005; D-3011; pipeline/subagent_fanout.py; pipeline/oneshot_ask.py; config/engine.yaml#fanout
   evidence: 'MEASURED 2026-10-15 - an in-session subagent is cancelled by the next user message (BUG-809) and the
@@ -985,8 +991,7 @@ tasks:
     engine.fanout.max_parallel=3, runs DETACHED through research_run, partitions by ARTEFACT, and is verified by a
     DIFFERENT family (R5). One-shot sub-agents cost 0.4s; a harness costs ~104s (Claude Code) or ~28s (Pi) per
     invocation, measured today.'
-  gate: 'the owner names the first real fan-out task: the executor needs a task file (id, model, question, files)
-    plus the word that its answers are to be applied.'
+  gate: 'pipeline: prepare the first real fan-out task as a FILE (id, model, question, files) for pipeline/subagent_fanout.py, capped and cross-verified, and show the plan before it runs. The word that its answers are to be APPLIED is the handover this task waits on.'
 - id: T-141
   priority: MUST
   state: open
@@ -1083,7 +1088,8 @@ tasks:
 - id: T-145
   priority: SHOULD
   state: open
-  mover: owner
+  mover: pipeline
+  owner_approved: '2026-10-16 (owner word, the D-3035 sitting)'
   title: 'EDGE0 IS DEFERRED WITH A NAMED TRIGGER, not fetched: the class is already
     served and the role is blocked on measurement, not bytes'
   source: D-3018; governance/NLI_ANCESTOR_VERDICT_20261015.md; Edge0/Edge0-35B-A3B-preview
@@ -1101,9 +1107,7 @@ tasks:
     CURRENT agent_loop model cannot be trusted for evidence-cited work (8 of 8 citations refuted,
     BUG-827), so the class does need a better model - but WHICH one is a measurement, not a
     purchase. Recommendation: DEFER, with T-153 as the release test.'
-  gate: 'OWNER: say ''fetch Edge0'' to override, or leave it deferred until T-137
-    pins the agent_loop model / BUG-805 re-measures decode at class context size.
-    The download lock (T-141) is now in place, so a single fetch is safe.'
+  gate: 'pipeline: NOTHING IS FETCHED - the class is already served and the role is unfilled, so the workaround stays and the ladder reports the trigger; the ONE WORD fetch Edge0 overrides it, and the download lock (T-141) is in place so a single fetch is safe. Until then this stays deferred, and a deferred item must not read as a pending question (the D-3035 sitting).'
 - id: T-146
   priority: COULD
   state: done
@@ -1543,7 +1547,8 @@ tasks:
     stays open, which is why this task is pipeline-moved rather than gated on a word.'
 - id: T-167
   priority: SHOULD
-  state: open
+  state: done
+  closed: '2026-10-16'
   mover: owner
   title: 'A SECOND PHI-4 FETCH SITS IN THE HUB WHOSE WEIGHTS ARE ALREADY THE BYTES THE ENGINE SERVES: drop the stale parked entry and the copy, or keep the spare'
   source: T-142; BUG-841; D-3010; D-3018; pipeline/hf_fetch_model.py; governance/model_store_census_20261015.json
@@ -1565,3 +1570,78 @@ tasks:
     files can defeat. Infrastructure: python3 pipeline/hf_fetch_model.py --repo mlx-community/Phi-4-mini-instruct-8bit
     --verify-only, then governance/hf_fetch_receipt.json.'
 
+
+- id: T-168
+  priority: MUST
+  state: open
+  mover: pipeline
+  title: 'A DELEGATED RUN LEAVES A TRACE: a start row written BEFORE the call (purpose, model, the exact files it
+    may write, its wall budget), an end row written after it (artifacts VERIFIED ON DISK, wall time) and a status
+    reader that names an open row past its budget'
+  source:
+  - BUG-844
+  - D-3036
+  - config/agent_surface.yaml#logging
+  - config/delegation_economy.yaml
+  why: 'MEASURED 2026-10-16 (BUG-844): three delegates were launched for independent read-only work and the harness
+    reported all three as cancelled before they finished - one of them had ALREADY written its artifact and one had
+    written nothing, and NOTHING ON DISK DISTINGUISHED THE TWO STATES. The delegation ECONOMY is measured (cost
+    tiers, the D2549 routing map) while the delegation ACT is not, so the delegation rule at the top of this file
+    ("delegate to the right local model, in parallel") is unverifiable: a stall, a kill and a success are the same
+    observation to every later reader.'
+  evidence: 'MEASURED 2026-10-16, this session: temp/draft_diagnose_skill_20261016.md exists (6,573 B, written by the
+    delegate before the cancellation notice) while the other two delegates left no artifact at all; there is no
+    start record, no budget, no timeout and no end record for any of the three anywhere in this repository. The peek
+    surface reports activity (turns, idle time, recent tool calls) but it is SESSION-SCOPED: it dies with the session
+    and no rail, handoff or next agent can join it.'
+  gate: 'the journal is written by a script the AGENT calls around delegate(): a start row BEFORE the call (so the
+    row cannot be missing when the call hangs) and an end row after, each artifact VERIFIED ON DISK rather than
+    claimed. An open row past its declared budget is a RED rail line, not a shrug; two delegates claiming one file
+    is a refusal before either runs (C21/C23). No LLM judgement is involved: presence, budget and artifact existence
+    are mechanical.'
+- id: T-169
+  priority: SHOULD
+  state: open
+  mover: pipeline
+  title: 'ONE ADAPTER SURFACE: the harness binding this repository already has becomes DECLARED, and a checker
+    refuses a new one outside it'
+  source:
+  - BUG-845
+  - D-3037
+  - config/agent_surface.yaml
+  - config/harness_policy.yaml
+  why: 'The core is already harness-agnostic (the engine owns the models, the pipeline is deterministic Python, the
+    registers are files, MCP is the declared agent interface, C21/C25) but the BINDING is scattered: skills in
+    agent/skills/ AND ~/.config/goose/skills/, delegate routing as prose in AGENTS.md, the context contract in
+    config/agent_context.yaml, harness verdicts in config/harness_policy.yaml. Measured 2026-10-16: a swap would be
+    archaeology, and each new harness would add another coupling nobody enumerated.'
+  evidence: 'MEASURED 2026-10-16: config/agent_surface.yaml now DECLARES the core, the ONE adapter root, the external
+    roots a swap re-points, the AGENTS.md sections that are adapter-owned text and the rule that a portable artifact
+    (a SKILL.md, a task, a decision) may not name a harness or a provider. agent/skills/diagnose-hard-bugs/SKILL.md is
+    the first skill written to that shape. The reader named here is scripts/check_agent_surface.py, which does not
+    exist yet - which is exactly why this row is open rather than closed.'
+  gate: 'the checker is a rail: a portable artifact naming a harness or a provider is a fault, a harness-specific
+    path outside the declared adapter roots is a fault, and every declared root either EXISTS or is declared optional.
+    Known-answer controls in both directions, wired into just health. Until then the declaration is a claim with no
+    reader, and the row stays open.'
+- id: T-170
+  priority: SHOULD
+  state: open
+  mover: pipeline
+  title: 'CALIBRATION IS A RAIL: every served classifier publishes an ECE with its ruler and corpus fingerprint,
+    and an axis with no number is a fault rather than a silence'
+  source:
+  - D-3038
+  - governance/INTAKE_ASSESSMENT_20261014.md
+  - governance/ABSTENTION_CALIBRATION_20260923.json
+  why: 'MEASURED in the 2026-10-14 intake (temp/intake_20261014, the decider ECE/Decision-Index columns): this
+    repository publishes ACCURACY and abstention points but NO calibration number per axis, although the classifiers
+    that decide a tier are exactly the models whose CONFIDENCE is used as if it were a probability. Calibration is a
+    rail, not a nicer metric: an uncalibrated 0.9 is a claim about the model, not about the world.'
+  evidence: 'MEASURED 2026-10-16: governance/ABSTENTION_CALIBRATION_20260923.json carries operating points and curves
+    for the abstention axes; no artifact carries an expected-calibration-error number with its ruler, corpus
+    fingerprint and bin count. The intake assessment rates this WORTH and it was never registered (D-3038 records
+    it).'
+  gate: 'a number is only accepted WITH its ruler (bin count, corpus fingerprint, commit) and a rail fails when a
+    served classifier axis publishes none - the same shape as every other measured floor in this repository. An ECE
+    quoted after its instrument has been invalidated is refused (D-2941).'

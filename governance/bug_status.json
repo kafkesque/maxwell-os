@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 606,
-  "open_n": 223,
-  "closed_n": 383,
+  "total_ids": 610,
+  "open_n": 226,
+  "closed_n": 384,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -1122,6 +1122,21 @@
       "id": "BUG-836",
       "title": "(MED - OPEN 2026-10-15) - the R5 cross-family review route produced NO usable review from either local verifier, and one of the two failures",
       "events": 1
+    },
+    {
+      "id": "BUG-844",
+      "title": "(MED - OPEN 2026-10-16) - pipeline/subagent_fanout.py can show a FAN-OUT while no delegated run leaves a trace: an async delegate has no dec",
+      "events": 1
+    },
+    {
+      "id": "BUG-845",
+      "title": "(MED - OPEN 2026-10-16) - the CORE is harness-agnostic while the BINDING is scattered across five homes and config/decisions.yaml names none",
+      "events": 1
+    },
+    {
+      "id": "BUG-846",
+      "title": "(LOW - OPEN 2026-10-16) - governance/buglog.md is a REGISTER while the intake assessment is only a DOCUMENT: a rejected research finding has",
+      "events": 1
     }
   ],
   "closed": [
@@ -1507,6 +1522,7 @@
     "BUG-839",
     "BUG-840",
     "BUG-841",
-    "BUG-842"
+    "BUG-842",
+    "BUG-843"
   ]
 }

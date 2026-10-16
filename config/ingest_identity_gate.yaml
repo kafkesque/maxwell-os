@@ -303,3 +303,42 @@ source_library:
     no_links_in_the_library: 'the library lives inside Dropbox (APFS, MEASURED 2026-10-16: /System/Volumes/Data, APFS); an APFS CLONE would share bytes locally and still be uploaded as a second file by the provider, and a symlink is not what the provider syncs - so neither is the mechanism, a GENERATED view is'
     view_rule: 'a view is GENERATED from the bytes home or it is not a view; the generator is declared before any view is materialised (none is declared yet, and that is a declaration rather than a silence)'
     drift_reading: 'python3 scripts/census_source_names.py --arrangement: the same work in two homes with DIFFERENT bytes is drift, counted and printed, never invisible'
+
+  # ── THE PLACEMENT (T-180/D-3049): WHERE A FILE BELONGS, DECLARED ONCE ────────────────────────────────────────
+  # The owner asked (2026-10-16): keep books and notes in the right folders, be told when something is unorganised
+  # or sitting in the inbox, and be told when a name carries no author and no title. A file cannot be MISPLACED
+  # until PLACED is declared: MEASURED on the live library the same day, the TWO declared roots carry TWO different
+  # axes (books separates by KIND, journals:notes by DOMAIN) and the sibling folders of their common parent appeared
+  # in NO declaration at all. That is a judgement where a declaration belongs (C12), so the declaration is written
+  # here and the reading is scripts/census_source_names.py --placement (one line: --brief), which MOVES NOTHING.
+  placement:
+    authority: D-3049
+    reading: 'python3 scripts/census_source_names.py --placement (the full reading) | --brief (ONE line, run by the ladder so an arrival is LOUD without becoming a fault)'
+    axes:
+      kind: 'the subfolder IS the file kind (books/epub, books/pdf, books/md): format decides how a file is READ, so it is the one axis a physical layout can carry (D-3048)'
+      domain: 'the subfolder is one of the pipeline OWN DOMAIN names, read from their one materialisation (the immediate subdirectories of the corpus home), never restated here - a note has no converter, so topic is the only axis it can carry'
+    #: ONE ROW PER DECLARED ROOT, and a root with no row is FATAL (D-3034: a declaration must resolve). The ADMITTED
+    #: KINDS are not restated here - they are read from source_library.roots[].kinds, their one home.
+    homes:
+      books: {axis: kind, subfolder_required: true}
+      journals_notes: {axis: domain, subfolder_required: true}
+    #: AN ARRIVAL PEN IS A QUEUE, NEVER A DEFECT. What would be a defect is the pen being UNDECLARED (a silence) or
+    #: a file outliving staleness_days (a queue nobody drains) - so the pen is declared HERE, with a reason, and the
+    #: reading counts what is waiting instead of an unorganised pile being argued about.
+    pens:
+      education_inbox:
+        path: '~/Library/CloudStorage/Dropbox/education/inbox'
+        staleness_days: 30
+        why: 'the owner OWN admission queue. MEASURED 2026-10-16: 12 files / 219 MB, every one a book, none of them in the corpus'
+      education_unsorted:
+        path: '~/Library/CloudStorage/Dropbox/education/unsorted'
+        staleness_days: 365
+        why: 'the owner own holding pen. MEASURED 2026-10-16: 1,729 files under 18 topical subfolders, nothing newer than 2026-03. Declared so it reads as a QUEUE WITH A NUMBER instead of an undeclared silence'
+    undeclared_is_the_class: 'a folder inside a declared root that the declared axis does not name, or a sibling of the declared roots that is neither a root nor a pen, is reported as OUTSIDE THE DECLARATION - the reading does not call it wrong (the declaration simply does not cover it) and it never WALKS a sibling: walking one would be this reading quietly widening its own domain, which is the very defect it reports'
+    refusals:
+      no_move: 'this reading never moves, copies, renames or deletes. A placement repair is an owner-lane act with its own plan (T-180), and a mover nobody can audit is the failure mode this repository refuses'
+      no_second_policy_home: 'a GUI rule engine may not OWN a placement rule. MEASURED 2026-10-16 on this machine: Hazel.app is installed with three rule sets stored as NSKeyedArchiver data (the shell file command reads "data" and plutil cannot parse it), one of them naming HazelMoveAction on the destinations ~/Downloads/00_INBOX, ~/Downloads/ebook and ~/Downloads/docs - and NONE of those three exists on disk. Rules that are undiffable, unversioned, move files while nobody watches and leave no receipt are the C12 defect with a GUI (BUG-864). Hazel is REFUSED as a decider; the owner existing Downloads rules are RECORDED here rather than adopted'
+      no_second_library: 'a second library app may own a READING surface and never the bytes. MEASURED 2026-10-16: the installed Calibre library (61 rows, ONE author, "Ismeretlen") holds this repository OWN governance documents, not the books - so it is not a metadata source the T-176 plan may read (a declared source no eligible row can reach would be a promise, not a measurement, D-3034)'
+      no_topic_copy: 'a topic is never a folder of COPIES (D-3048): a copied work is two works to every reader that joins by path'
+    new_file_definition: 'REUSED, never restated: config/ingest_identity_gate.yaml#door.new_file_definition (a name the S0.5 metadata cache cannot resolve) - so the pen reading counts what the PIPELINE has never seen, not what a script guesses is new'
+

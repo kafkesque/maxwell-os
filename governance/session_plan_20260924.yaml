@@ -11,6 +11,9 @@ next_state:
 - the anchor's MISSING domain axis produced as machine evidence by the reliable pair (DeepSeek + Qwen3.8) on the blind row
   text, silver consensus + needs_review, owner adjudicates; no domains_final is ever written by a script
 may_touch:
+- agent/adapters/goose/apply_provider_flip.py
+- justfile
+- temp/d3049_record.yaml
 - config/ingest_identity_gate.yaml
 - scripts/plan_source_rename.py
 - scripts/census_source_names.py

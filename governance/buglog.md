@@ -8,18 +8,19 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1176 decisions (census stamp 95a39111130c7f9c, 2026-10-16) · 626 bugs (227 open / 399 closed; highest OPEN = BUG-862) · 49 open tasks (MUST 11 / SHOULD 34 / WORTH 4; OWNER-moved 2, pipeline-moved 47; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1177 decisions (census stamp d80d15256a29d814, 2026-10-16) · 628 bugs (227 open / 401 closed; highest OPEN = BUG-864) · 50 open tasks (MUST 11 / SHOULD 35 / WORTH 4; OWNER-moved 3, pipeline-moved 47; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **79** of 1176 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 591 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1176, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **79** of 1177 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 592 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1177, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 227 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 34 · 🟨 MED 63 · 🟩 LOW 25 · UNLABELLED 101 (BUG-757) of 227 open.
+> Open BUGS by severity (population = the census's 227 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 34 · 🟨 MED 64 · 🟩 LOW 24 · UNLABELLED 101 (BUG-757) of 227 open.
 >
-> **OWNER LANE (2) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
+> **OWNER LANE (3) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
 > | T-176 | 🟠 SHOULD | THE SOURCE LIBRARY NAMES - THE OWNER WORD IS GIVEN AND THE PLAN IS PUBLISHED: what remains is the acceptance o | owner lane, plan-first: the owner accepts or edits the published plan  |
 > | T-179 | 🟠 SHOULD | THE SECOND MATERIALISATION - the library and the corpus hold the same work, the reading now measures how far t | owner lane: the owner decides between (a) RETIRING the second material |
+> | T-180 | 🟠 SHOULD | THE PLACEMENT - the declaration now says where a file belongs and the reading says what it does not cover: 281 | owner lane, four limbs, each separately wordable and none of them urge |
 >
 > **PIPELINE LANE (47) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
 >
@@ -15786,3 +15787,40 @@ SYMPTOM: MEASURED by `python3 scripts/census_source_names.py --arrangement` (REA
 ROOT CAUSE: the repository never declared which home is the AUTHORITY for an ingested work's bytes, so both homes were maintained, and a "copy" that nobody compares is two files the day after it is made. Nothing was wrong on the day of the copy: that is exactly why nothing detected anything. This is BUG-780's shape (530 rows, one text under two names) moved one layer out — from the corpus to the corpus AND the reading view — and it is the reason T-176 refuses to materialise a THIRD copy for a topic.
 
 REMEDY (D-3048): the corpus home is the ONE bytes home (it is the tree S0 reads and the only tree the S0.5 cache stamps); the library is the owner's READING surface; and the arrangement is a VIEW that is GENERATED or not a view at all. The drift is now a READING with a shrink-only ceiling (727, measured, never raised) at rc 2 — loud and owner-owed, never fatal — and the disposition (retire the second materialisation, or keep it as a declared view with a re-derivation receipt) is the owner's word, registered as T-179.
+
+
+## BUG-863 (LOW — FIXED 2026-10-16) — the operator LANES whose declared contract is rc 2 were printed by just(1) as a FAILED COMMAND, so the owner read a working reading as a broken one
+
+**Status:** FIXED 2026-10-16 (remedy: the tri-state guard on the recipes, the same form the ladder already used).
+
+FILE / LINES: `justfile` — the recipes `source-names`, `arrangement`, `rename-plan` (added 2026-10-16 with D-3048).
+
+SYMPTOM (MEASURED, not inferred): `just source-names` printed the whole reading and then `error: Recipe source-names failed on line 599 with exit code 2`, and the shell saw rc 2. The reader was RIGHT: rc 2 is its DECLARED contract (name debt is OWNER-OWED, loud, never fatal — BUG-457). The recipe was wrong: a plain line makes just(1) propagate rc 2 as a failure, so the owner is told a working reading is a broken command. This is the SECOND hand-off command to fail in the owner's hands this session, and the two failures are the same shape one layer apart: BUG-859 was a stale PATH in the hand-off, this is a stale GUARD on it.
+
+ROOT CAUSE: the tri-state contract was declared in the READERS and in the ladder comments, and the LADDER already wrote the correct form for `scripts/check_harness_homes.py` (`|| [ $? -eq 2 ]`), but the operator recipes were added later as plain lines. Nothing CHECKED them: `scripts/resolve_route.py` verifies that a lane's command still EXISTS in its recipe, and it says (correctly) that a command the LADDER runs is a guard's business — so a lane's own rc contract had no reader at all. The class is BUG-462: the reader printed "owner-owed" and the shell printed "failed".
+
+FIX + MEASURED AFTER: all four lanes carry `|| [ $? -eq 2 ]` with a comment naming why (`just source-names`, `just arrangement`, `just placement`, `just rename-plan` now read rc 0 and print their readings). THE FIX WAS ITSELF CAUGHT BY A RAIL: the new ladder line `--brief` was first declared `tri_state` in `config/rail_registry.yaml#guards` and the rail read it `fatal`, because `guard_of()` reads the LADDER'S OWN TEXT and the comment said "instead of || exit 1" — a comment that DESCRIBES the wrong guard IS the wrong guard as far as the reader is concerned. Re-worded, `check_rail_registry` reads rc 0.
+
+## BUG-864 (MED — OPEN 2026-10-16) — a GUI rule engine owns a PLACEMENT rule for a home no declaration covers, and the three destinations its rules name do not exist on disk
+
+**Status:** OPEN (remedy: D-3049's placement declaration + reading; the owner lane is to check the rules in Hazel's own UI). MEASURED 2026-10-16.
+
+FILE / EVIDENCE: `/Applications/Hazel.app`; `~/Library/Application Support/Hazel/` holds three `*.hazelrules` stores (one 27,510 B, modified 2026-03-14) plus `.hazeldb` files last written 2026-10-15 14:12; `file` reports the rule stores as `data` and `plutil -p` CANNOT parse them (NSKeyedArchiver), so the rules are neither diffable nor readable as text.
+
+SYMPTOM: decoding the largest store's strings shows a `HazelMoveAction` and the destinations `~/Downloads/00_INBOX`, `~/Downloads/ebook` (rules named "ebook epub+mobi sorting", "ebook pdf sorting") and `~/Downloads/docs` — and MEASURED the same day, NONE of those three directories EXISTS. A rule whose destination is gone cannot complete; and a BOOK arriving in Downloads can be moved by a rule the repository cannot read, out of a home the repository does not declare. The library reading cannot see it: Downloads is neither a declared root nor a declared pen.
+
+ROOT CAUSE: this machine's placement policy has TWO homes — the declaration in `config/ingest_identity_gate.yaml` and a binary rule store owned by a GUI app — and nothing compares them. One of them is not text, so no diff, no review and no receipt can ever mention it (C12's defect with a GUI). The owner's own Downloads triage is not wrong in KIND (an arrival pen is a good idea); it is wrong in HOME and in SILENCE.
+
+REMEDY (D-3049): the placement declaration records Hazel as REFUSED as a decider (`placement.refusals.no_second_policy_home`) and the reading counts DECLARED pens instead. Two owner-lane steps remain: (a) open Hazel and either retarget those rules at a DECLARED pen or disable the actions; (b) if Downloads is to stay an arrival pen, declare it as a pen row so the census counts it — a pen that is declared is a queue, a pen that is not is a silence.
+
+## BUG-854 (LOW — CLOSED 2026-10-16, by T-135/D-3049) — the writer OWNED the two values of its own safe phase, and the thinking-effort knob it sets was declared in NO contract
+
+**Status:** CLOSED 2026-10-16. The remedy landed as the KNOB BINDING, in three measured steps, and each is a reading rather than a promise.
+
+FIX, STEP 1 (a value needs a home): `config/agent_context.yaml#ratified.knobs.safe_phase` now declares `nvidia_enabled.value: 'false'` and `thinking_effort.value: 'medium'`, each WITH the key it is written to inside the client home and WITH its reason (C1: no NVIDIA tier; a thought on a LOCAL engine is prefill seconds nobody bills for while the block cache is unproven — F6/BUG-792). The values are quoted STRINGS, because the value is written into a client home as TEXT and `str(False)` would spell "False" into a field that expects "false".
+
+FIX, STEP 2 (the writer reads, never restates): `agent/adapters/goose/apply_provider_flip.py` no longer defines `SAFE_NVIDIA_ENABLED`/`SAFE_THINKING_EFFORT`; it holds two POINTERS and resolves both through the ONE resolver (`pipeline/harness_env.resolve`), the same one that already resolved the provider and the model. Its known-answer controls now also fail if a `SAFE_*` value literal is ever written back (a needle that reads the writer's own bytes — a control nothing runs is a comment, BUG-492).
+
+FIX, STEP 3 (a declaration nothing compares is a claim — D-3034): two `home_facts` read both knobs back from the client's own home (`safe_phase_nvidia_off`, `safe_phase_thinking_effort`), each `must_equal` a pointer into the declaration.
+
+MEASURED AFTER: `scripts/check_harness_homes.py` reads 5 declared fact(s), bound 5, conflicting 0, rc 0 (it read 3/3 before this act); the writer's `--selftest` reads 8/8; and the LIVE dry-run still reads `0 edit(s) to apply, 4 already applied`, which is the strongest of the three — the POINTER-RESOLVED values equal the bytes already in the client home, so the declaration, the writer and the home agree. WHAT REMAINS OPEN IS A DIFFERENT LIMB OF T-135: the FIVE environment names a BARE app launch never binds (`pipeline/harness_env.py --check` still reads rc 2), which is a launch-path act (scripts/bind_harness_env.sh is the infrastructure; the one line for the owner's shell profile is the manual step).

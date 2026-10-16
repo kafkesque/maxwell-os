@@ -186,6 +186,10 @@ guards:
   scripts/check_bug_recall.py --selftest: fatal
   #: D-3045/BUG-861: the source-library reader's controls. fatal (a control nothing runs is a comment, BUG-492)
   scripts/census_source_names.py --selftest: fatal
+  #: T-180/D-3049: the ONE-LINE placement notify. tri_state, because its rc 2 IS the owner-owed reading (a pen
+  #: with something in it, a misplaced file, a folder the declaration does not cover) - loud, never fatal (BUG-457).
+  #: Pinning it fatal would turn the owner's own inbox into a broken health run.
+  scripts/census_source_names.py --brief: tri_state
   #: T-176/D-3048: the owner-lane rename plan's controls. fatal - the plan is a PROPOSAL and its reader must
   #: be seen to refuse, not merely declare (its live reading is an operator lane, not a ladder line: it walks
   #: the owner's Dropbox, and a rail that walks Dropbox on every `just health` would be a tax, not a reading)

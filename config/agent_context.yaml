@@ -115,6 +115,28 @@ home_facts:
       D-3023: a cloud token is an ESCALATION, so the route is kept enabled (an escalation that cannot be
       taken is not one) while fact #1 keeps it out of the default. Removing it would make the escalation
       impossible; leaving it ACTIVE is what T-174 fixed.
+  # ── BUG-854/T-135: the two knobs the safe phase binds, read back from the SAME home the writer writes. Before
+  # these facts the two values were readable ONLY from the script that wrote them - a declaration nothing compares
+  # is a claim (D-3034), so each knob now has a home_fact and scripts/check_harness_homes.py reads it back.
+  - id: safe_phase_nvidia_off
+    home: harness_config
+    key: 'providers.nvidia.enabled'
+    must_equal: '@config/agent_context.yaml#ratified.knobs.safe_phase.nvidia_enabled.value'
+    decided_by: [D-3023, D-3049]
+    row: T-135
+    because: >-
+      C1: the everyday path must not hold an accelerator route open. The writer sets it; this fact reads it back
+      from the client's own home, so a hand-edit that switched it on again would be a READING, not a discovery.
+  - id: safe_phase_thinking_effort
+    home: harness_config
+    key: 'GOOSE_THINKING_EFFORT'
+    must_equal: '@config/agent_context.yaml#ratified.knobs.safe_phase.thinking_effort.value'
+    decided_by: [D-3049]
+    row: T-135
+    because: >-
+      the effort tier is what the safe phase lowered and nothing but the writer's own constant recorded it
+      (BUG-854). BOUND here means the client home and the declaration agree about the thought budget.
+
 parity_rule:
   statement: 'served_window == declared_context_limit for every model the harness may run'
   on_served_below_declared: truncation_risk     # the harness builds a prompt the server cannot attend to
@@ -211,6 +233,21 @@ ratified:
       max_compactions_per_session: 1
       min_headroom_tokens: 2048
       strategy: declared_handoff_first    # declared_handoff_over_in_place_compaction (above)
+    # ── BUG-854/T-135 (2026-10-16): THE TWO VALUES THE SAFE PHASE WRITES ────────────────────────────────────
+    # A value a client will OBEY may not be a constant inside the script that writes it - that was the C12 defect
+    # one layer below the one T-175 fixed (the writer stopped CONSTRUCTING a home and still OWNED two values). The
+    # writer now READS both from here through the ONE resolver, so a future decision about the thinking budget
+    # moves THIS line and the writer follows. Strings, not YAML booleans: the value is written into a client home
+    # as TEXT, and str(False) would spell "False" into a field that expects "false".
+    safe_phase:
+      nvidia_enabled:
+        value: 'false'
+        key: 'providers.nvidia.enabled'
+        why: 'this engine owns no NVIDIA tier, so an accelerator route can only spend money and add a failure mode (C1) - the safe phase switches it off, and the reason lives here instead of in a constant'
+      thinking_effort:
+        value: 'medium'
+        key: 'GOOSE_THINKING_EFFORT'
+        why: 'a thought on a LOCAL engine is prefill seconds nobody bills for, so the safe phase lowers the effort while the block cache is unproven (F6/BUG-792); THIS is the line to move when the cache is proven'
   binding:                       # T-132/D-3003: a declaration that is not in the environment is a comment.
                                  # The executor is a SIBLING of the knobs it binds and is named by them, so the
                                  # declaration cannot drift from the thing that executes it.

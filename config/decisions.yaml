@@ -26392,3 +26392,92 @@ decisions:
     because a view generator is a separate act and declaring one would be a promise rather than a reading; it does
     not retire the library''s md tree (that is the owner''s word, T-179); and it does not raise the drift ceiling
     — 727 is a measurement plus nothing, and D-3023/D-2644 make it shrink-only.'
+- id: D-3049
+  state: ACTIVE
+  date: '2026-10-16'
+  by: assistant
+  category: LIBRARY PLACEMENT, THE ARRIVAL PEN, AND THE TWO VALUES A CLIENT OBEYS
+  bugs:
+  - BUG-863
+  - BUG-864
+  - BUG-854
+  files:
+  - config/ingest_identity_gate.yaml
+  - scripts/census_source_names.py
+  - justfile
+  - config/capability_registry.yaml
+  - config/rail_registry.yaml
+  - config/agent_context.yaml
+  - agent/adapters/goose/apply_provider_flip.py
+  - config/task_register.yaml
+  - governance/buglog.md
+  title: PLACEMENT — where a file belongs is DECLARED once and read by ONE census that moves nothing; an arrival
+    pen is a QUEUE rather than a defect; a GUI rule engine may not own a placement rule; and the two values a client
+    obeys stop being constants inside the script that writes them
+  decision: 'OWNER QUESTION (2026-10-16, verbatim in part): "what would you recommend to keep things organized and
+    structured according to the agreed folder structure so no books are mixed ... if you find books, notes unorganized
+    in the agreed folder notes or book folders ... if you find books or notes in the attached inbox folder again
+    notify ... if you find books and/or notes in any of those folders with messy, truncated name without author
+    and title ... consider that we have calibre and hazel is that relevant, is it worth to create a command or are
+    there better ways, what is the most intuitive effortless way to keep everything clean and tight". (1) A FILE
+    CANNOT BE MISPLACED UNTIL PLACED IS DECLARED, AND IT WAS NOT DECLARED. MEASURED on the live library: the two
+    declared roots carry TWO DIFFERENT AXES (books separates by KIND - epub/pdf/md - while journals:notes separates
+    by DOMAIN 0..7), five sibling folders of their common parent (courses, images, podcast, quotes, videos) appeared
+    in NO declaration at all, and the one thing the owner asked to be TOLD about (the inbox) was not a declared
+    object either. So "unorganised" had no reading behind it and the judgement lived with whoever happened to look.
+    The placement is now declared, in the same home as the names: an AXIS per root (the admitted KINDS are not restated
+    - they are read from roots[].kinds, their one home), the domain vocabulary read from its ONE materialisation
+    (the corpus home''s own subdirectories, never a second list), an age budget per pen, and the class "outside
+    the declaration" for everything neither a root nor a pen names. (2) AN ARRIVAL PEN IS A QUEUE, NOT A DEFECT
+    - AND THE PENS ARE MEASURED, NOT ASSUMED. education/inbox: 12 files / 229.9 MB, every one a book, oldest 73
+    days, 1 past the declared 30-day budget, and 9 that the S0.5 cache CANNOT resolve - i.e. the pipeline has never
+    seen them, which is the DOOR''S OWN definition of a new file, reused rather than restated. education/unsorted:
+    1,729 files / 2,262.9 MB, 222 of a declared kind, oldest 4,592 days, nothing newer than 2026-03. Both are printed
+    on every health run in ONE line (census_source_names.py --brief): an arrival is LOUD without becoming a fault,
+    because that ladder line carries the tri-state guard - rc 2 there is the owner-owed reading (BUG-457), not a
+    broken build. (3) THE READING MOVES NOTHING AND THE REPAIR IS A SEPARATE OWNER-LANE ACT. --placement reports
+    where things are; T-180 is the act that would move anything, and it is owner-worded. What it found (MEASURED
+    2026-10-16): 2,811 files inside the declared roots, of which 2,530 are of a kind a root admits; 281 are NOT
+    (1 in books - "plein air KEYS.doc" - and 280 in journals:notes, overwhelmingly Screenshots); 0 files loose at
+    a root; 0 subfolders the declared axes do not name. So the honest answer to "are books and notes mixed?" is:
+    NOT on the axis (the axes hold, which is why this is a small number and not a reorganisation), and YES at the
+    file level - 281 files of a kind no root admits, 12 arrivals waiting, 1,741 files sitting in the two pens. (4)
+    THE NAME QUESTION IS REUSED, NOT RE-ANSWERED. The third thing the owner asked to be told about (a name with
+    no author and no title) already has ONE reader and ONE plan (D-3045/D-3048: --census for the classes and the
+    FREE/COUPLED split, plan_source_rename.py for the 122 eligible rows). This act added NO second name classifier
+    and --brief POINTS at "just source-names", because a second classifier is how two answers to one question start
+    disagreeing (D-2646). (5) CALIBRE AND HAZEL, BOTH MEASURED, BOTH ANSWERED BY A REFUSAL WITH ITS REASON. Calibre
+    is installed AND a library exists (~/Calibre könyvtár) - but it holds 61 rows with ONE author, "Ismeretlen",
+    and its titles are THIS REPOSITORY''S OWN governance documents (buglog, master-prompt audit, handover notes),
+    not the books. So Calibre is NOT a metadata source the T-176 plan may read (a declared source no eligible row
+    can reach would be a promise, not a measurement - D-3034); it may own a READING surface and never the bytes,
+    which is the shape of its own one-library / save-to-disk design. Hazel is installed and its rule store is LIVE
+    (three .hazelrules, one 27,510 B; .hazeldb last written 2026-10-15 14:12) - and it is REFUSED as a decider:
+    the shell file command reads the store as "data", plutil cannot parse it, so its rules are neither diffable
+    nor reviewable, and decoding its strings shows a HazelMoveAction whose destinations (~/Downloads/00_INBOX, ~/Downloads/ebook,
+    ~/Downloads/docs) DO NOT EXIST on disk (BUG-864). A placement rule no reader can read, executed by a process
+    nobody watches, leaving no receipt, is the C12 defect with a GUI. The owner''s own Downloads triage is not wrong
+    in KIND - an arrival pen is the right idea - it is wrong in HOME and in SILENCE: declare the pen and the census
+    will count it. (6) THE TWO VALUES A CLIENT OBEYS GET A HOME (T-135 / BUG-854, now CLOSED). config/agent_context.yaml#ratified.knobs.safe_phase
+    declares nvidia_enabled=''false'' and thinking_effort=''medium'' as quoted STRINGS, each with the KEY it is
+    written to and its REASON; agent/adapters/goose/apply_provider_flip.py resolves both through the ONE resolver
+    instead of owning them, and its controls now FAIL if a SAFE_* value literal is ever written back; and two home_facts
+    read both back from the client''s own home. MEASURED: check_harness_homes reads 5 declared facts, 5 BOUND, rc
+    0 (it read 3/3 before); the writer''s --selftest reads 8/8; and the LIVE dry-run still reads "0 edit(s) to apply,
+    4 already applied" - the pointer-resolved values equal the bytes already in the client home, so DECLARATION,
+    WRITER and HOME agree. (7) THE COMMAND THE OWNER RAN STOPS LYING ABOUT ITS OWN CONTRACT (BUG-863). just source-names,
+    just arrangement and just rename-plan printed their reading and then "error: Recipe ... failed with exit code
+    2", because the recipes were plain lines while rc 2 IS the declared owner-owed outcome (BUG-457). All four lanes
+    now carry the tri-state guard, the new placement lane with them, and the notify line is declared in config/rail_registry.yaml#guards
+    as tri_state - where the rail then caught THIS ACT''S OWN comment describing the wrong guard, because a reader
+    that reads text cannot tell a description of a guard from the guard.'
+  consequences:
+  - the placement block is the ONE home of "where a file belongs" - changing an axis is a change there, and the
+    reading follows it without a second declaration anywhere
+  - a second mover on this machine (a GUI rule engine, a launchd job, a Finder action) is a recorded refusal rather
+    than an automation nobody wrote down
+  - the pens' numbers are part of every health run, so an ignored arrival stays visible and a queue that never drains
+    is a NUMBER instead of a silence
+  - what this act does NOT do - it moves, renames, copies and deletes NOTHING; it declares no topic; it adopts neither
+    Calibre nor Hazel as an authority; and it answers neither T-176's rename plan (still the owner's per-row word)
+    nor T-179 (still the owner's disposition of the second materialisation)

@@ -54,18 +54,21 @@ import tempfile
 from datetime import datetime
 from pathlib import Path
 
-REPO = Path(__file__).resolve().parents[3]   # agent/adapters/<client>/ -> the repository root
+REPO = Path(__file__).resolve().parents[3]  # agent/adapters/<client>/ -> the repository root
 AGENT_CONTEXT = REPO / "config/agent_context.yaml"
 
 #: WHAT THIS WRITER MAY SET — declared once, as POINTERS into the homes that own the facts (C12). A provider or
 #: model name written here would be a second copy that silently disagrees the moment the declaration moves.
 PROVIDER_POINTER = "@config/engine.yaml#harnesses.goose_provider_id"
 AGENT_MODEL_POINTER = "@config/model_assignments.yaml#harness_roles.AGENT_LOOP_SHORT.model"
-#: The two values that belong to THIS script's own safe phase (no config home declares them, and neither is a
-#: provider or a model): the cloud accelerator is switched off and the thinking effort is lowered, because the
-#: engine that answers locally does not bill per thought.
-SAFE_NVIDIA_ENABLED = "false"
-SAFE_THINKING_EFFORT = "medium"
+#: THE TWO SAFE-PHASE VALUES ARE POINTERS, NOT CONSTANTS (T-135/BUG-854, MEASURED 2026-10-16). They used to be
+#: this writer's own policy - the C12 defect one layer below the one T-175 fixed: the writer had stopped
+#: CONSTRUCTING a home, but it still OWNED two values a client OBEYS, so a future decision about the thinking
+#: budget had no home to move and no reader to follow it. Both are resolved at run time from
+#: config/agent_context.yaml#ratified.knobs.safe_phase, and each is read BACK from the client home by a declared
+#: home_fact (safe_phase_nvidia_off / safe_phase_thinking_effort) - a value nothing compares is a claim (D-3034).
+SAFE_NVIDIA_POINTER = "@config/agent_context.yaml#ratified.knobs.safe_phase.nvidia_enabled.value"
+SAFE_EFFORT_POINTER = "@config/agent_context.yaml#ratified.knobs.safe_phase.thinking_effort.value"
 
 CONTROL_LABELS = (
     "a_pending_edit_is_applied_and_changes_exactly_one_block",
@@ -94,8 +97,10 @@ def declared_home(env: dict[str, str] | None = None) -> Path:
     try:
         home = yaml.safe_load(AGENT_CONTEXT.read_text(encoding="utf-8"))["homes"]["harness_config"]
     except Exception as exc:  # noqa: BLE001 — any failure means this writer cannot know the home
-        raise SystemExit(f"FATAL: {AGENT_CONTEXT}#homes.harness_config cannot be read "
-                         f"({type(exc).__name__}: {exc}) — this writer must not guess the client home") from exc
+        raise SystemExit(
+            f"FATAL: {AGENT_CONTEXT}#homes.harness_config cannot be read "
+            f"({type(exc).__name__}: {exc}) — this writer must not guess the client home"
+        ) from exc
     return Path(str(home)).expanduser()
 
 
@@ -109,38 +114,73 @@ def pointers() -> tuple[str, str]:
     return resolve(PROVIDER_POINTER), resolve(AGENT_MODEL_POINTER)
 
 
+def safe_value(pointer: str) -> str:
+    """The declared value of one SAFE-PHASE knob, read at run time from its ONE home (T-135/BUG-854).
+
+    A value a client OBEYS may not be a constant here (C12). The pointer goes through the SAME resolver the provider
+    and the model use, so an unresolvable pointer is FATAL rather than a silent default (C16).
+    """
+    from pipeline.harness_env import (
+        resolve,
+    )  # the ONE pointer resolver (D-2646: never re-implement)
+
+    return resolve(pointer)
+
+
 def declared_edits(provider: str, model: str) -> list[tuple[str, str, str, str]]:
     """The edit list: (label, pattern, replacement, phase).
 
     The OLD side of an edit is a PATTERN, so the value being replaced is read from the file rather than copied
-    into this script; the NEW side is the declared value. Both sides of the "now" phase are this writer's own
-    policy constants (see SAFE_* above).
+    into this script; the NEW side is the DECLARED value. Neither side is this writer's own policy any more: the
+    "flip" values resolve through pointers() and the "now" values through safe_value() (T-135/BUG-854).
     """
     return [
-        (f"pin {provider}.model to the declared agent_loop model",
-         rf"(?m)^(  {re.escape(provider)}:\n(?:    [^\n]*\n)*?    model: )\S+$", rf"\g<1>{model}", "flip"),
-        (f"flip active_provider to the declared provider ({provider})",
-         r"(?m)^active_provider: .+$", f"active_provider: {provider}", "flip"),
-        ("disable nvidia.enabled",
-         r"(?m)^(  nvidia:\n(?:    [^\n]*\n)*?    enabled: )\S+$", rf"\g<1>{SAFE_NVIDIA_ENABLED}", "now"),
-        ("lower GOOSE_THINKING_EFFORT",
-         r"(?m)^(GOOSE_THINKING_EFFORT: ).+$", rf"\g<1>{SAFE_THINKING_EFFORT}", "now"),
+        (
+            f"pin {provider}.model to the declared agent_loop model",
+            rf"(?m)^(  {re.escape(provider)}:\n(?:    [^\n]*\n)*?    model: )\S+$",
+            rf"\g<1>{model}",
+            "flip",
+        ),
+        (
+            f"flip active_provider to the declared provider ({provider})",
+            r"(?m)^active_provider: .+$",
+            f"active_provider: {provider}",
+            "flip",
+        ),
+        (
+            "disable nvidia.enabled",
+            r"(?m)^(  nvidia:\n(?:    [^\n]*\n)*?    enabled: )\S+$",
+            rf"\g<1>{safe_value(SAFE_NVIDIA_POINTER)}",
+            "now",
+        ),
+        (
+            "lower GOOSE_THINKING_EFFORT",
+            r"(?m)^(GOOSE_THINKING_EFFORT: ).+$",
+            rf"\g<1>{safe_value(SAFE_EFFORT_POINTER)}",
+            "now",
+        ),
     ]
 
 
-def classify(content: str, edits: list[tuple[str, str, str, str]]) -> tuple[list[tuple[str, str, str]], list[str]]:
+def classify(
+    content: str, edits: list[tuple[str, str, str, str]]
+) -> tuple[list[tuple[str, str, str]], list[str]]:
     """Per-edit state against the bytes on disk: PENDING, APPLIED, or DRIFTED (see the module docstring)."""
     pending: list[tuple[str, str, str]] = []
     problems: list[str] = []
     for label, pattern, replacement, _phase in edits:
         matches = len(re.findall(pattern, content))
         if matches == 0:
-            problems.append(f"edit '{label}': the block it targets is NOT in the home - neither the state this "
-                            f"edit expects nor the state it writes")
+            problems.append(
+                f"edit '{label}': the block it targets is NOT in the home - neither the state this "
+                f"edit expects nor the state it writes"
+            )
             continue
         if matches > 1:
-            problems.append(f"edit '{label}': its anchor matches {matches} times - an ambiguous anchor is a "
-                            f"drift, not a choice")
+            problems.append(
+                f"edit '{label}': its anchor matches {matches} times - an ambiguous anchor is a "
+                f"drift, not a choice"
+            )
             continue
         if re.sub(pattern, replacement, content, count=1) == content:
             continue  # APPLIED: the home already says what this edit declares, and nothing is rewritten
@@ -150,7 +190,9 @@ def classify(content: str, edits: list[tuple[str, str, str, str]]) -> tuple[list
 
 def _newest_backup(cfg: Path) -> Path | None:
     """Return the newest config.yaml.bak.* beside `cfg`, or None."""
-    backups = sorted(cfg.parent.glob(f"{cfg.name}.bak.*"), key=lambda p: p.stat().st_mtime, reverse=True)
+    backups = sorted(
+        cfg.parent.glob(f"{cfg.name}.bak.*"), key=lambda p: p.stat().st_mtime, reverse=True
+    )
     return backups[0] if backups else None
 
 
@@ -196,8 +238,10 @@ def verify(cfg: Path, applied: list[tuple[str, str, str]]) -> list[str]:
     for label, pattern, replacement in applied:
         matches = len(re.findall(pattern, text))
         if matches != 1 or re.sub(pattern, replacement, text, count=1) != text:
-            faults.append(f"edit '{label}' is NOT in effect after the write ({matches} anchor(s) matched, "
-                          f"substitution {'changed nothing' if matches == 1 else 'was not attempted'})")
+            faults.append(
+                f"edit '{label}' is NOT in effect after the write ({matches} anchor(s) matched, "
+                f"substitution {'changed nothing' if matches == 1 else 'was not attempted'})"
+            )
     return faults
 
 
@@ -211,15 +255,23 @@ def binding_faults(cfg: Path, provider: str, model: str) -> list[str]:
         return [f"the written home does not parse as YAML ({type(exc).__name__}: {exc})"]
     faults: list[str] = []
     if str(doc.get("active_provider")) != provider:
-        faults.append(f"active_provider is {doc.get('active_provider')!r}, not the declared {provider!r}")
+        faults.append(
+            f"active_provider is {doc.get('active_provider')!r}, not the declared {provider!r}"
+        )
     pinned = str(((doc.get("providers") or {}).get(provider) or {}).get("model") or "")
     if pinned != model:
-        faults.append(f"providers.{provider}.model is {pinned!r}, not the declared agent-loop model {model!r}")
+        faults.append(
+            f"providers.{provider}.model is {pinned!r}, not the declared agent-loop model {model!r}"
+        )
     return faults
 
 
-def apply_edits(edits: list[tuple[str, str, str, str]], dry_run: bool = False,
-                cfg: Path | None = None, expect_binding: bool = False) -> int:
+def apply_edits(
+    edits: list[tuple[str, str, str, str]],
+    dry_run: bool = False,
+    cfg: Path | None = None,
+    expect_binding: bool = False,
+) -> int:
     """Apply (or plan) `edits` against the harness home. Refuses ONLY on a DRIFTED edit."""
     cfg = cfg or declared_home()
     if not cfg.exists():
@@ -232,7 +284,9 @@ def apply_edits(edits: list[tuple[str, str, str, str]], dry_run: bool = False,
     if problems:
         return 1
     if dry_run:
-        print(f"DRY-RUN on {cfg}: {len(pending)} edit(s) to apply, {len(edits) - len(pending)} already applied:")
+        print(
+            f"DRY-RUN on {cfg}: {len(pending)} edit(s) to apply, {len(edits) - len(pending)} already applied:"
+        )
         for label, _pattern, _replacement in pending:
             print(f"  - {label}")
         return 0
@@ -270,10 +324,13 @@ def rollback(cfg: Path | None = None) -> int:
 
 
 def _warn_flip() -> None:
-    print("NOTE: the FLIP phase binds the everyday path to the engine that owns the models (T-174, owner word "
-          "2026-10-16). What REMAINS open is T-137: the agent-loop model PIN and the tiered-cache A/B, which "
-          "protect the per-turn BUDGET rather than the binding. Roll back in one command: "
-          "--rollback.", file=sys.stderr)
+    print(
+        "NOTE: the FLIP phase binds the everyday path to the engine that owns the models (T-174, owner word "
+        "2026-10-16). What REMAINS open is T-137: the agent-loop model PIN and the tiered-cache A/B, which "
+        "protect the per-turn BUDGET rather than the binding. Roll back in one command: "
+        "--rollback.",
+        file=sys.stderr,
+    )
 
 
 def selftest() -> int:
@@ -285,7 +342,9 @@ def selftest() -> int:
 
     old = "active_provider: vendor_a\n"
     new = "active_provider: vendor_b\n"
-    edits = [("flip the provider", r"(?m)^active_provider: .+$", "active_provider: vendor_b", "flip")]
+    edits = [
+        ("flip the provider", r"(?m)^active_provider: .+$", "active_provider: vendor_b", "flip")
+    ]
     body = "providers:\n  vendor_b:\n    enabled: true\n" + old
     with tempfile.TemporaryDirectory(prefix="provider_flip_") as tmp:
         cfg = Path(tmp) / "config.yaml"
@@ -332,22 +391,48 @@ def selftest() -> int:
             mark(CONTROL_LABELS[5], "a rollback with no backup beside the home did not refuse")
 
         own = Path(__file__).read_text(encoding="utf-8")
-        live_provider, live_model = pointers()   # the DECLARED facts, never a name written into this control
-        leaks = [name for name in (live_provider, live_model)
-                 if re.search(rf"['\"]{re.escape(name)}", own)]
+        live_provider, live_model = (
+            pointers()
+        )  # the DECLARED facts, never a name written into this control
+        leaks = [
+            name
+            for name in (live_provider, live_model)
+            if re.search(rf"['\"]{re.escape(name)}", own)
+        ]
         if leaks:
-            mark(CONTROL_LABELS[6], f"the writer restates a declared provider or model name: {leaks}")
-        for pointer in (PROVIDER_POINTER, AGENT_MODEL_POINTER):
+            mark(
+                CONTROL_LABELS[6], f"the writer restates a declared provider or model name: {leaks}"
+            )
+        for pointer in (
+            PROVIDER_POINTER,
+            AGENT_MODEL_POINTER,
+            SAFE_NVIDIA_POINTER,
+            SAFE_EFFORT_POINTER,
+        ):
             if pointer not in own:
-                mark(CONTROL_LABELS[6], f"the declared pointer {pointer} is not what this writer resolves")
+                mark(
+                    CONTROL_LABELS[6],
+                    f"the declared pointer {pointer} is not what this writer resolves",
+                )
+        # BUG-854/T-135: no SAFE_* knob may be a VALUE again - only a pointer. The needle is a regex over the
+        # writer's own bytes, so writing one back here fails this control instead of passing review.
+        if re.search(r'^SAFE_[A-Z_]*\s*=\s*["\'](?!@)', own, re.M) or ("med" + "ium") in own:
+            mark(
+                CONTROL_LABELS[6],
+                "the writer still OWNS a safe-phase value instead of pointing at its home",
+            )
 
         pinned = Path(tmp) / "pinned.yaml"
-        pinned.write_text("active_provider: vendor_b\nproviders:\n  vendor_b:\n    model: wrong-model\n",
-                          encoding="utf-8")
+        pinned.write_text(
+            "active_provider: vendor_b\nproviders:\n  vendor_b:\n    model: wrong-model\n",
+            encoding="utf-8",
+        )
         if not binding_faults(pinned, "vendor_b", "right-model"):
             mark(CONTROL_LABELS[7], "an assignment that is NOT in effect passed the read-back")
-        pinned.write_text("active_provider: vendor_b\nproviders:\n  vendor_b:\n    model: right-model\n",
-                          encoding="utf-8")
+        pinned.write_text(
+            "active_provider: vendor_b\nproviders:\n  vendor_b:\n    model: right-model\n",
+            encoding="utf-8",
+        )
         if binding_faults(pinned, "vendor_b", "right-model"):
             mark(CONTROL_LABELS[7], "a correct assignment was reported as not in effect")
         broken = Path(tmp) / "broken.yaml"
@@ -356,11 +441,18 @@ def selftest() -> int:
             mark(CONTROL_LABELS[7], "an unparseable home passed the read-back")
         in_effect = Path(tmp) / "in_effect.yaml"
         in_effect.write_text("active_provider: vendor_b\n", encoding="utf-8")
-        if verify(in_effect, [("flip the provider", r"(?m)^active_provider: .+$", "active_provider: vendor_b")]):
+        if verify(
+            in_effect,
+            [("flip the provider", r"(?m)^active_provider: .+$", "active_provider: vendor_b")],
+        ):
             mark(CONTROL_LABELS[7], "an edit that IS in effect failed the generic read-back")
-        if not verify(cfg, [("flip the provider", r"(?m)^active_provider: .+$", "active_provider: vendor_b")]):
+        if not verify(
+            cfg, [("flip the provider", r"(?m)^active_provider: .+$", "active_provider: vendor_b")]
+        ):
             mark(CONTROL_LABELS[7], "an edit that is NOT in effect passed the generic read-back")
-        if not verify(cfg, [("flip the provider", r"(?m)^active_provider: .+$", "active_provider: vendor_b")]):
+        if not verify(
+            cfg, [("flip the provider", r"(?m)^active_provider: .+$", "active_provider: vendor_b")]
+        ):
             mark(CONTROL_LABELS[7], "an edit that is NOT in effect passed the generic read-back")
 
     failed = {label for label, _ in failures}

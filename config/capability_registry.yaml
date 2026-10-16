@@ -333,6 +333,11 @@ lanes:
     produces: reading
     capability: source_library_names
     why: 'one work, how many materialisations: the two homes, their same-kind drift and their one-sided counts (D-3048) - the reading that answers "will sorting into topic folders duplicate my books?" with a number'
+  - recipe: placement
+    cmd: python3 scripts/census_source_names.py --placement
+    produces: reading
+    capability: source_library_names
+    why: 'WHERE things are against where the declaration says they belong (T-180/D-3049): the misplaced kinds, the files loose at a root, the subfolders the declared axis does not name, and every declared ARRIVAL PEN with its oldest file and how much of it the pipeline has never seen. It never moves a file - a placement repair is owner-worded (T-180)'
   - recipe: rename-plan
     cmd: python3 scripts/plan_source_rename.py --plan
     produces: receipt

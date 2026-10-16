@@ -2036,3 +2036,37 @@ tasks:
     is the copy this row is about). Either way the reading must be re-run and the ceiling LOWERED behind the
     disposal (shrink-only, D-3023/D-2644) and never raised, and no file may be removed without pipeline/safe_delete.py
     (R-D410).
+
+- id: T-180
+  priority: SHOULD
+  state: open
+  mover: owner
+  title: 'THE PLACEMENT - the declaration now says where a file belongs and the reading says what it does not
+    cover: 281 files of a kind no root admits, 12 arrivals in the inbox pen and 1,729 in the unsorted pen, and the
+    disposition of each is the owner word'
+  source: D-3049; scripts/census_source_names.py --placement; config/ingest_identity_gate.yaml#source_library.placement
+  why: >-
+    MEASURED 2026-10-16 by the new placement reading (READ-ONLY, 16/16 known-answer controls): inside the two
+    declared roots there are 2,811 files, of which 2,530 are of a kind a root admits and 281 are NOT (books holds
+    "plein air KEYS.doc"; journals:notes holds 280 files that are overwhelmingly Screenshots). Nothing is loose at a
+    root and no subfolder contradicts a declared axis, so the AXES hold - what does not hold is the FILE level, plus
+    two pens holding 1,741 files (12 and 1,729) of which 1,738 have never been seen by the pipeline at all. The
+    reading makes this a NUMBER on every health run; this row is the act that disposes of it, and it is owner-worded
+    because every limb of it changes the owner's own tree.
+  evidence: >-
+    MEASURED 2026-10-16: "just placement" reads rc 2 with 281 misplaced of 2,811 (1 in books, 280 in journals_notes),
+    0 loose at a root, 0 subfolders the declared axes do not name, education_inbox 12 files / 229.9 MB / oldest 73d
+    / 1 past the 30-day budget / 9 never seen, education_unsorted 1,729 files / 2,262.9 MB / oldest 4,592d / 1,729
+    past the 365-day budget / 1,729 never seen; and the folders the declaration does not cover are NAMED and never
+    walked: courses, images, podcast, quotes, videos. "just --brief" prints the same numbers in ONE line, on every
+    health run, without becoming a fault.
+  gate: >-
+    owner lane, four limbs, each separately wordable and none of them urgent: (1) the 281 files of a kind no root
+    admits - MOVE them to a declared home, DECLARE a new kind for the root that holds them, or declare them OUT of
+    scope (each choice is a word, and a silence is not one); (2) the inbox pen - admit its 12 books to the pipeline
+    (they are exactly what S0 is for) or declare why not, and decide whether the 30-day budget is the right one;
+    (3) the unsorted pen - 1,729 files, 222 of a declared kind: declare the ones that are books and notes as
+    arrivals, and declare the rest as a holding area with its own budget, so the number stops being ambiguous;
+    (4) Hazel (BUG-864) - open it, and either retarget its Downloads rules at a DECLARED pen or disable the actions
+    whose destinations do not exist. No file may be removed without pipeline/safe_delete.py (R-D410), and no limb
+    authorises a bulk renamer or a copy.

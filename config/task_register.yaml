@@ -981,7 +981,8 @@ tasks:
   gate: 'pipeline: run the A/B (baseline with pipeline/omlx_cache_enable.sh --rollback, then apply, then the same pair), then PIN the agent_loop model (Never evict if True - engine_pool.is_pinned) so adaptive eviction cannot evict it mid-request, then re-measure the per-turn budget on an uncrowded pool; per_turn_budget_s returns to 60 only after that reading. THE TIMING IS THE ONE WORD: the flap needs a moment when no long run depends on the pool, and which moment that is is the human call the pipeline must ask for before it flips anything.'
 - id: T-138
   priority: COULD
-  state: open
+  state: done
+  closed: '2026-10-16'
   owner_word: 'DEFERRED 2026-10-16 (COULD: install a harness only when a specific job needs it, C28) - not approved and not dropped'
   mover: owner
   title: "HARNESS ADOPTION ON DEMAND - one command per tool, and none of them load-bearing"
@@ -989,7 +990,21 @@ tasks:
   evidence: 'MEASURED 2026-10-15 - the engine can wire nine clients and ships a wiring module for each
     (Resources/omlx/integrations/*.py; claude.py sets ANTHROPIC_BASE_URL, ANTHROPIC_AUTH_TOKEN,
     ANTHROPIC_DEFAULT_{OPUS,SONNET,HAIKU}_MODEL). Installed: claude (--print) and pi (--print/--prompt).
-    Not installed: codex, codex_app, opencode, openclaw, hermes, copilot, dsh.'
+    Not installed: codex, codex_app, opencode, openclaw, hermes, copilot, dsh.
+
+    MEASURED 2026-10-16 (T-138 answered, D-3041): the adoption question is now DECLARED rather than open. The
+    wiring is verified on disk (12 modules at /Applications/oMLX.app/Contents/Resources/omlx/integrations/) and
+    `omlx launch` names all nine clients, so adoption is ONE command per client and needs no disk state of ours.
+    THE ANSWER, as readings: goose is the DEFAULT (27 extensions declared in the live config, recipes, a delegate
+    tool, skills, 10 providers - and it is the only installed client that can be handed a repository recipe); pi
+    is the cheapest measured loop (28.2 s, LOCAL); claude is SECOND and exists for ONE named reason - a pre-tool
+    hook surface is the candidate mechanism for T-171, which is a hypothesis with a red loop owed, not a reading.
+    THE CLIENT OWN COST IS ITS HEADLESS FORM: the goose CLI process held 712 MB RSS in the minute its desktop
+    renderer held 4,736 MB, so the GUI is for a human watching, not for driving work; the pool (8 served / 46.88
+    GB / 55 GB guard) stays the only server-side cost. AND THE CHOICE IS NOT LEFT TO A MODEL AT TASK TIME: a
+    decider may only SELECT A DECLARED ROW of config/harness_policy.yaml#harness_matrix (C25/C27/D-3036). The act
+    also MEASURED a fault: the default client DECLARED provider is not BOUND in the app process
+    (active_provider: custom_deepseek, GOOSE_PROVIDER unset) - BUG-849, T-174, remedy already in the repo.'
   gate: 'install a harness only when a specific job needs it (C28). The engine pool is the serial resource: 8 served,
     46.88 GB resident against a 55 GB guard. An interactive agent loop is honest work only on a model whose decode
     holds over a long context - this repo measured gemma-4-E4B ROUTABLE for agent_loop and the 30B coder REFUSED
@@ -1766,3 +1781,34 @@ tasks:
     is storage noise the door's key already strips, so no identity is at stake; or (ii) SANITISE the class
     through the declared sanitizer riding the same next re-ingest as T-172, with a census before/after and a
     receipt. No third state: the class may not stay counted-and-unowned.
+
+- id: T-174
+  priority: SHOULD
+  state: open
+  mover: owner
+  title: 'THE DECLARED PROVIDER MUST BE BOUND, NOT ONLY DECLARED - the default client falls back to a cloud
+    provider the repo forbids, so the everyday path can leave the machine while every declaration looks right'
+  source: governance/HARNESS_UTILIZATION_20261015.md; agent/adapters/CONTRACT.md; pipeline/harness_contract.py;
+    pipeline/harness_env.py; D-3041; D-3000; D-3003; T-132; T-157; BUG-849
+  why: >-
+    MEASURED 2026-10-16: pipeline/harness_contract.py (the rail that already MEASURES this) reads rc 2 with
+    GOOSE_PROVIDER, GOOSE_MODEL and GOOSE_CONTEXT_LIMIT all UNBOUND; config/engine.yaml#harnesses.goose_provider_id
+    declares maxwell_omlx and ~/.config/goose/config.yaml has it ENABLED, yet the process that runs the harness
+    carries no GOOSE_PROVIDER while active_provider is custom_deepseek - a provider DELEGATE-001
+    records as unusable (reasoning_content passthrough) and C1/C3/Hybrid-Sovereignty do not allow as a default.
+    The repo measured the consequence on 2026-10-15: a headless run answered while the local engine request
+    counter did NOT move. This is the D-3034 shape one layer out - a declaration nothing RESOLVES in the process
+    that acts on it - and the remedy already exists: pipeline/harness_env.py --exec binds the environment from
+    ONE home (config/agent_context.yaml), and scripts/bind_harness_env.sh names exactly this case (a harness
+    started outside a shell, including the desktop app).
+  evidence: >-
+    MEASURED 2026-10-16: the binding mechanism exists and is wired for a CHILD process
+    (pipeline/harness_env.py --exec <cmd>; its own header names the desktop app as the case it covers), the
+    declaration home is config/agent_context.yaml, and pipeline/harness_env.py resolves the provider id by POINTER
+    from config/engine.yaml#harnesses.goose_provider_id - so no model or provider name is restated (C12). The
+    nine clients are one command away (omlx launch), so this row is about the DEFAULT path only.
+  gate: >-
+    a headless run launched through the DECLARED path leaves a reading in which the engine own request counter
+    MOVES (the same witness the 2026-10-15 probe used), and the harness home active_provider is either the
+    declared local provider or an ACCEPTED NEGATIVE with its reason (D-3038). T-157 owns the census of that
+    harness home; until it exists this is a measurement, never a monitor.

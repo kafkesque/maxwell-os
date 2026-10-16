@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**224 open** / 388 closed of 612 ids.
+**225 open** / 388 closed of 613 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -231,3 +231,4 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-836 | (MED - OPEN 2026-10-15) - the R5 cross-family review route produced NO usable review from either local verifier, and one of the two failures | 1 |
 | BUG-845 | (MED - OPEN 2026-10-16) - the CORE is harness-agnostic while the BINDING is scattered across five homes and config/decisions.yaml names none | 1 |
 | BUG-846 | (LOW - OPEN 2026-10-16) - governance/buglog.md is a REGISTER while the intake assessment is only a DOCUMENT: a rejected research finding has | 1 |
+| BUG-849 | (MED — OPEN 2026-10-16) — pipeline/harness_contract.py reads the DEFAULT client's declared provider as UNBOUND, but nothing reads the CONSEQ | 1 |

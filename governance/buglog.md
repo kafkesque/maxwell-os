@@ -8,18 +8,18 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1168 decisions (census stamp 62465b489ede188f, 2026-10-16) · 612 bugs (224 open / 388 closed; highest OPEN = BUG-846) · 49 open tasks (MUST 12 / SHOULD 32 / WORTH 4; OWNER-moved 2, pipeline-moved 47; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1169 decisions (census stamp 66f2cb8a8ae9e99d, 2026-10-16) · 613 bugs (225 open / 388 closed; highest OPEN = BUG-849) · 49 open tasks (MUST 12 / SHOULD 33 / WORTH 4; OWNER-moved 2, pipeline-moved 47; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **79** of 1168 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 583 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1168, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **79** of 1169 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 584 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1169, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 224 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 34 · 🟨 MED 61 · 🟩 LOW 24 · UNLABELLED 101 (BUG-757) of 224 open.
+> Open BUGS by severity (population = the census's 225 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 34 · 🟨 MED 62 · 🟩 LOW 24 · UNLABELLED 101 (BUG-757) of 225 open.
 >
 > **OWNER LANE (2) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
 > | T-173 | 🟠 SHOULD | THE INGEST-SITE MARKER CLASS: 459 corpus stems still carry a mirror marker, and the door keeps them OWNER-OWED | the owner decides ONE of two and the row closes on that word: (i) ACCE |
-> | T-138 | COULD | HARNESS ADOPTION ON DEMAND - one command per tool, and none of them load-bearing | install a harness only when a specific job needs it (C28). The engine  |
+> | T-174 | 🟠 SHOULD | THE DECLARED PROVIDER MUST BE BOUND, NOT ONLY DECLARED - the default client falls back to a cloud provider the | a headless run launched through the DECLARED path leaves a reading in  |
 >
 > **PIPELINE LANE (47) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
 >
@@ -15437,3 +15437,53 @@ while the old one dies silently is not a control, BUG-492).
 ACKNOWLEDGED LIMIT: the four deferral REASONS (`same_work_identity`, `same_sanitized_stem`, `byte_identical`,
 `already_ingested_by_canonical_name`) are code-level tokens, not a declared vocabulary; a future hardening could
 declare them, and this entry records that they are not declared rather than implying that they are.
+
+
+## BUG-849 (MED — OPEN 2026-10-16) — pipeline/harness_contract.py reads the DEFAULT client's declared provider as UNBOUND, but nothing reads the CONSEQUENCE (the engine's own request counter), so the everyday path can leave the machine while every declaration looks correct
+
+**Status:** OPEN 2026-10-16 (remedy T-174; the census of the harness home is T-157). MEASURED 2026-10-16.
+
+SYMPTOM (read, not inferred): `config/engine.yaml#harnesses.goose_provider_id` declares `maxwell_omlx` and
+`~/.config/goose/config.yaml` has that provider `enabled: true` — while the SAME file sets
+`active_provider: custom_deepseek`, `GOOSE_PROVIDER`/`GOOSE_MODEL` are ABSENT from the environment this session
+runs in, and `DELEGATE-001` already records `custom_deepseek` as unusable (a `reasoning_content` passthrough bug).
+So the everyday driver of this repository can be answering from a cloud provider that the repo's own routing map
+forbids and that C1/C3 (sovereign, no marginal cost) do not allow as a default.
+
+MEASURED 2026-10-16 BY THE REPOSITORY'S OWN RAIL (this is the part I first got wrong, corrected before commit):
+`python3 pipeline/harness_contract.py` reads **rc 2 (OWNER-OWED)** with `GOOSE_PROVIDER`, `GOOSE_MODEL` and
+`GOOSE_CONTEXT_LIMIT` all **UNBOUND**, and it states the consequence itself — *"the harness will use its OWN
+defaults for the names above (C1/C22: those defaults are a cloud price tier, not a local budget)"*. So the UNBOUND
+state IS registered (T-132/D-3000 owns the BINDING and `config/agent_context.yaml#ratified.knobs.trigger` is the
+one home) and IS visible in the ladder. THIS ENTRY DOES NOT RESTATE THAT FACT (C12): it records the two things
+that rail cannot say.
+
+MEASURED CONSEQUENCE (2026-10-15, governance/HARNESS_UTILIZATION_20261015.md §6): a headless run answered PONG,
+rc 0, while the LOCAL engine's request counter did not move — i.e. the traffic left the machine. The counter, not
+the config, is the witness.
+
+ROOT CAUSE: the D-3034 shape one layer out — a DECLARATION that nothing RESOLVES in the process that acts on it. A
+provider id in a policy file is not an environment; an enabled provider is not a bound provider. T-132/D-3003 hit
+the same wall for the CONTEXT CONTRACT and the repo's answer was to bind the environment from ONE home
+(`pipeline/harness_env.py --exec`, `scripts/bind_harness_env.sh`), whose own header names this exact case: a
+harness started OUTSIDE a shell, including the desktop app.
+
+WHAT THE RAIL CANNOT SAY, and why this is still a bug rather than a duplicate of T-132:
+  (i) it measures the ENVIRONMENT, not the CONSEQUENCE. Nothing in the ladder reads the engine's own request
+      counter, so the day a binding is dropped — or bypassed — the contract line goes back to rc 2 while nobody
+      learns whether the traffic left. Same family as BUG-787/798: a reading taken on the wrong surface stays
+      green, and here the wrong surface is a config the RIGHT surface (a counter) disagrees with.
+  (ii) THE EVERYDAY PATH IS AN APP LAUNCH, which does not pass through the wrapper at all: the binding is a
+      CHILD-process contract (`pipeline/harness_env.py --exec`) plus a shell helper
+      (`scripts/bind_harness_env.sh`), and the desktop driver starts outside both. A contract that only holds for
+      the launches that remember it is exactly what T-132 was ratified to end.
+
+REMEDY (T-174, owner-visible): launch the default client through the DECLARED binding — `python3
+pipeline/harness_env.py --exec /Applications/Goose.app/Contents/Resources/bin/goose run -t "<text>"` — or bind the
+app's own environment the same way, then RE-MEASURE the engine counter instead of trusting the declaration. Making
+`active_provider` itself local is a ONE-LINE change to the owner's harness home and is deliberately NOT taken by a
+session: the provider in effect is the one serving the session that would be editing it.
+
+ACKNOWLEDGED LIMIT: nothing in the ladder reads the engine counter today, so this fault can recur silently the
+moment a binding is dropped. The durable monitor belongs with T-157 (census the harness homes a decision names)
+rather than in a second home for the counter.

@@ -86,3 +86,94 @@ change_conditions:
   - "the tiered cache proven by an A/B, so prefill stops being the wall (T-137)"
   - "a long-context measurement of MiniCPM5-2B-MLX at its class context size (BUG-805 discipline: never generalise a 17-token spot reading)"
   - "if a served model ever exceeds 0.9 on BOTH tool_calling and long_context_reasoning_16k, harness count stops being a risk"
+
+# ── 4. THE MEASURED CLIENT MATRIX (2026-10-16, T-138) — WHAT A CLIENT COSTS, AND WHICH ONE IS THE DEFAULT ──
+# THE OLD QUESTION ("how many harnesses can this machine afford?") is already answered in §1: the POOL is the
+# server's cost and the clients queue on it. The remaining questions are the client's OWN cost, its capability,
+# and WHO decides which one runs. All three are readings below. A reading I could not take says UNMEASURED —
+# never 0, never a plausible guess (D-795/BUG-805: a spot reading is not a class reading either).
+harness_matrix:
+  measured_at: '2026-10-16'
+  the_pool_is_the_SERVER_cost:
+    served: 8
+    resident_gb: 46.88
+    guard_gb: 55
+    reading: >-
+      RSS read at 2026-10-16 11:50: omlx-server 4.57 GB resident, with the models paged and loaded on demand — so a
+      resident moment is not a ceiling. Route by the declared pool figures, never by one moment's RSS.
+  measured_client_footprints:
+    goose_cli_process_mb: 712        # RSS of /Applications/Goose.app/Contents/Resources/bin/goose (pid 87724), 11:50
+    goose_desktop_renderer_mb: 4736  # the app WINDOW's webview helper (pid 87725) — 6.6x the CLI process
+    goose_binary_on_disk_mb: 267
+    claude_on_disk_mb: 192           # ~/.local/share/claude/versions/2.1.101 (a NATIVE binary, no node runtime)
+    pi_on_disk_mb: 162               # ~/.nvm/.../node_modules/@earendil-works (node package; the runtime is shared)
+    uninstalled: >-
+      a client that is not installed has NO footprint reading here, and absent is never 0. Adoption is ONE command
+      per client and the wiring ships with the engine — MEASURED 2026-10-16, not quoted from a doc: 12 modules
+      exist on disk at /Applications/oMLX.app/Contents/Resources/omlx/integrations/ (base, claude, codex, codex_app,
+      copilot, dsh, hermes, macapp, openclaw, opencode, pi) and `omlx launch list|--help` names all nine clients.
+  the_matrix:
+    goose:
+      installed: true
+      version: '1.54.0'
+      kind: cli_plus_desktop_app
+      headless: 'goose run -t <text> | --recipe <name> — MEASURED 2026-10-15: ~28 s, rc 0'
+      local_engine: >-
+        DECLARED and enabled (config/engine.yaml#harnesses.goose_provider_id: maxwell_omlx) but NOT BOUND in the
+        process that runs the harness: GOOSE_PROVIDER is unset and active_provider is custom_deepseek, so an
+        UNWRAPPED run leaves the machine. THE RAIL ALREADY MEASURES IT: `python3 pipeline/harness_contract.py`
+        reads rc 2 (OWNER-OWED) with all three GOOSE_* names UNBOUND and names the consequence (a cloud price tier is
+        the fallback default). The declared remedy is to wrap the launch (pipeline/harness_env.py --exec, D-3000) —
+        the same lesson as T-132 one layer out. See BUG-849 (the consequence is unmonitored) and T-174 (the everyday
+        path must USE the wrapper).
+      mcp: 'MEASURED: 27 extensions declared in the live ~/.config/goose/config.yaml, incl. skills, developer, orchestrator, scheduler, analyze, docguard, summon'
+      agent_surfaces: 'recipes + subrecipes, the delegate (subagent) tool, SKILL.md skills, sessions/boot rules'
+      verdict: DEFAULT
+    claude:
+      installed: true
+      kind: native_cli
+      headless: 'omlx launch claude -p — MEASURED 2026-10-15: 104.7 s, rc 0, LOCAL (the engine request counter moved 153 -> 154)'
+      local_engine: 'via the engine wiring module: ANTHROPIC_BASE_URL + ANTHROPIC_AUTH_TOKEN + the three tier models'
+      verdict: >-
+        SECOND, and the only client with a NAMED reason to exist beside goose: a pre-tool HOOK surface is the
+        candidate mechanism for T-171 (auto-journaling a delegated run at the harness boundary). That is a
+        HYPOTHESIS WITH A RED LOOP OWED (D-3036), not a reading: no hook has been run on this machine.
+    pi:
+      installed: true
+      kind: node_cli
+      headless: '--print / --prompt — MEASURED 2026-10-15: 28.2 s, rc 0, LOCAL'
+      verdict: 'CHEAPEST measured interactive loop; the fallback when a session is latency-bound'
+    codex:
+      installed: false
+      kind: native_cli_plus_desktop
+      local_engine: 'omlx launch codex (module on disk; --tools-profile is OpenClaw-only)'
+      verdict: ON_DEMAND
+    codex_app: {installed: false, kind: desktop_app, verdict: ON_DEMAND}
+    opencode: {installed: false, kind: node_cli, verdict: ON_DEMAND}
+    openclaw: {installed: false, kind: node_cli, verdict: ON_DEMAND}
+    hermes: {installed: false, kind: cli, verdict: ON_DEMAND}
+    copilot: {installed: false, kind: cli, verdict: ON_DEMAND}
+    dsh: {installed: false, kind: cli, verdict: ON_DEMAND}
+  default_rule:
+    everyday_scaffolding_and_governed_work: >-
+      goose, in its HEADLESS CLI form. The measured reason to prefer the CLI over the app is not taste: the desktop
+      renderer held 4.74 GB against the CLI process's 712 MB in the same minute, so the GUI is for a human WATCHING
+      and the CLI is for driving work.
+    interactive_human_in_the_loop: 'goose; pi when latency is the binding constraint'
+    unattended_batch: >-
+      NEVER a client. A harness costs 28-105 s per invocation against 0.4 s for pipeline/oneshot_ask.py on the same
+      prompt; unattended work is pipeline/research_run.py or a script (D-3005).
+    hook_shaped_work: >-
+      the one case where a DIFFERENT client is worth measuring: claude, IF its hook surface is verified here (T-171).
+    smallest_footprint: >-
+      among the three installed clients the CLI processes are comparable and ALL are small next to the pool; claude
+      is a native binary (no node runtime) and pi is a node package, so `claude` is the lighter INSTALL and pi the
+      lighter LOOP. Neither fact should drive the choice: the binding constraint is the model, not the client.
+  decision_rule: >-
+    THE CHOICE IS NOT LEFT TO A MODEL AT TASK TIME. A harness selected by an LLM per task is a non-deterministic
+    dependency nobody can verify (C25/C27/D-3036). A decider may only SELECT A DECLARED ROW of this matrix: a client
+    not declared here, or a row whose verdict is ON_DEMAND with no named job, is NOT a choice — the same shape as
+    every other route in this repository, where the graph refuses a route it does not declare and the deterministic
+    rule beats a proposal (D-2898). Where two rows disagree, the deterministic row wins and the disagreement is
+    recorded rather than averaged.
+

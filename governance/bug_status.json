@@ -2,8 +2,8 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 612,
-  "open_n": 224,
+  "total_ids": 613,
+  "open_n": 225,
   "closed_n": 388,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
@@ -1126,6 +1126,11 @@
     {
       "id": "BUG-846",
       "title": "(LOW - OPEN 2026-10-16) - governance/buglog.md is a REGISTER while the intake assessment is only a DOCUMENT: a rejected research finding has",
+      "events": 1
+    },
+    {
+      "id": "BUG-849",
+      "title": "(MED \u2014 OPEN 2026-10-16) \u2014 pipeline/harness_contract.py reads the DEFAULT client's declared provider as UNBOUND, but nothing reads the CONSEQ",
       "events": 1
     }
   ],

@@ -25876,3 +25876,57 @@ decisions:
     its owner word live in config/ingest_identity_gate.yaml#identity; the reader faults on anything undeclared;
     the rail comment and the ladder text were re-cut in the same act so the registry, the justfile and the reader
     agree on what rc 2 now means.'
+- id: D-3041
+  state: ACTIVE
+  date: '2026-10-16'
+  by: assistant
+  category: GOVERNANCE / HARNESS ADAPTER SURFACE
+  bugs:
+  - BUG-849
+  files:
+  - agent/adapters/CONTRACT.md
+  - config/harness_policy.yaml
+  - governance/HARNESS_UTILIZATION_20261015.md
+  - config/task_register.yaml
+  - config/capability_registry.yaml
+  title: 'THE HARNESS CHOICE IS DECLARED, MEASURED AND NEVER LEFT TO A MODEL: goose headless is the DEFAULT, pi
+    the cheap loop, claude the SECOND for hook-shaped work, the other six are one command away and adopted only
+    against a named job - and the adapter root is the ONLY place a client touches the core'
+  decision: 'OWNER QUESTION 2026-10-16 (verbatim): "T-138 which is the most memory and cpu frinedly harness and
+    which is the most versatile for task and which is the most suitable for general everyday maxwell os scaffolding
+    tasks ... or its better to leave utilization decsion to decsion model whant the task cames or goose is enough
+    and the right toll / or it lacks in certain features compare the others or do you have better stier recommendation
+    if it corrales to D-3037 examine strategically". ANSWERED AS READINGS, and the ones that could not be taken
+    are marked UNMEASURED rather than guessed (D-795). (1) THE CLIENT''S COST IS A HEADLESS-FORM QUESTION, NOT A
+    CLIENT QUESTION: the three installed clients are all small beside the pool, and the number that decides anything
+    is the GUI''s: the goose CLI process held 712 MB RSS in the same minute its desktop renderer held 4,736 MB (6.6x),
+    so memory/CPU friendliness argues for the CLI FORM, not for a different client - while the pool (8 served, 46.88
+    GB resident, 55 GB guard) stays the only SERVER-side cost and every client queues on it. (2) MOST VERSATILE
+    IS A MEASURED CLAIM ABOUT SURFACES, NOT POPULARITY: 27 extensions declared in the live config (MCP: filesystem,
+    developer, orchestrator, scheduler, skills, analyze, docguard, summon ...), recipes + subrecipes, a delegate/subagent
+    tool, SKILL.md skills, 10 declared providers - goose is the only installed client that can be handed a REPOSITORY
+    RECIPE, which is what Maxwell OS''s work is expressed as. (3) THE EVERYDAY DEFAULT IS THEREFORE GOOSE IN ITS
+    HEADLESS CLI FORM, pi is the cheap measured loop (28.2 s, LOCAL) and claude is SECOND for ONE named reason.
+    (4) THE CHOICE IS NOT LEFT TO A MODEL AT TASK TIME - the decisive answer: a harness selected by an LLM per task
+    is a non-deterministic dependency nobody can verify (C25/C27/D-3036), so a decider may only SELECT A DECLARED
+    ROW of config/harness_policy.yaml#harness_matrix, and rows are added only by the five-step procedure in agent/adapters/CONTRACT.md.
+    (5) THE ONE FUNCTIONAL GAP IN GOOSE, NAMED: an ordinary client cannot be made to journal a delegated run at
+    its own boundary, so the trace is a discipline the caller keeps (D-3039/T-171); a pre-tool HOOK surface is the
+    candidate mechanism, which is the entire reason claude is second rather than optional - and it is a HYPOTHESIS
+    WITH A RED LOOP OWED, not a reading (no hook has been run on this machine). (6) ADOPTION IS ONE COMMAND AND
+    NEEDS NO DISK STATE OF OURS, measured rather than quoted: 12 wiring modules exist on disk (/Applications/oMLX.app/Contents/Resources/omlx/integrations/)
+    and `omlx launch list|--help` names all nine clients, so C28''s "adopt on demand" is a real path with a real
+    receipt per client. (7) THE ADAPTER ROOT IS MADE PHYSICAL: agent/adapters/CONTRACT.md declares what may live
+    there (a wiring reference, an optional env wrapper, an optional T-171 hook, a matrix row), what may never (pipeline
+    logic, a governed artifact, a second copy of a declared value, load-bearing work), the five-step adoption procedure
+    and the swap checklist - so D-3037''s "one adapter surface" stops being a sentence. (8) THE ACT ALSO MEASURED
+    A FAULT, AND THE MEASUREMENT CORRECTED MY OWN FIRST DRAFT: `pipeline/harness_contract.py` already reads rc 2
+    with GOOSE_PROVIDER, GOOSE_MODEL and GOOSE_CONTEXT_LIMIT UNBOUND and names the fallback as a cloud price tier
+    - so the unbound state IS registered (T-132/D-3000) and I re-scoped BUG-849 before commit to the part no rail
+    reads: the CONSEQUENCE (nothing in the ladder reads the engine request counter) and the EVERYDAY PATH (an app
+    launch does not pass through the wrapper). (9) THE ROUTE THE GRAPH LACKED: capability harness_adapter declared
+    (agent/adapters/, the policy, the binding and its rail), so T-174 resolves to a route instead of growing routing
+    debt. (10) WHAT WOULD CHANGE THE VERDICT, each one a reading: a verified hook that journals a delegate automatically
+    (claude becomes the interactive default); the provider BOUND in the app process with the counter moving (gap
+    (5) closes); a pinned pool plus a proven tiered cache (T-137), after which a client''s own latency stops being
+    the binding constraint.'

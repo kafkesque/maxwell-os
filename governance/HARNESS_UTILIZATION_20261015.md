@@ -91,3 +91,50 @@ pipeline/subagent_fanout.py now refuses a task whose declared `expect: REGEX` is
 before any model is called - measured working: "premise ok: task fanout_cfg expect='max_parallel' found in
 ['config/engine.yaml']". And every instrument now FAILS when its config home is missing rather than inventing a
 value (C12/C16). Two bugs, one of them a retraction: BUG-816 (retracted) and BUG-817 (the real one).
+
+
+## 8. THE INTERSECTION, DECIDED (2026-10-16, T-138) — and the one thing goose does NOT have
+
+The owner asked which client is lightest, which is most versatile, which fits everyday scaffolding, and whether
+the CHOICE should be left to the decision model at task time. They are answered as readings; the full matrix and
+the decision rule now live in `config/harness_policy.yaml#harness_matrix` (one home, C12).
+
+**1. LIGHTEST (client cost, measured 11:50 today).** The three installed clients are ALL small next to the pool:
+claude is a 192 MB native binary with no node runtime, pi a 162 MB node package, goose a 267 MB binary whose CLI
+process held 712 MB RSS in the same minute its desktop renderer held **4,736 MB**. The number that decides
+anything is the last one: a GUI webview is 6.6x its own CLI, so memory/CPU friendliness is an argument for the
+HEADLESS form of a client, not for a different client. The pool (8 served, 46.88 GB, 55 GB guard) remains the
+only server-side cost, and every client queues on it.
+
+**2. MOST VERSATILE — goose, measured, not asserted.** 27 extensions declared in the live config (MCP:
+filesystem, developer, orchestrator, scheduler, skills, analyze, docguard, summon …), recipes + subrecipes, a
+delegate/subagent tool, SKILL.md skills, sessions with boot rules, 10 declared providers. No other client on this
+machine can be handed a REPOSITORY RECIPE. That is the versatility that matters here, because Maxwell OS's work
+is expressed as recipes, rails and registers.
+
+**3. EVERYDAY SCAFFOLDING — goose, in its headless CLI form.** It is the control plane the work already lives in,
+it is provider-agnostic, and it is the only installed client whose adoption costs nothing new.
+
+**4. LEAVE THE CHOICE TO THE MODEL AT TASK TIME? NO — and this is the decisive answer.** A harness chosen by an
+LLM per task is a non-deterministic dependency nobody can verify, which is exactly what C25/C27/D-3036 forbid. The
+correct shape is the one every other route in this repository already uses: a DECLARED table plus a decider that
+may only SELECT A ROW. Rows may be added only by the five-step procedure in `agent/adapters/CONTRACT.md`.
+
+**5. IS GOOSE ENOUGH? Almost — and its three gaps are all MEASURED, not felt.**
+- **(a) Sovereignty in the everyday path.** `maxwell_omlx` is declared and enabled, but the process that runs the
+  harness carries no `GOOSE_PROVIDER` while `active_provider` is `custom_deepseek` — a provider DELEGATE-001
+  records as unusable and C1/C3 do not allow as a default. The 2026-10-15 probe measured the consequence: PONG
+  came back with the local engine's counter unmoved. **BUG-849 / T-174**, with the remedy already in the repo
+  (`pipeline/harness_env.py --exec`).
+- **(b) The trace is a discipline, not a mechanism.** Nothing auto-journals a delegated run; **T-171** must fire
+  it AT this boundary. This is the ONLY functional gap in goose that another client plausibly closes, and it is
+  the entire reason `claude` is SECOND rather than merely optional: a pre-tool hook surface is the candidate
+  mechanism — a hypothesis with a red loop owed, not a reading.
+- **(c) The GUI costs 4.7 GB.** Not a defect, a decision: use the CLI form for driving, the app for watching.
+
+**What would change this verdict** (each one a reading, none a preference): a verified hook surface in claude that
+journals a delegate automatically (then claude becomes the interactive default); the goose provider BOUND in the
+app process with the counter moving (then (a) closes); a pinned pool plus a proven tiered cache (T-137), after
+which the client's own latency stops being the binding constraint. Until then: **goose headless is the default,
+pi is the cheap loop, claude is the second for hook-shaped work, and the other six clients are one command away
+and are adopted ONLY against a named job — which is T-138's own gate, now with a measured matrix behind it.**

@@ -127,6 +127,23 @@ capabilities:
     receipt: governance/DELETION_RECEIPT_20261016.json
     cost_tier: T0
     owns: [pipeline/model_store_sweep.py, pipeline/model_store_census.py]
+  - id: harness_adapter
+    kind: harness_job
+    entrypoint: python3 pipeline/harness_env.py --print
+    check: python3 pipeline/harness_contract.py --selftest
+    receipt: config/harness_policy.yaml
+    cost_tier: T0
+    #: T-138/D-3041: the adapter SURFACE - the binding that points a client at the local engine and the policy
+    #: that says which client a job earns. Declared 2026-10-16 because the route graph had NO capability for the
+    #: adapter root at all, so T-174 (the everyday path must USE the binding) resolved to nothing while the
+    #: contract rail that measures it is `fatal` in the ladder.
+    owns:
+    - agent/adapters/
+    - config/harness_policy.yaml
+    - pipeline/harness_env.py
+    - pipeline/harness_contract.py
+    - scripts/bind_harness_env.sh
+
   - id: ingest_identity_door
     kind: script
     entrypoint: python3 scripts/check_ingest_identity_gate.py
@@ -305,7 +322,7 @@ routing_debt:
   #: these items carried was the route graph's, not the tasks'. A shrink-only ceiling follows its measurement
   #: DOWN (D-2644/D-3023), so the next unrouted item is a fault rather than a shrug.
   measured: '2026-10-16'
-  unrouted_open_tasks: 33
+  unrouted_open_tasks: 31
   unrouted_open_bugs: 222
   note: >-
     the readings below are RE-MEASURED every run and printed per item; the ceiling exists so that a NEW unrouted

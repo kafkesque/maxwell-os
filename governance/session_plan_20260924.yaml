@@ -11,6 +11,7 @@ next_state:
 - the anchor's MISSING domain axis produced as machine evidence by the reliable pair (DeepSeek + Qwen3.8) on the blind row
   text, silver consensus + needs_review, owner adjudicates; no domains_final is ever written by a script
 may_touch:
+- agent/adapters/CONTRACT.md
 - governance/delegate_journal.jsonl
 - config/decisions.yaml
 - governance/MUTATION_JOURNAL.jsonl
@@ -1276,3 +1277,22 @@ widening_log:
   may_touch_untouched: false
   will_not_touch_untouched: true
   why: 'One widening, one NAMED grant.'
+- date: '2026-10-16'
+  actor: assistant
+  reason: >-
+    T-138 / D-3041 - THE HARNESS QUESTION, ANSWERED AS A MATRIX. The act writes ONE new governed home,
+    agent/adapters/CONTRACT.md (D-3037's adapter root, made physical), so that path is granted by NAME; every
+    other path it touches was already granted (config/harness_policy.yaml, config/task_register.yaml,
+    config/capability_registry.yaml, governance/HARNESS_UTILIZATION_20261015.md, governance/buglog.md, the faces).
+    No pinned artifact and no will_not_touch family is involved, no bytes are deleted, and no pipeline call path
+    changes: the act DECLARES what the engine already ships (12 integration modules on disk, nine clients one
+    command away) and records the one fault the measurement found (BUG-849: the default client's declared provider
+    is not BOUND in the app process, while the declaration says it is enabled).
+  additions:
+    - pattern: agent/adapters/CONTRACT.md
+      why: >-
+        the adapter root's contract: what may live here (a wiring reference, an optional env wrapper, an optional
+        T-171 hook, a row in harness_policy#harness_matrix), what may never (pipeline logic, a governed artifact, a
+        second copy of a declared value, load-bearing work), the five-step procedure for adding a client, and the
+        swap checklist that keeps the core harness-agnostic (C21/C25).
+  owner_ack: 'owner 2026-10-16 (verbatim): "T-138 which is the most memory and cpu frinedly harness ... or goose is enough ... or do you have better stier recommendation if it corrales to D-3037 examine strategically" + "ok implement"'

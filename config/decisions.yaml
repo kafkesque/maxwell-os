@@ -26710,3 +26710,76 @@ decisions:
   - 'RE-OPEN CONDITION: an interface the OS can pin (a declared CLI/MCP surface with a hashable version and a re-derivable
     index) plus a NAMED consumer. Until then the arm has no consumer by construction, which is what makes the refusal
     stable rather than a matter of taste.'
+- id: D-3053
+  state: ACTIVE
+  date: '2026-10-16'
+  by: assistant
+  category: THE WALL IS DERIVED, NEVER PICKED — WHY A DELEGATED RUN READ AS INFINITE, AND THE DECLARATION THIS HOST
+    HAS NOT BOUND
+  bugs:
+  - BUG-869
+  files:
+  - scripts/r5_review_gate.py
+  - tools/model_eval_suite.py
+  - config/agent_context.yaml
+  - pipeline/harness_contract.py
+  - scripts/delegate_journal.py
+  - pipeline/subagent_fanout.py
+  title: 'THE DELEGATED RUN THAT READ AS INFINITE — MEASURED, not assumed: a delegate issued with the harness''s
+    BACKGROUND mode was delivered as a FOREGROUND run that BLOCKED its parent ("Delegated to foreground subagent
+    20261016_9"), the run left NO journal row so `just delegates` read "0 open, 0 past budget" while it was live,
+    and the wall guarding the delegated call is PICKED rather than DERIVED (scripts/r5_review_gate.py declares 1800
+    s for a ONE-turn review against this repository''s own wall_rule, max_turns x per_turn_budget_s = 90 s). THE
+    COUNTER-MEASUREMENT REFUTES THE TEMPTING ANSWER: decode measured 29.3 tok/s on the very model whose log line
+    read 4.9 tok/s, because that line is a BLENDED rate dominated by an 11,447-token PREFILL — the cost of an agentic
+    turn here is prefill x turns, not decode. UPSTREAM OF ALL OF IT: the harness launched from the Dock binds exactly
+    ONE GOOSE_ name while the five ratified contract names are UNBOUND (pipeline/harness_contract.py --check, rc
+    2), so the compaction trigger is the client''s 225000 cloud price-tier cap instead of the declared 32768 — which
+    is why one conversation grew to a 971 MB session store with a 5.8 GB renderer burning a core. THE REPAIR IS
+    REGISTERED (T-185), NOT IMPROVISED, AND THE BINDING IS ONE COMMAND DERIVED FROM THE ONE DECLARED SOURCE.'
+  decision: 'BUG-869, REMEASURED RATHER THAN EXPLAINED, AND ITS REMEDY IS T-185. MEASURED 2026-10-16, before any
+    repair and before any answer to the owner''s question, in the order the readings happened. (1) THE TEMPTING
+    ANSWER WAS REFUTED FIRST. The reviewers'' log carried "198 tokens in 40.78s (4.9 tok/s), prompt: 11447" and
+    the second-line reading of it is a dead model; an authorised 64-token call measured 29.3 tok/s on the same model,
+    temperature 0.0, so decode was HEALTHY and the 4.9 tok/s line is a blended rate in which an 11,447-token prefill
+    dominates (about 34 s of prefill against about 7 s of decode). The neighbouring line, "1 tokens in 8.94s (0.1
+    tok/s), prompt: 11", is a cold start after 56 minutes of server idleness, not a rate. An agentic turn on this
+    host costs PREFILL x TURNS. (2) THE RUN THAT READ AS INFINITE: the call was issued in the harness''s background
+    mode and reported as "Delegated to foreground subagent 20261016_9" — a mode silently downgraded to foreground,
+    blocking the parent turn until a cancellation released it; and the run wrote NO start row, so governance/delegate_journal.jsonl
+    (two runs that night, both done, 34.3 s and 34.2 s) held nothing about it while `just delegates` read "0 open,
+    0 past budget". That is BUG-844/T-168/D-3039''s DECLARED LIMIT biting — the trace is a discipline the caller
+    keeps, since this repository cannot intercept the harness''s own call — and the discipline was not kept. (3)
+    THE WALL: scripts/r5_review_gate.py declares timeout=1800 on its reviewer subprocess and tools/model_eval_suite.py
+    declares timeout=900 inside it, while config/agent_context.yaml#turn_budget declares wall_rule: guards[timeout_guard]
+    >= max_turns * per_turn_budget_s with per_turn_budget_s: 90 ratified by the owner on 2026-10-15 (T-132/D-3027,
+    "the per-turn ceiling is derived, never picked"). A ONE-turn review owes 90 s and declares twenty times that,
+    printing nothing while it waits — which is exactly why a stall and progress were one state. (4) WHAT WAS NEVER
+    BROKEN, recorded so the repair is not aimed at the wrong thing: the review LANDED — scripts/plan_admission.py,
+    tier deep, reviewer gemma-4-E4B-it-MLX-4bit, three deterministic layers PASS, verdict APPROVE for sha256_16
+    4d20d18e1fc02e5c (18:55:57 receipt, 18:56:38 verdict), and the file''s current bytes still hash to that digest.
+    (5) UPSTREAM OF ALL OF IT, THE DECLARATION THIS HOST HAS NOT BOUND: the running app binds exactly ONE GOOSE_
+    name (GOOSE_SERVER__SECRET_KEY) while pipeline/harness_contract.py --check reads all FIVE contract names UNBOUND
+    (rc 2), so per config/agent_context.yaml:32-34 the compaction trigger is min(0.8 x window, 225000) — "the 225000
+    cap is a CLOUD PRICE-TIER artifact" — instead of the declared 32768. The consequence was measured for the first
+    time: sessions.db at 971,165,696 B, the renderer at 5,845,760 KB burning 184% CPU (605 CPU-minutes over a ten-hour
+    session), free pages 7,813 with 2,881 MB of 4,096 MB swap used. The conversation is allowed to grow to the client''s
+    cloud cap, and every turn re-pays prefill on it.'
+  consequences: '(a) BUG-869 is registered with its evidence and T-185 is its repair, so the class has ONE home
+    rather than a per-session re-diagnosis: the walls in the delegate and review paths are COMPUTED from config/agent_context.yaml#turn_budget
+    and a PICKED wall is a fault; the long call emits a heartbeat before and after; a run declared background must
+    BE background; and the caller writes the journal start row BEFORE the call, so the run is nameable by `just
+    delegates` while it is still open. (b) THE INSTRUCTION SHAPE IS PART OF THE FIX and is declared rather than
+    left to taste: a delegate asked to report evidence writes it to a FILE and returns the path, its digest and
+    the one decision line — a receipt, not a transcript. The run under review was asked to reproduce roughly two
+    hundred lines VERBATIM, the most expensive shape of work a prefill-bound model can be given. (c) T-135''s remaining
+    limb is re-measured and EXTENDED, not duplicated: the shell binding cannot reach an app the owner launches from
+    the Dock, whose environment comes from the login session, so the same declared values are bound into the GUI
+    session — one command DERIVED from the single declared source (pipeline/harness_env.py --print), zero values
+    restated (C12) — and the app must be RELAUNCHED for a Dock launch to see them. THE BOUND LIMIT, stated rather
+    than hidden: a launchctl binding is per-login-session and is cleared at logout, so a durable binding needs the
+    login-scoped home; the reader for that is T-135''s, not this act''s. (d) NOTHING WAS REPAIRED BY THIS ACT and
+    no rail was edited: no line of scripts/r5_review_gate.py, tools/model_eval_suite.py or pipeline/subagent_fanout.py
+    was touched, because one act has one subject and the machines that own those walls must move with their own
+    controls and their own R5 review. What this act changes is that the next reader meets the finding as a NAMED
+    class with a receipt instead of a shrug.'

@@ -393,6 +393,7 @@ may_touch:
 - governance/NOT-YET-EVALUATED-RESEARCH.md
 - temp/d3051_record.yaml
 - temp/d3052_record.yaml
+- temp/land_bug869.py
 will_not_touch:
 - governance/F11_*
 - governance/ANCHOR_RULER_CONSOLIDATED_*.csv
@@ -1384,4 +1385,16 @@ widening_log:
     - governance/NOT-YET-EVALUATED-RESEARCH.md
     - temp/d3051_record.yaml
     - temp/d3052_record.yaml
+  owner_ack: 'owner 2026-10-16 (verbatim): "T138 recommendation approve but clarification will the harness adapter be futureproof so later if I want other harenss to deploy or utilize will I be able" + "ok implement ... go forward based on the stratigically most consequnetial highest leverage"'
+- date: '2026-10-16'
+  actor: assistant
+  reason: >-
+    BUG-869 / T-185 - WHY A DELEGATED RUN READ AS INFINITE. The owner reported a subagent that ran past thirty
+    minutes; this act NAMES the class with receipts instead of guessing at it, registers the repair as T-185 and
+    extends T-135's evidence with the live reading (the harness app binds exactly one GOOSE_ name, all five
+    contract names UNBOUND, and that unbound trigger is what lets one conversation grow to a 971 MB store). No
+    file outside these three subjects was touched: governance/buglog.md, config/task_register.yaml and this act's
+    own temp script.
+  additions:
+    - temp/land_bug869.py
   owner_ack: 'owner 2026-10-16 (verbatim): "T138 recommendation approve but clarification will the harness adapter be futureproof so later if I want other harenss to deploy or utilize will I be able" + "ok implement ... go forward based on the stratigically most consequnetial highest leverage"'

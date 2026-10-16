@@ -974,6 +974,19 @@ tasks:
     (BUG-854). THE ACT THAT CLOSES THIS ROW: declare those two values with their reasons and add the ratified
     trigger names to the writer's declared edit list with an INSERT-IF-ABSENT mode plus one home_fact per knob, so
     scripts/check_harness_homes.py reads each one back and the --check reading is watched MOVING.
+    MEASURED 2026-10-16 (evening, re-measurement by BUG-869: the same row carries the CONSEQUENCE this time, not
+    only the reading): the harness that matters most is the one the OWNER launches from the Dock, and it binds
+    exactly ONE GOOSE_ name - the live process's own environment carries GOOSE_SERVER__SECRET_KEY and nothing else -
+    while pipeline/harness_contract.py --check reads all FIVE contract names UNBOUND (the trigger trio plus
+    GOOSE_PROVIDER/GOOSE_MODEL), rc 2. CONSEQUENCE, quantified for the first time: with GOOSE_AUTO_COMPACT_TOKEN_LIMIT
+    unbound the compaction trigger is min(0.8 x window, 225000) instead of the declared 32768, so the conversation
+    is allowed to grow to the client's CLOUD PRICE-TIER cap and every turn re-pays prefill on it. MEASURED in the
+    same session: ~/.local/share/goose/sessions.db at 971,165,696 B, the harness renderer holding 5,845,760 KB and
+    burning 184% CPU, free pages at 7,813 of 64 GB with 2,881 MB of 4,096 MB swap used. THE GUI LIMB: the shell
+    binding (scripts/bind_harness_env.sh) cannot reach an app launched from the Dock, whose environment comes from
+    the login session - so the same declared values must be bound into the GUI session for a Dock launch to see
+    them, and the app must be RELAUNCHED for the binding to take effect. Both halves are one command derived from
+    the ONE declared source (pipeline/harness_env.py --print) and neither restates a value.
 - id: T-136
   priority: SHOULD
   state: done
@@ -2178,3 +2191,29 @@ tasks:
     the class is counted with a bounded number of named examples, folded into the loud never-fatal condition beside
     misplaced (BUG-457), and covered by a fixture control: an .epub in pdf/ reads OUT-OF-ITS-KIND-FOLDER, an .epub in epub/ does
     not, and a .png in pdf/ stays MISPLACED without being counted twice.
+
+- id: T-185
+  priority: SHOULD
+  state: open
+  mover: pipeline
+  title: 'THE WALL IS DERIVED, NEVER PICKED - the delegate and review paths must COMPUTE their timeout from the ratified per-turn budget and emit a heartbeat, and a run declared to run in the background must not block its parent (BUG-869)'
+  source: BUG-869; config/agent_context.yaml#turn_budget (wall_rule, formula, decode_source); BUG-828; D-3027; scripts/delegate_journal.py
+  evidence: >-
+    MEASURED 2026-10-16 (evening). scripts/r5_review_gate.py declares timeout=1800 on its reviewer subprocess and
+    tools/model_eval_suite.py declares timeout=900 on the HTTP call inside it, while the repository's own
+    config/agent_context.yaml#turn_budget declares wall_rule: guards[timeout_guard] >= max_turns *
+    per_turn_budget_s with per_turn_budget_s: 90 ratified 2026-10-15 - so a ONE-turn review owes a 90 s wall and
+    declares twenty times that, printing nothing during it. The same night, a delegate issued with the harness's
+    background mode was reported as "Delegated to foreground subagent 20261016_9" and BLOCKED its parent until it
+    was cancelled; governance/delegate_journal.jsonl held two runs (both done, 34.3 s and 34.2 s) and NO row for
+    it, so `just delegates` read 0 open / 0 past budget WHILE the run was live - BUG-844's declared limit (the
+    trace is a discipline the caller keeps) biting rather than a new gap. COUNTER-MEASUREMENT, so the repair is not
+    aimed at the model: decode measured 29.3 tok/s on the same model the reviewers' log line showed as 4.9 tok/s -
+    that line is a BLENDED rate dominated by an 11,447-token PREFILL, and the 0.1 tok/s line beside it is a cold
+    start after 56 minutes of server idleness. The cost of an agentic turn here is prefill x turns.
+  gate: >-
+    deterministic and reader-checked: the reader resolves each wall from the declared formula and the class's
+    declared turns, prints the derived wall beside the declared one, and REFUSES a picked value (a declaration
+    that contradicts the formula is FATAL); the same reading covers the delivery mode, so a run declared background
+    that blocks its parent is reported rather than shrugged at. A heartbeat line before and after the long call is
+    part of the fix, because a silent ceiling is what made a stall indistinguishable from progress.

@@ -2,8 +2,8 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 632,
-  "open_n": 228,
+  "total_ids": 633,
+  "open_n": 229,
   "closed_n": 404,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
@@ -1146,6 +1146,11 @@
     {
       "id": "BUG-867",
       "title": "(LOW \u2014 OPEN 2026-10-16) \u2014 scripts/census_source_names.py never compares a file's own CONTAINER to the KIND folder its declared axis orders i",
+      "events": 1
+    },
+    {
+      "id": "BUG-869",
+      "title": "(MED \u2014 OPEN 2026-10-16) \u2014 pipeline/subagent_fanout.py delivered an `async: true` delegate as a FOREGROUND run that BLOCKED its parent, and t",
       "events": 1
     }
   ],

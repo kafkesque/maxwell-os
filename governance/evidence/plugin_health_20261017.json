@@ -1,0 +1,328 @@
+{
+ "measured_at": "2026-10-17T00:28:53+02:00",
+ "goose_version": "1.39.0",
+ "rows": [
+  {
+   "name": "developer",
+   "type": "platform",
+   "enabled": true,
+   "started": null,
+   "tools_count": 5,
+   "first_tools": [],
+   "wall_s": null,
+   "error": "UNTESTABLE-BY-HANDSHAKE: type=platform has no cmd/args (no stdio process to speak MCP to); tools_count is the delivered-surface count, not a handshake result"
+  },
+  {
+   "name": "analyze",
+   "type": "platform",
+   "enabled": true,
+   "started": null,
+   "tools_count": 1,
+   "first_tools": [],
+   "wall_s": null,
+   "error": "UNTESTABLE-BY-HANDSHAKE: type=platform has no cmd/args (no stdio process to speak MCP to); tools_count is the delivered-surface count, not a handshake result"
+  },
+  {
+   "name": "todo",
+   "type": "platform",
+   "enabled": true,
+   "started": null,
+   "tools_count": 1,
+   "first_tools": [],
+   "wall_s": null,
+   "error": "UNTESTABLE-BY-HANDSHAKE: type=platform has no cmd/args (no stdio process to speak MCP to); tools_count is the delivered-surface count, not a handshake result"
+  },
+  {
+   "name": "skills",
+   "type": "platform",
+   "enabled": true,
+   "started": null,
+   "tools_count": 2,
+   "first_tools": [],
+   "wall_s": null,
+   "error": "UNTESTABLE-BY-HANDSHAKE: type=platform has no cmd/args (no stdio process to speak MCP to); tools_count is the delivered-surface count, not a handshake result"
+  },
+  {
+   "name": "summon",
+   "type": "platform",
+   "enabled": true,
+   "started": null,
+   "tools_count": 2,
+   "first_tools": [],
+   "wall_s": null,
+   "error": "UNTESTABLE-BY-HANDSHAKE: type=platform has no cmd/args (no stdio process to speak MCP to); tools_count is the delivered-surface count, not a handshake result"
+  },
+  {
+   "name": "tom",
+   "type": "platform",
+   "enabled": true,
+   "started": null,
+   "tools_count": 0,
+   "first_tools": [],
+   "wall_s": null,
+   "error": "UNTESTABLE-BY-HANDSHAKE: type=platform has no cmd/args (no stdio process to speak MCP to); tools_count is the delivered-surface count, not a handshake result"
+  },
+  {
+   "name": "extensionmanager",
+   "type": "platform",
+   "enabled": true,
+   "started": null,
+   "tools_count": 3,
+   "first_tools": [],
+   "wall_s": null,
+   "error": "UNTESTABLE-BY-HANDSHAKE: type=platform has no cmd/args (no stdio process to speak MCP to); tools_count is the delivered-surface count, not a handshake result"
+  },
+  {
+   "name": "chatrecall",
+   "type": "platform",
+   "enabled": true,
+   "started": null,
+   "tools_count": 1,
+   "first_tools": [],
+   "wall_s": null,
+   "error": "UNTESTABLE-BY-HANDSHAKE: type=platform has no cmd/args (no stdio process to speak MCP to); tools_count is the delivered-surface count, not a handshake result"
+  },
+  {
+   "name": "code_execution",
+   "type": "platform",
+   "enabled": true,
+   "started": null,
+   "tools_count": 1,
+   "first_tools": [],
+   "wall_s": null,
+   "error": "UNTESTABLE-BY-HANDSHAKE: type=platform has no cmd/args (no stdio process to speak MCP to); tools_count is the delivered-surface count, not a handshake result"
+  },
+  {
+   "name": "summarize",
+   "type": "platform",
+   "enabled": true,
+   "started": null,
+   "tools_count": 1,
+   "first_tools": [],
+   "wall_s": null,
+   "error": "UNTESTABLE-BY-HANDSHAKE: type=platform has no cmd/args (no stdio process to speak MCP to); tools_count is the delivered-surface count, not a handshake result"
+  },
+  {
+   "name": "orchestrator",
+   "type": "platform",
+   "enabled": false,
+   "started": null,
+   "tools_count": null,
+   "first_tools": [],
+   "wall_s": null,
+   "error": "UNTESTABLE-BY-HANDSHAKE: type=platform has no cmd/args (no stdio process to speak MCP to); tools_count is the delivered-surface count, not a handshake result"
+  },
+  {
+   "name": "apps",
+   "type": "platform",
+   "enabled": true,
+   "started": null,
+   "tools_count": 4,
+   "first_tools": [],
+   "wall_s": null,
+   "error": "UNTESTABLE-BY-HANDSHAKE: type=platform has no cmd/args (no stdio process to speak MCP to); tools_count is the delivered-surface count, not a handshake result"
+  },
+  {
+   "name": "computercontroller",
+   "type": "builtin",
+   "enabled": false,
+   "started": null,
+   "tools_count": null,
+   "first_tools": [],
+   "wall_s": null,
+   "error": "UNTESTABLE-BY-HANDSHAKE: type=builtin has no cmd/args (no stdio process to speak MCP to); tools_count is the delivered-surface count, not a handshake result"
+  },
+  {
+   "name": "autovisualiser",
+   "type": "builtin",
+   "enabled": false,
+   "started": null,
+   "tools_count": null,
+   "first_tools": [],
+   "wall_s": null,
+   "error": "UNTESTABLE-BY-HANDSHAKE: type=builtin has no cmd/args (no stdio process to speak MCP to); tools_count is the delivered-surface count, not a handshake result"
+  },
+  {
+   "name": "memory",
+   "type": "builtin",
+   "enabled": true,
+   "started": null,
+   "tools_count": 4,
+   "first_tools": [],
+   "wall_s": null,
+   "error": "UNTESTABLE-BY-HANDSHAKE: type=builtin has no cmd/args (no stdio process to speak MCP to); tools_count is the delivered-surface count, not a handshake result"
+  },
+  {
+   "name": "tutorial",
+   "type": "builtin",
+   "enabled": false,
+   "started": null,
+   "tools_count": null,
+   "first_tools": [],
+   "wall_s": null,
+   "error": "UNTESTABLE-BY-HANDSHAKE: type=builtin has no cmd/args (no stdio process to speak MCP to); tools_count is the delivered-surface count, not a handshake result"
+  },
+  {
+   "name": "youtubetranscript",
+   "type": "stdio",
+   "enabled": true,
+   "started": true,
+   "tools_count": 4,
+   "first_tools": [
+    "get_transcript",
+    "get_timed_transcript",
+    "get_video_info"
+   ],
+   "wall_s": 1.6,
+   "error": "no error; stderr INFO: INFO:mcp_youtube_transcript.cli:starting Youtube Transcript MCP server"
+  },
+  {
+   "name": "pdfreader",
+   "type": "stdio",
+   "enabled": false,
+   "started": false,
+   "tools_count": 0,
+   "first_tools": [],
+   "wall_s": 30.2,
+   "error": "ModuleNotFoundError: No module named 'mcp.server.fastmcp'. This is mcp 2.x, where FastMCP was renamed to MCPServer (from mcp.server.mcpserver import MCPServer) and other APIs changed; see the migration guide at https://py.sdk.modelcontextprotocol.io/v2/migration/#fastmcp-renamed-to-mcpserver or pin 'mcp<2' to keep running v1 code."
+  },
+  {
+   "name": "docguard",
+   "type": "stdio",
+   "enabled": true,
+   "started": true,
+   "tools_count": 4,
+   "first_tools": [
+    "check_protected",
+    "safe_write",
+    "safe_append"
+   ],
+   "wall_s": 1.8,
+   "error": ""
+  },
+  {
+   "name": "gitmcp",
+   "type": "stdio",
+   "enabled": false,
+   "started": true,
+   "tools_count": 5,
+   "first_tools": [
+    "match_common_libs_owner_repo_mapping",
+    "fetch_generic_documentation",
+    "search_generic_documentation"
+   ],
+   "wall_s": 4.5,
+   "error": "no error; stderr: [63343] Using callback port derived from the server URL: 38255 | [63343] Discovering OAuth server configuration..."
+  },
+  {
+   "name": "fetch",
+   "type": "stdio",
+   "enabled": true,
+   "started": true,
+   "tools_count": 1,
+   "first_tools": [
+    "fetch"
+   ],
+   "wall_s": 0.8,
+   "error": ""
+  },
+  {
+   "name": "gitmcp-mcp",
+   "type": "stdio",
+   "enabled": true,
+   "started": true,
+   "tools_count": 12,
+   "first_tools": [
+    "git_status",
+    "git_diff_unstaged",
+    "git_diff_staged"
+   ],
+   "wall_s": 0.8,
+   "error": ""
+  },
+  {
+   "name": "filesystem",
+   "type": "stdio",
+   "enabled": true,
+   "started": true,
+   "tools_count": 14,
+   "first_tools": [
+    "read_file",
+    "read_text_file",
+    "read_media_file"
+   ],
+   "wall_s": 1.2,
+   "error": "no error; stderr INFO: Secure MCP Filesystem Server running on stdio | Client does not support MCP Roots, using allowed directories set from server args: [ '/Users/barn' ]"
+  },
+  {
+   "name": "puppeteer",
+   "type": "stdio",
+   "enabled": false,
+   "started": true,
+   "tools_count": 7,
+   "first_tools": [
+    "puppeteer_navigate",
+    "puppeteer_screenshot",
+    "puppeteer_click"
+   ],
+   "wall_s": 1.0,
+   "error": ""
+  },
+  {
+   "name": "scheduler",
+   "type": "platform",
+   "enabled": true,
+   "started": null,
+   "tools_count": 0,
+   "first_tools": [],
+   "wall_s": null,
+   "error": "UNTESTABLE-BY-HANDSHAKE: type=platform has no cmd/args (no stdio process to speak MCP to); tools_count is the delivered-surface count, not a handshake result"
+  },
+  {
+   "name": "reddit",
+   "type": "stdio",
+   "enabled": true,
+   "started": false,
+   "tools_count": 0,
+   "first_tools": [],
+   "wall_s": 30.2,
+   "error": "ModuleNotFoundError: An HTTP transport library needs to be installed."
+  }
+ ],
+ "harness_banner": [
+  "Warning: Failed to start extension 'Reddit' (process quit before initialization: stderr = Traceback (most recent call last):",
+  "  File \"/Users/barn/.cache/uv/archive-v0/q2AoTJIWbpM5PhRhhUp4E/bin/mcp-reddit\", line 6, in <module>",
+  "    from mcp_reddit.reddit_fetcher import mcp",
+  "  File \"/Users/barn/.cache/uv/archive-v0/q2AoTJIWbpM5PhRhhUp4E/lib/python3.14/site-packages/mcp_reddit/reddit_fetcher.py\", line 16, in <module>",
+  "    client = Client(*CREDS)",
+  "  File \"/Users/barn/.cache/uv/archive-v0/q2AoTJIWbpM5PhRhhUp4E/lib/python3.14/site-packages/redditwarp/client_ASYNC.py\", line 73, in __init__",
+  "    http = build_reddit_http_client(client_id, client_secret, grant)",
+  "  File \"/Users/barn/.cache/uv/archive-v0/q2AoTJIWbpM5PhRhhUp4E/lib/python3.14/site-packages/redditwarp/core/http_client_ASYNC.py\", line 117, in build_reddit_http_client",
+  "    connector = new_connector()",
+  "  File \"/Users/barn/.cache/uv/archive-v0/q2AoTJIWbpM5PhRhhUp4E/lib/python3.14/site-packages/redditwarp/http/transport/auto_ASYNC.py\", line 11, in new_connector",
+  "    return get_transport_adapter_module().new_connector()",
+  "           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^",
+  "  File \"/Users/barn/.cache/uv/archive-v0/q2AoTJIWbpM5PhRhhUp4E/lib/python3.14/site-packages/redditwarp/http/transport/reg_ASYNC.py\", line 31, in get_transport_adapter_module",
+  "    _current_transport_adapter_module = _init_transport_adapter_module()",
+  "  File \"/Users/barn/.cache/uv/archive-v0/q2AoTJIWbpM5PhRhhUp4E/lib/python3.14/site-packages/redditwarp/http/transport/reg_ASYNC.py\", line 26, in _init_transport_adapter_module",
+  "    raise ModuleNotFoundError(\"An HTTP transport library needs to be installed.\")",
+  "ModuleNotFoundError: An HTTP transport library needs to be installed.",
+  "), continuing without it",
+  "  Hint: once the session starts, ask goose to help debug the 'Reddit' extension"
+ ],
+ "notes": [
+  "TASK1 method: python3 subprocess + 3 MCP lines (initialize -> notifications/initialized -> tools/list), hard 60s budget/server, initialize deadline 30s; no `timeout` binary used.",
+  "TASK1 scope: 9 stdio extensions probed by handshake (6 enabled, 3 disabled: pdfreader, gitmcp, puppeteer). The other 17 are platform (13) / builtin (4) and have no cmd/args -> UNTESTABLE-BY-HANDSHAKE.",
+  "TASK2 method: single `goose run --provider maxwell_omlx --model MiniCPM5-2B-MLX -t 'Reply with the single word READY'` in /tmp/goose_probe_sandbox; live config NOT edited; rc=0, wall 16.2s, model answered READY; goose emitted exactly ONE extension failure (Reddit).",
+  "TASK2 authority: goose's own banner names 1 failed extension -> Reddit. No other enabled extension triggered a start warning.",
+  "TASK3 method: per-extension tool counts for platform/builtin taken from the tool surface actually delivered to this session (61 tools): analyze 1, apps 4, chatrecall 1, code_execution 1 (execute_typescript), developer 5 (edit/shell/write/tree/read_image), extensionmanager 3, skills 2 (load/load_skill), summarize 1, summon 2 (get_function_details/list_functions; 'delegate' also seen in parent transcripts), todo 1, memory 4. Unprefixed tools attributed by namespace convention - exact owner is not enumerable from the session store.",
+  "TASK3 evidence for scheduler: contributes 0 tools to the delivered surface AND is absent from sessions.extension_data in 12/12 most recent sessions, while every other loaded extension (16-17) IS listed. No goose start warning is emitted - a silent omission, not a crash.",
+  "TASK3 note: sessions.extension_data in goose 1.39.0 stores extension CONFIG only (no tool list), so it cannot be used as a tool-count source; the delivered surface + handshake are the authorities used here.",
+  "reddit declared cmd: uvx --from git+https://github.com/adhikasp/mcp-reddit.git mcp-reddit",
+  "reddit resolved entry point: /Users/barn/.cache/uv/archive-v0/q2AoTJIWbpM5PhRhhUp4E/bin/mcp-reddit (python3.14, redditwarp via redditwarp/http/transport/reg_ASYNC.py:26)",
+  "reddit failure is pre-handshake: uvx resolves and installs fine, then the process dies at import time before answering initialize (no stdout at all).",
+  "pdfreader (disabled) resolved+installed 38 packages in 90ms then died at import: the package is v1-SDK code running against mcp 2.x on python3.14.",
+  "Benign stderr NOT counted as errors: filesystem startup INFO (MCP Roots), youtubetranscript INFO log line, gitmcp OAuth-discovery chatter.",
+  "No install performed by this probe; uvx/npx populated their own caches as expected."
+ ]
+}

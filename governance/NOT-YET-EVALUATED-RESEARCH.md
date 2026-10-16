@@ -156,3 +156,9 @@ from specs/README.md (the sandbox charter) where the borrowed mechanisms are sta
 The admission plan (`governance/ADMISSION_PLAN_<date>.md`, D-3051) is built to be worked FROM this panel: 244
 candidate works and 1,741 pen files need the owner's own eye, and describing a book is how a human finds it.
 Recorded here, in the register and in D-3052, so the question is answered ONCE instead of re-asked per session.
+
+REACH RE-OPENED FOR THE RECORD (D-3054): DigUp 0.6.1 stays ACCEPTED AS THE OWNER'S FRONT DOOR / NO
+CONSUMER IN THE OS. The re-open condition is written as a PIN and not a hope: a declared CLI or MCP
+surface whose binary AND index are BOTH hashable, plus ONE NAMED consumer that calls it. Until all
+three exist, no arm of the OS may depend on it - an unpinned surface cannot be a dependency (D-3052),
+the same fault as an unpinned value (BUG-869), one layer out.

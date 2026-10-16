@@ -2212,7 +2212,16 @@ tasks:
     that line is a BLENDED rate dominated by an 11,447-token PREFILL, and the 0.1 tok/s line beside it is a cold
     start after 56 minutes of server idleness. The cost of an agentic turn here is prefill x turns.
   gate: >-
-    deterministic and reader-checked: the reader resolves each wall from the declared formula and the class's
+    deterministic and reader-checked: the reader resolves each wall from the declared formula and the class's    adopted: >-
+      D-3054 - THE REVIEWER'S VOCABULARY, two items adapted from an external reference pinned by SHA
+      (captivus/agent-review @ 031841cb9e2d3403546d5e5b56cd877c51d86006). (1) A CALLER'S CLOSING TOKEN:
+      a delegated or reviewed act ends with exactly `ARTIFACT-VERIFIED <sha256>` or
+      `ARTIFACT-MISSING: <exact reason>` - the missing half of BUG-844, because it turns a discipline the
+      caller keeps into a GREPPABLE token a reader can refuse on. (2) A JOURNAL FIELD, not a boolean:
+      `isolation: enforced|instructed`, where `enforced` may be claimed ONLY when a sandbox, container or
+      permission rule did it - "instructed" otherwise. A matching hash proves you checked the SAME file,
+      not that the file is RIGHT; a reviewer's suggested remedy is a hypothesis, not a specification.
+
     declared turns, prints the derived wall beside the declared one, and REFUSES a picked value (a declaration
     that contradicts the formula is FATAL); the same reading covers the delivery mode, so a run declared background
     that blocks its parent is reported rather than shrugged at. A heartbeat line before and after the long call is

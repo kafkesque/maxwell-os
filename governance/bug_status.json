@@ -2,8 +2,8 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 633,
-  "open_n": 229,
+  "total_ids": 635,
+  "open_n": 231,
   "closed_n": 404,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
@@ -1151,6 +1151,16 @@
     {
       "id": "BUG-869",
       "title": "(MED \u2014 OPEN 2026-10-16) \u2014 pipeline/subagent_fanout.py delivered an `async: true` delegate as a FOREGROUND run that BLOCKED its parent, and t",
+      "events": 1
+    },
+    {
+      "id": "BUG-870",
+      "title": "A DECISION STATE OUTSIDE THE DECLARED PARTITION (the BUG-765 recurrence)",
+      "events": 1
+    },
+    {
+      "id": "BUG-871",
+      "title": "A PROFILE EVAL IS NOT A SCOPE (the harness wall leaks into the owner's lane)",
       "events": 1
     }
   ],

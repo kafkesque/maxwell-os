@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**229 open** / 404 closed of 633 ids.
+**231 open** / 404 closed of 635 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -236,3 +236,5 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-864 | (MED — OPEN 2026-10-16) — scripts/census_source_names.py is the ONE reader that makes an abandoned GUI placement rule visible: Hazel owns a  | 3 |
 | BUG-867 | (LOW — OPEN 2026-10-16) — scripts/census_source_names.py never compares a file's own CONTAINER to the KIND folder its declared axis orders i | 1 |
 | BUG-869 | (MED — OPEN 2026-10-16) — pipeline/subagent_fanout.py delivered an `async: true` delegate as a FOREGROUND run that BLOCKED its parent, and t | 1 |
+| BUG-870 | A DECISION STATE OUTSIDE THE DECLARED PARTITION (the BUG-765 recurrence) | 1 |
+| BUG-871 | A PROFILE EVAL IS NOT A SCOPE (the harness wall leaks into the owner's lane) | 1 |

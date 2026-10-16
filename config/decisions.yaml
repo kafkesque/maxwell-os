@@ -26783,3 +26783,63 @@ decisions:
     was touched, because one act has one subject and the machines that own those walls must move with their own
     controls and their own R5 review. What this act changes is that the next reader meets the finding as a NAMED
     class with a receipt instead of a shrug.'
+- id: D-3054
+  state: ACTIVE
+  date: '2026-10-16'
+  by: assistant
+  category: THE REVIEWER'S VOCABULARY - A REVIEWER'S SUGGESTED REMEDY IS A HYPOTHESIS, NOT A SPECIFICATION
+  bugs:
+  - BUG-844
+  - BUG-869
+  files:
+  - config/task_register.yaml
+  - governance/NOT-YET-EVALUATED-RESEARCH.md
+  title: 'BUG-844 AND BUG-869, DISCHARGED ONE LAYER OUT: the OS REFERENCES captivus/agent-review pinned by commit
+    SHA 031841cb9e2d3403546d5e5b56cd877c51d86006 - FOUR tokens adopted, FIVE refused - and the referee it names
+    is already stricter than the referee it offers'
+  decision: "BUG-844 (an act that leaves no trace did not happen) and BUG-869 (an unpinned value is not a declaration)\
+    \ are the SAME fault seen at two layers; this decision discharges both one layer out, against an EXTERNAL reference\
+    \ rather than a new local invention. THE QUESTION (owner, 2026-10-16): is https://github.com/captivus/agent-review\
+    \ to be adapted or referenced in Maxwell OS scaffolding, pipeline, tool calling, skill orchestration, or later\
+    \ work? (1) WHAT IT IS: MIT, one author, v1.0.0, self-declaring 'developed from practice and hasn't been measured';\
+    \ a three-level review skill (L1 artifact-or-named-failure, L2 two agents against a control total, L3 adversarial\
+    \ review) carried as SKILL.md plus four reference files. (2) THE PIN, NOT THE RELEASE (D-382/R14): a floating\
+    \ release is not a dependency, so the reference is pinned by commit SHA 031841cb9e2d3403546d5e5b56cd877c51d86006\
+    \ (committed 2026-10-11). A later upstream edit cannot silently move what this decision cites. (3) WHAT IS ADOPTED\
+    \ (four tokens, wired into T-185, not into a new subsystem):\n  (a) an EXACT MANDATORY CLOSING LINE for a delegated\
+    \ act - 'ARTIFACT-VERIFIED <sha256>' or\n      'ARTIFACT-MISSING: <exact reason>'. The OS already REFUSES a\
+    \ 'done' whose artifact is absent\n      (scripts/delegate_journal.py); what was missing is that the RETURN\
+    \ carries the token a reader\n      can check without trusting the reporter. This is the missing half of BUG-844/T-185.\n\
+    \  (b) a journal field 'isolation: enforced | instructed' - never a boolean. It records whether\n      isolation\
+    \ was ENFORCED by a mechanism (sandbox, permission rules) or merely INSTRUCTED in\n      prose. A claim of independence\
+    \ that was only instructed is a different object from one that\n      was enforced, and the register must be\
+    \ able to tell them apart.\n  (c) the phrasing 'a reviewer's suggested remedy is a hypothesis, not a specification'\
+    \ - the crisp\n      restatement of D-3036 that a phase gate needs a receipt, not a guess.\n  (d) 'a technical\
+    \ objection needs an executed check against the real system' and 'a matching hash\n      proves you checked\
+    \ the same file, not that the file is right' - quoted verbatim into the R5\n      gate docstring, because VERDICT_SIZE_GUARD\
+    \ and verdict-by-journal already say exactly this.\n(4) WHAT IS REFUSED, recorded per D-3038 so it cannot be\
+    \ re-proposed silently:\n  (a) its Claude Code / Codex install paths - a second deployment home for a discipline\
+    \ the OS\n      already enforces locally (C1/C3, BUG-864);\n  (b) its 'reviews/' gitignore convention - a second\
+    \ policy home for what pipeline output is;\n  (c) references/tool-notes.md - an unmeasured second policy home\
+    \ for tool use (C25);\n  (d) a DIRECTORY MANIFEST HASH as the artifact contract - the OS names a FILE plus a\
+    \ digest\n      (config/artifact_ownership.yaml), which is hashable per file rather than a directory sweep;\n\
+    \  (e) PERSONA-BASED REVIEWER SIMULATION - a role is a SIMULATED audience, not a real expert, so it\n      cannot\
+    \ be a receipt under R14; the OS uses a DIFFERENT MODEL FAMILY instead (R5).\n(5) THE ENGINE MAPPING, stated\
+    \ so no new machinery is built: L1 is already the delegate journal\n  plus may_touch plus refusal-on-absent-artifact;\
+    \ L2 is already the census (D-3051's 2,811 read /\n  244 candidates / 870 refused IS a control total); L3 is\
+    \ already generator != verifier plus\n  scripts/r5_review_gate.py plus VERDICT_SIZE_GUARD plus 'rc alone is\
+    \ never a verdict' (D-2962).\n  Therefore: REFERENCE, NOT ADOPT - no new dependency, no new venv, no second\
+    \ review system.\n(6) THE ONE DURABLE ROW this act writes: governance/NOT-YET-EVALUATED-RESEARCH.md gains the\
+    \ DigUp\n  RE-OPEN row (wrong-home repair, see consequences), because the same discipline - pin the surface\n\
+    \  or refuse it as a dependency - is what re-opens DigUp 0.6.1."
+  consequences:
+  - 'The reviewer vocabulary is now part of T-185 (SHOULD, pipeline): a delegated or reviewed act returns ARTIFACT-VERIFIED
+    <sha256> or ARTIFACT-MISSING: <exact reason>, and its journal row declares isolation: enforced | instructed.
+    Both are evidence tokens, not prose.'
+  - 'REFERENCE, NOT ADOPT: nothing in scaffolding, pipeline, tool calling or skill orchestration consumes the upstream
+    repository at run time; only its pinned SHA and four tokens are cited.'
+  - 'REFUSED and recorded (D-3038): install paths, reviews/ gitignore, tool-notes.md, directory manifest hash, persona
+    simulation. Each carries its reason so re-proposal is a re-ask, not news.'
+  - 'The DigUp re-open condition is now recorded in the register of un-evaluated research: an interface the OS can
+    PIN (a declared CLI or MCP surface whose version and index are hashable) plus one NAMED consumer; until both
+    exist, DigUp stays the owner''s front door and no component.'

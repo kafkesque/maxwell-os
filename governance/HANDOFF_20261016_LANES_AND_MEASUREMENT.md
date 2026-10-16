@@ -45,6 +45,48 @@ pairing — after the parity in NEXT STEP 1 makes "SERVED" true again.
 
 ---
 
+## 1b. SPINE UPDATE — 2026-10-17, THIRD SITTING (append-only; nothing above is rewritten)
+
+**BUG-873 LIMB (b) IS CLOSED BY MEASUREMENT, FROM BYTES, WITH NO OWNER STEP** — and the answer is neither
+candidate as filed. Full reading in the buglog; the load-bearing facts:
+
+| what | reading |
+|---|---|
+| the store | `~/.local/share/goose/sessions/sessions.db` — one row per session; `sessions.extension_data` = the surface THAT session was given; VERIFIED enabled-only (`pdfreader: enabled:false` is absent from it, every enabled extension present) |
+| the long session `20261012_1` | born 10-12 11:22 local, 13,036 msgs, **last written 10-16 23:32 local** — snapshot carries NO youtube extension (instr 0), and its own reasoning at 10-16 23:08:13 local says *"this session's tool surface includes `Fetch.fetch`, but NO youtubetranscript tool, even though the extension is ON in the app config"* |
+| the fresh session `20261016_10` | born 10-16 23:42 local — extension in snapshot at byte 2244, all four tools bound |
+| the transition | every session born from **10-13 11:31 local** onward carries it; no earlier one does |
+| candidate (a) "predates the 13:16 write" | **DISPROVEN.** The `extensions:` block is BYTE-IDENTICAL to the **10-15 21:08** backup (`diff` empty; declared there, absent from the 09-21 backup). The write that landed at 13:16 changed exactly one key: `GOOSE_THINKING_EFFORT: high → medium`. |
+| candidate (b) "a resumed session keeps its surface" | **PROVEN.** The long session lived ACROSS the enabling write, was still being written 10 min before this sitting, and never gained the tool. |
+| still owed | the second limb: break `cmd` deliberately and confirm the fault is REPORTED rather than silent. (c) is not excluded — the store records what a session was GIVEN, never whether a server failed to answer. |
+
+**THE RULE THIS BUYS — and it belongs in the loader, not in prose: a config write is NOT LIVE until a NEW
+session starts.** A resumed or continued session keeps the surface it was born with. Nothing in the harness
+says so, which is why the owner had to ask three times.
+
+**BUG-874's PROBE IS NOW RUN (this handoff's NEXT STEP 1 said "probe first"), measured 2026-10-17:**
+
+| set | members |
+|---|---|
+| **SERVED** — engine pool on `:11435` (authenticated) | Phi-4-mini-instruct-8bit · Qwen3-Coder-30B-A3B-Instruct-MLX-4bit · Qwen3.8-27B-MLX-4bit · gemma-4-E4B-it-MLX-4bit · gpt-oss-20b-MXFP4-Q8 · **MiniCPM5-2B-MLX** · **Ornith-1.5-35B-A3B-REAP-19B** · **Ornith-1.5-9B-MLX-8bit** |
+| **GOOSE-TOLD** — `custom_providers/maxwell_omlx.json` | Phi-4-mini · Qwen3-Coder-30B · Qwen3.8-27B · gemma-4-E4B · gpt-oss-20b-Q8 · **gpt-oss-20b-MXFP4-Q4** · **Qwen3.5-9B-4bit** · **gemma-4-31B-it-MLX-8bit** |
+| the diff | **3 served-but-never-offered** (MiniCPM5-2B — the engine's own `default_model` — plus both Ornith models) vs **3 offered-but-never-served** (a delegate pointed at gpt-oss-20b-Q4, Qwen3.5-9B-4bit or gemma-4-31B-8bit asks a server that cannot answer). Engine pool at reading: `model_count 8, loaded_count 6, current 48.6 GB / ceiling 65.2 GB`. |
+
+NEXT STEP 1's probe half is therefore **DONE**: the correction is now a pure config act (REMOVE the 3 ghosts,
+ADD the 3 invisible), deterministic and LLM-free, and `harness_roles` must be re-read against the SERVED list
+rather than against prose. NEXT STEP 2 (T-131 prefill-bill with a slope) is untouched.
+
+**THE KNOWLEDGE LAYER, MEASURED — and the one gap that blocks "advisory by default".** The corpus is real and
+queryable: `knowledge pipeline/maxwell.db` (209 MB, the DECLARED live run DB — `config/db_torn_upload_guard.yaml`,
+`#anchor_family.store`, `capability_registry`) holds **7,640 FBs** with FTS (`fbs_fts`) AND sqlite-vec
+(`vec_fbs`, `vec_fbs_ctx`). Entrypoints exist: `pipeline/retrieve.py` (69 KB) with benchmark + evaluator +
+goldens (`pipeline/retrieval_benchmark.py`, `pipeline/retrieval_evaluator.py`, `governance/golden_reanchor_*`)
+and `pipeline/query.py` (read / --stats / --by-macro). **THE GAP: `just ask` IS NOT GROUNDED.** It runs
+`pipeline/oneshot_ask.py` (102 lines) — a bare one-shot model call that imports only `OMLX_API_KEY`, touches no
+DB and calls no retriever. Until `ask` retrieves, cites and REFUSES when the corpus is silent, no everyday
+decision can be grounded in the knowledge layer, and a recipe that cites no FB is prose. Also named:
+`data/maxwell.db` (128 KB, 19 July-era FBs) is a stray second home that no declaration names.
+
 ## 2. THE TWO MEASUREMENTS THAT MATTER MOST
 
 **a. Prefill is now nearly free on a warm prefix.** Byte-identical 2,616-token prefix, gemma-4-E4B:

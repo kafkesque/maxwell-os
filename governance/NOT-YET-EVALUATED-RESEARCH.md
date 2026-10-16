@@ -1,5 +1,5 @@
 # Maxwell OS — Not-Yet-Evaluated Research Opportunities
-> **Date:** 2026-08-09 (register opened) | **Last synced:** 2026-10-16 | **Source:** feed.opml + senior RAG developer assessment
+> **Date:** 2026-08-09 (register opened) | **Last synced:** 2026-10-17 | **Source:** feed.opml + senior RAG developer assessment
 > **Status:** A LIVE register: the P1–P3 rows below are candidates, and the DATED sections at the foot are the
 > evaluations that have since been run (D-3038: what we reject we register, with its reason). A row whose
 > "why deferred" has been ANSWERED by a measurement is re-cut in place rather than left standing — see R-12.
@@ -69,6 +69,8 @@
 |------|------|--------|
 | 2026-08-09 | R-01 (Prompt trimming) | ✅ IMPLEMENTED — 233 chars removed from CRIBS_ENRICHMENT_SYSTEM (19%) |
 | 2026-10-16 | First-party import resolution (BUG-875) | ✅ IMPLEMENTED — NOT a research candidate but a rail this register's "is it drift-proof?" column kept asking for: `config/repo_integrity.yaml#import_resolution` + `scripts/check_repo_integrity.py` (RAIL 0) now DERIVE every first-party top-level name from disk and fail closed when one resolves OUTSIDE the tree, naming the capturing distribution. 3 new two-sided known-answer controls (17 → 20). Measured RED naming `skillopt-0.1.0`, then GREEN. |
+| 2026-10-17 | Harness session-surface staleness (BUG-873 limb b) | ✅ **MEASURED — it RETIRES a candidate, not adds one.** `sessions.extension_data` in `~/.local/share/goose/sessions/sessions.db` is the surface a session was GIVEN and is enabled-only (verified: `pdfreader: enabled:false` is absent from it). Session `20261012_1` (born 10-12 11:22 local, still written 10-16 23:32) carries NO youtube extension and says so in its own reasoning; every session born from 10-13 11:31 does. The 13:16 write is NOT the enabling — the `extensions:` block is byte-identical to the 10-15 21:08 backup and 13:16 changed `GOOSE_THINKING_EFFORT` only. ⇒ **a config write is not live until a NEW session starts.** Constraint for any rail: `enabled_extensions.v0` exists only for sessions born from 10-13, older blobs record the surface NOT AT ALL, and substring search inside them is contaminated by todo prose. |
+| 2026-10-17 | Grounded `ask` (knowledge layer as everyday advisory) | ⬜ **GAP MEASURED, NOT YET CLOSED.** The corpus is queryable (7,640 FBs, FTS + sqlite-vec in the DECLARED `knowledge pipeline/maxwell.db`), but `just ask` runs `pipeline/oneshot_ask.py` — a BARE one-shot call (imports `OMLX_API_KEY` only: no DB, no retriever). Until `ask` retrieves, cites and refuses when the corpus is silent, no everyday decision can be grounded in the knowledge layer. |
 | 2026-08-09 | R-03 (llmfit preflight) | ✅ ADDED to just preflight |
 | 2026-08-09 | R-02 (Structured JSON) | ⬜ PENDING A/B test |
 | 2026-08-09 | R-07 (Merged CRIBS+Classify) | ⬜ PENDING A/B test |

@@ -8,7 +8,7 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1182 decisions (census stamp a16bf19e7b254858, 2026-10-16) · 639 bugs (232 open / 407 closed; highest OPEN = BUG-875) · 55 open tasks (MUST 12 / SHOULD 39 / WORTH 4; OWNER-moved 6, pipeline-moved 49; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1182 decisions (census stamp a16bf19e7b254858, 2026-10-17) · 639 bugs (232 open / 407 closed; highest OPEN = BUG-875) · 55 open tasks (MUST 12 / SHOULD 39 / WORTH 4; OWNER-moved 6, pipeline-moved 49; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **79** of 1182 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 597 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1182, D-2987/BUG-765)
 >
@@ -16066,6 +16066,46 @@ FIX (T-185, three limbs, each a rule the repository already declares elsewhere):
   **Adjacent finding from the same test:** the delegated-run journal this repository mandates (D-3036/BUG-844)
   could not RUN in this session at all - see BUG-875, filed from the same sitting. A fresh session therefore
   tests the surface, but the RECORD of the test could only be written after BUG-875 was repaired.
+- **LIMB (b) — CLOSED BY MEASUREMENT 2026-10-17, FROM BYTES, WITH NO OWNER STEP (nothing above is rewritten;
+  the reading below decides the question the paragraph above left open, and it decides it AGAINST the filing's
+  own leading candidate).** The harness writes the surface it hands a session to disk, so the pair does not
+  need a human eye on a UI.
+  **THE STORE.** `~/.local/share/goose/sessions/sessions.db` (SQLite, 976 MB, LIVE; read read-only under
+  `PRAGMA query_only=1`) holds one row per session, and `sessions.extension_data` is the surface THAT session
+  was given. VERIFIED enabled-only, so the column is evidence and not a guess: `pdfreader` is `enabled: false`
+  in `~/.config/goose/config.yaml` and the string "PDF Reader" is ABSENT from the snapshot (instr = 0), while
+  every enabled extension (DocGuard, "YouTube Transcript", ...) is present.
+  **THE MEASUREMENT** (store times are UTC; local = UTC+2):
+  (1) session `20261012_1` — born 2026-10-12 11:22 local, 13,036 messages, **last written 2026-10-16 23:32
+  local** (i.e. it was the live conversation minutes before this new session opened) — its snapshot carries NO
+  `mcp-youtube-transcript` at all (instr = 0), and the session's OWN recorded reasoning at 2026-10-16 23:08:13
+  local states it in its own words: *"this session's tool surface includes `Fetch.fetch`, but NO
+  youtubetranscript tool, even though the extension is ON in the app config."*
+  (2) session `20261016_10` — born 2026-10-16 23:42 local — carries the extension in its snapshot (byte 2244)
+  and bound all four tools.
+  (3) EVERY session born from 2026-10-13 11:31 local onward carries the extension in its snapshot; no session
+  born before that does.
+  **CANDIDATE (a) IS DISPROVEN, and by a file the filing never read.** The `2026-10-16 13:16` config write did
+  NOT enable this extension: the `extensions:` block of `~/.config/goose/config.yaml` is BYTE-IDENTICAL to the
+  backup taken at **2026-10-15 21:08** (`diff` of the two extension blocks: empty), it is declared there and
+  NOT in the 2026-09-21 backup, and the write that did land at 13:16 changed exactly ONE top-level key,
+  `GOOSE_THINKING_EFFORT: high -> medium`. A session's age relative to 13:16 therefore cannot explain a
+  missing tool: the enabling predates session (1) by a day and session (2) by four days.
+  **CANDIDATE (b) IS PROVEN: a session's tool surface is captured at the session's START and is NOT recomputed
+  from the config when the session is resumed or continued.** Session (1) lived ACROSS the enabling write, was
+  still being written ten minutes before this sitting, and never gained the tool - while its own record names
+  the config as ON. **A config write is NOT LIVE until a NEW SESSION STARTS**, and nothing in the harness says
+  so; that sentence is the repair this bug actually owes, and it belongs where a session reads it.
+  **STILL OWED:** the bug's declared SECOND limb - break the `cmd` deliberately (an unresolvable binary) and
+  confirm the fault is REPORTED rather than silent. Candidate (c) is NOT excluded by anything above: this
+  store records what a session was GIVEN, never whether a server failed to answer.
+  **NEW SUB-FINDING, and it constrains every rail built on this column:** the key `enabled_extensions.v0` is
+  written ONLY for sessions born from 2026-10-13 onward. Older sessions (`20261012_1`, `20261007_1`) hold the
+  OLD blob format - per-extension STATE, e.g. `{"todo.v0":{"content": ...}}` - with NO surface key at all, so
+  for them the store records NOTHING about the surface, and a substring search inside that blob is
+  CONTAMINATED: `20261007_1` appears to "carry" the extension only because its todo content quotes it (the
+  unique needle `mcp-youtube-transcript` matched at byte 3708 inside prose). A rail must read the SNAPSHOT KEY,
+  never a substring, and must report **NOT RECORDED** - never "absent" - for a pre-key session.
 ### BUG-872 (HIGH, FIXED 2026-10-16) — A DISPROVEN CACHE WAS RE-MEASURED AS WORKING (a two-day-old disproof was carrying a whole doctrine)
 - **state:** fixed | **severity:** high | **filed:** 2026-10-16 | **closed:** 2026-10-16 | **by:** assistant
 - **symptom.** `config/agent_context.yaml#cache_accounting.proof` declared `status: DISPROVEN_MEASURED_20261014`,

@@ -343,6 +343,18 @@ may_touch:
 - temp/mint_20261015h.yaml
 - governance/SESSION-HANDOFF-20261015-D3021.md
 - temp/mint_20261015g.yaml
+# 2026-10-16 (the D-3035 sitting): the artifacts this session CREATED. Named one by one, never a glob
+# (BUG-548/BUG-563): the sweep route and its receipt (T-167/D-3035), the ONE adapter surface and the
+# first portable skill (D-3037/D-3036), and the registry reads the new rules declare.
+- governance/DELETION_RECEIPT_20261016.json
+- agent/skills/diagnose-hard-bugs/SKILL.md
+- config/agent_surface.yaml
+- pipeline/model_store_sweep.py
+- config/decisions_policy.yaml
+- config/decisions_summary.json
+- config/artifact_ownership.yaml
+- config/capability_registry.yaml
+- pipeline/config_audit.py
 will_not_touch:
 - governance/F11_*
 - governance/ANCHOR_RULER_CONSOLIDATED_*.csv

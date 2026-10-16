@@ -16106,6 +16106,39 @@ FIX (T-185, three limbs, each a rule the repository already declares elsewhere):
   CONTAMINATED: `20261007_1` appears to "carry" the extension only because its todo content quotes it (the
   unique needle `mcp-youtube-transcript` matched at byte 3708 inside prose). A rail must read the SNAPSHOT KEY,
   never a substring, and must report **NOT RECORDED** - never "absent" - for a pre-key session.
+- **THE SECOND LIMB — MEASURED 2026-10-17, TWO-SIDED, IN A SANDBOX (the owner's live config was NOT touched).**
+  `goose run` exposes `--with-extension '<ENV=val command args...>'`, so the declared test - break the `cmd`
+  deliberately - can be run without editing `~/.config/goose/config.yaml` and without restarting the app.
+  Red loop, same prompt, same local model (`--provider maxwell_omlx --model MiniCPM5-2B-MLX`, so C1/C3 hold;
+  model calls stay local), differing in exactly one thing:
+  * CONTROL (no extra extension) - exits 0, answers `READY`, no extension fault.
+  * SUBJECT (`--with-extension '/nonexistent/uvx --from git+.../mcp-youtube-transcript mcp-youtube-transcript'`)
+    - exits 0, answers `READY`, and prints, on stdout, before the session starts:
+    `Warning: Failed to start extension 'uvx' (IO error: No such file or directory (os error 2)), continuing
+    without it` + `Hint: once the session starts, ask goose to help debug the 'uvx' extension`.
+  **VERDICT: candidate (c) IS DISPROVEN AS STATED, and replaced by a narrower, PROVEN one.** The harness does
+  NOT fail silently: it DETECTS the unresolvable binary, NAMES it, prints the error and offers a hint. What is
+  broken is WHO RECEIVES THAT REPORT and WHAT IT SAYS: the report goes to a TERMINAL BANNER at session start,
+  the SESSION IS NEVER TOLD (nothing enters the conversation, so the agent cannot distinguish a dead extension
+  from a capability that does not exist), and the phrase `continuing without it` presents a silent capability
+  loss as normal operation. In a RESUMED session the banner is not even reprinted. So BUG-873 is now fully
+  root-caused and BOTH halves are measured: (i) the surface is frozen at session start; (ii) a start failure is
+  detected and announced to the HUMAN at start, and to the AGENT never. The repair is therefore NOT a goose
+  patch: it is a DECLARATION the session can read plus a rail that can go RED on bytes.
+  **A LIVE INSTANCE OF THE SAME CLASS, FOUND BY THE SAME RUN (not a hypothetical):** the CONTROL run exposed
+  `ModuleNotFoundError: An HTTP transport library needs to be installed.` from the REDDIT extension's own uv
+  environment, reported exactly the same way (`..., continuing without it` + hint). `reddit` is `enabled: true`
+  in the live config (line 253) and IS present in the current session's snapshot - so the surface promised it
+  and the tools were absent in EVERY session on 2026-10-17, with the only report a scroll-away line at start.
+  This is BUG-873's own class live in the harness today, recorded here as its instance rather than as a second
+  bug (one defect, one home).
+  **SURFACE PARITY, MEASURED 2026-10-17 over the whole enabled set:** 19 extensions are `enabled: true` in
+  `~/.config/goose/config.yaml`; 18 appear in the current session's snapshot; **`scheduler` does NOT** - NAMED
+  rather than judged, because a non-tool extension legitimately need not appear (one check owed before any rail
+  reports it as a fault).
+  **THE MEASUREMENT'S OWN TRACE:** the two probe runs created sessions `20261016_11` and `20261016_12` (2
+  messages each, both under the local model) in the owner's session store. They are recorded here rather than
+  deleted - disposition of a session row is the owner's (R-D410/D-3018), not the assistant's.
 ### BUG-872 (HIGH, FIXED 2026-10-16) — A DISPROVEN CACHE WAS RE-MEASURED AS WORKING (a two-day-old disproof was carrying a whole doctrine)
 - **state:** fixed | **severity:** high | **filed:** 2026-10-16 | **closed:** 2026-10-16 | **by:** assistant
 - **symptom.** `config/agent_context.yaml#cache_accounting.proof` declared `status: DISPROVEN_MEASURED_20261014`,

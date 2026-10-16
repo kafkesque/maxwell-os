@@ -58,7 +58,10 @@ candidate as filed. Full reading in the buglog; the load-bearing facts:
 | the transition | every session born from **10-13 11:31 local** onward carries it; no earlier one does |
 | candidate (a) "predates the 13:16 write" | **DISPROVEN.** The `extensions:` block is BYTE-IDENTICAL to the **10-15 21:08** backup (`diff` empty; declared there, absent from the 09-21 backup). The write that landed at 13:16 changed exactly one key: `GOOSE_THINKING_EFFORT: high → medium`. |
 | candidate (b) "a resumed session keeps its surface" | **PROVEN.** The long session lived ACROSS the enabling write, was still being written 10 min before this sitting, and never gained the tool. |
-| still owed | the second limb: break `cmd` deliberately and confirm the fault is REPORTED rather than silent. (c) is not excluded — the store records what a session was GIVEN, never whether a server failed to answer. |
+| still owed | the second limb: break `cmd` deliberately and confirm the fault is REPORTED rather than silent. |
+| **second limb — MEASURED 2026-10-17, two-sided, sandboxed** | `goose run --with-extension '/nonexistent/uvx ...'` (local model, live config untouched): the harness **DOES** name the failure — `Warning: Failed to start extension 'uvx' (IO error: No such file or directory (os error 2)), continuing without it` + a debug hint — so "silent failure" is **DISPROVEN as stated** and replaced by the proven narrower one: **the report goes to a terminal banner at session start; the SESSION is never told, and "continuing without it" presents the loss as normal operation.** |
+| a LIVE instance, same run | the control run exposed the **Reddit** extension failing in every session today (`ModuleNotFoundError: An HTTP transport library needs to be installed.`) while `reddit` is `enabled: true` (config line 253) and present in the snapshot: surface promised it, tools absent, one scroll-away line as the only report. |
+| surface parity, whole set | 19 extensions `enabled: true`; 18 in the current snapshot; **`scheduler` absent — NAMED, not judged** (a non-tool extension need not appear; one check owed). |
 
 **THE RULE THIS BUYS — and it belongs in the loader, not in prose: a config write is NOT LIVE until a NEW
 session starts.** A resumed or continued session keeps the surface it was born with. Nothing in the harness

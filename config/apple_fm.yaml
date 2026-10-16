@@ -48,3 +48,26 @@ protocol:                       # declared now, USED only after the probe passes
   context_window: strict_verify # any consumer MUST verify the ceiling by measurement, not by the vendor's word
 arms: []                        # no consumer declared => no coupling exists to drift
 gated_on: "owner runs `sudo fm license`; then: python3 scripts/probe_apple_fm.py"
+# ── RE-PROPOSAL 2026-10-16 (owner asked again: "is it worth to utilize apple fm for this synch and moving
+#    files related to the book/notes task?") - REGISTERED SO IT IS NOT RE-LITIGATED AS A SURPRISE (D-3038).
+#    The refusal is D-2654 above and it is STRUCTURAL, so the new evidence below does not move it.
+#    MEASURED 2026-10-16 on this machine, not recalled: /usr/bin/fm present (root, 3.39 MB, 2026-09-03);
+#    `fm license --status` -> "Not agreed. Run 'sudo fm license' ..." and `fm available` -> the terms notice,
+#    which is MACHINE-WIDE ("applies to every user on the machine") and therefore an OWNER act, never one an
+#    assistant takes on his behalf; macOS 27.0 (26A428), arm64, FoundationModels.framework present, Swift 6.4.
+#    NEW EXTERNAL FACT: github.com/brianwestphal/apple-fm (MIT, TypeScript CLI + library, 7 stars, 0 forks,
+#    created 2026-06-19, last push 2026-07-22) - a THIRD-PARTY wrapper over the same OS model. It does NOT
+#    change (1)-(4) above: the weights stay SIP-unreadable and the framework version stays unrecordable, so
+#    anything it produced would still carry an unfalsifiable gen_model (R14/D-382). It ADDS: a Node/npm
+#    supply-chain surface, and a `chat --tools read,bash` mode that runs shell commands - a second policy
+#    home for commands on the owner's machine (the defect this repository refuses elsewhere, BUG-864 class).
+#    Its one genuine capability - schema-GUARANTEED output via DynamicGenerationSchema - is the only feature
+#    worth remembering, and the declared arm already reaches the same model with no third party: `fm serve`
+#    speaks OpenAI Chat Completions, so integration is CONFIG-FIRST through the provider protocol (C21/C25)
+#    with the fallback this file already names. WHERE IT COULD NOT BE USED EVEN IF LICENSED: the placement,
+#    the rename and the identity of a book are DETERMINISTIC acts (D-2898: no LLM or heuristic canonical
+#    decision; D-3045: a name is evidence, never identity), so an on-device 3B model may only ever ADVISE
+#    the owner and never move a byte, file a work or name one.
+#    RE-OPEN CONDITION (unchanged, from D-2654): the weights become READABLE and HASHABLE. Until then the arm
+#    stays enabled: false with arms: [] - and MEASURED 2026-10-16, nothing consumes it: the only reader in the
+#    tree is scripts/probe_apple_fm.py, so no coupling exists to drift.

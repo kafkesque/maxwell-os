@@ -15,6 +15,7 @@ may_touch:
 - justfile
 - temp/d3049_record.yaml
 - config/silent_repair.yaml
+- config/apple_fm.yaml
 - pipeline/batch_convert_epubs.py
 - config/ingest_identity_gate.yaml
 - scripts/plan_source_rename.py

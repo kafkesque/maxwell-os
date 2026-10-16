@@ -272,7 +272,55 @@ cache_accounting:
     method: 'two-call A/B on ONE resident model with a BYTE-IDENTICAL prefix (the server echoes the reused count)'
     min_speedup: 5.0               # below this, prefix reuse is UNPROVEN and every ledger field is UNTRUSTED
     measured_reference: '6.1 s warm vs 268 s cold = 44x (the referenced walkthrough, same session, same model)'
-    status: DISPROVEN_MEASURED_20261014
+    status: DISPROVEN_20261014__REMEASURED_PASSING_20261016   # BUG-872: this DISPROOF is stale; a LIVE prefix cache is measured below.
+    remeasured_20261016:                      # BUG-872. Read-only, same host, declared protocol, byte-identical prefix.
+      probe: 'python3 scripts/agent_context_probe.py --prefill-ab  (the DECLARED rail; no scratch script)'
+      protocol: 'three calls per model, byte-identical 2,616-token prefix, max_tokens=32, temperature=0.0'
+      gemma-4-E4B-it-MLX-4bit:
+        cold_wall_s: 6.90
+        warm_wall_s: [0.39, 0.16]
+        cached_tokens: [0, 2613, 2613]
+        prompt_tokens: 2616
+        prefill_rate_cold_tok_s: 379
+        speedup_cold_to_warm: 25.01            # declared bar is min_speedup 5.0 -> PASSES BY 5x
+      Qwen3.8-27B-MLX-4bit:
+        cold_wall_s: [81.01, 111.14]           # the SECOND call was SLOWER than the first
+        warm_wall_s: 2.87
+        cached_tokens: [0, 0, 2612]
+        prompt_tokens: 2619
+        prefill_rate_cold_tok_s: 32
+        speedup_cold_to_warm: 1.42             # fails the bar, but only because cold is catastrophic
+      server_evidence: >-
+        ~/.omlx/logs/server.log, 2026-10-16 22:43: "Reserved prefill capacity for 5847 tokens across 4
+        caches", "Using boundary cache snapshot ... storing 5844/6111 tokens (tail terminal, 11 intermediate
+        snapshots)", "Cache phase timings: ... prefix_cache_lookup=33.9ms/53". The subsystem is not merely
+        present, it is LOOKING THINGS UP.
+      why_it_changed_not_guessed: >-
+        pipeline/omlx_cache_enable.sh (F6/BUG-792 ACT 3) records that "cache.enabled is false in the live
+        settings"; ~/.omlx/settings.json now reads cache.enabled = true, hot_cache_max_size 8GB,
+        gdn_ssd_split_enabled true, ssd_cache_dir ~/.omlx/ssd_cache, initial_cache_blocks 256. So the SETTING
+        changed and the ENABLING ACT must be located before any cause is named - cause_state stays UNVERIFIED
+        until it is. The 2026-10-14 conclusion below is NOT deleted: it was true of that version, which is the
+        point of keeping it.
+      active_parameters_rule: >-
+        MEASURED, and it corrects this file's OWN ranking: prefill cost tracks ACTIVE parameters, not total.
+        The dense 27B (262144 window) is 12-15x SLOWER per prompt token than the 4B E4B, so "a bigger window
+        is faster" is FALSE here, and a two-sided (window x prefill bill) ranking MUST take the
+        active-parameter count as the bill's FIRST term. The resident MoE arms
+        (gemma-4-26B-A4B-it-OptiQ-4bit, Qwen3.6-35B-A3B-4bit, ~3-4B active) therefore read as 4B-class bills
+        with larger-model capacity - the correct candidates for a HARNESS LOOP - and NONE is currently
+        exposed to goose: ~/.omlx/model_settings.json and custom_providers/maxwell_omlx.json disagree on the
+        model set, which is what the parity_rule block above exists to catch.
+      conclusion: >-
+        SUPERSEDED 2026-10-16. Prefix reuse is LIVE on this machine and PASSES the declared bar by 5x. The
+        honest model of a local turn is therefore NOT "every turn pre-pays its whole prompt": it is "the FIRST
+        turn of a prefix pays the prompt; every later turn on the same prefix is nearly free". Two consequences
+        the cache-free doctrine had inverted: (1) the binding constraint is no longer prefill throughput but
+        PREFIX STABILITY - one byte changed at the head converts a 0.16 s turn back into a 6.9 s turn;
+        (2) COMPACTION IS NOW THE MOST EXPENSIVE EVENT IN A SESSION, because rewriting the history destroys a
+        live cache and re-prefills the summary cold. THAT is the mechanism that made a session capped at 32768
+        feel both frequently compacted AND slow: every compaction threw away a ~25x cheaper prefix. Shorter
+        prompts and fewer requests remain good hygiene; they are no longer the ONLY lever.
     measured_20261014:
       identical_prefix_calls: 12
       arms: ['large fixed SYSTEM block', 'large fixed USER block', 'large SYSTEM block with a per-call nonce at its head']
@@ -292,6 +340,7 @@ cache_accounting:
         prefix reuse is DISPROVEN on this machine today, so the honest model of a local turn is
         "every turn pre-pays its whole prompt". Every prefill optimisation must therefore be CACHE-FREE:
         fewer requests per unit of work, shorter prompts, and a model whose throughput can pay the bill.
+      superseded_by: remeasured_20261016        # ADDED 2026-10-16 (BUG-872). The text above is NOT rewritten.
 
 #: PREFIX STABILITY. The invariant that makes prefill cheap, and the three ways this harness breaks it.
 prefix_stability:
@@ -312,10 +361,21 @@ prefix_stability:
         the prefix unique per turn. A per-turn block belongs in the TAIL (a turn-context block is
         exactly this shape and must never be prepended).
     - id: no_cache_behind_a_stable_prefix
+      state: RESOLVED_MEASURED_20261016          # BUG-872: cached 2613 of 2616 -> the cache behind a stable prefix is LIVE
       why: >-
-        a byte-stable prefix is NECESSARY and NOT SUFFICIENT: MEASURED, twelve calls with an identical
-        prefix reused nothing. A stability claim without an A/B is a claim about the prompt, not about
-        the machine, and this hazard exists so the report cannot present the first as the second.
+        RESOLVED, and kept because the LESSON is the durable part. A byte-stable prefix is NECESSARY and NOT
+        SUFFICIENT: on 2026-10-14 twelve calls with an identical prefix reused nothing; on 2026-10-16 three
+        calls reused 2613 of 2616 tokens at 25.01x. A stability claim without an A/B is a claim about the
+        prompt, not about the machine - and a CACHE claim without a RE-MEASUREMENT is a claim about a VERSION.
+        The hazard survives as: a stale measurement must be re-run before any doctrine or ranking rests on it.
+    - id: compaction_destroys_a_live_cache    # NEW 2026-10-16 (BUG-872). The most expensive event in a session.
+      why: >-
+        MEASURED: a warm turn on a stable prefix costs 0.16-0.39 s and a cold one 6.90 s on the SAME prompt.
+        A compaction REPLACES THE WHOLE HISTORY, so the next call re-prefills the summary cold and every turn
+        after it keeps paying until the prefix stabilises again. This is why a session capped at 32768 felt
+        BOTH repeatedly compacted AND slow: the cap forced compactions, and each compaction threw away a prefix
+        ~25x cheaper to reuse than to re-read. The counter-measure is the wall itself - do not cap, compact
+        rarely, and never compact a prefix that is still being appended to.
   injection_envs: [GOOSE_MOIM_MESSAGE_TEXT, GOOSE_MOIM_MESSAGE_FILE]   # the per-turn injection homes
   verification: 'the probe prints the hazards it can measure from the live config and names the rest as UNVERIFIED'
 

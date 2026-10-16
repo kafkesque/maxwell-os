@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**231 open** / 404 closed of 635 ids.
+**232 open** / 404 closed of 636 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -238,3 +238,4 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-869 | (MED — OPEN 2026-10-16) — pipeline/subagent_fanout.py delivered an `async: true` delegate as a FOREGROUND run that BLOCKED its parent, and t | 1 |
 | BUG-870 | A DECISION STATE OUTSIDE THE DECLARED PARTITION (the BUG-765 recurrence) | 1 |
 | BUG-871 | A PROFILE EVAL IS NOT A SCOPE (the harness wall leaks into the owner's lane) | 1 |
+| BUG-872 | A DISPROVEN CACHE WAS RE-MEASURED AS WORKING (a two-day-old disproof was carrying a whole doctrine) | 1 |

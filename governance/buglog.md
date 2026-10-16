@@ -15922,6 +15922,56 @@ FIX (T-185, three limbs, each a rule the repository already declares elsewhere):
 - **fix (fail-closed, not cosmetic):** declare the FULL state vocabulary in config/gov_sync.yaml as two exhaustive, disjoint lists (`open_decision_states` + `closed_decision_states`); add a check that union == the states actually present in config/decisions.yaml, faulting on any UNCLASSIFIED state; render the count of unclassified = 0 in the face.
 - **related:** BUG-765, D-2987, D-2981, T-185.
 
+### BUG-872 — A DISPROVEN CACHE WAS RE-MEASURED AS WORKING (a two-day-old disproof was carrying a whole doctrine)
+- **state:** fixed | **severity:** high | **filed:** 2026-10-16 | **closed:** 2026-10-16 | **by:** assistant
+- **symptom.** `config/agent_context.yaml#cache_accounting.proof` declared `status: DISPROVEN_MEASURED_20261014`,
+  `cached_tokens_every_call: 0`, `speedup_measured: 1.01` against a declared bar of `min_speedup: 5.0`, and from
+  that built a doctrine: "prefix reuse is DISPROVEN on this machine today ... every prefill optimisation must
+  therefore be CACHE-FREE". MEASURED 2026-10-16, same host, same protocol (byte-identical 2,616-token prefix,
+  3 calls/model, temp 0.0, max_tokens 32): gemma-4-E4B-it-MLX-4bit cold 6.90 s -> warm 0.39/0.16 s, cached
+  **2613 of 2616**, speedup **25.01x** — PASSES the declared bar by 5x. Qwen3.8-27B cold 81.01/111.14 s ->
+  warm 2.87 s, cached 2612, speedup 1.42x.
+- **independent confirmation, unprompted by this act.** `scripts/agent_context_probe.py` (the DECLARED rail)
+  lists gemma-4-E4B at 455.0 tok/s and Qwen3.8-27B at 39.0 tok/s; its selftest is 17/17 green after the fix.
+  Two rails, two readings, same verdict.
+- **why this is a fault and not a footnote.** A stale disproof was not merely wrong; it had INVERTED the design
+  of the whole optimisation surface. With the cache live, the binding constraint is no longer prefill
+  throughput but PREFIX STABILITY: ONE byte changed at the head converts a 0.16 s turn back into a 6.90 s turn.
+- **the mechanism it explains, and this is the point.** A capped session felt BOTH frequently compacted AND
+  slow for ONE reason, not two: the 32k wall forced compactions, and each compaction REPLACED THE HISTORY,
+  destroying a live prefix that was ~25x cheaper to reuse than to re-read. Compaction is now the most expensive
+  event in a session. The counter-measure is the wall itself — do not cap, compact rarely, never compact a
+  prefix still being appended to.
+- **correction to a claim made in this session's conversation, by measurement.** "The 27B is faster than the
+  small model" is FALSE on this host: 39.0 tok/s against 455.0 tok/s is a 12x penalty, and `agent_loop` needs
+  672.2 s of prefill against a 60 s budget -> `prefill_bill`, NOT routable. Prefill cost tracks **ACTIVE**
+  parameters, not total, so the ranking must take the active-parameter count as the bill's FIRST term. The
+  resident MoE arms (~3-4B active of 26B/35B) are 4B-class bills with larger-model capacity — the right
+  candidates for a harness loop, and NONE is currently exposed to goose.
+- **CONTROL (executed).** `config/agent_context.yaml`: `status` -> `DISPROVEN_20261014__REMEASURED_PASSING_20261016`;
+  a new `remeasured_20261016` block ADDED as a sibling of `measured_20261014` (the 2026-10-14 text is NOT
+  rewritten — `superseded_by` points at the new block, R-D410); the cache-free `conclusion` SUPERSEDED; hazard
+  `no_cache_behind_a_stable_prefix` marked `RESOLVED_MEASURED_20261016`; NEW hazard
+  `compaction_destroys_a_live_cache` added. Probe selftest 17/17 green before and after.
+- **NOT established, and deliberately not guessed.** WHY the disproof changed. `pipeline/omlx_cache_enable.sh`
+  (F6/BUG-792 ACT 3) records that "cache.enabled is false in the live settings"; `~/.omlx/settings.json` now
+  reads `cache.enabled: true`, `hot_cache_max_size: 8GB`, `gdn_ssd_split_enabled: true`,
+  `ssd_cache_dir: ~/.omlx/ssd_cache`, `initial_cache_blocks: 256`. The SETTING changed, so an ENABLING ACT
+  exists and must be located before a cause is named. `cause_state` stays UNVERIFIED.
+- **NEXT (three, in consequential order — registered here so they cannot be lost).**
+  (1) **The one-shot/tool-calling model is UNROUTABLE.** `scripts/agent_context_probe.py` fails closed on
+  `Qwen3-Coder-30B-A3B-Instruct-MLX-4bit` — "UNMEASURED throughput -> NO route" — so the model declared for
+  tool-calling and one-shot work (`AGENT_TOOL_SHORT_ONESHOT`) cannot be routed to ANY class. Before any new
+  model is proposed for agentic/tool-calling duty, the DECLARED one must be measured.
+  (2) **The routing table is computed from a COLD prefill bill** and therefore now UNDERSTATES what is routable:
+  with a live cache, `agent_loop`'s 26,214-token working set costs seconds rather than the 57.6-124.8 s the
+  table bills. Every class route must be recomputed with a WARM bill, and the 4%-margin verdict on gemma-4-E4B
+  (57.6 s vs a 60 s budget) re-read.
+  (3) **Model-set parity is broken.** `~/.omlx/model_settings.json` and
+  `custom_providers/maxwell_omlx.json` disagree on the served set; the MoE arms are declared to the engine but
+  not exposed to goose. `config/agent_context.yaml#parity_rule` exists for exactly this and must be applied.
+- **related:** BUG-794 (an estimate is not a measurement), BUG-792/F6 ACT 3, BUG-828/T-132/T-154, D-2957
+  (absent is not zero), D-2680, BUG-871 (this session's sibling: a stale binding outliving its reason).
 ### BUG-871 — A PROFILE EVAL IS NOT A SCOPE (the harness wall leaks into the owner's lane)
 - **state:** fixed | **severity:** high | **filed:** 2026-10-16 | **closed:** 2026-10-16 | **by:** assistant
 - **CONTROL (executed 2026-10-16, measured):** `pipeline/harness_env.py` — `print_lines(bindings, scope)` now

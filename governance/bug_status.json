@@ -2,8 +2,8 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 635,
-  "open_n": 231,
+  "total_ids": 636,
+  "open_n": 232,
   "closed_n": 404,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
@@ -1161,6 +1161,11 @@
     {
       "id": "BUG-871",
       "title": "A PROFILE EVAL IS NOT A SCOPE (the harness wall leaks into the owner's lane)",
+      "events": 1
+    },
+    {
+      "id": "BUG-872",
+      "title": "A DISPROVEN CACHE WAS RE-MEASURED AS WORKING (a two-day-old disproof was carrying a whole doctrine)",
       "events": 1
     }
   ],

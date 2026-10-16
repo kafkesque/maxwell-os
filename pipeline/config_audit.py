@@ -47,6 +47,11 @@ CONFIG_TO_CODE: dict[str, tuple[str, str, str]] = {
     # longer drift behind a second copy in the offerer. Until 2026-10-16 the only reader was a sweep script
     # in temp/, which meant the rule that decides what the owner is shown had no governed consumer.
     "engine.yaml#model_store.deletion_floor_bytes": ("pipeline.model_store_census", "FLOOR", "int"),
+    # T-142/D-3034/BUG-840: the RESOLUTION RULE itself now has the same treatment as the floor. The rule that
+    # decides which bytes read as DECLARED - and therefore which bytes are never offered to the owner - is read
+    # from one home, so a second copy of it in code (the mention index it replaced) can be found by this rail.
+    "engine.yaml#model_store.resolution_domain":   ("pipeline.model_store_census", "RESOLUTION", "dict"),
+    "engine.yaml#model_store.resolution_domain.report_rows": ("pipeline.model_store_census", "REPORT_ROWS", "int"),
     # ── Stage 1.5 (embedding) ──
     "stage1_5.embed_model_hf":     ("pipeline.pipeline_paths", "S15_EMBED_MODEL_HF", "str"),
     "stage1_5.embed_dim":          ("pipeline.pipeline_paths", "S15_EMBED_DIM", "int"),

@@ -169,6 +169,26 @@ model_store:
     non_member_repo_prefixes: [datasets--, spaces--]   # a REPO, NEVER A CANDIDATE (D-3014(2)); spaces-- has zero members today and is DECLARED rather than implied (D-3031)
     store_metadata: [.locks, version.txt, CACHEDIR.TAG, blobs]   # NOT A REPO AT ALL: the store's own machinery
 
+  # WHAT MAY DECLARE ONE (T-142/D-3034/BUG-840, C12/D-402). DECLARED used to be a MENTION INDEX: the census
+  # asked whether a repo's stem appeared anywhere in the joined text of config/, pipeline/ and scripts/, so a
+  # GOVERNANCE WRITE reclassified 267.9 MB with no byte moving - the evidence line a landing had just added to
+  # config/task_register.yaml named a stem, and that prose then "declared" the bytes. MEASURED 2026-10-16: the
+  # homes that declared most of the bucket were config/decisions.yaml and config/task_register.yaml, two
+  # registers whose strings are SENTENCES. A record that mentions a model is not an owner of its bytes, so
+  # DECLARED now requires a RESOLUTION (D-3018: the byte-owner test is RESOLUTION, not MENTION) in exactly
+  # three forms: an engine entry whose realpath lies inside the repo dir; a VALUE that IS the reference (the
+  # full org/name or the bare name - a sentence is never equal to a model id); or a PATH that EXISTS and lies
+  # inside that dir (a citation whose subject is absent is an assertion, D-405). A string that merely CONTAINS
+  # a reference is reported as a MENTION and confers nothing. This is the DECLARED HOME of the rule: a reader
+  # that cannot find it REFUSES to run, because the alternative is the mention index this block replaces.
+  resolution_domain:
+    value_homes: [config]              # PARSED values only: a comment is not a value, so a remark cannot declare
+    code_homes: [pipeline, scripts]    # AST STRING CONSTANTS only: a docstring is prose, not a consumer
+    file_suffixes: [.yaml, .yml, .json, .py]
+    exclude: [pipeline/model_store_census.py]   # THE READER'S OWN VOCABULARY MAY NOT DECLARE A BYTE (BUG-838 limb 3); an empty list is FATAL rather than permissive
+    re_acquirable_marker: refs         # an entry carrying it was FETCHED by repo id, so its bytes can come back (T-142's re-acquirability column)
+    report_rows: 12                    # how many audit rows the printed face shows; the full set stays in --json-out
+
 
 # Download decisions are made by pipeline/model_loadability_probe.py, never by download counts.
 candidates:

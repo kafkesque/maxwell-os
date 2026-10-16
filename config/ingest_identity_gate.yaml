@@ -37,11 +37,64 @@ identity:
   # Deterministic name defects — MACHINE-decidable, so they are never an owner question; they are reported with
   # the sanitized name the file should carry. MEASURED 2026-10-14 on the 962-record cache: 571 names carry an
   # ingest-site marker, 34 carry a repeated internal space, 3 carry leading/trailing whitespace. Fixing an
-  # already-ingested name is a WRITE, so the corpus count is OWNER-OWED debt (rc 2), never a fatal line.
+  # already-ingested name is a WRITE, so the count is a DEBT rather than a fatal line — and WHICH debt it is, is
+  # its DISPOSITION below (T-130 option B, owner word 2026-10-16): the whitespace classes are ACCEPTED DEBT
+  # (printed and counted by this door, never an rc 2 trigger), the marker class stays OWNER-OWED and owns its
+  # own row (T-173), because bundling them would let one act answer for two different blast radii.
   name_defect_patterns:
     leading_or_trailing_whitespace: '^\s|\s$'
     repeated_internal_whitespace: '\S\s{2,}\S'
   ingest_site_marker_pattern: '(?i)(z-libr|libgen|liber3|anna''s archive|annas-archive|1lib)'
+
+  # ── T-130 OPTION (B) — THE OWNER WORD 2026-10-16 ("T-130 ok go with B") ──────────────────────────────────
+  # B is TWO things and nothing else: (1) the door's record lookup becomes DECLARED and ORDERED, so the 37
+  # names it calls defective are found through the SAME key it compares with (`_key()` already collapses
+  # whitespace) instead of through the very bytes it calls defective (BUG-799, D-3034); (2) the whitespace
+  # classes become DECLARED DEBT — printed, counted, and NOT an rc 2 trigger — while the marker class keeps a
+  # disposition of its own. It does NOT rename anything: the approved rename is a CASCADE until it rides a
+  # re-ingest (BUG-800: 2,952 references inside 13 already-written run receipts), so it is scheduled by a
+  # REGISTER ROW (T-172) rather than by this file, and this file only declares what the door must now read.
+  # The FIRST lookup that answers wins, and a receipt names WHICH one did. The order is not cosmetic: the
+  # canonical fallback is what lets the DECISION ground a variant name in IDENTITY, so a renamed or
+  # noise-suffixed file is DEFERRED and RECORDED (skipped in place, loudly) instead of being treated as a work
+  # the corpus has never seen. It deliberately does NOT govern candidacy — see candidate_lookup below.
+  candidate_lookup: [exact_name, exact_path]
+  #: WHY CANDIDACY IS A SEPARATE, DECLARED RULE (BUG-848, MEASURED 2026-10-16). pipeline/stage0_convert.py
+  #: converts the corpus MINUS the deferrals this door NAMES, so candidacy is VISIBILITY: a file no EXACT lookup
+  #: names must be DECIDED (candidate -> a recorded deferral -> skipped in place). If the canonical lookup were
+  #: allowed to decide candidacy, a noise-suffixed or freshly-renamed duplicate would be silently absorbed,
+  #: never named in the receipt, and then CONVERTED — the duplicate work this gate exists to prevent — while the
+  #: door's own reading still said 0 candidates. A candidate lookup that is not a SUBSET of record_lookup is
+  #: FATAL, because the only way back into that trap is to add `canonical_name` here.
+  record_lookup: [exact_name, exact_path, canonical_name]
+  #: Every class the door COUNTS must have a disposition — a class with none, a token outside this vocabulary,
+  #: or an `accepted_debt` with no named owner word is FATAL (the door's own reader faults on it). Acceptance is
+  #: the riskiest reading a gate can make; it may be a WORD, never a default (D-3038 records what we accept).
+  defect_disposition:
+    leading_or_trailing_whitespace: accepted_debt
+    repeated_internal_whitespace: accepted_debt
+    ingest_site_marker: owner_owed
+  accepted_debt:
+    declared_by: D-3040
+    owner_word: 'OWNER WORD 2026-10-16 (verbatim): "T-130 ok go with B" — ACCEPT the 37 corpus-name defects with
+      the debt declared, and make the acceptance safe with the canonical reader fallback and its own control.'
+    because: 'MEASURED 2026-10-15 (BUG-800): the approved whitespace rename cannot be applied against a live
+      corpus — the 37 stems are referenced 2,952 times INSIDE 13 already-written run receipts (the parquet export
+      2,419; the stage0/2/4/5 checkpoints and their input_fbs), which are RUN RECEIPTS and cannot be rewritten
+      without re-recording history (D-2642). The plan is written and waiting (89 rows -> 37 rows, apply_ready
+      False, each row naming its artifact), and the act becomes non-cascading when those artifacts are
+      regenerated anyway: T-172.'
+    not_a_hazard_because: 'MEASURED 2026-10-15 (BUG-799): the door''s own comparison key `_key()` already
+      collapses whitespace and strips, so a whitespace defect is STORAGE-non-canonicality, not ambiguity — it
+      converts no duplicate work into a distinct one and hides no collision. The 2 canonical collisions in the
+      live cache are duplicate records of ONE work (identical source_id), not two works under one name.'
+    safe_because: 'the acceptance is CARRIED BY A MECHANISM, not by tolerance: identity.record_lookup resolves a
+      defective name by the canonical key the door ALREADY compares with, so the DECISION grounds it in identity
+      (`record_resolution: canonical_name`) and the outcome is a RECORDED deferral, skipped in place — never a
+      work re-classified as new, and never a silent exclusion from the gate (BUG-848: candidacy stays EXACT).
+      Both directions are controlled (scripts/check_ingest_identity_gate.py: the fallback resolves, an exact
+      match still wins, a variant name STAYS a candidate and is deferred on identity, a record with no
+      author|title still defers on its sanitized stem, and a genuinely new name is still admitted).'
 
 ledger:
   file: governance/duplicate_adjudication.json     # D-2738 — the ONE owner ledger (59 pairs, PENDING)
@@ -117,3 +170,12 @@ name_normalisation:
   reading: scripts/normalise_corpus_names.py
   #: The door's own count of this debt (identity.name_defect_patterns above) is the DEFECT source of truth;
   #: this act never re-declares the patterns (C12) and never invents a second census home.
+  #:
+  #: T-130 OPTION (B), owner word 2026-10-16: this act is NOT applied against the live corpus. The whitespace
+  #: debt is DECLARED, and the rename RIDES THE NEXT RE-INGEST — when the artifacts that reference the 37 stems
+  #: are regenerated anyway, so the write stops being a cascade (BUG-800). The TRIGGER is a REGISTER ROW, T-172,
+  #: and the reason is a MEASUREMENT rather than a preference: `apply_ready` is False with 37/37 rows refused,
+  #: each naming its referencing artifact. Until then the refusal IS the finding.
+  #: The declaration above is what makes that day safe: with identity.record_lookup, a renamed file whose cache
+  #: record still carries the old name resolves canonically instead of reading as a NEW candidate and being
+  #: re-classified — so the deferral is a SCHEDULE, not a debt that can decay into a surprise.

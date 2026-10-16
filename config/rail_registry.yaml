@@ -153,7 +153,10 @@ guards:
   scripts/check_freeze_window.py: tri_state
   scripts/check_freeze_window.py --selftest: fatal
   #: D-2997/BUG-781: the INGEST DOOR. The health line is tri_state: 2 = OWNER-OWED (a ledger pair or a T-129
-  #: collapse row with no owner word; a corpus name defect whose fix is a write) — loud, NOT fatal (BUG-457).
+  #: collapse row with no owner word; a name-defect class DECLARED owner_owed — the ingest-site markers, T-173;
+  #: or candidates that would be deferred right now) — loud, NOT fatal (BUG-457). D-3040/T-130 option B: the
+  #: whitespace classes are DECLARED DEBT, printed and counted in the same reading but never an rc 2 trigger, and
+  #: the door resolves a record through the DECLARED lookup (identity.record_lookup) rather than by exact bytes.
   #: The SAME rc REFUSES at the ingest step: the door's reading is declared in config#door.ingest_reading, so a
   #: rail pinning the health line to `|| exit 1` would turn an owner's owed word into a broken build, and one
   #: pinning the ingest line to tri_state would let a run mint a corroboration claim its evidence contradicts.

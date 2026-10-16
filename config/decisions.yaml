@@ -25807,3 +25807,72 @@ decisions:
     third-party dependency (BUG-847, in pipeline/model_store_sweep.py, found by this act''s delegated review of
     an UNRELATED file); the repository''s declared package form is the remedy, and the durable lesson is that a
     new file is reviewed before it LANDS rather than only before it is edited.'
+- id: D-3040
+  state: ACTIVE
+  date: '2026-10-16'
+  by: assistant
+  category: GOVERNANCE / INGEST IDENTITY
+  bugs:
+  - BUG-799
+  - BUG-800
+  - BUG-848
+  files:
+  - pipeline/ingest_gate.py
+  - scripts/check_ingest_identity_gate.py
+  - config/ingest_identity_gate.yaml
+  - config/rail_registry.yaml
+  - justfile
+  - config/task_register.yaml
+  - governance/buglog.md
+  title: 'WHAT WE ACCEPT WE STILL DECLARE: the 37 whitespace-defective corpus names are ACCEPTED DEBT (printed,
+    counted, never an rc 2 trigger) and the acceptance is CARRIED BY A DECLARED LOOKUP - while candidacy stays EXACT,
+    because a file the delta rule absorbs is never decided and therefore CONVERTED twice'
+  decision: 'OWNER WORD 2026-10-16 (verbatim): "T-130 ok go with B" — ACCEPT the 37 corpus-name defects with the
+    debt declared, and make the acceptance safe with the canonical reader fallback and its own control. MEASURED
+    2026-10-16, this session; the door had declared 37 of 940 stems defective since 2026-10-14 while resolving their
+    records by EXACT BYTES (BUG-799): it called a name defective and then asked that name to identify itself, which
+    is a declaration the reader cannot RESOLVE (D-3034). (1) ACCEPTANCE IS A WORD, NEVER A DEFAULT: a defect class
+    carries a DISPOSITION (config#identity.defect_disposition) of `accepted_debt` (printed and counted in the same
+    reading, never an rc 2 trigger) or `owner_owed`; a class with NO disposition, a disposition outside the declared
+    vocabulary, or an `accepted_debt` with no named OWNER WORD is FATAL, so a new defect cannot be quietly accepted
+    by omission. The whitespace classes are accepted; the ingest-site marker class (459 corpus stems, 571 cache
+    names) keeps owner_owed and its OWN ROW (T-173), because its remedy is the sanitizer — widening a bounded whitespace
+    repair into a corpus-wide rename is how drift starts. (2) THE ACCEPTANCE IS CARRIED BY A MECHANISM, NOT BY TOLERANCE:
+    identity.record_lookup is DECLARED and ORDERED (exact_name -> exact_path -> canonical_name), the first lookup
+    that answers WINS, and every decision records WHICH one did (`record_resolution`), so a receipt shows the evidence
+    rather than the assumption. The canonical key is the door''s own `_key()`, which already collapses the whitespace
+    it calls defective — so the door now resolves the identity it was already comparing against. MEASURED in the
+    same act: all 940 corpus files resolve by exact_name, the delta census is 0 before and after, and the health
+    line''s rc is UNCHANGED (2 = the marker debt) — the fallback is INERT on today''s corpus, which is the safest
+    possible way to land a reader change. (3) CANDIDACY IS VISIBILITY, NOT IDENTITY (BUG-848, found by a PRE-EXISTING
+    control going RED, not by reasoning): the first version of this act routed the DELTA rule through the canonical
+    lookup too, and MEASURED pipeline/stage0_convert.py:202 converts the corpus MINUS the deferrals the door names
+    — so a noise-suffixed duplicate stopped being a candidate, was never named in the deferral receipt, and would
+    have been CONVERTED, i.e. ingested as a second work under a second name (BUG-780''s shape, 530 rows) while the
+    door''s own reading still said 0 candidates. Candidacy is therefore its own DECLARED key (config#identity.candidate_lookup,
+    exact lookups only) and a candidate lookup that is not a SUBSET of record_lookup is FATAL — the trap is MECHANISED,
+    not documented, because the only way back into it is to add `canonical_name` to that list. (4) THE CANONICAL
+    LOOKUP ALSO UNCOVERED A THIRD DEFERRAL STATE: a candidate whose record is found ONLY by a non-exact lookup is
+    a work the store ALREADY HOLDS — either the corpus holds it under a variant name, or the file IS the record''s
+    file renamed (its recorded source_path no longer exists). Admitting it would ingest work the store already has,
+    so it is DEFERRED (reason already_ingested_by_canonical_name, naming the record it matched) and skipped in place:
+    fail-closed and LOUD, and it is exactly what makes T-172''s deferred rename safe at the identity layer. The
+    weaker path stays ALIVE by control: a record with no author|title still defers on its sanitized stem. (5) CONTROLS
+    IN BOTH DIRECTIONS, 15 in the ladder (BUG-492): the fallback RESOLVES a defective name and NAMES itself, an
+    exact match still WINS over it, a variant name STAYS a candidate and is deferred (never admitted), a genuinely
+    new name is still ADMITTED, the third state fires, the stem path still fires, and the three acceptance refusals
+    (no disposition, unknown token, no owner word) all REFUSE. (6) WHAT WE REJECT WE REGISTER: the corpus rename
+    is NOT performed now — MEASURED 2026-10-15 (BUG-800): the 37 stems are referenced 2,952 times INSIDE 13 already-written
+    run receipts (the parquet export 2,419 alone; the stage0/2/4/5 checkpoints and their input_fbs), which cannot
+    be rewritten without re-recording history (D-2642). The plan (governance/normalise_corpus_names_plan_20261015.json,
+    37 rows, apply_ready False, each row naming its artifact) is written and waiting, and the act RIDES THE NEXT
+    RE-INGEST as a SCHEDULE with a REGISTER ROW (T-172) — a deferral a later reader can find, not a silence. (7)
+    KNOWN LIMIT, recorded rather than implied: the four deferral REASONS are code-level tokens (same_work_identity,
+    same_sanitized_stem, byte_identical, already_ingested_by_canonical_name) and are NOT a declared vocabulary;
+    declaring them in config is a hardening this act deliberately does not attempt, because a vocabulary nobody
+    validates would be a second home for a fact the receipts already carry. (8) THE RESIDUAL DEBT IS NAMED AND OWNED:
+    the marker class stays owner-owed with its own row (T-173) — the door may not count a debt that no register
+    row owns (the T-131..T-137 fault). (9) ONE HOME, ONE RULE: the lookup, the dispositions, the acceptance and
+    its owner word live in config/ingest_identity_gate.yaml#identity; the reader faults on anything undeclared;
+    the rail comment and the ladder text were re-cut in the same act so the registry, the justfile and the reader
+    agree on what rc 2 now means.'

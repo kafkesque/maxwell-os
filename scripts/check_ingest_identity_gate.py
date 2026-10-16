@@ -11,7 +11,8 @@ two questions the corpus could not answer before:
                  older than the corpus, and how much name noise the corpus carries. TRI-STATE, BUG-457:
                  0 clean | 1 FATAL (machine-decidable: unreadable input, undeclared verdict, stale ledger or
                  report — the door would be blind) | 2 OWNER-OWED (a pair with no word; a name defect whose fix
-                 is a write). rc 2 is loud and NOT fatal here.
+                 is a write — the ingest-site markers, T-173). rc 2 is loud and NOT fatal here; a class DECLARED as
+accepted debt is printed and counted in the same reading but is not an rc 2 trigger (T-130 option B).
   `--gate`       (ingest step, pre-S1.5) the DOOR's reading of the SAME facts. rc 2 here REFUSES the run: a run
                  that proceeded would mint the claim (corroboration by two VOICES) that the unresolved identity
                  makes false. The difference is DECLARED in config (`door.ingest_reading`), never accidental:
@@ -38,7 +39,7 @@ sys.path.insert(0, str(_PROJECT_ROOT))
 from pipeline import ingest_gate as gate  # noqa: E402
 
 CONTROL_LABELS = (
-    "a_noise_suffixed_candidate_collapses_to_its_corpus_stem_and_is_deferred",
+    "a_noise_suffixed_candidate_is_deferred_on_the_identity_its_canonical_lookup_resolves",
     "a_candidate_with_a_new_identity_is_admitted",
     "a_byte_identical_candidate_is_deferred_under_a_new_name",
     "an_already_cached_file_is_not_a_candidate_at_all",
@@ -47,6 +48,12 @@ CONTROL_LABELS = (
     "a_content_candidate_absent_from_the_ledger_is_fatal",
     "a_ruled_collapse_row_is_not_counted_as_owed",
     "a_word_with_no_provenance_is_owed_not_ruled",
+    "a_whitespace_defective_name_resolves_by_the_declared_canonical_lookup",
+    "an_exact_name_match_is_preferred_over_the_canonical_fallback",
+    "a_variant_name_stays_a_candidate_and_is_deferred_when_its_record_is_found_only_canonically",
+    "a_defect_class_with_no_declared_disposition_is_fatal_not_silently_accepted",
+    "an_accepted_debt_with_no_named_owner_word_is_fatal",
+    "a_record_without_author_or_title_still_defers_on_its_sanitized_stem",
 )
 
 
@@ -60,7 +67,7 @@ def _report(rep: dict[str, Any], stream: Any = sys.stdout) -> None:
         print(f"collapse sheet {collapse['file']}: {collapse['rows']} row(s) | ruled {collapse['ruled']} | owed {collapse['outstanding']}",
               file=stream)
     print(f"content report {content['file']}: {content['candidates']} candidate(s) | stale {content['stale']}", file=stream)
-    print(f"corpus name defects (fix is a write): {rep['name_defects']} | ingest-site markers {rep['marker_names']}",
+    print(f"corpus name defects: {rep['name_defects']} | ACCEPTED as DECLARED DEBT (T-130 option B, {rep['accepted_debt']['declared_by']}): {rep['accepted_debt']['total']} name(s), never an rc 2 trigger | ingest-site markers {rep['marker_names']} (OWNER-OWED, T-173)",
           file=stream)
     for line in rep["fatal"]:
         print(f"FATAL: {line}", file=stream)
@@ -159,8 +166,14 @@ def _selftest() -> int:
         (books / "Gamma Notes.md").write_text("gamma body " * 50, encoding="utf-8")
         rep = gate.preflight(books_dir=books, cache_path=cache, policy=policy, run_id="c1")
         by_name = {d["name"]: d for d in rep["decisions"]}
-        if by_name.get(noise.name, {}).get("defer_reason") != "same_sanitized_stem":
-            mark(CONTROL_LABELS[0], "noise-suffixed candidate was not deferred on its corpus stem")
+        # T-130 option B / BUG-799: the refusal is now grounded in the IDENTITY the canonical lookup resolves
+        # (that fixture record carries author|title), not in the stem the two names happen to share. The pre-B
+        # reading fell through to the stem only because the exact-bytes lookup could not find the record at all:
+        # the reason got STRONGER, and control 15 below proves the stem path is still alive without author|title.
+        reason_zero = by_name.get(noise.name, {}).get("defer_reason")
+        if reason_zero != "same_work_identity":
+            mark(CONTROL_LABELS[0],
+                 f"noise-suffixed candidate deferred as {reason_zero!r}, expected same_work_identity")
         if not by_name.get("Gamma Notes.md", {}).get("admitted"):
             mark(CONTROL_LABELS[1], "a candidate with a new identity was NOT admitted")
 
@@ -221,6 +234,95 @@ def _selftest() -> int:
         if (mixed["ruled"], mixed["outstanding"]) != (1, 1):
             mark(CONTROL_LABELS[8],
                  f"a provenance-carrying word was not ruled ({mixed['ruled']}/{mixed['outstanding']}, expected 1/1)")
+
+        # ── T-130 OPTION (B) / BUG-799: THE DECLARED CANONICAL LOOKUP AND THE CASCADE RULE THAT MUST USE IT ──
+        # The fixture is the live defect's exact shape: the CACHE names one work with a repeated internal space
+        # while the corpus file carries the clean name. Before B the door declared such a name defective and
+        # then resolved its record by those same defective bytes, so the DECISION could not see the identity the
+        # door's own key already collapses. The delta rule is deliberately NOT the place that fixes it (BUG-848):
+        # a file the cache cannot name by exact bytes stays a CANDIDATE and is then deferred on identity.
+        with cache.open("a", encoding="utf-8") as handle:
+            handle.write(json.dumps({"source_book": "Epsilon  Book.md", "author": "Ann Lee",
+                                     "title": "Epsilon Book",
+                                     "source_path": str(books / "Epsilon  Book.md")}) + "\n")
+            handle.write(json.dumps({"source_book": "Delta Book.md", "author": "Bo Reid",
+                                     "title": "Delta Book",
+                                     "source_path": str(books / "Delta Book.md")}) + "\n")
+            handle.write(json.dumps({"source_book": "Delta  Book.md", "author": "Bo Reid",
+                                     "title": "Delta Book",
+                                     "source_path": str(books / "Delta  Book.md")}) + "\n")
+        (books / "Epsilon Book.md").write_text("epsilon body " * 50, encoding="utf-8")
+        (books / "Delta Book.md").write_text("delta body " * 50, encoding="utf-8")
+        (books / "Zeta Book.md").write_text("zeta body " * 50, encoding="utf-8")
+        corpus = gate.corpus_files(books_dir=books)
+        census = gate.corpus_census(corpus, gate.cache_records(cache), policy)
+
+        # C10: the canonical fallback RESOLVES a whitespace-defective name, and SAYS that it did (evidence).
+        record, method = census["resolve"](books / "Epsilon Book.md")
+        if not record or method != "canonical_name":
+            mark(CONTROL_LABELS[9],
+                 f"a whitespace-defective name resolved as {method!r} (expected canonical_name)")
+
+        # C11: an EXACT match still WINS — the fallback may not quietly overrule the declared order.
+        record2, method2 = census["resolve"](books / "Delta Book.md")
+        if method2 != "exact_name" or not record2 or record2["source_book"] != "Delta Book.md":
+            mark(CONTROL_LABELS[10],
+                 f"an exact name match lost to the fallback ({method2!r}, "
+                 f"{record2 and record2.get('source_book')!r})")
+
+        # C12 (BUG-848): CANDIDACY IS VISIBILITY. A variant the cache does not name by EXACT bytes stays a
+        # candidate — it must be DECIDED, because stage0 converts the corpus minus the deferrals — and the
+        # canonical lookup is what turns it into a RECORDED, identity-grounded deferral rather than an
+        # invisible file that would be converted a second time.
+        delta_names = {path.name for path in gate.candidates(corpus, census, policy)}
+        if "Epsilon Book.md" not in delta_names:
+            mark(CONTROL_LABELS[11],
+                 f"a whitespace variant was silently absorbed by the delta rule: {sorted(delta_names)}")
+        variant = {d["name"]: d for d in gate.preflight(books_dir=books, cache_path=cache, policy=policy,
+                                                        run_id="c12", write_receipt=False)["decisions"]}
+        epsilon = variant.get("Epsilon Book.md") or {}
+        if epsilon.get("admitted") or epsilon.get("defer_reason") != gate.REASON_ALREADY_INGESTED:
+            mark(CONTROL_LABELS[11],
+                 f"a file whose record is found ONLY canonically was not deferred: {epsilon!r}")
+        if epsilon.get("record_resolution") != "canonical_name":
+            mark(CONTROL_LABELS[11],
+                 f"the deferral does not NAME the lookup it used: {epsilon.get('record_resolution')!r}")
+        # ... and the SAME control must not pass by refusing everything: a genuinely new name IS admitted.
+        if not (variant.get("Zeta Book.md") or {}).get("admitted"):
+            mark(CONTROL_LABELS[11],
+                 "a genuinely new name was NOT admitted (the delta rule refuses everything)")
+
+        # C13: a counted defect class with NO declared disposition is FATAL, never a silent acceptance.
+        policy_without_disposition = deepcopy(policy)
+        del policy_without_disposition["identity"]["defect_disposition"]["repeated_internal_whitespace"]
+        faults = gate.undeclared_defect_dispositions(policy_without_disposition)
+        if not any("repeated_internal_whitespace" in fault for fault in faults):
+            mark(CONTROL_LABELS[12],
+                 f"a class with no declared disposition was silently accepted (faults: {faults})")
+        tokens_outside = deepcopy(policy)
+        tokens_outside["identity"]["defect_disposition"]["ingest_site_marker"] = "probably_fine"
+        if not any("outside" in fault for fault in gate.undeclared_defect_dispositions(tokens_outside)):
+            mark(CONTROL_LABELS[12], "a disposition outside the declared vocabulary was accepted")
+
+        # C14: an ACCEPTED debt with NO named owner word is FATAL — the acceptance must be a word, not a default.
+        policy_without_word = deepcopy(policy)
+        policy_without_word["identity"]["accepted_debt"] = {}
+        if not any("owner word" in fault for fault in gate.undeclared_defect_dispositions(policy_without_word)):
+            mark(CONTROL_LABELS[13], "an accepted_debt with no owner word was not refused")
+
+        # C15 (BUG-848 / BUG-492): the WEAKER path must stay alive. With no author|title a record carries no
+        # honest identity, so the refusal falls back to the sanitized stem — the rule that was already there.
+        # A control that proves only the NEW path can pass while the old one dies silently is not a control.
+        with cache.open("a", encoding="utf-8") as handle:
+            handle.write(json.dumps({"source_book": "Eta.md"}) + "\n")
+        (books / "Eta.md").write_text("eta body " * 51, encoding="utf-8")
+        (books / "Eta (z-lib.sk).md").write_text("eta body " * 52, encoding="utf-8")
+        stem_only = {d["name"]: d for d in gate.preflight(books_dir=books, cache_path=cache, policy=policy,
+                                                          run_id="c15", write_receipt=False)["decisions"]}
+        eta = stem_only.get("Eta (z-lib.sk).md") or {}
+        if eta.get("defer_reason") != "same_sanitized_stem":
+            mark(CONTROL_LABELS[14],
+                 f"a record with no author|title did not defer on its stem: {eta.get('defer_reason')!r}")
 
     failed = {label for label, _ in failures}
     for label in CONTROL_LABELS:

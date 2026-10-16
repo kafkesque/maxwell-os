@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**225 open** / 386 closed of 611 ids.
+**224 open** / 388 closed of 612 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -210,7 +210,6 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-795 | (LOW — OPEN 2026-10-14) — one ledger row carries a NULL model and 156,098,139 input tokens | 1 |
 | BUG-796 | (MED — OPEN 2026-10-14) — a decision written outside the receipting writer leaves the attribution control red | 1 |
 | BUG-797 | (MED — OPEN 2026-10-15) — the `llmfit` preflight cell is a control that CANNOT FAIL | 1 |
-| BUG-799 | (LOW — OPEN 2026-10-15) — two cache records duplicate ONE work under two raw names, and the door looks names up by BYTES | 1 |
 | BUG-800 | (LOW — OPEN 2026-10-15) — the approved corpus-name rename is a CASCADE until it rides a re-ingest | 1 |
 | BUG-802 | (MED — OPEN 2026-10-15) — the $0 local engine does not survive a reboot, and nothing starts it | 1 |
 | BUG-803 | (MED — OPEN 2026-10-15) — a prefill reading without the POOL STATE it was taken at is not comparable either | 1 |

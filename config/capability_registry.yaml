@@ -127,6 +127,24 @@ capabilities:
     receipt: governance/DELETION_RECEIPT_20261016.json
     cost_tier: T0
     owns: [pipeline/model_store_sweep.py, pipeline/model_store_census.py]
+  - id: ingest_identity_door
+    kind: script
+    entrypoint: python3 scripts/check_ingest_identity_gate.py
+    check: python3 scripts/check_ingest_identity_gate.py --selftest
+    receipt: config/ingest_identity_gate.yaml
+    cost_tier: T0
+    #: T-130/D-2997/BUG-781: the identity screen the INGEST path never read. It PRODUCES a per-batch deferral
+    #: receipt under the declared runtime home (temp/ingest_deferrals, gitignored) and its RECEIPT pointer here
+    #: is its ONE policy home, which is what a reader consults to know what the door reads. Declared 2026-10-16
+    #: because the route graph had NO capability for the door at all: T-130, T-172 and T-173 all resolved to
+    #: nothing, i.e. the debt these rows carried was the route graph's, not the tasks'.
+    owns:
+    - pipeline/ingest_gate.py
+    - scripts/check_ingest_identity_gate.py
+    - config/ingest_identity_gate.yaml
+    - scripts/normalise_corpus_names.py
+    - governance/duplicate_adjudication.json
+
   - id: delegate_journal
     kind: script
     # T-168/BUG-844/D-3036: THE TRACE A DELEGATED RUN LEAVES. MEASURED 2026-10-16: three delegates were reported
@@ -282,9 +300,13 @@ unrouted: {}
 #: when the measured debt EXCEEDS the declared number, so inherited debt cannot grow unnoticed, and it reports a
 #: SHRINK as good news. Clearing an item is a route declaration or an item edit - never a raised ceiling.
 routing_debt:
-  measured: '2026-10-15'
-  unrouted_open_tasks: 35
-  unrouted_open_bugs: 225
+  #: T-130 option (B), 2026-10-16: both ceilings LOWERED to the measured reading. The new capability
+  #: `ingest_identity_door` routed 2 tasks (T-172, T-173) and 3 bugs that resolved to NOTHING before - the debt
+  #: these items carried was the route graph's, not the tasks'. A shrink-only ceiling follows its measurement
+  #: DOWN (D-2644/D-3023), so the next unrouted item is a fault rather than a shrug.
+  measured: '2026-10-16'
+  unrouted_open_tasks: 33
+  unrouted_open_bugs: 222
   note: >-
     the readings below are RE-MEASURED every run and printed per item; the ceiling exists so that a NEW unrouted
     item is a fault instead of a shrug, and so the worklist of the route graph is a number someone can shrink

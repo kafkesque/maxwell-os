@@ -26,8 +26,18 @@ two things BY DECLARATION: in `just health` rc 2 is owner-owed and NOT fatal (BU
 REFUSES, because a run that proceeded would mint the claim the unresolved identity makes false.
 
 TRI-STATE: 0 clean | 1 FATAL (a MACHINE-decidable defect: an unreadable input — a BLIND ingest is the defect
-class this gate exists for — an unknown ledger verdict, or a detector candidate the ledger never saw) |
-2 OWNER-OWED (a pair with no owner word; a corpus name defect, whose fix is a write).
+class this gate exists for — an unknown ledger verdict, a detector candidate the ledger never saw, or a
+name-defect class with no declared disposition) | 2 OWNER-OWED (a pair with no owner word; a name-defect class
+DECLARED owner_owed — the ingest-site markers, T-173 — or candidates that would be deferred right now).
+
+THE READER'S LOOKUP IS DECLARED (T-130 option B, owner word 2026-10-16, BUG-799). The door declares 37 corpus
+names DEFECTIVE (whitespace) while its own comparison key `_key()` ALREADY collapses that whitespace — so the
+door was depending on the exact bytes of a name it calls defective (D-3034: a declaration the reader cannot
+RESOLVE). Option B does two things and nothing else: the lookup becomes DECLARED and ORDERED
+(`identity.record_lookup`) and the whitespace classes become DECLARED DEBT (printed, counted, never an rc 2
+trigger) while the marker class keeps a disposition of its own. Acceptance is the riskiest reading a gate can
+make, so a class with no disposition, a disposition outside the vocabulary, or an accepted class with no named
+OWNER WORD is FATAL: acceptance must be a word, never a default.
 """
 from __future__ import annotations
 
@@ -123,6 +133,103 @@ def _key(name: str) -> str:
     return sanitize_source_book(str(name or "")).strip().lower()
 
 
+LOOKUPS = ("exact_name", "exact_path", "canonical_name")
+#: The DECLARED vocabulary of record-resolution methods (config#identity.record_lookup). A token outside it is
+#: FATAL: a lookup this module cannot perform must never read as "the record is absent".
+DISPOSITIONS = ("accepted_debt", "owner_owed")
+#: The DECLARED vocabulary of a defect class's disposition (config#identity.defect_disposition). An undeclared
+#: class or a token outside this tuple is FATAL - acceptance may never be acquired by omission (C16).
+ACCEPTED_DEBT, OWNER_OWED = DISPOSITIONS
+
+EXACT_METHODS = ("exact_name", "exact_path")
+#: The lookups that name THE FILE ITSELF: a record found by one of these IS this corpus file. A record found by
+#: any OTHER declared lookup is the same WORK reached through a variant name — a THIRD state the pre-B door
+#: could not reach (its exact-bytes lookup could never find such a file), and now a recorded deferral rather
+#: than an admission (T-130 option B / BUG-848: without it, the deferred rename of T-172 would re-ingest work
+#: the store already holds).
+
+NOT_FOUND = "none"
+REASON_ALREADY_INGESTED = "already_ingested_by_canonical_name"
+#: The deferral reason of the THIRD state (see decide_candidate): the work is already in the store under a
+#: variant name. It is a code-level token like the other three reasons (same_work_identity, same_sanitized_stem,
+#: byte_identical); declaring the reason VOCABULARY in config is a hardening this act does not perform and
+#: records instead as a known limit (BUG-848).
+#: The resolution the door reports when NO declared lookup answers. It is a NAME, never a blank: a receipt that
+#: cannot say HOW a record was found cannot show that acceptance was safe (D-795: absent is never 0).
+
+
+def lookup_order(policy: dict[str, Any] | None = None) -> list[str]:
+    """The DECLARED, ORDERED record-resolution rule: the first lookup that answers WINS (T-130 option B).
+
+    MEASURED BUG-799: the door declares 37 corpus names DEFECTIVE and resolved their records by EXACT BYTES,
+    so accepting those names would have depended on the very bytes it calls defective: the door called a name
+    defective and then asked that name to identify itself (D-3034). The rule lives in
+    config/ingest_identity_gate.yaml, not here — and it governs the DECISION, never candidacy
+    (identity.candidate_lookup, BUG-848).
+
+    Raises:
+        GateInputError: the declared order is empty, or names a lookup this module cannot perform (C12/C16).
+    """
+    pol = policy or load_policy()
+    order = [str(token) for token in pol["identity"]["record_lookup"]]
+    unknown = [token for token in order if token not in LOOKUPS]
+    if not order or unknown:
+        raise GateInputError(f"identity.record_lookup is undeclared or names an unknown lookup: {order} "
+                             f"(declared vocabulary: {list(LOOKUPS)})")
+    return order
+
+
+def undeclared_defect_dispositions(policy: dict[str, Any] | None = None) -> list[str]:
+    """Every FAULT in the declared dispositions, as strings (empty = every counted class has a lawful one).
+
+    Acceptance (T-130 option B) is the riskiest thing this gate can read: a class that silently acquired the
+    `accepted_debt` treatment would turn a NEW defect into a quiet green. So a counted class with no
+    disposition, a disposition outside the declared vocabulary, or an `accepted_debt` with no named OWNER WORD
+    is reported here and treated as FATAL by `standing()` — acceptance must be a WORD, never a default.
+    """
+    pol = policy or load_policy()
+    declared = set(pol["identity"]["name_defect_patterns"]) | {"ingest_site_marker"}
+    dispositions = pol["identity"]["defect_disposition"]
+    faults: list[str] = []
+    for name in sorted(declared):
+        token = dispositions.get(name)
+        if token is None:
+            faults.append(f"{name}: no disposition declared")
+        elif token not in DISPOSITIONS:
+            faults.append(f"{name}: disposition {token!r} is outside {list(DISPOSITIONS)}")
+    if any(dispositions.get(name) == ACCEPTED_DEBT for name in declared):
+        declaration = pol["identity"].get("accepted_debt") or {}
+        if not str(declaration.get("owner_word") or "").strip():
+            faults.append("a class is declared accepted_debt with NO owner word: acceptance must be a word, "
+                          "never a default")
+    return faults
+
+
+def candidate_lookup(policy: dict[str, Any] | None = None) -> list[str]:
+    """The DECLARED delta rule: which lookups may decide that a corpus file is NOT a candidate (BUG-848).
+
+    CANDIDACY IS VISIBILITY, NOT IDENTITY. `pipeline/stage0_convert.py` converts the corpus MINUS the deferrals
+    this gate names, so a file the delta rule absorbs is never decided, never recorded and never skipped — it is
+    CONVERTED (the duplicate-work outcome the whole gate exists to prevent). MEASURED 2026-10-16: routing this
+    rule through the canonical lookup made a noise-suffixed duplicate vanish, and a PRE-EXISTING control caught
+    it. The canonical fallback therefore belongs to the DECISION, where a variant name becomes a recorded
+    deferral grounded in identity instead of an invisible candidate.
+
+    Raises:
+        GateInputError: the candidate lookups are empty, unknown, or not a SUBSET of the declared record lookup
+            — the only way back into the trap is to add `canonical_name` here, so that edit is a FAULT.
+    """
+    pol = policy or load_policy()
+    declared = [str(token) for token in pol["identity"]["candidate_lookup"]]
+    unknown = [token for token in declared if token not in LOOKUPS]
+    outside = [token for token in declared if token not in lookup_order(pol)]
+    if not declared or unknown or outside:
+        raise GateInputError(f"identity.candidate_lookup is undeclared, unknown or outside record_lookup: "
+                             f"{declared} (declared vocabulary: {list(LOOKUPS)}; record_lookup governs identity "
+                             f"resolution and MUST contain the candidate lookups)")
+    return declared
+
+
 def honest_identity(record: dict[str, Any] | None) -> str:
     """The canonical source_id a cache record can HONESTLY support, or "" when it cannot.
 
@@ -142,20 +249,51 @@ def fallback_identity(name: str) -> str:
     return compute_source_id("", "", fallback_key=_key(name))
 
 
-def corpus_census(corpus: list[Path], records: list[dict[str, Any]]) -> dict[str, Any]:
-    """The corpus's identity census: canonical ids, sanitized stems, byte sizes, and the cache's own keys."""
+def corpus_census(corpus: list[Path], records: list[dict[str, Any]],
+                  policy: dict[str, Any] | None = None) -> dict[str, Any]:
+    """The corpus's identity census: canonical ids, sanitized stems, byte sizes, and the cache's own keys.
+
+    THE LOOKUP IS DECLARED AND ORDERED (T-130 option B / BUG-799). Three indexes are built — exact name, exact
+    path, and the CANONICAL key — and `resolve()` walks `identity.record_lookup` in order, returning WHICH
+    lookup answered, so a receipt carries the EVIDENCE of how an identity was found rather than the assumption.
+    The canonical index is what lets the door accept a whitespace-defective name SAFELY: `_key()` collapses
+    exactly that defect, so the door can find the identity of a name it also calls defective (D-3034).
+    """
+    pol = policy or load_policy()
+    order = lookup_order(pol)
     by_name: dict[str, dict[str, Any]] = {}
     by_path: dict[str, dict[str, Any]] = {}
+    by_key: dict[str, dict[str, Any]] = {}
     for rec in records:
         name = str(rec.get("source_book") or "").strip()
         if name:
             by_name.setdefault(name, rec)
+            by_key.setdefault(_key(name), rec)
         raw_path = str(rec.get("source_path") or "").strip()
         if raw_path:
             by_path.setdefault(str(Path(raw_path).resolve()), rec)
 
+    def resolve(path: Path, methods: list[str] | None = None) -> tuple[dict[str, Any] | None, str]:
+        """Resolve ONE corpus file to its cache record: the FIRST lookup in `methods` that answers wins.
+
+        `methods` defaults to the declared `identity.record_lookup`. The DELTA rule passes its own declared
+        subset (`identity.candidate_lookup`, exact lookups only): candidacy is visibility, not identity
+        (BUG-848), so the two readers share ONE implementation but deliberately NOT one rule.
+        """
+        for method in methods or order:
+            if method == "exact_name":
+                rec = by_name.get(path.name.strip())
+            elif method == "exact_path":
+                rec = by_path.get(str(path.resolve()))
+            else:  # canonical_name — the declared fallback (T-130 option B, BUG-799)
+                rec = by_key.get(_key(path.name))
+            if rec is not None:
+                return rec, method
+        return None, NOT_FOUND
+
     def record_for(path: Path) -> dict[str, Any] | None:
-        return by_name.get(path.name.strip()) or by_path.get(str(path.resolve()))
+        """Compatibility reader: the record alone. A caller that needs the METHOD (evidence) uses `resolve`."""
+        return resolve(path)[0]
 
     ids: dict[str, list[str]] = {}
     stems: dict[str, list[str]] = {}
@@ -170,20 +308,26 @@ def corpus_census(corpus: list[Path], records: list[dict[str, Any]]) -> dict[str
             sizes.setdefault(path.stat().st_size, []).append(str(path))
         except OSError:
             continue
-    return {"by_name": by_name, "by_path": by_path, "source_ids": ids, "stems": stems, "sizes": sizes,
-            "record_for": record_for}
+    return {"by_name": by_name, "by_path": by_path, "by_key": by_key, "source_ids": ids, "stems": stems,
+            "sizes": sizes, "record_for": record_for, "resolve": resolve, "lookup_order": order}
 
 
-def candidates(corpus: list[Path], census: dict[str, Any]) -> list[Path]:
-    """THE DELTA RULE: a file the metadata cache already knows is NOT a candidate and is never re-classified."""
-    out: list[Path] = []
-    for path in corpus:
-        if str(path.resolve()) in census["by_path"]:
-            continue
-        if path.name.strip() in census["by_name"]:
-            continue
-        out.append(path)
-    return out
+def candidates(corpus: list[Path], census: dict[str, Any],
+               policy: dict[str, Any] | None = None) -> list[Path]:
+    """THE DELTA RULE: a file the cache cannot name by EXACT bytes is a candidate, and is DECIDED (BUG-848).
+
+    CANDIDACY IS VISIBILITY. It is tempting to route this rule through the same canonical lookup the decision
+    uses, and it is WRONG: `stage0_convert.py` converts the corpus MINUS the deferrals this gate names, so a
+    file the delta rule absorbs is never decided, never recorded in the receipt and never skipped — it is
+    CONVERTED, i.e. ingested as a second work under a second name (the outcome BUG-780 measured 530 rows of).
+    MEASURED 2026-10-16: that routing made a noise-suffixed duplicate vanish, and a PRE-EXISTING control caught
+    it. The canonical fallback therefore belongs to the DECISION, where a variant name becomes a RECORDED
+    deferral grounded in identity — a loud skip — rather than a silent exclusion from the gate.
+    """
+    pol = policy or load_policy()
+    methods = candidate_lookup(pol)  # an undeclared or non-subset rule fails HERE rather than guessing (C12)
+    resolve = census["resolve"]
+    return [path for path in corpus if resolve(path, methods)[0] is None]
 
 
 def sha256_file(path: Path) -> str:
@@ -196,18 +340,27 @@ def sha256_file(path: Path) -> str:
 
 
 def decide_candidate(path: Path, census: dict[str, Any]) -> dict[str, Any]:
-    """Decide ONE candidate: admitted, or deferred with the reason and the corpus file it collides with.
+    """Decide ONE candidate: admitted, or deferred with the reason and the record/corpus file it collides with.
+
+    THREE DEFERRAL STATES, checked in this order (T-130 option B):
+      1. an IDENTITY twin — another corpus file shares this file's honest work identity (author|title);
+      2. a STEM twin — another corpus file shares its sanitized stem (the fallback when a record carries no
+         author|title, so no identity can be honestly claimed);
+      3. CANONICALLY ALREADY INGESTED — the cache names this work only through a variant name, so admitting it
+         would ingest a work the store already holds (BUG-848).
+    A byte twin closes the list.
 
     Self-matches are IMPOSSIBLE by construction: the candidate lives in the census too (it is a file in the
     corpus root), so every comparison excludes the candidate's own name. MEASURED 2026-10-14: without that
     exclusion a brand-new file matched ITSELF and was deferred — a control that fires on everything reports
     nothing.
     """
-    record = census["record_for"](path)
+    record, resolution = census["resolve"](path)
     sid = honest_identity(record)
     decision: dict[str, Any] = {"path": str(path), "name": path.name,
                                 "identity": sid or fallback_identity(path.name),
                                 "identity_is_evidence": bool(sid),
+                                "record_resolution": resolution,
                                 "canonical_name": f"{sanitize_source_book(path.stem).strip()}.md",
                                 "admitted": True, "defer_reason": "", "matched": ""}
     if sid:
@@ -219,6 +372,15 @@ def decide_candidate(path: Path, census: dict[str, Any]) -> dict[str, Any]:
     stem_others = [name for name in census["stems"].get(stem_key, []) if name != path.name]
     if stem_key and stem_others:
         decision.update(admitted=False, defer_reason="same_sanitized_stem", matched=stem_others[0])
+        return decision
+    if record is not None and resolution not in EXACT_METHODS:
+        # State 3 (T-130 option B / BUG-848): the record was found ONLY by a non-exact lookup, so this work is
+        # ALREADY IN THE STORE — the corpus holds it under a variant name, or this file IS the record's file
+        # renamed (its recorded source_path no longer exists: the state T-172's rename creates). Admitting it
+        # would ingest work the store already holds (BUG-780's shape, one file at a time). The fail-closed and
+        # LOUD answer is a recorded deferral naming the record it matched, which a human can adjudicate.
+        decision.update(admitted=False, defer_reason=REASON_ALREADY_INGESTED,
+                        matched=str(record.get("source_book") or ""))
         return decision
     try:
         size = path.stat().st_size
@@ -260,8 +422,8 @@ def preflight(books_dir: str | Path | None = None, cache_path: str | Path | None
         if not allow_missing_cache:
             raise
         records, identity_available = [], False
-    census = corpus_census(corpus, records)
-    delta = candidates(corpus, census)
+    census = corpus_census(corpus, records, pol)
+    delta = candidates(corpus, census, pol)
     decisions = [decide_candidate(path, census) for path in delta]
     deferrals = [d for d in decisions if not d["admitted"]]
     run = run_id or datetime.now(UTC).strftime("preflight-%Y%m%dT%H%M%SZ")
@@ -423,8 +585,11 @@ def standing(policy: dict[str, Any] | None = None, books_dir: str | Path | None 
 
     rc 1 FATAL  — an unreadable input, an UNDECLARED ledger verdict, a content candidate the ledger never saw
                   (the ledger is stale: the machine half of the gate did not run), or a stale content report.
-    rc 2 OWNER  — a pair with no owner word (ledger or collapse sheet), a corpus name defect (the fix is a
-                  write), or candidates that would be deferred if this batch were ingested now.
+    rc 2 OWNER  — a pair with no owner word (ledger or collapse sheet), a corpus name defect whose class is
+                  declared OWNER-OWED (a remedy that is a WRITE: the ingest-site markers, T-173), or candidates
+                  that would be deferred if this batch were ingested now. A class declared `accepted_debt` is
+                  PRINTED and COUNTED but is not an rc 2 trigger — and only a named OWNER WORD may accept a
+                  debt (T-130 option B); anything else is a quiet green and is FATAL.
     """
     pol = policy or load_policy()
     corpus = corpus_files(books_dir)
@@ -433,6 +598,8 @@ def standing(policy: dict[str, Any] | None = None, books_dir: str | Path | None 
     collapse = collapse_debt(pol)
     content = content_debt(pol, corpus)
     patterns = {str(k): re.compile(str(v)) for k, v in pol["identity"]["name_defect_patterns"].items()}
+    dispositions = {str(k): str(v) for k, v in pol["identity"]["defect_disposition"].items()}
+    accepted_decl = pol["identity"].get("accepted_debt") or {}
     marker = re.compile(str(pol["identity"]["ingest_site_marker_pattern"]))
     defects = {k: 0 for k in patterns}
     markers = 0
@@ -442,10 +609,18 @@ def standing(policy: dict[str, Any] | None = None, books_dir: str | Path | None 
                 defects[label] += 1
         if marker.search(path.stem):
             markers += 1
+    disposition_faults = undeclared_defect_dispositions(pol)
+    # ACCEPTED DEBT IS PRINTED, COUNTED AND NOT AN rc 2 TRIGGER — and only a class whose disposition says so
+    # can land here, which is why the disposition map is read fail-closed one line above (T-130 option B).
+    accepted_debt = {k: v for k, v in defects.items() if dispositions.get(k) == ACCEPTED_DEBT and v}
+    owed_defects = {k: v for k, v in defects.items() if v and dispositions.get(k) == OWNER_OWED}
+    markers_owed = markers if dispositions.get("ingest_site_marker") == OWNER_OWED else 0
     uncovered = uncovered_candidates(content["candidate_keys"], set(ledger["all_pair_keys"]))
     delta = preflight(books_dir=books_dir, policy=pol, write_receipt=False)
     fatal: list[str] = []
     owner: list[str] = []
+    if disposition_faults:
+        fatal.append("name-defect disposition fault: " + "; ".join(disposition_faults))
     if ledger["undeclared_verdicts"]:
         fatal.append(f"ledger verdict outside the declared vocabulary: {len(ledger['undeclared_verdicts'])} pair(s)")
     if uncovered:
@@ -462,8 +637,12 @@ def standing(policy: dict[str, Any] | None = None, books_dir: str | Path | None 
             f"'{collapse['provenance_none']}'): {collapse['unprovenanced']} of {collapse['rows']} - a value in the "
             f"DERIVED column is not an owner act (BUG-786: `--apply` is the only writer that records where a word "
             f"came from, so a provenance-less word is OWED until it is expanded from a signature)")
-    if sum(defects.values()) or markers:
-        owner.append(f"corpus name defects (fix is a write): {defects} markers={markers}")
+    if owed_defects:
+        owner.append(f"corpus name defects whose class is declared OWNER-OWED (the fix is a write): {owed_defects}")
+    if markers_owed:
+        owner.append(
+            f"ingest-site markers in corpus stems: {markers_owed} - a DIFFERENT defect class than the "
+            f"whitespace debt (its remedy is the sanitizer, which would rename 571 cache names, not 37): T-173")
     if delta["deferrals"]:
         owner.append(f"candidates deferred if this batch ingested NOW: {len(delta['deferrals'])}")
     if delta["override"]:
@@ -471,7 +650,12 @@ def standing(policy: dict[str, Any] | None = None, books_dir: str | Path | None 
     rc = RC_FATAL if fatal else (RC_OWNER_OWED if owner else RC_CLEAN)
     return {"rc": rc, "fatal": fatal, "owner_owed": owner, "corpus_files": len(corpus),
             "candidates": delta["candidates"], "ledger": ledger, "collapse": collapse,
-            "content": content, "name_defects": defects, "marker_names": markers, "override": delta["override"]}
+            "content": content, "name_defects": defects, "marker_names": markers,
+            "accepted_debt": {"defects": accepted_debt, "total": sum(accepted_debt.values()),
+                              "declared_by": str(accepted_decl.get("declared_by", "")),
+                              "owner_word": str(accepted_decl.get("owner_word", "")),
+                              "reason": str(accepted_decl.get("because", ""))},
+            "record_lookup": lookup_order(pol), "override": delta["override"]}
 
 
 def gate_read(decisions: list[dict[str, Any]], policy: dict[str, Any] | None = None) -> int:

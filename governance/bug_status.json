@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 611,
-  "open_n": 225,
-  "closed_n": 386,
+  "total_ids": 612,
+  "open_n": 224,
+  "closed_n": 388,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -1024,11 +1024,6 @@
       "events": 1
     },
     {
-      "id": "BUG-799",
-      "title": "(LOW \u2014 OPEN 2026-10-15) \u2014 two cache records duplicate ONE work under two raw names, and the door looks names up by BYTES",
-      "events": 1
-    },
-    {
       "id": "BUG-800",
       "title": "(LOW \u2014 OPEN 2026-10-15) \u2014 the approved corpus-name rename is a CASCADE until it rides a re-ingest",
       "events": 1
@@ -1494,6 +1489,7 @@
     "BUG-791",
     "BUG-794",
     "BUG-798",
+    "BUG-799",
     "BUG-801",
     "BUG-804",
     "BUG-807",
@@ -1520,6 +1516,7 @@
     "BUG-842",
     "BUG-843",
     "BUG-844",
-    "BUG-847"
+    "BUG-847",
+    "BUG-848"
   ]
 }

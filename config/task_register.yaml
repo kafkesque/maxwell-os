@@ -719,7 +719,8 @@ tasks:
     (T-130), so the two tasks are one pipeline step read twice.
 - id: T-130
   priority: MUST
-  state: open
+  state: done
+  closed: '2026-10-16'
   mover: owner
   owner_word_20261016: >-
     OWNER WORD 2026-10-16: the owner approved the T-130 recommendation. The PIPELINE act is
@@ -730,6 +731,17 @@ tasks:
     THAT word - approving a recommendation is not the same act as choosing between its two
     options, and a task whose own gate says the pipeline cannot advance it must not be moved
     into the pipeline lane (gov_sync#task_faults, MEASURED 2026-10-16).
+
+    THE OWNER CHOSE (B), 2026-10-16: "T-130 ok go with B" - ACCEPT the 37 whitespace defects with the debt
+    declared, and make the acceptance SAFE through the declared canonical reader lookup and its own control.
+    LANDED the same day (D-3040): identity.record_lookup (exact_name -> exact_path -> canonical_name) resolves a
+    record the door calls defective through the SAME key it already compares with (_key); every decision records
+    WHICH lookup answered (record_resolution); the whitespace classes become declared accepted_debt (printed and
+    counted, never an rc 2 trigger) while the ingest-site markers keep owner_owed under their OWN row (T-173);
+    and an accepted class with no named OWNER WORD is FATAL rather than a default. THE DELTA RULE DID NOT FOLLOW
+    IT: MEASURED 2026-10-16, pipeline/stage0_convert.py converts the corpus MINUS the deferrals, so a file the
+    delta rule absorbs is CONVERTED rather than skipped - a trap a PRE-EXISTING control caught, now mechanised as
+    a subset fault (BUG-848). The rename itself rides a RE-INGEST (T-172).
   title: THE INGEST DOOR — the identity guarantee becomes an ENFORCEMENT POINT (delta-scoped), so a duplicate work cannot be ingested while its identity is unresolved
   why: >-
     BUG-781: the identity machinery was never missing — detect_title_renames (D-2736) + detect_same_work_content
@@ -750,6 +762,16 @@ tasks:
     files, i.e. inert on the existing corpus BY CONSTRUCTION); config/ingest_identity_gate.yaml (the ONE policy
     home); wired into pipeline/stage0_convert.py (unbypassable) + justfile#health (tri_state) + justfile#triad
     (fatal). Audit + both plans: governance/INGEST_IDENTITY_GATE_20261014.md.
+
+    MEASURED 2026-10-16 (option (B) landed, D-3040): 15/15 known-answer controls green in
+    scripts/check_ingest_identity_gate.py - five added (the canonical fallback resolves and NAMES itself; an exact
+    match still wins; a variant name stays a CANDIDATE and is deferred by the third state; a record without
+    author|title still defers on its sanitized stem; and the two acceptance refusals). INERT ON THE LIVE CORPUS,
+    which is the point: all 940 corpus files resolve by exact_name, the delta census is 0 before and after, and
+    the health line rc is UNCHANGED (2 = the 459 ingest-site markers, now T-173) while the reading prints the
+    accepted debt LOUDLY with its declaring decision. BUG-799 FIXED; BUG-848 filed and FIXED (the delta-rule trap,
+    caught by the PRE-EXISTING control a_noise_suffixed_candidate..., not by reasoning); BUG-800 re-scoped to
+    T-172 with a named trigger.
   gate: >-
     THE DOOR NOW READS A DECLARED WORD, AND ITS rc 2 NAMES THE ONE DEBT THAT REMAINS (2026-10-14). MEASURED by
     `scripts/check_ingest_identity_gate.py --gate`: ledger 59 pairs / 59 closed / 0 open; collapse sheet 84 rows
@@ -760,6 +782,14 @@ tasks:
     names are NORMALISED by a declared, deterministic renamer (plan -> apply -> receipt, every path
     byte-identical otherwise) or ACCEPTED as they stand with the debt declared. The mover stays `owner`
     because the door's own reading says so: the pipeline cannot advance this one.
+
+    RESOLVED 2026-10-16 (OWNER WORD (B)). The door now ACCEPTS the 37 whitespace defects as DECLARED DEBT and
+    carries the acceptance with a DECLARED, ORDERED lookup proved by controls in BOTH directions: the fallback
+    resolves and NAMES itself; an exact match still WINS; a variant name stays a CANDIDATE and is deferred, never
+    admitted; a genuinely new name is still ADMITTED; the weaker stem path still fires; and the three ways an
+    acceptance could be smuggled in (a class with no disposition, a token outside the vocabulary, an accepted
+    class with no owner word) all REFUSE. The marker class stays owner_owed with its own row (T-173) and the
+    deferred rename is scheduled by T-172, so nothing waits for a word and the mover is pipeline.
   owner_word_20261015: >-
     OWNER WORD 2026-10-15: the WRITE is APPROVED ("Approve your T-130 Write recommendation"). The write
     was then REFUSED BY MEASUREMENT in the same session, and the refusal is the finding: the 37 defective stems
@@ -1676,3 +1706,63 @@ tasks:
     stamp precedes the call. If the boundary cannot be hooked at all, the accepted alternative is a DECLARED wrapper
     command taught at boot (AGENTS.md#working_rules), and that must be stated as the answer rather than left implied:
     a hook that can only be documented is not a fix.
+
+- id: T-172
+  priority: SHOULD
+  state: open
+  mover: pipeline
+  title: 'THE ACCEPTED DEBT RIDES A RE-INGEST: the 37 defective corpus stems are renamed when the artifacts that
+    reference them are regenerated anyway, so the write stops being a cascade'
+  source:
+  - T-130
+  - BUG-800
+  - D-3040
+  - config/ingest_identity_gate.yaml#name_normalisation
+  why: >-
+    MEASURED 2026-10-15, ACCEPTED 2026-10-16 (owner word (B), D-3040): the rename is deterministic and
+    byte-preserving, and it still CANNOT be applied against a live corpus - the 37 stems are referenced 2,952
+    times INSIDE 13 derived artifacts (the parquet export 2,419; the stage0/2/4/5 checkpoints and their
+    input_fbs), which are RUN RECEIPTS and cannot be rewritten without re-recording history (D-2642). The plan
+    is written and waiting: governance/normalise_corpus_names_plan_20261015.json (apply_ready False, each row
+    naming its referencing artifact). The act becomes non-cascading exactly when those artifacts are regenerated
+    anyway, so the trigger is a RE-INGEST rather than a calendar - and the deferral is a SCHEDULE a later reader
+    can find, not a silence.
+  evidence: >-
+    MEASURED 2026-10-16: apply_ready False with 37/37 rows refused, each naming its referencing artifact; and
+    the identity layer is now ready for the rename - identity.record_lookup (landed with D-3040) resolves a
+    record canonically, so a renamed file whose cache record still carries the old name is DEFERRED
+    (already_ingested_by_canonical_name, skipped in place) instead of being re-ingested.
+  gate: >-
+    at the next re-ingest, `python3 scripts/normalise_corpus_names.py --plan` reads apply_ready True, the 37
+    rows are renamed through the writer of record with a receipt, and the door census before/after shows the
+    same identity count and 0 delta candidates. Until then the debt is DECLARED
+    (config#identity.accepted_debt): the refusal IS the finding, not a failure.
+
+- id: T-173
+  priority: SHOULD
+  state: open
+  mover: owner
+  title: 'THE INGEST-SITE MARKER CLASS: 459 corpus stems still carry a mirror marker, and the door keeps them
+    OWNER-OWED rather than widening the whitespace act to cover them'
+  source:
+  - T-130
+  - D-3040
+  - config/ingest_identity_gate.yaml#identity.defect_disposition
+  why: >-
+    MEASURED 2026-10-16: 459 of 940 corpus stems match the declared ingest_site_marker_pattern (571 of 962
+    cache names carry one). The door COUNTS them, and T-130 option (B) deliberately did NOT widen its
+    whitespace-only act to cover them: the remedy here is the sanitizer (sanitize_source_book), which would
+    rename 571 names instead of 37 - a different defect with a different blast radius, and widening a bounded
+    repair into a corpus-wide rewrite is how drift starts. So the class keeps a disposition of its own
+    (owner_owed) and ITS OWN ROW rather than riding a fix that never covered it - a debt the door counts and no
+    row owns is the T-131..T-137 fault.
+  evidence: >-
+    MEASURED 2026-10-16: config#identity.defect_disposition pins ingest_site_marker: owner_owed; the door
+    prints the count in its own reading and in `just health` (rc 2, tri_state, not fatal); and a class with no
+    declared disposition is FATAL, so this debt cannot be quietly accepted by accident (control
+    a_defect_class_with_no_declared_disposition_is_fatal_not_silently_accepted).
+  gate: >-
+    the owner decides ONE of two and the row closes on that word: (i) ACCEPT with the debt declared - the marker
+    is storage noise the door's key already strips, so no identity is at stake; or (ii) SANITISE the class
+    through the declared sanitizer riding the same next re-ingest as T-172, with a census before/after and a
+    receipt. No third state: the class may not stay counted-and-unowned.

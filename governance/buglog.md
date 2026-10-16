@@ -8,20 +8,20 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1167 decisions (census stamp 91cfc625670e3cbc, 2026-10-16) · 611 bugs (225 open / 386 closed; highest OPEN = BUG-846) · 48 open tasks (MUST 13 / SHOULD 30 / WORTH 4; OWNER-moved 2, pipeline-moved 46; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1168 decisions (census stamp 62465b489ede188f, 2026-10-16) · 612 bugs (224 open / 388 closed; highest OPEN = BUG-846) · 49 open tasks (MUST 12 / SHOULD 32 / WORTH 4; OWNER-moved 2, pipeline-moved 47; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **79** of 1167 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 582 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1167, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **79** of 1168 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 583 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1168, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 225 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 34 · 🟨 MED 61 · 🟩 LOW 25 · UNLABELLED 101 (BUG-757) of 225 open.
+> Open BUGS by severity (population = the census's 224 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 34 · 🟨 MED 61 · 🟩 LOW 24 · UNLABELLED 101 (BUG-757) of 224 open.
 >
 > **OWNER LANE (2) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
-> | T-130 | 🔴 MUST | THE INGEST DOOR — the identity guarantee becomes an ENFORCEMENT POINT (delta-scoped), so a duplicate work cann | THE DOOR NOW READS A DECLARED WORD, AND ITS rc 2 NAMES THE ONE DEBT TH |
+> | T-173 | 🟠 SHOULD | THE INGEST-SITE MARKER CLASS: 459 corpus stems still carry a mirror marker, and the door keeps them OWNER-OWED | the owner decides ONE of two and the row closes on that word: (i) ACCE |
 > | T-138 | COULD | HARNESS ADOPTION ON DEMAND - one command per tool, and none of them load-bearing | install a harness only when a specific job needs it (C28). The engine  |
 >
-> **PIPELINE LANE (46) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
+> **PIPELINE LANE (47) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
 >
 > | id | pri | state | task | evidence |
 > |---|---|---|---|---|
@@ -38,7 +38,7 @@
 > | T-150 | 🔴 MUST | 🔴 open | THE DURABLE PATH IS THE DELEGATION PATH (D-3020): anything whose failure is not free goes through pipeline/sub | temp/runs/fanout_20261015i/98_receipt.json - 3/3 DONE with one task deliberately given a 1 |
 > | T-157 | 🔴 MUST | 🔴 open | CENSUS THE HARNESS HOMES A DECISION NAMES, so a reversal of a ruled remedy is a READING and not a discovery | MEASURED 2026-10-15: ~/.config/goose/config.yaml:311 reads active_provider: custom_deepsee |
 >
-> _the face is a VIEW: 12 of 46 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
+> _the face is a VIEW: 12 of 47 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
 >
 > **STANDING RULES — in effect, never close (1):**
 >
@@ -14021,7 +14021,9 @@ that reported clean (the BUG-787 shape: a control reading the wrong surface stay
 (a content reference IS counted; a filename match with no content reference is NOT). The plan now reads
 `apply_ready: False` with all 37 rows refused and the artifact named per row.
 
-## BUG-799 (LOW — OPEN 2026-10-15) — two cache records duplicate ONE work under two raw names, and the door looks names up by BYTES
+## BUG-799 (LOW — FIXED 2026-10-16) — two cache records duplicate ONE work under two raw names, and the door looks names up by BYTES
+
+**Status:** FIXED 2026-10-16 (remedy T-130 option (B) / D-3040, LANDED). MEASURED 2026-10-16, this session.
 
 MEASURED 2026-10-15 on the 962-record metadata cache: exactly 2 canonical keys hold more than one distinct
 raw `source_book` — `Identity Designed The Definitive Guide to Visual Branding by David Airey` and
@@ -14030,11 +14032,27 @@ difference. Both pairs carry the SAME author and title, so both compute the SAME
 (`bdb3a25d5707fafc`, `a4d8aacdbca22099`): the collapse is IDENTITY-PRESERVING and merges no distinct work
 (910 distinct source_ids survive; 962 -> 960 records).
 
+**WHY IT MATTERED MORE THAN IT LOOKED.** The door declared 37 corpus names DEFECTIVE (whitespace) while depending
+on those same defective BYTES to find their identity: a declaration the reader cannot RESOLVE (D-3034). Accepting
+the names without fixing the reader would have frozen a contradiction in place — and, as the control below
+measured, the obvious way to fix it (routing the DELTA rule through the canonical lookup) is WORSE than the defect.
+
 The defect is in the READER, not the corpus: `ingest_gate.corpus_census.record_for()` resolves a record by
 `by_name.get(path.name.strip())` and `by_path` — exact bytes, minus the ends — while the door's own
 comparison key `_key()` already collapses whitespace. So the door declares 37 corpus names DEFECTIVE and
 then depends on their exact bytes to find their identity. The durable fix is one canonical fallback in that
 lookup, and it needs a control of its own before it lands (BUG-492). Deliberately NOT applied this session.
+
+**FIXED 2026-10-16 (T-130 option B / D-3040).** MEASURED, not reasoned: the lookup is now DECLARED and ORDERED
+(config#identity.record_lookup: exact_name -> exact_path -> canonical_name), the first lookup that answers wins, and
+every decision records WHICH one did (`record_resolution`), so a receipt carries the EVIDENCE of how an identity was
+found rather than the assumption. The canonical key IS the door's own `_key()`, so the door now resolves the identity
+it was already comparing against. INERT ON THE LIVE CORPUS, which is the point: all 940 corpus files resolve by
+exact_name, the delta census is 0 before and after, the health line's rc is unchanged (2 = the 459 ingest-site
+markers, now T-173), and the accepted debt is printed LOUDLY with its declaring decision. Two controls hold it in
+both directions (the fallback resolves and NAMES itself; an exact match still WINS). The second half of the defect —
+two cache records duplicating one work — is IDENTITY-PRESERVING and merges no distinct work (910 distinct ids
+survive 962 records), so it stays a recorded reading rather than a repair; the rename act is T-172.
 
 ## BUG-800 (LOW — OPEN 2026-10-15) — the approved corpus-name rename is a CASCADE until it rides a re-ingest
 
@@ -14045,6 +14063,14 @@ cache (which it CAN do) but cannot rewrite a receipt without re-recording histor
 REFUSES: `apply_ready: False`, 37/37 rows refused, each naming its artifact. The plan is written and
 waiting: `governance/normalise_corpus_names_plan_20261015.json`. The act becomes non-cascading when the
 artifacts are regenerated anyway, i.e. BUNDLED WITH A RE-INGEST — not against a live corpus.
+
+**ACCEPTED AND SCHEDULED 2026-10-16 (T-130 option (B), owner word; D-3040).** The debt is now DECLARED
+(config#identity.accepted_debt, owner word quoted) and the act RIDES THE NEXT RE-INGEST as a SCHEDULE with a NAMED
+owner: T-172. The state of this bug is therefore unchanged and honest — the defect is real and unfixed — but it can no
+longer be mistaken for an unowned silence: the door prints the debt, the register owns its trigger, and the day the
+artifacts are regenerated the same plan becomes apply-ready. The identity layer is already prepared for that day:
+with `identity.record_lookup` a renamed file whose cache record still carries the old name is DEFERRED
+(`already_ingested_by_canonical_name`, skipped in place) instead of being re-ingested.
 
 ## BUG-801 (LOW — FIXED 2026-10-15, same session) — a prefill reading was published without the prompt SIZE it was taken at
 
@@ -15377,3 +15403,37 @@ SYMPTOM: `python3 scripts/r5_review_gate.py --file scripts/delegate_journal.py` 
 ROOT CAUSE: the sweep reached its sibling through `import model_store_census`, made importable by a late `sys.path.insert(0, ROOT / "pipeline")`. To a static reader a BARE module name reached that way is indistinguishable from a package nobody declared, so C11 was RIGHT to refuse it: the defect was the FORM of the import, not the gate. The repository already declares the package form (`pipeline/stage0_convert.py`: `from pipeline import ingest_gate`) and the sweep did not use it.
 
 REMEDY: `from pipeline import model_store_census as census` with the repository root on the path, and the two import statements ordered and separated as ruff's I001 requires; C11 now reads 123 files with every import declared. THE SECOND LIMB IS THE ONE WORTH KEEPING: a C11 finding on a NEW file is only ever caught when that file is next reviewed or staged, so it can sit in the tree for a sitting - it was found here by a review of an unrelated file. The commit-boundary gate and the R5 review gate both read it for anything that touches the file again, so the remedy is recorded as a discipline (review a new file before it lands, not only before it is edited) rather than as a new rail.
+
+
+## BUG-848 (MED — FIXED 2026-10-16) — the obvious way to fix the reader WOULD HAVE CONVERTED DUPLICATE WORKS: routing the DELTA rule through the canonical lookup makes a file the gate never decides, never records and never skips
+
+**Status:** FIXED 2026-10-16 (same session, found by a PRE-EXISTING control, mechanised so it cannot return). MEASURED 2026-10-16.
+
+SYMPTOM: the first landing of T-130 option (B) routed CANDIDACY through the same canonical lookup the decision uses,
+which looked like consistency ("one rule, both readers"). The pre-existing control
+`a_noise_suffixed_candidate_collapses_to_its_corpus_stem_and_is_deferred` went RED: `corpus name defects` counts
+unchanged, delta still 0, but a noise-suffixed duplicate of an ingested work was no longer a candidate AT ALL.
+
+ROOT CAUSE (MEASURED in `pipeline/stage0_convert.py:202`): stage0 computes the books it converts as the corpus MINUS
+`report["deferrals"]` — the set this door NAMES. A file the delta rule absorbs is therefore never decided, never named
+in the deferral receipt and never skipped: it is CONVERTED, i.e. ingested as a second work under a second name — the
+outcome BUG-780 measured 530 rows of — while the door's own reading still said `0 candidates`. The delta rule is about
+VISIBILITY; the canonical lookup is about IDENTITY. Sharing one implementation is right; sharing one RULE is a hole.
+
+WHY NO RAIL CAUGHT IT: every READING stayed green (0 candidates, rc unchanged, counts unchanged). The only thing that
+moved was a CONTROL, and only because the control asserted a REASON and not a count — the same shape as BUG-787/798
+(a reading on the wrong surface stays green).
+
+FIX (three parts, none of them documentation): (1) candidacy is its own DECLARED key
+(`config#identity.candidate_lookup`: exact_name, exact_path) and `candidate_lookup()` REFUSES a list that is not a
+SUBSET of `record_lookup` — so the only way back into the trap is a config edit that fails closed; (2) the same edit
+exposed a THIRD DEFERRAL STATE the pre-B door could not reach: a candidate whose record is found ONLY by a non-exact
+lookup is a work the store ALREADY HOLDS (the corpus holds it under a variant name, or the file IS the record's file
+renamed, its recorded `source_path` gone) — it is now DEFERRED (`already_ingested_by_canonical_name`, naming the record
+it matched) rather than admitted, which is what makes T-172's rename safe; (3) the weaker path stays ALIVE by control:
+a record with no author|title still defers on its sanitized stem (a control that proves only the new path can pass
+while the old one dies silently is not a control, BUG-492).
+
+ACKNOWLEDGED LIMIT: the four deferral REASONS (`same_work_identity`, `same_sanitized_stem`, `byte_identical`,
+`already_ingested_by_canonical_name`) are code-level tokens, not a declared vocabulary; a future hardening could
+declare them, and this entry records that they are not declared rather than implying that they are.

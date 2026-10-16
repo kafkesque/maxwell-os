@@ -13,13 +13,13 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1161 decisions (census stamp 118ef597a2298fa9, 2026-10-16) · 604 bugs (224 open / 380 closed; highest OPEN = BUG-840) · 46 open tasks (MUST 13 / SHOULD 28 / WORTH 4; OWNER-moved 11, pipeline-moved 35; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1162 decisions (census stamp 7818ed237e3d288d, 2026-10-16) · 606 bugs (223 open / 383 closed; highest OPEN = BUG-836) · 45 open tasks (MUST 13 / SHOULD 27 / WORTH 4; OWNER-moved 10, pipeline-moved 35; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **80** of 1161 — 🔴 open 32 · 🔵 proposed 27 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 576 · ⚖ ratified 145 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1161, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **80** of 1162 — 🔴 open 32 · 🔵 proposed 27 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 577 · ⚖ ratified 145 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1162, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 224 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 34 · 🟨 MED 61 · 🟩 LOW 24 · UNLABELLED 101 (BUG-757) of 224 open.
+> Open BUGS by severity (population = the census's 223 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 34 · 🟨 MED 60 · 🟩 LOW 24 · UNLABELLED 101 (BUG-757) of 223 open.
 >
-> **OWNER LANE (11) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
+> **OWNER LANE (10) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
@@ -31,11 +31,10 @@
 > | T-135 | 🟠 SHOULD | BIND the harness context contract - adopt the executor so the ratified knobs are in the environment, not in a  | the OWNER adopts the binding in the shell that starts the harness; the |
 > | T-137 | 🟠 SHOULD | PIN the agent_loop model and prove the tiered cache with an A/B | THE OWNER DECIDES WHEN THE ENGINE MAY BE FLAPPED: the A/B needs one ro |
 > | T-140 | 🟠 SHOULD | ADOPT THE FAN-OUT EXECUTOR for everyday scaffolding and debugging, capped and cross-verified | the owner names the first real fan-out task: the executor needs a task |
-> | T-142 | 🟠 SHOULD | BYTE-OWNER AUDIT of the DECLARED bucket: 59.7 GB whose only claim to be on disk is a mention | pipeline: re-run the census with a RESOLUTION test (does a served entr |
 > | T-145 | 🟠 SHOULD | EDGE0 IS DEFERRED WITH A NAMED TRIGGER, not fetched: the class is already served and the role is blocked on me | OWNER: say 'fetch Edge0' to override, or leave it deferred until T-137 |
 > | T-138 | COULD | HARNESS ADOPTION ON DEMAND - one command per tool, and none of them load-bearing | install a harness only when a specific job needs it (C28). The engine  |
 >
-> **PIPELINE LANE (35) — what the agent will do next, in strategic-consequential order (source: config/task_register.yaml):**
+> **PIPELINE LANE (35) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
 >
 > | id | pri | state | task | evidence |
 > |---|---|---|---|---|
@@ -51,6 +50,8 @@
 > | T-147 | 🔴 MUST | 🔴 open | WIRE THE STORE CENSUS TO EVERY DELETION BATCH: it is a generated face, and it lies the moment bytes move witho | MEASURED 2026-10-15: the census IS generated (pipeline/model_store_census.py: dir_bytes, m |
 > | T-150 | 🔴 MUST | 🔴 open | THE DURABLE PATH IS THE DELEGATION PATH (D-3020): anything whose failure is not free goes through pipeline/sub | temp/runs/fanout_20261015i/98_receipt.json - 3/3 DONE with one task deliberately given a 1 |
 > | T-157 | 🔴 MUST | 🔴 open | CENSUS THE HARNESS HOMES A DECISION NAMES, so a reversal of a ruled remedy is a READING and not a discovery | MEASURED 2026-10-15: ~/.config/goose/config.yaml:311 reads active_provider: custom_deepsee |
+>
+> _the face is a VIEW: 12 of 35 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
 >
 > **STANDING RULES — in effect, never close (1):**
 >
@@ -74,6 +75,8 @@
 > | D274b | OPEN | RETRIEVAL / ONTOLOGY | ROLE is the highest-leverage axis, not a decorative one (D-274b) |
 > | D273h | OPEN | LABEL QUALITY / MEASUREMEN | Cross the ruler strata with status and always report both frames (D-273h) |
 > | D273g | OPEN | RETRIEVAL / ONTOLOGY | A chunk/evidence leg IS worth it -- at step 8, and only after the filters constrain (D-273g) |
+>
+> _the face is a VIEW: 12 of 80 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
 >
 > **Open bugs, most severe first:** 🟥 BUG-297 · 🟥 BUG-299 · 🟥 BUG-305 · 🟥 BUG-712 · 🟧 BUG-300 · 🟧 BUG-301 · 🟧 BUG-303 · 🟧 BUG-304 · 🟧 BUG-306 · 🟧 BUG-312 · 🟧 BUG-318 · 🟧 BUG-341.
 <!-- GOV-INDEX:END -->

@@ -929,7 +929,7 @@ tasks:
   title: "THE STORE CENSUS AND THE RECLAIM PROPOSAL - decide what leaves the disk, and stop treating a parked symlink as a model"
   source: BUG-804; BUG-807; BUG-808; D-3004; pipeline/model_store_census.py; governance/model_store_census_20261015.json
   gate: 'the OWNER decides what leaves the disk; the census only proposes and pipeline/safe_delete.py is the only deleter (R-D410)'
-  evidence: 'MEASURED 2026-10-15 - ORPHAN 19 repos / 18056.8 MB; LIVE 7 / 74261.2 MB; DECLARED 26 / 59755.8 MB; five of six _unloaded entries are BROKEN because their hub repos are ABSENT; a 4.0 GB stale hub copy of Qwen3.8-27B sits beside the 15 GB directory the engine actually serves. RE-MEASURED 2026-10-16 with the same instrument (python3 pipeline/model_store_census.py): ORPHAN 8 repo(s) / 267.9 MB, LIVE 7 / 66651.0 MB, DECLARED 29 / 57918.6 MB, hub total 124837.5 MB, BROKEN entries: none, rc=0 - the earlier figures are kept above as history, and the decision this gate asks for is SMALLER than it was. A gate decided against stale bytes would be a decision about bytes that are gone (the D-2941 corollary: no metric may be quoted after its instrument has been invalidated). RESOLVED 2026-10-16 (T-136/D-3033). (a) THE OWNER LANE IS EMPTY BY THE SYSTEM OWN RATIFIED RULE, not by a judgement - config/engine.yaml#model_store.deletion_floor_bytes is 268435456 B (256 MiB) and D-3018 applies it PER REPO (a repo at or below it is NOT swept), so EVERY one of the 6 models the corrected census reports in ORPHAN is at or below the floor; the largest is typeform/distilbert-base-uncased-mnli at 267836416 B (255.4 MiB), a repo D-3018 already names as surviving the FLOOR rather than by usefulness. Owner-owed candidates ABOVE the floor - 0, 0.0 MB, rc 0. (b) NOTHING IS DELETED AND NOTHING IS HIDDEN - the six candidates stay REPORTED in the live line and in governance/model_store_census_20261015.json (below_floor_not_offered), and the rail returns rc 2 the moment a candidate crosses the floor, so the owner word remains available at any time and this gate is preserved rather than waived. (c) STOP TREATING A PARKED SYMLINK AS A MODEL IS LANDED (BUG-838/D-3033) - the partition DOMAIN is now DECLARED and read, so .locks, version.txt, CACHEDIR.TAG and the hub own blob root can never enter ORPHAN, the only class a deletion may be proposed from (D-3004(3)); a dataset repo can never be a candidate (D-3014(2), previously true only because a citation happened to exist); and an entry of no declared kind is a FAULT rather than a silent candidate. (d) MEASURED AFTER - ORPHAN 6 repo(s) / 267.9 MB of model repos only (was 8 repo(s), of which 2 were the hub own machinery); DECLARED 20 (was 29 - the 9 non-models removed); hub total 124837.5 MB unchanged; undeclared entries none; the instrument now carries 13 known-answer controls where it had none.'
+  evidence: 'MEASURED 2026-10-15 - ORPHAN 19 repos / 18056.8 MB; LIVE 7 / 74261.2 MB; DECLARED 26 / 59755.8 MB; five of six _unloaded entries are BROKEN because their hub repos are ABSENT; a 4.0 GB stale hub copy of Qwen3.8-27B sits beside the 15 GB directory the engine actually serves. RE-MEASURED 2026-10-16 with the same instrument (python3 pipeline/model_store_census.py): ORPHAN 8 repo(s) / 267.9 MB, LIVE 7 / 66651.0 MB, DECLARED 29 / 57918.6 MB, hub total 124837.5 MB, BROKEN entries: none, rc=0 - the earlier figures are kept above as history, and the decision this gate asks for is SMALLER than it was. A gate decided against stale bytes would be a decision about bytes that are gone (the D-2941 corollary: no metric may be quoted after its instrument has been invalidated). RESOLVED 2026-10-16 (T-136/D-3033). (a) THE OWNER LANE IS EMPTY BY THE SYSTEM OWN RATIFIED RULE, not by a judgement - config/engine.yaml#model_store.deletion_floor_bytes is 268435456 B (256 MiB) and D-3018 applies it PER REPO (a repo at or below it is NOT swept), so EVERY one of the 6 models the corrected census reports in ORPHAN is at or below the floor; the largest is typeform/distilbert-base-uncased-mnli at 267836416 B (255.4 MiB), a repo D-3018 already names as surviving the FLOOR rather than by usefulness. Owner-owed candidates ABOVE the floor - 0, 0.0 MB, rc 0. (b) NOTHING IS DELETED AND NOTHING IS HIDDEN - the six candidates stay REPORTED in the live line and in governance/model_store_census_20261015.json (below_floor_not_offered), and the rail returns rc 2 the moment a candidate crosses the floor, so the owner word remains available at any time and this gate is preserved rather than waived. (c) STOP TREATING A PARKED SYMLINK AS A MODEL IS LANDED (BUG-838/D-3033) - the partition DOMAIN is now DECLARED and read, so .locks, version.txt, CACHEDIR.TAG and the hub own blob root can never enter ORPHAN, the only class a deletion may be proposed from (D-3004(3)); a dataset repo can never be a candidate (D-3014(2), previously true only because a citation happened to exist); and an entry of no declared kind is a FAULT rather than a silent candidate. (d) MEASURED AFTER - ORPHAN 6 repo(s) / 267.9 MB of model repos only (was 8 repo(s), of which 2 were the hub own machinery); DECLARED 20 (was 29 - the 9 non-models removed); hub total 124837.5 MB unchanged; undeclared entries none; the instrument now carries 13 known-answer controls where it had none. RE-MEASURED 2026-10-16 (T-142/D-3034, the DECLARED class became a RESOLUTION test rather than a mention index): the readings quoted above are the reading of the MENTION instrument and are kept as HISTORY; under the resolution instrument LIVE 6 / PARKED 1 / DECLARED 13 / ORPHAN 13 (676.8 MB) / owner-owed 0, hub total 124837.5 MB unchanged. The conclusion of (a) is UNCHANGED and now rests on a stronger reading - the lane is empty by RESOLUTION as well as by the floor - and the five repos the floor had been protecting without naming are now NAMED in the audit.'
 - id: T-137
   priority: SHOULD
   state: open
@@ -1004,9 +1004,15 @@ tasks:
     two-process attempt where the second refuses.'
 - id: T-142
   priority: SHOULD
-  state: open
-  mover: owner
-  title: "BYTE-OWNER AUDIT of the DECLARED bucket: 59.7 GB whose only claim to be on disk is a mention"
+  state: done
+  closed: '2026-10-16'
+  mover: pipeline
+  # MEASURED 2026-10-16: this task was registered mover: owner while its own gate BEGAN with "pipeline: ...". The
+  # register's schema refuses a pipeline-moved task whose gate names the owner (task_faults), and that refusal is
+  # correct: the AUDIT is the pipeline act (an instrument plus a per-repo report) while a deletion batch is a
+  # separate, separately gated act (D-3010) that T-147 wires. So the two halves are now declared as two facts
+  # instead of one task carrying both - and the measurement below shows the second half is EMPTY today.
+  title: "BYTE-OWNER AUDIT of the DECLARED bucket: what DECLARES a byte, and whether it can come back (a RESOLUTION test, not a mention)"
   source: BUG-814; D-3010; governance/model_store_census_20261015.json; governance/DELETION_RECEIPT_20261015.json
   evidence: 'MEASURED 2026-10-15: three findings the census could not see because it classifies by NAME. (1) the hub
     holds 5.4 GB as a SECOND copy of Phi-4-mini-instruct-8bit while the model the engine serves is a real directory in
@@ -1014,10 +1020,28 @@ tasks:
     mlx-community 4bit, keXjos 9B, pooyakn73 and xy10086 9B distills) - a name that resolves to no weight at all.
     (3) DECLARED also contains pplx-decider-v1.1-27b-4bit 14 GB, clef-4bit 8.2 GB and clef-flash-4bit 5.8 GB, none
     of them served. BAAI--bge-m3 4.3 GB is NOT in scope until the sentence-transformers path is checked against the
-    Ollama path (deleting the live embedder would be a self-inflicted outage).'
-  gate: 'pipeline: re-run the census with a RESOLUTION test (does a served entry, config value or script resolve into
-    these bytes?) and report per repo: resolution, bytes, re-acquirability. Deletion follows D-3010 and needs the
-    owner word per batch.'
+    Ollama path (deleting the live embedder would be a self-inflicted outage). RESOLVED 2026-10-16 (T-142/D-3034).
+    The RESOLUTION test is LANDED in pipeline/model_store_census.py, and the rule that decides one has ONE home -
+    config/engine.yaml#model_store.resolution_domain - READ at import and FATAL when absent or empty: DECLARED is
+    conferred only by an ENGINE ENTRY whose realpath lies inside the repo dir, a VALUE that IS the reference (the
+    full org/name or the bare name - a sentence is never equal to a model id) or a PATH that EXISTS inside it, while
+    a string that merely CONTAINS a name is recorded as a MENTION that confers nothing (D-3018). The reader EXCLUDES
+    its own file through a DECLARED list, so the instrument own vocabulary cannot declare a byte (BUG-838 limb 3,
+    generalised). The audit prints, per repo: verdict, bytes, the resolution evidence with its home and key path or
+    line number, the mentions NOT counted, and re-acquirability (FETCHABLE-BY-ID when the cache entry carries the
+    declared refs marker, LOCAL-ONLY otherwise). MEASURED AFTER 2026-10-16: LIVE 6 / PARKED 1 / DECLARED 13 /
+    ORPHAN 13 (676.8 MB, every member at or below the declared 268435456 B floor; the largest is
+    typeform/distilbert-base-uncased-mnli at 267836416 B) / owner-owed 0 repo(s); hub total 124837.5 MB unchanged.
+    The three findings of 2026-10-15 are answered rather than narrated: (1) the hub copy of Phi-4-mini-instruct-8bit
+    is NOT redundant - the two inventories differ (27 files / 9872601143 B beside 14 files / 4097978555 B), so
+    NOTHING is offered for it, and BUG-841 is fixed (LIVE had been decided by NAME ACROSS STORES); (2) the five
+    12-24 KB stubs are ORPHAN and below the floor; (3) pplx-decider, clef-4bit and clef-flash-4bit each resolve by a
+    code constant or a value in config/pipeline_config.yaml, and all three are FETCHABLE-BY-ID. Controls 13 -> 24.
+    The gated half of this task (a deletion batch under D-3010) is EMPTY by measurement and stays wired via T-147.'
+  gate: 'pipeline: the census carries a RESOLUTION test - does a served entry, a config value or a code constant
+    resolve INTO these bytes - and reports per repo: resolution, bytes, re-acquirability. LANDED 2026-10-16 with 24
+    known-answer controls; a deletion batch is a separate act and is not part of this task (T-147 wires the face, and
+    pipeline/safe_delete.py remains the only deleter, R-D410).'
 - id: T-143
   priority: MUST
   state: open

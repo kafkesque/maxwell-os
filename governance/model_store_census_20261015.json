@@ -1,29 +1,668 @@
 {
  "below_floor_not_offered": [
   "models--typeform--distilbert-base-uncased-mnli",
+  "models--minishlab--potion-base-32M",
+  "models--cross-encoder--ms-marco-MiniLM-L-6-v2",
+  "models--sentence-transformers--all-MiniLM-L6-v2",
+  "models--Qdrant--all-MiniLM-L6-v2-onnx",
+  "models--google--flan-t5-base",
   "models--pooyakn73--Qwen3.8-9B-Distill-MTPLX-Q6G64",
   "models--xy10086--Qwen3.8-9B-Distill-Uncensored-Heretic-MTPLX-Q6G64",
+  "models--StargazerLabs--Qwen3.8-23B-Mini-Me-4bit",
   "models--lmstudio-community--Qwen3.8-27B-MLX-6bit",
   "models--mlx-community--Qwen3.8-27B-4bit",
-  "models--keXjos--Qwen3.8-9B-mlx-4Bit"
+  "models--keXjos--Qwen3.8-9B-mlx-4Bit",
+  "models--Pluto-AI-Labs--Qwen3.8-27B-MLX"
  ],
  "broken_entries": [],
  "buckets": {
   "DECLARED": {
-   "bytes": 56432.8,
-   "n": 20
+   "bytes": 56023.9,
+   "n": 13
   },
   "LIVE": {
-   "bytes": 66651.0,
-   "n": 7
-  },
-  "ORPHAN": {
-   "bytes": 267.9,
+   "bytes": 60876.4,
    "n": 6
   },
+  "ORPHAN": {
+   "bytes": 676.8,
+   "n": 13
+  },
   "PARKED": {
+   "bytes": 5774.6,
+   "n": 1
+  }
+ },
+ "byte_owner_audit": {
+  "models--BAAI--bge-m3": {
+   "bytes": 4564.4,
+   "engine_entries": [],
+   "mentions": [
+    "config/decisions.yaml#decisions.[1061].decision",
+    "config/decisions.yaml#decisions.[1061].title",
+    "config/decisions.yaml#decisions.[106].description",
+    "config/decisions.yaml#decisions.[1145].decision",
+    "config/decisions.yaml#decisions.[257].summary",
+    "config/decisions.yaml#decisions.[295].description",
+    "config/decisions.yaml#decisions.[298].description",
+    "config/decisions.yaml#decisions.[33].description",
+    "config/decisions.yaml#decisions.[35].description",
+    "config/decisions.yaml#decisions.[364].summary",
+    "config/decisions.yaml#decisions.[37].description",
+    "config/decisions.yaml#decisions.[48].description"
+   ],
+   "n_mentions": 53,
+   "re_acquirable": "FETCHABLE-BY-ID",
+   "resolution": [
+    "code:pipeline/coverage_check.py:32",
+    "code:pipeline/pipeline_paths.py:578",
+    "code:pipeline/pipeline_paths.py:582",
+    "code:pipeline/pipeline_paths.py:690",
+    "code:pipeline/pipeline_paths.py:692",
+    "code:pipeline/stage1_5_domain_cluster.py:44",
+    "code:pipeline/stage4_merge.py:819",
+    "code:pipeline/stage5_verify.py:328",
+    "code:pipeline/stage5_verify.py:640",
+    "code:scripts/smoke_bug623_dependencies.py:21",
+    "code:scripts/test_matryoshka_nli.py:147",
+    "value:config/model_assignments.yaml#roles.EMBEDDINGS.model"
+   ],
+   "verdict": "DECLARED"
+  },
+  "models--BAAI--bge-reranker-v2-m3": {
+   "bytes": 2293.2,
+   "engine_entries": [],
+   "mentions": [
+    "config/decisions.yaml#decisions.[33].description",
+    "config/decisions.yaml#decisions.[610].description",
+    "config/decisions.yaml#decisions.[656].description",
+    "config/decisions.yaml#decisions.[850].decision",
+    "scripts/benchmark_domain_taxonomy_match.py:210",
+    "scripts/benchmark_domain_taxonomy_match.py:214"
+   ],
+   "n_mentions": 6,
+   "re_acquirable": "FETCHABLE-BY-ID",
+   "resolution": [
+    "code:pipeline/rerank.py:35",
+    "code:scripts/benchmark_domain_taxonomy_match.py:39",
+    "value:config/pipeline_config.yaml#rerank.model"
+   ],
+   "verdict": "DECLARED"
+  },
+  "models--BAAI--bge-small-en-v1.5": {
+   "bytes": 134.5,
+   "engine_entries": [],
+   "mentions": [
+    "config/decisions.yaml#decisions.[1145].decision"
+   ],
+   "n_mentions": 1,
+   "re_acquirable": "FETCHABLE-BY-ID",
+   "resolution": [
+    "code:pipeline/stage1_5_domain_cluster.py:44",
+    "code:pipeline/stage1_5_fastembed.py:47"
+   ],
+   "verdict": "DECLARED"
+  },
+  "models--MoritzLaurer--DeBERTa-v3-large-mnli-fever-anli-ling-wanli": {
+   "bytes": 4136.1,
+   "engine_entries": [],
+   "mentions": [
+    "config/decisions.yaml#decisions.[1090].decision",
+    "config/decisions.yaml#decisions.[850].decision"
+   ],
+   "n_mentions": 2,
+   "re_acquirable": "FETCHABLE-BY-ID",
+   "resolution": [
+    "code:pipeline/pipeline_paths.py:426",
+    "code:scripts/smoke_bug623_dependencies.py:20",
+    "value:config/generator_pins.yaml#pins.[4].repo",
+    "value:config/generator_pins.yaml#pins.[4].served_as",
+    "value:config/pipeline_config.yaml#models.nli_large",
+    "value:config/pipeline_config.yaml#pipeline_manifest.models.nli",
+    "value:config/pipeline_config.yaml#stage5.nli_model"
+   ],
+   "verdict": "DECLARED"
+  },
+  "models--MoritzLaurer--bge-m3-zeroshot-v2.0": {
+   "bytes": 3429.5,
+   "engine_entries": [],
+   "mentions": [
+    "config/decisions.yaml#decisions.[1145].decision",
+    "config/decisions.yaml#decisions.[33].description",
+    "scripts/benchmark_domain_taxonomy_match.py:221"
+   ],
+   "n_mentions": 3,
+   "re_acquirable": "FETCHABLE-BY-ID",
+   "resolution": [
+    "code:scripts/benchmark_domain_taxonomy_match.py:40"
+   ],
+   "verdict": "DECLARED"
+  },
+  "models--Pluto-AI-Labs--Qwen3.8-27B-MLX": {
    "bytes": 0.0,
-   "n": 0
+   "engine_entries": [],
+   "mentions": [
+    "config/agent_context.yaml#candidates_20261015.measured_agent_loop_capable.[1]",
+    "config/agent_context.yaml#candidates_20261015b.delete_candidates_pending_a_blob_aware_census.[1]",
+    "config/agent_context.yaml#routing.measured_routable_20261014.pipeline_batch.[3]",
+    "config/agreement_floor.yaml#panels.depth_axis_panel.ingest.column_by_coder.raw_qwen38",
+    "config/agreement_floor.yaml#panels.depth_axis_panel.rater_columns.[0]",
+    "config/anchor_cross_exam.yaml#sources.[1].id",
+    "config/bench_preflight.yaml#environment.expected_models.[4]",
+    "config/claim_shape_instrument.yaml#elicitors.declared.[0]",
+    "config/claim_shape_instrument.yaml#elicitors.primary",
+    "config/decisions.yaml#decisions.[1127].evidence",
+    "config/decisions.yaml#decisions.[621].description",
+    "config/decisions.yaml#decisions.[71].description"
+   ],
+   "n_mentions": 49,
+   "re_acquirable": "FETCHABLE-BY-ID",
+   "resolution": [],
+   "verdict": "ORPHAN"
+  },
+  "models--Qdrant--all-MiniLM-L6-v2-onnx": {
+   "bytes": 91.1,
+   "engine_entries": [],
+   "mentions": [
+    "config/decisions.yaml#decisions.[1141].decision",
+    "config/decisions.yaml#decisions.[1145].decision"
+   ],
+   "n_mentions": 2,
+   "re_acquirable": "LOCAL-ONLY",
+   "resolution": [],
+   "verdict": "ORPHAN"
+  },
+  "models--StargazerLabs--Qwen3.8-23B-Mini-Me-4bit": {
+   "bytes": 0.0,
+   "engine_entries": [],
+   "mentions": [
+    "config/task_register.yaml#tasks.[31].evidence"
+   ],
+   "n_mentions": 1,
+   "re_acquirable": "FETCHABLE-BY-ID",
+   "resolution": [],
+   "verdict": "ORPHAN"
+  },
+  "models--answerdotai--ModernBERT-base": {
+   "bytes": 600.8,
+   "engine_entries": [],
+   "mentions": [
+    "config/decisions.yaml#decisions.[1145].decision",
+    "config/decisions.yaml#decisions.[238].description",
+    "config/decisions.yaml#decisions.[51].description",
+    "config/decisions.yaml#decisions.[52].description",
+    "config/decisions.yaml#decisions.[59].description",
+    "config/decisions.yaml#decisions.[60].description",
+    "config/decisions.yaml#decisions.[61].description",
+    "config/decisions.yaml#decisions.[886].decision",
+    "config/decisions.yaml#decisions.[887].decision",
+    "scripts/test_matryoshka_nli.py:266",
+    "scripts/test_matryoshka_nli.py:287",
+    "scripts/test_matryoshka_nli.py:292"
+   ],
+   "n_mentions": 12,
+   "re_acquirable": "FETCHABLE-BY-ID",
+   "resolution": [
+    "code:pipeline/student_classifier.py:38",
+    "code:scripts/calibrate_student_thresholds.py:49",
+    "code:scripts/train_discipline_classifier.py:38",
+    "value:config/pipeline_config.yaml#classifier_training.student_model"
+   ],
+   "verdict": "DECLARED"
+  },
+  "models--convaiinnovations--laya": {
+   "bytes": 1526.4,
+   "engine_entries": [],
+   "mentions": [
+    "config/bakeoff_laya.yaml#provenance.completeness",
+    "config/bakeoff_laya.yaml#provenance.snapshot_path",
+    "config/bakeoff_laya.yaml#venv",
+    "config/bakeoff_laya.yaml#weights.[0].role",
+    "config/decisions.yaml#decisions.[1032].decision",
+    "config/decisions.yaml#decisions.[1154].decision",
+    "config/decisions.yaml#decisions.[11].title",
+    "config/decisions.yaml#decisions.[11].verification",
+    "config/decisions.yaml#decisions.[14].verification",
+    "config/decisions.yaml#decisions.[687].decision",
+    "config/decisions.yaml#decisions.[690].decision",
+    "config/decisions.yaml#decisions.[692].decision"
+   ],
+   "n_mentions": 29,
+   "re_acquirable": "FETCHABLE-BY-ID",
+   "resolution": [
+    "code:scripts/d2884b_decider_ab.py:385",
+    "path:config/bakeoff_laya.yaml#provenance.snapshot_path -> ~/.cache/huggingface/hub/models--convaiinnovations--laya/snapshots/7b928d828b7b0e022f929d9bd2e44165aa270148",
+    "value:config/bakeoff_laya.yaml#provenance.hf_repo",
+    "value:config/bakeoff_laya.yaml#weights.[0].repo"
+   ],
+   "verdict": "DECLARED"
+  },
+  "models--cross-encoder--ms-marco-MiniLM-L-6-v2": {
+   "bytes": 91.8,
+   "engine_entries": [],
+   "mentions": [
+    "config/decisions.yaml#decisions.[1145].decision"
+   ],
+   "n_mentions": 1,
+   "re_acquirable": "FETCHABLE-BY-ID",
+   "resolution": [],
+   "verdict": "ORPHAN"
+  },
+  "models--google--flan-t5-base": {
+   "bytes": 3.2,
+   "engine_entries": [],
+   "mentions": [
+    "config/decisions.yaml#decisions.[1090].decision"
+   ],
+   "n_mentions": 1,
+   "re_acquirable": "FETCHABLE-BY-ID",
+   "resolution": [],
+   "verdict": "ORPHAN"
+  },
+  "models--keXjos--Qwen3.8-9B-mlx-4Bit": {
+   "bytes": 0.0,
+   "engine_entries": [],
+   "mentions": [],
+   "n_mentions": 0,
+   "re_acquirable": "FETCHABLE-BY-ID",
+   "resolution": [],
+   "verdict": "ORPHAN"
+  },
+  "models--lmstudio-community--Qwen3-Coder-30B-A3B-Instruct-MLX-4bit": {
+   "bytes": 17190.8,
+   "engine_entries": [
+    "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit"
+   ],
+   "mentions": [
+    "config/ab_harness_t137.yaml#question",
+    "config/agent_context.yaml#measured_decode_20261015.routability_after_this_run",
+    "config/decisions.yaml#decisions.[1091].decision",
+    "config/decisions.yaml#decisions.[1127].evidence",
+    "config/flag_consumer_registry.yaml#flags.[39].path",
+    "config/r5_review_gate.yaml#tiers.deep.not_candidates_why",
+    "config/store_columns.yaml#columns.gen_model.why",
+    "config/task_register.yaml#tasks.[31].evidence",
+    "config/task_register.yaml#tasks.[31].why",
+    "pipeline/apply_provider_flip.py:36"
+   ],
+   "n_mentions": 10,
+   "re_acquirable": "FETCHABLE-BY-ID",
+   "resolution": [
+    "engine_entry:Qwen3-Coder-30B-A3B-Instruct-MLX-4bit",
+    "code:pipeline/dspy_trainer.py:50",
+    "code:pipeline/hybrid_gate.py:60",
+    "code:pipeline/model_lazyload.py:67",
+    "code:pipeline/omlx_parallel.py:158",
+    "code:pipeline/probe_run.py:378",
+    "code:pipeline/probe_run.py:383",
+    "code:pipeline/repair_elaboration.py:35",
+    "code:pipeline/run_diagnostic.py:430",
+    "code:scripts/_omlx_apply_settings.py:25",
+    "code:scripts/arm4_capabilities.py:94",
+    "code:scripts/omlx_lever_ab.py:139",
+    "value:config/ab_harness_t137.yaml#control.model"
+   ],
+   "verdict": "LIVE"
+  },
+  "models--lmstudio-community--Qwen3.8-27B-MLX-4bit": {
+   "bytes": 4270.2,
+   "engine_entries": [],
+   "mentions": [
+    "config/agreement_floor.yaml#panels.depth_axis_panel.ingest.column_by_coder.raw_qwen38",
+    "config/agreement_floor.yaml#panels.depth_axis_panel.rater_columns.[0]",
+    "config/decisions.yaml#decisions.[1127].evidence",
+    "config/decisions.yaml#decisions.[621].description",
+    "config/decisions.yaml#decisions.[71].description",
+    "config/decisions.yaml#decisions.[769].decision",
+    "config/decisions.yaml#decisions.[769].evidence",
+    "config/flag_consumer_registry.yaml#flags.[40].path",
+    "config/instrument_controls.yaml#instruments.[0].predictions",
+    "config/task_register.yaml#tasks.[31].evidence",
+    "config/task_register.yaml#tasks.[31].why",
+    "config/task_register.yaml#tasks.[32].why"
+   ],
+   "n_mentions": 13,
+   "re_acquirable": "FETCHABLE-BY-ID",
+   "resolution": [
+    "code:scripts/_omlx_apply_settings.py:26",
+    "code:scripts/aggregate_domain_votes.py:39",
+    "code:scripts/build_depth_vote_set.py:80",
+    "code:scripts/build_discipline_domain_vote.py:77",
+    "code:scripts/build_joint_vote_set.py:84",
+    "code:scripts/classify_promotion_labels.py:33",
+    "code:scripts/dedup_judge.py:35",
+    "code:scripts/deepseek_frontier_audit.py:56",
+    "code:scripts/extend_alias_index.py:59",
+    "code:scripts/judge_suffix_duplicates.py:38",
+    "code:scripts/r5_review_gate.py:293",
+    "code:scripts/reconcile_review_queue.py:43"
+   ],
+   "verdict": "DECLARED"
+  },
+  "models--lmstudio-community--Qwen3.8-27B-MLX-6bit": {
+   "bytes": 0.0,
+   "engine_entries": [],
+   "mentions": [],
+   "n_mentions": 0,
+   "re_acquirable": "FETCHABLE-BY-ID",
+   "resolution": [],
+   "verdict": "ORPHAN"
+  },
+  "models--lmstudio-community--gemma-4-E4B-it-MLX-4bit": {
+   "bytes": 6861.8,
+   "engine_entries": [
+    "gemma-4-E4B-it-MLX-4bit"
+   ],
+   "mentions": [
+    "config/ab_harness_t137.yaml#question",
+    "config/agent_context.yaml#classes.agent_loop.evidence.longest_turn_measured_on",
+    "config/apple_fm.yaml#fallback",
+    "config/decisions.yaml#decisions.[1009].decision",
+    "config/decisions.yaml#decisions.[1024].decision",
+    "config/decisions.yaml#decisions.[1039].decision",
+    "config/decisions.yaml#decisions.[1061].decision",
+    "config/decisions.yaml#decisions.[1093].measured",
+    "config/decisions.yaml#decisions.[1094].measured",
+    "config/decisions.yaml#decisions.[1097].measured",
+    "config/decisions.yaml#decisions.[1101].measured",
+    "config/decisions.yaml#decisions.[1102].decision"
+   ],
+   "n_mentions": 31,
+   "re_acquirable": "FETCHABLE-BY-ID",
+   "resolution": [
+    "engine_entry:gemma-4-E4B-it-MLX-4bit",
+    "code:pipeline/delegation_economy.py:275",
+    "code:pipeline/delegation_economy.py:298",
+    "code:pipeline/delegation_economy.py:318",
+    "code:pipeline/fix_remaining.py:196",
+    "code:pipeline/model_lazyload.py:64",
+    "code:pipeline/omlx_call.py:195",
+    "code:pipeline/providers/test_mlx_provider.py:72",
+    "code:scripts/_omlx_apply_settings.py:27",
+    "code:scripts/arm4_capabilities.py:92",
+    "code:scripts/backfill_sidecar_empty_shells.py:42",
+    "code:scripts/project_ruler_to_rederived_v8.py:111",
+    "code:scripts/r5_code_review.py:105"
+   ],
+   "verdict": "LIVE"
+  },
+  "models--minishlab--potion-base-32M": {
+   "bytes": 131.2,
+   "engine_entries": [],
+   "mentions": [
+    "pipeline/providers/test_mlx_provider.py:187",
+    "pipeline/providers/test_mlx_provider.py:410"
+   ],
+   "n_mentions": 2,
+   "re_acquirable": "FETCHABLE-BY-ID",
+   "resolution": [],
+   "verdict": "ORPHAN"
+  },
+  "models--mlx-community--Ornith-1.5-35B-A3B-OptiQ-4bit-REAP-19B": {
+   "bytes": 13757.0,
+   "engine_entries": [
+    "Ornith-1.5-35B-A3B-REAP-19B"
+   ],
+   "mentions": [
+    "config/decisions.yaml#decisions.[916].measured",
+    "config/task_register.yaml#tasks.[45].evidence",
+    "config/task_register.yaml#tasks.[53].evidence"
+   ],
+   "n_mentions": 3,
+   "re_acquirable": "FETCHABLE-BY-ID",
+   "resolution": [
+    "engine_entry:Ornith-1.5-35B-A3B-REAP-19B",
+    "code:scripts/arm4_benchmark.py:46",
+    "code:scripts/arm4_capabilities.py:89",
+    "code:scripts/arm4_download.py:8"
+   ],
+   "verdict": "LIVE"
+  },
+  "models--mlx-community--Phi-4-mini-instruct-8bit": {
+   "bytes": 5774.6,
+   "engine_entries": [
+    "Phi-4-mini-instruct-8bit"
+   ],
+   "mentions": [
+    "config/agent_context.yaml#candidates_20261015b.CORRECTED_20261015b",
+    "config/decisions.yaml#decisions.[1127].evidence",
+    "config/decisions.yaml#decisions.[362].summary",
+    "config/decisions.yaml#decisions.[55].description",
+    "config/decisions.yaml#decisions.[88].description",
+    "config/flag_consumer_registry.yaml#flags.[43].path",
+    "config/task_register.yaml#tasks.[31].evidence",
+    "config/task_register.yaml#tasks.[42].evidence"
+   ],
+   "n_mentions": 8,
+   "re_acquirable": "FETCHABLE-BY-ID",
+   "resolution": [
+    "engine_entry:Phi-4-mini-instruct-8bit",
+    "code:pipeline/e2e_test.py:155",
+    "code:pipeline/model_lazyload.py:59",
+    "code:pipeline/model_lazyload.py:63",
+    "code:pipeline/pipeline_paths.py:753",
+    "code:pipeline/retrieval_evaluator.py:57",
+    "code:pipeline/run_diagnostic.py:512",
+    "code:pipeline/runner.py:795",
+    "code:pipeline/stage0_5_extract_metadata.py:49",
+    "code:scripts/_omlx_apply_settings.py:30",
+    "code:scripts/arm4_benchmark.py:47",
+    "code:scripts/arm4_capabilities.py:93",
+    "code:scripts/pipe_stage_probe.py:54"
+   ],
+   "same_name_served_elsewhere": {
+    "entry": "Phi-4-mini-instruct-8bit",
+    "redundant": false,
+    "same_weights": false,
+    "second_copy_at": "/Users/barn/.cache/huggingface/hub/models--mlx-community--Phi-4-mini-instruct-8bit/snapshots/93b273a5497a4fcdcfb7ac00143565506b4f72e4",
+    "served_from": "/Users/barn/.omlx/models_stashed/Phi-4-mini-instruct-8bit"
+   },
+   "verdict": "PARKED"
+  },
+  "models--mlx-community--Qwen2.5-Coder-7B-Instruct-4bit": {
+   "bytes": 4295.9,
+   "engine_entries": [],
+   "mentions": [],
+   "n_mentions": 0,
+   "re_acquirable": "FETCHABLE-BY-ID",
+   "resolution": [
+    "code:pipeline/model_lazyload.py:74"
+   ],
+   "verdict": "DECLARED"
+  },
+  "models--mlx-community--Qwen3-Embedding-0.6B-4bit-DWQ": {
+   "bytes": 351.2,
+   "engine_entries": [],
+   "mentions": [],
+   "n_mentions": 0,
+   "re_acquirable": "FETCHABLE-BY-ID",
+   "resolution": [
+    "value:config/pipeline_config.yaml#models.embeddings.alternative"
+   ],
+   "verdict": "DECLARED"
+  },
+  "models--mlx-community--Qwen3.8-27B-4bit": {
+   "bytes": 0.0,
+   "engine_entries": [],
+   "mentions": [],
+   "n_mentions": 0,
+   "re_acquirable": "FETCHABLE-BY-ID",
+   "resolution": [],
+   "verdict": "ORPHAN"
+  },
+  "models--mlx-community--clef-4bit": {
+   "bytes": 8845.4,
+   "engine_entries": [],
+   "mentions": [
+    "config/decisions.yaml#decisions.[1017].decision",
+    "config/decisions.yaml#decisions.[1031].decision",
+    "config/decisions.yaml#decisions.[1032].decision",
+    "config/task_register.yaml#tasks.[42].evidence"
+   ],
+   "n_mentions": 4,
+   "re_acquirable": "FETCHABLE-BY-ID",
+   "resolution": [
+    "code:scripts/d2884b_decider_ab.py:391",
+    "code:scripts/d2884b_decider_ab.py:392",
+    "code:scripts/d2884b_decider_ab.py:97"
+   ],
+   "verdict": "DECLARED"
+  },
+  "models--mlx-community--clef-flash-4bit": {
+   "bytes": 6214.0,
+   "engine_entries": [],
+   "mentions": [
+    "config/decisions.yaml#decisions.[1032].decision",
+    "config/decisions.yaml#decisions.[918].decision",
+    "config/decisions.yaml#decisions.[918].title",
+    "config/decisions.yaml#decisions.[919].decision",
+    "config/decisions.yaml#decisions.[919].measured",
+    "config/decisions.yaml#decisions.[922].decision",
+    "config/task_register.yaml#tasks.[42].evidence",
+    "scripts/d2884b_decider_ab.py:90"
+   ],
+   "n_mentions": 8,
+   "re_acquirable": "FETCHABLE-BY-ID",
+   "resolution": [
+    "code:scripts/d2884b_decider_ab.py:387",
+    "code:scripts/d2884b_decider_ab.py:388",
+    "value:config/pipeline_config.yaml#stage4.decider_emerging_abstention_signal"
+   ],
+   "verdict": "DECLARED"
+  },
+  "models--mlx-community--gpt-oss-20b-MXFP4-Q8": {
+   "bytes": 12104.2,
+   "engine_entries": [
+    "gpt-oss-20b-MXFP4-Q8"
+   ],
+   "mentions": [
+    "config/decisions.yaml#decisions.[1029].decision",
+    "config/decisions.yaml#decisions.[1032].decision",
+    "config/decisions.yaml#decisions.[1039].decision",
+    "config/decisions.yaml#decisions.[1127].evidence",
+    "config/decisions.yaml#decisions.[16].verification",
+    "config/decisions.yaml#decisions.[34].description",
+    "config/decisions.yaml#decisions.[354].summary",
+    "config/decisions.yaml#decisions.[579].description",
+    "config/decisions.yaml#decisions.[585].description",
+    "config/decisions.yaml#decisions.[597].description",
+    "config/decisions.yaml#decisions.[71].description",
+    "config/decisions.yaml#decisions.[88].description"
+   ],
+   "n_mentions": 28,
+   "re_acquirable": "FETCHABLE-BY-ID",
+   "resolution": [
+    "engine_entry:gpt-oss-20b-MXFP4-Q8",
+    "code:pipeline/model_lazyload.py:68",
+    "code:pipeline/probe_run.py:384",
+    "code:pipeline/probe_run.py:391",
+    "code:pipeline/run_diagnostic.py:485",
+    "code:pipeline/stage4_merged_call.py:1038",
+    "code:pipeline/stage4_merged_call.py:1159",
+    "code:pipeline/stage4_merged_call.py:415",
+    "code:pipeline/stage4_merged_call.py:892",
+    "code:scripts/_omlx_apply_settings.py:29",
+    "code:scripts/arm2_gptoss_fair.py:39",
+    "code:scripts/arm4_capabilities.py:91",
+    "code:scripts/benchmark_s4_depth_batch_variant_ab.py:32"
+   ],
+   "verdict": "LIVE"
+  },
+  "models--mlx-community--pplx-decider-v1.1-27b-4bit": {
+   "bytes": 15362.3,
+   "engine_entries": [],
+   "mentions": [
+    "config/decisions.yaml#decisions.[1032].decision",
+    "config/task_register.yaml#tasks.[42].evidence",
+    "scripts/d2884b_decider_ab.py:73"
+   ],
+   "n_mentions": 3,
+   "re_acquirable": "FETCHABLE-BY-ID",
+   "resolution": [
+    "code:scripts/d2884b_decider_ab.py:384",
+    "value:config/pipeline_config.yaml#stage4.decider_advisory_best_arm"
+   ],
+   "verdict": "DECLARED"
+  },
+  "models--openbmb--MiniCPM5-2B-MLX": {
+   "bytes": 1426.2,
+   "engine_entries": [
+    "MiniCPM5-2B-MLX"
+   ],
+   "mentions": [
+    "config/decisions.yaml#decisions.[1136].decision",
+    "config/harness_policy.yaml#change_conditions.[2]"
+   ],
+   "n_mentions": 2,
+   "re_acquirable": "FETCHABLE-BY-ID",
+   "resolution": [
+    "engine_entry:MiniCPM5-2B-MLX",
+    "value:config/engine.yaml#candidates.probe.[0]",
+    "value:config/model_assignments.yaml#harness_roles.LIGHTWEIGHT_PROBE.model"
+   ],
+   "verdict": "LIVE"
+  },
+  "models--ornith-ai--Ornith-1.5-9B-MLX-8bit": {
+   "bytes": 9536.3,
+   "engine_entries": [
+    "Ornith-1.5-9B-MLX-8bit"
+   ],
+   "mentions": [
+    "config/decisions.yaml#decisions.[916].measured",
+    "config/task_register.yaml#tasks.[31].evidence"
+   ],
+   "n_mentions": 2,
+   "re_acquirable": "FETCHABLE-BY-ID",
+   "resolution": [
+    "engine_entry:Ornith-1.5-9B-MLX-8bit",
+    "value:config/bench_preflight.yaml#environment.expected_models.[1]",
+    "value:config/engine.yaml#candidates.served_now.[6]",
+    "value:config/harness_policy.yaml#capability_axes.code_generation_humaneval.order.[2].model",
+    "value:config/model_assignments.yaml#harness_roles.BATCH_ONLY_DO_NOT_INTERACTIVE.models.[1]",
+    "value:config/model_assignments.yaml#harness_roles.VERIFIER_CROSS_FAMILY.candidates.[2]"
+   ],
+   "verdict": "LIVE"
+  },
+  "models--pooyakn73--Qwen3.8-9B-Distill-MTPLX-Q6G64": {
+   "bytes": 0.0,
+   "engine_entries": [],
+   "mentions": [],
+   "n_mentions": 0,
+   "re_acquirable": "FETCHABLE-BY-ID",
+   "resolution": [],
+   "verdict": "ORPHAN"
+  },
+  "models--sentence-transformers--all-MiniLM-L6-v2": {
+   "bytes": 91.6,
+   "engine_entries": [],
+   "mentions": [
+    "config/decisions.yaml#decisions.[1141].decision",
+    "config/decisions.yaml#decisions.[1145].decision"
+   ],
+   "n_mentions": 2,
+   "re_acquirable": "FETCHABLE-BY-ID",
+   "resolution": [],
+   "verdict": "ORPHAN"
+  },
+  "models--typeform--distilbert-base-uncased-mnli": {
+   "bytes": 267.8,
+   "engine_entries": [],
+   "mentions": [
+    "config/task_register.yaml#tasks.[36].evidence"
+   ],
+   "n_mentions": 1,
+   "re_acquirable": "FETCHABLE-BY-ID",
+   "resolution": [],
+   "verdict": "ORPHAN"
+  },
+  "models--xy10086--Qwen3.8-9B-Distill-Uncensored-Heretic-MTPLX-Q6G64": {
+   "bytes": 0.0,
+   "engine_entries": [],
+   "mentions": [],
+   "n_mentions": 0,
+   "re_acquirable": "FETCHABLE-BY-ID",
+   "resolution": [],
+   "verdict": "ORPHAN"
   }
  },
  "census_domain": {
@@ -41,6 +680,21 @@
    "blobs"
   ]
  },
+ "declared": [
+  "models--mlx-community--pplx-decider-v1.1-27b-4bit",
+  "models--mlx-community--clef-4bit",
+  "models--mlx-community--clef-flash-4bit",
+  "models--BAAI--bge-m3",
+  "models--mlx-community--Qwen2.5-Coder-7B-Instruct-4bit",
+  "models--lmstudio-community--Qwen3.8-27B-MLX-4bit",
+  "models--MoritzLaurer--DeBERTa-v3-large-mnli-fever-anli-ling-wanli",
+  "models--MoritzLaurer--bge-m3-zeroshot-v2.0",
+  "models--BAAI--bge-reranker-v2-m3",
+  "models--convaiinnovations--laya",
+  "models--answerdotai--ModernBERT-base",
+  "models--mlx-community--Qwen3-Embedding-0.6B-4bit-DWQ",
+  "models--BAAI--bge-small-en-v1.5"
+ ],
  "deletion_floor_bytes": 268435456,
  "engine_entries": {
   "parked": {
@@ -105,12 +759,11 @@
   "models--lmstudio-community--Qwen3-Coder-30B-A3B-Instruct-MLX-4bit",
   "models--lmstudio-community--gemma-4-E4B-it-MLX-4bit",
   "models--mlx-community--Ornith-1.5-35B-A3B-OptiQ-4bit-REAP-19B",
-  "models--mlx-community--Phi-4-mini-instruct-8bit",
   "models--mlx-community--gpt-oss-20b-MXFP4-Q8",
   "models--openbmb--MiniCPM5-2B-MLX",
   "models--ornith-ai--Ornith-1.5-9B-MLX-8bit"
  ],
- "measured_at": "2026-10-16T01:01:58",
+ "measured_at": "2026-10-16T02:05:44",
  "model_repo_bytes": 123351.8,
  "not_a_candidate_non_model_repo": {
   "datasets--HuggingFaceH4--MATH-500": 0.4,
@@ -129,14 +782,43 @@
  },
  "orphans": [
   "models--typeform--distilbert-base-uncased-mnli",
+  "models--minishlab--potion-base-32M",
+  "models--cross-encoder--ms-marco-MiniLM-L-6-v2",
+  "models--sentence-transformers--all-MiniLM-L6-v2",
+  "models--Qdrant--all-MiniLM-L6-v2-onnx",
+  "models--google--flan-t5-base",
   "models--pooyakn73--Qwen3.8-9B-Distill-MTPLX-Q6G64",
   "models--xy10086--Qwen3.8-9B-Distill-Uncensored-Heretic-MTPLX-Q6G64",
+  "models--StargazerLabs--Qwen3.8-23B-Mini-Me-4bit",
   "models--lmstudio-community--Qwen3.8-27B-MLX-6bit",
   "models--mlx-community--Qwen3.8-27B-4bit",
-  "models--keXjos--Qwen3.8-9B-mlx-4Bit"
+  "models--keXjos--Qwen3.8-9B-mlx-4Bit",
+  "models--Pluto-AI-Labs--Qwen3.8-27B-MLX"
  ],
  "owner_owed_above_floor": [],
- "parked": [],
+ "parked": [
+  "models--mlx-community--Phi-4-mini-instruct-8bit"
+ ],
+ "resolution_domain": {
+  "code_homes": [
+   "pipeline",
+   "scripts"
+  ],
+  "exclude": [
+   "pipeline/model_store_census.py"
+  ],
+  "file_suffixes": [
+   ".yaml",
+   ".yml",
+   ".json",
+   ".py"
+  ],
+  "re_acquirable_marker": "refs",
+  "report_rows": 12,
+  "value_homes": [
+   "config"
+  ]
+ },
  "schema_version": "1",
  "undeclared_entries": []
 }

@@ -25540,3 +25540,71 @@ decisions:
     (2026-10-16): hub total 124837.5 MB - unchanged, because that is the quantity the deletion movement check reads
     (T-147/T-151) - of which model repos 123351.8 MB over 33 repo(s); LIVE 7 / PARKED 0 / DECLARED 20 (was 29) /
     ORPHAN 6 (was 8); undeclared entries none; owner-owed 0 repo(s).'
+- id: D-3034
+  state: ACTIVE
+  date: '2026-10-16'
+  by: assistant
+  category: STORE / INTEGRITY
+  bugs:
+  - BUG-840
+  - BUG-841
+  - BUG-842
+  files:
+  - config/engine.yaml
+  - pipeline/model_store_census.py
+  - pipeline/config_audit.py
+  - scripts/resolve_route.py
+  - config/capability_registry.yaml
+  - config/gov_sync.yaml
+  - scripts/gov_sync.py
+  - justfile
+  title: 'A DECLARATION MUST RESOLVE: what DECLARES a byte is a resolution and never a mention, a second copy is
+    redundant by BYTES and never by name, and a declared command is runnable in the FORM it is written'
+  decision: 'MEASURED 2026-10-16 (BUG-840/T-142, from the owner reading his own store). DECLARED - the class that
+    decides which bytes are accounted for - was a MENTION INDEX: classify() asked whether a repo stem appeared ANYWHERE
+    in the joined text of config/, pipeline/ and scripts/, so a GOVERNANCE WRITE moved 267.9 MB out of ORPHAN with
+    no byte moving on disk: the evidence line a landing had just added to config/task_register.yaml named a stem,
+    and that prose then declared the bytes. A read-only probe over the census domain found the same defect at scale:
+    the homes that declared most of the bucket were config/decisions.yaml and config/task_register.yaml - two REGISTERS
+    whose values are SENTENCES. A record that mentions a model is a record of a decision, not an owner of its bytes,
+    and the class that permits the only destructive act in this system must not be decided by a substring. (1) A
+    DECLARATION MUST RESOLVE. DECLARED is conferred by exactly three forms - an ENGINE ENTRY whose realpath lies
+    inside the repo dir, a VALUE that IS the reference (the full org/name or the bare name, quoted exactly: a sentence
+    is never equal to a model id) or a PATH that EXISTS and lies inside that dir (D-405: a citation whose subject
+    is absent is an assertion). A string that merely CONTAINS a reference is recorded as a MENTION, reported in
+    the audit and conferring nothing. This is D-3018 (the byte-owner test is RESOLUTION, not MENTION) applied to
+    CLASSIFICATION, which is upstream of the sweep it governs. (2) THE HOMES OF THE RULE ARE DECLARED, AND THE READER
+    EXCLUDES ITSELF. config/engine.yaml#model_store. resolution_domain is the ONE home of which homes may declare
+    (parsed values by key path; AST string constants, so a comment and a docstring are not a consumer), of the suffixes
+    read, of the file EXCLUDED - the reader own source, so the instrument vocabulary cannot declare a byte (BUG-838
+    limb 3, generalised) - of the marker that says a cache entry was FETCHED, and of how many rows the face prints.
+    A reader that cannot find this block REFUSES to run, and an empty exclude list is FATAL rather than permissive:
+    the fallback is the mention index this decision retires. (3) A SECOND COPY IS REDUNDANT BY BYTES, NEVER BY NAME.
+    When the engine holds one entry name twice, the census compares the two FILE INVENTORIES and offers nothing
+    unless they are EQUAL. MEASURED 2026-10-16: the hub copy of Phi-4-mini-instruct-8bit (27 files, 9872601143 B)
+    and the copy the engine serves from models_stashed (14 files, 4097978555 B) are NOT the same bytes, so the parked
+    hub copy is the only pristine copy of that fetch and NOTHING is offered for it. A name-collision rule alone
+    would have proposed deleting a unique fetch. (4) LIVE NEEDS ITS OWN SUBJECT (BUG-841). LIVE was decided by NAME
+    ACROSS STORES, so the hub copy above read LIVE while the engine served a DIFFERENT directory under that name,
+    and 5774.6 MB of cache sat inside the LIVE bucket. An entry is served only when the serving store holds the
+    NAME and its TARGET lies inside these bytes; the collision is then REPORTED (SAME NAME, DIFFERENT BYTES) rather
+    than resolved by taste. (5) THE FORM OF A DECLARED COMMAND DECIDES WHAT IT REQUIRES (BUG-842/T-146). The owner
+    ran pipeline/hf_fetch_model.py and read "permission denied": the file carries a shebang and was mode 644. Counted
+    over git ls-files: 562 of 665 tracked .py files make the shebang promise and cannot keep it, so which mode a
+    file has was nobody fact - it was whatever last wrote it (both atomic writers drop the bit). scripts/resolve_route.py
+    now refuses a declared command written as a BARE path whose file is not executable, and does NOT require the
+    bit for the declared python3 <path> form (requiring it there would have made 562 files a fault). Its FIRST live
+    run found four declarations that could not be run as written - the capability route model_fetch and three operator
+    lanes naming pipeline/model_loadability_probe.py and pipeline/research_run.py - all now 755, with model_fetch
+    declared in the bare form the operator actually types, matching all eight lanes. (6) A FACE THAT HIDES ROWS
+    NAMES THEM (BUG-842, the same session). The owner asked why the PIPELINE LANE never moved: it announced 35 and
+    printed 12 rows with nothing saying so, and because it sorts by (priority, id) the twelve rows are the MUST
+    tasks - exactly the rows that outlive a session. The renderer now takes the lane label, the ORDER it really
+    sorts by and the disclosure note from config, and a list longer than face_list_limit states how many rows it
+    did not print; a control fires on both directions. The label no longer claims a strategic-consequential order
+    the register cannot support (the register carries no consequence ranking). MEASURED AFTER (2026-10-16, one run,
+    same machine): hub total 124837.5 MB - unchanged, the quantity the deletion movement check reads - of which
+    model repos 123351.8 MB over 33 repo(s); LIVE 6 / PARKED 1 / DECLARED 13 (56023.9 MB) / ORPHAN 13 (676.8 MB);
+    owner-owed 0 repo(s); the mention-only remainder is every repo at or below the declared floor, so the owner
+    lane is EMPTY by resolution as well as by the floor. Controls 13 -> 24, run by the ladder and declared fatal
+    in config/rail_registry.yaml; resolve-route controls 16 -> 17; gov-sync controls 23 -> 26.'

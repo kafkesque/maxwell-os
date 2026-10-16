@@ -8,13 +8,13 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1161 decisions (census stamp 118ef597a2298fa9, 2026-10-16) · 604 bugs (224 open / 380 closed; highest OPEN = BUG-840) · 46 open tasks (MUST 13 / SHOULD 28 / WORTH 4; OWNER-moved 11, pipeline-moved 35; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1162 decisions (census stamp 7818ed237e3d288d, 2026-10-16) · 606 bugs (223 open / 383 closed; highest OPEN = BUG-836) · 45 open tasks (MUST 13 / SHOULD 27 / WORTH 4; OWNER-moved 10, pipeline-moved 35; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **80** of 1161 — 🔴 open 32 · 🔵 proposed 27 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 576 · ⚖ ratified 145 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1161, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **80** of 1162 — 🔴 open 32 · 🔵 proposed 27 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 577 · ⚖ ratified 145 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1162, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 224 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 34 · 🟨 MED 61 · 🟩 LOW 24 · UNLABELLED 101 (BUG-757) of 224 open.
+> Open BUGS by severity (population = the census's 223 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 34 · 🟨 MED 60 · 🟩 LOW 24 · UNLABELLED 101 (BUG-757) of 223 open.
 >
-> **OWNER LANE (11) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
+> **OWNER LANE (10) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
@@ -26,11 +26,10 @@
 > | T-135 | 🟠 SHOULD | BIND the harness context contract - adopt the executor so the ratified knobs are in the environment, not in a  | the OWNER adopts the binding in the shell that starts the harness; the |
 > | T-137 | 🟠 SHOULD | PIN the agent_loop model and prove the tiered cache with an A/B | THE OWNER DECIDES WHEN THE ENGINE MAY BE FLAPPED: the A/B needs one ro |
 > | T-140 | 🟠 SHOULD | ADOPT THE FAN-OUT EXECUTOR for everyday scaffolding and debugging, capped and cross-verified | the owner names the first real fan-out task: the executor needs a task |
-> | T-142 | 🟠 SHOULD | BYTE-OWNER AUDIT of the DECLARED bucket: 59.7 GB whose only claim to be on disk is a mention | pipeline: re-run the census with a RESOLUTION test (does a served entr |
 > | T-145 | 🟠 SHOULD | EDGE0 IS DEFERRED WITH A NAMED TRIGGER, not fetched: the class is already served and the role is blocked on me | OWNER: say 'fetch Edge0' to override, or leave it deferred until T-137 |
 > | T-138 | COULD | HARNESS ADOPTION ON DEMAND - one command per tool, and none of them load-bearing | install a harness only when a specific job needs it (C28). The engine  |
 >
-> **PIPELINE LANE (35) — what the agent will do next, in strategic-consequential order (source: config/task_register.yaml):**
+> **PIPELINE LANE (35) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
 >
 > | id | pri | state | task | evidence |
 > |---|---|---|---|---|
@@ -46,6 +45,8 @@
 > | T-147 | 🔴 MUST | 🔴 open | WIRE THE STORE CENSUS TO EVERY DELETION BATCH: it is a generated face, and it lies the moment bytes move witho | MEASURED 2026-10-15: the census IS generated (pipeline/model_store_census.py: dir_bytes, m |
 > | T-150 | 🔴 MUST | 🔴 open | THE DURABLE PATH IS THE DELEGATION PATH (D-3020): anything whose failure is not free goes through pipeline/sub | temp/runs/fanout_20261015i/98_receipt.json - 3/3 DONE with one task deliberately given a 1 |
 > | T-157 | 🔴 MUST | 🔴 open | CENSUS THE HARNESS HOMES A DECISION NAMES, so a reversal of a ruled remedy is a READING and not a discovery | MEASURED 2026-10-15: ~/.config/goose/config.yaml:311 reads active_provider: custom_deepsee |
+>
+> _the face is a VIEW: 12 of 35 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
 >
 > **STANDING RULES — in effect, never close (1):**
 >
@@ -69,6 +70,8 @@
 > | D274b | OPEN | RETRIEVAL / ONTOLOGY | ROLE is the highest-leverage axis, not a decorative one (D-274b) |
 > | D273h | OPEN | LABEL QUALITY / MEASUREMEN | Cross the ruler strata with status and always report both frames (D-273h) |
 > | D273g | OPEN | RETRIEVAL / ONTOLOGY | A chunk/evidence leg IS worth it -- at step 8, and only after the filters constrain (D-273g) |
+>
+> _the face is a VIEW: 12 of 80 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
 >
 > **Open bugs, most severe first:** 🟥 BUG-297 · 🟥 BUG-299 · 🟥 BUG-305 · 🟥 BUG-712 · 🟧 BUG-300 · 🟧 BUG-301 · 🟧 BUG-303 · 🟧 BUG-304 · 🟧 BUG-306 · 🟧 BUG-312 · 🟧 BUG-318 · 🟧 BUG-341.
 <!-- GOV-INDEX:END -->
@@ -15296,3 +15299,35 @@ NOT edited to restore the earlier number: editing a record so a bucket flips bac
 opposite coat, and it would leave no trace. The reading, its cause and this correction are in the log instead. The
 floor verdict is unaffected either way - every candidate was and remains at or below 256 MiB, so T-136's owner lane
 was empty before this reclassification and is empty after it.
+
+## BUG-840 (CLOSED 2026-10-16) - the DECLARED class was a MENTION INDEX; a RESOLUTION test replaces it, and the control that refuses a SENTENCE is named
+
+**Status:** CLOSED (T-142/D-3034). The remedy is the same instrument, one rule deeper: pipeline/model_store_census.py#classify confers DECLARED only on a RESOLUTION, and what counts as one is DECLARED in config/engine.yaml#model_store.resolution_domain and READ from there (FATAL when absent or empty - BUG-487).
+
+MEASURED 2026-10-16, same machine, same hour, by the owner's read-only probe (temp/t142_probe.py) and by the census: before - LIVE 7 / PARKED 0 / DECLARED 20-21 / ORPHAN 5-6, owner-owed 0, hub total 124837.5 MB; after - LIVE 6 / PARKED 1 / DECLARED 13 (56023.9 MB) / ORPHAN 13 (676.8 MB), owner-owed 0, hub total 124837.5 MB unchanged. THE DOMINANT DECLARING HOMES WERE THE REGISTERS THEMSELVES: in the probe, config/decisions.yaml and config/task_register.yaml carried most of the strings that declared the bucket, and the values of both registers are SENTENCES. A decision that mentions a model is a RECORD of a decision, not an owner of its bytes.
+
+The three forms a resolution may take (D-3018: the byte-owner test is RESOLUTION, not MENTION): an ENGINE ENTRY whose realpath lies inside the repo dir; a VALUE that IS the reference (the full org/name or the bare name - a sentence is never equal to a model id); or a PATH that EXISTS and lies inside it (a citation whose subject is absent is an assertion, D-405). A string that merely CONTAINS a reference is recorded as a MENTION: reported in the audit, and it confers nothing.
+
+CONTROL (BUG-492: a remedy whose control nothing runs is a comment): a_SENTENCE_that_mentions_a_model_does_NOT_declare_it; a_value_that_IS_the_reference_DOES_declare_it_full_id_and_bare_name; a_bare_name_belonging_to_ANOTHER_org_does_not_declare_THESE_bytes_but_is_still_a_mention; a_PATH_that_RESOLVES_inside_the_repo_declares_it_and_one_that_does_NOT_does_not; the_INSTRUMENT_own_vocabulary_cannot_declare_a_repo (the reader's own file is EXCLUDED by a declared list - BUG-838 limb 3, generalised); and an_EMPTY_exclude_list_is_FATAL_because_the_reader_would_declare_itself. 24/24 known-answer controls fire where the instrument had 13.
+
+WHAT THE AUDIT NOW REPORTS (T-142's gate): per repo, the resolution evidence with its home and key path or line number, the bytes, the mentions it did NOT count, and whether the bytes can come back (FETCHABLE-BY-ID when the cache entry carries the declared refs/ marker - it was fetched by repo id and can be fetched again; LOCAL-ONLY otherwise). The mention-only remainder is 13 repos / 676.8 MB and every one of them is below config/engine.yaml#model_store.deletion_floor_bytes (268435456 B); the largest is typeform/distilbert-base-uncased-mnli at 267836416 B. So the owner-owed set is 0 by RESOLUTION as well as by the floor - a STRONGER statement than the floor alone, because it also NAMES the five repos the floor was protecting without saying why: sentence-transformers/all-MiniLM-L6-v2, Qdrant/all-MiniLM-L6-v2-onnx, cross-encoder/ms-marco-MiniLM-L-6-v2, minishlab/potion-base-32M, google/flan-t5-base.
+
+## BUG-841 (MED - FIXED 2026-10-16) - LIVE was decided by NAME ACROSS STORES, so a cache copy read as if the engine were serving it
+
+**Status:** FIXED (T-142/D-3034). classify() asked whether an entry NAME existed in the serving store, so a repo whose entry was PARKED read LIVE whenever the same name was also served from somewhere else.
+
+MEASURED 2026-10-16, verbatim: ~/.omlx/_unloaded/Phi-4-mini-instruct-8bit resolves to hub/models--mlx-community--Phi-4-mini-instruct-8bit/snapshots/93b273a5497a4fcdcfb7ac00143565506b4f72e4 (5774.6 MB of blobs; 27 files) while the SAME NAME is served from ~/.omlx/models_stashed/Phi-4-mini-instruct-8bit (4098.0 MB; 14 files). The hub copy therefore read LIVE and its bytes sat inside the LIVE bucket (66651.0 MB) although the engine serves a DIFFERENT directory under that name - a claim about bytes that were not its subject.
+
+REMEDY: serving_owners() - an entry is SERVED only when the serving store holds the NAME AND its TARGET lies inside these bytes. LIVE 7 -> 6, and the collision is REPORTED rather than resolved by taste: the face prints SAME NAME, DIFFERENT BYTES with both paths and the fact that the inventories differ. This is also why a duplicate is never offered by NAME (T-142): because the inventories are NOT equal, the hub copy is the only pristine copy of that fetch and NOTHING is offered for it. Had a same-name test alone been promoted to an offer, the census would have proposed deleting a unique fetch.
+
+CONTROL: an_engine_entry_in_ANOTHER_repo_does_not_claim_this_one, plus the two same-name-copy controls, which fire in BOTH directions (redundant when the inventories are equal, PARKED and not offered when they differ).
+
+## BUG-842 (MED - FIXED 2026-10-16) - a declared OPERATOR command could not be run as written: four lane declarations named a bare path whose file is mode 644
+
+**Status:** FIXED (T-146). The owner typed `pipeline/hf_fetch_model.py` and read "zsh: permission denied".
+
+MEASURED 2026-10-16: pipeline/hf_fetch_model.py was -rw-r--r-- and carries #!/usr/bin/env python3 on its first line. Counted over git ls-files: 665 tracked .py files, 562 carry a shebang and are NOT executable, 8 carry both, 95 carry neither. The shebang is therefore a claim this repo makes 562 times and keeps 8 times, and WHICH mode a file has was nobody's fact - it was whatever last wrote it (Docguard.safeWrite and Developer.write both drop the bit; that is how pipeline/model_store_census.py lost it in the previous landing and had to be chmod'd by hand).
+
+REMEDY, two limbs, both enforced. (1) THE FORM DECIDES THE REQUIREMENT: scripts/resolve_route.py#_bare_form_faults refuses a declared command written as a BARE path whose file is not executable, and does NOT require the bit for the declared python3 <path> form (requiring it there would have made all 562 a fault). Its FIRST live run found FOUR declarations that could not be run as written: lane model-loadability (pipeline/model_loadability_probe.py), lane research-selftest and lane research-status (pipeline/research_run.py), and the capability route model_fetch (pipeline/hf_fetch_model.py) - the owner had hit the fourth. All four are 755 now, and config/capability_registry.yaml#model_fetch.entrypoint is declared in the BARE form he typed, matching all eight operator lanes. (2) git preserves the bit, so the declared command is runnable as written and the next atomic rewrite that strips it turns scripts/resolve_route.py --check RED instead of waiting for the owner to discover it.
+
+CONTROL: bare_path_not_executable (BOTH sites, a capability and a lane) and interpreter_form_needs_no_exec_bit (the other direction - the rail is proved NOT to require a bit the repo does not set 562 times). resolve-route controls 16 -> 17, and --check is green on a route graph that was RED the moment the rule landed.

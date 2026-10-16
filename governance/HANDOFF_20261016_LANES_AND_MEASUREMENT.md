@@ -236,3 +236,38 @@ ebook/bibliography plugin classes (a second home beside S0's pandoc+Docling), th
 wrong operator for T-179's 727 drifted works), and every local memory/knowledge MCP (a second home beside the
 knowledge layer). The gap honestly named: NO plugin covers the real work - the retriever wired into `just ask` is
 WIRING, not a download.
+
+### 1d. FORENSIC AUDIT OF THIS SITTING (rc, per rail - nothing here is asserted)
+
+| rail | rc | reading |
+|---|---|---|
+| `scripts/check_repo_integrity.py` | **0** | HEAD resolves, logs/HEAD agrees, 0 conflict-marked names; the two notes about `pipeline`/`tools` being NAMESPACE roots are BUG-875's open half, unchanged by this sitting |
+| `scripts/agent_context_probe.py` | **0** | `the four layers agree, and nothing measured was written` (was FAIL 6 before the parity act) |
+| `check_buglog_coverage.py` | **0** | 878 blocks, every bug-id heading parsed, no byte-identical copy |
+| `check_governance_faces.py --check` | **0** | faces agree with the register; **0 owner-moved task(s)** |
+| `pipeline/subagent_fanout.py --selftest` | **0** | 66/66 known-answer |
+| `scripts/measure_subagent_loop.py --selftest` | **0** | 6/6; `pipeline/subagent_recipe.py --selftest` 5/5; ruff clean on both |
+| `check_session_plan.py --staged` | **0** | 0 undeclared path |
+| `pipeline/harness_contract.py --check` | **2** | PRE-EXISTING, owner-owed (C1/C22): the harness will use its own cloud-price-tier defaults for the contract names instead of the declared ones; no act this sitting made or unmade it |
+| `scripts/check_config_defaults.py --check` | **1** | PRE-EXISTING (stated, not hidden): config values read with a code default have no home in config |
+| `scripts/resolve_route.py --check` | **1** | **CAUSED BY THIS SITTING, and expected: routing debt 224 -> 225.** Flipping four rows into the PIPELINE lane obliges the route graph to resolve a capability for them, and T-181/T-183's commands (the note-home declaration, the admit applier) do not exist yet. Remedy, in order: declare the T-181 note-home lane, then T-183's applier lane. A mover flip that costs one debt unit is the honest price of a row that no longer reads as a pending question |
+
+**THE OWNER'S NEXT WORD (measured draft, nothing applied):** `apply_provider_flip.py` DRY-RUN on
+`~/.config/goose/config.yaml` reads *1 edit to apply (flip `active_provider` to the declared `maxwell_omlx`),
+3 already applied* - and `check_harness_homes.py` independently reports the same CONFLICT (`custom_deepseek` in the
+home vs `maxwell_omlx` in the declaration). That flip binds the everyday path to the engine that owns the models
+(T-174) and it is owner-worded; it is NOT applied here.
+
+**NEXT CRITICAL STEPS, consequential order (each one unblocked unless marked):**
+1. **T-181 limb 2 - the note's home** (the highest-leverage word now given): declare `journals:notes`' share of the
+   ONE corpus root so `admits_to` stops being `null` and the 621 files refused for "no declared corpus home"
+   acquire one; the declaration must state that ADMISSION IS NOT CONVERSION.
+2. **The BUG-773 red loop** (a rail, not a reminder): RED when `stage6.commit_scope` is `full_upsert` while
+   `never_at_commit` is true, with ROUTE 1/2 (measured this sitting) as its fixtures.
+3. **The provider-list writer** (BUG-874's residual) so the next model-set drift is a RED rail, not a hand fix.
+4. **T-183's applier**, then T-180's four limbs, then T-176's accepted 122 rows, T-179's retirement, T-182's
+   accepted negative.
+5. **`just ask` grounded in the retriever** (the measured gap): retrieve -> cite FB ids -> REFUSE when the corpus
+   is silent -> a receipt; no plugin is required for this, it is wiring.
+6. **The `scheduler` reading** (what a bundled platform extension could contribute) and the `orchestrator`
+   declaration, so the last two declarations in the extension set are true by measurement.

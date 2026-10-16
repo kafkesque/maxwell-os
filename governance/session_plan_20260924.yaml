@@ -361,6 +361,17 @@ may_touch:
 - config/artifact_ownership.yaml
 - config/capability_registry.yaml
 - pipeline/config_audit.py
+# 2026-10-16 (T-175/D-3046, the adapter-surface act): the writer MOVED into its declared adapter home, which is
+# a new governed path - granted by NAME (BUG-548/BUG-563: never a glob), plus the two findings' own scripts.
+# The plan's `will_not_touch` follows.
+- agent/adapters/goose/apply_provider_flip.py
+- pipeline/apply_provider_flip.py
+- temp/land_20261016p_t175.py
+- temp/land_20261016q_t175.py
+- temp/land_20261016r_t175.py
+- temp/land_20261016s_findings.py
+- temp/smoke_parallel.py
+- temp/d3046_record.yaml
 will_not_touch:
 - governance/F11_*
 - governance/ANCHOR_RULER_CONSOLIDATED_*.csv

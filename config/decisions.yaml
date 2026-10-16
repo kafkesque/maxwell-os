@@ -26173,3 +26173,81 @@ decisions:
     the store or any stage; it does not rename a single file; it does not make the marker or truncation classes
     a defect the pipeline must fix (the door key strips the marker and collapses whitespace, D-3040/T-173); and
     it does not change T-172, whose 37 corpus stems still ride the next re-ingest.'
+- id: D-3046
+  state: ACTIVE
+  date: '2026-10-16'
+  by: assistant
+  category: HARNESS / ADAPTER SURFACE
+  bugs:
+  - BUG-852
+  - BUG-853
+  files:
+  - config/agent_surface.yaml
+  - config/agent_context.yaml
+  - config/engine.yaml
+  - scripts/check_agent_surface.py
+  - pipeline/harness_env.py
+  - pipeline/parallel.py
+  - pipeline/subagent_fanout.py
+  - agent/adapters/goose/apply_provider_flip.py
+  - agent/adapters/goose/wiring.md
+  title: A CLASS IS MEASURED FROM THE BYTES, AND A REMEDY THAT HAS LANDED MOVES THE COUNT - the adapter surface's
+    three hand-bound client couplings are routed (one by a MOVE into its declared home, two by a declaration), the
+    register falls from 8 sites to 5, and the reading it prints is now a measurement instead of a promise
+  decision: '(1) THE DEFECT, MEASURED. The surface rail (scripts/check_agent_surface.py) declared a CLASS for every
+    binding site - owed, prose_citation, control_fixture, adapter_code - and NEVER tested that claim against the
+    file. So a row kept saying what it said last session. MEASURED 2026-10-16: pipeline/apply_provider_flip.py was
+    declared OWED, but after T-174''s remedy landed the file only QUOTES the shape it used to build (three of its
+    six hits sit in the module docstring), and the rail repeated the register and printed a THIRD OWED line. The
+    ladder therefore stayed LOUD for a remedy that had already landed, and "three sites owe" was a claim about last
+    session''s bytes rather than a reading of this one. Filed as BUG-852 (MED, FIXED). (2) THE RULE THIS DECISION
+    LOCKS. A class is a claim ABOUT A FILE, so the rail MEASURES it: comments and triple-quoted blocks are BLANKED
+    (never deleted - the line numbers stay valid, so a hit is tested against the same line in code), a site declared
+    prose_citation must hold EVERY shape it carries in prose, and a site of any other DECLARED class must hold at
+    least one in CODE. Both directions are faults: a citation that is really code would exempt a live coupling,
+    and a binding that is really a citation keeps dead debt on the ladder. Which classes QUOTE is itself declared
+    (config/agent_surface.yaml#rules.quoting_classes: [prose_citation]) - a vocabulary written into the rail would
+    be a second home for it (C12). Reading a class is therefore not bookkeeping: it is the difference between a
+    register that reports and a register that repeats. (3) WHAT THE MEASUREMENT FOUND, SITE BY SITE. MEASURED 2026-10-16
+    over 576 scanned files and 3 declared shapes: apply_provider_flip.py carried 6 hits (3 prose; 3 in code - the
+    client''s override variable read by name, and a label plus a regex naming the client''s thinking-effort knob);
+    pipeline/parallel.py carried 1 code hit (two client knobs popped by their literal names inside a worker initializer);
+    pipeline/subagent_fanout.py carried 1 code hit (the client''s app-bundle path written into generated shell).
+    Every OTHER declared site''s class was ALREADY true (harness_contract.py 2 prose; bind_harness_env.sh 1 prose;
+    resolve_route.py 1 prose; check_governance_faces.py 3 including code; check_agent_surface.py itself 2 including
+    code) - which is why the vocabulary could be trusted for four of the eight rows and not for three. (4) THE THREE
+    REMEDIES, each the one its own row named. SITE 1: the writer MOVED to agent/adapters/goose/apply_provider_flip.py,
+    because the surface''s own rule says a harness-specific file, path, provider binding or env var belongs under
+    adapter.roots or nowhere - and a file whose whole subject is ONE named client''s configuration home is that
+    client''s mechanism. The remedy was therefore not a new exemption but a MOVE (git mv, with every live reference
+    updated: the ladder line, the capability registry, T-137''s declared on_pass command, the census docstring,
+    and this client''s wiring doc). SITE 2: the names a pipeline WORKER must not inherit are DECLARED (config/agent_context.yaml#worker_env.strip,
+    each carrying the reason that keeps it there), read by ONE reader (pipeline/harness_env.py#worker_strip) - and
+    read in the PARENT, then passed to each worker as initargs, so an unreadable declaration stops the run with
+    a message instead of dying inside a forked worker whose failure mode is a hung pool. SITE 3: the client''s binary
+    and the wrapper that binds the ratified contract are DECLARED (config/agent_surface.yaml#adapter.provider_bindings.goose.client_bin,
+    and #adapter.executor for the wrapper, declared ONCE because the wrapper is harness-agnostic), and the fanout''s
+    agent mode invokes the executor with that binary: it writes neither into generated shell, so a swap moves a
+    declaration and not an executor. (5) WHY A WORD - NOT A PATH - DECIDES WHICH CLIENT, AND A CLAIM IN THE ADAPTER
+    REFUTED BY MEASUREMENT. config/engine.yaml#harnesses.default_harness: goose is a WORD beside goose_provider_id,
+    so no core script names a client at all. MEASURED while writing it, and it refutes the adapter''s own wiring
+    doc: `omlx launch list` and `omlx launch --help` serve NINE integrations (claude, codex, codex_app, opencode,
+    openclaw, hermes, pi, copilot, dsh) and goose is not one of them - the engine WIRES CLIENT TOOLS while goose
+    is the client this repository runs by default, so there is no engine integration to invoke and the form that
+    exists is the binary plus the declared executor. agent/adapters/goose/wiring.md said the opposite; it is corrected
+    in place, with the reading. Filed as BUG-853 (MED, FIXED). (6) THE COUNT IS NOW A MEASUREMENT, AND IT DID NOT
+    SHRINK BY DELETION. The register declares FIVE sites (from eight) and the ceiling was lowered 8 -> 6: the five
+    live sites plus ONE declared slot, because the channel that CAUGHT these three - a binding discovered in code,
+    registered as `owed`, read LOUD at rc 2 while the ladder kept running (BUG-457) - is the channel the NEXT discovery
+    needs, and a ceiling set exactly on the live count would make a discovery FATAL and force a remedy on the spot.
+    Rounding a discovery away is worse than a declared slot. Nothing was hidden to make the number look good: the
+    two declaration-routed sites no longer carry any shape, and the moved file''s hits are INSIDE a declared adapter
+    root, which is exactly where the rail says a binding BELONGS. (7) WHAT THIS DECISION DOES NOT DO. It does not
+    change pipeline behaviour: parallel.py strips the same two names, now declared - MEASURED in a real two-worker
+    pool (a parent holding both names in a sentinel value sees them ABSENT in every pooled worker and untouched
+    in the parent). It does not close T-135: the ratified context knobs are still UNBOUND for a bare launch (MEASURED
+    2026-10-16, pipeline/harness_env.py --check reads rc 2 with five names UNBOUND), and the writer still hardcodes
+    the two values of its own safe phase with the thinking-effort knob declared in no contract - filed as BUG-854
+    and registered as the next critical step. It does not touch the store, the corpus or S0. And it does not retire
+    the `owed` class: a binding discovered in code is still registered, still reads LOUD, and the ladder still keeps
+    running.'

@@ -6,16 +6,23 @@ is a REGEX substitution that must match exactly ONCE, the file is backed up befo
 file is READ BACK (parsed) to prove the assignment is in effect, and `--rollback` restores the newest backup.
 Default is `--dry-run` (no writes).
 
-TWO FACTS ABOUT THIS WRITER, MEASURED 2026-10-16 (T-174/T-175, BUG-850/BUG-851):
+THREE FACTS ABOUT THIS WRITER, MEASURED 2026-10-16 (T-174/T-175, BUG-850/BUG-851/BUG-852):
 
-  1. THE HOME IS DECLARED, NOT CONSTRUCTED. The client's home path used to live here as
-     `Path.home() / ".config" / "goose" / "config.yaml"` — a SECOND answer to a question
-     `config/agent_context.yaml#homes.harness_config` already answers, and the reason this file was registered
-     as an OWED binding site on the adapter surface (config/agent_surface.yaml#adapter.binding_sites). It is now
-     RESOLVED from the declaration, with `GOOSE_CONFIG` kept as the one deliberate override. The same rule
-     applies to the VALUES: nothing here restates a provider or a model name — those are pointers into
+  1. THE HOME IS DECLARED, NOT CONSTRUCTED. The client's home path used to be CONSTRUCTED here - a second answer
+     to a question `config/agent_context.yaml#homes.harness_config` already answers. It is now RESOLVED from that
+     declaration, and the client's own override variable (which the owner may set to point this writer at a
+     fixture home) is kept as the one deliberate override. The same rule applies to the VALUES: nothing here
+     restates a provider or a model name - those are pointers into
      config/engine.yaml#harnesses.goose_provider_id and config/model_assignments.yaml#harness_roles, so a swap
      moves the declaration and this writer follows. `--selftest` proves it by reading its own bytes.
+
+  3. THIS FILE MOVED TO ITS DECLARED HOME (T-175/D-3046, MEASURED 2026-10-16). It lived in `pipeline/` - the
+     deterministic core - while it edits ONE named client's configuration home, and the adapter surface's own
+     rule says a harness-specific file belongs under `adapter.roots` or nowhere. The surface therefore reported
+     it as an OWED binding site whose remedy was "read the home from the declared pointer": the reading landed,
+     and the whole-file remedy was the move. The register now declares NO owed site at all, so the count the
+     ladder prints is a MEASUREMENT rather than a promise - and this file may name its own client, which is
+     exactly what an adapter home is for (D-3037/C12).
 
   2. ALREADY-APPLIED IS NOT DRIFT. The writer refused with "matched 0 time(s)" on a file that was ALREADY in
      the state it produces (two of four edits had been applied in an earlier session), so the honest state was
@@ -47,7 +54,8 @@ import tempfile
 from datetime import datetime
 from pathlib import Path
 
-AGENT_CONTEXT = Path(__file__).resolve().parent.parent / "config/agent_context.yaml"
+REPO = Path(__file__).resolve().parents[3]   # agent/adapters/<client>/ -> the repository root
+AGENT_CONTEXT = REPO / "config/agent_context.yaml"
 
 #: WHAT THIS WRITER MAY SET — declared once, as POINTERS into the homes that own the facts (C12). A provider or
 #: model name written here would be a second copy that silently disagrees the moment the declaration moves.
@@ -93,7 +101,7 @@ def declared_home(env: dict[str, str] | None = None) -> Path:
 
 def pointers() -> tuple[str, str]:
     """(provider id, agent-loop model) resolved from their declared homes — never restated (C12)."""
-    sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+    sys.path.insert(0, str(REPO))
     from pipeline.harness_env import (
         resolve,  # the ONE pointer resolver (D-2646: never re-implement)
     )

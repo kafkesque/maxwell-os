@@ -72,7 +72,7 @@ terminal_condition:
   fail: any metric below bar -> treatment rejected; active_provider stays custom_deepseek
 
 gate:
-  on_pass: run pipeline/apply_provider_flip.py --apply-flip
+  on_pass: run agent/adapters/goose/apply_provider_flip.py --apply-flip
   on_fail: record bug, re-baseline the declared bar (never loosen a bar silently)
   blocked_by: 'BUG-832 (OPEN): the local session-brain route is REFUTED BY MEASUREMENT - gemma-4-E4B and
     Qwen3-Coder both score 0.0 on long_context_reasoning_16k (config/harness_policy.yaml), so flipping

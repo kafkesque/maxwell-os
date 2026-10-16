@@ -395,7 +395,11 @@ def check(w: World) -> tuple[list[str], dict]:
     for cls in ("tasks", "bugs"):
         ceiling = ceilings.get(f"unrouted_open_{cls}")
         if isinstance(ceiling, int) and debt[cls] > ceiling:
-            grown = [i.id for i, c, _ in rows if i.cls == cls and c != "routed"]
+            # BUG-855 (MEASURED 2026-10-16): `Item.cls` is the SINGULAR class token while `cls` here is the PLURAL
+            # ceiling key, so this comprehension matched NO row and the sentence ended at "Now unrouted: " - the ONE
+            # fault whose whole purpose is to name the items named none of them. `debt` above already compares with
+            # the singular, which is why the count and the ceiling were right while the LIST was empty.
+            grown = [i.id for i, c, _ in rows if i.cls == cls[:-1] and c != "routed"]
             faults.append(f"(vi) ROUTING DEBT GREW: {debt[cls]} open {cls} resolve to no declared capability, "
                           f"against a declared ceiling of {ceiling} (SHRINK-ONLY, the D-3023 shape). Declare the "
                           f"route, or disposition the item - never raise the ceiling. Now unrouted: "
@@ -606,6 +610,15 @@ def selftest() -> int:
     f, _ = check_world(w)
     control("debt_grew", len([x for x in f if "DEBT GREW" in x]), 1,
           "routing debt above the declared shrink-only ceiling is refused (D-3023 shape)")
+
+    # BUG-855: the assertion is on the IDS, never on the fault's existence - a fault that names nothing passed the
+    # control above, which is why nothing caught this. A world of two unrouted BUGS against a ceiling of one.
+    wb = synthetic(items=[Item("B-1", "bug", "", "x"), Item("B-2", "bug", "", "y")],
+                   cfg={"routing_debt": {"measured": "fixture", "unrouted_open_tasks": 1, "unrouted_open_bugs": 1}})
+    fb, _ = check_world(wb)
+    control("debt_grew_names_the_bugs_it_is_about",
+          len([x for x in fb if "DEBT GREW" in x and "B-1" in x and "B-2" in x]), 1,
+          "the routing-debt fault PRINTS the ids it is about, never an empty list (BUG-855)")
 
     w = synthetic()
     _f, c = check_world(w)

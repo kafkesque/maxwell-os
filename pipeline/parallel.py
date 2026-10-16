@@ -29,10 +29,18 @@ from __future__ import annotations
 
 import multiprocessing
 import os
+import pathlib
+import sys
 import time
 from collections.abc import Callable
 from multiprocessing import Pool
 from typing import Any, TypeVar
+
+ROOT = pathlib.Path(__file__).resolve().parent.parent
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+# ONE reader for the names a worker must not inherit (C12/T-175): config/agent_context.yaml#worker_env.strip.
+from pipeline.harness_env import worker_strip  # noqa: E402
 
 T = TypeVar("T")
 
@@ -46,10 +54,16 @@ class ParallelMapError(RuntimeError):
     """
 
 
-def _worker_init() -> None:
-    """Initialize worker process — suppress OMLX env issues."""
-    # Workers shouldn't inherit thinking mode flags
-    for var in ("GOOSE_THINKING_EFFORT", "GOOSE_PROVIDER"):
+def _worker_init(strip: tuple[str, ...] = ()) -> None:
+    """Initialize a worker process: drop the client names a WORKER must not inherit (T-175 / D-3046).
+
+    MEASURED 2026-10-16: this initializer used to pop two client knobs by their LITERAL names, which made this
+    module read as a hand-bound client coupling on the adapter surface (config/agent_surface.yaml). The names now
+    come from config/agent_context.yaml#worker_env.strip, and the LIST is read in the PARENT (see parallel_map):
+    a declaration this module cannot read must fail loudly here, never inside a forked worker whose failure mode
+    is a hung pool. The behavior is unchanged - a worker is not a session.
+    """
+    for var in strip:
         os.environ.pop(var, None)
 
 
@@ -94,9 +108,13 @@ def parallel_map(  # noqa: UP047
     results: list[T | None] = []
     errors: list[str] = []
 
+    # Read the declared names HERE, in the parent: an unreadable declaration must stop the run with a message,
+    # not die inside a worker the pool then waits on (T-175).
+    strip = worker_strip()
     with Pool(
         processes=min(max_workers, len(items)),
         initializer=_worker_init,
+        initargs=(strip,),
     ) as pool:
         # Submit all tasks asynchronously
         async_results = [

@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1173 decisions (census stamp 71188bc9fc73b61a, 2026-10-16) · 615 bugs (224 open / 391 closed; highest OPEN = BUG-850) · 47 open tasks (MUST 11 / SHOULD 31 / WORTH 5; OWNER-moved 1, pipeline-moved 46; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1174 decisions (census stamp de1c775e7f224a59, 2026-10-16) · 620 bugs (224 open / 396 closed; highest OPEN = BUG-854) · 46 open tasks (MUST 11 / SHOULD 30 / WORTH 5; OWNER-moved 1, pipeline-moved 45; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **79** of 1173 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 588 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1173, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **79** of 1174 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 589 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1174, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 224 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 34 · 🟨 MED 61 · 🟩 LOW 24 · UNLABELLED 101 (BUG-757) of 224 open.
+> Open BUGS by severity (population = the census's 224 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 34 · 🟨 MED 60 · 🟩 LOW 25 · UNLABELLED 101 (BUG-757) of 224 open.
 >
 > **OWNER LANE (1) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -20,7 +20,7 @@
 > |---|---|---|---|
 > | T-176 | 🟡 WORTH | THE SOURCE LIBRARY NAMES, IF HUMAN-READABLE NAMES ARE EVER WANTED - the act this decision priced and did NOT a | owner lane: the owner says whether human-readable library names are wa |
 >
-> **PIPELINE LANE (46) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
+> **PIPELINE LANE (45) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
 >
 > | id | pri | state | task | evidence |
 > |---|---|---|---|---|
@@ -37,7 +37,7 @@
 > | T-150 | 🔴 MUST | 🔴 open | THE DURABLE PATH IS THE DELEGATION PATH (D-3020): anything whose failure is not free goes through pipeline/sub | temp/runs/fanout_20261015i/98_receipt.json - 3/3 DONE with one task deliberately given a 1 |
 > | T-105 | 🟠 SHOULD | 🔴 open | REA tier A/B mining — DEVONthink 3 (related-document ranking) and Cursor (derived code index) | governance/NOT-YET-EVALUATED-RESEARCH.md (REA targets logged 2026-10-13) |
 >
-> _the face is a VIEW: 12 of 46 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
+> _the face is a VIEW: 12 of 45 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
 >
 > **STANDING RULES — in effect, never close (1):**
 >
@@ -15555,9 +15555,22 @@ control cannot pass by counting nothing (20/20 controls green).
 ACKNOWLEDGED LIMIT: the door's rc is still ONE number. What changed is that the reading names its driver per class,
 so a future acceptance cannot move the door silently.
 
-## BUG-850 (MED — OPEN 2026-10-16) — pipeline/apply_provider_flip.py, pipeline/parallel.py and pipeline/subagent_fanout.py each BIND a client binding by hand, so the ONE declared home is not the only home
+## BUG-850 (MED — FIXED 2026-10-16) — pipeline/apply_provider_flip.py, pipeline/parallel.py and pipeline/subagent_fanout.py each BIND a client binding by hand, so the ONE declared home is not the only home
 
-**Status:** OPEN (remedy T-175). MEASURED 2026-10-16 by `scripts/check_agent_surface.py` (19/19 known-answer controls), the rail T-169 landed.
+**Status:** FIXED 2026-10-16 (T-175/D-3046). MEASURED 2026-10-16 by `scripts/check_agent_surface.py` (19/19 known-answer controls when it was found; 21/21 after the class is measured), the rail T-169 landed.
+
+FIX (three sites, each the remedy its own row named - and no row was DELETED to make a number look good):
+SITE 1 MOVED - `agent/adapters/goose/apply_provider_flip.py`, because a file whose whole subject is ONE named
+client's configuration home is that client's mechanism, and the surface's own rule puts it under `adapter.roots`;
+the register row comes off because its hits are now INSIDE a declared root, which is where the rail says a binding
+BELONGS. SITE 2 DECLARED - `config/agent_context.yaml#worker_env.strip` names the client knobs a pipeline worker
+must not inherit, each with its reason, read by ONE reader (`pipeline/harness_env.py#worker_strip`) in the PARENT
+and passed to each worker as initargs; MEASURED in a real two-worker pool - a parent holding both names in a
+sentinel value sees them ABSENT in every pooled worker and untouched in the parent. SITE 3 DECLARED -
+`config/agent_surface.yaml#adapter.provider_bindings.goose.client_bin` plus `#adapter.executor` (declared ONCE,
+because the wrapper is harness-agnostic); the fanout's `agent` mode now invokes the declared executor with the
+declared binary and writes neither into generated shell. MEASURED AFTER: the live register declares FIVE sites,
+NO owed row, and the rail reads rc 0 where it read rc 2 with three debts.
 
 SYMPTOM: `config/agent_surface.yaml` declares ONE binding home (`config/agent_context.yaml`) and the engine's own
 integration module, and the first live reading of the new rail found three code sites that do the binding by hand:
@@ -15575,7 +15588,135 @@ comment (D-3034), and the first three sites the reader found were all second hom
 REMEDY (T-175): each site resolves its name, home or binary from the declared home rather than restating it, and the
 register SHRINKS (ceiling 8 -> 5, shrink-only, D-3023). Until then the rail reports them LOUDLY with the row named.
 
-ACKNOWLEDGED LIMIT: two hits in the register are NOT bindings - `scripts/check_governance_faces.py` and
+ACKNOWLEDGED LIMIT (narrowed 2026-10-16 by D-3046, not closed): `scripts/check_governance_faces.py` and
 `scripts/check_agent_surface.py` are declared `control_fixture`, because a known-answer control must CONTAIN the shape
-it proves the rail detects. That class is the one place the register can hide a real binding, and the reason the
-ceiling is shrink-only rather than a count that may drift.
+it proves the rail detects. The class is now MEASURED - its shape must sit in CODE, never in a docstring - so a
+CITATION can no longer hide there; what remains is that a fixture and a real binding look alike in bytes, which is
+why the ceiling is shrink-only and why a `control_fixture` row is a claim a reader must be able to check by hand.
+
+## BUG-852 (MED — FIXED 2026-10-16) — the binding register's CLASS was ASSERTED and never measured, so a row whose remedy had already landed kept the ladder reading LOUD and the count of owed sites was a promise rather than a reading
+
+**Status:** FIXED 2026-10-16 (T-175/D-3046; `scripts/check_agent_surface.py` 21/21 known-answer controls, two of them new).
+
+FILE / LINES: `scripts/check_agent_surface.py` (`site_faults`/`binding_hits`) reading `config/agent_surface.yaml#adapter.binding_sites.sites` → the row for `pipeline/apply_provider_flip.py`.
+
+SYMPTOM (read, not inferred): `python3 scripts/check_agent_surface.py` printed THREE `OWED` lines and rc 2, among them
+`OWED pipeline/apply_provider_flip.py (row T-175) — it CONSTRUCTS the client home (Path.home()/.config/... with a
+GOOSE_CONFIG override)` — while the file had stopped constructing anything one act earlier (T-174: the home is RESOLVED
+from `config/agent_context.yaml#homes.harness_config`). The rail was RESTATING the register, so a discharged site kept a
+whole ladder line loud and the honest number of owed sites (two) could not be read off the ladder.
+
+ROOT CAUSE: the register declares a CLASS per site, and the rail used that class as the disposition (`owed` ⇒ loud)
+without ever testing it against the file. MEASURED with the instrument that now exists: of that file's SIX shape hits,
+THREE sit inside the module docstring (prose) and three are code, so the row's claim had become FALSE while the shape
+itself was still present — exactly the state the existing "no longer carries a declared shape" fault cannot catch.
+
+FIX (MEASURED, both directions): comments and triple-quoted blocks are BLANKED (line numbers preserved, so a hit is
+tested against the same line in code); a site declared `prose_citation` must hold EVERY shape it carries in prose, and a
+site of any other DECLARED class must hold at least one in CODE. Both directions are controlled:
+`a_site_declared_owed_whose_shape_is_only_PROSE_is_a_fault_D3046` and
+`a_site_declared_a_citation_whose_CODE_carries_the_shape_is_a_fault_D3046`. WHICH classes quote is itself declared
+(`rules.quoting_classes`), so the rail hardcodes no vocabulary (C12). The three owed rows were then remedied for real
+(T-175: one MOVE into the adapter root, two declarations) and the live reading is rc 0 with NO owed site.
+
+ACKNOWLEDGED LIMIT: `control_fixture` remains the one class that could hide a binding — its shape must now be in CODE, so
+the residue is narrower (a fixture and a real binding genuinely look alike in bytes) but it is not gone. The shrink-only
+ceiling is what keeps that from being a free pass.
+
+---
+
+## BUG-853 (MED — FIXED 2026-10-16) — the default client's binding home named a launch form the engine does not serve: `omlx launch goose` is absent from the engine's own integration list, so the adapter's wiring doc described an invocation that cannot run
+
+**Status:** FIXED 2026-10-16 (T-175/D-3046; the doc is corrected in place and the form that EXISTS is declared).
+
+FILE / LINES: `agent/adapters/goose/wiring.md:3-4` (the claim) and its "the client's own wiring module" table row.
+
+SYMPTOM: the adapter home said the wiring "is the engine's own module ... `omlx launch goose` runs it". MEASURED
+2026-10-16: `omlx launch list` prints NINE integrations — claude, codex, codex_app, opencode, openclaw, hermes, pi,
+copilot, dsh — and `omlx launch --help` accepts exactly those; **goose is not among them**. The engine WIRES CLIENT TOOLS;
+goose is the client this repository runs BY DEFAULT and no engine integration for it exists.
+
+ROOT CAUSE: a plausible sentence written from the shape of the neighbouring tools and never executed. It also EXPLAINS
+the third hand-bound coupling (BUG-850 site 3): with no engine integration to call, the fanout wrote the client's binary
+path into generated shell by hand — the coupling existed because the declared alternative did not.
+
+FIX: `config/engine.yaml#harnesses.default_harness` is a WORD (never a path in code) so no core script names a client;
+`config/agent_surface.yaml#adapter` declares the two facts that exist — `executor` (the wrapper that binds the ratified
+contract for a child process) and `provider_bindings.goose.client_bin` (PATH first, then the app's own path). `wiring.md`
+carries the reading and its table row points at the declarations instead of at a command that cannot run.
+
+---
+
+## BUG-854 (LOW — OPEN 2026-10-16) — agent/adapters/goose/apply_provider_flip.py hardcodes the two values of its own safe phase, and the thinking-effort knob it sets is declared in NO contract
+
+**Status:** OPEN (remedy: the KNOB BINDING, owned by T-135 — registered as the next critical step). No owner word needed.
+
+FILE / LINES: `agent/adapters/goose/apply_provider_flip.py` — `SAFE_NVIDIA_ENABLED = "false"`,
+`SAFE_THINKING_EFFORT = "medium"`, and the two edits that use them.
+
+SYMPTOM: two values a client will OBEY are constants in a script, and one of the two knobs they name appears in no
+declaration anywhere under `config/` — MEASURED 2026-10-16: `config/agent_context.yaml#ratified.knobs.trigger` declares
+the window, the compaction pair and the identity pair, and `GOOSE_THINKING_EFFORT` is not among them (nor is
+`nvidia.enabled`).
+
+ROOT CAUSE: the "now" phase was written as this writer's own policy. That is the C12 defect one layer below the one T-175
+fixed: the file no longer CONSTRUCTS a home (it resolves it) but it still OWNS two values, so a future decision about the
+thinking budget has no home to change and no reader to move.
+
+PROPOSED FIX (the next critical step, T-135): declare both values WITH their reasons (a thought on a LOCAL engine costs
+prefill seconds nobody bills for; a cloud accelerator is off because this engine owns no NVIDIA tier), have the writer
+read them, add the ratified trigger names to the writer's declared edit list with an INSERT-IF-ABSENT mode, and add one
+`home_fact` per knob so `scripts/check_harness_homes.py` reads each one back — which is what moves
+`pipeline/harness_env.py --check` from rc 2 (FIVE names UNBOUND for a BARE launch) toward rc 0.
+
+---
+
+## BUG-855 (MED — FIXED 2026-10-16) — the routing-debt fault named NO item: the list it is about was built by comparing the SINGULAR item class with the PLURAL ceiling token, so a 223-item worklist read as "some debt somewhere"
+
+**Status:** FIXED 2026-10-16 (found by this act's forensic audit; `scripts/resolve_route.py --selftest` gains one control).
+
+FILE / LINES: `scripts/resolve_route.py:398` — `grown = [i.id for i, c, _ in rows if i.cls == cls ...]`, inside `for cls in ("tasks", "bugs")`.
+
+SYMPTOM (read, not inferred): `python3 scripts/resolve_route.py --check` read rc 1 with *"(vi) ROUTING DEBT GREW:
+223 open bugs resolve to no declared capability, against a declared ceiling of 222 (SHRINK-ONLY ...). Declare the
+route, or disposition the item - never raise the ceiling. Now unrouted: "* — and then NOTHING. `Item.cls` is the
+SINGULAR class token ("bug"/"task") while the loop token is the PLURAL ceiling key ("bugs"/"tasks"), so the
+comprehension matched no row: the ONE fault whose entire purpose is to name the items named none of them. It was
+found by hand, while attributing this session's debt growth to a new bug — the reader had to bisect a 223-id
+population because the rail would not print it.
+
+ROOT CAUSE: a plural/singular mismatch between two vocabularies that live in the same function. The `debt` dict
+builds the same comparison correctly (`i.cls == "bug"`), which is exactly why the fault FIRED with the right count
+and the right ceiling and still could not say WHICH items produced them.
+
+FIX + CONTROL: the loop derives the singular (`cls[:-1]`). The new control asserts the IDS are printed — never that
+the fault fires — because a fault that names nothing is what passed the old control:
+`debt_grew_names_the_bugs_it_is_about` (a synthetic world with two unrouted BUGS against a ceiling of one, both ids
+required in the sentence). MEASURED AFTER: the live check prints `Now unrouted: BUG-099, BUG-151, BUG-159, ...`.
+
+---
+
+## BUG-856 (LOW — FIXED 2026-10-16) — the route graph owned ITSELF nowhere, so a finding about `config/capability_registry.yaml` could never route and joined the unrouted worklist by construction
+
+**Status:** FIXED 2026-10-16 (found while routing this act's own bug; `config/capability_registry.yaml` gains the `route_graph` capability).
+
+FILE / LINES: `config/capability_registry.yaml` (the capabilities list) and the join in `scripts/resolve_route.py`.
+
+SYMPTOM (MEASURED 2026-10-16, by listing every capability's `owns`): NO capability owned `scripts/resolve_route.py`
+or `config/capability_registry.yaml` — the two artifacts whose whole subject IS routing were the only ones the graph
+could not route. A finding about the route graph therefore lands in the unrouted population (223 of 225 open bugs
+that day) BY CONSTRUCTION, and the register's own reason for that population ("a bug routes only when its title
+names a declared capability's artifact") becomes a closed loop: the artifact that would have to be named is owned by
+nobody.
+
+ROOT CAUSE: the registry enumerated the pipeline's subsystems and never itself. A graph whose own reader is not a
+node has an edge it cannot draw — and the consequence is measurable: the census that reports the unrouted debt
+cannot report the debt of the thing that reports it.
+
+FIX: a `route_graph` capability (kind script, entrypoint `python3 scripts/resolve_route.py --check`, check `--selftest`,
+owns both paths) whose receipt is a COMPOSED pointer into its own registry —
+`config/capability_registry.yaml#routing_debt.measured` — because what this capability leaves behind is exactly the
+shrink-only debt reading it maintains and refuses to raise, not a separate artifact. MEASURED AFTER: a finding
+titled with the registry's own path ROUTES, and the open-bug debt is back at the declared ceiling of 222.
+
+---

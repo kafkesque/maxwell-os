@@ -33,6 +33,14 @@ harnesses:
   # (maxwell_omlx, custom_deepseek, nvidia, ollama) and a DECLARED provider is not a BOUND one:
   # measured 2026-10-15, goose run -t answered without the local engine's request counter moving.
   goose_provider_id: maxwell_omlx
+  # WHICH CLIENT IS THE DEFAULT ONE (T-175/D-3046). The engine WIRES nine other tools to itself
+  # (harnesses.tools, measured by `omlx launch list`); the client this repository runs by default is NOT one of
+  # them - MEASURED 2026-10-16, `omlx launch list` names claude/codex/opencode/openclaw/hermes/pi/copilot/dsh
+  # and goose is absent from both the list and the command's own help. So the engine cannot launch it, and the
+  # form that exists is the binary plus the declared executor (config/agent_surface.yaml#adapter). This key is
+  # a WORD, never a path in code: a core script that must launch the client asks HERE which one it is, then
+  # reads that client's binding from the surface. A swap moves this word.
+  default_harness: goose
   # WHICH PROVIDER KEY IS THE ESCALATION (T-174/D-3044). D-3023 says a cloud token is an ESCALATION, not a
   # fallback; this names WHICH provider that is, so the distinction can be READ BACK from the client home
   # (scripts/check_harness_homes.py) instead of asserted here: the escalation must stay reachable and must

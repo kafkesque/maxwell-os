@@ -16,6 +16,12 @@ absent key is FATAL rather than defaulted, because an inferred rule can be made 
                 bundle, a client environment knob) unless the site is DECLARED in the register. The register
                 may not GROW (SHRINK-ONLY, D-3023), may not keep a stale row, may not carry an undeclared
                 class, and an `owed` row must name a row that EXISTS (D-3034: a declaration must resolve).
+                The CLASS of every site is MEASURED FROM THE BYTES and never asserted (D-3046, MEASURED
+                2026-10-16/BUG-852): a site declared `prose_citation` must hold EVERY shape it carries in a
+                comment or a docstring, and a site of any other class must hold at least one in CODE. A row
+                that says `owed` for a file that only QUOTES the shape kept a whole ladder line reading LOUD
+                for a remedy that had already landed - the register repeated a claim instead of measuring a
+                file, and the count of owed sites was a promise rather than a reading.
   R3 RESOLUTION every declaration must RESOLVE: an in-repo root exists or is declared optional, an external
                 root is declared OUTSIDE the repository (never mirrored), a declared glob matches at least
                 one file, the declared journal exists and its declared reader names this file, and the
@@ -65,6 +71,7 @@ REQUIRED_KEYS = (
     "rules.record_artifacts",
     "rules.forbidden_in_portable",
     "rules.binding_site_classes",
+    "rules.quoting_classes",
     "rules.binding_scan.roots",
     "rules.binding_scan.globs",
     "rules.binding_shapes",
@@ -139,13 +146,8 @@ def tool_files(repo: Path, scan: dict[str, Any]) -> list[Path]:
     return sorted(found)
 
 
-def binding_hits(
-    repo: Path,
-    files: list[Path],
-    shapes: list[Any],
-    adapter_roots: list[str],
-) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
-    """Split every shape hit into IN the declared adapter roots and OUTSIDE them (where it must be declared)."""
+def compiled_shapes(shapes: list[Any]) -> list[tuple[str, re.Pattern[str]]]:
+    """The declared shapes, compiled once. A shape without an id or a pattern is FATAL - a shape is DECLARED."""
     compiled: list[tuple[str, re.Pattern[str]]] = []
     for shape in shapes:
         if not isinstance(shape, dict) or "id" not in shape or "pattern" not in shape:
@@ -154,6 +156,38 @@ def binding_hits(
             compiled.append((str(shape["id"]), re.compile(str(shape["pattern"]))))
         except re.error as exc:
             fatal(f"the declared binding shape '{shape['id']}' is not a valid pattern: {exc}")
+    return compiled
+
+
+def code_only(text: str) -> str:
+    """The file's CODE, line for line: comments and triple-quoted blocks blanked out, never deleted.
+
+    WHY THIS EXISTS (T-175/D-3046, MEASURED 2026-10-16/BUG-852). The register declares a CLASS for every site,
+    and the class is a claim about the file: `prose_citation` says the file only QUOTES the shape it forbids or
+    measured, while every other class says the shape is in the bytes the file RUNS. Without this reading the
+    class was asserted by whoever wrote the row - so a site whose remedy had already landed kept the ladder
+    reading LOUD (rc 2) and the number of owed sites was a promise. Blanking rather than deleting keeps every
+    line number valid, so a hit can be tested against the SAME line in the code.
+    """
+    blanked = re.sub(r'"""(?:.|\n)*?"""', lambda m: re.sub(r"[^\n]", " ", m.group(0)), text)
+    single = "'" * 3
+    blanked = re.sub(re.escape(single) + r"(?:.|\n)*?" + re.escape(single),
+                     lambda m: re.sub(r"[^\n]", " ", m.group(0)), blanked)
+    return re.sub(r"(?m)#.*$", lambda m: " " * len(m.group(0)), blanked)
+
+
+def binding_hits(
+    repo: Path,
+    files: list[Path],
+    shapes: list[Any],
+    adapter_roots: list[str],
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """Split every shape hit into IN the declared adapter roots and OUTSIDE them (where it must be declared).
+
+    A hit carries `code`: whether the SAME line in the file's code (comments and docstrings blanked) still
+    matches. The report keeps one hit per shape per file, while the class measurement reads every line.
+    """
+    compiled = compiled_shapes(shapes)
     inside: list[dict[str, Any]] = []
     outside: list[dict[str, Any]] = []
     for path in files:
@@ -162,14 +196,51 @@ def binding_hits(
             text = path.read_text(encoding="utf-8", errors="replace")
         except OSError as exc:
             fatal(f"cannot read {relative}: {type(exc).__name__}: {exc}")
+        code_lines = code_only(text).splitlines()
         in_root = any(relative.startswith(f"{root}") for root in adapter_roots)
         for shape_id, pattern in compiled:
             for number, line in enumerate(text.splitlines(), 1):
                 if pattern.search(line):
-                    hit = {"path": relative, "line": number, "shape": shape_id}
+                    hit = {"path": relative, "line": number, "shape": shape_id,
+                           "code": bool(pattern.search(code_lines[number - 1]))}
                     (inside if in_root else outside).append(hit)
                     break
     return inside, outside
+
+
+def class_faults(repo: Path, data: dict[str, Any], sites: list[Any]) -> list[str]:
+    """R2/D-3046: measure each declared class against the BYTES - a citation is prose, every other class RUNS.
+
+    Both directions are faults, and both were measured before this existed: a row that said `owed` for a site
+    whose shape lived only in its docstring kept the ladder LOUD for a remedy that had already landed (BUG-852),
+    and a row that said `prose_citation` for code that BUILDS a client path would have exempted a real coupling.
+    """
+    faults: list[str] = []
+    vocabulary = [str(c) for c in as_list(dig(data, "rules.binding_site_classes"), "rules.binding_site_classes")]
+    quoting = [str(c) for c in as_list(dig(data, "rules.quoting_classes"), "rules.quoting_classes")]
+    if not set(quoting) <= set(vocabulary):
+        fatal(f"{SURFACE} declares quoting_classes {quoting} outside the site vocabulary {vocabulary}")
+    shapes = compiled_shapes(as_list(dig(data, "rules.binding_shapes"), "rules.binding_shapes"))
+    for site in sites:
+        if not isinstance(site, dict) or "path" not in site:
+            continue
+        klass = str(site.get("class"))
+        path = repo_path(repo, str(site["path"]))
+        if klass not in vocabulary or not path.is_file():
+            continue  # an undeclared class and an absent file are already faults in site_faults
+        text = path.read_text(encoding="utf-8", errors="replace")
+        quoted = [sid for sid, pat in shapes if any(pat.search(line) for line in text.splitlines())]
+        if not quoted:
+            continue  # a stale row is already a fault in site_faults
+        runs = [sid for sid, pat in shapes if any(pat.search(line) for line in code_only(text).splitlines())]
+        if klass in quoting and runs:
+            faults.append(f"R2 {site['path']} is declared '{klass}' but its CODE carries {sorted(runs)}: a "
+                          f"citation is QUOTED, never executed (D-3046)")
+        elif klass not in quoting and not runs:
+            faults.append(f"R2 {site['path']} is declared '{klass}' but every shape it carries is PROSE (a "
+                          f"comment or a docstring): the class is MEASURED from the bytes, and a remedy that has "
+                          f"landed must leave the register (D-3046/BUG-852)")
+    return faults
 
 
 def expand(repo: Path, pattern: str) -> list[Path]:
@@ -350,6 +421,7 @@ def audit(repo: Path, surface_path: Path) -> tuple[list[str], list[str], dict[st
         facts.extend(extra)
     rows, loud, site_count = site_faults(repo, data, outside)
     faults.extend(rows)
+    faults.extend(class_faults(repo, data, as_list(dig(data, "adapter.binding_sites.sites"), "sites")))
     facts.insert(
         0,
         f"code scanned: {len(files)} file(s) | shapes: {len(shapes)} | hits inside a declared root: {len(inside)} "
@@ -504,6 +576,26 @@ def selftest() -> int:
         set_key(data, "adapter.binding_sites.ceiling", 0)
         write_fixture(root, data, leak=True)
         checks.append(("the_register_may_not_grow_past_its_declared_ceiling", bool(faults_for(root, surface))))
+
+        # T-175/D-3046: the CLASS is measured from the bytes, in BOTH directions.
+        root, surface, data = fresh(leak=False)
+        (root / "pipeline" / "quote.py").write_text(
+            '"""this file QUOTES ~/.config/goose/config.yaml and binds nothing"""\n', encoding="utf-8"
+        )
+        set_key(data, "adapter.binding_sites.ceiling", 1)
+        set_key(data, "adapter.binding_sites.sites",
+                [{"path": "pipeline/quote.py", "class": "owed", "row": "T-175", "why": "a remedy already landed"}])
+        write_fixture(root, data, leak=False)
+        checks.append(("a_site_declared_owed_whose_shape_is_only_PROSE_is_a_fault_D3046",
+                       bool(faults_for(root, surface))))
+
+        root, surface, data = fresh(leak=True)
+        set_key(data, "adapter.binding_sites.ceiling", 1)
+        set_key(data, "adapter.binding_sites.sites",
+                [{"path": "pipeline/leak.py", "class": "prose_citation", "why": "a binding wearing a citation"}])
+        write_fixture(root, data, leak=True)
+        checks.append(("a_site_declared_a_citation_whose_CODE_carries_the_shape_is_a_fault_D3046",
+                       bool(faults_for(root, surface))))
 
         root, surface, data = fresh(leak=False)
         (root / "agent" / "skills" / "one" / "SKILL.md").write_text("# run this in goose\n", encoding="utf-8")

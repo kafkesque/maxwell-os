@@ -39,20 +39,29 @@ import sys
 
 import yaml
 
+REPO = pathlib.Path(__file__).resolve().parent.parent
+#: The DECLARED homes, kept as repository-relative names so a reader can see WHICH files are read (C12).
 CONFIG = pathlib.Path("config/agent_context.yaml")
 ENGINE = pathlib.Path("config/engine.yaml")
 TRIGGER = "trigger"
 CLASSES = "classes"
 JOBS = "jobs"
+WORKER_ENV = "worker_env"
 ENV_SHAPED = re.compile(r"^[A-Z][A-Z0-9_]*$")
 RC_OK, RC_FATAL, RC_OWNER_OWED = 0, 1, 2
 
 
 def _home(path: pathlib.Path) -> dict:
-    """Load one declared home, FAILING on absence rather than proceeding on emptiness (C12/C16)."""
-    if not path.exists():
+    """Load one declared home, FAILING on absence rather than proceeding on emptiness (C12/C16).
+
+    The path is resolved against the REPOSITORY ROOT, so a caller that runs from anywhere - a forked pool worker,
+    a generated shell - reads the same home. MEASURED need (T-175): pipeline/parallel.py reads this module's names
+    at pool construction, and a CWD-relative read there would have been a fault nobody could see.
+    """
+    resolved = path if path.is_absolute() else REPO / path
+    if not resolved.exists():
         raise SystemExit(f"FATAL: {path} is absent - it is the one home for what this reads (C12)")
-    return yaml.safe_load(path.read_text()) or {}
+    return yaml.safe_load(resolved.read_text()) or {}
 
 
 def declared() -> dict[str, str]:
@@ -65,6 +74,25 @@ def declared() -> dict[str, str]:
 def declared_classes() -> list[str]:
     """Every job class the harness contract declares, in declaration order."""
     return list((_home(CONFIG).get(CLASSES) or {}).keys())
+
+
+def worker_strip() -> tuple[str, ...]:
+    """The client names a pipeline WORKER must not inherit, read from their one home (T-175 / D-3046).
+
+    This is the reader pipeline/parallel.py uses: the names were LITERALS in a worker initializer, which is what
+    made the deterministic core read as a hand-bound client coupling on the adapter surface. An absent block, an
+    empty list, or an entry that is not an env-shaped name with a reason is FATAL, never defaulted (C12/D-2644):
+    the list decides what a forked worker sees, and an empty list would be indistinguishable from a correct one.
+    """
+    block = _home(CONFIG).get(WORKER_ENV)
+    if not isinstance(block, dict) or not isinstance(block.get("strip"), dict) or not block["strip"]:
+        raise SystemExit(f"FATAL: {CONFIG}#{WORKER_ENV}.strip is absent or empty - the names a worker must not "
+                         f"inherit are DECLARED, never inferred (C12)")
+    for name, reason in block["strip"].items():
+        if not ENV_SHAPED.match(str(name)) or not str(reason or "").strip():
+            raise SystemExit(f"FATAL: {CONFIG}#{WORKER_ENV}.strip declares '{name}' without an env-shaped name "
+                             f"or without a reason - a name nobody can justify is a name nobody can remove")
+    return tuple(str(name) for name in block["strip"])
 
 
 def job_rows() -> dict[str, dict]:
@@ -157,7 +185,7 @@ def resolve(value: str) -> str:
     ref, _, dotted = value[1:].partition("#")
     path = pathlib.Path(ref)
     if not path.is_absolute():
-        path = CONFIG.resolve().parent.parent / path
+        path = REPO / path
     try:
         node: object = yaml.safe_load(path.read_text())
         for part in dotted.split("."):
@@ -250,6 +278,13 @@ def selftest() -> int:
         checks.append(("an_unresolvable_pointer_is_FATAL", False))
     except SystemExit:
         checks.append(("an_unresolvable_pointer_is_FATAL", True))
+
+    # T-175/D-3046 controls: the names a worker must not inherit are DECLARED, and this module restates none.
+    strip = worker_strip()
+    checks.append(("every_name_a_worker_must_not_inherit_is_declared_T175",
+                   bool(strip) and all(ENV_SHAPED.match(name) for name in strip)))
+    checks.append(("the_worker_strip_reader_restates_no_declared_name_C12",
+                   not [name for name in strip if f'"{name}"' in own or f"'{name}'" in own]))
 
     # D-3017 controls: the job map must be complete, must not invent a class, and must FAIL closed.
     classes, rows = declared_classes(), job_rows()

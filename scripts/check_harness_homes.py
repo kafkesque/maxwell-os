@@ -22,7 +22,7 @@ It also prints the ENGINE'S OWN counter witness (`homes.engine_stats`) — the r
 that answers while that number stands still is a run that left the machine.
 
 READ-ONLY: it measures; it never writes a home. Fixing what it reports is an ACT
-(`python3 pipeline/apply_provider_flip.py`, whose plan is dry-run by default).
+(`python3 agent/adapters/goose/apply_provider_flip.py`, whose plan is dry-run by default).
 
 Exit: 0 every fact BOUND | 1 FATAL (an unreadable home, key or pointer) | 2 CONFLICT or WAITING-ON-A-HUMAN-WORD,
 loud and NOT fatal (BUG-457) | --selftest 0/1.

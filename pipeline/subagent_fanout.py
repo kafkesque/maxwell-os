@@ -87,6 +87,34 @@ def conf() -> dict:
     return doc
 
 
+def client_entry() -> dict:
+    """The default client's BINARY and the EXECUTOR that binds the contract, from their ONE declared surface.
+
+    T-175/D-3046: the `agent` mode used to write a client's binary PATH into generated shell by hand - a client
+    app bundle inside the deterministic core, which is the C25 coupling the adapter surface exists to end. Both
+    facts are now read from config/agent_surface.yaml (the executable) and config/engine.yaml#harnesses
+    (WHICH client is the default one). Every leg must resolve: an absent fact is FATAL and never invented (C12/
+    D-3034), because a workstream that cannot say what it will launch must not launch anything.
+    """
+    import yaml
+
+    engine = (conf().get("harnesses") or {})
+    which = str(engine.get("default_harness") or "")
+    surface_path = ROOT / "config" / "agent_surface.yaml"
+    if not which or not surface_path.is_file():
+        raise SystemExit("FATAL: config/engine.yaml#harnesses.default_harness or config/agent_surface.yaml is "
+                         "absent - the client a workstream launches is DECLARED, never inferred (C12)")
+    surface = yaml.safe_load(surface_path.read_text()) or {}
+    adapter = (surface.get("adapter") or {})
+    row = ((adapter.get("provider_bindings") or {}).get(which)) or {}
+    binary = row.get("client_bin") or {}
+    if not binary.get("command") or not binary.get("fallback") or not adapter.get("executor"):
+        raise SystemExit(f"FATAL: config/agent_surface.yaml declares no client_bin/executor for the default "
+                         f"client '{which}' - refusing to assemble a launch nobody declared (C12)")
+    return {"command": str(binary["command"]), "fallback": str(binary["fallback"]),
+            "executor": str(adapter["executor"])}
+
+
 def guards() -> dict:
     """The declared delegation guards, or a FATAL naming every missing key.
 
@@ -572,8 +600,13 @@ def _cmd_for(task: dict, wsd: str, g: dict, model: str) -> str:
         else:
             lines.append('cp "$WS_DIR/20_answer_raw.md" "$WS_DIR/20_answer.md"')
     elif mode == "agent":
-        lines.append('GOOSE=$(command -v goose || echo /Applications/Goose.app/Contents/Resources/bin/goose)')
-        lines.append('"$GOOSE" run -t "$(cat "$WS_DIR/00_prompt.txt")" > "$WS_DIR/20_answer.md" 2>&1')
+        # T-175/D-3046: neither the client's binary nor the wrapper that binds the ratified contract is written
+        # here - both are READ from the declared surface, so the bytes this module generates carry no client name
+        # and a swap moves the declaration instead of this executor.
+        entry = client_entry()
+        lines.append(f'HARNESS_BIN=$(command -v {entry["command"]} || echo {entry["fallback"]})')
+        lines.append(f'python3 {entry["executor"]} --exec -- "$HARNESS_BIN" run -t "$(cat "$WS_DIR/00_prompt.txt")" '
+                     f'> "$WS_DIR/20_answer.md" 2>&1')
     else:
         mt = int(task.get("max_tokens", conf().get("fanout", {}).get("default_max_tokens", 512)))
         lines.append(f'python3 pipeline/oneshot_ask.py --model {model} --prompt-file "$WS_DIR/00_prompt.txt" '
@@ -1214,6 +1247,16 @@ def selftest() -> int:
     checks.append(("a_harness_command_bakes_in_no_transcript_path_T154",
                    "PI_CODING_AGENT_DIR" not in hcmd and str(RUNS) not in hcmd))
     checks.append(("a_harness_command_is_graded_like_every_other_answer", "_grade" in hcmd and "TERMINAL:" not in hcmd))
+    # T-175/D-3046: an agent-loop workstream launches the client through the DECLARED executor, and the executor's
+    # own bytes carry no client path - read from the DECLARATION, never listed here (a literal list would match
+    # itself and the control could never pass).
+    entry = client_entry()
+    acmd = _cmd_for({"id": "a", "mode": "agent"}, "/tmp", g, "M")
+    own = pathlib.Path(__file__).read_text()
+    checks.append(("an_agent_command_is_launched_through_the_DECLARED_executor_T175",
+                   entry["executor"] in acmd and f'{entry["executor"]} --exec --' in acmd))
+    checks.append(("the_agent_command_reads_the_binary_from_the_DECLARATION_not_from_this_module_T175",
+                   entry["fallback"] not in own and entry["fallback"] in acmd))
     checks.append(("the_harness_and_the_agent_share_a_class_but_a_oneshot_does_not_T154",
                    class_for_mode("harness") == class_for_mode("agent") != class_for_mode("oneshot")))
     try:

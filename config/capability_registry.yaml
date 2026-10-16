@@ -90,6 +90,19 @@ capabilities:
     receipt: governance/bug_status.json
     cost_tier: T0
     owns: [governance/bug_status.json]
+  # T-175/D-3046 (BUG-856): THE ROUTE GRAPH OWNS ITSELF NOWHERE. MEASURED 2026-10-16: no capability's `owns`
+  # named scripts/resolve_route.py or config/capability_registry.yaml, so a finding ABOUT the route graph joined
+  # the unrouted population BY CONSTRUCTION - the two artifacts whose whole subject is routing were the only ones
+  # the graph could not route, and the dispositions reason ("a bug routes only when its title names a declared
+  # capability's artifact") became a closed loop. Its receipt is a COMPOSED pointer into its own registry: what
+  # this capability leaves behind is the shrink-only debt reading it maintains and refuses to raise.
+  - id: route_graph
+    kind: script
+    entrypoint: python3 scripts/resolve_route.py --check
+    check: python3 scripts/resolve_route.py --selftest
+    receipt: config/capability_registry.yaml#routing_debt
+    cost_tier: T0
+    owns: [scripts/resolve_route.py, config/capability_registry.yaml]
   - id: store_write
     kind: script
     entrypoint: python3 scripts/apply_relabel_store_write.py
@@ -146,7 +159,7 @@ capabilities:
     - scripts/check_agent_surface.py
     - config/agent_surface.yaml
     - scripts/check_harness_homes.py
-    - pipeline/apply_provider_flip.py
+    - agent/adapters/goose/apply_provider_flip.py
 
   - id: ingest_identity_door
     kind: script

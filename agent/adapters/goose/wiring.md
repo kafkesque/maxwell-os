@@ -1,16 +1,24 @@
 # `agent/adapters/goose/` — the DEFAULT client's binding home (D-3037 / D-3041 / T-169)
 
 This directory is what `config/agent_surface.yaml#adapter.provider_bindings.goose.binding_home` declares, and it
-holds **no value of its own**. Every name it needs is a **pointer** to the one home that owns it (C12), and the
-wiring itself is the **engine's own module**, not a copy of it: `omlx launch goose` runs it. There is exactly one
-copy of the integration code, and it ships with the engine.
+holds **no value of its own**: every name it needs is a **pointer** to the one home that owns it (C12).
+
+> **CORRECTED 2026-10-16 (T-175/BUG-853).** This file used to say the wiring "is the **engine's own module** ...
+> `omlx launch goose` runs it". MEASURED: `omlx launch list` names nine integrations
+> (claude, codex, codex_app, opencode, openclaw, hermes, pi, copilot, dsh) and **goose is not one of them** —
+> neither the list nor `omlx launch --help` accepts it, because the engine WIRES CLIENT TOOLS while goose is the
+> client that *we* run by default. No engine integration for it exists, so the form that DOES exist is the
+> client's own binary plus the declared executor, and those two facts are what
+> `config/agent_surface.yaml#adapter` declares: `executor` (harness-agnostic, binds the ratified contract for a
+> child process) and `provider_bindings.goose.client_bin` (the binary, PATH first, then the app's own path).
 
 ## What this binding reads, and where each name lives
 
 | what | the ONE home | how it resolves |
 |---|---|---|
 | the provider id the client must use | `config/engine.yaml#harnesses.goose_provider_id` | `pipeline/harness_env.py` reads it by pointer |
-| the client's own wiring module | the engine's `integrations/` (installed with the app) | `omlx launch goose` — never vendored into this repo |
+| the client's binary and the wrapper that binds the contract for it | `config/agent_surface.yaml#adapter` | `provider_bindings.goose.client_bin` + `executor`, read by every script that launches a client (T-175) |
+| the default client's IDENTITY (which client the core launches) | `config/engine.yaml#harnesses.default_harness` | a WORD, never a path in code |
 | the context knobs (window, compaction) | `config/agent_context.yaml#ratified.knobs` | read by `pipeline/harness_env.py` |
 | the client's config home (outside the repo) | `config/agent_context.yaml#homes.harness_config` | declared here, **never mirrored**; T-157 owns its census |
 | the measured state of the binding | `python3 pipeline/harness_contract.py` | rc 2 = UNBOUND (owner-owed, T-174) |
@@ -52,11 +60,13 @@ The wrapper binds a CHILD process; an app launch passes through no wrapper, whic
 could leave the machine (BUG-849). The home itself is now bound — by the declared writer, never by hand:
 
 ```bash
-python3 pipeline/apply_provider_flip.py                 # dry-run: prints the plan, writes nothing
-python3 pipeline/apply_provider_flip.py --apply-flip    # the binding (backup-first, read back)
-python3 pipeline/apply_provider_flip.py --rollback      # restore the newest backup
+python3 agent/adapters/goose/apply_provider_flip.py                 # dry-run: prints the plan, writes nothing
+python3 agent/adapters/goose/apply_provider_flip.py --apply-flip    # the binding (backup-first, read back)
+python3 agent/adapters/goose/apply_provider_flip.py --rollback      # restore the newest backup
 python3 scripts/check_harness_homes.py                  # the census: every declared fact, read back
 ```
+
+T-175 moved the writer itself into this directory (its own mechanism, where the surface's rule puts it).
 
 MEASURED 2026-10-16: before the binding the census read rc 2 with two CONFLICTS (the provider and the model
 pin) and a direct run left the engine counter at 594833; after it, all three declared facts read BOUND at

@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 615,
+  "total_ids": 620,
   "open_n": 224,
-  "closed_n": 391,
+  "closed_n": 396,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -1124,8 +1124,8 @@
       "events": 1
     },
     {
-      "id": "BUG-850",
-      "title": "(MED \u2014 OPEN 2026-10-16) \u2014 pipeline/apply_provider_flip.py, pipeline/parallel.py and pipeline/subagent_fanout.py each BIND a client binding b",
+      "id": "BUG-854",
+      "title": "(LOW \u2014 OPEN 2026-10-16) \u2014 agent/adapters/goose/apply_provider_flip.py hardcodes the two values of its own safe phase, and the thinking-effor",
       "events": 1
     }
   ],
@@ -1520,6 +1520,11 @@
     "BUG-847",
     "BUG-848",
     "BUG-849",
-    "BUG-851"
+    "BUG-850",
+    "BUG-851",
+    "BUG-852",
+    "BUG-853",
+    "BUG-855",
+    "BUG-856"
   ]
 }

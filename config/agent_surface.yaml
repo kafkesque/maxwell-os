@@ -13,7 +13,7 @@
 # provider; a harness- or provider-specific artifact may live ONLY under adapter.roots. scripts/check_agent_surface.py
 # is the reader (T-169); this block is what it reads, so a new binding is a DECLARED edit rather than a silent file.
 schema_version: '1'
-decided: [D-3037]   # the rail checks every cited decision RESOLVES in config/decisions.yaml (D-3034)
+decided: [D-3037, D-3046]   # the rail checks every cited decision RESOLVES in config/decisions.yaml (D-3034)
 
 core:
   # What must keep working with ANY harness (or none): the engine, the pipeline, the rails, the registers.
@@ -22,6 +22,11 @@ core:
 
 adapter:
   # The ONE surface. A harness-specific file, path, provider binding or env var belongs here or nowhere.
+  # THE DECLARED EXECUTOR (T-175/D-3046). The wrapper that binds the ratified context contract for a CHILD
+  # process is harness-AGNOSTIC (it sets the declared names and execs), which is why it is declared ONCE here and
+  # not per client: a script that must launch a client invokes THIS, never the binary by hand
+  # (pipeline/subagent_fanout.py's `agent` mode was the site that wrote the binary path into generated shell).
+  executor: pipeline/harness_env.py
   roots:
     - agent/adapters/            # in-repo: provider bindings, env wiring, invocation, per-harness rendering
     - agent/skills/              # PORTABLE skills (no harness name, no provider name inside a SKILL.md)
@@ -32,37 +37,41 @@ adapter:
     - ~/.config/goose/skills/
   agent_md_sections: [delegate_rules, models]   # the AGENTS.md sections that are ADAPTER-owned text
   provider_bindings:
-    goose: {provider: maxwell_omlx, base_url: http://127.0.0.1:11435, binding_home: agent/adapters/goose/}
+    goose:
+      provider: maxwell_omlx
+      base_url: http://127.0.0.1:11435
+      binding_home: agent/adapters/goose/
+      # HOW THE DEFAULT CLIENT IS LAUNCHED, MEASURED 2026-10-16 (T-175/D-3046): the engine's own launcher wires
+      # nine OTHER tools and goose is not among them (config/engine.yaml#harnesses.default_harness carries the
+      # reading), so the form that exists is the BINARY plus the declared executor above. The core invokes both
+      # from here and writes neither into generated shell. `command` is looked up on PATH first; `fallback` is
+      # where the app installs the binary on this machine (MEASURED: `command -v goose` returned exactly it).
+      client_bin:
+        command: goose
+        fallback: /Applications/Goose.app/Contents/Resources/bin/goose
 
   # THE BINDING REGISTER (T-169). Every IN-REPO code site that NAMES a client binding must be declared here, so
   # that "each new harness adds another coupling nobody enumerated" (BUG-845) becomes a FAULT instead of a
   # discovery. A declaration must RESOLVE (D-3034) - a row whose file is absent, or whose file no longer carries
-  # a declared shape, is a fault, so this cannot become a dumping ground. The CEILING IS SHRINK-ONLY (D-3023):
-  # the remedy for a new site is to route the binding through this surface, never to raise the ceiling.
+  # a declared shape, is a fault, so this cannot become a dumping ground.
   # CLASSES (rules.binding_site_classes): adapter_code = the binding's own mechanism; prose_citation = a comment
   # or docstring quoting the shape it forbids or the fact it measured; control_fixture = a known-answer fixture
   # that must contain the shape to prove a rail has teeth; owed = the site BINDS and owes a remedy (a row).
+  # A CLASS IS MEASURED FROM THE BYTES, NEVER ASSERTED (D-3046, MEASURED 2026-10-16/BUG-852): the rail now strips
+  # comments and docstrings and requires a `prose_citation` to hold NO shape in code and every other class to hold
+  # at least one. Before this, a row that said `owed` kept a whole ladder line reading LOUD for a remedy that had
+  # already landed - the rail repeated the register instead of measuring the file.
+  # THE CEILING IS SHRINK-ONLY (D-3023/D-3046) AND IT NOW SITS ONE ABOVE THE LIVE COUNT BY DESIGN. MEASURED
+  # 2026-10-16 (T-175): the three hand-bound couplings were routed - two through a declaration, one into the
+  # adapter root where the surface's own rule puts it - and the register fell from 8 sites to 5, so the ceiling
+  # was lowered 8 -> 6 = the five live sites plus ONE declared slot. The slot exists because the channel that
+  # CAUGHT these three (a binding discovered in code, registered as `owed`, read LOUD at rc 2 while the ladder
+  # kept running - BUG-457) is the channel the next discovery needs, and a ceiling set exactly on the live count
+  # would make a discovery FATAL and force a remedy on the spot. Rounding a discovery away is worse than a slot:
+  # registering a binding is a DECISION with a row, never a silent edit.
   binding_sites:
-    ceiling: 8
+    ceiling: 6
     sites:
-      - path: pipeline/apply_provider_flip.py
-        class: owed
-        row: T-175
-        why: 'it CONSTRUCTS the client home (Path.home()/.config/... with a GOOSE_CONFIG override) while
-          config/agent_context.yaml#homes.harness_config already IS that home - a second home for one fact (C12).
-          Remedy owned by T-175: read the home from the declared pointer.'
-      - path: pipeline/parallel.py
-        class: owed
-        row: T-175
-        why: 'it POPS two client knobs by their literal NAMES while config/agent_context.yaml#ratified.knobs
-          declares them - the intent is right (a worker must not inherit a harness binding) and the names are
-          restated. Remedy owned by T-175.'
-      - path: pipeline/subagent_fanout.py
-        class: owed
-        row: T-175
-        why: 'it writes a client BINARY PATH into generated shell (command -v <client> || echo /Applications/...)
-          inside the deterministic core, which is the C25 coupling ("no agent-specific coupling") - the remedy is
-          to invoke the declared wrapper, owned by T-175.'
       - path: pipeline/harness_contract.py
         class: prose_citation
         why: 'the rail that MEASURES the binding quotes the names it measured in its header; it reads every value
@@ -98,6 +107,11 @@ rules:
   # command is not a coupling while a constructed path is. The shapes and the classes are DECLARED here; the
   # rail names no path, no client and no magic number of its own (C12).
   binding_site_classes: [adapter_code, prose_citation, control_fixture, owed]
+  # WHICH CLASSES QUOTE AND WHICH RUN (T-175/D-3046). The rail MEASURES the class from the bytes: a site whose
+  # class is in `quoting_classes` must carry every shape it holds inside a comment or a docstring, and a site of
+  # any other declared class must carry at least one in CODE. A class vocabulary written into the rail would be a
+  # second home for it (C12), which is why the distinction is a declared value here.
+  quoting_classes: [prose_citation]
   binding_scan:
     roots: [pipeline/, scripts/, agent/adapters/]     # code only; a hit INSIDE a declared adapter root is where it BELONGS
     globs: ['**/*.py', '**/*.sh']

@@ -956,7 +956,24 @@ tasks:
   title: "BIND the harness context contract - adopt the executor so the ratified knobs are in the environment, not in a comment"
   source: D-3003; T-132; pipeline/harness_env.py; pipeline/harness_contract.py; config/agent_context.yaml#ratified.binding
   gate: 'pipeline: run pipeline/harness_env.py --check (0 bound / 2 declared-but-not-exported / 1 a contradiction) and hand over the ONE command that binds the ratified knobs in the shell that starts the harness; the ladder already reports the reading, so the act is one line.'
-  evidence: 'MEASURED 2026-10-15 - pipeline/harness_env.py --selftest 7/7 and --exec proved the CHILD process receives all three GOOSE_* names, while --check still reads all three UNBOUND (rc 2) because the harness is started outside that exec'
+  evidence: >-
+    MEASURED 2026-10-15 - pipeline/harness_env.py --selftest 7/7 and --exec proved the CHILD process receives all
+    three GOOSE_* names, while --check still reads all three UNBOUND (rc 2) because the harness is started outside
+    that exec.
+    MEASURED 2026-10-16 (T-175/D-3046 - SITE DISCHARGED, row OPEN): the FAN-OUT now adopts the executor.
+    pipeline/subagent_fanout.py's `agent` mode no longer writes the client's binary path into generated shell; it
+    invokes the DECLARED executor (config/agent_surface.yaml#adapter.executor) with the DECLARED binary
+    (#adapter.provider_bindings.goose.client_bin), so every fan-out agent-loop workstream runs with the ratified
+    contract IN its environment rather than beside it. The same act gave this reader a repository-root anchor and
+    a second reader (worker_strip, the names a pipeline WORKER must not inherit - MEASURED in a real pool: the
+    workers see them ABSENT and the parent's value is untouched).
+    WHAT REMAINS, MEASURED THE SAME DAY: `python3 pipeline/harness_env.py --check` still reads rc 2 with FIVE
+    names UNBOUND (the trigger trio plus GOOSE_PROVIDER/GOOSE_MODEL), so a BARE app launch still inherits the
+    client's own cloud price-tier defaults (C1/C22) - and agent/adapters/goose/apply_provider_flip.py still
+    hardcodes the two values of its own safe phase while the thinking-effort knob is declared in NO contract
+    (BUG-854). THE ACT THAT CLOSES THIS ROW: declare those two values with their reasons and add the ratified
+    trigger names to the writer's declared edit list with an INSERT-IF-ABSENT mode plus one home_fact per knob, so
+    scripts/check_harness_homes.py reads each one back and the --check reading is watched MOVING.
 - id: T-136
   priority: SHOULD
   state: done
@@ -1852,11 +1869,13 @@ tasks:
 
 - id: T-175
   priority: SHOULD
-  state: open
+  state: done
+  closed: '2026-10-16'
+  closed_by: 'D-3046'
   mover: pipeline
   title: 'THE THREE CODE SITES THAT BIND A CLIENT BY HAND - the adapter surface is DECLARED and now ENFORCED, and
     the couplings its first reading found must route through the ONE home instead of restating it'
-  source: [BUG-850, T-169, D-3037, D-3042, config/agent_surface.yaml]
+  source: [BUG-850, BUG-852, BUG-853, T-169, D-3037, D-3042, D-3046, config/agent_surface.yaml]
   why: >-
     MEASURED 2026-10-16 by the new rail (scripts/check_agent_surface.py, 19/19 known-answer controls): the binding
     register declares EIGHT sites and THREE of them BIND rather than cite. pipeline/apply_provider_flip.py
@@ -1879,10 +1898,35 @@ tasks:
     bytes to prove it). The register does NOT shrink yet: its ceiling is on the TOTAL and the other two sites
     (pipeline/parallel.py, pipeline/subagent_fanout.py) are still hand-bound, so shrinking now would report a
     remedy that is not complete (D-3023).
+    CLOSED 2026-10-16 (D-3046). THE THREE REMEDIES, and the two findings the act produced. SITE 1 MOVED: the
+    writer is now agent/adapters/goose/apply_provider_flip.py - a file whose whole subject is ONE named client's
+    configuration home is that client's mechanism, so the surface's own rule (a harness-specific file belongs
+    under adapter.roots or nowhere) decided a MOVE rather than a new exemption; every live reference followed
+    (the ladder line, the capability registry, T-137's declared on_pass command, the census docstring, the
+    client's own wiring doc). SITE 2 DECLARED: worker_env.strip carries each name WITH its reason and the reader
+    reads the list in the PARENT before the pool exists, so an unreadable declaration stops the run with a message
+    instead of dying inside a forked worker whose failure mode is a hung pool. SITE 3 DECLARED: the fanout's
+    `agent` mode invokes the DECLARED executor with the DECLARED binary, so every fan-out agent-loop workstream
+    now runs with the ratified contract in its environment. THE TWO FINDINGS: (i) BUG-852 - the register's own
+    class was ASSERTED, never measured, so a discharged row kept the ladder loud and the count of owed sites was
+    a promise; the rail now blanks prose and requires a citation to be prose and every other class to be code,
+    with both directions controlled. (ii) BUG-853 - the client's own wiring doc claimed `omlx launch goose` runs
+    the wiring, and MEASURED `omlx launch list` serves nine integrations, goose NOT among them; the form that
+    exists (the binary plus the executor) is now declared, and the false claim is corrected with its reading.
   gate: >-
-    each of the three sites resolves its client name, home or binary FROM a declared home (a pointer, never a
-    literal): after the remedy the register SHRINKS to 5 sites, scripts/check_agent_surface.py reads rc 0, and no
-    pipeline behaviour changes - proved by the three capability selftests plus scripts/resolve_route.py --check.
+    SATISFIED 2026-10-16, MEASURED on the declared path only. (a) Each of the three sites now resolves its client
+    name, home or binary FROM a declared home: site 1 MOVED to agent/adapters/goose/apply_provider_flip.py (its
+    hits are inside a declared adapter root, which is where the surface's rule puts a client's own mechanism), site
+    2 reads config/agent_context.yaml#worker_env.strip through pipeline/harness_env.py#worker_strip, site 3 reads
+    config/agent_surface.yaml#adapter.executor plus #adapter.provider_bindings.goose.client_bin. (b) THE REGISTER
+    SHRANK FROM 8 SITES TO 5 with NO owed row, and scripts/check_agent_surface.py reads rc 0 - and the count is now
+    a MEASUREMENT, not a promise: the rail tests every declared class against the bytes (D-3046/BUG-852), so an
+    `owed` row whose shape lives only in prose is a fault, and so is a citation whose CODE carries the shape.
+    (c) NO PIPELINE BEHAVIOUR CHANGED, and this is measured rather than argued: parallel.py strips the same two
+    names (MEASURED in a real two-worker pool: the workers see them ABSENT, the parent's value is untouched), the
+    writer's dry-run on the live harness home reports the same 4 edits already applied, and every capability selftest
+    (harness_env 16/16, the writer 8/8, the fanout 66/66, the surface rail 21/21) plus
+    scripts/resolve_route.py --check is green.
 
 - id: T-176
   priority: WORTH

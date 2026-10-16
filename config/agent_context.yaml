@@ -163,6 +163,26 @@ trigger:
   handoff_home: 'governance/session_plan_*.yaml + the session-resume skill'
 
 #: ── RATIFIED 2026-10-15 (owner: "Approve your ... T-132 recommendation") ──────────────────────────
+
+#: ── THE CLIENT NAMES A PIPELINE WORKER MUST NOT INHERIT (T-175 / D-3046) ───────────────────────────────
+#: MEASURED 2026-10-16: pipeline/parallel.py dropped two client knobs by their LITERAL names inside a worker
+#: initializer, which is what made the deterministic core read as a hand-bound client coupling on the adapter
+#: surface (config/agent_surface.yaml#adapter.binding_sites, row T-175). The BEHAVIOUR was right and it stays: a
+#: worker is not a session, and a harness binding leaking into a batch worker is a routing fact nobody declared.
+#: The NAMES now live here, each with the reason that keeps it here; the ONE reader is
+#: pipeline/harness_env.py#worker_strip, and the list is read in the PARENT so an unreadable declaration fails
+#: loudly instead of inside a forked worker.
+worker_env:
+  strip:
+    GOOSE_PROVIDER: >-
+      a worker's model call is routed by the pipeline (config/model_assignments.yaml), never by a client
+      binding: a worker that inherited one would answer as the session it was forked from.
+    GOOSE_THINKING_EFFORT: >-
+      thinking mode is a SESSION's knob. A batch worker pays its whole prompt again (the cache is DISPROVEN,
+      BUG-792) and gets nothing from a deeper thought budget it never asked for.
+  #: A name with no reason is a name nobody can remove: pipeline/harness_env.py --selftest refuses an entry that
+  #: is not an env-shaped name or carries no reason (the same rule the accepted-debt declarations carry, D-3043).
+
 #: THE TWO KNOBS AN AGENT MUST NEVER CHOOSE FOR ITSELF are now DECLARED rather than inherited. Both values
 #: are the measurement's, not a preference's, and both are reversible by one word.
 ratified:

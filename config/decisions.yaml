@@ -26047,3 +26047,70 @@ decisions:
     fixture OWING the class while the disposition is owner_owed (a control that could not see the difference would
     pass by counting nothing), the class-own-word fault, the unresolvable pointer, the stale acceptance, and the
     citation resolver.'
+- id: D-3044
+  state: ACTIVE
+  date: '2026-10-16'
+  by: assistant
+  category: HARNESS / PROVIDER BINDING
+  bugs:
+  - BUG-849
+  - BUG-850
+  files:
+  - pipeline/apply_provider_flip.py
+  - scripts/check_harness_homes.py
+  - config/agent_context.yaml
+  - config/engine.yaml
+  - config/task_register.yaml
+  - config/rail_registry.yaml
+  - config/capability_registry.yaml
+  - agent/adapters/goose/wiring.md
+  - justfile
+  title: 'THE EVERYDAY PATH IS BOUND, AND THE HOME IS READ BACK — the client home is bound to the engine that owns
+    the models by a DECLARED writer (measured: the engine counter moves now, where the same run left it still),
+    and a rail reads every fact a decision names back from the home it lives in'
+  decision: 'OWNER WORD 2026-10-16 (verbatim): "T-174 bound", following the three steps this session recommended
+    for T-174 ("the owner one line", "cloud as a NAMED escalation", "the counter gets a READER inside T-157"). (1)
+    THE BINDING IS AN ACT, NOT A HAND EDIT. `python3 pipeline/apply_provider_flip.py --apply-flip` (dry-run by default)
+    set the harness home to the DECLARED provider (config/engine.yaml#harnesses.goose_provider_id) and the DECLARED
+    agent-loop model (config/model_assignments.yaml#harness_roles.AGENT_LOOP_SHORT.model), backup-first, crash-safe,
+    and then READ THE FILE BACK: the assignment must be in effect or the act reports failure and names the rollback.
+    MEASURED BEFORE: a DIRECT headless run — the everyday path, no wrapper — answered PONG with the engine own request
+    counter standing still at 594833 (the BUG-849 symptom, reproduced this session). MEASURED AFTER: the same run
+    moved it 594833 -> 594835. One command reverts it (--rollback). (2) A DECLARATION NOBODY COMPARES IS A CLAIM,
+    SO THE HOME IS NOW READ BACK (T-157). MEASURED 2026-10-15: the home read custom_deepseek while BUG-243 (CLOSED)
+    rested on "active_provider=maxwell_omlx" and D-295 recorded the same remedy — invisible for months because this
+    repository measures config/*.yaml to the KEY and never read the harness homes that config/agent_context.yaml#homes
+    itself declares. scripts/check_harness_homes.py reads every fact in the new config/agent_context.yaml#home_facts
+    block and reports BOUND / CONFLICT / WAITING-ON-A-HUMAN-WORD / UNREADABLE, with the decision and the row that
+    own each fact printed beside it. 7/7 known-answer controls, including that an ABSENT home or an absent key is
+    FATAL and never BOUND (D-795) and that the rail names no home path, key or provider of its own (proved against
+    the LIVE declarations by reading its own bytes, C12). Its live reading BEFORE the binding: rc 2, TWO CONFLICTS
+    (the provider and the model pin) — the D-295 reversal caught as a READING, which is exactly what T-157 asked
+    for. AFTER: all three facts BOUND, rc 0. (3) CLOUD IS A NAMED ESCALATION IN THE HOME THAT OWNS THE PROVIDER
+    IDS. config/engine.yaml#harnesses now declares `escalation_provider_id` and `escalation_rule` (governed by D-3023:
+    a cloud token is an escalation, never a fallback), and the census proves the shape from two sides: the escalation
+    must stay REACHABLE (providers.<escalation>.enabled true — an escalation that cannot be taken is not one) while
+    the ACTIVE provider must be the engine. ACCEPTED NEGATIVE, recorded (D-3038): the cloud route is neither removed
+    nor mirrored — removing it would make the escalation impossible, and mirroring its weights is a different, much
+    larger act. (4) THE COUNTER HAS A READER. Its home is now DECLARED (config/agent_context.yaml#homes.engine_stats)
+    and the census prints it on every `just health`, so "is this machine actually serving the sessions it claims
+    to serve" is a line rather than a probe somebody remembers to run. An absent witness is printed and is NOT fatal,
+    but it is never a silent zero (D-2957). (5) THE WRITER OWED TWO THINGS AND BOTH LANDED (T-175 site 1, BUG-850).
+    FIRST, the home is RESOLVED from config/agent_context.yaml#homes.harness_config instead of being CONSTRUCTED
+    in code (GOOSE_CONFIG stays the one deliberate override): the adapter surface had registered this file as an
+    OWED site for exactly that, and its provider and model are now POINTERS, so the file restates no provider or
+    model name. SECOND — found by trying to use it — the writer REFUSED a home that was ALREADY in the state it
+    produces ("edit matched 0 time(s)"), because it could not tell ALREADY-APPLIED from DRIFTED. It now classifies
+    each edit PENDING / APPLIED / DRIFTED and refuses only on DRIFTED; 8 known-answer controls, including the measured
+    case that a file in the target state is not drift and that an ambiguous anchor refuses. A writer over the owner
+    own home that cannot tell "done" from "broken" is a writer nobody can trust with a revert. (6) WHAT THIS DECISION
+    DOES NOT DO. It does not shrink the adapter register: the ceiling is on the TOTAL and the other two hand-bound
+    sites (pipeline/parallel.py, pipeline/subagent_fanout.py) are still owed, so shrinking now would report a remedy
+    that is not complete (D-3023). It does not close T-137 (the agent-loop model PIN and the tiered-cache A/B) —
+    those protect the per-turn BUDGET, not the binding, and the flip notes it in its own output. And it does not
+    touch the pipeline: no stage reads the harness home, and the S0-S6 stages are unaffected. (7) RC CONTRACT AND
+    CONTROLS. scripts/check_harness_homes.py: 0 every fact BOUND | 1 FATAL (a home, a key or a pointer that cannot
+    be read) | 2 CONFLICT or WAITING-ON-A-HUMAN-WORD, loud and NOT fatal (BUG-457). Both rails are declared in config/rail_registry.yaml
+    in both directions (their selftests fatal, their readings tri_state) and wired into `just health`; the writer
+    selftest is fatal there too. config/capability_registry.yaml# harness_adapter now owns the census rail, the
+    writer and the declared facts, so the route graph resolves them.'

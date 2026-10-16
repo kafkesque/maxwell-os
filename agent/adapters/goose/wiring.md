@@ -46,6 +46,23 @@ python3 -c "import json,os;print(json.load(open(os.path.expanduser('~/.omlx/stat
 Take that number, run the command above, take it again. **A rise is the only proof that the declared provider is
 bound in the process that acted**; an unchanged number means the run left the machine (T-174 / BUG-849).
 
+## Binding the everyday path (T-174, done 2026-10-16) — and reverting it in one command
+
+The wrapper binds a CHILD process; an app launch passes through no wrapper, which is how the everyday path
+could leave the machine (BUG-849). The home itself is now bound — by the declared writer, never by hand:
+
+```bash
+python3 pipeline/apply_provider_flip.py                 # dry-run: prints the plan, writes nothing
+python3 pipeline/apply_provider_flip.py --apply-flip    # the binding (backup-first, read back)
+python3 pipeline/apply_provider_flip.py --rollback      # restore the newest backup
+python3 scripts/check_harness_homes.py                  # the census: every declared fact, read back
+```
+
+MEASURED 2026-10-16: before the binding the census read rc 2 with two CONFLICTS (the provider and the model
+pin) and a direct run left the engine counter at 594833; after it, all three declared facts read BOUND at
+rc 0 and the same run moved the counter to 594835. `scripts/check_harness_homes.py` is the monitor — it prints
+the counter from its declared home on every `just health`, so this is a reading rather than a probe.
+
 ## Swapping this client out (the whole procedure, from `agent/adapters/CONTRACT.md`)
 
 1. `omlx launch <client> --model <declared model>` — adoption is one command and needs no disk state of ours.

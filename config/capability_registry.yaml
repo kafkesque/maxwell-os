@@ -145,6 +145,8 @@ capabilities:
     - scripts/bind_harness_env.sh
     - scripts/check_agent_surface.py
     - config/agent_surface.yaml
+    - scripts/check_harness_homes.py
+    - pipeline/apply_provider_flip.py
 
   - id: ingest_identity_door
     kind: script

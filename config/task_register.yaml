@@ -1378,15 +1378,27 @@ tasks:
     findings landed as a real refinement (the two debt facts behind an unrouted item are now reported TOGETHER).'
 - id: T-157
   priority: MUST
-  state: open
+  state: done
   mover: pipeline
+  closed: '2026-10-16'
   title: 'CENSUS THE HARNESS HOMES A DECISION NAMES, so a reversal of a ruled remedy is a READING and not a discovery'
   source: BUG-832; D-295; BUG-243; config/agent_context.yaml#homes
-  evidence: 'MEASURED 2026-10-15: ~/.config/goose/config.yaml:311 reads active_provider:
-    custom_deepseek while BUG-243 (CLOSED) rests on the rationale "active_provider=maxwell_omlx ...
-    No active config references custom_deepseek" and DECISION-LOG D-295 records the same remedy. The
-    reversal is invisible because the repo measures config/*.yaml to the KEY and does not read the
-    harness homes that config/agent_context.yaml#homes itself declares.'
+  evidence: >-
+    MEASURED 2026-10-15: ~/.config/goose/config.yaml:311 read active_provider: custom_deepseek while BUG-243
+    (CLOSED) rests on the rationale "active_provider=maxwell_omlx ... No active config references
+    custom_deepseek" and DECISION-LOG D-295 records the same remedy. The reversal was invisible because the repo
+    measures config/*.yaml to the KEY and did not read the harness homes that config/agent_context.yaml#homes
+    itself declares. MEASURED 2026-10-16 (the census exists): scripts/check_harness_homes.py reads every declared
+    fact back from its home and reports BOUND / CONFLICT / WAITING-ON-A-HUMAN-WORD / UNREADABLE, with 7/7
+    known-answer controls (a matching home is BOUND; a reversal is CONFLICT and NAMES its decision and row; an
+    undeclared expectation is WAITING; an absent home, an absent key and an unresolvable pointer are FATAL, never
+    BOUND - D-795; the rail names no home path, key or provider of its own). BEFORE the binding the live reading
+    was rc 2 with TWO CONFLICTS (active_provider, where the home said custom_deepseek and D-295/BUG-243 say
+    maxwell_omlx; and the model pin, where the home said the coder model while the agent_loop role says
+    gemma-4-E4B-it-MLX-4bit) - the D-295 reversal, caught as a READING and not by a session noticing it. AFTER
+    the owner word (T-174, pipeline/apply_provider_flip.py --apply-flip) all three facts read BOUND, rc 0, and a
+    DIRECT headless run moved the engine counter 594833 -> 594835 where the same run had left it still. The facts
+    live at config/agent_context.yaml#home_facts; the escalation provider at config/engine.yaml#harnesses.
   gate: 'pipeline: the harness homes a decision names (the session provider and model, the harness
     job map, the Zed settings that BUG-829 concerns) are read by an instrument that reports
     BOUND / CONFLICT / WAITING-ON-A-HUMAN-WORD, and a hand edit to one of them shows up as a reading. Proof: a change
@@ -1801,8 +1813,9 @@ tasks:
 
 - id: T-174
   priority: SHOULD
-  state: open
+  state: done
   mover: owner
+  closed: '2026-10-16'
   title: 'THE DECLARED PROVIDER MUST BE BOUND, NOT ONLY DECLARED - the default client falls back to a cloud
     provider the repo forbids, so the everyday path can leave the machine while every declaration looks right'
   source: governance/HARNESS_UTILIZATION_20261015.md; agent/adapters/CONTRACT.md; pipeline/harness_contract.py;
@@ -1825,10 +1838,17 @@ tasks:
     from config/engine.yaml#harnesses.goose_provider_id - so no model or provider name is restated (C12). The
     nine clients are one command away (omlx launch), so this row is about the DEFAULT path only. MEASURED 2026-10-16 (this session): a headless client launched through the DECLARED path (python3 pipeline/harness_env.py --exec -- <client> run -t "...") answered in 19.0s on the LOCAL model the binding declares (gemma-4-E4B-it-MLX-4bit via maxwell_omlx) and the engine request counter ROSE 594825 -> 594828 (~/.omlx/stats.json#total_requests). So the MECHANISM binds and the witness MOVES whenever the wrapper is used, and the witness has a HOME a reader can reach (recorded in BUG-849). What remains is the everyday path: an app launch does not pass through the wrapper, the harness home still reads a non-declared provider, and that one line is the OWNER's file - which is why this row stays in the owner lane with the mechanism limb PROVEN.
   gate: >-
-    a headless run launched through the DECLARED path leaves a reading in which the engine own request counter
-    MOVES (the same witness the 2026-10-15 probe used), and the harness home active_provider is either the
-    declared local provider or an ACCEPTED NEGATIVE with its reason (D-3038). T-157 owns the census of that
-    harness home; until it exists this is a measurement, never a monitor.
+    SATISFIED 2026-10-16 on the owner's word ("T-174 bound"), on the DECLARED path only - no hand edit of the
+    harness home: `python3 pipeline/apply_provider_flip.py --apply-flip` (dry-run by default, backups beside
+    the home, the written file READ BACK, and the values resolved by POINTER from config/engine.yaml and
+    config/model_assignments.yaml - the T-175 site this file owed). MEASURED before: a DIRECT headless run
+    (the everyday path, no wrapper) answered PONG with the engine counter standing still at 594833. MEASURED
+    after: the same run moved it 594833 -> 594835, and `scripts/check_harness_homes.py` (T-157, landed in the
+    same act) read all three declared facts BOUND with rc 0 where it had read TWO CONFLICTS and rc 2 minutes
+    earlier. It is now a MONITOR, not a measurement: the counter's home is DECLARED
+    (config/agent_context.yaml#homes.engine_stats) and printed by that rail. Revert is one command
+    (`--rollback`); T-137 (the agent-loop pin and the tiered-cache A/B) protects the per-turn BUDGET, not the
+    binding, and stays open.
 
 - id: T-175
   priority: SHOULD
@@ -1852,6 +1872,13 @@ tasks:
     ceiling of 8 (D-3023), so each remedy REMOVES a row rather than adding one; the rail reports the three sites
     loudly (rc 2, tri_state, never fatal - BUG-457) naming the row that owns them; and an undeclared site is now a
     FAULT rather than a discovery, which is the whole point of the act (BUG-845).
+    MEASURED 2026-10-16 (site 1 DISCHARGED): pipeline/apply_provider_flip.py no longer CONSTRUCTS the client
+    home - it resolves it from config/agent_context.yaml#homes.harness_config, with GOOSE_CONFIG kept as the
+    one deliberate override - and its provider and agent-loop model are POINTERS into config/engine.yaml and
+    config/model_assignments.yaml, so the file restates neither of them (a known-answer control reads its own
+    bytes to prove it). The register does NOT shrink yet: its ceiling is on the TOTAL and the other two sites
+    (pipeline/parallel.py, pipeline/subagent_fanout.py) are still hand-bound, so shrinking now would report a
+    remedy that is not complete (D-3023).
   gate: >-
     each of the three sites resolves its client name, home or binary FROM a declared home (a pointer, never a
     literal): after the remedy the register SHRINKS to 5 sites, scripts/check_agent_surface.py reads rc 0, and no

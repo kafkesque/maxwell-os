@@ -66,9 +66,55 @@ homes:
   declaration: '~/.config/goose/custom_providers/maxwell_omlx.json'
   harness_config: '~/.config/goose/config.yaml'                  # top-level GOOSE_* keys = the env defaults
   cache_ledger: '~/.local/share/goose/sessions/sessions.db#usage_ledger'
+  # T-174/T-157: the ENGINE'S OWN request counter. The one witness that says whether a session was served
+  # BY THIS MACHINE, read here so the answer is a line in `just health` instead of a probe somebody
+  # remembers to run (a run that answers while this number stands still is a run that left the machine).
+  engine_stats: '~/.omlx/stats.json#total_requests'
   env_defaults_doc: 'https://goose-docs.ai/docs/guides/environment-variables.md#session-management'
 
 #: LAYER 1 <-> LAYER 2. The invariant: what the harness is TOLD equals what the server SERVES.
+# ── THE FACTS A DECISION NAMES ABOUT A HARNESS HOME, READ BACK (T-157 / D-3044) ──────────────────────
+# Each fact is declared ONCE here: the home (by pointer), the KEY to read inside it, what the declaration
+# says it must hold (a '@config/...' pointer, a literal, or null = not decided yet), who decided it and
+# which row owns a disagreement. scripts/check_harness_homes.py reads these back and reports
+# BOUND / CONFLICT / WAITING-ON-A-HUMAN-WORD; a reversal is a READING there and not a discovery (T-157).
+home_facts:
+  # MEASURED 2026-10-15: the home read custom_deepseek while BUG-243 (CLOSED) rested on
+  # 'active_provider=maxwell_omlx' and D-295 recorded the same remedy. MEASURED 2026-10-16 (T-174): a
+  # headless run answered without the engine counter moving, which is the consequence of this fact.
+  - id: active_provider
+    home: harness_config
+    key: active_provider
+    must_equal: '@config/engine.yaml#harnesses.goose_provider_id'
+    decided_by: [D-295, D-3023, D-3044]
+    row: T-174
+    because: >-
+      the everyday path (an app launch that never passes through pipeline/harness_env.py) must bind the
+      engine that owns the models; a harness home that says otherwise is a session that can leave the
+      machine while every declaration in this repository looks right.
+  # The model the client serves for the agent loop is a ROLE that config/model_assignments.yaml owns
+  # (harness_roles.AGENT_LOOP_SHORT: the only served model measured routable for an interactive loop).
+  - id: harness_model_pin
+    home: harness_config
+    key: 'providers.<provider>.model'
+    must_equal: '@config/model_assignments.yaml#harness_roles.AGENT_LOOP_SHORT.model'
+    decided_by: [D-3044]
+    row: T-174
+    because: >-
+      a client pinned to a model the role does not name runs the agent loop on the role's KNOWN worst
+      axis (MEASURED: the coder model collapses over a long context, DELEGATE-002).
+  # The escalation route must stay REACHABLE and must never be the ACTIVE provider: one fact says which
+  # provider is the exception (engine.yaml#harnesses), this one says it is still enabled in the client.
+  - id: escalation_provider_reachable
+    home: harness_config
+    key: 'providers.<escalation_provider>.enabled'
+    must_equal: true
+    decided_by: [D-3023, D-3044]
+    row: T-174
+    because: >-
+      D-3023: a cloud token is an ESCALATION, so the route is kept enabled (an escalation that cannot be
+      taken is not one) while fact #1 keeps it out of the default. Removing it would make the escalation
+      impossible; leaving it ACTIVE is what T-174 fixed.
 parity_rule:
   statement: 'served_window == declared_context_limit for every model the harness may run'
   on_served_below_declared: truncation_risk     # the harness builds a prompt the server cannot attend to

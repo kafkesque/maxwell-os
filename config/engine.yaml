@@ -33,6 +33,13 @@ harnesses:
   # (maxwell_omlx, custom_deepseek, nvidia, ollama) and a DECLARED provider is not a BOUND one:
   # measured 2026-10-15, goose run -t answered without the local engine's request counter moving.
   goose_provider_id: maxwell_omlx
+  # WHICH PROVIDER KEY IS THE ESCALATION (T-174/D-3044). D-3023 says a cloud token is an ESCALATION, not a
+  # fallback; this names WHICH provider that is, so the distinction can be READ BACK from the client home
+  # (scripts/check_harness_homes.py) instead of asserted here: the escalation must stay reachable and must
+  # never be the ACTIVE provider, and the run that takes it says in its own words why the local route
+  # cannot answer.
+  escalation_provider_id: custom_deepseek
+  escalation_rule: 'allowed, never the active provider, never silent: governed by D-3023'
   launch_by: "omlx launch TOOL - the engine's own wiring module sets the env (C12: never hand-write it)"
   tools:
     claude:    {display: "Claude Code",      installed: true}

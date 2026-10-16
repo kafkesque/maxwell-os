@@ -127,6 +127,18 @@ state_glyphs:
 # rail that requires the lane to be present.
 owner_gate_token: owner
 face_owner_lane_label: 'OWNER LANE'
+# MEASURED 2026-10-16, from the owner reading his OWN face and asking why the lane never moved (BUG-842/T-142).
+# The PIPELINE LANE announced 35 and printed 12, with nothing saying so - and because it sorts by
+# (priority, id), the twelve rows it printed are the MUST tasks: exactly the rows that outlive a session. So
+# the ONE list whose job is to show what the agent will do NEXT showed the same twelve rows every day. Three
+# facts were missing and all three are the renderer's own, so they are DECLARED here rather than typed there:
+# the lane's label, the ORDER it really sorts by - NOT a strategic order, because the register carries no
+# consequence ranking, and a face that claims one is claiming a field its source does not have - and a note
+# that NAMES the rows it did not print.
+face_pipeline_lane_label: 'PIPELINE LANE'
+face_pipeline_lane_note: "what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml)"
+face_list_truncation_note: 'the face is a VIEW: {shown} of {total} row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)'
+
 # D-2986 (BUG-761): a HEADING is a claim too. The region below the marker is populated by INDEX sections (a
 # tier heading followed by a table of rows), and one of those headings can claim a CURRENT state - and restate
 # a count - with nothing joining it. MEASURED 2026-10-13, the day after the LIVE region was policed: TWELVE

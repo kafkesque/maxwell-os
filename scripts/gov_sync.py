@@ -262,6 +262,23 @@ def _dec_bucket(d: dict, label: str, states: list, x: dict) -> str:
     return f" | {label}: " + " · ".join(f"{_cell(d, s, s)} {n}" for s, n in live)
 
 
+def _hidden_rows(d: dict, shown: int, total: int) -> list:
+    """The rows a face did NOT print must be named (BUG-842/T-142).
+
+    MEASURED 2026-10-16, by the owner reading his own face and asking why the lane never moved: the PIPELINE
+    LANE announced 35 and printed 12 with nothing saying so, and because it sorts by (priority, id) the rows
+    it prints are the MUST tasks - exactly the rows that outlive a session. A face IS a view
+    (config/gov_sync.yaml#face_list_limit), but a view that does not SAY it is one reports 35 and shows 12
+    with no lie anyone can catch. The note's text is DECLARED in config, never typed here (C12).
+    """
+    if total <= shown:
+        return []
+    note = str(d["face_list_truncation_note"])
+    for token, value in (("{shown}", shown), ("{total}", total), ("{limit}", shown)):
+        note = note.replace(token, str(value))
+    return [">", "> _" + note + "_"]
+
+
 def render_block(d: dict, x: dict, decs: list | None = None) -> str:
     lim = int(d.get("face_list_limit", 12))
     order = {p: i for i, p in enumerate(d["task_priorities"])}
@@ -298,8 +315,7 @@ def render_block(d: dict, x: dict, decs: list | None = None) -> str:
         out.append(f"> | {t.get('id')} | {_cell(d, t.get('priority'), t.get('priority'))} | "
                    f"{str(t.get('title',''))[:110]} | {str(t.get('gate',''))[:70]} |")
     out += [">",
-            f"> **PIPELINE LANE ({len(x['pipeline_moved'])}) — what the agent will do next, in "
-            f"strategic-consequential order (source: config/task_register.yaml):**",
+            f"> **{d['face_pipeline_lane_label']} ({len(x['pipeline_moved'])}) — {d['face_pipeline_lane_note']}:**",
             ">",
             "> | id | pri | state | task | evidence |",
             "> |---|---|---|---|---|"]
@@ -307,6 +323,7 @@ def render_block(d: dict, x: dict, decs: list | None = None) -> str:
         ev = str(t.get("evidence", ""))[:90].replace("|", "/")
         out.append(f"> | {t.get('id')} | {_cell(d, t.get('priority'), t.get('priority'))} | "
                    f"{_cell(d, t.get('state'), t.get('state'))} | {str(t.get('title',''))[:110]} | {ev} |")
+    out += _hidden_rows(d, lim, len(x["pipeline_moved"]))
     if x["rules"]:
         out += [">",
                 f"> **STANDING RULES — in effect, never close ({len(x['rules'])}):**",
@@ -323,6 +340,7 @@ def render_block(d: dict, x: dict, decs: list | None = None) -> str:
     decs = _open_decisions(d, x) if decs is None else decs
     for e in decs[:lim]:
         out.append(f"> | {e['id']} | {e['state']} | {str(e.get('category',''))[:26]} | {str(e.get('title',''))[:100]} |")
+    out += _hidden_rows(d, lim, len(decs))
     out += [">",
             f"> **Open bugs, most severe first:** " +
             " · ".join(_cell(d, _sev_of(b), b["id"]) for b in _severe(x)[:lim]) + ".",
@@ -583,6 +601,9 @@ def selftest() -> int:
          "task_priorities": ["MUST", "SHOULD", "WORTH"], "face_list_limit": 12, "severity_grandfathered": 0,
          "task_states": ["open", "rule", "done", "superseded"], "task_movers": ["owner", "pipeline"],
          "owner_gate_token": "owner", "face_owner_lane_label": "OWNER LANE",
+         "face_pipeline_lane_label": "PIPELINE LANE",
+         "face_pipeline_lane_note": "what the agent will do next (fixture)",
+         "face_list_truncation_note": "the face is a VIEW: {shown} of {total} row(s) (fixture)",
          "decision_in_effect_states": ["active", "ratified"],
          "decision_closed_states": ["resolved", "superseded", "archived", "rejected"],
          "decision_void_states": ["stale", "revoked", "abandoned"]}
@@ -655,7 +676,12 @@ def selftest() -> int:
                                                            "evidence": "e (2026-01-02)"}],
                                     "pipeline_moved": []})
     base = {"priority": "MUST", "evidence": "e (2026-01-02)", "gate": "none"}
+    one_lane = lambda n: [{"id": "T-%d" % i, "priority": "MUST", "state": "open", "mover": "pipeline",
+                           "title": "t", "evidence": "e (2026-01-02)"} for i in range(n)]
     rows = [
+        ("no key in this fixture is absent from the live config - a second home for a RENAMED fact would"
+         " drift here in silence (a key the fixture LACKS is caught by the renderer call below, which raises)",
+         set(d) - set(cfg()) == set()),
         ("a conforming task register makes no fault",
          task_faults([{**base, "id": "T-1", "state": "open", "mover": "pipeline", "title": "t"},
                       {**base, "id": "T-2", "state": "open", "mover": "owner", "title": "sign", "gate": "the owner word"},
@@ -674,6 +700,14 @@ def selftest() -> int:
          any("MOMENT OF MINT" in f for f in task_faults([{**base, "id": "T-1", "state": "open", "mover": "pipeline", "title": "t", "evidence": "185 open"}], d))),
         ("the derived block LEADS with the OWNER LANE (before the pipeline lane)",
          render_block(d, x, decs=[]).index("OWNER LANE") < render_block(d, x, decs=[]).index("PIPELINE LANE")),
+        ("a lane longer than face_list_limit MUST name the rows it did not print (BUG-842/T-142)",
+         "12 of 20" in render_block(d, {**x, "pipeline_moved": one_lane(20)}, decs=[])
+         and "20" in render_block(d, {**x, "pipeline_moved": one_lane(20)}, decs=[])),
+        ("a lane that FITS carries NO truncation note",
+         "row(s) shown" not in render_block(d, {**x, "pipeline_moved": one_lane(3)}, decs=[])),
+        ("the pipeline lane declares the ORDER the renderer sorts by, not a strategic order it cannot support",
+         d["face_pipeline_lane_note"] in render_block(d, x, decs=[])
+         and "strategic" not in render_block(d, x, decs=[]).lower()),
         ("a rendered value with an apostrophe is quoted so the BOOT face stays parseable (BUG-791)",
          _scalar_round_trips(quirky)),
         ("a standing RULE is NOT counted as open work", "standing rule(s) never close" in register_truth(d, x)),

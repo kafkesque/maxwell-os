@@ -226,6 +226,11 @@ def spelling_problems(decisions: list, pinned: list[str] | None = None) -> list[
 
 
 CANONICALISE_FLAG: str = "--canonicalise-states"
+#: The route a STATE TRANSITION takes (D-3035/M2, 2026-10-16). A state is a governed value inside a receipted
+#: region, so changing one is an in-place edit like any other: it needs the decision that ORDERS it (--because),
+#: it splices exactly ONE cell, and it prints the act and the obligation it leaves. Declared in
+#: config/decisions_policy.yaml#state_vocabulary.transition_route, read by this module, never remembered (C12).
+SET_STATE_FLAG: str = "--set-state"
 ID_LINE_RE = re.compile(r"^- id: (D-?\d+[a-z]?)$")
 
 
@@ -483,6 +488,185 @@ def canonicalise_main(argv: list[str]) -> int:
     print("ok " + str(d_total) + " record(s), stamp " + d_digest + ", census re-derived from the bytes ON DISK")
     print("OWED (SAME sitting, the readers are LOUD otherwise): (1) shrink "
           + POLICY_YAML.relative_to(ROOT).as_posix() + "#state_vocabulary.legacy_non_canonical_ids to []")
+    print_obligation(because)
+    return 0
+
+
+def policy_states(kind: str) -> list:
+    """The states config/decisions_policy.yaml DECLARES - read from its ONE home, never re-typed here (C12).
+
+    kind='graph' answers what a reader may REST on (in_force_states + not_in_force_states, D-2682); anything else
+    answers what the revocation ontology recognises as a whole-record withdrawal (D-2645). One home, one reader.
+    """
+    doc = yaml.safe_load(POLICY_YAML.read_text(encoding="utf-8")) or {}
+    if kind == "graph":
+        graph = doc.get("graph") or {}
+        return list(graph.get("in_force_states") or []) + list(graph.get("not_in_force_states") or [])
+    return list((doc.get("revocation") or {}).get("whole_record_states") or [])
+
+
+def state_target_problems(decisions: list, target: str, state: str) -> list:
+    """Every reason a requested STATE TRANSITION may not be made - asked of the RECORD before a byte moves.
+
+    Four clauses, each one a defect this registry has carried: the record must exist (a transition of nothing is
+    a sentence); the requested state must be in the canonical vocabulary (an undeclared state word is the BUG-483
+    defect); the state must actually CHANGE (a transition that moves nothing is a stale declaration, D-405); and
+    the new value must be a state some reader CLASSIFIES, so it cannot enter the register silently (D-2645).
+    """
+    problems: list = []
+    index = {normalized_id(r): r for r in decisions if isinstance(r, dict)}
+    record = index.get(normalized_id({"id": target}))
+    if record is None:
+        return [target + ": no record carries that id - a transition of nothing cannot be ordered (D-405)"]
+    want = str(state).strip().upper()
+    if want not in STATES:
+        return [want + " is not in the declared state vocabulary - an undeclared state word would be counted "
+                       "while saying nothing (BUG-483/C12)"]
+    now = str(record.get("state") or "").strip()
+    if now == want:
+        problems.append(target + ": already reads " + want + " - a transition that moves nothing is a stale "
+                        "declaration, and a stale declaration is a fault (D-405)")
+    classified = policy_states("graph") + policy_states("whole")
+    if classified and want not in classified:
+        problems.append(want + " is classified by neither graph.in_force_states nor not_in_force_states in "
+                        + POLICY_YAML.relative_to(ROOT).as_posix() + " - a state no reader classifies cannot "
+                        "enter the register silently (D-2645/BUG-483)")
+    return problems
+
+
+def licence_names_target(because: str, target: str) -> bool:
+    """True when the ORDERING decision's own payload NAMES the record it moves.
+
+    WHY (D-2972 generalised): a licence proves an act is ATTRIBUTABLE; it does not prove the act is the one the
+    decision ordered. A licence naming no target would let one order cover any record, so the ordering record
+    must SPEAK the id it orders - the discipline the mint gate already applies to a decision and its bugs.
+    """
+    decisions = [r for r in ((yaml.safe_load(DECISIONS_YAML.read_text(encoding="utf-8")) or {})
+                             .get("decisions") or []) if isinstance(r, dict)]
+    index = {normalized_id(r): r for r in decisions}
+    record = index.get(normalized_id({"id": because}))
+    return bool(record) and target in payload_text(record)
+
+
+def set_state_plan(text: str, target: str, state: str) -> tuple:
+    """Return (would-be registry text, problems): ONE state cell replaced by BYTE SPLICE (D-3035/M2).
+
+    THE DIFF IS THE PROOF, the same reasoning as the canonicalisation route: re-emitting the registry would make
+    every line a new byte, while the only write an append_only artifact tolerates is one whose touched cells can
+    be COUNTED. This plan moves exactly one line, refuses a block whose state cell is not unique, refuses a cell
+    that does not parse back to the record's own state (a cell this route cannot read is not one it may rewrite,
+    C16), and proves afterwards that no key but that one moved and that its declared postcondition holds.
+    """
+    data = yaml.safe_load(text) or {}
+    decisions = [r for r in (data.get("decisions") or []) if isinstance(r, dict)]
+    want = str(state).strip().upper()
+    problems = state_target_problems(decisions, target, want)
+    if problems:
+        return text, problems
+    key = normalized_id({"id": target})
+    lines = text.split(chr(10))
+    starts = [i for i, ln in enumerate(lines) if ln.startswith("- id: ")]
+    block = None
+    for at, start in enumerate(starts):
+        end = starts[at + 1] if at + 1 < len(starts) else len(lines)
+        match = ID_LINE_RE.match(lines[start])
+        if match and normalized_id({"id": match.group(1)}) == key:
+            block = (start, end)
+            break
+    if block is None:
+        return text, [target + ": whose bare record block this route cannot locate - refusing rather than "
+                               "rewriting a cell by guesswork (C16)"]
+    cells = [i for i in range(block[0], block[1]) if lines[i].startswith("  state: ")]
+    if len(cells) != 1:
+        return text, [target + ": carries " + str(len(cells)) + " state cell(s) at record indent - this route "
+                       "replaces exactly one cell (C16)"]
+    cell = cells[0]
+    try:
+        raw = yaml.safe_load(lines[cell][len("  state: "):].strip())
+    except yaml.YAMLError as exc:
+        return text, [target + ": the state cell does not parse (" + type(exc).__name__ + ") (C16)"]
+    index = {normalized_id(r): r for r in decisions}
+    if str(raw) != str(index[key].get("state")):
+        return text, [target + ": the state line parses to " + repr(raw) + " but the record reads "
+                      + repr(index[key].get("state")) + " - refusing to rewrite a cell that does not match the "
+                      "record (C16)"]
+    out = list(lines)
+    out[cell] = "  state: " + want
+    touched = sum(1 for a, b in zip(lines, out) if a != b)
+    if len(out) != len(lines) or touched != 1:
+        return text, ["the splice moved " + str(touched) + " line(s), not the ONE named cell - an edit that "
+                      "changes a line it did not declare is not a transition (C16)"]
+    new_text = chr(10).join(out)
+    post = [r for r in ((yaml.safe_load(new_text) or {}).get("decisions") or []) if isinstance(r, dict)]
+    pre_index = {normalized_id(r): r for r in decisions}
+    post_index = {normalized_id(r): r for r in post}
+    if set(pre_index) != set(post_index):
+        return text, ["the splice moved the registry ID SET - a transition may touch a state, never a record (C21)"]
+    for ident in sorted(post_index):
+        before = {k: v for k, v in pre_index[ident].items() if k != "state"}
+        after = {k: v for k, v in post_index[ident].items() if k != "state"}
+        if before != after:
+            return text, [ident + ": the splice moved a key OTHER than state - a transition edits ONE governed "
+                                  "value (D-2655)"]
+    if str(post_index[key].get("state")) != want:
+        return text, [target + ": the splice did not produce " + want + " - a route that cannot reach its own "
+                               "declared postcondition is not a route (C16)"]
+    return new_text, []
+
+
+def set_state_main(argv: list) -> int:
+    """--set-state <D-id> <STATE> --because <D-id> [--apply]: ONE declared state transition, with its licence.
+
+    THE DECLARED SEQUENCE (the three obligations the canonicalisation route carries, D-2972): the splice; the
+    obligation PRINTED, because the registry receipt must be re-cut in the same sitting (the splice moved bytes
+    INSIDE the receipted region by construction); and the act NAMED so a reader can join it. The licence is
+    checked FIRST - before any no-op branch - so nothing-to-do can never be the door a licence walks past.
+    """
+    tokens = list(argv[2:])   # argv[0] is this script and argv[1] is the flag (main reads sys.argv whole)
+    if len(tokens) < 2:
+        raise SystemExit("FAIL-CLOSED (" + WRITER + "): usage: " + SET_STATE_FLAG + " <D-id> <STATE> --because "
+                         "<D-id> [--apply]")
+    target, state, rest = tokens[0], tokens[1], tokens[2:]
+    # in_place_licence reads argv[1:], i.e. its caller's own argv with the script name at position 0, so the
+    # licence is asked with a two-token head: [script-name slot, flag] - then the licence's own tokens.
+    because, apply_now = in_place_licence([WRITER, SET_STATE_FLAG] + rest, SET_STATE_FLAG)
+    if not licence_names_target(because, target):
+        raise SystemExit("FAIL-CLOSED (" + WRITER + "): " + because + " does not NAME " + target + " in its own "
+                         "payload - an ordering decision must speak the record it moves, or one order would "
+                         "cover any record (D-2972/D-3035)")
+    text = DECISIONS_YAML.read_text(encoding="utf-8")
+    new_text, problems = set_state_plan(text, target, state)
+    if problems:
+        raise SystemExit("FAIL-CLOSED (" + WRITER + "): refusing to move " + target + ": " + "; ".join(problems))
+    pre_data = yaml.safe_load(text) or {}
+    post_data = yaml.safe_load(new_text) or {}
+    pre_total, _pre_summary, pre_stamp = recompute(pre_data)
+    post_total, _post_summary, post_stamp = recompute(post_data)
+    if post_total != pre_total:
+        raise SystemExit("FAIL-CLOSED (" + WRITER + "): the splice moved the RECORD COUNT (" + str(pre_total)
+                         + "->" + str(post_total) + ") - refusing")
+    yaml_guard.assert_yaml(new_text, "config/decisions.yaml", WRITER)
+    post_records = [r for r in (post_data.get("decisions") or []) if isinstance(r, dict)]
+    shape = ["derived key " + repr(k) + " came back into the append_only registry (D-2655)"
+             for k in REGISTRY_DERIVED_KEYS if k in post_data]
+    shape += record_problems(post_records) + vocabulary_problems()
+    if shape:
+        raise SystemExit("FAIL-CLOSED (" + WRITER + "): the spliced registry does not re-derive cleanly: "
+                         + "; ".join(map(str, shape)))
+    print("PRE  " + str(len(text.encode("utf-8"))) + " B sha256 " + hashlib.sha256(text.encode("utf-8")).hexdigest())
+    print("SPLICE " + target + " -> " + str(state).strip().upper() + " (licence " + because + ")")
+    print("POST " + str(len(new_text.encode("utf-8"))) + " B sha256 "
+          + hashlib.sha256(new_text.encode("utf-8")).hexdigest() + " - stamp " + pre_stamp + " -> " + post_stamp
+          + " (it MOVES: a state is part of the content stamp)")
+    if not apply_now:
+        print("PREVIEW (nothing written): re-run with " + APPLY_FLAG)
+        return 0
+    write_document(DECISIONS_YAML, new_text, writer=WRITER, owned_keys={OWNED_ANY}, backup=True, journal=True)
+    disk = DECISIONS_YAML.read_text(encoding="utf-8")
+    disk_data = yaml.safe_load(disk) or {}
+    d_total, d_summary, d_digest = recompute(disk_data)
+    write_census(census_document(disk_data, d_total, d_summary, d_digest, disk))
+    print("ok " + str(d_total) + " record(s), stamp " + d_digest + ", census re-derived from the bytes ON DISK")
     print_obligation(because)
     return 0
 
@@ -968,9 +1152,50 @@ def mint_controls() -> list[tuple[str, bool]]:
     ]
 
 
+def state_controls() -> list[tuple[str, bool]]:
+    """Known-answer controls for the STATE TRANSITION route (D-3035/M2) - every one SEEN to fire or accept."""
+    text = ("schema_version: '1'\ndecisions:\n"
+            "- id: D-9001\n  state: PROPOSED\n  category: X\n  title: control\n  decision: control\n"
+            "- id: D-9002\n  state: ACTIVE\n  category: X\n  title: control\n  decision: control\n")
+    twice = ("schema_version: '1'\ndecisions:\n"
+             "- id: D-9001\n  state: PROPOSED\n  state: PROPOSED\n  category: X\n")
+    decisions = [{"id": "D-9001", "state": "PROPOSED"}, {"id": "D-9002", "state": "ACTIVE"}]
+
+    def refuses(problems) -> bool:
+        return bool(problems)
+
+    def moves_exactly_one_line() -> bool:
+        new_text, problems = set_state_plan(text, "D-9001", "RATIFIED")
+        if problems:
+            return False
+        lines_before, lines_after = text.split(chr(10)), new_text.split(chr(10))
+        return (sum(1 for a, b in zip(lines_before, lines_after) if a != b) == 1
+                and len(lines_before) == len(lines_after)
+                and "  state: RATIFIED" in new_text
+                and [r for r in (yaml.safe_load(new_text) or {})["decisions"] if r["id"] == "D-9002"][0]["state"]
+                == "ACTIVE")
+
+    return [
+        ("a_state_word_not_in_the_declared_vocabulary_is_REFUSED",
+         lambda: refuses(state_target_problems(decisions, "D-9001", "BANANA"))),
+        ("a_transition_to_the_state_a_record_ALREADY_reads_is_REFUSED_as_a_stale_declaration",
+         lambda: refuses(state_target_problems(decisions, "D-9002", "ACTIVE"))),
+        ("a_transition_of_a_record_that_does_NOT_exist_is_REFUSED",
+         lambda: refuses(state_target_problems(decisions, "D-9999", "RATIFIED"))),
+        ("a_record_carrying_TWO_state_cells_is_REFUSED_rather_than_guessed",
+         lambda: refuses(set_state_plan(twice, "D-9001", "RATIFIED")[1])),
+        ("a_state_of_a_record_this_registry_does_NOT_carry_is_REFUSED",
+         lambda: refuses(set_state_plan(text, "D-9999", "RATIFIED")[1])),
+        ("a_valid_transition_moves_EXACTLY_ONE_line_and_leaves_every_other_record_alone",
+         moves_exactly_one_line),
+        ("every_state_the_vocabulary_declares_is_classified_by_the_policy_so_none_can_enter_silently",
+         lambda: all(s in (policy_states("graph") + policy_states("whole")) for s in STATES)),
+    ]
+
+
 def mint_selftest() -> int:
     """Run the mint gate's known-answer controls; return 1 if any control did NOT fire."""
-    rows = mint_controls()
+    rows = mint_controls() + state_controls()
     for name, ok in rows:
         print(("  ok  " if ok else "  !!  ") + name)
     failed = [n for n, ok in rows if not ok]
@@ -1147,6 +1372,8 @@ def main(argv: list[str]) -> int:
         return strip_main(argv)
     if CANONICALISE_FLAG in argv:
         return canonicalise_main(argv)
+    if SET_STATE_FLAG in argv:
+        return set_state_main(argv)
     check_only = "--check" in argv
     text = DECISIONS_YAML.read_text(encoding="utf-8")
     data = yaml.safe_load(text) or {}

@@ -236,6 +236,12 @@ state_vocabulary:
   canonical: 'the `STATES` vocabulary in scripts/recompute_decision_summary.py, upper-cased by canonical_state()'
   # The ONLY sanctioned in-place edit of that registry, named as a command so a reader can join it to a writer.
   canonicalisation_route: 'scripts/recompute_decision_summary.py --canonicalise-states [--apply]'
+  # The ONLY sanctioned SEMANTIC transition (D-3035/M2, added 2026-10-16). A canonicalisation fixes a SPELLING;
+  # this changes a state, and it carries the same three obligations: the ordering decision that NAMES the record
+  # it moves (--because, or the route refuses - a licence that names no target would let one order cover any
+  # record, D-2972), exactly ONE spliced cell, and the obligation printed because the splice moved bytes inside
+  # the receipted region by construction. Declared here so the rule has a home a reader can join to a writer.
+  transition_route: 'scripts/recompute_decision_summary.py --set-state <D-id> <STATE> --because <D-id> [--apply]'
   # Pinned BY IDENTITY, never by a count (a ceiling would let a NEW spelling hide inside it), and SHRINK-ONLY:
   # a pinned id that is canonical now is a STALE declaration and fails the rail (D-405). EMPTY after 2026-09-27:
   # all five were canonicalised, so a pin here would now be the stale declaration the rule exists to catch.

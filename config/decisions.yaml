@@ -24687,7 +24687,7 @@ decisions:
   decision: '(1) A CONTRACT IS BOUND, NOT DECLARED. A ratified knob that is not present in the environment is a COMMENT, so the declaration must be executable: ONE script reads the values from their one home and execs the child with them, restating none of them (C12). (2) THE READING IS TRI-STATE: BOUND, UNBOUND (owner-owed, because an absent variable means the harness silently uses its own default) and CONFLICT (fatal - an environment that contradicts the declaration is drift and hiding it is worse than failing, C16). (3) A CONFLICTING VALUE IS NEVER SILENTLY OVERRIDDEN. (4) The binding names ITSELF in the declaration it reads, so the declaration cannot drift from its executor.'
 - id: D-3004
   date: '2026-10-15'
-  state: PROPOSED
+  state: RATIFIED
   by: assistant
   category: STORE / INTEGRITY
   bugs: '[BUG-804, BUG-807, BUG-808]'
@@ -25608,3 +25608,146 @@ decisions:
     owner-owed 0 repo(s); the mention-only remainder is every repo at or below the declared floor, so the owner
     lane is EMPTY by resolution as well as by the floor. Controls 13 -> 24, run by the ladder and declared fatal
     in config/rail_registry.yaml; resolve-route controls 16 -> 17; gov-sync controls 23 -> 26.'
+- id: D-3035
+  state: ACTIVE
+  date: '2026-10-16'
+  by: assistant
+  category: STORE / INTEGRITY
+  bugs:
+  - BUG-818
+  - BUG-843
+  files:
+  - pipeline/model_store_sweep.py
+  - pipeline/model_store_census.py
+  - config/engine.yaml
+  - config/artifact_ownership.yaml
+  title: 'MODEL BYTES LEAVE BY A RECEIPT, NOT BY A COPY: a second copy is redundant by CONTENT, an owner word per
+    batch NAMES a decision, and the act is one route'
+  decision: 'MEASURED 2026-10-16 (T-167/BUG-843, from the owner reading his own store and asking whether the Phi-4
+    pair is a duplicate). The census said the two copies were NOT the same bytes and that the hub copy was "the
+    only pristine copy of that fetch". That sentence was false and the same file printed the digest that disproves
+    it: the served model.safetensors and the hub blob both hash to 84bcf5553d78094fd6fbe8d7b547a94c6b21996c4066a7a1e89ee4d347a50a24
+    at 4076012072 B. Redundancy had been asked of FILE INVENTORY EQUALITY, and a hub SNAPSHOT can never equal a
+    repacked directory (it carries .gitattributes and README.md more), so the comparison could never be satisfied
+    - a conservative outcome reported as a fact about the bytes - and the "27 files / 9872601143 B" figure that
+    made it look measured was a DOUBLE COUNT (a symlink-following walk counted the repository AND the served directory
+    it holds a copy of). (1) A SECOND COPY IS REDUNDANT BY CONTENT. config/engine.yaml#model_store.redundancy declares
+    what a weight file IS, which digest proves it, which marker means a PARTIAL download (1,676,647,640 B of this
+    very model sat beside the complete blob under a .incomplete name) and how many files a comparison may read;
+    weight_proof() re-hashes every weight file of the served twin from the bytes on disk and calls the copy redundant
+    only when each matches by name, size and digest, naming the files that differ. (2) MODEL BYTES DO NOT LEAVE
+    BY A COPY. pipeline/safe_delete.py is the route for PIPELINE OUTPUT and its protocol copies the target into
+    backup/deletions/ inside this Dropbox-synced repository (BUG-818c); the 2026-10-15 model sweep was therefore
+    executed by hand under an exception recorded in PROSE, which is an act with no route. The declared route for
+    a store is pipeline/model_store_sweep.py: it removes a parked NAME BEFORE the bytes it points into (so no window
+    holds a name that resolves to nothing, BUG-808), it takes NO copy - the served twin already holds the bytes
+    and the RECEIPT is the evidence in the copy''s place - it refuses any class config does not offer (a LIVE repo
+    never), it re-proves every same-name copy from disk and refuses the WHOLE batch on one differing digest, it
+    refuses to run until the path it is about to write is DECLARED in config/artifact_ownership.yaml, and it writes
+    one receipt per batch that is never rewritten. (3) THE OWNER''S WORD IS THE LICENCE. One batch, one word, and
+    the word must NAME a record in config/decisions.yaml (D-3010): a licence that names nothing is a favour (D-2972).
+    ORDERS ALSO: the record of D-3004 is brought to RATIFIED, because its remedy shipped and all three of its bugs
+    are closed while the registry still read PROPOSED - a register that lags the system it records is the same defect
+    direction as a receipt that never gets written.'
+- id: D-3036
+  state: ACTIVE
+  date: '2026-10-16'
+  by: assistant
+  category: AGENT / DISCIPLINE
+  bugs:
+  - BUG-844
+  files:
+  - agent/skills/diagnose-hard-bugs/SKILL.md
+  - AGENTS.md
+  - governance/buglog.md
+  title: 'NOTHING REPLACES THE OBSERVATION: a theory needs a red loop first, and a delegated act needs a trace a
+    later reader can join'
+  decision: 'MEASURED 2026-10-16 (the 2026-10-14 intake, governance/INTAKE_ASSESSMENT_20261014.md, rated WORTH and
+    never registered; the owner''s standing complaint about repetitive debugging; and BUG-844 from this session).
+    (1) A SKILL IS ADOPTED AS A PROCEDURE, NOT AS PROSE. agent/skills/diagnose-hard-bugs/SKILL.md is the first skill
+    in this repository written to the portable shape: front-matter (purpose, when_to_use, when_not_to_use, inputs,
+    outputs) plus SIX PHASES THAT ARE GATES - build the repro, minimise, rank falsifiable hypotheses, instrument,
+    fix with a regression test, clean up - and the standing contract of this repository restated in its own terms
+    (a receipt or a re-runnable command is the only evidence; buglog on discovery; deletion only through the declared
+    route; config-first; a metric from a dead instrument is retired; R5 for the fix; the 0/1/2 exit grammar). The
+    gate that matters is the FIRST one: no hypothesis may be formed until ONE named command exists, already run
+    once, that goes RED on this bug and GREEN when it is fixed - and for an INTERMITTENT bug the target is a debuggable
+    REPRODUCTION RATE rather than a clean repro, because "it did not happen this time" is not evidence and a flake
+    you cannot rate is a flake you cannot fix. (2) THE SAME DISCIPLINE APPLIES TO WHAT WE DO TO OURSELVES. BUG-844:
+    three delegates were launched and all three were reported cancelled; one had already written its artifact and
+    one had written nothing, and NOTHING ON DISK DISTINGUISHED THOSE STATES. An act that leaves no trace cannot
+    be told apart from an act that never happened, so a delegated or detached run declares its budget, its purpose
+    and the exact files it MAY write BEFORE it starts, and an artifact it claimed but did not leave is a NAMED fault
+    (T-168). (3) THE SKILLS STAY PORTABLE: the skill body may name no harness and no provider - the binding lives
+    in the adapter surface beside it (D-3037) - so the same procedure survives a swap. Read from the window is not
+    an instrument, and a plan is not a receipt.'
+- id: D-3037
+  state: ACTIVE
+  date: '2026-10-16'
+  by: assistant
+  category: ARCHITECTURE / SWAPPABILITY
+  bugs:
+  - BUG-845
+  files:
+  - config/agent_surface.yaml
+  - config/harness_policy.yaml
+  - agent/skills/diagnose-hard-bugs/SKILL.md
+  - AGENTS.md
+  title: 'MODULAR CORE AND ONE ADAPTER SURFACE: a harness is a CLIENT, so every harness-specific binding lives in
+    ONE declared home'
+  decision: 'MEASURED 2026-10-16 (BUG-845; C21 swappable infrastructure, C25 agent-agnostic, C27 zero future tax).
+    The owner asked whether Maxwell OS could swap goose for another harness later. The answer is a MEASURED yes
+    for the CORE and a NO as it stood for the BINDING. The core is agnostic by construction: oMLX owns the models
+    on 127.0.0.1:11435, the pipeline is deterministic Python pinned by config, the registers and rails are files,
+    and MCP is the declared agent interface - none of that knows a harness exists. The BINDING was scattered across
+    at least five homes (agent/skills/, ~/.config/goose/{config.yaml,custom_providers,skills}, AGENTS.md delegate
+    routing as PROSE, config/agent_context.yaml, config/harness_policy.yaml), so a swap was archaeology rather than
+    a re-point. THE CHOSEN SHAPE, against the two alternatives: not a MONOLITH (one harness baked into the rails
+    would violate C21/C25 and make the engine answerable to a UI) and not N SCATTERED COUPLINGS (every one a future
+    tax and an unenumerated risk). ONE adapter surface, declared in config/agent_surface.yaml: the core that must
+    survive a swap; the single adapter root (agent/adapters/) plus the portable skill root (agent/skills/); the
+    external roots a swap RE-POINTS rather than copies; the AGENTS.md sections that are adapter-owned text; and
+    the rule a reader can enforce - a PORTABLE artifact (a skill, a task, a decision) may not name a harness or
+    a provider, and a harness-specific path outside the declared roots is a fault. The strategy is deliberately
+    in-between: the core stays module-first and the coupling is compressed into one surface with a checklist, so
+    the cost of a swap is a declared list of acts rather than a codebase reading (T-169 builds the checker; until
+    it exists this is a declaration with no reader, which is why BUG-845 stays OPEN).'
+- id: D-3038
+  state: ACTIVE
+  date: '2026-10-16'
+  by: assistant
+  category: GOVERNANCE / RULES
+  bugs:
+  - BUG-842
+  - BUG-846
+  files:
+  - governance/INTAKE_ASSESSMENT_20261014.md
+  - agent/skills/diagnose-hard-bugs/SKILL.md
+  - config/agent_surface.yaml
+  - config/decisions_policy.yaml
+  - AGENTS.md
+  title: 'AN INTAKE IS A REGISTER, NOT A READ: every revelation gets a verdict, and WHAT WE REJECT WE REGISTER with
+    its reason'
+  decision: 'MEASURED 2026-10-16 (BUG-846). The 2026-10-14 intake screened two external repositories and produced
+    verdicts - MUST for tester-army''s "the assertion decides, the agent only drives" (R5 applied to instrumentation),
+    SHOULD for a small portable model-agnostic skill shape, WORTH for diagnosing-bugs / code-review / tdd as NAMED
+    procedures, WORTH for .out-of-scope/ as a first-class negative, WORTH for calibration (ECE) as a rail - and
+    SIXTEEN DAYS LATER not one of them had a home in the registers, because a verdict recorded where it was FORMED
+    (a report) is not a verdict recorded where it is USED (config/decisions.yaml, config/task_register.yaml, the
+    rails). (1) EVERY REVELATION GETS A VERDICT, and the verdict is REGISTERED: the portable skill shape is ADOPTED
+    (agent/skills/diagnose-hard-bugs/SKILL.md, D-3036); the six-phase diagnosis with the tight red->green gate is
+    ADOPTED as a procedure (D-3036) rather than imported wholesale; the assertion-decides discipline is the standing
+    engine of any instrument this repository builds (a control is a predicate that has been SEEN to fire, BUG-492);
+    calibration is DEFERRED TO A TASK with its conditions (T-170: an ECE quoted WITH its ruler, corpus fingerprint
+    and bin count, and an axis that publishes none is a fault); .out-of-scope is ADOPTED as the rule below. (2)
+    WHAT WE REJECT WE REGISTER. A rejected idea that is merely ABSENT can be re-proposed by the next reader as if
+    it were new, so a rejection is recorded WITH ITS REASON and an accepted negative is a first-class decision rather
+    than a silence. THE FIRST RECORDED NEGATIVE, decided here so it cannot be re-opened by intuition: this repository
+    does NOT impose a repo-wide rule that every shebang''d file be executable (M3, MEASURED 2026-10-16: 562 of 665
+    tracked .py files carry a shebang and are mode 644, all 562 of which are run as "python3 <path>"). The rule
+    in force is BUG-842/T-146 - the FORM of a declared command decides what it requires, and scripts/resolve_route.py
+    --check refuses a declared BARE path whose file is not executable, which found and fixed the four declared routes
+    that could not be run as written. Mass-chmodding 562 files would have made a promise TRUE by touching files
+    no route names, and its cost (a 562-file diff inside every future review) exceeds the defect it would have prevented.
+    (3) THE RULE FOLLOWS THE REGISTER: agents/rules that touch agent behaviour live in AGENTS.md#working_rules,
+    each citing its decision, so a rule can be traced to the measurement that produced it.'

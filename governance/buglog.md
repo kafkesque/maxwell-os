@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1182 decisions (census stamp a16bf19e7b254858, 2026-10-16) · 633 bugs (229 open / 404 closed; highest OPEN = BUG-869) · 55 open tasks (MUST 12 / SHOULD 39 / WORTH 4; OWNER-moved 6, pipeline-moved 49; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1182 decisions (census stamp a16bf19e7b254858, 2026-10-16) · 637 bugs (233 open / 404 closed; highest OPEN = BUG-873) · 55 open tasks (MUST 12 / SHOULD 39 / WORTH 4; OWNER-moved 6, pipeline-moved 49; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **79** of 1182 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 597 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1182, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 229 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 34 · 🟨 MED 65 · 🟩 LOW 25 · UNLABELLED 101 (BUG-757) of 229 open.
+> Open BUGS by severity (population = the census's 233 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 34 · 🟨 MED 65 · 🟩 LOW 25 · UNLABELLED 105 (BUG-757) of 233 open.
 >
 > **OWNER LANE (6) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -15922,6 +15922,51 @@ FIX (T-185, three limbs, each a rule the repository already declares elsewhere):
 - **fix (fail-closed, not cosmetic):** declare the FULL state vocabulary in config/gov_sync.yaml as two exhaustive, disjoint lists (`open_decision_states` + `closed_decision_states`); add a check that union == the states actually present in config/decisions.yaml, faulting on any UNCLASSIFIED state; render the count of unclassified = 0 in the face.
 - **related:** BUG-765, D-2987, D-2981, T-185.
 
+### BUG-874 — THREE MODEL SETS, THREE ANSWERS (the declared parity rule is RED, and 2 of 8 models can never be cached)
+- **state:** open | **severity:** high | **filed:** 2026-10-16 | **by:** assistant
+- **symptom (measured, live, this session).** Three homes disagree about which models exist:
+  * **the SERVER serves (authoritative, `GET /v1/models`):** Phi-4-mini 32768, Qwen3-Coder-30B-A3B 32768,
+    Qwen3.8-27B 262144, gemma-4-E4B 32768, gpt-oss-20b-Q8 131072, MiniCPM5-2B 131072,
+    Ornith-1.5-35B-A3B-REAP-19B 262144, Ornith-1.5-9B 262144 — **8 models**.
+  * **GOOSE is told (`custom_providers/maxwell_omlx.json`):** Phi-4-mini, gemma-4-E4B, Qwen3-Coder-30B,
+    gpt-oss-20b-Q8, gpt-oss-20b-Q4, Qwen3.5-9B-4bit, Qwen3.8-27B, gemma-4-31B-it-MLX-8bit — **a DIFFERENT 8**.
+  * **the engine has SETTINGS for:** 12 (adds Qwen2.5-Coder-7B, Qwen3.6-35B-A3B, Qwopus-GLM-18B,
+    gemma-4-12B-qat, gemma-4-26B-A4B, gemma-4-E2B).
+- **three concrete faults, not one.**
+  1. **EXPOSED BUT NOT SERVED (3):** `gpt-oss-20b-MXFP4-Q4`, `Qwen3.5-9B-4bit`, `gemma-4-31B-it-MLX-8bit`.
+     Goose may select a model the server does not serve -> a request that FAILS. This is the
+     `on_served_below_declared` side of the rule, and it is the DANGEROUS direction.
+  2. **SERVED BUT NOT EXPOSED (3):** `MiniCPM5-2B-MLX`, `Ornith-1.5-35B-A3B-REAP-19B`, `Ornith-1.5-9B`.
+     `MiniCPM5-2B-MLX` is the model `config/model_assignments.yaml` names for the **LIGHTWEIGHT_PROBE**
+     role — a DECLARED role whose model no session can reach. Served capacity is unreachable.
+  3. **`parity_rule` says `on_missing_either_side: unverifiable` / `fault_rc: 2`, and the probe RETURNS rc 2
+     TODAY:** `FAIL agent-context: 6 declared fault(s)` naming exactly those six. **The union of the two
+     three-model faults above IS the six-fault list** — one parity break, six names.
+- **and `config/agent_context.yaml` asserts the opposite of what is measured.** Its `served:` map lists FIVE
+  models and `declared_equal: true`. Measured: 8 served, and the two sets are not equal. The file that owns
+  the parity rule is itself the file that misstates it.
+- **FINDING (measured 2026-10-16, new): THE CACHE IS PER-MODEL, NOT GLOBAL.** Second byte-identical call:
+  cached_tokens 2560-2675 on gemma-4-E4B / Phi-4-mini / MiniCPM5-2B / gpt-oss-20b-Q8 / Qwen3-Coder-30B,
+  and **cached_tokens = 0 on BOTH Ornith models**, with a warm wall of 10.53 s and 23.45 s. So 2 of the 8
+  served models can NEVER benefit from prefix stability, and the "one byte at the head costs 25x" hazard does
+  not apply to them. `cache_accounting` states prefix reuse as a property of the MACHINE; it is a property of
+  the MODEL. Cache granularity also moved: 2616 - 2560 = 56 uncached tail tokens reads a ~2560 block boundary,
+  against the 4096 recorded on 2026-10-14.
+- **FINDING (measured 2026-10-16, new): the 2,000-token "comparable" floor is DISPROVEN.** gpt-oss-20b-Q8
+  reads 71.3 tok/s at 2,677 prompt tokens and 210 tok/s at 50,082 — the SAME model, a **2.9x spread, both above
+  the floor**. Prefill throughput keeps RISING with prompt size well past 2,000, so a reading at the floor is
+  not comparable to a 26,214-token class bill. `bench_preflight.yaml#size_scale_guard` needs a two-point
+  slope (like the decode axis already uses) rather than a single reading above a floor.
+- **CONTROL (executed).** Six readings that did not exist are now recorded in their declared home
+  (`config/agent_context.yaml#prefill_20261016`), each carrying the prompt size it was taken at. The row that
+  was `null` — `Qwen3-Coder-30B-A3B-Instruct-MLX-4bit: prefill_tps: 84.4 @ 2,616 tokens` — is FILLED. NO class
+  route was changed by this act: the readings are recorded as READINGS, deliberately not as bills (see the
+  two findings above), so this act cannot silently re-route work.
+- **NOT DONE HERE, and deliberately so.** `served:` and `declared_equal: true` were NOT edited: the probe reads
+  that block, and changing the comparison subject without re-running the probe would trade one mismatch for a
+  new one. The correction is a NAMED next step with the probe run FIRST.
+- **related:** BUG-872 (the doctrine built on a stale measurement), BUG-873 (a declared thing and an active
+  thing diverging silently) — the same family a third time. D-3034 (a declaration must RESOLVE).
 ### BUG-873 — AN ENABLED EXTENSION THAT CONTRIBUTES ZERO TOOLS RAISES NOTHING (and I gave a false answer because of it)
 - **state:** open | **severity:** medium | **filed:** 2026-10-16 | **by:** assistant
 - **symptom (measured).** `~/.config/goose/config.yaml` declares `youtubetranscript` `enabled: true`, type

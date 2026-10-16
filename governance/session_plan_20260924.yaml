@@ -11,6 +11,7 @@ next_state:
 - the anchor's MISSING domain axis produced as machine evidence by the reliable pair (DeepSeek + Qwen3.8) on the blind row
   text, silver consensus + needs_review, owner adjudicates; no domains_final is ever written by a script
 may_touch:
+- governance/HANDOFF_20261016_LANES_AND_MEASUREMENT.md
 - agent/adapters/goose/apply_provider_flip.py
 - justfile
 - temp/d3049_record.yaml
@@ -1398,3 +1399,15 @@ widening_log:
   additions:
     - temp/land_bug869.py
   owner_ack: 'owner 2026-10-16 (verbatim): "T138 recommendation approve but clarification will the harness adapter be futureproof so later if I want other harenss to deploy or utilize will I be able" + "ok implement ... go forward based on the stratigically most consequnetial highest leverage"'
+- date: '2026-10-16'
+  actor: assistant
+  reason: >-
+    SESSION HANDOFF (owner-requested, explicitly). The owner asked that nothing important proposed this
+    session be lost and that a handoff make the next session resumable. This session landed BUG-870
+    RETRACTED (a false positive of the assistant's own filing), BUG-871 FIXED with an executed control,
+    BUG-872 FIXED with the doctrine corrected, BUG-873 and BUG-874 FILED, and six size-declared prefill
+    readings recorded in their declared home. The handoff is a NEW file with no prior home, so it is NAMED
+    here rather than admitted by a glob (BUG-548/BUG-563).
+  additions:
+    - governance/HANDOFF_20261016_LANES_AND_MEASUREMENT.md
+  owner_ack: 'owner 2026-10-16 (verbatim): "in order to continue as you porpose this in a new susession / makesure that nothing from this session that is important proposed and or relevant dont get lost / and create session hand off / so we can continue from here so you can have the full context and continue from where we finish this session"'

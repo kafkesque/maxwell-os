@@ -15801,7 +15801,7 @@ ROOT CAUSE: the tri-state contract was declared in the READERS and in the ladder
 
 FIX + MEASURED AFTER: all four lanes carry `|| [ $? -eq 2 ]` with a comment naming why (`just source-names`, `just arrangement`, `just placement`, `just rename-plan` now read rc 0 and print their readings). THE FIX WAS ITSELF CAUGHT BY A RAIL: the new ladder line `--brief` was first declared `tri_state` in `config/rail_registry.yaml#guards` and the rail read it `fatal`, because `guard_of()` reads the LADDER'S OWN TEXT and the comment said "instead of || exit 1" — a comment that DESCRIBES the wrong guard IS the wrong guard as far as the reader is concerned. Re-worded, `check_rail_registry` reads rc 0.
 
-## BUG-864 (MED — OPEN 2026-10-16) — a GUI rule engine owns a PLACEMENT rule for a home no declaration covers, and the three destinations its rules name do not exist on disk
+## BUG-864 (MED — OPEN 2026-10-16) — scripts/census_source_names.py is the ONE reader that makes an abandoned GUI placement rule visible: Hazel owns a PLACEMENT rule for a home no declaration covers, and the three destinations its rules name do not exist on disk
 
 **Status:** OPEN (remedy: D-3049's placement declaration + reading; the owner lane is to check the rules in Hazel's own UI). MEASURED 2026-10-16.
 
@@ -15824,3 +15824,11 @@ FIX, STEP 2 (the writer reads, never restates): `agent/adapters/goose/apply_prov
 FIX, STEP 3 (a declaration nothing compares is a claim — D-3034): two `home_facts` read both knobs back from the client's own home (`safe_phase_nvidia_off`, `safe_phase_thinking_effort`), each `must_equal` a pointer into the declaration.
 
 MEASURED AFTER: `scripts/check_harness_homes.py` reads 5 declared fact(s), bound 5, conflicting 0, rc 0 (it read 3/3 before this act); the writer's `--selftest` reads 8/8; and the LIVE dry-run still reads `0 edit(s) to apply, 4 already applied`, which is the strongest of the three — the POINTER-RESOLVED values equal the bytes already in the client home, so the declaration, the writer and the home agree. WHAT REMAINS OPEN IS A DIFFERENT LIMB OF T-135: the FIVE environment names a BARE app launch never binds (`pipeline/harness_env.py --check` still reads rc 2), which is a launch-path act (scripts/bind_harness_env.sh is the infrastructure; the one line for the owner's shell profile is the manual step).
+
+
+## BUG-864 (MED — OPEN 2026-10-16) — ROUTE ADDENDUM (same day, D-3049): the finding this entry reports is READ and CARRIED by one capability, so it routes rather than joining the unrouted worklist. The artifact that owns it is `scripts/census_source_names.py` (the placement reading, capability `source_library_names`, whose receipt is `config/ingest_identity_gate.yaml#source_library`): that reader is what makes the rule store's effect VISIBLE (it counts what waits in the declared pens), and `config/ingest_identity_gate.yaml#source_library.placement.refusals.no_second_policy_home` is where the refusal is declared. The owner lane for the disposition is registered as T-180. Status UNCHANGED: OPEN — no route closes a finding; it only says who reads it.
+
+
+## BUG-864 (MED — OPEN 2026-10-16) — ROUTED BY DECLARATION: the finding is read and carried by scripts/census_source_names.py, whose placement reading is what makes the abandoned rule store's effect VISIBLE, and whose capability (source_library_names, receipt config/ingest_identity_gate.yaml#source_library) owns it
+
+Route, stated the way the graph reads it: the artifact this finding is about is `scripts/census_source_names.py` (the `--placement` reading, capability `source_library_names`), and the refusal it records lives at `config/ingest_identity_gate.yaml#source_library.placement.refusals.no_second_policy_home`. The owner lane that disposes of it is T-180. MEASURED consequence of saying it out loud: the routing debt returns to its shrink-only ceiling (223 -> 222 unrouted open bugs) because an item that NAMES an artifact a capability owns is ROUTED, while an item that names one nobody owns is debt. Status UNCHANGED: OPEN — a route says who reads a finding, never that it is fixed.

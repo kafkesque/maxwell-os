@@ -1140,8 +1140,8 @@
     },
     {
       "id": "BUG-864",
-      "title": "(MED \u2014 OPEN 2026-10-16) \u2014 a GUI rule engine owns a PLACEMENT rule for a home no declaration covers, and the three destinations its rules nam",
-      "events": 1
+      "title": "(MED \u2014 OPEN 2026-10-16) \u2014 scripts/census_source_names.py is the ONE reader that makes an abandoned GUI placement rule visible: Hazel owns a ",
+      "events": 3
     }
   ],
   "closed": [

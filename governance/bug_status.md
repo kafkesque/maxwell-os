@@ -233,4 +233,4 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-857 | (MED — OPEN 2026-10-16) — governance/buglog.md could be APPENDED TO and never QUERIED: no artifact computed which findings share a shape, so | 1 |
 | BUG-858 | (MED — OPEN 2026-10-16) — governance/buglog.md carries NO entry for BUG-492, the most-cited rule in this repository: 128 files cite it (53 l | 1 |
 | BUG-862 | (MED — OPEN 2026-10-16) — scripts/census_source_names.py now measures TWO MATERIALISATIONS of one work and config/ingest_identity_gate.yaml  | 1 |
-| BUG-864 | (MED — OPEN 2026-10-16) — a GUI rule engine owns a PLACEMENT rule for a home no declaration covers, and the three destinations its rules nam | 1 |
+| BUG-864 | (MED — OPEN 2026-10-16) — scripts/census_source_names.py is the ONE reader that makes an abandoned GUI placement rule visible: Hazel owns a  | 3 |

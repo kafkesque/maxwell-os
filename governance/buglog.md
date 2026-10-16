@@ -8,13 +8,13 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1162 decisions (census stamp 7818ed237e3d288d, 2026-10-16) · 606 bugs (223 open / 383 closed; highest OPEN = BUG-836) · 45 open tasks (MUST 13 / SHOULD 27 / WORTH 4; OWNER-moved 10, pipeline-moved 35; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1162 decisions (census stamp 7818ed237e3d288d, 2026-10-16) · 606 bugs (223 open / 383 closed; highest OPEN = BUG-836) · 46 open tasks (MUST 13 / SHOULD 28 / WORTH 4; OWNER-moved 11, pipeline-moved 35; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **80** of 1162 — 🔴 open 32 · 🔵 proposed 27 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 577 · ⚖ ratified 145 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1162, D-2987/BUG-765)
 >
 > Open BUGS by severity (population = the census's 223 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 34 · 🟨 MED 60 · 🟩 LOW 24 · UNLABELLED 101 (BUG-757) of 223 open.
 >
-> **OWNER LANE (10) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
+> **OWNER LANE (11) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
@@ -27,6 +27,7 @@
 > | T-137 | 🟠 SHOULD | PIN the agent_loop model and prove the tiered cache with an A/B | THE OWNER DECIDES WHEN THE ENGINE MAY BE FLAPPED: the A/B needs one ro |
 > | T-140 | 🟠 SHOULD | ADOPT THE FAN-OUT EXECUTOR for everyday scaffolding and debugging, capped and cross-verified | the owner names the first real fan-out task: the executor needs a task |
 > | T-145 | 🟠 SHOULD | EDGE0 IS DEFERRED WITH A NAMED TRIGGER, not fetched: the class is already served and the role is blocked on me | OWNER: say 'fetch Edge0' to override, or leave it deferred until T-137 |
+> | T-167 | 🟠 SHOULD | A SECOND PHI-4 FETCH SITS IN THE HUB WHOSE WEIGHTS ARE ALREADY THE BYTES THE ENGINE SERVES: drop the stale par | the OWNER decides whether the cached copy and its stale parked entry g |
 > | T-138 | COULD | HARNESS ADOPTION ON DEMAND - one command per tool, and none of them load-bearing | install a harness only when a specific job needs it (C28). The engine  |
 >
 > **PIPELINE LANE (35) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**

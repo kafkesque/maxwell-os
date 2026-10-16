@@ -550,11 +550,20 @@ def same_name_copy(repo: str, entries: dict, inventory: Callable = None) -> dict
             if not held or not _under(held, HUB / repo):
                 continue
             try:
-                same = inventory(pathlib.Path(held)) == inventory(pathlib.Path(served_from))
+                held_inv, served_inv = inventory(pathlib.Path(held)), inventory(pathlib.Path(served_from))
+                same = held_inv == served_inv
             except OSError:
-                same = False
+                held_inv, served_inv, same = frozenset(), frozenset(), False
+            #: A difference must be NAMED (MEASURED 2026-10-16): Phi-4-mini-instruct-8bit is on disk twice
+            #: and the only files that differ are .gitattributes and README.md - the weights are the SAME blob,
+            #: proved by hashing the served model.safetensors (84bcf5553d78094fd6fbe8d7b547a94c6b21996c4066a7a1
+            #: e89ee4d347a50a24) and finding that digest among the hub cache blob names, where the snapshot
+            #: symlink points. A face that says only "DIFFERENT BYTES" would let a reader conclude the cached
+            #: copy is unique when its weights are not, so the differing entries are reported by name.
             return {"entry": name, "served_from": served_from, "second_copy_at": held, "same_weights": same,
-                    "redundant": same}
+                    "redundant": same,
+                    "only_in_served": sorted(n for n, _s in sorted(served_inv - held_inv))[:REPORT_ROWS],
+                    "only_in_second": sorted(n for n, _s in sorted(held_inv - served_inv))[:REPORT_ROWS]}
     return {}
 
 
@@ -697,10 +706,13 @@ def print_audit(audit: dict, repos: dict) -> None:
     for repo in sorted(audit):
         note = audit[repo].get("same_name_served_elsewhere")
         if note and not note["redundant"]:
-            print(f"    SAME NAME, DIFFERENT BYTES - {pretty(repo)}: the engine serves {note['entry']!r} from "
+            print(f"    SAME NAME - {pretty(repo)}: the engine serves {note['entry']!r} from "
                   f"{str(note['served_from']).replace(str(HOME), '~')} while "
-                  f"{str(note['second_copy_at']).replace(str(HOME), '~')} holds a SECOND fetch; the inventories "
-                  f"differ, so NOTHING is offered (T-142)")
+                  f"{str(note['second_copy_at']).replace(str(HOME), '~')} holds a SECOND fetch")
+            print(f"      the inventories differ, so NOTHING is offered (T-142). The difference is NAMED so a "
+                  f"reader can judge it: only in the served copy {note['only_in_served'] or 'none'}; only in the "
+                  f"second copy {note['only_in_second'] or 'none'}. A blank list on BOTH sides with same_weights "
+                  f"still False means the same NAMES differ in SIZE")
 
 
 def main(argv: list) -> int:
@@ -914,6 +926,13 @@ def _cases() -> list:
         ("a_same_name_copy_with_DIFFERENT_bytes_is_PARKED_and_NOT_offered",
          lambda: shadow(different_bytes)["verdict"] == "PARKED"
          and shadow(different_bytes)["same_name_served_elsewhere"]["redundant"] is False),
+        ("a_non-redundant_copy_NAMES_the_files_that_differ_instead_of_calling_the_bytes_unique",
+         lambda: shadow(lambda path: (frozenset({("model.safetensors", 100), ("README.md", 10)})
+                                      if "served" in str(path) else frozenset({("model.safetensors", 100)}))
+                        )["same_name_served_elsewhere"]["only_in_served"] == ["README.md"]
+         and shadow(lambda path: (frozenset({("model.safetensors", 100), ("README.md", 10)})
+                                  if "served" in str(path) else frozenset({("model.safetensors", 100)}))
+                    )["same_name_served_elsewhere"]["only_in_second"] == []),
         ("an_engine_entry_in_ANOTHER_repo_does_not_claim_this_one",
          lambda: engine_owners(CONTROL_MODEL, {"serving": {"x": str(HUB / "models--mlx-community--clef-4bitX")},
                                                "parked": {}, "stashed": {}}) == []),

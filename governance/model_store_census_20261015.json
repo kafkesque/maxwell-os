@@ -155,7 +155,7 @@
     "config/decisions.yaml#decisions.[621].description",
     "config/decisions.yaml#decisions.[71].description"
    ],
-   "n_mentions": 49,
+   "n_mentions": 50,
    "re_acquirable": "FETCHABLE-BY-ID",
    "resolution": [],
    "verdict": "ORPHAN"
@@ -321,7 +321,7 @@
     "config/task_register.yaml#tasks.[31].why",
     "config/task_register.yaml#tasks.[32].why"
    ],
-   "n_mentions": 13,
+   "n_mentions": 14,
    "re_acquirable": "FETCHABLE-BY-ID",
    "resolution": [
     "code:scripts/_omlx_apply_settings.py:26",
@@ -426,14 +426,17 @@
    "mentions": [
     "config/agent_context.yaml#candidates_20261015b.CORRECTED_20261015b",
     "config/decisions.yaml#decisions.[1127].evidence",
+    "config/decisions.yaml#decisions.[1161].decision",
     "config/decisions.yaml#decisions.[362].summary",
     "config/decisions.yaml#decisions.[55].description",
     "config/decisions.yaml#decisions.[88].description",
     "config/flag_consumer_registry.yaml#flags.[43].path",
     "config/task_register.yaml#tasks.[31].evidence",
-    "config/task_register.yaml#tasks.[42].evidence"
+    "config/task_register.yaml#tasks.[42].evidence",
+    "config/task_register.yaml#tasks.[67].evidence",
+    "config/task_register.yaml#tasks.[67].gate"
    ],
-   "n_mentions": 8,
+   "n_mentions": 11,
    "re_acquirable": "FETCHABLE-BY-ID",
    "resolution": [
     "engine_entry:Phi-4-mini-instruct-8bit",
@@ -452,6 +455,11 @@
    ],
    "same_name_served_elsewhere": {
     "entry": "Phi-4-mini-instruct-8bit",
+    "only_in_second": [],
+    "only_in_served": [
+     ".gitattributes",
+     "README.md"
+    ],
     "redundant": false,
     "same_weights": false,
     "second_copy_at": "/Users/barn/.cache/huggingface/hub/models--mlx-community--Phi-4-mini-instruct-8bit/snapshots/93b273a5497a4fcdcfb7ac00143565506b4f72e4",
@@ -648,9 +656,10 @@
    "bytes": 267.8,
    "engine_entries": [],
    "mentions": [
-    "config/task_register.yaml#tasks.[36].evidence"
+    "config/task_register.yaml#tasks.[36].evidence",
+    "config/task_register.yaml#tasks.[42].evidence"
    ],
-   "n_mentions": 1,
+   "n_mentions": 2,
    "re_acquirable": "FETCHABLE-BY-ID",
    "resolution": [],
    "verdict": "ORPHAN"
@@ -763,7 +772,7 @@
   "models--openbmb--MiniCPM5-2B-MLX",
   "models--ornith-ai--Ornith-1.5-9B-MLX-8bit"
  ],
- "measured_at": "2026-10-16T02:05:44",
+ "measured_at": "2026-10-16T02:25:55",
  "model_repo_bytes": 123351.8,
  "not_a_candidate_non_model_repo": {
   "datasets--HuggingFaceH4--MATH-500": 0.4,

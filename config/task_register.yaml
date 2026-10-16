@@ -1541,4 +1541,27 @@ tasks:
     (D-405), and 4 new known-answer controls run in --selftest. NOT IN SCOPE HERE: the remaining 39 stay declared by
     D-2645 (a promoted header would carry a status no author wrote), and T-136''s reclaim gate - what LEAVES THE DISK -
     stays open, which is why this task is pipeline-moved rather than gated on a word.'
+- id: T-167
+  priority: SHOULD
+  state: open
+  mover: owner
+  title: 'A SECOND PHI-4 FETCH SITS IN THE HUB WHOSE WEIGHTS ARE ALREADY THE BYTES THE ENGINE SERVES: drop the stale parked entry and the copy, or keep the spare'
+  source: T-142; BUG-841; D-3010; D-3018; pipeline/hf_fetch_model.py; governance/model_store_census_20261015.json
+  evidence: 'MEASURED 2026-10-16 (T-142/D-3034, read-only). The hub holds 5774.6 MB of mlx-community/Phi-4-mini-instruct-8bit
+    while the engine serves the NAME Phi-4-mini-instruct-8bit from ~/.omlx/models_stashed/Phi-4-mini-instruct-8bit, and a
+    PARKED entry (~/.omlx/_unloaded/Phi-4-mini-instruct-8bit) still points into the hub snapshot. THE WEIGHTS ARE THE SAME
+    BYTES, PROVED BY CONTENT: the served model.safetensors hashes to 84bcf5553d78094fd6fbe8d7b547a94c6b21996c4066a7a1e89ee4d347a50a24
+    and that digest IS one of the 13 blob names in the hub cache, which is the file the snapshot symlink resolves to. The two
+    DIRECTORIES differ by two text files only - the served copy carries .gitattributes and README.md and nothing is present
+    only in the cached copy. The census therefore reads PARKED and offers NOTHING, by its DECLARED rule (a same-name copy is
+    redundant only when the two inventories are EQUAL, D-3034) - a conservative outcome now known to be conservative rather
+    than correct in substance, and the face NAMES the difference instead of calling the bytes unique. The same question may
+    apply twice: a 4270.2 MB hub copy of Qwen3.8-27B-MLX-4bit sits beside the directory the engine serves under that name,
+    and that pair has NOT been measured in content.'
+  gate: 'the OWNER decides whether the cached copy and its stale parked entry go. The act is a PAIR - the parked entry first,
+    or its target becomes ABSENT (the BUG-808 class) - and pipeline/safe_delete.py is the only deleter (R-D410) with the word
+    per batch under D-3010. If the answer is YES, the INSTRUMENT must be extended too: redundancy has to be proved by the
+    WEIGHT content (a digest match against the cache blob names) rather than by a full-inventory equality that two text
+    files can defeat. Infrastructure: python3 pipeline/hf_fetch_model.py --repo mlx-community/Phi-4-mini-instruct-8bit
+    --verify-only, then governance/hf_fetch_receipt.json.'
 

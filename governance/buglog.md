@@ -8,16 +8,17 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1172 decisions (census stamp 2e5b675154a735e1, 2026-10-16) · 615 bugs (224 open / 391 closed; highest OPEN = BUG-850) · 46 open tasks (MUST 11 / SHOULD 31 / WORTH 4; OWNER-moved 0, pipeline-moved 46; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1173 decisions (census stamp 71188bc9fc73b61a, 2026-10-16) · 615 bugs (224 open / 391 closed; highest OPEN = BUG-850) · 47 open tasks (MUST 11 / SHOULD 31 / WORTH 5; OWNER-moved 1, pipeline-moved 46; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **79** of 1172 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 587 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1172, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **79** of 1173 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 588 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1173, D-2987/BUG-765)
 >
 > Open BUGS by severity (population = the census's 224 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 34 · 🟨 MED 61 · 🟩 LOW 24 · UNLABELLED 101 (BUG-757) of 224 open.
 >
-> **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
+> **OWNER LANE (1) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
+> | T-176 | 🟡 WORTH | THE SOURCE LIBRARY NAMES, IF HUMAN-READABLE NAMES ARE EVER WANTED - the act this decision priced and did NOT a | owner lane: the owner says whether human-readable library names are wa |
 >
 > **PIPELINE LANE (46) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
 >

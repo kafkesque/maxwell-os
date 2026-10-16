@@ -3,7 +3,7 @@ session:
   pipeline_commit: 'v3.0-D2485'
   schema_version: '3.0'
   project_root: knowledge pipeline/
-  status: '2026-10-16 D-2981: the user-facing faces are DERIVED (scripts/gov_sync.py) and joined to the registers. Register: 1172 decisions (79 needing action) / 615 bugs (224 open) / 46 open tasks (0 OWNER-moved, 46 pipeline). YOURS: nothing. AGENT NEXT: 🔴 T-101 HARDEN THE RETRIEVAL GOLDEN SET (the gate is saturated); 🔴 T-104 BUG-757 — OPEN bugs carry NO severity token, so the register cannot be; 🟠 T-105 REA tier A/B mining — DEVONthink 3 (related-document ranking) and Curs.'
+  status: '2026-10-16 D-2981: the user-facing faces are DERIVED (scripts/gov_sync.py) and joined to the registers. Register: 1173 decisions (79 needing action) / 615 bugs (224 open) / 47 open tasks (1 OWNER-moved, 46 pipeline). YOURS: 🟡 T-176 THE SOURCE LIBRARY NAMES, IF HUMAN-READABLE NAMES ARE EVER WANTED - th. AGENT NEXT: 🔴 T-101 HARDEN THE RETRIEVAL GOLDEN SET (the gate is saturated); 🔴 T-104 BUG-757 — OPEN bugs carry NO severity token, so the register cannot be; 🟠 T-105 REA tier A/B mining — DEVONthink 3 (related-document ranking) and Curs.'
 models:
   generator:
     model: Qwen3-Coder-30B-A3B-Instruct-MLX-4bit
@@ -328,7 +328,7 @@ session_status_2026_10_06:
   summary: 'v7 PROMOTED (2026-10-06 apply). Domain rename research & methodology -> research practice
     (D-2853) DONE in menu+golden+anchors+DB (875+1 rows relabelled); discipline "research methodology" UNCHANGED.
     3 new disciplines (business administration / entrepreneurship studies / marketing). FORENSIC AUDIT 2026-10-07 v3
-    found the CIRCLES root cause: 1172 decisions D-2826..D-2859 UNCOMMITTED (git HEAD=D-2825, worktree=D-2859) + ~70
+    found the CIRCLES root cause: 1173 decisions D-2826..D-2859 UNCOMMITTED (git HEAD=D-2825, worktree=D-2859) + ~70
     modified + ~15 untracked files. NEW drift beyond v2: (1) taxonomy_shacl.ttl enum still lists research &
     methodology (unenforced, future tax); (2) closed_menu_v7 = 65 disc/44 dom vs live taxonomy_v5 = 64/43
     (off-by-one on BOTH axes, unreconciled); (3) 4 referee variants discipline_anchor_rederived_v6_20261006[.b.c.d].json

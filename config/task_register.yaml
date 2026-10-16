@@ -1883,3 +1883,28 @@ tasks:
     each of the three sites resolves its client name, home or binary FROM a declared home (a pointer, never a
     literal): after the remedy the register SHRINKS to 5 sites, scripts/check_agent_surface.py reads rc 0, and no
     pipeline behaviour changes - proved by the three capability selftests plus scripts/resolve_route.py --check.
+
+- id: T-176
+  priority: WORTH
+  state: open
+  mover: owner
+  title: 'THE SOURCE LIBRARY NAMES, IF HUMAN-READABLE NAMES ARE EVER WANTED - the act this decision priced and did
+    NOT authorise: plan-first, metadata-derived, refusing every name an ingest already resolves'
+  source: D-3045; config/ingest_identity_gate.yaml#source_library; scripts/census_source_names.py; T-172; BUG-800
+  why: >-
+    MEASURED 2026-10-16 (D-3045): 1254 of 2530 files in the owner library carry a declared name class, of which
+    222 are FREE to repair (no cache record keyed to the name yet) and 1032 are COUPLED to an ingest, where the
+    same rename is the cascade T-172 refuses at 37 corpus stems (BUG-800: 2,952 references inside 13 run
+    receipts). The identity these names carry is bought elsewhere - 1680 of 2530 already resolve author+title from
+    the S0.5 content cache - so this row exists only for the HANDLE, never for the corpus.
+  evidence: >-
+    MEASURED 2026-10-16 by scripts/census_source_names.py (READ-ONLY, 5/5 known-answer controls): the roots, the
+    file kinds, the name classes and the metadata cache are all DECLARED
+    (config/ingest_identity_gate.yaml#source_library), so the boundary between a free repair and an
+    ingest-coupled one is a reading rather than a judgement. No rename has been planned, proposed or applied.
+  gate: >-
+    owner lane: the owner says whether human-readable library names are wanted at all; if yes, the act must be
+    plan-first (a written plan naming each row, its source metadata and its references), metadata-derived (EPUB
+    OPF, PDF info or the S0.5 cache - never a guess and never a model), REFUSING every name the cache or the
+    corpus already resolves (those are T-172 shape), with a census before and after and a receipt - and it must
+    ride a moment BEFORE the next batch is ingested, because that is the only moment it is free.

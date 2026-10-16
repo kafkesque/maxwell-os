@@ -212,3 +212,30 @@ name_normalisation:
   #: The declaration above is what makes that day safe: with identity.record_lookup, a renamed file whose cache
   #: record still carries the old name resolves canonically instead of reading as a NEW candidate and being
   #: re-classified — so the deferral is a SCHEDULE, not a debt that can decay into a surprise.
+
+source_library:
+  # THE OWNER'S LIBRARY: files that have NOT entered the corpus yet. It is declared here because WHERE a repair
+  # happens decides what it costs: a name repaired BEFORE the first reference carries ZERO references, while the
+  # same repair after ingest is a cascade (MEASURED 2026-10-15, BUG-800: 37 defective stems referenced 2,952 times
+  # inside 13 run receipts, which is why the approved repair T-172 must ride a re-ingest). Roots are written '~...'
+  # and never mirrored (D-3034); the census is scripts/census_source_names.py, READ-ONLY, and it names no path of
+  # its own (C12).
+  roots:
+    - id: books
+      path: '~/Library/CloudStorage/Dropbox/education/books'
+      kinds: [epub, pdf, md, mobi, azw3, djvu]
+    - id: journals_notes
+      path: '~/Library/CloudStorage/Dropbox/education/journals:notes'
+      kinds: [pdf, docx, md, txt]
+  metadata_cache: 'knowledge pipeline/checkpoints/book_metadata.jsonl'
+  #: The three name classes this census counts. They are DIAGNOSTIC, not defects: the door's own key strips the
+  #: marker and collapses whitespace before any comparison, so none of them moves identity — they are what a HUMAN
+  #: sees in a file list, and the census exists to price a repair rather than to declare one.
+  marker_pattern: '(?i)\b(z-?lib|libgen|annas?-?archive|anna.s archive|1lib|zlibrary)\b'
+  spine_pattern: '\s--\s|\b[0-9a-f]{16,}\b'
+  truncation_pattern: '_(\s|$)|\b(and|with|for|the)\s*$|\([^)]*$'
+  #: WHAT THIS DECLARATION DOES NOT DO, recorded so it cannot be re-proposed as a surprise (D-3038): it does NOT
+  #: authorise a rename. A source-side repair is an OWNER-LANE act that must be plan-first, must derive any new
+  #: name from the file's OWN metadata (never from a guess), and must REFUSE on a name the cache or the corpus
+  #: already resolves (that one is ingest-coupled: T-172's shape). Nothing renames the owner's library by default.
+  accepted_negative: 'no default renamer: a bulk rename of the owner library is refused, because a name is evidence (a provenance handle including which mirror it came from) and never identity, and the pipeline reads identity from the TEXT and the BYTES (S0.5 metadata + the door key)'

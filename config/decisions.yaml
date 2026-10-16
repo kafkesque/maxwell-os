@@ -26114,3 +26114,62 @@ decisions:
     in both directions (their selftests fatal, their readings tri_state) and wired into `just health`; the writer
     selftest is fatal there too. config/capability_registry.yaml# harness_adapter now owns the census rail, the
     writer and the declared facts, so the route graph resolves them.'
+- id: D-3045
+  state: ACTIVE
+  date: '2026-10-16'
+  by: assistant
+  category: IDENTITY / SOURCE LIBRARY
+  bugs:
+  - BUG-800
+  files:
+  - config/ingest_identity_gate.yaml
+  - scripts/census_source_names.py
+  - config/task_register.yaml
+  title: 'A NAME IS EVIDENCE, NOT IDENTITY — and a source-side repair is cheapest before the FIRST REFERENCE: the
+    owner library is CENSUSED (2530 files, 1254 with a name class, of which 222 are free to repair and 1032 are
+    already coupled to an ingest), and a default renamer is REFUSED with its reason'
+  decision: 'OWNER QUESTION 2026-10-16 (verbatim): "in EPUB or PDF or any other format before S0 if there are duplicates
+    but with a truncated name that is missing author or title or both but the file text might contain it, would
+    it be easier before conversion, or generally default-normalise books and journal file names in the attached
+    folder so we can avoid any future tax and/or overcomplicate S0?" (1) THE ANSWER, FIRST PART: THE NAME CARRIES
+    NO IDENTITY, SO A TRUNCATED NAME HIDES NO DUPLICATE. Identity in this repository is the BYTES (the door defers
+    a byte-identical twin under a NEW name) and the CONTENT-DERIVED metadata (pipeline/stage0_5_extract_metadata.py
+    derives author/title/year from the file own text at temp 0.0 and caches it), compared through ONE key, sanitize_source_book().strip().lower()
+    (pipeline/book_metadata.py). A truncated name is a defective HANDLE, not a hidden work: the door still resolves
+    it, and the four future-batch layers (L0 the ingest door, L1 the content screen, L2 canonical source_ids, L3
+    the never-silent debt reading) are what prevent a duplicate from entering — none of them needs a filename. (2)
+    THE ANSWER, SECOND PART: A RENAME IS CHEAPEST BEFORE THE FIRST REFERENCE, AND WE ARE PAST THAT POINT FOR MOST
+    OF THE LIBRARY. MEASURED 2026-10-16 by scripts/census_source_names.py (READ-ONLY, 5/5 known-answer controls),
+    over the two declared roots: 2530 files (books 2180, journals+notes 350); 1254 carry at least one declared name
+    class (1160 an ingest-site marker, 218 a mirror spine or content hash, 276 a truncated-looking stem); 1680 of
+    2530 ALREADY resolve author+title from the S0.5 cache (960 records), which is the direct proof that the text
+    supplies what the name lacks. The split that decides the question: 222 defective names are FREE to repair (no
+    cache record is keyed to them yet — zero references), and 1032 are COUPLED to an ingest (a record already resolves
+    them), where the same repair is the CASCADE T-172 refuses at 37 stems — MEASURED 2026-10-15 (BUG-800): 2,952
+    references inside 13 already-written run receipts. (3) THE RULE THIS DECISION LOCKS. A name is EVIDENCE — a
+    provenance handle that records where a file came from — and never identity. Therefore: (a) the name authority
+    does NOT move (content-derived metadata plus the door key); (b) a source-side repair is legal ONLY before the
+    first reference, and the census declares that boundary rather than leaving it to judgement; (c) any such repair
+    is OWNER-LANE, PLAN-FIRST, and must derive the new name from the file OWN embedded metadata (EPUB OPF dc:title/dc:creator,
+    PDF info dict, or the S0.5 cache) — never from a guess, never from a model, because a name a model invents is
+    a claim with no owner (D-3034); and (d) it must REFUSE on any name the cache or the corpus already resolves,
+    because that rename is a re-ingest act. (4) THE ACCEPTED NEGATIVE, RECORDED WITH ITS REASON (D-3038). There
+    is NO default renamer for the owner library and this decision does not authorise a bulk rename. The reasons
+    are measured, not aesthetic: the library is a MIRROR-Named archive whose names record PROVENANCE (which mirror,
+    which edition, which hash) that no other home keeps; 1032 of the 1254 defective names are already keyed to an
+    ingest, so a bulk rename would be the largest cascade this repository has ever attempted; and the repair buys
+    ZERO identity — the same conclusion T-173 reached for the marker class in the CORPUS (accepted with the debt
+    declared, 459 stems), reached here one layer upstream. (5) WHERE THE DECLARATION LIVES. config/ingest_identity_gate.yaml#source_library
+    declares the two roots (written as an expanded home path, never mirrored — D-3034), the file kinds, the metadata
+    cache the census joins against, the three name classes as PATTERNS, and the accepted negative itself, so a future
+    session finds the decision where the roots are. scripts/census_source_names.py names no path of its own (C12,
+    proved by a control that reads its own bytes), writes NOTHING, and its rc is 2 while any name class is present
+    — loud, owner-owed, never fatal (BUG-457). It is an AUDIT (run on demand), not a ladder line: it reads the owner
+    filesystem and a rail that walks Dropbox on every `just health` would be a tax, not a reading. (6) WHAT THE
+    OWNER MAY SAY NEXT, PRICED. If human-readable names in the library are ever wanted, the act is registered as
+    T-176 and its shape is already declared: plan-first, metadata-derived, refusing on the 1032 coupled names, with
+    a census before and after and a receipt — and it is priced AT THE SOURCE, before the next batch is ingested,
+    because that is the only moment it is free. (7) WHAT THIS DECISION DOES NOT DO. It does not touch S0, the door,
+    the store or any stage; it does not rename a single file; it does not make the marker or truncation classes
+    a defect the pipeline must fix (the door key strips the marker and collapses whitespace, D-3040/T-173); and
+    it does not change T-172, whose 37 corpus stems still ride the next re-ingest.'

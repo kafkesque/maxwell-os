@@ -1411,3 +1411,28 @@ widening_log:
   additions:
     - governance/HANDOFF_20261016_LANES_AND_MEASUREMENT.md
   owner_ack: 'owner 2026-10-16 (verbatim): "in order to continue as you porpose this in a new susession / makesure that nothing from this session that is important proposed and or relevant dont get lost / and create session hand off / so we can continue from here so you can have the full context and continue from where we finish this session"'
+
+- date: '2026-10-16'
+  actor: assistant
+  reason: >-
+    BUG-875 - A FIRST-PARTY IMPORT NAME RESOLVES OUTSIDE THE TREE. MEASURED 2026-10-16 23:4x on this machine:
+    `import scripts` inside the repository resolves to
+    /Users/barn/miniforge3/lib/python3.13/site-packages/scripts/__init__.py - a top-level REGULAR package
+    installed by skillopt-0.1.0 (named in that dist-info's own RECORD), not to this repository's scripts/.
+    PEP 420 is the mechanism: a regular package found ANYWHERE on sys.path outranks a namespace portion, so
+    the repository's own `sys.path.insert(0, REPO_ROOT)` CANNOT win. Consequence, MEASURED: `python3
+    scripts/delegate_journal.py --selftest` - a declared FATAL rail - exits 1 with ModuleNotFoundError: No
+    module named 'scripts.lib', so the T-168/BUG-844 delegated-run journal, the ONE record of a delegated run,
+    cannot run at all on the interpreter an agent session uses, while the SAME declared command reads GREEN
+    under /usr/local/bin/python3 and /opt/homebrew/bin/python3: one command, two verdicts. Dead for the same
+    reason: pipeline/config_audit.py's agent_surface.yaml#logging join and 16 import sites across scripts/ and
+    tests/. The repair is scripts/__init__.py (a regular package marker: the repository DECLARES its own bytes)
+    plus a rule clause in RAIL 0 that makes a first-party name resolving OUTSIDE the tree a FAULT naming the
+    capturing distribution, so the class cannot recur silently when a dependency claims pipeline/, tests/ or
+    tools/. No file outside these subjects is touched by this act. The tree is clean (0 dirty paths) at entry.
+  additions:
+    - scripts/__init__.py
+    - scripts/check_repo_integrity.py
+    - config/repo_integrity.yaml
+  owner_ack: 'owner 2026-10-16 (verbatim): "I started a new session so test BUG 773 limb (b) / For clarification what local llm can be delegated and for what type of task / Is it worth to clarify in it can be clarified in model assigned.yaml? / continue with the next critical step starting with the highest leverage step ( task,bug or decsions) and follow consequential order / before you commit an serious implementation do a forensic audit to make sure that nothing breaks,cascade,drift, no blindspot,gap conflict,bug, hidden failure, error leak,mismatch,bloat"'
+

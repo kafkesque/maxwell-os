@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1182 decisions (census stamp a16bf19e7b254858, 2026-10-16) · 638 bugs (231 open / 407 closed; highest OPEN = BUG-874) · 55 open tasks (MUST 12 / SHOULD 39 / WORTH 4; OWNER-moved 6, pipeline-moved 49; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1182 decisions (census stamp a16bf19e7b254858, 2026-10-16) · 639 bugs (232 open / 407 closed; highest OPEN = BUG-875) · 55 open tasks (MUST 12 / SHOULD 39 / WORTH 4; OWNER-moved 6, pipeline-moved 49; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **79** of 1182 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 597 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1182, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 231 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 35 · 🟨 MED 66 · 🟩 LOW 25 · UNLABELLED 101 (BUG-757) of 231 open.
+> Open BUGS by severity (population = the census's 232 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 36 · 🟨 MED 66 · 🟩 LOW 25 · UNLABELLED 101 (BUG-757) of 232 open.
 >
 > **OWNER LANE (6) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -15967,6 +15967,55 @@ FIX (T-185, three limbs, each a rule the repository already declares elsewhere):
   new one. The correction is a NAMED next step with the probe run FIRST.
 - **related:** BUG-872 (the doctrine built on a stale measurement), BUG-873 (a declared thing and an active
   thing diverging silently) — the same family a third time. D-3034 (a declaration must RESOLVE).
+### BUG-875 (HIGH, OPEN) — A FIRST-PARTY IMPORT NAME RESOLVES OUTSIDE THE TREE, so the delegated-run journal and 16 import sites read ANOTHER PROJECT'S BYTES (and a declared FATAL rail was RED on the interpreter an agent session uses)
+- **state:** open | **severity:** high | **filed:** 2026-10-16 | **by:** assistant
+- **THE DEFECT (a declared command with TWO VERDICTS is not a rail).** MEASURED 2026-10-16 23:4x in this
+  repository: `import scripts` resolved to
+  `/Users/barn/miniforge3/lib/python3.13/site-packages/scripts/__init__.py` — a top-level REGULAR package
+  installed by the distribution **skillopt-0.1.0** (named in that dist-info's own RECORD) — and NOT to this
+  repository's `scripts/`. The mechanism is **PEP 420**, and it is why the repository could not fix this from
+  inside: a namespace portion on `sys.path` is consulted ONLY when no REGULAR package of that name exists
+  ANYWHERE on the path, so the `sys.path.insert(0, REPO_ROOT)` that `scripts/delegate_journal.py` performs
+  deliberately (its own comment says the import is placed AFTER the insert for that reason) **could not win**.
+  `scripts/` had no `__init__.py`, so it was a namespace package; `pipeline/`, `tools/` are in the same state.
+- **THE RED LOOP (D-3036), ONE NAMED COMMAND, RED THEN GREEN.** `python3 scripts/delegate_journal.py --selftest`
+  — a rail `config/rail_registry.yaml` declares **fatal** and the ladder runs — exited **1** with
+  `ModuleNotFoundError: No module named 'scripts.lib'`. The SAME declared command exits **0** under
+  `/usr/local/bin/python3` and `/opt/homebrew/bin/python3`. That is the whole defect in one pair of readings:
+  the verdict depended on which `python3` was first on PATH, so a session could be told the trace was intact
+  while the trace's only writer could not start. After the fix the same command reports **37/37 known-answer
+  controls** and `status` reads the journal (`4 row(s), 2 run(s), 0 open`).
+- **BLAST RADIUS, MEASURED (not estimated).** 16 import sites resolved through the foreign package:
+  `scripts/delegate_journal.py`, `scripts/resolve_domains_emerging.py`, four files under `tests/` (all four now
+  collect and pass, 14/14), and the rest in `temp/`. `pipeline/config_audit.py`'s declared join
+  `agent_surface.yaml#logging -> scripts.delegate_journal` failed to import for the same reason (that rail is
+  separately RED today for an unrelated missing `dspy-ai`, so this is stated as a SECOND cause, not as a new
+  reading). The severity is not the file count: the thing that could not run is the **T-168 delegated-run
+  journal**, which D-3036/BUG-844 declare to be the ONE record a delegated act leaves behind — the standing
+  delegation rule was unverifiable for exactly as long as this was true.
+- **WHY IT COULD NOT BE FOUND BY ANY EXISTING RAIL.** Every rail reads a file and trusts the read; none asked
+  whether a name this repository CALLS ITS OWN still resolves to this repository's bytes. `resolve_route.py --check`
+  proves an entrypoint EXISTS and the FORM of the command; it never asked where the entrypoint's imports land. The
+  repository's own clean-tree rails were green: **0 dirty paths, RAIL 0 intact, 0 conflict names.**
+- **FIX (LANDED, this act).** (i) `scripts/__init__.py` — a regular package marker, deliberately carrying no code,
+  which makes the name the repository's own on EVERY interpreter (a declaration, not a behaviour, C12).
+  (ii) **RAIL 0 gains the rule**: `config/repo_integrity.yaml#import_resolution` declares the check, and
+  `scripts/check_repo_integrity.py` DERIVES the names from disk (every top-level directory holding `.py`, plus
+  every top-level `.py` module, minus declared exclusions each carrying its reason) and fails closed on any name
+  that resolves outside the tree, **NAMING the origin file and the distributing package**. It was seen RED
+  BEFORE the repair, naming `skillopt`, and GREEN after; the rail's own selftest gained THREE two-sided controls
+  (a captured name is a fault, an in-tree name is not, a capturable namespace root is NAMED) built in a synthetic
+  repository with a synthetic `sys.path` entry, so the control is hermetic and does not measure this machine's
+  site-packages. Controls 17 -> 20.
+- **THE OPEN HALF, stated rather than hidden.** `pipeline` and `tools` still resolve as NAMESPACE packages, so
+  they are CAPTURABLE BY CONSTRUCTION — the rail now REPORTS them on every run instead of leaving the fragility
+  silent, and making them regular packages is a change to the whole pipeline's import surface, which this act
+  does not take. The foreign `skillopt` package was NOT deleted or moved: it is another distribution's bytes and
+  D-3018/R-D410 put that disposition with the owner; the repair makes the repository win without touching it.
+- **related:** BUG-842/T-146 (a declared command form that does not resolve), BUG-844/T-168 (a run that leaves no
+  trace), BUG-873 (an enabled extension contributing zero tools — filed the same day, same family: A DECLARED
+  THING AND AN ACTIVE THING DIVERGED SILENTLY), BUG-872 (a stale record carrying doctrine).
+
 ### BUG-873 (MED, OPEN) — AN ENABLED EXTENSION THAT CONTRIBUTES ZERO TOOLS RAISES NOTHING (and I gave a false answer because of it)
 - **state:** open | **severity:** medium | **filed:** 2026-10-16 | **by:** assistant
 - **symptom (measured).** `~/.config/goose/config.yaml` declares `youtubetranscript` `enabled: true`, type
@@ -15997,6 +16046,26 @@ FIX (T-185, three limbs, each a rule the repository already declares elsewhere):
   break the `cmd` deliberately (an unresolvable binary) and confirm the fault is REPORTED rather than silent.
 - **related:** BUG-871 (a capability that outlived its reason), BUG-872 (a stale record carrying a doctrine).
   All three are the same family: A DECLARED THING AND AN ACTIVE THING DIVERGED SILENTLY.
+- **LIMB (b) — THE FRESH-SESSION READING, MEASURED 2026-10-16 23:4x (owner restarted Goose into a FRESH session
+  expressly for this test).** In this session's registered function surface the extension IS present and WORKS:
+  `list_functions` exposes the `youtubetranscript` namespace with all four declared tools
+  (`getTranscript`, `getTimedTranscript`, `getVideoInfo`, `getAvailableLanguages`), and `getTranscript` on
+  `hJz7zi17mXA` returned the video's real content (`title: "Nokia Just Released a Free Jev Alternative
+  (AnyJev)"`, transcript starting "Okay, before we start, I want you to read this headline...").
+  **This is a TWO-POINT reading and it DISCRIMINATES**: the resumed session reported 40 functions with NOT ONE
+  YouTube tool, the fresh session reports the tools and a successful `tools/call`. So the fault is in the
+  SURFACE A SESSION RECEIVES, not in the extension, its `cmd`, its PATH, or its upstream.
+  **What survives, stated without overclaiming:** the pair is consistent with BOTH (a) "the session's extension
+  set was fixed at session start" and (b) "a resumed/compacted session keeps its original tool surface" - it does
+  NOT yet separate them, because whether the earlier session was created before or after the 2026-10-16 13:16
+  config write is not recorded. What it DOES establish: (c) "a stdio server that fails to start is silent" is not
+  the cause of THIS instance (the server answers and a fresh session binds it). (c) survives as a CLASS and is
+  still owed the bug's declared SECOND limb (break the `cmd` deliberately and confirm the fault is REPORTED
+  rather than silent). **The remaining reading is the owner's: a RESUMED session on the same config must still
+  be measured - if it lacks the tools while a fresh one has them, (b) is proven; if it has them, (a) is.**
+  **Adjacent finding from the same test:** the delegated-run journal this repository mandates (D-3036/BUG-844)
+  could not RUN in this session at all - see BUG-875, filed from the same sitting. A fresh session therefore
+  tests the surface, but the RECORD of the test could only be written after BUG-875 was repaired.
 ### BUG-872 (HIGH, FIXED 2026-10-16) — A DISPROVEN CACHE WAS RE-MEASURED AS WORKING (a two-day-old disproof was carrying a whole doctrine)
 - **state:** fixed | **severity:** high | **filed:** 2026-10-16 | **closed:** 2026-10-16 | **by:** assistant
 - **symptom.** `config/agent_context.yaml#cache_accounting.proof` declared `status: DISPROVEN_MEASURED_20261014`,

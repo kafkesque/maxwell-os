@@ -88,6 +88,30 @@ git:
   head_reflog_relpath: logs/HEAD
   reflog_must_agree_with_head: true
 
+import_resolution:
+  # BUG-875 (MEASURED 2026-10-16 23:4x). THE REPOSITORY MAY NOT LOSE ITS OWN NAMES.
+  #   `import scripts` inside this repository resolved to
+  #   /Users/barn/miniforge3/lib/python3.13/site-packages/scripts/__init__.py - a top-level REGULAR package
+  #   installed by skillopt-0.1.0 - so `python3 scripts/delegate_journal.py --selftest` (a declared FATAL
+  #   rail) exited 1 with ModuleNotFoundError while the SAME declared command read GREEN under a different
+  #   python3: ONE COMMAND, TWO VERDICTS. The mechanism is PEP 420: a namespace portion on sys.path is
+  #   consulted ONLY when no REGULAR package of that name exists ANYWHERE on the path, so inserting the
+  #   repository at sys.path[0] cannot win against an installed package. The repository had 16 import sites
+  #   (scripts/ and tests/) that resolved outside it, and RAIL 0 did not look.
+  # WHAT IS CHECKED. This probe DERIVES the names from DISK - every top-level directory holding .py files,
+  # plus every top-level .py module - never a list to re-cut when a directory is added, MINUS the declared
+  # exclusions below. Each name must then RESOLVE INSIDE this repository. A name that resolves outside is a
+  # FAULT naming the file and the distribution that captured it; a name that resolves inside as a NAMESPACE
+  # package (no __init__.py) is a NOTE, because such a name is CAPTURABLE BY CONSTRUCTION - the day a
+  # dependency ships a top-level package of that name it is taken silently, which is the whole of BUG-875.
+  enabled: true
+  # Each entry is an exclusion WITH ITS REASON, so an exclusion can never be a silent allow-list (D-405).
+  not_first_party:
+    temp: 'gitignored scratch (the EXCLUDED half of BUG-563): a name here is nobody declared API'
+    archive: 'retired code kept as evidence, never an import root'
+    backups: 'byte copies for restore, never imported'
+    benchmarks: 'measurement scratch, never imported by governed code'
+
 repair:
   # Bytes are never deleted: a conflict copy that is NOT restored is MOVED to this vault, which is outside
   # the synced tree (so it cannot conflict again) and holds a byte-exact copy plus a sha256 manifest.

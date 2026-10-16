@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**231 open** / 407 closed of 638 ids.
+**232 open** / 407 closed of 639 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -238,3 +238,4 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-869 | (MED — OPEN 2026-10-16) — pipeline/subagent_fanout.py delivered an `async: true` delegate as a FOREGROUND run that BLOCKED its parent, and t | 1 |
 | BUG-873 | (MED, OPEN) — AN ENABLED EXTENSION THAT CONTRIBUTES ZERO TOOLS RAISES NOTHING (and I gave a false answer because of it) | 1 |
 | BUG-874 | (HIGH, OPEN) — THREE MODEL SETS, THREE ANSWERS (the declared parity rule is RED, and 2 of 8 models can never be cached) | 1 |
+| BUG-875 | (HIGH, OPEN) — A FIRST-PARTY IMPORT NAME RESOLVES OUTSIDE THE TREE, so the delegated-run journal and 16 import sites read ANOTHER PROJECT'S  | 1 |

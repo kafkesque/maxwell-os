@@ -1,6 +1,8 @@
 # Maxwell OS — Not-Yet-Evaluated Research Opportunities
-> **Date:** 2026-08-09 | **Source:** feed.opml + senior RAG developer assessment
-> **Status:** Fresh opportunities — none rejected, none tested
+> **Date:** 2026-08-09 (register opened) | **Last synced:** 2026-10-16 | **Source:** feed.opml + senior RAG developer assessment
+> **Status:** A LIVE register: the P1–P3 rows below are candidates, and the DATED sections at the foot are the
+> evaluations that have since been run (D-3038: what we reject we register, with its reason). A row whose
+> "why deferred" has been ANSWERED by a measurement is re-cut in place rather than left standing — see R-12.
 
 ---
 
@@ -33,7 +35,7 @@
 | **R-09** | memvid | Agent memory layer (serverless) | Agent harness | ⭐15,901. Knowledge graph support. Evaluated for Maxwell agent, not pipeline. |
 | **R-10** | zvec | Alibaba embedded vector DB | Persistent vectors | ⭐14,942. HNSW, embedded. May replace FAISS for storage. |
 | **R-11** | SiliconScope | Apple Silicon native monitor | System diagnostics | ⭐802. ANE/Memory-bandwidth tracking. Diagnostic only. |
-| **R-12** | Prompt caching | Cache system prompts across calls | S4 | ~500 tokens saved per FB | Depends on OMLX caching support. NOT verified. |
+| **R-12** | Prompt caching | Cache system prompts across calls | S4 | ~500 tokens saved per FB | ✅ **ANSWERED 2026-10-16 (BUG-872): the cache is LIVE and was never disproven** — byte-identical 2,616-token prefix, gemma-4-E4B cold 6.90 s → warm 0.16–0.39 s, `cached 2613/2616`, **25.01x** against a declared 5.0x bar, confirmed independently by `agent_context_probe --prefill-ab`. Two corrections the measurement forced: the cache is **PER-MODEL** (`cached = 0` on both Orniths), and the binding constraint is **PREFIX STABILITY**, not prefill throughput — one byte changed at the head converts a 0.16 s turn back into a 6.90 s one. The `2,000-token comparable floor` this row's stage relied on is **DISPROVEN** (gpt-oss-20b-Q8: 71.3 tok/s @ 2,677 vs 210 tok/s @ 50,082). |
 | **R-13** | Token-efficient prompt patterns | Systematic prompt optimization | All stages | 10-30% across pipeline | Requires per-stage analysis. |
 
 ---
@@ -66,6 +68,7 @@
 | Date | Item | Action |
 |------|------|--------|
 | 2026-08-09 | R-01 (Prompt trimming) | ✅ IMPLEMENTED — 233 chars removed from CRIBS_ENRICHMENT_SYSTEM (19%) |
+| 2026-10-16 | First-party import resolution (BUG-875) | ✅ IMPLEMENTED — NOT a research candidate but a rail this register's "is it drift-proof?" column kept asking for: `config/repo_integrity.yaml#import_resolution` + `scripts/check_repo_integrity.py` (RAIL 0) now DERIVE every first-party top-level name from disk and fail closed when one resolves OUTSIDE the tree, naming the capturing distribution. 3 new two-sided known-answer controls (17 → 20). Measured RED naming `skillopt-0.1.0`, then GREEN. |
 | 2026-08-09 | R-03 (llmfit preflight) | ✅ ADDED to just preflight |
 | 2026-08-09 | R-02 (Structured JSON) | ⬜ PENDING A/B test |
 | 2026-08-09 | R-07 (Merged CRIBS+Classify) | ⬜ PENDING A/B test |

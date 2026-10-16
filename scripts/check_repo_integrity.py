@@ -357,6 +357,94 @@ def report_only(cfg: dict[str, Any], rel: str) -> bool:
     return any(fnmatch.fnmatch(rel, g) for g in cfg["severity"].get("report_only_globs") or [])
 
 
+def import_resolution_faults(rule: dict[str, Any], root: Path = REPO,
+                             extra_path: Sequence[Path] = ()) -> tuple[list[str], list[str]]:
+    """Return (faults, notes) for the import names this repository has to CALL ITS OWN (BUG-875).
+
+    MEASURED 2026-10-16: `import scripts` inside this repository resolved to a top-level REGULAR package
+    installed by skillopt-0.1.0 in the interpreter's site-packages, not to this repository's scripts/, so
+    `python3 scripts/delegate_journal.py --selftest` - a declared FATAL rail - exited 1 with
+    ModuleNotFoundError on the interpreter an agent session uses and exited 0 under another one. A declared
+    command with two verdicts is not a rail (BUG-842/T-146), and the T-168 delegated-run journal is the ONE
+    record a delegated act leaves behind (D-3036/BUG-844).
+
+    The names are DERIVED from disk and the exclusions are DECLARED (C12): a name list maintained here would
+    be a second home that drifts the first time a directory is added. A name resolving OUTSIDE the tree is a
+    fault; a name resolving inside as a NAMESPACE package is a note, because one is capturable by any future
+    install and the other is not.
+
+    Args:
+        rule: the `import_resolution` block read from config/repo_integrity.yaml.
+        root: the repository to resolve against (a parameter so a known-answer control can drive THIS function
+              inside a real repository in the system temp dir, never a lookalike).
+        extra_path: sys.path entries to append AFTER the root, so a control can place a decoy package of the
+                    same name on the path and watch the rule fire.
+
+    Returns:
+        (faults, notes): a fault is a name whose bytes are not this repository's; a note is a name that is
+        inside but capturable, or a name that could not be resolved at all.
+    """
+    faults: list[str] = []
+    notes: list[str] = []
+    if not rule or not rule.get("enabled"):
+        return faults, notes
+    import importlib.metadata
+    import importlib.util
+    skip = set(rule.get("not_first_party") or {})
+    candidates: list[str] = []
+    for entry in sorted(root.iterdir()):
+        if not entry.is_dir() or entry.name.startswith(".") or entry.name in skip:
+            continue
+        if entry.name == "__pycache__" or not any(entry.glob("*.py")):
+            continue
+        candidates.append(entry.name)
+    candidates.extend(sorted(f.stem for f in root.glob("*.py")))
+    saved = list(sys.path)
+    sys.path[:0] = [str(root)] + [str(p) for p in extra_path]
+    try:
+        for name in candidates:
+            try:
+                spec = importlib.util.find_spec(name)
+            except Exception as exc:  # a name whose OWN parent raises is named, never a quiet pass (C16)
+                faults.append(f"the first-party name {name!r} could not be resolved at all "
+                              f"({type(exc).__name__}: {exc}) - a name this repository has to call its own "
+                              f"that nothing can resolve (BUG-875)")
+                continue
+            if spec is None:
+                notes.append(f"the first-party name {name!r} resolves to NOTHING on this path - no Python "
+                             f"file here can import it (BUG-875)")
+                continue
+            locations = [str(p) for p in (getattr(spec, "submodule_search_locations", None) or [])]
+            origin = str(getattr(spec, "origin", None) or "")
+            if origin:
+                inside = origin.startswith(str(root))
+            else:
+                inside = bool(locations) and all(p.startswith(str(root)) for p in locations)
+            if inside:
+                if not origin and locations:
+                    notes.append(f"the first-party name {name!r} resolves INSIDE as a NAMESPACE package "
+                                 f"(no __init__.py): it is CAPTURABLE BY CONSTRUCTION - PEP 420 consults a "
+                                 f"namespace portion only when no REGULAR package of that name exists "
+                                 f"anywhere on sys.path, so the day a dependency ships a top-level package "
+                                 f"called {name!r} it is taken silently, which is the whole of BUG-875")
+                continue
+            owner = ""
+            try:
+                owner = ", ".join(importlib.metadata.packages_distributions().get(name) or [])
+            except Exception:
+                owner = ""
+            faults.append(f"the first-party name {name!r} resolves OUTSIDE this repository: "
+                          f"{origin or locations} (installed by {owner or 'an unknown distribution'}) - "
+                          f"PEP 420 is why inserting the repository at sys.path[0] cannot win against a "
+                          f"regular package of the same name, so every 'from {name}.x import y' inside this "
+                          f"repository reads ANOTHER PROJECT'S BYTES (BUG-875). Fix: give the name a regular "
+                          f"package of its own (an __init__.py) so the repository DECLARES it, and keep the "
+                          f"foreign package out of the interpreter the repository runs on")
+    finally:
+        sys.path[:] = saved
+    return faults, notes
+
+
 def checks(cfg: dict[str, Any], git_dir: Path | None, rows: list[dict[str, Any]],
            root: Path = REPO) -> tuple[list[str], list[str], list[str]]:
     """Return (fails, owner_owed, notes) by evaluating every probe in the config against 'root'.
@@ -415,6 +503,9 @@ def checks(cfg: dict[str, Any], git_dir: Path | None, rows: list[dict[str, Any]]
         if head and last_sha and last_sha != head:
             fails.append(f"{git_dir}/{reflog_rel} records HEAD as {last_sha[:7]} while HEAD is {head[:7]} - "
                          "two records of one fact disagree (P0-A)")
+    ir_faults, ir_notes = import_resolution_faults(cfg.get("import_resolution") or {}, root=root)
+    fails.extend(ir_faults)
+    notes.extend(ir_notes)
     for row in rows:
         if row["in_git"]:
             fails.append(f"{row['cc']} - git metadata was RENAMED by a sync client (P0-A)")
@@ -839,6 +930,49 @@ def selftest(skip_pin: bool = False) -> int:
                       "governance/buglog (M1 max's conflicted copy 2026-09-26).md"):
         print("FAIL repo-integrity selftest: a LIVE sibling was excused as archived (the archive rule overreaches)")
         ok = False
+    # BUG-875, THREE controls, TWO-SIDED. A synthetic repository plus a synthetic sys.path entry, so the
+    # RULE is driven (a capture is a fault, an in-tree namespace is not, and the capturable case is NAMED)
+    # without touching this machine's site-packages.
+    ir_rule = cfg.get("import_resolution") or {}
+    if not ir_rule.get("enabled"):
+        print("FAIL repo-integrity selftest: config declares import_resolution disabled - the capture rule "
+              "(BUG-875) would be a comment nothing runs (BUG-492)")
+        ok = False
+    else:
+        with tempfile.TemporaryDirectory() as td:
+            t2 = Path(td)
+            # The fixture name is UNIQUE so the control is HERMETIC: a name that happens to be installed on
+            # the machine running the control would be captured by the ambient path and the control would
+            # report the machine, not the rule (MEASURED: the first version of this control used "scripts" and
+            # did exactly that - skillopt's regular package captured the FIXTURE's namespace too, which is the
+            # rule working and the control measuring the wrong subject).
+            fixname = "mxwls_import_resolution_fixture"
+            froot = t2 / "repo"
+            (froot / fixname).mkdir(parents=True)
+            (froot / fixname / "x.py").write_text("", encoding="utf-8")
+            site = t2 / "site"
+            (site / fixname).mkdir(parents=True)
+            (site / fixname / "__init__.py").write_text("", encoding="utf-8")
+            clean_faults, clean_notes = import_resolution_faults(ir_rule, root=froot)
+            n += 1
+            if clean_faults:
+                print("FAIL repo-integrity selftest/an_in_tree_name_is_not_a_fault: a repository holding its "
+                      "own " + fixname + "/ reported " + repr(clean_faults[:1]) + " - a rule that fires "
+                      "on the legitimate case is the BUG-574 class")
+                ok = False
+            n += 1
+            if not [x for x in clean_notes if "NAMESPACE" in x]:
+                print("FAIL repo-integrity selftest/a_capturable_name_is_NAMED: an in-tree namespace root was "
+                      "not reported as capturable, so the fragility is silent - which is BUG-875 itself")
+                ok = False
+            n += 1
+            captured = import_resolution_faults(ir_rule, root=froot, extra_path=(site,))[0]
+            if not [f for f in captured if fixname in f]:
+                print("FAIL repo-integrity selftest/a_captured_name_is_a_fault: a foreign REGULAR package named "
+                      + repr(fixname) + " captured the repository's own " + fixname + " and the rule reported "
+                      + repr(captured[:1]) + " (BUG-875)")
+                ok = False
+
     if ok:
         print(f"ok repo-integrity selftest: {n} known-answer control(s)")
         return 0
@@ -885,6 +1019,8 @@ def main() -> int:
         print(f"owner_owed repo-integrity: {len(owed)} conflict copy/copies (bytes intact, disposition owed):")
         for o in owed:
             print("   ", o)
+    for note in notes:
+        print("note repo-integrity: " + note)
     if not fails and not owed:
         subject = (f"UNBORN: HEAD names {ref} with no commit yet - a fresh or freshly RECOVERED repository, "
                    f"INTACT (BUG-576)" if state == "unborn"

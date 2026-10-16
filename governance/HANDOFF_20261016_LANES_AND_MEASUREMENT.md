@@ -12,6 +12,38 @@
 | BUG-873 | OPEN | An enabled extension contributing ZERO tools raises nothing. `youtubetranscript` is `enabled: true`; the server is HEALTHY (driven directly it returned the 14,162-char transcript of `hJz7zi17mXA`); `list_functions` shows 40 functions and NOT ONE YouTube tool. **Root cause UNVERIFIED** — a PATH hypothesis was tested and DISPROVEN. Red loop named in the bug. |
 | BUG-874 | OPEN | Three model sets, three answers. See §3. |
 | AnyJev | REFUSED | Revised DOWN from "deferred to a sandbox arm" after READING an independent replication. The **order-rotation probe** is the token adopted; the method is not. See §5. |
+| BUG-875 | FIXED | **A first-party import name resolved OUTSIDE the tree.** `import scripts` landed in `site-packages/scripts/__init__.py` (a top-level REGULAR package installed by **skillopt-0.1.0**), because PEP 420 consults a namespace portion only when no regular package of that name exists anywhere on the path — so `sys.path.insert(0, REPO_ROOT)` could not win. `python3 scripts/delegate_journal.py --selftest` (a **fatal** rail on the ladder) exited 1 on the interpreter an agent session uses and 0 under another: **one command, two verdicts**, and the ONE record a delegated run leaves behind could not be written. Fix: `scripts/__init__.py` + a RAIL 0 clause that DERIVES the first-party names, fails closed on any that resolve outside, and **NAMES the capturing distribution** (RED naming skillopt, then GREEN). 16 import sites repaired; 14/14 tests now pass. |
+| BUG-873 · limb (b) | MEASURED | The fresh-session test the owner ran: the `youtubetranscript` namespace **IS** in this session's surface (all four tools) and `getTranscript` on `hJz7zi17mXA` returned the real video. Two-point reading with the resumed session's 40-functions-and-no-YouTube-tool: the fault is in the **surface a session receives**, not the extension/server/PATH. Candidates (a) and (b) both survive; (c) is not this instance's cause. **The resumed half is still the owner's to measure.** See §6.1. |
+
+## 1a. SPINE UPDATE — 2026-10-16, SECOND SITTING (append-only; nothing above is rewritten)
+
+**1. The trace can be kept again, and that came first for a reason.** `scripts/delegate_journal.py` — the ONE
+command the standing delegation rule requires before and after any delegated run — **could not run at all** on
+`python3` as an agent session finds it (BUG-875, fixed). Every delegation in this repository was therefore
+unreceipted by construction: `status` reported `4 row(s), 2 run(s), 0 open` while the writer was dead, and the
+same declared command read GREEN under `/usr/local/bin/python3` because that interpreter had no `skillopt`
+package capturing the name `scripts`. **This was not a detour from NEXT STEP 1; it was its precondition** — the
+parity correction below is a sequence of *delegated measurements*, and none of them could be recorded.
+
+**2. What the rule now is when you delegate.** Ask for the **ready receipt**: if the task has a declared home for
+its evidence, name THAT file as the artifact (the R5 review's receipt is `governance/r5_review_gate.jsonl`,
+written by the declared gate — not a new transcript-shaped file in `temp/`). Declare `--may-write` as the
+receipt's real home, or `none` when the receipt already had a home before the run.
+
+**3. The delegated-routing question the owner asked, answered with evidence rather than prose.**
+`config/model_assignments.yaml` is **NOT** the right home for "which local LLM for which task", and neither is
+the `delegate_rules` block in the agent file. On disk today the fact already lives in three declared places, and
+`config/capability_registry.yaml` says so in its own header: *"Who runs what therefore lived in prose (a
+CLAUDE.md delegate_rules block, ADVISORY)"*. The homes are: (i) **which MODEL for which AXIS** →
+`config/model_assignments.yaml#harness_roles` (already there: model + basis + never_for); (ii) **which ROUTE for
+which TASK, at which cost tier** → `config/capability_registry.yaml` (D-3024/T-156) with
+`scripts/resolve_route.py` as its ONE deterministic reader; (iii) **the tier vocabulary** →
+`config/delegation_economy.yaml` (T0 script / T1 local / T2 cloud, escalation reasons). Adding a fourth list to
+`model_assignments.yaml` would create the second home C12 forbids. **The open work is a face, not a list:** render
+the delegate table FROM those three declarations and have `resolve_route.py --check` refuse an unroutable
+pairing — after the parity in NEXT STEP 1 makes "SERVED" true again.
+
+---
 
 ## 2. THE TWO MEASUREMENTS THAT MATTER MOST
 

@@ -2,8 +2,8 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 638,
-  "open_n": 231,
+  "total_ids": 639,
+  "open_n": 232,
   "closed_n": 407,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
@@ -1161,6 +1161,11 @@
     {
       "id": "BUG-874",
       "title": "(HIGH, OPEN) \u2014 THREE MODEL SETS, THREE ANSWERS (the declared parity rule is RED, and 2 of 8 models can never be cached)",
+      "events": 1
+    },
+    {
+      "id": "BUG-875",
+      "title": "(HIGH, OPEN) \u2014 A FIRST-PARTY IMPORT NAME RESOLVES OUTSIDE THE TREE, so the delegated-run journal and 16 import sites read ANOTHER PROJECT'S ",
       "events": 1
     }
   ],

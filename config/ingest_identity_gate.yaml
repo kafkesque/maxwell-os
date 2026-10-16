@@ -73,28 +73,61 @@ identity:
   defect_disposition:
     leading_or_trailing_whitespace: accepted_debt
     repeated_internal_whitespace: accepted_debt
-    ingest_site_marker: owner_owed
+    ingest_site_marker: accepted_debt
   accepted_debt:
-    declared_by: D-3040
-    owner_word: 'OWNER WORD 2026-10-16 (verbatim): "T-130 ok go with B" — ACCEPT the 37 corpus-name defects with
-      the debt declared, and make the acceptance safe with the canonical reader fallback and its own control.'
-    because: 'MEASURED 2026-10-15 (BUG-800): the approved whitespace rename cannot be applied against a live
-      corpus — the 37 stems are referenced 2,952 times INSIDE 13 already-written run receipts (the parquet export
-      2,419; the stage0/2/4/5 checkpoints and their input_fbs), which are RUN RECEIPTS and cannot be rewritten
-      without re-recording history (D-2642). The plan is written and waiting (89 rows -> 37 rows, apply_ready
-      False, each row naming its artifact), and the act becomes non-cascading when those artifacts are
-      regenerated anyway: T-172.'
-    not_a_hazard_because: 'MEASURED 2026-10-15 (BUG-799): the door''s own comparison key `_key()` already
-      collapses whitespace and strips, so a whitespace defect is STORAGE-non-canonicality, not ambiguity — it
-      converts no duplicate work into a distinct one and hides no collision. The 2 canonical collisions in the
-      live cache are duplicate records of ONE work (identical source_id), not two works under one name.'
-    safe_because: 'the acceptance is CARRIED BY A MECHANISM, not by tolerance: identity.record_lookup resolves a
-      defective name by the canonical key the door ALREADY compares with, so the DECISION grounds it in identity
-      (`record_resolution: canonical_name`) and the outcome is a RECORDED deferral, skipped in place — never a
-      work re-classified as new, and never a silent exclusion from the gate (BUG-848: candidacy stays EXACT).
-      Both directions are controlled (scripts/check_ingest_identity_gate.py: the fallback resolves, an exact
-      match still wins, a variant name STAYS a candidate and is deferred on identity, a record with no
-      author|title still defers on its sanitized stem, and a genuinely new name is still admitted).'
+    # ONE WORD PER CLASS (D-3043 / T-173). An acceptance is a WORD ABOUT A CLASS: the word, the row it
+    # names and the reason it is not a hazard are declared ON the class they are about. `same_as` is a
+    # POINTER to another class's declaration and must RESOLVE (D-3034); an accepted class with no word of
+    # its own, or a declaration for a class that is NOT accepted, is FATAL (the door's own reader).
+    declarations:
+      leading_or_trailing_whitespace:
+        owner_word: 'OWNER WORD 2026-10-16 (verbatim): "T-130 ok go with B" — ACCEPT the 37 corpus-name
+          defects with the debt declared, and make the acceptance safe with the canonical reader fallback
+          and its own control.'
+        declared_by: [D-3040]
+        row: T-130
+        because: 'MEASURED 2026-10-15 (BUG-800): the approved whitespace rename cannot be applied against a live
+          corpus — the 37 stems are referenced 2,952 times INSIDE 13 already-written run receipts (the parquet export
+          2,419; the stage0/2/4/5 checkpoints and their input_fbs), which are RUN RECEIPTS and cannot be rewritten
+          without re-recording history (D-2642). The plan is written and waiting (89 rows -> 37 rows, apply_ready
+          False, each row naming its artifact), and the act becomes non-cascading when those artifacts are
+          regenerated anyway: T-172.'
+        not_a_hazard_because: 'MEASURED 2026-10-15 (BUG-799): the door''s own comparison key `_key()` already
+          collapses whitespace and strips, so a whitespace defect is STORAGE-non-canonicality, not ambiguity — it
+          converts no duplicate work into a distinct one and hides no collision. The 2 canonical collisions in the
+          live cache are duplicate records of ONE work (identical source_id), not two works under one name.'
+        safe_because: 'the acceptance is CARRIED BY A MECHANISM, not by tolerance: identity.record_lookup resolves a
+          defective name by the canonical key the door ALREADY compares with, so the DECISION grounds it in identity
+          (`record_resolution: canonical_name`) and the outcome is a RECORDED deferral, skipped in place — never a
+          work re-classified as new, and never a silent exclusion from the gate (BUG-848: candidacy stays EXACT).
+          Both directions are controlled (scripts/check_ingest_identity_gate.py: the fallback resolves, an exact
+          match still wins, a variant name STAYS a candidate and is deferred on identity, a record with no
+          author|title still defers on its sanitized stem, and a genuinely new name is still admitted).'
+      repeated_internal_whitespace:
+        same_as: leading_or_trailing_whitespace
+      ingest_site_marker:
+        owner_word: 'OWNER WORD 2026-10-16 (verbatim): "T-173 accept" — the 459 ingest-site markers are
+          ACCEPTED with the debt declared, and the SANITISE route is REFUSED with its reason (an accepted
+          negative, D-3038), not left as an open question.'
+        declared_by: [D-3043]
+        row: T-173
+        because: 'MEASURED 2026-10-16: 459 of 940 corpus stems carry an ingest-site marker (571 of 962
+          cache names), and the remedy for this class is the SANITIZER — which would rename 571 names,
+          not 37: T-130 option (B) deliberately did not widen its whitespace act into this class. The
+          marker is STORAGE noise, not identity: the door key `_key()` = sanitize_source_book(stem)
+          strips the marker before any comparison, so no work is read twice because of it and no
+          collision is hidden by it.'
+        not_a_hazard_because: 'the REFUSED route is the one with the blast radius. Renaming 571 names is
+          ~15x the accepted whitespace act for ZERO identity gain, and against a live corpus it is a
+          CASCADE (the same class of reference debt that makes T-172 refuse at 37 stems, BUG-800).
+          Accepting a storage class is therefore cheaper AND safer than repairing it, and the repair
+          stays available on the terms of T-172 if human-browsable names are ever wanted.'
+        safe_because: 'the acceptance is CARRIED BY MECHANISMS, not tolerance: (1) the door key strips
+          the marker, so a marker-bearing file resolves by the same canonical key as a clean one; (2)
+          since T-172 the identity layer DEFERS a renamed file whose cache record still carries the old
+          name (`already_ingested_by_canonical_name`) instead of re-ingesting it as a new work; (3) the
+          class stays COUNTED and PRINTED here and in `just health` — the acceptance changes the rc a
+          class triggers, never its visibility (D-3043).'
 
 ledger:
   file: governance/duplicate_adjudication.json     # D-2738 — the ONE owner ledger (59 pairs, PENDING)

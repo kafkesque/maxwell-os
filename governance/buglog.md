@@ -8,17 +8,16 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1170 decisions (census stamp 97951cfc9b4b3544, 2026-10-16) · 614 bugs (225 open / 389 closed; highest OPEN = BUG-850) · 49 open tasks (MUST 12 / SHOULD 33 / WORTH 4; OWNER-moved 2, pipeline-moved 47; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1171 decisions (census stamp 5eb3203b3a80ec75, 2026-10-16) · 615 bugs (225 open / 390 closed; highest OPEN = BUG-850) · 48 open tasks (MUST 12 / SHOULD 32 / WORTH 4; OWNER-moved 1, pipeline-moved 47; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **79** of 1170 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 585 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1170, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **79** of 1171 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 586 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1171, D-2987/BUG-765)
 >
 > Open BUGS by severity (population = the census's 225 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 34 · 🟨 MED 62 · 🟩 LOW 24 · UNLABELLED 101 (BUG-757) of 225 open.
 >
-> **OWNER LANE (2) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
+> **OWNER LANE (1) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
-> | T-173 | 🟠 SHOULD | THE INGEST-SITE MARKER CLASS: 459 corpus stems still carry a mirror marker, and the door keeps them OWNER-OWED | the owner decides ONE of two and the row closes on that word: (i) ACCE |
 > | T-174 | 🟠 SHOULD | THE DECLARED PROVIDER MUST BE BOUND, NOT ONLY DECLARED - the default client falls back to a cloud provider the | a headless run launched through the DECLARED path leaves a reading in  |
 >
 > **PIPELINE LANE (47) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
@@ -15512,6 +15511,36 @@ request count). So the probe below is a hand measurement, and the reader belongs
 before and after ONE headless run through the declared path - a RISE is the proof, a still number means the run
 left the machine (the agreed form of the command is in agent/adapters/goose/wiring.md#run-it). MEASURED 2026-10-16, 12:44: through the DECLARED path the counter ROSE 594825 -> 594828 and the run answered in 19.0s on the declared LOCAL model, so the wrapper DOES bind the provider it declares - the fault is exactly and only the everyday path that bypasses the wrapper (BUG-849 stands, and its mechanism limb is now a reading rather than a hypothesis). The durable monitor belongs with T-157 (census the harness homes a decision names)
 rather than in a second home for the counter.
+
+## BUG-851 (MED — FIXED 2026-10-16) — the door's rc 2 folded a STORAGE class into "identity is unresolved", so accepting the marker class opened the ingest door without either reading naming the item that drove the refusal
+
+**Status:** FIXED 2026-10-16 (the T-173 acceptance, D-3043). Found by the forensic audit OF that acceptance — the audit asked what the acceptance would change BEYOND the class, and the answer was the door itself.
+
+SYMPTOM: `scripts/check_ingest_identity_gate.py --gate` printed "REFUSED at the door: identity is unresolved, so a run
+would mint a corroboration claim its own evidence contradicts (task T-129/T-131)" while the ONLY owner-owed item was
+the 459-stem ingest-site MARKER class — a class the same gate documents as "a DIFFERENT defect class than the
+whitespace debt", whose remedy is a WRITE, and whose names the door's own `_key()` strips before any comparison
+(MEASURED 2026-10-15, BUG-799). Both readings were correct about the COUNT and silent about the DRIVER.
+
+ROOT CAUSE: one tri-state rc carried two unlike facts — "identity is unresolved" (an epistemic state about the
+corpus) and "a counted class is declared owner_owed" (a scheduling state about a remedy). Because the marker class
+was the LAST owner-owed item, accepting it (owner word 2026-10-16, T-173) flipped the ingest reading to rc 0 in one
+line of config, and the sentence printed above the flip would have described the new state just as confidently as
+the old. Nothing in either reading could have said which item moved.
+
+REMEDY (landed with the acceptance, D-3043): an accepted class is declared PER CLASS and is still COUNTED and
+PRINTED with its count, its word and its row; the reader prints one line per counted class DERIVED from the report
+instead of a literal (the literal said "ingest-site markers 459 (OWNER-OWED, T-173)" and could not have said
+anything else, whichever way the register moved). MEASURED after: the marker class appears under
+`accepted_debt.classes` with its word and row, `--gate` reads rc 0, 0 delta candidates are pending (so the opening
+is operationally neutral today), and the refusal that remains is genuine identity ambiguity.
+
+CONTROL: `an_accepted_class_is_counted_printed_and_not_an_rc_2_trigger`, whose fixture is measured in BOTH
+directions — it OWES the class while the disposition is `owner_owed` and stops owing it while accepted, so the
+control cannot pass by counting nothing (20/20 controls green).
+
+ACKNOWLEDGED LIMIT: the door's rc is still ONE number. What changed is that the reading names its driver per class,
+so a future acceptance cannot move the door silently.
 
 ## BUG-850 (MED — OPEN 2026-10-16) — pipeline/apply_provider_flip.py, pipeline/parallel.py and pipeline/subagent_fanout.py each BIND a client binding by hand, so the ONE declared home is not the only home
 

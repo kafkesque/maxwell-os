@@ -11,8 +11,10 @@ two questions the corpus could not answer before:
                  older than the corpus, and how much name noise the corpus carries. TRI-STATE, BUG-457:
                  0 clean | 1 FATAL (machine-decidable: unreadable input, undeclared verdict, stale ledger or
                  report — the door would be blind) | 2 OWNER-OWED (a pair with no word; a name defect whose fix
-                 is a write — the ingest-site markers, T-173). rc 2 is loud and NOT fatal here; a class DECLARED as
-accepted debt is printed and counted in the same reading but is not an rc 2 trigger (T-130 option B).
+                 is a write). rc 2 is loud and NOT fatal here; a class DECLARED as accepted debt is printed and
+                 counted in the same reading but is not an rc 2 trigger (T-130 option B), and since T-173/D-3043
+                 the marker class is accepted too — the reading names, PER CLASS, what it is, how many, the row
+                 it names and the owner word that accepted it (one class, one line, DERIVED from the report).
   `--gate`       (ingest step, pre-S1.5) the DOOR's reading of the SAME facts. rc 2 here REFUSES the run: a run
                  that proceeded would mint the claim (corroboration by two VOICES) that the unresolved identity
                  makes false. The difference is DECLARED in config (`door.ingest_reading`), never accidental:
@@ -54,7 +56,81 @@ CONTROL_LABELS = (
     "a_defect_class_with_no_declared_disposition_is_fatal_not_silently_accepted",
     "an_accepted_debt_with_no_named_owner_word_is_fatal",
     "a_record_without_author_or_title_still_defers_on_its_sanitized_stem",
+    "an_accepted_class_is_counted_printed_and_not_an_rc_2_trigger",
+    "an_accepted_class_without_its_own_word_is_fatal",
+    "a_same_as_pointer_that_does_not_resolve_is_not_an_acceptance",
+    "an_accepted_debt_declaration_for_a_class_that_is_not_accepted_is_a_fault",
+    "every_citation_an_acceptance_makes_resolves",
 )
+
+
+TASKS = Path("config/task_register.yaml")
+DECISIONS = Path("config/decisions.yaml")
+
+
+def _debt_reading(rep: dict[str, Any]) -> list[str]:
+    """The name-class reading, DERIVED from the report: every counted class with its disposition, its count and —
+    when the class is ACCEPTED — the owner word that accepted it and the row that word names.
+
+    WHY DERIVED AND NOT WRITTEN HERE (T-173/D-3043): this line used to say "ingest-site markers 459 (OWNER-OWED,
+    T-173)" as a LITERAL. The moment the register said something else (the owner accepted the class) the reading
+    would have kept printing OWNER-OWED — a reader disagreeing with the register is exactly the drift D-3034
+    exists to catch. Nothing is invented here and nothing is omitted: every counted class is printed, whether it
+    is accepted, owed or clean.
+    """
+    dispositions = rep["defect_dispositions"]
+    counts = dict(rep["name_defects"])
+    counts[gate.MARKER_CLASS] = rep["marker_names"]
+    accepted = rep["accepted_debt"]
+    lines: list[str] = []
+    for name in sorted(counts):
+        token = dispositions.get(name, "<undeclared>")
+        if accepted["classes"].get(name):
+            word = accepted["words"].get(name, "")
+            row = accepted["rows"].get(name, "") or "no row"
+            short = (word[:64] + "...") if len(word) > 64 else word
+            lines.append(f"  name class {name}: {counts[name]} — {token} ({row}) owner word: {short}")
+        else:
+            lines.append(f"  name class {name}: {counts[name]} — {token}")
+    lines.append(f"  accepted as DECLARED DEBT: {accepted['classes']} (total {accepted['total']}), "
+                 f"never an rc 2 trigger; declared by {accepted['declared_by']}")
+    return lines
+
+
+def _unresolved_citations(policy: dict[str, Any], tasks: Path = TASKS, decisions: Path = DECISIONS) -> list[str]:
+    """Every citation an accepted-debt declaration makes must RESOLVE (D-3034): its row, and its decisions.
+
+    A declaration that NAMES a row and a decision declares that those exist; a citation that resolves to nothing
+    is a claim with no owner (the D-3034 class, and the fault scripts/check_agent_surface.py catches on the
+    adapter surface). The check lives in the READER and not in the door: the door's job is identity, and a second
+    home for the registers would be exactly the drift this rail exists to prevent (C12). A register that cannot be
+    READ is FATAL, never silently empty (C16).
+    """
+    import yaml
+
+    def _ids(path: Path, key: str) -> set[str]:
+        if not path.exists():
+            raise gate.GateInputError(f"FATAL: {path} does not exist, so its citations cannot resolve (C16)")
+        doc = yaml.safe_load(path.read_text(encoding="utf-8"))
+        rows = doc.get(key) if isinstance(doc, dict) else doc
+        if not isinstance(rows, list):
+            raise gate.GateInputError(f"FATAL: {path} carries no list under {key!r} (C16)")
+        return {str(r["id"]) for r in rows if isinstance(r, dict) and r.get("id")}
+
+    row_ids = _ids(tasks, "tasks")
+    decision_ids = _ids(decisions, "decisions")
+    raw = (policy["identity"].get("accepted_debt") or {}).get("declarations") or {}
+    faults: list[str] = []
+    for name, decl in sorted(raw.items()):
+        if not isinstance(decl, dict) or decl.get("same_as"):
+            continue  # a pointer is checked at the entry that carries the word (and a cycle is a fault there)
+        row = str(decl.get("row") or "").strip()
+        if row and row not in row_ids:
+            faults.append(f"{name}: the row it names does not exist in {tasks}: {row}")
+        for cited in decl.get("declared_by") or []:
+            if str(cited) not in decision_ids:
+                faults.append(f"{name}: the decision it names does not exist in {decisions}: {cited}")
+    return faults
 
 
 def _report(rep: dict[str, Any], stream: Any = sys.stdout) -> None:
@@ -67,8 +143,8 @@ def _report(rep: dict[str, Any], stream: Any = sys.stdout) -> None:
         print(f"collapse sheet {collapse['file']}: {collapse['rows']} row(s) | ruled {collapse['ruled']} | owed {collapse['outstanding']}",
               file=stream)
     print(f"content report {content['file']}: {content['candidates']} candidate(s) | stale {content['stale']}", file=stream)
-    print(f"corpus name defects: {rep['name_defects']} | ACCEPTED as DECLARED DEBT (T-130 option B, {rep['accepted_debt']['declared_by']}): {rep['accepted_debt']['total']} name(s), never an rc 2 trigger | ingest-site markers {rep['marker_names']} (OWNER-OWED, T-173)",
-          file=stream)
+    for line in _debt_reading(rep):
+        print(line, file=stream)
     for line in rep["fatal"]:
         print(f"FATAL: {line}", file=stream)
     for line in rep["owner_owed"]:
@@ -77,6 +153,15 @@ def _report(rep: dict[str, Any], stream: Any = sys.stdout) -> None:
 
 def _run_check(as_json: bool) -> int:
     """`--check`: the standing census (health reading)."""
+    try:
+        citations = _unresolved_citations(gate.load_policy())
+    except gate.GateInputError as exc:
+        print(str(exc), file=sys.stderr)
+        return gate.RC_FATAL
+    for line in citations:
+        print(f"FATAL: an accepted-debt citation does not resolve: {line}", file=sys.stderr)
+    if citations:
+        return gate.RC_FATAL
     try:
         rep = gate.standing()
     except gate.GateInputError as exc:
@@ -109,6 +194,15 @@ def _run_preflight(run_id: str, as_json: bool) -> int:
 
 def _run_gate(as_json: bool) -> int:
     """`--gate`: the DOOR's reading. rc 2 REFUSES; rc 1 means the door cannot see (blind)."""
+    try:
+        citations = _unresolved_citations(gate.load_policy())
+    except gate.GateInputError as exc:
+        print(str(exc), file=sys.stderr)
+        return gate.RC_FATAL
+    for line in citations:
+        print(f"FATAL: an accepted-debt citation does not resolve: {line}", file=sys.stderr)
+    if citations:
+        return gate.RC_FATAL
     try:
         rep = gate.standing()
         delta = gate.preflight(write_receipt=False)
@@ -323,6 +417,78 @@ def _selftest() -> int:
         if eta.get("defer_reason") != "same_sanitized_stem":
             mark(CONTROL_LABELS[14],
                  f"a record with no author|title did not defer on its stem: {eta.get('defer_reason')!r}")
+
+        # C16-C19 (T-173/D-3043): AN ACCEPTANCE IS A WORD ABOUT A CLASS. The class stays counted and printed, a
+        # word belongs to the class it is about, a pointer must resolve, and a stale acceptance is a fault.
+        accepted = deepcopy(policy)
+        accepted["identity"]["defect_disposition"]["ingest_site_marker"] = "accepted_debt"
+        accepted["identity"]["accepted_debt"]["declarations"]["ingest_site_marker"] = {
+            "owner_word": "OWNER WORD 2026-10-16 (verbatim): \"T-173 accept\"",
+            "declared_by": ["D-3043"], "row": "T-173", "because": "a control fixture"}
+        (books / "Marker Book (z-lib.org).md").write_text("marker body " * 51, encoding="utf-8")
+        # The fixtures the census needs, written HERE so this control reads exactly what it asserts: an empty
+        # ledger, an empty ruler sheet, and a content report NEWER than the corpus (a stale screen is a
+        # different fault and would mask the one under control).
+        ledger_path.write_text(json.dumps({"pairs": []}), encoding="utf-8")
+        collapse_path.write_text("", encoding="utf-8")
+        (root / "content.json").write_text(json.dumps({"candidates": []}), encoding="utf-8")
+        accepted_rep = gate.standing(policy=accepted, books_dir=books)
+        if accepted_rep["marker_names"] < 1:
+            mark(CONTROL_LABELS[15], "the accepted class was no longer counted (a quiet green)")
+        if accepted_rep["accepted_debt"]["classes"].get(gate.MARKER_CLASS, 0) < 1:
+            mark(CONTROL_LABELS[15], "the accepted class did not appear in the accepted-debt census")
+        if any("marker" in line.lower() for line in accepted_rep["owner_owed"]):
+            mark(CONTROL_LABELS[15], "an ACCEPTED class was still reported as OWNER-OWED")
+        if accepted_rep["accepted_debt"]["rows"].get(gate.MARKER_CLASS) != "T-173":
+            mark(CONTROL_LABELS[15], "the accepted class does not name the row that accepted it")
+        # ... and the SAME fixture must OWE the class while it is declared owner_owed: a control that cannot see
+        # the difference between the two dispositions would pass by counting nothing at all.
+        owed_class = deepcopy(accepted)
+        owed_class["identity"]["defect_disposition"]["ingest_site_marker"] = "owner_owed"
+        owed_class["identity"]["accepted_debt"]["declarations"].pop("ingest_site_marker")
+        if not any("marker" in line.lower()
+                   for line in gate.standing(policy=owed_class, books_dir=books)["owner_owed"]):
+            mark(CONTROL_LABELS[15], "the same fixture did NOT owe the class while it was declared owner_owed")
+        owed = deepcopy(accepted)
+        del owed["identity"]["accepted_debt"]["declarations"]["ingest_site_marker"]
+        if not any("owner word" in fault and "ingest_site_marker" in fault
+                   for fault in gate.undeclared_defect_dispositions(owed)):
+            mark(CONTROL_LABELS[16], "an accepted class with no word OF ITS OWN was not refused")
+        pointed = deepcopy(accepted)
+        pointed["identity"]["accepted_debt"]["declarations"]["ingest_site_marker"] = {
+            "same_as": "a_class_that_does_not_exist"}
+        if not any("owner word" in fault and "ingest_site_marker" in fault
+                   for fault in gate.undeclared_defect_dispositions(pointed)):
+            mark(CONTROL_LABELS[17], "a `same_as` pointer to a missing class accepted the class anyway")
+        cycle = deepcopy(accepted)
+        cycle["identity"]["accepted_debt"]["declarations"]["ingest_site_marker"] = {"same_as": "ingest_site_marker"}
+        if not any("owner word" in fault for fault in gate.undeclared_defect_dispositions(cycle)):
+            mark(CONTROL_LABELS[17], "a `same_as` CYCLE accepted the class")
+        stale = deepcopy(accepted)
+        stale["identity"]["defect_disposition"]["ingest_site_marker"] = "owner_owed"
+        if not any("NOT declared" in fault for fault in gate.undeclared_defect_dispositions(stale)):
+            mark(CONTROL_LABELS[18], "a stale acceptance of a non-accepted class was not refused")
+
+        # C20: a citation an acceptance makes must RESOLVE (D-3034) — the row and the decisions it names.
+        with tempfile.TemporaryDirectory() as tmp:
+            tmpdir = Path(tmp)
+            (tmpdir / "tasks.yaml").write_text(
+                "tasks:\n- id: T-130\n  state: done\n- id: T-173\n  state: done\n", encoding="utf-8")
+            (tmpdir / "decisions.yaml").write_text(
+                "decisions:\n- id: D-3040\n- id: D-3043\n", encoding="utf-8")
+            if _unresolved_citations(accepted, tmpdir / "tasks.yaml", tmpdir / "decisions.yaml"):
+                mark(CONTROL_LABELS[19], "a citation that DOES resolve was reported unresolved")
+            (tmpdir / "tasks.yaml").write_text("tasks:\n- id: T-999\n", encoding="utf-8")
+            if not any("T-173" in fault
+                       for fault in _unresolved_citations(accepted, tmpdir / "tasks.yaml",
+                                                          tmpdir / "decisions.yaml")):
+                mark(CONTROL_LABELS[19], "a row that does not exist was accepted as a citation")
+            (tmpdir / "decisions.yaml").write_text("decisions: []\n", encoding="utf-8")
+            (tmpdir / "tasks.yaml").write_text("tasks:\n- id: T-130\n- id: T-173\n", encoding="utf-8")
+            if not any("D-3043" in fault
+                       for fault in _unresolved_citations(accepted, tmpdir / "tasks.yaml",
+                                                          tmpdir / "decisions.yaml")):
+                mark(CONTROL_LABELS[19], "a decision that does not exist was accepted as a citation")
 
     failed = {label for label, _ in failures}
     for label in CONTROL_LABELS:

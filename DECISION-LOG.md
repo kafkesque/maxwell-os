@@ -13,17 +13,16 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1170 decisions (census stamp 97951cfc9b4b3544, 2026-10-16) · 614 bugs (225 open / 389 closed; highest OPEN = BUG-850) · 49 open tasks (MUST 12 / SHOULD 33 / WORTH 4; OWNER-moved 2, pipeline-moved 47; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1171 decisions (census stamp 5eb3203b3a80ec75, 2026-10-16) · 615 bugs (225 open / 390 closed; highest OPEN = BUG-850) · 48 open tasks (MUST 12 / SHOULD 32 / WORTH 4; OWNER-moved 1, pipeline-moved 47; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **79** of 1170 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 585 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1170, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **79** of 1171 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 586 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1171, D-2987/BUG-765)
 >
 > Open BUGS by severity (population = the census's 225 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 34 · 🟨 MED 62 · 🟩 LOW 24 · UNLABELLED 101 (BUG-757) of 225 open.
 >
-> **OWNER LANE (2) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
+> **OWNER LANE (1) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
-> | T-173 | 🟠 SHOULD | THE INGEST-SITE MARKER CLASS: 459 corpus stems still carry a mirror marker, and the door keeps them OWNER-OWED | the owner decides ONE of two and the row closes on that word: (i) ACCE |
 > | T-174 | 🟠 SHOULD | THE DECLARED PROVIDER MUST BE BOUND, NOT ONLY DECLARED - the default client falls back to a cloud provider the | a headless run launched through the DECLARED path leaves a reading in  |
 >
 > **PIPELINE LANE (47) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**

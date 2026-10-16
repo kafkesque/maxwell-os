@@ -28,16 +28,25 @@ REFUSES, because a run that proceeded would mint the claim the unresolved identi
 TRI-STATE: 0 clean | 1 FATAL (a MACHINE-decidable defect: an unreadable input — a BLIND ingest is the defect
 class this gate exists for — an unknown ledger verdict, a detector candidate the ledger never saw, or a
 name-defect class with no declared disposition) | 2 OWNER-OWED (a pair with no owner word; a name-defect class
-DECLARED owner_owed — the ingest-site markers, T-173 — or candidates that would be deferred right now).
+DECLARED owner_owed; or candidates that would be deferred right now). MEASURED 2026-10-16 (T-173, D-3043):
+with the marker class ACCEPTED the last owner-owed item was this storage class, so the INGEST reading now
+reads rc 0 — the refusal that remains is genuine IDENTITY ambiguity, which is what this tri-state was always
+about, and the accepted class is still COUNTED and PRINTED.
 
 THE READER'S LOOKUP IS DECLARED (T-130 option B, owner word 2026-10-16, BUG-799). The door declares 37 corpus
 names DEFECTIVE (whitespace) while its own comparison key `_key()` ALREADY collapses that whitespace — so the
 door was depending on the exact bytes of a name it calls defective (D-3034: a declaration the reader cannot
 RESOLVE). Option B does two things and nothing else: the lookup becomes DECLARED and ORDERED
 (`identity.record_lookup`) and the whitespace classes become DECLARED DEBT (printed, counted, never an rc 2
-trigger) while the marker class keeps a disposition of its own. Acceptance is the riskiest reading a gate can
-make, so a class with no disposition, a disposition outside the vocabulary, or an accepted class with no named
-OWNER WORD is FATAL: acceptance must be a word, never a default.
+trigger) while the marker class kept a disposition of its own.
+
+ONE WORD PER CLASS (D-3043, owner word 2026-10-16 "T-173 accept"). The marker class is now accepted too, and
+acceptance is a WORD ABOUT A CLASS: the word, the row it names and the reason it is not a hazard are declared
+ON the class they are about (`identity.accepted_debt.declarations`; `same_as` is a POINTER and must RESOLVE,
+D-3034). Three things are FATAL: a class with no disposition, a disposition outside the vocabulary, and an
+accepted class with no word OF ITS OWN. An accepted class stays COUNTED and PRINTED — the acceptance changes
+the rc a class triggers, never its visibility: a class that goes quiet the moment it is accepted IS the
+quiet green this gate exists to prevent.
 """
 from __future__ import annotations
 
@@ -179,17 +188,43 @@ def lookup_order(policy: dict[str, Any] | None = None) -> list[str]:
     return order
 
 
+#: The one counted class whose pattern lives at its OWN key (`identity.ingest_site_marker_pattern`) because its
+#: remedy was a WRITE, not a rename. It is a COUNTED CLASS like any other, so `standing()` counts it once, in one
+#: place, beside the pattern classes (T-173/D-3043) — a class counted in two homes is a class that drifts.
+MARKER_CLASS = "ingest_site_marker"
+
+
+def _resolve_declaration(raw: dict[str, Any], name: str, seen: tuple[str, ...] = ()) -> dict[str, Any] | None:
+    """Follow an accepted-debt declaration's `same_as` pointer to the entry that carries the WORD.
+
+    Returns None when NOTHING carries a word: no entry for the class, a pointer to an entry that does not exist,
+    or a pointer CYCLE. A pointer must RESOLVE (D-3034) — "same_as" a class that was never declared is not an
+    acceptance, and two classes pointing at each other accept nothing.
+    """
+    decl = raw.get(name)
+    if not isinstance(decl, dict):
+        return None
+    target = str(decl.get("same_as") or "").strip()
+    if not target:
+        return decl
+    if target in (name, *seen):
+        return None
+    return _resolve_declaration(raw, target, (name, *seen))
+
+
 def undeclared_defect_dispositions(policy: dict[str, Any] | None = None) -> list[str]:
     """Every FAULT in the declared dispositions, as strings (empty = every counted class has a lawful one).
 
-    Acceptance (T-130 option B) is the riskiest thing this gate can read: a class that silently acquired the
-    `accepted_debt` treatment would turn a NEW defect into a quiet green. So a counted class with no
-    disposition, a disposition outside the declared vocabulary, or an `accepted_debt` with no named OWNER WORD
-    is reported here and treated as FATAL by `standing()` — acceptance must be a WORD, never a default.
+    Acceptance (T-130 option B, T-173/D-3043) is the riskiest thing this gate can read: a class that silently
+    acquired the `accepted_debt` treatment would turn a NEW defect into a quiet green. THREE faults are reported
+    here and treated as FATAL by `standing()` — an accepted class with no word OF ITS OWN, a `same_as` pointer
+    that does not resolve, and a stale acceptance for a class that is not accepted at all. Acceptance must be a
+    WORD about a CLASS: never a default, never a mood, never another class's word.
     """
     pol = policy or load_policy()
-    declared = set(pol["identity"]["name_defect_patterns"]) | {"ingest_site_marker"}
+    declared = set(pol["identity"]["name_defect_patterns"]) | {MARKER_CLASS}
     dispositions = pol["identity"]["defect_disposition"]
+    raw = (pol["identity"].get("accepted_debt") or {}).get("declarations") or {}
     faults: list[str] = []
     for name in sorted(declared):
         token = dispositions.get(name)
@@ -197,11 +232,19 @@ def undeclared_defect_dispositions(policy: dict[str, Any] | None = None) -> list
             faults.append(f"{name}: no disposition declared")
         elif token not in DISPOSITIONS:
             faults.append(f"{name}: disposition {token!r} is outside {list(DISPOSITIONS)}")
-    if any(dispositions.get(name) == ACCEPTED_DEBT for name in declared):
-        declaration = pol["identity"].get("accepted_debt") or {}
-        if not str(declaration.get("owner_word") or "").strip():
-            faults.append("a class is declared accepted_debt with NO owner word: acceptance must be a word, "
-                          "never a default")
+        elif token == ACCEPTED_DEBT:
+            decl = _resolve_declaration(raw, name)
+            if decl is None or not str(decl.get("owner_word") or "").strip():
+                faults.append(f"{name}: declared accepted_debt with NO owner word of its own - there is no "
+                              f"declaration carrying a word for THIS class under "
+                              f"identity.accepted_debt.declarations (a `same_as` pointer that does not resolve "
+                              f"is not a word, D-3034): acceptance must be a WORD about THIS class, never a "
+                              f"default")
+    for name in sorted(raw):
+        if dispositions.get(name) != ACCEPTED_DEBT:
+            faults.append(f"{name}: an accepted-debt declaration for a class that is NOT declared "
+                          f"accepted_debt (its disposition is {dispositions.get(name)!r}) - a stale acceptance "
+                          f"resolves to nothing (D-3034)")
     return faults
 
 
@@ -586,10 +629,11 @@ def standing(policy: dict[str, Any] | None = None, books_dir: str | Path | None 
     rc 1 FATAL  — an unreadable input, an UNDECLARED ledger verdict, a content candidate the ledger never saw
                   (the ledger is stale: the machine half of the gate did not run), or a stale content report.
     rc 2 OWNER  — a pair with no owner word (ledger or collapse sheet), a corpus name defect whose class is
-                  declared OWNER-OWED (a remedy that is a WRITE: the ingest-site markers, T-173), or candidates
-                  that would be deferred if this batch were ingested now. A class declared `accepted_debt` is
-                  PRINTED and COUNTED but is not an rc 2 trigger — and only a named OWNER WORD may accept a
-                  debt (T-130 option B); anything else is a quiet green and is FATAL.
+                  declared OWNER-OWED, or candidates that would be deferred if this batch were ingested now.
+                  A class declared `accepted_debt` is PRINTED and COUNTED but is never an rc 2 trigger — and
+                  only a named OWNER WORD, declared ON that class, may accept it (T-130 option B, T-173/
+                  D-3043); anything else is a quiet green and is FATAL. MEASURED 2026-10-16: accepting the
+                  marker class removed the last owner-owed item and the ingest reading now reads rc 0.
     """
     pol = policy or load_policy()
     corpus = corpus_files(books_dir)
@@ -599,7 +643,7 @@ def standing(policy: dict[str, Any] | None = None, books_dir: str | Path | None 
     content = content_debt(pol, corpus)
     patterns = {str(k): re.compile(str(v)) for k, v in pol["identity"]["name_defect_patterns"].items()}
     dispositions = {str(k): str(v) for k, v in pol["identity"]["defect_disposition"].items()}
-    accepted_decl = pol["identity"].get("accepted_debt") or {}
+    accepted_raw = (pol["identity"].get("accepted_debt") or {}).get("declarations") or {}
     marker = re.compile(str(pol["identity"]["ingest_site_marker_pattern"]))
     defects = {k: 0 for k in patterns}
     markers = 0
@@ -610,11 +654,21 @@ def standing(policy: dict[str, Any] | None = None, books_dir: str | Path | None 
         if marker.search(path.stem):
             markers += 1
     disposition_faults = undeclared_defect_dispositions(pol)
-    # ACCEPTED DEBT IS PRINTED, COUNTED AND NOT AN rc 2 TRIGGER — and only a class whose disposition says so
-    # can land here, which is why the disposition map is read fail-closed one line above (T-130 option B).
-    accepted_debt = {k: v for k, v in defects.items() if dispositions.get(k) == ACCEPTED_DEBT and v}
+    # ONE CLASS, ONE COUNT (D-3043/T-173). The marker pattern lives at its own key because its remedy was a
+    # WRITE, but it is a COUNTED CLASS like any other — so it is counted HERE, beside the pattern classes, and
+    # an accepted class stays COUNTED AND PRINTED: acceptance changes the rc a class TRIGGERS, never its
+    # VISIBILITY (a class that goes quiet the moment it is accepted is the quiet green this gate is for).
+    counted = dict(defects)
+    counted[MARKER_CLASS] = markers
+    accepted_debt = {k: v for k, v in counted.items() if dispositions.get(k) == ACCEPTED_DEBT and v}
     owed_defects = {k: v for k, v in defects.items() if v and dispositions.get(k) == OWNER_OWED}
-    markers_owed = markers if dispositions.get("ingest_site_marker") == OWNER_OWED else 0
+    accepted_words = {k: str((_resolve_declaration(accepted_raw, k) or {}).get("owner_word", ""))
+                      for k in sorted(accepted_debt)}
+    accepted_rows = {k: str((_resolve_declaration(accepted_raw, k) or {}).get("row", ""))
+                     for k in sorted(accepted_debt)}
+    accepted_by = sorted({str(_id) for k in accepted_debt
+                          for _id in ((_resolve_declaration(accepted_raw, k) or {}).get("declared_by") or [])})
+    markers_owed = markers if dispositions.get(MARKER_CLASS) == OWNER_OWED else 0
     uncovered = uncovered_candidates(content["candidate_keys"], set(ledger["all_pair_keys"]))
     delta = preflight(books_dir=books_dir, policy=pol, write_receipt=False)
     fatal: list[str] = []
@@ -651,10 +705,9 @@ def standing(policy: dict[str, Any] | None = None, books_dir: str | Path | None 
     return {"rc": rc, "fatal": fatal, "owner_owed": owner, "corpus_files": len(corpus),
             "candidates": delta["candidates"], "ledger": ledger, "collapse": collapse,
             "content": content, "name_defects": defects, "marker_names": markers,
-            "accepted_debt": {"defects": accepted_debt, "total": sum(accepted_debt.values()),
-                              "declared_by": str(accepted_decl.get("declared_by", "")),
-                              "owner_word": str(accepted_decl.get("owner_word", "")),
-                              "reason": str(accepted_decl.get("because", ""))},
+            "accepted_debt": {"classes": accepted_debt, "total": sum(accepted_debt.values()),
+                              "words": accepted_words, "rows": accepted_rows, "declared_by": accepted_by},
+            "defect_dispositions": dispositions,
             "record_lookup": lookup_order(pol), "override": delta["override"]}
 
 

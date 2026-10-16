@@ -1760,8 +1760,9 @@ tasks:
 
 - id: T-173
   priority: SHOULD
-  state: open
+  state: done
   mover: owner
+  closed: '2026-10-16'
   title: 'THE INGEST-SITE MARKER CLASS: 459 corpus stems still carry a mirror marker, and the door keeps them
     OWNER-OWED rather than widening the whitespace act to cover them'
   source:
@@ -1777,15 +1778,26 @@ tasks:
     (owner_owed) and ITS OWN ROW rather than riding a fix that never covered it - a debt the door counts and no
     row owns is the T-131..T-137 fault.
   evidence: >-
-    MEASURED 2026-10-16: config#identity.defect_disposition pins ingest_site_marker: owner_owed; the door
-    prints the count in its own reading and in `just health` (rc 2, tri_state, not fatal); and a class with no
-    declared disposition is FATAL, so this debt cannot be quietly accepted by accident (control
-    a_defect_class_with_no_declared_disposition_is_fatal_not_silently_accepted).
+    MEASURED 2026-10-16 (before the word): config#identity.defect_disposition pinned ingest_site_marker:
+    owner_owed; the door printed 459 markers (of 940 stems, 571 of 962 cache names) in its own reading and in
+    `just health` (rc 2, tri_state, not fatal); a class with no declared disposition was FATAL. MEASURED
+    2026-10-16 (after the word): ingest_site_marker: accepted_debt with a PER-CLASS declaration whose word is
+    quoted verbatim above; the door now reports the class under accepted_debt.classes with its count, word and
+    row (scripts/check_ingest_identity_gate.py prints one line per counted class, DERIVED from the report - a
+    literal in the reader is how a reading drifts from the register); 5 new known-answer controls (19 total)
+    cover the accepted class staying counted, the word belonging to its class, a `same_as` pointer that does
+    not resolve, a stale acceptance, and a citation resolving (D-3034); and the ingest reading moved rc 2 ->
+    rc 0 because this storage class was the last owner-owed item (D-3043, BUG-851).
   gate: >-
-    the owner decides ONE of two and the row closes on that word: (i) ACCEPT with the debt declared - the marker
-    is storage noise the door's key already strips, so no identity is at stake; or (ii) SANITISE the class
-    through the declared sanitizer riding the same next re-ingest as T-172, with a census before/after and a
-    receipt. No third state: the class may not stay counted-and-unowned.
+    CLOSED ON THE OWNER'S WORD 2026-10-16 (verbatim: "T-173 accept") - option (i), ACCEPT with the debt
+    declared; option (ii) SANITISE is recorded as an ACCEPTED NEGATIVE with its reason (D-3038: what we
+    refuse we register), not left as an open question. What the acceptance HAD to carry, and does: a word
+    declared ON the class (config#identity.accepted_debt.declarations.ingest_site_marker), the class still
+    COUNTED and PRINTED in the door's reading and in `just health`, its row resolved by the rail, and its
+    remedy still available on T-172's terms. MEASURED consequence: the marker count was the last OWNER-OWED
+    item at the door, so `check_ingest_identity_gate.py --gate` now reads rc 0 - the refusal that remains is
+    genuine IDENTITY ambiguity, and 0 delta candidates are pending, so the opening is operationally neutral
+    today (BUG-851 records the conflation this made visible).
 
 - id: T-174
   priority: SHOULD

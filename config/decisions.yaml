@@ -25989,3 +25989,61 @@ decisions:
     in code, a stale or unresolvable declaration, an absent required key); 2 = LOUD (a declared site owes a remedy),
     wired into `just health` as two lines - the selftest fatal, the reading tri_state - because a control nothing
     runs is a comment (BUG-492).'
+- id: D-3043
+  state: ACTIVE
+  date: '2026-10-16'
+  by: assistant
+  category: IDENTITY / NAME DEBT
+  bugs:
+  - BUG-851
+  - BUG-800
+  files:
+  - config/ingest_identity_gate.yaml
+  - pipeline/ingest_gate.py
+  - scripts/check_ingest_identity_gate.py
+  - config/task_register.yaml
+  title: 'AN ACCEPTED DEBT IS A WORD ABOUT A CLASS: the 459-stem ingest-site marker class is accepted on the owner
+    word of 2026-10-16, the SANITISE route is recorded as an accepted negative, and the class stays counted, printed
+    and named - so the door the acceptance opens is a reading rather than a surprise'
+  decision: 'OWNER WORD 2026-10-16 (verbatim): "T-173 accept". MEASURED 2026-10-16, this session. T-173 asked the
+    owner to decide ONE of two and the row closes on that word; the word is option (i), ACCEPT with the debt declared.
+    (1) WHAT IS ACCEPTED AND WHAT IS REFUSED. Accepted: the 459 of 940 corpus stems (and 571 of 962 cache names)
+    that carry an ingest-site marker, because the marker is STORAGE noise and not identity - the door key `_key()`
+    = sanitize_source_book(stem) strips it before any comparison, so it converts no duplicate work into a distinct
+    one and hides no collision (BUG-799, measured for the whitespace act and true one class over). REFUSED, and
+    recorded as an ACCEPTED NEGATIVE with its reason (D-3038: what we reject we register): option (ii) SANITISE
+    the class, because the remedy is the sanitizer itself and it would rename 571 names against a live corpus -
+    roughly 15x the blast radius of the accepted whitespace act for ZERO identity gain, and the same class of reference
+    debt that makes T-172 refuse at 37 stems (BUG-800). The repair is not forbidden, it is PRICED: it stays available
+    on the terms T-172 declares if human-browsable names are ever wanted. (2) AN ACCEPTANCE IS A WORD ABOUT A CLASS,
+    NEVER A MOOD. The word, the row it names and the reason it is not a hazard are declared ON the class they are
+    about, under identity.accepted_debt.declarations (config/ingest_identity_gate.yaml). A class may point at another
+    class declaration with `same_as`, which is a POINTER and must RESOLVE (D-3034) - two classes pointing at each
+    other accept nothing. FOUR faults are now FATAL rather than readable as green: a counted class with no disposition;
+    a disposition outside the declared vocabulary; a class declared accepted_debt with no owner word OF ITS OWN;
+    and a stale acceptance for a class that is not accepted at all. Before this decision ONE block accepted whichever
+    classes the disposition map pointed at, so the marker class accepted on the owner word above would have inherited
+    a word that was written about whitespace. (3) AN ACCEPTED CLASS STAYS COUNTED AND PRINTED. Acceptance changes
+    the rc a class TRIGGERS, never its VISIBILITY. The marker pattern lives at its own config key because its remedy
+    was a write, but it is a counted class like any other and is now counted ONCE, beside the pattern classes; the
+    report carries per-class counts, words and rows; and the reader prints one line per counted class DERIVED from
+    the report instead of a literal (the literal said "ingest-site markers 459 (OWNER-OWED, T-173)" whichever way
+    the register had moved). A class that goes quiet the moment it is accepted is the quiet green this gate exists
+    to prevent. (4) THE MEASURED CONSEQUENCE, NAMED. The marker class was the LAST owner-owed item at the door,
+    so the ingest reading moved rc 2 -> rc 0 in one line of config. MEASURED: 0 delta candidates are pending, so
+    the opening is operationally neutral today, and the refusal that remains is genuine IDENTITY ambiguity (ledger
+    pairs with no word, collapse rows owed, detector candidates the ledger never saw, deferrals NOW) - which is
+    what the tri-state was always about. BUG-851 records the conflation this made visible: one number carrying both
+    an epistemic state about the corpus and a scheduling state about a remedy, with neither reading naming its driver.
+    (5) A CITATION MUST RESOLVE, EVEN IN AN ACCEPTANCE (D-3034). Every accepted class row and declared_by is resolved
+    by the rail against config/task_register.yaml and config/decisions.yaml, and a citation that resolves to nothing
+    is FATAL. It FIRED on its first live run - this decision did not exist yet, and the rail refused the reading
+    with "the decision it names does not exist in config/decisions.yaml: D-3043" - which is a control proving itself
+    outside its fixture. (6) WHAT THIS DECISION DOES NOT DO. It does not sanitise the 459 markers (the accepted
+    negative above). It does not touch S0/S1 behaviour, the extract or the NLI: the marker is storage-side only.
+    It does not widen the whitespace act into the marker class, which is exactly what T-130 option (B) refused to
+    do. And it does not replace T-172: the 37 name defects still ride the next re-ingest. (7) CONTROLS. scripts/check_ingest_identity_gate.py:
+    20/20 known-answer controls green, including the accepted class staying counted with its word and row, the same
+    fixture OWING the class while the disposition is owner_owed (a control that could not see the difference would
+    pass by counting nothing), the class-own-word fault, the unresolvable pointer, the stale acceptance, and the
+    citation resolver.'

@@ -183,6 +183,8 @@ guards:
   # prints the engine's own request counter, the witness T-174 used by hand.
   scripts/check_harness_homes.py: tri_state
   scripts/check_harness_homes.py --selftest: fatal
+  scripts/check_bug_recall.py --selftest: fatal
+  scripts/check_bug_recall.py: tri_state
   # T-130 (owner-approved 2026-10-15): the corpus-name debt's remedy. The SELFTEST is fatal (its controls
   # prove the transform preserves the door's own comparison key, that a byte delta rolls a rename back, and
   # that an untouched cache record is never reformatted - D-2642); the CENSUS is tri_state because its rc 2

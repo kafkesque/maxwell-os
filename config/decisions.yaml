@@ -26251,3 +26251,65 @@ decisions:
     and registered as the next critical step. It does not touch the store, the corpus or S0. And it does not retire
     the `owed` class: a binding discovered in code is still registered, still reads LOUD, and the ladder still keeps
     running.'
+- id: D-3047
+  state: ACTIVE
+  date: '2026-10-16'
+  by: assistant
+  category: GOVERNANCE / REGISTER RECALL
+  bugs:
+  - BUG-857
+  files:
+  - config/bug_recall.yaml
+  - scripts/check_bug_recall.py
+  - config/rail_registry.yaml
+  - config/capability_registry.yaml
+  - justfile
+  - governance/buglog.md
+  title: THE REGISTER LEARNS TO BE QUERIED, AND THE RELATION IS A RESOLVABLE REFERENCE - the register's recall is
+    DERIVED rather than maintained (three ceilinged readings plus the RETRIEVE step), a citation that lands inside
+    nothing is REPORTED rather than counted, and every exclusion is a printed number instead of a silence
+  decision: '(1) THE DEFECT, MEASURED. The register is this repository''s memory of what went wrong, and MEASURED
+    2026-10-16 it could answer two questions only: how many findings exist, and what state each is in. No artifact
+    computed which findings share a SHAPE. The consequence was measured, not argued: 26 closed findings name no
+    artifact, no ruling and no control, so their remedy cannot be opened, re-run or watched go red; 10 OPEN findings
+    carry three or more heading events (BUG-712 twelve, BUG-736/737/748/749 five each) - re-characterised sitting
+    after sitting without closing - and the register''s own census face already counted that (`events`) while NOTHING
+    read it; 111 cited references resolve against nothing; and 79 references are cited by more than twenty findings,
+    which is how much of the register is common substrate rather than signal. Knowledge was recorded where it was
+    FORMED (a log entry, a hand-maintained recall map) and never where it is USED. BUG-846 measured the same failure
+    from the other side: verdicts in a document are not verdicts in a register, and a document cannot be joined
+    to anything. Filed as BUG-857 (MED, remedy landed). (2) THE RULE THIS DECISION LOCKS. The register''s RECALL
+    IS DERIVED, NEVER MAINTAINED. One reader reads the register, the census face, the ruling home and the capability
+    registry, and restates none of them; the fold of a heading into a status is loaded FROM the declared parser
+    home, because a second implementation of that fold is a second answer to a question the register already answers
+    (D-2646, and the same defect class T-175/D-3046 removed from the harness surface). A maintained recall map drifts
+    from what it summarises by construction; a derived one cannot. (3) THE RELATION IS A SHARED, RESOLVABLE REFERENCE
+    - NEVER A MODEL. No LLM, no embedding, no similarity score, no taxonomy. A class is MEASURED from the bytes
+    and never asserted (BUG-852), so nothing here decides what KIND of defect a finding is, and nothing here infers
+    that two findings are alike. What it knows is the repository''s own currency (D-3034): the two findings cite
+    the same artifact, or the same ruling. `must_resolve` applies that rule to the register itself - a finding that
+    names an artifact, a ruling or a sibling DECLARES something, and a citation that lands inside nothing is REPORTED
+    and never counted as a trace its fix left. (4) THREE READINGS, EACH CEILINGED BY ITS OWN MEASUREMENT PLUS ONE
+    DECLARED SLOT. untraced_closed 26 (ceiling 27), chronic_open 10 (ceiling 11), unresolved_reference 111 (ceiling
+    112). Shrink-only (D-3023/D-2644): a class above its ceiling is LOUD and NOT fatal (BUG-457), so the ladder
+    keeps running and the debt gets a row (T-177, BUG-857) instead of a shrug. The slot exists because a ceiling
+    set exactly on the live count would make the next discovery FATAL and force a remedy on the spot - and rounding
+    a discovery away is worse than a slot. (5) EVERY EXCLUSION IS A PRINTED NUMBER, NEVER A SILENCE (D-3038). MEASURED
+    on `--recall BUG-850`: 79 references cited by more than twenty findings are excluded as COMMON SUBSTRATE and
+    counted, and 23 findings sharing fewer than the declared minimum are dropped as COINCIDENCE and counted. Both
+    are declared in the home with their reason: a reference everyone cites is furniture, and one shared rare reference
+    can be a coincidence - a relation is claimed from the declared minimum upwards. Ranked by STRENGTH (shared references
+    over the SMALLER finding''s own set), then by SPECIFICITY, so a mega-entry cannot outrank a precise neighbour.
+    Without these three rules the relation was measured density and not evidence: BUG-712 shared something with
+    339 findings and the list was true and useless. (6) THE FOURTH MODE IS THE POINT. `--recall BUG-NNN` is the
+    RETRIEVE step: the neighbours with their strength, the rulings the finding cites THAT RESOLVE, and the capability
+    that OWNS each artifact it names - so an act starts from the register instead of re-deriving it. It is CBR''s
+    Retrieve (Aamodt & Plaza) built on this repository''s own references, and it is READ-ONLY: it opens the register
+    and writes nothing, because a reading that cannot be re-derived is a copy. (7) WHAT IT DOES NOT DO, DECLARED
+    RATHER THAN OMITTED (D-3038). No auto-repair and no reclassification: no existing entry is edited, no field
+    is demanded of 620 historical entries, and no ceiling is raised. No mutation-gate entry is added for this rail
+    in this act, deliberately: config/rail_mutations.yaml''s oracle cannot currently certify a rail whose runner
+    is already red at BASELINE (the open fault T-124 records), so a mutation here would join a gate that is itself
+    owed - it is the first act T-124 unblocks. Finally, the honest limit of one reading: unresolved_reference mixes
+    a stale repository path with a path that belongs to a home OUTSIDE the repository (a citation written without
+    its `~/` prefix), so that class is a worklist of citations to LOOK AT, not a verdict on each one.'

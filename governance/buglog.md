@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1174 decisions (census stamp de1c775e7f224a59, 2026-10-16) · 620 bugs (224 open / 396 closed; highest OPEN = BUG-854) · 46 open tasks (MUST 11 / SHOULD 30 / WORTH 5; OWNER-moved 1, pipeline-moved 45; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1175 decisions (census stamp 6135ed95e64f09e9, 2026-10-16) · 622 bugs (226 open / 396 closed; highest OPEN = BUG-858) · 48 open tasks (MUST 11 / SHOULD 32 / WORTH 5; OWNER-moved 1, pipeline-moved 47; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **79** of 1174 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 589 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1174, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **79** of 1175 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 590 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1175, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 224 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 34 · 🟨 MED 60 · 🟩 LOW 25 · UNLABELLED 101 (BUG-757) of 224 open.
+> Open BUGS by severity (population = the census's 226 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 34 · 🟨 MED 62 · 🟩 LOW 25 · UNLABELLED 101 (BUG-757) of 226 open.
 >
 > **OWNER LANE (1) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -20,7 +20,7 @@
 > |---|---|---|---|
 > | T-176 | 🟡 WORTH | THE SOURCE LIBRARY NAMES, IF HUMAN-READABLE NAMES ARE EVER WANTED - the act this decision priced and did NOT a | owner lane: the owner says whether human-readable library names are wa |
 >
-> **PIPELINE LANE (45) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
+> **PIPELINE LANE (47) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
 >
 > | id | pri | state | task | evidence |
 > |---|---|---|---|---|
@@ -37,7 +37,7 @@
 > | T-150 | 🔴 MUST | 🔴 open | THE DURABLE PATH IS THE DELEGATION PATH (D-3020): anything whose failure is not free goes through pipeline/sub | temp/runs/fanout_20261015i/98_receipt.json - 3/3 DONE with one task deliberately given a 1 |
 > | T-105 | 🟠 SHOULD | 🔴 open | REA tier A/B mining — DEVONthink 3 (related-document ranking) and Cursor (derived code index) | governance/NOT-YET-EVALUATED-RESEARCH.md (REA targets logged 2026-10-13) |
 >
-> _the face is a VIEW: 12 of 45 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
+> _the face is a VIEW: 12 of 47 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
 >
 > **STANDING RULES — in effect, never close (1):**
 >
@@ -15720,3 +15720,25 @@ shrink-only debt reading it maintains and refuses to raise, not a separate artif
 titled with the registry's own path ROUTES, and the open-bug debt is back at the declared ceiling of 222.
 
 ---
+
+## BUG-857 (MED — OPEN 2026-10-16) — governance/buglog.md could be APPENDED TO and never QUERIED: no artifact computed which findings share a shape, so a later reader re-derived history by reading a 1.6 MB log, and 26 closed findings left nothing anyone can find (remedy: config/bug_recall.yaml)
+
+**Status:** OPEN (remedy: D-3047 and the rail it declares, LANDED). MEASURED 2026-10-16.
+
+SYMPTOM: the register is the repository's memory of what went wrong, and it could answer only two questions — how many findings exist, and what state each is in (the census's own 620 ids, 224 open / 396 closed). It could not answer the three a LATER reader asks: which findings are CHRONIC, which CLOSED findings left no TRACE, and which findings are NEIGHBOURS of a given one. MEASURED, read-only, before any repair: (a) 26 closed findings name no artifact, no ruling and no control — a fix a later reader cannot open, cannot re-run and cannot watch go red; (b) 10 OPEN findings carry three or more heading events, i.e. they have been re-characterised at least twice without being closed, and BUG-712 carries TWELVE while BUG-736/737/748/749 carry five each — the register's own census face already counted this (`events`) and NOTHING read it; (c) 111 cited references resolve against NOTHING (D-3034's currency, in the register); (d) 79 references are cited by more than twenty findings, which is the measure of how much of the register is common substrate rather than signal.
+
+ROOT CAUSE: knowledge was recorded where it was FORMED (a log entry, a hand-maintained recall map) rather than where it is USED (a derived reading). BUG-846 measured the same failure from the other side — verdicts living in a document rather than a register — and `governance/CONTEXT_INDEX.md` calls itself the RECALL MAP while being a document that can drift from the register it summarises by construction. The consequence is not missing data: it is missing RECALL, so the same defect family is re-derived by each new reader (BUG-852 was BUG-492's shape rediscovered; BUG-856 was D-3034's shape rediscovered) and a closed finding with no trace can be reintroduced silently.
+
+REMEDY: D-3047 — the register's recall is DERIVED from the register and its declared homes. One reader (scripts/check_bug_recall.py, 20/20 known-answer controls, READ-ONLY, no LLM, no embedding, no writes) plus one declared home (config/bug_recall.yaml) fold the register through the parser that already owns the fold (D-2646, never a second implementation) and produce three CEILINGED readings plus the RETRIEVE step:
+
+FIX MEASURED AFTER (2026-10-16): `python3 scripts/check_bug_recall.py` reads 620 findings and reports untraced_closed 26 / chronic_open 10 / unresolved_reference 111, each against a declared shrink-only ceiling set from its own measurement plus one slot; `--recall BUG-850` names 13 neighbours ranked by strength (the strongest being BUG-815 at 100% and BUG-852 at 100%, with the ruling home's D-3046 beside it), the three rulings the finding cites that RESOLVE, and the capability that owns each artifact it names — a reading that took one command and previously took an archaeology session. The relation is deliberately narrow: a reference cited by more than twenty findings is EXCLUDED as common substrate (79 of them, COUNTED in the output), a neighbour must share at least two rare references (23 findings dropped for thinness on the BUG-850 query, COUNTED), and a finding related only by MENTIONING a sibling is not a neighbour at all (the class rule trace_sufficiency already declares). THE HONEST LIMIT: `unresolved_reference` mixes a stale repository path with a path that belongs to a home OUTSIDE the repository (a citation written without its `~/` prefix, e.g. ~/.config/goose/config.yaml), so that class is a worklist of citations to LOOK AT and not a verdict on each one.
+
+## BUG-858 (MED — OPEN 2026-10-16) — governance/buglog.md carries NO entry for BUG-492, the most-cited rule in this repository: 128 files cite it (53 lines of the justfile alone) and the census folds straight from BUG-491 to BUG-493
+
+**Status:** OPEN (remedy: promote the register's own text into a heading, or re-point the citations — T-178). FOUND 2026-10-16 by scripts/check_bug_recall.py's FIRST live run, through the `finding` trace class.
+
+SYMPTOM: `BUG-492` is cited 128 times across the repository — 92 files under scripts/, 14 under config/, 14 under governance/, 7 under pipeline/ and 53 separate mentions inside `justfile` — always as the standing rule "a control nothing runs is a comment". MEASURED: the register has NO HEADING for it anywhere (zero lines matching a heading at any hash depth), so the census's own fold skips it (BUG-491 → BUG-493) and the id is not an id the register can resolve. A reader who follows one of the 128 citations arrives at nothing, and the rule that most of this repository's rails are justified BY cannot be read in the register that justifies it. Its content does exist, but as prose INSIDE other entries (58 mention lines in the register itself, e.g. the guard_call_sites finding recorded within another bug's body).
+
+ROOT CAUSE: D-3034's own distinction, at the register level — a value that MENTIONS a thing declares nothing, and only a RESOLUTION confers identity. A heading resolves an id; 58 mentions do not. The id therefore entered the repository's working vocabulary (rails, justfile comments, docstrings) without ever entering the register, and no rail compared the two populations because nothing read a citation's resolvability.
+
+REMEDY (T-178): either PROMOTE the register's own recorded text into a `## BUG-492` heading — preserving the original wording and noting the promotion, never re-writing history (C12/D-2642) — or RE-POINT the 128 citations to the entry that actually carries the rule. The first is preferred: it makes 128 citations resolve in one act. Whichever is chosen, the act must be measured by the same reading that found it: `python3 scripts/check_bug_recall.py` must stop reporting a `finding:BUG-492` that resolves against nothing, and the census must carry the id.

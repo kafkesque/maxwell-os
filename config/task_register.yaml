@@ -1952,3 +1952,54 @@ tasks:
     OPF, PDF info or the S0.5 cache - never a guess and never a model), REFUSING every name the cache or the
     corpus already resolves (those are T-172 shape), with a census before and after and a receipt - and it must
     ride a moment BEFORE the next batch is ingested, because that is the only moment it is free.
+
+- id: T-177
+  priority: SHOULD
+  state: open
+  mover: pipeline
+  title: ADOPT THE RECALL AT A FINDING'S INTAKE - the register can now be QUERIED, and the two worklists it names must be worked off with their ceiling LOWERED behind them
+  source: [D-3047, BUG-857, config/bug_recall.yaml, scripts/check_bug_recall.py]
+  why: >-
+    MEASURED 2026-10-16 (BUG-857/D-3047): the register could be appended to and never queried, so the same defect family
+    was re-derived by each new reader (BUG-852 rediscovered BUG-492; BUG-856 rediscovered D-3034) and a closed finding
+    whose fix names no artifact, no ruling and no control could be reintroduced silently. The rail now MEASURES all of
+    that read-only, at $0, in one command - but a reading nothing reads is the failure mode the reading exists to catch
+    (a control nothing runs is a comment, BUG-492). This row is the ADOPTION: the recall rides a finding's intake, and
+    the two worklists it names are worked off rather than admired.
+  evidence: >-
+    MEASURED 2026-10-16 by scripts/check_bug_recall.py (20/20 known-answer controls, READ-ONLY, 15 declared patterns
+    loaded from its ONE home): `--recall BUG-850` names 13 neighbours ranked by strength, the 3 rulings it cites that
+    resolve, and the capability that owns each artifact it names; the live reading prints untraced_closed 26 (ceiling 27),
+    chronic_open 10 (ceiling 11) and unresolved_reference 111 (ceiling 112), each ceiling a measurement plus one declared
+    slot, never raised. The exclusions are readings too: 79 references cited by more than twenty findings are excluded as
+    common substrate and COUNTED, and 23 findings sharing fewer than the declared minimum are dropped as coincidence and
+    COUNTED.
+  gate: >-
+    pipeline: the recall is run at each finding's intake, and the two worklist classes are DISCHARGED - each of the 26
+    closed findings that left no trace either gains a named trace (an artifact, a ruling or a control) or is recorded as
+    an accepted negative with its reason (D-3038), and each of the 10 chronic findings gets a verdict (closed, or a
+    DECLARED REASON for why attention alone has not settled it) - with the ceiling in config/bug_recall.yaml#ceilings.classes
+    LOWERED behind each discharge (shrink-only, D-3023/D-2644) and never raised.
+
+- id: T-178
+  priority: SHOULD
+  state: open
+  mover: pipeline
+  title: GIVE BUG-492 ITS HEADING - the most-cited rule in this repository (128 files, 53 justfile lines) is not an id the register can resolve, so promote the register's own recorded text or re-point the 128 citations
+  source: [BUG-858, BUG-857, D-3047, config/bug_recall.yaml]
+  why: >-
+    MEASURED 2026-10-16 (BUG-858): the census folds straight from BUG-491 to BUG-493 while `BUG-492` is cited 128 times
+    across the repository - 92 files under scripts/, 14 under config/, 14 under governance/, 7 under pipeline/, and 53
+    mentions inside justfile - always as "a control nothing runs is a comment". The rule that most of this repository's
+    rails are JUSTIFIED BY cannot be read in the register that justifies it, and a reader following any of the 128
+    citations arrives at nothing.
+  evidence: >-
+    MEASURED 2026-10-16 by scripts/check_bug_recall.py (found by the `finding` trace class on its first live run, and
+    reproduced independently): zero heading lines match BUG-492 at any hash depth; the fold carries BUG-491 and BUG-493;
+    the register holds 58 mention lines for the id, so its content survives as prose inside other entries.
+  gate: >-
+    pipeline: the id resolves. Promoting the register's own text into a heading is preferred (one act makes 128
+    citations resolve); re-pointing the citations is the alternative. Either way the promotion must PRESERVE the
+    original wording and say so (C12/D-2642: never re-write history), and the act is measured by the reading that found
+    it - `python3 scripts/check_bug_recall.py` must stop reporting a `finding:BUG-492` that resolves against nothing,
+    and the census must carry the id.

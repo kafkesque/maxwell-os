@@ -250,6 +250,17 @@ capabilities:
     receipt: config/handoffs.yaml#journal
     cost_tier: T0
     owns: [pipeline/stage6_commit.py]
+  #: D-3047: THE REGISTER'S RECALL. MEASURED 2026-10-16: no artifact in this repository computed which
+  #: findings share a shape, so the register could be appended to and never queried - and the routing debt's
+  #: own reader could not route a finding ABOUT the register until this capability existed (BUG-856's shape:
+  #: a graph that owns itself nowhere joins the unrouted population by construction).
+  - id: bug_recall
+    kind: script
+    entrypoint: python3 scripts/check_bug_recall.py
+    check: python3 scripts/check_bug_recall.py --selftest
+    receipt: config/bug_recall.yaml#ceilings
+    cost_tier: T0
+    owns: [scripts/check_bug_recall.py, config/bug_recall.yaml]
 
 # ─── THE OPERATOR LANES (T-164/BUG-837's disposition) ───
 #: An operator lane is an entry point a HUMAN runs and that produces a READING or a STATE CHANGE, not a receipt —

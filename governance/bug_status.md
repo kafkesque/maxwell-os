@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**224 open** / 396 closed of 620 ids.
+**226 open** / 396 closed of 622 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -231,3 +231,5 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-836 | (MED - OPEN 2026-10-15) - the R5 cross-family review route produced NO usable review from either local verifier, and one of the two failures | 1 |
 | BUG-846 | (LOW - OPEN 2026-10-16) - governance/buglog.md is a REGISTER while the intake assessment is only a DOCUMENT: a rejected research finding has | 1 |
 | BUG-854 | (LOW — OPEN 2026-10-16) — agent/adapters/goose/apply_provider_flip.py hardcodes the two values of its own safe phase, and the thinking-effor | 1 |
+| BUG-857 | (MED — OPEN 2026-10-16) — governance/buglog.md could be APPENDED TO and never QUERIED: no artifact computed which findings share a shape, so | 1 |
+| BUG-858 | (MED — OPEN 2026-10-16) — governance/buglog.md carries NO entry for BUG-492, the most-cited rule in this repository: 128 files cite it (53 l | 1 |

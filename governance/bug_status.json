@@ -2,8 +2,8 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 620,
-  "open_n": 224,
+  "total_ids": 622,
+  "open_n": 226,
   "closed_n": 396,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
@@ -1126,6 +1126,16 @@
     {
       "id": "BUG-854",
       "title": "(LOW \u2014 OPEN 2026-10-16) \u2014 agent/adapters/goose/apply_provider_flip.py hardcodes the two values of its own safe phase, and the thinking-effor",
+      "events": 1
+    },
+    {
+      "id": "BUG-857",
+      "title": "(MED \u2014 OPEN 2026-10-16) \u2014 governance/buglog.md could be APPENDED TO and never QUERIED: no artifact computed which findings share a shape, so",
+      "events": 1
+    },
+    {
+      "id": "BUG-858",
+      "title": "(MED \u2014 OPEN 2026-10-16) \u2014 governance/buglog.md carries NO entry for BUG-492, the most-cited rule in this repository: 128 files cite it (53 l",
       "events": 1
     }
   ],

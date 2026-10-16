@@ -1,0 +1,153 @@
+# config/bug_recall.yaml
+# ── THE REGISTER'S RECALL (D-3047) ────────────────────────────────────────────────────────────────
+# WHY THIS FILE EXISTS — MEASURED 2026-10-16, read-only, over the register's own 620 ids.
+#
+#   The bug register is this repository's memory of what went wrong, and MEASURED it can answer exactly
+#   two questions: how many findings exist, and what state each one is in. It cannot answer the three a
+#   LATER reader actually asks, and every one of the three is a reading that nothing took:
+#
+#     (1) WHICH FINDINGS ARE CHRONIC. A heading EVENT is one AMENDMENT to one finding, never a
+#         recurrence: MEASURED, BUG-712 carries twelve headings because it took twelve sittings to
+#         characterise ONE defect ("MAGNITUDE CORRECTED", "ROOT CAUSE FOUND" ...), and BUG-736/737/
+#         748/749 carry five each. The register's own face already counts them (`events`) and NOTHING
+#         reads it. A finding that resists N sittings of attention is a worklist item that says
+#         "attention alone has not worked on this one" - which is a different debt from severity.
+#     (2) WHICH CLOSED FINDINGS LEFT NO TRACE. A remedy that names no artifact, no ruling and no
+#         control is a fix a later reader cannot find, cannot re-run and cannot watch go red. That is
+#         the recurrence-prone set, and the register cannot see it.
+#     (3) WHICH FINDINGS ARE NEIGHBOURS OF A GIVEN ONE. This is the RECALL step itself: a finding
+#         arrives, and instead of re-deriving its history by reading a 1.6 MB log, the reader NAMES
+#         the findings that share a cited artifact or a cited ruling, the rulings that RESOLVE, and the
+#         RAILS that own the cited artifacts. MEASURED 2026-10-16: no artifact in this repository
+#         computed which findings share a shape. `governance/CONTEXT_INDEX.md` calls itself the RECALL
+#         MAP and is a HAND-MAINTAINED DOCUMENT, and BUG-846 already measured that a document is not a
+#         register. This reader is the derived form: it cannot drift, because it restates nothing.
+#
+# WHAT IT IS NOT. Not a taxonomy (nothing here decides what KIND of defect a finding is - that would be
+# a semantic judgement, and BUG-852's lesson is that a CLASS must be MEASURED from the bytes, never
+# asserted). Not a model (no LLM, no embedding, no similarity score: the only relation it knows is a
+# SHARED, RESOLVABLE REFERENCE, which is the repository's own currency, D-3034). Not a writer (it opens
+# the register READ-ONLY and leaves no face: a reading that cannot be re-derived is a copy).
+#
+# Authority: D-3047. Every path, pattern, threshold and ceiling below is DECLARED here; the reader
+# restates none of them (C12) and proves it by reading its own bytes.
+schema_version: '1'
+authority: D-3047
+updated: '2026-10-16'
+state: measured
+why: >-
+  three readings the register could not take - CHRONIC, UNTRACED, UNRESOLVED - plus the RETRIEVE step
+  that names a finding's neighbours, the rulings it cites that RESOLVE, and the rails that own the
+  artifacts it names. A register nothing can query is a diary; this file is what makes it a memory.
+
+sources:
+  register: governance/buglog.md
+  census: governance/bug_status.json
+  parser_home: scripts/bug_status.py
+  decisions: config/decisions.yaml
+  capabilities: config/capability_registry.yaml
+  decisions_list_key: decisions          # the ruling home's own shape, DECLARED: a list of records
+  decisions_id_field: id                 # whose `id` IS the reference (D-3034)
+  artifact_root: .
+  #: WHY THE PARSER IS REUSED AND NOT RE-IMPLEMENTED (D-2646). Folding a heading into a status is
+  #: owned by ONE reader: it masks fenced blocks (a heading QUOTED inside a repro fence is
+  #: documentation, BUG-634), it classifies the status slot, and it folds events in file order. A second
+  #: implementation of that fold is a second answer to a question the register already answers - which
+  #: is exactly the defect class T-175/D-3046 removed from the harness surface. This reader imports the
+  #: declared home and adds only what nobody computed: the SPANS and the TRACES.
+  why_the_parser_is_reused: >-
+    D-2646: never re-implement a reader. The fold is loaded FROM ITS DECLARED HOME, so moving the
+    parser is a declaration change and this rail follows it.
+  #: THE CENSUS IS THE ONE HOME OF A COUNT (BUG-588/D-2692): nothing below restates one. This reader
+  #: READS the census face and CHECKS it against the register's own fold; a disagreement means the face
+  #: is stale, and a stale face is a reading no later reader can trust.
+  agreement_is_checked: true
+
+#: WHAT COUNTS AS A TRACE A FINDING LEFT. The vocabulary is DECLARED, and each class says what a
+#: citation of it PROVES. `must_resolve` is D-3034 applied to the register: a finding that names an
+#: artifact, a ruling or a sibling finding DECLARES something, and a declaration that does not land
+#: inside the thing it names is REPORTED rather than counted as a trace.
+traces:
+  artifact:
+    pattern: '(?<![\w./-])(?:scripts|pipeline|config|agent|governance|src|tests|temp)/[A-Za-z0-9_./-]*[A-Za-z0-9_-]\.(?:py|yaml|yml|json|md|sh|toml|txt)(?![\w/.])'
+    must_resolve: true
+    proves: 'a later reader can OPEN the thing that was fixed'
+  decision:
+    pattern: '(?<![\w-])D-?\d{3,4}(?![\w-])'
+    must_resolve: true
+    proves: 'the fix rests on a RULING, and a ruling the register carries can be read'
+  control:
+    pattern: '(?i)(?:known-answer control|known-answer controls|--selftest|selftest:|goes red|went red|reads red|reads rc 0|control\(|controls:)'
+    must_resolve: false
+    proves: 'the fix left something that can be SEEN GO RED on the defect (BUG-492: a control nothing runs is a comment)'
+  finding:
+    pattern: '(?<![\w-])BUG-?\d{3,4}(?![\w-])'
+    must_resolve: true
+    proves: 'the finding is SITUATED against a sibling; a citation to an id the register does not carry names nothing'
+
+#: A SIBLING CITATION IS THE WEAKEST TRACE and it is counted as one on purpose: it imports a finding's
+#: CONTEXT, never a remedy. Which classes are therefore SUFFICIENT to call a closed finding TRACED is a
+#: reading and not a taste, so it is declared - OUTSIDE `traces`, because a class list is not a class.
+trace_sufficiency:
+  traces_that_make_a_closed_finding_TRACED: [artifact, decision, control]
+  why: >-
+    a closed finding that names only a sibling finding has situated itself and left nothing a later
+    reader can open, re-run or watch go red: it is UNTRACED, and the difference between "named
+    something" and "left a trace" is exactly the distinction this class exists to keep.
+
+thresholds:
+  #: DECLARED, never inferred. A heading EVENT is an amendment, so the third amendment is the first
+  #: reading at which "attention alone has not settled this behind" is a claim rather than a hunch.
+  chronic_events: 3
+  why_chronic: >-
+    an OPEN finding whose heading events reach this number has been re-characterised at least twice
+    without being closed: the debt is not the finding, it is the ATTENTION it has already absorbed.
+
+ceilings:
+  #: SHRINK-ONLY (D-3023). A ceiling is a MEASUREMENT plus a declared SLOT: set exactly on the live
+  #: count, the next discovery would be FATAL and would force a remedy on the spot, and rounding a
+  #: discovery away is worse than a slot. The ceiling may only be LOWERED (D-2644) - never raised.
+  slot: 1
+  why: >-
+    the count is the debt: a class above its ceiling is loud and NOT fatal (BUG-457), so the ladder
+    keeps running and the debt gets a row instead of a shrug.
+  classes:
+    untraced_closed: {measured: 26, measured_on: '2026-10-16', ceiling: 27, row: T-177}
+    chronic_open: {measured: 10, measured_on: '2026-10-16', ceiling: 11, row: T-177}
+    unresolved_reference: {measured: 111, measured_on: '2026-10-16', ceiling: 112, row: BUG-857}
+
+report:
+  #: A COUNT IS A DEBT AND A SAMPLE IS A WORKLIST. Above this many rows the reading prints the count and
+  #: the first N ids; the full list is one `--recall <id>` away.
+  sample_n: 12
+  why: >-
+    the failure this guards against is the one BUG-855 fixed: a fault whose purpose is to name a
+    worklist, printing none.
+  #: ── THE NEIGHBOUR RELATION, DECLARED ─────────────────────────────────────────────────────────────
+  #: MEASURED 2026-10-16: the register cites 1597 distinct references, and a plain "shares a reference"
+  #: relation is TOO DENSE to be a reading - BUG-712 cites ~80 artifacts, so it shared something with
+  #: 339 findings and the list was true and useless. Two declared rules fix that, and neither invents a
+  #: similarity score:
+  #:   (1) A COMMON SUBSTRATE IS NOT A RELATION. A reference cited by MORE than the ceiling below is a
+  #:       thing this repository keeps saying (its own register, its ruling home, its config) and links
+  #:       findings by the fact that they all live here. It is EXCLUDED, and the number of excluded
+  #:       references is PRINTED - an exclusion that is a silence would be a defect (D-3038).
+  #:   (2) STRENGTH, NOT COUNT. Neighbours are ranked by the OVERLAP COEFFICIENT (shared references over
+  #:       the SMALLER finding's own reference set), which is the fraction of the smaller finding this
+  #:       neighbour accounts for - so a finding that cites everything cannot rank above one that cites
+  #:       four things and shares three of them.
+  max_reference_frequency: 20
+  refs_per_neighbour: 4
+  #: MINIMUM EVIDENCE. ONE shared rare reference can be a coincidence (two findings that happen to name
+  #: the same file); a relation is claimed from the declared minimum upwards. A neighbour dropped for
+  #: thinness is COUNTED in the header rather than dropped silently (D-3038).
+  min_shared_references: 2
+  #: WHICH CLASSES THE RELATION IS COMPUTED OVER. `finding` is deliberately NOT one of them, and the
+  #: reason is the one `trace_sufficiency` already declares: a citation to a sibling finding imports
+  #: CONTEXT and proves nothing about a shared subject, so two findings that merely mention each other
+  #: are not neighbours. A finding cited here is still EXTRACTED and still resolved (a citation to an id
+  #: the register lacks is reported there) - it simply does not create a relation.
+  relation_classes: [artifact, decision]
+  why_the_relation: >-
+    a shared RARE reference is evidence and a shared CONFIG FILE is furniture. Both rules are readings
+    over the register's own bytes: nothing here is a score, a weight or a model (D-3047).

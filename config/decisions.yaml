@@ -26313,3 +26313,82 @@ decisions:
     owed - it is the first act T-124 unblocks. Finally, the honest limit of one reading: unresolved_reference mixes
     a stale repository path with a path that belongs to a home OUTSIDE the repository (a citation written without
     its `~/` prefix), so that class is a worklist of citations to LOOK AT, not a verdict on each one.'
+- id: D-3048
+  state: ACTIVE
+  date: '2026-10-16'
+  by: assistant
+  category: IDENTITY / LIBRARY ARRANGEMENT AND NAMING
+  bugs:
+  - BUG-859
+  - BUG-860
+  - BUG-861
+  - BUG-862
+  files:
+  - config/ingest_identity_gate.yaml
+  - scripts/plan_source_rename.py
+  - scripts/census_source_names.py
+  - scripts/normalise_corpus_names.py
+  - config/capability_registry.yaml
+  - config/rail_registry.yaml
+  - justfile
+  - governance/SOURCE_RENAME_PLAN_20261016.md
+  title: THE LIBRARY IS ARRANGED, NOT COPIED — a work has ONE bytes home and the topic is a DERIVED view; the name
+    the owner asked for is repaired only where it carries no reference yet and only from the file's OWN metadata;
+    and the second materialisation this repository already had (929 works in two homes, 727 drifted in the same
+    kind) is a ceilinged reading instead of an invisible one
+  decision: 'OWNER WORD 2026-10-16 (verbatim): "T-176 yes I would prefer rename to only include author - title -
+    year format" and, on arrangement, "we should have a system that organizes books and journals based on their
+    format and copy based on their topic to specific folders and subfolders ... should new books and journals and
+    notes after sorting them into the right folders be synched with the S0 equivalent path ... what do you recommend
+    to prevent duplicates but keep things clean and don''t create future tax and unnecessary complexity". (1) THE
+    RENAME, ANSWERED WITH A PLAN RATHER THAN A PROMISE. The owner''s word is the narrow YES D-3045 left room for,
+    and its gate demanded plan-first, metadata-derived, refusing on anything an ingest already resolves. MEASURED
+    2026-10-16 by the new reader (scripts/plan_source_rename.py, READ-ONLY, 11/11 known-answer controls): of 1254
+    defective library names, 1032 are COUPLED to an ingest (a rename there is the T-172 cascade, BUG-800) and 122
+    are ELIGIBLE now — 39 from EPUB OPF metadata and 83 from the PDF Info dictionary, 11 of them without a year
+    (the segment is omitted and the row COUNTED, never invented). Every other row is REFUSED WITH ITS DECLARED REASON
+    and COUNTED: 69 carry no author or no title in any declared source, 16 are kinds with no declared metadata source
+    (.md/.mobi/.djvu — the S0.5 metadata is the pipeline''s job, not a filename''s), 4 name a tool or a scanner
+    as the author ("bsmoter", "sponsored by ..."), 3 would land on an existing name, and 8 are NAMED BY A DECLARED
+    SURFACE the act cannot rewrite (a dangling reference is a cascade, BUG-798). It touches NOTHING: the plan is
+    written to governance/SOURCE_RENAME_PLAN_20261016.md (+ .json) and the act that applies it is separate and owner-worded.
+    (2) WHAT THE RENAME DOES NOT DO TO THE ALREADY-PROCESSED CORPUS, MEASURED. It cannot touch it: the coupled class
+    is refused BY CONSTRUCTION (the S0.5 cache resolves those names), and the corpus''s own 37 defective stems (T-172)
+    still ride a re-ingest because 2,952 references inside 13 run receipts would dangle. So the answer to "does
+    the rename affect what is already processed?" is NO for 1032 names and NO for the corpus — the rename acts on
+    the layer BEFORE the first reference, which is the only layer where a name is free. (3) THE ARRANGEMENT, AND
+    WHY A TOPIC IS NEVER A COPY. The owner''s layout is already right on the FORMAT axis (books/epub, books/pdf,
+    books/md, journals:notes): format decides how a file is READ, so it is the one axis a physical layout carries.
+    TOPIC is a different kind of fact — it is a facet, it is many-to-many, and materialising it as a copy turns
+    one work into N works for every reader that joins by path (BUG-780: 530 rows, one text under two names; MEASURED
+    here: 21 works already exist as two files of the same kind in the library and 1 in the corpus). Therefore: ONE
+    bytes home (the corpus — the only tree S0 reads and the only tree the S0.5 cache stamps), the library as the
+    owner''s READING surface, and the topic as a view that is GENERATED or not a view at all. No link farm either:
+    the library lives inside Dropbox on APFS (MEASURED 2026-10-16: /System/Volumes/Data, APFS), so an APFS clone
+    would still be uploaded as a second file by the provider and a symlink is not what the provider syncs. A generated
+    index costs one file and cannot drift; a copy costs two files and drifts by construction. (4) THE "S0 SYNC"
+    QUESTION, ANSWERED BY THE READER THAT NOW MEASURES IT. The flow does not copy the library into S0 — MEASURED:
+    no script writes into the corpus home; the corpus .md files ARE the S0 input, the library''s md tree is a reading
+    view, and the S0.5 cache''s own source_path lands inside the corpus. Discovery is recursive (rglob), so sorting
+    NEW files into subfolders is SAFE for S0 — nothing is hidden by a deeper path. What the reading found instead
+    is the duplicate hazard nobody had named: 929 works exist in BOTH homes and 727 of them differ byte-for-byte
+    in the SAME kind (103 agree; 99 pairs are one work in two containers and are correctly NOT drift). That is BUG-862,
+    and its remedy is this reading plus the owner''s disposition (T-179). (5) THE THREE LIMBS THAT CARRY THE DECISION,
+    EACH ONE A READING. (a) `census_source_names.py --census` — the name classes and the FREE/COUPLED split (D-3045);
+    (b) `census_source_names.py --arrangement` — one work, how many materialisations, drift vs format pairs, one-sided
+    counts, with a SHRINK-ONLY ceiling (727, measured, never raised): rc 0 no drift, 2 drift within it (loud, owner-owed,
+    BUG-457), 1 above it (a disposition REGRESSED) — a ceiling that could not fire would be a comment; (c) `plan_source_rename.py
+    --plan` — the plan itself. (6) THE FOUR DEFECTS THIS ACT FOUND BY RUNNING, NOT BY READING. BUG-859: the ladder''s
+    own comment and T-174''s gate taught a command whose path stopped existing when the writer MOVED in T-175 —
+    the owner ran it and got No such file or directory; the writer is now an OPERATOR LANE (config/capability_registry.yaml#lanes
+    + a justfile recipe) so a stale path is a fault instead of a surprise (T-164/BUG-837). BUG-860: the reference
+    census built a GLOB out of a filename, so a name beginning with `*` CRASHED it (two live rows) — glob.escape,
+    and a reader that crashes on the row it was asked about cannot refuse it. BUG-861: the census''s known-answer
+    controls ran in NO ladder line for a full act (BUG-492 in its smallest form) — both controls are now `fatal`
+    ladder lines and registered guards, while the LIVE readings are operator lanes, because the audit/rail distinction
+    is really between a reading that walks the owner''s filesystem and a control that runs on fixtures in a temp
+    dir. (7) WHAT THIS DECISION DOES NOT DO. It renames NOTHING (no file in the library has moved); it does not
+    touch S0, the door, the store or the corpus''s own 37 stems (T-172 unchanged); it declares no view generator,
+    because a view generator is a separate act and declaring one would be a promise rather than a reading; it does
+    not retire the library''s md tree (that is the owner''s word, T-179); and it does not raise the drift ceiling
+    — 727 is a measurement plus nothing, and D-3023/D-2644 make it shrink-only.'

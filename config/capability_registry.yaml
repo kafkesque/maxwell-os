@@ -254,6 +254,18 @@ capabilities:
   #: findings share a shape, so the register could be appended to and never queried - and the routing debt's
   #: own reader could not route a finding ABOUT the register until this capability existed (BUG-856's shape:
   #: a graph that owns itself nowhere joins the unrouted population by construction).
+  # T-176/D-3048: THE SOURCE LIBRARY as a measurable subject - what its names cost (D-3045's census) and what a
+  # repair would be (the plan-first rename). Two readers, ONE declared home; neither writes to the library, and the
+  # plan a human reads is the only file either produces.
+  - id: source_library_names
+    kind: script
+    entrypoint: python3 scripts/plan_source_rename.py
+    check: python3 scripts/plan_source_rename.py --selftest
+    receipt: config/ingest_identity_gate.yaml#source_library
+    cost_tier: T0
+    owns:
+      - scripts/census_source_names.py
+      - scripts/plan_source_rename.py
   - id: bug_recall
     kind: script
     entrypoint: python3 scripts/check_bug_recall.py
@@ -306,14 +318,34 @@ lanes:
     produces: receipt
     capability: fanout
     why: 'one question to one local model, receipted at temp/ask.md - the smallest unit of the fleet (the recipe is named ask: - MEASURED 2026-10-15, a first draft of this registry named it task:, which is a misreading of a numbered listing and an example of why a lane command is CHECKED against the recipe rather than remembered)'
+  - recipe: provider-flip
+    cmd: python3 agent/adapters/goose/apply_provider_flip.py --dry-run
+    produces: reading
+    capability: harness_adapter
+    why: 'the ONE thing that touches the live harness home, and it is DRY-RUN by default (backup-first, read-back, --rollback restores). BUG-859: the ladder comment taught `pipeline/apply_provider_flip.py`, a path that stopped existing in T-175/D-3046, so the owner command failed with No such file or directory - a lane is CHECKED against the recipe, so a stale path is a fault here instead of a surprise in the owner hands'
+  - recipe: source-names
+    cmd: python3 scripts/census_source_names.py --census
+    produces: reading
+    capability: source_library_names
+    why: 'the name census (D-3045): the declared classes, the FREE/COUPLED split and the readiness a rename needs'
+  - recipe: arrangement
+    cmd: python3 scripts/census_source_names.py --arrangement
+    produces: reading
+    capability: source_library_names
+    why: 'one work, how many materialisations: the two homes, their same-kind drift and their one-sided counts (D-3048) - the reading that answers "will sorting into topic folders duplicate my books?" with a number'
+  - recipe: rename-plan
+    cmd: python3 scripts/plan_source_rename.py --plan
+    produces: receipt
+    capability: source_library_names
+    why: 'the plan-first limb of T-176: it writes governance/SOURCE_RENAME_PLAN_<date>.md (+ .json) and renames NOTHING - the act that applies a name is separate, owner-worded, and rides before the next batch is ingested'
   - recipe: retire-dry
     cmd: pipeline/omlx_retire_model.sh
     produces: state
     why: 'parks a model; the BYTES need pipeline/safe_delete.py (R-D410), so the lane never deletes'
 
-# ─── THE ITEM CENSUS (does open WORK route to a declared capability?) ───
-#: A disposition is what an item gets when it does NOT route. It is keyed by MOVER for tasks (the register's own
-#: vocabulary) and by class for bugs, and every reason must be DECLARED below: an item is never silently unrouted.
+  # ─── THE ITEM CENSUS (does open WORK route to a declared capability?) ───
+  #: A disposition is what an item gets when it does NOT route. It is keyed by MOVER for tasks (the register's own
+  #: vocabulary) and by class for bugs, and every reason must be DECLARED below: an item is never silently unrouted.
 dispositions:
   tasks:
     pipeline: route_graph_incomplete

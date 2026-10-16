@@ -1929,29 +1929,34 @@ tasks:
     scripts/resolve_route.py --check is green.
 
 - id: T-176
-  priority: WORTH
+  priority: SHOULD
   state: open
   mover: owner
-  title: 'THE SOURCE LIBRARY NAMES, IF HUMAN-READABLE NAMES ARE EVER WANTED - the act this decision priced and did
-    NOT authorise: plan-first, metadata-derived, refusing every name an ingest already resolves'
-  source: D-3045; config/ingest_identity_gate.yaml#source_library; scripts/census_source_names.py; T-172; BUG-800
+  title: 'THE SOURCE LIBRARY NAMES - THE OWNER WORD IS GIVEN AND THE PLAN IS PUBLISHED: what remains is the
+    acceptance of the named rows, and the repair rides the moment BEFORE the next batch is ingested because that is
+    the only moment it is free'
+  source: D-3045; D-3048; config/ingest_identity_gate.yaml#source_library; scripts/plan_source_rename.py; T-172; BUG-800
   why: >-
-    MEASURED 2026-10-16 (D-3045): 1254 of 2530 files in the owner library carry a declared name class, of which
-    222 are FREE to repair (no cache record keyed to the name yet) and 1032 are COUPLED to an ingest, where the
-    same rename is the cascade T-172 refuses at 37 corpus stems (BUG-800: 2,952 references inside 13 run
-    receipts). The identity these names carry is bought elsewhere - 1680 of 2530 already resolve author+title from
-    the S0.5 content cache - so this row exists only for the HANDLE, never for the corpus.
+    MEASURED 2026-10-16 (D-3045, answered by D-3048): the name carries a HANDLE and never identity - the corpus
+    resolves author+title from the file's own text at S0.5 - so a rename buys nothing the pipeline needs. The owner
+    asked for it anyway, for the HUMAN reading the file list, and the whole cost of granting that is TIME: a name
+    repaired before its first reference carries ZERO references, while the same repair after ingest is the cascade
+    T-172 refuses at the corpus's own defective stems (BUG-800: 2,952 references inside 13 run receipts). This row
+    therefore exists to spend that window deliberately, before the next batch is ingested, rather than to fix a name.
   evidence: >-
-    MEASURED 2026-10-16 by scripts/census_source_names.py (READ-ONLY, 5/5 known-answer controls): the roots, the
-    file kinds, the name classes and the metadata cache are all DECLARED
-    (config/ingest_identity_gate.yaml#source_library), so the boundary between a free repair and an
-    ingest-coupled one is a reading rather than a judgement. No rename has been planned, proposed or applied.
+    MEASURED 2026-10-16 by scripts/plan_source_rename.py (READ-ONLY, 11/11 known-answer controls) over the declared
+    roots: 1254 defective names, 1032 COUPLED to an ingest (refused by construction - the S0.5 cache resolves them),
+    122 ELIGIBLE (39 from EPUB OPF metadata, 83 from the PDF Info dictionary), 11 of those without a year (the
+    segment is omitted and the row COUNTED). Every other row is refused with its DECLARED reason and counted: 69
+    with no author or no title in any declared source, 16 of a kind with no declared metadata source, 4 whose author
+    is a tool or a scanner, 3 that would land on an existing name, 8 NAMED BY A DECLARED SURFACE this act cannot
+    rewrite. The plan was written to governance/SOURCE_RENAME_PLAN_20261016.md and NOTHING was renamed.
   gate: >-
-    owner lane: the owner says whether human-readable library names are wanted at all; if yes, the act must be
-    plan-first (a written plan naming each row, its source metadata and its references), metadata-derived (EPUB
-    OPF, PDF info or the S0.5 cache - never a guess and never a model), REFUSING every name the cache or the
-    corpus already resolves (those are T-172 shape), with a census before and after and a receipt - and it must
-    ride a moment BEFORE the next batch is ingested, because that is the only moment it is free.
+    owner lane, plan-first: the owner accepts or edits the published plan row by row (each row carries its derived
+    name, the metadata source it came from and its bytes); the accepted rows are applied ONLY at the moment before
+    the next batch is ingested, and never by a bulk renamer; a row the owner rejects keeps its reason in the record
+    (D-3038). The act is measured by the same reader - the applied rows leave the ELIGIBLE class and their names
+    resolve from their own metadata afterwards - and by a census before and after.
 
 - id: T-177
   priority: SHOULD
@@ -2003,3 +2008,31 @@ tasks:
     original wording and say so (C12/D-2642: never re-write history), and the act is measured by the reading that found
     it - `python3 scripts/check_bug_recall.py` must stop reporting a `finding:BUG-492` that resolves against nothing,
     and the census must carry the id.
+- id: T-179
+  priority: SHOULD
+  state: open
+  mover: owner
+  title: 'THE SECOND MATERIALISATION - the library and the corpus hold the same work, the reading now measures how
+    far they have drifted, and the disposition is the owner word: retire the second copy or declare it a VIEW with a
+    re-derivation receipt'
+  source: D-3048; BUG-862; scripts/census_source_names.py; config/ingest_identity_gate.yaml#source_library.arrangement
+  why: >-
+    MEASURED 2026-10-16 (BUG-862): through the door's own comparison key, 929 works exist in BOTH the owner's library
+    and the pipeline's corpus home, 103 agree byte-for-byte and 727 disagree while being the SAME kind of file. A
+    further 99 pairs are one work in two containers (an .epub and its .md) and are correctly NOT drift. Nothing was
+    wrong on the day a copy was made - which is exactly why nothing detected anything, and why the number grew
+    silently. This is BUG-780's shape (one text under two names) one layer out, and it is the measured reason T-176
+    refuses to materialise a THIRD copy for a topic: a topic is a view.
+  evidence: >-
+    MEASURED 2026-10-16 by `python3 scripts/census_source_names.py --arrangement` (READ-ONLY, 11/11 known-answer
+    controls): 2530 library files, 940 in the corpus home, 929 keys in both, 103 byte-equal, 727 drifted in the same
+    kind, 99 format pairs, 826 library-only, 10 corpus-only, and 21 works (library) / 1 (corpus) held as TWO files
+    of the SAME kind. The drift carries a SHRINK-ONLY ceiling of 727 measured on that date - rc 0 no drift, rc 2
+    within it (loud, owner-owed, BUG-457), rc 1 above it, because a disposition that regressed must be fatal.
+  gate: >-
+    owner lane: the owner decides between (a) RETIRING the second materialisation - the corpus home is the bytes home
+    S0 reads and the only one the S0.5 cache stamps - or (b) DECLARING the library a generated VIEW, in which case a
+    re-derivation receipt and its generator must exist before the view is claimed to be one (a view nobody generates
+    is the copy this row is about). Either way the reading must be re-run and the ceiling LOWERED behind the
+    disposal (shrink-only, D-3023/D-2644) and never raised, and no file may be removed without pipeline/safe_delete.py
+    (R-D410).

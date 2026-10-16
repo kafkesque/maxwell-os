@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 622,
-  "open_n": 226,
-  "closed_n": 396,
+  "total_ids": 626,
+  "open_n": 227,
+  "closed_n": 399,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -1137,6 +1137,11 @@
       "id": "BUG-858",
       "title": "(MED \u2014 OPEN 2026-10-16) \u2014 governance/buglog.md carries NO entry for BUG-492, the most-cited rule in this repository: 128 files cite it (53 l",
       "events": 1
+    },
+    {
+      "id": "BUG-862",
+      "title": "(MED \u2014 OPEN 2026-10-16) \u2014 scripts/census_source_names.py now measures TWO MATERIALISATIONS of one work and config/ingest_identity_gate.yaml ",
+      "events": 1
     }
   ],
   "closed": [
@@ -1535,6 +1540,9 @@
     "BUG-852",
     "BUG-853",
     "BUG-855",
-    "BUG-856"
+    "BUG-856",
+    "BUG-859",
+    "BUG-860",
+    "BUG-861"
   ]
 }

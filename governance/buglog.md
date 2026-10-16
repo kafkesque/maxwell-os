@@ -8,17 +8,18 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1175 decisions (census stamp 6135ed95e64f09e9, 2026-10-16) · 622 bugs (226 open / 396 closed; highest OPEN = BUG-858) · 48 open tasks (MUST 11 / SHOULD 32 / WORTH 5; OWNER-moved 1, pipeline-moved 47; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1176 decisions (census stamp 95a39111130c7f9c, 2026-10-16) · 626 bugs (227 open / 399 closed; highest OPEN = BUG-862) · 49 open tasks (MUST 11 / SHOULD 34 / WORTH 4; OWNER-moved 2, pipeline-moved 47; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **79** of 1175 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 590 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1175, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **79** of 1176 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 591 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1176, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 226 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 34 · 🟨 MED 62 · 🟩 LOW 25 · UNLABELLED 101 (BUG-757) of 226 open.
+> Open BUGS by severity (population = the census's 227 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 34 · 🟨 MED 63 · 🟩 LOW 25 · UNLABELLED 101 (BUG-757) of 227 open.
 >
-> **OWNER LANE (1) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
+> **OWNER LANE (2) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
-> | T-176 | 🟡 WORTH | THE SOURCE LIBRARY NAMES, IF HUMAN-READABLE NAMES ARE EVER WANTED - the act this decision priced and did NOT a | owner lane: the owner says whether human-readable library names are wa |
+> | T-176 | 🟠 SHOULD | THE SOURCE LIBRARY NAMES - THE OWNER WORD IS GIVEN AND THE PLAN IS PUBLISHED: what remains is the acceptance o | owner lane, plan-first: the owner accepts or edits the published plan  |
+> | T-179 | 🟠 SHOULD | THE SECOND MATERIALISATION - the library and the corpus hold the same work, the reading now measures how far t | owner lane: the owner decides between (a) RETIRING the second material |
 >
 > **PIPELINE LANE (47) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
 >
@@ -15742,3 +15743,46 @@ SYMPTOM: `BUG-492` is cited 128 times across the repository — 92 files under s
 ROOT CAUSE: D-3034's own distinction, at the register level — a value that MENTIONS a thing declares nothing, and only a RESOLUTION confers identity. A heading resolves an id; 58 mentions do not. The id therefore entered the repository's working vocabulary (rails, justfile comments, docstrings) without ever entering the register, and no rail compared the two populations because nothing read a citation's resolvability.
 
 REMEDY (T-178): either PROMOTE the register's own recorded text into a `## BUG-492` heading — preserving the original wording and noting the promotion, never re-writing history (C12/D-2642) — or RE-POINT the 128 citations to the entry that actually carries the rule. The first is preferred: it makes 128 citations resolve in one act. Whichever is chosen, the act must be measured by the same reading that found it: `python3 scripts/check_bug_recall.py` must stop reporting a `finding:BUG-492` that resolves against nothing, and the census must carry the id.
+
+
+---
+
+## BUG-859 (LOW — FIXED 2026-10-16) — justfile and config/task_register.yaml TAUGHT a command whose path stopped existing when agent/adapters/goose/apply_provider_flip.py MOVED: the owner ran it and got No such file or directory (remedy: config/capability_registry.yaml#lanes)
+
+**Status:** FIXED (2026-10-16). FOUND by the owner's own report ("your manual command doesn't work"), then MEASURED.
+
+SYMPTOM: the ladder's own comment beside the harness-homes rail, and T-174's gate text, both told a human to run the writer at its PRE-T-175 path under `pipeline/`. MEASURED 2026-10-16: `ls pipeline/apply_provider_flip.py` → No such file or directory, while the file itself is alive at `agent/adapters/goose/apply_provider_flip.py` (21031 B, mode 644) and `agent/adapters/goose/wiring.md` had carried the CORRECT path since T-175. So the instruction a human was handed and the file the repository runs had diverged, and the divergence was invisible because NOTHING read the two together: 14 sites named the old path (justfile comments, a session handoff, task rows, an earlier decision record) and none of them is a reader.
+
+ROOT CAUSE: a manual command is a CLAIM about a path, and it was living in comments, handoffs and prose — three homes that no rail compares with the file system. T-164/BUG-837 had already declared the fix for this class (an OPERATOR LANE: an entry point a human runs, declared in `config/capability_registry.yaml#lanes` and CHECKED against the recipe), and the writer had never been declared as one. A path that moves while the prose stays is not a documentation problem: it is a dangling reference in the one place a human is told to look.
+
+FIX MEASURED AFTER (2026-10-16): `config/capability_registry.yaml#lanes` declares `provider-flip` (recipe `provider-flip`, cmd `python3 agent/adapters/goose/apply_provider_flip.py --dry-run`, produces reading, capability `harness_adapter`), the recipe exists in `justfile` with that exact command, and `scripts/resolve_route.py --check` now REFUSES a lane whose recipe or command is absent (rc 0 live). The `--dry-run` form is declared rather than implied: the owner's command now states, in its own bytes, that it writes nothing. The stale path in the ladder comment was corrected IN PLACE (a live claim in a rail, not a record); the pre-T-175 path is preserved in this entry and in D-3044/D-3046 as the history it is.
+
+## BUG-860 (LOW — FIXED 2026-10-16) — scripts/normalise_corpus_names.py BUILT A GLOB from a filename, so a name beginning with `*` made the reference census CRASH instead of counting: two live library rows could not be planned at all (remedy: glob.escape)
+
+**Status:** FIXED (2026-10-16). FOUND by feeding the shared reader a population it had never seen.
+
+SYMPTOM: MEASURED 2026-10-16, running the new T-176 planner over the owner's library: `ValueError: Invalid pattern: '**' can only be an entire path component`, raised from `_stage_surface`'s `root.rglob(f"*{stem}*")`. The stem in question is `*Nina_N_rgaard,_Beatrix_Busse,_Roc_o_Montoro]_Ke(z-lib.org)`, and a second live row (`*[Rob_Carter,_Philip_B._Meggs,...`) fails the same way: a leading `*` closes the pattern early and the glob parser sees `**` as a path component.
+
+ROOT CAUSE: the stem is DATA and the pattern is CODE, and the reader concatenated them into one string. The corpus population this reader was first written for happened to contain no glob metacharacter, so the defect was invisible for one act — the same shape as BUG-798 (a filename-only census read a false green) one level down: there the population was measured wrongly, here it CRASHED, and a reader that crashes on the row it was asked about cannot refuse it, which is precisely the fail-closed duty it carries.
+
+FIX MEASURED AFTER: `glob.escape(stem)` — the name is a name again. The two rows now reach the planner's refusal vocabulary instead of raising, and the whole library (1254 defective names) plans in 42 s.
+
+## BUG-861 (LOW — FIXED 2026-10-16) — the 11 known-answer controls of scripts/census_source_names.py ran in NO ladder line for a full act: a control nothing runs is a comment (BUG-492, in its smallest possible form)
+
+**Status:** FIXED (2026-10-16). FOUND while wiring the rename plan into the ladder.
+
+SYMPTOM: `scripts/census_source_names.py` shipped in D-3045 with 5 known-answer controls and a `--selftest`; MEASURED 2026-10-16: `grep -n census_source_names justfile config/rail_registry.yaml` returned NOTHING. The controls were real, the reader was real, and the ladder that exists to run controls ran none of them — so the only thing standing between the census's five claims and a silent regression was that nobody had edited it yet.
+
+ROOT CAUSE: the act that landed the reader also declared it an AUDIT (correctly — its live reading walks the owner's Dropbox, and a rail that walks Dropbox on every `just health` would be a tax), and then let the audit-ness leak over the controls. The distinction the ladder needs is not audit vs rail: it is between a LIVE READING (which costs an owner's filesystem) and its CONTROLS (which run on synthetic fixtures in a temp dir in under a second).
+
+FIX MEASURED AFTER: `justfile` carries `python3 scripts/census_source_names.py --selftest || exit 1` and `python3 scripts/plan_source_rename.py --selftest || exit 1`, each declared as a `fatal` guard in `config/rail_registry.yaml#guards`; the live readings are OPERATOR LANES instead (`source-names`, `arrangement`, `rename-plan`), so what the ladder runs and what a human runs are two declared sets and not one ambiguous one.
+
+## BUG-862 (MED — OPEN 2026-10-16) — scripts/census_source_names.py now measures TWO MATERIALISATIONS of one work and config/ingest_identity_gate.yaml declares them the same work: 929 works live in both homes and 727 differ byte-for-byte in the SAME kind (remedy: D-3048)
+
+**Status:** OPEN (remedy: D-3048's arrangement reading, LANDED read-only; the disposition is the owner's). MEASURED 2026-10-16.
+
+SYMPTOM: MEASURED by `python3 scripts/census_source_names.py --arrangement` (READ-ONLY, 11/11 known-answer controls): the owner's library holds 2530 files and the pipeline's corpus home holds 940; through the DOOR'S OWN comparison key, 929 works exist in BOTH; of those, 103 agree byte-for-byte and **727 disagree while being the same kind of file** (an .md against an .md). A further 99 works exist in both homes in two CONTAINERS (an .epub and the .md converted from it) — those can never be byte-equal and are NOT drift, which is why the reader counts them separately. 21 works in the library and 1 in the corpus exist as TWO files of the SAME kind.
+
+ROOT CAUSE: the repository never declared which home is the AUTHORITY for an ingested work's bytes, so both homes were maintained, and a "copy" that nobody compares is two files the day after it is made. Nothing was wrong on the day of the copy: that is exactly why nothing detected anything. This is BUG-780's shape (530 rows, one text under two names) moved one layer out — from the corpus to the corpus AND the reading view — and it is the reason T-176 refuses to materialise a THIRD copy for a topic.
+
+REMEDY (D-3048): the corpus home is the ONE bytes home (it is the tree S0 reads and the only tree the S0.5 cache stamps); the library is the owner's READING surface; and the arrangement is a VIEW that is GENERATED or not a view at all. The drift is now a READING with a shrink-only ceiling (727, measured, never raised) at rc 2 — loud and owner-owed, never fatal — and the disposition (retire the second materialisation, or keep it as a declared view with a re-derivation receipt) is the owner's word, registered as T-179.

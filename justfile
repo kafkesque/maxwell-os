@@ -30,6 +30,8 @@ health:
     python3 scripts/check_agent_surface.py || [ $? -eq 2 ]   # T-169/BUG-845: the adapter surface's live reading. 2 = LOUD (a DECLARED site owes a remedy — MEASURED 2026-10-16: NONE, after the three hand-bound couplings were routed, T-175/D-3046), never fatal (BUG-457); 1 = an undeclared client binding in code, a stale declaration, a root that does not resolve, or an absent required key, and that IS fatal. It reads ONE home (config/agent_surface.yaml) and the two registers, and it writes nothing
     python3 scripts/check_bug_recall.py --selftest || exit 1   # D-3047: THE REGISTER'S RECALL - its known-answer controls on a FIXTURE register (a closed finding that names no trace reads UNTRACED and one that names a control or a ruling does not, a finding at or above the declared heading-event threshold reads CHRONIC and one below it does not, a named artifact that does not RESOLVE is reported and never counted as a trace (D-3034), a named ruling the declared home does not carry is reported, a citation to a sibling the register lacks is reported, recall names the finding that shares a reference and never a stranger, recall joins a cited artifact to the capability that declares it OWNS, a debt above its declared ceiling is LOUD and NOT fatal, an absent declaration key is FATAL and never defaulted, the reader names no declared path/pattern/threshold/ceiling of its own (proved by reading its own bytes, C12), a census face that disagrees with the register's own fold is FATAL and a matching one is not, a reference cited by more findings than the declared ceiling is EXCLUDED as common substrate AND counted, a finding related only by a sibling citation is not a neighbour, and a neighbour sharing fewer references than the declared minimum is not a relation) - a control nothing runs is a comment (BUG-492)
     python3 scripts/check_bug_recall.py || [ $? -eq 2 ]   # D-3047: the register's live recall - 0 every reading within its declared ceiling | 2 a class ABOVE it (DEBT: closed findings that left no trace, findings that have absorbed N amendments without closing, cited references that resolve against nothing), loud NOT fatal (BUG-457) so the ladder keeps running and the debt gets a row. It reads the register, the census face, the ruling home and the capability registry, folds headings through the ONE declared parser (D-2646, never a second implementation), and WRITES NOTHING: `--recall BUG-NNN` is the RETRIEVE step - the neighbours, the rulings it cites that resolve, and the rails that own what it names
+    python3 scripts/census_source_names.py --selftest || exit 1   # D-3045/BUG-861: the SOURCE-LIBRARY reader's known-answer controls - a mirror-marker name is counted in the marker class and a truncated name is not, an unreadable root is FATAL and never a zero, a name the cache resolves is counted as ingest-coupled, the reader names no root path of its own (C12), a work in two homes with DIFFERENT bytes of the SAME kind is DRIFT while one in two CONTAINERS is not, a work in one home only is never drift, one work as two files of one kind is counted (that is what a topic COPY creates), and drift ABOVE the declared shrink-only ceiling is FATAL while a reading within it is loud and NOT fatal (BUG-457) - MEASURED 2026-10-16: these controls ran in NO ladder line until now, which is BUG-492 in the smallest possible form
+    python3 scripts/plan_source_rename.py --selftest || exit 1   # T-176/D-3048: the OWNER-LANE RENAME PLAN's known-answer controls - a marker-named file carrying author/title/year of its own is planned in the owner's format, a name the cache resolves is REFUSED as the T-172 cascade, a file with no author or no title in any declared source is refused and never named from its filename, an author that is a tool or a scanner is refused, a proposed name already taken is refused, a kind with no declared metadata source is refused by name, an absent year omits the segment and is counted, a bare run writes NOTHING (the single write call site sits behind --plan, proved by reading its own bytes), the sanitiser decodes an entity and trims a dangling separator, the planner names no path/template/pattern of its own (C12), and its FREE/COUPLED split equals the census reader's over the same library (a control nothing runs is a comment, BUG-492)
     python3 scripts/normalise_corpus_names.py --selftest || exit 1   # T-130 (owner word 2026-10-15): the CORPUS-NAME rename's controls - the whitespace transform must leave the DOOR's own _key() IDENTICAL, a rename onto an existing file is refused, a rename that changed one byte is rolled back, a CONTENT reference inside a derived artifact is counted (a filename-only census read a false green - BUG-798), and an untouched cache record must never be reformatted (D-2642)
     python3 scripts/normalise_corpus_names.py --census || [ $? -eq 2 ]   # T-130: the standing corpus-name debt + the CASCADE census. 2 = OWNER-OWED, loud not fatal (BUG-457). MEASURED 2026-10-15: 37 stems, each referenced ~80 times INSIDE 13 derived run-receipt artifacts (2,952 content refs; the parquet export alone holds 2,419), so the approved rename REFUSES to apply until it rides a re-ingest - a rename that leaves a dangling reference is a cascade (BUG-800)
     python3 scripts/owner_marks.py --selftest || exit 1
@@ -583,3 +585,24 @@ retire-dry:
 # 0 nothing is open | 1 a journal fault | 2 an OPEN run past its DECLARED budget (loud, not fatal, BUG-457).
 delegates:
     @python3 scripts/delegate_journal.py status --all
+
+# --- 2026-10-16: the SOURCE LIBRARY (T-176/D-3048) and the harness-home WRITER ---
+# The writer's home MOVED in T-175/D-3046 (agent/adapters/goose/) and the ladder comment that taught the old
+# path kept teaching it, so the owner's command failed with `No such file or directory` (BUG-861). A command a
+# human is told to run belongs in an OPERATOR LANE, where scripts/resolve_route.py CHECKS it against the recipe
+# so a stale path is a fault and never a surprise (T-164/BUG-837). Dry-run is the default: this writes nothing.
+provider-flip:
+    python3 agent/adapters/goose/apply_provider_flip.py --dry-run
+
+# What the OWNER's library holds and costs: the name classes, the FREE/COUPLED split (T-176). READ-ONLY.
+source-names:
+    python3 scripts/census_source_names.py --census
+
+# ONE WORK, HOW MANY MATERIALISATIONS: the two homes, their drift and their one-sided counts (D-3048).
+arrangement:
+    python3 scripts/census_source_names.py --arrangement
+
+# The RENAME PLAN the owner's word asked for: writes governance/SOURCE_RENAME_PLAN_<date>.md (+ .json).
+# It renames NOTHING; the act that applies it is separate and owner-worded (T-176).
+rename-plan:
+    python3 scripts/plan_source_rename.py --plan

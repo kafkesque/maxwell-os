@@ -51,6 +51,12 @@ CONTROL_LABELS = (
     "an_unreadable_root_is_FATAL_and_never_a_zero",
     "a_name_that_the_cache_already_resolves_is_counted_as_ingest_coupled",
     "the_census_reads_its_roots_from_the_declaration_and_names_none_of_its_own",
+    "a_work_in_both_homes_with_DIFFERENT_bytes_is_counted_as_DRIFT",
+    "a_work_in_both_homes_with_EQUAL_bytes_is_NOT_drift",
+    "a_work_in_ONE_home_only_is_counted_as_one_sided_and_never_as_drift",
+    "a_work_materialised_twice_inside_one_home_is_counted_as_a_second_materialisation",
+    "drift_ABOVE_the_declared_ceiling_is_FATAL_and_a_reading_within_it_is_loud_NOT_fatal",
+    "the_arrangement_reader_names_no_home_path_of_its_own",
 )
 
 
@@ -186,6 +192,126 @@ def report(rep: dict[str, Any], stream: Any = sys.stdout) -> None:
         print(f"    e.g. {name[:110]}", file=stream)
 
 
+def _digest(path: Path) -> str:
+    """SHA-256 of a file's bytes - computed only where two homes hold the same work at the same size."""
+    import hashlib
+
+    h = hashlib.sha256()
+    with path.open("rb") as fh:
+        for block in iter(lambda: fh.read(1 << 20), b""):
+            h.update(block)
+    return h.hexdigest()
+
+
+def arrangement(pol: dict[str, Any] | None = None, corpus_root: Path | None = None) -> dict[str, Any]:
+    """The ARRANGEMENT reading (T-176/D-3048): one work, how many materialisations, and do they agree?
+
+    This is the reading the owner's question ("do books get copied into the S0 tree, and will sorting them into
+    topic folders duplicate them?") can be answered with. It counts, through the DOOR'S OWN comparison key:
+
+      * `library_files` / `corpus_files` - what each home holds, by the declared kinds;
+      * `keys_in_both` - works that exist in BOTH homes (a second materialisation);
+      * `byte_equal` / `byte_different` - of those, how many agree byte-for-byte and how many DISAGREE (drift);
+      * `library_only` / `corpus_only` - the honest one-sided counts (a corpus row with no library twin is not drift);
+      * `duplicated_within_a_home` - one key materialised MORE THAN ONCE in the SAME home.
+
+    A work whose bytes disagree between two homes is DRIFT, and it is counted rather than argued (a copy is not a
+    view: two files that were equal the day they were made are two files the day after). rc 2 = drift present and
+    above the declared ceiling (loud, owner-owed, BUG-457); 1 = FATAL (an undeclared or unreadable home).
+    """
+    doc = pol or policy()
+    declared = (doc.get("source_library") or {}).get("arrangement")
+    if not isinstance(declared, dict):
+        raise CensusError(f"FATAL: {POLICY}#source_library.arrangement is not declared - the homes this reading "
+                          f"compares are a declaration, never a guess (C12)")
+    home = str(declared.get("corpus_home") or "")
+    if not home:
+        raise CensusError(f"FATAL: {POLICY}#source_library.arrangement.corpus_home is not declared (C12)")
+    corpus = Path(corpus_root) if corpus_root else (_PROJECT_ROOT / home)
+    if not corpus.is_dir():
+        raise CensusError(f"FATAL: the declared corpus home does not exist: {corpus} (D-795: absent is not zero)")
+
+    def index(base: Path, kinds: set[str] | None) -> dict[str, list[Path]]:
+        out: dict[str, list[Path]] = {}
+        for path in sorted(base.rglob("*")):
+            if not path.is_file() or path.name.startswith("."):
+                continue
+            if kinds is not None and path.suffix.lower() not in kinds:
+                continue
+            out.setdefault(sanitize_source_book(path.stem).strip().lower(), []).append(path)
+        return out
+
+    library: dict[str, list[Path]] = {}
+    for root in roots(doc):
+        for key, paths in index(root["path"], root["kinds"]).items():
+            library.setdefault(key, []).extend(paths)
+    corpora = index(corpus, None)
+
+    both = sorted(set(library) & set(corpora))
+    equal, different, pairs_only = 0, [], 0
+    for key in both:
+        shared = {p.suffix.lower() for p in library[key]} & {p.suffix.lower() for p in corpora[key]}
+        if not shared:
+            # The same work in two CONTAINERS (an .epub and the .md converted from it) can never be byte-equal.
+            # Counting that as drift would be a false positive of the kind this repository refuses: the two files
+            # are not two copies of one artefact, they are one work in two formats (MEASURED 2026-10-16: the naive
+            # same-key reading called 826 works drifted, while the kind-matched reading is the number below).
+            pairs_only += 1
+            continue
+        agrees = any(
+            a.suffix.lower() == b.suffix.lower() and a.stat().st_size == b.stat().st_size and _digest(a) == _digest(b)
+            for a in library[key] for b in corpora[key])
+        if agrees:
+            equal += 1
+        else:
+            different.append(key)
+    # ONE WORK, HOW MANY FILES: grouped by KIND, because the format axis legitimately holds one file per kind.
+    within: dict[str, int] = {}
+    for key, paths in library.items():
+        seen: dict[str, int] = {}
+        for path in paths:
+            seen[path.suffix.lower()] = seen.get(path.suffix.lower(), 0) + 1
+        within[key] = max(seen.values())
+    twice = {k: n for k, n in within.items() if n > 1}
+    twice_corpus = {k: len(v) for k, v in corpora.items() if len(v) > 1}
+    ceiling = declared.get("drift_ceiling")
+    return {
+        "library_files": sum(len(v) for v in library.values()),
+        "corpus_files": sum(len(v) for v in corpora.values()),
+        "corpus_home": str(corpus),
+        "keys_in_both": len(both),
+        "byte_equal": equal,
+        "byte_different": len(different),
+        "drift_examples": different[:5],
+        "format_pairs_only": pairs_only,
+        "library_only": len(set(library) - set(corpora)),
+        "corpus_only": len(set(corpora) - set(library)),
+        "same_kind_twice_in_the_library": len(twice),
+        "same_kind_twice_in_the_corpus": len(twice_corpus),
+        "drift_ceiling": ceiling if isinstance(ceiling, int) else None,
+        # THE RULING, in one place: no drift is rc 0; drift WITHIN the declared ceiling is rc 2 (owner-owed, loud,
+        # NOT fatal - BUG-457); drift ABOVE it is FATAL, because the ceiling is SHRINK-ONLY (D-3023/D-2644) and a
+        # reading that grows past it means a disposition REGRESSED. A ceiling that could not fire would be a comment.
+        "rc": (RC_OK if not different else
+               RC_FATAL if isinstance(ceiling, int) and len(different) > ceiling else
+               RC_OWNER_OWED),
+    }
+
+
+def report_arrangement(rep: dict[str, Any], stream: Any = sys.stdout) -> None:
+    """Print the arrangement reading: two homes, one work, how many files, and how far they have drifted apart."""
+    print(f"arrangement: {rep['library_files']} library file(s) vs {rep['corpus_files']} in the bytes home "
+          f"({rep['corpus_home']})", file=stream)
+    print(f"  the same work in BOTH homes: {rep['keys_in_both']} | agreeing byte-for-byte {rep['byte_equal']} | "
+          f"DRIFTED (same kind, different bytes) {rep['byte_different']} (ceiling {rep['drift_ceiling']}) | "
+          f"one work in two containers (never byte-equal, NOT drift): {rep['format_pairs_only']}", file=stream)
+    print(f"  one home only: library {rep['library_only']} | corpus {rep['corpus_only']}", file=stream)
+    print(f"  one work as TWO files of the SAME kind: library {rep['same_kind_twice_in_the_library']} | "
+          f"corpus {rep['same_kind_twice_in_the_corpus']}  <- this is what a topic COPY would create", file=stream)
+    for key in rep["drift_examples"]:
+        print(f"    e.g. {key[:110]}", file=stream)
+
+
 def selftest() -> int:
     """Known-answer controls over synthetic roots and a synthetic cache in a temp dir (BUG-577)."""
     import tempfile
@@ -240,6 +366,48 @@ def selftest() -> int:
         own = Path(__file__).resolve().read_text(encoding="utf-8")
         if re.search(r"['\"]~/", own):
             mark(CONTROL_LABELS[4], "the census restates a root path of its own")
+
+        # ── the ARRANGEMENT reading (T-176/D-3048), over two synthetic homes ─────────────────────────────────
+        corpus_root = Path(tmp) / "corpus"
+        corpus_root.mkdir(parents=True)
+        (root / "Same Work.epub").write_text("identical", encoding="utf-8")
+        (corpus_root / "Same Work.epub").write_text("identical", encoding="utf-8")
+        (root / "Drifted Work.epub").write_text("one version", encoding="utf-8")
+        (corpus_root / "Drifted Work.epub").write_text("a DIFFERENT version", encoding="utf-8")
+        (root / "Format Pair.epub").write_text("container one", encoding="utf-8")
+        (corpus_root / "Format Pair.md").write_text("container two", encoding="utf-8")
+        (root / "Library Only.epub").write_text("x", encoding="utf-8")
+        (corpus_root / "Corpus Only.md").write_text("x", encoding="utf-8")
+        (root / "Dup.epub").write_text("x", encoding="utf-8")           # the same work, twice in ONE home
+        (root / "sub").mkdir()
+        (root / "sub" / "Dup.epub").write_text("x", encoding="utf-8")
+        block = pol["source_library"]
+        block["arrangement"] = {"corpus_home": "corpus", "drift_ceiling": 0}
+        arr = arrangement(pol, corpus_root=corpus_root)
+        if arr["byte_different"] != 1 or not arr.get("drift_examples"):
+            mark(CONTROL_LABELS[5], f"drift counted {arr['byte_different']}, expected 1 (and to be named)")
+        if arr["byte_equal"] != 1 or arr["format_pairs_only"] != 1:
+            mark(CONTROL_LABELS[6], f"an equal pair counted as drift, or a format pair counted as drift "
+                                    f"(byte_equal={arr['byte_equal']}, format_pairs_only={arr['format_pairs_only']}, "
+                                    f"expected 1/1)")
+        if arr["library_only"] < 2 or arr["corpus_only"] != 1:
+            mark(CONTROL_LABELS[7], f"one-sided counts were {arr['library_only']}/{arr['corpus_only']}, expected >=2/1")
+        if arr["same_kind_twice_in_the_library"] != 1 or arr["same_kind_twice_in_the_corpus"] != 0:
+            mark(CONTROL_LABELS[8],
+                 f"a key materialised twice inside one home was not counted "
+                 f"({arr['duplicated_within_the_library']}/{arr['duplicated_within_the_corpus']})")
+        leaked = [tok for tok in ("~" + "/Library/CloudStorage", "knowledge " + "pipeline/books") if tok in own]
+        if leaked:
+            mark(CONTROL_LABELS[10], f"the reader restates a home path of its own: {leaked}")
+
+        # (10) the CEILING fires: 1 drifting pair against a ceiling of 0 is FATAL; within its ceiling it is loud
+        # and NOT fatal - the same pair of readings BUG-457 draws, seen in BOTH directions.
+        if arr["rc"] != RC_FATAL:
+            mark(CONTROL_LABELS[9], f"drift above a ceiling of 0 read rc {arr['rc']}, expected the FATAL code")
+        block["arrangement"]["drift_ceiling"] = 5
+        within = arrangement(pol, corpus_root=corpus_root)
+        if within["rc"] != RC_OWNER_OWED:
+            mark(CONTROL_LABELS[9], f"drift within its ceiling read rc {within['rc']}, expected OWNER-OWED")
     failed = {label for label, _ in failures}
     for label in CONTROL_LABELS:
         print(f"  {'FAIL' if label in failed else 'ok  '} {label}")
@@ -252,20 +420,25 @@ def selftest() -> int:
 
 
 def main(argv: list[str] | None = None) -> int:
-    """CLI: (default) the census | --json | --selftest."""
+    """CLI: (default) the name census | --arrangement | --json | --selftest."""
     parser = argparse.ArgumentParser(description="The owner's source library, read as a name census (read-only).")
+    parser.add_argument("--census", action="store_true", help="the name census (the default reading)")
+    parser.add_argument("--arrangement", action="store_true",
+                        help="the ARRANGEMENT reading: one work, how many materialisations, and their drift")
     parser.add_argument("--json", action="store_true")
     parser.add_argument("--selftest", action="store_true")
     args = parser.parse_args(argv)
     if args.selftest:
         return selftest()
     try:
-        rep = census()
+        rep = arrangement() if args.arrangement else census()
     except CensusError as exc:
         print(str(exc), file=sys.stderr)
         return RC_FATAL
     if args.json:
         print(json.dumps(rep, indent=2, ensure_ascii=False))
+    elif args.arrangement:
+        report_arrangement(rep)
     else:
         report(rep)
     return int(rep["rc"])

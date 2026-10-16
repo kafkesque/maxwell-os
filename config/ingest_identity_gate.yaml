@@ -239,3 +239,67 @@ source_library:
   #: name from the file's OWN metadata (never from a guess), and must REFUSE on a name the cache or the corpus
   #: already resolves (that one is ingest-coupled: T-172's shape). Nothing renames the owner's library by default.
   accepted_negative: 'no default renamer: a bulk rename of the owner library is refused, because a name is evidence (a provenance handle including which mirror it came from) and never identity, and the pipeline reads identity from the TEXT and the BYTES (S0.5 metadata + the door key)'
+  # ── T-176 / D-3048: THE OWNER'S ANSWER, AND THE ONLY WAY A NAME MAY BE REPAIRED ──────────────────────────────
+  # The owner answered on 2026-10-16: human-readable names ARE wanted, in the format below. That answer turns the
+  # accepted negative above into a NARROW yes: a name may be repaired ONLY where it carries no reference yet, ONLY
+  # from the file's OWN embedded metadata, and NEVER by a bulk renamer. Everything this block does not authorise
+  # stays refused, and the refusal is COUNTED rather than silent (D-3038: a rejected idea is registered with its
+  # reason so it cannot be re-proposed as a surprise).
+  name_policy:
+    owner_word: '2026-10-16 (verbatim): "yes I would prefer rename to only include author - title - year format"'
+    template: '{author} - {title} - {year}'
+    when_year_absent: omit_the_year_segment_and_count_the_row
+    author_form: 'the creators as the metadata spells them, joined by "; " - a list is carried, never truncated to one and never invented'
+    #: The ORDER is the policy, and every entry is a source the FILE ITSELF carries. The S0.5 metadata cache is
+    #: deliberately NOT here: a row the cache resolves is ingest-COUPLED and is refused before any name is proposed,
+    #: so in this act the cache is the DISQUALIFIER and never a source (declaring it as a source would be a source
+    #: no eligible row could ever reach - a promise, not a measurement). A model is not a source either, ever.
+    metadata_priority: [epub_opf, pdf_info]
+    #: Which reading each KIND admits. A kind with no entry here carries no metadata this act may read, so its rows
+    #: are REFUSED by name rather than renamed from the filename (the filename is the defective handle, not evidence).
+    kind_sources:
+      epub: epub_opf
+      pdf: pdf_info
+    sanitiser:
+      collapse_whitespace: true
+      unicode_form: NFC
+      decode_html_entities: true
+      drop_characters: ['/', '\\', ':', '\n', '\r', '\t', '\u0000']
+      separator: ';'
+      separator_spacing: true
+      collapse_repeated_separators: true
+      trim_trailing: '[-_.;, ]'
+      max_segment_chars: 120
+      max_name_bytes: 200
+      extension_preserved: true
+    implausible_author_pattern: '(?i)^\s*(bsmoter|adobe|microsoft|scanner|unknown|user|administrator|admin|guest|sponsored(\s+by)?|www\.|https?://)'
+    refusals:
+      already_resolved_by_an_ingest: 'the S0.5 cache resolves this name, so a rename here is a re-ingest act (T-172/BUG-800 shape) - it rides the next ingest window, never this one'
+      no_metadata_in_a_declared_source: 'no source in metadata_priority supplied BOTH an author and a title - a name is never invented, and a filename is not a source'
+      author_is_not_an_author: 'the author field matches implausible_author_pattern (a tool, a scanner or a URL) - the metadata is about whoever made the file, not the work'
+      proposed_name_already_exists: 'the proposed name is taken on disk or by another row of this plan - a rename may never land on an existing file'
+      referenced: 'a declared surface names this file and this act cannot rewrite it - a rename that leaves a dangling reference is a cascade (BUG-798)'
+      kind_has_no_declared_metadata_source: 'this kind has no entry in kind_sources, so the act may not read its metadata'
+    reference_surfaces: 'config/ingest_identity_gate.yaml#name_normalisation.surfaces (the SAME declared surfaces the corpus-name act counts - one list, never a second)'
+    plan_prefix: governance/SOURCE_RENAME_PLAN_
+    reading: scripts/plan_source_rename.py
+    ladder: 'python3 scripts/plan_source_rename.py --selftest -> 0/1; --plan writes the plan (a READ of the library plus one file); a bare run PRINTS and writes nothing'
+  # ── THE ARRANGEMENT (T-176): WHERE A WORK LIVES, AND WHY A TOPIC IS NEVER A COPY ────────────────────────────
+  arrangement:
+    authority: D-3048
+    one_bytes_home: 'knowledge pipeline/books - the ONE tree S0 reads and the ONE tree the S0.5 cache stamps (MEASURED: every cache record source_path lands inside it)'
+    corpus_home: 'knowledge pipeline/books'
+    compare_key: "the door's OWN comparison key (pipeline/book_metadata.sanitize_source_book) - two homes resolve to one work only through the key the pipeline itself uses"
+    #: MEASURED 2026-10-16 (D-3048): of the corpus stems, most also exist in the reading view and only a minority
+    #: of those pairs are byte-identical - the same work under the same name with DIFFERENT bytes. That is the
+    #: duplicate hazard this repository actually has, and it is not caused by the names: it is caused by TWO
+    #: MATERIALISATIONS of one work. A topic copy would make it a THIRD. The ceiling below is set from the reader's
+    #: own live reading (a measurement plus one declared slot), and it is SHRINK-ONLY (D-3023/D-2644).
+    drift_ceiling: 727   # MEASURED 2026-10-16 by the reader itself; SHRINK-ONLY (D-3023/D-2644)
+    library_is_a_view: 'the library is the owner READING surface; it holds the bytes of works the corpus does not hold yet (the un-ingested originals) and a reading view of the rest, and it is never a second authority'
+    format_is_the_physical_axis: 'the library separates by FORMAT (books/epub, books/pdf, books/md, journals:notes) - format is what decides how a file is read, so it is the one axis a physical layout carries'
+    topic_is_a_derived_view: 'topic is the pipeline own DOMAIN (already materialised once, in the corpus) or a facet of the catalogue - a facet is DERIVED and printed, never materialised as a copy'
+    no_topic_copies: 'a copied work is two works to every reader that joins by path (BUG-780: 530 rows, one text under two names) and it doubles storage and sync for zero new identity'
+    no_links_in_the_library: 'the library lives inside Dropbox (APFS, MEASURED 2026-10-16: /System/Volumes/Data, APFS); an APFS CLONE would share bytes locally and still be uploaded as a second file by the provider, and a symlink is not what the provider syncs - so neither is the mechanism, a GENERATED view is'
+    view_rule: 'a view is GENERATED from the bytes home or it is not a view; the generator is declared before any view is materialised (none is declared yet, and that is a declaration rather than a silence)'
+    drift_reading: 'python3 scripts/census_source_names.py --arrangement: the same work in two homes with DIFFERENT bytes is drift, counted and printed, never invisible'

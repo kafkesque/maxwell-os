@@ -170,12 +170,20 @@ def _cache_surface(cfg: dict[str, Any], stem: str, name: str, cache_dir: Path | 
 
 
 def _stage_surface(dirs: list[tuple[str, Path]], stem: str) -> dict[str, Any]:
-    """Stage outputs whose FILENAME carries the old stem. The act CANNOT rewrite these: a hit refuses."""
+    """Stage outputs whose FILENAME carries the old stem. The act CANNOT rewrite these: a hit refuses.
+
+    BUG-860 (MEASURED 2026-10-16): the pattern `*{stem}*` is a GLOB, so a stem that carries a glob
+    metacharacter made `rglob` raise `ValueError: Invalid pattern: '**'` instead of returning a count - two
+    rows of the owner library begin with `*`. `glob.escape` makes the name a name again: a reference census
+    that CRASHES on the row it was asked about is a census that cannot refuse it (C16).
+    """
+    import glob as _glob
+
     total, where = 0, []
     for attr, root in dirs:
         if not root.exists():
             continue
-        for child in root.rglob(f"*{stem}*"):
+        for child in root.rglob(f"*{_glob.escape(stem)}*"):
             total += 1
             if len(where) < 5:
                 where.append(f"{attr}/{child.name}"[:90])

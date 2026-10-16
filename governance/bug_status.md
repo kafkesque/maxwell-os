@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**226 open** / 396 closed of 622 ids.
+**227 open** / 399 closed of 626 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -233,3 +233,4 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-854 | (LOW — OPEN 2026-10-16) — agent/adapters/goose/apply_provider_flip.py hardcodes the two values of its own safe phase, and the thinking-effor | 1 |
 | BUG-857 | (MED — OPEN 2026-10-16) — governance/buglog.md could be APPENDED TO and never QUERIED: no artifact computed which findings share a shape, so | 1 |
 | BUG-858 | (MED — OPEN 2026-10-16) — governance/buglog.md carries NO entry for BUG-492, the most-cited rule in this repository: 128 files cite it (53 l | 1 |
+| BUG-862 | (MED — OPEN 2026-10-16) — scripts/census_source_names.py now measures TWO MATERIALISATIONS of one work and config/ingest_identity_gate.yaml  | 1 |

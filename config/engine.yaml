@@ -103,6 +103,74 @@ fanout:
   default_max_tokens: 512
   excerpt_bytes: 24000
   verify_with_another_family: true     # R5: the verifier may never be the generator
+
+  # ── THE SUB-AGENT RECIPE VOCABULARY (approved by the owner 2026-10-17). A RECIPE answers three questions and
+  # ── nothing else: WHAT it asks for (shape), WHICH axis model serves it (a POINTER into
+  # ── config/model_assignments.yaml#harness_roles - never a model name here), and HOW we know it FINISHED
+  # ── (done_check: a command whose EXIT CODE decides). THE ONE RULE: a loop may run with NO human in it only when
+  # ── done_check RESOLVES; human_free: true with done_check: null is REFUSED by the runner
+  # ── (pipeline/subagent_recipe.py), because an LLM judging an LLM is not a verifier (R5). A recipe that cannot
+  # ── yet be run declares what it OWES instead of pretending (D-3038).
+  task_recipes:
+    review-artifact:
+      question: >-
+        Review the artefact {target}. Report the DEFECTS you can point at, each one as <file>:<line> followed by
+        the reasoning that says what is WRONG there. A list of locations with no claim about them is not a review.
+      shape: review
+      model_role: AGENT_LOOP_SHORT
+      mode: oneshot
+      max_tokens: 900
+      done_check: 'python3 pipeline/subagent_fanout.py verify --run {run} --model {model} --out {out}'
+      human_free: true
+    read-and-report:
+      question: >-
+        Read {target} and report what it CONTAINS as an inventory: every item you name must carry its
+        <file>:<line>. Make no claim beyond what the bytes say.
+      model_role: PROBE_S2
+      mode: oneshot
+      max_tokens: 700
+      done_check: 'python3 pipeline/subagent_fanout.py citations --answer {answer}'
+      human_free: true
+      caveat: 'a TRUE listing is not an answer to a question that needs a claim - use it only where an inventory IS the deliverable'
+    summarize-with-source:
+      question: >-
+        Summarise {target} USING ONLY ITS OWN TEXT, and cite the span each sentence comes from as <file>:<line>.
+        If the file does not support a statement, do not make it.
+      model_role: PROBE_S2
+      mode: oneshot
+      max_tokens: 700
+      done_check: 'python3 pipeline/subagent_fanout.py citations --answer {answer}'
+      human_free: true
+    draft-then-verify:
+      question: >-
+        Change {target} so that it does what this asks: {question_extra}. Return the COMPLETE edited file.
+      model_role: AGENT_TOOL_SHORT_ONESHOT
+      mode: oneshot
+      max_tokens: 1200
+      done_check: 'python3 scripts/r5_review_gate.py --file {file} --no-llm'
+      human_free: true
+      note: 'human-free ONLY on the DETERMINISTIC layers (syntax, lint, C11/C12). The advisory reviewer verdict is recorded beside it and is never the decider (R5).'
+    measure-two-point:
+      question: >-
+        Run the measurement for {target} TWICE under the same conditions and report BOTH readings with the
+        exact command each came from, then their ratio.
+      model_role: AGENT_LOOP_SHORT
+      mode: oneshot
+      max_tokens: 600
+      done_check: null
+      human_free: false
+      owed: 'a slope reader: the two receipts exist (scripts/measure_subagent_loop.py writes one per model) but no command yet computes their ratio and refutes/accepts it. Until that command exists this recipe is NOT runnable - and it says so rather than borrowing confidence.'
+    grind-a-register:
+      question: >-
+        Apply the ACCEPTED rows of {target}. Dry-run first; refuse a row the plan does not carry.
+      model_role: null
+      mode: oneshot
+      max_tokens: 400
+      done_check: null
+      human_free: false
+      owed: 'the T-183 admit applier (plan-keyed, dry-run default, receipted) does not exist yet; a register grind is owner-gated BY CONSTRUCTION, so it is never human-free.'
+
+
   guards:                              # D-3020 (BUG-809): a delegation that cannot finish must SAY SO
     default_timeout_s: 120             # measured oneshot: 0.4-17 s, so 120 s is 7x the slowest ever seen
     agent_timeout_s: 600               # `goose run -t` holds tools; the only mode that earns minutes

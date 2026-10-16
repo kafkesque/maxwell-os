@@ -45,6 +45,30 @@
 - WHAT WE REJECT WE REGISTER (D-3038). A rejected idea is recorded WITH ITS REASON so it cannot be re-proposed; an accepted negative ("we deliberately do NOT do X, and here is why") is a first-class decision, not a silence.
 </working_rules>
 
+<!-- HARNESS FACTS — MEASURED 2026-10-17 (BUG-873). Not advice: readings taken from this machine, each with the
+     reading that re-takes it. A line may be added here only together with its receipt. -->
+<harness_facts>
+- **A CONFIG WRITE IS NOT LIVE UNTIL A NEW SESSION STARTS.** MEASURED from
+  `~/.local/share/goose/sessions/sessions.db#sessions.extension_data`: session 20261012_1 (born 2026-10-12,
+  13,036 messages, still being written on 2026-10-16) carries NO YouTube extension while that extension is
+  `enabled: true` in the config; every session BORN from 2026-10-13 onward carries it. A resumed or continued
+  session — and every delegated subagent session — keeps the tool surface it was BORN with. To prove an extension
+  change, start a NEW session (`goose run`); the current one can never show it.
+- **A DEAD EXTENSION REPORTS TO THE TERMINAL, NEVER TO THE SESSION.** MEASURED two-sided with
+  `goose run --with-extension '<deliberately broken>'`: the harness prints
+  `Warning: Failed to start extension '<name>' ... continuing without it` plus a hint BEFORE the session starts,
+  and NOTHING enters the conversation. An agent therefore cannot tell a dead extension from a capability that never
+  existed, and a resumed session does not even reprint the banner. `reddit` failed this way in EVERY session
+  (`ModuleNotFoundError: An HTTP transport library needs to be installed.`) while declared `enabled: true`;
+  repaired 2026-10-17.
+- **BEFORE ANY DELEGATE OR AGENT RELIES ON A TOOL, READ THE SURFACE — DO NOT ASSUME IT.** The reading is
+  `sqlite3 "file:$HOME/.local/share/goose/sessions/sessions.db?mode=ro" "select extension_data from sessions
+  where id='<session-id>'"`: it holds the surface that session was GIVEN, under the key `enabled_extensions.v0`.
+  A session born before 2026-10-13 has NO such key and must be reported **NOT RECORDED** — never "absent" (a
+  substring search inside those older blobs is contaminated by quoted todo prose). The model side has the same
+  shape and its own reading: `python3 scripts/agent_context_probe.py` (served vs declared, fail-closed).
+</harness_facts>
+
 <!-- BOOT SEQUENCE -->
 <boot>
 1. Read CONSTITUTION.md

@@ -174,3 +174,65 @@ exactly what this project forbids. **Adopted: the order-rotation PROBE as a rail
 `7d83b04` BUG-870 retracted + BUG-871 filed · `1b5dfee` BUG-871 fixed · `3dbff10` D-3038 register (AnyJev +
 title + Hermes) · `75ea576` BUG-872 fixed + doctrine corrected · `b461306`/`3f39dcd` receipts ·
 `67adf87` AnyJev revised + BUG-873 filed · plus the BUG-874 act.
+
+## 1c. SPINE UPDATE - 2026-10-17, FOURTH SITTING (append-only; nothing above is rewritten)
+
+**THE THREE MANUAL STEPS ARE DONE, and each one left a reading.**
+1. **BUG-874's parity act, executed through MEASUREMENT, not through a typed list.**
+   `scripts/agent_context_probe.py` read `FAIL agent-context: 6 declared fault(s)` (3 served-but-undeclared:
+   MiniCPM5-2B-MLX, Ornith-1.5-35B-A3B-REAP-19B, Ornith-1.5-9B-MLX-8bit; 3 declared-but-never-served:
+   Qwen3.5-9B-4bit, gemma-4-31B-it-MLX-8bit, gpt-oss-20b-MXFP4-Q4). The goose provider file's `#models` was then
+   RE-DERIVED from the live `/v1/models` reading and now holds exactly the EIGHT SERVED models with their served
+   windows; the SAME probe prints `ok agent-context: the four layers agree`. **None of the three ghost models is
+   present on this machine** (no `~/.omlx/models` directory, no hub repo; `Qwen3.5-9B-4bit` exists only as
+   `Qwen3.5-9B-MLX-4bit/-8bit`, downloaded and never served). Backups: `maxwell_omlx.json.bak.20261017003537`.
+   The residual is NAMED: the model list has no declared writer (`apply_provider_flip.py` binds the provider and
+   the agent-loop model but does not render `#models`), so a writer is owed and the probe is the current guard.
+2. **AGENTS.md now carries the two harness facts** (measured, with the reading that re-takes each) plus the rule
+   that an agent must read the session's own surface instead of assuming it: a config write is not live until a
+   NEW session starts; a dead extension reports to the terminal and never to the session.
+3. **The extension sweep, whole set** (receipt `temp/plugin_health_20261017.md/.json`): 26 declared, 19 enabled,
+   **18 WORKING / 3 DEAD / 4 NOT-A-TOOL-EXTENSION / 1 UNTESTABLE**. Both repairs were MEASURED before being
+   written: `reddit` needs `--with httpx` (2 tools), `pdfreader` needs `--with mcp<2` (1 tool, left DISABLED -
+   available on demand, not resident). `scheduler` is the third dead one and the worst kind: an ENABLED bundled
+   platform extension that contributes ZERO tools and emits NO error, absent from the surface in 12/12 sessions -
+   NAMED, not flipped, because what it could contribute to a CLI harness is unmeasured.
+
+**THE D-2549 MEASUREMENT EXISTS AND IT REFUTED TWO DECLARED BASES.** `scripts/measure_subagent_loop.py` (new;
+served set, base_url, key and the 90 s per-turn budget all read from their declared homes) runs ONE fixed 3-call
+tool loop against EVERY served model: **7/8 PASS** (MiniCPM5-2B 2.1 s | Ornith-35B 8.3 s | Ornith-9B 11.5 s |
+gemma-4-E4B 14.3 s | gpt-oss-20b-Q8 18.5 s | Qwen3.8-27B 50.2 s | Qwen3-Coder-30B 79.9 s slowest turn, budget
+90 s). `Phi-4-mini-instruct-8bit` FAILS with ZERO tool calls (it answered from memory - BUG-053's shape, now
+measured on a loop). Consequence: two `never_for` strings in model_assignments.yaml were FALSE as written and are
+corrected (gpt-oss-20b drove a loop correctly; Phi-4 must never drive one). This retires the claim that only
+gemma-4-E4B can drive a loop.
+
+**THE APPROVED RECIPE VOCABULARY IS DECLARED AND ITS RUNNER REFUSES THE DANGEROUS SHAPE.**
+`config/engine.yaml#fanout.task_recipes` declares six recipes (review-artifact, read-and-report,
+summarize-with-source, draft-then-verify, measure-two-point, grind-a-register), each with a shape, a model ROLE
+(pointer, never a name) and a DONE CHECK. `pipeline/subagent_recipe.py --list` resolves all six; the two whose
+decider does not exist yet are marked `human_free: false` with what they OWE named - and the runner REFUSES
+`human_free: true` with no done_check, because an LLM judging an LLM is not a verifier (R5). Controls: 6/6 and
+5/5 known-answer; ruff clean.
+
+**BUG-773 LIMB (b), TERMINATED BY TEST.** On a temp DB built from the LIVE `fbs` DDL: `INSERT OR REPLACE`
+destroys the body (ROUTE 1, reproduced on demand), the S5-scoped `UPDATE` preserves it (ROUTE 2), and the live
+`update_s5_provenance()` refused a diverged row aloud (ROUTE 3). Live `commit_scope` reads
+**verification_scoped**, so **the contradiction is NOT LIVE**. What remains is real and narrower: `full_upsert` is
+an unguarded escape route, and `content_basis` still has no writer.
+
+**THE SIX OWNER-LANE ROWS ARE MOVED, WITH THE WORD RECORDED HERE.** T-181 (a note is a first-class kind with a
+declared share of the ONE corpus root), T-183 (the applier as declared), T-180 (limbs 1-2, incl. the inbox pen),
+T-176 (accept the 122 ELIGIBLE rows), T-179 (the corpus is the direction of truth; retire the library .md twins),
+T-182 (register the legacy vocabulary SUPERSEDED) - all six now carry `mover: pipeline` and a gate that states the
+pipeline-side act, and the disposition word given on 2026-10-17 is recorded in `governance/session_plan_20260924.yaml`'s
+widening_log (owner_ack verbatim). `check_governance_faces` confirms 0 owner-moved rows remain.
+
+**MARKET SWEEP (read-only, 23 searches, every third-party claim carrying its URL):**
+`temp/PLUGIN_SURVEY_20261017.md` (20.6 KB). ADOPT: ruff+mypy as the rail C17 has never had. TRIAL: `ripwire`
+(pinned, read-only - aimed at the MEASURED weakness in `engine.yaml#fanout.excerpt_bytes`, a byte budget rather
+than a relevance choice) and the goose catalog's own PDF Reader. REFUSE: the whole document-conversion and
+ebook/bibliography plugin classes (a second home beside S0's pandoc+Docling), the byte-equality dedupers (the
+wrong operator for T-179's 727 drifted works), and every local memory/knowledge MCP (a second home beside the
+knowledge layer). The gap honestly named: NO plugin covers the real work - the retriever wired into `just ask` is
+WIRING, not a download.

@@ -636,6 +636,40 @@ measured_prefill_20261016:
     reading at the floor is still climbing and is NOT comparable to a 26,214-token class bill. These rows
     are therefore recorded as READINGS, not as bills: no class route is changed by them (BUG-874).
 
+#: ── MEASURED 2026-10-17 (the BUG-874 act). The parity is now TRUE BY MEASUREMENT rather than a
+#: coincidence of two hand-edited files in two directories. Kept as a READING of that day, exactly as the
+#: 2026-10-14 block below is kept: the LIVE parity is re-derived by the probe on every run, never read from here.
+measured_20261017:
+  rail: >-
+    python3 scripts/agent_context_probe.py — the SAME command that read FAIL on 6 declared faults before the act
+    and "ok agent-context: the four layers agree" after it. That pair IS the red loop (D-3036): a named command,
+    RED on the defect and GREEN on the fix, both readings taken by the rail and not by this file.
+  before: [MiniCPM5-2B-MLX: unverifiable, Ornith-1.5-35B-A3B-REAP-19B: unverifiable,
+           Ornith-1.5-9B-MLX-8bit: unverifiable, Qwen3.5-9B-4bit: unverifiable,
+           gemma-4-31B-it-MLX-8bit: unverifiable, gpt-oss-20b-MXFP4-Q4: unverifiable]
+  act: >-
+    ~/.config/goose/custom_providers/maxwell_omlx.json#models was RE-DERIVED from the live /v1/models reading
+    (name + max_model_len, the bearer key read out of that same file): the 3 declared-but-never-served entries
+    REMOVED, the 3 served-but-never-declared ADDED. The file was backed up beside itself before the write
+    (maxwell_omlx.json.bak.20261017003537). No model name and no window was typed by hand.
+  declared_equal: true
+  served_and_declared: {MiniCPM5-2B-MLX: 131072, Ornith-1.5-35B-A3B-REAP-19B: 262144,
+                        Ornith-1.5-9B-MLX-8bit: 262144, Phi-4-mini-instruct-8bit: 32768,
+                        Qwen3-Coder-30B-A3B-Instruct-MLX-4bit: 32768, Qwen3.8-27B-MLX-4bit: 262144,
+                        gemma-4-E4B-it-MLX-4bit: 32768, gpt-oss-20b-MXFP4-Q8: 131072}
+  removed_and_why:
+    gpt-oss-20b-MXFP4-Q4: 'NOT PRESENT: no directory under ~/.omlx/models and no HuggingFace hub repo under that name'
+    Qwen3.5-9B-4bit: 'NOT PRESENT under that name; only hub repos Qwen3.5-9B-MLX-4bit / -8bit exist, and NEITHER is served'
+    gemma-4-31B-it-MLX-8bit: 'NOT PRESENT: no directory under ~/.omlx/models and no hub repo under that name'
+  added_and_why:
+    MiniCPM5-2B-MLX: "the engine's OWN default_model — served, and until today invisible to goose"
+    Ornith-1.5-35B-A3B-REAP-19B: 'served; stays BATCH_ONLY (model_assignments#harness_roles) - exposure is not a licence to drive it interactively'
+    Ornith-1.5-9B-MLX-8bit: 'served; stays BATCH_ONLY for the same measured reason'
+  still_owed: >-
+    the provider model LIST has no declared writer: agent/adapters/goose/apply_provider_flip.py binds the
+    provider and the agent-loop model but does not render #models, so this list stays hand-maintained and the
+    probe (which runs in the health ladder) is its only guard. A writer is owed - named, not silently assumed.
+
 measured_20261014:
   served: {Phi-4-mini-instruct-8bit: 32768, gemma-4-E4B-it-MLX-4bit: 32768,
            Qwen3-Coder-30B-A3B-Instruct-MLX-4bit: 32768, gpt-oss-20b-MXFP4-Q8: 131072,

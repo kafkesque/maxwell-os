@@ -259,7 +259,7 @@ _merged_at: 2026-07-08 20:31 UTC
 harness_roles:
   AGENT_LOOP_SHORT:
     model: gemma-4-E4B-it-MLX-4bit
-    basis: "T-131: the only served model ROUTABLE for agent_loop (54.7s against a 60s budget)"
+    basis: "T-131: the only served model ROUTABLE for agent_loop (54.7s against a 60s budget); RE-MEASURED 2026-10-17 by scripts/agent_context_probe.py: 455.0 tok/s prefill, working_set 26214 in 57.6 s against the class prefill_budget_s 60 - still the ONLY routable agent_loop model"
     also_best_at: "stability 0.7 - the highest measured, which is what an interactive loop needs"
     never_for: "code generation (humaneval 0.16) and long context (lc_reason 0.0)"
   AGENT_EDIT_LONG_CONTEXT:
@@ -274,14 +274,15 @@ harness_roles:
     model: MiniCPM5-2B-MLX
     basis: "adopted 2026-10-15: 110.1 tok/s decode, 66.7 tok/s prefill, TTFT 0.25s, load 1.26s at a 17-token prompt"
     unmeasured: "long-context prefill - BUG-805 forbids generalising a 17-token spot reading"
+    exposed_to_harness: "DECLARED in the goose provider file 2026-10-17 (the BUG-874 act): it is the engine's own default_model, it was SERVED all along and invisible to goose. Exposure changes what may be delegated to it, never what it is good at"
   CLASSIFIER_S4:
     model: gpt-oss-20b-MXFP4-Q8
     basis: "D2249 routing"
-    never_for: "tool calling - 0.0 measured, so it must never drive a tool loop"
+    never_for: "tool calling - the 2026-10-15 axis score reads 0.0; CORRECTED 2026-10-17 by scripts/measure_subagent_loop.py: on a fixed 3-call loop with one trivial tool it PASSED (3 calls, answer correct, 18.5 s slowest turn against a 90 s budget). The 0.0 is a CALL-FORMAT score and must not be read as a loop ban; what remains true is that a loop needing a long call-format chain is not this model's strength"
   PROBE_S2:
     model: Phi-4-mini-instruct-8bit
     basis: "D2319"
-    never_for: "open-ended research (BUG-053)"
+    never_for: "open-ended research (BUG-053) and ANY tool loop - MEASURED 2026-10-17 by scripts/measure_subagent_loop.py: 0 tool calls in 3 turns, it answered from memory instead of calling the tool. That is the BUG-053 shape, now measured on a loop: it is a summariser WITH source, never a sub-agent"
   STABILITY_FIRST:
     model: gemma-4-E4B-it-MLX-4bit
     basis: "stability 0.7, self-agreement 10/10"
@@ -291,5 +292,6 @@ harness_roles:
     basis: "every served model measured 10/10 self-agreement, so cross-family choice is safe on stability"
   BATCH_ONLY_DO_NOT_INTERACTIVE:
     models: [Ornith-1.5-35B-A3B-REAP-19B, Ornith-1.5-9B-MLX-8bit]
+    now_exposed_but_still_batch_only: "both are DECLARED to goose as of the 2026-10-17 parity act (they were served and invisible). The reason they stay batch-only is MEASURED, not assumed: the 35B reads stability 0.2 - a long interactive session on it produces work nobody can reproduce"
     basis: "Ornith-35B: stability 0.2, lc_reason 0.5, toolcalling 0.6 - a long interactive session on a
       0.2-stability model produces work nobody can reproduce"

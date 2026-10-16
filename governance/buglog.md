@@ -8,24 +8,18 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1182 decisions (census stamp a16bf19e7b254858, 2026-10-17) · 639 bugs (232 open / 407 closed; highest OPEN = BUG-875) · 55 open tasks (MUST 12 / SHOULD 39 / WORTH 4; OWNER-moved 6, pipeline-moved 49; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1182 decisions (census stamp a16bf19e7b254858, 2026-10-17) · 639 bugs (232 open / 407 closed; highest OPEN = BUG-875) · 55 open tasks (MUST 12 / SHOULD 39 / WORTH 4; OWNER-moved 0, pipeline-moved 55; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **79** of 1182 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 597 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1182, D-2987/BUG-765)
 >
 > Open BUGS by severity (population = the census's 232 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 36 · 🟨 MED 66 · 🟩 LOW 25 · UNLABELLED 101 (BUG-757) of 232 open.
 >
-> **OWNER LANE (6) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
+> **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
-> | T-181 | 🔴 MUST | THE ADMISSION - the fifth transition is DECLARED, counted and PLANNED (D-3051): what remains is the word on wh | owner lane, TWO limbs remain. (1) CLOSED 2026-10-16 by D-3051 - the ad |
-> | T-176 | 🟠 SHOULD | THE SOURCE LIBRARY NAMES - THE OWNER WORD IS GIVEN AND THE PLAN IS PUBLISHED: what remains is the acceptance o | owner lane, plan-first: the owner accepts or edits the published plan  |
-> | T-179 | 🟠 SHOULD | THE SECOND MATERIALISATION - the library and the corpus hold the same work, the reading now measures how far t | owner lane: the owner decides between (a) RETIRING the second material |
-> | T-180 | 🟠 SHOULD | THE PLACEMENT - the declaration now says where a file belongs and the reading says what it does not cover: 281 | owner lane, four limbs, each separately wordable and none of them urge |
-> | T-182 | 🟠 SHOULD | THE LEGACY PLACEMENT TOOLS - the topic vocabulary the library materialises BELOW its declared axis has a SECON | owner lane, three limbs: (1) decide whether the below-axis vocabulary  |
-> | T-183 | 🟠 SHOULD | THE ADMIT APPLIER - once the owner accepts rows of governance/ADMISSION_PLAN_<date>.md, ONE crash-safe writer  | owner-gated by construction: the applier reads an ACCEPTED plan (a fil |
 >
-> **PIPELINE LANE (49) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
+> **PIPELINE LANE (55) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
 >
 > | id | pri | state | task | evidence |
 > |---|---|---|---|---|
@@ -40,9 +34,9 @@
 > | T-143 | 🔴 MUST | 🔴 open | RESOURCE-CLASS THE FAN-OUT: the engine pool is a mutex, the governed homes are a single writer | MEASURED 2026-10-15: the engine declares model_count 9 / loaded 3 / final_ceiling 56.6 GB, |
 > | T-147 | 🔴 MUST | 🔴 open | WIRE THE STORE CENSUS TO EVERY DELETION BATCH: it is a generated face, and it lies the moment bytes move witho | MEASURED 2026-10-15: the census IS generated (pipeline/model_store_census.py: dir_bytes, m |
 > | T-150 | 🔴 MUST | 🔴 open | THE DURABLE PATH IS THE DELEGATION PATH (D-3020): anything whose failure is not free goes through pipeline/sub | temp/runs/fanout_20261015i/98_receipt.json - 3/3 DONE with one task deliberately given a 1 |
-> | T-105 | 🟠 SHOULD | 🔴 open | REA tier A/B mining — DEVONthink 3 (related-document ranking) and Cursor (derived code index) | governance/NOT-YET-EVALUATED-RESEARCH.md (REA targets logged 2026-10-13) |
+> | T-181 | 🔴 MUST | 🔴 open | THE ADMISSION - the fifth transition is DECLARED, counted and PLANNED (D-3051): what remains is the word on wh | MEASURED 2026-10-16 by the FIRST live reading of scripts/plan_admission.py: 2,811 files in |
 >
-> _the face is a VIEW: 12 of 49 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
+> _the face is a VIEW: 12 of 55 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
 >
 > **STANDING RULES — in effect, never close (1):**
 >
@@ -16225,3 +16219,97 @@ FIX (T-185, three limbs, each a rule the repository already declares elsewhere):
 - **second half of the fault (C25/agent-agnostic):** pinning `GOOSE_PROVIDER`/`GOOSE_MODEL` in a GENERIC env emitter couples every consumer to the subagent's model — a value that belongs in the subagent's own recipe, not in a profile.
 - **fix (fail-closed, not cosmetic):** `pipeline/harness_env.py` MUST require an explicit `--scope subagent|cron`; `--print` without it REFUSES (rc non-zero) rather than printing bindable exports; the emitted block carries an in-band scope marker so a stray `eval` is visible. `scripts/bind_harness_env.sh` must pass the scope it means and must never be a no-arg default that evals.
 - **related:** T-132, T-135, D-3000, D-3003, BUG-870 (the sibling false assumption: a wall that a lane needs is not a wall the whole host needs).
+
+## BUG-873 (MED, OPEN) - THE FULL PLUGIN SWEEP, WHOLE SET: 26 declared, 19 enabled, 18 WORKING, 3 that do not do what they say (MEASURED 2026-10-17)
+- **THE MEASUREMENT IS THE WHOLE SET, NOT ONE EXTENSION** (receipt: temp/plugin_health_20261017.md + .json,
+  13,097 B). Every stdio extension was driven DIRECTLY over stdio JSON-RPC (initialize -> notifications/initialized
+  -> tools/list, 60 s budget each, macOS has no `timeout`) and `goose run` was captured in full for the harness's
+  OWN verdict. **WORKING 18 | DEAD 3 | NOT-A-TOOL-EXTENSION 4 | UNTESTABLE 1.**
+- **WORKING 18:** the twelve `type: platform` extensions (analyze, apps, chatrecall, code_execution, developer,
+  extensionmanager, scheduler*, skills, summarize, summon, todo, tom) plus `memory` (builtin) answer in-process;
+  the stdio servers answer tools/list: `docguard` 4 / 1.8 s, `fetch` 1 / 0.8 s, `filesystem` 14 / 1.2 s,
+  `gitmcp-mcp` 12 / 0.8 s, `youtubetranscript` 4 / 1.6 s (get_transcript, get_timed_transcript, get_video_info,
+  get_available_languages) - **the extension this bug was filed around is WORKING, and always was: the bug was
+  never in that server** - plus the two DISABLED-but-healthy `gitmcp` 5 / 4.5 s and `puppeteer` 7 / 1.0 s. (*scheduler
+  is listed by its type, not by its behaviour - see DEAD below.)
+- **DEAD 1 of 3 - `reddit` (ENABLED, zero tools), REPAIRED BY MEASUREMENT.** The exact error:
+  `ModuleNotFoundError: An HTTP transport library needs to be installed.` raised by redditwarp
+  (`http/transport/reg_ASYNC.py` probes `impls.httpx_ASYNC` then `impls.aiohttp` and raises when BOTH fail), so
+  the uvx env carried mcp-reddit with no HTTP transport. Candidates were run one at a time:
+  `--with httpx` -> tools/list answers **2** (fetch_reddit_hot_threads, fetch_reddit_post_content) **WORKS**;
+  `--with 'httpx[http2]'` -> 2 but not minimal; `--with aiohttp` -> 0 (`RuntimeError: no running event loop`);
+  `--with 'redditwarp[http2]'` -> 0; `--with 'redditwarp[aiohttp]'` -> 0. APPLIED to
+  `~/.config/goose/config.yaml` (backup `config.yaml.bak.20261017003537`), so the declared args are now the ones
+  that were MEASURED to work.
+- **DEAD 2 of 3 - `pdfreader` (DISABLED, zero tools), REPAIRED AND LEFT DISABLED.**
+  `ModuleNotFoundError: No module named 'mcp.server.fastmcp'` - the package is written against mcp v1 while uvx
+  resolves mcp 2.x (FastMCP renamed). `uvx --with mcp<2 mcp-read-pdf` -> **1 tool (read_pdf) WORKS**;
+  `mcp==1.9.4` FAILS on Python 3.14 (`cannot import name 'eval_type_backport' from
+  'pydantic._internal._typing_extra'`). Repaired, and deliberately NOT enabled: a capability that is available
+  ON DEMAND (the in-session extension manager, or `--with-extension`) need not be resident in every session.
+- **DEAD 3 of 3 - `scheduler` (ENABLED, `type: platform`, bundled): NO ERROR IS EMITTED AT ALL and it is absent
+  from `sessions.extension_data` in 12/12 recent sessions.** It therefore contributes ZERO tools *silently* - this
+  bug's own class with no report anywhere, which is worse than the reddit case that at least printed a banner.
+  NAMED, NOT FLIPPED: what a goose-bundled platform extension ("Create and manage scheduled recipe execution")
+  could contribute to a CLI harness is UNMEASURED, and one reading is owed before a declaration is changed.
+- **NOT-A-TOOL-EXTENSION 4:** `tom`, `computercontroller`, `autovisualiser`, `tutorial` declare no tools. An
+  extension with nothing to offer is not a lie; the lie is claiming an ENABLED capability a session never gets.
+- **UNTESTABLE 1:** `orchestrator` - declared with no cmd/args to handshake and no tool surface to read.
+- **WHAT THIS MEANS.** A declaration is only as true as the last session that was TOLD it: the two repairs are
+  NOT live until a NEW session starts (the rule recorded in AGENTS.md#harness_facts). The sweep is reproducible -
+  the method is the handshake, the receipt is the json above, and the ONE reading still owed is `scheduler`.
+
+## BUG-874 (HIGH - FIXED 2026-10-17) - the three model sets now have ONE answer, and the red loop that proved it was the probe that already existed
+- **RED, BEFORE THE ACT:** `python3 scripts/agent_context_probe.py` printed
+  `FAIL agent-context: 6 declared fault(s)` - MiniCPM5-2B-MLX, Ornith-1.5-35B-A3B-REAP-19B,
+  Ornith-1.5-9B-MLX-8bit (SERVED but never declared) and Qwen3.5-9B-4bit, gemma-4-31B-it-MLX-8bit,
+  gpt-oss-20b-MXFP4-Q4 (DECLARED but never served), all six `unverifiable` - the fault class the file's own
+  `parity_rule` block declares. **This is D-3036 satisfied by an existing rail: a named command, already run
+  once, READ RED, and GREEN when the defect is repaired.**
+- **THE ACT:** `~/.config/goose/custom_providers/maxwell_omlx.json#models` was RE-DERIVED from the live
+  `/v1/models` reading (name + `max_model_len`, the bearer key read out of that same file): the 3 ghosts
+  REMOVED, the 3 invisible ADDED. NOT ONE MODEL NAME AND NOT ONE WINDOW WAS TYPED BY HAND. Backup written beside
+  it: `maxwell_omlx.json.bak.20261017003537`.
+- **GREEN, AFTER THE ACT:** the SAME command prints
+  `ok agent-context: the four layers agree, and nothing measured was written`. Eight served, eight declared.
+- **THE OWNER'S PRESENCE QUESTION, ANSWERED FROM DISK: NONE OF THE THREE GHOSTS IS PRESENT.**
+  `gpt-oss-20b-MXFP4-Q4` and `gemma-4-31B-it-MLX-8bit` have no directory under `~/.omlx/models` and no
+  HuggingFace hub repo at all; `Qwen3.5-9B-4bit` exists only as `models--lmstudio-community--Qwen3.5-9B-MLX-4bit`
+  / `-8bit`, downloaded and NEVER served. `~/.omlx/models` holds exactly the EIGHT served models, so the three
+  entries were declarations of models this machine does not have.
+- **A RELATED BASIS WAS REFUTED IN THE SAME SITTING (the D-2549 measurement).** `scripts/measure_subagent_loop.py`
+  (NEW) ran ONE fixed 3-call tool loop - same prompt, same generated fixture, temperature 0.0 - against EVERY
+  SERVED model, with the served set, base_url, key and the 90 s per-turn budget read from their declared homes:
+  **7/8 PASS** (MiniCPM5-2B 2.1 s | Ornith-35B 8.3 s | Ornith-9B 11.5 s | gemma-4-E4B 14.3 s |
+  gpt-oss-20b-Q8 18.5 s | Qwen3.8-27B 50.2 s | Qwen3-Coder-30B 79.9 s slowest turn). FAIL:
+  `Phi-4-mini-instruct-8bit` with **ZERO tool calls** - it answered from memory, which is the BUG-053 shape
+  MEASURED ON A LOOP. Two declared `never_for` strings were therefore false as written and are corrected in
+  `config/model_assignments.yaml`: gpt-oss-20b's "0.0 tool calling, so it must never drive a tool loop" (it drove
+  one and answered correctly - the 0.0 is a CALL-FORMAT score), and Phi-4's (now: never a loop either).
+- **RESIDUAL, NAMED.** The model list has NO declared writer: `agent/adapters/goose/apply_provider_flip.py` binds
+  the provider and the agent-loop model but does not render `#models`, so the list stays hand-maintained and the
+  probe is its only guard. Owed: a writer that renders the list FROM the declaration, so the next drift is a RED
+  rail rather than a hand fix.
+
+## BUG-773 (HIGH, OPEN - NARROWED 2026-10-17) - limb (b) MEASURED two-sided: the contradiction is NOT live; the ESCAPE ROUTE is what remains
+- **THE TEST, two-sided, on a temp DB built from the LIVE `fbs` DDL (78 columns; the seven NOT NULL columns were
+  filled with declared placeholders rather than a guess):**
+  - ROUTE 1 `INSERT OR REPLACE INTO fbs` (the historical write path) -> body = **MOVED-BODY**: the prior reading
+    is DESTROYED, reproduced on demand.
+  - ROUTE 2 `UPDATE fbs ... WHERE fb_id` scoped to the S5-owned columns -> body = **ORIGINAL-BODY**: the body
+    SURVIVES.
+  - ROUTE 3 the live code's own `update_s5_provenance()`, called for real -> returned **False**, body unchanged,
+    and it SAID WHY: `UNDECIDABLE: no factual check in verification_results and no dedup marker ... REJECTED
+    (fail-closed, D274a)`. The definition-divergence guard sits BEHIND `pre_write_verdict`; BOTH stand in front
+    of the write.
+- **VERDICT.** `config/pipeline_config.yaml#stage6.commit_scope` reads **verification_scoped**, and
+  `pipeline/stage6_commit.py:1509` routes an EXISTING `fb_id` to `update_s5_provenance` under exactly that
+  scope. The filed contradiction - "a commit may never rewrite an existing row's body" vs the live upsert - is
+  therefore **NOT LIVE**. It becomes live on ONE config flip.
+- **WHAT IS STILL OPEN (narrowed, both halves real):** (1) `full_upsert` remains a DECLARED value of the same knob
+  and NOTHING goes RED when it is set, so the flip that re-enables body rewriting is unguarded (ROUTE 1 is its
+  reproduction); (2) `content_basis` is still a RESERVED NAME WITH NO WRITER, so a supersession stays invisible
+  on BOTH paths - the visibility half of this bug is untouched by the scope fix.
+- **RED LOOP, NAMED (D-3036).** A check that reads `stage6.commit_scope` and goes RED when it is `full_upsert`
+  while `config/dedup_identity.yaml#edition_supersession.execution.never_at_commit` is true, with ROUTE 1/2 as its
+  fixtures. Owed - it is a rail, not a prose reminder, and it is the next act on this row.

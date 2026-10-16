@@ -612,6 +612,12 @@ rename-plan:
 # THE ADMISSION PLAN the flow's fifth transition asks for: what the pipeline has never seen, by the door's own
 # key, and where each candidate's corpus copy would land. It writes governance/ADMISSION_PLAN_<date>.md (+ .json)
 # and admits NOTHING - the act that admits a work is separate and owner-worded (T-183).
+recipes:                                             # the DECLARED sub-agent recipe vocabulary (config/engine.yaml#fanout.task_recipes): what to delegate, which AXIS model, and the DETERMINISTIC done-check that decides whether a human may be left out. Read-only.
+    python3 pipeline/subagent_recipe.py --list
+recipe-plan name *set:                               # render ONE declared recipe into a fan-out task file under temp/recipe_<name>_<ts>/ - STARTS NOTHING
+    python3 pipeline/subagent_recipe.py --plan {{name}} {{set}}
+subagent-loop-measure:                               # D-2549/T-131: the PER-MODEL sub-agent loop measurement - one fixed 3-call task, every SERVED model, one receipt per run
+    python3 scripts/measure_subagent_loop.py
 admit-plan:
     python3 scripts/plan_admission.py --plan || [ $? -eq 2 ]   # BUG-863: rows waiting for the owner's word ARE the OWNER-OWED outcome, not a failed command - and it moves nothing
 placement:

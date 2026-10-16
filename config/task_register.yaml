@@ -1646,3 +1646,33 @@ tasks:
   gate: 'a number is only accepted WITH its ruler (bin count, corpus fingerprint, commit) and a rail fails when a
     served classifier axis publishes none - the same shape as every other measured floor in this repository. An ECE
     quoted after its instrument has been invalidated is refused (D-2941).'
+
+- id: T-171
+  priority: SHOULD
+  state: open
+  mover: pipeline
+  source:
+  - T-168
+  - BUG-844
+  - D-3039
+  - config/agent_surface.yaml
+  title: 'THE TRACE AT THE HARNESS BOUNDARY - the start/end pair becomes AUTOMATIC for the harness own delegate calls
+    through the ADAPTER surface (agent/adapters/), so the discipline stops depending on the agent remembering it'
+  why: >-
+    MEASURED 2026-10-16 (D-3039, and the LIMIT D-3039 declares): the journal exists, its controls run in the ladder and
+    its reader is a rail, but this repository cannot INTERCEPT the harness delegate call - so the trace depends on the
+    caller keeping the discipline, which is the exact shape D-3036 named (a rule that cannot be verified decays into a
+    habit). The owner asked how to see a subagent progressing, and the honest answer today is one command the agent
+    must remember: a rule, not a mechanism. D-3037 already declares WHERE the harness binding lives (adapter roots
+    agent/adapters/ and the swap checklist), so the fix belongs there rather than in any portable artifact - a
+    pre-delegate hook, a skill invoked by the harness, or a wrapper the agent is taught at boot.
+  evidence: >-
+    MEASURED 2026-10-16: two real rows exist (run DJ-20261016T092915Z-95ee and its superseding run
+    DJ-20261016T093110Z-ef8c), each a START/END pair of a delegated R5 review with its artifacts verified on disk -
+    so the mechanism is proven, and what is NOT proven is that it happens WITHOUT the agent typing the two commands.
+  gate: >-
+    a delegated run launched through the adapter leaves a START row BEFORE the call and an END row AFTER it with
+    artifacts verified on disk, WITHOUT the agent issuing two extra commands - the proof is a row pair whose start
+    stamp precedes the call. If the boundary cannot be hooked at all, the accepted alternative is a DECLARED wrapper
+    command taught at boot (AGENTS.md#working_rules), and that must be stated as the answer rather than left implied:
+    a hook that can only be documented is not a fix.

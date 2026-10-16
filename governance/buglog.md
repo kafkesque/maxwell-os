@@ -15922,6 +15922,36 @@ FIX (T-185, three limbs, each a rule the repository already declares elsewhere):
 - **fix (fail-closed, not cosmetic):** declare the FULL state vocabulary in config/gov_sync.yaml as two exhaustive, disjoint lists (`open_decision_states` + `closed_decision_states`); add a check that union == the states actually present in config/decisions.yaml, faulting on any UNCLASSIFIED state; render the count of unclassified = 0 in the face.
 - **related:** BUG-765, D-2987, D-2981, T-185.
 
+### BUG-873 — AN ENABLED EXTENSION THAT CONTRIBUTES ZERO TOOLS RAISES NOTHING (and I gave a false answer because of it)
+- **state:** open | **severity:** medium | **filed:** 2026-10-16 | **by:** assistant
+- **symptom (measured).** `~/.config/goose/config.yaml` declares `youtubetranscript` `enabled: true`, type
+  `stdio`, `cmd: uvx`, args `--from git+https://github.com/jkawamoto/mcp-youtube-transcript
+  mcp-youtube-transcript`. `list_functions` in THIS session returns 40 functions and **NOT ONE is a YouTube
+  tool**. So the capability the owner believes is ON is ABSENT from the tool surface, and NOTHING anywhere says
+  so — no error, no warning, no fault line. `just health` cannot see it: it reads the repo, not the harness.
+- **the server itself is HEALTHY (proven, not assumed).** Driven directly over stdio JSON-RPC it answered
+  `tools/list` with `['get_transcript', 'get_timed_transcript', 'get_video_info', 'get_available_languages']`
+  and `tools/call get_transcript` returned the full 14,162-character transcript of video `hJz7zi17mXA`. So the
+  extension, its command, its PATH and its upstream are all FINE. The fault is in the BINDING between an
+  enabled extension and the tools a session actually receives.
+- **HARM (why this is not cosmetic).** Asked to review a video, the assistant answered "I can't view video" —
+  a FALSE statement about its own capability, because the tool's absence was indistinguishable from the tool's
+  non-existence. The owner had to ask three times. A missing capability that reports as impossible is worse
+  than a broken one that reports as broken.
+- **ROOT CAUSE: NOT ESTABLISHED, AND NOT GUESSED.** A first hypothesis (`~/.profile` line 2 has a broken path,
+  so a GUI-launched app never finds `uvx`) was tested and **DISPROVEN**: the line reads
+  `. "$HOME/.local/bin/env"` and a login shell resolves `uvx` to `/Users/barn/.local/bin/uvx`; the
+  `/.local/bin/env` error came from the test's own `env -i` stripping `$HOME`. Surviving candidates, in order:
+  (a) the session's extension set was FIXED at session start and this session predates the `2026-10-16 13:16`
+  config write (a backup of exactly that timestamp exists); (b) a RESUMED/compacted session keeps its original
+  tool surface; (c) a stdio server that fails to start is silent. The candidate is named as a candidate.
+- **THE RED LOOP FIRST (D-3036 — no theory before a command that can go RED).** TWO commands, run against a
+  FRESH session and a resumed one: (1) list the enabled extensions from the harness config; (2) list that
+  session's registered functions. RED = an enabled extension appears in (1) and contributes ZERO names in (2).
+  GREEN = every enabled extension contributes at least one function, or names itself as failed. SECOND limb:
+  break the `cmd` deliberately (an unresolvable binary) and confirm the fault is REPORTED rather than silent.
+- **related:** BUG-871 (a capability that outlived its reason), BUG-872 (a stale record carrying a doctrine).
+  All three are the same family: A DECLARED THING AND AN ACTIVE THING DIVERGED SILENTLY.
 ### BUG-872 — A DISPROVEN CACHE WAS RE-MEASURED AS WORKING (a two-day-old disproof was carrying a whole doctrine)
 - **state:** fixed | **severity:** high | **filed:** 2026-10-16 | **closed:** 2026-10-16 | **by:** assistant
 - **symptom.** `config/agent_context.yaml#cache_accounting.proof` declared `status: DISPROVEN_MEASURED_20261014`,

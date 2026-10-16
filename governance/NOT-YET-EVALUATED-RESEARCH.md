@@ -167,7 +167,40 @@ the same fault as an unpinned value (BUG-869), one layer out.
 
 ## EVALUATED 2026-10-16 — three candidates put to the test (D-3038: what we reject we register)
 
-### 1. AnyJev (`nokia-applied-research/AnyJev`) — DEFERRED TO A SECOND SANDBOX ARM. NOT ADOPTED.
+### 1. AnyJev (`nokia-applied-research/AnyJev`) — REVISED 2026-10-16: **REFUSED for labeller/classifier lanes.** The ORDER-ROTATION PROBE is adopted as a control; the METHOD is not.
+- **REVISION REASON:** the first reading of this entry was written from the repo README and its public
+  leaderboard placement. An INDEPENDENT third-party test was then READ (not skimmed): "Nokia Just Released a
+  Free Jev Alternative (AnyJev)", Better Stack, video `hJz7zi17mXA`, transcript obtained via the
+  `youtubetranscript` extension. A README is a claim; an adversarial replication is evidence. The claim did not
+  survive contact with the replication, and the register is corrected before anything was installed.
+- **WHAT THE INDEPENDENT TEST MEASURED** (Qwen ~8B on a MacBook, L0 vs the hosted Jev vs raw readout):
+  * **order-flip rate: raw = 4% (20/500 headlines changed answer when the two options were SWAPPED);
+    L0 = 0.** Position bias is REAL and dramatic in the raw readout (one headline read 1% satire with one
+    ordering and 99.8% with the reverse); L0 returned the same answer both ways. **This is the one claim that
+    replicated, and it replicated completely.**
+  * **accuracy: Jev ~12 points MORE accurate than AnyJev.** AnyJev does not catch up to the purpose-built
+    decision model.
+  * **sequential round (one item at a time, so `content_free_prior` is forced): AnyJev 60%, raw 80%, Jev 90%.
+    AnyJev LOST.**
+  * **the failure mode, and it is the one that disqualifies it here: removing a lean OVERSHOOTS when the MIX of
+    answers changes.** With an even 50/50 mix the content-free correction TRADED AWAY satire answers the raw
+    model had RIGHT and won back none (66.6%, two points below its own point estimate). The correction is
+    estimated FROM THE BATCH, so the ruler moves with the corpus.
+  * **calibration: L0's error is 0.3, essentially the same as raw.** The docs say so themselves: L0 removes
+    BIAS, not calibration. 87% of raw answers arrived at >=99% confidence and were wrong on 30% of those. The
+    levels that DO calibrate need a few hundred LABELLED examples - which contradicts "no training" for the
+    mode worth having.
+- **WHY THAT IS DISQUALIFYING FOR US, ontologically rather than by taste.** A debiaser whose correction is
+  estimated from the batch makes the DECISION DEPEND ON THE CORPUS MIX. Maxwell OS's standing rule is
+  drift-proof, do-not-mutate: a labeller whose answer changes when the surrounding batch changes is a labeller
+  that DRIFTS BY CONSTRUCTION. It cannot sit under an eval-integrity floor, and it cannot be an S2/S4
+  classifier on the current labels (session_seed `do_not`: no provenance column exists). And a probability that
+  is not calibrated cannot be used where a floor is expressed in pp.
+- **WHAT IS ADOPTED (token, not tool): THE ORDER-ROTATION PROBE.** Permute the option order, ask again, count
+  flips. It needs no model swap, no new dependency and no licence - and the independent test shows it catches a
+  real defect that ours could not see: raw readouts flip on 4% of items. NO MAXWELL OS RAIL MEASURES THIS TODAY.
+  Registered as a candidate control against the S3/S4 classification path.
+- **Status: REFUSED as a labeller for governed lanes. Not installed. `pip install anyjev` is NOT a step.**
 - **What it actually is:** a training-free READOUT/PROTOCOL layer that turns an EXISTING local model into typed
   decisions with real probabilities (`state`/`question`/`options` -> `answer`, `probs`, `route`). It is not a
   labeler and not a generator: it WRAPS a model we already serve. Apache-2.0, Python, `pip install anyjev`,

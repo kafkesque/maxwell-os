@@ -162,3 +162,62 @@ CONSUMER IN THE OS. The re-open condition is written as a PIN and not a hope: a 
 surface whose binary AND index are BOTH hashable, plus ONE NAMED consumer that calls it. Until all
 three exist, no arm of the OS may depend on it - an unpinned surface cannot be a dependency (D-3052),
 the same fault as an unpinned value (BUG-869), one layer out.
+
+---
+
+## EVALUATED 2026-10-16 — three candidates put to the test (D-3038: what we reject we register)
+
+### 1. AnyJev (`nokia-applied-research/AnyJev`) — DEFERRED TO A SECOND SANDBOX ARM. NOT ADOPTED.
+- **What it actually is:** a training-free READOUT/PROTOCOL layer that turns an EXISTING local model into typed
+  decisions with real probabilities (`state`/`question`/`options` -> `answer`, `probs`, `route`). It is not a
+  labeler and not a generator: it WRAPS a model we already serve. Apache-2.0, Python, `pip install anyjev`,
+  runs on transformers / in-process vLLM / `vllm serve`. arXiv report 2610.00831. Its own self-distilled
+  models ("Tacit", 1.7B-9B, one forward pass per decision) are a separate download.
+- **Community evidence cited (a CLAIM, not a control):** order-flip rate 0.230 -> 0.073 and accuracy
+  0.747 -> 0.803, auto-decidable at 5% risk 7.7% -> 46.3% (Qwen3-8B, BANKING77-20, raw readout vs L0); the
+  training-free L0 Decider on UNCHANGED Gemma-4-31B scores 60.22 on the public Decision Index 0.3
+  (5th of 149 entries, 2026-10-12). Numbers measured on THEIR benchmark, not on Maxwell OS's frozen ruler.
+- **Why it is NOT "better or worse than Laya":** the two objects do not answer the same question. Laya is a
+  benchmark-only ARBITRATION arm (`config/bakeoff_laya.yaml`: role `labeler`, `enabled: false`, bar D-300
+  ">=5.0 absolute pp error-rate gain on the frozen ruler at equal-or-lower abstention", Phase B blocked on
+  F-11 second coder, `imports_in_production_code: false`). AnyJev is a readout over whatever model we already
+  run, and could WRAP Laya. Comparing their headline numbers would be comparing a ruler to a reading.
+- **The one thing here that is NEW to us, and it is not the accuracy figure:** Maxwell OS has NO rail that
+  measures whether a label SURVIVES A PERMUTATION OF ITS OPTIONS. An order-flip rate is exactly the
+  drift/stability control the standing rules ask for and none of our 60+ checks implement. The 5%-risk
+  auto-decidable share is the same abstention axis D-300's bar is phrased in.
+- **Condition to proceed (fail-closed, same ruler):** enter as a SECOND ARM of the existing laya bakeoff -
+  same frozen ruler, same D-300 adoption bar, same single-coder caveat (F-11) - never on community numbers.
+  Revisions must be PINNED (D-382/R14). Engine friction to weigh: transformers/vLLM-oriented, NOT MLX-native,
+  while this host's local stack is MLX.
+- **Status: registered as a candidate arm + one candidate new rail (order-flip control). Nothing installed.**
+
+### 2. `desert-ant-labs/title` — REFUSED on three independent grounds.
+- **(a) Licence.** Card: `license: other` / `license_name: desert-ant-labs-source-available-1.0` /
+  `license_link: https://license.desertant.com/1.0` — SOURCE-AVAILABLE, not open source. It cannot enter a
+  $0-marginal, sovereign, no-lock-in stack (C1/C2/C3); D-322's treatment of a checkpoint with an advisory-only
+  licence is the precedent.
+- **(b) Task mismatch.** It "suggests a title and description for any text" — GENERATION. Maxwell OS's title
+  NORMALISATION is DETERMINISTIC (`pipeline/book_metadata.py#normalize_title`: NFKC->NFKD, combining marks
+  stripped, `_SPACE_SUBTITLE_SPLIT`), and D-2898 forbids a model from deciding a canonical/topic. Replacing a
+  deterministic normaliser with a generator would be a REGRESSION of an already-decided rule.
+- **(c) No control.** 10 likes / ~29.9k downloads / 2026-08, 286 MB (`GraniteMoeHybridForCausalLM`), no
+  Maxwell OS measurement. A floating release is not a dependency (D-382/R14).
+- **Status: REFUSED. Do not re-propose without a licence change AND a deterministic-interface argument.**
+
+### 3. `divinetribe/Hermes-4-14B-abliterated-4bit-mlx` — REFUSED for every GOVERNED lane.
+- **Licence is fine** (apache-2.0) — the refusal is not about licence. It is about provenance and purpose.
+- **(a) Provenance is one ungoverned hop deep.** `base_model: Babsie/Hermes-4-14B-BF16-abliterated` (itself
+  already abliterated), derived from NousResearch Hermes-4-14B (a Qwen3-14B derivative). The upstream that
+  released THESE weights never published them; R14 requires every persistent object to be stamped with its
+  `gen_model`, and a weight edit with no release note cannot be stamped.
+- **(b) Its defining edit removes a REFUSAL DIRECTION** (tags: `abliterated`, `uncensored`). The lanes it was
+  proposed for — verification, classification, fail-closed gates — exist TO REFUSE (S5/D2298). A lane whose
+  job is refusing must not run a model edited to refuse less.
+- **(c) Redundant against the declared roster.** Tool calling / one-shot already has
+  `AGENT_TOOL_SHORT_ONESHOT -> Qwen3-Coder-30B-A3B-Instruct-MLX-4bit`; classification has
+  `CLASSIFIER_S4 -> gpt-oss-20b-MXFP4-Q8`. A 14B dense 4-bit adds a new `harness_roles` entry, a parity
+  check and a bench, and buys nothing the roster lacks. 5 likes / 1,078 downloads / 2026-05.
+- **Status: REFUSED for governed lanes. Not installed. If ever wanted for OFF-LANE drafting, that is a
+  separate proposal with its own reason — an off-lane use does not license an on-lane one.**
+

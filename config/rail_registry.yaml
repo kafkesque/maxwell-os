@@ -194,6 +194,11 @@ guards:
   #: be seen to refuse, not merely declare (its live reading is an operator lane, not a ladder line: it walks
   #: the owner's Dropbox, and a rail that walks Dropbox on every `just health` would be a tax, not a reading)
   scripts/plan_source_rename.py --selftest: fatal
+  #: T-181/D-3051: the ADMISSION PLAN's controls. fatal (a control nothing runs is a comment, BUG-492). Its live
+  #: reading is tri_state because rc 2 IS the owner-owed reading - rows waiting for the owner's word - loud and
+  #: never fatal (BUG-457); pinning it fatal would turn the owner's own library into a broken health run.
+  scripts/plan_admission.py --selftest: fatal
+  scripts/plan_admission.py --brief: tri_state
   scripts/check_bug_recall.py: tri_state
   # T-130 (owner-approved 2026-10-15): the corpus-name debt's remedy. The SELFTEST is fatal (its controls
   # prove the transform preserves the door's own comparison key, that a byte delta rolls a rename back, and

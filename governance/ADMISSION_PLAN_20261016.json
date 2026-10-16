@@ -1,0 +1,2295 @@
+{
+  "act": "T-181 admission plan",
+  "authority": "D-3051",
+  "generated": "2026-10-16T16:54:27Z",
+  "corpus_home": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books",
+  "accepted_containers": [
+    ".epub",
+    ".md",
+    ".pdf"
+  ],
+  "target_rule": "a plan row proposes corpus_home / (the source file's own path BELOW its declared kind folder), with the suffix the conversion stage writes (.md). A topic is never decided by an engine: the proposed path inherits the source's OWN arrangement and the owner may move a row's folder",
+  "decisions_declared": {
+    "already_in_the_corpus": "a file whose DOOR KEY the corpus home already holds: the pipeline has the work and there is nothing to admit",
+    "seen_by_an_ingest_record": "a file only the S0.5 metadata cache names, because the corpus file now carries a different key (MEASURED 2026-10-16: the corpus itself was renamed under T-130). The pipeline READ the work, so it is SEEN and not a candidate - printed because a second voice saying 'seen' is not the same voice as the corpus saying it",
+    "admit_candidate": "a file whose key neither the corpus nor an ingest record names, in a container the conversion stage accepts, inside its declared kind folder, under a root that declares a corpus home, carrying a name NO defect pattern matches: THE OWNER'S WORKLIST",
+    "refused_no_declared_corpus_home": "its root declares admits_to: null, so NO declaration names a home its works are admitted to: the refusal names the missing declaration instead of inventing a destination (T-181 limb 2)",
+    "refused_container_no_stage_reads_it": "a container the conversion stage cannot read (declared kinds such as .mobi/.azw3/.djvu/.docx are OWNED but not convertible): admitting one needs an ENGINE, which is T-180 misplaced class and not this reader act",
+    "refused_name_repair_first": "a name a declared defect pattern matches (marker/spine/truncation): an admitted file's name becomes the CORPUS NAME and the DOOR KEY, so admitting a defect materialises it into the tree the S0.5 cache then STAMPS. The repair rides FIRST - T-176, the owner's rename plan, whose eligible rows are exactly this class",
+    "refused_not_in_its_kind_folder": "the file does not sit under its declared kind folder (the placement axis, axis_depth 1), so the path its corpus twin would take cannot be derived: the misplaced class T-180 owns"
+  },
+  "roots": [
+    {
+      "id": "books",
+      "files": 2181,
+      "seen": 1688,
+      "never_seen": 493,
+      "admits_to": "corpus_home"
+    },
+    {
+      "id": "journals_notes",
+      "files": 630,
+      "seen": 9,
+      "never_seen": 621,
+      "admits_to": null
+    }
+  ],
+  "files": 2811,
+  "seen": 1697,
+  "never_seen": 1114,
+  "seen_keys": 950,
+  "unseen_keys": 1029,
+  "counts": {
+    "already_in_the_corpus": 1668,
+    "seen_by_an_ingest_record": 29,
+    "admit_candidate": 244,
+    "refused_no_declared_corpus_home": 621,
+    "refused_container_no_stage_reads_it": 9,
+    "refused_name_repair_first": 188,
+    "refused_not_in_its_kind_folder": 52
+  },
+  "examples": {
+    "already_in_the_corpus": [
+      "books/epub/AI Agents with MCP (First Early Release) -- Kyle Stratis -- 2025-07-07_ First Release, 2025 -- O'Reilly Media",
+      "books/epub/AI Cashflow_ Turn ChatGPT into Your 24_7 Money Machine (2025 -- K Shukla -- 2025 -- 1a8879e72dc16252766f6753e",
+      "books/epub/AI Value Creators (Rob Thomas, Paul Zikopoulos, Kate Soule) (z-library.sk, 1lib.sk, z-lib.sk).epub",
+      "books/epub/AI and machine learning for coders _ a programmer's guide to -- Laurence Moroney; Andrew Ng; O'Reilly Media -",
+      "books/epub/AI for Finance (AI for Everything) -- Edward P_ K_ Tsang -- AI for Everything, 1, 2023 -- Taylor & Francis Gr"
+    ],
+    "seen_by_an_ingest_record": [
+      "books/epub/DOMAIN 0 Systems + Decision/execution+operations/Digital Minimalism Choosing a Focused Life in a Noisy World ",
+      "books/epub/DOMAIN 0 Systems + Decision/mental+models+epistemology/The Great Mental Models, Volume 3 Systems and Mathemat",
+      "books/epub/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/Domain-Specific Small Language Models (MEAP) (Guglielmo Iozzia) (z-l",
+      "books/epub/DOMAIN 2 Design/practice+process/Making Ideas Happen Overcoming the Obstacles Between.epub",
+      "books/epub/DOMAIN 2 Design/visual+fundamentals/Thinking with Type, 2nd revised and expanded edition A.epub"
+    ],
+    "admit_candidate": [],
+    "refused_no_declared_corpus_home": [
+      "journals_notes/DOMAIN 0 Systems + Decision/r27121.pdf",
+      "journals_notes/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/136.full.pdf",
+      "journals_notes/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/1470357218764436.pdf",
+      "journals_notes/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/List-79F64E28-2BE4-FC74-C2C1-9C562EFFFCAD-bibliography.pdf",
+      "journals_notes/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/language/9423-34509-2-PB.pdf"
+    ],
+    "refused_container_no_stage_reads_it": [
+      "books/epub/DOMAIN 0 Systems + Decision/systems+complexity/The Systems Bible_ The Beginner_'s Guide to Systems Large and ",
+      "books/epub/DOMAIN 2 Design/design+systems/Laying the Foundations -- Andrew Couldwell -- 2019 -- 898b840e9d7b80bc2a4a7849",
+      "books/epub/DOMAIN 3 Art + Computational Media/Digital Art, Third edition (World of Art).azw3",
+      "books/epub/The Elements of Style [Illustrated] -- Strunk Jr_, William -- 2011 -- Seedbox Press, LLC -- 7b4f785e400d8b629",
+      "books/pdf/DOMAIN 0 Systems + Decision/systems+complexity/SYSTEMANTICS. THE SYSTEMS BIBLE (John Gall) (z-library.sk, 1lib"
+    ],
+    "refused_name_repair_first": [
+      "books/epub/AI-Assisted Programming for Web and Machine Learning_ -- Christoffer Noring, Anjali Jain, Marina Fernandez, A",
+      "books/epub/Build a Multi-Agent System (from Scratch) -- Val Andrei Fajardo -- None -- 499a745fd121358a158cdb6d6415e4d0 -",
+      "books/epub/DOMAIN 0 Systems + Decision/decision+strategy/Competing Against Luck _ The Story of Innovation and -- Recorde",
+      "books/epub/DOMAIN 0 Systems + Decision/decision+strategy/Seeking Wisdom_ From Darwin to Munger, 3rd Edition -- Bevelin, ",
+      "books/epub/DOMAIN 0 Systems + Decision/decision+strategy/The Innovator's Dilemma, with a New Foreword_ When New -- Clayt"
+    ],
+    "refused_not_in_its_kind_folder": [
+      "books/epub/DOMAIN 2 Design/communication+design/_Visual Metaphor Structure and Process (Gerard J.Steen) (z-library.sk, 1",
+      "books/epub/DOMAIN 2 Design/design+systems/Design Beyond Limits with Figma 50+ Figma solutions for advanced collaboration",
+      "books/epub/DOMAIN 4 Business/practice+economics/100-Habits of Successful Freelance Designers Insider Secrets for Working",
+      "books/epub/DOMAIN 4 Business/practice+economics/365 Habits of Successful Graphic Designers Insider Secrets from Top Desi",
+      "books/pdf/DOMAIN 0 Systems + Decision/execution+operations/The Art of Strategy_ A Game Theorist_'s Guide to Success in B"
+    ]
+  },
+  "rows": [
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/epub/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/mental+models+epistemology/Nordic Ideology A Metamodern Guide to Politics, Book Two (Metamodern Guides 2) by Freinacht, Hanzi [Freinacht, Hanzi].epub",
+      "rel": "books/epub/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/mental+models+epistemology/Nordic Ideology A Metamodern Guide to Politics, Book Two (Metamodern Guides 2) by Freinacht, Hanzi [Freinacht, Hanzi].epub",
+      "root": "books",
+      "kind": "epub",
+      "key": "nordic ideology a metamodern guide to politics, book two (metamodern guides 2) by freinacht, hanzi [freinacht, hanzi]",
+      "bytes": 2561973,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/mental+models+epistemology/Nordic Ideology A Metamodern Guide to Politics, Book Two (Metamodern Guides 2) by Freinacht, Hanzi [Freinacht, Hanzi].md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/epub/DOMAIN 2 Design/communication+design/Graphic design the new basics Lupton, Ellen;Phillips, Jennifer Cole liber3-1.epub",
+      "rel": "books/epub/DOMAIN 2 Design/communication+design/Graphic design the new basics Lupton, Ellen;Phillips, Jennifer Cole liber3-1.epub",
+      "root": "books",
+      "kind": "epub",
+      "key": "graphic design the new basics lupton, ellen;phillips, jennifer cole liber3-1",
+      "bytes": 56913271,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/communication+design/Graphic design the new basics Lupton, Ellen;Phillips, Jennifer Cole liber3-1.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/epub/DOMAIN 2 Design/communication+design/The UX book process and guidelines for ensuring a quality user experience Hartson, Rex;Pyla, Pardha S liber3.epub",
+      "rel": "books/epub/DOMAIN 2 Design/communication+design/The UX book process and guidelines for ensuring a quality user experience Hartson, Rex;Pyla, Pardha S liber3.epub",
+      "root": "books",
+      "kind": "epub",
+      "key": "the ux book process and guidelines for ensuring a quality user experience hartson, rex;pyla, pardha s liber3",
+      "bytes": 10300794,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/communication+design/The UX book process and guidelines for ensuring a quality user experience Hartson, Rex;Pyla, Pardha S liber3.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/epub/DOMAIN 2 Design/communication+design/Visualizing Financial Data_Rodriguez, Julie; Kaczmarek, Piotr;; Piotr Kaczmarek_liber3.epub",
+      "rel": "books/epub/DOMAIN 2 Design/communication+design/Visualizing Financial Data_Rodriguez, Julie; Kaczmarek, Piotr;; Piotr Kaczmarek_liber3.epub",
+      "root": "books",
+      "kind": "epub",
+      "key": "visualizing financial data_rodriguez, julie; kaczmarek, piotr;; piotr kaczmarek_liber3",
+      "bytes": 33963620,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/communication+design/Visualizing Financial Data_Rodriguez, Julie; Kaczmarek, Piotr;; Piotr Kaczmarek_liber3.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/epub/DOMAIN 2 Design/communication+design/[Robin Williams] The Non-Designer's Design Book.epub",
+      "rel": "books/epub/DOMAIN 2 Design/communication+design/[Robin Williams] The Non-Designer's Design Book.epub",
+      "root": "books",
+      "kind": "epub",
+      "key": "[robin williams] the non-designer's design book",
+      "bytes": 8940877,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/communication+design/[Robin Williams] The Non-Designer's Design Book.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/epub/DOMAIN 2 Design/communication+design/[Ruth E Page; Beatrix Busse; Nina N rgaard; Micha.epub",
+      "rel": "books/epub/DOMAIN 2 Design/communication+design/[Ruth E Page; Beatrix Busse; Nina N rgaard; Micha.epub",
+      "root": "books",
+      "kind": "epub",
+      "key": "[ruth e page; beatrix busse; nina n rgaard; micha",
+      "bytes": 5645569,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/communication+design/[Ruth E Page; Beatrix Busse; Nina N rgaard; Micha.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/epub/DOMAIN 2 Design/practice+process/Designing for growth a Design Thinking Toolkit for Managers Ogilvie, Tim;Liedtka, Jeanne liber3.epub",
+      "rel": "books/epub/DOMAIN 2 Design/practice+process/Designing for growth a Design Thinking Toolkit for Managers Ogilvie, Tim;Liedtka, Jeanne liber3.epub",
+      "root": "books",
+      "kind": "epub",
+      "key": "designing for growth a design thinking toolkit for managers ogilvie, tim;liedtka, jeanne liber3",
+      "bytes": 2838014,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/practice+process/Designing for growth a Design Thinking Toolkit for Managers Ogilvie, Tim;Liedtka, Jeanne liber3.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/epub/DOMAIN 2 Design/practice+process/How to use graphic desi gn to sell things, explain things, make things ylib.org).epub",
+      "rel": "books/epub/DOMAIN 2 Design/practice+process/How to use graphic desi gn to sell things, explain things, make things ylib.org).epub",
+      "root": "books",
+      "kind": "epub",
+      "key": "how to use graphic desi gn to sell things, explain things, make things ylib.org",
+      "bytes": 137319019,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/practice+process/How to use graphic desi gn to sell things, explain things, make things ylib.org).md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/epub/DOMAIN 2 Design/practice+process/The Design of Everyday Things Revised and Expanded Edition.epub",
+      "rel": "books/epub/DOMAIN 2 Design/practice+process/The Design of Everyday Things Revised and Expanded Edition.epub",
+      "root": "books",
+      "kind": "epub",
+      "key": "the design of everyday things revised and expanded edition",
+      "bytes": 1221175,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/practice+process/The Design of Everyday Things Revised and Expanded Edition.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/epub/DOMAIN 2 Design/visual+fundamentals/*Alex W. White Listening to Type Making Language.epub",
+      "rel": "books/epub/DOMAIN 2 Design/visual+fundamentals/*Alex W. White Listening to Type Making Language.epub",
+      "root": "books",
+      "kind": "epub",
+      "key": "*alex w. white listening to type making language",
+      "bytes": 85945789,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/visual+fundamentals/*Alex W. White Listening to Type Making Language.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/epub/DOMAIN 2 Design/visual+fundamentals/Bierut, Michael; Rand, Paul Thoughts on design.epub",
+      "rel": "books/epub/DOMAIN 2 Design/visual+fundamentals/Bierut, Michael; Rand, Paul Thoughts on design.epub",
+      "root": "books",
+      "kind": "epub",
+      "key": "bierut, michael; rand, paul thoughts on design",
+      "bytes": 7446187,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/visual+fundamentals/Bierut, Michael; Rand, Paul Thoughts on design.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/epub/DOMAIN 2 Design/visual+fundamentals/Handbook of Color Psychology Andrew J. Elliot; Mark D. Fairchild; Anna Franklin liber3.epub",
+      "rel": "books/epub/DOMAIN 2 Design/visual+fundamentals/Handbook of Color Psychology Andrew J. Elliot; Mark D. Fairchild; Anna Franklin liber3.epub",
+      "root": "books",
+      "kind": "epub",
+      "key": "handbook of color psychology andrew j. elliot; mark d. fairchild; anna franklin liber3",
+      "bytes": 7736267,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/visual+fundamentals/Handbook of Color Psychology Andrew J. Elliot; Mark D. Fairchild; Anna Franklin liber3.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/epub/DOMAIN 2 Design/visual+fundamentals/The Designer's Dictionary of Color.epub",
+      "rel": "books/epub/DOMAIN 2 Design/visual+fundamentals/The Designer's Dictionary of Color.epub",
+      "root": "books",
+      "kind": "epub",
+      "key": "the designer's dictionary of color",
+      "bytes": 47160362,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/visual+fundamentals/The Designer's Dictionary of Color.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/epub/DOMAIN 2 Design/visual+fundamentals/Type Rules The Designer 's Guide to Professional Typography, 4th Edition Strizver, Ilene liber3.epub",
+      "rel": "books/epub/DOMAIN 2 Design/visual+fundamentals/Type Rules The Designer 's Guide to Professional Typography, 4th Edition Strizver, Ilene liber3.epub",
+      "root": "books",
+      "kind": "epub",
+      "key": "type rules the designer 's guide to professional typography, 4th edition strizver, ilene liber3",
+      "bytes": 25309996,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/visual+fundamentals/Type Rules The Designer 's Guide to Professional Typography, 4th Edition Strizver, Ilene liber3.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/epub/DOMAIN 2 Design/visual+fundamentals/[Paul Sahre] Two-Dimensional Man A Graphic Memoir.epub",
+      "rel": "books/epub/DOMAIN 2 Design/visual+fundamentals/[Paul Sahre] Two-Dimensional Man A Graphic Memoir.epub",
+      "root": "books",
+      "kind": "epub",
+      "key": "[paul sahre] two-dimensional man a graphic memoir",
+      "bytes": 27356796,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/visual+fundamentals/[Paul Sahre] Two-Dimensional Man A Graphic Memoir.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/epub/DOMAIN 3 Art + Computational Media/[Tullett, Barrie;] Typewriter art a modern antho.epub",
+      "rel": "books/epub/DOMAIN 3 Art + Computational Media/[Tullett, Barrie;] Typewriter art a modern antho.epub",
+      "root": "books",
+      "kind": "epub",
+      "key": "[tullett, barrie;] typewriter art a modern antho",
+      "bytes": 27573217,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 3 Art + Computational Media/[Tullett, Barrie;] Typewriter art a modern antho.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/epub/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Code as Creative Medium A Handbook for Computational Art and Design Golan Levin; Tega Brain liber3.epub",
+      "rel": "books/epub/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Code as Creative Medium A Handbook for Computational Art and Design Golan Levin; Tega Brain liber3.epub",
+      "root": "books",
+      "kind": "epub",
+      "key": "code as creative medium a handbook for computational art and design golan levin; tega brain liber3",
+      "bytes": 56406917,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Code as Creative Medium A Handbook for Computational Art and Design Golan Levin; Tega Brain liber3.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/epub/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Generating Sound & Organizing Time Graham Wakefield & Gregory Taylor liber3.epub",
+      "rel": "books/epub/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Generating Sound & Organizing Time Graham Wakefield & Gregory Taylor liber3.epub",
+      "root": "books",
+      "kind": "epub",
+      "key": "generating sound & organizing time graham wakefield & gregory taylor liber3",
+      "bytes": 28913667,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Generating Sound & Organizing Time Graham Wakefield & Gregory Taylor liber3.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/epub/DOMAIN 4 Business/marketing+growth/This Is Marketing You Can't Be Seen Until You Learn to See.epub",
+      "rel": "books/epub/DOMAIN 4 Business/marketing+growth/This Is Marketing You Can't Be Seen Until You Learn to See.epub",
+      "root": "books",
+      "kind": "epub",
+      "key": "this is marketing you can't be seen until you learn to see",
+      "bytes": 1497362,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/marketing+growth/This Is Marketing You Can't Be Seen Until You Learn to See.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/epub/DOMAIN 4 Business/practice+economics/Don't Get a Job, Build a Business.epub",
+      "rel": "books/epub/DOMAIN 4 Business/practice+economics/Don't Get a Job, Build a Business.epub",
+      "root": "books",
+      "kind": "epub",
+      "key": "don't get a job, build a business",
+      "bytes": 5128511,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/practice+economics/Don't Get a Job, Build a Business.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/epub/DOMAIN 4 Business/practice+economics/Legal Guide for the Visual Artist Tad Crawford; M. J. Bogatin liber3.epub",
+      "rel": "books/epub/DOMAIN 4 Business/practice+economics/Legal Guide for the Visual Artist Tad Crawford; M. J. Bogatin liber3.epub",
+      "root": "books",
+      "kind": "epub",
+      "key": "legal guide for the visual artist tad crawford; m. j. bogatin liber3",
+      "bytes": 7108622,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/practice+economics/Legal Guide for the Visual Artist Tad Crawford; M. J. Bogatin liber3.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/epub/DOMAIN 4 Business/practice+economics/Real Artists Don't Starve Timeless Strategies for Thriving.epub",
+      "rel": "books/epub/DOMAIN 4 Business/practice+economics/Real Artists Don't Starve Timeless Strategies for Thriving.epub",
+      "root": "books",
+      "kind": "epub",
+      "key": "real artists don't starve timeless strategies for thriving",
+      "bytes": 389657,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/practice+economics/Real Artists Don't Starve Timeless Strategies for Thriving.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/epub/DOMAIN 4 Business/practice+economics/The Harvard Business Review Entrepreneur's Handbook.epub",
+      "rel": "books/epub/DOMAIN 4 Business/practice+economics/The Harvard Business Review Entrepreneur's Handbook.epub",
+      "root": "books",
+      "kind": "epub",
+      "key": "the harvard business review entrepreneur's handbook",
+      "bytes": 4872896,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/practice+economics/The Harvard Business Review Entrepreneur's Handbook.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/epub/DOMAIN 4 Business/practice+economics/[Colin Barrow; Paul Barrow; Robert Brown] The Busi.epub",
+      "rel": "books/epub/DOMAIN 4 Business/practice+economics/[Colin Barrow; Paul Barrow; Robert Brown] The Busi.epub",
+      "root": "books",
+      "kind": "epub",
+      "key": "[colin barrow; paul barrow; robert brown] the busi",
+      "bytes": 2769596,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/practice+economics/[Colin Barrow; Paul Barrow; Robert Brown] The Busi.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/epub/DOMAIN 5 Personal Practice/habits+behavior+change/[Dale-Carnegie-&-Associates]-How-to-Win-Friends-an.epub",
+      "rel": "books/epub/DOMAIN 5 Personal Practice/habits+behavior+change/[Dale-Carnegie-&-Associates]-How-to-Win-Friends-an.epub",
+      "root": "books",
+      "kind": "epub",
+      "key": "[dale-carnegie-&-associates]-how-to-win-friends-an",
+      "bytes": 3640731,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 5 Personal Practice/habits+behavior+change/[Dale-Carnegie-&-Associates]-How-to-Win-Friends-an.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/epub/DOMAIN 5 Personal Practice/mood+therapy/Happy Sexy Millionaire Unexpected Truths about Fulfillment, Love, and Success Steven Bartlett.epub",
+      "rel": "books/epub/DOMAIN 5 Personal Practice/mood+therapy/Happy Sexy Millionaire Unexpected Truths about Fulfillment, Love, and Success Steven Bartlett.epub",
+      "root": "books",
+      "kind": "epub",
+      "key": "happy sexy millionaire unexpected truths about fulfillment, love, and success steven bartlett",
+      "bytes": 139987,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 5 Personal Practice/mood+therapy/Happy Sexy Millionaire Unexpected Truths about Fulfillment, Love, and Success Steven Bartlett.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/epub/DOMAIN 5 Personal Practice/mood+therapy/[Dr. Jen Gunter] The Vagina Bible The Vulva And T.epub",
+      "rel": "books/epub/DOMAIN 5 Personal Practice/mood+therapy/[Dr. Jen Gunter] The Vagina Bible The Vulva And T.epub",
+      "root": "books",
+      "kind": "epub",
+      "key": "[dr. jen gunter] the vagina bible the vulva and t",
+      "bytes": 4744401,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 5 Personal Practice/mood+therapy/[Dr. Jen Gunter] The Vagina Bible The Vulva And T.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/epub/DOMAIN 5 Personal Practice/mood+therapy/[Emily Nagoski Ph.D.] Come as You Are The Surpris.epub",
+      "rel": "books/epub/DOMAIN 5 Personal Practice/mood+therapy/[Emily Nagoski Ph.D.] Come as You Are The Surpris.epub",
+      "root": "books",
+      "kind": "epub",
+      "key": "[emily nagoski ph.d.] come as you are the surpris",
+      "bytes": 5366078,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 5 Personal Practice/mood+therapy/[Emily Nagoski Ph.D.] Come as You Are The Surpris.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/epub/DOMAIN 5 Personal Practice/productivity+execution/HBR Management Tips Collection (2 Books) Harvard Business Review liber3.epub",
+      "rel": "books/epub/DOMAIN 5 Personal Practice/productivity+execution/HBR Management Tips Collection (2 Books) Harvard Business Review liber3.epub",
+      "root": "books",
+      "kind": "epub",
+      "key": "hbr management tips collection (2 books) harvard business review liber3",
+      "bytes": 2513527,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 5 Personal Practice/productivity+execution/HBR Management Tips Collection (2 Books) Harvard Business Review liber3.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/md/DOMAIN 7 Influence + Power/social+engineering+profiling/Galic\u030c2017_Article_BenthamDeleuzeAndBeyondAnOverv.md",
+      "rel": "books/md/DOMAIN 7 Influence + Power/social+engineering+profiling/Galic\u030c2017_Article_BenthamDeleuzeAndBeyondAnOverv.md",
+      "root": "books",
+      "kind": "md",
+      "key": "galic\u030c2017_article_benthamdeleuzeandbeyondanoverv",
+      "bytes": 109798,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 7 Influence + Power/social+engineering+profiling/Galic\u030c2017_Article_BenthamDeleuzeAndBeyondAnOverv.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/FULLTEXT01.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/FULLTEXT01.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "fulltext01",
+      "bytes": 610029,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/FULLTEXT01.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/George Orwell  - 1984 (ORIGINAL) (1949).pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/George Orwell  - 1984 (ORIGINAL) (1949).pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "george orwell - 1984 (original) (1949",
+      "bytes": 704798,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/George Orwell  - 1984 (ORIGINAL) (1949).md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/Wim Wenders - The Logic of Images.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/Wim Wenders - The Logic of Images.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "wim wenders - the logic of images",
+      "bytes": 13683887,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/Wim Wenders - The Logic of Images.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/av99.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/av99.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "av99",
+      "bytes": 4436165,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/av99.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/book-en-print.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/book-en-print.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "book-en-print",
+      "bytes": 3731420,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/book-en-print.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/114819898-Robert-Fludd-Hermetic-Philosopher1.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/114819898-Robert-Fludd-Hermetic-Philosopher1.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "114819898-robert-fludd-hermetic-philosopher1",
+      "bytes": 4919223,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/114819898-Robert-Fludd-Hermetic-Philosopher1.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/2011_0001_545_04_Magyarito_szotar.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/2011_0001_545_04_Magyarito_szotar.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "2011_0001_545_04_magyarito_szotar",
+      "bytes": 3242134,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/2011_0001_545_04_Magyarito_szotar.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/259-451-1-SM.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/259-451-1-SM.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "259-451-1-sm",
+      "bytes": 9659646,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/259-451-1-SM.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/53481411-De-Re-Metallica-1556-Agricola.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/53481411-De-Re-Metallica-1556-Agricola.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "53481411-de-re-metallica-1556-agricola",
+      "bytes": 99065265,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/53481411-De-Re-Metallica-1556-Agricola.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Accumulator-Plans.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Accumulator-Plans.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "accumulator-plans",
+      "bytes": 3046442,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Accumulator-Plans.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Albert Pike - Morals and Dogma.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Albert Pike - Morals and Dogma.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "albert pike - morals and dogma",
+      "bytes": 2614713,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Albert Pike - Morals and Dogma.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Alchemy Overview.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Alchemy Overview.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "alchemy overview",
+      "bytes": 162286,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Alchemy Overview.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Amber Wolfe - In the Shadow of the Shaman.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Amber Wolfe - In the Shadow of the Shaman.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "amber wolfe - in the shadow of the shaman",
+      "bytes": 10167655,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Amber Wolfe - In the Shadow of the Shaman.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Awakening to divine wisdom Christian initiation into three worl_nodrm.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Awakening to divine wisdom Christian initiation into three worl_nodrm.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "awakening to divine wisdom christian initiation into three worl_nodrm",
+      "bytes": 8822179,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Awakening to divine wisdom Christian initiation into three worl_nodrm.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Beginning_Luciferian_Magick.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Beginning_Luciferian_Magick.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "beginning_luciferian_magick",
+      "bytes": 5769321,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Beginning_Luciferian_Magick.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Cagliostro's Secret Ritual Of Egyptian Rite Freemasonry.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Cagliostro's Secret Ritual Of Egyptian Rite Freemasonry.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "cagliostro's secret ritual of egyptian rite freemasonry",
+      "bytes": 129078,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Cagliostro's Secret Ritual Of Egyptian Rite Freemasonry.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Celtic-Mythology-And-Religion.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Celtic-Mythology-And-Religion.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "celtic-mythology-and-religion",
+      "bytes": 1739357,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Celtic-Mythology-And-Religion.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Christopher Penczak - The Temple of Shamanic Witchcraft.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Christopher Penczak - The Temple of Shamanic Witchcraft.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "christopher penczak - the temple of shamanic witchcraft",
+      "bytes": 5604853,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Christopher Penczak - The Temple of Shamanic Witchcraft.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Codex Seraphinianus (Luigi Serafini) (Z-Library).pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Codex Seraphinianus (Luigi Serafini) (Z-Library).pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "codex seraphinianus (luigi serafini",
+      "bytes": 336261176,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Codex Seraphinianus (Luigi Serafini) (Z-Library).md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Coelum Philosophorum.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Coelum Philosophorum.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "coelum philosophorum",
+      "bytes": 45417,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Coelum Philosophorum.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Cognitive Economics - Springer-Verlag Berlin Heidelberg. Professor Bernard Walliser (auth.) (2008).pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Cognitive Economics - Springer-Verlag Berlin Heidelberg. Professor Bernard Walliser (auth.) (2008).pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "cognitive economics - springer-verlag berlin heidelberg. professor bernard walliser (auth.) (2008",
+      "bytes": 1054739,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Cognitive Economics - Springer-Verlag Berlin Heidelberg. Professor Bernard Walliser (auth.) (2008).md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Concentrated Salt of Nature.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Concentrated Salt of Nature.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "concentrated salt of nature",
+      "bytes": 172557,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Concentrated Salt of Nature.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Conway, D.J. - Falcon, Feather and Valkyrie Sword.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Conway, D.J. - Falcon, Feather and Valkyrie Sword.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "conway, d.j. - falcon, feather and valkyrie sword",
+      "bytes": 3650514,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Conway, D.J. - Falcon, Feather and Valkyrie Sword.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/DO IT YOURSELF PROJECT ORGONE ACCUMULATOR.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/DO IT YOURSELF PROJECT ORGONE ACCUMULATOR.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "do it yourself project orgone accumulator",
+      "bytes": 7077173,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/DO IT YOURSELF PROJECT ORGONE ACCUMULATOR.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Encyclopedia of Prostitution and Sex Work (2 Volumes Set).pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Encyclopedia of Prostitution and Sex Work (2 Volumes Set).pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "encyclopedia of prostitution and sex work (2 volumes set",
+      "bytes": 69891872,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Encyclopedia of Prostitution and Sex Work (2 Volumes Set).md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Encylopedia of Freemasonry - Vols 1and2.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Encylopedia of Freemasonry - Vols 1and2.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "encylopedia of freemasonry - vols 1and2",
+      "bytes": 30408704,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Encylopedia of Freemasonry - Vols 1and2.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Frater Oz - A Bi\u0301blia Vampi\u0301rica.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Frater Oz - A Bi\u0301blia Vampi\u0301rica.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "frater oz - a bi\u0301blia vampi\u0301rica",
+      "bytes": 99829,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Frater Oz - A Bi\u0301blia Vampi\u0301rica.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Freemason Bluebook.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Freemason Bluebook.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "freemason bluebook",
+      "bytes": 151923,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Freemason Bluebook.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Fulcanelli - The Dwellings of the Philosophers (Les Demeures Philosophales).pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Fulcanelli - The Dwellings of the Philosophers (Les Demeures Philosophales).pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "fulcanelli - the dwellings of the philosophers (les demeures philosophales",
+      "bytes": 1732415,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Fulcanelli - The Dwellings of the Philosophers (Les Demeures Philosophales).md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Galic\u030c2017_Article_BenthamDeleuzeAndBeyondAnOverv.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Galic\u030c2017_Article_BenthamDeleuzeAndBeyondAnOverv.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "galic\u030c2017_article_benthamdeleuzeandbeyondanoverv",
+      "bytes": 824074,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Galic\u030c2017_Article_BenthamDeleuzeAndBeyondAnOverv.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Gerard Cremonensis, Astrological Geomancy.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Gerard Cremonensis, Astrological Geomancy.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "gerard cremonensis, astrological geomancy",
+      "bytes": 170078,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Gerard Cremonensis, Astrological Geomancy.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/GodMan_10236902.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/GodMan_10236902.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "godman_10236902",
+      "bytes": 4832437,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/GodMan_10236902.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Goffman_Erving_The_Presentation_of_Self_in_Everyday_Life.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Goffman_Erving_The_Presentation_of_Self_in_Everyday_Life.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "goffman_erving_the_presentation_of_self_in_everyday_life",
+      "bytes": 3591628,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Goffman_Erving_The_Presentation_of_Self_in_Everyday_Life.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Hungry_Minds_The_Book_The_Ultimate_Guide_to_Rebuilding_Civilization.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Hungry_Minds_The_Book_The_Ultimate_Guide_to_Rebuilding_Civilization.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "hungry_minds_the_book_the_ultimate_guide_to_rebuilding_civilization",
+      "bytes": 70176618,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Hungry_Minds_The_Book_The_Ultimate_Guide_to_Rebuilding_Civilization.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Jim DeKorne - Psychedelic Shamanism.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Jim DeKorne - Psychedelic Shamanism.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "jim dekorne - psychedelic shamanism",
+      "bytes": 3797464,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Jim DeKorne - Psychedelic Shamanism.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/M.M. Pattison Muir - The Story of Alchemy and the Beginnings of Chemistry.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/M.M. Pattison Muir - The Story of Alchemy and the Beginnings of Chemistry.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "m.m. pattison muir - the story of alchemy and the beginnings of chemistry",
+      "bytes": 6128873,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/M.M. Pattison Muir - The Story of Alchemy and the Beginnings of Chemistry.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/MOONSHINE_original.PDF",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/MOONSHINE_original.PDF",
+      "root": "books",
+      "kind": "pdf",
+      "key": "moonshine_original",
+      "bytes": 3634045,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/MOONSHINE_original.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/McKenna, Terence - Lectures on Alchemy.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/McKenna, Terence - Lectures on Alchemy.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "mckenna, terence - lectures on alchemy",
+      "bytes": 197584,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/McKenna, Terence - Lectures on Alchemy.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Mckenna, Terence - Food Of The Gods.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Mckenna, Terence - Food Of The Gods.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "mckenna, terence - food of the gods",
+      "bytes": 3446277,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Mckenna, Terence - Food Of The Gods.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Mckenna, Terence - Invisible Landscape.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Mckenna, Terence - Invisible Landscape.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "mckenna, terence - invisible landscape",
+      "bytes": 1415355,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Mckenna, Terence - Invisible Landscape.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Michael J. Harner - Hallucinogens and Shamanism.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Michael J. Harner - Hallucinogens and Shamanism.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "michael j. harner - hallucinogens and shamanism",
+      "bytes": 36856564,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Michael J. Harner - Hallucinogens and Shamanism.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Mirror of Alchemy.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Mirror of Alchemy.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "mirror of alchemy",
+      "bytes": 40766,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Mirror of Alchemy.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/OCCLITH.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/OCCLITH.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "occlith",
+      "bytes": 30151522,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/OCCLITH.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/On the A and P Rite of Masonry (Memphis 7 Misraim) - Jeremiah How.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/On the A and P Rite of Masonry (Memphis 7 Misraim) - Jeremiah How.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "on the a and p rite of masonry (memphis 7 misraim) - jeremiah how",
+      "bytes": 38319,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/On the A and P Rite of Masonry (Memphis 7 Misraim) - Jeremiah How.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Opinions on Speculative Masonry - J Odiorne.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Opinions on Speculative Masonry - J Odiorne.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "opinions on speculative masonry - j odiorne",
+      "bytes": 49695297,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Opinions on Speculative Masonry - J Odiorne.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Pansophic EA Study Guide.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Pansophic EA Study Guide.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "pansophic ea study guide",
+      "bytes": 888840,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Pansophic EA Study Guide.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Phil Hine - Walking Between The Worlds.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Phil Hine - Walking Between The Worlds.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "phil hine - walking between the worlds",
+      "bytes": 117688,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Phil Hine - Walking Between The Worlds.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Philosophic Lodge of the Knights of the Eagle - Francken.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Philosophic Lodge of the Knights of the Eagle - Francken.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "philosophic lodge of the knights of the eagle - francken",
+      "bytes": 4570211,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Philosophic Lodge of the Knights of the Eagle - Francken.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Reality Switch Technologies Psychedelics as Tools for the Discovery and Exploration of New Worlds (Andrew R. Gallimore) (Z-Library).pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Reality Switch Technologies Psychedelics as Tools for the Discovery and Exploration of New Worlds (Andrew R. Gallimore) (Z-Library).pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "reality switch technologies psychedelics as tools for the discovery and exploration of new worlds (andrew r. gallimore",
+      "bytes": 21213801,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Reality Switch Technologies Psychedelics as Tools for the Discovery and Exploration of New Worlds (Andrew R. Gallimore) (Z-Library).md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Robert Anton Wilson - Cosmic Trigger I - The Final Secret Of The Illuminati.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Robert Anton Wilson - Cosmic Trigger I - The Final Secret Of The Illuminati.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "robert anton wilson - cosmic trigger i - the final secret of the illuminati",
+      "bytes": 53006582,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Robert Anton Wilson - Cosmic Trigger I - The Final Secret Of The Illuminati.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Robert Anton Wilson - MIT Encyclopedia of the Cognitive Scie.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Robert Anton Wilson - MIT Encyclopedia of the Cognitive Scie.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "robert anton wilson - mit encyclopedia of the cognitive scie",
+      "bytes": 12072159,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Robert Anton Wilson - MIT Encyclopedia of the Cognitive Scie.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Robert Anton Wilson - Prometheus Rising.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Robert Anton Wilson - Prometheus Rising.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "robert anton wilson - prometheus rising",
+      "bytes": 4149731,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Robert Anton Wilson - Prometheus Rising.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Robert J. Wallis - Shamans and Neo-Shamans.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Robert J. Wallis - Shamans and Neo-Shamans.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "robert j. wallis - shamans and neo-shamans",
+      "bytes": 5271645,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Robert J. Wallis - Shamans and Neo-Shamans.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/SYMBOLS.PDF",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/SYMBOLS.PDF",
+      "root": "books",
+      "kind": "pdf",
+      "key": "symbols",
+      "bytes": 2008080,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/SYMBOLS.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Shaman Pablo Amaringo - Ayahuasca Visions - Ebook.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Shaman Pablo Amaringo - Ayahuasca Visions - Ebook.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "shaman pablo amaringo - ayahuasca visions - ebook",
+      "bytes": 3147286,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Shaman Pablo Amaringo - Ayahuasca Visions - Ebook.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Souls Of Distortion Awakening.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Souls Of Distortion Awakening.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "souls of distortion awakening",
+      "bytes": 4064419,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Souls Of Distortion Awakening.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Apocalypse of Freemasonry - F Castells.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Apocalypse of Freemasonry - F Castells.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "the apocalypse of freemasonry - f castells",
+      "bytes": 377971,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Apocalypse of Freemasonry - F Castells.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Arcane Schools - John Yarker.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Arcane Schools - John Yarker.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "the arcane schools - john yarker",
+      "bytes": 3217739,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Arcane Schools - John Yarker.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Baphomet Codex.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Baphomet Codex.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "the baphomet codex",
+      "bytes": 3585548,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Baphomet Codex.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Book of the Words - Albert Pike.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Book of the Words - Albert Pike.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "the book of the words - albert pike",
+      "bytes": 6109725,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Book of the Words - Albert Pike.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Builders A Story and Study of Masonary - J Newton.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Builders A Story and Study of Masonary - J Newton.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "the builders a story and study of masonary - j newton",
+      "bytes": 472725,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Builders A Story and Study of Masonary - J Newton.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Call Of Cthulhu - H.P. Lovecraft.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Call Of Cthulhu - H.P. Lovecraft.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "the call of cthulhu - h.p. lovecraft",
+      "bytes": 1998734,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Call Of Cthulhu - H.P. Lovecraft.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Constitutions of the Freemasons - 1734.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Constitutions of the Freemasons - 1734.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "the constitutions of the freemasons - 1734",
+      "bytes": 1039040,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Constitutions of the Freemasons - 1734.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Entered Apprentice Handbook - JSM Ward.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Entered Apprentice Handbook - JSM Ward.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "the entered apprentice handbook - jsm ward",
+      "bytes": 311131,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Entered Apprentice Handbook - JSM Ward.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Fellow Crafts Handbook - JSM Ward.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Fellow Crafts Handbook - JSM Ward.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "the fellow crafts handbook - jsm ward",
+      "bytes": 240498,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Fellow Crafts Handbook - JSM Ward.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Great Big Narcotics Cookbook.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Great Big Narcotics Cookbook.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "the great big narcotics cookbook",
+      "bytes": 501289,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Great Big Narcotics Cookbook.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Hidden Gears of Free Masonry.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Hidden Gears of Free Masonry.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "the hidden gears of free masonry",
+      "bytes": 707180,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Hidden Gears of Free Masonry.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Hidden Life in Freemasonry - CW Leadbeater.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Hidden Life in Freemasonry - CW Leadbeater.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "the hidden life in freemasonry - cw leadbeater",
+      "bytes": 1473275,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Hidden Life in Freemasonry - CW Leadbeater.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Higher Degrees Handbook - JSM Ward.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Higher Degrees Handbook - JSM Ward.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "the higher degrees handbook - jsm ward",
+      "bytes": 175191,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Higher Degrees Handbook - JSM Ward.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Master Masons Handbook - JSM Ward.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Master Masons Handbook - JSM Ward.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "the master masons handbook - jsm ward",
+      "bytes": 322023,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Master Masons Handbook - JSM Ward.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Mysteries of Freemasonry - Captain William Morgan.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Mysteries of Freemasonry - Captain William Morgan.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "the mysteries of freemasonry - captain william morgan",
+      "bytes": 824798,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Mysteries of Freemasonry - Captain William Morgan.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Mysticism of Masonry - Unknown.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Mysticism of Masonry - Unknown.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "the mysticism of masonry - unknown",
+      "bytes": 187082,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Mysticism of Masonry - Unknown.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Necromantic Ritual Book.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Necromantic Ritual Book.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "the necromantic ritual book",
+      "bytes": 12700330,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Necromantic Ritual Book.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Secret Book of Artephius.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Secret Book of Artephius.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "the secret book of artephius",
+      "bytes": 64539,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Secret Book of Artephius.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Underworld Service-online.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Underworld Service-online.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "the underworld service-online",
+      "bytes": 5328013,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Underworld Service-online.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Vampire Predator Bible.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Vampire Predator Bible.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "the vampire predator bible",
+      "bytes": 27466068,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Vampire Predator Bible.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The_Alchemy_Reader_From_Hermes_Trismegistus_to_Isaac_Newton-Cambridge_University_Press_2003.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The_Alchemy_Reader_From_Hermes_Trismegistus_to_Isaac_Newton-Cambridge_University_Press_2003.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "the_alchemy_reader_from_hermes_trismegistus_to_isaac_newton-cambridge_university_press_2003",
+      "bytes": 10924467,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The_Alchemy_Reader_From_Hermes_Trismegistus_to_Isaac_Newton-Cambridge_University_Press_2003.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The_History_Book_-_Big_Ideas_Simply_Explained_By_DK.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The_History_Book_-_Big_Ideas_Simply_Explained_By_DK.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "the_history_book_-_big_ideas_simply_explained_by_dk",
+      "bytes": 51718699,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The_History_Book_-_Big_Ideas_Simply_Explained_By_DK.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Thinking Visually_Stephen K. Reed_liber3.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Thinking Visually_Stephen K. Reed_liber3.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "thinking visually_stephen k. reed_liber3",
+      "bytes": 23177116,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Thinking Visually_Stephen K. Reed_liber3.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/ToV - Bloodlines.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/ToV - Bloodlines.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "tov - bloodlines",
+      "bytes": 100329638,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/ToV - Bloodlines.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Twelve Keys.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Twelve Keys.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "twelve keys",
+      "bytes": 70312,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Twelve Keys.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/[Rupert_Sheldrake,_Terence_McKenna,_Ralph_Abraham](BookFi.org).pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/[Rupert_Sheldrake,_Terence_McKenna,_Ralph_Abraham](BookFi.org).pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "[rupert_sheldrake,_terence_mckenna,_ralph_abraham](bookfi.org",
+      "bytes": 347599,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/[Rupert_Sheldrake,_Terence_McKenna,_Ralph_Abraham](BookFi.org).md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/[Terence_McKenna]_True_Hallucinations(BookFi.org).pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/[Terence_McKenna]_True_Hallucinations(BookFi.org).pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "[terence_mckenna]_true_hallucinations(bookfi.org",
+      "bytes": 870191,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/[Terence_McKenna]_True_Hallucinations(BookFi.org).md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/[Terence_Mckenna]_The_Archaic_Revival_Speculation(BookFi.org).pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/[Terence_Mckenna]_The_Archaic_Revival_Speculation(BookFi.org).pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "[terence_mckenna]_the_archaic_revival_speculation(bookfi.org",
+      "bytes": 43708750,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/[Terence_Mckenna]_The_Archaic_Revival_Speculation(BookFi.org).md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/_OceanofPDF.com_The_Psychology_of_Totalitarianism_-_Mattias_Desmet.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/_OceanofPDF.com_The_Psychology_of_Totalitarianism_-_Mattias_Desmet.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "_oceanofpdf.com_the_psychology_of_totalitarianism_-_mattias_desmet",
+      "bytes": 4427592,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/_OceanofPDF.com_The_Psychology_of_Totalitarianism_-_Mattias_Desmet.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/communication-design-principles-methods-and-practice.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/communication-design-principles-methods-and-practice.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "communication-design-principles-methods-and-practice",
+      "bytes": 7001572,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/communication-design-principles-methods-and-practice.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/godmanwordmadefl00carerich.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/godmanwordmadefl00carerich.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "godmanwordmadefl00carerich",
+      "bytes": 10755868,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/godmanwordmadefl00carerich.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/las-plantas-de-los-dioses-shultes-y-hofmann-1.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/las-plantas-de-los-dioses-shultes-y-hofmann-1.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "las-plantas-de-los-dioses-shultes-y-hofmann-1",
+      "bytes": 44283648,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/las-plantas-de-los-dioses-shultes-y-hofmann-1.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/lexicon_of_alchemy.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/lexicon_of_alchemy.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "lexicon_of_alchemy",
+      "bytes": 3108566,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/lexicon_of_alchemy.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/pkpadmin,+DeMeo-20-3_Layout+1.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/pkpadmin,+DeMeo-20-3_Layout+1.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "pkpadmin,+demeo-20-3_layout+1",
+      "bytes": 578002,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/pkpadmin,+DeMeo-20-3_Layout+1.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/wtwr.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/wtwr.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "wtwr",
+      "bytes": 16127844,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/wtwr.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/mental+models+epistemology/Simulacra and Simulation (Jean Baudrillard, Sheila Faria Glaser) (Z-Library).pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/mental+models+epistemology/Simulacra and Simulation (Jean Baudrillard, Sheila Faria Glaser) (Z-Library).pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "simulacra and simulation (jean baudrillard, sheila faria glaser",
+      "bytes": 488004,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/mental+models+epistemology/Simulacra and Simulation (Jean Baudrillard, Sheila Faria Glaser) (Z-Library).md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/mental+models+epistemology/The Agony of Power (Jean Baudrillard, Sylve\u0300re Lotringer) (Z-Library).pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/mental+models+epistemology/The Agony of Power (Jean Baudrillard, Sylve\u0300re Lotringer) (Z-Library).pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "the agony of power (jean baudrillard, sylve\u0300re lotringer",
+      "bytes": 1559048,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/mental+models+epistemology/The Agony of Power (Jean Baudrillard, Sylve\u0300re Lotringer) (Z-Library).md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/mental+models+epistemology/The Illusion of the End (Jean Baudrillard translated by Chris Turner) (Z-Library).pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/mental+models+epistemology/The Illusion of the End (Jean Baudrillard translated by Chris Turner) (Z-Library).pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "the illusion of the end (jean baudrillard translated by chris turner",
+      "bytes": 1766684,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/mental+models+epistemology/The Illusion of the End (Jean Baudrillard translated by Chris Turner) (Z-Library).md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/mental+models+epistemology/The Spirit of Terrorism, New Revised Edition (Jean Baudrillard, Chris Turner) (Z-Library).pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/mental+models+epistemology/The Spirit of Terrorism, New Revised Edition (Jean Baudrillard, Chris Turner) (Z-Library).pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "the spirit of terrorism, new revised edition (jean baudrillard, chris turner",
+      "bytes": 5314928,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/mental+models+epistemology/The Spirit of Terrorism, New Revised Edition (Jean Baudrillard, Chris Turner) (Z-Library).md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/mental+models+epistemology/The post-existentialist neo-stoicism of Jason Xenakis and the stoic theory of suicide.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/mental+models+epistemology/The post-existentialist neo-stoicism of Jason Xenakis and the stoic theory of suicide.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "the post-existentialist neo-stoicism of jason xenakis and the stoic theory of suicide",
+      "bytes": 4528991,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/mental+models+epistemology/The post-existentialist neo-stoicism of Jason Xenakis and the stoic theory of suicide.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/mental+models+epistemology/The unbomber manifesto, the futre of industrial society.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/mental+models+epistemology/The unbomber manifesto, the futre of industrial society.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "the unbomber manifesto, the futre of industrial society",
+      "bytes": 896532,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/mental+models+epistemology/The unbomber manifesto, the futre of industrial society.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/semiotics+meaning/Peirce-C-S-Logic-Semiotic.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/semiotics+meaning/Peirce-C-S-Logic-Semiotic.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "peirce-c-s-logic-semiotic",
+      "bytes": 1141831,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/semiotics+meaning/Peirce-C-S-Logic-Semiotic.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/semiotics+meaning/Semiotics-the-Basics.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/semiotics+meaning/Semiotics-the-Basics.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "semiotics-the-basics",
+      "bytes": 1412611,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/semiotics+meaning/Semiotics-the-Basics.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/semiotics+meaning/robert c holub reception theory.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/semiotics+meaning/robert c holub reception theory.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "robert c holub reception theory",
+      "bytes": 849617,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/semiotics+meaning/robert c holub reception theory.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/semiotics+meaning/v. Halliday  Matthiessen - Hallidays Introduction to Functional Grammar.pdf",
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/semiotics+meaning/v. Halliday  Matthiessen - Hallidays Introduction to Functional Grammar.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "v. halliday matthiessen - hallidays introduction to functional grammar",
+      "bytes": 13783312,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/semiotics+meaning/v. Halliday  Matthiessen - Hallidays Introduction to Functional Grammar.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 2 Design/A_Dictionary_Of_Color_Combinations_Various2011.pdf",
+      "rel": "books/pdf/DOMAIN 2 Design/A_Dictionary_Of_Color_Combinations_Various2011.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "a_dictionary_of_color_combinations_various2011",
+      "bytes": 6930756,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/A_Dictionary_Of_Color_Combinations_Various2011.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 2 Design/Draplin Design Co. (Aaron James Draplin) (Z-Library).pdf",
+      "rel": "books/pdf/DOMAIN 2 Design/Draplin Design Co. (Aaron James Draplin) (Z-Library).pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "draplin design co. (aaron james draplin",
+      "bytes": 35292495,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/Draplin Design Co. (Aaron James Draplin) (Z-Library).md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 2 Design/La paleta perfecta.pdf",
+      "rel": "books/pdf/DOMAIN 2 Design/La paleta perfecta.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "la paleta perfecta",
+      "bytes": 1791588168,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/La paleta perfecta.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 2 Design/On Tyranny, Graphic Edition (Timothy Snyder) (Z-Library).pdf",
+      "rel": "books/pdf/DOMAIN 2 Design/On Tyranny, Graphic Edition (Timothy Snyder) (Z-Library).pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "on tyranny, graphic edition (timothy snyder",
+      "bytes": 194947687,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/On Tyranny, Graphic Edition (Timothy Snyder) (Z-Library).md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 2 Design/Tweed-Valley-Forest-Park-Map-and-Trail-Guide.pdf",
+      "rel": "books/pdf/DOMAIN 2 Design/Tweed-Valley-Forest-Park-Map-and-Trail-Guide.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "tweed-valley-forest-park-map-and-trail-guide",
+      "bytes": 3919302,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/Tweed-Valley-Forest-Park-Map-and-Trail-Guide.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 2 Design/Visualizing Equations Essential Math for Game Devs .pdf",
+      "rel": "books/pdf/DOMAIN 2 Design/Visualizing Equations Essential Math for Game Devs .pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "visualizing equations essential math for game devs",
+      "bytes": 5227152,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/Visualizing Equations Essential Math for Game Devs .md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 2 Design/communication+design/00913367.2014.920283.pdf",
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/00913367.2014.920283.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "00913367.2014.920283",
+      "bytes": 439806,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/communication+design/00913367.2014.920283.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 2 Design/communication+design/175630614X13787503069918.pdf",
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/175630614X13787503069918.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "175630614x13787503069918",
+      "bytes": 502823,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/communication+design/175630614X13787503069918.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 2 Design/communication+design/1bd7dd6c-8e4e-47a2-88b2-5063b82cf13b.pdf",
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/1bd7dd6c-8e4e-47a2-88b2-5063b82cf13b.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "1bd7dd6c-8e4e-47a2-88b2-5063b82cf13b",
+      "bytes": 1541988,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/communication+design/1bd7dd6c-8e4e-47a2-88b2-5063b82cf13b.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 2 Design/communication+design/5\u7ae0_Sheet.pdf",
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/5\u7ae0_Sheet.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "5\u7ae0_sheet",
+      "bytes": 6623678,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/communication+design/5\u7ae0_Sheet.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 2 Design/communication+design/Beyond_Visual_Metaphor_A_New_Typology_of_Visual_Rh.pdf",
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/Beyond_Visual_Metaphor_A_New_Typology_of_Visual_Rh.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "beyond_visual_metaphor_a_new_typology_of_visual_rh",
+      "bytes": 939439,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/communication+design/Beyond_Visual_Metaphor_A_New_Typology_of_Visual_Rh.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 2 Design/communication+design/Blender_Pro_Tips_Modeling_and_Texturing_like_a_Professional_in_Blender.pdf",
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/Blender_Pro_Tips_Modeling_and_Texturing_like_a_Professional_in_Blender.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "blender_pro_tips_modeling_and_texturing_like_a_professional_in_blender",
+      "bytes": 5688857,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/communication+design/Blender_Pro_Tips_Modeling_and_Texturing_like_a_Professional_in_Blender.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 2 Design/communication+design/Challenge3 - AdvancedKeying.pdf",
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/Challenge3 - AdvancedKeying.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "challenge3 - advancedkeying",
+      "bytes": 1057521,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/communication+design/Challenge3 - AdvancedKeying.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 2 Design/communication+design/Closing the Loop Systems Thinking for Designers (Sheryl Cababa) (Z-Library).pdf",
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/Closing the Loop Systems Thinking for Designers (Sheryl Cababa) (Z-Library).pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "closing the loop systems thinking for designers (sheryl cababa",
+      "bytes": 7728220,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/communication+design/Closing the Loop Systems Thinking for Designers (Sheryl Cababa) (Z-Library).md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 2 Design/communication+design/ENG_Google_Translated_Ohira_Kouki_After_effects_for_Animation_BEGINNER.pdf",
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/ENG_Google_Translated_Ohira_Kouki_After_effects_for_Animation_BEGINNER.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "eng_google_translated_ohira_kouki_after_effects_for_animation_beginner",
+      "bytes": 123949604,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/communication+design/ENG_Google_Translated_Ohira_Kouki_After_effects_for_Animation_BEGINNER.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 2 Design/communication+design/Info_We_Trust_How_to_Inspire_the_World_with_Data.pdf",
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/Info_We_Trust_How_to_Inspire_the_World_with_Data.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "info_we_trust_how_to_inspire_the_world_with_data",
+      "bytes": 88530863,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/communication+design/Info_We_Trust_How_to_Inspire_the_World_with_Data.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 2 Design/communication+design/The Psychology Behind Design.pdf",
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/The Psychology Behind Design.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "the psychology behind design",
+      "bytes": 178587114,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/communication+design/The Psychology Behind Design.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 2 Design/communication+design/Visualizing Financial Data_Julie Rodriguez, Piotr Kaczmarek_liber3.pdf",
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/Visualizing Financial Data_Julie Rodriguez, Piotr Kaczmarek_liber3.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "visualizing financial data_julie rodriguez, piotr kaczmarek_liber3",
+      "bytes": 26265399,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/communication+design/Visualizing Financial Data_Julie Rodriguez, Piotr Kaczmarek_liber3.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 2 Design/communication+design/[ENG Translated] After Effects for Animation EXPERT.pdf",
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/[ENG Translated] After Effects for Animation EXPERT.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "[eng translated] after effects for animation expert",
+      "bytes": 170766092,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/communication+design/[ENG Translated] After Effects for Animation EXPERT.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 2 Design/communication+design/_Principles of three dimensional design._Wucius Wong_liber3.pdf",
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/_Principles of three dimensional design._Wucius Wong_liber3.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "_principles of three dimensional design._wucius wong_liber3",
+      "bytes": 4604227,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/communication+design/_Principles of three dimensional design._Wucius Wong_liber3.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 2 Design/communication+design/_principles-of-two-dimensional-design-by-wucius-wong_compress.pdf",
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/_principles-of-two-dimensional-design-by-wucius-wong_compress.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "_principles-of-two-dimensional-design-by-wucius-wong_compress",
+      "bytes": 33099804,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/communication+design/_principles-of-two-dimensional-design-by-wucius-wong_compress.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 2 Design/communication+design/peterson2018.pdf",
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/peterson2018.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "peterson2018",
+      "bytes": 1522516,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/communication+design/peterson2018.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 2 Design/communication+design/phillips2004.pdf",
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/phillips2004.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "phillips2004",
+      "bytes": 586126,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/communication+design/phillips2004.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 2 Design/communication+design/rcl.11.2.07fen.pdf",
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/rcl.11.2.07fen.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "rcl.11.2.07fen",
+      "bytes": 5493554,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/communication+design/rcl.11.2.07fen.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 2 Design/communication+design/sco-003_2002_2__442_d.pdf",
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/sco-003_2002_2__442_d.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "sco-003_2002_2__442_d",
+      "bytes": 8929177,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/communication+design/sco-003_2002_2__442_d.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 2 Design/communication+design/vanmulken2010.pdf",
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/vanmulken2010.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "vanmulken2010",
+      "bytes": 280809,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/communication+design/vanmulken2010.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 2 Design/practice+process/The Rules We Break Lessons in Play, Thinking, and Design (Eric Zimmerman) (Z-Library).pdf",
+      "rel": "books/pdf/DOMAIN 2 Design/practice+process/The Rules We Break Lessons in Play, Thinking, and Design (Eric Zimmerman) (Z-Library).pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "the rules we break lessons in play, thinking, and design (eric zimmerman",
+      "bytes": 20052914,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/practice+process/The Rules We Break Lessons in Play, Thinking, and Design (Eric Zimmerman) (Z-Library).md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 2 Design/practice+process/The_Creative_Act_A_Way_of_Being_Rick_Rubin_2023_Penguin_Publishing.pdf",
+      "rel": "books/pdf/DOMAIN 2 Design/practice+process/The_Creative_Act_A_Way_of_Being_Rick_Rubin_2023_Penguin_Publishing.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "the_creative_act_a_way_of_being_rick_rubin_2023_penguin_publishing",
+      "bytes": 5379524,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/practice+process/The_Creative_Act_A_Way_of_Being_Rick_Rubin_2023_Penguin_Publishing.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 2 Design/practice+process/lwm_23.pdf",
+      "rel": "books/pdf/DOMAIN 2 Design/practice+process/lwm_23.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "lwm_23",
+      "bytes": 14752777,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/practice+process/lwm_23.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 2 Design/visual+fundamentals/ saul bass.pdf",
+      "rel": "books/pdf/DOMAIN 2 Design/visual+fundamentals/ saul bass.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "saul bass",
+      "bytes": 8483703,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/visual+fundamentals/ saul bass.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 2 Design/visual+fundamentals/**Bringhurst, Robert - The Elements of Typographic Style.pdf",
+      "rel": "books/pdf/DOMAIN 2 Design/visual+fundamentals/**Bringhurst, Robert - The Elements of Typographic Style.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "**bringhurst, robert - the elements of typographic style",
+      "bytes": 62561405,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/visual+fundamentals/**Bringhurst, Robert - The Elements of Typographic Style.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 2 Design/visual+fundamentals/Contemporary Processes Of Text Typeface Design (Michael Harkins) (Z-Library).pdf",
+      "rel": "books/pdf/DOMAIN 2 Design/visual+fundamentals/Contemporary Processes Of Text Typeface Design (Michael Harkins) (Z-Library).pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "contemporary processes of text typeface design (michael harkins",
+      "bytes": 4118776,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/visual+fundamentals/Contemporary Processes Of Text Typeface Design (Michael Harkins) (Z-Library).md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 2 Design/visual+fundamentals/Designing Type_Karen Cheng_liber3.pdf",
+      "rel": "books/pdf/DOMAIN 2 Design/visual+fundamentals/Designing Type_Karen Cheng_liber3.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "designing type_karen cheng_liber3",
+      "bytes": 6230071,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/visual+fundamentals/Designing Type_Karen Cheng_liber3.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 2 Design/visual+fundamentals/Gill_Eric_An_Essay_on_Typography.pdf",
+      "rel": "books/pdf/DOMAIN 2 Design/visual+fundamentals/Gill_Eric_An_Essay_on_Typography.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "gill_eric_an_essay_on_typography",
+      "bytes": 2233671,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/visual+fundamentals/Gill_Eric_An_Essay_on_Typography.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 2 Design/visual+fundamentals/Grid Systems in Graphic Design Raster Systeme Fur Die Visuele Gestaltung (German and English Edition)_Josef Muller-Brockmann_liber3.pdf",
+      "rel": "books/pdf/DOMAIN 2 Design/visual+fundamentals/Grid Systems in Graphic Design Raster Systeme Fur Die Visuele Gestaltung (German and English Edition)_Josef Muller-Brockmann_liber3.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "grid systems in graphic design raster systeme fur die visuele gestaltung (german and english edition)_josef muller-brockmann_liber3",
+      "bytes": 19175256,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/visual+fundamentals/Grid Systems in Graphic Design Raster Systeme Fur Die Visuele Gestaltung (German and English Edition)_Josef Muller-Brockmann_liber3.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 2 Design/visual+fundamentals/How to create typefaces from sketch to screen (Cristo\u0301bal Henestrosa Matus, Jose\u0301 Scaglione) (Z-Library).pdf",
+      "rel": "books/pdf/DOMAIN 2 Design/visual+fundamentals/How to create typefaces from sketch to screen (Cristo\u0301bal Henestrosa Matus, Jose\u0301 Scaglione) (Z-Library).pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "how to create typefaces from sketch to screen (cristo\u0301bal henestrosa matus, jose\u0301 scaglione",
+      "bytes": 84705163,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/visual+fundamentals/How to create typefaces from sketch to screen (Cristo\u0301bal Henestrosa Matus, Jose\u0301 Scaglione) (Z-Library).md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 2 Design/visual+fundamentals/Jason-Santa-Maria_On-Web-Typography.pdf",
+      "rel": "books/pdf/DOMAIN 2 Design/visual+fundamentals/Jason-Santa-Maria_On-Web-Typography.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "jason-santa-maria_on-web-typography",
+      "bytes": 9895431,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/visual+fundamentals/Jason-Santa-Maria_On-Web-Typography.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 2 Design/visual+fundamentals/Manovich-Lev_The_Language_of_the_New_Media.pdf",
+      "rel": "books/pdf/DOMAIN 2 Design/visual+fundamentals/Manovich-Lev_The_Language_of_the_New_Media.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "manovich-lev_the_language_of_the_new_media",
+      "bytes": 33996264,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/visual+fundamentals/Manovich-Lev_The_Language_of_the_New_Media.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 2 Design/visual+fundamentals/The Art of Color Scripting.pdf",
+      "rel": "books/pdf/DOMAIN 2 Design/visual+fundamentals/The Art of Color Scripting.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "the art of color scripting",
+      "bytes": 3232670,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/visual+fundamentals/The Art of Color Scripting.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 2 Design/visual+fundamentals/color choices: making color sense out of color theory.pdf",
+      "rel": "books/pdf/DOMAIN 2 Design/visual+fundamentals/color choices: making color sense out of color theory.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "color choices: making color sense out of color theory",
+      "bytes": 5244077,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/visual+fundamentals/color choices: making color sense out of color theory.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 2 Design/visual+fundamentals/\u0422\u0438\u043c\u043e\u0442\u0438 \u0421\u0430\u043c\u0430\u0440\u0430  \u00abMaking and Breaking the Grid\u00bb.pdf",
+      "rel": "books/pdf/DOMAIN 2 Design/visual+fundamentals/\u0422\u0438\u043c\u043e\u0442\u0438 \u0421\u0430\u043c\u0430\u0440\u0430  \u00abMaking and Breaking the Grid\u00bb.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "\u0442\u0438\u043c\u043e\u0442\u0438 \u0441\u0430\u043c\u0430\u0440\u0430 \u00abmaking and breaking the grid\u00bb",
+      "bytes": 40358812,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/visual+fundamentals/\u0422\u0438\u043c\u043e\u0442\u0438 \u0421\u0430\u043c\u0430\u0440\u0430  \u00abMaking and Breaking the Grid\u00bb.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 3 Art + Computational Media/FABE, M (2004) CLOSELY WATCHED FILMS- AN INTRODUCTION TO THE ART OF NARRATIVE FILM TECHNIQue.pdf",
+      "rel": "books/pdf/DOMAIN 3 Art + Computational Media/FABE, M (2004) CLOSELY WATCHED FILMS- AN INTRODUCTION TO THE ART OF NARRATIVE FILM TECHNIQue.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "fabe, m (2004) closely watched films- an introduction to the art of narrative film technique",
+      "bytes": 2915493,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 3 Art + Computational Media/FABE, M (2004) CLOSELY WATCHED FILMS- AN INTRODUCTION TO THE ART OF NARRATIVE FILM TECHNIQue.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Art_Fundamentals_2nd_edition_Light,_shape,_color,_3DTotal_Publishing.pdf",
+      "rel": "books/pdf/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Art_Fundamentals_2nd_edition_Light,_shape,_color,_3DTotal_Publishing.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "art_fundamentals_2nd_edition_light,_shape,_color,_3dtotal_publishing",
+      "bytes": 29303443,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Art_Fundamentals_2nd_edition_Light,_shape,_color,_3DTotal_Publishing.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Coding_Art.pdf",
+      "rel": "books/pdf/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Coding_Art.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "coding_art",
+      "bytes": 3895019,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Coding_Art.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/New aesthetics and art.pdf",
+      "rel": "books/pdf/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/New aesthetics and art.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "new aesthetics and art",
+      "bytes": 29337566,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/New aesthetics and art.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/20 ways paint more loosely.pdf",
+      "rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/20 ways paint more loosely.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "20 ways paint more loosely",
+      "bytes": 2530629,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 3 Art + Computational Media/glitch+media+art/20 ways paint more loosely.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Animal Painting and Anatomy (Frank Calderon) (Z-Library).pdf",
+      "rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Animal Painting and Anatomy (Frank Calderon) (Z-Library).pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "animal painting and anatomy (frank calderon",
+      "bytes": 49592708,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 3 Art + Computational Media/glitch+media+art/Animal Painting and Anatomy (Frank Calderon) (Z-Library).md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Charles_Bargue_Drawing_Course_text.pdf",
+      "rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Charles_Bargue_Drawing_Course_text.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "charles_bargue_drawing_course_text",
+      "bytes": 6929513,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 3 Art + Computational Media/glitch+media+art/Charles_Bargue_Drawing_Course_text.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Color and Light - James Gurney.pdf",
+      "rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Color and Light - James Gurney.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "color and light - james gurney",
+      "bytes": 56286796,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 3 Art + Computational Media/glitch+media+art/Color and Light - James Gurney.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Constructive Anatomy.pdf",
+      "rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Constructive Anatomy.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "constructive anatomy",
+      "bytes": 7278146,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 3 Art + Computational Media/glitch+media+art/Constructive Anatomy.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Draw 50 Animals ( PDFDrive.com ).pdf",
+      "rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Draw 50 Animals ( PDFDrive.com ).pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "draw 50 animals",
+      "bytes": 5463071,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 3 Art + Computational Media/glitch+media+art/Draw 50 Animals ( PDFDrive.com ).md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Draw+50+Airplanes,+Aircraft,+and+Spacecraft_+The+Step_by_Step+W.pdf",
+      "rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Draw+50+Airplanes,+Aircraft,+and+Spacecraft_+The+Step_by_Step+W.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "draw+50+airplanes,+aircraft,+and+spacecraft_+the+step_by_step+w",
+      "bytes": 6220883,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 3 Art + Computational Media/glitch+media+art/Draw+50+Airplanes,+Aircraft,+and+Spacecraft_+The+Step_by_Step+W.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/FORCE - Drawing Human Anatomy - 1E (2016).pdf",
+      "rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/FORCE - Drawing Human Anatomy - 1E (2016).pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "force - drawing human anatomy - 1e (2016",
+      "bytes": 16828286,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 3 Art + Computational Media/glitch+media+art/FORCE - Drawing Human Anatomy - 1E (2016).md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Figure Drawing.pdf",
+      "rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Figure Drawing.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "figure drawing",
+      "bytes": 7825900,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 3 Art + Computational Media/glitch+media+art/Figure Drawing.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Gary Faigin - The Artist's Complete Guide To Facial Expression.pdf",
+      "rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Gary Faigin - The Artist's Complete Guide To Facial Expression.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "gary faigin - the artist's complete guide to facial expression",
+      "bytes": 115607603,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 3 Art + Computational Media/glitch+media+art/Gary Faigin - The Artist's Complete Guide To Facial Expression.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/How to Draw Cars the Hot Wheels Way (Scott Robertson) (Z-Library).pdf",
+      "rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/How to Draw Cars the Hot Wheels Way (Scott Robertson) (Z-Library).pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "how to draw cars the hot wheels way (scott robertson",
+      "bytes": 36452580,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 3 Art + Computational Media/glitch+media+art/How to Draw Cars the Hot Wheels Way (Scott Robertson) (Z-Library).md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Justin_R_Martin_Poses_For_Artists_Original_Character_Workbook_Volume.pdf",
+      "rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Justin_R_Martin_Poses_For_Artists_Original_Character_Workbook_Volume.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "justin_r_martin_poses_for_artists_original_character_workbook_volume",
+      "bytes": 4562507,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 3 Art + Computational Media/glitch+media+art/Justin_R_Martin_Poses_For_Artists_Original_Character_Workbook_Volume.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Perspective  - Drawing Perspective Made Easy.pdf",
+      "rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Perspective  - Drawing Perspective Made Easy.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "perspective - drawing perspective made easy",
+      "bytes": 17857469,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 3 Art + Computational Media/glitch+media+art/Perspective  - Drawing Perspective Made Easy.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Perspective_Drawing_Handbook-JosephDAmelio.pdf",
+      "rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Perspective_Drawing_Handbook-JosephDAmelio.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "perspective_drawing_handbook-josephdamelio",
+      "bytes": 46148566,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 3 Art + Computational Media/glitch+media+art/Perspective_Drawing_Handbook-JosephDAmelio.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Preview_Mastering_Manga_How_to_Draw_Manga_Scenes_Crilley,_Mark_Z.pdf",
+      "rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Preview_Mastering_Manga_How_to_Draw_Manga_Scenes_Crilley,_Mark_Z.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "preview_mastering_manga_how_to_draw_manga_scenes_crilley,_mark_z",
+      "bytes": 5947861,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 3 Art + Computational Media/glitch+media+art/Preview_Mastering_Manga_How_to_Draw_Manga_Scenes_Crilley,_Mark_Z.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Sample_Draw_and_animate_your_manga_characters_The_Complete_Guide.pdf",
+      "rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Sample_Draw_and_animate_your_manga_characters_The_Complete_Guide.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "sample_draw_and_animate_your_manga_characters_the_complete_guide",
+      "bytes": 4027358,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 3 Art + Computational Media/glitch+media+art/Sample_Draw_and_animate_your_manga_characters_The_Complete_Guide.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Sketching for the Absolute Beginner.pdf",
+      "rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Sketching for the Absolute Beginner.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "sketching for the absolute beginner",
+      "bytes": 131222178,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 3 Art + Computational Media/glitch+media+art/Sketching for the Absolute Beginner.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Stonehouses Anatomy (Incomplete - 555 pages only) (Seok Jung Hyun) (Z-Library).pdf",
+      "rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Stonehouses Anatomy (Incomplete - 555 pages only) (Seok Jung Hyun) (Z-Library).pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "stonehouses anatomy (incomplete - 555 pages only) (seok jung hyun",
+      "bytes": 79156138,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 3 Art + Computational Media/glitch+media+art/Stonehouses Anatomy (Incomplete - 555 pages only) (Seok Jung Hyun) (Z-Library).md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Ten_Step_Drawing_People_Draw_a_range_of_figures_&_faces_in_10_easy.pdf",
+      "rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Ten_Step_Drawing_People_Draw_a_range_of_figures_&_faces_in_10_easy.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "ten_step_drawing_people_draw_a_range_of_figures_&_faces_in_10_easy",
+      "bytes": 5829850,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 3 Art + Computational Media/glitch+media+art/Ten_Step_Drawing_People_Draw_a_range_of_figures_&_faces_in_10_easy.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/The_Practice_of_Drawing_and_Painting_Lan.pdf",
+      "rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/The_Practice_of_Drawing_and_Painting_Lan.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "the_practice_of_drawing_and_painting_lan",
+      "bytes": 8790397,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 3 Art + Computational Media/glitch+media+art/The_Practice_of_Drawing_and_Painting_Lan.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/[Mike_Mattesi]_Force_Dynamic_Life_Drawing_for_Ani(b-ok.org).pdf",
+      "rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/[Mike_Mattesi]_Force_Dynamic_Life_Drawing_for_Ani(b-ok.org).pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "[mike_mattesi]_force_dynamic_life_drawing_for_ani(b-ok.org",
+      "bytes": 10674590,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 3 Art + Computational Media/glitch+media+art/[Mike_Mattesi]_Force_Dynamic_Life_Drawing_for_Ani(b-ok.org).md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/[Mike_Mattesi]_Force_The_Key_to_Capturing_Life_Th(b-ok.org).pdf",
+      "rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/[Mike_Mattesi]_Force_The_Key_to_Capturing_Life_Th(b-ok.org).pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "[mike_mattesi]_force_the_key_to_capturing_life_th(b-ok.org",
+      "bytes": 41718677,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 3 Art + Computational Media/glitch+media+art/[Mike_Mattesi]_Force_The_Key_to_Capturing_Life_Th(b-ok.org).md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/[Walter_Foster_Creative_Team,_Walter_Foster_Publis(b-ok.xyz).pdf",
+      "rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/[Walter_Foster_Creative_Team,_Walter_Foster_Publis(b-ok.xyz).pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "[walter_foster_creative_team,_walter_foster_publis(b-ok.xyz",
+      "bytes": 104510030,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 3 Art + Computational Media/glitch+media+art/[Walter_Foster_Creative_Team,_Walter_Foster_Publis(b-ok.xyz).md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/color-in-shadows.pdf",
+      "rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/color-in-shadows.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "color-in-shadows",
+      "bytes": 642952,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 3 Art + Computational Media/glitch+media+art/color-in-shadows.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/composition of outdoor painting.pdf",
+      "rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/composition of outdoor painting.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "composition of outdoor painting",
+      "bytes": 351179,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 3 Art + Computational Media/glitch+media+art/composition of outdoor painting.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/dl2-5.pdf",
+      "rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/dl2-5.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "dl2-5",
+      "bytes": 6057077,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 3 Art + Computational Media/glitch+media+art/dl2-5.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/how to draw locomotives.pdf",
+      "rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/how to draw locomotives.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "how to draw locomotives",
+      "bytes": 3902160,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 3 Art + Computational Media/glitch+media+art/how to draw locomotives.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/lofi_Rosa_Menkman_-_A_Vernacular_of_File_Formats.pdf",
+      "rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/lofi_Rosa_Menkman_-_A_Vernacular_of_File_Formats.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "lofi_rosa_menkman_-_a_vernacular_of_file_formats",
+      "bytes": 7941617,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 3 Art + Computational Media/glitch+media+art/lofi_Rosa_Menkman_-_A_Vernacular_of_File_Formats.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/the-natural-way-to-draw-kimon-nicolaides.pdf",
+      "rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/the-natural-way-to-draw-kimon-nicolaides.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "the-natural-way-to-draw-kimon-nicolaides",
+      "bytes": 47041150,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 3 Art + Computational Media/glitch+media+art/the-natural-way-to-draw-kimon-nicolaides.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/yanBOOK.pdf",
+      "rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/yanBOOK.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "yanbook",
+      "bytes": 79884748,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 3 Art + Computational Media/glitch+media+art/yanBOOK.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 3 Art + Computational Media/screenplay.pdf",
+      "rel": "books/pdf/DOMAIN 3 Art + Computational Media/screenplay.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "screenplay",
+      "bytes": 5069335,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 3 Art + Computational Media/screenplay.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 4 Business/Business guide.pdf",
+      "rel": "books/pdf/DOMAIN 4 Business/Business guide.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "business guide",
+      "bytes": 2048149,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/Business guide.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 4 Business/organizations+leadership/100M Offers How To Make Offers So Good People Feel Stupid Saying No (Alex Hormozi) (Z-Library).pdf",
+      "rel": "books/pdf/DOMAIN 4 Business/organizations+leadership/100M Offers How To Make Offers So Good People Feel Stupid Saying No (Alex Hormozi) (Z-Library).pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "100m offers how to make offers so good people feel stupid saying no (alex hormozi",
+      "bytes": 3302640,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/organizations+leadership/100M Offers How To Make Offers So Good People Feel Stupid Saying No (Alex Hormozi) (Z-Library).md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 4 Business/practice+economics/Made by James (James Martin  Made by James) (Z-Library).pdf",
+      "rel": "books/pdf/DOMAIN 4 Business/practice+economics/Made by James (James Martin  Made by James) (Z-Library).pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "made by james (james martin made by james",
+      "bytes": 39149170,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/practice+economics/Made by James (James Martin  Made by James) (Z-Library).md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 4 Business/practice+economics/Shaughnessy, Adrian - How to be a Graphic Designer without Losing your Soul 150dpi.pdf",
+      "rel": "books/pdf/DOMAIN 4 Business/practice+economics/Shaughnessy, Adrian - How to be a Graphic Designer without Losing your Soul 150dpi.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "shaughnessy, adrian - how to be a graphic designer without losing your soul 150dpi",
+      "bytes": 26232190,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/practice+economics/Shaughnessy, Adrian - How to be a Graphic Designer without Losing your Soul 150dpi.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 4 Business/practice+economics/You \u0301re My Favorite Client_Mike Monteiro_liber3.pdf",
+      "rel": "books/pdf/DOMAIN 4 Business/practice+economics/You \u0301re My Favorite Client_Mike Monteiro_liber3.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "you \u0301re my favorite client_mike monteiro_liber3",
+      "bytes": 910372,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/practice+economics/You \u0301re My Favorite Client_Mike Monteiro_liber3.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 5 Personal Practice/habits+behavior+change/Behavior Operations Manual (Chase Hughes) (Z-Library).pdf",
+      "rel": "books/pdf/DOMAIN 5 Personal Practice/habits+behavior+change/Behavior Operations Manual (Chase Hughes) (Z-Library).pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "behavior operations manual (chase hughes",
+      "bytes": 97257626,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 5 Personal Practice/habits+behavior+change/Behavior Operations Manual (Chase Hughes) (Z-Library).md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 5 Personal Practice/habits+behavior+change/The Behavior Operations Manual Neuro-Cognitive Intelligence (Chase Hughes) (Z-Library).pdf",
+      "rel": "books/pdf/DOMAIN 5 Personal Practice/habits+behavior+change/The Behavior Operations Manual Neuro-Cognitive Intelligence (Chase Hughes) (Z-Library).pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "the behavior operations manual neuro-cognitive intelligence (chase hughes",
+      "bytes": 9848979,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 5 Personal Practice/habits+behavior+change/The Behavior Operations Manual Neuro-Cognitive Intelligence (Chase Hughes) (Z-Library).md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 5 Personal Practice/mood+therapy/Cosmic Trigger The Final Secret of the Illuminati (Robert Anton Wilson) (Z-Library).pdf",
+      "rel": "books/pdf/DOMAIN 5 Personal Practice/mood+therapy/Cosmic Trigger The Final Secret of the Illuminati (Robert Anton Wilson) (Z-Library).pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "cosmic trigger the final secret of the illuminati (robert anton wilson",
+      "bytes": 4075644,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 5 Personal Practice/mood+therapy/Cosmic Trigger The Final Secret of the Illuminati (Robert Anton Wilson) (Z-Library).md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 5 Personal Practice/mood+therapy/Hamvas Be\u0301la - Scienta Sacra 1. Ko\u0308tet.pdf",
+      "rel": "books/pdf/DOMAIN 5 Personal Practice/mood+therapy/Hamvas Be\u0301la - Scienta Sacra 1. Ko\u0308tet.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "hamvas be\u0301la - scienta sacra 1. ko\u0308tet",
+      "bytes": 911281,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 5 Personal Practice/mood+therapy/Hamvas Be\u0301la - Scienta Sacra 1. Ko\u0308tet.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 5 Personal Practice/mood+therapy/Men's Sexual Health - Fitness for Satisfying Sex By Barry W. McCarthy.pdf",
+      "rel": "books/pdf/DOMAIN 5 Personal Practice/mood+therapy/Men's Sexual Health - Fitness for Satisfying Sex By Barry W. McCarthy.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "men's sexual health - fitness for satisfying sex by barry w. mccarthy",
+      "bytes": 3764730,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 5 Personal Practice/mood+therapy/Men's Sexual Health - Fitness for Satisfying Sex By Barry W. McCarthy.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 5 Personal Practice/mood+therapy/Quantum Psychology (Robert Anton Wilson) (Z-Library).pdf",
+      "rel": "books/pdf/DOMAIN 5 Personal Practice/mood+therapy/Quantum Psychology (Robert Anton Wilson) (Z-Library).pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "quantum psychology (robert anton wilson",
+      "bytes": 8359259,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 5 Personal Practice/mood+therapy/Quantum Psychology (Robert Anton Wilson) (Z-Library).md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 5 Personal Practice/mood+therapy/The Body Language of Sex, Power & Aggression.pdf",
+      "rel": "books/pdf/DOMAIN 5 Personal Practice/mood+therapy/The Body Language of Sex, Power & Aggression.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "the body language of sex, power & aggression",
+      "bytes": 595053,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 5 Personal Practice/mood+therapy/The Body Language of Sex, Power & Aggression.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 5 Personal Practice/mood+therapy/the art of loving.pdf",
+      "rel": "books/pdf/DOMAIN 5 Personal Practice/mood+therapy/the art of loving.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "the art of loving",
+      "bytes": 1225658,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 5 Personal Practice/mood+therapy/the art of loving.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 5 Personal Practice/productivity+execution/'Make Electronics by Charles Platt.pdf.pdf'.pdf",
+      "rel": "books/pdf/DOMAIN 5 Personal Practice/productivity+execution/'Make Electronics by Charles Platt.pdf.pdf'.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "'make electronics by charles platt.pdf.pdf'",
+      "bytes": 17939858,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 5 Personal Practice/productivity+execution/'Make Electronics by Charles Platt.pdf.pdf'.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 5 Personal Practice/productivity+execution/Atomic_Habits_Tiny_Changes,_Remarkable_Results_James_Clear_PDF.pdf",
+      "rel": "books/pdf/DOMAIN 5 Personal Practice/productivity+execution/Atomic_Habits_Tiny_Changes,_Remarkable_Results_James_Clear_PDF.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "atomic_habits_tiny_changes,_remarkable_results_james_clear_pdf",
+      "bytes": 6120516,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 5 Personal Practice/productivity+execution/Atomic_Habits_Tiny_Changes,_Remarkable_Results_James_Clear_PDF.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 5 Personal Practice/productivity+execution/Authentic Revolution Games Manual FINAL.pdf",
+      "rel": "books/pdf/DOMAIN 5 Personal Practice/productivity+execution/Authentic Revolution Games Manual FINAL.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "authentic revolution games manual final",
+      "bytes": 50931296,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 5 Personal Practice/productivity+execution/Authentic Revolution Games Manual FINAL.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 5 Personal Practice/productivity+execution/Circuit-bending build your own alien instruments (Reed Ghazala) (Z-Library).pdf",
+      "rel": "books/pdf/DOMAIN 5 Personal Practice/productivity+execution/Circuit-bending build your own alien instruments (Reed Ghazala) (Z-Library).pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "circuit-bending build your own alien instruments (reed ghazala",
+      "bytes": 10834382,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 5 Personal Practice/productivity+execution/Circuit-bending build your own alien instruments (Reed Ghazala) (Z-Library).md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 5 Personal Practice/productivity+execution/Encyclopedia of Electronic Components Volume 1.pdf",
+      "rel": "books/pdf/DOMAIN 5 Personal Practice/productivity+execution/Encyclopedia of Electronic Components Volume 1.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "encyclopedia of electronic components volume 1",
+      "bytes": 33479972,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 5 Personal Practice/productivity+execution/Encyclopedia of Electronic Components Volume 1.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 5 Personal Practice/productivity+execution/IJRITCC_1349.pdf",
+      "rel": "books/pdf/DOMAIN 5 Personal Practice/productivity+execution/IJRITCC_1349.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "ijritcc_1349",
+      "bytes": 450430,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 5 Personal Practice/productivity+execution/IJRITCC_1349.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 5 Personal Practice/productivity+execution/Internationa Taxation.pdf",
+      "rel": "books/pdf/DOMAIN 5 Personal Practice/productivity+execution/Internationa Taxation.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "internationa taxation",
+      "bytes": 19601266,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 5 Personal Practice/productivity+execution/Internationa Taxation.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 5 Personal Practice/productivity+execution/Sansui-AV-77-Service-Manual.pdf",
+      "rel": "books/pdf/DOMAIN 5 Personal Practice/productivity+execution/Sansui-AV-77-Service-Manual.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "sansui-av-77-service-manual",
+      "bytes": 6445329,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 5 Personal Practice/productivity+execution/Sansui-AV-77-Service-Manual.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 5 Personal Practice/productivity+execution/The Writer's Idea Thesaurus - Fred White.pdf",
+      "rel": "books/pdf/DOMAIN 5 Personal Practice/productivity+execution/The Writer's Idea Thesaurus - Fred White.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "the writer's idea thesaurus - fred white",
+      "bytes": 9502208,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 5 Personal Practice/productivity+execution/The Writer's Idea Thesaurus - Fred White.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 5 Personal Practice/productivity+execution/What's_Your_Dream_Find_Your_Passion,_Love_Your_Work_and_Build_a.pdf",
+      "rel": "books/pdf/DOMAIN 5 Personal Practice/productivity+execution/What's_Your_Dream_Find_Your_Passion,_Love_Your_Work_and_Build_a.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "what's_your_dream_find_your_passion,_love_your_work_and_build_a",
+      "bytes": 3947316,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 5 Personal Practice/productivity+execution/What's_Your_Dream_Find_Your_Passion,_Love_Your_Work_and_Build_a.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 5 Personal Practice/productivity+execution/kupdf.com_how-to-test-almost-everything-electronic-3rd-ed.pdf",
+      "rel": "books/pdf/DOMAIN 5 Personal Practice/productivity+execution/kupdf.com_how-to-test-almost-everything-electronic-3rd-ed.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "kupdf.com_how-to-test-almost-everything-electronic-3rd-ed",
+      "bytes": 13861114,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 5 Personal Practice/productivity+execution/kupdf.com_how-to-test-almost-everything-electronic-3rd-ed.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 5 Personal Practice/productivity+execution/oreilly-make-more-electronics-2014.pdf",
+      "rel": "books/pdf/DOMAIN 5 Personal Practice/productivity+execution/oreilly-make-more-electronics-2014.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "oreilly-make-more-electronics-2014",
+      "bytes": 49727037,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 5 Personal Practice/productivity+execution/oreilly-make-more-electronics-2014.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 5 Personal Practice/productivity+execution/the-orgone-accumulator-handbook.pdf",
+      "rel": "books/pdf/DOMAIN 5 Personal Practice/productivity+execution/the-orgone-accumulator-handbook.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "the-orgone-accumulator-handbook",
+      "bytes": 22612671,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 5 Personal Practice/productivity+execution/the-orgone-accumulator-handbook.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 6 AI + Computing/210912-LB-Network-Map.pdf",
+      "rel": "books/pdf/DOMAIN 6 AI + Computing/210912-LB-Network-Map.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "210912-lb-network-map",
+      "bytes": 4079473,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 6 AI + Computing/210912-LB-Network-Map.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 6 AI + Computing/Bitcoin Mining Handbook.pdf",
+      "rel": "books/pdf/DOMAIN 6 AI + Computing/Bitcoin Mining Handbook.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "bitcoin mining handbook",
+      "bytes": 4451770,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 6 AI + Computing/Bitcoin Mining Handbook.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 6 AI + Computing/programming/  .pdf",
+      "rel": "books/pdf/DOMAIN 6 AI + Computing/programming/  .pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "",
+      "bytes": 3480513,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 6 AI + Computing/programming/  .md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 6 AI + Computing/programming/Amariei C. - Arduino Development Cookbook - 2015.pdf",
+      "rel": "books/pdf/DOMAIN 6 AI + Computing/programming/Amariei C. - Arduino Development Cookbook - 2015.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "amariei c. - arduino development cookbook - 2015",
+      "bytes": 3948476,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 6 AI + Computing/programming/Amariei C. - Arduino Development Cookbook - 2015.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 6 AI + Computing/programming/Designing_the_Internet_of_Things.pdf",
+      "rel": "books/pdf/DOMAIN 6 AI + Computing/programming/Designing_the_Internet_of_Things.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "designing_the_internet_of_things",
+      "bytes": 5200025,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 6 AI + Computing/programming/Designing_the_Internet_of_Things.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 6 AI + Computing/programming/KRUMM, J. (2009) UBIQUITOUS COMPUTING FUNDAMENTALS- CRC PRESS, 1st ed. .pdf",
+      "rel": "books/pdf/DOMAIN 6 AI + Computing/programming/KRUMM, J. (2009) UBIQUITOUS COMPUTING FUNDAMENTALS- CRC PRESS, 1st ed. .pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "krumm, j. (2009) ubiquitous computing fundamentals- crc press, 1st ed.",
+      "bytes": 8118021,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 6 AI + Computing/programming/KRUMM, J. (2009) UBIQUITOUS COMPUTING FUNDAMENTALS- CRC PRESS, 1st ed. .md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 6 AI + Computing/programming/Processing- A Programming Handbook for Visual Designers and Artists, 2 edition.pdf",
+      "rel": "books/pdf/DOMAIN 6 AI + Computing/programming/Processing- A Programming Handbook for Visual Designers and Artists, 2 edition.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "processing- a programming handbook for visual designers and artists, 2 edition",
+      "bytes": 15889378,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 6 AI + Computing/programming/Processing- A Programming Handbook for Visual Designers and Artists, 2 edition.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 6 AI + Computing/programming/SkienaTheAlgorithmDesignManual.pdf",
+      "rel": "books/pdf/DOMAIN 6 AI + Computing/programming/SkienaTheAlgorithmDesignManual.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "skienathealgorithmdesignmanual",
+      "bytes": 4082875,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 6 AI + Computing/programming/SkienaTheAlgorithmDesignManual.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 6 AI + Computing/programming/[Matt_Pearson]_Generative_Art(BookFi.org).pdf",
+      "rel": "books/pdf/DOMAIN 6 AI + Computing/programming/[Matt_Pearson]_Generative_Art(BookFi.org).pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "[matt_pearson]_generative_art(bookfi.org",
+      "bytes": 17538492,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 6 AI + Computing/programming/[Matt_Pearson]_Generative_Art(BookFi.org).md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 6 AI + Computing/programming/_OceanofPDF.com_clean-code.pdf",
+      "rel": "books/pdf/DOMAIN 6 AI + Computing/programming/_OceanofPDF.com_clean-code.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "_oceanofpdf.com_clean-code",
+      "bytes": 4261722,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 6 AI + Computing/programming/_OceanofPDF.com_clean-code.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 7 Influence + Power/Police-Auction-Catalogue-February-2024.pdf",
+      "rel": "books/pdf/DOMAIN 7 Influence + Power/Police-Auction-Catalogue-February-2024.pdf",
+      "root": "books",
+      "kind": "pdf",
+      "key": "police-auction-catalogue-february-2024",
+      "bytes": 5059624,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 7 Influence + Power/Police-Auction-Catalogue-February-2024.md"
+    }
+  ],
+  "rc": 2
+}

@@ -13,23 +13,24 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1178 decisions (census stamp 0aaa23ca749afb59, 2026-10-16) · 630 bugs (227 open / 403 closed; highest OPEN = BUG-864) · 52 open tasks (MUST 12 / SHOULD 36 / WORTH 4; OWNER-moved 5, pipeline-moved 47; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1180 decisions (census stamp 4a42714340c28d62, 2026-10-16) · 632 bugs (228 open / 404 closed; highest OPEN = BUG-867) · 54 open tasks (MUST 12 / SHOULD 38 / WORTH 4; OWNER-moved 6, pipeline-moved 48; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **79** of 1178 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 593 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1178, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **79** of 1180 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 595 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1180, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 227 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 34 · 🟨 MED 64 · 🟩 LOW 24 · UNLABELLED 101 (BUG-757) of 227 open.
+> Open BUGS by severity (population = the census's 228 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 34 · 🟨 MED 64 · 🟩 LOW 25 · UNLABELLED 101 (BUG-757) of 228 open.
 >
-> **OWNER LANE (5) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
+> **OWNER LANE (6) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
-> | T-181 | 🔴 MUST | THE FLOW - scripts/census_source_names.py --flow now DECLARES the five transitions between an arrival and a st | owner lane, three limbs: (1) NAME THE ADMISSION - is it the owner plac |
+> | T-181 | 🔴 MUST | THE ADMISSION - the fifth transition is DECLARED, counted and PLANNED (D-3051): what remains is the word on wh | owner lane, TWO limbs remain. (1) CLOSED 2026-10-16 by D-3051 - the ad |
 > | T-176 | 🟠 SHOULD | THE SOURCE LIBRARY NAMES - THE OWNER WORD IS GIVEN AND THE PLAN IS PUBLISHED: what remains is the acceptance o | owner lane, plan-first: the owner accepts or edits the published plan  |
 > | T-179 | 🟠 SHOULD | THE SECOND MATERIALISATION - the library and the corpus hold the same work, the reading now measures how far t | owner lane: the owner decides between (a) RETIRING the second material |
 > | T-180 | 🟠 SHOULD | THE PLACEMENT - the declaration now says where a file belongs and the reading says what it does not cover: 281 | owner lane, four limbs, each separately wordable and none of them urge |
 > | T-182 | 🟠 SHOULD | THE LEGACY PLACEMENT TOOLS - the topic vocabulary the library materialises BELOW its declared axis has a SECON | owner lane, three limbs: (1) decide whether the below-axis vocabulary  |
+> | T-183 | 🟠 SHOULD | THE ADMIT APPLIER - once the owner accepts rows of governance/ADMISSION_PLAN_<date>.md, ONE crash-safe writer  | owner-gated by construction: the applier reads an ACCEPTED plan (a fil |
 >
-> **PIPELINE LANE (47) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
+> **PIPELINE LANE (48) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
 >
 > | id | pri | state | task | evidence |
 > |---|---|---|---|---|
@@ -46,7 +47,7 @@
 > | T-150 | 🔴 MUST | 🔴 open | THE DURABLE PATH IS THE DELEGATION PATH (D-3020): anything whose failure is not free goes through pipeline/sub | temp/runs/fanout_20261015i/98_receipt.json - 3/3 DONE with one task deliberately given a 1 |
 > | T-105 | 🟠 SHOULD | 🔴 open | REA tier A/B mining — DEVONthink 3 (related-document ranking) and Cursor (derived code index) | governance/NOT-YET-EVALUATED-RESEARCH.md (REA targets logged 2026-10-13) |
 >
-> _the face is a VIEW: 12 of 47 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
+> _the face is a VIEW: 12 of 48 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
 >
 > **STANDING RULES — in effect, never close (1):**
 >

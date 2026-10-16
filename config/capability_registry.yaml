@@ -266,6 +266,7 @@ capabilities:
     owns:
       - scripts/census_source_names.py
       - scripts/plan_source_rename.py
+      - scripts/plan_admission.py   # D-3051: the admission plan - what the pipeline has never seen, by the door own key
   - id: bug_recall
     kind: script
     entrypoint: python3 scripts/check_bug_recall.py
@@ -338,6 +339,11 @@ lanes:
     produces: reading
     capability: source_library_names
     why: 'WHERE things are against where the declaration says they belong (T-180/D-3049): the misplaced kinds, the files loose at a root, the subfolders the declared axis does not name, and every declared ARRIVAL PEN with its oldest file and how much of it the pipeline has never seen. It never moves a file - a placement repair is owner-worded (T-180)'
+  - recipe: admit-plan
+    cmd: python3 scripts/plan_admission.py --plan
+    produces: receipt
+    capability: source_library_names
+    why: 'T-181/D-3051: THE ADMISSION PLAN - for every file in the declared library kind roots, whether the corpus or an ingest record already names it by the door own key, and what is left (MEASURED 2026-10-16: 2,811 files, 244 admission candidates, 621 refused for a root that declares no corpus home). It writes the plan and admits NOTHING: the act that admits a work is separate and owner-worded (T-183), and no engine moves a file because of its name (D-3045)'
   - recipe: rename-plan
     cmd: python3 scripts/plan_source_rename.py --plan
     produces: receipt

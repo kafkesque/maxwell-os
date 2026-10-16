@@ -8,23 +8,24 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1178 decisions (census stamp 0aaa23ca749afb59, 2026-10-16) · 630 bugs (227 open / 403 closed; highest OPEN = BUG-864) · 52 open tasks (MUST 12 / SHOULD 36 / WORTH 4; OWNER-moved 5, pipeline-moved 47; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1180 decisions (census stamp 4a42714340c28d62, 2026-10-16) · 632 bugs (228 open / 404 closed; highest OPEN = BUG-867) · 54 open tasks (MUST 12 / SHOULD 38 / WORTH 4; OWNER-moved 6, pipeline-moved 48; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **79** of 1178 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 593 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1178, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **79** of 1180 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 595 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1180, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 227 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 34 · 🟨 MED 64 · 🟩 LOW 24 · UNLABELLED 101 (BUG-757) of 227 open.
+> Open BUGS by severity (population = the census's 228 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 34 · 🟨 MED 64 · 🟩 LOW 25 · UNLABELLED 101 (BUG-757) of 228 open.
 >
-> **OWNER LANE (5) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
+> **OWNER LANE (6) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
-> | T-181 | 🔴 MUST | THE FLOW - scripts/census_source_names.py --flow now DECLARES the five transitions between an arrival and a st | owner lane, three limbs: (1) NAME THE ADMISSION - is it the owner plac |
+> | T-181 | 🔴 MUST | THE ADMISSION - the fifth transition is DECLARED, counted and PLANNED (D-3051): what remains is the word on wh | owner lane, TWO limbs remain. (1) CLOSED 2026-10-16 by D-3051 - the ad |
 > | T-176 | 🟠 SHOULD | THE SOURCE LIBRARY NAMES - THE OWNER WORD IS GIVEN AND THE PLAN IS PUBLISHED: what remains is the acceptance o | owner lane, plan-first: the owner accepts or edits the published plan  |
 > | T-179 | 🟠 SHOULD | THE SECOND MATERIALISATION - the library and the corpus hold the same work, the reading now measures how far t | owner lane: the owner decides between (a) RETIRING the second material |
 > | T-180 | 🟠 SHOULD | THE PLACEMENT - the declaration now says where a file belongs and the reading says what it does not cover: 281 | owner lane, four limbs, each separately wordable and none of them urge |
 > | T-182 | 🟠 SHOULD | THE LEGACY PLACEMENT TOOLS - the topic vocabulary the library materialises BELOW its declared axis has a SECON | owner lane, three limbs: (1) decide whether the below-axis vocabulary  |
+> | T-183 | 🟠 SHOULD | THE ADMIT APPLIER - once the owner accepts rows of governance/ADMISSION_PLAN_<date>.md, ONE crash-safe writer  | owner-gated by construction: the applier reads an ACCEPTED plan (a fil |
 >
-> **PIPELINE LANE (47) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
+> **PIPELINE LANE (48) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
 >
 > | id | pri | state | task | evidence |
 > |---|---|---|---|---|
@@ -41,7 +42,7 @@
 > | T-150 | 🔴 MUST | 🔴 open | THE DURABLE PATH IS THE DELEGATION PATH (D-3020): anything whose failure is not free goes through pipeline/sub | temp/runs/fanout_20261015i/98_receipt.json - 3/3 DONE with one task deliberately given a 1 |
 > | T-105 | 🟠 SHOULD | 🔴 open | REA tier A/B mining — DEVONthink 3 (related-document ranking) and Cursor (derived code index) | governance/NOT-YET-EVALUATED-RESEARCH.md (REA targets logged 2026-10-13) |
 >
-> _the face is a VIEW: 12 of 47 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
+> _the face is a VIEW: 12 of 48 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
 >
 > **STANDING RULES — in effect, never close (1):**
 >
@@ -15863,3 +15864,27 @@ FIX: the bridge now (1) matches through the DOOR'S OWN comparison key (`pipeline
 MEASURED AFTER: `pipeline/batch_convert_epubs.py --selftest` 4/4 green; the live PLAN writes nothing; `SOURCE_EPUB_DIR` resolves to the library epub root (exists=True, 554 .epub under it) and `SOURCE_PDF_DIR` to the library pdf root (exists=True). STILL OPEN AND REGISTERED: the admission transition itself (T-181) and the legacy tools' second home for the topic vocabulary (T-182).
 
 FILE / EVIDENCE: pipeline/batch_convert_epubs.py; config/pipeline_config.yaml#source_epub_dir; scripts/census_source_names.py --flow.
+
+## BUG-867 (LOW — OPEN 2026-10-16) — scripts/census_source_names.py never compares a file's own CONTAINER to the KIND folder its declared axis orders it by: it reads "misplaced 281, 0 subfolders the axis does not name" while 92 files sit in a kind folder that contradicts them (remedy: T-184)
+
+**Status:** OPEN (remedy: T-184, the placement reading's own gap). FOUND 2026-10-16 by writing the ADMISSION PLAN (scripts/plan_admission.py, D-3051) and reading its own refusal classes back.
+
+SYMPTOM: MEASURED 2026-10-16, `python3 scripts/census_source_names.py --placement` reads "2,811 file(s) inside the declared roots, 2,530 admitted, 281 misplaced, 0 loose at a root, 0 in a subfolder the declared axis does not name" — and NOTHING in that sentence covers a file that sits INSIDE a declared kind folder while carrying a DIFFERENT container. MEASURED: 92 such files under the books home — 42 `.epub` in `books/pdf/`, 24 `.md` in `books/pdf/`, 10 `.pdf` in `books/epub/`, 8 `.mobi` in `books/epub/`, 5 `.mobi` in `books/pdf/`, and one each of `.azw3` in epub, `.djvu` in pdf, `.doc` in pdf. The reading's two classes that exist between them leave the contradiction uncounted: `misplaced` counts a kind NO ROOT ADMITS (the `.png`/`.psd` population, 281 files) and `undeclared subfolder` counts a DEPTH-1 NAME the axis does not name. So a `.epub` filed under `books/pdf/` passes both tests — its kind IS admitted, and `pdf` IS a declared name — while the declaration it is filed under says the folder IS the container claim. The ONE line the owner reads on every health run is therefore silent about 92 files, and the FIRST live admission reading found them by accident (it refused them, correctly, as `refused_not_in_its_kind_folder`, 52 of them after the refuses that precede it in the order).
+
+ROOT CAUSE: the placement reading compares the axis to a NAME (the folder's own name against the declared set, the file's suffix against the KIND set) but never to the OTHER HALF of the same declaration: `placement.homes.<root>.axis: kind` at `axis_depth: 1` says the depth-1 folder IS the file's own container claim, and the reading never asks whether the file agrees with the folder it is under. This is D-3034's distinction inside a reading — a declaration must RESOLVE — a folder named `pdf` resolves nothing unless the file in it is a pdf. The gap is invisible from outside because every number the reading prints is TRUE: it is the COVERAGE of the printed classes that is short, which is BUG-865's shape one level down (there the blindness was BELOW the declared axis; here it is AT it, where the axis was declared and then read as a set of names rather than as a claim).
+
+FIX (T-184): the placement reading gains the class it lacks — a file whose own container contradicts the kind folder its home's axis orders it by — COUNTED, with a bounded number of named examples, folded into the same loud owner-owed condition as `misplaced` (BUG-457), and covered by a fixture control (a `.epub` in `pdf/` reads OUT-OF-ITS-KIND-FOLDER, an `.epub` in `epub/` does not, and a `.png` in `pdf/` stays MISPLACED without being counted twice). MEASURED EFFECT TO EXPECT: the notify's misplaced-family count moves 281 -> 373 and the class is NAMED. This entry is deliberately OPEN and no line of the placement reader was edited by the act that found it: one act, one subject, and the repair belongs to the reading that owns the question. The counts above are the reading the repair must move.
+
+**Ids:** D-3051 (the admission plan, the act that found it) | T-184 (the repair) | T-180 (the disposition of the misplaced population, owner-worded) | BUG-865 (the same shape below the axis)
+
+## BUG-868 (LOW — FIXED 2026-10-16) — an UNDECLARED, un-stamped DERIVED INDEX of this repository and of the corpus exists on this machine (a GUI built it over the owner's Dropbox), and config/ingest_identity_gate.yaml — the file whose arrangement declares "ONE bytes home plus ONE derived tree that carries a receipt" — said nothing about it (remedy: D-3052 — the disclosure IS the remedy)
+
+**Status:** FIXED 2026-10-16 (owner's own report: "I already installed it — check if this can be utilized"). MEASURED before any answer.
+
+SYMPTOM: MEASURED 2026-10-16 on this machine: /Applications/DigUp.app (com.abdurrahim.DigUp, 0.6.1, LSUIElement, Sparkle auto-update ON with a public feed) holds a semantic index of the owner's chosen folders — Desktop, Documents, Downloads, Pictures, Movies, Music, the WHOLE Dropbox and iCloud Drive — i.e. of this repository, its governance and the corpus home. Its stores are ~/Library/Application Support/DigUp/index.noindex/index.sqlite (242,728,960 B at 18:21 that day, plus a 244 MB WAL) and a SEPARATE code.sqlite, its models are embeddinggemma-2-Q8_0.gguf (309,855,456 B) and mmproj-embeddinggemma-2-Q8_0.gguf (554,821,024 B, a multi-modal projector), and its own worker log names the runtime: "[llama.cpp worker] ready in 7.47 s (text-only, llama.cpp b11461, vectors 1)". Nothing in this repository declared that a second, DERIVED, un-receipted index of the corpus and of the repository itself exists on the machine — no register row, no decision, no reading. It is local and $0 marginal (C1/C3 hold), so this is not a sovereignty defect; it is a SILENCE: D-3050 declares "ONE bytes home plus ONE derived tree that carries a receipt", and a 242 MB derived index of those same bytes with no receipt and no stamp is a THIRD reading of them that no rail can see.
+
+ROOT CAUSE: the declaration law in this repository is written for artifacts the OS makes, and an application the OWNER installs keeps its own state outside the tree — so the artifact is real, load-bearing for the owner's daily work, and structurally invisible: no path in the tree names it, no census walks it, and the two facts that matter for any future use (its VERSION FLOATS — the app auto-updates from a public feed, so a hash taken today names a binary that may not exist tomorrow; its INDEX is UNREPRODUCIBLE — built quietly by a GUI, with no schema, no promise and no stamp) would have stayed unrecorded until someone tried to build on it and found the ground moving.
+
+REMEDY (D-3052, and it is a DISCLOSURE rather than a repair — nothing in this repository owns the owner's app): the arm is REGISTERED with NO CONSUMER — nothing in the scaffold, the tools, the skill orchestration or the knowledge pipeline may read it — its measured facts, the four mechanical reasons (no callable interface, a floating version, an unreproducible index, a second index of the same bytes), the one reusable asset (a hashable GGUF model, usable only as its OWN declared vector space and never mixed with bge-m3) and the RE-OPEN CONDITION (a pinnable interface plus a named consumer) are recorded once, in the register and in governance/NOT-YET-EVALUATED-RESEARCH.md, so the question is answered ONCE instead of re-asked per session. No code, lane, rail or config file is added: a declaration nothing consumes would be prose (D-405).
+
+**Ids:** D-3052 (the verdict) | BUG-864 (the same class on the placement side: a GUI rule engine refused as a DECIDER) | D-2654 (the stronger refusal next door: an unhashable model) | T-179 (the second materialisation, one layer in)

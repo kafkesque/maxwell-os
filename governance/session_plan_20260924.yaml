@@ -387,6 +387,12 @@ may_touch:
 - temp/land_20261016s_findings.py
 - temp/smoke_parallel.py
 - temp/d3046_record.yaml
+- scripts/plan_admission.py
+- governance/ADMISSION_PLAN_20261016.md
+- governance/ADMISSION_PLAN_20261016.json
+- governance/NOT-YET-EVALUATED-RESEARCH.md
+- temp/d3051_record.yaml
+- temp/d3052_record.yaml
 will_not_touch:
 - governance/F11_*
 - governance/ANCHOR_RULER_CONSOLIDATED_*.csv
@@ -1360,4 +1366,22 @@ widening_log:
       why: >-
         the decision payload, minted after the bug and the row exist, because a decision citing an unregistered bug
         is refused (D-2660).
+  owner_ack: 'owner 2026-10-16 (verbatim): "T138 recommendation approve but clarification will the harness adapter be futureproof so later if I want other harenss to deploy or utilize will I be able" + "ok implement ... go forward based on the stratigically most consequnetial highest leverage"'
+- date: '2026-10-16'
+  actor: assistant
+  reason: >-
+    T-181 / D-3051 - THE ADMISSION. The flow's fifth transition was declared NOWHERE, so the pipeline's own input path
+    was the one step a human did by hand with no counter and no receipt. This act declares it (actor, moves, counter,
+    plan, refuses, owed), lands the READ-ONLY plan reader that names what the corpus has never seen by the DOOR's own
+    key, its 18 known-answer controls, its ladder line and its operator lane, and registers the two findings the
+    reading produced (BUG-867, the kind folder a file contradicts - T-184; BUG-868, an undeclared derived index on the
+    machine, with the DigUp verdict D-3052). No path outside the admission subject was widened: every edited file is
+    already inside may_touch, and the six names added here are the act's own new artifacts.
+  additions:
+    - scripts/plan_admission.py
+    - governance/ADMISSION_PLAN_20261016.md
+    - governance/ADMISSION_PLAN_20261016.json
+    - governance/NOT-YET-EVALUATED-RESEARCH.md
+    - temp/d3051_record.yaml
+    - temp/d3052_record.yaml
   owner_ack: 'owner 2026-10-16 (verbatim): "T138 recommendation approve but clarification will the harness adapter be futureproof so later if I want other harenss to deploy or utilize will I be able" + "ok implement ... go forward based on the stratigically most consequnetial highest leverage"'

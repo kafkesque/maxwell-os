@@ -26550,3 +26550,163 @@ decisions:
   - 'the residual risk is NAMED rather than closed: the admission step (T-181), the topic vocabulary''s second home
     in the legacy tools (T-182), and the 727-pair drift whose origin this act REFUTED for the bridge and left as
     an open question with its candidates listed instead of a culprit'
+- id: D-3051
+  state: ACTIVE
+  date: '2026-10-16'
+  by: assistant
+  category: THE ADMISSION — THE FIFTH TRANSITION GETS A NAME, A COUNTER AND A PLAN
+  bugs:
+  - BUG-867
+  files:
+  - config/ingest_identity_gate.yaml
+  - scripts/plan_admission.py
+  - justfile
+  - config/rail_registry.yaml
+  - config/capability_registry.yaml
+  - config/task_register.yaml
+  - governance/ADMISSION_PLAN_20261016.md
+  - governance/ADMISSION_PLAN_20261016.json
+  - governance/buglog.md
+  title: 'THE ADMISSION — the one transition in the flow that was declared NOWHERE now has a DECLARED home, a ONE-line
+    counter on every health run, and a READ-ONLY plan that names, by the door''s own key, every work the pipeline
+    has never seen, how many the corpus already holds, and every refusal with its reason COUNTED: 2,811 files read,
+    244 admission candidates, 870 refused, and NO engine moves a file because of its name'
+  decision: 'MEASURED 2026-10-16, before this act: the flow between an arrival and a stamped work had FIVE declared
+    transitions and the middle one — the step that puts a library file INTO the corpus that pipeline/stage0_convert.py
+    reads — was declared NOWHERE. The pipeline''s own INPUT PATH was therefore the one step a human performed by
+    hand, with no counter and no receipt (D-3050, T-181). A plan is the smallest thing that removes that silence
+    without inventing a mover, and the measurement said a mover must NOT be invented yet: the whole population is
+    not even in one state. (1) THE TRANSITION IS DECLARED, WITH ITS ONE HOME. config/ingest_identity_gate.yaml#
+    source_library.flow.transitions.admission now carries authority, state ("DECLARED 2026-10-16 — it stood UNDECLARED
+    until this date": the history is kept, D-2642), where, actor (owner), moves (the owner''s word, row by row,
+    from the plan — NO engine admits a file because of its name), counter, plan, refuses, and owed. The corpus home
+    is a POINTER and never a restated path: each root declares admits_to, which NAMES the key arrangement.corpus_home
+    holds, so the two homes cannot drift apart (C12/D-3034). A root that does not declare admits_to is FATAL — a
+    silence about where a work goes is never a clean answer (D-3038). (2) THE PLAN IS A READER, NOT A MOVER. scripts/plan_admission.py
+    (READ-ONLY, 18 known-answer controls, 0.4 s live, one write call site behind --plan, proved by reading its own
+    bytes) answers ONE question per file in the declared kind roots: does the corpus, or an ingest record, already
+    name a work by this file''s KEY? The key is the DOOR''S OWN comparison key (pipeline/book_metadata.sanitize_source_book
+    on the stem) — a second key would be a second identity (D-3045) — and a control proves it IS that key. FIRST
+    LIVE READING 2026-10-16: 2,811 files in the declared kind roots, 1,697 the pipeline has seen (1,668 by the door''s
+    key, 29 by an ingest record whose corpus file now carries a different name — the T-130 rename''s own shadow),
+    1,114 never seen carrying 1,029 distinct keys; 244 ADMISSION CANDIDATES; 870 refused. The plan is governance/ADMISSION_PLAN_<date>.md
+    (+ .json): the owner''s worklist, written by --plan and by nothing else. (3) THE UNIT IS DECLARED, AND SO IS
+    WHAT A ROW PROPOSES. The unit is a FILE and not a work (a plan row is a file the owner can point at), so the
+    distinct KEYS are printed beside the counts. A row''s proposed corpus path is DERIVED from the source''s own
+    arrangement — corpus_home / (the source''s path BELOW its declared kind folder), with the .md the conversion
+    stage writes — and MEASURED 2026-10-16 over 200 sampled pairs the corpus copy carries the SAME stem in 199 but
+    the SAME topic folder in only 152: the two materialisations disagree about the folder below the axis in 48 of
+    200, which is exactly WHY a proposed path is a PROPOSAL the owner may move and never an act (D-2898: a topic
+    is not decided by an engine, and a name is evidence, never identity, D-3045). (4) THE DECISION VOCABULARY IS
+    CLOSED AND DECLARED, and every refusal is COUNTED (D-3038). The gate declares the seven classes with their meanings;
+    a class this reader can produce and the declaration does not carry is FATAL (a silent decision), and a declared
+    class that reads zero is PRINTED as zero (green by vacancy is visible, BUG-487). The four refusals, MEASURED:
+    no declared corpus home 621 (the notes root declares admits_to: null — 341 of those files are of a kind the
+    root DECLARES, so this is a missing declaration and not an empty pen); container no stage reads 9 (a declared
+    .mobi/.azw3/.djvu is OWNED but not convertible); name repair first 188 (an admitted file''s name becomes the
+    corpus name AND the door key, so admitting a defect materialises it into the tree the S0.5 cache then STAMPS
+    — the repair rides first, T-176); not in its kind folder 52 (the misplaced class T-180 owns). (5) THE AXIS IS
+    READ, NOT ASSUMED — the latent class this act caught in its OWN reader before it shipped: the kind-folder test
+    means something only where the home''s declared axis IS the kind. A `domain` home keeps the owner''s own topic
+    folders, so applying the test there would have refused every note the day that root gains a home, under a name
+    nobody declared. The axis is read from placement.homes, an axis outside the declared vocabulary is FATAL, and
+    a control proves that a domain-axis home with a corpus home never produces the class (it would have been a false
+    class waiting for a config edit, i.e. drift with a delay). (6) TWO MEASUREMENTS THE ACT CARRIES FOR ROWS IT
+    DOES NOT OWN (never acted on). (a) BUG-867, filed: 92 files under the books home sit in a DECLARED kind folder
+    that contradicts their own container (42 .epub and 24 .md inside books/pdf, 10 .pdf and 8 .mobi inside books/epub,
+    5 .mobi inside books/pdf, one each .azw3/.djvu/.doc) while `just placement` prints "281 misplaced, 0 subfolders
+    the axis does not name" — BUG-865''s shape one level down (there the blindness was BELOW the axis, here AT it);
+    the remedy is T-184 and the disposition stays T-180. (b) 23 of the 962 S0.5 cache records name a source_path
+    that does not resolve (2 of them still resolve by the door''s key, 21 under no key) — BUG-848''s acknowledged
+    class, handled by the door''s canonical lookup (already_ingested_by_canonical_name), RE-MEASURED here and deliberately
+    NOT re-filed as a bug. (7) WHAT THIS DECISION DOES NOT DO, recorded so it cannot be re-proposed as a surprise
+    (D-3038). It authorises NO MOVER: the applier is T-183, owner-gated by an ACCEPTED plan. It decides no topic
+    and repairs no name (T-176, D-2898''s rule intact). It does not touch the library md twin (T-179). It does not
+    admit a note: 621 note files have no home any declaration names, and naming one is the owner''s word (T-181
+    limb 2). It does not edit the placement reading, although it found a class missing there (one act, one subject
+    — T-184).'
+  consequences:
+  - 'T-181 limb (1) — NAME THE ADMISSION — is CLOSED: the transition is declared, counted and planned. The row stays
+    OPEN on the two limbs that need the owner''s word: where a NOTE is admitted (currently refused as undeclared,
+    621 files) and the library md twin (T-179).'
+  - 'The ladder gained ONE line: `ADMISSION: 2,811 file(s) ... candidates 244, refused 870 (...)` (tri_state, rc
+    2 is the owner-owed reading, loud and never fatal — BUG-457), plus the plan''s 18 controls as a fatal guard;
+    the registry carries both directions, so the notify and its controls cannot stop running silently (BUG-492).'
+  - A new operator lane `just admit-plan` writes the plan (receipt-producing, declared in config/capability_registry.yaml#lanes),
+    and the capability source_library_names now OWNS scripts/plan_admission.py, so an artifact named by a row still
+    resolves in the route graph.
+  - 'THE PLAN IS THE MANUAL TASK''S PIECE OF INFRASTRUCTURE (the standing rule): the owner does not have to find
+    the 244 candidates — they are listed with their keys, their sizes and the corpus path each would land on, and
+    the refusals are grouped by the reason that must be cleared first (188 waits on the rename plan, 621 waits on
+    a note home, 52 waits on T-180''s disposal of a file that is not where its kind says).'
+  - 'The plan file (governance/ADMISSION_PLAN_20261016.md/.json) is a PROPOSAL and is superseded by the next one:
+    the reader is the durable artifact, the file is its reading at a moment (D-2646).'
+- id: D-3052
+  state: ACTIVE
+  date: '2026-10-16'
+  by: assistant
+  category: THE OWNER'S DESKTOP INDEX — AN ARM WITH NO CONSUMER, AND WHY NOTHING IN THE OS MAY DEPEND ON IT
+  bugs:
+  - BUG-868
+  files:
+  - governance/NOT-YET-EVALUATED-RESEARCH.md
+  title: 'THE OWNER''S DESKTOP SEMANTIC INDEX — MEASURED on this machine: DigUp 0.6.1 indexes the owner''s own folders
+    with embeddinggemma-2 (llama.cpp b11461) and answers by MEANING in ~120 ms, entirely on-device. It is the owner''s
+    FRONT DOOR and it is ACCEPTED AS SUCH; it is NOT an OS component. Nothing in Maxwell OS reads it, no lane names
+    it, and its index may never enter the knowledge pipeline: it is a derived, unreproducible, un-stamped artifact
+    built by a GUI over the owner''s Dropbox — the T-179 family, one layer out. RE-OPEN CONDITION: an interface
+    the OS can PIN (a declared CLI or MCP surface whose version and index are hashable) and a named consumer.'
+  decision: 'THE QUESTION (owner, 2026-10-16, verbatim): "I already installed it — check if this can be utilized
+    in everyday maxwell os scaffold or future maxwell os tools and current skill orchestration and or in the knowledge
+    pipeline." MEASURED, not assumed (the standing rule), before answering: /Applications/DigUp.app, bundle id com.abdurrahim.DigUp,
+    CFBundleShortVersionString 0.6.1, LSUIElement, Sparkle updater with SUEnableAutomaticChecks true and a public
+    feed (raw.githubusercontent.com/ARahim3/DigUp/main/appcast.xml); its Application Support holds Models/embeddinggemma-2-Q8_0.gguf
+    (309,855,456 B) and Models/mmproj-embeddinggemma-2-Q8_0.gguf (554,821,024 B, a MULTI-MODAL projector), plus
+    index.noindex/index.sqlite (~242 MB) and a SEPARATE code.sqlite, and its own worker names its runtime in a log
+    line this act read: "[llama.cpp worker] ready in 7.47 s (text-only, llama.cpp b11461, vectors 1)". Its declared
+    roots are the owner''s Desktop, Documents, Downloads, Pictures, Movies, Music, the whole Dropbox and iCloud
+    Drive — i.e. this repository, the corpus and the library are all inside its index — and its search log shows
+    word and meaning lanes answering in 122 ms to 637 ms (first query cold, after a 7.5 s model load). It is $0
+    marginal (C1), local (C3), and its MODEL is a hashable GGUF, which is the one property the Apple Foundation
+    Models arm does not have (D-2654). (1) WHAT IT IS USED FOR: the OWNER''s front door. When 244 admission candidates
+    and 1,741 pen files need a human decision, a search that answers "where is the book that argues X" is the instrument
+    the owner''s own eye needs, and the admission plan is written to be worked from exactly that way. This is an
+    ACCEPTED USE and it needs no infrastructure, because it is not the OS using it — it is the owner. (2) WHY THE
+    OS MAY NOT DEPEND ON IT (four mechanical reasons, each one measured above): (a) it exposes NO interface a program
+    can call — no CLI, no socket, no MCP surface is declared or present; a wrapper over a GUI would be a second
+    policy home for commands (BUG-864''s class) with no receipt; (b) its VERSION FLOATS: the app auto-updates from
+    a public feed, so a hash taken today names a binary that may not exist tomorrow (D-382/R14 — the class that
+    refused Apple FM, in a milder form: the file IS hashable, the release is NOT); (c) its INDEX is DERIVED and
+    UNREPRODUCIBLE — built quietly over the owner''s Dropbox by a GUI, with no promise, no receipt, no schema and
+    no stamp, so a reading drawn from it can never be re-derived (D-2646''s rule that a derived artifact must be
+    a reading of its own home); (d) it would be a SECOND INDEX of the same bytes: this repository already owns a
+    retrieval store, and an index that nobody can re-derive is exactly the second-materialisation defect T-179 measures
+    one layer in — the same reason Calibre was refused as a metadata source (BUG-864). (3) WHAT IS REUSABLE, IF
+    THE OS EVER WANTS IT: its MODEL. embeddinggemma-2-Q8_0 is an on-device, hashable, multi-modal embedding model,
+    and a future retrieval lane that wants image+text meanings could declare it as its OWN embedding arm. The condition
+    is structural and not negotiable: a second embedding model is a SECOND VECTOR SPACE, so it may never be mixed
+    into bge-m3''s store or its Matryoshka dimension — it is a new declared store or it is nothing (the drift class
+    this repository spends most of its rails on). NOTHING IS ADOPTED HERE: this limb is recorded as reachable, not
+    requested, and it is not a task because no consumer has asked for it. (4) WHAT WAS REFUSED, RECORDED SO IT IS
+    NOT RE-PROPOSED AS A SURPRISE (D-3038): an agent-facing wrapper, an MCP server over the GUI, an index-of-the-corpus
+    read from it, and a placement decision informed by its meaning search. The last one is refused by D-2898''s
+    rule and not by this arm''s weaknesses: a topic is never decided by a heuristic or a model, and a placement
+    engine is refused however good the instrument is (BUG-864/placement.refusals). (5) THE BUG IT DISCHARGES, AND
+    THE FILE IT LIVES IN. BUG-868 is the SILENCE this decision answers — a derived, un-stamped index of this repository
+    and of the corpus existed on the machine and no declaration said so — and its remedy is this disclosure (nothing
+    in this repository owns the owner''s app, so no repair is owed in code). The catalogue row lands in governance/NOT-YET-EVALUATED-RESEARCH.md,
+    the file that already answers "have we looked at tool X" for Notion, Apple FM, the frontend/agent-design tools
+    and fourteen other entries, so the answer is found ONCE instead of re-derived per session. (6) WHAT THIS DECISION
+    DOES NOT DO: it does not install, configure, license, disable or read the owner''s app; it adds no config file
+    (an arm that nothing consumes needs no declaration file — a config nothing reads is prose, D-405), no lane,
+    no rail and no dependency, and it changes no byte of the pipeline. The measurement lives here, in the register,
+    where a later reader finds it by the decision id instead of re-deriving it.'
+  consequences:
+  - 'ANSWER (owner-facing): nothing in Maxwell OS Scaffold, its tools, its skill orchestration or the knowledge
+    pipeline may consume DigUp; the OWNER may use it every day as the front door to his own files, and the admission
+    plan is built to be worked from it (244 rows to place, one search box to find each work in).'
+  - The one durable asset is its MODEL (a hashable GGUF) — recorded as REACHABLE for a future multi-modal embedding
+    arm under the one condition that it is a SECOND declared vector space and never mixed with bge-m3.
+  - 'RE-OPEN CONDITION: an interface the OS can pin (a declared CLI/MCP surface with a hashable version and a re-derivable
+    index) plus a NAMED consumer. Until then the arm has no consumer by construction, which is what makes the refusal
+    stable rather than a matter of taste.'

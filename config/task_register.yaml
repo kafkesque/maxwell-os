@@ -2074,10 +2074,10 @@ tasks:
   priority: MUST
   state: open
   mover: owner
-  title: 'THE FLOW - scripts/census_source_names.py --flow now DECLARES the five transitions between an arrival and a
-    stamped work, and the ONE hole in them is named: no command puts a library file into the corpus, so the pipeline
-    own input path is the only step a human does by hand with no counter and no receipt'
-  source: D-3050; config/ingest_identity_gate.yaml#source_library.flow; scripts/census_source_names.py --flow
+  title: 'THE ADMISSION - the fifth transition is DECLARED, counted and PLANNED (D-3051): what remains is the word
+    on where a NOTE is admitted and on the applier, because the books wait for a home and the notes have no declared
+    home at all'
+  source: D-3050, D-3051; config/ingest_identity_gate.yaml#source_library.flow.transitions.admission and #source_library.admission; scripts/plan_admission.py
   why: >-
     The owner asked how a book actually gets organised, converted and kept in step. MEASURED 2026-10-16: S0 reads the
     CORPUS only (books_dir = knowledge pipeline/books, and 962 of 962 S0.5 cache source_paths land inside it), the
@@ -2086,17 +2086,22 @@ tasks:
     their ONE home each (arrival, placement, admission, conversion, identity); the ADMISSION is the one with no
     command, which makes it the only step in the pipeline own input path that nothing counts.
   evidence: >-
-    MEASURED 2026-10-16: the placement reading prints "FLOW: 5 transition(s) declared, 0 command(s) that do not
-    resolve" and the flow reader resolves every command it names on disk (D-3034); the library epub root holds 554
-    .epub files while the corpus holds 940 .md and no epub/pdf at all; the keyed bridge PLAN writes nothing by default.
+    MEASURED 2026-10-16 by the FIRST live reading of scripts/plan_admission.py: 2,811 files in the declared kind roots,
+    1,697 the pipeline has seen (1,668 by the door's own key, 29 by an ingest record whose corpus file now carries a
+    different name), 1,114 never seen carrying 1,029 distinct keys; 244 ADMISSION CANDIDATES; 870 refused (name repair
+    first 188, container no stage reads 9, no declared corpus home 621, not in its kind folder 52); the notes root
+    declares admits_to: null, so 621 files there have no home any declaration names. The plan is
+    governance/ADMISSION_PLAN_20261016.md (+ .json) and the reading costs 0.4 s. EARLIER, same day: the placement
+    reading prints "FLOW: 5 transition(s) declared, 0 command(s) that do not resolve" (D-3034) and the library epub
+    root holds 554 .epub while the corpus holds 940 .md and no epub/pdf at all.
   gate: >-
-    owner lane, three limbs: (1) NAME THE ADMISSION - is it the owner placing a file into the corpus by hand, or a
-    planned, door-keyed, dry-run-first command in the shape BUG-866's fix now uses? Either answer is declarable, and an
-    undeclared answer is what this row exists to remove; (2) DECIDE WHAT A NEW ARRIVAL'S HOME IS - the corpus carries
-    DOMAIN/<subtopic>, so filing a work by topic before it has been classified needs a classifier, which D-2898 refuses
-    (no LLM or heuristic canonical decision: deterministic match_to_canonical plus an owner gate), while a KIND-only
-    home needs no classifier at all; (3) the library md twin's fate overlaps T-179 - retire it, or declare it the
-    originals archive with its own age budget. Nothing here authorises moving, renaming or deleting a byte.
+    owner lane, TWO limbs remain. (1) CLOSED 2026-10-16 by D-3051 - the admission IS declared: owner actor, one
+    counter line on every health run (just admit-plan / the ladder's --brief), a plan-first lane, a measured target
+    rule, and a CLOSED decision vocabulary. (2) A NOTE'S HOME - journals:notes declares admits_to: null and no
+    declaration names a home a note is admitted to: decide it (a second corpus, a declared share of the one corpus, or
+    notes out of scope), because 341 of its 621 unseen files are of a kind the root declares. (3) the library md twin's
+    fate overlaps T-179 - retire it, or declare it the originals archive with its own age budget. The APPLIER is its
+    own row (T-183). Nothing here authorises moving, renaming or deleting a byte.
 - id: T-182
   priority: SHOULD
   state: open
@@ -2130,3 +2135,46 @@ tasks:
     (2) if a pen-drain command is wanted, it must be a PLAN (dry-run default, door-keyed, receipted), never a port of
     the heuristic router - a mover that decides a TOPIC by keyword is a second policy home with no identity key
     (D-3045); (3) nothing in the legacy tools authorises deletion (R-D410) or a bulk rename (D-3048).
+- id: T-183
+  priority: SHOULD
+  state: open
+  mover: owner
+  title: 'THE ADMIT APPLIER - once the owner accepts rows of governance/ADMISSION_PLAN_<date>.md, ONE crash-safe writer
+    puts a library work into the corpus through S0 (plan-keyed, dry-run default, receipted): never a heuristic mover,
+    and never by a name'
+  source: D-3051; config/ingest_identity_gate.yaml#source_library.admission; scripts/plan_admission.py
+  why: >-
+    the plan names 244 candidates, and admitting them by hand is 244 Finder drags - a drag that knows nothing about the
+    door's own key, the declared kind folder, a collision with an existing corpus name, or the S0.5 cache that would
+    stamp the result. What the applier may NOT do is DECIDE: it applies a plan the owner has accepted row by row, it
+    copies crash-safe (tempfile -> fsync -> os.replace, C6), and its receipt names source, target and the door key. A
+    work's TOPIC stays the owner's (D-2898) and its NAME stays the rename plan's (T-176).
+  evidence: >-
+    MEASURED 2026-10-16: the first admission plan reads 244 candidates over 2,181 files in the books root (the corpus
+    holds 940 .md and no .epub/.pdf at all), so an admitted .epub/.pdf is a NEW container in the corpus and S0 is the
+    only thing that turns it into the .md the pipeline reads.
+  gate: >-
+    owner-gated by construction: the applier reads an ACCEPTED plan (a file the owner has signed), refuses a row absent
+    from it, refuses a target that already exists, refuses while the rename has not ridden (a defective name would
+    become the corpus name AND the door key), and writes nothing without --apply.
+- id: T-184
+  priority: SHOULD
+  state: open
+  mover: pipeline
+  title: 'THE KIND FOLDER THE FILE CONTRADICTS - the placement reading never compares a file''s own container to the
+    KIND folder its declared axis orders it by, so the notify line is silent about the contradiction (BUG-867)'
+  source: BUG-867; config/ingest_identity_gate.yaml#source_library.placement.homes; scripts/census_source_names.py --placement
+  why: >-
+    placement.homes.<root>.axis: kind at axis_depth 1 declares that the depth-1 folder IS the container claim, and the
+    reading treats that axis as a set of allowed NAMES instead of a claim the file must satisfy - so a .epub filed
+    under books/pdf/ is neither misplaced (its kind IS admitted) nor an undeclared subfolder (the name IS declared).
+    The remedy is one counted class in the reading that owns it, with a fixture control; the DISPOSITION of those
+    files is T-180's (that row carries the human gate; this one is a reading repair).
+  evidence: >-
+    MEASURED 2026-10-16: 92 files under the books home sit in a declared kind folder that contradicts their own
+    container (42 .epub and 24 .md inside books/pdf, 10 .pdf and 8 .mobi inside books/epub, 5 .mobi inside books/pdf, 1
+    each .azw3/.djvu/.doc), while "just placement" prints 281 misplaced and 0 subfolders the axis does not name.
+  gate: >-
+    the class is counted with a bounded number of named examples, folded into the loud never-fatal condition beside
+    misplaced (BUG-457), and covered by a fixture control: an .epub in pdf/ reads OUT-OF-ITS-KIND-FOLDER, an .epub in epub/ does
+    not, and a .png in pdf/ stays MISPLACED without being counted twice.

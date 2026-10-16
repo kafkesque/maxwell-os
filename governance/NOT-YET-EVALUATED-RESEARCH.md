@@ -145,3 +145,14 @@ BGE-M3 retrieval-quality baseline.
 
 Both are recorded here so the question is answered ONCE instead of re-asked per session, and both are referenced
 from specs/README.md (the sandbox charter) where the borrowed mechanisms are stated as rules.
+
+
+## OWNER'S DESKTOP INDEX ASSESSED 2026-10-16 (owner-asked) — REFERENCE ONLY, NO CONSUMER
+
+| tool | what it is (MEASURED on this machine) | verdict for Maxwell OS |
+|---|---|---|
+| DigUp 0.6.1 (com.abdurrahim.DigUp, ARahim3/DigUp) | an on-device semantic search panel (hotkey + LSUIElement) over the owner's chosen folders; embeddinggemma-2-Q8_0 GGUF (309,855,456 B) + a multi-modal projector (554,821,024 B) on llama.cpp b11461; index.sqlite ~242 MB + a separate code index; word and meaning lanes answering in ~120-640 ms, first query after a 7.5 s model load; Sparkle auto-update ON | **ACCEPTED AS THE OWNER'S FRONT DOOR, NO CONSUMER IN THE OS.** Nothing in the scaffold, the tools, the skill orchestration or the knowledge pipeline reads it: it exposes no callable interface, its version floats with its own auto-update, and its index is derived, un-stamped and unreproducible (BUG-868, D-3052). Its MODEL is a hashable GGUF and is recorded as REACHABLE for a future multi-modal arm ONLY as its own declared vector space — never mixed into bge-m3's store or dimension. REFUSED explicitly: an agent-facing wrapper, an MCP surface over the GUI, an index-of-the-corpus read from it, and any placement decision informed by its meaning search (D-2898: a topic is never decided by a model or a heuristic; BUG-864). |
+
+The admission plan (`governance/ADMISSION_PLAN_<date>.md`, D-3051) is built to be worked FROM this panel: 244
+candidate works and 1,741 pen files need the owner's own eye, and describing a book is how a human finds it.
+Recorded here, in the register and in D-3052, so the question is answered ONCE instead of re-asked per session.

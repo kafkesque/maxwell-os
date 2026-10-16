@@ -571,3 +571,8 @@ ask:
 
 retire-dry:
     bash pipeline/omlx_retire_model.sh --model $(MODEL)   # --confirm parks it; the bytes need safe_delete (R-D410)
+
+# T-168/BUG-844/D-3039: WHO IS RUNNING - the delegated-run journal, one word for the owner.
+# 0 nothing is open | 1 a journal fault | 2 an OPEN run past its DECLARED budget (loud, not fatal, BUG-457).
+delegates:
+    @python3 scripts/delegate_journal.py status --all

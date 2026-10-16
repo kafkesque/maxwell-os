@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 637,
-  "open_n": 233,
-  "closed_n": 404,
+  "total_ids": 638,
+  "open_n": 231,
+  "closed_n": 407,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -1154,23 +1154,13 @@
       "events": 1
     },
     {
-      "id": "BUG-870",
-      "title": "A DECISION STATE OUTSIDE THE DECLARED PARTITION (the BUG-765 recurrence)",
-      "events": 1
-    },
-    {
-      "id": "BUG-871",
-      "title": "A PROFILE EVAL IS NOT A SCOPE (the harness wall leaks into the owner's lane)",
-      "events": 1
-    },
-    {
-      "id": "BUG-872",
-      "title": "A DISPROVEN CACHE WAS RE-MEASURED AS WORKING (a two-day-old disproof was carrying a whole doctrine)",
-      "events": 1
-    },
-    {
       "id": "BUG-873",
-      "title": "AN ENABLED EXTENSION THAT CONTRIBUTES ZERO TOOLS RAISES NOTHING (and I gave a false answer because of it)",
+      "title": "(MED, OPEN) \u2014 AN ENABLED EXTENSION THAT CONTRIBUTES ZERO TOOLS RAISES NOTHING (and I gave a false answer because of it)",
+      "events": 1
+    },
+    {
+      "id": "BUG-874",
+      "title": "(HIGH, OPEN) \u2014 THREE MODEL SETS, THREE ANSWERS (the declared parity rule is RED, and 2 of 8 models can never be cached)",
       "events": 1
     }
   ],
@@ -1578,6 +1568,9 @@
     "BUG-863",
     "BUG-865",
     "BUG-866",
-    "BUG-868"
+    "BUG-868",
+    "BUG-870",
+    "BUG-871",
+    "BUG-872"
   ]
 }

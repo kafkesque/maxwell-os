@@ -614,6 +614,28 @@ pipeline_stages:
 
 #: THE BASELINE this contract was written against. Drift is visible by re-running the probe; a baseline
 #: nobody re-measures is a claim, so the probe prints its own numbers beside these.
+measured_prefill_20261016:
+  method: 'two calls per model, BYTE-IDENTICAL ~2,610-token prefix, max_tokens=32, temperature=0.0; server-echoed prompt_tokens'
+  Phi-4-mini-instruct-8bit:              {prompt_tokens: 2608, prefill_tps: 343.5, warm_wall_s: 1.24, cached: 2560, speedup: 6.12}
+  Qwen3-Coder-30B-A3B-Instruct-MLX-4bit: {prompt_tokens: 2616, prefill_tps: 84.4,  warm_wall_s: 1.45, cached: 2560, speedup: 21.37}
+  gpt-oss-20b-MXFP4-Q8:                  {prompt_tokens: 2677, prefill_tps: 71.3,  warm_wall_s: 1.17, cached: 2675, speedup: 32.10}
+  MiniCPM5-2B-MLX:                       {prompt_tokens: 2621, prefill_tps: 265.1, warm_wall_s: 1.17, cached: 2560, speedup: 8.45}
+  Ornith-1.5-35B-A3B-REAP-19B:           {prompt_tokens: 2617, prefill_tps: 155.1, warm_wall_s: 10.53, cached: 0, speedup: 1.60}
+  Ornith-1.5-9B-MLX-8bit:                {prompt_tokens: 2617, prefill_tps: 83.9,  warm_wall_s: 23.45, cached: 0, speedup: 1.33}
+  FINDING_1_cache_is_PER_MODEL_not_global: >-
+    MEASURED: the second IDENTICAL call reported cached_tokens = 0 on BOTH Ornith models while five other
+    models in the same minute returned 2560-2675. `cache_accounting` treats prefix reuse as a property of
+    the MACHINE; it is a property of the MODEL. Two of the eight served models can never be helped by
+    prefix stability, and the doctrine's "one byte at the head costs 25x" does NOT hold for them.
+    Their warm wall (10.53 s / 23.45 s) is not a decode cost: the rate IMPROVED on call 2 while the wall
+    stayed high. Also note the cache granularity: 2616 - 2560 = 56 uncached tail tokens, so the block
+    boundary here reads ~2560, not the 4096 recorded on 2026-10-14.
+  FINDING_2_the_2000_token_comparable_floor_is_DISPROVEN: >-
+    gpt-oss-20b-MXFP4-Q8 reads 71.3 tok/s at 2,677 prompt tokens and 210 tok/s at 50,082 - the SAME model,
+    a 2.9x spread, both ABOVE the declared min_prompt_tokens_for_a_comparable_reading of 2,000. So a
+    reading at the floor is still climbing and is NOT comparable to a 26,214-token class bill. These rows
+    are therefore recorded as READINGS, not as bills: no class route is changed by them (BUG-874).
+
 measured_20261014:
   served: {Phi-4-mini-instruct-8bit: 32768, gemma-4-E4B-it-MLX-4bit: 32768,
            Qwen3-Coder-30B-A3B-Instruct-MLX-4bit: 32768, gpt-oss-20b-MXFP4-Q8: 131072,
@@ -630,27 +652,6 @@ measured_20261014:
     Qwen3-Coder-30B-A3B-Instruct-MLX-4bit: {prompt_tokens: 2616, prefill_tps: 84.4, note: 'MEASURED 2026-10-16; previously null/UNMEASURED'}
   # ── MEASURED 2026-10-16 (BUG-874). Six rows that had NO reading. Every row declares the prompt size it
   # ── was taken at, because a prefill figure without one is INCOMPARABLE (the rule above).
-  prefill_20261016:
-    method: 'two calls per model, BYTE-IDENTICAL ~2,610-token prefix, max_tokens=32, temperature=0.0; server-echoed prompt_tokens'
-    Phi-4-mini-instruct-8bit:              {prompt_tokens: 2608, prefill_tps: 343.5, warm_wall_s: 1.24, cached: 2560, speedup: 6.12}
-    Qwen3-Coder-30B-A3B-Instruct-MLX-4bit: {prompt_tokens: 2616, prefill_tps: 84.4,  warm_wall_s: 1.45, cached: 2560, speedup: 21.37}
-    gpt-oss-20b-MXFP4-Q8:                  {prompt_tokens: 2677, prefill_tps: 71.3,  warm_wall_s: 1.17, cached: 2675, speedup: 32.10}
-    MiniCPM5-2B-MLX:                       {prompt_tokens: 2621, prefill_tps: 265.1, warm_wall_s: 1.17, cached: 2560, speedup: 8.45}
-    Ornith-1.5-35B-A3B-REAP-19B:           {prompt_tokens: 2617, prefill_tps: 155.1, warm_wall_s: 10.53, cached: 0, speedup: 1.60}
-    Ornith-1.5-9B-MLX-8bit:                {prompt_tokens: 2617, prefill_tps: 83.9,  warm_wall_s: 23.45, cached: 0, speedup: 1.33}
-    FINDING_1_cache_is_PER_MODEL_not_global: >-
-      MEASURED: the second IDENTICAL call reported cached_tokens = 0 on BOTH Ornith models while five other
-      models in the same minute returned 2560-2675. `cache_accounting` treats prefix reuse as a property of
-      the MACHINE; it is a property of the MODEL. Two of the eight served models can never be helped by
-      prefix stability, and the doctrine's "one byte at the head costs 25x" does NOT hold for them.
-      Their warm wall (10.53 s / 23.45 s) is not a decode cost: the rate IMPROVED on call 2 while the wall
-      stayed high. Also note the cache granularity: 2616 - 2560 = 56 uncached tail tokens, so the block
-      boundary here reads ~2560, not the 4096 recorded on 2026-10-14.
-    FINDING_2_the_2000_token_comparable_floor_is_DISPROVEN: >-
-      gpt-oss-20b-MXFP4-Q8 reads 71.3 tok/s at 2,677 prompt tokens and 210 tok/s at 50,082 - the SAME model,
-      a 2.9x spread, both ABOVE the declared min_prompt_tokens_for_a_comparable_reading of 2,000. So a
-      reading at the floor is still climbing and is NOT comparable to a 26,214-token class bill. These rows
-      are therefore recorded as READINGS, not as bills: no class route is changed by them (BUG-874).
   prefill_reading: 'prompt_tokens is the number the SERVER echoed; a row without it is refused rather than estimated'
   ledger: {calls: 28646, input_tokens: 2856939380, cache_read_tokens: 2742286067,
            compactions: 676, local_agent_loop_cache_evidence: none}

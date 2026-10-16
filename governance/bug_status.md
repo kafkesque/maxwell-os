@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**233 open** / 404 closed of 637 ids.
+**231 open** / 407 closed of 638 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -236,7 +236,5 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-864 | (MED — OPEN 2026-10-16) — scripts/census_source_names.py is the ONE reader that makes an abandoned GUI placement rule visible: Hazel owns a  | 3 |
 | BUG-867 | (LOW — OPEN 2026-10-16) — scripts/census_source_names.py never compares a file's own CONTAINER to the KIND folder its declared axis orders i | 1 |
 | BUG-869 | (MED — OPEN 2026-10-16) — pipeline/subagent_fanout.py delivered an `async: true` delegate as a FOREGROUND run that BLOCKED its parent, and t | 1 |
-| BUG-870 | A DECISION STATE OUTSIDE THE DECLARED PARTITION (the BUG-765 recurrence) | 1 |
-| BUG-871 | A PROFILE EVAL IS NOT A SCOPE (the harness wall leaks into the owner's lane) | 1 |
-| BUG-872 | A DISPROVEN CACHE WAS RE-MEASURED AS WORKING (a two-day-old disproof was carrying a whole doctrine) | 1 |
-| BUG-873 | AN ENABLED EXTENSION THAT CONTRIBUTES ZERO TOOLS RAISES NOTHING (and I gave a false answer because of it) | 1 |
+| BUG-873 | (MED, OPEN) — AN ENABLED EXTENSION THAT CONTRIBUTES ZERO TOOLS RAISES NOTHING (and I gave a false answer because of it) | 1 |
+| BUG-874 | (HIGH, OPEN) — THREE MODEL SETS, THREE ANSWERS (the declared parity rule is RED, and 2 of 8 models can never be cached) | 1 |

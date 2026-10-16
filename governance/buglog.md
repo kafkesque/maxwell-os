@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1182 decisions (census stamp a16bf19e7b254858, 2026-10-16) · 637 bugs (233 open / 404 closed; highest OPEN = BUG-873) · 55 open tasks (MUST 12 / SHOULD 39 / WORTH 4; OWNER-moved 6, pipeline-moved 49; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1182 decisions (census stamp a16bf19e7b254858, 2026-10-16) · 638 bugs (231 open / 407 closed; highest OPEN = BUG-874) · 55 open tasks (MUST 12 / SHOULD 39 / WORTH 4; OWNER-moved 6, pipeline-moved 49; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **79** of 1182 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 597 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1182, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 233 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 34 · 🟨 MED 65 · 🟩 LOW 25 · UNLABELLED 105 (BUG-757) of 233 open.
+> Open BUGS by severity (population = the census's 231 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 35 · 🟨 MED 66 · 🟩 LOW 25 · UNLABELLED 101 (BUG-757) of 231 open.
 >
 > **OWNER LANE (6) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -15908,7 +15908,7 @@ FIX (T-185, three limbs, each a rule the repository already declares elsewhere):
 
 **Ids:** BUG-844/T-168/D-3039 (the trace that was not kept: the declared limit, not a new gap) | BUG-828/D-3027 (the same class: a ceiling derived, never picked) | T-132/D-3000 (the ratified context contract this host has not bound) | T-135 (its remaining limb, re-measured here — the GUI-session binding is what makes a Dock launch see the declaration) | D-2946 (the R5 discipline the landed verdict satisfied) | T-184 (the only open work the reviewed file found)
 
-### BUG-870 — A DECISION STATE OUTSIDE THE DECLARED PARTITION (the BUG-765 recurrence)
+### BUG-870 (HIGH, RETRACTED 2026-10-16) — A DECISION STATE OUTSIDE THE DECLARED PARTITION (the BUG-765 recurrence)
 - **state:** resolved | **severity:** n/a — INVALID FILING (retracted) | **filed:** 2026-10-16 | **closed:** 2026-10-16 | **by:** assistant
 - **RETRACTED 2026-10-16 — FALSE POSITIVE (filed by the assistant, corrected by the assistant):** the state vocabulary is ALREADY total. `config/gov_sync.yaml` declares FOUR bucket keys, not two: `open_decision_states` [open, proposed, draft, deferred, planned], `decision_in_effect_states` [active, ratified], `decision_closed_states` [resolved, superseded, archived, rejected], `decision_void_states` [stale, revoked, abandoned]. Together they ARE the partition. Measured coverage of the census (`config/decisions_summary.json`): 79 open + 743 in-effect + 360 closed + 0 void = 1182 = every record.
 - **ROOT CAUSE of the false positive (the bug was in the DIAGNOSTIC, not the config):** the census script selected buckets with `{k:v for k,v in d.items() if k.endswith('_decision_states')}` — which matches ONLY `open_decision_states`. The other three keys do NOT end in that suffix, so the union collapsed to the open set and a spurious UNCLASSIFIED list appeared. A name-suffix guess is not a census.
@@ -15922,7 +15922,7 @@ FIX (T-185, three limbs, each a rule the repository already declares elsewhere):
 - **fix (fail-closed, not cosmetic):** declare the FULL state vocabulary in config/gov_sync.yaml as two exhaustive, disjoint lists (`open_decision_states` + `closed_decision_states`); add a check that union == the states actually present in config/decisions.yaml, faulting on any UNCLASSIFIED state; render the count of unclassified = 0 in the face.
 - **related:** BUG-765, D-2987, D-2981, T-185.
 
-### BUG-874 — THREE MODEL SETS, THREE ANSWERS (the declared parity rule is RED, and 2 of 8 models can never be cached)
+### BUG-874 (HIGH, OPEN) — THREE MODEL SETS, THREE ANSWERS (the declared parity rule is RED, and 2 of 8 models can never be cached)
 - **state:** open | **severity:** high | **filed:** 2026-10-16 | **by:** assistant
 - **symptom (measured, live, this session).** Three homes disagree about which models exist:
   * **the SERVER serves (authoritative, `GET /v1/models`):** Phi-4-mini 32768, Qwen3-Coder-30B-A3B 32768,
@@ -15967,7 +15967,7 @@ FIX (T-185, three limbs, each a rule the repository already declares elsewhere):
   new one. The correction is a NAMED next step with the probe run FIRST.
 - **related:** BUG-872 (the doctrine built on a stale measurement), BUG-873 (a declared thing and an active
   thing diverging silently) — the same family a third time. D-3034 (a declaration must RESOLVE).
-### BUG-873 — AN ENABLED EXTENSION THAT CONTRIBUTES ZERO TOOLS RAISES NOTHING (and I gave a false answer because of it)
+### BUG-873 (MED, OPEN) — AN ENABLED EXTENSION THAT CONTRIBUTES ZERO TOOLS RAISES NOTHING (and I gave a false answer because of it)
 - **state:** open | **severity:** medium | **filed:** 2026-10-16 | **by:** assistant
 - **symptom (measured).** `~/.config/goose/config.yaml` declares `youtubetranscript` `enabled: true`, type
   `stdio`, `cmd: uvx`, args `--from git+https://github.com/jkawamoto/mcp-youtube-transcript
@@ -15997,7 +15997,7 @@ FIX (T-185, three limbs, each a rule the repository already declares elsewhere):
   break the `cmd` deliberately (an unresolvable binary) and confirm the fault is REPORTED rather than silent.
 - **related:** BUG-871 (a capability that outlived its reason), BUG-872 (a stale record carrying a doctrine).
   All three are the same family: A DECLARED THING AND AN ACTIVE THING DIVERGED SILENTLY.
-### BUG-872 — A DISPROVEN CACHE WAS RE-MEASURED AS WORKING (a two-day-old disproof was carrying a whole doctrine)
+### BUG-872 (HIGH, FIXED 2026-10-16) — A DISPROVEN CACHE WAS RE-MEASURED AS WORKING (a two-day-old disproof was carrying a whole doctrine)
 - **state:** fixed | **severity:** high | **filed:** 2026-10-16 | **closed:** 2026-10-16 | **by:** assistant
 - **symptom.** `config/agent_context.yaml#cache_accounting.proof` declared `status: DISPROVEN_MEASURED_20261014`,
   `cached_tokens_every_call: 0`, `speedup_measured: 1.01` against a declared bar of `min_speedup: 5.0`, and from
@@ -16047,7 +16047,7 @@ FIX (T-185, three limbs, each a rule the repository already declares elsewhere):
   not exposed to goose. `config/agent_context.yaml#parity_rule` exists for exactly this and must be applied.
 - **related:** BUG-794 (an estimate is not a measurement), BUG-792/F6 ACT 3, BUG-828/T-132/T-154, D-2957
   (absent is not zero), D-2680, BUG-871 (this session's sibling: a stale binding outliving its reason).
-### BUG-871 — A PROFILE EVAL IS NOT A SCOPE (the harness wall leaks into the owner's lane)
+### BUG-871 (HIGH, FIXED 2026-10-16) — A PROFILE EVAL IS NOT A SCOPE (the harness wall leaks into the owner's lane)
 - **state:** fixed | **severity:** high | **filed:** 2026-10-16 | **closed:** 2026-10-16 | **by:** assistant
 - **CONTROL (executed 2026-10-16, measured):** `pipeline/harness_env.py` — `print_lines(bindings, scope)` now
   REFUSES an empty or undeclared scope, and `main()` reads `--scope` before dispatching `--print`. Measured:

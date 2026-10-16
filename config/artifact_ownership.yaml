@@ -37,6 +37,19 @@ guard_coverage:
     exemption is retirable (not owner-gated) is named as the next I1 step inside its own reason.
 
 artifacts:
+  governance/delegate_journal.jsonl:
+    mutability: append_only
+    writer_of_record: scripts/delegate_journal.py
+    unreconciled_reason: >-
+      T-168/BUG-844/D-3036: this file is a LEDGER OF ACTS, not a generated artifact. A reconciliation entry would
+      have to assert a count of delegated runs, and no declaration carries one - the count is what a sitting actually
+      did, measured after the fact, never predicted (the same reason the handoff journal carries a prefix rule rather
+      than a total). Append-only by construction and proved as a SUFFIX by the guard (BUG-560/D-2685), so history is
+      never rewritten (R-D410); the reader folds the rows and refuses to skip an unreadable line (C16).
+    note: >-
+      A start row is written BEFORE the delegate call and an end row after it, so a call that HUNG, a call that was
+      KILLED and a call that SUCCEEDED are three different readings of this file instead of one silence (BUG-844).
+      Written only through scripts/lib/write_guard.append_lines, so every row leaves a mutation receipt.
   MASTER-TASK-REGISTER.md:
     mutability: derived_regenerable
     writer_of_record: scripts/gov_sync.py

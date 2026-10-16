@@ -45,11 +45,17 @@ import sys
 import yaml
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "pipeline"))
 sys.path.insert(0, str(ROOT / "scripts"))
 
-import model_store_census as census  # noqa: E402 - the ONE instrument, never a second implementation
-from lib import handoff, write_guard  # noqa: E402 - the decision-id namespace; the guarded document write
+# BUG-847: 'import model_store_census' read as an UNDECLARED third-party import to C11 (pre_commit_gate), because a
+# bare name reached through a sys.path hack is indistinguishable from a package nobody declared; the repo's DECLARED
+# convention is the package form (pipeline/stage0_convert.py: 'from pipeline import ingest_gate'). Both lines are
+# SHORT so isort has nothing to wrap, and the module names sort as ruff's I001 requires (lib before pipeline).
+from lib import handoff, write_guard  # noqa: E402
+
+from pipeline import model_store_census as census  # noqa: E402
 
 ENGINE_YAML = ROOT / "config" / "engine.yaml"
 OWNERSHIP_YAML = ROOT / "config" / "artifact_ownership.yaml"

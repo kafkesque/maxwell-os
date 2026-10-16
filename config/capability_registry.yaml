@@ -127,6 +127,20 @@ capabilities:
     receipt: governance/DELETION_RECEIPT_20261016.json
     cost_tier: T0
     owns: [pipeline/model_store_sweep.py, pipeline/model_store_census.py]
+  - id: delegate_journal
+    kind: script
+    # T-168/BUG-844/D-3036: THE TRACE A DELEGATED RUN LEAVES. MEASURED 2026-10-16: three delegates were reported
+    # cancelled, ONE of them had already written its artifact and nothing on disk distinguished it from the two that
+    # had written nothing - so a STALL, a KILL and a SUCCESS were one state, and the standing rule ("delegate to the
+    # right local model, in parallel") could not be verified by any later reader. This route is the ACT's half of
+    # the delegation economy: the economy measures the COST (pipeline/delegation_economy.py, from the harness ledger)
+    # and this measures the ACT (purpose, model, claims, budget BEFORE the call; state, measured wall time and
+    # artifacts VERIFIED ON DISK after it). The model is the JOIN KEY between the two; no price is restated here.
+    entrypoint: python3 scripts/delegate_journal.py status
+    check: python3 scripts/delegate_journal.py --selftest
+    receipt: governance/delegate_journal.jsonl
+    cost_tier: T0
+    owns: [scripts/delegate_journal.py, governance/delegate_journal.jsonl]
   - id: model_fetch
     kind: script
     # BUG-842/T-146: the BARE form, because that is how an OPERATOR-typed command is declared in this file

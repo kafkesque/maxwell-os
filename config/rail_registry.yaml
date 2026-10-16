@@ -73,6 +73,12 @@ dormant:
 #: Rails that WRITE or REGENERATE an artifact. Each must be run with --selftest BY THE LADDER, because such a
 #: rail's remedy is a claim about bytes it replaces, and an unproven remedy is where BUG-537/BUG-556 came from.
 writers:
+  scripts/delegate_journal.py:
+    writes: ['governance/delegate_journal.jsonl (append-only; every row is a suffix proof under write_guard)']
+    why: >-
+      T-168/BUG-844: it is a WRITER, so its remedy is a claim about bytes and the ladder must run its --selftest (37
+      known-answer controls) before the journal can be believed. It restates no verdict and re-derives nothing: the
+      rows are the evidence and the fold is the reader.
   scripts/apply_owner_domain_review.py:
     writes: ['governance/DOMAIN_RULER_FROZEN_20261008.json']
     why: >-
@@ -190,6 +196,19 @@ guards:
   # 2 bytes only an owner disposes of (a candidate ABOVE the floor). Before D-3033 the rc was 2 for ANY
   # orphan, which asked the owner to decide about the hub's own lock directory.
   pipeline/model_store_census.py: tri_state
+  # T-168/BUG-844/D-3036: the DELEGATED-RUN TRACE's known-answer controls (BUG-492). They hold the REFUSALS - a row
+  # with no purpose, no model or no budget; a claim that resolves OUTSIDE the tree; a claim ANOTHER OPEN run already
+  # holds, by equality or by containment; a reused run id; an end with no start, a second end, an undeclared state
+  # word; and the false success (a 'done' whose artifact is ABSENT, refused so the row STAYS OPEN) - and the ACCEPTS
+  # (a clean declaration; the honest 'failed' word; a verified artifact). Plus the READER's own decisions: a fault
+  # outranks a budget, 90s past a 60s budget reads OVERDUE and 10s does not, and a line that is not a row is a NAMED
+  # fault rather than a shorter history reported as the whole one (C16). A control nothing runs is a comment.
+  scripts/delegate_journal.py --selftest: fatal
+  # T-168: the live reading - 0 nothing is open | 1 a JOURNAL FAULT (a line that is not a row, a duplicate start, an
+  # end with no start) | 2 an OPEN run past its DECLARED budget (OWNER-OWED, loud and NOT fatal, BUG-457). MEASURED
+  # 2026-10-16: the harness reported three delegates as cancelled and NOTHING ON DISK distinguished the one that had
+  # already written its artifact from the two that had written nothing.
+  scripts/delegate_journal.py status: tri_state
   # T-132: the contract's ONE reading - 0 the RUNNING env is bound | 2 OWNER-OWED (declared but not exported, so the
   # harness silently uses its own cloud price-tier defaults) | 1 FATAL (an env contradicts the declaration: a drift,
   # not a default). 2 is loud and NOT fatal, by the BUG-457 convention.

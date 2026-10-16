@@ -54,6 +54,11 @@ CONFIG_TO_CODE: dict[str, tuple[str, str, str]] = {
     "engine.yaml#model_store.resolution_domain.report_rows": ("pipeline.model_store_census", "REPORT_ROWS", "int"),
     "engine.yaml#model_store.redundancy":   ("pipeline.model_store_census", "REDUNDANCY", "dict"),
     "engine.yaml#model_store.sweep":        ("pipeline.model_store_sweep", "RULE", "dict"),
+    # T-168/BUG-844/D-3036: the delegated-run trace reads the journal home, the end-state vocabulary, the
+    # read-only token and the budget rule from ONE declared place (config/agent_surface.yaml#logging), so the
+    # reader can never restate them (C12) - and every key is REQUIRED there, so a value the config lacks is
+    # FATAL rather than a default (D-2644).
+    "agent_surface.yaml#logging":           ("scripts.delegate_journal", "LOGGING", "dict"),
     # ── Stage 1.5 (embedding) ──
     "stage1_5.embed_model_hf":     ("pipeline.pipeline_paths", "S15_EMBED_MODEL_HF", "str"),
     "stage1_5.embed_dim":          ("pipeline.pipeline_paths", "S15_EMBED_DIM", "int"),

@@ -45,7 +45,16 @@ rules:
     - re-render AGENTS.md#delegate_rules and #models from agent/adapters/<harness>/
     - re-run the rails: just health, scripts/resolve_route.py --check, scripts/check_governance_faces.py
 logging:
-  # BUG-844/T-168: a delegated run declares itself BEFORE it starts; an untraced act is not an act.
+  # BUG-844/T-168/D-3036: a delegated run declares itself BEFORE it starts; an untraced act is not an act.
+  # READ BY scripts/delegate_journal.py (ONE reader: its `start`, its `end` and its `status` verb), which is why
+  # every key below is REQUIRED and absent-is-FATAL rather than defaulted (C12/D-2644): a journal whose own rules
+  # are inferred can be made to accept anything by editing the thing it reads.
   journal: governance/delegate_journal.jsonl
-  budget_required: true
-  verified_artifacts_required: true
+  budget_required: true                     # a run with no declared budget can never be OVERDUE, so never reported
+  verified_artifacts_required: true         # an artifact is VERIFIED ON DISK, and a claimed-but-absent one is refused
+  id_prefix: DJ-                            # a run id is a WORD (stamp + 4 hex): it is quoted in a handoff, never counted
+  row_schema_version: '1'
+  end_states: [done, failed, cancelled]     # the CLOSED vocabulary of an end row; an undeclared word is refused
+  artifact_required_states: [done]          # 'done' with no artifact present is REFUSED, never recorded
+  read_only_token: none                     # the word a caller writes to DECLARE that the run writes no repo path
+  max_rows_read: 20000                       # past this the reader REPORTS the bound; it never truncates in silence

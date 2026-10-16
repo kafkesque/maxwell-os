@@ -116,7 +116,13 @@ capabilities:
     owns: [pipeline/research_run.py]
   - id: model_fetch
     kind: script
-    entrypoint: python3 pipeline/hf_fetch_model.py --repo
+    # BUG-842/T-146: the BARE form, because that is how an OPERATOR-typed command is declared in this file
+    # (all eight lanes below are bare, and every one of them is executable). MEASURED 2026-10-16: the owner ran
+    # the bare form of this route and got "permission denied" - the file carried a shebang that promises direct
+    # execution and was mode 644, because its mode was whatever last wrote it. Declaring the form he types is
+    # what makes scripts/resolve_route.py#_bare_form_faults require the executable bit, so the next silent
+    # rewrite cannot break the route again.
+    entrypoint: pipeline/hf_fetch_model.py --repo
     check: python3 pipeline/hf_fetch_model.py --verify-only
     receipt: config/engine.yaml#model_store
     cost_tier: T0

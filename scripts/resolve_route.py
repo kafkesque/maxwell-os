@@ -59,6 +59,37 @@ TIER = re.compile(r"\bT[0-2]\b")
 RECIPE = re.compile(r"^([A-Za-z0-9_-]+):")
 PATHISH = re.compile(r"^[\w.-]+(?:/[\w .&()-]+)+$")
 
+
+def _executable(rel: str) -> bool:
+    """Is this repo-relative file executable? The real bit, read from the real path (BUG-842/T-146)."""
+    try:
+        return bool((REPO / rel).stat().st_mode & 0o111)
+    except OSError:
+        return False
+
+
+def _bare_form_faults(where: str, cmd: str, w: "World") -> list:
+    """A command written as a BARE script path must be runnable BY TYPING IT (BUG-842/T-146).
+
+    MEASURED 2026-10-16: the owner ran 'pipeline/hf_fetch_model.py' and got "permission denied". The file
+    carries a shebang, which PROMISES it can be run directly, and this repo has 562 tracked .py files that
+    make that promise and cannot keep it - so the promise was a matter of habit in both directions. The
+    declared rule is the FORM, and it is the form every capability in config/capability_registry.yaml already
+    uses: 'python3 <path>' requires the file to EXIST, while a bare '<path> <args>' requires the executable
+    bit, because that is how that command is read and run. Enforcing the form is what makes either spelling
+    honest instead of tribal.
+    """
+    tokens = str(cmd).split()
+    if not tokens:
+        return []
+    first = tokens[0]
+    if not PATHISH.match(first) or "/" not in first or w.executable(first):
+        return []
+    return [f"{where}: it is written as a BARE path {first!r} and is run by typing it, but the file is not "
+            f"executable - either declare the interpreter form 'python3 {first}' (the form every capability "
+            f"in this registry uses, so a mode-by-accident cannot break a declared route) or make the file "
+            f"executable (BUG-842/T-146)"]
+
 #: where the ITEM text lives. A task's evidence is part of its claim (T-156's own source list is evidence), and a
 #: bug carries only a title, which is why a bug routes rarely and by design (see #dispositions).
 TASK_TEXT_FIELDS = ("source", "gate", "evidence", "title", "why", "blocked_by")
@@ -122,6 +153,7 @@ class World:
     recipes: dict[str, str]
     governed: tuple[str, ...]                                # the recipes the RAIL REGISTRY governs
     exists: Callable[[str], bool]
+    executable: Callable[[str], bool]                        # is this repo-relative file runnable by path
     tiers: set[str]
     items: list[Item]
     edges: tuple[int, int]                                   # (declaration edges, flag edges)
@@ -168,7 +200,8 @@ def world() -> World:
              sum(len(f.get("consumers") or []) for f in flags.get("flags") or []))
     return World(cfg=load_cfg(), recipes=recipe_bodies(ladder.read_text(encoding="utf-8")),
                  governed=tuple(str(r) for r in (rail.get("recipes") or [])),
-                 exists=lambda p: (REPO / p).exists(), tiers=set(TIER.findall(ECON.read_text(encoding="utf-8"))),
+                 exists=lambda p: (REPO / p).exists(), executable=_executable,
+                 tiers=set(TIER.findall(ECON.read_text(encoding="utf-8"))),
                  items=load_items(), edges=edges)
 
 
@@ -209,6 +242,7 @@ def capability_faults(cap: dict, w: World) -> list[str]:
                 faults.append(f"capability {cid}: its {field} names {module!r}, which DOES NOT EXIST - a declared "
                               f"route whose entrypoint is absent is the one thing this registry exists to refuse "
                               f"(T-156)")
+            faults.extend(_bare_form_faults(f"capability {cid}: its {field}", cmd, w))
     if cap.get("owns") and not isinstance(cap["owns"], list):
         faults.append(f"capability {cid}: owns is {type(cap['owns']).__name__}, not a LIST - a bare string would be "
                       f"iterated character by character and report a fault per letter, which reads as a cascade rather "
@@ -244,6 +278,7 @@ def lane_faults(lane: dict, w: World) -> list[str]:
             if name in w.recipes and cmd in w.recipes[name]:
                 faults.append(f"lane {rid}: {cmd!r} is ALSO run by the governed ladder recipe {name!r} - its guard "
                               f"class belongs in config/rail_registry.yaml#guards, not in a lane (T-164)")
+    faults.extend(_bare_form_faults(f"lane {rid}", cmd, w))
     cap = lane.get("capability")
     if cap and str(cap) not in [str(c.get("id")) for c in w.cfg.get("capabilities") or []]:
         faults.append(f"lane {rid}: it names capability {cap!r}, which the registry does not declare")
@@ -465,7 +500,8 @@ def synthetic(**over) -> World:
                                                                                      "unrouted_open_bugs": 0}}
     cfg.update(over.pop("cfg", {}))
     w = World(cfg=cfg, recipes={"lane_a": "    python3 scripts/check_a.py --selftest"}, governed=("health",),
-              exists=lambda p: p in {"scripts/check_a.py", "temp", "temp/receipt.json"}, tiers={"T0", "T1", "T2"},
+              exists=lambda p: p in {"scripts/check_a.py", "temp", "temp/receipt.json"},
+              executable=lambda p: p == "scripts/check_a.py", tiers={"T0", "T1", "T2"},
               items=[Item("T-X", "task", "pipeline", "no artifact here")], edges=(0, 0))
     return dataclasses.replace(w, **over) if over else w
 
@@ -506,6 +542,21 @@ def selftest() -> int:
     w.cfg["capabilities"][0]["entrypoint"] = "just no_such_recipe"
     f, _ = check_world(w)
     control("recipe_absent", f, 1, "a `just <recipe>` route whose recipe is gone is refused")
+
+    w = synthetic()
+    w.cfg["capabilities"][0]["entrypoint"] = "scripts/check_a.py --selftest"
+    w = dataclasses.replace(w, executable=lambda p: False)
+    f, _ = check_world(w)
+    control("bare_path_not_executable", f, 2, "the BARE form is refused at BOTH sites (a capability and a lane) - "
+            "this is the command the owner typed and got permission denied (BUG-842/T-146)")
+
+    w = synthetic()
+    w.cfg["capabilities"][0]["entrypoint"] = "python3 scripts/check_a.py --selftest"
+    w.cfg["lanes"][0]["cmd"] = "python3 scripts/check_a.py --selftest"
+    w = dataclasses.replace(w, executable=lambda p: False)
+    f, _ = check_world(w)
+    control("interpreter_form_needs_no_exec_bit", f, 0, "the OTHER direction: 562 tracked .py files carry a "
+            "shebang and are not executable, so the declared 'python3 X' form must NOT require the bit")
 
     w = synthetic()
     w.cfg["capabilities"][0]["cost_tier"] = "T9"

@@ -26481,3 +26481,72 @@ decisions:
   - what this act does NOT do - it moves, renames, copies and deletes NOTHING; it declares no topic; it adopts neither
     Calibre nor Hazel as an authority; and it answers neither T-176's rename plan (still the owner's per-row word)
     nor T-179 (still the owner's disposition of the second materialisation)
+- id: D-3050
+  state: ACTIVE
+  date: '2026-10-16'
+  by: assistant
+  category: THE FLOW, THE LEVELS BELOW THE AXIS, AND THE BRIDGE THAT KEYED ON A NAME
+  bugs:
+  - BUG-865
+  - BUG-866
+  files:
+  - config/ingest_identity_gate.yaml
+  - config/pipeline_config.yaml
+  - scripts/census_source_names.py
+  - pipeline/batch_convert_epubs.py
+  - config/task_register.yaml
+  - governance/buglog.md
+  title: THE FLOW - a file's five transitions from an arrival to a stamped work are DECLARED once, the library is
+    the ORIGIN and the corpus the DERIVED tree (there is no sync and there never was), every level below a declared
+    axis is COUNTED instead of invisible, and the one bridge between the two trees stops deciding by filename
+  decision: 'OWNER QUESTION (2026-10-16): "so based on your recommendation what will happen - will you create hazel
+    and/or calibre instruction that will move from inbox into the right book or notes subfolder the inbox folder
+    files, or what? please clarify or how the queue will look like, also clarify how will the conversion from pdf,
+    epub to md happen and how the synch happen between ... is the synch happen between md folder ... or how is it
+    happen currently how is the flow, is there better solution". (1) THERE IS NO SYNC, AND THERE NEVER WAS ONE.
+    MEASURED the same day by the arrangement reading plus mtime: the library books/md tree holds 852 stems, the
+    corpus 940, 830 names are shared, 103 pairs are byte-identical and 727 DIFFER in their bytes - and the corpus
+    copy is NEWER in 727 of 727. Two materialisations of one work, one of them derived, kept in step only by whoever
+    last ran a conversion. That truth is now declared at config/ingest_identity_gate.yaml#source_library.flow.no_sync.
+    (2) THE LIBRARY IS THE ORIGIN, NOT A VIEW, which SUPERSEDES two claims D-3048 made and the bytes refute: arrangement.library_is_a_view
+    (a view is GENERATED, and the library is OLDER) and arrangement.topic_is_a_derived_view (MEASURED: the topic
+    is materialised in BOTH homes and in TWO levels each - the corpus carries DOMAIN/<subtopic>/ file.md with 939
+    of its 940 files below the first level). Both keys were RENAMED rather than left standing; the refusal of a
+    THIRD materialisation (a topic copy) is unchanged. (3) THE FLOW IS FIVE TRANSITIONS, EACH WITH ONE HOME: arrival
+    (a declared pen, a queue with a number, nothing moves), placement (the owner, by hand - no engine moves a file
+    because of its name), admission (UNDECLARED - THE HOLE, T-181), conversion (pipeline/stage0_convert.py reads
+    the corpus recursively; pandoc for epub, docling for pdf; an .md is already converted and is the only kind the
+    corpus holds), identity (pipeline/stage0_5_extract_metadata.py reads the file''s own text, cached under the
+    door''s own key). scripts/census_source_names.py --flow prints all five and RESOLVES every command it names
+    on disk, so a step nothing can run is FATAL rather than decorative (D-3034). (4) A DECLARED AXIS HAS A DEPTH,
+    AND WHAT SITS BELOW IT IS COUNTED. Each home now declares axis_depth and below_the_declared_axis; the reading
+    counts the files below, prints the distinct folder names with their counts, and never enumerates them as a vocabulary,
+    never reads one and never moves one. MEASURED live: 2,738 of the 2,811 files in the declared roots sit below
+    the declared axis, in 24 distinct folder names. A home that does not say what sits below is LOUD (rc 2), because
+    a silence must never read as a clean tree (D-3038). (5) THE BRIDGE STOPS DECIDING BY NAME. pipeline/batch_convert_epubs.py
+    matched its corpus target by FILENAME STEM (first rglob hit) and WROTE by default; since the door''s cache keys
+    on a NAME, an in-place overwrite under an unchanged name is invisible to the door - a re-ingest act in a repair''s
+    clothes (BUG-866). It now matches through the door''s OWN comparison key, refuses an ambiguous key, refuses
+    a work the cache already resolves, is DRY by default and carries four known-answer controls. Its two source
+    roots were declared null, so three writers (it, pipeline/enhance_md_headers.py, pipeline/fix_remaining.py) converted
+    NOTHING while printing that they ran; the keys are now the library kind roots and both resolve (MEASURED: 554
+    .epub and 42 .pdf under them). (6) WHAT WE REJECT IS REGISTERED (D-3038). Hazel stays refused as a DECIDER (a
+    GUI rule store is not text, so it can be neither diffed nor receipted - BUG-864) and Calibre stays refused as
+    a metadata source (its 61 rows hold this repository''s OWN governance documents). Neither becomes an instruction-set
+    that moves the owner''s files. (7) THE ONE HOLE LEFT OPEN. Nothing declared puts a library file into the corpus,
+    so the pipeline''s own input path is the single step a human performs by hand with no counter and no receipt:
+    registered as T-181. The legacy v2.0 tools that BUILT the below-axis level (place_quarantine.py, restructure_books.py)
+    are registered as T-182 rather than adopted: they move by heuristic and match counterparts by name.'
+  consequences:
+  - 'a false-clean is now impossible in the placement reading: the notify prints how many files sit BELOW the declared
+    axis and how many distinct names that is, so "0 in a subfolder the axis does not name" can never again be read
+    as "the tree is flat" (BUG-865)'
+  - 'the flow is a declaration a reader can CHECK, not prose in a handoff: every command it names is resolved on
+    disk inside the same reading the ladder already runs, so a stale step becomes a fault on the next health run'
+  - 'an overwrite of the corpus is no longer a silent act: it must pass the door''s own comparison key, it must
+    be unambiguous, it must not touch a work the cache already resolves, and it must be asked for twice (--apply)'
+  - two claims D-3048 made about the library are marked superseded inside their own declaration rather than quietly
+    living on, and the correction is recorded here so no later reader re-asserts them
+  - 'the residual risk is NAMED rather than closed: the admission step (T-181), the topic vocabulary''s second home
+    in the legacy tools (T-182), and the 727-pair drift whose origin this act REFUTED for the bridge and left as
+    an open question with its candidates listed instead of a culprit'

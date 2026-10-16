@@ -18,7 +18,8 @@ scan_roots: [scripts, pipeline, tools]          # tools/ was OUTSIDE the first c
 # REPAIRED, not declared - the first reads through the decode home, the second named ONE rule for its input
 # (its silent repair could never fire: the module already opened the same file strictly).
 ceiling:
-  debt: 14          # LOWERED 17 -> 14 on 2026-10-14 in the same act as the code (D-2642: SHRINK-ONLY). MEASURED
+  debt: 13          # LOWERED 14 -> 13 on 2026-10-16 by D-3050/BUG-866 (the bridge's read-back was DELEGATED to
+                    # scripts/lib/artifact_encoding.py, so its entry is gone) and 17 -> 14 on 2026-10-14 in the same act as the code (D-2642: SHRINK-ONLY). MEASURED
                     # after the change: 25 sites found, 25 declared, 0 undeclared, 0 stale, 14 of them `debt`-kind.
                     # The DRIFT that reddened this rail (`scripts/verify_anchor_family_registry.py:66`) is now
                     # DELEGATED to scripts/lib/artifact_encoding.py, and three entries whose debt had already been
@@ -93,10 +94,11 @@ debt:
   # REMOVED 2026-10-14 (the debt was PAID in code and never shrunk here): the CSV path of
   # scripts/verify_anchor_family_registry.py was already delegated to scripts/lib/artifact_encoding.py, and the
   # JSONL path (read_jsonl) is delegated in the SAME act - so the entry has nothing left to declare.
-  - path: pipeline/batch_convert_epubs.py
-    lines: [160]
-    mode: replace
-    why: pipeline/** is will_not_touch this session (rail 4); the convert path READS BACK the md it will write.
+  # REMOVED 2026-10-16 (D-3050/BUG-866): this entry was `lines: [160]` - a COORDINATE that went stale the moment
+  # the bridge was rewritten, and a coordinate is not a fact about the code (BUG-542's class). The DEBT BEHIND IT
+  # WAS PAID IN CODE in the same act: pipeline/batch_convert_epubs.py::read_back() now delegates its read-back to
+  # scripts/lib/artifact_encoding.py, so there is no silent repair left to declare. An entry with no measured site
+  # is STALE rather than tolerated (BUG-424 class), and the ceiling below is LOWERED with it (SHRINK-ONLY).
   - path: pipeline/enhance_md_headers.py
     # BUG-542: was `lines: [182, 248]`, a COORDINATE that went stale when the header pass grew a line above each
     # site (182->183, 248->249) - ONE site reported twice (STALE + FATAL DRIFT). Keyed by CONTENT now.

@@ -8,19 +8,21 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1177 decisions (census stamp d80d15256a29d814, 2026-10-16) · 628 bugs (227 open / 401 closed; highest OPEN = BUG-864) · 50 open tasks (MUST 11 / SHOULD 35 / WORTH 4; OWNER-moved 3, pipeline-moved 47; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1178 decisions (census stamp 0aaa23ca749afb59, 2026-10-16) · 630 bugs (227 open / 403 closed; highest OPEN = BUG-864) · 52 open tasks (MUST 12 / SHOULD 36 / WORTH 4; OWNER-moved 5, pipeline-moved 47; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **79** of 1177 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 592 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1177, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **79** of 1178 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 593 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1178, D-2987/BUG-765)
 >
 > Open BUGS by severity (population = the census's 227 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 34 · 🟨 MED 64 · 🟩 LOW 24 · UNLABELLED 101 (BUG-757) of 227 open.
 >
-> **OWNER LANE (3) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
+> **OWNER LANE (5) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
+> | T-181 | 🔴 MUST | THE FLOW - scripts/census_source_names.py --flow now DECLARES the five transitions between an arrival and a st | owner lane, three limbs: (1) NAME THE ADMISSION - is it the owner plac |
 > | T-176 | 🟠 SHOULD | THE SOURCE LIBRARY NAMES - THE OWNER WORD IS GIVEN AND THE PLAN IS PUBLISHED: what remains is the acceptance o | owner lane, plan-first: the owner accepts or edits the published plan  |
 > | T-179 | 🟠 SHOULD | THE SECOND MATERIALISATION - the library and the corpus hold the same work, the reading now measures how far t | owner lane: the owner decides between (a) RETIRING the second material |
 > | T-180 | 🟠 SHOULD | THE PLACEMENT - the declaration now says where a file belongs and the reading says what it does not cover: 281 | owner lane, four limbs, each separately wordable and none of them urge |
+> | T-182 | 🟠 SHOULD | THE LEGACY PLACEMENT TOOLS - the topic vocabulary the library materialises BELOW its declared axis has a SECON | owner lane, three limbs: (1) decide whether the below-axis vocabulary  |
 >
 > **PIPELINE LANE (47) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
 >
@@ -15832,3 +15834,32 @@ MEASURED AFTER: `scripts/check_harness_homes.py` reads 5 declared fact(s), bound
 ## BUG-864 (MED — OPEN 2026-10-16) — ROUTED BY DECLARATION: the finding is read and carried by scripts/census_source_names.py, whose placement reading is what makes the abandoned rule store's effect VISIBLE, and whose capability (source_library_names, receipt config/ingest_identity_gate.yaml#source_library) owns it
 
 Route, stated the way the graph reads it: the artifact this finding is about is `scripts/census_source_names.py` (the `--placement` reading, capability `source_library_names`), and the refusal it records lives at `config/ingest_identity_gate.yaml#source_library.placement.refusals.no_second_policy_home`. The owner lane that disposes of it is T-180. MEASURED consequence of saying it out loud: the routing debt returns to its shrink-only ceiling (223 -> 222 unrouted open bugs) because an item that NAMES an artifact a capability owns is ROUTED, while an item that names one nobody owns is debt. Status UNCHANGED: OPEN — a route says who reads a finding, never that it is fixed.
+
+## BUG-865 (LOW — FIXED 2026-10-16) — scripts/census_source_names.py printed a CLEAN verdict about a tree it had only looked at the top of: the placement reading was BLIND below the declared axis, and the FLOW between an arrival and a stamped work was declared NOWHERE
+
+**Status:** FIXED 2026-10-16 (D-3050; selftest 18/18 green). Found by the owner's own question — "how do the pdf/epub become md, and how are the library and the corpus kept in sync?" — which no reading in this repository could answer.
+
+SYMPTOM: `--placement` printed `in a subfolder the declared axis does not name 0` for BOTH declared roots, while MEASURED the same day the library materialises TWO further levels below the declared axis (`books/epub/DOMAIN 6 AI + Computing/ai+engineering+agents/<book>.epub`, `journals:notes/DOMAIN 2 Design/design-notes/<paper>.pdf`). The sentence was TRUE AT DEPTH ONE and silent about everything below it — the count that mattered read zero.
+
+ROOT CAUSE: the reading compared `rel[0]` only. A verdict nobody can falsify at the level it did not look at is the BUG-462 class (a printed verdict and a measurement that disagree), and here the reader of that verdict is the OWNER, who reasonably read "0" as "clean".
+
+FIX: (1) each declared home now declares `axis_depth` and `below_the_declared_axis` (config/ingest_identity_gate.yaml#source_library.placement.homes); (2) the reading COUNTS what sits below the axis and prints its distinct folder names with their counts — it never enumerates them as a vocabulary, never reads one and never moves one (MEASURED live: 2,738 of the 2,811 files in the declared roots sit below the declared axis, in 24 distinct folder names); (3) a home that does NOT declare what sits below it is LOUD (rc 2) instead of silently clean (D-3038); (4) the FLOW is declared once (source_library.flow, authority D-3050) as five transitions, and the reader RESOLVES every command it names on disk — so the ONE ladder line that prints the notify also proves the flow is still real (D-3034).
+
+MEASURED AFTER: `--selftest` 18/18; `--brief` reads `below the declared axis 2738 file(s) in 24 name(s), undeclared below: none || flow: 5 transition(s), 0 unresolved`.
+
+FILE / EVIDENCE: scripts/census_source_names.py; config/ingest_identity_gate.yaml#source_library.placement.axes/.homes/.flow.
+
+## BUG-866 (MED — FIXED 2026-10-16) — the BRIDGE that puts library EPUBs into the corpus matched by FILENAME STEM and wrote on a bare run, and the library roots it reads were declared null so three writers converted NOTHING while printing that they ran
+
+**Status:** FIXED (code + config) 2026-10-16 by D-3050. The routed carrier of this finding is scripts/census_source_names.py, whose `--flow` reading declares the step this bug lives in.
+
+MEASURED (2026-10-16):
+(a) `pipeline/batch_convert_epubs.py` matched its target with `epub_path.stem + ".md"` and took the FIRST `rglob` hit, then WROTE by default. A name is evidence, never identity (D-3045), so a filename decided WHICH BYTES THE PIPELINE READS — and `rglob` let the hit land in a DOMAIN folder the work's own classification never named. Worse: the S0.5 cache keys on the door's own NAME (`door.new_file_definition: absent_from_metadata_cache`), so an in-place overwrite under an unchanged name is INVISIBLE to the door — a RE-INGEST act wearing a repair's clothes.
+(b) `config/pipeline_config.yaml#source_epub_dir` and `#source_pdf_dir` were declared `null`, so `pipeline_paths.SOURCE_EPUB_DIR` fell back to `<corpus>/epub` — MEASURED, that path DOES NOT EXIST. Three declared writers read it (`batch_convert_epubs.py`, `enhance_md_headers.py`, `fix_remaining.py`): an absent root means each converts NOTHING while printing that it ran. A declaration that does not resolve is a promise, not a measurement (D-3034).
+(c) REFUTED HYPOTHESIS, recorded because it was mine: (b) also means this script CANNOT have produced the 727 same-name, different-byte pairs `--arrangement` counts between the library and the corpus. Its root did not exist, `rglob` over a missing directory yields nothing, and the old code printed "Found 0 EPUBs" and exited 0. THE ORIGIN OF THE DRIFT IS THEREFORE STILL OPEN, named as an open question instead of assigned: candidates are the two other consumers of the same roots (`enhance_md_headers.py`, `fix_remaining.py`), the legacy v2.0 aliasing tools (T-182) and an owner copy. Naming one would be a guess; the measurement only says THIS one did not do it.
+
+FIX: the bridge now (1) matches through the DOOR'S OWN comparison key (`pipeline.book_metadata.sanitize_source_book`), so bridge and pipeline agree on what one work is; (2) REFUSES and COUNTS an ambiguous key (0 or >1 candidates) instead of taking a first hit; (3) REFUSES a corpus file the S0.5 cache already resolves and names it a RE-INGEST act (T-172's shape), `--allow-ingested` being the only way through; (4) is DRY by default (`--apply` writes) and says so; (5) fails LOUDLY on an absent root (D-795); (6) carries four known-answer controls, one of which proves a PLAN that decides to convert still writes nothing. The two config keys are declared as the library kind roots.
+
+MEASURED AFTER: `pipeline/batch_convert_epubs.py --selftest` 4/4 green; the live PLAN writes nothing; `SOURCE_EPUB_DIR` resolves to the library epub root (exists=True, 554 .epub under it) and `SOURCE_PDF_DIR` to the library pdf root (exists=True). STILL OPEN AND REGISTERED: the admission transition itself (T-181) and the legacy tools' second home for the topic vocabulary (T-182).
+
+FILE / EVIDENCE: pipeline/batch_convert_epubs.py; config/pipeline_config.yaml#source_epub_dir; scripts/census_source_names.py --flow.

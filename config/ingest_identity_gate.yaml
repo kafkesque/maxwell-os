@@ -296,9 +296,20 @@ source_library:
     #: MATERIALISATIONS of one work. A topic copy would make it a THIRD. The ceiling below is set from the reader's
     #: own live reading (a measurement plus one declared slot), and it is SHRINK-ONLY (D-3023/D-2644).
     drift_ceiling: 727   # MEASURED 2026-10-16 by the reader itself; SHRINK-ONLY (D-3023/D-2644)
-    library_is_a_view: 'the library is the owner READING surface; it holds the bytes of works the corpus does not hold yet (the un-ingested originals) and a reading view of the rest, and it is never a second authority'
+    #: SUPERSEDED 2026-10-16 by D-3050 (see `flow` at the end of this block). This key read `library_is_a_view`,
+    #: claiming the library was "a reading view of the rest". The BYTES refute it: a view is GENERATED, and the
+    #: library md tree is OLDER than the corpus in 727 of 727 same-name pairs (MEASURED by --arrangement plus
+    #: mtime), so the library is the ORIGIN and the corpus is the derived tree. The key is RENAMED rather than
+    #: left standing: a claim the measurement refutes is a false declaration (C16/D-3030 class).
+    library_is_the_origin: "the library is where the works CAME FROM - the epub/pdf the owner downloaded and the md materialised beside them, arranged by the owner's own topic folders; the corpus is the pipeline's DERIVED tree. Neither is an authority over the other, and the same work in both homes with different bytes is COUNTED (--arrangement), never invisible"
     format_is_the_physical_axis: 'the library separates by FORMAT (books/epub, books/pdf, books/md, journals:notes) - format is what decides how a file is read, so it is the one axis a physical layout carries'
-    topic_is_a_derived_view: 'topic is the pipeline own DOMAIN (already materialised once, in the corpus) or a facet of the catalogue - a facet is DERIVED and printed, never materialised as a copy'
+    #: SUPERSEDED 2026-10-16 by D-3050: this key read `topic_is_a_derived_view` and claimed the topic was
+    #: "already materialised once, in the corpus". MEASURED the same day: the topic is materialised in BOTH
+    #: homes and in TWO levels each - the corpus carries DOMAIN/<subtopic>/file.md (939 of its 940 files sit
+    #: below the first level) and the library mirrors the same DOMAIN/<subtopic> shape. What stays forbidden is
+    #: a THIRD copy: a facet used for QUERYING is derived from the catalogue and printed, never materialised as
+    #: another tree (no_topic_copies below still holds).
+    topic_is_materialised_in_both_homes: 'MEASURED 2026-10-16: DOMAIN/<subtopic> in the corpus AND in the library. The topic is therefore a real physical axis in two trees, which is exactly why the drift between them is counted (--arrangement) and why a THIRD materialisation is refused'
     no_topic_copies: 'a copied work is two works to every reader that joins by path (BUG-780: 530 rows, one text under two names) and it doubles storage and sync for zero new identity'
     no_links_in_the_library: 'the library lives inside Dropbox (APFS, MEASURED 2026-10-16: /System/Volumes/Data, APFS); an APFS CLONE would share bytes locally and still be uploaded as a second file by the provider, and a symlink is not what the provider syncs - so neither is the mechanism, a GENERATED view is'
     view_rule: 'a view is GENERATED from the bytes home or it is not a view; the generator is declared before any view is materialised (none is declared yet, and that is a declaration rather than a silence)'
@@ -317,11 +328,27 @@ source_library:
     axes:
       kind: 'the subfolder IS the file kind (books/epub, books/pdf, books/md): format decides how a file is READ, so it is the one axis a physical layout can carry (D-3048)'
       domain: 'the subfolder is one of the pipeline OWN DOMAIN names, read from their one materialisation (the immediate subdirectories of the corpus home), never restated here - a note has no converter, so topic is the only axis it can carry'
+    #: THE AXIS HAS A DEPTH, and everything BELOW it is the blind spot this row closes (BUG-865). MEASURED
+    #: 2026-10-16: below the declared axis both homes carry the owner's own topic arrangement, in TWO further
+    #: levels (books/epub/DOMAIN 6 AI + Computing/ai+engineering+agents/, notes/DOMAIN 2 Design/design-notes/) -
+    #: 30 distinct folder names in books and 16 in journals:notes, with 636 files deeper than three levels.
+    #: Those names are maintained by a human and owned by NO vocabulary here, so the reading COUNTS them and
+    #: prints their number: it never enumerates them as a vocabulary and never moves one. A home whose row does
+    #: NOT declare what sits below is reported as UNDECLARED and is LOUD (rc 2) - a silence must never read as a
+    #: clean tree (D-3038).
     #: ONE ROW PER DECLARED ROOT, and a root with no row is FATAL (D-3034: a declaration must resolve). The ADMITTED
     #: KINDS are not restated here - they are read from source_library.roots[].kinds, their one home.
     homes:
-      books: {axis: kind, subfolder_required: true}
-      journals_notes: {axis: domain, subfolder_required: true}
+      books:
+        axis: kind
+        axis_depth: 1
+        subfolder_required: true
+        below_the_declared_axis: "the owner's own topic arrangement (DOMAIN/<subtopic>), counted and printed, never enumerated, never read, never moved"
+      journals_notes:
+        axis: domain
+        axis_depth: 1
+        subfolder_required: true
+        below_the_declared_axis: "the owner's own subtopic folders under each DOMAIN (e.g. design-notes, business-notes), counted and printed, never enumerated, never read, never moved"
     #: AN ARRIVAL PEN IS A QUEUE, NEVER A DEFECT. What would be a defect is the pen being UNDECLARED (a silence) or
     #: a file outliving staleness_days (a queue nobody drains) - so the pen is declared HERE, with a reason, and the
     #: reading counts what is waiting instead of an unorganised pile being argued about.
@@ -341,4 +368,48 @@ source_library:
       no_second_library: 'a second library app may own a READING surface and never the bytes. MEASURED 2026-10-16: the installed Calibre library (61 rows, ONE author, "Ismeretlen") holds this repository OWN governance documents, not the books - so it is not a metadata source the T-176 plan may read (a declared source no eligible row can reach would be a promise, not a measurement, D-3034)'
       no_topic_copy: 'a topic is never a folder of COPIES (D-3048): a copied work is two works to every reader that joins by path'
     new_file_definition: 'REUSED, never restated: config/ingest_identity_gate.yaml#door.new_file_definition (a name the S0.5 metadata cache cannot resolve) - so the pen reading counts what the PIPELINE has never seen, not what a script guesses is new'
+  # ── THE FLOW (T-181/D-3050): THE FIVE TRANSITIONS BETWEEN AN ARRIVAL AND A STAMPED WORK ─────────────────
+  # The owner asked (2026-10-16): how does a file actually GET organised, how do PDF/EPUB become MD, and how are
+  # the library and the corpus kept in step? The answer is a DECLARATION with measurements, not a reassurance.
+  # MEASURED the same day: the pipeline never reads the library (config/pipeline_config.yaml#books_dir is the
+  # corpus, and 962 of 962 S0.5 cache records carry a source_path inside it); the two trees are TWO
+  # MATERIALISATIONS of the same works (830 shared names, 103 byte-identical, 727 DIFFERENT, and the corpus copy
+  # is NEWER in 727 of 727); and the ONE script that bridged them matched by FILENAME STEM until today (BUG-865).
+  flow:
+    authority: D-3050
+    reading: "python3 scripts/census_source_names.py --flow (the detail). The same check runs inside --placement, so the ONE ladder line that prints the notify also proves every command below is still on disk (D-3034)"
+    transitions:
+      arrival:
+        where: "the declared pens (source_library.placement.pens)"
+        actor: owner
+        counter: "python3 scripts/census_source_names.py --brief (ONE line, on every health run)"
+        moves: false
+        why: "an arrival is a QUEUE with a number: nothing is moved, renamed or converted on arrival, so a drop can never race a run (D-3049)"
+      placement:
+        where: "the declared homes (source_library.placement.homes: kind for books, domain for journals:notes)"
+        actor: owner
+        moves: "the owner, by hand or in Finder - NO engine moves a file because of its name"
+        why: "a name is evidence, never identity (D-3045): a mover that decides by extension or by substring is a second policy home with no identity key, which is why Hazel is refused as a decider (placement.refusals.no_second_policy_home)"
+      admission:
+        state: "UNDECLARED - THE ONE HOLE IN THIS FLOW (T-181)"
+        measured: "MEASURED 2026-10-16: pipeline/stage0_convert.py reads the CORPUS (books_dir = knowledge pipeline/books) and NOTHING declares the transition that puts a library file into it. Today that step is done by hand, so the pipeline's OWN INPUT PATH is the one step with no declaration and no counter"
+        owner: T-181
+      conversion:
+        command: "python3 pipeline/stage0_convert.py"
+        reads: "every .epub/.pdf/.md under the corpus home, RECURSIVELY (find_books; an .md is 'already converted' and is the only kind the corpus holds today - MEASURED 940 of 940)"
+        engines: "pandoc for epub; docling for pdf, falling back to pandoc"
+        writes: "the corpus home itself - the SAME tree the S0.5 cache then stamps, so the corpus is both the input and the output of S0"
+        re_conversion: "pipeline/batch_convert_epubs.py (D2134, declared in config/silent_repair.yaml) re-converts a LIBRARY epub and overwrites the matching corpus .md in place. Until D-3050 it matched by FILENAME STEM and wrote on a bare run (BUG-865); it now matches through the door's OWN comparison key, refuses an ambiguous key, refuses a work the S0.5 cache already resolves (a RE-INGEST act), and is DRY by default"
+        source_roots: "config/pipeline_config.yaml#source_epub_dir and #source_pdf_dir - the library kind roots. They were DECLARED as null until D-3050, so the fallback resolved to a path that does not exist and three declared writers silently converted nothing (MEASURED 2026-10-16)"
+      identity:
+        command: "python3 pipeline/stage0_5_extract_metadata.py"
+        reads: "the file's OWN text (D-3045: a name is evidence, never identity)"
+        cache: "knowledge pipeline/checkpoints/book_metadata.jsonl, reused as the door's OWN definition of a new file - its one home is source_library.metadata_cache, never restated"
+        boundary: "the cache keys on the door's OWN comparison key, so a byte change under an unchanged name is INVISIBLE to the door. That is why an in-place overwrite of the corpus is a re-ingest act and not a repair (BUG-865)"
+    no_sync:
+      fact: "THERE IS NO SYNC between the library and the corpus, and there never was one: they are two materialisations of the same works, kept in step only by whoever last ran a conversion"
+      measured: "MEASURED 2026-10-16 by --arrangement plus mtime: library books/md 852 stems, corpus 940, 830 shared names, 103 byte-identical, 727 with DIFFERENT bytes, and the corpus copy is NEWER in 727 of 727"
+      therefore: "the library is the ORIGIN and the corpus is the DERIVED tree - this SUPERSEDES arrangement.library_is_a_view (D-3048), which the bytes refute"
+      a_view_is_generated: "nothing generates the library, and a generated view would carry its generator and the source commit - so calling the library a view would be a claim the measurement refutes (C16)"
+      better_solution: "ONE bytes home plus ONE derived tree that carries a receipt. The library md twin is the candidate: retire it (T-179, owner-worded) or declare it the originals archive with its own age budget. What stays refused is a THIRD materialisation (a topic copy) and a bridge that decides by name (BUG-865)"
 

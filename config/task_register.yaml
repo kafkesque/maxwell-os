@@ -2070,3 +2070,63 @@ tasks:
     (4) Hazel (BUG-864) - open it, and either retarget its Downloads rules at a DECLARED pen or disable the actions
     whose destinations do not exist. No file may be removed without pipeline/safe_delete.py (R-D410), and no limb
     authorises a bulk renamer or a copy.
+- id: T-181
+  priority: MUST
+  state: open
+  mover: owner
+  title: 'THE FLOW - scripts/census_source_names.py --flow now DECLARES the five transitions between an arrival and a
+    stamped work, and the ONE hole in them is named: no command puts a library file into the corpus, so the pipeline
+    own input path is the only step a human does by hand with no counter and no receipt'
+  source: D-3050; config/ingest_identity_gate.yaml#source_library.flow; scripts/census_source_names.py --flow
+  why: >-
+    The owner asked how a book actually gets organised, converted and kept in step. MEASURED 2026-10-16: S0 reads the
+    CORPUS only (books_dir = knowledge pipeline/books, and 962 of 962 S0.5 cache source_paths land inside it), the
+    library is read by no stage, and the two trees are TWO MATERIALISATIONS of the same works (830 shared names, 103
+    byte-identical, 727 different, the corpus copy NEWER in 727 of 727). The five transitions are now declared with
+    their ONE home each (arrival, placement, admission, conversion, identity); the ADMISSION is the one with no
+    command, which makes it the only step in the pipeline own input path that nothing counts.
+  evidence: >-
+    MEASURED 2026-10-16: the placement reading prints "FLOW: 5 transition(s) declared, 0 command(s) that do not
+    resolve" and the flow reader resolves every command it names on disk (D-3034); the library epub root holds 554
+    .epub files while the corpus holds 940 .md and no epub/pdf at all; the keyed bridge PLAN writes nothing by default.
+  gate: >-
+    owner lane, three limbs: (1) NAME THE ADMISSION - is it the owner placing a file into the corpus by hand, or a
+    planned, door-keyed, dry-run-first command in the shape BUG-866's fix now uses? Either answer is declarable, and an
+    undeclared answer is what this row exists to remove; (2) DECIDE WHAT A NEW ARRIVAL'S HOME IS - the corpus carries
+    DOMAIN/<subtopic>, so filing a work by topic before it has been classified needs a classifier, which D-2898 refuses
+    (no LLM or heuristic canonical decision: deterministic match_to_canonical plus an owner gate), while a KIND-only
+    home needs no classifier at all; (3) the library md twin's fate overlaps T-179 - retire it, or declare it the
+    originals archive with its own age budget. Nothing here authorises moving, renaming or deleting a byte.
+- id: T-182
+  priority: SHOULD
+  state: open
+  mover: owner
+  title: 'THE LEGACY PLACEMENT TOOLS - the topic vocabulary the library materialises BELOW its declared axis has a
+    SECOND home in the old v2.0 tools of the sibling project (place_quarantine.py routes books to
+    education/books/{md,epub,pdf}/DOMAIN/cross_domain and matches epub/pdf counterparts from the inbox;
+    restructure_books.py carries the DOMAIN-to-cross_domain table): reconcile them against
+    config/ingest_identity_gate.yaml#source_library or register them as superseded'
+  source: D-3050; BUG-865; config/ingest_identity_gate.yaml#source_library.placement
+  why: >-
+    MEASURED 2026-10-16 by reading the sibling project: the 24 folder names counted BELOW the declared axis are exactly
+    the cross_domain vocabulary those two legacy tools write - restructure_books.py owns the DOMAIN-to-cross_domain
+    table (brand_identity to communication+design, color_grid_layout to visual+fundamentals, ai_agents to
+    ai+engineering+agents) and place_quarantine.py routes each book to books/{kind}/DOMAIN/cross_domain/ and matches
+    epub/pdf counterparts from the inbox. So the library's below-axis level is MACHINE-PRODUCED, and the vocabulary has
+    two homes: the corpus own materialisation (which the placement reading reads, D-3049) and this legacy table inside
+    a script in another project.
+  evidence: >-
+    MEASURED 2026-10-16 by reading the sibling project: tools/place_quarantine.py (267 lines) - "Routes each book to education/books/{md,epub,pdf}/DOMAIN/
+    cross_domain/ and matches epub/pdf counterparts from inbox", with --dry-run/--execute; tools/restructure_books.py
+    (410 lines, wrapped by reorganize_books.py) - phases 1-3 (flatten nesting, unify naming, fix contamination) over a
+    hardcoded DOMAIN-to-cross_domain map. Both MOVE files (shutil.move), both decide by keyword or embedding
+    heuristics, and the counterpart match is BY NAME - the class BUG-866 fixed in the v2.0 bridge. Also measured and
+    REFUSED as an organizer: tools/merge_inbox_books.py, which merges three HARDCODED extract directories for three
+    named books (a one-off, not a policy).
+  gate: >-
+    owner lane, three limbs: (1) decide whether the below-axis vocabulary is ADOPTED (declared once and read from the
+    corpus, the way the DOMAIN vocabulary already is) or SUPERSEDED (the legacy table registered as an accepted
+    negative with its reason, D-3038) - a vocabulary with two homes drifts, and this one lives inside code nobody runs;
+    (2) if a pen-drain command is wanted, it must be a PLAN (dry-run default, door-keyed, receipted), never a port of
+    the heuristic router - a mover that decides a TOPIC by keyword is a second policy home with no identity key
+    (D-3045); (3) nothing in the legacy tools authorises deletion (R-D410) or a bulk rename (D-3048).

@@ -14,6 +14,8 @@ may_touch:
 - agent/adapters/goose/apply_provider_flip.py
 - justfile
 - temp/d3049_record.yaml
+- config/silent_repair.yaml
+- pipeline/batch_convert_epubs.py
 - config/ingest_identity_gate.yaml
 - scripts/plan_source_rename.py
 - scripts/census_source_names.py

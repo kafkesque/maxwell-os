@@ -74,6 +74,8 @@ CONTROL_LABELS = (
     "a_subfolder_the_declared_axis_does_not_name_is_counted_as_OUTSIDE_the_declaration",
     "a_file_waiting_in_a_declared_ARRIVAL_PEN_is_counted_while_a_STALE_one_is_counted_apart",
     "the_placement_reader_names_no_root_pen_or_path_of_its_own",
+    "a_file_BELOW_the_declared_axis_is_counted_and_a_home_that_does_not_declare_it_is_LOUD",
+    "the_flow_reader_RESOLVES_every_command_the_declaration_names_and_restates_no_path_of_its_own",
 )
 
 
@@ -449,12 +451,18 @@ def placement(pol: dict[str, Any] | None = None, corpus_root: Path | None = None
     corpus = Path(corpus_root) if corpus_root else (_PROJECT_ROOT / corpus_home)
     vocab = axis_vocabulary(doc, corpus)
     cache = cache_keys(doc)
+    # The FLOW this placement belongs to (T-181/D-3050). It is validated HERE so the ONE ladder line that prints
+    # the notify also proves every command the declaration names is still on disk (D-3034: never assume, resolve).
+    flow_rep = flow(doc)
 
     per_root: dict[str, dict[str, Any]] = {}
     misplaced_examples: list[str] = []
     loose_examples: list[str] = []
     undeclared: dict[str, int] = {}
-    files = admitted = misplaced = loose = 0
+    below_names: dict[str, int] = {}
+    below_examples: list[str] = []
+    below_undeclared: set[str] = set()
+    files = admitted = misplaced = loose = below_files = 0
     for root in roots(doc):
         row = homes.get(root["id"])
         if not isinstance(row, dict):
@@ -472,12 +480,21 @@ def placement(pol: dict[str, Any] | None = None, corpus_root: Path | None = None
             raise CensusError(
                 f"FATAL: placement.homes.{root['id']} does not declare subfolder_required (C16)"
             )
+        # BUG-865: the axis a subfolder carries sits at ONE level by construction; `axis_depth` lets a home say so
+        # explicitly, and everything BELOW that depth is counted as a class of its own instead of being invisible.
+        depth = row.get("axis_depth", 1)
+        if not isinstance(depth, int) or isinstance(depth, bool) or depth < 1:
+            raise CensusError(
+                f"FATAL: placement.homes.{root['id']}.axis_depth must be a positive integer (C16)"
+            )
+        below_declared = str(row.get("below_the_declared_axis") or "")
         counts = {
             "files": 0,
             "admitted": 0,
             "misplaced_kind": 0,
             "loose_at_root": 0,
             "undeclared_subfolders": 0,
+            "below_the_declared_axis": 0,
         }
         for path in sorted(root["path"].rglob("*")):
             if not path.is_file() or path.name.startswith("."):
@@ -499,11 +516,23 @@ def placement(pol: dict[str, Any] | None = None, corpus_root: Path | None = None
             elif rel[0] not in vocab[axis]:
                 counts["undeclared_subfolders"] += 1
                 undeclared[rel[0]] = undeclared.get(rel[0], 0) + 1
+            if len(rel) - 1 > depth:
+                # BELOW the declared axis (BUG-865): MEASURED 2026-10-16 this is where both homes keep the owner's
+                # own topic arrangement - a vocabulary no declaration here owns. It is COUNTED and its names are
+                # numbered, never enumerated as a vocabulary and never moved; a home that does not say what sits
+                # below is LOUD (a silence must never read as a clean tree, D-3038).
+                counts["below_the_declared_axis"] += 1
+                below_names[rel[depth]] = below_names.get(rel[depth], 0) + 1
+                if len(below_examples) < 5:
+                    below_examples.append(f"{root['id']}/{'/'.join(rel[: depth + 1])}"[:90])
+                if not below_declared:
+                    below_undeclared.add(root["id"])
         per_root[root["id"]] = counts
         files += counts["files"]
         admitted += counts["admitted"]
         misplaced += counts["misplaced_kind"]
         loose += counts["loose_at_root"]
+        below_files += counts["below_the_declared_axis"]
 
     admitted_kinds: set[str] = set()
     for root in roots(doc):
@@ -588,13 +617,122 @@ def placement(pol: dict[str, Any] | None = None, corpus_root: Path | None = None
         "stale": sum(row["stale"] for row in pen_rows),
         "unseen": sum(row["unseen"] for row in pen_rows),
         "vocabulary": {axis: len(names) for axis, names in vocab.items()},
+        "below_axis_files": below_files,
+        "below_axis_names": below_names,
+        "below_axis_examples": below_examples,
+        "below_axis_undeclared": sorted(below_undeclared),
+        "flow": {"transitions": len(flow_rep["transitions"]), "unresolved": flow_rep["unresolved"]},
         "rc": (
-            RC_OWNER_OWED
-            if (waiting or misplaced or loose or undeclared_files or siblings)
-            else RC_OK
+            RC_FATAL
+            if flow_rep["unresolved"]
+            else (
+                RC_OWNER_OWED
+                if (waiting or misplaced or loose or undeclared_files or siblings or below_undeclared)
+                else RC_OK
+            )
         ),
     }
 
+
+COMMAND_RE = re.compile(r"/?[A-Za-z0-9_][A-Za-z0-9_./-]*\.(?:py|sh)")
+
+
+def flow(pol: dict[str, Any] | None = None) -> dict[str, Any]:
+    """The declared FLOW (T-181/D-3050), with every command it names RESOLVED on disk (D-3034).
+
+    The owner asked how a file actually gets organised, how PDF/EPUB become MD and how the library and the
+    corpus are kept in step. The honest answer is this declaration: five transitions, each naming its ONE home
+    and its ONE counter, plus the measured fact that the two trees are TWO MATERIALISATIONS with no sync between
+    them - the library holding the originals and the corpus the derived md the pipeline works on.
+
+    A transition whose declared command is not on disk is FATAL: a declaration that does not resolve is a
+    promise, not a measurement. The reader names NO path of its own (C12): every path it prints comes from the
+    declaration it just read.
+
+    Args:
+        pol: The declaration document, or the one home on disk.
+
+    Returns:
+        The transitions with their actors, commands and counters, the resolved and unresolved command lists, the
+        `no_sync` facts, and `rc` (0 = every declared command resolves, 1 = FATAL).
+    """
+    doc = pol or policy()
+    declared = (doc.get("source_library") or {}).get("flow")
+    if not isinstance(declared, dict):
+        raise CensusError(
+            f"FATAL: {POLICY}#source_library.flow is not declared - the transitions between an arrival and a "
+            f"stamped work are then a SILENCE, and a silence reads as if nothing moved (C12/D-3038)"
+        )
+    transitions = declared.get("transitions")
+    if not isinstance(transitions, dict) or not transitions:
+        raise CensusError(
+            f"FATAL: {POLICY}#source_library.flow.transitions must be a non-empty mapping (C16)"
+        )
+    rows: list[dict[str, Any]] = []
+    resolved: list[str] = []
+    unresolved: list[str] = []
+    for tid, row in transitions.items():
+        if not isinstance(row, dict):
+            raise CensusError(
+                f"FATAL: {POLICY}#source_library.flow.transitions.{tid} is not a mapping (C16)"
+            )
+        command = str(row.get("command") or "")
+        named = COMMAND_RE.findall(command)
+        for tok in named:
+            path = Path(tok) if Path(tok).is_absolute() else _PROJECT_ROOT / tok
+            (resolved if path.exists() else unresolved).append(tok)
+        rows.append(
+            {
+                "id": tid,
+                "actor": str(row.get("actor") or ""),
+                "command": command,
+                "counter": str(row.get("counter") or ""),
+                "state": str(row.get("state") or ""),
+                "moves": row.get("moves"),
+                "commands": named,
+            }
+        )
+    no_sync = declared.get("no_sync")
+    if not isinstance(no_sync, dict) or not no_sync:
+        raise CensusError(
+            f"FATAL: {POLICY}#source_library.flow.no_sync is not declared - whether the two trees are kept in "
+            f"step is a FACT, and an undeclared fact is where a reader invents a sync (C12/D-3038)"
+        )
+    return {
+        "authority": str(declared.get("authority") or ""),
+        "reading": str(declared.get("reading") or ""),
+        "transitions": rows,
+        "resolved": sorted(set(resolved)),
+        "unresolved": sorted(set(unresolved)),
+        "no_sync": dict(no_sync),
+        "rc": RC_FATAL if unresolved else RC_OK,
+    }
+
+
+def report_flow(rep: dict[str, Any], stream: Any = sys.stdout) -> None:
+    """Print the declared flow: every transition, its actor, its counter and the commands it names."""
+    print(
+        f"FLOW ({rep['authority']}): {len(rep['transitions'])} transition(s) declared between an arrival and "
+        f"a stamped work",
+        file=stream,
+    )
+    for row in rep["transitions"]:
+        head = f"  {row['id']}"
+        if row["state"]:
+            head += f" | {row['state']}"
+        if row["actor"]:
+            head += f" | actor: {row['actor']}"
+        print(head, file=stream)
+        for key in ("command", "counter", "moves"):
+            if row.get(key) not in ("", None):
+                print(f"      {key}: {row[key]}", file=stream)
+    print(f"  commands that RESOLVE on disk: {len(rep['resolved'])}", file=stream)
+    for tok in rep["resolved"]:
+        print(f"    ok  {tok}", file=stream)
+    for tok in rep["unresolved"]:
+        print(f"    ❌ MISSING {tok} - a declared step nothing can run (D-3034)", file=stream)
+    for key, value in rep["no_sync"].items():
+        print(f"  no_sync.{key}: {value}", file=stream)
 
 def report_placement(rep: dict[str, Any], stream: Any = sys.stdout) -> None:
     """Print the placement reading: the roots, the axes, the pens and the folders the declaration does not cover."""
@@ -615,6 +753,27 @@ def report_placement(rep: dict[str, Any], stream: Any = sys.stdout) -> None:
         print(f"    loose e.g. {name}", file=stream)
     print(
         f"  the axes admit {rep['vocabulary']} subfolder name(s) - kind from the declaration, domain from the corpus",
+        file=stream,
+    )
+    print(
+        f"  BELOW THE DECLARED AXIS (counted, never enumerated as a vocabulary and never moved): "
+        f"{rep['below_axis_files']} file(s) in {len(rep['below_axis_names'])} distinct folder name(s)",
+        file=stream,
+    )
+    for name, count in sorted(rep["below_axis_names"].items(), key=lambda kv: -kv[1])[:6]:
+        print(f"    {count:5d}  {name}", file=stream)
+    for name in rep["below_axis_examples"][:2]:
+        print(f"    e.g. {name}", file=stream)
+    if rep["below_axis_undeclared"]:
+        print(
+            f"  !! UNDECLARED BELOW THE AXIS (loud, D-3038): {', '.join(rep['below_axis_undeclared'])} - the home "
+            f"does not say what sits below its axis",
+            file=stream,
+        )
+    print(
+        f"  FLOW: {rep['flow']['transitions']} transition(s) declared, "
+        f"{len(rep['flow']['unresolved'])} command(s) that do not resolve "
+        f"(just flow: the whole declaration)",
         file=stream,
     )
     print("  ARRIVAL PENS (a queue, never a defect):", file=stream)
@@ -642,11 +801,14 @@ def brief(rep: dict[str, Any]) -> str:
         for p in rep["pens"]
     )
     outside = ", ".join(rep["siblings_outside_the_declaration"]) or "none"
+    undecl = ", ".join(rep["below_axis_undeclared"]) or "none"
     return (
         f"LIBRARY: pens -> {pens} || misplaced {rep['misplaced']} of {rep['files']} file(s) in the declared roots "
         f"(loose at a root {rep['loose_at_root']}, in a subfolder the axis does not name "
-        f"{rep['undeclared_subfolder_files']}) || outside the declaration: {outside} "
-        f"|| detail: just placement | names: just source-names"
+        f"{rep['undeclared_subfolder_files']}) || below the declared axis {rep['below_axis_files']} file(s) in "
+        f"{len(rep['below_axis_names'])} name(s), undeclared below: {undecl} || flow: "
+        f"{rep['flow']['transitions']} transition(s), {len(rep['flow']['unresolved'])} unresolved "
+        f"|| outside the declaration: {outside} || detail: just placement | names: just source-names"
     )
 
 
@@ -665,6 +827,11 @@ def selftest() -> int:
                 "source_library": {
                     "roots": [{"id": "lib", "path": "", "kinds": ["epub", "pdf"]}],
                     "metadata_cache": "",
+                    "flow": {
+                        "authority": "D-3050",
+                        "transitions": {"a_step": {"command": "python3 scripts/census_source_names.py"}},
+                        "no_sync": {"fact": "two materialisations, no sync between them"},
+                    },
                     "marker_pattern": r"(?i)\b(z-lib|annas?-?archive|1lib)\b",
                     "spine_pattern": r"\s--\s|\b[0-9a-f]{16,}\b",
                     "truncation_pattern": r"_$|\($|\band\s*$",
@@ -799,9 +966,20 @@ def selftest() -> int:
         os.utime(pen / "Old Arrival.epub", (old, old))
         pl = pol["source_library"]
         pl["roots"].append({"id": "notes", "path": str(notes), "kinds": ["md"]})
+        (root / "epub" / "DOMAIN 6 AI + Computing" / "ai+engineering+agents").mkdir(parents=True)
+        (root / "epub" / "DOMAIN 6 AI + Computing" / "ai+engineering+agents" / "deep.epub").write_text(
+            "x", encoding="utf-8"
+        )
+        (notes / "DOMAIN 6 AI + Computing" / "design-notes").mkdir(parents=True)
+        (notes / "DOMAIN 6 AI + Computing" / "design-notes" / "deep.md").write_text("x", encoding="utf-8")
         pl["placement"] = {
             "homes": {
-                "lib": {"axis": "kind", "subfolder_required": True},
+                "lib": {
+                    "axis": "kind",
+                    "axis_depth": 1,
+                    "subfolder_required": True,
+                    "below_the_declared_axis": "the owner's own topic arrangement",
+                },
                 "notes": {"axis": "domain", "subfolder_required": True},
             },
             "pens": {"test_pen": {"path": str(pen), "staleness_days": 30}},
@@ -856,6 +1034,63 @@ def selftest() -> int:
                 "the placement reader this control is about does not exist in the file",
             )
 
+        # (16) BELOW the declared axis (BUG-865): the fixture puts a file deeper than each root's axis. The `lib`
+        # home declares what sits below it (a COUNT); the `notes` home does not (LOUD) - a silence must never read
+        # as a clean tree (D-3038).
+        if (
+            plc["below_axis_files"] < 2
+            or "DOMAIN 6 AI + Computing" not in plc["below_axis_names"]
+            or "design-notes" not in plc["below_axis_names"]
+        ):
+            mark(
+                CONTROL_LABELS[16],
+                f"a file below the declared axis was not counted ({plc['below_axis_files']}, "
+                f"{sorted(plc['below_axis_names'])})",
+            )
+        if plc["below_axis_undeclared"] != ["notes"]:
+            mark(
+                CONTROL_LABELS[16],
+                f"a home that does not declare what sits below it read {plc['below_axis_undeclared']},"
+                f"expected ['notes'] (loud)",
+            )
+
+        # (17) THE FLOW (T-181/D-3050): the reader RESOLVES every command the declaration names, reads the command
+        # OUT OF THE DECLARATION (a fixture path, not a constant of its own), and treats an absent flow as FATAL.
+        step_ok = Path(tmp) / "step_ok.py"
+        step_ok.write_text("x", encoding="utf-8")
+        step_ghost = Path(tmp) / "no_such_step.py"
+        fl = pol["source_library"]
+        fl["flow"] = {
+            "authority": "D-3050",
+            "transitions": {
+                "a_step": {"command": f"python3 {step_ok}", "actor": "owner"},
+                "a_ghost": {"command": f"python3 {step_ghost}"},
+            },
+            "no_sync": {"fact": "two materialisations"},
+        }
+        flw = flow(pol)
+        if flw["resolved"] != [str(step_ok)] or flw["unresolved"] != [str(step_ghost)]:
+            mark(
+                CONTROL_LABELS[17],
+                f"flow resolution read resolved={flw['resolved']} unresolved={flw['unresolved']}",
+            )
+        if flw["rc"] != RC_FATAL:
+            mark(CONTROL_LABELS[17], f"an unresolvable declared command read rc {flw['rc']}")
+        fl["flow"]["transitions"] = {"a_step": {"command": f"python3 {step_ok}"}}
+        if flow(pol)["rc"] != RC_OK:
+            mark(CONTROL_LABELS[17], "a flow whose commands all resolve did not read rc 0")
+        absent = json.loads(json.dumps(pol))
+        absent["source_library"].pop("flow")
+        try:
+            flow(absent)
+            mark(CONTROL_LABELS[17], "an ABSENT flow declaration did not raise (a silence read as a clean flow)")
+        except CensusError:
+            pass
+        flow_needles = ["~" + "/Library", "knowledge " + "pipeline/books", "educa" + "tion/"]
+        leaked_flow = [tok for tok in flow_needles if tok in own]
+        if leaked_flow:
+            mark(CONTROL_LABELS[17], f"the flow reader restates a path of its own: {leaked_flow}")
+
     failed = {label for label, _ in failures}
     for label in CONTROL_LABELS:
         print(f"  {'FAIL' if label in failed else 'ok  '} {label}")
@@ -891,6 +1126,12 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="ONE line: the placement notify the ladder prints on every health run",
     )
+    parser.add_argument(
+        "--flow",
+        action="store_true",
+        help="the FLOW reading (T-181/D-3050): every transition between an arrival and a stamped work, with every "
+        "command it names RESOLVED on disk",
+    )
     parser.add_argument("--json", action="store_true")
     parser.add_argument("--selftest", action="store_true")
     args = parser.parse_args(argv)
@@ -901,6 +1142,10 @@ def main(argv: list[str] | None = None) -> int:
             rep = placement()
             print(brief(rep))
             return int(rep["rc"])
+        if args.flow:
+            frep = flow()
+            report_flow(frep)
+            return int(frep["rc"])
         rep = placement() if args.placement else (arrangement() if args.arrangement else census())
     except CensusError as exc:
         print(str(exc), file=sys.stderr)

@@ -1179,8 +1179,17 @@ test:
     extraction_top_n: 8
     extraction_combined_chars: 600
     extraction_prompt_limit: 3000
-source_epub_dir: null
-source_pdf_dir: null
+# D-3050 (BUG-866, MEASURED 2026-10-16): these two keys were declared null, so pipeline_paths fell back to
+# BOOKS_DIR/epub and BOOKS_DIR/pdf - paths that DO NOT EXIST. Three declared writers read them
+# (pipeline/batch_convert_epubs.py, pipeline/enhance_md_headers.py, pipeline/fix_remaining.py), and an absent
+# root makes each of them convert NOTHING while printing that it ran: a declaration that does not resolve is
+# a promise, not a measurement (D-3034). They are now the library kind roots, which is where the ORIGINALS
+# live - the corpus (books_dir above) holds the DERIVED md. The library roots are declared once, in
+# config/ingest_identity_gate.yaml#source_library.roots, and these two carry the same absolute paths because
+# pipeline_paths reads scalars, not pointers; changing the library's home means changing BOTH, and
+# scripts/census_source_names.py --flow prints both so the two can never drift apart unnoticed.
+source_epub_dir: /Users/barn/Library/CloudStorage/Dropbox/education/books/epub
+source_pdf_dir: /Users/barn/Library/CloudStorage/Dropbox/education/books/pdf
 omlx_wired_stress:
   rounds: 5
   prompts_per_round: 20

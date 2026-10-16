@@ -15923,7 +15923,36 @@ FIX (T-185, three limbs, each a rule the repository already declares elsewhere):
 - **related:** BUG-765, D-2987, D-2981, T-185.
 
 ### BUG-871 — A PROFILE EVAL IS NOT A SCOPE (the harness wall leaks into the owner's lane)
-- **state:** open | **severity:** high | **filed:** 2026-10-16 | **by:** assistant
+- **state:** fixed | **severity:** high | **filed:** 2026-10-16 | **closed:** 2026-10-16 | **by:** assistant
+- **CONTROL (executed 2026-10-16, measured):** `pipeline/harness_env.py` — `print_lines(bindings, scope)` now
+  REFUSES an empty or undeclared scope, and `main()` reads `--scope` before dispatching `--print`. Measured:
+  `--print` alone -> rc=1, `FATAL: --print needs --scope <class> - a profile eval is not a scope (BUG-871)`;
+  `--print --scope NO-SUCH-CLASS` -> rc=1; `--print --scope agent_probe` -> rc=0 and the first emitted line is
+  an in-band marker `# scope: agent_probe - bound FOR this class; never place these lines in a login profile
+  (BUG-871)`. Two new selftest limbs (`print_without_a_scope_is_REFUSED`, `print_with_an_undeclared_scope_is_REFUSED`)
+  -> selftest 18/18. `scripts/bind_harness_env.sh` — the no-argument branch that EVALED is gone: the class is a
+  mandatory argument, an unknown flag is fatal, two classes are refused, and the eval path binds only what the
+  reader returned (`BOUND="$(...)" || exit 1`) so a refusal cannot silently bind nothing. Measured: `bash
+  scripts/bind_harness_env.sh` with no argument -> rc=1 listing the declared classes.
+- **CORRECTION TO THIS BUG'S OWN FILED FIX (D-3036: a hypothesis is not a specification):** it asked for
+  `--scope subagent|cron`. `subagent` and `cron` are NOT declared anywhere — they were words I invented while
+  filing. The executed scope is the DECLARED class from `config/agent_context.yaml#classes`
+  (`['agent_loop', 'agent_probe', 'pipeline_batch']`), read from its one home, so no second vocabulary was
+  minted (C12). The filed remedy was a hypothesis; the executed check made it a specification.
+- **RESIDUAL, NOT FIXED HERE (the next step, deliberately not guessed):** only `agent_loop` EARNS a harness
+  (`config/engine.yaml#harnesses.jobs`: `agent_probe -> harness: null` "pipeline/oneshot_ask.py answers in 0.4 s;
+  a harness is 70x-260x that for the same answer"; `pipeline_batch -> harness: null` "the pipeline calls the model
+  directly"). So binding a harness env FOR those two classes is itself a scope that was never resolved — and the
+  single `GOOSE_MODEL` the emitter prints (`gemma-4-E4B-it-MLX-4bit`) is the `AGENT_LOOP_SHORT` role's model
+  (`config/model_assignments.yaml#harness_roles`), handed to all three classes alike. A per-class model
+  `--scope` may only be bound once that class -> role mapping EXISTS in a declared home; minting it here would
+  be a second home for an assignment that already has one.
+- **R5 (generator != verifier, D-2962):** `pipeline/harness_env.py` sha256_16=`7737bbb0f21425a3` VERDICT
+  APPROVE; `scripts/bind_harness_env.sh` sha256_16=`e9b84dc75c1099ba` VERDICT APPROVE (both by
+  gemma-4-E4B-it-MLX-4bit, a different family from the generator, written to `governance/r5_reviews.jsonl`).
+  The lint layer's single `UP031` finding at line 166 was measured to be PRE-EXISTING (identical at the same
+  line before the change); this act introduced no new finding — three successive fixes (`%` -> `{0}` -> `{}` ->
+  f-string) were each re-reviewed so the verdict covers the FINAL digest, never an intermediate one.
 - **symptom (measured live):** `python3 pipeline/harness_env.py --print` emits FIVE exports — `GOOSE_CONTEXT_LIMIT=32768`, `GOOSE_AUTO_COMPACT_THRESHOLD=0.8`, `GOOSE_AUTO_COMPACT_TOKEN_LIMIT=32768`, `GOOSE_PROVIDER=maxwell_omlx`, `GOOSE_MODEL=gemma-4-E4B-it-MLX-4bit`. `scripts/bind_harness_env.sh` with NO argument EVALS that output (`*) eval "$(python3 "$READER" --print)"`). The 32k wall and the 4B subagent model therefore land in whatever shell sources it — including the owner's interactive login profile.
 - **why this is a fault:** the wall was imposed for ONE lane (delegated/subagent work) that the owner does not run. A global binding of `GOOSE_CONTEXT_LIMIT`/`GOOSE_AUTO_COMPACT_TOKEN_LIMIT` capped EVERY Goose session at 32k and compacted the owner's DeepSeek lane every ~5 minutes (0.8 x 32768 = 26,214 tokens). The `launchctl setenv` occurrences were unset this session (readback: all four names empty), but the SAME values are still one `eval` away — the fault moved from the launchd namespace into a shell idiom, and gained a provider/model pin.
 - **second half of the fault (C25/agent-agnostic):** pinning `GOOSE_PROVIDER`/`GOOSE_MODEL` in a GENERIC env emitter couples every consumer to the subagent's model — a value that belongs in the subagent's own recipe, not in a profile.

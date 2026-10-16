@@ -18,7 +18,7 @@ prints the two commands. An unknown class is FATAL: a job that cannot decide mus
 (D-3015).
 
 Usage:
-  python3 pipeline/harness_env.py --print                  # the export lines, for a shell profile
+  python3 pipeline/harness_env.py --print --scope <class>  # the export lines, for ONE declared class (BUG-871)
   python3 pipeline/harness_env.py --check                  # BOUND / UNBOUND / CONFLICT in this shell
   python3 pipeline/harness_env.py --exec -- <cmd> [args]   # exec cmd with the contract bound
   python3 pipeline/harness_env.py --jobs                   # every job class and the harness it earns
@@ -145,7 +145,7 @@ def render(job: str) -> int:
     print(f"HARNESS {job} -> {harness}" + (f" (fallback {fallback})" if fallback else ""))
     print(f"  why: {row.get('why', '(no reason declared)')}")
     print("  the two commands:")
-    print('    eval "$(python3 pipeline/harness_env.py --print)"')
+    print(f'    eval "$(python3 pipeline/harness_env.py --print --scope {job})"')
     print(f"    {launch} launch {harness}")
     return RC_OK
 
@@ -209,8 +209,25 @@ def state(bindings: dict[str, str]) -> list[tuple[str, str, str]]:
     return rows
 
 
-def print_lines(bindings: dict[str, str]) -> int:
-    """Emit shell export lines - values read from config, never restated in this file (C12)."""
+def print_lines(bindings: dict[str, str], scope: str) -> int:
+    """Emit shell export lines - values read from config, never restated in this file (C12).
+
+    A SCOPE IS MANDATORY (BUG-871). These names are GLOBAL to the harness process, so an eval dropped
+    into a login or interactive profile clamps EVERY session of EVERY provider - which is exactly how
+    the owner's cloud lane came to be compacted on a timer while the narrow local windows it was
+    declared for never needed a global to exist. The caller must name the
+    DECLARED class the binding is FOR; the name is read from its one home (C12), never invented.
+    """
+    classes = declared_classes()
+    if not scope:
+        print("FATAL: --print needs --scope <class> - a profile eval is not a scope (BUG-871)")
+        print("       declared classes (config/agent_context.yaml#classes): %s" % (classes,))
+        return RC_FATAL
+    if scope not in classes:
+        print("FATAL: '%s' is not a declared class - a binding FOR nobody is a binding for everybody "
+              "(C12/BUG-871); declared: %s" % (scope, classes))
+        return RC_FATAL
+    print("# scope: %s - bound FOR this class; never place these lines in a login profile (BUG-871)" % scope)
     for name, want in bindings.items():
         print('export %s="%s"' % (name, want))
     return RC_OK
@@ -228,7 +245,7 @@ def check() -> int:
     if worst == RC_OWNER_OWED:
         print("OWNER-OWED: an unbound name is not a default - the harness will use its own, and the")
         print("           contract is DECLARED, not BOUND. Bind it for this shell with:")
-        print('           eval "$(python3 pipeline/harness_env.py --print)"')
+        print('           eval "$(python3 pipeline/harness_env.py --print --scope <class>)"')
     return worst
 
 
@@ -299,6 +316,13 @@ def selftest() -> int:
                    or all(((_home(ENGINE).get("harnesses") or {}).get("tools") or {})
                           .get((rows.get(c) or {}).get("harness"), {}).get("installed") for c in classes)))
 
+    import contextlib as _ctx, io as _io
+    with _ctx.redirect_stdout(_io.StringIO()):
+        _refused_no_scope = print_lines({}, "") == RC_FATAL
+        _refused_bad_scope = print_lines({}, "NO-SUCH-CLASS") == RC_FATAL
+    checks.append(("print_without_a_scope_is_REFUSED (BUG-871)", _refused_no_scope))
+    checks.append(("print_with_an_undeclared_scope_is_REFUSED (C12)", _refused_bad_scope))
+
     for name, ok in checks:
         print("%-4s %s" % ("ok" if ok else "FAIL", name))
     print("selftest: %d/%d" % (sum(1 for _, ok in checks if ok), len(checks)))
@@ -309,8 +333,12 @@ def main(argv: list[str]) -> int:
     """Dispatch the readings; an unknown flag is fatal rather than silently ignored (C16)."""
     if "--selftest" in argv:
         return selftest()
+    scope = ""
+    if "--scope" in argv:
+        _rest = [a for a in argv[argv.index("--scope") + 1:] if not a.startswith("--")]
+        scope = _rest[0] if _rest else ""
     if "--print" in argv:
-        return print_lines(declared())
+        return print_lines(declared(), scope)
     if "--check" in argv:
         return check()
     if "--jobs" in argv:

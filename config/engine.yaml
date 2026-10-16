@@ -189,6 +189,42 @@ model_store:
     re_acquirable_marker: refs         # an entry carrying it was FETCHED by repo id, so its bytes can come back (T-142's re-acquirability column)
     report_rows: 12                    # how many audit rows the printed face shows; the full set stays in --json-out
 
+  # HOW A SECOND COPY IS PROVED REDUNDANT (T-167/D-3035, C12/D-402). The first rule compared FILE INVENTORIES, and
+  # equality can never be reached between a hub snapshot and a repacked directory: MEASURED 2026-10-16, the served
+  # copy of Phi-4-mini-instruct-8bit carries .gitattributes and README.md that the snapshot does not, so the census
+  # printed "NOT the same bytes" and "the only pristine copy of that fetch" while the SAME instrument printed the
+  # digest that disproves it - served model.safetensors and the snapshot blob both hash to
+  # 84bcf5553d78094fd6fbe8d7b547a94c6b21996c4066a7a1e89ee4d347a50a24 at 4076012072 B. A weight is proved the same
+  # by CONTENT, never by the other files a directory happens to carry. So: weight_suffixes are the files that ARE
+  # the model, digest is the declared proof (the hub names a blob BY it), partial_marker is declared because a
+  # cache holds PARTIAL downloads beside complete ones - 1,676,647,640 B of this very model sat in the same repo
+  # under a .incomplete name - and max_weight_files BOUNDS the rule (C28) so a directory with hundreds of weight
+  # files is reported rather than read.
+  redundancy:
+    weight_suffixes: [.safetensors, .bin, .gguf, .npz, .h5, .pt, .pth, .msgpack]   # the files that ARE the model
+    digest: sha256                    # the declared proof; the reader REFUSES a declared algorithm it does not implement
+    partial_marker: .incomplete       # a partial download is not a copy of anything, and it is NAMED on the face
+    max_weight_files: 64              # above this a copy is REPORTED as uncompared rather than read (C28)
+
+  # HOW MODEL BYTES LEAVE (T-167/D-3035, C12/D-402). safe_delete.py is the route for PIPELINE OUTPUT and its
+  # protocol COPIES the target into backup/deletions/ inside this Dropbox-synced repo (BUG-818c); MEASURED
+  # 2026-10-15 the 12.4 GB model sweep was therefore done by hand under an exception recorded in PROSE
+  # (governance/DELETION_RECEIPT_20261015.json#method) - an act with no route. This block declares the route's
+  # bounds: which classes may be offered (a LIVE repo never, and a PARKED name is a NAME, not a proved copy),
+  # that the owner's word must NAME a decision (D-3010: one word per batch), that nothing is copied for weights
+  # (the served twin already holds the bytes, and a 4 GB copy costs the repo its own headroom), the order the
+  # batch is executed in (a NAME is removed before the bytes it points into, so no window holds a broken name -
+  # BUG-808), and where the receipt goes. floor_bytes is NOT re-declared here: the census floor (D-3018) is read.
+  sweep:
+    offered_classes: [SHADOW, ORPHAN]        # SHADOW = a redundant same-name copy; ORPHAN = no live resolver
+    owner_word_prefix: D-                    # the word must name a record in config/decisions.yaml, or it is not a licence
+    order: [name, bytes]                     # a parked NAME first, then the bytes it points into (BUG-808)
+    copy_policy: none-for-weights            # safe_delete copies into the repo; weights leave by RECEIPT instead (BUG-818c/D-3013)
+    receipt_dir: governance                  # evidence, not scratch: temp/ is purged (7d), a receipt must outlive it
+    receipt_prefix: DELETION_RECEIPT_
+    receipt_suffix: .json
+    verify_digest: true                      # the served twin is re-hashed after the batch, so the receipt says what SURVIVED
+
 
 # Download decisions are made by pipeline/model_loadability_probe.py, never by download counts.
 candidates:

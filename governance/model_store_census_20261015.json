@@ -29,8 +29,8 @@
    "n": 13
   },
   "PARKED": {
-   "bytes": 5774.6,
-   "n": 1
+   "bytes": 0.0,
+   "n": 0
   }
  },
  "byte_owner_audit": {
@@ -418,55 +418,6 @@
    ],
    "verdict": "LIVE"
   },
-  "models--mlx-community--Phi-4-mini-instruct-8bit": {
-   "bytes": 5774.6,
-   "engine_entries": [
-    "Phi-4-mini-instruct-8bit"
-   ],
-   "mentions": [
-    "config/agent_context.yaml#candidates_20261015b.CORRECTED_20261015b",
-    "config/decisions.yaml#decisions.[1127].evidence",
-    "config/decisions.yaml#decisions.[1161].decision",
-    "config/decisions.yaml#decisions.[362].summary",
-    "config/decisions.yaml#decisions.[55].description",
-    "config/decisions.yaml#decisions.[88].description",
-    "config/flag_consumer_registry.yaml#flags.[43].path",
-    "config/task_register.yaml#tasks.[31].evidence",
-    "config/task_register.yaml#tasks.[42].evidence",
-    "config/task_register.yaml#tasks.[67].evidence",
-    "config/task_register.yaml#tasks.[67].gate"
-   ],
-   "n_mentions": 11,
-   "re_acquirable": "FETCHABLE-BY-ID",
-   "resolution": [
-    "engine_entry:Phi-4-mini-instruct-8bit",
-    "code:pipeline/e2e_test.py:155",
-    "code:pipeline/model_lazyload.py:59",
-    "code:pipeline/model_lazyload.py:63",
-    "code:pipeline/pipeline_paths.py:753",
-    "code:pipeline/retrieval_evaluator.py:57",
-    "code:pipeline/run_diagnostic.py:512",
-    "code:pipeline/runner.py:795",
-    "code:pipeline/stage0_5_extract_metadata.py:49",
-    "code:scripts/_omlx_apply_settings.py:30",
-    "code:scripts/arm4_benchmark.py:47",
-    "code:scripts/arm4_capabilities.py:93",
-    "code:scripts/pipe_stage_probe.py:54"
-   ],
-   "same_name_served_elsewhere": {
-    "entry": "Phi-4-mini-instruct-8bit",
-    "only_in_second": [],
-    "only_in_served": [
-     ".gitattributes",
-     "README.md"
-    ],
-    "redundant": false,
-    "same_weights": false,
-    "second_copy_at": "/Users/barn/.cache/huggingface/hub/models--mlx-community--Phi-4-mini-instruct-8bit/snapshots/93b273a5497a4fcdcfb7ac00143565506b4f72e4",
-    "served_from": "/Users/barn/.omlx/models_stashed/Phi-4-mini-instruct-8bit"
-   },
-   "verdict": "PARKED"
-  },
   "models--mlx-community--Qwen2.5-Coder-7B-Instruct-4bit": {
    "bytes": 4295.9,
    "engine_entries": [],
@@ -706,9 +657,7 @@
  ],
  "deletion_floor_bytes": 268435456,
  "engine_entries": {
-  "parked": {
-   "Phi-4-mini-instruct-8bit": "/Users/barn/.cache/huggingface/hub/models--mlx-community--Phi-4-mini-instruct-8bit/snapshots/93b273a5497a4fcdcfb7ac00143565506b4f72e4"
-  },
+  "parked": {},
   "serving": {
    "MiniCPM5-2B-MLX": "/Users/barn/.cache/huggingface/hub/models--openbmb--MiniCPM5-2B-MLX/snapshots/8a9ad7539ac86281d0ac2b017ba04a5de53fe9a3",
    "Ornith-1.5-35B-A3B-REAP-19B": "/Users/barn/.cache/huggingface/hub/models--mlx-community--Ornith-1.5-35B-A3B-OptiQ-4bit-REAP-19B/snapshots/d2930458b7e8ff4799d5e17ea1ef23818746361e",
@@ -728,7 +677,7 @@
   "note": "not on the serving path; measured twice because a single reading reported 85 GB that the owner then cleaned (BUG-807)",
   "transient": false
  },
- "hub_bytes": 124837.5,
+ "hub_bytes": 119062.9,
  "hub_repos": {
   "models--BAAI--bge-m3": 4564.4,
   "models--BAAI--bge-reranker-v2-m3": 2293.2,
@@ -749,7 +698,6 @@
   "models--lmstudio-community--gemma-4-E4B-it-MLX-4bit": 6861.8,
   "models--minishlab--potion-base-32M": 131.2,
   "models--mlx-community--Ornith-1.5-35B-A3B-OptiQ-4bit-REAP-19B": 13757.0,
-  "models--mlx-community--Phi-4-mini-instruct-8bit": 5774.6,
   "models--mlx-community--Qwen2.5-Coder-7B-Instruct-4bit": 4295.9,
   "models--mlx-community--Qwen3-Embedding-0.6B-4bit-DWQ": 351.2,
   "models--mlx-community--Qwen3.8-27B-4bit": 0.0,
@@ -772,8 +720,8 @@
   "models--openbmb--MiniCPM5-2B-MLX",
   "models--ornith-ai--Ornith-1.5-9B-MLX-8bit"
  ],
- "measured_at": "2026-10-16T02:25:55",
- "model_repo_bytes": 123351.8,
+ "measured_at": "2026-10-16T10:56:33",
+ "model_repo_bytes": 117577.1,
  "not_a_candidate_non_model_repo": {
   "datasets--HuggingFaceH4--MATH-500": 0.4,
   "datasets--TIGER-Lab--MMLU-Pro": 4.2,
@@ -805,9 +753,7 @@
   "models--Pluto-AI-Labs--Qwen3.8-27B-MLX"
  ],
  "owner_owed_above_floor": [],
- "parked": [
-  "models--mlx-community--Phi-4-mini-instruct-8bit"
- ],
+ "parked": [],
  "resolution_domain": {
   "code_homes": [
    "pipeline",

@@ -114,6 +114,19 @@ capabilities:
     receipt: temp/runs/
     cost_tier: T1
     owns: [pipeline/research_run.py]
+  - id: model_sweep
+    kind: script
+    # T-167/D-3035: the ONE route by which MODEL-STORE bytes leave the disk. It is the census's ACTING half: the
+    # census measures and OFFERS (read-only, R-D410), and this route proves the copy by CONTENT one more time from
+    # the bytes on disk, refuses any class config does not offer, removes a parked NAME before the bytes it points
+    # into, takes NO copy (safe_delete.py copies into this Dropbox-synced repo - BUG-818c) and writes a RECEIPT.
+    # The BARE form is deliberate: it is how an operator and the ladder run it, so resolve_route requires the bit
+    # (BUG-842/T-146) - and the act itself takes the owner word as its licence (D-3010).
+    entrypoint: python3 pipeline/model_store_sweep.py --plan
+    check: python3 pipeline/model_store_sweep.py --selftest
+    receipt: governance/DELETION_RECEIPT_20261016.json
+    cost_tier: T0
+    owns: [pipeline/model_store_sweep.py, pipeline/model_store_census.py]
   - id: model_fetch
     kind: script
     # BUG-842/T-146: the BARE form, because that is how an OPERATOR-typed command is declared in this file

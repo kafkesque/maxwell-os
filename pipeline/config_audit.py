@@ -52,6 +52,8 @@ CONFIG_TO_CODE: dict[str, tuple[str, str, str]] = {
     # from one home, so a second copy of it in code (the mention index it replaced) can be found by this rail.
     "engine.yaml#model_store.resolution_domain":   ("pipeline.model_store_census", "RESOLUTION", "dict"),
     "engine.yaml#model_store.resolution_domain.report_rows": ("pipeline.model_store_census", "REPORT_ROWS", "int"),
+    "engine.yaml#model_store.redundancy":   ("pipeline.model_store_census", "REDUNDANCY", "dict"),
+    "engine.yaml#model_store.sweep":        ("pipeline.model_store_sweep", "RULE", "dict"),
     # ── Stage 1.5 (embedding) ──
     "stage1_5.embed_model_hf":     ("pipeline.pipeline_paths", "S15_EMBED_MODEL_HF", "str"),
     "stage1_5.embed_dim":          ("pipeline.pipeline_paths", "S15_EMBED_DIM", "int"),

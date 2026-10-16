@@ -35,10 +35,18 @@ ownership. WHAT may declare is itself DECLARED in config/engine.yaml#model_store
 THIS file by name - the reader's own vocabulary may not declare a byte (BUG-838 limb 3, generalised).
 
 A second copy of a model is never called redundant by NAME either. When the engine holds the same entry name
-twice, the census compares the two FILE INVENTORIES and offers nothing unless they are EQUAL. MEASURED
-2026-10-16: Phi-4-mini-instruct-8bit is on disk twice - the hub copy (27 files, 9872601143 B of blobs) and the
-copy the engine serves from models_stashed (14 files, 4097978555 B) - and they are NOT the same bytes. The
-parked hub copy is therefore the only pristine copy of that fetch, it is NOT redundant, and nothing is offered.
+twice, the census proves the WEIGHTS the same BY CONTENT - each weight file by name, size and the declared digest -
+and the other files a directory happens to carry are NAMED rather than allowed to decide. MEASURED 2026-10-16
+(T-167/BUG-843): the hub's copy of Phi-4-mini-instruct-8bit was called "the only pristine copy of that fetch"
+because the two FILE INVENTORIES could never be equal - the served directory carries .gitattributes and README.md
+that the snapshot does not - while the same instrument printed the digest that disproves it: served
+model.safetensors and the snapshot blob both hash to 84bcf555...a24 at 4076012072 B, so the copy is REDUNDANT and
+its removal cannot lose a byte. Two defects made that sentence possible and both are retired: a walk that FOLLOWS
+symlinks counted a content-addressed store twice (27 files / 9872601143 B was the served directory ADDED to the
+repository that holds it, not a second measurement of it), and an inventory equality was asked of two directories
+that are not the same KIND of thing. The difference a reader actually needs is named - only_in_served,
+only_in_second, and a PARTIAL download beside a complete blob (1,676,647,640 B of .incomplete sat in that repo) -
+and WHAT the proof reads is declared in config/engine.yaml#model_store.redundancy, never spelled here.
 
 Classification asks four questions, in order, and a MODEL repo that any of them answers stops there: LIVE (the
 engine serves it now), PARKED (an engine entry that is not served), DECLARED (a declared home RESOLVES into
@@ -53,6 +61,7 @@ value the config does not carry); 2 = bytes only an owner can dispose of.
 from __future__ import annotations
 
 import ast
+import hashlib
 import json
 import os
 import pathlib
@@ -82,6 +91,12 @@ KIND_UNDECLARED = "UNDECLARED"
 DOMAIN_KEYS = ("member_prefixes", "non_member_repo_prefixes", "store_metadata")
 BUCKETS = ("LIVE", "PARKED", "DECLARED", "ORPHAN")
 VERDICT_SHADOW = "SHADOW"
+
+#: The digest algorithms this reader IMPLEMENTS (T-167/D-3035). config declares WHICH one proves a copy; code
+#: declares what it can actually do, and a declared algorithm outside this set is a NAMED refusal rather than a
+#: silent fallback to another one (C12/C16).
+IMPLEMENTED_DIGESTS: tuple = ("sha256",)
+DIGEST_CHUNK = 1024 * 1024
 
 #: The vocabulary of RESOLUTION (T-142). A resolution is evidence that SOMEONE ELSE resolves these bytes; a
 #: mention is evidence that someone WROTE the name down. Only the first may confer ownership.
@@ -181,6 +196,46 @@ def resolution_domain(path: pathlib.Path = ENGINE_YAML) -> dict:
     return out
 
 
+def redundancy_rule(path: pathlib.Path = ENGINE_YAML) -> dict:
+    """HOW a second copy is proved redundant - DECLARED, not spelled in a comparison (T-167/D-3035/C12/D-402).
+
+    The rule reads: which files ARE the model, which digest proves them, which marker means a PARTIAL download,
+    and how many weight files a comparison may read (a bound, so an unbounded walk cannot become a future tax,
+    C28). Every one is FATAL when absent or empty, and a declared digest this program does not implement is a
+    NAMED refusal rather than a quiet fallback to another one: a proof nobody can compute is a proof that never
+    runs (C16/BUG-487).
+    """
+    row = _model_store(path)
+    rule = row.get("redundancy")
+    if not isinstance(rule, dict) or not rule:
+        raise SystemExit("FATAL: config/engine.yaml#model_store.redundancy is absent - a second copy would be "
+                         "called redundant by FILE INVENTORY equality, which a hub snapshot and a repacked "
+                         "directory can never reach (T-167/BUG-843)")
+    suffixes = rule.get("weight_suffixes")
+    if not isinstance(suffixes, list) or not suffixes or not all(isinstance(x, str) and x.startswith(".")
+                                                                for x in suffixes):
+        raise SystemExit("FATAL: config/engine.yaml#model_store.redundancy.weight_suffixes is absent or empty - "
+                         "a proof with no declared subject is green by vacancy (BUG-487)")
+    digest = rule.get("digest")
+    if not isinstance(digest, str) or not digest:
+        raise SystemExit("FATAL: config/engine.yaml#model_store.redundancy.digest is absent - refusing to invent "
+                         "a proof of sameness (C12)")
+    if digest not in IMPLEMENTED_DIGESTS:
+        raise SystemExit("FATAL: config/engine.yaml#model_store.redundancy.digest declares " + repr(digest)
+                         + " while this reader implements " + str(list(IMPLEMENTED_DIGESTS)) + " - a declared "
+                           "algorithm nobody can compute is a proof that never runs (C16/T-167)")
+    marker = rule.get("partial_marker")
+    if not isinstance(marker, str) or not marker.startswith("."):
+        raise SystemExit("FATAL: config/engine.yaml#model_store.redundancy.partial_marker is absent - a PARTIAL "
+                         "download would be compared as if it were a weight file (T-167)")
+    bound = rule.get("max_weight_files")
+    if not isinstance(bound, int) or isinstance(bound, bool) or bound <= 0:
+        raise SystemExit("FATAL: config/engine.yaml#model_store.redundancy.max_weight_files is not a positive int "
+                         "- an unbounded digest walk is a future tax (C28)")
+    return {"weight_suffixes": list(suffixes), "digest": digest, "partial_marker": marker,
+            "max_weight_files": bound}
+
+
 def deletion_floor(path: pathlib.Path = ENGINE_YAML) -> int:
     """The floor below which a candidate is not worth a decision (D-3018). READ, never restated (C12)."""
     row = _model_store(path)
@@ -209,6 +264,7 @@ MOVE = _census_move_ratio()
 FLOOR = deletion_floor()
 DOMAIN = census_domain()
 RESOLUTION = resolution_domain()
+REDUNDANCY = redundancy_rule()
 REPORT_ROWS = RESOLUTION["report_rows"]
 
 
@@ -531,16 +587,105 @@ def serving_owners(repo: str, entries: dict) -> list:
     return out
 
 
-def same_name_copy(repo: str, entries: dict, inventory: Callable = None) -> dict:
+def weight_files(path: pathlib.Path, rule: dict = None) -> dict:
+    """Which files under path ARE the model, and which names are PARTIAL downloads (T-167).
+
+    Returns {"weights": {name: size}, "partials": {name: size}}. A partial name is never a weight file: MEASURED
+    2026-10-16, the hub's Phi-4 copy held a complete 4,076,012,072 B blob AND 1,676,647,640 B of the same
+    model.safetensors under a .incomplete name, and a walk that counted every file would have compared a
+    half-download as a second weight. What counts is DECLARED (config/engine.yaml#model_store.redundancy), so a
+    new weight format is a config edit rather than a code change (C12).
+    """
+    rule = REDUNDANCY if rule is None else rule
+    weights, partials = {}, {}
+    for root, _dirs, files in os.walk(path, followlinks=True):
+        for name in files:
+            try:
+                size = (pathlib.Path(root) / name).stat().st_size
+            except OSError:
+                continue
+            if name.endswith(rule["partial_marker"]):
+                partials[name] = size
+            elif pathlib.Path(name).suffix in rule["weight_suffixes"]:
+                weights[name] = size
+    return {"weights": weights, "partials": partials}
+
+
+def digest_file(path: pathlib.Path, algo: str = None) -> str:
+    """The declared CONTENT proof of one file (T-167). The hub names a blob BY its sha256, which is why a copy's
+    weights can be proved the same without trusting a listing - and in chunks, because a weight file is 4 GB.
+    """
+    algo = REDUNDANCY["digest"] if algo is None else algo
+    if algo not in IMPLEMENTED_DIGESTS:
+        raise SystemExit("FATAL: a digest of " + repr(algo) + " was asked for and this reader implements "
+                         + str(list(IMPLEMENTED_DIGESTS)) + " (C16/T-167)")
+    handle = hashlib.new(algo)
+    with open(path, "rb") as stream:
+        for chunk in iter(lambda: stream.read(DIGEST_CHUNK), b""):
+            handle.update(chunk)
+    return handle.hexdigest()
+
+
+def weight_proof(second: pathlib.Path, served: pathlib.Path, rule: dict = None) -> dict:
+    """Prove (or REFUSE to prove) that two directories hold the SAME WEIGHTS, file by file, by content.
+
+    The verdict is same_weights: True only when every weight file of the served copy is present in the second
+    copy under the same name, with the same size AND the same declared digest. Anything else is False with a
+    NAMED why - a different file set, a different size, a different digest, no weight file to compare against, or
+    more weight files than the declared bound. The digests actually computed are returned so a receipt can carry
+    them as evidence (T-167/D-3035); the proof never reads a name alone (D-3034).
+    """
+    rule = REDUNDANCY if rule is None else rule
+    second_files, served_files = weight_files(second, rule), weight_files(served, rule)
+    proof = {"same_weights": False, "why": "", "digest": rule["digest"], "n_weights": len(served_files["weights"]),
+             "size_mismatch": [], "digest_mismatch": [], "missing_in_second": [],
+             "partials": sorted(second_files["partials"])[:REPORT_ROWS], "digests": {}}
+    if not served_files["weights"]:
+        proof["why"] = ("the copy the engine serves holds NO declared weight file, so there is nothing to prove "
+                        "sameness against")
+        return proof
+    if len(served_files["weights"]) > rule["max_weight_files"]:
+        proof["why"] = (str(len(served_files["weights"])) + " weight file(s) exceed the declared bound of "
+                        + str(rule["max_weight_files"]) + " - reported rather than read (C28)")
+        return proof
+    if set(second_files["weights"]) != set(served_files["weights"]):
+        proof["missing_in_second"] = sorted(set(served_files["weights"]) - set(second_files["weights"]))[:REPORT_ROWS]
+        proof["why"] = ("the second copy holds a DIFFERENT SET of weight files (missing "
+                        + str(proof["missing_in_second"]) + ")")
+        return proof
+    proof["size_mismatch"] = sorted(name for name in served_files["weights"]
+                                    if second_files["weights"][name] != served_files["weights"][name])
+    if proof["size_mismatch"]:
+        proof["why"] = "a weight file of the same NAME has a different SIZE: " + str(proof["size_mismatch"])
+        return proof
+    for name in sorted(served_files["weights"]):
+        served_digest = digest_file(served / name, rule["digest"])
+        proof["digests"][name] = served_digest
+        if digest_file(second / name, rule["digest"]) != served_digest:
+            proof["digest_mismatch"].append(name)
+    if proof["digest_mismatch"]:
+        proof["why"] = ("a weight file of the same name and size has a different " + rule["digest"] + ": "
+                        + str(proof["digest_mismatch"]))
+        return proof
+    proof["same_weights"] = True
+    proof["why"] = (str(len(served_files["weights"])) + " weight file(s) match by name, size and " + rule["digest"]
+                    + " digest")
+    return proof
+
+
+def same_name_copy(repo: str, entries: dict, inventory: Callable = None, proof: Callable = None) -> dict:
     """A copy of this model, under the SAME entry name, that the engine serves from somewhere else.
 
-    A name collision is not redundancy. same_weights is the proof and the only thing that may promote this to
-    an offer: MEASURED 2026-10-16, Phi-4-mini-instruct-8bit is on disk twice with DIFFERENT inventories
-    (27 files / 9872601143 B beside 14 files / 4097978555 B), so the hub copy is the only pristine copy of
-    that fetch and NO offer is made for it. Without this limb the census would have proposed deleting a
-    unique fetch because a name was repeated (T-142).
+    A name collision is not redundancy, and neither is an inventory mismatch: MEASURED 2026-10-16 the hub's copy
+    of Phi-4-mini-instruct-8bit was called "the only pristine copy of that fetch" BECAUSE the two file lists can
+    never be equal - the served directory carries .gitattributes and README.md that a hub snapshot does not -
+    while the one WEIGHT FILE both directories hold was byte-identical by sha256 (4076012072 B, 84bcf555...a24).
+    The proof is therefore the weights, file by file, by the declared digest; the difference a reader needs is
+    NAMED beside it; and a PARTIAL download is named too, because 1,676,647,640 B of this model sat in that repo
+    under a .incomplete name (T-167/BUG-843, D-3034's "redundant by BYTES, never by name").
     """
     inventory = file_inventory if inventory is None else inventory
+    proof_fn = weight_proof if proof is None else proof
     bare = reference_forms(repo)[1]
     for name, served_from in entries.get("serving", {}).items():
         if name != bare:
@@ -551,17 +696,15 @@ def same_name_copy(repo: str, entries: dict, inventory: Callable = None) -> dict
                 continue
             try:
                 held_inv, served_inv = inventory(pathlib.Path(held)), inventory(pathlib.Path(served_from))
-                same = held_inv == served_inv
-            except OSError:
-                held_inv, served_inv, same = frozenset(), frozenset(), False
-            #: A difference must be NAMED (MEASURED 2026-10-16): Phi-4-mini-instruct-8bit is on disk twice
-            #: and the only files that differ are .gitattributes and README.md - the weights are the SAME blob,
-            #: proved by hashing the served model.safetensors (84bcf5553d78094fd6fbe8d7b547a94c6b21996c4066a7a1
-            #: e89ee4d347a50a24) and finding that digest among the hub cache blob names, where the snapshot
-            #: symlink points. A face that says only "DIFFERENT BYTES" would let a reader conclude the cached
-            #: copy is unique when its weights are not, so the differing entries are reported by name.
-            return {"entry": name, "served_from": served_from, "second_copy_at": held, "same_weights": same,
-                    "redundant": same,
+                weights = proof_fn(pathlib.Path(held), pathlib.Path(served_from))
+            except OSError as exc:
+                held_inv, served_inv = frozenset(), frozenset()
+                weights = {"same_weights": False, "why": "the walk failed: " + str(exc),
+                           "digest": REDUNDANCY["digest"], "n_weights": 0, "size_mismatch": [],
+                           "digest_mismatch": [], "missing_in_second": [], "partials": [], "digests": {}}
+            return {"entry": name, "served_from": served_from, "second_copy_at": held,
+                    "same_weights": bool(weights["same_weights"]), "redundant": bool(weights["same_weights"]),
+                    "weight_proof": weights,
                     "only_in_served": sorted(n for n, _s in sorted(served_inv - held_inv))[:REPORT_ROWS],
                     "only_in_second": sorted(n for n, _s in sorted(held_inv - served_inv))[:REPORT_ROWS]}
     return {}
@@ -576,7 +719,7 @@ def re_acquirability(repo: str, dom: dict = None) -> str:
 
 
 def classify(repos: dict, entries: dict, index: dict, exists: Callable = None,
-             inventory: Callable = None) -> tuple:
+             inventory: Callable = None, proof: Callable = None) -> tuple:
     """LIVE / PARKED / DECLARED / ORPHAN plus the per-repo audit - and only a RESOLUTION may confer the third.
 
     The first question that answers wins, so ORPHAN stays conservative: an engine entry outranks any string,
@@ -588,7 +731,7 @@ def classify(repos: dict, entries: dict, index: dict, exists: Callable = None,
         owners = engine_owners(repo, entries)
         resolutions = sorted(MODE_ENTRY + ":" + name for name in owners)
         served = serving_owners(repo, entries)
-        copy_notes = same_name_copy(repo, entries, inventory)
+        copy_notes = same_name_copy(repo, entries, inventory, proof)
         hits = resolve(repo, index, exists)
         audit[repo] = {
             "bytes": mb(repos[repo]),
@@ -705,14 +848,22 @@ def print_audit(audit: dict, repos: dict) -> None:
         print(f"    ... and {len(rows) - REPORT_ROWS} more row(s) in the face (report_rows = {REPORT_ROWS})")
     for repo in sorted(audit):
         note = audit[repo].get("same_name_served_elsewhere")
-        if note and not note["redundant"]:
-            print(f"    SAME NAME - {pretty(repo)}: the engine serves {note['entry']!r} from "
-                  f"{str(note['served_from']).replace(str(HOME), '~')} while "
-                  f"{str(note['second_copy_at']).replace(str(HOME), '~')} holds a SECOND fetch")
-            print(f"      the inventories differ, so NOTHING is offered (T-142). The difference is NAMED so a "
-                  f"reader can judge it: only in the served copy {note['only_in_served'] or 'none'}; only in the "
-                  f"second copy {note['only_in_second'] or 'none'}. A blank list on BOTH sides with same_weights "
-                  f"still False means the same NAMES differ in SIZE")
+        if not note:
+            continue
+        proof = note.get("weight_proof") or {}
+        partial = f"; PARTIAL download present: {proof.get('partials')}" if proof.get("partials") else ""
+        print(f"    SAME NAME - {pretty(repo)}: the engine serves {note['entry']!r} from "
+              f"{str(note['served_from']).replace(str(HOME), '~')} while "
+              f"{str(note['second_copy_at']).replace(str(HOME), '~')} holds a SECOND fetch")
+        head = "REDUNDANT BY CONTENT - the weights are the same bytes" if note["redundant"] \
+            else "NOT redundant - the weights are NOT the same bytes"
+        print(f"      {head}: {proof.get('why', 'no proof was taken')}. "
+              f"The files that differ are NAMED so a reader can judge them: only in the served copy "
+              f"{note['only_in_served'] or 'none'}; only in the second copy {note['only_in_second'] or 'none'}"
+              f"{partial}")
+        if note["redundant"]:
+            print(f"      these bytes may leave, and the name still resolves from the served copy "
+                  f"(T-167/D-3035); nothing is removed without an owner word")
 
 
 def main(argv: list) -> int:
@@ -825,6 +976,13 @@ def _cases() -> list:
                                "    value_homes: [config]\n    code_homes: [pipeline]\n"
                                "    file_suffixes: [.yaml]\n    exclude: []\n"
                                "    re_acquirable_marker: refs\n    report_rows: 12\n")
+    no_redundancy = _yaml_with("model_store:\n  deletion_floor_bytes: 1\n")
+    unimplemented_digest = _yaml_with("model_store:\n  deletion_floor_bytes: 1\n  redundancy:\n"
+                                      "    weight_suffixes: [.safetensors]\n    digest: blake3\n"
+                                      "    partial_marker: .incomplete\n    max_weight_files: 4\n")
+    empty_suffixes = _yaml_with("model_store:\n  deletion_floor_bytes: 1\n  redundancy:\n"
+                                "    weight_suffixes: []\n    digest: sha256\n"
+                                "    partial_marker: .incomplete\n    max_weight_files: 4\n")
     readings = {"n": 0}
 
     def reader_moves(_path):
@@ -846,6 +1004,35 @@ def _cases() -> list:
         """The candidate class those members produce - the only class a deletion may be proposed from."""
         return set(classify(members(), {}, {"values": [], "code": []})[0]["ORPHAN"])
 
+    def _copy_tree(root: pathlib.Path, weights: dict, extra: dict = None, partial: dict = None) -> pathlib.Path:
+        """A synthetic model DIRECTORY: weight files, extra text files, and PARTIAL downloads (T-167)."""
+        root.mkdir(parents=True, exist_ok=True)
+        for name, payload in (weights or {}).items():
+            (root / name).write_bytes(payload)
+        for name, payload in (extra or {}).items():
+            (root / name).write_text(payload)
+        for name, payload in (partial or {}).items():
+            (root / name).write_bytes(payload)
+        return root
+
+    def synth_proof(second_weights: dict, served_weights: dict, extra_second: dict = None) -> dict:
+        """A REAL weight proof over two synthetic directories: the digest path is exercised, not mocked."""
+        with tempfile.TemporaryDirectory() as tmp:
+            base = pathlib.Path(tmp)
+            second = _copy_tree(base / "second", second_weights, extra=extra_second)
+            served = _copy_tree(base / "served", served_weights, extra={"README.md": "readme"})
+            return weight_proof(second, served)
+
+    def synth_weights() -> dict:
+        """weight_files over a synthetic repo dir holding one weight file and one PARTIAL download."""
+        with tempfile.TemporaryDirectory() as tmp:
+            return weight_files(_copy_tree(pathlib.Path(tmp) / "repo", {"model.safetensors": b"x"},
+                                           partial={"model.safetensors.abc.incomplete": b"yy"}))
+
+    #: The two control proofs: what a caller INJECTS when the verdict must follow the proof and not the walk.
+    same_weights_proof = lambda _a, _b: {"same_weights": True, "why": "control: proved", "digest": "sha256"}
+    other_weights_proof = lambda _a, _b: {"same_weights": False, "why": "control: not proved", "digest": "sha256"}
+
     real_index = resolution_index()
     hub_snapshot = str(HUB / CONTROL_MODEL / "snapshots" / "abc")
     same_bytes = lambda _path: frozenset({("model.safetensors", 100)})
@@ -856,9 +1043,10 @@ def _cases() -> list:
         """The engine holding ONE entry name twice: served from a real dir, parked inside the hub repo."""
         return {"serving": {"clef-4bit": "/served/clef-4bit"}, "parked": {"clef-4bit": hub_snapshot}, "stashed": {}}
 
-    def shadow(inventory) -> dict:
+    def shadow(inventory, proof=None) -> dict:
         """The audit row for a hub repo whose entry name is also served from somewhere else."""
-        return classify({CONTROL_MODEL: 1}, two_names(), {"values": [], "code": []}, inventory=inventory)[1][CONTROL_MODEL]
+        return classify({CONTROL_MODEL: 1}, two_names(), {"values": [], "code": []}, inventory=inventory,
+                        proof=proof)[1][CONTROL_MODEL]
 
     return [
         ("a_dataset_and_the_store_machinery_can_never_be_ORPHAN",
@@ -920,12 +1108,16 @@ def _cases() -> list:
                                    "file_suffixes": [".yaml"], "exclude": ["pipeline/model_store_census.py"],
                                    "re_acquirable_marker": "refs", "report_rows": 12})
          == {"values": [], "code": [], "unreadable": []}),
-        ("a_same_name_copy_IS_redundant_when_the_inventories_are_EQUAL",
-         lambda: shadow(same_bytes)["verdict"] == VERDICT_SHADOW
-         and shadow(same_bytes)["same_name_served_elsewhere"]["redundant"] is True),
-        ("a_same_name_copy_with_DIFFERENT_bytes_is_PARKED_and_NOT_offered",
-         lambda: shadow(different_bytes)["verdict"] == "PARKED"
-         and shadow(different_bytes)["same_name_served_elsewhere"]["redundant"] is False),
+        ("a_same_name_copy_IS_redundant_when_the_WEIGHTS_are_PROVED_the_same",
+         lambda: shadow(same_bytes, same_weights_proof)["verdict"] == VERDICT_SHADOW
+         and shadow(same_bytes, same_weights_proof)["same_name_served_elsewhere"]["redundant"] is True
+         and shadow(same_bytes, same_weights_proof)["same_name_served_elsewhere"]["weight_proof"][
+             "same_weights"] is True),
+        ("a_copy_whose_weights_are_NOT_proved_the_same_is_PARKED_and_NOT_offered",
+         lambda: shadow(same_bytes, other_weights_proof)["verdict"] == "PARKED"
+         and shadow(same_bytes, other_weights_proof)["same_name_served_elsewhere"]["redundant"] is False),
+        ("the_PROOF_decides_and_never_the_file_lists_so_different_lists_with_the_SAME_weights_are_redundant",
+         lambda: shadow(different_bytes, same_weights_proof)["verdict"] == VERDICT_SHADOW),
         ("a_non-redundant_copy_NAMES_the_files_that_differ_instead_of_calling_the_bytes_unique",
          lambda: shadow(lambda path: (frozenset({("model.safetensors", 100), ("README.md", 10)})
                                       if "served" in str(path) else frozenset({("model.safetensors", 100)}))
@@ -936,6 +1128,39 @@ def _cases() -> list:
         ("an_engine_entry_in_ANOTHER_repo_does_not_claim_this_one",
          lambda: engine_owners(CONTROL_MODEL, {"serving": {"x": str(HUB / "models--mlx-community--clef-4bitX")},
                                                "parked": {}, "stashed": {}}) == []),
+        ("a_second_copy_whose_WEIGHTS_match_by_CONTENT_is_redundant_though_the_file_lists_differ",
+         lambda: synth_proof({"model.safetensors": b"same bytes"}, {"model.safetensors": b"same bytes"},
+                             extra_second={"extra.json": "{}"})["same_weights"] is True),
+        ("a_weight_file_of_the_same_NAME_and_SIZE_but_DIFFERENT_content_is_NOT_redundant",
+         lambda: synth_proof({"model.safetensors": b"AAAA"}, {"model.safetensors": b"BBBB"})["same_weights"] is False
+         and synth_proof({"model.safetensors": b"AAAA"}, {"model.safetensors": b"BBBB"})["digest_mismatch"]
+         == ["model.safetensors"]),
+        ("a_second_copy_MISSING_a_weight_file_the_engine_serves_is_NOT_redundant",
+         lambda: synth_proof({"other.safetensors": b"x"}, {"model.safetensors": b"x"})["same_weights"] is False
+         and synth_proof({"other.safetensors": b"x"}, {"model.safetensors": b"x"})["missing_in_second"]
+         == ["model.safetensors"]),
+        ("a_copy_whose_SERVED_twin_holds_no_weight_file_cannot_be_called_redundant",
+         lambda: synth_proof({"model.safetensors": b"x"}, {})["same_weights"] is False
+         and "NO declared weight file" in synth_proof({"model.safetensors": b"x"}, {})["why"]),
+        ("a_copy_with_MORE_weight_files_than_the_declared_bound_is_REPORTED_not_read",
+         lambda: synth_proof({("m%d.safetensors" % i): b"x" for i in range(REDUNDANCY["max_weight_files"] + 1)},
+                             {("m%d.safetensors" % i): b"x" for i in range(REDUNDANCY["max_weight_files"] + 1)}
+                             )["same_weights"] is False
+         and "exceed the declared bound" in synth_proof(
+             {("m%d.safetensors" % i): b"x" for i in range(REDUNDANCY["max_weight_files"] + 1)},
+             {("m%d.safetensors" % i): b"x" for i in range(REDUNDANCY["max_weight_files"] + 1)})["why"]),
+        ("a_PARTIAL_download_is_NAMED_beside_the_weight_file_and_never_compared_as_one",
+         lambda: list(synth_weights()["weights"]) == ["model.safetensors"]
+         and list(synth_weights()["partials"]) == ["model.safetensors.abc.incomplete"]
+         and weight_files(pathlib.Path("."))["partials"] == {}),
+        ("an_UNDECLARED_digest_algorithm_is_a_NAMED_REFUSAL",
+         lambda: _raises(lambda: digest_file(pathlib.Path("."), "blake3"))),
+        ("an_absent_redundancy_rule_is_FATAL",
+         lambda: _raises(lambda: redundancy_rule(no_redundancy))),
+        ("a_declared_digest_this_reader_does_NOT_implement_is_FATAL_rather_than_a_fallback",
+         lambda: _raises(lambda: redundancy_rule(unimplemented_digest))),
+        ("an_EMPTY_weight_suffixes_list_is_FATAL_green_by_vacancy",
+         lambda: _raises(lambda: redundancy_rule(empty_suffixes))),
     ]
 
 

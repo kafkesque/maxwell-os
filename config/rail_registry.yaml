@@ -178,6 +178,13 @@ guards:
   # proved to flag a moving store and not a still one (BUG-807, whose remedy had no control) - a control
   # nothing runs is a comment (BUG-492).
   pipeline/model_store_census.py --selftest: fatal
+  # T-167/D-3035: the SWEEP route's known-answer controls (BUG-492). They hold both the refusals (no owner word,
+  # a word that names no record, an existing receipt, an undeclared receipt path, a NAME that is not a symlink,
+  # absent bytes, ONE differing weight digest failing the WHOLE batch) and the accepts (a valid batch removes the
+  # NAME before the BYTES and leaves the served twin intact), plus the fail-closed reads of a rule this reader
+  # cannot honour (an offered class it must never sweep, an order that would break a name, a copy policy that is
+  # not this one). A route whose refusals have never been seen to fire is a route nobody can trust with bytes.
+  pipeline/model_store_sweep.py --selftest: fatal
   # D-3033: the live reading - 0 NOTHING OWED (every candidate is at or below the declared floor, so no
   # decision is owed) | 1 FAULT (a hub entry of no declared kind, or a declared value the config lacks) |
   # 2 bytes only an owner disposes of (a candidate ABOVE the floor). Before D-3033 the rc was 2 for ANY

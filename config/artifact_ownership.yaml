@@ -60,6 +60,10 @@ artifacts:
     unreconciled_reason: >-
       D-2981: same shape as its sibling face - the derived GOV-INDEX block + the census restatement
       lines are machine-owned; the records below the history marker are append-only history.
+  governance/DELETION_RECEIPT_20261016.json:
+    mutability: immutable
+    writer_of_record: pipeline/model_store_sweep.py
+    unreconciled_reason: "D-3035/T-167: the receipt of the model-store sweep that removed the redundant hub copy of Phi-4-mini-instruct-8bit. It is EVIDENCE - what left the disk, the sha256 proof that the engine's served twin retains the bytes, and what was deliberately NOT removed - so it is never rewritten: a second batch writes a second receipt through --receipt. Written through scripts/lib/write_guard.py by pipeline/model_store_sweep.py --apply, which refuses to run until the path it is about to write is declared here (an artifact no file owns is a hole, D-401)."
   governance/buglog.md:
     mutability: derived_regenerable
     writer_of_record: scripts/gov_sync.py

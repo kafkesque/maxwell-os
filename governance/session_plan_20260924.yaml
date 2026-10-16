@@ -11,6 +11,7 @@ next_state:
 - the anchor's MISSING domain axis produced as machine evidence by the reliable pair (DeepSeek + Qwen3.8) on the blind row
   text, silver consensus + needs_review, owner adjudicates; no domains_final is ever written by a script
 may_touch:
+- governance/delegate_journal.jsonl
 - config/decisions.yaml
 - governance/MUTATION_JOURNAL.jsonl
 - governance/bug_status.json
@@ -1253,3 +1254,25 @@ widening_log:
     The owner ordered the deletion of gemma-4-12B-it-qat-OptiQ-4bit and Qwen2.5-7B-Instruct-4bit on 2026-10-15.
     12.4 GB freed, 7 broken names removed at zero byte cost, and the engine now serves 8 models. Nothing else
     was deleted: the NLI and embedder ancestors and the eval datasets await a kind-classified batch (D-3014).
+
+- date: '2026-10-16'
+  actor: assistant
+  reason: >-
+    T-168/BUG-844 - the DELEGATED-RUN TRACE. The journal is a NEW governed artifact, so it needs a NAMED grant before
+    the writer can leave it dirty: scripts/delegate_journal.py is inside scripts/*.py, and every other path this act
+    touches (config/*.yaml, justfile, pipeline/**, the faces, the append-only journals) was already granted. No
+    pipeline call path, no pinned artifact and no will_not_touch family is involved, and no bytes are deleted: this
+    act only makes an EXISTING absence - a delegated run that left no trace - impossible to record as a success.
+  additions:
+  - pattern: governance/delegate_journal.jsonl
+    why: 'the append-only journal of DELEGATED RUNS: a start row BEFORE the call (purpose, model, the exact files it
+      may write, its wall budget) and an end row after it (state, a wall time MEASURED from the journal own two rows,
+      and artifacts VERIFIED ON DISK rather than claimed). Its writer and its reader are the same script,
+      scripts/delegate_journal.py, wired as a rail in justfile#health (tri_state: 2 = an open run past its budget).'
+  owner_ack: >-
+    owner 2026-10-16 (verbatim): "how can I see subagents progresses and what will T168 exactly do" + "ok implement";
+    with the standing rules (delegate to the right local models in parallel, prevent slop and drift, futureproof but
+    do not over-engineer, forensic audit before a serious implementation, synchronise the gov dependencies).
+  may_touch_untouched: false
+  will_not_touch_untouched: true
+  why: 'One widening, one NAMED grant.'

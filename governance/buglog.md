@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1166 decisions (census stamp 4597f723d828f647, 2026-10-16) · 610 bugs (226 open / 384 closed; highest OPEN = BUG-846) · 48 open tasks (MUST 14 / SHOULD 29 / WORTH 4; OWNER-moved 2, pipeline-moved 46; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1167 decisions (census stamp 91cfc625670e3cbc, 2026-10-16) · 611 bugs (225 open / 386 closed; highest OPEN = BUG-846) · 47 open tasks (MUST 13 / SHOULD 29 / WORTH 4; OWNER-moved 2, pipeline-moved 45; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **79** of 1166 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 581 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1166, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **79** of 1167 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 582 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1167, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 226 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 34 · 🟨 MED 62 · 🟩 LOW 25 · UNLABELLED 101 (BUG-757) of 226 open.
+> Open BUGS by severity (population = the census's 225 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 34 · 🟨 MED 61 · 🟩 LOW 25 · UNLABELLED 101 (BUG-757) of 225 open.
 >
 > **OWNER LANE (2) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -21,7 +21,7 @@
 > | T-130 | 🔴 MUST | THE INGEST DOOR — the identity guarantee becomes an ENFORCEMENT POINT (delta-scoped), so a duplicate work cann | THE DOOR NOW READS A DECLARED WORD, AND ITS rc 2 NAMES THE ONE DEBT TH |
 > | T-138 | COULD | HARNESS ADOPTION ON DEMAND - one command per tool, and none of them load-bearing | install a harness only when a specific job needs it (C28). The engine  |
 >
-> **PIPELINE LANE (46) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
+> **PIPELINE LANE (45) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
 >
 > | id | pri | state | task | evidence |
 > |---|---|---|---|---|
@@ -38,7 +38,7 @@
 > | T-150 | 🔴 MUST | 🔴 open | THE DURABLE PATH IS THE DELEGATION PATH (D-3020): anything whose failure is not free goes through pipeline/sub | temp/runs/fanout_20261015i/98_receipt.json - 3/3 DONE with one task deliberately given a 1 |
 > | T-157 | 🔴 MUST | 🔴 open | CENSUS THE HARNESS HOMES A DECISION NAMES, so a reversal of a ruled remedy is a READING and not a discovery | MEASURED 2026-10-15: ~/.config/goose/config.yaml:311 reads active_provider: custom_deepsee |
 >
-> _the face is a VIEW: 12 of 46 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
+> _the face is a VIEW: 12 of 45 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
 >
 > **STANDING RULES — in effect, never close (1):**
 >
@@ -15336,15 +15336,17 @@ REMEDY: `config/engine.yaml#model_store.redundancy` DECLARES what a weight file 
 
 CONTROL (BUG-492): 12 new known-answer controls over synthetic directories - the digest path is EXERCISED, not mocked. They hold both directions (the same content under different listings IS redundant; the same NAME and SIZE with different content is NOT, and the digest mismatch is named), a missing weight file, a served twin with no weight file at all, the declared bound, the `.incomplete` naming, an undeclared digest algorithm refusing BY NAME, and the fail-closed reads of an absent / empty / unimplemented redundancy rule. `model-store-census: 36/36 known-answer control(s) fire` (was 24).
 
-## BUG-844 (MED - OPEN 2026-10-16) - pipeline/subagent_fanout.py can show a FAN-OUT while no delegated run leaves a trace: an async delegate has no declared budget and no start or end record, so a stalled, a finished and a cancelled subagent are ONE state to every later reader
+## BUG-844 (MED - FIXED 2026-10-16) - pipeline/subagent_fanout.py can show a FAN-OUT while no delegated run leaves a trace: an async delegate has no declared budget and no start or end record, so a stalled, a finished and a cancelled subagent are ONE state to every later reader
 
-**Status:** OPEN (remedy T-168). MEASURED 2026-10-16, this session.
+**Status:** FIXED 2026-10-16 (remedy T-168, LANDED). MEASURED 2026-10-16, this session.
 
 SYMPTOM (the owner's words): "how the fuck do I know if they progressing or not and timed out?" Three delegates were launched for independent read-only work. The harness then reported "cancelled before it finished" for all three. ONE had already written its artifact (`temp/draft_diagnose_skill_20261016.md`, 6,573 B) and was still in its closing turns; the other two had written nothing. NOTHING ON DISK DISTINGUISHED THOSE THREE STATES - there is no start record, no artifact claim, no budget, no timeout and no end record anywhere in this repository, so the only witness was the session transcript, which no later reader can join.
 
 ROOT CAUSE: the delegation ECONOMY is measured (`config/delegation_economy.yaml`, cost tiers, the D2549 routing map) while the delegation ACT is not. `pipeline/omlx_delegate.py` and `scripts/delegation_economy.py` count what a call COSTS; nothing records that a call was MADE, what it was allowed to write, how long it had, whether the file it claimed to write exists, or whether the harness killed it. The peek surface reports activity (turn count, idle time, recent tool calls) but it is SESSION-SCOPED: it dies with the session and it is invisible to `just health`, to a handoff and to the next agent.
 
 PROPOSED FIX (T-168): a declared delegate journal - a START row (task id, purpose, model, the exact files it MAY write, its wall budget) written BEFORE the call, an END row (outcome, artifacts VERIFIED ON DISK, wall time) written after - plus a `--status` reader that lists OPEN rows past their budget, wired as a rail, so a silent stall becomes a RED line instead of a shrug. Files it may write must be declared because two delegates on one file is a conflict nobody sees (C21/C23).
+
+LANDED 2026-10-16 (T-168/D-3039). The trace EXISTS and is a RAIL. `scripts/delegate_journal.py` writes a START row BEFORE the call (purpose, model, the exact files the run MAY write, its wall budget) and an END row after it (state, a wall time MEASURED from the journal's own two rows, and artifacts VERIFIED ON DISK with their byte count and content stamp), and its `status` verb is wired into `just health` as a tri_state rail: 0 nothing is open | 1 a JOURNAL FAULT | 2 an OPEN run past its declared budget. The four states the old absence made indistinguishable are now four READINGS: working reads OPEN inside its budget, stalled reads OVERDUE, killed reads OPEN past its budget until an end row arrives, and succeeded reads ENDED with its artifacts' digests. THREE REFUSALS make the trace un-fakeable rather than merely available: a `done` whose artifact is ABSENT is REFUSED and the row STAYS OPEN, so a false success has no home in the file (the honest alternative, `--state failed`, is always available); a claim that resolves OUTSIDE this repository is refused (BUG-818c - work that leaves the tree leaves its receipts behind); and a file another OPEN run already holds - by equality or by CONTAINMENT - is refused BEFORE either runs (C21/C23: two delegates on one file is interleaving, and the loser is whoever wrote first). 37 known-answer controls, one per limb, run in the ladder (a control nothing runs is a comment, BUG-492), and the journal's own home, vocabulary and budget rule are read from ONE declaration (`config/agent_surface.yaml#logging`, every key REQUIRED and absent-is-FATAL) with the join registered in `pipeline/config_audit.py`. The DURABLE reading is the digest: run 1 approved the bytes before the lint fixes, run 2 the final bytes, and each end row records the artifacts and their stamps rather than a verdict - a verdict is evidence only for the digest it names (R5). THE DECLARED LIMIT, stated rather than hidden: this repository cannot INTERCEPT the harness's own `delegate` call, so the trace is a discipline the caller keeps - what changed is that keeping it is now ONE COMMAND, that the writer's first live start (which crashed on a virgin tree with FileNotFoundError, because a suffix proof needs a pre-image) is fixed and controlled, and that omitting it is visible to every later reader rather than being indistinguishable from a kill.
 
 ## BUG-845 (MED - OPEN 2026-10-16) - the CORE is harness-agnostic while the BINDING is scattered across five homes and config/decisions.yaml names none of them, so a harness swap is archaeology
 
@@ -15365,3 +15367,13 @@ SYMPTOM: the 2026-10-14 intake (`governance/INTAKE_ASSESSMENT_20261014.md`) scre
 ROOT CAUSE: verdicts are recorded where they were FORMED (a report) rather than where they are USED (the registers), so a future reader must find and trust the report. No artifact enumerated the accepted negatives.
 
 REMEDY: D-3038 registers the intake as a REGISTER - each revelation gets a verdict in a decision, the accepted NEGATIVE (M3: no repo-wide shebang-equals-exec-bit invariant; the FORM rule stays, BUG-842) is recorded as a first-class decision rather than a silence, and the two adoptions that need building become T-169/T-170.
+
+## BUG-847 (MED - FIXED 2026-10-16) - C11 read a SIBLING import as an undeclared third-party dependency, and the finding sat in the tree for a sitting because the only rail that reads it is a review
+
+**Status:** FIXED 2026-10-16 (found by the R5 review of scripts/delegate_journal.py; declared by D-3039's measurement). MEASURED 2026-10-16.
+
+SYMPTOM: `python3 scripts/r5_review_gate.py --file scripts/delegate_journal.py` reported the C11 layer RED - "Undeclared imports: model_store_sweep.py: imports `model_store_census` - not in stdlib, local, or known deps" - naming a file nobody was reviewing. The finding belonged to `pipeline/model_store_sweep.py`, which landed the day before, and no earlier rail had reported it.
+
+ROOT CAUSE: the sweep reached its sibling through `import model_store_census`, made importable by a late `sys.path.insert(0, ROOT / "pipeline")`. To a static reader a BARE module name reached that way is indistinguishable from a package nobody declared, so C11 was RIGHT to refuse it: the defect was the FORM of the import, not the gate. The repository already declares the package form (`pipeline/stage0_convert.py`: `from pipeline import ingest_gate`) and the sweep did not use it.
+
+REMEDY: `from pipeline import model_store_census as census` with the repository root on the path, and the two import statements ordered and separated as ruff's I001 requires; C11 now reads 123 files with every import declared. THE SECOND LIMB IS THE ONE WORTH KEEPING: a C11 finding on a NEW file is only ever caught when that file is next reviewed or staged, so it can sit in the tree for a sitting - it was found here by a review of an unrelated file. The commit-boundary gate and the R5 review gate both read it for anything that touches the file again, so the remedy is recorded as a discipline (review a new file before it lands, not only before it is edited) rather than as a new rail.

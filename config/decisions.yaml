@@ -25751,3 +25751,59 @@ decisions:
     no route names, and its cost (a 562-file diff inside every future review) exceeds the defect it would have prevented.
     (3) THE RULE FOLLOWS THE REGISTER: agents/rules that touch agent behaviour live in AGENTS.md#working_rules,
     each citing its decision, so a rule can be traced to the measurement that produced it.'
+- id: D-3039
+  state: ACTIVE
+  date: '2026-10-16'
+  by: assistant
+  category: GOVERNANCE / DELEGATION
+  bugs:
+  - BUG-844
+  - BUG-847
+  files:
+  - scripts/delegate_journal.py
+  - governance/delegate_journal.jsonl
+  - config/agent_surface.yaml
+  - config/artifact_ownership.yaml
+  - config/capability_registry.yaml
+  - config/rail_registry.yaml
+  - pipeline/config_audit.py
+  - pipeline/model_store_sweep.py
+  - justfile
+  - AGENTS.md
+  - governance/r5_reviews.jsonl
+  title: 'A DELEGATED RUN DECLARES ITSELF BEFORE IT STARTS: purpose, model, the files it may write and its wall
+    budget are recorded first, its artifacts are VERIFIED ON DISK after, and the budget is what turns silence into
+    a reading'
+  decision: 'MEASURED 2026-10-16 (BUG-844, T-168; and BUG-847, found by this act''s own delegated review). The delegation
+    ECONOMY was measured while the delegation ACT was not: three delegates reported cancelled were ONE state to
+    every later reader, although one had already written its artifact (6,573 B) and two had written nothing. (1)
+    A DELEGATED RUN DECLARES ITSELF BEFORE IT STARTS - purpose, model, the exact files it MAY write and its wall
+    BUDGET - because the START row must exist even when the call HANGS, and because an undeclared budget is what
+    makes a stall un-reportable: 0 nothing is open | 1 a journal FAULT | 2 an OPEN run past its declared budget.
+    (2) THE TRACE IS UN-FAKEABLE RATHER THAN MERELY AVAILABLE: a ''done'' whose artifact is ABSENT is REFUSED and
+    the row STAYS OPEN, so a false success has no home in the file and the honest word (''failed'') is always available;
+    a claim that resolves outside the repository is refused (BUG-818c); a file another OPEN run holds - by equality
+    or by CONTAINMENT - is refused BEFORE either runs (C21/C23). (3) THE WALL TIME AND THE ARTIFACT PROOF ARE MEASURED,
+    NEVER CLAIMED: the journal subtracts its own two rows and hashes each file it is told about, so a row can be
+    wrong only by naming a file that is not there - which is exactly the state it refuses to record. (4) THE JOURNAL
+    RESTATES NO COST: the MODEL is the JOIN KEY to the harness''s own ledger (config/delegation_economy.yaml, D-3023),
+    and no price, tier or escalation reason is copied here, because a second home for a measured fact IS the drift
+    (C12). (5) THE RULES LIVE IN ONE DECLARATION (config/agent_surface.yaml#logging: the journal path, the END-STATE
+    vocabulary, the artifact-required states, the read-only token, the read bound) with every key REQUIRED and absent-is-FATAL,
+    the join registered in pipeline/config_audit.py, the home declared in config/artifact_ownership.yaml and the
+    route declared in config/capability_registry.yaml - so a value nobody declared cannot be inferred into the writer.
+    (6) ONE COMMAND IS THE DIFFERENCE BETWEEN A RULE AND A HABIT: ''python3 scripts/delegate_journal.py start --purpose
+    ... --model ... --may-write <path|none> --budget-s N'' BEFORE the call and ''end --id <id> --state done --artifact
+    <path>'' after it, wired into justfile#health as a rail, with 37 known-answer controls in the ladder (BUG-492)
+    - and the rule is recorded in AGENTS.md#working_rules so a session meets it at boot. (7) THE DECLARED LIMIT:
+    this repository cannot INTERCEPT the harness''s own delegate call, so the trace is a discipline the caller keeps;
+    what this decision changes is that keeping it is one command, that its writer survives a virgin tree (its own
+    first live start crashed with FileNotFoundError, because a suffix proof needs a pre-image - fixed with ensure_ledger()
+    and two controls), and that omitting it is VISIBLE rather than indistinguishable from a kill. (8) THE FIRST
+    TWO LIVE ROWS ARE A REAL REVIEW, NOT A FIXTURE: run DJ-20261016T092915Z-95ee approved the bytes before the lint
+    fixes and run DJ-20261016T093110Z-ef8c the FINAL bytes, because a verdict is evidence only for the digest it
+    names - which is why the digest lives in the review artifact and the journal records the artifacts rather than
+    a verdict. (9) SEPARATE DECISION, same act: C11 read a SIBLING import behind a sys.path hack as an undeclared
+    third-party dependency (BUG-847, in pipeline/model_store_sweep.py, found by this act''s delegated review of
+    an UNRELATED file); the repository''s declared package form is the remedy, and the durable lesson is that a
+    new file is reviewed before it LANDS rather than only before it is edited.'

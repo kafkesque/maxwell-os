@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 610,
-  "open_n": 226,
-  "closed_n": 384,
+  "total_ids": 611,
+  "open_n": 225,
+  "closed_n": 386,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -1124,11 +1124,6 @@
       "events": 1
     },
     {
-      "id": "BUG-844",
-      "title": "(MED - OPEN 2026-10-16) - pipeline/subagent_fanout.py can show a FAN-OUT while no delegated run leaves a trace: an async delegate has no dec",
-      "events": 1
-    },
-    {
       "id": "BUG-845",
       "title": "(MED - OPEN 2026-10-16) - the CORE is harness-agnostic while the BINDING is scattered across five homes and config/decisions.yaml names none",
       "events": 1
@@ -1523,6 +1518,8 @@
     "BUG-840",
     "BUG-841",
     "BUG-842",
-    "BUG-843"
+    "BUG-843",
+    "BUG-844",
+    "BUG-847"
   ]
 }

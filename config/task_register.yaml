@@ -1573,7 +1573,8 @@ tasks:
 
 - id: T-168
   priority: MUST
-  state: open
+  state: done
+  closed: '2026-10-16'
   mover: pipeline
   title: 'A DELEGATED RUN LEAVES A TRACE: a start row written BEFORE the call (purpose, model, the exact files it
     may write, its wall budget), an end row written after it (artifacts VERIFIED ON DISK, wall time) and a status
@@ -1593,7 +1594,7 @@ tasks:
     delegate before the cancellation notice) while the other two delegates left no artifact at all; there is no
     start record, no budget, no timeout and no end record for any of the three anywhere in this repository. The peek
     surface reports activity (turns, idle time, recent tool calls) but it is SESSION-SCOPED: it dies with the session
-    and no rail, handoff or next agent can join it.'
+    and no rail, handoff or next agent can join it. LANDED 2026-10-16 (D-3039): scripts/delegate_journal.py writes the START row BEFORE the call and the END row after it, verifies EVERY artifact on disk (bytes + content stamp), and its status verb is a rail in justfile#health (0 nothing open | 1 a journal fault | 2 an open run past its budget); 37 known-answer controls run in the ladder, its home is declared in config/artifact_ownership.yaml, its rules are read from config/agent_surface.yaml#logging (every key REQUIRED, absent-is-FATAL) with the join registered in pipeline/config_audit.py, and it is a capability in the route graph. The first two live rows are run DJ-20261016T092915Z-95ee (the R5 review of the bytes before the lint fixes) and DJ-20261016T093110Z-ef8c (the SUPERSEDING review of the final bytes) - each a START/END pair with its artifacts, each measured at ~34s against a 420s budget. Its own FIRST live start CRASHED (FileNotFoundError: a virgin tree has no pre-image for a suffix proof), which is why ensure_ledger() and its two controls exist; and the same delegated review found BUG-847 in a file it was not reviewing.'
   gate: 'the journal is written by a script the AGENT calls around delegate(): a start row BEFORE the call (so the
     row cannot be missing when the call hangs) and an end row after, each artifact VERIFIED ON DISK rather than
     claimed. An open row past its declared budget is a RED rail line, not a shrug; two delegates claiming one file

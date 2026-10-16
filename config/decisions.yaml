@@ -25930,3 +25930,62 @@ decisions:
     (claude becomes the interactive default); the provider BOUND in the app process with the counter moving (gap
     (5) closes); a pinned pool plus a proven tiered cache (T-137), after which a client''s own latency stops being
     the binding constraint.'
+- id: D-3042
+  state: ACTIVE
+  date: '2026-10-16'
+  by: assistant
+  category: GOVERNANCE / AGENT SURFACE
+  bugs:
+  - BUG-845
+  - BUG-850
+  files:
+  - scripts/check_agent_surface.py
+  - config/agent_surface.yaml
+  - agent/adapters/goose/wiring.md
+  - config/rail_registry.yaml
+  - justfile
+  - config/capability_registry.yaml
+  title: 'THE ADAPTER SURFACE IS ENFORCED: a declaration with no reader is a claim, so the surface that says where
+    a harness is bound now has a rail that can REFUSE - and on its first live reading it found three code sites
+    that bind a client by hand'
+  decision: 'OWNER WORD 2026-10-16 (verbatim): "T138 recommendation approve but clarification will the harness adapter
+    be futureproof so later if I want other harenss to deploy or utilize will I be able" + "ok implement ... go
+    forward based on the stratigically most consequnetial highest leverage". MEASURED 2026-10-16, this session.
+    The honest answer to the question was: the STRUCTURE was already futureproof (a decider may only SELECT a declared
+    row of config/harness_policy.yaml#harness_matrix, adoption is one command, and a new client adds a wiring.md
+    plus a row) while the ENFORCEMENT did not exist - config/agent_surface.yaml was a claim with NO READER (BUG-845).
+    This decision records what closed that gap. (1) A DECLARATION MUST RESOLVE, INCLUDING THE SURFACE (D-3034):
+    every in-repo adapter root exists or is declared optional; every external root is written OUTSIDE the repository
+    (declared, never mirrored, because a mirror drifts); every declared glob matches at least one file; the declared
+    journal exists and its declared READER names this one home (a reader that reads a copy is the defect C12 names,
+    one level out); every cited decision exists in the register; and an `owed` site must name a row that EXISTS.
+    Each of those is a fault, each has a known-answer control, and an ABSENT REQUIRED KEY is fatal rather than defaulted
+    (C12/D-2644). (2) TWO ARTIFACT CLASSES, because ONE LIST COULD NOT BE ENFORCED IN EITHER DIRECTION. The first
+    declaration put `agent/skills/**/SKILL.md`, the two registers and `governance/**` in one `portable_artifacts`
+    list, so a reader enforcing "a portable artifact may not name a harness" would have had to fault a DECISION
+    that legitimately names a client (the T-138 row, D-3041) - or stay silent. Both directions were wrong. Now:
+    a PORTABLE artifact (a skill) may not NAME a client or a provider, because a skill that names one stops being
+    drop-in; a RECORD artifact (a register, a decision, a governance document) may NAME one - its subject can BE
+    a client (D-3038) - and may not BIND one. (3) THE BINDING RULE IS ENFORCED ON CODE, WHERE A SWAP ACTUALLY BREAKS,
+    through a DECLARED REGISTER (config/agent_surface.yaml#adapter.binding_sites) whose ceiling is SHRINK-ONLY (D-3023):
+    the remedy for a new site is to route the binding through the surface, never to raise the ceiling. Declared
+    classes: `adapter_code` (the binding mechanism), `prose_citation` (a comment or docstring quoting the shape
+    it forbids or the fact it measured), `control_fixture` (a known-answer fixture that must CONTAIN the shape to
+    prove a rail has teeth), and `owed` (the site binds and owes a remedy, named by a row - acceptance must be a
+    word, never a default, D-3040). (4) THE FIRST LIVE READING FOUND WHAT NOBODY HAD ENUMERATED (BUG-850/T-175):
+    of eight declared sites, THREE bind rather than cite - pipeline/apply_provider_flip.py CONSTRUCTS the client
+    home that config/agent_context.yaml#homes.harness_config already declares, pipeline/parallel.py pops two client
+    knobs by literal names that config/agent_context.yaml #ratified.knobs declares, and pipeline/subagent_fanout.py
+    writes a client BINARY PATH into generated shell from inside the deterministic core (the C25 coupling, in the
+    layer that must survive a swap). They are reported LOUDLY (rc 2, tri_state, never fatal - BUG-457) with the
+    row that owns them, and an UNDECLARED site is now a fault rather than a discovery - which is the whole point.
+    (5) WHAT A SWAP COSTS NOW, DECLARED: the client-side binding lives in ONE home (config/agent_context.yaml),
+    the adapter holds pointers and no values (agent/adapters/goose/wiring.md restates nothing, C12), the skills
+    stay portable (the rail faults a client name in one), and adding a client is one command plus a row plus a wiring.md
+    - so "will I be able to deploy another harness later" has an ENFORCED answer rather than a promise. (6) ACCEPTED
+    NEGATIVE, RECORDED (D-3038): this rail does NOT scan prose for client names, because a decision about a client
+    must be able to name it, and a citation of a command in a document is not a coupling while a constructed path
+    is. (7) RC CONTRACT: 0 = every declaration resolves and no site owes a remedy; 1 = FAULT (an undeclared binding
+    in code, a stale or unresolvable declaration, an absent required key); 2 = LOUD (a declared site owes a remedy),
+    wired into `just health` as two lines - the selftest fatal, the reading tri_state - because a control nothing
+    runs is a comment (BUG-492).'

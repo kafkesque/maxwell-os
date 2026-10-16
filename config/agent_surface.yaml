@@ -13,7 +13,7 @@
 # provider; a harness- or provider-specific artifact may live ONLY under adapter.roots. scripts/check_agent_surface.py
 # is the reader (T-169); this block is what it reads, so a new binding is a DECLARED edit rather than a silent file.
 schema_version: '1'
-decided: D-3037
+decided: [D-3037]   # the rail checks every cited decision RESOLVES in config/decisions.yaml (D-3034)
 
 core:
   # What must keep working with ANY harness (or none): the engine, the pipeline, the rails, the registers.
@@ -34,11 +34,85 @@ adapter:
   provider_bindings:
     goose: {provider: maxwell_omlx, base_url: http://127.0.0.1:11435, binding_home: agent/adapters/goose/}
 
+  # THE BINDING REGISTER (T-169). Every IN-REPO code site that NAMES a client binding must be declared here, so
+  # that "each new harness adds another coupling nobody enumerated" (BUG-845) becomes a FAULT instead of a
+  # discovery. A declaration must RESOLVE (D-3034) - a row whose file is absent, or whose file no longer carries
+  # a declared shape, is a fault, so this cannot become a dumping ground. The CEILING IS SHRINK-ONLY (D-3023):
+  # the remedy for a new site is to route the binding through this surface, never to raise the ceiling.
+  # CLASSES (rules.binding_site_classes): adapter_code = the binding's own mechanism; prose_citation = a comment
+  # or docstring quoting the shape it forbids or the fact it measured; control_fixture = a known-answer fixture
+  # that must contain the shape to prove a rail has teeth; owed = the site BINDS and owes a remedy (a row).
+  binding_sites:
+    ceiling: 8
+    sites:
+      - path: pipeline/apply_provider_flip.py
+        class: owed
+        row: T-175
+        why: 'it CONSTRUCTS the client home (Path.home()/.config/... with a GOOSE_CONFIG override) while
+          config/agent_context.yaml#homes.harness_config already IS that home - a second home for one fact (C12).
+          Remedy owned by T-175: read the home from the declared pointer.'
+      - path: pipeline/parallel.py
+        class: owed
+        row: T-175
+        why: 'it POPS two client knobs by their literal NAMES while config/agent_context.yaml#ratified.knobs
+          declares them - the intent is right (a worker must not inherit a harness binding) and the names are
+          restated. Remedy owned by T-175.'
+      - path: pipeline/subagent_fanout.py
+        class: owed
+        row: T-175
+        why: 'it writes a client BINARY PATH into generated shell (command -v <client> || echo /Applications/...)
+          inside the deterministic core, which is the C25 coupling ("no agent-specific coupling") - the remedy is
+          to invoke the declared wrapper, owned by T-175.'
+      - path: pipeline/harness_contract.py
+        class: prose_citation
+        why: 'the rail that MEASURES the binding quotes the names it measured in its header; it reads every value
+          from config/agent_context.yaml and binds nothing of its own.'
+      - path: scripts/bind_harness_env.sh
+        class: prose_citation
+        why: 'the shell entry point names the client binary and the wrapper in its USAGE comment; the binding
+          itself is a pointer into config/agent_context.yaml.'
+      - path: scripts/resolve_route.py
+        class: prose_citation
+        why: 'it documents WHY it reports a quoted home as a fact rather than a value (the reader cannot tell a
+          path from a path-shaped string); it reads the registries, not the client.'
+      - path: scripts/check_governance_faces.py
+        class: control_fixture
+        why: 'known-answer fixtures quote a client home to prove the path-quoting rule fires in both directions.'
+      - path: scripts/check_agent_surface.py
+        class: control_fixture
+        why: 'the surface rail itself: its controls must CONTAIN the shapes to prove detection, so it declares the
+          shape it forbids without ever binding it (it reads every pattern from this file).'
+
 rules:
-  portable_artifacts: [agent/skills/**/SKILL.md, config/task_register.yaml, config/decisions.yaml, governance/**]
+  # TWO artifact classes, because they carry DIFFERENT obligations and a single list would have implied an
+  # obligation nothing could enforce (MEASURED 2026-10-16: the first declaration put the registers and
+  # governance/** in the same list as a SKILL.md, so the reader would have had to fault a decision that
+  # legitimately names a client - T-138's own row - or stay silent. Both directions were wrong).
+  portable_artifacts: [agent/skills/**/SKILL.md]   # DROP-IN: must survive a swap unchanged - naming a client is a FAULT
+  record_artifacts: [config/task_register.yaml, config/decisions.yaml, governance/**]   # a RECORD: may NAME a client (D-3038), may not BIND one
   # A portable artifact that names a harness or a provider is a review failure: the binding belongs in the
   # adapter, beside the artifact, so the artifact itself is the same file under any harness.
   forbidden_in_portable: [goose, claude, codex, opencode, copilot, hermes, dsh, anthropic, openai]
+
+  # THE BINDING RULE (T-169). Enforced where a swap actually BREAKS - code - because a prose citation of a
+  # command is not a coupling while a constructed path is. The shapes and the classes are DECLARED here; the
+  # rail names no path, no client and no magic number of its own (C12).
+  binding_site_classes: [adapter_code, prose_citation, control_fixture, owed]
+  binding_scan:
+    roots: [pipeline/, scripts/, agent/adapters/]     # code only; a hit INSIDE a declared adapter root is where it BELONGS
+    globs: ['**/*.py', '**/*.sh']
+    files: [justfile]
+    skip: [temp, backups, backup, archive, node_modules, .venv]
+  binding_shapes:
+    - id: client_home
+      pattern: '(?i)(\.config|Library/Application Support)/(goose|claude|codex|opencode|openclaw|hermes|copilot|dsh)\b'
+      what: a client's configuration home
+    - id: client_app
+      pattern: '/Applications/(?!oMLX)[A-Za-z]+\.app'
+      what: a client's app bundle (oMLX is the SERVER the core talks to, not a client - C25)
+    - id: client_env
+      pattern: '\b(GOOSE|CLAUDE|ANTHROPIC|OPENAI|CODEX|COPILOT)_[A-Z_]+'
+      what: a client's environment knob
   swap_checklist:
     - re-point the harness at 127.0.0.1:11435 (never at a model path)
     - re-install agent/skills/ into the new harness's skill home (the files themselves do not change)
@@ -50,6 +124,9 @@ logging:
   # every key below is REQUIRED and absent-is-FATAL rather than defaulted (C12/D-2644): a journal whose own rules
   # are inferred can be made to accept anything by editing the thing it reads.
   journal: governance/delegate_journal.jsonl
+  reader: scripts/delegate_journal.py        # the ONE script allowed to read this block; the rail verifies that
+                                             # this reader NAMES this file (a reader that reads a copy is the
+                                             # defect C12 names, one level out)
   budget_required: true                     # a run with no declared budget can never be OVERDUE, so never reported
   verified_artifacts_required: true         # an artifact is VERIFIED ON DISK, and a claimed-but-absent one is refused
   id_prefix: DJ-                            # a run id is a WORD (stamp + 4 hex): it is quoted in a handoff, never counted

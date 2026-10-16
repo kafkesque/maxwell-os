@@ -143,6 +143,8 @@ capabilities:
     - pipeline/harness_env.py
     - pipeline/harness_contract.py
     - scripts/bind_harness_env.sh
+    - scripts/check_agent_surface.py
+    - config/agent_surface.yaml
 
   - id: ingest_identity_door
     kind: script

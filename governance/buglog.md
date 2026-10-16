@@ -8,9 +8,9 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1169 decisions (census stamp 66f2cb8a8ae9e99d, 2026-10-16) · 613 bugs (225 open / 388 closed; highest OPEN = BUG-849) · 49 open tasks (MUST 12 / SHOULD 33 / WORTH 4; OWNER-moved 2, pipeline-moved 47; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1170 decisions (census stamp 97951cfc9b4b3544, 2026-10-16) · 614 bugs (225 open / 389 closed; highest OPEN = BUG-850) · 49 open tasks (MUST 12 / SHOULD 33 / WORTH 4; OWNER-moved 2, pipeline-moved 47; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **79** of 1169 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 584 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1169, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **79** of 1170 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 585 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1170, D-2987/BUG-765)
 >
 > Open BUGS by severity (population = the census's 225 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 34 · 🟨 MED 62 · 🟩 LOW 24 · UNLABELLED 101 (BUG-757) of 225 open.
 >
@@ -15374,7 +15374,7 @@ PROPOSED FIX (T-168): a declared delegate journal - a START row (task id, purpos
 
 LANDED 2026-10-16 (T-168/D-3039). The trace EXISTS and is a RAIL. `scripts/delegate_journal.py` writes a START row BEFORE the call (purpose, model, the exact files the run MAY write, its wall budget) and an END row after it (state, a wall time MEASURED from the journal's own two rows, and artifacts VERIFIED ON DISK with their byte count and content stamp), and its `status` verb is wired into `just health` as a tri_state rail: 0 nothing is open | 1 a JOURNAL FAULT | 2 an OPEN run past its declared budget. The four states the old absence made indistinguishable are now four READINGS: working reads OPEN inside its budget, stalled reads OVERDUE, killed reads OPEN past its budget until an end row arrives, and succeeded reads ENDED with its artifacts' digests. THREE REFUSALS make the trace un-fakeable rather than merely available: a `done` whose artifact is ABSENT is REFUSED and the row STAYS OPEN, so a false success has no home in the file (the honest alternative, `--state failed`, is always available); a claim that resolves OUTSIDE this repository is refused (BUG-818c - work that leaves the tree leaves its receipts behind); and a file another OPEN run already holds - by equality or by CONTAINMENT - is refused BEFORE either runs (C21/C23: two delegates on one file is interleaving, and the loser is whoever wrote first). 37 known-answer controls, one per limb, run in the ladder (a control nothing runs is a comment, BUG-492), and the journal's own home, vocabulary and budget rule are read from ONE declaration (`config/agent_surface.yaml#logging`, every key REQUIRED and absent-is-FATAL) with the join registered in `pipeline/config_audit.py`. The DURABLE reading is the digest: run 1 approved the bytes before the lint fixes, run 2 the final bytes, and each end row records the artifacts and their stamps rather than a verdict - a verdict is evidence only for the digest it names (R5). THE DECLARED LIMIT, stated rather than hidden: this repository cannot INTERCEPT the harness's own `delegate` call, so the trace is a discipline the caller keeps - what changed is that keeping it is now ONE COMMAND, that the writer's first live start (which crashed on a virgin tree with FileNotFoundError, because a suffix proof needs a pre-image) is fixed and controlled, and that omitting it is visible to every later reader rather than being indistinguishable from a kill.
 
-## BUG-845 (MED - OPEN 2026-10-16) - the CORE is harness-agnostic while the BINDING is scattered across five homes and config/decisions.yaml names none of them, so a harness swap is archaeology
+## BUG-845 (MED - FIXED 2026-10-16) - the CORE is harness-agnostic while the BINDING is scattered across five homes and config/decisions.yaml names none of them, so a harness swap is archaeology
 
 **Status:** OPEN (remedy T-169). MEASURED 2026-10-16, read-only.
 
@@ -15383,6 +15383,25 @@ SYMPTOM: nothing in this repository says where the agent harness is bound. The c
 ROOT CAUSE: C21/C25 are enforced for INFRASTRUCTURE (every component behind a protocol) and for the AGENT INTERFACE (MCP, no agent-specific coupling in the engine), but nothing declared where the CLIENT of that interface is configured. So each harness addition appends another coupling that no file enumerates, and a swap cannot be checked - only attempted.
 
 REMEDY (T-169): `config/agent_surface.yaml` DECLARES the core, the ONE adapter root, the external roots a swap re-points, the AGENTS.md sections that are adapter-owned text, and the rule that a PORTABLE artifact (a SKILL.md, a task, a decision) may not name a harness or a provider. The reader is `scripts/check_agent_surface.py` (a rail, still to be written - which is why this bug is OPEN and not FIXED): a forbidden name in a portable artifact, or a harness-specific path outside the declared roots, is a fault.
+
+**FIXED 2026-10-16 (T-169/D-3042).** The remedy is LANDED, not promised: `scripts/check_agent_surface.py`
+reads `config/agent_surface.yaml` and REFUSES - 19/19 known-answer controls in both directions, wired into
+`just health` as two lines (selftest fatal, reading tri_state).
+
+WHAT THE FIRST DRAFT OF THE DECLARATION GOT WRONG, and this is the part worth keeping: it put `agent/skills/**/SKILL.md`,
+`config/task_register.yaml`, `config/decisions.yaml` and `governance/**` in ONE `portable_artifacts` list, so a reader
+enforcing "a portable artifact may not name a harness" would have had to fault a decision that legitimately NAMES a
+client (the T-138 row, D-3041) - or stay silent. Both directions were wrong, so the classes were SPLIT: a **portable**
+artifact (a skill) may not NAME a client, while a **record** artifact (a register, a decision, a governance document)
+may name one and may not BIND one. And the binding rule is enforced where a swap actually BREAKS - CODE - through a
+declared register rather than through prose.
+
+WHAT IT FOUND ON ITS FIRST LIVE RUN (the reason the rail is worth its controls): EIGHT sites name a client binding in
+code, and THREE of them BIND rather than cite - `pipeline/apply_provider_flip.py` constructs the client home that
+`config/agent_context.yaml#homes.harness_config` already declares, `pipeline/parallel.py` pops two client knobs by
+their literal names that `config/agent_context.yaml#ratified.knobs` declares, and `pipeline/subagent_fanout.py` writes
+a client binary path into generated shell inside the deterministic core. Registered as BUG-850, remedy T-175, reported
+loudly (rc 2) with the row named - a debt that is counted AND declared, never a discovery (D-3040).
 
 ## BUG-846 (LOW - OPEN 2026-10-16) - governance/buglog.md is a REGISTER while the intake assessment is only a DOCUMENT: a rejected research finding has no register, so it can be re-proposed by the next reader as if it were new
 
@@ -15485,5 +15504,36 @@ app's own environment the same way, then RE-MEASURE the engine counter instead o
 session: the provider in effect is the one serving the session that would be editing it.
 
 ACKNOWLEDGED LIMIT: nothing in the ladder reads the engine counter today, so this fault can recur silently the
-moment a binding is dropped. The durable monitor belongs with T-157 (census the harness homes a decision names)
+moment a binding is dropped. THE WITNESS'S HOME, MEASURED 2026-10-16: the counter is `total_requests` in the
+engine's own stats file under the app-support directory (~/.omlx/stats.json) - a file, on disk, that NO script in
+this repository reads (the repo has the ENGINE's health endpoint and the CLIENT's ledger, and neither carries a
+request count). So the probe below is a hand measurement, and the reader belongs to this row: the check is
+`python3 -c "import json,os;print(json.load(open(os.path.expanduser('~/.omlx/stats.json')))[\"total_requests\"])"`
+before and after ONE headless run through the declared path - a RISE is the proof, a still number means the run
+left the machine (the agreed form of the command is in agent/adapters/goose/wiring.md#run-it). MEASURED 2026-10-16, 12:44: through the DECLARED path the counter ROSE 594825 -> 594828 and the run answered in 19.0s on the declared LOCAL model, so the wrapper DOES bind the provider it declares - the fault is exactly and only the everyday path that bypasses the wrapper (BUG-849 stands, and its mechanism limb is now a reading rather than a hypothesis). The durable monitor belongs with T-157 (census the harness homes a decision names)
 rather than in a second home for the counter.
+
+## BUG-850 (MED — OPEN 2026-10-16) — pipeline/apply_provider_flip.py, pipeline/parallel.py and pipeline/subagent_fanout.py each BIND a client binding by hand, so the ONE declared home is not the only home
+
+**Status:** OPEN (remedy T-175). MEASURED 2026-10-16 by `scripts/check_agent_surface.py` (19/19 known-answer controls), the rail T-169 landed.
+
+SYMPTOM: `config/agent_surface.yaml` declares ONE binding home (`config/agent_context.yaml`) and the engine's own
+integration module, and the first live reading of the new rail found three code sites that do the binding by hand:
+`pipeline/apply_provider_flip.py` joins the client's home path itself (with a config-env override) although
+`config/agent_context.yaml#homes.harness_config` declares that home; `pipeline/parallel.py` pops two client knobs by
+their literal names although `config/agent_context.yaml#ratified.knobs` declares them; `pipeline/subagent_fanout.py`
+writes the client's BINARY PATH into a generated shell script. Each is invisible to every existing rail: they are not
+portable artifacts (nothing scans code for a binding), and they are not a second DECLARATION (nothing compared a
+constructed path with the declared home).
+
+ROOT CAUSE: C21/C25 were enforced for INFRASTRUCTURE and for the AGENT INTERFACE, and the CLIENT-SIDE couplings
+accumulated where no rail looked - the same shape as BUG-845 one layer down. A declaration with no reader is a
+comment (D-3034), and the first three sites the reader found were all second homes for facts the repo already owns.
+
+REMEDY (T-175): each site resolves its name, home or binary from the declared home rather than restating it, and the
+register SHRINKS (ceiling 8 -> 5, shrink-only, D-3023). Until then the rail reports them LOUDLY with the row named.
+
+ACKNOWLEDGED LIMIT: two hits in the register are NOT bindings - `scripts/check_governance_faces.py` and
+`scripts/check_agent_surface.py` are declared `control_fixture`, because a known-answer control must CONTAIN the shape
+it proves the rail detects. That class is the one place the register can hide a real binding, and the reason the
+ceiling is shrink-only rather than a count that may drift.

@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 613,
+  "total_ids": 614,
   "open_n": 225,
-  "closed_n": 388,
+  "closed_n": 389,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -1119,11 +1119,6 @@
       "events": 1
     },
     {
-      "id": "BUG-845",
-      "title": "(MED - OPEN 2026-10-16) - the CORE is harness-agnostic while the BINDING is scattered across five homes and config/decisions.yaml names none",
-      "events": 1
-    },
-    {
       "id": "BUG-846",
       "title": "(LOW - OPEN 2026-10-16) - governance/buglog.md is a REGISTER while the intake assessment is only a DOCUMENT: a rejected research finding has",
       "events": 1
@@ -1131,6 +1126,11 @@
     {
       "id": "BUG-849",
       "title": "(MED \u2014 OPEN 2026-10-16) \u2014 pipeline/harness_contract.py reads the DEFAULT client's declared provider as UNBOUND, but nothing reads the CONSEQ",
+      "events": 1
+    },
+    {
+      "id": "BUG-850",
+      "title": "(MED \u2014 OPEN 2026-10-16) \u2014 pipeline/apply_provider_flip.py, pipeline/parallel.py and pipeline/subagent_fanout.py each BIND a client binding b",
       "events": 1
     }
   ],
@@ -1521,6 +1521,7 @@
     "BUG-842",
     "BUG-843",
     "BUG-844",
+    "BUG-845",
     "BUG-847",
     "BUG-848"
   ]

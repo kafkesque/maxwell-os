@@ -1647,7 +1647,8 @@ tasks:
     are mechanical.'
 - id: T-169
   priority: SHOULD
-  state: open
+  state: done
+  closed: '2026-10-16'
   mover: pipeline
   title: 'ONE ADAPTER SURFACE: the harness binding this repository already has becomes DECLARED, and a checker
     refuses a new one outside it'
@@ -1668,8 +1669,12 @@ tasks:
     exist yet - which is exactly why this row is open rather than closed.'
   gate: 'the checker is a rail: a portable artifact naming a harness or a provider is a fault, a harness-specific
     path outside the declared adapter roots is a fault, and every declared root either EXISTS or is declared optional.
-    Known-answer controls in both directions, wired into just health. Until then the declaration is a claim with no
-    reader, and the row stays open.'
+    Known-answer controls in both directions, wired into just health - LANDED 2026-10-16 (19/19). RESOLVED: the
+    reader EXISTS (scripts/check_agent_surface.py) and is a rail in `just health`; the portable class was SPLIT
+    from a RECORD class, because one list would have had to fault a decision that legitimately names a client
+    (the T-138 row) or stay silent, and both directions were wrong (D-3042); the binding rule is enforced on
+    CODE, where a swap actually breaks, through a declared register with a SHRINK-ONLY ceiling; and that
+    register found three real couplings on its first live run (BUG-850/T-175).'
 - id: T-170
   priority: SHOULD
   state: open
@@ -1806,9 +1811,36 @@ tasks:
     (pipeline/harness_env.py --exec <cmd>; its own header names the desktop app as the case it covers), the
     declaration home is config/agent_context.yaml, and pipeline/harness_env.py resolves the provider id by POINTER
     from config/engine.yaml#harnesses.goose_provider_id - so no model or provider name is restated (C12). The
-    nine clients are one command away (omlx launch), so this row is about the DEFAULT path only.
+    nine clients are one command away (omlx launch), so this row is about the DEFAULT path only. MEASURED 2026-10-16 (this session): a headless client launched through the DECLARED path (python3 pipeline/harness_env.py --exec -- <client> run -t "...") answered in 19.0s on the LOCAL model the binding declares (gemma-4-E4B-it-MLX-4bit via maxwell_omlx) and the engine request counter ROSE 594825 -> 594828 (~/.omlx/stats.json#total_requests). So the MECHANISM binds and the witness MOVES whenever the wrapper is used, and the witness has a HOME a reader can reach (recorded in BUG-849). What remains is the everyday path: an app launch does not pass through the wrapper, the harness home still reads a non-declared provider, and that one line is the OWNER's file - which is why this row stays in the owner lane with the mechanism limb PROVEN.
   gate: >-
     a headless run launched through the DECLARED path leaves a reading in which the engine own request counter
     MOVES (the same witness the 2026-10-15 probe used), and the harness home active_provider is either the
     declared local provider or an ACCEPTED NEGATIVE with its reason (D-3038). T-157 owns the census of that
     harness home; until it exists this is a measurement, never a monitor.
+
+- id: T-175
+  priority: SHOULD
+  state: open
+  mover: pipeline
+  title: 'THE THREE CODE SITES THAT BIND A CLIENT BY HAND - the adapter surface is DECLARED and now ENFORCED, and
+    the couplings its first reading found must route through the ONE home instead of restating it'
+  source: [BUG-850, T-169, D-3037, D-3042, config/agent_surface.yaml]
+  why: >-
+    MEASURED 2026-10-16 by the new rail (scripts/check_agent_surface.py, 19/19 known-answer controls): the binding
+    register declares EIGHT sites and THREE of them BIND rather than cite. pipeline/apply_provider_flip.py
+    CONSTRUCTS the client home (a home-joined path plus a config-env override) while config/agent_context.yaml
+    #homes.harness_config already IS that home; pipeline/parallel.py POPS two client knobs by their literal names
+    while config/agent_context.yaml#ratified.knobs declares them; and pipeline/subagent_fanout.py writes a client
+    BINARY PATH into generated shell from inside the deterministic core. The first two are a second home for one
+    declared fact (C12); the third is the agent-specific coupling C25 forbids, in the layer that must survive a
+    swap. None of them was visible before, because nothing enumerated where a client touches this repository.
+  evidence: >-
+    MEASURED 2026-10-16 by this rail (19/19 known-answer controls): the register
+    (config/agent_surface.yaml#adapter.binding_sites) is deliberately SHRINK-ONLY at a declared
+    ceiling of 8 (D-3023), so each remedy REMOVES a row rather than adding one; the rail reports the three sites
+    loudly (rc 2, tri_state, never fatal - BUG-457) naming the row that owns them; and an undeclared site is now a
+    FAULT rather than a discovery, which is the whole point of the act (BUG-845).
+  gate: >-
+    each of the three sites resolves its client name, home or binary FROM a declared home (a pointer, never a
+    literal): after the remedy the register SHRINKS to 5 sites, scripts/check_agent_surface.py reads rc 0, and no
+    pipeline behaviour changes - proved by the three capability selftests plus scripts/resolve_route.py --check.

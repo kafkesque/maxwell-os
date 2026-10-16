@@ -12,6 +12,10 @@ next_state:
   text, silver consensus + needs_review, owner adjudicates; no domains_final is ever written by a script
 may_touch:
 - agent/adapters/CONTRACT.md
+- scripts/check_agent_surface.py
+- agent/adapters/goose/wiring.md
+- temp/land_20261016k_adapter_enforce.py
+- temp/d3042_record.yaml
 - governance/delegate_journal.jsonl
 - config/decisions.yaml
 - governance/MUTATION_JOURNAL.jsonl
@@ -1296,3 +1300,38 @@ widening_log:
         second copy of a declared value, load-bearing work), the five-step procedure for adding a client, and the
         swap checklist that keeps the core harness-agnostic (C21/C25).
   owner_ack: 'owner 2026-10-16 (verbatim): "T-138 which is the most memory and cpu frinedly harness ... or goose is enough ... or do you have better stier recommendation if it corrales to D-3037 examine strategically" + "ok implement"'
+
+- date: '2026-10-16'
+  actor: assistant
+  reason: >-
+    T-169 / BUG-845 / BUG-850 / D-3042 - THE ADAPTER SURFACE BECOMES ENFORCED. The owner approved the T-138
+    recommendation ("T-138 recommendation approve") and asked the one question the declaration could not answer: will
+    it be FUTUREPROOF if other harnesses are added later. The honest answer was that the STRUCTURE was already open
+    (a row may only be SELECTED from the declared matrix, and adoption is one command) while the ENFORCEMENT did not
+    exist: config/agent_surface.yaml was a claim with no reader. This act lands the reader (19/19 known-answer
+    controls, wired into the ladder), splits the one artifact list that could not be enforced in either direction
+    into a portable class and a record class, adds a DECLARED binding register with a shrink-only ceiling, and
+    registers the three real couplings that register found on its first live run (BUG-850, remedy T-175). Every path
+    it touches was already granted except the four below; no pinned artifact and no will_not_touch family is
+    involved, no bytes are deleted, and no pipeline behaviour changes - the act ENFORCES declarations the repo
+    already carried and records the faults they were hiding.
+  additions:
+    - pattern: scripts/check_agent_surface.py
+      why: >-
+        the rail itself: it reads config/agent_surface.yaml and can REFUSE - an undeclared client binding in code, a
+        declaration that no longer resolves, a portable artifact naming a client, and an absent required key are
+        faults; a declared site that owes a remedy is loud (rc 2) and names the row that owns it.
+    - pattern: agent/adapters/goose/wiring.md
+      why: >-
+        the binding home config/agent_surface.yaml#adapter.provider_bindings.goose.binding_home declares. It holds NO
+        value of its own - every name is a pointer to the home that owns it (C12) - and it carries the exact working
+        invocation, because the form in the previous hand-off was wrong twice (the wrapper needs the `--` separator,
+        and the client needs its prompt text).
+    - pattern: temp/land_20261016k_adapter_enforce.py
+      why: >-
+        the landing script: every edit is REPLACE-ONCE with a postcondition, anchored on the BYTES the files carry.
+    - pattern: temp/d3042_record.yaml
+      why: >-
+        the decision payload, minted after the bug and the row exist, because a decision citing an unregistered bug
+        is refused (D-2660).
+  owner_ack: 'owner 2026-10-16 (verbatim): "T138 recommendation approve but clarification will the harness adapter be futureproof so later if I want other harenss to deploy or utilize will I be able" + "ok implement ... go forward based on the stratigically most consequnetial highest leverage"'

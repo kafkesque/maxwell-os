@@ -1,7 +1,7 @@
 schema_version: '1.0'
 plan: governance/ADMISSION_PLAN_20261017.json
-plan_sha256: 965446f913ad0c8a71f83a628cea987de285b4a7360edc9e79fc1a478e4eb803
-scope_sha256: a3ef5de0ad80bb5e35d8db39aa6bab540642d5c29a36c05b98947fcd3efc64d9
+plan_sha256: 3869d63cf4be514a24adc2e36108513a26f047739ee09cfda5f018d2018fa4a7
+scope_sha256: bb49c9d02a7384894caa18a82d6a94870f0b566dc48fb96c9f564ee41a619038
 accepted_by: human
 accepted_on: '2026-10-17'
 mode: all
@@ -156,8 +156,6 @@ rows:
   Spirit of Terrorism, New Revised Edition (Jean Baudrillard, Chris Turner) (Z-Library).pdf
 - books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/mental+models+epistemology/The
   post-existentialist neo-stoicism of Jason Xenakis and the stoic theory of suicide.pdf
-- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/mental+models+epistemology/The
-  unbomber manifesto, the futre of industrial society.pdf
 - books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/semiotics+meaning/Peirce-C-S-Logic-Semiotic.pdf
 - books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/semiotics+meaning/Semiotics-the-Basics.pdf
 - books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/semiotics+meaning/robert c holub

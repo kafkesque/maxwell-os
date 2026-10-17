@@ -8,7 +8,7 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1203 decisions (census stamp 4ce7e84958e62cc8, 2026-10-17) · 668 bugs (240 open / 428 closed; highest OPEN = BUG-902) · 59 open tasks (MUST 12 / SHOULD 43 / WORTH 4; OWNER-moved 1, pipeline-moved 58; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1203 decisions (census stamp 4ce7e84958e62cc8, 2026-10-17) · 669 bugs (240 open / 429 closed; highest OPEN = BUG-902) · 59 open tasks (MUST 12 / SHOULD 43 / WORTH 4; OWNER-moved 1, pipeline-moved 58; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **79** of 1203 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 618 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1203, D-2987/BUG-765)
 >
@@ -17246,3 +17246,29 @@ file whose failure mode is "quarantine the wrong books quietly". It was caught b
 log and READ 45 seconds later, not because a test caught it — `stage0_convert.py` has NO selftest for the door's
 return shape. Registered as the missing instrument: the door's two return values and their candidate-scoping deserve
 a known-answer control in the same class as the other rails, and that is the next task on this file.
+
+### BUG-904 (HIGH — FIXED 2026-10-17) — A CODE-DRIFT REFUSAL IS INDISTINGUISHABLE FROM A DEFECTIVE BOOK
+
+The BUG-614 fingerprint guard fired on EVERY row of two consecutive apply attempts and the receipt said, 121 times,
+`S0 rc=1, markdown absent — ingest door: 66 candidate(s) deferred …`. The real cause was a `RuntimeError` four frames
+deep — `stage0 code fingerprint mismatch … stored 937a240333b60419 != current 21581ee1bf71fe79` — and the tail the
+applier keeps (`stdout.splitlines()[-3:]`) held the ingest-door line instead of the traceback. So a refusal about
+THE CODE was recorded as a failure of THE BOOK, and every copy was quarantined.
+
+WHY THE SIDE CAR WAS NOT FOUND WHEN IT WAS LOOKED FOR. It was looked for at `data/checkpoints/stage0_convert.jsonl`,
+which has none. The live path is the RUN-scoped checkpoint,
+`knowledge pipeline/stage0_convert/rechunk-v4-20260929/checkpoint.jsonl`, and its side car holds the fingerprint written
+by the run that admitted 15 works at 17:09. Editing `pipeline/stage0_convert.py` (D-3076) therefore retired that
+fingerprint, exactly as designed — the guard was RIGHT, and it was the READING of its refusal that was wrong. The
+lesson is not "check harder" but that a refusal must name ITSELF: the remedy for this refusal is
+`--force`/a re-stamp, never a re-download, and nothing in the receipt said so.
+
+THE READING, VERIFIED END TO END: with the fingerprint re-stamped, the SAME argv the applier uses
+(`python3 pipeline/stage0_convert.py --book "DOMAIN 1 Test/ZZ REPRO.pdf"`, a copy of `FULLTEXT01.pdf`) returned
+`→ ✅ 151KB (65.6s)`, `❌ Failed: 0`, rc 0. Re-stamping is recorded here as a DELIBERATE drift, not a silent one: the
+checkpoint's records are "already converted" marks whose conversion semantics did not change (only budgets and
+failure classes did), so resuming cannot silently reuse a conversion the new code would perform differently.
+
+REMAINING, AND THE NEXT TASK ON THIS FILE: a `failure_class` of `code_fingerprint_mismatch` (or similar) must be
+produced when the guard fires, so the receipt says "the code changed", and the applier can refuse the row WITHOUT
+quarantining a work whose bytes were never examined. Today the guard is a correct refusal reported as a wrong thing.

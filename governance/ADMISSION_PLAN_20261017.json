@@ -1,7 +1,7 @@
 {
   "act": "T-181 admission plan",
   "authority": "D-3051",
-  "generated": "2026-10-17T15:40:07Z",
+  "generated": "2026-10-17T15:59:31Z",
   "corpus_home": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books",
   "accepted_containers": [
     ".epub",
@@ -29,8 +29,8 @@
     {
       "id": "books",
       "files": 2184,
-      "seen": 1740,
-      "never_seen": 444,
+      "seen": 1741,
+      "never_seen": 443,
       "admits_to": "corpus_home"
     },
     {
@@ -42,14 +42,14 @@
     }
   ],
   "files": 2814,
-  "seen": 1749,
-  "never_seen": 1065,
-  "seen_keys": 993,
-  "unseen_keys": 989,
+  "seen": 1750,
+  "never_seen": 1064,
+  "seen_keys": 994,
+  "unseen_keys": 988,
   "counts": {
-    "already_in_the_corpus": 1722,
+    "already_in_the_corpus": 1723,
     "seen_by_an_ingest_record": 27,
-    "admit_candidate": 439,
+    "admit_candidate": 438,
     "refused_no_declared_corpus_home": 0,
     "refused_container_no_stage_reads_it": 389,
     "refused_container_corrupt": 5,
@@ -4027,15 +4027,6 @@
       "key": "the post-existentialist neo-stoicism of jason xenakis and the stoic theory of suicide",
       "bytes": 4528991,
       "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/mental+models+epistemology/The post-existentialist neo-stoicism of Jason Xenakis and the stoic theory of suicide.md"
-    },
-    {
-      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/mental+models+epistemology/The unbomber manifesto, the futre of industrial society.pdf",
-      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/mental+models+epistemology/The unbomber manifesto, the futre of industrial society.pdf",
-      "root": "books",
-      "kind": "pdf",
-      "key": "the unbomber manifesto, the futre of industrial society",
-      "bytes": 896532,
-      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/mental+models+epistemology/The unbomber manifesto, the futre of industrial society.md"
     },
     {
       "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/semiotics+meaning/Peirce-C-S-Logic-Semiotic.pdf",

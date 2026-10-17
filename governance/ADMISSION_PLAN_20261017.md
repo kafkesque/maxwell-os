@@ -1,4 +1,4 @@
-# ADMISSION PLAN — 2026-10-17T15:40:07Z
+# ADMISSION PLAN — 2026-10-17T15:59:31Z
 
 > Authority **D-3051** (T-181). The corpus home is `/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books`. This file is a
 > **plan**: it admits nothing, it moves nothing and it converts nothing. The act that admits a work is
@@ -6,11 +6,11 @@
 
 ## What is measured, and in what unit
 
-- files in the declared library kind roots: **2814** (993 distinct keys they
-  share with the corpus or an ingest record, 989 distinct keys they do not)
-- already in the corpus by the door's key: **1722**
+- files in the declared library kind roots: **2814** (994 distinct keys they
+  share with the corpus or an ingest record, 988 distinct keys they do not)
+- already in the corpus by the door's key: **1723**
 - seen by an INGEST RECORD whose corpus file now carries a different key: **27** (the pipeline read the work; the name moved, T-130)
-- **admission candidates the pipeline has never seen: 439**
+- **admission candidates the pipeline has never seen: 438**
 
 ## The target rule (declared, never inferred here)
 
@@ -24,9 +24,9 @@ Readability probes, declared per kind (`container_integrity`, BUG-886): `.epub->
 
 | class | files | declared meaning |
 |---|---|---|
-| `already_in_the_corpus` | 1722 | a file whose DOOR KEY the corpus home already holds: the pipeline has the work and there is nothing to admit |
+| `already_in_the_corpus` | 1723 | a file whose DOOR KEY the corpus home already holds: the pipeline has the work and there is nothing to admit |
 | `seen_by_an_ingest_record` | 27 | a file only the S0.5 metadata cache names, because the corpus file now carries a different key (MEASURED 2026-10-16: the corpus itself was renamed under T-130). The pipeline READ the work, so it is SEEN and not a candidate - printed because a second voice saying 'seen' is not the same voice as the corpus saying it |
-| `admit_candidate` | 439 | a file whose key neither the corpus nor an ingest record names, in a container the conversion stage accepts, inside its declared kind folder, under a root that declares a corpus home, carrying a name NO defect pattern matches: THE OWNER'S WORKLIST |
+| `admit_candidate` | 438 | a file whose key neither the corpus nor an ingest record names, in a container the conversion stage accepts, inside its declared kind folder, under a root that declares a corpus home, carrying a name NO defect pattern matches: THE OWNER'S WORKLIST |
 | `refused_no_declared_corpus_home` | 0 | its root declares admits_to: null, so NO declaration names a home its works are admitted to: the refusal names the missing declaration instead of inventing a destination (T-181 limb 2) |
 | `refused_container_no_stage_reads_it` | 389 | a container the conversion stage cannot read (declared kinds such as .mobi/.azw3/.djvu/.docx are OWNED but not convertible): admitting one needs an ENGINE, which is T-180's misplaced class and not this reader's act |
 | `refused_container_corrupt` | 5 | a container of an ACCEPTED kind whose own BYTES are not openable (a truncated download, a file renamed to a suffix it is not): the stage reads this kind, so the remedy is not an engine but a RE-DOWNLOAD of the work. It is its own class because it is its own remedy - folding it into the engine class would let one act answer for two blast radii (BUG-886, MEASURED 2026-10-17: 3 of 1,289 library containers read as ordinary candidates) |
@@ -68,7 +68,7 @@ All 51 rows are in `ADMISSION_PLAN_20261017.json#refused`; this document names t
 
 — (none in this reading)
 
-## The admission candidates (439)
+## The admission candidates (438)
 
 | file (below its root) | key | kind | proposed corpus path | bytes |
 |---|---|---|---|---|
@@ -160,7 +160,6 @@ All 51 rows are in `ADMISSION_PLAN_20261017.json#refused`; this document names t
 | `books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/mental+models+epistemology/The Illusion of the End (Jean Baudrillard translated by Chris Turner) (Z-Library).pdf` | `the illusion of the end (jean baudrillard transl` | pdf | `DOMAIN 1 Substrate — Mind, Math, Meaning/mental+models+epistemology/The Illusion of the End (Jean Baudrillard translated by Chris Turner) (Z-Library).md` | 1766684 |
 | `books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/mental+models+epistemology/The Spirit of Terrorism, New Revised Edition (Jean Baudrillard, Chris Turner) (Z-Library).pdf` | `the spirit of terrorism, new revised edition (je` | pdf | `DOMAIN 1 Substrate — Mind, Math, Meaning/mental+models+epistemology/The Spirit of Terrorism, New Revised Edition (Jean Baudrillard, Chris Turner) (Z-Library).md` | 5314928 |
 | `books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/mental+models+epistemology/The post-existentialist neo-stoicism of Jason Xenakis and the stoic theory of suicide.pdf` | `the post-existentialist neo-stoicism of jason xe` | pdf | `DOMAIN 1 Substrate — Mind, Math, Meaning/mental+models+epistemology/The post-existentialist neo-stoicism of Jason Xenakis and the stoic theory of suicide.md` | 4528991 |
-| `books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/mental+models+epistemology/The unbomber manifesto, the futre of industrial society.pdf` | `the unbomber manifesto, the futre of industrial ` | pdf | `DOMAIN 1 Substrate — Mind, Math, Meaning/mental+models+epistemology/The unbomber manifesto, the futre of industrial society.md` | 896532 |
 | `books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/semiotics+meaning/Peirce-C-S-Logic-Semiotic.pdf` | `peirce-c-s-logic-semiotic` | pdf | `DOMAIN 1 Substrate — Mind, Math, Meaning/semiotics+meaning/Peirce-C-S-Logic-Semiotic.md` | 1141831 |
 | `books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/semiotics+meaning/Semiotics-the-Basics.pdf` | `semiotics-the-basics` | pdf | `DOMAIN 1 Substrate — Mind, Math, Meaning/semiotics+meaning/Semiotics-the-Basics.md` | 1412611 |
 | `books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/semiotics+meaning/robert c holub reception theory.pdf` | `robert c holub reception theory` | pdf | `DOMAIN 1 Substrate — Mind, Math, Meaning/semiotics+meaning/robert c holub reception theory.md` | 849617 |

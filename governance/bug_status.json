@@ -2,8 +2,8 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 665,
-  "open_n": 238,
+  "total_ids": 666,
+  "open_n": 239,
   "closed_n": 427,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
@@ -1197,6 +1197,11 @@
       "id": "BUG-900",
       "title": "(MED \u2014 OPEN 2026-10-17) \u2014 A BOOK CAN PASS EVERY CONTAINER PROBE AND STILL BE UNCONVERTIBLE, AND THIS IS INVISIBLE TO `admit-alert`",
       "events": 1
+    },
+    {
+      "id": "BUG-901",
+      "title": "(MED \u2014 OPEN 2026-10-17) \u2014 THE INGEST DOOR COUNTS A WORK'S OWN CONVERSION AS A DUPLICATE OF ITSELF",
+      "events": 2
     }
   ],
   "closed": [

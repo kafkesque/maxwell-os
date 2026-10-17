@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1203 decisions (census stamp 4ce7e84958e62cc8, 2026-10-17) · 665 bugs (238 open / 427 closed; highest OPEN = BUG-900) · 59 open tasks (MUST 12 / SHOULD 43 / WORTH 4; OWNER-moved 1, pipeline-moved 58; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1203 decisions (census stamp 4ce7e84958e62cc8, 2026-10-17) · 666 bugs (239 open / 427 closed; highest OPEN = BUG-901) · 59 open tasks (MUST 12 / SHOULD 43 / WORTH 4; OWNER-moved 1, pipeline-moved 58; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **79** of 1203 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 618 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1203, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 238 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 35 · 🟨 MED 72 · 🟩 LOW 26 · UNLABELLED 101 (BUG-757) of 238 open.
+> Open BUGS by severity (population = the census's 239 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 35 · 🟨 MED 73 · 🟩 LOW 26 · UNLABELLED 101 (BUG-757) of 239 open.
 >
 > **OWNER LANE (1) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -17142,3 +17142,57 @@ Four declared `failure_class` values, carried on the summary line the applier ke
 tail (elapsed seconds + bytes) appended to `data/checkpoints/stage0_convert.jsonl.failures.jsonl`. `quality_failed`
 is deliberately NOT declared: D2326's quality check is a receipt field today, and a class no code path can produce
 would be a declaration with no referent (D-3034).
+
+### BUG-898 (MEDIUM — FIXED 2026-10-17) — ADDENDUM: THE DOOR'S OWN REFUSAL NOW CARRIES A CLASS TOO
+
+Found while auditing the apply that this fix was built for, and it is the same defect in a second mouth. The ingest
+door (`apply_ingest_door`) REMOVED a deferred candidate from the candidate list and returned silently, so S0 exited 0
+having converted nothing, and the applier wrote `S0 rc=0, markdown absent` — a receipt that names neither the door
+nor the collision, about a book whose bytes are perfect. A fifth declared class, `deferred_for_identity`, now rides
+the same summary line, carrying the class, the work it collides with and the door's own reason. The file is never
+deleted (R-D410) and the applier's quarantine is the right home for it: an unadmitted work may not rest in the corpus
+where the next plan would read it as `already_in_the_corpus` (BUG-887/D-3071).
+
+KNOWN-ANSWER CONTROL (run 17:52Z): `apply_ingest_door([<a real deferred candidate>])` returned 0 convertible books
+and 66 NAMED non-admissions, the first reading
+`deferred_for_identity | George Orwell - 1984 (ORIGINAL) (1949).md | collides with … .pdf`, and the source file was
+still on disk afterwards. Before this change the same call returned an empty list and said nothing.
+
+### BUG-901 (MED — OPEN 2026-10-17) — THE INGEST DOOR COUNTS A WORK'S OWN CONVERSION AS A DUPLICATE OF ITSELF
+
+MEASURED 17:52Z, and it is the whole of the door's current deferral count: **all 66 deferrals are of ONE shape** —
+`same_sanitized_stem` between a container and the `.md` that S0 wrote beside it. `George Orwell - 1984 (ORIGINAL)
+(1949).pdf` and `… .md` defer EACH OTHER; so do `av99`, `book-en-print`, `Alchemy Overview`, and 29 more pairs. The
+corpus holds 973 `.md` files, and exactly **33** of them have a container sibling — one pair per work the applier has
+admitted, which is why the count moves by TWO every time a book is admitted.
+
+WHY IT IS A DEFECT AND NOT A DECLARATION. `door.new_file_definition` is `absent_from_metadata_cache`, and S0's own
+output is absent from that cache, so the door treats the conversion as a NEW FILE that duplicates its source. It is
+not a duplicate: it is the same work in the two containers the pipeline itself creates. BUG-861 already declares the
+distinction the door is missing — "a work in two homes with DIFFERENT bytes of the same kind is DRIFT while one in
+two CONTAINERS is not". The consequence is visible in the reading: an ingest gate whose deferral count is 66 today
+will read 878 after a 439-row batch, every one of them an artifact of the pipeline's own success, and the true
+identity deferrals (the ones an owner must adjudicate) are buried inside that inflation.
+
+SECOND, NOT YET MEASURED, AND THE REASON THIS IS MED AND NOT LOW: the door declares TWO points, `pre_s0` and
+`pre_s1_5`. If the same reader defers the `.md` at `pre_s1_5`, the door would refuse the very artifact the pipeline
+exists to process. NOT MEASURED — stated as a hypothesis and not acted on. The instrument is a single `pre_s1_5`
+preflight over one admitted work, and it must be run BEFORE any batch that depends on the `.md` reaching S1_5.
+
+DELIBERATELY NOT FIXED IN THIS SITTING: it changes what the door defers, and the plan is mid-apply. Sequence it after
+the current batch, with the `pre_s1_5` measurement FIRST (D-3036: a theory needs a red loop before a repair).
+
+### BUG-901 — ADDENDUM AT 17:55Z: THE SECOND LIMB IS MEASURED AND THE HYPOTHESIS IS RETIRED (still OPEN)
+
+The entry above stated a hypothesis and said it was unmeasured. It is now measured, and it is FALSE: a repository-wide
+search for `ingest_gate.preflight(` finds **exactly one caller**, `pipeline/stage0_convert.py:275`. Nothing calls the
+door at `pre_s1_5`. So no `.md` is refused downstream today, and the batch may proceed.
+
+The receipt also exposes a SECOND, SEPARATE finding worth more than the hypothesis it retired:
+`config/ingest_identity_gate.yaml#door.points` declares TWO points, `pre_s0` and `pre_s1_5`, and only the first has a
+caller. A declared point that no code implements is a declaration with no referent (D-3034) — the same shape as a
+subagent profile naming a disabled extension. Either the S1_5 call is built, or the declaration drops to the point
+that exists; silence lets a reader believe identity is enforced twice when it is enforced once.
+
+The first limb of BUG-901 is untouched by this: the door still counts a work's own `.md` as a duplicate of its
+container, and that count still grows by two per admitted book.

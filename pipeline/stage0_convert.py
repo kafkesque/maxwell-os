@@ -262,10 +262,13 @@ def apply_ingest_door(books: list[Path], books_dir: Path) -> list[Path]:
         books_dir: Corpus root, for the report and the receipt.
 
     Returns:
-        The books that may be converted: the input minus the deferred candidates (subject to `door.action`).
+        A pair: the books that may be converted (the input minus the deferred candidates, subject to
+        `door.action`), and the deferred candidates as NAMED non-admissions carrying the declared
+        `deferred_for_identity` class (BUG-898: a silently dropped candidate made S0 exit 0 having
+        converted nothing, and the applier then recorded `S0 rc=0, markdown absent` about a whole book).
     """
     if not books:
-        return books
+        return books, []
     policy = ingest_gate.load_policy()
     degrade = str(policy["door"].get("on_missing_cache", "abort")) == "degrade_loud"
     try:
@@ -283,7 +286,7 @@ def apply_ingest_door(books: list[Path], books_dir: Path) -> list[Path]:
         print("   ⚠️  INGEST DOOR degraded LOUDLY: no metadata cache yet, so identity is FILENAME-ONLY at this "
               "point (receipted as identity_available=false; the door re-runs stronger after S0.5)")
     if not deferred:
-        return books
+        return books, []
     action = "report" if report["override"] else str(report["action"])
     print(f"   ingest door: {len(deferred)} candidate(s) deferred | action={action} | receipt={report['receipt']}")
     if action == "abort":
@@ -291,8 +294,28 @@ def apply_ingest_door(books: list[Path], books_dir: Path) -> list[Path]:
         sys.exit(1)
     if action == "report":
         print("   action=report: converting anyway — the deferrals are NAMED above and receipted, never silent")
-        return books
-    return [book for book in books if str(book.resolve()) not in deferred]
+        return books, []
+    #: BUG-898 FAMILY, MEASURED 2026-10-17: a deferred candidate was silently DROPPED from the candidate list, so
+    #: S0 exited 0 having converted nothing, and the applier recorded `S0 rc=0, markdown absent` — a receipt that
+    #: names neither the door nor the collision, about a book whose bytes are fine. A deferral is NOT an admission
+    #: and must say so: it is returned as a NAMED non-admission carrying its class, the work it collides with and
+    #: the reason, so it lands on the summary line the applier keeps in its receipt.
+    named = [
+        {
+            "file": str(item.get("name") or Path(str(item.get("path", ""))).name),
+            "format": Path(str(item.get("path", ""))).suffix.lower(),
+            "failure_class": "deferred_for_identity",
+            "meaning": S0_FAILURE_CLASSES["deferred_for_identity"],
+            "detail": f"the ingest door deferred this work ({item.get('defer_reason')}) — it collides with "
+                      f"{item.get('matched')} (canonical name: {item.get('canonical_name')}); it needs an OWNER "
+                      f"WORD on identity, and it was NOT deleted (R-D410)",
+            "elapsed_s": 0.0,
+            "bytes": Path(str(item.get("path", ""))).stat().st_size if Path(str(item.get("path", ""))).exists() else 0,
+            "source_path": str(item.get("path", "")),
+        }
+        for item in report["deferrals"]
+    ]
+    return [book for book in books if str(book.resolve()) not in deferred], named
 
 
 def record_failures(failed: list[dict[str, Any]], pipeline_commit: str) -> None:
@@ -385,7 +408,7 @@ def run_stage0(
 
     # ── The INGEST DOOR (D-2997/BUG-781) ────────────────────────────────
     # Delta-scoped: only files the metadata cache does NOT know can be deferred; a deferred file stays on disk.
-    books = apply_ingest_door(books, books_dir)
+    books, deferred_named = apply_ingest_door(books, books_dir)  # BUG-898: a deferral is a NAMED non-admission
 
     print(f"📚 Stage 0: Convert — {len(books)} books found")
     if limit:
@@ -403,7 +426,7 @@ def run_stage0(
             check_stage_code_fingerprint(STAGE0_CHECKPOINT, "stage0")
         existing = load_existing_checkpoint() if not force else {}
     converted = []
-    failed = []
+    failed = list(deferred_named)  # the door's refusals are failures with a declared class
     skipped = 0
 
     pipeline_commit = get_pipeline_commit()

@@ -318,6 +318,7 @@ stage0:
     budget_expired: "the converter did not finish inside its DECLARED budget — this is a timeout, and its remedy is MORE TIME, never a new copy"
     container_unreadable: "the converter refused the work's own container (a broken spine reference, a missing manifest) — the bytes pass a zip/PDF probe, so this is an authoring defect, not a truncated download"
     no_output: "the converter reported success and wrote nothing — the RECEIPT is defective, not the book; re-run before touching the source"
+    deferred_for_identity: "the INGEST DOOR refused to duplicate a work already in the corpus (D-2997/BUG-781) — the book is whole and was never converted; it needs an OWNER WORD on identity, not a new copy"
     #: DELIBERATELY ABSENT: `quality_failed`. D2326's quality check is a RECEIPT FIELD today
     #: (`quality_status` in the checkpoint), not an admission gate — no code path can produce that class yet, and a
     #: declared class with no producer is a declaration with no referent (D-3034). When the quality check becomes a

@@ -2322,6 +2322,12 @@ tasks:
     session surface recorded in `sessions.db#extension_data` is the surface the session was BORN with, so a mid-
     session disable is invisible to every rail and to every later reader. It is the D-3036 shape exactly: the act
     happened to the session's capability set and nothing can prove it did not.
+    PROGRESS 2026-10-17 (fifth sitting, D-3064): the BIRTH half is BUILT and measured - `just session <profile>`
+    refuses a profile whose member would start dead, and `just born [N]` reads `enabled_extensions.v0` back from the
+    harness's own store, so "what was this session GIVEN" is a reading rather than a claim. The TOGGLE half is
+    untouched, and its trigger now has a measured answer: the harness exposes `PreToolUse` / `PostToolUse` hooks
+    (goose-docs.ai/docs/guides/context-engineering/hooks), which fire on the tool call itself - the exact trigger
+    this row said was missing.
   gate: >-
     A reading that answers "what could this session call at turn N" - the cheapest form is a session-scoped receipt
     written whenever the surface changes (the toggle is model-driven, so the trigger must be the tool call itself,

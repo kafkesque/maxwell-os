@@ -2,8 +2,8 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 642,
-  "open_n": 233,
+  "total_ids": 643,
+  "open_n": 234,
   "closed_n": 409,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
@@ -135,7 +135,7 @@
     },
     {
       "id": "BUG-270",
-      "title": "OPEN (2026-09-17) \u2014 the frontier69 audit artifact disagrees with the runtime KB on 10 of 69 objects, and two concepts exist in BOTH taxonomi",
+      "title": "OPEN (2026-09-17) \u2014 the frontier69 audit artifact disagrees with the runtime KB on 10 of 69 objects, and two concepts exist in BOTH",
       "events": 1
     },
     {
@@ -410,7 +410,7 @@
     },
     {
       "id": "BUG-389",
-      "title": "MED - Two verdicts were derived from checks that could not resolve what they were checking (BUG-375 class), and both were WRONG: (a) 'rerank",
+      "title": "MED - Two verdicts were derived from checks that could not resolve what they were checking (BUG-375 class), and both were WRONG: (a)",
       "events": 1
     },
     {
@@ -425,7 +425,7 @@
     },
     {
       "id": "BUG-394",
-      "title": "(HIGH, OPEN) - the contextual vector store is 100 percent referentially dead, and the recorded description of BUG-387 was an inference, not ",
+      "title": "(HIGH, OPEN) - the contextual vector store is 100 percent referentially dead, and the recorded description of BUG-387 was an inference, not",
       "events": 2
     },
     {
@@ -470,7 +470,7 @@
     },
     {
       "id": "BUG-415",
-      "title": "(MED, OPEN 2026-09-23) - depth is the only production axis with NO anchor row, while D2577 plans a fine-tuned depth model that D274f says re",
+      "title": "(MED, OPEN 2026-09-23) - depth is the only production axis with NO anchor row, while D2577 plans a fine-tuned depth model that D274f says",
       "events": 1
     },
     {
@@ -480,7 +480,7 @@
     },
     {
       "id": "BUG-417",
-      "title": "(HIGH, OPEN 2026-09-23) - the A2 corrected list's headline candidate is NOT a duplicate: `blobs/` is the target store of 14 live symlinks, a",
+      "title": "(HIGH, OPEN 2026-09-23) - the A2 corrected list's headline candidate is NOT a duplicate: `blobs/` is the target store of 14 live symlinks,",
       "events": 1
     },
     {
@@ -490,7 +490,7 @@
     },
     {
       "id": "BUG-420",
-      "title": "(MED, OPEN 2026-09-24) - the anchor family has NO fb_id bridge: its item_id is a sheet-local row label (R001...), so existing human depth wo",
+      "title": "(MED, OPEN 2026-09-24) - the anchor family has NO fb_id bridge: its item_id is a sheet-local row label (R001...), so existing human depth",
       "events": 2
     },
     {
@@ -500,7 +500,7 @@
     },
     {
       "id": "BUG-426",
-      "title": "(HIGH, OPEN - UNRESOLVED) - twice asserted \"the 150's domain axis was never asked\" while the owner states it WAS done. My search was methodo",
+      "title": "(HIGH, OPEN - UNRESOLVED) - twice asserted \"the 150's domain axis was never asked\" while the owner states it WAS done. My search was",
       "events": 1
     },
     {
@@ -660,12 +660,12 @@
     },
     {
       "id": "BUG-523",
-      "title": "(OPEN - found 2026-09-26 only because a human asked \"what exactly must I ratify in D-2650?\") - the reserved-fixture rule covered the TOKEN a",
+      "title": "(OPEN - found 2026-09-26 only because a human asked \"what exactly must I ratify in D-2650?\") - the reserved-fixture rule covered the TOKEN",
       "events": 1
     },
     {
       "id": "BUG-524",
-      "title": "(OPEN 2026-09-26) - the STORES and COLUMNS axes had NO machine: two rails land, and their own controls found 3 defects in the rails themselv",
+      "title": "(OPEN 2026-09-26) - the STORES and COLUMNS axes had NO machine: two rails land, and their own controls found 3 defects in the rails",
       "events": 1
     },
     {
@@ -675,7 +675,7 @@
     },
     {
       "id": "BUG-526",
-      "title": "(OPEN 2026-09-26) - the pin invariant had a SCAN and no WRITE moment: a pinned artifact could be edited and committed with nothing consultin",
+      "title": "(OPEN 2026-09-26) - the pin invariant had a SCAN and no WRITE moment: a pinned artifact could be edited and committed with nothing",
       "events": 1
     },
     {
@@ -695,17 +695,17 @@
     },
     {
       "id": "BUG-545",
-      "title": "(MEDIUM - OPEN, MEASURED 2026-09-26): 17 of the 60 rails the health ladder invokes are NOT tracked by git - the control plane has no history",
+      "title": "(MEDIUM - OPEN, MEASURED 2026-09-26): 17 of the 60 rails the health ladder invokes are NOT tracked by git - the control plane has no",
       "events": 1
     },
     {
       "id": "BUG-559",
-      "title": "(STRUCTURAL - D-2666, OPEN 2026-09-26): a receipt can be cut over bytes joined to NO revision, so `mutability: human_authored` certified a f",
+      "title": "(STRUCTURAL - D-2666, OPEN 2026-09-26): a receipt can be cut over bytes joined to NO revision, so `mutability: human_authored` certified a",
       "events": 1
     },
     {
       "id": "BUG-593",
-      "title": "(OPEN, MED - the MUTATION GATE's fixture carries ONE commit, so a rule whose oracle joins GIT HISTORY cannot satisfy limb (iv) - FILED 2026-",
+      "title": "(OPEN, MED - the MUTATION GATE's fixture carries ONE commit, so a rule whose oracle joins GIT HISTORY cannot satisfy limb (iv) - FILED",
       "events": 1
     },
     {
@@ -720,37 +720,37 @@
     },
     {
       "id": "BUG-604",
-      "title": "(OPEN, 2026-09-30) \u2014 stage0_5 metadata extractor mis-splits \"liber3.md\" filenames, leaking title words into the author field (split book ide",
+      "title": "(OPEN, 2026-09-30) \u2014 stage0_5 metadata extractor mis-splits \"liber3.md\" filenames, leaking title words into the author field (split book",
       "events": 1
     },
     {
       "id": "BUG-628",
-      "title": "(OPEN, 2026-10-03) \u2014 ANCHOR five-axis propagation FAILURE: the owner's D-2795 discipline re-label landed in ONE artifact; 4 siblings stayed ",
+      "title": "(OPEN, 2026-10-03) \u2014 ANCHOR five-axis propagation FAILURE: the owner's D-2795 discipline re-label landed in ONE artifact; 4 siblings stayed",
       "events": 1
     },
     {
       "id": "BUG-629",
-      "title": "(OPEN, 2026-10-04) \u2014 S4 discipline=emerging regression 26.9% on the v4 re-chunk corpus (above the 15% threshold); 1,253 DEMOTIONS from valid",
+      "title": "(OPEN, 2026-10-04) \u2014 S4 discipline=emerging regression 26.9% on the v4 re-chunk corpus (above the 15% threshold); 1,253 DEMOTIONS from",
       "events": 1
     },
     {
       "id": "BUG-630",
-      "title": "(OPEN, 2026-10-04) \u2014 the cross-axis guard is TOO BLUNT: a raw label that is canonical on the OPPOSITE axis is forced to 'emerging' instead o",
+      "title": "(OPEN, 2026-10-04) \u2014 the cross-axis guard is TOO BLUNT: a raw label that is canonical on the OPPOSITE axis is forced to 'emerging' instead",
       "events": 1
     },
     {
       "id": "BUG-632",
-      "title": "(OPEN, 2026-10-04) \u2014 the D2496 \"authoritative expected FB count\" gate CANNOT DISTINGUISH a DECLARED failure from a SILENT drop, so S5 and S6",
+      "title": "(OPEN, 2026-10-04) \u2014 the D2496 \"authoritative expected FB count\" gate CANNOT DISTINGUISH a DECLARED failure from a SILENT drop, so S5 and",
       "events": 1
     },
     {
       "id": "BUG-635",
-      "title": "(OPEN, 2026-10-04) \u2014 merged-call sparse classification is quarantined under D2371 as \"empty application\", masking the true failure and dropp",
+      "title": "(OPEN, 2026-10-04) \u2014 merged-call sparse classification is quarantined under D2371 as \"empty application\", masking the true failure and",
       "events": 1
     },
     {
       "id": "BUG-636",
-      "title": "(OPEN, 2026-10-04) \u2014 S4 exit-2 clears the resume sidecars before the failure check, so the documented \"re-run to retry failed clusters\" inst",
+      "title": "(OPEN, 2026-10-04) \u2014 S4 exit-2 clears the resume sidecars before the failure check, so the documented \"re-run to retry failed clusters\"",
       "events": 1
     },
     {
@@ -800,12 +800,12 @@
     },
     {
       "id": "BUG-681",
-      "title": "(OPEN, 2026-10-08) \u2014 `just health-full` found 6 faults in one pass; 2 fixed deterministically, 4 remain (3 red contract tests + 3 rails) and",
+      "title": "(OPEN, 2026-10-08) \u2014 `just health-full` found 6 faults in one pass; 2 fixed deterministically, 4 remain (3 red contract tests + 3 rails)",
       "events": 2
     },
     {
       "id": "BUG-698",
-      "title": "(OPEN, 2026-10-10) \u2014 v8\u2192v9 discipline-anchor off-menu rows are 22 in THREE categories, not the \"7 delta rows\" assumed in GATE-2; abstained r",
+      "title": "(OPEN, 2026-10-10) \u2014 v8\u2192v9 discipline-anchor off-menu rows are 22 in THREE categories, not the \"7 delta rows\" assumed in GATE-2; abstained",
       "events": 1
     },
     {
@@ -855,7 +855,7 @@
     },
     {
       "id": "BUG-719",
-      "title": "(MED - OPEN 2026-10-12): the non-principle sidecars are not content-type pure, and the \"81 tool_instruction remaining\" figure was an arithme",
+      "title": "(MED - OPEN 2026-10-12): the non-principle sidecars are not content-type pure, and the \"81 tool_instruction remaining\" figure was an",
       "events": 1
     },
     {
@@ -880,12 +880,12 @@
     },
     {
       "id": "BUG-731",
-      "title": "(MED - OPEN 2026-10-12) \u2014 the undeclared-default census is 12 over its ceiling (PRE-EXISTING), and the rail's receiver list cannot see `pipe",
+      "title": "(MED - OPEN 2026-10-12) \u2014 the undeclared-default census is 12 over its ceiling (PRE-EXISTING), and the rail's receiver list cannot see",
       "events": 2
     },
     {
       "id": "BUG-736",
-      "title": "(MED - OPEN 2026-10-12) \u2014 the verifier instruments, measured: the R5 reviewer is uninformative ~40-50% of the time and the S5 NLI's edge is ",
+      "title": "(MED - OPEN 2026-10-12) \u2014 the verifier instruments, measured: the R5 reviewer is uninformative ~40-50% of the time and the S5 NLI's edge is",
       "events": 5
     },
     {
@@ -895,42 +895,42 @@
     },
     {
       "id": "BUG-738",
-      "title": "(MED - OPEN 2026-10-12) - R5 code review had NO deterministic layer: 7 of 43 verdicts were not decisions, and the deep auditor was the gener",
+      "title": "(MED - OPEN 2026-10-12) - R5 code review had NO deterministic layer: 7 of 43 verdicts were not decisions, and the deep auditor was the",
       "events": 2
     },
     {
       "id": "BUG-741",
-      "title": "(MED - OPEN 2026-10-12) - the adjudication map's `proposed` field CONFLATES two vocabularies, so one owner adjudication is not expressible a",
+      "title": "(MED - OPEN 2026-10-12) - the adjudication map's `proposed` field CONFLATES two vocabularies, so one owner adjudication is not expressible",
       "events": 4
     },
     {
       "id": "BUG-743",
-      "title": "(LOW - OPEN 2026-10-12) - a DELEGATED reviewer's verdict is not re-readable after the fact, so a receipt that cites it must CAPTURE THE TEXT",
+      "title": "(LOW - OPEN 2026-10-12) - a DELEGATED reviewer's verdict is not re-readable after the fact, so a receipt that cites it must CAPTURE THE",
       "events": 1
     },
     {
       "id": "BUG-748",
-      "title": "(MED - OPEN 2026-10-13) - D-2928's definition re-scope left 177 canonical rows ON the moved boundary, and the audit D-2905's precedent requi",
+      "title": "(MED - OPEN 2026-10-13) - D-2928's definition re-scope left 177 canonical rows ON the moved boundary, and the audit D-2905's precedent",
       "events": 5
     },
     {
       "id": "BUG-749",
-      "title": "(HIGH - OPEN 2026-10-13) - 1,072 in-subject rows (16.3%) carry a discipline the live production mapper does NOT reproduce from their own raw",
+      "title": "(HIGH - OPEN 2026-10-13) - 1,072 in-subject rows (16.3%) carry a discipline the live production mapper does NOT reproduce from their own",
       "events": 5
     },
     {
       "id": "BUG-750",
-      "title": "(LOW - OPEN 2026-10-13) - a GENERATED artifact can go stale behind its own generator and no rail sees it: the canonical-labels reference sti",
+      "title": "(LOW - OPEN 2026-10-13) - a GENERATED artifact can go stale behind its own generator and no rail sees it: the canonical-labels reference",
       "events": 1
     },
     {
       "id": "BUG-757",
-      "title": "(MED - OPEN, found 2026-10-13 while auditing the user-facing faces) - 125 open bugs carry NO severity token, so the open register cannot be ",
+      "title": "(MED - OPEN, found 2026-10-13 while auditing the user-facing faces) - 125 open bugs carry NO severity token, so the open register cannot be",
       "events": 1
     },
     {
       "id": "BUG-766",
-      "title": "(HIGH - OPEN 2026-10-13) - the store-columns register holds TWO defects the ladder has been RED on: TWELVE columns declare `outside: absent`",
+      "title": "(HIGH - OPEN 2026-10-13) - the store-columns register holds TWO defects the ladder has been RED on: TWELVE columns declare `outside:",
       "events": 1
     },
     {
@@ -940,7 +940,7 @@
     },
     {
       "id": "BUG-768",
-      "title": "(HIGH - OPEN 2026-10-13) - BORP is satisfied by a MINORITY of the served corpus: the deleted per-row check left the SINGLETON route unguarde",
+      "title": "(HIGH - OPEN 2026-10-13) - BORP is satisfied by a MINORITY of the served corpus: the deleted per-row check left the SINGLETON route",
       "events": 1
     },
     {
@@ -960,7 +960,7 @@
     },
     {
       "id": "BUG-774",
-      "title": "(MED - OPEN 2026-10-13, PREVENTIVE) - the planned non-book intake has no identity, and the branch it would fall to is the one a closed defec",
+      "title": "(MED - OPEN 2026-10-13, PREVENTIVE) - the planned non-book intake has no identity, and the branch it would fall to is the one a closed",
       "events": 1
     },
     {
@@ -970,22 +970,22 @@
     },
     {
       "id": "BUG-777",
-      "title": "(HIGH - OPEN 2026-10-14) - the anchor<->corpus bridge no longer re-derives: the content join collapsed 208 entries to 13 and most anchor row",
+      "title": "(HIGH - OPEN 2026-10-14) - the anchor<->corpus bridge no longer re-derives: the content join collapsed 208 entries to 13 and most anchor",
       "events": 1
     },
     {
       "id": "BUG-778",
-      "title": "(HIGH - OPEN 2026-10-14) - a RED ladder line MASKS every rail below it: 5 of the 68 rails after BUG-777 measured red, each with its own caus",
+      "title": "(HIGH - OPEN 2026-10-14) - a RED ladder line MASKS every rail below it: 5 of the 68 rails after BUG-777 measured red, each with its own",
       "events": 1
     },
     {
       "id": "BUG-780",
-      "title": "(HIGH - OPEN 2026-10-14) - WORK IDENTITY COLLAPSE: 84 work-pairs are ONE TEXT under TWO NAMES, so 530 \"corroborated\" rows (369 of them SERVE",
+      "title": "(HIGH - OPEN 2026-10-14) - WORK IDENTITY COLLAPSE: 84 work-pairs are ONE TEXT under TWO NAMES, so 530 \"corroborated\" rows (369 of them",
       "events": 1
     },
     {
       "id": "BUG-781",
-      "title": "(HIGH - OPEN 2026-10-14) - THE IDENTITY MACHINERY HAD NO ENFORCEMENT POINT: the owner ledger sat 59 pairs PENDING for a fortnight while the ",
+      "title": "(HIGH - OPEN 2026-10-14) - THE IDENTITY MACHINERY HAD NO ENFORCEMENT POINT: the owner ledger sat 59 pairs PENDING for a fortnight while the",
       "events": 1
     },
     {
@@ -1075,12 +1075,12 @@
     },
     {
       "id": "BUG-817",
-      "title": "(HIGH - OPEN 2026-10-15) - a failed edit was read as a success, so two declared config blocks never existed while three instruments invented",
+      "title": "(HIGH - OPEN 2026-10-15) - a failed edit was read as a success, so two declared config blocks never existed while three instruments",
       "events": 2
     },
     {
       "id": "BUG-818",
-      "title": "(MED - OPEN 2026-10-15) - the retire tool's dry run promises a park and its code performs a delete; and safe_delete would copy model weights",
+      "title": "(MED - OPEN 2026-10-15) - the retire tool's dry run promises a park and its code performs a delete; and safe_delete would copy model",
       "events": 1
     },
     {
@@ -1095,7 +1095,7 @@
     },
     {
       "id": "BUG-821",
-      "title": "(MED - OPEN 2026-10-15) - the census could not count 16 records because the mint path was bypassed, so four faces quoted a stale total for t",
+      "title": "(MED - OPEN 2026-10-15) - the census could not count 16 records because the mint path was bypassed, so four faces quoted a stale total for",
       "events": 1
     },
     {
@@ -1110,47 +1110,47 @@
     },
     {
       "id": "BUG-834",
-      "title": "(MED - OPEN 2026-10-15) \u2014 a delegate's handle did not resolve, so the deliverable of an in-process delegation was unretrievable in the same ",
+      "title": "(MED - OPEN 2026-10-15) \u2014 a delegate's handle did not resolve, so the deliverable of an in-process delegation was unretrievable in the same",
       "events": 1
     },
     {
       "id": "BUG-836",
-      "title": "(MED - OPEN 2026-10-15) - the R5 cross-family review route produced NO usable review from either local verifier, and one of the two failures",
+      "title": "(MED - OPEN 2026-10-15) - the R5 cross-family review route produced NO usable review from either local verifier, and one of the two",
       "events": 1
     },
     {
       "id": "BUG-846",
-      "title": "(LOW - OPEN 2026-10-16) - governance/buglog.md is a REGISTER while the intake assessment is only a DOCUMENT: a rejected research finding has",
+      "title": "(LOW - OPEN 2026-10-16) - governance/buglog.md is a REGISTER while the intake assessment is only a DOCUMENT: a rejected research finding",
       "events": 1
     },
     {
       "id": "BUG-857",
-      "title": "(MED \u2014 OPEN 2026-10-16) \u2014 governance/buglog.md could be APPENDED TO and never QUERIED: no artifact computed which findings share a shape, so",
+      "title": "(MED \u2014 OPEN 2026-10-16) \u2014 governance/buglog.md could be APPENDED TO and never QUERIED: no artifact computed which findings share a shape,",
       "events": 1
     },
     {
       "id": "BUG-858",
-      "title": "(MED \u2014 OPEN 2026-10-16) \u2014 governance/buglog.md carries NO entry for BUG-492, the most-cited rule in this repository: 128 files cite it (53 l",
+      "title": "(MED \u2014 OPEN 2026-10-16) \u2014 governance/buglog.md carries NO entry for BUG-492, the most-cited rule in this repository: 128 files cite it (53",
       "events": 1
     },
     {
       "id": "BUG-862",
-      "title": "(MED \u2014 OPEN 2026-10-16) \u2014 scripts/census_source_names.py now measures TWO MATERIALISATIONS of one work and config/ingest_identity_gate.yaml ",
+      "title": "(MED \u2014 OPEN 2026-10-16) \u2014 scripts/census_source_names.py now measures TWO MATERIALISATIONS of one work and config/ingest_identity_gate.yaml",
       "events": 1
     },
     {
       "id": "BUG-864",
-      "title": "(MED \u2014 OPEN 2026-10-16) \u2014 scripts/census_source_names.py is the ONE reader that makes an abandoned GUI placement rule visible: Hazel owns a ",
+      "title": "(MED \u2014 OPEN 2026-10-16) \u2014 scripts/census_source_names.py is the ONE reader that makes an abandoned GUI placement rule visible: Hazel owns a",
       "events": 3
     },
     {
       "id": "BUG-867",
-      "title": "(LOW \u2014 OPEN 2026-10-16) \u2014 scripts/census_source_names.py never compares a file's own CONTAINER to the KIND folder its declared axis orders i",
+      "title": "(LOW \u2014 OPEN 2026-10-16) \u2014 scripts/census_source_names.py never compares a file's own CONTAINER to the KIND folder its declared axis orders",
       "events": 1
     },
     {
       "id": "BUG-869",
-      "title": "(MED \u2014 OPEN 2026-10-16) \u2014 pipeline/subagent_fanout.py delivered an `async: true` delegate as a FOREGROUND run that BLOCKED its parent, and t",
+      "title": "(MED \u2014 OPEN 2026-10-16) \u2014 pipeline/subagent_fanout.py delivered an `async: true` delegate as a FOREGROUND run that BLOCKED its parent, and",
       "events": 1
     },
     {
@@ -1160,7 +1160,7 @@
     },
     {
       "id": "BUG-875",
-      "title": "(HIGH, OPEN) \u2014 A FIRST-PARTY IMPORT NAME RESOLVES OUTSIDE THE TREE, so the delegated-run journal and 16 import sites read ANOTHER PROJECT'S ",
+      "title": "(HIGH, OPEN) \u2014 A FIRST-PARTY IMPORT NAME RESOLVES OUTSIDE THE TREE, so the delegated-run journal and 16 import sites read ANOTHER PROJECT'S",
       "events": 1
     },
     {
@@ -1170,7 +1170,12 @@
     },
     {
       "id": "BUG-877",
-      "title": "(MED, OPEN 2026-10-17) \u2014 A GOVERNED WRITE TO THE HARNESS HOME DOES NOT SURVIVE: scripts/check_harness_homes.py reads CONFLICT again, and no ",
+      "title": "(MED, OPEN 2026-10-17) \u2014 A GOVERNED WRITE TO THE HARNESS HOME DOES NOT SURVIVE: scripts/check_harness_homes.py reads CONFLICT again, and no",
+      "events": 1
+    },
+    {
+      "id": "BUG-878",
+      "title": "(HIGH, OPEN 2026-10-17) \u2014 `mcp_doc_guard.py` IS DECLARED WITH A CWD-RELATIVE COMMAND: a session started outside the repo is born without",
       "events": 1
     }
   ],

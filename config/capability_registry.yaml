@@ -161,6 +161,22 @@ capabilities:
     - scripts/check_harness_homes.py
     - agent/adapters/goose/apply_provider_flip.py
 
+  - id: extension_residency
+    kind: script
+    entrypoint: python3 scripts/goose_profile.py --launch
+    check: python3 scripts/goose_profile.py --check
+    receipt: config/extension_profiles.yaml
+    cost_tier: T0
+    #: T-186/D-3056/D-3064: WHAT THE HARNESS RUNS AS AN EXTENSION, AND WHETHER IT STARTS. Declared 2026-10-17
+    #: because this lane had NO route at all: `config/extension_profiles.yaml` and `scripts/goose_profile.py` existed
+    #: while no capability owned them, so every bug about a resident extension (including BUG-878, a write gate born
+    #: dead from the wrong directory) resolved to nothing - the exact shape the route graph's `facts_census` reports as
+    #: an existing artifact with no owner.
+    owns:
+    - scripts/goose_profile.py
+    - config/extension_profiles.yaml
+    - mcp_doc_guard.py
+
   - id: ingest_identity_door
     kind: script
     entrypoint: python3 scripts/check_ingest_identity_gate.py

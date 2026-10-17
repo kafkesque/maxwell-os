@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1188 decisions (census stamp 5e08aaba4af83ece, 2026-10-17) · 642 bugs (233 open / 409 closed; highest OPEN = BUG-877) · 59 open tasks (MUST 12 / SHOULD 43 / WORTH 4; OWNER-moved 0, pipeline-moved 59; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1191 decisions (census stamp 7927367319ef8cca, 2026-10-17) · 643 bugs (234 open / 409 closed; highest OPEN = BUG-878) · 59 open tasks (MUST 12 / SHOULD 43 / WORTH 4; OWNER-moved 0, pipeline-moved 59; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **79** of 1188 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 603 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1188, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **79** of 1191 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 606 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1191, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 233 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 35 · 🟨 MED 68 · 🟩 LOW 25 · UNLABELLED 101 (BUG-757) of 233 open.
+> Open BUGS by severity (population = the census's 234 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 36 · 🟨 MED 68 · 🟩 LOW 25 · UNLABELLED 101 (BUG-757) of 234 open.
 >
 > **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -16399,3 +16399,25 @@ FIX (T-185, three limbs, each a rule the repository already declares elsewhere):
 - **Remedy owed:** (a) a reproduction that names what rewrites the home (start the client, read `active_provider`
   before/after; the reading is one command); (b) a schedule, not just a reading — `check_harness_homes.py` must run
   at the point the home is written, or the rail's rc only ever describes the last time someone looked.
+
+### BUG-878 (HIGH, OPEN 2026-10-17) — `mcp_doc_guard.py` IS DECLARED WITH A CWD-RELATIVE COMMAND: a session started outside the repo is born without the write gate, and nothing inside it says so
+
+- **MEASURED, TWO-SIDED, IN ONE MINUTE.** `docguard` is declared in the harness home as `cmd: python3`,
+  `args: [mcp_doc_guard.py]` — a RELATIVE script path. From the repo root the extension starts and the model answers.
+  From `/tmp` the SAME declaration reports
+  `Warning: Failed to start extension 'python3' (process quit before initialization: ... can't open file '/private/tmp/mcp_doc_guard.py': [Errno 2] No such file or directory), continuing without it`
+  and the run **exits 0 and answers normally**. The failure is real; the exit code says nothing about it.
+- **WHY THIS IS NOT COSMETIC.** `docguard` is the D824 write gate (`append_only` / `never_overwrite` / `versioned`) for
+  the governed documents. The harness reports a dead extension to the TERMINAL and never to the session (AGENTS.md
+  harness fact, and this is its second independent confirmation), so from the inside a session with no write gate is
+  INDISTINGUISHABLE from one that has it: the agent believes protected files are guarded while every write is
+  unguarded. `enabled: true` in the config is not evidence that the extension is running.
+- **THE SHAPE IS THE C12 CLASS.** A command whose resolution depends on the CALLER'S DIRECTORY is a path that lives in
+  the environment rather than in the declaration. It resolves today only because sessions happen to start in the repo
+  root, which is a coincidence and not a guarantee.
+- **REMEDY (owner act on the harness home, backup + read-back like T-186's flips):** make the argument absolute —
+  `args: ['/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/mcp_doc_guard.py']`.
+  Until then `just session <profile>` (D-3064) REFUSES to birth a profile whose gate would be dead, which protects
+  LAUNCHED sessions only; a session started by any other route stays exposed.
+- **RED LOOP (already red, already run — D-3036):** the two commands above. It goes GREEN when the `/tmp` invocation
+  starts the extension with ZERO warning and the session's own surface names it.

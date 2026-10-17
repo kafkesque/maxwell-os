@@ -39,9 +39,23 @@ THREE FACTS DECIDE THE VERDICT, never a count:
   * RESOLUTION (D-3034). A name in the policy that the harness config does not declare is a FAULT. So is a profile
     that adds a name it may not add (an unknown name, or one classified `never`).
 
+THE BIRTH, AND WHY IT IS A COMMAND (D-3064). A profile that is only RENDERED is a policy nobody performs. `--launch`
+executes the per-session form - so a task-labelled session is one word (`just session workshop`), the surface is
+EXPLICIT rather than inherited, and the OS can say afterwards what the session was GIVEN. Two refusals make it a
+control instead of a convenience: a profile the policy does not declare cannot be born, and a profile whose stdio
+member would start DEAD cannot be born either (a dead extension prints its failure to the TERMINAL, the session
+continues without it, and from the inside the two are indistinguishable - MEASURED 2026-10-17).
+
+`--born` answers the question no transcript can: WHAT SURFACE WAS THIS SESSION GIVEN? It reads the harness's own
+record (`enabled_extensions.v0` in the session store, resolved through config/agent_context.yaml), maps the display
+names the record carries back to the policy's keys, and reports the profile the surface EQUALS - or that it equals
+none. A session born before the harness recorded a surface reads NOT RECORDED, never "empty" (C16).
+
 Usage:
   python3 scripts/goose_profile.py --list
   python3 scripts/goose_profile.py --render workshop
+  python3 scripts/goose_profile.py --launch workshop   # BIRTH; refuses a dead member; replaces this process
+  python3 scripts/goose_profile.py --born 5            # what the last 5 sessions were GIVEN at birth
   python3 scripts/goose_profile.py --check          # tri-state: 0 agree | 1 FAULT | 2 owner-owed drift
   python3 scripts/goose_profile.py --selftest
 """
@@ -308,6 +322,275 @@ def render(policy: dict[str, Any], config: dict[str, Any], classes: dict[str, st
     return "\n".join(lines)
 
 
+#: The harness's OWN record of the surface a session was GIVEN at birth. READ, never restated (C12): the path and
+#: the key live in one declared place, and this file names neither of its own.
+AGENT_CONTEXT = REPO / "config" / "agent_context.yaml"
+#: The key the harness stores that surface under (MEASURED 2026-10-17, BUG-873 limb b). A session born before
+#: 2026-10-13 carries NO such key: it must read NOT RECORDED, never "empty" - an absence is not a zero (C16).
+SURFACE_KEY = "enabled_extensions.v0"
+NOT_RECORDED = "NOT RECORDED"
+BORN_DEFAULT = 5
+#: An argument with this shape is a SCRIPT PATH, resolved against the cwd at birth. A RELATIVE one is a death
+#: sentence for any session not launched from the same directory - MEASURED two-sided 2026-10-17: the declared
+#: `docguard` command (`python3 mcp_doc_guard.py`) starts from the repo root and fails from /tmp, and the harness
+#: prints that failure to the TERMINAL and lets the session continue WITHOUT the write gate.
+SCRIPTISH = re.compile(r"\.(?:py|js|mjs|cjs|sh|rb)$")
+
+
+def sessions_db() -> pathlib.Path:
+    """The harness session store, resolved from its ONE declared pointer (C12: no second home for a path).
+
+    Returns:
+        The sqlite path. The pointer is '<path>#<table>'; only the path is used here.
+
+    Raises:
+        SystemExit: when the pointer is absent - a reader with a hardcoded home would be the defect this avoids.
+    """
+    doc = _yaml(AGENT_CONTEXT)
+    pointer = str((doc.get("homes") or {}).get("cache_ledger") or "").strip()
+    if not pointer:
+        raise SystemExit(
+            f"FATAL: {AGENT_CONTEXT.name}#homes.cache_ledger is not declared, so the session store has no home"
+        )
+    return pathlib.Path(os.path.expanduser(pointer.split("#", 1)[0]))
+
+
+def display_names(config: dict[str, Any]) -> dict[str, str]:
+    """Map the DISPLAY name each session record carries back to the KEY the policy classifies.
+
+    Args:
+        config: the parsed harness config.
+
+    Returns:
+        display name -> key, and key -> key (so a record that already holds a key resolves too). The harness
+        records 'Extension Manager' where the policy says 'extensionmanager'; without this map the comparison
+        would read a matching surface as a stranger.
+    """
+    out: dict[str, str] = {}
+    for key, cfg in (config.get("extensions") or {}).items():
+        out[str(key)] = str(key)
+        out[str((cfg or {}).get("name") or key)] = str(key)
+    return out
+
+
+def born_sessions(db: pathlib.Path, limit: int) -> list[dict[str, Any]]:
+    """Read the last `limit` sessions and the surface each was GIVEN at birth - from the harness's own store.
+
+    Args:
+        db: the session store (see sessions_db).
+        limit: how many of the newest sessions to read.
+
+    Returns:
+        One row per session: id, created, name, type, surface (None = NOT RECORDED), extensions (raw count).
+
+    Raises:
+        SystemExit: when the store is absent - a reading of nothing is not a reading.
+    """
+    import sqlite3
+
+    if not db.exists():
+        raise SystemExit(f"FATAL: the harness session store {db} does not exist - nothing to read")
+    rows: list[dict[str, Any]] = []
+    conn = sqlite3.connect(f"file:{db}?mode=ro", uri=True)
+    try:
+        cur = conn.execute(
+            "select id, created_at, name, session_type, extension_data from sessions "
+            "order by created_at desc, id desc limit ?",
+            (int(limit),),
+        )
+        for sid, created, name, stype, blob in cur.fetchall():
+            surface: list[str] | None = None
+            try:
+                data = json.loads(blob or "{}")
+            except (json.JSONDecodeError, TypeError):
+                data = {}
+            entry = data.get(SURFACE_KEY) if isinstance(data, dict) else None
+            if isinstance(entry, dict) and isinstance(entry.get("extensions"), list):
+                surface = [
+                    str(e.get("name") if isinstance(e, dict) else e) for e in entry["extensions"]
+                ]
+            rows.append(
+                {
+                    "id": str(sid),
+                    "created": str(created or ""),
+                    "name": str(name or ""),
+                    "type": str(stype or ""),
+                    "surface": surface,
+                }
+            )
+    finally:
+        conn.close()
+    return rows
+
+
+def profile_of(surface_keys: set[str], policy: dict[str, Any], classes: dict[str, str]) -> list[str]:
+    """Every declared profile whose member set EQUALS this surface - a match, never a guess.
+
+    Args:
+        surface_keys: the born surface, mapped to policy keys.
+        policy: the parsed policy.
+        classes: the name -> class map.
+
+    Returns:
+        The profiles the surface IS. Empty when it equals no declared profile - which is a reading, not a fault:
+        a session may legitimately be born with a set no profile names.
+    """
+    out: list[str] = []
+    for name in (policy.get("profiles") or {}):
+        try:
+            members = set(profile_members(policy, classes, str(name)))
+        except SystemExit:
+            continue
+        if members == surface_keys:
+            out.append(str(name))
+    return out
+
+
+def render_born(rows: list[dict[str, Any]], policy: dict[str, Any], classes: dict[str, str],
+                config: dict[str, Any]) -> str:
+    """Print the surface each session was born with, and which declared profile - if any - it equals.
+
+    Args:
+        rows: the output of born_sessions.
+        policy: the parsed policy.
+        classes: the name -> class map.
+        config: the parsed harness config.
+
+    Returns:
+        The reading, one block per session.
+    """
+    names = display_names(config)
+    lines: list[str] = []
+    for row in rows:
+        lines.append(f"{row['id']}  {row['created']}  [{row['type']}] {row['name'][:46]!r}")
+        surface = row["surface"]
+        if surface is None:
+            lines.append(f"   surface: {NOT_RECORDED} (born before the harness recorded one, or by a build that does not)")
+            lines.append("")
+            continue
+        keys = {names.get(str(n), str(n)) for n in surface}
+        unknown = sorted(k for k in keys if k not in classes)
+        matched = profile_of(keys, policy, classes)
+        lines.append(f"   surface: {len(surface)} extension(s) -> " +
+                     (", ".join(matched) if matched else "NO DECLARED PROFILE"))
+        if unknown:
+            lines.append(f"   !! {len(unknown)} name(s) the policy does not classify: {', '.join(unknown)}")
+        lines.append("")
+    return "\n".join(lines).rstrip()
+
+
+def unresolvable(policy: dict[str, Any], config: dict[str, Any], classes: dict[str, str],
+                 profile: str, cwd: pathlib.Path) -> list[str]:
+    """Every stdio member of `profile` whose declared command would NOT start from `cwd`.
+
+    WHY A CHECK AND NOT A COMMENT. A stdio extension that fails to start prints its failure to the TERMINAL and the
+    session continues without it (measured harness fact). From INSIDE, a session born without its write gate is
+    indistinguishable from one that has it - so the birth must be REFUSED, not annotated.
+
+    Args:
+        policy: the parsed policy.
+        config: the parsed harness config.
+        classes: the name -> class map.
+        profile: the profile about to be born.
+        cwd: the directory the session would start in.
+
+    Returns:
+        One line per member that cannot start, naming the path that does not resolve. Empty when all resolve.
+    """
+    extensions = config.get("extensions") or {}
+    out: list[str] = []
+    for name in profile_members(policy, classes, profile):
+        cfg = extensions.get(name) or {}
+        if str(cfg.get("type") or "") != "stdio":
+            continue
+        parts = [str(cfg.get("cmd") or "")] + [str(a) for a in (cfg.get("args") or [])]
+        for part in parts:
+            if not part or part.startswith("-") or not SCRIPTISH.search(part):
+                continue
+            path = pathlib.Path(os.path.expanduser(part))
+            if path.is_absolute():
+                if not path.exists():
+                    out.append(f"{name}: {part} is declared ABSOLUTE and does not exist - the extension would be born DEAD")
+                continue
+            if not (cwd / path).exists():
+                out.append(
+                    f"{name}: {part} is declared RELATIVE and does not resolve from {cwd} - the extension would be "
+                    f"born DEAD, and the session would not be told"
+                )
+    return out
+
+
+def birth_argv(policy: dict[str, Any], config: dict[str, Any], classes: dict[str, str],
+               profile: str) -> list[str]:
+    """The exact argv that BIRTHS an interactive session with one profile (the per-session realisation).
+
+    Args:
+        policy: the parsed policy.
+        config: the parsed harness config.
+        classes: the name -> class map.
+        profile: the profile to be born with (refused when the policy does not declare it).
+
+    Returns:
+        The command, in the form MEASURED for platform/builtin names.
+
+    Raises:
+        SystemExit: on an undeclared profile, or a stdio member with no declared command (D-3034), or one whose
+        single-string form is UNVERIFIED (an argument containing whitespace).
+    """
+    members = profile_members(policy, classes, profile)
+    extensions = config.get("extensions") or {}
+    builtin = [n for n in members if (extensions.get(n) or {}).get("type") in ("platform", "builtin")]
+    stdio = [n for n in members if (extensions.get(n) or {}).get("type") == "stdio"]
+    argv = ["goose", "session", "--no-profile"]
+    if builtin:
+        argv += ["--with-builtin", ",".join(builtin)]
+    for name in stdio:
+        cfg = extensions.get(name) or {}
+        parts = [str(cfg.get("cmd") or "")] + [str(a) for a in (cfg.get("args") or [])]
+        text = " ".join(parts).strip()
+        if not text:
+            raise SystemExit(f"FATAL: {name} declares no cmd - it cannot be born (D-3034)")
+        if any(" " in p for p in parts):
+            raise SystemExit(
+                f"FATAL: {name} carries an argument containing whitespace; the single-string form is UNVERIFIED "
+                f"for it, so {profile} may be RENDERED but not LAUNCHED"
+            )
+        argv += ["--with-extension", text]
+    return argv
+
+
+def launch(policy: dict[str, Any], config: dict[str, Any], classes: dict[str, str], profile: str) -> None:
+    """Birth an interactive session with one profile, refusing first when a member would be born dead.
+
+    Args:
+        policy: the parsed policy.
+        config: the parsed harness config.
+        classes: the name -> class map.
+        profile: the profile to be born with.
+
+    Returns:
+        Never - the process is REPLACED by the harness (so the exit code is the session's own).
+
+    Raises:
+        SystemExit: when a member cannot start from this directory - the birth is refused BEFORE anything runs.
+    """
+    argv = birth_argv(policy, config, classes, profile)
+    cwd = pathlib.Path.cwd()
+    dead = unresolvable(policy, config, classes, profile, cwd)
+    if dead:
+        print(f"FATAL: {profile} would be born with a DEAD extension - refusing the birth")
+        for line in dead:
+            print("   " + line)
+        raise SystemExit(1)
+    print(f"BIRTH profile={profile} cwd={cwd}", file=sys.stderr)
+    print("   " + " ".join(argv), file=sys.stderr)
+    print("   (this session inherits NOTHING from the harness config: the command above IS its surface)",
+          file=sys.stderr)
+    sys.stderr.flush()
+    sys.stdout.flush()
+    os.execvp(argv[0], argv)
+
+
 def undiscovered(policy: dict[str, Any], config: dict[str, Any]) -> list[str]:
     """Every extension the harness declares that no class carries yet - what an arrival leaves behind.
 
@@ -511,6 +794,33 @@ def _selftest() -> int:
     controls.append(("a delegate class refused by decision is REFUSED",
                      _refuses(lambda: render_delegate(dpolicy, dclasses, config, "research"))))
 
+    # THE BIRTH: a session is born with an EXPLICIT surface, and a surface that would be born DEAD is refused.
+    bpolicy = dict(policy, profiles={"work": {"adds": ["filesystem"]}, "plain": {"adds": []}})
+    argv = birth_argv(bpolicy, config, classes, "plain")
+    controls.append(("the birth argv is the per-session form, not a config edit",
+                     argv[:3] == ["goose", "session", "--no-profile"] and "developer" in argv[4]))
+    controls.append(("the birth argv never names a NEVER extension", "tom" not in " ".join(argv)))
+    controls.append(("an undeclared profile cannot be born",
+                     _refuses(lambda: birth_argv(bpolicy, config, classes, "nope"))))
+    controls.append(("a member whose argument holds whitespace may be RENDERED but never LAUNCHED",
+                     _refuses(lambda: birth_argv(bpolicy, config, classes, "work"))))
+    # MEASURED TWO-SIDED 2026-10-17: `python3 mcp_doc_guard.py` starts from the repo root and fails from anywhere
+    # else, and the harness tells the TERMINAL only. So the check must catch it - and must NOT cry wolf at home.
+    localcfg = {"extensions": dict(config["extensions"], local={
+        "type": "stdio", "enabled": True, "cmd": "python3", "args": ["mcp_doc_guard.py"]})}
+    lclasses = dict(classes, local=ALWAYS)
+    controls.append(("a RELATIVE script member is caught away from the repo root",
+                     bool(unresolvable(bpolicy, localcfg, lclasses, "plain", pathlib.Path(tempfile.gettempdir())))))
+    controls.append(("the same member resolves AT the repo root",
+                     unresolvable(bpolicy, localcfg, lclasses, "plain", REPO) == []))
+    controls.append(("a born surface EQUAL to a profile is that profile",
+                     profile_of({"developer", "docguard", "filesystem"}, bpolicy, classes) == ["work"]))
+    controls.append(("a born surface no profile names matches NONE (a reading, not a guess)",
+                     profile_of({"filesystem"}, bpolicy, classes) == []))
+    controls.append(("the harness's display name maps back to the policy key",
+                     display_names({"extensions": {"extensionmanager": {
+                         "type": "platform", "name": "Extension Manager"}}})["Extension Manager"] == "extensionmanager"))
+
     for label, ok in controls:
         print(f"  {'ok  ' if ok else 'FAIL'} {label}")
     passed = sum(1 for _, ok in controls if ok)
@@ -549,6 +859,10 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--check", action="store_true", help="compare the policy against the harness state")
     parser.add_argument("--adopt", action="store_true", help="register newly arrived extensions into quarantine")
     parser.add_argument("--delegate", metavar="PROFILE", help="print the extensions list a delegate is born with")
+    parser.add_argument("--launch", metavar="PROFILE",
+                        help="BIRTH an interactive session with one profile (the per-session form, executed)")
+    parser.add_argument("--born", nargs="?", const=BORN_DEFAULT, type=int, metavar="N",
+                        help="read the last N sessions' BIRTH SURFACES from the harness's own record")
     parser.add_argument("--selftest", action="store_true", help="known-answer controls only")
     args = parser.parse_args(argv)
     if args.selftest:
@@ -594,6 +908,19 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.render:
         print(render(policy, config, classes, args.render))
+        return 0
+
+    if args.born is not None:
+        rows = born_sessions(sessions_db(), args.born)
+        print(f"BIRTH SURFACES - the last {len(rows)} session(s), read from the harness's own store")
+        print("(the surface a session was GIVEN at birth; a config edit is NOT live inside it, BUG-873)")
+        print("(a member that FAILED to start still appears here: the record says what was GIVEN, never what started)")
+        print("")
+        print(render_born(rows, policy, classes, config))
+        return 0
+
+    if args.launch:
+        launch(policy, config, classes, args.launch)
         return 0
 
     rc, faults, drift, pending = check(policy, config)

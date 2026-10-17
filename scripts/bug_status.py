@@ -66,6 +66,29 @@ PAREN_RE = re.compile("[(]([^)]*)[)]")
 FENCE_RE = re.compile(r"^(`{3,}|~{3,})")
 
 
+#: The census title's length cap. A FIXED SLICE severs a token: MEASURED 2026-10-17, BUG-878's heading was cut at
+#: `` `mcp_do `` - so the route graph, which reads artifacts out of this title, saw NO artifact in a heading that named
+#: one, and the item was counted as `no_artifact_named`. A cap is a display budget; it may not invent a different fact.
+TITLE_MAX = 140
+
+
+def _title(rest: str, limit: int = TITLE_MAX) -> str:
+    """Cut a heading to the census budget at a WORD boundary, never inside a token.
+
+    Args:
+        rest: the heading text after the bug id.
+        limit: the maximum length.
+
+    Returns:
+        The heading, truncated at the last whitespace at or below the limit.
+    """
+    if len(rest) <= limit:
+        return rest
+    cut = rest[:limit]
+    space = cut.rfind(" ")
+    return (cut[:space] if space > 0 else cut).rstrip()
+
+
 def status_slot(rest: str) -> str:
     """
     Return only the header STATUS SLOT (BUG-350/BUG-572), never the prose title.
@@ -236,7 +259,7 @@ def scan(text_lines: list[str]) -> dict[str, dict]:
         if not m:
             continue
         bid, rest = m.group(1), m.group(2).strip()
-        rec = bugs.setdefault(bid, {"id": bid, "status": "open", "events": [], "title": rest[:140], "line": i})
+        rec = bugs.setdefault(bid, {"id": bid, "status": "open", "events": [], "title": _title(rest), "line": i})
         event = classify(status_slot(rest))
         rec["events"].append({"line": i, "event": event, "text": rest[:140]})
         if event == "closed" and rec["status"] == "open":

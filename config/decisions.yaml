@@ -27143,3 +27143,52 @@ decisions:
   - '621 rows stopped being refused for a declaration that did not exist; 235 of them became the owner''s worklist (the rest are containers no stage converts).'
   - 'The domain vocabulary can no longer be widened by an admission - a drift class that had no reader is now a counted refusal.'
   - 'R5 (gemma-4-E4B) returned REJECT on two objections - a file outside its kind folder, and the corpus-key test preceding the admission tests. Both were ADJUDICATED as declared behaviour rather than accepted or dismissed: the first IS the counted refused_not_in_its_kind_folder class (52 rows, unchanged), and the second is the D-3045 identity rule the control a_work_the_corpus_holds_by_KEY_is_NOT_an_admission_candidate exists to hold. The rejection is recorded here rather than a green.'
+
+- id: D-3064
+  state: ACTIVE
+  date: '2026-10-17'
+  by: assistant
+  category: HARNESS / THE BIRTH IS A COMMAND (T-186 residual, T-190 birth half)
+  bugs: [BUG-878]
+  files:
+  - scripts/goose_profile.py
+  - justfile
+  title: 'A PROFILE THAT IS ONLY RENDERED IS A POLICY NOBODY PERFORMS - the birth is now ONE command with TWO refusals, and the surface a session was GIVEN is READ BACK from the harness''s own record.'
+  decision: >-
+    The residency policy (D-3056/T-186) declared which extension a profile may hold, and `--render` printed the exact
+    command - but printing is not performing, so in practice every session was still born from the harness default and
+    the policy described a road nobody drove. Three things are now declared together. (1) THE BIRTH IS A COMMAND:
+    `just session <profile>` executes the per-session realisation (`goose session --no-profile --with-builtin ...
+    --with-extension ...`), so the task label and the profile are ONE word rather than a mapping table that could drift
+    (C12: one home - the profile name IS the label). (2) A BIRTH THAT WOULD BE DEAD IS REFUSED: every stdio member's
+    declared script argument is resolved against the birth directory first, because a stdio extension that fails to
+    start prints to the TERMINAL and the session continues without it - MEASURED, BUG-878, where `docguard` was born
+    dead from `/tmp` while the run exited 0. A session that cannot tell its gate from its absence must not be born.
+    (3) THE SURFACE IS READ BACK, NOT REMEMBERED: `just born [N]` reads `enabled_extensions.v0` from the harness's own
+    session store (path resolved through config/agent_context.yaml#homes.cache_ledger, never restated), maps the
+    DISPLAY names it carries ('Extension Manager') back to the policy's KEYS, and reports the profile each surface
+    EQUALS - or that it equals none, which is a reading and not a fault. A session born before the harness recorded a
+    surface reads NOT RECORDED, never 'empty' (C16); a member that FAILED to start still appears, because the record
+    says what was GIVEN, never what worked.
+  rationale: >-
+    THE MID-SESSION QUESTION, ANSWERED BY MECHANISM RATHER THAN BY HOPE. The surface is read at birth and cannot be
+    widened inside the session (BUG-873 limb b), and the only runtime switch (`extensionmanager.manage_extensions`)
+    offers `disable` and `install`, i.e. a one-way door: a session can SHED a tool, never GAIN one it was not born
+    with. So there are exactly three honest answers to a mid-session need, and none of them is 'switch profile':
+    (a) SHED - disable the heavy on_demand extension once its work is done (model-judged, convenience only, never a
+    rail); (b) BE REBORN - a sister session born with the right profile, which costs nothing that matters because this
+    OS's memory is the registers and receipts, not the transcript; (c) DELEGATE - a subagent is its own session and
+    takes an explicit `extensions:` list (config/extension_profiles.yaml#delegate_profiles), which is the per-session
+    form applied to a bounded task. A session that crosses task classes should be REBORN or DELEGATE, never mutated.
+  evidence: >-
+    MEASURED 2026-10-17, all on this machine. The born reader returns real surfaces with their type
+    (`sub_agent` with 0, a user session with the full 14), so the comparison is made against the harness's record and
+    not against a config file that a running session may have drifted from. The two-sided resolution control is the
+    BUG-878 measurement: `python3 mcp_doc_guard.py` starts from the repo root and fails from `/tmp`, so
+    `unresolvable()` must catch it AWAY and must not cry wolf AT HOME - both asserted. `--launch core` from `/tmp`
+    refused live (rc 1) naming the exact path, without starting a session. Selftest 22 -> 31 controls, all green;
+    `--check` still rc 0 (26 declared / 8 profiles).
+  consequences:
+  - 'A task-labelled session is one word, and the profile it was born with is a READ-BACK, not a claim.'
+  - 'A birth that would silently lack the write gate is refused before anything runs (BUG-878 is the live case).'
+  - 'The runtime toggle keeps its honest place: a way to SHED, never the record (T-190 still owes the receipt for the toggle itself).'

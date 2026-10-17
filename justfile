@@ -629,6 +629,12 @@ extensions:                                          # T-186/D-3056: what each d
 extension-profile name:                              # T-186/D-3056: the two realisations of ONE profile (config flips + the --no-profile command). Writes nothing.
     python3 scripts/goose_profile.py --render {{name}}
 
+session profile:                                     # D-3064: BIRTH a task-labelled session with one profile - the surface is EXPLICIT, never inherited, and a birth that would be dead is REFUSED
+    python3 scripts/goose_profile.py --launch {{profile}}
+
+born n="5":                                          # D-3064: what each of the last N sessions was GIVEN at birth, read from the harness's own store (never from a transcript)
+    python3 scripts/goose_profile.py --born {{n}}
+
 extensions-check:                                    # T-186/D-3056: residency policy vs live harness state - tri-state (0 agree | 1 fault | 2 owner-owed)
     python3 scripts/goose_profile.py --check
 

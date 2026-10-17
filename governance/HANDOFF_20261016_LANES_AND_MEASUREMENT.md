@@ -515,3 +515,133 @@ reading did not include it, which is recorded as an open question, not a verdict
 6. **The routing debt 225 vs 222** — pre-existing, and its SHAPE is now measured: **223 of the 225 name NO artifact
    in their title at all** (`no_artifact_named`). The metric is measuring bug-TITLE hygiene more than routing; a
    disposition or a title rule is the honest fix, not 223 capability declarations.
+
+---
+
+## 1f. SPINE UPDATE — 2026-10-17, FIFTH SITTING (append-only; nothing above is rewritten)
+
+**0. THE OWNER'S QUESTION WAS "HOW DO I ACTUALLY USE THIS?", AND THE ANSWER WAS A MISSING MECHANISM, NOT A MISSING
+PARAGRAPH.** The residency policy (D-3056) could RENDER a profile and nothing could PERFORM one, so every session was
+still born from the harness default and the policy described a road nobody drove. This sitting made the birth a
+command (D-3064), made a dead member refuse the birth, added the read-back that answers *what was this session given*,
+declared the capability the whole lane was missing, and — behind the launcher — found and measured a real defect in the
+one guard that matters most for governed writes (BUG-878).
+
+### 1. THE THREE REFERENCES, EXAMINED (adapt / reference / refuse — each with a measurement)
+
+| reference | what it is | verdict |
+|---|---|---|
+| `youtube.com/watch?v=UXcMa3fOHXk` | the **pstack** explainer (19:01, unofficial): playbooks, principles, `poteto-mode`, overnight/handoff contract, deslop/unslop, benchmark-checklist | **NOT the source — the same thing as the next row.** Kept as a REFERENCE for the *reading order* of its playbooks, not as a dependency. |
+| `github.com/cursor/plugins/tree/main/pstack` | 54 skills + 2 agents + 23 playbooks, MIT, `plugin.json` on `agent-plugins.org` schema | **PARTIALLY ADAPTABLE, and NOT as a bundle.** MEASURED: installing it wholesale costs **2,676 description tokens per request** (54 × their frontmatter descriptions; content is 48,269 tokens on demand). That is half the price of the entire extension tax we just removed. **REFUSED wholesale**; the four ideas worth porting are named in §3. |
+| `goose-docs.ai/extensions/` | the harness's extension directory (client-rendered; read instead from `docs/getting-started/using-extensions`) | **REFERENCE, already implemented.** It documents built-in vs platform vs stdio extensions and the toggles we already encode. One thing it documents that we had not used: **plugins** (`plugin.json` + `skills/` + `hooks/`, Open Plugins or Gemini-extension format, `goose plugin install <git-url>`, discovered from `~/.agents/plugins/`). |
+
+**What the harness already offers and this repo did not use (MEASURED 2026-10-17, not read from a card):**
+- `goose plugin install <git-url>` + `goose skills list` — a plugin is a *distribution* container for skills and hooks.
+- **`SessionStart` / `SessionEnd` / `PreToolUse` / `PostToolUse` hooks** — the missing trigger for T-190's receipt: a
+  mid-session surface change and a session BIRTH can both leave a record without a new store (see §5, next steps).
+- `goose local-models search "<query>"` — a **live HuggingFace search for GGUF *and* MLX** repos (see §4).
+
+### 2. THE OPERATING PROTOCOL — how a profile is chosen, and what happens when a session needs more
+
+1. **You never switch a profile. You NAME the session.** `just session <profile>` births it (`--no-profile` + the
+   explicit set). The profile name IS the task label — deliberately, because a second vocabulary
+   (task-class → profile) would be a mapping layer that drifts (C12).
+2. **Which one — one line each, priced by the MEASURED schema cost it adds per request**
+   (`just extension-profile <name>` prints the exact command and the flips):
+
+   | profile | the act it is for | added cost/turn |
+   |---|---|---|
+   | `core` | read a few files, answer, write ONE governed document | **+0** (cheapest birth this OS can offer) |
+   | `workshop` | repository work: sweeps, history, moves | **+5,633** (filesystem 3,727 + gitmcp-mcp 1,906) |
+   | `research` | finding something out | **+1,517** (transcripts 1,168 + reddit 349) |
+   | `documents` | read one PDF in place | **+350** |
+   | `web` | drive a browser | **+1,834** (puppeteer 834 + transcripts 1,168) |
+   | `recall` | "what did we decide in a past session" | +0 measured (platform tool, unmeasured — D-2957) |
+   | `sandbox` | run code with NO shell | +0 measured (platform tool) |
+   | `everything` | the audit profile — used to MEASURE, never as a default | +7,909 |
+
+3. **You know afterwards, not from memory:** `just born 5` reads the harness's own record and prints, per session, the
+   surface it was GIVEN and the profile that surface EQUALS (or that it equals none).
+4. **A mid-session need has exactly three honest answers, and none of them is "switch":**
+   (a) **SHED** — `extensionmanager` can `disable` and `install`, i.e. a ONE-WAY DOOR: a session can drop a heavy tool,
+   never gain one it was not born with (BUG-873 limb b). Model-judged, convenience only, never a rail;
+   (b) **BE REBORN** — start a sister session with the right profile (cheap: the prefix is byte-identical, 25.01x warm
+   cache, BUG-872) and hand it a written intent, because this OS's memory is the registers and receipts, not the transcript;
+   (c) **DELEGATE** — a subagent is its own session and takes an explicit `extensions:` list
+   (`just extensions-delegate review|sweep|extract`), which is the per-session form applied to a bounded task.
+   A session that crosses task classes should be REBORN or DELEGATE, **never mutated**.
+
+### 3. WHAT IS WORTH TAKING FROM pstack, AND WHAT IS ALREADY BETTER HERE
+
+Take (as OUR OWN skills, one at a time, never the bundle): **(i)** `prove-it-works` — an artefact must be demonstrated,
+not asserted (we already have this as the receipt rule; pstack's phrasing is a better *prompt*, and the shape is
+"run the thing, show the output"); **(ii)** `benchmark-checklist` — vet a number (limiter, repeats, end-to-end) — this
+is D-3061's oracle ladder in plain words, and the 79.9 s / 59.3 tok/s surprise is exactly its case; **(iii)**
+`deslop`/`unslop` — a diff-cleanliness pass, which is C12/C19/C20 as a *procedure*; **(iv)** `interrogate` — N models
+try to break a diff, which is R5 done properly (we ran R5 this sitting and it ACCEPTed; the disagreement is the value).
+Refuse: the 23-playbook router (`poteto-mode`) — a second routing surface beside `resolve_route`/`capability_registry`
+would be two homes for one decision; the agent/automation fleet (Cursor-specific, C25); and the whole-bundle install
+(2,676 tok/request for skills we would then have to keep in sync with our own decisions).
+
+### 4. llmfit vs the harness's own model instruments — "can it check all of HuggingFace?" NO, and it does not need to
+
+- **llmfit is a hardware-FIT oracle with a bundled catalogue**, not a HuggingFace crawler: it carries 5,103 models,
+  refreshes with `llmfit update`, and can query HF with `llmfit hf-search` — for **GGUF (llama.cpp)** only. Its
+  capability tags are measured INVERTED on this roster and its `estimated_tps` is computed at an 8,192-token cap
+  (D-3061). Its coverage of the eight models this machine SERVES is **4/8**.
+- **The harness has a better instrument for *discovery*, and this repo had not used it:**
+  `goose local-models search "<query>"` returns **live HuggingFace results for GGUF *and* MLX** (`mlx-safetensors`),
+  which is the format this machine actually serves. MEASURED 2026-10-17: it returned eight MLX repos for
+  "Qwen3-30B-A3B MLX 4bit", including **`Qwen3-30B-A3B-Instruct-2507-MLX-4bit` (lmstudio-community)** and
+  `mlx-community/Qwen3-30B-A3B-Instruct-2507-4bit` — the D-3061 candidate, available, nothing downloaded.
+  Its own output carries the honest caveat `MLX support was not compiled in`: it can **FIND** MLX repos but this build
+  cannot **download** them (`goose local-models download` is GGUF-only), so a fetch stays `huggingface-cli`/`hf`.
+- **What OMLX itself offers:** the served-side facts the OS already reads — `GET /v1/models` (`max_model_len`, the
+  served window), `~/.omlx/model_settings.json`, `~/.omlx/stats.json#total_requests` (the engine's own request
+  counter, the only witness that a run was served BY THIS MACHINE). It is a SERVING surface, not a discovery one:
+  nothing in OMLX knows what is on HuggingFace.
+- **Therefore the market-research procedure is four steps, and each has an owner**: discover (`goose local-models
+  search` / `llmfit hf-search`) → FIT (`llmfit`, this machine, tags ignored) → PRIOR (BFCL / τ²-bench / SWE-bench,
+  `machine_truthful: false`) → **MEASURE THE LOOP** (`scripts/measure_subagent_loop.py`, the only gate). A fifth
+  tool would not add evidence; it would add a fourth opinion.
+
+### 5. WHAT LANDED THIS SITTING
+
+| item | before | after | how it was measured |
+|---|---|---|---|
+| a session's birth surface | RENDERED only; every session inherited the config default | **`just session <profile>`** executes the per-session form; an undeclared profile is refused; a member that would start DEAD refuses the birth | selftest **22 → 31** controls; live refusal from `/tmp` (rc 1, no session started) |
+| "what was this session given?" | unanswerable (a transcript is not a surface) | **`just born [N]`** reads `enabled_extensions.v0` and names the profile the surface EQUALS | live read of the last sessions; `NOT RECORDED` when the key is absent |
+| the write gate | born DEAD from any cwd but the repo root, silently, rc 0 | **BUG-878 filed** (the gate reads the TERMINAL, never the session) | two-sided: repo root starts, `/tmp` warns and continues, exit 0 |
+| the residency lane's route | **no capability owned it** (`extension_profiles.yaml`, `goose_profile.py` unowned) | **`extension_residency`** declared (owns the policy, the reader, and `mcp_doc_guard.py`) | `resolve_route.py --check`: debt **226 → 225**, BUG-878 `routed` |
+| the bug census title | a fixed `rest[:140]` slice severed a token, so a heading naming `mcp_doc_guard.py` read **`mcp_do`** and the item counted as `no_artifact_named` | cut at a WORD boundary (`TITLE_MAX` named, C20) | the same item now resolves to its capability |
+| decisions / bugs / faces | 1188 / 643 / 59 — and the 1188 was **STALE**: the registry already held D-3062 and D-3063 | **1191** / 643 / 59, four faces equal their re-derivation | `recompute_decision_summary.py`, then `gov_sync.py --apply`, `check_governance_faces.py` rc 0 |
+
+**AND THE STALENESS IS ITSELF A READING (BUG-573, third observed instance).** `recompute_decision_summary.py
+--check` IS a fatal rail (justfile:183 and :231) — but `just health` reports a PREFIX and stops at the FIRST non-zero
+line, and `route_graph` is red ahead of it, so the census was never re-derived while two decisions sat uncounted. The
+four faces then agreed with each other and with a stale census, which is green because two derived things agree, not
+because either is true. **The honest reading of this ladder is `just health-full`**, and the census must be recomputed
+as part of any act that MINTS a decision — not left to a rail that an earlier red can hide.
+
+**R5 (generator ≠ verifier), run as a journaled delegate** (`DJ-20261017T104719Z-50e5`, gemma-4-E4B, 127.4 s, wall
+measured from the journal's own rows): verdict **ACCEPT** with three objections, each adjudicated on evidence and none
+of them turned into a silent change — (1) `unresolvable` relies on `profile_members` refusing first: **the call order
+in `launch()` IS the guarantee** (`birth_argv` runs before it), and a direct call refusing is the correct answer;
+(2) a path on a cloud mount can flake: **the failure direction is fail-closed** (the birth is refused, not born dead);
+(3) `SystemExit` "makes debugging harder": **the message names the member AND the path that does not resolve** — that
+is the debugging.
+
+### 6. NEXT CRITICAL STEPS, consequential order (each unblocked unless marked)
+
+1. **BUG-878's remedy is an OWNER ACT** — one line in the harness home:
+   `docguard.args: ['/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/mcp_doc_guard.py']`,
+   backup beside the home + read-back (the T-186 form). Until then every session NOT launched by `just session`
+   may be running without the D824 write gate and cannot tell.
+2. **T-183's applier** — the last limb of THE ADMISSION: 479 candidates have a declared home and a derived target and
+   nothing may move until a plan-keyed, dry-run-default, crash-safe writer exists. It is the pipeline lane's #1.
+3. **T-190's remaining half** — the `extensionmanager` toggle still leaves no trace; the harness now offers
+   `PreToolUse`/`PostToolUse` hooks, which is the trigger the row said was missing.
+4. **BUG-876** (the attribution control) — still the one thing blocking a loop agent from adjudicating a governed write.
+5. **T-187** — the two-step/two-tool fixture; still the only gate for any model promotion.
+6. **The routing debt 225 vs 222** — its shape is now measured twice: 223 of 225 name no artifact, and the census title
+   was itself SEVERING artifacts at char 140 (fixed this sitting). Re-read the census before adding 223 declarations.

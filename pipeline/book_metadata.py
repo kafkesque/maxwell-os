@@ -97,7 +97,13 @@ def sanitize_source_book(filename: str) -> str:
     hash>") so persisted source_books / source_text / citation carry only the
     real author/title. Idempotent; returns the original when nothing matches.
     """
-    name = (filename or "").strip()
+    # BUG-883: ONE text form for one work. The SAME file reaches this function as NFC from one root and NFD from
+    # another (MEASURED 2026-10-17: the corpus held 'Galič' precomposed, U+010D, while the source library held
+    # 'c'+U+030C for the identical work), so a key minted without normalising reads ONE work as TWO: the admission
+    # reader called an in-corpus work a new candidate, and on a normalisation-SENSITIVE filesystem (Linux, C26) the
+    # applier would have created the twin instead of refusing it. NFC is idempotent, so every already-NFC name keeps
+    # the key it has today and nothing persisted is re-keyed.
+    name = unicodedata.normalize("NFC", filename or "").strip()
     if not name:
         return name
     # Remove any parenthetical group containing a noise marker.

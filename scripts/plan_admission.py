@@ -101,6 +101,7 @@ CONTROL_LABELS = (
     "an_axis_outside_the_declared_vocabulary_is_FATAL_and_never_guessed",
     "a_bare_run_writes_NOTHING_and_the_reader_names_no_path_of_its_own",
     "the_ONE_line_brief_agrees_with_the_full_reading",
+    "the_same_work_spelled_NFC_and_NFD_is_ONE_key_and_distinct_names_stay_distinct",
     "a_DOMAIN_axis_root_KEEPS_its_DOMAIN_folder_and_a_folder_the_corpus_does_not_materialise_is_REFUSED",
 )
 
@@ -695,6 +696,16 @@ def selftest() -> int:
                and str(plan["never_seen"]) in line
                and line.startswith("ADMISSION:"),
                f"the brief read {line!r} — one line, carrying the reading's own numbers")
+
+    # (15) BUG-883: ONE text form for ONE work. The same name minted from NFC and from NFD must be the SAME key,
+    #      and two genuinely different names must STAY different (two-sided: a normaliser that flattened everything
+    #      would satisfy the first half alone). MEASURED 2026-10-17: the corpus held 'Galič' (U+010D) while the
+    #      source library held 'c'+U+030C for the identical work, so the reader called an in-corpus work a NEW
+    #      candidate and the writer refused the row it had priced — a workspace that disagreed with itself.
+    expect(CONTROL_LABELS[16],
+           key_of("Galič2017_Article") == key_of("Galic\u030c2017_Article")
+           and key_of("Another Work") != key_of("Galič2017_Article"),
+           f"NFC {key_of('Galič2017_Article')!r} vs NFD {key_of('Galic\u030c2017_Article')!r}")
 
     failed = {label for label, _ in failures}
     for label in CONTROL_LABELS:

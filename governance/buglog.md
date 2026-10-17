@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1196 decisions (census stamp e63966a9f40156e7, 2026-10-17) · 645 bugs (234 open / 411 closed; highest OPEN = BUG-879) · 59 open tasks (MUST 12 / SHOULD 43 / WORTH 4; OWNER-moved 0, pipeline-moved 59; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1197 decisions (census stamp 2af13d21c90659f0, 2026-10-17) · 650 bugs (235 open / 415 closed; highest OPEN = BUG-885) · 59 open tasks (MUST 12 / SHOULD 43 / WORTH 4; OWNER-moved 0, pipeline-moved 59; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **79** of 1196 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 611 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1196, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **79** of 1197 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 612 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1197, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 234 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 35 · 🟨 MED 68 · 🟩 LOW 26 · UNLABELLED 101 (BUG-757) of 234 open.
+> Open BUGS by severity (population = the census's 235 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 35 · 🟨 MED 69 · 🟩 LOW 26 · UNLABELLED 101 (BUG-757) of 235 open.
 >
 > **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -16516,3 +16516,162 @@ route would be deleted to silence a false alarm.
 **Status:** FIXED (`scripts/resolve_route.py`: `RECIPE` now accepts `name [params]: [# comment]`; one new control;
 19/19). Route: `route_graph` (the capability that owns the reader). No ceiling was raised and no lane was renamed to
 satisfy the parser.
+
+### BUG-881 (MED, FIXED 2026-10-17) — THE APPLIER'S FIRST REAL RUN DIED ON `TypeError: 'str' object is not callable`: a LOCAL binding shadowed the module's own `stamp()`, and every control had tested the UNIT instead of the COMPOSITION
+
+**Measured 2026-10-17, from the owner's own door.** `just admit-apply --dry-run` — the first time a SIGNED
+acceptance existed — reached the row loop and stopped:
+
+```
+File ".../scripts/apply_admission.py", line 484, in run
+    record = stamp(apply_row(...), header)
+TypeError: 'str' object is not callable
+```
+
+`run()` bound `stamp = datetime.now(UTC).strftime(...)` fifty lines above the module-level
+`def stamp(record, header)`. From that line on, the FUNCTION was unreachable — but Python says nothing until the
+call executes, and the call executes only on the operator's path.
+
+**Why 15/15 controls did not see it (D-3036: a control that tests a re-implementation tests nothing).** Control 11
+called `stamp(done, {...})` at MODULE scope, where `stamp` is the function. It proved the function works. The crash
+lived in the one composition the controls never entered: `run()`. A control that calls a unit the way its author
+remembers is not a control over the path the operator drives.
+
+**RED LOOP.** RED: the traceback above, verbatim, on `just admit-apply --dry-run`. GREEN: the same door prices the
+plan with rc 0 (see BUG-882 for the timing reading), and the reader's own controls read **22/22**, two of them new
+and two-sided: `the_shadow_detector_FINDS_a_planted_shadow` (a synthetic module whose `run()` binds `stamp`) and
+`THIS_file_binds_no_local_that_shadows_a_module_callable` (the file's own bytes, parsed, every function's local
+bindings intersected with module-level callables). The detector is a CLASS check: `shadowed_module_names()`.
+
+**Swept, not just patched.** The same scan over every first-party `.py` (excluding `.venv*`, `archive/`) found
+**3** sites; the other two are latent (they bind a module-level name and never call it) and were renamed anyway:
+`audit_menu_rescope_cohort._canonical_run` (`run`) and `bakeoff_typed_decision.arm_deberta` (`score`). The reading
+that re-takes it is the `ast` scan in this entry's RED LOOP; promoting that scan to a rail is a PROPOSAL, not an act
+(no rail was created: the class is now covered inside the file that committed the defect, and a new rail would owe a
+registry row, a ladder line and its own controls).
+
+### BUG-882 (MED, FIXED 2026-10-17) — A DRY RUN READ EVERY SOURCE IN FULL: pricing the plan cost 8.0 GiB of I/O and STALLED for minutes on an unmaterialised Dropbox file
+
+**Measured 2026-10-17, two-sided, on the same door.** The full `just admit-apply --dry-run` (479 rows) had not
+returned after **300 s** and two child processes were asleep in I/O. With `--limit 3` the same command finished in
+**0.7 s**, and with `--limit 100` in **5.0 s** — so the cost was per row, not per run. The run had reached row 309:
+
+```
+would journals_notes/DOMAIN 2 Design/design-notes/pdf/Sound design/Mastering.pdf -> ...
+```
+
+`apply_row()` computed `sha256_bytes(source)` **before** the `apply` branch: a dry run hashed all 479 sources —
+**8,271.5 MiB** — and on this Dropbox-backed library an unmaterialised PDF costs a cloud fetch, so a *pricing*
+command could block for minutes with nothing on screen saying why. The act needs the digest as EVIDENCE of what it
+copied; the price needs only `stat`, which answers "did it change since the plan was derived" in microseconds.
+
+**RED LOOP.** RED: `just admit-apply --dry-run` → no output after 300 s (twice), two `apply_admission.py` children
+parked in I/O. GREEN: the full 479-row price returns in **16.6 s** (and 477 rows in **17 s** after BUG-883), and two
+new controls pin the placement: `a_dry_run_does_NOT_read_the_source_bytes` (a source rewritten to the SAME size with
+different bytes still prices as `would_apply` with an EMPTY digest — proving no hash ran) and
+`the_ACT_takes_the_source_digest` (the same row, applied, carries the digest). The pair is two-sided: deleting the
+hash entirely turns the second control red.
+
+### BUG-883 (HIGH, FIXED 2026-10-17) — THE DOOR'S KEY WAS NOT NORMALISATION-INVARIANT: ONE WORK, TWO IDENTITIES (the corpus held `Galič` NFC, the source library held `c`+U+030C NFD)
+
+**Measured 2026-10-17, on the one row the writer refused.** The 479-row price returned exactly one refusal:
+
+```
+NO  books/md/DOMAIN 7 .../Galič2017_Article_BenthamDeleuzeAndBeyondAnOverv -> the markdown target already exists
+    and NO receipt accounts for it
+```
+
+The plan called that work a NEW candidate; a file already sat at the derived target with **109,817** bytes against
+the source's **109,798** — a 19-byte `# <stem>\n\n` heading. The cause was not a stale plan: it was TEXT FORM.
+
+```
+corpus .md NFC  key chars: ['0x10d']                 (one precomposed č)
+source .md NFD  key chars: ['0x30c']                 (c + combining caron)
+source .pdf NFD key chars: ['0x30c']
+```
+
+`sanitize_source_book()` — the ONE key producer the ingest door, the census, the plan, the applier and the rename
+planner all call — stripped and regexed the name but never normalised it, so both forms minted DIFFERENT keys for the
+SAME work. MEASURED span: **6** of 939 corpus keys and **8** of 960 ingest-cache keys are non-NFC.
+
+**Why this is HIGH and not cosmetic.** Three consequences, and the third is the dangerous one:
+1. the reader classified a work the corpus HOLDS as a NEW admission candidate (`already_in_the_corpus` 1,668 → the
+   work reads as unseen), so the plan and the writer disagreed by a row — the owner would sign a plan carrying a row
+   that must refuse;
+2. `admit_candidate` over-counted (479 → 477), and `refused_name_repair_first` over-counted (194 → 179);
+3. macOS is normalisation-INSENSITIVE at lookup, which is the only reason the writer's `target.exists()` caught it.
+   On a normalisation-SENSITIVE filesystem — Linux, which C26 names as a target — the applier would have **created
+   the twin** and the corpus would hold one work twice, with the ingest door keying them apart forever.
+
+**RED LOOP.** RED: `plan_admission --brief` read `candidates 479` while `apply_admission --dry-run` refused a row it
+had itself priced. GREEN: NFC normalisation at the ONE producer (`pipeline/book_metadata.sanitize_source_book`)
+makes the key invariant — `candidates 477`, `already_in_the_corpus 1688`, and `apply_admission --dry-run` prints
+**477 would_apply, 0 refusals, rc 0**. New control:
+`the_same_work_spelled_NFC_and_NFD_is_ONE_key_and_distinct_names_stay_distinct` (two-sided: a normaliser that
+flattened every name would satisfy the first half only). Every consumer's own controls stay green (census 18/18,
+plan_source_rename 11/11, normalise_corpus_names 10/10, ingest_identity_gate 20/20, apply_admission 22/22,
+book_metadata 9/9 pytest).
+
+**Why NFC and not "compare loosely".** NFC is IDEMPOTENT: every name that is already NFC keeps the key it has today,
+so nothing persisted is re-keyed and no migration is owed. A case-folded or accent-stripped key would have merged
+genuinely different works. The 6 NFD corpus names and 8 NFD cache names are now READ correctly; renaming the files
+themselves is the owner-gated path (`normalise_corpus_names`), not this fix.
+
+### BUG-884 (LOW, FIXED 2026-10-17) — A GOVERNED REFUSAL CRASHED WHILE REPORTING ITSELF: `ValueError: invalid literal for int()` instead of the digest mismatch it had just detected
+
+**Measured 2026-10-17, on the first stale signature this plan ever met.** After the plan was re-derived (new digest),
+the old signature became exactly what the design says it must be — REFUSED. It refused, and then crashed:
+
+```
+ValueError: invalid literal for int() with base 10: 'FATAL: the acceptance pins digest 2cc69892... but
+ADMISSION_PLAN_20261017.json hashes to 191a13e3...'
+```
+
+`ApplierError(SystemExit)` was raised with a MESSAGE, so `.code` held that message; the handler did
+`int(exc.code or RC_FATAL)` and turned every governed refusal into a traceback.
+
+**Why it matters even though fail-closed held.** Nothing was written — the exit code was still non-zero — but the
+one thing a refusal exists to do is SAY WHY, and the digest mismatch is the sentence that teaches the operator to
+re-print the signature instead of hunting a ghost. A refusal that cannot speak is BUG-457's shape with the polarity
+reversed: loud in exit code, silent in text.
+
+**RED LOOP.** RED: the traceback above, on `apply_admission --dry-run` against the stale acceptance. GREEN: the same
+command now prints the full sentence and exits 1, and two controls pin both branches —
+`a_refusal_exits_RC_FATAL_when_its_code_is_a_message` and `a_refusal_keeps_a_declared_INTEGER_code`. The normaliser
+is `applier_rc(exc)`, one function, no second handler.
+
+### BUG-885 (MED, OPEN 2026-10-17) — THE DECLARED `disproven` PREFIX-CACHE STATE NO LONGER REPRODUCES: the server served 5,888 of 5,894 prompt tokens from cache, and the doctrine built on "every turn re-pays its whole prompt" is now unmeasured
+
+**Measured 2026-10-17, one command, four models.** BUG-792 (2026-10-14) recorded `prompt_tokens_details.cached_tokens
+= 0` on every call and declared the prefill question `disproven`, which is why the parallel-execution doctrine treats
+a long agent context as an unpayable bill. Re-taken today against `localhost` OMLX with a 5,894-token prompt twice
+per model:
+
+```
+Qwen3-Coder-30B-A3B-Instruct-MLX-4bit  ttft=0.58s cached=5888/5894
+gemma-4-E4B-it-MLX-4bit                ttft=11.78s (load) then 0.50s cached=5893/5896
+```
+
+The cache is WARM. Whatever the 2026-10-14 reading caught (a 4,096-token block boundary after a model load, per that
+entry), it is not the steady state today, and the difference is decisive for delegation policy: a 6k-token agent turn
+costs ~0.5-1.9 s of prefill, not a full re-read.
+
+**Same day, the model question itself.** One probe — 2 tools, one dependent instruction — on four served models:
+
+| model | prompt | ttft | decode | tool call emitted |
+|---|---|---|---|---|
+| Qwen3-Coder-30B-A3B-Instruct-MLX-4bit | 5,900 | 1.87 s | 34.5 tok/s | `read_file {"path": "governance/buglog.md"}` |
+| gemma-4-E4B-it-MLX-4bit | 5,901 | 0.77 s | 30.8 tok/s | same |
+| Ornith-1.5-35B-A3B-REAP-19B | 5,902 | 42.88 s (load) | **210.6 tok/s** | same |
+| Qwen3.8-27B-MLX-4bit | 5,904 | 134.29 s (load) | 8.2 tok/s | same |
+
+Four of four emitted a correct tool call with the right argument. That does NOT promote any of them — one probe is a
+probe, and T-187 (the two-tool, two-DEPENDENT-step fixture with a distractor and an expected answer only the second
+tool's output can produce) is still the only gate. It does DISPROVE the standing sentence "only gemma can be used for
+multi-turn agentic work, the rest are useless": what was measured in the past was a cold-load stall plus a cold
+prefix, not a capability. The correct state word for the other three is **UNMEASURED**, and the ttft column above
+shows the real operational cost is MODEL SWAP (42 s, 134 s), which a warm model does not pay.
+
+**Owed (not done here, and not silently):** re-run BUG-792's declared protocol end to end, then either close it with
+the new reading or name the variable that changed. Until then this entry holds the MEASUREMENT only, and the ladder's
+`--check` readings are unaffected because BUG-792's state lives in the buglog, not in a rail.

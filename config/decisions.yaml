@@ -27423,3 +27423,51 @@ decisions:
   - 'The owner launches with `just go` and does nothing else: no `eval`, no profile, no remembered scope. `just session workshop` remains the escape hatch for bulk file tools.'
   - 'A shell that launches `goose` by hand is still UNBOUND, and `harness_env.py --check` still reads rc 2 there - that is the correct reading, not a fault to silence.'
   - 'A deliberate per-session model override must now be explicit at the harness level (or the door must be bypassed on purpose): the one door will not out-vote the declared contract.'
+
+- id: D-3070  # IDENTITY / NAMES — ONE TEXT FORM: every identity key is NFC-normalised at its single producer
+  state: ACTIVE
+  date: '2026-10-17'
+  by: assistant
+  category: IDENTITY / NAMES
+  bugs: [BUG-883]
+  files:
+  - pipeline/book_metadata.py
+  title: >-
+    One work has ONE identity: every key minted from a name is NFC-normalised at the ONE producer
+    (pipeline/book_metadata.sanitize_source_book), so two spellings of the same title can never be two works
+  context: >-
+    BUG-883, measured 2026-10-17 on the one row the admit applier refused. The corpus held
+    'Galič2017_Article...' with a PRECOMPOSED č (U+010D) while the source library held
+    'c' + COMBINING CARON (U+030C) for the identical work. sanitize_source_book() stripped and regexed the name but
+    never normalised it, so the same work minted two keys: the admission reader called an in-corpus work a NEW
+    candidate (479 instead of 477), the name-repair class over-counted (194 instead of 179), and the applier refused
+    the row it had just priced. macOS hid the split because its lookup is normalisation-INSENSITIVE; on Linux, which
+    C26 names as a target platform, the applier would have created the TWIN and the ingest door would have keyed the
+    two copies apart forever. 6 of 939 corpus keys and 8 of 960 ingest-cache keys were non-NFC.
+  decision: >-
+    The key is normalised to NFC WHERE IT IS MINTED, not where it is compared. sanitize_source_book() - already the
+    single key producer for the ingest door, the census, the admission plan, the applier and the rename planner -
+    gains unicodedata.normalize("NFC", ...) as its first act. No consumer gains a second normalisation, and no
+    comparison site grows a "loose match".
+  rationale: >-
+    NFC is IDEMPOTENT, which is the whole reason it is safe: every name already in NFC keeps the key it has today, so
+    nothing persisted is re-keyed and no migration is owed, while the 14 measured NFD names start resolving to the
+    works they always were. The rejected alternatives are the usual three: (a) compare casefolded/stripped-of-accents
+    keys - that MERGES genuinely different works and destroys identity to fix a spelling; (b) normalise at every
+    comparison site - a second and third home for the rule, which is C12's failure mode; (c) rename the files now -
+    that is the owner-gated path (normalise_corpus_names, plan-first) and it fixes the FILES while leaving the
+    IDENTITY rule broken for the next arrival.
+  evidence: >-
+    MEASURED 2026-10-17, two-sided. BEFORE: 'plan_admission --brief' read candidates 479 / name-repair 194 /
+    already-in-corpus 1668, and 'apply_admission --dry-run' printed 478 would_apply + 1 REFUSED ("the markdown target
+    already exists and NO receipt accounts for it") - the reader and the writer disagreed by a row. AFTER: candidates
+    477 / name-repair 179 / already-in-corpus 1688 and the dry run prints 477 would_apply, 0 refusals, rc 0 in 17 s.
+    New known-answer control 'the_same_work_spelled_NFC_and_NFD_is_ONE_key_and_distinct_names_stay_distinct'
+    (plan_admission 20/20). Every consumer's controls stay green: census_source_names 18/18, plan_source_rename 11/11,
+    normalise_corpus_names 10/10, check_ingest_identity_gate 20/20, apply_admission 22/22, book_metadata pytest 9/9.
+    R5 (generator != verifier): gemma-4-E4B-it-MLX-4bit, VERDICT APPROVE, sha256_16=106ba3090bfcebf1
+    (governance/r5_reviews.jsonl).
+  consequences:
+  - 'A name key is a pure function of the TEXT, never of how an OS handed the bytes over: the same work cannot be admitted twice by spelling it differently.'
+  - 'The 14 measured NFD names (6 corpus, 8 cache) are now READ correctly; renaming the corpus files themselves stays an owner-gated plan (normalise_corpus_names), so a reader repair never moves a file.'
+  - 'A future consumer that mints a key WITHOUT sanitize_source_book is a second identity (D-3045) and must be routed through the one producer, not given its own normalisation.'

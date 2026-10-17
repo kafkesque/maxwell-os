@@ -1,7 +1,7 @@
 {
   "act": "T-181 admission plan",
   "authority": "D-3051",
-  "generated": "2026-10-17T12:22:00Z",
+  "generated": "2026-10-17T13:01:23Z",
   "corpus_home": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books",
   "accepted_containers": [
     ".epub",
@@ -23,8 +23,8 @@
     {
       "id": "books",
       "files": 2181,
-      "seen": 1688,
-      "never_seen": 493,
+      "seen": 1706,
+      "never_seen": 475,
       "admits_to": "corpus_home"
     },
     {
@@ -36,18 +36,18 @@
     }
   ],
   "files": 2811,
-  "seen": 1697,
-  "never_seen": 1114,
-  "seen_keys": 950,
-  "unseen_keys": 1029,
+  "seen": 1715,
+  "never_seen": 1096,
+  "seen_keys": 959,
+  "unseen_keys": 1020,
   "counts": {
-    "already_in_the_corpus": 1668,
-    "seen_by_an_ingest_record": 29,
-    "admit_candidate": 479,
+    "already_in_the_corpus": 1688,
+    "seen_by_an_ingest_record": 27,
+    "admit_candidate": 477,
     "refused_no_declared_corpus_home": 0,
     "refused_container_no_stage_reads_it": 389,
-    "refused_name_repair_first": 194,
-    "refused_not_in_its_kind_folder": 52,
+    "refused_name_repair_first": 179,
+    "refused_not_in_its_kind_folder": 51,
     "refused_domain_not_a_corpus_domain": 0
   },
   "examples": {
@@ -83,10 +83,10 @@
     ],
     "refused_not_in_its_kind_folder": [
       "books/epub/DOMAIN 2 Design/communication+design/_Visual Metaphor Structure and Process (Gerard J.Steen) (z-library.sk, 1",
-      "books/epub/DOMAIN 2 Design/design+systems/Design Beyond Limits with Figma 50+ Figma solutions for advanced collaboration",
       "books/epub/DOMAIN 4 Business/practice+economics/100-Habits of Successful Freelance Designers Insider Secrets for Working",
       "books/epub/DOMAIN 4 Business/practice+economics/365 Habits of Successful Graphic Designers Insider Secrets from Top Desi",
-      "books/pdf/DOMAIN 0 Systems + Decision/execution+operations/The Art of Strategy_ A Game Theorist_'s Guide to Success in B"
+      "books/pdf/DOMAIN 0 Systems + Decision/execution+operations/The Art of Strategy_ A Game Theorist_'s Guide to Success in B",
+      "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/AMARINGO, Pablo et al - Plant Spirit Shamanism T"
     ],
     "refused_domain_not_a_corpus_domain": []
   },
@@ -353,15 +353,6 @@
       "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 5 Personal Practice/productivity+execution/HBR Management Tips Collection (2 Books) Harvard Business Review liber3.md"
     },
     {
-      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/md/DOMAIN 7 Influence + Power/social+engineering+profiling/Galic\u030c2017_Article_BenthamDeleuzeAndBeyondAnOverv.md",
-      "rel": "books/md/DOMAIN 7 Influence + Power/social+engineering+profiling/Galic\u030c2017_Article_BenthamDeleuzeAndBeyondAnOverv.md",
-      "root": "books",
-      "kind": "md",
-      "key": "galic\u030c2017_article_benthamdeleuzeandbeyondanoverv",
-      "bytes": 109798,
-      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 7 Influence + Power/social+engineering+profiling/Galic\u030c2017_Article_BenthamDeleuzeAndBeyondAnOverv.md"
-    },
-    {
       "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/FULLTEXT01.pdf",
       "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/FULLTEXT01.pdf",
       "root": "books",
@@ -600,7 +591,7 @@
       "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Frater Oz - A Bi\u0301blia Vampi\u0301rica.pdf",
       "root": "books",
       "kind": "pdf",
-      "key": "frater oz - a bi\u0301blia vampi\u0301rica",
+      "key": "frater oz - a b\u00edblia vamp\u00edrica",
       "bytes": 99829,
       "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Frater Oz - A Bi\u0301blia Vampi\u0301rica.md"
     },
@@ -621,15 +612,6 @@
       "key": "fulcanelli - the dwellings of the philosophers (les demeures philosophales",
       "bytes": 1732415,
       "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Fulcanelli - The Dwellings of the Philosophers (Les Demeures Philosophales).md"
-    },
-    {
-      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Galic\u030c2017_Article_BenthamDeleuzeAndBeyondAnOverv.pdf",
-      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Galic\u030c2017_Article_BenthamDeleuzeAndBeyondAnOverv.pdf",
-      "root": "books",
-      "kind": "pdf",
-      "key": "galic\u030c2017_article_benthamdeleuzeandbeyondanoverv",
-      "bytes": 824074,
-      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Galic\u030c2017_Article_BenthamDeleuzeAndBeyondAnOverv.md"
     },
     {
       "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Gerard Cremonensis, Astrological Geomancy.pdf",
@@ -1194,7 +1176,7 @@
       "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/mental+models+epistemology/The Agony of Power (Jean Baudrillard, Sylve\u0300re Lotringer) (Z-Library).pdf",
       "root": "books",
       "kind": "pdf",
-      "key": "the agony of power (jean baudrillard, sylve\u0300re lotringer",
+      "key": "the agony of power (jean baudrillard, sylv\u00e8re lotringer",
       "bytes": 1559048,
       "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/mental+models+epistemology/The Agony of Power (Jean Baudrillard, Sylve\u0300re Lotringer) (Z-Library).md"
     },
@@ -1590,7 +1572,7 @@
       "rel": "books/pdf/DOMAIN 2 Design/visual+fundamentals/How to create typefaces from sketch to screen (Cristo\u0301bal Henestrosa Matus, Jose\u0301 Scaglione) (Z-Library).pdf",
       "root": "books",
       "kind": "pdf",
-      "key": "how to create typefaces from sketch to screen (cristo\u0301bal henestrosa matus, jose\u0301 scaglione",
+      "key": "how to create typefaces from sketch to screen (crist\u00f3bal henestrosa matus, jos\u00e9 scaglione",
       "bytes": 84705163,
       "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/visual+fundamentals/How to create typefaces from sketch to screen (Cristo\u0301bal Henestrosa Matus, Jose\u0301 Scaglione) (Z-Library).md"
     },
@@ -2031,7 +2013,7 @@
       "rel": "books/pdf/DOMAIN 5 Personal Practice/mood+therapy/Hamvas Be\u0301la - Scienta Sacra 1. Ko\u0308tet.pdf",
       "root": "books",
       "kind": "pdf",
-      "key": "hamvas be\u0301la - scienta sacra 1. ko\u0308tet",
+      "key": "hamvas b\u00e9la - scienta sacra 1. k\u00f6tet",
       "bytes": 911281,
       "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 5 Personal Practice/mood+therapy/Hamvas Be\u0301la - Scienta Sacra 1. Ko\u0308tet.md"
     },
@@ -2382,7 +2364,7 @@
       "rel": "journals_notes/DOMAIN 2 Design/Handbook_Of_Interior_Lighting_Design_by_Ru\u0308diger_Ganslandt,_Harald.pdf",
       "root": "journals_notes",
       "kind": "pdf",
-      "key": "handbook_of_interior_lighting_design_by_ru\u0308diger_ganslandt,_harald",
+      "key": "handbook_of_interior_lighting_design_by_r\u00fcdiger_ganslandt,_harald",
       "bytes": 4451182,
       "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/Handbook_Of_Interior_Lighting_Design_by_Ru\u0308diger_Ganslandt,_Harald.md"
     },

@@ -29,6 +29,7 @@ refused row, a failed conversion, an escape from the corpus home).
 from __future__ import annotations
 
 import argparse
+import ast
 import hashlib
 import json
 import os
@@ -59,6 +60,14 @@ GEN_MODEL = "deterministic"  # R14: this act is not a model's — it is a repeat
 
 class ApplierError(SystemExit):
     """Fail-closed: an undeclared, absent or unresolvable input is a fault, never a silent zero (C16/D-795)."""
+
+
+def applier_rc(exc: SystemExit) -> int:
+    """The exit code of a refusal — BUG-884: a message passed to SystemExit lands in `.code` as a STRING, so the
+    first handler turned every governed refusal ("the acceptance pins digest X but Y hashes to Z") into
+    `ValueError: invalid literal for int()`. Fail-closed held — nothing was written — but the operator got a
+    traceback instead of the refusal, which is the one thing a refusal exists to say."""
+    return exc.code if isinstance(exc.code, int) else RC_FATAL
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -348,12 +357,17 @@ def apply_row(row: dict[str, Any], corpus: Path, decl: dict[str, Any], index: di
     if not source.is_file():
         record.update(state="refused", reason="the source file is gone (the plan names bytes that no longer exist)")
         return record
-    source_digest = sha256_bytes(source)
+    source_digest = ""
     if int(row.get("bytes") or -1) != source.stat().st_size:
         record.update(state="refused",
                       reason=f"the source changed since the plan was derived ({row.get('bytes')} -> "
                              f"{source.stat().st_size} bytes)")
         return record
+    # BUG-882: a DRY RUN PRICES the work. Hashing here read every source in full — 8.0 GiB over 479 rows, and on
+    # this Dropbox-backed library an unmaterialised PDF STALLED the reading for minutes (row 309, 2026-10-17).
+    # `stat` answers "did it change" in microseconds; the digest is EVIDENCE of the ACT and is taken only when acting.
+    if apply:
+        source_digest = sha256_bytes(source)
     record["source_sha256"] = source_digest
     #: The rename rides FIRST (T-176): an admitted name is the corpus name AND the door's key.
     patterns = plan_admission.name_patterns(census.policy(POLICY))
@@ -421,6 +435,36 @@ def path_inside(root: Path, path: Path) -> bool:
         return False
 
 
+def shadowed_module_names(source: str) -> list[str]:
+    """Local bindings that shadow a module-level callable of the SAME file — the defect class of BUG-881.
+
+    WHY a class and not the instance: `stamp = datetime.now(...)` inside `run()` made the module's own
+    `stamp(...)` call a `TypeError: 'str' object is not callable` at the moment the operator ran the ACT.
+    No control caught it because the controls called `stamp()` directly — they tested the UNIT, the crash lived
+    in the COMPOSITION. A name bound locally over a module-level callable is unreachable from that point on, and
+    Python reports it only when that line finally executes. So the check is static, whole-file, and reads the
+    file's own bytes: it names every function/class of module scope that some function binds over.
+    """
+    tree = ast.parse(source)
+    module_level = {node.name for node in tree.body
+                    if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))}
+    findings: list[str] = []
+    for fn in ast.walk(tree):
+        if not isinstance(fn, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            continue
+        bound: set[str] = set()
+        for node in ast.walk(fn):
+            if isinstance(node, ast.Assign):
+                targets: list[ast.expr] = list(node.targets)
+            elif isinstance(node, (ast.AnnAssign, ast.AugAssign, ast.For)):
+                targets = [node.target]
+            else:
+                continue
+            bound.update(t.id for t in targets if isinstance(t, ast.Name))
+        findings += [f"{fn.name}:{name}" for name in sorted((bound & module_level) - {fn.name})]
+    return findings
+
+
 # ---------------------------------------------------------------------------------------------------------------------
 # THE RUN
 # ---------------------------------------------------------------------------------------------------------------------
@@ -469,10 +513,10 @@ def run(plan_path: Path | None, accept_path: Path | None, *, apply: bool, conver
         raise ApplierError(f"FATAL: {need / 2**30:.2f} GiB to copy but {free / 2**30:.2f} GiB free in {corpus}")
 
     index = receipt_index(decl)
-    stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
-    out_path = receipt_path(decl, stamp)
+    run_stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")  # BUG-881: never `stamp` — that name is the FUNCTION below
+    out_path = receipt_path(decl, run_stamp)
     header = {"schema_version": SCHEMA_VERSION, "gen_model": GEN_MODEL, "state": "run",
-              "ts": stamp, "plan": str(plan_path), "plan_sha256": plan_digest,
+              "ts": run_stamp, "plan": str(plan_path), "plan_sha256": plan_digest,
               "accept": str(accept_path), "accept_sha256": sha256_bytes(accept_path),
               "mode": acc["mode"], "apply": apply, "convert": convert, "rows": len(rows),
               "bytes": need, "pipeline_commit": pipeline_commit()}
@@ -584,6 +628,25 @@ def selftest() -> int:
         expect("a_dry_run_writes_no_file_and_no_receipt", before == after and dry["state"] == "would_apply",
                dry["state"])
 
+        # 3b. BUG-882: the DRY RUN prices the work — it does not READ it. A source rewritten to the SAME size with
+        #     different bytes stays invisible to the dry run (empty digest) and is caught by the ACT, which takes
+        #     the digest because the digest is EVIDENCE of the act. This is the control that a hash cannot creep
+        #     back in front of `apply`: on this Dropbox-backed library it read 8.0 GiB and STALLED a pricing run.
+        twin = library / "epub" / "DOMAIN 1 Test" / "A Twin.md"
+        twin.write_text("AAAA" * 100, encoding="utf-8")
+        twin_row = dict(rows[0], path=str(twin), rel="books/epub/DOMAIN 1 Test/A Twin.md", key="a twin", kind="md",
+                        bytes=twin.stat().st_size, target=str(corpus / "DOMAIN 1 Test" / "A Twin.md"))
+        twin.write_text("BBBB" * 100, encoding="utf-8")  # same size, different bytes
+        index = receipt_index(decl)
+        priced = apply_row(twin_row, corpus, decl, index, apply=False, convert=False)
+        expect("a_dry_run_does_NOT_read_the_source_bytes",
+               priced["state"] == "would_apply" and priced["source_sha256"] == "",
+               (priced["state"], priced["source_sha256"]))
+        index = receipt_index(decl)
+        acted = apply_row(twin_row, corpus, decl, index, apply=True, convert=False)
+        expect("the_ACT_takes_the_source_digest", acted["state"] == "applied"
+               and acted["source_sha256"] == sha256_bytes(twin), (acted["state"], acted["source_sha256"][:12]))
+
         # 4. a defective name is refused even when the plan carries it — through the WRITER, not a lookup
         bad_source = library / "epub" / "DOMAIN 1 Test" / "A Work (z-lib.org).epub"
         bad_source.write_bytes(b"EPUB-BYTES" * 100)
@@ -662,6 +725,25 @@ def selftest() -> int:
                rendered["plan_sha256"] == digest and rendered["mode"] == "all"
                and rendered["plan"] == str(plan_file), rendered)
 
+        # 14. BUG-881: no local binding shadows a module-level callable of THIS file (the class, not the instance).
+        #     The instance was `stamp = <str>` inside run(), which made the module's own stamp() uncallable — and
+        #     control 11 below WOULD NOT SEE IT, because it called stamp() directly: the unit, not the composition.
+        planted = ("def stamp(r, h):\n    return r\n\n\ndef run():\n    stamp = 'a string'\n"
+                   "    return stamp({}, {})\n")
+        expect("the_shadow_detector_FINDS_a_planted_shadow",
+               shadowed_module_names(planted) == ["run:stamp"], shadowed_module_names(planted))
+        expect("a_clean_module_reports_no_shadow", shadowed_module_names("def f():\n    return 1\n") == [])
+        own = Path(__file__).read_text(encoding="utf-8")
+        expect("THIS_file_binds_no_local_that_shadows_a_module_callable",
+               shadowed_module_names(own) == [], shadowed_module_names(own))
+
+        # 15. BUG-884: a REFUSAL prints its message and exits RC_FATAL — never a traceback. A message string handed
+        #     to SystemExit lands in `.code`, so `int(exc.code)` turned the digest-mismatch refusal into a
+        #     ValueError. Both branches are asserted: a message string AND a declared integer code.
+        expect("a_refusal_exits_RC_FATAL_when_its_code_is_a_message",
+               applier_rc(ApplierError("FATAL: the acceptance pins a different digest")) == RC_FATAL)
+        expect("a_refusal_keeps_a_declared_INTEGER_code", applier_rc(ApplierError(RC_OWNER_OWED)) == RC_OWNER_OWED)
+
     passed = sum(1 for _label, ok in checks if ok)
     for label, ok in checks:
         print(f"{'ok  ' if ok else 'FAIL'} {label}")
@@ -700,7 +782,7 @@ def main(argv: list[str] | None = None) -> int:
                    limit=args.limit, json_out=args.json)
     except ApplierError as exc:
         print(str(exc))
-        return int(exc.code or RC_FATAL)
+        return applier_rc(exc)
 
 
 if __name__ == "__main__":

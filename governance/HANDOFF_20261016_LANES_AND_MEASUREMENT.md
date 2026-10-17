@@ -985,3 +985,144 @@ just admit-apply --limit 10    # the first tranche
 A control (`the_acceptance_template_parses_and_pins_the_live_digest`, 15/15) fails if the printed signature ever
 stops matching the plan it names. §f.3's hand-written template is therefore **SUPERSEDED by this paragraph** — it
 still works, but the printed one cannot be mistyped.
+
+---
+
+## §1j — NINTH SITTING (2026-10-17, 14:46): THE FIRST REAL RUN OF THE APPLIER FOUND FOUR DEFECTS (all fixed, all controlled), ONE OF THEM HIGH — and the SITTING'S BIGGEST FINDING IS THAT THE HOUSE'S OWN "only gemma can do multi-turn" RULE NO LONGER HOLDS
+
+Append-only. Nothing above is rewritten; where this section contradicts an earlier one, THIS section is the reading,
+and the earlier one stays visible as the history of how the belief was formed.
+
+### a. WHAT THE OWNER'S COMMAND ACTUALLY DID
+
+`just admit-apply --dry-run` — the first run of the applier with a (unsigned) acceptance on disk — printed
+`TypeError: 'str' object is not callable`. That single command then produced four bugs, one of them HIGH. None of the
+four was findable by reading the file: each fell out of RUNNING THE DOOR THE OPERATOR RUNS.
+
+| bug | severity | what it was | state |
+|---|---|---|---|
+| BUG-881 | MED | a local `stamp = <str>` binding in `run()` shadowed the module's own `stamp()`, and all 15 controls called `stamp()` directly — they tested the UNIT, the crash lived in the COMPOSITION | FIXED + 2 controls (planted shadow found; this file's own bytes clean) |
+| BUG-882 | MED | the DRY RUN hashed every source: 8,271.5 MiB read to PRICE the plan, >300 s stall on one unmaterialised Dropbox PDF (row 309). The price is now `stat` only, 17 s | FIXED + 2 controls (dry run leaves the digest EMPTY; the ACT takes it) |
+| BUG-883 | **HIGH** | the door's key was NOT NFC-normalised: the corpus held `Galič` precomposed (U+010D), the library held `c`+U+030C for the SAME work, so ONE work had TWO identities | FIXED at the one producer, D-3070 |
+| BUG-884 | LOW | a governed refusal crashed while reporting itself: `int(exc.code)` on a SystemExit whose code was the MESSAGE → `ValueError` instead of "the acceptance pins digest X but Y hashes to Z" | FIXED + 2 controls (message → RC_FATAL, integer kept) |
+
+### b. WHY BUG-883 IS THE ONE TO REMEMBER
+
+It is the first defect in this sitting that would have produced **silent duplicate knowledge**, not a missing step:
+
+1. the reader called a work the corpus HELD a NEW admission candidate (479 instead of 477) — so the owner's signature
+   would have covered a row that must refuse;
+2. `refused_name_repair_first` over-counted (194 vs 179) — a *name defect* class absorbing names that were merely
+   spelled differently, which is the wrong ontology for T-176;
+3. **macOS hid it.** Its lookup is normalisation-insensitive, so the applier's `target.exists()` caught the collision
+   and refused. On Linux — C26 names it as a target platform — that same check is FALSE and the applier would have
+   **created the twin**, with the ingest door keying the two copies apart forever.
+
+The cure is one line at the ONE producer (`pipeline/book_metadata.sanitize_source_book`), chosen for IDEMPOTENCE: NFC
+leaves every already-NFC name's key untouched, so nothing persisted is re-keyed and no migration is owed. Rejected:
+a casefolded/accent-stripped comparison (it MERGES different works), normalising at each comparison site (a second
+home for the rule), and renaming the files now (that is the owner-gated `normalise_corpus_names`, and it fixes the
+FILES while leaving the IDENTITY rule broken for the next arrival).
+
+The 14 measured NFD names (6 corpus, 8 ingest-cache) now resolve. Renaming the 6 corpus files is still the owner's.
+
+### c. THE FINDING THAT CHANGES POLICY — the "only gemma" rule is a measurement artefact, not a capability
+
+The standing sentence, in `AGENTS.md` and in `DELEGATE-002`, is: *Qwen3-Coder's multi-turn decode collapses (~6.8 →
+0.4 tok/s) as agent context grows; gemma-4-E4B is the only confirmed multi-turn model.* MEASURED TODAY, on this
+machine, one command each:
+
+```
+Qwen3-Coder-30B-A3B-Instruct-MLX-4bit   5,900-token prompt   ttft 0.58 s   cached 5,888/5,894
+gemma-4-E4B-it-MLX-4bit                 5,896-token prompt   ttft 0.50 s   cached 5,893/5,896 (after a 11.8 s load)
+```
+
+**The prefix cache is WARM.** BUG-792 recorded `cached_tokens = 0` on every call on 2026-10-14 and declared the
+question `disproven`; that state does not reproduce. A 6k-token agent turn costs ~0.5-1.9 s of prefill, not a full
+re-read — which is the whole mechanism the "collapse" story blamed.
+
+And the capability question, asked directly (2 tools, 1 dependent instruction, same prompt to four served models):
+
+| model | prompt | ttft | decode | tool call |
+|---|---|---|---|---|
+| Qwen3-Coder-30B-A3B-Instruct-MLX-4bit | 5,900 | 1.87 s | 34.5 tok/s | `read_file{"path":"governance/buglog.md"}` |
+| gemma-4-E4B-it-MLX-4bit | 5,901 | 0.77 s | 30.8 tok/s | same |
+| Ornith-1.5-35B-A3B-REAP-19B | 5,902 | 42.9 s (LOAD) | **210.6 tok/s** | same |
+| Qwen3.8-27B-MLX-4bit | 5,904 | 134.3 s (LOAD) | 8.2 tok/s | same |
+
+Four of four emitted a correct tool call with the correct argument. That is ONE probe and it promotes NOTHING —
+T-187 (two tools with a distractor, two DEPENDENT steps, an answer only the second tool's output can produce) remains
+the only gate. But it does dispose of "the rest are useless": what was measured before was a COLD MODEL LOAD
+(42 s, 134 s) plus a cold prefix, and a delegate that hits a cold load looks exactly like a model that cannot think.
+The correct state word for the other three is **UNMEASURED**, and BUG-885 holds the reading.
+
+**So: is there no reliable candidate on HuggingFace?** No — that conclusion was never measured. What exists and is
+MLX-convertible at a size this machine can hold (all confirmed present on the hub today): **Qwen3-30B-A3B-Instruct-
+2507** (the INSTRUCT refresh, not the coder variant that collapsed; 3B active params), **Devstral-Small-2507** (24B,
+built for agentic coding loops), **Hermes-4-14B** (function-calling tuned), **granite-4.0-h-small** (compact, tool-
+trained), and **GLM-4.5-Air** (106B — outside the 24 GB delegate budget; do not). The house already serves a 19B-class
+MoE at 210 tok/s. The missing thing is not a model. It is the fixture that decides between them, which is T-187.
+
+### d. THE THREE SOURCES THE OWNER ASKED ABOUT — what to borrow, what to refuse
+
+**leanrea (`github.com/aicodeking/leanrea`) — ADOPT THE PATTERN, not the package.** It is ONE 8 KB `SKILL.md` that
+replaces an MCP server's 207 tool definitions. Measured on 4 RE tasks × 3 reps: 34.5k tokens of context vs 400.7k
+with every tool loaded, 38% less wall time, 56% fewer turns, **same accuracy (74/75 vs 75/75)**. That is the same
+finding this house already paid for twice — filesystem + gitmcp-mcp cost 5,633 tokens on EVERY request (T-186/D-3067)
+— and it is the exact shape the four pstack skills should take: a decision table, ready-to-paste commands, and the
+traps. Never a tool schema. No third-party integration is needed or wanted: the artifact is a paragraph of Markdown.
+
+**vibe-kanban (BloopAI, 28.4k stars; `vibekanban.com`) — BORROW TWO IDEAS, refuse the product.** Its thesis is "the
+bottleneck moved from writing to planning and reviewing". Its mechanics: one **git worktree per card** (parallel
+agents cannot collide), a **card state machine** (todo → in-progress → review → done), and **agents as swappable
+executors**. Maxwell OS already owns all three in different homes — `worktree` isolation is BUG-563's grant/exclude
+machinery, the state machine is the task register's `mover:` field, the executor swap is the route graph. What is
+missing is the ONE VIEW: a read-only board that shows, per open row, which agent holds it, what it has written, and
+what is waiting for the owner. That is a projection over `config/task_register.yaml` + `delegate_journal status` +
+lane receipts, i.e. a `just board` — no server, no MCP, no new state.
+
+**`github.com/topics/agent-orchestration` — almost nothing is worth porting.** The recurring patterns are supervisor/
+worker, blackboard, event bus, durable checkpointing and human-in-the-loop gates. This house already has a stricter
+version of each: routes (capability → script), the registers (blackboard), receipts + journal (durable checkpointing,
+fsync'd), and rc 2 = OWNER-OWED (the gate). The gap the topic exposes is the same one as above: **observability of
+live subagents**, and the cheapest honest answer is the journal plus the board — not an orchestrator. Porting a
+framework here would buy schemas, not capability, and would violate C1/C3/C4 in one move.
+
+### e. WHAT THE OWNER OWNS NOW (exact)
+
+1. **T-183, one file and one command.** `governance/ADMISSION_ACCEPTED_20261017.yaml` was RE-PRINTED from
+   `--template` (the old file pinned the pre-fix digest and is now refused BY DESIGN). Set `accepted_by: <name>`,
+   then:
+   ```
+   just admit-apply --dry-run          # 477 would_apply, 0 refusals, rc 0   (MEASURED, 17 s)
+   just admit-apply --limit 10         # the first tranche, one receipt line per row
+   ```
+   For a tranche that is NOT the first 10, set `mode: listed` and copy the `rel` labels exactly as the plan prints
+   them. If the plan is ever re-derived, re-print the signature — a signature for different bytes is refused, which
+   is the point.
+2. **The 6 NFD corpus names** are read correctly now; renaming the FILES is the owner-gated path
+   (`python3 scripts/normalise_corpus_names.py --census`, T-130). Nothing is renamed automatically.
+3. **Nothing else.** Launch with `just go`; `just session workshop` is the whole escape hatch.
+
+### f. NEXT CRITICAL STEPS, in consequential order
+
+1. **T-183's first tranche** (`--limit 10`) — the only remaining act, and it exercises S0 → S0.5 → S1 before scale.
+2. **T-187** — now the highest-leverage build in the house, because BUG-885 turned "which model" from a preference
+   into a measurable question and the fixture is what measures it. Two tools with a DISTRACTOR, two DEPENDENT steps,
+   an expected answer only the second tool's output can produce, same served set, a receipt; and it must report
+   DECODE RATE and TTFT per step (the numbers in §1j.c are the baseline it has to beat).
+3. **BUG-885's owed close** — re-run BUG-792's declared protocol; either close it with today's reading or name the
+   variable that changed. Until then `AGENTS.md`'s DELEGATE-002 sentence is a claim the machine no longer supports,
+   and `AGENTS.md` is PROTECTED: revising it is the owner's edit, and this section is the evidence for it.
+4. **BUG-876** (attribution control cannot go green on `config/decisions.yaml`) then **T-190's toggle half**
+   (`PreToolUse`/`PostToolUse` hooks) then **BUG-879**.
+5. The four pstack skills, in leanrea's shape (one SKILL.md each, zero tools): `prove-it-works`,
+   `benchmark-checklist`, `deslop`/`unslop`, `interrogate`.
+
+### g. STATE AT CLOSE
+
+`apply_admission --selftest` **22/22**; `plan_admission --selftest` **20/20**; census 18/18; plan_source_rename
+11/11; normalise_corpus_names 10/10; ingest_identity_gate 20/20; book_metadata pytest 9/9; R5 APPROVE on both
+changed files (gemma-4-E4B-it-MLX-4bit). Plan: **477 rows**, sha256 `191a13e3498f5f4d92e683b03370d3148ae76635972fbe
+b41b033c260ef2c17d`. Decisions 1,196 → 1,197 (D-3070). Bugs 645 → 650 (881-884 FIXED, 885 OPEN).
+Dry run: 477 would_apply / 0 refusals / rc 0 / 17 s.

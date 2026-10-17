@@ -28,6 +28,7 @@ may_touch:
 - governance/SOURCE_RENAME_PLAN_20261016.json
 - governance/ADMISSION_PLAN_20261017.json
 - governance/ADMISSION_PLAN_20261017.md
+- governance/ADMISSION_ACCEPTED_20261017.yaml
 - temp/d3048_record.yaml
 - agent/adapters/CONTRACT.md
 - scripts/check_agent_surface.py
@@ -1222,3 +1223,41 @@ widening_log:
     granted; `scripts/apply_admission.py` is a NEW file under the granted `scripts/` prefix and is named in the reason
     so the act is not invisible. The standing rules (R5 before mint, delegation journalled, forensic audit before a
     serious act, governance faces re-derived) were followed in that order.
+- date: '2026-10-17'
+  actor: assistant
+  reason: >-
+    NINTH SITTING - THE FIRST REAL RUN OF THE APPLIER FOUND FOUR DEFECTS, ALL FIXED WITH CONTROLS. Running
+    `just admit-apply --dry-run` (the operator's own door, the first time an acceptance existed) died on
+    `TypeError: 'str' object is not callable`: a local `stamp` binding in `run()` shadowed the module's own `stamp()`,
+    and all 15 controls had called the function directly, so they tested the UNIT while the crash lived in the
+    COMPOSITION (BUG-881, FIXED: renamed to `run_stamp`; a class-level AST control now reads this file's own bytes and
+    two known-answer controls are two-sided). Fixing it exposed BUG-882 (FIXED): the DRY RUN hashed all 479 sources =
+    8,271.5 MiB and stalled past 300 s on one unmaterialised Dropbox PDF (row 309); the digest now sits behind
+    `apply`, so a price costs `stat` and 17 s, with two controls pinning it. Then the price returned ONE refusal and
+    that refusal was the sitting's real find - BUG-883 (HIGH, FIXED): the door's key was not NFC-normalised, so the
+    corpus held `Galic` PRESECOMPOSED (U+010D) while the source library held `c`+COMBINING CARON (U+030C) for the
+    SAME work; one work had two identities, the reader called an in-corpus work a NEW candidate, and on a
+    normalisation-SENSITIVE filesystem (Linux, C26) the applier would have created the twin instead of refusing it.
+    Fixed at the ONE producer (`pipeline/book_metadata.sanitize_source_book`, D-3070) because NFC is idempotent and
+    nothing persisted is re-keyed: candidates 479 -> 477, name-repair 194 -> 179, dry run 477 would_apply / 0
+    refusals / rc 0. BUG-884 (FIXED): a governed refusal crashed while reporting itself (`int(exc.code)` on a
+    SystemExit whose code was the message) - `applier_rc()` now prints the sentence and exits RC_FATAL. ALSO MEASURED,
+    and it corrects a standing rule rather than a file: the local prefix cache IS warm (5,888 of 5,894 prompt tokens
+    cached, ttft 0.49-1.87 s) and FOUR served models emitted a correct tool call on the same probe, including a 19B
+    MoE at 210.6 tok/s - so "only gemma can do multi-turn agentic work" is a COLD-LOAD artefact, not a capability
+    (BUG-885, OPEN: the measurement is recorded, the declared protocol's re-run is owed).
+  additions:
+  - pattern: governance/ADMISSION_ACCEPTED_20261017.yaml
+    why: 'T-183/D-3068 - the SIGNATURE the applier reads, RE-PRINTED from `--template` after D-3070 changed the plan digest (the previous file pinned the pre-fix digest and is now refused BY DESIGN). It is the owner''s artifact and it must be versioned: an unversioned signature is a consent nobody can audit.'
+  owner_ack: >-
+    VERBATIM (this sitting): 'so for clarification for multi-turn agentic task only gemma can be utilized the rest
+    are are usless for that and there are no reliable candidate on huggingface to fasttrack our workload ? examine
+    from astier senior agentic engeenr lens how it can be improved do indepth market research also can we have more
+    and also adapt and or reference for their orchestration or moniotring or for gnereal maxwell os project managments
+    ... to see what agents subagent are doing and gave your futurepoof best optimized ,most efficent recommendation
+    alsoo check if this worth to adapt,reference for or use in our toolkit https://github.com/aicodeking/leanrea
+    considering we want to minimize 3rd party integration we can just reverseengineer them also utilize this in everydys
+    scalfolding and coding task I got this ... TypeError: str object is not callable ... first look in general maxwell
+    os current state continue with the next critical step starting with the highest leverage step'. NOTE ON SCOPE:
+    every other touched path was already granted; the four code files are named in the reason so the act is not
+    invisible, and no path was widened without a named addition.

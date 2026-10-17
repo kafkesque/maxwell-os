@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1208 decisions (census stamp b8fdd38ce7774659, 2026-10-17) · 680 bugs (247 open / 433 closed; highest OPEN = BUG-915) · 59 open tasks (MUST 12 / SHOULD 43 / WORTH 4; OWNER-moved 1, pipeline-moved 58; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1212 decisions (census stamp 47cf6924676b6ef4, 2026-10-17) · 682 bugs (248 open / 434 closed; highest OPEN = BUG-917) · 59 open tasks (MUST 12 / SHOULD 43 / WORTH 4; OWNER-moved 1, pipeline-moved 58; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **79** of 1208 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 623 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1208, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **79** of 1212 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 627 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1212, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 247 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 36 · 🟨 MED 78 · 🟩 LOW 28 · UNLABELLED 101 (BUG-757) of 247 open.
+> Open BUGS by severity (population = the census's 248 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 37 · 🟨 MED 78 · 🟩 LOW 28 · UNLABELLED 101 (BUG-757) of 248 open.
 >
 > **OWNER LANE (1) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -17608,3 +17608,93 @@ the replacement is proposed by one model and reviewed against the measurement, n
 **INTERIM.** Do not raise `docling_ceiling_s` (D-3023: never raise a ceiling to fit a reading). Do not retry the three
 already-quarantined `budget_expired` rows: a retry under the same allowance reproduces the same refusal, and the
 caller would learn nothing it did not already have.
+
+## BUG-916 (HIGH, FIXED 2026-10-17) — A HEALTH RAIL WENT RED FOR THE WHOLE LENGTH OF A LEGITIMATE RUN, AND THE DECLARATION THAT SHOULD HAVE DECIDED IT WAS READ BY NO CODE
+
+**THE RED LOOP (D-3036), taken before any theory.** One nameable command, run once, red on the bug and green when it
+is fixed:
+
+    python3 scripts/check_ingest_identity_gate.py ; echo $?
+
+MEASURED 2026-10-17T21:11Z (before): rc **1** — `FATAL: content report older than the newest corpus file:
+same_work_content_candidates.json`. `just health` therefore died at **line 33 of 184** and every line after it was
+never read (BUG-573's own prefix shape, in its most expensive form: a ladder that reports a PREFIX hides the set).
+Measured again after the fix: rc **2** (OWNER-OWED, loud, printed, and the ladder line already tolerates it), and
+`just health` now runs to line 54.
+
+**THE DEFECT, in two limbs.**
+
+1. **The class is unavoidable while a conversion runs.** `content_debt()`
+   (`pipeline/ingest_gate.py`) decides staleness as `report_mtime < max(corpus_file_mtime)`. The admission applier
+   (`scripts/apply_admission.py`, PID 54639) copies a container INTO `knowledge pipeline/books` and writes its S0
+   `.md` there **once per row**, for 510 rows / ~29 h. So the newest corpus file is always seconds old, the content
+   screen is always minutes old, and the comparison is FALSE for the entire run **by construction** — through no
+   fault of the operator and with no act that could make it true short of re-running a 2-minute scan between every
+   row. MEASURED: report mtime 18:12Z, newest corpus files 21:11:27Z (`.pdf`) and 21:11:25Z (`.md`), both written by
+   the applier's own two calls.
+2. **The declaration that should have decided it was dead.** `config/ingest_identity_gate.yaml#content.staleness`
+   declared `staleness: fatal` — and **no code read it**: the class was hardcoded into `standing()`'s `fatal` list.
+   A declaration with no consumer (D-3034). That is why the disposition could not be right for two different callers
+   without anyone noticing that it was being decided twice.
+
+**WHY IT MATTERS, measured rather than argued.** The first thing the repaired ladder did was expose a fault that had
+been invisible behind line 33: `delegation_economy.py --check` reports **BREACH — cloud calls 37,354.00 > ceiling
+37,000.00** (shrink-only, D-3023, measured at 32,851 on 2026-10-15). Filed as **BUG-917**. A red rail that is red for
+reasons nobody can act on does not protect a system; it hides the one rail that would have spoken.
+
+**THE FIX (built, `mode` is DECLARED by the caller and never inferred).**
+
+* `config/ingest_identity_gate.yaml#content.staleness` becomes a per-mode mapping — `reading: owner_owed`,
+  `door: fatal`, plus `remedy` so the printed line carries its own command. A disposition outside
+  `{fatal, owner_owed}`, a mode nobody declared, or the retired scalar is **FATAL, never defaulted**.
+* `pipeline/ingest_gate.py`: `standing(policy, books_dir, mode="reading")`; `_stale_disposition/_stale_remedy` read
+  the declaration (fail-closed) and route the ONE line to `fatal` or `owner_owed`.
+* `scripts/check_ingest_identity_gate.py`: `--gate` passes `mode="door"`; `--check` (the health line) keeps the
+  default. One new control, **21/21 green**:
+  `a_stale_content_screen_is_owed_in_the_reading_and_fatal_at_the_door` — it asserts BOTH rcs on the same fixture, and
+  that the retired scalar is REFUSED rather than honoured.
+* VERIFIED two-sided after: `--check` rc **2**, `--gate` rc **1**. The door still refuses; only the census stopped
+  going dark.
+
+**WHAT IS NOT CLAIMED.** The fix does not make `just health` green, and it must not be read as doing so: the ladder
+now stops at **line 54** on a REAL breach (BUG-917) and `just health-full` reports **16 faults over 184 lines in
+1087.6 s**, all of them pre-existing debt that line 33 had been hiding. It also does not re-run the content screen;
+after the applier finishes, `python3 scripts/detect_same_work_content.py` is still an owed prerequisite before the
+ingest door opens (which is the correct behaviour and is why `door: fatal` was kept).
+
+## BUG-917 (HIGH, OPEN 2026-10-17) — THE CLOUD-CALL CEILING IS EXCEEDED BY 354 CALLS AND NOBODY OWNS THE READING
+
+**FOUND BY** the BUG-916 repair, on the first run of the ladder that could get past line 33 (a hidden fault, not a
+new one). The reading, verbatim:
+
+    BREACH  cloud calls: 37,354.00 > ceiling 37,000.00
+    a ceiling is SHRINK-ONLY: route the work to T0 (script) or T1 (local engine), or the OWNER raises the ceiling
+    with a reason (D-3023)
+    ceiling cloud calls: 37,000.00 (shrink-only; measured 2026-10-15 at 32,851.00)
+
+**WHAT IT IS.** Cumulative metered cloud calls rose **4,503** between the 2026-10-15 reading and 2026-10-17T21:40Z —
+fast enough that the ceiling cannot be respected by a routing change alone, which is why it is registered rather than
+quietly absorbed. `just health` stops here (line 54 of 184) and therefore still reports a PREFIX.
+
+**WHY A ROUTING FIX DOES NOT CLOSE IT.** The ceiling is a LIFETIME counter, not a rate: every future call adds to a
+number that is already over. `delegation_economy.py`'s own declared remedies are (a) route the work to T0/T1, which
+slows the growth but never reduces the count, and (b) the OWNER raises the ceiling **with a reason** (D-3023 forbids
+raising it to fit a reading; it does not forbid a reason that names the work). There is no third route, and inventing
+one would be the exact move the ceiling exists to prevent.
+
+**THE UNCOMFORTABLE PART, RECORDED BECAUSE IT IS THE LIKELY SOURCE.** The operator's own agent harness is served by a
+CLOUD provider, so conversation turns and delegated subagents are metered while the pipeline itself is local (C1's
+`$0 marginal cost` is a claim about GENERATION, not about the harness). This has never been declared as a separate
+stream, so the ceiling is currently answering two questions at once — "is the pipeline sovereign?" and "is the
+harness metered?" — and they have different answers.
+
+**OWNER DECISION OWED, one of three, each with its own consequence:**
+1. **Raise the ceiling with a named reason** (e.g. "the operator harness is cloud-served until T-132's local route is
+   measured") — one line in `config/delegation_economy.yaml`, and the reading returns to green honestly.
+2. **Split the counter into two declared streams** — `pipeline` (must be $0) and `harness` (metered, capped
+   separately) — the ontologically correct answer, and the larger change.
+3. **Keep it red and shrink-only, and read it every session** — legitimate, but then `just health` cannot be the
+   first line of defence and `just health-full` becomes mandatory.
+
+NOT DONE HERE: no ceiling was raised, no counter was split, no routing was changed. A measurement never mints its own
+permission.

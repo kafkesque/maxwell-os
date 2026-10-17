@@ -446,6 +446,8 @@ unrouted:
   BUG-911: bug_is_a_finding   # Anna's needs a headed browser (the engine is the finding, not a route)
   BUG-912: bug_is_a_finding   # an OA route can hand back an HTML landing page (the adapter's finding)
   BUG-914: bug_is_a_finding   # the lane records delivery and never custody (a model gap, not a file's route)
+  BUG-915: bug_is_a_finding   # a conversion BUDGET's basis is a finding about docling's cost, not a file's route
+  BUG-917: bug_is_a_finding   # a metered counter over its ceiling is a finding about the world, not a file
 
 #: SHRINK-ONLY (the D-3023 ceiling shape). These are the instrument's own readings, not targets: the reader FAILS
 #: when the measured debt EXCEEDS the declared number, so inherited debt cannot grow unnoticed, and it reports a

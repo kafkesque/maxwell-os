@@ -158,7 +158,23 @@ content:
   report: governance/same_work_content_candidates.json
   title_report: governance/title_rename_candidates.json
   # A report OLDER than the newest corpus file certifies a corpus that no longer exists: measured, not assumed.
-  staleness: fatal
+  #: D-3085/BUG-916 — WHICH MODE EARNS WHICH rc, DECLARED AND NOW READ. MEASURED 2026-10-17: this key was declared
+  #: `staleness: fatal` and read by NO CODE AT ALL (the class was hardcoded in pipeline/ingest_gate.py#standing) — a
+  #: declaration with no consumer (D-3034). The shape it hid: while an authorised S0 conversion writes the corpus,
+  #: "the report is older than the newest corpus file" is TRUE FOR EVERY ROW OF THE RUN, so the health reading was
+  #: red for the WHOLE run (MEASURED 2026-10-17 23:11: `just health` dead at line 33 with 510 rows / ~29 h still to
+  #: go), and a ladder that dies at one line HIDES every line after it (BUG-573's own prefix shape). Two declared
+  #: values, because the same fact means two things to two callers — the door may not open, the census may not go
+  #: dark:
+  #:   reading: the STANDING census (`--check`, the `just health` line) — OWNER-OWED rc 2: loud, counted, printed
+  #:            with its remedy. A corpus being written by a DECLARED conversion is a CONDITION, not a blind door.
+  #:   door:    the INGEST step (`--gate`, pre-S1.5) — FATAL rc 1, unchanged. A run that proceeded would mint
+  #:            claims about a corpus the content screen never saw.
+  #: A mode this block does not declare, or a disposition outside {fatal, owner_owed}, is FATAL — never defaulted.
+  staleness:
+    reading: owner_owed
+    door: fatal
+    remedy: 'python3 scripts/detect_same_work_content.py'
 
 name_normalisation:
   # T-130, OWNER-APPROVED 2026-10-15 ("Approve your T-130 Write recommendation"). The door's rc 2 named ONE

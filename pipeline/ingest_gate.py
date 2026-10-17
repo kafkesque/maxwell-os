@@ -627,11 +627,57 @@ def content_debt(policy: dict[str, Any] | None = None, corpus: list[Path] | None
             "candidate_keys": [pair_key(c.get("a_id"), c.get("b_id")) for c in cands if c.get("a_id") and c.get("b_id")]}
 
 
-def standing(policy: dict[str, Any] | None = None, books_dir: str | Path | None = None) -> dict[str, Any]:
+STALE_MODES = ("reading", "door")
+STALE_DISPOSITIONS = ("fatal", "owner_owed")
+
+
+def _stale_block(pol: dict[str, Any]) -> dict[str, Any]:
+    """The DECLARED staleness disposition per caller (config#content.staleness), fail-closed (C12/D-3034).
+
+    Raises:
+        GateInputError: the declaration is absent, is still the retired scalar, or names no disposition for the
+            mode the caller asked for. A silence about a disposition is never defaulted: defaulting it is how the
+            old scalar became a key nothing read (BUG-916).
+    """
+    block = (pol.get("content") or {}).get("staleness")
+    if not isinstance(block, dict):
+        raise GateInputError(
+            "content.staleness is not declared as a per-mode mapping {reading, door} - a disposition nobody "
+            "declared is never defaulted (D-3085/BUG-916)")
+    return block
+
+
+def _stale_disposition(pol: dict[str, Any], mode: str) -> str:
+    """The disposition for ONE caller, validated against the CLOSED vocabulary.
+
+    Raises:
+        GateInputError: an undeclared mode, or a disposition outside {fatal, owner_owed}.
+    """
+    if mode not in STALE_MODES:
+        raise GateInputError(f"undefined standing() mode {mode!r} - declared modes are {list(STALE_MODES)}")
+    disposition = str(_stale_block(pol).get(mode, ""))
+    if disposition not in STALE_DISPOSITIONS:
+        raise GateInputError(
+            f"content.staleness.{mode}={disposition!r} is outside the declared vocabulary {list(STALE_DISPOSITIONS)}")
+    return disposition
+
+
+def _stale_remedy(pol: dict[str, Any]) -> str:
+    """The declared command that refreshes the screen, so the printed line carries its own fix (D-3034)."""
+    return str(_stale_block(pol).get("remedy", "")).strip() or "detect_same_work_content.py"
+
+
+def standing(policy: dict[str, Any] | None = None, books_dir: str | Path | None = None,
+             mode: str = "reading") -> dict[str, Any]:
     """The `--check` census: every debt this gate is the door for, with the tri-state rc it earns.
 
     rc 1 FATAL  — an unreadable input, an UNDECLARED ledger verdict, a content candidate the ledger never saw
-                  (the ledger is stale: the machine half of the gate did not run), or a stale content report.
+                  (the ledger is stale: the machine half of the gate did not run), or a stale content report
+                  WHOSE DECLARED DISPOSITION FOR THIS MODE IS fatal (D-3085/BUG-916).
+    `mode` is the CALLER, DECLARED, never inferred: "reading" is the standing census (`--check`, the health
+    line) and "door" is the ingest step (`--gate`, pre-S1.5). A stale content screen is a CONDITION of a
+    corpus under an authorised conversion and a REFUSAL at the door — one fact, two declared rcs, because a
+    rail that is red for the whole length of a legitimate run hides every rail after it (BUG-573).
     rc 2 OWNER  — a pair with no owner word (ledger or collapse sheet), a corpus name defect whose class is
                   declared OWNER-OWED, or candidates that would be deferred if this batch were ingested now.
                   A class declared `accepted_debt` is PRINTED and COUNTED but is never an rc 2 trigger — and
@@ -684,7 +730,10 @@ def standing(policy: dict[str, Any] | None = None, books_dir: str | Path | None 
     if uncovered:
         fatal.append(f"content candidates the ledger never saw (re-run gate_duplicate_candidates.py): {len(uncovered)}")
     if content["stale"]:
-        fatal.append(f"content report older than the newest corpus file: {content['file']} (re-run detect_same_work_content.py)")
+        disposition = _stale_disposition(pol, mode)
+        stale_line = (f"content report older than the newest corpus file: {content['file']} "
+                      f"(re-run {_stale_remedy(pol)})")
+        (fatal if disposition == "fatal" else owner).append(stale_line)
     if ledger["open"]:
         owner.append(f"ledger pairs with no owner word: {ledger['open']} of {ledger['pairs']}")
     if collapse["outstanding"]:

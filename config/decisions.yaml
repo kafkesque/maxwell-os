@@ -27951,3 +27951,150 @@ decisions:
     nine newly registered sources is a RUNG — `bookracy`, `mobilism`, `sci_net` and `libgen_torrents` are CANDIDATES
     with a stated `why`, and §4 of the pipeline spec (no adapters for Mobilism/Bookracy/OceanOfPDF/pdfroom/WeLib/
     ebookoz) still stands (D-3038: what we reject, we register).
+
+- id: D-3082
+  state: ACTIVE
+  date: '2026-10-17'
+  by: owner
+  category: 'THE SHADOW KEY IS APPROVED BY THE OWNER — AND IT BUYS SPEED ON ONE RUNG, NOT ACCESS'
+  refines: [D-3081, D-3080]
+  bugs: [BUG-911, BUG-914]
+  decision: >-
+    OWNER WORD, verbatim: "approve shadow key" (2026-10-17). The recommendation on the table was DO NOT BUY, and it
+    is SUPERSEDED: Anna's Archive membership is approved. WHAT THE PURCHASE DOES AND DOES NOT DO is unchanged by the
+    approval, because it is a measurement and not an opinion: the membership raises the fast-downloads-per-24h counter
+    on Anna's ONE JSON API (`/dyn/api/fast_download.json`); it does not unlock a key, a dataset, or a route that is
+    otherwise refused, and Anna's own FAQ still points non-members at the free bulk dumps and torrent list. LibGen
+    remains keyless and proven (the two-step, D-3081). Z-Library issues no key at all and remains SESSION-gated.
+    CONSEQUENCE, DECLARED RATHER THAN DISCOVERED LATER: the spend is a convenience purchase on one rung of the ladder.
+    It must be recorded as a spend with its date and its receipt, it must never be cited as the reason a work is
+    admissible, and it does not change any `access:` value in config/research_sources.yaml (a credential that is paid
+    for is still `access: credential`). THE LIMIT THIS DECISION ACCEPTS: if the counter is the only thing the money
+    buys, then buying it while the S0 applier is still running (and the corpus is therefore not yet chunked) is a
+    purchase made before the lane that needs it is ready — which is the owner's call to make and is recorded here as
+    made, not argued.
+  notes: >-
+    NOT CLAIMED: that a purchase has completed. The owner approved the purchase; no transaction is recorded in this
+    act, and the lane's `annas` rung still refuses by name until a credential exists on disk. The rung's three
+    unmeasured questions (cdn2.booksdl.lc Referer, queue key lifetime, saturated-front behaviour) are unchanged and
+    still gate the `direct` route (D-3081).
+  supersedes: []
+
+- id: D-3083
+  state: ACTIVE
+  date: '2026-10-17'
+  by: owner
+  category: 'THE BUSINESS IDEA IS SECONDARY BY OWNER RULING — AND IT IS BLOCKED ON FOUR NAMED READINESS GATES, NOT ON A SENTENCE'
+  refines: [D-3081, D-3078, D-3051, D-3050]
+  bugs: [BUG-914, BUG-916, BUG-917, BUG-915]
+  decision: >-
+    OWNER RULING, verbatim: "business idea one line can come after the harness, the pipeline and skill orchestration
+    and the knowledge layer is ready — until that is secondary." The standing ask ("give me the one-line business idea
+    so the lane can run on your subject instead of a fixture") is therefore WITHDRAWN as a request and RE-CAST as a
+    gate: the idea is not a missing INPUT, it is a dependent of four READINESS GATES. Each gate is a command whose
+    answer is checkable, which is what makes this a priority ruling rather than a postponement. (1) HARNESS —
+    `python3 scripts/goose_profile.py --check` rc 0 and `just extensions-check` rc 0 (T-186/D-3056): the surface the
+    agent is BORN with agrees with the residency policy, so no later act is measured through a dead extension (the
+    BUG-873 harness facts). (2) PIPELINE — the admission applier finishes, the content screen is re-run
+    (`python3 scripts/detect_same_work_content.py`), the ingest door opens (`--gate` rc 0), and S0.5–S6 has been run
+    over the newly admitted works (`python3 pipeline/runner.py`): measured state at this act — 510 of 541 rows still
+    to apply. (3) SKILL ORCHESTRATION — the `maxwell_acq` stdio wrapper exists (C21/C25, ~1 h, no rewrite) so a skill
+    calls the lane through a protocol instead of a shell, and the Telegram/session tools are reachable the same way.
+    (4) KNOWLEDGE LAYER — the corpus is actually CHUNKED: measured 2026-10-17, 933 of 1,010 corpus `.md` carry an S1
+    record in the declared run, 2 more exist only in the older `latest` run, and **75 have never been chunked by any
+    run at all**; plus the ~510 arriving works. The S0 applier is producing ORPHANS until S1 runs, and a business-idea
+    evaluation answered from an unchunked corpus would be an answer about a corpus that does not exist.
+    CONSEQUENTIAL ORDER IS THEREFORE FIXED: harness → pipeline drain → chunk → orchestration → THEN the idea line.
+  notes: >-
+    WHAT THIS DECISION DOES NOT DO. It does not close any task in the acquisition lane: BUG-914 (custody), T-179 (the
+    library md twin), BUG-900 (the epub spine probe), BUG-915 (the docling basis) all stand. It does not delete the
+    owner's standing questions — the review/reference-source set and the final market-research/webscraper spec are
+    already declared (D-3080's register, 52 sources) and simply lose their queue position. And it deliberately does
+    NOT restate a readiness gate that already has a home: the four gates are named as COMMANDS so that "ready" can be
+    read off the machine rather than argued in a message.
+  supersedes: []
+
+- id: D-3084
+  state: ACTIVE
+  date: '2026-10-17'
+  by: owner
+  category: 'THREE TOOL ADOPTIONS ACCEPTED BY THE OWNER — LADDER, BUSTER, TELEGRAM (SESSION, NOT BOT) — EACH WITH THE CONSTRAINT THAT MAKES IT ADMISSIBLE'
+  refines: [D-3080, D-3067, D-3078]
+  bugs: [BUG-911, BUG-914]
+  decision: >-
+    OWNER WORD, verbatim: "accept your selfhosted ladder (everywall/ladder) and buster (autocaptcha) and telegram
+    based recommendation" (2026-10-17). THREE ADOPTIONS, and each is accepted WITH the limb that made it recommendable,
+    because an adoption that drops its constraint is a different, worse tool. (1) LADDER (everywall/ladder, GPL-3.0,
+    9,188 stars, Go, pushed 2026-10-13) — ACCEPTED as the only SOVEREIGNTY-COMPATIBLE paywall route (C1/C3: it runs on
+    this machine, no third party sees the URL). ITS CONSTRAINT IS UNCHANGED AND IS THE OPERATIVE PART: it re-requests
+    an article under a SEARCH-ENGINE CRAWLER user-agent, so every text it returns was fetched under a FALSE IDENTITY.
+    It therefore remains an OWNER-SIDE, MANUAL route and NEVER a lane: nothing it fetches may become a corpus work
+    that states its own `licence_class`, and any retained text is tagged `paywalled_personal` in assessment notes only.
+    (2) BUSTER (dessant/buster, GPL-3.0, 9,337 stars, pushed 2026-06-27) — ACCEPTED because it solves the AUDIO
+    challenge LOCALLY (speech-to-text on this machine), which is the only captcha capability that passes C1/C3.
+    MEASURED LIMIT, not a caveat: it does NOT defeat reCAPTCHA v3/invisible or Cloudflare Turnstile, and FMHY's own
+    note says the `buster-client` desktop app "greatly improves the success rate" because it simulates user
+    interaction — so the honest claim is "keeps a headed session alive on audio fallbacks", never "solves captchas".
+    NopeCHA stays REFUSED (D-3038: paid cloud, sees every page, per-token cost). Privacy Pass stays kept (it reduces
+    how often a challenge appears; it bypasses nothing). (3) TELEGRAM — ACCEPTED AS A SESSION, NOT A BOT: a bot is a
+    closed endpoint somebody else controls, so the adopted shape is chigwell/telegram-mcp (Apache-2.0, 1,846 stars,
+    Python/Telethon, pushed 2026-10-17) as a LOCAL stdio server over the OWNER'S OWN account, with `iyear/tdl`
+    (AGPL-3.0, 8,171 stars, one static Go binary) as the file limb. HARD RULE, declared because a session string IS
+    the account: dedicated account, read-only, chat ALLOWLIST, local stdio only, never a hosted endpoint, and every
+    pull lands in the quarantine pen.
+  receipts:
+    ladder: 'github.com/everywall/ladder — GPL-3.0, 9,188 stars, Go, pushed 2026-10-13 (measured 2026-10-17T22:52Z)'
+    buster: 'github.com/dessant/buster — GPL-3.0, 9,337 stars, JavaScript, pushed 2026-06-27'
+    nopecha: 'REFUSED — paid cloud + sees every page + unbounded per-token cost (D-3038)'
+    privacy_pass: 'kept — cloudflare/pp-browser-extension, 200 / 382,456 B; reduces challenges, bypasses nothing'
+    telegram_mcp: 'github.com/chigwell/telegram-mcp — Apache-2.0, 1,846 stars, Python/Telethon, pushed 2026-10-17, 80+ tools, chat allowlist'
+    tdl: 'github.com/iyear/tdl — AGPL-3.0, 8,171 stars, Go, pushed 2026-10-15, one static binary'
+    register: 'config/research_sources.yaml — 52 declared sources, 0 faults (python3 scripts/acquire.py sources --check)'
+  notes: >-
+    WHAT ACCEPTANCE DOES NOT DO. It installs nothing and grants no rung: Ladder and Buster are browser-side tools the
+    OWNER operates, and the Telegram pair stays DECLARED-not-installed until the owner names a dedicated account
+    (installing a Telethon session is an account act, not a repo act). None of the three is a `lane`, so none appears
+    in the acquisition ladder's routed set; each is recorded in config/research_sources.yaml#tools_not_integrated with
+    `access: manual` or `access: credential` and its `why`. The shadow_sources row for `@newspaper_archive` stands
+    measured as `access: credential` (public preview disabled: `/s/` 302s with zero messages).
+  supersedes: []
+
+- id: D-3085
+  state: ACTIVE
+  date: '2026-10-17'
+  by: assistant
+  category: 'ONE FACT, TWO DECLARED rcs — A STALE CONTENT SCREEN IS OWNER-OWED TO THE CENSUS AND FATAL AT THE DOOR (BUG-916), AND THE DECLARATION THAT SHOULD HAVE SAID SO WAS READ BY NO CODE'
+  refines: [D-2997, D-3043, D-3034]
+  bugs: [BUG-916, BUG-917]
+  decision: >-
+    A health rail was red for the whole length of a legitimate run, and the reason was structural rather than
+    accidental: `content_debt()` decides staleness as `report_mtime < max(corpus_file_mtime)`, while the admission
+    applier writes a container AND its S0 `.md` into the corpus once per row — so during any conversion the comparison
+    is false BY CONSTRUCTION, and `just health` died at line 33 of 184, hiding every rail after it (BUG-573's prefix
+    shape in its most expensive form). The disposition is now DECLARED PER CALLER and READ by the code, because the
+    same fact means two different things to two different callers: to the CENSUS (`--check`, the health line) a corpus
+    being written by a declared conversion is a CONDITION and the line is OWNER-OWED (rc 2 — loud, counted, carrying
+    its own remedy); to the DOOR (`--gate`, pre-S1.5) it is a REFUSAL (rc 1) because a run that proceeded would mint
+    claims about a corpus the content screen never saw. Fails closed: an undeclared mode, a disposition outside
+    `{fatal, owner_owed}`, or the retired scalar `staleness: fatal` is FATAL and never defaulted — the old scalar is
+    precisely the declaration that was read by nobody, so honouring it would have repeated the defect. `mode` is a
+    parameter the caller DECLARES, never something inferred from context.
+  files:
+    config: 'config/ingest_identity_gate.yaml#content.staleness — reading: owner_owed | door: fatal | remedy (one mapping, read)'
+    gate: 'pipeline/ingest_gate.py — standing(mode="reading"), _stale_disposition/_stale_remedy (fail-closed)'
+    rail: 'scripts/check_ingest_identity_gate.py — --gate passes mode="door"; 1 new control (21/21 green)'
+  receipts:
+    before: 'python3 scripts/check_ingest_identity_gate.py ; echo $? -> 1 (FATAL: content report older than the newest corpus file)'
+    after_reading: '--check rc=2 (OWNER-OWED, printed with the declared remedy)'
+    after_door: '--gate rc=1 (unchanged: the door still refuses)'
+    selftest: '21/21 controls green — a_stale_content_screen_is_owed_in_the_reading_and_fatal_at_the_door'
+    ladder: 'just health now runs to line 54; just health-full reports 16 faults over 184 lines in 1087.6 s'
+    exposed: 'BUG-917 — BREACH cloud calls 37,354.00 > ceiling 37,000.00 (the first fault line 33 had been hiding)'
+  notes: >-
+    WHAT THIS DOES NOT CLAIM. It does not make `just health` green: the ladder still stops, now on BUG-917, which is a
+    real breach rather than noise — and that is the point of the change (a rail may be red, but never for a reason no
+    act can satisfy). It does not re-run the content screen: after the applier finishes,
+    `python3 scripts/detect_same_work_content.py` remains an owed prerequisite before the door opens, which is exactly
+    why `door: fatal` was kept rather than softened. And it does not touch the applier, `pipeline/stage0_convert.py`
+    or any running process (BUG-614).
+  supersedes: []

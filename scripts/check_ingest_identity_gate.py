@@ -61,6 +61,7 @@ CONTROL_LABELS = (
     "a_same_as_pointer_that_does_not_resolve_is_not_an_acceptance",
     "an_accepted_debt_declaration_for_a_class_that_is_not_accepted_is_a_fault",
     "every_citation_an_acceptance_makes_resolves",
+    "a_stale_content_screen_is_owed_in_the_reading_and_fatal_at_the_door",
 )
 
 
@@ -204,7 +205,7 @@ def _run_gate(as_json: bool) -> int:
     if citations:
         return gate.RC_FATAL
     try:
-        rep = gate.standing()
+        rep = gate.standing(mode="door")  # D-3085/BUG-916: the door DECLARES which caller it is
         delta = gate.preflight(write_receipt=False)
     except gate.GateInputError as exc:
         print(f"FATAL: {exc}", file=sys.stderr)
@@ -489,6 +490,37 @@ def _selftest() -> int:
                        for fault in _unresolved_citations(accepted, tmpdir / "tasks.yaml",
                                                           tmpdir / "decisions.yaml")):
                 mark(CONTROL_LABELS[19], "a decision that does not exist was accepted as a citation")
+
+    # C21 — D-3085/BUG-916: A STALE CONTENT SCREEN EARNS TWO DECLARED rcs, and the DECLARATION is what decides.
+    # MEASURED 2026-10-17: the health ladder was dead at ONE line for the whole length of a legitimate S0 run,
+    # because the class was hardcoded FATAL for every caller - and a prefix ladder hides every rail after it.
+    with tempfile.TemporaryDirectory(prefix="stale_screen_") as stale_tmp:
+        stale_root = Path(stale_tmp)
+        stale_books = stale_root / "books"
+        stale_books.mkdir()
+        stale_policy = deepcopy(gate.load_policy())
+        stale_policy["content"]["report"] = str(stale_root / "content.json")
+        (stale_root / "content.json").write_text(json.dumps({"candidates": []}), encoding="utf-8")
+        screened_after = stale_books / "Screen Me.md"
+        screened_after.write_text("screen body " * 50, encoding="utf-8")   # written AFTER the report: the corpus moved on
+        reading_rep = gate.standing(policy=stale_policy, books_dir=stale_books, mode="reading")
+        door_rep = gate.standing(policy=stale_policy, books_dir=stale_books, mode="door")
+        if not any("older than the newest corpus file" in line for line in reading_rep["owner_owed"]):
+            mark(CONTROL_LABELS[20], "the READING did not OWE a stale content screen (it went dark instead)")
+        if reading_rep["rc"] != gate.RC_OWNER_OWED:
+            mark(CONTROL_LABELS[20], f"the READING rc was {reading_rep['rc']}, expected OWNER-OWED")
+        if not any("older than the newest corpus file" in line for line in door_rep["fatal"]):
+            mark(CONTROL_LABELS[20], "the DOOR did not read a stale content screen as FATAL (it would have opened blind)")
+        if door_rep["rc"] != gate.RC_FATAL:
+            mark(CONTROL_LABELS[20], f"the DOOR rc was {door_rep['rc']}, expected FATAL")
+        # ... and a disposition the config does not declare is REFUSED, never defaulted (the retired scalar's fault)
+        undeclared = deepcopy(stale_policy)
+        undeclared["content"]["staleness"] = "fatal"
+        try:
+            gate.standing(policy=undeclared, books_dir=stale_books, mode="reading")
+            mark(CONTROL_LABELS[20], "the RETIRED scalar disposition was accepted instead of refused")
+        except gate.GateInputError:
+            pass
 
     failed = {label for label, _ in failures}
     for label in CONTROL_LABELS:

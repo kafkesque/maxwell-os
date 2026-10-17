@@ -44,7 +44,7 @@ rule: >-
 #: THE SET EVERY SESSION IS BORN WITH, named as a profile so it is a CHOICE with a reason rather than a
 #: minimum.  --check measures the live `enabled:` flags against THIS profile: a session default is a decision,
 #: and a decision that is not declared cannot be drifted from.
-default_profile: workshop
+default_profile: core
 
 always:
   - developer          # the act surface: shell/edit/write. Nothing in this OS is done without it.
@@ -124,13 +124,16 @@ never:
       second home for one capability. RETIRE candidate - the live one stays available, the twin does not.
 
 profiles:
-  #: THE MINIMAL SESSION (declaration only until the owner flips ONE config line). MEASURED 2026-10-17: the two
+  #: THE MINIMAL SESSION - AND, SINCE 2026-10-17, THE DECLARED DEFAULT (D-3067). MEASURED 2026-10-17: the two
   #: members workshop adds are the two LARGEST schemas in the set (filesystem 14 tools / 3,727 tok, gitmcp-mcp 12
   #: tools / 1,906 tok = 5,633 of the ~7,909 tok/request the six stdio extensions ship), and both duplicate what
-  #: `developer.shell` already does at ZERO schema cost. This profile exists so the choice "pay 5.6k tokens in every
-  #: session" is a NAMED decision rather than a default nobody looked at. NOT applied: `default_profile` still reads
-  #: workshop, because switching it is an owner act on the harness home (a pipeline lane editing it would be the
-  #: unwatched mover D-3049 refuses) AND it only takes effect in a NEW session (BUG-873 limb b).
+  #: `developer.shell` already does at ZERO schema cost. The choice "pay 5.6k tokens in every session" is now made
+  #: in favour of NOT paying it: `default_profile` reads core, and `filesystem` / `gitmcp-mcp` are DISABLED in the
+  #: harness home (backup `config.yaml.bak.20261017134734.taskB-core`; only those two lines changed, read back).
+  #: The escape hatch is real, not asserted: `just session workshop` births the full surface from a DISABLED
+  #: declaration (measured, session 20261017_17, zero warnings) because the per-session form supplies the command
+  #: itself and never consults `enabled:`.
+  #: RECEIPT OF THE DEFAULT: a session born from /tmp with ten extensions and ZERO start warnings (20261017_14).
   core:
     adds: []
     when: >-
@@ -209,8 +212,16 @@ delegate_profiles:
       delegate whose OUTPUT IS JUDGED must be able to load the house rules - without it the reviewer judges C12/C17
       blind and approves exactly the hardcoding it exists to catch.
   sweep:
-    extensions: [developer, analyze, filesystem]
-    why: 'read-only repository sweep over many files: the file reader is the only addition a sweep needs.'
+    extensions: [developer, analyze]
+    why: >-
+      read-only repository sweep over many files. It NAMED the file reader (filesystem) until 2026-10-17, and that
+      name stopped resolving the moment the default birth changed: MEASURED (D-3067) a subagent's explicit list can
+      only provision an extension the config has ENABLED - a child asked for [developer, filesystem] and was born
+      with developer ALONE (session 20261017_15), while the same mechanism provisioned [analyze, memory] exactly
+      (20261017_16) when both were enabled. A declaration that cannot RESOLVE is a wish, not a grant (D-3034), so the
+      name is dropped rather than left to fail silently in a worker that then lacks a tool it was promised:
+      `developer.shell` reads files at ZERO schema cost, which is what a sweep actually needs. `--check` now reports
+      any delegate profile that names a DISABLED extension, so this cannot recur quietly.
   extract:
     extensions: [developer, summarize]
     why: 'summarise WITH source text in hand (never open-ended: BUG-053). The summariser is the harness compaction path.'

@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1193 decisions (census stamp adb983cbaff56ff1, 2026-10-17) · 643 bugs (233 open / 410 closed; highest OPEN = BUG-877) · 59 open tasks (MUST 12 / SHOULD 43 / WORTH 4; OWNER-moved 0, pipeline-moved 59; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1194 decisions (census stamp a988a5f874809a58, 2026-10-17) · 644 bugs (234 open / 410 closed; highest OPEN = BUG-879) · 59 open tasks (MUST 12 / SHOULD 43 / WORTH 4; OWNER-moved 0, pipeline-moved 59; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **79** of 1193 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 608 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1193, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **79** of 1194 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 609 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1194, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 233 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 35 · 🟨 MED 68 · 🟩 LOW 25 · UNLABELLED 101 (BUG-757) of 233 open.
+> Open BUGS by severity (population = the census's 234 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 35 · 🟨 MED 68 · 🟩 LOW 26 · UNLABELLED 101 (BUG-757) of 234 open.
 >
 > **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -15822,6 +15822,14 @@ FIX, STEP 3 (a declaration nothing compares is a claim — D-3034): two `home_fa
 
 MEASURED AFTER: `scripts/check_harness_homes.py` reads 5 declared fact(s), bound 5, conflicting 0, rc 0 (it read 3/3 before this act); the writer's `--selftest` reads 8/8; and the LIVE dry-run still reads `0 edit(s) to apply, 4 already applied`, which is the strongest of the three — the POINTER-RESOLVED values equal the bytes already in the client home, so the declaration, the writer and the home agree. WHAT REMAINS OPEN IS A DIFFERENT LIMB OF T-135: the FIVE environment names a BARE app launch never binds (`pipeline/harness_env.py --check` still reads rc 2), which is a launch-path act (scripts/bind_harness_env.sh is the infrastructure; the one line for the owner's shell profile is the manual step).
 
+**CORRECTION 2026-10-17 — the instruction above would RE-CREATE BUG-871, and the tool refuses it aloud.** The
+binding is PER SCOPE, never a login-profile line: `python3 pipeline/harness_env.py --print --scope agent_loop` emits
+its own header `# scope: agent_loop - bound FOR this class; never place these lines in a login profile (BUG-871)`.
+BUG-871 was exactly the defect of a global 32k cap plus the 4B subagent model landing in the owner's login profile
+(`bind_harness_env.sh` no longer EVALs without `--scope`). So the manual step is one line in the shell that LAUNCHES
+goose, not in `~/.profile`: `eval "$(python3 pipeline/harness_env.py --print --scope agent_loop)"`. Recorded here
+rather than left as a trap for the next reader of this entry.
+
 
 ## BUG-864 (MED — OPEN 2026-10-16) — ROUTE ADDENDUM (same day, D-3049): the finding this entry reports is READ and CARRIED by one capability, so it routes rather than joining the unrouted worklist. The artifact that owns it is `scripts/census_source_names.py` (the placement reading, capability `source_library_names`, whose receipt is `config/ingest_identity_gate.yaml#source_library`): that reader is what makes the rule store's effect VISIBLE (it counts what waits in the declared pens), and `config/ingest_identity_gate.yaml#source_library.placement.refusals.no_second_policy_home` is where the refusal is declared. The owner lane for the disposition is registered as T-180. Status UNCHANGED: OPEN — no route closes a finding; it only says who reads it.
 
@@ -16448,3 +16456,28 @@ FIX (T-185, three limbs, each a rule the repository already declares elsewhere):
   silently. Adjudicated rather than waved away: that IS what the harness does, so mirroring it is the only faithful
   reading — a launcher that "corrected" the harness would start something the declaration does not describe. The case
   is recorded here and is not reachable today, because the sweep above leaves exactly one script argument, absolute.
+
+### BUG-879 (LOW, OPEN 2026-10-17) — THE BIRTH RECORD NAMES A STDIO MEMBER BY ITS COMMAND, SO `scripts/goose_profile.py --born` CANNOT DISTINGUISH TWO `uvx` MEMBERS AND A BIRTH CANNOT BE AUDITED MEMBER-BY-MEMBER
+
+**Measured 2026-10-17** on session `20261017_17`, born from the rendered workshop per-session form. Four stdio
+extensions were supplied (`python3 <docguard>`, `uvx mcp-server-fetch`, `npx @modelcontextprotocol/server-filesystem`,
+`uvx mcp-server-git`) and the session's `enabled_extensions.v0` records **three** names: `npx`, `python3`, `uvx`. The
+two `uvx` members are indistinguishable in the record - the extension's DECLARED NAME (`Fetch`, `GitMCP`) is not what
+is stored; the command is.
+
+**Why this is a bug and not cosmetics.** It is the identity confusion that made BUG-878 unreadable: the failing
+session's record named a member called `python3`, which is a command, not an extension. It also means a birth can never
+be audited member-by-member from the store: if ONE of two `uvx` members failed to start, the record would still show
+one `uvx` row and the only evidence would be a terminal banner the session never receives (harness fact, BUG-873).
+A reading that cannot distinguish its subjects cannot testify about them.
+
+**Named remedy (not guessed):** record the declared name as the entry's identity and keep `cmd` in its own field -
+`extension_data` already carries `cmd`/`args` separately, so the name is the only field being improvised. The reader
+that must then be able to speak is the birth renderer in `scripts/goose_profile.py` (`--born`), which maps a recorded
+member back to its policy key (`config/extension_profiles.yaml` carries the declared names). Acceptance reading: a
+session born with four stdio members shows FOUR distinct names, and the existing `--born` renderer matches each to its
+policy key without a display-name guess.
+
+**Status:** OPEN. Route: `extension_residency` (the same capability that owns the profile rail). Found by the forensic
+audit of D-3067, and deliberately NOT folded into BUG-873: BUG-873 is a silent zero-tool extension; this is a record
+that cannot name what it started. Different subject, different remedy.

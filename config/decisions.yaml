@@ -27274,3 +27274,54 @@ decisions:
   - 'Discovery has one owner with a live index; a model absent from llmfit''s cache is an absent READING, not an absent model.'
   - 'Fit arithmetic keeps its instrument; no decision may rest on it alone (gates_promotion stays false).'
   - 'One orphan script and its runtime `pip install` leave the repo; the archive index must be regenerated.'
+- id: D-3067
+  state: ACTIVE
+  date: '2026-10-17'
+  by: assistant
+  category: HARNESS / THE DEFAULT BIRTH (D-3056 APPLIED; D-3060 AMENDED BY MEASUREMENT)
+  files:
+  - config/extension_profiles.yaml
+  - scripts/goose_profile.py
+  - /Users/barn/.config/goose/config.yaml
+  title: 'THE CHEAP BIRTH IS NOW THE DEFAULT - `core` is what a session gets when nobody says otherwise, so the 5,633 tok/request is paid only by a session that ASKS for it; and `enabled:` turned out to be a GATE on named provisioning, not merely a default.'
+  decision: >-
+    The owner said DO B. Two flips, both in the ONE home that owns each fact: `default_profile: core` in the policy
+    (config/extension_profiles.yaml) and `enabled: false` for `filesystem` and `gitmcp-mcp` in the harness home
+    (~/.config/goose/config.yaml). Nothing else moved - two lines, read back, and a revert-and-compare proof that every
+    other key is byte-identical. The consequence is the one that was measured before it was promised: a session born
+    from /tmp carries TEN extensions and ZERO start warnings, and pays ~759 tok/request of measured schema instead of
+    ~6,392. The escape hatch is unchanged and now PROVEN: `just session workshop` births the 12-extension surface on
+    demand, from a DISABLED declaration, because the per-session form supplies the command itself. A delegate profile
+    may no longer name an extension the config disables; `sweep` drops `filesystem` (it has `developer.shell` at zero
+    schema cost) and `--check` now reports any profile that would resolve to nothing.
+  rationale: >-
+    The previous sitting made the profile RESOLVED rather than chosen (D-3065) and left the default at `workshop`
+    because flipping it is an owner act on the harness home. The owner has now given that word. The order matters: the
+    resolver was built and measured FIRST, so this act is one line of policy and two lines of state, not a new
+    mechanism. `core` is the correct default on evidence rather than on thrift: of the 26 declared extensions, no
+    script, recipe, skill or justfile recipe in the repo names a `filesystem` or `gitmcp-mcp` tool (the grep finds only
+    the policy's own prose), while both duplicate what `developer.shell` already does at ZERO schema cost. What is
+    refused with the same evidence: keeping `workshop` as the default to avoid one occasional inconvenience (paying
+    5.6k tokens in every request to save one `find`), and making the human pass a profile (the cognitive load D-3065
+    exists to remove).
+  evidence: >-
+    MEASURED 2026-10-17, all four readings independent of each other. (1) BIRTH OF THE DEFAULT: `cd /tmp && goose run
+    --name taskB-core-birth --max-turns 1` -> rc 0, stderr 0 bytes, ZERO start warnings, session `20261017_14`, and
+    its `enabled_extensions.v0` holds exactly ten names (DocGuard, Extension Manager, Fetch, analyze, developer,
+    memory, skills, summarize, summon, todo) with filesystem and gitmcp-mcp ABSENT. (2) THE ESCAPE HATCH: the rendered
+    per-session workshop command, run from /tmp -> rc 0, zero warnings, session `20261017_17`, 11 recorded members
+    including `npx` (filesystem) while the declaration is DISABLED. (3) THE GATE, two-sided: a delegate given
+    `extensions: ["developer","filesystem"]` while filesystem was DISABLED was born with `developer` ALONE (session
+    `20261017_15`), and the same mechanism given `["analyze","memory"]` while both were ENABLED was born with exactly
+    those two (session `20261017_16`) - so the drop is the config's gate, not a broken parameter. (4) RAILS: policy
+    vs live state `--check` rc 0 (26 declared / 8 profiles), selftest 38/38 with a known-answer control that fails if
+    the gate is removed, ruff clean. Backup `~/.config/goose/config.yaml.bak.20261017134734.taskB-core` (7,959 B,
+    verified). R5 (gemma-4-E4B-it-MLX-4bit, `DJ-20261017T115149Z-9fbd`): Verdict REJECT on one objection - a DATE
+    inside a runtime message should be comment-provenance, not prose the OS prints. Upheld and fixed (the message now
+    cites D-3067 only; the dates and session ids live in the comment), and recorded here rather than argued away.
+  consequences:
+  - 'Sessions are born cheap and grow by DELEGATION; a session that needs bulk file tools is started with `just session workshop` (one door, no name to remember for ordinary work).'
+  - '`enabled:` is now known to be a PROVISIONING GATE: a delegate profile that names a disabled extension resolves to nothing, which is a declaration without a referent (D-3034). `--check` reports it OWNER-OWED, and `sweep` was corrected to [developer, analyze].'
+  - 'The saving is CONTEXT, not memory: 5,633 tok/request of the six stdio extensions is now paid only where it is asked for; the RSS saving is the two subprocesses a `core` session no longer starts.'
+  - 'The flip is live only at the NEXT birth (BUG-873 limb b), never inside the session that made it - so the session that applied it still runs the old surface, by construction.'
+  - 'A NEW defect is registered, not hidden: the birth record names a stdio member by its COMMAND, so two `uvx` members collapse into one row (BUG-879) - the same identity confusion that made BUG-878 read as "a member called python3".'

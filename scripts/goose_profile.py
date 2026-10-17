@@ -240,6 +240,24 @@ def check(policy: dict[str, Any], config: dict[str, Any]) -> tuple[int, list[str
         elif name not in expected and enabled:
             drift.append(f"{name}: classified {classes[name]}, not part of the declared default, but ENABLED")
 
+    # A DELEGATE PROFILE NAMES WHAT A CHILD IS BORN WITH - AND A CHILD CAN ONLY BE GIVEN WHAT THE CONFIG ENABLES.
+    # MEASURED 2026-10-17 two-sided (D-3067): a subagent asked for ["developer","filesystem"] while `filesystem` was
+    # DISABLED was born with `developer` ALONE (session 20261017_15), and the same mechanism provisioned
+    # ["analyze","memory"] exactly when both were ENABLED (session 20261017_16). So `enabled:` is not merely the
+    # session default - it is a GATE on named provisioning, and a delegate profile naming a disabled extension is a
+    # declaration that resolves to nothing. Reported here so it is a reading, never a worker's silent missing tool.
+    for delegate, spec in sorted((policy.get("delegate_profiles") or {}).items()):
+        if not isinstance(spec, dict):
+            continue
+        for name in [str(x) for x in (spec.get("extensions") or [])]:
+            if name not in extensions:
+                faults.append(
+                    f"delegate profile {delegate!r} names {name!r}, which the harness does not declare (D-3034)")
+            elif not bool((extensions.get(name) or {}).get("enabled")):
+                drift.append(
+                    f"delegate profile {delegate!r} names {name!r}, but the harness has it DISABLED - a child born"
+                    f" with that list is provisioned WITHOUT it (D-3067)")
+
     if faults:
         return 1, faults, drift, pending
     return (2 if drift or pending else 0), faults, drift, pending
@@ -907,6 +925,15 @@ def _selftest() -> int:
                      _refuses(lambda: render_delegate(dpolicy, dclasses, config, "ghost"))))
     controls.append(("a delegate class refused by decision is REFUSED",
                      _refuses(lambda: render_delegate(dpolicy, dclasses, config, "research"))))
+    # A CHILD CANNOT BE GIVEN WHAT THE CONFIG DISABLES (measured 2026-10-17, D-3067): the same policy naming an
+    # extension the harness has switched OFF must be OWNER-OWED, never silently resolved.
+    disabled = {"extensions": dict(config["extensions"], filesystem={"type": "stdio", "enabled": False,
+                                                                    "cmd": "npx", "args": ["fs", "/a b/c"]})}
+    dpol = dict(policy, profiles={"work": {"adds": []}}, default_profile="work",
+                delegate_profiles={"sweeper": {"extensions": ["developer", "filesystem"], "why": "x"}})
+    drows, _dfa, ddrift, _dp = check(dpol, disabled)
+    controls.append(("a delegate profile naming a DISABLED extension is OWNER-OWED, not a silent drop",
+                     drows == 2 and any("sweeper" in d and "DISABLED" in d for d in ddrift)))
 
     # THE BIRTH: a session is born with an EXPLICIT surface, and a surface that would be born DEAD is refused.
     bpolicy = dict(policy, profiles={"work": {"adds": ["filesystem"]}, "plain": {"adds": []}})

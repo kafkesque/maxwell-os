@@ -67,6 +67,22 @@
   A session born before 2026-10-13 has NO such key and must be reported **NOT RECORDED** — never "absent" (a
   substring search inside those older blobs is contaminated by quoted todo prose). The model side has the same
   shape and its own reading: `python3 scripts/agent_context_probe.py` (served vs declared, fail-closed).
+- **`enabled:` IS A GATE ON NAMED PROVISIONING, NOT ONLY A SESSION DEFAULT.** MEASURED two-sided 2026-10-17: a
+  delegate given `extensions: ["developer","filesystem"]` while `filesystem` was `enabled: false` was born with
+  **`developer` alone** (session `20261017_15`); the same call given `["analyze","memory"]` while both were enabled
+  was born with **exactly those two** (`20261017_16`). So a name in a subagent's list is FILTERED by the config's
+  flag, silently. A delegate profile that names a disabled extension is a declaration with no referent (D-3034), and
+  `scripts/goose_profile.py --check` reports it OWNER-OWED. The reading that re-takes it is the child's own
+  `enabled_extensions.v0` row — never the child's report of which tools it "had".
+- **THE PER-SESSION FORM DOES NOT CONSULT `enabled:`.** MEASURED 2026-10-17: `goose run --no-profile --with-extension
+  'npx -y @modelcontextprotocol/server-filesystem <dir>' …` started **11** extensions with **zero** start warnings
+  while `filesystem` was `enabled: false` in the config (session `20261017_17`). A disabled declaration is therefore
+  available ON DEMAND through `--with-extension`, and never through a subagent's name list. That asymmetry is the
+  whole lever the extension policy rests on (D-3067).
+- **THE BIRTH RECORD NAMES A STDIO MEMBER BY ITS COMMAND.** MEASURED 2026-10-17: four stdio members were supplied
+  and the record holds three names — `python3`, `npx`, `uvx` — so two `uvx` members collapse into one row and a birth
+  cannot be audited member-by-member from the store (session `20261017_17`, BUG-879). This is why an old record can
+  show a "member" called `python3`: that is a command, not an extension.
 </harness_facts>
 
 <!-- BOOT SEQUENCE -->

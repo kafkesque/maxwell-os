@@ -695,3 +695,123 @@ are static per session in goose, so "`core` at birth + delegate for depth" is ou
 3. **T-190's toggle half** — `PreToolUse`/`PostToolUse` hooks are the measured trigger; still unbuilt.
 4. **T-187** — the two-step/two-tool loop fixture; still the only gate for any model promotion.
 5. Pre-existing reds unchanged: `route_graph` (225 vs 222), `check_rail_mutations`, `check_config_defaults`, BUG-876.
+
+## §1h — SEVENTH SITTING (2026-10-17, afternoon): TASK B APPLIED AND PROVEN BY BIRTH, the cascade it exposed FIXED, the three owner acts VERIFIED
+
+### a. What the owner asked (verbatim, trimmed)
+"do B and and do the 3 manual task ... after this queiry you finished I will open a new session so again provide a
+handoff with ll required context so we can continue the conversation from where we finished in this session ...
+first look in general maxwell os current state, continue with the next critical step starting with the highest
+leverage step". Standing rules restated by the owner: senior RAG/systems/ontological lens; clear manual instructions;
+delegate to the right local LLMs and check none drifted; forensic audit BEFORE any serious implementation; list the
+next critical step; sync the governance dependencies so nothing conflicts and nothing superseded stays open.
+
+### b. STATE AT CLOSE (numbers, not impressions)
+| thing | reading |
+|---|---|
+| decisions | **1,194** (D-3067 minted ACTIVE) |
+| bugs | **644** — 234 OPEN / 410 CLOSED (BUG-879 filed, routed) |
+| open tasks | 59 |
+| `goose_profile --check` | **rc 0** — 26 declared extensions / 8 profiles, policy == live state |
+| `goose_profile --selftest` | **38/38** |
+| `check_governance_faces --check` | **rc 0** (644 bug ids, 0 owner-moved tasks) |
+| `gov_sync --apply` | 4 faces equal their re-derivation |
+| `check_freeze_window` | **rc 0** — META-LANE-FREEZE-1 CLOSED, exit MET, parked 12, still OPEN 0 |
+| `resolve_route --check` | **RED (pre-existing)** 225 unrouted bugs vs ceiling 222 — this sitting added a ROUTED bug, so the debt did not grow |
+| `harness_env --check` | **rc 2 OWNER-OWED, by design** — five names unbound in THIS shell; see §h for the correct instruction |
+| pipeline | OMLX + Ollama up; 7,640 FBs (4,503 PASS / 3,137 QUARANTINE); no stage touched this sitting |
+
+### c. TASK B — what landed (before → after → the receipt that decides it)
+| thing | before | after | receipt |
+|---|---|---|---|
+| `default_profile` | `workshop` | **`core`** | `config/extension_profiles.yaml`; resolver prints `('core','default_profile=core')` |
+| `filesystem` | enabled | **disabled** | harness home, 2 lines changed, backup `config.yaml.bak.20261017134734.taskB-core`, revert-and-compare proof that every other key is byte-identical |
+| `gitmcp-mcp` | enabled | **disabled** | same write, same proof |
+| the birth | 12 extensions, ≈6,392 tok/request | **10 extensions, ≈759 tok/request** | `cd /tmp && goose run --max-turns 1` → rc 0, stderr 0 B, **0 warnings**, session **20261017_14**, surface read from `enabled_extensions.v0`: DocGuard, Extension Manager, Fetch, analyze, developer, memory, skills, summarize, summon, todo |
+| the escape hatch | asserted | **PROVEN** | the rendered per-session workshop command, run from `/tmp` → rc 0, 0 warnings, session **20261017_17**, 11 recorded members incl. `npx` — while `filesystem` is DISABLED in the config |
+| `delegate_profiles.sweep` | `[developer, analyze, filesystem]` | **`[developer, analyze]`** | the cascade below: the name stopped resolving the moment the default changed |
+| `--check` | did not see delegate profiles | **reports any delegate profile naming a DISABLED extension as OWNER-OWED** | known-answer control that FAILS if the branch is removed (selftest 38/38) |
+
+**What this buys, stated in the currencies it is actually paid in:** the 5,633 tok/request of `filesystem` (3,727) +
+`gitmcp-mcp` (1,906) is no longer paid by a session that did not ask for it; two subprocesses a `core` session no
+longer starts are the memory half. It is live only at the NEXT birth (BUG-873 limb b) — the session that applied it
+still runs the old surface, by construction.
+
+### d. THE CASCADE THE FORENSIC AUDIT FOUND — and it is fixed here, not deferred
+The audit asked the one question that mattered: *who already depended on the surface being switched off?* Answer:
+the declared subagent profiles. `enabled:` is **not** merely "the session default" — it is a **gate on named
+provisioning**, measured two-sided: a delegate given `extensions: ["developer","filesystem"]` while `filesystem` was
+disabled was born with **`developer` alone** (session `20261017_15`); the same mechanism given
+`["analyze","memory"]` while both were enabled was born with **exactly those two** (`20261017_16`). So `sweep`, which
+named `filesystem`, had silently become a declaration with no referent (D-3034). Two acts, both landed: the profile
+drops the name (`developer.shell` reads files at ZERO schema cost), and `--check` now makes the shape loud.
+**Consumer sweep before either act:** of every `.py`, `.md`, `.yaml` and justfile recipe in the repo, NONE names a
+`filesystem` or `gitmcp-mcp` tool — the only hit is the policy's own prose.
+
+### e. THE THREE MANUAL ACTS — VERIFIED BY THEIR OWN RAILS, none redone on faith
+| act | how it was verified this sitting | reading |
+|---|---|---|
+| **T-186 residency flips** (the 7 extensions switched off, 12 left resident) | the flip receipt `temp/t186_flip_20261017.json` **and** the live comparison `goose_profile --check` (policy vs harness state) | 7 disabled / 12 enabled at the time; today **rc 0** against `core`, and the receipt backup is named |
+| **T-174 provider flip** | the writer's own dry run, `apply_provider_flip.py --dry-run` | **`0 edit(s) to apply, 4 already applied`** — the pointer-resolved values equal the bytes in the home |
+| **META-LANE-FREEZE-1** (re-rule or close) | `scripts/check_freeze_window.py` | **rc 0**, `state=closed`, `closed_by: the owner 2026-10-17`, exit MET on both clauses, parked 12 (ceiling 12), **still OPEN 0**, released 3 |
+They were already discharged; re-doing them would have been theatre. What was owed was a READING, and each now has one.
+
+### f. NEW HARNESS FACTS (each with the reading that re-takes it; also written into AGENTS.md)
+1. **`enabled:` is a gate on named provisioning.** Delegate lists are filtered by it, silently. Re-take: the child's
+   own `enabled_extensions.v0` row (`20261017_15` vs `20261017_16`) — never the child's report of its tools.
+2. **The per-session form does not consult `enabled:`.** `--with-extension '<cmd> <args>'` starts a DISABLED
+   declaration (20261017_17). That asymmetry is the whole lever the extension policy rests on: a disabled declaration
+   is available ON DEMAND, and never through a subagent's name list.
+3. **The birth record names a stdio member by its COMMAND.** Four stdio members were supplied and the record holds
+   three names (`python3`, `npx`, `uvx`), so two `uvx` members collapse into one row — BUG-879, and the reason an old
+   record can show a "member" called `python3`, which is what made BUG-878 read wrong the first time.
+
+### g. ONE GOVERNANCE CORRECTION (a live instruction that would have re-created a fixed bug)
+BUG-854's residual sentence said the missing environment binding is "the one line for the owner's shell profile".
+`pipeline/harness_env.py --print` refuses that in its own header: `# scope: agent_loop - bound FOR this class; never
+place these lines in a login profile (BUG-871)`. A global cap + the 4B model in a login profile IS BUG-871. The entry
+now carries a dated CORRECTION with the correct form (below), so the next reader is not led into it.
+
+### h. WHAT THE OWNER STILL OWNS (exact command, no ambiguity)
+1. **Bind the harness contract in the shell that LAUNCHES goose** (not a login profile, see §g). One line:
+   ```
+   eval "$(python3 pipeline/harness_env.py --print --scope agent_loop)"
+   ```
+   Reading after it, in that same shell: `python3 pipeline/harness_env.py --check` → rc 0 (it is rc 2 now: five names
+   UNBOUND, which is the DECLARED-not-BOUND state, loud and not fatal, BUG-457).
+2. **Nothing else.** `just go` needs no argument, no profile name, no per-session choice: it resolves `core`.
+   `just session workshop` is the whole of the escape hatch when bulk file tools are wanted.
+
+### i. NEXT CRITICAL STEPS, consequential order (each unblocked unless marked)
+1. **T-183's applier** — pipeline lane #1, still untouched: 479 admission candidates have a corpus home and a derived
+   target under the D-3062 share rule; nothing may move until a plan-keyed, dry-run-default, crash-safe
+   (tempfile→fsync→os.replace), receipted writer exists that refuses a row absent from the signed plan, an existing
+   target, or a run while the rename has not ridden.
+2. **T-187** — the two-step/two-tool loop fixture: still the ONLY gate for any model promotion (and for the
+   Qwen3-30B-A3B-Instruct-2507 candidate).
+3. **T-190's toggle half** — `extensionmanager` still leaves no trace; the measured trigger is goose hooks
+   `PreToolUse`/`PostToolUse`, with `SessionStart` as the birth receipt. `PreToolUse` is also where a "you are using a
+   tool from an extension you are about to disable" guard would live.
+4. **BUG-879** (new, LOW) — record the declared NAME as the member identity and keep `cmd` in its own field, so a birth
+   can be audited member-by-member. Acceptance reading is written in the bug.
+5. **BUG-876** — the attribution control cannot go green on `config/decisions.yaml` (no receipted post-image); still
+   the one blocker preventing a loop agent from adjudicating a governed write.
+6. **The four pstack ideas to port as OUR OWN single skills** (never the bundle): `prove-it-works`,
+   `benchmark-checklist`, `deslop`/`unslop`, `interrogate`.
+7. **The verified-but-unbuilt peer gap**: true progressive disclosure is impossible with static MCP schemas in goose,
+   so `core` + delegate is the faithful approximation. Any future work on dynamic tool surfaces must NAME the gap
+   rather than assume it closed.
+8. **Pre-existing reds, unchanged this sitting:** `route_graph` 225 vs 222 (SHRINK-ONLY), `check_rail_mutations`,
+   `check_config_defaults`, `check_bug_recall` (owner-owed class ceiling), `lib/handoff --selftest`,
+   `check_silent_repair`, `check_undeclared_encoding`, `check_store_columns`, `reconcile`, `verify_generator_pins`,
+   `check_tests`, `build_anchor_store_bridge`, BUG-875 (`pipeline`/`tools` remain PEP-420 namespace roots).
+
+### j. HOW TO RESUME IN A FRESH SESSION (the read order, in this order)
+1. `python3 scripts/goose_profile.py --check` → expect **rc 0**; `--render core` prints the realised surface. This is
+   now the cheapest possible reading of "what my session is": ten extensions, ≈759 tok/request of measured schema.
+2. `python3 scripts/check_freeze_window.py` and `python3 scripts/check_governance_faces.py --check` → both rc 0.
+3. `just health` → ONE known red (`route graph`, 225 vs 222) plus the `harness_env` rc 2 until the owner runs §h.1.
+4. Read D-3065 → D-3067 in `config/decisions.yaml` (the profile is RESOLVED; the default is `core`; the gate on named
+   provisioning), then `config/extension_profiles.yaml` (policy) — never the handoff prose INSTEAD of them.
+5. Then start at §i.1. Delegation remains: `sweep` (read-only repositories), `review` (judge one artefact),
+   `extract` (summarise WITH source). Never: open-ended research, promotions, governed writes.

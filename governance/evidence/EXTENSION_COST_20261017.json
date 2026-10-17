@@ -1,0 +1,427 @@
+{
+  "measured_at": "2026-10-17T10:36:08+0200",
+  "home": "/Users/barn/.config/goose/config.yaml",
+  "bytes_per_token": 4,
+  "server_timeout_s": 45.0,
+  "rows": [
+    {
+      "name": "developer",
+      "type": "platform",
+      "measured": false,
+      "tools": null,
+      "schema_bytes": null,
+      "verdict": "NOT-A-SUBPROCESS",
+      "note": "platform/builtin: no process and no separable tools/list - schema bytes ABSENT, not zero (D-2957)",
+      "enabled": true,
+      "cmd": null,
+      "args": null
+    },
+    {
+      "name": "analyze",
+      "type": "platform",
+      "measured": false,
+      "tools": null,
+      "schema_bytes": null,
+      "verdict": "NOT-A-SUBPROCESS",
+      "note": "platform/builtin: no process and no separable tools/list - schema bytes ABSENT, not zero (D-2957)",
+      "enabled": true,
+      "cmd": null,
+      "args": null
+    },
+    {
+      "name": "todo",
+      "type": "platform",
+      "measured": false,
+      "tools": null,
+      "schema_bytes": null,
+      "verdict": "NOT-A-SUBPROCESS",
+      "note": "platform/builtin: no process and no separable tools/list - schema bytes ABSENT, not zero (D-2957)",
+      "enabled": true,
+      "cmd": null,
+      "args": null
+    },
+    {
+      "name": "skills",
+      "type": "platform",
+      "measured": false,
+      "tools": null,
+      "schema_bytes": null,
+      "verdict": "NOT-A-SUBPROCESS",
+      "note": "platform/builtin: no process and no separable tools/list - schema bytes ABSENT, not zero (D-2957)",
+      "enabled": true,
+      "cmd": null,
+      "args": null
+    },
+    {
+      "name": "summon",
+      "type": "platform",
+      "measured": false,
+      "tools": null,
+      "schema_bytes": null,
+      "verdict": "NOT-A-SUBPROCESS",
+      "note": "platform/builtin: no process and no separable tools/list - schema bytes ABSENT, not zero (D-2957)",
+      "enabled": true,
+      "cmd": null,
+      "args": null
+    },
+    {
+      "name": "tom",
+      "type": "platform",
+      "measured": false,
+      "tools": null,
+      "schema_bytes": null,
+      "verdict": "NOT-A-SUBPROCESS",
+      "note": "platform/builtin: no process and no separable tools/list - schema bytes ABSENT, not zero (D-2957)",
+      "enabled": true,
+      "cmd": null,
+      "args": null
+    },
+    {
+      "name": "extensionmanager",
+      "type": "platform",
+      "measured": false,
+      "tools": null,
+      "schema_bytes": null,
+      "verdict": "NOT-A-SUBPROCESS",
+      "note": "platform/builtin: no process and no separable tools/list - schema bytes ABSENT, not zero (D-2957)",
+      "enabled": true,
+      "cmd": null,
+      "args": null
+    },
+    {
+      "name": "chatrecall",
+      "type": "platform",
+      "measured": false,
+      "tools": null,
+      "schema_bytes": null,
+      "verdict": "NOT-A-SUBPROCESS",
+      "note": "platform/builtin: no process and no separable tools/list - schema bytes ABSENT, not zero (D-2957)",
+      "enabled": true,
+      "cmd": null,
+      "args": null
+    },
+    {
+      "name": "code_execution",
+      "type": "platform",
+      "measured": false,
+      "tools": null,
+      "schema_bytes": null,
+      "verdict": "NOT-A-SUBPROCESS",
+      "note": "platform/builtin: no process and no separable tools/list - schema bytes ABSENT, not zero (D-2957)",
+      "enabled": true,
+      "cmd": null,
+      "args": null
+    },
+    {
+      "name": "summarize",
+      "type": "platform",
+      "measured": false,
+      "tools": null,
+      "schema_bytes": null,
+      "verdict": "NOT-A-SUBPROCESS",
+      "note": "platform/builtin: no process and no separable tools/list - schema bytes ABSENT, not zero (D-2957)",
+      "enabled": true,
+      "cmd": null,
+      "args": null
+    },
+    {
+      "name": "orchestrator",
+      "type": "platform",
+      "measured": false,
+      "tools": null,
+      "schema_bytes": null,
+      "verdict": "NOT-A-SUBPROCESS",
+      "note": "platform/builtin: no process and no separable tools/list - schema bytes ABSENT, not zero (D-2957)",
+      "enabled": false,
+      "cmd": null,
+      "args": null
+    },
+    {
+      "name": "apps",
+      "type": "platform",
+      "measured": false,
+      "tools": null,
+      "schema_bytes": null,
+      "verdict": "NOT-A-SUBPROCESS",
+      "note": "platform/builtin: no process and no separable tools/list - schema bytes ABSENT, not zero (D-2957)",
+      "enabled": true,
+      "cmd": null,
+      "args": null
+    },
+    {
+      "name": "computercontroller",
+      "type": "builtin",
+      "measured": false,
+      "tools": null,
+      "schema_bytes": null,
+      "verdict": "NOT-A-SUBPROCESS",
+      "note": "platform/builtin: no process and no separable tools/list - schema bytes ABSENT, not zero (D-2957)",
+      "enabled": false,
+      "cmd": null,
+      "args": null
+    },
+    {
+      "name": "autovisualiser",
+      "type": "builtin",
+      "measured": false,
+      "tools": null,
+      "schema_bytes": null,
+      "verdict": "NOT-A-SUBPROCESS",
+      "note": "platform/builtin: no process and no separable tools/list - schema bytes ABSENT, not zero (D-2957)",
+      "enabled": false,
+      "cmd": null,
+      "args": null
+    },
+    {
+      "name": "memory",
+      "type": "builtin",
+      "measured": false,
+      "tools": null,
+      "schema_bytes": null,
+      "verdict": "NOT-A-SUBPROCESS",
+      "note": "platform/builtin: no process and no separable tools/list - schema bytes ABSENT, not zero (D-2957)",
+      "enabled": true,
+      "cmd": null,
+      "args": null
+    },
+    {
+      "name": "tutorial",
+      "type": "builtin",
+      "measured": false,
+      "tools": null,
+      "schema_bytes": null,
+      "verdict": "NOT-A-SUBPROCESS",
+      "note": "platform/builtin: no process and no separable tools/list - schema bytes ABSENT, not zero (D-2957)",
+      "enabled": false,
+      "cmd": null,
+      "args": null
+    },
+    {
+      "name": "youtubetranscript",
+      "type": "stdio",
+      "measured": true,
+      "tools": 4,
+      "schema_bytes": 4671,
+      "tokens_est": 1168,
+      "first_tools": [
+        "get_transcript",
+        "get_timed_transcript",
+        "get_video_info",
+        "get_available_languages"
+      ],
+      "verdict": "OK",
+      "wall_s": 1.5,
+      "enabled": true,
+      "cmd": "uvx",
+      "args": [
+        "--from",
+        "git+https://github.com/jkawamoto/mcp-youtube-transcript",
+        "mcp-youtube-transcript"
+      ]
+    },
+    {
+      "name": "pdfreader",
+      "type": "stdio",
+      "measured": true,
+      "tools": 1,
+      "schema_bytes": 1398,
+      "tokens_est": 350,
+      "first_tools": [
+        "read_pdf"
+      ],
+      "verdict": "OK",
+      "wall_s": 1.2,
+      "enabled": false,
+      "cmd": "uvx",
+      "args": [
+        "--with",
+        "mcp<2",
+        "mcp-read-pdf"
+      ]
+    },
+    {
+      "name": "docguard",
+      "type": "stdio",
+      "measured": true,
+      "tools": 4,
+      "schema_bytes": 1683,
+      "tokens_est": 421,
+      "first_tools": [
+        "check_protected",
+        "safe_write",
+        "safe_append",
+        "safe_edit"
+      ],
+      "verdict": "OK",
+      "wall_s": 1.0,
+      "enabled": true,
+      "cmd": "python3",
+      "args": [
+        "mcp_doc_guard.py"
+      ]
+    },
+    {
+      "name": "gitmcp",
+      "type": "stdio",
+      "measured": true,
+      "tools": 5,
+      "schema_bytes": 3539,
+      "tokens_est": 885,
+      "first_tools": [
+        "match_common_libs_owner_repo_mapping",
+        "fetch_generic_documentation",
+        "search_generic_documentation",
+        "search_generic_code",
+        "fetch_generic_url_content"
+      ],
+      "verdict": "OK",
+      "wall_s": 3.9,
+      "enabled": false,
+      "cmd": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "https://gitmcp.io/docs"
+      ]
+    },
+    {
+      "name": "fetch",
+      "type": "stdio",
+      "measured": true,
+      "tools": 1,
+      "schema_bytes": 1354,
+      "tokens_est": 338,
+      "first_tools": [
+        "fetch"
+      ],
+      "verdict": "OK",
+      "wall_s": 0.9,
+      "enabled": true,
+      "cmd": "uvx",
+      "args": [
+        "mcp-server-fetch"
+      ]
+    },
+    {
+      "name": "gitmcp-mcp",
+      "type": "stdio",
+      "measured": true,
+      "tools": 12,
+      "schema_bytes": 7624,
+      "tokens_est": 1906,
+      "first_tools": [
+        "git_status",
+        "git_diff_unstaged",
+        "git_diff_staged",
+        "git_diff",
+        "git_commit"
+      ],
+      "verdict": "OK",
+      "wall_s": 0.9,
+      "enabled": true,
+      "cmd": "uvx",
+      "args": [
+        "mcp-server-git"
+      ]
+    },
+    {
+      "name": "filesystem",
+      "type": "stdio",
+      "measured": true,
+      "tools": 14,
+      "schema_bytes": 14909,
+      "tokens_est": 3727,
+      "first_tools": [
+        "read_file",
+        "read_text_file",
+        "read_media_file",
+        "read_multiple_files",
+        "write_file"
+      ],
+      "verdict": "OK",
+      "wall_s": 1.5,
+      "enabled": true,
+      "cmd": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "/Users/barn"
+      ]
+    },
+    {
+      "name": "puppeteer",
+      "type": "stdio",
+      "measured": true,
+      "tools": 7,
+      "schema_bytes": 3336,
+      "tokens_est": 834,
+      "first_tools": [
+        "puppeteer_navigate",
+        "puppeteer_screenshot",
+        "puppeteer_click",
+        "puppeteer_fill",
+        "puppeteer_select"
+      ],
+      "verdict": "OK",
+      "wall_s": 1.5,
+      "enabled": false,
+      "cmd": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-puppeteer"
+      ]
+    },
+    {
+      "name": "scheduler",
+      "type": "platform",
+      "measured": false,
+      "tools": null,
+      "schema_bytes": null,
+      "verdict": "NOT-A-SUBPROCESS",
+      "note": "platform/builtin: no process and no separable tools/list - schema bytes ABSENT, not zero (D-2957)",
+      "enabled": true,
+      "cmd": null,
+      "args": null
+    },
+    {
+      "name": "reddit",
+      "type": "stdio",
+      "measured": true,
+      "tools": 2,
+      "schema_bytes": 1395,
+      "tokens_est": 349,
+      "first_tools": [
+        "fetch_reddit_hot_threads",
+        "fetch_reddit_post_content"
+      ],
+      "verdict": "OK",
+      "wall_s": 2.2,
+      "enabled": true,
+      "cmd": "uvx",
+      "args": [
+        "--with",
+        "httpx",
+        "--from",
+        "git+https://github.com/adhikasp/mcp-reddit.git",
+        "mcp-reddit"
+      ]
+    }
+  ],
+  "totals": {
+    "declared": 26,
+    "enabled": 19,
+    "enabled_stdio_measured": 6,
+    "enabled_tools_measured": 37,
+    "enabled_schema_bytes_measured": 31636,
+    "enabled_tokens_est_measured": 7909
+  },
+  "live_rss_mb": {
+    "git+https://github.com/jkawamoto/mcp-youtube-transcript": 27.4,
+    "/Users/barn/.cache/uv/archive-v0/gKNTi4HJwhD7woLgymPoq/bin/mcp-youtube-transcript": 77.5,
+    "mcp-server-fetch": 55.3,
+    "mcp-server-git": 55.9,
+    "/Users/barn/.cache/uv/archive-v0/myYBlDHPBwowL8wHDGO9N/bin/mcp-server-fetch": 134.9,
+    "/Users/barn/.cache/uv/archive-v0/cmqCFcrfOGUgRqXpN7aJ1/bin/mcp-server-git": 115.2,
+    "/Users/barn/.npm/_npx/a3241bba59c344f5/node_modules/.bin/mcp-server-filesystem": 56.7
+  }
+}

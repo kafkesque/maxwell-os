@@ -26843,3 +26843,111 @@ decisions:
   - 'The DigUp re-open condition is now recorded in the register of un-evaluated research: an interface the OS can
     PIN (a declared CLI or MCP surface whose version and index are hashable) plus one NAMED consumer; until both
     exist, DigUp stays the owner''s front door and no component.'
+- id: D-3056
+  state: ACTIVE
+  date: '2026-10-17'
+  by: assistant
+  category: EXTENSION RESIDENCY / CONTEXT ECONOMY (extension rot)
+  bugs: [BUG-873]
+  files: [config/extension_profiles.yaml, scripts/goose_profile.py, scripts/measure_extension_cost.py,
+    config/rail_registry.yaml, justfile, governance/evidence/EXTENSION_COST_20261017.json]
+  title: >-
+    EXTENSION ROT IS ANSWERED AT THE POLICY LAYER - a TOTAL classification (always / on_demand / never), a MEASURED
+    cost per resident extension, and the harness's own --no-profile as the switch. Nothing is deleted, and nothing
+    stays resident because it once arrived.
+  decision: |-
+    An extension arrives for one task and stays forever, because no one owns the question "may this be resident at
+    all?". That question now has a home. config/extension_profiles.yaml classifies every extension the harness
+    declares: always (10), on_demand (8), never (8). The classification is TOTAL - an extension nobody classified is
+    a FAULT (C16), not a silence - and every name must RESOLVE in the harness config while no cmd, arg or env is
+    restated here (D-3034/C12: the commands and the live flags keep their one home).
+
+    THE COST IS MEASURED, NOT QUOTED. scripts/measure_extension_cost.py spawns each ENABLED stdio extension exactly
+    as the harness would and reads its tools/list: the six enabled stdio extensions ship 37 tool schemas =
+    31,636 bytes = ~7,909 tokens PER REQUEST, before one word of work. Platform/builtin schema bytes are ABSENT, not
+    zero (D-2957): their 25 tools are counted but not priced. The live memory reading is 649 MB of RSS across 11
+    processes - the CONTEXT cost is the larger one, which is why a tool count was never the right number.
+
+    THE SWITCH IS THE HARNESS'S, MEASURED TWO-SIDED 2026-10-17: "goose run --no-profile --with-builtin developer"
+    started with ZERO warnings and answered, while adding a bogus name printed "Warning: Failed to start extension
+    'not_a_real_extension' ... continuing without it". Two realisations are printed by scripts/goose_profile.py
+    --render and NEITHER is applied by it: the persistent one (enabled flags, live at the NEXT session's birth - a
+    running session keeps the surface it was born with) and the per-session one (--no-profile). Writing the owner's
+    harness home stays the owner's act.
+
+    --check compares POLICY to STATE in the three states the rail registry can report: 0 agree, 1 FAULT (an
+    unclassified extension, a policy name the harness does not declare, a profile that adds what it may not add),
+    2 OWNER-OWED (extensions resident against the policy, each listed with its measured token cost).
+  consequences:
+  - 'MEASURED TAX, so the size of the problem is not guessed: ~7,909 tokens/request of stdio tool schema against gemma-4-E4B''s 32,768-token window is ~24% of the window before any work; the 649 MB of live RSS is the smaller half.'
+  - 'NINE extensions are resident against the policy on 2026-10-17 (apps, chatrecall, code_execution, filesystem, gitmcp-mcp, reddit, scheduler, tom, youtubetranscript). Flipping them is the OWNER''s act (T-186): a pipeline lane editing the owner''s harness home would be an unwatched mover (D-3049), so the script only PRINTS the flips.'
+  - 'filesystem (3,727 tok) and gitmcp-mcp (1,906 tok) are the two largest residents and both overlap developer (read/write, git through the shell): they move to the WORKSHOP profile, not out of the toolset.'
+  - 'tom and scheduler are MEASURED 0-tool extensions and are classified never: the BUG-873 shape, with a verdict home at last.'
+  - 'extensionmanager stays resident ON PURPOSE: it is the in-session switch, so an on-demand policy needs it present.'
+  - 'A new extension now lands UNCLASSIFIED, which the health ladder reports. Extension rot becomes a red line, not a habit.'
+- id: D-3057
+  state: ACTIVE
+  date: '2026-10-17'
+  by: owner
+  category: DEPENDENCY POLICY / PLUGIN VERDICTS
+  bugs: [BUG-873]
+  files: [governance/evidence/PLUGIN_SURVEY_20261017.md, governance/evidence/PLUGIN_HEALTH_20261017.md,
+    governance/NOT-YET-EVALUATED-RESEARCH.md]
+  title: >-
+    THE PLUGIN VERDICTS ARE APPROVED AND REGISTERED (D-3038): adopt two, trial two, refuse six classes - and the
+    capability the survey found missing is WIRING, not a download.
+  decision: |-
+    The market sweep (23 searches, every third-party claim carrying a URL, checked against 19 already-rejected items)
+    is converted from a survey into a register of verdicts, so a refused idea cannot be re-proposed as news.
+
+    ADOPT: (a) ruff + mypy as rails - C17 is a rule that has only half a runner; (b) mcp-read-pdf, the goose
+    catalogue's PDF Reader - already installed, REPAIRED by measurement ("--with mcp<2"; mcp==1.9.4 cannot import on
+    Python 3.14), and classified on_demand / documents so it is never resident.
+
+    TRIAL: ripwire, pinned and read-only, aimed at the MEASURED weakness that excerpt_bytes truncates at 24,000 B
+    silently. A trial that is not pinned is an adoption nobody recorded.
+
+    REFUSE, each with its reason: the whole document-conversion MCP class (docling-mcp / markitdown-mcp /
+    mcp-pandoc) - a second home beside S0's pandoc+Docling pipeline; ebook and bibliography MCPs - calibre-mcp is an
+    unwatched mover (D-3049), ZotSeek is unlicensed, mcp-zotero is cloud (C3); byte-equality dedupers (czkawka /
+    fclones) - the wrong operator for 727 DRIFTED works, which need near-duplicate judgement rather than equality;
+    Watchexec - an unwatched mover; local memory/knowledge MCPs and read-only SQL MCPs - second homes for the corpus
+    and for retrieval, which already have one each.
+  consequences:
+  - 'THE GAP THE SWEEP FOUND IS NOT CLOSABLE BY DOWNLOAD: grounding "just ask" in the retriever (retrieve -> cite FB ids -> REFUSE when the corpus is silent -> receipt) is WIRING, and it remains the top product-side task.'
+  - 'mypy is owed a RAIL (T-188): approving a tool is not running it (BUG-492).'
+  - 'ripwire may become a dependency of no pipeline stage until it has one NAMED consumer; until then it is a read-only instrument.'
+  - 'REFUSED and recorded, so each is a re-ask rather than a discovery: document conversion, ebook/bibliography, byte-equality dedup, filesystem watch, and second-home memory/knowledge and SQL surfaces.'
+- id: D-3058
+  state: ACTIVE
+  date: '2026-10-17'
+  by: owner
+  category: MODEL ROSTER / TOOL CALLING (the loop tier)
+  bugs: [BUG-874]
+  files: [config/model_assignments.yaml, scripts/measure_subagent_loop.py, config/agent_context.yaml]
+  title: >-
+    QWEN3.5-9B HAS NO MEASURED USE AND IS RETIRED FROM DECLARATIONS; "ONLY GEMMA CAN TOOL-CALL" IS REFUTED BY
+    MEASUREMENT; and no model is promoted into an agent-loop role before the TWO-STEP test.
+  decision: |-
+    QWEN3.5-9B. Downloaded (5.7 GB), benchmarked and REJECTED for S4 at 0% domain agreement with gpt-oss-20b and
+    1.8x slower (HANDOFF_D2293), then pruned - and the NAME survived in a harness declaration that resolved to
+    nothing: no served model answers to it, and the only bytes on this machine are two LM-Studio MLX hub repos
+    (4bit/8bit) that were NEVER SERVED. BUG-874 removed the name from the provider list. Verdict: not bloat on the
+    route it was measured on, bloat on disk; the name is retired everywhere and disposal of the hub copies is the
+    OWNER's (R-D410). The Qwen3.5-35B-A3B SHAPE stays a candidate (20.4 GB, llmfit estimate 56 tok/s) with no
+    measurement and therefore no slot.
+
+    TOOL CALLING. The D-2549 measurement drove a fixed 3-call tool loop with every SERVED model and 7 of 8 passed, so
+    "only gemma can drive a loop" is RETIRED - it was a conclusion from one model having been tried. Ranked by the
+    slowest turn: MiniCPM5-2B 2.1 s, Ornith-1.5-35B-A3B 8.3 s, Ornith-1.5-9B 11.5 s, gemma-4-E4B 14.3 s,
+    gpt-oss-20b 18.5 s, Qwen3.8-27B 50.2 s, Qwen3-Coder-30B 79.9 s; Phi-4-mini made ZERO tool calls and answered
+    from memory (BUG-053's shape on a loop).
+
+    llmfit (0.9.38, run 2026-10-17) recommends DeepSeek-R1-0528-Qwen3-8B at score 95.3 with capability "Tool Use".
+    REFUSED, not downloaded: that 95.3 is a HARDWARE-FIT score computed at an 8,192-token context estimate, the model
+    is a 2025 reasoning distill, and this register already records that llmfit's database lags the market. A fit
+    score is not a loop measurement, and a capability TAG is not a capability.
+  consequences:
+  - 'Two candidates are NAMED and NEITHER is promoted: AGENT_LOOP_FAST (MiniCPM5-2B - ~7x faster than gemma, 131k window) and AGENT_LOOP_WORKHORSE (Ornith-1.5-9B - 262k window). gemma-4-E4B stays the verified default until T-187 lands.'
+  - 'T-187 owes the test the 3-call loop is NOT: two tools with a DISTRACTOR, two DEPENDENT steps, and an answer only the second tool''s output can produce. One datapoint on a trivial read is not evidence of agentic ability, and promoting a model on it would be exactly the drift this decision exists to prevent.'
+  - 'A never_for string is now a MEASURED claim: two were FALSE as written (gpt-oss-20b drove a loop and passed; Phi-4 must never drive one) and were corrected in config/model_assignments.yaml.'

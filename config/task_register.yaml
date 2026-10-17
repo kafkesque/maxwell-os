@@ -1,6 +1,6 @@
 schema_version: '1'
 authority: D-2981
-updated: '2026-10-13'
+updated: '2026-10-17'
 tasks:
 - id: T-101
   priority: MUST
@@ -2223,3 +2223,49 @@ tasks:
     \ contradicts the formula is FATAL); the same reading covers the delivery mode, so a run declared background that\
     \ blocks its parent is reported rather than shrugged at. A heartbeat line before and after the long call is part\
     \ of the fix, because a silent ceiling is what made a stall indistinguishable from progress."
+- id: T-186
+  priority: SHOULD
+  state: open
+  mover: owner
+  title: APPLY THE EXTENSION RESIDENCY POLICY - flip the nine residents the policy does not justify, and start research/document sessions in the per-session form
+  source: D-3056; config/extension_profiles.yaml; scripts/goose_profile.py; BUG-873
+  evidence: >-
+    MEASURED 2026-10-17 (governance/evidence/EXTENSION_COST_20261017.json): the six enabled stdio extensions ship 37
+    tool schemas = 31,636 B = ~7,909 tokens per request, and "python3 scripts/goose_profile.py --check" reports NINE
+    extensions resident against the policy - apps, chatrecall, code_execution, filesystem, gitmcp-mcp, reddit,
+    scheduler, tom, youtubetranscript. Two of them (tom, scheduler) are measured 0-TOOL extensions. The switch itself
+    is the harness's and was measured two-sided: --no-profile with --with-builtin starts clean, a bogus name warns.
+  gate: >-
+    The DISPOSITION-GIVER applies the printed flips ("just extension-profile workshop" prints them; the script writes
+    nothing) and confirms the result in a NEW session - a running session keeps the surface it was born with - by
+    reading that session's own extension surface. Until then rc 2 from "just extensions-check" is the honest state
+    of the harness, and it is owner-owed, not a fault.
+- id: T-187
+  priority: SHOULD
+  state: open
+  mover: pipeline
+  title: THE TWO-STEP / TWO-TOOL LOOP DISCRIMINATION - before any model is promoted into an agent-loop role
+  source: D-3058; scripts/measure_subagent_loop.py; D-2549
+  evidence: >-
+    MEASURED 2026-10-17: the fixed 3-call loop passed for 7 of 8 served models, which retires "only gemma can
+    tool-call" but does NOT rank them - the task needed one trivial read and every model that called it answered 12.
+    MiniCPM5-2B passed in 2.1 s and gemma in 14.3 s, yet a single read cannot distinguish "drives a loop" from "calls
+    a tool once and guesses". Phi-4-mini made ZERO calls, the one real discriminator the current fixture produced.
+  gate: >-
+    A second fixture in scripts/measure_subagent_loop.py: two tools with a DISTRACTOR, two DEPENDENT steps, and an
+    expected answer that only the second tool's output can produce; the same served set; a receipt. Promotion of
+    AGENT_LOOP_FAST / AGENT_LOOP_WORKHORSE into config/model_assignments.yaml is gated on it (D-3058).
+- id: T-188
+  priority: SHOULD
+  state: open
+  mover: pipeline
+  title: MYPY AS A RAIL - C17 is a rule with only half a runner (ruff runs, mypy does not)
+  source: D-3057; GOVERNANCE/C17; governance/evidence/PLUGIN_SURVEY_20261017.md
+  evidence: >-
+    MEASURED 2026-10-17: every new script in this sitting was checked with "python3 -m ruff check" and passed, while
+    NO rail in config/rail_registry.yaml invokes a type checker. C17 ("type hints on all function signatures") is
+    therefore enforced by habit, and a habit is not a control (BUG-492).
+  gate: >-
+    A rail that runs mypy over the declared surface from a pinned config, registered in config/rail_registry.yaml and
+    invoked by the health ladder, tri-state (a new untyped signature is RED, not a note). The baseline must be
+    ratcheted, never made "clean by exclusion" of the files that fail today.

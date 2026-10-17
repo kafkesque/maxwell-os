@@ -1,0 +1,142 @@
+schema_version: "1.0"
+# config/extension_profiles.yaml - WHICH EXTENSION MAY BE RESIDENT, AND WHY (T-186 / D-3056).
+#
+# THE PROBLEM THIS ANSWERS. "Turn an extension on only when it is needed" is unanswerable while no one owns the
+# question "may this extension be resident at all?". Without that owner, an extension arrives for one task and stays
+# forever: nothing ever removes it, because removing it is nobody's act. That is EXTENSION ROT. It is paid in two
+# currencies, and only one of them is visible in `ps`:
+#
+#   MEMORY  - an enabled stdio extension is a live subprocess for the whole session (in practice two: the uvx/npx
+#             shim plus its interpreter). It is resident whether or not a single tool is called.
+#   CONTEXT - every tool an extension declares is shipped to the model WITH EVERY REQUEST as a schema. This is the
+#             expensive one: it is paid per turn, it competes with the corpus for the window, and it never appears in
+#             a memory reading. Measured 2026-10-17 (receipt below): the six enabled stdio extensions alone ship
+#             37 tool schemas = 31,636 bytes ≈ 7,909 tokens per request, before one word of work.
+#
+# WHAT THIS FILE IS, AND WHAT IT IS NOT. It declares a CLASSIFICATION and nothing else. It does NOT restate any
+# extension's cmd, args or env - those live in the ONE home (the harness config, resolved through
+# config/agent_context.yaml#homes.harness_config), and scripts/goose_profile.py reads them from there. It does NOT
+# restate the live enabled/disabled flags either: those are the harness's own state, and copying them here would be a
+# second home that drifts silently (C12). The relation is: POLICY (here) vs STATE (there), and
+# `python3 scripts/goose_profile.py --check` makes a disagreement between them LOUD (owner-owed, rc 2) instead of
+# letting it be discovered by a slow session.
+#
+# THE CLASSIFICATION IS TOTAL (C16: a missing value is FATAL, not zero). Every extension the harness config declares
+# must appear in exactly ONE of `always` / `on_demand` / `never`. An extension nobody classified is not "unclassified",
+# it is an owner-owed decision - and the rail refuses to call that state clean.
+
+measured_by:
+  date: '2026-10-17'
+  rail: 'python3 scripts/measure_extension_cost.py'
+  receipt: 'governance/evidence/EXTENSION_COST_20261017.json'
+  note: >-
+    The numbers are NOT copied here on purpose: a cost that lives in two places is a cost that is wrong in one of
+    them. The receipt is the measurement; this file is the policy. Re-run the rail after any config change.
+
+# THE RESIDENCY RULE, stated so a future extension has somewhere to land:
+rule: >-
+  An extension is `always` only when an act the OS performs in EVERY session needs one of its tools AND its schema
+  cost is small. It is `on_demand` when the act is real but occasional - it is added for the session that needs it and
+  is absent otherwise. It is `never` when it is measured to contribute NOTHING (0 tools), DUPLICATES another
+  extension's server, or is refused on a governance ground already recorded. A new extension is UNCLASSIFIED on
+  arrival, which the rail reports as owner-owed - never as allowed.
+
+always:
+  - developer          # the act surface: shell/edit/write. Nothing in this OS is done without it.
+  - analyze            # code structure; the cheapest way to answer "what is in this file".
+  - todo               # the plan surface a session writes its own steps to.
+  - docguard           # 4 tools / 421 tok - the write gate for protected files. Cheap, and the guard is the point.
+  - memory             # 4 tools - cross-session recall. The OS's own memory, not a convenience.
+  - skills             # 2 tools - the declared skill surface (this session's own rules live behind it).
+  - summon             # 2 tools - delegation is a standing rule, so the delegation surface is always resident.
+  - extensionmanager   # 3 tools - the RUNTIME switch: it is the mechanism by which an on-demand extension can be
+                       # added inside a session that was born without it. An on-demand policy needs it resident.
+  - fetch              # 1 tool / 338 tok - one URL to text. The cheapest research primitive that exists.
+  - summarize          # 1 tool - the harness's own compaction path. Removing it removes the harness's ability to
+                       # shrink a long session, which is the opposite of memory optimisation.
+
+on_demand:
+  filesystem:
+    why: >-
+      14 tools / 3,727 tok - the single largest schema in the set, and the one that most overlaps `developer`
+      (read/write) for ordinary edits. It earns its place for BULK work (media reads, directory sweeps, moves) and is
+      dead weight in a session that only reads two YAML files.
+    profiles: [workshop]
+  gitmcp-mcp:
+    why: >-
+      12 tools / 1,906 tok - repository history through a server, while `developer.shell` already runs `git` at zero
+      schema cost. It is the right tool for a session whose ACT is repository archaeology, and 1.9k tokens of pure
+      overhead for one that is not.
+    profiles: [workshop]
+  youtubetranscript:
+    why: '4 tools / 1,168 tok - a research act (transcripts), never a pipeline act.'
+    profiles: [research, web]
+  reddit:
+    why: >-
+      2 tools / 349 tok - research. It was DEAD (ModuleNotFoundError: an HTTP transport library needs to be
+      installed) while enabled, and is now REPAIRED by measurement (--with httpx); repaired is not the same as
+      needed-every-session (BUG-873).
+    profiles: [research]
+  pdfreader:
+    why: >-
+      1 tool / 350 tok - document reads. S0 already converts PDFs to MD (pandoc/Docling), so this is for READING one
+      PDF in a session, not for ingesting it. Repaired by measurement and deliberately left absent (--with mcp<2).
+    profiles: [documents]
+  puppeteer:
+    why: '7 tools / 834 tok - browser automation; a deliberate, occasional act.'
+    profiles: [web]
+  chatrecall:
+    why: '1 tool - recall across past sessions. Occasionally decisive, never per-turn.'
+    profiles: [recall]
+  code_execution:
+    why: >-
+      1 tool - a second execution surface beside developer.shell. Two homes for "run this code" is exactly the
+      duplication C12 refuses; it is kept only for a session that must run code WITHOUT shell access.
+    profiles: [sandbox]
+
+never:
+  tom:
+    why: 'MEASURED 0 tools (2026-10-17 sweep). It contributes nothing and costs a start: the exact shape of BUG-873.'
+  scheduler:
+    why: >-
+      MEASURED 0 tools and ABSENT from 12/12 session surfaces. What a bundled platform scheduler could contribute to
+      a CLI harness is still unmeasured; until it is, it is not resident.
+  apps:
+    why: '4 tools of desktop-app launching. Not a knowledge-pipeline act, and a harness-coupled one (C25).'
+  computercontroller:
+    why: >-
+      REFUSED as a placement actor (D-3049: an unwatched mover). A screen/keyboard surface is the widest write
+      surface on this machine and it is not governed by the plan.
+  autovisualiser:
+    why: 'Presentation of a result, not production of one. Nothing in the pipeline consumes it.'
+  tutorial:
+    why: 'Onboarding content. It is not a capability.'
+  orchestrator:
+    why: 'Declared with no cmd/args to handshake - it has never been started, so nothing may claim it works.'
+  gitmcp:
+    why: >-
+      The SAME server as gitmcp-mcp (5 overlapping tools / 885 tok). Two extensions, one server: keeping both is a
+      second home for one capability. RETIRE candidate - the live one stays available, the twin does not.
+
+profiles:
+  workshop:
+    adds: [filesystem, gitmcp-mcp]
+    when: 'a session whose act is repository work: sweeping files, reading history, moving artifacts.'
+  research:
+    adds: [youtubetranscript, reddit]
+    when: 'a session whose act is finding something out. Costs ≈1.5k tokens/turn while it is open.'
+  documents:
+    adds: [pdfreader]
+    when: 'a session that must read one PDF in place (S0 converts for ingestion; this reads for a question).'
+  web:
+    adds: [puppeteer, youtubetranscript]
+    when: 'a session that must drive a browser.'
+  recall:
+    adds: [chatrecall]
+    when: 'a session that must answer "what did we decide in a past session" from the harness store itself.'
+  sandbox:
+    adds: [code_execution]
+    when: 'a session that must run code with no shell (never the default: developer.shell is the one executor).'
+  everything:
+    adds: [filesystem, gitmcp-mcp, youtubetranscript, reddit, pdfreader, puppeteer, chatrecall, code_execution]
+    when: 'the audit profile: deliberately the whole on_demand set, used to MEASURE, never as a working default.'

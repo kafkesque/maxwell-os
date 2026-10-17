@@ -347,6 +347,17 @@ guards:
   #: mover and a debt that GREW are all defects in the tree, not words the owner owes.
   scripts/resolve_route.py --selftest: fatal
   scripts/resolve_route.py --check: fatal
+  #: T-186/D-3056: the EXTENSION RESIDENCY POLICY vs the live harness state. An unclassified extension or an
+  #: unresolvable profile name is a FAULT; a policy-vs-live disagreement is OWNER-OWED (flipping the owner config
+  #: is their act). It reads the ONE home of the commands and restates none of them (C12).
+  scripts/goose_profile.py --check: tri_state
+  scripts/goose_profile.py --selftest: fatal
+  #: BUG-773 / D-2933 rule V: the RED LOOP that was named and owed. It reads the KNOB (never_at_commit vs
+  #: stage6.commit_scope) AND THE ROUTE (the dispatch into the S5-scoped UPDATE), because a perfect config over a
+  #: deleted branch protects nothing - rail class (i), BUG-492.
+  scripts/check_commit_scope_guard.py: fatal
+  scripts/check_commit_scope_guard.py --selftest: fatal
+  scripts/measure_extension_cost.py --selftest: fatal
 commit_boundary:
   path: git-path:hooks/pre-commit
   why: 'a commit is the one act that makes a conflicted tree permanent (RAIL 0); four rails run ONLY there, so a deleted line is a rail that nothing runs - class (i) at the commit boundary. TWO SMALLER ACTS DISARM IT JUST AS SILENTLY, and neither was the subject of any rail (D-2687). (1) THE ROUTE: this declaration used to name a PATH SHAPE (gitdir: + hooks/). git does not promise to run that file - core.hooksPath decides, and the --git-dir of a linked worktree is not where hooks live. MEASURED 2026-09-27 in a real repository: with core.hooksPath set, `git rev-parse --git-path hooks/pre-commit` answered hooks/pre-commit while --git-dir answered .git, the file at gitdir:hooks/pre-commit DID NOT EXIST, and a DIFFERENT file received the commit and refused it. The route is therefore declared as git-path:<rel>: GIT ITSELF, never a path shape. (2) THE MODE: MEASURED the same day, a mode-644 hook is IGNORED - git LANDS the commit (rc=0), runs none of the four rails, and prints only a `hint:` git documents how to suppress. A byte-perfect verification of a file that may not be executed is class (i) with a green verdict, so the declared subject is the RESOLVED path, its bytes, AND its mode'

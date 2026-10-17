@@ -271,3 +271,40 @@ home vs `maxwell_omlx` in the declaration). That flip binds the everyday path to
    is silent -> a receipt; no plugin is required for this, it is wiring.
 6. **The `scheduler` reading** (what a bundled platform extension could contribute) and the `orchestrator`
    declaration, so the last two declarations in the extension set are true by measurement.
+
+## §1e — FIFTH SITTING (2026-10-17, afternoon): extension rot answered at the policy layer, the BUG-773 red loop landed, three decisions minted
+
+**THE OWNER'S FOUR QUESTIONS, ANSWERED WITH RECEIPTS.**
+1. *Can a goose extension be switched on only when it is needed?* YES — and two-sided measured:
+   `goose run --no-profile --with-builtin developer` starts clean, while a bogus name prints
+   `Warning: Failed to start extension ... continuing without it`. What was missing was POLICY, now
+   `config/extension_profiles.yaml` + `scripts/goose_profile.py` (D-3056). The measured tax is CONTEXT, not RSS:
+   ~7,909 tokens/request of stdio schema (≈24% of gemma-4-E4B's window) against 649 MB of live RSS.
+2. *Are the plugin recommendations approved?* Approved and REGISTERED as verdicts (D-3057): adopt two, trial two,
+   refuse six classes — each refusal carrying its reason so it is a re-ask, not a discovery (D-3038).
+3. *Does Qwen 3.5 have any use, or is it bloat?* No measured use (0% domain agreement on S4, 1.8× slower, never
+   served); the NAME is retired everywhere, the two hub copies are the owner's to delete (D-3058).
+4. *Is gemma the only local model that can tool-call?* NO. 7 of 8 served models drove a fixed 3-call loop; only
+   Phi-4-mini failed (0 calls). Fastest is MiniCPM5-2B (2.1 s), best window is Ornith-1.5-9B (262k). Neither is
+   promoted until the two-step test lands (T-187) — one trivial read does not rank a model.
+
+**WHAT MOVED (files).** `config/extension_profiles.yaml`, `scripts/goose_profile.py` (selftest 13/13),
+`scripts/measure_extension_cost.py` (selftest 6/6), `scripts/check_commit_scope_guard.py` (selftest 9/9),
+`governance/evidence/EXTENSION_COST_20261017.json`, four guard entries in `config/rail_registry.yaml`, five ladder
+lines + three recipes in `justfile`, decisions D-3056..D-3058, tasks T-186..T-188.
+
+**FORENSIC AUDIT — rc by rc.** `check_commit_scope_guard` 0 (live: rule holds on the route that runs) ·
+`goose_profile --check` 2 OWNER-OWED (9 residents against policy — the honest state, not a fault) ·
+`measure_extension_cost --selftest` 0 · `goose_profile --selftest` 0 · `gov_sync` 0 (4 faces equal, 1185 decisions)
+· `recompute_decision_summary --check` 0 · `check_governance_faces --check` 0 (1 owner-moved task: T-186) ·
+`check_repo_integrity` 0 · ruff clean on all three new scripts.
+
+**THE OWNER'S NEXT WORD (unchanged, now with one more).** (a) T-186: apply the residency flips (`just
+extension-profile workshop` prints them; nothing is written for you); (b) the provider flip T-174 (dry-run: 1 edit);
+(c) META-LANE-FREEZE-1 is expired — re-rule or close; (d) T-181 limb 2 (the note's declared share of the ONE corpus
+root) is still the highest-leverage ontology word.
+
+**NEXT CRITICAL STEPS IN CONSEQUENTIAL ORDER.** 1) T-187 the two-step loop discrimination (unblocks any model
+promotion) · 2) the provider-list WRITER (BUG-874's residual: the probe is the only guard) · 3) `just ask` grounded in
+the retriever (the measured product gap, D-3057) · 4) T-188 the mypy rail · 5) T-183 → T-180 → T-176 → T-179 → T-182
+· 6) the scheduler/orchestrator readings.

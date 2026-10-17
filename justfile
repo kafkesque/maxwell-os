@@ -13,6 +13,11 @@ health:
     python3 pipeline/status.py
     python3 pipeline/integrity_check.py --quick
     python3 scripts/audit_flag_consumers.py || exit 1
+    python3 scripts/check_commit_scope_guard.py --selftest || exit 1   # BUG-773/D-2933 rule V controls (D-3036: the red loop this bug owed)
+    python3 scripts/check_commit_scope_guard.py || exit 1   # BUG-773: the declared rule holds on the route that WILL run - knob AND branch
+    python3 scripts/goose_profile.py --selftest || exit 1   # T-186/D-3056: extension RESIDENCY policy controls (extension rot)
+    python3 scripts/goose_profile.py --check || [ $? -eq 2 ]   # T-186: policy vs live state - 2 = owner-owed (resident against policy), LOUD not fatal
+    python3 scripts/measure_extension_cost.py --selftest || exit 1   # T-186: the cost measurement own arithmetic
     python3 scripts/verify_anchor_manifest.py || exit 1
     python3 scripts/verify_split_manifest.py --selftest || exit 1   # D-2733: golden/eval split leakage rail controls (BUG-492)
     python3 scripts/verify_split_manifest.py || exit 1   # D-2733/BUG-603: a golden id re-entering eval FAILS (208->162 invariant)
@@ -618,6 +623,15 @@ recipe-plan name *set:                               # render ONE declared recip
     python3 pipeline/subagent_recipe.py --plan {{name}} {{set}}
 subagent-loop-measure:                               # D-2549/T-131: the PER-MODEL sub-agent loop measurement - one fixed 3-call task, every SERVED model, one receipt per run
     python3 scripts/measure_subagent_loop.py
+extensions:                                          # T-186/D-3056: what each declared extension COSTS while resident - schema bytes/tokens shipped PER REQUEST, measured by spawning it
+    python3 scripts/measure_extension_cost.py
+
+extension-profile name:                              # T-186/D-3056: the two realisations of ONE profile (config flips + the --no-profile command). Writes nothing.
+    python3 scripts/goose_profile.py --render {{name}}
+
+extensions-check:                                    # T-186/D-3056: residency policy vs live harness state - tri-state (0 agree | 1 fault | 2 owner-owed)
+    python3 scripts/goose_profile.py --check
+
 admit-plan:
     python3 scripts/plan_admission.py --plan || [ $? -eq 2 ]   # BUG-863: rows waiting for the owner's word ARE the OWNER-OWED outcome, not a failed command - and it moves nothing
 placement:

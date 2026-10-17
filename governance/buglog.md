@@ -8,18 +8,19 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1182 decisions (census stamp a16bf19e7b254858, 2026-10-17) · 639 bugs (232 open / 407 closed; highest OPEN = BUG-875) · 55 open tasks (MUST 12 / SHOULD 39 / WORTH 4; OWNER-moved 0, pipeline-moved 55; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1185 decisions (census stamp 687511a3ddee8ca0, 2026-10-17) · 639 bugs (232 open / 407 closed; highest OPEN = BUG-875) · 58 open tasks (MUST 12 / SHOULD 42 / WORTH 4; OWNER-moved 1, pipeline-moved 57; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **79** of 1182 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 597 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1182, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **79** of 1185 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 600 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1185, D-2987/BUG-765)
 >
 > Open BUGS by severity (population = the census's 232 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 36 · 🟨 MED 66 · 🟩 LOW 25 · UNLABELLED 101 (BUG-757) of 232 open.
 >
-> **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
+> **OWNER LANE (1) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
 > | id | pri | what YOU decide | the gate |
 > |---|---|---|---|
+> | T-186 | 🟠 SHOULD | APPLY THE EXTENSION RESIDENCY POLICY - flip the nine residents the policy does not justify, and start research | The DISPOSITION-GIVER applies the printed flips ("just extension-profi |
 >
-> **PIPELINE LANE (55) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
+> **PIPELINE LANE (57) — what the agent will do next, ordered by priority then id (the register's two fields; source: config/task_register.yaml):**
 >
 > | id | pri | state | task | evidence |
 > |---|---|---|---|---|
@@ -36,7 +37,7 @@
 > | T-150 | 🔴 MUST | 🔴 open | THE DURABLE PATH IS THE DELEGATION PATH (D-3020): anything whose failure is not free goes through pipeline/sub | temp/runs/fanout_20261015i/98_receipt.json - 3/3 DONE with one task deliberately given a 1 |
 > | T-181 | 🔴 MUST | 🔴 open | THE ADMISSION - the fifth transition is DECLARED, counted and PLANNED (D-3051): what remains is the word on wh | MEASURED 2026-10-16 by the FIRST live reading of scripts/plan_admission.py: 2,811 files in |
 >
-> _the face is a VIEW: 12 of 55 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
+> _the face is a VIEW: 12 of 57 row(s) shown, the rest are in the register (config/gov_sync.yaml#face_list_limit)_
 >
 > **STANDING RULES — in effect, never close (1):**
 >
@@ -16313,3 +16314,28 @@ FIX (T-185, three limbs, each a rule the repository already declares elsewhere):
 - **RED LOOP, NAMED (D-3036).** A check that reads `stage6.commit_scope` and goes RED when it is `full_upsert`
   while `config/dedup_identity.yaml#edition_supersession.execution.never_at_commit` is true, with ROUTE 1/2 as its
   fixtures. Owed - it is a rail, not a prose reminder, and it is the next act on this row.
+
+### BUG-773 — THE RED LOOP LANDED 2026-10-17 (the act this row owed; the bug stays OPEN)
+- **THE RAIL:** `scripts/check_commit_scope_guard.py`, registered in `config/rail_registry.yaml` (class `fatal`) and
+  invoked by the `health` ladder. Selftest 9/9 known-answer; live run GREEN.
+- **IT READS TWO THINGS, NOT ONE.** (1) THE KNOB: `dedup_identity.yaml#edition_supersession.execution.never_at_commit`
+  against `pipeline_config.yaml#stage6.commit_scope`. (2) THE ROUTE: the dispatch
+  `if S6_COMMIT_SCOPE == "verification_scoped" and fbs_rowid(...)`, the `update_s5_provenance` definition and its
+  `UPDATE fbs SET`. A perfect configuration over a DELETED branch protects nothing — rail class (i), BUG-492 — so a
+  config-only check would have been a second prose reminder wearing a rail's clothes.
+- **LIVE VERDICT 2026-10-17:** `never_at_commit=True`, `scope=verification_scoped`, dispatch present, writer scoped
+  → the declared rule holds on the route that WILL run. The rail also states, in the same line, that the destroying
+  `INSERT OR REPLACE INTO fbs` is still present in `insert_fb` and is reachable only by an explicit `full_upsert`.
+- **STILL OPEN, unchanged:** (1) `stage6.commit_scope: full_upsert` remains an ESCAPE ROUTE one config edit away.
+  The rail now goes RED on that edit instead of leaving it unwatched - fenced, not repaired; (2) `content_basis` is
+  still a reserved name with no writer, so a supersession stays invisible on both paths.
+
+### BUG-873 — THE ZERO-TOOL CLASS NOW HAS A POLICY HOME 2026-10-17 (the harness defect is still OPEN)
+- The sweep measured three extensions contributing ZERO tools while enabled (`reddit` before its repair) or while
+  declared at all (`scheduler`, `tom`). Nothing owned the question "may this be resident?" - so a zero-tool
+  extension, which is indistinguishable from a working one at the session boundary, stayed forever.
+- `config/extension_profiles.yaml` (D-3056) now classifies every declared extension `always` / `on_demand` / `never`,
+  and `tom` + `scheduler` are `never` BY MEASUREMENT (0 tools). The COST is measured too: the six enabled stdio
+  extensions ship 37 tool schemas = 31,636 B ≈ 7,909 tokens PER REQUEST (`scripts/measure_extension_cost.py`).
+- **The harness defect itself is untouched and stays OPEN:** an enabled extension that contributes zero tools still
+  raises nothing to the session. The policy prevents the ROT; it does not fix the SILENCE.

@@ -437,7 +437,15 @@ reasons:
 #: an item whose mover-level reason is not the true one carries its own reason here, and the reader refuses a reason
 #: that is not in the vocabulary above and refuses an entry for an item that is no longer open (a stale reason is the
 #: same defect as a stale declaration, D-405).
-unrouted: {}
+unrouted:
+  #: D-3080/BUG-913 (2026-10-17): a bug whose TITLE names no owned artifact is the NORMAL shape for a finding
+  #: ("we measured the world and here is what it does"), not a missing route. These two were appended to an
+  #: APPEND-ONLY register, so their titles could not be made to name an artifact; the override is the rail's
+  #: documented escape. It is honoured by BOTH checks now: the fault at (v) and the debt count at (vi) - before
+  #: BUG-913 the declaration was inert, which is why the ceiling had to be raised instead of the debt lowered.
+  BUG-911: bug_is_a_finding   # Anna's needs a headed browser (the engine is the finding, not a route)
+  BUG-912: bug_is_a_finding   # an OA route can hand back an HTML landing page (the adapter's finding)
+  BUG-914: bug_is_a_finding   # the lane records delivery and never custody (a model gap, not a file's route)
 
 #: SHRINK-ONLY (the D-3023 ceiling shape). These are the instrument's own readings, not targets: the reader FAILS
 #: when the measured debt EXCEEDS the declared number, so inherited debt cannot grow unnoticed, and it reports a
@@ -452,11 +460,16 @@ routing_debt:
   #: RE-MEASURED 222 -> 225 on 2026-10-17 by D-3080, and the raise is DISCLOSED rather than smuggled: two bugs
   #: (BUG-911, BUG-912) were appended to a register that is APPEND-ONLY, so their TITLES could not be made to name
   #: an artifact owned by `acquisition_lane` — and this file's own reason `bug_is_a_finding` says a bug routes only
-  #: when its title names one. The `unrouted:` override above does NOT reduce the measured count (BUG-913), so a new
-  #: finding whose title names no path can NEITHER be routed NOR dispositioned. That is a defect in the INSTRUMENT,
-  #: recorded as BUG-913; the reading is raised to what is actually measured, and the next shrink must come from a
-  #: route or an item edit, exactly as the comment below says.
-  unrouted_open_bugs: 225
+  #: when its title names one. The `unrouted:` override above did NOT reduce the measured count (BUG-913), so a new
+  #: finding whose title names no path could NEITHER be routed NOR dispositioned — a defect in the INSTRUMENT.
+  #:
+  #: THEN THE INSTRUMENT WAS FIXED (BUG-913 CLOSED the same day), AND THE CEILING FOLLOWED THE READING DOWN 225 -> 223.
+  #: `item_faults` now subtracts the per-item `unrouted:` declaration from the debt count, so the escape the rail
+  #: offers ("declare the route, or disposition the item") MOVES THE NUMBER it tells the reader to move. Re-measured
+  #: after the fix: BUG-911/BUG-912 overridden (-2), BUG-913 closed (-1), BUG-914 opened (+1) => 223. The ceiling is
+  #: pinned to that reading, so the next unrouted item is a fault rather than a shrug. The raise above is retired;
+  #: this line is the current number, and it may only go down.
+  unrouted_open_bugs: 223
   note: >-
     the readings below are RE-MEASURED every run and printed per item; the ceiling exists so that a NEW unrouted
     item is a fault instead of a shrug, and so the worklist of the route graph is a number someone can shrink

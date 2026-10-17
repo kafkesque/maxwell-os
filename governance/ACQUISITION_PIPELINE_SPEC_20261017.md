@@ -314,3 +314,198 @@ probe `pdf` PASS, receipt `governance/evidence/ACQUISITION_20261017T191805Z.json
 - **BUG-909 (OPEN):** every LibGen front answered `500 max_user_connections (current value: 300)` at 21:20–21:26 —
   the one working shadow rung is a single point of failure. Remedy is an OWNER WORD: (a) an official Anna's API key,
   (b) a second shadow source behind the same protocol, or (c) accept the named gap.
+
+---
+
+## 8. v1.1 CONSOLIDATION — 2026-10-17T22:50Z (authority: D-3081)
+
+> **What this section is.** Four questions the owner asked in one message, answered from measurements taken today, and
+> the corrections that the answered questions force on the sections above. It does not replace §0–§7: the six layers,
+> the three capabilities and the D-3078 invariant (an acquirer's receipt is a FILE IN A PEN) all stand unchanged.
+> What changes is §6 (`BUILT`), which has drifted, and one missing LAYER (§8.7), which the ledger proved was missing.
+
+### 8.1 Drift named — four claims in §6 that are no longer true
+
+| §6 said | measured now | authority |
+|---|---|---|
+| "Anna's Archive: declared `unreachable_by_scraping` (DDoS-Guard JS challenge)" | **wrong ENGINE, not unreachable.** Headed Chrome settles the challenge in 14 s → 693,342 B → 116 `/md5/` rows; plain HTTP 403 (902 B), headless 403 (1,896 B) | BUG-911, D-3080 |
+| "Z-Library: declared `not_implemented` (needs a personal login this repository must not hold)" | **implemented as `credential_required`** — it refuses BY NAME until `ZLIB_DOMAIN`+`ZLIB_COOKIE` (or `zlib login`) exists, which is the correct behaviour, not an absence | D-3080, §8.3 |
+| "`--selftest` is the control (31 checks)" | **42/42 green**, 11 new controls including the decoy matcher and the lawful-before-shadow ordering assertion | `python3 scripts/acquire.py --selftest` |
+| §2.3 ladder `open_access → gutenberg/StandardEbooks → annas → libgen → zlibrary`, with Sci-Hub "NOT in the default ladder" | the ladder is **8 rungs**: `open_access (3 routes) → gutenberg → standardebooks → arxiv → annas → libgen → zlibrary → scihub`. Two differences, both deliberate and both declared here so the two documents cannot be read as a contradiction: **arxiv is inserted before annas** (a lawful PAPER rung must precede a shadow BOOK rung, and a paper gap offered a book is a wrong answer, not a slow one); **scihub is in the ORDER but owner-word-gated**, so "not in the default ladder" still holds in effect — the order declares where it would sit, `requires_owner_word` decides whether it is walked | D-3080, `config/acquisition.yaml` |
+
+### 8.2 THE FREE-KEY QUESTION — answered in the vendors' own words
+
+**There is no free official API key. There is a free official BULK route, and it is better than the key.**
+
+- **Anna's Archive.** The official FAQ states: *"We have one stable JSON API for members, for getting a fast download
+  URL: `/dyn/api/fast_download.json`"* — members, i.e. donors. Memberships do not auto-renew, and the thing a
+  membership buys is a **fast-downloads-per-24 h counter**, not access. For everything else the FAQ points at the
+  **free** route: generated ElasticSearch and MariaDB databases, raw JSON, and a **torrent JSON list**. So the honest
+  reading is: *a key buys concurrency; it buys no capability.* A torrent of the corpus is unattended, parallel, and
+  gets faster with scale instead of hitting a quota — it is the only route here that does.
+- **Z-Library.** No API key exists to obtain. The official apps (indexed at `go-to-library.sk`) authenticate a
+  **session against the website**; `heartleo/zlib` reads as `internal/cli/{login,cookies,search,download,history,
+  profile}.go` — login, cookies, search, download, quota. The quota is **server-side per account AND per IP**:
+  community documentation (Awesome-Zlibrary, 2026) says ~**10 books/day** for a free registered account, up to **60**
+  with personal access. No client-side trick can raise it; the only levers are more accounts (a ToS violation that is
+  IP-bound and therefore mostly ineffective), premium, or **not needing it** (§8.7's ladder).
+- **LibGen.** No API. Its free download path is a **two-step**: `ads.php?md5=<hash>` → extract the session key →
+  `get.php?md5=<hash>&key=<session>` → a direct URL valid for a few minutes. Bulk = torrents.
+- **Sci-Hub.** No API, a captcha wall; the keyless paper route is `sci-net.xyz/{doi}` → iframe PDF (**NOT MEASURED
+  here** — a README is not a receipt).
+
+**Consequence for the decision the owner was about to make:** buying the Anna's key is a **convenience purchase**
+(no window, run two candidates in parallel), not an unlock. The measured free alternatives are the torrent dump (bulk)
+and the slow-partner links (single files). Buy the key only if the 24 s-per-file, one-at-a-time ceiling becomes the
+binding constraint in real use — not before.
+
+### 8.3 "Reverse-engineer the app via `go-to-library.sk`" — what exists, and why it does not help
+
+`go-to-library.sk` is the **official apps/extensions index** (FMHY links it as exactly that). Its clients do not talk
+to a separate API: they log into the same website and reuse the session cookie. That is the whole surface.
+
+- **There is nothing to decompile that the website does not already give you.** An APK's embedded client id or
+  signing secret grants no quota: the quota is enforced server-side against the account and the IP.
+- **It would be a net loss.** Decompilation adds malware exposure (unsigned, unverifiable binaries from a shadow
+  index) and a legal footing worse than the session reuse, in exchange for **zero** additional capability.
+- **The correct lever is the ladder, not the client.** Z-Library is rung 7 of 8. A 10-books/day cap is irrelevant to
+  a lane that only reaches it after six other rungs have missed. Making the ladder right is worth more than any
+  amount of client work.
+- **Owner action, unchanged and already declared:** `brew install heartleo/tap/zlib && zlib login` (MIT, Go, reviewed,
+  actively maintained) **or** export `ZLIB_DOMAIN` + `ZLIB_COOKIE` in the shell that runs `acquire.py`.
+
+### 8.4 Headless / MCP across the FMHY list — ranked by SUPPLY-CHAIN risk
+
+The ransomware risk is **in the package, not in the shadow library**: a shadow library serves a `.epub`, while a
+random MCP server or installer runs **code with your privileges**.
+
+| tier | what | verdict |
+|---|---|---|
+| 0 | our own adapters (`pipeline/acquisition/adapters.py`, 8 rungs, one protocol) | **use** — no third-party code executes |
+| 1 | **port the method, never call the service**: `francy2222/annas-archive-download-mcp` (LibGen 2-step + Sci-Net + slow partner links, **no key**) | **port** — the chain is three HTTP calls; the hosted Vercel endpoint sees every query and runs with your privileges |
+| 2 | **run locally, reviewed, licensed**: `heartleo/zlib` (MIT, Go, 993★, pushed 2026-10-07) | **use** for the Z-Library credential path |
+| 3 | **read, do not depend**: `JeremiahM37/librarr` (Go, MIT, 13 indexers, Torznab/OPDS — the best public map of what a book finder must try), `calibrain/shelfmark`, `bookracy.com` | reference only; our ladder already covers the ground behind a protocol (C21) |
+| 4 | **never**: hosted MCP endpoints, prebuilt binaries from young/low-star repos, `curl \| sh` installers, **unlicensed** repos (`iosifache/annas-mcp` has no LICENSE — no licence means no rights), anything that asks for your account password instead of a cookie | refused |
+
+**Hard rules for anything from tier 1–3** (these are the ransomware controls, and they are cheap):
+1. build from source at a **pinned commit**; nothing is fetched as an opaque binary;
+2. Python via `pip install --require-hashes`; Go via `go build` from the pinned tree;
+3. **never hand a third-party server a password** — a cookie stays local, and it is revoked by logging out;
+4. first run under a read-only sandbox with network egress limited to the source's own domains;
+5. **the lane never executes and never auto-opens what it fetches** — bytes go to the QUARANTINE pen and must pass the
+   container probe before they are named a work. That single rule is why a malicious file costs a refused probe, not
+   a compromise.
+
+### 8.5 Paywalls (Substack / Medium / other blogs) — measured landscape and the posture
+
+Measured 2026-10-17T22:33Z: **Freedium** mirrors exist for Medium; **Hover** (referer/crawler impersonation) is
+1,311★ but last pushed **2024-08**; **Bypass Paywalls Clean**'s canonical GitLab answers **403** and gitflic **500**,
+with GitHub carrying only a **2022-06** mirror — so BPC is **not a pinnable dependency** and is registered as rejected
+for that measured reason.
+
+Posture, in order: **legitimate → grey → red.**
+- **Legitimate and usually sufficient:** Substack **RSS gives the full text** of free posts; many writers republish
+  the same essay on their own site; institutional access covers most journals; the author's own copy is the cleanest
+  possible source of a paywalled essay.
+- **Grey:** an archived snapshot (`archive.today`) for a link that has rotted — for *reading*, not for corpus-building.
+- **Red:** sharing credentials, or bulk-scraping paid content. It breaks the licence field later (§3), and a corpus
+  that cannot state its own licence is exactly what Maxwell refuses elsewhere.
+
+**Architecture ruling:** a bypass the OWNER uses in their own browser is an **owner-side manual route**, never a lane.
+If paywalled text is retained at all it is `licence_class: paywalled_personal` and it lives in the **assessment notes**,
+never in `knowledge pipeline/books`.
+
+### 8.6 Review intelligence — what experts actually use for pragmatic judgement
+
+The distinction that decides everything: **CRITIC** (a byline, an editorial policy, paid by the *publication*) vs
+**CROWD** (a star average anyone can enter) vs **PAID PLACEMENT** (the *publisher* pays).
+
+| class | source | measured today | use it for |
+|---|---|---|---|
+| critic | **Book Marks** (`bookmarks.reviews`) | 200, 626,458 B | the best single "is this book any good" — aggregates NAMED critics per book and shows the individual verdicts, not one blended star |
+| expert nomination | **Five Books** | 200, 764,222 B | the best proxy for expert *curation*: a named expert picks five works and explains why — use it to SEED a gap |
+| critic (academic) | **Choice Reviews** | 200; corpus subscription-gated | the best review source for a **monograph/textbook** — the reviewer is a subject librarian with no commercial stake |
+| criticism | **NYRB** / **LRB** / **Literary Review** | 200 / 200 / 200, metered | the best place to find an *argument* about a book; most useful where two of them **disagree** |
+| crowd, clean-ish | **Open Library** (keyless), **BookWyrm** (federated, self-hostable) | 200 / 200 | metadata + a small, un-gamed signal; BookWyrm is the only review network that is sovereign-compatible by construction |
+| crowd, dirty at scale | **Goodreads**, Amazon | 200 | review VOLUME only — expect review bombing and incentivised ratings; never a verdict on its own |
+| paid placement | **Kirkus** | 200 | registered **with its conflict**: the publisher pays. Use as an existence/metadata check, never as quality |
+
+**The score this OS should use — three limbs, never a star average alone:**
+`independent critic agreement (Book Marks) + expert nomination (Five Books) + citation percentile (OpenAlex)` — a work
+that scores on one limb and fails the other two is a *popular* book, not a *reliable* one. All 41 sources and their
+measured access codes live in `config/research_sources.yaml`; the check is `python3 scripts/acquire.py sources --check`.
+
+### 8.7 THE DOWNLOAD SPEC v1.1 — the layer that was missing: **CUSTODY**
+
+The lane had `RESOLVE → RANK → ROUTE → FETCH → PROBE → PEN`. It has no memory of what it already delivered, and the
+ledger caught it: two shadow rungs — the most expensive in the ladder — were spent on Donald Norman's *The Design of
+Everyday Things*, and the `annas` delivery's sha256 (`c8b20f47…`) is **byte-identical to a corpus file with mtime
+15:22**, fifty minutes *before* the fetch. The `libgen` delivery (`baab2124…`) exists nowhere at all. Filed as
+BUG-914 and carried by hand in `governance/evidence/ACQ_LANDED_LEDGER.md` until the layer exists.
+
+**CUSTODY (new, three points):**
+1. **before the ladder**: `already_in_corpus(work)` by sha256 → canonical id → normalized name key; a hit REFUSES with
+   the path, because the cheapest possible saving in this lane is not fetching (precision over recall, same posture as
+   the title matcher);
+2. **on landing**: append a custody row (`custody: {checked, inbox_present, corpus_match}`) beside the delivery row;
+3. **on admit**: append `admit_handoff` when the door admits a file whose sha256 matches a landed row — so a delivery's
+   later life is *recorded*, never inferred.
+
+**Engine per access class** (the register's vocabulary is the router):
+
+| `access` | engine | example |
+|---|---|---|
+| `api` | `net.read_text` → JSON | OpenAlex, Unpaywall, Europe PMC, arXiv Atom |
+| `scrape` | `net.read_text` → HTML parse | LibGen rows, Book Marks, Goodreads |
+| `browser` | **headed Chrome**, persistent profile, challenge loop | Anna's search, `/md5/`, `/slow_download/` |
+| `credential` | cookie/session from env or the owner's CLI | Z-Library |
+| `captcha` | human hand-off, declared | Sci-Hub; Telegram bot |
+| `manual` / `none` | **refuse BY NAME** with the reason (D-3034) | StoryGraph, LibraryThing, Mobilism |
+
+**Throughput, measured, so a plan can be costed:** `open_access` ~1–2 s/work (3 routes tried in order); `arxiv` polite
+interval; `annas` **24 s/file** plus one browser session for the whole run; `libgen` 1–2 s/row *when a front is up*
+(BUG-909: intermittent 500 `max_user_connections`); `zlibrary` **10/day** (served by a session, not a key); `scihub`
+human-in-the-loop. A ten-work shadow manifest therefore costs ≈ 5 minutes of browser and 4 minutes of slow downloads —
+not an afternoon.
+
+**Failure taxonomy — every class has ONE declared response:** 403 challenge → browser, else refuse by name; 429 →
+breaker + back-off, never a retry storm; 5xx → one retry with jitter, then breaker and a NAMED refusal carrying the
+body (BUG-909); wrong bytes (`text/html`, a truncated container) → refuse and name the content type (BUG-912); timeout
+→ retry once then breaker; a raised ceiling → **never** (D-3023/D-3038).
+
+**Acceptance tests** (all already controls, `42/42` green): the ladder puts every lawful rung before every shadow rung;
+a decoy with FULL token recall is still refused; zlibrary names the missing credential instead of pretending the book
+is absent; annas declares the engine it needs instead of claiming the source is dead; a route that cannot be reached
+is declared, not dropped; an unknown task is refused by name. **Three to add with CUSTODY:** a work already in the
+corpus is refused *before* the ladder; a landed file with no custody row is a named fault; a custody row whose corpus
+path has vanished is a named fault.
+
+### 8.8 WHAT IS REJECTED, with the reason (D-3038 — so none of it is re-proposed from memory)
+
+- **Buying the Anna's key today** — the torrent dump is free and faster; buy it only when the 24 s/file ceiling binds.
+- **Decompiling Z-Library clients** — same server-side quota, worse legal footing, real malware exposure, zero gain.
+- **Hosted MCP endpoints** (any) — an unknown account sees every query and executes with your privileges.
+- **Bypass Paywalls Clean as a dependency** — canonical source 403/500, GitHub mirrors frozen at 2022-06.
+- **Scraping StoryGraph / LibraryThing** — 403 Cloudflare; an owner CSV export is the honest route.
+- **Adapters for Mobilism / Bookracy / OceanOfPDF / pdfroom / WeLib / ebookoz** — §4 stands. They are REGISTERED in
+  `config/research_sources.yaml` as *candidates with a `why`* and explicitly **not** as rungs: registration is how a
+  candidate stops being re-proposed from memory, not an approval to build (D-3035).
+- **A star average as a quality verdict** — three limbs or nothing (§8.6).
+
+### 8.9 The running applier — measured, not estimated (2026-10-17T22:35Z)
+
+PID 54639, started 19:09:51Z, **25 rows of 541** (`failed 5`), at **3.26 min/row** → **516 remaining ≈ 28.0 h**,
+ETA **2026-10-19 ≈ 02:30 CEST**, dominated by large PDFs. It is crash-safe and resumable, SIGINT only *between* rows.
+Do not edit `pipeline/stage0_convert.py` while it runs (BUG-614 fails every remaining row). The five failures so far
+are 2 × `pandoc rc=64` on VALID zips (BUG-900's class) and 3 × `budget_expired` on large PDFs — all quarantined
+correctly, none silent.
+
+### 8.10 The next three actions, in consequential order
+
+1. **CUSTODY (BUG-914)** — the cheapest fix in the lane: it stops the most expensive rungs being spent on works the
+   corpus already holds. One lookup, three write points, three new selftest controls.
+2. **The `ads.php → get.php` probe (BUG-911)** — two minutes, and it decides whether the shadow lane needs a browser at
+   all: if the session-key chain resolves headlessly, two candidates can run in parallel and a closed window stops
+   being a failure mode. **A route is declared only after it names its bytes.**
+3. **BUG-900's spine probe** — refuse a container-readable-but-uncovertible epub at PLAN time instead of after a copy
+   and a pandoc failure; **not while the applier is running**.

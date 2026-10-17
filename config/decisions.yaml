@@ -27889,3 +27889,65 @@ decisions:
     register: 'python3 scripts/acquire.py sources --check → 0 faults, 23 declared sources, 5 named NOT_MEASURED'
     shadow_route: 'headed Chrome 14 s → 693,342 B → 116 /md5/ rows → 16 slow_download → node URL with .epub (2026-10-17 21:58)'
     libgen: 'libgen.li 200 / 89,057 B / 25 parseable rows at 21:52, forty minutes after the same front answered 500'
+
+- id: D-3081
+  state: ACTIVE
+  date: 2026-10-17
+  by: assistant
+  category: ACQUISITION v1.2 — NO FREE API KEY EXISTS, THE TWO-STEP IS PROVEN HEADLESS, AND THE LANE'S MISSING LAYER IS CUSTODY
+  refines: [D-3080, D-3079, D-3078]
+  bugs: [BUG-911, BUG-913, BUG-914, BUG-909, BUG-912]
+  decision: >-
+    FOUR QUESTIONS WERE ASKED AND EACH IS ANSWERED BY A READING, NOT BY A RECOMMENDATION.
+    (1) THERE IS NO FREE OFFICIAL API KEY, AND THERE IS A BETTER FREE ROUTE. Anna's Archive's own FAQ declares ONE
+    JSON API (`/dyn/api/fast_download.json`) and scopes it to MEMBERS; a membership buys a fast-downloads-per-24h
+    counter, not access, and the FAQ directs everyone else to the FREE bulk route (generated ElasticSearch/MariaDB
+    dumps, raw JSON, and a torrent JSON list). Z-Library issues no key at all: its official clients authenticate a
+    SESSION against the website, and its quota (~10 books/day free, up to 60 with personal access) is enforced
+    server-side per account and per IP, so no client-side move raises it. LibGen has no API; its free path is a
+    two-step session key. Sci-Hub has no API, only a captcha wall. CONSEQUENCE: buying a key is a CONVENIENCE
+    (unattended, parallel), never a capability unlock, and the torrent dump is the only route that gets FASTER with
+    scale instead of hitting a quota.
+    (2) THE TWO-STEP IS PROVEN HEADLESS AND KEYLESS, SO THE SHADOW LANE DOES NOT NEED A BROWSER TO DOWNLOAD.
+    MEASURED 22:52Z: `ads.php?md5=…` 200 / 20,530 B carrying `get.php?md5=…&key=<KEY>`; that URL 307 ->
+    `cdn2.booksdl.lc`; there 200 / `application/octet-stream` / 15,097,549 B / `content-disposition: … .epub`, and a
+    range read of bytes 0-7 returned `50 4b 03 04` (a real container). libgen.gl answered the same shape with a
+    different key. This VALIDATES SHIPPED CODE (`LibgenAdapter.locate` -> `Delivery(referer=ads)` -> `net.download`),
+    and it narrows BUG-911 to its true scope: the browser is needed for Anna's SEARCH and `/scidb/<doi>`, not for a
+    LibGen download.
+    (3) REVERSE-ENGINEERING Z-LIBRARY'S APP BUYS NOTHING. `go-to-library.sk` is the official apps/extensions index;
+    its clients reuse the website session. There is no separate key to extract, the quota is server-side, and
+    decompiling an unsigned binary adds malware and legal exposure for zero capability. The correct lever is THE
+    LADDER, not the client: Z-Library is rung 7 of 8, and a 10/day cap is irrelevant to a lane that only reaches it
+    after six rungs have missed.
+    (4) THE LANE RECORDED DELIVERY AND NEVER CUSTODY, AND THE LEDGER CAUGHT IT. Two shadow rungs - the most
+    expensive in the ladder - were spent on Donald Norman's THE DESIGN OF EVERYDAY THINGS. The `annas` delivery's
+    sha256 (`c8b20f47…`) is BYTE-IDENTICAL to a corpus file whose mtime is 15:22, FIFTY MINUTES BEFORE the fetch; the
+    `libgen` delivery (`baab2124…`) exists nowhere on disk. So one was a duplicate purchase of bytes already owned
+    and the other left no trace: BUG-914. The missing layer is CUSTODY - a lookup before the ladder, a custody row on
+    landing, an `admit_handoff` row on admission.
+    ALSO SETTLED, AND REGISTERED RATHER THAN SILENTLY ACTED ON: the review-intelligence answer is three limbs
+    (independent critic agreement via Book Marks, expert nomination via Five Books, citation percentile via OpenAlex)
+    and never a star average alone; Kirkus is registered WITH its conflict (the publisher pays); paywall bypasses are
+    OWNER-SIDE manual routes and never a lane, because a corpus that cannot state its licence_class is the thing this
+    OS refuses elsewhere; and Bypass Paywalls Clean is rejected for a MEASURED reason (canonical source 403/500,
+    GitHub mirrors frozen 2022-06), not for taste.
+  receipts:
+    free_api: 'annas-archive FAQ (mirror .gl/.pk/.gd, 200, 207,114 B): one stable JSON API for members; free bulk = ElasticSearch/MariaDB dumps + raw JSON + torrent list'
+    zlibrary_quota: 'heartleo/zlib source tree (internal/cli/{login,cookies,search,download,history,profile}.go) — session, not key; Awesome-Zlibrary (2026) states ~10 books/day free, up to 60 with personal access'
+    two_step: 'libgen.li ads.php 200/20,530 B -> get.php 307 -> cdn2.booksdl.lc 200 application/octet-stream 15,097,549 B, content-disposition .epub, range 0-7 = 50 4b 03 04'
+    register: 'python3 scripts/acquire.py sources --check -> 41 declared sources, 0 faults, 13 NOT_MEASURED named'
+    selftest: 'python3 scripts/acquire.py --selftest -> 42/42 green'
+    routing: 'BUG-913 fixed (debt now subtracts the per-item `unrouted:` declaration); ceiling SHRUNK 225 -> 223 after re-measurement; resolve_route --check rc=0'
+    ledger: 'governance/evidence/ACQ_LANDED_LEDGER.md — 4 deliveries, 2 clean, 1 duplicate-of-corpus, 1 no-bytes-on-disk'
+    faces: 'bug_status OPEN 246 / CLOSED 433 of 679; two custody rows appended to knowledge pipeline/acquisition/index.jsonl'
+  supersedes: []
+  notes: >-
+    WHAT THIS DECISION DOES NOT CLAIM. It does not claim the shadow lane is unattended end-to-end: Anna's SEARCH still
+    needs the headed engine (BUG-911), and a `direct` route (md5 -> two-step, skipping the browser) is DECLARED but
+    NOT BUILT. It does not claim Z-Library is usable: it refuses by name until the owner supplies a session. It does
+    not claim the torrent route is integrated: it is the architectural answer to "can this scale", and integrating a
+    torrent client is a separate decision with its own disk and seeding consequences. And it does not claim any of the
+    nine newly registered sources is a RUNG — `bookracy`, `mobilism`, `sci_net` and `libgen_torrents` are CANDIDATES
+    with a stated `why`, and §4 of the pipeline spec (no adapters for Mobilism/Bookracy/OceanOfPDF/pdfroom/WeLib/
+    ebookoz) still stands (D-3038: what we reject, we register).

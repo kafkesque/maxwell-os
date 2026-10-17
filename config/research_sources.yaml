@@ -91,6 +91,85 @@ book_sources:
     measured: {at: '2026-10-17T21:47Z', code: 429, bytes: 0, note: 'quota exhausted keyless from this IP; a key restores it.'}
     why: 'Excellent metadata for IN-PRINT works and a decent ratings field; useless without a key from this machine. Keep as the metadata fallback when Open Library has no edition.'
 
+  # ── ADDED 2026-10-17 (D-3081): the sources that judge a work by NAMED EXPERTISE rather than a star average ──
+  #: WHY A SEPARATE BLOCK. The owner asked what EXPERTS use for pragmatic judgement. The answer is not another
+  #: rating site: it is criticism with a byline and a policy. Measured today, so the claim ages visibly.
+  book_marks:
+    family: books
+    answers: 'an AGGREGATE of professional critic reviews (the US/UK review pages), with a per-book verdict'
+    access: scrape
+    api_url: 'https://bookmarks.reviews/'
+    auth: none
+    tier: A
+    signal: [review_value, recency]
+    measured: {at: '2026-10-17T22:31Z', code: 200, bytes: 626458, note: 'HTML 200 from this machine, no challenge.'}
+    why: 'The cleanest single answer to "is this book any good": it aggregates NAMED critics who are paid by their publication, not by the publisher, and it shows the individual verdicts rather than one blended star. SCRAPE-only (no API), so it belongs behind its own adapter like Goodreads.'
+  five_books:
+    family: books
+    answers: 'an EXPERT nominates the five best books on one question, and says why'
+    access: scrape
+    api_url: 'https://fivebooks.com/'
+    auth: none
+    tier: A
+    signal: [review_value]
+    measured: {at: '2026-10-17T22:31Z', code: 200, bytes: 764222, note: 'HTML 200, no challenge.'}
+    why: 'The best available proxy for expert CURATION: every list carries a named expert and a transcript of the reasoning. Use it to SEED a gap (which five works define a question) rather than to score a work.'
+  choice_reviews:
+    family: books
+    answers: 'academic-librarian reviews of scholarly books and reference works'
+    access: scrape
+    api_url: 'https://www.choicereviews.org/'
+    auth: none
+    tier: A
+    signal: [review_value]
+    measured: {at: '2026-10-17T22:31Z', code: 200, bytes: 15091, note: 'HTML 200; the review corpus itself is subscription-gated, the site is not.'}
+    why: 'The single best review source for a MONOGRAPH or a textbook, because the reviewer is a subject librarian with no commercial stake. Access to the full reviews is paid; the site is readable, so register the route honestly as scrape-plus-owner-access.'
+  nyrb:
+    family: books
+    answers: 'long-form signed criticism (essay-length, argument-bearing)'
+    access: scrape
+    api_url: 'https://www.nybooks.com/'
+    auth: none
+    tier: B
+    signal: [review_value, recency]
+    measured: {at: '2026-10-17T22:31Z', code: 200, bytes: 281513, note: 'HTML 200; most essays are metered/paywalled after the first few.'}
+    why: 'The best place to find an ARGUMENT about a book rather than a verdict. Metered, so it is a `paywalled_personal` source, never a bulk corpus.'
+  lrb:
+    family: books
+    answers: 'long-form signed criticism, UK'
+    access: scrape
+    api_url: 'https://www.lrb.co.uk/'
+    auth: none
+    tier: B
+    signal: [review_value, recency]
+    measured: {at: '2026-10-17T22:31Z', code: 200, bytes: 459861, note: 'HTML 200; archive mostly paywalled.'}
+    why: 'The counterpart to NYRB with a different editorial lineage; useful precisely where the two DISAGREE.'
+  kirkus_reviews:
+    family: books
+    answers: 'pre-publication reviews'
+    access: scrape
+    tier: C
+    signal: []
+    measured: {at: '2026-10-17T22:31Z', code: 200, bytes: 158910, note: 'HTML 200.'}
+    why: 'REGISTERED WITH ITS CONFLICT (D-3038): the publisher pays for the review, so it is an advertisement-shaped signal. Use it as an EARLY existence check (is this book real, who published it), never as a quality verdict. A register that omitted this distinction would rank paid praise like independent criticism.'
+  the_greatest_books:
+    family: books
+    answers: 'algorithmic aggregation of "greatest books" lists'
+    access: none
+    tier: C
+    measured: {at: '2026-10-17T22:31Z', code: 403, bytes: 5638, note: 'Cloudflare challenge (Just a moment...).'}
+    why: 'A useful consensus prior, but unreachable from this machine today and it is an aggregation of OTHER lists — the underlying lists (awards, Five Books) are better sources for the same signal. Not worth an engine.'
+  bookwyrm:
+    family: books
+    answers: 'federated social reading: ratings + reviews, self-hostable'
+    access: api
+    api_url: 'https://bookwyrm.social/api/v1/search?q={query}'
+    auth: none
+    tier: B
+    signal: [review_volume, review_value]
+    measured: {at: '2026-10-17T22:31Z', code: 200, bytes: 13056, note: 'joinbookwyrm.com 200; instance API not probed from this machine — recorded as site-measured only.'}
+    why: 'The ONLY review network that is sovereign-compatible by construction: ActivityPub, self-hostable, no advertising, no paid placement. Volume is small today, which is exactly why it is a second limb and not the primary one.'
+
 # ── PAPER SOURCES (a different question: a paper has no "rating", it has a citation graph) ────────────────────
 paper_sources:
   openalex:
@@ -197,6 +276,38 @@ tools_not_integrated:
     measured: {at: '2026-10-17T21:47Z', code: 0, bytes: 0, note: 'web tools; no public API.'}
     why: 'OpenAlex already exposes `referenced_works` and `cited_by` with a budget — the same graph, locally, keyless. The tools are UX, not data.'
 
+# ── ACQUISITION TOOLING measured 2026-10-17 (D-3081): supply-chain risk is the deciding limb ──────────────────
+  annas_download_mcp:
+    answers: 'keyless Anna s download: LibGen 2-step (ads.php -> session key -> get.php_) and Sci-Net (DOI -> PDF)'
+    access: manual
+    measured: {at: '2026-10-17T22:36Z', code: 0, bytes: 0, note: 'README read from source (francy2222/annas-archive-download-mcp); hosted endpoint is a third-party Vercel function.'}
+    why: 'The METHOD is the finding and it is worth PORTING: it proves Anna s slow downloads are reachable with NO key by following the partner links already rendered in the page. The ENDPOINT is not adopted: a hosted MCP server run by an unknown account sees every query and every session it touches, and MCP servers execute with the caller s privileges. Port, do not call.'
+  librarr:
+    answers: 'a self-hosted Sonarr-for-books: 13 indexers, confidence scoring, Torznab/OPDS, auto-import to Calibre'
+    access: none
+    measured: {at: '2026-10-17T22:36Z', code: 0, bytes: 0, note: 'README read (JeremiahM37/librarr, Go, MIT, ~17 MB binary, 14 MB RSS idle).'}
+    why: 'REGISTERED AS A REFERENCE, NOT A DEPENDENCY (D-3038): its indexer list and confidence-scoring shape are the best public map of what a book finder must try, and our ladder already covers the same ground behind an Adapter protocol (C21). Adding a Go daemon would buy no capability and a new failure mode.'
+  heartleo_zlib:
+    answers: 'search, download by id, history, quota profile, send-to-Kindle, proxy/custom domain'
+    access: credential
+    measured: {at: '2026-10-17T22:36Z', code: 0, bytes: 0, note: 'source tree read: internal/cli/{login,cookies,search,download,history,profile}.go — it authenticates a SESSION against the website and reuses cookies; there is no separate API key.'}
+    why: 'The reviewed, MIT, actively-maintained client for the Z-Library credential path (993 stars, pushed 2026-10-07). It is also the evidence for the reverse-engineering answer: the only surface that exists is the WEBSITE behind a login, so "an API key" cannot be obtained because it does not exist.'
+  hover_paywalls:
+    answers: 'opens a paywalled article by rewriting the referer/crawler identity'
+    access: manual
+    measured: {at: '2026-10-17T22:33Z', code: 0, bytes: 0, note: 'nang-dev/hover-paywalls-browser-extension, 1,311 stars, last push 2024-08 (stale).'}
+    why: 'REGISTERED, NOT RECOMMENDED AS A LANE (D-3038): it is a browser extension, so it can only run in the headed-Chrome engine, and it works by impersonating a crawler — which is a terms violation on most publishers. The OWNER may use it in their own browsing; the OS must not make it a source, because a corpus built that way cannot state its own licence_class truthfully.'
+  freedium:
+    answers: 'a Medium proxy that renders the full text'
+    access: manual
+    measured: {at: '2026-10-17T22:33Z', code: 0, bytes: 0, note: 'wywywywy/freedium-browser-extension and similar mirrors exist; the upstream freedium service moves hosts often.'}
+    why: 'The only one of the paywall tools aimed at exactly the owner s ask (Medium/Substack). Same posture: OWNER-SIDE manual route, never an automated lane, and any text kept is licence_class paywalled_personal — an assessment note, not a corpus work.'
+  bypass_paywalls_clean:
+    answers: 'per-site paywall rules for ~200 outlets'
+    access: manual
+    measured: {at: '2026-10-17T22:33Z', code: 403, bytes: 5664, note: 'the canonical GitLab moved/blocked (403); gitflic returned 500; GitHub carries only stale mirrors (csns1 mirror last pushed 2022-06).'}
+    why: 'REJECTED AS A DEPENDENCY for a measured reason: the canonical source is no longer reliably fetchable, so pinning a commit is not possible and a 2022 mirror is a supply-chain risk with no update path. Recorded so it is not re-proposed from memory.'
+
 # ── SHADOW SOURCES (books) — licence_class and the measured access route ──────────────────────────────────────
 shadow_sources:
   annas_archive:
@@ -227,3 +338,42 @@ shadow_sources:
     licence_class: shadow
     measured: {at: '2026-10-17T21:47Z', code: 200, bytes: 7363, note: 'sci-hub.ru and sci-hub.st answer 200 with `captcha` in the body; sci-hub.se has no DNS.'}
     why: 'The paper rung of last resort, and today it is a wall — except through Anna s /scidb/<doi> via the browser engine.'
+
+  # ── ADDED 2026-10-17 (D-3081): the FREE routes that need no key and no account ───────────────────────────────
+  #: These exist because the owner asked "is there a free safe API". There is no key to buy or beg: what exists is
+  #: a set of FREE DOWNLOAD PATHS that the paid API would only make faster. Each is measured or explicitly marked.
+  sci_net:
+    answers: 'a DOI -> PDF for scientific articles, no key and no account'
+    access: scrape
+    tier: S
+    licence_class: shadow
+    measured: {at: '2026-10-17T22:36Z', code: 0, bytes: 0, note: 'NOT MEASURED from this machine — endpoint shape read from francy2222/annas-archive-download-mcp (sci-net.xyz/{doi} -> iframe PDF).'}
+    why: 'The most promising KEYLESS paper route inside the shadow lane, and the only one that would let the paper rung work without the headed browser. Declared NOT MEASURED on purpose: a route enters the ladder only after it is probed, not because a README says so (D-3036).'
+  annas_slow_partners:
+    answers: 'the free download links rendered on an Anna s /md5/ page (library.lol, IPFS gateways, Z-Library mirrors)'
+    access: browser
+    tier: S
+    licence_class: shadow
+    measured: {at: '2026-10-17T22:04Z', code: 200, bytes: 322465, note: 'the /md5/ page carried 16 slow_download and 105 fast_download links; one slow_download settled after 24 s into a direct node URL carrying a real .epub.'}
+    why: 'This is the MEASURED free route that already landed a book (annas rung, 20:02Z). It needs the browser engine for the challenge and then 24 s of patience per file — a throughput fact, not a blocker.'
+  bookracy:
+    answers: 'a books/comics/manga front with its own download button'
+    access: scrape
+    tier: S
+    licence_class: shadow
+    measured: {at: '2026-10-17T22:33Z', code: 0, bytes: 0, note: 'NOT MEASURED from this machine; listed by FMHY as a starred ebook source with a userscript download button.'}
+    why: 'Recorded as CANDIDATE because the owner asked for "the more the better". A candidate is not a rung: it enters the ladder after a probe that names its bytes (BUG-912 is the shape of getting this wrong).'
+  mobilism:
+    answers: 'a forum with direct book/audiobook/magazine attachments'
+    access: credential
+    tier: S
+    licence_class: shadow
+    measured: {at: '2026-10-17T22:33Z', code: 0, bytes: 0, note: 'NOT MEASURED; FMHY notes a RANKS system (forum trust levels) for download rights.'}
+    why: 'High-yield for textbooks and magazines, but a FORUM: downloads are gated by an account and a rank, so the honest class is `credential`. It also carries the highest malware exposure of anything in this list (user-uploaded attachments) — it may only ever be fetched into a quarantine pen and probed before it is named a work.'
+  libgen_torrents:
+    answers: 'the whole LibGen corpus as torrents + MariaDB/ElasticSearch dumps'
+    access: scrape
+    tier: S
+    licence_class: shadow
+    measured: {at: '2026-10-17T22:20Z', code: 200, bytes: 207114, note: 'annas-archive FAQ states the bulk route: generated ElasticSearch + MariaDB databases, raw JSON files, and a torrent JSON list — no key, no account.'}
+    why: 'THE ARCHITECTURAL ANSWER the owner was actually asking for. Scraping is the slow, fragile, rate-limited path; a torrent of the corpus is the FAST, unattended, parallel one. It is the only route here that gets FASTER with scale instead of hitting a quota, and it is why a paid API key is a convenience, not a capability.'

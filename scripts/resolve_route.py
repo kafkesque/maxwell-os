@@ -353,8 +353,16 @@ def item_faults(w: World) -> tuple[list[str], list[tuple[Item, str, list[str]]],
     for reason in sorted((disp.get("bugs") or {}).values()):
         if str(reason) not in reasons:
             faults.append(f"(v) dispositions.bugs names reason {reason!r}, which is not declared")
-    debt = {"tasks": sum(1 for i, c, _ in rows if i.cls == "task" and c != "routed"),
-            "bugs": sum(1 for i, c, _ in rows if i.cls == "bug" and c != "routed")}
+    # BUG-913 (2026-10-17): the DEBT must count what the rail's own escape does NOT cover. `unrouted:` declares
+    # an item a FINDING rather than a missing route (reason `bug_is_a_finding`), and a declaration that lowers no
+    # measurement is a declaration with no referent (D-3034) - the first version of this block honoured the fault
+    # at (v) and then counted the item anyway at (vi), so the ONE escape the message offers ("declare the route, or
+    # disposition the item") could not move the number it was telling the reader to move. Only the PER-ITEM
+    # override is subtracted: subtracting `dispositions.bugs.default` (which covers every bug) would zero the debt
+    # and make it meaningless.
+    overridden = {str(k) for k in (w.cfg.get("unrouted") or {})}
+    debt = {"tasks": sum(1 for i, c, _ in rows if i.cls == "task" and c != "routed" and str(i.id) not in overridden),
+            "bugs": sum(1 for i, c, _ in rows if i.cls == "bug" and c != "routed" and str(i.id) not in overridden)}
     return faults, rows, debt
 
 

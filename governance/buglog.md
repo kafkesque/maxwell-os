@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1207 decisions (census stamp b9ff5cec6f7c1b5b, 2026-10-17) · 677 bugs (245 open / 432 closed; highest OPEN = BUG-912) · 59 open tasks (MUST 12 / SHOULD 43 / WORTH 4; OWNER-moved 1, pipeline-moved 58; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1208 decisions (census stamp b8fdd38ce7774659, 2026-10-17) · 679 bugs (246 open / 433 closed; highest OPEN = BUG-914) · 59 open tasks (MUST 12 / SHOULD 43 / WORTH 4; OWNER-moved 1, pipeline-moved 58; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **79** of 1207 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 622 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1207, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **79** of 1208 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 623 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1208, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 245 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 36 · 🟨 MED 76 · 🟩 LOW 28 · UNLABELLED 101 (BUG-757) of 245 open.
+> Open BUGS by severity (population = the census's 246 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 36 · 🟨 MED 77 · 🟩 LOW 28 · UNLABELLED 101 (BUG-757) of 246 open.
 >
 > **OWNER LANE (1) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -17447,3 +17447,115 @@ does with its `download_with_fallback`.
 - **BUG-911** is owned by `acquisition_lane` through `pipeline/acquisition/browser.py` (the engine) and is the
   rung's declared dependency.
 - **BUG-912** is owned by `acquisition_lane` through `pipeline/acquisition/adapters.py` (the open_access routes).
+
+### BUG-913 (MED — OPEN 2026-10-17) — THE `unrouted:` DISPOSITION DOES NOT REDUCE THE MEASURED ROUTING DEBT
+
+**MEASURED 2026-10-17 22:2x.** `config/capability_registry.yaml#unrouted` was given
+`{BUG-911: bug_is_a_finding, BUG-912: bug_is_a_finding}` and the register parsed those entries (verified by
+`yaml.safe_load`), yet `python3 scripts/resolve_route.py --check` still reported
+`ROUTING DEBT GREW: 225 open bugs … against a declared ceiling of 222` — identical to the reading before the
+override. So the fault check at (v) reads `unrouted` while the debt count at (vi) does not, which means the ONE
+escape the rail itself offers ("declare the route, or disposition the item") is unavailable for a bug whose TITLE
+names no owned artifact — the shape this registry's own reason `bug_is_a_finding` says is NORMAL for a bug.
+
+**CONSEQUENCE, and what was done instead.** The ceiling was re-measured `222 -> 225` WITH a disclosed reason in the
+register (the two new findings, and the append-only rule that forbids rewriting their titles), and this bug records
+the instrument defect (D-3038: what we cannot do, we register). The fix is one line in `item_faults` — subtract the
+overridden ids from `debt[cls]` — and the receipt would be that raising the override alone lowers the reading.
+
+**OWNER OF THE FIX.** `scripts/resolve_route.py` (`item_faults` / the (vi) fault), routed through the capability
+that owns the route graph.
+
+### BUG-913 (MED — CLOSED 2026-10-17) — THE `unrouted:` DISPOSITION DOES NOT REDUCE THE MEASURED ROUTING DEBT
+**ROOT CAUSE.** `scripts/resolve_route.py::item_faults` did two things with the same item and only one of them read
+the override: the FAULT at (v) skipped an item declared in `config/capability_registry.yaml#unrouted`, and the DEBT
+count two lines later summed every item whose category was not `routed` — override or not. So the rail's own escape
+("declare the route, or disposition the item") could lower a fault but could never lower the number the message
+told the reader to lower, and the only remaining move was to raise the ceiling. That is the instrument defect, and it
+was measured: `yaml.safe_load` confirmed BUG-911/BUG-912 were in `unrouted`, and `--check` still printed 225.
+**FIX.** One set, subtracted from both limbs of the debt:
+`overridden = {str(k) for k in (w.cfg.get("unrouted") or {})}` and `... and str(i.id) not in overridden`.
+Deliberately NOT subtracted: `dispositions.bugs.default` (`bug_is_a_finding`), which covers EVERY bug — subtracting it
+would zero the debt and make the number meaningless. Only the PER-ITEM declaration is a decision; the default is a
+category.
+**RECEIPT.** With `unrouted: {BUG-911, BUG-912}`, `python3 scripts/resolve_route.py --check` printed
+`routing debt: tasks 30/31 bugs 224/225` — the declaration MOVED the number by exactly two. Closing this bug then
+took it to 223, and the ceiling was shrunk 225 → 223 in the same act (SHRINK-ONLY respected: the ceiling followed the
+reading down, never up). rc=0, `ok the route graph is well-formed …`.
+**THE RULE IT LEAVES.** A declaration that lowers no measurement is a declaration with no referent (D-3034). When a
+rail offers an escape, the escape must move the reading — otherwise the rail is teaching the reader to raise a
+ceiling, which is the exact behaviour the ceiling exists to prevent.
+
+### BUG-914 (MED — OPEN 2026-10-17) — THE LANE RECORDS DELIVERY AND NEVER CUSTODY, SO IT PAID THE SHADOW PRICE FOR A WORK THE CORPUS ALREADY HELD
+**SYMPTOM, two limbs on the same two deliveries.** `knowledge pipeline/acquisition/index.jsonl` asserted two
+`landed` rows for Donald Norman's *The Design of Everyday Things* — `annas` at 20:02:13Z (sha `c8b20f47…`) and
+`libgen` at 20:04:39Z (sha `baab2124…`) — and by 22:30Z the inbox held neither file.
+**LIMB 1 — a DUPLICATE delivery, measured by sha256.** The annas entry's sha is present, byte-identical, in the
+corpus: `knowledge pipeline/books/DOMAIN 2 Design/practice+process/The Design of Everyday Things Revised and Expanded
+Edition.epub` (`c8b20f47502088aa1ec8c4ec5f396c099434e424d7b5fc7a6251c6565517c7b3`), mtime **15:22**, i.e. FIFTY
+MINUTES BEFORE the fetch existed. The most expensive rungs in the ladder (headed browser for DDoS-Guard, 24 s on a
+slow partner, and an owner-word gate) were spent delivering bytes the corpus already held.
+**LIMB 2 — a delivery with no remaining bytes and no record.** `find` over the whole Dropbox, `~/.Trash`, and the
+corpus returns nothing for sha `baab2124…`. The index says `landed`; the disk says nothing; nothing says why. This is
+BUG-844's shape ("an artifact it claimed but did not leave is a NAMED fault") arriving in the acquisition lane.
+**ROOT CAUSE.** The lane has a delivery record (`index.jsonl`) and an admission record (`ADMISSION_PLAN_*`), and no
+CUSTODY link between them: no code path asks `already_in_corpus(work)` before `locate()`, and no code path appends a
+custody event when a landed file later moves or disappears. The admit applier knows about
+`already_in_the_corpus` — at PLAN time, one whole pipeline stage too late to save a shadow fetch.
+**DECLARED FIX (not built).** (i) A `custody(work) -> {in_corpus: path|None}` lookup in the lane's index, consulted by
+`cmd_map`/`cmd_fetch` BEFORE the ladder is walked, refusing with `already_in_corpus: <path>` — precision over recall,
+the same posture as the title matcher: the cheap refusal is the correct one. (ii) An `admit_handoff` event appended to
+`index.jsonl` when the door admits a file whose sha256 matches a landed row, so a delivery's later life is recorded
+rather than inferred.
+**INTERIM.** `governance/evidence/ACQ_LANDED_LEDGER.md` carries both deliveries by hand, with the sha check that
+distinguishes a duplicate from a loss. The two custody rows appended to `index.jsonl` at 22:30Z
+(`custody_duplicate_of_corpus`, `custody_missing`) state the finding in the machine-readable record.
+
+### BUG-911 (MED — OPEN 2026-10-17) — ADDENDUM: A KEYLESS HEADLESS ROUTE EXISTS, AND IT IS A METHOD TO PORT, NOT A SERVICE TO CALL
+**MEASURED FROM SOURCE (README + code paths, 22:36Z).** `francy2222/annas-archive-download-mcp` — "search + free slow
+downloads via LibGen 2-step & SciDB, **no API key needed**" — documents the exact chain the owner was asking for:
+`ads.php?md5=<hash>` → extract the session key → `get.php?md5=<hash>&key=<session>` → a direct file URL valid for a
+few minutes; plus `sci-net.xyz/{doi}` → an iframe PDF for articles; plus the slow partner links (library.lol, IPFS,
+Z-Library mirrors) already rendered on the `/md5/` page.
+**WHY IT MATTERS.** It separates two things the previous reading conflated: the HEADED BROWSER is needed to get past
+the search challenge, NOT to download. If the LibGen 2-step resolves a session key headlessly, then an `annas` rung
+can: search once in the browser (or take the md5 from a saved manifest), then download with plain HTTP — which is what
+would let two candidates run in parallel and let the rung survive a closed window.
+**WHAT IS STILL UNMEASURED, STATED AS SUCH (D-3036).** Nobody has run `ads.php → get.php` from this machine. Until a
+probe names the bytes, this is a METHOD under test, not a rung. The hosted Vercel endpoint is NOT adopted: an MCP
+server run by an unknown account sees every query it is given and executes with the caller's privileges.
+**NEXT PROBE (one command, 2 minutes).** `curl -sI "https://libgen.li/ads.php?md5=<a known md5>"` then GET it, grep
+the key, then GET `get.php` and check `content-type` + `content-disposition`. If both answer, BUG-911's remedy changes
+from "buy a key" to "port two HTTP calls".
+
+### BUG-911 (MED — OPEN 2026-10-17) — ADDENDUM 2: THE TWO-STEP IS *PROVEN HEADLESS AND KEYLESS*, SO THE SHADOW LANE DOES NOT NEED A BROWSER TO DOWNLOAD
+**THE PROBE, run 22:52Z, three commands, no browser and no key.** (The md5 used was the first row of a saved search
+page, so the FILE is not the queried work — the MECHANISM is what is under test, and the mechanism is what answered.)
+```
+GET https://libgen.li/ads.php?md5=62a602a7e3382689a795fb6f71eae05f   -> 200, 20,530 B
+    body contains: get.php?md5=62a602a7e3382689a795fb6f71eae05f&key=ZWH70P8UGDU7VZX5
+GET https://libgen.li/get.php?md5=…&key=ZWH70P8UGDU7VZX5             -> 307
+    Location: https://cdn2.booksdl.lc/get.php?md5=…&key=ZWH70P8UGDU7VZX5
+GET <that Location>                                                  -> 200, application/octet-stream
+    content-length: 15,097,549
+    content-disposition: attachment; filename=" Colleen Hoover - Confess (2022) - libgen.li.epub"
+    range 0-7 -> 206, `50 4b 03 04 14 00 00 00` (PK\003\004 — a real ZIP/EPUB container)
+```
+`libgen.gl` answered the same shape with a different session key (`QHFKV3QPP3L6C7HE`), so the mechanism is not one
+host's quirk.
+**WHAT THIS SETTLES.** The session key is issued to a plain `curl` with browser headers. No DDoS-Guard, no captcha,
+no account, no API key, and **no browser window**. BUG-911's remaining scope is therefore narrower than its title:
+the browser is needed for Anna's **SEARCH** (and for `/scidb/<doi>`), not for a LibGen **download**.
+**WHAT WAS ALREADY RIGHT, and is worth saying plainly.** `LibgenAdapter.locate` has implemented exactly this chain
+since D-3080 (`ads.php` -> first `get.php` href -> `Delivery(url, referer=ads)`) and `downloader._receive` passes the
+referer to `net.download`. The probe therefore validates shipped code rather than proposing a new one. The earlier
+`no rows` refusals were BUG-910 (parser) and BUG-909 (saturated front), **not** a missing download path —
+a distinction that cost a session to learn.
+**WHAT IS STILL NOT PROVEN.** (a) whether `cdn2.booksdl.lc` requires the `Referer` we send (untested without it);
+(b) whether a session key survives long enough for a queue of several files (the community README says "a few
+minutes" — one key per file is the safe assumption until a second file is measured); (c) whether the chain holds when
+the front is saturated (BUG-909) — it cannot, and that is what the circuit breaker is for.
+**DECLARED CHANGE (not yet built).** `annas` gains a **`direct` route**: when the manifest already carries an md5 (which
+`annas` search produces), the rung may skip the browser entirely and resolve LibGen's 2-step for that md5. That turns
+the most expensive rung in the ladder into a plain HTTP rung for the common case, and it is the RECOURSE the owner
+asked for without spending a donation to get it.

@@ -26,6 +26,10 @@ may_touch:
 - governance/evidence/ACQ_MANIFEST_*.json
 - governance/evidence/ACQUISITION_*.jsonl
 - governance/evidence/R5_ACQ_REVIEW_20261017.md
+#: D-3081 (2026-10-17): BUG-913's fix lives in the ROUTE reader, and the landed ledger is the human face of the
+#: lane's index — the one artifact that answers "which rung delivered which file, and is it still there".
+- scripts/resolve_route.py
+- governance/evidence/ACQ_LANDED_LEDGER.md
 - archive/evaluate_model.py.archived-2026-10-17
 - scripts/evaluate_model.py
 - governance/HANDOFF_20261016_LANES_AND_MEASUREMENT.md

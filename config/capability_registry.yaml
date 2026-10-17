@@ -283,6 +283,7 @@ capabilities:
       - scripts/census_source_names.py
       - scripts/plan_source_rename.py
       - scripts/plan_admission.py   # D-3051: the admission plan - what the pipeline has never seen, by the door own key
+      - scripts/apply_admission.py  # T-183/D-3068: the APPLIER half - one crash-safe, plan-keyed, receipted writer
   - id: bug_recall
     kind: script
     entrypoint: python3 scripts/check_bug_recall.py
@@ -360,6 +361,11 @@ lanes:
     produces: receipt
     capability: source_library_names
     why: 'T-181/D-3051: THE ADMISSION PLAN - for every file in the declared library kind roots, whether the corpus or an ingest record already names it by the door own key, and what is left (MEASURED 2026-10-16: 2,811 files, 244 admission candidates, 621 refused for a root that declares no corpus home). It writes the plan and admits NOTHING: the act that admits a work is separate and owner-worded (T-183), and no engine moves a file because of its name (D-3045)'
+  - recipe: admit-apply
+    cmd: python3 scripts/apply_admission.py --apply
+    produces: receipt
+    capability: source_library_names
+    why: 'T-183/D-3068: THE ADMIT APPLIER - the act the plan has been waiting for since 2026-10-16. Dry run by default (rows + GiB, so the owner sees the cost before the copy), --apply only against a SIGNED acceptance that pins the plan digest and names the rows in scope. Crash-safe (C6), one receipt line per row (D-3036), refuses an unexplained target, a changed source, a defective name (T-176 rides first) and any path outside the corpus home. MEASURED 2026-10-17: the fresh plan reads 479 candidates / 8,271.5 MiB'
   - recipe: rename-plan
     cmd: python3 scripts/plan_source_rename.py --plan
     produces: receipt

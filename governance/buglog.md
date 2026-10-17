@@ -8,9 +8,9 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1194 decisions (census stamp a988a5f874809a58, 2026-10-17) · 644 bugs (234 open / 410 closed; highest OPEN = BUG-879) · 59 open tasks (MUST 12 / SHOULD 43 / WORTH 4; OWNER-moved 0, pipeline-moved 59; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1196 decisions (census stamp e63966a9f40156e7, 2026-10-17) · 645 bugs (234 open / 411 closed; highest OPEN = BUG-879) · 59 open tasks (MUST 12 / SHOULD 43 / WORTH 4; OWNER-moved 0, pipeline-moved 59; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **79** of 1194 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 609 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1194, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **79** of 1196 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 611 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1196, D-2987/BUG-765)
 >
 > Open BUGS by severity (population = the census's 234 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 35 · 🟨 MED 68 · 🟩 LOW 26 · UNLABELLED 101 (BUG-757) of 234 open.
 >
@@ -16481,3 +16481,38 @@ policy key without a display-name guess.
 **Status:** OPEN. Route: `extension_residency` (the same capability that owns the profile rail). Found by the forensic
 audit of D-3067, and deliberately NOT folded into BUG-873: BUG-873 is a silent zero-tool extension; this is a record
 that cannot name what it started. Different subject, different remedy.
+
+### BUG-880 (LOW, FIXED 2026-10-17) — THE LANE READER COULD NOT PARSE A PARAMETRISED RECIPE, SO A LANE POINTING AT A REAL, RUNNABLE RECIPE READ "the ladder file declares no such recipe"
+
+**Measured 2026-10-17, two-sided, on the first lane that ever carried a parameter.** Declaring T-183's applier as an
+operator lane (`recipe: admit-apply`, `cmd: python3 scripts/apply_admission.py --apply`) produced THREE faults from
+`python3 scripts/resolve_route.py --check`, two of them variants of the same defect:
+
+```
+- lane admit-apply: the ladder file declares no such recipe - a lane the operator is told to run and cannot (BUG-482)
+- lane admit-apply: 'python3 scripts/apply_admission.py' is ALSO run by the governed ladder recipe 'health'
+```
+
+The first is false by construction: `just --list` shows `admit-apply *ARGS` and `just --show admit-apply` prints its
+body. The recipe-header pattern was `^([A-Za-z0-9_-]+):` — it required the colon IMMEDIATELY after the name, so a
+recipe with any parameter (`admit-apply *ARGS:`, and equally `session profile="":`) was invisible to
+`recipe_bodies()`. A route that EXISTS read as ABSENT: the exact class (D-3034) the lane check exists to catch,
+turned against a working declaration.
+
+The second fault is a real property of the check, not a bug in it: the lane command was a PREFIX of the health line
+(`... --selftest`) and the overlap test is substring-based. That was fixed at the DECLARATION, not by weakening the
+check: the lane names the ACT (`--apply`) and the preview is the same door with `--dry-run`.
+
+**RED LOOP.** RED: `resolve_route.py --check` reported the two lane faults above while the recipe ran. GREEN: after
+the header pattern accepted an optional parameter segment and the lane named `--apply`, `--check` reports NO lane
+fault (only the pre-existing routing-debt fault remains), and the reader's own controls read **19/19** with a new
+known-answer control — `parametrised_recipe_header` — that FAILS if the pattern regresses to `^name:`.
+
+**Why this is a bug and not cosmetics.** The lane check is how the owner is told which door to run. A parser that
+cannot see a recipe it could execute is a diagnostic that accuses the working file (BUG-870's shape, one layer over):
+the cheapest possible repair is to weaken the declaration until the reader is happy, which is precisely how a working
+route would be deleted to silence a false alarm.
+
+**Status:** FIXED (`scripts/resolve_route.py`: `RECIPE` now accepts `name [params]: [# comment]`; one new control;
+19/19). Route: `route_graph` (the capability that owns the reader). No ceiling was raised and no lane was renamed to
+satisfy the parser.

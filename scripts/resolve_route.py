@@ -56,7 +56,7 @@ PRODUCES = ("reading", "receipt", "state")
 ARTIFACT = re.compile(r"[A-Za-z0-9_][A-Za-z0-9_./-]*\.(?:py|ya?ml|json|md|sh|jsonl|txt)")
 JUST = re.compile(r"\bjust\s+([A-Za-z0-9][A-Za-z0-9_-]*)")   # a recipe name may carry _ and - (justfile)
 TIER = re.compile(r"\bT[0-2]\b")
-RECIPE = re.compile(r"^([A-Za-z0-9_-]+):")
+RECIPE = re.compile(r"^([A-Za-z0-9_-]+)(?:\s+[^:\n]+)?:\s*(?:#.*)?$")
 PATHISH = re.compile(r"^[\w.-]+(?:/[\w .&()-]+)+$")
 
 
@@ -546,6 +546,16 @@ def selftest() -> int:
     w.cfg["capabilities"][0]["entrypoint"] = "just no_such_recipe"
     f, _ = check_world(w)
     control("recipe_absent", f, 1, "a `just <recipe>` route whose recipe is gone is refused")
+
+    # A PARAMETRISED RECIPE IS STILL A RECIPE (BUG-880, MEASURED 2026-10-17): the header pattern required the
+    # colon IMMEDIATELY after the name, so `admit-apply *ARGS:` - a real, runnable recipe - was invisible, and a
+    # lane pointing at it read "the ladder file declares no such recipe". A route that exists read as absent: the
+    # exact defect class (D-3034) the lane check exists to catch, turned against a working declaration.
+    bodies = recipe_bodies("admit-apply *ARGS:\n    python3 x.py\n\nplain:\n    y\n")
+    control("parametrised_recipe_header",
+            [] if bodies.get("admit-apply", "").strip() == "python3 x.py" and bodies.get("plain") == "    y"
+            else ["a parametrised header is unreadable"], 0,
+            "a recipe with a parameter is parsed, so a lane may point at one")
 
     w = synthetic()
     w.cfg["capabilities"][0]["entrypoint"] = "scripts/check_a.py --selftest"

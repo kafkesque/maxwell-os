@@ -815,3 +815,148 @@ now carries a dated CORRECTION with the correct form (below), so the next reader
    provisioning), then `config/extension_profiles.yaml` (policy) — never the handoff prose INSTEAD of them.
 5. Then start at §i.1. Delegation remains: `sweep` (read-only repositories), `review` (judge one artefact),
    `extract` (summarise WITH source). Never: open-ended research, promotions, governed writes.
+
+## §1i — EIGHTH SITTING (2026-10-17, afternoon): T-183's APPLIER IS BUILT (and decides nothing), the ONE DOOR BINDS ITS OWN CONTRACT, and the plan on disk was STALE
+
+### a. What the owner asked (verbatim, trimmed)
+"continue from previous session … So for clarification we don't need filesystem nor mcp git extension because
+developer extension holds both? Or why is it disabled? And from now whenever I start a new session those 2 will be
+disabled by default And I have to switch on when I want them — reliable intuitive solution … And since I don't know
+how to implement do this: In the shell where you launch goose — not in ~/.zshrc: eval … first look in general maxwell
+os current state, continue with the next critical step starting with the highest leverage step."
+
+### b. THE THREE ANSWERS (the part the owner asked for in plain words)
+
+**1. "Do we need filesystem / git MCP if developer holds both?" — No, and that is the measured reason they are off.**
+`developer` gives `shell` (which runs `git` and reads any file), `write`, `edit`, `tree`. `filesystem` re-implements
+read/write/search through a second server (**14 tools / 3,727 tok per request**) and `gitmcp-mcp` re-implements git
+through a server (**12 tools / 1,906 tok**). Neither does anything `developer.shell` cannot do, and both are paid for
+**on every request of every session**. D-3067 switched them off; **they were not deleted** — they are `on_demand`, they
+still carry their `why:`, and the `workshop` profile still names them.
+
+**2. "So from now a new session has them off and I turn them on when I want." — Yes, exactly, and it is ONE word.**
+A new session is born `core`: ten extensions, **≈759 tok/request** instead of ≈6,392. When you want bulk file tools:
+`just session workshop`. That is the whole escape hatch. If you want a narrower one: `just session research`,
+`documents`, `web`, `recall`, `sandbox` (each adds only its own set). Nothing to edit, no config to remember. The two
+things that DO NOT work, both measured: editing `enabled:` **inside** a running session (no effect until the next
+birth — BUG-873), and expecting a subagent to receive a disabled extension by naming it (a child asked for
+`[developer, filesystem]` was born with `developer` alone, session `20261017_15`).
+
+**3. "How do I do the `eval` line?" — You no longer have to.** `just go` now binds the declared `agent_loop` contract
+**for the child process it starts** and the binding dies with the session (D-3069). Proof, run this sitting with a
+stand-in harness on PATH: `goose_profile.py --launch` printed `harness: 4 agent_loop name(s) bound for THIS process
+only`, and the child read `GOOSE_MODEL=gemma-4-E4B-it-MLX-4bit GOOSE_CONTEXT_LIMIT=32768
+GOOSE_PROVIDER=maxwell_omlx`. In a session born that way, `python3 pipeline/harness_env.py --check` reads **rc 0**.
+If you ever launch `goose` **by hand** instead of through `just go`, that shell is unbound and `--check` correctly reads
+rc 2 — the manual form (never in `~/.zshrc`, see BUG-871) is
+`eval "$(python3 pipeline/harness_env.py --print --scope agent_loop)"`.
+A shell that contradicts the declaration (`GOOSE_MODEL=something-else`) now **refuses the birth** instead of being
+silently out-voted.
+
+### c. STATE AT CLOSE (numbers, not impressions)
+| thing | reading |
+|---|---|
+| decisions | **1,196** (D-3068 applier contract; D-3069 the door binds its child) |
+| bugs | **645** — 234 OPEN / 411 CLOSED (BUG-880 filed **and fixed** this sitting) |
+| open tasks | 59 |
+| `goose_profile --check` | **rc 0**; `--selftest` **41/41** (3 new controls: the door binds; a contradiction refuses; an equal value is not a conflict) |
+| `apply_admission --selftest` | **14/14** |
+| `apply_admission` dry run | **479 rows / 8,271.5 MiB**, rc **2** (no signature yet — by design) |
+| `plan_admission` (live re-derivation) | 2,811 files; 1,697 seen; **479 candidates**; 0 unresolved-home; 389 container-no-stage; 194 name-repair-first; 52 out-of-kind |
+| `resolve_route --selftest` | **19/19** (new: a parametrised recipe header parses) |
+| `resolve_route --check` | **RED (pre-existing only)**: routing debt 225 vs 222. No lane fault. |
+| `gov_sync` / `check_governance_faces` | 4 faces equal their re-derivation; faces **rc 0** (1,196 decisions / 645 bugs) |
+| `check_freeze_window` | **rc 0** — CLOSED, both exit clauses MET |
+| `check_repo_integrity --worktree` | **rc 0** — 21 dirty paths, 21 granted by the session plan |
+| R5 | gemma-4-E4B-it-MLX-4bit **APPROVE** on `scripts/apply_admission.py`, receipt `governance/r5_reviews.jsonl`, journal `DJ-20261017T122451Z-ec88` (39.2 s, 0 open) |
+
+### d. WHAT LANDED
+| thing | before → after | receipt |
+|---|---|---|
+| T-183's writer | did not exist → **`scripts/apply_admission.py`** | 14/14 controls; R5 APPROVE; `just admit-apply --dry-run` / `--limit N` / `--apply` |
+| the authority | the plan alone → **plan + a SIGNED acceptance** (`governance/ADMISSION_ACCEPTED_<date>.yaml`) that pins the plan's **sha256** and names the rows (`mode: all\|listed`) | a digest mismatch is FATAL; a listed row the plan does not hold is FATAL |
+| the plan artifact | **STALE**: `ADMISSION_PLAN_20261016` held the pre-D-3062 derivation (**244** rows, notes root with no home) | re-derived → `ADMISSION_PLAN_20261017.{json,md}` (479 rows) |
+| the copy | — | C6 `tempfile → fsync → os.replace` **in the target dir**; never `--force` on S0 (force DISCARDS the stage0 checkpoint) |
+| the trace | — | one fsync'd JSON line per row: source, both targets, key, source/md digests, plan+accept digests, `pipeline_commit`, `schema_version`, `gen_model` |
+| the door | `just go` did not bind the contract | `just go` binds `agent_loop` for the CHILD (D-3069); refuses a contradictory shell value |
+| the lane reader | `^name:` could not see `admit-apply *ARGS:` → **a live recipe read as absent** | BUG-880 fixed + control; lane `admit-apply` registered in `config/capability_registry.yaml` |
+| harness checks | 38/38 | **41/41** |
+
+**The applier refuses, by construction:** a row absent from the signed set; a target that exists unless a receipt
+accounts for **that digest**; a source whose byte count moved; a name a declared defect pattern still matches (T-176
+rides first); a path resolving outside the corpus home; a sheet with less free space than the batch needs. Dry run is
+the default; `--dry-run` wins from the same door so a preview costs one word.
+
+### e. THE FORENSIC AUDIT — what it found, in the order it found it
+1. **THE PLAN WAS STALE, AND THAT WAS INVISIBLE.** The handoff said "479 rows"; the artifact on disk said 244 (derived
+   2026-10-16, before the notes root declared a home). Both numbers were true of *different trees*. The applier is
+   therefore **per-row verifying**: it re-derives the classification and refuses any accepted row that no longer reads
+   `admit_candidate` with the same key. A stale plan cannot walk through it — and the artifact is now re-derived.
+2. **THE COST IS REAL AND WAS NEVER ON SCREEN: 8,271.5 MiB** copied into the corpus (the library keeps its original;
+   T-179's arrangement reading counts a same-work pair with EQUAL bytes as AGREEMENT, not drift, so this adds no
+   drift — it adds storage). Hence `--limit N` tranches and the free-space guard.
+3. **S0's `--force` WOULD HAVE ERASED THE CONVERSION LEDGER.** `run_stage0` sets `existing = {}` under force and
+   rewrites the checkpoint from that empty set. The applier never passes `--force`; it uses the single-book path and
+   refuses a filename collision instead (the door's key is a prefix of the name, so two rows cannot share a
+   checkpoint key without sharing a key — which the reader already refuses upstream).
+4. **A LANE CAN BE UNREADABLE WHILE ITS RECIPE RUNS.** BUG-880: `just --list` showed `admit-apply`, `just --show`
+   printed the body, and the route graph said "the ladder file declares no such recipe". The parser, not the recipe,
+   was wrong. Fixed with a control rather than by renaming the lane.
+5. **A NAMED MIS-ATTRIBUTION OF MY OWN (D-3036): the R5 receipt.** The journal run above declared the artifact as
+   `governance/r5_review_gate.jsonl` (this file's §1a.2 advice); the gate that actually ran,
+   `scripts/r5_code_review.py`, writes **`governance/r5_reviews.jsonl`** (14:25). The presence check passed because the
+   OTHER file exists — which is exactly the "an artifact it claimed but did not leave" shape. Recorded here, not
+   papered over: **§1a.2's sentence is corrected in this paragraph** — `r5_code_review.py` → `r5_reviews.jsonl`;
+   `r5_review_gate.jsonl` belongs to the tiered gate (syntax/lint/C11 layers), not to this one.
+6. **Consumer sweep:** every touched consumer was re-read. `capability_registry.owns` gained the new script; the lane
+   names the ACT (`--apply`) so it cannot collide with the health line's `--selftest` (the overlap check is substring-
+   based and was right to fire); the session plan grants the two new plan artifacts **by name** (BUG-548: a widening
+   that is only recorded is not granted).
+
+### f. WHAT THE OWNER STILL OWNS (exact commands, no ambiguity)
+1. **Nothing, for the harness.** Launch with `just go`. (Manual alternative, not in `~/.zshrc`:
+   `eval "$(python3 pipeline/harness_env.py --print --scope agent_loop)"`.)
+2. **Nothing, for the extensions.** `just session workshop` when bulk file tools are wanted; `just go` otherwise.
+3. **T-183's rows — ONE file, and then one command.** The 2026-10-17 GO approved the **applier**, not the rows. To
+   authorise a tranche, write `governance/ADMISSION_ACCEPTED_20261017.yaml`:
+   ```yaml
+   schema_version: "1.0"
+   plan: governance/ADMISSION_PLAN_20261017.json
+   plan_sha256: 2cc698921a64f605ba3e5cc5cc72d0e5d7fdde2fc7778732724e2c530895ea10
+   accepted_by: barn
+   accepted_on: "2026-10-17"
+   mode: listed          # or: all
+   rows:                 # `rel` labels exactly as the plan prints them (mode: listed only)
+     - books/epub/DOMAIN 2 Design/communication+design/The Design of Everyday Things Revised and Expanded Edition.epub
+   ```
+   then `just admit-apply --limit 10` (preview first: `just admit-apply --dry-run`). The digest above is the one
+   measured this sitting — **re-take it with `shasum -a 256 governance/ADMISSION_PLAN_20261017.json`** before signing
+   if the plan is regenerated (a signature pins bytes, not a filename).
+
+### g. NEXT CRITICAL STEPS, in consequential order (each unblocked unless marked)
+1. **T-183, the owner's signature** — the writer is done; what remains is the word. A 10-row tranche proves
+   S0 → S0.5 → S1 end to end for a few files, and the receipt turns the remaining 469 into a count.
+2. **T-187 — the two-step / two-tool loop fixture**: still the ONLY gate for any model promotion (and for the
+   Qwen3-30B-A3B-Instruct-2507 candidate). One tool cannot distinguish "drives a loop" from "calls once and guesses".
+3. **BUG-876 — the attribution control** on `config/decisions.yaml`: still the one blocker preventing a loop agent from
+   adjudicating a governed write (no receipted post-image).
+4. **T-190's toggle half** — `extensionmanager` still leaves no trace; the measured trigger is goose
+   `PreToolUse`/`PostToolUse` hooks, with `SessionStart` as the birth receipt.
+5. **BUG-879** — the birth record names a stdio member by its COMMAND. It is a **harness-side** defect (the store is
+   written by goose, not by this repo): the local half is `--born`'s mapping, the real fix needs the upstream record.
+   Named as harness-side rather than promised here.
+6. **The four pstack ideas as OUR OWN single skills** (never the bundle): `prove-it-works`, `benchmark-checklist`,
+   `deslop`/`unslop`, `interrogate`.
+7. **Pre-existing reds, unchanged this sitting:** `route_graph` 225 vs 222 (SHRINK-ONLY), `check_rail_mutations`,
+   `check_config_defaults`, `check_bug_recall` (owner-owed class ceiling), `lib/handoff --selftest`,
+   `check_silent_repair`, `check_undeclared_encoding`, `check_store_columns`, `reconcile`, `verify_generator_pins`,
+   `check_tests`, `build_anchor_store_bridge`, BUG-875 (`pipeline`/`tools` remain PEP-420 namespace roots).
+
+### h. HOW TO RESUME IN A FRESH SESSION (read order)
+1. `python3 scripts/goose_profile.py --check` → rc 0; `just go` → the door binds its child (msg on stderr).
+2. `python3 scripts/check_freeze_window.py` and `python3 scripts/check_governance_faces.py --check` → rc 0.
+3. `just health` → ONE known red (`route graph`, 225 vs 222) and nothing else.
+4. Read **D-3068 → D-3069** in `config/decisions.yaml`, then `config/ingest_identity_gate.yaml#source_library.admission.applier`
+   (the contract), never this prose INSTEAD of them.
+5. Then start at §g.1. Delegation unchanged: `sweep` (read-only), `review` (judge one artefact), `extract`
+   (summarise WITH source). Never: open-ended research, promotions, governed writes.

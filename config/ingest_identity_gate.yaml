@@ -488,4 +488,36 @@ source_library:
       refused_not_in_its_kind_folder: 'the file does not sit under its declared kind folder (the placement axis, axis_depth 1), so the path its corpus twin would take cannot be derived: the misplaced class T-180 owns'
       refused_domain_not_a_corpus_domain: 'the file does not sit under a folder this root declared as its axis, or that folder is not a name the CORPUS already materialises (arrangement.share_rule): admitting it would put a new top-level name in the one corpus home and silently widen the domain vocabulary the pipeline classifies against, so the row is refused and counted instead (D-3062)'
 
+    #: THE APPLIER'S CONTRACT (T-183/D-3068). The plan is a PROPOSAL; this block declares the SECOND document that
+    #: turns a proposal into an authorisation, and the ledger that makes a batch readable afterwards. Both are
+    #: declared here rather than in the writer, because a prefix in code is a second home (C12).
+    #:
+    #: A SIGNATURE IS NOT THE PLAN. `ADMISSION_ACCEPTED_<date>.yaml` names ONE plan file and pins its sha256, so a
+    #: plan edited after signing no longer matches and the applier refuses (D-3034: only a RESOLUTION grants).
+    #: `mode: all` puts every row in scope; `mode: listed` names rows by their `rel` label. A row the signature
+    #: names and the plan does not hold is FATAL - an approval that cannot resolve is a wish, not a grant.
+    applier:
+      authority: D-3068
+      command: python3 scripts/apply_admission.py
+      reading: 'python3 scripts/apply_admission.py (dry run, the owner cost estimate) | --apply (the act) | --limit N (a tranche) | --selftest (its known-answer controls)'
+      accept_prefix: 'governance/ADMISSION_ACCEPTED_'
+      accept_extension: '.yaml'
+      receipt_prefix: 'governance/evidence/ADMISSION_APPLIED_'
+      receipt_extension: '.jsonl'
+      accept_modes: [all, listed]
+      accept_required: [schema_version, plan, plan_sha256, accepted_by, accepted_on, mode]
+      #: THE CLOSED STATE VOCABULARY. A state this writer can produce and this list does not carry is FATAL: a
+      #: receipt line whose state nobody declared is a state no reader can classify.
+      states: [run, would_apply, applied, already_applied, refused, failed, summary]
+      refuses:
+        a_row_absent_from_the_signed_set: 'the signature is the whole authorisation; the plan is only its subject'
+        a_target_that_already_exists: 'unless a receipt accounts for that target with the SAME digest - the honest reading of a rerun, never a licence to overwrite an unexplained file'
+        a_source_whose_bytes_changed: 'the plan names a byte count; a file that grew or shrank is not the work that was approved'
+        a_name_a_defect_pattern_still_matches: 'an admitted name becomes the CORPUS NAME and the DOOR KEY, so the repair rides first (T-176)'
+        a_target_outside_the_corpus_home: 'a row may not write outside the one tree the pipeline reads'
+      never:
+        - 'deletes anything (R-D410); the only unlink is this writer own half-written temp file'
+        - 'decides a topic (D-2898) or a name (T-176): both arrive from the plan'
+        - 'uses --force on S0: force DISCARDS the stage0 checkpoint (existing = {}), which would erase every prior conversion record'
+
 

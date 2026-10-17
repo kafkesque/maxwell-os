@@ -27325,3 +27325,101 @@ decisions:
   - 'The saving is CONTEXT, not memory: 5,633 tok/request of the six stdio extensions is now paid only where it is asked for; the RSS saving is the two subprocesses a `core` session no longer starts.'
   - 'The flip is live only at the NEXT birth (BUG-873 limb b), never inside the session that made it - so the session that applied it still runs the old surface, by construction.'
   - 'A NEW defect is registered, not hidden: the birth record names a stdio member by its COMMAND, so two `uvx` members collapse into one row (BUG-879) - the same identity confusion that made BUG-878 read as "a member called python3".'
+- id: D-3068
+  state: ACTIVE
+  date: '2026-10-17'
+  by: assistant
+  category: PIPELINE / ADMISSION
+  bugs: []
+  files:
+  - scripts/apply_admission.py
+  - config/ingest_identity_gate.yaml
+  - justfile
+  - config/capability_registry.yaml
+  - governance/ADMISSION_PLAN_20261017.json
+  title: 'THE ADMIT APPLIER EXISTS AND DECIDES NOTHING - a SIGNED acceptance pins the plan digest and names the rows in scope, the copy is crash-safe, and the batch cost is a number the owner sees before paying it.'
+  decision: >-
+    T-183's owed limb is BUILT as `scripts/apply_admission.py`, and its authority is split in two so that neither half
+    can pretend to be the other. (1) THE PLAN is a derivation (`scripts/plan_admission.py`, D-3051): it proposes a
+    corpus path for every candidate and admits nothing. (2) THE SIGNATURE is a separate owner document
+    (`governance/ADMISSION_ACCEPTED_<date>.yaml`) that names ONE plan file, pins its sha256, records accepted_by /
+    accepted_on, and declares `mode: all | listed` with the `rel` labels it puts in scope. A plan is not accepted
+    because it exists; a signature that pins a different digest authorises different BYTES and is refused. The applier
+    then refuses a row absent from the signed set, a target that already exists unless a receipt accounts for that
+    exact digest, a source whose byte count moved since the derivation, a name a declared defect pattern still
+    matches (T-176 rides first), and any path that resolves outside the declared corpus home. It copies crash-safe
+    (C6: tempfile in the TARGET directory -> fsync -> os.replace), never deletes (the only unlink is its own
+    half-written temp file), and appends one fsync'd JSON line per row so an interrupted batch reads as a batch
+    (D-3036). It runs the declared conversion entrypoint (S0) per container and NEVER with `--force`, because force
+    discards the stage0 checkpoint (`existing = {}`) and would erase every prior conversion record. Dry run is the
+    default; `--apply` is the act; `--dry-run` wins from the same door so a preview costs one word.
+  rationale: >-
+    The gate T-183 declared a year of work ago was never the code - it was the QUESTION "who may say a row is
+    admitted?". Answering it with "the owner, by a file that pins the plan's bytes" makes the plan disposable and the
+    signature load-bearing: the plan can be re-derived any time, the signature cannot be forged by re-running a script.
+    The refusals are chosen from the failure modes this repository has already paid for: BUG-780 (one text under two
+    names) is why a target must be accounted for rather than overwritten; BUG-800 (a defective name becomes the door's
+    key and costs 2,952 references to undo) is why the name guard is re-checked in the WRITER even though the reader
+    already excludes it; BUG-614/the stage0 checkpoint is why force is refused by declaration rather than by discipline.
+    What is refused as a design: a heuristic mover (D-3045: a name is evidence, never identity), a copy that skips the
+    conversion stage (the corpus reads .md; a bare container would be a "work" nothing can open), and an applier that
+    decides a topic (D-2898).
+  evidence: >-
+    MEASURED 2026-10-17. (1) CONTROLS: `python3 scripts/apply_admission.py --selftest` -> 14/14 on a fixture tree (no
+    library file and no receipt of the owner's is touched): digest mismatch FATAL, a listed row the plan does not hold
+    FATAL, a dry run writes no file and no receipt, a defective name refused THROUGH the writer, an applied row keeps
+    its source, an accounted target reads already_applied while an unexplained target is refused with its bytes
+    intact, a changed source refused, an escape from the corpus home FATAL, the S0 command names the row's own path,
+    and the receipt carries source/target/key/digests/commit. (2) THE LIVE READING: the plan artifact on disk was
+    STALE (244 rows, derived 2026-10-16, before the notes root declared a home) while the declaration now derives 479
+    candidates over 2,811 files with 0 unresolved-home refusals - so the plan was REGENERATED as
+    `governance/ADMISSION_PLAN_20261017.{json,md}` and the dry run reads: 479 rows, 8,271.5 MiB to copy, digest
+    2cc698921a64f605ba3e5cc5cc72d0e5d7fdde2fc7778732724e2c530895ea10, rc 2 because NO signature exists yet. (3) THE
+    ROUTE: `scripts/resolve_route.py --check` names no lane fault for `admit-apply`; its selftest is 19/19 after the
+    recipe-header parser was corrected (BUG-880: `admit-apply *ARGS:` was invisible to `^name:`). (4) R5: gemma-4-E4B
+    (a different model family from the generator) APPROVED `scripts/apply_admission.py` on 2026-10-17T14:25:28, receipt
+    `governance/r5_reviews.jsonl`, journal run `DJ-20261017T122451Z-ec88` (39.2 s, 0 open).
+  consequences:
+  - 'NO ROW MOVES UNTIL THE OWNER SIGNS. The applier is complete and refuses by construction: `just admit-apply --dry-run` prints the cost; `--apply` without `governance/ADMISSION_ACCEPTED_<date>.yaml` writes nothing and exits 2.'
+  - 'THE COST IS NOW VISIBLE: 479 rows / 8,271.5 MiB copied into the corpus home. A first tranche (`--limit 10`) is the recommended proof - it exercises S0 -> S0.5 -> S1 end to end for a few files, and the receipt makes the remaining 469 a count rather than an assumption.'
+  - 'THE CONTAINER IS COPIED, NOT MOVED: the library keeps its original (it is the origin) and the corpus gains the container S0 reads. T-179''s arrangement reading counts a same-work pair with EQUAL bytes as agreement, so this creates no drift - but it does spend the storage, which is why the dry run prints the total.'
+  - 'S0''s stage0 checkpoint is never discarded: the applier refuses `--force` by declaration and relies on the single-book path, so a batch cannot erase the conversion record (BUG-614''s hazard).'
+  - 'A filename collision in the stage0 checkpoint remains an OWNED risk, not a silent skip: the plan key is the door''s key over the whole name prefix, so two rows cannot share a checkpoint key without sharing a key - and a shared key is refused as already_in_the_corpus upstream.'
+- id: D-3069
+  state: ACTIVE
+  date: '2026-10-17'
+  by: assistant
+  category: HARNESS / THE ONE DOOR
+  bugs: []
+  files:
+  - scripts/goose_profile.py
+  - pipeline/harness_env.py
+  title: 'THE ONE DOOR BINDS THE HARNESS CONTRACT FOR ITS OWN CHILD - `just go` resolves the agent_loop names at birth, so BUG-871''s profile eval stops being an owner step.'
+  decision: >-
+    `scripts/goose_profile.py --launch` (the body of `just go`, D-3065) now RESOLVES the declared agent_loop contract
+    (`pipeline/harness_env.py#declared`) and executes the harness with those names in the CHILD's environment. The
+    binding is therefore scoped to the process that needs it and dies with the session; nothing is written to a shell
+    profile and no `eval` line is the owner's to remember. A name already present with a DIFFERENT value refuses the
+    birth instead of being overwritten: the declaration is the thing being obeyed, and silently out-voting the caller
+    is the drift BUG-871 exists to prevent. `python3 pipeline/harness_env.py --check` remains the reading (rc 2 =
+    declared-not-bound is still the honest state of a shell that did not launch through the door).
+  rationale: >-
+    BUG-871 was not "a binding was wrong" but "the binding had NO SCOPE": a global cap and the 4B subagent model
+    dropped into a login profile clamp every provider's sessions forever. The cure is not to abandon the binding - the
+    contract exists because a 32k window with no compaction threshold is the measured cause of the compaction storm -
+    but to bind it at the only place that knows which class is being born. The launcher IS that place: it already
+    resolves the profile, refuses a dead member, and prints the exact command it will run. What is refused as a
+    design: another `bind_harness_env.sh` the owner must remember (the same abandonment that produced rc 2 in every
+    shell), and a silent override of a caller's GOOSE_MODEL (that would make the contract advisory).
+  evidence: >-
+    MEASURED 2026-10-17. (1) `python3 scripts/goose_profile.py --selftest` -> 41/41, three new known-answer controls:
+    the door binds every declared name for the child; a contradictory shell value REFUSES the birth; an equal value is
+    not a conflict. (2) END TO END, with a stand-in harness on PATH (`goose` replaced by a script that prints its
+    environment): `python3 scripts/goose_profile.py --launch` printed `harness: 4 agent_loop name(s) bound for THIS
+    process only` and the child read `GOOSE_MODEL=gemma-4-E4B-it-MLX-4bit GOOSE_CONTEXT_LIMIT=32768
+    GOOSE_PROVIDER=maxwell_omlx`. (3) `--check` rc 0 after the policy check (`goose_profile.py --check` rc 0, 26
+    declared / 8 profiles) - the surface is unchanged; only the environment of the child gains the contract.
+  consequences:
+  - 'The owner launches with `just go` and does nothing else: no `eval`, no profile, no remembered scope. `just session workshop` remains the escape hatch for bulk file tools.'
+  - 'A shell that launches `goose` by hand is still UNBOUND, and `harness_env.py --check` still reads rc 2 there - that is the correct reading, not a fault to silence.'
+  - 'A deliberate per-session model override must now be explicit at the harness level (or the door must be bypassed on purpose): the one door will not out-vote the declared contract.'

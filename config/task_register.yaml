@@ -2185,13 +2185,17 @@ tasks:
     work''s TOPIC stays the owner''s (D-2898) and its NAME stays the rename plan''s (T-176).'
   evidence: 'MEASURED 2026-10-16: the first admission plan reads 244 candidates over 2,181 files in the books root (the
     corpus holds 940 .md and no .epub/.pdf at all), so an admitted .epub/.pdf is a NEW container in the corpus and S0
-    is the only thing that turns it into the .md the pipeline reads.'
+    is the only thing that turns it into the .md the pipeline reads. PROGRESS 2026-10-17: the plan was RE-DERIVED after
+    the notes root declared a home (D-3062) and now reads 479 admission candidates over 2,811 files with ZERO
+    unresolved-home refusals (governance/ADMISSION_PLAN_20261017.json); the applier was BUILT the same day
+    (scripts/apply_admission.py, 14/14 controls, R5 APPROVED by gemma-4-E4B on 2026-10-17) and its dry run prices the
+    whole plan at 8,271.5 MiB to copy.'
   gate: 'the applier reads an ACCEPTED plan (a file the disposition has signed), refuses a row absent from it, refuses
     a target that already exists, refuses while the rename has not ridden (a defective name would become the corpus name
     AND the door key), and writes nothing without --apply. | WHAT REMAINS IS THE PIPELINE-SIDE ACT - the word that was
     given on 2026-10-17 is recorded in the handoff 1b: the disposition''s GO 2026-10-17 approved the applier AS DECLARED:
     plan-keyed, dry-run by default, crash-safe (C6), receipted, refusing a row absent from the signed plan, an existing
-    target, or a run while the rename has not ridden. Never a heuristic mover and never by a name.'
+    target, or a run while the rename has not ridden. Never a heuristic mover and never by a name. | PROGRESS 2026-10-17: THE WRITER EXISTS (scripts/apply_admission.py, D-3068) and every refusal above is a control (14/14). What remains is NOT code: a SIGNED acceptance (governance/ADMISSION_ACCEPTED_<date>.yaml) that pins the plan digest and names the rows in scope, because the 2026-10-17 disposition approved the APPLIER, not the rows. Recommended first tranche: `just admit-apply --limit 10` on the fresh plan, then re-read the corpus census before the rest.'
 - id: T-184
   priority: SHOULD
   state: open

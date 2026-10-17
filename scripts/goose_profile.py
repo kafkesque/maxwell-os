@@ -686,6 +686,43 @@ def birth_argv(policy: dict[str, Any], config: dict[str, Any], classes: dict[str
     return argv
 
 
+def bind_harness_env(environ: dict[str, str] | None = None) -> dict[str, str]:
+    """The DECLARED agent-loop contract, bound for the CHILD process only (D-3069; BUG-871).
+
+    Why here and not in a shell profile: every name in `config/agent_context.yaml#ratified.harness_env` is GLOBAL
+    to a harness process, so an `eval` dropped into a login or interactive profile clamps EVERY session of EVERY
+    provider - measured (BUG-871) as the way a 32k cap and the 4B subagent model reached the owner's cloud lane.
+    The ONE DOOR (`just go` -> this launcher) starts exactly one agent loop, so it is the only place that can bind
+    them for exactly the process that needs them, and the binding dies with the session.
+
+    A name already set to a DIFFERENT value is refused, never overridden: the declared contract is the thing being
+    obeyed, and silently out-voting the caller is the drift this function exists to prevent (C16).
+
+    Args:
+        environ: the environment to derive from (the process environment by default).
+
+    Returns:
+        A new environment with every declared name set to its declared value.
+
+    Raises:
+        SystemExit: when a name already carries a value that contradicts the declaration.
+    """
+    if str(REPO) not in sys.path:
+        sys.path.insert(0, str(REPO))  # the contract's own module lives under the repository root (BUG-875)
+    from pipeline.harness_env import declared
+
+    env = dict(os.environ if environ is None else environ)
+    for name, want in declared().items():
+        have = env.get(name)
+        if have is not None and have != want:
+            raise SystemExit(
+                f"FATAL: {name}={have!r} contradicts the declared agent_loop value {want!r} - unset it, or run "
+                f"goose directly for a deliberate exception. The one door will not out-vote the contract (C16)."
+            )
+        env[name] = want
+    return env
+
+
 def launch(policy: dict[str, Any], config: dict[str, Any], classes: dict[str, str],
            profile: str | None = None) -> None:
     """Birth an interactive session, RESOLVING the profile when none is named, and refusing a dead member first.
@@ -717,9 +754,16 @@ def launch(policy: dict[str, Any], config: dict[str, Any], classes: dict[str, st
     print("   " + " ".join(argv), file=sys.stderr)
     print("   (this session inherits NOTHING from the harness config: the command above IS its surface)",
           file=sys.stderr)
+    env = bind_harness_env()
+    delta = sum(1 for name, want in env.items() if os.environ.get(name) != want)
+    if delta:
+        print(f"   harness: {delta} agent_loop name(s) bound for THIS process only (D-3069, never a login profile)",
+              file=sys.stderr)
+    else:
+        print("   harness: agent_loop contract already bound in this shell", file=sys.stderr)
     sys.stderr.flush()
     sys.stdout.flush()
-    os.execvp(argv[0], argv)
+    os.execvpe(argv[0], argv, env)
 
 
 def undiscovered(policy: dict[str, Any], config: dict[str, Any]) -> list[str]:
@@ -984,6 +1028,20 @@ def _selftest() -> int:
     controls.append(("the harness's display name maps back to the policy key",
                      display_names({"extensions": {"extensionmanager": {
                          "type": "platform", "name": "Extension Manager"}}})["Extension Manager"] == "extensionmanager"))
+    # THE HARNESS CONTRACT IS BOUND BY THE DOOR, FOR THE CHILD ONLY (D-3069). BUG-871's hazard was a binding that
+    # outlived the thing it was for; the cure is not "no binding" but "a binding whose scope IS the session".
+    if str(REPO) not in sys.path:
+        sys.path.insert(0, str(REPO))  # the contract's own module lives under the repository root (BUG-875)
+    from pipeline.harness_env import declared as _declared_env
+
+    bound = bind_harness_env({})
+    controls.append(("the one door binds every declared agent_loop name for the child",
+                     all(bound.get(name) == want for name, want in _declared_env().items())))
+    controls.append(("a shell value that CONTRADICTS the declaration refuses the birth",
+                     _refuses(lambda: bind_harness_env({"GOOSE_MODEL": "some-other-model"}))))
+    controls.append(("a shell value EQUAL to the declaration is not a conflict",
+                     bind_harness_env({"GOOSE_MODEL": _declared_env()["GOOSE_MODEL"]})
+                     ["GOOSE_MODEL"] == _declared_env()["GOOSE_MODEL"]))
 
     for label, ok in controls:
         print(f"  {'ok  ' if ok else 'FAIL'} {label}")

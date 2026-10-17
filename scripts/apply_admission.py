@@ -49,6 +49,10 @@ import plan_admission  # noqa: E402 — the reader whose rows this writer applie
 import census_source_names as census  # noqa: E402 — the library reader: roots, name classes, the cache join
 from pipeline.book_metadata import sanitize_source_book  # noqa: E402 — the door's OWN key (D-3045)
 from pipeline.container_integrity import is_readable, probes_from  # noqa: E402 — BUG-886/D-3071
+#: BUG-897/D-3076: the OUTER wall of a conversion is declared, not a constant. A Stage-0 subprocess killed by this
+#: ceiling is reported as `S0 could not be run`, which names neither the work nor the reason — so the docling
+#: ceiling inside it must stay strictly below it (asserted at import in pipeline/pipeline_paths.py).
+from pipeline.pipeline_paths import S0_STAGE_TIMEOUT_S  # noqa: E402
 
 POLICY = census.POLICY
 RC_OK, RC_FATAL, RC_OWNER_OWED = 0, 1, 2
@@ -569,7 +573,7 @@ def apply_row(row: dict[str, Any], corpus: Path, decl: dict[str, Any], index: di
         return record
     argv = conversion_argv(container_target, corpus)
     try:
-        done = subprocess.run(argv, cwd=str(_PROJECT_ROOT), capture_output=True, text=True, timeout=1800)
+        done = subprocess.run(argv, cwd=str(_PROJECT_ROOT), capture_output=True, text=True, timeout=S0_STAGE_TIMEOUT_S)
     except (OSError, subprocess.SubprocessError) as exc:
         record.update(state="failed", reason=f"S0 could not be run ({type(exc).__name__}: {exc})")
         return record

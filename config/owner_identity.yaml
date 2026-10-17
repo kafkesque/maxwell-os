@@ -1,0 +1,7 @@
+schema_version: '1.0'
+authority: D-3072
+accept_by: human
+declared_on: '2026-10-17'
+why: 'the owner''s IDENTITY: declared ONCE, so a re-derived plan never asks for it
+  again. It is not a decision about any plan - the SCOPE (scope_sha256) is what a
+  plan change re-decides.'

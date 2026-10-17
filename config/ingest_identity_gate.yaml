@@ -513,6 +513,18 @@ source_library:
         epub: zip          # a zip-family container: an end-of-central-directory record must resolve
         pdf: pdf            # `%PDF-` at the head AND a `%%EOF` trailer near the end (a truncated pdf keeps its magic)
         md: none            # plain text: its readability IS its name, declared rather than assumed
+      #: D-3075 — WHEN AN UNREADABLE CONTAINER IS NOT A DEFECT YET. The owner's rule (2026-10-17): a book that is
+      #: truncated OR STILL HALF-DOWNLOADED must never be processed, and the owner must be TOLD so they can fetch
+      #: it again by hand. The door already refuses the first (`refused_container_corrupt`); what it could not say
+      #: is which refusals are UNFINISHED rather than damaged — and the two need opposite words: "re-download this"
+      #: versus "let it finish". A transfer that is still writing bytes fails the probe for the same reason a
+      #: truncated file does, so a reader that asks "what is wrong with these bytes" BEFORE "is a transfer still in
+      #: flight" sends an owner to re-fetch a download that is already running. Both thresholds are declared here
+      #: rather than in the reader, because "how long is a download allowed to be in flight" is a judgement about
+      #: this machine and this owner (C12).
+      arriving:
+        part_suffixes: ['.part', '.crdownload', '.download', '.opdownload', '.tmp']
+        settle_minutes: 15   # a container written this recently is ARRIVING, never DAMAGED: the bytes may still be changing
       #: BUG-893/D-3073 — WHY IT DOES NOT OPEN, IN WORDS THE OWNER CAN ACT ON. A refusal that says only "corrupt"
       #: leaves an owner to re-download a file they already have: MEASURED 2026-10-17, one of the 5 unopenable
       #: containers is a macOS FINDER ALIAS (880 bytes of bookmark magic pointing at

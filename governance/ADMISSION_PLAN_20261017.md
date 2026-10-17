@@ -1,4 +1,4 @@
-# ADMISSION PLAN — 2026-10-17T14:12:20Z
+# ADMISSION PLAN — 2026-10-17T15:40:07Z
 
 > Authority **D-3051** (T-181). The corpus home is `/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books`. This file is a
 > **plan**: it admits nothing, it moves nothing and it converts nothing. The act that admits a work is
@@ -6,11 +6,11 @@
 
 ## What is measured, and in what unit
 
-- files in the declared library kind roots: **2811** (968 distinct keys they
-  share with the corpus or an ingest record, 1011 distinct keys they do not)
-- already in the corpus by the door's key: **1697**
+- files in the declared library kind roots: **2814** (993 distinct keys they
+  share with the corpus or an ingest record, 989 distinct keys they do not)
+- already in the corpus by the door's key: **1722**
 - seen by an INGEST RECORD whose corpus file now carries a different key: **27** (the pipeline read the work; the name moved, T-130)
-- **admission candidates the pipeline has never seen: 463**
+- **admission candidates the pipeline has never seen: 439**
 
 ## The target rule (declared, never inferred here)
 
@@ -24,13 +24,13 @@ Readability probes, declared per kind (`container_integrity`, BUG-886): `.epub->
 
 | class | files | declared meaning |
 |---|---|---|
-| `already_in_the_corpus` | 1697 | a file whose DOOR KEY the corpus home already holds: the pipeline has the work and there is nothing to admit |
+| `already_in_the_corpus` | 1722 | a file whose DOOR KEY the corpus home already holds: the pipeline has the work and there is nothing to admit |
 | `seen_by_an_ingest_record` | 27 | a file only the S0.5 metadata cache names, because the corpus file now carries a different key (MEASURED 2026-10-16: the corpus itself was renamed under T-130). The pipeline READ the work, so it is SEEN and not a candidate - printed because a second voice saying 'seen' is not the same voice as the corpus saying it |
-| `admit_candidate` | 463 | a file whose key neither the corpus nor an ingest record names, in a container the conversion stage accepts, inside its declared kind folder, under a root that declares a corpus home, carrying a name NO defect pattern matches: THE OWNER'S WORKLIST |
+| `admit_candidate` | 439 | a file whose key neither the corpus nor an ingest record names, in a container the conversion stage accepts, inside its declared kind folder, under a root that declares a corpus home, carrying a name NO defect pattern matches: THE OWNER'S WORKLIST |
 | `refused_no_declared_corpus_home` | 0 | its root declares admits_to: null, so NO declaration names a home its works are admitted to: the refusal names the missing declaration instead of inventing a destination (T-181 limb 2) |
 | `refused_container_no_stage_reads_it` | 389 | a container the conversion stage cannot read (declared kinds such as .mobi/.azw3/.djvu/.docx are OWNED but not convertible): admitting one needs an ENGINE, which is T-180's misplaced class and not this reader's act |
 | `refused_container_corrupt` | 5 | a container of an ACCEPTED kind whose own BYTES are not openable (a truncated download, a file renamed to a suffix it is not): the stage reads this kind, so the remedy is not an engine but a RE-DOWNLOAD of the work. It is its own class because it is its own remedy - folding it into the engine class would let one act answer for two blast radii (BUG-886, MEASURED 2026-10-17: 3 of 1,289 library containers read as ordinary candidates) |
-| `refused_name_repair_first` | 179 | a name a declared defect pattern matches (marker/spine/truncation): an admitted file's name becomes the CORPUS NAME and the DOOR KEY, so admitting a defect materialises it into the tree the S0.5 cache then STAMPS. The repair rides FIRST - T-176, the owner's rename plan, whose eligible rows are exactly this class |
+| `refused_name_repair_first` | 181 | a name a declared defect pattern matches (marker/spine/truncation): an admitted file's name becomes the CORPUS NAME and the DOOR KEY, so admitting a defect materialises it into the tree the S0.5 cache then STAMPS. The repair rides FIRST - T-176, the owner's rename plan, whose eligible rows are exactly this class |
 | `refused_not_in_its_kind_folder` | 51 | the file does not sit under its declared kind folder (the placement axis, axis_depth 1), so the path its corpus twin would take cannot be derived: the misplaced class T-180 owns |
 | `refused_domain_not_a_corpus_domain` | 0 | the file does not sit under a folder this root declared as its axis, or that folder is not a name the CORPUS already materialises (arrangement.share_rule): admitting it would put a new top-level name in the one corpus home and silently widen the domain vocabulary the pipeline classifies against, so the row is refused and counted instead (D-3062) |
 
@@ -54,11 +54,11 @@ All 389 rows are in `ADMISSION_PLAN_20261017.json#refused`; this document names 
 | `books/epub/DOMAIN 5 Personal Practice/mood+therapy/Happy Sexy Millionaire Unexpected Truths about Fulfillment, Love, and Success Steven Bartlett.epub` | epub | truncated_zip_no_central_directory | RE-DOWNLOAD the work — no local repair can invent the bytes that never arrived. A rebuild from the surviving local headers can recover text (measured: 641 headers, 321 text entries) but produces a file whose checksum matches no published edition, so it is a LAST resort and never an admission |
 | `books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Encylopedia of Freemasonry - Vols 1and2.pdf` | pdf | truncated_pdf_no_trailer | RE-DOWNLOAD the work. Do NOT rebuild the xref locally: a repaired file that silently loses pages is worse than an absent one, and nothing in this pipeline can tell them apart afterwards |
 | `books/pdf/DOMAIN 2 Design/visual+fundamentals/color choices: making color sense out of color theory.pdf` | pdf | null_bytes | RE-DOWNLOAD, then verify the new copy opens BEFORE it is proposed again (the plan re-probes every candidate, so a good copy clears itself) |
-| `journals_notes/DOMAIN 2 Design/design-notes/mo graph/Keylight_1.2_AE.pdf` | pdf | apple_bookmark | RESOLVE THE POINTER, do not download: the alias records its own target path — copy the real file in beside it (the alias itself may stay; it will simply stay refused) |
+| `journals_notes/DOMAIN 2 Design/design-notes/mo graph/Keylight_1.2_AE.pdf` | pdf | apple_bookmark | CHECK THE POINTER FIRST: `ls` the target path the alias records (it is plain text inside the file). If it RESOLVES, copy the real file in beside the alias - nothing needs downloading. If it DANGLES the work is not on this machine: re-obtain it or acknowledge the alias as dead (the plan re-probes every candidate, so a good copy clears itself and a dead alias simply stays refused) |
 
-### `refused_name_repair_first` — 179 row(s)
+### `refused_name_repair_first` — 181 row(s)
 
-All 179 rows are in `ADMISSION_PLAN_20261017.json#refused`; this document names the class and its declared meaning rather than printing a block nobody reads.
+All 181 rows are in `ADMISSION_PLAN_20261017.json#refused`; this document names the class and its declared meaning rather than printing a block nobody reads.
 
 ### `refused_not_in_its_kind_folder` — 51 row(s)
 
@@ -68,42 +68,18 @@ All 51 rows are in `ADMISSION_PLAN_20261017.json#refused`; this document names t
 
 — (none in this reading)
 
-## The admission candidates (463)
+## The admission candidates (439)
 
 | file (below its root) | key | kind | proposed corpus path | bytes |
 |---|---|---|---|---|
-| `books/epub/DOMAIN 2 Design/visual+fundamentals/Bierut, Michael; Rand, Paul Thoughts on design.epub` | `bierut, michael; rand, paul thoughts on design` | epub | `DOMAIN 2 Design/visual+fundamentals/Bierut, Michael; Rand, Paul Thoughts on design.md` | 7446187 |
-| `books/epub/DOMAIN 2 Design/visual+fundamentals/Handbook of Color Psychology Andrew J. Elliot; Mark D. Fairchild; Anna Franklin liber3.epub` | `handbook of color psychology andrew j. elliot; m` | epub | `DOMAIN 2 Design/visual+fundamentals/Handbook of Color Psychology Andrew J. Elliot; Mark D. Fairchild; Anna Franklin liber3.md` | 7736267 |
-| `books/epub/DOMAIN 2 Design/visual+fundamentals/The Designer's Dictionary of Color.epub` | `the designer's dictionary of color` | epub | `DOMAIN 2 Design/visual+fundamentals/The Designer's Dictionary of Color.md` | 47160362 |
-| `books/epub/DOMAIN 2 Design/visual+fundamentals/Type Rules The Designer 's Guide to Professional Typography, 4th Edition Strizver, Ilene liber3.epub` | `type rules the designer 's guide to professional` | epub | `DOMAIN 2 Design/visual+fundamentals/Type Rules The Designer 's Guide to Professional Typography, 4th Edition Strizver, Ilene liber3.md` | 25309996 |
-| `books/epub/DOMAIN 2 Design/visual+fundamentals/[Paul Sahre] Two-Dimensional Man A Graphic Memoir.epub` | `[paul sahre] two-dimensional man a graphic memoi` | epub | `DOMAIN 2 Design/visual+fundamentals/[Paul Sahre] Two-Dimensional Man A Graphic Memoir.md` | 27356796 |
-| `books/epub/DOMAIN 3 Art + Computational Media/[Tullett, Barrie;] Typewriter art a modern antho.epub` | `[tullett, barrie;] typewriter art a modern antho` | epub | `DOMAIN 3 Art + Computational Media/[Tullett, Barrie;] Typewriter art a modern antho.md` | 27573217 |
-| `books/epub/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Code as Creative Medium A Handbook for Computational Art and Design Golan Levin; Tega Brain liber3.epub` | `code as creative medium a handbook for computati` | epub | `DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Code as Creative Medium A Handbook for Computational Art and Design Golan Levin; Tega Brain liber3.md` | 56406917 |
+| `books/epub/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Generating Sound & Organizing Time (Wakefield; Taylor).epub` | `generating sound & organizing time (wakefield; t` | epub | `DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Generating Sound & Organizing Time (Wakefield; Taylor).md` | 28877442 |
 | `books/epub/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Generating Sound & Organizing Time Graham Wakefield & Gregory Taylor liber3.epub` | `generating sound & organizing time graham wakefi` | epub | `DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Generating Sound & Organizing Time Graham Wakefield & Gregory Taylor liber3.md` | 28913667 |
-| `books/epub/DOMAIN 4 Business/marketing+growth/This Is Marketing You Can't Be Seen Until You Learn to See.epub` | `this is marketing you can't be seen until you le` | epub | `DOMAIN 4 Business/marketing+growth/This Is Marketing You Can't Be Seen Until You Learn to See.md` | 1497362 |
-| `books/epub/DOMAIN 4 Business/practice+economics/Don't Get a Job, Build a Business.epub` | `don't get a job, build a business` | epub | `DOMAIN 4 Business/practice+economics/Don't Get a Job, Build a Business.md` | 5128511 |
-| `books/epub/DOMAIN 4 Business/practice+economics/Legal Guide for the Visual Artist Tad Crawford; M. J. Bogatin liber3.epub` | `legal guide for the visual artist tad crawford; ` | epub | `DOMAIN 4 Business/practice+economics/Legal Guide for the Visual Artist Tad Crawford; M. J. Bogatin liber3.md` | 7108622 |
-| `books/epub/DOMAIN 4 Business/practice+economics/Real Artists Don't Starve Timeless Strategies for Thriving.epub` | `real artists don't starve timeless strategies fo` | epub | `DOMAIN 4 Business/practice+economics/Real Artists Don't Starve Timeless Strategies for Thriving.md` | 389657 |
-| `books/epub/DOMAIN 4 Business/practice+economics/The Harvard Business Review Entrepreneur's Handbook.epub` | `the harvard business review entrepreneur's handb` | epub | `DOMAIN 4 Business/practice+economics/The Harvard Business Review Entrepreneur's Handbook.md` | 4872896 |
-| `books/epub/DOMAIN 4 Business/practice+economics/[Colin Barrow; Paul Barrow; Robert Brown] The Busi.epub` | `[colin barrow; paul barrow; robert brown] the bu` | epub | `DOMAIN 4 Business/practice+economics/[Colin Barrow; Paul Barrow; Robert Brown] The Busi.md` | 2769596 |
-| `books/epub/DOMAIN 5 Personal Practice/habits+behavior+change/[Dale-Carnegie-&-Associates]-How-to-Win-Friends-an.epub` | `[dale-carnegie-&-associates]-how-to-win-friends-` | epub | `DOMAIN 5 Personal Practice/habits+behavior+change/[Dale-Carnegie-&-Associates]-How-to-Win-Friends-an.md` | 3640731 |
-| `books/epub/DOMAIN 5 Personal Practice/mood+therapy/[Dr. Jen Gunter] The Vagina Bible The Vulva And T.epub` | `[dr. jen gunter] the vagina bible the vulva and ` | epub | `DOMAIN 5 Personal Practice/mood+therapy/[Dr. Jen Gunter] The Vagina Bible The Vulva And T.md` | 4744401 |
-| `books/epub/DOMAIN 5 Personal Practice/mood+therapy/[Emily Nagoski Ph.D.] Come as You Are The Surpris.epub` | `[emily nagoski ph.d.] come as you are the surpri` | epub | `DOMAIN 5 Personal Practice/mood+therapy/[Emily Nagoski Ph.D.] Come as You Are The Surpris.md` | 5366078 |
 | `books/epub/DOMAIN 5 Personal Practice/productivity+execution/HBR Management Tips Collection (2 Books) Harvard Business Review liber3.epub` | `hbr management tips collection (2 books) harvard` | epub | `DOMAIN 5 Personal Practice/productivity+execution/HBR Management Tips Collection (2 Books) Harvard Business Review liber3.md` | 2513527 |
 | `books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/FULLTEXT01.pdf` | `fulltext01` | pdf | `DOMAIN 1 Substrate — Mind, Math, Meaning/FULLTEXT01.md` | 610029 |
-| `books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/George Orwell  - 1984 (ORIGINAL) (1949).pdf` | `george orwell - 1984 (original) (1949` | pdf | `DOMAIN 1 Substrate — Mind, Math, Meaning/George Orwell  - 1984 (ORIGINAL) (1949).md` | 704798 |
 | `books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/Wim Wenders - The Logic of Images.pdf` | `wim wenders - the logic of images` | pdf | `DOMAIN 1 Substrate — Mind, Math, Meaning/Wim Wenders - The Logic of Images.md` | 13683887 |
-| `books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/av99.pdf` | `av99` | pdf | `DOMAIN 1 Substrate — Mind, Math, Meaning/av99.md` | 4436165 |
-| `books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/book-en-print.pdf` | `book-en-print` | pdf | `DOMAIN 1 Substrate — Mind, Math, Meaning/book-en-print.md` | 3731420 |
 | `books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/114819898-Robert-Fludd-Hermetic-Philosopher1.pdf` | `114819898-robert-fludd-hermetic-philosopher1` | pdf | `DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/114819898-Robert-Fludd-Hermetic-Philosopher1.md` | 4919223 |
 | `books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/2011_0001_545_04_Magyarito_szotar.pdf` | `2011_0001_545_04_magyarito_szotar` | pdf | `DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/2011_0001_545_04_Magyarito_szotar.md` | 3242134 |
-| `books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/259-451-1-SM.pdf` | `259-451-1-sm` | pdf | `DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/259-451-1-SM.md` | 9659646 |
 | `books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/53481411-De-Re-Metallica-1556-Agricola.pdf` | `53481411-de-re-metallica-1556-agricola` | pdf | `DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/53481411-De-Re-Metallica-1556-Agricola.md` | 99065265 |
-| `books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Accumulator-Plans.pdf` | `accumulator-plans` | pdf | `DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Accumulator-Plans.md` | 3046442 |
-| `books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Albert Pike - Morals and Dogma.pdf` | `albert pike - morals and dogma` | pdf | `DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Albert Pike - Morals and Dogma.md` | 2614713 |
-| `books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Alchemy Overview.pdf` | `alchemy overview` | pdf | `DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Alchemy Overview.md` | 162286 |
-| `books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Amber Wolfe - In the Shadow of the Shaman.pdf` | `amber wolfe - in the shadow of the shaman` | pdf | `DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Amber Wolfe - In the Shadow of the Shaman.md` | 10167655 |
-| `books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Awakening to divine wisdom Christian initiation into three worl_nodrm.pdf` | `awakening to divine wisdom christian initiation ` | pdf | `DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Awakening to divine wisdom Christian initiation into three worl_nodrm.md` | 8822179 |
 | `books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Beginning_Luciferian_Magick.pdf` | `beginning_luciferian_magick` | pdf | `DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Beginning_Luciferian_Magick.md` | 5769321 |
 | `books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Cagliostro's Secret Ritual Of Egyptian Rite Freemasonry.pdf` | `cagliostro's secret ritual of egyptian rite free` | pdf | `DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Cagliostro's Secret Ritual Of Egyptian Rite Freemasonry.md` | 129078 |
 | `books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Celtic-Mythology-And-Religion.pdf` | `celtic-mythology-and-religion` | pdf | `DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Celtic-Mythology-And-Religion.md` | 1739357 |

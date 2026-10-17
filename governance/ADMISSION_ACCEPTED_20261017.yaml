@@ -1,70 +1,22 @@
-# THE SIGNATURE THIS PLAN NEEDS (T-183/D-3068, D-3072).
-# It authorises 463 row(s), listed at the end of this file by their `rel` label.
-# `plan_sha256` pins the DOCUMENT; `scope_sha256` pins the ACTS (rel + source digest + target + kind), so a
-# re-derived plan with identical acts does NOT void this signature and one whose acts moved is REFUSED.
-# `accepted_by` is the owner's IDENTITY: once it is declared (`--sign --as`), this printer carries it and
-# never asks again. A placeholder or an empty name is REFUSED (BUG-888).
 schema_version: '1.0'
 plan: governance/ADMISSION_PLAN_20261017.json
-plan_sha256: 2cf19a18881f6d2899a1834b5009cebd1eb7e2e2e686a3ff06aec07483b76917
-scope_sha256: f9278be8c30b07380fd6e744f1e17cbbcc6497eb89cb5d33851a60ea82dc2966
-accepted_by: <your name>
+plan_sha256: 965446f913ad0c8a71f83a628cea987de285b4a7360edc9e79fc1a478e4eb803
+scope_sha256: a3ef5de0ad80bb5e35d8db39aa6bab540642d5c29a36c05b98947fcd3efc64d9
+accepted_by: human
 accepted_on: '2026-10-17'
 mode: all
 rows:
-- books/epub/DOMAIN 2 Design/visual+fundamentals/Bierut, Michael; Rand, Paul Thoughts
-  on design.epub
-- books/epub/DOMAIN 2 Design/visual+fundamentals/Handbook of Color Psychology Andrew
-  J. Elliot; Mark D. Fairchild; Anna Franklin liber3.epub
-- books/epub/DOMAIN 2 Design/visual+fundamentals/The Designer's Dictionary of Color.epub
-- books/epub/DOMAIN 2 Design/visual+fundamentals/Type Rules The Designer 's Guide
-  to Professional Typography, 4th Edition Strizver, Ilene liber3.epub
-- books/epub/DOMAIN 2 Design/visual+fundamentals/[Paul Sahre] Two-Dimensional Man
-  A Graphic Memoir.epub
-- books/epub/DOMAIN 3 Art + Computational Media/[Tullett, Barrie;] Typewriter art
-  a modern antho.epub
-- books/epub/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Code
-  as Creative Medium A Handbook for Computational Art and Design Golan Levin; Tega
-  Brain liber3.epub
+- books/epub/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Generating
+  Sound & Organizing Time (Wakefield; Taylor).epub
 - books/epub/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Generating
   Sound & Organizing Time Graham Wakefield & Gregory Taylor liber3.epub
-- books/epub/DOMAIN 4 Business/marketing+growth/This Is Marketing You Can't Be Seen
-  Until You Learn to See.epub
-- books/epub/DOMAIN 4 Business/practice+economics/Don't Get a Job, Build a Business.epub
-- books/epub/DOMAIN 4 Business/practice+economics/Legal Guide for the Visual Artist
-  Tad Crawford; M. J. Bogatin liber3.epub
-- books/epub/DOMAIN 4 Business/practice+economics/Real Artists Don't Starve Timeless
-  Strategies for Thriving.epub
-- books/epub/DOMAIN 4 Business/practice+economics/The Harvard Business Review Entrepreneur's
-  Handbook.epub
-- books/epub/DOMAIN 4 Business/practice+economics/[Colin Barrow; Paul Barrow; Robert
-  Brown] The Busi.epub
-- books/epub/DOMAIN 5 Personal Practice/habits+behavior+change/[Dale-Carnegie-&-Associates]-How-to-Win-Friends-an.epub
-- books/epub/DOMAIN 5 Personal Practice/mood+therapy/[Dr. Jen Gunter] The Vagina Bible
-  The Vulva And T.epub
-- books/epub/DOMAIN 5 Personal Practice/mood+therapy/[Emily Nagoski Ph.D.] Come as
-  You Are The Surpris.epub
 - books/epub/DOMAIN 5 Personal Practice/productivity+execution/HBR Management Tips
   Collection (2 Books) Harvard Business Review liber3.epub
 - books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/FULLTEXT01.pdf
-- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/George Orwell  - 1984 (ORIGINAL)
-  (1949).pdf
 - books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/Wim Wenders - The Logic of Images.pdf
-- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/av99.pdf
-- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/book-en-print.pdf
 - books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/114819898-Robert-Fludd-Hermetic-Philosopher1.pdf
 - books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/2011_0001_545_04_Magyarito_szotar.pdf
-- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/259-451-1-SM.pdf
 - books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/53481411-De-Re-Metallica-1556-Agricola.pdf
-- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Accumulator-Plans.pdf
-- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Albert Pike
-  - Morals and Dogma.pdf
-- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Alchemy
-  Overview.pdf
-- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Amber Wolfe
-  - In the Shadow of the Shaman.pdf
-- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Awakening
-  to divine wisdom Christian initiation into three worl_nodrm.pdf
 - books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Beginning_Luciferian_Magick.pdf
 - books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Cagliostro's
   Secret Ritual Of Egyptian Rite Freemasonry.pdf

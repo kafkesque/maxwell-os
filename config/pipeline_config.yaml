@@ -297,6 +297,31 @@ stage0:
   fingerprint_files:
     - pipeline/stage0_convert.py
     - pipeline/io_guard.py
+  #: BUG-897/D-3076 — THE BUDGET IS DECLARED, NEVER A MAGIC NUMBER. Two constants used to sit between the owner's
+  #: acceptance and a work's admission (`timeout=180` for Docling, `timeout=120` for Pandoc), and they decided WHICH
+  #: BOOKS ENTER THE LIBRARY. MEASURED 2026-10-17: Wim Wenders — The Logic of Images converted rc=0 in 287.28 s with
+  #: the ceiling lifted, and was quarantined as "failed" at 180 s. The ceiling discriminates against LONG, SCANNED,
+  #: IMAGE-HEAVY works first — exactly the part of a library that costs most to replace.
+  #: The allowance is computed FROM THE WORK (`basis`), so a big book is not refused for being big.
+  conversion_budget:
+    basis: bytes            # the signal the allowance is derived from (no page-count dependency: cross-platform, C26)
+    pandoc_timeout_s: 300   # epub: flat — Pandoc reads an epub in seconds regardless of size
+    docling_floor_s: 300    # pdf: the smallest allowance any work gets
+    docling_per_mb_s: 40    # pdf: allowance per MiB of source (a scanned page is bytes; a text page is few)
+    docling_ceiling_s: 1500 # pdf: the largest allowance any single work may claim
+    stage_timeout_s: 1800   # the applier's per-book subprocess ceiling; MUST exceed docling_ceiling_s (checked at import)
+  #: BUG-898 — A RECEIPT MUST CARRY THE DIAGNOSIS, NOT THE TAIL. Four failures printed the same sentence structure, so
+  #: the real causes (an epub parse error, a budget expiry, a void fallback) were unrecoverable without re-running by
+  #: hand. Every failed conversion now names ONE of these, and the meaning says what the owner should do about it.
+  failure_classes:
+    converter_absent: "the converter is NOT INSTALLED on this machine — the work is whole and nothing was tried against it"
+    budget_expired: "the converter did not finish inside its DECLARED budget — this is a timeout, and its remedy is MORE TIME, never a new copy"
+    container_unreadable: "the converter refused the work's own container (a broken spine reference, a missing manifest) — the bytes pass a zip/PDF probe, so this is an authoring defect, not a truncated download"
+    no_output: "the converter reported success and wrote nothing — the RECEIPT is defective, not the book; re-run before touching the source"
+    #: DELIBERATELY ABSENT: `quality_failed`. D2326's quality check is a RECEIPT FIELD today
+    #: (`quality_status` in the checkpoint), not an admission gate — no code path can produce that class yet, and a
+    #: declared class with no producer is a declaration with no referent (D-3034). When the quality check becomes a
+    #: gate it emits its own class, in the change that makes it a gate.
 stage0_5:
   fingerprint_files:
     - pipeline/stage0_5_extract_metadata.py

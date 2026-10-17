@@ -28,6 +28,14 @@ may_touch:
 - governance/SOURCE_RENAME_PLAN_20261016.json
 - governance/ADMISSION_PLAN_20261017.json
 - governance/ADMISSION_PLAN_20261017.md
+#: T-176/D-3048 — THE RENAME PLAN IS A DATED GENERATED FAMILY, so it is granted as one. `just rename-plan` writes
+#: `governance/SOURCE_RENAME_PLAN_<date>.{json,md}` on every run, and the guard matches whole paths, so a per-file
+#: grant turns every re-derivation into a NEW red line on the health ladder (measured 2026-10-17 17:39: the two
+#: files written by the owner's own `just rename-plan` stopped the ladder at RAIL 0, BUG-563). The plan prefix is
+#: already a standing artifact of this system; granting its dated instances is a widening of FORM, not of scope —
+#: nothing outside `governance/SOURCE_RENAME_PLAN_*` becomes committable.
+- governance/SOURCE_RENAME_PLAN_*.json
+- governance/SOURCE_RENAME_PLAN_*.md
 - governance/ADMISSION_ACCEPTED_20261017.yaml
 - temp/d3048_record.yaml
 - agent/adapters/CONTRACT.md

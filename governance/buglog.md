@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1200 decisions (census stamp 449e63e466b0f0c3, 2026-10-17) · 660 bugs (236 open / 424 closed; highest OPEN = BUG-891) · 59 open tasks (MUST 12 / SHOULD 43 / WORTH 4; OWNER-moved 1, pipeline-moved 58; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1203 decisions (census stamp 4ce7e84958e62cc8, 2026-10-17) · 665 bugs (238 open / 427 closed; highest OPEN = BUG-900) · 59 open tasks (MUST 12 / SHOULD 43 / WORTH 4; OWNER-moved 1, pipeline-moved 58; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **79** of 1200 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 615 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1200, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **79** of 1203 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 618 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1203, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 236 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 35 · 🟨 MED 70 · 🟩 LOW 26 · UNLABELLED 101 (BUG-757) of 236 open.
+> Open BUGS by severity (population = the census's 238 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 35 · 🟨 MED 72 · 🟩 LOW 26 · UNLABELLED 101 (BUG-757) of 238 open.
 >
 > **OWNER LANE (1) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -16956,3 +16956,189 @@ the real corpus), the 36th control reads this file's own text and requires `sign
 that carries it — the BUG-881 shape ("the controls had tested the UNIT, never the composition"), caught here before
 it could cost the owner a third run. The temporary acceptance was removed; no governance artifact carries a name
 nobody signed.
+
+## BUG-896 (HIGH, OPEN 2026-10-17) — THE PDF FALLBACK IS A PROMISE NO TOOL ON THIS MACHINE CAN KEEP
+
+`pipeline/stage0_convert.py#convert_pdf` tries Docling, and on any failure "falls back to Pandoc". MEASURED
+2026-10-17, verbatim from pandoc 3.x:
+
+```
+$ pandoc "Wim Wenders - The Logic of Images.pdf" -t markdown -o /tmp/x.md
+Pandoc error: Unknown input format pdf
+Pandoc can convert to PDF, but not from PDF.
+```
+
+Pandoc has never had a PDF reader. The fallback therefore cannot succeed — it is a control that looks like
+resilience and is in fact a guaranteed second failure. Its cost is not the wasted second: it is that **every
+Docling failure is reported to the owner as "conversion failed" with no alternative tried**, which reads like a
+property of the book. The upstream cause (BUG-897) is a budget expiry, so a book that is merely slow is recorded
+as unreadable, MOVED out of the corpus into `admission_quarantine/` (BUG-887), and can only return through a fresh
+plan + a fresh owner signature.
+
+WHY IT SURVIVED: the branch is never exercised by a control. `stage0`'s selftest cannot run a converter, so the
+fallback has only ever been *read*, never *executed* — the BUG-881 shape (the controls tested the unit, the defect
+lived in the composition).
+
+REMEDY (not applied while a live apply is running, see D-3076): either a fallback that can actually read a PDF, or
+no fallback at all plus an honest word — "Docling did not finish inside its budget", which is a fact about the
+budget. A fallback that cannot work must not exist (C16).
+
+## BUG-897 (HIGH, OPEN 2026-10-17) — A HARDCODED 180-SECOND CEILING DECIDES WHICH BOOKS ENTER THE LIBRARY
+
+`pipeline/stage0_convert.py:103` holds `timeout=180` for Docling and `:78` holds `timeout=120` for Pandoc — two
+magic numbers (C12/C20) sitting between an owner's acceptance and a work's admission.
+
+MEASURED on the live 17:09 apply (receipt `governance/evidence/ADMISSION_APPLIED_20261017T150904Z.jsonl`), the
+first 14 rows: **4 failed, and at least 2 of them are not defective books at all.**
+
+* `Wim Wenders - The Logic of Images.pdf` (119 pages, 13.7 MB, 7,839 chars of text in its first 8 pages — a
+  photo-heavy art book that needs OCR) — ran >180 s and was killed, then the void fallback of BUG-896 answered.
+* `FULLTEXT01.pdf` (25 pages, 0.6 MB, a clean text layer) — **fails in the apply, converts in 26.9 s standalone**
+  (Docling rc=0, measured 17:22). The same bytes, a different verdict, decided by machine load.
+
+So the receipt's `state: failed` is not a property of the container. It is a property of *the budget at that
+moment*. That makes S0's failure rate non-reproducible in exactly the way D-3036 forbids: the reading cannot be
+re-taken and cannot be argued with.
+
+CONSEQUENCE, sized before acting: 442 of the 454 rows in the live plan are PDFs, and 127 of them are >10 MB
+(median 3.6 MB, mean 18.2 MB, 8.02 GB total). At the observed 166-229 s per PDF, the 180 s ceiling is not a safety
+net, it is a coin flip — and it discriminates against LONG AND IMAGE-HEAVY WORKS, i.e. the substantial books.
+
+REMEDY (declared, not yet written): the ceiling becomes config (`stages.stage0.*_timeout_s`) and scales with the
+work — estimated page count × a declared per-page budget, with a floor — so the budget follows the book instead of
+the book following the budget. A timeout must be recorded as `timeout`, never as `unreadable`, because the two
+have opposite remedies (more time vs. a new copy).
+
+## BUG-898 (MEDIUM, OPEN 2026-10-17) — THE RECEIPT KEEPS THE TAIL, NOT THE DIAGNOSIS
+
+`scripts/apply_admission.py` records a failed row as
+`S0 rc=…, markdown absent — {last three lines of stdout/stderr}`. MEASURED consequence: 4 failures in the 17:09
+apply printed the **same** sentence structure, and the actual causes (a pandoc epub parse error; a Docling budget
+expiry; a fallback that cannot read PDF) were unrecoverable from the record. Diagnosing them required re-running
+the conversions by hand — a forensic audit that the receipt should have made unnecessary.
+
+This is the C16 family with a twist: nothing was swallowed *at the moment of failure*, but the record that the
+owner and every later reading sees has lost the one line that names the cause. A receipt that cannot support a
+decision is a log, not evidence (D-3036: an act that leaves no trace did not happen — and a trace that omits the
+cause leaves the act undiagnosable).
+
+REMEDY: the row carries a declared `failure_class` (`converter_absent`, `budget_expired`, `container_unreadable`,
+`quality_failed`) beside the tail, and the tail is kept in full beside the receipt rather than truncated into it.
+
+### BUG-897 — the decisive receipt (appended 2026-10-17 17:34 UTC, same sitting)
+
+The claim above is not an inference from timings. The book the live run killed was converted, unchanged, with the
+ceiling lifted:
+
+```
+$ docling ".../Wim Wenders - The Logic of Images.pdf" --to md --output /tmp/dlg2
+INFO docling.document_converter: Finished converting document Wim Wenders - The Logic of Images.pdf in 287.28 sec.
+rc: 0
+```
+
+**287.3 s against a 180 s ceiling, rc 0.** The book is whole; the budget refused it. And it is not one book: the
+three failures that followed it in the same run — `114819898-Robert-Fludd-Hermetic-Philosopher1.pdf` (15:20:37Z),
+`2011_0001_545_04_Magyarito_szotar.pdf` (15:23:38Z), `53481411-De-Re-Metallica-1556-Agricola.pdf` (15:27:39Z) —
+each consumed 3-4 minutes (Docling ceiling + the void fallback of BUG-896) and each is a scanned, OCR-heavy volume,
+i.e. exactly the class whose conversion time exceeds the constant. MEASURED at 17:34Z: **14 applied / 7 failed in
+21 rows (33 %)**, and at least 4 of the 7 are ceiling victims rather than defective works.
+
+The failure is therefore not random: the constant removes the LONG, SCANNED and IMAGE-HEAVY works first, which is
+precisely the part of a library that costs the most to replace.
+
+### BUG-896 / BUG-897 / BUG-898 — FIXED 2026-10-17 (same sitting, after the owner stopped the run)
+
+**What changed, in one place.** `pipeline/stage0_convert.py` no longer holds a number that decides which books enter
+the library. Both ceilings moved into `config/pipeline_config.yaml#stage0.conversion_budget`, and the Docling
+allowance is now DERIVED FROM THE WORK rather than fixed: `floor 300 s + 40 s/MiB`, clamped to a `1500 s` ceiling,
+with the applier's own outer wall (`stage_timeout_s: 1800`) also declared instead of hardcoded at
+`scripts/apply_admission.py:572`. `pipeline/pipeline_paths.py` asserts at import that the outer wall strictly
+EXCEEDS the inner ceiling, so the two can never be declared apart (D-3034).
+
+**BUG-896 closes as an ACCEPTED NEGATIVE, not as a repair.** The Pandoc-for-PDF fallback was DELETED, not fixed.
+`pandoc` has no PDF reader; the fallback could only ever produce a guaranteed second failure reported as the first.
+Deleting it means a Docling failure now speaks in its own voice. Registered here with its reason so it cannot be
+re-proposed from memory (D-3038).
+
+**BUG-898 closes with a vocabulary and a ledger.** Every failed conversion names one of four DECLARED classes —
+`converter_absent`, `budget_expired`, `container_unreadable`, `no_output` — and the class rides the summary line the
+applier carries into its receipt (`tail[-3:]`), so the receipt now names the DIAGNOSIS and not just the file. The
+full tail, with elapsed seconds and byte count, is appended to `data/checkpoints/stage0_convert.jsonl.failures.jsonl`
+beside the checkpoint. It is deliberately NOT the checkpoint itself: the checkpoint's keys are what a resume SKIPS,
+so a failure written there would never be retried and the failure would become permanent by accident.
+
+**MEASURED, after the change (known-answer controls, output into /tmp, nothing in the library moved):**
+
+| control | expected | observed |
+|---|---|---|
+| HBR epub (case-only spine mismatch) | `container_unreadable` | `Pandoc rc=64 … No entry on path: OEBPS/cover.xhtml` |
+| Generating Sound epub (no manifest element) | `container_unreadable` | `Pandoc rc=64 … Unable to find element: QName … manifest` |
+| `FULLTEXT01.pdf` — the book that FAILED in the live apply | converts | **ok in 28.5 s** under a **323 s** declared budget |
+| the same book with the ceiling forced to 1 s | `budget_expired` | `budget_expired`, naming floor/per-MiB/ceiling |
+| a class nobody declared | refused | `ValueError` FATAL |
+| a declared budget of 0 (found by the R5 verifier) | refused | `RuntimeError` at import |
+
+**Budget table for the LIVE plan (433 pdf rows):** min 300 s, median 438 s, max 1500 s; 80 works sit at the
+ceiling (>37.5 MiB). Wim Wenders — the 287.28 s book the old 180 s ceiling killed — now gets 821 s.
+
+**R5:** `gemma-4-E4B-it-MLX-4bit` reviewed the diff and returned NO DEFECTS FOUND, having caught one real hole (a
+declared 0 was honoured literally). Receipt: `governance/evidence/R5_REVIEW_20261017_stage0.md`, journal
+`DJ-20261017T154522Z-c2c8`.
+
+**Fingerprint (BUG-614) checked before editing, not after.** `data/checkpoints/stage0_convert.jsonl` carries no
+`.code_fingerprint` sidecar — it is a Jul-19 legacy checkpoint — and `check_stage_code_fingerprint` permits a
+legacy checkpoint with no sidecar, so the edit could not refuse the next apply. The new code stamps the sidecar on
+its first run and guards every edit after that. `pipeline/pipeline_paths.py` is in NO stage's `fingerprint_files`,
+so editing it cannot make another stage refuse to resume.
+
+### BUG-899 (MED — OPEN 2026-10-17) — `--book` CAN SILENTLY SKIP A WORK WHOSE NAME IT HAS SEEN BEFORE
+
+`run_stage0` builds `existing` from the checkpoint keyed by BASENAME, and skips a candidate whose basename is in
+it. The applier invokes S0 as `stage0_convert.py --book <rel>`, which leaves `limit` as None, so the skip path is
+LIVE on every admitted row. A book whose name was converted in an earlier corpus would therefore be skipped, S0
+would exit 0, `md_target` would be absent, and the applier would record `S0 rc=0, markdown absent` and QUARANTINE
+the copy — a whole work refused because of its name, with a receipt that blames the conversion.
+
+MEASURED at 17:41Z: **0 of the 439 live rows collide** with the 130 basenames the checkpoint holds, so nothing is
+broken today. It stays OPEN as a latent defect because the failure is silent and misattributed, and the obvious
+"fix the skip" is DESTRUCTIVE: `all_records = existing.values() + converted` rewrites the checkpoint, so simply
+dropping `existing` for a single-book run would WIPE 130 records. The repair has to re-key the checkpoint by
+`source_file` merge rather than concatenation — a change to resume semantics that must be measured, not assumed.
+
+### BUG-900 (MED — OPEN 2026-10-17) — A BOOK CAN PASS EVERY CONTAINER PROBE AND STILL BE UNCONVERTIBLE, AND THIS IS INVISIBLE TO `admit-alert`
+
+The two failed epubs of the live apply are VALID ZIPS: HBR holds all 96 entries and Generating Sound holds 459.
+`admit-alert` reports both READABLE, because the declared probe for `.epub` is `zip` — and it is telling the truth
+about the question it was declared to ask. What no reading asks is whether the book's OWN SPINE resolves: HBR's
+manifest references `OEBPS/cover.xhtml` while the zip stores `OEBPS/Cover.xhtml` (a CASE-only mismatch), and
+Generating Sound's `content.opf` carries NO manifest element at all. Both are authoring defects, both are
+uncovertible, and both will fail S0 on every future run while the owner is told nothing before the run.
+
+The gap is real and it is the same shape as D-3075's reason for existing — a defect that reaches the pipeline
+before it reaches the owner. The repair is a declared SPINE probe beside `zip` (`probes: {epub: zip_spine}`), so
+the door refuses the row at PLAN time and the alert names it, instead of S0 discovering it after a copy and a
+conversion attempt. It is deliberately NOT done in this sitting: it changes what the plan admits, and the plan is
+mid-apply. Sequence it AFTER the current 439-row batch.
+
+### BUG-896 (HIGH — FIXED 2026-10-17) — THE VOID PDF FALLBACK IS DELETED, AND THE REFUSAL IS REGISTERED
+
+`pipeline/stage0_convert.py::convert_pdf` no longer calls `pandoc` on a PDF. A fallback that cannot read its own
+input is not a fallback; it is a second failure wearing the first one's name, and it cost the diagnosis of every
+real failure behind it. Accepted negative, reason recorded (D-3038): no PDF-reading fallback ships on this machine,
+so the honest word is the one the converter says.
+
+### BUG-897 (HIGH — FIXED 2026-10-17) — BOTH CEILINGS ARE DECLARED, AND THE INNER ONE IS DERIVED FROM THE WORK
+
+`config/pipeline_config.yaml#stage0.conversion_budget` declares `pandoc_timeout_s`, `docling_floor_s`,
+`docling_per_mb_s`, `docling_ceiling_s` and the applier's `stage_timeout_s`; `pipeline/pipeline_paths.py` refuses an
+absent, non-integer or non-positive value at import, and refuses a ceiling the outer wall could never reach. The
+Docling allowance is `floor + per_mb × MiB`, clamped to the ceiling, so a long scanned volume is not refused for
+being long. MEASURED: the 287.28 s Wim Wenders volume now receives 821 s; `FULLTEXT01.pdf`, which failed inside the
+live apply, converts rc=0 in 28.5 s under 323 s.
+
+### BUG-898 (MEDIUM — FIXED 2026-10-17) — THE RECEIPT NAMES THE DIAGNOSIS
+
+Four declared `failure_class` values, carried on the summary line the applier keeps in its receipt, with the full
+tail (elapsed seconds + bytes) appended to `data/checkpoints/stage0_convert.jsonl.failures.jsonl`. `quality_failed`
+is deliberately NOT declared: D2326's quality check is a receipt field today, and a class no code path can produce
+would be a declaration with no referent (D-3034).

@@ -242,6 +242,57 @@ ENHANCE_MIN_HEADER_GAP_CHARS=int(_CFG.get("pipeline", {}).get("enhance_min_heade
 # No pipeline stage imports this — safe to remove entirely in v3.2.
 BORP_MIN_SOURCES=int(_env("borp_min_sources",_CFG["pipeline"]["borp_min_sources"])); SMOKE_BOOK_LIMIT=int(_CFG["pipeline"]["smoke_book_limit"])
 S0_MAX_FAILED_RATIO=float(_CFG.get("stage0", {}).get("max_failed_ratio", 0.0))  # D2326: fail-closed ingestion tolerance
+
+
+def _s0_budget(key: str) -> int:
+    """Read ONE declared Stage-0 conversion budget value (BUG-897/D-3076).
+
+    An absent or non-integer declaration is FATAL rather than defaulted: a budget that
+    silently falls back to a number in the code is exactly the magic constant this
+    config block exists to remove (C12/C20).
+    """
+    block = _CFG.get("stage0", {}).get("conversion_budget") or {}
+    if key not in block:
+        raise RuntimeError(
+            f"FATAL: config/pipeline_config.yaml#stage0.conversion_budget.{key} is not declared — an absent "
+            f"budget is refused, never defaulted (C12, BUG-897)"
+        )
+    try:
+        value = int(block[key])
+    except (TypeError, ValueError) as exc:
+        raise RuntimeError(
+            f"FATAL: stage0.conversion_budget.{key}={block[key]!r} is not an integer (C12, BUG-897)"
+        ) from exc
+    if value <= 0:
+        #: R5 review catch: a declared 0 was honoured literally, which turns every work into an instant timeout and
+        #: reports it as `budget_expired` — a budget that permits NO work is a declaration that does not resolve.
+        raise RuntimeError(
+            f"FATAL: stage0.conversion_budget.{key}={value} is not a positive number of seconds (C12, BUG-897)"
+        )
+    return value
+
+
+S0_BUDGET_BASIS=str(_CFG.get("stage0", {}).get("conversion_budget", {}).get("basis", ""))  # the signal the allowance derives from
+S0_PANDOC_TIMEOUT_S=_s0_budget("pandoc_timeout_s")
+S0_DOCLING_FLOOR_S=_s0_budget("docling_floor_s")
+S0_DOCLING_PER_MB_S=_s0_budget("docling_per_mb_s")
+S0_DOCLING_CEILING_S=_s0_budget("docling_ceiling_s")
+S0_STAGE_TIMEOUT_S=_s0_budget("stage_timeout_s")
+#: D-3034: a declaration must RESOLVE. The applier kills the whole Stage-0 subprocess at stage_timeout_s, so a
+#: Docling ceiling at or above it would make the inner budget unreachable — the outer wall would speak instead, and
+#: it speaks as `S0 could not be run`, which names neither the work nor the reason. Refused at import.
+if S0_STAGE_TIMEOUT_S <= S0_DOCLING_CEILING_S:
+    raise RuntimeError(
+        f"FATAL: stage0.conversion_budget.stage_timeout_s={S0_STAGE_TIMEOUT_S} must EXCEED docling_ceiling_s="
+        f"{S0_DOCLING_CEILING_S} — a ceiling the outer wall can never reach is a declaration with no referent (C12)"
+    )
+#: BUG-898: the failure vocabulary, declared (not invented in the converter). The meaning is what the owner reads.
+S0_FAILURE_CLASSES={str(k): str(v) for k, v in (_CFG.get("stage0", {}).get("failure_classes") or {}).items()}
+if not S0_FAILURE_CLASSES:
+    raise RuntimeError(
+        "FATAL: config/pipeline_config.yaml#stage0.failure_classes is empty — a failure that cannot be named is the "
+        "tail again (C12/C16, BUG-898)"
+    )
 INTENT_TOP_K_RATIO=float(_env("intent_top_k",_CFG["pipeline"]["intent_top_k_ratio"]))
 INTENT_THRESHOLD=float(_env("intent_threshold",_CFG["pipeline"]["intent_threshold"]))
 

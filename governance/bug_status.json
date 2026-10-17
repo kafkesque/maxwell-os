@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 660,
-  "open_n": 236,
-  "closed_n": 424,
+  "total_ids": 665,
+  "open_n": 238,
+  "closed_n": 427,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -1187,6 +1187,16 @@
       "id": "BUG-891",
       "title": "(MED, OPEN 2026-10-17) \u2014 `config/agent_surface.yaml`'s SWAP CHECKLIST NAMES A RENDER SOURCE THAT DOES NOT EXIST, SO EVERY CORRECTION TO",
       "events": 1
+    },
+    {
+      "id": "BUG-899",
+      "title": "(MED \u2014 OPEN 2026-10-17) \u2014 `--book` CAN SILENTLY SKIP A WORK WHOSE NAME IT HAS SEEN BEFORE",
+      "events": 1
+    },
+    {
+      "id": "BUG-900",
+      "title": "(MED \u2014 OPEN 2026-10-17) \u2014 A BOOK CAN PASS EVERY CONTAINER PROBE AND STILL BE UNCONVERTIBLE, AND THIS IS INVISIBLE TO `admit-alert`",
+      "events": 1
     }
   ],
   "closed": [
@@ -1613,6 +1623,9 @@
     "BUG-892",
     "BUG-893",
     "BUG-894",
-    "BUG-895"
+    "BUG-895",
+    "BUG-896",
+    "BUG-897",
+    "BUG-898"
   ]
 }

@@ -27607,3 +27607,112 @@ decisions:
     25/25 (plan) with the worklist two-sided: every refused `rel` must RESOLVE on disk, the list length must equal
     the sum of the refusal counts, the corrupt rows must carry their declared remedy verbatim, and the valid
     siblings in the same folders must still be CANDIDATES.
+
+- id: D-3074
+  state: ACTIVE
+  date: 2026-10-17
+  by: assistant
+  category: ADMISSION / THE DOWNLOAD
+  bugs: []
+  files: [scripts/fetch_verify.py, config/fetch_verify.yaml, justfile]
+  decision: >-
+    A resume-safe download whose LAST word is the admission door's own probe. (1) curl -C - with --retry
+    --retry-all-errors --fail --connect-timeout, so a network or HTTP error retries and a partial transfer
+    RESUMES rather than starting over. (2) the download lands on OUTPUT.part and is promoted with os.replace
+    ONLY after it passes the door's integrity probe, READ from ingest_identity_gate.yaml (container_integrity)
+    rather than restated - so the door and the downloader can never disagree about what "readable" means. (3) a
+    truncated container (truncated_zip_no_central_directory, truncated_pdf_no_trailer, null_bytes) is REFUSED at
+    arrival and answered with "resume", not discovered days later as an admission refusal.
+  rationale: >-
+    MEASURED 2026-10-17. The owner's 4 dead books are BYTES-corrupt (2 truncated epub, 1 truncated pdf, 1
+    all-zero write) and 3 predate the "downloads default truncated" symptom by 5-15 years - but browser
+    truncation is a real, reproducible future risk (the owner reports every download truncates). The door already
+    diagnoses these defects correctly (BUG-893/D-3073); the gap was that nothing caught a truncated download
+    BEFORE it was filed into inbox/books, so the corrupt bytes entered the library and only surfaced as an
+    admission refusal later. This helper closes that gap at the arrival edge, reusing the SAME probe so the
+    definition of "readable" has one owner. REJECTED: a separate integrity vocabulary (drift); a rebuild lane for
+    the already-dead files (zip -FF timed out at 300s and produces a checksum matching no edition).
+
+
+- id: D-3075
+  state: ACTIVE
+  date: 2026-10-17
+  by: assistant
+  category: ADMISSION / THE ALERT
+  supersedes: D-3074
+  bugs: [BUG-896, BUG-897, BUG-898]
+  files: [scripts/container_alert.py, config/ingest_identity_gate.yaml, justfile]
+  decision: >-
+    THE OWNER'S RULE, AS A READING. "Do not process those books that are truncated or just half downloaded - rather
+    alert me so I can re-download them manually" is answered by a READ-ONLY reading, `scripts/container_alert.py`
+    (`just admit-alert`), which probes EVERY file in the declared kind roots AND every declared arrival pen with the
+    door's OWN probe (pipeline/container_integrity.py), and says one of three words per file: READABLE, ARRIVING or
+    DAMAGED. ARRIVING is its own word because a transfer that is still writing bytes fails the probe for the same
+    reason a truncated file does, and the two have OPPOSITE remedies ("let it finish" vs "fetch it again"): a file
+    whose name carries a declared in-flight suffix (.part/.crdownload/.download/.opdownload/.tmp), or that is younger
+    than the declared settle window, or that has a partial sibling beside it, is ARRIVING and never DAMAGED. DAMAGED
+    names the declared defect AND its declared remedy. Nothing is processed, moved, renamed, deleted or downloaded;
+    a kind that declares no probe (.mobi/.azw3/.djvu) is counted UNPROBED and no claim is made about it. The
+    thresholds (part_suffixes, settle_minutes) are declared in the gate beside the probes, not in the reader (C12).
+  rationale: >-
+    MEASURED 2026-10-17, the evening D-3074 was written. The owner rejected the fetcher in one sentence - "this
+    command is not able to resume download ... it was not the point was to not process those books ... rather alert
+    me" - and the rejection is STRUCTURAL, not cosmetic: (1) a fetcher presumes a URL, and the owner downloads by
+    hand in a browser, so it is usable only by the one person who does not need it; (2) "is this container readable"
+    was never the missing piece - the door already declares and enforces it (D-3071/D-3073) and the applier never
+    converts a refused row. The missing piece was NOTIFICATION, and specifically notification that reaches a
+    half-downloaded file BEFORE it is a plan row: the plan walks the kind roots only, so a partial book sitting in
+    the inbox pen for days is invisible to it. FIRST LIVE READING (17:32 UTC): 4,555 files probed across 2 roots and
+    2 pens; 2,628 readable; 6 DAMAGED. The 6 include the 5 already known (2 truncated epub, 1 truncated pdf, 1 file
+    of zeros, 1 dangling Finder alias) AND a SIXTH that no previous reading could see because it sits in the
+    `education_unsorted` pen: `social engineering/The Effect of International NGOs on Influencing Domestic Policy
+    a.pdf`, 393,216 bytes, defect `no_magic` - a .pdf suffix whose first bytes are not `%PDF-`, invisible to the
+    plan and now named. 1,921 files are UNPROBED (mobi/azw3/djvu and non-container kinds), counted so that
+    "2,628 readable" can never be read as "2,628 checked". The one idea kept from D-3074 is the one that mattered:
+    the probe is READ from ingest_identity_gate.yaml, never restated, so the alert and the door cannot disagree
+    about what "readable" means. The downloader itself is archived (archive/superseded_20261017_downloader/ with a
+    WHY-THIS-IS-HERE.md) and its justfile recipe is gone - dead code is a promise the OS cannot keep (C19).
+    REJECTED: a fourth reading of the same tree (drift - the plan already counts refusals); a notify that also
+    MOVES a damaged file out of the library (an unowned mover is the failure mode T-180 refuses); treating a
+    fresh-but-unreadable container as DAMAGED (it would send the owner to re-fetch a download that is running).
+- id: D-3076
+  state: ACTIVE
+  date: 2026-10-17
+  by: assistant
+  category: PIPELINE / STAGE-0 CONVERSION BUDGET
+  supersedes: []
+  bugs: [BUG-896, BUG-897, BUG-898, BUG-899, BUG-900]
+  files: [pipeline/stage0_convert.py, pipeline/pipeline_paths.py, config/pipeline_config.yaml, scripts/apply_admission.py, governance/session_plan_20260924.yaml]
+  decision: >-
+    NO NUMBER THAT DECIDES WHICH BOOKS ENTER THE LIBRARY MAY LIVE IN THE CODE. Two hardcoded ceilings (Pandoc 120 s,
+    Docling 180 s) and a third outside them (the applier's `timeout=1800`) sat between the owner's acceptance and a
+    work's admission. All three are now DECLARED in config/pipeline_config.yaml#stage0.conversion_budget, and the
+    Docling allowance is DERIVED FROM THE WORK rather than fixed: floor 300 s + 40 s/MiB, clamped to a 1500 s
+    ceiling. pipeline/pipeline_paths.py refuses at import an absent, non-integer or non-positive value, and refuses
+    a Docling ceiling the applier's declared outer wall could never reach. A conversion that runs out of time says
+    `budget_expired` and means MORE TIME, never a new copy. The Pandoc-for-PDF fallback is DELETED as an accepted
+    negative (D-3038) rather than repaired, because pandoc has no PDF reader and the branch could only ever produce
+    a guaranteed second failure reported as the first. Every failure names one of four declared classes and the full
+    tail is appended beside the checkpoint, never into it.
+  rationale: >-
+    MEASURED 2026-10-17, on the owner's own apply run (17:09-17:34, stopped by the owner at 17:35): 15 applied, 7
+    failed in 22 receipt lines, and at least four of the seven were CEILING VICTIMS, not books - Wim Wenders - The
+    Logic of Images converts rc=0 in 287.28 s with the ceiling lifted and was quarantined as "failed" at 180 s;
+    FULLTEXT01.pdf converts rc=0 in 28.5 s standing alone. The failure was therefore CLASS-BIASED, not random: a
+    flat ceiling removes the LONG, SCANNED, IMAGE-HEAVY works first, which is exactly the part of a library that
+    costs most to replace, and it reports the refusal in the vocabulary of a defect. Immediately after the change,
+    FULLTEXT01 converts rc=0 in 28.5 s under a 323 s declared budget, and the 287.28 s volume would receive 821 s.
+    WHY THE BUDGET IS DERIVED AND NOT MERELY RAISED: a bigger constant is the same mistake with a later failure
+    date; the allowance now scales with the work, so the only books that can expire are ones whose conversion
+    genuinely exceeds a declared per-MiB rate, and those are NAMED with the arithmetic that refused them. THE COST
+    OF THE WHOLE CONFIG IS ZERO WHEN UNUSED: a budget is a ceiling, not a spend. BUG-898's cost is measured too -
+    four failures printed the same sentence structure, so the real causes were unrecoverable without re-running
+    conversions by hand; the class now rides the summary line the applier carries into its receipt, so the receipt
+    names the diagnosis. TWO DEFECTS ARE REGISTERED RATHER THAN QUIETLY LEFT: BUG-899 (the `--book` skip path can
+    refuse a work because its BASENAME was seen before - measured 0 collisions today, which is why it is latent and
+    not urgent) and BUG-900 (a book can pass every container probe and still be uncovertible: both failed epubs are
+    VALID ZIPS, so `admit-alert` correctly reports them READABLE - the declared zip probe answers the question it
+    was declared to ask). The repair for BUG-900 is a declared SPINE probe, and it is deliberately NOT done in this
+    sitting: it changes what the plan admits, and the plan is mid-apply. R5 (generator != verifier) was satisfied by
+    gemma-4-E4B-it-MLX-4bit at temperature 0.0, which returned NO DEFECTS FOUND and caught one real hole - a
+    declared budget of 0, now refused at import. Receipt: governance/evidence/R5_REVIEW_20261017_stage0.md.

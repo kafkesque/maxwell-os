@@ -7,8 +7,11 @@ Authority: CONSTITUTION.md §3 (Pipeline Stage 0)
 Input:  EPUB/PDF files from books/ directory
 Output: Clean .md files, checkpoint at data/checkpoints/stage0_convert.jsonl
 
-Uses Pandoc for EPUB, Docling for PDF. Falls back to Pandoc for PDF
-if Docling is not installed.
+Uses Pandoc for EPUB, Docling for PDF, each inside a DECLARED time budget derived from the work itself
+(BUG-897/D-3076). There is deliberately NO Pandoc fallback for PDF: Pandoc has no PDF reader, so a
+fallback could only ever produce a guaranteed second failure reported as the first (BUG-896).
+Every failed conversion is named by a DECLARED failure_class and its full tail is kept beside the
+checkpoint, so a receipt carries the DIAGNOSIS and not just the last three lines (BUG-898).
 
 Usage:
     python3 pipeline/stage0_convert.py                          # Convert all books
@@ -24,6 +27,7 @@ import subprocess
 import sys
 import time
 from pathlib import Path
+from typing import Any
 
 # ── Paths ──────────────────────────────────────────────────────────────────
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -33,7 +37,13 @@ from pipeline.io_guard import load_jsonl, safe_write  # D2332 fail-closed read +
 from pipeline.pipeline_paths import (
     BOOKS_DIR,
     CHECKPOINT_DIR,
+    S0_BUDGET_BASIS,
+    S0_DOCLING_CEILING_S,
+    S0_DOCLING_FLOOR_S,
+    S0_DOCLING_PER_MB_S,
+    S0_FAILURE_CLASSES,
     S0_MAX_FAILED_RATIO,
+    S0_PANDOC_TIMEOUT_S,
     SMOKE_BOOK_LIMIT,
     STAGE0_CHECKPOINT,
 )
@@ -43,6 +53,55 @@ from pipeline.text_cleaner import check_conversion_quality
 # ── Constants ──────────────────────────────────────────────────────────────
 SUPPORTED_EXTENSIONS = {".epub", ".pdf", ".md"}  # .md = already converted
 MD_EXTENSION = ".md"
+MIN_OUTPUT_BYTES = 100  # C20: a converter that "succeeded" into <100 bytes wrote a receipt, not a work
+#: BUG-898: where the FULL tail of a failed conversion rests. Derived from the checkpoint it belongs to, so no new
+#: path has to be declared, and NOT the checkpoint itself: the checkpoint's keys are what a resume SKIPS, so a
+#: failure written there would never be retried (the failure would become permanent by accident).
+S0_FAILURE_LEDGER = Path(str(STAGE0_CHECKPOINT) + ".failures.jsonl")
+
+
+def _ok() -> dict[str, Any]:
+    """A conversion that produced a work."""
+    return {"ok": True, "failure_class": None, "meaning": "", "detail": ""}
+
+
+def _failure(failure_class: str, detail: str) -> dict[str, Any]:
+    """A conversion that did NOT produce a work, named by a DECLARED class (BUG-898/C12).
+
+    The class is checked against `config/pipeline_config.yaml#stage0.failure_classes` rather than accepted
+    from the caller: a class invented at the call site is a word nobody declared, which is the tail again.
+    """
+    if failure_class not in S0_FAILURE_CLASSES:
+        raise ValueError(
+            f"FATAL: {failure_class!r} is not a declared failure_class "
+            f"(config/pipeline_config.yaml#stage0.failure_classes, C12)"
+        )
+    return {
+        "ok": False,
+        "failure_class": failure_class,
+        "meaning": S0_FAILURE_CLASSES[failure_class],
+        "detail": " ".join(str(detail).split())[:3000],
+    }
+
+
+def docling_budget_s(pdf_path: Path) -> int:
+    """The DECLARED time allowance for THIS work (BUG-897/D-3076).
+
+    WHY IT IS DERIVED FROM THE WORK AND NOT A CEILING. A flat 180 s refused Wim Wenders — The Logic of
+    Images, a whole 119-page photo-heavy volume that converts rc=0 in 287.28 s. A flat ceiling therefore
+    discriminates against long, scanned, image-heavy works FIRST — exactly the part of a library that
+    costs most to replace — and it reports the refusal in the vocabulary of a defect ("failed"), which
+    sends the owner after a new copy instead of after more time. Two books in one evening were refused
+    this way and the bytes were never the problem.
+    """
+    if S0_BUDGET_BASIS != "bytes":
+        raise RuntimeError(
+            f"FATAL: stage0.conversion_budget.basis={S0_BUDGET_BASIS!r} is not implemented — only 'bytes' is "
+            f"(C12: an unimplemented basis is a declaration with no referent)"
+        )
+    size_mb = pdf_path.stat().st_size / (1024 * 1024)
+    allowance = S0_DOCLING_FLOOR_S + int(S0_DOCLING_PER_MB_S * size_mb)
+    return int(min(S0_DOCLING_CEILING_S, max(S0_DOCLING_FLOOR_S, allowance)))
 
 
 def find_books(books_dir: Path, subdir: str | None = None) -> list[Path]:
@@ -63,8 +122,8 @@ def find_books(books_dir: Path, subdir: str | None = None) -> list[Path]:
     return sorted(books, key=lambda p: p.name)
 
 
-def convert_epub(epub_path: Path, output_path: Path) -> bool:
-    """Convert EPUB to Markdown using Pandoc."""
+def convert_epub(epub_path: Path, output_path: Path) -> dict[str, Any]:
+    """Convert EPUB to Markdown using Pandoc, inside the declared Pandoc budget."""
     try:
         result = subprocess.run(
             [
@@ -78,66 +137,83 @@ def convert_epub(epub_path: Path, output_path: Path) -> bool:
             ],
             capture_output=True,
             text=True,
-            timeout=120,
+            timeout=S0_PANDOC_TIMEOUT_S,
         )
-        if result.returncode != 0:
-            print(f"  ⚠️  Pandoc error: {result.stderr[:200]}")
-            return False
-        return output_path.exists() and output_path.stat().st_size > 100
     except FileNotFoundError:
-        print("  ❌ Pandoc not found. Install with: brew install pandoc")
-        return False
+        return _failure("converter_absent", "pandoc is not installed on this machine (brew install pandoc)")
     except subprocess.TimeoutExpired:
-        print(f"  ⚠️  Pandoc timeout on {epub_path.name}")
-        return False
+        return _failure(
+            "budget_expired",
+            f"Pandoc did not finish inside its declared {S0_PANDOC_TIMEOUT_S}s budget on {epub_path.name} — "
+            f"a timeout is MORE TIME, never a new copy",
+        )
+    if result.returncode != 0:
+        #: An epub that fails Pandoc is CONTAINER-UNREADABLE in the honest sense: the zip is intact (the plan's own
+        #: probe passed it), and the work's spine/manifest is what refuses — MEASURED 2026-10-17 on two of them:
+        #: `No entry on path: OEBPS/cover.xhtml` (the zip stores Cover.xhtml: a case-only mismatch) and
+        #: `Unable to find element: QName ... manifest` (the content.opf carries no manifest at all).
+        return _failure(
+            "container_unreadable",
+            f"Pandoc rc={result.returncode} refused the container: {result.stderr.strip()[:800]}",
+        )
+    if not output_path.exists() or output_path.stat().st_size <= MIN_OUTPUT_BYTES:
+        written = output_path.stat().st_size if output_path.exists() else 0
+        return _failure(
+            "no_output",
+            f"Pandoc rc=0 and wrote {written} bytes of markdown for {epub_path.name} "
+            f"(below the {MIN_OUTPUT_BYTES}-byte floor)",
+        )
+    return _ok()
 
 
-def convert_pdf(pdf_path: Path, output_path: Path) -> bool:
-    """Convert PDF to Markdown. Tries Docling first, falls back to Pandoc."""
-    # Try Docling first
+def convert_pdf(pdf_path: Path, output_path: Path) -> dict[str, Any]:
+    """Convert PDF to Markdown with Docling, inside a budget derived from THIS work's size.
+
+    THE PANDOC FALLBACK IS GONE — an ACCEPTED NEGATIVE, registered rather than silently dropped (BUG-896/D-3038).
+    `pandoc` has no PDF READER. MEASURED, verbatim: "Pandoc error: Unknown input format pdf / Pandoc can convert
+    to PDF, but not from PDF." So every Docling failure used to earn a GUARANTEED second failure, and the owner was
+    told "conversion failed" with no alternative tried and no way to tell a timeout from a defective file. A
+    fallback that cannot read its own input is not a fallback; it is a second failure wearing the first one's name,
+    and it cost the diagnosis of every real failure behind it.
+    """
+    budget = docling_budget_s(pdf_path)
+    size_mb = pdf_path.stat().st_size / (1024 * 1024)
     try:
         result = subprocess.run(
             ["docling", str(pdf_path), "--to", "md", "--output", str(output_path.parent)],
             capture_output=True,
             text=True,
-            timeout=180,
+            timeout=budget,
         )
-        if result.returncode == 0:
-            # Docling output name may differ — find it
-            docling_output = output_path.parent / f"{pdf_path.stem}.md"
-            if docling_output.exists():
-                if docling_output != output_path:
-                    docling_output.rename(output_path)
-                return True
-    except FileNotFoundError as e:
-        print(f"  ⚠️  Docling not found ({e}) — falling back to Pandoc for PDF (C16)", file=sys.stderr)
-    except subprocess.TimeoutExpired as e:
-        print(f"  ⚠️  Docling timed out after {e.timeout}s — falling back to Pandoc for PDF (C16)", file=sys.stderr)
-
-    # Fallback to Pandoc
-    print("  ℹ️  Docling not available, trying Pandoc for PDF...")
-    try:
-        result = subprocess.run(
-            [
-                "pandoc",
-                str(pdf_path),
-                "-t",
-                "markdown",
-                "--wrap=none",
-                "-o",
-                str(output_path),
-            ],
-            capture_output=True,
-            text=True,
-            timeout=120,
+    except FileNotFoundError as exc:
+        return _failure("converter_absent", f"docling is not installed on this machine ({exc})")
+    except subprocess.TimeoutExpired:
+        return _failure(
+            "budget_expired",
+            f"Docling did not finish inside the {budget}s allowance declared for this {size_mb:.1f} MiB work "
+            f"(floor {S0_DOCLING_FLOOR_S}s + {S0_DOCLING_PER_MB_S}s/MiB, ceiling {S0_DOCLING_CEILING_S}s) — "
+            f"THIS IS A TIMEOUT: raise stage0.conversion_budget if the work is worth the time, and do NOT fetch it again",
         )
-        if result.returncode != 0:
-            print(f"  ⚠️  Pandoc error: {result.stderr[:200]}")
-            return False
-        return output_path.exists() and output_path.stat().st_size > 100
-    except FileNotFoundError:
-        print("  ❌ Neither Docling nor Pandoc found for PDF conversion")
-        return False
+    if result.returncode != 0:
+        return _failure(
+            "container_unreadable",
+            f"Docling rc={result.returncode}: {(result.stderr or result.stdout).strip()[:800]}",
+        )
+    docling_output = output_path.parent / f"{pdf_path.stem}.md"
+    if not docling_output.exists():
+        return _failure(
+            "no_output",
+            f"Docling rc=0 and wrote no markdown for {pdf_path.name} — the RECEIPT is defective, not the book",
+        )
+    if docling_output != output_path:
+        docling_output.rename(output_path)
+    if output_path.stat().st_size <= MIN_OUTPUT_BYTES:
+        return _failure(
+            "no_output",
+            f"Docling rc=0 and wrote {output_path.stat().st_size} bytes of markdown for {pdf_path.name} "
+            f"(below the {MIN_OUTPUT_BYTES}-byte floor)",
+        )
+    return _ok()
 
 
 def compute_sha256(file_path: Path) -> str:
@@ -217,6 +293,42 @@ def apply_ingest_door(books: list[Path], books_dir: Path) -> list[Path]:
         print("   action=report: converting anyway — the deferrals are NAMED above and receipted, never silent")
         return books
     return [book for book in books if str(book.resolve()) not in deferred]
+
+
+def record_failures(failed: list[dict[str, Any]], pipeline_commit: str) -> None:
+    """Append every failed conversion, with its FULL tail, beside the checkpoint (BUG-898).
+
+    WHY A SEPARATE LEDGER, AND NOT THE CHECKPOINT. The checkpoint's keys are what a resume SKIPS, so a failed
+    book written there would never be retried — the failure would become permanent by accident. This file skips
+    nothing and is read by nothing in the pipeline: it is the evidence a later run, or the owner, reads INSTEAD
+    of re-running conversions by hand. MEASURED cost of not having it: 4 failures in one apply printed the same
+    sentence structure, and the real causes (an epub parse error, a budget expiry, a void fallback) were
+    unrecoverable without re-converting each by hand.
+    """
+    if not failed:
+        return
+    S0_FAILURE_LEDGER.parent.mkdir(parents=True, exist_ok=True)
+    payload = []
+    for item in failed:
+        rec = stamp_record(
+            {
+                "source_file": item["file"],
+                "source_path": item["source_path"],
+                "format": item["format"],
+                "bytes": item["bytes"],
+                "elapsed_s": item["elapsed_s"],
+                "failure_class": item["failure_class"],
+                "meaning": item["meaning"],
+                "detail": item["detail"],
+            },
+            gen_model="pandoc/docling",
+        )
+        rec["pipeline_commit"] = pipeline_commit
+        payload.append(json.dumps(rec, ensure_ascii=False))
+    with open(S0_FAILURE_LEDGER, "a", encoding="utf-8") as fh:  # append: each run's evidence is kept, none overwrites
+        fh.write("\n".join(payload) + "\n")
+        fh.flush()
+        os.fsync(fh.fileno())
 
 
 def run_stage0(
@@ -335,16 +447,16 @@ def run_stage0(
 
         start = time.time()
         if ext == ".epub":
-            success = convert_epub(book_path, md_path)
+            outcome = convert_epub(book_path, md_path)
         elif ext == ".pdf":
-            success = convert_pdf(book_path, md_path)
+            outcome = convert_pdf(book_path, md_path)
         else:
             print("→ ⏭️  Unsupported format")
             continue
 
         elapsed = time.time() - start
 
-        if success:
+        if outcome["ok"]:
             size_kb = md_path.stat().st_size / 1024
             sha = compute_sha256(md_path)
             # ── H4: Post-conversion quality check (D2326: tri-state, never silent) ──
@@ -386,8 +498,19 @@ def run_stage0(
             converted.append(rec)
             print(f"→ ✅ {size_kb:.0f}KB ({elapsed:.1f}s)")
         else:
-            failed.append({"file": book_path.name, "format": ext})
-            print("→ ❌ Failed")
+            failed.append(
+                {
+                    "file": book_path.name,
+                    "format": ext,
+                    "failure_class": outcome["failure_class"],
+                    "meaning": outcome["meaning"],
+                    "detail": outcome["detail"],
+                    "elapsed_s": round(elapsed, 1),
+                    "bytes": book_path.stat().st_size,
+                    "source_path": str(book_path),
+                }
+            )
+            print(f"→ ❌ {outcome['failure_class']}")
 
     # Write checkpoint
     all_records = list(existing.values()) + converted
@@ -396,6 +519,7 @@ def run_stage0(
         "\n".join(json.dumps(r, ensure_ascii=False) for r in all_records) + "\n",
     )
     write_stage_code_fingerprint(STAGE0_CHECKPOINT, "stage0")  # BUG-614: bind checkpoint to producing code
+    record_failures(failed, pipeline_commit)  # BUG-898: the DIAGNOSIS and the full tail, beside the receipt
 
     # Summary
     print(f"\n{'=' * 60}")
@@ -403,8 +527,10 @@ def run_stage0(
     print(f"⏭️  Skipped:   {skipped}")
     print(f"❌ Failed:    {len(failed)}")
     if failed:
+        #: BUG-898: this line is ONE of the three the applier carries into its receipt (`tail[-3:]`), so the CLASS
+        #: has to be ON IT. A summary that names only the file leaves the receipt naming only the file.
         for f in failed:
-            print(f"     - {f['file']}")
+            print(f"     - {f['file']} [{f['failure_class']}] {f['detail'][:200]}")
     print(f"📋 Checkpoint: {STAGE0_CHECKPOINT}")
 
     # D2326: fail-closed ingestion — a failed conversion must not look like success.

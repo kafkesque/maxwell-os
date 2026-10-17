@@ -1,7 +1,7 @@
 {
   "act": "T-181 admission plan",
   "authority": "D-3051",
-  "generated": "2026-10-17T14:12:20Z",
+  "generated": "2026-10-17T15:40:07Z",
   "corpus_home": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books",
   "accepted_containers": [
     ".epub",
@@ -28,9 +28,9 @@
   "roots": [
     {
       "id": "books",
-      "files": 2181,
-      "seen": 1715,
-      "never_seen": 466,
+      "files": 2184,
+      "seen": 1740,
+      "never_seen": 444,
       "admits_to": "corpus_home"
     },
     {
@@ -41,19 +41,19 @@
       "admits_to": "corpus_home"
     }
   ],
-  "files": 2811,
-  "seen": 1724,
-  "never_seen": 1087,
-  "seen_keys": 968,
-  "unseen_keys": 1011,
+  "files": 2814,
+  "seen": 1749,
+  "never_seen": 1065,
+  "seen_keys": 993,
+  "unseen_keys": 989,
   "counts": {
-    "already_in_the_corpus": 1697,
+    "already_in_the_corpus": 1722,
     "seen_by_an_ingest_record": 27,
-    "admit_candidate": 463,
+    "admit_candidate": 439,
     "refused_no_declared_corpus_home": 0,
     "refused_container_no_stage_reads_it": 389,
     "refused_container_corrupt": 5,
-    "refused_name_repair_first": 179,
+    "refused_name_repair_first": 181,
     "refused_not_in_its_kind_folder": 51,
     "refused_domain_not_a_corpus_domain": 0
   },
@@ -865,6 +865,11 @@
       "kind": "epub"
     },
     {
+      "rel": "books/pdf/DOMAIN 2 Design/practice+process/How to Use Graphic Design to Sell Things, Explain Things, Make Things Look Better, Make People Laugh, Make People Cry, and\u2026 (Michael Bierut) (z-library.sk, 1lib.sk, z-lib.sk).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
       "rel": "books/pdf/DOMAIN 2 Design/practice+process/Making Ideas Happen Overcoming the Obstacles Between Vision and Reality by Scott Belsky (z-lib.org).pdf",
       "decision": "refused_name_repair_first",
       "kind": "pdf"
@@ -921,6 +926,11 @@
     },
     {
       "rel": "books/pdf/DOMAIN 2 Design/visual+fundamentals/Layout Essentials Revised And Updated 100 Design Principles For Using Grids by Beth Tondreau (z-lib.org).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/visual+fundamentals/Making sense of color management (Craig Hockenberry) (z-library.sk, 1lib.sk, z-lib.sk).pdf",
       "decision": "refused_name_repair_first",
       "kind": "pdf"
     },
@@ -2036,7 +2046,7 @@
       "decision": "refused_container_corrupt",
       "kind": "pdf",
       "defect": "apple_bookmark",
-      "remedy": "RESOLVE THE POINTER, do not download: the alias records its own target path \u2014 copy the real file in beside it (the alias itself may stay; it will simply stay refused)"
+      "remedy": "CHECK THE POINTER FIRST: `ls` the target path the alias records (it is plain text inside the file). If it RESOLVES, copy the real file in beside the alias - nothing needs downloading. If it DANGLES the work is not on this machine: re-obtain it or acknowledge the alias as dead (the plan re-probes every candidate, so a good copy clears itself and a dead alias simply stays refused)"
     },
     {
       "rel": "journals_notes/DOMAIN 3 Art + Computational Media/narrative/digital_storytelling_synthesis_19th_november_2009.docx",
@@ -3227,67 +3237,13 @@
   "worklist_in_full": 40,
   "rows": [
     {
-      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/epub/DOMAIN 2 Design/visual+fundamentals/Bierut, Michael; Rand, Paul Thoughts on design.epub",
-      "rel": "books/epub/DOMAIN 2 Design/visual+fundamentals/Bierut, Michael; Rand, Paul Thoughts on design.epub",
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/epub/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Generating Sound & Organizing Time (Wakefield; Taylor).epub",
+      "rel": "books/epub/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Generating Sound & Organizing Time (Wakefield; Taylor).epub",
       "root": "books",
       "kind": "epub",
-      "key": "bierut, michael; rand, paul thoughts on design",
-      "bytes": 7446187,
-      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/visual+fundamentals/Bierut, Michael; Rand, Paul Thoughts on design.md"
-    },
-    {
-      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/epub/DOMAIN 2 Design/visual+fundamentals/Handbook of Color Psychology Andrew J. Elliot; Mark D. Fairchild; Anna Franklin liber3.epub",
-      "rel": "books/epub/DOMAIN 2 Design/visual+fundamentals/Handbook of Color Psychology Andrew J. Elliot; Mark D. Fairchild; Anna Franklin liber3.epub",
-      "root": "books",
-      "kind": "epub",
-      "key": "handbook of color psychology andrew j. elliot; mark d. fairchild; anna franklin liber3",
-      "bytes": 7736267,
-      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/visual+fundamentals/Handbook of Color Psychology Andrew J. Elliot; Mark D. Fairchild; Anna Franklin liber3.md"
-    },
-    {
-      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/epub/DOMAIN 2 Design/visual+fundamentals/The Designer's Dictionary of Color.epub",
-      "rel": "books/epub/DOMAIN 2 Design/visual+fundamentals/The Designer's Dictionary of Color.epub",
-      "root": "books",
-      "kind": "epub",
-      "key": "the designer's dictionary of color",
-      "bytes": 47160362,
-      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/visual+fundamentals/The Designer's Dictionary of Color.md"
-    },
-    {
-      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/epub/DOMAIN 2 Design/visual+fundamentals/Type Rules The Designer 's Guide to Professional Typography, 4th Edition Strizver, Ilene liber3.epub",
-      "rel": "books/epub/DOMAIN 2 Design/visual+fundamentals/Type Rules The Designer 's Guide to Professional Typography, 4th Edition Strizver, Ilene liber3.epub",
-      "root": "books",
-      "kind": "epub",
-      "key": "type rules the designer 's guide to professional typography, 4th edition strizver, ilene liber3",
-      "bytes": 25309996,
-      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/visual+fundamentals/Type Rules The Designer 's Guide to Professional Typography, 4th Edition Strizver, Ilene liber3.md"
-    },
-    {
-      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/epub/DOMAIN 2 Design/visual+fundamentals/[Paul Sahre] Two-Dimensional Man A Graphic Memoir.epub",
-      "rel": "books/epub/DOMAIN 2 Design/visual+fundamentals/[Paul Sahre] Two-Dimensional Man A Graphic Memoir.epub",
-      "root": "books",
-      "kind": "epub",
-      "key": "[paul sahre] two-dimensional man a graphic memoir",
-      "bytes": 27356796,
-      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/visual+fundamentals/[Paul Sahre] Two-Dimensional Man A Graphic Memoir.md"
-    },
-    {
-      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/epub/DOMAIN 3 Art + Computational Media/[Tullett, Barrie;] Typewriter art a modern antho.epub",
-      "rel": "books/epub/DOMAIN 3 Art + Computational Media/[Tullett, Barrie;] Typewriter art a modern antho.epub",
-      "root": "books",
-      "kind": "epub",
-      "key": "[tullett, barrie;] typewriter art a modern antho",
-      "bytes": 27573217,
-      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 3 Art + Computational Media/[Tullett, Barrie;] Typewriter art a modern antho.md"
-    },
-    {
-      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/epub/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Code as Creative Medium A Handbook for Computational Art and Design Golan Levin; Tega Brain liber3.epub",
-      "rel": "books/epub/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Code as Creative Medium A Handbook for Computational Art and Design Golan Levin; Tega Brain liber3.epub",
-      "root": "books",
-      "kind": "epub",
-      "key": "code as creative medium a handbook for computational art and design golan levin; tega brain liber3",
-      "bytes": 56406917,
-      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Code as Creative Medium A Handbook for Computational Art and Design Golan Levin; Tega Brain liber3.md"
+      "key": "generating sound & organizing time (wakefield; taylor",
+      "bytes": 28877442,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Generating Sound & Organizing Time (Wakefield; Taylor).md"
     },
     {
       "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/epub/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Generating Sound & Organizing Time Graham Wakefield & Gregory Taylor liber3.epub",
@@ -3297,87 +3253,6 @@
       "key": "generating sound & organizing time graham wakefield & gregory taylor liber3",
       "bytes": 28913667,
       "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Generating Sound & Organizing Time Graham Wakefield & Gregory Taylor liber3.md"
-    },
-    {
-      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/epub/DOMAIN 4 Business/marketing+growth/This Is Marketing You Can't Be Seen Until You Learn to See.epub",
-      "rel": "books/epub/DOMAIN 4 Business/marketing+growth/This Is Marketing You Can't Be Seen Until You Learn to See.epub",
-      "root": "books",
-      "kind": "epub",
-      "key": "this is marketing you can't be seen until you learn to see",
-      "bytes": 1497362,
-      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/marketing+growth/This Is Marketing You Can't Be Seen Until You Learn to See.md"
-    },
-    {
-      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/epub/DOMAIN 4 Business/practice+economics/Don't Get a Job, Build a Business.epub",
-      "rel": "books/epub/DOMAIN 4 Business/practice+economics/Don't Get a Job, Build a Business.epub",
-      "root": "books",
-      "kind": "epub",
-      "key": "don't get a job, build a business",
-      "bytes": 5128511,
-      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/practice+economics/Don't Get a Job, Build a Business.md"
-    },
-    {
-      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/epub/DOMAIN 4 Business/practice+economics/Legal Guide for the Visual Artist Tad Crawford; M. J. Bogatin liber3.epub",
-      "rel": "books/epub/DOMAIN 4 Business/practice+economics/Legal Guide for the Visual Artist Tad Crawford; M. J. Bogatin liber3.epub",
-      "root": "books",
-      "kind": "epub",
-      "key": "legal guide for the visual artist tad crawford; m. j. bogatin liber3",
-      "bytes": 7108622,
-      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/practice+economics/Legal Guide for the Visual Artist Tad Crawford; M. J. Bogatin liber3.md"
-    },
-    {
-      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/epub/DOMAIN 4 Business/practice+economics/Real Artists Don't Starve Timeless Strategies for Thriving.epub",
-      "rel": "books/epub/DOMAIN 4 Business/practice+economics/Real Artists Don't Starve Timeless Strategies for Thriving.epub",
-      "root": "books",
-      "kind": "epub",
-      "key": "real artists don't starve timeless strategies for thriving",
-      "bytes": 389657,
-      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/practice+economics/Real Artists Don't Starve Timeless Strategies for Thriving.md"
-    },
-    {
-      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/epub/DOMAIN 4 Business/practice+economics/The Harvard Business Review Entrepreneur's Handbook.epub",
-      "rel": "books/epub/DOMAIN 4 Business/practice+economics/The Harvard Business Review Entrepreneur's Handbook.epub",
-      "root": "books",
-      "kind": "epub",
-      "key": "the harvard business review entrepreneur's handbook",
-      "bytes": 4872896,
-      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/practice+economics/The Harvard Business Review Entrepreneur's Handbook.md"
-    },
-    {
-      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/epub/DOMAIN 4 Business/practice+economics/[Colin Barrow; Paul Barrow; Robert Brown] The Busi.epub",
-      "rel": "books/epub/DOMAIN 4 Business/practice+economics/[Colin Barrow; Paul Barrow; Robert Brown] The Busi.epub",
-      "root": "books",
-      "kind": "epub",
-      "key": "[colin barrow; paul barrow; robert brown] the busi",
-      "bytes": 2769596,
-      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/practice+economics/[Colin Barrow; Paul Barrow; Robert Brown] The Busi.md"
-    },
-    {
-      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/epub/DOMAIN 5 Personal Practice/habits+behavior+change/[Dale-Carnegie-&-Associates]-How-to-Win-Friends-an.epub",
-      "rel": "books/epub/DOMAIN 5 Personal Practice/habits+behavior+change/[Dale-Carnegie-&-Associates]-How-to-Win-Friends-an.epub",
-      "root": "books",
-      "kind": "epub",
-      "key": "[dale-carnegie-&-associates]-how-to-win-friends-an",
-      "bytes": 3640731,
-      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 5 Personal Practice/habits+behavior+change/[Dale-Carnegie-&-Associates]-How-to-Win-Friends-an.md"
-    },
-    {
-      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/epub/DOMAIN 5 Personal Practice/mood+therapy/[Dr. Jen Gunter] The Vagina Bible The Vulva And T.epub",
-      "rel": "books/epub/DOMAIN 5 Personal Practice/mood+therapy/[Dr. Jen Gunter] The Vagina Bible The Vulva And T.epub",
-      "root": "books",
-      "kind": "epub",
-      "key": "[dr. jen gunter] the vagina bible the vulva and t",
-      "bytes": 4744401,
-      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 5 Personal Practice/mood+therapy/[Dr. Jen Gunter] The Vagina Bible The Vulva And T.md"
-    },
-    {
-      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/epub/DOMAIN 5 Personal Practice/mood+therapy/[Emily Nagoski Ph.D.] Come as You Are The Surpris.epub",
-      "rel": "books/epub/DOMAIN 5 Personal Practice/mood+therapy/[Emily Nagoski Ph.D.] Come as You Are The Surpris.epub",
-      "root": "books",
-      "kind": "epub",
-      "key": "[emily nagoski ph.d.] come as you are the surpris",
-      "bytes": 5366078,
-      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 5 Personal Practice/mood+therapy/[Emily Nagoski Ph.D.] Come as You Are The Surpris.md"
     },
     {
       "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/epub/DOMAIN 5 Personal Practice/productivity+execution/HBR Management Tips Collection (2 Books) Harvard Business Review liber3.epub",
@@ -3398,15 +3273,6 @@
       "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/FULLTEXT01.md"
     },
     {
-      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/George Orwell  - 1984 (ORIGINAL) (1949).pdf",
-      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/George Orwell  - 1984 (ORIGINAL) (1949).pdf",
-      "root": "books",
-      "kind": "pdf",
-      "key": "george orwell - 1984 (original) (1949",
-      "bytes": 704798,
-      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/George Orwell  - 1984 (ORIGINAL) (1949).md"
-    },
-    {
       "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/Wim Wenders - The Logic of Images.pdf",
       "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/Wim Wenders - The Logic of Images.pdf",
       "root": "books",
@@ -3414,24 +3280,6 @@
       "key": "wim wenders - the logic of images",
       "bytes": 13683887,
       "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/Wim Wenders - The Logic of Images.md"
-    },
-    {
-      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/av99.pdf",
-      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/av99.pdf",
-      "root": "books",
-      "kind": "pdf",
-      "key": "av99",
-      "bytes": 4436165,
-      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/av99.md"
-    },
-    {
-      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/book-en-print.pdf",
-      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/book-en-print.pdf",
-      "root": "books",
-      "kind": "pdf",
-      "key": "book-en-print",
-      "bytes": 3731420,
-      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/book-en-print.md"
     },
     {
       "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/114819898-Robert-Fludd-Hermetic-Philosopher1.pdf",
@@ -3452,15 +3300,6 @@
       "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/2011_0001_545_04_Magyarito_szotar.md"
     },
     {
-      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/259-451-1-SM.pdf",
-      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/259-451-1-SM.pdf",
-      "root": "books",
-      "kind": "pdf",
-      "key": "259-451-1-sm",
-      "bytes": 9659646,
-      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/259-451-1-SM.md"
-    },
-    {
       "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/53481411-De-Re-Metallica-1556-Agricola.pdf",
       "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/53481411-De-Re-Metallica-1556-Agricola.pdf",
       "root": "books",
@@ -3468,51 +3307,6 @@
       "key": "53481411-de-re-metallica-1556-agricola",
       "bytes": 99065265,
       "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/53481411-De-Re-Metallica-1556-Agricola.md"
-    },
-    {
-      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Accumulator-Plans.pdf",
-      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Accumulator-Plans.pdf",
-      "root": "books",
-      "kind": "pdf",
-      "key": "accumulator-plans",
-      "bytes": 3046442,
-      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Accumulator-Plans.md"
-    },
-    {
-      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Albert Pike - Morals and Dogma.pdf",
-      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Albert Pike - Morals and Dogma.pdf",
-      "root": "books",
-      "kind": "pdf",
-      "key": "albert pike - morals and dogma",
-      "bytes": 2614713,
-      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Albert Pike - Morals and Dogma.md"
-    },
-    {
-      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Alchemy Overview.pdf",
-      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Alchemy Overview.pdf",
-      "root": "books",
-      "kind": "pdf",
-      "key": "alchemy overview",
-      "bytes": 162286,
-      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Alchemy Overview.md"
-    },
-    {
-      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Amber Wolfe - In the Shadow of the Shaman.pdf",
-      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Amber Wolfe - In the Shadow of the Shaman.pdf",
-      "root": "books",
-      "kind": "pdf",
-      "key": "amber wolfe - in the shadow of the shaman",
-      "bytes": 10167655,
-      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Amber Wolfe - In the Shadow of the Shaman.md"
-    },
-    {
-      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Awakening to divine wisdom Christian initiation into three worl_nodrm.pdf",
-      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Awakening to divine wisdom Christian initiation into three worl_nodrm.pdf",
-      "root": "books",
-      "kind": "pdf",
-      "key": "awakening to divine wisdom christian initiation into three worl_nodrm",
-      "bytes": 8822179,
-      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Awakening to divine wisdom Christian initiation into three worl_nodrm.md"
     },
     {
       "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Beginning_Luciferian_Magick.pdf",

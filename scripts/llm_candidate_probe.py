@@ -100,9 +100,9 @@ def probe(binary: str, model: str) -> dict[str, Any] | None:
         return None
     try:
         payload = json.loads(proc.stdout)
-    except json.JSONDecodeError:
+    except json.JSONDecodeError as exc:
         first = (proc.stdout or proc.stderr).strip().splitlines()
-        raise SystemExit(f"FATAL: llmfit did not answer JSON for {model}: {first[:1]}")
+        raise SystemExit(f"FATAL: llmfit did not answer JSON for {model}: {first[:1]}") from exc
     models = payload.get("models") if isinstance(payload, dict) else None
     if not models:
         return None

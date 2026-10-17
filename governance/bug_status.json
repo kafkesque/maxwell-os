@@ -2,8 +2,8 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 640,
-  "open_n": 231,
+  "total_ids": 641,
+  "open_n": 232,
   "closed_n": 409,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
@@ -1161,6 +1161,11 @@
     {
       "id": "BUG-875",
       "title": "(HIGH, OPEN) \u2014 A FIRST-PARTY IMPORT NAME RESOLVES OUTSIDE THE TREE, so the delegated-run journal and 16 import sites read ANOTHER PROJECT'S ",
+      "events": 1
+    },
+    {
+      "id": "BUG-876",
+      "title": "(MEDIUM, OPEN 2026-10-17) \u2014 THE ATTRIBUTION CONTROL CANNOT GO GREEN ON THE REGISTRY IT MEASURES",
       "events": 1
     }
   ],

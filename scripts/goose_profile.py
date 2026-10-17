@@ -1037,11 +1037,14 @@ def _selftest() -> int:
     bound = bind_harness_env({})
     controls.append(("the one door binds every declared agent_loop name for the child",
                      all(bound.get(name) == want for name, want in _declared_env().items())))
+    # The probe name is READ from the declaration, never typed: a client env-var literal in this file would be a
+    # SECOND binding site outside the adapter root (the rail caught exactly that on this control's first draft).
+    _names = _declared_env()
+    _probe = next(iter(_names))
     controls.append(("a shell value that CONTRADICTS the declaration refuses the birth",
-                     _refuses(lambda: bind_harness_env({"GOOSE_MODEL": "some-other-model"}))))
+                     _refuses(lambda: bind_harness_env({_probe: _names[_probe] + "-contradiction"}))))
     controls.append(("a shell value EQUAL to the declaration is not a conflict",
-                     bind_harness_env({"GOOSE_MODEL": _declared_env()["GOOSE_MODEL"]})
-                     ["GOOSE_MODEL"] == _declared_env()["GOOSE_MODEL"]))
+                     bind_harness_env({_probe: _names[_probe]})[_probe] == _names[_probe]))
 
     for label, ok in controls:
         print(f"  {'ok  ' if ok else 'FAIL'} {label}")

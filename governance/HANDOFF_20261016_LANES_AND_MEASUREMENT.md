@@ -960,3 +960,12 @@ the default; `--dry-run` wins from the same door so a preview costs one word.
    (the contract), never this prose INSTEAD of them.
 5. Then start at §g.1. Delegation unchanged: `sweep` (read-only), `review` (judge one artefact), `extract`
    (summarise WITH source). Never: open-ended research, promotions, governed writes.
+
+### i. ADDENDUM (same sitting, after the first commit): A RAIL CAUGHT WHAT THE REVIEW DID NOT
+
+`check_agent_surface.py` went RED on the FIRST draft of D-3069's controls: the selftest named a client variable
+literally (`"GOOSE_MODEL"`) as a fixture, which is a **binding site outside an adapter root** — the exact class
+BUG-845/D-3042 exists to refuse. R5 had already APPROVED that file; the rail was the verifier that noticed. Fixed at
+the DECLARATION (the probe name is now READ from `pipeline.harness_env.declared()`), not by declaring an exception:
+`check_agent_surface` rc 0, `goose_profile --selftest` 41/41. Recorded because it is the argument for keeping the
+rails rather than trusting a review: a reviewer judges prose, a rail reads bytes.

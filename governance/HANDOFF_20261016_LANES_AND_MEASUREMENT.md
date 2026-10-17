@@ -308,3 +308,125 @@ root) is still the highest-leverage ontology word.
 promotion) · 2) the provider-list WRITER (BUG-874's residual: the probe is the only guard) · 3) `just ask` grounded in
 the retriever (the measured product gap, D-3057) · 4) T-188 the mypy rail · 5) T-183 → T-180 → T-176 → T-179 → T-182
 · 6) the scheduler/orchestrator readings.
+
+## §1f — SIXTH SITTING (2026-10-17, late morning): T-186 APPLIED GREEN, residency codified as a two-switch model, the oracle ladder declared
+
+**WHAT THE OWNER ASKED.** (1) Codify: a new extension, created or downloaded, must register itself automatically in
+`config/extension_profiles.yaml`. (2) Will the switch happen AUTOMATICALLY when the agent/subagent needs it and off
+when it does not? (3) Do the T-186 manual step 2. (4) Extensive research on Qwen3-Coder-class local models, better
+tool-calling subagent candidates, and whether a CAPABILITY oracle exists; from now on, research on a model ALWAYS
+runs llmfit and adds any oracle found. (5) Check the script/skill graph and whether tasks/decisions are subagent-proof.
+(6) Are we ready for loop-agent debugging given the bug count, and what can be delegated to speed the backlog?
+(7) Explain T-174 / META-LANE-FREEZE-1 / T-181 limb 2 and recommend. (8) Check the last four sittings for unregistered
+revelations. (9) State, then the next critical step in consequential order, then gov sync, then this handoff.
+
+**COMMITS.** `55562b1` plan widening (D-2860, with the ORDER BREACH recorded rather than hidden: the widening was
+written after the edits because the owner's message arrived as one block) · `d627f48` the work: D-3060, D-3061,
+T-186 applied, the two new scripts, the two new tasks, BUG-053's missing header, BUG-876.
+
+### 1. T-186 IS DONE, AND IT IS GREEN
+The seven declared flips (`apps`, `chatrecall`, `code_execution`, `reddit`, `scheduler`, `tom`, `youtubetranscript`)
+were written into `~/.config/goose/config.yaml` LINE-LEVEL (tempfile → fsync → os.replace; backup
+`config.yaml.bak-20261017114041-t186`), with an invariant check proving every non-target body and the
+`extensionmanager` entry byte-identical. `just extensions-check`: **rc 0 — 26 declared, 12 enabled, exactly the
+workshop profile** (was rc 2 with 7 residents). Freed: ≈1.5k tokens/request of measured schema, two MEASURED 0-tool
+processes, and three platform residents. **The session that applied it keeps the surface it was born with** — the
+change is live in the NEXT session.
+
+### 2. THE SWITCH: TWO MECHANISMS, ONE RAIL (D-3060)
+- **BIRTH-TIME (the rail, deterministic):** `--no-profile --with-builtin … --with-extension '…'` per session, or the
+  `enabled:` flag persistently (live at the next session's birth, NEVER in the running one).
+- **RUNTIME (judgement, not a control):** `extensionmanager` exposes a ManageExtensions tool (`action` + `name`) —
+  read from the goose 1.39.0 binary (`The extension '<name>' has been disabled successfully`), NOT handshaken,
+  because a platform extension is not exposed by `goose mcp` (only memory, computercontroller, autovisualiser are).
+  It CAN change a running session's surface. **Bound to `on_demand` only; `always`/`never`/`quarantined` are
+  untouchable; `not_a_rail: true`.**
+- **So the honest answer to "will it switch automatically when needed": NO — not by itself.** The harness has no
+  demand-driven loading. What exists is (a) a deterministic surface chosen at birth, (b) a model-judged toggle that
+  can strand a task mid-flight, and (c) the delegate's own `extensions:` list. The reliable design is (a)+(c), with
+  (b) as convenience. A session that crosses task classes should be REBORN, not mutated.
+- **ADOPTION ON ARRIVAL (codified):** `just extensions-adopt` registers any extension the harness declares but no
+  class carries into `quarantine` with a dated `seen:` stamp — granted NOTHING, refused by every profile, reported
+  rc 2 (loud, not fatal). An ARRIVAL IS NOT A DECISION; the registration is automatic, the grant is not.
+- **SUBAGENT SURFACE (codified):** `just extensions-delegate <class>` prints the exact `extensions:` list —
+  `review` = developer+analyze+skills (a judged output must be able to load the house rules), `sweep`, `extract`;
+  `research` is REFUSED as a class. Every name is resolved against the harness or the render REFUSES.
+- **KNOWN GAPS, RECORDED NOT PRETENDED:** no read-only surface exists (T-189) and a mid-session surface change
+  leaves no receipt anywhere (T-190).
+
+### 3. THE RESEARCH: NOTHING TO DOWNLOAD, AND THE ORACLE QUESTION IS ANSWERED (D-3061)
+- No drop-in FASTER model in the Qwen3-Coder class here: Qwen3-30B-A3B-Instruct-2507 is the same 30.5B MoE and
+  llmfit estimates the IDENTICAL 59.3 tok/s (at an 8192-token cap) for a model that measured **79.9 s** on a 3-call
+  loop. Speed is a property of the SHAPE (3B active), and the shapes that beat it are already served
+  (MiniCPM5-2B 2.1 s, Ornith-9B 11.5 s).
+- The catalogue's own top-50 of `tool_use` + fits + ≤40B = **32 families in 50 rows, 20 distills, and FIVE
+  quantisations of the same #1 — DeepSeek-R1-0528-Qwen3-8B, a REASONER**, the worst loop shape. Not a shortlist.
+- **llmfit's coverage is 4/8 of this roster** and its tags are dropped by quantisation — D-3058's evidence is
+  CORRECTED in the research register (conclusion survives).
+- **ORACLE LADDER (declared in `config/model_oracles.yaml`, mechanised by `scripts/llm_candidate_probe.py`):**
+  fit (llmfit) → named external prior (BFCL / τ²-bench / SWE-bench Verified) → **the MEASURED loop is the only
+  gate**. Refused as evidence, with reasons: parameter count, catalogue tags, card prose, vendor demos,
+  estimated_tps-as-loop-time.
+
+### 4. THE STATE: FOURTEEN REDS, AND THEY ARE THE FIRST READING ANYONE HAS HAD
+`scripts/run_ladder.py --collect health` ran all **181** declaring lines in 909 s (a normal `just health` stops at
+the first failure — BUG-573's shape). **14 reds, none new** (all five residency lines added this sitting read `ok`):
+`check_bug_recall` · `resolve_route` (225 unrouted vs the 222 SHRINK-ONLY ceiling) · `check_bug_status` (fixed) ·
+`check_register_divergence` (fixed: BUG-053 got its missing HEADER, BUG-492 was CLAIMED by D-3059 and is now only
+cited) · `build_anchor_store_bridge` · `check_config_defaults` (debt GREW: 595 sites / 594 modules) ·
+`lib/handoff --selftest` (**BUG-876**, a real defect: no receipted post-image exists for `decisions.yaml` and
+`--backfill` skips it) · `check_silent_repair` · `check_undeclared_encoding` · `check_store_columns` · `reconcile` ·
+`verify_generator_pins` · `check_tests` (the 4th fatal) · `check_rail_mutations`. Fault set now RECORDED, not unknown.
+
+### 5. LOOP-AGENT READINESS: NOT YET, AND THE BLOCKER IS NOT THE BUG COUNT
+The register holds 231 open bugs, but a loop agent is not blocked by a backlog — it is blocked by not being able to
+tell a good run from a bad one. What is MISSING is small and named: (a) T-187's two-step/two-tool fixture, without
+which no model may be promoted into the loop; (b) BUG-876, because a loop's whole output is claims about governed
+files and the attribution control that would check them cannot go green; (c) T-190, because a loop that can change
+its own tool surface mid-run leaves no trace. Three acts, not three hundred. **Verdict: loop-agent debugging may
+start on READ-ONLY and measurement tasks now (they need none of the three); it may not adjudicate a governed write
+until (b) lands.**
+
+### 6. WHAT TO DELEGATE (the fast track), AND WHAT NEVER
+- **Delegate now (read-only, no writes):** repo sweeps for the 14 reds — each is a file:line reading
+  (`sweep` profile: developer+analyze+filesystem); the 225 unrouted bugs → capability proposals (`sweep`, never
+  applied — D-2898 forbids an LLM deciding a promotion); research digests WITH source text in hand (`extract`).
+- **Never delegate:** open-ended research (BUG-053), a canonical promotion, a governed write, or anything whose
+  failure would not be visible (D-3020: the durable path is the delegation path).
+- **The graph findings.** Script graph: 417 scripts / 74 `just` recipes — a STAR (just → scripts), with most
+  scripts unreachable from any recipe (T-165's class), and `pipeline/`+`tools/` still PEP-420 namespace roots
+  (BUG-875, CAPTURABLE BY CONSTRUCTION on every run). Route graph: 22 capabilities + lanes, 640 findings routed,
+  225 with no capability at all. Skill graph: TWO in-repo skills (`agent/skills/`) — and a delegate inherits none
+  of them unless `skills` is in its `extensions:` list, which is why `review` now carries it. **Subagent-proofing
+  verdict: the DECISIONS are (each has a home and a rail); the TASKS are not yet (59 open, 57 pipeline, no
+  delegation surface per task); the SKILLS are thin (2 for a 417-script OS).**
+
+### 7. THE OWNER'S THREE WORDS, ANSWERED
+- **(b) T-174, the provider flip — what and why.** The harness config says `active_provider: custom_deepseek`,
+  while the declaration says `maxwell_omlx`. `agent/adapters/goose/apply_provider_flip.py` is the ONE writer that can
+  make the live home agree with the declaration: dry-run today = **1 edit to apply, 3 already applied**. Why it
+  matters: every session is one mis-click away from routing to a provider the OS does not declare (and
+  `custom_deepseek` is the one with the reasoning-passthrough defect, DELEGATE-001). **Recommendation: APPLY IT**
+  (`python3 agent/adapters/goose/apply_provider_flip.py --apply`), then start a new session — it is a one-line flip,
+  it is reversible (the script has `--rollback`), and every day it stays unapplied is a day the declaration and the
+  home disagree. It does NOT render the model list (BUG-874's residual), which stays owed.
+- **(c) META-LANE-FREEZE-1 — what and why.** It is a freeze on the GOVERNANCE MACHINERY: a new governance bug may
+  be FILED but not WORKED while it is open (opened 2026-09-27 because ~37 of the last 40 bugs were about the
+  machinery). Its own stated precondition was that the ladder report its WHOLE fault set in one pass. **That is now
+  MEASURED TRUE: 181 lines, one pass, 14 faults named, receipt on disk.** The window's `review_by` has passed with
+  its exit UNMET (2 still parked). **Recommendation: CLOSE IT**, on its own precondition, and let the 2 remaining
+  held ids (BUG-568, BUG-559) enter T-114's discharge order as ordinary rows. Keeping an expired window open makes
+  every governance act argued rather than ruled, which is the drift it was built to stop.
+- **(d) T-181 limb 2 — what and why.** One corpus root admits books but the notes share is still NULL, so 621 files
+  are refused for "no declared corpus home". **Recommendation: declare the notes share** with ADMISSION IS NOT
+  CONVERSION stated in the same word — it is the highest-leverage ontology decision outstanding, and it unblocks
+  T-180 and T-183 in one move.
+
+### 8. NEXT CRITICAL STEPS, IN CONSEQUENTIAL ORDER
+1. **Start a new session** (the only way to see the new 12-extension surface) and read `just extensions-check`.
+2. **T-114's first three**: the `check_config_defaults` growth (debt GREW — never re-record upward), the
+   `build_anchor_store_bridge` re-derive, and `handoff.py`'s attribution control (BUG-876).
+3. **T-187** the two-step/two-tool loop discrimination — still the only gate for a model promotion.
+4. **T-188** mypy as a rail (C17 half-runner) and **T-189/T-190** (read-only reviewer; a receipt for a surface change).
+5. **The provider-list writer** (BUG-874's residual), then grounded `just ask`, then the owner lane T-183 → T-180 →
+   T-176 → T-179 → T-182.

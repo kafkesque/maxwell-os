@@ -17559,3 +17559,52 @@ the front is saturated (BUG-909) — it cannot, and that is what the circuit bre
 `annas` search produces), the rung may skip the browser entirely and resolve LibGen's 2-step for that md5. That turns
 the most expensive rung in the ladder into a plain HTTP rung for the common case, and it is the RECOURSE the owner
 asked for without spending a donation to get it.
+
+### BUG-915 (MED — OPEN 2026-10-17) — THE DOCLING BUDGET'S DECLARED BASIS IS **BYTES**, AND BYTES DO NOT PREDICT CONVERSION COST (MEASURED r = −0.131)
+
+**THE RED LOOP (D-3036) — one command, already run, RED now.** Join the applier's own receipt timestamps against each
+row's declared `bytes` and measured `pages`, then correlate. Reading taken 2026-10-17T20:55Z over the 25 rows whose
+inter-receipt gap is ≥2 s and <1500 s:
+
+```
+n = 25
+Pearson r  log(bytes) vs log(seconds) : -0.131
+Pearson r  log(pages) vs log(seconds) : +0.002
+```
+
+Not weak. **ABSENT, and slightly negative on bytes.** The GREEN form of this loop is a basis whose r clears a
+declared floor; the fix has to move that number, not merely re-word the docstring.
+
+**THE INVERSION, in two works from the same run.**
+
+| work | bytes | pages | seconds |
+|---|---|---|---|
+| Coelum Philosophorum.pdf | 0.04 MB | 15 | **1501** |
+| Encyclopedia of Prostitution and Sex Work (2 vol).pdf | 69.89 MB | 821 | **46** |
+
+A model that prices 1,700× more bytes at 1/32 of the time is not a model of the thing it is pricing.
+
+**WHY IT MATTERS.** `docling_budget_s` in `pipeline/stage0_convert.py` exists for a measured reason (D-3076): a flat
+180 s refused a 119-page photo-heavy volume that converts fine in 287 s, and the refusal was reported in the
+vocabulary of a defect. The declared remedy was an allowance "derived from THIS work's size" so that long, scanned,
+image-heavy works are not refused FIRST. Measured, the expensive rows are the **small** ones and the cheapest row in
+the run is the largest — so the derivation is inert in exactly the direction it was built to matter, and 76 of the 399
+remaining PDFs are ceiling-capped at 1,500 s on the strength of a number that carries no information about them.
+
+**POPULATION AUDIT (receipt: `governance/evidence/APPLIER_POPULATION_AUDIT_20261017.json`, 399 remaining PDFs).**
+303 carry a text layer (median 15 pages); 96 are image-only (median 178 pages, 18,718 pages between them); 59 are
+≤30 MB text; 76 are >30 MB and therefore ceiling-capped, of which **33 are scans**. Sum of every declared allowance
+= **73.4 h** (the hard wall); measured mean = **216 s/row**, so 515 remaining rows project to **~31 h**, and the
+spread (p50 67 s, p90 692 s) is why the earlier 28 h estimate keeps drifting upward as heavy rows land.
+
+**WHAT IS NOT CLAIMED.** The **cause** is a HYPOTHESIS: Docling's layout and table-structure passes dominate, so a
+figure-heavy 15-page document can cost more than an 821-page linear one. NOT MEASURED: per-page figure/table density,
+and whether OCR is being invoked on pages that already carry text. No fix is proposed until the cause is measured.
+
+**FIX DIRECTION (declared, not built).** `basis: pages` — or `pages` plus a scan multiplier — is the only candidate
+with a plausible referent, and it must be TESTED against this same receipt before it replaces the current basis (R5:
+the replacement is proposed by one model and reviewed against the measurement, not against its own confidence).
+
+**INTERIM.** Do not raise `docling_ceiling_s` (D-3023: never raise a ceiling to fit a reading). Do not retry the three
+already-quarantined `budget_expired` rows: a retry under the same allowance reproduces the same refusal, and the
+caller would learn nothing it did not already have.

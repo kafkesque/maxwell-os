@@ -1,0 +1,3197 @@
+{
+"generated": "2026-10-17T20:50:04.674635+00:00",
+"rows": [
+{
+"rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Opinions on Speculative Masonry - J Odiorne.pdf",
+"bytes": 49695297,
+"kind": "pdf",
+"pages": 286,
+"chars3": 0,
+"budget": 1500
+},
+{
+"rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Pansophic EA Study Guide.pdf",
+"bytes": 888840,
+"kind": "pdf",
+"pages": 54,
+"chars3": 6017,
+"budget": 333
+},
+{
+"rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Phil Hine - Walking Between The Worlds.pdf",
+"bytes": 117688,
+"kind": "pdf",
+"pages": 46,
+"chars3": 1646,
+"budget": 304
+},
+{
+"rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Philosophic Lodge of the Knights of the Eagle - Francken.pdf",
+"bytes": 4570211,
+"kind": "pdf",
+"pages": 48,
+"chars3": 0,
+"budget": 474
+},
+{
+"rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Reality Switch Technologies Psychedelics as Tools for the Discovery and Exploration of New Worlds (Andrew R. Gallimore) (Z-Library).pdf",
+"bytes": 21213801,
+"kind": "pdf",
+"pages": 336,
+"chars3": 317,
+"budget": 1109
+},
+{
+"rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Robert Anton Wilson - Cosmic Trigger I - The Final Secret Of The Illuminati.pdf",
+"bytes": 53006582,
+"kind": "pdf",
+"pages": 298,
+"chars3": 0,
+"budget": 1500
+},
+{
+"rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Robert Anton Wilson - MIT Encyclopedia of the Cognitive Scie.pdf",
+"bytes": 12072159,
+"kind": "pdf",
+"pages": 1097,
+"chars3": 273,
+"budget": 760
+},
+{
+"rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Robert Anton Wilson - Prometheus Rising.pdf",
+"bytes": 4149731,
+"kind": "pdf",
+"pages": 284,
+"chars3": 1354,
+"budget": 458
+},
+{
+"rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Robert J. Wallis - Shamans and Neo-Shamans.pdf",
+"bytes": 5271645,
+"kind": "pdf",
+"pages": 325,
+"chars3": 2217,
+"budget": 501
+},
+{
+"rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/SYMBOLS.PDF",
+"bytes": 2008080,
+"kind": "pdf",
+"pages": 32,
+"chars3": 1720,
+"budget": 376
+},
+{
+"rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Shaman Pablo Amaringo - Ayahuasca Visions - Ebook.pdf",
+"bytes": 3147286,
+"kind": "pdf",
+"pages": 132,
+"chars3": 4311,
+"budget": 420
+},
+{
+"rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Souls Of Distortion Awakening.pdf",
+"bytes": 4064419,
+"kind": "pdf",
+"pages": 192,
+"chars3": 5859,
+"budget": 455
+},
+{
+"rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Apocalypse of Freemasonry - F Castells.pdf",
+"bytes": 377971,
+"kind": "pdf",
+"pages": 230,
+"chars3": 444,
+"budget": 314
+},
+{
+"rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Arcane Schools - John Yarker.pdf",
+"bytes": 3217739,
+"kind": "pdf",
+"pages": 342,
+"chars3": 9084,
+"budget": 422
+},
+{
+"rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Baphomet Codex.pdf",
+"bytes": 3585548,
+"kind": "pdf",
+"pages": 237,
+"chars3": 2508,
+"budget": 436
+},
+{
+"rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Book of the Words - Albert Pike.pdf",
+"bytes": 6109725,
+"kind": "pdf",
+"pages": 177,
+"chars3": 60,
+"budget": 533
+},
+{
+"rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Builders A Story and Study of Masonary - J Newton.pdf",
+"bytes": 472725,
+"kind": "pdf",
+"pages": 131,
+"chars3": 2113,
+"budget": 318
+},
+{
+"rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Call Of Cthulhu - H.P. Lovecraft.pdf",
+"bytes": 1998734,
+"kind": "pdf",
+"pages": 34,
+"chars3": 0,
+"budget": 376
+},
+{
+"rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Constitutions of the Freemasons - 1734.pdf",
+"bytes": 1039040,
+"kind": "pdf",
+"pages": 51,
+"chars3": 3810,
+"budget": 339
+},
+{
+"rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Entered Apprentice Handbook - JSM Ward.pdf",
+"bytes": 311131,
+"kind": "pdf",
+"pages": 29,
+"chars3": 6345,
+"budget": 311
+},
+{
+"rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Fellow Crafts Handbook - JSM Ward.pdf",
+"bytes": 240498,
+"kind": "pdf",
+"pages": 23,
+"chars3": 8015,
+"budget": 309
+},
+{
+"rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Great Big Narcotics Cookbook.pdf",
+"bytes": 501289,
+"kind": "pdf",
+"pages": 98,
+"chars3": 1560,
+"budget": 319
+},
+{
+"rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Hidden Gears of Free Masonry.pdf",
+"bytes": 707180,
+"kind": "pdf",
+"pages": 18,
+"chars3": 12607,
+"budget": 326
+},
+{
+"rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Hidden Life in Freemasonry - CW Leadbeater.pdf",
+"bytes": 1473275,
+"kind": "pdf",
+"pages": 254,
+"chars3": 5630,
+"budget": 356
+},
+{
+"rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Higher Degrees Handbook - JSM Ward.pdf",
+"bytes": 175191,
+"kind": "pdf",
+"pages": 26,
+"chars3": 7785,
+"budget": 306
+},
+{
+"rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Master Masons Handbook - JSM Ward.pdf",
+"bytes": 322023,
+"kind": "pdf",
+"pages": 32,
+"chars3": 8585,
+"budget": 312
+},
+{
+"rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Mysteries of Freemasonry - Captain William Morgan.pdf",
+"bytes": 824798,
+"kind": "pdf",
+"pages": 187,
+"chars3": 4850,
+"budget": 331
+},
+{
+"rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Mysticism of Masonry - Unknown.pdf",
+"bytes": 187082,
+"kind": "pdf",
+"pages": 82,
+"chars3": 10616,
+"budget": 307
+},
+{
+"rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Necromantic Ritual Book.pdf",
+"bytes": 12700330,
+"kind": "pdf",
+"pages": 59,
+"chars3": 0,
+"budget": 784
+},
+{
+"rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Secret Book of Artephius.pdf",
+"bytes": 64539,
+"kind": "pdf",
+"pages": 14,
+"chars3": 4674,
+"budget": 302
+},
+{
+"rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Underworld Service-online.pdf",
+"bytes": 5328013,
+"kind": "pdf",
+"pages": 26,
+"chars3": 3084,
+"budget": 503
+},
+{
+"rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Vampire Predator Bible.pdf",
+"bytes": 27466068,
+"kind": "pdf",
+"pages": 29,
+"chars3": 0,
+"budget": 1347
+},
+{
+"rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The_Alchemy_Reader_From_Hermes_Trismegistus_to_Isaac_Newton-Cambridge_University_Press_2003.pdf",
+"bytes": 10924467,
+"kind": "pdf",
+"pages": 144,
+"chars3": 4212,
+"budget": 716
+},
+{
+"rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The_History_Book_-_Big_Ideas_Simply_Explained_By_DK.pdf",
+"bytes": 51718699,
+"kind": "pdf",
+"pages": 354,
+"chars3": 17,
+"budget": 1500
+},
+{
+"rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/ToV - Bloodlines.pdf",
+"bytes": 100329638,
+"kind": "pdf",
+"pages": 64,
+"chars3": 0,
+"budget": 1500
+},
+{
+"rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Twelve Keys.pdf",
+"bytes": 70312,
+"kind": "pdf",
+"pages": 24,
+"chars3": 5350,
+"budget": 302
+},
+{
+"rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/[Rupert_Sheldrake,_Terence_McKenna,_Ralph_Abraham](BookFi.org).pdf",
+"bytes": 347599,
+"kind": "pdf",
+"pages": 85,
+"chars3": 2495,
+"budget": 313
+},
+{
+"rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/[Terence_McKenna]_True_Hallucinations(BookFi.org).pdf",
+"bytes": 870191,
+"kind": "pdf",
+"pages": 179,
+"chars3": 151,
+"budget": 333
+},
+{
+"rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/[Terence_Mckenna]_The_Archaic_Revival_Speculation(BookFi.org).pdf",
+"bytes": 43708750,
+"kind": "pdf",
+"pages": 282,
+"chars3": 0,
+"budget": 1500
+},
+{
+"rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/_OceanofPDF.com_The_Psychology_of_Totalitarianism_-_Mattias_Desmet.pdf",
+"bytes": 4427592,
+"kind": "pdf",
+"pages": 217,
+"chars3": 2996,
+"budget": 468
+},
+{
+"rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/communication-design-principles-methods-and-practice.pdf",
+"bytes": 7001572,
+"kind": "pdf",
+"pages": 225,
+"chars3": 119,
+"budget": 567
+},
+{
+"rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/godmanwordmadefl00carerich.pdf",
+"bytes": 10755868,
+"kind": "pdf",
+"pages": 184,
+"chars3": 7,
+"budget": 710
+},
+{
+"rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/las-plantas-de-los-dioses-shultes-y-hofmann-1.pdf",
+"bytes": 44283648,
+"kind": "pdf",
+"pages": 197,
+"chars3": 0,
+"budget": 1500
+},
+{
+"rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/lexicon_of_alchemy.pdf",
+"bytes": 3108566,
+"kind": "pdf",
+"pages": 413,
+"chars3": 5253,
+"budget": 418
+},
+{
+"rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/pkpadmin,+DeMeo-20-3_Layout+1.pdf",
+"bytes": 578002,
+"kind": "pdf",
+"pages": 16,
+"chars3": 11132,
+"budget": 322
+},
+{
+"rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/wtwr.pdf",
+"bytes": 16127844,
+"kind": "pdf",
+"pages": 97,
+"chars3": 2359,
+"budget": 915
+},
+{
+"rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/mental+models+epistemology/Simulacra and Simulation (Jean Baudrillard, Sheila Faria Glaser) (Z-Library).pdf",
+"bytes": 488004,
+"kind": "pdf",
+"pages": 108,
+"chars3": 3909,
+"budget": 318
+},
+{
+"rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/mental+models+epistemology/The Agony of Power (Jean Baudrillard, Sylve\u0300re Lotringer) (Z-Library).pdf",
+"bytes": 1559048,
+"kind": "pdf",
+"pages": 127,
+"chars3": 840,
+"budget": 359
+},
+{
+"rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/mental+models+epistemology/The Illusion of the End (Jean Baudrillard translated by Chris Turner) (Z-Library).pdf",
+"bytes": 1766684,
+"kind": "pdf",
+"pages": 129,
+"chars3": 1972,
+"budget": 367
+},
+{
+"rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/mental+models+epistemology/The Spirit of Terrorism, New Revised Edition (Jean Baudrillard, Chris Turner) (Z-Library).pdf",
+"bytes": 5314928,
+"kind": "pdf",
+"pages": 52,
+"chars3": 3901,
+"budget": 502
+},
+{
+"rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/mental+models+epistemology/The post-existentialist neo-stoicism of Jason Xenakis and the stoic theory of suicide.pdf",
+"bytes": 4528991,
+"kind": "pdf",
+"pages": 10,
+"chars3": 17460,
+"budget": 472
+},
+{
+"rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/semiotics+meaning/Peirce-C-S-Logic-Semiotic.pdf",
+"bytes": 1141831,
+"kind": "pdf",
+"pages": 12,
+"chars3": 0,
+"budget": 343
+},
+{
+"rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/semiotics+meaning/Semiotics-the-Basics.pdf",
+"bytes": 1412611,
+"kind": "pdf",
+"pages": 326,
+"chars3": 1385,
+"budget": 353
+},
+{
+"rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/semiotics+meaning/robert c holub reception theory.pdf",
+"bytes": 849617,
+"kind": "pdf",
+"pages": 26,
+"chars3": 2126,
+"budget": 332
+},
+{
+"rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/semiotics+meaning/v. Halliday  Matthiessen - Hallidays Introduction to Functional Grammar.pdf",
+"bytes": 13783312,
+"kind": "pdf",
+"pages": 808,
+"chars3": 1633,
+"budget": 825
+},
+{
+"rel": "books/pdf/DOMAIN 2 Design/A_Dictionary_Of_Color_Combinations_Various2011.pdf",
+"bytes": 6930756,
+"kind": "pdf",
+"pages": 356,
+"chars3": 90,
+"budget": 564
+},
+{
+"rel": "books/pdf/DOMAIN 2 Design/Draplin Design Co. (Aaron James Draplin) (Z-Library).pdf",
+"bytes": 35292495,
+"kind": "pdf",
+"pages": 818,
+"chars3": 0,
+"budget": 1500
+},
+{
+"rel": "books/pdf/DOMAIN 2 Design/La paleta perfecta.pdf",
+"bytes": 1791588168,
+"kind": "pdf",
+"pages": 294,
+"chars3": 0,
+"budget": 1500
+},
+{
+"rel": "books/pdf/DOMAIN 2 Design/On Tyranny, Graphic Edition (Timothy Snyder) (Z-Library).pdf",
+"bytes": 194947687,
+"kind": "pdf",
+"pages": 66,
+"chars3": 0,
+"budget": 1500
+},
+{
+"rel": "books/pdf/DOMAIN 2 Design/Tweed-Valley-Forest-Park-Map-and-Trail-Guide.pdf",
+"bytes": 3919302,
+"kind": "pdf",
+"pages": 2,
+"chars3": 18350,
+"budget": 449
+},
+{
+"rel": "books/pdf/DOMAIN 2 Design/Visualizing Equations Essential Math for Game Devs .pdf",
+"bytes": 5227152,
+"kind": "pdf",
+"pages": 129,
+"chars3": 376,
+"budget": 499
+},
+{
+"rel": "books/pdf/DOMAIN 2 Design/communication+design/00913367.2014.920283.pdf",
+"bytes": 439806,
+"kind": "pdf",
+"pages": 12,
+"chars3": 12134,
+"budget": 316
+},
+{
+"rel": "books/pdf/DOMAIN 2 Design/communication+design/175630614X13787503069918.pdf",
+"bytes": 502823,
+"kind": "pdf",
+"pages": 17,
+"chars3": 4576,
+"budget": 319
+},
+{
+"rel": "books/pdf/DOMAIN 2 Design/communication+design/1bd7dd6c-8e4e-47a2-88b2-5063b82cf13b.pdf",
+"bytes": 1541988,
+"kind": "pdf",
+"pages": 19,
+"chars3": 8672,
+"budget": 358
+},
+{
+"rel": "books/pdf/DOMAIN 2 Design/communication+design/5\u7ae0_Sheet.pdf",
+"bytes": 6623678,
+"kind": "pdf",
+"pages": 2,
+"chars3": 0,
+"budget": 552
+},
+{
+"rel": "books/pdf/DOMAIN 2 Design/communication+design/Beyond_Visual_Metaphor_A_New_Typology_of_Visual_Rh.pdf",
+"bytes": 939439,
+"kind": "pdf",
+"pages": 25,
+"chars3": 6468,
+"budget": 335
+},
+{
+"rel": "books/pdf/DOMAIN 2 Design/communication+design/Blender_Pro_Tips_Modeling_and_Texturing_like_a_Professional_in_Blender.pdf",
+"bytes": 5688857,
+"kind": "pdf",
+"pages": 78,
+"chars3": 262,
+"budget": 517
+},
+{
+"rel": "books/pdf/DOMAIN 2 Design/communication+design/Challenge3 - AdvancedKeying.pdf",
+"bytes": 1057521,
+"kind": "pdf",
+"pages": 7,
+"chars3": 0,
+"budget": 340
+},
+{
+"rel": "books/pdf/DOMAIN 2 Design/communication+design/Closing the Loop Systems Thinking for Designers (Sheryl Cababa) (Z-Library).pdf",
+"bytes": 7728220,
+"kind": "pdf",
+"pages": 357,
+"chars3": 1382,
+"budget": 594
+},
+{
+"rel": "books/pdf/DOMAIN 2 Design/communication+design/ENG_Google_Translated_Ohira_Kouki_After_effects_for_Animation_BEGINNER.pdf",
+"bytes": 123949604,
+"kind": "pdf",
+"pages": 256,
+"chars3": 0,
+"budget": 1500
+},
+{
+"rel": "books/pdf/DOMAIN 2 Design/communication+design/Info_We_Trust_How_to_Inspire_the_World_with_Data.pdf",
+"bytes": 88530863,
+"kind": "pdf",
+"pages": 270,
+"chars3": 83,
+"budget": 1500
+},
+{
+"rel": "books/pdf/DOMAIN 2 Design/communication+design/The Psychology Behind Design.pdf",
+"bytes": 178587114,
+"kind": "pdf",
+"pages": 190,
+"chars3": 0,
+"budget": 1500
+},
+{
+"rel": "books/pdf/DOMAIN 2 Design/communication+design/Visualizing Financial Data_Julie Rodriguez, Piotr Kaczmarek_liber3.pdf",
+"bytes": 26265399,
+"kind": "pdf",
+"pages": 483,
+"chars3": 26,
+"budget": 1301
+},
+{
+"rel": "books/pdf/DOMAIN 2 Design/communication+design/[ENG Translated] After Effects for Animation EXPERT.pdf",
+"bytes": 170766092,
+"kind": "pdf",
+"pages": 343,
+"chars3": 0,
+"budget": 1500
+},
+{
+"rel": "books/pdf/DOMAIN 2 Design/communication+design/_Principles of three dimensional design._Wucius Wong_liber3.pdf",
+"bytes": 4604227,
+"kind": "pdf",
+"pages": 116,
+"chars3": 155,
+"budget": 475
+},
+{
+"rel": "books/pdf/DOMAIN 2 Design/communication+design/_principles-of-two-dimensional-design-by-wucius-wong_compress.pdf",
+"bytes": 33099804,
+"kind": "pdf",
+"pages": 96,
+"chars3": 0,
+"budget": 1500
+},
+{
+"rel": "books/pdf/DOMAIN 2 Design/communication+design/peterson2018.pdf",
+"bytes": 1522516,
+"kind": "pdf",
+"pages": 31,
+"chars3": 7164,
+"budget": 358
+},
+{
+"rel": "books/pdf/DOMAIN 2 Design/communication+design/phillips2004.pdf",
+"bytes": 586126,
+"kind": "pdf",
+"pages": 25,
+"chars3": 6198,
+"budget": 322
+},
+{
+"rel": "books/pdf/DOMAIN 2 Design/communication+design/rcl.11.2.07fen.pdf",
+"bytes": 5493554,
+"kind": "pdf",
+"pages": 16,
+"chars3": 8170,
+"budget": 509
+},
+{
+"rel": "books/pdf/DOMAIN 2 Design/communication+design/sco-003_2002_2__442_d.pdf",
+"bytes": 8929177,
+"kind": "pdf",
+"pages": 23,
+"chars3": 5335,
+"budget": 640
+},
+{
+"rel": "books/pdf/DOMAIN 2 Design/communication+design/vanmulken2010.pdf",
+"bytes": 280809,
+"kind": "pdf",
+"pages": 13,
+"chars3": 16067,
+"budget": 310
+},
+{
+"rel": "books/pdf/DOMAIN 2 Design/practice+process/How to Use Graphic Design to Sell Things, Explain Things, Make Things Look Better, Make People Laugh, Make People Cry, and\u2026 (Michael Bierut).pdf",
+"bytes": 35705816,
+"kind": "pdf",
+"pages": 162,
+"chars3": 187,
+"budget": 1500
+},
+{
+"rel": "books/pdf/DOMAIN 2 Design/practice+process/The Rules We Break Lessons in Play, Thinking, and Design (Eric Zimmerman) (Z-Library).pdf",
+"bytes": 20052914,
+"kind": "pdf",
+"pages": 208,
+"chars3": 37,
+"budget": 1064
+},
+{
+"rel": "books/pdf/DOMAIN 2 Design/practice+process/The_Creative_Act_A_Way_of_Being_Rick_Rubin_2023_Penguin_Publishing.pdf",
+"bytes": 5379524,
+"kind": "pdf",
+"pages": 248,
+"chars3": 0,
+"budget": 505
+},
+{
+"rel": "books/pdf/DOMAIN 2 Design/practice+process/lwm_23.pdf",
+"bytes": 14752777,
+"kind": "pdf",
+"pages": 157,
+"chars3": 3685,
+"budget": 862
+},
+{
+"rel": "books/pdf/DOMAIN 2 Design/visual+fundamentals/ saul bass.pdf",
+"bytes": 8483703,
+"kind": "pdf",
+"pages": 493,
+"chars3": 9,
+"budget": 623
+},
+{
+"rel": "books/pdf/DOMAIN 2 Design/visual+fundamentals/**Bringhurst, Robert - The Elements of Typographic Style.pdf",
+"bytes": 62561405,
+"kind": "pdf",
+"pages": 386,
+"chars3": 88,
+"budget": 1500
+},
+{
+"rel": "books/pdf/DOMAIN 2 Design/visual+fundamentals/Contemporary Processes Of Text Typeface Design (Michael Harkins) (Z-Library).pdf",
+"bytes": 4118776,
+"kind": "pdf",
+"pages": 165,
+"chars3": 1507,
+"budget": 457
+},
+{
+"rel": "books/pdf/DOMAIN 2 Design/visual+fundamentals/Designing Type_Karen Cheng_liber3.pdf",
+"bytes": 6230071,
+"kind": "pdf",
+"pages": 249,
+"chars3": 804,
+"budget": 537
+},
+{
+"rel": "books/pdf/DOMAIN 2 Design/visual+fundamentals/Gill_Eric_An_Essay_on_Typography.pdf",
+"bytes": 2233671,
+"kind": "pdf",
+"pages": 141,
+"chars3": 1579,
+"budget": 385
+},
+{
+"rel": "books/pdf/DOMAIN 2 Design/visual+fundamentals/Grid Systems in Graphic Design Raster Systeme Fur Die Visuele Gestaltung (German and English Edition)_Josef Muller-Brockmann_liber3.pdf",
+"bytes": 19175256,
+"kind": "pdf",
+"pages": 162,
+"chars3": 0,
+"budget": 1031
+},
+{
+"rel": "books/pdf/DOMAIN 2 Design/visual+fundamentals/How to create typefaces from sketch to screen (Cristo\u0301bal Henestrosa Matus, Jose\u0301 Scaglione) (Z-Library).pdf",
+"bytes": 84705163,
+"kind": "pdf",
+"pages": 130,
+"chars3": 0,
+"budget": 1500
+},
+{
+"rel": "books/pdf/DOMAIN 2 Design/visual+fundamentals/Jason-Santa-Maria_On-Web-Typography.pdf",
+"bytes": 9895431,
+"kind": "pdf",
+"pages": 152,
+"chars3": 2768,
+"budget": 677
+},
+{
+"rel": "books/pdf/DOMAIN 2 Design/visual+fundamentals/Manovich-Lev_The_Language_of_the_New_Media.pdf",
+"bytes": 33996264,
+"kind": "pdf",
+"pages": 202,
+"chars3": 0,
+"budget": 1500
+},
+{
+"rel": "books/pdf/DOMAIN 2 Design/visual+fundamentals/The Art of Color Scripting.pdf",
+"bytes": 3232670,
+"kind": "pdf",
+"pages": 62,
+"chars3": 0,
+"budget": 423
+},
+{
+"rel": "books/pdf/DOMAIN 2 Design/visual+fundamentals/\u0422\u0438\u043c\u043e\u0442\u0438 \u0421\u0430\u043c\u0430\u0440\u0430  \u00abMaking and Breaking the Grid\u00bb.pdf",
+"bytes": 40358812,
+"kind": "pdf",
+"pages": 109,
+"chars3": 0,
+"budget": 1500
+},
+{
+"rel": "books/pdf/DOMAIN 3 Art + Computational Media/FABE, M (2004) CLOSELY WATCHED FILMS- AN INTRODUCTION TO THE ART OF NARRATIVE FILM TECHNIQue.pdf",
+"bytes": 2915493,
+"kind": "pdf",
+"pages": 299,
+"chars3": 21,
+"budget": 411
+},
+{
+"rel": "books/pdf/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Art_Fundamentals_2nd_edition_Light,_shape,_color,_3DTotal_Publishing.pdf",
+"bytes": 29303443,
+"kind": "pdf",
+"pages": 147,
+"chars3": 0,
+"budget": 1417
+},
+{
+"rel": "books/pdf/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Coding_Art.pdf",
+"bytes": 3895019,
+"kind": "pdf",
+"pages": 284,
+"chars3": 595,
+"budget": 448
+},
+{
+"rel": "books/pdf/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/New aesthetics and art.pdf",
+"bytes": 29337566,
+"kind": "pdf",
+"pages": 280,
+"chars3": 1133,
+"budget": 1419
+},
+{
+"rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/20 ways paint more loosely.pdf",
+"bytes": 2530629,
+"kind": "pdf",
+"pages": 14,
+"chars3": 1890,
+"budget": 396
+},
+{
+"rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Animal Painting and Anatomy (Frank Calderon) (Z-Library).pdf",
+"bytes": 49592708,
+"kind": "pdf",
+"pages": 279,
+"chars3": 0,
+"budget": 1500
+},
+{
+"rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Charles_Bargue_Drawing_Course_text.pdf",
+"bytes": 6929513,
+"kind": "pdf",
+"pages": 214,
+"chars3": 1478,
+"budget": 564
+},
+{
+"rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Color and Light - James Gurney.pdf",
+"bytes": 56286796,
+"kind": "pdf",
+"pages": 226,
+"chars3": 0,
+"budget": 1500
+},
+{
+"rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Constructive Anatomy.pdf",
+"bytes": 7278146,
+"kind": "pdf",
+"pages": 224,
+"chars3": 232,
+"budget": 577
+},
+{
+"rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Draw 50 Animals ( PDFDrive.com ).pdf",
+"bytes": 5463071,
+"kind": "pdf",
+"pages": 61,
+"chars3": 0,
+"budget": 508
+},
+{
+"rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Draw+50+Airplanes,+Aircraft,+and+Spacecraft_+The+Step_by_Step+W.pdf",
+"bytes": 6220883,
+"kind": "pdf",
+"pages": 179,
+"chars3": 724,
+"budget": 537
+},
+{
+"rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/FORCE - Drawing Human Anatomy - 1E (2016).pdf",
+"bytes": 16828286,
+"kind": "pdf",
+"pages": 334,
+"chars3": 61,
+"budget": 941
+},
+{
+"rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Figure Drawing.pdf",
+"bytes": 7825900,
+"kind": "pdf",
+"pages": 31,
+"chars3": 1521,
+"budget": 598
+},
+{
+"rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Gary Faigin - The Artist's Complete Guide To Facial Expression.pdf",
+"bytes": 115607603,
+"kind": "pdf",
+"pages": 291,
+"chars3": 0,
+"budget": 1500
+},
+{
+"rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/How to Draw Cars the Hot Wheels Way (Scott Robertson) (Z-Library).pdf",
+"bytes": 36452580,
+"kind": "pdf",
+"pages": 124,
+"chars3": 0,
+"budget": 1500
+},
+{
+"rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Justin_R_Martin_Poses_For_Artists_Original_Character_Workbook_Volume.pdf",
+"bytes": 4562507,
+"kind": "pdf",
+"pages": 126,
+"chars3": 0,
+"budget": 474
+},
+{
+"rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Perspective  - Drawing Perspective Made Easy.pdf",
+"bytes": 17857469,
+"kind": "pdf",
+"pages": 228,
+"chars3": 0,
+"budget": 981
+},
+{
+"rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Perspective_Drawing_Handbook-JosephDAmelio.pdf",
+"bytes": 46148566,
+"kind": "pdf",
+"pages": 98,
+"chars3": 0,
+"budget": 1500
+},
+{
+"rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Preview_Mastering_Manga_How_to_Draw_Manga_Scenes_Crilley,_Mark_Z.pdf",
+"bytes": 5947861,
+"kind": "pdf",
+"pages": 90,
+"chars3": 649,
+"budget": 526
+},
+{
+"rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Sample_Draw_and_animate_your_manga_characters_The_Complete_Guide.pdf",
+"bytes": 4027358,
+"kind": "pdf",
+"pages": 24,
+"chars3": 33,
+"budget": 453
+},
+{
+"rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Sketching for the Absolute Beginner.pdf",
+"bytes": 131222178,
+"kind": "pdf",
+"pages": 148,
+"chars3": 0,
+"budget": 1500
+},
+{
+"rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Stonehouses Anatomy (Incomplete - 555 pages only) (Seok Jung Hyun) (Z-Library).pdf",
+"bytes": 79156138,
+"kind": "pdf",
+"pages": 556,
+"chars3": 1405,
+"budget": 1500
+},
+{
+"rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Ten_Step_Drawing_People_Draw_a_range_of_figures_&_faces_in_10_easy.pdf",
+"bytes": 5829850,
+"kind": "pdf",
+"pages": 132,
+"chars3": 330,
+"budget": 522
+},
+{
+"rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/The_Practice_of_Drawing_and_Painting_Lan.pdf",
+"bytes": 8790397,
+"kind": "pdf",
+"pages": 175,
+"chars3": 196,
+"budget": 635
+},
+{
+"rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/[Mike_Mattesi]_Force_Dynamic_Life_Drawing_for_Ani(b-ok.org).pdf",
+"bytes": 10674590,
+"kind": "pdf",
+"pages": 246,
+"chars3": 42,
+"budget": 707
+},
+{
+"rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/[Mike_Mattesi]_Force_The_Key_to_Capturing_Life_Th(b-ok.org).pdf",
+"bytes": 41718677,
+"kind": "pdf",
+"pages": 192,
+"chars3": 0,
+"budget": 1500
+},
+{
+"rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/[Walter_Foster_Creative_Team,_Walter_Foster_Publis(b-ok.xyz).pdf",
+"bytes": 104510030,
+"kind": "pdf",
+"pages": 145,
+"chars3": 0,
+"budget": 1500
+},
+{
+"rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/color-in-shadows.pdf",
+"bytes": 642952,
+"kind": "pdf",
+"pages": 2,
+"chars3": 4587,
+"budget": 324
+},
+{
+"rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/composition of outdoor painting.pdf",
+"bytes": 351179,
+"kind": "pdf",
+"pages": 5,
+"chars3": 1524,
+"budget": 313
+},
+{
+"rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/dl2-5.pdf",
+"bytes": 6057077,
+"kind": "pdf",
+"pages": 157,
+"chars3": 730,
+"budget": 531
+},
+{
+"rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/how to draw locomotives.pdf",
+"bytes": 3902160,
+"kind": "pdf",
+"pages": 68,
+"chars3": 201,
+"budget": 448
+},
+{
+"rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/lofi_Rosa_Menkman_-_A_Vernacular_of_File_Formats.pdf",
+"bytes": 7941617,
+"kind": "pdf",
+"pages": 24,
+"chars3": 7255,
+"budget": 602
+},
+{
+"rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/the-natural-way-to-draw-kimon-nicolaides.pdf",
+"bytes": 47041150,
+"kind": "pdf",
+"pages": 237,
+"chars3": 0,
+"budget": 1500
+},
+{
+"rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/yanBOOK.pdf",
+"bytes": 79884748,
+"kind": "pdf",
+"pages": 190,
+"chars3": 0,
+"budget": 1500
+},
+{
+"rel": "books/pdf/DOMAIN 3 Art + Computational Media/screenplay.pdf",
+"bytes": 5069335,
+"kind": "pdf",
+"pages": 340,
+"chars3": 2568,
+"budget": 493
+},
+{
+"rel": "books/pdf/DOMAIN 4 Business/Business guide.pdf",
+"bytes": 2048149,
+"kind": "pdf",
+"pages": 9,
+"chars3": 0,
+"budget": 378
+},
+{
+"rel": "books/pdf/DOMAIN 4 Business/organizations+leadership/100M Offers How To Make Offers So Good People Feel Stupid Saying No (Alex Hormozi) (Z-Library).pdf",
+"bytes": 3302640,
+"kind": "pdf",
+"pages": 225,
+"chars3": 117,
+"budget": 425
+},
+{
+"rel": "books/pdf/DOMAIN 4 Business/practice+economics/Made by James (James Martin  Made by James) (Z-Library).pdf",
+"bytes": 39149170,
+"kind": "pdf",
+"pages": 314,
+"chars3": 0,
+"budget": 1500
+},
+{
+"rel": "books/pdf/DOMAIN 4 Business/practice+economics/Shaughnessy, Adrian - How to be a Graphic Designer without Losing your Soul 150dpi.pdf",
+"bytes": 26232190,
+"kind": "pdf",
+"pages": 164,
+"chars3": 0,
+"budget": 1300
+},
+{
+"rel": "books/pdf/DOMAIN 4 Business/practice+economics/You \u0301re My Favorite Client_Mike Monteiro_liber3.pdf",
+"bytes": 910372,
+"kind": "pdf",
+"pages": 135,
+"chars3": 635,
+"budget": 334
+},
+{
+"rel": "books/pdf/DOMAIN 5 Personal Practice/habits+behavior+change/Behavior Operations Manual (Chase Hughes) (Z-Library).pdf",
+"bytes": 97257626,
+"kind": "pdf",
+"pages": 1027,
+"chars3": 0,
+"budget": 1500
+},
+{
+"rel": "books/pdf/DOMAIN 5 Personal Practice/habits+behavior+change/The Behavior Operations Manual Neuro-Cognitive Intelligence (Chase Hughes) (Z-Library).pdf",
+"bytes": 9848979,
+"kind": "pdf",
+"pages": 249,
+"chars3": 0,
+"budget": 675
+},
+{
+"rel": "books/pdf/DOMAIN 5 Personal Practice/mood+therapy/Cosmic Trigger The Final Secret of the Illuminati (Robert Anton Wilson) (Z-Library).pdf",
+"bytes": 4075644,
+"kind": "pdf",
+"pages": 292,
+"chars3": 47,
+"budget": 455
+},
+{
+"rel": "books/pdf/DOMAIN 5 Personal Practice/mood+therapy/Hamvas Be\u0301la - Scienta Sacra 1. Ko\u0308tet.pdf",
+"bytes": 911281,
+"kind": "pdf",
+"pages": 165,
+"chars3": 5321,
+"budget": 334
+},
+{
+"rel": "books/pdf/DOMAIN 5 Personal Practice/mood+therapy/Men's Sexual Health - Fitness for Satisfying Sex By Barry W. McCarthy.pdf",
+"bytes": 3764730,
+"kind": "pdf",
+"pages": 226,
+"chars3": 103,
+"budget": 443
+},
+{
+"rel": "books/pdf/DOMAIN 5 Personal Practice/mood+therapy/Quantum Psychology (Robert Anton Wilson) (Z-Library).pdf",
+"bytes": 8359259,
+"kind": "pdf",
+"pages": 206,
+"chars3": 0,
+"budget": 618
+},
+{
+"rel": "books/pdf/DOMAIN 5 Personal Practice/mood+therapy/The Body Language of Sex, Power & Aggression.pdf",
+"bytes": 595053,
+"kind": "pdf",
+"pages": 184,
+"chars3": 872,
+"budget": 322
+},
+{
+"rel": "books/pdf/DOMAIN 5 Personal Practice/mood+therapy/the art of loving.pdf",
+"bytes": 1225658,
+"kind": "pdf",
+"pages": 148,
+"chars3": 2194,
+"budget": 346
+},
+{
+"rel": "books/pdf/DOMAIN 5 Personal Practice/productivity+execution/'Make Electronics by Charles Platt.pdf.pdf'.pdf",
+"bytes": 17939858,
+"kind": "pdf",
+"pages": 351,
+"chars3": 79,
+"budget": 984
+},
+{
+"rel": "books/pdf/DOMAIN 5 Personal Practice/productivity+execution/Atomic_Habits_Tiny_Changes,_Remarkable_Results_James_Clear_PDF.pdf",
+"bytes": 6120516,
+"kind": "pdf",
+"pages": 290,
+"chars3": 0,
+"budget": 533
+},
+{
+"rel": "books/pdf/DOMAIN 5 Personal Practice/productivity+execution/Authentic Revolution Games Manual FINAL.pdf",
+"bytes": 50931296,
+"kind": "pdf",
+"pages": 224,
+"chars3": 1202,
+"budget": 1500
+},
+{
+"rel": "books/pdf/DOMAIN 5 Personal Practice/productivity+execution/Circuit-bending build your own alien instruments (Reed Ghazala) (Z-Library).pdf",
+"bytes": 10834382,
+"kind": "pdf",
+"pages": 435,
+"chars3": 62,
+"budget": 713
+},
+{
+"rel": "books/pdf/DOMAIN 5 Personal Practice/productivity+execution/Encyclopedia of Electronic Components Volume 1.pdf",
+"bytes": 33479972,
+"kind": "pdf",
+"pages": 302,
+"chars3": 123,
+"budget": 1500
+},
+{
+"rel": "books/pdf/DOMAIN 5 Personal Practice/productivity+execution/IJRITCC_1349.pdf",
+"bytes": 450430,
+"kind": "pdf",
+"pages": 6,
+"chars3": 11580,
+"budget": 317
+},
+{
+"rel": "books/pdf/DOMAIN 5 Personal Practice/productivity+execution/Internationa Taxation.pdf",
+"bytes": 19601266,
+"kind": "pdf",
+"pages": 26,
+"chars3": 1880,
+"budget": 1047
+},
+{
+"rel": "books/pdf/DOMAIN 5 Personal Practice/productivity+execution/Sansui-AV-77-Service-Manual.pdf",
+"bytes": 6445329,
+"kind": "pdf",
+"pages": 17,
+"chars3": 0,
+"budget": 545
+},
+{
+"rel": "books/pdf/DOMAIN 5 Personal Practice/productivity+execution/The Writer's Idea Thesaurus - Fred White.pdf",
+"bytes": 9502208,
+"kind": "pdf",
+"pages": 322,
+"chars3": 3918,
+"budget": 662
+},
+{
+"rel": "books/pdf/DOMAIN 5 Personal Practice/productivity+execution/What's_Your_Dream_Find_Your_Passion,_Love_Your_Work_and_Build_a.pdf",
+"bytes": 3947316,
+"kind": "pdf",
+"pages": 261,
+"chars3": 609,
+"budget": 450
+},
+{
+"rel": "books/pdf/DOMAIN 5 Personal Practice/productivity+execution/kupdf.com_how-to-test-almost-everything-electronic-3rd-ed.pdf",
+"bytes": 13861114,
+"kind": "pdf",
+"pages": 337,
+"chars3": 0,
+"budget": 828
+},
+{
+"rel": "books/pdf/DOMAIN 5 Personal Practice/productivity+execution/oreilly-make-more-electronics-2014.pdf",
+"bytes": 49727037,
+"kind": "pdf",
+"pages": 783,
+"chars3": 163,
+"budget": 1500
+},
+{
+"rel": "books/pdf/DOMAIN 5 Personal Practice/productivity+execution/the-orgone-accumulator-handbook.pdf",
+"bytes": 22612671,
+"kind": "pdf",
+"pages": 175,
+"chars3": 0,
+"budget": 1162
+},
+{
+"rel": "books/pdf/DOMAIN 6 AI + Computing/210912-LB-Network-Map.pdf",
+"bytes": 4079473,
+"kind": "pdf",
+"pages": 1,
+"chars3": 87,
+"budget": 455
+},
+{
+"rel": "books/pdf/DOMAIN 6 AI + Computing/Bitcoin Mining Handbook.pdf",
+"bytes": 4451770,
+"kind": "pdf",
+"pages": 105,
+"chars3": 990,
+"budget": 469
+},
+{
+"rel": "books/pdf/DOMAIN 6 AI + Computing/programming/  .pdf",
+"bytes": 3480513,
+"kind": "pdf",
+"pages": 352,
+"chars3": 1458,
+"budget": 432
+},
+{
+"rel": "books/pdf/DOMAIN 6 AI + Computing/programming/Amariei C. - Arduino Development Cookbook - 2015.pdf",
+"bytes": 3948476,
+"kind": "pdf",
+"pages": 246,
+"chars3": 1396,
+"budget": 450
+},
+{
+"rel": "books/pdf/DOMAIN 6 AI + Computing/programming/Designing_the_Internet_of_Things.pdf",
+"bytes": 5200025,
+"kind": "pdf",
+"pages": 338,
+"chars3": 64,
+"budget": 498
+},
+{
+"rel": "books/pdf/DOMAIN 6 AI + Computing/programming/KRUMM, J. (2009) UBIQUITOUS COMPUTING FUNDAMENTALS- CRC PRESS, 1st ed. .pdf",
+"bytes": 8118021,
+"kind": "pdf",
+"pages": 410,
+"chars3": 33,
+"budget": 609
+},
+{
+"rel": "books/pdf/DOMAIN 6 AI + Computing/programming/Processing- A Programming Handbook for Visual Designers and Artists, 2 edition.pdf",
+"bytes": 15889378,
+"kind": "pdf",
+"pages": 663,
+"chars3": 60,
+"budget": 906
+},
+{
+"rel": "books/pdf/DOMAIN 6 AI + Computing/programming/SkienaTheAlgorithmDesignManual.pdf",
+"bytes": 4082875,
+"kind": "pdf",
+"pages": 739,
+"chars3": 1589,
+"budget": 455
+},
+{
+"rel": "books/pdf/DOMAIN 6 AI + Computing/programming/[Matt_Pearson]_Generative_Art(BookFi.org).pdf",
+"bytes": 17538492,
+"kind": "pdf",
+"pages": 241,
+"chars3": 118,
+"budget": 969
+},
+{
+"rel": "books/pdf/DOMAIN 6 AI + Computing/programming/_OceanofPDF.com_clean-code.pdf",
+"bytes": 4261722,
+"kind": "pdf",
+"pages": 462,
+"chars3": 1642,
+"budget": 462
+},
+{
+"rel": "books/pdf/DOMAIN 7 Influence + Power/Police-Auction-Catalogue-February-2024.pdf",
+"bytes": 5059624,
+"kind": "pdf",
+"pages": 28,
+"chars3": 7432,
+"budget": 493
+},
+{
+"rel": "journals_notes/DOMAIN 0 Systems + Decision/r27121.pdf",
+"bytes": 78070,
+"kind": "pdf",
+"pages": 15,
+"chars3": 10517,
+"budget": 302
+},
+{
+"rel": "journals_notes/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/136.full.pdf",
+"bytes": 78058,
+"kind": "pdf",
+"pages": 9,
+"chars3": 13980,
+"budget": 302
+},
+{
+"rel": "journals_notes/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/List-79F64E28-2BE4-FC74-C2C1-9C562EFFFCAD-bibliography.pdf",
+"bytes": 53787,
+"kind": "pdf",
+"pages": 10,
+"chars3": 7243,
+"budget": 302
+},
+{
+"rel": "journals_notes/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/language/9423-34509-2-PB.pdf",
+"bytes": 580479,
+"kind": "pdf",
+"pages": 11,
+"chars3": 7821,
+"budget": 322
+},
+{
+"rel": "journals_notes/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/rhetoric/Marcel Danesi.pdf",
+"bytes": 122421,
+"kind": "pdf",
+"pages": 17,
+"chars3": 8163,
+"budget": 304
+},
+{
+"rel": "journals_notes/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/semiotics/kupdf.net_semiotics.pdf",
+"bytes": 2801106,
+"kind": "pdf",
+"pages": 20,
+"chars3": 40,
+"budget": 406
+},
+{
+"rel": "journals_notes/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/semiotics/visual semiotics/15.pdf",
+"bytes": 406351,
+"kind": "pdf",
+"pages": 5,
+"chars3": 17818,
+"budget": 315
+},
+{
+"rel": "journals_notes/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/semiotics/visual semiotics/linguagem_ensino_nascimento.pdf",
+"bytes": 1647380,
+"kind": "pdf",
+"pages": 32,
+"chars3": 7439,
+"budget": 362
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/Color/BRLeeuwen2011.pdf",
+"bytes": 378884,
+"kind": "pdf",
+"pages": 6,
+"chars3": 11876,
+"budget": 314
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/Color/synestesia.pdf",
+"bytes": 121855,
+"kind": "pdf",
+"pages": 15,
+"chars3": 11434,
+"budget": 304
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/Handbook_Of_Interior_Lighting_Design_by_Ru\u0308diger_Ganslandt,_Harald.pdf",
+"bytes": 4451182,
+"kind": "pdf",
+"pages": 289,
+"chars3": 925,
+"budget": 469
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/Interactive_documentary_and_live_perform.pdf",
+"bytes": 250502,
+"kind": "pdf",
+"pages": 15,
+"chars3": 7669,
+"budget": 309
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/Typography/SemioticsofTypography.pdf",
+"bytes": 792349,
+"kind": "pdf",
+"pages": 20,
+"chars3": 6954,
+"budget": 330
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/Typography/ThePrinciplesoftheNewTypography.pdf",
+"bytes": 11925613,
+"kind": "pdf",
+"pages": 14,
+"chars3": 0,
+"budget": 754
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/Typography/Typography Today Emotion Recognition in Typography.pdf",
+"bytes": 260237,
+"kind": "pdf",
+"pages": 10,
+"chars3": 8955,
+"budget": 309
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/Typography/desi.2006.22.1.89.pdf",
+"bytes": 1566024,
+"kind": "pdf",
+"pages": 2,
+"chars3": 7546,
+"budget": 359
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/Typography/kinetic typography/ Typography in Motion  A Framework of Moving Type Use.pdf",
+"bytes": 1227006,
+"kind": "pdf",
+"pages": 14,
+"chars3": 15892,
+"budget": 346
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/Typography/kinetic typography/1-s2.0-S2351978915009658-main.pdf",
+"bytes": 98981,
+"kind": "pdf",
+"pages": 4,
+"chars3": 12001,
+"budget": 303
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/Typography/kinetic typography/10.1080@10350330.2019.1568957.pdf",
+"bytes": 3004543,
+"kind": "pdf",
+"pages": 21,
+"chars3": 5817,
+"budget": 414
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/Typography/kinetic typography/Automatic_kinetic_typography_composer.pdf",
+"bytes": 125249,
+"kind": "pdf",
+"pages": 5,
+"chars3": 11220,
+"budget": 304
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/Typography/kinetic typography/Bringing_the_Text_to_Life_Automatically.pdf",
+"bytes": 235505,
+"kind": "pdf",
+"pages": 8,
+"chars3": 10582,
+"budget": 308
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/Typography/kinetic typography/Dances with Words.pdf",
+"bytes": 122455,
+"kind": "pdf",
+"pages": 6,
+"chars3": 16476,
+"budget": 304
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/Typography/kinetic typography/Emotional Expression and Effective Communication on Kinetic  Typography.pdf",
+"bytes": 611581,
+"kind": "pdf",
+"pages": 8,
+"chars3": 14004,
+"budget": 323
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/Typography/kinetic typography/Fluid Typography -Construction, Metamorphosis and Revelation Barbara Brownie.pdf",
+"bytes": 399077,
+"kind": "pdf",
+"pages": 15,
+"chars3": 6571,
+"budget": 315
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/Typography/kinetic typography/Integrating Typography and Motion in Visual Communication.pdf",
+"bytes": 374919,
+"kind": "pdf",
+"pages": 9,
+"chars3": 6706,
+"budget": 314
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/Typography/kinetic typography/Ironic_Expressions_and_Moving_Words.pdf",
+"bytes": 235407,
+"kind": "pdf",
+"pages": 12,
+"chars3": 8762,
+"budget": 308
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/Typography/kinetic typography/Jeremy+Downes+Dissertation.pdf",
+"bytes": 1575905,
+"kind": "pdf",
+"pages": 20,
+"chars3": 2819,
+"budget": 360
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/Typography/kinetic typography/KinTypo_22yrs_v5.pdf",
+"bytes": 2322107,
+"kind": "pdf",
+"pages": 25,
+"chars3": 246,
+"budget": 388
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/Typography/kinetic typography/Kinetic Typography-Based Instant Messaging.pdf",
+"bytes": 152221,
+"kind": "pdf",
+"pages": 2,
+"chars3": 8392,
+"budget": 305
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/Typography/kinetic typography/Lee_Jun_DIS06.pdf",
+"bytes": 388294,
+"kind": "pdf",
+"pages": 11,
+"chars3": 7808,
+"budget": 314
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/Typography/kinetic typography/Luiz F. Las_Casas Cinedesign-typography in motion pictures.pdf",
+"bytes": 579315,
+"kind": "pdf",
+"pages": 8,
+"chars3": 12714,
+"budget": 322
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/Typography/kinetic typography/MeSSCA_Brownie_FluidType.pdf",
+"bytes": 264265,
+"kind": "pdf",
+"pages": 7,
+"chars3": 9212,
+"budget": 310
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/Typography/kinetic typography/Notes towards a semiotics of kinetic typography2015.pdf",
+"bytes": 792029,
+"kind": "pdf",
+"pages": 11,
+"chars3": 9524,
+"budget": 330
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/Typography/kinetic typography/Phrase Animation Generation Based on.pdf",
+"bytes": 812273,
+"kind": "pdf",
+"pages": 7,
+"chars3": 14893,
+"budget": 330
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/Typography/kinetic typography/Robotype Studies of Kinetic Typography by Robot Display.pdf",
+"bytes": 335621,
+"kind": "pdf",
+"pages": 9,
+"chars3": 9372,
+"budget": 312
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/Typography/kinetic typography/The Behaviours of Fluid Characterforms in Temporal Typography.pdf",
+"bytes": 39848275,
+"kind": "pdf",
+"pages": 334,
+"chars3": 3220,
+"budget": 1500
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/Typography/kinetic typography/bvai07.pdf",
+"bytes": 206457,
+"kind": "pdf",
+"pages": 16,
+"chars3": 6508,
+"budget": 307
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/Typography/kinetic typography/he2017.pdf",
+"bytes": 2662398,
+"kind": "pdf",
+"pages": 30,
+"chars3": 8554,
+"budget": 401
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/Typography/kinetic typography/writingdesign.pdf",
+"bytes": 583281,
+"kind": "pdf",
+"pages": 15,
+"chars3": 6571,
+"budget": 322
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/Typography/multimodality/serafini-typography.pdf",
+"bytes": 276750,
+"kind": "pdf",
+"pages": 16,
+"chars3": 6506,
+"budget": 310
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/Typography/typographical signification/Towards a semiotics of typography.pdf",
+"bytes": 2897435,
+"kind": "pdf",
+"pages": 17,
+"chars3": 7620,
+"budget": 410
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/Typography/typographical signification/Towards_a_Typology_of_Typographic_Signif.pdf",
+"bytes": 3869421,
+"kind": "pdf",
+"pages": 80,
+"chars3": 2982,
+"budget": 447
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/branding/logo-file-formats.pdf",
+"bytes": 1250468,
+"kind": "pdf",
+"pages": 3,
+"chars3": 1707,
+"budget": 347
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/branding/text/alt-text-made-easy.pdf",
+"bytes": 1286702,
+"kind": "pdf",
+"pages": 9,
+"chars3": 1136,
+"budget": 349
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/design-notes/Commandments Of Visual Thinking by Dan Roam.pdf",
+"bytes": 869099,
+"kind": "pdf",
+"pages": 14,
+"chars3": 2557,
+"budget": 333
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/design-notes/Folder structure/[My Business] Folder/Read Me - Business Folder.pdf",
+"bytes": 795645,
+"kind": "pdf",
+"pages": 1,
+"chars3": 586,
+"budget": 330
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/design-notes/branding/logo design/Logo Trend Report.pdf",
+"bytes": 2599449,
+"kind": "pdf",
+"pages": 23,
+"chars3": 872,
+"budget": 399
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/design-notes/creative focus worksheet.pdf",
+"bytes": 100248,
+"kind": "pdf",
+"pages": 9,
+"chars3": 3033,
+"budget": 303
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Conducting-an-Interview-with-Empathy.pdf",
+"bytes": 147715,
+"kind": "pdf",
+"pages": 2,
+"chars3": 2362,
+"budget": 305
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/design-notes/pdf/5-accessibility-mistakes.pdf",
+"bytes": 682674,
+"kind": "pdf",
+"pages": 8,
+"chars3": 1544,
+"budget": 326
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/design-notes/pdf/After Effect Lab.pdf",
+"bytes": 2118318,
+"kind": "pdf",
+"pages": 30,
+"chars3": 2585,
+"budget": 380
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/design-notes/pdf/Canny-The-Complete-Website-Checklist 1.pdf",
+"bytes": 1390792,
+"kind": "pdf",
+"pages": 29,
+"chars3": 680,
+"budget": 353
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/design-notes/pdf/Canny-The-Ultimate-Small-Business-Branding-Guide.pdf",
+"bytes": 1562553,
+"kind": "pdf",
+"pages": 51,
+"chars3": 652,
+"budget": 359
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/design-notes/pdf/Indesign/Chelius_L6148_Workbook_1601585886800001qEgM.pdf",
+"bytes": 1258097,
+"kind": "pdf",
+"pages": 28,
+"chars3": 3015,
+"budget": 347
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/design-notes/pdf/L6140_L8024_Harmer_1602772442395001EYpQ.pdf",
+"bytes": 3679932,
+"kind": "pdf",
+"pages": 14,
+"chars3": 3388,
+"budget": 440
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/design-notes/pdf/L6147_L8025_InDesignTypeandLayout_NigelFrench_1602960488881001SAtP.pdf",
+"bytes": 6691586,
+"kind": "pdf",
+"pages": 30,
+"chars3": 3367,
+"budget": 555
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/design-notes/pdf/Managing International Suppliers.pdf",
+"bytes": 38493306,
+"kind": "pdf",
+"pages": 3,
+"chars3": 5635,
+"budget": 1500
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/design-notes/pdf/Personal-Branding-Toolkit.pdf",
+"bytes": 1577546,
+"kind": "pdf",
+"pages": 44,
+"chars3": 1712,
+"budget": 360
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/design-notes/pdf/Sound design/Acustic.pdf",
+"bytes": 976045,
+"kind": "pdf",
+"pages": 5,
+"chars3": 0,
+"budget": 337
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/design-notes/pdf/Sound design/Automation.pdf",
+"bytes": 803899,
+"kind": "pdf",
+"pages": 6,
+"chars3": 0,
+"budget": 330
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/design-notes/pdf/Sound design/Editing.pdf",
+"bytes": 316243,
+"kind": "pdf",
+"pages": 5,
+"chars3": 0,
+"budget": 312
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/design-notes/pdf/Sound design/Kerdesek.pdf",
+"bytes": 217914,
+"kind": "pdf",
+"pages": 4,
+"chars3": 0,
+"budget": 308
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/design-notes/pdf/Sound design/Mastering.pdf",
+"bytes": 924318,
+"kind": "pdf",
+"pages": 5,
+"chars3": 0,
+"budget": 335
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/design-notes/pdf/Sound design/Mixing.pdf",
+"bytes": 690932,
+"kind": "pdf",
+"pages": 5,
+"chars3": 0,
+"budget": 326
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/design-notes/pdf/Sound design/Notebook7.pdf",
+"bytes": 333699,
+"kind": "pdf",
+"pages": 2,
+"chars3": 0,
+"budget": 312
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/design-notes/pdf/Sound design/Notebook8.pdf",
+"bytes": 1373,
+"kind": "pdf",
+"pages": 1,
+"chars3": 0,
+"budget": 300
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/design-notes/pdf/Sound design/Notebook9.pdf",
+"bytes": 1373,
+"kind": "pdf",
+"pages": 1,
+"chars3": 0,
+"budget": 300
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/design-notes/pdf/Sound design/Pro Tools.pdf",
+"bytes": 19444610,
+"kind": "pdf",
+"pages": 337,
+"chars3": 3586,
+"budget": 1041
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/design-notes/pdf/Sound design/Questlove_Teaches_Music_Curation_and_DJing_MasterClass.pdf",
+"bytes": 21450963,
+"kind": "pdf",
+"pages": 34,
+"chars3": 2345,
+"budget": 1118
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/design-notes/pdf/Sound design/Signal processing.pdf",
+"bytes": 2183357,
+"kind": "pdf",
+"pages": 12,
+"chars3": 0,
+"budget": 383
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/design-notes/pdf/lee2015.pdf",
+"bytes": 941585,
+"kind": "pdf",
+"pages": 7,
+"chars3": 11864,
+"budget": 335
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/design-notes/pdf/mind framing.pdf",
+"bytes": 102678,
+"kind": "pdf",
+"pages": 22,
+"chars3": 157,
+"budget": 303
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/design-notes/pdf/newkind-toolkit-developing-brand-voice-in-tech.pdf",
+"bytes": 614431,
+"kind": "pdf",
+"pages": 12,
+"chars3": 1716,
+"budget": 323
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/design-notes/pdf/one6creative_content_ideas_for_designers.pdf",
+"bytes": 565274,
+"kind": "pdf",
+"pages": 9,
+"chars3": 2823,
+"budget": 321
+},
+{
+"rel": "journals_notes/DOMAIN 2 Design/design-notes/permission-marketing-200903065314.pdf",
+"bytes": 4017861,
+"kind": "pdf",
+"pages": 66,
+"chars3": 511,
+"budget": 453
+},
+{
+"rel": "journals_notes/DOMAIN 3 Art + Computational Media/Interactive_documentary_and_live_perform.pdf",
+"bytes": 250502,
+"kind": "pdf",
+"pages": 15,
+"chars3": 7669,
+"budget": 309
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/Blunt House TA.pdf",
+"bytes": 88118,
+"kind": "pdf",
+"pages": 24,
+"chars3": 1180,
+"budget": 303
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/IdentityLectureNotes.pdf",
+"bytes": 144111,
+"kind": "pdf",
+"pages": 10,
+"chars3": 13438,
+"budget": 305
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Branching Out/One Careful Owner.pdf",
+"bytes": 38339900,
+"kind": "pdf",
+"pages": 3,
+"chars3": 3290,
+"budget": 1500
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Decisions Decisions/Knowing when to stop.pdf",
+"bytes": 38487814,
+"kind": "pdf",
+"pages": 3,
+"chars3": 5131,
+"budget": 1500
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Decisions Decisions/Looking to the future.pdf",
+"bytes": 38556273,
+"kind": "pdf",
+"pages": 3,
+"chars3": 5109,
+"budget": 1500
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Decisions Decisions/The delicate art of turning away clients.pdf",
+"bytes": 40039825,
+"kind": "pdf",
+"pages": 3,
+"chars3": 4704,
+"budget": 1500
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Decisions Decisions/Wrestling with doubt.pdf",
+"bytes": 39083078,
+"kind": "pdf",
+"pages": 3,
+"chars3": 4574,
+"budget": 1500
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Get Up& Go/Dividing Your Time Between Creativity and Business.pdf",
+"bytes": 38339513,
+"kind": "pdf",
+"pages": 3,
+"chars3": 5293,
+"budget": 1500
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Get Up& Go/Ideas are the New Craft.pdf",
+"bytes": 42009581,
+"kind": "pdf",
+"pages": 4,
+"chars3": 5411,
+"budget": 1500
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Get Up& Go/Making Fun Pay.pdf",
+"bytes": 38613330,
+"kind": "pdf",
+"pages": 4,
+"chars3": 5424,
+"budget": 1500
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Get Up& Go/Starting From Scratch.pdf",
+"bytes": 38673877,
+"kind": "pdf",
+"pages": 4,
+"chars3": 4469,
+"budget": 1500
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Get Up& Go/Work vs Life.pdf",
+"bytes": 38920390,
+"kind": "pdf",
+"pages": 3,
+"chars3": 4884,
+"budget": 1500
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Getting Noticed/Don't explain your creativity, show it.pdf",
+"bytes": 41109648,
+"kind": "pdf",
+"pages": 5,
+"chars3": 3310,
+"budget": 1500
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Getting Noticed/Embrace the social video clutter.pdf",
+"bytes": 38480111,
+"kind": "pdf",
+"pages": 3,
+"chars3": 5392,
+"budget": 1500
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Getting Noticed/Making Your Own Success.pdf",
+"bytes": 38338503,
+"kind": "pdf",
+"pages": 3,
+"chars3": 5473,
+"budget": 1500
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Getting Noticed/Mastering Your Market.pdf",
+"bytes": 38477003,
+"kind": "pdf",
+"pages": 3,
+"chars3": 5002,
+"budget": 1500
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Getting Noticed/Pitfalls of Networking.pdf",
+"bytes": 39004125,
+"kind": "pdf",
+"pages": 4,
+"chars3": 5172,
+"budget": 1500
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Getting Noticed/Putting Yourself Out There.pdf",
+"bytes": 38999146,
+"kind": "pdf",
+"pages": 3,
+"chars3": 5386,
+"budget": 1500
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Identity/Can a succesful business create fun stuff.pdf",
+"bytes": 39866220,
+"kind": "pdf",
+"pages": 3,
+"chars3": 4967,
+"budget": 1500
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Identity/Defining a brand with integrity.pdf",
+"bytes": 38747837,
+"kind": "pdf",
+"pages": 3,
+"chars3": 5070,
+"budget": 1500
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Identity/Developing Products to Build Brand Image.pdf",
+"bytes": 39417030,
+"kind": "pdf",
+"pages": 3,
+"chars3": 5063,
+"budget": 1500
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Identity/Focusing your business proposition.pdf",
+"bytes": 38410716,
+"kind": "pdf",
+"pages": 3,
+"chars3": 5164,
+"budget": 1500
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Identity/Shedding your artistic pretences.pdf",
+"bytes": 40436286,
+"kind": "pdf",
+"pages": 3,
+"chars3": 5175,
+"budget": 1500
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Identity/What's your Company Culture.pdf",
+"bytes": 2179727,
+"kind": "pdf",
+"pages": 3,
+"chars3": 4977,
+"budget": 383
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Money/An Entrepeneurs Perspective on Investors.pdf",
+"bytes": 38481477,
+"kind": "pdf",
+"pages": 4,
+"chars3": 5511,
+"budget": 1500
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Money/Being Thrifty Isnt Cheap.pdf",
+"bytes": 38338974,
+"kind": "pdf",
+"pages": 3,
+"chars3": 5073,
+"budget": 1500
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Money/Hiring a Financial Director.pdf",
+"bytes": 38849363,
+"kind": "pdf",
+"pages": 5,
+"chars3": 3224,
+"budget": 1500
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Money/Making Cash Flow.pdf",
+"bytes": 38849290,
+"kind": "pdf",
+"pages": 5,
+"chars3": 3480,
+"budget": 1500
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Money/When to reinvest early profits.pdf",
+"bytes": 38865355,
+"kind": "pdf",
+"pages": 3,
+"chars3": 4822,
+"budget": 1500
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Nifty Fifty/CGF_Nifty_Fifty.pdf",
+"bytes": 517423,
+"kind": "pdf",
+"pages": 12,
+"chars3": 4678,
+"budget": 319
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/People/Building a team from scratch.pdf",
+"bytes": 38478161,
+"kind": "pdf",
+"pages": 3,
+"chars3": 5634,
+"budget": 1500
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/People/Cap Table/Cap-Table 1.pdf",
+"bytes": 671432,
+"kind": "pdf",
+"pages": 4,
+"chars3": 3222,
+"budget": 325
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/People/Cap Table/Cap-Table.pdf",
+"bytes": 671432,
+"kind": "pdf",
+"pages": 4,
+"chars3": 3222,
+"budget": 325
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/People/Hiring Your First Employee.pdf",
+"bytes": 39817047,
+"kind": "pdf",
+"pages": 4,
+"chars3": 5489,
+"budget": 1500
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/People/Investing in New Talent.pdf",
+"bytes": 39953733,
+"kind": "pdf",
+"pages": 3,
+"chars3": 4920,
+"budget": 1500
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/People/The Benefits of Collaboration.pdf",
+"bytes": 38339226,
+"kind": "pdf",
+"pages": 3,
+"chars3": 5217,
+"budget": 1500
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/People/Turning Friends into a Team.pdf",
+"bytes": 38340146,
+"kind": "pdf",
+"pages": 3,
+"chars3": 5117,
+"budget": 1500
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Strategy/Focusing Your Business Model.pdf",
+"bytes": 38478073,
+"kind": "pdf",
+"pages": 3,
+"chars3": 4877,
+"budget": 1500
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Strategy/Getting on with business.pdf",
+"bytes": 38548489,
+"kind": "pdf",
+"pages": 3,
+"chars3": 4812,
+"budget": 1500
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Strategy/Going Full Service.pdf",
+"bytes": 41573350,
+"kind": "pdf",
+"pages": 3,
+"chars3": 5160,
+"budget": 1500
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Strategy/How different is it running a large agency.pdf",
+"bytes": 38338884,
+"kind": "pdf",
+"pages": 4,
+"chars3": 4516,
+"budget": 1500
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Strategy/Selling time vs selling products.pdf",
+"bytes": 38512964,
+"kind": "pdf",
+"pages": 4,
+"chars3": 4654,
+"budget": 1500
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Strategy/The Benefits of Staying Small.pdf",
+"bytes": 38877074,
+"kind": "pdf",
+"pages": 3,
+"chars3": 5053,
+"budget": 1500
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 01- Positioning Your Business/M01L10-Creating an Elevator Pitch Worksheet.pdf",
+"bytes": 65146,
+"kind": "pdf",
+"pages": 1,
+"chars3": 2757,
+"budget": 302
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 01- Positioning Your Business/M01L11-Three Marketing Summaries Worksheet.pdf",
+"bytes": 123209,
+"kind": "pdf",
+"pages": 5,
+"chars3": 6872,
+"budget": 304
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L03-CAPABILITIES-AGENCY-OVERVIEW-JANDA-V1 Folder/CAPABILITIES-AGENCY-OVERVIEW-JANDA-V1 Folder/CAPABILITIES-AGENCY-OVERVIEW-JANDA-V1 1.pdf",
+"bytes": 4499589,
+"kind": "pdf",
+"pages": 9,
+"chars3": 1508,
+"budget": 471
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L03-CAPABILITIES-AGENCY-OVERVIEW-JANDA-V1 Folder/CAPABILITIES-AGENCY-OVERVIEW-JANDA-V1 Folder/CAPABILITIES-AGENCY-OVERVIEW-JANDA-V1.pdf",
+"bytes": 4499589,
+"kind": "pdf",
+"pages": 9,
+"chars3": 1508,
+"budget": 471
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L04-CAPABILITIES-LOGODESIGN-JANDA-V1 Folder/CAPABILITIES-LOGODESIGN-JANDA-V1 Folder/CAPABILITIES-LOGODESIGN-JANDA-V1 1.pdf",
+"bytes": 4523801,
+"kind": "pdf",
+"pages": 14,
+"chars3": 1929,
+"budget": 472
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L04-CAPABILITIES-LOGODESIGN-JANDA-V1 Folder/CAPABILITIES-LOGODESIGN-JANDA-V1 Folder/CAPABILITIES-LOGODESIGN-JANDA-V1.pdf",
+"bytes": 4523801,
+"kind": "pdf",
+"pages": 14,
+"chars3": 1929,
+"budget": 472
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L05-CAPABILITIES-PRINT-JANDA-V1 Folder/CAPABILITIES-PRINT-JANDA-V1 Folder/CAPABILITIES-PRINT-JANDA-V1 1.pdf",
+"bytes": 6856442,
+"kind": "pdf",
+"pages": 12,
+"chars3": 2007,
+"budget": 561
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L05-CAPABILITIES-PRINT-JANDA-V1 Folder/CAPABILITIES-PRINT-JANDA-V1 Folder/CAPABILITIES-PRINT-JANDA-V1.pdf",
+"bytes": 6856442,
+"kind": "pdf",
+"pages": 12,
+"chars3": 2007,
+"budget": 561
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L06-CAPABILITIES-WEBSITE-JANDA-V1 Folder/CAPABILITIES-WEBSITE-JANDA-V1 Folder/CAPABILITIES-WEBSITE-JANDA-V1 1.pdf",
+"bytes": 11387141,
+"kind": "pdf",
+"pages": 16,
+"chars3": 1925,
+"budget": 734
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L06-CAPABILITIES-WEBSITE-JANDA-V1 Folder/CAPABILITIES-WEBSITE-JANDA-V1 Folder/CAPABILITIES-WEBSITE-JANDA-V1.pdf",
+"bytes": 11387141,
+"kind": "pdf",
+"pages": 16,
+"chars3": 1925,
+"budget": 734
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L07-CAPABILITIES-GENERIC-JANDA-V1 Folder/CAPABILITIES-GENERIC-JANDA-V1 Folder/CAPABILITIES-GENERIC-JANDA-V1 1.pdf",
+"bytes": 852713,
+"kind": "pdf",
+"pages": 9,
+"chars3": 2345,
+"budget": 332
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L07-CAPABILITIES-GENERIC-JANDA-V1 Folder/CAPABILITIES-GENERIC-JANDA-V1 Folder/CAPABILITIES-GENERIC-JANDA-V1.pdf",
+"bytes": 852713,
+"kind": "pdf",
+"pages": 9,
+"chars3": 2345,
+"budget": 332
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L08-CASESTUDY-TROPOLIS-JANDA-V1 Folder/CASESTUDY-TROPOLIS-JANDA-V1 Folder/CASESTUDY-TROPOLIS-JANDA-V1 1.pdf",
+"bytes": 5461869,
+"kind": "pdf",
+"pages": 10,
+"chars3": 958,
+"budget": 508
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L08-CASESTUDY-TROPOLIS-JANDA-V1 Folder/CASESTUDY-TROPOLIS-JANDA-V1 Folder/CASESTUDY-TROPOLIS-JANDA-V1.pdf",
+"bytes": 5461869,
+"kind": "pdf",
+"pages": 10,
+"chars3": 958,
+"budget": 508
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L09-CASESTUDY-GENERIC-JANDA-V1 Folder/CASESTUDY-GENERIC-JANDA-V1 Folder/CASESTUDY-GENERIC-JANDA-V1 1.pdf",
+"bytes": 160123,
+"kind": "pdf",
+"pages": 11,
+"chars3": 1147,
+"budget": 306
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L09-CASESTUDY-GENERIC-JANDA-V1 Folder/CASESTUDY-GENERIC-JANDA-V1 Folder/CASESTUDY-GENERIC-JANDA-V1.pdf",
+"bytes": 160123,
+"kind": "pdf",
+"pages": 11,
+"chars3": 1147,
+"budget": 306
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 04- Deal Flow/M04L02-New Project Interview.pdf",
+"bytes": 71842,
+"kind": "pdf",
+"pages": 1,
+"chars3": 4734,
+"budget": 302
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 04- Deal Flow/M04L03-New Project Analysis.pdf",
+"bytes": 85529,
+"kind": "pdf",
+"pages": 1,
+"chars3": 3113,
+"budget": 303
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 04- Deal Flow/M04L05-Discovery Meeting-Unkown Project.pdf",
+"bytes": 68239,
+"kind": "pdf",
+"pages": 1,
+"chars3": 3726,
+"budget": 302
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 04- Deal Flow/M04L06-Discovery Meeting-Identity Design.pdf",
+"bytes": 72588,
+"kind": "pdf",
+"pages": 1,
+"chars3": 4464,
+"budget": 302
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 04- Deal Flow/M04L07-Discovery Meeting-Print Design.pdf",
+"bytes": 71745,
+"kind": "pdf",
+"pages": 1,
+"chars3": 4082,
+"budget": 302
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 04- Deal Flow/M04L08-Discovery Meeting-Website Design.pdf",
+"bytes": 73680,
+"kind": "pdf",
+"pages": 1,
+"chars3": 4639,
+"budget": 302
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 02- Project Organization/PROJ-M02L02-Project Organization Idenity Project.pdf",
+"bytes": 88477,
+"kind": "pdf",
+"pages": 2,
+"chars3": 8791,
+"budget": 303
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 02- Project Organization/PROJ-M02L03-Project Organization Print Project.pdf",
+"bytes": 85257,
+"kind": "pdf",
+"pages": 2,
+"chars3": 6696,
+"budget": 303
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 02- Project Organization/PROJ-M02L04-Project Organization Website Project.pdf",
+"bytes": 98215,
+"kind": "pdf",
+"pages": 3,
+"chars3": 13584,
+"budget": 303
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 02- Project Organization/PROJ-M02L05-Project Organization Worksheet.pdf",
+"bytes": 56027,
+"kind": "pdf",
+"pages": 6,
+"chars3": 7357,
+"budget": 302
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 03- Project Execution Strategies/PROJ-M03L01-Project Kickoff Meeting.pdf",
+"bytes": 83296,
+"kind": "pdf",
+"pages": 1,
+"chars3": 4635,
+"budget": 303
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 03- Project Execution Strategies/PROJ-M03L05-Critique Checklist.pdf",
+"bytes": 72404,
+"kind": "pdf",
+"pages": 1,
+"chars3": 4664,
+"budget": 302
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 04- Communication/PROJ-M04L07-Canned Communication.pdf",
+"bytes": 100695,
+"kind": "pdf",
+"pages": 5,
+"chars3": 5284,
+"budget": 303
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-IDENTITY-JANDA-V1 Folder/DELIVERY-IDENTITY-JANDA-V1 Folder/DELIVERY-IDENTITY-JANDA-V1 1.pdf",
+"bytes": 1632889,
+"kind": "pdf",
+"pages": 20,
+"chars3": 1454,
+"budget": 362
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-IDENTITY-JANDA-V1 Folder/DELIVERY-IDENTITY-JANDA-V1 Folder/DELIVERY-IDENTITY-JANDA-V1.pdf",
+"bytes": 1632889,
+"kind": "pdf",
+"pages": 20,
+"chars3": 1454,
+"budget": 362
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-PRINT-JANDA-V1 Folder/DELIVERY-PRINT-JANDA-V1 Folder/DELIVERY-PRINT-JANDA-V1 1.pdf",
+"bytes": 14604458,
+"kind": "pdf",
+"pages": 18,
+"chars3": 1726,
+"budget": 857
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-PRINT-JANDA-V1 Folder/DELIVERY-PRINT-JANDA-V1 Folder/DELIVERY-PRINT-JANDA-V1.pdf",
+"bytes": 14604458,
+"kind": "pdf",
+"pages": 18,
+"chars3": 1726,
+"budget": 857
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-PROJECTTITLE-JANDA-V1 1.pdf",
+"bytes": 248235,
+"kind": "pdf",
+"pages": 14,
+"chars3": 134,
+"budget": 309
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-PROJECTTITLE-JANDA-V1.pdf",
+"bytes": 248235,
+"kind": "pdf",
+"pages": 14,
+"chars3": 134,
+"budget": 309
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-WEBSITE-JANDA-V1 Folder/DELIVERY-WEBSITE-JANDA-V1 Folder/DELIVERY-WEBSITE-JANDA-V1 1.pdf",
+"bytes": 3846280,
+"kind": "pdf",
+"pages": 19,
+"chars3": 1377,
+"budget": 446
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-WEBSITE-JANDA-V1 Folder/DELIVERY-WEBSITE-JANDA-V1 Folder/DELIVERY-WEBSITE-JANDA-V1.pdf",
+"bytes": 3846280,
+"kind": "pdf",
+"pages": 19,
+"chars3": 1377,
+"budget": 446
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 06- Post Mortem/PROJ-M06L01-Post Mortem.pdf",
+"bytes": 34146,
+"kind": "pdf",
+"pages": 1,
+"chars3": 4570,
+"budget": 301
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/6 Managing a Creative Business/Module 02- Tracking Data/BUS-M02L04-Business Insights Worksheet.pdf",
+"bytes": 88756,
+"kind": "pdf",
+"pages": 5,
+"chars3": 8617,
+"budget": 303
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/6 Managing a Creative Business/Module 04- Growing Your Agency/BUS-M04L02-Employment Offer Letter.pdf",
+"bytes": 56081,
+"kind": "pdf",
+"pages": 1,
+"chars3": 1773,
+"budget": 302
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/6 Managing a Creative Business/Module 04- Growing Your Agency/BUS-M04L03-Employment Agreement (Simple).pdf",
+"bytes": 104877,
+"kind": "pdf",
+"pages": 2,
+"chars3": 4392,
+"budget": 304
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/6 Managing a Creative Business/Module 04- Growing Your Agency/BUS-M04L05-Employment Termination Letter.pdf",
+"bytes": 54667,
+"kind": "pdf",
+"pages": 1,
+"chars3": 1967,
+"budget": 302
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/6 Managing a Creative Business/Module 04- Growing Your Agency/BUS-M04L06-Employment Layoff Letter.pdf",
+"bytes": 54293,
+"kind": "pdf",
+"pages": 1,
+"chars3": 1628,
+"budget": 302
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/hub/Creative_HubKit.pdf",
+"bytes": 525545,
+"kind": "pdf",
+"pages": 51,
+"chars3": 3855,
+"budget": 320
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/hub/Creative_Hub_Leaders_Toolkit.pdf",
+"bytes": 5144629,
+"kind": "pdf",
+"pages": 68,
+"chars3": 1441,
+"budget": 496
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/bootstrap/financial planning/document.pdf",
+"bytes": 421674,
+"kind": "pdf",
+"pages": 30,
+"chars3": 1158,
+"budget": 316
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/pdf/Advanced+Technical+SEO+A+Complete+Guide.pdf",
+"bytes": 24425838,
+"kind": "pdf",
+"pages": 385,
+"chars3": 1149,
+"budget": 1231
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/pdf/How analytics can drive your sales.pdf",
+"bytes": 3321706,
+"kind": "pdf",
+"pages": 3,
+"chars3": 5347,
+"budget": 426
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/pdf/How to choose the right ideas to develop.pdf",
+"bytes": 38403783,
+"kind": "pdf",
+"pages": 3,
+"chars3": 5328,
+"budget": 1500
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/pdf/InVision_DesignEngineeringHandbook.pdf",
+"bytes": 5306515,
+"kind": "pdf",
+"pages": 127,
+"chars3": 698,
+"budget": 502
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/pdf/Mapping_Creative_Hubs_Scotland_report.pdf",
+"bytes": 2212533,
+"kind": "pdf",
+"pages": 58,
+"chars3": 3142,
+"budget": 384
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/pdf/Resilient-OrganizationFixed.pdf",
+"bytes": 741522,
+"kind": "pdf",
+"pages": 15,
+"chars3": 7261,
+"budget": 328
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/pdf/SEO-for-Beginners.pdf",
+"bytes": 26027186,
+"kind": "pdf",
+"pages": 547,
+"chars3": 416,
+"budget": 1292
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/pdf/Succeeding_In_House_Creative/Exercise Files/Creative_Needs_Rationale.pdf",
+"bytes": 469480,
+"kind": "pdf",
+"pages": 1,
+"chars3": 994,
+"budget": 317
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/pdf/Succeeding_In_House_Creative/Exercise Files/Design Value Proposition Resources.pdf",
+"bytes": 70039,
+"kind": "pdf",
+"pages": 1,
+"chars3": 1383,
+"budget": 302
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/pdf/Succeeding_In_House_Creative/Exercise Files/FAB_Features_Advantages_Benefits.pdf",
+"bytes": 69704,
+"kind": "pdf",
+"pages": 1,
+"chars3": 573,
+"budget": 302
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/pdf/Succeeding_In_House_Creative/Exercise Files/Inhouse_Skills_Matrix.pdf",
+"bytes": 484543,
+"kind": "pdf",
+"pages": 1,
+"chars3": 1300,
+"budget": 318
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/pdf/Succeeding_In_House_Creative/Exercise Files/Mission_Vision_Statements.pdf",
+"bytes": 496336,
+"kind": "pdf",
+"pages": 1,
+"chars3": 1277,
+"budget": 318
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/pdf/Succeeding_In_House_Creative/Exercise Files/Your_ROI_Matrix.pdf",
+"bytes": 484035,
+"kind": "pdf",
+"pages": 1,
+"chars3": 1135,
+"budget": 318
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/pdf/Templates/Social Media Guide + Worksheet/PDF/Social Media Guide For Remote Freelancers.pdf",
+"bytes": 1031725,
+"kind": "pdf",
+"pages": 20,
+"chars3": 926,
+"budget": 339
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/pdf/Templates/legal file/Transfer of Copyright/The Logo Smith Transfer of Copyright.pdf",
+"bytes": 75135,
+"kind": "pdf",
+"pages": 1,
+"chars3": 2358,
+"budget": 302
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/pdf/business plan/30casesreport-160219115412.pdf",
+"bytes": 8477008,
+"kind": "pdf",
+"pages": 75,
+"chars3": 1468,
+"budget": 623
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/pdf/business plan/50businessmodelexamples-171001025828.pdf",
+"bytes": 8824434,
+"kind": "pdf",
+"pages": 104,
+"chars3": 1050,
+"budget": 636
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/pdf/business plan/Business Plan.pdf",
+"bytes": 660054,
+"kind": "pdf",
+"pages": 15,
+"chars3": 3935,
+"budget": 325
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/pdf/business plan/Business guide.pdf",
+"bytes": 1978297,
+"kind": "pdf",
+"pages": 9,
+"chars3": 0,
+"budget": 375
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/pdf/business plan/Microsoft Word - Sample Business Plan - Wooden Grain Toy Company.doc.pdf",
+"bytes": 107630,
+"kind": "pdf",
+"pages": 8,
+"chars3": 1652,
+"budget": 304
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/pdf/business plan/Microsoft Word - Sample Business Plan - Wooden Grain Toy Company.pdf",
+"bytes": 61034,
+"kind": "pdf",
+"pages": 8,
+"chars3": 1652,
+"budget": 302
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/pdf/business plan/SCORE-Deluxe-Startup-Business-Plan-Template_2.pdf",
+"bytes": 328045,
+"kind": "pdf",
+"pages": 34,
+"chars3": 2696,
+"budget": 312
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/pdf/business plan/Sample Lean Business Plan - Wooden Grain Toy Company(1).pdf",
+"bytes": 33679,
+"kind": "pdf",
+"pages": 1,
+"chars3": 1668,
+"budget": 301
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/pdf/fund/EIC Work Programme 2021.pdf",
+"bytes": 1913192,
+"kind": "pdf",
+"pages": 155,
+"chars3": 3151,
+"budget": 372
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/pdf/fund/Introduction-to-Small-Business-Funding-3.pdf",
+"bytes": 10447529,
+"kind": "pdf",
+"pages": 47,
+"chars3": 937,
+"budget": 698
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/pdf/fund/New-Ideas-Fund-FAQs-2021.pdf",
+"bytes": 3000497,
+"kind": "pdf",
+"pages": 5,
+"chars3": 2771,
+"budget": 414
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/pdf/fund/Preparing_for_Investment_2021_V1.pdf",
+"bytes": 38245207,
+"kind": "pdf",
+"pages": 6,
+"chars3": 3191,
+"budget": 1500
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/pdf/fund/The_Start_Up_Loans_Company_Business_Plan_Guide_Nov2020_CE_version.pdf",
+"bytes": 915768,
+"kind": "pdf",
+"pages": 14,
+"chars3": 6047,
+"budget": 334
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/pdf/fund/UK-Small-Business-Funding-Course.pdf",
+"bytes": 10447529,
+"kind": "pdf",
+"pages": 47,
+"chars3": 937,
+"budget": 698
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/pdf/nesta_cetoolkit_english_4books_casestudies_tutornotes_worksheets.pdf",
+"bytes": 11886049,
+"kind": "pdf",
+"pages": 139,
+"chars3": 771,
+"budget": 753
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/pdf/pre-hire.pdf",
+"bytes": 9983103,
+"kind": "pdf",
+"pages": 8,
+"chars3": 1952,
+"budget": 680
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/pdf/the-growth-handbook(1).pdf",
+"bytes": 3388091,
+"kind": "pdf",
+"pages": 79,
+"chars3": 841,
+"budget": 429
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/pdf/tipps/Tips on Creating an Effective Contract_Freelance Contract 101.pdf",
+"bytes": 72716,
+"kind": "pdf",
+"pages": 15,
+"chars3": 1013,
+"budget": 302
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-notes/pricing/4 Pricing Creative Services/Module 01- Pricing Fundamentals/M01L09-Pricing Spectrum.pdf",
+"bytes": 81274,
+"kind": "pdf",
+"pages": 1,
+"chars3": 1732,
+"budget": 303
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-pdf/Succeeding_In_House_Creative/Exercise Files/Creative_Needs_Rationale.pdf",
+"bytes": 469480,
+"kind": "pdf",
+"pages": 1,
+"chars3": 994,
+"budget": 317
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-pdf/Succeeding_In_House_Creative/Exercise Files/Design Value Proposition Resources.pdf",
+"bytes": 70039,
+"kind": "pdf",
+"pages": 1,
+"chars3": 1383,
+"budget": 302
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-pdf/Succeeding_In_House_Creative/Exercise Files/FAB_Features_Advantages_Benefits.pdf",
+"bytes": 69704,
+"kind": "pdf",
+"pages": 1,
+"chars3": 573,
+"budget": 302
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-pdf/Succeeding_In_House_Creative/Exercise Files/Generic_Workflow_Chart.pdf",
+"bytes": 505675,
+"kind": "pdf",
+"pages": 1,
+"chars3": 2874,
+"budget": 319
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-pdf/Succeeding_In_House_Creative/Exercise Files/Inhouse_Skills_Matrix.pdf",
+"bytes": 484543,
+"kind": "pdf",
+"pages": 1,
+"chars3": 1300,
+"budget": 318
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-pdf/Succeeding_In_House_Creative/Exercise Files/Mission_Vision_Statements.pdf",
+"bytes": 496336,
+"kind": "pdf",
+"pages": 1,
+"chars3": 1277,
+"budget": 318
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/business-pdf/Succeeding_In_House_Creative/Exercise Files/Your_ROI_Matrix.pdf",
+"bytes": 484035,
+"kind": "pdf",
+"pages": 1,
+"chars3": 1135,
+"budget": 318
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/reports/ARK\u2013Invest_BigIdeas_2021.pdf",
+"bytes": 7618215,
+"kind": "pdf",
+"pages": 112,
+"chars3": 3110,
+"budget": 590
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/reports/CV_VC_Top_50_Report_H2_2020.pdf",
+"bytes": 9748979,
+"kind": "pdf",
+"pages": 55,
+"chars3": 1703,
+"budget": 671
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/reports/DI_CIR 2020 global blockchain survey.pdf",
+"bytes": 3097255,
+"kind": "pdf",
+"pages": 44,
+"chars3": 1266,
+"budget": 418
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/reports/Disruptive-Technologies.pdf",
+"bytes": 2826082,
+"kind": "pdf",
+"pages": 47,
+"chars3": 1265,
+"budget": 407
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/reports/Industry-Report-2021-Final.pdf",
+"bytes": 14342470,
+"kind": "pdf",
+"pages": 40,
+"chars3": 3555,
+"budget": 847
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/reports/Market-Report-Advertising-and-Marketing-August-2021.pdf",
+"bytes": 401667,
+"kind": "pdf",
+"pages": 6,
+"chars3": 6446,
+"budget": 315
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/reports/Market-Report-Record-label-and-Recording-Studio-January-2021.pdf",
+"bytes": 380427,
+"kind": "pdf",
+"pages": 6,
+"chars3": 7093,
+"budget": 314
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/reports/SEO-Trends-2021.pdf",
+"bytes": 9694992,
+"kind": "pdf",
+"pages": 215,
+"chars3": 449,
+"budget": 669
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/reports/Sample Global Corporate Identity Design Market Report 2021 - Cognitive Market Research.pdf",
+"bytes": 4617123,
+"kind": "pdf",
+"pages": 134,
+"chars3": 5237,
+"budget": 476
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/reports/State of Independence 2021 Report.pdf",
+"bytes": 30095317,
+"kind": "pdf",
+"pages": 67,
+"chars3": 0,
+"budget": 1448
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/reports/WEF_Future_of_Jobs_2020(1).pdf",
+"bytes": 11105626,
+"kind": "pdf",
+"pages": 163,
+"chars3": 5339,
+"budget": 723
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/reports/WEF_Future_of_Jobs_2020.pdf",
+"bytes": 11105626,
+"kind": "pdf",
+"pages": 163,
+"chars3": 5339,
+"budget": 723
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/reports/dribbble-global-design-survey-2019.pdf",
+"bytes": 17334508,
+"kind": "pdf",
+"pages": 12,
+"chars3": 2475,
+"budget": 961
+},
+{
+"rel": "journals_notes/DOMAIN 4 Business/reports/infographic-cmo-spend-survey-2021.pdf",
+"bytes": 545508,
+"kind": "pdf",
+"pages": 1,
+"chars3": 2811,
+"budget": 320
+},
+{
+"rel": "journals_notes/DOMAIN 5 Personal Practice/hustle/Refund Bible 2023\ud83e\uddd1\ud83c\udffd\u200d\ud83d\udcbb/Amazon Refund Sauce \ud83d\ude4e\ud83c\udfff\u200d\u2642\ufe0f/AMAZON REFUND.pdf",
+"bytes": 13100589,
+"kind": "pdf",
+"pages": 25,
+"chars3": 1433,
+"budget": 799
+},
+{
+"rel": "journals_notes/DOMAIN 5 Personal Practice/hustle/Refund Bible 2023\ud83e\uddd1\ud83c\udffd\u200d\ud83d\udcbb/G2A Gift card refund sauce/G2A Method 2023 (works as of JUNE 26th).pdf",
+"bytes": 1549083,
+"kind": "pdf",
+"pages": 8,
+"chars3": 3638,
+"budget": 359
+},
+{
+"rel": "journals_notes/DOMAIN 6 AI + Computing/NeurIPS-2024-benchmarking-complex-instruction-following-with-multiple-constraints-composition-Paper-Datasets_and_Benchmarks_Track.pdf",
+"bytes": 9087163,
+"kind": "pdf",
+"pages": 36,
+"chars3": 12053,
+"budget": 646
+},
+{
+"rel": "journals_notes/DOMAIN 6 AI + Computing/Pixel_Encoder - Instructions.pdf",
+"bytes": 2315722,
+"kind": "pdf",
+"pages": 7,
+"chars3": 2327,
+"budget": 388
+},
+{
+"rel": "journals_notes/DOMAIN 6 AI + Computing/electronics/IJRITCC_1349.pdf",
+"bytes": 450430,
+"kind": "pdf",
+"pages": 6,
+"chars3": 11580,
+"budget": 317
+},
+{
+"rel": "journals_notes/DOMAIN 6 AI + Computing/intent-engineering/2026.eacl-long.320.pdf",
+"bytes": 6537284,
+"kind": "pdf",
+"pages": 21,
+"chars3": 13021,
+"budget": 549
+},
+{
+"rel": "journals_notes/DOMAIN 6 AI + Computing/intent-engineering/2432_Evolving_Prompts_In_Conte.pdf",
+"bytes": 1527033,
+"kind": "pdf",
+"pages": 52,
+"chars3": 15650,
+"budget": 358
+},
+{
+"rel": "journals_notes/DOMAIN 6 AI + Computing/intent-engineering/2605.03986v1.pdf",
+"bytes": 593176,
+"kind": "pdf",
+"pages": 14,
+"chars3": 12682,
+"budget": 322
+},
+{
+"rel": "journals_notes/DOMAIN 6 AI + Computing/intent-engineering/3777411.pdf",
+"bytes": 631542,
+"kind": "pdf",
+"pages": 36,
+"chars3": 11621,
+"budget": 324
+},
+{
+"rel": "journals_notes/DOMAIN 6 AI + Computing/intent-engineering/NeurIPS-2024-benchmarking-complex-instruction-following-with-multiple-constraints-composition-Paper-Datasets_and_Benchmarks_Track.pdf",
+"bytes": 9087163,
+"kind": "pdf",
+"pages": 36,
+"chars3": 12053,
+"budget": 646
+},
+{
+"rel": "journals_notes/DOMAIN 7 Influence + Power/privacy/CameraShyHoodie_Instructions.pdf",
+"bytes": 640389,
+"kind": "pdf",
+"pages": 26,
+"chars3": 4629,
+"budget": 324
+}
+]
+}

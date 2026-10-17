@@ -305,8 +305,69 @@ tools_not_integrated:
   bypass_paywalls_clean:
     answers: 'per-site paywall rules for ~200 outlets'
     access: manual
-    measured: {at: '2026-10-17T22:33Z', code: 403, bytes: 5664, note: 'the canonical GitLab moved/blocked (403); gitflic returned 500; GitHub carries only stale mirrors (csns1 mirror last pushed 2022-06).'}
-    why: 'REJECTED AS A DEPENDENCY for a measured reason: the canonical source is no longer reliably fetchable, so pinning a commit is not possible and a 2022 mirror is a supply-chain risk with no update path. Recorded so it is not re-proposed from memory.'
+    tier: C
+    measured: {at: '2026-10-17T22:52Z', code: 200, bytes: 29696, note: 'CORRECTED: FMHY names gitflic.ru/project/magnolia1234/bpc_uploads as canonical and it answers 200 / 29,696 B carrying a "Release latest" download; the 22:33Z reading of 403 / 5,664 B was a DIFFERENT url (gitlab.com/magnolia1234/...) and the 500 was gitflic.ru/project/bpc/. GitHub still carries only stale mirrors (2022-06, 2024-11).'}
+    why: 'OWNER-SIDE, AND NOW PINNABLE: the earlier rejection ("no update path") was measured against the wrong referent and is RETIRED (D-3034 — a claim whose value does not resolve is not a finding). Still not a LANE: a browser extension that patches per-site JS runs only in the headed engine, breaks on every redesign, and every article it opens was fetched under a BYPASSED identity — so it can never build a corpus that states its own licence truthfully.'
+  ladder:
+    answers: 'a self-hosted proxy that re-requests an article as a search-engine crawler so the publisher serves the full text'
+    access: manual
+    tier: C
+    measured: {at: '2026-10-17T22:52Z', code: 200, bytes: 420285, note: 'everywall/ladder — GPL-3.0, 9,188 stars, Go, pushed 2026-10-13 (active).'}
+    why: 'THE ONLY SOVEREIGN-COMPATIBLE PAYWALL OPTION (C1/C3: it runs on our hardware, no third party ever sees the URL) — and STILL owner-side manual, not a lane: it fetches under a FALSE IDENTITY (crawler user-agent), so its output is exactly the text a corpus cannot license truthfully. Promoting it to a lane would need its own decision with that consequence written down; there is no version of it that is both automated and honest.'
+  wallabag:
+    answers: 'self-hosted read-later with full-text extraction'
+    access: manual
+    tier: C
+    measured: {at: '2026-10-17T22:52Z', code: 200, bytes: 15438, note: 'wallabag.org 200; publishes a list of public instances open for registration.'}
+    why: 'Registered as the LEGITIMATE half of the question: it archives what the owner ALREADY has access to. It defeats no paywall and must never be described as if it does — the honest use is "keep what I could read".'
+  freedium_mirror:
+    answers: 'Medium full text through a mirror front-end'
+    access: manual
+    tier: C
+    measured: {at: '2026-10-17T22:52Z', code: 200, bytes: 48429, note: 'freedium-mirror.cfd 200 from this machine — the FMHY-listed current host; the service moves hosts periodically.'}
+    why: 'OWNER-SIDE manual (D-3081): for READING a Medium piece the owner already wants. Any retained text is licence_class paywalled_personal and lives in assessment notes — never in knowledge pipeline/books.'
+  readmedium:
+    answers: 'Medium full text through a mirror front-end'
+    access: manual
+    tier: C
+    measured: {at: '2026-10-17T22:52Z', code: 200, bytes: 22382, note: 'readmedium.com 200.'}
+    why: 'A second front-end for the same job, registered so the route survives one host dying; refused as a lane for the same licence reason as freedium_mirror.'
+  hosted_paywall_proxies:
+    answers: 'paste a URL, get the article back — pressreleased, byebyepaywall, unwall, smry.ai'
+    access: manual
+    tier: C
+    measured: {at: '2026-10-17T22:52Z', code: 200, bytes: 667249, note: 'all four answer 200 from this machine: pressreleased.alwaysdata.net 7,388 B; byebyepaywall.com/en 6,582 B; unwall.app 16,701 B; smry.ai 667,249 B — and smry.ai is an AI SUMMARISER, so it returns an interpretation, not the text.'}
+    why: 'REFUSED AS A DEPENDENCY (D-3038): each is a THIRD-PARTY PROXY — the owner s URL, and often the owner s text, passes through a service whose operator, retention policy and jurisdiction are unknown. That is a C3 violation with a research trail attached, and smry.ai additionally returns a summary, i.e. precisely the slop this OS refuses. Refused as a dependency only; a browser bookmark is not a lane.'
+  buster:
+    answers: 'an audio-challenge captcha solver that runs LOCALLY in the browser'
+    access: manual
+    tier: C
+    measured: {at: '2026-10-17T22:52Z', code: 200, bytes: 312026, note: 'dessant/buster — GPL-3.0, 9,337 stars, JavaScript, pushed 2026-06-27. FMHY s own note: the companion buster-client desktop app "greatly improves the success rate" by simulating user interaction.'}
+    why: 'THE ONLY CAPTCHA TOOL THAT PASSES THE SOVEREIGNTY TEST: it solves the AUDIO challenge locally (speech-to-text), sends nothing to a solver service, and is GPL-3. It does NOT defeat reCAPTCHA v3/invisible or Cloudflare Turnstile — no client-side tool does — so the honest claim is "it clears the audio fallback often enough to keep a headed session alive", never "it bypasses captchas".'
+  nopecha:
+    answers: 'a hosted token service for reCAPTCHA / hCaptcha / Turnstile'
+    access: none
+    tier: C
+    measured: {at: '2026-10-17T22:52Z', code: 200, bytes: 150839, note: 'nopecha.com 200; priced per solved captcha, requires an account and a key.'}
+    why: 'REJECTED (D-3038) on three limbs: a PAID cloud dependency (C1), it sees every page it solves (C3), and a per-token meter makes an unattended run unbounded in cost. A captcha is the site saying it does not want automation; paying a third party to answer it is the one place where this OS would be BUYING capability instead of convenience.'
+  privacy_pass:
+    answers: 'Cloudflare s own token-passing extension — fewer CHALLENGES, not fewer walls'
+    access: manual
+    tier: C
+    measured: {at: '2026-10-17T22:52Z', code: 200, bytes: 382456, note: 'cloudflare/pp-browser-extension 200 — an official Cloudflare project, not a third-party bypass.'}
+    why: 'Registered as the LEGITIMATE counter to the captcha problem: it reduces how OFTEN an honest session is challenged, so the headed browser survives longer without solving anything. It bypasses no wall and is therefore compatible with the licence discipline.'
+  telegram_mcp:
+    answers: 'read, search and export Telegram chats and channels from an MCP client, over MTProto'
+    access: credential
+    tier: C
+    measured: {at: '2026-10-17T22:52Z', code: 200, bytes: 0, note: 'chigwell/telegram-mcp — Apache-2.0, 1,846 stars, Python/Telethon, pushed 2026-10-17 (today); 80+ tools; README documents a chat allowlist and file-path security.'}
+    why: 'THE RIGHT SHAPE FOR A TELEGRAM SOURCE (C25: agent-agnostic transport, the owner s OWN account, local stdio): no bot token, no hosted service. The consequence is total — a session string IS the account — so it may only run as a LOCAL stdio server over a dedicated account, with a chat allowlist and read-only use.'
+  tdl:
+    answers: 'download files and export history from Telegram channels with the owner s account'
+    access: credential
+    tier: C
+    measured: {at: '2026-10-17T22:52Z', code: 200, bytes: 0, note: 'iyear/tdl — AGPL-3.0, 8,171 stars, Go, pushed 2026-10-15; one static binary.'}
+    why: 'The FILE limb: a channel that distributes magazine/newspaper issues is only useful if the attachment can be pulled at volume, and this is the reviewed tool that does it with a session and no bot. Same custody rule as every other rung: land into the pen, probe the container, never auto-open. AGPL is a distribution obligation, not a use restriction, and we do not redistribute it.'
 
 # ── SHADOW SOURCES (books) — licence_class and the measured access route ──────────────────────────────────────
 shadow_sources:
@@ -338,6 +399,13 @@ shadow_sources:
     licence_class: shadow
     measured: {at: '2026-10-17T21:47Z', code: 200, bytes: 7363, note: 'sci-hub.ru and sci-hub.st answer 200 with `captcha` in the body; sci-hub.se has no DNS.'}
     why: 'The paper rung of last resort, and today it is a wall — except through Anna s /scidb/<doi> via the browser engine.'
+  newspaper_archive:
+    answers: 'a Telegram channel that posts whole newspaper and magazine issues — WSJ, FT, NYT, WP, The Economist, Forbes, Bloomberg'
+    access: credential
+    tier: S
+    licence_class: shadow
+    measured: {at: '2026-10-17T22:52Z', code: 302, bytes: 11942, note: 't.me/newspaper_archive resolves (channel page 11,942 B) but the /s/ preview 302-redirects to the channel page and renders ZERO messages — the public preview is disabled, so reading it needs a SESSION; the titles above are what the channel s own description names.'}
+    why: 'THE MARKET-RESEARCH NEWSPAPER ROUTE the owner asked for, and its constraint is Z-Library s constraint exactly: no API, no preview, a session required (access `credential`, the same rung shape as zlibrary). Registered with its cost stated: it is a DISTRIBUTION channel, so its bytes are licence_class shadow, arrive as whole issues (not articles), and must pass the container probe before any of them is named a work.'
 
   # ── ADDED 2026-10-17 (D-3081): the FREE routes that need no key and no account ───────────────────────────────
   #: These exist because the owner asked "is there a free safe API". There is no key to buy or beg: what exists is

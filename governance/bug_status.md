@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**232 open** / 409 closed of 641 ids.
+**233 open** / 409 closed of 642 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -239,3 +239,4 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-873 | (MED, OPEN) — AN ENABLED EXTENSION THAT CONTRIBUTES ZERO TOOLS RAISES NOTHING (and I gave a false answer because of it) | 3 |
 | BUG-875 | (HIGH, OPEN) — A FIRST-PARTY IMPORT NAME RESOLVES OUTSIDE THE TREE, so the delegated-run journal and 16 import sites read ANOTHER PROJECT'S  | 1 |
 | BUG-876 | (MED, OPEN 2026-10-17) — THE ATTRIBUTION CONTROL CANNOT GO GREEN ON THE REGISTRY IT MEASURES | 1 |
+| BUG-877 | (MED, OPEN 2026-10-17) — A GOVERNED WRITE TO THE HARNESS HOME DOES NOT SURVIVE: scripts/check_harness_homes.py reads CONFLICT again, and no  | 1 |

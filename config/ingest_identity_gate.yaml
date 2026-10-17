@@ -232,11 +232,27 @@ source_library:
     - id: journals_notes
       path: '~/Library/CloudStorage/Dropbox/education/journals:notes'
       kinds: [pdf, docx, md, txt]
-      #: MEASURED 2026-10-16 (D-3051/T-181 limb 2): the one corpus home this repository declares holds BOOKS, and
-      #: NO declaration names a home a NOTE is admitted to. null is therefore the honest value: the admission plan
-      #: counts and prints every file it refuses for this reason (786 files today, 222 of a declared kind) rather
-      #: than inventing a destination. What a note's home IS, is the owner's word - T-181 limb 2.
-      admits_to: null
+      #: THE NOTE'S SHARE IS DECLARED (D-3062, owner word 2026-10-17; T-181 limb 2 was the last word owed here).
+      #: A note is admitted to the SAME one corpus home - never a second corpus (a second home for one fact, C12)
+      #: and never out of scope (T-181 measured 341 files of a kind this root declares). What makes it a SHARE
+      #: rather than a merge is the AXIS: this root's placement axis is DOMAIN (placement.homes.journals_notes),
+      #: the corpus's own layout axis is DOMAIN (its immediate subdirectories), and the two vocabularies are
+      #: byte-identical - measured 2026-10-17: both trees carry the same eight DOMAIN names. So an admitted note
+      #: lands at corpus_home/<its own DOMAIN>/<its own subtopic>/<name>.md: it keeps the owner's arrangement and
+      #: adds nothing to the corpus the corpus does not already materialise. See arrangement.share_rule below for
+      #: the rule the reader ENFORCES, and admission.decisions.refused_domain_not_a_corpus_domain for its refusal.
+      #:
+      #: ADMISSION IS NOT CONVERSION, and this line does not convert anything. The conversion stage accepts
+      #: [.epub, .pdf, .md] only (flow.transitions.conversion.accepts, the origin of that set): of this root's
+      #: declared kinds, a .pdf and a .md are convertible, while a .docx or a .txt is REFUSED as a container no
+      #: stage reads - counted, printed, and owned by T-180 rather than admitted on a promise. MEASURED 2026-10-17
+      #: on the live library: 718 files under this root, of which 247 are .pdf and 99 .docx, and the rest are
+      #: image/design formats no declaration here owns at all (png, jpg, psd, ai, indd, idml).
+      #:
+      #: WHAT IS STILL NOT AUTHORISED: no engine admits a note (admission.actor is the owner, row by row, from the
+      #: plan), nothing here moves a byte, and the applier is T-183. The 621 rows the plan refused for "no declared
+      #: corpus home" now acquire a home and are RE-CLASSIFIED by the same reader; nothing is admitted by this act.
+      admits_to: corpus_home
   metadata_cache: 'knowledge pipeline/checkpoints/book_metadata.jsonl'
   #: The three name classes this census counts. They are DIAGNOSTIC, not defects: the door's own key strips the
   #: marker and collapses whitespace before any comparison, so none of them moves identity — they are what a HUMAN
@@ -299,6 +315,15 @@ source_library:
     authority: D-3048
     one_bytes_home: 'knowledge pipeline/books - the ONE tree S0 reads and the ONE tree the S0.5 cache stamps (MEASURED: every cache record source_path lands inside it)'
     corpus_home: 'knowledge pipeline/books'
+    #: THE SHARE RULE (D-3062), stated so a future root has somewhere to land and so the reader has something to
+    #: ENFORCE rather than something to remember. A root's share of the one corpus home is expressed on THAT
+    #: HOME'S OWN AXIS, never as a new top-level folder: the domain vocabulary's ONE materialisation is the corpus's
+    #: own immediate subdirectories (census_source_names.axis_vocabulary), so a top-level folder invented by an
+    #: admission would silently WIDEN the vocabulary the pipeline classifies against. Therefore a file may only be
+    #: admitted into a subpath whose FIRST component is a name the corpus already materialises; anything else is
+    #: refused as refused_domain_not_a_corpus_domain, counted and printed. This is why a note needs no folder of
+    #: its own: its DOMAIN is already a share of the corpus.
+    share_rule: 'a share is a subtree on the HOME OWN axis and never a new top-level folder: the first component of an admitted path must be a name the corpus already materialises, or the row is REFUSED (D-3062)'
     compare_key: "the door's OWN comparison key (pipeline/book_metadata.sanitize_source_book) - two homes resolve to one work only through the key the pipeline itself uses"
     #: MEASURED 2026-10-16 (D-3048): of the corpus stems, most also exist in the reading view and only a minority
     #: of those pairs are byte-identical - the same work under the same name with DIFFERENT bytes. That is the
@@ -404,13 +429,13 @@ source_library:
         authority: D-3051
         state: "DECLARED 2026-10-16 (T-181 limb 1) - it stood UNDECLARED until this date"
         was: "MEASURED 2026-10-16 (before this transition existed): pipeline/stage0_convert.py reads the CORPUS (books_dir = knowledge pipeline/books) and NOTHING declared the transition that puts a library file into it, so the pipeline's OWN INPUT PATH was the one step a human did by hand with no counter and no receipt"
-        where: "from a declared library kind root (source_library.roots) INTO the corpus home that root declares (roots[].admits_to -> arrangement.corpus_home), carrying the source's own path below its declared kind folder"
+        where: "from a declared library kind root (source_library.roots) INTO the corpus home that root declares (roots[].admits_to -> arrangement.corpus_home), carrying the source's own path below its DECLARED AXIS folder (kind for books, domain for journals:notes) - see arrangement.share_rule"
         actor: owner
         moves: "the owner's word, row by row, from the plan this transition names - NO engine admits a file because of its name, exactly as no engine PLACES one (D-3045, D-2898)"
         counter: "python3 scripts/plan_admission.py --brief (ONE line, on every health run, beside the arrival counter)"
         plan: "python3 scripts/plan_admission.py --plan -> writes the plan file (READ-ONLY: it admits nothing). See source_library.admission for the target rule and the CLOSED decision vocabulary"
         refuses: "a root that declares no corpus home, a container the conversion stage cannot read, a file outside its declared kind folder, and a name a defect pattern matches - each COUNTED and printed, never silently skipped (D-3038)"
-        owed: "T-183 (the applier limb: a plan-keyed, dry-run-default, crash-safe writer) | T-176 (the rename rides BEFORE the first admit: an admitted name becomes the corpus name AND the door's key) | T-179 (the library md twin's fate) | T-181 limb 2 (a note's home)"
+        owed: "T-183 (the applier limb: a plan-keyed, dry-run-default, crash-safe writer) | T-176 (the rename rides BEFORE the first admit: an admitted name becomes the corpus name AND the door's key) | T-179 (the library md twin's fate). CLOSED 2026-10-17: T-181 limb 2 (a note's home) - declared as a SHARE on the corpus's own domain axis, D-3062"
       conversion:
         command: "python3 pipeline/stage0_convert.py"
         accepts: [.epub, .pdf, .md]   # origin: pipeline/stage0_convert.py::SUPPORTED_EXTENSIONS (D-3051; the admission plan REFUSES a container outside this set and a control in it compares the two homes)
@@ -461,5 +486,6 @@ source_library:
       refused_container_no_stage_reads_it: 'a container the conversion stage cannot read (declared kinds such as .mobi/.azw3/.djvu/.docx are OWNED but not convertible): admitting one needs an ENGINE, which is T-180''s misplaced class and not this reader''s act'
       refused_name_repair_first: "a name a declared defect pattern matches (marker/spine/truncation): an admitted file's name becomes the CORPUS NAME and the DOOR KEY, so admitting a defect materialises it into the tree the S0.5 cache then STAMPS. The repair rides FIRST - T-176, the owner's rename plan, whose eligible rows are exactly this class"
       refused_not_in_its_kind_folder: 'the file does not sit under its declared kind folder (the placement axis, axis_depth 1), so the path its corpus twin would take cannot be derived: the misplaced class T-180 owns'
+      refused_domain_not_a_corpus_domain: 'the file does not sit under a folder this root declared as its axis, or that folder is not a name the CORPUS already materialises (arrangement.share_rule): admitting it would put a new top-level name in the one corpus home and silently widen the domain vocabulary the pipeline classifies against, so the row is refused and counted instead (D-3062)'
 
 

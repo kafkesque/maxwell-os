@@ -75,6 +75,11 @@ DECISIONS = (
     "refused_container_no_stage_reads_it",
     "refused_name_repair_first",
     "refused_not_in_its_kind_folder",
+    #: D-3062: a note's share of the ONE corpus root is its own DOMAIN subtree. A source folder the corpus does
+    #: NOT materialise would land at the corpus TOP LEVEL, beside the DOMAIN trees - and the domain vocabulary
+    #: HAS ONE MATERIALISATION (census_source_names.axis_vocabulary reads the corpus's own immediate
+    #: subdirectories), so an admission would silently WIDEN it. That is a declared refusal, not a guess.
+    "refused_domain_not_a_corpus_domain",
 )
 
 CONTROL_LABELS = (
@@ -96,6 +101,7 @@ CONTROL_LABELS = (
     "an_axis_outside_the_declared_vocabulary_is_FATAL_and_never_guessed",
     "a_bare_run_writes_NOTHING_and_the_reader_names_no_path_of_its_own",
     "the_ONE_line_brief_agrees_with_the_full_reading",
+    "a_DOMAIN_axis_root_KEEPS_its_DOMAIN_folder_and_a_folder_the_corpus_does_not_materialise_is_REFUSED",
 )
 
 
@@ -249,7 +255,11 @@ def build(pol: dict[str, Any] | None = None) -> dict[str, Any]:
     axes = home_axes(doc)
     patterns = name_patterns(doc)
     cache = census.cache_keys(doc)
-    index = corpus_index(home_path(homes, "corpus_home"))
+    corpus_root = home_path(homes, "corpus_home")
+    index = corpus_index(corpus_root)
+    #: The DOMAIN names the corpus MATERIALISES (census_source_names.axis_vocabulary -> its own immediate
+    #: subdirectories). Read, never restated: a second list here would be a second home for the topic vocabulary.
+    domains = census.axis_vocabulary(doc, corpus_root)["domain"]
 
     counts = {name: 0 for name in DECISIONS}
     examples: dict[str, list[str]] = {name: [] for name in DECISIONS}
@@ -282,6 +292,21 @@ def build(pol: dict[str, Any] | None = None) -> dict[str, Any]:
             key = key_of(path.stem)
             stat["files"] += 1
             kind_dir = root["path"] / suffix.lstrip(".")
+            #: THE TARGET PATH COMES FROM THE ROOT'S OWN DECLARED AXIS AND NOTHING ELSE (D-3062).
+            #:   kind   -> below the KIND folder (books/epub/DOMAIN/sub/name)
+            #:   domain -> below the ROOT itself, so the DOMAIN folder at depth 1 is CARRIED (notes/DOMAIN/sub/name)
+            #: A domain-axis root read with the kind rule proposes every note at the corpus ROOT (its "kind folder"
+            #: does not exist), which loses the owner's arrangement AND creates a top-level entry the domain
+            #: vocabulary would then claim as a DOMAIN. The axis is declared in placement.homes; this follows it.
+            if axis == "kind" and kind_dir.is_dir() and path.is_relative_to(kind_dir):
+                rel = path.relative_to(kind_dir)
+                rel_label = f"{root['id']}/{suffix.lstrip('.')}/{rel}"
+            elif axis == "domain":
+                rel = path.relative_to(root["path"])
+                rel_label = f"{root['id']}/{rel}"
+            else:
+                rel = Path(path.name)
+                rel_label = f"{root['id']}/{suffix.lstrip('.')}/{rel}"
             if key in index:
                 decision = "already_in_the_corpus"
             elif key in cache:
@@ -294,6 +319,8 @@ def build(pol: dict[str, Any] | None = None) -> dict[str, Any]:
                     decision = "refused_container_no_stage_reads_it"
                 elif axis == "kind" and not (kind_dir.is_dir() and path.is_relative_to(kind_dir)):
                     decision = "refused_not_in_its_kind_folder"
+                elif axis == "domain" and (len(rel.parts) < 2 or rel.parts[0] not in domains):
+                    decision = "refused_domain_not_a_corpus_domain"
                 elif classes:
                     decision = "refused_name_repair_first"
                 else:
@@ -306,11 +333,10 @@ def build(pol: dict[str, Any] | None = None) -> dict[str, Any]:
             else:
                 stat["never_seen"] += 1
             if decision == "admit_candidate":
-                rel = path.relative_to(kind_dir) if kind_dir.is_dir() else Path(path.name)
                 rows.append(
                     {
                         "path": str(path),
-                        "rel": f"{root['id']}/{suffix.lstrip('.')}/{rel}",
+                        "rel": rel_label,
                         "root": root["id"],
                         "kind": suffix.lstrip("."),
                         "key": key,
@@ -393,8 +419,10 @@ def render(plan: dict[str, Any]) -> str:
     lines += ["", "## What this plan does NOT do", "",
               "- it does not move, copy, rename or convert a single file, and a bare run writes no file;",
               "- it does not decide a TOPIC: the proposed path inherits the source's own arrangement below its",
-              "  declared kind folder, and the owner may move a row's folder (a topic is never decided by an",
-              "  engine, D-2898);",
+              "  declared AXIS folder (kind for books, domain for journals:notes), and the owner may move a row's",
+              "  folder (a topic is never decided by an engine, D-2898);",
+              "- it does not WIDEN the corpus: a path whose first component is not a name the corpus already",
+              "  materialises is refused (arrangement.share_rule, D-3062);",
               "- it does not repair a name: a defective name is refused here and rides the rename plan (T-176),",
               "  because admitting it would materialise a defect the S0.5 cache then STAMPS;",
               "- it does not read a file's content: the identity of a work is evidence by name, and the door's",
@@ -415,21 +443,18 @@ def write_plan(plan: dict[str, Any], decl: dict[str, Any], root: Path = _PROJECT
 def brief(plan: dict[str, Any]) -> str:
     """THE NOTIFY, in ONE line, for the ladder: what waits for the owner's word and nothing else."""
     counts = plan["counts"]
-    refused = (
-        counts["refused_name_repair_first"]
-        + counts["refused_container_no_stage_reads_it"]
-        + counts["refused_no_declared_corpus_home"]
-        + counts["refused_not_in_its_kind_folder"]
-    )
+    #: EVERY declared refusal class, DERIVED from the closed vocabulary - never a hand-kept subset. The line this
+    #: replaces named four of the classes in prose, so a class added later could read its count only in the plan
+    #: file and never on the ladder: a declared class that reads ZERO must still be PRINTED (BUG-487), and one
+    #: that is not printed at all is indistinguishable from one that does not exist.
+    refusals = [name for name in DECISIONS if name.startswith("refused_")]
+    refused = sum(counts[name] for name in refusals)
+    detail = ", ".join(f"{name[len('refused_'):].replace('_', ' ')} {counts[name]}" for name in refusals)
     return (
         f"ADMISSION: {plan['files']} file(s) in the declared kind roots, {plan['seen']} the pipeline has seen "
         f"(by key {counts['already_in_the_corpus']}, by an ingest record {counts['seen_by_an_ingest_record']}) "
         f"|| never seen {plan['never_seen']} ({plan['unseen_keys']} key(s)): "
-        f"candidates {counts['admit_candidate']}, refused {refused} "
-        f"(name repair first {counts['refused_name_repair_first']}, container no stage reads "
-        f"{counts['refused_container_no_stage_reads_it']}, no declared corpus home "
-        f"{counts['refused_no_declared_corpus_home']}, not in its kind folder "
-        f"{counts['refused_not_in_its_kind_folder']}) || plan: just admit-plan"
+        f"candidates {counts['admit_candidate']}, refused {refused} ({detail}) || plan: just admit-plan"
     )
 
 
@@ -462,9 +487,16 @@ def selftest() -> int:
         (books / "epub" / "DOMAIN 6 AI + Computing" / "No Stage Reads This.mobi").write_text("x", encoding="utf-8")
         (books / "epub" / "loose at the root.epub").write_text("x", encoding="utf-8")
         (books / "stray out of its kind folder.pdf").write_text("x", encoding="utf-8")
+        #: THE NOTE ROOT DECLARES A SHARE of the ONE corpus root (D-3062): its own DOMAIN/<subtopic> path is
+        #: CARRIED into the corpus, and a folder the corpus does not materialise as a DOMAIN is REFUSED.
         notes = base_dir / "notes"
-        (notes / "pdf").mkdir(parents=True)
-        (notes / "pdf" / "A Note.pdf").write_text("x", encoding="utf-8")
+        (notes / "DOMAIN 6 AI + Computing" / "design-notes").mkdir(parents=True)
+        (notes / "DOMAIN 6 AI + Computing" / "design-notes" / "A Note.pdf").write_text("x", encoding="utf-8")
+        (notes / "unsorted notes").mkdir(parents=True)
+        (notes / "unsorted notes" / "Homeless Note.pdf").write_text("x", encoding="utf-8")
+        unhomed = base_dir / "unhomed"
+        (unhomed / "pdf").mkdir(parents=True)
+        (unhomed / "pdf" / "No Home.pdf").write_text("x", encoding="utf-8")
         cache = base_dir / "book_metadata.jsonl"
         cache.write_text(
             json.dumps({"source_book": "Renamed Work.md", "author": "A Voice", "title": "Renamed Work"}) + "\n",
@@ -474,7 +506,8 @@ def selftest() -> int:
             "source_library": {
                 "roots": [
                     {"id": "books", "path": str(books), "kinds": ["epub", "pdf", "md"], "admits_to": "corpus_home"},
-                    {"id": "notes", "path": str(notes), "kinds": ["pdf", "md"], "admits_to": None},
+                    {"id": "notes", "path": str(notes), "kinds": ["pdf", "md"], "admits_to": "corpus_home"},
+                    {"id": "unhomed", "path": str(unhomed), "kinds": ["pdf"], "admits_to": None},
                 ],
                 "metadata_cache": str(cache),
                 "marker_pattern": r"(?i)\b(z-lib|1lib)\b",
@@ -485,12 +518,13 @@ def selftest() -> int:
                     "homes": {
                         "books": {"axis": "kind", "axis_depth": 1},
                         "notes": {"axis": "domain", "axis_depth": 1},
+                        "unhomed": {"axis": "domain", "axis_depth": 1},
                     }
                 },
                 "admission": {
                     "authority": "D-XXXX-fixture",
                     "plan_prefix": "governance/ADMISSION_PLAN_",
-                    "target_rule": "fixture rule: the source's own path below its kind folder, suffix -> .md",
+                    "target_rule": "fixture rule: the source's own path below its DECLARED AXIS folder, suffix -> .md",
                     "refusal_examples": 3,
                     "decisions": {name: f"fixture meaning of {name}" for name in DECISIONS},
                 },
@@ -526,6 +560,16 @@ def selftest() -> int:
                and "DOMAIN 6 AI + Computing" in str(row["target"]),
                f"the candidate row read {row} — expected a target below the corpus home with the source's own "
                f"sub-path and the .md suffix the conversion stage writes")
+
+        # (18) a NOTE keeps its DOMAIN folder and its own subtopic; a folder the corpus does not materialise is REFUSED
+        note = rows.get("A Note.pdf", {})
+        expect(CONTROL_LABELS[18],
+               bool(note) and str(note.get("target", "")).endswith("DOMAIN 6 AI + Computing/design-notes/A Note.md")
+               and counts["refused_domain_not_a_corpus_domain"] == 1,
+               "the note row read " + str(note) + " and the undeclared-folder refusal read "
+               + str(counts["refused_domain_not_a_corpus_domain"]) + " — a note must KEEP its DOMAIN folder and its "
+               "own subtopic (the owner's arrangement, never an engine's topic), and a source folder the corpus does "
+               "not materialise must be REFUSED rather than widen the domain vocabulary")
 
         # (3) a container no stage reads is REFUSED and counted; (5) an undeclared corpus home is REFUSED
         expect(CONTROL_LABELS[3], counts["refused_container_no_stage_reads_it"] == 1,
@@ -596,11 +640,15 @@ def selftest() -> int:
                and ("def saniti" + "ze") not in own,
                f"the reader's key read {key_of('Seen Book')!r} against the door's own {door!r} - it must BE that key")
 
-        # (17) THE DECLARED AXIS (the latent class this reader first got wrong): a home whose axis is NOT the kind
-        # keeps the owner's own topic folders, so the SAME file must read as a CANDIDATE there and never as "out of
-        # its kind folder" - the kind-folder test means something only where the axis IS the kind.
+        # (17) THE DECLARED AXIS (the latent class this reader first got wrong, and CLOSED by D-3062): a home whose
+        # axis is NOT the kind keeps the owner's own topic folders, so the SAME file must read as a CANDIDATE there
+        # and never as "out of its kind folder" - the kind-folder test means something only where the axis IS the
+        # kind. The base fixture now DECLARES that share, so this control isolates the class the other way: it removes
+        # the root that declares NO home, leaving one domain-axis home whose works DO have a home.
         domain_home = json.loads(json.dumps(pol))
-        domain_home["source_library"]["roots"][1]["admits_to"] = "corpus_home"
+        domain_home["source_library"]["roots"] = [
+            r for r in domain_home["source_library"]["roots"] if r["id"] != "unhomed"
+        ]
         with_home = build(domain_home)
         expect(CONTROL_LABELS[16],
                with_home["counts"]["refused_not_in_its_kind_folder"] == 1

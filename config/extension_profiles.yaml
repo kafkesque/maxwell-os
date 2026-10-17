@@ -124,6 +124,19 @@ never:
       second home for one capability. RETIRE candidate - the live one stays available, the twin does not.
 
 profiles:
+  #: THE MINIMAL SESSION (declaration only until the owner flips ONE config line). MEASURED 2026-10-17: the two
+  #: members workshop adds are the two LARGEST schemas in the set (filesystem 14 tools / 3,727 tok, gitmcp-mcp 12
+  #: tools / 1,906 tok = 5,633 of the ~7,909 tok/request the six stdio extensions ship), and both duplicate what
+  #: `developer.shell` already does at ZERO schema cost. This profile exists so the choice "pay 5.6k tokens in every
+  #: session" is a NAMED decision rather than a default nobody looked at. NOT applied: `default_profile` still reads
+  #: workshop, because switching it is an owner act on the harness home (a pipeline lane editing it would be the
+  #: unwatched mover D-3049 refuses) AND it only takes effect in a NEW session (BUG-873 limb b).
+  core:
+    adds: []
+    when: >-
+      the always set and nothing else: a session that reads a few files, answers a question, or writes one governed
+      document. The cheapest birth surface this OS can offer, at the price of not having list_directory_with_sizes /
+      read_multiple_files until a workshop session is started.
   workshop:
     adds: [filesystem, gitmcp-mcp]
     when: 'a session whose act is repository work: sweeping files, reading history, moving artifacts.'

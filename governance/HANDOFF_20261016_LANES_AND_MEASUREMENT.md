@@ -430,3 +430,88 @@ until (b) lands.**
 4. **T-188** mypy as a rail (C17 half-runner) and **T-189/T-190** (read-only reviewer; a receipt for a surface change).
 5. **The provider-list writer** (BUG-874's residual), then grounded `just ask`, then the owner lane T-183 → T-180 →
    T-176 → T-179 → T-182.
+
+---
+
+## 1e. SPINE UPDATE — 2026-10-17, FOURTH SITTING (append-only; nothing above is rewritten)
+
+**0. THE OWNER'S FOUR WORDS, ANSWERED WITH BYTES.** (a) the extension model was EXAMINED, not re-decided;
+(b) T-174 was RE-BOUND and its command corrected; (c) META-LANE-FREEZE-1 was CLOSED by its own terms;
+(d) T-181 limb 2 — the NOTE'S HOME — was DECLARED, and the reader that would have got it wrong was fixed with it.
+One new bug filed (BUG-877), two decisions minted (D-3062, D-3063), one rail message made true.
+
+| item | before | after | how it was measured |
+|---|---|---|---|
+| `just extensions-check` | rc 2 (9 residents vs policy) six days ago; **rc 0** this sitting | **rc 0**, 26 declared / 12 enabled = workshop | `scripts/goose_profile.py --check` |
+| harness homes | rc 2, `active_provider` CONFLICT (custom_deepseek) | **5 bound / 0 conflicting**, rc 0 | backup `config.yaml.bak.20261017121710`, file read back |
+| META-LANE-FREEZE-1 | state open, day 20 of 14, exit UNMET, rc 2 | **state closed, BOTH clauses MET, rc 0** | `check_freeze_window.py`, 15/15 controls |
+| T-181 limb 2 | `admits_to: null`, 621 rows refused | **declared**, no-home refusals **621 → 0**, candidates **244 → 479** | `plan_admission.py --brief`, 19/19 controls |
+| routing debt | 225 vs ceiling 222 (filed by the third sitting) | **225** — this sitting did NOT make it worse (BUG-877 routes) | `resolve_route.py --check` |
+
+**1. THE EXTENSION QUESTION, ANSWERED BY ONE MEASURED ASYMMETRY — mid-session switching is a ONE-WAY DOOR.**
+The policy already declares two switches (`config/extension_profiles.yaml#residency`), and they are not equivalent:
+`enabled:` is read **at BIRTH** (BUG-873 limb b: a resumed session keeps the surface it was born with, proven from
+`sessions.db`), and the runtime switch (`extensionmanager.manage_extensions`) advertises **`disable` and `install`** —
+it can REMOVE a tool, it cannot ADD one the session was not born with. So "switch the profile mid-session" is not a
+design choice we are free to make: **you can only shed, never gain.** The reliable architecture is therefore the one
+already declared — **a task-labels the session, and the profile is chosen at birth** — with the runtime switch kept
+for what it honestly is: a way to drop a heavy extension once its work is done, decided by a MODEL and therefore
+never a rail (`judged_by: model`, `not_a_rail: true`).
+
+**2. DOES THAT COST CONTINUITY? NO — BECAUSE THIS OS'S MEMORY IS NOT THE TRANSCRIPT.** A task-labelled session loses
+nothing that matters if it leaves a receipt: the durable layers are `memory` (always resident), `chatrecall`
+(on_demand, for "what did we decide in a past session" from the harness store), and — decisively — the FILE SYSTEM:
+`governance/buglog.md`, `config/task_register.yaml`, `config/decisions.yaml`, the handoff this line is written in,
+and `scripts/delegate_journal.py`. That is why task sessions are not a regression here: **the OS already refuses to
+treat a transcript as a record** (D-3036, "an act that leaves no trace did not happen"). The one real cost is
+re-establishing context, and that cost is MEASURED and low: the prefix cache returns 25.01x on a byte-stable prefix
+(BUG-872), so a NEW session is cheap precisely when its opening bytes are stable.
+
+**3. THE PROFILES THAT MATCH THE ACTS WE ACTUALLY PERFORM** (all declared; nothing new invented): `workshop`
+(repo engineering — the current default), `core` (**added this sitting as a DECLARATION, not applied**), `research`
+(finding something out), `documents` (read one PDF in place), `recall` (past-session questions), `web`, `sandbox`,
+`everything` (measurement only). Delegates already have their own three (`review` = developer+analyze+**skills**,
+`sweep` = developer+analyze+filesystem, `extract` = developer+summarize) — and a delegate is a SESSION, so the same
+birth-time rule applies to it.
+
+**4. THE ONE LEVER STILL ON THE TABLE, PRICED.** `workshop` adds the two largest schemas in the set — `filesystem`
+(14 tools / 3,727 tok) and `gitmcp-mcp` (12 tools / 1,906 tok) = **5,633 of the ~7,909 tok/request** the stdio set
+ships — and both duplicate `developer.shell` at zero schema cost. `core` is now declared so that paying it is a
+NAMED decision. **Switching it is an OWNER act** (two flips in the harness home + `default_profile: core`) and it
+takes effect in the NEXT session only. `python3 scripts/goose_profile.py --render core` prints the exact commands.
+
+**5. R5 RAN, AND IT SAID REJECT — RECORDED, THEN ADJUDICATED.** gemma-4-E4B reviewed the `plan_admission.py` change
+(`DJ-20261017T101927Z-7c80`, journaled BEFORE the call) and returned REJECT on two objections. Both were answered
+with a measurement rather than a green: (i) "a file outside its kind folder may resolve wrongly" — that IS the
+declared, counted `refused_not_in_its_kind_folder` class (52 rows, unchanged before and after); (ii) "the corpus-key
+test precedes the admission tests" — that is the D-3045 identity rule, held by the control
+`a_work_the_corpus_holds_by_KEY_is_NOT_an_admission_candidate`. **No code changed for the rejection**; the
+adjudication is D-3063's consequence, and a reviewer disagreeing is information, not a verdict.
+
+**6. WHAT THE NOTE'S DECLARATION ACTUALLY CHANGED IN THE TREE'S OWN TAXONOMY.** Declaring `admits_to` alone would
+have been WRONG: the reader derived every target as `corpus_home/(path below the root's KIND folder)`, and a
+domain-axis root has no kind folder — so the fallback proposed **every note at the corpus ROOT**, beside the DOMAIN
+trees, where the domain vocabulary (read from the corpus's own immediate subdirectories) would have claimed it as a
+new DOMAIN. That is the drift class this reading exists to prevent, found by measuring before writing. Fixed by
+deriving the path from the DECLARED AXIS, and the rule is now ENFORCED as a refusal
+(`refused_domain_not_a_corpus_domain`, 0 on today's library — printed as a zero, never omitted).
+
+**7. BUG-877 — A GOVERNED WRITE THAT DOES NOT SURVIVE.** T-174's gate recorded BOUND on 2026-10-16; today the home
+read `custom_deepseek` again and **no backup beside it carries the flipped value** (13:16, 00:35, 11:40×2 all read
+custom_deepseek). Something rewrote the owner home without a backup; the candidate (the client rewrites its own
+config) is a HYPOTHESIS. The rail that measures it is right and is in the ladder — and the sixth sitting's 14-red
+reading did not include it, which is recorded as an open question, not a verdict.
+
+### NEXT CRITICAL STEPS, consequential order (each unblocked unless marked)
+1. **T-183's applier** — the last limb of THE ADMISSION. 479 candidates now have a declared home and a derived target;
+   nothing may move until a plan-keyed, dry-run-default, crash-safe writer exists.
+2. **The BUG-877 red loop** — a two-point reading either side of a client restart, naming what rewrites the home.
+   The reading is one command; the missing thing is a SCHEDULE, not an instrument.
+3. **BUG-876** — the attribution control; still the one thing that blocks a loop agent from adjudicating a governed
+   write (the sixth sitting's verdict stands).
+4. **`just ask` grounded in the retriever** — the measured gap; a diff to one script plus a refuse-when-silent clause.
+5. **T-187** — the two-step/two-tool fixture; still the only gate for a model promotion (and the ONLY gate for the
+   2507-class candidate recorded in D-3061).
+6. **The routing debt 225 vs 222** — pre-existing, and its SHAPE is now measured: **223 of the 225 name NO artifact
+   in their title at all** (`no_artifact_named`). The metric is measuring bug-TITLE hygiene more than routing; a
+   disposition or a title rule is the honest fix, not 223 capability declarations.

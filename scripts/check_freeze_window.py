@@ -14,7 +14,8 @@ The ONE home is config/freeze_window.yaml; this is the ONE reader. It settles wh
 declared EXIT met, has the declared HORIZON passed, is every parked id REAL, and has the parked set outgrown
 its declared ceiling. It does not decide policy - it reports whether the window can still END.
 
-Exit: 0 the window is OPEN, its exit UNMET and it is inside its horizon (the normal state)
+Exit: 0 the window is OPEN, its exit UNMET and it is inside its horizon (the normal state) - or it is CLOSED
+        and its exit is MET (the ended state; a closed window whose exit is UNMET is a FAULT, clause (f))
       1 a fault - a parked id the register does not carry, a set past its ceiling, a malformed declaration
       2 OWNER-OWED, loud, NOT fatal (BUG-457): the EXIT IS MET (close it), or the HORIZON PASSED with the exit
         unmet (re-rule it) - renewing by default is how a window becomes a policy
@@ -347,6 +348,9 @@ def main() -> int:
         else:
             print("  OWNER-OWED: the horizon " + str(review_by) + " has passed with the exit UNMET - RE-RULE the window (a new review_by with a reason) or close it; renewing by default is how a window becomes a policy (D-337)")
         return 2
+    if str(win.get("state")) == "closed":
+        print("  ok   the window is CLOSED and its declared EXIT is MET: it ended by its own terms, and the parked set stays COUNTED (D-2688)")
+        return 0
     print("  ok   the window is OPEN with its exit written DOWN and UNMET inside its horizon: the parked set is COUNTED and the exit is DECLARED (D-2688)")
     return 0
 

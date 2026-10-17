@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1188 decisions (census stamp 5e08aaba4af83ece, 2026-10-17) · 641 bugs (232 open / 409 closed; highest OPEN = BUG-876) · 59 open tasks (MUST 12 / SHOULD 43 / WORTH 4; OWNER-moved 0, pipeline-moved 59; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1188 decisions (census stamp 5e08aaba4af83ece, 2026-10-17) · 642 bugs (233 open / 409 closed; highest OPEN = BUG-877) · 59 open tasks (MUST 12 / SHOULD 43 / WORTH 4; OWNER-moved 0, pipeline-moved 59; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **79** of 1188 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 603 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1188, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 232 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 35 · 🟨 MED 67 · 🟩 LOW 25 · UNLABELLED 101 (BUG-757) of 232 open.
+> Open BUGS by severity (population = the census's 233 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 35 · 🟨 MED 68 · 🟩 LOW 25 · UNLABELLED 101 (BUG-757) of 233 open.
 >
 > **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -16368,3 +16368,34 @@ FIX (T-185, three limbs, each a rule the repository already declares elsewhere):
   unattributable is the one whose provenance matters most. The control is honest - it refuses to answer - which is
   why it must be repaired rather than quieted; a green here would be a lie.
 - NOT this sitting's doing: measured red at 11:0x, before any edit of this session.
+
+### BUG-877 (MED, OPEN 2026-10-17) — A GOVERNED WRITE TO THE HARNESS HOME DOES NOT SURVIVE: scripts/check_harness_homes.py reads CONFLICT again, and no backup beside the home ever carried the applied value
+
+- **Status: OPEN.** `python3 scripts/check_harness_homes.py` read rc 2 at 12:1x today: `active_provider` CONFLICT
+  (the home says `custom_deepseek`, the declaration says `maxwell_omlx`). It is the D-295/BUG-243 reversal, one
+  layer out: the everyday path can leave the machine while every declaration in the repo looks right (C1/C3).
+- **MEASURED (bytes, not memory):** every backup beside the home from `config.yaml.bak.20261016131628` onward —
+  10-16 13:16, 10-17 00:35, and the two 11:40 T-186 backups — reads `active_provider: custom_deepseek`. **No
+  backup on disk carries the flipped value**, so there is no recorded post-image of T-174's apply anywhere beside
+  the file it edited.
+- **THE CONTRADICTION, stated rather than smoothed:** T-174's `gate` records that after
+  `apply_provider_flip.py --apply-flip` "all three declared facts read BOUND with rc 0". Both readings are real;
+  they cannot be the same state of the file. So **something rewrote the home after the apply, without a backup**.
+  The candidate (the harness app owns `config.yaml` and rewrites it at start/exit) is a HYPOTHESIS, not a finding
+  — no reproduction has been run and none is claimed here.
+- **The rail that would have caught it exists and is RIGHT** (`Justfile` line 65: rc 2 = CONFLICT, loud not fatal),
+  and the sixth sitting's whole-set ladder run reported FOURTEEN reds without this line among them. Either the
+  reversion happened after that run, or the line's rc was not collected. **Recorded as an open question, not a
+  verdict** — D-3036: a theory needs a red loop first, and the red loop here is a two-point reading either side of
+  a harness restart (start the app, read the home again, name what changed).
+- **WHAT THIS ACT DID:** one `--apply-flip` (backup `config.yaml.bak.20261017121710`, written file READ BACK, rc 0)
+  → `check_harness_homes.py` now reads **5 bound / 0 conflicting / 0 waiting**, rc 0. The owner's exposure is closed
+  for now; the DEFECT — a governed write that does not survive — is not.
+- **Also corrected, same act:** the declared command for T-174 was stale in TWO homes (the task register's gate and
+  the ladder comment) — it named `pipeline/apply_provider_flip.py`, the pre-move path (T-175/D-3046 moved the
+  writer to `agent/adapters/goose/`). A declared command that does not resolve is the D-3034 class, and the owner
+  hit its shadow when `--apply` (a mode this writer never declared) answered `FATAL: unknown mode`. The writer
+  REFUSING rather than guessing is the one thing here that worked exactly as designed.
+- **Remedy owed:** (a) a reproduction that names what rewrites the home (start the client, read `active_provider`
+  before/after; the reading is one command); (b) a schedule, not just a reading — `check_harness_homes.py` must run
+  at the point the home is written, or the rail's rc only ever describes the last time someone looked.

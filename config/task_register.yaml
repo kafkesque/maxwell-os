@@ -1461,7 +1461,8 @@ tasks:
     BEFORE the binding the live reading was rc 2 with TWO CONFLICTS (active_provider, where the home said custom_deepseek
     and D-295/BUG-243 say maxwell_omlx; and the model pin, where the home said the coder model while the agent_loop role
     says gemma-4-E4B-it-MLX-4bit) - the D-295 reversal, caught as a READING and not by a session noticing it. AFTER the
-    owner word (T-174, pipeline/apply_provider_flip.py --apply-flip) all three facts read BOUND, rc 0, and a DIRECT headless
+    owner word (T-174, agent/adapters/goose/apply_provider_flip.py --apply-flip; the dump below names the pre-move path and is
+    left as measured) all three facts read BOUND, rc 0, and a DIRECT headless
     run moved the engine counter 594833 -> 594835 where the same run had left it still. The facts live at config/agent_context.yaml#home_facts;
     the escalation provider at config/engine.yaml#harnesses.'
   gate: 'pipeline: the harness homes a decision names (the session provider and model, the harness job map, the Zed settings
@@ -1885,7 +1886,7 @@ tasks:
     the harness home still reads a non-declared provider, and that one line is the OWNER''s file - which is why this
     row stays in the owner lane with the mechanism limb PROVEN.'
   gate: 'SATISFIED 2026-10-16 on the owner''s word ("T-174 bound"), on the DECLARED path only - no hand edit of the harness
-    home: `python3 pipeline/apply_provider_flip.py --apply-flip` (dry-run by default, backups beside the home, the written
+    home: `python3 agent/adapters/goose/apply_provider_flip.py --apply-flip` (dry-run by default, backups beside the home, the written
     file READ BACK, and the values resolved by POINTER from config/engine.yaml and config/model_assignments.yaml - the
     T-175 site this file owed). MEASURED before: a DIRECT headless run (the everyday path, no wrapper) answered PONG
     with the engine counter standing still at 594833. MEASURED after: the same run moved it 594833 -> 594835, and `scripts/check_harness_homes.py`
@@ -2123,11 +2124,14 @@ tasks:
     0 command(s) that do not resolve" (D-3034) and the library epub root holds 554 .epub while the corpus holds 940 .md
     and no epub/pdf at all.'
   gate: 'PIPELINE LANE (the disposition word was GIVEN 2026-10-17 and is recorded in governance/HANDOFF_20261016_LANES_AND_MEASUREMENT.md#1b;
-    what remains is the pipeline-side act), TWO limbs remain. (1) CLOSED 2026-10-16 by D-3051 - the admission IS declared:
-    disposition-giver actor, one counter line on every health run (just admit-plan / the ladder''s --brief), a plan-first
-    lane, a measured target rule, and a CLOSED decision vocabulary. (2) A NOTE''S HOME - journals:notes declares admits_to:
-    null and no declaration names a home a note is admitted to: decide it (a second corpus, a declared share of the one
-    corpus, or notes out of scope), because 341 of its 621 unseen files are of a kind the root declares. (3) the library
+    what remains is the pipeline-side act). LIMB 1 CLOSED 2026-10-16 by D-3051 - the admission IS declared: disposition-giver
+    actor, one counter line on every health run (just admit-plan / the ladder''s --brief), a plan-first lane, a measured
+    target rule, and a CLOSED decision vocabulary. LIMB 2 CLOSED 2026-10-17 by D-3062 - journals:notes now declares its
+    SHARE of the ONE corpus root (admits_to: corpus_home), carried on the corpus''s OWN DOMAIN axis, so the rows refused
+    for no declared corpus home read ZERO and are re-classified (MEASURED 2026-10-17: candidates 244 -> 479,
+    container-no-stage-reads 9 -> 389 - the .docx/.txt this root owns but no stage converts - and
+    domain-not-a-corpus-domain 0). The READER was wrong for that root and was fixed in the SAME act: read with the kind
+    rule, a domain-axis root proposed every note at the corpus ROOT, beside the DOMAIN trees. (3) the library
     md twin''s fate overlaps T-179 - retire it, or declare it the originals archive with its own age budget. The APPLIER
     is its own row (T-183). Nothing here authorises moving, renaming or deleting a byte. | WHAT REMAINS IS THE PIPELINE-SIDE
     ACT - the word that was given on 2026-10-17 is recorded in the handoff 1b: the disposition''s GO 2026-10-17 approved

@@ -27070,3 +27070,76 @@ decisions:
   - 'Research on a model now leaves a receipt that says what is MISSING from the evidence, not only what was found.'
   - 'llmfit''s coverage of the served roster is recorded as 4/8 - a future reader may not assume the fit oracle can see the machine.'
   - 'T-131 (the model-swap bench) now has a declared shape; T-187 remains the only gate for a promotion.'
+
+- id: D-3062
+  state: ACTIVE
+  date: '2026-10-17'
+  by: assistant
+  category: GOVERNANCE / THE FREEZE WINDOW CLOSES
+  bugs: []
+  files:
+  - config/freeze_window.yaml
+  - scripts/check_freeze_window.py
+  title: 'META-LANE-FREEZE-1 IS CLOSED BY ITS OWN TERMS - the two ids it still held are RELEASED, not fixed, and a green line that called a closed window OPEN was made true.'
+  decision: >-
+    The owner closed the window (verbatim: "META-LANE-FREEZE-1 close it"). Recorded in the ONE home its reader reads
+    (config/freeze_window.yaml#window: state closed, closed, closed_by, closed_why) rather than in prose, because the
+    rail COMPUTES the exit from that file. The close is BY THE WINDOW'S TERMS: opening_set_closed was already MET, and
+    nothing_still_held becomes MET because BUG-559 and BUG-593 are RELEASED with a reason - a release is a ruling
+    ABOUT a hold (D-2688), so both ids STAY OPEN in the register and are worked in the ordinary lane. The alternative
+    the file also declares - re-ruling the horizon - was refused: the horizon passed on 2026-10-11 and renewing by
+    default is how a window becomes a policy (D-337). No clause was edited, no ceiling was raised, and nothing was
+    deleted from window.held.
+  evidence: >-
+    MEASURED before: `python3 scripts/check_freeze_window.py` rc 2 - "day 20 of 14, review_by 2026-10-11, parked 12
+    (ceiling 12), still OPEN 2", exit UNMET on nothing_still_held, OWNER-OWED on the passed horizon. MEASURED after:
+    rc 0, "state=closed, still OPEN 0, released 3", BOTH exit clauses MET. Controls 15/15 before and after. The
+    register was not asked to agree: governance/bug_status.md still carries BUG-559 and BUG-593 OPEN, which is the
+    point of the ruling. One defect was FOUND AND FIXED in the same act: the rail's success line printed "the window
+    is OPEN ..." unconditionally, so a CLOSED window ending by its own terms read as an open one - a green line whose
+    prose is false is drift, and it now branches on the state.
+  consequences:
+  - 'The governance lane the window protected is back to the ordinary lane; so are BUG-559 and BUG-593, which are OPEN work rather than parked work.'
+  - 'The ladder line returns 0 instead of 2, so an OWNER-OWED reading that had been true for six days no longer competes with a real one.'
+  - 'A future window must declare its own exit and horizon again; the mechanism (D-2688) is unchanged and its controls still fire.'
+- id: D-3063
+  state: ACTIVE
+  date: '2026-10-17'
+  by: assistant
+  category: INGEST / THE NOTE'S HOME (T-181 LIMB 2)
+  bugs: []
+  files:
+  - config/ingest_identity_gate.yaml
+  - scripts/plan_admission.py
+  title: 'A NOTE IS ADMITTED TO THE ONE CORPUS ROOT ON THE CORPUS''S OWN AXIS - the share is a subtree, never a new top-level folder - and the reader that proposed every note at the corpus ROOT was fixed in the same act.'
+  decision: >-
+    journals_notes.admits_to is DECLARED (corpus_home; it read null, so 621 files were refused for having no home).
+    The share is expressed by the AXIS and not by a folder: this root's placement axis is domain, the corpus's layout
+    axis is domain, and the two vocabularies are byte-identical (both carry the same eight DOMAIN names, MEASURED
+    2026-10-17), so an admitted note lands at corpus_home/<its own DOMAIN>/<its own subtopic>/<name>.md. Refused, with
+    reasons (D-3038): a SECOND corpus (a second home for one fact, C12) and notes-out-of-scope (T-181 measured 341
+    files of a kind this root declares). A new RULE is declared and ENFORCED rather than remembered
+    (arrangement.share_rule): the first component of an admitted path must be a name the corpus already materialises,
+    because the domain vocabulary's one materialisation is the corpus's own immediate subdirectories - an admission
+    that invented a top-level name would silently WIDEN the taxonomy the pipeline classifies against. A row that
+    breaks it is REFUSED as refused_domain_not_a_corpus_domain, counted and printed. ADMISSION IS NOT CONVERSION, and
+    the declaration says so: the conversion stage accepts [.epub,.pdf,.md], so a .docx or .txt is refused as a
+    container no stage reads rather than admitted on a promise. No engine admits anything, no byte moves, and the
+    applier remains T-183.
+  evidence: >-
+    MEASURED, and the SECOND measurement is why this act touched code: setting admits_to alone would have been WRONG.
+    The reader derived every target as corpus_home/(path below the root's KIND folder); a domain-axis root has no kind
+    folder, so the fallback was Path(path.name) - every note proposed at the corpus ROOT, losing the owner's
+    arrangement AND creating a top-level entry the domain vocabulary would then claim as a DOMAIN. Fixed to derive the
+    path from the DECLARED AXIS (kind -> below the kind folder; domain -> below the root, carrying the DOMAIN folder).
+    BEFORE: 2,811 files, 1,697 seen, candidates 244, refused 870 (name repair first 188, container 9, no declared
+    corpus home 621, not in its kind folder 52). AFTER: candidates 479, refused 635 (container 389 - the .docx/.txt
+    this root owns, name repair first 194, not in its kind folder 52, no declared corpus home 0,
+    domain-not-a-corpus-domain 0), and 0 note targets at the corpus root. Controls 18 -> 19, all green; ruff clean. The
+    ladder brief was also repaired: it named FOUR refusal classes in prose, so a class added later could read its count
+    only in the plan file - it now derives EVERY declared class from the closed vocabulary (BUG-487: a declared class
+    that reads zero must still be PRINTED).
+  consequences:
+  - '621 rows stopped being refused for a declaration that did not exist; 235 of them became the owner''s worklist (the rest are containers no stage converts).'
+  - 'The domain vocabulary can no longer be widened by an admission - a drift class that had no reader is now a counted refusal.'
+  - 'R5 (gemma-4-E4B) returned REJECT on two objections - a file outside its kind folder, and the corpus-key test preceding the admission tests. Both were ADJUDICATED as declared behaviour rather than accepted or dismissed: the first IS the counted refused_not_in_its_kind_folder class (52 rows, unchanged), and the second is the D-3045 identity rule the control a_work_the_corpus_holds_by_KEY_is_NOT_an_admission_candidate exists to hold. The rejection is recorded here rather than a green.'

@@ -16,9 +16,22 @@ authority: D-2688
 
 window:
   id: META-LANE-FREEZE-1
-  state: open                  # open | closed - a window outliving its MET exit is a policy, and the rail is loud
+  state: closed                # open | closed - a window outliving its MET exit is a policy, and the rail is loud
   opened: 2026-09-27
   ruled_by: 'the owner, 2026-09-27 ("ok freeze window + your recommendations")'
+  #: THE CLOSE (owner word 2026-10-17, verbatim: "META-LANE-FREEZE-1 close it"). Recorded in the ONE home its
+  #: reader reads (D-2688), never in prose: the rail COMPUTES the exit from this file, so a close that lives
+  #: anywhere else is a belief. It is a close BY ITS OWN TERMS, not around them - see `released` below.
+  closed: '2026-10-17'
+  closed_by: 'the owner, 2026-10-17'
+  closed_why: >-
+    CLOSED BY ITS OWN TERMS. opening_set_closed was already MET. nothing_still_held becomes MET because the two ids
+    still OPEN are RELEASED below by an owner ruling - and a release states the truth exactly: they are NOT fixed,
+    they are no longer PARKED. A released id stays OPEN in the register and is worked in the ordinary lane; what
+    ended is the HOLD, which is all this window ever was. The horizon 2026-10-11 had passed with the exit unmet, so
+    the declared choices were RE-RULE or CLOSE (D-337: renewing by default is how a window becomes a policy). The
+    owner closed it. NOT claimed here: that the two released defects no longer matter. They matter; they are simply
+    no longer held.
   scope: >-
     The governance MACHINERY: the rails, the registries and the controls that make the tree auditable. A NEW
     governance bug may be FILED (measured, with a remedy) but NOT WORKED while this window is open; the product
@@ -75,6 +88,20 @@ window:
       DECOY with its own marker, MUTATION-SEEN (floor 31 -> 32). The id STAYS in window.held above: a release is
       a ruling ABOUT a hold, not a deletion of it, and the freeze rail refuses a release of an id held does not
       name (D-2688).
+
+    BUG-559: >-
+      RELEASED, NOT DRAINED, by the owner's close of this window (2026-10-17). MEASURED at the close: the register
+      carries BUG-559 OPEN (a receipt can be cut over bytes joined to NO revision, so mutability: human_authored was
+      certified by a claim the machine cannot check) and this window never worked it. The ruling is therefore about
+      the HOLD and nothing else: it is no longer parked, it is not fixed, and it is worked from now on in the
+      ordinary lane like any other open defect. Recorded here rather than by deleting it from `held`, because a
+      release is a ruling ABOUT a hold (D-2688).
+    BUG-593: >-
+      RELEASED, NOT DRAINED, by the same owner word (2026-10-17). MEASURED at the close: BUG-593 (the mutation
+      gate's fixture carries ONE commit, so a rule whose oracle joins GIT HISTORY cannot satisfy limb (iv)) is
+      still OPEN, and it stayed parked for TWO windows' worth of days because a window with an unmet exit cannot
+      be re-opened for it. Its remedy is a fixture.history recipe - ordinary product work, not a governance
+      emergency - which is exactly what the ordinary lane is for. NOT fixed; no longer held.
 
   # THE WRITTEN EXIT. Each clause is a fact a reader settles WITHOUT judgement; `review_by` is the horizon a
   # WINDOW must have and a POLICY never does.

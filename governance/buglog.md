@@ -12,7 +12,7 @@
 >
 > Decisions NEEDING ACTION: **79** of 1188 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 603 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1188, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 232 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 35 · 🟨 MED 66 · 🟩 LOW 25 · UNLABELLED 102 (BUG-757) of 232 open.
+> Open BUGS by severity (population = the census's 232 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 35 · 🟨 MED 67 · 🟩 LOW 25 · UNLABELLED 101 (BUG-757) of 232 open.
 >
 > **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -16351,7 +16351,7 @@ FIX (T-185, three limbs, each a rule the repository already declares elsewhere):
   D-2549 loop sweep of 2026-10-17, where it was the ONLY one of eight served models to make ZERO tool calls and
   answer from memory - the same shape, on a loop.
 
-### BUG-876 (MEDIUM, OPEN 2026-10-17) — THE ATTRIBUTION CONTROL CANNOT GO GREEN ON THE REGISTRY IT MEASURES
+### BUG-876 (MED, OPEN 2026-10-17) — THE ATTRIBUTION CONTROL CANNOT GO GREEN ON THE REGISTRY IT MEASURES
 - **Status: OPEN** — `python3 scripts/lib/handoff.py --selftest` reports `1 of 4 attribution control(s) did not
   fire`, and the one that fails is the POSITIVE control: "a governed write that IS the current bytes is attributed".
 - MEASURED, twice, either side of an append: the control compares `last_governed_write("config/decisions.yaml")

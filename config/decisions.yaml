@@ -27192,3 +27192,85 @@ decisions:
   - 'A task-labelled session is one word, and the profile it was born with is a READ-BACK, not a claim.'
   - 'A birth that would silently lack the write gate is refused before anything runs (BUG-878 is the live case).'
   - 'The runtime toggle keeps its honest place: a way to SHED, never the record (T-190 still owes the receipt for the toggle itself).'
+- id: D-3065
+  state: ACTIVE
+  date: '2026-10-17'
+  by: assistant
+  category: HARNESS / THE PROFILE IS RESOLVED, NOT CHOSEN (D-3064 completed; T-186)
+  bugs: [BUG-878]
+  files:
+  - scripts/goose_profile.py
+  - justfile
+  - config/extension_profiles.yaml
+  title: 'A HUMAN WHO MUST REMEMBER A PROFILE NAME IS A ROUTER WITH NO RECEIPT - the birth now RESOLVES the profile (one env override, then the declared default), and specialisation moves to WORKERS instead of to the session.'
+  decision: >-
+    D-3064 made the birth a command but left the CHOICE with the human ("just session <profile>"), which is a
+    cognitive tax on the one act that cannot be got wrong, and eight names is already more than a person should hold.
+    Three things are now declared. (1) THE PROFILE IS RESOLVED: `resolve_profile()` reads `MAXWELL_PROFILE` and
+    otherwise `default_profile`; both are validated against the declared profiles, and an unknown name is a REFUSAL,
+    never a fallback. The resolver is DETERMINISTIC - no model, no memory, no keyword guess: a birth happens before
+    anything is measured, so an LLM router there would add a failure mode, a latency and its own token cost to the one
+    step that must be exact. `just go` is the door with NO argument; `just session <profile>` survives only as an
+    override. (2) SPECIALISATION BELONGS TO WORKERS: a parent session is born with the minimum and grows by
+    DELEGATION (`summon` is already `always`), because a subagent is its own session with an explicit extension list -
+    the same separation Claude Code documents (each subagent runs with "specific tool access"). A profile is therefore
+    something a WORKER carries, not something a human maintains. (3) THE RESOLUTION CONTEXT BELONGS TO THE
+    DECLARATION: a script argument resolves in the extension's declared `cwd` FIRST, then the birth directory -
+    MEASURED as the harness's own order, so the reader predicts what the harness will START rather than what the
+    caller hoped.
+  rationale: >-
+    Two alternative proposals were examined and refused on evidence. A KEYWORD ROUTER over the task text would be a
+    second routing surface beside resolve_route/capability_registry (the reason pstack's 23-playbook router was
+    refused), would drift with phrasing, and would decide before any receipt exists. AN LLM ROUTER AT BIRTH adds a
+    model call and a hallucination surface to the one step with no measurement to check it against; the OS's own rule
+    is that no LLM decides a canonical home or a promotion (D-2898/D-2941), and nothing here justifies an exception.
+    PEER PRACTICE points the same way: Anthropic's Agent Skills preload only a name+description index and read the
+    body on demand (progressive disclosure); Claude Code gives each subagent its own restricted tool access and warns
+    when subagent DESCRIPTIONS exceed 15k tokens; and Anthropic's engineering posts state that loading all tool
+    definitions upfront "overloads the context window" (Nov 2025) and that a description index is how you avoid it.
+    Each of those is a way of not paying for capability nobody is using - which is what `core` does at birth and what
+    delegation does afterwards.
+  evidence: >-
+    MEASURED 2026-10-17: `resolve_profile` returns ("workshop","default_profile=workshop") with no override and
+    ("core","MAXWELL_PROFILE=core") with one; `MAXWELL_PROFILE=ghost` exits 1 naming the declared set and starts NO
+    session. `birth_argv("core")` from /tmp inlines `python3 "…/mcp_doc_guard.py"` and `unresolvable(…) == []`.
+    Selftest 22 -> 31 -> 37 controls, all green; ruff clean; `--check` rc 0 (26 declared / 8 profiles). The measured
+    reason `core` is the intended default: workshop's two additions are 5,633 of the ~7,909 tok/request the stdio
+    extensions ship (filesystem 3,727 + gitmcp-mcp 1,906) and both duplicate `developer.shell` at zero schema cost.
+  consequences:
+  - 'Nobody has to remember a profile name: `just go` resolves one, prints the reason, and refuses a dead member.'
+  - 'A session that crosses task classes is REBORN or DELEGATES; it is never mutated (the one-way door, BUG-873).'
+  - 'The default stays `workshop` until the owner flips ONE line (task B); `just go` is safe to adopt before that.'
+- id: D-3066
+  state: ACTIVE
+  date: '2026-10-17'
+  by: assistant
+  category: MODELS / ORACLES (D-3061 amended, not rewritten)
+  files:
+  - config/model_oracles.yaml
+  - archive/evaluate_model.py.archived-2026-10-17
+  title: 'llmfit KEEPS ONE JOB AND LOSES TWO - discovery is `goose local-models search` (live HuggingFace, GGUF *and* MLX) and capability tags stay refused; the fit ARITHMETIC survives, and its orphan wrapper is archived.'
+  decision: >-
+    Answered by measurement, not by taste. llmfit is NOT retired: it is the only local instrument that computes
+    memory_required_gb / best_quant / a KV-costed fit, and no rail is allowed to rest on it alone. It IS stripped of
+    two claims it never earned: DISCOVERY (its `hf-search` is GGUF-only over a bundled 5,103-model catalogue and
+    covers 4 of the 8 served models) and CAPABILITY (its tags are inverted on this roster, already refused). The
+    ladder is unchanged in shape - discover, FIT, PRIOR, MEASURE THE LOOP - and only the discover OWNER changes.
+    `scripts/evaluate_model.py` is archived: nothing references it, it `pip install`s llmfit at runtime (a network
+    side effect inside a script, refused by C22), and it duplicates both the oracle register and
+    `measure_subagent_loop.py`.
+  rationale: >-
+    "Remove it if it is bloat" is the right question, and the honest answer is narrower than the question: the binary
+    is a real instrument with one job; the wrapper is bloat. Deleting the instrument would leave fit arithmetic with
+    no owner and force a re-implementation of KV-cache math that already works. Keeping the wrapper would preserve a
+    second home for two decisions the OS already declares once (C12), plus an ungoverned installer.
+  evidence: >-
+    MEASURED/PARSED 2026-10-17: `which llmfit` -> /opt/homebrew/bin/llmfit (Cellar 0.9.38);
+    `grep -rn llmfit scripts/ pipeline/ justfile` -> the ONLY executing consumer is `scripts/evaluate_model.py`
+    (`subprocess ... llmfit recommend --json`), and nothing references that script (no justfile recipe, no
+    capability_registry entry, no governance row). `goose local-models search "Qwen3-30B-A3B MLX 4bit" -l 8` returns
+    8 MLX repos including the D-3061 candidate; `llmfit hf-search` cannot see them.
+  consequences:
+  - 'Discovery has one owner with a live index; a model absent from llmfit''s cache is an absent READING, not an absent model.'
+  - 'Fit arithmetic keeps its instrument; no decision may rest on it alone (gates_promotion stays false).'
+  - 'One orphan script and its runtime `pip install` leave the repo; the archive index must be regenerated.'

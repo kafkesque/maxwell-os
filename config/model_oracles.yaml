@@ -20,10 +20,11 @@ authority: 'config/model_oracles.yaml (this file)'
 updated: '2026-10-17'
 
 rule: >-
-  A capability claim must name its oracle. Any candidate model is recorded with (1) a FIT reading (llmfit, this
-  machine) and (2) at most one external benchmark number WITH its oracle named - and (3) it may not be promoted into
-  any role until a machine-truthful oracle has spoken for it. A card's prose is not evidence: "excels in tool
-  calling" with no table is marketing, and it is refused as a class (D-3038).
+  A capability claim must name its oracle. Any candidate model is recorded with (1) a FIT reading from this machine
+  (llmfit's fit arithmetic; DISCOVERY is `goose local-models search`, D-3066 - llmfit's own `hf-search` is GGUF-only
+  and sees a bundled catalogue) and (2) at most one external benchmark number WITH its oracle named - and (3) it may
+  not be promoted into any role until a machine-truthful oracle has spoken for it. A card's prose is not evidence:
+  "excels in tool calling" with no table is marketing, and it is refused as a class (D-3038).
 
 oracles:
   measure_subagent_loop:
@@ -38,9 +39,9 @@ oracles:
       or recover from a refusal. T-187 adds that second fixture before any promotion.
   llmfit:
     kind: local
-    measures: 'hardware fit: fit_level, memory_required_gb, disk_size_gb, estimated_tps, best_quant'
+    measures: 'hardware fit arithmetic: fit_level, memory_required_gb, disk_size_gb, best_quant, estimated_tps'
     machine_truthful: true
-    scope: 'FIT ONLY'
+    scope: 'FIT ARITHMETIC ONLY (D-3066) - never discovery, never a capability claim, never a gate'
     tags: unreliable
     evidence: 'MEASURED 2026-10-17: the served roster''s capability tags are inverted (see header).'
     caveat: >-
@@ -73,3 +74,8 @@ refused_as_evidence:
     llmfit's estimate is a fit-model output at an 8192-token cap. A loop is dominated by prefill and by decode
     under a growing context; substituting one for the other produced the 79.9 s surprise on the model llmfit rates
     fastest in its class.
+  llmfit_as_discovery: >-
+    D-3066, MEASURED 2026-10-17: llmfit's `hf-search` is GGUF-ONLY (the format this machine does not serve) over a
+    BUNDLED catalogue it refreshes itself (`llmfit update`), and it covers 4 of the 8 served models. Discovery is
+    `goose local-models search`, which returns LIVE HuggingFace results for GGUF *and* MLX. A missing model in
+    llmfit's cache is an absence of a reading, never evidence that the model does not exist.

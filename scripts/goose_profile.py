@@ -304,13 +304,15 @@ def render(policy: dict[str, Any], config: dict[str, Any], classes: dict[str, st
     for name in stdio:
         cfg = extensions.get(name) or {}
         parts = [str(cfg.get("cmd") or "")] + [str(a) for a in (cfg.get("args") or [])]
-        text = " ".join(parts).strip()
-        if not text:
+        if not "".join(parts).strip():
             unverified.append(f"{name}: declares no cmd (D-3034)")
             continue
-        if any(" " in p for p in parts):
-            unverified.append(f"{name}: an argument contains whitespace - the single-string form is UNVERIFIED for it")
-        cmd += f" --with-extension '{text}'"
+        resolved = [str(_abs_script(p, cfg, pathlib.Path.cwd()))
+                    if p and not p.startswith("-") and SCRIPTISH.search(p) else p for p in parts]
+        for p in resolved:
+            if SCRIPTISH.search(p) and not pathlib.Path(p).exists():
+                unverified.append(f"{name}: {p} does not exist - the extension would be born DEAD")
+        cmd += " --with-extension '" + " ".join(_quoted(p) for p in resolved) + "'"
     lines.append("      " + cmd)
     for note in unverified:
         lines.append(f"      UNVERIFIED {note}")
@@ -479,6 +481,96 @@ def render_born(rows: list[dict[str, Any]], policy: dict[str, Any], classes: dic
     return "\n".join(lines).rstrip()
 
 
+#: The ONE override a human may set without naming a profile on the command line (D-3065). A profile is RESOLVED,
+#: never remembered: the resolver is deterministic, so no model and no memory decides a session's surface.
+PROFILE_ENV = "MAXWELL_PROFILE"
+
+
+def _abs_script(part: str, cfg: dict[str, Any], birth_cwd: pathlib.Path) -> pathlib.Path:
+    """Resolve a declared SCRIPT argument IN THE DECLARATION'S OWN CONTEXT, then the birth directory.
+
+    WHY THIS ORDER (MEASURED 2026-10-17, BUG-878 RE-SCOPED). The harness starts a CONFIG-declared stdio extension in
+    the `cwd` that declaration carries, so `args: [mcp_doc_guard.py]` beside `cwd: <repo>` starts from `<repo>` even
+    when the session was born in /tmp - MEASURED: session 20261017_10, born in /private/tmp, 12 extensions, ZERO
+    start warnings. A `--with-extension` string carries NO cwd, so the SAME declaration resolves against the
+    caller's directory and dies there - MEASURED: the failing invocation, whose surface records a member named
+    `python3` and no cwd. The declaration's context is therefore FIRST; the caller's directory is only a fallback.
+    Resolving in the caller's context is the defect, whichever route is used.
+
+    Args:
+        part: one declared command part.
+        cfg: that extension's declaration (its `cwd` is the context it will be started in).
+        birth_cwd: the directory the session is being born in.
+
+    Returns:
+        An ABSOLUTE path. It may not exist: the caller checks, because a refusal must name what it looked for.
+    """
+    raw = pathlib.Path(os.path.expanduser(part))
+    if raw.is_absolute():
+        return raw
+    declared = str(cfg.get("cwd") or "").strip()
+    if declared:
+        candidate = pathlib.Path(os.path.expanduser(declared)) / raw
+        if candidate.exists():
+            return candidate
+    return birth_cwd / raw
+
+
+def _quoted(part: str) -> str:
+    """Quote a part for the harness's single-string extension form when it contains whitespace.
+
+    MEASURED 2026-10-17: `--with-extension 'python3 "<path with a space>/mcp_doc_guard.py"'` starts with ZERO
+    warnings from /tmp (session 20261017_11), so the quoted form IS verified for a PATH argument. The unquoted form
+    of the same path is not verified - and it is what made a sound declaration look directory-dependent.
+
+    Args:
+        part: one resolved command part.
+
+    Returns:
+        The part, quoted only when quoting is needed.
+    """
+    return f'"{part}"' if any(c.isspace() for c in part) else part
+
+
+def resolve_profile(policy: dict[str, Any], environ: dict[str, str] | None = None) -> tuple[str, str]:
+    """The profile a birth uses when none is NAMED, and the reason - deterministic, auditable, model-free.
+
+    WHY RESOLVED AND NOT CHOSEN (D-3065). Requiring a human to remember which of eight profiles to name is a
+    cognitive tax on the one act that must never be got wrong, and an LLM router would add a failure mode, a
+    latency and its own token cost to the BIRTH - where nothing is measured yet. Precedence is therefore a two-line
+    rule an operator can hold in their head: an explicit `MAXWELL_PROFILE` wins, otherwise the DECLARED default.
+    `default_profile` is itself a decision with a reason in the policy file, so "which profile?" is answered once,
+    in writing, instead of once per session by a human under time pressure.
+
+    Args:
+        policy: the parsed policy (its `profiles` and `default_profile`).
+        environ: the environment to read (default: os.environ).
+
+    Returns:
+        (profile, reason) - the profile is always one the policy declares.
+
+    Raises:
+        SystemExit: when the policy declares no usable default, or the override names no declared profile.
+    """
+    environ = os.environ if environ is None else environ
+    declared = policy.get("profiles") or {}
+    asked = str(environ.get(PROFILE_ENV) or "").strip()
+    if asked:
+        if asked not in declared:
+            raise SystemExit(
+                f"FATAL: {PROFILE_ENV}={asked} names no profile this policy declares "
+                f"({', '.join(sorted(declared))}) - refusing the birth"
+            )
+        return asked, f"{PROFILE_ENV}={asked}"
+    default = str(policy.get("default_profile") or "").strip()
+    if default not in declared:
+        raise SystemExit(
+            f"FATAL: default_profile={default or '(absent)'} is not a declared profile - the birth has no surface "
+            f"to resolve to (C16: an absent default is fatal, never a guess)"
+        )
+    return default, f"default_profile={default}"
+
+
 def unresolvable(policy: dict[str, Any], config: dict[str, Any], classes: dict[str, str],
                  profile: str, cwd: pathlib.Path) -> list[str]:
     """Every stdio member of `profile` whose declared command would NOT start from `cwd`.
@@ -504,39 +596,45 @@ def unresolvable(policy: dict[str, Any], config: dict[str, Any], classes: dict[s
         if str(cfg.get("type") or "") != "stdio":
             continue
         parts = [str(cfg.get("cmd") or "")] + [str(a) for a in (cfg.get("args") or [])]
+        declared = str(cfg.get("cwd") or "").strip()
         for part in parts:
             if not part or part.startswith("-") or not SCRIPTISH.search(part):
                 continue
-            path = pathlib.Path(os.path.expanduser(part))
-            if path.is_absolute():
-                if not path.exists():
-                    out.append(f"{name}: {part} is declared ABSOLUTE and does not exist - the extension would be born DEAD")
+            path = _abs_script(part, cfg, cwd)
+            if path.exists():
                 continue
-            if not (cwd / path).exists():
-                out.append(
-                    f"{name}: {part} is declared RELATIVE and does not resolve from {cwd} - the extension would be "
-                    f"born DEAD, and the session would not be told"
-                )
+            out.append(
+                f"{name}: {part} resolves to {path}, which does not exist - the extension would be born DEAD, and "
+                f"the session would not be told (looked in the declaration's cwd "
+                f"{declared or '(none declared)'}, then in {cwd})"
+            )
     return out
 
 
 def birth_argv(policy: dict[str, Any], config: dict[str, Any], classes: dict[str, str],
-               profile: str) -> list[str]:
+               profile: str, cwd: pathlib.Path | None = None) -> list[str]:
     """The exact argv that BIRTHS an interactive session with one profile (the per-session realisation).
+
+    Every SCRIPT argument is inlined as an ABSOLUTE, quoted-when-needed path resolved in the DECLARATION's context
+    (see `_abs_script`), so the command does not depend on the directory it is run from - which is the whole
+    difference between a declaration and a convention.
 
     Args:
         policy: the parsed policy.
         config: the parsed harness config.
         classes: the name -> class map.
         profile: the profile to be born with (refused when the policy does not declare it).
+        cwd: the birth directory (default: the current one).
 
     Returns:
         The command, in the form MEASURED for platform/builtin names.
 
     Raises:
-        SystemExit: on an undeclared profile, or a stdio member with no declared command (D-3034), or one whose
-        single-string form is UNVERIFIED (an argument containing whitespace).
+        SystemExit: on an undeclared profile, a stdio member with no declared command (D-3034), a script argument
+        that resolves nowhere, or a `cmd` itself containing whitespace (that form is UNVERIFIED - only a PATH
+        argument was measured).
     """
+    cwd = pathlib.Path.cwd() if cwd is None else cwd
     members = profile_members(policy, classes, profile)
     extensions = config.get("extensions") or {}
     builtin = [n for n in members if (extensions.get(n) or {}).get("type") in ("platform", "builtin")]
@@ -546,27 +644,39 @@ def birth_argv(policy: dict[str, Any], config: dict[str, Any], classes: dict[str
         argv += ["--with-builtin", ",".join(builtin)]
     for name in stdio:
         cfg = extensions.get(name) or {}
-        parts = [str(cfg.get("cmd") or "")] + [str(a) for a in (cfg.get("args") or [])]
-        text = " ".join(parts).strip()
-        if not text:
+        cmd = str(cfg.get("cmd") or "").strip()
+        if not cmd:
             raise SystemExit(f"FATAL: {name} declares no cmd - it cannot be born (D-3034)")
-        if any(" " in p for p in parts):
+        if any(c.isspace() for c in cmd):
             raise SystemExit(
-                f"FATAL: {name} carries an argument containing whitespace; the single-string form is UNVERIFIED "
-                f"for it, so {profile} may be RENDERED but not LAUNCHED"
+                f"FATAL: {name} declares a cmd containing whitespace; the single-string form is UNVERIFIED for a "
+                f"COMMAND (only a path argument is measured), so {profile} may be RENDERED but not LAUNCHED"
             )
-        argv += ["--with-extension", text]
+        parts = [cmd]
+        for arg in (cfg.get("args") or []):
+            text = str(arg)
+            if text and not text.startswith("-") and SCRIPTISH.search(text):
+                path = _abs_script(text, cfg, cwd)
+                if not path.exists():
+                    raise SystemExit(
+                        f"FATAL: {name}: {text} resolves to {path} in the declaration's context AND nowhere "
+                        f"else - the extension would be born DEAD, and the session would not be told"
+                    )
+                text = str(path)
+            parts.append(text)
+        argv += ["--with-extension", " ".join(_quoted(p) for p in parts)]
     return argv
 
 
-def launch(policy: dict[str, Any], config: dict[str, Any], classes: dict[str, str], profile: str) -> None:
-    """Birth an interactive session with one profile, refusing first when a member would be born dead.
+def launch(policy: dict[str, Any], config: dict[str, Any], classes: dict[str, str],
+           profile: str | None = None) -> None:
+    """Birth an interactive session, RESOLVING the profile when none is named, and refusing a dead member first.
 
     Args:
         policy: the parsed policy.
         config: the parsed harness config.
         classes: the name -> class map.
-        profile: the profile to be born with.
+        profile: an explicit profile, or None to resolve one from the policy (D-3065).
 
     Returns:
         Never - the process is REPLACED by the harness (so the exit code is the session's own).
@@ -574,15 +684,18 @@ def launch(policy: dict[str, Any], config: dict[str, Any], classes: dict[str, st
     Raises:
         SystemExit: when a member cannot start from this directory - the birth is refused BEFORE anything runs.
     """
-    argv = birth_argv(policy, config, classes, profile)
     cwd = pathlib.Path.cwd()
+    reason = "named on the command line"
+    if profile is None:
+        profile, reason = resolve_profile(policy)
+    argv = birth_argv(policy, config, classes, profile, cwd)
     dead = unresolvable(policy, config, classes, profile, cwd)
     if dead:
         print(f"FATAL: {profile} would be born with a DEAD extension - refusing the birth")
         for line in dead:
             print("   " + line)
         raise SystemExit(1)
-    print(f"BIRTH profile={profile} cwd={cwd}", file=sys.stderr)
+    print(f"BIRTH profile={profile} ({reason}) cwd={cwd}", file=sys.stderr)
     print("   " + " ".join(argv), file=sys.stderr)
     print("   (this session inherits NOTHING from the harness config: the command above IS its surface)",
           file=sys.stderr)
@@ -756,7 +869,8 @@ def _selftest() -> int:
                      check(clean, config)[0] == 2
                      and check(dict(clean, default_profile="work"), work_state)[0] == 0))
     text = render(policy, config, classes, "work")
-    controls.append(("the render marks a whitespace-bearing stdio arg UNVERIFIED", "UNVERIFIED" in text))
+    controls.append(("the render QUOTES a whitespace-bearing path arg (measured form) and marks nothing UNVERIFIED",
+                     '"/a b/c"' in text and "UNVERIFIED" not in text))
     controls.append(("the render never silently enables a NEVER extension", "tom" not in text.split("(b)")[1]))
 
     # ADOPTION ON ARRIVAL (D-3060): a new name must REGISTER itself and grant NOTHING.
@@ -796,14 +910,14 @@ def _selftest() -> int:
 
     # THE BIRTH: a session is born with an EXPLICIT surface, and a surface that would be born DEAD is refused.
     bpolicy = dict(policy, profiles={"work": {"adds": ["filesystem"]}, "plain": {"adds": []}})
-    argv = birth_argv(bpolicy, config, classes, "plain")
+    argv = birth_argv(bpolicy, config, classes, "plain", REPO)
     controls.append(("the birth argv is the per-session form, not a config edit",
                      argv[:3] == ["goose", "session", "--no-profile"] and "developer" in argv[4]))
     controls.append(("the birth argv never names a NEVER extension", "tom" not in " ".join(argv)))
     controls.append(("an undeclared profile cannot be born",
                      _refuses(lambda: birth_argv(bpolicy, config, classes, "nope"))))
-    controls.append(("a member whose argument holds whitespace may be RENDERED but never LAUNCHED",
-                     _refuses(lambda: birth_argv(bpolicy, config, classes, "work"))))
+    controls.append(("a whitespace-bearing PATH argument is QUOTED, not refused (that form is MEASURED)",
+                     '"' in birth_argv(bpolicy, config, classes, "work", REPO)[-1]))
     # MEASURED TWO-SIDED 2026-10-17: `python3 mcp_doc_guard.py` starts from the repo root and fails from anywhere
     # else, and the harness tells the TERMINAL only. So the check must catch it - and must NOT cry wolf at home.
     localcfg = {"extensions": dict(config["extensions"], local={
@@ -813,6 +927,29 @@ def _selftest() -> int:
                      bool(unresolvable(bpolicy, localcfg, lclasses, "plain", pathlib.Path(tempfile.gettempdir())))))
     controls.append(("the same member resolves AT the repo root",
                      unresolvable(bpolicy, localcfg, lclasses, "plain", REPO) == []))
+    # THE CONTEXT BELONGS TO THE DECLARATION (BUG-878 re-scoped, D-3065). The harness starts a config-declared
+    # extension in ITS OWN cwd - measured from /tmp with zero warnings - so a relative arg beside a declared cwd is
+    # SOUND from any birth directory, and the launcher must resolve it there rather than accusing the declaration.
+    declared_ctx = {"extensions": dict(config["extensions"], local={
+        "type": "stdio", "enabled": True, "cmd": "python3", "args": ["mcp_doc_guard.py"], "cwd": str(REPO)})}
+    elsewhere = pathlib.Path(tempfile.gettempdir())
+    controls.append(("a RELATIVE script arg is resolved in the DECLARATION's cwd, not the birth cwd",
+                     str(REPO / "mcp_doc_guard.py") in " ".join(
+                         birth_argv(bpolicy, declared_ctx, lclasses, "plain", elsewhere))))
+    controls.append(("such a member is NOT 'unresolvable' from an unrelated directory",
+                     unresolvable(bpolicy, declared_ctx, lclasses, "plain", elsewhere) == []))
+    # THE PROFILE IS RESOLVED, NOT REMEMBERED (D-3065): deterministic, so it can be stated and audited.
+    controls.append(("no name given -> the declared default, with its reason",
+                     resolve_profile({"profiles": {"work": {}}, "default_profile": "work"}, {})
+                     == ("work", "default_profile=work")))
+    controls.append(("MAXWELL_PROFILE wins over the default",
+                     resolve_profile({"profiles": {"work": {}, "plain": {}}, "default_profile": "work"},
+                                     {PROFILE_ENV: "plain"})[0] == "plain"))
+    controls.append(("an override naming no declared profile is REFUSED",
+                     _refuses(lambda: resolve_profile({"profiles": {"work": {}}, "default_profile": "work"},
+                                                     {PROFILE_ENV: "ghost"}))))
+    controls.append(("an absent default is FATAL, never a guess",
+                     _refuses(lambda: resolve_profile({"profiles": {"work": {}}}, {}))))
     controls.append(("a born surface EQUAL to a profile is that profile",
                      profile_of({"developer", "docguard", "filesystem"}, bpolicy, classes) == ["work"]))
     controls.append(("a born surface no profile names matches NONE (a reading, not a guess)",
@@ -859,8 +996,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--check", action="store_true", help="compare the policy against the harness state")
     parser.add_argument("--adopt", action="store_true", help="register newly arrived extensions into quarantine")
     parser.add_argument("--delegate", metavar="PROFILE", help="print the extensions list a delegate is born with")
-    parser.add_argument("--launch", metavar="PROFILE",
-                        help="BIRTH an interactive session with one profile (the per-session form, executed)")
+    parser.add_argument("--launch", nargs="?", const="", metavar="PROFILE",
+                        help="BIRTH an interactive session; with no PROFILE the policy RESOLVES one (D-3065)")
     parser.add_argument("--born", nargs="?", const=BORN_DEFAULT, type=int, metavar="N",
                         help="read the last N sessions' BIRTH SURFACES from the harness's own record")
     parser.add_argument("--selftest", action="store_true", help="known-answer controls only")
@@ -919,8 +1056,8 @@ def main(argv: list[str] | None = None) -> int:
         print(render_born(rows, policy, classes, config))
         return 0
 
-    if args.launch:
-        launch(policy, config, classes, args.launch)
+    if args.launch is not None:
+        launch(policy, config, classes, args.launch or None)
         return 0
 
     rc, faults, drift, pending = check(policy, config)

@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**234 open** / 409 closed of 643 ids.
+**233 open** / 410 closed of 643 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -240,4 +240,3 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-875 | (HIGH, OPEN) — A FIRST-PARTY IMPORT NAME RESOLVES OUTSIDE THE TREE, so the delegated-run journal and 16 import sites read ANOTHER PROJECT'S | 1 |
 | BUG-876 | (MED, OPEN 2026-10-17) — THE ATTRIBUTION CONTROL CANNOT GO GREEN ON THE REGISTRY IT MEASURES | 1 |
 | BUG-877 | (MED, OPEN 2026-10-17) — A GOVERNED WRITE TO THE HARNESS HOME DOES NOT SURVIVE: scripts/check_harness_homes.py reads CONFLICT again, and no | 1 |
-| BUG-878 | (HIGH, OPEN 2026-10-17) — `mcp_doc_guard.py` IS DECLARED WITH A CWD-RELATIVE COMMAND: a session started outside the repo is born without | 1 |

@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1191 decisions (census stamp 7927367319ef8cca, 2026-10-17) · 643 bugs (234 open / 409 closed; highest OPEN = BUG-878) · 59 open tasks (MUST 12 / SHOULD 43 / WORTH 4; OWNER-moved 0, pipeline-moved 59; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1193 decisions (census stamp adb983cbaff56ff1, 2026-10-17) · 643 bugs (233 open / 410 closed; highest OPEN = BUG-877) · 59 open tasks (MUST 12 / SHOULD 43 / WORTH 4; OWNER-moved 0, pipeline-moved 59; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **79** of 1191 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 606 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1191, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **79** of 1193 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 608 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1193, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 234 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 36 · 🟨 MED 68 · 🟩 LOW 25 · UNLABELLED 101 (BUG-757) of 234 open.
+> Open BUGS by severity (population = the census's 233 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 35 · 🟨 MED 68 · 🟩 LOW 25 · UNLABELLED 101 (BUG-757) of 233 open.
 >
 > **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -16400,7 +16400,7 @@ FIX (T-185, three limbs, each a rule the repository already declares elsewhere):
   before/after; the reading is one command); (b) a schedule, not just a reading — `check_harness_homes.py` must run
   at the point the home is written, or the rail's rc only ever describes the last time someone looked.
 
-### BUG-878 (HIGH, OPEN 2026-10-17) — `mcp_doc_guard.py` IS DECLARED WITH A CWD-RELATIVE COMMAND: a session started outside the repo is born without the write gate, and nothing inside it says so
+### BUG-878 (HIGH, FIXED 2026-10-17) — `mcp_doc_guard.py` WAS DECLARED RELATIVE AND THE PER-SESSION FORM CARRIED NO CWD: the write gate could be born dead with nothing in the session saying so
 
 - **MEASURED, TWO-SIDED, IN ONE MINUTE.** `docguard` is declared in the harness home as `cmd: python3`,
   `args: [mcp_doc_guard.py]` — a RELATIVE script path. From the repo root the extension starts and the model answers.
@@ -16421,3 +16421,30 @@ FIX (T-185, three limbs, each a rule the repository already declares elsewhere):
   LAUNCHED sessions only; a session started by any other route stays exposed.
 - **RED LOOP (already red, already run — D-3036):** the two commands above. It goes GREEN when the `/tmp` invocation
   starts the extension with ZERO warning and the session's own surface names it.
+- **RE-SCOPED BY MEASUREMENT, 2026-10-17 (sixth sitting).** The claim above was TRUE OF THE ROUTE IT WAS MEASURED ON AND
+  FALSE OF THE CONFIG. The harness starts a CONFIG-declared stdio extension in the `cwd` THAT DECLARATION CARRIES, so
+  the relative argument was never the defect on the config path: from `/tmp`, `goose run` was born with all 12 workshop
+  extensions and produced **ZERO** start warnings while answering normally (session `20261017_10`; repeated as
+  `20261017_12` after the repair). What died was the `--with-extension '<cmd> <args>'` form, which carries NO cwd — and
+  that is exactly the form `just session` emits: the failing session's own record names a member called `python3` and
+  records no cwd. The defect was **resolution in the caller's context**, and the launcher was its only live route.
+- **REMEDY, APPLIED IN THREE PARTS (each measured).** (1) The declaration is now ABSOLUTE
+  (`args: ['/Users/…/maxwell os 2.0/mcp_doc_guard.py']`), so it no longer depends on a CloudStorage `cwd` being
+  mounted at birth: one line changed, every other key byte-identical, backup
+  `~/.config/goose/config.yaml.bak.20261017131255.bug878-abs`, `cwd` kept. (2) `_abs_script()` resolves a relative
+  script argument in the DECLARATION's `cwd` FIRST and the birth directory second — the harness's own order, so the
+  reader predicts what the harness will START rather than what the caller hoped. (3) A resolved path containing
+  whitespace is QUOTED, never refused: `--with-extension 'python3 "<path with a space>/mcp_doc_guard.py"'` was
+  measured to start with zero warnings from `/tmp` (session `20261017_11`), so the single-string form is faithful and
+  `just session` is directory-independent.
+- **RED LOOP IS GREEN, BOTH PATHS.** config path: `cd /tmp && goose run -t …` → `rc=0`, **0** warnings, surface =
+  workshop. Launcher path: `birth_argv("core")` from `/tmp` inlines `python3 "…/mcp_doc_guard.py"` and
+  `unresolvable(…) == []`.
+- **FORENSIC SWEEP, no sibling left behind:** of the 26 declared extensions exactly ONE carried a relative script
+  argument (`docguard`), and it is now absolute; the other 25 declare a platform/builtin type or a command with no
+  script path (every stdio declaration parsed, every script-shaped part resolved).
+- **ADJUDICATION OF R5** (gemma-4-E4B-it-MLX-4bit, `DJ-20261017T111319Z-082b`, wall 74.8 s, verdict **ACCEPT**).
+  Objection: with a WRONG declared `cwd` that happens to contain a same-named file, the resolver could pick it
+  silently. Adjudicated rather than waved away: that IS what the harness does, so mirroring it is the only faithful
+  reading — a launcher that "corrected" the harness would start something the declaration does not describe. The case
+  is recorded here and is not reachable today, because the sweep above leaves exactly one script argument, absolute.

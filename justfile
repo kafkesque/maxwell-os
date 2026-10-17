@@ -629,7 +629,10 @@ extensions:                                          # T-186/D-3056: what each d
 extension-profile name:                              # T-186/D-3056: the two realisations of ONE profile (config flips + the --no-profile command). Writes nothing.
     python3 scripts/goose_profile.py --render {{name}}
 
-session profile:                                     # D-3064: BIRTH a task-labelled session with one profile - the surface is EXPLICIT, never inherited, and a birth that would be dead is REFUSED
+go:                                                  # D-3065: THE ONE DOOR - no profile is named; the policy RESOLVES one (MAXWELL_PROFILE overrides), so nobody has to remember a name
+    python3 scripts/goose_profile.py --launch
+
+session profile="":                                  # D-3064/D-3065: name a profile ONLY to override the resolution - the surface is EXPLICIT, never inherited, and a birth that would be dead is REFUSED
     python3 scripts/goose_profile.py --launch {{profile}}
 
 born n="5":                                          # D-3064: what each of the last N sessions was GIVEN at birth, read from the harness's own store (never from a transcript)

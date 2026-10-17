@@ -645,3 +645,53 @@ is the debugging.
 5. **T-187** — the two-step/two-tool fixture; still the only gate for any model promotion.
 6. **The routing debt 225 vs 222** — its shape is now measured twice: 223 of 225 name no artifact, and the census title
    was itself SEVERING artifacts at char 140 (fixed this sitting). Re-read the census before adding 223 declarations.
+
+## §1g — SPINE UPDATE, 2026-10-17 (SIXTH SITTING): THE PROFILE IS RESOLVED, NOT CHOSEN
+
+### a. The question, answered in one paragraph
+"Who switches the extension profile — the agent or me?" **Neither, and no session needs a profile label a human
+maintains.** A session's guest list is fixed at the door (BUG-873: `enabled:` is read at BIRTH; the runtime switch
+can only SHED). So the only lever is *how the session is born*. `just go` — no argument — resolves the profile
+deterministically (`MAXWELL_PROFILE` if set, otherwise `default_profile`), prints WHY, refuses to be born with a dead
+member, and starts. Naming a profile (`just session research`) survives as the OVERRIDE, not the routine. Depth comes
+from WORKERS: a subagent is its own session with an explicit extension list (`just extensions-delegate review|sweep|
+extract`), which is exactly the separation Claude Code documents as "specific tool access". A profile is therefore
+something a worker carries, not something you keep in your head.
+
+### b. What landed (before → after)
+| thing | before | after | receipt |
+|---|---|---|---|
+| choosing a profile | the human must remember one of 8 names | **`just go`** resolves one and prints `(MAXWELL_PROFILE=… / default_profile=…)`; an unknown name is a REFUSAL, never a fallback | `resolve_profile()`, selftest 31 → **37/37** |
+| a declared script argument | resolved against the CALLER's cwd — the defect BUG-878 actually was | resolved in the **DECLARATION's** `cwd` first, then the birth dir; inlined ABSOLUTE and quoted | `_abs_script()`, `_quoted()` |
+| `docguard` in the harness home | `args: [mcp_doc_guard.py]`, dependent on a CloudStorage `cwd` being mounted | **absolute**, one line changed, all other keys byte-identical, backup `config.yaml.bak.20261017131255.bug878-abs` | `/tmp` birth → 0 warnings (`20261017_12`) |
+| llmfit | cited as a discovery + capability oracle | **FIT ARITHMETIC ONLY**; discovery = `goose local-models search` (GGUF **and** MLX, live) | D-3066, `model_oracles.yaml` |
+| `scripts/evaluate_model.py` | an orphan that `pip install`s llmfit at runtime | **archived** (`archive/evaluate_model.py.archived-2026-10-17`), index regenerated (45 entries) | `build_archive_index.py --check` rc 0 |
+
+### c. BUG-878 was RE-SCOPED, not merely patched — read this before trusting the old text
+The filed claim ("a session started outside the repo is born without the write gate") was true of the route it was
+measured on and **false of the config**: from `/tmp`, `goose run` was born with 12 workshop extensions and ZERO start
+warnings, because the harness honours a config-declared `cwd`. The thing that died was `--with-extension '<cmd>
+<args>'` — the form `just session` emits — which carries no cwd. So the defect was **resolution in the caller's
+context**, and the launcher was its only live route. Forensic sweep: of 26 declared extensions, exactly one carried a
+relative script argument; it is now absolute. R5 (gemma-4-E4B, `DJ-20261017T111319Z-082b`, 74.8 s) returned ACCEPT
+with one objection (a wrong declared cwd could win silently) — adjudicated on evidence: that IS the harness's order, so
+mirroring it is the faithful reading, and the case is unreachable today because the sweep leaves one absolute argument.
+
+### d. Peer cross-examination (why this shape and not another)
+Refused: a **keyword router** over the task text (a second routing surface, the reason pstack's playbook router was
+refused) and an **LLM router at birth** (a model call plus a hallucination surface at the one step with no measurement
+to check it against; D-2898/D-2941). Adopted: the peer consensus that capability should NOT be paid for upfront —
+Anthropic preloads a name+description index and reads bodies on demand; Claude Code caps subagent **descriptions** at
+15k tokens before warning, and gives each subagent its own tool access; Gemini CLI and goose plugins are distribution
+containers, never residency. The one peer feature we do NOT yet have is true progressive disclosure: MCP tool schemas
+are static per session in goose, so "`core` at birth + delegate for depth" is our faithful approximation.
+
+### e. NEXT CRITICAL STEPS (consequential)
+1. **OWNER, one line (task B, now unblocked):** `default_profile: workshop` → `core` in `config/extension_profiles.yaml`,
+   then flip `enabled: false` for `filesystem` and `gitmcp-mcp` in the harness home. Worth **5,633 tok/request**; takes
+   effect only in the NEXT birth, and `just go` already routes through it. `--check` must then read rc 0.
+2. **T-183's applier** — pipeline lane #1, untouched: 479 admission candidates have a home and a target and may not
+   move until a plan-keyed, dry-run-default, crash-safe, receipted writer exists.
+3. **T-190's toggle half** — `PreToolUse`/`PostToolUse` hooks are the measured trigger; still unbuilt.
+4. **T-187** — the two-step/two-tool loop fixture; still the only gate for any model promotion.
+5. Pre-existing reds unchanged: `route_graph` (225 vs 222), `check_rail_mutations`, `check_config_defaults`, BUG-876.

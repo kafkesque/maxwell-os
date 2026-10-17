@@ -3,8 +3,8 @@
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
   "total_ids": 643,
-  "open_n": 234,
-  "closed_n": 409,
+  "open_n": 233,
+  "closed_n": 410,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -1172,11 +1172,6 @@
       "id": "BUG-877",
       "title": "(MED, OPEN 2026-10-17) \u2014 A GOVERNED WRITE TO THE HARNESS HOME DOES NOT SURVIVE: scripts/check_harness_homes.py reads CONFLICT again, and no",
       "events": 1
-    },
-    {
-      "id": "BUG-878",
-      "title": "(HIGH, OPEN 2026-10-17) \u2014 `mcp_doc_guard.py` IS DECLARED WITH A CWD-RELATIVE COMMAND: a session started outside the repo is born without",
-      "events": 1
     }
   ],
   "closed": [
@@ -1588,6 +1583,7 @@
     "BUG-870",
     "BUG-871",
     "BUG-872",
-    "BUG-874"
+    "BUG-874",
+    "BUG-878"
   ]
 }

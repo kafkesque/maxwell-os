@@ -1126,3 +1126,97 @@ framework here would buy schemas, not capability, and would violate C1/C3/C4 in 
 changed files (gemma-4-E4B-it-MLX-4bit). Plan: **477 rows**, sha256 `191a13e3498f5f4d92e683b03370d3148ae76635972fbe
 b41b033c260ef2c17d`. Decisions 1,196 → 1,197 (D-3070). Bugs 645 → 650 (881-884 FIXED, 885 OPEN).
 Dry run: 477 would_apply / 0 refusals / rc 0 / 17 s.
+
+## §1k — TENTH SITTING (2026-10-17, 15:2x): THE FIRST TRANCHE RAN — 9 APPLIED, 1 FAILED, AND THE FAILURE WAS A CLASS (3 defects, all fixed with controls; the loader's DELEGATE-002 sentence superseded; the candidate register written)
+
+### a. WHAT THE OWNER'S RUN DID, AND WHAT THE ONE FAILURE WAS
+
+`just admit-apply --limit 10` → `{'applied': 9, 'failed': 1}`, receipt
+`governance/evidence/ADMISSION_APPLIED_20261017T132219Z.jsonl` (plan digest `191a13e3…`). The failing row was
+`books/epub/DOMAIN 2 Design/practice+process/How to use graphic desi gn to sell things, explain things, make things
+ylib.org).epub` — 137,319,019 bytes, and its bytes are **not a zip at all**: a valid `PK\x03\x04` header and NO
+end-of-central-directory record. A truncated download. The conversion stage was right to refuse it; the *plan* was
+wrong to propose it.
+
+### b. THREE DEFECTS, ONE DOOR (all fixed, all controlled)
+
+| bug | what it was | the proof that matters |
+|---|---|---|
+| **BUG-886** (HIGH) | the gate refuses "a container the conversion stage cannot read" and implemented that as a **suffix test**. Over all 1,289 declared containers, **5 cannot be opened** — 3 truncated at a chunk boundary (one is EXACTLY 29 MiB), one all-zeros, one an Apple `book` archive wearing `.pdf` — and every one read as an ordinary candidate | `pdfinfo` independently refuses the 29 MiB pdf that a `%PDF-` magic check PASSES. Fixed in `pipeline/container_integrity.py` (new, closed probe vocabulary) + a declared per-kind probe in the gate + class `refused_container_corrupt`. Asked LAST: 0.33 s over 1,289 files, dry run still 17.16 s. Candidates 477 → **463** |
+| **BUG-887** (HIGH) | a failed conversion left its container **in the corpus**: the next plan read its key as `already_in_the_corpus` (a work that never arrived, absorbed and unretryable) and every later S0 run failed on it | RED `stage0_convert.py` → `1/941 failed (0.1% > max_failed_ratio=0.0)`, rc 1. The copy is now MOVED to the declared `admission.applier.quarantine_prefix` (a move, never a delete — R-D410, and the bytes are evidence). GREEN after: **rc 0, 0 failed, 940 skipped**; corpus census **0 containers without their work** |
+| **BUG-888** (HIGH) | the signature's `accepted_by` was checked for PRESENCE, never for RESOLUTION — the owner's file carried the template's own `<your name>` and the act RAN | the placeholder is now declared once (`accept_by_placeholder`) and refused, empty names refused, real names still pass (two-sided). 26/26 controls |
+
+**Why these three are one lesson:** every one is a *declaration that did not resolve* (D-3034). "Cannot read" →
+resolved to a suffix. "Already in the corpus" → resolved to the presence of a key, not of a work. "Accepted by" →
+resolved to the presence of a field. The door was reading its own words as if they were facts.
+
+### c. THE LOADER'S DELEGATE-002 SENTENCE — DONE, AND A SECOND GAP FOUND UNDER IT
+
+The owner asked for the manual act. `AGENTS.md` is `append_only` (D824), so the correction is a **superseding block**
+appended to the loader (the stale line quotes itself, then the corrected routing table), exactly as this OS supersedes
+rather than silently rewrites. What it now says: the 6.8→0.4 tok/s collapse is **not reproducible** (34.5 tok/s on the
+2-tool probe, 79.9 s / 3 calls on the loop); "only gemma can tool-call" is RETIRED; Qwen3-Coder multi-turn is
+**ALLOWED** with the wall clock budgeted; the truer reason to route elsewhere is measured SPEED; long multi-turn
+sessions stay **UNMEASURED** until T-187.
+**BUG-890** records the claim; **BUG-891** records what the act exposed: `config/agent_surface.yaml`'s swap checklist
+promises to "re-render AGENTS.md#delegate_rules and #models from `agent/adapters/<harness>/`" and **that render source
+does not exist** (no template under `agent/adapters/` carries the text). So the routing block has no declared source of
+truth, and a future swap would drop the correction. That is a build (template + renderer + a rail that refuses a
+disagreement), not a note.
+
+### d. THE CANDIDATE REGISTER (the owner's question 2) — WRITTEN, IN THE PLACE THAT ALREADY OWNS VERDICTS
+
+`governance/NOT-YET-EVALUATED-RESEARCH.md` gained one dated row: **six named, none promoted, one instrument owed.**
+Qwen3-30B-A3B-Instruct-2507 (30.5 GB, quality at equal speed, MLX 4-bit available) · Devstral-Small-2-24B (15.1 GB,
+agentic coding — never the generator) · Hermes-4-14B (**REFUSED**: the only MLX build is an abliterated derivative one
+ungoverned hop deep) · granite-4.0-h-small (~5 GB, cheap to measure, least evidence) · GLM-4.5-Air (**REFUSED**:
+106B, outside the ~24 GB delegate budget, therefore unmeasurable here) · "only gemma" (refuted, D-3058). The gate is
+**T-187's two-step/two-tool fixture**, already specified in the task register. `config/model_assignments.yaml` is
+`never_overwrite`, so the registry itself was not touched — the register names the candidates and the gate, and the
+config keeps its roles.
+**BUG-885 CLOSED on the way:** `agent_context_probe.py --prefill-ab` re-read the prefix cache at a 26,240-token prefix
+— **cached 26,237/26,240, 22.2x** against a 5.0x bar, `verdict: proven`. `config/agent_context.yaml`'s `disproven`
+words were corrected in place, and its **revisit trigger is recorded as FIRED** — raising the token threshold is now
+an OWNER DECISION with no evidence blocking it, not an automatic edit.
+
+### e. THE CENSUS ODDITY (the owner's "something is off") — IT IS REAL, AND IT UNDER-REPORTS
+
+`normalise_corpus_names.py --census` reads **37** defects (34 repeated internal space + 3 leading/trailing) while the
+corpus holds **43**: the **6 non-NFC names** are invisible to it, because the defect vocabulary is a mapping of
+REGEXES and "is this name NFC?" is a NORMALISATION question. **BUG-889** files it with the reason it is not a hazard
+today (the key is NFC-normalised at its producer, D-3070; and `apply_ready: False` — all 37 eligible rows are refused
+for dangling references, BUG-800) and with the shape of the fix (a declared `name_defect_forms: {not_nfc: NFC}` read
+beside the patterns, with its own `accepted_debt` reason rather than a `same_as` pointer). **Read it as a false green,
+not as a miscount.**
+
+### f. WHAT THE OWNER OWNS NOW (exact, two lines)
+
+1. `governance/ADMISSION_ACCEPTED_20261017.yaml` — it is re-printed for the NEW digest `0692ce6f…` (463 rows) and it
+   is **REFUSED** until `accepted_by` carries a real name (BUG-888). Then `just admit-apply --dry-run` should read
+   **463 would_apply / 0 refused / rc 0 / 17.16 s** (measured), and `just admit-apply --limit 10` takes the next
+   tranche.
+2. THE 5 CORRUPT CONTAINERS are now a WORKLIST, not a surprise: `governance/ADMISSION_PLAN_20261017.md` names them
+   under `refused_container_corrupt`; each needs a RE-DOWNLOAD (that is the remedy, and it is why the class is separate
+   from the engine class). The rolled-out copy of the truncated one sits at
+   `knowledge pipeline/admission_quarantine/20261017T132219Z/` with its receipt.
+
+### g. NEXT CRITICAL STEPS, in consequential order
+
+1. **T-183's first tranche** (owner's word + run) — the only thing that moves the pipeline's input path forward.
+2. **T-187** (the two-step/two-tool fixture) — now the highest-leverage BUILD: four candidates are online and no
+   benchmark can rank them; only this fixture can, and it also decides whether Qwen3-Coder sustains a long session.
+3. **BUG-891** (the render source for `AGENTS.md#delegate_rules`) — small, and it is what makes any future routing
+   correction durable.
+4. **BUG-889** (the census's NFD blindness) — a schema change, owner-gated with T-130/T-172.
+5. **The fired revisit trigger** in `config/agent_context.yaml` — an owner decision about the token threshold now that
+   growth is nearly free.
+6. **BUG-876** (the attribution control) and **T-190's toggle half** — unchanged, and unchanged in priority.
+
+### h. STATE AT CLOSE
+
+Controls: `apply_admission.py` **26/26**, `plan_admission.py` **22/22**. Plan: 463 candidates over 2,811 files,
+digest `0692ce6fe78d410431b5ab0f99d4eb448b389a0f9f210caf546deecc729d94dd`. Corpus: 949 md, 9 containers, **0
+containers without their work**. S0: rc 0, 0 failed. Decisions: **D-3071** appended (suffix-is-a-claim / the corpus
+holds works / a signature field must resolve). Bugs: 885 CLOSED, 886/887/888 FIXED, 890 ADDRESSED, 889/891 OPEN. The
+standing reds are unchanged and NOT papered over: routing debt (225 vs 222, SHRINK-ONLY) and the pre-existing rail
+list in §1j.g.

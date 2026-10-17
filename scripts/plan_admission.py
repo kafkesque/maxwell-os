@@ -54,6 +54,7 @@ import census_source_names as census  # noqa: E402 — the library reader: roots
 from pipeline.book_metadata import (  # noqa: E402 - the door's OWN comparison key (D-3045)
     sanitize_source_book,
 )
+from pipeline.container_integrity import is_readable, probes_from  # noqa: E402 - BUG-886/D-3071
 
 POLICY = census.POLICY
 RC_OK, RC_FATAL, RC_OWNER_OWED = 0, 1, 2
@@ -73,6 +74,11 @@ DECISIONS = (
     "admit_candidate",
     "refused_no_declared_corpus_home",
     "refused_container_no_stage_reads_it",
+    #: BUG-886/D-3071: an ACCEPTED kind whose own BYTES are not openable. Its own class because its own REMEDY:
+    #: a `.mobi` needs an engine (the class above), a truncated `.epub` needs a re-download. MEASURED 2026-10-17:
+    #: 3 of 1,289 declared containers cannot be opened, and every one of them read as an ordinary candidate —
+    #: the owner signed one, 137 MB were copied, and S0 failed (BUG-887).
+    "refused_container_corrupt",
     "refused_name_repair_first",
     "refused_not_in_its_kind_folder",
     #: D-3062: a note's share of the ONE corpus root is its own DOMAIN subtree. A source folder the corpus does
@@ -103,6 +109,10 @@ CONTROL_LABELS = (
     "the_ONE_line_brief_agrees_with_the_full_reading",
     "the_same_work_spelled_NFC_and_NFD_is_ONE_key_and_distinct_names_stay_distinct",
     "a_DOMAIN_axis_root_KEEPS_its_DOMAIN_folder_and_a_folder_the_corpus_does_not_materialise_is_REFUSED",
+    #: BUG-886/D-3071 — appended, not inserted: the indices above are how every control addresses this table,
+    #: and renumbering them to slot one in would rewrite nineteen controls to add a twentieth (drift for nothing).
+    "a_container_the_stage_CANNOT_OPEN_is_REFUSED_as_CORRUPT_and_never_proposed_for_the_owner_word",
+    "an_ACCEPTED_kind_with_no_declared_readability_probe_is_FATAL_and_never_admitted_unchecked",
 )
 
 
@@ -255,6 +265,10 @@ def build(pol: dict[str, Any] | None = None) -> dict[str, Any]:
     accepted = accepted_containers(doc)
     axes = home_axes(doc)
     patterns = name_patterns(doc)
+    #: BUG-886/D-3071: the probe each ACCEPTED kind uses, read from the gate. `accepted` is the conversion
+    #: stage's own set, so a kind the stage reads with NO declared probe is FATAL here rather than admitted
+    #: unchecked later (C12: an absent declaration is never a zero).
+    probes = probes_from(decl, AdmissionError, accepted=accepted)
     cache = census.cache_keys(doc)
     corpus_root = home_path(homes, "corpus_home")
     index = corpus_index(corpus_root)
@@ -324,6 +338,16 @@ def build(pol: dict[str, Any] | None = None) -> dict[str, Any]:
                     decision = "refused_domain_not_a_corpus_domain"
                 elif classes:
                     decision = "refused_name_repair_first"
+                #: BUG-886/D-3071 — ASKED LAST, and that is a DECISION with two reasons. (1) REMEDY ORDER: the
+                #: branches above say WHERE a work would go or what it would be called; only a file that would
+                #: otherwise be SIGNED needs the question "are these bytes openable at all". (2) COST: the probe
+                #: opens the file (a zip's trailer, a pdf's head and trailer), and on this cloud-backed library a
+                #: cold root pays a fetch per file — so it is asked of the ~477 candidates, never of all 1,289
+                #: containers. A corrupt file that ALSO carries a defective name still reads as name-repair-first;
+                #: the census counts that debt separately (T-130), so nothing is lost, and after the rename it
+                #: reads as corrupt and is refused here.
+                elif not is_readable(path, probes[suffix]):
+                    decision = "refused_container_corrupt"
                 else:
                     decision = "admit_candidate"
                 unseen_keys.add(key)
@@ -357,6 +381,9 @@ def build(pol: dict[str, Any] | None = None) -> dict[str, Any]:
         "generated": generated,
         "corpus_home": str(home_path(homes, "corpus_home")),
         "accepted_containers": sorted(accepted),
+        #: WHAT THE PLAN TESTED, not only what it concluded: a refusal whose probe is not printed is a refusal
+        #: the owner cannot argue with (BUG-886/D-3071).
+        "readability_probes": probes,
         "target_rule": str(decl["target_rule"]),
         "decisions_declared": {name: str(declared_decisions[name]) for name in DECISIONS},
         "roots": per_root,
@@ -396,6 +423,11 @@ def render(plan: dict[str, Any]) -> str:
         "",
         f"Accepted containers (declared in the conversion transition, origin `pipeline/stage0_convert.py`): "
         f"`{' '.join(plan['accepted_containers'])}`.",
+        "",
+        f"Readability probes, declared per kind (`container_integrity`, BUG-886): "
+        f"`{' '.join(f'{kind}->{token}' for kind, token in plan['readability_probes'].items())}` — a container "
+        f"an accepted kind accepts is opened before it is proposed, so a truncated download is a REFUSAL with "
+        f"a remedy (re-download) and never a signed row.",
         "",
         "## Every decision, with the reason it is declared under",
         "",
@@ -472,6 +504,17 @@ def selftest() -> int:
         if not condition:
             mark(label, detail)
 
+    def write_epub(path: Path) -> None:
+        """A MINIMAL container a zip reader can open — the fixture must not be a claim it cannot support."""
+        import zipfile
+        with zipfile.ZipFile(path, "w") as book:
+            book.writestr("mimetype", "application/epub+zip")
+            book.writestr("META-INF/container.xml", "<container/>")
+
+    def write_pdf(path: Path) -> None:
+        """A minimal PDF: magic at the head, trailer near the end (the two ends `pdf` probes for)."""
+        path.write_bytes(b"%PDF-1.4\n1 0 obj\n<<>>\nendobj\ntrailer\n<<>>\nstartxref\n0\n%%EOF\n")
+
     with tempfile.TemporaryDirectory(prefix="admission_") as tmp:
         base_dir = Path(tmp)
         corpus = base_dir / "corpus"
@@ -480,19 +523,24 @@ def selftest() -> int:
         books = base_dir / "books"
         for kind in ("epub", "pdf", "md"):
             (books / kind / "DOMAIN 6 AI + Computing").mkdir(parents=True, exist_ok=True)
-        (books / "epub" / "DOMAIN 6 AI + Computing" / "Seen Book.epub").write_text("x", encoding="utf-8")
+        write_epub(books / "epub" / "DOMAIN 6 AI + Computing" / "Seen Book.epub")
         (books / "md" / "Renamed Work.md").write_text("x", encoding="utf-8")
         (books / "md" / "never in the corpus.md").write_text("x", encoding="utf-8")
-        (books / "epub" / "DOMAIN 6 AI + Computing" / "Never Seen.epub").write_text("x", encoding="utf-8")
-        (books / "epub" / "DOMAIN 6 AI + Computing" / "A Title (z-lib.org).epub").write_text("x", encoding="utf-8")
+        write_epub(books / "epub" / "DOMAIN 6 AI + Computing" / "Never Seen.epub")
+        write_epub(books / "epub" / "DOMAIN 6 AI + Computing" / "A Title (z-lib.org).epub")
         (books / "epub" / "DOMAIN 6 AI + Computing" / "No Stage Reads This.mobi").write_text("x", encoding="utf-8")
-        (books / "epub" / "loose at the root.epub").write_text("x", encoding="utf-8")
-        (books / "stray out of its kind folder.pdf").write_text("x", encoding="utf-8")
+        write_epub(books / "epub" / "loose at the root.epub")
+        #: BUG-886: a TRUNCATED DOWNLOAD — a valid zip HEADER and no end-of-central-directory record, which is
+        #: exactly the shape MEASURED in the owner's library (137,319,019 bytes, `EPUB document` by magic,
+        #: `BadZipFile` by structure). A suffix test calls it an admission candidate; the probe must not.
+        (books / "epub" / "DOMAIN 6 AI + Computing" / "A Truncated Download.epub").write_bytes(
+            b"PK\x03\x04\x14\x00\x00\x00\x08\x00" + b"\x00" * 512)
+        write_pdf(books / "stray out of its kind folder.pdf")
         #: THE NOTE ROOT DECLARES A SHARE of the ONE corpus root (D-3062): its own DOMAIN/<subtopic> path is
         #: CARRIED into the corpus, and a folder the corpus does not materialise as a DOMAIN is REFUSED.
         notes = base_dir / "notes"
         (notes / "DOMAIN 6 AI + Computing" / "design-notes").mkdir(parents=True)
-        (notes / "DOMAIN 6 AI + Computing" / "design-notes" / "A Note.pdf").write_text("x", encoding="utf-8")
+        write_pdf(notes / "DOMAIN 6 AI + Computing" / "design-notes" / "A Note.pdf")
         (notes / "unsorted notes").mkdir(parents=True)
         (notes / "unsorted notes" / "Homeless Note.pdf").write_text("x", encoding="utf-8")
         unhomed = base_dir / "unhomed"
@@ -528,6 +576,12 @@ def selftest() -> int:
                     "target_rule": "fixture rule: the source's own path below its DECLARED AXIS folder, suffix -> .md",
                     "refusal_examples": 3,
                     "decisions": {name: f"fixture meaning of {name}" for name in DECISIONS},
+                    #: BUG-886/D-3071: the probe each ACCEPTED fixture kind declares. A fixture that skips this
+                    #: block is FATAL (probes_from), which is the control that the declaration is required.
+                    "container_integrity": {
+                        "authority": "D-XXXX-fixture",
+                        "probes": {".epub": "zip", ".pdf": "pdf", ".md": "none"},
+                    },
                 },
                 "flow": {
                     "authority": "D-3050",
@@ -672,6 +726,38 @@ def selftest() -> int:
         try:
             build(no_homes)
             mark(CONTROL_LABELS[17], "an absent placement.homes did not raise")
+        except AdmissionError:
+            pass
+
+        # (19) BUG-886/D-3071: a container of an ACCEPTED kind whose BYTES do not open is REFUSED as CORRUPT and is
+        #      never proposed for the owner's word. TWO-SIDED: the truncated fixture file must be refused AND the
+        #      valid one in the same folder must still be a candidate, so a probe that simply refused every `.epub`
+        #      fails this control too (a refusal that answers everything is not a reading).
+        truncated = books / "epub" / "DOMAIN 6 AI + Computing" / "A Truncated Download.epub"
+        expect(CONTROL_LABELS[19],
+               counts["refused_container_corrupt"] == 1
+               and not any("A Truncated Download" in row["rel"] for row in plan["rows"])
+               and any("A Truncated Download" in item for item in plan["examples"]["refused_container_corrupt"])
+               and is_readable(truncated, "zip") is False
+               and is_readable(books / "epub" / "DOMAIN 6 AI + Computing" / "Never Seen.epub", "zip") is True
+               and any(row["rel"].endswith("Never Seen.epub") for row in plan["rows"]),
+               f"corrupt {counts['refused_container_corrupt']} | rows "
+               f"{[r['rel'] for r in plan['rows'] if 'Seen' in r['rel']]}")
+
+        # (20) an ACCEPTED kind with no declared probe is FATAL: silence about how a kind is opened is how a
+        #      truncated container gets admitted unchecked, one declaration edit later (D-3034/C12).
+        no_probe = json.loads(json.dumps(pol))
+        no_probe["source_library"]["admission"]["container_integrity"]["probes"].pop(".md")
+        try:
+            build(no_probe)
+            mark(CONTROL_LABELS[20], "an accepted kind with no declared probe did not raise")
+        except AdmissionError:
+            pass
+        unknown_probe = json.loads(json.dumps(pol))
+        unknown_probe["source_library"]["admission"]["container_integrity"]["probes"][".epub"] = "vibes"
+        try:
+            build(unknown_probe)
+            mark(CONTROL_LABELS[20], "an unknown probe token did not raise")
         except AdmissionError:
             pass
 

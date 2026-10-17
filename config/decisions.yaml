@@ -27471,3 +27471,49 @@ decisions:
   - 'A name key is a pure function of the TEXT, never of how an OS handed the bytes over: the same work cannot be admitted twice by spelling it differently.'
   - 'The 14 measured NFD names (6 corpus, 8 cache) are now READ correctly; renaming the corpus files themselves stays an owner-gated plan (normalise_corpus_names), so a reader repair never moves a file.'
   - 'A future consumer that mints a key WITHOUT sanitize_source_book is a second identity (D-3045) and must be routed through the one producer, not given its own normalisation.'
+
+- id: D-3071  # ADMISSION / CONTAINER INTEGRITY — A SUFFIX IS A CLAIM, THE BYTES ARE THE FACT, AND THE CORPUS HOLDS WORKS
+  state: ACTIVE
+  date: '2026-10-17'
+  by: assistant
+  category: ADMISSION / CONTAINER INTEGRITY
+  bugs: [BUG-886, BUG-887, BUG-888]
+  files:
+  - pipeline/container_integrity.py
+  - scripts/plan_admission.py
+  - scripts/apply_admission.py
+  - config/ingest_identity_gate.yaml
+  title: >-
+    A container is READABLE only when its own BYTES say so, judged by a probe declared per kind at the ONE home both
+    readers share; an accepted kind with no declared probe is FATAL; an admission that cannot become a work MOVES its
+    copy out of the corpus instead of leaving it; and a signature field must RESOLVE, not merely be present.
+  decision: >-
+    (1) READABILITY IS A DECLARED PROBE, NOT A SUFFIX. pipeline/container_integrity.py holds a CLOSED vocabulary
+    (zip: an end-of-central-directory record must resolve; pdf: `%PDF-` at the head AND `%%EOF` near the end; none:
+    plain text), and config/ingest_identity_gate.yaml#admission.container_integrity.probes declares which kind uses
+    which. Both readers share that ONE declaration — the plan (which proposes rows an owner may sign) and the
+    applier (which decides whether to spend a 137 MB copy plus an S0 run) — because a probe restated in the second
+    reader would be a second home (C12). (2) IT IS ASKED LAST, and only where it changes an answer: on rows that
+    would otherwise be CANDIDATES, so the cost is bounded to the worklist (0.33 s over 1,289 files measured; the
+    full dry run prices in 17.16 s, unchanged). (3) A ROW THAT CANNOT BECOME A WORK LEAVES NOTHING BEHIND: a failed
+    S0 MOVES its copy (container and any too-small markdown) to admission.applier.quarantine_prefix and records the
+    path in the receipt. The corpus holds works, not attempts. (4) THE SIGNATURE'S NAME MUST RESOLVE: an empty
+    accepted_by, or the template's own declared placeholder, is refused.
+  rationale: >-
+    MEASURED 2026-10-17, the owner's first real tranche: 5 of 1,289 declared containers cannot be opened (3 truncated
+    downloads cut at a chunk boundary, one zeros, one an Apple `book` archive with a `.pdf` suffix), and the plan
+    proposed them as ordinary candidates because "a container the conversion stage cannot read" was implemented as
+    a suffix test. The tenth signed row copied 137,319,019 bytes into the corpus and failed S0 — and then cost twice
+    more: the next plan read its KEY as already_in_the_corpus (a work that never arrived, absorbed and
+    unretryable), and every later S0 run re-failed on it (`Stage 0 FAILED: 1/941 ... 0.1% > max_failed_ratio=0.0`).
+    The proof is two-sided and was run in that order: RED `stage0_convert.py` rc 1 with 1 failed; the orphan moved
+    out; GREEN rc 0, 0 failed, 940 skipped; corpus census 0 containers without their work. An independent parser
+    (`pdfinfo`) was used to confirm the two files a `%PDF-` magic check would have PASSED, so the stricter probe is
+    not a false refusal. REJECTED: (a) folding corrupt into refused_container_no_stage_reads_it (different REMEDY:
+    re-download vs an engine — one class per remedy, or one act answers for two blast radii); (b) DELETING the
+    failed copy (R-D410: the bytes of a failure are evidence, and the source is the only thing that must be kept
+    intact — a move keeps every byte); (c) quarantining INSIDE the corpus (S0's find_books skips no dot-directory, so
+    the failure would recur forever — measured); (d) probing EVERY file (a cold cloud root pays a fetch per file for
+    a question that only matters for candidates); (e) trusting a magic number alone (it PASSES the 29 MiB truncated
+    pdf); (f) accepting `accepted_by` by presence (BUG-888: the owner's first signature carried the template's
+    placeholder and was applied).

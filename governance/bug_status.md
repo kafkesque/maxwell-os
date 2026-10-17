@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**235 open** / 415 closed of 650 ids.
+**236 open** / 420 closed of 656 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -205,7 +205,6 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-781 | (HIGH - OPEN 2026-10-14) - THE IDENTITY MACHINERY HAD NO ENFORCEMENT POINT: the owner ledger sat 59 pairs PENDING for a fortnight while the | 1 |
 | BUG-789 | (MED — OPEN) — the local model server's app config carries a Hugging Face token in plaintext | 1 |
 | BUG-790 | (LOW — OPEN) — the ingest door's refusal names the WRONG TASK | 1 |
-| BUG-792 | (MED — OPEN 2026-10-14) — the local server reuses no prefix, so every agent turn pre-pays its whole prompt | 1 |
 | BUG-793 | (MED — OPEN 2026-10-14) — Qwen3.8-27B prefills at 39 tok/s, four times worse than its parameter ratio predicts | 1 |
 | BUG-795 | (LOW — OPEN 2026-10-14) — one ledger row carries a NULL model and 156,098,139 input tokens | 1 |
 | BUG-796 | (MED — OPEN 2026-10-14) — a decision written outside the receipting writer leaves the attribution control red | 1 |
@@ -241,4 +240,6 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-876 | (MED, OPEN 2026-10-17) — THE ATTRIBUTION CONTROL CANNOT GO GREEN ON THE REGISTRY IT MEASURES | 1 |
 | BUG-877 | (MED, OPEN 2026-10-17) — A GOVERNED WRITE TO THE HARNESS HOME DOES NOT SURVIVE: scripts/check_harness_homes.py reads CONFLICT again, and no | 1 |
 | BUG-879 | (LOW, OPEN 2026-10-17) — THE BIRTH RECORD NAMES A STDIO MEMBER BY ITS COMMAND, SO `scripts/goose_profile.py --born` CANNOT DISTINGUISH TWO | 1 |
-| BUG-885 | (MED, OPEN 2026-10-17) — `pipeline/harness_contract.py`'s DECLARED `disproven` PREFIX-CACHE STATE NO LONGER REPRODUCES: the server served | 1 |
+| BUG-889 | (MED, OPEN 2026-10-17) — `scripts/normalise_corpus_names.py --census` CANNOT SEE THE 6 NFD NAMES IT EXISTS TO CURE: ITS DEFECT CLASSES ARE | 1 |
+| BUG-890 | (MED, ADDRESSED 2026-10-17) — `AGENTS.md#delegate_rules` STILL CARRIES DELEGATE-002's "SINGLE-SHOT ONLY / 6.8→0.4 tok/s COLLAPSE", A CLAIM | 1 |
+| BUG-891 | (MED, OPEN 2026-10-17) — `config/agent_surface.yaml`'s SWAP CHECKLIST NAMES A RENDER SOURCE THAT DOES NOT EXIST, SO EVERY CORRECTION TO | 1 |

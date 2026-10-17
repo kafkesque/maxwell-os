@@ -247,7 +247,7 @@ ratified:
       thinking_effort:
         value: 'medium'
         key: 'GOOSE_THINKING_EFFORT'
-        why: 'a thought on a LOCAL engine is prefill seconds nobody bills for, so the safe phase lowers the effort while the block cache is unproven (F6/BUG-792); THIS is the line to move when the cache is proven'
+        why: 'a thought on a LOCAL engine is prefill seconds nobody bills for, so the safe phase lowers the effort while the block cache was unproven (F6/BUG-792) — MEASURED 2026-10-17 (BUG-885): the cache is PROVEN (22.2x, cached 26,237/26,240 on a 26,240-token prefix), so this line is no longer blocked by evidence and MOVING it is an owner decision, not a correction; the value stays medium until that word'
   binding:                       # T-132/D-3003: a declaration that is not in the environment is a comment.
                                  # The executor is a SIBLING of the knobs it binds and is named by them, so the
                                  # declaration cannot drift from the thing that executes it.
@@ -255,8 +255,11 @@ ratified:
     state: 'BOUND-BY-SCRIPT - the values under knobs are read from this file at run time and never restated (C12)'
     owner_command: 'eval "$(python3 pipeline/harness_env.py --print)"'
     ladder: 'python3 pipeline/harness_env.py --check -> 0 every name bound, 2 OWNER-OWED, 1 fatal on CONFLICT'
-  revisit_when: 'the block cache is PROVEN (F6/BUG-792): with a proven cache growth is nearly free and the
-                 threshold may rise toward the window; until then every rise buys prefill seconds per turn'
+  revisit_when: 'FIRED 2026-10-17 (BUG-885) - the block cache IS PROVEN: `agent_context_probe.py --prefill-ab` read
+                 cached 26,237/26,240 and 22.2x against a 5.0x bar, on BUG-792''s own protocol. With growth nearly
+                 free the threshold MAY rise toward the window, and that rise is now a DECISION for the owner (it
+                 buys decode time per turn and costs a longer prefix to refresh whenever the head changes, BUG-872);
+                 nothing here moved automatically, because a fired trigger is a question, never an edit'
 
 #: LAYER 4. Cache accounting. A ratio is computed ONLY over rows that CARRY the field; the rows that do
 #: not are counted and REPORTED as unknown. A fabricated 0 is BUG-767's defect class, not a measurement.

@@ -48,6 +48,7 @@ sys.path.insert(0, str(_PROJECT_ROOT / "scripts"))
 import plan_admission  # noqa: E402 — the reader whose rows this writer applies (never a second derivation)
 import census_source_names as census  # noqa: E402 — the library reader: roots, name classes, the cache join
 from pipeline.book_metadata import sanitize_source_book  # noqa: E402 — the door's OWN key (D-3045)
+from pipeline.container_integrity import is_readable, probes_from  # noqa: E402 — BUG-886/D-3071
 
 POLICY = census.POLICY
 RC_OK, RC_FATAL, RC_OWNER_OWED = 0, 1, 2
@@ -82,13 +83,18 @@ def applier_policy(doc: dict[str, Any]) -> dict[str, Any]:
             f"home and the signature's required keys must come from the declaration, never from this writer (C12)"
         )
     for key in ("authority", "command", "accept_prefix", "accept_extension", "receipt_prefix",
-                "receipt_extension", "accept_modes", "accept_required", "states"):
+                "receipt_extension", "accept_modes", "accept_required", "states", "quarantine_prefix",
+                "accept_by_placeholder"):
         if key not in decl:
             raise ApplierError(
                 f"FATAL: {POLICY}#source_library.admission.applier does not declare {key!r} (C12: an absent "
                 f"value is FATAL and never defaulted)"
             )
-    return decl
+    #: THE READABILITY PROBE MAP LIVES ONE LEVEL UP, beside the decision vocabulary, because BOTH readers share it:
+    #: the plan refuses an unopenable container before an owner signs it and this writer asks again before it
+    #: copies (BUG-886/D-3071). A second copy of the map inside this block would be a second home for one fact
+    #: (C12), so the declaration is HANDED DOWN here and `probes_from` still refuses an absent or unknown one.
+    return dict(decl, container_integrity=(doc["source_library"]["admission"] or {}).get("container_integrity"))
 
 
 def resolve_root(value: str) -> Path:
@@ -157,6 +163,18 @@ def load_acceptance(path: Path, plan_path: Path, plan_digest: str, decl: dict[st
     missing = [key for key in decl["accept_required"] if key not in acc]
     if missing:
         raise ApplierError(f"FATAL: {path} does not carry {missing} — a signature missing a field signs nothing")
+    #: BUG-888 — A FIELD THAT IS PRESENT IS NOT A FIELD THAT RESOLVES (D-3034). MEASURED 2026-10-17: the owner's
+    #: first acceptance carried `accepted_by: <your name>` — the TEMPLATE'S OWN PLACEHOLDER — and it was applied,
+    #: because only the field's PRESENCE was ever checked. The name is the whole authorisation: an unresolvable
+    #: one is a signature nobody signed. The placeholder is DECLARED (`accept_by_placeholder`) so the writer and
+    #: the template cannot disagree about what it is, and an empty value is refused on the same branch.
+    who = str(acc["accepted_by"]).strip()
+    placeholder = str(decl["accept_by_placeholder"]).strip()
+    if not who or who.lower() == placeholder.lower():
+        raise ApplierError(
+            f"FATAL: {path} carries accepted_by={acc['accepted_by']!r} — a placeholder or an empty name is not a "
+            f"signature (the acceptance is the owner's word; write YOUR name, the one this act will be asked about)"
+        )
     if acc["mode"] not in decl["accept_modes"]:
         raise ApplierError(
             f"FATAL: {path} declares mode {acc['mode']!r}, outside the declared vocabulary "
@@ -178,7 +196,8 @@ def load_acceptance(path: Path, plan_path: Path, plan_digest: str, decl: dict[st
     return acc
 
 
-def acceptance_template(plan_path: Path, digest: str, rows: int) -> str:
+def acceptance_template(plan_path: Path, digest: str, rows: int,
+                        placeholder: str = "<your name>") -> str:
     """A ready-to-sign acceptance, with the LIVE digest already in it — so signing cannot fail on a copied hash.
 
     The template is deliberately `mode: all` with `rows: []` and a comment naming the alternative: a signature that
@@ -194,7 +213,7 @@ def acceptance_template(plan_path: Path, digest: str, rows: int) -> str:
         "schema_version": SCHEMA_VERSION,
         "plan": plan_ref,
         "plan_sha256": digest,
-        "accepted_by": "<your name>",
+        "accepted_by": placeholder,
         "accepted_on": datetime.now(UTC).strftime("%Y-%m-%d"),
         "mode": "all",
         "rows": [],
@@ -317,6 +336,33 @@ def copy_atomic(source: Path, target: Path) -> None:
         raise
 
 
+def quarantine_copy(paths: list[Path], decl: dict[str, Any], run_stamp: str, why: str) -> list[str]:
+    """MOVE the files THIS row created out of the corpus, so the corpus holds only works (BUG-887/D-3071).
+
+    WHY A MOVE AND NOT A DELETE: R-D410 forbids this writer to delete (its only unlink is its own half-written
+    temp file), and the bytes of a failed conversion are EVIDENCE — they are what a later reader inspects to learn
+    why a work would not convert. A move keeps every byte, leaves the source untouched, and is recorded in the
+    receipt beside the reason.
+
+    WHY OUTSIDE THE CORPUS, and not a dot-folder inside it: `pipeline/stage0_convert.py::find_books` discovers
+    books with `rglob('*<ext>')` and skips no dot-directory, so a quarantine inside the corpus would be re-read
+    and would fail again on EVERY later run. MEASURED 2026-10-17 (the owner's first tranche): one unreadable
+    container left in the corpus turned `Stage 0 FAILED: 1/941 ... 0.1% > max_failed_ratio=0.0` — a single bad
+    byte-source halted the whole conversion stage for everything else. The destination is DECLARED
+    (`admission.applier.quarantine_prefix`), never spelled here (C12), and each run writes below its own stamp.
+    """
+    base = resolve_root(str(decl["quarantine_prefix"])) / run_stamp
+    moved: list[str] = []
+    for path in paths:
+        if not path.exists():
+            continue
+        destination = base / path.name
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.move(str(path), str(destination))
+        moved.append(str(destination))
+    return moved
+
+
 def conversion_argv(container: Path, corpus: Path) -> list[str]:
     """The declared conversion entrypoint, given the row's OWN path below the corpus home (never a bare name)."""
     rel = container.relative_to(corpus)
@@ -338,7 +384,7 @@ def target_paths(row: dict[str, Any], corpus: Path) -> tuple[Path, Path]:
 
 
 def apply_row(row: dict[str, Any], corpus: Path, decl: dict[str, Any], index: dict[str, dict[str, Any]],
-              *, apply: bool, convert: bool) -> dict[str, Any]:
+              *, apply: bool, convert: bool, run_stamp: str = "") -> dict[str, Any]:
     """Decide and (when `apply`) perform ONE row. Returns the receipt record; never raises for a refusal."""
     source = Path(str(row["path"]))
     container_target, md_target = target_paths(row, corpus)
@@ -388,6 +434,24 @@ def apply_row(row: dict[str, Any], corpus: Path, decl: dict[str, Any], index: di
     if path_inside(corpus, source):
         record.update(state="already_applied", reason="the source ALREADY lives inside the corpus home")
         return record
+    #: BUG-886/D-3071 — A SUFFIX IS A CLAIM, THE BYTES ARE THE FACT. The PLAN now refuses a container no stage can
+    #: open, but a plan may be OLDER than the bytes it priced (a download that completed mid-flight, a file
+    #: replaced at the same size), and this ACT is where the cost of trusting a suffix is actually paid: MEASURED
+    #: 2026-10-17, one 137 MB truncated `.epub` was copied into the corpus and then failed S0. So the act asks
+    #: again, and asks BEFORE the copy — the refusal is cheap and the copy is not.
+    probes = probes_from(decl, ApplierError)
+    probe = probes.get(f".{str(row['kind']).lower()}")
+    if probe is None:
+        raise ApplierError(
+            f"FATAL: the row's kind {row['kind']!r} declares no readability probe "
+            f"({sorted(probes)}) — an accepted kind nobody checks is admitted on its suffix alone (C12)"
+        )
+    if not is_readable(source, probe):
+        record.update(state="refused",
+                      reason=f"the source is not a readable .{row['kind']} container (declared probe {probe!r}): the "
+                             f"stage that would read it cannot OPEN it, so the remedy is a re-download of the work, "
+                             f"not an admission — nothing was copied")
+        return record
     if not apply:
         record.update(state="would_apply", reason="dry run: nothing was written")
         return record
@@ -412,9 +476,18 @@ def apply_row(row: dict[str, Any], corpus: Path, decl: dict[str, Any], index: di
         return record
     tail = " | ".join(line.strip() for line in (done.stdout or done.stderr or "").strip().splitlines()[-3:])
     if done.returncode != 0 or not md_target.is_file() or md_target.stat().st_size < MIN_WORK_BYTES:
-        record.update(state="failed",
-                      reason=f"S0 rc={done.returncode}, markdown {'absent' if not md_target.is_file() else 'too small'}"
-                             f" — {tail[:400]}")
+        #: BUG-887/D-3071 — THE CORPUS HOLDS WORKS, NOT ATTEMPTS. Leaving the copy behind cost twice: the next plan
+        #: read its KEY as `already_in_the_corpus` (so a work that never arrived was silently absorbed and could
+        #: never be retried through this door), and every later S0 run re-failed on it under max_failed_ratio 0.0.
+        #: The row still FAILS loudly — what changes is only WHERE its bytes rest.
+        why = (f"S0 rc={done.returncode}, markdown "
+               f"{'absent' if not md_target.is_file() else 'too small'} — {tail[:400]}")
+        moved = quarantine_copy([container_target, md_target], decl,
+                                run_stamp or datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ"), why)
+        record.update(state="failed", reason=why)
+        record["quarantine"] = moved
+        record["reason"] += (f" | the copy was MOVED out of the corpus to {moved[0]}" if moved
+                             else " | nothing was left in the corpus")
         return record
     record.update(state="applied", md_sha256=sha256_bytes(md_target), reason=f"S0 rc=0 — {tail[:200]}")
     return record
@@ -525,7 +598,8 @@ def run(plan_path: Path | None, accept_path: Path | None, *, apply: bool, conver
 
     counts: dict[str, int] = {}
     for row in rows:
-        record = stamp(apply_row(row, corpus, decl, index, apply=apply, convert=convert), header)
+        record = stamp(apply_row(row, corpus, decl, index, apply=apply, convert=convert, run_stamp=run_stamp),
+                       header)
         counts[record["state"]] = counts.get(record["state"], 0) + 1
         if apply:
             append_receipt(out_path, record)
@@ -571,7 +645,12 @@ def selftest() -> int:
         (corpus / "DOMAIN 1 Test").mkdir(parents=True)
         (library / "epub" / "DOMAIN 1 Test").mkdir(parents=True)
         source = library / "epub" / "DOMAIN 1 Test" / "A Work.epub"
-        source.write_bytes(b"EPUB-BYTES" * 100)
+        #: BUG-886: a fixture container must be OPENABLE — the ACT now asks the bytes before it copies, so a fake
+        #: `.epub` would make every control below read as a corruption refusal instead of whatever it tests.
+        import zipfile
+        with zipfile.ZipFile(source, "w") as book:
+            book.writestr("mimetype", "application/epub+zip")
+            book.writestr("META-INF/container.xml", "<container/>")
         md_source = library / "epub" / "DOMAIN 1 Test" / "A Note.md"
         md_source.write_text("# a note\n" + "text " * 200, encoding="utf-8")
 
@@ -590,7 +669,12 @@ def selftest() -> int:
                 "accept_required": ["schema_version", "plan", "plan_sha256", "accepted_by", "accepted_on", "mode"],
                 "accept_extension": ".yaml", "receipt_prefix": str(tmp_root / "receipts" / "ADMISSION_APPLIED_"),
                 "receipt_extension": ".jsonl", "command": "python3 scripts/apply_admission.py",
-                "authority": "D-3068", "accept_prefix": str(tmp_root / "ADMISSION_ACCEPTED_"), "states": []}
+                "authority": "D-3068", "accept_prefix": str(tmp_root / "ADMISSION_ACCEPTED_"), "states": [],
+                "accept_by_placeholder": "<your name>",
+                #: BUG-886/D-3071: the declared probes and the declared quarantine. Both are REQUIRED by the
+                #: writer (an absent one is FATAL), so the fixture declares them the way the gate does.
+                "container_integrity": {"probes": {".epub": "zip", ".pdf": "pdf", ".md": "none"}},
+                "quarantine_prefix": str(tmp_root / "quarantine")}
 
         accept_file = tmp_root / "ADMISSION_ACCEPTED_TEST.yaml"
         base_accept = {"schema_version": "1.0", "plan": str(plan_file), "plan_sha256": digest,
@@ -607,6 +691,22 @@ def selftest() -> int:
         except ApplierError:
             refused = True
         expect("a_plan_digest_mismatch_is_FATAL", refused)
+
+        # 1b. BUG-888: a signature that carries the TEMPLATE'S OWN PLACEHOLDER resolved to nothing and was applied
+        #     (MEASURED 2026-10-17: the owner's first acceptance held `accepted_by: <your name>`). The name is the
+        #     whole authorisation, so an unresolvable one is refused - and a real name still passes (two-sided: a
+        #     check that refused every signature would refuse the owner's own act).
+        unsigned = dict(base_accept, accepted_by="  <your name>  ")
+        unsigned_file = tmp_root / "UNSIGNED.yaml"
+        unsigned_file.write_text(yaml.safe_dump(unsigned), encoding="utf-8")
+        refused = False
+        try:
+            load_acceptance(unsigned_file, plan_file, digest, decl)
+        except ApplierError:
+            refused = True
+        expect("a_signature_carrying_the_TEMPLATE_PLACEHOLDER_is_REFUSED", refused)
+        expect("a_signature_with_a_REAL_name_still_passes",
+               load_acceptance(accept_file, plan_file, digest, decl)["accepted_by"] == "selftest")
 
         # 2. a row the signature names but the plan does not hold is FATAL
         listed = dict(base_accept, mode="listed", rows=["books/epub/DOMAIN 1 Test/GHOST.epub"])
@@ -737,6 +837,39 @@ def selftest() -> int:
         expect("THIS_file_binds_no_local_that_shadows_a_module_callable",
                shadowed_module_names(own) == [], shadowed_module_names(own))
 
+        # 16. BUG-886/D-3071: a container whose BYTES do not open is REFUSED BEFORE A BYTE IS COPIED. The plan may be
+        #     OLDER than the bytes it priced, and this ACT is where trusting a suffix is actually paid for (MEASURED
+        #     2026-10-17: 137 MB copied into the corpus, then S0 failed). TWO-SIDED by construction: control 3 above
+        #     drives the SAME row through the SAME probe on a VALID epub and must still read `would_apply`, so a
+        #     probe that refused every container would turn that control red.
+        truncated = library / "epub" / "DOMAIN 1 Test" / "A Truncated Download.epub"
+        truncated.write_bytes(b"PK\x03\x04\x14\x00\x00\x00\x08\x00" + b"\x00" * 512)
+        broken_row = dict(rows[0], path=str(truncated), rel="books/epub/DOMAIN 1 Test/A Truncated Download.epub",
+                          key="a truncated download", bytes=truncated.stat().st_size,
+                          target=str(corpus / "DOMAIN 1 Test" / "A Truncated Download.md"))
+        index = receipt_index(decl)
+        corrupt = apply_row(broken_row, corpus, decl, index, apply=True, convert=True)
+        expect("a_source_whose_bytes_do_not_OPEN_is_REFUSED_before_a_byte_is_copied",
+               corrupt["state"] == "refused" and "cannot OPEN" in corrupt["reason"]
+               and not (corpus / "DOMAIN 1 Test" / "A Truncated Download.epub").exists(),
+               corrupt["state"])
+
+        # 17. BUG-887/D-3071: a row whose S0 run produces NO work leaves NOTHING in the corpus — the copy is MOVED to
+        #     the declared quarantine, never deleted (R-D410) and never left where the next plan would read its key
+        #     as `already_in_the_corpus`. MEASURED: the owner's first tranche left a 137 MB container that then made
+        #     `Stage 0 FAILED: 1/941 ... > max_failed_ratio=0.0` true for every later run.
+        doomed = dict(rows[0], rel="books/epub/DOMAIN 1 Test/A Work.epub", key="a doomed work",
+                      target=str(corpus / "DOMAIN 1 Test" / "A Doomed Work.md"))
+        index = receipt_index(decl)
+        failed = apply_row(doomed, corpus, decl, index, apply=True, convert=True, run_stamp="TESTSTAMP")
+        quarantine = tmp_root / "quarantine" / "TESTSTAMP"
+        expect("a_row_whose_S0_run_produced_no_work_leaves_NO_container_in_the_corpus",
+               failed["state"] == "failed"
+               and not Path(failed["container_target"]).exists()
+               and (quarantine / Path(failed["container_target"]).name).is_file()
+               and bool(failed.get("quarantine")),
+               (failed["state"], failed.get("quarantine")))
+
         # 15. BUG-884: a REFUSAL prints its message and exits RC_FATAL — never a traceback. A message string handed
         #     to SystemExit lands in `.code`, so `int(exc.code)` turned the digest-mismatch refusal into a
         #     ValueError. Both branches are asserted: a message string AND a declared integer code.
@@ -764,7 +897,8 @@ def main(argv: list[str] | None = None) -> int:
             print(f"FATAL: no plan found under {plan_admission.admission_policy(doc)['plan_prefix']}*.json")
             return RC_FATAL
         plan = load_plan(plan_path)
-        print(acceptance_template(plan_path, sha256_bytes(plan_path), len(plan["rows"])), end="")
+        print(acceptance_template(plan_path, sha256_bytes(plan_path), len(plan["rows"]),
+                                  str(applier_policy(doc)["accept_by_placeholder"])), end="")
         return RC_OK
     parser = argparse.ArgumentParser(
         description="The admit applier (T-183): apply an ACCEPTED admission plan, crash-safe, dry run by default.")

@@ -167,3 +167,53 @@
 </protected>
 
 </maxwell_os>
+<!-- ═══════════════════════════════════════════════════════════════════════════════════════════════════════════
+     DELEGATE-002 IS SUPERSEDED — READ THIS BEFORE THE `DELEGATION STATUS` BLOCK ABOVE (2026-10-17, BUG-890)
+     This file is APPEND-ONLY by policy (docguard: append_only), so the stale line above could not be rewritten.
+     The line that is superseded, quoted exactly, is:
+       "Qwen3-Coder-30B-A3B-Instruct-MLX-4bit: SINGLE-SHOT code gen ONLY (via curl/one-shot). Do NOT delegate
+        multi-turn agentic tasks — decode collapses monotonically (~6.8→0.4 tok/s) as agent context grows,
+        responses shrink to ~50-token stubs (DELEGATE-002, 2026-08-28)."
+     ═══════════════════════════════════════════════════════════════════════════════════════════════════════════ -->
+
+## DELEGATE-002 superseded: the 6.8→0.4 tok/s collapse is NOT REPRODUCIBLE, and "only gemma can drive a loop" is RETIRED
+
+**What was measured, on this machine, and what it retires.**
+
+1. **The collapse did not reproduce.** On the two-tool probe (`scripts/measure_subagent_loop.py`) Qwen3-Coder-30B
+   decoded **34.5 tok/s** and emitted a correct tool call with the right argument, the same answer the other served
+   models gave. On the fixed 3-call loop it COMPLETED, correctly, with 79.9 s as its slowest turn against a 90 s
+   budget (D-3058). Two independent fixtures, both contradicting "decode collapses to 0.4 tok/s … ~50-token stubs".
+   The 2026-08-28 reading was ONE observation on ONE fixture, and it is now a claim the machine does not support.
+2. **"Only gemma can do multi-turn / tool-calling" is REFUTED, not merely doubted.** 7 of 8 served models drove the
+   3-call loop (D-2549/D-3058); 4 of 4 emitted a valid tool call on the 2-tool probe. Phi-4-mini is the single real
+   exception (0 tool calls — the BUG-053 shape, measured on a loop).
+3. **What is TRUE, and is the reason to route elsewhere anyway:** Qwen3-Coder is the SLOWEST loop driver measured
+   (79.9 s for three calls), the fastest are MiniCPM5-2B (2.1 s) and Ornith-1.5-9B (11.5 s), and a cold model load
+   costs 42 s – 134 s TTFT — a cost a warm model does not pay. So the rule is a SPEED rule, not a capability ban.
+
+**The corrected rule — use this, not the line above.**
+
+| task shape | model | why (measured) |
+|---|---|---|
+| multi-turn agentic loop, latency matters | MiniCPM5-2B, Ornith-1.5-9B | fastest completed loops (2.1 s, 11.5 s) |
+| code review / classification / summarisation WITH source | gemma-4-E4B-it-MLX-4bit | confirmed, 0.48 s, and the R5 partner for a Qwen generator |
+| single-shot code generation | Qwen3-Coder-30B-A3B-Instruct-MLX-4bit | correct; 34.5 tok/s decode; SLOW per loop turn |
+| multi-turn on Qwen3-Coder | **ALLOWED, no longer banned** — budget for the wall clock | 79.9 s / 3 calls, completes correctly |
+| open-ended research / fact-finding | NOT a delegate: `shell`/`curl` | BUG-053: open-ended delegation hallucinates |
+| any tool loop | NEVER Phi-4-mini | 0 tool calls in 3 turns (BUG-053 shape, measured) |
+
+**What remains UNMEASURED, stated as such (D-3036 — a hypothesis stays labelled until a receipt speaks).** Whether
+Qwen3-Coder *sustains* a LONG multi-turn session (20+ turns with a large agent context) is NOT what these fixtures
+tested, and no claim is made either way. **T-187 is the instrument that decides it** — the two-step / two-tool
+fixture with a distractor, two DEPENDENT steps, and an expected answer only the second tool's output can produce;
+TTFT and decode rate per step; a receipt. Nothing is promoted into `AGENT_LOOP_FAST` / `AGENT_LOOP_WORKHORSE`
+before it lands (D-3058). The candidate register that fixture would rank is
+`governance/NOT-YET-EVALUATED-RESEARCH.md` (2026-10-17 rows) — four MLX/4-bit candidates and two refusals, with
+their reasons, so none is re-proposed from memory.
+
+**Why this block is appended rather than edited in place:** `AGENTS.md` is protected as `append_only` (D824), and
+that protection is worth more than a tidy file — a silent rewrite of a loader is exactly the drift this OS refuses.
+A reader must therefore treat THIS block as the operative text and the `DELEGATION STATUS` block above as history
+dated 2026-07-26. If the owner wants the stale line gone from the top of the file, that is an owner edit to a
+protected file; the correction itself is already made here.

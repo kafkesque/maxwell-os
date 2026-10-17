@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1197 decisions (census stamp 2af13d21c90659f0, 2026-10-17) · 650 bugs (235 open / 415 closed; highest OPEN = BUG-885) · 59 open tasks (MUST 12 / SHOULD 43 / WORTH 4; OWNER-moved 0, pipeline-moved 59; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1198 decisions (census stamp 1306f0d73784715e, 2026-10-17) · 656 bugs (237 open / 419 closed; highest OPEN = BUG-891) · 59 open tasks (MUST 12 / SHOULD 43 / WORTH 4; OWNER-moved 0, pipeline-moved 59; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **79** of 1197 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 612 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1197, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **79** of 1198 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 613 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1198, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 235 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 35 · 🟨 MED 69 · 🟩 LOW 26 · UNLABELLED 101 (BUG-757) of 235 open.
+> Open BUGS by severity (population = the census's 237 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 35 · 🟨 MED 71 · 🟩 LOW 26 · UNLABELLED 101 (BUG-757) of 237 open.
 >
 > **OWNER LANE (0) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -16687,3 +16687,138 @@ itself declared, plus the two-call cached-tokens probe used here (5,894-token pr
 read `cached=5,888`). This amendment exists so the buglog carries the route and the re-take command rather than
 leaving the finding with no owner (D-3034/D-3036) — and so the route graph's shrink-only debt does not grow because a
 NEW finding was recorded without its artifact.
+
+### BUG-885 (MED, CLOSED 2026-10-17) — THE PREFIX CACHE IS PROVEN (22.2x), SO `config/agent_context.yaml`'s DISPROVEN STATE AND ITS REVISIT TRIGGER WERE BOTH STALE
+
+**The owed reading was run, not argued.** `python3 scripts/agent_context_probe.py --prefill-ab` (BUG-792's own
+protocol, on a 26,240-token prefix instead of the 5,894 one): call 1 = 22.2 s, call 2 = **1.0 s**, `cached_tokens`
+**26,237 / 26,240**, **speedup 22.2x** against the declared 5.0x bar, `verdict: proven`. The cross-family control
+(`Phi-4-mini-instruct-8bit`, 26,231 tokens) read 28.9 s cold. So the property BUG-792 declared `disproven` on
+2026-10-14 reproduces the OTHER way today, on BOTH fixtures now (this one and the 5,894-token two-call probe,
+`cached=5,888`).
+**What was wrong was the STATE WORD, and it was in the wrong file.** BUG-885's amendment named
+`pipeline/harness_contract.py`; the disproven claim is not there — it is declared in
+`config/agent_context.yaml` (`thinking_effort.why`, `revisit_when`) and restated in `config/task_register.yaml`.
+Both were corrected, not deleted: the revisit trigger is now recorded as **FIRED** rather than left standing as a
+future question, and what it fires is a DECISION (may the token threshold rise toward the window now that growth is
+nearly free), never an automatic edit.
+**What this does NOT say:** a warm cache does not make a model capable. The DELEGATE-002 sentence is a separate
+claim with its own evidence, and it is answered in AGENTS.md by a superseding block (see BUG-890).
+
+### BUG-886 (HIGH, FIXED 2026-10-17) — `scripts/plan_admission.py` REFUSED "A CONTAINER THE STAGE CANNOT READ" AND DECIDED IT BY SUFFIX ALONE, SO A TRUNCATED `.epub` WAS PROPOSED FOR THE OWNER'S SIGNATURE
+
+**The defect, in the gate's own words versus the gate's own test.** `config/ingest_identity_gate.yaml` declares
+that the admission refuses "a container the conversion stage cannot read"; the reader implemented that as
+`suffix not in accepted`. A suffix is a CLAIM made by a name; readability is a FACT about bytes. MEASURED
+2026-10-17 over all 1,289 declared containers in the two library roots: **1,286 open, 5 do not**, and every one of
+the five read as an ordinary candidate. The class is not exotic — 3 are truncated downloads cut at a chunk
+boundary (30,408,704 bytes = exactly 29 MiB; 137,319,019 bytes with no end-of-central-directory anywhere), one is
+zeros, one is an Apple `book` archive wearing a `.pdf` suffix.
+**INDEPENDENTLY CONFIRMED, not inferred from my own probe:** `pdfinfo` on
+`Encylopedia of Freemasonry - Vols 1and2.pdf` reports "Invalid XRef entry ... Top-level pages object is wrong type
+(null)" and reads 0 pages. Note the file PASSES a `%PDF-` magic check — the trailer test is what catches it.
+**The fix is a declaration plus one probe, not a heuristic.** `pipeline/container_integrity.py` (new) holds the
+CLOSED probe vocabulary (`zip` = an end-of-central-directory must resolve; `pdf` = magic at the head AND `%%EOF`
+near the end; `none` = plain text); `config/ingest_identity_gate.yaml#admission.container_integrity.probes`
+declares which kind uses which, so an ACCEPTED kind with no declared probe is FATAL rather than admitted
+unchecked. The new class `refused_container_corrupt` is separate from `refused_container_no_stage_reads_it`
+because the REMEDIES differ: a `.mobi` needs an engine (T-180), a truncated `.epub` needs a RE-DOWNLOAD.
+**Cost, measured so it cannot become BUG-882 again:** the probe reads a bounded tail, 0.33 s over 1,289 files. It
+is asked LAST — only of rows that would otherwise be candidates — so a cold cloud root pays for ~463 files, not
+1,289, and the full dry run still prices in **17.16 s** (463 would_apply, unchanged).
+BEFORE: candidates 477, `refused_container_corrupt` 0 (class absent), 5 unopenable containers proposed.
+AFTER: candidates **463**, `refused_container_corrupt` **5**, plan digest `0692ce6f…`. Controls 22/22.
+
+### BUG-887 (HIGH, FIXED 2026-10-17) — A FAILED CONVERSION LEFT ITS CONTAINER IN THE CORPUS: THE NEXT PLAN ABSORBED IT AS ALREADY-IN-CORPUS AND EVERY LATER S0 RUN FAILED ON IT
+
+**Two costs from one file, both measured on the owner's first tranche.** Row 10 copied 137 MB into the corpus and
+S0 failed. From then on: (1) the next plan read the container's KEY as `already_in_the_corpus`, so a work that
+never arrived was silently absorbed and could never be retried through this door; (2) `pipeline/stage0_convert.py`
+discovers books with `rglob('*<ext>')` and skips no dot-directory, so every later run re-failed on it —
+`RED LOOP, RUN BEFORE THE FIX: Stage 0 FAILED: 1/941 book(s) failed conversion (0.1% > max_failed_ratio=0.0)`.
+**FIX: the corpus holds works, not attempts.** A row whose S0 run produced no work MOVES its copy (container and
+any too-small markdown) to the DECLARED `admission.applier.quarantine_prefix` and records the destination in the
+receipt beside the reason. A MOVE, not a delete: R-D410 forbids this writer to delete, the bytes of a failure are
+evidence, and the source is untouched. The destination must be OUTSIDE the corpus, or S0 would re-read it.
+**GREEN LOOP AFTER: `python3 pipeline/stage0_convert.py` → rc 0, 0 failed, 940 skipped.** The orphan was rolled
+out with the same function (receipted, `admission_quarantine/20261017T132219Z/`), and a census now reads
+**0 containers without their work** in `knowledge pipeline/books` (949 md, 9 containers, every container paired).
+Controls 24/24 (including: a failed row leaves no container, and a live name shadows no module callable).
+
+### BUG-888 (HIGH, FIXED 2026-10-17) — `scripts/apply_admission.py` ACCEPTED `accepted_by: <your name>`: THE ONE FIELD THAT CARRIES CONSENT WAS CHECKED FOR PRESENCE, NEVER FOR RESOLUTION
+
+**MEASURED on the owner's own signed file**: `governance/ADMISSION_ACCEPTED_20261017.yaml` carried
+`accepted_by: <your name>` — the TEMPLATE'S OWN PLACEHOLDER — and the act ran. The required-field check reads
+`[key for key in accept_required if key not in acc]`, so a field that is PRESENT but resolves to nothing passed
+(D-3034's defect, in the signature itself). The whole authority of this applier is "the owner's word": a name
+nobody answers to is not a word.
+**FIX:** the placeholder is DECLARED once (`admission.applier.accept_by_placeholder`) so the template printer and
+the checker cannot disagree, and the reader refuses an empty name or that placeholder — case-insensitive,
+whitespace-trimmed. Two-sided control: the placeholder is REFUSED **and** a real name still passes (a check that
+refused every signature would refuse the owner's own act). Controls 26/26.
+**Consequence for the owner, stated plainly:** the current acceptance is REFUSED until it carries a real name, and
+it must also be re-printed for the new digest (`0692ce6f…`, 463 rows) because BUG-886 changed the plan.
+
+### BUG-889 (MED, OPEN 2026-10-17) — `scripts/normalise_corpus_names.py --census` CANNOT SEE THE 6 NFD NAMES IT EXISTS TO CURE: ITS DEFECT CLASSES ARE REGEX-ONLY
+
+**The owner's "something is off" is a real under-report.** `--census` reads `37 corpus name defects` (34 repeated
+internal space + 3 leading/trailing) while the corpus actually holds **43**: the 6 non-NFC names MEASURED on
+2026-10-17 (`Apolinário`, `Ortíz`, `Abbés`, `Tomaž`, `Renée` x2, all `.md`, all in `knowledge pipeline/books`).
+The reason is structural, not a count bug: `identity.name_defect_patterns` is a mapping of REGEXES and
+`defect_rows()` compiles each one — "is this name NFC?" is a NORMALISATION question, and no regex can ask it. So
+the census is complete over the classes it can express and blind to the one class this sitting proved is an
+identity defect (D-3070).
+**Not a hazard today, and that is exactly why it must be recorded rather than fixed in a hurry:** the `_key()`
+collapse makes NFD storage-non-canonicality, not ambiguity (the same argument the accepted whitespace debt rests
+on), and the census reads `apply_ready: False` anyway — all 37 eligible rows are refused for dangling references
+(BUG-800), so no rename can be applied and nothing is silently mis-keyed. The FIX is a schema one: a defect class
+whose test is a normalisation, not a pattern (a declared `name_defect_forms: {not_nfc: NFC}` read beside the
+patterns), plus its own `accepted_debt` declaration with a reason of its own — NOT a `same_as` pointer, because the
+blast radius differs from the whitespace class. Owner-gated by T-130/T-172, and a census that under-reports is a
+false green, which is the direction this register exists to refuse.
+
+### BUG-890 (MED, ADDRESSED 2026-10-17) — `AGENTS.md#delegate_rules` STILL CARRIES DELEGATE-002's "SINGLE-SHOT ONLY / 6.8→0.4 tok/s COLLAPSE", A CLAIM TWO FIXTURES NOW CONTRADICT; ITS OWNING DECLARATION IS `config/agent_surface.yaml#agent_md_sections`
+
+**Why it is a bug and not stale prose.** The `delegate_rules` block is the loader an agent reads before it routes a
+task, and `config/agent_surface.yaml` declares that block (and `#models`) as ADAPTER-OWNED text. Its Qwen3-Coder line
+says "SINGLE-SHOT code gen ONLY … Do NOT delegate multi-turn agentic tasks — decode collapses monotonically
+(~6.8→0.4 tok/s) … ~50-token stubs (DELEGATE-002, 2026-08-28)". MEASURED 2026-10-17 on two independent fixtures: the
+two-tool probe decoded **34.5 tok/s** and produced a CORRECT tool call, and the fixed 3-call loop COMPLETED correctly
+with 79.9 s as its slowest turn against a 90 s budget. The 2026-08-28 figure is one observation on one fixture.
+**What is still true, and it is a SPEED fact, not a capability ban:** Qwen3-Coder is the slowest loop driver measured;
+the fastest are MiniCPM5-2B (2.1 s) and Ornith-1.5-9B (11.5 s); a cold load costs 42–134 s TTFT.
+**The act:** a superseding block appended to `AGENTS.md` — a CORRECTED routing table (loop → MiniCPM5/Ornith, review →
+gemma, single-shot code → Qwen3-Coder, multi-turn on Qwen3-Coder ALLOWED with the wall clock budgeted, never a tool
+loop on Phi-4-mini) plus an explicit UNMEASURED statement for long multi-turn sessions, whose only gate is T-187.
+**NOT done, and named rather than implied:** `AGENTS.md` is `append_only` (D824), so the stale sentence still stands at
+the top of the file and the reader is told to treat the appended block as operative. Removing it in place is an OWNER
+edit to a protected file — and BUG-891 is why doing it by hand would not hold.
+
+### BUG-891 (MED, OPEN 2026-10-17) — `config/agent_surface.yaml`'s SWAP CHECKLIST NAMES A RENDER SOURCE THAT DOES NOT EXIST, SO EVERY CORRECTION TO `AGENTS.md#delegate_rules` IS LOST ON THE NEXT HARNESS SWAP
+
+**MEASURED 2026-10-17:** the checklist's third line is "re-render AGENTS.md#delegate_rules and #models from
+`agent/adapters/<harness>/`", and `agent/adapters/` holds `CONTRACT.md`, `goose/wiring.md`,
+`goose/apply_provider_flip.py` — **no template carrying the delegate_rules text** (a grep for DELEGATE-002 /
+SINGLE-SHOT / 6.8 under `agent/` returns nothing). So the step is unperformable by anyone, and the block it claims to
+own is in fact hand-maintained. That is a declaration with no referent (D-3034), and its consequence is concrete:
+BUG-890's correction lives ONLY in an appended block, which a future "re-render" (or a hand swap done from memory)
+would silently drop.
+**The route (not taken here, because it is a build):** commit ONE template per harness under `agent/adapters/<harness>/`
+that carries `#delegate_rules` and `#models` verbatim, plus a renderer that writes the block between markers, plus a
+rail that REFUSES when the rendered region and the template disagree — so a correction has a durable home and a swap
+cannot lose it. Until then the honest state is: AGENTS.md's routing text has NO declared source of truth, and this
+entry is that statement rather than a silence.
+
+### BUG-792 (MED, CLOSED 2026-10-17) — THE PREFIX CACHE IS NOT DISPROVEN: 22.2x ON ITS OWN PROTOCOL, ON A 26,240-TOKEN PREFIX
+
+Closed by re-running the protocol the entry itself declared, not by argument:
+`python3 scripts/agent_context_probe.py --prefill-ab` → call 1 **22.2 s**, call 2 **1.0 s**, `cached_tokens`
+**26,237 / 26,240**, **speedup 22.2x** against the declared 5.0x bar, `verdict: proven`; the cross-family control
+(`Phi-4-mini-instruct-8bit`, 26,231 tokens) read 28.9 s cold. The 2026-10-14 reading ("twelve identical-prefix calls,
+every one reporting no reused tokens, 1.04x") is therefore NOT REPRODUCIBLE on the same server, and no variable was
+changed that this entry can name — the honest record is that the earlier state was an observation the machine no
+longer supports. What the two readings DO agree on, and what survives: the cache is **PER-MODEL** (both Orniths read
+`cached = 0` in the same session) and the binding constraint is **PREFIX STABILITY**, not throughput (one byte changed
+at the head converts a warm turn back into a cold one — BUG-872). The dependent declaration in
+`config/agent_context.yaml` (`thinking_effort.why`, `revisit_when`) was corrected in place and its revisit trigger is
+recorded as FIRED; the threshold rise it points at is an OWNER DECISION, not an automatic edit.

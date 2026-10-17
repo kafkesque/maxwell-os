@@ -1,4 +1,4 @@
-# ADMISSION PLAN — 2026-10-17T13:01:23Z
+# ADMISSION PLAN — 2026-10-17T13:40:19Z
 
 > Authority **D-3051** (T-181). The corpus home is `/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books`. This file is a
 > **plan**: it admits nothing, it moves nothing and it converts nothing. The act that admits a work is
@@ -6,11 +6,11 @@
 
 ## What is measured, and in what unit
 
-- files in the declared library kind roots: **2811** (959 distinct keys they
-  share with the corpus or an ingest record, 1020 distinct keys they do not)
-- already in the corpus by the door's key: **1688**
+- files in the declared library kind roots: **2811** (968 distinct keys they
+  share with the corpus or an ingest record, 1011 distinct keys they do not)
+- already in the corpus by the door's key: **1697**
 - seen by an INGEST RECORD whose corpus file now carries a different key: **27** (the pipeline read the work; the name moved, T-130)
-- **admission candidates the pipeline has never seen: 477**
+- **admission candidates the pipeline has never seen: 463**
 
 ## The target rule (declared, never inferred here)
 
@@ -18,15 +18,18 @@ a plan row proposes corpus_home / (the source file's own path BELOW its declared
 
 Accepted containers (declared in the conversion transition, origin `pipeline/stage0_convert.py`): `.epub .md .pdf`.
 
+Readability probes, declared per kind (`container_integrity`, BUG-886): `.epub->zip .pdf->pdf .md->none` — a container an accepted kind accepts is opened before it is proposed, so a truncated download is a REFUSAL with a remedy (re-download) and never a signed row.
+
 ## Every decision, with the reason it is declared under
 
 | class | files | declared meaning |
 |---|---|---|
-| `already_in_the_corpus` | 1688 | a file whose DOOR KEY the corpus home already holds: the pipeline has the work and there is nothing to admit |
+| `already_in_the_corpus` | 1697 | a file whose DOOR KEY the corpus home already holds: the pipeline has the work and there is nothing to admit |
 | `seen_by_an_ingest_record` | 27 | a file only the S0.5 metadata cache names, because the corpus file now carries a different key (MEASURED 2026-10-16: the corpus itself was renamed under T-130). The pipeline READ the work, so it is SEEN and not a candidate - printed because a second voice saying 'seen' is not the same voice as the corpus saying it |
-| `admit_candidate` | 477 | a file whose key neither the corpus nor an ingest record names, in a container the conversion stage accepts, inside its declared kind folder, under a root that declares a corpus home, carrying a name NO defect pattern matches: THE OWNER'S WORKLIST |
+| `admit_candidate` | 463 | a file whose key neither the corpus nor an ingest record names, in a container the conversion stage accepts, inside its declared kind folder, under a root that declares a corpus home, carrying a name NO defect pattern matches: THE OWNER'S WORKLIST |
 | `refused_no_declared_corpus_home` | 0 | its root declares admits_to: null, so NO declaration names a home its works are admitted to: the refusal names the missing declaration instead of inventing a destination (T-181 limb 2) |
 | `refused_container_no_stage_reads_it` | 389 | a container the conversion stage cannot read (declared kinds such as .mobi/.azw3/.djvu/.docx are OWNED but not convertible): admitting one needs an ENGINE, which is T-180's misplaced class and not this reader's act |
+| `refused_container_corrupt` | 5 | a container of an ACCEPTED kind whose own BYTES are not openable (a truncated download, a file renamed to a suffix it is not): the stage reads this kind, so the remedy is not an engine but a RE-DOWNLOAD of the work. It is its own class because it is its own remedy - folding it into the engine class would let one act answer for two blast radii (BUG-886, MEASURED 2026-10-17: 3 of 1,289 library containers read as ordinary candidates) |
 | `refused_name_repair_first` | 179 | a name a declared defect pattern matches (marker/spine/truncation): an admitted file's name becomes the CORPUS NAME and the DOOR KEY, so admitting a defect materialises it into the tree the S0.5 cache then STAMPS. The repair rides FIRST - T-176, the owner's rename plan, whose eligible rows are exactly this class |
 | `refused_not_in_its_kind_folder` | 51 | the file does not sit under its declared kind folder (the placement axis, axis_depth 1), so the path its corpus twin would take cannot be derived: the misplaced class T-180 owns |
 | `refused_domain_not_a_corpus_domain` | 0 | the file does not sit under a folder this root declared as its axis, or that folder is not a name the CORPUS already materialises (arrangement.share_rule): admitting it would put a new top-level name in the one corpus home and silently widen the domain vocabulary the pipeline classifies against, so the row is refused and counted instead (D-3062) |
@@ -35,24 +38,15 @@ Accepted containers (declared in the conversion transition, origin `pipeline/sta
 
 - `refused_no_declared_corpus_home`: `—`
 - `refused_container_no_stage_reads_it`: `books/epub/DOMAIN 0 Systems + Decision/systems+complexity/The Systems Bible_ The Beginner_'s Guide to Systems Large and `; `books/epub/DOMAIN 2 Design/design+systems/Laying the Foundations -- Andrew Couldwell -- 2019 -- 898b840e9d7b80bc2a4a7849`; `books/epub/DOMAIN 3 Art + Computational Media/Digital Art, Third edition (World of Art).azw3`; `books/epub/The Elements of Style [Illustrated] -- Strunk Jr_, William -- 2011 -- Seedbox Press, LLC -- 7b4f785e400d8b629`; `books/pdf/DOMAIN 0 Systems + Decision/systems+complexity/SYSTEMANTICS. THE SYSTEMS BIBLE (John Gall) (z-library.sk, 1lib`
+- `refused_container_corrupt`: `books/epub/DOMAIN 2 Design/practice+process/How to use graphic desi gn to sell things, explain things, make things ylib.`; `books/epub/DOMAIN 5 Personal Practice/mood+therapy/Happy Sexy Millionaire Unexpected Truths about Fulfillment, Love, and`; `books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Encylopedia of Freemasonry - Vols 1and2.pdf`; `books/pdf/DOMAIN 2 Design/visual+fundamentals/color choices: making color sense out of color theory.pdf`; `journals_notes/DOMAIN 2 Design/design-notes/mo graph/Keylight_1.2_AE.pdf`
 - `refused_name_repair_first`: `books/epub/AI-Assisted Programming for Web and Machine Learning_ -- Christoffer Noring, Anjali Jain, Marina Fernandez, A`; `books/epub/Build a Multi-Agent System (from Scratch) -- Val Andrei Fajardo -- None -- 499a745fd121358a158cdb6d6415e4d0 -`; `books/epub/DOMAIN 0 Systems + Decision/decision+strategy/Competing Against Luck _ The Story of Innovation and -- Recorde`; `books/epub/DOMAIN 0 Systems + Decision/decision+strategy/Seeking Wisdom_ From Darwin to Munger, 3rd Edition -- Bevelin, `; `books/epub/DOMAIN 0 Systems + Decision/decision+strategy/The Innovator's Dilemma, with a New Foreword_ When New -- Clayt`
 - `refused_not_in_its_kind_folder`: `books/epub/DOMAIN 2 Design/communication+design/_Visual Metaphor Structure and Process (Gerard J.Steen) (z-library.sk, 1`; `books/epub/DOMAIN 4 Business/practice+economics/100-Habits of Successful Freelance Designers Insider Secrets for Working`; `books/epub/DOMAIN 4 Business/practice+economics/365 Habits of Successful Graphic Designers Insider Secrets from Top Desi`; `books/pdf/DOMAIN 0 Systems + Decision/execution+operations/The Art of Strategy_ A Game Theorist_'s Guide to Success in B`; `books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/AMARINGO, Pablo et al - Plant Spirit Shamanism T`
 - `refused_domain_not_a_corpus_domain`: `—`
 
-## The admission candidates (477)
+## The admission candidates (463)
 
 | file (below its root) | key | kind | proposed corpus path | bytes |
 |---|---|---|---|---|
-| `books/epub/DOMAIN 1 Substrate — Mind, Math, Meaning/mental+models+epistemology/Nordic Ideology A Metamodern Guide to Politics, Book Two (Metamodern Guides 2) by Freinacht, Hanzi [Freinacht, Hanzi].epub` | `nordic ideology a metamodern guide to politics, ` | epub | `DOMAIN 1 Substrate — Mind, Math, Meaning/mental+models+epistemology/Nordic Ideology A Metamodern Guide to Politics, Book Two (Metamodern Guides 2) by Freinacht, Hanzi [Freinacht, Hanzi].md` | 2561973 |
-| `books/epub/DOMAIN 2 Design/communication+design/Graphic design the new basics Lupton, Ellen;Phillips, Jennifer Cole liber3-1.epub` | `graphic design the new basics lupton, ellen;phil` | epub | `DOMAIN 2 Design/communication+design/Graphic design the new basics Lupton, Ellen;Phillips, Jennifer Cole liber3-1.md` | 56913271 |
-| `books/epub/DOMAIN 2 Design/communication+design/The UX book process and guidelines for ensuring a quality user experience Hartson, Rex;Pyla, Pardha S liber3.epub` | `the ux book process and guidelines for ensuring ` | epub | `DOMAIN 2 Design/communication+design/The UX book process and guidelines for ensuring a quality user experience Hartson, Rex;Pyla, Pardha S liber3.md` | 10300794 |
-| `books/epub/DOMAIN 2 Design/communication+design/Visualizing Financial Data_Rodriguez, Julie; Kaczmarek, Piotr;; Piotr Kaczmarek_liber3.epub` | `visualizing financial data_rodriguez, julie; kac` | epub | `DOMAIN 2 Design/communication+design/Visualizing Financial Data_Rodriguez, Julie; Kaczmarek, Piotr;; Piotr Kaczmarek_liber3.md` | 33963620 |
-| `books/epub/DOMAIN 2 Design/communication+design/[Robin Williams] The Non-Designer's Design Book.epub` | `[robin williams] the non-designer's design book` | epub | `DOMAIN 2 Design/communication+design/[Robin Williams] The Non-Designer's Design Book.md` | 8940877 |
-| `books/epub/DOMAIN 2 Design/communication+design/[Ruth E Page; Beatrix Busse; Nina N rgaard; Micha.epub` | `[ruth e page; beatrix busse; nina n rgaard; mich` | epub | `DOMAIN 2 Design/communication+design/[Ruth E Page; Beatrix Busse; Nina N rgaard; Micha.md` | 5645569 |
-| `books/epub/DOMAIN 2 Design/practice+process/Designing for growth a Design Thinking Toolkit for Managers Ogilvie, Tim;Liedtka, Jeanne liber3.epub` | `designing for growth a design thinking toolkit f` | epub | `DOMAIN 2 Design/practice+process/Designing for growth a Design Thinking Toolkit for Managers Ogilvie, Tim;Liedtka, Jeanne liber3.md` | 2838014 |
-| `books/epub/DOMAIN 2 Design/practice+process/How to use graphic desi gn to sell things, explain things, make things ylib.org).epub` | `how to use graphic desi gn to sell things, expla` | epub | `DOMAIN 2 Design/practice+process/How to use graphic desi gn to sell things, explain things, make things ylib.org).md` | 137319019 |
-| `books/epub/DOMAIN 2 Design/practice+process/The Design of Everyday Things Revised and Expanded Edition.epub` | `the design of everyday things revised and expand` | epub | `DOMAIN 2 Design/practice+process/The Design of Everyday Things Revised and Expanded Edition.md` | 1221175 |
-| `books/epub/DOMAIN 2 Design/visual+fundamentals/*Alex W. White Listening to Type Making Language.epub` | `*alex w. white listening to type making language` | epub | `DOMAIN 2 Design/visual+fundamentals/*Alex W. White Listening to Type Making Language.md` | 85945789 |
 | `books/epub/DOMAIN 2 Design/visual+fundamentals/Bierut, Michael; Rand, Paul Thoughts on design.epub` | `bierut, michael; rand, paul thoughts on design` | epub | `DOMAIN 2 Design/visual+fundamentals/Bierut, Michael; Rand, Paul Thoughts on design.md` | 7446187 |
 | `books/epub/DOMAIN 2 Design/visual+fundamentals/Handbook of Color Psychology Andrew J. Elliot; Mark D. Fairchild; Anna Franklin liber3.epub` | `handbook of color psychology andrew j. elliot; m` | epub | `DOMAIN 2 Design/visual+fundamentals/Handbook of Color Psychology Andrew J. Elliot; Mark D. Fairchild; Anna Franklin liber3.md` | 7736267 |
 | `books/epub/DOMAIN 2 Design/visual+fundamentals/The Designer's Dictionary of Color.epub` | `the designer's dictionary of color` | epub | `DOMAIN 2 Design/visual+fundamentals/The Designer's Dictionary of Color.md` | 47160362 |
@@ -68,7 +62,6 @@ Accepted containers (declared in the conversion transition, origin `pipeline/sta
 | `books/epub/DOMAIN 4 Business/practice+economics/The Harvard Business Review Entrepreneur's Handbook.epub` | `the harvard business review entrepreneur's handb` | epub | `DOMAIN 4 Business/practice+economics/The Harvard Business Review Entrepreneur's Handbook.md` | 4872896 |
 | `books/epub/DOMAIN 4 Business/practice+economics/[Colin Barrow; Paul Barrow; Robert Brown] The Busi.epub` | `[colin barrow; paul barrow; robert brown] the bu` | epub | `DOMAIN 4 Business/practice+economics/[Colin Barrow; Paul Barrow; Robert Brown] The Busi.md` | 2769596 |
 | `books/epub/DOMAIN 5 Personal Practice/habits+behavior+change/[Dale-Carnegie-&-Associates]-How-to-Win-Friends-an.epub` | `[dale-carnegie-&-associates]-how-to-win-friends-` | epub | `DOMAIN 5 Personal Practice/habits+behavior+change/[Dale-Carnegie-&-Associates]-How-to-Win-Friends-an.md` | 3640731 |
-| `books/epub/DOMAIN 5 Personal Practice/mood+therapy/Happy Sexy Millionaire Unexpected Truths about Fulfillment, Love, and Success Steven Bartlett.epub` | `happy sexy millionaire unexpected truths about f` | epub | `DOMAIN 5 Personal Practice/mood+therapy/Happy Sexy Millionaire Unexpected Truths about Fulfillment, Love, and Success Steven Bartlett.md` | 139987 |
 | `books/epub/DOMAIN 5 Personal Practice/mood+therapy/[Dr. Jen Gunter] The Vagina Bible The Vulva And T.epub` | `[dr. jen gunter] the vagina bible the vulva and ` | epub | `DOMAIN 5 Personal Practice/mood+therapy/[Dr. Jen Gunter] The Vagina Bible The Vulva And T.md` | 4744401 |
 | `books/epub/DOMAIN 5 Personal Practice/mood+therapy/[Emily Nagoski Ph.D.] Come as You Are The Surpris.epub` | `[emily nagoski ph.d.] come as you are the surpri` | epub | `DOMAIN 5 Personal Practice/mood+therapy/[Emily Nagoski Ph.D.] Come as You Are The Surpris.md` | 5366078 |
 | `books/epub/DOMAIN 5 Personal Practice/productivity+execution/HBR Management Tips Collection (2 Books) Harvard Business Review liber3.epub` | `hbr management tips collection (2 books) harvard` | epub | `DOMAIN 5 Personal Practice/productivity+execution/HBR Management Tips Collection (2 Books) Harvard Business Review liber3.md` | 2513527 |
@@ -97,7 +90,6 @@ Accepted containers (declared in the conversion transition, origin `pipeline/sta
 | `books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Conway, D.J. - Falcon, Feather and Valkyrie Sword.pdf` | `conway, d.j. - falcon, feather and valkyrie swor` | pdf | `DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Conway, D.J. - Falcon, Feather and Valkyrie Sword.md` | 3650514 |
 | `books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/DO IT YOURSELF PROJECT ORGONE ACCUMULATOR.pdf` | `do it yourself project orgone accumulator` | pdf | `DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/DO IT YOURSELF PROJECT ORGONE ACCUMULATOR.md` | 7077173 |
 | `books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Encyclopedia of Prostitution and Sex Work (2 Volumes Set).pdf` | `encyclopedia of prostitution and sex work (2 vol` | pdf | `DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Encyclopedia of Prostitution and Sex Work (2 Volumes Set).md` | 69891872 |
-| `books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Encylopedia of Freemasonry - Vols 1and2.pdf` | `encylopedia of freemasonry - vols 1and2` | pdf | `DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Encylopedia of Freemasonry - Vols 1and2.md` | 30408704 |
 | `books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Frater Oz - A Bíblia Vampírica.pdf` | `frater oz - a bíblia vampírica` | pdf | `DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Frater Oz - A Bíblia Vampírica.md` | 99829 |
 | `books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Freemason Bluebook.pdf` | `freemason bluebook` | pdf | `DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Freemason Bluebook.md` | 151923 |
 | `books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Fulcanelli - The Dwellings of the Philosophers (Les Demeures Philosophales).pdf` | `fulcanelli - the dwellings of the philosophers (` | pdf | `DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Fulcanelli - The Dwellings of the Philosophers (Les Demeures Philosophales).md` | 1732415 |
@@ -211,7 +203,6 @@ Accepted containers (declared in the conversion transition, origin `pipeline/sta
 | `books/pdf/DOMAIN 2 Design/visual+fundamentals/Jason-Santa-Maria_On-Web-Typography.pdf` | `jason-santa-maria_on-web-typography` | pdf | `DOMAIN 2 Design/visual+fundamentals/Jason-Santa-Maria_On-Web-Typography.md` | 9895431 |
 | `books/pdf/DOMAIN 2 Design/visual+fundamentals/Manovich-Lev_The_Language_of_the_New_Media.pdf` | `manovich-lev_the_language_of_the_new_media` | pdf | `DOMAIN 2 Design/visual+fundamentals/Manovich-Lev_The_Language_of_the_New_Media.md` | 33996264 |
 | `books/pdf/DOMAIN 2 Design/visual+fundamentals/The Art of Color Scripting.pdf` | `the art of color scripting` | pdf | `DOMAIN 2 Design/visual+fundamentals/The Art of Color Scripting.md` | 3232670 |
-| `books/pdf/DOMAIN 2 Design/visual+fundamentals/color choices: making color sense out of color theory.pdf` | `color choices: making color sense out of color t` | pdf | `DOMAIN 2 Design/visual+fundamentals/color choices: making color sense out of color theory.md` | 5244077 |
 | `books/pdf/DOMAIN 2 Design/visual+fundamentals/Тимоти Самара  «Making and Breaking the Grid».pdf` | `тимоти самара «making and breaking the grid»` | pdf | `DOMAIN 2 Design/visual+fundamentals/Тимоти Самара  «Making and Breaking the Grid».md` | 40358812 |
 | `books/pdf/DOMAIN 3 Art + Computational Media/FABE, M (2004) CLOSELY WATCHED FILMS- AN INTRODUCTION TO THE ART OF NARRATIVE FILM TECHNIQue.pdf` | `fabe, m (2004) closely watched films- an introdu` | pdf | `DOMAIN 3 Art + Computational Media/FABE, M (2004) CLOSELY WATCHED FILMS- AN INTRODUCTION TO THE ART OF NARRATIVE FILM TECHNIQue.md` | 2915493 |
 | `books/pdf/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Art_Fundamentals_2nd_edition_Light,_shape,_color,_3DTotal_Publishing.pdf` | `art_fundamentals_2nd_edition_light,_shape,_color` | pdf | `DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Art_Fundamentals_2nd_edition_Light,_shape,_color,_3DTotal_Publishing.md` | 29303443 |
@@ -334,7 +325,6 @@ Accepted containers (declared in the conversion transition, origin `pipeline/sta
 | `journals_notes/DOMAIN 2 Design/design-notes/branding/logo design/Logo Trend Report.pdf` | `logo trend report` | pdf | `DOMAIN 2 Design/design-notes/branding/logo design/Logo Trend Report.md` | 2599449 |
 | `journals_notes/DOMAIN 2 Design/design-notes/creative focus worksheet.pdf` | `creative focus worksheet` | pdf | `DOMAIN 2 Design/design-notes/creative focus worksheet.md` | 100248 |
 | `journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Conducting-an-Interview-with-Empathy.pdf` | `conducting-an-interview-with-empathy` | pdf | `DOMAIN 2 Design/design-notes/docs/ui:ux/Conducting-an-Interview-with-Empathy.md` | 147715 |
-| `journals_notes/DOMAIN 2 Design/design-notes/mo graph/Keylight_1.2_AE.pdf` | `keylight_1.2_ae` | pdf | `DOMAIN 2 Design/design-notes/mo graph/Keylight_1.2_AE.md` | 880 |
 | `journals_notes/DOMAIN 2 Design/design-notes/pdf/5-accessibility-mistakes.pdf` | `5-accessibility-mistakes` | pdf | `DOMAIN 2 Design/design-notes/pdf/5-accessibility-mistakes.md` | 682674 |
 | `journals_notes/DOMAIN 2 Design/design-notes/pdf/After Effect Lab.pdf` | `after effect lab` | pdf | `DOMAIN 2 Design/design-notes/pdf/After Effect Lab.md` | 2118318 |
 | `journals_notes/DOMAIN 2 Design/design-notes/pdf/Canny-The-Complete-Website-Checklist 1.pdf` | `canny-the-complete-website-checklist 1` | pdf | `DOMAIN 2 Design/design-notes/pdf/Canny-The-Complete-Website-Checklist 1.md` | 1390792 |

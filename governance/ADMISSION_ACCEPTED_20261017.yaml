@@ -1,10 +1,10 @@
 # THE SIGNATURE THIS PLAN NEEDS (T-183/D-3068).
-# It authorises 477 row(s). `mode: all` covers them; for a TRANCHE change to `mode: listed` and list the
+# It authorises 463 row(s). `mode: all` covers them; for a TRANCHE change to `mode: listed` and list the
 # `rel` labels exactly as the plan prints them.
 # The digest below pins the BYTES: if the plan is re-derived, this signature stops matching and is REFUSED.
 schema_version: '1.0'
 plan: governance/ADMISSION_PLAN_20261017.json
-plan_sha256: 191a13e3498f5f4d92e683b03370d3148ae76635972fbeb41b033c260ef2c17d
+plan_sha256: 0692ce6fe78d410431b5ab0f99d4eb448b389a0f9f210caf546deecc729d94dd
 accepted_by: <your name>
 accepted_on: '2026-10-17'
 mode: all

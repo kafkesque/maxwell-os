@@ -484,9 +484,27 @@ source_library:
       admit_candidate: "a file whose key neither the corpus nor an ingest record names, in a container the conversion stage accepts, inside its declared kind folder, under a root that declares a corpus home, carrying a name NO defect pattern matches: THE OWNER'S WORKLIST"
       refused_no_declared_corpus_home: 'its root declares admits_to: null, so NO declaration names a home its works are admitted to: the refusal names the missing declaration instead of inventing a destination (T-181 limb 2)'
       refused_container_no_stage_reads_it: 'a container the conversion stage cannot read (declared kinds such as .mobi/.azw3/.djvu/.docx are OWNED but not convertible): admitting one needs an ENGINE, which is T-180''s misplaced class and not this reader''s act'
+      refused_container_corrupt: 'a container of an ACCEPTED kind whose own BYTES are not openable (a truncated download, a file renamed to a suffix it is not): the stage reads this kind, so the remedy is not an engine but a RE-DOWNLOAD of the work. It is its own class because it is its own remedy - folding it into the engine class would let one act answer for two blast radii (BUG-886, MEASURED 2026-10-17: 3 of 1,289 library containers read as ordinary candidates)'
       refused_name_repair_first: "a name a declared defect pattern matches (marker/spine/truncation): an admitted file's name becomes the CORPUS NAME and the DOOR KEY, so admitting a defect materialises it into the tree the S0.5 cache then STAMPS. The repair rides FIRST - T-176, the owner's rename plan, whose eligible rows are exactly this class"
       refused_not_in_its_kind_folder: 'the file does not sit under its declared kind folder (the placement axis, axis_depth 1), so the path its corpus twin would take cannot be derived: the misplaced class T-180 owns'
       refused_domain_not_a_corpus_domain: 'the file does not sit under a folder this root declared as its axis, or that folder is not a name the CORPUS already materialises (arrangement.share_rule): admitting it would put a new top-level name in the one corpus home and silently widen the domain vocabulary the pipeline classifies against, so the row is refused and counted instead (D-3062)'
+
+    #: WHICH PROBE ANSWERS "ARE THESE BYTES A CONTAINER THE STAGE CAN OPEN" (BUG-886, D-3071).
+    #: MEASURED 2026-10-17: the class above refused "a container the conversion stage cannot read" and decided it
+    #: by SUFFIX alone, so a 137,319,019-byte `.epub` that is a TRUNCATED DOWNLOAD (valid `PK\x03\x04` header, no
+    #: end-of-central-directory record) read as an ordinary candidate: the owner signed it, 137 MB were copied into
+    #: the corpus, and S0 failed. A suffix is a CLAIM; the bytes are the FACT. The probes are tokens from
+    #: pipeline/container_integrity.py's CLOSED vocabulary (zip | pdf | none) and every kind the conversion stage
+    #: accepts MUST declare one - a kind nobody probes is FATAL, never defaulted (C12).
+    #: COST, so this can sit in front of a dry run without becoming BUG-882 again: the probe reads a bounded TAIL,
+    #: 0.33 s MEASURED over all 1,289 declared containers (a dry run that HASHED 8,271.5 MiB stalled past 300 s).
+    container_integrity:
+      authority: D-3071
+      module: pipeline/container_integrity.py
+      probes:
+        epub: zip          # a zip-family container: an end-of-central-directory record must resolve
+        pdf: pdf            # `%PDF-` at the head AND a `%%EOF` trailer near the end (a truncated pdf keeps its magic)
+        md: none            # plain text: its readability IS its name, declared rather than assumed
 
     #: THE APPLIER'S CONTRACT (T-183/D-3068). The plan is a PROPOSAL; this block declares the SECOND document that
     #: turns a proposal into an authorisation, and the ledger that makes a batch readable afterwards. Both are
@@ -506,17 +524,28 @@ source_library:
       receipt_extension: '.jsonl'
       accept_modes: [all, listed]
       accept_required: [schema_version, plan, plan_sha256, accepted_by, accepted_on, mode]
+      #: BUG-888: THE TEMPLATE'S OWN PLACEHOLDER, declared ONCE so the printer and the checker cannot disagree.
+      #: MEASURED 2026-10-17: the first real acceptance carried it verbatim and was APPLIED, because only the
+      #: field's presence was ever read — a signature whose name resolves to nothing is a consent nobody gave.
+      accept_by_placeholder: '<your name>'
+      #: WHERE A COPY THAT COULD NOT BECOME A WORK GOES (BUG-887/D-3071). OUTSIDE the corpus home on purpose:
+      #: pipeline/stage0_convert.py discovers books with `rglob('*<ext>')` and skips no dot-directory, so a
+      #: quarantine INSIDE the corpus would be re-read and would fail again on every later run. The path is
+      #: declared here, never spelled in the writer (C12), and a run appends its own stamp below it.
+      quarantine_prefix: 'knowledge pipeline/admission_quarantine'
       #: THE CLOSED STATE VOCABULARY. A state this writer can produce and this list does not carry is FATAL: a
       #: receipt line whose state nobody declared is a state no reader can classify.
       states: [run, would_apply, applied, already_applied, refused, failed, summary]
       refuses:
         a_row_absent_from_the_signed_set: 'the signature is the whole authorisation; the plan is only its subject'
+        a_source_whose_bytes_are_not_a_readable_container: 'the plan may be older than the bytes it priced: a truncated or mis-renamed container is refused BEFORE a byte is copied, so a doomed 137 MB copy and its S0 run are never paid for (BUG-886, D-3071)'
         a_target_that_already_exists: 'unless a receipt accounts for that target with the SAME digest - the honest reading of a rerun, never a licence to overwrite an unexplained file'
         a_source_whose_bytes_changed: 'the plan names a byte count; a file that grew or shrank is not the work that was approved'
         a_name_a_defect_pattern_still_matches: 'an admitted name becomes the CORPUS NAME and the DOOR KEY, so the repair rides first (T-176)'
         a_target_outside_the_corpus_home: 'a row may not write outside the one tree the pipeline reads'
       never:
         - 'deletes anything (R-D410); the only unlink is this writer own half-written temp file'
+        - 'leaves a copy it could not convert in the corpus: a row whose S0 run FAILED is MOVED to the declared quarantine_prefix, so the corpus holds only works (BUG-887). The move is not a deletion - the bytes stay readable, the receipt names the path, and the source is untouched - and it is what keeps ONE unreadable container from halting every later S0 run under max_failed_ratio 0.0'
         - 'decides a topic (D-2898) or a name (T-176): both arrive from the plan'
         - 'uses --force on S0: force DISCARDS the stage0 checkpoint (existing = {}), which would erase every prior conversion record'
 

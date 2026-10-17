@@ -1,13 +1,18 @@
 {
   "act": "T-181 admission plan",
   "authority": "D-3051",
-  "generated": "2026-10-17T13:01:23Z",
+  "generated": "2026-10-17T13:40:19Z",
   "corpus_home": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books",
   "accepted_containers": [
     ".epub",
     ".md",
     ".pdf"
   ],
+  "readability_probes": {
+    ".epub": "zip",
+    ".pdf": "pdf",
+    ".md": "none"
+  },
   "target_rule": "a plan row proposes corpus_home / (the source file's own path BELOW its declared kind folder), with the suffix the conversion stage writes (.md). A topic is never decided by an engine: the proposed path inherits the source's OWN arrangement and the owner may move a row's folder",
   "decisions_declared": {
     "already_in_the_corpus": "a file whose DOOR KEY the corpus home already holds: the pipeline has the work and there is nothing to admit",
@@ -15,6 +20,7 @@
     "admit_candidate": "a file whose key neither the corpus nor an ingest record names, in a container the conversion stage accepts, inside its declared kind folder, under a root that declares a corpus home, carrying a name NO defect pattern matches: THE OWNER'S WORKLIST",
     "refused_no_declared_corpus_home": "its root declares admits_to: null, so NO declaration names a home its works are admitted to: the refusal names the missing declaration instead of inventing a destination (T-181 limb 2)",
     "refused_container_no_stage_reads_it": "a container the conversion stage cannot read (declared kinds such as .mobi/.azw3/.djvu/.docx are OWNED but not convertible): admitting one needs an ENGINE, which is T-180's misplaced class and not this reader's act",
+    "refused_container_corrupt": "a container of an ACCEPTED kind whose own BYTES are not openable (a truncated download, a file renamed to a suffix it is not): the stage reads this kind, so the remedy is not an engine but a RE-DOWNLOAD of the work. It is its own class because it is its own remedy - folding it into the engine class would let one act answer for two blast radii (BUG-886, MEASURED 2026-10-17: 3 of 1,289 library containers read as ordinary candidates)",
     "refused_name_repair_first": "a name a declared defect pattern matches (marker/spine/truncation): an admitted file's name becomes the CORPUS NAME and the DOOR KEY, so admitting a defect materialises it into the tree the S0.5 cache then STAMPS. The repair rides FIRST - T-176, the owner's rename plan, whose eligible rows are exactly this class",
     "refused_not_in_its_kind_folder": "the file does not sit under its declared kind folder (the placement axis, axis_depth 1), so the path its corpus twin would take cannot be derived: the misplaced class T-180 owns",
     "refused_domain_not_a_corpus_domain": "the file does not sit under a folder this root declared as its axis, or that folder is not a name the CORPUS already materialises (arrangement.share_rule): admitting it would put a new top-level name in the one corpus home and silently widen the domain vocabulary the pipeline classifies against, so the row is refused and counted instead (D-3062)"
@@ -23,8 +29,8 @@
     {
       "id": "books",
       "files": 2181,
-      "seen": 1706,
-      "never_seen": 475,
+      "seen": 1715,
+      "never_seen": 466,
       "admits_to": "corpus_home"
     },
     {
@@ -36,16 +42,17 @@
     }
   ],
   "files": 2811,
-  "seen": 1715,
-  "never_seen": 1096,
-  "seen_keys": 959,
-  "unseen_keys": 1020,
+  "seen": 1724,
+  "never_seen": 1087,
+  "seen_keys": 968,
+  "unseen_keys": 1011,
   "counts": {
-    "already_in_the_corpus": 1688,
+    "already_in_the_corpus": 1697,
     "seen_by_an_ingest_record": 27,
-    "admit_candidate": 477,
+    "admit_candidate": 463,
     "refused_no_declared_corpus_home": 0,
     "refused_container_no_stage_reads_it": 389,
+    "refused_container_corrupt": 5,
     "refused_name_repair_first": 179,
     "refused_not_in_its_kind_folder": 51,
     "refused_domain_not_a_corpus_domain": 0
@@ -74,6 +81,13 @@
       "books/epub/The Elements of Style [Illustrated] -- Strunk Jr_, William -- 2011 -- Seedbox Press, LLC -- 7b4f785e400d8b629",
       "books/pdf/DOMAIN 0 Systems + Decision/systems+complexity/SYSTEMANTICS. THE SYSTEMS BIBLE (John Gall) (z-library.sk, 1lib"
     ],
+    "refused_container_corrupt": [
+      "books/epub/DOMAIN 2 Design/practice+process/How to use graphic desi gn to sell things, explain things, make things ylib.",
+      "books/epub/DOMAIN 5 Personal Practice/mood+therapy/Happy Sexy Millionaire Unexpected Truths about Fulfillment, Love, and",
+      "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Encylopedia of Freemasonry - Vols 1and2.pdf",
+      "books/pdf/DOMAIN 2 Design/visual+fundamentals/color choices: making color sense out of color theory.pdf",
+      "journals_notes/DOMAIN 2 Design/design-notes/mo graph/Keylight_1.2_AE.pdf"
+    ],
     "refused_name_repair_first": [
       "books/epub/AI-Assisted Programming for Web and Machine Learning_ -- Christoffer Noring, Anjali Jain, Marina Fernandez, A",
       "books/epub/Build a Multi-Agent System (from Scratch) -- Val Andrei Fajardo -- None -- 499a745fd121358a158cdb6d6415e4d0 -",
@@ -91,96 +105,6 @@
     "refused_domain_not_a_corpus_domain": []
   },
   "rows": [
-    {
-      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/epub/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/mental+models+epistemology/Nordic Ideology A Metamodern Guide to Politics, Book Two (Metamodern Guides 2) by Freinacht, Hanzi [Freinacht, Hanzi].epub",
-      "rel": "books/epub/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/mental+models+epistemology/Nordic Ideology A Metamodern Guide to Politics, Book Two (Metamodern Guides 2) by Freinacht, Hanzi [Freinacht, Hanzi].epub",
-      "root": "books",
-      "kind": "epub",
-      "key": "nordic ideology a metamodern guide to politics, book two (metamodern guides 2) by freinacht, hanzi [freinacht, hanzi]",
-      "bytes": 2561973,
-      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/mental+models+epistemology/Nordic Ideology A Metamodern Guide to Politics, Book Two (Metamodern Guides 2) by Freinacht, Hanzi [Freinacht, Hanzi].md"
-    },
-    {
-      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/epub/DOMAIN 2 Design/communication+design/Graphic design the new basics Lupton, Ellen;Phillips, Jennifer Cole liber3-1.epub",
-      "rel": "books/epub/DOMAIN 2 Design/communication+design/Graphic design the new basics Lupton, Ellen;Phillips, Jennifer Cole liber3-1.epub",
-      "root": "books",
-      "kind": "epub",
-      "key": "graphic design the new basics lupton, ellen;phillips, jennifer cole liber3-1",
-      "bytes": 56913271,
-      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/communication+design/Graphic design the new basics Lupton, Ellen;Phillips, Jennifer Cole liber3-1.md"
-    },
-    {
-      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/epub/DOMAIN 2 Design/communication+design/The UX book process and guidelines for ensuring a quality user experience Hartson, Rex;Pyla, Pardha S liber3.epub",
-      "rel": "books/epub/DOMAIN 2 Design/communication+design/The UX book process and guidelines for ensuring a quality user experience Hartson, Rex;Pyla, Pardha S liber3.epub",
-      "root": "books",
-      "kind": "epub",
-      "key": "the ux book process and guidelines for ensuring a quality user experience hartson, rex;pyla, pardha s liber3",
-      "bytes": 10300794,
-      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/communication+design/The UX book process and guidelines for ensuring a quality user experience Hartson, Rex;Pyla, Pardha S liber3.md"
-    },
-    {
-      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/epub/DOMAIN 2 Design/communication+design/Visualizing Financial Data_Rodriguez, Julie; Kaczmarek, Piotr;; Piotr Kaczmarek_liber3.epub",
-      "rel": "books/epub/DOMAIN 2 Design/communication+design/Visualizing Financial Data_Rodriguez, Julie; Kaczmarek, Piotr;; Piotr Kaczmarek_liber3.epub",
-      "root": "books",
-      "kind": "epub",
-      "key": "visualizing financial data_rodriguez, julie; kaczmarek, piotr;; piotr kaczmarek_liber3",
-      "bytes": 33963620,
-      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/communication+design/Visualizing Financial Data_Rodriguez, Julie; Kaczmarek, Piotr;; Piotr Kaczmarek_liber3.md"
-    },
-    {
-      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/epub/DOMAIN 2 Design/communication+design/[Robin Williams] The Non-Designer's Design Book.epub",
-      "rel": "books/epub/DOMAIN 2 Design/communication+design/[Robin Williams] The Non-Designer's Design Book.epub",
-      "root": "books",
-      "kind": "epub",
-      "key": "[robin williams] the non-designer's design book",
-      "bytes": 8940877,
-      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/communication+design/[Robin Williams] The Non-Designer's Design Book.md"
-    },
-    {
-      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/epub/DOMAIN 2 Design/communication+design/[Ruth E Page; Beatrix Busse; Nina N rgaard; Micha.epub",
-      "rel": "books/epub/DOMAIN 2 Design/communication+design/[Ruth E Page; Beatrix Busse; Nina N rgaard; Micha.epub",
-      "root": "books",
-      "kind": "epub",
-      "key": "[ruth e page; beatrix busse; nina n rgaard; micha",
-      "bytes": 5645569,
-      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/communication+design/[Ruth E Page; Beatrix Busse; Nina N rgaard; Micha.md"
-    },
-    {
-      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/epub/DOMAIN 2 Design/practice+process/Designing for growth a Design Thinking Toolkit for Managers Ogilvie, Tim;Liedtka, Jeanne liber3.epub",
-      "rel": "books/epub/DOMAIN 2 Design/practice+process/Designing for growth a Design Thinking Toolkit for Managers Ogilvie, Tim;Liedtka, Jeanne liber3.epub",
-      "root": "books",
-      "kind": "epub",
-      "key": "designing for growth a design thinking toolkit for managers ogilvie, tim;liedtka, jeanne liber3",
-      "bytes": 2838014,
-      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/practice+process/Designing for growth a Design Thinking Toolkit for Managers Ogilvie, Tim;Liedtka, Jeanne liber3.md"
-    },
-    {
-      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/epub/DOMAIN 2 Design/practice+process/How to use graphic desi gn to sell things, explain things, make things ylib.org).epub",
-      "rel": "books/epub/DOMAIN 2 Design/practice+process/How to use graphic desi gn to sell things, explain things, make things ylib.org).epub",
-      "root": "books",
-      "kind": "epub",
-      "key": "how to use graphic desi gn to sell things, explain things, make things ylib.org",
-      "bytes": 137319019,
-      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/practice+process/How to use graphic desi gn to sell things, explain things, make things ylib.org).md"
-    },
-    {
-      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/epub/DOMAIN 2 Design/practice+process/The Design of Everyday Things Revised and Expanded Edition.epub",
-      "rel": "books/epub/DOMAIN 2 Design/practice+process/The Design of Everyday Things Revised and Expanded Edition.epub",
-      "root": "books",
-      "kind": "epub",
-      "key": "the design of everyday things revised and expanded edition",
-      "bytes": 1221175,
-      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/practice+process/The Design of Everyday Things Revised and Expanded Edition.md"
-    },
-    {
-      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/epub/DOMAIN 2 Design/visual+fundamentals/*Alex W. White Listening to Type Making Language.epub",
-      "rel": "books/epub/DOMAIN 2 Design/visual+fundamentals/*Alex W. White Listening to Type Making Language.epub",
-      "root": "books",
-      "kind": "epub",
-      "key": "*alex w. white listening to type making language",
-      "bytes": 85945789,
-      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/visual+fundamentals/*Alex W. White Listening to Type Making Language.md"
-    },
     {
       "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/epub/DOMAIN 2 Design/visual+fundamentals/Bierut, Michael; Rand, Paul Thoughts on design.epub",
       "rel": "books/epub/DOMAIN 2 Design/visual+fundamentals/Bierut, Michael; Rand, Paul Thoughts on design.epub",
@@ -315,15 +239,6 @@
       "key": "[dale-carnegie-&-associates]-how-to-win-friends-an",
       "bytes": 3640731,
       "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 5 Personal Practice/habits+behavior+change/[Dale-Carnegie-&-Associates]-How-to-Win-Friends-an.md"
-    },
-    {
-      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/epub/DOMAIN 5 Personal Practice/mood+therapy/Happy Sexy Millionaire Unexpected Truths about Fulfillment, Love, and Success Steven Bartlett.epub",
-      "rel": "books/epub/DOMAIN 5 Personal Practice/mood+therapy/Happy Sexy Millionaire Unexpected Truths about Fulfillment, Love, and Success Steven Bartlett.epub",
-      "root": "books",
-      "kind": "epub",
-      "key": "happy sexy millionaire unexpected truths about fulfillment, love, and success steven bartlett",
-      "bytes": 139987,
-      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 5 Personal Practice/mood+therapy/Happy Sexy Millionaire Unexpected Truths about Fulfillment, Love, and Success Steven Bartlett.md"
     },
     {
       "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/epub/DOMAIN 5 Personal Practice/mood+therapy/[Dr. Jen Gunter] The Vagina Bible The Vulva And T.epub",
@@ -576,15 +491,6 @@
       "key": "encyclopedia of prostitution and sex work (2 volumes set",
       "bytes": 69891872,
       "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Encyclopedia of Prostitution and Sex Work (2 Volumes Set).md"
-    },
-    {
-      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Encylopedia of Freemasonry - Vols 1and2.pdf",
-      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Encylopedia of Freemasonry - Vols 1and2.pdf",
-      "root": "books",
-      "kind": "pdf",
-      "key": "encylopedia of freemasonry - vols 1and2",
-      "bytes": 30408704,
-      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Encylopedia of Freemasonry - Vols 1and2.md"
     },
     {
       "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Frater Oz - A Bi\u0301blia Vampi\u0301rica.pdf",
@@ -1602,15 +1508,6 @@
       "key": "the art of color scripting",
       "bytes": 3232670,
       "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/visual+fundamentals/The Art of Color Scripting.md"
-    },
-    {
-      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 2 Design/visual+fundamentals/color choices: making color sense out of color theory.pdf",
-      "rel": "books/pdf/DOMAIN 2 Design/visual+fundamentals/color choices: making color sense out of color theory.pdf",
-      "root": "books",
-      "kind": "pdf",
-      "key": "color choices: making color sense out of color theory",
-      "bytes": 5244077,
-      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/visual+fundamentals/color choices: making color sense out of color theory.md"
     },
     {
       "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 2 Design/visual+fundamentals/\u0422\u0438\u043c\u043e\u0442\u0438 \u0421\u0430\u043c\u0430\u0440\u0430  \u00abMaking and Breaking the Grid\u00bb.pdf",
@@ -2709,15 +2606,6 @@
       "key": "conducting-an-interview-with-empathy",
       "bytes": 147715,
       "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/design-notes/docs/ui:ux/Conducting-an-Interview-with-Empathy.md"
-    },
-    {
-      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 2 Design/design-notes/mo graph/Keylight_1.2_AE.pdf",
-      "rel": "journals_notes/DOMAIN 2 Design/design-notes/mo graph/Keylight_1.2_AE.pdf",
-      "root": "journals_notes",
-      "kind": "pdf",
-      "key": "keylight_1.2_ae",
-      "bytes": 880,
-      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/design-notes/mo graph/Keylight_1.2_AE.md"
     },
     {
       "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 2 Design/design-notes/pdf/5-accessibility-mistakes.pdf",

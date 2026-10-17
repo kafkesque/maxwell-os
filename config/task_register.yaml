@@ -2173,7 +2173,10 @@ tasks:
 - id: T-183
   priority: SHOULD
   state: open
-  mover: pipeline
+  #: D-3035 (an open owner-lane row is a proposal, never an approval): the WRITER, the PLAN and the RECEIPT
+  #: are built and controlled, and the only act left is the owner's WORD - `just admit-sign "<name>"`
+  #: (D-3072). A task the pipeline cannot advance is mover: owner, and the rail says so on every boot.
+  mover: owner
   title: 'THE ADMIT APPLIER - once the owner accepts rows of governance/ADMISSION_PLAN_<date>.md, ONE crash-safe writer
     puts a library work into the corpus through S0 (plan-keyed, dry-run default, receipted): never a heuristic mover,
     and never by a name'

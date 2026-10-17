@@ -499,7 +499,7 @@ source_library:
     applier:
       authority: D-3068
       command: python3 scripts/apply_admission.py
-      reading: 'python3 scripts/apply_admission.py (dry run, the owner cost estimate) | --apply (the act) | --limit N (a tranche) | --selftest (its known-answer controls)'
+      reading: 'python3 scripts/apply_admission.py (dry run, the owner cost estimate) | --template (a ready-to-sign acceptance, pinned to the live digest) | --apply (the act) | --limit N (a tranche) | --selftest (its known-answer controls)'
       accept_prefix: 'governance/ADMISSION_ACCEPTED_'
       accept_extension: '.yaml'
       receipt_prefix: 'governance/evidence/ADMISSION_APPLIED_'

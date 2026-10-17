@@ -169,6 +169,36 @@ def load_acceptance(path: Path, plan_path: Path, plan_digest: str, decl: dict[st
     return acc
 
 
+def acceptance_template(plan_path: Path, digest: str, rows: int) -> str:
+    """A ready-to-sign acceptance, with the LIVE digest already in it — so signing cannot fail on a copied hash.
+
+    The template is deliberately `mode: all` with `rows: []` and a comment naming the alternative: a signature that
+    silently selected nothing would look like an authorisation while authorising nothing (D-3034).
+    """
+    import yaml
+
+    try:  # a signature is more portable when it names the plan RELATIVE to the tree it governs
+        plan_ref = plan_path.resolve().relative_to(_PROJECT_ROOT).as_posix()
+    except ValueError:  # a plan outside the repo keeps its own absolute path
+        plan_ref = str(plan_path)
+    body = {
+        "schema_version": SCHEMA_VERSION,
+        "plan": plan_ref,
+        "plan_sha256": digest,
+        "accepted_by": "<your name>",
+        "accepted_on": datetime.now(UTC).strftime("%Y-%m-%d"),
+        "mode": "all",
+        "rows": [],
+    }
+    return (
+        f"# THE SIGNATURE THIS PLAN NEEDS (T-183/D-3068).\n"
+        f"# It authorises {rows} row(s). `mode: all` covers them; for a TRANCHE change to `mode: listed` and list the\n"
+        f"# `rel` labels exactly as the plan prints them.\n"
+        f"# The digest below pins the BYTES: if the plan is re-derived, this signature stops matching and is REFUSED.\n"
+        + yaml.safe_dump(body, sort_keys=False, allow_unicode=True)
+    )
+
+
 def selected_rows(plan: dict[str, Any], acc: dict[str, Any]) -> tuple[list[dict[str, Any]], list[str]]:
     """The rows this signature puts in scope. A row the signature names but the plan does not hold is FATAL."""
     rows = plan["rows"]
@@ -626,6 +656,12 @@ def selftest() -> int:
                str(resolve_root(decl["receipt_prefix"])).startswith(str(tmp_root))
                and str(resolve_root(decl["accept_prefix"])).startswith(str(tmp_root)))
 
+        # 13. the printed template is a VALID signature for THIS plan, pinned to the live digest
+        rendered = yaml.safe_load(acceptance_template(plan_file, digest, len(rows)))
+        expect("the_acceptance_template_parses_and_pins_the_live_digest",
+               rendered["plan_sha256"] == digest and rendered["mode"] == "all"
+               and rendered["plan"] == str(plan_file), rendered)
+
     passed = sum(1 for _label, ok in checks if ok)
     for label, ok in checks:
         print(f"{'ok  ' if ok else 'FAIL'} {label}")
@@ -638,6 +674,16 @@ def main(argv: list[str] | None = None) -> int:
     argv = list(sys.argv[1:] if argv is None else argv)
     if "--selftest" in argv:
         return selftest()
+    if "--template" in argv:
+        # The signature, pre-pinned to the plan's LIVE digest: the one step a human could get wrong is removed.
+        doc = census.policy(POLICY)
+        plan_path = newest(str(plan_admission.admission_policy(doc)["plan_prefix"]), ".json")
+        if plan_path is None or not plan_path.is_file():
+            print(f"FATAL: no plan found under {plan_admission.admission_policy(doc)['plan_prefix']}*.json")
+            return RC_FATAL
+        plan = load_plan(plan_path)
+        print(acceptance_template(plan_path, sha256_bytes(plan_path), len(plan["rows"])), end="")
+        return RC_OK
     parser = argparse.ArgumentParser(
         description="The admit applier (T-183): apply an ACCEPTED admission plan, crash-safe, dry run by default.")
     parser.add_argument("--plan", type=Path, help="the plan JSON (default: the newest under the declared prefix)")

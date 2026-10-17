@@ -969,3 +969,19 @@ BUG-845/D-3042 exists to refuse. R5 had already APPROVED that file; the rail was
 the DECLARATION (the probe name is now READ from `pipeline.harness_env.declared()`), not by declaring an exception:
 `check_agent_surface` rc 0, `goose_profile --selftest` 41/41. Recorded because it is the argument for keeping the
 rails rather than trusting a review: a reviewer judges prose, a rail reads bytes.
+
+### j. ADDENDUM 2: THE SIGNATURE IS PRINTED, NOT TYPED (same sitting)
+
+The step most likely to fail was the human one: copying a 64-character digest into a YAML file. `--template` now
+prints a ready-to-sign acceptance with the **LIVE** digest already pinned, so signing is one redirect plus a name:
+
+```bash
+python3 scripts/apply_admission.py --template > governance/ADMISSION_ACCEPTED_20261017.yaml
+# edit accepted_by; optionally set mode: listed and the rel labels for a tranche
+just admit-apply --dry-run     # price it: rows + GiB, writes nothing
+just admit-apply --limit 10    # the first tranche
+```
+
+A control (`the_acceptance_template_parses_and_pins_the_live_digest`, 15/15) fails if the printed signature ever
+stops matching the plan it names. §f.3's hand-written template is therefore **SUPERSEDED by this paragraph** — it
+still works, but the printed one cannot be mistyped.

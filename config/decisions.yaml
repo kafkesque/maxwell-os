@@ -26951,3 +26951,27 @@ decisions:
   - 'Two candidates are NAMED and NEITHER is promoted: AGENT_LOOP_FAST (MiniCPM5-2B - ~7x faster than gemma, 131k window) and AGENT_LOOP_WORKHORSE (Ornith-1.5-9B - 262k window). gemma-4-E4B stays the verified default until T-187 lands.'
   - 'T-187 owes the test the 3-call loop is NOT: two tools with a DISTRACTOR, two DEPENDENT steps, and an answer only the second tool''s output can produce. One datapoint on a trivial read is not evidence of agentic ability, and promoting a model on it would be exactly the drift this decision exists to prevent.'
   - 'A never_for string is now a MEASURED claim: two were FALSE as written (gpt-oss-20b drove a loop and passed; Phi-4 must never drive one) and were corrected in config/model_assignments.yaml.'
+- id: D-3059
+  state: ACTIVE
+  date: '2026-10-17'
+  by: assistant
+  category: EXTENSION RESIDENCY / THE RAIL'S SUBJECT
+  bugs: [BUG-492]
+  files: [config/extension_profiles.yaml, scripts/goose_profile.py]
+  title: >-
+    THE RESIDENCY RAIL'S SUBJECT IS THE DECLARED DEFAULT PROFILE, NOT A MINIMUM - a rail that measures a deliberate
+    choice as drift is a rail that gets ignored.
+  decision: |-
+    D-3056's classification answers "what MUST be present in every session" (always). It does not answer "what a
+    session is normally BORN with", and the harness's enabled flags are exactly the second question. Measured the day
+    it was written: comparing the live flags against the always minimum reported NINE residents, two of which
+    (filesystem at 3,727 tokens/request and gitmcp-mcp at 1,906) are the deliberate choice of the workshop set. A
+    check that calls a decision "rot" for ever is not a control; it is noise a reader learns to skip.
+
+    The policy therefore DECLARES its default (default_profile: workshop) and scripts/goose_profile.py measures the
+    live flags against THAT profile. The count falls from 9 to 7, and the 7 are unambiguous: tom and scheduler
+    (MEASURED 0-tool extensions), reddit and youtubetranscript (research), chatrecall, code_execution and apps.
+  consequences:
+  - 'A profile is now a declaration of INTENT with a name, so changing what a session is born with is a dated decision rather than an untracked edit.'
+  - 'The rail keeps its tri-state: 1 (a fault) is still a structural break - an unclassified extension, an unresolvable name, a profile that adds what it may not add; 2 is still owner-owed.'
+  - 'Known-answer control added (14/14): the same state is drift against the always minimum and CLEAN once the default names a profile that includes it.'

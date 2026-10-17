@@ -174,17 +174,24 @@ def check(policy: dict[str, Any], config: dict[str, Any]) -> tuple[int, list[str
         except SystemExit as exc:
             faults.append(str(exc))
 
+    # THE SUBJECT IS THE DECLARED DEFAULT, not the always minimum: a session default is a decision, and
+    # comparing against a minimum would report a deliberate choice as drift for ever (a rail that cries wolf).
+    default = str(policy.get("default_profile") or "")
+    try:
+        expected = set(profile_members(policy, classes, default)) if default else {n for n, c in classes.items() if c == ALWAYS}
+    except SystemExit as exc:
+        faults.append(str(exc))
+        expected = {n for n, c in classes.items() if c == ALWAYS}
+
     drift: list[str] = []
     for name, cfg in sorted(extensions.items()):
         if name not in classes:
             continue
         enabled = bool(isinstance(cfg, dict) and cfg.get("enabled"))
-        if classes[name] == ALWAYS and not enabled:
-            drift.append(f"{name}: policy says ALWAYS but the harness has it DISABLED")
-        elif classes[name] == NEVER and enabled:
-            drift.append(f"{name}: policy says NEVER but the harness has it ENABLED")
-        elif classes[name] == ON_DEMAND and enabled:
-            drift.append(f"{name}: policy says ON_DEMAND but the harness has it ENABLED as default")
+        if name in expected and not enabled:
+            drift.append(f"{name}: the declared default ENABLES it but the harness has it DISABLED")
+        elif name not in expected and enabled:
+            drift.append(f"{name}: classified {classes[name]}, not part of the declared default, but ENABLED")
 
     if faults:
         return 1, faults, drift
@@ -315,6 +322,17 @@ def _selftest() -> int:
                                "filesystem": {"type": "stdio", "enabled": False, "cmd": "npx", "args": ["fs"]},
                                "tom": {"type": "platform", "enabled": False}}}
     controls.append(("policy and state agreeing is rc 0", check(clean, agreeing)[0] == 0))
+    # THE SUBJECT IS THE DECLARED DEFAULT: the same state is drift against the always minimum and clean once
+    # the default names a profile that includes it - a deliberate choice is not rot.
+    work_state = {"extensions": {
+        "developer": {"type": "platform", "enabled": True},
+        "docguard": {"type": "stdio", "enabled": True, "cmd": "uvx", "args": ["d"]},
+        "filesystem": {"type": "stdio", "enabled": True, "cmd": "npx", "args": ["fs"]},
+        "tom": {"type": "platform", "enabled": False},
+    }}
+    controls.append(("the check measures the DECLARED DEFAULT, not the always minimum",
+                     check(clean, config)[0] == 2
+                     and check(dict(clean, default_profile="work"), work_state)[0] == 0))
     text = render(policy, config, classes, "work")
     controls.append(("the render marks a whitespace-bearing stdio arg UNVERIFIED", "UNVERIFIED" in text))
     controls.append(("the render never silently enables a NEVER extension", "tom" not in text.split("(b)")[1]))

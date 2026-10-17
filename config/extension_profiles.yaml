@@ -41,6 +41,11 @@ rule: >-
   extension's server, or is refused on a governance ground already recorded. A new extension is UNCLASSIFIED on
   arrival, which the rail reports as owner-owed - never as allowed.
 
+#: THE SET EVERY SESSION IS BORN WITH, named as a profile so it is a CHOICE with a reason rather than a
+#: minimum.  --check measures the live `enabled:` flags against THIS profile: a session default is a decision,
+#: and a decision that is not declared cannot be drifted from.
+default_profile: workshop
+
 always:
   - developer          # the act surface: shell/edit/write. Nothing in this OS is done without it.
   - analyze            # code structure; the cheapest way to answer "what is in this file".

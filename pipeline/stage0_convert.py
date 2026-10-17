@@ -23,8 +23,10 @@ import argparse
 import hashlib
 import json
 import os
+import shutil
 import subprocess
 import sys
+import tempfile
 import time
 from pathlib import Path
 from typing import Any
@@ -38,6 +40,7 @@ from pipeline.pipeline_paths import (
     BOOKS_DIR,
     CHECKPOINT_DIR,
     S0_BUDGET_BASIS,
+    S0_CONTAINERS,
     S0_DOCLING_CEILING_S,
     S0_DOCLING_FLOOR_S,
     S0_DOCLING_PER_MB_S,
@@ -51,7 +54,12 @@ from pipeline.stamp import check_stage_code_fingerprint, get_pipeline_commit, ge
 from pipeline.text_cleaner import check_conversion_quality
 
 # ── Constants ──────────────────────────────────────────────────────────────
-SUPPORTED_EXTENSIONS = {".epub", ".pdf", ".md"}  # .md = already converted
+SUPPORTED_EXTENSIONS = set(S0_CONTAINERS)
+#: D-3077 — WHY THIS IS NO LONGER A LITERAL IN THIS FILE. It was `{".epub", ".pdf", ".md"}`, and MEASURED 2026-10-17
+#: that three-item set is what produced 389 of 626 admission refusals that the door could only describe as "a
+#: container the conversion stage cannot read": 99 .docx, 6 .mobi, 5 .rtf, 4 .pptx — every one of them readable, on
+#: this machine, by the pandoc and KindleUnpack steps below. The container axis is now DECLARED, one line per
+#: container naming its reader (config/pipeline_config.yaml#stage0.containers), and this set DERIVES from it.
 MD_EXTENSION = ".md"
 MIN_OUTPUT_BYTES = 100  # C20: a converter that "succeeded" into <100 bytes wrote a receipt, not a work
 #: BUG-898: where the FULL tail of a failed conversion rests. Derived from the checkpoint it belongs to, so no new
@@ -122,19 +130,24 @@ def find_books(books_dir: Path, subdir: str | None = None) -> list[Path]:
     return sorted(books, key=lambda p: p.name)
 
 
-def convert_epub(epub_path: Path, output_path: Path) -> dict[str, Any]:
-    """Convert EPUB to Markdown using Pandoc, inside the declared Pandoc budget."""
+def _pandoc_reader(source_path: Path, output_path: Path, from_fmt: str | None, what: str) -> dict[str, Any]:
+    """One pandoc invocation, inside the DECLARED Pandoc budget, mapped onto the declared failure classes.
+
+    Args:
+        source_path: the file pandoc reads (an epub, a .docx, or the html/epub KindleUnpack produced).
+        output_path: where the markdown lands.
+        from_fmt: pandoc's `-f` value; None lets pandoc infer the reader from the suffix — correct for .epub,
+            .docx, .pptx and .rtf, and WRONG for .txt, where the default reader escapes markdown syntax
+            (MEASURED: `-\\> Under \\$500`), which is why `.txt` declares `pandoc_plain`.
+        what: how a failure should NAME the work. Never a bare filename: when the reader is a temporary unpack the
+            owner never asked for, the receipt must still name the container they own.
+    """
+    argv = ["pandoc", str(source_path), "-t", "markdown", "--wrap=none", "-o", str(output_path)]
+    if from_fmt:
+        argv.extend(["-f", from_fmt])
     try:
         result = subprocess.run(
-            [
-                "pandoc",
-                str(epub_path),
-                "-t",
-                "markdown",
-                "--wrap=none",
-                "-o",
-                str(output_path),
-            ],
+            argv,
             capture_output=True,
             text=True,
             timeout=S0_PANDOC_TIMEOUT_S,
@@ -144,26 +157,105 @@ def convert_epub(epub_path: Path, output_path: Path) -> dict[str, Any]:
     except subprocess.TimeoutExpired:
         return _failure(
             "budget_expired",
-            f"Pandoc did not finish inside its declared {S0_PANDOC_TIMEOUT_S}s budget on {epub_path.name} — "
+            f"Pandoc did not finish inside its declared {S0_PANDOC_TIMEOUT_S}s budget on {what} — "
             f"a timeout is MORE TIME, never a new copy",
         )
     if result.returncode != 0:
-        #: An epub that fails Pandoc is CONTAINER-UNREADABLE in the honest sense: the zip is intact (the plan's own
-        #: probe passed it), and the work's spine/manifest is what refuses — MEASURED 2026-10-17 on two of them:
-        #: `No entry on path: OEBPS/cover.xhtml` (the zip stores Cover.xhtml: a case-only mismatch) and
-        #: `Unable to find element: QName ... manifest` (the content.opf carries no manifest at all).
         return _failure(
             "container_unreadable",
-            f"Pandoc rc={result.returncode} refused the container: {result.stderr.strip()[:800]}",
+            f"Pandoc rc={result.returncode} refused {what}: {result.stderr.strip()[:800]}",
         )
     if not output_path.exists() or output_path.stat().st_size <= MIN_OUTPUT_BYTES:
         written = output_path.stat().st_size if output_path.exists() else 0
         return _failure(
             "no_output",
-            f"Pandoc rc=0 and wrote {written} bytes of markdown for {epub_path.name} "
+            f"Pandoc rc=0 and wrote {written} bytes of markdown for {what} "
             f"(below the {MIN_OUTPUT_BYTES}-byte floor)",
         )
     return _ok()
+
+
+def convert_epub(epub_path: Path, output_path: Path) -> dict[str, Any]:
+    """Convert EPUB to Markdown with Pandoc.
+
+    An epub that fails Pandoc is CONTAINER-UNREADABLE in the honest sense: the zip is intact (the plan's own probe
+    passed it), and the work's spine/manifest is what refuses — MEASURED 2026-10-17 on two of them:
+    `No entry on path: OEBPS/cover.xhtml` (the zip stores Cover.xhtml: a case-only mismatch) and
+    `Unable to find element: QName ... manifest` (the content.opf carries no manifest at all).
+    """
+    return _pandoc_reader(epub_path, output_path, None, f"{epub_path.name}'s container")
+
+
+def convert_document(source_path: Path, output_path: Path, from_fmt: str | None) -> dict[str, Any]:
+    """Convert a word-processor / presentation container (.docx, .pptx, .rtf) or plain text (.txt) with Pandoc."""
+    return _pandoc_reader(source_path, output_path, from_fmt, source_path.name)
+
+
+def convert_native_text(source_path: Path, output_path: Path) -> dict[str, Any]:
+    """A .txt is ALREADY text: normalise its line endings and write it. No converter, and that is the point.
+
+    MEASURED 2026-10-17: there is no `plain` reader in `pandoc --list-input-formats` (v3.9), so delegating a .txt to
+    pandoc forces `-f markdown`, which ESCAPES the text — the sample file came back as `-\\> Under \\$500 1. Give them a
+    call`. An engine that damages the bytes it was handed is not an engine this stage should use.
+    """
+    try:
+        raw = source_path.read_bytes()
+    except OSError as exc:
+        return _failure("container_unreadable", f"the file could not be read: {type(exc).__name__}: {exc}")
+    text = raw.decode("utf-8", errors="replace").replace("\r\n", "\n").replace("\r", "\n")
+    output_path.write_text(text, encoding="utf-8")
+    if output_path.stat().st_size <= MIN_OUTPUT_BYTES:
+        return _failure(
+            "no_output",
+            f"the text held {len(text)} characters for {source_path.name} (below the {MIN_OUTPUT_BYTES}-byte floor)",
+        )
+    return _ok()
+
+
+def convert_kindle(source_path: Path, output_path: Path) -> dict[str, Any]:
+    """Convert a Kindle container (.mobi/.azw/.azw3) to Markdown: KindleUnpack first, then the SAME pandoc step.
+
+    WHY THIS SHAPE (D-3077, MEASURED 2026-10-17). Nothing reads MOBI and writes GOOD markdown in one step: pandoc
+    has no MOBI reader at all (`pandoc --list-input-formats`, v3.9, read on this machine), and the only single-step
+    writer — calibre's `ebook-convert --txt-output-formatting markdown` — is a ~1 GB Qt application that performs the
+    same reconstruction behind a GUI stack. KindleUnpack IS that reconstruction, and it is pure Python. MEASURED on
+    the owner's own 36.7 MB book: unpack 0.21 s -> book.html (756,715 B) + 435 extracted images, then pandoc 1.93 s
+    -> 576,244 B of markdown. One small dependency, and NO new output dialect: a .mobi converges on the same pandoc
+    step an .epub takes, so two containers of one work are converted by one engine.
+
+    A MOBI is one of three KINDS and KindleUnpack returns whichever applies: an epub, an html, or a pdf. A pdf goes
+    to the PDF reader — never to pandoc, which has no PDF reader (BUG-896, the accepted negative).
+    """
+    try:
+        import mobi  # KindleUnpack's library fork; imported here so the stage runs without it installed
+    except ImportError:
+        return _failure(
+            "converter_absent",
+            "the `mobi` package (a KindleUnpack fork, pure python) is not installed on this machine — "
+            "`pip install mobi`; the work is whole and nothing was tried against it",
+        )
+    unpack_dir = ""
+    try:
+        try:
+            unpack_dir, produced = mobi.extract(str(source_path))
+        except Exception as exc:  # KindleUnpack raises per defect; the class we report is OUR declared one
+            return _failure(
+                "container_unreadable",
+                f"KindleUnpack refused the container of {source_path.name}: {type(exc).__name__}: {exc}",
+            )
+        produced_path = Path(produced)
+        if produced_path.suffix.lower() == ".pdf":
+            return convert_pdf(produced_path, output_path)
+        from_fmt = None if produced_path.suffix.lower() == ".epub" else "html"
+        return _pandoc_reader(
+            produced_path, output_path, from_fmt, f"{source_path.name} (via KindleUnpack's {produced_path.name})"
+        )
+    finally:
+        #: KindleUnpack unpacks into its OWN temp tree; the extracted images are referenced by the markdown but not
+        #: materialised beside it, which is exactly what the epub path already does (MEASURED: the corpus's epub
+        #: markdown carries `![](images/00003.jpg)` with no image bytes beside it).
+        if unpack_dir:
+            shutil.rmtree(unpack_dir, ignore_errors=True)
 
 
 def convert_pdf(pdf_path: Path, output_path: Path) -> dict[str, Any]:
@@ -214,6 +306,30 @@ def convert_pdf(pdf_path: Path, output_path: Path) -> dict[str, Any]:
             f"(below the {MIN_OUTPUT_BYTES}-byte floor)",
         )
     return _ok()
+
+
+#: D-3077: the READERS this stage owns, keyed by the id `config#stage0.containers` names. `native_md` is the one
+#: container that needs no reader at all (an .md IS the artifact) and is handled by the caller before dispatch.
+_READERS: dict[str, Any] = {
+    "pandoc_epub": convert_epub,
+    "docling_pdf": convert_pdf,
+    "kindleunpack_pandoc": convert_kindle,
+    "pandoc_docx": lambda src, out: convert_document(src, out, None),
+    "pandoc_pptx": lambda src, out: convert_document(src, out, None),
+    "pandoc_rtf": lambda src, out: convert_document(src, out, None),
+    "native_text": convert_native_text,
+}
+_NATIVE_READER = "native_md"
+#: D-3034 — a container whose reader does not exist is a work silently skipped; a reader no container names is dead
+#: code (C19). Both directions are refused AT IMPORT, so a config edit cannot quietly unsupport a book.
+_UNDECLARED_READERS = set(S0_CONTAINERS.values()) - {_NATIVE_READER} - set(_READERS)
+_UNUSED_READERS = set(_READERS) - set(S0_CONTAINERS.values())
+if _UNDECLARED_READERS or _UNUSED_READERS:
+    raise RuntimeError(
+        f"FATAL: config/pipeline_config.yaml#stage0.containers and this stage's readers disagree — "
+        f"declared but unimplemented {sorted(_UNDECLARED_READERS)}, implemented but named by no container "
+        f"{sorted(_UNUSED_READERS)} (C12/C19, D-3077)"
+    )
 
 
 def compute_sha256(file_path: Path) -> str:
@@ -477,13 +593,18 @@ def run_stage0(
             continue
 
         start = time.time()
-        if ext == ".epub":
-            outcome = convert_epub(book_path, md_path)
-        elif ext == ".pdf":
-            outcome = convert_pdf(book_path, md_path)
+        reader = _READERS.get(S0_CONTAINERS.get(ext, ""))
+        if reader is None:
+            #: D-3077/C16: a skip printed as a skip is STILL a silence — the work vanishes between the door and the
+            #: corpus and nothing downstream can tell it from a book nobody offered. A container this stage has no
+            #: reader for is a NAMED failure now, and it is a DOOR/PLAN fault: the door should never have handed it on.
+            outcome = _failure(
+                "unsupported_format",
+                f"{ext or '(no suffix)'} is not a container this stage declares "
+                f"(config/pipeline_config.yaml#stage0.containers)",
+            )
         else:
-            print("→ ⏭️  Unsupported format")
-            continue
+            outcome = reader(book_path, md_path)
 
         elapsed = time.time() - start
 

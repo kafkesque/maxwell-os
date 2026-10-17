@@ -1,4 +1,4 @@
-# ADMISSION PLAN — 2026-10-17T15:59:31Z
+# ADMISSION PLAN — 2026-10-17T17:07:17Z
 
 > Authority **D-3051** (T-181). The corpus home is `/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books`. This file is a
 > **plan**: it admits nothing, it moves nothing and it converts nothing. The act that admits a work is
@@ -6,32 +6,32 @@
 
 ## What is measured, and in what unit
 
-- files in the declared library kind roots: **2814** (994 distinct keys they
-  share with the corpus or an ingest record, 988 distinct keys they do not)
-- already in the corpus by the door's key: **1723**
+- files in the declared library kind roots: **2810** (1005 distinct keys they
+  share with the corpus or an ingest record, 973 distinct keys they do not)
+- already in the corpus by the door's key: **1734**
 - seen by an INGEST RECORD whose corpus file now carries a different key: **27** (the pipeline read the work; the name moved, T-130)
-- **admission candidates the pipeline has never seen: 438**
+- **admission candidates the pipeline has never seen: 536**
 
 ## The target rule (declared, never inferred here)
 
 a plan row proposes corpus_home / (the source file's own path BELOW its declared kind folder), with the suffix the conversion stage writes (.md). A topic is never decided by an engine: the proposed path inherits the source's OWN arrangement and the owner may move a row's folder
 
-Accepted containers (declared in the conversion transition, origin `pipeline/stage0_convert.py`): `.epub .md .pdf`.
+Accepted containers (declared in the conversion transition, origin `pipeline/stage0_convert.py`): `.azw .azw3 .docx .epub .md .mobi .pdf .pptx .rtf .txt`.
 
-Readability probes, declared per kind (`container_integrity`, BUG-886): `.epub->zip .pdf->pdf .md->none` — a container an accepted kind accepts is opened before it is proposed, so a truncated download is a REFUSAL with a remedy (re-download) and never a signed row.
+Readability probes, declared per kind (`container_integrity`, BUG-886): `.epub->zip .pdf->pdf .md->none .docx->zip .pptx->zip .mobi->mobi .azw->mobi .azw3->mobi .rtf->none .txt->none` — a container an accepted kind accepts is opened before it is proposed, so a truncated download is a REFUSAL with a remedy (re-download) and never a signed row.
 
 ## Every decision, with the reason it is declared under
 
 | class | files | declared meaning |
 |---|---|---|
-| `already_in_the_corpus` | 1723 | a file whose DOOR KEY the corpus home already holds: the pipeline has the work and there is nothing to admit |
+| `already_in_the_corpus` | 1734 | a file whose DOOR KEY the corpus home already holds: the pipeline has the work and there is nothing to admit |
 | `seen_by_an_ingest_record` | 27 | a file only the S0.5 metadata cache names, because the corpus file now carries a different key (MEASURED 2026-10-16: the corpus itself was renamed under T-130). The pipeline READ the work, so it is SEEN and not a candidate - printed because a second voice saying 'seen' is not the same voice as the corpus saying it |
-| `admit_candidate` | 438 | a file whose key neither the corpus nor an ingest record names, in a container the conversion stage accepts, inside its declared kind folder, under a root that declares a corpus home, carrying a name NO defect pattern matches: THE OWNER'S WORKLIST |
+| `admit_candidate` | 536 | a file whose key neither the corpus nor an ingest record names, in a container the conversion stage accepts, inside its declared kind folder, under a root that declares a corpus home, carrying a name NO defect pattern matches: THE OWNER'S WORKLIST |
 | `refused_no_declared_corpus_home` | 0 | its root declares admits_to: null, so NO declaration names a home its works are admitted to: the refusal names the missing declaration instead of inventing a destination (T-181 limb 2) |
-| `refused_container_no_stage_reads_it` | 389 | a container the conversion stage cannot read (declared kinds such as .mobi/.azw3/.djvu/.docx are OWNED but not convertible): admitting one needs an ENGINE, which is T-180's misplaced class and not this reader's act |
-| `refused_container_corrupt` | 5 | a container of an ACCEPTED kind whose own BYTES are not openable (a truncated download, a file renamed to a suffix it is not): the stage reads this kind, so the remedy is not an engine but a RE-DOWNLOAD of the work. It is its own class because it is its own remedy - folding it into the engine class would let one act answer for two blast radii (BUG-886, MEASURED 2026-10-17: 3 of 1,289 library containers read as ordinary candidates) |
+| `refused_container_no_stage_reads_it` | 273 | a container the conversion stage cannot read (MEASURED 2026-10-17 after D-3077 the residue is .djvu/.doc/.ppt, the DESIGN AND IMAGE formats .png/.jpg/.psd/.ai/.indd/.idml and the archives): admitting one needs an ENGINE, which is T-180's misplaced class and not this reader's act |
+| `refused_container_corrupt` | 1 | a container of an ACCEPTED kind whose own BYTES are not openable (a truncated download, a file renamed to a suffix it is not): the stage reads this kind, so the remedy is not an engine but a RE-DOWNLOAD of the work. It is its own class because it is its own remedy - folding it into the engine class would let one act answer for two blast radii (BUG-886, MEASURED 2026-10-17: 3 of 1,289 library containers read as ordinary candidates) |
 | `refused_name_repair_first` | 181 | a name a declared defect pattern matches (marker/spine/truncation): an admitted file's name becomes the CORPUS NAME and the DOOR KEY, so admitting a defect materialises it into the tree the S0.5 cache then STAMPS. The repair rides FIRST - T-176, the owner's rename plan, whose eligible rows are exactly this class |
-| `refused_not_in_its_kind_folder` | 51 | the file does not sit under its declared kind folder (the placement axis, axis_depth 1), so the path its corpus twin would take cannot be derived: the misplaced class T-180 owns |
+| `refused_not_in_its_kind_folder` | 58 | the file does not sit under its declared kind folder (the placement axis, axis_depth 1), so the path its corpus twin would take cannot be derived: the misplaced class T-180 owns |
 | `refused_domain_not_a_corpus_domain` | 0 | the file does not sit under a folder this root declared as its axis, or that folder is not a name the CORPUS already materialises (arrangement.share_rule): admitting it would put a new top-level name in the one corpus home and silently widen the domain vocabulary the pipeline classifies against, so the row is refused and counted instead (D-3062) |
 
 ## THE WORKLIST — every refusal, with the act it asks for
@@ -42,49 +42,35 @@ Every refusal is COUNTED above and every refused row is listed in full in the ma
 
 — (none in this reading)
 
-### `refused_container_no_stage_reads_it` — 389 row(s)
+### `refused_container_no_stage_reads_it` — 273 row(s)
 
-All 389 rows are in `ADMISSION_PLAN_20261017.json#refused`; this document names the class and its declared meaning rather than printing a block nobody reads.
+All 273 rows are in `ADMISSION_PLAN_20261017.json#refused`; this document names the class and its declared meaning rather than printing a block nobody reads.
 
-### `refused_container_corrupt` — 5 row(s)
+### `refused_container_corrupt` — 1 row(s)
 
 | row (resolves as printed) | kind | defect | remedy |
 |---|---|---|---|
-| `books/epub/DOMAIN 2 Design/practice+process/How to use graphic desi gn to sell things, explain things, make things ylib.org).epub` | epub | truncated_zip_no_central_directory | RE-DOWNLOAD the work — no local repair can invent the bytes that never arrived. A rebuild from the surviving local headers can recover text (measured: 641 headers, 321 text entries) but produces a file whose checksum matches no published edition, so it is a LAST resort and never an admission |
-| `books/epub/DOMAIN 5 Personal Practice/mood+therapy/Happy Sexy Millionaire Unexpected Truths about Fulfillment, Love, and Success Steven Bartlett.epub` | epub | truncated_zip_no_central_directory | RE-DOWNLOAD the work — no local repair can invent the bytes that never arrived. A rebuild from the surviving local headers can recover text (measured: 641 headers, 321 text entries) but produces a file whose checksum matches no published edition, so it is a LAST resort and never an admission |
-| `books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Encylopedia of Freemasonry - Vols 1and2.pdf` | pdf | truncated_pdf_no_trailer | RE-DOWNLOAD the work. Do NOT rebuild the xref locally: a repaired file that silently loses pages is worse than an absent one, and nothing in this pipeline can tell them apart afterwards |
-| `books/pdf/DOMAIN 2 Design/visual+fundamentals/color choices: making color sense out of color theory.pdf` | pdf | null_bytes | RE-DOWNLOAD, then verify the new copy opens BEFORE it is proposed again (the plan re-probes every candidate, so a good copy clears itself) |
 | `journals_notes/DOMAIN 2 Design/design-notes/mo graph/Keylight_1.2_AE.pdf` | pdf | apple_bookmark | CHECK THE POINTER FIRST: `ls` the target path the alias records (it is plain text inside the file). If it RESOLVES, copy the real file in beside the alias - nothing needs downloading. If it DANGLES the work is not on this machine: re-obtain it or acknowledge the alias as dead (the plan re-probes every candidate, so a good copy clears itself and a dead alias simply stays refused) |
 
 ### `refused_name_repair_first` — 181 row(s)
 
 All 181 rows are in `ADMISSION_PLAN_20261017.json#refused`; this document names the class and its declared meaning rather than printing a block nobody reads.
 
-### `refused_not_in_its_kind_folder` — 51 row(s)
+### `refused_not_in_its_kind_folder` — 58 row(s)
 
-All 51 rows are in `ADMISSION_PLAN_20261017.json#refused`; this document names the class and its declared meaning rather than printing a block nobody reads.
+All 58 rows are in `ADMISSION_PLAN_20261017.json#refused`; this document names the class and its declared meaning rather than printing a block nobody reads.
 
 ### `refused_domain_not_a_corpus_domain` — 0 row(s)
 
 — (none in this reading)
 
-## The admission candidates (438)
+## The admission candidates (536)
 
 | file (below its root) | key | kind | proposed corpus path | bytes |
 |---|---|---|---|---|
-| `books/epub/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Generating Sound & Organizing Time (Wakefield; Taylor).epub` | `generating sound & organizing time (wakefield; t` | epub | `DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Generating Sound & Organizing Time (Wakefield; Taylor).md` | 28877442 |
 | `books/epub/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Generating Sound & Organizing Time Graham Wakefield & Gregory Taylor liber3.epub` | `generating sound & organizing time graham wakefi` | epub | `DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Generating Sound & Organizing Time Graham Wakefield & Gregory Taylor liber3.md` | 28913667 |
 | `books/epub/DOMAIN 5 Personal Practice/productivity+execution/HBR Management Tips Collection (2 Books) Harvard Business Review liber3.epub` | `hbr management tips collection (2 books) harvard` | epub | `DOMAIN 5 Personal Practice/productivity+execution/HBR Management Tips Collection (2 Books) Harvard Business Review liber3.md` | 2513527 |
-| `books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/FULLTEXT01.pdf` | `fulltext01` | pdf | `DOMAIN 1 Substrate — Mind, Math, Meaning/FULLTEXT01.md` | 610029 |
-| `books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/Wim Wenders - The Logic of Images.pdf` | `wim wenders - the logic of images` | pdf | `DOMAIN 1 Substrate — Mind, Math, Meaning/Wim Wenders - The Logic of Images.md` | 13683887 |
-| `books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/114819898-Robert-Fludd-Hermetic-Philosopher1.pdf` | `114819898-robert-fludd-hermetic-philosopher1` | pdf | `DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/114819898-Robert-Fludd-Hermetic-Philosopher1.md` | 4919223 |
-| `books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/2011_0001_545_04_Magyarito_szotar.pdf` | `2011_0001_545_04_magyarito_szotar` | pdf | `DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/2011_0001_545_04_Magyarito_szotar.md` | 3242134 |
 | `books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/53481411-De-Re-Metallica-1556-Agricola.pdf` | `53481411-de-re-metallica-1556-agricola` | pdf | `DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/53481411-De-Re-Metallica-1556-Agricola.md` | 99065265 |
-| `books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Beginning_Luciferian_Magick.pdf` | `beginning_luciferian_magick` | pdf | `DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Beginning_Luciferian_Magick.md` | 5769321 |
-| `books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Cagliostro's Secret Ritual Of Egyptian Rite Freemasonry.pdf` | `cagliostro's secret ritual of egyptian rite free` | pdf | `DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Cagliostro's Secret Ritual Of Egyptian Rite Freemasonry.md` | 129078 |
-| `books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Celtic-Mythology-And-Religion.pdf` | `celtic-mythology-and-religion` | pdf | `DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Celtic-Mythology-And-Religion.md` | 1739357 |
-| `books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Christopher Penczak - The Temple of Shamanic Witchcraft.pdf` | `christopher penczak - the temple of shamanic wit` | pdf | `DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Christopher Penczak - The Temple of Shamanic Witchcraft.md` | 5604853 |
-| `books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Codex Seraphinianus (Luigi Serafini) (Z-Library).pdf` | `codex seraphinianus (luigi serafini` | pdf | `DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Codex Seraphinianus (Luigi Serafini) (Z-Library).md` | 336261176 |
 | `books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Coelum Philosophorum.pdf` | `coelum philosophorum` | pdf | `DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Coelum Philosophorum.md` | 45417 |
 | `books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Cognitive Economics - Springer-Verlag Berlin Heidelberg. Professor Bernard Walliser (auth.) (2008).pdf` | `cognitive economics - springer-verlag berlin hei` | pdf | `DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Cognitive Economics - Springer-Verlag Berlin Heidelberg. Professor Bernard Walliser (auth.) (2008).md` | 1054739 |
 | `books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Concentrated Salt of Nature.pdf` | `concentrated salt of nature` | pdf | `DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Concentrated Salt of Nature.md` | 172557 |
@@ -142,7 +128,6 @@ All 51 rows are in `ADMISSION_PLAN_20261017.json#refused`; this document names t
 | `books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/The Vampire Predator Bible.pdf` | `the vampire predator bible` | pdf | `DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/The Vampire Predator Bible.md` | 27466068 |
 | `books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/The_Alchemy_Reader_From_Hermes_Trismegistus_to_Isaac_Newton-Cambridge_University_Press_2003.pdf` | `the_alchemy_reader_from_hermes_trismegistus_to_i` | pdf | `DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/The_Alchemy_Reader_From_Hermes_Trismegistus_to_Isaac_Newton-Cambridge_University_Press_2003.md` | 10924467 |
 | `books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/The_History_Book_-_Big_Ideas_Simply_Explained_By_DK.pdf` | `the_history_book_-_big_ideas_simply_explained_by` | pdf | `DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/The_History_Book_-_Big_Ideas_Simply_Explained_By_DK.md` | 51718699 |
-| `books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Thinking Visually_Stephen K. Reed_liber3.pdf` | `thinking visually_stephen k. reed_liber3` | pdf | `DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Thinking Visually_Stephen K. Reed_liber3.md` | 23177116 |
 | `books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/ToV - Bloodlines.pdf` | `tov - bloodlines` | pdf | `DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/ToV - Bloodlines.md` | 100329638 |
 | `books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Twelve Keys.pdf` | `twelve keys` | pdf | `DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Twelve Keys.md` | 70312 |
 | `books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/[Rupert_Sheldrake,_Terence_McKenna,_Ralph_Abraham](BookFi.org).pdf` | `[rupert_sheldrake,_terence_mckenna,_ralph_abraha` | pdf | `DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/[Rupert_Sheldrake,_Terence_McKenna,_Ralph_Abraham](BookFi.org).md` | 347599 |
@@ -287,6 +272,7 @@ All 51 rows are in `ADMISSION_PLAN_20261017.json#refused`; this document names t
 | `journals_notes/DOMAIN 2 Design/Color/BRLeeuwen2011.pdf` | `brleeuwen2011` | pdf | `DOMAIN 2 Design/Color/BRLeeuwen2011.md` | 378884 |
 | `journals_notes/DOMAIN 2 Design/Color/synestesia.pdf` | `synestesia` | pdf | `DOMAIN 2 Design/Color/synestesia.md` | 121855 |
 | `journals_notes/DOMAIN 2 Design/Handbook_Of_Interior_Lighting_Design_by_Rüdiger_Ganslandt,_Harald.pdf` | `handbook_of_interior_lighting_design_by_rüdiger_` | pdf | `DOMAIN 2 Design/Handbook_Of_Interior_Lighting_Design_by_Rüdiger_Ganslandt,_Harald.md` | 4451182 |
+| `journals_notes/DOMAIN 2 Design/IdentityLectureNotes.docx` | `identitylecturenotes` | docx | `DOMAIN 2 Design/IdentityLectureNotes.md` | 67716 |
 | `journals_notes/DOMAIN 2 Design/Interactive_documentary_and_live_perform.pdf` | `interactive_documentary_and_live_perform` | pdf | `DOMAIN 2 Design/Interactive_documentary_and_live_perform.md` | 250502 |
 | `journals_notes/DOMAIN 2 Design/Typography/SemioticsofTypography.pdf` | `semioticsoftypography` | pdf | `DOMAIN 2 Design/Typography/SemioticsofTypography.md` | 792349 |
 | `journals_notes/DOMAIN 2 Design/Typography/ThePrinciplesoftheNewTypography.pdf` | `theprinciplesofthenewtypography` | pdf | `DOMAIN 2 Design/Typography/ThePrinciplesoftheNewTypography.md` | 11925613 |
@@ -318,13 +304,67 @@ All 51 rows are in `ADMISSION_PLAN_20261017.json#refused`; this document names t
 | `journals_notes/DOMAIN 2 Design/Typography/multimodality/serafini-typography.pdf` | `serafini-typography` | pdf | `DOMAIN 2 Design/Typography/multimodality/serafini-typography.md` | 276750 |
 | `journals_notes/DOMAIN 2 Design/Typography/typographical signification/Towards a semiotics of typography.pdf` | `towards a semiotics of typography` | pdf | `DOMAIN 2 Design/Typography/typographical signification/Towards a semiotics of typography.md` | 2897435 |
 | `journals_notes/DOMAIN 2 Design/Typography/typographical signification/Towards_a_Typology_of_Typographic_Signif.pdf` | `towards_a_typology_of_typographic_signif` | pdf | `DOMAIN 2 Design/Typography/typographical signification/Towards_a_Typology_of_Typographic_Signif.md` | 3869421 |
+| `journals_notes/DOMAIN 2 Design/branding/Blockchain Branding.docx` | `blockchain branding` | docx | `DOMAIN 2 Design/branding/Blockchain Branding.md` | 14820 |
+| `journals_notes/DOMAIN 2 Design/branding/Brand Identity design Process.docx` | `brand identity design process` | docx | `DOMAIN 2 Design/branding/Brand Identity design Process.md` | 17539 |
+| `journals_notes/DOMAIN 2 Design/branding/Brand Strategy Made Simple - Workbook.docx` | `brand strategy made simple - workbook` | docx | `DOMAIN 2 Design/branding/Brand Strategy Made Simple - Workbook.md` | 82458 |
+| `journals_notes/DOMAIN 2 Design/branding/Brand Strategy.docx` | `brand strategy` | docx | `DOMAIN 2 Design/branding/Brand Strategy.md` | 26937 |
+| `journals_notes/DOMAIN 2 Design/branding/Brand nameing.docx` | `brand nameing` | docx | `DOMAIN 2 Design/branding/Brand nameing.md` | 23260 |
+| `journals_notes/DOMAIN 2 Design/branding/Brand positioning.docx` | `brand positioning` | docx | `DOMAIN 2 Design/branding/Brand positioning.md` | 20894 |
+| `journals_notes/DOMAIN 2 Design/branding/Brand visual design strategy.docx` | `brand visual design strategy` | docx | `DOMAIN 2 Design/branding/Brand visual design strategy.md` | 12410 |
+| `journals_notes/DOMAIN 2 Design/branding/Branding Workflow.docx` | `branding workflow` | docx | `DOMAIN 2 Design/branding/Branding Workflow.md` | 1125834 |
+| `journals_notes/DOMAIN 2 Design/branding/Customer goals.docx` | `customer goals` | docx | `DOMAIN 2 Design/branding/Customer goals.md` | 16062 |
+| `journals_notes/DOMAIN 2 Design/branding/The-Branding-Brief-Canny.docx` | `the-branding-brief-canny` | docx | `DOMAIN 2 Design/branding/The-Branding-Brief-Canny.md` | 104419 |
 | `journals_notes/DOMAIN 2 Design/branding/logo-file-formats.pdf` | `logo-file-formats` | pdf | `DOMAIN 2 Design/branding/logo-file-formats.md` | 1250468 |
 | `journals_notes/DOMAIN 2 Design/branding/text/alt-text-made-easy.pdf` | `alt-text-made-easy` | pdf | `DOMAIN 2 Design/branding/text/alt-text-made-easy.md` | 1286702 |
 | `journals_notes/DOMAIN 2 Design/design-notes/Commandments Of Visual Thinking by Dan Roam.pdf` | `commandments of visual thinking by dan roam` | pdf | `DOMAIN 2 Design/design-notes/Commandments Of Visual Thinking by Dan Roam.md` | 869099 |
+| `journals_notes/DOMAIN 2 Design/design-notes/Folder structure/GYST by Erica Gorochow/*GYST_README!.rtf` | `*gyst_readme!` | rtf | `DOMAIN 2 Design/design-notes/Folder structure/GYST by Erica Gorochow/*GYST_README!.md` | 831 |
+| `journals_notes/DOMAIN 2 Design/design-notes/Folder structure/GYST by Harry Frank/*GYST_README!.rtf` | `*gyst_readme!` | rtf | `DOMAIN 2 Design/design-notes/Folder structure/GYST by Harry Frank/*GYST_README!.md` | 831 |
+| `journals_notes/DOMAIN 2 Design/design-notes/Folder structure/GYST by Hasraf Dulull/*GYST_README!.rtf` | `*gyst_readme!` | rtf | `DOMAIN 2 Design/design-notes/Folder structure/GYST by Hasraf Dulull/*GYST_README!.md` | 831 |
+| `journals_notes/DOMAIN 2 Design/design-notes/Folder structure/GYST by Jonathan Winbush/*GYST_README!.rtf` | `*gyst_readme!` | rtf | `DOMAIN 2 Design/design-notes/Folder structure/GYST by Jonathan Winbush/*GYST_README!.md` | 831 |
+| `journals_notes/DOMAIN 2 Design/design-notes/Folder structure/XXX_PROJECT_TITLE_000000/*GYST_README!.rtf` | `*gyst_readme!` | rtf | `DOMAIN 2 Design/design-notes/Folder structure/XXX_PROJECT_TITLE_000000/*GYST_README!.md` | 831 |
 | `journals_notes/DOMAIN 2 Design/design-notes/Folder structure/[My Business] Folder/Read Me - Business Folder.pdf` | `read me - business folder` | pdf | `DOMAIN 2 Design/design-notes/Folder structure/[My Business] Folder/Read Me - Business Folder.md` | 795645 |
 | `journals_notes/DOMAIN 2 Design/design-notes/branding/logo design/Logo Trend Report.pdf` | `logo trend report` | pdf | `DOMAIN 2 Design/design-notes/branding/logo design/Logo Trend Report.md` | 2599449 |
 | `journals_notes/DOMAIN 2 Design/design-notes/creative focus worksheet.pdf` | `creative focus worksheet` | pdf | `DOMAIN 2 Design/design-notes/creative focus worksheet.md` | 100248 |
+| `journals_notes/DOMAIN 2 Design/design-notes/docs/Conceptual thinking/CREATIVE THINKING.docx` | `creative thinking` | docx | `DOMAIN 2 Design/design-notes/docs/Conceptual thinking/CREATIVE THINKING.md` | 18738 |
+| `journals_notes/DOMAIN 2 Design/design-notes/docs/Conceptual thinking/Design for motion.docx` | `design for motion` | docx | `DOMAIN 2 Design/design-notes/docs/Conceptual thinking/Design for motion.md` | 24943 |
+| `journals_notes/DOMAIN 2 Design/design-notes/docs/Conceptual thinking/Ellen Lupton.docx` | `ellen lupton` | docx | `DOMAIN 2 Design/design-notes/docs/Conceptual thinking/Ellen Lupton.md` | 34078 |
+| `journals_notes/DOMAIN 2 Design/design-notes/docs/Conceptual thinking/Workflow tips for typography.docx` | `workflow tips for typography` | docx | `DOMAIN 2 Design/design-notes/docs/Conceptual thinking/Workflow tips for typography.md` | 17660 |
+| `journals_notes/DOMAIN 2 Design/design-notes/docs/Ideation/Ideation tipps.docx` | `ideation tipps` | docx | `DOMAIN 2 Design/design-notes/docs/Ideation/Ideation tipps.md` | 14558 |
+| `journals_notes/DOMAIN 2 Design/design-notes/docs/Ideation/Tackle design challenges.docx` | `tackle design challenges` | docx | `DOMAIN 2 Design/design-notes/docs/Ideation/Tackle design challenges.md` | 15695 |
+| `journals_notes/DOMAIN 2 Design/design-notes/docs/Ideation/Tactics.docx` | `tactics` | docx | `DOMAIN 2 Design/design-notes/docs/Ideation/Tactics.md` | 22856 |
+| `journals_notes/DOMAIN 2 Design/design-notes/docs/The-Design-Brief-Canny.docx` | `the-design-brief-canny` | docx | `DOMAIN 2 Design/design-notes/docs/The-Design-Brief-Canny.md` | 94669 |
+| `journals_notes/DOMAIN 2 Design/design-notes/docs/Types of kinetic actions in terms of figure of speech.docx` | `types of kinetic actions in terms of figure of s` | docx | `DOMAIN 2 Design/design-notes/docs/Types of kinetic actions in terms of figure of speech.md` | 14209 |
+| `journals_notes/DOMAIN 2 Design/design-notes/docs/mograph/Design for motion techical.docx` | `design for motion techical` | docx | `DOMAIN 2 Design/design-notes/docs/mograph/Design for motion techical.md` | 25143 |
+| `journals_notes/DOMAIN 2 Design/design-notes/docs/mograph/Parallax/PARALLAX.docx` | `parallax` | docx | `DOMAIN 2 Design/design-notes/docs/mograph/Parallax/PARALLAX.md` | 18404 |
+| `journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/01. Design Thinking for Visual Design workflow.docx` | `01. design thinking for visual design workflow` | docx | `DOMAIN 2 Design/design-notes/docs/ui:ux/01. Design Thinking for Visual Design workflow.md` | 24421 |
 | `journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Conducting-an-Interview-with-Empathy.pdf` | `conducting-an-interview-with-empathy` | pdf | `DOMAIN 2 Design/design-notes/docs/ui:ux/Conducting-an-Interview-with-Empathy.md` | 147715 |
+| `journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Content strategy & information architecture.docx` | `content strategy & information architecture` | docx | `DOMAIN 2 Design/design-notes/docs/ui:ux/Content strategy & information architecture.md` | 4480657 |
+| `journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Creative Brief.docx` | `creative brief` | docx | `DOMAIN 2 Design/design-notes/docs/ui:ux/Creative Brief.md` | 15187 |
+| `journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Design System.docx` | `design system` | docx | `DOMAIN 2 Design/design-notes/docs/ui:ux/Design System.md` | 505768 |
+| `journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Design System1.docx` | `design system1` | docx | `DOMAIN 2 Design/design-notes/docs/ui:ux/Design System1.md` | 609165 |
+| `journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Design Thinking for Visual Design workflow.docx` | `design thinking for visual design workflow` | docx | `DOMAIN 2 Design/design-notes/docs/ui:ux/Design Thinking for Visual Design workflow.md` | 23227 |
+| `journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Moodboard structure.docx` | `moodboard structure` | docx | `DOMAIN 2 Design/design-notes/docs/ui:ux/Moodboard structure.md` | 15954 |
+| `journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Styleboard.docx` | `styleboard` | docx | `DOMAIN 2 Design/design-notes/docs/ui:ux/Styleboard.md` | 14765 |
+| `journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Techniques paper/Figma/FIGMA short cuts.docx` | `figma short cuts` | docx | `DOMAIN 2 Design/design-notes/docs/ui:ux/Techniques paper/Figma/FIGMA short cuts.md` | 14861 |
+| `journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Techniques paper/Figma/Figma Instructions.docx` | `figma instructions` | docx | `DOMAIN 2 Design/design-notes/docs/ui:ux/Techniques paper/Figma/Figma Instructions.md` | 14364 |
+| `journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Techniques paper/Figma tipps.docx` | `figma tipps` | docx | `DOMAIN 2 Design/design-notes/docs/ui:ux/Techniques paper/Figma tipps.md` | 30558 |
+| `journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Techniques paper/Photoshop.docx` | `photoshop` | docx | `DOMAIN 2 Design/design-notes/docs/ui:ux/Techniques paper/Photoshop.md` | 12204 |
+| `journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Techniques paper/Printing techniques.docx` | `printing techniques` | docx | `DOMAIN 2 Design/design-notes/docs/ui:ux/Techniques paper/Printing techniques.md` | 17792 |
+| `journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/02. Hierarchy & Structure.docx` | `02. hierarchy & structure` | docx | `DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/02. Hierarchy & Structure.md` | 20502 |
+| `journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Color.docx` | `color` | docx | `DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Color.md` | 695022 |
+| `journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/DARK UI.docx` | `dark ui` | docx | `DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/DARK UI.md` | 651597 |
+| `journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Developing guidelines.docx` | `developing guidelines` | docx | `DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Developing guidelines.md` | 13420 |
+| `journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Elements.docx` | `elements` | docx | `DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Elements.md` | 773891 |
+| `journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Grid:layout.docx` | `grid:layout` | docx | `DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Grid:layout.md` | 328991 |
+| `journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Grids.docx` | `grids` | docx | `DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Grids.md` | 14246 |
+| `journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Hierarchy & Structure.docx` | `hierarchy & structure` | docx | `DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Hierarchy & Structure.md` | 14697 |
+| `journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Imagery.docx` | `imagery` | docx | `DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Imagery.md` | 2112942 |
+| `journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Onboarding.docx` | `onboarding` | docx | `DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Onboarding.md` | 15918 |
+| `journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Style.docx` | `style` | docx | `DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Style.md` | 26019 |
+| `journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Typography UI.docx` | `typography ui` | docx | `DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Typography UI.md` | 131874 |
+| `journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/UI design workflow.docx` | `ui design workflow` | docx | `DOMAIN 2 Design/design-notes/docs/ui:ux/UI design workflow.md` | 203362 |
+| `journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/UI workflow.docx` | `ui workflow` | docx | `DOMAIN 2 Design/design-notes/docs/ui:ux/UI workflow.md` | 27778 |
+| `journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Visual design tips.docx` | `visual design tips` | docx | `DOMAIN 2 Design/design-notes/docs/ui:ux/Visual design tips.md` | 15042 |
 | `journals_notes/DOMAIN 2 Design/design-notes/pdf/5-accessibility-mistakes.pdf` | `5-accessibility-mistakes` | pdf | `DOMAIN 2 Design/design-notes/pdf/5-accessibility-mistakes.md` | 682674 |
 | `journals_notes/DOMAIN 2 Design/design-notes/pdf/After Effect Lab.pdf` | `after effect lab` | pdf | `DOMAIN 2 Design/design-notes/pdf/After Effect Lab.md` | 2118318 |
 | `journals_notes/DOMAIN 2 Design/design-notes/pdf/Canny-The-Complete-Website-Checklist 1.pdf` | `canny-the-complete-website-checklist 1` | pdf | `DOMAIN 2 Design/design-notes/pdf/Canny-The-Complete-Website-Checklist 1.md` | 1390792 |
@@ -352,6 +392,7 @@ All 51 rows are in `ADMISSION_PLAN_20261017.json#refused`; this document names t
 | `journals_notes/DOMAIN 2 Design/design-notes/pdf/one6creative_content_ideas_for_designers.pdf` | `one6creative_content_ideas_for_designers` | pdf | `DOMAIN 2 Design/design-notes/pdf/one6creative_content_ideas_for_designers.md` | 565274 |
 | `journals_notes/DOMAIN 2 Design/design-notes/permission-marketing-200903065314.pdf` | `permission-marketing-200903065314` | pdf | `DOMAIN 2 Design/design-notes/permission-marketing-200903065314.md` | 4017861 |
 | `journals_notes/DOMAIN 3 Art + Computational Media/Interactive_documentary_and_live_perform.pdf` | `interactive_documentary_and_live_perform` | pdf | `DOMAIN 3 Art + Computational Media/Interactive_documentary_and_live_perform.md` | 250502 |
+| `journals_notes/DOMAIN 3 Art + Computational Media/narrative/digital_storytelling_synthesis_19th_november_2009.docx` | `digital_storytelling_synthesis_19th_november_200` | docx | `DOMAIN 3 Art + Computational Media/narrative/digital_storytelling_synthesis_19th_november_2009.md` | 445392 |
 | `journals_notes/DOMAIN 4 Business/Blunt House TA.pdf` | `blunt house ta` | pdf | `DOMAIN 4 Business/Blunt House TA.md` | 88118 |
 | `journals_notes/DOMAIN 4 Business/IdentityLectureNotes.pdf` | `identitylecturenotes` | pdf | `DOMAIN 4 Business/IdentityLectureNotes.md` | 144111 |
 | `journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Branching Out/One Careful Owner.pdf` | `one careful owner` | pdf | `DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Branching Out/One Careful Owner.md` | 38339900 |
@@ -440,8 +481,55 @@ All 51 rows are in `ADMISSION_PLAN_20261017.json#refused`; this document names t
 | `journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/6 Managing a Creative Business/Module 04- Growing Your Agency/BUS-M04L06-Employment Layoff Letter.pdf` | `bus-m04l06-employment layoff letter` | pdf | `DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/6 Managing a Creative Business/Module 04- Growing Your Agency/BUS-M04L06-Employment Layoff Letter.md` | 54293 |
 | `journals_notes/DOMAIN 4 Business/business-notes/Educational Material/hub/Creative_HubKit.pdf` | `creative_hubkit` | pdf | `DOMAIN 4 Business/business-notes/Educational Material/hub/Creative_HubKit.md` | 525545 |
 | `journals_notes/DOMAIN 4 Business/business-notes/Educational Material/hub/Creative_Hub_Leaders_Toolkit.pdf` | `creative_hub_leaders_toolkit` | pdf | `DOMAIN 4 Business/business-notes/Educational Material/hub/Creative_Hub_Leaders_Toolkit.md` | 5144629 |
+| `journals_notes/DOMAIN 4 Business/business-notes/Financial/Start-Up-Programme-Finance-Workbook-January-2013.docx` | `start-up-programme-finance-workbook-january-2013` | docx | `DOMAIN 4 Business/business-notes/Financial/Start-Up-Programme-Finance-Workbook-January-2013.md` | 606201 |
 | `journals_notes/DOMAIN 4 Business/business-notes/Financial/Start-Up-Programme-Finance-Workbook-January-2013.md` | `start-up-programme-finance-workbook-january-2013` | md | `DOMAIN 4 Business/business-notes/Financial/Start-Up-Programme-Finance-Workbook-January-2013.md` | 15352 |
 | `journals_notes/DOMAIN 4 Business/business-notes/bootstrap/financial planning/document.pdf` | `document` | pdf | `DOMAIN 4 Business/business-notes/bootstrap/financial planning/document.md` | 421674 |
+| `journals_notes/DOMAIN 4 Business/business-notes/docs/Billing.docx` | `billing` | docx | `DOMAIN 4 Business/business-notes/docs/Billing.md` | 14140 |
+| `journals_notes/DOMAIN 4 Business/business-notes/docs/Creative brief.docx` | `creative brief` | docx | `DOMAIN 4 Business/business-notes/docs/Creative brief.md` | 22689 |
+| `journals_notes/DOMAIN 4 Business/business-notes/docs/First time with client meeting.docx` | `first time with client meeting` | docx | `DOMAIN 4 Business/business-notes/docs/First time with client meeting.md` | 24849 |
+| `journals_notes/DOMAIN 4 Business/business-notes/docs/Frameworks/Scoping:estimating framework.docx` | `scoping:estimating framework` | docx | `DOMAIN 4 Business/business-notes/docs/Frameworks/Scoping:estimating framework.md` | 18088 |
+| `journals_notes/DOMAIN 4 Business/business-notes/docs/Freelancing/Creative brief.docx` | `creative brief` | docx | `DOMAIN 4 Business/business-notes/docs/Freelancing/Creative brief.md` | 22689 |
+| `journals_notes/DOMAIN 4 Business/business-notes/docs/Freelancing/Design Proposal.docx` | `design proposal` | docx | `DOMAIN 4 Business/business-notes/docs/Freelancing/Design Proposal.md` | 16255 |
+| `journals_notes/DOMAIN 4 Business/business-notes/docs/Freelancing/FIRST MEETING.docx` | `first meeting` | docx | `DOMAIN 4 Business/business-notes/docs/Freelancing/FIRST MEETING.md` | 17074 |
+| `journals_notes/DOMAIN 4 Business/business-notes/docs/Freelancing/FREELANCING.docx` | `freelancing` | docx | `DOMAIN 4 Business/business-notes/docs/Freelancing/FREELANCING.md` | 20138 |
+| `journals_notes/DOMAIN 4 Business/business-notes/docs/Freelancing/First time with client meeting.docx` | `first time with client meeting` | docx | `DOMAIN 4 Business/business-notes/docs/Freelancing/First time with client meeting.md` | 24849 |
+| `journals_notes/DOMAIN 4 Business/business-notes/docs/Freelancing/Freelance traits.docx` | `freelance traits` | docx | `DOMAIN 4 Business/business-notes/docs/Freelancing/Freelance traits.md` | 123990 |
+| `journals_notes/DOMAIN 4 Business/business-notes/docs/Freelancing/Q&A client.docx` | `q&a client` | docx | `DOMAIN 4 Business/business-notes/docs/Freelancing/Q&A client.md` | 16843 |
+| `journals_notes/DOMAIN 4 Business/business-notes/docs/Freelancing.docx` | `freelancing` | docx | `DOMAIN 4 Business/business-notes/docs/Freelancing.md` | 21712 |
+| `journals_notes/DOMAIN 4 Business/business-notes/docs/GOALS.docx` | `goals` | docx | `DOMAIN 4 Business/business-notes/docs/GOALS.md` | 14368 |
+| `journals_notes/DOMAIN 4 Business/business-notes/docs/How to become more valuable.docx` | `how to become more valuable` | docx | `DOMAIN 4 Business/business-notes/docs/How to become more valuable.md` | 15841 |
+| `journals_notes/DOMAIN 4 Business/business-notes/docs/Ikigai.docx` | `ikigai` | docx | `DOMAIN 4 Business/business-notes/docs/Ikigai.md` | 36100 |
+| `journals_notes/DOMAIN 4 Business/business-notes/docs/Invoice.docx` | `invoice` | docx | `DOMAIN 4 Business/business-notes/docs/Invoice.md` | 15775 |
+| `journals_notes/DOMAIN 4 Business/business-notes/docs/Legal/Term Contract tipps.docx` | `term contract tipps` | docx | `DOMAIN 4 Business/business-notes/docs/Legal/Term Contract tipps.md` | 16362 |
+| `journals_notes/DOMAIN 4 Business/business-notes/docs/Legal/terms.docx` | `terms` | docx | `DOMAIN 4 Business/business-notes/docs/Legal/terms.md` | 18349 |
+| `journals_notes/DOMAIN 4 Business/business-notes/docs/MAKING and breaking the grid.docx` | `making and breaking the grid` | docx | `DOMAIN 4 Business/business-notes/docs/MAKING and breaking the grid.md` | 14971 |
+| `journals_notes/DOMAIN 4 Business/business-notes/docs/Market research.docx` | `market research` | docx | `DOMAIN 4 Business/business-notes/docs/Market research.md` | 14292 |
+| `journals_notes/DOMAIN 4 Business/business-notes/docs/Marketing/1st Clients.docx` | `1st clients` | docx | `DOMAIN 4 Business/business-notes/docs/Marketing/1st Clients.md` | 16941 |
+| `journals_notes/DOMAIN 4 Business/business-notes/docs/Marketing/Content Marketing ideas.docx` | `content marketing ideas` | docx | `DOMAIN 4 Business/business-notes/docs/Marketing/Content Marketing ideas.md` | 12241 |
+| `journals_notes/DOMAIN 4 Business/business-notes/docs/Marketing/DIGITAL MARKETING theoretical.docx` | `digital marketing theoretical` | docx | `DOMAIN 4 Business/business-notes/docs/Marketing/DIGITAL MARKETING theoretical.md` | 22513 |
+| `journals_notes/DOMAIN 4 Business/business-notes/docs/Marketing/Email Marketing.docx` | `email marketing` | docx | `DOMAIN 4 Business/business-notes/docs/Marketing/Email Marketing.md` | 18252 |
+| `journals_notes/DOMAIN 4 Business/business-notes/docs/Marketing/Marketing.docx` | `marketing` | docx | `DOMAIN 4 Business/business-notes/docs/Marketing/Marketing.md` | 531688 |
+| `journals_notes/DOMAIN 4 Business/business-notes/docs/Meaningful member expereience business modell.docx` | `meaningful member expereience business modell` | docx | `DOMAIN 4 Business/business-notes/docs/Meaningful member expereience business modell.md` | 16278 |
+| `journals_notes/DOMAIN 4 Business/business-notes/docs/Mission & vision statement.docx` | `mission & vision statement` | docx | `DOMAIN 4 Business/business-notes/docs/Mission & vision statement.md` | 23246 |
+| `journals_notes/DOMAIN 4 Business/business-notes/docs/Price negotiation/Price negotiations.docx` | `price negotiations` | docx | `DOMAIN 4 Business/business-notes/docs/Price negotiation/Price negotiations.md` | 21539 |
+| `journals_notes/DOMAIN 4 Business/business-notes/docs/Pricing/Pricing strategy.docx` | `pricing strategy` | docx | `DOMAIN 4 Business/business-notes/docs/Pricing/Pricing strategy.md` | 38893 |
+| `journals_notes/DOMAIN 4 Business/business-notes/docs/Pricing/Project specific price factoring.docx` | `project specific price factoring` | docx | `DOMAIN 4 Business/business-notes/docs/Pricing/Project specific price factoring.md` | 18512 |
+| `journals_notes/DOMAIN 4 Business/business-notes/docs/Proposal.docx` | `proposal` | docx | `DOMAIN 4 Business/business-notes/docs/Proposal.md` | 11961 |
+| `journals_notes/DOMAIN 4 Business/business-notes/docs/Questions business.docx` | `questions business` | docx | `DOMAIN 4 Business/business-notes/docs/Questions business.md` | 29224 |
+| `journals_notes/DOMAIN 4 Business/business-notes/docs/RISK management.docx` | `risk management` | docx | `DOMAIN 4 Business/business-notes/docs/RISK management.md` | 15056 |
+| `journals_notes/DOMAIN 4 Business/business-notes/docs/Strategic Tools.docx` | `strategic tools` | docx | `DOMAIN 4 Business/business-notes/docs/Strategic Tools.md` | 391826 |
+| `journals_notes/DOMAIN 4 Business/business-notes/docs/The-RFP-_-RFQ-Template-Canny.docx` | `the-rfp-_-rfq-template-canny` | docx | `DOMAIN 4 Business/business-notes/docs/The-RFP-_-RFQ-Template-Canny.md` | 222509 |
+| `journals_notes/DOMAIN 4 Business/business-notes/docs/The-Rebranding-Brief-Canny.docx` | `the-rebranding-brief-canny` | docx | `DOMAIN 4 Business/business-notes/docs/The-Rebranding-Brief-Canny.md` | 108720 |
+| `journals_notes/DOMAIN 4 Business/business-notes/docs/Value Proposition.docx` | `value proposition` | docx | `DOMAIN 4 Business/business-notes/docs/Value Proposition.md` | 12533 |
+| `journals_notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/BP 2017-18 Tri 2_Off_The_Beaten_Track.docx` | `bp 2017-18 tri 2_off_the_beaten_track` | docx | `DOMAIN 4 Business/business-notes/docs/busines plan case studies/BP 2017-18 Tri 2_Off_The_Beaten_Track.md` | 2459723 |
+| `journals_notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/Business Plan Marking Sheet and Structure.docx` | `business plan marking sheet and structure` | docx | `DOMAIN 4 Business/business-notes/docs/busines plan case studies/Business Plan Marking Sheet and Structure.md` | 17836 |
+| `journals_notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/Business plan blueprint.docx` | `business plan blueprint` | docx | `DOMAIN 4 Business/business-notes/docs/busines plan case studies/Business plan blueprint.md` | 648523 |
+| `journals_notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/IC-Startup-Business-Plan-Template-9026_WORD.docx` | `ic-startup-business-plan-template-9026_word` | docx | `DOMAIN 4 Business/business-notes/docs/busines plan case studies/IC-Startup-Business-Plan-Template-9026_WORD.md` | 53463 |
+| `journals_notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/Koan21 business plan.docx` | `koan21 business plan` | docx | `DOMAIN 4 Business/business-notes/docs/busines plan case studies/Koan21 business plan.md` | 17933 |
+| `journals_notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/SCORE-Deluxe-Startup-Business-Plan-Template_2.docx` | `score-deluxe-startup-business-plan-template_2` | docx | `DOMAIN 4 Business/business-notes/docs/busines plan case studies/SCORE-Deluxe-Startup-Business-Plan-Template_2.md` | 154360 |
+| `journals_notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/Starting a new business/Business Plan Marking Sheet and Structure.docx` | `business plan marking sheet and structure` | docx | `DOMAIN 4 Business/business-notes/docs/busines plan case studies/Starting a new business/Business Plan Marking Sheet and Structure.md` | 17836 |
+| `journals_notes/DOMAIN 4 Business/business-notes/docs/funds/The_Start_Up_Loans_Company_Business_Plan_template_Nov-2020-002_CE-version.docx` | `the_start_up_loans_company_business_plan_templat` | docx | `DOMAIN 4 Business/business-notes/docs/funds/The_Start_Up_Loans_Company_Business_Plan_template_Nov-2020-002_CE-version.md` | 1599419 |
+| `journals_notes/DOMAIN 4 Business/business-notes/docs/market research2.docx` | `market research2` | docx | `DOMAIN 4 Business/business-notes/docs/market research2.md` | 16509 |
 | `journals_notes/DOMAIN 4 Business/business-notes/pdf/Advanced+Technical+SEO+A+Complete+Guide.pdf` | `advanced+technical+seo+a+complete+guide` | pdf | `DOMAIN 4 Business/business-notes/pdf/Advanced+Technical+SEO+A+Complete+Guide.md` | 24425838 |
 | `journals_notes/DOMAIN 4 Business/business-notes/pdf/How analytics can drive your sales.pdf` | `how analytics can drive your sales` | pdf | `DOMAIN 4 Business/business-notes/pdf/How analytics can drive your sales.md` | 3321706 |
 | `journals_notes/DOMAIN 4 Business/business-notes/pdf/How to choose the right ideas to develop.pdf` | `how to choose the right ideas to develop` | pdf | `DOMAIN 4 Business/business-notes/pdf/How to choose the right ideas to develop.md` | 38403783 |
@@ -475,6 +563,10 @@ All 51 rows are in `ADMISSION_PLAN_20261017.json#refused`; this document names t
 | `journals_notes/DOMAIN 4 Business/business-notes/pdf/pre-hire.pdf` | `pre-hire` | pdf | `DOMAIN 4 Business/business-notes/pdf/pre-hire.md` | 9983103 |
 | `journals_notes/DOMAIN 4 Business/business-notes/pdf/the-growth-handbook(1).pdf` | `the-growth-handbook(1` | pdf | `DOMAIN 4 Business/business-notes/pdf/the-growth-handbook(1).md` | 3388091 |
 | `journals_notes/DOMAIN 4 Business/business-notes/pdf/tipps/Tips on Creating an Effective Contract_Freelance Contract 101.pdf` | `tips on creating an effective contract_freelance` | pdf | `DOMAIN 4 Business/business-notes/pdf/tipps/Tips on Creating an Effective Contract_Freelance Contract 101.md` | 72716 |
+| `journals_notes/DOMAIN 4 Business/business-notes/ppt/Starting a new business/BMC Template - powerpoint 1.pptx` | `bmc template - powerpoint 1` | pptx | `DOMAIN 4 Business/business-notes/ppt/Starting a new business/BMC Template - powerpoint 1.md` | 160545 |
+| `journals_notes/DOMAIN 4 Business/business-notes/ppt/Starting a new business/BMC Template - powerpoint.pptx` | `bmc template - powerpoint` | pptx | `DOMAIN 4 Business/business-notes/ppt/Starting a new business/BMC Template - powerpoint.md` | 160545 |
+| `journals_notes/DOMAIN 4 Business/business-notes/ppt/Starting a new business/Week 5 BMC (2).pptx` | `week 5 bmc (2` | pptx | `DOMAIN 4 Business/business-notes/ppt/Starting a new business/Week 5 BMC (2).md` | 967539 |
+| `journals_notes/DOMAIN 4 Business/business-notes/ppt/Starting a new business/Week 8.pptx` | `week 8` | pptx | `DOMAIN 4 Business/business-notes/ppt/Starting a new business/Week 8.md` | 3994490 |
 | `journals_notes/DOMAIN 4 Business/business-notes/pricing/4 Pricing Creative Services/Module 01- Pricing Fundamentals/M01L09-Pricing Spectrum.pdf` | `m01l09-pricing spectrum` | pdf | `DOMAIN 4 Business/business-notes/pricing/4 Pricing Creative Services/Module 01- Pricing Fundamentals/M01L09-Pricing Spectrum.md` | 81274 |
 | `journals_notes/DOMAIN 4 Business/business-pdf/Succeeding_In_House_Creative/Exercise Files/Creative_Needs_Rationale.pdf` | `creative_needs_rationale` | pdf | `DOMAIN 4 Business/business-pdf/Succeeding_In_House_Creative/Exercise Files/Creative_Needs_Rationale.md` | 469480 |
 | `journals_notes/DOMAIN 4 Business/business-pdf/Succeeding_In_House_Creative/Exercise Files/Design Value Proposition Resources.pdf` | `design value proposition resources` | pdf | `DOMAIN 4 Business/business-pdf/Succeeding_In_House_Creative/Exercise Files/Design Value Proposition Resources.md` | 70039 |
@@ -499,6 +591,8 @@ All 51 rows are in `ADMISSION_PLAN_20261017.json#refused`; this document names t
 | `journals_notes/DOMAIN 4 Business/reports/infographic-cmo-spend-survey-2021.pdf` | `infographic-cmo-spend-survey-2021` | pdf | `DOMAIN 4 Business/reports/infographic-cmo-spend-survey-2021.md` | 545508 |
 | `journals_notes/DOMAIN 5 Personal Practice/hustle/Refund Bible 2023🧑🏽‍💻/Amazon Refund Sauce 🙎🏿‍♂️/AMAZON REFUND.pdf` | `amazon refund` | pdf | `DOMAIN 5 Personal Practice/hustle/Refund Bible 2023🧑🏽‍💻/Amazon Refund Sauce 🙎🏿‍♂️/AMAZON REFUND.md` | 13100589 |
 | `journals_notes/DOMAIN 5 Personal Practice/hustle/Refund Bible 2023🧑🏽‍💻/G2A Gift card refund sauce/G2A Method 2023 (works as of JUNE 26th).pdf` | `g2a method 2023 (works as of june 26th` | pdf | `DOMAIN 5 Personal Practice/hustle/Refund Bible 2023🧑🏽‍💻/G2A Gift card refund sauce/G2A Method 2023 (works as of JUNE 26th).md` | 1549083 |
+| `journals_notes/DOMAIN 5 Personal Practice/hustle/Refund Bible 2023🧑🏽‍💻/Nike Refund Sauce/Best Nike Refund Method 2023.txt` | `best nike refund method 2023` | txt | `DOMAIN 5 Personal Practice/hustle/Refund Bible 2023🧑🏽‍💻/Nike Refund Sauce/Best Nike Refund Method 2023.md` | 931 |
+| `journals_notes/DOMAIN 5 Personal Practice/hustle/Refund Bible 2023🧑🏽‍💻/StockX Refund Method 👖/Stockx Method 2022.docx` | `stockx method 2022` | docx | `DOMAIN 5 Personal Practice/hustle/Refund Bible 2023🧑🏽‍💻/StockX Refund Method 👖/Stockx Method 2022.md` | 7143 |
 | `journals_notes/DOMAIN 5 Personal Practice/hustle/Refund Bible 2023🧑🏽‍💻/StockX Refund Method 👖/Stockx Method 2022.md` | `stockx method 2022` | md | `DOMAIN 5 Personal Practice/hustle/Refund Bible 2023🧑🏽‍💻/StockX Refund Method 👖/Stockx Method 2022.md` | 1528 |
 | `journals_notes/DOMAIN 6 AI + Computing/NeurIPS-2024-benchmarking-complex-instruction-following-with-multiple-constraints-composition-Paper-Datasets_and_Benchmarks_Track.pdf` | `neurips-2024-benchmarking-complex-instruction-fo` | pdf | `DOMAIN 6 AI + Computing/NeurIPS-2024-benchmarking-complex-instruction-following-with-multiple-constraints-composition-Paper-Datasets_and_Benchmarks_Track.md` | 9087163 |
 | `journals_notes/DOMAIN 6 AI + Computing/Pixel_Encoder - Instructions.pdf` | `pixel_encoder - instructions` | pdf | `DOMAIN 6 AI + Computing/Pixel_Encoder - Instructions.md` | 2315722 |

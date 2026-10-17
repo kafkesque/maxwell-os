@@ -37,7 +37,6 @@ and plan-first (T-183), exactly as the rename plan is separate from the rename.
 from __future__ import annotations
 
 import argparse
-import ast
 import json
 import re
 import sys
@@ -64,11 +63,14 @@ from pipeline.container_integrity import (  # noqa: E402 - BUG-886/D-3071, BUG-8
 POLICY = census.POLICY
 RC_OK, RC_FATAL, RC_OWNER_OWED = 0, 1, 2
 
-#: The conversion stage's OWN accepted-container set lives in `pipeline/stage0_convert.py::SUPPORTED_EXTENSIONS`.
-#: This reader does NOT import that module (it pulls the pipeline's I/O stack, and a ladder line must not pay for
-#: it): the set is DECLARED in the gate's conversion transition and a control below reads the origin and refuses
-#: a disagreement between the two homes.
-STAGE0 = _PROJECT_ROOT / "pipeline" / "stage0_convert.py"
+#: D-3077 — THE CONTAINER SET HAS ONE DECLARATION, AND IT IS CONFIG. It used to be an AST read of a literal set in
+#: `pipeline/stage0_convert.py`; the literal is gone, because which container this stage can open is now declared one
+#: line per container (`config/pipeline_config.yaml#stage0.containers`, naming the reader that opens it). This reader
+#: still does NOT import the pipeline (it pulls the I/O stack, and a ladder line must not pay for it) — it reads the
+#: YAML, which is the declaration of record, and the control below still refuses a disagreement with the gate's own
+#: `flow.transitions.conversion.accepts`. Two independently declared surfaces, compared: the door's policy, and the
+#: stage's capability.
+STAGE0_CONFIG = _PROJECT_ROOT / "config" / "pipeline_config.yaml"
 
 #: The CLOSED decision vocabulary. Every one of these must be DECLARED in the gate
 #: (`source_library.admission.decisions`), a class this reader produces that the declaration does not carry is
@@ -105,7 +107,7 @@ CONTROL_LABELS = (
     "an_absent_declaration_key_is_FATAL_and_never_defaulted",
     "a_corpus_home_that_does_not_resolve_is_FATAL",
     "an_ingest_record_naming_a_work_is_counted_as_SEEN_and_never_swallowed",
-    "the_declared_accepted_containers_equal_the_CONVERSION_stage_own_constant",
+    "the_declared_accepted_containers_equal_the_CONVERSION_stage_declared_containers",
     "the_key_is_the_DOOR_own_key_and_not_a_second_one",
     "a_decision_the_declaration_does_not_carry_is_FATAL_and_a_declared_one_reads_zero",
     "a_home_whose_axis_is_NOT_the_kind_is_never_refused_for_its_folder",
@@ -188,17 +190,18 @@ def _container(raw: str) -> str:
     return f".{raw.lower().lstrip('.')}"
 
 
-def stage0_containers(path: Path = STAGE0) -> set[str]:
-    """The conversion stage's OWN constant, READ (never imported: the pipeline I/O stack is not worth a ladder)."""
-    source = path.read_text(encoding="utf-8")
-    for node in ast.walk(ast.parse(source)):
-        if not isinstance(node, ast.Assign):
-            continue
-        if not any(getattr(target, "id", "") == "SUPPORTED_EXTENSIONS" for target in node.targets):
-            continue
-        if isinstance(node.value, (ast.Set, ast.Tuple, ast.List)):
-            return {_container(str(item.value)) for item in node.value.elts}
-    raise AdmissionError(f"FATAL: {path} no longer declares SUPPORTED_EXTENSIONS (the origin of the set)")
+def stage0_containers(path: Path = STAGE0_CONFIG) -> set[str]:
+    """The stage's declared container set, READ from its declaration of record (D-3077), never imported."""
+    import yaml  # local: the ladder line does not pay for a YAML parse it does not need
+
+    doc = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+    declared = (doc.get("stage0") or {}).get("containers")
+    if not isinstance(declared, dict) or not declared:
+        raise AdmissionError(
+            f"FATAL: {path}#stage0.containers is not declared — the set of containers the conversion stage can open "
+            f"is a declaration, and this plan refuses to guess it (C12, D-3077)"
+        )
+    return {_container(str(item)) for item in declared}
 
 
 def name_patterns(pol: dict[str, Any]) -> dict[str, re.Pattern[str]]:
@@ -758,10 +761,11 @@ def selftest() -> int:
         except AdmissionError:
             pass
 
-        # (10) the declared accepted set is the conversion stage's OWN constant (the origin, read from its bytes)
+        # (10) the declared accepted set equals the CONVERSION stage's declared container set (two surfaces, one fact)
         expect(CONTROL_LABELS[11], accepted_containers(pol) == stage0_containers(),
                f"the declared containers {sorted(accepted_containers(pol))} disagree with "
-               f"{sorted(stage0_containers())} — the origin is pipeline/stage0_convert.py::SUPPORTED_EXTENSIONS")
+               f"{sorted(stage0_containers())} — the stage's declaration of record is "
+               f"config/pipeline_config.yaml#stage0.containers (D-3077)")
 
         # (12) the key is the DOOR's own key: the same function on both sides of the join, and no second one here
         door = sanitize_source_book("Seen Book").strip().lower()

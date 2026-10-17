@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1203 decisions (census stamp 4ce7e84958e62cc8, 2026-10-17) · 669 bugs (240 open / 429 closed; highest OPEN = BUG-902) · 59 open tasks (MUST 12 / SHOULD 43 / WORTH 4; OWNER-moved 1, pipeline-moved 58; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1204 decisions (census stamp 54afef95443eff6e, 2026-10-17) · 671 bugs (242 open / 429 closed; highest OPEN = BUG-906) · 59 open tasks (MUST 12 / SHOULD 43 / WORTH 4; OWNER-moved 1, pipeline-moved 58; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **79** of 1203 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 618 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1203, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **79** of 1204 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 619 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1204, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 240 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 35 · 🟨 MED 74 · 🟩 LOW 26 · UNLABELLED 101 (BUG-757) of 240 open.
+> Open BUGS by severity (population = the census's 242 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 35 · 🟨 MED 75 · 🟩 LOW 27 · UNLABELLED 101 (BUG-757) of 242 open.
 >
 > **OWNER LANE (1) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -17272,3 +17272,44 @@ failure classes did), so resuming cannot silently reuse a conversion the new cod
 REMAINING, AND THE NEXT TASK ON THIS FILE: a `failure_class` of `code_fingerprint_mismatch` (or similar) must be
 produced when the guard fires, so the receipt says "the code changed", and the applier can refuse the row WITHOUT
 quarantining a work whose bytes were never examined. Today the guard is a correct refusal reported as a wrong thing.
+
+### BUG-906 (LOW — OPEN 2026-10-17) — A READ-ONLY DELEGATE RUN CANNOT BE CLOSED AS `done`
+
+**Found while** closing the R5 review of D-3077 (`DJ-20261017T170759Z-88bc`). **Symptom:** the run completes,
+and neither closing form is accepted:
+
+- `end --id X --state done` → `REFUSED: state 'done' requires at least one --artifact: an act that leaves no trace did not happen (D-3036), and a run that wrote nothing records the word that says so`
+- `end --id X --state done --artifact none` → `REFUSED: the disk CONTRADICTS the claim: none absent — a claimed artifact that is not there is a NAMED fault (BUG-844)`
+
+**Consequence:** a review whose declared `--may-write` is `none` stays OPEN forever and is reported `OVERDUE` by
+`delegate_journal.py status`. MEASURED 2026-10-17: 2 open rows, 1 past budget — and the past-budget one is the
+PREVIOUS session's R5 review (`DJ-20261017T154522Z-c2c8`), which was closed the same wrong way.
+
+**Remedy applied (no code change):** name the RECEIPT as the artifact — it is the trace the run actually left.
+Both open rows were closed with `--artifact governance/evidence/R5_REVIEW_20261017_*.md`. The rule to write down
+for the next agent: **a read-only run's artifact is its receipt, and the parent writes it.**
+
+**Remedy owed:** either `--artifact none` is honoured as the declared word "this run wrote nothing" (which is what
+D-3036's wording implies), or `--may-write none` runs are exempt from the artifact requirement. One of the two, so
+the closing form matrix has no hole.
+
+### BUG-905 (MED — OPEN 2026-10-17) — THE KINDLE ENGINE EXISTS AND STILL CANNOT BE USED: A DECLARED KIND HAS NO KIND FOLDER
+
+**Found by** re-deriving the plan immediately after D-3077. **Symptom:** the plan's `.mobi` rows that used to fail
+as `refused_container_no_stage_reads_it` now fail as `refused_not_in_its_kind_folder` — 51 → 58. The engine is
+there; the PLACEMENT rule refuses first.
+
+**Cause.** `config/ingest_identity_gate.yaml#source_library.roots[books].kinds` declares six kinds
+`[epub, pdf, md, mobi, azw3, djvu]`, while the root's actual folders are `books/epub`, `books/pdf`, `books/md`
+(plus `books/*`). The placement rule requires a work to sit under ITS OWN kind folder at axis_depth 1, so a `.mobi`
+sitting in `books/epub/` — which is where all 13 of them sit — can never be admitted, whatever reader exists.
+
+**Measured 2026-10-17:** 13 `.mobi` + 1 `.azw3` in the library, ALL outside a kind folder of their own; 6 of the
+13 are in the plan's refusal set, the rest are deeper in the corpus already. The `.mobi` engine itself is proven
+on the owner's own files (inbox 36.7 MB → 576,244 B of markdown in 2.3 s; library `.azw3` → 555,685 B in 2.6 s).
+
+**Remedy (OWNER WORD, one act):** either (a) declare a `books/mobi` kind folder and move the 14 works into it, or
+(b) declare that a Kindle container may share the `epub` kind folder (i.e. "a work in two CONTAINERS is not drift",
+BUG-861, applied to the placement axis). (a) is a filesystem act with a clear blast radius; (b) is a declaration
+change that affects every future Kindle file. **Not done here:** both change what the owner's library LOOKS like,
+and neither is a conversion fix.

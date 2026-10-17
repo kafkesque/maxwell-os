@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**240 open** / 429 closed of 669 ids.
+**242 open** / 429 closed of 671 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -247,3 +247,5 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-900 | (MED — OPEN 2026-10-17) — A BOOK CAN PASS EVERY CONTAINER PROBE AND STILL BE UNCONVERTIBLE, AND THIS IS INVISIBLE TO `admit-alert` | 1 |
 | BUG-901 | (MED — OPEN 2026-10-17) — THE INGEST DOOR COUNTS A WORK'S OWN CONVERSION AS A DUPLICATE OF ITSELF | 2 |
 | BUG-902 | (MED — OPEN 2026-10-17) — THE ROUTE-GRAPH DEBT WAS OVER ITS SHRINK-ONLY CEILING BEFORE TODAY'S FINDINGS | 1 |
+| BUG-905 | (MED — OPEN 2026-10-17) — THE KINDLE ENGINE EXISTS AND STILL CANNOT BE USED: A DECLARED KIND HAS NO KIND FOLDER | 1 |
+| BUG-906 | (LOW — OPEN 2026-10-17) — A READ-ONLY DELEGATE RUN CANNOT BE CLOSED AS `done` | 1 |

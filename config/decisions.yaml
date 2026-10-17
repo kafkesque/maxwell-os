@@ -27716,3 +27716,52 @@ decisions:
     sitting: it changes what the plan admits, and the plan is mid-apply. R5 (generator != verifier) was satisfied by
     gemma-4-E4B-it-MLX-4bit at temperature 0.0, which returned NO DEFECTS FOUND and caught one real hole - a
     declared budget of 0, now refused at import. Receipt: governance/evidence/R5_REVIEW_20261017_stage0.md.
+
+- id: D-3077
+  state: ACTIVE
+  date: 2026-10-17
+  by: assistant
+  category: PIPELINE / STAGE-0 CONTAINER REGISTRY
+  supersedes: []
+  bugs: [BUG-905, BUG-906]
+  files: [config/pipeline_config.yaml, config/ingest_identity_gate.yaml, pipeline/pipeline_paths.py, pipeline/stage0_convert.py, pipeline/ingest_gate.py, pipeline/container_integrity.py, scripts/plan_admission.py]
+  decision: >-
+    A LIBRARY'S DECLARED KINDS MAY NOT EXCEED ITS STAGE'S DECLARED READERS. Which container Stage 0 can open was a
+    three-item literal in code — `{".epub", ".pdf", ".md"}` — while the door's own roots declared six kinds for the
+    books root (epub, pdf, md, mobi, azw3, djvu) and four for journals:notes (pdf, docx, md, txt). Everything else
+    was REFUSED with a reason that read like a book defect. The container axis is now DECLARED, one line per
+    container naming the READER that opens it (config/pipeline_config.yaml#stage0.containers: .md native_md, .epub
+    pandoc_epub, .pdf docling_pdf, .mobi/.azw/.azw3 kindleunpack_pandoc, .docx/.pptx/.rtf pandoc_*, .txt
+    native_text), and the code holds only the reader FUNCTIONS. Both directions are refused at import: a container
+    naming a reader that does not exist, and a reader no container names. An unsupported container is now a NAMED
+    failure (`unsupported_format`) instead of a printed "Unsupported format" skip, and the duplicate of the set that
+    lived in pipeline/ingest_gate.py — with an "origin:" comment and nothing that could check it — is deleted:
+    ingest_gate now reads the one declaration through the leaf module both sides already import.
+  rationale: >-
+    MEASURED 2026-10-17 on the live plan: 389 of 626 refusals were `refused_container_no_stage_reads_it` — works the
+    door says the library OWNS and the stage could not open. Of those, 157 were READABLE ON THIS MACHINE with no new
+    dependency at all: 99 .docx (pandoc, 0.5 s → 35,122 B, 10 headings), 5 .rtf (0.1 s), 4 .pptx (0.1 s), 4
+    .ppt/.doc (REFUSED: docling accepts the format and then fails on the real file, rc=0 with no output — so they
+    are NOT declared, because a row that can only fail would fail a stage whose max_failed_ratio is 0.0), 1 .djvu
+    (needs djvulibre, absent) and 1 .txt (no `plain` reader exists in pandoc 3.9, and the default reader ESCAPES the
+    text: the sample came back `-\> Under \$500`, so .txt is a native pass-through, not a pandoc call). The re-derived
+    plan went 437 → 536 rows, of which 99 are .docx that were previously invisible. MOBI — the owner's actual
+    question — has NO single-step reader that writes good markdown: pandoc has no MOBI reader at all, and the only
+    one-shot writer (calibre `ebook-convert --txt-output-formatting markdown`) performs the same reconstruction
+    behind a ~1 GB Qt stack. KindleUnpack IS that reconstruction and is pure Python; MEASURED on the owner's own
+    36.7 MB book: unpack 0.21 s → book.html (756,715 B) + 435 images, then pandoc 1.93 s → 576,244 B of markdown,
+    and on the library's .azw3: 2.59 s → 555,685 B. A .mobi therefore CONVERGES on the step an .epub already takes,
+    so two containers of one work are converted by one engine and there is no second output dialect to maintain.
+    A container that could be truncated now has a probe of its own (`mobi`: PalmDB `BOOKMOBI` magic at byte 60 AND
+    the LAST record offset landing inside the file — an O(1) completeness test), because the head of a truncated
+    Kindle file survives and only the tail does not: MEASURED whole 36.7 MB → readable, its first 5 MB → refused.
+    WHAT WAS REJECTED, AND WHY (D-3038): .png/.jpg/.jpeg/.gif/.psd/.ai/.indd/.idml/.aep/.jsx/.ttc/.zip/.rar (232
+    refusals) are ASSETS, not text works — the door's "a container the conversion stage cannot read" claims the
+    stage SHOULD read a PSD, and it should not; .xlsx/.xls/.numbers (41) are DATA, not prose, and are left to an
+    OWNER WORD rather than decided here, because pandoc CAN read them and the question is what the corpus is FOR.
+    ALSO MEASURED AND FIXED IN PASSING: the door's own conversion transition still declared "docling for pdf,
+    falling back to pandoc" — a fallback DELETED in BUG-896 — so a governance face was describing a code path that
+    no longer existed. R5 (generator != verifier) by gemma-4-E4B-it-MLX-4bit returned no defect and could not
+    confirm the temp-tree cleanup from a diff; the five questions were therefore re-answered by deterministic
+    controls and the one real gap (a leak inside `mobi.extract()` itself) is registered, not rounded up. Receipt:
+    governance/evidence/R5_REVIEW_20261017_D3077.md.

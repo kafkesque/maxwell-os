@@ -1,17 +1,31 @@
 {
   "act": "T-181 admission plan",
   "authority": "D-3051",
-  "generated": "2026-10-17T15:59:31Z",
+  "generated": "2026-10-17T17:07:17Z",
   "corpus_home": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books",
   "accepted_containers": [
+    ".azw",
+    ".azw3",
+    ".docx",
     ".epub",
     ".md",
-    ".pdf"
+    ".mobi",
+    ".pdf",
+    ".pptx",
+    ".rtf",
+    ".txt"
   ],
   "readability_probes": {
     ".epub": "zip",
     ".pdf": "pdf",
-    ".md": "none"
+    ".md": "none",
+    ".docx": "zip",
+    ".pptx": "zip",
+    ".mobi": "mobi",
+    ".azw": "mobi",
+    ".azw3": "mobi",
+    ".rtf": "none",
+    ".txt": "none"
   },
   "target_rule": "a plan row proposes corpus_home / (the source file's own path BELOW its declared kind folder), with the suffix the conversion stage writes (.md). A topic is never decided by an engine: the proposed path inherits the source's OWN arrangement and the owner may move a row's folder",
   "decisions_declared": {
@@ -19,7 +33,7 @@
     "seen_by_an_ingest_record": "a file only the S0.5 metadata cache names, because the corpus file now carries a different key (MEASURED 2026-10-16: the corpus itself was renamed under T-130). The pipeline READ the work, so it is SEEN and not a candidate - printed because a second voice saying 'seen' is not the same voice as the corpus saying it",
     "admit_candidate": "a file whose key neither the corpus nor an ingest record names, in a container the conversion stage accepts, inside its declared kind folder, under a root that declares a corpus home, carrying a name NO defect pattern matches: THE OWNER'S WORKLIST",
     "refused_no_declared_corpus_home": "its root declares admits_to: null, so NO declaration names a home its works are admitted to: the refusal names the missing declaration instead of inventing a destination (T-181 limb 2)",
-    "refused_container_no_stage_reads_it": "a container the conversion stage cannot read (declared kinds such as .mobi/.azw3/.djvu/.docx are OWNED but not convertible): admitting one needs an ENGINE, which is T-180's misplaced class and not this reader's act",
+    "refused_container_no_stage_reads_it": "a container the conversion stage cannot read (MEASURED 2026-10-17 after D-3077 the residue is .djvu/.doc/.ppt, the DESIGN AND IMAGE formats .png/.jpg/.psd/.ai/.indd/.idml and the archives): admitting one needs an ENGINE, which is T-180's misplaced class and not this reader's act",
     "refused_container_corrupt": "a container of an ACCEPTED kind whose own BYTES are not openable (a truncated download, a file renamed to a suffix it is not): the stage reads this kind, so the remedy is not an engine but a RE-DOWNLOAD of the work. It is its own class because it is its own remedy - folding it into the engine class would let one act answer for two blast radii (BUG-886, MEASURED 2026-10-17: 3 of 1,289 library containers read as ordinary candidates)",
     "refused_name_repair_first": "a name a declared defect pattern matches (marker/spine/truncation): an admitted file's name becomes the CORPUS NAME and the DOOR KEY, so admitting a defect materialises it into the tree the S0.5 cache then STAMPS. The repair rides FIRST - T-176, the owner's rename plan, whose eligible rows are exactly this class",
     "refused_not_in_its_kind_folder": "the file does not sit under its declared kind folder (the placement axis, axis_depth 1), so the path its corpus twin would take cannot be derived: the misplaced class T-180 owns",
@@ -28,9 +42,9 @@
   "roots": [
     {
       "id": "books",
-      "files": 2184,
-      "seen": 1741,
-      "never_seen": 443,
+      "files": 2180,
+      "seen": 1752,
+      "never_seen": 428,
       "admits_to": "corpus_home"
     },
     {
@@ -41,20 +55,20 @@
       "admits_to": "corpus_home"
     }
   ],
-  "files": 2814,
-  "seen": 1750,
-  "never_seen": 1064,
-  "seen_keys": 994,
-  "unseen_keys": 988,
+  "files": 2810,
+  "seen": 1761,
+  "never_seen": 1049,
+  "seen_keys": 1005,
+  "unseen_keys": 973,
   "counts": {
-    "already_in_the_corpus": 1723,
+    "already_in_the_corpus": 1734,
     "seen_by_an_ingest_record": 27,
-    "admit_candidate": 438,
+    "admit_candidate": 536,
     "refused_no_declared_corpus_home": 0,
-    "refused_container_no_stage_reads_it": 389,
-    "refused_container_corrupt": 5,
+    "refused_container_no_stage_reads_it": 273,
+    "refused_container_corrupt": 1,
     "refused_name_repair_first": 181,
-    "refused_not_in_its_kind_folder": 51,
+    "refused_not_in_its_kind_folder": 58,
     "refused_domain_not_a_corpus_domain": 0
   },
   "examples": {
@@ -63,17 +77,13 @@
     "admit_candidate": [],
     "refused_no_declared_corpus_home": [],
     "refused_container_no_stage_reads_it": [
-      "books/epub/DOMAIN 0 Systems + Decision/systems+complexity/The Systems Bible_ The Beginner_'s Guide to Systems Large and Small_John Gall_liber3.mobi",
-      "books/epub/DOMAIN 2 Design/design+systems/Laying the Foundations -- Andrew Couldwell -- 2019 -- 898b840e9d7b80bc2a4a7849418341a5 -- Anna\u2019s Archive.mobi",
-      "books/epub/DOMAIN 3 Art + Computational Media/Digital Art, Third edition (World of Art).azw3",
-      "books/epub/The Elements of Style [Illustrated] -- Strunk Jr_, William -- 2011 -- Seedbox Press, LLC -- 7b4f785e400d8b6294e26324ee067d0f -- Anna\u2019s Archive.mobi",
-      "books/pdf/DOMAIN 0 Systems + Decision/systems+complexity/SYSTEMANTICS. THE SYSTEMS BIBLE (John Gall) (z-library.sk, 1lib.sk, z-lib.sk).mobi"
+      "books/pdf/DOMAIN 2 Design/Semiology of Graphics Diagrams, Networks, Maps (Jacques Bertin) (z-library.sk, 1lib.sk, z-lib.sk).djvu",
+      "books/pdf/DOMAIN 3 Art + Computational Media/plein air KEYS.doc",
+      "journals_notes/DOMAIN 2 Design/design-notes/Chris Do- How to Stand OUT/Screenshot 2020-12-10 at 18.07.26.png",
+      "journals_notes/DOMAIN 2 Design/design-notes/Chris Do- How to Stand OUT/Screenshot 2020-12-11 at 23.25.22.png",
+      "journals_notes/DOMAIN 2 Design/design-notes/Chris Do- How to Stand OUT/Screenshot 2020-12-18 at 13.56.22.png"
     ],
     "refused_container_corrupt": [
-      "books/epub/DOMAIN 2 Design/practice+process/How to use graphic desi gn to sell things, explain things, make things ylib.org).epub",
-      "books/epub/DOMAIN 5 Personal Practice/mood+therapy/Happy Sexy Millionaire Unexpected Truths about Fulfillment, Love, and Success Steven Bartlett.epub",
-      "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Encylopedia of Freemasonry - Vols 1and2.pdf",
-      "books/pdf/DOMAIN 2 Design/visual+fundamentals/color choices: making color sense out of color theory.pdf",
       "journals_notes/DOMAIN 2 Design/design-notes/mo graph/Keylight_1.2_AE.pdf"
     ],
     "refused_name_repair_first": [
@@ -84,11 +94,11 @@
       "books/epub/DOMAIN 0 Systems + Decision/decision+strategy/The Innovator's Dilemma, with a New Foreword_ When New -- Clayton M_ Christensen, Marc Benioff -- Boston, Massachusetts, 2024 -- Harvard Business -- 9781647826765 -- a59e96922fa14713e58cd764a3e4195c -- Anna\u2019s Archive.epub"
     ],
     "refused_not_in_its_kind_folder": [
+      "books/epub/DOMAIN 0 Systems + Decision/systems+complexity/The Systems Bible_ The Beginner_'s Guide to Systems Large and Small_John Gall_liber3.mobi",
       "books/epub/DOMAIN 2 Design/communication+design/_Visual Metaphor Structure and Process (Gerard J.Steen) (z-library.sk, 1lib.sk, z-lib.sk).pdf",
-      "books/epub/DOMAIN 4 Business/practice+economics/100-Habits of Successful Freelance Designers Insider Secrets for Working Smart  Staying Creative (Steve Gordon) (z-library.sk, 1lib.sk, z-lib.sk).pdf",
-      "books/epub/DOMAIN 4 Business/practice+economics/365 Habits of Successful Graphic Designers Insider Secrets from Top Designers on Working Smart and Staying Creative (Laurel Saville, Joshua Berger etc.) (z-library.sk, 1lib.sk, z-lib.sk).pdf",
-      "books/pdf/DOMAIN 0 Systems + Decision/execution+operations/The Art of Strategy_ A Game Theorist_'s Guide to Success in Business and Life_Dixit, Avinash K.;Nalebuff Barry J_liber3.epub",
-      "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/AMARINGO, Pablo et al - Plant Spirit Shamanism Traditional Techniques for Healing the Soul-Destiny Books (2006).epub"
+      "books/epub/DOMAIN 2 Design/design+systems/Laying the Foundations -- Andrew Couldwell -- 2019 -- 898b840e9d7b80bc2a4a7849418341a5 -- Anna\u2019s Archive.mobi",
+      "books/epub/DOMAIN 3 Art + Computational Media/Digital Art, Third edition (World of Art).azw3",
+      "books/epub/DOMAIN 4 Business/practice+economics/100-Habits of Successful Freelance Designers Insider Secrets for Working Smart  Staying Creative (Steve Gordon) (z-library.sk, 1lib.sk, z-lib.sk).pdf"
     ],
     "refused_domain_not_a_corpus_domain": []
   },
@@ -120,7 +130,7 @@
     },
     {
       "rel": "books/epub/DOMAIN 0 Systems + Decision/systems+complexity/The Systems Bible_ The Beginner_'s Guide to Systems Large and Small_John Gall_liber3.mobi",
-      "decision": "refused_container_no_stage_reads_it",
+      "decision": "refused_not_in_its_kind_folder",
       "kind": "mobi"
     },
     {
@@ -150,15 +160,8 @@
     },
     {
       "rel": "books/epub/DOMAIN 2 Design/design+systems/Laying the Foundations -- Andrew Couldwell -- 2019 -- 898b840e9d7b80bc2a4a7849418341a5 -- Anna\u2019s Archive.mobi",
-      "decision": "refused_container_no_stage_reads_it",
+      "decision": "refused_not_in_its_kind_folder",
       "kind": "mobi"
-    },
-    {
-      "rel": "books/epub/DOMAIN 2 Design/practice+process/How to use graphic desi gn to sell things, explain things, make things ylib.org).epub",
-      "decision": "refused_container_corrupt",
-      "kind": "epub",
-      "defect": "truncated_zip_no_central_directory",
-      "remedy": "RE-DOWNLOAD the work \u2014 no local repair can invent the bytes that never arrived. A rebuild from the surviving local headers can recover text (measured: 641 headers, 321 text entries) but produces a file whose checksum matches no published edition, so it is a LAST resort and never an admission"
     },
     {
       "rel": "books/epub/DOMAIN 2 Design/visual+fundamentals/Advanced Typography From Knowledge to Mastery (Richard Hunt) (z-library.sk, 1lib.sk, z-lib.sk).epub",
@@ -167,7 +170,7 @@
     },
     {
       "rel": "books/epub/DOMAIN 3 Art + Computational Media/Digital Art, Third edition (World of Art).azw3",
-      "decision": "refused_container_no_stage_reads_it",
+      "decision": "refused_not_in_its_kind_folder",
       "kind": "azw3"
     },
     {
@@ -199,13 +202,6 @@
       "rel": "books/epub/DOMAIN 4 Business/strategy+brand/Blue Ocean Strategy and Beyond Disruption Collection (2 -- Kim, W_ Chan, Mauborgne, Rene\u0301e A_ -- 2024;2023 -- Harvard Business Review Press -- isbn13 9781647829674 -- dd8b809f7dbec9acf0bb1fa0b0d2cc2c -- Anna\u2019s Archive.epub",
       "decision": "refused_name_repair_first",
       "kind": "epub"
-    },
-    {
-      "rel": "books/epub/DOMAIN 5 Personal Practice/mood+therapy/Happy Sexy Millionaire Unexpected Truths about Fulfillment, Love, and Success Steven Bartlett.epub",
-      "decision": "refused_container_corrupt",
-      "kind": "epub",
-      "defect": "truncated_zip_no_central_directory",
-      "remedy": "RE-DOWNLOAD the work \u2014 no local repair can invent the bytes that never arrived. A rebuild from the surviving local headers can recover text (measured: 641 headers, 321 text entries) but produces a file whose checksum matches no published edition, so it is a LAST resort and never an admission"
     },
     {
       "rel": "books/epub/DOMAIN 6 AI + Computing/How to speak machine _ computational thinking for the rest -- Maeda, John -- Illustrated, 2021 -- Penguin Publishing Group;Portfolio;Penguin -- 9780241422144 -- ded07b41e64d28bc7a3c04e7faf6a2ae -- Anna\u2019s Archive.epub",
@@ -279,7 +275,7 @@
     },
     {
       "rel": "books/epub/The Elements of Style [Illustrated] -- Strunk Jr_, William -- 2011 -- Seedbox Press, LLC -- 7b4f785e400d8b6294e26324ee067d0f -- Anna\u2019s Archive.mobi",
-      "decision": "refused_container_no_stage_reads_it",
+      "decision": "refused_not_in_its_kind_folder",
       "kind": "mobi"
     },
     {
@@ -344,7 +340,7 @@
     },
     {
       "rel": "books/pdf/DOMAIN 0 Systems + Decision/systems+complexity/SYSTEMANTICS. THE SYSTEMS BIBLE (John Gall) (z-library.sk, 1lib.sk, z-lib.sk).mobi",
-      "decision": "refused_container_no_stage_reads_it",
+      "decision": "refused_not_in_its_kind_folder",
       "kind": "mobi"
     },
     {
@@ -376,13 +372,6 @@
       "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Daniel Pinchbeck - Breaking Open the Head_ A Psychedelic Journey into the Heart of Contemporary Shamanism (2003) - libgen.li.pdf",
       "decision": "refused_name_repair_first",
       "kind": "pdf"
-    },
-    {
-      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Encylopedia of Freemasonry - Vols 1and2.pdf",
-      "decision": "refused_container_corrupt",
-      "kind": "pdf",
-      "defect": "truncated_pdf_no_trailer",
-      "remedy": "RE-DOWNLOAD the work. Do NOT rebuild the xref locally: a repaired file that silently loses pages is worse than an absent one, and nothing in this pipeline can tell them apart afterwards"
     },
     {
       "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Gordon White - The Chaos Protocols Magical Techniques for Navigating the New Economic Reality (2016, Llewellyn Publications) - libgen.li.epub",
@@ -1035,13 +1024,6 @@
       "kind": "pdf"
     },
     {
-      "rel": "books/pdf/DOMAIN 2 Design/visual+fundamentals/color choices: making color sense out of color theory.pdf",
-      "decision": "refused_container_corrupt",
-      "kind": "pdf",
-      "defect": "null_bytes",
-      "remedy": "RE-DOWNLOAD, then verify the new copy opens BEFORE it is proposed again (the plan re-probes every candidate, so a good copy clears itself)"
-    },
-    {
       "rel": "books/pdf/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Art Vs_ TV _ A Brief History of Contemporary Artists' -- Francesco Spampinato -- Bloomsbury USA, New York, NY, 2022 -- Bloomsbury Publishing Inc -- 9781501370533 -- 0a74dbfacec12a3292639eb9912eb3e9 -- Anna\u2019s Archive.pdf",
       "decision": "refused_name_repair_first",
       "kind": "pdf"
@@ -1173,7 +1155,7 @@
     },
     {
       "rel": "books/pdf/DOMAIN 4 Business/practice+economics/Pricing Design_Dan Mall_liber3.mobi",
-      "decision": "refused_container_no_stage_reads_it",
+      "decision": "refused_not_in_its_kind_folder",
       "kind": "mobi"
     },
     {
@@ -1228,7 +1210,7 @@
     },
     {
       "rel": "books/pdf/DOMAIN 5 Personal Practice/productivity+execution/How to DeFi by CoinGecko Lau, Darren Lau, Daryl Teh, Sze Jin Kho, Kristian Azmi, Erina Lee, TM Ong, Bobby (z-lib.org).mobi",
-      "decision": "refused_container_no_stage_reads_it",
+      "decision": "refused_not_in_its_kind_folder",
       "kind": "mobi"
     },
     {
@@ -1307,11 +1289,6 @@
       "kind": "pdf"
     },
     {
-      "rel": "journals_notes/DOMAIN 2 Design/IdentityLectureNotes.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
       "rel": "journals_notes/DOMAIN 2 Design/Typography/kinetic typography/Communicating emotion with.pdf",
       "decision": "refused_name_repair_first",
       "kind": "pdf"
@@ -1330,56 +1307,6 @@
       "rel": "journals_notes/DOMAIN 2 Design/Typography/typographical signification/5d1f30e1581e502aea3a8d514fa425370ec8.pdf",
       "decision": "refused_name_repair_first",
       "kind": "pdf"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 2 Design/branding/Blockchain Branding.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 2 Design/branding/Brand Identity design Process.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 2 Design/branding/Brand Strategy Made Simple - Workbook.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 2 Design/branding/Brand Strategy.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 2 Design/branding/Brand nameing.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 2 Design/branding/Brand positioning.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 2 Design/branding/Brand visual design strategy.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 2 Design/branding/Branding Workflow.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 2 Design/branding/Customer goals.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 2 Design/branding/The-Branding-Brief-Canny.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
     },
     {
       "rel": "journals_notes/DOMAIN 2 Design/design-notes/Chris Do- How to Stand OUT/Screenshot 2020-12-10 at 18.07.26.png",
@@ -1472,16 +1399,6 @@
       "kind": "png"
     },
     {
-      "rel": "journals_notes/DOMAIN 2 Design/design-notes/Folder structure/GYST by Erica Gorochow/*GYST_README!.rtf",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "rtf"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 2 Design/design-notes/Folder structure/GYST by Harry Frank/*GYST_README!.rtf",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "rtf"
-    },
-    {
       "rel": "journals_notes/DOMAIN 2 Design/design-notes/Folder structure/GYST by Harry Frank/2_Projects/AEP/AE_TEMPLATE (converted) 1.aep",
       "decision": "refused_container_no_stage_reads_it",
       "kind": "aep"
@@ -1500,16 +1417,6 @@
       "rel": "journals_notes/DOMAIN 2 Design/design-notes/Folder structure/GYST by Harry Frank/2_Projects/AEP/GYST_FolderGen_HF_V01.jsx",
       "decision": "refused_container_no_stage_reads_it",
       "kind": "jsx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 2 Design/design-notes/Folder structure/GYST by Hasraf Dulull/*GYST_README!.rtf",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "rtf"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 2 Design/design-notes/Folder structure/GYST by Jonathan Winbush/*GYST_README!.rtf",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "rtf"
     },
     {
       "rel": "journals_notes/DOMAIN 2 Design/design-notes/Folder structure/GYST by Jonathan Winbush/AE/GYST_FolderGen_JW_V01 1.jsx",
@@ -1580,11 +1487,6 @@
       "rel": "journals_notes/DOMAIN 2 Design/design-notes/Folder structure/GYST by Jonathan Winbush/STYLEFRAMES/Templates.indd",
       "decision": "refused_container_no_stage_reads_it",
       "kind": "indd"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 2 Design/design-notes/Folder structure/XXX_PROJECT_TITLE_000000/*GYST_README!.rtf",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "rtf"
     },
     {
       "rel": "journals_notes/DOMAIN 2 Design/design-notes/branding/case studies/1*SRYPdNSkCSQU5yRuFnhqag.gif",
@@ -1837,201 +1739,6 @@
       "kind": "png"
     },
     {
-      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/Conceptual thinking/CREATIVE THINKING.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/Conceptual thinking/Design for motion.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/Conceptual thinking/Ellen Lupton.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/Conceptual thinking/Workflow tips for typography.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/Ideation/Ideation tipps.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/Ideation/Tackle design challenges.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/Ideation/Tactics.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/The-Design-Brief-Canny.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/Types of kinetic actions in terms of figure of speech.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/mograph/Design for motion techical.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/mograph/Parallax/PARALLAX.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/01. Design Thinking for Visual Design workflow.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Content strategy & information architecture.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Creative Brief.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Design System.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Design System1.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Design Thinking for Visual Design workflow.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Moodboard structure.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Styleboard.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Techniques paper/Figma/FIGMA short cuts.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Techniques paper/Figma/Figma Instructions.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Techniques paper/Figma tipps.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Techniques paper/Photoshop.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Techniques paper/Printing techniques.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/02. Hierarchy & Structure.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Color.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/DARK UI.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Developing guidelines.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Elements.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Grid:layout.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Grids.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Hierarchy & Structure.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Imagery.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Onboarding.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Style.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Typography UI.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/UI design workflow.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/UI workflow.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Visual design tips.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
       "rel": "journals_notes/DOMAIN 2 Design/design-notes/illustrator/Screenshot 2020-10-21 at 20.11.03.png",
       "decision": "refused_container_no_stage_reads_it",
       "kind": "png"
@@ -2047,11 +1754,6 @@
       "kind": "pdf",
       "defect": "apple_bookmark",
       "remedy": "CHECK THE POINTER FIRST: `ls` the target path the alias records (it is plain text inside the file). If it RESOLVES, copy the real file in beside the alias - nothing needs downloading. If it DANGLES the work is not on this machine: re-obtain it or acknowledge the alias as dead (the plan re-probes every candidate, so a good copy clears itself and a dead alias simply stays refused)"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 3 Art + Computational Media/narrative/digital_storytelling_synthesis_19th_november_2009.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
     },
     {
       "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/People/Cap Table/Cap-Table-Template 1.xlsx",
@@ -2814,11 +2516,6 @@
       "kind": "xlsx"
     },
     {
-      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Financial/Start-Up-Programme-Finance-Workbook-January-2013.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
       "rel": "journals_notes/DOMAIN 4 Business/business-notes/Financial/cashflow-forecast-template.xls",
       "decision": "refused_container_no_stage_reads_it",
       "kind": "xls"
@@ -2854,221 +2551,6 @@
       "kind": "zip"
     },
     {
-      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Billing.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Creative brief.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/First time with client meeting.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Frameworks/Scoping:estimating framework.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Freelancing/Creative brief.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Freelancing/Design Proposal.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Freelancing/FIRST MEETING.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Freelancing/FREELANCING.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Freelancing/First time with client meeting.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Freelancing/Freelance traits.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Freelancing/Q&A client.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Freelancing.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/GOALS.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/How to become more valuable.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Ikigai.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Invoice.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Legal/Term Contract tipps.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Legal/terms.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/MAKING and breaking the grid.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Market research.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Marketing/1st Clients.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Marketing/Content Marketing ideas.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Marketing/DIGITAL MARKETING theoretical.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Marketing/Email Marketing.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Marketing/Marketing.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Meaningful member expereience business modell.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Mission & vision statement.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Price negotiation/Price negotiations.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Pricing/Pricing strategy.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Pricing/Project specific price factoring.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Proposal.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Questions business.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/RISK management.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Strategic Tools.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/The-RFP-_-RFQ-Template-Canny.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/The-Rebranding-Brief-Canny.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Value Proposition.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/BP 2017-18 Tri 2_Off_The_Beaten_Track.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/Business Plan Marking Sheet and Structure.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/Business plan blueprint.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/IC-Startup-Business-Plan-Template-9026_WORD.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/Koan21 business plan.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/SCORE-Deluxe-Startup-Business-Plan-Template_2.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
       "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/Sample Business Plan - Wooden Grain Toy Company(1).doc",
       "decision": "refused_container_no_stage_reads_it",
       "kind": "doc"
@@ -3089,21 +2571,6 @@
       "kind": "doc"
     },
     {
-      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/Starting a new business/Business Plan Marking Sheet and Structure.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/funds/The_Start_Up_Loans_Company_Business_Plan_template_Nov-2020-002_CE-version.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/market research2.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
       "rel": "journals_notes/DOMAIN 4 Business/business-notes/pdf/Templates/legal file/Transfer of Copyright/The Logo Smith Transfer of Copyright.idml",
       "decision": "refused_container_no_stage_reads_it",
       "kind": "idml"
@@ -3119,29 +2586,9 @@
       "kind": "idlk"
     },
     {
-      "rel": "journals_notes/DOMAIN 4 Business/business-notes/ppt/Starting a new business/BMC Template - powerpoint 1.pptx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "pptx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 4 Business/business-notes/ppt/Starting a new business/BMC Template - powerpoint.pptx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "pptx"
-    },
-    {
       "rel": "journals_notes/DOMAIN 4 Business/business-notes/ppt/Starting a new business/Week 2 Introductions and Finding Your Idea-20210116.zip",
       "decision": "refused_container_no_stage_reads_it",
       "kind": "zip"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 4 Business/business-notes/ppt/Starting a new business/Week 5 BMC (2).pptx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "pptx"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 4 Business/business-notes/ppt/Starting a new business/Week 8.pptx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "pptx"
     },
     {
       "rel": "journals_notes/DOMAIN 4 Business/business-notes/ppt/Starting a new business/Week 9.ppt",
@@ -3219,16 +2666,6 @@
       "kind": ""
     },
     {
-      "rel": "journals_notes/DOMAIN 5 Personal Practice/hustle/Refund Bible 2023\ud83e\uddd1\ud83c\udffd\u200d\ud83d\udcbb/Nike Refund Sauce/Best Nike Refund Method 2023.txt",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "txt"
-    },
-    {
-      "rel": "journals_notes/DOMAIN 5 Personal Practice/hustle/Refund Bible 2023\ud83e\uddd1\ud83c\udffd\u200d\ud83d\udcbb/StockX Refund Method \ud83d\udc56/Stockx Method 2022.docx",
-      "decision": "refused_container_no_stage_reads_it",
-      "kind": "docx"
-    },
-    {
       "rel": "journals_notes/DOMAIN 5 Personal Practice/hustle/Refund Bible 2023\ud83e\uddd1\ud83c\udffd\u200d\ud83d\udcbb/Walmart Refund Sauce \ud83d\udcb2/\ud83c\udd7f",
       "decision": "refused_container_no_stage_reads_it",
       "kind": ""
@@ -3236,15 +2673,6 @@
   ],
   "worklist_in_full": 40,
   "rows": [
-    {
-      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/epub/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Generating Sound & Organizing Time (Wakefield; Taylor).epub",
-      "rel": "books/epub/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Generating Sound & Organizing Time (Wakefield; Taylor).epub",
-      "root": "books",
-      "kind": "epub",
-      "key": "generating sound & organizing time (wakefield; taylor",
-      "bytes": 28877442,
-      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Generating Sound & Organizing Time (Wakefield; Taylor).md"
-    },
     {
       "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/epub/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Generating Sound & Organizing Time Graham Wakefield & Gregory Taylor liber3.epub",
       "rel": "books/epub/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Generating Sound & Organizing Time Graham Wakefield & Gregory Taylor liber3.epub",
@@ -3264,42 +2692,6 @@
       "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 5 Personal Practice/productivity+execution/HBR Management Tips Collection (2 Books) Harvard Business Review liber3.md"
     },
     {
-      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/FULLTEXT01.pdf",
-      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/FULLTEXT01.pdf",
-      "root": "books",
-      "kind": "pdf",
-      "key": "fulltext01",
-      "bytes": 610029,
-      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/FULLTEXT01.md"
-    },
-    {
-      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/Wim Wenders - The Logic of Images.pdf",
-      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/Wim Wenders - The Logic of Images.pdf",
-      "root": "books",
-      "kind": "pdf",
-      "key": "wim wenders - the logic of images",
-      "bytes": 13683887,
-      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/Wim Wenders - The Logic of Images.md"
-    },
-    {
-      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/114819898-Robert-Fludd-Hermetic-Philosopher1.pdf",
-      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/114819898-Robert-Fludd-Hermetic-Philosopher1.pdf",
-      "root": "books",
-      "kind": "pdf",
-      "key": "114819898-robert-fludd-hermetic-philosopher1",
-      "bytes": 4919223,
-      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/114819898-Robert-Fludd-Hermetic-Philosopher1.md"
-    },
-    {
-      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/2011_0001_545_04_Magyarito_szotar.pdf",
-      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/2011_0001_545_04_Magyarito_szotar.pdf",
-      "root": "books",
-      "kind": "pdf",
-      "key": "2011_0001_545_04_magyarito_szotar",
-      "bytes": 3242134,
-      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/2011_0001_545_04_Magyarito_szotar.md"
-    },
-    {
       "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/53481411-De-Re-Metallica-1556-Agricola.pdf",
       "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/53481411-De-Re-Metallica-1556-Agricola.pdf",
       "root": "books",
@@ -3307,51 +2699,6 @@
       "key": "53481411-de-re-metallica-1556-agricola",
       "bytes": 99065265,
       "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/53481411-De-Re-Metallica-1556-Agricola.md"
-    },
-    {
-      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Beginning_Luciferian_Magick.pdf",
-      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Beginning_Luciferian_Magick.pdf",
-      "root": "books",
-      "kind": "pdf",
-      "key": "beginning_luciferian_magick",
-      "bytes": 5769321,
-      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Beginning_Luciferian_Magick.md"
-    },
-    {
-      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Cagliostro's Secret Ritual Of Egyptian Rite Freemasonry.pdf",
-      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Cagliostro's Secret Ritual Of Egyptian Rite Freemasonry.pdf",
-      "root": "books",
-      "kind": "pdf",
-      "key": "cagliostro's secret ritual of egyptian rite freemasonry",
-      "bytes": 129078,
-      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Cagliostro's Secret Ritual Of Egyptian Rite Freemasonry.md"
-    },
-    {
-      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Celtic-Mythology-And-Religion.pdf",
-      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Celtic-Mythology-And-Religion.pdf",
-      "root": "books",
-      "kind": "pdf",
-      "key": "celtic-mythology-and-religion",
-      "bytes": 1739357,
-      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Celtic-Mythology-And-Religion.md"
-    },
-    {
-      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Christopher Penczak - The Temple of Shamanic Witchcraft.pdf",
-      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Christopher Penczak - The Temple of Shamanic Witchcraft.pdf",
-      "root": "books",
-      "kind": "pdf",
-      "key": "christopher penczak - the temple of shamanic witchcraft",
-      "bytes": 5604853,
-      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Christopher Penczak - The Temple of Shamanic Witchcraft.md"
-    },
-    {
-      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Codex Seraphinianus (Luigi Serafini) (Z-Library).pdf",
-      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Codex Seraphinianus (Luigi Serafini) (Z-Library).pdf",
-      "root": "books",
-      "kind": "pdf",
-      "key": "codex seraphinianus (luigi serafini",
-      "bytes": 336261176,
-      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Codex Seraphinianus (Luigi Serafini) (Z-Library).md"
     },
     {
       "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Coelum Philosophorum.pdf",
@@ -3865,15 +3212,6 @@
       "key": "the_history_book_-_big_ideas_simply_explained_by_dk",
       "bytes": 51718699,
       "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The_History_Book_-_Big_Ideas_Simply_Explained_By_DK.md"
-    },
-    {
-      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Thinking Visually_Stephen K. Reed_liber3.pdf",
-      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Thinking Visually_Stephen K. Reed_liber3.pdf",
-      "root": "books",
-      "kind": "pdf",
-      "key": "thinking visually_stephen k. reed_liber3",
-      "bytes": 23177116,
-      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Thinking Visually_Stephen K. Reed_liber3.md"
     },
     {
       "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/ToV - Bloodlines.pdf",
@@ -5172,6 +4510,15 @@
       "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/Handbook_Of_Interior_Lighting_Design_by_Ru\u0308diger_Ganslandt,_Harald.md"
     },
     {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 2 Design/IdentityLectureNotes.docx",
+      "rel": "journals_notes/DOMAIN 2 Design/IdentityLectureNotes.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "identitylecturenotes",
+      "bytes": 67716,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/IdentityLectureNotes.md"
+    },
+    {
       "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 2 Design/Interactive_documentary_and_live_perform.pdf",
       "rel": "journals_notes/DOMAIN 2 Design/Interactive_documentary_and_live_perform.pdf",
       "root": "journals_notes",
@@ -5451,6 +4798,96 @@
       "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/Typography/typographical signification/Towards_a_Typology_of_Typographic_Signif.md"
     },
     {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 2 Design/branding/Blockchain Branding.docx",
+      "rel": "journals_notes/DOMAIN 2 Design/branding/Blockchain Branding.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "blockchain branding",
+      "bytes": 14820,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/branding/Blockchain Branding.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 2 Design/branding/Brand Identity design Process.docx",
+      "rel": "journals_notes/DOMAIN 2 Design/branding/Brand Identity design Process.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "brand identity design process",
+      "bytes": 17539,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/branding/Brand Identity design Process.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 2 Design/branding/Brand Strategy Made Simple - Workbook.docx",
+      "rel": "journals_notes/DOMAIN 2 Design/branding/Brand Strategy Made Simple - Workbook.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "brand strategy made simple - workbook",
+      "bytes": 82458,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/branding/Brand Strategy Made Simple - Workbook.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 2 Design/branding/Brand Strategy.docx",
+      "rel": "journals_notes/DOMAIN 2 Design/branding/Brand Strategy.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "brand strategy",
+      "bytes": 26937,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/branding/Brand Strategy.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 2 Design/branding/Brand nameing.docx",
+      "rel": "journals_notes/DOMAIN 2 Design/branding/Brand nameing.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "brand nameing",
+      "bytes": 23260,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/branding/Brand nameing.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 2 Design/branding/Brand positioning.docx",
+      "rel": "journals_notes/DOMAIN 2 Design/branding/Brand positioning.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "brand positioning",
+      "bytes": 20894,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/branding/Brand positioning.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 2 Design/branding/Brand visual design strategy.docx",
+      "rel": "journals_notes/DOMAIN 2 Design/branding/Brand visual design strategy.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "brand visual design strategy",
+      "bytes": 12410,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/branding/Brand visual design strategy.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 2 Design/branding/Branding Workflow.docx",
+      "rel": "journals_notes/DOMAIN 2 Design/branding/Branding Workflow.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "branding workflow",
+      "bytes": 1125834,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/branding/Branding Workflow.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 2 Design/branding/Customer goals.docx",
+      "rel": "journals_notes/DOMAIN 2 Design/branding/Customer goals.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "customer goals",
+      "bytes": 16062,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/branding/Customer goals.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 2 Design/branding/The-Branding-Brief-Canny.docx",
+      "rel": "journals_notes/DOMAIN 2 Design/branding/The-Branding-Brief-Canny.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "the-branding-brief-canny",
+      "bytes": 104419,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/branding/The-Branding-Brief-Canny.md"
+    },
+    {
       "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 2 Design/branding/logo-file-formats.pdf",
       "rel": "journals_notes/DOMAIN 2 Design/branding/logo-file-formats.pdf",
       "root": "journals_notes",
@@ -5476,6 +4913,51 @@
       "key": "commandments of visual thinking by dan roam",
       "bytes": 869099,
       "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/design-notes/Commandments Of Visual Thinking by Dan Roam.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 2 Design/design-notes/Folder structure/GYST by Erica Gorochow/*GYST_README!.rtf",
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/Folder structure/GYST by Erica Gorochow/*GYST_README!.rtf",
+      "root": "journals_notes",
+      "kind": "rtf",
+      "key": "*gyst_readme!",
+      "bytes": 831,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/design-notes/Folder structure/GYST by Erica Gorochow/*GYST_README!.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 2 Design/design-notes/Folder structure/GYST by Harry Frank/*GYST_README!.rtf",
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/Folder structure/GYST by Harry Frank/*GYST_README!.rtf",
+      "root": "journals_notes",
+      "kind": "rtf",
+      "key": "*gyst_readme!",
+      "bytes": 831,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/design-notes/Folder structure/GYST by Harry Frank/*GYST_README!.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 2 Design/design-notes/Folder structure/GYST by Hasraf Dulull/*GYST_README!.rtf",
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/Folder structure/GYST by Hasraf Dulull/*GYST_README!.rtf",
+      "root": "journals_notes",
+      "kind": "rtf",
+      "key": "*gyst_readme!",
+      "bytes": 831,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/design-notes/Folder structure/GYST by Hasraf Dulull/*GYST_README!.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 2 Design/design-notes/Folder structure/GYST by Jonathan Winbush/*GYST_README!.rtf",
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/Folder structure/GYST by Jonathan Winbush/*GYST_README!.rtf",
+      "root": "journals_notes",
+      "kind": "rtf",
+      "key": "*gyst_readme!",
+      "bytes": 831,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/design-notes/Folder structure/GYST by Jonathan Winbush/*GYST_README!.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 2 Design/design-notes/Folder structure/XXX_PROJECT_TITLE_000000/*GYST_README!.rtf",
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/Folder structure/XXX_PROJECT_TITLE_000000/*GYST_README!.rtf",
+      "root": "journals_notes",
+      "kind": "rtf",
+      "key": "*gyst_readme!",
+      "bytes": 831,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/design-notes/Folder structure/XXX_PROJECT_TITLE_000000/*GYST_README!.md"
     },
     {
       "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 2 Design/design-notes/Folder structure/[My Business] Folder/Read Me - Business Folder.pdf",
@@ -5505,6 +4987,114 @@
       "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/design-notes/creative focus worksheet.md"
     },
     {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 2 Design/design-notes/docs/Conceptual thinking/CREATIVE THINKING.docx",
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/Conceptual thinking/CREATIVE THINKING.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "creative thinking",
+      "bytes": 18738,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/design-notes/docs/Conceptual thinking/CREATIVE THINKING.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 2 Design/design-notes/docs/Conceptual thinking/Design for motion.docx",
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/Conceptual thinking/Design for motion.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "design for motion",
+      "bytes": 24943,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/design-notes/docs/Conceptual thinking/Design for motion.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 2 Design/design-notes/docs/Conceptual thinking/Ellen Lupton.docx",
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/Conceptual thinking/Ellen Lupton.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "ellen lupton",
+      "bytes": 34078,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/design-notes/docs/Conceptual thinking/Ellen Lupton.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 2 Design/design-notes/docs/Conceptual thinking/Workflow tips for typography.docx",
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/Conceptual thinking/Workflow tips for typography.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "workflow tips for typography",
+      "bytes": 17660,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/design-notes/docs/Conceptual thinking/Workflow tips for typography.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 2 Design/design-notes/docs/Ideation/Ideation tipps.docx",
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/Ideation/Ideation tipps.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "ideation tipps",
+      "bytes": 14558,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/design-notes/docs/Ideation/Ideation tipps.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 2 Design/design-notes/docs/Ideation/Tackle design challenges.docx",
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/Ideation/Tackle design challenges.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "tackle design challenges",
+      "bytes": 15695,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/design-notes/docs/Ideation/Tackle design challenges.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 2 Design/design-notes/docs/Ideation/Tactics.docx",
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/Ideation/Tactics.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "tactics",
+      "bytes": 22856,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/design-notes/docs/Ideation/Tactics.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 2 Design/design-notes/docs/The-Design-Brief-Canny.docx",
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/The-Design-Brief-Canny.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "the-design-brief-canny",
+      "bytes": 94669,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/design-notes/docs/The-Design-Brief-Canny.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 2 Design/design-notes/docs/Types of kinetic actions in terms of figure of speech.docx",
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/Types of kinetic actions in terms of figure of speech.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "types of kinetic actions in terms of figure of speech",
+      "bytes": 14209,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/design-notes/docs/Types of kinetic actions in terms of figure of speech.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 2 Design/design-notes/docs/mograph/Design for motion techical.docx",
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/mograph/Design for motion techical.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "design for motion techical",
+      "bytes": 25143,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/design-notes/docs/mograph/Design for motion techical.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 2 Design/design-notes/docs/mograph/Parallax/PARALLAX.docx",
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/mograph/Parallax/PARALLAX.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "parallax",
+      "bytes": 18404,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/design-notes/docs/mograph/Parallax/PARALLAX.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 2 Design/design-notes/docs/ui:ux/01. Design Thinking for Visual Design workflow.docx",
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/01. Design Thinking for Visual Design workflow.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "01. design thinking for visual design workflow",
+      "bytes": 24421,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/design-notes/docs/ui:ux/01. Design Thinking for Visual Design workflow.md"
+    },
+    {
       "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Conducting-an-Interview-with-Empathy.pdf",
       "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Conducting-an-Interview-with-Empathy.pdf",
       "root": "journals_notes",
@@ -5512,6 +5102,249 @@
       "key": "conducting-an-interview-with-empathy",
       "bytes": 147715,
       "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/design-notes/docs/ui:ux/Conducting-an-Interview-with-Empathy.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Content strategy & information architecture.docx",
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Content strategy & information architecture.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "content strategy & information architecture",
+      "bytes": 4480657,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/design-notes/docs/ui:ux/Content strategy & information architecture.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Creative Brief.docx",
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Creative Brief.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "creative brief",
+      "bytes": 15187,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/design-notes/docs/ui:ux/Creative Brief.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Design System.docx",
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Design System.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "design system",
+      "bytes": 505768,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/design-notes/docs/ui:ux/Design System.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Design System1.docx",
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Design System1.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "design system1",
+      "bytes": 609165,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/design-notes/docs/ui:ux/Design System1.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Design Thinking for Visual Design workflow.docx",
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Design Thinking for Visual Design workflow.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "design thinking for visual design workflow",
+      "bytes": 23227,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/design-notes/docs/ui:ux/Design Thinking for Visual Design workflow.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Moodboard structure.docx",
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Moodboard structure.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "moodboard structure",
+      "bytes": 15954,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/design-notes/docs/ui:ux/Moodboard structure.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Styleboard.docx",
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Styleboard.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "styleboard",
+      "bytes": 14765,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/design-notes/docs/ui:ux/Styleboard.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Techniques paper/Figma/FIGMA short cuts.docx",
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Techniques paper/Figma/FIGMA short cuts.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "figma short cuts",
+      "bytes": 14861,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/design-notes/docs/ui:ux/Techniques paper/Figma/FIGMA short cuts.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Techniques paper/Figma/Figma Instructions.docx",
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Techniques paper/Figma/Figma Instructions.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "figma instructions",
+      "bytes": 14364,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/design-notes/docs/ui:ux/Techniques paper/Figma/Figma Instructions.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Techniques paper/Figma tipps.docx",
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Techniques paper/Figma tipps.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "figma tipps",
+      "bytes": 30558,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/design-notes/docs/ui:ux/Techniques paper/Figma tipps.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Techniques paper/Photoshop.docx",
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Techniques paper/Photoshop.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "photoshop",
+      "bytes": 12204,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/design-notes/docs/ui:ux/Techniques paper/Photoshop.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Techniques paper/Printing techniques.docx",
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Techniques paper/Printing techniques.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "printing techniques",
+      "bytes": 17792,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/design-notes/docs/ui:ux/Techniques paper/Printing techniques.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/02. Hierarchy & Structure.docx",
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/02. Hierarchy & Structure.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "02. hierarchy & structure",
+      "bytes": 20502,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/02. Hierarchy & Structure.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Color.docx",
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Color.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "color",
+      "bytes": 695022,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Color.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/DARK UI.docx",
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/DARK UI.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "dark ui",
+      "bytes": 651597,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/DARK UI.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Developing guidelines.docx",
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Developing guidelines.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "developing guidelines",
+      "bytes": 13420,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Developing guidelines.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Elements.docx",
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Elements.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "elements",
+      "bytes": 773891,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Elements.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Grid:layout.docx",
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Grid:layout.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "grid:layout",
+      "bytes": 328991,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Grid:layout.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Grids.docx",
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Grids.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "grids",
+      "bytes": 14246,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Grids.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Hierarchy & Structure.docx",
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Hierarchy & Structure.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "hierarchy & structure",
+      "bytes": 14697,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Hierarchy & Structure.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Imagery.docx",
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Imagery.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "imagery",
+      "bytes": 2112942,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Imagery.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Onboarding.docx",
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Onboarding.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "onboarding",
+      "bytes": 15918,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Onboarding.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Style.docx",
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Style.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "style",
+      "bytes": 26019,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Style.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Typography UI.docx",
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Typography UI.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "typography ui",
+      "bytes": 131874,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Typography UI.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 2 Design/design-notes/docs/ui:ux/UI design workflow.docx",
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/UI design workflow.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "ui design workflow",
+      "bytes": 203362,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/design-notes/docs/ui:ux/UI design workflow.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 2 Design/design-notes/docs/ui:ux/UI workflow.docx",
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/UI workflow.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "ui workflow",
+      "bytes": 27778,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/design-notes/docs/ui:ux/UI workflow.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Visual design tips.docx",
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Visual design tips.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "visual design tips",
+      "bytes": 15042,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 2 Design/design-notes/docs/ui:ux/Visual design tips.md"
     },
     {
       "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 2 Design/design-notes/pdf/5-accessibility-mistakes.pdf",
@@ -5755,6 +5588,15 @@
       "key": "interactive_documentary_and_live_perform",
       "bytes": 250502,
       "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 3 Art + Computational Media/Interactive_documentary_and_live_perform.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 3 Art + Computational Media/narrative/digital_storytelling_synthesis_19th_november_2009.docx",
+      "rel": "journals_notes/DOMAIN 3 Art + Computational Media/narrative/digital_storytelling_synthesis_19th_november_2009.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "digital_storytelling_synthesis_19th_november_2009",
+      "bytes": 445392,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 3 Art + Computational Media/narrative/digital_storytelling_synthesis_19th_november_2009.md"
     },
     {
       "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 4 Business/Blunt House TA.pdf",
@@ -6549,6 +6391,15 @@
       "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/business-notes/Educational Material/hub/Creative_Hub_Leaders_Toolkit.md"
     },
     {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 4 Business/business-notes/Financial/Start-Up-Programme-Finance-Workbook-January-2013.docx",
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Financial/Start-Up-Programme-Finance-Workbook-January-2013.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "start-up-programme-finance-workbook-january-2013",
+      "bytes": 606201,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/business-notes/Financial/Start-Up-Programme-Finance-Workbook-January-2013.md"
+    },
+    {
       "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 4 Business/business-notes/Financial/Start-Up-Programme-Finance-Workbook-January-2013.md",
       "rel": "journals_notes/DOMAIN 4 Business/business-notes/Financial/Start-Up-Programme-Finance-Workbook-January-2013.md",
       "root": "journals_notes",
@@ -6565,6 +6416,420 @@
       "key": "document",
       "bytes": 421674,
       "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/business-notes/bootstrap/financial planning/document.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 4 Business/business-notes/docs/Billing.docx",
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Billing.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "billing",
+      "bytes": 14140,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/business-notes/docs/Billing.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 4 Business/business-notes/docs/Creative brief.docx",
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Creative brief.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "creative brief",
+      "bytes": 22689,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/business-notes/docs/Creative brief.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 4 Business/business-notes/docs/First time with client meeting.docx",
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/First time with client meeting.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "first time with client meeting",
+      "bytes": 24849,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/business-notes/docs/First time with client meeting.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 4 Business/business-notes/docs/Frameworks/Scoping:estimating framework.docx",
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Frameworks/Scoping:estimating framework.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "scoping:estimating framework",
+      "bytes": 18088,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/business-notes/docs/Frameworks/Scoping:estimating framework.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 4 Business/business-notes/docs/Freelancing/Creative brief.docx",
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Freelancing/Creative brief.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "creative brief",
+      "bytes": 22689,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/business-notes/docs/Freelancing/Creative brief.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 4 Business/business-notes/docs/Freelancing/Design Proposal.docx",
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Freelancing/Design Proposal.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "design proposal",
+      "bytes": 16255,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/business-notes/docs/Freelancing/Design Proposal.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 4 Business/business-notes/docs/Freelancing/FIRST MEETING.docx",
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Freelancing/FIRST MEETING.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "first meeting",
+      "bytes": 17074,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/business-notes/docs/Freelancing/FIRST MEETING.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 4 Business/business-notes/docs/Freelancing/FREELANCING.docx",
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Freelancing/FREELANCING.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "freelancing",
+      "bytes": 20138,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/business-notes/docs/Freelancing/FREELANCING.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 4 Business/business-notes/docs/Freelancing/First time with client meeting.docx",
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Freelancing/First time with client meeting.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "first time with client meeting",
+      "bytes": 24849,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/business-notes/docs/Freelancing/First time with client meeting.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 4 Business/business-notes/docs/Freelancing/Freelance traits.docx",
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Freelancing/Freelance traits.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "freelance traits",
+      "bytes": 123990,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/business-notes/docs/Freelancing/Freelance traits.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 4 Business/business-notes/docs/Freelancing/Q&A client.docx",
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Freelancing/Q&A client.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "q&a client",
+      "bytes": 16843,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/business-notes/docs/Freelancing/Q&A client.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 4 Business/business-notes/docs/Freelancing.docx",
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Freelancing.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "freelancing",
+      "bytes": 21712,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/business-notes/docs/Freelancing.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 4 Business/business-notes/docs/GOALS.docx",
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/GOALS.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "goals",
+      "bytes": 14368,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/business-notes/docs/GOALS.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 4 Business/business-notes/docs/How to become more valuable.docx",
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/How to become more valuable.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "how to become more valuable",
+      "bytes": 15841,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/business-notes/docs/How to become more valuable.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 4 Business/business-notes/docs/Ikigai.docx",
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Ikigai.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "ikigai",
+      "bytes": 36100,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/business-notes/docs/Ikigai.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 4 Business/business-notes/docs/Invoice.docx",
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Invoice.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "invoice",
+      "bytes": 15775,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/business-notes/docs/Invoice.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 4 Business/business-notes/docs/Legal/Term Contract tipps.docx",
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Legal/Term Contract tipps.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "term contract tipps",
+      "bytes": 16362,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/business-notes/docs/Legal/Term Contract tipps.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 4 Business/business-notes/docs/Legal/terms.docx",
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Legal/terms.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "terms",
+      "bytes": 18349,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/business-notes/docs/Legal/terms.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 4 Business/business-notes/docs/MAKING and breaking the grid.docx",
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/MAKING and breaking the grid.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "making and breaking the grid",
+      "bytes": 14971,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/business-notes/docs/MAKING and breaking the grid.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 4 Business/business-notes/docs/Market research.docx",
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Market research.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "market research",
+      "bytes": 14292,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/business-notes/docs/Market research.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 4 Business/business-notes/docs/Marketing/1st Clients.docx",
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Marketing/1st Clients.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "1st clients",
+      "bytes": 16941,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/business-notes/docs/Marketing/1st Clients.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 4 Business/business-notes/docs/Marketing/Content Marketing ideas.docx",
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Marketing/Content Marketing ideas.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "content marketing ideas",
+      "bytes": 12241,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/business-notes/docs/Marketing/Content Marketing ideas.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 4 Business/business-notes/docs/Marketing/DIGITAL MARKETING theoretical.docx",
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Marketing/DIGITAL MARKETING theoretical.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "digital marketing theoretical",
+      "bytes": 22513,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/business-notes/docs/Marketing/DIGITAL MARKETING theoretical.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 4 Business/business-notes/docs/Marketing/Email Marketing.docx",
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Marketing/Email Marketing.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "email marketing",
+      "bytes": 18252,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/business-notes/docs/Marketing/Email Marketing.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 4 Business/business-notes/docs/Marketing/Marketing.docx",
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Marketing/Marketing.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "marketing",
+      "bytes": 531688,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/business-notes/docs/Marketing/Marketing.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 4 Business/business-notes/docs/Meaningful member expereience business modell.docx",
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Meaningful member expereience business modell.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "meaningful member expereience business modell",
+      "bytes": 16278,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/business-notes/docs/Meaningful member expereience business modell.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 4 Business/business-notes/docs/Mission & vision statement.docx",
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Mission & vision statement.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "mission & vision statement",
+      "bytes": 23246,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/business-notes/docs/Mission & vision statement.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 4 Business/business-notes/docs/Price negotiation/Price negotiations.docx",
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Price negotiation/Price negotiations.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "price negotiations",
+      "bytes": 21539,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/business-notes/docs/Price negotiation/Price negotiations.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 4 Business/business-notes/docs/Pricing/Pricing strategy.docx",
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Pricing/Pricing strategy.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "pricing strategy",
+      "bytes": 38893,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/business-notes/docs/Pricing/Pricing strategy.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 4 Business/business-notes/docs/Pricing/Project specific price factoring.docx",
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Pricing/Project specific price factoring.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "project specific price factoring",
+      "bytes": 18512,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/business-notes/docs/Pricing/Project specific price factoring.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 4 Business/business-notes/docs/Proposal.docx",
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Proposal.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "proposal",
+      "bytes": 11961,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/business-notes/docs/Proposal.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 4 Business/business-notes/docs/Questions business.docx",
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Questions business.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "questions business",
+      "bytes": 29224,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/business-notes/docs/Questions business.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 4 Business/business-notes/docs/RISK management.docx",
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/RISK management.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "risk management",
+      "bytes": 15056,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/business-notes/docs/RISK management.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 4 Business/business-notes/docs/Strategic Tools.docx",
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Strategic Tools.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "strategic tools",
+      "bytes": 391826,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/business-notes/docs/Strategic Tools.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 4 Business/business-notes/docs/The-RFP-_-RFQ-Template-Canny.docx",
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/The-RFP-_-RFQ-Template-Canny.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "the-rfp-_-rfq-template-canny",
+      "bytes": 222509,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/business-notes/docs/The-RFP-_-RFQ-Template-Canny.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 4 Business/business-notes/docs/The-Rebranding-Brief-Canny.docx",
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/The-Rebranding-Brief-Canny.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "the-rebranding-brief-canny",
+      "bytes": 108720,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/business-notes/docs/The-Rebranding-Brief-Canny.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 4 Business/business-notes/docs/Value Proposition.docx",
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Value Proposition.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "value proposition",
+      "bytes": 12533,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/business-notes/docs/Value Proposition.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/BP 2017-18 Tri 2_Off_The_Beaten_Track.docx",
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/BP 2017-18 Tri 2_Off_The_Beaten_Track.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "bp 2017-18 tri 2_off_the_beaten_track",
+      "bytes": 2459723,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/business-notes/docs/busines plan case studies/BP 2017-18 Tri 2_Off_The_Beaten_Track.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/Business Plan Marking Sheet and Structure.docx",
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/Business Plan Marking Sheet and Structure.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "business plan marking sheet and structure",
+      "bytes": 17836,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/business-notes/docs/busines plan case studies/Business Plan Marking Sheet and Structure.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/Business plan blueprint.docx",
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/Business plan blueprint.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "business plan blueprint",
+      "bytes": 648523,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/business-notes/docs/busines plan case studies/Business plan blueprint.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/IC-Startup-Business-Plan-Template-9026_WORD.docx",
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/IC-Startup-Business-Plan-Template-9026_WORD.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "ic-startup-business-plan-template-9026_word",
+      "bytes": 53463,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/business-notes/docs/busines plan case studies/IC-Startup-Business-Plan-Template-9026_WORD.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/Koan21 business plan.docx",
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/Koan21 business plan.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "koan21 business plan",
+      "bytes": 17933,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/business-notes/docs/busines plan case studies/Koan21 business plan.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/SCORE-Deluxe-Startup-Business-Plan-Template_2.docx",
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/SCORE-Deluxe-Startup-Business-Plan-Template_2.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "score-deluxe-startup-business-plan-template_2",
+      "bytes": 154360,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/business-notes/docs/busines plan case studies/SCORE-Deluxe-Startup-Business-Plan-Template_2.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/Starting a new business/Business Plan Marking Sheet and Structure.docx",
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/Starting a new business/Business Plan Marking Sheet and Structure.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "business plan marking sheet and structure",
+      "bytes": 17836,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/business-notes/docs/busines plan case studies/Starting a new business/Business Plan Marking Sheet and Structure.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 4 Business/business-notes/docs/funds/The_Start_Up_Loans_Company_Business_Plan_template_Nov-2020-002_CE-version.docx",
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/funds/The_Start_Up_Loans_Company_Business_Plan_template_Nov-2020-002_CE-version.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "the_start_up_loans_company_business_plan_template_nov-2020-002_ce-version",
+      "bytes": 1599419,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/business-notes/docs/funds/The_Start_Up_Loans_Company_Business_Plan_template_Nov-2020-002_CE-version.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 4 Business/business-notes/docs/market research2.docx",
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/market research2.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "market research2",
+      "bytes": 16509,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/business-notes/docs/market research2.md"
     },
     {
       "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 4 Business/business-notes/pdf/Advanced+Technical+SEO+A+Complete+Guide.pdf",
@@ -6864,6 +7129,42 @@
       "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/business-notes/pdf/tipps/Tips on Creating an Effective Contract_Freelance Contract 101.md"
     },
     {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 4 Business/business-notes/ppt/Starting a new business/BMC Template - powerpoint 1.pptx",
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/ppt/Starting a new business/BMC Template - powerpoint 1.pptx",
+      "root": "journals_notes",
+      "kind": "pptx",
+      "key": "bmc template - powerpoint 1",
+      "bytes": 160545,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/business-notes/ppt/Starting a new business/BMC Template - powerpoint 1.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 4 Business/business-notes/ppt/Starting a new business/BMC Template - powerpoint.pptx",
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/ppt/Starting a new business/BMC Template - powerpoint.pptx",
+      "root": "journals_notes",
+      "kind": "pptx",
+      "key": "bmc template - powerpoint",
+      "bytes": 160545,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/business-notes/ppt/Starting a new business/BMC Template - powerpoint.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 4 Business/business-notes/ppt/Starting a new business/Week 5 BMC (2).pptx",
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/ppt/Starting a new business/Week 5 BMC (2).pptx",
+      "root": "journals_notes",
+      "kind": "pptx",
+      "key": "week 5 bmc (2",
+      "bytes": 967539,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/business-notes/ppt/Starting a new business/Week 5 BMC (2).md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 4 Business/business-notes/ppt/Starting a new business/Week 8.pptx",
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/ppt/Starting a new business/Week 8.pptx",
+      "root": "journals_notes",
+      "kind": "pptx",
+      "key": "week 8",
+      "bytes": 3994490,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/business-notes/ppt/Starting a new business/Week 8.md"
+    },
+    {
       "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 4 Business/business-notes/pricing/4 Pricing Creative Services/Module 01- Pricing Fundamentals/M01L09-Pricing Spectrum.pdf",
       "rel": "journals_notes/DOMAIN 4 Business/business-notes/pricing/4 Pricing Creative Services/Module 01- Pricing Fundamentals/M01L09-Pricing Spectrum.pdf",
       "root": "journals_notes",
@@ -7078,6 +7379,24 @@
       "key": "g2a method 2023 (works as of june 26th",
       "bytes": 1549083,
       "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 5 Personal Practice/hustle/Refund Bible 2023\ud83e\uddd1\ud83c\udffd\u200d\ud83d\udcbb/G2A Gift card refund sauce/G2A Method 2023 (works as of JUNE 26th).md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 5 Personal Practice/hustle/Refund Bible 2023\ud83e\uddd1\ud83c\udffd\u200d\ud83d\udcbb/Nike Refund Sauce/Best Nike Refund Method 2023.txt",
+      "rel": "journals_notes/DOMAIN 5 Personal Practice/hustle/Refund Bible 2023\ud83e\uddd1\ud83c\udffd\u200d\ud83d\udcbb/Nike Refund Sauce/Best Nike Refund Method 2023.txt",
+      "root": "journals_notes",
+      "kind": "txt",
+      "key": "best nike refund method 2023",
+      "bytes": 931,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 5 Personal Practice/hustle/Refund Bible 2023\ud83e\uddd1\ud83c\udffd\u200d\ud83d\udcbb/Nike Refund Sauce/Best Nike Refund Method 2023.md"
+    },
+    {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 5 Personal Practice/hustle/Refund Bible 2023\ud83e\uddd1\ud83c\udffd\u200d\ud83d\udcbb/StockX Refund Method \ud83d\udc56/Stockx Method 2022.docx",
+      "rel": "journals_notes/DOMAIN 5 Personal Practice/hustle/Refund Bible 2023\ud83e\uddd1\ud83c\udffd\u200d\ud83d\udcbb/StockX Refund Method \ud83d\udc56/Stockx Method 2022.docx",
+      "root": "journals_notes",
+      "kind": "docx",
+      "key": "stockx method 2022",
+      "bytes": 7143,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 5 Personal Practice/hustle/Refund Bible 2023\ud83e\uddd1\ud83c\udffd\u200d\ud83d\udcbb/StockX Refund Method \ud83d\udc56/Stockx Method 2022.md"
     },
     {
       "path": "/Users/barn/Library/CloudStorage/Dropbox/education/journals:notes/DOMAIN 5 Personal Practice/hustle/Refund Bible 2023\ud83e\uddd1\ud83c\udffd\u200d\ud83d\udcbb/StockX Refund Method \ud83d\udc56/Stockx Method 2022.md",

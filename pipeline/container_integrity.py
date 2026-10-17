@@ -74,10 +74,46 @@ def _always_readable(_path: Path) -> bool:
     return True
 
 
+#: A Kindle container is a PALM DATABASE: the type/creator pair `BOOKMOBI` sits at byte 60, and the RECORD TABLE
+#: starts at byte 78 with one 8-byte entry per record (4-byte offset, 1-byte attributes, 3-byte unique id).
+PALMDB_MAGIC = b"BOOKMOBI"
+PALMDB_MAGIC_OFFSET = 60
+PALMDB_HEADER_BYTES = 78
+PALMDB_RECORD_ENTRY_BYTES = 8
+
+
+def _mobi_readable(path: Path) -> bool:
+    """True when the PalmDB header names a Kindle container AND its LAST record offset still lands inside the file.
+
+    WHY A TRUNCATED MOBI IS DETECTABLE (D-3077). A truncated download keeps the head — the magic is at byte 60 —
+    and loses the tail, so the record table still lists records whose offsets point past the end of the file. That
+    makes the last entry an O(1) completeness test: read 78 bytes, read the last entry, compare with the size. This
+    is the question a suffix cannot answer and the one the owner's standing rule needs answered BEFORE any work is
+    copied or converted ("never process a book that is truncated or half-downloaded — tell me and I fetch it").
+    """
+    try:
+        with Path(path).open("rb") as handle:
+            header = handle.read(PALMDB_HEADER_BYTES)
+            if len(header) < PALMDB_HEADER_BYTES:
+                return False
+            if header[PALMDB_MAGIC_OFFSET:PALMDB_MAGIC_OFFSET + len(PALMDB_MAGIC)] != PALMDB_MAGIC:
+                return False
+            record_count = int.from_bytes(header[76:78], "big")
+            if record_count < 1:
+                return False
+            handle.seek(PALMDB_HEADER_BYTES + (record_count - 1) * PALMDB_RECORD_ENTRY_BYTES)
+            last_offset = int.from_bytes(handle.read(4), "big")
+            size = Path(path).stat().st_size
+            return 0 < last_offset < size
+    except OSError:
+        return False
+
+
 #: The CLOSED probe vocabulary. A declaration names one of these tokens; a token outside it is FATAL.
 PROBES: dict[str, Callable[[Path], bool]] = {
     "zip": _zip_readable,
     "pdf": _pdf_readable,
+    "mobi": _mobi_readable,
     "none": _always_readable,
 }
 

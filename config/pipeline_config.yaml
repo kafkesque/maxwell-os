@@ -310,6 +310,42 @@ stage0:
     docling_per_mb_s: 40    # pdf: allowance per MiB of source (a scanned page is bytes; a text page is few)
     docling_ceiling_s: 1500 # pdf: the largest allowance any single work may claim
     stage_timeout_s: 1800   # the applier's per-book subprocess ceiling; MUST exceed docling_ceiling_s (checked at import)
+  #: D-3077 — A LIBRARY'S DECLARED KINDS MAY NOT EXCEED ITS STAGE'S DECLARED READERS. MEASURED 2026-10-17 on the
+  #: live plan: 389 of 626 refusals were `refused_container_no_stage_reads_it` — works the door says the library OWNS
+  #: (books root kinds: epub, pdf, md, mobi, azw3, djvu; journals:notes kinds: pdf, docx, md, txt) that Stage 0 could
+  #: not open, because this stage's reader set was a three-item literal in code: {.epub, .pdf, .md}.
+  #: The container axis is therefore DECLARED HERE, one line per container, naming the READER that opens it. Adding a
+  #: format is a config edit plus a reader function — never a scramble through the dispatch. MEASURED that same day,
+  #: each reader below on a real library file:
+  #:   .docx  pandoc      rc=0  0.5 s  35,122 B  10 headings   (99 works unlocked)
+  #:   .pptx  pandoc      rc=0  0.1 s   1,693 B   1 heading    (4 works)
+  #:   .rtf   pandoc      rc=0  0.1 s     515 B   0 headings   (5 works; pandoc's RTF reader is thin — a receipt
+  #:                                                          field quality_status is what catches a thin result)
+  #:   .mobi  kindleunpack+pandoc  unpack 0.21 s + pandoc 1.93 s -> 576,244 B, 435 images, on a 36.7 MB MOBI
+  #:   .txt   pandoc -f plain       rc=0 (the DEFAULT reader escaped the text: `-\> Under \$500` — declared, not assumed)
+  #: NOT DECLARED, and why (D-3038: what we reject is registered, so it cannot be re-proposed from memory):
+  #:   .doc / .ppt  legacy OLE binaries. MEASURED: docling ACCEPTS the format and then FAILS on the real file
+  #:                ("failed to convert", rc=0 with no output) — declaring a container whose engine cannot open THIS
+  #:                library's files would add rows to the plan that are guaranteed to fail (max_failed_ratio is 0.0).
+  #:                Remedy when the owner wants them: `soffice --headless --convert-to docx` (LibreOffice) as the reader.
+  #:   .djvu        needs `djvutxt` (djvulibre); ABSENT on this machine. One work.
+  #:   .png/.jpg/.jpeg/.gif/.psd/.ai/.indd/.idml/.aep/.jsx/.ttc/.zip/.rar  ASSETS, not text works: 232 of the 389.
+  #:                The door's reason for these reads "a container the conversion stage cannot read", which claims the
+  #:                stage SHOULD read a PSD. It should not. This is the accepted negative, not an engine debt.
+  #:   .xlsx/.xls/.numbers  DATA, not prose: 41 works. Deliberately left to an OWNER WORD rather than decided here —
+  #:                pandoc DOES read xlsx into markdown tables, so this is a judgement about the corpus's contents
+  #:                (a spreadsheet is not a book), not a missing engine.
+  containers:
+    .md:   native_md             # already converted: the file IS the artifact
+    .epub: pandoc_epub
+    .pdf:  docling_pdf           # budget derived from the work's own bytes (conversion_budget); no fallback (BUG-896)
+    .mobi: kindleunpack_pandoc   # KindleUnpack (pure python) unpacks to HTML/EPUB, then the SAME pandoc step
+    .azw:  kindleunpack_pandoc
+    .azw3: kindleunpack_pandoc
+    .docx: pandoc_docx
+    .pptx: pandoc_pptx
+    .rtf:  pandoc_rtf
+    .txt:  native_text           # no converter: pandoc's only text reader escapes the bytes (MEASURED 2026-10-17)
   #: BUG-898 — A RECEIPT MUST CARRY THE DIAGNOSIS, NOT THE TAIL. Four failures printed the same sentence structure, so
   #: the real causes (an epub parse error, a budget expiry, a void fallback) were unrecoverable without re-running by
   #: hand. Every failed conversion now names ONE of these, and the meaning says what the owner should do about it.
@@ -319,6 +355,7 @@ stage0:
     container_unreadable: "the converter refused the work's own container (a broken spine reference, a missing manifest) — the bytes pass a zip/PDF probe, so this is an authoring defect, not a truncated download"
     no_output: "the converter reported success and wrote nothing — the RECEIPT is defective, not the book; re-run before touching the source"
     deferred_for_identity: "the INGEST DOOR refused to duplicate a work already in the corpus (D-2997/BUG-781) — the book is whole and was never converted; it needs an OWNER WORD on identity, not a new copy"
+    unsupported_format: "the container is not one of the readers this stage DECLARES (config/pipeline_config.yaml#stage0.containers) — the library may own the format, but S0 has no engine for it, so this is a DOOR/PLAN fault and never a book fault. It used to print 'Unsupported format' and SKIP the file: a silent skip is indistinguishable from a conversion, which is exactly the blindness D-3077 exists to end"
     #: DELIBERATELY ABSENT: `quality_failed`. D2326's quality check is a RECEIPT FIELD today
     #: (`quality_status` in the checkpoint), not an admission gate — no code path can produce that class yet, and a
     #: declared class with no producer is a declaration with no referent (D-3034). When the quality check becomes a

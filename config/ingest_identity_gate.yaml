@@ -242,12 +242,11 @@ source_library:
       #: adds nothing to the corpus the corpus does not already materialise. See arrangement.share_rule below for
       #: the rule the reader ENFORCES, and admission.decisions.refused_domain_not_a_corpus_domain for its refusal.
       #:
-      #: ADMISSION IS NOT CONVERSION, and this line does not convert anything. The conversion stage accepts
-      #: [.epub, .pdf, .md] only (flow.transitions.conversion.accepts, the origin of that set): of this root's
-      #: declared kinds, a .pdf and a .md are convertible, while a .docx or a .txt is REFUSED as a container no
-      #: stage reads - counted, printed, and owned by T-180 rather than admitted on a promise. MEASURED 2026-10-17
-      #: on the live library: 718 files under this root, of which 247 are .pdf and 99 .docx, and the rest are
-      #: image/design formats no declaration here owns at all (png, jpg, psd, ai, indd, idml).
+      #: ADMISSION IS NOT CONVERSION, and this line does not convert anything. Since D-3077 the conversion stage
+      #: declares its containers per format (config/pipeline_config.yaml#stage0.containers, mirrored in
+      #: flow.transitions.conversion.accepts above): of this root's declared kinds, a .pdf, a .md, a .docx and a .txt
+      #: are convertible and a defect-named file is REFUSED as name-repair-first. MEASURED 2026-10-17 on the live
+      #: library: 718 files under this root, of which 247 are .pdf and 99 .docx.
       #:
       #: WHAT IS STILL NOT AUTHORISED: no engine admits a note (admission.actor is the owner, row by row, from the
       #: plan), nothing here moves a byte, and the applier is T-183. The 621 rows the plan refused for "no declared
@@ -438,9 +437,9 @@ source_library:
         owed: "T-183 (the applier limb: a plan-keyed, dry-run-default, crash-safe writer) | T-176 (the rename rides BEFORE the first admit: an admitted name becomes the corpus name AND the door's key) | T-179 (the library md twin's fate). CLOSED 2026-10-17: T-181 limb 2 (a note's home) - declared as a SHARE on the corpus's own domain axis, D-3062"
       conversion:
         command: "python3 pipeline/stage0_convert.py"
-        accepts: [.epub, .pdf, .md]   # origin: pipeline/stage0_convert.py::SUPPORTED_EXTENSIONS (D-3051; the admission plan REFUSES a container outside this set and a control in it compares the two homes)
-        reads: "every .epub/.pdf/.md under the corpus home, RECURSIVELY (find_books; an .md is 'already converted' and is the only kind the corpus holds today - MEASURED 940 of 940)"
-        engines: "pandoc for epub; docling for pdf, falling back to pandoc"
+        accepts: [.epub, .pdf, .md, .mobi, .azw, .azw3, .docx, .pptx, .rtf, .txt]   # origin: config/pipeline_config.yaml#stage0.containers (D-3077; the admission plan REFUSES a container outside this set and a control in it compares the two homes)
+        reads: "every container this stage declares (config#stage0.containers), under the corpus home, RECURSIVELY (find_books). MEASURED 2026-10-17 after D-3077: the corpus holds 982 .md, 26 .epub and 20 .pdf; a library work is admitted as its container plus the .md S0 writes beside it"
+        engines: "pandoc for .epub/.docx/.pptx/.rtf and plain text; docling for .pdf (budget derived from the work's own bytes, D-3076; NO Pandoc fallback, BUG-896); KindleUnpack then pandoc for .mobi/.azw/.azw3. MEASURED 2026-10-17: docling ACCEPTS .doc/.ppt and then fails on this library's real files, so neither is declared until a reader that opens them is installed (LibreOffice)"
         writes: "the corpus home itself - the SAME tree the S0.5 cache then stamps, so the corpus is both the input and the output of S0"
         re_conversion: "pipeline/batch_convert_epubs.py (D2134, declared in config/silent_repair.yaml) re-converts a LIBRARY epub and overwrites the matching corpus .md in place. Until D-3050 it matched by FILENAME STEM and wrote on a bare run (BUG-865); it now matches through the door's OWN comparison key, refuses an ambiguous key, refuses a work the S0.5 cache already resolves (a RE-INGEST act), and is DRY by default"
         source_roots: "config/pipeline_config.yaml#source_epub_dir and #source_pdf_dir - the library kind roots. They were DECLARED as null until D-3050, so the fallback resolved to a path that does not exist and three declared writers silently converted nothing (MEASURED 2026-10-16)"
@@ -491,7 +490,7 @@ source_library:
       seen_by_an_ingest_record: "a file only the S0.5 metadata cache names, because the corpus file now carries a different key (MEASURED 2026-10-16: the corpus itself was renamed under T-130). The pipeline READ the work, so it is SEEN and not a candidate - printed because a second voice saying 'seen' is not the same voice as the corpus saying it"
       admit_candidate: "a file whose key neither the corpus nor an ingest record names, in a container the conversion stage accepts, inside its declared kind folder, under a root that declares a corpus home, carrying a name NO defect pattern matches: THE OWNER'S WORKLIST"
       refused_no_declared_corpus_home: 'its root declares admits_to: null, so NO declaration names a home its works are admitted to: the refusal names the missing declaration instead of inventing a destination (T-181 limb 2)'
-      refused_container_no_stage_reads_it: 'a container the conversion stage cannot read (declared kinds such as .mobi/.azw3/.djvu/.docx are OWNED but not convertible): admitting one needs an ENGINE, which is T-180''s misplaced class and not this reader''s act'
+      refused_container_no_stage_reads_it: 'a container the conversion stage cannot read (MEASURED 2026-10-17 after D-3077 the residue is .djvu/.doc/.ppt, the DESIGN AND IMAGE formats .png/.jpg/.psd/.ai/.indd/.idml and the archives): admitting one needs an ENGINE, which is T-180''s misplaced class and not this reader''s act'
       refused_container_corrupt: 'a container of an ACCEPTED kind whose own BYTES are not openable (a truncated download, a file renamed to a suffix it is not): the stage reads this kind, so the remedy is not an engine but a RE-DOWNLOAD of the work. It is its own class because it is its own remedy - folding it into the engine class would let one act answer for two blast radii (BUG-886, MEASURED 2026-10-17: 3 of 1,289 library containers read as ordinary candidates)'
       refused_name_repair_first: "a name a declared defect pattern matches (marker/spine/truncation): an admitted file's name becomes the CORPUS NAME and the DOOR KEY, so admitting a defect materialises it into the tree the S0.5 cache then STAMPS. The repair rides FIRST - T-176, the owner's rename plan, whose eligible rows are exactly this class"
       refused_not_in_its_kind_folder: 'the file does not sit under its declared kind folder (the placement axis, axis_depth 1), so the path its corpus twin would take cannot be derived: the misplaced class T-180 owns'
@@ -513,6 +512,17 @@ source_library:
         epub: zip          # a zip-family container: an end-of-central-directory record must resolve
         pdf: pdf            # `%PDF-` at the head AND a `%%EOF` trailer near the end (a truncated pdf keeps its magic)
         md: none            # plain text: its readability IS its name, declared rather than assumed
+        #: D-3077 — the seven kinds the container registry added. A kind nobody probes is FATAL, never defaulted, so
+        #: each one names its test: the OOXML pair (.docx/.pptx) and .epub are ZIPs; a Kindle container is a PalmDB
+        #: whose LAST record offset must still land inside the file (an O(1) truncation test — the head survives a
+        #: truncated download, the tail does not); .rtf and .txt are text, and their readability IS their name.
+        docx: zip
+        pptx: zip
+        mobi: mobi
+        azw: mobi
+        azw3: mobi
+        rtf: none
+        txt: none
       #: D-3075 — WHEN AN UNREADABLE CONTAINER IS NOT A DEFECT YET. The owner's rule (2026-10-17): a book that is
       #: truncated OR STILL HALF-DOWNLOADED must never be processed, and the owner must be TOLD so they can fetch
       #: it again by hand. The door already refuses the first (`refused_container_corrupt`); what it could not say

@@ -293,6 +293,41 @@ if not S0_FAILURE_CLASSES:
         "FATAL: config/pipeline_config.yaml#stage0.failure_classes is empty — a failure that cannot be named is the "
         "tail again (C12/C16, BUG-898)"
     )
+
+
+#: D-3077 — WHICH CONTAINERS THIS STAGE CAN OPEN, DECLARED, ONE LINE PER CONTAINER naming the reader that opens it.
+#: The CODE owns which readers EXIST (pipeline/stage0_convert.py::_READERS, where each one is a function); the CONFIG
+#: owns which container is read by which of them. Neither may name a reader the other has never heard of, and BOTH
+#: directions are refused (stage0_convert.py, at import). MEASURED 2026-10-17: the three-item set literal that used to
+#: live in that file is what produced 389 of 626 admission refusals the door could only call "a container the
+#: conversion stage cannot read" — 99 .docx, 6 .mobi, 5 .rtf, 4 .pptx among them, all readable on this machine.
+def _s0_container_map() -> dict[str, str]:
+    """Read `config#stage0.containers` (extension -> reader id), fail-closed on an absent, empty or malformed block."""
+    block = _CFG.get("stage0", {}).get("containers")
+    if not isinstance(block, dict) or not block:
+        raise RuntimeError(
+            "FATAL: config/pipeline_config.yaml#stage0.containers is not declared — which containers this stage can "
+            "open is a DECLARED fact, never an inference from a literal in code (C12, D-3077)"
+        )
+    mapping: dict[str, str] = {}
+    for raw_ext, raw_reader in block.items():
+        ext = str(raw_ext).strip().lower()
+        reader = str(raw_reader).strip()
+        if len(ext) < 2 or not ext.startswith("."):
+            raise RuntimeError(
+                f"FATAL: stage0.containers key {raw_ext!r} is not a dotted extension (the shape is '.epub')"
+            )
+        if not reader:
+            raise RuntimeError(
+                f"FATAL: stage0.containers[{ext}] names no reader — a container with no engine is exactly the silence "
+                f"applied admission could not see through (C12, D-3077)"
+            )
+        mapping[ext] = reader
+    return mapping
+
+
+S0_CONTAINERS: dict[str, str] = _s0_container_map()
+S0_SUPPORTED_EXTENSIONS: frozenset[str] = frozenset(S0_CONTAINERS)
 INTENT_TOP_K_RATIO=float(_env("intent_top_k",_CFG["pipeline"]["intent_top_k_ratio"]))
 INTENT_THRESHOLD=float(_env("intent_threshold",_CFG["pipeline"]["intent_threshold"]))
 

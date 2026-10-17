@@ -2,8 +2,8 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 669,
-  "open_n": 240,
+  "total_ids": 671,
+  "open_n": 242,
   "closed_n": 429,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
@@ -1206,6 +1206,16 @@
     {
       "id": "BUG-902",
       "title": "(MED \u2014 OPEN 2026-10-17) \u2014 THE ROUTE-GRAPH DEBT WAS OVER ITS SHRINK-ONLY CEILING BEFORE TODAY'S FINDINGS",
+      "events": 1
+    },
+    {
+      "id": "BUG-905",
+      "title": "(MED \u2014 OPEN 2026-10-17) \u2014 THE KINDLE ENGINE EXISTS AND STILL CANNOT BE USED: A DECLARED KIND HAS NO KIND FOLDER",
+      "events": 1
+    },
+    {
+      "id": "BUG-906",
+      "title": "(LOW \u2014 OPEN 2026-10-17) \u2014 A READ-ONLY DELEGATE RUN CANNOT BE CLOSED AS `done`",
       "events": 1
     }
   ],

@@ -65,12 +65,16 @@ from pipeline.book_metadata import (  # D2176/D2308/D2449 — identity + noise h
     sanitize_source_book,
 )
 from pipeline.io_guard import load_jsonl  # D2332: the declared JSONL reader (never a second reader)
-from pipeline.pipeline_paths import BOOKS_DIR, CHECKPOINT_DIR, PROJECT_ROOT
+from pipeline.pipeline_paths import BOOKS_DIR, CHECKPOINT_DIR, PROJECT_ROOT, S0_SUPPORTED_EXTENSIONS
 from pipeline.stamp import get_pipeline_commit
 
 CONFIG_REL = "config/ingest_identity_gate.yaml"
 METADATA_CACHE_NAME = "book_metadata.jsonl"  # origin: pipeline/stage0_5_extract_metadata.py::METADATA_CACHE
-SUPPORTED_EXTENSIONS = (".md", ".epub", ".pdf")  # origin: pipeline/stage0_convert.py::SUPPORTED_EXTENSIONS
+#: D-3077: THIS USED TO BE A COPY OF THE STAGE'S SET, carrying an "origin:" comment and nothing that could check it —
+#: a second declaration of one fact, and the only reason the copy stayed true was that nobody edited either. It is now
+#: READ from the stage's own declaration (config#stage0.containers, through the leaf module both sides already import),
+#: so the door's idea of a corpus file and the stage's idea of a readable container cannot drift apart in silence.
+SUPPORTED_EXTENSIONS = tuple(sorted(S0_SUPPORTED_EXTENSIONS))
 # MEASURED 2026-10-14 (this gate's first control run): compute_source_id's filename-fallback branch returns a
 # BARE digest — there is no `unknown|` prefix to test for. Trusting the id's SHAPE as evidence of work identity
 # admitted a file as its own duplicate; identity honesty is therefore decided by the SOURCE (a cache record

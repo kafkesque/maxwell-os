@@ -1,7 +1,7 @@
 schema_version: '1.0'
 plan: governance/ADMISSION_PLAN_20261017.json
-plan_sha256: 3869d63cf4be514a24adc2e36108513a26f047739ee09cfda5f018d2018fa4a7
-scope_sha256: bb49c9d02a7384894caa18a82d6a94870f0b566dc48fb96c9f564ee41a619038
+plan_sha256: 35b1a86c701fbcf4b8b129ab1eb914dfaf48b48a71a1aaf74bfacb749007b210
+scope_sha256: f7b63aa08335983bd33b2a8c7dd7b9f799ae39ce440efb44a2bd006992792b46
 accepted_by: human
 accepted_on: '2026-10-17'
 mode: all
@@ -132,8 +132,6 @@ rows:
   Predator Bible.pdf
 - books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/The_Alchemy_Reader_From_Hermes_Trismegistus_to_Isaac_Newton-Cambridge_University_Press_2003.pdf
 - books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/The_History_Book_-_Big_Ideas_Simply_Explained_By_DK.pdf
-- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Thinking
-  Visually_Stephen K. Reed_liber3.pdf
 - books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/ToV - Bloodlines.pdf
 - books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Twelve Keys.pdf
 - books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/[Rupert_Sheldrake,_Terence_McKenna,_Ralph_Abraham](BookFi.org).pdf

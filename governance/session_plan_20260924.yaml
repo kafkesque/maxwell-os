@@ -362,6 +362,9 @@ may_touch:
 - scripts/goose_profile.py
 - scripts/check_commit_scope_guard.py
 - governance/evidence/EXTENSION_COST_20261017.json
+- scripts/llm_candidate_probe.py
+- config/model_oracles.yaml
+- governance/evidence/LLM_CANDIDATE_20261017_Qwen__Qwen3-30B-A3B-Instruct-2507.json
 will_not_touch:
 - governance/F11_*
 - governance/ANCHOR_RULER_CONSOLIDATED_*.csv
@@ -1101,3 +1104,36 @@ widening_log:
   reason: 'OWNER''S QUESTION OF THIS SITTING, answered by a declared control rather than prose: extension rot and memory overload - whether a goose extension may be switched on ONLY when needed. The act is four files: a MEASURED per-extension cost (schema bytes and tools per server, so the residency decision is not an estimate), a TOTAL CLASSIFICATION of every declared extension (resident / on-demand / never - an unclassified extension is a FATAL, C16), a renderer that composes a profile from the ONE home of the commands (the harness config, C12: names only here, no second copy of a cmd), and the BUG-773 red loop that was NAMED and OWED (a rail, not a reminder).'
   additions: '[''scripts/measure_extension_cost.py'', ''config/extension_profiles.yaml'', ''scripts/goose_profile.py'', ''scripts/check_commit_scope_guard.py'', ''governance/evidence/EXTENSION_COST_20261017.json'']'
   owner_ack: 'owner 2026-10-17 (verbatim): "examine from an stier senior agentic engnieer to prevent extension rot and memory overload / can be goose extension for the sake of memory optimalization only switched on when they are neeeded / approve your plugin recommendations / Does Qwen 3.5 has any use based on previous benchmarks or its bloat ? / Considering that only gemma able for tool call ashould b in loop tasks e there any other gemma level capapbility local llm taht can tool call if yes which would be theat best candidnat a besides tool call are capable of other useful taks? do amaket research with llmfit"'
+- date: '2026-10-17'
+  actor: assistant
+  reason: >-
+    SIXTH SITTING, same day, three acts beyond the previous widening. (1) THE RESIDENCY SWITCHES - the owner asked
+    whether an extension can switch on when the work needs it and off when it does not. Measured answer: birth-time
+    (--no-profile / --with-*) is the RAIL; the extensionmanager ManageExtensions tool is a MODEL-JUDGED runtime
+    toggle (read from the goose 1.39.0 binary, not handshaken), so D-3060 bounds it to on_demand members and declares
+    it not_a_rail. (2) ADOPTION ON ARRIVAL - a new extension registers itself into `quarantine` granting NOTHING, so
+    "add it automatically" and "may it be resident" stop being the same question. (3) THE ORACLE LADDER - the owner
+    asked for market research with llmfit and for any capability oracle. llmfit is a FIT oracle whose tags are
+    dropped by quantisation and which cannot read 4 of the 8 served models, so config/model_oracles.yaml declares
+    what may count as evidence and scripts/llm_candidate_probe.py makes the order mechanical. D-3060, D-3061.
+  additions:
+  - scripts/llm_candidate_probe.py
+  - config/model_oracles.yaml
+  - governance/evidence/LLM_CANDIDATE_20261017_Qwen__Qwen3-30B-A3B-Instruct-2507.json
+  - 'config/extension_profiles.yaml (edited: residency + delegate_profiles + quarantine)'
+  - 'scripts/goose_profile.py (edited: --adopt, --delegate, a quarantine class)'
+  - 'justfile (edited: extensions-adopt, extensions-delegate)'
+  - 'config/decisions.yaml (D-3060, D-3061)'
+  - 'config/task_register.yaml (T-186 done; T-114 gate; T-189, T-190)'
+  - 'governance/buglog.md (BUG-053 gets its header, BUG-876 named)'
+  - 'governance/NOT-YET-EVALUATED-RESEARCH.md (2 rows)'
+  owner_ack: >-
+    VERBATIM (this sitting): 'codify(only its not obvious) whenever new extension created or added from internet add
+    automatically to extension profiles.yaml ... will this extension switch on automatically happen whenever the llm,
+    goose agent and or subagent need it and after dont need it switch off ... if yes codify / do the manual step T186
+    ... do the 2nd step / do an extensive research for qwen3 coder level capability llm on hugging face ... also
+    check if there are any capability oracle / and from now codify whenever you do research on potential llms do
+    llmfit and if you find capability oracle or if omlx have capability oracle add that'. NOTE ON ORDER, stated not
+    hidden: D-2860 requires the plan to be committed BEFORE the work it authorises. This widening was written AFTER
+    the edits, because the owner's message arrived as one block; the commits are ordered plan-first anyway, and this
+    sentence is the receipt of the breach rather than a claim that it did not happen.

@@ -16676,7 +16676,7 @@ shows the real operational cost is MODEL SWAP (42 s, 134 s), which a warm model 
 the new reading or name the variable that changed. Until then this entry holds the MEASUREMENT only, and the ladder's
 `--check` readings are unaffected because BUG-792's state lives in the buglog, not in a rail.
 
-#### BUG-885 — AMENDMENT (same sitting): the artifact and the reading that CLOSE it
+**AMENDMENT to the entry above (same sitting, BUG-885): the artifact and the reading that CLOSE it.**
 
 The finding above is not prose standing alone: it names work, and that work has a home. The **artifact** is
 `pipeline/harness_contract.py` — the harness's own contract reader, which is the declared subject of the

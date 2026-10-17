@@ -286,6 +286,35 @@ def selftest() -> int:
         check("a colliding name gets a distinct path", downloader._unique_path(tmp, "Book.epub").name == "Book (2).epub")
         check("the index is empty for a fresh id", "doi:10.0000/selftest" not in downloader.load_index({**cfg, "pens": {**cfg["pens"], "index": str(tmp / "index.jsonl")}}))
 
+        # R5 CONTROL (D-3079): A SOURCE THAT REFUSES IS NOT A RUN THAT ENDS. Two candidates, one adapter whose
+        # locate() refuses with AcquisitionError (the shape `no VALIDATED mirror for libgen` has in production).
+        # The run must attempt BOTH and record two named refusals — before the R5 finding it attempted ONE and
+        # raised out of the loop, so a saturated mirror could end a ten-candidate manifest at the first row.
+        class _Fault(adapters.Adapter):
+            id = "fault"
+            licence_class = "open_access"
+
+            def locate(self, candidate, cfg_inner):  # noqa: ARG002 - the fault IS the behaviour
+                raise config.AcquisitionError("no VALIDATED mirror for `fault` (selftest)")
+
+        adapters.REGISTRY["fault"] = _Fault
+        fault_cfg = json.loads(json.dumps(cfg))
+        fault_cfg["adapters"]["fault"] = {"enabled": True, "licence_class": "open_access", "requires_owner_word": False}
+        fault_cfg["adapters"]["order"] = ["fault"]
+        fault_cfg["pens"]["index"] = str(tmp / "fault-index.jsonl")
+        fault_cfg["pens"]["evidence"] = str(tmp / "evidence")
+        two = json.loads(manifest.read_text(encoding="utf-8"))
+        two["candidates"].append({**two["candidates"][0], "canonical_id": "doi:10.0000/selftest-two"})
+        two_path = tmp / "manifest-two.json"
+        two_path.write_text(json.dumps(two), encoding="utf-8")
+        result = downloader.fetch_manifest(two_path, fault_cfg)
+        check("a refusing source does not end the run (two attempted, both named)",
+              len(result["outcomes"]) == 2 and all(
+                  any(attempt.get("failure_class") == "adapter_error" for attempt in outcome["attempts"])
+                  for outcome in result["outcomes"]),
+              json.dumps(result["counts"]))
+        adapters.REGISTRY.pop("fault", None)
+
     # the receipt vocabulary: a shadow run without a word is refused BEFORE any network call.
     check("allow_shadow without an owner word is refused",
           _raises(lambda: downloader.fetch_manifest(Path("/nonexistent.json"), cfg, allow_shadow=True), config.AcquisitionError))

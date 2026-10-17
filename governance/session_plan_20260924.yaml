@@ -19,7 +19,7 @@ may_touch:
 - pipeline/acquisition/*.py
 - governance/evidence/ACQ_MANIFEST_*.json
 - governance/evidence/ACQUISITION_*.jsonl
-- knowledge pipeline/acquisition/*
+- governance/evidence/R5_ACQ_REVIEW_20261017.md
 - archive/evaluate_model.py.archived-2026-10-17
 - scripts/evaluate_model.py
 - governance/HANDOFF_20261016_LANES_AND_MEASUREMENT.md

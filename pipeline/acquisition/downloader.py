@@ -229,6 +229,15 @@ def fetch_manifest(
             except adapter_module.AdapterMiss as miss:
                 outcome.attempts.append({"adapter": adapter.id, "failure_class": "adapter_miss", "detail": str(miss)[:300]})
                 continue
+            except AcquisitionError as refusal_error:
+                # R5 FINDING (gemma-4-E4B-it, a different family, 2026-10-17): a refusal that is NOT a miss — e.g.
+                # `no VALIDATED mirror for libgen` from mirrors.live_domains — used to escape this loop and ABORT THE
+                # WHOLE RUN, so one saturated mirror ended a manifest of ten candidates after the first. A source that
+                # cannot serve is a property of that SOURCE, not of the run: it is recorded against this adapter and
+                # the ladder moves on. A genuine config fault still fails fast, because the declaration is read
+                # before this loop (land_pen, ladder, probe_map).
+                outcome.attempts.append({"adapter": adapter.id, "failure_class": "adapter_error", "detail": str(refusal_error)[:300]})
+                continue
             except net.NetworkRefused as refusal:
                 outcome.attempts.append({"adapter": adapter.id, **refusal.failure.as_dict()})
                 breaker["failures"][adapter.id] = breaker["failures"].get(adapter.id, 0) + 1
@@ -258,6 +267,10 @@ def fetch_manifest(
                 outcome.sha256 = landed["sha256"]
                 outcome.licence_class = delivery.licence_class
                 outcome.attempts.append({"adapter": adapter.id, "url": delivery.url, "probe": landed["probe"]})
+                # R5 FINDING (gemma-4-E4B-it, 2026-10-17): the failure counter was never RESET, so an adapter that
+                # failed three times across a long manifest opened its breaker even while it was still serving —
+                # the breaker measured the run's history, not the adapter's health. A success IS the health signal.
+                breaker["failures"][adapter.id] = 0
                 break
             # The bytes arrived and are NOT the container their name claims: it does not stay in the inbox.
             quarantine.mkdir(parents=True, exist_ok=True)

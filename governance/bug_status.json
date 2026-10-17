@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 674,
-  "open_n": 243,
-  "closed_n": 431,
+  "total_ids": 677,
+  "open_n": 245,
+  "closed_n": 432,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -1221,6 +1221,16 @@
     {
       "id": "BUG-909",
       "title": "(HIGH \u2014 OPEN 2026-10-17) \u2014 THE ONLY SHADOW RUNG THAT WORKS IS A SINGLE POINT OF FAILURE: EVERY LibGen FRONT ANSWERS `500",
+      "events": 2
+    },
+    {
+      "id": "BUG-911",
+      "title": "(MED \u2014 OPEN 2026-10-17) \u2014 THE ONLY ROUTE INTO ANNA'S ARCHIVE IS A HEADED BROWSER WINDOW",
+      "events": 1
+    },
+    {
+      "id": "BUG-912",
+      "title": "(LOW \u2014 OPEN 2026-10-17) \u2014 An `open_access` ROUTE CAN DELIVER AN HTML LANDING PAGE FOR A DOI",
       "events": 1
     }
   ],
@@ -1655,6 +1665,7 @@
     "BUG-903",
     "BUG-904",
     "BUG-907",
-    "BUG-908"
+    "BUG-908",
+    "BUG-910"
   ]
 }

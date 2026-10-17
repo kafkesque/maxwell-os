@@ -15,6 +15,12 @@ may_touch:
 #: (`ACQ_MANIFEST_*`, `ACQUISITION_*.jsonl`), and a per-file grant would turn every run into a new red line on the
 #: worktree rail (the BUG-563 shape). Nothing outside these prefixes becomes committable.
 - config/acquisition.yaml
+#: D-3080 (2026-10-17): the research-source register and the browser engine — one declaration and one engine, so a
+#: source that needs JavaScript or a token is DECLARED instead of being misread as absent (BUG-911).
+- config/research_sources.yaml
+- pipeline/acquisition/browser.py
+- pipeline/acquisition/sources.py
+- governance/evidence/ACQ_*.json
 - scripts/acquire.py
 - pipeline/acquisition/*.py
 - governance/evidence/ACQ_MANIFEST_*.json

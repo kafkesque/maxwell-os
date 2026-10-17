@@ -105,33 +105,54 @@ cartography:
 #: ONE PROTOCOL, N ADAPTERS (C21). `order` is the DECLARED LADDER: lawful before shadow, public domain before
 #: licensed. A shadow adapter is OFF until an owner word names it, and the word is carried in the receipt.
 adapters:
-  order: [open_access, gutenberg, standardebooks, annas, libgen, zlibrary]
+  #: LAWFUL BEFORE SHADOW, and a paper rung before a book rung for a paper candidate — the ladder is the
+  #: declaration the downloader reads, so its ORDER is policy, not convenience.
+  order: [open_access, gutenberg, standardebooks, arxiv, annas, libgen, zlibrary, scihub]
   open_access:
     licence_class: open_access
     enabled: true
     requires_owner_word: false
-    note: 'OpenAlex best_oa_location.pdf_url / open_access.oa_url. The lawful first rung: a DOI with an OA copy.'
+    #: THREE ROUTES, in order. The first needs no network call (the resolver already reported the field); the next
+    #: two answer for a DOI when OpenAlex did not index the copy. MEASURED 2026-10-17: unpaywall 200 keyless with a
+    #: contact email, Europe PMC 200 keyless.
+    routes: [oa_pdf, unpaywall, europepmc]
+    unpaywall_email: maxwell-acquisition@localhost
+    note: 'Lawful first rung. A work refused here is refused by THREE routes, which is a fact about availability
+      rather than a fact about this adapter.'
   gutenberg:
     licence_class: public_domain
     enabled: true
     requires_owner_word: false
     metadata_api: "https://gutendex.com/books?search={query}"
     note: 'Project Gutenberg. Public domain only, and its catalogue is a PREFIX of any research gap — it will answer
-      "the canonical text of X" and never "the 2019 survey of X".'
+      "the canonical text of X" and never the current survey of X.'
   standardebooks:
     licence_class: public_domain
     enabled: true
     requires_owner_word: false
     search: "https://standardebooks.org/ebooks?query={query}"
     note: 'Standard Ebooks: public domain, hand-transcribed, and the highest-fidelity EPUB a free source offers.'
+  arxiv:
+    licence_class: open_access
+    enabled: true
+    requires_owner_word: false
+    search: 'https://export.arxiv.org/api/query?search_query=ti:"{query}"&max_results=5'
+    note: 'MEASURED 2026-10-17: the Atom API answers 200 keyless and each entry carries an abs id that resolves to
+      /pdf/<id>. This is the rung that serves a PAPER gap; Gutenberg and Standard Ebooks structurally cannot.'
   annas:
     licence_class: shadow
-    enabled: false
+    #: BUILT (enabled) and RUN-gated (requires_owner_word): the two gates have two meanings.
+    enabled: true
     requires_owner_word: true
-    state: unreachable_by_scraping
-    measured: '2026-10-17: .org has no DNS; .li returns 200 as a PARKED domain; .gd/.gl/.pk answer every search
-      with a DDoS-Guard JS challenge. A plain HTTP adapter cannot pass it, so the adapter is declared instead of
-      pretended. The lawful route to the same index is its official (paid) API key, or its bulk torrents.'
+    state: browser_engine
+    engine: browser
+    search: "https://{mirror}/search?q={query}&content=book_any"
+    slow_wait_s: 75
+    measured: '2026-10-17 21:58, five readings: urllib 403 (902 B DDoS-Guard) | headless Chrome 403 (1,896 B) |
+      HEADED Chrome settles in 14 s to 693,342 B with 116 /md5/ rows | /md5/<hash> gives 16 slow_download and 105
+      fast_download links | /slow_download/<hash>/0/0 settles in 24 s to a node URL with a real .epub. Endpoint
+      shapes taken from the community MCP iosifache/annas-mcp (search needs no key; downloads take a key, so the
+      key is an ACCELERATOR here, never a precondition).'
   libgen:
     licence_class: shadow
     #: TWO GATES, TWO MEANINGS (measured defect, first shadow run 2026-10-17): `enabled` says the adapter is PART
@@ -142,20 +163,59 @@ adapters:
     requires_owner_word: true
     state: implemented
     search: "https://{mirror}/index.php?req={query}"
-    note: 'MEASURED working 2026-10-17: search → ads.php?md5= → get.php?md5=&key= → 307 → node. This is the
-      shadow rung that actually works from this machine, and it is OFF until the owner names it.'
+    note: 'MEASURED working 2026-10-17: search → ads.php?md5= → get.php?md5=&key= → 307 → node. libgen.li answered
+      500 (max_user_connections) at 21:20 and 200 with 25 parseable rows at 21:52 — the saturation is INTERMITTENT
+      (BUG-909), which is why the rung keeps its retries and its breaker instead of a raised threshold.'
   zlibrary:
     licence_class: shadow
-    enabled: false
+    enabled: true
     requires_owner_word: true
-    state: not_implemented
-    note: 'Needs a personal login (a credential this repository does not hold, and must not). Declared so the
-      ladder shows the hole instead of silently ending early (D-3038).'
+    state: credential_required
+    domain_env: ZLIB_DOMAIN
+    cookie_env: ZLIB_COOKIE
+    note: 'MEASURED 2026-10-17: every published front answers a guard, not a catalogue — z-lib.gd 503 (9.5 KB
+      Checking your browser), z-library.qa/-gy 503, z-library.sk no DNS, z-lib.fm/-im/-sk 307. The community CLI
+      heartleo/zlib (993 stars, pushed 2026-10-07) needs a PERSONAL DOMAIN + LOGIN and supports proxy/custom domain.
+      So the one missing thing is the owner s own session: either `brew install heartleo/tap/zlib && zlib login`,
+      or ZLIB_DOMAIN + ZLIB_COOKIE. The rung refuses BY NAME until one exists (D-3034).'
+  scihub:
+    licence_class: shadow
+    enabled: true
+    requires_owner_word: true
+    state: captcha_measured
+    mirrors: [sci-hub.ru, sci-hub.st]
+    scidb_via_browser: true
+    note: 'MEASURED 2026-10-17: sci-hub.ru and sci-hub.st answer 200 with a body carrying `captcha`; sci-hub.se has
+      no DNS. The second route WORKS through the same browser engine: Anna s Archive indexes Sci-Hub at
+      /scidb/<doi> (403 to plain HTTP, like every Anna s page). A captcha is a MISS WITH THAT NAME, never a silent
+      refusal of the work.'
+
+# ── THE MATCHER ──────────────────────────────────────────────────────────────────────────────────────────────
+#: Why two limbs: MEASURED 2026-10-17, a LibGen search for `The Design of Everyday Things` returns
+#: `Design Your Life: The Pleasures and Perils of Everyday Things`, whose TOKEN RECALL against the query is 1.0 —
+#: every word the owner asked for is in it. Recall alone would land the WRONG BOOK UNDER THE RIGHT NAME, the one
+#: corruption this lane exists to prevent. The character ratio separates the pair (0.55 vs 0.92 for the true work),
+#: so a title must pass BOTH limbs. Precision over recall, declared.
+matcher:
+  min_token_recall: 0.6
+  min_title_ratio: 0.62
+
+# ── THE BROWSER ENGINE ───────────────────────────────────────────────────────────────────────────────────────
+#: MEASURED 2026-10-17: headless is DETECTED (403, 1,896 B). The engine is therefore headed with a persistent
+#: profile, so the challenge is answered once per run and the session/cookie survives across navigations.
+browser:
+  headless: false
+  channel: chrome
+  navigation_timeout_s: 60
+  challenge_wait_s: 30
+  profile_dir: "knowledge pipeline/acquisition/browser-profile"
 
 # ───────────────────────────────────────────────────────────────────────────────────────────── THE MIRRORS ──
 mirrors:
   #: Never hardcode a domain that renames itself monthly. Ask the tracker, then VALIDATE by content.
   source: "https://open-slum.org/"
+  #: A mirror probe asks 'alive now', so it gets ONE attempt and a short ceiling (BUG-911).
+  probe_timeout_s: 15
   cache: "knowledge pipeline/acquisition/mirrors.json"
   ttl_hours: 6
   probe_timeout_s: 15

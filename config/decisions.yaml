@@ -27840,3 +27840,52 @@ decisions:
     receipted; a shadow dry-run located a real `get.php` link before the mirror saturated (BUG-909). WHAT REMAINS OPEN
     is a SOURCE problem, not a code problem: one working shadow rung is a single point of failure, and the remedy
     (Annas API key, a second adapter behind the same protocol, or an accepted named gap) is an OWNER WORD.
+- id: D-3080
+  state: ACTIVE
+  date: 2026-10-17
+  by: assistant
+  category: ACQUISITION v1.1 — THE SHADOW LANE IS REACHABLE, THE REVIEW SITES ARE REGISTERED, AND BOTH FACTS ARE MEASURED
+  refines: [D-3079, D-3078]
+  bugs: [BUG-909, BUG-910, BUG-911, BUG-912]
+  files: [config/acquisition.yaml, config/research_sources.yaml, pipeline/acquisition/browser.py,
+          pipeline/acquisition/sources.py, pipeline/acquisition/adapters.py, scripts/acquire.py]
+  decision: >-
+    THREE THINGS WERE ASSUMED AND ARE NOW MEASURED, AND ONE OF THEM CHANGES THE LANE'S SHAPE.
+
+    (1) ANNA'S ARCHIVE IS NOT UNREACHABLE — IT IS UNREACHABLE BY THE WRONG ENGINE. urllib 403 (902 B, DDoS-Guard);
+    Playwright HEADLESS 403 (1,896 B); Playwright HEADED Chrome settles the same URL in 14 s to 693,342 B with 116
+    /md5/ rows, and /slow_download/<hash>/0/0 settles in 24 s to a node URL carrying a real .epub. The old
+    declaration ("unreachable by scraping") was TRUE OF AN HTTP CLIENT and FALSE OF A BROWSER — a declaration about
+    the adapter misread as a fact about the source (D-3034). The engine is therefore a DECLARED component
+    (pipeline/acquisition/browser.py, config browser.*) and an absent engine is a MISS that names the remedy.
+
+    (2) A SHADOW RUNG'S PARSER CAN SILENTLY REFUSE EVERY BOOK, AND ITS REFUSAL LOOKS LIKE AN ABSENT BOOK (BUG-910).
+    libgen.li puts a `>` inside its title anchor's tooltip attribute, so the title was invisible and the fallback
+    read the ISBN line or the journal name; every candidate scored 0 and was refused as `no rows`. Fixed with a
+    quote-aware anchor and a cell-based extension/size read. THE SECOND HALF IS THE IMPORTANT ONE: with titles
+    parsed, `The Design of Everyday Things` matched `Design Your Life: The Pleasures and Perils of Everyday Things`
+    at token recall 1.00 — so the matcher now needs TWO limbs (recall 0.6 AND character ratio 0.62), because the
+    filename comes from the manifest candidate and a mismatched file is a SILENT CORRUPTION, not a near miss.
+
+    (3) "BEST REVIEW SITES" IS NOT A PROSE QUESTION. Every candidate aged within a month: Goodreads has had no
+    public API since 2020-12, StoryGraph answers 403 behind Cloudflare with no API (CSV export only), Hardcover
+    moved to GraphQL with a free bearer token, LibraryThing 403s with the JSON API retired. So the list is a
+    DECLARED REGISTER (config/research_sources.yaml, 23 sources, `access` ∈ api|scrape|browser|credential|captcha|
+    manual|none) with a measurement and a REASON for every entry that cannot be automated (D-3038), read by ONE
+    module (pipeline/acquisition/sources.py) and checked by `scripts/acquire.py sources --check` (faults exit 1).
+    Ranking is four limbs — citation 1.0, review_volume 0.45, review_value 0.35, open_access 0.25, recency 0.30 —
+    with `min_reviews_for_signal: 25` because 4.8 from 3 ratings is noise. On that reading the best INTEGRABLE book
+    sources are Hardcover (GraphQL + token) and Open Library (keyless), Goodreads is the best review VOLUME
+    (scrape-only), and StoryGraph is the best per-book quality signal that this OS may NOT read automatically.
+
+    ALSO DECIDED: the ladder gains `arxiv` (lawful, measured 200 keyless) and `scihub` (shadow; sci-hub.ru and
+    sci-hub.st answer 200 with `captcha`, with Anna's /scidb/<doi> as the working second route through the browser);
+    `open_access` becomes a THREE-ROUTE rung (oa_pdf → unpaywall → europepmc) because a rung that reads one field
+    refuses every work whose OA copy the resolver did not index; and `zlibrary` is declared `credential_required`
+    with the owner's exact action, because every published front answers a guard (503/307/no-DNS) and a 503 dressed
+    as "no such book" would be a lie.
+  receipts:
+    selftest: 'python3 scripts/acquire.py --selftest → 42/42 green (was 38)'
+    register: 'python3 scripts/acquire.py sources --check → 0 faults, 23 declared sources, 5 named NOT_MEASURED'
+    shadow_route: 'headed Chrome 14 s → 693,342 B → 116 /md5/ rows → 16 slow_download → node URL with .epub (2026-10-17 21:58)'
+    libgen: 'libgen.li 200 / 89,057 B / 25 parseable rows at 21:52, forty minutes after the same front answered 500'

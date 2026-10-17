@@ -30,7 +30,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from pipeline.acquisition import adapters, config, downloader, gaps, mirrors, net, resolvers  # noqa: E402
+from pipeline.acquisition import adapters, config, downloader, gaps, mirrors, net, resolvers, sources  # noqa: E402
 
 
 def _print(payload: dict[str, Any], as_json: bool) -> None:
@@ -39,6 +39,42 @@ def _print(payload: dict[str, Any], as_json: bool) -> None:
         print(json.dumps(payload, indent=2, ensure_ascii=False))
         return
     print(json.dumps(payload, indent=2, ensure_ascii=False))
+
+
+def cmd_sources(args: argparse.Namespace, cfg: dict[str, Any]) -> int:
+    """The research-source register: what a market-research pass may read, and whether that is still true."""
+    document = sources.load()
+    faults, notes = sources.check(document)
+    rows = sources.rank(str(args.task), document) if args.task else []
+    reading: dict[str, Any] = {
+        "act": "research_sources",
+        "authority": "D-3080",
+        "register": str(sources.REGISTER.relative_to(sources.ROOT)),
+        "sources": len(sources.entries(document)),
+        "faults": faults,
+        "notes": notes,
+    }
+    if rows:
+        reading["task"] = args.task
+        reading["ranked"] = [
+            {"id": row["id"], "tier": row.get("tier"), "access": row.get("access"),
+             "signal": row.get("signal"), "answers": row.get("answers")}
+            for row in rows
+        ]
+    if args.json:
+        print(json.dumps(reading, indent=2))
+    else:
+        print(f"register: {reading['register']} — {reading['sources']} declared source(s)")
+        for note in notes:
+            print(f"  NOTE  {note}")
+        for fault in faults:
+            print(f"  FAULT {fault}")
+        for row in reading.get("ranked", []):
+            limbs = ",".join(row["signal"] or []) or "no signal limb"
+            print(f"  [{row['tier']}] {row['id']:<20} {row['access']:<10} {limbs:<38} {row['answers']}")
+        if not notes and not faults:
+            print("ok every declared source resolves and is measured")
+    return 1 if faults else 0
 
 
 def cmd_gap(args: argparse.Namespace, cfg: dict[str, Any]) -> int:
@@ -228,14 +264,28 @@ def selftest() -> int:
     # the ladder: shadow is OFF without a word, ON with one, and a disabled rung never appears.
     lawful = [adapter.id for adapter in adapters.ladder(cfg, allow_shadow=False)]
     with_word = [adapter.id for adapter in adapters.ladder(cfg, allow_shadow=True)]
-    check("the lawful rungs are enabled in the declared order",
-          lawful == [name for name in ("open_access", "gutenberg", "standardebooks") if name in lawful], str(lawful))
-    check("no shadow rung is reachable without an owner word", not set(lawful) & {"libgen", "annas", "zlibrary"}, str(lawful))
-    check("the owner's word ADDS the shadow rung that is built", "libgen" in with_word and "libgen" not in lawful, str(with_word))
-    check("a shadow rung that is NOT built stays out even WITH the word",
-          not set(with_word) & {"annas", "zlibrary"}, str(with_word))
-    check("annas refuses by measurement, not by silence",
-          _raises(lambda: adapters.AnnasAdapter().locate(candidate, cfg), adapters.AdapterMiss))
+    lawful_expected = [name for name in ("open_access", "gutenberg", "standardebooks", "arxiv") if name in lawful]
+    check("the lawful rungs are enabled in the declared order", lawful == lawful_expected, str(lawful))
+    check("no shadow rung is reachable without an owner word",
+          not set(lawful) & {"libgen", "annas", "zlibrary", "scihub"}, str(lawful))
+    check("the owner's word ADDS every shadow rung that is built",
+          {"libgen", "annas", "zlibrary", "scihub"} <= set(with_word), str(with_word))
+    check("the ladder puts every lawful rung before every shadow rung",
+          max(lawful.index(name) for name in lawful) < min(with_word.index(name) for name in set(with_word) - set(lawful)),
+          str(with_word))
+
+    # Two-gate honesty: a shadow rung that needs a credential says WHICH credential, by name (D-3034).
+    check("zlibrary names the missing credential instead of pretending the book is absent",
+          "ZLIB_DOMAIN" in _refusal(lambda: adapters.ZlibraryAdapter().locate(candidate, cfg)))
+    not_a_doi = resolvers.Candidate("openalex:W123", "T", ("A",), 2000, "", "book", 0, None, None, "x")
+    check("scihub refuses a candidate that is not a DOI, by name",
+          "not one" in _refusal(lambda: adapters.ScihubAdapter().locate(not_a_doi, cfg)))
+    engine_ok, engine_why = adapters.browser.available()
+    check("the browser engine either exists or NAMES its remedy",
+          engine_ok or "pip install playwright" in engine_why, engine_why)
+    check("annas declares the engine it needs instead of claiming the source is dead",
+          adapters.AnnasAdapter.STATE == "browser_engine" and cfg["adapters"]["annas"]["engine"] == "browser",
+          adapters.AnnasAdapter.STATE)
 
     # libgen rows: the parser is pinned to a FIXTURE so a site redesign fails a test, not a download.
     fixture = (
@@ -247,10 +297,42 @@ def selftest() -> int:
           len(rows) == 1 and rows[0]["md5"] == "53ea92403d513c35327558c57fc8c3bb" and rows[0]["title"] == "Generative Art Theory"
           and rows[0]["extension"] == "epub", str(rows))
     check("a row without an md5 is not a row", adapters.parse_libgen_rows("<tr><td>no link</td></tr>") == [])
+    #: THE MEASURED SHAPE (BUG-910): libgen.li puts a `>` INSIDE the title anchor's tooltip attribute, which made
+    #: every book title invisible to the first parser; and a decoy row whose recall is 1.0 must still be refused.
+    measured = (
+        '<tr><td><a title="Add/Edit : 2017-10-04; ID: 93129822<br>Emotional Design - Donald A. Norman" '
+        'href="edition.php?id=137898842">Emotional Design: Why We Love (or Hate) Everyday Things <i>1</i></a></td>'
+        '<td>Don Norman</td><td>Basic Books</td><td><nobr>2005</nobr></td><td>English</td><td>0 / 272</td>'
+        '<td><nobr><a href="/file.php?id=93129822">985 kB</a></nobr></td><td>epub</td>'
+        '<td><a href="/ads.php?md5=76CF57A9D4F5E87FA92A85E31F9DC3F2"><span>1</span></a></td></tr>'
+    )
+    measured_rows = adapters.parse_libgen_rows(measured)
+    check("a title survives a `>` inside its own tooltip attribute (BUG-910)",
+          len(measured_rows) == 1 and measured_rows[0]["title"].startswith("Emotional Design"), str(measured_rows))
+    check("a real title matches the work it names",
+          adapters._title_match("Emotional Design: Why We Love (or Hate) Everyday Things",
+                                measured_rows[0]["title"], cfg)[0], measured_rows[0]["title"])
+    check("a decoy with FULL token recall is still refused (precision over recall)",
+          not adapters._title_match("The Design of Everyday Things",
+                                    "Design Your Life: The Pleasures and Perils of Everyday Things", cfg)[0])
 
     # mirrors: the regex recognises the families and a 200 with no marker is NOT usable (the parked-domain case).
     check("the tracker parse finds annas domains", bool(mirrors.FAMILY_PATTERN["annas"].findall("x annas-archive.gd y")))
     check("the tracker parse finds libgen domains", bool(mirrors.FAMILY_PATTERN["libgen"].findall("x libgen.bz y")))
+
+    # the research-source register (D-3080): a declaration that cannot be checked is a prose list.
+    register = sources.load()
+    faults, _notes = sources.check(register)
+    check("every declared research source resolves (access vocabulary, api_url, env name, reason, measurement)",
+          not faults, "; ".join(faults[:3]))
+    ranked_books = sources.rank("books", register)
+    check("the book ranking puts an integrable source before a manual one",
+          [row["access"] in {"api", "scrape", "browser", "credential", "captcha"} for row in ranked_books]
+          == sorted((row["access"] in {"api", "scrape", "browser", "credential", "captcha"} for row in ranked_books), reverse=True),
+          str([(row["id"], row["access"]) for row in ranked_books]))
+    check("a review site that cannot be reached is declared, not dropped",
+          any(row["id"] == "the_storygraph" and row["access"] == "manual" for row in ranked_books))
+    check("an unknown task is refused by name", _raises(lambda: sources.rank("vibes", register)))
 
     # the gap reader: a real census, and every unmeasured class NAMED.
     reading = gaps.read_all(cfg, 5)
@@ -326,6 +408,15 @@ def selftest() -> int:
     return 0 if not failed else 1
 
 
+def _refusal(call) -> str:
+    """The refusal's own words — so a control can assert WHAT a miss says, not only that it refused."""
+    try:
+        call()
+    except BaseException as error:  # noqa: BLE001 - the control asserts the message, never re-raises
+        return str(error)
+    return ""
+
+
 def _raises(call, expected: type[BaseException] | None = None) -> bool:
     """True when the call refuses with the expected class (or any refusal when none is named)."""
     try:
@@ -360,6 +451,10 @@ def main(argv: list[str] | None = None) -> int:
 
     subparsers.add_parser("status", help="the lane's own state")
 
+    sources_parser = subparsers.add_parser("sources", help="the research-source register (D-3080)")
+    sources_parser.add_argument("--check", action="store_true", help="verify every declaration resolves (the default reading)")
+    sources_parser.add_argument("--task", choices=["books", "papers", "shadow", "all"], default="")
+    sources_parser.add_argument("--json", action="store_true")
     mirrors_parser = subparsers.add_parser("mirrors", help="which mirror domains are validated today")
     mirrors_parser.add_argument("--refresh", action="store_true")
 
@@ -370,7 +465,8 @@ def main(argv: list[str] | None = None) -> int:
         parser.print_help()
         return 2
     cfg = config.load_config()
-    handlers = {"gap": cmd_gap, "map": cmd_map, "fetch": cmd_fetch, "status": cmd_status, "mirrors": cmd_mirrors}
+    handlers = {"gap": cmd_gap, "map": cmd_map, "fetch": cmd_fetch, "status": cmd_status,
+                "mirrors": cmd_mirrors, "sources": cmd_sources}
     try:
         return handlers[args.command](args, cfg)
     except config.AcquisitionError as refusal:

@@ -1,7 +1,7 @@
 {
   "act": "T-181 admission plan",
   "authority": "D-3051",
-  "generated": "2026-10-17T18:21:42Z",
+  "generated": "2026-10-17T20:01:55Z",
   "corpus_home": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books",
   "accepted_containers": [
     ".azw",
@@ -45,8 +45,8 @@
     {
       "id": "books",
       "files": 2180,
-      "seen": 1752,
-      "never_seen": 428,
+      "seen": 1763,
+      "never_seen": 417,
       "admits_to": "corpus_home"
     },
     {
@@ -58,19 +58,19 @@
     }
   ],
   "files": 2810,
-  "seen": 1761,
-  "never_seen": 1049,
-  "seen_keys": 1005,
-  "unseen_keys": 973,
+  "seen": 1772,
+  "never_seen": 1038,
+  "seen_keys": 1016,
+  "unseen_keys": 962,
   "counts": {
-    "already_in_the_corpus": 1734,
+    "already_in_the_corpus": 1745,
     "seen_by_an_ingest_record": 27,
-    "admit_candidate": 541,
+    "admit_candidate": 531,
     "refused_no_declared_corpus_home": 0,
     "refused_container_no_stage_reads_it": 268,
     "refused_container_corrupt": 1,
-    "refused_name_repair_first": 180,
-    "refused_not_in_its_kind_folder": 59,
+    "refused_name_repair_first": 185,
+    "refused_not_in_its_kind_folder": 53,
     "refused_domain_not_a_corpus_domain": 0
   },
   "examples": {
@@ -96,11 +96,11 @@
       "books/epub/DOMAIN 0 Systems + Decision/decision+strategy/The Innovator's Dilemma, with a New Foreword_ When New -- Clayton M_ Christensen, Marc Benioff -- Boston, Massachusetts, 2024 -- Harvard Business -- 9781647826765 -- a59e96922fa14713e58cd764a3e4195c -- Anna\u2019s Archive.epub"
     ],
     "refused_not_in_its_kind_folder": [
-      "books/epub/DOMAIN 0 Systems + Decision/systems+complexity/The Systems Bible_ The Beginner_'s Guide to Systems Large and Small_John Gall_liber3.mobi",
       "books/epub/DOMAIN 2 Design/communication+design/_Visual Metaphor Structure and Process (Gerard J.Steen) (z-library.sk, 1lib.sk, z-lib.sk).pdf",
-      "books/epub/DOMAIN 2 Design/design+systems/Laying the Foundations -- Andrew Couldwell -- 2019 -- 898b840e9d7b80bc2a4a7849418341a5 -- Anna\u2019s Archive.mobi",
-      "books/epub/DOMAIN 3 Art + Computational Media/Digital Art, Third edition (World of Art).azw3",
-      "books/epub/DOMAIN 4 Business/practice+economics/100-Habits of Successful Freelance Designers Insider Secrets for Working Smart  Staying Creative (Steve Gordon) (z-library.sk, 1lib.sk, z-lib.sk).pdf"
+      "books/epub/DOMAIN 4 Business/practice+economics/100-Habits of Successful Freelance Designers Insider Secrets for Working Smart  Staying Creative (Steve Gordon) (z-library.sk, 1lib.sk, z-lib.sk).pdf",
+      "books/epub/DOMAIN 4 Business/practice+economics/365 Habits of Successful Graphic Designers Insider Secrets from Top Designers on Working Smart and Staying Creative (Laurel Saville, Joshua Berger etc.) (z-library.sk, 1lib.sk, z-lib.sk).pdf",
+      "books/mobi/DOMAIN 3 Art + Computational Media/Digital Art, Third edition (World of Art).azw3",
+      "books/pdf/DOMAIN 0 Systems + Decision/execution+operations/The Art of Strategy_ A Game Theorist_'s Guide to Success in Business and Life_Dixit, Avinash K.;Nalebuff Barry J_liber3.epub"
     ],
     "refused_domain_not_a_corpus_domain": []
   },
@@ -131,11 +131,6 @@
       "kind": "epub"
     },
     {
-      "rel": "books/epub/DOMAIN 0 Systems + Decision/systems+complexity/The Systems Bible_ The Beginner_'s Guide to Systems Large and Small_John Gall_liber3.mobi",
-      "decision": "refused_not_in_its_kind_folder",
-      "kind": "mobi"
-    },
-    {
       "rel": "books/epub/DOMAIN 2 Design/communication+design/Brand Naming The Complete Guide to Creating a Name for.epub",
       "decision": "refused_name_repair_first",
       "kind": "epub"
@@ -161,19 +156,9 @@
       "kind": "pdf"
     },
     {
-      "rel": "books/epub/DOMAIN 2 Design/design+systems/Laying the Foundations -- Andrew Couldwell -- 2019 -- 898b840e9d7b80bc2a4a7849418341a5 -- Anna\u2019s Archive.mobi",
-      "decision": "refused_not_in_its_kind_folder",
-      "kind": "mobi"
-    },
-    {
       "rel": "books/epub/DOMAIN 2 Design/visual+fundamentals/Advanced Typography From Knowledge to Mastery (Richard Hunt) (z-library.sk, 1lib.sk, z-lib.sk).epub",
       "decision": "refused_name_repair_first",
       "kind": "epub"
-    },
-    {
-      "rel": "books/epub/DOMAIN 3 Art + Computational Media/Digital Art, Third edition (World of Art).azw3",
-      "decision": "refused_not_in_its_kind_folder",
-      "kind": "azw3"
     },
     {
       "rel": "books/epub/DOMAIN 3 Art + Computational Media/live+visuals+vjing/Introduction to TouchDesigner 099 (sponsored by nVoid) (z-library.sk, 1lib.sk, z-lib.sk).epub",
@@ -276,8 +261,33 @@
       "kind": "epub"
     },
     {
-      "rel": "books/epub/The Elements of Style [Illustrated] -- Strunk Jr_, William -- 2011 -- Seedbox Press, LLC -- 7b4f785e400d8b6294e26324ee067d0f -- Anna\u2019s Archive.mobi",
+      "rel": "books/mobi/DOMAIN 0 Systems + Decision/systems+complexity/SYSTEMANTICS. THE SYSTEMS BIBLE (John Gall) (z-library.sk, 1lib.sk, z-lib.sk).mobi",
+      "decision": "refused_name_repair_first",
+      "kind": "mobi"
+    },
+    {
+      "rel": "books/mobi/DOMAIN 0 Systems + Decision/systems+complexity/The Systems Bible_ The Beginner_'s Guide to Systems Large and Small_John Gall_liber3.mobi",
+      "decision": "refused_name_repair_first",
+      "kind": "mobi"
+    },
+    {
+      "rel": "books/mobi/DOMAIN 2 Design/design+systems/Laying the Foundations -- Andrew Couldwell -- 2019 -- 898b840e9d7b80bc2a4a7849418341a5 -- Anna\u2019s Archive.mobi",
+      "decision": "refused_name_repair_first",
+      "kind": "mobi"
+    },
+    {
+      "rel": "books/mobi/DOMAIN 3 Art + Computational Media/Digital Art, Third edition (World of Art).azw3",
       "decision": "refused_not_in_its_kind_folder",
+      "kind": "azw3"
+    },
+    {
+      "rel": "books/mobi/DOMAIN 5 Personal Practice/productivity+execution/How to DeFi by CoinGecko Lau, Darren Lau, Daryl Teh, Sze Jin Kho, Kristian Azmi, Erina Lee, TM Ong, Bobby (z-lib.org).mobi",
+      "decision": "refused_name_repair_first",
+      "kind": "mobi"
+    },
+    {
+      "rel": "books/mobi/The Elements of Style [Illustrated] -- Strunk Jr_, William -- 2011 -- Seedbox Press, LLC -- 7b4f785e400d8b6294e26324ee067d0f -- Anna\u2019s Archive.mobi",
+      "decision": "refused_name_repair_first",
       "kind": "mobi"
     },
     {
@@ -339,11 +349,6 @@
       "rel": "books/pdf/DOMAIN 0 Systems + Decision/systems+complexity/Philosophy of Complex Systems (Cliff A. Hooker, Dov M. Gabbay etc.) (z-library.sk, 1lib.sk, z-lib.sk).pdf",
       "decision": "refused_name_repair_first",
       "kind": "pdf"
-    },
-    {
-      "rel": "books/pdf/DOMAIN 0 Systems + Decision/systems+complexity/SYSTEMANTICS. THE SYSTEMS BIBLE (John Gall) (z-library.sk, 1lib.sk, z-lib.sk).mobi",
-      "decision": "refused_not_in_its_kind_folder",
-      "kind": "mobi"
     },
     {
       "rel": "books/pdf/DOMAIN 0 Systems + Decision/systems+complexity/The Art of Problem Solving_ Accompanied by Ackoff_'s Fables_Russell L. Ackoff_liber3.pdf",
@@ -1151,11 +1156,6 @@
       "kind": "epub"
     },
     {
-      "rel": "books/pdf/DOMAIN 4 Business/practice+economics/Pricing Design_Dan Mall_liber3.mobi",
-      "decision": "refused_not_in_its_kind_folder",
-      "kind": "mobi"
-    },
-    {
       "rel": "books/pdf/DOMAIN 4 Business/practice+economics/[Josh_Berger,_Sarah_Dougher,_Plazm]_100_Habits_of_(z-lib.org).pdf",
       "decision": "refused_name_repair_first",
       "kind": "pdf"
@@ -1204,11 +1204,6 @@
       "rel": "books/pdf/DOMAIN 5 Personal Practice/productivity+execution/Everybody Writes Your Go-To Guide to Creating Ridiculously Good Content by Ann Handley (z-lib.org).pdf",
       "decision": "refused_name_repair_first",
       "kind": "pdf"
-    },
-    {
-      "rel": "books/pdf/DOMAIN 5 Personal Practice/productivity+execution/How to DeFi by CoinGecko Lau, Darren Lau, Daryl Teh, Sze Jin Kho, Kristian Azmi, Erina Lee, TM Ong, Bobby (z-lib.org).mobi",
-      "decision": "refused_not_in_its_kind_folder",
-      "kind": "mobi"
     },
     {
       "rel": "books/pdf/DOMAIN 5 Personal Practice/productivity+execution/The Wall Street Era is Over The Investors Guide to Cryptocurrency and DeFi, the Decentralized Finance Revolution by App, DEFIYIELD (z-lib.org).pdf",
@@ -2669,6 +2664,15 @@
       "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 5 Personal Practice/productivity+execution/HBR Management Tips Collection (2 Books) Harvard Business Review liber3.md"
     },
     {
+      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/mobi/DOMAIN 4 Business/practice+economics/Pricing Design_Dan Mall_liber3.mobi",
+      "rel": "books/mobi/DOMAIN 4 Business/practice+economics/Pricing Design_Dan Mall_liber3.mobi",
+      "root": "books",
+      "kind": "mobi",
+      "key": "pricing design_dan mall_liber3",
+      "bytes": 4682920,
+      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 4 Business/practice+economics/Pricing Design_Dan Mall_liber3.md"
+    },
+    {
       "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/53481411-De-Re-Metallica-1556-Agricola.pdf",
       "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/53481411-De-Re-Metallica-1556-Agricola.pdf",
       "root": "books",
@@ -2676,96 +2680,6 @@
       "key": "53481411-de-re-metallica-1556-agricola",
       "bytes": 99065265,
       "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/53481411-De-Re-Metallica-1556-Agricola.md"
-    },
-    {
-      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Coelum Philosophorum.pdf",
-      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Coelum Philosophorum.pdf",
-      "root": "books",
-      "kind": "pdf",
-      "key": "coelum philosophorum",
-      "bytes": 45417,
-      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Coelum Philosophorum.md"
-    },
-    {
-      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Cognitive Economics - Springer-Verlag Berlin Heidelberg. Professor Bernard Walliser (auth.) (2008).pdf",
-      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Cognitive Economics - Springer-Verlag Berlin Heidelberg. Professor Bernard Walliser (auth.) (2008).pdf",
-      "root": "books",
-      "kind": "pdf",
-      "key": "cognitive economics - springer-verlag berlin heidelberg. professor bernard walliser (auth.) (2008",
-      "bytes": 1054739,
-      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Cognitive Economics - Springer-Verlag Berlin Heidelberg. Professor Bernard Walliser (auth.) (2008).md"
-    },
-    {
-      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Concentrated Salt of Nature.pdf",
-      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Concentrated Salt of Nature.pdf",
-      "root": "books",
-      "kind": "pdf",
-      "key": "concentrated salt of nature",
-      "bytes": 172557,
-      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Concentrated Salt of Nature.md"
-    },
-    {
-      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Conway, D.J. - Falcon, Feather and Valkyrie Sword.pdf",
-      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Conway, D.J. - Falcon, Feather and Valkyrie Sword.pdf",
-      "root": "books",
-      "kind": "pdf",
-      "key": "conway, d.j. - falcon, feather and valkyrie sword",
-      "bytes": 3650514,
-      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Conway, D.J. - Falcon, Feather and Valkyrie Sword.md"
-    },
-    {
-      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/DO IT YOURSELF PROJECT ORGONE ACCUMULATOR.pdf",
-      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/DO IT YOURSELF PROJECT ORGONE ACCUMULATOR.pdf",
-      "root": "books",
-      "kind": "pdf",
-      "key": "do it yourself project orgone accumulator",
-      "bytes": 7077173,
-      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/DO IT YOURSELF PROJECT ORGONE ACCUMULATOR.md"
-    },
-    {
-      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Encyclopedia of Prostitution and Sex Work (2 Volumes Set).pdf",
-      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Encyclopedia of Prostitution and Sex Work (2 Volumes Set).pdf",
-      "root": "books",
-      "kind": "pdf",
-      "key": "encyclopedia of prostitution and sex work (2 volumes set",
-      "bytes": 69891872,
-      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Encyclopedia of Prostitution and Sex Work (2 Volumes Set).md"
-    },
-    {
-      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Frater Oz - A Bi\u0301blia Vampi\u0301rica.pdf",
-      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Frater Oz - A Bi\u0301blia Vampi\u0301rica.pdf",
-      "root": "books",
-      "kind": "pdf",
-      "key": "frater oz - a b\u00edblia vamp\u00edrica",
-      "bytes": 99829,
-      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Frater Oz - A Bi\u0301blia Vampi\u0301rica.md"
-    },
-    {
-      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Freemason Bluebook.pdf",
-      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Freemason Bluebook.pdf",
-      "root": "books",
-      "kind": "pdf",
-      "key": "freemason bluebook",
-      "bytes": 151923,
-      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Freemason Bluebook.md"
-    },
-    {
-      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Fulcanelli - The Dwellings of the Philosophers (Les Demeures Philosophales).pdf",
-      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Fulcanelli - The Dwellings of the Philosophers (Les Demeures Philosophales).pdf",
-      "root": "books",
-      "kind": "pdf",
-      "key": "fulcanelli - the dwellings of the philosophers (les demeures philosophales",
-      "bytes": 1732415,
-      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Fulcanelli - The Dwellings of the Philosophers (Les Demeures Philosophales).md"
-    },
-    {
-      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Gerard Cremonensis, Astrological Geomancy.pdf",
-      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Gerard Cremonensis, Astrological Geomancy.pdf",
-      "root": "books",
-      "kind": "pdf",
-      "key": "gerard cremonensis, astrological geomancy",
-      "bytes": 170078,
-      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Gerard Cremonensis, Astrological Geomancy.md"
     },
     {
       "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/GodMan_10236902.pdf",
@@ -2784,15 +2698,6 @@
       "key": "goffman_erving_the_presentation_of_self_in_everyday_life",
       "bytes": 3591628,
       "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Goffman_Erving_The_Presentation_of_Self_in_Everyday_Life.md"
-    },
-    {
-      "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Hungry_Minds_The_Book_The_Ultimate_Guide_to_Rebuilding_Civilization.pdf",
-      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Hungry_Minds_The_Book_The_Ultimate_Guide_to_Rebuilding_Civilization.pdf",
-      "root": "books",
-      "kind": "pdf",
-      "key": "hungry_minds_the_book_the_ultimate_guide_to_rebuilding_civilization",
-      "bytes": 70176618,
-      "target": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Hungry_Minds_The_Book_The_Ultimate_Guide_to_Rebuilding_Civilization.md"
     },
     {
       "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Jim DeKorne - Psychedelic Shamanism.pdf",

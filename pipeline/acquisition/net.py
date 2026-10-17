@@ -53,7 +53,8 @@ def _request(url: str, cfg: dict[str, Any], headers: dict[str, str] | None = Non
     return urllib.request.Request(url, headers=merged, method="GET")
 
 
-def read_text(url: str, cfg: dict[str, Any], timeout_s: float | None = None) -> str:
+def read_text(url: str, cfg: dict[str, Any], timeout_s: float | None = None,
+              attempts: int | None = None) -> str:
     """Read a URL as text, refusing (never silently returning empty) on any transport failure.
 
     A 5xx carries its REASON in the body and the reason matters: MEASURED 2026-10-17, every LibGen front answered
@@ -62,7 +63,10 @@ def read_text(url: str, cfg: dict[str, Any], timeout_s: float | None = None) -> 
     """
     connection = cfg.get("download") or {}
     timeout = float(timeout_s or (cfg.get("mirrors") or {}).get("probe_timeout_s", 20))
-    attempts = 1 + max(0, int(connection.get("retries") or 0))
+    #: `attempts` is an override for a PROBE (a mirror liveness check), never for a download: retrying a
+    #: guard that answers 403 in a second turns a 3-domain probe into minutes (MEASURED 2026-10-17, BUG-911).
+    if attempts is None:
+        attempts = 1 + max(0, int(connection.get("retries") or 0))
     backoff = float(connection.get("retry_backoff_s") or 2)
     last: NetworkRefused | None = None
     for attempt in range(attempts):

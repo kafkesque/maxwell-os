@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**243 open** / 431 closed of 674 ids.
+**245 open** / 432 closed of 677 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -249,4 +249,6 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-902 | (MED — OPEN 2026-10-17) — THE ROUTE-GRAPH DEBT WAS OVER ITS SHRINK-ONLY CEILING IN `config/capability_registry.yaml` BEFORE TODAY'S FINDINGS | 1 |
 | BUG-905 | (MED — OPEN 2026-10-17) — THE KINDLE ENGINE EXISTS AND STILL CANNOT BE USED: config/ingest_identity_gate.yaml DECLARES A KIND FOLDER THAT | 1 |
 | BUG-906 | (LOW — OPEN 2026-10-17) — A READ-ONLY DELEGATE RUN CANNOT BE CLOSED AS `done`: scripts/delegate_journal.py REFUSES `--artifact none` | 1 |
-| BUG-909 | (HIGH — OPEN 2026-10-17) — THE ONLY SHADOW RUNG THAT WORKS IS A SINGLE POINT OF FAILURE: EVERY LibGen FRONT ANSWERS `500 | 1 |
+| BUG-909 | (HIGH — OPEN 2026-10-17) — THE ONLY SHADOW RUNG THAT WORKS IS A SINGLE POINT OF FAILURE: EVERY LibGen FRONT ANSWERS `500 | 2 |
+| BUG-911 | (MED — OPEN 2026-10-17) — THE ONLY ROUTE INTO ANNA'S ARCHIVE IS A HEADED BROWSER WINDOW | 1 |
+| BUG-912 | (LOW — OPEN 2026-10-17) — An `open_access` ROUTE CAN DELIVER AN HTML LANDING PAGE FOR A DOI | 1 |

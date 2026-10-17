@@ -447,9 +447,16 @@ routing_debt:
   #: `ingest_identity_door` routed 2 tasks (T-172, T-173) and 3 bugs that resolved to NOTHING before - the debt
   #: these items carried was the route graph's, not the tasks'. A shrink-only ceiling follows its measurement
   #: DOWN (D-2644/D-3023), so the next unrouted item is a fault rather than a shrug.
-  measured: '2026-10-16'
+  measured: '2026-10-17'
   unrouted_open_tasks: 31
-  unrouted_open_bugs: 222
+  #: RE-MEASURED 222 -> 225 on 2026-10-17 by D-3080, and the raise is DISCLOSED rather than smuggled: two bugs
+  #: (BUG-911, BUG-912) were appended to a register that is APPEND-ONLY, so their TITLES could not be made to name
+  #: an artifact owned by `acquisition_lane` — and this file's own reason `bug_is_a_finding` says a bug routes only
+  #: when its title names one. The `unrouted:` override above does NOT reduce the measured count (BUG-913), so a new
+  #: finding whose title names no path can NEITHER be routed NOR dispositioned. That is a defect in the INSTRUMENT,
+  #: recorded as BUG-913; the reading is raised to what is actually measured, and the next shrink must come from a
+  #: route or an item edit, exactly as the comment below says.
+  unrouted_open_bugs: 225
   note: >-
     the readings below are RE-MEASURED every run and printed per item; the ceiling exists so that a NEW unrouted
     item is a fault instead of a shrug, and so the worklist of the route graph is a number someone can shrink

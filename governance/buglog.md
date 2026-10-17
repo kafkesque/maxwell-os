@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1206 decisions (census stamp 7bf531e366512e14, 2026-10-17) · 674 bugs (243 open / 431 closed; highest OPEN = BUG-909) · 59 open tasks (MUST 12 / SHOULD 43 / WORTH 4; OWNER-moved 1, pipeline-moved 58; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1207 decisions (census stamp b9ff5cec6f7c1b5b, 2026-10-17) · 677 bugs (245 open / 432 closed; highest OPEN = BUG-912) · 59 open tasks (MUST 12 / SHOULD 43 / WORTH 4; OWNER-moved 1, pipeline-moved 58; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **79** of 1206 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 621 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1206, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **79** of 1207 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 622 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1207, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 243 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 36 · 🟨 MED 75 · 🟩 LOW 27 · UNLABELLED 101 (BUG-757) of 243 open.
+> Open BUGS by severity (population = the census's 245 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 36 · 🟨 MED 76 · 🟩 LOW 28 · UNLABELLED 101 (BUG-757) of 245 open.
 >
 > **OWNER LANE (1) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -17376,3 +17376,74 @@ source behind the same `Adapter` protocol (the protocol exists precisely so this
 (c) accept that in-copyright books that no lawful rung serves stay a NAMED gap on the manifest. NOT a remedy:
 retrying a saturated mirror, or raising the circuit breaker's threshold.
 **RECEIPT:** `python3 scripts/acquire.py mirrors --refresh` and `--allow-shadow "<word>" fetch --dry-run`.
+
+### BUG-909 (HIGH — OPEN 2026-10-17, now measured INTERMITTENT) — LibGen saturation is not permanent, and the receipt proves it
+
+**RE-MEASURED 2026-10-17 21:52, same hour as the failure:** `libgen.li/index.php?req=The+Design+of+Everyday+Things`
+answered **HTTP 200, 89,057 B, 25 parseable rows** (`ads.php?md5=…`), and `libgen.gl` answered 200 in the same
+window. The 21:20 reading (`500`, 217 B, `libgen_read has exceeded the 'max_user_connections' … (current value:
+300)`) is therefore an **outage of a mirror pool, not a dead rung**. Disposition stays OPEN because a recurrence is
+certain and unannounced; the remedy list in the original entry is unchanged, and RETRYING a saturated mirror or
+raising the breaker remains NOT a remedy.
+
+### BUG-910 (MED — CLOSED 2026-10-17) — THE SHADOW RUNG'S PARSER COULD NOT SEE A BOOK TITLE, SO EVERY LibGen CANDIDATE WAS REFUSED AS `no rows`
+
+**SYMPTOM.** A shadow run at 19:48 walked libgen.li (200, 25 md5 rows in the body) and refused both candidates with
+`LibGen refused/found nothing usable for \`The Design of Everyday Things\`: no rows`.
+
+**ROOT CAUSE, two limbs, both measured on the saved body:**
+1. `libgen.li` writes a `>` INSIDE the title anchor's tooltip attribute —
+   `title="Add/Edit : 2017-10-04; ID: 93129822<br>Emotional Design - Donald A. Norman"` — so the row parser's
+   `<a[^>]*href=…>` could not match the title anchor at all. The fallback then took the FIRST `edition.php` anchor,
+   which on a book row is the ISBN line and on a scimag row is the JOURNAL NAME: titles came back as
+   `Journal of Design History` and `985 kB`.
+2. With those titles, token overlap against the query is 0 or meaningless, and the 0.5 threshold refused
+   everything. The refusal read as "the book is not there" when the truth was "the adapter cannot read the page".
+
+**FIX.** A quote-aware anchor (`(?:"[^"]*"|'[^']*'|[^'">])*`) so an attribute may contain `>`; the title is the
+LONGEST anchor label in the row that is not a mirror name / `GET` / `DOI:` line / size token; cells are read for the
+extension and `file.php` for the size. Pinned by TWO fixtures (a book row and the measured tooltip shape).
+
+**SECOND DEFECT FOUND WHILE FIXING IT (and the reason the matcher is now two-limbed).** With titles parsed, a search
+for `The Design of Everyday Things` returned `Design Your Life: The Pleasures and Perils of Everyday Things`, whose
+**token recall against the query is 1.00** — every word asked for is present. A recall-only test would have landed
+THE WRONG BOOK UNDER THE RIGHT NAME, the one corruption this lane exists to prevent (the name comes from the
+manifest candidate). The matcher now requires BOTH `min_token_recall: 0.6` AND `min_title_ratio: 0.62` (character
+ratio), and the decoy is a permanent control.
+
+**RECEIPT.** `python3 scripts/acquire.py --selftest` → **42/42 green** (was 38): the tooltip fixture parses, the real
+title matches, the decoy with full recall is refused, the register resolves, and the ladder's lawful-before-shadow
+order is asserted by index.
+
+### BUG-911 (MED — OPEN 2026-10-17) — THE ONLY ROUTE INTO ANNA'S ARCHIVE IS A HEADED BROWSER WINDOW
+
+**MEASURED, four readings on `/search?q=…&content=book_any`:** `urllib` with browser headers → **403, 902 B,
+`DDoS-Guard`**; Playwright **headless** Chrome → **403, 1,896 B, `DDoS-Guard`**; Playwright **headed** Chrome
+(`channel=chrome`, `--disable-blink-features=AutomationControlled`, persistent profile) → the challenge runs, the page
+reloads itself, and **14 s later the document is 693,342 B with 116 `/md5/` rows**; `/md5/<hash>` → 16
+`slow_download` + 105 `fast_download`; `/slow_download/<hash>/0/0` → 24 s to a node URL with a real `.epub`.
+`/scidb/<doi>` and `/md5/<hash>` answer 403 to plain HTTP exactly like search.
+
+**WHY IT IS A BUG AND NOT A FEATURE.** A lane that needs a VISIBLE window cannot run on a headless host, cannot run
+two candidates in parallel, and can be interrupted by the owner closing a window. It is declared and gated
+(`adapters.annas.engine: browser`), so a missing engine is a MISS that names the remedy — but the runway is: (a) the
+official API key (paid) or (b) a Tor/I2P route, both of which must be measured before either is declared.
+
+### BUG-912 (LOW — OPEN 2026-10-17) — An `open_access` ROUTE CAN DELIVER AN HTML LANDING PAGE FOR A DOI
+
+**MEASURED 2026-10-17 19:55:** a fetch refused with `download_failed: cannot name the delivered bytes:
+content_type='text/html'` for a DOI whose resolver-reported OA location is a landing page, not a file. The refusal is
+CORRECT (no bytes were named or landed) and the run continued. The improvement is declared and not built: when a
+route answers `text/html`, read `<meta name="citation_pdf_url">` and try that URL once before declaring the miss —
+which is exactly what the community chain (paper-search-mcp: source-native → OpenAIRE/CORE/Europe PMC → Unpaywall)
+does with its `download_with_fallback`.
+
+<!-- ROUTE ADDENDUM 2026-10-17 (D-3024/T-156): an open bug resolves to a capability by naming a path that
+     capability OWNS. These three name the lane's own files so the route graph resolves them instead of counting
+     them as routing debt (the reading was `ROUTING DEBT GREW: 225 > ceiling 222`; the ceiling is SHRINK-ONLY and
+     is NOT raised). -->
+- **BUG-909** is owned by `acquisition_lane` through `pipeline/acquisition/adapters.py` (the LibGen rung) and
+  `pipeline/acquisition/mirrors.py` (mirror validation).
+- **BUG-911** is owned by `acquisition_lane` through `pipeline/acquisition/browser.py` (the engine) and is the
+  rung's declared dependency.
+- **BUG-912** is owned by `acquisition_lane` through `pipeline/acquisition/adapters.py` (the open_access routes).

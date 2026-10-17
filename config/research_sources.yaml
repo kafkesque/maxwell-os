@@ -1,0 +1,229 @@
+# THE RESEARCH-SOURCE REGISTER — what a market-research / knowledge-advisory pass may read, and what each source
+# is actually worth. `authority: D-3080`. ONE home; the reader is `pipeline/acquisition/sources.py`, the check is
+# `python3 scripts/acquire.py sources --check`.
+#
+# WHY A REGISTER AND NOT A LIST IN PROSE. A "best review sites" answer ages in weeks: Goodreads closed its public
+# API in Dec 2020, StoryGraph sits behind Cloudflare, Hardcover moved to GraphQL with a token. A prose list cannot
+# be checked, so the list is DECLARED with the measurement that justifies it and one field says how it can be
+# INTEGRATED (`access`). A source whose `access` is `manual` is not a candidate for the agent no matter how good
+# its reviews are (D-3034 — a declaration must resolve).
+#
+# MEASURED 2026-10-17, 21:47-22:05 CEST, from this machine, with a browser user-agent. Codes are HTTP status and
+# bytes are the response body size; a source that answers 403 to a plain client is recorded as such even when its
+# data is excellent, because that is the fact that decides integrability.
+schema_version: '1.0'
+authority: D-3080
+
+# ── THE WEIGHTS ───────────────────────────────────────────────────────────────────────────────────────────────
+#: What "best literature" means when several sources disagree. Four limbs, and each answers a DIFFERENT question:
+#: an expert writes the work (citation), the crowd reads it (rating count), the crowd likes it (rating value), and
+#: the machine can actually GET it (resolvability). A source that carries no limb contributes nothing to a rank —
+#: which is why a review site with 12 ratings cannot outvote a paper with 4,000 citations.
+signal_weights:
+  citation: 1.0          # OpenAlex / Semantic Scholar / Crossref cited_by_count
+  review_volume: 0.45    # log-scaled count of ratings/reviews (Goodreads, Hardcover, Open Library, StoryGraph)
+  review_value: 0.35     # normalised mean rating (same sources)
+  open_access: 0.25      # is a lawful full text resolvable (Unpaywall / Europe PMC / arXiv)
+  recency: 0.30          # decays; a 1998 survey is not a 2024 survey
+#: A review signal is only trusted above this many ratings: 4.8 from 3 ratings is noise, not a verdict.
+min_reviews_for_signal: 25
+
+# ── BOOK SOURCES (the question the owner asked: reviews, besides subreddits) ──────────────────────────────────
+book_sources:
+  open_library:
+    family: books
+    answers: 'metadata + edition + subject + ratings; the widest keyless book index'
+    access: api
+    api_url: 'https://openlibrary.org/search.json?q={query}&limit={rows}'
+    auth: none
+    tier: A
+    signal: [review_volume, review_value]
+    measured: {at: '2026-10-17T21:47Z', code: 200, bytes: 0, note: 'search.json answered 200 with numFound 1147 for `creative coding`; doc URL in body.'}
+    why: 'The only large book catalogue that is free, keyless AND stable. Ratings exist but are thin (its audience is librarians, not reviewers), so it ranks METADATA, not quality.'
+  goodreads:
+    family: books
+    answers: 'the largest review/rating corpus in existence: rating count, mean rating, shelves, "readers also enjoyed"'
+    access: scrape
+    api_url: 'https://www.goodreads.com/search?q={query}'
+    auth: none
+    tier: B
+    signal: [review_volume, review_value]
+    measured: {at: '2026-10-17T21:47Z', code: 200, bytes: 52629, note: 'HTML 200. No public API since 2020-12 (developer programme closed); the site is scrapeable but its markup is an anti-bot target.'}
+    why: 'Best review VOLUME by far, and volume is what makes a rating a verdict. Use it for the signal only (rating count + mean), never as a chapter-level source; cache aggressively and keep it behind its own adapter so a block costs a rung, not the run.'
+  hardcover:
+    family: books
+    answers: 'modern book social graph: ratings, shelves, lists, "similar books", reading status'
+    access: api
+    api_url: 'https://api.hardcover.app/v1/graphql'
+    auth: "env:HARDCOVER_TOKEN"  # a free token from account settings
+    tier: A
+    signal: [review_volume, review_value]
+    measured: {at: '2026-10-17T21:47Z', code: 400, bytes: 0, note: 'POST {books(limit:1)} -> 400 unauthenticated: the endpoint EXISTS and requires a bearer token.'}
+    why: 'The best INTEGRATION target of the three review sites: a real GraphQL API (deterministic queries, no scraping), a younger catalogue that is strong exactly where Goodreads is noisy (design, tech, non-fiction). One free token unlocks it.'
+  the_storygraph:
+    family: books
+    answers: 'mood/pace/character-driven reviews; the strongest "is this book any GOOD for this reader" signal'
+    access: manual  # CSV export, no API
+    api_url: 'https://www.thestorygraph.com/'
+    auth: account
+    tier: C
+    signal: [review_value]
+    measured: {at: '2026-10-17T21:47Z', code: 403, bytes: 5465, note: 'Cloudflare 403 to a plain client. No public API; the site offers Goodreads IMPORT and per-account CSV EXPORT.'}
+    why: 'NOT integrable today, and saying so is the point. Its per-book quality signal is the best of the three for non-fiction judgement, but only through an owner export; a scraper against Cloudflare would be the most brittle 200 lines in this repo.'
+  library_thing:
+    family: books
+    answers: 'legacy librarian metadata, series/character data, early-reviewer culture'
+    access: none
+    api_url: 'https://www.librarything.com/'
+    auth: account
+    tier: C
+    signal: []
+    measured: {at: '2026-10-17T21:47Z', code: 403, bytes: 8968, note: '403; the JSON API was retired for new keys.'}
+    why: 'Registered as REJECTED WITH REASON (D-3038): good data, no door.'
+  google_books:
+    family: books
+    answers: 'in-print metadata, previews, page counts, subject codes'
+    access: api
+    api_url: 'https://www.googleapis.com/books/v1/volumes?q={query}&maxResults={rows}'
+    auth: "env:GOOGLE_BOOKS_KEY"
+    tier: B
+    signal: [review_value]
+    measured: {at: '2026-10-17T21:47Z', code: 429, bytes: 0, note: 'quota exhausted keyless from this IP; a key restores it.'}
+    why: 'Excellent metadata for IN-PRINT works and a decent ratings field; useless without a key from this machine. Keep as the metadata fallback when Open Library has no edition.'
+
+# ── PAPER SOURCES (a different question: a paper has no "rating", it has a citation graph) ────────────────────
+paper_sources:
+  openalex:
+    family: papers
+    answers: 'the metadata backbone: works, authors, venues, citations, OA locations'
+    access: api
+    api_url: 'https://api.openalex.org/works?search={query}'
+    auth: none
+    tier: A
+    signal: [citation, open_access]
+    measured: {at: '2026-10-17T21:47Z', code: 200, bytes: 0, note: 'keyless, ~1.2 s; already the lane resolver.'}
+    why: 'The resolver this OS already trusts. Keyless, no quota surprises, and it reports the OA location that rung one needs.'
+  crossref:
+    family: papers
+    answers: 'DOI registry of record: publisher, year, references, licence'
+    access: api
+    api_url: 'https://api.crossref.org/works?query={query}'
+    auth: none
+    tier: A
+    signal: [citation]
+    measured: {at: '2026-10-17T21:47Z', code: 200, bytes: 0, note: 'keyless, ~0.5 s.'}
+    why: 'Identity, not quality: it is the fallback that gives a work a DOI when OpenAlex has no record.'
+  semantic_scholar:
+    family: papers
+    answers: 'influential-citation counts, TLDRs, "citing this with intent", paper similarity'
+    access: api
+    api_url: 'https://api.semanticscholar.org/graph/v1/paper/search?query={query}'
+    auth: "env:SEMANTIC_SCHOLAR_KEY"
+    tier: A
+    signal: [citation]
+    measured: {at: '2026-10-17T21:47Z', code: 429, bytes: 0, note: 'keyless requests are rate-limited to the point of uselessness; a free key raises it.'}
+    why: 'The only free source with INFLUENTIAL citations (citations that mattered, not citations that exist) — the single best quality discriminator for a paper. Needs a key to be usable in a loop.'
+  europe_pmc:
+    family: papers
+    answers: 'life-science full text, OA availability, PMID/PMCID'
+    access: api
+    api_url: 'https://www.ebi.ac.uk/europepmc/webservices/rest/search?query={query}&format=json'
+    auth: none
+    tier: A
+    signal: [open_access]
+    measured: {at: '2026-10-17T21:47Z', code: 200, bytes: 0, note: '200 keyless.'}
+    why: 'A lawful full-text route that needs no key — used as route three of the open_access rung.'
+  arxiv:
+    family: papers
+    answers: 'preprints: the current state of a fast-moving field, before peer review freezes it'
+    access: api
+    api_url: 'https://export.arxiv.org/api/query?search_query={query}'
+    auth: none
+    tier: A
+    signal: [recency]
+    measured: {at: '2026-10-17T21:47Z', code: 200, bytes: 0, note: 'Atom feed, keyless.'}
+    why: 'The only source that answers "what happened this year". A gap filled only by pre-2015 books is a gap filled by history.'
+  unpaywall:
+    family: papers
+    answers: 'is this DOI open, and where is the lawful PDF?'
+    access: api
+    api_url: 'https://api.unpaywall.org/v2/{doi}?email={email}'
+    auth: none
+    tier: A
+    signal: [open_access]
+    measured: {at: '2026-10-17T21:47Z', code: 200, bytes: 0, note: '200 with a contact email; best_oa_location.url_for_pdf present.'}
+    why: 'Turns "no copy" into "a lawful copy at this URL" for a large share of paywalled papers. The highest-leverage lawful rung in the lane.'
+  dblp:
+    family: papers
+    answers: 'computer-science venue quality and author disambiguation'
+    access: api
+    api_url: 'https://dblp.org/search/publ/api?q={query}&format=json'
+    auth: none
+    tier: B
+    signal: [citation]
+    measured: {at: '2026-10-17T21:47Z', code: 0, bytes: 0, note: 'NOT MEASURED this session — declared for CS gaps, must be probed before use.'}
+    why: 'For a CS/design-technology gap, a DBLP venue is a stronger quality signal than a citation count. Declared, unmeasured, therefore not yet trusted.'
+  core:
+    family: papers
+    answers: 'aggregated open-access full text across repositories'
+    access: api
+    api_url: 'https://api.core.ac.uk/v3/search/works?q={query}'
+    auth: "env:CORE_API_KEY"
+    tier: B
+    signal: [open_access]
+    measured: {at: '2026-10-17T21:47Z', code: 301, bytes: 0, note: 'v3 endpoint redirects; a key is required for the current path.'}
+    why: 'A useful SECOND lawful full-text route when Unpaywall and Europe PMC both miss; needs a free key.'
+
+# ── REVIEW-INTELLIGENCE TOOLS: measured, and deliberately NOT integrated ──────────────────────────────────────
+tools_not_integrated:
+  elicit:
+    answers: 'structured extraction across papers (population, method, finding)'
+    access: none
+    measured: {at: '2026-10-17T21:47Z', code: 0, bytes: 0, note: 'commercial SaaS, no public API; a manual tool.'}
+    why: 'REGISTERED AS REJECTED (D-3038): cloud SaaS breaks C1 (marginal cost) and C3 (sovereignty). Its method is worth copying — extraction into typed fields is what stage2 already does — its service is not.'
+  consensus:
+    answers: '"does the literature agree?" — a yes/no/mixed answer over papers'
+    access: none
+    measured: {at: '2026-10-17T21:47Z', code: 0, bytes: 0, note: 'commercial, no API.'}
+    why: 'REJECTED for the same two reasons; the local equivalent is stage5 NLI, which is already fail-closed (D2298).'
+  scite:
+    answers: 'citation INTENT (supporting / contrasting / mentioning)'
+    access: none
+    measured: {at: '2026-10-17T21:47Z', code: 0, bytes: 0, note: 'commercial, no free API.'}
+    why: 'The most valuable idea in the list and the one that cannot be bought into the OS: citation intent would need a model, not a subscription. Recorded so nobody re-proposes the subscription.'
+  research_rabbit / litmaps / connected_papers:
+    answers: 'citation-graph neighbourhoods ("what is near this paper")'
+    access: none
+    measured: {at: '2026-10-17T21:47Z', code: 0, bytes: 0, note: 'web tools; no public API.'}
+    why: 'OpenAlex already exposes `referenced_works` and `cited_by` with a budget — the same graph, locally, keyless. The tools are UX, not data.'
+
+# ── SHADOW SOURCES (books) — licence_class and the measured access route ──────────────────────────────────────
+shadow_sources:
+  annas_archive:
+    answers: 'an index OF LibGen + Sci-Hub + Z-Library, one search box'
+    access: browser  # a real Chrome; see config/acquisition.yaml#adapters.annas
+    tier: S
+    licence_class: shadow
+    measured: {at: '2026-10-17T21:58Z', code: 200, bytes: 693342, note: 'headed Chrome settles the DDoS-Guard challenge in 14 s; 116 /md5/ rows; plain HTTP = 403 (902 B) and headless Chrome = 403 (1,896 B).'}
+    why: 'The widest single index and the only one that also resolves a DOI (via /scidb/). Reachable ONLY through the browser engine — that is a measured constraint, not a preference.'
+  libgen:
+    answers: 'the book files themselves'
+    access: scrape
+    tier: S
+    licence_class: shadow
+    measured: {at: '2026-10-17T21:52Z', code: 200, bytes: 89057, note: 'index.php?req= 200 with 25 parseable rows; at 21:20 the same front answered 500 max_user_connections (BUG-909) — INTERMITTENT.'}
+    why: 'The fastest working rung when it is up. Its parser had to learn that a `>` inside a tooltip attribute hides the title (BUG-910).'
+  zlibrary:
+    answers: 'books + a "send to Kindle" path'
+    access: credential  # ZLIB_DOMAIN + ZLIB_COOKIE, or the community CLI
+    tier: S
+    licence_class: shadow
+    measured: {at: '2026-10-17T21:47Z', code: 503, bytes: 9592, note: 'z-lib.gd 503, z-library.qa/-gy 503, z-library.sk no DNS, z-lib.fm/-im/-sk 307.'}
+    why: 'Refuses BY NAME until the owner supplies a session. A 503 dressed as "no such book" would be a lie (D-3034).'
+  sci_hub:
+    answers: 'papers by DOI'
+    access: captcha
+    tier: S
+    licence_class: shadow
+    measured: {at: '2026-10-17T21:47Z', code: 200, bytes: 7363, note: 'sci-hub.ru and sci-hub.st answer 200 with `captcha` in the body; sci-hub.se has no DNS.'}
+    why: 'The paper rung of last resort, and today it is a wall — except through Anna s /scidb/<doi> via the browser engine.'

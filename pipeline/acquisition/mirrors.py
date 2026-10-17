@@ -98,7 +98,12 @@ def validate(cfg: dict[str, Any], family: str, domain: str) -> tuple[bool, str]:
     """
     markers = ((cfg.get("mirrors") or {}).get("markers") or {}).get(family) or []
     try:
-        body = net.read_text(f"https://{domain}/", cfg)
+        #: ONE attempt and a short ceiling: a mirror probe asks "is this alive NOW", so a retry only multiplies the
+        #: wait of an answer that will not change (MEASURED: three annas domains x three attempts x 180 s stalled a
+        #: shadow run for 25 minutes before any book was looked at — BUG-911).
+        body = net.read_text(f"https://{domain}/", cfg,
+                             timeout_s=float((cfg.get("mirrors") or {}).get("probe_timeout_s") or 15),
+                             attempts=1)
     except net.NetworkRefused as refusal:
         return False, refusal.failure.class_
     missing = [marker for marker in markers if marker.lower() not in body.lower()]

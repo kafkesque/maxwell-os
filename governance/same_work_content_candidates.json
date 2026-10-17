@@ -164,14 +164,14 @@
       "b_id": "fb4d2ee6da031405",
       "a": "Anonymous — The Essential Guide to Business for Artists and Designers",
       "b": "Alison Branagan — The essential guide to business for artists designers",
-      "similarity": 0.5841
+      "similarity": 0.5839
     },
     {
       "a_id": "15da781a87b25405",
       "b_id": "adbfa0ad879f1034",
       "a": "Addy Osmani — Beyond Vibe Coding (for True Epub)",
       "b": "Addy Osmani — Beyond Vibe Coding",
-      "similarity": 0.5798
+      "similarity": 0.5795
     },
     {
       "a_id": "fb14eceea1857e00",
@@ -181,18 +181,11 @@
       "similarity": 0.5714
     },
     {
-      "a_id": "3a0c20ab274efcd5",
-      "b_id": "8fbfcb06f27bf76a",
-      "a": "Charles J. Forceville, Eduardo Urios-Aparisi — Multimodal Metaphor",
-      "b": "Charles-J. Forceville, Eduardo Urios-Aparisi — Multimodal Metaphor",
-      "similarity": 0.5466
-    },
-    {
       "a_id": "ec3a3dc1ce55b4a6",
       "b_id": "b75d8f2ca67dca1f",
       "a": "Rajat Bhargava, Will Herman — The Startup Playbook",
       "b": "Rajat Bhargava — The Startup Playbook Founder-to-Founder Advice from Two Startup Veterans",
-      "similarity": 0.543
+      "similarity": 0.5446
     },
     {
       "a_id": "265a59860aab522d",
@@ -200,6 +193,13 @@
       "a": "George Bokhua — Principles of Logo Design",
       "b": " — Principles of Logo Design: A Practical Guide to Creating",
       "similarity": 0.5332
+    },
+    {
+      "a_id": "3a0c20ab274efcd5",
+      "b_id": "8fbfcb06f27bf76a",
+      "a": "Charles J. Forceville, Eduardo Urios-Aparisi — Multimodal Metaphor",
+      "b": "Charles-J. Forceville, Eduardo Urios-Aparisi — Multimodal Metaphor",
+      "similarity": 0.5273
     },
     {
       "a_id": "f566bc18cd0c4478",

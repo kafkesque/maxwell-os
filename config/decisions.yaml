@@ -27517,3 +27517,93 @@ decisions:
     a question that only matters for candidates); (e) trusting a magic number alone (it PASSES the 29 MiB truncated
     pdf); (f) accepting `accepted_by` by presence (BUG-888: the owner's first signature carried the template's
     placeholder and was applied).
+
+- id: D-3072  # ADMISSION / THE OWNER'S WORD — A SIGNATURE PINS THE ACTS, AND THE NAME IS AN IDENTITY GIVEN ONCE
+  state: ACTIVE
+  date: '2026-10-17'
+  by: assistant
+  category: ADMISSION / THE OWNER'S WORD
+  bugs: [BUG-892]
+  files:
+  - scripts/apply_admission.py
+  - config/ingest_identity_gate.yaml
+  - config/owner_identity.yaml
+  - justfile
+  decision: >-
+    (1) A SIGNATURE PINS THE ACTS, NOT THE DOCUMENT. Every acceptance carries `scope_sha256` — the ordered list of
+    (rel, source_sha256, target, kind) for the rows it puts in scope, plus the `rel` MANIFEST itself — and the
+    applier verifies that scope before a byte is copied. `plan_sha256` is kept and is the strongest proof when the
+    plan's bytes have not moved; when they have, a re-derived plan whose ACTS are identical still satisfies the
+    word, and one whose acts moved is refused BY NAME. (2) THE NAME IS AN IDENTITY, GIVEN ONCE: the owner's name is
+    declared in `config/owner_identity.yaml` (home declared as `admission.applier.accept_by_identity`) and is never
+    asked for again after that. (3) THE WORD IS A COMMAND, NOT A HAND EDIT: `apply_admission.py --sign --as NAME`
+    (lane `just admit-sign`) writes the identity and the acceptance crash-safe; re-printing a template never
+    touches the name, and an identity SWAP is refused rather than overwritten. (4) THE PLACEHOLDER REFUSAL NAMES
+    ITS OWN REMEDY: it prints the command that satisfies it. BUG-888's teeth are unchanged — an empty or
+    placeholder name is still refused, and an absent identity file still yields the placeholder.
+  rationale: >-
+    MEASURED 2026-10-17, twice in one sitting and in the owner's own words ("again it failed … why the fuck are we
+    going in circles"): `just admit-apply --limit 10` refused on `accepted_by: '<your name>'` and wrote NO receipt
+    at all (newest run receipt still 13:22Z), so the run died at the SIGNATURE and never reached a row. Two
+    structural faults, both mine: the name lived in a file the TOOL PRINTS, so every re-derivation of the plan
+    (BUG-886's probe, a count moving by one row, a timestamp) forced a re-print that RESET the name to the
+    placeholder; and the word was pinned to the plan's BYTES, so any re-derivation VOIDED a signature already
+    given. Together that is an artifact that GUARANTEES recurrence: fix anything, re-derive, re-print, name lost,
+    refused. ROOT (D-3034, for the fourth time this week): the thing signed was a DOCUMENT and the thing authorised
+    is a SET OF ACTS. The applier reads rel, source_digest, target and kind — nothing else in a plan is acted on,
+    so nothing else can be a grant. This is also the STRICTER reading: a re-derived plan that changed a target or
+    a source digest changes the scope and is still refused. REJECTED: (a) keep asking the owner to retype their
+    name into a generated file — MEASURED: zero authorisations prevented, two runs lost, and recurrence is built in;
+    (b) accept any non-empty name — that is BUG-888, and it is how a consent nobody gave gets applied; (c) let the
+    applier auto-sign on every derivation — the scope must be the owner's word and the command is the act;
+    (d) pin only the rows' `rel` — under-pins: a changed target or changed source bytes is a different act;
+    (e) pin the full plan JSON including counts/examples — that re-creates the very coupling this decision removes.
+    CONTROLS 35/35, two-sided: a moved scope FATAL and names the change; a re-derived plan with identical acts
+    proves `signed_by: scope`; a plan whose bytes are the signed ones proves `digest`; a plan that lost an
+    authorised row names it; a signature with no scope is refused; `--sign` refuses a placeholder, writes the
+    identity once, its output is accepted by the applier, a second name cannot replace the first, and re-signing
+    the same name is idempotent.
+
+- id: D-3073  # ADMISSION / THE WORKLIST — A REFUSAL MUST CARRY A RESOLVABLE HANDLE AND THE ACT IT ASKS FOR
+  state: ACTIVE
+  date: '2026-10-17'
+  by: assistant
+  category: ADMISSION / THE WORKLIST
+  bugs: [BUG-893, BUG-894]
+  files:
+  - scripts/plan_admission.py
+  - pipeline/container_integrity.py
+  - config/ingest_identity_gate.yaml
+  decision: >-
+    (1) THE WORKLIST IS DATA, NOT ILLUSTRATION: the machine plan carries `refused[]` — EVERY refused row, in FULL,
+    with its class — and the human document prints a class row by row when it holds at most
+    `admission.worklist_in_full` (declared: 40) rows, naming the class and its task beyond that. Refusal examples
+    are never truncated. (2) A REFUSAL NAMES WHY AND WHAT TO DO: `pipeline/container_integrity.py#diagnose()` names
+    the defect against a DECLARED vocabulary (`container_integrity.defects`: truncated_zip_no_central_directory,
+    truncated_pdf_no_trailer, null_bytes, apple_bookmark, no_magic, unrecognised) and each defect carries a
+    `remedy` in the gate; a defect with no remedy is FATAL, and so is a detected shape nobody declared. (3) THE
+    CLASS STAYS COARSE, THE ROW CARRIES THE ACT: `refused_container_corrupt` means "the bytes are not openable";
+    the DEFECT and its remedy belong to the row, because splitting the class per defect would multiply a taxonomy
+    faster than the remedies justify.
+  rationale: >-
+    MEASURED 2026-10-17. BUG-893: the plan built refusal examples with `[:120]`, so a class that counted 5 handed
+    back handles that resolve to no file — e.g. `books/epub/…/How to use graphic desi gn … ylib.` — and the owner
+    could not action one without hunting the library by eye. A count that cannot be walked to its rows is a
+    declaration with no resolution (D-3034), i.e. the same defect as BUG-888 one artifact over. BUG-894: the five
+    unopenable containers were ONE undifferentiated class with one word ("corrupt"), and the bytes say they are
+    FOUR different situations — 2 truncated `.epub` (no end-of-central-directory; 641 local headers and 321 text
+    entries survive in the 137 MB one), 1 `.pdf` truncated at exactly 29 MiB (30,408,704 bytes, no `%%EOF`), 1
+    `.pdf` of ZERO bytes (5,244,077 of `\x00`), and 1 **macOS Finder ALIAS** of 880 bytes carrying the bookmark
+    magic `book\0\0\0\0mark` — NOT the "Apple `book` archive" D-3071 recorded, which this decision CORRECTS. Its
+    measured target is `/Applications/Adobe After Effects 2024/Plug-ins/Effects/Keylight/docs/Keylight_1.2_AE.pdf`
+    and that path DOES NOT EXIST on this machine, so the alias DANGLES and its remedy is a CHECK, never "copy the
+    real file in" (which would have sent the owner to a file that is not there). REJECTED: (a) print all 624 refused
+    rows into the human document — a 389-line table is read by nobody and a worklist that is not read is
+    decoration; (b) a class per defect — the remedies split into two families (obtain the bytes / resolve a
+    pointer) and four classes for two remedies is taxonomy for its own sake; (c) build a rebuild lane for truncated
+    zips — measured: `zip -FF` on the 137 MB file did not finish in 300 s, and the output's checksum matches no
+    published edition, so it can never be evidence of the work; (d) parse the alias to resolve it automatically —
+    that is a proprietary bookmark format and a reader must not claim a resolution it cannot verify. CONTROLS
+    25/25 (plan) with the worklist two-sided: every refused `rel` must RESOLVE on disk, the list length must equal
+    the sum of the refusal counts, the corrupt rows must carry their declared remedy verbatim, and the valid
+    siblings in the same folders must still be CANDIDATES.

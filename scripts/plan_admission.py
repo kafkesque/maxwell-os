@@ -54,7 +54,12 @@ import census_source_names as census  # noqa: E402 — the library reader: roots
 from pipeline.book_metadata import (  # noqa: E402 - the door's OWN comparison key (D-3045)
     sanitize_source_book,
 )
-from pipeline.container_integrity import is_readable, probes_from  # noqa: E402 - BUG-886/D-3071
+from pipeline.container_integrity import (  # noqa: E402 - BUG-886/D-3071, BUG-893/D-3073
+    defects_from,
+    diagnose,
+    is_readable,
+    probes_from,
+)
 
 POLICY = census.POLICY
 RC_OK, RC_FATAL, RC_OWNER_OWED = 0, 1, 2
@@ -113,6 +118,11 @@ CONTROL_LABELS = (
     #: and renumbering them to slot one in would rewrite nineteen controls to add a twentieth (drift for nothing).
     "a_container_the_stage_CANNOT_OPEN_is_REFUSED_as_CORRUPT_and_never_proposed_for_the_owner_word",
     "an_ACCEPTED_kind_with_no_declared_readability_probe_is_FATAL_and_never_admitted_unchecked",
+    #: BUG-893/D-3073 — appended for the same reason: an index is how a control addresses this table.
+    "EVERY_refused_row_carries_a_handle_that_RESOLVES_and_the_corrupt_ones_name_their_DEFECT_and_REMEDY",
+    "a_defect_outside_the_declared_vocabulary_is_FATAL_and_never_printed_as_a_guess",
+    #: BUG-895 — the control OF the controls.
+    "EVERY_control_label_is_cited_by_INDEX_so_no_name_prints_green_with_nothing_behind_it",
 )
 
 
@@ -128,7 +138,8 @@ def admission_policy(pol: dict[str, Any]) -> dict[str, Any]:
             f"FATAL: {POLICY}#source_library.admission is not declared — the plan prefix, the target rule and "
             f"the decision vocabulary must come from the declaration, never from this reader (C12)"
         )
-    for key in ("authority", "plan_prefix", "target_rule", "refusal_examples", "decisions"):
+    for key in ("authority", "plan_prefix", "target_rule", "refusal_examples", "worklist_in_full",
+                "decisions"):
         if key not in decl:
             raise AdmissionError(
                 f"FATAL: {POLICY}#source_library.admission does not declare {key!r} (C12: an absent value is "
@@ -269,6 +280,9 @@ def build(pol: dict[str, Any] | None = None) -> dict[str, Any]:
     #: stage's own set, so a kind the stage reads with NO declared probe is FATAL here rather than admitted
     #: unchecked later (C12: an absent declaration is never a zero).
     probes = probes_from(decl, AdmissionError, accepted=accepted)
+    #: BUG-893/D-3073: WHAT KIND of unopenable, and what the owner should DO. Read from the same declaration
+    #: block as the probes, because a defect name and its remedy are one fact and this reader may not own either.
+    defects = defects_from(decl, AdmissionError)
     cache = census.cache_keys(doc)
     corpus_root = home_path(homes, "corpus_home")
     index = corpus_index(corpus_root)
@@ -280,6 +294,13 @@ def build(pol: dict[str, Any] | None = None) -> dict[str, Any]:
     examples: dict[str, list[str]] = {name: [] for name in DECISIONS}
     limit = int(decl["refusal_examples"])
     rows: list[dict[str, Any]] = []
+    #: BUG-893/D-3073 — THE WORKLIST IS THE DATA, NOT THE ILLUSTRATION. MEASURED 2026-10-17: the plan printed its
+    #: refusal examples cut to 120 characters, so the class `refused_container_corrupt` said "5" and handed back
+    #: handles like `books/epub/.../How to use graphic desi gn ... ylib.` that resolve to NO file on disk. A count
+    #: that cannot be walked to its rows is a declaration with no resolution (D-3034), and the owner's five
+    #: corrupt containers became a sentence in a document instead of an act. Every refused row is kept here in
+    #: FULL, with its class and — for a container defect — the diagnosed defect and its declared remedy.
+    refused: list[dict[str, Any]] = []
     per_root: list[dict[str, Any]] = []
     seen_keys: set[str] = set()
     unseen_keys: set[str] = set()
@@ -369,8 +390,18 @@ def build(pol: dict[str, Any] | None = None) -> dict[str, Any]:
                         "target": str((target_root / rel).with_suffix(".md")) if target_root else "",
                     }
                 )
-            elif len(examples[decision]) < limit:
-                examples[decision].append(f"{root['id']}/{path.relative_to(root['path'])}"[:120])
+            elif decision not in ("already_in_the_corpus", "seen_by_an_ingest_record"):
+                #: THE WORKLIST IS THE REFUSALS, and a work the door already KNOWS is not a refusal: the two seen
+                #: classes are counted and then left alone (they need no act and would double the list).
+                handle = f"{root['id']}/{path.relative_to(root['path'])}"
+                if len(examples[decision]) < limit:
+                    examples[decision].append(handle)
+                entry: dict[str, Any] = {"rel": handle, "decision": decision, "kind": suffix.lstrip(".")}
+                if decision == "refused_container_corrupt":
+                    defect = diagnose(path, probes[suffix], defects, AdmissionError)
+                    entry["defect"] = defect
+                    entry["remedy"] = str(defects[defect]["remedy"])
+                refused.append(entry)
         per_root.append(stat)
 
     anomalies = counts["seen_by_an_ingest_record"]
@@ -394,13 +425,19 @@ def build(pol: dict[str, Any] | None = None) -> dict[str, Any]:
         "unseen_keys": len(unseen_keys),
         "counts": counts,
         "examples": examples,
+        "refused": refused,
+        #: BUG-893/D-3073: how many rows a class may print IN FULL before the document names the class
+        #: instead. Declared, because "a list a human can read" is a judgement this reader may not hold.
+        "worklist_in_full": int(decl["worklist_in_full"]),
         "rows": rows,
         "rc": RC_OWNER_OWED if (counts["admit_candidate"] or anomalies) else RC_OK,
     }
 
 
-def render(plan: dict[str, Any]) -> str:
+def render(plan: dict[str, Any], plan_name: str = "") -> str:
     """The plan as the owner reads it: what it proposes, then every refusal with the reason it is declared under."""
+    plan_path_name = plan_name or "the machine plan"
+    worklist_full = int(plan.get("worklist_in_full", 0))
     lines = [
         f"# ADMISSION PLAN — {plan['generated']}",
         "",
@@ -436,13 +473,36 @@ def render(plan: dict[str, Any]) -> str:
     ]
     for name in DECISIONS:
         lines.append(f"| `{name}` | {plan['counts'][name]} | {plan['decisions_declared'][name]} |")
-    lines += ["", "## Examples of what is refused (bounded; every refusal is COUNTED above)", ""]
+    lines += ["", "## THE WORKLIST — every refusal, with the act it asks for", "",
+              f"Every refusal is COUNTED above and every refused row is listed in full in the machine plan "
+              f"(`{plan_path_name}`) under `refused[]`. Here each class prints its rows when there are at most "
+              f"{worklist_full} of them — the small classes are the ones an owner can act on one by one — and names "
+              f"the class's own task when the list is longer, because a hundred-line block in a table is read by "
+              f"nobody and the worklist must not become decoration.", ""]
+    by_decision: dict[str, list[dict[str, Any]]] = {}
+    for entry in plan.get("refused") or []:
+        by_decision.setdefault(str(entry["decision"]), []).append(entry)
     for name in DECISIONS:
-        if name not in ("admit_candidate", "already_in_the_corpus", "seen_by_an_ingest_record"):
-            shown = plan["examples"].get(name) or ["—"]
-            lines.append(f"- `{name}`: " + "; ".join(f"`{item}`" for item in shown))
-    lines += ["", f"## The admission candidates ({len(plan['rows'])})", "",
-              "| file (below its root) | key | kind | proposed corpus path | bytes |", "|---|---|---|---|---|"]
+        if name in ("admit_candidate", "already_in_the_corpus", "seen_by_an_ingest_record"):
+            continue
+        held = by_decision.get(name) or []
+        lines.append(f"### `{name}` — {len(held)} row(s)")
+        lines.append("")
+        if not held:
+            lines += ["— (none in this reading)", ""]
+            continue
+        if len(held) <= worklist_full:
+            lines += ["| row (resolves as printed) | kind | defect | remedy |", "|---|---|---|---|"]
+            for entry in held:
+                lines.append(
+                    f"| `{entry['rel']}` | {entry.get('kind', '')} | {entry.get('defect', '—')} | "
+                    f"{entry.get('remedy', '—')} |"
+                )
+        else:
+            lines.append(f"All {len(held)} rows are in `{plan_path_name}#refused`; this document names the class "
+                         f"and its declared meaning rather than printing a block nobody reads.")
+        lines.append("")
+    lines += [f"## The admission candidates ({len(plan['rows'])})", "",              "| file (below its root) | key | kind | proposed corpus path | bytes |", "|---|---|---|---|---|"]
     home = plan["corpus_home"].rstrip("/") + "/"
     for row in plan["rows"]:
         shown = row["target"][len(home):] if row["target"].startswith(home) else row["target"]
@@ -468,7 +528,7 @@ def write_plan(plan: dict[str, Any], decl: dict[str, Any], root: Path = _PROJECT
     stamp = plan["generated"][:10].replace("-", "")
     prefix = root / str(decl["plan_prefix"])
     md, js = Path(f"{prefix}{stamp}.md"), Path(f"{prefix}{stamp}.json")
-    md.write_text(render(plan), encoding="utf-8")
+    md.write_text(render(plan, js.name), encoding="utf-8")
     js.write_text(json.dumps(plan, indent=2, sort_keys=False) + "\n", encoding="utf-8")
     return [md, js]
 
@@ -575,12 +635,21 @@ def selftest() -> int:
                     "plan_prefix": "governance/ADMISSION_PLAN_",
                     "target_rule": "fixture rule: the source's own path below its DECLARED AXIS folder, suffix -> .md",
                     "refusal_examples": 3,
+                    "worklist_in_full": 3,
                     "decisions": {name: f"fixture meaning of {name}" for name in DECISIONS},
                     #: BUG-886/D-3071: the probe each ACCEPTED fixture kind declares. A fixture that skips this
                     #: block is FATAL (probes_from), which is the control that the declaration is required.
                     "container_integrity": {
                         "authority": "D-XXXX-fixture",
                         "probes": {".epub": "zip", ".pdf": "pdf", ".md": "none"},
+                        #: BUG-893/D-3073: the fixture declares its OWN defect vocabulary, so a control can prove
+                        #: the reader refuses a defect the declaration does not carry - and can drive the
+                        #: apple_bookmark shape the owner's library actually holds.
+                        "defects": {
+                            token: {"meaning": f"fixture meaning of {token}", "remedy": f"fixture remedy for {token}"}
+                            for token in ("truncated_zip_no_central_directory", "truncated_pdf_no_trailer",
+                                          "null_bytes", "apple_bookmark", "no_magic", "unrecognised")
+                        },
                     },
                 },
                 "flow": {
@@ -618,7 +687,7 @@ def selftest() -> int:
 
         # (18) a NOTE keeps its DOMAIN folder and its own subtopic; a folder the corpus does not materialise is REFUSED
         note = rows.get("A Note.pdf", {})
-        expect(CONTROL_LABELS[18],
+        expect(CONTROL_LABELS[19],
                bool(note) and str(note.get("target", "")).endswith("DOMAIN 6 AI + Computing/design-notes/A Note.md")
                and counts["refused_domain_not_a_corpus_domain"] == 1,
                "the note row read " + str(note) + " and the undeclared-folder refusal read "
@@ -629,6 +698,14 @@ def selftest() -> int:
         # (3) a container no stage reads is REFUSED and counted; (5) an undeclared corpus home is REFUSED
         expect(CONTROL_LABELS[3], counts["refused_container_no_stage_reads_it"] == 1,
                f"a .mobi read {counts['refused_container_no_stage_reads_it']}, expected 1 (counted, never skipped)")
+        #: label 10 was CITED BY NOTHING before BUG-895: every label printed, so a control with no assertion
+        #: behind it read green. This asserts the fact its name claims, and the citation control below keeps the
+        #: whole table honest.
+        expect(CONTROL_LABELS[10],
+               counts["seen_by_an_ingest_record"] == 1
+               and not any("Renamed Work" in row["rel"] for row in plan["rows"]),
+               f"an ingest-record work read {counts['seen_by_an_ingest_record']} and "
+               f"{[r['rel'] for r in plan['rows'] if 'Renamed' in r['rel']]}")
         expect(CONTROL_LABELS[5], counts["refused_no_declared_corpus_home"] == 1,
                f"the notes root (admits_to null) read {counts['refused_no_declared_corpus_home']}, expected 1")
 
@@ -664,7 +741,8 @@ def selftest() -> int:
             mark(CONTROL_LABELS[7], "an absent root did not raise (an absent root is never a count of zero)")
         except SystemExit:
             pass
-        for key in ("authority", "plan_prefix", "target_rule", "refusal_examples", "decisions"):
+        for key in ("authority", "plan_prefix", "target_rule", "refusal_examples", "worklist_in_full",
+                    "decisions"):
             missing = json.loads(json.dumps(pol))
             missing["source_library"]["admission"].pop(key)
             try:
@@ -705,7 +783,7 @@ def selftest() -> int:
             r for r in domain_home["source_library"]["roots"] if r["id"] != "unhomed"
         ]
         with_home = build(domain_home)
-        expect(CONTROL_LABELS[16],
+        expect(CONTROL_LABELS[14],
                with_home["counts"]["refused_not_in_its_kind_folder"] == 1
                and with_home["counts"]["refused_no_declared_corpus_home"] == 0
                and any(row["rel"].startswith("notes/") for row in with_home["rows"]),
@@ -734,7 +812,7 @@ def selftest() -> int:
         #      valid one in the same folder must still be a candidate, so a probe that simply refused every `.epub`
         #      fails this control too (a refusal that answers everything is not a reading).
         truncated = books / "epub" / "DOMAIN 6 AI + Computing" / "A Truncated Download.epub"
-        expect(CONTROL_LABELS[19],
+        expect(CONTROL_LABELS[20],
                counts["refused_container_corrupt"] == 1
                and not any("A Truncated Download" in row["rel"] for row in plan["rows"])
                and any("A Truncated Download" in item for item in plan["examples"]["refused_container_corrupt"])
@@ -750,14 +828,65 @@ def selftest() -> int:
         no_probe["source_library"]["admission"]["container_integrity"]["probes"].pop(".md")
         try:
             build(no_probe)
-            mark(CONTROL_LABELS[20], "an accepted kind with no declared probe did not raise")
+            mark(CONTROL_LABELS[21], "an accepted kind with no declared probe did not raise")
         except AdmissionError:
             pass
         unknown_probe = json.loads(json.dumps(pol))
         unknown_probe["source_library"]["admission"]["container_integrity"]["probes"][".epub"] = "vibes"
         try:
             build(unknown_probe)
-            mark(CONTROL_LABELS[20], "an unknown probe token did not raise")
+            mark(CONTROL_LABELS[21], "an unknown probe token did not raise")
+        except AdmissionError:
+            pass
+
+        # (21) BUG-893/D-3073: THE WORKLIST RESOLVES. MEASURED 2026-10-17: the plan printed its refusal examples
+        #      cut to 120 characters, so a class that counted 5 handed back handles that named no file - the
+        #      owner's five corrupt containers could not be walked to an act. TWO-SIDED by construction: every
+        #      refused `rel` must resolve to a file on disk (a truncation anywhere in the list fails it) AND the
+        #      count must equal the list (a reading whose total disagrees with its rows is two readings), while
+        #      the valid siblings in the same folders must still be CANDIDATES - a worklist built by refusing
+        #      everything would pass the first half and fail that.
+        alias = books / "pdf" / "DOMAIN 6 AI + Computing" / "A Finder Alias.pdf"
+        alias.write_bytes(b"book\x00\x00\x00\x00mark" + b"\x00" * 16
+                          + b"/Applications/Somewhere/Plug-ins/docs/Keylight_1.2_AE.pdf")
+        with_alias = build(pol)
+        roots_by_id = {"books": books, "notes": notes, "unhomed": unhomed}
+        refused_rows = with_alias["refused"]
+        unresolved = [e["rel"] for e in refused_rows
+                      if not (roots_by_id[e["rel"].split("/", 1)[0]] / e["rel"].split("/", 1)[1]).is_file()]
+        refusal_classes = [name for name in DECISIONS
+                           if name not in ("admit_candidate", "already_in_the_corpus", "seen_by_an_ingest_record")]
+        corrupt_rows = [e for e in refused_rows if e["decision"] == "refused_container_corrupt"]
+        expect(CONTROL_LABELS[22],
+               not unresolved
+               and len(refused_rows) == sum(with_alias["counts"][name] for name in refusal_classes)
+               and len(corrupt_rows) == 2
+               and {e.get("defect") for e in corrupt_rows}
+               == {"truncated_zip_no_central_directory", "apple_bookmark"}
+               and all(e.get("remedy")
+                       == pol["source_library"]["admission"]["container_integrity"]["defects"][e["defect"]]["remedy"]
+                       for e in corrupt_rows)
+               and not any("A Truncated Download" in row["rel"] or "A Finder Alias" in row["rel"]
+                           for row in with_alias["rows"])
+               and any(row["rel"].endswith("Never Seen.epub") for row in with_alias["rows"]),
+               f"unresolved {unresolved[:3]} | refused {len(refused_rows)} vs counted "
+               f"{sum(with_alias['counts'][name] for name in refusal_classes)} | "
+               f"defects {[e.get('defect') for e in corrupt_rows]}")
+
+        # (22) a defect the declaration does not carry is FATAL: printing a shape nobody named as though it were
+        #      diagnosed is how a worklist acquires a row with no remedy (D-3034/D-3038).
+        undeclared = json.loads(json.dumps(pol))
+        undeclared["source_library"]["admission"]["container_integrity"]["defects"].pop("apple_bookmark")
+        try:
+            build(undeclared)
+            mark(CONTROL_LABELS[23], "an undeclared defect did not raise")
+        except AdmissionError:
+            pass
+        no_defects = json.loads(json.dumps(pol))
+        no_defects["source_library"]["admission"]["container_integrity"].pop("defects")
+        try:
+            build(no_defects)
+            mark(CONTROL_LABELS[23], "an absent defect vocabulary did not raise")
         except AdmissionError:
             pass
 
@@ -770,7 +899,7 @@ def selftest() -> int:
             for token in ("~" + "/Library/CloudStorage", "knowledge " + "pipeline/books", "educa" + "tion/")
             if token in own
         ]
-        expect(CONTROL_LABELS[14], len(calls) == 1 and branch is not None and calls[0] > branch and not leaks,
+        expect(CONTROL_LABELS[16], len(calls) == 1 and branch is not None and calls[0] > branch and not leaks,
                f"a bare run could write ({calls} vs the --plan branch at {branch}) or the reader restates "
                f"{leaks} — it names no path, key or container of its own (C12)")
 
@@ -788,10 +917,20 @@ def selftest() -> int:
     #      would satisfy the first half alone). MEASURED 2026-10-17: the corpus held 'Galič' (U+010D) while the
     #      source library held 'c'+U+030C for the identical work, so the reader called an in-corpus work a NEW
     #      candidate and the writer refused the row it had priced — a workspace that disagreed with itself.
-    expect(CONTROL_LABELS[16],
+    expect(CONTROL_LABELS[18],
            key_of("Galič2017_Article") == key_of("Galic\u030c2017_Article")
            and key_of("Another Work") != key_of("Galič2017_Article"),
            f"NFC {key_of('Galič2017_Article')!r} vs NFD {key_of('Galic\u030c2017_Article')!r}")
+
+    # (23) BUG-895: A LABEL NOBODY CITES PRINTS GREEN. MEASURED 2026-10-17: labels appended mid-table were not
+    #      pointed at by the code that names them, so the tail was shifted by one or two - the NFC control reported a
+    #      note/domain assertion, the domain-home control reported the bare-run assertion, and label 10 had NO
+    #      assertion at all yet printed `ok`, because the printer reads the LABEL TABLE and not the assertions. This
+    #      reads this file's own text: every index in the table must be cited, so a label can never again be a name
+    #      with nothing behind it. (Duplicates are fine - one label may carry two halves of one rule.)
+    cited = {int(match) for match in re.findall(r"CONTROL_LABELS\[(\d+)\]", Path(__file__).read_text("utf-8"))}
+    expect(CONTROL_LABELS[24], cited == set(range(len(CONTROL_LABELS))),
+           f"label index (or indices) {sorted(set(range(len(CONTROL_LABELS))) - cited)} print ok with no assertion")
 
     failed = {label for label, _ in failures}
     for label in CONTROL_LABELS:

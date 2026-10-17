@@ -8,9 +8,9 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1198 decisions (census stamp 1306f0d73784715e, 2026-10-17) · 656 bugs (236 open / 420 closed; highest OPEN = BUG-891) · 59 open tasks (MUST 12 / SHOULD 43 / WORTH 4; OWNER-moved 0, pipeline-moved 59; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1200 decisions (census stamp 449e63e466b0f0c3, 2026-10-17) · 660 bugs (236 open / 424 closed; highest OPEN = BUG-891) · 59 open tasks (MUST 12 / SHOULD 43 / WORTH 4; OWNER-moved 0, pipeline-moved 59; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **79** of 1198 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 613 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1198, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **79** of 1200 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 615 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1200, D-2987/BUG-765)
 >
 > Open BUGS by severity (population = the census's 236 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 35 · 🟨 MED 70 · 🟩 LOW 26 · UNLABELLED 101 (BUG-757) of 236 open.
 >
@@ -97,7 +97,6 @@
 | Bug | Date | Issue |
 |---|---|---|
 | BUG-796 | 2026-10-14 | **A DECISION WRITTEN OUTSIDE THE RECEIPTING WRITER LEAVES THE ATTRIBUTION CONTROL RED, and it is red on a commit that predates this session.** MEASURED 2026-10-14: `python3 scripts/lib/handoff.py --selftest` fails 1 of 4 attribution controls - `a governed write that IS the current bytes is attributed, and the join is by CONTENT` - because the MUTATION-journal's newest record for `config/decisions.yaml` (post-image `e93a3121639d77a3`, written by `scripts/recompute_decision_summary.py` at 20261014T152011Z) is not the live digest. PROVEN PRE-EXISTING, not a cascade from this session: the SAME control reds in a clean worktree at 7ccb4cd, where the live digest was `ed47950ec8a932f0`. The gap is the one every guarded write shares: `config/decisions.yaml` is written by the mint path and by the doc guard, and NEITHER records a post-image into the journal the control reads. `--rebaseline` correctly REFUSES to move it ("nothing was rewritten"), so the honest state is RED and owner-owed. FIX: the registry's writers record the post-image they produce (the mint already has the bytes), or the control accepts a verified ancestor and says so; never a hand re-record (D-2642). |
-| BUG-792 | 2026-10-14 | **THE LOCAL SERVER REUSES NO PREFIX, SO EVERY AGENT TURN PRE-PAYS ITS WHOLE PROMPT.** MEASURED 2026-10-14 (read-only, 12 identical-prefix calls + the probe's own `--prefill-ab`): `prompt_tokens_details.cached_tokens = 0` on every call, speedup 1.01x then 1.04x against the declared 5x bar. The one non-zero reading (a 4096-token block boundary straight after a model load) names the mechanism - a 4096-token BLOCK cache, switched OFF by the D2460 thrash guard, which is a RAIL that refuses inference when it is on. FIX: re-test ONE variable at a time under a declared protocol with a decode-rate oracle (the D2460 baseline is a decode collapse); until then the declared state is `disproven` and every prefill optimisation must be CACHE-FREE (fewer requests, shorter prompts, a model whose throughput can pay the bill). |
 | BUG-793 | 2026-10-14 | **Qwen3.8-27B PREFILLS AT 39 tok/s - FOUR TIMES WORSE THAN ITS PARAMETER RATIO PREDICTS.** MEASURED 2026-10-14: 32,026-token prefill = 715.7 s (11.9 minutes), decode 1.7 tok/s, model load 26.5 s, against gpt-oss-20b's 210 tok/s at a 50,082-token prompt on the same machine and the same settings tier. The parameter ratio alone predicts ~155 tok/s. CONSEQUENCE: the 27B cannot host an agent loop at any declared budget (672 s per 26,214-token turn), and its declared 262,144-token window would cost ~1.9 hours of prefill for one turn. FIX: diagnose before using it - memory guard tier, KV memory pressure, `specprefill_enabled: False` on this model while other models have it on. |
 | BUG-789 | 2026-10-14 | **THE LOCAL MODEL SERVER'S APP CONFIG CARRIES A HUGGING FACE TOKEN IN PLAINTEXT (mode 644, world-readable, 215 bytes).** MEASURED 2026-10-14 while mapping the agent harness: the oMLX app config holds an `hf_token` field verbatim. C3 declares all data and compute sovereign and local, and a credential in a plaintext config is neither: it is a live secret with no rotation, no env indirection and no file protection. FIX (declared): move it to the environment (`HF_TOKEN`) or the keychain, revoke and reissue the exposed value, and add a rail that refuses a secret-shaped literal in an app config. The value is deliberately NOT restated here. |
 | BUG-774 | 2026-10-13 | **The internet-intake plan has no IDENTITY: `source_id` is book-shaped and the fallback branch it would fall to is the one a closed defect class removed — PREVENTIVE, nothing ingested yet.** `source_id = SHA-256(normalize_author｜normalize_title)` with a FILENAME FALLBACK branch (`pipeline/book_metadata.py::compute_source_id`), over a converter that accepts only `{.epub, .pdf, .md}` (`pipeline/stage0_convert.py`); the evaluator’s rail asserts that fallback is NEVER live at ratio 0.0 (`config/eval_integrity.yaml` → `source_identity`, enforced by `scripts/verify_source_identity.py`, whose docstring records the original defect: `source_diversity` counted FILENAMES and 29.1% of convergence was the same book twice). A transcript, a podcast episode or a social thread has no author｜title in that shape, and a work re-published in another medium (preprint → version of record, book → the author’s podcast) would count as a SECOND source and certify a voice against itself. FIX: a source-kind axis + a per-kind identity resolver (the `config/references.yaml` OpenAlex-by-DOI precedent) + the re-publication collapse rule (D-2308 generalised) BEFORE any conversion (T-121). |
@@ -16822,3 +16821,126 @@ longer supports. What the two readings DO agree on, and what survives: the cache
 at the head converts a warm turn back into a cold one — BUG-872). The dependent declaration in
 `config/agent_context.yaml` (`thinking_effort.why`, `revisit_when`) was corrected in place and its revisit trigger is
 recorded as FIRED; the threshold rise it points at is an OWNER DECISION, not an automatic edit.
+
+## BUG-892 (HIGH, FIXED 2026-10-17) — THE OWNER'S WORD WAS UNPERSISTABLE BY CONSTRUCTION: THE SIGNATURE PINNED A DOCUMENT AND THE NAME LIVED INSIDE A RE-PRINTABLE TEMPLATE
+
+MEASURED (twice in one sitting, the owner's own words: *"again it failed … why the fuck are we going in circles"*):
+`just admit-apply --limit 10` refused with
+
+    FATAL: governance/ADMISSION_ACCEPTED_20261017.yaml carries accepted_by='<your name>' — a placeholder …
+
+and no receipt was written at all (the newest run receipt stayed at 13:22Z), i.e. the run died at the SIGNATURE, not at a row.
+The two faults, both structural and both mine:
+
+1. **The name lived in a file the tool PRINTS.** `acceptance_template()` hard-coded `accepted_by: <your name>`, and
+   every re-derivation of the plan forced a re-print (`--template > governance/ADMISSION_ACCEPTED_<date>.yaml`),
+   which **reset the name to the placeholder**. The owner was asked to retype their own name into a generated
+   artifact after every plan move. That is not a control — it prevented no authorisation and cost two runs.
+2. **The word was pinned to the plan's BYTES.** `plan_sha256` meant ANY re-derivation voided a signature already
+   given: a probe added (BUG-886), a count moving by one row, a timestamp. So the artifact *guaranteed* recurrence:
+   fix anything → re-derive → re-print → name lost → refusal.
+
+ROOT (D-3034, the same one three times over): **the thing signed was a DOCUMENT; the thing authorised is a SET OF ACTS.**
+`plan_sha256` is not the owner's grant — `(rel, source_sha256, target, kind)` is, because that is what the applier
+reads and all it reads; everything else in a plan (counts, examples, probes, a timestamp) is a derivation the owner
+never signed and the applier never uses.
+
+FIX (D-3072):
+- **`scope_sha256`** pins the ordered acts; every acceptance carries the **manifest** (`rows: [rel…]`) so a moved scope
+  can be REFUSED BY NAME rather than by two digests.
+- **`--sign --as <name>`** is THE act (`just admit-sign "<name>"`): it declares the owner's identity ONCE in
+  `config/owner_identity.yaml` (declared home `admission.applier.accept_by_identity`), pins the LIVE scope, and writes
+  the acceptance crash-safe. Re-printing never touches the name again; an identity SWAP is refused, not overwritten.
+- `verify_scope` proves the word two ways, strongest first: the plan's own bytes (`signed_by: digest`) or a
+  re-derived plan whose ACTS are identical (`signed_by: scope`); anything else is FATAL and names the rows. A
+  signature carrying no `scope_sha256` is refused (silence about what was authorised is not consent).
+- The placeholder refusal now NAMES the command: it was a sentence an owner could do nothing with.
+- **BUG-888 keeps its teeth**: an empty or placeholder name is still refused (two-sided control), and an absent
+  identity file still yields the placeholder. What changed is only that the owner is never asked twice.
+- Receipt header now records `signed_by`, `scope_sha256`, `accepted_by` — "the plan moved but the acts did not" is a
+  fact a reader of a receipt can see, never infer.
+
+CONTROLS 35/35 (`--selftest`): a moved scope is FATAL and names the change; a re-derived plan with identical acts
+still matches (`scope`); a plan whose bytes are the signed ones proves by `digest`; a plan that LOST an authorised row
+names it; a signature pinning no scope is refused; `--sign` refuses a placeholder/empty name, writes the identity ONCE,
+its output is accepted by the applier that reads it, a different name cannot silently replace the declared identity,
+and re-signing the same name is idempotent.
+
+SUPERSEDES THE REMEDY of BUG-888 only (the refusal stands; the way to satisfy it is now a command). R5 gemma APPROVE
+(`scripts/apply_admission.py` sha256_16=…).
+
+## BUG-893 (MEDIUM, FIXED 2026-10-17) — THE PLAN TRUNCATED ITS OWN REFUSAL HANDLES, SO THE WORKLIST WAS A COUNT NOBODY COULD WALK
+
+MEASURED: `scripts/plan_admission.py` built its examples with
+`examples[decision].append(f"{root['id']}/{…}"[:120])` — every refused handle CUT AT 120 CHARACTERS. The class
+`refused_container_corrupt` counted 5 and printed handles like
+
+    books/epub/DOMAIN 2 Design/practice+process/How to use graphic desi gn to sell things, explain things, make things ylib.
+
+which resolves to no file on disk. The five were therefore a SENTENCE IN A DOCUMENT rather than five acts, and the
+owner could not action one without hunting the library by eye.
+
+ROOT (D-3034 again): **a COUNT that cannot be walked to its rows is a declaration with no resolution.** The examples
+were bounded for readability and the bound silently became the information.
+
+FIX (D-3073): the machine plan now carries **`refused[]` — EVERY refused row, in FULL** (624 rows measured: 389 no
+stage, 179 name-repair, 51 misplaced, 5 corrupt), each with its class and, for a container defect, its diagnosed
+defect and declared remedy. The illustrative `examples` are no longer truncated. The human document prints a class's
+rows in full when there are at most `admission.worklist_in_full` (declared: 40) of them and otherwise NAMES the class
+and its task with a pointer to `refused[]` — a 389-line table is read by nobody and a worklist that is not read is
+decoration.
+
+CONTROLS 25/25: EVERY refused row's handle RESOLVES on disk (a truncation anywhere fails it), the list length equals
+the sum of the refusal counts, the corrupt rows name their defect and the EXACT declared remedy, and the valid
+siblings in the same folders are still candidates (a worklist built by refusing everything would fail that half).
+
+## BUG-894 (MEDIUM, FIXED 2026-10-17) — THE 5 UNOPENABLE CONTAINERS WERE ONE UNDIFFERENTIATED CLASS, AND ONE OF THEM IS NOT A CONTAINER: IT IS A DANGLING FINDER ALIAS
+
+MEASURED over the declared library roots with the declared probe (the module's own answer, not a guess):
+
+| bytes | head | defect |
+|---|---|---|
+| 137,319,019 | `PK\x03\x04`, no EOCD | `.epub` truncated download (641 local headers, 321 text entries survive) |
+| 139,987 | `PK\x03\x04`, no EOCD | `.epub` truncated download |
+| 30,408,704 (= exactly 29 MiB) | `%PDF-1.7`, no `%%EOF` | `.pdf` cut at a chunk boundary |
+| 5,244,077 | `\x00` throughout | `.pdf` of ZERO bytes — a failed write |
+| 880 | `book\x00\x00\x00\x00mark` | **a macOS Finder ALIAS** wearing a `.pdf` suffix |
+
+BUG-886's class said "the bytes are not openable" and stopped there, which is correct as far as it goes and useless as
+a worklist: four of these need BYTES, the fifth needs a POINTER RESOLVED, and two of the four need different acts again
+(re-download vs re-download-and-verify). D-3071's own rule — a class exists because a REMEDY does — therefore demanded
+the next layer down.
+
+FIX (D-3073): `pipeline/container_integrity.py#diagnose()` names WHY, against a DECLARED vocabulary
+(`container_integrity.defects`: truncated_zip_no_central_directory, truncated_pdf_no_trailer, null_bytes,
+apple_bookmark, no_magic, unrecognised), each with its `remedy` in the gate. A defect with no remedy is FATAL, and so
+is a detected shape nobody declared.
+
+CORRECTION TO THE RECORD: D-3071 called this file "an Apple `book` archive". It is not an archive — `book\0\0\0\0mark`
+is Apple's BOOKMARK magic, and the file is a Finder alias. MEASURED consequence, and the reason the remedy below is a
+CHECK: the alias records `/Applications/Adobe After Effects 2024/Plug-ins/Effects/Keylight/docs/Keylight_1.2_AE.pdf`
+and **that path does not exist on this machine** (After Effects 2024 is not installed) — the alias DANGLES, so the
+work is not on this machine either. A remedy of "copy the real file in" would have sent the owner to a file that is
+not there; the declared remedy now says `ls` the recorded path first, and both outcomes are written out.
+
+## BUG-895 (MEDIUM, FIXED 2026-10-17) — A CONTROL NAME WITH NO ASSERTION BEHIND IT PRINTED GREEN, AND SHIFTED INDICES REPORTED ASSERTIONS UNDER OTHER CONTROLS' NAMES
+
+MEASURED in `scripts/plan_admission.py --selftest`: labels appended to `CONTROL_LABELS` ("appended, not inserted")
+left the tail of the table SHIFTED against the indices the code cited. So the NFC control's assertion reported as the
+note/domain control, the domain-home assertion reported as the bare-run control, and **label 10 had NO assertion at
+all** — yet it printed `ok`, because the printer reads the LABEL TABLE and never the assertions. A control suite that
+reports passes under other controls' names is not evidence; it is a green with nothing behind it (D-3036).
+
+FIX: every site re-pointed at the label that NAMES it; label 10 given the assertion its name claims; and a control OF
+the controls added — it reads this file's own text and requires every index in the table to be CITED, so a label can
+never again be a name with nothing behind it. PROVEN RED before trusted: removing the citation of label 10 makes the
+new control report `label index [10] print ok with no assertion`, and restoring it returns 25/25 green.
+
+## The five-container worklist (2026-10-17) — THE ACT EACH ROW ASKS FOR
+
+Full rows with their defects and remedies are in `governance/ADMISSION_PLAN_20261017.md#THE-WORKLIST` and
+`governance/ADMISSION_PLAN_20261017.json#refused`. Summary of the acts: **3 need RE-DOWNLOAD** (2 truncated `.epub`,
+1 file of zeros), **1 needs RE-DOWNLOAD AND a page-count check** (the 29 MiB `.pdf` — a locally rebuilt xref that
+silently loses pages cannot be told apart from a whole one afterwards), **1 needs the POINTER CHECKED** (the Finder
+alias, whose target is absent). Nothing is deleted and nothing is re-downloaded by this OS: the plan re-probes every
+candidate, so a good copy CLEARS ITSELF and a dead row simply stays refused.

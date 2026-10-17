@@ -133,3 +133,77 @@ def probes_from(admission: dict[str, Any], error: type[Exception] = ValueError,
                 f"suffix alone, which is exactly BUG-886 (C12)"
             )
     return probes
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+# WHY the bytes are not openable — a REFUSAL MUST NAME ITS OWN REMEDY (BUG-893/D-3073)
+# ---------------------------------------------------------------------------------------------------------------------
+#: MEASURED 2026-10-17 over the declared library roots the day the first tranche ran: the 5 unopenable containers
+#: are NOT one defect, and one of them is not a container at all —
+#:   2 `.epub`  truncated downloads (a valid `PK\x03\x04` head, no end-of-central-directory anywhere; one is
+#:              30,408,704 bytes = exactly 29 MiB, cut at a chunk boundary);
+#:   1 `.pdf`   all ZERO bytes (5,244,077 of `\x00`): a failed write, not a work;
+#:   1 `.pdf`   an Apple FINDER ALIAS — 880 bytes carrying the bookmark magic `book\x00\x00\x00\x00mark` and the
+#:              path `/Applications/Adobe After Effects 2024/Plug-ins/Effects/Keylight/docs/Keylight_1.2_AE.pdf`.
+#:              Retyping `.pdf` on an alias cannot make it a PDF, and the work it POINTS AT already exists on this
+#:              machine: its remedy is to resolve a POINTER, not to download anything.
+#: The class says "the bytes are not openable"; the DEFECT says what to DO about it. Both are needed, because a
+#: refusal whose only advice is "it is corrupt" leaves an owner to re-download a file they already have.
+APPLE_BOOKMARK_MAGIC = b"book\x00\x00\x00\x00mark"  #: a macOS alias/Finder bookmark (NOT an archive)
+ZIP_LOCAL_HEADER = b"PK\x03\x04"                    #: a zip that STARTED and never finished
+HEAD_BYTES = 512                                    #: enough to hold either magic and to see a run of zeros
+
+
+def _head(path: Path, size: int = HEAD_BYTES) -> bytes:
+    """The first `size` bytes — the only region a DEFECT diagnosis needs, so it never reads a whole 137 MB file."""
+    with Path(path).open("rb") as handle:
+        return handle.read(size)
+
+
+def diagnose(path: str | Path, probe: str, defects: dict[str, Any],
+             error: type[Exception] = ValueError) -> str:
+    """Name WHY a container the probe refused cannot be opened, in the DECLARED defect vocabulary.
+
+    The detection is here and the vocabulary (with each defect's remedy) is config, because a remedy is a
+    declaration about the world rather than a branch in a reader (C12). An unrecognised shape is its own DECLARED
+    token rather than a silent `unknown`: a defect nobody named is a worklist row nobody can action (D-3034).
+    """
+    if not isinstance(defects, dict) or not defects:
+        raise error(
+            "FATAL: container_integrity.defects is not declared — a refusal whose reason nobody can name leaves "
+            "the owner to guess the remedy (C12)"
+        )
+    head = _head(path)
+    token: str | None = None
+    if not head.strip(b"\x00"):  # a file that is nothing but zeros never held a byte of the work
+        token = "null_bytes"
+    elif head.startswith(APPLE_BOOKMARK_MAGIC):
+        token = "apple_bookmark"
+    elif probe == "zip":
+        token = "truncated_zip_no_central_directory" if head.startswith(ZIP_LOCAL_HEADER) else None
+    elif probe == "pdf":
+        token = "truncated_pdf_no_trailer" if head.startswith(PDF_MAGIC) else "no_magic"
+    token = token or "unrecognised"
+    if token not in defects:
+        raise error(
+            f"FATAL: the defect {token!r} is outside the declared vocabulary {sorted(defects)} — the reader "
+            f"detected a shape the declaration does not describe (D-3034)"
+        )
+    return token
+
+
+def defects_from(admission: dict[str, Any], error: type[Exception] = ValueError) -> dict[str, Any]:
+    """The declared defect vocabulary, in ONE spelling — read beside `probes`, from the same block."""
+    block = (admission or {}).get("container_integrity")
+    if not isinstance(block, dict):
+        raise error("FATAL: container_integrity is not declared beside the admission policy (C12)")
+    declared = block.get("defects")
+    if not isinstance(declared, dict) or not declared:
+        raise error("FATAL: container_integrity.defects must be a non-empty mapping of defect -> {meaning, remedy}")
+    for token, body in declared.items():
+        if not isinstance(body, dict) or not str(body.get("remedy", "")).strip():
+            raise error(
+                f"FATAL: the defect {token!r} declares no `remedy` — a defect with no act attached is a word, "
+                f"not a worklist entry (D-3034)"
+            )
+    return declared

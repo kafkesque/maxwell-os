@@ -1,11 +1,789 @@
-# THE SIGNATURE THIS PLAN NEEDS (T-183/D-3068).
-# It authorises 463 row(s). `mode: all` covers them; for a TRANCHE change to `mode: listed` and list the
-# `rel` labels exactly as the plan prints them.
-# The digest below pins the BYTES: if the plan is re-derived, this signature stops matching and is REFUSED.
+# THE SIGNATURE THIS PLAN NEEDS (T-183/D-3068, D-3072).
+# It authorises 463 row(s), listed at the end of this file by their `rel` label.
+# `plan_sha256` pins the DOCUMENT; `scope_sha256` pins the ACTS (rel + source digest + target + kind), so a
+# re-derived plan with identical acts does NOT void this signature and one whose acts moved is REFUSED.
+# `accepted_by` is the owner's IDENTITY: once it is declared (`--sign --as`), this printer carries it and
+# never asks again. A placeholder or an empty name is REFUSED (BUG-888).
 schema_version: '1.0'
 plan: governance/ADMISSION_PLAN_20261017.json
-plan_sha256: 0692ce6fe78d410431b5ab0f99d4eb448b389a0f9f210caf546deecc729d94dd
+plan_sha256: 2cf19a18881f6d2899a1834b5009cebd1eb7e2e2e686a3ff06aec07483b76917
+scope_sha256: f9278be8c30b07380fd6e744f1e17cbbcc6497eb89cb5d33851a60ea82dc2966
 accepted_by: <your name>
 accepted_on: '2026-10-17'
 mode: all
-rows: []
+rows:
+- books/epub/DOMAIN 2 Design/visual+fundamentals/Bierut, Michael; Rand, Paul Thoughts
+  on design.epub
+- books/epub/DOMAIN 2 Design/visual+fundamentals/Handbook of Color Psychology Andrew
+  J. Elliot; Mark D. Fairchild; Anna Franklin liber3.epub
+- books/epub/DOMAIN 2 Design/visual+fundamentals/The Designer's Dictionary of Color.epub
+- books/epub/DOMAIN 2 Design/visual+fundamentals/Type Rules The Designer 's Guide
+  to Professional Typography, 4th Edition Strizver, Ilene liber3.epub
+- books/epub/DOMAIN 2 Design/visual+fundamentals/[Paul Sahre] Two-Dimensional Man
+  A Graphic Memoir.epub
+- books/epub/DOMAIN 3 Art + Computational Media/[Tullett, Barrie;] Typewriter art
+  a modern antho.epub
+- books/epub/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Code
+  as Creative Medium A Handbook for Computational Art and Design Golan Levin; Tega
+  Brain liber3.epub
+- books/epub/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Generating
+  Sound & Organizing Time Graham Wakefield & Gregory Taylor liber3.epub
+- books/epub/DOMAIN 4 Business/marketing+growth/This Is Marketing You Can't Be Seen
+  Until You Learn to See.epub
+- books/epub/DOMAIN 4 Business/practice+economics/Don't Get a Job, Build a Business.epub
+- books/epub/DOMAIN 4 Business/practice+economics/Legal Guide for the Visual Artist
+  Tad Crawford; M. J. Bogatin liber3.epub
+- books/epub/DOMAIN 4 Business/practice+economics/Real Artists Don't Starve Timeless
+  Strategies for Thriving.epub
+- books/epub/DOMAIN 4 Business/practice+economics/The Harvard Business Review Entrepreneur's
+  Handbook.epub
+- books/epub/DOMAIN 4 Business/practice+economics/[Colin Barrow; Paul Barrow; Robert
+  Brown] The Busi.epub
+- books/epub/DOMAIN 5 Personal Practice/habits+behavior+change/[Dale-Carnegie-&-Associates]-How-to-Win-Friends-an.epub
+- books/epub/DOMAIN 5 Personal Practice/mood+therapy/[Dr. Jen Gunter] The Vagina Bible
+  The Vulva And T.epub
+- books/epub/DOMAIN 5 Personal Practice/mood+therapy/[Emily Nagoski Ph.D.] Come as
+  You Are The Surpris.epub
+- books/epub/DOMAIN 5 Personal Practice/productivity+execution/HBR Management Tips
+  Collection (2 Books) Harvard Business Review liber3.epub
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/FULLTEXT01.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/George Orwell  - 1984 (ORIGINAL)
+  (1949).pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/Wim Wenders - The Logic of Images.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/av99.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/book-en-print.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/114819898-Robert-Fludd-Hermetic-Philosopher1.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/2011_0001_545_04_Magyarito_szotar.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/259-451-1-SM.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/53481411-De-Re-Metallica-1556-Agricola.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Accumulator-Plans.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Albert Pike
+  - Morals and Dogma.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Alchemy
+  Overview.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Amber Wolfe
+  - In the Shadow of the Shaman.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Awakening
+  to divine wisdom Christian initiation into three worl_nodrm.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Beginning_Luciferian_Magick.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Cagliostro's
+  Secret Ritual Of Egyptian Rite Freemasonry.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Celtic-Mythology-And-Religion.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Christopher
+  Penczak - The Temple of Shamanic Witchcraft.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Codex Seraphinianus
+  (Luigi Serafini) (Z-Library).pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Coelum Philosophorum.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Cognitive
+  Economics - Springer-Verlag Berlin Heidelberg. Professor Bernard Walliser (auth.)
+  (2008).pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Concentrated
+  Salt of Nature.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Conway,
+  D.J. - Falcon, Feather and Valkyrie Sword.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/DO IT YOURSELF
+  PROJECT ORGONE ACCUMULATOR.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Encyclopedia
+  of Prostitution and Sex Work (2 Volumes Set).pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Frater Oz
+  - A Bíblia Vampírica.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Freemason
+  Bluebook.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Fulcanelli
+  - The Dwellings of the Philosophers (Les Demeures Philosophales).pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Gerard Cremonensis,
+  Astrological Geomancy.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/GodMan_10236902.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Goffman_Erving_The_Presentation_of_Self_in_Everyday_Life.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Hungry_Minds_The_Book_The_Ultimate_Guide_to_Rebuilding_Civilization.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Jim DeKorne
+  - Psychedelic Shamanism.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/M.M. Pattison
+  Muir - The Story of Alchemy and the Beginnings of Chemistry.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/MOONSHINE_original.PDF
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/McKenna,
+  Terence - Lectures on Alchemy.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Mckenna,
+  Terence - Food Of The Gods.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Mckenna,
+  Terence - Invisible Landscape.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Michael
+  J. Harner - Hallucinogens and Shamanism.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Mirror of
+  Alchemy.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/OCCLITH.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/On the A
+  and P Rite of Masonry (Memphis 7 Misraim) - Jeremiah How.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Opinions
+  on Speculative Masonry - J Odiorne.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Pansophic
+  EA Study Guide.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Phil Hine
+  - Walking Between The Worlds.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Philosophic
+  Lodge of the Knights of the Eagle - Francken.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Reality
+  Switch Technologies Psychedelics as Tools for the Discovery and Exploration of New
+  Worlds (Andrew R. Gallimore) (Z-Library).pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Robert Anton
+  Wilson - Cosmic Trigger I - The Final Secret Of The Illuminati.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Robert Anton
+  Wilson - MIT Encyclopedia of the Cognitive Scie.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Robert Anton
+  Wilson - Prometheus Rising.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Robert J.
+  Wallis - Shamans and Neo-Shamans.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/SYMBOLS.PDF
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Shaman Pablo
+  Amaringo - Ayahuasca Visions - Ebook.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Souls Of
+  Distortion Awakening.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/The Apocalypse
+  of Freemasonry - F Castells.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/The Arcane
+  Schools - John Yarker.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/The Baphomet
+  Codex.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/The Book
+  of the Words - Albert Pike.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/The Builders
+  A Story and Study of Masonary - J Newton.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/The Call
+  Of Cthulhu - H.P. Lovecraft.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/The Constitutions
+  of the Freemasons - 1734.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/The Entered
+  Apprentice Handbook - JSM Ward.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/The Fellow
+  Crafts Handbook - JSM Ward.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/The Great
+  Big Narcotics Cookbook.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/The Hidden
+  Gears of Free Masonry.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/The Hidden
+  Life in Freemasonry - CW Leadbeater.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/The Higher
+  Degrees Handbook - JSM Ward.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/The Master
+  Masons Handbook - JSM Ward.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/The Mysteries
+  of Freemasonry - Captain William Morgan.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/The Mysticism
+  of Masonry - Unknown.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/The Necromantic
+  Ritual Book.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/The Secret
+  Book of Artephius.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/The Underworld
+  Service-online.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/The Vampire
+  Predator Bible.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/The_Alchemy_Reader_From_Hermes_Trismegistus_to_Isaac_Newton-Cambridge_University_Press_2003.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/The_History_Book_-_Big_Ideas_Simply_Explained_By_DK.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Thinking
+  Visually_Stephen K. Reed_liber3.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/ToV - Bloodlines.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Twelve Keys.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/[Rupert_Sheldrake,_Terence_McKenna,_Ralph_Abraham](BookFi.org).pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/[Terence_McKenna]_True_Hallucinations(BookFi.org).pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/[Terence_Mckenna]_The_Archaic_Revival_Speculation(BookFi.org).pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/_OceanofPDF.com_The_Psychology_of_Totalitarianism_-_Mattias_Desmet.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/communication-design-principles-methods-and-practice.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/godmanwordmadefl00carerich.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/las-plantas-de-los-dioses-shultes-y-hofmann-1.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/lexicon_of_alchemy.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/pkpadmin,+DeMeo-20-3_Layout+1.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/wtwr.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/mental+models+epistemology/Simulacra
+  and Simulation (Jean Baudrillard, Sheila Faria Glaser) (Z-Library).pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/mental+models+epistemology/The
+  Agony of Power (Jean Baudrillard, Sylvère Lotringer) (Z-Library).pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/mental+models+epistemology/The
+  Illusion of the End (Jean Baudrillard translated by Chris Turner) (Z-Library).pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/mental+models+epistemology/The
+  Spirit of Terrorism, New Revised Edition (Jean Baudrillard, Chris Turner) (Z-Library).pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/mental+models+epistemology/The
+  post-existentialist neo-stoicism of Jason Xenakis and the stoic theory of suicide.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/mental+models+epistemology/The
+  unbomber manifesto, the futre of industrial society.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/semiotics+meaning/Peirce-C-S-Logic-Semiotic.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/semiotics+meaning/Semiotics-the-Basics.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/semiotics+meaning/robert c holub
+  reception theory.pdf
+- books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/semiotics+meaning/v. Halliday  Matthiessen
+  - Hallidays Introduction to Functional Grammar.pdf
+- books/pdf/DOMAIN 2 Design/A_Dictionary_Of_Color_Combinations_Various2011.pdf
+- books/pdf/DOMAIN 2 Design/Draplin Design Co. (Aaron James Draplin) (Z-Library).pdf
+- books/pdf/DOMAIN 2 Design/La paleta perfecta.pdf
+- books/pdf/DOMAIN 2 Design/On Tyranny, Graphic Edition (Timothy Snyder) (Z-Library).pdf
+- books/pdf/DOMAIN 2 Design/Tweed-Valley-Forest-Park-Map-and-Trail-Guide.pdf
+- books/pdf/DOMAIN 2 Design/Visualizing Equations Essential Math for Game Devs .pdf
+- books/pdf/DOMAIN 2 Design/communication+design/00913367.2014.920283.pdf
+- books/pdf/DOMAIN 2 Design/communication+design/175630614X13787503069918.pdf
+- books/pdf/DOMAIN 2 Design/communication+design/1bd7dd6c-8e4e-47a2-88b2-5063b82cf13b.pdf
+- books/pdf/DOMAIN 2 Design/communication+design/5章_Sheet.pdf
+- books/pdf/DOMAIN 2 Design/communication+design/Beyond_Visual_Metaphor_A_New_Typology_of_Visual_Rh.pdf
+- books/pdf/DOMAIN 2 Design/communication+design/Blender_Pro_Tips_Modeling_and_Texturing_like_a_Professional_in_Blender.pdf
+- books/pdf/DOMAIN 2 Design/communication+design/Challenge3 - AdvancedKeying.pdf
+- books/pdf/DOMAIN 2 Design/communication+design/Closing the Loop Systems Thinking
+  for Designers (Sheryl Cababa) (Z-Library).pdf
+- books/pdf/DOMAIN 2 Design/communication+design/ENG_Google_Translated_Ohira_Kouki_After_effects_for_Animation_BEGINNER.pdf
+- books/pdf/DOMAIN 2 Design/communication+design/Info_We_Trust_How_to_Inspire_the_World_with_Data.pdf
+- books/pdf/DOMAIN 2 Design/communication+design/The Psychology Behind Design.pdf
+- books/pdf/DOMAIN 2 Design/communication+design/Visualizing Financial Data_Julie
+  Rodriguez, Piotr Kaczmarek_liber3.pdf
+- books/pdf/DOMAIN 2 Design/communication+design/[ENG Translated] After Effects for
+  Animation EXPERT.pdf
+- books/pdf/DOMAIN 2 Design/communication+design/_Principles of three dimensional
+  design._Wucius Wong_liber3.pdf
+- books/pdf/DOMAIN 2 Design/communication+design/_principles-of-two-dimensional-design-by-wucius-wong_compress.pdf
+- books/pdf/DOMAIN 2 Design/communication+design/peterson2018.pdf
+- books/pdf/DOMAIN 2 Design/communication+design/phillips2004.pdf
+- books/pdf/DOMAIN 2 Design/communication+design/rcl.11.2.07fen.pdf
+- books/pdf/DOMAIN 2 Design/communication+design/sco-003_2002_2__442_d.pdf
+- books/pdf/DOMAIN 2 Design/communication+design/vanmulken2010.pdf
+- books/pdf/DOMAIN 2 Design/practice+process/The Rules We Break Lessons in Play, Thinking,
+  and Design (Eric Zimmerman) (Z-Library).pdf
+- books/pdf/DOMAIN 2 Design/practice+process/The_Creative_Act_A_Way_of_Being_Rick_Rubin_2023_Penguin_Publishing.pdf
+- books/pdf/DOMAIN 2 Design/practice+process/lwm_23.pdf
+- books/pdf/DOMAIN 2 Design/visual+fundamentals/ saul bass.pdf
+- books/pdf/DOMAIN 2 Design/visual+fundamentals/**Bringhurst, Robert - The Elements
+  of Typographic Style.pdf
+- books/pdf/DOMAIN 2 Design/visual+fundamentals/Contemporary Processes Of Text Typeface
+  Design (Michael Harkins) (Z-Library).pdf
+- books/pdf/DOMAIN 2 Design/visual+fundamentals/Designing Type_Karen Cheng_liber3.pdf
+- books/pdf/DOMAIN 2 Design/visual+fundamentals/Gill_Eric_An_Essay_on_Typography.pdf
+- books/pdf/DOMAIN 2 Design/visual+fundamentals/Grid Systems in Graphic Design Raster
+  Systeme Fur Die Visuele Gestaltung (German and English Edition)_Josef Muller-Brockmann_liber3.pdf
+- books/pdf/DOMAIN 2 Design/visual+fundamentals/How to create typefaces from sketch
+  to screen (Cristóbal Henestrosa Matus, José Scaglione) (Z-Library).pdf
+- books/pdf/DOMAIN 2 Design/visual+fundamentals/Jason-Santa-Maria_On-Web-Typography.pdf
+- books/pdf/DOMAIN 2 Design/visual+fundamentals/Manovich-Lev_The_Language_of_the_New_Media.pdf
+- books/pdf/DOMAIN 2 Design/visual+fundamentals/The Art of Color Scripting.pdf
+- books/pdf/DOMAIN 2 Design/visual+fundamentals/Тимоти Самара  «Making and Breaking
+  the Grid».pdf
+- books/pdf/DOMAIN 3 Art + Computational Media/FABE, M (2004) CLOSELY WATCHED FILMS-
+  AN INTRODUCTION TO THE ART OF NARRATIVE FILM TECHNIQue.pdf
+- books/pdf/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Art_Fundamentals_2nd_edition_Light,_shape,_color,_3DTotal_Publishing.pdf
+- books/pdf/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Coding_Art.pdf
+- books/pdf/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/New
+  aesthetics and art.pdf
+- books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/20 ways paint more
+  loosely.pdf
+- books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Animal Painting and
+  Anatomy (Frank Calderon) (Z-Library).pdf
+- books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Charles_Bargue_Drawing_Course_text.pdf
+- books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Color and Light -
+  James Gurney.pdf
+- books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Constructive Anatomy.pdf
+- books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Draw 50 Animals (
+  PDFDrive.com ).pdf
+- books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Draw+50+Airplanes,+Aircraft,+and+Spacecraft_+The+Step_by_Step+W.pdf
+- books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/FORCE - Drawing Human
+  Anatomy - 1E (2016).pdf
+- books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Figure Drawing.pdf
+- books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Gary Faigin - The
+  Artist's Complete Guide To Facial Expression.pdf
+- books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/How to Draw Cars the
+  Hot Wheels Way (Scott Robertson) (Z-Library).pdf
+- books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Justin_R_Martin_Poses_For_Artists_Original_Character_Workbook_Volume.pdf
+- books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Perspective  - Drawing
+  Perspective Made Easy.pdf
+- books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Perspective_Drawing_Handbook-JosephDAmelio.pdf
+- books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Preview_Mastering_Manga_How_to_Draw_Manga_Scenes_Crilley,_Mark_Z.pdf
+- books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Sample_Draw_and_animate_your_manga_characters_The_Complete_Guide.pdf
+- books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Sketching for the
+  Absolute Beginner.pdf
+- books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Stonehouses Anatomy
+  (Incomplete - 555 pages only) (Seok Jung Hyun) (Z-Library).pdf
+- books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Ten_Step_Drawing_People_Draw_a_range_of_figures_&_faces_in_10_easy.pdf
+- books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/The_Practice_of_Drawing_and_Painting_Lan.pdf
+- books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/[Mike_Mattesi]_Force_Dynamic_Life_Drawing_for_Ani(b-ok.org).pdf
+- books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/[Mike_Mattesi]_Force_The_Key_to_Capturing_Life_Th(b-ok.org).pdf
+- books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/[Walter_Foster_Creative_Team,_Walter_Foster_Publis(b-ok.xyz).pdf
+- books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/color-in-shadows.pdf
+- books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/composition of outdoor
+  painting.pdf
+- books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/dl2-5.pdf
+- books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/how to draw locomotives.pdf
+- books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/lofi_Rosa_Menkman_-_A_Vernacular_of_File_Formats.pdf
+- books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/the-natural-way-to-draw-kimon-nicolaides.pdf
+- books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/yanBOOK.pdf
+- books/pdf/DOMAIN 3 Art + Computational Media/screenplay.pdf
+- books/pdf/DOMAIN 4 Business/Business guide.pdf
+- books/pdf/DOMAIN 4 Business/organizations+leadership/100M Offers How To Make Offers
+  So Good People Feel Stupid Saying No (Alex Hormozi) (Z-Library).pdf
+- books/pdf/DOMAIN 4 Business/practice+economics/Made by James (James Martin  Made
+  by James) (Z-Library).pdf
+- books/pdf/DOMAIN 4 Business/practice+economics/Shaughnessy, Adrian - How to be a
+  Graphic Designer without Losing your Soul 150dpi.pdf
+- books/pdf/DOMAIN 4 Business/practice+economics/You ́re My Favorite Client_Mike Monteiro_liber3.pdf
+- books/pdf/DOMAIN 5 Personal Practice/habits+behavior+change/Behavior Operations
+  Manual (Chase Hughes) (Z-Library).pdf
+- books/pdf/DOMAIN 5 Personal Practice/habits+behavior+change/The Behavior Operations
+  Manual Neuro-Cognitive Intelligence (Chase Hughes) (Z-Library).pdf
+- books/pdf/DOMAIN 5 Personal Practice/mood+therapy/Cosmic Trigger The Final Secret
+  of the Illuminati (Robert Anton Wilson) (Z-Library).pdf
+- books/pdf/DOMAIN 5 Personal Practice/mood+therapy/Hamvas Béla - Scienta Sacra 1.
+  Kötet.pdf
+- books/pdf/DOMAIN 5 Personal Practice/mood+therapy/Men's Sexual Health - Fitness
+  for Satisfying Sex By Barry W. McCarthy.pdf
+- books/pdf/DOMAIN 5 Personal Practice/mood+therapy/Quantum Psychology (Robert Anton
+  Wilson) (Z-Library).pdf
+- books/pdf/DOMAIN 5 Personal Practice/mood+therapy/The Body Language of Sex, Power
+  & Aggression.pdf
+- books/pdf/DOMAIN 5 Personal Practice/mood+therapy/the art of loving.pdf
+- books/pdf/DOMAIN 5 Personal Practice/productivity+execution/'Make Electronics by
+  Charles Platt.pdf.pdf'.pdf
+- books/pdf/DOMAIN 5 Personal Practice/productivity+execution/Atomic_Habits_Tiny_Changes,_Remarkable_Results_James_Clear_PDF.pdf
+- books/pdf/DOMAIN 5 Personal Practice/productivity+execution/Authentic Revolution
+  Games Manual FINAL.pdf
+- books/pdf/DOMAIN 5 Personal Practice/productivity+execution/Circuit-bending build
+  your own alien instruments (Reed Ghazala) (Z-Library).pdf
+- books/pdf/DOMAIN 5 Personal Practice/productivity+execution/Encyclopedia of Electronic
+  Components Volume 1.pdf
+- books/pdf/DOMAIN 5 Personal Practice/productivity+execution/IJRITCC_1349.pdf
+- books/pdf/DOMAIN 5 Personal Practice/productivity+execution/Internationa Taxation.pdf
+- books/pdf/DOMAIN 5 Personal Practice/productivity+execution/Sansui-AV-77-Service-Manual.pdf
+- books/pdf/DOMAIN 5 Personal Practice/productivity+execution/The Writer's Idea Thesaurus
+  - Fred White.pdf
+- books/pdf/DOMAIN 5 Personal Practice/productivity+execution/What's_Your_Dream_Find_Your_Passion,_Love_Your_Work_and_Build_a.pdf
+- books/pdf/DOMAIN 5 Personal Practice/productivity+execution/kupdf.com_how-to-test-almost-everything-electronic-3rd-ed.pdf
+- books/pdf/DOMAIN 5 Personal Practice/productivity+execution/oreilly-make-more-electronics-2014.pdf
+- books/pdf/DOMAIN 5 Personal Practice/productivity+execution/the-orgone-accumulator-handbook.pdf
+- books/pdf/DOMAIN 6 AI + Computing/210912-LB-Network-Map.pdf
+- books/pdf/DOMAIN 6 AI + Computing/Bitcoin Mining Handbook.pdf
+- books/pdf/DOMAIN 6 AI + Computing/programming/  .pdf
+- books/pdf/DOMAIN 6 AI + Computing/programming/Amariei C. - Arduino Development Cookbook
+  - 2015.pdf
+- books/pdf/DOMAIN 6 AI + Computing/programming/Designing_the_Internet_of_Things.pdf
+- books/pdf/DOMAIN 6 AI + Computing/programming/KRUMM, J. (2009) UBIQUITOUS COMPUTING
+  FUNDAMENTALS- CRC PRESS, 1st ed. .pdf
+- books/pdf/DOMAIN 6 AI + Computing/programming/Processing- A Programming Handbook
+  for Visual Designers and Artists, 2 edition.pdf
+- books/pdf/DOMAIN 6 AI + Computing/programming/SkienaTheAlgorithmDesignManual.pdf
+- books/pdf/DOMAIN 6 AI + Computing/programming/[Matt_Pearson]_Generative_Art(BookFi.org).pdf
+- books/pdf/DOMAIN 6 AI + Computing/programming/_OceanofPDF.com_clean-code.pdf
+- books/pdf/DOMAIN 7 Influence + Power/Police-Auction-Catalogue-February-2024.pdf
+- journals_notes/DOMAIN 0 Systems + Decision/r27121.pdf
+- journals_notes/DOMAIN 1 Substrate — Mind, Math, Meaning/136.full.pdf
+- journals_notes/DOMAIN 1 Substrate — Mind, Math, Meaning/List-79F64E28-2BE4-FC74-C2C1-9C562EFFFCAD-bibliography.pdf
+- journals_notes/DOMAIN 1 Substrate — Mind, Math, Meaning/language/9423-34509-2-PB.pdf
+- journals_notes/DOMAIN 1 Substrate — Mind, Math, Meaning/rhetoric/Marcel Danesi.pdf
+- journals_notes/DOMAIN 1 Substrate — Mind, Math, Meaning/semiotics/kupdf.net_semiotics.pdf
+- journals_notes/DOMAIN 1 Substrate — Mind, Math, Meaning/semiotics/visual semiotics/15.pdf
+- journals_notes/DOMAIN 1 Substrate — Mind, Math, Meaning/semiotics/visual semiotics/linguagem_ensino_nascimento.pdf
+- journals_notes/DOMAIN 2 Design/Color/BRLeeuwen2011.pdf
+- journals_notes/DOMAIN 2 Design/Color/synestesia.pdf
+- journals_notes/DOMAIN 2 Design/Handbook_Of_Interior_Lighting_Design_by_Rüdiger_Ganslandt,_Harald.pdf
+- journals_notes/DOMAIN 2 Design/Interactive_documentary_and_live_perform.pdf
+- journals_notes/DOMAIN 2 Design/Typography/SemioticsofTypography.pdf
+- journals_notes/DOMAIN 2 Design/Typography/ThePrinciplesoftheNewTypography.pdf
+- journals_notes/DOMAIN 2 Design/Typography/Typography Today Emotion Recognition in
+  Typography.pdf
+- journals_notes/DOMAIN 2 Design/Typography/desi.2006.22.1.89.pdf
+- journals_notes/DOMAIN 2 Design/Typography/kinetic typography/ Typography in Motion  A
+  Framework of Moving Type Use.pdf
+- journals_notes/DOMAIN 2 Design/Typography/kinetic typography/1-s2.0-S2351978915009658-main.pdf
+- journals_notes/DOMAIN 2 Design/Typography/kinetic typography/10.1080@10350330.2019.1568957.pdf
+- journals_notes/DOMAIN 2 Design/Typography/kinetic typography/Automatic_kinetic_typography_composer.pdf
+- journals_notes/DOMAIN 2 Design/Typography/kinetic typography/Bringing_the_Text_to_Life_Automatically.pdf
+- journals_notes/DOMAIN 2 Design/Typography/kinetic typography/Dances with Words.pdf
+- journals_notes/DOMAIN 2 Design/Typography/kinetic typography/Emotional Expression
+  and Effective Communication on Kinetic  Typography.pdf
+- journals_notes/DOMAIN 2 Design/Typography/kinetic typography/Fluid Typography -Construction,
+  Metamorphosis and Revelation Barbara Brownie.pdf
+- journals_notes/DOMAIN 2 Design/Typography/kinetic typography/Integrating Typography
+  and Motion in Visual Communication.pdf
+- journals_notes/DOMAIN 2 Design/Typography/kinetic typography/Ironic_Expressions_and_Moving_Words.pdf
+- journals_notes/DOMAIN 2 Design/Typography/kinetic typography/Jeremy+Downes+Dissertation.pdf
+- journals_notes/DOMAIN 2 Design/Typography/kinetic typography/KinTypo_22yrs_v5.pdf
+- journals_notes/DOMAIN 2 Design/Typography/kinetic typography/Kinetic Typography-Based
+  Instant Messaging.pdf
+- journals_notes/DOMAIN 2 Design/Typography/kinetic typography/Lee_Jun_DIS06.pdf
+- journals_notes/DOMAIN 2 Design/Typography/kinetic typography/Luiz F. Las_Casas Cinedesign-typography
+  in motion pictures.pdf
+- journals_notes/DOMAIN 2 Design/Typography/kinetic typography/MeSSCA_Brownie_FluidType.pdf
+- journals_notes/DOMAIN 2 Design/Typography/kinetic typography/Notes towards a semiotics
+  of kinetic typography2015.pdf
+- journals_notes/DOMAIN 2 Design/Typography/kinetic typography/Phrase Animation Generation
+  Based on.pdf
+- journals_notes/DOMAIN 2 Design/Typography/kinetic typography/Robotype Studies of
+  Kinetic Typography by Robot Display.pdf
+- journals_notes/DOMAIN 2 Design/Typography/kinetic typography/The Behaviours of Fluid
+  Characterforms in Temporal Typography.pdf
+- journals_notes/DOMAIN 2 Design/Typography/kinetic typography/bvai07.pdf
+- journals_notes/DOMAIN 2 Design/Typography/kinetic typography/he2017.pdf
+- journals_notes/DOMAIN 2 Design/Typography/kinetic typography/writingdesign.pdf
+- journals_notes/DOMAIN 2 Design/Typography/multimodality/serafini-typography.pdf
+- journals_notes/DOMAIN 2 Design/Typography/typographical signification/Towards a
+  semiotics of typography.pdf
+- journals_notes/DOMAIN 2 Design/Typography/typographical signification/Towards_a_Typology_of_Typographic_Signif.pdf
+- journals_notes/DOMAIN 2 Design/branding/logo-file-formats.pdf
+- journals_notes/DOMAIN 2 Design/branding/text/alt-text-made-easy.pdf
+- journals_notes/DOMAIN 2 Design/design-notes/Commandments Of Visual Thinking by Dan
+  Roam.pdf
+- journals_notes/DOMAIN 2 Design/design-notes/Folder structure/[My Business] Folder/Read
+  Me - Business Folder.pdf
+- journals_notes/DOMAIN 2 Design/design-notes/branding/logo design/Logo Trend Report.pdf
+- journals_notes/DOMAIN 2 Design/design-notes/creative focus worksheet.pdf
+- journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Conducting-an-Interview-with-Empathy.pdf
+- journals_notes/DOMAIN 2 Design/design-notes/pdf/5-accessibility-mistakes.pdf
+- journals_notes/DOMAIN 2 Design/design-notes/pdf/After Effect Lab.pdf
+- journals_notes/DOMAIN 2 Design/design-notes/pdf/Canny-The-Complete-Website-Checklist
+  1.pdf
+- journals_notes/DOMAIN 2 Design/design-notes/pdf/Canny-The-Ultimate-Small-Business-Branding-Guide.pdf
+- journals_notes/DOMAIN 2 Design/design-notes/pdf/Indesign/Chelius_L6148_Workbook_1601585886800001qEgM.pdf
+- journals_notes/DOMAIN 2 Design/design-notes/pdf/L6140_L8024_Harmer_1602772442395001EYpQ.pdf
+- journals_notes/DOMAIN 2 Design/design-notes/pdf/L6147_L8025_InDesignTypeandLayout_NigelFrench_1602960488881001SAtP.pdf
+- journals_notes/DOMAIN 2 Design/design-notes/pdf/Managing International Suppliers.pdf
+- journals_notes/DOMAIN 2 Design/design-notes/pdf/Personal-Branding-Toolkit.pdf
+- journals_notes/DOMAIN 2 Design/design-notes/pdf/Sound design/Acustic.pdf
+- journals_notes/DOMAIN 2 Design/design-notes/pdf/Sound design/Automation.pdf
+- journals_notes/DOMAIN 2 Design/design-notes/pdf/Sound design/Editing.pdf
+- journals_notes/DOMAIN 2 Design/design-notes/pdf/Sound design/Kerdesek.pdf
+- journals_notes/DOMAIN 2 Design/design-notes/pdf/Sound design/Mastering.pdf
+- journals_notes/DOMAIN 2 Design/design-notes/pdf/Sound design/Mixing.pdf
+- journals_notes/DOMAIN 2 Design/design-notes/pdf/Sound design/Notebook7.pdf
+- journals_notes/DOMAIN 2 Design/design-notes/pdf/Sound design/Notebook8.pdf
+- journals_notes/DOMAIN 2 Design/design-notes/pdf/Sound design/Notebook9.pdf
+- journals_notes/DOMAIN 2 Design/design-notes/pdf/Sound design/Pro Tools.pdf
+- journals_notes/DOMAIN 2 Design/design-notes/pdf/Sound design/Questlove_Teaches_Music_Curation_and_DJing_MasterClass.pdf
+- journals_notes/DOMAIN 2 Design/design-notes/pdf/Sound design/Signal processing.pdf
+- journals_notes/DOMAIN 2 Design/design-notes/pdf/lee2015.pdf
+- journals_notes/DOMAIN 2 Design/design-notes/pdf/mind framing.pdf
+- journals_notes/DOMAIN 2 Design/design-notes/pdf/newkind-toolkit-developing-brand-voice-in-tech.pdf
+- journals_notes/DOMAIN 2 Design/design-notes/pdf/one6creative_content_ideas_for_designers.pdf
+- journals_notes/DOMAIN 2 Design/design-notes/permission-marketing-200903065314.pdf
+- journals_notes/DOMAIN 3 Art + Computational Media/Interactive_documentary_and_live_perform.pdf
+- journals_notes/DOMAIN 4 Business/Blunt House TA.pdf
+- journals_notes/DOMAIN 4 Business/IdentityLectureNotes.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Branching
+  Out/One Careful Owner.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Decisions
+  Decisions/Knowing when to stop.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Decisions
+  Decisions/Looking to the future.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Decisions
+  Decisions/The delicate art of turning away clients.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Decisions
+  Decisions/Wrestling with doubt.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Get
+  Up& Go/Dividing Your Time Between Creativity and Business.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Get
+  Up& Go/Ideas are the New Craft.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Get
+  Up& Go/Making Fun Pay.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Get
+  Up& Go/Starting From Scratch.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Get
+  Up& Go/Work vs Life.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Getting
+  Noticed/Don't explain your creativity, show it.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Getting
+  Noticed/Embrace the social video clutter.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Getting
+  Noticed/Making Your Own Success.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Getting
+  Noticed/Mastering Your Market.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Getting
+  Noticed/Pitfalls of Networking.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Getting
+  Noticed/Putting Yourself Out There.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Identity/Can
+  a succesful business create fun stuff.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Identity/Defining
+  a brand with integrity.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Identity/Developing
+  Products to Build Brand Image.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Identity/Focusing
+  your business proposition.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Identity/Shedding
+  your artistic pretences.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Identity/What's
+  your Company Culture.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Money/An
+  Entrepeneurs Perspective on Investors.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Money/Being
+  Thrifty Isnt Cheap.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Money/Hiring
+  a Financial Director.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Money/Making
+  Cash Flow.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Money/When
+  to reinvest early profits.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Nifty
+  Fifty/CGF_Nifty_Fifty.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/People/Building
+  a team from scratch.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/People/Cap
+  Table/Cap-Table 1.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/People/Cap
+  Table/Cap-Table.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/People/Hiring
+  Your First Employee.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/People/Investing
+  in New Talent.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/People/The
+  Benefits of Collaboration.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/People/Turning
+  Friends into a Team.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Strategy/Focusing
+  Your Business Model.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Strategy/Getting
+  on with business.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Strategy/Going
+  Full Service.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Strategy/How
+  different is it running a large agency.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Strategy/Selling
+  time vs selling products.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/Strategy/The
+  Benefits of Staying Small.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda]
+  The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module
+  01- Positioning Your Business/M01L10-Creating an Elevator Pitch Worksheet.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda]
+  The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module
+  01- Positioning Your Business/M01L11-Three Marketing Summaries Worksheet.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda]
+  The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module
+  03- Capabilities Decks/M03L03-CAPABILITIES-AGENCY-OVERVIEW-JANDA-V1 Folder/CAPABILITIES-AGENCY-OVERVIEW-JANDA-V1
+  Folder/CAPABILITIES-AGENCY-OVERVIEW-JANDA-V1 1.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda]
+  The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module
+  03- Capabilities Decks/M03L03-CAPABILITIES-AGENCY-OVERVIEW-JANDA-V1 Folder/CAPABILITIES-AGENCY-OVERVIEW-JANDA-V1
+  Folder/CAPABILITIES-AGENCY-OVERVIEW-JANDA-V1.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda]
+  The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module
+  03- Capabilities Decks/M03L04-CAPABILITIES-LOGODESIGN-JANDA-V1 Folder/CAPABILITIES-LOGODESIGN-JANDA-V1
+  Folder/CAPABILITIES-LOGODESIGN-JANDA-V1 1.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda]
+  The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module
+  03- Capabilities Decks/M03L04-CAPABILITIES-LOGODESIGN-JANDA-V1 Folder/CAPABILITIES-LOGODESIGN-JANDA-V1
+  Folder/CAPABILITIES-LOGODESIGN-JANDA-V1.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda]
+  The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module
+  03- Capabilities Decks/M03L05-CAPABILITIES-PRINT-JANDA-V1 Folder/CAPABILITIES-PRINT-JANDA-V1
+  Folder/CAPABILITIES-PRINT-JANDA-V1 1.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda]
+  The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module
+  03- Capabilities Decks/M03L05-CAPABILITIES-PRINT-JANDA-V1 Folder/CAPABILITIES-PRINT-JANDA-V1
+  Folder/CAPABILITIES-PRINT-JANDA-V1.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda]
+  The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module
+  03- Capabilities Decks/M03L06-CAPABILITIES-WEBSITE-JANDA-V1 Folder/CAPABILITIES-WEBSITE-JANDA-V1
+  Folder/CAPABILITIES-WEBSITE-JANDA-V1 1.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda]
+  The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module
+  03- Capabilities Decks/M03L06-CAPABILITIES-WEBSITE-JANDA-V1 Folder/CAPABILITIES-WEBSITE-JANDA-V1
+  Folder/CAPABILITIES-WEBSITE-JANDA-V1.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda]
+  The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module
+  03- Capabilities Decks/M03L07-CAPABILITIES-GENERIC-JANDA-V1 Folder/CAPABILITIES-GENERIC-JANDA-V1
+  Folder/CAPABILITIES-GENERIC-JANDA-V1 1.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda]
+  The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module
+  03- Capabilities Decks/M03L07-CAPABILITIES-GENERIC-JANDA-V1 Folder/CAPABILITIES-GENERIC-JANDA-V1
+  Folder/CAPABILITIES-GENERIC-JANDA-V1.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda]
+  The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module
+  03- Capabilities Decks/M03L08-CASESTUDY-TROPOLIS-JANDA-V1 Folder/CASESTUDY-TROPOLIS-JANDA-V1
+  Folder/CASESTUDY-TROPOLIS-JANDA-V1 1.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda]
+  The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module
+  03- Capabilities Decks/M03L08-CASESTUDY-TROPOLIS-JANDA-V1 Folder/CASESTUDY-TROPOLIS-JANDA-V1
+  Folder/CASESTUDY-TROPOLIS-JANDA-V1.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda]
+  The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module
+  03- Capabilities Decks/M03L09-CASESTUDY-GENERIC-JANDA-V1 Folder/CASESTUDY-GENERIC-JANDA-V1
+  Folder/CASESTUDY-GENERIC-JANDA-V1 1.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda]
+  The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module
+  03- Capabilities Decks/M03L09-CASESTUDY-GENERIC-JANDA-V1 Folder/CASESTUDY-GENERIC-JANDA-V1
+  Folder/CASESTUDY-GENERIC-JANDA-V1.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda]
+  The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module
+  04- Deal Flow/M04L02-New Project Interview.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda]
+  The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module
+  04- Deal Flow/M04L03-New Project Analysis.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda]
+  The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module
+  04- Deal Flow/M04L05-Discovery Meeting-Unkown Project.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda]
+  The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module
+  04- Deal Flow/M04L06-Discovery Meeting-Identity Design.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda]
+  The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module
+  04- Deal Flow/M04L07-Discovery Meeting-Print Design.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda]
+  The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module
+  04- Deal Flow/M04L08-Discovery Meeting-Website Design.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda]
+  The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module
+  02- Project Organization/PROJ-M02L02-Project Organization Idenity Project.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda]
+  The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module
+  02- Project Organization/PROJ-M02L03-Project Organization Print Project.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda]
+  The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module
+  02- Project Organization/PROJ-M02L04-Project Organization Website Project.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda]
+  The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module
+  02- Project Organization/PROJ-M02L05-Project Organization Worksheet.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda]
+  The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module
+  03- Project Execution Strategies/PROJ-M03L01-Project Kickoff Meeting.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda]
+  The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module
+  03- Project Execution Strategies/PROJ-M03L05-Critique Checklist.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda]
+  The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module
+  04- Communication/PROJ-M04L07-Canned Communication.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda]
+  The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module
+  05- Milestone Deliveries/DELIVERY-IDENTITY-JANDA-V1 Folder/DELIVERY-IDENTITY-JANDA-V1
+  Folder/DELIVERY-IDENTITY-JANDA-V1 1.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda]
+  The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module
+  05- Milestone Deliveries/DELIVERY-IDENTITY-JANDA-V1 Folder/DELIVERY-IDENTITY-JANDA-V1
+  Folder/DELIVERY-IDENTITY-JANDA-V1.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda]
+  The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module
+  05- Milestone Deliveries/DELIVERY-PRINT-JANDA-V1 Folder/DELIVERY-PRINT-JANDA-V1
+  Folder/DELIVERY-PRINT-JANDA-V1 1.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda]
+  The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module
+  05- Milestone Deliveries/DELIVERY-PRINT-JANDA-V1 Folder/DELIVERY-PRINT-JANDA-V1
+  Folder/DELIVERY-PRINT-JANDA-V1.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda]
+  The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module
+  05- Milestone Deliveries/DELIVERY-PROJECTTITLE-JANDA-V1 1.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda]
+  The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module
+  05- Milestone Deliveries/DELIVERY-PROJECTTITLE-JANDA-V1.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda]
+  The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module
+  05- Milestone Deliveries/DELIVERY-WEBSITE-JANDA-V1 Folder/DELIVERY-WEBSITE-JANDA-V1
+  Folder/DELIVERY-WEBSITE-JANDA-V1 1.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda]
+  The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module
+  05- Milestone Deliveries/DELIVERY-WEBSITE-JANDA-V1 Folder/DELIVERY-WEBSITE-JANDA-V1
+  Folder/DELIVERY-WEBSITE-JANDA-V1.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda]
+  The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module
+  06- Post Mortem/PROJ-M06L01-Post Mortem.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda]
+  The Ultimate Freelance Course by Michael Janda/6 Managing a Creative Business/Module
+  02- Tracking Data/BUS-M02L04-Business Insights Worksheet.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda]
+  The Ultimate Freelance Course by Michael Janda/6 Managing a Creative Business/Module
+  04- Growing Your Agency/BUS-M04L02-Employment Offer Letter.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda]
+  The Ultimate Freelance Course by Michael Janda/6 Managing a Creative Business/Module
+  04- Growing Your Agency/BUS-M04L03-Employment Agreement (Simple).pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda]
+  The Ultimate Freelance Course by Michael Janda/6 Managing a Creative Business/Module
+  04- Growing Your Agency/BUS-M04L05-Employment Termination Letter.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda]
+  The Ultimate Freelance Course by Michael Janda/6 Managing a Creative Business/Module
+  04- Growing Your Agency/BUS-M04L06-Employment Layoff Letter.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/hub/Creative_HubKit.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Educational Material/hub/Creative_Hub_Leaders_Toolkit.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/Financial/Start-Up-Programme-Finance-Workbook-January-2013.md
+- journals_notes/DOMAIN 4 Business/business-notes/bootstrap/financial planning/document.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/pdf/Advanced+Technical+SEO+A+Complete+Guide.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/pdf/How analytics can drive your
+  sales.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/pdf/How to choose the right ideas
+  to develop.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/pdf/InVision_DesignEngineeringHandbook.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/pdf/Mapping_Creative_Hubs_Scotland_report.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/pdf/Resilient-OrganizationFixed.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/pdf/SEO-for-Beginners.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/pdf/Succeeding_In_House_Creative/Exercise
+  Files/Creative_Needs_Rationale.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/pdf/Succeeding_In_House_Creative/Exercise
+  Files/Design Value Proposition Resources.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/pdf/Succeeding_In_House_Creative/Exercise
+  Files/FAB_Features_Advantages_Benefits.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/pdf/Succeeding_In_House_Creative/Exercise
+  Files/Inhouse_Skills_Matrix.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/pdf/Succeeding_In_House_Creative/Exercise
+  Files/Mission_Vision_Statements.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/pdf/Succeeding_In_House_Creative/Exercise
+  Files/Your_ROI_Matrix.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/pdf/Templates/Social Media Guide
+  + Worksheet/PDF/Social Media Guide For Remote Freelancers.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/pdf/Templates/legal file/Transfer
+  of Copyright/The Logo Smith Transfer of Copyright.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/pdf/business plan/30casesreport-160219115412.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/pdf/business plan/50businessmodelexamples-171001025828.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/pdf/business plan/Business Plan.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/pdf/business plan/Business guide.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/pdf/business plan/Microsoft Word
+  - Sample Business Plan - Wooden Grain Toy Company.doc.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/pdf/business plan/Microsoft Word
+  - Sample Business Plan - Wooden Grain Toy Company.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/pdf/business plan/SCORE-Deluxe-Startup-Business-Plan-Template_2.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/pdf/business plan/Sample Lean Business
+  Plan - Wooden Grain Toy Company(1).pdf
+- journals_notes/DOMAIN 4 Business/business-notes/pdf/fund/EIC Work Programme 2021.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/pdf/fund/Introduction-to-Small-Business-Funding-3.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/pdf/fund/New-Ideas-Fund-FAQs-2021.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/pdf/fund/Preparing_for_Investment_2021_V1.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/pdf/fund/The_Start_Up_Loans_Company_Business_Plan_Guide_Nov2020_CE_version.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/pdf/fund/UK-Small-Business-Funding-Course.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/pdf/nesta_cetoolkit_english_4books_casestudies_tutornotes_worksheets.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/pdf/pre-hire.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/pdf/the-growth-handbook(1).pdf
+- journals_notes/DOMAIN 4 Business/business-notes/pdf/tipps/Tips on Creating an Effective
+  Contract_Freelance Contract 101.pdf
+- journals_notes/DOMAIN 4 Business/business-notes/pricing/4 Pricing Creative Services/Module
+  01- Pricing Fundamentals/M01L09-Pricing Spectrum.pdf
+- journals_notes/DOMAIN 4 Business/business-pdf/Succeeding_In_House_Creative/Exercise
+  Files/Creative_Needs_Rationale.pdf
+- journals_notes/DOMAIN 4 Business/business-pdf/Succeeding_In_House_Creative/Exercise
+  Files/Design Value Proposition Resources.pdf
+- journals_notes/DOMAIN 4 Business/business-pdf/Succeeding_In_House_Creative/Exercise
+  Files/FAB_Features_Advantages_Benefits.pdf
+- journals_notes/DOMAIN 4 Business/business-pdf/Succeeding_In_House_Creative/Exercise
+  Files/Generic_Workflow_Chart.pdf
+- journals_notes/DOMAIN 4 Business/business-pdf/Succeeding_In_House_Creative/Exercise
+  Files/Inhouse_Skills_Matrix.pdf
+- journals_notes/DOMAIN 4 Business/business-pdf/Succeeding_In_House_Creative/Exercise
+  Files/Mission_Vision_Statements.pdf
+- journals_notes/DOMAIN 4 Business/business-pdf/Succeeding_In_House_Creative/Exercise
+  Files/Your_ROI_Matrix.pdf
+- journals_notes/DOMAIN 4 Business/reports/ARK–Invest_BigIdeas_2021.pdf
+- journals_notes/DOMAIN 4 Business/reports/CV_VC_Top_50_Report_H2_2020.pdf
+- journals_notes/DOMAIN 4 Business/reports/DI_CIR 2020 global blockchain survey.pdf
+- journals_notes/DOMAIN 4 Business/reports/Disruptive-Technologies.pdf
+- journals_notes/DOMAIN 4 Business/reports/Industry-Report-2021-Final.pdf
+- journals_notes/DOMAIN 4 Business/reports/Market-Report-Advertising-and-Marketing-August-2021.pdf
+- journals_notes/DOMAIN 4 Business/reports/Market-Report-Record-label-and-Recording-Studio-January-2021.pdf
+- journals_notes/DOMAIN 4 Business/reports/SEO-Trends-2021.pdf
+- journals_notes/DOMAIN 4 Business/reports/Sample Global Corporate Identity Design
+  Market Report 2021 - Cognitive Market Research.pdf
+- journals_notes/DOMAIN 4 Business/reports/State of Independence 2021 Report.pdf
+- journals_notes/DOMAIN 4 Business/reports/WEF_Future_of_Jobs_2020(1).pdf
+- journals_notes/DOMAIN 4 Business/reports/WEF_Future_of_Jobs_2020.pdf
+- journals_notes/DOMAIN 4 Business/reports/dribbble-global-design-survey-2019.pdf
+- journals_notes/DOMAIN 4 Business/reports/infographic-cmo-spend-survey-2021.pdf
+- journals_notes/DOMAIN 5 Personal Practice/hustle/Refund Bible 2023🧑🏽‍💻/Amazon Refund
+  Sauce 🙎🏿‍♂️/AMAZON REFUND.pdf
+- journals_notes/DOMAIN 5 Personal Practice/hustle/Refund Bible 2023🧑🏽‍💻/G2A Gift
+  card refund sauce/G2A Method 2023 (works as of JUNE 26th).pdf
+- journals_notes/DOMAIN 5 Personal Practice/hustle/Refund Bible 2023🧑🏽‍💻/StockX Refund
+  Method 👖/Stockx Method 2022.md
+- journals_notes/DOMAIN 6 AI + Computing/NeurIPS-2024-benchmarking-complex-instruction-following-with-multiple-constraints-composition-Paper-Datasets_and_Benchmarks_Track.pdf
+- journals_notes/DOMAIN 6 AI + Computing/Pixel_Encoder - Instructions.pdf
+- journals_notes/DOMAIN 6 AI + Computing/electronics/IJRITCC_1349.pdf
+- journals_notes/DOMAIN 6 AI + Computing/intent-engineering/2026.eacl-long.320.pdf
+- journals_notes/DOMAIN 6 AI + Computing/intent-engineering/2432_Evolving_Prompts_In_Conte.pdf
+- journals_notes/DOMAIN 6 AI + Computing/intent-engineering/2605.03986v1.pdf
+- journals_notes/DOMAIN 6 AI + Computing/intent-engineering/3777411.pdf
+- journals_notes/DOMAIN 6 AI + Computing/intent-engineering/NeurIPS-2024-benchmarking-complex-instruction-following-with-multiple-constraints-composition-Paper-Datasets_and_Benchmarks_Track.pdf
+- journals_notes/DOMAIN 6 AI + Computing/intent-engineering-md/instruction-tuning.md
+- journals_notes/DOMAIN 7 Influence + Power/privacy/CameraShyHoodie_Instructions.pdf

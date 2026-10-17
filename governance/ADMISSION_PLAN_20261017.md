@@ -1,4 +1,4 @@
-# ADMISSION PLAN — 2026-10-17T13:40:19Z
+# ADMISSION PLAN — 2026-10-17T14:12:20Z
 
 > Authority **D-3051** (T-181). The corpus home is `/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books`. This file is a
 > **plan**: it admits nothing, it moves nothing and it converts nothing. The act that admits a work is
@@ -34,14 +34,39 @@ Readability probes, declared per kind (`container_integrity`, BUG-886): `.epub->
 | `refused_not_in_its_kind_folder` | 51 | the file does not sit under its declared kind folder (the placement axis, axis_depth 1), so the path its corpus twin would take cannot be derived: the misplaced class T-180 owns |
 | `refused_domain_not_a_corpus_domain` | 0 | the file does not sit under a folder this root declared as its axis, or that folder is not a name the CORPUS already materialises (arrangement.share_rule): admitting it would put a new top-level name in the one corpus home and silently widen the domain vocabulary the pipeline classifies against, so the row is refused and counted instead (D-3062) |
 
-## Examples of what is refused (bounded; every refusal is COUNTED above)
+## THE WORKLIST — every refusal, with the act it asks for
 
-- `refused_no_declared_corpus_home`: `—`
-- `refused_container_no_stage_reads_it`: `books/epub/DOMAIN 0 Systems + Decision/systems+complexity/The Systems Bible_ The Beginner_'s Guide to Systems Large and `; `books/epub/DOMAIN 2 Design/design+systems/Laying the Foundations -- Andrew Couldwell -- 2019 -- 898b840e9d7b80bc2a4a7849`; `books/epub/DOMAIN 3 Art + Computational Media/Digital Art, Third edition (World of Art).azw3`; `books/epub/The Elements of Style [Illustrated] -- Strunk Jr_, William -- 2011 -- Seedbox Press, LLC -- 7b4f785e400d8b629`; `books/pdf/DOMAIN 0 Systems + Decision/systems+complexity/SYSTEMANTICS. THE SYSTEMS BIBLE (John Gall) (z-library.sk, 1lib`
-- `refused_container_corrupt`: `books/epub/DOMAIN 2 Design/practice+process/How to use graphic desi gn to sell things, explain things, make things ylib.`; `books/epub/DOMAIN 5 Personal Practice/mood+therapy/Happy Sexy Millionaire Unexpected Truths about Fulfillment, Love, and`; `books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Encylopedia of Freemasonry - Vols 1and2.pdf`; `books/pdf/DOMAIN 2 Design/visual+fundamentals/color choices: making color sense out of color theory.pdf`; `journals_notes/DOMAIN 2 Design/design-notes/mo graph/Keylight_1.2_AE.pdf`
-- `refused_name_repair_first`: `books/epub/AI-Assisted Programming for Web and Machine Learning_ -- Christoffer Noring, Anjali Jain, Marina Fernandez, A`; `books/epub/Build a Multi-Agent System (from Scratch) -- Val Andrei Fajardo -- None -- 499a745fd121358a158cdb6d6415e4d0 -`; `books/epub/DOMAIN 0 Systems + Decision/decision+strategy/Competing Against Luck _ The Story of Innovation and -- Recorde`; `books/epub/DOMAIN 0 Systems + Decision/decision+strategy/Seeking Wisdom_ From Darwin to Munger, 3rd Edition -- Bevelin, `; `books/epub/DOMAIN 0 Systems + Decision/decision+strategy/The Innovator's Dilemma, with a New Foreword_ When New -- Clayt`
-- `refused_not_in_its_kind_folder`: `books/epub/DOMAIN 2 Design/communication+design/_Visual Metaphor Structure and Process (Gerard J.Steen) (z-library.sk, 1`; `books/epub/DOMAIN 4 Business/practice+economics/100-Habits of Successful Freelance Designers Insider Secrets for Working`; `books/epub/DOMAIN 4 Business/practice+economics/365 Habits of Successful Graphic Designers Insider Secrets from Top Desi`; `books/pdf/DOMAIN 0 Systems + Decision/execution+operations/The Art of Strategy_ A Game Theorist_'s Guide to Success in B`; `books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/AMARINGO, Pablo et al - Plant Spirit Shamanism T`
-- `refused_domain_not_a_corpus_domain`: `—`
+Every refusal is COUNTED above and every refused row is listed in full in the machine plan (`ADMISSION_PLAN_20261017.json`) under `refused[]`. Here each class prints its rows when there are at most 40 of them — the small classes are the ones an owner can act on one by one — and names the class's own task when the list is longer, because a hundred-line block in a table is read by nobody and the worklist must not become decoration.
+
+### `refused_no_declared_corpus_home` — 0 row(s)
+
+— (none in this reading)
+
+### `refused_container_no_stage_reads_it` — 389 row(s)
+
+All 389 rows are in `ADMISSION_PLAN_20261017.json#refused`; this document names the class and its declared meaning rather than printing a block nobody reads.
+
+### `refused_container_corrupt` — 5 row(s)
+
+| row (resolves as printed) | kind | defect | remedy |
+|---|---|---|---|
+| `books/epub/DOMAIN 2 Design/practice+process/How to use graphic desi gn to sell things, explain things, make things ylib.org).epub` | epub | truncated_zip_no_central_directory | RE-DOWNLOAD the work — no local repair can invent the bytes that never arrived. A rebuild from the surviving local headers can recover text (measured: 641 headers, 321 text entries) but produces a file whose checksum matches no published edition, so it is a LAST resort and never an admission |
+| `books/epub/DOMAIN 5 Personal Practice/mood+therapy/Happy Sexy Millionaire Unexpected Truths about Fulfillment, Love, and Success Steven Bartlett.epub` | epub | truncated_zip_no_central_directory | RE-DOWNLOAD the work — no local repair can invent the bytes that never arrived. A rebuild from the surviving local headers can recover text (measured: 641 headers, 321 text entries) but produces a file whose checksum matches no published edition, so it is a LAST resort and never an admission |
+| `books/pdf/DOMAIN 1 Substrate — Mind, Math, Meaning/cognition+perception/Encylopedia of Freemasonry - Vols 1and2.pdf` | pdf | truncated_pdf_no_trailer | RE-DOWNLOAD the work. Do NOT rebuild the xref locally: a repaired file that silently loses pages is worse than an absent one, and nothing in this pipeline can tell them apart afterwards |
+| `books/pdf/DOMAIN 2 Design/visual+fundamentals/color choices: making color sense out of color theory.pdf` | pdf | null_bytes | RE-DOWNLOAD, then verify the new copy opens BEFORE it is proposed again (the plan re-probes every candidate, so a good copy clears itself) |
+| `journals_notes/DOMAIN 2 Design/design-notes/mo graph/Keylight_1.2_AE.pdf` | pdf | apple_bookmark | RESOLVE THE POINTER, do not download: the alias records its own target path — copy the real file in beside it (the alias itself may stay; it will simply stay refused) |
+
+### `refused_name_repair_first` — 179 row(s)
+
+All 179 rows are in `ADMISSION_PLAN_20261017.json#refused`; this document names the class and its declared meaning rather than printing a block nobody reads.
+
+### `refused_not_in_its_kind_folder` — 51 row(s)
+
+All 51 rows are in `ADMISSION_PLAN_20261017.json#refused`; this document names the class and its declared meaning rather than printing a block nobody reads.
+
+### `refused_domain_not_a_corpus_domain` — 0 row(s)
+
+— (none in this reading)
 
 ## The admission candidates (463)
 

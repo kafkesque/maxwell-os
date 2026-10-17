@@ -1220,3 +1220,117 @@ containers without their work**. S0: rc 0, 0 failed. Decisions: **D-3071** appen
 holds works / a signature field must resolve). Bugs: 885 CLOSED, 886/887/888 FIXED, 890 ADDRESSED, 889/891 OPEN. The
 standing reds are unchanged and NOT papered over: routing debt (225 vs 222, SHRINK-ONLY) and the pre-existing rail
 list in §1j.g.
+
+## §1l — ELEVENTH SITTING (2026-10-17, 16:0x): THE LOOP WAS THE ARTIFACT, NOT THE OWNER
+
+The owner's message, verbatim: *"again it failed / why the fuck are we going in circles??? what the fuck can fix this
+once and for all"*. He was right to be angry, and the answer was not "write your name again".
+
+### a. WHAT THE SECOND FAILURE ACTUALLY WAS
+
+`just admit-apply --limit 10` refused with
+
+    FATAL: governance/ADMISSION_ACCEPTED_20261017.yaml carries accepted_by='<your name>' — a placeholder …
+
+and **no receipt was written at all** — the newest run receipt was still `ADMISSION_APPLIED_20261017T132219Z.jsonl`
+from 13:22Z. So the run died at the SIGNATURE, never at a row. Nothing was attempted, nothing was damaged.
+
+### b. WHY IT RECURRED — TWO STRUCTURAL FAULTS, BOTH MINE
+
+1. **The name lived inside a file the TOOL PRINTS.** `acceptance_template()` hard-coded `accepted_by: <your name>`,
+   and every plan re-derivation forced `--template > governance/ADMISSION_ACCEPTED_<date>.yaml`, which **reset the
+   name to the placeholder**. The owner was asked to retype his own name into a generated artifact, after every
+   plan move, forever. That is not a control — it prevented no authorisation and cost two runs.
+2. **The word was pinned to the plan's BYTES.** `plan_sha256` meant any re-derivation voided a signature already
+   given: BUG-886's probe, a refusal count moving by one, a timestamp. Fix anything → re-derive → re-print → name
+   lost → refused. The artifact *guaranteed* recurrence.
+
+ROOT (D-3034, the fourth time this week): **the thing signed was a DOCUMENT; the thing authorised is a SET OF ACTS.**
+`plan_sha256` is not the grant — `(rel, source_sha256, target, kind)` is, because that is what the applier reads and
+all it reads.
+
+### c. WHAT WAS BUILT (D-3072)
+
+- `scope_sha256` pins the ACTS; every signature also carries its `rel` **MANIFEST**, so a moved scope is refused
+  **by name** instead of by two hashes at an owner.
+- **`just admit-sign "<name>"`** is THE act: it declares the identity **ONCE** in `config/owner_identity.yaml`
+  (declared home `admission.applier.accept_by_identity`), pins the LIVE scope, and writes the acceptance crash-safe.
+  Re-printing never touches the name; an identity **swap is refused**, never overwritten.
+- `verify_scope` proves the word two ways, strongest first: the plan's bytes (`signed_by: digest`), or a re-derived
+  plan whose acts are identical (`signed_by: scope`). Anything else is FATAL and names the rows. A signature with no
+  `scope_sha256` is refused — silence about what was authorised is not consent.
+- The placeholder refusal now **names the command that satisfies it**.
+- **BUG-888 keeps its teeth**: placeholder/empty still refused; absent identity still yields the placeholder.
+- Receipt header records `signed_by`, `scope_sha256`, `accepted_by`.
+
+### d. THE WORKLIST RESOLVES (D-3073) — and the 5 corrupt containers are not one thing
+
+`ADMISSION_PLAN_20261017.json#refused` now holds **every refused row in FULL** (624: 389 no-stage, 179 name-repair,
+51 misplaced, 5 corrupt), each with its class and, for a container, its **diagnosed defect and declared remedy**
+(`pipeline/container_integrity.py#diagnose`, vocabulary + remedies in the gate; a defect with no remedy is FATAL).
+The reason it did not exist: the examples were cut with `[:120]`, so a class counting 5 handed back handles that
+resolve to **no file on disk** — a count nobody could walk (BUG-893).
+
+MEASURED with the declared probe, the five are four different situations and one is not a container:
+
+| bytes | head | defect | act |
+|---|---|---|---|
+| 137,319,019 | `PK\x03\x04`, no EOCD | truncated `.epub` (641 local headers, 321 text entries survive) | **RE-DOWNLOAD** |
+| 139,987 | `PK\x03\x04`, no EOCD | truncated `.epub` | **RE-DOWNLOAD** |
+| 30,408,704 (= 29 MiB) | `%PDF-1.7`, no `%%EOF` | `.pdf` cut at a chunk boundary | **RE-DOWNLOAD + verify page count** (a rebuilt xref that silently drops pages cannot be told apart afterwards) |
+| 5,244,077 | `\x00` throughout | `.pdf` of **zeros** — a failed write | **RE-DOWNLOAD** |
+| 880 | `book\x00\x00\x00\x00mark` | a macOS **Finder ALIAS**, not an "Apple `book` archive" as D-3071 recorded | **CHECK THE POINTER** — its target `/Applications/Adobe After Effects 2024/Plug-ins/Effects/Keylight/docs/Keylight_1.2_AE.pdf` **does not exist on this machine**, so that work is not here either |
+
+Nothing is deleted and nothing is fetched by this OS: the plan re-probes every candidate, so a good copy **clears
+itself** and a dead row simply stays refused. `zip -FF` was tried on the 137 MB `.epub` and did not finish in 300 s —
+and a rebuilt archive matches no published edition, so it can never be evidence of the work: it is not a lane.
+
+### e. A FALSE GREEN FOUND ON THE WAY OUT (BUG-895)
+
+`plan_admission --selftest` cited shifted label indices after labels were appended mid-table, so the NFC control
+reported as the note/domain control, the domain-home assertion reported as the bare-run control, and **label 10 had
+no assertion at all yet printed `ok`** (the printer reads the LABEL TABLE, never the assertions). Every site was
+re-pointed at the label that names it, label 10 got its assertion, and a **control of the controls** now reads the
+file's own text and requires every index to be cited — proven RED (`label index [10] print ok with no assertion`)
+before it was trusted.
+
+### f. WHAT THE OWNER OWNS NOW — TWO MANUAL ACTS, NEITHER OF THEM "RETYPE YOUR NAME"
+
+1. **ONE COMMAND — give the word, once:**
+
+       cd "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0"
+       just admit-sign "<your real name>"
+
+   It writes `config/owner_identity.yaml` (identity, once) and `governance/ADMISSION_ACCEPTED_20261017.yaml`
+   (463 acts, scope pinned). It refuses a placeholder, so it cannot be satisfied by accident. **It never asks
+   again** — every later plan re-derivation reuses the name.
+   Then, when he wants the next tranche:
+
+       just admit-apply --dry-run          # expect: 463 would_apply, 0 refused, rc 0
+       just admit-apply --limit 10         # the tranche
+
+2. **The four re-downloads** (from his own sources; nothing here may fetch them): the two truncated `.epub`, the
+   29 MiB `.pdf`, and the zeros `.pdf`. Drop each fresh copy over the dead file in his library; the next
+   `just admit-plan` re-probes it and it becomes a candidate with no bookkeeping. For the **Finder alias**
+   (`journals_notes/DOMAIN 2 Design/design-notes/mo graph/Keylight_1.2_AE.pdf`) the pointer is dead
+   (After Effects 2024 is not installed): either re-obtain the doc or leave the alias — it stays refused forever,
+   which is the honest state of a pointer to nothing.
+
+### g. NEXT CRITICAL STEPS, in consequential order
+
+1. **The owner's `just admit-sign`** — the only thing between here and the remaining ~453 rows.
+2. **T-187** (two-step/two-tool loop fixture) — still the highest-leverage BUILD, unchanged.
+3. **BUG-891** (the render source for `AGENTS.md#delegate_rules`) — small, makes routing corrections durable.
+4. **BUG-889** (census NFD blindness) — owner-gated with T-130/T-172.
+5. **The fired revisit trigger** in `config/agent_context.yaml` — an owner decision.
+6. **BUG-876**, **T-190** toggle half — unchanged.
+
+### h. STATE AT CLOSE
+
+Controls: `apply_admission.py` **35/35**, `plan_admission.py` **25/25**. Plan: **463 candidates** over 2,811 files,
+digest `2cf19a18881f6d28…`, scope `f9278be8c30b0738…`, 624 refused rows now listed in full. Decisions **1,200**
+(D-3072, D-3073). Bugs **660** (236 open / 424 closed; 892/893/894/895 added and FIXED). R5 APPROVE ×3
+(`pipeline/container_integrity.py`, `scripts/apply_admission.py`, `scripts/plan_admission.py`) by
+gemma-4-E4B-it-MLX-4bit. Governance faces green, buglog coverage green, commit frontier green. Routing debt holds at
+**225 vs 222** — pre-existing, SHRINK-ONLY, NOT papered over, and the four new bugs resolve to declared capabilities
+so they added none.

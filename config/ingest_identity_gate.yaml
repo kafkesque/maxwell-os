@@ -466,6 +466,14 @@ source_library:
     authority: D-3051
     plan_prefix: 'governance/ADMISSION_PLAN_'
     refusal_examples: 5
+    #: BUG-893/D-3073 — HOW BIG A REFUSAL LIST MAY BE AND STILL BE PRINTED ROW BY ROW. MEASURED 2026-10-17: the
+    #: plan said `refused_container_corrupt: 5` and handed back FIVE handles cut to 120 characters, none of which
+    #: resolved to a file — a count with no walkable rows is a declaration that does not RESOLVE (D-3034), which is
+    #: why the owner's five corrupt containers became a sentence in a document rather than five acts. Every refused
+    #: row now lands in the machine plan as `refused[]` IN FULL; this number decides which classes the human
+    #: document also prints row by row. Above it the class is NAMED with its task, because a 389-line table is read
+    #: by nobody and a worklist that is not read is decoration.
+    worklist_in_full: 40
     reading: "python3 scripts/plan_admission.py (the detail) | --brief (ONE line, for the ladder) | --plan (writes the plan; a bare run writes no file)"
     ladder: "python3 scripts/plan_admission.py --selftest || exit 1 (its 16 controls) and --brief || [ $? -eq 2 ] (the reading: rc 2 is OWNER-OWED, loud and never fatal - BUG-457)"
     #: THE DECLARED UNIT: a FILE, not a work. A plan row is a file the owner can point at, and the distinct KEYS
@@ -505,25 +513,70 @@ source_library:
         epub: zip          # a zip-family container: an end-of-central-directory record must resolve
         pdf: pdf            # `%PDF-` at the head AND a `%%EOF` trailer near the end (a truncated pdf keeps its magic)
         md: none            # plain text: its readability IS its name, declared rather than assumed
+      #: BUG-893/D-3073 — WHY IT DOES NOT OPEN, IN WORDS THE OWNER CAN ACT ON. A refusal that says only "corrupt"
+      #: leaves an owner to re-download a file they already have: MEASURED 2026-10-17, one of the 5 unopenable
+      #: containers is a macOS FINDER ALIAS (880 bytes of bookmark magic pointing at
+      #: `/Applications/Adobe After Effects 2024/Plug-ins/Effects/Keylight/docs/Keylight_1.2_AE.pdf`) wearing a
+      #: `.pdf` suffix — the work it points at is ALREADY ON THIS MACHINE, so its remedy is to resolve a pointer,
+      #: not to fetch anything. The reader DETECTS the shape (pipeline/container_integrity.py#diagnose); the
+      #: vocabulary and every remedy are declared here, because a remedy is a judgement about the world and a
+      #: reader may not hold one (C12). A defect with no `remedy` is FATAL, and so is a shape nobody declared.
+      defects:
+        truncated_zip_no_central_directory:
+          meaning: 'a zip-family container that started and never finished: a `PK\x03\x04` local header is present and the end-of-central-directory record is absent, which is exactly what a download cut at a byte or chunk boundary looks like'
+          remedy: 'RE-DOWNLOAD the work — no local repair can invent the bytes that never arrived. A rebuild from the surviving local headers can recover text (measured: 641 headers, 321 text entries) but produces a file whose checksum matches no published edition, so it is a LAST resort and never an admission'
+        truncated_pdf_no_trailer:
+          meaning: 'a pdf whose `%PDF-` magic is intact and whose `%%EOF` trailer is gone: the file ends mid-object (measured: 30,408,704 bytes = exactly 29 MiB, a chunk boundary), so its cross-reference table and page tree are unreachable'
+          remedy: 'RE-DOWNLOAD the work. Do NOT rebuild the xref locally: a repaired file that silently loses pages is worse than an absent one, and nothing in this pipeline can tell them apart afterwards'
+        null_bytes:
+          meaning: 'a file of zero bytes throughout: a write that failed and was never retried, or a sync placeholder that never materialised'
+          remedy: 'RE-DOWNLOAD, then verify the new copy opens BEFORE it is proposed again (the plan re-probes every candidate, so a good copy clears itself)'
+        apple_bookmark:
+          meaning: 'a macOS Finder ALIAS (the `book\x00\x00\x00\x00mark` bookmark magic) that a name gave a container suffix: the bytes are a POINTER to a file, never the work itself'
+          #: MEASURED 2026-10-17 on the one live instance: the alias records
+          #: `/Applications/Adobe After Effects 2024/Plug-ins/Effects/Keylight/docs/Keylight_1.2_AE.pdf`, and that path
+          #: DOES NOT EXIST on this machine (After Effects 2024 is not installed) - so this alias DANGLES. A remedy
+          #: that says "copy the real file in" would have sent the owner to a file that is not there, which is why
+          #: the first act below is a CHECK and the two outcomes are written out.
+          remedy: 'CHECK THE POINTER FIRST: `ls` the target path the alias records (it is plain text inside the file). If it RESOLVES, copy the real file in beside the alias - nothing needs downloading. If it DANGLES the work is not on this machine: re-obtain it or acknowledge the alias as dead (the plan re-probes every candidate, so a good copy clears itself and a dead alias simply stays refused)'
+          measured: 'the one live instance DANGLES (After Effects 2024 is not installed): 880 bytes, target absent, so this row needs re-obtainment or a decision to drop it - not a copy'
+        no_magic:
+          meaning: 'a pdf-suffixed file whose first bytes are neither `%PDF-` nor any other declared shape: the name asserts a container the bytes do not claim'
+          remedy: 'READ the first bytes and decide: either the file is another format the door does not accept (T-180) or the name is wrong — repair the NAME rather than the bytes'
+        unrecognised:
+          meaning: 'bytes that are not a container this declaration knows, and not one of the declared failure shapes: the honest state of a defect nobody has diagnosed yet'
+          remedy: 'OPEN the file by hand and add the shape to this vocabulary WITH its remedy, so the next occurrence is a worklist row rather than a mystery (D-3038)'
 
     #: THE APPLIER'S CONTRACT (T-183/D-3068). The plan is a PROPOSAL; this block declares the SECOND document that
     #: turns a proposal into an authorisation, and the ledger that makes a batch readable afterwards. Both are
     #: declared here rather than in the writer, because a prefix in code is a second home (C12).
     #:
-    #: A SIGNATURE IS NOT THE PLAN. `ADMISSION_ACCEPTED_<date>.yaml` names ONE plan file and pins its sha256, so a
-    #: plan edited after signing no longer matches and the applier refuses (D-3034: only a RESOLUTION grants).
+    #: A SIGNATURE IS NOT THE PLAN. `ADMISSION_ACCEPTED_<date>.yaml` names ONE plan file, pins its sha256 AND the
+    #: ACTS it authorises (D-3072), so a plan whose acts moved after signing no longer matches and the applier
+    #: refuses - while a plan merely RE-DERIVED with identical acts still satisfies the word, which is what stops
+    #: every re-derivation from voiding a signature already given (D-3034: only a RESOLUTION grants).
     #: `mode: all` puts every row in scope; `mode: listed` names rows by their `rel` label. A row the signature
     #: names and the plan does not hold is FATAL - an approval that cannot resolve is a wish, not a grant.
     applier:
       authority: D-3068
       command: python3 scripts/apply_admission.py
-      reading: 'python3 scripts/apply_admission.py (dry run, the owner cost estimate) | --template (a ready-to-sign acceptance, pinned to the live digest) | --apply (the act) | --limit N (a tranche) | --selftest (its known-answer controls)'
+      reading: 'python3 scripts/apply_admission.py --sign --as NAME (THE OWNER WORD: pin the live plan ACTS to a name, once) | --template (print a ready-to-sign acceptance) | --dry-run (the price, writes nothing) | --apply (the act) | --limit N (a tranche) | --selftest (its known-answer controls)'
       accept_prefix: 'governance/ADMISSION_ACCEPTED_'
       accept_extension: '.yaml'
       receipt_prefix: 'governance/evidence/ADMISSION_APPLIED_'
       receipt_extension: '.jsonl'
       accept_modes: [all, listed]
-      accept_required: [schema_version, plan, plan_sha256, accepted_by, accepted_on, mode]
+      #: D-3072: A SIGNATURE PINS THE ACTS. `plan_sha256` is the DOCUMENT; `scope_sha256` is the ordered list of
+      #: (rel, source_sha256, target, kind) — what the applier actually reads and all it reads. MEASURED 2026-10-17:
+      #: pinning only the document voided the owner's word on ANY re-derivation (a probe added, a count moved, a
+      #: timestamp) and the re-print reset `accepted_by` to the placeholder, so the applier refused a word already
+      #: given — twice in one sitting. Now a re-derived plan with identical ACTS still matches, and one whose acts
+      #: moved is refused and NAMES the rows that moved.
+      accept_required: [schema_version, plan, plan_sha256, scope_sha256, accepted_by, accepted_on, mode]
+      #: WHERE THE OWNER'S IDENTITY LIVES (D-3072), written ONCE by `--sign --as`. It is NOT a plan fact: the name
+      #: is who is speaking, the scope is what is being agreed to. A file rather than a constant, and a declaration
+      #: rather than a path in the writer (C12); an absent or placeholder identity stays a REFUSAL (BUG-888).
+      accept_by_identity: 'config/owner_identity.yaml'
       #: BUG-888: THE TEMPLATE'S OWN PLACEHOLDER, declared ONCE so the printer and the checker cannot disagree.
       #: MEASURED 2026-10-17: the first real acceptance carried it verbatim and was APPLIED, because only the
       #: field's presence was ever read — a signature whose name resolves to nothing is a consent nobody gave.

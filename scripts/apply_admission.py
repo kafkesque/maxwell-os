@@ -84,7 +84,7 @@ def applier_policy(doc: dict[str, Any]) -> dict[str, Any]:
         )
     for key in ("authority", "command", "accept_prefix", "accept_extension", "receipt_prefix",
                 "receipt_extension", "accept_modes", "accept_required", "states", "quarantine_prefix",
-                "accept_by_placeholder"):
+                "accept_by_placeholder", "accept_by_identity"):
         if key not in decl:
             raise ApplierError(
                 f"FATAL: {POLICY}#source_library.admission.applier does not declare {key!r} (C12: an absent "
@@ -150,6 +150,80 @@ def load_plan(path: Path) -> dict[str, Any]:
     return plan
 
 
+#: THE FIELDS A SIGNATURE ACTUALLY AUTHORISES (D-3072). A row is an ACT: WHICH file (rel), WHOSE bytes
+#: (source_sha256), WHERE the corpus copy lands (target) and what kind it is. Those four are what the applier reads
+#: and all it reads, so those four ARE the word. Everything else in a plan — counts, examples, a probe list, a
+#: timestamp, a class that moved from 179 to 180 — is a DERIVATION the owner never signed.
+SCOPE_FIELDS = ("rel", "source_sha256", "target", "kind")
+
+
+def scope_digest(rows: list[dict[str, Any]]) -> str:
+    """The digest of the ACTS a signature puts in scope, in PLAN ORDER (order is part of the act: `--limit` reads it).
+
+    MEASURED 2026-10-17, twice: the owner's word was pinned to the plan FILE's sha256, so ANY re-derivation of the
+    plan voided it — a bug fix in the reader, a probe added, a timestamp, one refusal class moving by one row. The
+    word was voided twice in one sitting and each time the file had to be re-printed, which resets the name to the
+    template placeholder, which the applier then refused (BUG-888). That is a loop built into the artifact, not a
+    mistake by its owner: the thing being signed (a DOCUMENT) is not the thing being authorised (a SET OF ACTS).
+    Pinning the acts is also the stricter reading: a re-derived plan that changed a target or a source digest
+    changes the scope and is still refused (D-3034 — only a RESOLUTION grants).
+    """
+    body = [{field: str(row.get(field, "")) for field in SCOPE_FIELDS} for row in rows]
+    canonical = json.dumps(body, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+
+def scope_diff(authorised: list[str], live: list[dict[str, Any]]) -> list[str]:
+    """What moved between the acts an owner authorised and the acts this plan holds, named in rows.
+
+    A refusal that says only "the digest changed" is a fact its owner can do nothing with (D-3034: a message that
+    does not RESOLVE is a sentence). The manifest of `rel` labels the signature carries is what makes this listable.
+    """
+    authorised_set = {str(rel) for rel in authorised}
+    live_set = {str(row.get("rel")) for row in live}
+    gone = sorted(authorised_set - live_set)
+    new = sorted(live_set - authorised_set)
+    lines: list[str] = []
+    if gone:
+        lines.append(f"{len(gone)} authorised row(s) the plan no longer holds {gone[:3]}")
+    if new:
+        lines.append(f"{len(new)} row(s) the plan now holds that were never authorised {new[:3]}")
+    if not lines:
+        lines.append("the SAME rows, with at least one act changed underneath them (target, source digest or kind)")
+    return lines
+
+
+def verify_scope(acc: dict[str, Any], plan_path: Path, plan_digest: str,
+                 signed: list[dict[str, Any]], live: list[dict[str, Any]],
+                 decl: dict[str, Any]) -> str:
+    """Does this signature still authorise THIS plan? Returns how it was proved, and refuses when it does not.
+
+    Two proofs, in order of strength: the plan's own BYTES (the file has not moved a byte since it was signed), or
+    its SCOPE (a re-derived plan whose every authorised act is identical). Anything else is FATAL and NAMES the
+    rows that differ. A signature that pins neither is refused: silence about what was authorised is not consent.
+    """
+    pinned = str(acc.get("scope_sha256", "")).strip().lower()
+    if not pinned:
+        raise ApplierError(
+            f"FATAL: the signature carries no `scope_sha256` — a signature that names no ACTS cannot be checked "
+            f"against them. Re-sign: `{decl['command']} --sign --as <your name>` (D-3072)"
+        )
+    live_scope = scope_digest(live)
+    if pinned != live_scope:
+        raise ApplierError(
+            f"FATAL: this signature authorises a DIFFERENT set of acts than {plan_path.name} holds: "
+            + "; ".join(scope_diff([str(rel) for rel in acc.get("rows") or []], live))
+            + f". Re-sign with the LIVE scope: `{decl['command']} --sign --as <your name>` (D-3072)"
+        )
+    if str(acc.get("plan_sha256", "")).strip().lower() == plan_digest:
+        return "digest"
+    #: THE PLAN FILE MOVED, THE ACTS DID NOT. MEASURED: a re-derived plan differs in a timestamp, a count, a class
+    #: that moved by one row — none of which the owner signed and none of which the applier reads. Refusing here is
+    #: what kept the owner in a loop: the word was voided by a DOCUMENT change and had to be re-printed, and
+    #: re-printing resets the name to the placeholder the applier then refused (BUG-888/BUG-892).
+    return "scope"
+
+
 def load_acceptance(path: Path, plan_path: Path, plan_digest: str, decl: dict[str, Any]) -> dict[str, Any]:
     """Read the owner's signature: the plan it names, the digest it pins, and the rows it puts in scope."""
     import yaml
@@ -173,7 +247,8 @@ def load_acceptance(path: Path, plan_path: Path, plan_digest: str, decl: dict[st
     if not who or who.lower() == placeholder.lower():
         raise ApplierError(
             f"FATAL: {path} carries accepted_by={acc['accepted_by']!r} — a placeholder or an empty name is not a "
-            f"signature (the acceptance is the owner's word; write YOUR name, the one this act will be asked about)"
+            f"signature (the acceptance is the owner's word). Give it ONCE, as a command, and every later plan "
+            f"re-derivation reuses it: `{decl['command']} --sign --as <your name>` (D-3072)"
         )
     if acc["mode"] not in decl["accept_modes"]:
         raise ApplierError(
@@ -186,18 +261,35 @@ def load_acceptance(path: Path, plan_path: Path, plan_digest: str, decl: dict[st
             f"FATAL: the acceptance names {named.name} but this run applies {plan_path.name} — a signature for "
             f"another plan authorises nothing (D-3034)"
         )
-    if str(acc["plan_sha256"]).strip().lower() != plan_digest:
-        raise ApplierError(
-            f"FATAL: the acceptance pins digest {acc['plan_sha256']} but {plan_path.name} hashes to {plan_digest} "
-            f"— the plan moved after it was signed, so the signature is about DIFFERENT bytes"
-        )
+    #: D-3072: THE DIGEST NO LONGER DECIDES ALONE. It is checked in `verify_scope`, AFTER the rows are selected,
+    #: because what an owner authorises is a SET OF ACTS and the acts are the rows — not the file that lists them.
+    #: Pinning only the file made every re-derivation of the plan void the word (MEASURED twice on 2026-10-17).
     if acc["mode"] == "listed" and not isinstance(acc.get("rows"), list):
         raise ApplierError(f"FATAL: {path} declares mode=listed but carries no rows list")
     return acc
 
 
-def acceptance_template(plan_path: Path, digest: str, rows: int,
-                        placeholder: str = "<your name>") -> str:
+def declared_identity(decl: dict[str, Any]) -> str:
+    """The owner's name, from its ONE declared home — empty until the owner has said it once (D-3072).
+
+    MEASURED 2026-10-17, twice in one sitting: the signature lives in a file the tool PRINTS, and printing reset
+    `accepted_by` to the template placeholder every time the plan was re-derived, so the applier refused a word
+    the owner had already given. The NAME is an IDENTITY, not a per-plan decision: it is declared once, and only
+    the SCOPE is re-decided. An absent or placeholder identity stays a REFUSAL (BUG-888 keeps its teeth).
+    """
+    path = resolve_root(str(decl["accept_by_identity"]))
+    if not path.is_file():
+        return ""
+    import yaml
+    try:
+        doc = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+    except Exception as exc:  # noqa: BLE001 — an unreadable identity is not an absent one (C16)
+        raise ApplierError(f"FATAL: the declared identity file {path} cannot be read ({type(exc).__name__}: {exc})")
+    return str((doc or {}).get("accept_by") or "").strip()
+
+
+def acceptance_template(plan_path: Path, digest: str, rows: list[dict[str, Any]],
+                        placeholder: str = "<your name>", who: str = "") -> str:
     """A ready-to-sign acceptance, with the LIVE digest already in it — so signing cannot fail on a copied hash.
 
     The template is deliberately `mode: all` with `rows: []` and a comment naming the alternative: a signature that
@@ -213,16 +305,23 @@ def acceptance_template(plan_path: Path, digest: str, rows: int,
         "schema_version": SCHEMA_VERSION,
         "plan": plan_ref,
         "plan_sha256": digest,
-        "accepted_by": placeholder,
+        #: D-3072: WHAT THE OWNER ACTUALLY AUTHORISES — the acts, not the document. A re-derived plan whose acts are
+        #: identical still matches this; a plan whose acts moved does not, whatever its bytes hash to.
+        "scope_sha256": scope_digest(rows),
+        "accepted_by": who or placeholder,
         "accepted_on": datetime.now(UTC).strftime("%Y-%m-%d"),
         "mode": "all",
-        "rows": [],
+        #: THE MANIFEST: the `rel` of every act in scope, written even under `mode: all`, so a refusal can NAME the
+        #: rows that moved instead of printing two digests at an owner (D-3034).
+        "rows": [str(row["rel"]) for row in rows],
     }
     return (
-        f"# THE SIGNATURE THIS PLAN NEEDS (T-183/D-3068).\n"
-        f"# It authorises {rows} row(s). `mode: all` covers them; for a TRANCHE change to `mode: listed` and list the\n"
-        f"# `rel` labels exactly as the plan prints them.\n"
-        f"# The digest below pins the BYTES: if the plan is re-derived, this signature stops matching and is REFUSED.\n"
+        f"# THE SIGNATURE THIS PLAN NEEDS (T-183/D-3068, D-3072).\n"
+        f"# It authorises {len(rows)} row(s), listed at the end of this file by their `rel` label.\n"
+        f"# `plan_sha256` pins the DOCUMENT; `scope_sha256` pins the ACTS (rel + source digest + target + kind), so a\n"
+        f"# re-derived plan with identical acts does NOT void this signature and one whose acts moved is REFUSED.\n"
+        f"# `accepted_by` is the owner's IDENTITY: once it is declared (`--sign --as`), this printer carries it and\n"
+        f"# never asks again. A placeholder or an empty name is REFUSED (BUG-888).\n"
         + yaml.safe_dump(body, sort_keys=False, allow_unicode=True)
     )
 
@@ -567,7 +666,11 @@ def run(plan_path: Path | None, accept_path: Path | None, *, apply: bool, conver
         print(f"            nothing is written until one exists (mode is declared in {POLICY})")
         return RC_OWNER_OWED
     acc = load_acceptance(accept_path, plan_path, plan_digest, decl)
-    rows, _ = selected_rows(plan, acc)
+    signed, _ = selected_rows(plan, acc)
+    #: THE WORD IS CHECKED AGAINST THE ACTS, before a tranche limit narrows them: `--limit` decides how many of the
+    #: SIGNED rows this run takes, never which acts were authorised.
+    signed_by = verify_scope(acc, plan_path, plan_digest, signed, signed, decl)
+    rows = signed
     if limit is not None:
         rows = rows[:limit]
 
@@ -591,6 +694,10 @@ def run(plan_path: Path | None, accept_path: Path | None, *, apply: bool, conver
     header = {"schema_version": SCHEMA_VERSION, "gen_model": GEN_MODEL, "state": "run",
               "ts": run_stamp, "plan": str(plan_path), "plan_sha256": plan_digest,
               "accept": str(accept_path), "accept_sha256": sha256_bytes(accept_path),
+              #: D-3072: HOW the signature was proved this run — its own bytes (`digest`) or a re-derived plan whose
+              #: ACTS are identical (`scope`). Recorded because "the plan moved but the acts did not" is a fact a
+              #: reader of the receipt must be able to see, not infer.
+              "signed_by": signed_by, "scope_sha256": scope_digest(signed), "accepted_by": acc["accepted_by"],
               "mode": acc["mode"], "apply": apply, "convert": convert, "rows": len(rows),
               "bytes": need, "pipeline_commit": pipeline_commit()}
     if apply:
@@ -636,6 +743,14 @@ def selftest() -> int:
         if not condition:
             print(f"FAIL {label} {detail}")
 
+    def _refuses(call) -> bool:
+        """Did this governed act REFUSE? A refusal is the evidence; a return value is not (C16)."""
+        try:
+            call()
+        except ApplierError:
+            return True
+        return False
+
     import yaml
 
     with tempfile.TemporaryDirectory() as tmp:
@@ -666,7 +781,9 @@ def selftest() -> int:
         plan_file.write_text(json.dumps({"rows": rows}), encoding="utf-8")
         digest = sha256_bytes(plan_file)
         decl = {"accept_modes": ["all", "listed"],
-                "accept_required": ["schema_version", "plan", "plan_sha256", "accepted_by", "accepted_on", "mode"],
+                "accept_required": ["schema_version", "plan", "plan_sha256", "scope_sha256", "accepted_by",
+                                    "accepted_on", "mode"],
+                "accept_by_identity": str(tmp_root / "owner_identity.yaml"),
                 "accept_extension": ".yaml", "receipt_prefix": str(tmp_root / "receipts" / "ADMISSION_APPLIED_"),
                 "receipt_extension": ".jsonl", "command": "python3 scripts/apply_admission.py",
                 "authority": "D-3068", "accept_prefix": str(tmp_root / "ADMISSION_ACCEPTED_"), "states": [],
@@ -678,19 +795,44 @@ def selftest() -> int:
 
         accept_file = tmp_root / "ADMISSION_ACCEPTED_TEST.yaml"
         base_accept = {"schema_version": "1.0", "plan": str(plan_file), "plan_sha256": digest,
-                       "accepted_by": "selftest", "accepted_on": "2026-10-17", "mode": "all"}
+                       "scope_sha256": scope_digest(rows), "accepted_by": "selftest", "accepted_on": "2026-10-17",
+                       "mode": "all", "rows": [row["rel"] for row in rows]}
         accept_file.write_text(yaml.safe_dump(base_accept), encoding="utf-8")
 
-        # 1. a digest mismatch is FATAL
-        bad = dict(base_accept, plan_sha256="0" * 64)
-        bad_file = tmp_root / "BAD.yaml"
-        bad_file.write_text(yaml.safe_dump(bad), encoding="utf-8")
-        refused = False
+        # 1. D-3072: THE WORD PINS THE ACTS. MEASURED 2026-10-17, twice in one sitting: a signature pinned to the
+        #    plan FILE was voided by ANY re-derivation (a probe added, a class count that moved, a timestamp), and
+        #    re-printing the signature reset `accepted_by` to the placeholder the applier then refused. Two-sided by
+        #    construction: a plan whose ACTS moved must still be REFUSED (naming the row), and a plan re-derived
+        #    with identical acts must PASS, or "fixed" becomes "authorised anything".
+        moved = dict(base_accept, scope_sha256="0" * 64)
+        moved_file = tmp_root / "MOVED.yaml"
+        moved_file.write_text(yaml.safe_dump(moved), encoding="utf-8")
+        refused, told = False, ""
         try:
-            load_acceptance(bad_file, plan_file, digest, decl)
-        except ApplierError:
-            refused = True
-        expect("a_plan_digest_mismatch_is_FATAL", refused)
+            verify_scope(load_acceptance(moved_file, plan_file, digest, decl), plan_file, digest, rows, rows, decl)
+        except ApplierError as exc:
+            refused, told = True, str(exc)
+        expect("a_signature_whose_ACTOR_SCOPE_moved_is_FATAL_and_NAMES_the_change",
+               refused and "authorises a DIFFERENT set of acts" in told, told)
+
+        rederived = tmp_root / "ADMISSION_PLAN_REDERIVED.json"
+        rederived.write_text(json.dumps({"rows": rows, "generated": "2026-10-17T15:00:00Z",
+                                         "counts": {"admit_candidate": 2}}), encoding="utf-8")
+        expect("a_re_derived_plan_with_the_SAME_acts_STILL_MATCHES_the_word",
+               verify_scope(base_accept, rederived, sha256_bytes(rederived), rows, rows, decl) == "scope")
+        expect("a_plan_whose_BYTES_are_the_signed_ones_is_proved_by_its_DIGEST",
+               verify_scope(base_accept, plan_file, digest, rows, rows, decl) == "digest")
+
+        shrunk = [rows[0]]
+        refused, told = False, ""
+        try:
+            verify_scope(base_accept, plan_file, digest, rows, shrunk, decl)
+        except ApplierError as exc:
+            refused, told = True, str(exc)
+        expect("a_plan_that_LOST_an_authorised_row_is_FATAL_and_names_it",
+               refused and "authorised row(s) the plan no longer holds" in told, told)
+        expect("a_signature_that_pins_NO_scope_is_REFUSED",
+               _refuses(lambda: verify_scope(dict(base_accept, scope_sha256=""), plan_file, digest, rows, rows, decl)))
 
         # 1b. BUG-888: a signature that carries the TEMPLATE'S OWN PLACEHOLDER resolved to nothing and was applied
         #     (MEASURED 2026-10-17: the owner's first acceptance held `accepted_by: <your name>`). The name is the
@@ -820,10 +962,12 @@ def selftest() -> int:
                and str(resolve_root(decl["accept_prefix"])).startswith(str(tmp_root)))
 
         # 13. the printed template is a VALID signature for THIS plan, pinned to the live digest
-        rendered = yaml.safe_load(acceptance_template(plan_file, digest, len(rows)))
+        rendered = yaml.safe_load(acceptance_template(plan_file, digest, rows))
         expect("the_acceptance_template_parses_and_pins_the_live_digest",
                rendered["plan_sha256"] == digest and rendered["mode"] == "all"
-               and rendered["plan"] == str(plan_file), rendered)
+               and rendered["plan"] == str(plan_file)
+               and rendered["scope_sha256"] == scope_digest(rows)
+               and rendered["rows"] == [row["rel"] for row in rows], rendered)
 
         # 14. BUG-881: no local binding shadows a module-level callable of THIS file (the class, not the instance).
         #     The instance was `stamp = <str>` inside run(), which made the module's own stamp() uncallable — and
@@ -870,6 +1014,38 @@ def selftest() -> int:
                and bool(failed.get("quarantine")),
                (failed["state"], failed.get("quarantine")))
 
+        # 18. D-3072/BUG-892: THE OWNER'S WORD IS ONE COMMAND, AND IT IS GIVEN ONCE. MEASURED 2026-10-17: the name
+        #     lived inside a file the tool PRINTS, so every re-derivation reset it to the placeholder and the applier
+        #     refused a word already given — the owner ran the same command twice and got the same refusal. Four
+        #     sides: a placeholder is refused, a real name is written ONCE and reused, the identity cannot be
+        #     silently swapped, and the file the command writes is accepted by the applier that reads it.
+        import contextlib
+        import io
+
+        def quiet_sign(who: str) -> int:
+            with contextlib.redirect_stdout(io.StringIO()):
+                return sign(plan_file, decl, who, "all", None)
+
+        identity = resolve_root(str(decl["accept_by_identity"]))
+        signed_file = resolve_root(
+            f"{decl['accept_prefix']}{datetime.now(UTC).strftime('%Y%m%d')}{decl['accept_extension']}")
+        expect("a_signed_word_refuses_a_PLACEHOLDER_or_an_empty_name",
+               _refuses(lambda: sign(plan_file, decl, "<your name>", "all", None))
+               and _refuses(lambda: sign(plan_file, decl, "   ", "all", None)))
+        expect("ONE_command_writes_the_IDENTITY_and_pins_the_LIVE_ACTS",
+               quiet_sign("A Human") == RC_OK
+               and identity.is_file() and declared_identity(decl) == "A Human"
+               and signed_file.is_file()
+               and yaml.safe_load(signed_file.read_text(encoding="utf-8"))["scope_sha256"] == scope_digest(rows))
+        expect("the_word_that_command_writes_is_ACCEPTED_by_the_applier_that_reads_it",
+               verify_scope(load_acceptance(signed_file, plan_file, digest, decl), plan_file, digest, rows, rows,
+                            decl) == "digest")
+        expect("a_DIFFERENT_name_CANNOT_silently_replace_the_declared_identity",
+               _refuses(lambda: sign(plan_file, decl, "Somebody Else", "all", None))
+               and declared_identity(decl) == "A Human")
+        expect("re_signing_the_SAME_name_is_IDEMPOTENT_and_never_a_second_identity",
+               quiet_sign("A Human") == RC_OK and declared_identity(decl) == "A Human")
+
         # 15. BUG-884: a REFUSAL prints its message and exits RC_FATAL — never a traceback. A message string handed
         #     to SystemExit lands in `.code`, so `int(exc.code)` turned the digest-mismatch refusal into a
         #     ValueError. Both branches are asserted: a message string AND a declared integer code.
@@ -884,11 +1060,126 @@ def selftest() -> int:
     return RC_OK if passed == len(checks) else RC_FATAL
 
 
+def write_atomic_text(path: Path, text: str) -> None:
+    """tempfile -> fsync -> os.replace in the TARGET directory (C6): a crash leaves the old file or the new one."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fd, tmp = tempfile.mkstemp(dir=str(path.parent), prefix=f".{path.name}.", suffix=".tmp")
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as handle:
+            handle.write(text)
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(tmp, path)
+    except BaseException:
+        if os.path.exists(tmp):
+            os.unlink(tmp)  # this writer's OWN half-written temp file, never the owner's bytes
+        raise
+
+
+def sign(plan_path: Path | None, decl: dict[str, Any], who: str, mode: str, rows_path: Path | None) -> int:
+    """WRITE THE OWNER'S WORD — the one act that used to be a hand-edited YAML, and the reason for BUG-892.
+
+    MEASURED 2026-10-17: `just admit-apply --limit 10` failed twice on `accepted_by: <your name>` because the file
+    carrying the word is a file this tool PRINTS, and printing reset the name to the placeholder every time the
+    plan was re-derived. The owner was told to retype their name into a generated artifact — a step that is not a
+    control (it prevented no authorisation and cost two runs), it is a chore with a failure mode. So the name is
+    declared ONCE here and the SCOPE is what a plan change re-decides.
+
+    An identity SWAP is refused rather than overwritten: a signature carrying a different name is a different
+    signer, and a file that silently changes who signed it is worse than no file (D-3034).
+    """
+    import yaml
+
+    plan_path = plan_path or newest(str(plan_admission.admission_policy(census.policy(POLICY))["plan_prefix"]), ".json")
+    if plan_path is None or not plan_path.is_file():
+        raise ApplierError("FATAL: --sign needs a plan to authorise; derive one first (plan_admission.py --plan)")
+    plan = load_plan(plan_path)
+    digest = sha256_bytes(plan_path)
+    placeholder = str(decl["accept_by_placeholder"]).strip()
+    name = who.strip()
+    if not name or name.lower() == placeholder.lower() or "<" in name or ">" in name:
+        raise ApplierError(
+            f"FATAL: --as {who!r} is not a name — a placeholder, an empty value or a template token is a signature "
+            f"nobody signed (BUG-888). Write the name this act will be asked about."
+        )
+    if mode not in decl["accept_modes"]:
+        raise ApplierError(f"FATAL: --mode {mode!r} is outside the declared vocabulary {decl['accept_modes']} (C12)")
+    wanted: list[str] = []
+    if mode == "listed":
+        if rows_path is None or not rows_path.is_file():
+            raise ApplierError("FATAL: --mode listed needs --rows FILE with one `rel` label per line")
+        wanted = [line.strip() for line in rows_path.read_text(encoding="utf-8").splitlines()
+                  if line.strip() and not line.strip().startswith("#")]
+        if not wanted:
+            raise ApplierError(f"FATAL: {rows_path} names no row — a signature that silently selects nothing looks "
+                              f"like an authorisation while authorising nothing (D-3034)")
+    selected, _ = selected_rows(plan, {"mode": mode, "rows": wanted})
+
+    identity_path = resolve_root(str(decl["accept_by_identity"]))
+    declared = declared_identity(decl)
+    if declared and declared.lower() != name.lower():
+        raise ApplierError(
+            f"FATAL: {identity_path} already declares the owner as {declared!r} and this act would sign as "
+            f"{name!r} — an identity change is a NEW DECISION, never an overwrite (D-3034). Correct the file "
+            f"deliberately, with the reason, or sign as {declared!r}."
+        )
+    if not declared:
+        write_atomic_text(identity_path, yaml.safe_dump({
+            "schema_version": SCHEMA_VERSION,
+            "authority": "D-3072",
+            "accept_by": name,
+            "declared_on": datetime.now(UTC).strftime("%Y-%m-%d"),
+            "why": "the owner's IDENTITY: declared ONCE, so a re-derived plan never asks for it again. It is not a "
+                   "decision about any plan - the SCOPE (scope_sha256) is what a plan change re-decides.",
+        }, sort_keys=False, allow_unicode=True))
+
+    try:  # a signature is more portable when it names the plan RELATIVE to the tree it governs
+        plan_ref = plan_path.resolve().relative_to(_PROJECT_ROOT).as_posix()
+    except ValueError:
+        plan_ref = str(plan_path)
+    acceptance = {
+        "schema_version": SCHEMA_VERSION,
+        "plan": plan_ref,
+        "plan_sha256": digest,
+        "scope_sha256": scope_digest(selected),
+        "accepted_by": name,
+        "accepted_on": datetime.now(UTC).strftime("%Y-%m-%d"),
+        "mode": mode,
+        "rows": [str(row["rel"]) for row in selected],
+    }
+    target = resolve_root(f"{decl['accept_prefix']}{datetime.now(UTC).strftime('%Y%m%d')}{decl['accept_extension']}")
+    write_atomic_text(target, yaml.safe_dump(acceptance, sort_keys=False, allow_unicode=True))
+    print(f"SIGNED  {target}")
+    print(f"        by        {name}")
+    print(f"        acts      {len(selected)} row(s), mode {mode}")
+    print(f"        plan      {plan_path.name} sha256 {digest}")
+    print(f"        scope     {acceptance['scope_sha256']}")
+    print(f"        next      {decl['command']} --dry-run   (the price), then --apply --limit 10")
+    return RC_OK
+
+
 def main(argv: list[str] | None = None) -> int:
     """Dispatch the readings; an unknown flag is fatal rather than silently ignored (C16)."""
     argv = list(sys.argv[1:] if argv is None else argv)
     if "--selftest" in argv:
         return selftest()
+    if "--sign" in argv:
+        #: THE OWNER'S ACT IS A COMMAND, not a hand edit of a generated file (D-3072).
+        doc = census.policy(POLICY)
+        decl = applier_policy(doc)
+        parser = argparse.ArgumentParser(prog="apply_admission.py --sign",
+                                         description="Write the owner's word: pin the LIVE plan's ACTS to a name.")
+        parser.add_argument("--sign", action="store_true")
+        parser.add_argument("--as", dest="who", required=True, help="the owner's name (declared once, then reused)")
+        parser.add_argument("--mode", default="all", help="all (every candidate row) or listed (--rows FILE)")
+        parser.add_argument("--rows", type=Path, help="for --mode listed: one `rel` label per line")
+        parser.add_argument("--plan", type=Path, help="the plan JSON (default: the newest under the declared prefix)")
+        args = parser.parse_args(argv)
+        try:
+            return sign(args.plan, decl, args.who, args.mode, args.rows)
+        except ApplierError as exc:
+            print(str(exc))
+            return applier_rc(exc)
     if "--template" in argv:
         # The signature, pre-pinned to the plan's LIVE digest: the one step a human could get wrong is removed.
         doc = census.policy(POLICY)
@@ -897,8 +1188,9 @@ def main(argv: list[str] | None = None) -> int:
             print(f"FATAL: no plan found under {plan_admission.admission_policy(doc)['plan_prefix']}*.json")
             return RC_FATAL
         plan = load_plan(plan_path)
-        print(acceptance_template(plan_path, sha256_bytes(plan_path), len(plan["rows"]),
-                                  str(applier_policy(doc)["accept_by_placeholder"])), end="")
+        decl = applier_policy(doc)
+        print(acceptance_template(plan_path, sha256_bytes(plan_path), plan["rows"],
+                                  str(decl["accept_by_placeholder"]), declared_identity(decl)), end="")
         return RC_OK
     parser = argparse.ArgumentParser(
         description="The admit applier (T-183): apply an ACCEPTED admission plan, crash-safe, dry run by default.")

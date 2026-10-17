@@ -1,7 +1,7 @@
 {
   "act": "T-181 admission plan",
   "authority": "D-3051",
-  "generated": "2026-10-17T13:40:19Z",
+  "generated": "2026-10-17T14:12:20Z",
   "corpus_home": "/Users/barn/Library/CloudStorage/Dropbox/claude projects/maxwell os 2.0/knowledge pipeline/books",
   "accepted_containers": [
     ".epub",
@@ -58,52 +58,3173 @@
     "refused_domain_not_a_corpus_domain": 0
   },
   "examples": {
-    "already_in_the_corpus": [
-      "books/epub/AI Agents with MCP (First Early Release) -- Kyle Stratis -- 2025-07-07_ First Release, 2025 -- O'Reilly Media",
-      "books/epub/AI Cashflow_ Turn ChatGPT into Your 24_7 Money Machine (2025 -- K Shukla -- 2025 -- 1a8879e72dc16252766f6753e",
-      "books/epub/AI Value Creators (Rob Thomas, Paul Zikopoulos, Kate Soule) (z-library.sk, 1lib.sk, z-lib.sk).epub",
-      "books/epub/AI and machine learning for coders _ a programmer's guide to -- Laurence Moroney; Andrew Ng; O'Reilly Media -",
-      "books/epub/AI for Finance (AI for Everything) -- Edward P_ K_ Tsang -- AI for Everything, 1, 2023 -- Taylor & Francis Gr"
-    ],
-    "seen_by_an_ingest_record": [
-      "books/epub/DOMAIN 0 Systems + Decision/execution+operations/Digital Minimalism Choosing a Focused Life in a Noisy World ",
-      "books/epub/DOMAIN 0 Systems + Decision/mental+models+epistemology/The Great Mental Models, Volume 3 Systems and Mathemat",
-      "books/epub/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/Domain-Specific Small Language Models (MEAP) (Guglielmo Iozzia) (z-l",
-      "books/epub/DOMAIN 2 Design/practice+process/Making Ideas Happen Overcoming the Obstacles Between.epub",
-      "books/epub/DOMAIN 2 Design/visual+fundamentals/Thinking with Type, 2nd revised and expanded edition A.epub"
-    ],
+    "already_in_the_corpus": [],
+    "seen_by_an_ingest_record": [],
     "admit_candidate": [],
     "refused_no_declared_corpus_home": [],
     "refused_container_no_stage_reads_it": [
-      "books/epub/DOMAIN 0 Systems + Decision/systems+complexity/The Systems Bible_ The Beginner_'s Guide to Systems Large and ",
-      "books/epub/DOMAIN 2 Design/design+systems/Laying the Foundations -- Andrew Couldwell -- 2019 -- 898b840e9d7b80bc2a4a7849",
+      "books/epub/DOMAIN 0 Systems + Decision/systems+complexity/The Systems Bible_ The Beginner_'s Guide to Systems Large and Small_John Gall_liber3.mobi",
+      "books/epub/DOMAIN 2 Design/design+systems/Laying the Foundations -- Andrew Couldwell -- 2019 -- 898b840e9d7b80bc2a4a7849418341a5 -- Anna\u2019s Archive.mobi",
       "books/epub/DOMAIN 3 Art + Computational Media/Digital Art, Third edition (World of Art).azw3",
-      "books/epub/The Elements of Style [Illustrated] -- Strunk Jr_, William -- 2011 -- Seedbox Press, LLC -- 7b4f785e400d8b629",
-      "books/pdf/DOMAIN 0 Systems + Decision/systems+complexity/SYSTEMANTICS. THE SYSTEMS BIBLE (John Gall) (z-library.sk, 1lib"
+      "books/epub/The Elements of Style [Illustrated] -- Strunk Jr_, William -- 2011 -- Seedbox Press, LLC -- 7b4f785e400d8b6294e26324ee067d0f -- Anna\u2019s Archive.mobi",
+      "books/pdf/DOMAIN 0 Systems + Decision/systems+complexity/SYSTEMANTICS. THE SYSTEMS BIBLE (John Gall) (z-library.sk, 1lib.sk, z-lib.sk).mobi"
     ],
     "refused_container_corrupt": [
-      "books/epub/DOMAIN 2 Design/practice+process/How to use graphic desi gn to sell things, explain things, make things ylib.",
-      "books/epub/DOMAIN 5 Personal Practice/mood+therapy/Happy Sexy Millionaire Unexpected Truths about Fulfillment, Love, and",
+      "books/epub/DOMAIN 2 Design/practice+process/How to use graphic desi gn to sell things, explain things, make things ylib.org).epub",
+      "books/epub/DOMAIN 5 Personal Practice/mood+therapy/Happy Sexy Millionaire Unexpected Truths about Fulfillment, Love, and Success Steven Bartlett.epub",
       "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Encylopedia of Freemasonry - Vols 1and2.pdf",
       "books/pdf/DOMAIN 2 Design/visual+fundamentals/color choices: making color sense out of color theory.pdf",
       "journals_notes/DOMAIN 2 Design/design-notes/mo graph/Keylight_1.2_AE.pdf"
     ],
     "refused_name_repair_first": [
-      "books/epub/AI-Assisted Programming for Web and Machine Learning_ -- Christoffer Noring, Anjali Jain, Marina Fernandez, A",
-      "books/epub/Build a Multi-Agent System (from Scratch) -- Val Andrei Fajardo -- None -- 499a745fd121358a158cdb6d6415e4d0 -",
-      "books/epub/DOMAIN 0 Systems + Decision/decision+strategy/Competing Against Luck _ The Story of Innovation and -- Recorde",
-      "books/epub/DOMAIN 0 Systems + Decision/decision+strategy/Seeking Wisdom_ From Darwin to Munger, 3rd Edition -- Bevelin, ",
-      "books/epub/DOMAIN 0 Systems + Decision/decision+strategy/The Innovator's Dilemma, with a New Foreword_ When New -- Clayt"
+      "books/epub/AI-Assisted Programming for Web and Machine Learning_ -- Christoffer Noring, Anjali Jain, Marina Fernandez, Ays\u0327e -- First Edition, 2024 -- Packt -- isbn13 9781835086056 -- 29a18ea4e3b80b6eff0565ed3bd1c2d2 -- Anna\u2019s Archive.epub",
+      "books/epub/Build a Multi-Agent System (from Scratch) -- Val Andrei Fajardo -- None -- 499a745fd121358a158cdb6d6415e4d0 -- Anna\u2019s Archive.epub",
+      "books/epub/DOMAIN 0 Systems + Decision/decision+strategy/Competing Against Luck _ The Story of Innovation and -- Recorded Books, Inc_; Christensen, Clayton M_; Dillon, -- HarperCollins, [Place of publication -- 9780062435613 -- cdfd7a64ae12968e6a9dcdb8997d050d -- Anna\u2019s Archive.epub",
+      "books/epub/DOMAIN 0 Systems + Decision/decision+strategy/Seeking Wisdom_ From Darwin to Munger, 3rd Edition -- Bevelin, Peter -- Third edition, 2018;2007 -- PCA Publications L_L_C_; PCA Publications -- 9781578644285 -- fc29e83e825ec3045c15f31e225e2324 -- Anna\u2019s Archive.epub",
+      "books/epub/DOMAIN 0 Systems + Decision/decision+strategy/The Innovator's Dilemma, with a New Foreword_ When New -- Clayton M_ Christensen, Marc Benioff -- Boston, Massachusetts, 2024 -- Harvard Business -- 9781647826765 -- a59e96922fa14713e58cd764a3e4195c -- Anna\u2019s Archive.epub"
     ],
     "refused_not_in_its_kind_folder": [
-      "books/epub/DOMAIN 2 Design/communication+design/_Visual Metaphor Structure and Process (Gerard J.Steen) (z-library.sk, 1",
-      "books/epub/DOMAIN 4 Business/practice+economics/100-Habits of Successful Freelance Designers Insider Secrets for Working",
-      "books/epub/DOMAIN 4 Business/practice+economics/365 Habits of Successful Graphic Designers Insider Secrets from Top Desi",
-      "books/pdf/DOMAIN 0 Systems + Decision/execution+operations/The Art of Strategy_ A Game Theorist_'s Guide to Success in B",
-      "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/AMARINGO, Pablo et al - Plant Spirit Shamanism T"
+      "books/epub/DOMAIN 2 Design/communication+design/_Visual Metaphor Structure and Process (Gerard J.Steen) (z-library.sk, 1lib.sk, z-lib.sk).pdf",
+      "books/epub/DOMAIN 4 Business/practice+economics/100-Habits of Successful Freelance Designers Insider Secrets for Working Smart  Staying Creative (Steve Gordon) (z-library.sk, 1lib.sk, z-lib.sk).pdf",
+      "books/epub/DOMAIN 4 Business/practice+economics/365 Habits of Successful Graphic Designers Insider Secrets from Top Designers on Working Smart and Staying Creative (Laurel Saville, Joshua Berger etc.) (z-library.sk, 1lib.sk, z-lib.sk).pdf",
+      "books/pdf/DOMAIN 0 Systems + Decision/execution+operations/The Art of Strategy_ A Game Theorist_'s Guide to Success in Business and Life_Dixit, Avinash K.;Nalebuff Barry J_liber3.epub",
+      "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/AMARINGO, Pablo et al - Plant Spirit Shamanism Traditional Techniques for Healing the Soul-Destiny Books (2006).epub"
     ],
     "refused_domain_not_a_corpus_domain": []
   },
+  "refused": [
+    {
+      "rel": "books/epub/AI-Assisted Programming for Web and Machine Learning_ -- Christoffer Noring, Anjali Jain, Marina Fernandez, Ays\u0327e -- First Edition, 2024 -- Packt -- isbn13 9781835086056 -- 29a18ea4e3b80b6eff0565ed3bd1c2d2 -- Anna\u2019s Archive.epub",
+      "decision": "refused_name_repair_first",
+      "kind": "epub"
+    },
+    {
+      "rel": "books/epub/Build a Multi-Agent System (from Scratch) -- Val Andrei Fajardo -- None -- 499a745fd121358a158cdb6d6415e4d0 -- Anna\u2019s Archive.epub",
+      "decision": "refused_name_repair_first",
+      "kind": "epub"
+    },
+    {
+      "rel": "books/epub/DOMAIN 0 Systems + Decision/decision+strategy/Competing Against Luck _ The Story of Innovation and -- Recorded Books, Inc_; Christensen, Clayton M_; Dillon, -- HarperCollins, [Place of publication -- 9780062435613 -- cdfd7a64ae12968e6a9dcdb8997d050d -- Anna\u2019s Archive.epub",
+      "decision": "refused_name_repair_first",
+      "kind": "epub"
+    },
+    {
+      "rel": "books/epub/DOMAIN 0 Systems + Decision/decision+strategy/Seeking Wisdom_ From Darwin to Munger, 3rd Edition -- Bevelin, Peter -- Third edition, 2018;2007 -- PCA Publications L_L_C_; PCA Publications -- 9781578644285 -- fc29e83e825ec3045c15f31e225e2324 -- Anna\u2019s Archive.epub",
+      "decision": "refused_name_repair_first",
+      "kind": "epub"
+    },
+    {
+      "rel": "books/epub/DOMAIN 0 Systems + Decision/decision+strategy/The Innovator's Dilemma, with a New Foreword_ When New -- Clayton M_ Christensen, Marc Benioff -- Boston, Massachusetts, 2024 -- Harvard Business -- 9781647826765 -- a59e96922fa14713e58cd764a3e4195c -- Anna\u2019s Archive.epub",
+      "decision": "refused_name_repair_first",
+      "kind": "epub"
+    },
+    {
+      "rel": "books/epub/DOMAIN 0 Systems + Decision/systems+complexity/The Systems Bible_ The Beginner_'s Guide to Systems Large and Small_John Gall_liber3.mobi",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "mobi"
+    },
+    {
+      "rel": "books/epub/DOMAIN 2 Design/communication+design/Brand Naming The Complete Guide to Creating a Name for.epub",
+      "decision": "refused_name_repair_first",
+      "kind": "epub"
+    },
+    {
+      "rel": "books/epub/DOMAIN 2 Design/communication+design/Data Sketches_ A journey of imagination, exploration, and -- Nadieh Bremer, Shirley Wu -- AK Peters visualization series, First edition, Boca Raton ; -- 9780367000080 -- 578d82c9c04b8a3a2afe8183f2ec39d8 -- Anna\u2019s Archive.epub",
+      "decision": "refused_name_repair_first",
+      "kind": "epub"
+    },
+    {
+      "rel": "books/epub/DOMAIN 2 Design/communication+design/HTML  CSS Design and Build Websites (Jon Duckett) (z-library.sk, 1lib.sk, z-lib.sk).epub",
+      "decision": "refused_name_repair_first",
+      "kind": "epub"
+    },
+    {
+      "rel": "books/epub/DOMAIN 2 Design/communication+design/Laws of UX - Using Psychology to Design Better Products  Services [ 2nd Ed ] (Jon Yablonski) (z-library.sk, 1lib.sk, z-lib.sk).epub",
+      "decision": "refused_name_repair_first",
+      "kind": "epub"
+    },
+    {
+      "rel": "books/epub/DOMAIN 2 Design/communication+design/_Visual Metaphor Structure and Process (Gerard J.Steen) (z-library.sk, 1lib.sk, z-lib.sk).pdf",
+      "decision": "refused_not_in_its_kind_folder",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/epub/DOMAIN 2 Design/design+systems/Laying the Foundations -- Andrew Couldwell -- 2019 -- 898b840e9d7b80bc2a4a7849418341a5 -- Anna\u2019s Archive.mobi",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "mobi"
+    },
+    {
+      "rel": "books/epub/DOMAIN 2 Design/practice+process/How to use graphic desi gn to sell things, explain things, make things ylib.org).epub",
+      "decision": "refused_container_corrupt",
+      "kind": "epub",
+      "defect": "truncated_zip_no_central_directory",
+      "remedy": "RE-DOWNLOAD the work \u2014 no local repair can invent the bytes that never arrived. A rebuild from the surviving local headers can recover text (measured: 641 headers, 321 text entries) but produces a file whose checksum matches no published edition, so it is a LAST resort and never an admission"
+    },
+    {
+      "rel": "books/epub/DOMAIN 2 Design/visual+fundamentals/Advanced Typography From Knowledge to Mastery (Richard Hunt) (z-library.sk, 1lib.sk, z-lib.sk).epub",
+      "decision": "refused_name_repair_first",
+      "kind": "epub"
+    },
+    {
+      "rel": "books/epub/DOMAIN 3 Art + Computational Media/Digital Art, Third edition (World of Art).azw3",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "azw3"
+    },
+    {
+      "rel": "books/epub/DOMAIN 3 Art + Computational Media/live+visuals+vjing/Introduction to TouchDesigner 099 (sponsored by nVoid) (z-library.sk, 1lib.sk, z-lib.sk).epub",
+      "decision": "refused_name_repair_first",
+      "kind": "epub"
+    },
+    {
+      "rel": "books/epub/DOMAIN 3 Art + Computational Media/live+visuals+vjing/The Art of Noticing_ 131 Ways to Spark Creativity, Find -- Rob Walker; -- 2019 -- Penguin Random House LLC -- aa2993ad8e7fa4c33dd997ef9636175a -- Anna\u2019s Archive.epub",
+      "decision": "refused_name_repair_first",
+      "kind": "epub"
+    },
+    {
+      "rel": "books/epub/DOMAIN 4 Business/practice+economics/100-Habits of Successful Freelance Designers Insider Secrets for Working Smart  Staying Creative (Steve Gordon) (z-library.sk, 1lib.sk, z-lib.sk).pdf",
+      "decision": "refused_not_in_its_kind_folder",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/epub/DOMAIN 4 Business/practice+economics/365 Habits of Successful Graphic Designers Insider Secrets from Top Designers on Working Smart and Staying Creative (Laurel Saville, Joshua Berger etc.) (z-library.sk, 1lib.sk, z-lib.sk).pdf",
+      "decision": "refused_not_in_its_kind_folder",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/epub/DOMAIN 4 Business/practice+economics/Opportunity Recognition _ 15 Approaches for More Business -- Andreas Engelen; Clara von Gagern; Monika Engelen -- Springer Nature, Wiesbaden, 2023 -- isbn13 9783658398101 -- ede6ec83a61da806d4214189983f4843 -- Anna\u2019s Archive.epub",
+      "decision": "refused_name_repair_first",
+      "kind": "epub"
+    },
+    {
+      "rel": "books/epub/DOMAIN 4 Business/strategy+brand/Blue Ocean Strategy and Beyond Disruption Collection (2 -- Kim, W_ Chan, Mauborgne, Rene\u0301e A_ -- 2024;2023 -- Harvard Business Review Press -- isbn13 9781647829674 -- dd8b809f7dbec9acf0bb1fa0b0d2cc2c -- Anna\u2019s Archive.epub",
+      "decision": "refused_name_repair_first",
+      "kind": "epub"
+    },
+    {
+      "rel": "books/epub/DOMAIN 5 Personal Practice/mood+therapy/Happy Sexy Millionaire Unexpected Truths about Fulfillment, Love, and Success Steven Bartlett.epub",
+      "decision": "refused_container_corrupt",
+      "kind": "epub",
+      "defect": "truncated_zip_no_central_directory",
+      "remedy": "RE-DOWNLOAD the work \u2014 no local repair can invent the bytes that never arrived. A rebuild from the surviving local headers can recover text (measured: 641 headers, 321 text entries) but produces a file whose checksum matches no published edition, so it is a LAST resort and never an admission"
+    },
+    {
+      "rel": "books/epub/DOMAIN 6 AI + Computing/How to speak machine _ computational thinking for the rest -- Maeda, John -- Illustrated, 2021 -- Penguin Publishing Group;Portfolio;Penguin -- 9780241422144 -- ded07b41e64d28bc7a3c04e7faf6a2ae -- Anna\u2019s Archive.epub",
+      "decision": "refused_name_repair_first",
+      "kind": "epub"
+    },
+    {
+      "rel": "books/epub/DOMAIN 6 AI + Computing/ai+engineering+agents/Mustafa Suleyman_Michael Bhaskar__ Michael Bhaskar - The Coming Wave _ Technology, Power, and the Twenty-first Century's Greatest Dilemma (2023, Penguin Random House LLC) - libgen.li.epub",
+      "decision": "refused_name_repair_first",
+      "kind": "epub"
+    },
+    {
+      "rel": "books/epub/DOMAIN 6 AI + Computing/ai+society+business/The Age of AI - And Our Human Future -- Huttenlocher, Daniel; Schmidt, Eric; Kissinger, Henry A -- 1, 2021 -- John Murray Press -- isbn13 9781529376005 -- 022735950a476e44c718f6746eeef0c7 -- Anna\u2019s Archive.epub",
+      "decision": "refused_name_repair_first",
+      "kind": "epub"
+    },
+    {
+      "rel": "books/epub/DOMAIN 6 AI + Computing/programming/AI Prompt Engineering Absolute Beginner's Guide -- Michael Miller -- 1, 2025 -- Addison Wesley Professional -- 9780135570463 -- 7bc786245236cee04dc14799e4132d56 -- Anna\u2019s Archive.epub",
+      "decision": "refused_name_repair_first",
+      "kind": "epub"
+    },
+    {
+      "rel": "books/epub/DOMAIN 6 AI + Computing/programming/Art in the Age of Machine Learning (Leonardo) -- Audry, Sofian; Bengio, Yoshua -- MIT Press, Cambridge, Massachusetts, 2021 -- The MIT Press -- 9780262046183 -- 721846964ef38a20958f0dbcc1f20290 -- Anna\u2019s Archive.epub",
+      "decision": "refused_name_repair_first",
+      "kind": "epub"
+    },
+    {
+      "rel": "books/epub/DOMAIN 6 AI + Computing/programming/LLM Engineer's Handbook_ Master the Art of Engineering Large -- Paul Iusztin & Maxime Labonne & Alex Vesa -- 2024 -- Packt Publishing -- 9781836200062 -- eec4e0451d5ed347034dee70af6044e8 -- Anna\u2019s Archive.epub",
+      "decision": "refused_name_repair_first",
+      "kind": "epub"
+    },
+    {
+      "rel": "books/epub/DOMAIN 6 AI + Computing/programming/Prompt Engineering for Generative AI_ Future-Proof Inputs -- James Phoenix and Michael Taylor -- O'Reilly Media, [S_l_], 2024 -- O'Reilly Media, -- 9781098153403 -- 566d1a173782a422ad1df1b1241919e3 -- Anna\u2019s Archive.epub",
+      "decision": "refused_name_repair_first",
+      "kind": "epub"
+    },
+    {
+      "rel": "books/epub/DOMAIN 6 AI + Computing/programming/Prompt Engineering for LLMs_ The Art and Science of Building -- John Berryman & Albert Ziegler -- 2024 -- O'Reilly Media, Incorporated -- 9781098156152 -- 5f2cb8d5f26e202cdd7b308091def046 -- Anna\u2019s Archive.epub",
+      "decision": "refused_name_repair_first",
+      "kind": "epub"
+    },
+    {
+      "rel": "books/epub/DOMAIN 6 AI + Computing/programming/The Art of Machine Learning -- Norman Matloff; -- 2023 -- Penguin Random House LLC (Publisher Services) -- f95a4e86d884a576caafb183d3d6257e -- Anna\u2019s Archive.epub",
+      "decision": "refused_name_repair_first",
+      "kind": "epub"
+    },
+    {
+      "rel": "books/epub/Designing AI Agents (Principles, patterns and best practices) MEAP (Jia Huang) (z-library.sk, 1lib.sk, z-lib.sk).epub",
+      "decision": "refused_name_repair_first",
+      "kind": "epub"
+    },
+    {
+      "rel": "books/epub/Domain-Specific Small Language Models -- welcome_html -- 8a5a4570bfa712a688cbe58bd413e10a -- Anna\u2019s Archive.epub",
+      "decision": "refused_name_repair_first",
+      "kind": "epub"
+    },
+    {
+      "rel": "books/epub/Graph Neural Networks in Action MEAP V05 -- copyright-2020-manning-publications_html -- 6b1e81473a193f1d964b395e33f86157 -- Anna\u2019s Archive.epub",
+      "decision": "refused_name_repair_first",
+      "kind": "epub"
+    },
+    {
+      "rel": "books/epub/Prompt Engineering for AI Systems -- welcome_html -- e39b7875d2b4ce972e359b925e6232f8 -- Anna\u2019s Archive.epub",
+      "decision": "refused_name_repair_first",
+      "kind": "epub"
+    },
+    {
+      "rel": "books/epub/RAG Generative AI_ A Practical Guide to Building Custom -- Smith, Julie -- null, null, 2024 -- UNKNOWN -- 443f5e8291b61c689b81808777c81df7 -- Anna\u2019s Archive.epub",
+      "decision": "refused_name_repair_first",
+      "kind": "epub"
+    },
+    {
+      "rel": "books/epub/The Elements of Style [Illustrated] -- Strunk Jr_, William -- 2011 -- Seedbox Press, LLC -- 7b4f785e400d8b6294e26324ee067d0f -- Anna\u2019s Archive.mobi",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "mobi"
+    },
+    {
+      "rel": "books/pdf/AI for Creatives_ Unlocking Expressive Digital Potential -- Vivian Ching & Dinesh Mothi -- 2025 -- CRC Press -- 90daed3d00e4db212134b1bf798f3fd8 -- Anna\u2019s Archive.pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 0 Systems + Decision/execution+operations/Decisive _ how to make better choices in life and work -- Heath, Chip, author, Heath, Dan, 1973- author -- Toronto, Ontario, 2013 -- Toronto _ Random -- 9780307361134 -- 79fefad7327f5ccd9c2a3807455cd4c2 -- Anna\u2019s Archive.pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 0 Systems + Decision/execution+operations/LLM Design Patterns_ A Practical Guide to Building Robust -- Ken Huang -- Expert Insight, 1, 2025 -- Packt Publishing -- isbn13 9781836207030 -- c0e80f07a55a4a78b9a6c0735670de5d -- Anna\u2019s Archive.pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 0 Systems + Decision/execution+operations/The Art of Strategy_ A Game Theorist_'s Guide to Success in Business and Life_Dixit, Avinash K.;Nalebuff Barry J_liber3.epub",
+      "decision": "refused_not_in_its_kind_folder",
+      "kind": "epub"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 0 Systems + Decision/execution+operations/The Decision Book Fifty Models for Strategic Thinking by Mikael Krogerus, Roman Tscha\u0308ppeler (z-lib.org).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 0 Systems + Decision/mental+models+epistemology/Mental Models At Work The 16 Most Valuable Thinking Tools For Effective Work Performance (Thinknetic) (z-library.sk, 1lib.sk, z-lib.sk) (1).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 0 Systems + Decision/mental+models+epistemology/Mental Models At Work The 16 Most Valuable Thinking Tools For Effective Work Performance (Thinknetic) (z-library.sk, 1lib.sk, z-lib.sk).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 0 Systems + Decision/mental+models+epistemology/Nonsense A Handbook of Logical Fallacies (Robert J. Gula) (z-library.sk, 1lib.sk, z-lib.sk) (1).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 0 Systems + Decision/mental+models+epistemology/Nonsense A Handbook of Logical Fallacies (Robert J. Gula) (z-library.sk, 1lib.sk, z-lib.sk).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 0 Systems + Decision/mental+models+epistemology/Seeking Wisdom From Darwin to Munger (Peter Bevelin) (z-library.sk, 1lib.sk, z-lib.sk).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 0 Systems + Decision/systems+complexity/Complex Adaptive Systems_ An Introduction to Computational -- Miller, John H_; Page, Scott E_ -- Princeton studies in complexity, Course Book, 2009 -- 9780691127026 -- 021dd4817ab9bc9630b737c64add4441 -- Anna\u2019s Archive.pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 0 Systems + Decision/systems+complexity/Philosophy of Complex Systems (Cliff A. Hooker, Dov M. Gabbay etc.) (z-library.sk, 1lib.sk, z-lib.sk).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 0 Systems + Decision/systems+complexity/SYSTEMANTICS. THE SYSTEMS BIBLE (John Gall) (z-library.sk, 1lib.sk, z-lib.sk).mobi",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "mobi"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 0 Systems + Decision/systems+complexity/The Art of Problem Solving_ Accompanied by Ackoff_'s Fables_Russell L. Ackoff_liber3.pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 0 Systems + Decision/systems+complexity/Understanding Complexity - The Great Courses - Lecture -- Scott E Page; Teaching Company -- Great courses (DVD), Chantilly, Va, \u00a92009 -- The Teaching -- 9781598035605 -- 0c7629c1a9ba5989a6b8d102e96be3ff -- Anna\u2019s Archive.pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/Attribution theory from a neuropsychological perspective (z-lib.org).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/AMARINGO, Pablo et al - Plant Spirit Shamanism Traditional Techniques for Healing the Soul-Destiny Books (2006).epub",
+      "decision": "refused_not_in_its_kind_folder",
+      "kind": "epub"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Alan Chapman - Advanced Magick for Beginners (2008) - libgen.li.pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Daniel Pinchbeck - Breaking Open the Head_ A Psychedelic Journey into the Heart of Contemporary Shamanism (2003) - libgen.li.pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Encylopedia of Freemasonry - Vols 1and2.pdf",
+      "decision": "refused_container_corrupt",
+      "kind": "pdf",
+      "defect": "truncated_pdf_no_trailer",
+      "remedy": "RE-DOWNLOAD the work. Do NOT rebuild the xref locally: a repaired file that silently loses pages is worse than an absent one, and nothing in this pipeline can tell them apart afterwards"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Gordon White - The Chaos Protocols Magical Techniques for Navigating the New Economic Reality (2016, Llewellyn Publications) - libgen.li.epub",
+      "decision": "refused_not_in_its_kind_folder",
+      "kind": "epub"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/International Encyclopedia of Unified Science by Neurath, Otto Carnap, Rudolf Morris, Charles (eds.) (z-lib.org).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/James Fadiman - The Psychedelic Explorer's Guide Safe, Therapeutic, and Sacred Journeys (2011, Park Street Press) - libgen.li.epub",
+      "decision": "refused_not_in_its_kind_folder",
+      "kind": "epub"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/LSD and the Divine Scientist _ The Final Thoughts and -- Albert Hofmann [Hofmann, Albert] -- Simon & Schuster, Rochester, Vermont, 2013 -- Inner -- 9780802776402 -- 545ce306c10f4fb6d66352dd12d87186 -- Anna\u2019s Archive.pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Learning Airtable Building Database-Driven Applications with No-Code (Elliott Adams) (z-library.sk, 1lib.sk, z-lib.sk).epub",
+      "decision": "refused_not_in_its_kind_folder",
+      "kind": "epub"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Learning LangChain (Mayo Oshin, Nuno Campos) (z-library.sk, 1lib.sk, z-lib.sk).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Malaclypse The Younger, Omar Khayyam Ravenhurst - Principia Discordia, Or, How I Found Goddess and What I Did to Her When I Found Her_ The Magnum Opiate of Malaclypse the Younger (1980, Loompanics Unlimited) - libgen.li.pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Manly Palmer Hall - The secret teachings of all ages an encyclopedic outline of Masonic, Hermetic, Qabbalistic, and Rosicrucian symbolical philosop (1928, Jeremy P. Tarcher Penguin) - libgen.li.epub",
+      "decision": "refused_not_in_its_kind_folder",
+      "kind": "epub"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Michael Pollan - How to Change Your Mind_ What the New Science of Psychedelics Teaches Us About Consciousness, Dying, Addiction, Depression, and (2018, PENGUIN PRESS) - libgen.li.pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Mike Ma - Harassment Architecture (2019, Mike Ma) - libgen.li.pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Muraresku, Brian C. - The Immortality Key_ The Secret History of the Religion With No Name (2020, St. Martin's Publishing Group) - libgen.li.pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Paul Stamets - Mycelium running how mushrooms can help save the world (2005, Potter TenSpeed Harmony Ten Speed Press) - libgen.li.epub",
+      "decision": "refused_not_in_its_kind_folder",
+      "kind": "epub"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Phil Hine - Condensed Chaos An Introduction to Chaos Magic (2012, The Original Falcon Press) - libgen.li.epub",
+      "decision": "refused_not_in_its_kind_folder",
+      "kind": "epub"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Practical Tableau 100 Tips, Tutorials, and Strategies from a Tableau Zen Master (Ryan Sleeper) (z-library.sk, 1lib.sk, z-lib.sk).epub",
+      "decision": "refused_not_in_its_kind_folder",
+      "kind": "epub"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Robert Anton Wilson - Cosmic Trigger II Down to Earth 2 (2019, Hilaritas Press, LLC.) - libgen.li.epub",
+      "decision": "refused_not_in_its_kind_folder",
+      "kind": "epub"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Robert Anton Wilson - Cosmic Trigger III My Life After Death 3 (2019, Hilaritas Press, LLC.) - libgen.li.epub",
+      "decision": "refused_not_in_its_kind_folder",
+      "kind": "epub"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Robert Shea, Robert Anton Wilson - The Illuminatus! Trilogy (1983, Dell) - libgen.li.pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/The Holographic Universe By Michael Talbot 1991.epub",
+      "decision": "refused_not_in_its_kind_folder",
+      "kind": "epub"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Virginia Haze and K. Mandrake - The Psilocybin Mushroom Bible (2016, Green Candy Press) - libgen.li.pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/Where Reincarnation and Biology Intersect -- Ian Stevenson -- Westport, Conn, Connecticut, 1997 -- Greenwood Publishing Group, Incorporated -- 9780275951887 -- 38c58ca401fdacd3d0d6404bce827cce -- Anna\u2019s Archive.pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/[Cosmic Trigger I] Wilson, Robert Anton - Cosmic Trigger I Final Secrets of the Illuminati (2020, Hilaritas Press) - libgen.li.epub",
+      "decision": "refused_not_in_its_kind_folder",
+      "kind": "epub"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/[H._J._Eysenck]_Genius__The_Natural_History_of_Cre(z-lib.org).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/[Illuminati 2 ] Wilson, Robert Anton - Masks of the Illuminati (1981, Timescape Books) - libgen.li.epub",
+      "decision": "refused_not_in_its_kind_folder",
+      "kind": "epub"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/the-orgone-accumulator-handbook-construction-plans--annas-archive.pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/cognition+perception/the-orgone-energy-orgone-energy-accumulator-kindle.epub",
+      "decision": "refused_not_in_its_kind_folder",
+      "kind": "epub"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/mathematics+geometry/Build a Mathematical Mind - Even If You Think You Can't Have -- Albert Rutherford -- 2023 -- Albert Rutherford -- b435ff30445d7a332b11dfec591da533 -- Anna\u2019s Archive.pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/mathematics+geometry/Geometry of Design Studies in Proportion and Composition by Kimberly Elam (z-lib.org).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/mathematics+geometry/Naked Statistics_ Stripping the Dread from the Data_Charles Wheelan_liber3.epub",
+      "decision": "refused_not_in_its_kind_folder",
+      "kind": "epub"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/semiotics+meaning/*Nina_N_rgaard,_Beatrix_Busse,_Roc_o_Montoro]_Ke(z-lib.org).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/semiotics+meaning/[Christian_Mosbaek_Johannessen;_Theo_van_Leeuwen]_(z-lib.org).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/semiotics+meaning/[Ga_kowski,_Artur;_Kopytowska,_Monika_Weronika]_C(z-lib.org).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/semiotics+meaning/[Roland_Barthes;__Annette_Lavers_(sel._and_transl.(z-lib.org).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/semiotics+meaning/[T._L._Short]_Peirce's_Theory_of_Signs(z-lib.org).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/Semiology of Graphics Diagrams, Networks, Maps (Jacques Bertin) (z-library.sk, 1lib.sk, z-lib.sk).djvu",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "djvu"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/The Visual Display of Quantitative Information, 2e, 5th -- Edward R_ Tufte -- 2nd ed, Cheshire, Conn, \u00a92001 -- Graphics Press -- 9780961392147 -- e465e34149d5664a24d7d4010902eea3 -- Anna\u2019s Archive.pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/[0961392126] [9780961392123] Visual Explanations_ Images and -- Edward R Tufte; Dmitry Krasny -- 4th print_, with revisions, Apr_ 2000, Cheshire, -- 9780961392123 -- eaab68ed8e7623a90d14cca5bbad6dba -- Anna\u2019s Archive.pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/1,000 Icons, Symbols, and Pictograms Visual Communication for Every Language by Blackcoffee Design Inc (z-lib.org).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/A smile in the mind _ witty thinking in graphic design -- Beryl McAlhone & David Stuart; [Forew_ by Edward de Bono; -- Revised & updated_, London, -- 9780714838120 -- 99ad8cd473a8443092702396e3be8938 -- Anna\u2019s Archive.pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/Architecture_Blueprint.md",
+      "decision": "refused_not_in_its_kind_folder",
+      "kind": "md"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/Batch1_Tufte.md",
+      "decision": "refused_not_in_its_kind_folder",
+      "kind": "md"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/Batch2_Cairo_Few.md",
+      "decision": "refused_not_in_its_kind_folder",
+      "kind": "md"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/Batch3_Munzner_Kirk_Ware_Wilkinson.md",
+      "decision": "refused_not_in_its_kind_folder",
+      "kind": "md"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/Batch4_Knaflic_Berinato_Wilke_Schwabish.md",
+      "decision": "refused_not_in_its_kind_folder",
+      "kind": "md"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/Batch5_Healy_Yau_Hil_Lima_Dykes.md",
+      "decision": "refused_not_in_its_kind_folder",
+      "kind": "md"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/Batch6_Secondary.md",
+      "decision": "refused_not_in_its_kind_folder",
+      "kind": "md"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/Batch7_Wexler_Duarte_Cairo_Yau_Others.md",
+      "decision": "refused_not_in_its_kind_folder",
+      "kind": "md"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/Beautiful Visualization_ Looking at Data Through the Eyes of Experts_Julie Steele, Noah Iliinsky_liber3.pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/Berinato_Notes.md",
+      "decision": "refused_not_in_its_kind_folder",
+      "kind": "md"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/Better Data Visualizations A Guide for Scholars, Researchers, and Wonks (Jonathan Schwabish) (z-lib.org).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/Beyond Visual Metaphor A New Typology of Visual Rhetoric in Advertising (Phillips, Barbara J. McQuarrie, Edward F) (z-library.sk, 1lib.sk, z-lib.sk).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/Culture Jamming, Hacking, Slashing and Sniping in the Empire of Signs (Mark Dery) (z-library.sk, 1lib.sk, z-lib.sk).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/Culture jam (Kalle Lasn) (z-library.sk, 1lib.sk, z-lib.sk) (1).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/Culture jam (Kalle Lasn) (z-library.sk, 1lib.sk, z-lib.sk).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/DATAVIS_BOOK_NOTES \u2014 Condensed Knowledge.md",
+      "decision": "refused_not_in_its_kind_folder",
+      "kind": "md"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/Data Sketches -- Nadieh Bremer; Shirley Wu -- 1c73ce115742a856647e07e70421f24b -- Anna\u2019s Archive.pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/Dear Data (Giorgia Lupi Stefanie Posavec) (z-lib.org).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/Decision_Framework.md",
+      "decision": "refused_not_in_its_kind_folder",
+      "kind": "md"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/Design Anarchy (Kalle Lasn) (z-library.sk, 1lib.sk, z-lib.sk).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/Envisioning Information (Edward R. Tufte) (z-lib.org).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/Evergreen_Notes.md",
+      "decision": "refused_not_in_its_kind_folder",
+      "kind": "md"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/Few_Notes.md",
+      "decision": "refused_not_in_its_kind_folder",
+      "kind": "md"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/Graphic Design School The Principles and Practice of Graphic Design by David Dabner Sandra Stewart Eric Zempol (z-lib.org).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/Grok_Anytype_Prompt_Review.md",
+      "decision": "refused_not_in_its_kind_folder",
+      "kind": "md"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/Healy_Notes.md",
+      "decision": "refused_not_in_its_kind_folder",
+      "kind": "md"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/Hil_Lachenmeier_Notes.md",
+      "decision": "refused_not_in_its_kind_folder",
+      "kind": "md"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/How charts lie  getting smarter about visual information , How charts lie  getting smarter about visual information (Cairo, Alberto, 1974- author, Cairo, Alberto etc.) (z-library.sk, 1lib.sk, z-lib.sk).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/Information Dashboard Design (Stephen Few) (z-library.sk, 1lib.sk, z-lib.sk).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/Interactive Data Visualization for the Web_ An Introduction to Designing with D3_Scott Murray_liber3.pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/Kirk_Notes.md",
+      "decision": "refused_not_in_its_kind_folder",
+      "kind": "md"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/Laws of UX - Using Psychology to Design Better Products  Services (Jon Yablonski) (z-library.sk, 1lib.sk, z-lib.sk).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/Lima_Notes.md",
+      "decision": "refused_not_in_its_kind_folder",
+      "kind": "md"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/Master_Pipeline_Digest.md",
+      "decision": "refused_not_in_its_kind_folder",
+      "kind": "md"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/Munzner_Notes.md",
+      "decision": "refused_not_in_its_kind_folder",
+      "kind": "md"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/Pipeline_Map.md",
+      "decision": "refused_not_in_its_kind_folder",
+      "kind": "md"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/Refactoring UI by Steve Schoger, Adam Wathan (z-lib.org).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/Specialization_Previews.md",
+      "decision": "refused_not_in_its_kind_folder",
+      "kind": "md"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/Storytelling with Data A Data Visualization Guide for Business Professionals by Cole Nussbaumer Knaflic (z-lib.org).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/Structural Packaging Design Your Own Boxes and 3D Forms (Paul Jackson) (z-library.sk, 1lib.sk, z-lib.sk).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/The Animators Survival Kit by Richard Williams (z-lib.org).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/The Functional Art - An Introduction to Information Graphics and Visualization (Alberto Cairo) (z-lib.org).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/The UX Book Process and Guidelines for Ensuring a Quality User Experience (Rex Hartson  Pardha S. Pyla [Hartson etc.) (z-library.sk, 1lib.sk, z-lib.sk).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/The Visual Display of Quantitative Information (Edward R. Tufte) (z-library.sk, 1lib.sk, z-lib.sk).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/The Visual Story Creating the Visual Structure of Film, TV, and Digital Media-3rd Edition (Bruce Block) (z-library.sk, 1lib.sk, z-lib.sk).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/The package design book 3 (Wiedemann, Julius, editor) (z-library.sk, 1lib.sk, z-lib.sk).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/ULTIMATE_MASTER_SYNTHESIS_PROMPT.md",
+      "decision": "refused_not_in_its_kind_folder",
+      "kind": "md"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/Understanding Comics _ The Invisible Art -- McCloud, Scott -- May 17, 1994 -- Perfection Learning Corporation -- 9781627652735 -- e1b6e267038e23e60154501582d5be59 -- Anna\u2019s Archive.pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/Visual Complexity Mapping Patterns Of Information (Manuel Lima) (z-lib.org).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/Visual Explanations - Images and Quantities, Evidence and Narrative (Edward R. Tufte) (z-lib.org).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/Visual Thinking for Information Design (Colin Ware) (z-library.sk, 1lib.sk, z-lib.sk).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/Visualization Analysis and Design (Tamara Munzner) (z-lib.org).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/Wexler_Notes.md",
+      "decision": "refused_not_in_its_kind_folder",
+      "kind": "md"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/[Philip_B._Meggs;_Alston_W._Purvis]_Meggs__History(z-lib.org).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/_Visual Explanations Images and Quantities, Evidence and Narrative (Edward Rolf Tufte) (z-library.sk, 1lib.sk, z-lib.sk).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/_[Christian_Leborg]_Visual_Grammar_(Design_Briefs)(z-lib.org).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/communication+design/practical applications of dynamic symmetry (jay hambidge) (z-library.sk, 1lib.sk, z-lib.sk).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/practice+process/Customer Journey Mapping_Botha, Chantel; Botha, Chantel_liber3.epub",
+      "decision": "refused_not_in_its_kind_folder",
+      "kind": "epub"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/practice+process/Making Ideas Happen Overcoming the Obstacles Between Vision and Reality by Scott Belsky (z-lib.org).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/practice+process/[Patrick_Van_Der_Pijl,_Justin_Lokitz,_Lisa_Kay_Sol(z-lib.org).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/visual+fundamentals/*[Rob_Carter,_Philip_B._Meggs,_Ben_Day,_Sandra_Maxa(z-lib.org).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/visual+fundamentals/Color  a workshop for artists and designers by Hornung, David (z-lib.org).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/visual+fundamentals/Color Design Workbook A Real World Guide to Using Color in Graphic Design by AdamsMorioka (z-lib.org).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/visual+fundamentals/Color and design by DeLong, Marilyn Revell Martinson, Barbara (z-lib.org).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/visual+fundamentals/Design Is Storytelling (COOPER HEWITT) -- Ellen Lupton; Cooper-Hewitt Museum -- 1, US, 2017 -- Cooper Hewitt, Smithsonian Design Museum -- 9781942303190 -- ce3cbfa9619ac85fb4b2936bf23d97c9 -- Anna\u2019s Archive.pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/visual+fundamentals/Design The Key Concepts (D. J. Huppatz) (z-library.sk, 1lib.sk, z-lib.sk) (1).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/visual+fundamentals/Interacting with Color A Practical Guide to Josef Albers\u2019s Color Experiments (Fritz Horstman) (z-library.sk, 1lib.sk, z-lib.sk).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/visual+fundamentals/Interaction of Color by Josef Albers (z-lib.org).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/visual+fundamentals/Laying the Foundations (Andrew Couldwell) (z-library.sk, 1lib.sk, z-lib.sk).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/visual+fundamentals/Layout Essentials Revised And Updated 100 Design Principles For Using Grids by Beth Tondreau (z-lib.org).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/visual+fundamentals/Paul Rand _ a designer's art -- [by Paul Rand; afterword by Steven Heller] -- First Princeton Architectural Press edition, reprinted, New -- Princeton -- 9781616894863 -- 2e88b396d185f95c7cf24947113a0eae -- Anna\u2019s Archive.pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/visual+fundamentals/The Art of Looking Sideways (Alan Fletcher) (z-library.sk, 1lib.sk, z-lib.sk).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/visual+fundamentals/The Elements of Typographic Style (Robert Bringhurst) (z-library.sk, 1lib.sk, z-lib.sk).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/visual+fundamentals/Theory of Type Design -- Gerard Unger -- Rotterdam, 2018 -- NAi Uitgevers _ Publishers Stichting; Nai010 Publishers; -- 9789462084407 -- 24ef04cc8951b2c53db2fa38ecf9b093 -- Anna\u2019s Archive.pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/visual+fundamentals/Type Specific_ Designing Custom Fonts for Function and Identity_Charlotte Rivers_liber3.pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/visual+fundamentals/Why design matters _ conversations with the world's most -- Debbie Millman; Roxane Gay; Timothy Ferriss -- New York, NY _, 2021 -- Harper Design, An -- 9780062872968 -- 7c31b8f3c1602885ea58e8e5cf7de128 -- Anna\u2019s Archive.pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/visual+fundamentals/[Betty_Edwards]_Color_by_Betty_Edwards__A_Course_i(z-lib.org).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/visual+fundamentals/[Bruno_Munari]_The_Circle__Discovery_of_the_Circle(z-lib.org).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/visual+fundamentals/[Ellen_Lupton]_Type_on_Screen__A_Critical_Guide_fo(z-lib.org).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/visual+fundamentals/[Ilene_Strizver]_Type_Rules__The_Designer's_Guide_(z-lib.org).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/visual+fundamentals/[Marshall,_Lindsey;_Meachem,_Lester]_How_to_use_ty(z-lib.org).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/visual+fundamentals/[Paul_Rand]_Paul_Rand__A_Designer_s_Art(z-lib.org).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/visual+fundamentals/[Robert_Klanten,_Mika_Mischler,_Silja_Bilz]_The_Li(z-lib.org).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/visual+fundamentals/[Samara,_Timothy]_Making_and_breaking_the_grid___a(z-lib.org).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/visual+fundamentals/[Sarah_Hyndman]_Why_Fonts_Matter(z-lib.org).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/visual+fundamentals/[Sean_Adams]_The_Designer's_Dictionary_of_Color(z-lib.org).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/visual+fundamentals/[Steven_Heller,_Mirko_Ilic]_Stop,_Think,_Go,_Do__H(z-lib.org).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/visual+fundamentals/[Timothy_Samara]_Letterforms__Typeface_Design_from(z-lib.org).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/visual+fundamentals/_Detail in Typography by Hochuli Jost. (z-lib.org).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/visual+fundamentals/_Typographic Systems of Design_ Frameworks for Type Beyond -- Kimberly Elam -- 7th, 2007 -- Princeton Architectural Press -- 9781568986876 -- d86fe8537d90535cdb467fef53cd0a56 -- Anna\u2019s Archive.pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 2 Design/visual+fundamentals/color choices: making color sense out of color theory.pdf",
+      "decision": "refused_container_corrupt",
+      "kind": "pdf",
+      "defect": "null_bytes",
+      "remedy": "RE-DOWNLOAD, then verify the new copy opens BEFORE it is proposed again (the plan re-probes every candidate, so a good copy clears itself)"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Art Vs_ TV _ A Brief History of Contemporary Artists' -- Francesco Spampinato -- Bloomsbury USA, New York, NY, 2022 -- Bloomsbury Publishing Inc -- 9781501370533 -- 0a74dbfacec12a3292639eb9912eb3e9 -- Anna\u2019s Archive.pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Code as Creative Medium A Handbook for Computational Art and Design (Golan Levin Tega Brain) (z-library.sk, 1lib.sk, z-lib.sk).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Coding Art A Guide to Unlocking Your Creativity with the Processing Language and p5.js in Four Simple Steps (Mathias Funk, Yu Zhang) (z-library.sk, 1lib.sk, z-lib.sk).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 3 Art + Computational Media/generative+art+creative+coding/Form and code in design, art, and architecture -- Casey Reas; Chandler McWilliams; Jeroen Barendse; Princeton -- Repr_, 2013 -- Princeton -- 9781568989372 -- 7ade4d6489b1b38200c36e5ab8258faa -- Anna\u2019s Archive.pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/65856456342523 Sanet.st.epub",
+      "decision": "refused_not_in_its_kind_folder",
+      "kind": "epub"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Artist039s Color Manual The Complete Guide to Working with Color by Simon Jennings (z-lib.org).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Circuit-Bending_ Build Your Own Alien Instruments -- Reed Ghazala -- ExtremeTech, Indianapolis, IN, \u00a92005 -- Wiley Publishing -- 9780471752950 -- 598bedd580070b8a6a0a3dd5eb0dc98b -- Anna\u2019s Archive.pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Essentials of Landscape Composition.epub",
+      "decision": "refused_not_in_its_kind_folder",
+      "kind": "epub"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Handmade Electronic Music_ The Art of Hardware Hacking_Nicolas Collins_liber3.pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Harold Speed - Drawing.epub",
+      "decision": "refused_not_in_its_kind_folder",
+      "kind": "epub"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/High-Tech Trash _ Glitch, Noise, and Aesthetic Failure -- Carolyn L_ Kane -- Rhetoric and public culture_ history, theory, critique, 1, -- University -- 9780520340145 -- b45fe9e396e206eb151f6e1c903ee8d5 -- Anna\u2019s Archive.pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/Morpho_ Fat and Skin Folds_ Anatomy for Artists.pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/The Emergence of Video Processing Tools Volumes 1 & 2 _ -- Kathryn High; Sherry Miller Hocking; Mona Jimenez -- 2 volume set, PS, 2014 -- Intellect -- 9781783203000 -- 137aeb237b23910c448d7d18679a23cc -- Anna\u2019s Archive.pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/The Hardware Hacker_ Adventures in Making and Breaking Hardware_Andrew \u2019bunnie\u2019 Huang_liber3.epub",
+      "decision": "refused_not_in_its_kind_folder",
+      "kind": "epub"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 3 Art + Computational Media/glitch+media+art/[Timothy Callaghan] One Painting A Day A 6-Week C(BookZZ.org).epub",
+      "decision": "refused_not_in_its_kind_folder",
+      "kind": "epub"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 3 Art + Computational Media/live+visuals+vjing/Expanded Cinema_ Fiftieth Anniversary Edition_Gene Youngblood; R. Buckminster Fuller_liber3.pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 3 Art + Computational Media/live+visuals+vjing/VJ_ AUDIO-VISUAL ART + VJ CULTURE; ED_ BY MICHAEL FAULKNER -- Unknown -- 1St Edition, First Edition, PS, 2006 -- LONDON LAURENCE KING -- 9781856694902 -- 507d3d1c9adef9c9e0a4b7b09f3b3359 -- Anna\u2019s Archive.pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 3 Art + Computational Media/plein air KEYS.doc",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "doc"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 4 Business/marketing+growth/Marketing Research, An Applied Orientation, 7e -- Naresh K Malhotra; Stayabhusan Das -- Seventh 7th Edition, 2016-03-11 -- Pearson India Education -- isbn13 9789332555693 -- 7c21f4f06345dfe4e8f262d77f5ae9d8 -- Anna\u2019s Archive.pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 4 Business/marketing+growth/Marketing opportunity analysis_ text and cases -- Robert E_ Stevens ___ [et al_] -- 1, PT, 2006 -- Best Business Books; Routledge; Brand_ Routledge -- isbn13 9780203823491 -- 539eb8155daa2b15873ee44ae2bd39a3 -- Anna\u2019s Archive.pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 4 Business/marketing+growth/Unleashing the Ideavirus by Seth Godin, Malcolm Gladwell (z-lib.org).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 4 Business/practice+economics/100 Habits of Successful Freelance Designers Insider Secrets for Working Smart Staying Creative by Steve Gordon Jr. (z-lib.org).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 4 Business/practice+economics/Creative personal branding _ create opportunities, grow -- Salenbacher, Ju\u0308rgen, 1970- author -- Lightning Source Inc_ (Tier 2), Amsterdam, 2013 -- 9789063693152 -- cbc4888ec8f31ce2eff693721a233e72 -- Anna\u2019s Archive-1.pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 4 Business/practice+economics/Design Is a Job by Mike Monteiro (z-lib.org).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 4 Business/practice+economics/Make Your Mark The Creative's - Jocelyn K. Glei 99u.epub",
+      "decision": "refused_not_in_its_kind_folder",
+      "kind": "epub"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 4 Business/practice+economics/Pocket Full of Do (Chris Do)@.epub",
+      "decision": "refused_not_in_its_kind_folder",
+      "kind": "epub"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 4 Business/practice+economics/Pricing Design_Dan Mall_liber3.mobi",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "mobi"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 4 Business/practice+economics/[Josh_Berger,_Sarah_Dougher,_Plazm]_100_Habits_of_(z-lib.org).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 4 Business/practice+economics/zero to one by Peter Thiel (z-lib.org).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 4 Business/strategy+brand/Fusion _ How Integrating Brand and Culture Powers the -- Denise Lee Yohn -- Hachette Book Group, Boston, MA, 2018 -- Nicholas Brealey; Nicholas -- 9781473676985 -- e77ff71a88af72eabf996539ad284c76 -- Anna\u2019s Archive.pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 4 Business/strategy+brand/The 22 Immutable Laws of Branding -- Al Ries and Laura Ries -- 2000 -- Profile Books(GB) -- 9780060085186 -- c31144e53a3d7ab274b9e29fb1d93e6f -- Anna\u2019s Archive.pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 4 Business/strategy+brand/[Alexander_Osterwalder,_Yves_Pigneur,_Gregory_Bern(z-lib.org).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 5 Personal Practice/mood+therapy/June Singer - Boundaries of the soul_ The practice of Jung's psychology (1994, Anchor Books) - libgen.li.pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 5 Personal Practice/mood+therapy/The Almanack of Naval Ravikant -- Eric Jorgenson -- 706b2073d04a6924b89fbff77caa7ebd -- Anna\u2019s Archive.pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 5 Personal Practice/mood+therapy/[Emily-Dubberley]-The-Field-Guide-to-F_CKING_-A-Ha(z-lib.org).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 5 Personal Practice/productivity+execution/Don\u2019t Get a Job \u2026 Make a Job How to Make it as a Creative Graduate by Gem Barton (z-lib.org).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 5 Personal Practice/productivity+execution/Everybody Writes Your Go-To Guide to Creating Ridiculously Good Content by Ann Handley (z-lib.org).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 5 Personal Practice/productivity+execution/How to DeFi by CoinGecko Lau, Darren Lau, Daryl Teh, Sze Jin Kho, Kristian Azmi, Erina Lee, TM Ong, Bobby (z-lib.org).mobi",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "mobi"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 5 Personal Practice/productivity+execution/The Wall Street Era is Over The Investors Guide to Cryptocurrency and DeFi, the Decentralized Finance Revolution by App, DEFIYIELD (z-lib.org).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 5 Personal Practice/productivity+execution/Visualizing with Text (Richard Brath) (z-lib.org).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 5 Personal Practice/productivity+execution/garnet-hertz-zombie-media-circuit-bending-media-archaeology- -- pdftk 1_44 - www_pdftk_com -- e7b1f99f4aad2dbc0362a031ec9cf5a1 -- Anna\u2019s Archive.pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 6 AI + Computing/RAG-Driven Generative AI Build MAS-RAG with DualRAG, GraphRAG, multimodal video pipelines, and Oracle Database 23ai (Denis Rothman) (z-library.sk, 1lib.sk, z-lib.sk) (1).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/DOMAIN 7 Influence + Power/The Behavior Operations Manual (Chase Hughes) (z-library.sk, 1lib.sk, z-lib.sk).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/Grid Systems -- Elam, Kimberly; -- 2004 -- f8405d722f5f30e9e162e5c877f18631 -- Anna\u2019s Archive.pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/HOW TO BUILD YOUR CAREER IN AI -- ANDREW  NG -- 1, 1, 2023 -- Deeplearning_AI -- 7bbdcf8e7030ae26a0dbe77475e37b46 -- Anna\u2019s Archive.pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/Inference and Learning from Data, Volume 1 (I)_ Foundations -- Ali H_ Sayed -- Inference and Learning from Data, 1, 1, 2023 -- Cambridge University -- isbn13 9781009218108 -- c3bdbadbd1abdd59d950b76fb916b60a -- Anna\u2019s Archive.pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/Introduction to Machine Learning Systems_ Principles and -- Vijay Janapa Reddi -- 2025 -- MIT Press -- ceae8c3aada215854347420f08c20a9c -- Anna\u2019s Archive.pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/Mastering AI Agents -- Pratik Bhavsar -- f644458367de1c43a7c1b6eb7e79a443 -- Anna\u2019s Archive.pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/Principles of Building AI Agents -- Sam Bhagwat -- 2fc3bbeec6412d59bab96cff599adec7 -- Anna\u2019s Archive.pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/The AI Playbook_ Mastering the Rare Art of Machine Learning -- Eric Siegel -- Management on the Cutting Edge, 1, 2024 -- The MIT Press -- isbn13 9780262048903 -- 99a58a0ea5f8204f7fbf446f6593fd4f -- Anna\u2019s Archive.pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "books/pdf/UX for AI_ A Framework for Designing AI-Driven Products -- Greg Nudelman & Daria Kempka -- 2025 -- 149865d74196e390fbc671203f4ebaa7 -- Anna\u2019s Archive.pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/1470357218764436.pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 1 Substrate \u2014 Mind, Math, Meaning/semiotics/visual semiotics/68409de8b1ab9b1965fee0a94432699e074d.pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/IdentityLectureNotes.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/Typography/kinetic typography/Communicating emotion with.pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/Typography/kinetic typography/[Barbara_Brownie]_Transforming_Type(z-lib.org).pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/Typography/kinetic typography/cfd2686d5786befa87eabf500d083d68d2f5.pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/Typography/typographical signification/5d1f30e1581e502aea3a8d514fa425370ec8.pdf",
+      "decision": "refused_name_repair_first",
+      "kind": "pdf"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/branding/Blockchain Branding.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/branding/Brand Identity design Process.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/branding/Brand Strategy Made Simple - Workbook.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/branding/Brand Strategy.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/branding/Brand nameing.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/branding/Brand positioning.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/branding/Brand visual design strategy.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/branding/Branding Workflow.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/branding/Customer goals.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/branding/The-Branding-Brief-Canny.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/Chris Do- How to Stand OUT/Screenshot 2020-12-10 at 18.07.26.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/Chris Do- How to Stand OUT/Screenshot 2020-12-11 at 23.25.22.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/Chris Do- How to Stand OUT/Screenshot 2020-12-18 at 13.56.22.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/Chris Do- How to Stand OUT/Screenshot 2020-12-18 at 13.56.39.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/Chris Do- How to Stand OUT/Screenshot 2020-12-18 at 13.56.46.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/Chris Do- How to Stand OUT/Screenshot 2020-12-18 at 13.56.58.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/Chris Do- How to Stand OUT/Screenshot 2020-12-18 at 13.57.13.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/Chris Do- How to Stand OUT/Screenshot 2020-12-18 at 13.57.25.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/Chris Do- How to Stand OUT/Screenshot 2020-12-18 at 13.57.37.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/Chris Do- How to Stand OUT/Screenshot 2020-12-18 at 13.57.48.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/Chris Do- How to Stand OUT/Screenshot 2020-12-18 at 14.37.52.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/Chris Do- How to Stand OUT/Screenshot 2020-12-18 at 14.38.06.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/Chris Do- How to Stand OUT/Screenshot 2021-07-07 at 20.02.59.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/Chris Do- How to Stand OUT/Screenshot 2021-07-22 at 12.44.12.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/Chris Do- How to Stand OUT/Screenshot 2021-07-28 at 13.17.11.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/Chris Do- How to Stand OUT/Screenshot 2021-07-28 at 18.37.37.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/Chris Do- How to Stand OUT/Screenshot 2021-08-07 at 16.47.36.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/Chris Do- How to Stand OUT/Screenshot 2021-08-07 at 16.55.29.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/Folder structure/GYST by Erica Gorochow/*GYST_README!.rtf",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "rtf"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/Folder structure/GYST by Harry Frank/*GYST_README!.rtf",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "rtf"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/Folder structure/GYST by Harry Frank/2_Projects/AEP/AE_TEMPLATE (converted) 1.aep",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "aep"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/Folder structure/GYST by Harry Frank/2_Projects/AEP/AE_TEMPLATE (converted).aep",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "aep"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/Folder structure/GYST by Harry Frank/2_Projects/AEP/GYST_FolderGen_HF_V01 1.jsx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "jsx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/Folder structure/GYST by Harry Frank/2_Projects/AEP/GYST_FolderGen_HF_V01.jsx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "jsx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/Folder structure/GYST by Hasraf Dulull/*GYST_README!.rtf",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "rtf"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/Folder structure/GYST by Jonathan Winbush/*GYST_README!.rtf",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "rtf"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/Folder structure/GYST by Jonathan Winbush/AE/GYST_FolderGen_JW_V01 1.jsx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "jsx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/Folder structure/GYST by Jonathan Winbush/AE/GYST_FolderGen_JW_V01.jsx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "jsx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/Folder structure/GYST by Jonathan Winbush/AE/XXX_000000_info_xx_v1 1.aep",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "aep"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/Folder structure/GYST by Jonathan Winbush/AE/XXX_000000_info_xx_v1.aep",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "aep"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/Folder structure/GYST by Jonathan Winbush/STYLEFRAMES/TEMPLATES/TEMP_185_styleframe 1.psd",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "psd"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/Folder structure/GYST by Jonathan Winbush/STYLEFRAMES/TEMPLATES/TEMP_185_styleframe.psd",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "psd"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/Folder structure/GYST by Jonathan Winbush/STYLEFRAMES/TEMPLATES/TEMP_235_styleframe 1.psd",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "psd"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/Folder structure/GYST by Jonathan Winbush/STYLEFRAMES/TEMPLATES/TEMP_235_styleframe.psd",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "psd"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/Folder structure/GYST by Jonathan Winbush/STYLEFRAMES/TEMPLATES/TEMP_HD_styleframe 1.psd",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "psd"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/Folder structure/GYST by Jonathan Winbush/STYLEFRAMES/TEMPLATES/TEMP_HD_styleframe.psd",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "psd"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/Folder structure/GYST by Jonathan Winbush/STYLEFRAMES/TEMPLATES/TEMP_TV_1K_styleframe 1.psd",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "psd"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/Folder structure/GYST by Jonathan Winbush/STYLEFRAMES/TEMPLATES/TEMP_TV_1K_styleframe.psd",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "psd"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/Folder structure/GYST by Jonathan Winbush/STYLEFRAMES/Templates 1.indd",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "indd"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/Folder structure/GYST by Jonathan Winbush/STYLEFRAMES/Templates.indd",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "indd"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/Folder structure/XXX_PROJECT_TITLE_000000/*GYST_README!.rtf",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "rtf"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/branding/case studies/1*SRYPdNSkCSQU5yRuFnhqag.gif",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "gif"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/branding/case studies/futuristic_logo_animation.gif",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "gif"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/branding/case studies/moving parts.gif",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "gif"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/branding/logo/Screenshot 2020-10-26 at 23.53.30.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/branding/logo/Screenshot 2020-10-28 at 14.14.30.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/branding/logo design/Screenshot 2020-10-23 at 00.45.59.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/branding/logo design/Screenshot 2020-10-23 at 00.46.54.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/branding/logo design/Screenshot 2020-10-23 at 00.47.07.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/branding/logo design/Screenshot 2020-10-23 at 00.47.20.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/branding/logo design/Screenshot 2020-10-23 at 00.47.44.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/branding/logo design/Screenshot 2020-10-23 at 00.48.06.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/branding/logo design/Screenshot 2020-10-23 at 00.49.25.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/branding/logo design/Screenshot 2020-10-23 at 00.49.40.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/branding/logo design/Screenshot 2020-10-23 at 00.50.44.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/branding/logo design/Screenshot 2020-10-23 at 00.51.58.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/branding/logo design/Screenshot 2020-10-23 at 00.52.50.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/branding/logo design/Screenshot 2020-10-23 at 00.53.33.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/branding/logo design/Screenshot 2020-10-23 at 00.54.22.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/branding/logo design/Screenshot 2020-10-23 at 00.54.26.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/branding/logo design/Screenshot 2020-10-23 at 00.56.49.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/branding/logo design/Screenshot 2020-10-23 at 00.57.06.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/branding/logo design/Screenshot 2020-10-23 at 00.57.43.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/branding/logo design/Screenshot 2020-10-23 at 00.57.46.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/branding/logo design/Screenshot 2020-10-23 at 00.59.08.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/branding/logo design/Screenshot 2020-10-23 at 01.02.53.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/branding/logo design/Screenshot 2020-10-23 at 01.02.55.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/branding/logo design/Screenshot 2020-10-23 at 01.03.12.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/branding/logo design/Screenshot 2020-10-23 at 01.03.33.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/branding/logo design/Screenshot 2020-10-23 at 01.06.02.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/branding/logo design/motion graph studios.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/branding/presentation/Screenshot 2020-10-22 at 11.09.06.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/branding/presentation/Screenshot 2020-10-22 at 11.09.26.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/branding/presentation/Screenshot 2020-10-22 at 11.10.27.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/branding/presentation/Screenshot 2020-10-22 at 11.10.52.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/branding/presentation/Screenshot 2020-10-22 at 11.11.45.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/branding/presentation/Screenshot 2020-10-22 at 11.12.32.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/branding/presentation/Screenshot 2020-10-22 at 11.14.00.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/branding/presentation/Screenshot 2020-10-22 at 11.16.24.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/branding/presentation/Screenshot 2020-10-22 at 11.17.06.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/branding/presentation/Screenshot 2020-10-22 at 11.20.09.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/branding/presentation/Screenshot 2020-10-22 at 11.20.33.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/branding/presentation/Screenshot 2020-10-22 at 11.21.29.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/branding/presentation/Screenshot 2020-10-22 at 11.23.34.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/branding/presentation/Screenshot 2020-10-22 at 11.26.06.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/branding/presentation/Screenshot 2020-10-22 at 11.26.26.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/branding/presentation/Screenshot 2020-10-22 at 11.26.41.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/branding/presentation/Screenshot 2020-10-22 at 11.26.58.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/branding/presentation/Screenshot 2020-10-22 at 11.27.04.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/branding/presentation/Screenshot 2020-10-22 at 11.27.43.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/branding/presentation/Screenshot 2020-10-22 at 11.28.59.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/Conceptual thinking/CREATIVE THINKING.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/Conceptual thinking/Design for motion.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/Conceptual thinking/Ellen Lupton.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/Conceptual thinking/Workflow tips for typography.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/Ideation/Ideation tipps.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/Ideation/Tackle design challenges.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/Ideation/Tactics.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/The-Design-Brief-Canny.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/Types of kinetic actions in terms of figure of speech.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/mograph/Design for motion techical.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/mograph/Parallax/PARALLAX.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/01. Design Thinking for Visual Design workflow.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Content strategy & information architecture.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Creative Brief.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Design System.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Design System1.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Design Thinking for Visual Design workflow.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Moodboard structure.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Styleboard.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Techniques paper/Figma/FIGMA short cuts.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Techniques paper/Figma/Figma Instructions.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Techniques paper/Figma tipps.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Techniques paper/Photoshop.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Techniques paper/Printing techniques.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/02. Hierarchy & Structure.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Color.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/DARK UI.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Developing guidelines.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Elements.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Grid:layout.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Grids.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Hierarchy & Structure.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Imagery.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Onboarding.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Style.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Theory/Typography UI.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/UI design workflow.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/UI workflow.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/docs/ui:ux/Visual design tips.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/illustrator/Screenshot 2020-10-21 at 20.11.03.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/illustrator/Screenshot 2020-10-21 at 22.03.29.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 2 Design/design-notes/mo graph/Keylight_1.2_AE.pdf",
+      "decision": "refused_container_corrupt",
+      "kind": "pdf",
+      "defect": "apple_bookmark",
+      "remedy": "RESOLVE THE POINTER, do not download: the alias records its own target path \u2014 copy the real file in beside it (the alias itself may stay; it will simply stay refused)"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 3 Art + Computational Media/narrative/digital_storytelling_synthesis_19th_november_2009.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/People/Cap Table/Cap-Table-Template 1.xlsx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "xlsx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/Resource Library/People/Cap Table/Cap-Table-Template.xlsx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "xlsx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 02- Finding Clients/M02L06-Staying Top of Mind.xlsx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "xlsx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 02- Finding Clients/M02L19-Tracking Sales Efforts.xlsx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "xlsx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L03-CAPABILITIES-AGENCY-OVERVIEW-JANDA-V1 Folder/CAPABILITIES-AGENCY-OVERVIEW-JANDA-V1 Folder/CAPABILITIES-AGENCY-OVERVIEW-JANDA-V1 1.idml",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "idml"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L03-CAPABILITIES-AGENCY-OVERVIEW-JANDA-V1 Folder/CAPABILITIES-AGENCY-OVERVIEW-JANDA-V1 Folder/CAPABILITIES-AGENCY-OVERVIEW-JANDA-V1 1.indd",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "indd"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L03-CAPABILITIES-AGENCY-OVERVIEW-JANDA-V1 Folder/CAPABILITIES-AGENCY-OVERVIEW-JANDA-V1 Folder/CAPABILITIES-AGENCY-OVERVIEW-JANDA-V1.idml",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "idml"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L03-CAPABILITIES-AGENCY-OVERVIEW-JANDA-V1 Folder/CAPABILITIES-AGENCY-OVERVIEW-JANDA-V1 Folder/CAPABILITIES-AGENCY-OVERVIEW-JANDA-V1.indd",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "indd"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L03-CAPABILITIES-AGENCY-OVERVIEW-JANDA-V1 Folder/CAPABILITIES-AGENCY-OVERVIEW-JANDA-V1 Folder/Document fonts/AdobeFnt22 1.lst",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "lst"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L03-CAPABILITIES-AGENCY-OVERVIEW-JANDA-V1 Folder/CAPABILITIES-AGENCY-OVERVIEW-JANDA-V1 Folder/Document fonts/AdobeFnt22.lst",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "lst"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L03-CAPABILITIES-AGENCY-OVERVIEW-JANDA-V1 Folder/CAPABILITIES-AGENCY-OVERVIEW-JANDA-V1 Folder/Document fonts/Helvetica 1.ttc",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "ttc"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L03-CAPABILITIES-AGENCY-OVERVIEW-JANDA-V1 Folder/CAPABILITIES-AGENCY-OVERVIEW-JANDA-V1 Folder/Document fonts/Helvetica.ttc",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "ttc"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L04-CAPABILITIES-LOGODESIGN-JANDA-V1 Folder/CAPABILITIES-LOGODESIGN-JANDA-V1 Folder/CAPABILITIES-LOGODESIGN-JANDA-V1 1.idml",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "idml"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L04-CAPABILITIES-LOGODESIGN-JANDA-V1 Folder/CAPABILITIES-LOGODESIGN-JANDA-V1 Folder/CAPABILITIES-LOGODESIGN-JANDA-V1 1.indd",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "indd"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L04-CAPABILITIES-LOGODESIGN-JANDA-V1 Folder/CAPABILITIES-LOGODESIGN-JANDA-V1 Folder/CAPABILITIES-LOGODESIGN-JANDA-V1.idml",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "idml"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L04-CAPABILITIES-LOGODESIGN-JANDA-V1 Folder/CAPABILITIES-LOGODESIGN-JANDA-V1 Folder/CAPABILITIES-LOGODESIGN-JANDA-V1.indd",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "indd"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L05-CAPABILITIES-PRINT-JANDA-V1 Folder/CAPABILITIES-PRINT-JANDA-V1 Folder/CAPABILITIES-PRINT-JANDA-V1 1.idml",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "idml"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L05-CAPABILITIES-PRINT-JANDA-V1 Folder/CAPABILITIES-PRINT-JANDA-V1 Folder/CAPABILITIES-PRINT-JANDA-V1 1.indd",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "indd"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L05-CAPABILITIES-PRINT-JANDA-V1 Folder/CAPABILITIES-PRINT-JANDA-V1 Folder/CAPABILITIES-PRINT-JANDA-V1.idml",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "idml"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L05-CAPABILITIES-PRINT-JANDA-V1 Folder/CAPABILITIES-PRINT-JANDA-V1 Folder/CAPABILITIES-PRINT-JANDA-V1.indd",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "indd"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L06-CAPABILITIES-WEBSITE-JANDA-V1 Folder/CAPABILITIES-WEBSITE-JANDA-V1 Folder/CAPABILITIES-WEBSITE-JANDA-V1 1.idml",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "idml"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L06-CAPABILITIES-WEBSITE-JANDA-V1 Folder/CAPABILITIES-WEBSITE-JANDA-V1 Folder/CAPABILITIES-WEBSITE-JANDA-V1 1.indd",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "indd"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L06-CAPABILITIES-WEBSITE-JANDA-V1 Folder/CAPABILITIES-WEBSITE-JANDA-V1 Folder/CAPABILITIES-WEBSITE-JANDA-V1.idml",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "idml"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L06-CAPABILITIES-WEBSITE-JANDA-V1 Folder/CAPABILITIES-WEBSITE-JANDA-V1 Folder/CAPABILITIES-WEBSITE-JANDA-V1.indd",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "indd"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L07-CAPABILITIES-GENERIC-JANDA-V1 Folder/CAPABILITIES-GENERIC-JANDA-V1 Folder/CAPABILITIES-GENERIC-JANDA-V1 1.idml",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "idml"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L07-CAPABILITIES-GENERIC-JANDA-V1 Folder/CAPABILITIES-GENERIC-JANDA-V1 Folder/CAPABILITIES-GENERIC-JANDA-V1 1.indd",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "indd"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L07-CAPABILITIES-GENERIC-JANDA-V1 Folder/CAPABILITIES-GENERIC-JANDA-V1 Folder/CAPABILITIES-GENERIC-JANDA-V1.idml",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "idml"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L07-CAPABILITIES-GENERIC-JANDA-V1 Folder/CAPABILITIES-GENERIC-JANDA-V1 Folder/CAPABILITIES-GENERIC-JANDA-V1.indd",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "indd"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L08-CASESTUDY-TROPOLIS-JANDA-V1 Folder/CASESTUDY-TROPOLIS-JANDA-V1 Folder/CASESTUDY-TROPOLIS-JANDA-V1 1.idml",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "idml"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L08-CASESTUDY-TROPOLIS-JANDA-V1 Folder/CASESTUDY-TROPOLIS-JANDA-V1 Folder/CASESTUDY-TROPOLIS-JANDA-V1 1.indd",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "indd"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L08-CASESTUDY-TROPOLIS-JANDA-V1 Folder/CASESTUDY-TROPOLIS-JANDA-V1 Folder/CASESTUDY-TROPOLIS-JANDA-V1.idml",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "idml"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L08-CASESTUDY-TROPOLIS-JANDA-V1 Folder/CASESTUDY-TROPOLIS-JANDA-V1 Folder/CASESTUDY-TROPOLIS-JANDA-V1.indd",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "indd"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L08-CASESTUDY-TROPOLIS-JANDA-V1 Folder/CASESTUDY-TROPOLIS-JANDA-V1 Folder/Links/TROPOLIS-GAMES 1.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L08-CASESTUDY-TROPOLIS-JANDA-V1 Folder/CASESTUDY-TROPOLIS-JANDA-V1 Folder/Links/TROPOLIS-GAMES.png",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "png"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L08-CASESTUDY-TROPOLIS-JANDA-V1 Folder/CASESTUDY-TROPOLIS-JANDA-V1 Folder/Links/mainpromo-tropolis-30002 1.jpg",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "jpg"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L08-CASESTUDY-TROPOLIS-JANDA-V1 Folder/CASESTUDY-TROPOLIS-JANDA-V1 Folder/Links/mainpromo-tropolis-30002.jpg",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "jpg"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L08-CASESTUDY-TROPOLIS-JANDA-V1 Folder/CASESTUDY-TROPOLIS-JANDA-V1 Folder/Links/sketchbook1-tropolis-2 1.jpg",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "jpg"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L08-CASESTUDY-TROPOLIS-JANDA-V1 Folder/CASESTUDY-TROPOLIS-JANDA-V1 Folder/Links/sketchbook1-tropolis-2.jpg",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "jpg"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L08-CASESTUDY-TROPOLIS-JANDA-V1 Folder/CASESTUDY-TROPOLIS-JANDA-V1 Folder/Links/sketching-tropolis-large 1.jpg",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "jpg"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L08-CASESTUDY-TROPOLIS-JANDA-V1 Folder/CASESTUDY-TROPOLIS-JANDA-V1 Folder/Links/sketching-tropolis-large.jpg",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "jpg"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L08-CASESTUDY-TROPOLIS-JANDA-V1 Folder/CASESTUDY-TROPOLIS-JANDA-V1 Folder/Links/tropolis-dividers-1 1.jpg",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "jpg"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L08-CASESTUDY-TROPOLIS-JANDA-V1 Folder/CASESTUDY-TROPOLIS-JANDA-V1 Folder/Links/tropolis-dividers-1.jpg",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "jpg"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L08-CASESTUDY-TROPOLIS-JANDA-V1 Folder/CASESTUDY-TROPOLIS-JANDA-V1 Folder/Links/tropolis-dividers-2 1.jpg",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "jpg"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L08-CASESTUDY-TROPOLIS-JANDA-V1 Folder/CASESTUDY-TROPOLIS-JANDA-V1 Folder/Links/tropolis-dividers-2.jpg",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "jpg"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L08-CASESTUDY-TROPOLIS-JANDA-V1 Folder/CASESTUDY-TROPOLIS-JANDA-V1 Folder/Links/tropolis-site- 1.jpg",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "jpg"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L08-CASESTUDY-TROPOLIS-JANDA-V1 Folder/CASESTUDY-TROPOLIS-JANDA-V1 Folder/Links/tropolis-site-.jpg",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "jpg"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L08-CASESTUDY-TROPOLIS-JANDA-V1 Folder/CASESTUDY-TROPOLIS-JANDA-V1 Folder/Links/tropolis-skewed 1.jpg",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "jpg"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L08-CASESTUDY-TROPOLIS-JANDA-V1 Folder/CASESTUDY-TROPOLIS-JANDA-V1 Folder/Links/tropolis-skewed.jpg",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "jpg"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L09-CASESTUDY-GENERIC-JANDA-V1 Folder/CASESTUDY-GENERIC-JANDA-V1 Folder/CASESTUDY-GENERIC-JANDA-V1 1.idml",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "idml"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L09-CASESTUDY-GENERIC-JANDA-V1 Folder/CASESTUDY-GENERIC-JANDA-V1 Folder/CASESTUDY-GENERIC-JANDA-V1 1.indd",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "indd"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L09-CASESTUDY-GENERIC-JANDA-V1 Folder/CASESTUDY-GENERIC-JANDA-V1 Folder/CASESTUDY-GENERIC-JANDA-V1.idml",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "idml"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/2 Selling Creative Services/Module 03- Capabilities Decks/M03L09-CASESTUDY-GENERIC-JANDA-V1 Folder/CASESTUDY-GENERIC-JANDA-V1 Folder/CASESTUDY-GENERIC-JANDA-V1.indd",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "indd"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 03- Project Execution Strategies/PROJ-M03L02-Competitive Research.xlsx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "xlsx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-IDENTITY-JANDA-V1 Folder/DELIVERY-IDENTITY-JANDA-V1 Folder/DELIVERY-IDENTITY-JANDA-V1 1.idml",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "idml"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-IDENTITY-JANDA-V1 Folder/DELIVERY-IDENTITY-JANDA-V1 Folder/DELIVERY-IDENTITY-JANDA-V1 1.indd",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "indd"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-IDENTITY-JANDA-V1 Folder/DELIVERY-IDENTITY-JANDA-V1 Folder/DELIVERY-IDENTITY-JANDA-V1.idml",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "idml"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-IDENTITY-JANDA-V1 Folder/DELIVERY-IDENTITY-JANDA-V1 Folder/DELIVERY-IDENTITY-JANDA-V1.indd",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "indd"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-IDENTITY-JANDA-V1 Folder/DELIVERY-IDENTITY-JANDA-V1 Folder/Links/UX-JANDA-M04L03.002 2 1.jpeg",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "jpeg"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-IDENTITY-JANDA-V1 Folder/DELIVERY-IDENTITY-JANDA-V1 Folder/Links/UX-JANDA-M04L03.002 2.jpeg",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "jpeg"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-IDENTITY-JANDA-V1 Folder/DELIVERY-IDENTITY-JANDA-V1 Folder/Links/logo-r1v1a 1.ai",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "ai"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-IDENTITY-JANDA-V1 Folder/DELIVERY-IDENTITY-JANDA-V1 Folder/Links/logo-r1v1a-application 1.psd",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "psd"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-IDENTITY-JANDA-V1 Folder/DELIVERY-IDENTITY-JANDA-V1 Folder/Links/logo-r1v1a-application.psd",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "psd"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-IDENTITY-JANDA-V1 Folder/DELIVERY-IDENTITY-JANDA-V1 Folder/Links/logo-r1v1a.ai",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "ai"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-IDENTITY-JANDA-V1 Folder/DELIVERY-IDENTITY-JANDA-V1 Folder/Links/logo-r1v2a 1.ai",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "ai"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-IDENTITY-JANDA-V1 Folder/DELIVERY-IDENTITY-JANDA-V1 Folder/Links/logo-r1v2a-application 1.psd",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "psd"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-IDENTITY-JANDA-V1 Folder/DELIVERY-IDENTITY-JANDA-V1 Folder/Links/logo-r1v2a-application.psd",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "psd"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-IDENTITY-JANDA-V1 Folder/DELIVERY-IDENTITY-JANDA-V1 Folder/Links/logo-r1v2a.ai",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "ai"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-IDENTITY-JANDA-V1 Folder/DELIVERY-IDENTITY-JANDA-V1 Folder/Links/logo-r1v3c 1.ai",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "ai"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-IDENTITY-JANDA-V1 Folder/DELIVERY-IDENTITY-JANDA-V1 Folder/Links/logo-r1v3c-application 1.psd",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "psd"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-IDENTITY-JANDA-V1 Folder/DELIVERY-IDENTITY-JANDA-V1 Folder/Links/logo-r1v3c-application.psd",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "psd"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-IDENTITY-JANDA-V1 Folder/DELIVERY-IDENTITY-JANDA-V1 Folder/Links/logo-r1v3c.ai",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "ai"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-IDENTITY-JANDA-V1 Folder/DELIVERY-IDENTITY-JANDA-V1 Folder/Links/logo-r4v1a 1.ai",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "ai"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-IDENTITY-JANDA-V1 Folder/DELIVERY-IDENTITY-JANDA-V1 Folder/Links/logo-r4v1a.ai",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "ai"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-IDENTITY-JANDA-V1 Folder/DELIVERY-IDENTITY-JANDA-V1 Folder/Links/logo-r4v1b-application4 1.psd",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "psd"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-IDENTITY-JANDA-V1 Folder/DELIVERY-IDENTITY-JANDA-V1 Folder/Links/logo-r4v1b-application4.psd",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "psd"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-IDENTITY-JANDA-V1 Folder/DELIVERY-IDENTITY-JANDA-V1 Folder/Links/nai-colorstory-r1v1 1.jpg",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "jpg"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-IDENTITY-JANDA-V1 Folder/DELIVERY-IDENTITY-JANDA-V1 Folder/Links/nai-colorstory-r1v1.jpg",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "jpg"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-PRINT-JANDA-V1 Folder/DELIVERY-PRINT-JANDA-V1 Folder/DELIVERY-PRINT-JANDA-V1 1.idml",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "idml"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-PRINT-JANDA-V1 Folder/DELIVERY-PRINT-JANDA-V1 Folder/DELIVERY-PRINT-JANDA-V1 1.indd",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "indd"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-PRINT-JANDA-V1 Folder/DELIVERY-PRINT-JANDA-V1 Folder/DELIVERY-PRINT-JANDA-V1.idml",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "idml"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-PRINT-JANDA-V1 Folder/DELIVERY-PRINT-JANDA-V1 Folder/DELIVERY-PRINT-JANDA-V1.indd",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "indd"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-PRINT-JANDA-V1 Folder/DELIVERY-PRINT-JANDA-V1 Folder/Links/comp_1 1.psd",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "psd"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-PRINT-JANDA-V1 Folder/DELIVERY-PRINT-JANDA-V1 Folder/Links/comp_1.psd",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "psd"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-PRINT-JANDA-V1 Folder/DELIVERY-PRINT-JANDA-V1 Folder/Links/comp_2 1.psd",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "psd"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-PRINT-JANDA-V1 Folder/DELIVERY-PRINT-JANDA-V1 Folder/Links/comp_2.psd",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "psd"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-PRINT-JANDA-V1 Folder/DELIVERY-PRINT-JANDA-V1 Folder/Links/comp_3 1.psd",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "psd"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-PRINT-JANDA-V1 Folder/DELIVERY-PRINT-JANDA-V1 Folder/Links/comp_3.psd",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "psd"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-PRINT-JANDA-V1 Folder/DELIVERY-PRINT-JANDA-V1 Folder/Links/comp_4 1.psd",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "psd"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-PRINT-JANDA-V1 Folder/DELIVERY-PRINT-JANDA-V1 Folder/Links/comp_4.psd",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "psd"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-PRINT-JANDA-V1 Folder/DELIVERY-PRINT-JANDA-V1 Folder/Links/zwick_kitcover_1a 1.ai",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "ai"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-PRINT-JANDA-V1 Folder/DELIVERY-PRINT-JANDA-V1 Folder/Links/zwick_kitcover_1a.ai",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "ai"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-PRINT-JANDA-V1 Folder/DELIVERY-PRINT-JANDA-V1 Folder/Links/zwick_kitcover_1b 1.ai",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "ai"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-PRINT-JANDA-V1 Folder/DELIVERY-PRINT-JANDA-V1 Folder/Links/zwick_kitcover_1b.ai",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "ai"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-PRINT-JANDA-V1 Folder/DELIVERY-PRINT-JANDA-V1 Folder/Links/zwick_kitcover_1c 1.ai",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "ai"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-PRINT-JANDA-V1 Folder/DELIVERY-PRINT-JANDA-V1 Folder/Links/zwick_kitcover_1c.ai",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "ai"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-PRINT-JANDA-V1 Folder/DELIVERY-PRINT-JANDA-V1 Folder/Links/zwick_kitcover_1e 1.ai",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "ai"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-PRINT-JANDA-V1 Folder/DELIVERY-PRINT-JANDA-V1 Folder/Links/zwick_kitcover_1e.ai",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "ai"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-WEBSITE-JANDA-V1 Folder/DELIVERY-WEBSITE-JANDA-V1 Folder/DELIVERY-WEBSITE-JANDA-V1 1.idml",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "idml"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-WEBSITE-JANDA-V1 Folder/DELIVERY-WEBSITE-JANDA-V1 Folder/DELIVERY-WEBSITE-JANDA-V1 1.indd",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "indd"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-WEBSITE-JANDA-V1 Folder/DELIVERY-WEBSITE-JANDA-V1 Folder/DELIVERY-WEBSITE-JANDA-V1.idml",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "idml"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-WEBSITE-JANDA-V1 Folder/DELIVERY-WEBSITE-JANDA-V1 Folder/DELIVERY-WEBSITE-JANDA-V1.indd",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "indd"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-WEBSITE-JANDA-V1 Folder/DELIVERY-WEBSITE-JANDA-V1 Folder/Document fonts/AdobeFnt22 1.lst",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "lst"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-WEBSITE-JANDA-V1 Folder/DELIVERY-WEBSITE-JANDA-V1 Folder/Document fonts/AdobeFnt22.lst",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "lst"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-WEBSITE-JANDA-V1 Folder/DELIVERY-WEBSITE-JANDA-V1 Folder/Document fonts/Helvetica 1.ttc",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "ttc"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-WEBSITE-JANDA-V1 Folder/DELIVERY-WEBSITE-JANDA-V1 Folder/Document fonts/Helvetica.ttc",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "ttc"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-WEBSITE-JANDA-V1 Folder/DELIVERY-WEBSITE-JANDA-V1 Folder/Links/UX-JANDA-M04L03.001 1.jpeg",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "jpeg"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-WEBSITE-JANDA-V1 Folder/DELIVERY-WEBSITE-JANDA-V1 Folder/Links/UX-JANDA-M04L03.001.jpeg",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "jpeg"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-WEBSITE-JANDA-V1 Folder/DELIVERY-WEBSITE-JANDA-V1 Folder/Links/faircom-home-r1v1 1.jpg",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "jpg"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-WEBSITE-JANDA-V1 Folder/DELIVERY-WEBSITE-JANDA-V1 Folder/Links/faircom-home-r1v1.jpg",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "jpg"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-WEBSITE-JANDA-V1 Folder/DELIVERY-WEBSITE-JANDA-V1 Folder/Links/faircom-home-r1v2 1.jpg",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "jpg"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-WEBSITE-JANDA-V1 Folder/DELIVERY-WEBSITE-JANDA-V1 Folder/Links/faircom-home-r1v2.jpg",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "jpg"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-WEBSITE-JANDA-V1 Folder/DELIVERY-WEBSITE-JANDA-V1 Folder/Links/faircom-home-r1v3 1.jpg",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "jpg"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-WEBSITE-JANDA-V1 Folder/DELIVERY-WEBSITE-JANDA-V1 Folder/Links/faircom-home-r1v3.jpg",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "jpg"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-WEBSITE-JANDA-V1 Folder/DELIVERY-WEBSITE-JANDA-V1 Folder/Links/faircom-moodboard-r1v1 1.psd",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "psd"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-WEBSITE-JANDA-V1 Folder/DELIVERY-WEBSITE-JANDA-V1 Folder/Links/faircom-moodboard-r1v1.psd",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "psd"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-WEBSITE-JANDA-V1 Folder/DELIVERY-WEBSITE-JANDA-V1 Folder/Links/faircom-moodboard-r1v2 1.psd",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "psd"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-WEBSITE-JANDA-V1 Folder/DELIVERY-WEBSITE-JANDA-V1 Folder/Links/faircom-moodboard-r1v2.psd",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "psd"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-WEBSITE-JANDA-V1 Folder/DELIVERY-WEBSITE-JANDA-V1 Folder/Links/faircom-site-mocks-1A 1.jpg",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "jpg"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-WEBSITE-JANDA-V1 Folder/DELIVERY-WEBSITE-JANDA-V1 Folder/Links/faircom-site-mocks-1A.jpg",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "jpg"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-WEBSITE-JANDA-V1 Folder/DELIVERY-WEBSITE-JANDA-V1 Folder/Links/faircom-site-mocks-2A 1.jpg",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "jpg"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-WEBSITE-JANDA-V1 Folder/DELIVERY-WEBSITE-JANDA-V1 Folder/Links/faircom-site-mocks-2A.jpg",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "jpg"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-WEBSITE-JANDA-V1 Folder/DELIVERY-WEBSITE-JANDA-V1 Folder/Links/faircom-site-mocks-3A 1.jpg",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "jpg"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/5 Project Management for Creatives/Module 05- Milestone Deliveries/DELIVERY-WEBSITE-JANDA-V1 Folder/DELIVERY-WEBSITE-JANDA-V1 Folder/Links/faircom-site-mocks-3A.jpg",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "jpg"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/6 Managing a Creative Business/Module 02- Tracking Data/BUS-M02L02-Revenue vs Expense.xlsx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "xlsx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/6 Managing a Creative Business/Module 02- Tracking Data/BUS-M02L03-Proposal Tracker.xlsx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "xlsx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/6 Managing a Creative Business/Module 02- Tracking Data/BUS-M02L04-Business Insights Worksheet 1.indd",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "indd"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/6 Managing a Creative Business/Module 02- Tracking Data/BUS-M02L04-Business Insights Worksheet.indd",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "indd"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/6 Managing a Creative Business/Module 02- Tracking Data/BUS-M02L04-Tracking Sales Efforts.xlsx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "xlsx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/6 Managing a Creative Business/Module 03- Financial Management/BUS-M03L03-Invoice Scheduling (Example).xlsx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "xlsx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/6 Managing a Creative Business/Module 03- Financial Management/BUS-M03L03-Invoice Scheduling.xlsx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "xlsx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/6 Managing a Creative Business/Module 03- Financial Management/BUS-M03L04-Next Worry Date.xlsx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "xlsx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/6 Managing a Creative Business/Module 04- Growing Your Agency/BUS-M04L02-Employment Offer Letter.indd",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "indd"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/6 Managing a Creative Business/Module 04- Growing Your Agency/BUS-M04L03-Employment Agreement (Simple).indd",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "indd"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/6 Managing a Creative Business/Module 04- Growing Your Agency/BUS-M04L05-Employment Termination Letter.indd",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "indd"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Educational Material/[Michael Janda] The Ultimate Freelance Course by Michael Janda/6 Managing a Creative Business/Module 04- Growing Your Agency/BUS-M04L06-Employment Layoff Letter.indd",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "indd"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Financial/Break Even Calculator.xlsx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "xlsx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Financial/CVP-Analysis-Template.xlsx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "xlsx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Financial/Calculations - Magdalena M.numbers",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "numbers"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Financial/ChallengeJP-Cash-Flow-Forecast-Template.xlsx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "xlsx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Financial/Copy of 1 year Financials(2).xls",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "xls"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Financial/Copy of 1 year Financials.xls",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "xls"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Financial/IC-12-Month-Cash-Flow-Forecast-9026.xlsx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "xlsx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Financial/IC-Balance-Sheet-Template-9026.xlsx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "xlsx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Financial/IC-Business-Planning-Schedule-Template-9026.xlsx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "xlsx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Financial/IC-Marketing-Plan-Template-9026.xlsx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "xlsx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Financial/IC-Sales-Forecast-Template-9026.xlsx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "xlsx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Financial/IC-Scope-of-Work-Template-8719.xlsx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "xlsx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Financial/IC-Startup-Financial-Projections-9026.xlsx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "xlsx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Financial/Runway and Cash Budget Tool by Foresight.xlsx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "xlsx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Financial/SCORE_Financial_Projections_Spreadsheet_Feb2020.xlsx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "xlsx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Financial/SaaSFinancialPlan2.0.xlsx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "xlsx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Financial/Start-Up-Loans-Master-Business-Templates-April-2021.xlsx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "xlsx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Financial/Start-Up-Programme-Finance-Workbook-January-2013.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Financial/cashflow-forecast-template.xls",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "xls"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Financial/financial-projections-template-13.xlsx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "xlsx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Financial/overheads.xlsx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "xlsx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Financial/reader-budget-spreadsheet.xlsx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "xlsx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Financial/sales-forecast.xlsx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "xlsx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Marketing funnels.xlsx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "xlsx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/Product-Marketing-Kit-HubSpot.zip",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "zip"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Billing.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Creative brief.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/First time with client meeting.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Frameworks/Scoping:estimating framework.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Freelancing/Creative brief.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Freelancing/Design Proposal.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Freelancing/FIRST MEETING.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Freelancing/FREELANCING.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Freelancing/First time with client meeting.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Freelancing/Freelance traits.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Freelancing/Q&A client.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Freelancing.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/GOALS.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/How to become more valuable.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Ikigai.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Invoice.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Legal/Term Contract tipps.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Legal/terms.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/MAKING and breaking the grid.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Market research.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Marketing/1st Clients.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Marketing/Content Marketing ideas.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Marketing/DIGITAL MARKETING theoretical.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Marketing/Email Marketing.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Marketing/Marketing.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Meaningful member expereience business modell.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Mission & vision statement.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Price negotiation/Price negotiations.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Pricing/Pricing strategy.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Pricing/Project specific price factoring.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Proposal.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Questions business.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/RISK management.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Strategic Tools.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/The-RFP-_-RFQ-Template-Canny.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/The-Rebranding-Brief-Canny.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/Value Proposition.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/BP 2017-18 Tri 2_Off_The_Beaten_Track.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/Business Plan Marking Sheet and Structure.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/Business plan blueprint.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/IC-Startup-Business-Plan-Template-9026_WORD.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/Koan21 business plan.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/SCORE-Deluxe-Startup-Business-Plan-Template_2.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/Sample Business Plan - Wooden Grain Toy Company(1).doc",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "doc"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/Sample Business Plan - Wooden Grain Toy Company.doc",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "doc"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/Sample Lean Business Plan - Wooden Grain Toy Company(1).doc",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "doc"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/Sample Lean Business Plan - Wooden Grain Toy Company.doc",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "doc"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/busines plan case studies/Starting a new business/Business Plan Marking Sheet and Structure.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/funds/The_Start_Up_Loans_Company_Business_Plan_template_Nov-2020-002_CE-version.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/docs/market research2.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/pdf/Templates/legal file/Transfer of Copyright/The Logo Smith Transfer of Copyright.idml",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "idml"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/pdf/Templates/legal file/Transfer of Copyright/The Logo Smith Transfer of Copyright.indd",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "indd"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/pdf/Templates/legal file/Transfer of Copyright/~the logo smith tra~mx9uwx.idlk",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "idlk"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/ppt/Starting a new business/BMC Template - powerpoint 1.pptx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "pptx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/ppt/Starting a new business/BMC Template - powerpoint.pptx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "pptx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/ppt/Starting a new business/Week 2 Introductions and Finding Your Idea-20210116.zip",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "zip"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/ppt/Starting a new business/Week 5 BMC (2).pptx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "pptx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/ppt/Starting a new business/Week 8.pptx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "pptx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/ppt/Starting a new business/Week 9.ppt",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "ppt"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/ppt/Starting a new business/week 10 slides.ppt",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "ppt"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/ppt/Starting a new business/week 11.ppt",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "ppt"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/ppt/Starting a new business/week 12 legal status and business plan top tips.ppt",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "ppt"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/pricing/4 Pricing Creative Services/Module 01- Pricing Fundamentals/M01L03-Hourly Burn Rate (Part-time).xlsx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "xlsx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/pricing/4 Pricing Creative Services/Module 01- Pricing Fundamentals/M01L04-Hourly Burn Rate (Full-time).xlsx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "xlsx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/pricing/4 Pricing Creative Services/Module 01- Pricing Fundamentals/M01L05-Hourly Burn Rate (Agency).xlsx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "xlsx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/pricing/4 Pricing Creative Services/Module 02- Pricing Structures/M02L02-Billable-Hourly Rate Calculator.xlsx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "xlsx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/pricing/4 Pricing Creative Services/Module 03- Price Master System/M03L02-Price Master Identity.xlsx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "xlsx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/pricing/4 Pricing Creative Services/Module 03- Price Master System/M03L03-Price Master Print.xlsx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "xlsx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/pricing/4 Pricing Creative Services/Module 03- Price Master System/M03L04-Price Master Digital.xlsx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "xlsx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 4 Business/business-notes/pricing/BrandIdentityInfoGraphics.jpg",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "jpg"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 5 Personal Practice/hustle/50-Cracking-Tools-All-The-Tools-You-Need-To-Crack.rar",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "rar"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 5 Personal Practice/hustle/Refund Bible 2023\ud83e\uddd1\ud83c\udffd\u200d\ud83d\udcbb/DoorDash-UberEats Refund Sauce\ud83c\udf5f/\ud83c\udd7f",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": ""
+    },
+    {
+      "rel": "journals_notes/DOMAIN 5 Personal Practice/hustle/Refund Bible 2023\ud83e\uddd1\ud83c\udffd\u200d\ud83d\udcbb/Goat Refund Method \ud83d\udc5f/Goat Sauce",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": ""
+    },
+    {
+      "rel": "journals_notes/DOMAIN 5 Personal Practice/hustle/Refund Bible 2023\ud83e\uddd1\ud83c\udffd\u200d\ud83d\udcbb/Nike Refund Sauce/Best Nike Refund Method 2023.txt",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "txt"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 5 Personal Practice/hustle/Refund Bible 2023\ud83e\uddd1\ud83c\udffd\u200d\ud83d\udcbb/StockX Refund Method \ud83d\udc56/Stockx Method 2022.docx",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": "docx"
+    },
+    {
+      "rel": "journals_notes/DOMAIN 5 Personal Practice/hustle/Refund Bible 2023\ud83e\uddd1\ud83c\udffd\u200d\ud83d\udcbb/Walmart Refund Sauce \ud83d\udcb2/\ud83c\udd7f",
+      "decision": "refused_container_no_stage_reads_it",
+      "kind": ""
+    }
+  ],
+  "worklist_in_full": 40,
   "rows": [
     {
       "path": "/Users/barn/Library/CloudStorage/Dropbox/education/books/epub/DOMAIN 2 Design/visual+fundamentals/Bierut, Michael; Rand, Paul Thoughts on design.epub",

@@ -650,6 +650,8 @@ extensions-delegate profile:                         # D-3060: the smallest exte
 
 admit-plan:
     python3 scripts/plan_admission.py --plan || [ $? -eq 2 ]   # BUG-863: rows waiting for the owner's word ARE the OWNER-OWED outcome, not a failed command - and it moves nothing
+admit-sign who *ARGS:                            # D-3072: THE OWNER'S WORD, AS ONE COMMAND. Declares the name ONCE (config/owner_identity.yaml) and pins the LIVE plan's ACTS (scope_sha256), not its bytes - so a re-derived plan with identical acts no longer voids it
+    python3 scripts/apply_admission.py --sign --as "{{who}}" {{ARGS}}
 admit-apply *ARGS:
     python3 scripts/apply_admission.py --apply {{ARGS}} || [ $? -eq 2 ]   # T-183/D-3068: THE ADMIT APPLIER'S ACT. Needs a SIGNED acceptance (governance/ADMISSION_ACCEPTED_<date>.yaml) that pins the plan's digest and names the rows in scope - without one it writes NOTHING and exits 2 (OWNER-OWED, loud, never fatal). PRINT the signature instead of typing it: `python3 scripts/apply_admission.py --template > governance/ADMISSION_ACCEPTED_<date>.yaml` (the LIVE digest is already in it), then `--dry-run` to price it, then `--limit N` for a first tranche. Crash-safe copy (C6), one receipt line per row, refuses an unexplained target, a changed source, a defective name and any path outside the corpus home. rc 2 = no signature yet (OWNER-OWED, loud, never fatal)
 placement:

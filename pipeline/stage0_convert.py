@@ -300,6 +300,13 @@ def apply_ingest_door(books: list[Path], books_dir: Path) -> list[Path]:
     #: names neither the door nor the collision, about a book whose bytes are fine. A deferral is NOT an admission
     #: and must say so: it is returned as a NAMED non-admission carrying its class, the work it collides with and
     #: the reason, so it lands on the summary line the applier keeps in its receipt.
+    #: SCOPE, AND WHY IT IS THE WHOLE DEFECT (measured 2026-10-17 18:05Z, 88 rows in 45 s, ZERO applied). The door's
+    #: deferral list is CORPUS-WIDE: it names every pair the corpus already holds (today 66, all of them an admitted
+    #: work's own container and the .md S0 wrote beside it). Handing that list back as this run's failures made EVERY
+    #: row exit 1 having converted nothing, and the applier quarantined each copy as `markdown absent`. A deferral is a
+    #: non-admission of THIS run only when the deferred file is one of THIS run's candidates; the rest is the door's
+    #: standing state, which the census reports and this reader must not restate (D-2942: one fact, one home).
+    candidate_paths = {str(book.resolve()) for book in books}
     named = [
         {
             "file": str(item.get("name") or Path(str(item.get("path", ""))).name),
@@ -314,6 +321,7 @@ def apply_ingest_door(books: list[Path], books_dir: Path) -> list[Path]:
             "source_path": str(item.get("path", "")),
         }
         for item in report["deferrals"]
+        if str(Path(str(item.get("path", ""))).resolve()) in candidate_paths
     ]
     return [book for book in books if str(book.resolve()) not in deferred], named
 

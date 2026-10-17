@@ -8,7 +8,7 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1203 decisions (census stamp 4ce7e84958e62cc8, 2026-10-17) · 667 bugs (240 open / 427 closed; highest OPEN = BUG-902) · 59 open tasks (MUST 12 / SHOULD 43 / WORTH 4; OWNER-moved 1, pipeline-moved 58; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1203 decisions (census stamp 4ce7e84958e62cc8, 2026-10-17) · 668 bugs (240 open / 428 closed; highest OPEN = BUG-902) · 59 open tasks (MUST 12 / SHOULD 43 / WORTH 4; OWNER-moved 1, pipeline-moved 58; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **79** of 1203 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 618 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1203, D-2987/BUG-765)
 >
@@ -17222,3 +17222,27 @@ in the same turn as a 439-row batch — a malformed capability entry produces NE
 resolution) and the batch's receipt would then be written under a graph nobody had validated. Sequence it AFTER the
 batch, together with BUG-901, and re-measure the ceiling at that point. This entry exists so the red line is a
 REGISTERED fact with a number and a cause, not a silence.
+
+### BUG-903 (HIGH — FIXED 2026-10-17) — MY OWN DEFERRAL CHANGE MADE EVERY ROW FAIL, AND THE RUN WAS STOPPED IN 45 s
+
+Found and stopped by measurement, not by luck. The `deferred_for_identity` class added hours earlier (BUG-898
+addendum) returned EVERY corpus-wide deferral as this run's non-admission. The door's deferral list is not scoped to
+the candidate: it names every pair the corpus already holds — 66 of them, each one an admitted work's own container
+and the `.md` S0 wrote beside it (BUG-901). So on each of the 439 rows S0 was handed 66 failures it had never
+attempted, exited 1 having converted nothing, and the applier quarantined the copy as `markdown absent`.
+
+RECEIPT (governance/evidence/ADMISSION_APPLIED_20261017T155744Z.jsonl): **88 rows failed, 0 applied, in 45 seconds** —
+a failure rate and a failure SPEED that no conversion could produce, which is what made it visible immediately. The
+run was stopped with SIGINT and nothing was admitted, so no work entered the corpus under a wrong verdict.
+
+THE REPAIR IS A SCOPE, NOT A SUPPRESSION: a deferral is this run's non-admission ONLY when the deferred path is one
+of THIS run's candidates (`candidate_paths`). The corpus-wide list is the door's STANDING state, reported by the
+census and never restated by the converter (D-2942, one fact one home). Three known-answer controls, all green:
+a not-deferred candidate yields 1 convertible / 0 named; a really deferred candidate yields 0 / 1 with the declared
+class; and a byte-identical copy of an existing work is deferred as `byte_identical` — which is the door working.
+
+WHAT THIS ENTRY IS FOR. The defect was introduced by a change made in the same session that fixed its sibling, in a
+file whose failure mode is "quarantine the wrong books quietly". It was caught because the run was launched WITH a
+log and READ 45 seconds later, not because a test caught it — `stage0_convert.py` has NO selftest for the door's
+return shape. Registered as the missing instrument: the door's two return values and their candidate-scoping deserve
+a known-answer control in the same class as the other rails, and that is the next task on this file.

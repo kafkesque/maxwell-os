@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**239 open** / 427 closed of 666 ids.
+**240 open** / 427 closed of 667 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -246,3 +246,4 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-899 | (MED — OPEN 2026-10-17) — `--book` CAN SILENTLY SKIP A WORK WHOSE NAME IT HAS SEEN BEFORE | 1 |
 | BUG-900 | (MED — OPEN 2026-10-17) — A BOOK CAN PASS EVERY CONTAINER PROBE AND STILL BE UNCONVERTIBLE, AND THIS IS INVISIBLE TO `admit-alert` | 1 |
 | BUG-901 | (MED — OPEN 2026-10-17) — THE INGEST DOOR COUNTS A WORK'S OWN CONVERSION AS A DUPLICATE OF ITSELF | 2 |
+| BUG-902 | (MED — OPEN 2026-10-17) — THE ROUTE-GRAPH DEBT WAS OVER ITS SHRINK-ONLY CEILING BEFORE TODAY'S FINDINGS | 1 |

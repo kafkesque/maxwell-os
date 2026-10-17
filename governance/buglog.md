@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1203 decisions (census stamp 4ce7e84958e62cc8, 2026-10-17) · 666 bugs (239 open / 427 closed; highest OPEN = BUG-901) · 59 open tasks (MUST 12 / SHOULD 43 / WORTH 4; OWNER-moved 1, pipeline-moved 58; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1203 decisions (census stamp 4ce7e84958e62cc8, 2026-10-17) · 667 bugs (240 open / 427 closed; highest OPEN = BUG-902) · 59 open tasks (MUST 12 / SHOULD 43 / WORTH 4; OWNER-moved 1, pipeline-moved 58; 1 standing rule(s) never close).
 >
 > Decisions NEEDING ACTION: **79** of 1203 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 618 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1203, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 239 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 35 · 🟨 MED 73 · 🟩 LOW 26 · UNLABELLED 101 (BUG-757) of 239 open.
+> Open BUGS by severity (population = the census's 240 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 35 · 🟨 MED 74 · 🟩 LOW 26 · UNLABELLED 101 (BUG-757) of 240 open.
 >
 > **OWNER LANE (1) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -17196,3 +17196,29 @@ that exists; silence lets a reader believe identity is enforced twice when it is
 
 The first limb of BUG-901 is untouched by this: the door still counts a work's own `.md` as a duplicate of its
 container, and that count still grows by two per admitted book.
+### BUG-902 (MED — OPEN 2026-10-17) — THE ROUTE-GRAPH DEBT WAS OVER ITS SHRINK-ONLY CEILING BEFORE TODAY'S FINDINGS
+
+MEASURED 18:00Z: `resolve_route.py --check` reports **228 open bugs resolving to no declared capability against a
+declared ceiling of 222**. Three of the 228 are this sitting's BUG-899/900/901; the other three predate them, so the
+rail was ALREADY red when this session reached it — it had simply never been reached, because `just health` stops at
+its first non-zero line and this session's earlier reds were at lines 10 and 33 (BUG-573 in the smallest possible
+form: the ladder's prefix behaviour hid a red line further down).
+
+WHY THE CEILING CANNOT BE HONOURED BY DECLARATION. A bug is routed "by the artifacts it names" (D-3024), and the text
+read is the bug CENSUS title — which is the bug's FIRST heading. `dispositions.bugs.default` already declares the
+reason `bug_is_a_finding` for every unrouted bug, and that reason does NOT reduce the debt: `debt[cls]` counts every
+row whose category is not `routed`, dispositions included. The only ways to shrink it are to ROUTE an item or to edit
+a heading that is append-only history. Neither is available for a finding that names no artifact, which is why the
+counting rule and the ceiling now disagree by construction rather than by accident.
+
+ONE OF THE THREE IS FIXABLE AND NAMES A REAL GAP (D-3034). BUG-900 is about `scripts/container_alert.py` /
+`just admit-alert`, which is a capability this OS now USES on every health run (D-3075) and which
+`config/capability_registry.yaml` does not declare at all. So the alert is a declaration with no referent in the
+graph: it cannot be routed, cannot be refused, and cannot be checked by the same rail that checks every other
+instrument. Registering it is the correct first repair, and it shrinks the debt by one.
+
+DELIBERATELY NOT FIXED IN THIS SITTING: the capability registration was designed and rejected as too risky to land
+in the same turn as a 439-row batch — a malformed capability entry produces NEW faults (entrypoint/check/artifact
+resolution) and the batch's receipt would then be written under a graph nobody had validated. Sequence it AFTER the
+batch, together with BUG-901, and re-measure the ceiling at that point. This entry exists so the red line is a
+REGISTERED fact with a number and a cause, not a silence.

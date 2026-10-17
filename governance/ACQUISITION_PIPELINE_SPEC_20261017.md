@@ -264,3 +264,53 @@ was available.
 3. **The lawful-first ordering:** accept it, or is `annas` first because coverage matters more than exposure?
 4. **Does `open-slum.org` expose JSON?** If not, the mirror-health poll parses HTML and that parser is a declared
    debt from day one.
+
+---
+
+## 6. BUILT — 2026-10-17 (this lane is now code, not only a spec)
+
+**What exists.** `scripts/acquire.py` is the ONE entry point; `pipeline/acquisition/` holds four modules behind one
+protocol. `python3 scripts/acquire.py --selftest` is the control (31 checks).
+
+| act | command | what it does | writes |
+|---|---|---|---|
+| DETECT | `python3 scripts/acquire.py gap` | three declared classes; every unmeasured class NAMED (`NOT_MEASURED`) | nothing |
+| ASK | `python3 scripts/acquire.py map --census --limit 1` | worst measured starvation gap → ranked JSON manifest | `governance/evidence/ACQ_MANIFEST_*.json` |
+| ASK | `python3 scripts/acquire.py map --gap "colour theory"` | a named topic → same manifest shape | same |
+| LOCATE/FETCH | `python3 scripts/acquire.py fetch --manifest <json>` | lawful ladder only (OA → Gutenberg → Standard Ebooks) | **the INBOX pen only** |
+| LOCATE/FETCH | `python3 scripts/acquire.py fetch --manifest <json> --allow-shadow "<your word>"` | adds the LibGen rung | **the INBOX pen only** |
+| READ | `python3 scripts/acquire.py status` / `mirrors --refresh` | the lane's own state; which domains are VALIDATED today | cache + nothing |
+
+**Where a downloaded book goes — the whole point.** `pens.land: education_inbox` → resolved through
+`config/ingest_identity_gate.yaml#source_library.placement.pens` → `~/Library/CloudStorage/Dropbox/education/inbox`.
+**Directly into the inbox, no subfolder, never `knowledge pipeline/books`, never an `.md`, never a conversion.**
+A file that arrives damaged is moved to `knowledge pipeline/acquisition/quarantine/<stamp>/` and recorded as
+`refused_container_unreadable`, so the inbox the owner reads holds only what is worth reading.
+
+**The first real acquisition (proven, not claimed).** Gap `starvation:creative coding` → manifest of 10 ranked works
+→ fetch → landed in the inbox:
+`Sietske W. Kleibeuker; P. Cédric M. P. Koolschijn; Dietsje Jolles - The neural coding of creative idea generation
+across adolescence and early adulthood - 2013.pdf`, 1,149,690 B, sha256 `403e939a…`, licence_class `open_access`,
+probe `pdf` PASS, receipt `governance/evidence/ACQUISITION_20261017T191805Z.jsonl`, index row in
+`knowledge pipeline/acquisition/index.jsonl`.
+
+**Four rules that replaced versions which were WRONG in practice** (D-3079; each was measured, see BUG-908):
+1. the resolver answers in its own RELEVANCE order; the declared score ranks INSIDE that answer;
+2. `enabled` (build) and `requires_owner_word` (run) are two gates — collapsing them made `--allow-shadow` inert;
+3. a 200 is not liveness (a parked domain answers 200) and a 500 carries its reason — so mirrors are validated by
+   MARKER and refusals keep the body;
+4. one write path: adapters only LOCATE, the downloader names/probes/lands, and it cannot manufacture a name the
+   ingest door refuses (marker, spine, truncation patterns).
+
+**What is NOT built, stated so it cannot be mistaken for done.**
+- `primitive_absence` needs a readings file (`primitive_readings.jsonl` — query + cosine). The tau is declared
+  `DEFAULT_UNMEASURED`; the class reports `NOT_MEASURED` until a real calibration replaces it.
+- `claim_unsupported` reads `stage5_verify_report.jsonl` when it exists; today it reports `NOT_MEASURED`.
+- Anna's Archive: declared `unreachable_by_scraping` (DDoS-Guard JS challenge; one mirror is a parked domain).
+- Z-Library: declared `not_implemented` (needs a personal login this repository must not hold).
+- A local MCP wrapper (`maxwell_acq`) is a THIN layer over this CLI and is not built; `Adapter` is already the
+  protocol it would expose, so the work is a transport, not a rewrite (C21).
+- PaperQA2-class reading of what was fetched is Phase 4 and untouched.
+- **BUG-909 (OPEN):** every LibGen front answered `500 max_user_connections (current value: 300)` at 21:20–21:26 —
+  the one working shadow rung is a single point of failure. Remedy is an OWNER WORD: (a) an official Anna's API key,
+  (b) a second shadow source behind the same protocol, or (c) accept the named gap.

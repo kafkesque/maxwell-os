@@ -1,15 +1,15 @@
 {
   "schema_version": "1.0",
   "source_path": "config/decisions.yaml",
-  "source_sha256": "f64c5034f5e97a35494914b2f03c30a0205f9da86736402ec6bd89c602e1af2b",
+  "source_sha256": "155ffd9ac072dd1b90a7a7dfcc7be049a095fc16578dcf47763cb9fd6712da8b",
   "written_by": "scripts/recompute_decision_summary.py",
-  "decisions_sha256_16": "0d4d4b6dcd9569d6",
-  "total_decisions": 1205,
+  "decisions_sha256_16": "7bf531e366512e14",
+  "total_decisions": 1206,
   "summary": {
-    "total": 1205,
+    "total": 1206,
     "proposed": 26,
     "draft": 1,
-    "active": 620,
+    "active": 621,
     "stale": 0,
     "superseded": 16,
     "archived": 8,
@@ -22,6 +22,7 @@
     "revoked": 0,
     "abandoned": 0,
     "by_category": {
+      "ACQUISITION / DOWNLOADER v1 (the lane is BUILT, not merely specified)": 1,
       "ACQUISITION / KNOWLEDGE-GAP FILLING": 1,
       "ADMISSION / CONTAINER INTEGRITY": 1,
       "ADMISSION / THE ALERT": 1,

@@ -27797,3 +27797,46 @@ decisions:
     durable form is one local MCP Maxwell owns behind a protocol (C21), never a pinned dependency. Full spec:
     governance/ACQUISITION_PIPELINE_SPEC_20261017.md. NOT IMPLEMENTED and nothing may be until the owner words the
     shadow lane; Phase 0 (the gap record) and Phase 2 (one lawful adapter) need no such word.
+- id: D-3079
+  state: ACTIVE
+  date: 2026-10-17
+  by: assistant
+  category: ACQUISITION / DOWNLOADER v1 (the lane is BUILT, not merely specified)
+  supersedes: []
+  refines: [D-3078]
+  bugs: [BUG-908, BUG-909]
+  files: [config/acquisition.yaml, scripts/acquire.py, pipeline/acquisition/config.py, pipeline/acquisition/net.py,
+          pipeline/acquisition/resolvers.py, pipeline/acquisition/mirrors.py, pipeline/acquisition/adapters.py,
+          pipeline/acquisition/gaps.py, pipeline/acquisition/downloader.py, config/capability_registry.yaml]
+  decision: >-
+    THE DOWNLOADER EXISTS: FOUR ACTS, ONE ENTRY POINT, ONE WRITE PATH, AND FOUR RULES THAT WERE MEASURED RATHER THAN
+    ASSUMED. Built and proven live on 2026-10-17 — `scripts/acquire.py gap | map | fetch | status | mirrors`, with
+    `pipeline/acquisition/` holding gaps (DETECT, no network), resolvers (ASK), adapters (LOCATE) and downloader
+    (FETCH). D-3078 still governs WHAT it may do; this decision records HOW it was made to work, and each rule below
+    replaced a version that was wrong in practice:
+    (1) THE SEARCH ENGINE DECIDES RELEVANCE, THE DECLARED SCORE DECIDES READING ORDER. The first live map asked
+    OpenAlex for a topic sorted by citations and got 'Applications of hybrid organic-inorganic nanocomposites' as the
+    top answer to `creative coding`; 47 of 51 rows then died on the overlap filter. A resolver is asked in its OWN
+    relevance order (`openalex` relevance, `crossref` relevance, no `sort=` in either URL) and the weighted score in
+    config/acquisition.yaml#cartography.score ranks INSIDE that answer. Conflating the two produces the most-cited
+    work that merely mentions the words, which is the opposite of filling a gap.
+    (2) TWO GATES, TWO MEANINGS. `enabled` says the adapter is PART OF THE BUILD; `requires_owner_word` says a RUN
+    needs the owner's word. Collapsing them into one flag made `--allow-shadow "<word>"` INERT (measured: a ladder of
+    three lawful rungs on a run that carried the word) — a gate that looks closed twice is a gate nobody can open.
+    (3) A 200 IS NOT LIVENESS; A 500 CARRIES ITS REASON. `annas-archive.li` answered 200 with a parked-domain
+    for-sale page while `.org` had no DNS at all, so a mirror is used only after its body carries the family's MARKER
+    and a rejected domain is recorded WITH its reason. Conversely every LibGen front later answered 500 with
+    `max_user_connections (current value: 300)` — a saturated mirror, not a blocked client — so the refusal keeps the
+    body snippet. Neither fact may be encoded as a hardcoded domain list: the tracker is read, the candidate is
+    VALIDATED, the answer is cached for a declared TTL (D-3034).
+    (4) ONE WRITE PATH, AND IT ENDS IN THE INBOX. Every adapter only LOCATES (url, referer, licence_class); the
+    downloader is the only code that writes, it writes to a `.part` file in the pen and renames in place (C6), names
+    the file from the OWNER'S OWN template resolved through the name policy, PROBES the landed bytes with the door's
+    own probe, and quarantines a container that fails — so the acquirer cannot manufacture a file the door will
+    refuse, and a name that matches the door's marker/spine patterns is impossible by construction.
+    MEASURED RECEIPTS, same session: selftest 31/31 across 9 files; a REAL lawful fetch landed
+    `Sietske W. Kleibeuker; P. Cédric M. P. Koolschijn; Dietsje Jolles - The neural coding of creative idea generation
+    across adolescence and early adulthood - 2013.pdf` (1,149,690 B) directly in `education_inbox`, probed, indexed and
+    receipted; a shadow dry-run located a real `get.php` link before the mirror saturated (BUG-909). WHAT REMAINS OPEN
+    is a SOURCE problem, not a code problem: one working shadow rung is a single point of failure, and the remedy
+    (Annas API key, a second adapter behind the same protocol, or an accepted named gap) is an OWNER WORD.

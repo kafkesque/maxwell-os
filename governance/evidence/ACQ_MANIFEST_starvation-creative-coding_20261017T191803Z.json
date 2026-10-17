@@ -1,0 +1,373 @@
+{
+  "schema_version": "1.0",
+  "gen_model": "deterministic",
+  "pipeline_commit": "d70a2680d89010f8278f805a67c4e0310c423d70",
+  "generated": "2026-10-17T19:18:03Z",
+  "act": "reading_cartography",
+  "authority": "D-3078",
+  "gap": {
+    "gap_id": "starvation:creative coding",
+    "class": "discipline_starvation",
+    "discipline": "creative coding",
+    "tier": "CRITICAL",
+    "trigger": {
+      "golden_count": 5,
+      "golden_shortfall": 5,
+      "convergent_count": 3,
+      "convergent_shortfall": 17
+    },
+    "source": "governance/targeted_ingestion_plan.json"
+  },
+  "queries": [
+    "creative coding",
+    "creative coding handbook",
+    "creative coding foundations survey"
+  ],
+  "resolver_failures": [],
+  "candidates": [
+    {
+      "canonical_id": "doi:10.1145/3586183.3606719",
+      "title": "Spellburst: A Node-based Interface for Exploratory Creative Coding with Natural Language Prompts",
+      "authors": [
+        "Tyler Angert",
+        "Miroslav Suzara",
+        "Jenny Han",
+        "Christopher Pondoc",
+        "Hariharan Subramonyam"
+      ],
+      "year": 2023,
+      "venue": "ACM Symposium on User Interface Software and Technology (UIST)",
+      "kind": "conference-paper",
+      "cited_by": 72,
+      "oa_pdf": "https://dl.acm.org/doi/pdf/10.1145/3586183.3606719",
+      "landing": "https://doi.org/10.1145/3586183.3606719",
+      "licence_class": "open_access",
+      "resolved_by": [
+        "openalex"
+      ],
+      "score": 1.052,
+      "why_ranked": [
+        "citation=0.466(72)",
+        "recency=0.961(2023)",
+        "oa=yes",
+        "kind=conference-paper",
+        "query_overlap=1.00"
+      ]
+    },
+    {
+      "canonical_id": "doi:10.3389/fnhum.2013.00905",
+      "title": "The neural coding of creative idea generation across adolescence and early adulthood",
+      "authors": [
+        "Sietske W. Kleibeuker",
+        "P. Cédric M. P. Koolschijn",
+        "Dietsje Jolles",
+        "Carsten K. W. De Dreu",
+        "Eveline A. Crone"
+      ],
+      "year": 2013,
+      "venue": "Frontiers in Human Neuroscience",
+      "kind": "article",
+      "cited_by": 105,
+      "oa_pdf": "https://www.frontiersin.org/articles/10.3389/fnhum.2013.00905/pdf",
+      "landing": "https://doi.org/10.3389/fnhum.2013.00905",
+      "licence_class": "open_access",
+      "resolved_by": [
+        "openalex"
+      ],
+      "score": 1.0465,
+      "why_ranked": [
+        "citation=0.506(105)",
+        "recency=0.829(2013)",
+        "oa=yes",
+        "kind=article",
+        "query_overlap=1.00"
+      ]
+    },
+    {
+      "canonical_id": "doi:10.4324/9781003020714",
+      "title": "Routledge Handbook for Creative Futures",
+      "authors": [
+        "Alfonso A. Montuori",
+        "Gabrielle Donnelly"
+      ],
+      "year": 2022,
+      "venue": "Routledge eBooks",
+      "kind": "book",
+      "cited_by": 14,
+      "oa_pdf": "https://doras.dcu.ie/33131/3/Societies%20of%20the%20Possible.pdf",
+      "landing": "https://orcid.org/0000-0002-6029-6718>",
+      "licence_class": "open_access",
+      "resolved_by": [
+        "openalex"
+      ],
+      "score": 1.0256,
+      "why_ranked": [
+        "citation=0.294(14)",
+        "recency=0.947(2022)",
+        "oa=yes",
+        "kind=book",
+        "query_overlap=0.50"
+      ]
+    },
+    {
+      "canonical_id": "doi:10.1007/978-3-030-73770-2_16",
+      "title": "Creative Coding as Compost(ing)",
+      "authors": [
+        "Tomi Slotte Dufva"
+      ],
+      "year": 2021,
+      "venue": "Springer eBooks",
+      "kind": "book-chapter",
+      "cited_by": 9,
+      "oa_pdf": "https://link.springer.com/content/pdf/10.1007/978-3-030-73770-2_16.pdf",
+      "landing": "https://doi.org/10.1007/978-3-030-73770-2_16",
+      "licence_class": "open_access",
+      "resolved_by": [
+        "openalex"
+      ],
+      "score": 0.977,
+      "why_ranked": [
+        "citation=0.250(9)",
+        "recency=0.934(2021)",
+        "oa=yes",
+        "kind=book-chapter",
+        "query_overlap=1.00"
+      ]
+    },
+    {
+      "canonical_id": "doi:10.1109/access.2023.3243797",
+      "title": "Coding in Diffusion-Based Molecular Nanonetworks: A Comprehensive Survey",
+      "authors": [
+        "Pit Hofmann",
+        "Juan Alberto Cabrera",
+        "Riccardo Bassoli",
+        "Martin Reisslein B",
+        "Frank H. P. Fitzek"
+      ],
+      "year": 2023,
+      "venue": "IEEE Access",
+      "kind": "article",
+      "cited_by": 34,
+      "oa_pdf": "https://ieeexplore.ieee.org/ielx7/6287639/6514899/10041114.pdf",
+      "landing": "https://doi.org/10.1109/access.2023.3243797",
+      "licence_class": "open_access",
+      "resolved_by": [
+        "openalex"
+      ],
+      "score": 0.9722,
+      "why_ranked": [
+        "citation=0.386(34)",
+        "recency=0.961(2023)",
+        "oa=yes",
+        "kind=article",
+        "query_overlap=0.50"
+      ]
+    },
+    {
+      "canonical_id": "doi:10.1007/s10639-021-10873-w",
+      "title": "Evaluating young children’s creative coding: rubric development and testing for ScratchJr projects",
+      "authors": [
+        "Apittha Unahalekhaka",
+        "Marina Umaschi Bers"
+      ],
+      "year": 2022,
+      "venue": "Education and Information Technologies",
+      "kind": "article",
+      "cited_by": 23,
+      "oa_pdf": "https://link.springer.com/content/pdf/10.1007/s10639-021-10873-w.pdf",
+      "landing": "https://doi.org/10.1007/s10639-021-10873-w",
+      "licence_class": "open_access",
+      "resolved_by": [
+        "openalex"
+      ],
+      "score": 0.9266,
+      "why_ranked": [
+        "citation=0.345(23)",
+        "recency=0.947(2022)",
+        "oa=yes",
+        "kind=article",
+        "query_overlap=1.00"
+      ]
+    },
+    {
+      "canonical_id": "doi:10.1145/3544548.3580683",
+      "title": "A Study of Editor Features in a Creative Coding Classroom",
+      "authors": [
+        "Andrew Michael McNutt",
+        "Anton Outkine",
+        "Ravi Chugh"
+      ],
+      "year": 2023,
+      "venue": "CHI Conference on Human Factors in Computing Systems",
+      "kind": "conference-paper",
+      "cited_by": 21,
+      "oa_pdf": "https://dl.acm.org/doi/pdf/10.1145/3544548.3580683",
+      "landing": "https://doi.org/10.1145/3544548.3580683",
+      "licence_class": "open_access",
+      "resolved_by": [
+        "openalex"
+      ],
+      "score": 0.9218,
+      "why_ranked": [
+        "citation=0.336(21)",
+        "recency=0.961(2023)",
+        "oa=yes",
+        "kind=conference-paper",
+        "query_overlap=1.00"
+      ]
+    },
+    {
+      "canonical_id": "doi:10.1145/3713043.3727051",
+      "title": "Scratch Copilot: Supporting Youth Creative Coding with AI",
+      "authors": [
+        "Stefania Druga",
+        "Amy J. Ko"
+      ],
+      "year": 2025,
+      "venue": "Interaction Design and Children",
+      "kind": "conference-paper",
+      "cited_by": 17,
+      "oa_pdf": "https://dl.acm.org/doi/pdf/10.1145/3713043.3727051",
+      "landing": "https://doi.org/10.1145/3713043.3727051",
+      "licence_class": "open_access",
+      "resolved_by": [
+        "openalex"
+      ],
+      "score": 0.9092,
+      "why_ranked": [
+        "citation=0.314(17)",
+        "recency=0.987(2025)",
+        "oa=yes",
+        "kind=conference-paper",
+        "query_overlap=1.00"
+      ]
+    },
+    {
+      "canonical_id": "doi:10.1145/3563657.3595969",
+      "title": "Forking a Sketch: How the OpenProcessing Community Uses Remixing to Collect, Annotate, Tune, and Extend Creative Code",
+      "authors": [
+        "Blair Subbaraman",
+        "Shenna Shim",
+        "Nadya Peek"
+      ],
+      "year": 2023,
+      "venue": "ACM Designing Interactive Systems Conference (DIS)",
+      "kind": "conference-paper",
+      "cited_by": 12,
+      "oa_pdf": "https://dl.acm.org/doi/pdf/10.1145/3563657.3595969",
+      "landing": "https://doi.org/10.1145/3563657.3595969",
+      "licence_class": "open_access",
+      "resolved_by": [
+        "openalex"
+      ],
+      "score": 0.8647,
+      "why_ranked": [
+        "citation=0.278(12)",
+        "recency=0.961(2023)",
+        "oa=yes",
+        "kind=conference-paper",
+        "query_overlap=0.50"
+      ]
+    },
+    {
+      "canonical_id": "doi:10.1002/bmb.21692",
+      "title": "Student responses to creative coding in biomedical science education",
+      "authors": [
+        "Phillip Gough",
+        "Oliver Bown",
+        "Craig R Campbell",
+        "Philip Poronnik",
+        "Pauline Mary Ross"
+      ],
+      "year": 2022,
+      "venue": "Biochemistry and Molecular Biology Education",
+      "kind": "article",
+      "cited_by": 12,
+      "oa_pdf": "https://doi.org/10.1002/bmb.21692",
+      "landing": "https://doi.org/10.1002/bmb.21692",
+      "licence_class": "open_access",
+      "resolved_by": [
+        "openalex"
+      ],
+      "score": 0.8601,
+      "why_ranked": [
+        "citation=0.278(12)",
+        "recency=0.947(2022)",
+        "oa=yes",
+        "kind=article",
+        "query_overlap=1.00"
+      ]
+    }
+  ],
+  "refused": [
+    {
+      "canonical_id": "openalex:W7166972548",
+      "why": "kind_other_not_declared"
+    },
+    {
+      "canonical_id": "doi:10.1145/3626253.3635428",
+      "why": "kind_conference-abstract_not_declared"
+    },
+    {
+      "canonical_id": "openalex:W2593049714",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.1561/0300000025",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "openalex:W2592378911",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.5539/ies.v8n7p144",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.36227/techrxiv.176315468.89085719/v1",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.1016/j.sbspro.2014.07.016",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.1145/3628161",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "openalex:W7220142265",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.48550/arxiv.2608.20379",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "openalex:W197747621",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.5281/zenodo.5790874",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.25911/5d78d699e9886",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.1109/comst.2026.3660844",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.1007/978-3-319-64816-3",
+      "why": "refused_query_overlap"
+    }
+  ],
+  "counts": {
+    "queries": 3,
+    "candidates": 10,
+    "refused": 16
+  }
+}

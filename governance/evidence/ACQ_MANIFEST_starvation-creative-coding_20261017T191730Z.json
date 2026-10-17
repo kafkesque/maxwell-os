@@ -1,0 +1,261 @@
+{
+  "schema_version": "1.0",
+  "gen_model": "deterministic",
+  "pipeline_commit": "d70a2680d89010f8278f805a67c4e0310c423d70",
+  "generated": "2026-10-17T19:17:30Z",
+  "act": "reading_cartography",
+  "authority": "D-3078",
+  "gap": {
+    "gap_id": "starvation:creative coding",
+    "class": "discipline_starvation",
+    "discipline": "creative coding",
+    "tier": "CRITICAL",
+    "trigger": {
+      "golden_count": 5,
+      "golden_shortfall": 5,
+      "convergent_count": 3,
+      "convergent_shortfall": 17
+    },
+    "source": "governance/targeted_ingestion_plan.json"
+  },
+  "queries": [
+    "creative coding",
+    "creative coding handbook",
+    "creative coding foundations survey"
+  ],
+  "resolver_failures": [],
+  "candidates": [
+    {
+      "canonical_id": "doi:10.29333/ajqr/12085",
+      "title": "The Coding Manual for Qualitative Researchers",
+      "authors": [
+        "Maria Lungu"
+      ],
+      "year": 2022,
+      "venue": "American Journal of Qualitative Research",
+      "kind": "article",
+      "cited_by": 10826,
+      "oa_pdf": "https://www.ajqr.org/download/the-coding-manual-for-qualitative-researchers-12085.pdf",
+      "landing": "https://doi.org/10.29333/ajqr/12085",
+      "licence_class": "open_access",
+      "resolved_by": [
+        "openalex"
+      ],
+      "score": 1.5816,
+      "why_ranked": [
+        "citation=1.000(10826)",
+        "recency=0.947(2022)",
+        "oa=yes",
+        "kind=article",
+        "query_overlap=0.50"
+      ]
+    }
+  ],
+  "refused": [
+    {
+      "canonical_id": "doi:10.1136/bmj.n71",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.3322/caac.20107",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.1093/molbev/mst010",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.1038/s41586-021-03819-2",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.3758/brm.40.3.879",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.3322/caac.21262",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.3322/caac.21834",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.4324/9780203793206",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.1038/35057062",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.1109/cvpr.2017.632",
+      "why": "kind_conference-paper_not_declared"
+    },
+    {
+      "canonical_id": "doi:10.1093/molbev/msab120",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.3322/caac.21551",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.1109/tpami.2016.2644615",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.3322/canjclin.55.2.74",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.1038/sdata.2016.18",
+      "why": "kind_data-paper_not_declared"
+    },
+    {
+      "canonical_id": "doi:10.1038/nature11247",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.1093/molbev/msaa015",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.3322/caac.21654",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.1111/j.1467-",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.1016/j.media.2017.07.005",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.1002/jae.951",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.1016/j.future.2013.01.010",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.1002/1098-240x(200008)23:4<334::aid-nur9>3.0.co;2-g",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.1007/s11135-017-0574-8",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.1136/bmj.n160",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.1111/j.1600-0587.2012.07348.x",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.1136/bmj.j4008",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.1007/978-3-030-80519-7",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.1111/nhs.12048",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.1002/smj.507",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.1111/j.1540-6261.2006.00885.x",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.1002/hep.20933",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.1016/j.jbusres.2019.09.022",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.1371/journal.pmed.0040297",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.1038/s42254-021-00314-5",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.1109/jsac.2014.2328098",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.1016/s0140-6736(10)61854-5",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.3847/1538-4357/ac7c74",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.1109/tpami.2018.2798607",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.1111/2041-210x.12512",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.1214/ss/1009213726",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.1002/9781394333325.fmatter",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.3386/w10766",
+      "why": "kind_report_not_declared"
+    },
+    {
+      "canonical_id": "doi:10.1111/jofi.12505",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.1016/j.lrp.2018.12.001",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.1162/coli_a_00049",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.1007/s10488-010-0327-7",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.1016/s0921-8890(02)00372-x",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.1145/3641289",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.1177/0149206314527128",
+      "why": "refused_query_overlap"
+    }
+  ],
+  "counts": {
+    "queries": 3,
+    "candidates": 1,
+    "refused": 50
+  }
+}

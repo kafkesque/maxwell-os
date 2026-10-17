@@ -1,0 +1,294 @@
+{
+  "schema_version": "1.0",
+  "gen_model": "deterministic",
+  "pipeline_commit": "d70a2680d89010f8278f805a67c4e0310c423d70",
+  "generated": "2026-10-17T19:19:10Z",
+  "act": "reading_cartography",
+  "authority": "D-3078",
+  "gap": {
+    "gap_id": "manual:design of everyday things",
+    "class": "manual",
+    "discipline": "design of everyday things"
+  },
+  "queries": [
+    "design of everyday things",
+    "design of everyday things handbook",
+    "design of everyday things foundations survey"
+  ],
+  "resolver_failures": [],
+  "candidates": [
+    {
+      "canonical_id": "doi:10.15358/9783800648108",
+      "title": "The Design of Everyday Things",
+      "authors": [
+        "Donald A. Norman"
+      ],
+      "year": 2016,
+      "venue": "Vahlen eBooks",
+      "kind": "book",
+      "cited_by": 6374,
+      "oa_pdf": null,
+      "landing": "https://openalex.org/W1528027857",
+      "licence_class": "publisher_licensed",
+      "resolved_by": [
+        "openalex"
+      ],
+      "score": 1.4051,
+      "why_ranked": [
+        "citation=0.951(6374)",
+        "recency=0.868(2016)",
+        "oa=no",
+        "kind=book",
+        "query_overlap=1.00"
+      ]
+    },
+    {
+      "canonical_id": "openalex:W2613049552",
+      "title": "The Design of Everyday Things: Revised and Expanded Edition",
+      "authors": [
+        "Donald A. Norman"
+      ],
+      "year": 2013,
+      "venue": "",
+      "kind": "book",
+      "cited_by": 1951,
+      "oa_pdf": null,
+      "landing": "https://openalex.org/W2613049552",
+      "licence_class": "publisher_licensed",
+      "resolved_by": [
+        "openalex"
+      ],
+      "score": 1.2627,
+      "why_ranked": [
+        "citation=0.823(1951)",
+        "recency=0.829(2013)",
+        "oa=no",
+        "kind=book",
+        "query_overlap=1.00"
+      ]
+    },
+    {
+      "canonical_id": "doi:10.1162/desi_a_00165",
+      "title": "Design Things and Design Thinking: Contemporary Participatory Design Challenges",
+      "authors": [
+        "Erling Bjögvinsson",
+        "Pelle Ehn",
+        "Per-Anders Hillgren"
+      ],
+      "year": 2012,
+      "venue": "Design Issues",
+      "kind": "article",
+      "cited_by": 779,
+      "oa_pdf": "https://direct.mit.edu/desi/article-pdf/28/3/101/1715050/desi_a_00165.pdf",
+      "landing": "https://doi.org/10.1162/desi_a_00165",
+      "licence_class": "open_access",
+      "resolved_by": [
+        "openalex"
+      ],
+      "score": 1.2585,
+      "why_ranked": [
+        "citation=0.723(779)",
+        "recency=0.816(2012)",
+        "oa=yes",
+        "kind=article",
+        "query_overlap=0.67"
+      ]
+    },
+    {
+      "canonical_id": "doi:10.1016/j.destud.2004.03.001",
+      "title": "Seeing things: consumer response to the visual domain in product design",
+      "authors": [
+        "Nathan Crilly",
+        "James Moultrie",
+        "P. John Clarkson"
+      ],
+      "year": 2004,
+      "venue": "Design Studies",
+      "kind": "article",
+      "cited_by": 970,
+      "oa_pdf": "https://www.repository.cam.ac.uk/handle/1810/286953",
+      "landing": "https://www.repository.cam.ac.uk/handle/1810/286953",
+      "licence_class": "open_access",
+      "resolved_by": [
+        "openalex"
+      ],
+      "score": 1.2455,
+      "why_ranked": [
+        "citation=0.747(970)",
+        "recency=0.711(2004)",
+        "oa=yes",
+        "kind=article",
+        "query_overlap=0.67"
+      ]
+    },
+    {
+      "canonical_id": "doi:10.1080/14606925.2019.1614320",
+      "title": "More-Than Human Centred Design: Considering Other Things",
+      "authors": [
+        "Paul Coulton",
+        "Joseph Lindley"
+      ],
+      "year": 2019,
+      "venue": "The Design Journal",
+      "kind": "article",
+      "cited_by": 161,
+      "oa_pdf": "https://eprints.lancs.ac.uk/id/eprint/133984/1/more_than_human_centered_design_v_3.1.pdf",
+      "landing": "https://eprints.lancs.ac.uk/id/eprint/133984/1/more_than_human_centered_design_v_3.1.pdf",
+      "licence_class": "open_access",
+      "resolved_by": [
+        "openalex"
+      ],
+      "score": 1.1201,
+      "why_ranked": [
+        "citation=0.552(161)",
+        "recency=0.908(2019)",
+        "oa=yes",
+        "kind=article",
+        "query_overlap=0.67"
+      ]
+    }
+  ],
+  "refused": [
+    {
+      "canonical_id": "doi:10.5860/choice.51-5559",
+      "why": "kind_book-review_not_declared"
+    },
+    {
+      "canonical_id": "doi:10.48014/bcps.20260119001",
+      "why": "kind_book-review_not_declared"
+    },
+    {
+      "canonical_id": "doi:10.5860/choice.41-6846",
+      "why": "kind_book-review_not_declared"
+    },
+    {
+      "canonical_id": "doi:10.5860/choice.26-1204",
+      "why": "kind_book-review_not_declared"
+    },
+    {
+      "canonical_id": "doi:10.1017/cbo9781139207058",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "openalex:W2902587397",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "openalex:W7210250019",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.1007/s11528-014-0824-8",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.1080/09687599.2014.995512",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.4324/9780203154427",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.1093/socrel/sru013",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.24059/olj.v27i2.3470",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.1080/13527258.2024.2417066",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.1016/j.jnca.2015.12.016",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.1109/access.2015.2437951",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.1109/access.2015.2389854",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.1016/j.pmcj.2017.06.018",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.3390/s20133619",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.1504/ijitca.2018.090162",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.2312/conf/eg2013/stars/039-063",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.1109/access.2023.3327335",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.1016/j.compind.2017.10.001",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.3390/fi11040100",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.1145/3617694.3623261",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.1145/3387166",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.31031/prm.2021.04.000592",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.3390/network1030017",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.1109/access.2024.3393567",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.3390/app13010404",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "openalex:W7111435851",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.3390/iot2010005",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.4324/9781003464259-15",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "doi:10.1007/s12525-015-0196-8",
+      "why": "refused_query_overlap"
+    },
+    {
+      "canonical_id": "openalex:W2285957597",
+      "why": "refused_query_overlap"
+    }
+  ],
+  "counts": {
+    "queries": 3,
+    "candidates": 5,
+    "refused": 34
+  }
+}

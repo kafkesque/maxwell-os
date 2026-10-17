@@ -2,9 +2,9 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 672,
-  "open_n": 242,
-  "closed_n": 430,
+  "total_ids": 674,
+  "open_n": 243,
+  "closed_n": 431,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
   "open": [
@@ -1217,6 +1217,11 @@
       "id": "BUG-906",
       "title": "(LOW \u2014 OPEN 2026-10-17) \u2014 A READ-ONLY DELEGATE RUN CANNOT BE CLOSED AS `done`: scripts/delegate_journal.py REFUSES `--artifact none`",
       "events": 1
+    },
+    {
+      "id": "BUG-909",
+      "title": "(HIGH \u2014 OPEN 2026-10-17) \u2014 THE ONLY SHADOW RUNG THAT WORKS IS A SINGLE POINT OF FAILURE: EVERY LibGen FRONT ANSWERS `500",
+      "events": 1
     }
   ],
   "closed": [
@@ -1649,6 +1654,7 @@
     "BUG-898",
     "BUG-903",
     "BUG-904",
-    "BUG-907"
+    "BUG-907",
+    "BUG-908"
   ]
 }

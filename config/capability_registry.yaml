@@ -293,7 +293,24 @@ capabilities:
     cost_tier: T0
     owns: [scripts/check_bug_recall.py, config/bug_recall.yaml]
 
-  # ── BUG-902: THE ONE CAPABILITY THAT RAN ON EVERY HEALTH PASS AND WAS DECLARED NOWHERE ──
+  # ── D-3078: THE ACQUISITION LANE — gap → manifest → bytes in the INBOX, and it stops at the pen ──
+  - id: acquisition_lane
+    kind: script
+    entrypoint: python3 scripts/acquire.py status
+    check: python3 scripts/acquire.py --selftest
+    receipt: config/acquisition.yaml#pens
+    cost_tier: T0
+    owns:
+      - scripts/acquire.py
+      - pipeline/acquisition/
+      - config/acquisition.yaml
+    why: >-
+      The lane has four acts (gap, map, fetch, status) behind one entry point. Its ONE write surface is the pen
+      `education_inbox`, resolved from the ingest door's own placement declaration — it may not write
+      `knowledge pipeline/books`, an .md, a signature or a conversion (D-3078). The selftest is the control: 31
+      checks including a shadow rung that is unreachable without an owner word, a name that carries no
+      door-refused marker, and a manifest row that must rebuild into a Candidate.
+
   #: D-3075 landed `scripts/container_alert.py` + `pipeline/container_integrity.py` and put the alert on the ladder,
   #: but neither the capability nor its probe module was ever declared here — so a rail that runs daily had no route,
   #: no owner and no cost, which is the exact blindness this registry exists to refuse (T-156). It WRITES NOTHING by

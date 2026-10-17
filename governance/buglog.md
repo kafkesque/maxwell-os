@@ -8,11 +8,11 @@
 
 <!-- GOV-INDEX:START (D-2981 - DERIVED by scripts/gov_sync.py; do NOT hand-edit inside) -->
 > **LIVE INDEX (D-2981 - DERIVED; do NOT hand-edit inside these sentinels).**
-> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1205 decisions (census stamp 0d4d4b6dcd9569d6, 2026-10-17) · 672 bugs (242 open / 430 closed; highest OPEN = BUG-906) · 59 open tasks (MUST 12 / SHOULD 43 / WORTH 4; OWNER-moved 1, pipeline-moved 58; 1 standing rule(s) never close).
+> Register truth (BUG-588/D-2692 - the census is the ONE home; nothing below restates a count): 1206 decisions (census stamp 7bf531e366512e14, 2026-10-17) · 674 bugs (243 open / 431 closed; highest OPEN = BUG-909) · 59 open tasks (MUST 12 / SHOULD 43 / WORTH 4; OWNER-moved 1, pipeline-moved 58; 1 standing rule(s) never close).
 >
-> Decisions NEEDING ACTION: **79** of 1205 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 620 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1205, D-2987/BUG-765)
+> Decisions NEEDING ACTION: **79** of 1206 — 🔴 open 32 · 🔵 proposed 26 · 📝 draft 1 · ⏳ deferred 14 · 📅 planned 6 | in effect: 🟢 active 621 · ⚖ ratified 146 | closed: ✅ resolved 325 · ⚪ superseded 16 · ⚪ archived 8 · ⛔ rejected 11 — the DECLARED buckets sum to the whole register (1206, D-2987/BUG-765)
 >
-> Open BUGS by severity (population = the census's 242 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 35 · 🟨 MED 75 · 🟩 LOW 27 · UNLABELLED 101 (BUG-757) of 242 open.
+> Open BUGS by severity (population = the census's 243 open ids; severity read from each id's FIRST heading at ANY hash depth): 🟥 CRITICAL 4 · 🟧 HIGH 36 · 🟨 MED 75 · 🟩 LOW 27 · UNLABELLED 101 (BUG-757) of 243 open.
 >
 > **OWNER LANE (1) — what ONLY YOU can move; the pipeline cannot advance these, each needs YOUR word:**
 >
@@ -17337,3 +17337,42 @@ absent.
 
 **MEASURED:** selftest 25/25 green (was 24/25); live brief reads `candidates 537, refused 512` with the join
 resolving; `just health` proceeds past line 43.
+
+### BUG-908 (MED — CLOSED 2026-10-17) — THE SHADOW RUNG'S FIRST LIVE RUN: `--allow-shadow` DID NOTHING, AND TWO MIRROR FACTS THE DECLARATION DID NOT KNOW
+**FOUND:** building the D-3078 downloader (`scripts/acquire.py`), first shadow dry-run against the real ladder.
+**THREE LIMBS, one code path, one fix:**
+1. **A GATE THAT LOOKED CLOSED TWICE WAS A GATE NOBODY COULD OPEN.** `adapters.ladder()` skipped any adapter whose
+   `enabled` was false AND any shadow adapter without an owner word, so `--allow-shadow "<word>"` produced a ladder
+   of the three lawful rungs and the shadow rung vanished without a word. MEASURED: `adapters: [open_access,
+   gutenberg, standardebooks]` on a run that carried the owner's word. FIX: the two gates now mean two things —
+   `enabled` = PART OF THE BUILD, `requires_owner_word` = THIS RUN NEEDS THE WORD — and the selftest asserts BOTH
+   directions ("the owner's word ADDS the shadow rung that is built", "a shadow rung that is NOT built stays out even
+   WITH the word"). `libgen` is therefore `enabled: true, requires_owner_word: true`.
+2. **A 200 IS NOT LIVENESS.** `annas-archive.li` answered HTTP 200 with a 27,799-byte PARKED-DOMAIN for-sale page
+   (`assets.abovedomains.com/.../forsale.min.js`), while `annas-archive.org` resolved to NO ADDRESS and
+   `annas-archive.se` refused instantly. A mirror is now used only after its body carries the family's own MARKER
+   (`config/acquisition.yaml#mirrors.markers`), and a rejected domain is recorded WITH its reason in the cache.
+3. **THE TRACKER'S MARKUP IS NOT A DOMAIN LIST.** `\blibgen\.[a-z]{2,4}\b` matched `libgen.html` inside
+   open-slum.org's own HTML, which cost a probe and then failed validation. FIX: file suffixes are excluded by name
+   in `mirrors.FAMILY_PATTERN`.
+**MEASURED AFTER THE FIX:** `libgen.li` search → `ads.php?md5=53ea92403d513c35327558c57fc8c3bb` → that page holds
+exactly ONE link, `get.php?md5=…&key=XV5F4AMMX3GZCMBP` → 307 to a node. The adapter is real; see BUG-909 for what
+the mirror answered twenty minutes later.
+**RECEIPT:** `python3 scripts/acquire.py --selftest` → 31/31 green (was 29); `just health` route graph 222/222.
+
+### BUG-909 (HIGH — OPEN 2026-10-17) — THE ONLY SHADOW RUNG THAT WORKS IS A SINGLE POINT OF FAILURE: EVERY LibGen FRONT ANSWERS `500 max_user_connections (current value: 300)`
+**MEASURED, 2026-10-17 21:20–21:26 local:** `libgen.li`, `libgen.bz`, `libgen.gl`, `libgen.la` ALL answered
+`HTTP 500`, 217 bytes, body `Could not connect to the database 3306. User 'libgen_read' has exceeded the
+'max_user_connections' resource (current value: 300)`; `libgen.vg` did not resolve. Twenty minutes earlier
+`libgen.li` had answered 200 and produced a real `get.php` link (BUG-908), so this is the SITE, not the client.
+**WHY IT MATTERS MORE THAN AN OUTAGE:** the ladder has exactly ONE working shadow rung. Anna's is a DDoS-Guard JS
+challenge (declared `unreachable_by_scraping`), Z-Library needs a login this repository must not hold, and the four
+LibGen fronts share one saturated database. A gap whose literature is a modern in-copyright book therefore has NO
+acquirable source today, and the lane correctly refuses BY NAME (`unreachable`/`http_status` + the body) rather
+than pretending.
+**REMEDY (owner-worded, in preference order):** (a) an official Anna's Archive **API key** (paid) — the lawful-if-paid
+route to the same index and the only one that does not depend on a scraped mirror; (b) declare a second shadow
+source behind the same `Adapter` protocol (the protocol exists precisely so this is a new file, not a rewrite);
+(c) accept that in-copyright books that no lawful rung serves stay a NAMED gap on the manifest. NOT a remedy:
+retrying a saturated mirror, or raising the circuit breaker's threshold.
+**RECEIPT:** `python3 scripts/acquire.py mirrors --refresh` and `--allow-shadow "<word>" fetch --dry-run`.

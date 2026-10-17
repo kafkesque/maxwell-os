@@ -1,0 +1,192 @@
+# ════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+# config/acquisition.yaml — THE ACQUISITION LANE'S DECLARATION OF RECORD (D-3078)
+#
+# WHAT THIS FILE IS. Every knob the acquirer uses: where acquired bytes may LAND, which adapters exist and which
+# are enabled, which mirrors are believed, how a candidate is RANKED, and how much a run may cost. Code holds
+# behaviour, never values (C12/C20).
+#
+# THE ONE INVARIANT THIS FILE ENFORCES BY SHAPE (D-3078): `pens.land` is a POINTER INTO THE DOOR'S OWN DECLARATION
+# (`config/ingest_identity_gate.yaml#source_library.placement.pens`), not a path typed here. The acquirer writes a
+# file into a declared PEN and stops. It never writes `knowledge pipeline/books`, never creates an .md, never signs
+# and never converts. The pen is the whole licence to download: a bad acquisition costs a file the owner deletes,
+# never a corpus object they cannot untangle.
+#
+# MEASURED, on this machine, 2026-10-17 21:14 local (each line re-takes with the command in `reading`):
+#   • api.openalex.org 200 (1.2 s) | api.crossref.org 200 (0.5 s) | gutenberg.org 200 | standardebooks.org 200
+#   • libgen.li 200 (9.3 s): search `index.php?req=` → row `ads.php?md5=<md5>` → page holds ONE link
+#     `get.php?md5=<md5>&key=<KEY>` → 307 → download node. SCRAPEABLE with a plain HTTP client.
+#   • annas-archive.org: DNS resolves NOTHING (000, 0.02 s). annas-archive.li: HTTP 200 but it is a PARKED DOMAIN
+#     (abovedomains.com "for sale" page, 27,799 B) — a 200 is NOT liveness. annas-archive.se 000.
+#     annas-archive.gd/.gl/.pk: 200 (175,819 B) but every search is behind a DDoS-Guard JS challenge, so a
+#     plain HTTP client CANNOT read a result page. Annas is therefore DECLARED UNREACHABLE by scraping and off.
+#   • open-slum.org 200: live domains it named at that moment — annas gd/gl/pk, libgen bz/gl/la/li/vg.
+# ════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+schema_version: '1.0'
+authority: D-3078
+declared_on: '2026-10-17'
+reading: "python3 scripts/acquire.py --selftest | status | gap | map | fetch | mirrors"
+#: The lane has FOUR acts and each has its own reading. `gap` DETECTS (T0, no network). `map` ASKS for literature
+#: (T1, resolver-first). `fetch` MOVES BYTES into a pen (T0, network). `status` says what arrived and what is owed.
+
+# ─────────────────────────────────────────────────────────────────────────────── WHERE ACQUIRED BYTES MAY LAND ──
+pens:
+  #: A PEN NAME, resolved through the door's own declaration. Typing a path here would be a second home for the
+  #: same fact, and the door's placement census would stop being able to see what the acquirer did (D-3034).
+  land: education_inbox
+  land_from: "config/ingest_identity_gate.yaml#source_library.placement.pens"
+  #: The acquirer's refused-payload pen. A downloaded file that FAILS the door's container probe lands here with
+  #: its defect named, so the pen the owner reads holds only what is worth reading.
+  quarantine: "knowledge pipeline/acquisition/quarantine"
+  #: One receipt line per attempt. Never inside the corpus.
+  evidence: "governance/evidence"
+  #: The idempotency index: canonical_id → what was attempted and how it ended. Append-only.
+  index: "knowledge pipeline/acquisition/index.jsonl"
+
+# ─────────────────────────────────────────────────────────────────────────────────────────── THE GAP READER ──
+gaps:
+  #: discipline_starvation has a MEASURED source that already exists: plan_targeted_ingestion.py's census
+  #: (18 starved disciplines / 9 CRITICAL, 2026-10-17). The acquirer READS it; it does not re-derive it.
+  starvation_census: "governance/targeted_ingestion_plan.json"
+  #: Which tiers of the census are worth spending a network run on.
+  tiers_eligible: [CRITICAL, HIGH]
+  max_gaps_per_run: 5
+  #: primitive_absence: a query whose FAISS top-k cosine falls below this is a gap, not a retrieval. THE VALUE IS
+  #: NOT CALIBRATED — `state` says so out loud so the first calibration run REPLACES it instead of inheriting a
+  #: number that only looks measured (D-3036: a hypothesis stays labelled until a receipt speaks).
+  tau_cosine:
+    value: 0.55
+    state: DEFAULT_UNMEASURED
+    why: 'declared to make the class executable; calibration is a named task, not a claim this file makes'
+  #: claim_unsupported: stage5_verify.py is fail-closed, so an unsupported claim already has a home. The acquirer
+  #: names the class and reads the verify report when it exists; it never invents a second verdict.
+  verify_report: "knowledge pipeline/checkpoints/stage5_verify_report.jsonl"
+
+# ─────────────────────────────────────────────────────────────────────────────────────────── THE CARTOGRAPHER ──
+#: RESOLVER-FIRST IS THE ANTI-HALLUCINATION DESIGN, not a preference. A candidate is a row a resolver RETURNED.
+#: There is no code path that can write a title into a manifest, which is why the two fabricated arXiv ids this
+#: repository already paid for (2602.14862 / 2605.18796) cannot recur through this lane.
+cartography:
+  provider: openalex
+  fallback_provider: crossref
+  rows_per_query: 25
+  max_queries_per_gap: 3
+  #: WHO DECIDES WHAT IS ON TOPIC, AND WHO DECIDES WHAT TO READ FIRST — two different jobs, and conflating them
+  #: was a MEASURED defect the first live run caught (2026-10-17, gap `creative coding`): asking OpenAlex for a
+  #: topic sorted by CITATIONS returns the most-cited work that merely mentions the words ("Applications of hybrid
+  #: organic-inorganic nanocomposites"), and 47 of 51 rows died on the overlap filter. The resolver therefore
+  #: answers in its own RELEVANCE order, and `score` below decides the reading order inside that answer.
+  resolver_order: relevance
+  resolver_order_why: 'a search engine ranks topical relevance; a citation count ranks impact. Reading a gap needs
+    the first before the second, so the second is applied only inside the first one''s answer.'
+  #: A starved DISCIPLINE is not a book title. These are the translations from a census entry to an askable query.
+  query_templates:
+    - '{discipline}'
+    - '{discipline} handbook'
+    - '{discipline} foundations survey'
+  filters:
+    min_year: 1950
+    max_year_buffer: 1
+    #: A candidate with no resolver identity never enters a manifest (D-3078 invariant 2).
+    require_resolver_identity: true
+    kinds: [article, book, book-chapter, conference-paper, preprint, dissertation, review, report]
+    #: a work whose own title carries none of the query's content words is not an answer to the question
+    min_query_token_overlap: 0.34
+  score:
+    citation_weight: 1.0
+    recency_weight: 0.35
+    oa_bonus: 0.25
+    book_bonus: 0.15
+    #: log10(1 + cited_by_count) / log10(1 + this) capped at 1 — a 112,000-citation paper and an 800-citation
+    #: paper must not be three orders of magnitude apart in a RANKING whose job is to pick a reading order.
+    citation_log_saturation: 10000
+  manifest_dir: "governance/evidence"
+
+# ───────────────────────────────────────────────────────────────────────────────────────────── THE ADAPTERS ──
+#: ONE PROTOCOL, N ADAPTERS (C21). `order` is the DECLARED LADDER: lawful before shadow, public domain before
+#: licensed. A shadow adapter is OFF until an owner word names it, and the word is carried in the receipt.
+adapters:
+  order: [open_access, gutenberg, standardebooks, annas, libgen, zlibrary]
+  open_access:
+    licence_class: open_access
+    enabled: true
+    requires_owner_word: false
+    note: 'OpenAlex best_oa_location.pdf_url / open_access.oa_url. The lawful first rung: a DOI with an OA copy.'
+  gutenberg:
+    licence_class: public_domain
+    enabled: true
+    requires_owner_word: false
+    metadata_api: "https://gutendex.com/books?search={query}"
+    note: 'Project Gutenberg. Public domain only, and its catalogue is a PREFIX of any research gap — it will answer
+      "the canonical text of X" and never "the 2019 survey of X".'
+  standardebooks:
+    licence_class: public_domain
+    enabled: true
+    requires_owner_word: false
+    search: "https://standardebooks.org/ebooks?query={query}"
+    note: 'Standard Ebooks: public domain, hand-transcribed, and the highest-fidelity EPUB a free source offers.'
+  annas:
+    licence_class: shadow
+    enabled: false
+    requires_owner_word: true
+    state: unreachable_by_scraping
+    measured: '2026-10-17: .org has no DNS; .li returns 200 as a PARKED domain; .gd/.gl/.pk answer every search
+      with a DDoS-Guard JS challenge. A plain HTTP adapter cannot pass it, so the adapter is declared instead of
+      pretended. The lawful route to the same index is its official (paid) API key, or its bulk torrents.'
+  libgen:
+    licence_class: shadow
+    #: TWO GATES, TWO MEANINGS (measured defect, first shadow run 2026-10-17): `enabled` says the adapter is PART
+    #: OF THE BUILD; `requires_owner_word` says a RUN needs the owner's word. Conflating them meant `--allow-shadow`
+    #: silently did nothing, because the adapter was also switched off at build level — a gate that looks closed
+    #: twice is a gate nobody can open.
+    enabled: true
+    requires_owner_word: true
+    state: implemented
+    search: "https://{mirror}/index.php?req={query}"
+    note: 'MEASURED working 2026-10-17: search → ads.php?md5= → get.php?md5=&key= → 307 → node. This is the
+      shadow rung that actually works from this machine, and it is OFF until the owner names it.'
+  zlibrary:
+    licence_class: shadow
+    enabled: false
+    requires_owner_word: true
+    state: not_implemented
+    note: 'Needs a personal login (a credential this repository does not hold, and must not). Declared so the
+      ladder shows the hole instead of silently ending early (D-3038).'
+
+# ───────────────────────────────────────────────────────────────────────────────────────────── THE MIRRORS ──
+mirrors:
+  #: Never hardcode a domain that renames itself monthly. Ask the tracker, then VALIDATE by content.
+  source: "https://open-slum.org/"
+  cache: "knowledge pipeline/acquisition/mirrors.json"
+  ttl_hours: 6
+  probe_timeout_s: 15
+  #: A 200 IS NOT LIVENESS (measured: a parked domain answers 200). A mirror is used only when its body carries
+  #: the family's own marker.
+  markers:
+    annas: ["Anna’s Archive", "annas-archive"]
+    libgen: ["Library Genesis", "libgen"]
+  #: Fallbacks, in order, used ONLY if the tracker cannot be read. They are candidates, not beliefs: each is
+  #: validated by marker before a single byte is requested.
+  declared:
+    annas: [annas-archive.gd, annas-archive.gl, annas-archive.pk]
+    libgen: [libgen.li, libgen.bz, libgen.gl, libgen.la]
+
+# ───────────────────────────────────────────────────────────────────────────────────────────── THE DOWNLOAD ──
+download:
+  user_agent: "maxwell-acq/1.0 (local sovereign knowledge acquisition; +D-3078)"
+  timeout_s: 180
+  #: A book, not a dataset. Anything larger is a different kind of object and a different decision.
+  max_bytes: 268435456
+  chunk_bytes: 1048576
+  retries: 2
+  retry_backoff_s: 2
+  #: A retry is only worth it for a 5xx or a dropped connection; a 4xx is an answer and is never retried.
+  #: Three consecutive failures on one adapter inside the window open its breaker: a blocked site must cost a
+  #: named refusal, not twenty minutes of silent retries.
+  circuit_breaker:
+    failures: 3
+    cooldown_s: 900
+  #: NAME: resolved from the owner's own name policy, never restated here (D-3034).
+  name_template_from: "config/ingest_identity_gate.yaml#source_library.name_policy.template"
+  when_year_absent: omit_the_year_segment_and_count_the_row
+  #: The door's own probe decides whether a landed byte-stream is a document. No second definition of readable.
+  probe_from: "config/ingest_identity_gate.yaml#source_library.admission.container_integrity.probes"

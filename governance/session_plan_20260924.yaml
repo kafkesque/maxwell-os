@@ -10,6 +10,16 @@ next_state:
 - the anchor's MISSING domain axis produced as machine evidence by the reliable pair (DeepSeek + Qwen3.8) on the blind row text, silver consensus + needs_review, owner adjudicates; no domains_final is ever written by a script
 may_touch:
 - governance/ACQUISITION_PIPELINE_SPEC_20261017.md
+#: D-3078 THE LANE ITSELF (2026-10-17): the downloader is four modules behind one protocol, one CLI and one
+#: declaration. Each is granted as a family because the lane's own run artefacts are DATED and re-derived
+#: (`ACQ_MANIFEST_*`, `ACQUISITION_*.jsonl`), and a per-file grant would turn every run into a new red line on the
+#: worktree rail (the BUG-563 shape). Nothing outside these prefixes becomes committable.
+- config/acquisition.yaml
+- scripts/acquire.py
+- pipeline/acquisition/*.py
+- governance/evidence/ACQ_MANIFEST_*.json
+- governance/evidence/ACQUISITION_*.jsonl
+- knowledge pipeline/acquisition/*
 - archive/evaluate_model.py.archived-2026-10-17
 - scripts/evaluate_model.py
 - governance/HANDOFF_20261016_LANES_AND_MEASUREMENT.md

@@ -2,7 +2,7 @@
 
 Re-derive with `python3 scripts/bug_status.py` (source: `governance/buglog.md`).
 
-**246 open** / 433 closed of 679 ids.
+**247 open** / 433 closed of 680 ids.
 C15 append-to-handoffs required: **True** (threshold 5).
 
 | id | title (last header) | events |
@@ -253,3 +253,4 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-911 | (MED — OPEN 2026-10-17) — THE ONLY ROUTE INTO ANNA'S ARCHIVE IS A HEADED BROWSER WINDOW | 3 |
 | BUG-912 | (LOW — OPEN 2026-10-17) — An `open_access` ROUTE CAN DELIVER AN HTML LANDING PAGE FOR A DOI | 1 |
 | BUG-914 | (MED — OPEN 2026-10-17) — THE LANE RECORDS DELIVERY AND NEVER CUSTODY, SO IT PAID THE SHADOW PRICE FOR A WORK THE CORPUS ALREADY HELD | 1 |
+| BUG-915 | (MED — OPEN 2026-10-17) — THE DOCLING BUDGET'S DECLARED BASIS IS **BYTES**, AND BYTES DO NOT PREDICT CONVERSION COST (MEASURED r = −0.131) | 1 |

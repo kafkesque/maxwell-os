@@ -2,8 +2,8 @@
   "schema_version": "1.0",
   "source": "governance/buglog.md",
   "parser": "scripts/bug_status.py",
-  "total_ids": 679,
-  "open_n": 246,
+  "total_ids": 680,
+  "open_n": 247,
   "closed_n": 433,
   "c15_threshold": 5,
   "c15_must_append_to_handoffs": true,
@@ -1236,6 +1236,11 @@
     {
       "id": "BUG-914",
       "title": "(MED \u2014 OPEN 2026-10-17) \u2014 THE LANE RECORDS DELIVERY AND NEVER CUSTODY, SO IT PAID THE SHADOW PRICE FOR A WORK THE CORPUS ALREADY HELD",
+      "events": 1
+    },
+    {
+      "id": "BUG-915",
+      "title": "(MED \u2014 OPEN 2026-10-17) \u2014 THE DOCLING BUDGET'S DECLARED BASIS IS **BYTES**, AND BYTES DO NOT PREDICT CONVERSION COST (MEASURED r = \u22120.131)",
       "events": 1
     }
   ],

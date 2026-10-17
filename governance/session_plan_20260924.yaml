@@ -26,6 +26,8 @@ may_touch:
 - config/rail_registry.yaml
 - governance/SOURCE_RENAME_PLAN_20261016.md
 - governance/SOURCE_RENAME_PLAN_20261016.json
+- governance/ADMISSION_PLAN_20261017.json
+- governance/ADMISSION_PLAN_20261017.md
 - temp/d3048_record.yaml
 - agent/adapters/CONTRACT.md
 - scripts/check_agent_surface.py
@@ -1190,3 +1192,33 @@ widening_log:
     finished in this session'. NOTE ON SCOPE, stated not hidden: no path outside may_touch was written this sitting
     (all 13 touched paths were already granted), so `additions` is EMPTY by fact and not by omission - the entry is
     here because the sitting's AUTHORISATION is a fact the plan should carry, not because a permission was borrowed.
+- date: '2026-10-17'
+  actor: assistant
+  reason: >-
+    EIGHTH SITTING - THE ADMIT APPLIER IS BUILT (T-183/D-3068) and the harness contract is bound by the ONE DOOR
+    (D-3069). (1) `scripts/apply_admission.py`: a plan-keyed, dry-run-default, crash-safe (tempfile -> fsync ->
+    os.replace), receipted writer that refuses a row absent from a SIGNED acceptance, an unexplained target, a changed
+    source, a defective name, and any path outside the corpus home; 14/14 known-answer controls; R5 APPROVED by
+    gemma-4-E4B-it-MLX-4bit (a different family from the generator). (2) THE PLAN WAS STALE AND IS RE-DERIVED: the
+    artifact on disk held the pre-D-3062 derivation (244 rows, notes root with no home); the declaration now derives
+    479 candidates over 2,811 files, and the fresh plan is `governance/ADMISSION_PLAN_20261017.{json,md}`. (3)
+    `just go` now binds the declared agent_loop names for its own CHILD (BIND, never a login profile - BUG-871's cure),
+    proven end-to-end with a stand-in harness, and it REFUSES a contradictory shell value. (4) BUG-880 FOUND AND
+    FIXED: the lane reader's recipe-header pattern could not parse a parametrised recipe, so a lane pointing at a
+    real, runnable recipe read "the ladder file declares no such recipe"; the pattern now accepts a parameter segment
+    and a known-answer control guards it (resolve-route 19/19).
+  additions:
+  - pattern: governance/ADMISSION_PLAN_20261017.json
+    why: 'T-183/D-3068 - the RE-DERIVED machine plan the applier reads. The plan prefix itself is already granted, but the guard matches whole paths, and the plan is a NEW dated artifact: a widening that is only recorded is not granted (BUG-548).'
+  - pattern: governance/ADMISSION_PLAN_20261017.md
+    why: 'T-183/D-3068 - the human face of the same plan, written by the same reader in the same act.'
+  owner_ack: >-
+    VERBATIM (this sitting): 'continue from previous session where we finished So for clarification we dont need
+    filesystem nor mcp git extension because developer extension holds both? Or why is it disabled? And from now
+    whenever I start I new session those 2 will be disabled by default And I have to with on when I want hem f
+    reliable intuitive solution Next critical steps ... And since I dont how to implement do this In the shell where
+    you launch goose - not in ~/.zshrc: eval ... first look in general maxwell os current state continue with the next
+    critical step starting with the highest leverage step'. NOTE ON SCOPE: every other touched path was already
+    granted; `scripts/apply_admission.py` is a NEW file under the granted `scripts/` prefix and is named in the reason
+    so the act is not invisible. The standing rules (R5 before mint, delegation journalled, forensic audit before a
+    serious act, governance faces re-derived) were followed in that order.

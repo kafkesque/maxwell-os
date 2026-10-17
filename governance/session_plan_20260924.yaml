@@ -1166,3 +1166,27 @@ widening_log:
     hanress have better tool use that and if llmfit had become a bloat, has no usecaseget rid of that ... do A)
     manual task ... we will do B) after we figured it out best ultimate solution'. NOTE ON ORDER, stated not hidden:
     the plan is committed FIRST, then the work it authorises.
+- date: '2026-10-17'
+  actor: assistant
+  reason: >-
+    SEVENTH SITTING - TASK B APPLIED, and it turned out to be TWO acts, not one. (1) THE DEFAULT BIRTH IS NOW `core`
+    (D-3067): `default_profile: workshop` -> `core` in config/extension_profiles.yaml AND `enabled: false` for
+    `filesystem` and `gitmcp-mcp` in the harness home - two lines, read back, with a revert-and-compare proof that
+    every other key is byte-identical (backup config.yaml.bak.20261017134734.taskB-core). Proven by BIRTH, not by
+    intent: a session born from /tmp carries ten extensions and ZERO start warnings (20261017_14), and the
+    per-session workshop form still births all of them from the now-DISABLED declaration (20261017_17).
+    (2) THE FORENSIC AUDIT FOUND A REAL CASCADE AND IT IS FIXED HERE, not deferred: `enabled:` is a GATE on NAMED
+    PROVISIONING, so the declared delegate profile `sweep` (which named `filesystem`) stopped resolving the moment the
+    default changed (two-sided measurement: 20261017_15 born with `developer` alone, 20261017_16 born with exactly
+    `analyze`+`memory` while both were enabled). `sweep` is corrected to [developer, analyze] - `developer.shell`
+    reads files at zero schema cost - and `goose_profile.check()` now reports ANY delegate profile that names a
+    DISABLED extension as OWNER-OWED, with a known-answer control (selftest 38/38). (3) A new defect is registered
+    rather than hidden: the birth record names a stdio member by its COMMAND, so two `uvx` members collapse into one
+    row (BUG-879) - the identity confusion that once made BUG-878 read as "a member called python3".
+  additions: []
+  owner_ack: >-
+    VERBATIM (this sitting): 'do B and and do the 3 manual task after this queiry you finished I will open a new
+    session so again provide ahandoff with ll required context so we can continue the conversation from where we
+    finished in this session'. NOTE ON SCOPE, stated not hidden: no path outside may_touch was written this sitting
+    (all 13 touched paths were already granted), so `additions` is EMPTY by fact and not by omission - the entry is
+    here because the sitting's AUTHORISATION is a fact the plan should carry, not because a permission was borrowed.

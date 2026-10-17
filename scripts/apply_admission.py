@@ -1046,6 +1046,19 @@ def selftest() -> int:
         expect("re_signing_the_SAME_name_is_IDEMPOTENT_and_never_a_second_identity",
                quiet_sign("A Human") == RC_OK and declared_identity(decl) == "A Human")
 
+        # 19. D-3072/BUG-881: THE RECEIPT'S WORD-PROOF KEYS ARE BOUND BEFORE THE HEADER THAT CARRIES THEM. The header
+        #     is built inside run(), which no control executes (it reads the live POLICY and the real corpus), and the
+        #     composition is exactly where BUG-881 lived: the controls had tested the UNIT, never the composition, so
+        #     a shadowed name only failed on the operator's command. This reads the file's own text and requires the
+        #     definition to precede the use - cheap, and it fails on the day the header is refactored above its proof.
+        run_text = own[own.index("def run("):]
+        run_text = run_text[:run_text.index("\ndef ")] if "\ndef " in run_text else run_text
+        expect("the_receipts_word_proof_keys_are_BOUND_before_the_header_that_carries_them",
+               all(token in run_text for token in ('"signed_by": signed_by', '"scope_sha256": scope_digest(signed)',
+                                                  '"accepted_by": acc["accepted_by"]'))
+               and run_text.index("signed_by = verify_scope(") < run_text.index('"signed_by": signed_by'),
+               "the header references a value run() has not bound yet")
+
         # 15. BUG-884: a REFUSAL prints its message and exits RC_FATAL — never a traceback. A message string handed
         #     to SystemExit lands in `.code`, so `int(exc.code)` turned the digest-mismatch refusal into a
         #     ValueError. Both branches are asserted: a message string AND a declared integer code.

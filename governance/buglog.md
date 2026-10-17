@@ -16944,3 +16944,14 @@ Full rows with their defects and remedies are in `governance/ADMISSION_PLAN_2026
 silently loses pages cannot be told apart from a whole one afterwards), **1 needs the POINTER CHECKED** (the Finder
 alias, whose target is absent). Nothing is deleted and nothing is re-downloaded by this OS: the plan re-probes every
 candidate, so a good copy CLEARS ITSELF and a dead row simply stays refused.
+
+Note added after the record above was written, same sitting: `apply_admission.py --selftest` now reads **36/36**, not
+35 — one control was added because the composition was PROVEN LIVE and only then guarded. The word-proof experiment
+was run against the LIVE plan through `run()` itself (a temporary acceptance in `/tmp`, dry run, nothing written):
+**plan_sha256 forged to 64 zeros with the scope kept → `would_apply: 463`, rc 0** (the loop-killer, on real data), and
+**scope corrupted → FATAL: "this signature authorises a DIFFERENT set of acts … the SAME rows, with at least one act
+changed underneath them"** (the two-sided negative). Because no control executes `run()` (it reads the live POLICY and
+the real corpus), the 36th control reads this file's own text and requires `signed_by` to be BOUND before the header
+that carries it — the BUG-881 shape ("the controls had tested the UNIT, never the composition"), caught here before
+it could cost the owner a third run. The temporary acceptance was removed; no governance artifact carries a name
+nobody signed.

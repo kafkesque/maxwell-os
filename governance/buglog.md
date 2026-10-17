@@ -16640,7 +16640,7 @@ command now prints the full sentence and exits 1, and two controls pin both bran
 `a_refusal_exits_RC_FATAL_when_its_code_is_a_message` and `a_refusal_keeps_a_declared_INTEGER_code`. The normaliser
 is `applier_rc(exc)`, one function, no second handler.
 
-### BUG-885 (MED, OPEN 2026-10-17) — THE DECLARED `disproven` PREFIX-CACHE STATE NO LONGER REPRODUCES: the server served 5,888 of 5,894 prompt tokens from cache, and the doctrine built on "every turn re-pays its whole prompt" is now unmeasured
+### BUG-885 (MED, OPEN 2026-10-17) — `pipeline/harness_contract.py`'s DECLARED `disproven` PREFIX-CACHE STATE NO LONGER REPRODUCES: the server served 5,888 of 5,894 prompt tokens from cache, and the doctrine built on "every turn re-pays its whole prompt" is now unmeasured
 
 **Measured 2026-10-17, one command, four models.** BUG-792 (2026-10-14) recorded `prompt_tokens_details.cached_tokens
 = 0` on every call and declared the prefill question `disproven`, which is why the parallel-execution doctrine treats
@@ -16675,3 +16675,15 @@ shows the real operational cost is MODEL SWAP (42 s, 134 s), which a warm model 
 **Owed (not done here, and not silently):** re-run BUG-792's declared protocol end to end, then either close it with
 the new reading or name the variable that changed. Until then this entry holds the MEASUREMENT only, and the ladder's
 `--check` readings are unaffected because BUG-792's state lives in the buglog, not in a rail.
+
+#### BUG-885 — AMENDMENT (same sitting): the artifact and the reading that CLOSE it
+
+The finding above is not prose standing alone: it names work, and that work has a home. The **artifact** is
+`pipeline/harness_contract.py` — the harness's own contract reader, which is the declared subject of the
+`harness_adapter` capability (`config/capability_registry.yaml`) — because what BUG-792 declared `disproven` was a
+property of the HARNESS contract (prefill/prefix reuse), not of a model. The **reading that re-takes it**, and the
+one that would close BUG-792, is `python3 scripts/agent_context_probe.py --prefill-ab` under the protocol BUG-792
+itself declared, plus the two-call cached-tokens probe used here (5,894-token prompt twice per model; the second call
+read `cached=5,888`). This amendment exists so the buglog carries the route and the re-take command rather than
+leaving the finding with no owner (D-3034/D-3036) — and so the route graph's shrink-only debt does not grow because a
+NEW finding was recorded without its artifact.

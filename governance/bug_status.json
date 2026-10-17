@@ -1180,7 +1180,7 @@
     },
     {
       "id": "BUG-885",
-      "title": "(MED, OPEN 2026-10-17) \u2014 THE DECLARED `disproven` PREFIX-CACHE STATE NO LONGER REPRODUCES: the server served 5,888 of 5,894 prompt tokens",
+      "title": "(MED, OPEN 2026-10-17) \u2014 `pipeline/harness_contract.py`'s DECLARED `disproven` PREFIX-CACHE STATE NO LONGER REPRODUCES: the server served",
       "events": 1
     }
   ],

@@ -241,4 +241,4 @@ C15 append-to-handoffs required: **True** (threshold 5).
 | BUG-876 | (MED, OPEN 2026-10-17) — THE ATTRIBUTION CONTROL CANNOT GO GREEN ON THE REGISTRY IT MEASURES | 1 |
 | BUG-877 | (MED, OPEN 2026-10-17) — A GOVERNED WRITE TO THE HARNESS HOME DOES NOT SURVIVE: scripts/check_harness_homes.py reads CONFLICT again, and no | 1 |
 | BUG-879 | (LOW, OPEN 2026-10-17) — THE BIRTH RECORD NAMES A STDIO MEMBER BY ITS COMMAND, SO `scripts/goose_profile.py --born` CANNOT DISTINGUISH TWO | 1 |
-| BUG-885 | (MED, OPEN 2026-10-17) — THE DECLARED `disproven` PREFIX-CACHE STATE NO LONGER REPRODUCES: the server served 5,888 of 5,894 prompt tokens | 1 |
+| BUG-885 | (MED, OPEN 2026-10-17) — `pipeline/harness_contract.py`'s DECLARED `disproven` PREFIX-CACHE STATE NO LONGER REPRODUCES: the server served | 1 |
